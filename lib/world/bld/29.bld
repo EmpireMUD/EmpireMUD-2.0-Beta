@@ -1,0 +1,133 @@
+#2908
+Imperial Carriage~
+Inside the Carriage~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+C
+disembark~
+D
+   This carriage is spacious. Every seat is velvet, and the curtains protect
+your fine skin from the sun. Truly this is how an emperor was meant to ride:
+with all the luxuries and comforts of home.
+~
+S
+#2911
+Pigeon Station~
+The Ship's Pigeon Station~
+~
+0 0 aH 0
+0 0 0 -1
+C
+disembark, mail~
+D
+   This part of this ship is slightly foul, and is devoted mainly to pigeon
+cages. There is a scribe's desk and writing implements, allowing you to send
+mail on the high sea.
+~
+F
+m
+M
+255 20.00 c
+S
+#2912
+Ship's Forge~
+The Ship's Forge~
+~
+0 0 aH 0
+0 0 0 -1
+C
+disembark, forge, smelt~
+D
+   The walls in this part of the ship are black with soot. It has been
+converted into a forge, although the searing hot pit that is used to smelt and
+forge metal is far too hot for a ship. Surely it has been enchanted so that the
+heroes on this ship have a place to repair their armor.
+~
+F
+hv
+M
+255 20.00 c
+S
+#2913
+Smithy Wagon~
+The Smithy's Wagon~
+&0[  ]~
+1 0 aH 0
+0 0 0 -1
+C
+disembark, forge, smelt~
+D
+   You have reached the final wagon, which devotes much of its space to
+supplies and spare equipment. There is also an anvil and a hot pit that surely
+must be enchanted as it is hot enough to melt iron, but cool enough that it
+doesn't burn down the caravan.
+~
+F
+hv
+S
+#2914
+Bedroom Wagon~
+A Royal Sleeping Wagon~
+&0[  ]~
+1 0 aH 0
+0 0 0 -1
+C
+disembark, sleep~
+D
+   This wagon is darker than the rest, having two layers of heavy curtains and
+tapestries to block the harsh sun. Much of the wagon is filled with a bed fit
+for a king, covered in downy pillows and warm furs.
+~
+F
+d
+S
+#2915
+Galley Wagon~
+The Galley Wagon~
+&0[  ]~
+1 0 aH 0
+0 0 0 -1
+C
+cook, disembark~
+D
+   This wagon has a woodburning stove, a small larder, and some cases of
+provisions. Like the rest of the caravan, this wagon is decked in royal
+curtains and tapestries, accented with gold and silver.
+~
+F
+G
+S
+#2916
+Inside Caravan~
+Inside the Caravan~
+&0[  ]~
+1 0 aH 0
+0 1 0 -1
+C
+disembark, mail~
+D
+   This grand, well-appointed caravan is made up of a series of wagons. Some
+are connected directly, and others have their own team of steeds. This wagon
+looks like something of an office, with a box marked 'pigeon mail' and a desk
+for writing. Royal curtains hang along the sides of the wagon, ensuring you
+never have to see the peasants outside.
+~
+F
+m
+S
+#2917
+On Deck~
+On the Deck~
+~
+0 0 aHR 0
+0 1 0 -1
+C
+disembark, sail~
+D
+You're standing on the deck of the heroic galleon.
+~
+M
+255 20.00 c
+S
+$

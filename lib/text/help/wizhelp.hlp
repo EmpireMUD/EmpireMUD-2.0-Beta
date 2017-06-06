@@ -1,3 +1,20 @@
+"ACCESS LEVEL"
+
+Access levels determine what commands a player can use. This is mainly used for
+immortals. Here is a breakdown of the access levels:
+
+ 1 - Mortal: players
+ 2 - God: an unused system for advanced players
+ 3 - Immortal: the base admin level
+ 4 - Assistant
+ 5 - Co-Implementor: can use virtually all commands and privileges
+ 6 - Implementor: the top access level
+
+Immortals and Assistants don't have access to most of the admin commands.
+Instead, they can be given specific commands with the grant system.
+
+See also: GOD SYSTEM, GRANT
+#d
 ADVANCE
 
 Usage:  advance <victim> <access level>
@@ -44,6 +61,31 @@ Examples:
   > at (0,0) bark  -- There must be no spaces in the coordinates
 
 See also: GOTO
+#d
+AUTOMESSAGE AUTOMSG
+
+Usage: automessage list
+       automessage add <type> [interval] <msg>
+       automessage change <id> <property> <new val>
+       automessage delete <id>
+
+The automessage system allows you to set messages that will display to all
+players at a set time. When you add a one-time or repeating message, there is
+a short "grace period" before the message starts displaying. This gives you
+time to edit typoes or change your mind and delete the message.
+
+Available types are:
+  one-time - Displayed once to each player.
+  login - Displayed every time a player logs in.
+  repeating - Displayed to each player every <interval> minutes. Players do not
+     necessarily all see repeating messages at the same time.
+
+The message will begin with your mud's name in brackets. You can configure the
+color of this header with the 'automessage_color' game config.
+
+This command is grantable.
+
+See also: CONFIGURE, GRANT, MESSAGES
 #d
 AUTOWIZ
 
@@ -269,6 +311,22 @@ This is the history command for the immortal and god channels.
 
 See also: WIZNET, GODNET
 #d
+GOD GODS "GOD SYSTEM"
+
+The god system (access level 2) was originally a group of players who could
+teleport around the map and create items. Gods were empowered by items that
+mortals sacrificed to them, and could only create items using raw materials
+from the sacrifices.
+
+There have been no changes, maintenance, or improvements to the god system in
+EmpireMUD 2.0 and it is not considered operational. Concerns that would have
+to be addressed include:
+ - It's currently possible to get infinite resources by creating items that can
+   be broken down or crafted into multiple other items, then sacrificing those
+   items again.
+ - Gods can't be hurt by anyone other than gods, so adventures would be far too
+   easy.
+#
 GODNET
 
 The gods' communication channel.
@@ -300,11 +358,14 @@ Examples:
 
 See also: GRANT, POOFIN, POOFOUT, WIZAT
 #d
-GRANTS
+GRANT GRANTS
+
+Usage:  set <name> grants [add | remove] <grants>
 
 Grants allow a player to use commands that are above his or her privilege
 level. Grants can be added or removed using the "set" command. Mortals can also
 be granted access to some immortal commands, but this isn't always a good idea.
+You can see a person's grants by using 'stat' on them.
 
 Most of the grant names correspond to actual commands, but some are special:
  empires - Allows eedit, edelete, moveeinv, and more.
@@ -312,7 +373,8 @@ Most of the grant names correspond to actual commands, but some are special:
  olc-controls - Allows .setflags, .setminvnum, and .setmaxvnum.
  transfer - Allows moving mortals with commands like transfer and portal.
 
-Try 'helpsearch grantable' to find grantable commands.
+Try 'helpsearch grantable' to find grantable commands. You can also type
+'set <name> grants' with no other arguments to see a list of grants.
 
 See also: OLC-CONTROLS
 #d
@@ -415,15 +477,15 @@ INVIS INVISIBLE
 Usage:  invis [level]
 
 INVIS sets your invisibility level. With no argument, invis toggles between
-making you fully visible and fully invisible. If you specify a level, only
-people at and above the level you specify will be able to see you.
+making you fully visible and fully invisible. If you specify an access level,
+only people at and above the level you specify will be able to see you.
 
 Examples:
 
   > invis
   > invis 3
 
-See also: INCOGNITO, INVSTART, VISIBLE, WIZHIDE
+See also: ACCESS LEVEL, INCOGNITO, INVSTART, VISIBLE, WIZHIDE
 #d
 INVSTART INVISSTART "INVIS START" "INV START" "START INVISIBLE"
 
@@ -756,11 +818,13 @@ age            BOTH    NUMBER       Player age
 bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
+currency       PC      MISC         Sets amounts of adventure currencies
 faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
-level          PC      NUMBER       Player's immortal level
+learned        PC      MISC         Turns learned recipes on/off
+access         PC      NUMBER       Player's immortal access level
 loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
 password       PC      STRING       Change password
@@ -801,7 +865,15 @@ wizhide        PC      BINARY       Turns on/off wizhide
 
 scale          NPC     NUMBER       Rescales a mob to a given level
 
-See also: GRANT, STAT
+See also: ACCESS LEVEL, GRANT, STAT
+#d
+"SET CURRENCY" "SET CURRENCIES"
+
+Usage:  set [file] <player> currency <vnum> <amount>
+
+This allows you to change the amount of an adventure currency the player has.
+
+See also: COINS, SHOW CURRENCY
 #d
 "SET FACTION"
 
@@ -814,6 +886,15 @@ level (e.g. "Revered") or specific point value.
 You can delete a reputation entirely by setting it to 'none'.
 
 See also: FACTION, SHOW FACTIONS
+#d
+"SET LEARNED"
+
+Usage:  set [file] <player> learned <craft vnum> <on | off>
+
+This lets you give (or revoke) learned crafts. The craft must have the
+LEARNED flag.
+
+See also: LEARN, LEARNED, SHOW LEARNED
 #d
 SHOW
 
@@ -828,10 +909,12 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
 components Immort   Shows all items matching a component type (and flags).
+currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+learned    Immort   Shows you learned recipes.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
@@ -878,6 +961,14 @@ If you specify any flags, all those flags must match the output.
 For a list of component types, see: HELP COMPONENT TYPES
 For a list of component flags, see: HELP COMPONENT FLAGS
 #e
+"SHOW CURRENCY" "SHOW CURRENCIES"
+
+Usage:  show currency <player>
+
+This shows all the coins and adventure currencies owned by the player.
+
+See also: SET CURRENCY
+#e
 "SHOW DAILYCYCLE" "SHOW DAILY CYCLE"
 
 Usage:  show dailycycle <number>
@@ -911,6 +1002,14 @@ The immortal version of the 'islands' command; useful for MOVEEINV. You can use
 an empire's leaderboard rank in place of its name, but not vnum.
 
 See also: ISLANDS, MOVEEINV
+#e
+"SHOW LEARNED"
+
+Usage:  show learned <player> [search phrase]
+
+Shows you the recipes learned by a player.
+
+See also: SET LEARNED
 #e
 "SHOW NOTES"
 
@@ -1222,8 +1321,8 @@ specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, faction, global, mob, morph, obj, quest,
-                 roomtemplate, sector, skill, social, trigger, vehicle
+                 class, crop, faction, global, generic, mob, morph, obj, quest,
+                 roomtemplate, sector, shop, skill, social, trigger, vehicle
 
 Examples:
 
@@ -1244,8 +1343,8 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, faction, global, mob, morph, obj, quest,
-                 roomtemplate, sector, skill, social, trigger, vehicle
+                 class, crop, faction, global, generic, mob, morph, obj, quest,
+                 roomtemplate, sector, shop, skill, social, trigger, vehicle
 
 Examples:
 

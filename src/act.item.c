@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 
 /**
 * Contents:
@@ -40,16 +41,17 @@
 */
 
 // extern variables
-extern const char *drinks[];
-extern int drink_aff[][3];
 extern const char *extra_bits[];
 extern const char *mob_move_types[];
+extern struct faction_reputation_type reputation_levels[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
+extern struct shop_temp_list *build_available_shop_list(char_data *ch);
 extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void expire_trading_post_item(struct trading_post_data *tpd);
+void free_shop_temp_list(struct shop_temp_list *list);
 extern char *get_room_name(room_data *room, bool color);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 void read_vault(empire_data *emp);
@@ -202,20 +204,37 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 *
 * @param char_data *ch The person getting obj.
 * @param obj_data *obj The item being picked up.
+* @return bool TRUE if the obj was extracted, FALSE if it stays.
 */
-void get_check_money(char_data *ch, obj_data *obj) {
-	int value = GET_COINS_AMOUNT(obj);
+bool get_check_money(char_data *ch, obj_data *obj) {
 	empire_data *emp = real_empire(GET_COINS_EMPIRE_ID(obj));
+	int value;
 
 	// npcs will keep the obj version
-	if (IS_NPC(ch) || GET_OBJ_TYPE(obj) != ITEM_COINS || value <= 0) {
-		return;
+	if (IS_NPC(ch)) {
+		return FALSE;
 	}
-
+	
+	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_COINS: {
+			value = GET_COINS_AMOUNT(obj);
+			increase_coins(ch, emp, value);
+			msg_to_char(ch, "There %s %s.\r\n", (value == 1 ? "was" : "were"), money_amount(emp, value));
+			break;
+		}
+		case ITEM_CURRENCY: {
+			value = GET_CURRENCY_AMOUNT(obj);
+			add_currency(ch, GET_CURRENCY_VNUM(obj), value);
+			break;
+		}
+		default: {
+			return FALSE;	// nope
+		}
+	}
+	
+	// made it this far
 	extract_obj(obj);
-	increase_coins(ch, emp, value);
-
-	msg_to_char(ch, "There %s %s.\r\n", (value == 1 ? "was" : "were"), money_amount(emp, value));
+	return TRUE;
 }
 
 
@@ -251,7 +270,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
 	extern const char *climate_types[];
-	extern const char *drinks[];
+	extern const char *craft_types[];
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
@@ -364,11 +383,17 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "Affects: %s\r\n", buf);
 	}
 	
+	// ITEM_x: identify obj
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_POISON: {
 			extern const struct poison_data_type poison_data[];
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
+			msg_to_char(ch, "Teaches craft: %s (%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:
@@ -384,7 +409,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		case ITEM_DRINKCON:
 			if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-				msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+				msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			}
 			else {
 				msg_to_char(ch, "It is empty.\r\n");
@@ -421,6 +446,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		case ITEM_COINS: {
 			msg_to_char(ch, "Contains %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj)));
+			break;
+		}
+		case ITEM_CURRENCY: {
+			msg_to_char(ch, "Amount: %d %s\r\n", GET_CURRENCY_AMOUNT(obj), get_generic_string_by_vnum(GET_CURRENCY_VNUM(obj), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(obj))));
 			break;
 		}
 		case ITEM_MISSILE_WEAPON:
@@ -1515,7 +1544,7 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 		case drink_OBJ:
 			sprintf(buf, "$n %s from $p.", subcmd == SCMD_SIP ? "sips" : "drinks");
 			act(buf, TRUE, ch, obj, 0, TO_ROOM);
-			msg_to_char(ch, "You %s the %s.\r\n", subcmd == SCMD_SIP ? "sip" : "drink", drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+			msg_to_char(ch, "You %s the %s.\r\n", subcmd == SCMD_SIP ? "sip" : "drink", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 
 			*liq = GET_DRINK_CONTAINER_TYPE(obj);
 			break;
@@ -1527,7 +1556,7 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 	}
 
 	if (subcmd == SCMD_SIP) {
-		msg_to_char(ch, "It tastes like %s.\r\n", drinks[*liq]);
+		msg_to_char(ch, "It tastes like %s.\r\n", get_generic_string_by_vnum(*liq, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 }
 
@@ -2075,13 +2104,13 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 * @return room_data* The found docks room, or NULL for none.
 */
 room_data *find_docks(empire_data *emp, int island_id) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	
 	if (!emp || island_id == NO_ISLAND) {
 		return NULL;
 	}
 	
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (GET_ISLAND_ID(ter->room) != island_id) {
 			continue;
 		}
@@ -2107,7 +2136,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 * @return vehicle_data* A ship, or NULL if none.
 */
 vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	struct shipping_data *iter;
 	bool already_used;
 	vehicle_data *veh;
@@ -2117,7 +2146,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		return NULL;
 	}
 	
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
 			continue;
 		}
@@ -2233,7 +2262,7 @@ vehicle_data *find_ship_by_shipping_id(empire_data *emp, int shipping_id) {
 * @return room_data* The ship holding pen.
 */
 room_data *get_ship_pen(void) {
-	extern room_data *create_room();
+	extern room_data *create_room(room_data *home);
 
 	room_data *room, *iter;
 	
@@ -2244,8 +2273,10 @@ room_data *get_ship_pen(void) {
 	}
 	
 	// did not find -- make one
-	room = create_room();
+	room = create_room(NULL);
 	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room, TRUE);
+	GET_ISLAND_ID(room) = NO_ISLAND;
+	GET_ISLAND(room) = NULL;
 	
 	return room;
 }
@@ -3513,6 +3544,117 @@ void warehouse_store(char_data *ch, char *argument) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+ACMD(do_buy) {
+	char buf[MAX_STRING_LENGTH], orig_arg[MAX_INPUT_LENGTH];
+	struct shop_temp_list *stl, *shop_list = NULL;
+	empire_data *coin_emp = NULL;
+	struct shop_item *item;
+	obj_data *obj;
+	int number;
+	
+	skip_spaces(&argument);	// optional filter
+	strcpy(orig_arg, argument);
+	number = get_number(&argument);	// x.name syntax
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs don't buy.\r\n");
+		return;
+	}
+	if (FIGHTING(ch)) {
+		msg_to_char(ch, "You can't do that right now!\r\n");
+		return;
+	}
+	if (!*argument) {
+		msg_to_char(ch, "Buy what?\r\n");
+		return;
+	}
+	
+	// find shops: MUST free this before returning
+	shop_list = build_available_shop_list(ch);
+	
+	// now show any shops available
+	LL_FOREACH(shop_list, stl) {		
+		// the nopes
+		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;	// in-dev
+		}
+		
+		// list of items
+		LL_FOREACH(SHOP_ITEMS(stl->shop), item) {
+			if (!(obj = obj_proto(item->vnum))) {
+				continue;	// no obj
+			}
+			if (!multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+				continue;
+			}
+			if (--number > 0) {
+				continue;
+			}
+			
+			// we have validated which object. Now try to afford it:
+			if (SHOP_ALLEGIANCE(stl->shop) && item->min_rep != REP_NONE && !has_reputation(ch, FCT_VNUM(SHOP_ALLEGIANCE(stl->shop)), item->min_rep)) {
+				msg_to_char(ch, "You must be at least %s by %s to buy %s.\r\n", reputation_levels[rep_const_to_index(item->min_rep)].name, FCT_NAME(SHOP_ALLEGIANCE(stl->shop)), GET_OBJ_SHORT_DESC(obj));
+				free_shop_temp_list(shop_list);
+				return;
+			}
+			if (item->currency == NOTHING) {
+				coin_emp = (stl->from_mob ? GET_LOYALTY(stl->from_mob) : (stl->from_room ? ROOM_OWNER(stl->from_room) : NULL));
+				if (!can_afford_coins(ch, coin_emp, item->cost)) {
+					msg_to_char(ch, "You need %s to buy %s.\r\n", money_amount(coin_emp, item->cost), GET_OBJ_SHORT_DESC(obj));
+					free_shop_temp_list(shop_list);
+					return;
+				}
+			}
+			else if (item->currency != NOTHING && get_currency(ch, item->currency) < item->cost) {
+				msg_to_char(ch, "You need %d %s to buy %s.\r\n", item->cost, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)), GET_OBJ_SHORT_DESC(obj));
+				free_shop_temp_list(shop_list);
+				return;
+			}
+			else if (!CAN_CARRY_OBJ(ch, obj)) {
+				msg_to_char(ch, "Your arms are already full!\r\n");
+				free_shop_temp_list(shop_list);
+				return;
+			}
+			
+			// load the object before the buy trigger, in case
+			obj = read_object(item->vnum, TRUE);
+			obj_to_char(obj, ch);
+			scale_item_to_level(obj, get_approximate_level(ch));
+			
+			if (!check_buy_trigger(ch, stl->from_mob, obj, item->cost, item->currency)) {
+				// triggered: purchase failed
+				extract_obj(obj);
+				return;
+			}
+			
+			// finish the purchase
+			if (item->currency == NOTHING) {
+				charge_coins(ch, coin_emp, item->cost, NULL);
+				sprintf(buf, "You buy $p for %s.", money_amount(coin_emp, item->cost));
+			}
+			else {
+				add_currency(ch, item->currency, -(item->cost));
+				sprintf(buf, "You buy $p for %d %s.", item->cost, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)));
+			}
+			
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n buys $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			if (!get_check_money(ch, obj)) {
+				load_otrigger(obj);
+			}
+			
+			free_shop_temp_list(shop_list);
+			return;	// done now
+		}
+	}
+	
+	// did we make it this far?
+	msg_to_char(ch, "You don't see any %s for sale here.\r\n", orig_arg);
+	free_shop_temp_list(shop_list);
+}
+
+
 ACMD(do_combine) {
 	char arg[MAX_INPUT_LENGTH];
 	obj_data *obj;
@@ -3704,14 +3846,14 @@ ACMD(do_drink) {
 		// drinking blood?
 		amount = GET_MAX_BLOOD(ch) - GET_BLOOD(ch);
 	}
-	else if ((drink_aff[liquid][THIRST] > 0 && GET_COND(ch, THIRST) == UNLIMITED) || (drink_aff[liquid][FULL] > 0 && GET_COND(ch, FULL) == UNLIMITED) || (drink_aff[liquid][DRUNK] > 0 && GET_COND(ch, DRUNK) == UNLIMITED)) {
+	else if ((get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) > 0 && GET_COND(ch, THIRST) == UNLIMITED) || (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) > 0 && GET_COND(ch, FULL) == UNLIMITED) || (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) > 0 && GET_COND(ch, DRUNK) == UNLIMITED)) {
 		// if theirs is unlimited
 		amount = 1;
 	}
 	else {
 		// how many hours of thirst I have, divided by how much thirst it gives per hour
-		thirst_amt = GET_COND(ch, THIRST) == UNLIMITED ? 1 : (((double) GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR) / (double) drink_aff[liquid][THIRST]);
-		hunger_amt = GET_COND(ch, FULL) == UNLIMITED ? 1 : (((double) GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR) / (double) drink_aff[liquid][FULL]);
+		thirst_amt = GET_COND(ch, THIRST) == UNLIMITED ? 1 : (((double) GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR) / (double) get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST));
+		hunger_amt = GET_COND(ch, FULL) == UNLIMITED ? 1 : (((double) GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR) / (double) get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL));
 		
 		// poor man's round-up
 		if (((int)(thirst_amt * 10)) % 10 > 0) {
@@ -3726,7 +3868,7 @@ ACMD(do_drink) {
 		amount = MAX((int)thirst_amt, (int)hunger_amt);
 	
 		// if it causes drunkenness, minimum of 1
-		if (drink_aff[liquid][DRUNK] > 0) {
+		if (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) > 0) {
 			amount = MAX(1, amount);
 		}
 	}
@@ -3744,19 +3886,19 @@ ACMD(do_drink) {
 	}
 	
 	// -1 to remove condition, amount = number of gulps
-	gain_condition(ch, THIRST, -1 * drink_aff[liquid][THIRST] * REAL_UPDATES_PER_MUD_HOUR * amount);
-	gain_condition(ch, FULL, -1 * drink_aff[liquid][FULL] * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, THIRST, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, FULL, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) * REAL_UPDATES_PER_MUD_HOUR * amount);
 	// drunk goes positive instead of negative
-	gain_condition(ch, DRUNK, 1 * drink_aff[liquid][DRUNK] * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, DRUNK, 1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) * REAL_UPDATES_PER_MUD_HOUR * amount);
 
 	// messages based on what changed
-	if (GET_COND(ch, DRUNK) > 150 && drink_aff[liquid][DRUNK] != 0) {
+	if (GET_COND(ch, DRUNK) > 150 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) != 0) {
 		send_to_char("You feel drunk.\r\n", ch);
 	}
-	if (GET_COND(ch, THIRST) < 75 && drink_aff[liquid][THIRST] != 0) {
+	if (GET_COND(ch, THIRST) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) != 0) {
 		send_to_char("You don't feel thirsty any more.\r\n", ch);
 	}
-	if (GET_COND(ch, FULL) < 75 && drink_aff[liquid][FULL] != 0) {
+	if (GET_COND(ch, FULL) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) != 0) {
 		send_to_char("You are full.\r\n", ch);
 	}
 
@@ -4597,6 +4739,124 @@ ACMD(do_light) {
 }
 
 
+ACMD(do_list) {
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH];
+	struct shop_temp_list *stl, *shop_list = NULL;
+	struct shop_item *item;
+	bool any, this;
+	obj_data *obj;
+	size_t size;
+	bool ok;
+	
+	skip_spaces(&argument);	// optional filter
+	
+	// find shops
+	shop_list = build_available_shop_list(ch);
+	any = FALSE;
+	
+	if (*argument) {
+		snprintf(matching, sizeof(matching), " items matching '%s'", argument);
+	}
+	else {
+		*matching = '\0';
+	}
+	
+	size = 0;
+	*buf = '\0';
+
+	// now show any shops available
+	LL_FOREACH(shop_list, stl) {
+		this = FALSE;
+		
+		// the nopes
+		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;	// in-dev
+		}
+		
+		// list of items
+		LL_FOREACH(SHOP_ITEMS(stl->shop), item) {
+			if (!(obj = obj_proto(item->vnum))) {
+				continue;	// no obj
+			}
+			if (*argument) {	// search option
+				ok = multi_isname(argument, GET_OBJ_KEYWORDS(obj));
+				if (!ok) {
+					ok = (item->currency == NOTHING && !str_cmp(argument, "coins"));
+				}
+				if (!ok) {
+					ok = multi_isname(argument, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)));
+				}
+				
+				if (!ok) {
+					continue;	// search option
+				}
+			}
+			
+			if (!this) {
+				this = TRUE;
+				
+				if (SHOP_ALLEGIANCE(stl->shop)) {
+					snprintf(rep, sizeof(rep), " (%s)", FCT_NAME(SHOP_ALLEGIANCE(stl->shop)));
+				}
+				else {
+					*rep = '\0';
+				}
+				
+				if (stl->from_mob) {
+					strcpy(tmp, PERS(stl->from_mob, ch, FALSE));
+					snprintf(line, sizeof(line), "%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), rep, matching);
+				}
+				else if (stl->from_obj) {
+					strcpy(tmp, GET_OBJ_SHORT_DESC(stl->from_obj));
+					snprintf(line, sizeof(line), "%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), rep, matching);
+				}
+				else {
+					snprintf(line, sizeof(line), "%sYou can %sbuy%s%s:\r\n", (*buf ? "\r\n" : ""), (*buf ? "also " : ""), rep, matching);
+				}
+				
+				if (size + strlen(line) < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+					any = TRUE;
+				}
+				else {
+					break;
+				}
+			}
+			
+			if (SHOP_ALLEGIANCE(stl->shop) && item->min_rep != REP_NONE) {
+				snprintf(rep, sizeof(rep), ", %s reputation", reputation_levels[rep_const_to_index(item->min_rep)].name);
+			}
+			else {
+				*rep = '\0';
+			}
+			
+			snprintf(line, sizeof(line), " - %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+				any = TRUE;
+			}
+			else {
+				break;
+			}
+		}
+	}
+
+	if (any) {
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	else {
+		msg_to_char(ch, "There's nothing for sale here%s.\r\n", (*argument ? " by that name" : ""));
+	}
+
+	free_shop_temp_list(shop_list);
+}
+
+
 ACMD(do_pour) {	
 	char arg1[MAX_INPUT_LENGTH];
 	char arg2[MAX_INPUT_LENGTH];
@@ -4690,11 +4950,13 @@ ACMD(do_pour) {
 
 			/* If it's a trench, fill her up */
 			if (GET_DRINK_CONTAINER_TYPE(from_obj) == LIQ_WATER && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
-				add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, GET_DRINK_CONTAINER_CONTENTS(from_obj));
-
-				if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= config_get_int("trench_full_value")) {
-					void fill_trench(room_data *room);
-					fill_trench(IN_ROOM(ch));
+				add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_FILL_TIME, -25 * GET_DRINK_CONTAINER_CONTENTS(from_obj));
+				if (find_stored_event(SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL)) {
+					cancel_stored_event(&SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL);
+				}
+				if (GET_MAP_LOC(IN_ROOM(ch))) {	// can this be null?
+					void schedule_trench_fill(struct map_data *map);
+					schedule_trench_fill(GET_MAP_LOC(IN_ROOM(ch)));
 				}
 			}
 
@@ -4729,7 +4991,7 @@ ACMD(do_pour) {
 		return;
 	}
 	if (subcmd == SCMD_POUR) {
-		sprintf(buf, "You pour the %s into %s.", drinks[GET_DRINK_CONTAINER_TYPE(from_obj)], GET_OBJ_SHORT_DESC(to_obj));
+		sprintf(buf, "You pour the %s into %s.", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(from_obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), GET_OBJ_SHORT_DESC(to_obj));
 		send_to_char(buf, ch);
 	}
 	if (subcmd == SCMD_FILL) {

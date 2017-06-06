@@ -48,6 +48,7 @@ extern int top_account_id;
 extern int top_idnum;
 
 // external funcs
+void add_learned_craft(char_data *ch, any_vnum vnum);
 ACMD(do_slash_channel);
 void update_class(char_data *ch);
 
@@ -734,6 +735,8 @@ void free_char(char_data *ch) {
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct player_slash_history *slash_hist, *next_slash_hist;
+	struct player_craft_data *pcd, *next_pcd;
+	struct player_currency *cur, *next_cur;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
 	struct offer_data *offer;
@@ -905,6 +908,14 @@ void free_char(char_data *ch) {
 			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
 		}
+		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+			HASH_DEL(GET_CURRENCIES(ch), cur);
+			free(cur);
+		}
+		HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
+			free(pcd);
+		}
 		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
 			HASH_DEL(GET_MOUNT_LIST(ch), mount);
 			free(mount);
@@ -1049,6 +1060,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct mail_data *mail, *last_mail = NULL;
 	struct player_completed_quest *plrcom;
 	struct player_ability_data *abildata;
+	struct player_automessage *automsg;
 	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
@@ -1059,7 +1071,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	bool end = FALSE;
 	obj_data *obj;
 	double dbl_in;
-	long l_in[2];
+	long l_in[3];
 	char c_in;
 	
 	// allocate player if we didn't receive one
@@ -1192,11 +1204,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Affect:", length)) {
-					sscanf(line + length + 1, "%d %d %d %d %d %s", &i_in[0], &i_in[1], &i_in[2], &i_in[3], &i_in[4], str_in);
+					sscanf(line + length + 1, "%d %d %ld %d %d %s", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], str_in);
 					CREATE(af, struct affected_type, 1);
 					af->type = i_in[0];
 					af->cast_by = i_in[1];
-					af->duration = i_in[2];
+					af->duration = l_in[2];
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
@@ -1246,6 +1258,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 							break;
 						}
 					}
+				}
+				else if (PFILE_TAG(line, "Automessage:", length)) {
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
+					CREATE(automsg, struct player_automessage, 1);
+					automsg->id = i_in[0];
+					automsg->timestamp = l_in[0];
+					HASH_ADD_INT(GET_AUTOMESSAGES(ch), id, automsg);
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -1337,6 +1356,15 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						GET_CUSTOM_COLOR(ch, num) = c_in;
 					}
 				}
+				else if (PFILE_TAG(line, "Currency:", length)) {
+					struct player_currency *cur;
+					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					
+					CREATE(cur, struct player_currency, 1);
+					cur->vnum = i_in[0];
+					cur->amount = i_in[1];
+					HASH_ADD_INT(GET_CURRENCIES(ch), vnum, cur);
+				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
@@ -1371,11 +1399,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "DoT Effect:", length)) {
-					sscanf(line + length + 1, "%d %d %d %d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
+					sscanf(line + length + 1, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
 					CREATE(dot, struct over_time_effect_type, 1);
 					dot->type = i_in[0];
 					dot->cast_by = i_in[1];
-					dot->duration = i_in[2];
+					dot->duration = l_in[2];
 					dot->damage_type = i_in[3];
 					dot->damage = i_in[4];
 					dot->stack = i_in[5];
@@ -1517,6 +1545,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Last Corpse Id:", length)) {
 					GET_LAST_CORPSE_ID(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Learned Craft:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						add_learned_craft(ch, i_in[0]);
+					}
 				}
 				else if (PFILE_TAG(line, "Load Room:", length)) {
 					GET_LOADROOM(ch) = atoi(line + length + 1);
@@ -1940,7 +1973,7 @@ void remove_player_from_table(player_index_data *plr) {
 void save_char(char_data *ch, room_data *load_room) {
 	char filename[256], tempname[256];
 	player_index_data *index;
-	room_data *map;
+	struct map_data *map;
 	FILE *fl;
 
 	if (IS_NPC(ch)) {
@@ -1951,8 +1984,8 @@ void save_char(char_data *ch, room_data *load_room) {
 	if (!PLR_FLAGGED(ch, PLR_LOADROOM)) {
 		if (load_room) {
 			GET_LOADROOM(ch) = GET_ROOM_VNUM(load_room);
-			map = get_map_location_for(load_room);
-			GET_LOAD_ROOM_CHECK(ch) = (map ? GET_ROOM_VNUM(map) : NOWHERE);
+			map = GET_MAP_LOC(load_room);
+			GET_LOAD_ROOM_CHECK(ch) = (map ? map->vnum : NOWHERE);
 		}
 		else {
 			GET_LOADROOM(ch) = NOWHERE;
@@ -2099,6 +2132,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct player_craft_data *pcd, *next_pcd;
+	struct player_currency *cur, *next_cur;
 	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
@@ -2141,12 +2176,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// unaffect: affects
 	af_list = NULL;
 	while ((af = ch->affected)) {
-		if (af->type > ATYPE_RESERVED && af->type < NUM_ATYPES) {
-			CREATE(new_af, struct affected_type, 1);
-			*new_af = *af;
-			new_af->next = af_list;
-			af_list = new_af;
-		}
+		CREATE(new_af, struct affected_type, 1);
+		*new_af = *af;
+		new_af->next = af_list;
+		af_list = new_af;
+		
 		affect_remove(ch, af);
 	}
 	
@@ -2222,7 +2256,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
 	for (af = af_list; af; af = af->next) {	// stored earlier
-		fprintf(fl, "Affect: %d %d %d %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
 	}
 	fprintf(fl, "Affect Flags: %s\n", bitv_to_alpha(AFF_FLAGS(ch)));
 	if (GET_APPARENT_AGE(ch)) {
@@ -2272,6 +2306,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_CREATION_HOST(ch)) {
 		fprintf(fl, "Creation Host: %s\n", GET_CREATION_HOST(ch));
 	}
+	HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+		fprintf(fl, "Currency: %d %d\n", cur->vnum, cur->amount);
+	}
 	
 	// 'D'
 	fprintf(fl, "Daily Cycle: %d\n", GET_DAILY_CYCLE(ch));
@@ -2288,7 +2325,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Disguised Sex: %s\n", genders[(int) GET_DISGUISED_SEX(ch)]);
 	}
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		fprintf(fl, "DoT Effect: %d %d %d %d %d %d %d\n", dot->type, dot->cast_by, dot->duration, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
+		fprintf(fl, "DoT Effect: %d %d %ld %d %d %d %d\n", dot->type, dot->cast_by, dot->duration, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
 	}
 	
 	// 'E'
@@ -2343,6 +2380,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_LASTNAME(ch)) {
 		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
+	}
+	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+		fprintf(fl, "Learned Craft: %d\n", pcd->vnum);
 	}
 	fprintf(fl, "Load Room: %d\n", GET_LOADROOM(ch));
 	fprintf(fl, "Load Room Check: %d\n", GET_LOAD_ROOM_CHECK(ch));
@@ -2497,6 +2537,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct player_completed_quest *plrcom, *next_plrcom;
+	struct player_automessage *automsg, *next_automsg;
 	struct player_slash_history *psh, *next_psh;
 	struct player_faction_data *pfd, *next_pfd;
 	struct channel_history_data *hist;
@@ -2523,6 +2564,9 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'A'
 	for (alias = GET_ALIASES(ch); alias; alias = alias->next) {
 		fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias->type, strlen(alias->alias), strlen(alias->replacement)-1, alias->alias, alias->replacement + 1);
+	}
+	HASH_ITER(hh, GET_AUTOMESSAGES(ch), automsg, next_automsg) {
+		fprintf(fl, "Automessage: %d %ld\n", automsg->id, automsg->timestamp);
 	}
 	
 	// 'C'
@@ -2958,6 +3002,50 @@ void announce_login(char_data *ch) {
 
 
 /**
+* Checks that all a player's learned crafts are valid.
+*
+* @param char_data *ch The player to check.
+*/
+void check_learned_crafts(char_data *ch) {
+	void remove_learned_craft(char_data *ch, any_vnum vnum);
+	
+	struct player_craft_data *pcd, *next_pcd;
+	craft_data *craft;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+
+	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+		if (!(craft = craft_proto(pcd->vnum)) || !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+			remove_learned_craft(ch, pcd->vnum);
+		}
+	}
+}
+
+
+/**
+* Checks that all a player's currencies are valid.
+*
+* @param char_data *ch The player to check.
+*/
+void check_currencies(char_data *ch) {
+	struct player_currency *cur, *next_cur;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+		if (!find_generic(cur->vnum, GENERIC_CURRENCY)) {
+			HASH_DEL(GET_CURRENCIES(ch), cur);
+			free(cur);
+		}
+	}
+}
+
+
+/**
 * Ensures that all of a player's skills and abilities exist, and updates their
 * class. This should be called on login.
 */
@@ -3201,7 +3289,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
-	room_data *load_room = NULL, *map_loc;
+	room_data *load_room = NULL;
 	char_data *ch = d->character, *repl;
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
@@ -3259,8 +3347,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		
 		// this verifies they are still in the same map location as where they logged out
 		if (load_room && !PLR_FLAGGED(ch, PLR_LOADROOM)) {
-			map_loc = get_map_location_for(load_room);
-			if (GET_LOAD_ROOM_CHECK(ch) == NOWHERE || !map_loc || GET_ROOM_VNUM(map_loc) != GET_LOAD_ROOM_CHECK(ch)) {
+			if (GET_LOAD_ROOM_CHECK(ch) == NOWHERE || !GET_MAP_LOC(load_room) || GET_MAP_LOC(load_room)->vnum != GET_LOAD_ROOM_CHECK(ch)) {
 				// ensure they are on the same continent they used to be when it finds them a new loadroom
 				GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
 				load_room = NULL;
@@ -3438,8 +3525,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
 	
-	// ensure quests are up-to-date
+	// ensure data is up-to-date
 	refresh_all_quests(ch);
+	check_learned_crafts(ch);
+	check_currencies(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {

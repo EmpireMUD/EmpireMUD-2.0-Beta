@@ -97,29 +97,15 @@ purges itself.
 0 0
 T 18207
 S
-#18208
-pouch chelonian shell token~
-a chelonian shell token pouch~
-A chelonian shell token pouch is lying here.~
-   This pouch holds chelonian shell tokens from the Guild of Adventurers. You
-can spend these tokens at the guildmasters' shops in the Tipsy Tortoise Tavern.
-Type 'list' at any of the guildmasters there, and use 'buy' to make a purchase.
-~
-3 p a 3
-0 0 0
-7 0
-T 18208
-S
 #18209
 token shell chelonian single~
 a chelonian shell token~
 A single chelonian shell token is lying here.~
 These tokens are used in the shop aboard the Tipsy Tortoise Tavern.
 ~
-3 p a 4
-0 0 0
+12 p a 5
+1 18200 0
 0 0
-T 18209
 S
 #18210
 bauble frivolous~

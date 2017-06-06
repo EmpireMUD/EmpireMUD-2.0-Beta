@@ -479,7 +479,7 @@ void summon_materials(char_data *ch, char *argument) {
 		return;
 	}
 	
-	if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
+	if (!GET_ISLAND(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't summon materials here.\r\n");
 		return;
 	}
@@ -1640,7 +1640,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			msg_to_char(ch, "Your home teleportation is still on cooldown.\r\n");
 			return FALSE;
 		}
-		else if (!(map = get_map_location_for(to_room))) {
+		else if (!(map = (GET_MAP_LOC(to_room) ? real_room(GET_MAP_LOC(to_room)->vnum) : NULL))) {
 			msg_to_char(ch, "You can't teleport home right now.\r\n");
 			return FALSE;
 		}
@@ -1708,7 +1708,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		++tries;
 	}
 	
-	if (!to_room || !can_teleport_to(ch, to_room, TRUE) || !(map = get_map_location_for(to_room))) {
+	if (!to_room || !can_teleport_to(ch, to_room, TRUE) || !(map = (GET_MAP_LOC(to_room) ? real_room(GET_MAP_LOC(to_room)->vnum) : NULL))) {
 		msg_to_char(ch, "Teleportation failed: you couldn't find a safe place to teleport.\r\n");
 	}
 	else if (!can_teleport_to(ch, map, FALSE)) {

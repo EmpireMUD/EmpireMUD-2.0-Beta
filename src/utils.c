@@ -49,7 +49,6 @@
 */
 
 // external vars
-extern const char *drinks[];
 extern const char *pool_types[];
 
 // external funcs
@@ -2316,8 +2315,6 @@ void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, 
 * @param struct resource_data **build_used_list Optional: If you need to track the actual resources used, pass a pointer to that list.
 */
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list) {
-	extern const char *res_action_messages[][NUM_APPLY_RES_TYPES][2];
-	
 	bool messaged_char = FALSE, messaged_room = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	int amt;
@@ -2326,7 +2323,7 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		return;	// nothing to do
 	}
 	
-	// APPLPY_RES_x: send custom messages (only) now
+	// APPLY_RES_x: send custom messages (only) now
 	if (use_obj) {
 		switch (msg_type) {
 			case APPLY_RES_BUILD: {
@@ -2457,6 +2454,19 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			res->amount = 0;	// cost paid in full
 			break;
 		}
+		case RES_CURRENCY: {
+			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "You spend %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "$n spends %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			add_currency(ch, res->vnum, -(res->amount));
+			res->amount = 0;	// paid all at once
+			break;
+		}
 		case RES_POOL: {
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
 				snprintf(buf, sizeof(buf), "You spend %d %s point%s.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
@@ -2483,11 +2493,36 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			break;
 		}
 		case RES_ACTION: {
-			if (*res_action_messages[res->vnum][msg_type][0]) {
-				act(res_action_messages[res->vnum][msg_type][0], FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
-			}
-			if (*res_action_messages[res->vnum][msg_type][1]) {
-				act(res_action_messages[res->vnum][msg_type][1], FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+			generic_data *gen = find_generic(res->vnum, GENERIC_ACTION);
+			
+			switch (msg_type) {
+				case APPLY_RES_BUILD: {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)) {
+						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_CRAFT: {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_REPAIR: {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
 			}
 			
 			res->amount -= 1;	// only 1 at a time
@@ -2639,6 +2674,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
 					break;
 				}
+				case RES_CURRENCY: {
+					add_currency(ch, res->vnum, -(res->amount));
+					break;
+				}
 				case RES_POOL: {
 					if (build_used_list) {
 						add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
@@ -2745,6 +2784,12 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 				}
 				break;
 			}
+			case RES_CURRENCY: {
+				if (get_currency(ch, res->vnum) >= res->amount) {
+					return res;
+				}
+				break;
+			}
 			case RES_POOL: {
 				// special rule: require that blood or health costs not reduce player below 1
 				amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
@@ -2779,9 +2824,7 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 * @param sturct resource_data *res The resource to display.
 * @return char* A short string including quantity and type.
 */
-char *get_resource_name(struct resource_data *res) {
-	extern const char *res_action_type[];
-	
+char *get_resource_name(struct resource_data *res) {	
 	static char output[MAX_STRING_LENGTH];
 	
 	*output = '\0';
@@ -2797,11 +2840,15 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_LIQUID: {
-			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		}
 		case RES_COINS: {
 			snprintf(output, sizeof(output), money_amount(real_empire(res->vnum), res->amount));
+			break;
+		}
+		case RES_CURRENCY: {
+			snprintf(output, sizeof(output), "%d %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 			break;
 		}
 		case RES_POOL: {
@@ -2809,7 +2856,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_ACTION: {
-			snprintf(output, sizeof(output), "%dx [%s]", res->amount, res_action_type[res->vnum]);
+			snprintf(output, sizeof(output), "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
 			break;
 		}
 		default: {
@@ -2899,6 +2946,11 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 			}
 			case RES_COINS: {
 				increase_coins(ch, real_empire(res->vnum), res->amount / (split ? 2 : 1));
+				last = FALSE;	// cause next obj to refund
+				break;
+			}
+			case RES_CURRENCY: {
+				add_currency(ch, res->vnum, res->amount);
 				last = FALSE;	// cause next obj to refund
 				break;
 			}
@@ -3056,7 +3108,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_LIQUID: {
-									msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), drinks[res->vnum]);
+									msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 									break;
 								}
 							}
@@ -3071,6 +3123,13 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 						if (send_msgs) {
 							msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
 						}
+						ok = FALSE;
+					}
+					break;
+				}
+				case RES_CURRENCY: {
+					if (get_currency(ch, res->vnum) < res->amount) {
+						snprintf(buf, sizeof(buf), "You need %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 						ok = FALSE;
 					}
 					break;
@@ -4358,7 +4417,7 @@ room_data *get_map_location_for(room_data *room) {
 room_data *find_load_room(char_data *ch) {
 	extern room_data *find_starting_location();
 	
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	room_data *rl, *rl_last_room, *found = NULL;
 	int num_found = 0;
 	sh_int island;
@@ -4367,7 +4426,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (room_has_function_and_city_ok(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED) && !BUILDING_BURNING(rl)) {
+		if (room_has_function_and_city_ok(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
 			return rl;
 		}
 	}
@@ -4375,8 +4434,8 @@ room_data *find_load_room(char_data *ch) {
 	// first: look for graveyard
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
-		for (ter = EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)); ter; ter = ter->next) {
-			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !BUILDING_BURNING(ter->room)) {
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
+			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
@@ -4425,10 +4484,10 @@ bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with
 */
 bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance) {
 	int x, y;
-	room_data *shift, *real = get_map_location_for(room);
+	room_data *shift, *real;
 	bool found = FALSE;
 	
-	if (!real) {	// no map location
+	if (!(real = (GET_MAP_LOC(room) ? real_room(GET_MAP_LOC(room)->vnum) : NULL))) {	// no map location
 		return FALSE;
 	}
 	
@@ -4475,13 +4534,13 @@ bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int di
 * @return bool TRUE if the sect is found
 */
 bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance) {
-	room_data *real = get_map_location_for(room);
+	room_data *real;
 	sector_data *find = sector_proto(sect);
 	bool found = FALSE;
 	room_data *shift;
 	int x, y;
 	
-	if (!real) {	// no map location
+	if (!(real = (GET_MAP_LOC(room) ? real_room(GET_MAP_LOC(room)->vnum) : NULL))) {	// no map location
 		return FALSE;
 	}
 	
@@ -4645,41 +4704,6 @@ int get_direction_to(room_data *from, room_data *to) {
 
 
 /**
-* Fetch the island id based on the map location of the room. This was a macro,
-* but get_map_location_for() can return a NULL.
-*
-* @param room_data *room The room to check.
-* @return int The island ID, or NO_ISLAND if none.
-*/
-int GET_ISLAND_ID(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	
-	if (map && GET_ROOM_VNUM(map) < MAP_SIZE) {
-		return world_map[FLAT_X_COORD(map)][FLAT_Y_COORD(map)].island;
-	}
-	else {
-		return NO_ISLAND;
-	}
-}
-
-
-/**
-* Changes the island id of a room.
-*
-* @param room_data *room The room to change the island on.
-* @param int island The island ID to set it to.
-*/
-void SET_ISLAND_ID(room_data *room, int island) {
-	extern bool world_map_needs_save;
-	
-	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].island = island;
-		world_map_needs_save = TRUE;
-	}
-}
-
-
-/**
 * @param room_data *room A room that has existing mine data
 * @return TRUE if the room has a deep mine set up
 */
@@ -4708,7 +4732,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 		return;
 	}
 
-	if (!(icon = use_icon)) {	
+	if (!(icon = use_icon)) {
 		season = pick_season(room);
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), season);
 	}
@@ -4735,7 +4759,7 @@ room_data *real_shift(room_data *origin, int x_shift, int y_shift) {
 		return NULL;
 	}
 	
-	map = get_map_location_for(origin);
+	map = (GET_MAP_LOC(origin) ? real_room(GET_MAP_LOC(origin)->vnum) : NULL);
 	
 	// are we somehow not on the map? if not, don't shift
 	if (!map || GET_ROOM_VNUM(map) >= MAP_SIZE) {
@@ -4854,9 +4878,8 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 * @return int The x-coordinate, or -1 if none.
 */
 int X_COORD(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	if (map) {
-		return FLAT_X_COORD(map);
+	if (GET_MAP_LOC(room)) {
+		return MAP_X_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
 		return -1;
@@ -4872,9 +4895,8 @@ int X_COORD(room_data *room) {
 * @return int The y-coordinate, or -1 if none.
 */
 int Y_COORD(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	if (map) {
-		return FLAT_Y_COORD(map);
+	if (GET_MAP_LOC(room)) {
+		return MAP_Y_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
 		return -1;

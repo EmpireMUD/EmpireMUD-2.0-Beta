@@ -1,0 +1,27 @@
+#2100
+Chop Tutorial~
+   Take your axe and use it to chop down a tree either in a temperate forest or
+a desert grove. Instructions:
+ 1. Make sure you're using the axe (wield axe).
+ 2. Type 'chop'.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+You're well on your way to building an empire.
+~
+4 h 0 15 -1
+A
+2 2100
+A
+2 2101
+R
+0 0 1
+W
+2 120 0 1
+W
+2 122 0 1
+Z
+2 120
+Z
+2 122
+S
+$

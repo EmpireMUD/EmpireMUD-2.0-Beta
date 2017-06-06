@@ -1455,17 +1455,9 @@ if %test% != %self%
 end
 eval room_var %self.room%
 * once per 60 minutes
-if %actor.varexists(last_skycleave_trinket_time)%
-  if (%timestamp% - %actor.last_skycleave_trinket_time%) < 3600
-    eval diff (%actor.last_skycleave_trinket_time% - %timestamp%) + 3600
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
-    halt
-  end
+if %actor.cooldown(10079)%
+  %send% %actor% Your %cooldown.10079% is on cooldown.
+  halt
 end
 eval cycle 0
 while %cycle% >= 0
@@ -1513,8 +1505,7 @@ while %cycle% >= 0
       %teleport% %actor% %loc%
       %force% %actor% look
       %echoaround% %actor% %actor.name% appears in a flash of blue light!
-      eval last_skycleave_trinket_time %timestamp%
-      remote last_skycleave_trinket_time %actor.id%
+      nop %actor.set_cooldown(10079, 3600)%
       nop %actor.cancel_adventure_summon%
       eval bind %%self.bind(%actor%)%%
       nop %bind%

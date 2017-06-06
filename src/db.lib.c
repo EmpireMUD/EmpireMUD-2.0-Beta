@@ -21,11 +21,13 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 #include "vnums.h"
 
 /**
 * Contents:
 *   Adventure Lib
+*   Automessages Lib
 *   Building Lib
 *   Craft Lib
 *   Crop Lib
@@ -42,6 +44,7 @@
 *   Room Lib
 *   Room Template Lib
 *   Sector Lib
+*   Stored Event Lib
 *   Trigger Lib
 *   Core Lib Functions
 *   Index Saving
@@ -52,8 +55,10 @@
 */
 
 // external variables
+extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
+extern int max_automessage_id;
 extern bool world_is_sorted;
 
 // external funcs
@@ -74,6 +79,7 @@ void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
@@ -81,7 +87,9 @@ void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message 
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
 void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
+void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
 
@@ -175,8 +183,7 @@ void init_adventure(adv_data *adv) {
 */
 void parse_adventure(FILE *fl, adv_vnum vnum) {
 	int int_in[4];
-	char line[256], str_in[256], str_in2[256];
-	struct adventure_link_rule *link, *last_link = NULL;
+	char line[256], str_in[256];
 	adv_data *adv, *find;
 
 	CREATE(adv, adv_data, 1);
@@ -228,44 +235,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 		}
 		switch (*line) {
 			case 'L': {	// linking rule
-				CREATE(link, struct adventure_link_rule, 1);
-				link->next = NULL;
-				if (last_link) {
-					last_link->next = link;
-				}
-				else {
-					GET_ADV_LINKING(adv) = link;
-				}
-				last_link = link;
-				
-				// line 1: type flags
-				if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
-					log("SYSERR: Format error in L line 1 of %s", buf2);
-					exit(1);
-				}
-				
-				link->type = int_in[0];
-				link->flags = asciiflag_conv(str_in);
-				
-				// line 2: value portal_in portal_out
-				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
-					log("SYSERR: Format error in L line 2 of %s", buf2);
-					exit(1);
-				}
-				
-				link->value = int_in[0];
-				link->portal_in = int_in[1];
-				link->portal_out = int_in[2];
-				
-				// line 3: dir bld_on bld_facing
-				if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
-					log("SYSERR: Format error in L line 3 of %s", buf2);
-					exit(1);
-				}
-				
-				link->dir = int_in[0];
-				link->bld_on = asciiflag_conv(str_in);
-				link->bld_facing = asciiflag_conv(str_in2);
+				parse_link_rule(fl, &GET_ADV_LINKING(adv), buf2);
 				break;
 			}
 
@@ -296,8 +266,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 * @param adv_data *adv The thing to save.
 */
 void write_adventure_to_file(FILE *fl, adv_data *adv) {
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
-	struct adventure_link_rule *link;
+	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !adv) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_adventure_to_file called without %s", !fl ? "file" : "adventure");
@@ -317,21 +286,258 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	fprintf(fl, "%d %d %s %d\n", GET_ADV_MAX_INSTANCES(adv), GET_ADV_RESET_TIME(adv), bitv_to_alpha(GET_ADV_FLAGS(adv)), GET_ADV_PLAYER_LIMIT(adv));
 
 	// L: linking rules
-	for (link = GET_ADV_LINKING(adv); link; link = link->next) {
-		fprintf(fl, "L\n");
-		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
-		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
-		
-		strcpy(temp, bitv_to_alpha(link->bld_on));
-		strcpy(temp2, bitv_to_alpha(link->bld_facing));
-		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
-	}
+	write_linking_rules_to_file(fl, 'L', GET_ADV_LINKING(adv));
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_ADV_SCRIPTS(adv));
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUTOMESSAGES LIB ////////////////////////////////////////////////////////
+
+/**
+* Formats and sends an auto-message.
+*/
+void show_automessage_to_char(char_data *ch, struct automessage *msg) {
+	if (msg->msg && *msg->msg) {
+		msg_to_char(ch, "[%s%s&0] %s\r\n", config_get_string("automessage_color"), config_get_string("mud_name"), msg->msg);
+	}
+}
+
+
+// quick-sorter by id
+int sort_automessage_by_id(struct automessage *a, struct automessage *b) {
+	return a->id - b->id;
+}
+
+
+// quick-sorter by type/time
+int sort_automessage_by_data(struct automessage *a, struct automessage *b) {
+	// sort one-time to the top
+	if (a->timing != b->timing) {
+		if (a->timing == AUTOMSG_ONE_TIME) {
+			return -1;
+		}
+		if (b->timing == AUTOMSG_ONE_TIME) {
+			return 1;
+		}
+	}
+	
+	// otherwise sort by timestamp
+	return a->timestamp - b->timestamp;
+}
+
+
+/**
+* Checks if anybody needs an automessage, and sends it.
+*/
+void display_automessages(void) {
+	struct automessage *msg, *next_msg;
+	struct player_automessage *pam;
+	descriptor_data *desc;
+	time_t now = time(0);
+	char_data *ch;
+	int id;
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		id = msg->id;
+		
+		if (msg->timing == AUTOMSG_ON_LOGIN) {
+			continue;	// we don't show these now
+		}
+		if (msg->timestamp > now - (2 * SECS_PER_REAL_MIN)) {
+			continue;	// don't show messages newer than 2 minutes (grace period)
+		}
+		
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || IS_NPC(ch)) {
+				continue;	// not playing
+			}
+			
+			// have/should they see/n it
+			HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
+			if (pam && msg->timing == AUTOMSG_ONE_TIME) {
+				continue;	// seen
+			}
+			else if (pam && msg->timing == AUTOMSG_REPEATING && (now - pam->timestamp) < (msg->interval * SECS_PER_REAL_MIN)) {
+				continue;	// too soon
+			}
+			
+			// validated!
+			show_automessage_to_char(ch, msg);
+			
+			// update or add player data
+			if (!pam) {
+				CREATE(pam, struct player_automessage, 1);
+				pam->id = id;
+				HASH_ADD_INT(GET_AUTOMESSAGES(ch), id, pam);
+			}
+			pam->timestamp = now;
+		}
+	}
+}
+
+
+/**
+* Looks for login messages to send to a player who just logged in.
+*
+* @param char_data *ch The player.
+*/
+void display_automessages_on_login(char_data *ch) {
+	struct automessage *msg, *next_msg;
+	bool any = FALSE;
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		if (msg->timing != AUTOMSG_ON_LOGIN) {
+			continue;	// only showing 1 type
+		}
+		
+		show_automessage_to_char(ch, msg);
+		any = TRUE;
+	}
+		
+	// trailing crlf
+	if (any) {
+		msg_to_char(ch, "\r\n");
+	}
+}
+
+
+/**
+* Frees up an automessage.
+*
+* @param struct automessage *msg The message to free.
+*/
+void free_automessage(struct automessage *msg) {
+	if (msg->msg) {
+		free(msg->msg);
+	}
+	free(msg);
+}
+
+
+void load_automessages(void) {
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH];
+	int id, author, timing, interval, version;
+	struct automessage *msg, *find;
+	bool end = FALSE;
+	char *tmp;
+	FILE *fl;
+	long ts;
+	
+	version = 1;	// default (makes for easier alternate parsing to have version numbers)
+	if (version < 0) {
+		// nothing to do here, but it prevents a compiler warning until version is used
+	}
+	
+	if (!(fl = fopen(AUTOMESSAGE_FILE, "r"))) {
+		return;	// there are no messages
+	}
+	
+	snprintf(error, sizeof(error), "automessage file");
+	
+	while (!end) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Unexpected end of automessage file");
+			break;
+		}
+		
+		if (*line == '$') {
+			end = TRUE;
+		}
+		else if (!strn_cmp(line, "Automessage:", 12)) {
+			version = atoi(line+13);
+		}
+		else if (!strn_cmp(line, "Index:", 6)) {
+			max_automessage_id = atoi(line+7);
+		}
+		else if (!strn_cmp(line, "Message:", 8)) {
+			if (sscanf(line + 8, " %d %d %ld %d %d", &id, &author, &ts, &timing, &interval) != 5) {
+				log("SYSERR: Bad format in automessage file. Skipping message.");
+				tmp = fread_string(fl, error);
+				if (tmp) {	// skip a line
+					free(tmp);
+				}
+				continue;
+			}
+			
+			CREATE(msg, struct automessage, 1);
+			msg->id = id;
+			msg->author = author;
+			msg->timestamp = ts;
+			msg->timing = timing;
+			msg->interval = interval;
+			msg->msg = fread_string(fl, error);
+			
+			HASH_FIND_INT(automessages, &id, find);
+			if (find) {
+				log("SYSERR: Duplicate automessage id %d found in file", id);
+				HASH_DEL(automessages, find);
+				free_automessage(find);
+			}
+			
+			HASH_ADD_INT(automessages, id, msg);
+		}
+	}
+	
+	fclose(fl);
+}
+
+
+int new_automessage_id(void) {
+	struct automessage *msg, *next_msg;
+	int last = 0, found = 0;
+	
+	if (max_automessage_id < MAX_INT) {
+		return ++max_automessage_id;
+	}
+	else {
+		// whaaaa? find the first free id
+		HASH_SORT(automessages, sort_automessage_by_id);
+		HASH_ITER(hh, automessages, msg, next_msg) {
+			if (msg->id > last + 1) {
+				found = last + 1;
+			}
+			last = msg->id;
+		}
+		
+		// sort back
+		HASH_SORT(automessages, sort_automessage_by_data);
+		if (found) {
+			return found;
+		}
+	}
+	
+	// did we get here?
+	log("SYSERR: No free automessage id (somehow)");
+	return 1;
+}
+
+
+void save_automessages(void) {
+	struct automessage *msg, *next_msg;
+	FILE *fl;
+	
+	if (!(fl = fopen(AUTOMESSAGE_FILE TEMP_SUFFIX, "w"))) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write %s", AUTOMESSAGE_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// header
+	fprintf(fl, "Automessage: 1\n");	// version tag
+	fprintf(fl, "Index: %d\n", max_automessage_id);
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		fprintf(fl, "Message: %d %d %ld %d %d\n%s~\n", msg->id, msg->author, msg->timestamp, msg->timing, msg->interval, NULLSAFE(msg->msg));
+	}
+	
+	fprintf(fl, "$~\n");
+	fclose(fl);
+	rename(AUTOMESSAGE_FILE TEMP_SUFFIX, AUTOMESSAGE_FILE);	
 }
 
 
@@ -1488,7 +1694,7 @@ void free_empire(empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store;
 	struct empire_unique_storage *eus;
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
@@ -1557,9 +1763,9 @@ void free_empire(empire_data *emp) {
 	}
 	
 	// free territory
-	while ((ter = emp->territory_list)) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (ter == global_next_territory_entry) {
-			global_next_territory_entry = ter->next;
+			global_next_territory_entry = ter->hh.next;
 		}
 		
 		// free npcs
@@ -1567,7 +1773,6 @@ void free_empire(empire_data *emp) {
 			delete_territory_npc(ter, ter->npcs);
 		}
 		
-		emp->territory_list = ter->next;
 		free(ter);
 	}
 	
@@ -2033,7 +2238,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
 	struct empire_log_data *elog;
@@ -2110,8 +2315,8 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		fprintf(fl, "R%d\n%s~\n", iter, EMPIRE_RANK(emp, iter));
 
 	// T: territory buildings
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
-		fprintf(fl, "T %d %d\n", GET_ROOM_VNUM(ter->room), ter->population_timer);
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		fprintf(fl, "T %d %d\n", ter->vnum, ter->population_timer);
 	
 		// npcs who live there
 		for (npc = ter->npcs; npc; npc = npc->next) {
@@ -2413,9 +2618,7 @@ void update_empire_npc_data(void) {
 		}
 		
 		// each territory spot
-		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = next_ter) {
-			next_ter = ter->next;
-			
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 			if (--ter->population_timer <= 0) {
 				populate_npc(ter->room, ter);
 			}
@@ -2481,9 +2684,7 @@ void kill_empire_npc(char_data *ch) {
 	}
 	
 	// find and remove the entry
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter && !found; ter = ter_next) {
-		ter_next = ter->next;
-		
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, ter_next) {
 		for (npc = ter->npcs; npc && !found; npc = npc_next) {
 			npc_next = npc->next;
 			
@@ -2492,9 +2693,12 @@ void kill_empire_npc(char_data *ch) {
 				
 				// reset the population timer
 				ter->population_timer = building_population_timer;
-				
 				found = TRUE;
 			}
+		}
+		
+		if (found) {
+			break;
 		}
 	}
 	
@@ -3118,12 +3322,7 @@ struct island_info *get_island_by_coords(char *coords) {
 		return NULL;
 	}
 	
-	if (GET_ISLAND_ID(room) == NO_ISLAND) {
-		return NULL;
-	}
-	else {
-		return get_island(GET_ISLAND_ID(room), TRUE);
-	}
+	return GET_ISLAND(room);
 }
 
 
@@ -4112,9 +4311,12 @@ void parse_room(FILE *fl, room_vnum vnum) {
 
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
 	double dbl_in;
+	long l_in;
 	int t[10];
 	struct depletion_data *dep;
 	struct reset_com *reset, *last_reset = NULL;
+	struct affected_type *af;
+	struct track_data *track;
 	room_data *room, *find;
 	bool error = FALSE;
 	char *ptr;
@@ -4125,6 +4327,18 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	
 	// basic setup: things that don't default to 0/NULL
 	room->vnum = vnum;
+	
+	// attach/create shared data
+	if (vnum < MAP_SIZE) {
+		SHARED_DATA(room) = world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)].shared;
+	}
+	else {
+		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+	}
+	
+	if (vnum < MAP_SIZE) {
+		GET_MAP_LOC(room) = &(world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)]);
+	}
 	
 	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {
@@ -4146,9 +4360,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		exit(1);
 	}
 	
-	if (t[0] != NOTHING) {
-		SET_ISLAND_ID(room, t[0]);
-	}
+	GET_ISLAND_ID(room) = t[0];
 	room->sector_type = sector_proto(t[1]);
 	room->base_sector = sector_proto(t[2]);
 
@@ -4166,8 +4378,25 @@ void parse_room(FILE *fl, room_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'A': {	// affects
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d %d %s", &t[0], &t[1], &l_in, &t[3], &t[4], str1) != 6) {
+					log("SYSERR: Format error in A line of room #%d", vnum);
+					exit(1);
+				}
+				
+				CREATE(af, struct affected_type, 1);
+				af->type = t[0];
+				af->cast_by = t[1];
+				af->duration = l_in;
+				af->modifier = t[3];
+				af->location = t[4];
+				af->bitvector = asciiflag_conv(str1);
+				
+				LL_PREPEND(ROOM_AFFECTS(room), af);
+				break;
+			}
 			case 'B': {	// building data
-				if (!get_line(fl, line2) || sscanf(line2, "%d %d %d %d %d %lf %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &dbl_in, &t[6], &t[7]) != 8) {
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %d %d %ld %lf %d %d", &t[0], &t[1], &t[2], &t[3], &l_in, &dbl_in, &t[6], &t[7]) != 8) {
 					log("SYSERR: Format error in B line of room #%d", vnum);
 					exit(1);
 				}
@@ -4186,7 +4415,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				
 				COMPLEX_DATA(room)->entrance = t[2];
 				COMPLEX_DATA(room)->patron = t[3];
-				COMPLEX_DATA(room)->burning = t[4];
+				COMPLEX_DATA(room)->burn_down_time = l_in;
 				COMPLEX_DATA(room)->damage = dbl_in;	// formerly t[5], which is now unused
 				COMPLEX_DATA(room)->private_owner = t[6];
 				COMPLEX_DATA(room)->disrepair = t[7];	// not currently used (initialized to 0 after b4.15)
@@ -4276,8 +4505,8 @@ void parse_room(FILE *fl, room_vnum vnum) {
 					break;
 				}
 
-				room->base_affects = asciiflag_conv(line2);
-				room->affects = room->base_affects;
+				ROOM_BASE_FLAGS(room) = asciiflag_conv(line2);
+				ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
 				break;
 			}
 			case 'H': {	// home_room
@@ -4291,18 +4520,24 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			case 'I': {	// icon
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->icon = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_ICON(room)) {
+					free(ROOM_CUSTOM_ICON(room));
+				}
+				ROOM_CUSTOM_ICON(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'M': {	// description
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->description = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_DESCRIPTION(room)) {
+					free(ROOM_CUSTOM_DESCRIPTION(room));
+				}
+				ROOM_CUSTOM_DESCRIPTION(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'N': {	// name
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->name = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_NAME(room)) {
+					free(ROOM_CUSTOM_NAME(room));
+				}
+				ROOM_CUSTOM_NAME(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'O': {	// owner (empire_vnum)
@@ -4359,6 +4594,22 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			
+			case 'Y': {	// tracks
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d", &t[0], &t[1], &l_in, &t[2]) != 4) {
+					log("SYSERR: Bad formatting in Y section of room #%d", vnum);
+					exit(1);
+				}
+				
+				CREATE(track, struct track_data, 1);
+				track->player_id = t[0];
+				track->mob_num = t[1];
+				track->timestamp = l_in;
+				track->dir = t[2];
+				
+				LL_PREPEND(ROOM_TRACKS(room), track);
+				break;
+			}
+			
 			case 'Z': {	// extra data
 				if (!get_line(fl, line2) || sscanf(line2, "%d %d", &t[0], &t[1]) != 2) {
 					log("SYSERR: Bad formatting in Z section of room #%d", vnum);
@@ -4391,11 +4642,9 @@ void parse_room(FILE *fl, room_vnum vnum) {
 void write_room_to_file(FILE *fl, room_data *room) {
 	extern bool objpack_save_room(room_data *room);
 	
-	char temp[MAX_STRING_LENGTH];
-	struct room_extra_data *red, *next_red;
-	struct depletion_data *dep;
 	struct cooldown_data *cool;
 	struct trig_var_data *tvd;
+	struct affected_type *af;
 	trig_data *trig;
 	char_data *mob;
 	
@@ -4408,13 +4657,17 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	fprintf(fl, "#%d\n", GET_ROOM_VNUM(room));
 	
 	// both sector and original-sector must save vnums
-	// NOTE: does not need an island id if it's not on the map
-	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(room) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
+	fprintf(fl, "%d %d %d\n", GET_ISLAND_ID(room), GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
+	
+	// A affects
+	LL_FOREACH(ROOM_AFFECTS(room), af) {
+		fprintf(fl, "A\n%d %d %ld %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+	}
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
 		// NOTE: disrepair is not used and is always 0 after b4.15
-		fprintf(fl, "B\n%d %d %d %d %d %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burning, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->disrepair);
+		fprintf(fl, "B\n%d %d %d %d %ld %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burn_down_time, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->disrepair);
 	}
 	
 	// C: load commands
@@ -4483,32 +4736,10 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			}
 		}
 	}
-
-	// E affects
-	if (ROOM_BASE_FLAGS(room)) {
-		fprintf(fl, "E\n%d\n", ROOM_BASE_FLAGS(room));
-	}
 	
 	// H home room
 	if (HOME_ROOM(room) != room) {
 		fprintf(fl, "H%d\n", GET_ROOM_VNUM(HOME_ROOM(room)));
-	}
-	
-	// I icon
-	if (ROOM_CUSTOM_ICON(room)) {
-		fprintf(fl, "I\n%s~\n", ROOM_CUSTOM_ICON(room));
-	}
-	
-	// M description
-	if (ROOM_CUSTOM_DESCRIPTION(room)) {
-		strcpy(temp, ROOM_CUSTOM_DESCRIPTION(room));
-		strip_crlf(temp);
-		fprintf(fl, "M\n%s~\n", temp);
-	}
-	
-	// N name
-	if (ROOM_CUSTOM_NAME(room)) {
-		fprintf(fl, "N\n%s~\n", ROOM_CUSTOM_NAME(room));
 	}
 	
 	// O owner
@@ -4524,11 +4755,6 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// R resource
 	if (COMPLEX_DATA(room) && BUILDING_RESOURCES(room)) {
 		write_resources_to_file(fl, 'R', BUILDING_RESOURCES(room));
-	}
-	
-	// X depletion
-	for (dep = ROOM_DEPLETION(room); dep; dep = dep->next) {
-		fprintf(fl, "X\n%d %d\n", dep->type, dep->count);
 	}
 
 	// D door
@@ -4555,9 +4781,9 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		write_resources_to_file(fl, 'W', GET_BUILT_WITH(room));
 	}
 	
-	// Z: extra data
-	HASH_ITER(hh, room->extra_data, red, next_red) {
-		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
+	// Things that we prefer to save to the base map
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		write_shared_room_data(fl, SHARED_DATA(room));
 	}
 	
 	// end
@@ -5190,6 +5416,118 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// STORED EVENT LIB ////////////////////////////////////////////////////////
+
+// cancel func externs
+EVENT_CANCEL_FUNC(cancel_burn_event);
+EVENT_CANCEL_FUNC(cancel_map_event);
+EVENT_CANCEL_FUNC(cancel_room_event);
+
+
+// SEV_x: list of cancel functions
+struct stored_event_info_t stored_event_info[] = {
+	{ cancel_map_event },	// SEV_TRENCH_FILL
+	{ cancel_room_event },	// SEV_CHECK_UNLOAD
+	{ cancel_burn_event },	// SEV_BURN_DOWN
+	{ cancel_map_event },	// SEV_GROW_CROP
+	{ cancel_room_event },	// SEV_TAVERN
+	{ cancel_room_event },	// SEV_RESET_TRIGGER
+};
+
+
+/**
+* Adds a stored event to a list. If there's already one of the same type in
+* the list, it will be replaced.
+*
+* @param struct stored_event **list The list to add to.
+* @param int type The SEV_ type to add the event as.
+* @param struct event *event The event to store.
+*/
+void add_stored_event(struct stored_event **list, int type, struct event *event) {
+	struct stored_event *sev;
+	
+	if (!event) {
+		return;
+	}
+	
+	// ensure no duplicate entries
+	sev = find_stored_event(*list, type);
+	if (!sev) {
+		CREATE(sev, struct stored_event, 1);
+		sev->type = type;
+		HASH_ADD_INT(*list, type, sev);
+	}
+	
+	sev->ev = event;
+}
+
+
+/**
+* Cancels an event that was stored, and deletes the entry.
+*
+* @param struct stored_event **list The list to cancel out of.
+* @param int type The SEV_ type to cancel.
+*/
+void cancel_stored_event(struct stored_event **list, int type) {
+	struct stored_event *sev = find_stored_event(*list, type);
+	
+	if (sev && sev->ev) {
+		event_cancel(sev->ev, stored_event_info[type].cancel);
+		sev->ev = NULL;
+	}
+	
+	if (sev) {
+		HASH_DEL(*list, sev);
+		free(sev);
+	}
+}
+
+
+/**
+* Deletes a stored event without canceling it.
+*
+* @param struct stored_event **list The list to delete from.
+* @param int type The SEV_ type to cancel.
+*/
+void delete_stored_event(struct stored_event **list, int type) {
+	struct stored_event *sev = find_stored_event(*list, type);
+	if (sev) {
+		HASH_DEL(*list, sev);
+		free(sev);
+	}
+}
+
+
+/**
+* Finds a stored event in a list of them.
+*
+* @param struct stored_event *list The list to search in.
+* @param int type Any SEV_ const.
+* @return struct stored_event* The found event if any, or NULL.
+*/
+struct stored_event *find_stored_event(struct stored_event *list, int type) {
+	struct stored_event *find;
+	
+	HASH_FIND_INT(list, &type, find);
+	return find;
+}
+
+
+// frees memory when a map event is canceled
+EVENT_CANCEL_FUNC(cancel_map_event) {
+	struct map_event_data *data = (struct map_event_data *)event_obj;
+	free(data);
+}
+
+
+// generic canceller for room events) {
+EVENT_CANCEL_FUNC(cancel_room_event) {
+	struct room_event_data *data = (struct room_event_data *)event_obj;
+	free(data);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER LIB /////////////////////////////////////////////////////////////
 
 /**
@@ -5306,7 +5644,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5370,6 +5708,11 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_faction(fl, nr);
 					break;
 				}
+				case DB_BOOT_GEN: {
+					void parse_generic(FILE *fl, int nr);
+					parse_generic(fl, nr);
+					break;
+				}
 				case DB_BOOT_GLB: {
 					parse_global(fl, nr);
 					break;
@@ -5404,6 +5747,11 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				}
 				case DB_BOOT_SECTOR: {
 					parse_sector(fl, nr);
+					break;
+				}
+				case DB_BOOT_SHOP: {
+					void parse_shop(FILE *fl, int nr);
+					parse_shop(fl, nr);
 					break;
 				}
 				case DB_BOOT_SKILL: {
@@ -5484,8 +5832,7 @@ void index_boot(int mode) {
 	}
 
 	if (!rec_count) {
-		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST || mode == DB_BOOT_SOC || mode == DB_BOOT_FCT) {
+		if (db_boot_info[mode].allow_zero) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5498,10 +5845,7 @@ void index_boot(int mode) {
 			exit(1);
 		}
 	}
-
-	/* Any idea why you put this here Jeremy? */
-	rec_count++;
-
+	
 	/*
 	 * DB_BOOT_x:
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
@@ -5565,6 +5909,11 @@ void index_boot(int mode) {
 			log("   %d factions, %d bytes in factions table.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_GEN: {
+			size[0] = sizeof(generic_data) * rec_count;
+			log("   %d generics, %d bytes in generics table.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_GLB: {
 			size[0] = sizeof(struct global_data) * rec_count;
 			log("   %d globals, %d bytes in globals table.", rec_count, size[0]);
@@ -5601,6 +5950,11 @@ void index_boot(int mode) {
 		case DB_BOOT_SECTOR: {
 			size[0] = sizeof(sector_data) * rec_count;
 			log("   %d sectors, %d bytes in sector.", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			size[0] = sizeof(shop_data) * rec_count;
+			log("   %d shops, %d bytes in shops table.", rec_count, size[0]);
 			break;
 		}
 		case DB_BOOT_SKILL: {
@@ -5644,6 +5998,7 @@ void index_boot(int mode) {
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
 			case DB_BOOT_FCT:
+			case DB_BOOT_GEN:
 			case DB_BOOT_GLB:
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
@@ -5653,6 +6008,7 @@ void index_boot(int mode) {
 			case DB_BOOT_QST:
 			case DB_BOOT_RMT:
 			case DB_BOOT_SECTOR:
+			case DB_BOOT_SHOP:
 			case DB_BOOT_SKILL:
 			case DB_BOOT_SOC:
 			case DB_BOOT_TRG:
@@ -5807,6 +6163,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			}
 			break;
 		}
+		case DB_BOOT_GEN: {
+			void write_generic_to_file(FILE *fl, generic_data *gen);
+			generic_data *gen, *next_gen;
+			HASH_ITER(hh, generic_table, gen, next_gen) {
+				if (GEN_VNUM(gen) >= (zone * 100) && GEN_VNUM(gen) <= (zone * 100 + 99)) {
+					write_generic_to_file(fl, gen);
+				}
+			}
+			break;
+		}
 		case DB_BOOT_GLB: {
 			struct global_data *glb, *next_glb;
 			HASH_ITER(hh, globals_table, glb, next_glb) {
@@ -5868,6 +6234,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, sector_table, sect, next_sect) {
 				if (GET_SECT_VNUM(sect) >= (zone * 100) && GET_SECT_VNUM(sect) <= (zone * 100 + 99)) {
 					write_sector_to_file(fl, sect);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			void write_shop_to_file(FILE *fl, shop_data *shop);
+			shop_data *shop, *next_shop;
+			HASH_ITER(hh, shop_table, shop, next_shop) {
+				if (SHOP_VNUM(shop) >= (zone * 100) && SHOP_VNUM(shop) <= (zone * 100 + 99)) {
+					write_shop_to_file(fl, shop);
 				}
 			}
 			break;
@@ -6187,6 +6563,11 @@ void save_index(int type) {
 			write_faction_index(fl);
 			break;
 		}
+		case DB_BOOT_GEN: {
+			void write_generic_index(FILE *fl);
+			write_generic_index(fl);
+			break;
+		}
 		case DB_BOOT_GLB: {
 			write_globals_index(fl);
 			break;
@@ -6215,6 +6596,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_SECTOR: {
 			write_sector_index(fl);
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			void write_shop_index(FILE *fl);
+			write_shop_index(fl);
 			break;
 		}
 		case DB_BOOT_SKILL: {
@@ -7275,7 +7661,7 @@ struct complex_room_data *init_complex_data() {
 	data->home_room = NULL;
 	data->private_owner = NOBODY;
 	
-	data->burning = 0;	// not-burning
+	data->burn_down_time = 0;	// not-burning
 	data->damage = 0;	// no damage
 	
 	return data;
@@ -7301,6 +7687,47 @@ void free_complex_data(struct complex_room_data *data) {
 	
 	free_resource_list(data->to_build);
 	free_resource_list(data->built_with);
+	
+	free(data);
+}
+
+
+/**
+* Frees the memory for shared room data.
+*
+* @param struct shared_room_data *data The data to free.
+*/
+void free_shared_room_data(struct shared_room_data *data) {
+	struct room_extra_data *room_ex, *next_room_ex;
+	struct stored_event *ev, *next_ev;
+	struct depletion_data *dep;
+	struct track_data *track;
+	
+	if (data->name) {
+		free(data->name);
+	}
+	if (data->icon) {
+		free(data->icon);
+	}
+	if (data->description) {
+		free(data->description);
+	}
+	
+	while ((dep = data->depletion)) {
+		data->depletion = dep->next;
+		free(dep);
+	}
+	HASH_ITER(hh, data->extra_data, room_ex, next_room_ex) {
+		free(room_ex);
+	}
+	while ((track = data->tracks)) {
+		data->tracks = track->next;
+		free(track);
+	}
+	
+	HASH_ITER(hh, data->events, ev, next_ev) {
+		cancel_stored_event(&data->events, ev->type);
+	}
 	
 	free(data);
 }
@@ -7418,6 +7845,53 @@ void parse_generic_name_file(FILE *fl, char *err_str) {
 
 
 /**
+* Parse one linking rule and assign it to the end of the given list.
+* This function will trigger an exit(1) if it errors.
+*
+* @param FILE *fl The file, open for reading, right after the letter tag (usually L).
+* @param struct adventure_link_rule **list A reference to the start of the list to assign to.
+* @param char *error_part A string containing e.g. "mob #1234", describing where the error occurred, if one happens.
+*/
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part) {
+	char line[MAX_INPUT_LENGTH], str_in[MAX_INPUT_LENGTH], str_in2[MAX_INPUT_LENGTH];
+	struct adventure_link_rule *link;
+	int int_in[3];
+	
+	CREATE(link, struct adventure_link_rule, 1);
+	LL_APPEND(*list, link);
+	
+	// line 1: type flags
+	if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
+		log("SYSERR: Format error in link rule line 1 of %s", buf2);
+		exit(1);
+	}
+	
+	link->type = int_in[0];
+	link->flags = asciiflag_conv(str_in);
+	
+	// line 2: value portal_in portal_out
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+		log("SYSERR: Format error in link rule line 2 of %s", buf2);
+		exit(1);
+	}
+	
+	link->value = int_in[0];
+	link->portal_in = int_in[1];
+	link->portal_out = int_in[2];
+	
+	// line 3: dir bld_on bld_facing
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
+		log("SYSERR: Format error in link rule line 3 of %s", buf2);
+		exit(1);
+	}
+	
+	link->dir = int_in[0];
+	link->bld_on = asciiflag_conv(str_in);
+	link->bld_facing = asciiflag_conv(str_in2);
+}
+
+
+/**
 * Writes the A tag for any apply_data list.
 *
 * @param FILE *fl The file to write to.
@@ -7492,6 +7966,29 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 
 
 /**
+* Saves linking rule data (usually 'L' tag) to a db file.
+*
+* @param FILE *fl The open file to write to.
+* @param char letter The letter to tag in the file.
+* @param struct adventure_link_rule *list The list to write.
+*/
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list) {
+	struct adventure_link_rule *link;
+	char temp[256], temp2[256];
+	
+	LL_FOREACH(list, link) {
+		fprintf(fl, "%c\n", letter);
+		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
+		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
+		
+		strcpy(temp, bitv_to_alpha(link->bld_on));
+		strcpy(temp2, bitv_to_alpha(link->bld_facing));
+		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
+	}
+}
+
+
+/**
 * Writes a list of 'req_data' to a data file.
 *
 * @param FILE *fl The file, open for writing.
@@ -7508,5 +8005,56 @@ void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
 		else {
 			fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
 		}
+	}
+}
+
+
+/**
+* Saves the 'shared' portion of a room or map tile to file.
+*
+* @param FILE *fl The file already open for writing.
+* @param struct shared_room_data *dat The shared data to write.
+*/
+void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
+	struct room_extra_data *red, *next_red;
+	char temp[MAX_STRING_LENGTH];
+	struct depletion_data *dep;
+	struct track_data *track;
+	
+	// E affects
+	if (dat->base_affects) {
+		fprintf(fl, "E\n%llu\n", dat->base_affects);
+	}
+
+	// I icon
+	if (dat->icon) {
+		fprintf(fl, "I\n%s~\n", dat->icon);
+	}
+
+	// M description
+	if (dat->description) {
+		strcpy(temp, dat->description);
+		strip_crlf(temp);
+		fprintf(fl, "M\n%s~\n", temp);
+	}
+
+	// N name
+	if (dat->name) {
+		fprintf(fl, "N\n%s~\n", dat->name);
+	}
+	
+	// X depletion
+	LL_FOREACH(dat->depletion, dep) {
+		fprintf(fl, "X\n%d %d\n", dep->type, dep->count);
+	}
+	
+	// Y tracks
+	LL_FOREACH(dat->tracks, track) {
+		fprintf(fl, "Y\n%d %d %ld %d\n", track->player_id, track->mob_num, track->timestamp, track->dir);
+	}
+
+	// Z: extra data
+	HASH_ITER(hh, dat->extra_data, red, next_red) {
+		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
 }

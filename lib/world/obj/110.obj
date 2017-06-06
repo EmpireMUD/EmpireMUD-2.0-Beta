@@ -67,57 +67,27 @@ O
 R
 5119 0
 S
-#11004
-pouch talons golden~
-a pouch of golden talons~
-A pouch of golden talons is sitting here.~
-   This simple leather pouch holds golden talons, redeemable for rewards from
-the Gigantic Nest adventure. You can type 'count talons' to see how many you
-have. Complete one of the helpful quests in the nest to summon the roc who
-trades talons for rewards.
-~
-3 p a 7
-0 0 0
-14 0
-T 11004
-S
 #11005
 talon golden~
 a golden talon~
 A golden talon is lying here.~
-   You shouldn't actually be seeing this. The script on this item should add
-directly to your golden talon count, which is stored as a script variable.
+   These are used to buy items in the golden talon shop after completing a
+helpful roc quest.
 ~
-3 p a 10
-0 0 0
+12 p a 11
+1 11004 0
 14 0
-T 11005
-S
-#11006
-pouch talons corrupted~
-a pouch of corrupted talons~
-A pouch of corrupted talons is sitting here.~
-   This simple leather pouch holds corrupted talons, redeemable for rewards
-from the Gigantic Nest adventure. You can type 'count talons' to see how many
-you have. Complete one of the harmful quests in the nest to summon the person
-who trades talons for rewards.
-~
-3 p a 8
-0 0 0
-14 0
-T 11004
 S
 #11007
 talon corrupted~
 a corrupted talon~
 A corrupted talon is lying here.~
-   You shouldn't actually be seeing this. The script on this item should add
-directly to your corrupted talon count, which is stored as a script variable.
+   These are used to buy items in the corrupted talon shop after completing a
+harmful roc quest.
 ~
-3 p a 9
-0 0 0
+12 p a 10
+1 11003 0
 14 0
-T 11005
 S
 #11008
 bag seeds wispy zephyr cattails~
@@ -350,10 +320,9 @@ pattern downy rucksack sack~
 the downy rucksack pattern~
 The downy rucksack pattern is lying here.~
 This pattern is used to make the downy rucksack, a great pack item.
-Sew (Magical Vestments): downy rucksack
 ~
-3 o a 2
-0 0 0
+7 0 a 3
+11024 0 0
 0 0
 S
 #11026
@@ -378,11 +347,10 @@ S
 pattern feathered saddle~
 the feathered saddle pattern~
 The feathered saddle pattern is lying here.~
-This pattern can be used to craft a fine saddle.
-Sew (Dangerous Leathers): feathered saddle
+This pattern can be used to craft a feathered saddle.
 ~
-3 o a 3
-0 0 0
+7 0 a 4
+11026 0 0
 0 0
 S
 #11028
@@ -406,11 +374,10 @@ schematic earrings roc~
 the roc earrings schematic~
 The roc earrings schematic is lying here.~
    This schematic can be used to make incredible earrings, which bestow
-greatness upon the wearer.
-Forge (Jewelry): roc earrings
+greatness upon the wearer. It teaches you to forge roc earrings.
 ~
-3 o a 5
-0 0 0
+7 0 a 6
+11028 0 0
 0 0
 S
 #11030
@@ -467,10 +434,9 @@ the wings of Daedalus schematic~
 The wings of Daedalus schematic is lying here.~
    This incredible schematic depicts the wings of Daedalus, an incredible
 artifact that bestows flight upon its wearer for a short time.
-Craft (Master Craftsman): wings of Daedalus
 ~
-3 o a 6
-0 0 0
+7 0 a 7
+11032 0 0
 0 0
 S
 #11034
@@ -511,11 +477,11 @@ S
 pattern feathered arm guards~
 the feathered arm guards pattern~
 The feathered arm guards pattern is lying here.~
-This pattern can be used to make a great melee dps armpiece.
-Sew (Dangerous Leathers): feathered arm guards
+   This pattern can be used to make a great melee dps armpiece. It teaches you
+to sew feathered arm guards.
 ~
-3 o a 7
-0 0 0
+7 0 a 8
+11035 0 0
 0 0
 S
 #11037
@@ -550,11 +516,11 @@ S
 pattern stonefeather arm plates~
 the stonefeather arm plates pattern~
 The stonefeather arm plates pattern is lying here.~
-This pattern shows how to create a powerful tank armpiece.
-Forge (Imperial Armors): stonefeather arm plates
+   This pattern shows how to create a powerful tank armpiece. It teaches you to
+forge stonefeather arm plates.
 ~
-3 o a 8
-0 0 0
+7 0 a 9
+11037 0 0
 0 0
 S
 #11039
@@ -583,11 +549,11 @@ S
 pattern roc feather sleeves~
 the roc feather sleeves pattern~
 The roc feather sleeves pattern is lying here.~
-This pattern shows you how to make a great caster dps armpiece.
-Sew (Magical Vestments): roc feather sleeves
+   This pattern shows you how to make a great caster dps armpiece. It teaches
+you to sew roc feather sleeves.
 ~
-3 o a 9
-0 0 0
+7 0 a 10
+11039 0 0
 0 0
 S
 #11041
@@ -617,11 +583,11 @@ S
 pattern downy white sleeves~
 the downy white sleeves pattern~
 The downy white sleeves pattern is lying here.~
-This pattern shows you how to make a fantastic healer armpiece.
-Sew (Magical Vestments): downy white sleeves
+   This pattern shows you how to make a fantastic healer armpiece. It teaches
+you to sew downy white sleeves.
 ~
-3 o a 10
-0 0 0
+7 0 a 11
+11041 0 0
 0 0
 S
 #11043
@@ -652,11 +618,11 @@ S
 pattern razor feather gauntlets~
 the razor feather gauntlets pattern~
 The razor feather gauntlets pattern is lying here.~
-This pattern shows you how to make powerful melee dps gauntlets.
-Sew (Dangerous Leathers): razor feather gauntlets
+   This pattern shows you how to make powerful melee dps gauntlets. It teaches
+you to sew razor feather gauntlets.
 ~
-3 o a 11
-0 0 0
+7 0 a 12
+11043 0 0
 0 0
 S
 #11045
@@ -687,11 +653,11 @@ S
 pattern feathered imperium gauntlets~
 the feathered imperium gauntlets pattern~
 The feathered imperium gauntlets pattern is lying here.~
-This pattern shows you how to create incredible tank gauntlets.
-Forge (Imperial Armors): feathered imperium gauntlets
+   This pattern shows you how to create incredible tank gauntlets. It teaches
+you to forge feathered imperium gauntlets.
 ~
-3 o a 12
-0 0 0
+7 0 a 13
+11045 0 0
 0 0
 S
 #11047
@@ -720,11 +686,11 @@ S
 pattern gloves feather wondrous~
 the wondrous feather gloves pattern~
 The wondrous feather gloves pattern is lying here.~
-This pattern shows how to make a powerful pair of caster dps gloves.
-Sew (Magical Vestments): wondrous feather gloves
+   This pattern shows how to make a powerful pair of caster dps gloves. It
+teaches you to sew wondrous feather gloves.
 ~
-3 o a 13
-0 0 0
+7 0 a 15
+11047 0 0
 0 0
 S
 #11049
@@ -752,11 +718,11 @@ S
 pattern roc quill finger caps~
 the roc quill finger caps pattern~
 The roc quill finger caps pattern is lying here.~
-This pattern shows you how to make incredible healer handgear.
-Sew (Magical Vestments): roc quill finger caps
+   This pattern shows you how to make incredible healer handgear. It teaches
+you to sew roc quill finger caps.
 ~
-3 o a 14
-0 0 0
+7 0 a 15
+11049 0 0
 0 0
 S
 #11051

@@ -1,0 +1,145 @@
+#0
+Water~
+1 0
+0 0 3 0
+T0
+water~
+T1
+clear~
+S
+#1
+Lager~
+1 0
+2 1 1 0
+T0
+lager~
+T1
+brown~
+S
+#2
+Wheat Beer~
+1 0
+3 1 1 0
+T0
+wheat beer~
+T1
+golden white~
+S
+#3
+Ale~
+1 0
+2 1 1 0
+T0
+ale~
+T1
+golden~
+S
+#4
+Cider~
+1 0
+3 1 1 0
+T0
+cider~
+T1
+golden~
+S
+#5
+Milk~
+1 0
+0 2 2 0
+T0
+milk~
+T1
+white~
+S
+#6
+Blood~
+1 0
+0 0 -1 0
+T0
+blood~
+T1
+red~
+S
+#7
+Honey~
+1 0
+0 1 1 0
+T0
+honey~
+T1
+golden~
+S
+#8
+Bean Soup~
+1 0
+0 4 0 0
+T0
+bean soup~
+T1
+soupy~
+S
+#9
+Coffee~
+1 0
+0 0 1 0
+T0
+coffee~
+T1
+brown~
+S
+#10
+Green Tea~
+1 0
+0 0 1 0
+T0
+green tea~
+T1
+green~
+S
+#11
+Red Wine~
+1 0
+4 0 1 0
+T0
+red wine~
+T1
+red~
+S
+#12
+White Wine~
+1 0
+3 0 1 0
+T0
+white wine~
+T1
+clear~
+S
+#13
+Grog~
+1 0
+2 1 1 0
+T0
+grog~
+T1
+amber~
+S
+#14
+Mead~
+1 0
+1 1 1 0
+T0
+mead~
+T1
+golden~
+S
+#15
+Stout~
+1 0
+3 2 1 0
+T0
+stout~
+T1
+black~
+S
+$

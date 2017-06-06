@@ -47,6 +47,7 @@ extern obj_data *has_sharp_tool(char_data *ch);
 extern bool is_deep_mine(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void scale_item_to_level(obj_data *obj, int level);
+void schedule_crop_growth(struct map_data *map);
 
 // local prototypes
 obj_data *has_shovel(char_data *ch);
@@ -1280,7 +1281,9 @@ void process_escaping(char_data *ch) {
 *
 * @param char_data *ch The excavator.
 */
-void process_excavating(char_data *ch) {	
+void process_excavating(char_data *ch) {
+	void finish_trench(room_data *room);
+	
 	int count, total;
 	char_data *iter;
 
@@ -1323,6 +1326,8 @@ void process_excavating(char_data *ch) {
 			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
 				msg_to_char(ch, "You finish excavating the trench!\r\n");
 				act("$n finishes excavating the trench!", FALSE, ch, 0, 0, TO_ROOM);
+				
+				finish_trench(IN_ROOM(ch));
 				
 				// this also stops ch
 				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
@@ -1906,6 +1911,8 @@ void process_picking(char_data *ch) {
 * @param char_data *ch The planter.
 */
 void process_planting(char_data *ch) {
+	int left = get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME) - time(0);	// seconds left
+	
 	// decrement
 	GET_ACTION_TIMER(ch) -= 1;
 		
@@ -1916,7 +1923,11 @@ void process_planting(char_data *ch) {
 				msg_to_char(ch, "You carefully plant seeds in rows along the ground.\r\n");
 			}
 			act("$n carefully plants seeds in rows along the ground.", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
-			multiply_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, 0.5);
+			left /= 2;
+			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, time(0) + left);
+			if (GET_MAP_LOC(IN_ROOM(ch))) {
+				schedule_crop_growth(GET_MAP_LOC(IN_ROOM(ch)));
+			}
 			break;
 		}
 		case 2: {
@@ -1924,7 +1935,11 @@ void process_planting(char_data *ch) {
 				msg_to_char(ch, "You cover the seeds and gently pack the dirt.\r\n");
 			}
 			act("$n covers rows of seeds with dirt and gently packs them down.", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
-			multiply_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, 0.5);
+			left /= 2;
+			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, time(0) + left);
+			if (GET_MAP_LOC(IN_ROOM(ch))) {
+				schedule_crop_growth(GET_MAP_LOC(IN_ROOM(ch)));
+			}
 			break;
 		}
 		case 1: {
@@ -1932,7 +1947,11 @@ void process_planting(char_data *ch) {
 				msg_to_char(ch, "You water the freshly seeded ground.\r\n");
 			}
 			act("$n waters the freshly seeded ground.", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
-			multiply_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, 0.5);
+			left /= 2;
+			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, time(0) + left);
+			if (GET_MAP_LOC(IN_ROOM(ch))) {
+				schedule_crop_growth(GET_MAP_LOC(IN_ROOM(ch)));
+			}
 			break;
 		}
 	}
@@ -2869,8 +2888,6 @@ ACMD(do_plant) {
 	sector_data *original;
 	obj_data *obj;
 	crop_data *cp;
-	
-	int planting_base_timer = config_get_int("planting_base_timer");
 
 	one_argument(argument, arg);
 
@@ -2925,7 +2942,11 @@ ACMD(do_plant) {
 		
 		// don't use GET_FOOD_CROP_TYPE because not all plantables are food
 		set_crop_type(IN_ROOM(ch), cp);
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, planting_base_timer);
+		
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, time(0) + config_get_int("planting_base_timer"));
+		if (GET_MAP_LOC(IN_ROOM(ch))) {
+			schedule_crop_growth(GET_MAP_LOC(IN_ROOM(ch)));
+		}
 		
 		// temporarily deplete seeded rooms
 		set_depletion(IN_ROOM(ch), DPLTN_FORAGE, config_get_int("short_depletion"));

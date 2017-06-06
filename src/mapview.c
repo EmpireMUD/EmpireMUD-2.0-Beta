@@ -917,7 +917,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : (IS_INCOMPLETE(room) ? "Completion" : "Maintain")), partialbuf);
 	}
 	
-	if (BUILDING_BURNING(room)) {
+	if (IS_BURNING(room)) {
 		msg_to_char(ch, "\t[B300]The building is on fire!\t0\r\n");
 	}
 	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_ON_FIRE)) {
@@ -1179,7 +1179,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
-	room_data *map_loc = get_map_location_for(IN_ROOM(ch)), *map_to_room = get_map_location_for(to_room);
+	room_data *map_loc, *map_to_room;
 	vehicle_data *show_veh;
 	
 	// options
@@ -1198,6 +1198,10 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	room_data *r_southeast = SHIFT_CHAR_DIR(ch, to_room, SOUTHEAST);
 	
 	#define distance(x, y, a, b)		((x - a) * (x - a) + (y - b) * (y - b))
+	
+	// detect map locations
+	map_loc = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
+	map_to_room = (GET_MAP_LOC(to_room) ? real_room(GET_MAP_LOC(to_room)->vnum) : NULL);
 
 	// detect base icon
 	base_icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);
@@ -1440,7 +1444,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 	// buf now contains the tile with preliminary color codes including &?
 
-	if (BUILDING_BURNING(to_room)) {
+	if (IS_BURNING(to_room)) {
 		strcpy(buf1, strip_color(buf));
 		sprintf(buf, "\t0\t[B300]%s", buf1);
 		need_color_terminator = TRUE;
@@ -2132,7 +2136,7 @@ ACMD(do_scan) {
 
 	int dir;
 	
-	room_data *use_room = get_map_location_for(IN_ROOM(ch));
+	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
 	
 	skip_spaces(&argument);
 	

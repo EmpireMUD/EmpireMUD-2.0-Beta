@@ -20,9 +20,6 @@
 
 /********** Event related section *********/
 
-#define EVENTFUNC(name) long (name)(void *event_obj)
-
-
 /*
 ** define event related structures
 */
@@ -37,7 +34,7 @@ struct event {
 /***** Queue related info ******/
 
 /* number of queues to use (reduces enqueue cost) */
-#define NUM_EVENT_QUEUES    10
+#define NUM_EVENT_QUEUES    250
 
 struct queue {
 	struct q_element *head[NUM_EVENT_QUEUES], *tail[NUM_EVENT_QUEUES];
@@ -53,7 +50,7 @@ struct q_element {
 /* - events - function protos need by other modules */
 void event_init(void);
 struct event *event_create(EVENTFUNC(*func), void *event_obj, long when);
-void event_cancel(struct event *event);
+void event_cancel(struct event *event, EVENT_CANCEL_FUNC(*func));
 void event_process(void);
 long event_time(struct event *event);
 void event_free_all(void);

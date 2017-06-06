@@ -25,6 +25,12 @@ blocks that are currently in use.
 2100  Primitive gear, forge, and low leather items
 2200  Forged weapons
 2300  Forged armors, high sewing items
+2400  Tank craftable gear, level 100+
+2500  Healer craftable gear, level 100+
+2600  Melee craftable gear, level 100+
+2700  Caster craftable gear, level 100+
+2800  PVP/Solo craftable gear, level 100+
+2900  Miscellaneous additional craftables, level 100+
 
 3000  Map/natural food items
 3100   "

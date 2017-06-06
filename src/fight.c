@@ -1824,12 +1824,12 @@ void process_tower(room_data *room) {
 * Iterates over empires, finds guard towers, and tries to shoot with them.
 */
 void update_guard_towers(void) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *ter_next;
 	room_data *tower;
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, ter_next) {
 			tower = ter->room;
 			
 			if (room_has_function_and_city_ok(tower, FNC_GUARD_TOWER)) {
@@ -2404,7 +2404,7 @@ void besiege_room(room_data *to_room, int damage) {
 		}
 		else {	// not over-damaged
 			// apply needed maintenance if we did more than 10% damage
-			if (GET_BUILDING(to_room) && GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) && damage >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(to_room)) / 10)) {
+			if (GET_BUILDING(to_room) && damage >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(to_room)) / 10)) {
 				old_list = GET_BUILDING_RESOURCES(to_room);
 				GET_BUILDING_RESOURCES(to_room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) ? GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) : default_res);
 				free_resource_list(old_list);

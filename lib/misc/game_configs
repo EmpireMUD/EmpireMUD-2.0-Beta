@@ -3,6 +3,7 @@
 *
 * Game configs
 allow_extended_color_codes 0
+automessage_color &y
 hiring_builders 0
 hiring_coders 0
 huh_string Huh?!?
@@ -43,12 +44,13 @@ mining_timer 45
 panning_timer 10
 pick_base_timer 4
 pick_depletion 14
-planting_base_timer 120
+planting_base_timer 9000
 shear_growth_time 6
 short_depletion 25
 tan_timer 12
 tavern_brew_time 10
 tavern_timer 60
+trench_fill_time 43200
 trench_full_value 2000
 trench_gain_from_rain 5
 trench_initial_value -500
@@ -165,6 +167,7 @@ trading_post_fee 0.050000
 trading_post_max_hours 72
 *
 * War configs
+burn_down_time 600
 death_release_minutes 5
 deaths_before_penalty 5
 deaths_before_penalty_war 0

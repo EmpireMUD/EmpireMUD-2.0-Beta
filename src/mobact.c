@@ -23,6 +23,7 @@
 #include "handler.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -632,6 +633,7 @@ void mobile_activity(void) {
 
 					// track to next room
 					for (track = ROOM_TRACKS(IN_ROOM(ch)); !found && track; track = track->next) {
+						// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
 						if (track->player_id == purs->idnum) {
 							found = TRUE;
 							dir = track->dir;
@@ -1082,7 +1084,7 @@ void spawn_mobs_from_center(room_data *center) {
 	int mob_spawn_radius = config_get_int("mob_spawn_radius");
 	
 	// always start on the map
-	center = get_map_location_for(center);
+	center = (GET_MAP_LOC(center) ? real_room(GET_MAP_LOC(center)->vnum) : NULL);
 	
 	// skip if we didn't find a map location
 	if (!center || GET_ROOM_VNUM(center) >= MAP_SIZE) {

@@ -22,9 +22,9 @@ the city. The mahogany walls are windowless, but light is provided by glowing
 chandeliers. For so much clutter, the guildhall is surprisingly well-kept.
 ~
 R
-8 1 5 0
+1008 1 5 0
 R
-2 1 5 0
+1002 1 5 0
 T 18216
 S
 #18217
@@ -87,7 +87,7 @@ egg strange~
 weather, it seems to be warm to the touch.
 ~
 R
-1 1 5 0
+1001 1 5 0
 S
 #18222
 Gigantic Egg~
@@ -102,7 +102,7 @@ inside this egg is so strong, you can feel it pulse along the ground beneath
 your feet.
 ~
 R
-1 1 5 0
+1001 1 5 0
 S
 #18223
 Hatching Egg~
@@ -115,7 +115,7 @@ egg hatching gigantic~
 The egg is nearly the size of a small castle, and has begun to tear open!
 ~
 R
-1 1 5 0
+1001 1 5 0
 S
 #18224
 Tortoise's Back~

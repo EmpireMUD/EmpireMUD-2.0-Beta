@@ -303,10 +303,19 @@ ACMD(do_hit) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FIGHTING(ch) ? FALSE : TRUE);	// count as exp only if not already fighting
-			// ensure hitting
-			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
+			if (!FIGHTING(ch)) {
+				hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FIGHTING(ch) ? FALSE : TRUE);	// count as exp only if not already fighting
+				
+				// ensure hitting
+				if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
+					FIGHTING(ch) = vict;
+				}
+			}
+			else {	// already fighting -- just change targets
 				FIGHTING(ch) = vict;
+				act("You change your focus to $N.", FALSE, ch, NULL, vict, TO_CHAR);
+				act("$n changes $s focus to $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
+				act("$n changes $s focus to you!", FALSE, ch, NULL, vict, TO_VICT);
 			}
 			
 			// cancel combat if auto-execute is off and the mob is unconscious after the hit

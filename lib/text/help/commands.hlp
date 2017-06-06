@@ -237,6 +237,18 @@ seconds, after which they can follow again.
 
 See also: FOLLOW
 #
+BECKON
+
+Usage:  beckon [name]
+
+This beckons people to follow you. Players who you beckon can just type
+'follow' without having to type your name, so long as they're still in the
+room with you.
+
+Inviting a player to a group automatically beckons them to follow.
+
+See also: FOLLOW
+#
 BOARD
 
 Usage:  board <vehicle>
@@ -691,12 +703,14 @@ Usage:  follow <leader>
 Use FOLLOW to automatically follow someone else. You can use AVOID to shake
 someone loose.
 
-Examples:
+If someone has beckoned you to follow, you can just type 'follow' without
+their name.
 
+Examples:
   > follow ras
   > follow self
 
-See also: AVOID, GROUP, SNEAK
+See also: AVOID, BECKON, GROUP, SNEAK
 #
 GET TAKE
 
@@ -774,6 +788,9 @@ invite them to the group.
 
 There is a limit of 4 members in a group at a time. This is intended to help
 balance game encounters against the number of players in the group.
+
+Inviting a player to a group automatically beckons them to follow, if they
+aren't already following someone.
 
 See also: ADVENTURE SUMMON, GSAY
 #
@@ -954,6 +971,22 @@ road sign.
 
 See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
+LEARN LEARNED LEARNING
+
+Usage:  learn <recipe>
+        learned [search terms]
+
+You can learn a recipe (including patterns, schematics, and designs) from an
+item that teaches it. This gives you permanent access to that craft recipe
+(although you must still meet any skill and level requirements).
+
+Learning a recipe will consume the recipe item.
+
+You can see your learned recipes with the 'learned' command and, optionally,
+can filter the results.
+
+See also: RECIPES
+#
 LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
 Usage:  load <mob | vehicle | all> <onto vehicle>
@@ -1043,6 +1076,13 @@ distance to it. This can help with city planning and measuring distances for
 Workforce.
 
 See also: WORKFORCE
+#
+MESSAGES
+
+Usage:  messages
+
+This displays any system messages from the last 24 hours, plus any messages
+that are set to show on login or on auto-repeat.
 #
 METERS "COMBAT METERS"
 
@@ -1841,6 +1881,7 @@ Toggles:
   autodismount - will dismount you while moving, if necessary
   no-empire - will not create a new empire when you try to claim or build
   clearmeters - automatically clears your meters between combats
+  tutorials - you won't see available tutorial quests if this is off
 
 Immortal toggles:
   wiznet - shuts off the immortal channel

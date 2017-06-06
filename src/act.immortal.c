@@ -39,7 +39,6 @@
 
 // external vars
 extern const char *action_bits[];
-extern const char *affect_types[];
 extern const char *affected_bits[];
 extern const char *apply_types[];
 extern const char *bld_on_flags[];
@@ -47,8 +46,8 @@ extern const char *bonus_bits[];
 extern const char *climate_types[];
 extern const char *component_flags[];
 extern const char *component_types[];
+extern const char *craft_types[];
 extern const char *dirs[];
-extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *function_flags[];
 extern const char *genders[];
@@ -892,8 +891,9 @@ void do_instance_list_all(char_data *ch) {
 			break;
 		}
 		
-		// skip adventures with no count
-		if (!(count = count_instances(adv))) {
+		// skip in-dev adventures with no count
+		count = count_instances(adv);
+		if (ADVENTURE_FLAGGED(adv, ADV_IN_DEVELOPMENT) && !count) {
 			continue;
 		}
 		
@@ -954,7 +954,9 @@ void do_instance_nearby(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	int num = 0, count = 0, distance = 50, size;
-	room_data *inst_loc, *loc = get_map_location_for(IN_ROOM(ch));
+	room_data *inst_loc, *loc;
+	
+	loc = GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL;
 	
 	if (*argument && (!isdigit(*argument) || (distance = atoi(argument)) < 0)) {
 		msg_to_char(ch, "Invalid distance '%s'.\r\n", argument);
@@ -1141,7 +1143,7 @@ struct set_struct {
 		{ "drunk",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "hunger",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "thirst",		LVL_START_IMM, 	BOTH, 	MISC },
-		{ "level",		LVL_CIMPL, 	PC, 	NUMBER },
+		{ "access",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
@@ -1165,6 +1167,8 @@ struct set_struct {
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
 		{ "skill", LVL_START_IMM, PC, MISC },
 		{ "faction", LVL_START_IMM, PC, MISC },
+		{ "learned", LVL_START_IMM, PC, MISC },
+		{ "currency", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1398,7 +1402,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			return (0);
 		}
 	}
-	else if SET_CASE("level") {
+	else if SET_CASE("access") {
 		if (value > GET_ACCESS_LEVEL(ch) || value > LVL_IMPL) {
 			send_to_char("You can't do that.\r\n", ch);
 			return (0);
@@ -1671,6 +1675,59 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		update_class(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
+	}
+	else if SET_CASE("learned") {
+		void add_learned_craft(char_data *ch, any_vnum vnum);
+		void remove_learned_craft(char_data *ch, any_vnum vnum);
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		craft_data *cft;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> learned <craft vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(cft = craft_proto(atoi(vnum_arg))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED) || CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Invalid craft (must be LEARNED and not IN-DEV).\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			add_learned_craft(ch, GET_CRAFT_VNUM(cft));
+			sprintf(output, "%s learned craft %d %s.", GET_NAME(vict), GET_CRAFT_VNUM(cft), GET_CRAFT_NAME(cft));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			remove_learned_craft(ch, GET_CRAFT_VNUM(cft));
+			sprintf(output, "%s un-learned craft %d %s.", GET_NAME(vict), GET_CRAFT_VNUM(cft), GET_CRAFT_NAME(cft));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
+		}
+	}
+	else if SET_CASE("currency") {
+		char vnum_arg[MAX_INPUT_LENGTH], amt_arg[MAX_INPUT_LENGTH];
+		generic_data *gen;
+		int amt;
+		
+		half_chop(val_arg, vnum_arg, amt_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*amt_arg) {
+			msg_to_char(ch, "Usage: set <name> currency <vnum> <amount>\r\n");
+			return 0;
+		}
+		if (!(gen = find_generic(atoi(vnum_arg), GENERIC_CURRENCY))) {
+			msg_to_char(ch, "Invalid currency vnum.\r\n");
+			return 0;
+		}
+		if (!isdigit(*amt_arg) || (amt = atoi(amt_arg)) < 0) {
+			msg_to_char(ch, "You must set it to zero or greater.\r\n");
+			return 0;
+		}
+		
+		amt = add_currency(vict, GEN_VNUM(gen), amt - get_currency(vict, GEN_VNUM(gen)));
+		sprintf(output, "%s's %d %s set to %d.", GET_NAME(vict), GEN_VNUM(gen), GEN_NAME(gen), amt);
 	}
 
 	else if SET_CASE("account") {
@@ -2243,7 +2300,7 @@ SHOW(show_stats) {
 	// other counts
 	LL_COUNT(object_list, obj, num_objs);
 	LL_COUNT(vehicle_list, veh, num_vehs);
-	LL_COUNT(trigger_list, trig, num_trigs);
+	LL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -2272,7 +2329,8 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d classes          %6d skills\r\n", HASH_COUNT(class_table), HASH_COUNT(skill_table));
 	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
 	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
-	msg_to_char(ch, "  %6d socials\r\n", HASH_COUNT(social_table));
+	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
+	msg_to_char(ch, "  %6d shops\r\n", HASH_COUNT(shop_table));
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
 }
@@ -2839,6 +2897,120 @@ SHOW(show_ignoring) {
 }
 
 
+SHOW(show_currency) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_currency *cur, *next_cur;
+	char_data *plr = NULL;
+	bool file = FALSE;
+	size_t size;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show currency <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+	
+		coin_string(GET_PLAYER_COINS(ch), line);
+		size = snprintf(buf, sizeof(buf), "%s has %s.\r\n", GET_NAME(plr), line);
+	
+		if (GET_CURRENCIES(plr)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Currencies:\r\n");
+		
+			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
+				snprintf(line, sizeof(line), "%3d %s\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+			
+				if (size + strlen(line) < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
+				else {
+					break;
+				}
+			}
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
+SHOW(show_learned) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_craft_data *pcd, *next_pcd;
+	char_data *plr = NULL;
+	size_t size, count;
+	craft_data *craft;
+	bool file = FALSE;
+	
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show learned <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_LEARNED_CRAFTS(plr), pcd, next_pcd) {
+			if (!(craft = craft_proto(pcd->vnum))) {
+				continue;	// no craft?
+			}
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+				continue;	// in-dev
+			}
+			if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " %s (%s)\r\n", GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_workforce) {
 	void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 	
@@ -3290,7 +3462,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	extern const char *account_flags[];
 	extern const char *class_role[];
-	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
 	extern const char *mob_custom_types[];
@@ -3511,8 +3682,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				sprinttype(cool->type, cooldown_types, buf);
-				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), buf, (diff / 60), (diff % 60));
+				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
 				
 				found = TRUE;
 			}
@@ -3538,7 +3708,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 				sprintf(lbuf, "%.1fmin", ((double)(aff->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
 			}
 
-			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, affect_types[aff->type]);
+			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -3565,7 +3735,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			sprintf(lbuf, "%.1fmin", ((double)(dot->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
 		}
 		
-		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, affect_types[dot->type], dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 
 	/* check mobiles for a script */
@@ -3597,7 +3767,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
 	extern const char *craft_flags[];
-	extern const char *craft_types[];
 	
 	ability_data *abil;
 	bld_data *bld;
@@ -3613,7 +3782,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		msg_to_char(ch, "Creates Vehicle: [&c%d&0] %s\r\n", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
-		msg_to_char(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : drinks[GET_CRAFT_OBJECT(craft)]));
+		msg_to_char(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 	else {
 		msg_to_char(ch, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
@@ -3849,7 +4018,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		msg_to_char(ch, "\r\n");
 	}
-
+	
+	// ITEM_X: stat obj
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
@@ -3859,6 +4029,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		case ITEM_POISON: {
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(j));
+			msg_to_char(ch, "Teaches craft: %d %s (%s)\r\n", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:
@@ -3875,7 +4050,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Flags: %s\r\n", buf);
 			break;
 		case ITEM_DRINKCON:
-			msg_to_char(ch, "Contains: %d/%d drinks of %s\r\n", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), drinks[GET_DRINK_CONTAINER_TYPE(j)]);
+			msg_to_char(ch, "Contains: %d/%d drinks of %s\r\n", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(j), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for: %d hour%s\r\n", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
@@ -3895,6 +4070,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		case ITEM_COINS: {
 			msg_to_char(ch, "Amount: %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
+			break;
+		}
+		case ITEM_CURRENCY: {
+			msg_to_char(ch, "Amount: %d %s\r\n", GET_CURRENCY_AMOUNT(j), get_generic_string_by_vnum(GET_CURRENCY_VNUM(j), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(j))));
 			break;
 		}
 		case ITEM_MISSILE_WEAPON:
@@ -4066,7 +4245,7 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0%s)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))), buf3);
-	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home), get_island(GET_ISLAND_ID(home), TRUE)->name);
+	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island");
 	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
@@ -4098,7 +4277,14 @@ void do_stat_room(char_data *ch) {
 		if (GET_INSIDE_ROOMS(home) > 0) {
 			msg_to_char(ch, "Designated rooms: %d\r\n", GET_INSIDE_ROOMS(home));
 		}
-		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
+		
+		if (IS_BURNING(home)) {
+			sprintf(buf2, "Burns down in: %ld seconds", BUILDING_BURN_DOWN_TIME(home) - time(0));
+		}
+		else {
+			strcpy(buf2, "Not on fire");
+		}
+		msg_to_char(ch, "%s, Damage: %d/%d\r\n", buf2, (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
@@ -4218,7 +4404,7 @@ void do_stat_room(char_data *ch) {
 		for (aff = ROOM_AFFECTS(IN_ROOM(ch)); aff; aff = aff->next) {
 			*buf2 = '\0';
 
-			sprintf(buf, "Affect: (%3dhr) &c%s&0 ", aff->duration + 1, affect_types[aff->type]);
+			sprintf(buf, "Affect: (%3ldsec) &c%s&0 ", (aff->duration - time(0)), get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -4236,10 +4422,10 @@ void do_stat_room(char_data *ch) {
 		}
 	}
 	
-	if (IN_ROOM(ch)->extra_data) {
+	if (ROOM_EXTRA_DATA(IN_ROOM(ch))) {
 		msg_to_char(ch, "Extra data:\r\n");
 		
-		HASH_ITER(hh, IN_ROOM(ch)->extra_data, red, next_red) {
+		HASH_ITER(hh, ROOM_EXTRA_DATA(IN_ROOM(ch)), red, next_red) {
 			sprinttype(red->type, room_extra_types, buf);
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}
@@ -4475,6 +4661,8 @@ int vnum_crop(char *searchname, char_data *ch) {
 * @return int The number of matches shown.
 */
 int vnum_global(char *searchname, char_data *ch) {
+	extern const char *global_types[];
+	
 	struct global_data *iter, *next_iter;
 	char flags[MAX_STRING_LENGTH];
 	int found = 0;
@@ -4485,16 +4673,16 @@ int vnum_global(char *searchname, char_data *ch) {
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags);
+					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_MINE_DATA: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), sector_flags, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s - %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags);
+					msg_to_char(ch, "%3d. [%5d] %s - %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				default: {
-					msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter));
+					msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 			}
@@ -4838,6 +5026,211 @@ ACMD(do_at) {
 	if (IN_ROOM(ch) == location) {
 		char_from_room(ch);
 		char_to_room(ch, original_loc);
+	}
+}
+
+
+ACMD(do_automessage) {
+	extern int new_automessage_id();
+	void free_automessage(struct automessage *msg);
+	void save_automessages(void);
+	extern int sort_automessage_by_data(struct automessage *a, struct automessage *b);
+	extern const char *automessage_types[];
+	extern struct automessage *automessages;
+	
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], id_arg[MAX_STRING_LENGTH];
+	struct automessage *msg, *next_msg;
+	int id, iter, type, interval = 5;
+	player_index_data *plr;
+	size_t size;
+	
+	argument = any_one_arg(argument, cmd_arg);
+	
+	if (is_abbrev(cmd_arg, "list")) {
+		size = snprintf(buf, sizeof(buf), "Automessages:\r\n");
+		
+		HASH_ITER(hh, automessages, msg, next_msg) {
+			switch (msg->timing) {
+				case AUTOMSG_REPEATING: {
+					snprintf(part, sizeof(part), "%s (%dm)", automessage_types[msg->timing], msg->interval);
+					break;
+				}
+				default: {
+					strcpy(part, automessage_types[msg->timing]);
+					break;
+				}
+			}
+			
+			plr = find_player_index_by_idnum(msg->author);
+			snprintf(line, sizeof(line), "%d. %s (%s): %s\r\n", msg->id, part, plr->fullname, msg->msg);
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		if (!automessages) {
+			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "add")) {
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!*type_arg) {
+			msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
+			return;
+		}
+		if ((type = search_block(type_arg, automessage_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid message type '%s'.\r\n", type_arg);
+			return;
+		}
+		
+		// special handling for repeats
+		if (type == AUTOMSG_REPEATING) {
+			argument = any_one_arg(argument, type_arg);
+			if (!*type_arg) {
+				msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
+				return;
+			}
+			if (!isdigit(*type_arg) || (interval = atoi(type_arg)) < 1) {
+				msg_to_char(ch, "Invalid repeating interval '%s'.\r\n", type_arg);
+				return;
+			}
+		}
+		
+		skip_spaces(&argument);
+		if (!*argument) {
+			msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
+			return;
+		}
+		
+		// ready!
+		CREATE(msg, struct automessage, 1);
+		msg->id = new_automessage_id();
+		msg->timestamp = time(0);
+		msg->author = GET_IDNUM(ch);
+		msg->timing = type;
+		msg->interval = interval;
+		msg->msg = str_dup(argument);
+		
+		HASH_ADD_INT(automessages, id, msg);
+		
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s added automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
+		msg_to_char(ch, "You create a new message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
+		
+		HASH_SORT(automessages, sort_automessage_by_data);
+		save_automessages();
+	}
+	else if (is_abbrev(cmd_arg, "change")) {
+		argument = any_one_arg(argument, id_arg);
+		
+		if (!*id_arg || !isdigit(*id_arg) || (id = atoi(id_arg)) < 0) {
+			msg_to_char(ch, "Usage: automessage change <id> <property> <value>\r\n");
+			return;
+		}
+		
+		HASH_FIND_INT(automessages, &id, msg);
+		if (!msg) {
+			msg_to_char(ch, "Invalid message id %d.\r\n", id);
+			return;
+		}
+		
+		argument = any_one_arg(argument, type_arg);
+		skip_spaces(&argument);
+		
+		if (is_abbrev(type_arg, "type")) {
+			if (!*argument) {
+				msg_to_char(ch, "Change the type to what?\r\n");
+				return;
+			}
+			if ((type = search_block(argument, automessage_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid message type '%s'.\r\n", type_arg);
+				return;
+			}
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s changed automessage %d's type to %s", GET_NAME(ch), msg->id, automessage_types[type]);
+			msg_to_char(ch, "You change automessage %d's type to %s\r\n", msg->id, automessage_types[type]);
+			if (type == AUTOMSG_REPEATING && type != msg->timing) {
+				msg->interval = 5;	// safe default
+			}
+			msg->timing = type;
+			HASH_SORT(automessages, sort_automessage_by_data);
+			save_automessages();
+		}
+		else if (is_abbrev(type_arg, "interval")) {
+			if (msg->timing != AUTOMSG_REPEATING) {
+				msg_to_char(ch, "You can only change that on a repeating message.\r\n");
+				return;
+			}
+			if (!*argument || !isdigit(*argument) || (interval = atoi(argument)) < 1) {
+				msg_to_char(ch, "Invalid interval.\r\n");
+				return;
+			}
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s changed automessage %d's interval to %d minute%s", GET_NAME(ch), msg->id, interval, PLURAL(interval));
+			msg_to_char(ch, "You change automessage %d's interval to %d minute%s\r\n", msg->id, interval, PLURAL(interval));
+			msg->interval = interval;
+			save_automessages();
+		}
+		else if (is_abbrev(type_arg, "message")) {
+			if (!*argument) {
+				msg_to_char(ch, "Change the message to what?\r\n");
+				return;
+			}
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s changed automessage %d to: %s", GET_NAME(ch), msg->id, argument);
+			msg_to_char(ch, "You change automessage %d from: %s\r\nTo: %s\r\n", msg->id, NULLSAFE(msg->msg), argument);
+			
+			if (msg->msg) {
+				free(msg->msg);
+			}
+			msg->msg = str_dup(argument);
+			save_automessages();
+		}
+		else {
+			msg_to_char(ch, "You can change the type, interval, or message.\r\n");
+			return;
+		}
+	}
+	else if (is_abbrev(cmd_arg, "delete")) {
+		skip_spaces(&argument);
+		if (!*argument) {
+			msg_to_char(ch, "Delete which automessage (id)?\r\n");
+			return;
+		}
+		
+		id = atoi(argument);
+		HASH_FIND_INT(automessages, &id, msg);
+		if (!msg) {
+			msg_to_char(ch, "No such message id to delete.\r\n");
+			return;
+		}
+		
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
+		msg_to_char(ch, "You delete message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
+		HASH_DEL(automessages, msg);
+		free_automessage(msg);
+		save_automessages();
+	}
+	else {
+		msg_to_char(ch, "Usage: automessage list\r\n");
+		msg_to_char(ch, "       automessage add <type> [interval] <msg>\r\n");
+		msg_to_char(ch, "       automessage change <id> <property> <new val>\r\n");
+		msg_to_char(ch, "       automessage delete <id>\r\n");
+		msg_to_char(ch, "Types: ");
+		for (iter = 0; *automessage_types[iter] != '\n'; ++iter) {
+			msg_to_char(ch, "%s%s", (iter > 0 ? ", " : ""), automessage_types[iter]);
+		}
+		msg_to_char(ch, "\r\n");
 	}
 }
 
@@ -6276,7 +6669,7 @@ ACMD(do_random) {
 	// looks for a random non-ocean location
 	for (tries = 0; tries < 100; ++tries) {
 		roll = number(0, MAP_SIZE - 1);
-		loc = real_real_room(roll);	// use real_real_room to skip BASIC_OCEAN
+		loc = real_real_room(roll);	// use real_real_room to skip !SECT_IS_LAND_MAP
 		
 		if (loc && !ROOM_IS_CLOSED(loc) && !ROOM_SECT_FLAGGED(loc, SECTF_OCEAN)) {
 			perform_goto(ch, loc);
@@ -6781,6 +7174,8 @@ ACMD(do_show) {
 		{ "factions", LVL_START_IMM, show_factions },
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 		{ "data", LVL_CIMPL, show_data },
+		{ "learned", LVL_START_IMM, show_learned },
+		{ "currency", LVL_START_IMM, show_currency },
 
 		// last
 		{ "\n", 0, NULL }
@@ -7511,9 +7906,15 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No factions by that name.\r\n");
 		}
 	}
-	else if (is_abbrev(buf, "global")) {
+	else if (is_abbrev(buf, "global")) {	// takes precedence on 'g'
 		if (!vnum_global(buf2, ch)) {
 			msg_to_char(ch, "No globals by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "generic")) {
+		extern int vnum_generic(char *searchname, char_data *ch);
+		if (!vnum_generic(buf2, ch)) {
+			msg_to_char(ch, "No generics by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "morph")) {
@@ -7536,6 +7937,12 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "sector")) {
 		if (!vnum_sector(buf2, ch)) {
 			msg_to_char(ch, "No sectors by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "shop")) {
+		extern int vnum_shop(char *searchname, char_data *ch);
+		if (!vnum_shop(buf2, ch)) {
+			msg_to_char(ch, "No shops by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "skill")) {
@@ -7668,13 +8075,22 @@ ACMD(do_vstat) {
 		}
 		do_stat_faction(ch, fct);
 	}
-	else if (is_abbrev(buf, "global")) {
+	else if (is_abbrev(buf, "global")) {	// precedence on 'g'
 		struct global_data *glb = global_proto(number);
 		if (!glb) {
 			msg_to_char(ch, "There is no global with that number.\r\n");
 			return;
 		}
 		do_stat_global(ch, glb);
+	}
+	else if (is_abbrev(buf, "generic")) {
+		void do_stat_generic(char_data *ch, generic_data *gen);
+		generic_data *gen = real_generic(number);
+		if (!gen) {
+			msg_to_char(ch, "There is no generic with that number.\r\n");
+			return;
+		}
+		do_stat_generic(ch, gen);
 	}
 	else if (is_abbrev(buf, "mobile")) {
 		if (!mob_proto(number)) {
@@ -7729,6 +8145,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_sector(ch, sect);
+	}
+	else if (is_abbrev(buf, "shop")) {
+		void do_stat_shop(char_data *ch, shop_data *shop);
+		shop_data *shop = real_shop(number);
+		if (!shop) {
+			msg_to_char(ch, "There is no shop with that number.\r\n");
+			return;
+		}
+		do_stat_shop(ch, shop);
 	}
 	else if (is_abbrev(buf, "skill")) {
 		void do_stat_skill(char_data *ch, skill_data *skill);

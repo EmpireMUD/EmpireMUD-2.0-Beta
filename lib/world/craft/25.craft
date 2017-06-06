@@ -1,0 +1,127 @@
+#2500
+imperial raiment of the bear~
+2500 1
+4 199 gq 42 -1
+L
+100
+R
+176 8 0 0
+R
+1206 12 0 0
+R
+10 2 1 16384
+R
+10 2 1 32
+R
+26 16 1 128
+R
+15 2 1 32
+R
+170 1 0 0
+S
+#2502
+imperial bear cowl~
+2502 1
+4 199 gq 42 -1
+L
+100
+R
+176 8 0 0
+R
+1206 12 0 0
+R
+10 2 1 16384
+R
+10 2 1 32
+R
+26 4 1 128
+S
+#2504
+imperial bearclaw armband~
+2504 1
+4 199 gq 42 -1
+L
+100
+R
+176 8 0 0
+R
+1206 12 0 0
+R
+10 2 1 16384
+R
+10 2 1 32
+R
+26 10 1 128
+S
+#2506
+imperial totem of the bear~
+2506 1
+2 203 aq 42 -1
+L
+100
+R
+1206 12 0 0
+R
+176 8 0 0
+R
+170 1 0 0
+S
+#2508
+heroic unicorn armor~
+2508 1
+4 199 gq 42 -1
+L
+200
+R
+613 12 0 0
+R
+611 8 0 0
+R
+11 1 1 4160
+R
+170 1 0 0
+R
+171 1 0 0
+S
+#2510
+heroic unicorn circlet~
+2510 1
+4 199 gq 42 -1
+L
+200
+R
+613 12 0 0
+R
+611 8 0 0
+R
+11 1 1 4160
+S
+#2512
+heroic strands of unicorn's blessing~
+2512 1
+4 199 gq 42 -1
+L
+200
+R
+613 12 0 0
+R
+611 8 0 0
+R
+11 1 1 4160
+S
+#2514
+heroic unicorn wand of healing~
+2514 1
+2 196 aq 42 -1
+L
+200
+R
+611 4 0 0
+R
+613 2 0 0
+R
+13 1 1 64
+R
+171 1 0 0
+S
+$

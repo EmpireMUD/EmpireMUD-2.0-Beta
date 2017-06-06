@@ -129,7 +129,7 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 	int iter;
 	empire_data *emp = GET_LOYALTY(ch); //This method should only be called if ch belongs to an empire, so this should never return null here.
 	
-	ch_current_island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), false);
+	ch_current_island = GET_ISLAND(IN_ROOM(ch));
 	
 	//Error validation
 	if (!ch_current_island || ch_current_island->id == NO_ISLAND) {
@@ -183,7 +183,7 @@ void do_customize_island(char_data *ch, char *argument) {
 	// check cities ahead of time
 	if (GET_LOYALTY(ch)) {
 		LL_FOREACH(EMPIRE_CITY_LIST(GET_LOYALTY(ch)), city) {
-			if (GET_ISLAND_ID(city->location) == GET_ISLAND_ID(IN_ROOM(ch)) && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) < time(0))) {
+			if (GET_ISLAND(city->location) == GET_ISLAND(IN_ROOM(ch)) && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) < time(0))) {
 				has_city = TRUE;
 				break;
 			}
@@ -202,7 +202,7 @@ void do_customize_island(char_data *ch, char *argument) {
 	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
 		msg_to_char(ch, "You don't have permission to customize anything.\r\n");
 	}
-	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)) || !(eisle = get_empire_island(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch))))) {
+	else if (!(island = GET_ISLAND(IN_ROOM(ch))) || !(eisle = get_empire_island(GET_LOYALTY(ch), island->id))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 	}
 	else if (IS_SET(island->flags, ISLE_NO_CUSTOMIZE)) {
@@ -714,7 +714,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		return;
 	}
 	
-	if (GET_ISLAND_ID(IN_ROOM(ch)) == NOTHING && !IS_IMMORTAL(ch)) {
+	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't check any empire inventory here.\r\n");
 		return;
 	}
@@ -902,7 +902,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 			continue;
 		}
 		
-		if ( here && requesters_island != GET_ISLAND_ID(IN_ROOM(ch_iter))) {
+		if (here && requesters_island != GET_ISLAND_ID(IN_ROOM(ch_iter))) {
 			continue;
 		}
 		
@@ -1261,7 +1261,7 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to found cities.\r\n");
 		return;
 	}
-	if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)) && IS_SET(isle->flags, ISLE_NEWBIE) && !config_get_bool("cities_on_newbie_islands")) {
+	if ((isle = GET_ISLAND(IN_ROOM(ch))) && IS_SET(isle->flags, ISLE_NEWBIE) && !config_get_bool("cities_on_newbie_islands")) {
 		msg_to_char(ch, "You can't found a city on a newbie island.\r\n");
 		return;
 	}
@@ -1438,7 +1438,7 @@ void list_cities(char_data *ch, char *argument) {
 		found = TRUE;
 		rl = city->location;
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
-		isle = get_island(GET_ISLAND_ID(rl), TRUE);
+		isle = GET_ISLAND(rl);
 		
 		pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
 		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
@@ -2189,7 +2189,7 @@ bool extract_tavern_resources(room_data *room) {
 */
 void show_tavern_status(char_data *ch) {
 	empire_data *emp = GET_LOYALTY(ch);
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	bool found = FALSE;
 	
 	if (!emp) {
@@ -2198,7 +2198,7 @@ void show_tavern_status(char_data *ch) {
 	
 	msg_to_char(ch, "Your taverns:\r\n");
 	
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (room_has_function_and_city_ok(ter->room, FNC_TAVERN)) {
 			found = TRUE;
 			
@@ -2307,6 +2307,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y;
 	char output[MAX_STRING_LENGTH], line[128];
+	struct map_data *map_loc;
 	room_data *map, *room;
 	size_t size, lsize;
 	vehicle_data *veh;
@@ -2322,7 +2323,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 		msg_to_char(ch, "Scan for what?\r\n");
 		return;
 	}
-	if (!(map = get_map_location_for(IN_ROOM(ch)))) {
+	if ((map_loc = GET_MAP_LOC(IN_ROOM(ch))) || !(map = real_room(map_loc->vnum))) {
 		msg_to_char(ch, "You can't scan for anything here.\r\n");
 		return;
 	}
@@ -2756,6 +2757,9 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't seem to cede land to %s.\r\n", REAL_HMHR(targ));
 	else if (f == e)
 		msg_to_char(ch, "You can't cede land to your own empire!\r\n");
+	else if (GET_RANK(targ) < EMPIRE_PRIV(GET_LOYALTY(targ), PRIV_CLAIM)) {
+		act("You can't cede to $M because $E doesn't have the claim privilege.", FALSE, ch, NULL, targ, TO_CHAR);
+	}
 	else if (EMPIRE_CITY_TERRITORY(f) + EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, FALSE))
 		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", REAL_HMHR(targ), REAL_HSHR(targ));
 	else if (!is_in_city_for_empire(room, f, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
@@ -3941,20 +3945,16 @@ ACMD(do_enroll) {
 			}
 
 			// territory data
-			for (ter = EMPIRE_TERRITORY_LIST(old); ter; ter = next_ter) {
-				next_ter = ter->next;
-				
+			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(old), ter, next_ter) {
 				// switch npc allegiance
 				for (npc = ter->npcs; npc; npc = npc->next) {
 					npc->empire_id = EMPIRE_VNUM(e);
 				}
 				
 				// move territory over
-				ter->next = EMPIRE_TERRITORY_LIST(e);
-				EMPIRE_TERRITORY_LIST(e) = ter;
+				HASH_DEL(EMPIRE_TERRITORY_LIST(old), ter);
+				HASH_ADD_INT(EMPIRE_TERRITORY_LIST(e), vnum, ter);
 			}
-			
-			EMPIRE_TERRITORY_LIST(old) = NULL;
 			
 			// move territory over
 			HASH_ITER(hh, world_table, room, next_room) {
@@ -4240,7 +4240,7 @@ ACMD(do_findmaintenance) {
 	struct resource_data *old_res, *total_list = NULL;
 	struct island_info *find_island = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	room_data *find_room = NULL;
 	int total = 0;
 	
@@ -4301,7 +4301,7 @@ ACMD(do_findmaintenance) {
 	}
 	
 	// check all the territory
-	LL_FOREACH(EMPIRE_TERRITORY_LIST(emp), ter) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		// validate the tile
 		if (GET_ROOM_VNUM(ter->room) >= MAP_SIZE) {
 			continue;
@@ -4309,7 +4309,7 @@ ACMD(do_findmaintenance) {
 		if ((!IS_COMPLETE(ter->room) || !BUILDING_RESOURCES(ter->room)) && !HAS_MINOR_DISREPAIR(ter->room)) {
 			continue;
 		}
-		if (find_island && GET_ISLAND_ID(ter->room) != find_island->id) {
+		if (find_island && GET_ISLAND(ter->room) != find_island) {
 			continue;
 		}
 		
@@ -4596,6 +4596,8 @@ ACMD(do_islands) {
 
 
 ACMD(do_tavern) {
+	void check_tavern_setup(room_data *room);
+	
 	int iter, type = NOTHING, pos, old;
 	
 	one_argument(argument, arg);
@@ -4646,6 +4648,7 @@ ACMD(do_tavern) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_BREWING_TIME, config_get_int("tavern_brew_time"));
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
 			msg_to_char(ch, "This tavern will now brew %s.\r\n", tavern_data[type].name);
+			check_tavern_setup(IN_ROOM(ch));
 		}
 		else {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE, old);
@@ -5550,7 +5553,7 @@ ACMD(do_workforce) {
 		
 		// island arg
 		if (!*island_arg) {
-			if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
+			if (!GET_ISLAND(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't set local workforce options when you're not on any island.\r\n");
 				return;
 			}

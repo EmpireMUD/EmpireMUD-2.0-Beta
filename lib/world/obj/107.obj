@@ -53,8 +53,8 @@ the honey-cured ham recipe~
 The honey-cured ham recipe is lying here.~
 You can cook: honey-cured ham
 ~
-3 p a 3
-0 0 0
+7 p a 4
+10703 0 0
 0 0
 S
 #10705
@@ -82,8 +82,8 @@ the fruitcake recipe~
 The fruitcake recipe is lying on the ground.~
 You can cook: fruitcake
 ~
-3 p a 4
-0 0 0
+7 p a 5
+10705 0 0
 0 0
 S
 #10707
@@ -108,8 +108,8 @@ the roast goose recipe~
 The roast goose recipe is lying here.~
 You can cook: roast goose
 ~
-3 p a 4
-0 0 0
+7 p a 5
+10707 0 0
 0 0
 S
 #10709
@@ -227,18 +227,18 @@ the Christmas cookie recipe~
 The Christmas cookie recipe is lying here.~
 You can cook: Christmas cookies
 ~
-3 p a 4
-0 0 0
+7 p a 5
+10716 0 0
 0 0
 S
 #10718
 schematic sleigh~
 the sleigh schematic~
 The sleigh schematic is lying on the ground.~
-You can craft (Advanced Woodworking): sleigh
+This schematic teaches you to craft a sleigh.
 ~
-3 p a 2
-0 0 0
+7 p a 3
+10715 0 0
 0 0
 S
 #10719
@@ -936,5 +936,16 @@ it. It's in poor condition and doesn't look like it will last very long
 0 0 0
 0 288
 T 10771
+S
+#10772
+replacer goblin raft~
+a goblin raft~
+A goblin raft replacer has bugged out.~
+This is supposed to purge itself and spawn a goblin raft. Evidently it didn't.
+~
+3 0 0 2
+0 0 0
+0 1
+T 10773
 S
 $

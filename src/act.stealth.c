@@ -764,7 +764,7 @@ ACMD(do_darkness) {
 		CREATE(af, struct affected_type, 1);
 		af->type = ATYPE_DARKNESS;
 		af->cast_by = CAST_BY_ID(ch);
-		af->duration = 1;
+		af->duration = time(0) + 75;	// duration is actually expire time on room affs (TODO: change the name)
 		af->modifier = 0;
 		af->location = APPLY_NONE;
 		af->bitvector = ROOM_AFF_DARK;
