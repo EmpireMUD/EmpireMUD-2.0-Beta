@@ -378,10 +378,6 @@ void parse_social(FILE *fl, any_vnum vnum) {
 	SOC_MIN_CHAR_POS(soc) = int_in[0];
 	SOC_MIN_VICT_POS(soc) = int_in[1];
 	
-	// end
-	fprintf(fl, "S\n");
-
-	
 	// optionals
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -681,7 +677,7 @@ void do_stat_social(char_data *ch, social_data *soc) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Command: \tc%s\t0 Name: \tc%s\t0\r\n", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Command: \tc%s\t0, Name: \tc%s\t0\r\n", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Min actor position: \ty%s\t0, Min victim position: \ty%s\t0\r\n", position_types[SOC_MIN_CHAR_POS(soc)], position_types[SOC_MIN_VICT_POS(soc)]);
 	

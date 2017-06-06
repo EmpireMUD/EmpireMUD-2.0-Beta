@@ -278,6 +278,16 @@ This building can only be built in a city.
 
 See also: DESIGNATE, PORTCULLIS, INTERLINK
 #
+FAMILYGRAVESITE "FAMILY GRAVESITE"
+
+..x.  Family Gravesite (Basic Buildings ability)
+
+The family gravesite is a small tomb (respawn point) that you can build inside
+your cities. It can't be built outside of an established city, and won't work
+if the city is removed.
+
+See also: TOMB
+#
 FENCE
 
 vvvv  Fence  (Basic Buildings)
@@ -1057,6 +1067,9 @@ Stored here:  tools
 Each utility shed stores tools and miscellaneous items for the empire. Like all
 storage facilities, your NPCs move tools between yards so that you can
 retrieve it from any such location.
+
+Only basic tools can be stored in the utility shed (items that scale in level
+cannot be stored here).
 
 See also: STORAGE
 #

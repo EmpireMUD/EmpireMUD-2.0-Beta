@@ -541,24 +541,26 @@ void summon_materials(char_data *ch, char *argument) {
 			}
 			
 			while (count < total && store->amount > 0) {
-				++count;
-				if (!retrieve_resource(ch, emp, store, FALSE)) {
-					break;
+				if (retrieve_resource(ch, emp, store, FALSE)) {
+					++count;
+				}
+				else {
+					break;	// no more
 				}
 			}
 		}
 	}
 	
-	if (found && count < total) {
+	if (found && count < total && count > 0) {
 		msg_to_char(ch, "There weren't enough, but you managed to summon %d.\r\n", count);
 	}
-
+	
 	// result messages
 	if (!found) {
 		msg_to_char(ch, "Nothing like that is stored around here.\r\n");
 	}
 	else if (count == 0) {
-		msg_to_char(ch, "There is nothing stored in your empire nearby.\r\n");
+		// they must have gotten an error message
 	}
 	else {
 		// save the empire
@@ -1703,6 +1705,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		if (rand_room && !ROOM_IS_CLOSED(rand_room) && can_teleport_to(ch, rand_room, TRUE)) {
 			to_room = rand_room;
 		}
+		++tries;
 	}
 	
 	if (!to_room || !can_teleport_to(ch, to_room, TRUE) || !(map = (GET_MAP_LOC(to_room) ? real_room(GET_MAP_LOC(to_room)->vnum) : NULL))) {

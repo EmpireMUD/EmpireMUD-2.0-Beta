@@ -1532,6 +1532,11 @@ void process_gathering(char_data *ch) {
 * @param char_data *ch The harvester.
 */
 void process_harvesting(char_data *ch) {
+	if (!ROOM_CROP(IN_ROOM(ch))) {
+		msg_to_char(ch, "There's nothing left to harvest here.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!GET_EQ(ch, WEAR_WIELD) || (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLASH)) {
 		send_to_char("You're not wielding the proper tool for harvesting.\r\n", ch);
 		cancel_action(ch);

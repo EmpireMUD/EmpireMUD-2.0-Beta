@@ -485,7 +485,8 @@ Special Variables When using field - The variable returns:
 
 Speech (trigger type)
 
-Argument type:  the phrase (whole string) or word list to match
+Argument type:  the phrase (whole string) or word list to match, or * to match
+   any text.
 
 Speech triggers occur when someone in the room says the phrase (or one of the
 words in a word list) using the normal "say" command. This is can be used to

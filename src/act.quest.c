@@ -152,6 +152,12 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 		return;
 	}
 	
+	// take objs if necessary
+	if (QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS)) {
+		extract_required_items(ch, pq->tracker);
+	}
+	remove_quest_items_by_quest(ch, QUEST_VNUM(quest));
+	
 	qt_quest_completed(ch, pq->vnum);
 	qt_lose_quest(ch, pq->vnum);
 	
@@ -174,6 +180,11 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
 		pcq->last_completed = data_get_long(DATA_DAILY_CYCLE);
 	}
+	
+	// remove from player's tracker
+	LL_DELETE(GET_QUESTS(ch), pq);
+	pq->next = NULL;
+	free_player_quests(pq);
 	
 	// determine scale level
 	level = get_approximate_level(ch);
@@ -289,13 +300,6 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 		}
 	}
 	
-	// take objs if necessary
-	if (QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS)) {
-		extract_required_items(ch, pq->tracker);
-	}
-	
-	remove_quest_items_by_quest(ch, QUEST_VNUM(quest));
-	
 	// dailies:
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
 		GET_DAILY_QUESTS(ch) += 1;
@@ -305,11 +309,6 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 			msg_to_char(ch, "You have hit the daily quest limit and your remaining daily quests expire.\r\n");
 		}
 	}
-	
-	// remove from player's tracker
-	LL_DELETE(GET_QUESTS(ch), pq);
-	pq->next = NULL;
-	free_player_quests(pq);
 }
 
 
