@@ -507,6 +507,31 @@ craft_data *find_building_list_entry(room_data *room, byte type) {
 	return NULL;
 }
 
+/**
+* Finds a room that the player could designate here.
+*
+* @param char *name The room name to search for.
+* @param bitvector_t flags The DES_ designate flags that must match.
+* @return bld_data *The matching room (building) entry or NULL if no match.
+*/
+bld_data *find_designate_room_by_name(char *name, bitvector_t flags) {
+	bld_data *iter, *next_iter, *partial = NULL;
+	
+	HASH_ITER(hh, building_table, iter, next_iter) {
+		if (flags && !IS_SET(GET_BLD_DESIGNATE_FLAGS(iter), flags)) {
+			continue;	// not matching
+		}
+		if (!str_cmp(name, GET_BLD_NAME(iter))) {
+			return iter;	// exact match
+		}
+		else if (!partial && is_abbrev(name, GET_BLD_NAME(iter))) {
+			partial = iter;
+		}
+	}
+	
+	return partial;	// if any
+}
+
 
 /**
 * @param bld_data *bb The building to search for.
@@ -1668,7 +1693,10 @@ ACMD(do_designate) {
 	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!*argument || !(type = get_building_by_name(argument, TRUE))) {
+	else if (!*argument || !(type = find_designate_room_by_name(argument, valid_des_flags))) {
+		if (*argument) {	// if any
+			msg_to_char(ch, "You can't designate a '%s' here.\r\n", argument);
+		}
 		msg_to_char(ch, "Usage: %s <room>\r\n", (subcmd == SCMD_REDESIGNATE) ? "redesignate" : "designate <direction>");
 
 		if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && (subcmd == SCMD_DESIGNATE) && GET_INSIDE_ROOMS(home) >= maxrooms) {

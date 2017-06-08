@@ -4145,15 +4145,21 @@ char *trim(char *string) {
 * @return bld_data *The matching building entry (BUILDING_x const) or NULL.
 */
 bld_data *get_building_by_name(char *name, bool room_only) {
-	bld_data *iter, *next_iter;
+	bld_data *iter, *next_iter, *partial = NULL;
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
-		if ((!room_only || IS_SET(GET_BLD_FLAGS(iter), BLD_ROOM)) && is_abbrev(name, GET_BLD_NAME(iter))) {
-			return iter;
+		if (room_only && !IS_SET(GET_BLD_FLAGS(iter), BLD_ROOM)) {
+			continue;
+		}
+		if (!str_cmp(name, GET_BLD_NAME(iter))) {
+			return iter;	// exact match
+		}
+		else if (!partial && is_abbrev(name, GET_BLD_NAME(iter))) {
+			partial = iter;
 		}
 	}
 	
-	return NULL;
+	return partial;	// if any
 }
 
 
