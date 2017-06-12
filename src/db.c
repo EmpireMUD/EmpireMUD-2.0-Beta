@@ -865,7 +865,7 @@ void verify_sectors(void) {
 		}
 		
 		// also check for missing crop data
-		if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA | SECTF_CROP) && map->crop_type && (room = real_room(map->vnum))) {
+		if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA | SECTF_CROP) && !map->crop_type && (room = real_room(map->vnum))) {
 			crop_data *new_crop = get_potential_crop_for_location(room);
 			if (new_crop) {
 				set_crop_type(room, new_crop);
