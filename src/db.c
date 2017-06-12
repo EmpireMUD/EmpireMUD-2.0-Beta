@@ -918,6 +918,13 @@ void renum_world(void) {
 	process_temporary_room_data();
 	
 	HASH_ITER(hh, world_table, room, next_room) {
+		// check for unloadability now:
+		if (CAN_UNLOAD_MAP_ROOM(room)) {
+			delete_stored_event_room(room, SEV_CHECK_UNLOAD);	// delete first so it doesn't free/cancel
+			delete_room(room, FALSE);	// no need to check exits (CAN_UNLOAD_MAP_ROOM checks them)
+			continue;
+		}
+		
 		// affects
 		LL_FOREACH(ROOM_AFFECTS(room), af) {
 			schedule_room_affect_expire(room, af);
