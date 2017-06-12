@@ -3258,6 +3258,7 @@ void build_world_map(void) {
 		x = FLAT_X_COORD(room);
 		y = FLAT_Y_COORD(room);
 		
+		// TODO: this should no longer matter because of shared data
 		if (world_map[x][y].shared->island_id != GET_ISLAND_ID(room)) {
 			world_map[x][y].shared->island_id = GET_ISLAND_ID(room);
 			world_map[x][y].shared->island_ptr = (world_map[x][y].shared->island_id != NOTHING) ? get_island(world_map[x][y].shared->island_id, TRUE) : NULL;
