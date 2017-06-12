@@ -1506,7 +1506,7 @@ void number_and_count_islands(bool reset) {
 	int iter, use_id;
 	
 	// find top island id (and reset if requested)
-	top_island_num = -1;
+	top_island_num = 0;	// this ensures any new island ID has a minimum of 1
 	for (map = land_map; map; map = map->next) {
 		if (reset || SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
 			map->shared->island_id = NO_ISLAND;
