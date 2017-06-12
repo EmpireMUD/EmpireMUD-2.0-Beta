@@ -987,8 +987,9 @@ eval room7 %room6.east(room)%
 Jungle Temple adventure cleanup building replacer~
 2 e 100
 ~
+eval instance_cleared (%instance.loaded% && !%instance.mob(18500)%
 eval dir %room.exit_dir%
-if !%instance.mob(18500)%
+if %instance_cleared%
   if %dir%
     %build% %room% 18501 %dir%
   end

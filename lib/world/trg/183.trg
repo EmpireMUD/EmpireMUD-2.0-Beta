@@ -291,6 +291,7 @@ while %person%
   eval person %next_person%
 done
 otimer 24
+%at% i18300 %load% mob 18309
 ~
 #18305
 Pyramid delayed despawn~

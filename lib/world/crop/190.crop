@@ -1,18 +1,19 @@
-#18500
-papayas~
-A Papaya Grove~
-34 3 bc
+#19041
+okra~
+A Patch of Okra~
+4 3 ac
 0 100 0 100
 D0
-^&o0&?^^~
+@@@@~
 &G~
-D0
-^^&o0&?^~
-&G~
-I 6 18501 100.00 1  # FORAGE: a single papaya
-I 8 18500 100.00 1  # HARVEST: a basket of papayas
-I 9 121 100.00 1  # GATHER: a stick
-I 20 128 100.00 1  # CHOP: a massive jungle tree
+I 6 19041 100.00 1  # FORAGE: some okra seeds
+I 8 19042 20.00 2 H  # HARVEST: a bunch of okra pods
+I 8 19042 20.00 3 H  # HARVEST: a bunch of okra pods
+I 8 19042 20.00 4 H  # HARVEST: a bunch of okra pods
+I 8 19042 20.00 5 H  # HARVEST: a bunch of okra pods
+I 8 19042 20.00 6 H  # HARVEST: a bunch of okra pods
+I 8 19041 75.00 2 S  # HARVEST: some okra seeds
+I 8 19041 25.00 3 S  # HARVEST: some okra seeds
 M
 9061 0.01 d
 M

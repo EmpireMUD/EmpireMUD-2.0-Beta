@@ -1,0 +1,19 @@
+#19047
+hut walking~
+a walking hut~
+A hut on stilts is standing here.~
+   This strange hut stands ten feet off the ground, held aloft by what look to
+be wooden chicken legs. The hut itself is simple, almost crude, but that's a
+small price to pay for a home that can travel.
+~
+&?.&w()&?.~
+bhm 0 16 0 0
+C
+100 175
+D
+19047 0 0
+R
+1007 1 5 0
+T 19047
+S
+$

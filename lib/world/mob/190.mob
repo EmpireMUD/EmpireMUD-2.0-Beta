@@ -1,0 +1,107 @@
+#19000
+hag swamp old~
+the swamp hag~
+An old hag is rocking slowly in her chair.
+~
+0 0 bdgvxB c
+2 0 0 15
+I 4 19003 100.00 1  # LOOT: the Swamp Hag loot replacer
+I 4 19011 9.00 1 L  # LOOT: a repulsive stench
+I 4 19012 9.00 1 L  # LOOT: an offensive stench
+I 4 19013 9.00 1 L  # LOOT: a ghastly stench
+I 4 19014 9.00 1 L  # LOOT: a vile stench
+I 4 19015 9.00 1 L  # LOOT: an assailing stench
+I 4 19016 5.00 1 L  # LOOT: the hag's pestle
+I 4 19018 5.00 1 L  # LOOT: plague claws
+I 4 19020 5.00 1 L  # LOOT: the hag's cauldron
+I 4 19022 5.00 1 L  # LOOT: a swarm of stinging insects
+I 4 19024 5.00 1 L  # LOOT: the hag's broom
+I 4 19026 5.00 1 L  # LOOT: the hag's hunting bow
+I 4 19028 5.00 1 L  # LOOT: the hag's wading boots
+I 4 19030 5.00 1 L  # LOOT: the hag's sandals
+I 4 19032 5.00 1 L  # LOOT: the hag's slippers
+I 4 19034 5.00 1 L  # LOOT: the hag's pointe shoes
+I 4 19036 5.00 1 L  # LOOT: the hag's shearling boots
+M
+0
+$n rocks in $s chair.~
+M
+0
+$n grinds a pile of bones using a huge mortar and pestle.~
+M
+0
+$n plucks out one of $s eyes, cleans it on $s shirt, then pops it back in.~
+M
+0
+$n gurgles the words, 'Something wicked this way is.'~
+T 19008
+T 19001
+T 19002
+T 19003
+T 19004
+T 19009
+T 19010
+S
+#19001
+rat swamp grizzled~
+a swamp rat~
+A grizzled swamp rat is sitting in the corner.
+~
+0 0 abdhoz c
+0 0 0 9
+T 19013
+T 19014
+S
+#19002
+rat swamp huge~
+a huge swamp rat~
+A huge swamp rat decked out in bone jewelry stares malevolently at you.
+~
+0 0 abdhoz c
+0 0 0 9
+T 19013
+S
+#19007
+rat swamp~
+a swamp rat~
+A swamp rat is trying to climb your leg.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+$n squeaks.~
+M
+0
+$n cleans $s whiskers.~
+M
+0
+$n squeaks loudly.~
+T 9901
+T 9902
+S
+#19008
+rodent size unusual~
+a rodent of unusual size~
+A rodent of unusual size is cleaning its whiskers.
+~
+100 125 dej 0
+0 0 8 9
+S
+#19009
+manatee~
+a manatee~
+A manatee rolls over playfully.
+~
+100 125 del 0
+0 0 6 9
+S
+#19010
+broom enchanted~
+an enchanted broom~
+An enchanted broom is hovering here.
+~
+100 125 bde m
+0 0 2 28
+S
+$
