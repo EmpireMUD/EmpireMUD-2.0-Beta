@@ -4360,6 +4360,13 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		exit(1);
 	}
 	
+	// need to unlink shared data, if present, if this is not an ocean
+	if (t[1] != BASIC_OCEAN && SHARED_DATA(room) == &ocean_shared_data) {
+		// converting from ocean to non-ocean
+		SHARED_DATA(room) = NULL;	// unlink ocean share
+		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+	}
+	
 	GET_ISLAND_ID(room) = t[0];
 	room->sector_type = sector_proto(t[1]);
 	room->base_sector = sector_proto(t[2]);
