@@ -19,11 +19,25 @@ done
 ~
 #19001
 Swamp Hag 2.0: Summon Allies~
-0 k 20
+0 k 100
 ~
 if %self.cooldown(19001)%
   halt
 end
+* Clear blind just in case...
+if %self.affect(BLIND)%
+  %echo% %self.name%'s eyes flash blue, and %self.hisher% vision clears!
+  dg_affect %self% BLIND off 1
+end
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.vnum% == 19001 || %person.vnum% == 19002
+    * Rat already present
+    halt
+  end
+  eval person %person.next_in_room%
+done
 nop %self.set_cooldown(19001, 30)%
 eval heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% reaches under the bed and opens a cage.
@@ -264,6 +278,7 @@ if %self.mob_flagged(HARD)% || %self.mob_flagged(GROUP)%
     eval ch %ch.next_in_room%
   done
 end
+return 0
 ~
 #19009
 Swamp Hag 2.0 group: Bind ~
@@ -365,6 +380,13 @@ if %actor.varexists(struggle_counter)%
   halt
 end
 ~
+#19012
+Hag difficulty select: wrong command~
+1 c 4
+up climb~
+%send% %actor% You can't climb up the rope. Select a difficulty level first.
+return 1
+~
 #19013
 Swamp Rat Combat 2.0~
 0 k 100
@@ -383,6 +405,13 @@ if %self.vnum% == 19002
   remote enrage_counter %self.id%
   if %random.4% == 4
     %echo% %self.name% seems to grow slightly!
+  end
+  if %enrage_counter% == 100
+    eval master %self.master%
+    if %master%
+      %force% %master% shout Magic wand, make my monster groooooooow!
+      %echo% %master.name% smacks %self.name% with her pestle.
+    end
   end
 end
 * Bite deep
