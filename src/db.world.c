@@ -857,6 +857,32 @@ void save_whole_world(void) {
 }
 
 
+/**
+* Frees up any map rooms that are no longer needed, and schedules the rest
+* for delayed un-loads. To be run at the end of startup.
+*/
+void schedule_map_unloads(void) {
+	void schedule_check_unload(room_data *room, bool offset);
+	room_data *room, *next_room;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+			continue;	// not a map room
+		}
+		
+		if (CAN_UNLOAD_MAP_ROOM(room)) {	// unload it now
+			cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
+			delete_room(room, FALSE);	// no need to check exits (CAN_UNLOAD_MAP_ROOM checks them)
+		}
+		else {	// set up unload event
+			if (!ROOM_OWNER(room)) {
+				schedule_check_unload(room, TRUE);
+			}
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ANNUAL MAP UPDATE ///////////////////////////////////////////////////////
 

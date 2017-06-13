@@ -437,6 +437,7 @@ void boot_world(void) {
 	void number_and_count_islands(bool reset);
 	void read_ability_requirements();
 	void renum_world();
+	void schedule_map_unloads();
 	void setup_start_locations();
 	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
 	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
@@ -576,6 +577,9 @@ void boot_world(void) {
 	
 	log("Checking newbie islands.");
 	check_newbie_islands();
+	
+	log("Managing world memory.");
+	schedule_map_unloads();
 	
 	log("Assigning dummy mob traits.");
 	dummy_mob.rank = 1;	// prevents random crashes when IS_NPC isn't checked correctly in new code
@@ -905,7 +909,6 @@ void process_temporary_room_data(void) {
 void renum_world(void) {
 	void check_tavern_setup(room_data *room);
 	void schedule_burn_down(room_data *room);
-	void schedule_check_unload(room_data *room, bool offset);
 	void schedule_crop_growth(struct map_data *map);
 	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 	void schedule_trench_fill(struct map_data *map);
@@ -964,11 +967,6 @@ void renum_world(void) {
 		
 		// other room setup
 		check_tavern_setup(room);
-		
-		// set up unload event
-		if (GET_ROOM_VNUM(room) < MAP_SIZE && !ROOM_OWNER(room)) {
-			schedule_check_unload(room, TRUE);
-		}
 		
 		// ensure affects
 		affect_total_room(room);
