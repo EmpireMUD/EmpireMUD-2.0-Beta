@@ -3381,6 +3381,7 @@ void load_world_map_from_file(void) {
 			}
 		
 			map->shared->island_id = var[2];
+			map->shared->island_ptr = (var[2] == NO_ISLAND ? NULL : get_island(var[2], TRUE));
 		
 			// these will be validated later
 			map->sector_type = sector_proto(var[3]);

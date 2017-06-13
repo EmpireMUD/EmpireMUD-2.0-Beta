@@ -4368,6 +4368,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	}
 	
 	GET_ISLAND_ID(room) = t[0];
+	SHARED_DATA(room)->island_ptr = (t[0] == NO_ISLAND ? NULL : get_island(t[0], TRUE));
 	room->sector_type = sector_proto(t[1]);
 	room->base_sector = sector_proto(t[2]);
 
