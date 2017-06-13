@@ -6278,6 +6278,11 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			break;
 		}
 	}
+	
+	if (!sc) {
+		script_log("Attempting to run script without script data (trig: %d)", GET_TRIG_VNUM(trig));
+		return ret_val;
+	}
 
 	if (mode == TRIG_NEW) {
 		GET_TRIG_DEPTH(trig) = 1;
