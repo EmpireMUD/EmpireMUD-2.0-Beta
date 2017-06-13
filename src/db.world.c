@@ -3370,7 +3370,7 @@ void load_world_map_from_file(void) {
 			map = &(world_map[var[0]][var[1]]);
 			sprintf(error_buf, "map tile %d", map->vnum);
 			
-			if (var[3] != BASIC_OCEAN) {
+			if (var[3] != BASIC_OCEAN && map->shared == &ocean_shared_data) {
 				map->shared = NULL;	// unlink basic ocean
 				CREATE(map->shared, struct shared_room_data, 1);
 			}

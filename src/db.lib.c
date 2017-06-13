@@ -4362,6 +4362,10 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		// converting from ocean to non-ocean
 		SHARED_DATA(room) = NULL;	// unlink ocean share
 		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+		
+		if (GET_MAP_LOC(room)) {	// and pass this shared data back up to the world
+			GET_MAP_LOC(room)->shared = SHARED_DATA(room);
+		}
 	}
 	
 	GET_ISLAND_ID(room) = t[0];
