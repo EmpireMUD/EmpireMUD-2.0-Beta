@@ -3283,12 +3283,7 @@ void build_world_map(void) {
 		
 		x = FLAT_X_COORD(room);
 		y = FLAT_Y_COORD(room);
-		
-		if (world_map[x][y].shared->island_id != GET_ISLAND_ID(room)) {
-			world_map[x][y].shared->island_id = GET_ISLAND_ID(room);
-			world_map[x][y].shared->island_ptr = (world_map[x][y].shared->island_id != NOTHING) ? get_island(world_map[x][y].shared->island_id, TRUE) : NULL;
-		}
-		
+				
 		if (SECT(room)) {
 			world_map[x][y].sector_type = SECT(room);
 		}
@@ -3379,10 +3374,12 @@ void load_world_map_from_file(void) {
 				map->shared = NULL;	// unlink basic ocean
 				CREATE(map->shared, struct shared_room_data, 1);
 			}
-		
-			map->shared->island_id = var[2];
-			map->shared->island_ptr = (var[2] == NO_ISLAND ? NULL : get_island(var[2], TRUE));
-		
+			
+			if (map->shared->island_id != var[2]) {
+				map->shared->island_id = var[2];
+				map->shared->island_ptr = (var[2] == NO_ISLAND ? NULL : get_island(var[2], TRUE));
+			}
+			
 			// these will be validated later
 			map->sector_type = sector_proto(var[3]);
 			map->base_sector = sector_proto(var[4]);

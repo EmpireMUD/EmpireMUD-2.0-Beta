@@ -4330,14 +4330,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	
 	// attach/create shared data
 	if (vnum < MAP_SIZE) {
-		SHARED_DATA(room) = world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)].shared;
+		GET_MAP_LOC(room) = &(world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)]);
+		SHARED_DATA(room) = GET_MAP_LOC(room)->shared;
 	}
 	else {
 		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
-	}
-	
-	if (vnum < MAP_SIZE) {
-		GET_MAP_LOC(room) = &(world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)]);
 	}
 	
 	HASH_FIND_INT(world_table, &vnum, find);
@@ -4371,6 +4368,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	SHARED_DATA(room)->island_ptr = (t[0] == NO_ISLAND ? NULL : get_island(t[0], TRUE));
 	room->sector_type = sector_proto(t[1]);
 	room->base_sector = sector_proto(t[2]);
+	
+	if (GET_MAP_LOC(room)) {
+		GET_MAP_LOC(room)->sector_type = room->sector_type;
+		GET_MAP_LOC(room)->base_sector = room->base_sector;
+	}
 
 	// set up building data?
 	if (IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) {
