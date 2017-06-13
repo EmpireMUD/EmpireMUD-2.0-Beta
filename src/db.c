@@ -835,7 +835,9 @@ void delete_orphaned_rooms(void) {
 */
 void verify_sectors(void) {	
 	sector_data *use_sect, *sect, *next_sect;
-	room_data *room, *next_room;
+	struct map_data *map, *next_map;
+	crop_data *new_crop;
+	room_data *room;
 	
 	// ensure we have a backup sect
 	use_sect = sector_proto(climate_default_sector[CLIMATE_TEMPERATE]);
@@ -854,18 +856,26 @@ void verify_sectors(void) {
 	}
 	
 	// check whole world
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (!SECT(room)) {
+	LL_FOREACH_SAFE(land_map, map, next_map) {
+		room = real_real_room(map->vnum);
+		
+		if (!map->sector_type) {
 			// can't use change_terrain() here
-			perform_change_sect(room, NULL, use_sect);
+			perform_change_sect(NULL, map, use_sect);
 		}
-		if (!BASE_SECT(room)) {
+		if (!map->base_sector) {
+			if (!room) {
+				room = real_room(map->vnum);	// load it into memory
+			}
 			change_base_sector(room, use_sect);
 		}
 		
 		// also check for missing crop data
-		if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !ROOM_CROP(room)) {
-			crop_data *new_crop = get_potential_crop_for_location(room);
+		if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA | SECTF_CROP) && !map->crop_type) {
+			if (!room) {
+				room = real_room(map->vnum);	// load it into memory
+			}
+			new_crop = get_potential_crop_for_location(room);
 			if (new_crop) {
 				set_crop_type(room, new_crop);
 			}
