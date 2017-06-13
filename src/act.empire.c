@@ -2323,7 +2323,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 		msg_to_char(ch, "Scan for what?\r\n");
 		return;
 	}
-	if ((map_loc = GET_MAP_LOC(IN_ROOM(ch))) || !(map = real_room(map_loc->vnum))) {
+	if (!(map_loc = GET_MAP_LOC(IN_ROOM(ch))) || !(map = real_room(map_loc->vnum))) {
 		msg_to_char(ch, "You can't scan for anything here.\r\n");
 		return;
 	}

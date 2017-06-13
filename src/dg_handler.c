@@ -102,7 +102,7 @@ struct script_data *create_script_data(void *attach_to, int type) {
 void free_freeable_triggers(void) {
 	trig_data *trig, *next_trig;
 	
-	LL_FOREACH_SAFE(free_trigger_list, trig, next_trig) {
+	LL_FOREACH_SAFE2(free_trigger_list, trig, next_trig, next_to_free) {
 		actually_free_trigger(trig);
 	}
 	free_trigger_list = NULL;
@@ -131,7 +131,7 @@ void free_trigger(trig_data *trig) {
 		GET_TRIG_WAIT(trig) = NULL;
 	}
 	
-	LL_PREPEND(free_trigger_list, trig);
+	LL_PREPEND2(free_trigger_list, trig, next_to_free);
 }
 
 

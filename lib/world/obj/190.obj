@@ -1,0 +1,693 @@
+#19000
+ball crystal cloudy~
+a cloudy crystal ball~
+A cloudy crystal ball sits in the middle of the table.~
+   As you gaze into the crystal ball, you realize the old hag was browsing
+goods somewhere called the Amazon. It appears to be some sort of store! Try
+typing list or buy.
+~
+3 0 0 2
+0 0 0
+12 0
+S
+#19001
+phial swamp water~
+a phial of swamp water~
+A phial of swamp water is lying here.~
+It looks murky.
+~
+3 0 a 1
+0 0 0
+8 0
+R
+5193 0
+R
+5621 0
+S
+#19003
+swamp hag loot replacer~
+the Swamp Hag loot replacer~
+The Swamp Hag loot replacer isn't working.~
+If you're seeing this item in the world, please bug it.
+~
+3 p a 1
+0 0 0
+0 0
+T 19015
+S
+#19004
+feathers fistful firebird glowing~
+a fistful of firebird feathers~
+Some firebird feathers are glowing on the ground.~
+The feathers come from the mythical firebird, and glow even when plucked.
+~
+3 c a 2
+0 0 0
+10 400
+S
+#19005
+rope hanging~
+a hanging rope~
+A rope hangs down from the bottom of the hut.~
+   The rope appears to be attached to the rope ladder, and is therefore your
+ticket into the hut. You can select your difficulty here.
+Usage:  difficulty <normal | hard | group | boss>
+~
+3 0 0 3
+0 0 0
+0 0
+T 19005
+T 19006
+S
+#19006
+clothing hag's hags~
+the hag's clothing~
+The hag's clothing is lying here.~
+This clothing looks like someone has been washing it in a swamp.
+~
+2 p ad 1
+0 0 0
+0 0
+A
+5 1 0
+C
+100 150
+M
+12
+The swamp hag, $n, is standing here.~
+S
+#19007
+whistle swamp rat~
+a swamp rat whistle~
+A swamp rat whistle is on the ground.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+19007 0 0
+0 0
+T 9900
+S
+#19008
+whistle rous r.o.u.s.~
+an R.O.U.S. whistle~
+An R.O.U.S. whistle is lying here.~
+   This whistle is made mostly from rat hair. It looks like you could use it to
+summon a land mount.
+~
+3 p a 11
+19008 0 0
+7 0
+T 10263
+S
+#19009
+whistle manatee~
+a manatee whistle~
+A manatee whistle is here.~
+   This whistle is made mostly from rat hair. It looks like you could use it to
+summon a aquatic mount.
+~
+3 p a 12
+19009 0 0
+7 0
+T 10263
+S
+#19010
+broom enchanted~
+an enchanted broom~
+An enchanted broom is lying here.~
+   This enchanted broom seems fairly inert, but if you 'use broom', it will
+summon a flying mount.
+~
+3 jp a 13
+19010 0 0
+7 0
+T 10263
+S
+#19011
+stench repulsive~
+a repulsive stench~
+A repulsive stench lingers in the air.~
+It just seems to be a lingering stench, but you're getting used to it.
+~
+3 mp ak 6
+0 0 0
+10 0
+A
+15 1 0
+A
+18 3 0
+A
+13 1 0
+A
+5 1 6
+C
+100 150
+M
+9
+$n takes on a repulsive stench.~
+M
+8
+You take on a repulsive stench.~
+S
+#19012
+stench offensive~
+an offensive stench~
+An offensive stench hangs in the air.~
+It just seems to be a lingering stench, but you're getting used to it.
+~
+3 mp ak 7
+0 0 0
+10 0
+A
+11 1 0
+A
+17 3 0
+A
+1 1 0
+A
+5 1 6
+C
+100 150
+M
+8
+You take on an offensive stench.~
+M
+9
+$n takes on an offensive stench.~
+S
+#19013
+stench ghastly~
+a ghastly stench~
+A ghastly stench fills the air.~
+It just seems to be a lingering stench, but you're getting used to it.
+~
+3 mp ak 8
+0 0 0
+10 0
+A
+16 1 0
+A
+23 3 0
+A
+7 1 0
+A
+5 1 6
+C
+100 150
+M
+8
+You take on a ghastly stench.~
+M
+9
+$n takes on a ghastly stench.~
+S
+#19014
+stench vile~
+a vile stench~
+A vile stench hangs heavy in the air.~
+It just seems to be a lingering stench, but you're getting used to it.
+~
+3 mp ak 9
+0 0 0
+10 0
+A
+16 1 0
+A
+17 3 0
+A
+8 1 0
+A
+5 1 6
+C
+100 150
+M
+8
+You take on a vile stench.~
+M
+9
+$n takes on a vile stench.~
+S
+#19015
+stench assailing~
+an assailing stench~
+An assailing stench permeates the air.~
+It just seems to be a lingering stench, but you're getting used to it.
+~
+3 mp ak 10
+0 0 0
+10 0
+A
+15 1 0
+A
+17 2 0
+A
+18 2 0
+A
+5 1 6
+C
+100 150
+M
+8
+You take on an assailing stench.~
+M
+9
+$n takes on an assailing stench.~
+S
+#19016
+pestle hag's hags stone large~
+the hag's pestle~
+A large stone pestle is lying on the ground.~
+This looks like it could be used to grind bone!
+~
+1 ehmp an 4
+0 1 5
+1 0
+A
+2 1 0
+A
+24 1 0
+A
+13 1 0
+A
+18 1 0
+A
+5 1 3
+C
+100 175
+T 19007
+S
+#19017
+schematic hag's pestle~
+the hag's pestle schematic~
+The hag's pestle schematic is on the ground.~
+This schematic will teach you to forge: hag's pestle.
+~
+7 0 a 1
+19016 0 0
+0 0
+S
+#19018
+claws plague~
+plague claws~
+A set of plague claws is lying here.~
+It looks like someone attached plague rat claws to a gauntlet for some reason.
+~
+1 imp an 6
+0 4 10
+1 0
+A
+2 1 0
+A
+5 1 3
+C
+100 175
+T 19007
+S
+#19019
+schematic plague claws~
+the plague claws schematic~
+The plague claws schematic is on the ground.~
+This schematic will teach you to craft: plague claws.
+~
+7 0 a 1
+19018 0 0
+0 0
+S
+#19020
+cauldron hag's hags~
+the hag's cauldron~
+A cauldron is sitting on the ground.~
+This cauldron looks heavy!
+~
+1 ehmnp an 7
+0 4 5
+2 0
+A
+2 1 0
+A
+5 1 3
+C
+100 175
+T 19007
+S
+#19021
+schematic hag's cauldron~
+the hag's cauldron schematic~
+The hag's cauldron schematic is on the ground.~
+This schematic will teach you to forge: hag's cauldron.
+~
+7 0 a 1
+19020 0 0
+0 0
+S
+#19022
+swarm insects stinging~
+a swarm of stinging insects~
+A swarm of stinging insects buzzes around you.~
+The insects seem tame, but rather sharp.
+~
+1 ehmp an 8
+0 1 23
+7 0
+A
+8 1 0
+A
+9 1 0
+A
+7 2 0
+A
+5 1 3
+C
+100 175
+T 19007
+S
+#19023
+schematic stinging swarm~
+the stinging swarm schematic~
+The stinging swarm schematic is on the ground.~
+This schematic will teach you to craft: stinging swarm.
+~
+7 0 a 1
+19022 0 0
+0 0
+S
+#19024
+broom hag's hags~
+the hag's broom~
+A broom is standing here.~
+   This looks like a fairly standard broom, other than the mana coming out its
+straw end.
+~
+1 emp an 9
+0 4 19
+0 0
+A
+2 1 0
+A
+5 1 3
+C
+100 175
+T 19007
+S
+#19025
+schematic hag's broom~
+the hag's broom schematic~
+The hag's broom schematic is on the ground.~
+This schematic will teach you to craft: hag's broom.
+~
+7 0 a 1
+19024 0 0
+0 0
+S
+#19026
+bow hunting hag's hags~
+the hag's hunting bow~
+The hag's hunting bow is lying here.~
+   Judging from the size of this bow, the hag must use it to hunt rodents of
+unusual size.
+~
+20 imp ap 7
+0 1 0
+0 0
+C
+100 175
+T 19007
+S
+#19027
+schematic hag's hunting bow~
+the hag's hunting bow schematic~
+The hag's hunting bow schematic is on the ground.~
+This schematic will teach you to craft: hag's hunting bow.
+~
+7 0 a 1
+19026 0 0
+0 0
+S
+#19028
+boots wading hag's hags~
+the hag's wading boots~
+The hag's wading boots are lying here.~
+These boots are air-tight and come all the way up to your waist.
+~
+27 mp ag 1
+3 0 0
+7 0
+A
+13 2 0
+A
+24 1 0
+A
+12 1 0
+C
+100 175
+T 19007
+S
+#19029
+pattern hag's wading boots~
+the hag's wading boots pattern~
+The hag's wading boots pattern is on the ground.~
+This pattern will teach you to forge: hag's wading boots.
+~
+7 0 a 1
+19028 0 0
+0 0
+S
+#19030
+sandals hag's hags~
+the hag's sandals~
+The hag's sandals are standing here.~
+These sandals are made from leather, and look quite worn.
+~
+27 mp ag 2
+1 0 0
+7 0
+A
+17 2 0
+A
+21 1 0
+A
+9 1 0
+C
+100 175
+T 19007
+S
+#19031
+pattern hag's sandals~
+the hag's sandals pattern~
+The hag's sandals pattern is on the ground.~
+This pattern will teach you to sew: hag's sandals.
+~
+7 0 a 1
+19030 0 0
+0 0
+S
+#19032
+slippers hag's hags~
+the hag's slippers~
+The hag's slippers look warm on the ground.~
+The slippers look comfy, if a bit muddy.
+~
+27 mp ag 3
+0 0 0
+7 0
+A
+7 2 0
+A
+23 1 0
+A
+9 1 0
+C
+100 175
+T 19007
+S
+#19033
+pattern hag's slippers~
+the hag's slippers pattern~
+The hag's slippers pattern is on the ground.~
+This pattern will teach you to sew: hag's slippers.
+~
+7 0 a 1
+19032 0 0
+0 0
+S
+#19034
+shoes pointe hag's hags~
+the hag's pointe shoes~
+The hag's point shoes are dancing around.~
+These shoes look surprisingly graceful consider where they came from.
+~
+27 mp ag 4
+0 0 0
+7 0
+A
+17 2 0
+A
+22 1 0
+A
+9 1 0
+C
+100 175
+T 19007
+S
+#19035
+pattern hag's pointe shoes~
+the hag's pointe shoes pattern~
+The hag's pointe shoes pattern is on the ground.~
+This pattern will teach you to sew: hag's pointe shoes.
+~
+7 0 a 1
+19034 0 0
+0 0
+S
+#19036
+boots shearling hag's hags~
+the hag's shearling boots~
+The hag's shearling boots are standing here.~
+These boots look quite warm.
+~
+27 mp ag 3
+2 0 0
+7 0
+A
+17 2 0
+A
+18 2 0
+C
+100 175
+T 19007
+S
+#19037
+pattern hag's shearling boots~
+the hag's shearling boots pattern~
+The hag's shearling boots pattern is on the ground.~
+This pattern will teach you to sew: hag's shearling boots.
+~
+7 0 a 1
+19036 0 0
+0 0
+S
+#19038
+shoes walking hag's hags~
+the hag's walking shoes~
+The hag's walking shoes are standing here.~
+These shoes look like they could even walk around on their own.
+~
+2 mp ag 4
+0 0 0
+7 0
+A
+11 2 0
+A
+6 1 0
+C
+100 175
+T 19007
+S
+#19039
+pattern hag's walking shoes~
+the hag's walking shoes pattern~
+The hag's walking shoes pattern is on the ground.~
+This pattern will teach you to sew: hag's walking shoes.
+~
+7 0 a 1
+19038 0 0
+0 0
+S
+#19040
+sigil swamp rat~
+the swamp rat sigil~
+The swamp rat sigil is lying here.~
+   This sheet of parchment has a sigil in the shape of a swamp rat. It enables
+druids who know the Animal Forms power to shapeshift into a swamp rat.
+~
+3 p a 2
+0 0 0
+0 0
+C
+100 150
+S
+#19041
+seeds okra~
+some okra seeds~
+Some okra seeds are scattered here.~
+You have a handful of small, round seeds. They can be used to plant okra.
+~
+6 b a 8
+1 19041 0
+7 576
+R
+5116 0
+S
+#19042
+pods okra bunch~
+a bunch of okra pods~
+A bunch of okra pods are lying here.~
+   The okra pods are odd little green plants, but are delicious when cooked. 
+You could use them to make gumbo or fried okra.
+~
+6 0 a 7
+4 3017 0
+7 168
+O
+27 br
+R
+5606 0
+S
+#19043
+gumbo bowl hearty~
+a hearty bowl of gumbo~
+A bowl of gumbo has been left on the ground.~
+   This bowl of thick brown gumbo may not look like much, but the smell is
+intoxicating.
+~
+6 m a 5
+48 0 0
+7 336
+A
+16 2 0
+A
+7 1 0
+C
+0 175
+S
+#19044
+okra sack fried crispy~
+a sack of crispy fried okra~
+A sack of fried okra has spilled on the floor.~
+The okra has been sliced, breaded, and fried.
+~
+6 m a 6
+48 0 0
+7 336
+A
+22 1 0
+A
+23 1 0
+C
+0 175
+S
+#19047
+legs chicken wooden pair~
+a pair of wooden chicken legs~
+A pair of wooden chicken legs are standing here.~
+It looks like someone carved these chicken legs from some exotic tropical wood.
+~
+3 e a 1
+0 0 0
+0 0
+C
+100 150
+S
+#19048
+mug wooden~
+a wooden mug~
+A wooden mug is lying here.~
+   This mug looks like it's been sitting in the swamp too long. A note
+scratched into the bottom says 'fill me at the hag's hut'.
+~
+5 0 a 5
+56 56 19048
+0 0
+S
+$

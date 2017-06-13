@@ -1,0 +1,84 @@
+#19000
+Swamp Hag Money~
+5 0
+0 0 0 0
+T0
+rat tail~
+T1
+rat tails~
+S
+#19001
+swamp hag attack~
+3 0
+0 0 0 0
+T0
+Your swamp hag attack cooldown has ended.~
+S
+#19002
+pestle smash~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by the pestle smash.~
+S
+#19003
+phantom wounds~
+4 0
+0 0 0 0
+T0
+Your phantom injuries fade away.~
+S
+#19004
+insect swarm~
+4 0
+0 0 0 0
+T0
+You are no longer blinded by the insect swarm.~
+S
+#19007
+swamp rat whistle~
+3 0
+0 0 0 0
+T0
+Your swamp rat whistle cooldown has ended.~
+S
+#19009
+bound~
+4 0
+0 0 0 0
+T0
+The swamp hag's bindings fade away.~
+T1
+$n is no longer bound.~
+S
+#19010
+struggle~
+3 0
+0 0 0 0
+T0
+Your struggle cooldown has ended.~
+S
+#19013
+rat bite~
+4 0
+0 0 0 0
+T0
+You stop bleeding from rat-inflicted injuries.~
+S
+#19014
+enlarge rodent~
+4 0
+0 0 0 0
+T0
+You shrink.~
+S
+#19048
+Hag's Coffee~
+1 0
+-6 0 1 0
+T0
+hag's coffee~
+T1
+black~
+S
+$
