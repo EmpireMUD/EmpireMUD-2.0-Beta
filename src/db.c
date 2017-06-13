@@ -296,6 +296,7 @@ void boot_db(void) {
 	void load_trading_post();
 	int run_convert_vehicle_list();
 	void run_reboot_triggers();
+	void schedule_map_unloads();
 	void sort_commands();
 	void startup_room_reset();
 	void verify_sectors();
@@ -402,6 +403,9 @@ void boot_db(void) {
 	
 	log(" Calculating territory and members.");
 	reread_empire_tech(NULL);
+	
+	log("Managing world memory.");
+	schedule_map_unloads();
 	
 	// END
 	log("Boot db -- DONE.");
@@ -831,7 +835,9 @@ void delete_orphaned_rooms(void) {
 */
 void verify_sectors(void) {	
 	sector_data *use_sect, *sect, *next_sect;
-	room_data *room, *next_room;
+	struct map_data *map, *next_map;
+	crop_data *new_crop;
+	room_data *room;
 	
 	// ensure we have a backup sect
 	use_sect = sector_proto(climate_default_sector[CLIMATE_TEMPERATE]);
@@ -850,18 +856,26 @@ void verify_sectors(void) {
 	}
 	
 	// check whole world
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (!SECT(room)) {
+	LL_FOREACH_SAFE(land_map, map, next_map) {
+		room = real_real_room(map->vnum);
+		
+		if (!map->sector_type) {
 			// can't use change_terrain() here
-			perform_change_sect(room, NULL, use_sect);
+			perform_change_sect(NULL, map, use_sect);
 		}
-		if (!BASE_SECT(room)) {
+		if (!map->base_sector) {
+			if (!room) {
+				room = real_room(map->vnum);	// load it into memory
+			}
 			change_base_sector(room, use_sect);
 		}
 		
 		// also check for missing crop data
-		if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !ROOM_CROP(room)) {
-			crop_data *new_crop = get_potential_crop_for_location(room);
+		if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA | SECTF_CROP) && !map->crop_type) {
+			if (!room) {
+				room = real_room(map->vnum);	// load it into memory
+			}
+			new_crop = get_potential_crop_for_location(room);
 			if (new_crop) {
 				set_crop_type(room, new_crop);
 			}
@@ -905,7 +919,6 @@ void process_temporary_room_data(void) {
 void renum_world(void) {
 	void check_tavern_setup(room_data *room);
 	void schedule_burn_down(room_data *room);
-	void schedule_check_unload(room_data *room, bool offset);
 	void schedule_crop_growth(struct map_data *map);
 	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 	void schedule_trench_fill(struct map_data *map);
@@ -964,11 +977,6 @@ void renum_world(void) {
 		
 		// other room setup
 		check_tavern_setup(room);
-		
-		// set up unload event
-		if (GET_ROOM_VNUM(room) < MAP_SIZE && !ROOM_OWNER(room)) {
-			schedule_check_unload(room, TRUE);
-		}
 		
 		// ensure affects
 		affect_total_room(room);
@@ -1506,7 +1514,7 @@ void number_and_count_islands(bool reset) {
 	int iter, use_id;
 	
 	// find top island id (and reset if requested)
-	top_island_num = -1;
+	top_island_num = 0;	// this ensures any new island ID has a minimum of 1
 	for (map = land_map; map; map = map->next) {
 		if (reset || SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
 			map->shared->island_id = NO_ISLAND;
@@ -1874,9 +1882,14 @@ const char *versions_list[] = {
 int get_last_boot_version(void) {
 	char str[256];
 	FILE *fl;
+	int iter;
 	
 	if (!(fl = fopen(VERSION_FILE, "r"))) {
-		return -1;
+		// if no file, do not run auto-updaters -- skip them
+		for (iter = 0; *versions_list[iter] != '\n'; ++iter) {
+			// just looking for last entry
+		}
+		return iter - 1;
 	}
 	
 	sprintf(buf, "version file");

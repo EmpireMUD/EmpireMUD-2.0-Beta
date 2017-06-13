@@ -857,6 +857,32 @@ void save_whole_world(void) {
 }
 
 
+/**
+* Frees up any map rooms that are no longer needed, and schedules the rest
+* for delayed un-loads. To be run at the end of startup.
+*/
+void schedule_map_unloads(void) {
+	void schedule_check_unload(room_data *room, bool offset);
+	room_data *room, *next_room;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+			continue;	// not a map room
+		}
+		
+		if (CAN_UNLOAD_MAP_ROOM(room)) {	// unload it now
+			cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
+			delete_room(room, FALSE);	// no need to check exits (CAN_UNLOAD_MAP_ROOM checks them)
+		}
+		else {	// set up unload event
+			if (!ROOM_OWNER(room)) {
+				schedule_check_unload(room, TRUE);
+			}
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ANNUAL MAP UPDATE ///////////////////////////////////////////////////////
 
@@ -3257,13 +3283,7 @@ void build_world_map(void) {
 		
 		x = FLAT_X_COORD(room);
 		y = FLAT_Y_COORD(room);
-		
-		// TODO: this should no longer matter because of shared data
-		if (world_map[x][y].shared->island_id != GET_ISLAND_ID(room)) {
-			world_map[x][y].shared->island_id = GET_ISLAND_ID(room);
-			world_map[x][y].shared->island_ptr = (world_map[x][y].shared->island_id != NOTHING) ? get_island(world_map[x][y].shared->island_id, TRUE) : NULL;
-		}
-		
+				
 		if (SECT(room)) {
 			world_map[x][y].sector_type = SECT(room);
 		}
@@ -3350,13 +3370,16 @@ void load_world_map_from_file(void) {
 			map = &(world_map[var[0]][var[1]]);
 			sprintf(error_buf, "map tile %d", map->vnum);
 			
-			if (var[3] != BASIC_OCEAN) {
+			if (var[3] != BASIC_OCEAN && map->shared == &ocean_shared_data) {
 				map->shared = NULL;	// unlink basic ocean
 				CREATE(map->shared, struct shared_room_data, 1);
 			}
-		
-			map->shared->island_id = var[2];
-		
+			
+			if (map->shared->island_id != var[2]) {
+				map->shared->island_id = var[2];
+				map->shared->island_ptr = (var[2] == NO_ISLAND ? NULL : get_island(var[2], TRUE));
+			}
+			
 			// these will be validated later
 			map->sector_type = sector_proto(var[3]);
 			map->base_sector = sector_proto(var[4]);
