@@ -296,6 +296,7 @@ void boot_db(void) {
 	void load_trading_post();
 	int run_convert_vehicle_list();
 	void run_reboot_triggers();
+	void schedule_map_unloads();
 	void sort_commands();
 	void startup_room_reset();
 	void verify_sectors();
@@ -403,6 +404,9 @@ void boot_db(void) {
 	log(" Calculating territory and members.");
 	reread_empire_tech(NULL);
 	
+	log("Managing world memory.");
+	schedule_map_unloads();
+	
 	// END
 	log("Boot db -- DONE.");
 	boot_time = time(0);
@@ -437,7 +441,6 @@ void boot_world(void) {
 	void number_and_count_islands(bool reset);
 	void read_ability_requirements();
 	void renum_world();
-	void schedule_map_unloads();
 	void setup_start_locations();
 	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
 	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
@@ -577,9 +580,6 @@ void boot_world(void) {
 	
 	log("Checking newbie islands.");
 	check_newbie_islands();
-	
-	log("Managing world memory.");
-	schedule_map_unloads();
 	
 	log("Assigning dummy mob traits.");
 	dummy_mob.rank = 1;	// prevents random crashes when IS_NPC isn't checked correctly in new code
