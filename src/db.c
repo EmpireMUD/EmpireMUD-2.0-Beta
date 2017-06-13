@@ -1872,9 +1872,14 @@ const char *versions_list[] = {
 int get_last_boot_version(void) {
 	char str[256];
 	FILE *fl;
+	int iter;
 	
 	if (!(fl = fopen(VERSION_FILE, "r"))) {
-		return -1;
+		// if no file, do not run auto-updaters -- skip them
+		for (iter = 0; *versions_list[iter] != '\n'; ++iter) {
+			// just looking for last entry
+		}
+		return iter - 1;
 	}
 	
 	sprintf(buf, "version file");
