@@ -3012,7 +3012,8 @@ void halve_resource_list(struct resource_data **list, bool remove_nonrefundables
 * @param bool ground If TRUE, will also count resources on the ground.
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
 */
-bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {	
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {
+	char buf[MAX_STRING_LENGTH];
 	int total, amt, liter, cycle;
 	struct resource_data *res;
 	bool ok = TRUE;
@@ -4978,6 +4979,7 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 * @param PLAYER_UPDATE_FUNC(*func)  A function pointer for the function to run on each player.
 */
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
+	char buf[MAX_STRING_LENGTH];
 	player_index_data *index, *next_index;
 	descriptor_data *desc;
 	char_data *ch;

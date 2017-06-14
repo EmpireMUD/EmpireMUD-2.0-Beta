@@ -1282,6 +1282,7 @@ void free_alias(struct alias_data *a) {
 #define NUM_TOKENS       9
 
 void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data *a) {
+	char buf[MAX_STRING_LENGTH];
 	struct txt_q temp_queue;
 	char *tokens[NUM_TOKENS], *temp, *write_point;
 	int num_of_tokens = 0, num;
@@ -1664,6 +1665,8 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
+	char buf[MAX_STRING_LENGTH];
+	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1998,6 +2001,7 @@ void send_motd(descriptor_data *d) {
 * @param int bad_pws Number of bad password attempts, which sometimes must be retrieved and cleared ahead of time.
 */
 void send_login_motd(descriptor_data *desc, int bad_pws) {
+	char buf[MAX_STRING_LENGTH];
 	send_motd(desc);
 	MXPSendTag(desc, "<VERSION>");
 	
