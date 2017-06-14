@@ -1748,6 +1748,7 @@ void close_socket(descriptor_data *d) {
 
 /* Empty the queues before closing connection */
 void flush_queues(descriptor_data *d) {
+	char buf2[MAX_STRING_LENGTH];
 	int dummy;
 
 	if (d->large_outbuf) {
@@ -3851,6 +3852,7 @@ void reboot_recover(void) {
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern bool global_mute_slash_channel_joins;
 
+	char buf[MAX_STRING_LENGTH];
 	descriptor_data *d;
 	char_data *plr, *ldr;
 	FILE *fp;

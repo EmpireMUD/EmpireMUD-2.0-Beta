@@ -6148,7 +6148,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		default: {
-			sprintf(buf, "Unknown condition");
+			sprintf(output, "Unknown condition");
 			break;
 		}
 	}
