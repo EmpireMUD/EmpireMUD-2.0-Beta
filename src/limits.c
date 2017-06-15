@@ -394,7 +394,7 @@ void point_update_char(char_data *ch) {
 	// check mob crowding (for npcs in stables)
 	if (IS_NPC(ch) && !ch->desc && HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
 		count = 1;	// me
-		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), chiter) {
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 			if (ch != chiter && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
 				++count;
 			}
