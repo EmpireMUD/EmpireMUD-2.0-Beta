@@ -205,16 +205,18 @@ L
 S
 #125
 Ruins: The Goblin Challenge~
-Paul Clarke~
+Paul Clarke and Owen Morris~
    The ruins have attracted a nest of goblins, and you'll have to clear them
 out before the ruins can be removed. That might not be easy, as you have
 stumbled upon the Goblin Challenge. Goblins might be small, but they aren't
 known to fight fair. Play this encounter in phases, increasing in difficulty.
-This adventure locks its level when you start combat, so check if it's already
-locked before you start.
+This adventure has three difficulties:
+  Easy: normal and hard mobs (levels 50-100)
+  Normal: hard and group mobs (levels 50-150)
+  Hard: group and boss mobs (levels 100-150)
 ~
 10200 10224 50-150
-50 0 ck 4
+50 0 k 4
 L
 0 ac
 5007 -1 -1

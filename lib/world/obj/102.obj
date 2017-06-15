@@ -89,13 +89,13 @@ open-fingered gloves~
 A pair of open-fingered gloves is lying here.~
 The gloves appear to be goblincraft.
 ~
-2 moy ah 1
+2 moy ah 2
 0 0 0
 11 0
 A
-21 2 0
-A
 17 1 0
+A
+9 1 0
 S
 #10208
 collar goblin~
@@ -103,8 +103,8 @@ a goblin collar~
 A goblin collar has been left on the ground.~
 The collar looks strong enough to protect the neck.
 ~
-27 moy ac 1
-3 0 0
+2 moy ac 2
+0 0 0
 2 0
 A
 15 1 0
@@ -115,13 +115,11 @@ a warg-bone earring~
 A strange bone earring is lying here.~
 The earring appears to be goblincraft.
 ~
-2 jmoy am 2
+2 jmoy am 4
 0 0 0
 14 0
 A
-22 2 1
-A
-17 1 0
+2 1 0
 S
 #10210
 club bone zelkab's~
@@ -129,13 +127,15 @@ Zelkab's bone club~
 A bone club is sitting on the ground.~
 This goblincraft club looks to be primarily warg bone.
 ~
-1 ehmp an 1
+1 ehmp an 2
 0 3 5
 14 0
 A
 12 -1 0
 A
 17 1 0
+A
+5 1 6
 S
 #10211
 gauntlets armored zelkab's pair~
@@ -157,13 +157,15 @@ Garlgarl's glowing staff~
 A glowing bone staff is lying here.~
 The staff appears to be goblincraft, and made from warg bone.
 ~
-1 ehmp an 1
+1 ehmp an 2
 0 1 19
 14 0
 A
 4 -1 0
 A
 23 3 0
+A
+5 1 6
 S
 #10213
 belt herbs garlgarl's~
@@ -223,7 +225,7 @@ Walts's heavy belt~
 A heavy belt is lying here.~
 The belt appears to be goblincraft.
 ~
-27 mp al 1
+27 mp al 2
 1 0 0
 7 0
 A
@@ -241,7 +243,7 @@ Nilbog's armored waistband~
 An armored waistband is lying here.~
 It is a goblincraft waistband.
 ~
-27 emp al 1
+27 emp al 2
 3 0 0
 0 0
 A
@@ -275,7 +277,7 @@ Furl's flaming wristbands~
 A pair of flaming wristbands are lying here.~
 The wristbands appear to be goblincraft, and are on fire.
 ~
-27 mp aj 2
+27 mp aj 3
 0 0 0
 0 0
 A
@@ -286,8 +288,6 @@ A
 9 1 0
 A
 17 1 0
-B
-c
 S
 #10221
 wristbands armored pair furl's~
@@ -295,7 +295,7 @@ Furl's armored wristbands~
 A pair of armored wristbands are lying here.~
 The wristbands appear to be goblincraft, made from enchanted wood.
 ~
-27 mp aj 2
+27 mp aj 3
 2 0 0
 0 0
 A
@@ -304,8 +304,28 @@ A
 17 1 0
 A
 18 1 0
-A
-6 1 0
+S
+#10222
+whistle warg~
+a warg whistle~
+A warg whistle is lying here.~
+It looks like you could use it to summon a land mount.
+~
+3 p a 12
+10222 0 0
+7 0
+T 10263
+S
+#10224
+whistle winged wolf~
+a winged wolf whistle~
+A winged wolf whistle is lying here.~
+It looks like you could use it to summon a flying mount.
+~
+3 p a 13
+10224 0 0
+7 0
+T 10263
 S
 #10225
 hole~

@@ -571,4 +571,436 @@ eval set_quantity %target.val1(%target.val0%)%%
 nop %set_type%
 nop %set_quantity%
 ~
+#19060
+Goblin Challenge 2.0 Difficulty Selector~
+1 c 4
+difficulty~
+eval room %self.room%
+if !%arg%
+  %send% %actor% You must specify a level of difficulty.
+  return 1
+  halt
+end
+* TODO: Check nobody's in the adventure before changing difficulty
+eval level 50
+eval person %room.people%
+while %person%
+  if %person.level% > %level%
+    eval level %person.level%
+  end
+  eval person %person.next_in_room%
+done
+if easy /= %arg%
+  %echo% Setting difficulty to Easy...
+  eval difficulty 1
+  if %level% > 100
+    eval level 100
+  end
+elseif normal /= %arg%
+  %echo% Setting difficulty to Normal...
+  eval difficulty 2
+elseif hard /= %arg%
+  %echo% Setting difficulty to Hard...
+  eval difficulty 3
+  if %level% < 100
+    eval level 100
+  end
+else
+  %send% %actor% That is not a valid difficulty level for this adventure.
+  halt
+  return 1
+end
+* Scale adventure
+eval scale %%instance.level(%level%)%%
+nop %scale%
+* Load mob, apply difficulty setting
+%load% mob 10200
+eval mob %room.people%
+remote difficulty %mob.id%
+eval mob_diff %difficulty%
+if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+  eval mob_diff %mob_diff% + 1
+end
+dg_affect %mob% !ATTACK on 5
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %mob_diff% == 1
+  * Then we don't need to do anything
+elseif %mob_diff% == 2
+  nop %mob.add_mob_flag(HARD)%
+elseif %mob_diff% == 3
+  nop %mob.add_mob_flag(GROUP)%
+elseif %mob_diff% == 4
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+* Done applying difficulty setting
+%send% %actor% You ring %self.shortdesc%, and %mob.name% charges out to meet you.
+%echoaround% %actor% %actor.name% rings %self.shortdesc%, and %mob.name% charges out to meet you.
+%adventurecomplete%
+%purge% %self%
+~
+#19061
+Power Strike~
+0 k 33
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+* Group only -- boss only for Nilbog
+if %self.mob_flagged(GROUP)%
+  if %self.mob_flagged(HARD)% || %self.vnum% != 19404
+    eval heroic_mode 1
+  end
+end
+%send% %actor% %self.name% raises %self.hisher% weapon high and deals you a powerful blow!
+%echoaround% %actor% %self.name% raises %self.hisher% weapon high and deals %actor.name% a powerful blow!
+if %heroic_mode%
+  %damage% %actor% 200 physical
+  %send% %actor% You are stunned and knocked off-balance!
+  dg_affect #10202 %actor% STUNNED on 10
+  dg_affect #10201 %actor% DODGE -20 20
+  dg_affect #10201 %actor% TO-HIT -20 20
+else
+  %damage% %actor% 75 physical
+  %send% %actor% You are knocked off-balance!
+  dg_affect #10201 %actor% DODGE -10 20
+  dg_affect #10201 %actor% TO-HIT -10 20
+end
+~
+#19062
+Whirlwind Attack~
+0 k 50
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+if %self.mob_flagged(GROUP)%
+  if %self.mob_flagged(HARD)% || %self.vnum% != 19404
+    eval heroic_mode 1
+  end
+end
+%echo% %self.name% starts spinning in circles!
+wait 3 sec
+%echo% &r%self.name% swings %self.hisher% weapon wildly, hitting everything in sight!
+if %heroic_mode%
+  %aoe% 125 physical
+  %echo% &r%self.name%'s wild swings leave bleeding wounds!
+  eval room %self.room%
+  eval person %room.people%
+  while %person%
+    eval test %%person.is_enemy(%self%)%%
+    if %test%
+      %dot% #10203 %actor% 100 20 physical
+    end
+    eval person %person.next_in_room%
+  done
+else
+  %aoe% 75 physical
+end
+~
+#19063
+Filks & Walts: Backstab!~
+0 k 33
+~
+if %self.cooldown(10200)%
+  halt
+end
+if %actor.fighting% == %self%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+if !%heroic_mode%
+  %send% %actor% You spot %self.name% trying to sneak around behind you...
+end
+%echoaround% %actor% %self.name% slips around behind %actor.name% and draws a wicked dagger...
+wait 5 sec
+if %self.disabled% || %actor.fighting% == %self% || !%actor.fighting% || %self.aff_flagged(DISARM)% || %self.aff_flagged(ENTANGLED)%
+  %echo% %self.name%'s backstab is interrupted!
+  halt
+else
+  %send% %actor% %self.name% sinks %self.hisher% dagger into your back!
+  %echoaround% %actor% %self.name% sinks %self.hisher% dagger into %actor.name%'s back!
+  if %heroic_mode%
+    %damage% %actor% 750
+  else
+    %damage% %actor% 150
+  end
+end
+~
+#19064
+Filks & Walts: Flank Attack~
+0 k 50
+~
+if %self.cooldown(10200)%
+  halt
+end
+if %actor.fighting% == %self%
+  halt
+end
+eval target 0
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.vnum% >= 10200 && %person.vnum% <= 10205 && %person.vnum% != %self.vnum% && %person.fighting% == %self.fighting%
+    eval target %person%
+  end
+  eval person %person.next_in_room%
+done
+if !%target%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+%send% %actor% %self.name% flanks you as you attack %target.name%, leaving you vulnerable!
+%echoaround %actor% %self.name% and %target.name% flank %actor.name%, giving %self.name% an advantage!
+if %heroic_mode%
+  dg_affect #10204 %self% TO-HIT 75 30
+else
+  dg_affect #10204 %self% TO-HIT 25 30
+end
+~
+#19065
+Goblin Shaman: Goblinfire~
+0 k 33
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+%send% %actor% %self.name% splashes goblinfire at you, causing serious burns!
+%echoaround% %actor% %self.name% splashes goblinfire at %actor.name%, causing serious burns!
+if %heroic_mode%
+  %dot% #10205 %actor% 100 120 fire 5
+  %damage% %actor% 100 fire
+else
+  %dot% #10205 %actor% 75 15 fire
+  %damage% %actor% 75 fire
+end
+~
+#19066
+Goblin Shaman: Fire Spiral~
+0 k 50
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+if %self.mob_flagged(GROUP)%
+  if %self.mob_flagged(HARD)% || %self.vnum% != 10205
+    eval heroic_mode 1
+  end
+end
+%echo% %self.name% begins spinning spirals of flame...
+if %heroic_mode%
+  eval cycles 5
+else
+  eval cycles 1
+end
+eval cycle 1
+while %cycle% <= %cycles%
+  wait 3 sec
+  %echo% &r%self.name% unleashes a flame spiral!
+  %aoe% 50 fire
+  eval cycle %cycle% + 1
+done
+wait 3 sec
+%echo% %self.name%'s flame spirals fade away.
+~
+#19067
+Zelkab: Knockout Punch~
+0 k 100
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+%echo% %self.name% draws back %self.hisher% fist for a mighty blow...
+wait 3 sec
+if %heroic_mode%
+  %send% %actor% &r%self.name%'s fist flies right at your face!
+  %damage% %actor% 150 physical
+  %send% %actor% Everything turns dark and confusing...
+  %echoaround% %actor% %self.name% decks %actor.name% with one powerful punch!
+  dg_affect #10206 %actor% BLIND on 15
+  dg_affect #10206 %actor% STUNNED on 15
+else
+  %send% %actor% %self.name% hits you hard, stunning you!
+  %echoaround% %actor% %self.name% hits %actor.name% hard, stunning %actor.himher%!
+  %damage% %actor% 100 physical
+  dg_affect #10206 %actor% STUNNED on 5
+end
+~
+#19068
+Garlgarl: Troll Blood~
+0 k 100
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+%echo% %self.name% starts searching for something...
+wait 5 sec
+if %self.disabled%
+  %echo% %self.name%'s search is interrupted.
+  halt
+end
+%echo% %self.name% grabs a vial labeled 'TROL BLUD' and drinks it!
+%echo% %self.name%'s wounds start to close!
+if %heroic_mode%
+  %damage% %self% -200
+  dg_affect #10207 %self% HEAL-OVER-TIME 125 on 30
+else
+  %damage% %self% -100
+  dg_affect #10207 %self% HEAL-OVER-TIME 20 on 30
+end
+~
+#19069
+Filks: Poison Arrow~
+0 k 100
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+eval target %random.enemy%
+if !%target%
+  eval target %actor%
+end
+if !%target%
+  halt
+end
+%send% %actor% %self.name% dashes backwards, draws %self.hisher% bow, and aims at you!
+%echoaround% %actor% %self.name% dashes backwards, draws %self.hisher% bow, and aims at %actor.name%!
+wait 2 sec
+%send% %actor% %self.name% shoots you with a poisoned arrow!
+%echoaround% %actor% %self.name% shoots %actor.name% with a poisoned arrow!
+if %heroic_mode%
+  %damage% %actor% 50 physical
+  %dot% #10208 %actor% 200 30 poison
+else
+  %damage% %actor% 50 physical
+  %dot% #10208 %actor% 75 15 poison
+end
+~
+#19070
+Walts: Bomb Lob~
+0 k 100
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+%echo% Walts runs to the edge of the nest and pulls out a bomb!
+wait 5 sec
+%echo% %self.name% hurls the bomb at you!
+if %heroic_mode%
+  %echo% &rThe bomb explodes, stunning you!
+  %aoe% 100 physical
+  eval room %self.room%
+  eval person %room.people%
+  while %person%
+    eval test %%person.is_enemy(%self%)%%
+    if %test%
+      dg_affect #10209 %person% STUNNED on 5
+    end
+    eval person %person.next_in_room%
+  done
+else
+  %echo% &rThe bomb explodes!
+  %aoe% 75 physical
+end
+~
+#19071
+Nilbog: Shield Block~
+0 k 100
+~
+if %self.cooldown(10200)%
+  halt
+end
+nop %self.set_cooldown(10200, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+if %heroic_mode%
+  %echo% %self.name% raises %self.hisher% tarnished shield and strikes from behind it.
+  eval magnitude %self.level%/2
+  dg_affect #10210 %self% DODGE %magnitude% 30
+  eval magnitude %self.level% / 6
+  dg_affect #10210 %self% HEAL-OVER-TIME %magnitude% 30
+else
+  %echo% %self.name% raises %self.hisher% tarnished shield and cowers behind it.
+  eval magnitude %self.level% / 4
+  dg_affect #10210 %self% DODGE %magnitude% 30
+  dg_affect #10210 %self% STUNNED on 30
+  eval magnitude %self.level% / 6
+  dg_affect #10210 %self% HEAL-OVER-TIME %magnitude% 30
+end
+~
+#19072
+Furl: Spellstorm / Moonrise~
+0 k 50
+~
+if %self.cooldown(10200)%
+  halt
+end
+eval goblin 0
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.vnum% >= 10200 && %person.vnum% <= 10205 && %person.vnum% != %self.vnum%
+    eval goblin %person%
+  end
+  eval person %person.next_in_room%
+done
+nop %self.set_cooldown(10200, 30)%
+%echo% %self.name% starts casting a spell...
+wait 3 sec
+eval heroic_mode %self.mob_flagged(GROUP)%
+if %goblin% || !%heroic_mode%
+  if %heroic_mode%
+    %echo% &r%self.name% unleashes a storm of uncontrolled magical energy!
+    %aoe% 100 magical
+    eval person %room.people%
+    while %person%
+      eval test %%person.is_enemy(%self%)%%
+      if %test%
+        %dot% #10221 %person% 75 30 magical
+        dg_affect #10211 %person% SLOW on 30
+      end
+      eval person %person.next_in_room%
+    done
+  else
+    %send% %actor% &r%self.name% unleashes a bolt of uncontrolled magical energy, which strikes you!
+    %echoaround% %actor% %self.name% unleashes a bolt of uncontrolled magical energy, which strikes %actor.name%!
+    %damage% %actor% 100 magical
+    %dot% #10211 %actor% 75 30 magical
+    dg_affect #10211 %actor% SLOW on 30
+  end
+  dg_affect #10211 %self% HASTE on 30
+  if %goblin%
+    dg_affect #10211 %goblin% HASTE on 30
+  end
+else
+  eval vnum 10200 + %random.5% - 1
+  %load% mob %vnum% ally %self.level%
+  eval mob %room.people%
+  %echo% %self.name% slams %self.hisher% staff into the ground.
+  eval str_name %mob.alias%
+  eval str_name %str_name.car%
+  shout Get up, lazy %str_name%! We still fighting!
+  eval difficulty 1
+  remote difficulty %mob.id%
+  nop %mob.add_mob_flag(!LOOT)%
+  nop %mob.add_mob_flag(UNDEAD)%
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+end
+~
 $

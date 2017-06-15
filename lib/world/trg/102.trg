@@ -32,8 +32,38 @@ done
 Zelkab Death~
 0 f 100
 ~
-%echo% As Zelkab dies, Garlgarl steps into the nest!
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
+return 0
+eval difficulty %self.difficulty%
+eval room %self.room%
 %load% mob 10201
+eval mob %room.people%
+remote difficulty %mob.id%
+eval mob_diff %difficulty%
+if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+  eval mob_diff %mob_diff% + 1
+end
+dg_affect %mob% !ATTACK on 5
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %mob_diff% == 1
+  * Then we don't need to do anything
+elseif %mob_diff% == 2
+  nop %mob.add_mob_flag(HARD)%
+elseif %mob_diff% == 3
+  nop %mob.add_mob_flag(GROUP)%
+elseif %mob_diff% == 4
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+eval self_name %self.alias%
+eval self_name %self_name.car%
+eval mob_name %mob.alias%
+eval mob_name %mob_name.car%
+%echo% As %self_name% dies, %mob_name% steps into the nest!
 ~
 #10206
 Garlgarl Shaman Combat~
@@ -61,9 +91,40 @@ done
 Garlgarl Death~
 0 f 100
 ~
-%echo% As Garlgarl dies, Filks and Walts step into the nest!
-%load% mob 10202
-%load% mob 10203
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
+return 0
+eval difficulty %self.difficulty%
+eval room %self.room%
+eval mob_diff %difficulty%
+if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+  eval mob_diff %mob_diff% + 1
+end
+eval mob_num 10202
+while %mob_num% <= 10203
+  %load% mob %mob_num%
+  eval mob %room.people%
+  remote difficulty %mob.id%
+  dg_affect %mob% !ATTACK on 5
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+  if %mob_diff% == 1
+    * Then we don't need to do anything
+  elseif %mob_diff% == 2
+    nop %mob.add_mob_flag(HARD)%
+  elseif %mob_diff% == 3
+    nop %mob.add_mob_flag(GROUP)%
+  elseif %mob_diff% == 4
+    nop %mob.add_mob_flag(HARD)%
+    nop %mob.add_mob_flag(GROUP)%
+  end
+  eval self_name %self.alias%
+  eval self_name %self_name.car%
+  eval mob_num %mob_num% + 1
+done
+%echo% As %self_name% dies, Filks and Walts step into the nest!
 ~
 #10208
 Filks Archer Combat~
@@ -78,6 +139,10 @@ Filks Archer Combat~
 Filks Death~
 0 f 100
 ~
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
 eval room %self.room%
 eval ch %room.people%
 eval found 0
@@ -88,8 +153,34 @@ while %ch% && !%found%
   eval ch %ch.next_in_room%
 done
 if !%found%
-  %echo% As Filks dies, Nilbog steps into the nest!
+  return 0
+  eval difficulty %self.difficulty%
+  eval room %self.room%
   %load% mob 10204
+  eval mob %room.people%
+  remote difficulty %mob.id%
+  eval mob_diff %difficulty%
+  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+    eval mob_diff %mob_diff% + 1
+  end
+  dg_affect %mob% !ATTACK on 5
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+  if %mob_diff% == 1
+    * Then we don't need to do anything
+  elseif %mob_diff% == 2
+    nop %mob.add_mob_flag(HARD)%
+  elseif %mob_diff% == 3
+    nop %mob.add_mob_flag(GROUP)%
+  elseif %mob_diff% == 4
+    nop %mob.add_mob_flag(HARD)%
+    nop %mob.add_mob_flag(GROUP)%
+  end
+  eval self_name %self.alias%
+  eval self_name %self_name.car%
+  eval mob_name %mob.alias%
+  eval mob_name %mob_name.car%
+  %echo% As %self_name% dies, %mob_name% steps into the nest!
 end
 ~
 #10210
@@ -103,6 +194,10 @@ Walts Sapper Combat~
 Walts Death~
 0 f 100
 ~
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
 eval room %self.room%
 eval ch %room.people%
 eval found 0
@@ -113,8 +208,34 @@ while %ch% && !%found%
   eval ch %ch.next_in_room%
 done
 if !%found%
-  %echo% As Walts dies, Nilbog steps into the nest!
+  return 0
+  eval difficulty %self.difficulty%
+  eval room %self.room%
   %load% mob 10204
+  eval mob %room.people%
+  remote difficulty %mob.id%
+  eval mob_diff %difficulty%
+  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+    eval mob_diff %mob_diff% + 1
+  end
+  dg_affect %mob% !ATTACK on 5
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+  if %mob_diff% == 1
+    * Then we don't need to do anything
+  elseif %mob_diff% == 2
+    nop %mob.add_mob_flag(HARD)%
+  elseif %mob_diff% == 3
+    nop %mob.add_mob_flag(GROUP)%
+  elseif %mob_diff% == 4
+    nop %mob.add_mob_flag(HARD)%
+    nop %mob.add_mob_flag(GROUP)%
+  end
+  eval self_name %self.alias%
+  eval self_name %self_name.car%
+  eval mob_name %mob.alias%
+  eval mob_name %mob_name.car%
+  %echo% As %self_name% dies, %mob_name% steps into the nest!
 end
 ~
 #10212
@@ -141,8 +262,38 @@ done
 Nilbog Death~
 0 f 100
 ~
-%echo% As Nilbog dies, Furl steps into the nest!
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
+return 0
+eval difficulty %self.difficulty%
+eval room %self.room%
 %load% mob 10205
+eval mob %room.people%
+remote difficulty %mob.id%
+eval mob_diff %difficulty%
+if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+  eval mob_diff %mob_diff% + 1
+end
+dg_affect %mob% !ATTACK on 5
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %mob_diff% == 1
+  * Then we don't need to do anything
+elseif %mob_diff% == 2
+  nop %mob.add_mob_flag(HARD)%
+elseif %mob_diff% == 3
+  nop %mob.add_mob_flag(GROUP)%
+elseif %mob_diff% == 4
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+eval self_name %self.alias%
+eval self_name %self_name.car%
+eval mob_name %mob.alias%
+eval mob_name %mob_name.car%
+%echo% As %self_name% dies, %mob_name% steps into the nest!
 ~
 #10214
 Furl War Shaman Combat~
@@ -162,14 +313,6 @@ switch %random.4%
     skybrand
   break
 done
-~
-#10215
-Furl Death Rarespawn~
-0 f 5
-~
-%echo% As Furl dies, you notice his trusty mount enter the nest!
-%load% mob 10206
-%adventurecomplete%
 ~
 #10216
 Filks Respawn~
@@ -236,12 +379,14 @@ while %person%
     if %person.fighting%
       set fighting 1
     end
+    eval goblin %person%
     set filks_present 1
   elseif %person.vnum% == 10203
     if %person.fighting%
       set fighting 1
     end
     set walts_present 1
+    eval goblin %person%
   end
   eval person %person.next_in_room%
 done
@@ -260,6 +405,26 @@ elseif %walts_present% && !%filks_present% && !%fighting%
   if %new_mob.vnum% == 10202
     %echo% %new_mob.name% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
+  end
+end
+if %new_mob%
+  eval difficulty %goblin.difficulty%
+  remote difficulty %new_mob.id%
+  eval mob_diff %difficulty%
+  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+    eval mob_diff %mob_diff% + 1
+  end
+  nop %new_mob.remove_mob_flag(HARD)%
+  nop %new_mob.remove_mob_flag(GROUP)%
+  if %mob_diff% == 1
+    * Then we don't need to do anything
+  elseif %mob_diff% == 2
+    nop %new_mob.add_mob_flag(HARD)%
+  elseif %mob_diff% == 3
+    nop %new_mob.add_mob_flag(GROUP)%
+  elseif %mob_diff% == 4
+    nop %new_mob.add_mob_flag(HARD)%
+    nop %new_mob.add_mob_flag(GROUP)%
   end
 end
 ~

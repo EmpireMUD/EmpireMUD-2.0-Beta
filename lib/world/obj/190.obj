@@ -693,4 +693,163 @@ scratched into the bottom says 'fill me at the hag's hut'.
 56 56 19048
 0 0
 S
+#19060
+bell crude huge goblin~
+the goblin bell~
+A huge, crude bell is hanging nearby.~
+You can use this to set the adventure's difficulty.
+Usage: difficulty <easy | normal | hard>
+Easy: 1-2 players level 50-100.
+Normal: 2-4 players level 50-150.
+Hard: 3-4 players level 100-150.
+~
+3 0 0 3
+0 0 0
+13 0
+T 19060
+S
+#19061
+sash flaming burning furls furl's~
+Furl's flaming sash~
+Furl's sash is burning on the ground.~
+   This sash appears to be on fire, or made of fire. It bears the logo of Furl,
+goblin war shaman.
+~
+27 mp al 3
+0 0 0
+10 0
+A
+8 1 0
+A
+22 2 0
+S
+#19062
+belt championship zelkab's zelkabs~
+Zelkab's championship belt~
+You see Zelkab's championship belt on the ground.~
+This belt is big and shiny, with a tiny waistband.
+~
+27 mp al 3
+2 0 0
+2 0
+A
+2 1 0
+A
+17 1 0
+A
+18 1 0
+S
+#19063
+shinies pile garlgarl's garlgarls~
+shinies of Garlgarl~
+A pile of Garlgarl's shinies is on the ground.~
+These sparkling bangles once belonged to Garlgarl, goblin shaman.
+~
+27 mp aj 3
+0 0 0
+4 0
+A
+12 -1 0
+A
+9 2 0
+A
+7 1 0
+S
+#19064
+wristbands reinforced Walts's waltss pile~
+Walts's reinforced wristbands~
+A pair of reinforced wristbands is lying here.~
+   These writsbands are goblincraft, for sure. You can always tell by the
+stitching.
+~
+27 emp aj 3
+1 0 0
+7 0
+A
+21 2 0
+A
+17 1 0
+A
+9 1 0
+E
+stitching~
+Upon closer inspection, this is definitely goblincraft.
+~
+S
+#19065
+wristplates wargskull Nilbog's nilbogs~
+Nilbog's wargskull wristplates~
+Nilbog's wargskull wristplates are lying here.~
+The skulls is goblincraft, with signature leather and beading.
+~
+27 mp aj 2
+3 0 0
+14 0
+A
+4 -1 0
+A
+15 1 0
+A
+18 1 0
+A
+13 1 0
+S
+#19066
+axe family nilbog's nilbogs~
+Nilbog's family axe~
+Nilbog's family axe is sticking out of the ground.~
+This goblincraft axe has the crest of Nilbog.
+~
+1 ehmp an 4
+0 1 2
+14 0
+A
+21 -2 0
+A
+2 1 0
+A
+13 2 0
+A
+24 1 0
+A
+12 1 0
+A
+5 1 6
+S
+#19067
+mana goblin grungy ball~
+a ball of grungy goblin mana~
+A ball of goblin mana hovers before you.~
+This little ball of green mana is small, but powerful.
+~
+1 hmp an 4
+0 1 28
+14 0
+A
+23 -2 0
+A
+9 1 0
+A
+8 1 0
+A
+22 2 0
+A
+5 1 6
+S
+#19068
+pick nightmare furl's furls~
+Furl's nightmare pick~
+Furl's nightmare pick sticks out of the ground.~
+This pick is forged from hellfire, branded with goblin runes.
+~
+1 eimp an 3
+0 3 8
+10 0
+A
+2 1 0
+A
+9 1 0
+A
+5 1 6
+S
 $
