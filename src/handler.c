@@ -3360,6 +3360,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	
 	bool any = FALSE, done_cumulative = FALSE;
 	struct global_data *glb, *next_glb, *choose_last;
+	struct instance_data *inst;
 	int cumulative_prc;
 	adv_data *adv;
 	
@@ -3368,7 +3369,8 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		return FALSE;
 	}
 	
-	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
+	inst = real_instance(MOB_INSTANCE_ID(mob));
+	adv = inst ? inst->adventure : NULL;
 	cumulative_prc = number(1, 10000);
 	choose_last = NULL;
 
@@ -3401,7 +3403,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		}
 		
 		// check adventure-only -- late-matching because it does more work than other conditions
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && (!adv || get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv)) {
 			continue;
 		}
 		
