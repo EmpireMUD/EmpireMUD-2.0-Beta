@@ -3,7 +3,7 @@ Zelkab goblin bruiser~
 Zelkab, goblin bruiser~
 A goblin bruiser is guarding the nest.
 ~
-0 0 bdy 0
+50 150 bdy 0
 1 0 0 5
 T 10201
 T 10205
@@ -16,7 +16,7 @@ Garlgarl goblin shaman~
 Garlgarl, goblin shaman~
 A goblin shaman is drawing symbols in the blood on the floor.
 ~
-0 0 bdxA 0
+50 150 bdxyA 0
 2 0 0 16
 T 10200
 T 10201
@@ -30,7 +30,7 @@ Filks goblin archer~
 Filks, goblin archer~
 A goblin archer is trying to fix her bow.
 ~
-0 0 abdzA 0
+50 150 abdzA 0
 2 0 0 1
 T 10200
 T 10201
@@ -44,7 +44,7 @@ Walts goblin sapper~
 Walts, goblin sapper~
 A goblin sapper is trying to light something on fire.
 ~
-0 0 abdyA s
+50 150 abdyA s
 1 0 0 4
 T 10200
 T 10201
@@ -58,7 +58,7 @@ Nilbog goblin champion~
 Nilbog, goblin champion~
 The goblin champion is unpolishing her armor.
 ~
-0 0 bdyB 0
+50 150 bdyB 0
 2 0 0 2
 T 10200
 T 10201
@@ -72,7 +72,7 @@ Furl goblin war shaman~
 Furl, war shaman~
 The goblin war shaman is raising his staff!
 ~
-0 0 bdxAB 0
+50 150 bdxAB 0
 1 0 0 18
 T 10200
 T 10201
@@ -116,7 +116,7 @@ I 1 1351 50.00 1  # SKIN: a large skin
 I 3 10207 100.00 1 X  # BARDE: an armored goblin warg
 S
 #10224
-warg winged~
+wolf winged~
 a winged wolf~
 A winged worg flaps around near the ground.
 ~

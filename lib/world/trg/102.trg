@@ -376,13 +376,13 @@ set fighting 0
 eval person %room.people%
 while %person%
   if %person.vnum% == 10202
-    if %person.fighting%
+    if %person.fighting% || %person.mob_flagged(UNDEAD)%
       set fighting 1
     end
     eval goblin %person%
     set filks_present 1
   elseif %person.vnum% == 10203
-    if %person.fighting%
+    if %person.fighting% || %person.mob_flagged(UNDEAD)%
       set fighting 1
     end
     set walts_present 1

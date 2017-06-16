@@ -596,11 +596,11 @@ if easy /= %arg%
   if %level% > 100
     eval level 100
   end
-elseif normal /= %arg%
-  %echo% Setting difficulty to Normal...
+elseif medium /= %arg%
+  %echo% Setting difficulty to Medium...
   eval difficulty 2
-elseif hard /= %arg%
-  %echo% Setting difficulty to Hard...
+elseif difficult /= %arg%
+  %echo% Setting difficulty to Difficult...
   eval difficulty 3
   if %level% < 100
     eval level 100
@@ -650,7 +650,7 @@ end
 nop %self.set_cooldown(10200, 30)%
 * Group only -- boss only for Nilbog
 if %self.mob_flagged(GROUP)%
-  if %self.mob_flagged(HARD)% || %self.vnum% != 19404
+  if %self.mob_flagged(HARD)% || %self.vnum% != 10204
     eval heroic_mode 1
   end
 end
@@ -678,7 +678,7 @@ if %self.cooldown(10200)%
 end
 nop %self.set_cooldown(10200, 30)%
 if %self.mob_flagged(GROUP)%
-  if %self.mob_flagged(HARD)% || %self.vnum% != 19404
+  if %self.mob_flagged(HARD)% || %self.vnum% != 10204
     eval heroic_mode 1
   end
 end
@@ -693,7 +693,7 @@ if %heroic_mode%
   while %person%
     eval test %%person.is_enemy(%self%)%%
     if %test%
-      %dot% #10203 %actor% 100 20 physical
+      %dot% #10203 %person% 100 20 physical
     end
     eval person %person.next_in_room%
   done
@@ -855,10 +855,10 @@ end
 %echo% %self.name%'s wounds start to close!
 if %heroic_mode%
   %damage% %self% -200
-  dg_affect #10207 %self% HEAL-OVER-TIME 125 on 30
+  dg_affect #10207 %self% HEAL-OVER-TIME 125 30
 else
   %damage% %self% -100
-  dg_affect #10207 %self% HEAL-OVER-TIME 20 on 30
+  dg_affect #10207 %self% HEAL-OVER-TIME 20 30
 end
 ~
 #19069
@@ -997,10 +997,12 @@ else
   shout Get up, lazy %str_name%! We still fighting!
   eval difficulty 1
   remote difficulty %mob.id%
+  nop %mob.add_mob_flag(SPAWNED)%
   nop %mob.add_mob_flag(!LOOT)%
   nop %mob.add_mob_flag(UNDEAD)%
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
+  %force% %mob% %aggro% %actor%
 end
 ~
 $

@@ -698,12 +698,12 @@ bell crude huge goblin~
 the goblin bell~
 A huge, crude bell is hanging nearby.~
 You can use this to set the adventure's difficulty.
-Usage: difficulty <easy | normal | hard>
+Usage: difficulty <easy | medium | difficult>
 Easy: 1-2 players level 50-100.
-Normal: 2-4 players level 50-150.
-Hard: 3-4 players level 100-150.
+Medium: 2-4 players level 50-150.
+Difficult: 3-4 players level 100-150.
 ~
-3 0 0 3
+3 0 0 5
 0 0 0
 13 0
 T 19060
@@ -715,13 +715,15 @@ Furl's sash is burning on the ground.~
    This sash appears to be on fire, or made of fire. It bears the logo of Furl,
 goblin war shaman.
 ~
-27 mp al 3
+27 mp al 4
 0 0 0
 10 0
 A
 8 1 0
 A
 22 2 0
+C
+50 150
 S
 #19062
 belt championship zelkab's zelkabs~
@@ -729,7 +731,7 @@ Zelkab's championship belt~
 You see Zelkab's championship belt on the ground.~
 This belt is big and shiny, with a tiny waistband.
 ~
-27 mp al 3
+27 mp al 4
 2 0 0
 2 0
 A
@@ -738,6 +740,8 @@ A
 17 1 0
 A
 18 1 0
+C
+50 150
 S
 #19063
 shinies pile garlgarl's garlgarls~
@@ -745,7 +749,7 @@ shinies of Garlgarl~
 A pile of Garlgarl's shinies is on the ground.~
 These sparkling bangles once belonged to Garlgarl, goblin shaman.
 ~
-27 mp aj 3
+27 mp aj 4
 0 0 0
 4 0
 A
@@ -754,6 +758,8 @@ A
 9 2 0
 A
 7 1 0
+C
+50 150
 S
 #19064
 wristbands reinforced Walts's waltss pile~
@@ -762,7 +768,7 @@ A pair of reinforced wristbands is lying here.~
    These writsbands are goblincraft, for sure. You can always tell by the
 stitching.
 ~
-27 emp aj 3
+27 emp aj 4
 1 0 0
 7 0
 A
@@ -771,6 +777,8 @@ A
 17 1 0
 A
 9 1 0
+C
+50 150
 E
 stitching~
 Upon closer inspection, this is definitely goblincraft.
@@ -782,7 +790,7 @@ Nilbog's wargskull wristplates~
 Nilbog's wargskull wristplates are lying here.~
 The skulls is goblincraft, with signature leather and beading.
 ~
-27 mp aj 2
+27 mp aj 3
 3 0 0
 14 0
 A
@@ -793,6 +801,8 @@ A
 18 1 0
 A
 13 1 0
+C
+50 150
 S
 #19066
 axe family nilbog's nilbogs~
@@ -800,7 +810,7 @@ Nilbog's family axe~
 Nilbog's family axe is sticking out of the ground.~
 This goblincraft axe has the crest of Nilbog.
 ~
-1 ehmp an 4
+1 ehmp an 5
 0 1 2
 14 0
 A
@@ -815,6 +825,8 @@ A
 12 1 0
 A
 5 1 6
+C
+50 150
 S
 #19067
 mana goblin grungy ball~
@@ -822,7 +834,7 @@ a ball of grungy goblin mana~
 A ball of goblin mana hovers before you.~
 This little ball of green mana is small, but powerful.
 ~
-1 hmp an 4
+1 hmp an 5
 0 1 28
 14 0
 A
@@ -835,6 +847,8 @@ A
 22 2 0
 A
 5 1 6
+C
+50 150
 S
 #19068
 pick nightmare furl's furls~
@@ -842,7 +856,7 @@ Furl's nightmare pick~
 Furl's nightmare pick sticks out of the ground.~
 This pick is forged from hellfire, branded with goblin runes.
 ~
-1 eimp an 3
+1 eimp an 4
 0 3 8
 10 0
 A
@@ -851,5 +865,186 @@ A
 9 1 0
 A
 5 1 6
+C
+50 150
+S
+#19069
+legplates plates goblin pair giant~
+giant goblin legplates~
+A pair of giant goblin legplates is sitting on the ground.~
+These goblincraft plates actually look a little bit small for you.
+~
+27 mp af 5
+3 0 0
+2 0
+A
+24 1 0
+A
+12 1 0
+C
+50 150
+S
+#19070
+breeches goblin breaching breeching breaches~
+goblin breeches of breaching~
+The goblin breeches of breaching are lying here.~
+   These pants are obviously goblincraft, but you think you could squeeze into
+them.
+~
+27 mp af 6
+1 0 0
+7 0
+A
+17 3 0
+A
+9 1 0
+C
+50 150
+S
+#19071
+loincloth cloth goblin mystic~
+a mystic goblin loincloth~
+A goblin loincloth is lying here, untouched.~
+   You are frightened to touch the loincloth, but it looks like it's made from
+horse skin.
+~
+27 mp af 7
+0 0 0
+7 0
+A
+23 1 0
+C
+50 150
+S
+#19072
+kneecap cap carved human~
+a carved human kneecap~
+A carved human kneecap is lying here.~
+   This kneecap appears to have come from a person. It has goblin writing
+carved (or perhaps scratched) into the entire surface, and is held onto your
+leg by a leather strap.
+~
+27 mp af 8
+0 0 0
+7 0
+A
+8 1 0
+A
+22 3 0
+C
+50 150
+S
+#19073
+garter goblin crude~
+a crude goblin garter~
+A goblin garter is lying here.~
+   It appears to be a goblincraft garter. No telling what animal this was made
+from.
+~
+27 mp af 7
+2 0 0
+7 0
+A
+2 1 0
+A
+9 1 0
+A
+17 1 0
+A
+18 1 0
+C
+50 150
+S
+#19074
+gem goblin iron~
+the iron goblin gem~
+The iron goblin gem is dangling here.~
+   'Iron gem' is a generous term for what really just appears to be a rough-cut
+piece of iron on a chain.
+~
+2 mp ac 5
+0 0 0
+2 0
+A
+2 1 0
+A
+24 1 0
+A
+12 1 0
+C
+50 150
+S
+#19075
+talon roc pilfered~
+a pilfered roc talon~
+A pilfered roc talon is dangling here.~
+The talon is quite large, and hangs from your neck by a chain.
+~
+2 mp ac 8
+0 0 0
+14 0
+A
+1 1 0
+A
+2 1 0
+A
+17 1 0
+C
+50 150
+S
+#19076
+locket celestial cracked~
+a cracked celestial locket~
+A cracked celestial locket is dangling here.~
+   This heavy locket has the color of the blue, cloudless sky. But the hinge is
+popped and some of the gems are missing. Bits of rat fur stick out from inside
+the locket, which is bound shut by horse hair.
+~
+2 mp ac 7
+0 0 0
+2 0
+A
+8 1 0
+A
+16 1 0
+C
+50 150
+S
+#19077
+choker goblinsilk silk~
+a goblinsilk choker~
+A goblinsilk choker is dangling here.~
+This odd silk lace, if you can call it that, is clearly goblincraft.
+~
+2 mp ac 8
+0 0 0
+11 0
+A
+8 1 0
+A
+2 1 0
+A
+22 1 0
+C
+50 150
+S
+#19078
+metatarsal guile~
+the metatarsal of guile~
+The metatarsal of guile is dangling here.~
+   This appears to be a large toe bone, hung from a chain. Hopefully it's not
+human.
+~
+2 mp ac 7
+0 0 0
+14 0
+A
+18 1 0
+A
+17 1 0
+A
+2 1 0
+C
+50 150
 S
 $
