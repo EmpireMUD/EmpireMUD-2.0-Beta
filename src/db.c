@@ -1870,6 +1870,7 @@ const char *versions_list[] = {
 	"b4.38",
 	"b4.39",
 	"b5.1",
+	"b5.3",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2631,6 +2632,25 @@ void b5_1_global_update(void) {
 }
 
 
+// b5.3 looks for missile weapons that need updates
+void b5_3_missile_update(void) {
+	obj_data *obj, *next_obj;
+	
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (!IS_MISSILE_WEAPON(obj)) {
+			continue;
+		}
+		
+		// ALL bows are TYPE_BOW before this update
+		if (GET_MISSILE_WEAPON_TYPE(obj) != TYPE_BOW) {
+			log(" - updating %d %s from %d to %d (bow)", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), GET_MISSILE_WEAPON_TYPE(obj), TYPE_BOW);
+			GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_TYPE) = TYPE_BOW;
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2845,6 +2865,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.1")) {
 			log("Updating to b5.1...");
 			b5_1_global_update();
+		}
+		if (MATCH_VERSION("b5.3")) {
+			log("Updating to b5.3...");
+			b5_3_missile_update();
 		}
 	}
 	

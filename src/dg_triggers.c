@@ -1258,7 +1258,19 @@ int leave_otrigger(room_data *room, char_data *actor, int dir) {
 	return final;
 }
 
-int consume_otrigger(obj_data *obj, char_data *actor, int cmd) {
+
+/**
+* A trigger that fires when a character tries to 'consume' an object. Most
+* consume triggers can block the action by returning 0, but a few (poisons and
+* shooting) cannot block.
+*
+* @param obj_data *obj The item to test for triggers.
+* @param char_data *actor The player consuming the object.
+* @param int cmd The command that's consuming the item (OCMD_*).
+* @param char_data *target Optional: If the consume is targeted (e.g. poisons), the target (may be NULL).
+* @return int 0 to block consume, 1 to continue.
+*/
+int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val;
@@ -1270,6 +1282,13 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd) {
 		if (TRIGGER_CHECK(t, OTRIG_CONSUME)) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			if (target) {
+				ADD_UID_VAR(buf, t, char_script_id(target), "target", 0);
+			}
+			else {
+				add_var(&GET_TRIG_VARS(t), "target", "", 0);
+			}
+			
 			switch (cmd) {
 				case OCMD_EAT:
 					add_var(&GET_TRIG_VARS(t), "command", "eat", 0);
@@ -1290,6 +1309,14 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd) {
 				}
 				case OCMD_CRAFT: {
 					add_var(&GET_TRIG_VARS(t), "command", "craft", 0);
+					break;
+				}
+				case OCMD_SHOOT: {
+					add_var(&GET_TRIG_VARS(t), "command", "shoot", 0);
+					break;
+				}
+				case OCMD_POISON: {
+					add_var(&GET_TRIG_VARS(t), "command", "poison", 0);
 					break;
 				}
 			}

@@ -453,7 +453,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON:
-			msg_to_char(ch, "Fires at a speed of %.2f for %d damage.\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(obj)], GET_MISSILE_WEAPON_DAMAGE(obj));
+			msg_to_char(ch, "Speed: %.2f\r\n", get_weapon_speed(obj));
+			msg_to_char(ch, "Damage: %d (%s+%.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			msg_to_char(ch, "Damage type is %s.\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
 			break;
 		case ITEM_ARROW:
 			if (GET_ARROW_QUANTITY(obj) > 0) {
@@ -461,6 +463,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			}
 			if (GET_ARROW_DAMAGE_BONUS(obj)) {
 				msg_to_char(ch, "Adds %+d damage.\r\n", GET_ARROW_DAMAGE_BONUS(obj));
+			}
+			
+			if (GET_OBJ_AFF_FLAGS(obj) || GET_OBJ_APPLIES(obj)) {
+				generic_data *aftype = find_generic(GET_OBJ_VNUM(obj), GENERIC_AFFECT);
+				msg_to_char(ch, "Debuff name: %s\r\n", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
 			}
 			break;
 		case ITEM_PACK: {
@@ -3828,7 +3835,7 @@ ACMD(do_drink) {
 	}
 
 	/* check trigger */
-	if (obj && !consume_otrigger(obj, ch, OCMD_DRINK)) {
+	if (obj && !consume_otrigger(obj, ch, OCMD_DRINK, NULL)) {
 		return;
 	}
 
@@ -4118,7 +4125,7 @@ ACMD(do_eat) {
 	}
 
 	/* check trigger */
-	if (!consume_otrigger(food, ch, OCMD_EAT)) {
+	if (!consume_otrigger(food, ch, OCMD_EAT, NULL)) {
 		return;
 	}
 	

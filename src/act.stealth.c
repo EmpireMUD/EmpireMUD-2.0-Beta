@@ -512,14 +512,14 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	// applied -- charge a charge
 	GET_OBJ_VAL(obj, VAL_POISON_CHARGES) -= 1;
 	
-	if (GET_POISON_CHARGES(obj) <= 0) {
-		extract_obj(obj);
-	}
-	
 	// attempt immunity/resist
 	if (has_ability(vict, ABIL_POISON_IMMUNITY)) {
 		if (can_gain_exp_from(vict, ch)) {
 			gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
+		}
+		
+		if (GET_POISON_CHARGES(obj) <= 0) {
+			extract_obj(obj);
 		}
 		return 0;
 	}
@@ -528,6 +528,9 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 			gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
 		}
 		if (!number(0, 2)) {
+			if (GET_POISON_CHARGES(obj) <= 0) {
+				extract_obj(obj);
+			}
 			return 0;
 		}
 	}
@@ -567,9 +570,16 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 			break;
 		}
 	}
-
+	
 	if (result >= 0 && GET_HEALTH(vict) > GET_MAX_HEALTH(vict)) {
 		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
+	}
+	
+	// fire a consume trigger but it can't block execution here
+	if (consume_otrigger(obj, ch, OCMD_POISON, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
+		if (GET_POISON_CHARGES(obj) <= 0) {
+			extract_obj(obj);
+		}
 	}
 	
 	return result;

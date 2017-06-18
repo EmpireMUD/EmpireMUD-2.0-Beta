@@ -153,6 +153,8 @@
 #define OCMD_READ  4
 #define OCMD_BUILD  5
 #define OCMD_CRAFT  6
+#define OCMD_SHOOT  7
+#define OCMD_POISON  8
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */
@@ -289,7 +291,7 @@ int leave_otrigger(room_data *room, char_data *actor, int dir);
 int door_mtrigger(char_data *actor, int subcmd, int dir);
 int door_wtrigger(char_data *actor, int subcmd, int dir);
 
-int consume_otrigger(obj_data *obj, char_data *actor, int cmd);
+int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target);
 
 int finish_otrigger(obj_data *obj, char_data *actor);
 

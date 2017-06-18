@@ -1306,7 +1306,7 @@ ACMD(do_quaff) {
 	else if (!IS_POTION(obj)) {
 		msg_to_char(ch, "You can only quaff potions.\r\n");
 	}
-	else if (!consume_otrigger(obj, ch, OCMD_QUAFF)) {
+	else if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
 		/* check trigger */
 		return;
 	}

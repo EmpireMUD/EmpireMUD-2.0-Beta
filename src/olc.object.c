@@ -1800,15 +1800,16 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
-			sprintf(storage + strlen(storage), "<&ymissilespeed&0> %.2f\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(obj)]);
-			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), get_base_dps(obj));
-			sprintf(storage + strlen(storage), "<&yarrowtype&0> %c\r\n", 'A' + GET_MISSILE_WEAPON_TYPE(obj));
+			sprintf(storage + strlen(storage), "<&yweapontype&0> %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %s+%.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			sprintf(storage + strlen(storage), "<&yarrowtype&0> %c\r\n", 'A' + GET_MISSILE_WEAPON_ARROW_TYPE(obj));
 			break;
 		}
 		case ITEM_ARROW: {
 			sprintf(storage + strlen(storage), "<&yquantity&0> %d\r\n", GET_ARROW_QUANTITY(obj));
 			sprintf(storage + strlen(storage), "<&ydamage&0> %+d\r\n", GET_ARROW_DAMAGE_BONUS(obj));
 			sprintf(storage + strlen(storage), "<&yarrowtype&0> %c\r\n", 'A' + GET_ARROW_TYPE(obj));
+			sprintf(storage + strlen(storage), "NOTE: Positive applies become negative debuffs (see HELP ARROW ITEM)\r\n");
 			break;
 		}
 		case ITEM_PACK: {
@@ -2199,7 +2200,7 @@ OLC_MODULE(oedit_arrowtype) {
 	// this chooses the VAL slot and validates the type
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_MISSILE_WEAPON: {
-			slot = VAL_MISSILE_WEAPON_TYPE;
+			slot = VAL_MISSILE_WEAPON_ARROW_TYPE;
 			break;
 		}
 		case ITEM_ARROW: {
@@ -2659,39 +2660,6 @@ OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
 	GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
-}
-
-
-OLC_MODULE(oedit_missilespeed) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	static char **speed_types = NULL;
-	int iter, count;
-	
-	// this does not have a const char** list .. build one the first time
-	if (!speed_types) {
-		// count types
-		count = 0;
-		for (iter = 0; missile_weapon_speed[iter] > 0; ++iter) {
-			++count;
-		}
-	
-		CREATE(speed_types, char*, count+1);
-		
-		for (iter = 0; iter < count; ++iter) {
-			sprintf(buf, "%.2f", missile_weapon_speed[iter]);
-			speed_types[iter] = str_dup(buf);
-		}
-		
-		// must terminate
-		speed_types[count] = str_dup("\n");
-	}
-
-	if (!IS_MISSILE_WEAPON(obj)) {
-		msg_to_char(ch, "You can only set missilespeed type on a missile weapon.\r\n");
-	}
-	else {
-		GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_SPEED) = olc_process_type(ch, argument, "missile speed", "missilespeed", (const char**)speed_types, GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_SPEED));
-	}
 }
 
 
@@ -3198,13 +3166,24 @@ OLC_MODULE(oedit_wealth) {
 
 OLC_MODULE(oedit_weapontype) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	int pos = 0;
 	
-	if (GET_OBJ_TYPE(obj) != ITEM_WEAPON) {
-		msg_to_char(ch, "You can only set weapontype on a weapon.\r\n");
+	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_WEAPON: {
+			pos = VAL_WEAPON_TYPE;
+			break;
+		}
+		case ITEM_MISSILE_WEAPON: {
+			pos = VAL_MISSILE_WEAPON_TYPE;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only set weapontype on a weapon.\r\n");
+			return;
+		}
 	}
-	else {
-		GET_OBJ_VAL(obj, VAL_WEAPON_TYPE) = olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, VAL_WEAPON_TYPE));
-	}
+	
+	GET_OBJ_VAL(obj, pos) = olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, pos));
 }
 
 

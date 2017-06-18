@@ -322,6 +322,8 @@ Objects (OEDIT):
 - The COMBINE interaction should always use 1 exclusion set, as it will extract
   the original item if the interaction succeeds, and it's usually not safe to
   run additional interactions.
+- Arrow items that cause debuffs will use an 'affect' generic with the same
+  vnum as the arrow, if one exists.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
@@ -4029,19 +4031,6 @@ to any level under the maximum.
 
 See also: ITEM SCALING, OEDIT MAXLEVEL, OLC OBJECTS
 #d
-"OEDIT MISSILESPEED" "OEDIT MISSILE SPEED"
-
-Usage:  .missilespeed <number>
-
-This trait determines how fast a missile weapon (e.g. a bow) attacks in combat.
-You cannot choose your own speed; you must pick from a list. You should always
-specify the number in the list as your argument to this command.
-
-The 'speed' trait is the number of seconds between attacks in combat, so a
-lower number means a faster weapon. In that way, the name is backwards.
-
-See also: OLC OBJECTS
-#d
 "OEDIT REQUIRESQUEST" "OEDIT REQUIRES QUEST" "OEDIT REQUIRE QUEST" "OEDIT QUEST"
 
 Usage:  .requiresquest <vnum | none>
@@ -4303,7 +4292,8 @@ See also: OEDIT STORAGE, OLC OBJECTS
 Usage:  .weapontype <type>
 
 The weapon type determines which combat messages are sent, how fast the weapon
-attacks in combat, and whether or not it is sharp.
+attacks in combat, and whether or not it is sharp. Both regular weapons and
+missile weapons share the same set of types.
 
 The following weapon types are available:
  1. RESERVED - do not use
@@ -4335,6 +4325,10 @@ The following weapon types are available:
 27. peck - animals
 28. gore - animals
 29. mana blast - normal magical attack (e.g. disarmed mage)
+30. bow (shoot) - a normal bow
+31. crossbow (shoot) - a crossbow
+32. pistol (shoot) - a small firearm
+33. musket (shoot) - a large firearm
 
 See also: OLC OBJECTS
 #d
@@ -5837,9 +5831,17 @@ The ARROW item type is used to create stacks of ammunition for the MISSILE
 WEAPON type. Its damage is added to the missile weapon's own damage. Arrows
 normally come in stacks of 10 and are named as "a quiver of arrows".
 
-If the arrow is scalable, its damage bonus will scale. Applies don't matter on
-arrow items because they are not equipped. Arrows only fire out of the player's
-inventory.
+If the arrow is scalable, its damage bonus will scale. Arrows only fire out of
+the player's inventory.
+
+If there are any applies, they will become debuffs on the enemy when hit by
+the arrow. These applies need to be positive, not negative, to be debuffs.
+If there is an 'affect' generic with the same vnum as the arrow item, it will
+be used for the debuff.
+
+NOTE: Positive applies on arrows lead to negative debuffs on enemies. The
+arrow applies must be positive in order for the scaling engine to handle them
+correctly.
 #d
 "BOARD ITEM" "BOARD OBJECT"
 
@@ -5935,6 +5937,8 @@ use weapons of this type, players must also have matching ARROW items in their
 inventory.
 
 If the missile weapon is scalable, it will scale its own damage bonus.
+
+See also: ARROW ITEM
 #d
 "OTHER ITEM" "OTHER OBJECT"
 
