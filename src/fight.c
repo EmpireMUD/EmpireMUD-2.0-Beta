@@ -1967,26 +1967,36 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 		"$n decimates you with $s #x.",
 		"$n decimates $N with $s #x." },
 
-		{ 40,
+		{ 45,
 		"You OBLITERATE $N with your deadly #x!!",
 		"$n OBLITERATES you with $s deadly #x!!",
 		"$n OBLITERATES $N with $s deadly #x!!" },
 
-		{ 50,
+		{ 60,
 		"You ANNIHILATE $N with your deadly #x!!",
 		"$n ANNIHILATES you with $s deadly #x!!",
 		"$n ANNIHILATES $N with $s deadly #x!!" },
 
-		{ 60,
+		{ 75,
 		"You MUTILATE $N with your deadly #x!!",
 		"$n MUTILATES you with $s deadly #x!!",
 		"$n MUTILATES $N with $s deadly #x!!" },
 
+		{ 100,
+		"You SLAUGHTER $N with your deadly #x!!",
+		"$n SLAUGHTER you with $s deadly #x!!",
+		"$n SLAUGHTER $N with $s deadly #x!!" },
+
+		{ 125,
+		"You **ERADICATE** $N with your deadly #x!!",
+		"$n **ERADICATE** you with $s deadly #x!!",
+		"$n **ERADICATE** $N with $s deadly #x!!" },
+
 		// use -1 as the final entry (REQUIRED) -- captures any higher damage
 		{ -1,
-		"You LIQUIDATE $N with your deadly #x!!",
-		"$n LIQUIDATES you with $s deadly #x!!",
-		"$n LIQUIDATES $N with $s deadly #x!!" }
+		"You **LIQUIDATE** $N with your deadly #x!!",
+		"$n **LIQUIDATES** you with $s deadly #x!!",
+		"$n **LIQUIDATES** $N with $s deadly #x!!" }
 	};
 
 	// find matching message
