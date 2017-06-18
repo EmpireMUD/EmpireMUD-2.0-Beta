@@ -261,6 +261,22 @@ Gain experience when you try to kick something.
 
 See also: SHADOW KICK
 #
+KITE
+
+Kite (Battle ability)
+
+Usage:  kite
+Cooldown:  30 seconds
+Cost:  50 move
+
+You can kite opponents to keep them at range while you shoot them. However,
+your opponents must be stunned, entangled, or attacking someone else. If you
+use this ability while already at range, it will increase the time it takes
+for your opponent to run to you. Otherwise, it will move you back to ranged
+distance and start the run-in timer.
+
+Gain experience when you kite someone.
+#
 "NOBLE BEARING"
 
 Noble Bearing

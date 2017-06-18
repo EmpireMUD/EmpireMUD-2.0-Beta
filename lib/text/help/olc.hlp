@@ -4247,7 +4247,7 @@ Available types:
  *SHIP - use vehicles instead
  * - unused
  * - unused
- MISSILE_WEAPON - a bow, or similar (requires .wear RANGED)
+ MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
  ARROW - ammunition for missile weapons
  INSTRUMENT - a musical instrument -- must set custom messages
  SHIELD - for blocking attacks (requires .wear HOLD)

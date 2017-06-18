@@ -1770,7 +1770,7 @@ const char *item_types[] = {
 	"*SHIP",
 	"*",
 	"*",
-	"MISSILE_WEAPON",
+	"MISSILE-WEAPON",
 	"ARROW",
 	"INSTRUMENT",
 	"SHIELD",

@@ -362,6 +362,7 @@
 #define COOLDOWN_SOULCHAIN  2065
 #define COOLDOWN_STARSTRIKE  2066
 #define COOLDOWN_THORNLASH  2067
+#define COOLDOWN_KITE  2068
 
 
 // LIQ_x: Some different kind of liquids (vnums of GENERIC_LIQUID)
