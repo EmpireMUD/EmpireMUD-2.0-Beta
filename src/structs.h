@@ -2116,7 +2116,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MAIL_SIZE  4096	// arbitrary
-#define MAX_MESSAGES  60	// fight.c
+#define MAX_MESSAGES  100	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_NAME_LENGTH  20
 #define MAX_OBJ_AFFECT  6
