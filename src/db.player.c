@@ -1873,6 +1873,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'U': {
+				if (PFILE_TAG(line, "Using Ammo:", length)) {
+					USING_AMMO(ch) = atoi(line + length + 1);
+				}
 				if (PFILE_TAG(line, "Using Poison:", length)) {
 					USING_POISON(ch) = atoi(line + length + 1);
 				}
@@ -2483,6 +2486,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'U'
+	if (USING_AMMO(ch)) {
+		fprintf(fl, "Using Ammo: %d\n", USING_AMMO(ch));
+	}
 	if (USING_POISON(ch)) {
 		fprintf(fl, "Using Poison: %d\n", USING_POISON(ch));
 	}

@@ -25,6 +25,7 @@
 
 /**
 * Contents:
+*   Helpers
 *   Commands
 */
 
@@ -38,6 +39,27 @@ extern int determine_best_scale_level(char_data *ch, bool check_group);	// mobac
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS ////////////////////////////////////////////////////////////////
+
+/**
+* For the "use" command -- switches your preferred arrows.
+*
+* @param char_data *ch The player.
+* @param obj_data *obj The arrow to prefer.
+*/
+void use_arrows(char_data *ch, obj_data *obj) {
+	if (!IS_ARROW(obj)) {
+		// ??? shouldn't ever get here
+		act("$p isn't something you can use like this.", FALSE, ch, obj, NULL, TO_CHAR);
+		return;
+	}
+	
+	USING_AMMO(ch) = GET_OBJ_VNUM(obj);
+	act("You are now using $p as your preferred ammunition.", FALSE, ch, obj, NULL, TO_CHAR);
+}
 
 
  //////////////////////////////////////////////////////////////////////////////

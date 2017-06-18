@@ -1879,12 +1879,19 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 *
 * @param char_data *ch the attacker
 * @param char_data *victim the guy who blocked
-* @param obj_data *arrow The arrow item being shot.
+* @param obj_data *arrow The arrow item being shot. (optional)
 */
 void block_missile_attack(char_data *ch, char_data *victim, obj_data *arrow) {
-	act("You shoot $p at $N, but $E blocks.", FALSE, ch, arrow, victim, TO_CHAR | TO_COMBAT_MISS);
-	act("$n shoots $p at $N, who blocks.", FALSE, ch, arrow, victim, TO_NOTVICT | TO_COMBAT_MISS);
-	act("$n shoots $p at you, but you block.", FALSE, ch, arrow, victim, TO_VICT | TO_COMBAT_MISS);
+	if (arrow) {
+		act("You shoot $p at $N, but $E blocks.", FALSE, ch, arrow, victim, TO_CHAR | TO_COMBAT_MISS);
+		act("$n shoots $p at $N, who blocks.", FALSE, ch, arrow, victim, TO_NOTVICT | TO_COMBAT_MISS);
+		act("$n shoots $p at you, but you block.", FALSE, ch, arrow, victim, TO_VICT | TO_COMBAT_MISS);
+	}
+	else {
+		act("You shoot at $N, but $E blocks.", FALSE, ch, NULL, victim, TO_CHAR | TO_COMBAT_MISS);
+		act("$n shoots at $N, who blocks.", FALSE, ch, NULL, victim, TO_NOTVICT | TO_COMBAT_MISS);
+		act("$n shoots at you, but you block.", FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_MISS);
+	}
 }
 
 
@@ -3611,15 +3618,28 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	// detect arrows
 	best = NULL;
-	for (arrow = ch->carrying; arrow; arrow = arrow->next_content) {
-		if (IS_ARROW(arrow) && GET_ARROW_TYPE(arrow) == GET_MISSILE_WEAPON_ARROW_TYPE(weapon)) {
-			if (!best || GET_ARROW_DAMAGE_BONUS(arrow) > GET_ARROW_DAMAGE_BONUS(best)) {
-				best = arrow;
+	
+	if (!IS_NPC(ch)) {
+		LL_FOREACH2(ch->carrying, arrow, next_content) {
+			if (IS_ARROW(arrow) && GET_OBJ_VNUM(arrow) == USING_AMMO(ch) && GET_ARROW_TYPE(arrow) == GET_MISSILE_WEAPON_ARROW_TYPE(weapon)) {
+				if (!best || GET_ARROW_DAMAGE_BONUS(arrow) > GET_ARROW_DAMAGE_BONUS(best)) {
+					best = arrow;	// found a [better] match!
+				}
 			}
 		}
 	}
 	
-	if (!best) {
+	if (!best) {	// if we didn't find a preferred one
+		for (arrow = ch->carrying; arrow; arrow = arrow->next_content) {
+			if (IS_ARROW(arrow) && GET_ARROW_TYPE(arrow) == GET_MISSILE_WEAPON_ARROW_TYPE(weapon)) {
+				if (!best || GET_ARROW_DAMAGE_BONUS(arrow) > GET_ARROW_DAMAGE_BONUS(best)) {
+					best = arrow;
+				}
+			}
+		}
+	}
+	
+	if (!best && !IS_NPC(ch)) {
 		msg_to_char(ch, "You don't have anything that you can shoot!\r\n");
 		if (FIGHT_MODE(vict) == FMODE_MISSILE) {
 			FIGHT_MODE(ch) = FMODE_WAITING;
@@ -3648,13 +3668,13 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 	else {
 		// compute damage
-		dam = GET_MISSILE_WEAPON_DAMAGE(weapon) + GET_ARROW_DAMAGE_BONUS(best);
+		dam = GET_MISSILE_WEAPON_DAMAGE(weapon) + (best ? GET_ARROW_DAMAGE_BONUS(best) : 0);
 		
 		// damage last! it's sometimes fatal for vict
 		ret = damage(ch, vict, dam, GET_MISSILE_WEAPON_TYPE(weapon), attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].damage_type);
 		
 		// affects?
-		if (ret > 0 && (GET_OBJ_AFF_FLAGS(best) || GET_OBJ_APPLIES(best))) {
+		if (ret > 0 && best && (GET_OBJ_AFF_FLAGS(best) || GET_OBJ_APPLIES(best))) {
 			atype = find_generic(GET_OBJ_VNUM(best), GENERIC_AFFECT) ? GET_OBJ_VNUM(best) : ATYPE_RANGED_WEAPON;
 			
 			if (GET_OBJ_AFF_FLAGS(best)) {
@@ -3671,7 +3691,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		}
 		
 		// fire a consume trigger but it can't block execution here
-		if (!consume_otrigger(best, ch, OCMD_SHOOT, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
+		if (best && !consume_otrigger(best, ch, OCMD_SHOOT, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
 			purge = FALSE;	// arrow likely extracted
 		}
 		
@@ -3686,7 +3706,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 	
 	// arrow countdown/extract (only if the arrows weren't extracted by a script
-	if (purge) {
+	if (purge && best) {
 		GET_OBJ_VAL(best, VAL_ARROW_QUANTITY) -= 1;
 		if (GET_ARROW_QUANTITY(best) <= 0) {
 			extract_obj(best);

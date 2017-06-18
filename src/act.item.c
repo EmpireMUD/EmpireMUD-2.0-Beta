@@ -5921,6 +5921,7 @@ ACMD(do_unshare) {
 
 
 ACMD(do_use) {
+	void use_arrows(char_data *ch, obj_data *obj);
 	void use_poison(char_data *ch, obj_data *obj);
 
 	obj_data *obj;
@@ -5936,6 +5937,10 @@ ACMD(do_use) {
 	else {
 		if (IS_POISON(obj)) {
 			use_poison(ch, obj);
+			return;
+		}
+		if (IS_ARROW(obj)) {
+			use_arrows(ch, obj);
 			return;
 		}
 	

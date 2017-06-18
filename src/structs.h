@@ -3314,6 +3314,7 @@ struct player_special_data {
 	char *disguised_name;	// verbatim copy of name -- grabs custom mob names and empire names
 	byte disguised_sex;	// sex of the mob you're disguised as
 	byte using_poison;	// poison preference for Stealth
+	any_vnum using_ammo;	// preferred ranged ammo
 
 	// mount info
 	struct mount_data *mount_list;	// list of stored mounts
