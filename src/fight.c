@@ -3680,6 +3680,13 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		// compute damage
 		dam = GET_MISSILE_WEAPON_DAMAGE(weapon) + (best ? GET_ARROW_DAMAGE_BONUS(best) : 0);
 		
+		if (!IS_NPC(ch) && has_ability(ch, ABIL_BOWMASTER)) {
+			dam *= 1.5;
+			if (can_gain_exp_from(ch, vict)) {
+				gain_ability_exp(ch, ABIL_BOWMASTER, 2);
+			}
+		}
+		
 		// damage last! it's sometimes fatal for vict
 		ret = damage(ch, vict, dam, GET_MISSILE_WEAPON_TYPE(weapon), attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].damage_type);
 		
