@@ -430,6 +430,9 @@ Triggers and Scripts (TRIGEDIT):
 - Do not put a "%quest% finish" in a trigger that's attached to an object
   that requires that quest. The object will be extracted during the "finish"
   and it will interrupt the execution of your trigger.
+- Consume triggers on poisons or arrows MUST return 0 if they purge the %self%
+  items. You can also check "if %target%" to be sure you have someone to hit
+  in these triggers.
 
 Vehicles (VEDIT):
 - Keywords should always have the most significant word first (the noun). This
