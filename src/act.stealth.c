@@ -569,6 +569,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 		if (GET_POISON_CHARGES(obj) <= 0) {
 			extract_obj(obj);
 		}
+		result = 1;
 	}
 	
 	return result;
