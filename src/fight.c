@@ -781,10 +781,10 @@ static char *replace_fight_string(const char *str, const char *weapon_first, con
 		if (*str == '#') {
 			switch (*(++str)) {
 				case 'W':
-					for (; *weapon_first; *(cp++) = *(weapon_first++));
+					for (; *weapon_third; *(cp++) = *(weapon_third++));
 					break;
 				case 'w':
-					for (; *weapon_third; *(cp++) = *(weapon_third++));
+					for (; *weapon_first; *(cp++) = *(weapon_first++));
 					break;
 				case 'x': {
 					for (; *weapon_noun; *(cp++) = *(weapon_noun++));
