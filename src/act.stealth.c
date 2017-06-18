@@ -560,6 +560,11 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 		result = 1;
 	}
 	
+	// mark result if there's a consume trigger
+	if (!result && SCRIPT_CHECK(obj, OTRIG_CONSUME)) {
+		result = 1;
+	}
+	
 	if (result >= 0 && GET_HEALTH(vict) > GET_MAX_HEALTH(vict)) {
 		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
 	}
@@ -569,7 +574,6 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 		if (GET_POISON_CHARGES(obj) <= 0) {
 			extract_obj(obj);
 		}
-		result = 1;
 	}
 	
 	return result;
