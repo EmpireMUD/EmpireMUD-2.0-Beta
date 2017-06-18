@@ -61,6 +61,7 @@ ACMD(do_affects);
 ACMD(do_alacrity);
 ACMD(do_alias);
 ACMD(do_alternate);
+ACMD(do_approach);
 ACMD(do_approve);
 ACMD(do_assist);
 ACMD(do_at);
@@ -565,6 +566,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "alacrity", POS_RESTING, do_alacrity, NO_MIN, CTYPE_SKILL, ABIL_ALACRITY ),
 	SIMPLE_CMD( "alternate", POS_DEAD, do_alternate, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "affects", POS_DEAD, do_affects, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "approach", POS_FIGHTING, do_approach, NO_MIN, CTYPE_COMBAT ),
 	STANDARD_CMD( "approve", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_APPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	STANDARD_CMD( "arclight", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ARCLIGHT, CTYPE_COMBAT, NOBITS, ABIL_ARCLIGHT ),
 	SIMPLE_CMD( "assist", POS_FIGHTING, do_assist, NO_MIN, CTYPE_COMBAT ),

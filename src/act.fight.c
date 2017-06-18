@@ -65,6 +65,28 @@ void use_arrows(char_data *ch, obj_data *obj) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+ACMD(do_approach) {
+	if (!FIGHTING(ch)) {
+		msg_to_char(ch, "You aren't even fighting.\r\n");
+	}
+	else if (FIGHT_MODE(ch) == FMODE_MELEE) {
+		msg_to_char(ch, "You're already in melee combat.\r\n");
+	}
+	else if (FIGHT_MODE(ch) == FMODE_WAITING) {
+		msg_to_char(ch, "You're already trying to approach!\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_ENTANGLED)) {
+		msg_to_char(ch, "You can't try to approach right now!\r\n");
+	}
+	else {
+		FIGHT_MODE(ch) = FMODE_WAITING;
+		FIGHT_WAIT(ch) = 4;
+		msg_to_char(ch, "You start to approach!\r\n");
+		act("$n starts to approach!", FALSE, ch, NULL, NULL, TO_ROOM);
+	}
+}
+
+
 ACMD(do_assist) {
 	char_data *helpee, *opponent;
 
