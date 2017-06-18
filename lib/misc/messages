@@ -1043,7 +1043,7 @@ You hear a dull thud as an arrow pierces $N in the stomach!
 #
 #
 
-* Arrow
+* Arrow (no longer used because bows use normal attack types now)
 M
  53
 Your arrow pierces $N's heart, killing $M!
@@ -1121,7 +1121,7 @@ You wince in pain as the sun scorches your unliving flesh!
 #
 #
 
-* Searing poison
+* Searing poison (no longer used because searing poison is scripted now)
 M
  57
 $N winces in pain and falls over dead from your searing poison!
