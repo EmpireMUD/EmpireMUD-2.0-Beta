@@ -4078,6 +4078,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
+			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(j)].name);
 			msg_to_char(ch, "Arrow type: %c\r\n", 'A' + GET_MISSILE_WEAPON_ARROW_TYPE(j));
 			break;
 		case ITEM_ARROW:

@@ -328,10 +328,7 @@ bool valid_unseen_passing(room_data *room) {
  //////////////////////////////////////////////////////////////////////////////
 //// POISONS /////////////////////////////////////////////////////////////////
 
-#define POISONS_LINE_BREAK  { "*", NO_ABIL,  0, 0, 0, 0, 0, 0, 0, 0, 0,	0, FALSE }
-
-#define SPEC_NONE  0
-#define SPEC_SEARING  1
+#define POISONS_LINE_BREAK  { "*", NO_ABIL,  0, 0, 0, 0, 0, 0, 0, 0,	0, FALSE }
 
 // master potion data
 const struct poison_data_type poison_data[] = {
@@ -340,31 +337,31 @@ const struct poison_data_type poison_data[] = {
 	// The position in this array corresponds to obj val 0
 
 	{	// 0
-		"searing", ABIL_POISONS,
+		"other", ABIL_POISONS,
 		0, 0, 0, 0,	// no affect
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_SEARING, FALSE
+		FALSE
 	},
 
 	{	// 1
 		"weakness", ABIL_POISONS,
 		ATYPE_POISON, APPLY_HEALTH, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 
 	{	// 2
 		"exhaustion", ABIL_POISONS,
 		ATYPE_POISON, APPLY_MOVE, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 
 	{	// 3
 		"braindrain", ABIL_POISONS,
 		ATYPE_POISON, APPLY_MANA, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	POISONS_LINE_BREAK,	// 4
@@ -373,35 +370,35 @@ const struct poison_data_type poison_data[] = {
 		"strength", ABIL_POISONS,
 		ATYPE_POISON, APPLY_STRENGTH, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 6
 		"dexterity", ABIL_POISONS,
 		ATYPE_POISON, APPLY_DEXTERITY, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 7
 		"charisma", ABIL_POISONS,
 		ATYPE_POISON, APPLY_CHARISMA, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 8
 		"intelligence", ABIL_POISONS,
 		ATYPE_POISON, APPLY_INTELLIGENCE, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 9
 		"wits", ABIL_POISONS,
 		ATYPE_POISON, APPLY_WITS, -2, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	POISONS_LINE_BREAK,	// 10
@@ -410,21 +407,21 @@ const struct poison_data_type poison_data[] = {
 		"pain", ABIL_DEADLY_POISONS,
 		0, 0, 0, 0,
 		ATYPE_POISON, 5, DAM_POISON, 2, 5,	// no dot
-		SPEC_NONE, TRUE	// likely doubled due to deadly poisons
+		TRUE	// likely doubled due to deadly poisons
 	},
 	
 	{	// 12
 		"slow", ABIL_DEADLY_POISONS,
 		ATYPE_POISON, APPLY_NONE, 0, AFF_SLOW,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 13
 		"heartstop", ABIL_DEADLY_POISONS,
 		ATYPE_POISON, APPLY_NONE, 0, AFF_CANT_SPEND_BLOOD,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 
 	// END
@@ -432,7 +429,7 @@ const struct poison_data_type poison_data[] = {
 		"\n", NO_ABIL,
 		0, 0, 0, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	}
 };
 
@@ -561,14 +558,6 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 		}
 		
 		result = 1;
-	}
-	
-	// special cases
-	switch (poison_data[type].special) {
-		case SPEC_SEARING: {
-			result = damage(ch, vict, 5 * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), ATTACK_POISON, DAM_POISON);
-			break;
-		}
 	}
 	
 	if (result >= 0 && GET_HEALTH(vict) > GET_MAX_HEALTH(vict)) {

@@ -3643,7 +3643,6 @@ struct poison_data_type {
 	int dot_damage;	// damage for the dot
 	int dot_max_stacks;	// how high the dot can stack
 	
-	int special;	// special poison procedure
 	bool allow_stack;	// whether or not it can stack
 };
 
