@@ -418,6 +418,8 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_COOK  293
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
+#define ABIL_TRICK_SHOTS  296
+#define ABIL_CHARGE  297
 
 
 // TYPE_x: WEAPON ATTACK TYPES

@@ -907,7 +907,7 @@ the options below. Valid Modes:
 Mode       Level    Description
 ------     ------   -------------
 stats      God      Shows game stats including prototypes.
-arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
+ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
 components Immort   Shows all items matching a component type (and flags).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
@@ -944,11 +944,11 @@ Usage:  show stats
 Shows some game statistics, similar to the ones you see when quitting, and
 including both instances in the world and prototypes.
 #e
-"SHOW ARROWTYPES"
+"SHOW AMMOTYPES" "SHOW ARROWTYPES"
 
-Usage:  show arrowtypes
+Usage:  show ammotypes
 
-Lists all bows and arrows by arrowtype. Useful for figuring out what arrowtype
+Lists all bows and ammo by ammotype. Useful for figuring out what ammotype
 to use for a new weapon/ammo.
 #e
 "SHOW COMPONENTS"

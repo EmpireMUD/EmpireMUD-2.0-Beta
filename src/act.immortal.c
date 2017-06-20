@@ -2829,22 +2829,22 @@ SHOW(show_notes) {
 }
 
 
-SHOW(show_arrowtypes) {
+SHOW(show_ammotypes) {
 	obj_data *obj, *next_obj;
 	int total;
 	
-	strcpy(buf, "You find the following arrow types:\r\n");
+	strcpy(buf, "You find the following ammo types:\r\n");
 	
 	total = 0;
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (IS_MISSILE_WEAPON(obj) || IS_ARROW(obj)) {
-			sprintf(buf1, " %c: %s", 'A' + GET_OBJ_VAL(obj, IS_ARROW(obj) ? VAL_ARROW_TYPE : VAL_MISSILE_WEAPON_ARROW_TYPE), GET_OBJ_SHORT_DESC(obj));
+		if (IS_MISSILE_WEAPON(obj) || IS_AMMO(obj)) {
+			sprintf(buf1, " %c: %s", 'A' + GET_OBJ_VAL(obj, IS_AMMO(obj) ? VAL_AMMO_TYPE : VAL_MISSILE_WEAPON_AMMO_TYPE), GET_OBJ_SHORT_DESC(obj));
 			sprintf(buf + strlen(buf), "%-32.32s%s", buf1, ((total++ % 2) ? "\r\n" : ""));
 		}
 	}
 	
 	if (total == 0) {
-		msg_to_char(ch, "You find no objects with arrow types.\r\n");
+		msg_to_char(ch, "You find no objects with ammo types.\r\n");
 	}
 	else {
 		if ((total % 2) != 0) {
@@ -4079,16 +4079,16 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
 			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(j)].name);
-			msg_to_char(ch, "Arrow type: %c\r\n", 'A' + GET_MISSILE_WEAPON_ARROW_TYPE(j));
+			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
 			break;
-		case ITEM_ARROW:
-			if (GET_ARROW_QUANTITY(j) > 0) {
-				msg_to_char(ch, "Quantity: %d\r\n", GET_ARROW_QUANTITY(j));
+		case ITEM_AMMO:
+			if (GET_AMMO_QUANTITY(j) > 0) {
+				msg_to_char(ch, "Quantity: %d\r\n", GET_AMMO_QUANTITY(j));
 			}
-			if (GET_ARROW_DAMAGE_BONUS(j) > 0) {
-				msg_to_char(ch, "Damage: %+d\r\n", GET_ARROW_DAMAGE_BONUS(j));
+			if (GET_AMMO_DAMAGE_BONUS(j) > 0) {
+				msg_to_char(ch, "Damage: %+d\r\n", GET_AMMO_DAMAGE_BONUS(j));
 			}
-			msg_to_char(ch, "Arrow type: %c\r\n", 'A' + GET_ARROW_TYPE(j));
+			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_AMMO_TYPE(j));
 			if (GET_OBJ_AFF_FLAGS(j) || GET_OBJ_APPLIES(j)) {
 				generic_data *aftype = find_generic(GET_OBJ_VNUM(j), GENERIC_AFFECT);
 				msg_to_char(ch, "Debuff name: %s\r\n", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
@@ -7163,7 +7163,7 @@ ACMD(do_show) {
 		{ "terrain", LVL_START_IMM, show_terrain },
 		{ "account", LVL_CIMPL, show_account },
 		{ "notes", LVL_START_IMM, show_notes },
-		{ "arrowtypes", LVL_START_IMM, show_arrowtypes },
+		{ "ammotypes", LVL_START_IMM, show_ammotypes },
 		{ "skills", LVL_START_IMM, show_skills },
 		{ "storage", LVL_START_IMM, show_storage },
 		{ "startlocs", LVL_START_IMM, show_startlocs },

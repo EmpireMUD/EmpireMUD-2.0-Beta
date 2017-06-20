@@ -290,6 +290,11 @@ ACMD(do_damage_spell) {
 		return;
 	}
 	
+	if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+		return;
+	}
+	
 	if (ABILITY_TRIGGERS(ch, vict, NULL, damage_spell[type].ability)) {
 		return;
 	}

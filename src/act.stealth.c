@@ -643,9 +643,6 @@ ACMD(do_backstab) {
 	else if (vict == ch) {
 		send_to_char("You can't backstab yourself!\r\n", ch);
 	}
-	else if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-	}
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
 	}
@@ -680,7 +677,17 @@ ACMD(do_backstab) {
 						// dedz
 					}
 				}
-			}		
+			}
+			
+			// force melee
+			if (FIGHTING(ch) == vict) {
+				FIGHT_MODE(ch) = FMODE_MELEE;
+				FIGHT_WAIT(ch) = 0;
+			}
+			if (FIGHTING(vict) == ch) {
+				FIGHT_MODE(vict) = FMODE_MELEE;
+				FIGHT_WAIT(vict) = 0;
+			}
 		}
 		
 		if (can_gain_exp_from(ch, vict)) {
@@ -706,11 +713,11 @@ ACMD(do_blind) {
 	else if (vict == ch) {
 		send_to_char("You shouldn't blind yourself!\r\n", ch);
 	}
-	else if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-	}
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
+	}
+	else if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_BLIND)) {
 		return;
@@ -1137,11 +1144,11 @@ ACMD(do_jab) {
 	else if (vict == ch) {
 		send_to_char("You can't jab yourself!\r\n", ch);
 	}
-	else if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-	}
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
+	}
+	else if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_JAB)) {
 		return;
@@ -1321,9 +1328,6 @@ ACMD(do_prick) {
 	else if (vict == ch) {
 		send_to_char("You can't prick yourself!\r\n", ch);
 	}
-	else if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-	}
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
 	}
@@ -1332,6 +1336,9 @@ ACMD(do_prick) {
 	}
 	else if (GET_MOVE(ch) < cost) {
 		msg_to_char(ch, "You need %d move points to prick.\r\n", cost);
+	}
+	else if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PRICK)) {
 		return;

@@ -1162,8 +1162,8 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
 		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
-	else if (IS_ARROW(obj)) {
-		sprintf(sdesc, "%s (%d)", GET_OBJ_SHORT_DESC(obj), MAX(1, GET_ARROW_QUANTITY(obj)));
+	else if (IS_AMMO(obj)) {
+		sprintf(sdesc, "%s (%d)", GET_OBJ_SHORT_DESC(obj), MAX(1, GET_AMMO_QUANTITY(obj)));
 	}
 
 	switch (mode) {

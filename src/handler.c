@@ -595,15 +595,17 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 
 
 /**
-* Insert an affect_type in a char_data structure
-*  Automatically sets apropriate bits and apply's
+* Insert an affect_type in a char_data structure. Automatically sets apropriate
+* bits and applies.
+*
+* NOTE: This version does not send the apply message.
 *
 * Caution: this duplicates af (because of how it used to load from the pfile)
 *
 * @param char_data *ch The person to add the affect to
 * @param struct affected_type *af The affect to add.
 */
-void affect_to_char(char_data *ch, struct affected_type *af) {
+void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 	struct affected_type *affected_alloc;
 
 	CREATE(affected_alloc, struct affected_type, 1);
@@ -614,6 +616,29 @@ void affect_to_char(char_data *ch, struct affected_type *af) {
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
+}
+
+
+/**
+* Insert an affect_type in a char_data structure. Automatically sets apropriate
+* bits and applies.
+*
+* Caution: this duplicates af (because of how it used to load from the pfile)
+*
+* @param char_data *ch The person to add the affect to
+* @param struct affected_type *af The affect to add.
+*/
+void affect_to_char(char_data *ch, struct affected_type *af) {
+	generic_data *gen = find_generic(af->type, GENERIC_AFFECT);
+	
+	if (gen && GET_AFFECT_APPLY_TO_CHAR(gen)) {
+		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen)) {
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_CHAR);
+	}
+	
+	affect_to_char_silent(ch, af);
 }
 
 
@@ -4249,8 +4274,8 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	
 	// certain things that must always copy over
 	switch (GET_OBJ_TYPE(new)) {
-		case ITEM_ARROW: {
-			GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY);
+		case ITEM_AMMO: {
+			GET_OBJ_VAL(new, VAL_AMMO_QUANTITY) = GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY);
 			break;
 		}
 		case ITEM_BOOK: {

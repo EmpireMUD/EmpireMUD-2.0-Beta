@@ -43,6 +43,8 @@ extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 //// BATTLE HELPERS //////////////////////////////////////////////////////////
 
 /**
+* Performs a rescue and ensures everyone is fighting the right thing.
+*
 * @param char_data *ch The person who is rescuing...
 * @param char_data *vict The person in need of rescue.
 * @param char_data *from The attacker, who will now hit ch.
@@ -51,16 +53,33 @@ void perform_rescue(char_data *ch, char_data *vict, char_data *from) {
 	send_to_char("Banzai! To the rescue...\r\n", ch);
 	act("You are rescued by $N!", FALSE, vict, 0, ch, TO_CHAR);
 	act("$n heroically rescues $N!", FALSE, ch, 0, vict, TO_NOTVICT);
-
-	if (FIGHTING(vict) == from)
+	
+	// switch ch to fighting from
+	if (FIGHTING(ch) && FIGHTING(ch) != from) {
+		FIGHTING(ch) = from;
+		if (FIGHT_MODE(from) != FMODE_MELEE && FIGHT_MODE(ch) == FMODE_MELEE) {
+			FIGHT_MODE(ch) = FMODE_MISSILE;
+		}
+	}
+	else if (!FIGHTING(ch)) {
+		set_fighting(ch, from, (FIGHTING(from) && FIGHT_MODE(from) != FMODE_MELEE) ? FMODE_MISSILE : FMODE_MELEE);
+	}
+	
+	// switch from to fighting ch
+	if (FIGHTING(from) && FIGHTING(from) != ch) {
+		FIGHTING(from) = ch;
+		if (FIGHT_MODE(ch) != FMODE_MELEE && FIGHT_MODE(from) == FMODE_MELEE) {
+			FIGHT_MODE(from) = FMODE_MISSILE;
+		}
+	}
+	else if (!FIGHTING(from)) {
+		set_fighting(from, ch, (FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) ? FMODE_MISSILE : FMODE_MELEE);
+	}
+	
+	// cancel vict's fight
+	if (FIGHTING(vict) == from) {
 		stop_fighting(vict);
-	if (FIGHTING(from))
-		stop_fighting(from);
-	if (FIGHTING(ch))
-		stop_fighting(ch);
-
-	set_fighting(ch, from, FMODE_MELEE);
-	set_fighting(from, ch, FMODE_MELEE);
+	}
 }
 
 
@@ -99,9 +118,9 @@ ACMD(do_bash) {
 		send_to_char("Aren't we funny today...\r\n", ch);
 		return;
 	}
-
-	if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
+	
+	if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 		return;
 	}
 
@@ -158,6 +177,75 @@ ACMD(do_bash) {
 }
 
 
+ACMD(do_charge) {
+	struct affected_type *af;
+	int res, cost = 50;
+	char_data *vict;
+	
+	one_argument(argument, arg);
+
+	if (!can_use_ability(ch, ABIL_CHARGE, MOVE, cost, COOLDOWN_CHARGE)) {
+		// nope
+	}
+	else if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (!*arg && !(vict = FIGHTING(ch))) {
+		msg_to_char(ch, "You aren't fighting anybody.\r\n");
+	}
+	else if (FIGHTING(ch) == vict && FIGHT_MODE(ch) == FMODE_MELEE) {
+		msg_to_char(ch, "You're already in melee range.\r\n");
+	}
+	else if (!NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You're already in melee range.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_ENTANGLED)) {
+		msg_to_char(ch, "You can't charge right now!\r\n");
+	}
+	else if (!can_fight(ch, vict)) {
+		act("You can't attack $N!", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else {	// ok
+		if (SHOULD_APPEAR(ch)) {
+			appear(ch);
+		}
+		
+		// 'charge' ability cost :D
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_CHARGE, 3 * SECS_PER_REAL_MIN, WAIT_COMBAT_ABILITY);
+		act("You charge at $N!", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n charges at you!", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n charges at $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+		
+		// apply temporary hit/damage boosts
+		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_TO_HIT, 100, ch);
+		affect_join(ch, af, 0);
+		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_BONUS_PHYSICAL, GET_STRENGTH(ch), ch);
+		affect_join(ch, af, 0);
+		af = create_mod_aff(ATYPE_CHARGE, 1, APPLY_BONUS_MAGICAL, GET_INTELLIGENCE(ch), ch);
+		affect_join(ch, af, 0);
+		
+		res = hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
+		
+		if (res >= 0 && FIGHTING(ch) && FIGHTING(ch) != vict) {
+			// ensure ch is hitting the right person
+			FIGHTING(ch) = vict;
+		}
+		if (FIGHTING(ch) == vict) {	// ensure melee
+			FIGHT_MODE(ch) = FMODE_MELEE;
+			FIGHT_WAIT(ch) = 0;
+		}
+		if (FIGHTING(vict) == ch) {	// reciprocate melee
+			FIGHT_MODE(vict) = FMODE_MELEE;
+			FIGHT_WAIT(vict) = 0;
+		}
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_CHARGE, 15);
+		}
+	}
+}
+
+
 ACMD(do_disarm) {
 	struct affected_type *af;
 	char_data *victim;
@@ -177,6 +265,9 @@ ACMD(do_disarm) {
 		msg_to_char(ch, "You cannot use this ability on so godly a target!\r\n");
 	else if (!can_fight(ch, victim))
 		act("You can't attack $M!", FALSE, ch, 0, victim, TO_CHAR);
+	else if (NOT_MELEE_RANGE(ch, victim)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+	}
 	else if (!IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD)) {
 		msg_to_char(ch, "You can't disarm someone who isn't wielding a weapon.\r\n");
 	}
@@ -321,6 +412,9 @@ ACMD(do_heartstop) {
 	else if (!IS_VAMPIRE(victim)) {
 		msg_to_char(ch, "You can only use heartstop on vampires.\r\n");
 	}
+	else if (NOT_MELEE_RANGE(ch, victim)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+	}
 	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_HEARTSTOP)) {
 		return;
 	}
@@ -384,12 +478,12 @@ ACMD(do_kick) {
 		send_to_char("Aren't we funny today...\r\n", ch);
 		return;
 	}
-	if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-		return;
-	}
 	if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
+		return;
+	}
+	if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 		return;
 	}
 	if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_KICK)) {
@@ -569,7 +663,7 @@ ACMD(do_rescue) {
 			if (vict == ch || !FIGHTING(vict) || IS_NPC(FIGHTING(vict)) || FIGHTING(vict) == ch || !in_same_group(ch, FIGHTING(vict))) {
 				continue;
 			}
-			if (is_fight_ally(ch, vict) || !can_fight(ch, vict) || FIGHT_MODE(vict) != FMODE_MELEE) {
+			if (is_fight_ally(ch, vict) || !can_fight(ch, vict)) {
 				continue;
 			}
 			
@@ -614,11 +708,6 @@ ACMD(do_rescue) {
 
 	if (!tmp_ch) {
 		act("But nobody is fighting $M!", FALSE, ch, 0, vict, TO_CHAR);
-		return;
-	}
-
-	if (FIGHT_MODE(tmp_ch) != FMODE_MELEE) {
-		msg_to_char(ch, "You may only rescue someone engaged in melee combat.\r\n");
 		return;
 	}
 

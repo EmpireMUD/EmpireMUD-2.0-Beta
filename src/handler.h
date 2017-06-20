@@ -69,6 +69,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags);
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add);
 void affect_remove(char_data *ch, struct affected_type *af);
 void affect_remove_room(room_data *room, struct affected_type *af);
+void affect_to_char_silent(char_data *ch, struct affected_type *af);
 void affect_to_char(char_data *ch, struct affected_type *af);
 void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);

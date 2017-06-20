@@ -48,10 +48,10 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 * For the "use" command -- switches your preferred arrows.
 *
 * @param char_data *ch The player.
-* @param obj_data *obj The arrow to prefer.
+* @param obj_data *obj The ammo to prefer.
 */
-void use_arrows(char_data *ch, obj_data *obj) {
-	if (!IS_ARROW(obj)) {
+void use_ammo(char_data *ch, obj_data *obj) {
+	if (!IS_AMMO(obj)) {
 		// ??? shouldn't ever get here
 		act("$p isn't something you can use like this.", FALSE, ch, obj, NULL, TO_CHAR);
 		return;
@@ -356,10 +356,22 @@ ACMD(do_hit) {
 				}
 			}
 			else {	// already fighting -- just change targets
-				FIGHTING(ch) = vict;
 				act("You change your focus to $N.", FALSE, ch, NULL, vict, TO_CHAR);
 				act("$n changes $s focus to $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
 				act("$n changes $s focus to you!", FALSE, ch, NULL, vict, TO_VICT);
+				
+				FIGHTING(ch) = vict;
+				
+				if (FIGHTING(vict) == ch && FIGHT_MODE(vict) == FMODE_MELEE) {
+					FIGHT_MODE(ch) = FMODE_MELEE;
+					FIGHT_WAIT(ch) = 0;
+				}
+				else if (FIGHT_MODE(vict) == FMODE_MISSILE) {
+					if (FIGHT_MODE(ch) != FMODE_MISSILE) {
+						FIGHT_MODE(ch) = FMODE_MISSILE;
+					}
+					FIGHT_WAIT(ch) = 0;
+				}
 			}
 			
 			// cancel combat if auto-execute is off and the mob is unconscious after the hit
@@ -462,8 +474,11 @@ ACMD(do_shoot) {
 	char_data *vict;
 
 	one_argument(argument, arg);
-
-	if (!*arg)
+	
+	if (FIGHTING(ch) && FIGHT_MODE(ch) == FMODE_MELEE) {
+		msg_to_char(ch, "You can't shoot anyone while you're in melee combat.\r\n");
+	}
+	else if (!*arg)
 		msg_to_char(ch, "Shoot whom?\r\n");
 	else if (!(vict= get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
@@ -473,8 +488,25 @@ ACMD(do_shoot) {
 		act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
 	else if (!GET_EQ(ch, WEAR_RANGED) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_RANGED)) != ITEM_MISSILE_WEAPON)
 		msg_to_char(ch, "You don't have anything to shoot!\r\n");
-	else if (FIGHTING(ch))
-		msg_to_char(ch, "You're already fighting for your life!\r\n");
+	else if (FIGHTING(ch) && vict == FIGHTING(ch)) {
+		act("You're already fighting $N!", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (FIGHTING(ch)) {
+		// switch target (we are either in missile or ranged states
+		FIGHTING(ch) = vict;
+		if (FIGHT_MODE(ch) == FMODE_WAITING) {
+			FIGHT_WAIT(ch) = 0;
+		}
+		FIGHT_MODE(ch) = FMODE_MISSILE;
+		
+		act("You change your focus to $N.", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n changes $s focus to $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
+		act("$n changes $s focus to you!", FALSE, ch, NULL, vict, TO_VICT);
+		
+		if (!FIGHTING(vict)) {
+			set_fighting(vict, ch, FMODE_MISSILE);
+		}
+	}
 	else if (can_fight(ch, vict)) {
 		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;

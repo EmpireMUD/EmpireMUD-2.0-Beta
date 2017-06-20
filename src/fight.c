@@ -1879,19 +1879,19 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 *
 * @param char_data *ch the attacker
 * @param char_data *victim the guy who blocked
-* @param obj_data *arrow The arrow item being shot. (optional)
+* @param int type The TYPE_ attack type.
 */
-void block_missile_attack(char_data *ch, char_data *victim, obj_data *arrow) {
-	if (arrow) {
-		act("You shoot $p at $N, but $E blocks.", FALSE, ch, arrow, victim, TO_CHAR | TO_COMBAT_MISS);
-		act("$n shoots $p at $N, who blocks.", FALSE, ch, arrow, victim, TO_NOTVICT | TO_COMBAT_MISS);
-		act("$n shoots $p at you, but you block.", FALSE, ch, arrow, victim, TO_VICT | TO_COMBAT_MISS);
-	}
-	else {
-		act("You shoot at $N, but $E blocks.", FALSE, ch, NULL, victim, TO_CHAR | TO_COMBAT_MISS);
-		act("$n shoots at $N, who blocks.", FALSE, ch, NULL, victim, TO_NOTVICT | TO_COMBAT_MISS);
-		act("$n shoots at you, but you block.", FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_MISS);
-	}
+void block_missile_attack(char_data *ch, char_data *victim, int type) {
+	char buf[MAX_STRING_LENGTH];
+	
+	snprintf(buf, sizeof(buf), "You %s at $N, but $E blocks.", attack_hit_info[type].first_pers);
+	act(buf, FALSE, ch, NULL, victim, TO_CHAR | TO_COMBAT_MISS);
+	
+	snprintf(buf, sizeof(buf), "$n %s at $N, who blocks.", attack_hit_info[type].third_pers);
+	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | TO_COMBAT_MISS);
+	
+	snprintf(buf, sizeof(buf), "$n %s at you, but you block.", attack_hit_info[type].third_pers);
+	act(buf, FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_MISS);
 }
 
 
@@ -3602,11 +3602,12 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 * @param obj_data *weapon Which weapon to attack with.
 */
 void perform_violence_missile(char_data *ch, obj_data *weapon) {
-	obj_data *arrow, *best = NULL;
+	bool success = FALSE, block = FALSE, purge = TRUE;
+	obj_data *ammo, *best = NULL;
+	char buf[MAX_STRING_LENGTH];
 	struct affected_type *af;
 	struct obj_apply *apply;
 	int dam = 0, ret, atype;
-	bool success = FALSE, block = FALSE, purge = TRUE;
 	char_data *vict;
 	
 	if (!(vict = FIGHTING(ch))) {
@@ -3618,7 +3619,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		msg_to_char(ch, "You don't have a ranged weapon to shoot with!\r\n");
 		if (FIGHT_MODE(vict) == FMODE_MISSILE) {
 			FIGHT_MODE(ch) = FMODE_WAITING;
-			FIGHT_WAIT(ch) = 2;
+			FIGHT_WAIT(ch) = 4;
 		}
 		else {
 			FIGHT_MODE(ch) = FMODE_MELEE;
@@ -3626,24 +3627,24 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		return;
 	}
 	
-	// detect arrows
+	// detect ammo
 	best = NULL;
 	
 	if (!IS_NPC(ch)) {
-		LL_FOREACH2(ch->carrying, arrow, next_content) {
-			if (IS_ARROW(arrow) && GET_OBJ_VNUM(arrow) == USING_AMMO(ch) && GET_ARROW_TYPE(arrow) == GET_MISSILE_WEAPON_ARROW_TYPE(weapon)) {
-				if (!best || GET_ARROW_DAMAGE_BONUS(arrow) > GET_ARROW_DAMAGE_BONUS(best)) {
-					best = arrow;	// found a [better] match!
+		LL_FOREACH2(ch->carrying, ammo, next_content) {
+			if (IS_AMMO(ammo) && GET_OBJ_VNUM(ammo) == USING_AMMO(ch) && GET_AMMO_TYPE(ammo) == GET_MISSILE_WEAPON_AMMO_TYPE(weapon)) {
+				if (!best || GET_AMMO_DAMAGE_BONUS(ammo) > GET_AMMO_DAMAGE_BONUS(best)) {
+					best = ammo;	// found a [better] match!
 				}
 			}
 		}
 	}
 	
 	if (!best) {	// if we didn't find a preferred one
-		for (arrow = ch->carrying; arrow; arrow = arrow->next_content) {
-			if (IS_ARROW(arrow) && GET_ARROW_TYPE(arrow) == GET_MISSILE_WEAPON_ARROW_TYPE(weapon)) {
-				if (!best || GET_ARROW_DAMAGE_BONUS(arrow) > GET_ARROW_DAMAGE_BONUS(best)) {
-					best = arrow;
+		for (ammo = ch->carrying; ammo; ammo = ammo->next_content) {
+			if (IS_AMMO(ammo) && GET_AMMO_TYPE(ammo) == GET_MISSILE_WEAPON_AMMO_TYPE(weapon)) {
+				if (!best || GET_AMMO_DAMAGE_BONUS(ammo) > GET_AMMO_DAMAGE_BONUS(best)) {
+					best = ammo;
 				}
 			}
 		}
@@ -3671,14 +3672,14 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 	
 	if (block) {
-		block_missile_attack(ch, vict, best);
+		block_missile_attack(ch, vict, GET_MISSILE_WEAPON_TYPE(weapon));
 	}
 	else if (!success) {
-		damage(ch, vict, 0, ATTACK_ARROW, DAM_PHYSICAL);
+		damage(ch, vict, 0, GET_MISSILE_WEAPON_TYPE(weapon), DAM_PHYSICAL);
 	}
 	else {
 		// compute damage
-		dam = GET_MISSILE_WEAPON_DAMAGE(weapon) + (best ? GET_ARROW_DAMAGE_BONUS(best) : 0);
+		dam = GET_MISSILE_WEAPON_DAMAGE(weapon) + (best ? GET_AMMO_DAMAGE_BONUS(best) : 0);
 		
 		if (!IS_NPC(ch) && has_ability(ch, ABIL_BOWMASTER)) {
 			dam *= 1.5;
@@ -3690,26 +3691,67 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		// damage last! it's sometimes fatal for vict
 		ret = damage(ch, vict, dam, GET_MISSILE_WEAPON_TYPE(weapon), attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].damage_type);
 		
-		// affects?
-		if (ret > 0 && best && (GET_OBJ_AFF_FLAGS(best) || GET_OBJ_APPLIES(best))) {
-			atype = find_generic(GET_OBJ_VNUM(best), GENERIC_AFFECT) ? GET_OBJ_VNUM(best) : ATYPE_RANGED_WEAPON;
+		if (ret > 0 && !EXTRACTED(vict) && !IS_DEAD(vict) && IN_ROOM(vict) == IN_ROOM(ch)) {
+			// affects?
+			if (best && (GET_OBJ_AFF_FLAGS(best) || GET_OBJ_APPLIES(best))) {
+				atype = find_generic(GET_OBJ_VNUM(best), GENERIC_AFFECT) ? GET_OBJ_VNUM(best) : ATYPE_RANGED_WEAPON;
 			
-			if (GET_OBJ_AFF_FLAGS(best)) {
-				af = create_flag_aff(atype, 1, GET_OBJ_AFF_FLAGS(best), ch);
-				affect_to_char(vict, af);
-				free(af);
+				if (GET_OBJ_AFF_FLAGS(best)) {
+					af = create_flag_aff(atype, 1, GET_OBJ_AFF_FLAGS(best), ch);
+					affect_to_char(vict, af);
+					free(af);
+				}
+			
+				LL_FOREACH(GET_OBJ_APPLIES(best), apply) {
+					af = create_mod_aff(atype, 1, apply->location, -1 * apply->modifier, ch);
+					affect_to_char(vict, af);
+					free(af);
+				}
 			}
-			
-			LL_FOREACH(GET_OBJ_APPLIES(best), apply) {
-				af = create_mod_aff(atype, 1, apply->location, -1 * apply->modifier, ch);
-				affect_to_char(vict, af);
-				free(af);
+		
+			// ability effects
+			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
+				switch (GET_MISSILE_WEAPON_TYPE(weapon)) {
+					// slow, disarm, dot, dot
+					case TYPE_BOW: {
+						apply_dot_effect(vict, ATYPE_CUT_DEEP, 5, DAM_PHYSICAL, 5, 5, ch);
+						
+						act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+					case TYPE_CROSSBOW: {
+						break;
+					}
+					case TYPE_PISTOL: {
+						break;
+					}
+					case TYPE_MUSKET: {
+						af = create_flag_aff(ATYPE_TRICK_SHOT, 2, AFF_SLOW, ch);
+						affect_join(vict, af, 0);
+						
+						snprintf(buf, sizeof(buf), "That %s to the leg seems to slow $N!", attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].first_pers);
+						act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+						
+						snprintf(buf, sizeof(buf), "$n's last %s hit your leg! You feel slower.", attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].noun);
+						act(buf, FALSE, ch, NULL, vict, TO_VICT);
+						
+						snprintf(buf, sizeof(buf), "$n's last %s seems to stun $N!", attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].noun);
+						act(buf, FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+				}
+				
+				if (can_gain_exp_from(ch, vict)) {
+					gain_ability_exp(ch, ABIL_TRICK_SHOTS, 10);
+				}
 			}
 		}
 		
 		// fire a consume trigger but it can't block execution here
 		if (best && !consume_otrigger(best, ch, OCMD_SHOOT, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
-			purge = FALSE;	// arrow likely extracted
+			purge = FALSE;	// ammo likely extracted
 		}
 		
 		// McSkillups
@@ -3722,10 +3764,10 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		}
 	}
 	
-	// arrow countdown/extract (only if the arrows weren't extracted by a script
+	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
 	if (purge && best) {
-		GET_OBJ_VAL(best, VAL_ARROW_QUANTITY) -= 1;
-		if (GET_ARROW_QUANTITY(best) <= 0) {
+		GET_OBJ_VAL(best, VAL_AMMO_QUANTITY) -= 1;
+		if (GET_AMMO_QUANTITY(best) <= 0) {
 			extract_obj(best);
 		}
 	}

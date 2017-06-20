@@ -2056,8 +2056,8 @@ double rate_item(obj_data *obj) {
 			score += get_base_dps(obj);
 			break;
 		}
-		case ITEM_ARROW: {
-			score += GET_ARROW_DAMAGE_BONUS(obj);
+		case ITEM_AMMO: {
+			score += GET_AMMO_DAMAGE_BONUS(obj);
 			break;
 		}
 		case ITEM_PACK: {

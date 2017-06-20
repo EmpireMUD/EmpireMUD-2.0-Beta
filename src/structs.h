@@ -1319,7 +1319,7 @@ typedef struct vehicle_data vehicle_data;
 	#define ITEM_UNUSED4  18
 	#define ITEM_UNUSED5  19
 #define ITEM_MISSILE_WEAPON  20	// bow/crossbow/etc
-#define ITEM_ARROW  21	// for missile weapons
+#define ITEM_AMMO  21	// for missile weapons
 #define ITEM_INSTRUMENT  22	// item is a musical instrument
 #define ITEM_SHIELD  23	// item is a shield
 #define ITEM_PACK  24	// increases inventory size

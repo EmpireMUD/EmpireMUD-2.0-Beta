@@ -233,9 +233,9 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
-		case ITEM_ARROW: {
-			if (GET_ARROW_QUANTITY(obj) == 0) {
-				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Arrow quantity not set");
+		case ITEM_AMMO: {
+			if (GET_AMMO_QUANTITY(obj) == 0) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Ammo quantity not set");
 				problem = TRUE;
 			}
 			break;
@@ -1802,14 +1802,14 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_MISSILE_WEAPON: {
 			sprintf(storage + strlen(storage), "<&yweapontype&0> %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
 			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %s+%.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
-			sprintf(storage + strlen(storage), "<&yarrowtype&0> %c\r\n", 'A' + GET_MISSILE_WEAPON_ARROW_TYPE(obj));
+			sprintf(storage + strlen(storage), "<&yammotype&0> %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(obj));
 			break;
 		}
-		case ITEM_ARROW: {
-			sprintf(storage + strlen(storage), "<&yquantity&0> %d\r\n", GET_ARROW_QUANTITY(obj));
-			sprintf(storage + strlen(storage), "<&ydamage&0> %+d\r\n", GET_ARROW_DAMAGE_BONUS(obj));
-			sprintf(storage + strlen(storage), "<&yarrowtype&0> %c\r\n", 'A' + GET_ARROW_TYPE(obj));
-			sprintf(storage + strlen(storage), "NOTE: Positive applies become negative debuffs (see HELP ARROW ITEM)\r\n");
+		case ITEM_AMMO: {
+			sprintf(storage + strlen(storage), "<&yquantity&0> %d\r\n", GET_AMMO_QUANTITY(obj));
+			sprintf(storage + strlen(storage), "<&ydamage&0> %+d\r\n", GET_AMMO_DAMAGE_BONUS(obj));
+			sprintf(storage + strlen(storage), "<&yammotype&0> %c\r\n", 'A' + GET_AMMO_TYPE(obj));
+			sprintf(storage + strlen(storage), "NOTE: Positive applies become negative debuffs (see HELP AMMO ITEM)\r\n");
 			break;
 		}
 		case ITEM_PACK: {
@@ -2192,7 +2192,7 @@ OLC_MODULE(oedit_armortype) {
 }
 
 
-OLC_MODULE(oedit_arrowtype) {
+OLC_MODULE(oedit_ammotype) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int slot = NOTHING;
 	char val;
@@ -2200,24 +2200,24 @@ OLC_MODULE(oedit_arrowtype) {
 	// this chooses the VAL slot and validates the type
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_MISSILE_WEAPON: {
-			slot = VAL_MISSILE_WEAPON_ARROW_TYPE;
+			slot = VAL_MISSILE_WEAPON_AMMO_TYPE;
 			break;
 		}
-		case ITEM_ARROW: {
-			slot = VAL_ARROW_TYPE;
+		case ITEM_AMMO: {
+			slot = VAL_AMMO_TYPE;
 			break;
 		}
 	}
 	
 	if (slot == NOTHING) {
-		msg_to_char(ch, "You can only set arrowtype for missile weapons and arrows.\r\n");
+		msg_to_char(ch, "You can only set ammotype for missile weapons and ammo.\r\n");
 	}
 	else if (strlen(argument) > 1 || (val = UPPER(*argument)) < 'A' || val > 'Z') {
-		msg_to_char(ch, "Arrowtype must by a letter from A to Z.\r\n");
+		msg_to_char(ch, "Ammotype must by a letter from A to Z.\r\n");
 	}
 	else {
 		GET_OBJ_VAL(obj, slot) = val - 'A';
-		msg_to_char(ch, "You set the arrowtype to %c.\r\n", val);
+		msg_to_char(ch, "You set the ammotype to %c.\r\n", val);
 	}
 }
 
@@ -2560,8 +2560,8 @@ OLC_MODULE(oedit_damage) {
 			showdps = TRUE;
 			break;
 		}
-		case ITEM_ARROW: {
-			slot = VAL_ARROW_DAMAGE_BONUS;
+		case ITEM_AMMO: {
+			slot = VAL_AMMO_DAMAGE_BONUS;
 			break;
 		}
 	}
@@ -2763,11 +2763,11 @@ OLC_MODULE(oedit_potionscale) {
 OLC_MODULE(oedit_quantity) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	if (!IS_ARROW(obj)) {
+	if (!IS_AMMO(obj)) {
 		msg_to_char(ch, "You can't set quantity on this type of item.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY));
+		GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY));
 	}
 }
 
