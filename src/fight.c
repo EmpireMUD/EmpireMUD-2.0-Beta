@@ -1984,13 +1984,13 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 
 		{ 100,
 		"You SLAUGHTER $N with your deadly #x!!",
-		"$n SLAUGHTER you with $s deadly #x!!",
-		"$n SLAUGHTER $N with $s deadly #x!!" },
+		"$n SLAUGHTERS you with $s deadly #x!!",
+		"$n SLAUGHTERS $N with $s deadly #x!!" },
 
 		{ 125,
 		"You **ERADICATE** $N with your deadly #x!!",
-		"$n **ERADICATE** you with $s deadly #x!!",
-		"$n **ERADICATE** $N with $s deadly #x!!" },
+		"$n **ERADICATES** you with $s deadly #x!!",
+		"$n **ERADICATES** $N with $s deadly #x!!" },
 
 		// use -1 as the final entry (REQUIRED) -- captures any higher damage
 		{ -1,
