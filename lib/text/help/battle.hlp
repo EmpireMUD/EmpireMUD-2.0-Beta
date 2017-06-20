@@ -484,9 +484,18 @@ Trick Shots (Battle ability)
 
 Debuff type:  Battle
 
-Your ranged attacks get new effects based on attack type.
+Your ranged attacks get new effects based on attack type. Your chance to apply
+the effect on each shot is based on your Battle skill.
+
+Available affects:
+  bow (shoot) - Slows the victim.
+  crossbow (shoot) - Causes a stackable physical DoT.
+  pistol (shoot) - The victim loses dodge based on your Dexterity.
+  musket (shoot) - Causes a stackable physical DoT.
 
 Gain experience when fighting at range.
+
+See also: DODGE, DOT
 #
 "TWO-HANDED WEAPONS" "TWO HANDED WEAPONS" "TWOHANDED WEAPONS" "2HANDED WEAPONS" "2H"
 

@@ -3604,7 +3604,6 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	bool success = FALSE, block = FALSE, purge = TRUE;
 	obj_data *ammo, *best = NULL;
-	char buf[MAX_STRING_LENGTH];
 	struct affected_type *af;
 	struct obj_apply *apply;
 	int dam = 0, ret, atype;
@@ -3712,33 +3711,38 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			// ability effects
 			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
 				switch (GET_MISSILE_WEAPON_TYPE(weapon)) {
-					// slow, disarm, dot, dot
 					case TYPE_BOW: {
-						apply_dot_effect(vict, ATYPE_CUT_DEEP, 5, DAM_PHYSICAL, 5, 5, ch);
-						
-						act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
-						act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
-						act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
-						break;
-					}
-					case TYPE_CROSSBOW: {
-						break;
-					}
-					case TYPE_PISTOL: {
-						break;
-					}
-					case TYPE_MUSKET: {
 						af = create_flag_aff(ATYPE_TRICK_SHOT, 2, AFF_SLOW, ch);
 						affect_join(vict, af, 0);
 						
-						snprintf(buf, sizeof(buf), "That %s to the leg seems to slow $N!", attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].first_pers);
-						act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+						act("That shot to the leg seems to slow $N!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's last shot hit your leg! You feel slower.", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's last shot seems to stun $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+					case TYPE_CROSSBOW: {
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
 						
-						snprintf(buf, sizeof(buf), "$n's last %s hit your leg! You feel slower.", attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].noun);
-						act(buf, FALSE, ch, NULL, vict, TO_VICT);
+						act("Your shot opens a deep artery in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+					case TYPE_PISTOL: {
+						af = create_mod_aff(ATYPE_TRICK_SHOT, 2, APPLY_DODGE, -(GET_DEXTERITY(ch) * hit_per_dex), ch);
+						affect_join(vict, af, 0);
 						
-						snprintf(buf, sizeof(buf), "$n's last %s seems to stun $N!", attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].noun);
-						act(buf, FALSE, ch, NULL, vict, TO_NOTVICT);
+						act("That shot to the arm seems to shake $N!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's last shot hit your arm! You feel shaken.", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's last shot seems to shake $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+					case TYPE_MUSKET: {
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						
+						act("Your shot opens a deep artery in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
 						break;
 					}
 				}
