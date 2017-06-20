@@ -595,15 +595,17 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 
 
 /**
-* Insert an affect_type in a char_data structure
-*  Automatically sets apropriate bits and apply's
+* Insert an affect_type in a char_data structure. Automatically sets apropriate
+* bits and applies.
+*
+* NOTE: This version does not send the apply message.
 *
 * Caution: this duplicates af (because of how it used to load from the pfile)
 *
 * @param char_data *ch The person to add the affect to
 * @param struct affected_type *af The affect to add.
 */
-void affect_to_char(char_data *ch, struct affected_type *af) {
+void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 	struct affected_type *affected_alloc;
 
 	CREATE(affected_alloc, struct affected_type, 1);
@@ -614,6 +616,29 @@ void affect_to_char(char_data *ch, struct affected_type *af) {
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
+}
+
+
+/**
+* Insert an affect_type in a char_data structure. Automatically sets apropriate
+* bits and applies.
+*
+* Caution: this duplicates af (because of how it used to load from the pfile)
+*
+* @param char_data *ch The person to add the affect to
+* @param struct affected_type *af The affect to add.
+*/
+void affect_to_char(char_data *ch, struct affected_type *af) {
+	generic_data *gen = find_generic(af->type, GENERIC_AFFECT);
+	
+	if (gen && GET_AFFECT_APPLY_TO_CHAR(gen)) {
+		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen)) {
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_CHAR);
+	}
+	
+	affect_to_char_silent(ch, af);
 }
 
 
@@ -3360,6 +3385,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	
 	bool any = FALSE, done_cumulative = FALSE;
 	struct global_data *glb, *next_glb, *choose_last;
+	struct instance_data *inst;
 	int cumulative_prc;
 	adv_data *adv;
 	
@@ -3368,7 +3394,8 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		return FALSE;
 	}
 	
-	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
+	inst = real_instance(MOB_INSTANCE_ID(mob));
+	adv = inst ? inst->adventure : NULL;
 	cumulative_prc = number(1, 10000);
 	choose_last = NULL;
 
@@ -3401,7 +3428,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		}
 		
 		// check adventure-only -- late-matching because it does more work than other conditions
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && (!adv || get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv)) {
 			continue;
 		}
 		
@@ -4247,8 +4274,8 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	
 	// certain things that must always copy over
 	switch (GET_OBJ_TYPE(new)) {
-		case ITEM_ARROW: {
-			GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY);
+		case ITEM_AMMO: {
+			GET_OBJ_VAL(new, VAL_AMMO_QUANTITY) = GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY);
 			break;
 		}
 		case ITEM_BOOK: {
@@ -6148,7 +6175,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		default: {
-			sprintf(buf, "Unknown condition");
+			sprintf(output, "Unknown condition");
 			break;
 		}
 	}

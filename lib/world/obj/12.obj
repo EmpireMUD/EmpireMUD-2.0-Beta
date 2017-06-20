@@ -292,13 +292,10 @@ a vial of searing poison~
 A vial of searing poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 0 15 0
 8 0
-R
-5130 0
-R
-5618 0
+T 1264
 S
 #1265
 vial poison weakness~

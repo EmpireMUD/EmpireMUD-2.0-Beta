@@ -416,9 +416,13 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_SCAVENGING  291
 #define ABIL_BITE  292
 #define ABIL_COOK  293
+#define ABIL_KITE  294
+#define ABIL_BOWMASTER  295
+#define ABIL_TRICK_SHOTS  296
+#define ABIL_CHARGE  297
 
 
-/* WEAPON ATTACK TYPES */
+// TYPE_x: WEAPON ATTACK TYPES
 #define TYPE_UNDEFINED  -1
 #define TYPE_RESERVED  0
 #define TYPE_SLASH  1
@@ -449,8 +453,12 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define TYPE_PECK  26	// animal
 #define TYPE_GORE  27	// animal
 #define TYPE_MANA_BLAST  28	// default magical
+#define TYPE_BOW  29	// shoot / bow
+#define TYPE_CROSSBOW  30	// shoot / crossbow
+#define TYPE_PISTOL  31	// shoot / pistol
+#define TYPE_MUSKET  32	// shoot / musket
 
-#define NUM_ATTACK_TYPES  29	// total
+#define NUM_ATTACK_TYPES  33	// total
 
 // helpfulment
 #define IS_WEAPON_TYPE(type) (((type) >= TYPE_RESERVED) && ((type) < TYPE_SUFFERING))
@@ -538,11 +546,12 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define WEAPON_MAGIC  2
 
 
-// TYPE_x Attacktypes with grammar
+// TYPE_ Attacktypes with grammar
 struct attack_hit_type {
 	const char *name;
-	const char *singular;	// You "slash"
-	const char *plural;	// $n "slashes"
+	const char *first_pers;	// You "slash"
+	const char *third_pers;	// $n "slashes"
+	const char *noun;	// ... with your "swing"
 	double speed[NUM_SPEEDS];	// { fast, normal, slow }
 	int weapon_type;	// WEAPON_ type
 	int damage_type;	// DAM_ type
@@ -552,7 +561,6 @@ struct attack_hit_type {
 
 // skill and ability data
 extern struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES];
-extern const double missile_weapon_speed[];
 
 
  //////////////////////////////////////////////////////////////////////////////

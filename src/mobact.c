@@ -1288,9 +1288,19 @@ void scale_mob_to_level(char_data *mob, int level) {
 
 	// health
 	value = (1.5 * low_level) + (3.25 * mid_level) + (5.0 * high_level) + (12 * over_level);
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 4.5 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 5.5 : 1.0;
+	target = 40.0;	// max multiplier of health flags
+	if (MOB_FLAGGED(mob, MOB_GROUP) && MOB_FLAGGED(mob, MOB_HARD)) {	// boss
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (1.0 * target) : (0.75 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_GROUP)) {
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (0.65 * target) : (0.5 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_HARD)) {
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (0.25 * target) : (0.1 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_TANK)) {
+		value *= (0.05 * target);
+	}
 	mob->points.max_pools[HEALTH] = MAX(1, (int) ceil(value));
 	
 	// move

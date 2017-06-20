@@ -25,11 +25,13 @@ ARCHERY
 
 Archery (Battle ability)
 
-Learn to use bows to start combat while you're still at a safe distance.
+Learn to use bows (and other ranged weapons) to start combat while you're still
+at a safe distance. This ability also allows you to craft basic arrows. You can
+craft better arrows with the Fletching ability.
 
-Gain experience when you successfully hit with an arrow.
+Gain experience when you successfully hit with a ranged weapon.
 
-See also: QUICK DRAW, SHOOT
+See also: FLETCHING, QUICK DRAW, SHOOT
 #
 ARMOR "LIGHT ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "MAGE ARMOR"
 
@@ -94,9 +96,31 @@ See also: NULL MANA, HEARTSTOP
 Block Arrows (Battle ability)
 
 With training, you can learn to use shields to block incoming arrows, and
-take less damage before you've even gotten to your opponent.
+take less damage before you've even gotten to your opponent. This also works
+on other types of ranged weapons.
 
-Gains experience when you fail to dodge arrows.
+Gains experience when you fail to dodge ranged weapons.
+#
+BOWMASTER "BOW MASTER"
+
+Bowmaster (Battle ability)
+
+This ability increases your damage with ranged weapons by 50%. Gain experience
+when fighting with one.
+#
+CHARGE
+
+Charge (Battle ability)
+
+Cost:  50 move
+Cooldown:  3 minutes
+
+This ability allows you to charge directly into melee range. It can only be
+used if you're in ranged combat (or running into melee) or aren't in combat
+at all.
+
+You receive a brief boost to your to-hit and damage when you charge. The amount
+of the damage boost is based on your strength and intelligence.
 #
 "CUT DEEP" "DEEP CUTS"
 
@@ -261,6 +285,22 @@ Gain experience when you try to kick something.
 
 See also: SHADOW KICK
 #
+KITE
+
+Kite (Battle ability)
+
+Usage:  kite
+Cooldown:  30 seconds
+Cost:  50 move
+
+You can kite opponents to keep them at range while you shoot them. However,
+your opponents must be stunned, entangled, or attacking someone else. If you
+use this ability while already at range, it will increase the time it takes
+for your opponent to run to you. Otherwise, it will move you back to ranged
+distance and start the run-in timer.
+
+Gain experience when you kite someone.
+#
 "NOBLE BEARING"
 
 Noble Bearing
@@ -318,9 +358,10 @@ Shoot more arrows before your enemies reach you by learning to draw more
 quickly, leading to more damage per second. This improves your ranged combat
 speed by 25% (or 35% as a class ability).
 
-The close-combat version of this ability is Finesse.
+The close-combat version of this ability is Finesse. It works on all ranged
+weapons, not just arrows.
 
-Gain experience when you successfully hit with an arrow.
+Gain experience when you successfully hit with a ranged weapon.
 
 See also: ARCHERY, SHOOT
 #
@@ -437,6 +478,25 @@ SUMMARY "COMBAT SUMMARY"
 Usage:  summary
 
 This command shows a summary of you, your allies, and your enemies in combat.
+#
+"TRICK SHOTS"
+
+Trick Shots (Battle ability)
+
+Debuff type:  Battle
+
+Your ranged attacks get new effects based on attack type. Your chance to apply
+the effect on each shot is based on your Battle skill.
+
+Available affects:
+  bow (shoot) - Slows the victim.
+  crossbow (shoot) - Causes a stackable physical DoT.
+  pistol (shoot) - The victim loses dodge based on your Dexterity.
+  musket (shoot) - Causes a stackable physical DoT.
+
+Gain experience when fighting at range.
+
+See also: DODGE, DOT
 #
 "TWO-HANDED WEAPONS" "TWO HANDED WEAPONS" "TWOHANDED WEAPONS" "2HANDED WEAPONS" "2H"
 

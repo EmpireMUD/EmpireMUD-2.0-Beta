@@ -328,10 +328,7 @@ bool valid_unseen_passing(room_data *room) {
  //////////////////////////////////////////////////////////////////////////////
 //// POISONS /////////////////////////////////////////////////////////////////
 
-#define POISONS_LINE_BREAK  { "*", NO_ABIL,  0, 0, 0, 0, 0, 0, 0, 0, 0,	0, FALSE }
-
-#define SPEC_NONE  0
-#define SPEC_SEARING  1
+#define POISONS_LINE_BREAK  { "*", NO_ABIL,  0, 0, 0, 0, 0, 0, 0, 0,	0, FALSE }
 
 // master potion data
 const struct poison_data_type poison_data[] = {
@@ -340,31 +337,31 @@ const struct poison_data_type poison_data[] = {
 	// The position in this array corresponds to obj val 0
 
 	{	// 0
-		"searing", ABIL_POISONS,
+		"other", ABIL_POISONS,
 		0, 0, 0, 0,	// no affect
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_SEARING, FALSE
+		FALSE
 	},
 
 	{	// 1
 		"weakness", ABIL_POISONS,
 		ATYPE_POISON, APPLY_HEALTH, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 
 	{	// 2
 		"exhaustion", ABIL_POISONS,
 		ATYPE_POISON, APPLY_MOVE, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 
 	{	// 3
 		"braindrain", ABIL_POISONS,
 		ATYPE_POISON, APPLY_MANA, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	POISONS_LINE_BREAK,	// 4
@@ -373,35 +370,35 @@ const struct poison_data_type poison_data[] = {
 		"strength", ABIL_POISONS,
 		ATYPE_POISON, APPLY_STRENGTH, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 6
 		"dexterity", ABIL_POISONS,
 		ATYPE_POISON, APPLY_DEXTERITY, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 7
 		"charisma", ABIL_POISONS,
 		ATYPE_POISON, APPLY_CHARISMA, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 8
 		"intelligence", ABIL_POISONS,
 		ATYPE_POISON, APPLY_INTELLIGENCE, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 9
 		"wits", ABIL_POISONS,
 		ATYPE_POISON, APPLY_WITS, -2, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	POISONS_LINE_BREAK,	// 10
@@ -410,21 +407,21 @@ const struct poison_data_type poison_data[] = {
 		"pain", ABIL_DEADLY_POISONS,
 		0, 0, 0, 0,
 		ATYPE_POISON, 5, DAM_POISON, 2, 5,	// no dot
-		SPEC_NONE, TRUE	// likely doubled due to deadly poisons
+		TRUE	// likely doubled due to deadly poisons
 	},
 	
 	{	// 12
 		"slow", ABIL_DEADLY_POISONS,
 		ATYPE_POISON, APPLY_NONE, 0, AFF_SLOW,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 	
 	{	// 13
 		"heartstop", ABIL_DEADLY_POISONS,
 		ATYPE_POISON, APPLY_NONE, 0, AFF_CANT_SPEND_BLOOD,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	},
 
 	// END
@@ -432,7 +429,7 @@ const struct poison_data_type poison_data[] = {
 		"\n", NO_ABIL,
 		0, 0, 0, 0,
 		0, 0, 0, 0, 0,	// no dot
-		SPEC_NONE, FALSE
+		FALSE
 	}
 };
 
@@ -512,14 +509,14 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	// applied -- charge a charge
 	GET_OBJ_VAL(obj, VAL_POISON_CHARGES) -= 1;
 	
-	if (GET_POISON_CHARGES(obj) <= 0) {
-		extract_obj(obj);
-	}
-	
 	// attempt immunity/resist
 	if (has_ability(vict, ABIL_POISON_IMMUNITY)) {
 		if (can_gain_exp_from(vict, ch)) {
 			gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
+		}
+		
+		if (GET_POISON_CHARGES(obj) <= 0) {
+			extract_obj(obj);
 		}
 		return 0;
 	}
@@ -528,6 +525,9 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 			gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
 		}
 		if (!number(0, 2)) {
+			if (GET_POISON_CHARGES(obj) <= 0) {
+				extract_obj(obj);
+			}
 			return 0;
 		}
 	}
@@ -560,16 +560,20 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 		result = 1;
 	}
 	
-	// special cases
-	switch (poison_data[type].special) {
-		case SPEC_SEARING: {
-			result = damage(ch, vict, 5 * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), ATTACK_POISON, DAM_POISON);
-			break;
-		}
+	// mark result if there's a consume trigger
+	if (!result && SCRIPT_CHECK(obj, OTRIG_CONSUME)) {
+		result = 1;
 	}
-
+	
 	if (result >= 0 && GET_HEALTH(vict) > GET_MAX_HEALTH(vict)) {
 		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
+	}
+	
+	// fire a consume trigger but it can't block execution here
+	if (consume_otrigger(obj, ch, OCMD_POISON, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
+		if (GET_POISON_CHARGES(obj) <= 0) {
+			extract_obj(obj);
+		}
 	}
 	
 	return result;
@@ -639,9 +643,6 @@ ACMD(do_backstab) {
 	else if (vict == ch) {
 		send_to_char("You can't backstab yourself!\r\n", ch);
 	}
-	else if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-	}
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
 	}
@@ -676,7 +677,17 @@ ACMD(do_backstab) {
 						// dedz
 					}
 				}
-			}		
+			}
+			
+			// force melee
+			if (FIGHTING(ch) == vict) {
+				FIGHT_MODE(ch) = FMODE_MELEE;
+				FIGHT_WAIT(ch) = 0;
+			}
+			if (FIGHTING(vict) == ch) {
+				FIGHT_MODE(vict) = FMODE_MELEE;
+				FIGHT_WAIT(vict) = 0;
+			}
 		}
 		
 		if (can_gain_exp_from(ch, vict)) {
@@ -702,11 +713,11 @@ ACMD(do_blind) {
 	else if (vict == ch) {
 		send_to_char("You shouldn't blind yourself!\r\n", ch);
 	}
-	else if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-	}
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
+	}
+	else if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_BLIND)) {
 		return;
@@ -1133,11 +1144,11 @@ ACMD(do_jab) {
 	else if (vict == ch) {
 		send_to_char("You can't jab yourself!\r\n", ch);
 	}
-	else if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-	}
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
+	}
+	else if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_JAB)) {
 		return;
@@ -1317,9 +1328,6 @@ ACMD(do_prick) {
 	else if (vict == ch) {
 		send_to_char("You can't prick yourself!\r\n", ch);
 	}
-	else if (FIGHT_MODE(vict) == FMODE_MISSILE || FIGHT_MODE(ch) == FMODE_MISSILE) {
-		msg_to_char(ch, "You aren't close enough.\r\n");
-	}
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
 	}
@@ -1328,6 +1336,9 @@ ACMD(do_prick) {
 	}
 	else if (GET_MOVE(ch) < cost) {
 		msg_to_char(ch, "You need %d move points to prick.\r\n", cost);
+	}
+	else if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PRICK)) {
 		return;

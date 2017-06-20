@@ -1319,7 +1319,7 @@ typedef struct vehicle_data vehicle_data;
 	#define ITEM_UNUSED4  18
 	#define ITEM_UNUSED5  19
 #define ITEM_MISSILE_WEAPON  20	// bow/crossbow/etc
-#define ITEM_ARROW  21	// for missile weapons
+#define ITEM_AMMO  21	// for missile weapons
 #define ITEM_INSTRUMENT  22	// item is a musical instrument
 #define ITEM_SHIELD  23	// item is a shield
 #define ITEM_PACK  24	// increases inventory size
@@ -2116,7 +2116,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MAIL_SIZE  4096	// arbitrary
-#define MAX_MESSAGES  60	// fight.c
+#define MAX_MESSAGES  100	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_NAME_LENGTH  20
 #define MAX_OBJ_AFFECT  6
@@ -3314,6 +3314,7 @@ struct player_special_data {
 	char *disguised_name;	// verbatim copy of name -- grabs custom mob names and empire names
 	byte disguised_sex;	// sex of the mob you're disguised as
 	byte using_poison;	// poison preference for Stealth
+	any_vnum using_ammo;	// preferred ranged ammo
 
 	// mount info
 	struct mount_data *mount_list;	// list of stored mounts
@@ -3643,7 +3644,6 @@ struct poison_data_type {
 	int dot_damage;	// damage for the dot
 	int dot_max_stacks;	// how high the dot can stack
 	
-	int special;	// special poison procedure
 	bool allow_stack;	// whether or not it can stack
 };
 

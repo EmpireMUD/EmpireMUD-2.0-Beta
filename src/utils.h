@@ -353,6 +353,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (get_skill_level((ch), SKILL_NATURAL_MAGIC) > 0 || get_skill_level((ch), SKILL_HIGH_SORCERY) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (get_skill_level((ch), SKILL_VAMPIRE) > 0))
+#define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? (((ch)->master && !IS_NPC((ch)->master)) ? PRF_FLAGGED((ch)->master, PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
 
 // helpers
@@ -587,8 +588,12 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // GENERIC_AFFECT
 #define GSTR_AFFECT_WEAR_OFF_TO_CHAR  0
 #define GSTR_AFFECT_WEAR_OFF_TO_ROOM  1
+#define GSTR_AFFECT_APPLY_TO_CHAR  2
+#define GSTR_AFFECT_APPLY_TO_ROOM  3
 #define GET_AFFECT_WEAR_OFF_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_CHAR) : NULL)
 #define GET_AFFECT_WEAR_OFF_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_ROOM) : NULL)
+#define GET_AFFECT_APPLY_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_CHAR) : NULL)
+#define GET_AFFECT_APPLY_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_ROOM) : NULL)
 
 // GENERIC_CURRENCY
 #define GSTR_CURRENCY_SINGULAR  0
@@ -780,7 +785,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
 
 // for stacking, sotring, etc
-#define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IS_ARROW(obj))
+#define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IS_AMMO(obj))
 #define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
 #define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && !IS_STOLEN(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP)
@@ -890,21 +895,21 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // ITEM_MISSILE_WEAPON
 #define IS_MISSILE_WEAPON(obj)  (GET_OBJ_TYPE(obj) == ITEM_MISSILE_WEAPON)
-#define VAL_MISSILE_WEAPON_SPEED  0
+#define VAL_MISSILE_WEAPON_TYPE  0	// attack type
 #define VAL_MISSILE_WEAPON_DAMAGE  1
-#define VAL_MISSILE_WEAPON_TYPE  2
-#define GET_MISSILE_WEAPON_SPEED(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_SPEED) : 0)
+#define VAL_MISSILE_WEAPON_AMMO_TYPE  2
+#define GET_MISSILE_WEAPON_TYPE(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_TYPE) : 0)
 #define GET_MISSILE_WEAPON_DAMAGE(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_DAMAGE) : 0)
-#define GET_MISSILE_WEAPON_TYPE(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_TYPE) : NOTHING)
+#define GET_MISSILE_WEAPON_AMMO_TYPE(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_AMMO_TYPE) : NOTHING)
 
-// ITEM_ARROW
-#define IS_ARROW(obj)  (GET_OBJ_TYPE(obj) == ITEM_ARROW)
-#define VAL_ARROW_QUANTITY  0
-#define VAL_ARROW_DAMAGE_BONUS  1
-#define VAL_ARROW_TYPE  2
-#define GET_ARROW_DAMAGE_BONUS(obj)  (IS_ARROW(obj) ? GET_OBJ_VAL((obj), VAL_ARROW_DAMAGE_BONUS) : 0)
-#define GET_ARROW_TYPE(obj)  (IS_ARROW(obj) ? GET_OBJ_VAL((obj), VAL_ARROW_TYPE) : NOTHING)
-#define GET_ARROW_QUANTITY(obj)  (IS_ARROW(obj) ? GET_OBJ_VAL((obj), VAL_ARROW_QUANTITY) : 0)
+// ITEM_AMMO
+#define IS_AMMO(obj)  (GET_OBJ_TYPE(obj) == ITEM_AMMO)
+#define VAL_AMMO_QUANTITY  0
+#define VAL_AMMO_DAMAGE_BONUS  1
+#define VAL_AMMO_TYPE  2
+#define GET_AMMO_DAMAGE_BONUS(obj)  (IS_AMMO(obj) ? GET_OBJ_VAL((obj), VAL_AMMO_DAMAGE_BONUS) : 0)
+#define GET_AMMO_TYPE(obj)  (IS_AMMO(obj) ? GET_OBJ_VAL((obj), VAL_AMMO_TYPE) : NOTHING)
+#define GET_AMMO_QUANTITY(obj)  (IS_AMMO(obj) ? GET_OBJ_VAL((obj), VAL_AMMO_QUANTITY) : 0)
 
 // ITEM_INSTRUMENT
 #define IS_INSTRUMENT(obj)  (GET_OBJ_TYPE(obj) == ITEM_INSTRUMENT)
@@ -1037,6 +1042,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define REBOOT_CONF(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reboot_conf))
 #define REREAD_EMPIRE_TECH_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reread_empire_tech_on_login))
 #define RESTORE_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->restore_on_login))
+#define USING_AMMO(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->using_ammo))
 #define USING_POISON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->using_poison))
 
 // helpers

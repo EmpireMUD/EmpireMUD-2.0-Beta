@@ -27,11 +27,13 @@ goblin shoes~
 A pair of goblin shoes are splitting on the ground.~
 The goblin shoes are in disrepair.
 ~
-2 moy ag 1
+2 moy ag 2
 0 0 0
 11 0
 A
 11 1 0
+C
+50 150
 S
 #10203
 coins goblin pile tarnished~
@@ -39,9 +41,11 @@ a pile of goblin coins~
 A tarnished pile of coins is lying here.~
 It doesn't look like there are too many coins here.
 ~
-11 m a 1
+11 m a 2
 1 -1 0
 2 0
+C
+50 150
 S
 #10204
 saddle goblincraft~
@@ -49,11 +53,13 @@ a goblincraft saddle~
 A goblincraft saddle has been left behind.~
 The saddle appears to be in good condition!
 ~
-2 emoy as 1
+2 emoy as 2
 0 0 0
 7 0
 A
 6 1 0
+C
+50 150
 S
 #10205
 necklace tarnished~
@@ -61,13 +67,15 @@ a tarnished necklace~
 A tarnished necklace is coiled in the dust.~
 The necklace appears to be goblincraft.
 ~
-2 moy ac 1
+2 moy ac 2
 0 0 0
 2 0
 A
 4 -1 0
 A
 11 1 0
+C
+50 150
 S
 #10206
 timepiece goblin strange~
@@ -75,13 +83,15 @@ a goblin timepiece~
 A strange goblin timepiece is lying here.~
 It seems to be a wristband that tells time, but you can't read it.
 ~
-2 moy aj 1
+2 moy aj 2
 0 0 0
 0 0
 A
 4 2 0
 A
 9 1 0
+C
+50 150
 S
 #10207
 gloves open-fingered fingered pair~
@@ -89,13 +99,15 @@ open-fingered gloves~
 A pair of open-fingered gloves is lying here.~
 The gloves appear to be goblincraft.
 ~
-2 moy ah 1
+2 moy ah 3
 0 0 0
 11 0
 A
-21 2 0
-A
 17 1 0
+A
+9 1 0
+C
+50 150
 S
 #10208
 collar goblin~
@@ -103,11 +115,13 @@ a goblin collar~
 A goblin collar has been left on the ground.~
 The collar looks strong enough to protect the neck.
 ~
-27 moy ac 1
-3 0 0
+2 moy ac 3
+0 0 0
 2 0
 A
 15 1 0
+C
+50 150
 S
 #10209
 earring warg-bone bone strange~
@@ -115,13 +129,13 @@ a warg-bone earring~
 A strange bone earring is lying here.~
 The earring appears to be goblincraft.
 ~
-2 jmoy am 2
+2 jmoy am 5
 0 0 0
 14 0
 A
-22 2 1
-A
-17 1 0
+2 1 0
+C
+50 150
 S
 #10210
 club bone zelkab's~
@@ -129,13 +143,17 @@ Zelkab's bone club~
 A bone club is sitting on the ground.~
 This goblincraft club looks to be primarily warg bone.
 ~
-1 ehmp an 1
+1 ehmp an 3
 0 3 5
 14 0
 A
 12 -1 0
 A
 17 1 0
+A
+5 1 6
+C
+50 150
 S
 #10211
 gauntlets armored zelkab's pair~
@@ -143,13 +161,15 @@ Zelkab's armored gauntlets~
 A pair of armored gauntlets are lying here.~
 The gauntlets appear to be goblincraft.
 ~
-27 mp ah 2
+27 mp ah 3
 1 0 0
 7 0
 A
 21 1 0
 A
 17 1 0
+C
+50 150
 S
 #10212
 staff bone glowing garlgarl's~
@@ -157,13 +177,17 @@ Garlgarl's glowing staff~
 A glowing bone staff is lying here.~
 The staff appears to be goblincraft, and made from warg bone.
 ~
-1 ehmp an 1
+1 ehmp an 3
 0 1 19
 14 0
 A
 4 -1 0
 A
 23 3 0
+A
+5 1 6
+C
+50 150
 S
 #10213
 belt herbs garlgarl's~
@@ -171,13 +195,15 @@ Garlgarl's belt of herbs~
 A belt made of herbs is scattered here.~
 The belt appears to be goblincraft, and crude.
 ~
-27 mp al 1
+27 mp al 2
 0 0 0
 0 0
 A
 23 1 0
 A
 7 1 0
+C
+50 150
 S
 #10214
 bow firebranded branded filks's~
@@ -185,11 +211,13 @@ Filks's firebranded bow~
 A firebranded bow is lying here.~
 The bow appears to be goblincraft.
 ~
-20 eimp ap 1
-2 1 0
+20 eimp ap 2
+29 1 0
 0 0
 A
 17 1 0
+C
+50 150
 S
 #10215
 arrows bundle goblin~
@@ -197,9 +225,11 @@ a bundle of goblin arrows~
 A bundle of goblin arrows is lying here.~
 The goblincraft arrows seem strong, but small.
 ~
-21 m a 4
+21 m a 5
 30 1 0
 0 0
+C
+50 150
 S
 #10216
 leggings reinforced pair walts's~
@@ -207,7 +237,7 @@ Walts's reinforced leggings~
 A pair of reinforced leggings is lying here.~
 The leggings are goblincraft, for sure.
 ~
-27 emp af 1
+27 emp af 2
 1 0 0
 7 0
 A
@@ -216,6 +246,8 @@ A
 17 1 0
 A
 9 1 0
+C
+50 150
 S
 #10217
 belt heavy walts's~
@@ -223,7 +255,7 @@ Walts's heavy belt~
 A heavy belt is lying here.~
 The belt appears to be goblincraft.
 ~
-27 mp al 1
+27 mp al 3
 1 0 0
 7 0
 A
@@ -234,6 +266,8 @@ A
 17 1 0
 A
 6 1 0
+C
+50 150
 S
 #10218
 waistband band armored nilbog's~
@@ -241,7 +275,7 @@ Nilbog's armored waistband~
 An armored waistband is lying here.~
 It is a goblincraft waistband.
 ~
-27 emp al 1
+27 emp al 3
 3 0 0
 0 0
 A
@@ -250,6 +284,8 @@ A
 9 -1 0
 A
 18 2 0
+C
+50 150
 S
 #10219
 helm wargskull skull Nilbog's~
@@ -257,7 +293,7 @@ Nilbog's wargskull helm~
 A helm made from a skull is lying here.~
 The skull is goblincraft, with signature leather and beading.
 ~
-27 mp ae 1
+27 mp ae 2
 3 0 0
 14 0
 A
@@ -268,6 +304,8 @@ A
 18 1 0
 A
 13 1 0
+C
+50 150
 S
 #10220
 wristbands flaming pair furl's~
@@ -275,7 +313,7 @@ Furl's flaming wristbands~
 A pair of flaming wristbands are lying here.~
 The wristbands appear to be goblincraft, and are on fire.
 ~
-27 mp aj 2
+27 mp aj 4
 0 0 0
 0 0
 A
@@ -286,8 +324,8 @@ A
 9 1 0
 A
 17 1 0
-B
-c
+C
+50 150
 S
 #10221
 wristbands armored pair furl's~
@@ -295,7 +333,7 @@ Furl's armored wristbands~
 A pair of armored wristbands are lying here.~
 The wristbands appear to be goblincraft, made from enchanted wood.
 ~
-27 mp aj 2
+27 mp aj 4
 2 0 0
 0 0
 A
@@ -304,8 +342,30 @@ A
 17 1 0
 A
 18 1 0
-A
-6 1 0
+C
+50 150
+S
+#10222
+whistle warg~
+a warg whistle~
+A warg whistle is lying here.~
+It looks like you could use it to summon a land mount.
+~
+3 p a 12
+10222 0 0
+7 0
+T 10263
+S
+#10224
+whistle winged wolf~
+a winged wolf whistle~
+A winged wolf whistle is lying here.~
+It looks like you could use it to summon a flying mount.
+~
+3 p a 13
+10224 0 0
+7 0
+T 10263
 S
 #10225
 hole~

@@ -723,6 +723,11 @@ ACMD(do_entangle) {
 		return;
 	}
 	
+	if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+		return;
+	}
+	
 	if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_ENTANGLE)) {
 		return;
 	}
@@ -1306,7 +1311,7 @@ ACMD(do_quaff) {
 	else if (!IS_POTION(obj)) {
 		msg_to_char(ch, "You can only quaff potions.\r\n");
 	}
-	else if (!consume_otrigger(obj, ch, OCMD_QUAFF)) {
+	else if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
 		/* check trigger */
 		return;
 	}
@@ -1512,6 +1517,10 @@ ACMD(do_skybrand) {
 	// check validity
 	if (!can_fight(ch, vict)) {
 		act("You can't attack $M!", FALSE, ch, NULL, vict, TO_CHAR);
+		return;
+	}
+	if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 		return;
 	}
 	

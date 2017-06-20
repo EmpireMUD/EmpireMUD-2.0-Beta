@@ -453,14 +453,21 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON:
-			msg_to_char(ch, "Fires at a speed of %.2f for %d damage.\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(obj)], GET_MISSILE_WEAPON_DAMAGE(obj));
+			msg_to_char(ch, "Speed: %.2f\r\n", get_weapon_speed(obj));
+			msg_to_char(ch, "Damage: %d (%s+%.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			msg_to_char(ch, "Damage type is %s.\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
 			break;
-		case ITEM_ARROW:
-			if (GET_ARROW_QUANTITY(obj) > 0) {
-				msg_to_char(ch, "Quantity: %d\r\n", GET_ARROW_QUANTITY(obj));
+		case ITEM_AMMO:
+			if (GET_AMMO_QUANTITY(obj) > 0) {
+				msg_to_char(ch, "Quantity: %d\r\n", GET_AMMO_QUANTITY(obj));
 			}
-			if (GET_ARROW_DAMAGE_BONUS(obj)) {
-				msg_to_char(ch, "Adds %+d damage.\r\n", GET_ARROW_DAMAGE_BONUS(obj));
+			if (GET_AMMO_DAMAGE_BONUS(obj)) {
+				msg_to_char(ch, "Adds %+d damage.\r\n", GET_AMMO_DAMAGE_BONUS(obj));
+			}
+			
+			if (GET_OBJ_AFF_FLAGS(obj) || GET_OBJ_APPLIES(obj)) {
+				generic_data *aftype = find_generic(GET_OBJ_VNUM(obj), GENERIC_AFFECT);
+				msg_to_char(ch, "Debuff name: %s\r\n", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
 			}
 			break;
 		case ITEM_PACK: {
@@ -587,8 +594,8 @@ INTERACTION_FUNC(light_obj_interact) {
 		act(buf1, FALSE, ch, new, NULL, TO_CHAR | TO_ROOM);
 	}
 	
-	if (inter_item && IS_ARROW(inter_item) && IS_ARROW(new)) {
-		GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_ARROW_QUANTITY(inter_item);
+	if (inter_item && IS_AMMO(inter_item) && IS_AMMO(new)) {
+		GET_OBJ_VAL(new, VAL_AMMO_QUANTITY) = GET_AMMO_QUANTITY(inter_item);
 	}
 	
 	return TRUE;
@@ -1773,8 +1780,8 @@ void scale_item_to_level(obj_data *obj, int level) {
 			SHARE_OR_BONUS(GET_MISSILE_WEAPON_DAMAGE(obj));
 			break;
 		}
-		case ITEM_ARROW: {
-			SHARE_OR_BONUS(GET_ARROW_DAMAGE_BONUS(obj));
+		case ITEM_AMMO: {
+			SHARE_OR_BONUS(GET_AMMO_DAMAGE_BONUS(obj));
 			break;
 		}
 		case ITEM_PACK: {
@@ -1867,13 +1874,13 @@ void scale_item_to_level(obj_data *obj, int level) {
 			// leave negatives alone
 			break;
 		}
-		case ITEM_ARROW: {
-			if (GET_ARROW_DAMAGE_BONUS(obj) > 0) {
-				amt = (int)round(this_share * GET_ARROW_DAMAGE_BONUS(obj));
+		case ITEM_AMMO: {
+			if (GET_AMMO_DAMAGE_BONUS(obj) > 0) {
+				amt = (int)round(this_share * GET_AMMO_DAMAGE_BONUS(obj));
 				if (amt > 0) {
-					points_to_give -= (this_share * GET_ARROW_DAMAGE_BONUS(obj));
+					points_to_give -= (this_share * GET_AMMO_DAMAGE_BONUS(obj));
 				}
-				GET_OBJ_VAL(obj, VAL_ARROW_DAMAGE_BONUS) = amt;
+				GET_OBJ_VAL(obj, VAL_AMMO_DAMAGE_BONUS) = amt;
 			}
 			// leave negatives alone
 			break;
@@ -3828,7 +3835,7 @@ ACMD(do_drink) {
 	}
 
 	/* check trigger */
-	if (obj && !consume_otrigger(obj, ch, OCMD_DRINK)) {
+	if (obj && !consume_otrigger(obj, ch, OCMD_DRINK, NULL)) {
 		return;
 	}
 
@@ -4118,7 +4125,7 @@ ACMD(do_eat) {
 	}
 
 	/* check trigger */
-	if (!consume_otrigger(food, ch, OCMD_EAT)) {
+	if (!consume_otrigger(food, ch, OCMD_EAT, NULL)) {
 		return;
 	}
 	
@@ -5914,6 +5921,7 @@ ACMD(do_unshare) {
 
 
 ACMD(do_use) {
+	void use_ammo(char_data *ch, obj_data *obj);
 	void use_poison(char_data *ch, obj_data *obj);
 
 	obj_data *obj;
@@ -5929,6 +5937,10 @@ ACMD(do_use) {
 	else {
 		if (IS_POISON(obj)) {
 			use_poison(ch, obj);
+			return;
+		}
+		if (IS_AMMO(obj)) {
+			use_ammo(ch, obj);
 			return;
 		}
 	

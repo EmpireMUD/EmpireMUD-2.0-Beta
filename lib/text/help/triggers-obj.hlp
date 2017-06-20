@@ -12,14 +12,22 @@ See also:
 
 Consume (object trigger)
 
-Supported commands:  &cdrink, eat, quaff, read, build/craft/etc.&0
+Supported commands:  &cdrink, eat, quaff, read, shoot, poiosn, build/craft/etc.&0
 Argument type:  percent chance to execute
 Return value:  return 0 to prevent the consumption
 
 Activated any time a character attempts to consume or use the object.
 
+The 'shoot' (arrows) and 'poison' consume triggers cannot prevent consumption
+by returning 0. These types also have a target. They only fire when the actor
+successfully attacks with a poison or arrow.
+
+Note: If you purge a poison or arrow object in its consume trigger, you must
+return 0 to prevent trying to extract the item afterwards.
+
 Variables:
   &c%actor%&0 - The character attempting to consume the object.
+  &c%target%&0 - The target of the consumption (poison/shoot only).
   &c%self%&0 - The object being consumed.
   &c%command%&0 - Which consume command was used (e.g. drink).
 #d

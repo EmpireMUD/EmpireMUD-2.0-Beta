@@ -322,6 +322,8 @@ Objects (OEDIT):
 - The COMBINE interaction should always use 1 exclusion set, as it will extract
   the original item if the interaction succeeds, and it's usually not safe to
   run additional interactions.
+- Ammo items that cause debuffs will use an 'affect' generic with the same
+  vnum as the ammo, if one exists.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
@@ -428,6 +430,9 @@ Triggers and Scripts (TRIGEDIT):
 - Do not put a "%quest% finish" in a trigger that's attached to an object
   that requires that quest. The object will be extracted during the "finish"
   and it will interrupt the execution of your trigger.
+- Consume triggers on poisons or arrows MUST return 0 if they purge the %self%
+  items. You can also check "if %target%" to be sure you have someone to hit
+  in these triggers.
 
 Vehicles (VEDIT):
 - Keywords should always have the most significant word first (the noun). This
@@ -2289,8 +2294,12 @@ See also: OLC GENERICS, DOLLAR SIGN CODES
 Generic 'affects' are used by spells, abilities, and scripts to show names on
 the affect list, and to show messages when these effects wear off.
 
-Affects have 2 properties:
-  <&ywearoff&0> An optional message shown to the character.
+Affects have 4 properties:
+  <&yapply2char&0> An optional message shown to the character when the affect
+    is applied.
+  <&yapply2room&0> An optional message shown to the room when the affect is
+    applied.
+  <&ywearoff&0> An optional message shown to the character when the affect ends.
   <&ywearoff2room&0> An optional message shown to the rest of the room.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
@@ -2298,6 +2307,24 @@ adds a message for the character -- normal effects don't show anything to the
 room when they end.
 
 See also: AFFECTS, OLC GENERICS
+#d
+"GENEDIT APPLY2CHAR"
+
+Usage:  .apply2char <message | none>
+
+This message is sent to the character when he/she gains this affect. This
+message is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS
+#d
+"GENEDIT APPLY2ROOM"
+
+Usage:  .apply2room <message | none>
+
+This message is sent to the room when a person gains this affect. It will
+only be shown to players who can see that person. This message is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS
 #d
 "GENERIC COOLDOWN" "COOLDOWN EDITOR" "COOLDOWN GENERICS"
 
@@ -2664,7 +2691,7 @@ Scaling based on item types:
  drink container - the "capacity" value
  coins - the "coinamount" value
  missile weapons - the "damage" value
- arrow - the "damage" value
+ ammo - the "damage" value
  pack - the "capacity" value
  potion - the "potionscale" value
 
@@ -3529,19 +3556,19 @@ heavy - Should include a -WITS or -STRENGTH penalty, and should include only
 
 See also: OLC OBJECTS, APPLIES
 #d
-"OEDIT ARROWTYPE" "OEDIT ARROW TYPE"
+"OEDIT AMMOTYPE" "OEDIT AMMO TYPE"
 
-Usage:  .arrowtype <letter>
+Usage:  .ammotype <letter>
 
-Arrow type is a property you set on missile weapons (e.g. bows) and arrow
-objects, to match the two up together. An arrow object any kind (whether it's
+Ammo type is a property you set on missile weapons (e.g. bows) and ammo
+objects, to match the two up together. An ammo object any kind (whether it's
 actually an arrow, or a bolt, or whatever) can only be used on a bow with the
-same arrow type.
+same ammo type.
 
-Arrow types are single letters, like 'A', 'B', and so on. You can find a list
-of existing items and their arrowtypes by typing "show arrowtypes".
+Ammo types are single letters, like 'A', 'B', and so on. You can find a list
+of existing items and their ammotypes by typing "show ammotypes".
 
-Common arrow types:
+Common ammo types:
  A - arrows
 
 See also: OLC OBJECTS, OEDIT TYPE, SHOW
@@ -3766,7 +3793,7 @@ See also: OLC OBJECTS, DOLLAR SIGN CODES
 Usage:  .damage <amount>
 
 This lets you set the damage on various types of weapons. Usually this amount
-of damage is added to another number, like bow damage + arrow damage, or
+of damage is added to another number, like bow damage + ammo damage, or
 strength + weapon damage.
 
 When you set the damage, it will also give you the weapon's current DPS. This
@@ -4029,19 +4056,6 @@ to any level under the maximum.
 
 See also: ITEM SCALING, OEDIT MAXLEVEL, OLC OBJECTS
 #d
-"OEDIT MISSILESPEED" "OEDIT MISSILE SPEED"
-
-Usage:  .missilespeed <number>
-
-This trait determines how fast a missile weapon (e.g. a bow) attacks in combat.
-You cannot choose your own speed; you must pick from a list. You should always
-specify the number in the list as your argument to this command.
-
-The 'speed' trait is the number of seconds between attacks in combat, so a
-lower number means a faster weapon. In that way, the name is backwards.
-
-See also: OLC OBJECTS
-#d
 "OEDIT REQUIRESQUEST" "OEDIT REQUIRES QUEST" "OEDIT REQUIRE QUEST" "OEDIT QUEST"
 
 Usage:  .requiresquest <vnum | none>
@@ -4122,7 +4136,8 @@ See also: ITEM SCALING, POTION, OLC OBJECTS
 
 Usage:  .quantity <number>
 
-This sets how many arrows are available from a given ARROW object.
+This sets how many arrows (or other ammo) are available from a given AMMO
+object.
 
 See also: OLC OBJECTS
 #d
@@ -4255,8 +4270,8 @@ Available types:
  *SHIP - use vehicles instead
  * - unused
  * - unused
- MISSILE_WEAPON - a bow, or similar (requires .wear RANGED)
- ARROW - ammunition for missile weapons
+ MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
+ AMMO - ammunition for missile weapons
  INSTRUMENT - a musical instrument -- must set custom messages
  SHIELD - for blocking attacks (requires .wear HOLD)
  PACK - expands the player's inventory (requires .wear PACK)
@@ -4303,7 +4318,8 @@ See also: OEDIT STORAGE, OLC OBJECTS
 Usage:  .weapontype <type>
 
 The weapon type determines which combat messages are sent, how fast the weapon
-attacks in combat, and whether or not it is sharp.
+attacks in combat, and whether or not it is sharp. Both regular weapons and
+missile weapons share the same set of types.
 
 The following weapon types are available:
  1. RESERVED - do not use
@@ -4335,6 +4351,10 @@ The following weapon types are available:
 27. peck - animals
 28. gore - animals
 29. mana blast - normal magical attack (e.g. disarmed mage)
+30. bow (shoot) - a normal bow
+31. crossbow (shoot) - a crossbow
+32. pistol (shoot) - a small firearm
+33. musket (shoot) - a large firearm
 
 See also: OLC OBJECTS
 #d
@@ -5831,15 +5851,23 @@ Medium armor is for PVP or solo adventuring, and should give both DPS and
 Heavy armor should always include -WITS, -STRENGTH, or other melee penalties.
    It should only include tank traits otherwise.
 #d
-"ARROW ITEM" "ARROW OBJECT"
+"AMMO ITEM" "AMMO OBJECT" "ARROW ITEM" "ARROW OBJECT"
 
-The ARROW item type is used to create stacks of ammunition for the MISSILE
+The AMMO item type is used to create stacks of ammunition for the MISSILE
 WEAPON type. Its damage is added to the missile weapon's own damage. Arrows
 normally come in stacks of 10 and are named as "a quiver of arrows".
 
-If the arrow is scalable, its damage bonus will scale. Applies don't matter on
-arrow items because they are not equipped. Arrows only fire out of the player's
-inventory.
+If the ammo is scalable, its damage bonus will scale. Ammo only fires out of
+the player's inventory.
+
+If there are any applies, they will become debuffs on the enemy when hit by
+the ammo. These applies need to be positive, not negative, to be debuffs.
+If there is an 'affect' generic with the same vnum as the ammo item, it will
+be used for the debuff.
+
+NOTE: Positive applies on ammo lead to negative debuffs on enemies. The
+ammo applies must be positive in order for the scaling engine to handle them
+correctly.
 #d
 "BOARD ITEM" "BOARD OBJECT"
 
@@ -5931,10 +5959,12 @@ extra-description to get the same effect.
 
 The MISSILE WEAPON item type represents a bow, crossbow, or similar item. It
 should always have the RANGED wear slot only, never wield or hold. In order to
-use weapons of this type, players must also have matching ARROW items in their
+use weapons of this type, players must also have matching AMMO items in their
 inventory.
 
 If the missile weapon is scalable, it will scale its own damage bonus.
+
+See also: AMMO ITEM
 #d
 "OTHER ITEM" "OTHER OBJECT"
 

@@ -394,7 +394,7 @@ void point_update_char(char_data *ch) {
 	// check mob crowding (for npcs in stables)
 	if (IS_NPC(ch) && !ch->desc && HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
 		count = 1;	// me
-		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), chiter) {
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 			if (ch != chiter && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
 				++count;
 			}
@@ -592,6 +592,7 @@ void real_update_char(char_data *ch) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
 	char_data *room_ch, *next_ch, *caster;
+	char buf[MAX_STRING_LENGTH];
 	int result, iter, type;
 	int fol_count, gain;
 	bool found, took_dot;
@@ -1385,6 +1386,7 @@ bool check_autostore(obj_data *obj, bool force) {
 * @param obj_data *obj The object to update.
 */
 void point_update_obj(obj_data *obj) {
+	char buf[MAX_STRING_LENGTH];
 	room_data *to_room, *obj_r;
 	obj_data *top;
 	char_data *c;

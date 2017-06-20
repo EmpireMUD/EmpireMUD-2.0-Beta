@@ -202,6 +202,13 @@ Bright colors:
  
 See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
 #
+APPROACH
+
+Usage:  approach
+
+When you're involved in ranged combat, you can manually end this phase and
+begin to approach your opponent.
+#
 ASSIST
 
 Usage:  assist <person in need>
@@ -1920,9 +1927,9 @@ USE
 Usage:  use <item>
 
 This command is used to interact with some items, such as the hestian trinket.
-It also sets your active poison.
+It also sets your active poison or your preferred ammunition.
 
-See also: HESTIAN TRINKET, POISON
+See also: HESTIAN TRINKET, POISON, AMMUNITION
 #
 VISIBLE
 

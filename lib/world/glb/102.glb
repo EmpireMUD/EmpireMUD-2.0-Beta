@@ -1,0 +1,213 @@
+#10200
+GC core loot~
+0 b 0 j 0-0
+E
+-1 100.00
+0 0 0
+I 4 10210 3.71 1 A  # LOOT: Zelkab's bone club
+I 4 10212 3.71 1 A  # LOOT: Garlgarl's glowing staff
+I 4 10213 3.70 1 A  # LOOT: Garlgarl's belt of herbs
+I 4 10214 3.70 1 A  # LOOT: Filks's firebranded bow
+I 4 10215 3.70 1 A  # LOOT: a bundle of goblin arrows
+I 4 10217 3.70 1 A  # LOOT: Walts's heavy belt
+I 4 10218 3.70 1 A  # LOOT: Nilbog's armored waistband
+I 4 10220 3.70 1 A  # LOOT: Furl's flaming wristbands
+I 4 10221 3.70 1 A  # LOOT: Furl's armored wristbands
+I 4 19061 3.70 1 A  # LOOT: Furl's flaming sash
+I 4 19062 3.70 1 A  # LOOT: Zelkab's championship belt
+I 4 19063 3.70 1 A  # LOOT: shinies of Garlgarl
+I 4 19064 3.70 1 A  # LOOT: Walts's reinforced wristbands
+I 4 19065 3.70 1 A  # LOOT: Nilbog's wargskull wristplates
+I 4 19066 3.71 1 A  # LOOT: Nilbog's family axe
+I 4 19067 3.71 1 A  # LOOT: a ball of grungy goblin mana
+I 4 19068 3.71 1 A  # LOOT: Furl's nightmare pick
+I 4 19069 3.70 1 A  # LOOT: giant goblin legplates
+I 4 19070 3.70 1 A  # LOOT: goblin breeches of breaching
+I 4 19071 3.70 1 A  # LOOT: a mystic goblin loincloth
+I 4 19072 3.70 1 A  # LOOT: a carved human kneecap
+I 4 19073 3.70 1 A  # LOOT: a crude goblin garter
+I 4 19074 3.71 1 A  # LOOT: the iron goblin gem
+I 4 19075 3.71 1 A  # LOOT: a pilfered roc talon
+I 4 19076 3.71 1 A  # LOOT: a cracked celestial locket
+I 4 19077 3.71 1 A  # LOOT: a goblinsilk choker
+I 4 19078 3.71 1 A  # LOOT: the metatarsal of guile
+S
+#10201
+GC hard loot~
+0 b A jB 0-0
+E
+-1 25.00
+0 0 0
+I 4 10210 3.71 1 A  # LOOT: Zelkab's bone club
+I 4 10212 3.71 1 A  # LOOT: Garlgarl's glowing staff
+I 4 10213 3.70 1 A  # LOOT: Garlgarl's belt of herbs
+I 4 10214 3.70 1 A  # LOOT: Filks's firebranded bow
+I 4 10215 3.70 1 A  # LOOT: a bundle of goblin arrows
+I 4 10217 3.70 1 A  # LOOT: Walts's heavy belt
+I 4 10218 3.70 1 A  # LOOT: Nilbog's armored waistband
+I 4 10220 3.70 1 A  # LOOT: Furl's flaming wristbands
+I 4 10221 3.70 1 A  # LOOT: Furl's armored wristbands
+I 4 19061 3.70 1 A  # LOOT: Furl's flaming sash
+I 4 19062 3.70 1 A  # LOOT: Zelkab's championship belt
+I 4 19063 3.70 1 A  # LOOT: shinies of Garlgarl
+I 4 19064 3.70 1 A  # LOOT: Walts's reinforced wristbands
+I 4 19065 3.70 1 A  # LOOT: Nilbog's wargskull wristplates
+I 4 19066 3.71 1 A  # LOOT: Nilbog's family axe
+I 4 19067 3.71 1 A  # LOOT: a ball of grungy goblin mana
+I 4 19068 3.71 1 A  # LOOT: Furl's nightmare pick
+I 4 19069 3.70 1 A  # LOOT: giant goblin legplates
+I 4 19070 3.70 1 A  # LOOT: goblin breeches of breaching
+I 4 19071 3.70 1 A  # LOOT: a mystic goblin loincloth
+I 4 19072 3.70 1 A  # LOOT: a carved human kneecap
+I 4 19073 3.70 1 A  # LOOT: a crude goblin garter
+I 4 19074 3.71 1 A  # LOOT: the iron goblin gem
+I 4 19075 3.71 1 A  # LOOT: a pilfered roc talon
+I 4 19076 3.71 1 A  # LOOT: a cracked celestial locket
+I 4 19077 3.71 1 A  # LOOT: a goblinsilk choker
+I 4 19078 3.71 1 A  # LOOT: the metatarsal of guile
+S
+#10202
+GC group loot~
+0 b B jA 0-0
+E
+-1 50.00
+0 0 0
+I 4 10210 3.71 1 A  # LOOT: Zelkab's bone club
+I 4 10212 3.71 1 A  # LOOT: Garlgarl's glowing staff
+I 4 10213 3.70 1 A  # LOOT: Garlgarl's belt of herbs
+I 4 10214 3.70 1 A  # LOOT: Filks's firebranded bow
+I 4 10215 3.70 1 A  # LOOT: a bundle of goblin arrows
+I 4 10217 3.70 1 A  # LOOT: Walts's heavy belt
+I 4 10218 3.70 1 A  # LOOT: Nilbog's armored waistband
+I 4 10220 3.70 1 A  # LOOT: Furl's flaming wristbands
+I 4 10221 3.70 1 A  # LOOT: Furl's armored wristbands
+I 4 19061 3.70 1 A  # LOOT: Furl's flaming sash
+I 4 19062 3.70 1 A  # LOOT: Zelkab's championship belt
+I 4 19063 3.70 1 A  # LOOT: shinies of Garlgarl
+I 4 19064 3.70 1 A  # LOOT: Walts's reinforced wristbands
+I 4 19065 3.70 1 A  # LOOT: Nilbog's wargskull wristplates
+I 4 19066 3.71 1 A  # LOOT: Nilbog's family axe
+I 4 19067 3.71 1 A  # LOOT: a ball of grungy goblin mana
+I 4 19068 3.71 1 A  # LOOT: Furl's nightmare pick
+I 4 19069 3.70 1 A  # LOOT: giant goblin legplates
+I 4 19070 3.70 1 A  # LOOT: goblin breeches of breaching
+I 4 19071 3.70 1 A  # LOOT: a mystic goblin loincloth
+I 4 19072 3.70 1 A  # LOOT: a carved human kneecap
+I 4 19073 3.70 1 A  # LOOT: a crude goblin garter
+I 4 19074 3.71 1 A  # LOOT: the iron goblin gem
+I 4 19075 3.71 1 A  # LOOT: a pilfered roc talon
+I 4 19076 3.71 1 A  # LOOT: a cracked celestial locket
+I 4 19077 3.71 1 A  # LOOT: a goblinsilk choker
+I 4 19078 3.71 1 A  # LOOT: the metatarsal of guile
+S
+#10203
+GC boss loot~
+0 b AB j 0-0
+E
+-1 75.00
+0 0 0
+I 4 10210 3.71 1 A  # LOOT: Zelkab's bone club
+I 4 10212 3.71 1 A  # LOOT: Garlgarl's glowing staff
+I 4 10213 3.70 1 A  # LOOT: Garlgarl's belt of herbs
+I 4 10214 3.70 1 A  # LOOT: Filks's firebranded bow
+I 4 10215 3.70 1 A  # LOOT: a bundle of goblin arrows
+I 4 10217 3.70 1 A  # LOOT: Walts's heavy belt
+I 4 10218 3.70 1 A  # LOOT: Nilbog's armored waistband
+I 4 10220 3.70 1 A  # LOOT: Furl's flaming wristbands
+I 4 10221 3.70 1 A  # LOOT: Furl's armored wristbands
+I 4 19061 3.70 1 A  # LOOT: Furl's flaming sash
+I 4 19062 3.70 1 A  # LOOT: Zelkab's championship belt
+I 4 19063 3.70 1 A  # LOOT: shinies of Garlgarl
+I 4 19064 3.70 1 A  # LOOT: Walts's reinforced wristbands
+I 4 19065 3.70 1 A  # LOOT: Nilbog's wargskull wristplates
+I 4 19066 3.71 1 A  # LOOT: Nilbog's family axe
+I 4 19067 3.71 1 A  # LOOT: a ball of grungy goblin mana
+I 4 19068 3.71 1 A  # LOOT: Furl's nightmare pick
+I 4 19069 3.70 1 A  # LOOT: giant goblin legplates
+I 4 19070 3.70 1 A  # LOOT: goblin breeches of breaching
+I 4 19071 3.70 1 A  # LOOT: a mystic goblin loincloth
+I 4 19072 3.70 1 A  # LOOT: a carved human kneecap
+I 4 19073 3.70 1 A  # LOOT: a crude goblin garter
+I 4 19074 3.71 1 A  # LOOT: the iron goblin gem
+I 4 19075 3.71 1 A  # LOOT: a pilfered roc talon
+I 4 19076 3.71 1 A  # LOOT: a cracked celestial locket
+I 4 19077 3.71 1 A  # LOOT: a goblinsilk choker
+I 4 19078 3.71 1 A  # LOOT: the metatarsal of guile
+S
+#10210
+GC BoE loot, normal~
+0 b 0 jAB 0-0
+E
+-1 10.00
+0 0 0
+I 4 10200 8.87 1 B  # LOOT: goblin clothing
+I 4 10201 8.83 1 B  # LOOT: goblin pants
+I 4 10202 8.83 1 B  # LOOT: goblin shoes
+I 4 10203 8.83 1 B  # LOOT: a pile of goblin coins
+I 4 10204 8.83 1 B  # LOOT: a goblincraft saddle
+I 4 10205 8.83 1 B  # LOOT: a tarnished necklace
+I 4 10206 8.83 1 B  # LOOT: a goblin timepiece
+I 4 10207 8.83 1 B  # LOOT: open-fingered gloves
+I 4 10208 8.83 1 B  # LOOT: a goblin collar
+I 4 10209 8.83 1 B  # LOOT: a warg-bone earring
+I 4 10222 8.83 1 B  # LOOT: a warg whistle
+I 4 10224 2.83 1 B  # LOOT: a winged wolf whistle
+S
+#10211
+GC BoE loot, hard~
+0 b A jB 0-0
+E
+-1 25.00
+0 0 0
+I 4 10200 8.87 1 B  # LOOT: goblin clothing
+I 4 10201 8.83 1 B  # LOOT: goblin pants
+I 4 10202 8.83 1 B  # LOOT: goblin shoes
+I 4 10203 8.83 1 B  # LOOT: a pile of goblin coins
+I 4 10204 8.83 1 B  # LOOT: a goblincraft saddle
+I 4 10205 8.83 1 B  # LOOT: a tarnished necklace
+I 4 10206 8.83 1 B  # LOOT: a goblin timepiece
+I 4 10207 8.83 1 B  # LOOT: open-fingered gloves
+I 4 10208 8.83 1 B  # LOOT: a goblin collar
+I 4 10209 8.83 1 B  # LOOT: a warg-bone earring
+I 4 10222 8.83 1 B  # LOOT: a warg whistle
+I 4 10224 2.83 1 B  # LOOT: a winged wolf whistle
+S
+#10212
+GC BoE loot, group~
+0 b B jA 0-0
+E
+-1 50.00
+0 0 0
+I 4 10200 8.87 1 B  # LOOT: goblin clothing
+I 4 10201 8.83 1 B  # LOOT: goblin pants
+I 4 10202 8.83 1 B  # LOOT: goblin shoes
+I 4 10203 8.83 1 B  # LOOT: a pile of goblin coins
+I 4 10204 8.83 1 B  # LOOT: a goblincraft saddle
+I 4 10205 8.83 1 B  # LOOT: a tarnished necklace
+I 4 10206 8.83 1 B  # LOOT: a goblin timepiece
+I 4 10207 8.83 1 B  # LOOT: open-fingered gloves
+I 4 10208 8.83 1 B  # LOOT: a goblin collar
+I 4 10209 8.83 1 B  # LOOT: a warg-bone earring
+I 4 10222 8.83 1 B  # LOOT: a warg whistle
+I 4 10224 2.83 1 B  # LOOT: a winged wolf whistle
+S
+#10213
+GC BoE loot, boss~
+0 b AB j 0-0
+E
+-1 100.00
+0 0 0
+I 4 10200 8.87 1 B  # LOOT: goblin clothing
+I 4 10201 8.83 1 B  # LOOT: goblin pants
+I 4 10202 8.83 1 B  # LOOT: goblin shoes
+I 4 10203 8.83 1 B  # LOOT: a pile of goblin coins
+I 4 10204 8.83 1 B  # LOOT: a goblincraft saddle
+I 4 10205 8.83 1 B  # LOOT: a tarnished necklace
+I 4 10206 8.83 1 B  # LOOT: a goblin timepiece
+I 4 10207 8.83 1 B  # LOOT: open-fingered gloves
+I 4 10208 8.83 1 B  # LOOT: a goblin collar
+I 4 10209 8.83 1 B  # LOOT: a warg-bone earring
+I 4 10222 8.83 1 B  # LOOT: a warg whistle
+I 4 10224 2.83 1 B  # LOOT: a winged wolf whistle
+S
+$

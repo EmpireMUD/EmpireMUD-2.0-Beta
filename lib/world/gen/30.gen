@@ -528,4 +528,21 @@ nature burn~
 T0
 Your nature burn eases.~
 S
+#3079
+ranged weapon~
+4 0
+0 0 0 0
+S
+#3080
+charge~
+4 0
+0 0 0 0
+S
+#3081
+trick shot~
+4 0
+0 0 0 0
+T0
+You're no longer affected by the trick shot.~
+S
 $

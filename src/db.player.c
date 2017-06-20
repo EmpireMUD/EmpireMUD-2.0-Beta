@@ -1873,7 +1873,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'U': {
-				if (PFILE_TAG(line, "Using Poison:", length)) {
+				if (PFILE_TAG(line, "Using Ammo:", length)) {
+					USING_AMMO(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Using Poison:", length)) {
 					USING_POISON(ch) = atoi(line + length + 1);
 				}
 				BAD_TAG_WARNING(line);
@@ -1935,7 +1938,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	
 	// apply affects
 	LL_FOREACH_SAFE(af_list, af, next_af) {
-		affect_to_char(ch, af);
+		affect_to_char_silent(ch, af);
 		free(af);
 	}
 	
@@ -2483,6 +2486,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'U'
+	if (USING_AMMO(ch)) {
+		fprintf(fl, "Using Ammo: %d\n", USING_AMMO(ch));
+	}
 	if (USING_POISON(ch)) {
 		fprintf(fl, "Using Poison: %d\n", USING_POISON(ch));
 	}
@@ -2493,7 +2499,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// re-apply: affects
 	for (af = af_list; af; af = next_af) {
 		next_af = af->next;
-		affect_to_char(ch, af);
+		affect_to_char_silent(ch, af);
 		free(af);
 	}
 	

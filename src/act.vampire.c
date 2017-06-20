@@ -658,6 +658,9 @@ ACMD(do_bite) {
 	}
 	else if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && !can_fight(ch, victim))
 		act("You can't attack $N!", FALSE, ch, 0, victim, TO_CHAR);
+	else if (NOT_MELEE_RANGE(ch, victim)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+	}
 	else if (check_scaling(victim, ch) && !PRF_FLAGGED(victim, PRF_BOTHERABLE) && AWAKE(victim) && GET_HEALTH(victim) > MAX(5, GET_MAX_HEALTH(victim)/20)) {
 		// must scale before checking health ^
 		msg_to_char(ch, "You can only bite people who are vulnerable or low on health.\r\n");
@@ -1440,6 +1443,9 @@ ACMD(do_weaken) {
 		act("$E is already weak!", FALSE, ch, 0, victim, TO_CHAR);
 	else if (!can_fight(ch, victim))
 		act("You can't attack $M!", FALSE, ch, 0, victim, TO_CHAR);
+	else if (NOT_MELEE_RANGE(ch, victim)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+	}
 	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_WEAKEN)) {
 		return;
 	}

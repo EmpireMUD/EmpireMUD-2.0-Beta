@@ -291,6 +291,9 @@
 #define ATYPE_ARROW_TO_THE_KNEE  3076
 #define ATYPE_HOSTILE_DELAY  3077
 #define ATYPE_NATURE_BURN  3078
+#define ATYPE_RANGED_WEAPON  3079
+#define ATYPE_CHARGE  3080
+#define ATYPE_TRICK_SHOT  3081
 
 
 // GENERIC_COOLDOWN entires used by the code
@@ -361,6 +364,8 @@
 #define COOLDOWN_SOULCHAIN  2065
 #define COOLDOWN_STARSTRIKE  2066
 #define COOLDOWN_THORNLASH  2067
+#define COOLDOWN_KITE  2068
+#define COOLDOWN_CHARGE  2069
 
 
 // LIQ_x: Some different kind of liquids (vnums of GENERIC_LIQUID)

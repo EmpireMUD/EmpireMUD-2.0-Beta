@@ -183,6 +183,8 @@ OLC_MODULE(genedit_drunk);
 OLC_MODULE(genedit_hunger);
 OLC_MODULE(genedit_liquid);
 OLC_MODULE(genedit_thirst);
+OLC_MODULE(genedit_apply2char);
+OLC_MODULE(genedit_apply2room);
 OLC_MODULE(genedit_build2char);
 OLC_MODULE(genedit_build2room);
 OLC_MODULE(genedit_craft2char);
@@ -271,7 +273,7 @@ OLC_MODULE(oedit_action_desc);
 OLC_MODULE(oedit_affects);
 OLC_MODULE(oedit_apply);
 OLC_MODULE(oedit_armortype);
-OLC_MODULE(oedit_arrowtype);
+OLC_MODULE(oedit_ammotype);
 OLC_MODULE(oedit_automint);
 OLC_MODULE(oedit_capacity);
 OLC_MODULE(oedit_charges);
@@ -294,7 +296,6 @@ OLC_MODULE(oedit_long_desc);
 OLC_MODULE(oedit_material);
 OLC_MODULE(oedit_maxlevel);
 OLC_MODULE(oedit_minlevel);
-OLC_MODULE(oedit_missilespeed);
 OLC_MODULE(oedit_plants);
 OLC_MODULE(oedit_poison);
 OLC_MODULE(oedit_potion);
@@ -664,6 +665,8 @@ const struct olc_command_data olc_data[] = {
 	{ "repair2char", genedit_repair2char, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "repair2room", genedit_repair2room, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: cooldowns
+	{ "apply2char", genedit_apply2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "apply2room", genedit_apply2room, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },
 	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },
@@ -752,7 +755,7 @@ const struct olc_command_data olc_data[] = {
 	{ "affects", oedit_affects, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "apply", oedit_apply, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "armortype", oedit_armortype, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "arrowtype", oedit_arrowtype, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "ammotype", oedit_ammotype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "automint", oedit_automint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
@@ -776,7 +779,6 @@ const struct olc_command_data olc_data[] = {
 	{ "material", oedit_material, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "maxlevel", oedit_maxlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "missilespeed", oedit_missilespeed, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "poison", oedit_poison, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "potion", oedit_potion, OLC_OBJECT, OLC_CF_EDITOR },

@@ -5,7 +5,7 @@ Paul Clarke and Owen Morris~
 dilapidated, and surrounded by unfriendly swamp creatures. What sort of person
 would live like this?
 ~
-19000 19099 100-150
+19000 19059 100-150
 15 0 ek 0
 L
 6 0
@@ -15,5 +15,13 @@ L
 1 0
 19000 -1 -1
 2 m m
+S
+#19060
+Goblin Challenge Additional Items~
+Paul Clarke and Owen Morris~
+These vnums just contain additional items for the upgraded Goblin Challenge.
+~
+19060 19099 50-150
+1 30 a 0
 S
 $

@@ -159,6 +159,7 @@ void string_add(descriptor_data *d, char *str) {
 	extern char *stripcr(char *dest, const char *src);
 	extern int improved_editor_execute(descriptor_data *d, char *str);
 	
+	char buf1[MAX_STRING_LENGTH];
 	player_index_data *index;
 	struct mail_data *mail;
 	account_data *acct;
@@ -491,7 +492,7 @@ void page_string(descriptor_data *d, char *str, int keep_internal) {
 
 /* The call that displays the next page. */
 void show_string(descriptor_data *d, char *input) {
-	char buffer[MAX_STRING_LENGTH];
+	char buffer[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	int diff;
 
 	any_one_arg(input, buf);
@@ -662,7 +663,7 @@ void parse_action(int command, char *string, descriptor_data *d) {
 	extern int format_script(descriptor_data *d);
 	extern int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
 	
-	char buf[MAX_STRING_LENGTH * 3];	// should be big enough
+	char buf[MAX_STRING_LENGTH * 3], buf2[MAX_STRING_LENGTH * 3];	// should be big enough
 	int indent = 0, rep_all = 0, flags = 0, replaced, i, line_low, line_high, j = 0;
 	unsigned int total_len;
 	char *s, *t, temp;
