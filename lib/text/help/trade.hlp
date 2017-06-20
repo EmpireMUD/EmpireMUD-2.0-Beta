@@ -317,6 +317,18 @@ With this ability, you can make the following fine pottery items:
 
 See also: POTTERY, MASTER CRAFTSMAN
 #
+FLETCHING
+
+Fletching (Trade ability)
+
+Mastery ability:  Master Craftsman
+Command:  craft [number] <type of arrows>
+
+This ability will allow you to craft better arrows. These arrows are not yet
+implemented.
+
+See also: CRAFT
+#
 FORGE
 
 Forge (Trade ability)

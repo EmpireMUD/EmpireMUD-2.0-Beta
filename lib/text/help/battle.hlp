@@ -26,11 +26,12 @@ ARCHERY
 Archery (Battle ability)
 
 Learn to use bows (and other ranged weapons) to start combat while you're still
-at a safe distance.
+at a safe distance. This ability also allows you to craft basic arrows. You can
+craft better arrows with the Fletching ability.
 
 Gain experience when you successfully hit with a ranged weapon.
 
-See also: QUICK DRAW, SHOOT
+See also: FLETCHING, QUICK DRAW, SHOOT
 #
 ARMOR "LIGHT ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "MAGE ARMOR"
 
