@@ -3,7 +3,7 @@ Zelkab goblin bruiser~
 Zelkab, goblin bruiser~
 A goblin bruiser is guarding the nest.
 ~
-50 150 bdy 0
+50 150 bd 0
 1 0 0 5
 T 10201
 T 10205
@@ -58,7 +58,7 @@ Nilbog goblin champion~
 Nilbog, goblin champion~
 The goblin champion is unpolishing her armor.
 ~
-50 150 bdyB 0
+50 150 bdB 0
 2 0 0 2
 T 10200
 T 10201
@@ -72,7 +72,7 @@ Furl goblin war shaman~
 Furl, war shaman~
 The goblin war shaman is raising his staff!
 ~
-50 150 bdxAB 0
+50 150 bdxyAB 0
 1 0 0 18
 T 10200
 T 10201

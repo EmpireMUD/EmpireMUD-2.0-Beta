@@ -59,6 +59,7 @@ elseif %mob_diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+%scale% %mob% %mob.level%
 eval self_name %self.alias%
 eval self_name %self_name.car%
 eval mob_name %mob.alias%
@@ -120,6 +121,7 @@ while %mob_num% <= 10203
     nop %mob.add_mob_flag(HARD)%
     nop %mob.add_mob_flag(GROUP)%
   end
+  %scale% %mob% %mob.level%
   eval self_name %self.alias%
   eval self_name %self_name.car%
   eval mob_num %mob_num% + 1
@@ -177,6 +179,7 @@ if !%found%
     nop %mob.add_mob_flag(GROUP)%
   end
   eval self_name %self.alias%
+  %scale% %mob% %mob.level%
   eval self_name %self_name.car%
   eval mob_name %mob.alias%
   eval mob_name %mob_name.car%
@@ -231,6 +234,7 @@ if !%found%
     nop %mob.add_mob_flag(HARD)%
     nop %mob.add_mob_flag(GROUP)%
   end
+  %scale% %mob% %mob.level%
   eval self_name %self.alias%
   eval self_name %self_name.car%
   eval mob_name %mob.alias%
@@ -289,6 +293,7 @@ elseif %mob_diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+%scale% %mob% %mob.level%
 eval self_name %self.alias%
 eval self_name %self_name.car%
 eval mob_name %mob.alias%

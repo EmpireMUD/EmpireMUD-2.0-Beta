@@ -611,8 +611,8 @@ else
   return 1
 end
 * Scale adventure
-eval scale %%instance.level(%level%)%%
-nop %scale%
+eval scale_inst %%instance.level(%level%)%%
+nop %scale_inst%
 * Load mob, apply difficulty setting
 %load% mob 10200
 eval mob %room.people%
@@ -634,6 +634,7 @@ elseif %mob_diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+%scale% %mob% %mob.level%
 * Done applying difficulty setting
 %send% %actor% You ring %self.shortdesc%, and %mob.name% charges out to meet you.
 %echoaround% %actor% %actor.name% rings %self.shortdesc%, and %mob.name% charges out to meet you.
@@ -963,7 +964,8 @@ nop %self.set_cooldown(10200, 30)%
 %echo% %self.name% starts casting a spell...
 wait 3 sec
 eval heroic_mode %self.mob_flagged(GROUP)%
-if %goblin% || !%heroic_mode%
+eval hard %self.mob_flagged(HARD)%
+if %goblin% || !%heroic_mode% || !%hard%
   if %heroic_mode%
     %echo% &r%self.name% unleashes a storm of uncontrolled magical energy!
     %aoe% 100 magical
@@ -1002,6 +1004,7 @@ else
   nop %mob.add_mob_flag(UNDEAD)%
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
+  %scale% %mob% %mob.level%
   %force% %mob% %aggro% %actor%
 end
 ~
