@@ -197,11 +197,11 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 
 
 /**
-* Determines what TYPE_x a character is actually using.
+* Determines what TYPE_ a character is actually using.
 * 
 * @param char_data *ch The character attacking.
 * @param obj_data *weapon Optional: a weapon to use.
-* @return int A TYPE_x value.
+* @return int A TYPE_ value.
 */
 int get_attack_type(char_data *ch, obj_data *weapon) {
 	int w_type = TYPE_HIT;
@@ -516,16 +516,7 @@ double get_weapon_speed(obj_data *weapon) {
 		speed = attack_hit_info[GET_WEAPON_TYPE(weapon)].speed[spd];
 	}
 	else if (IS_MISSILE_WEAPON(weapon)) {
-		spd = SPD_NORMAL;
-		
-		speed = missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(weapon)];
-		
-		if (spd == SPD_FAST) {
-			speed *= 0.8;
-		}
-		else if (spd == SPD_SLOW) {
-			speed *= 1.2;
-		}
+		speed = attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].speed[spd];
 	}
 	else {
 		speed = 2.0;
@@ -774,14 +765,15 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 
 
 /**
-* Replaces #w and #W with singular and plural attack types.
+* Replaces #w and #W with first/third person attack types.
 *
 * @param const char *str The input string.
-* @param const char *weapon_singular The string to replace #w with.
-* @param const char *weapon_plural The string to replace #W with.
+* @param const char *weapon_first The string to replace #w with.
+* @param const char *weapon_third The string to replace #W with.
+* @param const char *weapon_noun The string to replace #x with.
 * @return char* The replaced string.
 */
-static char *replace_fight_string(const char *str, const char *weapon_singular, const char *weapon_plural) {
+static char *replace_fight_string(const char *str, const char *weapon_first, const char *weapon_third, const char *weapon_noun) {
 	static char buf[MAX_STRING_LENGTH];
 	char *cp = buf;
 
@@ -789,11 +781,15 @@ static char *replace_fight_string(const char *str, const char *weapon_singular, 
 		if (*str == '#') {
 			switch (*(++str)) {
 				case 'W':
-					for (; *weapon_plural; *(cp++) = *(weapon_plural++));
+					for (; *weapon_third; *(cp++) = *(weapon_third++));
 					break;
 				case 'w':
-					for (; *weapon_singular; *(cp++) = *(weapon_singular++));
+					for (; *weapon_first; *(cp++) = *(weapon_first++));
 					break;
+				case 'x': {
+					for (; *weapon_noun; *(cp++) = *(weapon_noun++));
+					break;
+				}
 				default:
 					*(cp++) = '#';
 					break;
@@ -1824,12 +1820,12 @@ void process_tower(room_data *room) {
 * Iterates over empires, finds guard towers, and tries to shoot with them.
 */
 void update_guard_towers(void) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *ter_next;
 	room_data *tower;
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, ter_next) {
 			tower = ter->room;
 			
 			if (room_has_function_and_city_ok(tower, FNC_GUARD_TOWER)) {
@@ -1854,14 +1850,14 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 	char *pbuf;
 	
 	// block message to onlookers
-	pbuf = replace_fight_string("$N blocks $n's #w.", attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
+	pbuf = replace_fight_string("$N blocks $n's #x.", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
 	act(pbuf, FALSE, ch, NULL, victim, TO_NOTVICT | TO_COMBAT_MISS);
 
 	// block message to ch
 	if (ch->desc) {
 		// send color separately because of act capitalization
 		send_to_char("&y", ch);
-		pbuf = replace_fight_string("You try to #w $N, but $E blocks.&0", attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
+		pbuf = replace_fight_string("You try to #w $N, but $E blocks.&0", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
 		act(pbuf, FALSE, ch, NULL, victim, TO_CHAR | TO_COMBAT_MISS);
 	}
 
@@ -1869,7 +1865,7 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 	if (victim->desc) {
 		// send color separately because of act capitalization
 		send_to_char("&r", victim);
-		pbuf = replace_fight_string("You block $n's #w.&0", attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
+		pbuf = replace_fight_string("You block $n's #x.&0", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
 		act(pbuf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
 	}
 	
@@ -1883,12 +1879,19 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 *
 * @param char_data *ch the attacker
 * @param char_data *victim the guy who blocked
-* @param obj_data *arrow The arrow item being shot.
+* @param int type The TYPE_ attack type.
 */
-void block_missile_attack(char_data *ch, char_data *victim, obj_data *arrow) {
-	act("You shoot $p at $N, but $E blocks.", FALSE, ch, arrow, victim, TO_CHAR | TO_COMBAT_MISS);
-	act("$n shoots $p at $N, who blocks.", FALSE, ch, arrow, victim, TO_NOTVICT | TO_COMBAT_MISS);
-	act("$n shoots $p at you, but you block.", FALSE, ch, arrow, victim, TO_VICT | TO_COMBAT_MISS);
+void block_missile_attack(char_data *ch, char_data *victim, int type) {
+	char buf[MAX_STRING_LENGTH];
+	
+	snprintf(buf, sizeof(buf), "You %s at $N, but $E blocks.", attack_hit_info[type].first_pers);
+	act(buf, FALSE, ch, NULL, victim, TO_CHAR | TO_COMBAT_MISS);
+	
+	snprintf(buf, sizeof(buf), "$n %s at $N, who blocks.", attack_hit_info[type].third_pers);
+	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | TO_COMBAT_MISS);
+	
+	snprintf(buf, sizeof(buf), "$n %s at you, but you block.", attack_hit_info[type].third_pers);
+	act(buf, FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_MISS);
 }
 
 
@@ -1898,7 +1901,7 @@ void block_missile_attack(char_data *ch, char_data *victim, obj_data *arrow) {
 * @param int dam How much damage was done.
 * @param char_data *ch The character dealing the damage.
 * @param char_data *victim The person receiving the damage.
-* @param int w_type The weapon type (TYPE_x)
+* @param int w_type The weapon type (TYPE_)
 */
 void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	bitvector_t fmsg_type;
@@ -1912,7 +1915,7 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 		const char *to_room;	// rearranged this from circle3 to match the order of the "messages" file -pc
 	} dam_weapons[] = {
 
-		/* use #w for singular (i.e. "slash") and #W for plural (i.e. "slashes") */
+		/* use #w for 1st-person (i.e. "slash") and #W for 3rd-person (i.e. "slashes") */
 
 		{ 0,
 		"You try to #w $N, but miss.",
@@ -1950,40 +1953,50 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 		"$n #W $N extremely hard." },
 
 		{ 24,
-		"You maul $N with your #w.",
-		"$n mauls you with $s #w.",
-		"$n mauls $N with $s #w." },
+		"You maul $N with your #x.",
+		"$n mauls you with $s #x.",
+		"$n mauls $N with $s #x." },
 
 		{ 28,
-		"You massacre $N with your #w.",
-		"$n massacres you with $s #w.",
-		"$n massacres $N with $s #w." },
+		"You massacre $N with your #x.",
+		"$n massacres you with $s #x.",
+		"$n massacres $N with $s #x." },
 
 		{ 32,
-		"You decimate $N with your #w.",
-		"$n decimates you with $s #w.",
-		"$n decimates $N with $s #w." },
+		"You decimate $N with your #x.",
+		"$n decimates you with $s #x.",
+		"$n decimates $N with $s #x." },
 
-		{ 40,
-		"You OBLITERATE $N with your deadly #w!!",
-		"$n OBLITERATES you with $s deadly #w!!",
-		"$n OBLITERATES $N with $s deadly #w!!" },
-
-		{ 50,
-		"You ANNIHILATE $N with your deadly #w!!",
-		"$n ANNIHILATES you with $s deadly #w!!",
-		"$n ANNIHILATES $N with $s deadly #w!!" },
+		{ 45,
+		"You OBLITERATE $N with your deadly #x!!",
+		"$n OBLITERATES you with $s deadly #x!!",
+		"$n OBLITERATES $N with $s deadly #x!!" },
 
 		{ 60,
-		"You MUTILATE $N with your deadly #w!!",
-		"$n MUTILATES you with $s deadly #w!!",
-		"$n MUTILATES $N with $s deadly #w!!" },
+		"You ANNIHILATE $N with your deadly #x!!",
+		"$n ANNIHILATES you with $s deadly #x!!",
+		"$n ANNIHILATES $N with $s deadly #x!!" },
+
+		{ 75,
+		"You MUTILATE $N with your deadly #x!!",
+		"$n MUTILATES you with $s deadly #x!!",
+		"$n MUTILATES $N with $s deadly #x!!" },
+
+		{ 100,
+		"You SLAUGHTER $N with your deadly #x!!",
+		"$n SLAUGHTERS you with $s deadly #x!!",
+		"$n SLAUGHTERS $N with $s deadly #x!!" },
+
+		{ 125,
+		"You **ERADICATE** $N with your deadly #x!!",
+		"$n **ERADICATES** you with $s deadly #x!!",
+		"$n **ERADICATES** $N with $s deadly #x!!" },
 
 		// use -1 as the final entry (REQUIRED) -- captures any higher damage
 		{ -1,
-		"You LIQUIDATE $N with your deadly #w!!",
-		"$n LIQUIDATES you with $s deadly #w!!",
-		"$n LIQUIDATES $N with $s deadly #w!!" }
+		"You **LIQUIDATE** $N with your deadly #x!!",
+		"$n **LIQUIDATES** you with $s deadly #x!!",
+		"$n **LIQUIDATES** $N with $s deadly #x!!" }
 	};
 
 	// find matching message
@@ -1999,14 +2012,14 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 
 	/* damage message to onlookers */
 	if (!AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
-		buf = replace_fight_string(dam_weapons[msgnum].to_room, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
+		buf = replace_fight_string(dam_weapons[msgnum].to_room, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
 		act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | fmsg_type);
 	}
 
 	/* damage message to damager */
 	if (ch->desc && ch != victim && !AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
 		send_to_char("&y", ch);
-		buf = replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
+		buf = replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
 		act(buf, FALSE, ch, NULL, victim, TO_CHAR | fmsg_type);
 		send_to_char("&0", ch);
 	}
@@ -2014,7 +2027,7 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	/* damage message to damagee */
 	if (victim->desc) {
 		send_to_char("&r", victim);
-		buf = replace_fight_string(dam_weapons[msgnum].to_victim, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
+		buf = replace_fight_string(dam_weapons[msgnum].to_victim, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
 		act(buf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | fmsg_type);
 		send_to_char("&0", victim);
 	}
@@ -2404,7 +2417,7 @@ void besiege_room(room_data *to_room, int damage) {
 		}
 		else {	// not over-damaged
 			// apply needed maintenance if we did more than 10% damage
-			if (GET_BUILDING(to_room) && GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) && damage >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(to_room)) / 10)) {
+			if (GET_BUILDING(to_room) && damage >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(to_room)) / 10)) {
 				old_list = GET_BUILDING_RESOURCES(to_room);
 				GET_BUILDING_RESOURCES(to_room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) ? GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) : default_res);
 				free_resource_list(old_list);
@@ -2900,7 +2913,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 *
 * @param char_data *ch The person dying.
 * @param char_data *killer The person who killed him.
-* @param int type An ATTACK_x or TYPE_x damage type that killed ch (e.g. ATTACK_EXECUTE).
+* @param int type An ATTACK_ or TYPE_ damage type that killed ch (e.g. ATTACK_EXECUTE).
 */
 void death_log(char_data *ch, char_data *killer, int type) {
 	char *msg;
@@ -3330,7 +3343,7 @@ void out_of_blood(char_data *ch) {
 *
 * @param char_data *ch The murderer.
 * @param char_data *victim The unfortunate one.
-* @param int attacktype Any ATTACK_x or TYPE_x.
+* @param int attacktype Any ATTACK_ or TYPE_.
 * @param int damtype DAM_x.
 */
 void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype) {
@@ -3589,19 +3602,23 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 * @param obj_data *weapon Which weapon to attack with.
 */
 void perform_violence_missile(char_data *ch, obj_data *weapon) {
-	obj_data *arrow, *best = NULL;
-	int dam = 0;
-	bool success = FALSE, block = FALSE;
+	bool success = FALSE, block = FALSE, purge = TRUE;
+	obj_data *ammo, *best = NULL;
+	struct affected_type *af;
+	struct obj_apply *apply;
+	int dam = 0, ret, atype;
+	char_data *vict;
 	
-	if (!FIGHTING(ch)) {
+	if (!(vict = FIGHTING(ch))) {
 		return;
 	}
-
+	
+	// ensure missile weapon
 	if (!weapon || !IS_MISSILE_WEAPON(weapon)) {
 		msg_to_char(ch, "You don't have a ranged weapon to shoot with!\r\n");
-		if (FIGHT_MODE(FIGHTING(ch)) == FMODE_MISSILE) {
+		if (FIGHT_MODE(vict) == FMODE_MISSILE) {
 			FIGHT_MODE(ch) = FMODE_WAITING;
-			FIGHT_WAIT(ch) = 2;
+			FIGHT_WAIT(ch) = 4;
 		}
 		else {
 			FIGHT_MODE(ch) = FMODE_MELEE;
@@ -3609,18 +3626,32 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		return;
 	}
 	
+	// detect ammo
 	best = NULL;
-	for (arrow = ch->carrying; arrow; arrow = arrow->next_content) {
-		if (IS_ARROW(arrow) && GET_ARROW_TYPE(arrow) == GET_MISSILE_WEAPON_TYPE(weapon)) {
-			if (!best || GET_ARROW_DAMAGE_BONUS(arrow) > GET_ARROW_DAMAGE_BONUS(best)) {
-				best = arrow;
+	
+	if (!IS_NPC(ch)) {
+		LL_FOREACH2(ch->carrying, ammo, next_content) {
+			if (IS_AMMO(ammo) && GET_OBJ_VNUM(ammo) == USING_AMMO(ch) && GET_AMMO_TYPE(ammo) == GET_MISSILE_WEAPON_AMMO_TYPE(weapon)) {
+				if (!best || GET_AMMO_DAMAGE_BONUS(ammo) > GET_AMMO_DAMAGE_BONUS(best)) {
+					best = ammo;	// found a [better] match!
+				}
 			}
 		}
 	}
 	
-	if (!best) {
+	if (!best) {	// if we didn't find a preferred one
+		for (ammo = ch->carrying; ammo; ammo = ammo->next_content) {
+			if (IS_AMMO(ammo) && GET_AMMO_TYPE(ammo) == GET_MISSILE_WEAPON_AMMO_TYPE(weapon)) {
+				if (!best || GET_AMMO_DAMAGE_BONUS(ammo) > GET_AMMO_DAMAGE_BONUS(best)) {
+					best = ammo;
+				}
+			}
+		}
+	}
+	
+	if (!best && !IS_NPC(ch)) {
 		msg_to_char(ch, "You don't have anything that you can shoot!\r\n");
-		if (FIGHT_MODE(FIGHTING(ch)) == FMODE_MISSILE) {
+		if (FIGHT_MODE(vict) == FMODE_MISSILE) {
 			FIGHT_MODE(ch) = FMODE_WAITING;
 			FIGHT_WAIT(ch) = 2;
 			}
@@ -3628,32 +3659,107 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			FIGHT_MODE(ch) = FMODE_MELEE;
 		return;
 	}
-
-	// compute
-	success = check_hit_vs_dodge(ch, FIGHTING(ch), FALSE);
 	
-	if (success && AWAKE(FIGHTING(ch)) && has_ability(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
-		block = check_block(FIGHTING(ch), ch, TRUE);
-		if (GET_EQ(FIGHTING(ch), WEAR_HOLD) && IS_SHIELD(GET_EQ(FIGHTING(ch), WEAR_HOLD)) && can_gain_exp_from(FIGHTING(ch), ch)) {
-			gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
+	// compute
+	success = check_hit_vs_dodge(ch, vict, FALSE);
+	
+	if (success && AWAKE(vict) && has_ability(vict, ABIL_BLOCK_ARROWS)) {
+		block = check_block(vict, ch, TRUE);
+		if (GET_EQ(vict, WEAR_HOLD) && IS_SHIELD(GET_EQ(vict, WEAR_HOLD)) && can_gain_exp_from(vict, ch)) {
+			gain_ability_exp(vict, ABIL_BLOCK_ARROWS, 2);
 		}
 	}
 	
 	if (block) {
-		block_missile_attack(ch, FIGHTING(ch), best);
+		block_missile_attack(ch, vict, GET_MISSILE_WEAPON_TYPE(weapon));
 	}
 	else if (!success) {
-		damage(ch, FIGHTING(ch), 0, ATTACK_ARROW, DAM_PHYSICAL);
+		damage(ch, vict, 0, GET_MISSILE_WEAPON_TYPE(weapon), DAM_PHYSICAL);
 	}
 	else {
 		// compute damage
-		dam = GET_MISSILE_WEAPON_DAMAGE(weapon) + GET_ARROW_DAMAGE_BONUS(best);
+		dam = GET_MISSILE_WEAPON_DAMAGE(weapon) + (best ? GET_AMMO_DAMAGE_BONUS(best) : 0);
 		
-		// damage last! it's sometimes fatal for FIGHTING(ch)
-		damage(ch, FIGHTING(ch), dam, ATTACK_ARROW, DAM_PHYSICAL);
+		if (!IS_NPC(ch) && has_ability(ch, ABIL_BOWMASTER)) {
+			dam *= 1.5;
+			if (can_gain_exp_from(ch, vict)) {
+				gain_ability_exp(ch, ABIL_BOWMASTER, 2);
+			}
+		}
+		
+		// damage last! it's sometimes fatal for vict
+		ret = damage(ch, vict, dam, GET_MISSILE_WEAPON_TYPE(weapon), attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].damage_type);
+		
+		if (ret > 0 && !EXTRACTED(vict) && !IS_DEAD(vict) && IN_ROOM(vict) == IN_ROOM(ch)) {
+			// affects?
+			if (best && (GET_OBJ_AFF_FLAGS(best) || GET_OBJ_APPLIES(best))) {
+				atype = find_generic(GET_OBJ_VNUM(best), GENERIC_AFFECT) ? GET_OBJ_VNUM(best) : ATYPE_RANGED_WEAPON;
+			
+				if (GET_OBJ_AFF_FLAGS(best)) {
+					af = create_flag_aff(atype, 1, GET_OBJ_AFF_FLAGS(best), ch);
+					affect_to_char(vict, af);
+					free(af);
+				}
+			
+				LL_FOREACH(GET_OBJ_APPLIES(best), apply) {
+					af = create_mod_aff(atype, 1, apply->location, -1 * apply->modifier, ch);
+					affect_to_char(vict, af);
+					free(af);
+				}
+			}
+		
+			// ability effects
+			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
+				switch (GET_MISSILE_WEAPON_TYPE(weapon)) {
+					case TYPE_BOW: {
+						af = create_flag_aff(ATYPE_TRICK_SHOT, 2, AFF_SLOW, ch);
+						affect_join(vict, af, 0);
+						
+						act("That shot to the leg seems to slow $N!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's last shot hit your leg! You feel slower.", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's last shot seems to stun $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+					case TYPE_CROSSBOW: {
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						
+						act("Your shot opens a deep artery in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+					case TYPE_PISTOL: {
+						af = create_mod_aff(ATYPE_TRICK_SHOT, 2, APPLY_DODGE, -(GET_DEXTERITY(ch) * hit_per_dex), ch);
+						affect_join(vict, af, 0);
+						
+						act("That shot to the arm seems to shake $N!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's last shot hit your arm! You feel shaken.", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's last shot seems to shake $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+					case TYPE_MUSKET: {
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						
+						act("Your shot opens a deep artery in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
+				}
+				
+				if (can_gain_exp_from(ch, vict)) {
+					gain_ability_exp(ch, ABIL_TRICK_SHOTS, 10);
+				}
+			}
+		}
+		
+		// fire a consume trigger but it can't block execution here
+		if (best && !consume_otrigger(best, ch, OCMD_SHOOT, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
+			purge = FALSE;	// ammo likely extracted
+		}
 		
 		// McSkillups
-		if (can_gain_exp_from(ch, FIGHTING(ch))) {
+		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_ARCHERY, 2);
 			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
 			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
@@ -3662,12 +3768,15 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		}
 	}
 	
-	// arrow countdown/extract
-	GET_OBJ_VAL(best, VAL_ARROW_QUANTITY) -= 1;
-	if (GET_ARROW_QUANTITY(best) <= 0) {
-		extract_obj(best);
+	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
+	if (purge && best) {
+		GET_OBJ_VAL(best, VAL_AMMO_QUANTITY) -= 1;
+		if (GET_AMMO_QUANTITY(best) <= 0) {
+			extract_obj(best);
+		}
 	}
-		
+	
+	// if still fighting
 	if (FIGHTING(ch) && GET_HEALTH(FIGHTING(ch)) <= 0 && WOULD_EXECUTE(ch, FIGHTING(ch))) {
 		stop_fighting(ch);
 	}

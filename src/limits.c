@@ -38,7 +38,6 @@
 */
 
 // external vars
-extern const char *affect_wear_off_msgs[];
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const struct material_data materials[NUM_MATERIALS];
@@ -165,11 +164,9 @@ void check_death_respawn(void) {
 * only runs on players who are connected. Nobody else, including mobs, needs
 * to know.
 */
-void check_expired_cooldowns(void) {
-	extern const char *cooldown_types[];
-	
+void check_expired_cooldowns(void) {	
 	struct cooldown_data *cool, *next_cool;
-	char lbuf[MAX_STRING_LENGTH];
+	generic_data *gen;
 	char_data *ch;
 	descriptor_data *d;
 	
@@ -179,8 +176,9 @@ void check_expired_cooldowns(void) {
 				next_cool = cool->next;
 				
 				if ((cool->expire_time - time(0)) <= 0) {
-					sprinttype(cool->type, cooldown_types, lbuf);
-					msg_to_char(ch, "&%cYour %s cooldown has ended.&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', lbuf);
+					if ((gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
+						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_COOLDOWN_WEAR_OFF(gen));
+					}
 					remove_cooldown(ch, cool);
 				}
 			}
@@ -384,12 +382,29 @@ void point_update_char(char_data *ch) {
 	struct cooldown_data *cool, *next_cool;
 	struct instance_data *inst;
 	obj_data *obj, *next_obj;
+	char_data *c, *chiter;
 	empire_data *emp;
-	char_data *c;
 	bool found;
+	int count;
 	
 	if (IS_NPC(ch) && FIGHTING(ch)) {
 		check_pointless_fight(ch);
+	}
+	
+	// check mob crowding (for npcs in stables)
+	if (IS_NPC(ch) && !ch->desc && HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
+		count = 1;	// me
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+			if (ch != chiter && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
+				++count;
+			}
+		}
+		
+		if (count > config_get_int("num_duplicates_in_stable")) {
+			act("$n is feeling overcrowded, and leaves.", TRUE, ch, NULL, NULL, TO_ROOM);
+			extract_char(ch);
+			return;
+		}
 	}
 	
 	if (!IS_NPC(ch)) {
@@ -523,7 +538,17 @@ void point_update_char(char_data *ch) {
 			}
 		}
 	}
-
+	
+	// warn about burning
+	if (IS_BURNING(IN_ROOM(ch))) {
+		if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
+			act("The walls crackle and crisp as they burn!", FALSE, ch, NULL, NULL, TO_CHAR);
+		}
+		else {
+			act("The fire rages as the building burns!", FALSE, ch, NULL, NULL, TO_CHAR);
+		}
+	}
+	
 	// check all cooldowns -- ignore chars with descriptors, as they'll want
 	// the OTHER function to remove this (it sends messages; this one includes
 	// NPCs and doesn't)
@@ -567,6 +592,7 @@ void real_update_char(char_data *ch) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
 	char_data *room_ch, *next_ch, *caster;
+	char buf[MAX_STRING_LENGTH];
 	int result, iter, type;
 	int fol_count, gain;
 	bool found, took_dot;
@@ -1360,6 +1386,7 @@ bool check_autostore(obj_data *obj, bool force) {
 * @param obj_data *obj The object to update.
 */
 void point_update_obj(obj_data *obj) {
+	char buf[MAX_STRING_LENGTH];
 	room_data *to_room, *obj_r;
 	obj_data *top;
 	char_data *c;
@@ -1564,6 +1591,8 @@ void point_update_obj(obj_data *obj) {
 * @param obj_data *obj The object to update.
 */
 void real_update_obj(obj_data *obj) {
+	void start_burning(room_data *room);
+	
 	struct empire_political_data *pol;
 	empire_data *emp, *enemy;
 	room_data *home;
@@ -1571,7 +1600,7 @@ void real_update_obj(obj_data *obj) {
 	// burny
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
 		home = HOME_ROOM(IN_ROOM(obj));
-		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !BUILDING_BURNING(home)) {
+		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
 			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
 			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
 				// check that the empire is at war
@@ -1580,15 +1609,10 @@ void real_update_obj(obj_data *obj) {
 				
 				// check for war
 				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
-					// TODO magic number -- this should be a config
-					COMPLEX_DATA(home)->burning = number(4, 12);
-					if (ROOM_PEOPLE(home)) {
-						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(home), obj, 0, TO_CHAR | TO_ROOM);
-
-						// ensure no building or dismantling
-						stop_room_action(home, ACT_BUILDING, CHORE_BUILDING);
-						stop_room_action(home, ACT_DISMANTLING, CHORE_BUILDING);
+					if (ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
 					}
+					start_burning(home);
 				}
 			}
 		}
@@ -1598,181 +1622,6 @@ void real_update_obj(obj_data *obj) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM LIMITS /////////////////////////////////////////////////////////////
-
-/**
-* Point update (per mud hour / 75 seconds) for each room.
-*
-* @param room_data *room The room to update.
-*/
-void point_update_room(room_data *room) {
-	void death_log(char_data *ch, char_data *killer, int type);
-	void fill_trench(room_data *room);
-
-	char_data *ch, *next_ch, *sub_ch, *next_sub;
-	obj_data *o, *next_o;
-	struct track_data *track, *next_track, *temp;
-	struct affected_type *af, *next_af;
-	empire_data *emp;
-	time_t now = time(0);
-	bool junk;
-	int count;
-	
-	int allowed_animals = config_get_int("num_duplicates_in_stable");
-
-	// map-only portion
-	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-		if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
-			if (weather_info.sky >= SKY_RAINING) {
-				add_to_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_gain_from_rain"));
-				if (get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS) >= config_get_int("trench_full_value")) {
-					fill_trench(room);
-				}
-			}
-			
-			// still a trench? (may have been filled by rain)
-			if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH)) {
-				if (find_flagged_sect_within_distance_from_room(room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER, NOBITS, 1)) {
-					fill_trench(room);
-				}
-			}
-		}
-
-		if (room_affected_by_spell(room, ATYPE_DARKNESS) && weather_info.sunlight != SUN_DARK && !number(0, 1)) {
-			affect_from_room(room, ATYPE_DARKNESS);
-			if (ROOM_PEOPLE(room))
-				act("The darkness dissipates.", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-		}
-
-		if (COMPLEX_DATA(room) && HOME_ROOM(room) == room && BUILDING_BURNING(room)) {
-			/* Reduce by one tick */
-			--COMPLEX_DATA(room)->burning;
-		
-			emp = ROOM_OWNER(room);
-			if (emp) {
-				log_to_empire(emp, ELOG_HOSTILITY, "Building on fire at (%d, %d) -- douse it quickly", X_COORD(room), Y_COORD(room));
-			}
-
-			/* Time's up! */
-			if (BUILDING_BURNING(room) == 0) {
-				if (ROOM_IS_CLOSED(room)) {
-					if (ROOM_PEOPLE(room)) {
-						act("The building collapses in flames around you!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-					for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-						next_ch = ch->next_in_room;
-						
-						if (!IS_NPC(ch)) {
-							death_log(ch, ch, TYPE_SUFFERING);
-						}
-						die(ch, ch);
-					}
-				}
-				else {
-					// not closed
-					if (ROOM_PEOPLE(room)) {
-						act("The building burns to the ground!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-				}
-			
-				disassociate_building(room);
-				
-				// auto-abandon if not in city
-				if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
-					// does check the city time limit for abandon protection
-					abandon_room(room);
-				}
-
-				/* Destroy 50% of the objects */
-				for (o = ROOM_CONTENTS(room); o; o = next_o) {
-					next_o = o->next_content;
-					if (!number(0, 1)) {
-						extract_obj(o);
-					}
-				}
-
-				return;
-			}
-
-			/* Otherwise, just send a message */
-			if (ROOM_PEOPLE(room)) {
-				if (ROOM_IS_CLOSED(room)) {
-					act("The walls crackle and crisp as they burn!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-				}
-				else {
-					act("The fire rages as the building burns!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-				}
-			}
-		}
-	}
-
-	// For remaining interior rooms, make sure everyone knows the place is crispy
-	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		if (HOME_ROOM(room) != room && BUILDING_BURNING(room) && ROOM_PEOPLE(room)) {
-			act("The walls crackle and crisp as they burn!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-		}
-	}
-
-	// WHOLE WORLD:
-	
-	// check tracks
-	for (track = ROOM_TRACKS(room); track; track = next_track) {
-		next_track = track->next;
-		
-		if (now - track->timestamp > config_get_int("tracks_lifespan") * SECS_PER_REAL_MIN) {
-			REMOVE_FROM_LIST(track, ROOM_TRACKS(room), next);
-			free(track);
-		}
-	}
-	
-	// check mob crowding
-	if (HAS_FUNCTION(room, FNC_STABLE)) {
-		for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-			next_ch = ch->next_in_room;
-			
-			// skip non-npcs and familiars
-			if (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_FAMILIAR)) {
-				continue;
-			}
-			
-			// look for more here than allowed
-			count = 1;
-			for (sub_ch = ch->next_in_room; sub_ch; sub_ch = next_sub) {
-				next_sub = sub_ch->next_in_room;
-				
-				// only looking for dupes
-				if (!IS_NPC(sub_ch) || sub_ch->desc || GET_MOB_VNUM(sub_ch) != GET_MOB_VNUM(ch)) {
-					continue;
-				}
-				
-				if (count++ >= allowed_animals) {
-					act("$n is feeling overcrowded, and leaves.", TRUE, sub_ch, NULL, NULL, TO_ROOM);
-					extract_char(sub_ch);
-				}
-			}
-		}
-	}
-
-	// update room ffects
-	for (af = ROOM_AFFECTS(room); af; af = next_af) {
-		next_af = af->next;
-		if (af->duration >= 1) {
-			af->duration--;
-		}
-		else if (af->duration != UNLIMITED) {
-			if ((af->type > 0)) {
-				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if (*affect_wear_off_msgs[af->type] && ROOM_PEOPLE(room)) {
-						act(affect_wear_off_msgs[af->type], FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-				}
-			}
-			affect_remove_room(room, af);
-		}
-	}
-	
-	// ensure these are up to date
-	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
-}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2205,7 +2054,6 @@ void point_update(bool run_real) {
 	void update_players_online_stats();
 	
 	vehicle_data *veh, *next_veh;
-	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
 	
@@ -2259,11 +2107,6 @@ void point_update(bool run_real) {
 		
 		real_update_obj(obj);
 		point_update_obj(obj);
-	}
-	
-	// rooms
-	HASH_ITER(hh, world_table, room, next_room) {
-		point_update_room(room);
 	}
 }
 

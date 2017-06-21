@@ -95,8 +95,8 @@ a short bow~
 A short bow has been left here.~
 Equip a quiver of arrows and then use "shoot" to start ranged combat.
 ~
-20 emo ap 1
-2 2 0
+20 ehmo ap 2
+29 2 0
 0 0
 A
 17 1 0
@@ -110,7 +110,7 @@ A long bow has been dropped here.~
 Equip a quiver of arrows and then use "shoot" to start ranged combat.
 ~
 20 emo ap 1
-1 3 0
+29 3 0
 0 0
 A
 17 1 0

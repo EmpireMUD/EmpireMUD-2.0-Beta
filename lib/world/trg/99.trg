@@ -13,20 +13,11 @@ if (%actor.position% != Standing)
   halt
 end
 eval varname minipet%self.val0%
-eval test %%actor.varexists(%varname%)%%
+eval test %%actor.cooldown(%self.val0%)%%
 * once per 30 minutes
 if %test%
-  eval tt %%actor.%varname%%%
-  if (%timestamp% - %tt%) < 1800
-    eval diff (%tt% - %timestamp%) + 1800
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
-    halt
-  end
+  %send% %actor% %self.shortdesc% is on cooldown.
+  halt
 end
 * check too many mobs
 eval mobs 0
@@ -60,8 +51,8 @@ else
   if (%pet% && %pet.vnum% == %self.val0%)
     %force% %pet% mfollow %actor%
     %echo% %pet.name% appears!
-    eval %varname% %timestamp%
-    remote %varname% %actor.id%
+    eval cooldown %%actor.set_cooldown(%self.val0%, 1800)%%
+    nop %cooldown%
     dg_affect %pet% *CHARM on -1
     nop %pet.add_mob_flag(!EXP)%
     nop %pet.unlink_instance%
@@ -103,6 +94,25 @@ done
 * Despawn if no players present
 if %count% < 1
   %purge% %self%
+end
+~
+#9926
+Heisenbug!~
+0 btw 25
+~
+eval master %self.master%
+if !%master%
+  %purge% %self%
+  halt
+end
+if %self.aff_flagged(!SEE)%
+  dg_affect %self% !SEE off 1
+  dg_affect %self% SNEAK off 1
+  %echo% %self.name% appears out of nowhere and starts following %master.name%.
+else
+  %echo% %self.name% vanishes into thin air.
+  dg_affect %self% !SEE on -1
+  dg_affect %self% SNEAK on -1
 end
 ~
 $

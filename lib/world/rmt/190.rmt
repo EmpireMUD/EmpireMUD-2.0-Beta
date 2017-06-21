@@ -1,0 +1,44 @@
+#19000
+Beneath the Hut~
+   You find yourself in ankle-deep water beneath the hut. The air is stale
+here, filled with swarming insects. It looks like there's a rope ladder hanging
+above you, but you can't reach it.
+~
+ah 0 0
+M 1 19005 100.00 1
+S
+#19001
+Beneath the Hut~
+   You find yourself in ankle-deep water beneath the hut. The air is stale
+here, filled with swarming insects. A rope ladder hangs down from the hut above
+you, though the scratching at the floorboards make you hesitant to climb up.
+~
+ah 0 0
+D8
+~
+0 19002
+E
+rope ladder~
+The rope ladder is shabby but should hold your weight.
+~
+S
+#19002
+A Crude Hut, Overlooking the Swamp~
+   The hut overlooks the swamp, but it offers no protection from the many
+insects that swarm outside. The inside of the hut is a single room, cluttered
+with furs that have been turned into crude dolls and furniture made from
+strange bones. This is not the sort of place most people would choose to live.
+~
+h 0 aG
+D9
+~
+0 19001
+E
+insects bugs swarm~
+There are more insects here than you would believe.
+~
+M 0 19000 100.00 1
+T 19011
+T 19048
+S
+$

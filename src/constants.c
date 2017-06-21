@@ -33,11 +33,13 @@
 *   Craft Recipe Constants
 *   Empire Constants
 *   Faction Constants
+*   Generic Constants
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
 *   Quest Constants
 *   Room/World Constants
+*   Shop Constants
 *   Skill Constants
 *   Social Constants
 *   Trigger Constants
@@ -117,6 +119,7 @@ const char *adventure_flags[] = {
 	"NEWBIE-ONLY",
 	"NO-MOB-CLEANUP",
 	"EMPTY-RESET-ONLY",
+	"CAN-DELAY-LOAD",
 	"\n"
 };
 
@@ -155,6 +158,7 @@ const char *adventure_spawn_types[] = {
 // INST_x
 const char *instance_flags[] = {
 	"COMPLETED",
+	"NEEDS-LOAD",
 	"\n"
 };
 
@@ -237,7 +241,7 @@ const struct augment_type_data augment_info[] = {
 
 // AUG_x: augment flags
 const char *augment_flags[] = {
-	"IN-DEV",
+	"IN-DEVELOPMENT",
 	"SELF-ONLY",
 	"ARMOR",
 	"SHIELD",
@@ -420,6 +424,7 @@ const char *grant_bits[] = {
 	"oset",
 	"playerdelete",
 	"unquest",
+	"automessage",
 	"\n"
 };
 
@@ -494,6 +499,7 @@ const char *preference_bits[] = {
 	"AUTODISMOUNT",
 	"!EMPIRE",
 	"CLEARMETERS",
+	"!TUTORIALS",
 	"\n"
 };
 
@@ -558,6 +564,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
+	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -1316,6 +1323,7 @@ const char *craft_flags[] = {
 	"VEHICLE",
 	"SHIPYARD",
 	"BLD-UPGRADED",
+	"LEARNED",
 	"\n"
 };
 
@@ -1338,6 +1346,7 @@ const char *craft_flag_for_info[] = {
 	"",	// vehicle
 	"requires shipyard",
 	"requires upgrade",
+	"",	// learned
 	"\n"
 };
 
@@ -1554,6 +1563,28 @@ struct faction_reputation_type reputation_levels[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GENERIC CONSTANTS ///////////////////////////////////////////////////////
+
+// GENERIC_x: generic types
+const char *generic_types[] = {
+	"UNKNOWN",
+	"LIQUID",
+	"ACTION",
+	"COOLDOWN",
+	"AFFECT",
+	"CURRENCY",
+	"\n"
+};
+
+
+// GEN_x: generic flags
+const char *generic_flags[] = {
+	// none yet defined
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOB CONSTANTS ///////////////////////////////////////////////////////////
 
 /* MOB_x */
@@ -1726,12 +1757,12 @@ const char *item_types[] = {
 	"CONTAINER",
 	"DRINKCON",
 	"FOOD",
-	"*",
+	"RECIPE",
 	"PORTAL",
 	"*BOARD",
 	"CORPSE",
 	"COINS",
-	"*",
+	"CURRENCY",
 	"*",
 	"*MAIL",
 	"WEALTH",
@@ -1739,8 +1770,8 @@ const char *item_types[] = {
 	"*SHIP",
 	"*",
 	"*",
-	"MISSILE_WEAPON",
-	"ARROW",
+	"MISSILE-WEAPON",
+	"AMMO",
 	"INSTRUMENT",
 	"SHIELD",
 	"PACK",
@@ -1752,7 +1783,7 @@ const char *item_types[] = {
 };
 
 
-// ITEM_WEAR_ (wear bitvector) -- also see wear_significance
+// ITEM_WEAR_x (wear bitvector) -- also see wear_significance
 const char *wear_bits[] = {
 	"TAKE",
 	"FINGER",
@@ -1965,94 +1996,6 @@ const char *container_bits[] = {
 };
 
 
-/* LIQ_x */
-const char *drinks[] = {
-	"water",
-	"lager",
-	"wheat beer",
-	"ale",
-	"cider",
-	"milk",
-	"blood",
-	"honey",
-	"bean soup",
-	"coffee",
-	"green tea",
-	"red wine",
-	"white wine",
-	"grog",
-	"mead",
-	"stout",
-	"\n"
-};
-
-
-/* LIQ_x one-word alias for each drink */
-const char *drinknames[] = {
-	"water",
-	"lager",
-	"wheatbeer",
-	"ale",
-	"cider",
-	"milk",
-	"blood",
-	"honey",
-	"soup",
-	"coffee",
-	"tea",
-	"wine",
-	"wine",
-	"grog",
-	"mead",
-	"stout",
-	"\n"
-};
-
-
-// LIQ_x: this table is amount per "drink", in mud hours of thirst cured, etc
-// effect on DRUNK, FULL, THIRST
-int drink_aff[][3] = {
-	{ 0, 0, 3 },	/* water	*/
-	{ 2, 1, 1 },	/* larger	*/
-	{ 3, 1, 1 },	/* wheatbeer	*/
-	{ 2, 1, 1 },	/* ale		*/
-	{ 3, 1, 1 },	/* cider	*/
-	{ 0, 2, 2 },	/* milk		*/
-	{ 0, 0, -1 },	/* blood	*/
-	{ 0, 0, 1 },	/* honey	*/
-	{ 0, 4, 0 },	// bean soup
-	{ 0, 0, 1 },	// coffee
-	{ 0, 0, 1 },	// green tea
-	{ 4, 0, 1 },	// red wine
-	{ 3, 0, 1 },	// white wine
-	{ 2, 1, 1 },	// grog
-	{ 1, 1, 1 },	// mead
-	{ 3, 2, 1 },	// stout
-};
-
-
-// LIQ_x: color of the various drinks
-const char *color_liquid[] = {
-	"clear",
-	"brown",
-	"golden white",
-	"golden",
-	"golden",
-	"white",
-	"red",
-	"golden",
-	"soupy",
-	"brown",
-	"green",
-	"red",
-	"clear",
-	"amber",
-	"golden",
-	"black",
-	"\n"
-};
-
-
 // CMP_x: component types
 const char *component_types[] = {
 	"none",
@@ -2132,74 +2075,8 @@ const char *resource_types[] = {
 	"coins",
 	"pool",
 	"action",
+	"currency",
 	"\n"
-};
-
-
-// NOTE: these match up with 'res_action_messages', and you must add entries to both
-const char *res_action_type[] = {
-	"dig",
-	"clear terrain",
-	"tidy up",
-	"repair",	// 3: used in vnums.h
-	"scout area",
-	"block water",
-	"engrave",
-	"magic words",
-	"organize",
-	"\n"
-};
-
-
-// these match up with 'res_action_type'; all message pairs are to-char, to-room; vehicles use $V
-const char *res_action_messages[][NUM_APPLY_RES_TYPES][2] = {
-	#define RES_ACTION_MESSAGE(build_to_char, build_to_room, veh_to_char, veh_to_room, repair_to_char, repair_to_room)  {{"",""},{build_to_char,build_to_room},{veh_to_char,veh_to_room},{repair_to_char,repair_to_room}}
-	
-	RES_ACTION_MESSAGE(	// dig
-		"You dig at the ground.", "$n digs at the ground.",	// building/maintaining
-		"You dig underneath $V.", "$n digs underneath $V.",	// craft vehicle
-		"You dig underneath $V.", "$n digs underneath $V."	// repair vehicle
-	),
-	RES_ACTION_MESSAGE(	// clear terrain
-		"You clear the area of debris.", "$n clears the area of debris.",
-		"You clear the area around $V.", "$n clears the area around $V.",
-		"You clear the area around $V.", "$n clears the area around $V."
-	),
-	RES_ACTION_MESSAGE(	// tidy up
-		"You tidy up the area.", "$n tidies up the area.",
-		"You tidy up around $V.", "$n tidies up around $V.",
-		"You tidy up $V.", "$n tidies up $V."
-	),
-	RES_ACTION_MESSAGE(	// repair
-		"You repair the building.", "$n repairs the building.",
-		"You repair $V.", "$n repairs $V.",
-		"You repair $V.", "$n repairs $V."
-	),
-	RES_ACTION_MESSAGE(	// scout area
-		"You scout the area.", "$n scouts the area.",
-		"You scout the area.", "$n scouts the area.",
-		"You scout the area around $V.", "$n scouts the area around $V."
-	),
-	RES_ACTION_MESSAGE(	// block water
-		"You block off the water.", "$n blocks off the water.",
-		"You block off the water around $V.", "$n blocks off the water around $V.",
-		"You block off the water around $V.", "$n blocks off the water around $V."
-	),
-	RES_ACTION_MESSAGE(	// engrave
-		"You engrave the building.", "$n engraves the building.",
-		"You engrave $V.", "$n engraves $V.",
-		"You engrave $V.", "$n engraves $V."
-	),
-	RES_ACTION_MESSAGE(	// magic words
-		"You speak some magic words.", "$n speaks some magic words.",
-		"You speak some magic words.", "$n speaks some magic words.",
-		"You speak some magic words.", "$n speaks some magic words."
-	),
-	RES_ACTION_MESSAGE(	// organize
-		"You organize the building.", "$n organizes the building.",
-		"You organize $V.", "$n organizes $V.",
-		"You organize $V.", "$n organizes $V."
-	),
 };
 
 
@@ -2234,53 +2111,46 @@ const char *obj_custom_types[] = {
 // Weapon attack texts -- TYPE_x
 struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	// * lower numbers are better for speeds (seconds between attacks)
-	// name, singular, plural, { fast spd, normal spd, slow spd }, WEAPON_, DAM_, disarmable
-	{ "RESERVED", "hit", "hits", { 1.8, 2.0, 2.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "slash", "slash", "slashes", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "slice", "slice", "slices", { 3.0, 3.2, 3.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "jab", "jab", "jabs", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "stab", "stab", "stabs", { 2.0, 2.2, 2.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "pound", "pound", "pounds", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "hammer", "hammer", "hammers", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "whip", "whip", "whips", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "pick", "jab", "jabs", { 3.4, 3.6, 3.8 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "bite", "bite", "bites", { 2.2, 2.4, 2.6 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "claw", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "kick", "kick", "kicks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "fire", "burn", "burns", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_FIRE, TRUE },
-	{ "vampire claws", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "crush", "crush", "crushes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "hit", "hit", "hits", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "magic fire", "blast", "blasts", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "lightning staff", "zap", "zaps", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "burn staff", "burn", "burns", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "agony staff", "agonize", "agonizes", { 3.3, 3.6, 3.9 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic frost", "chill", "chills", { 4.1, 4.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic shock", "shock", "shocks", { 2.6, 2.8, 3.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic light", "flash", "flashes", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "sting", "sting", "stings", { 3.6, 3.8, 4.0 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "swipe", "swipe", "swipes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "tail swipe", "swipe", "swipes", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "peck", "peck", "pecks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "mana blast", "blast", "blasts", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE }
+	// name, first-pers, 2nd-pers, noun, { fast spd, normal spd, slow spd }, WEAPON_, DAM_, disarmable
+	{ "RESERVED", "hit", "hits", "hit", { 1.8, 2.0, 2.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "slash", "slash", "slashes", "slash", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "slice", "slice", "slices", "swing", { 3.0, 3.2, 3.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "jab", "jab", "jabs", "jab", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "stab", "stab", "stabs", "stab", { 2.0, 2.2, 2.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "pound", "pound", "pounds", "swing", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "hammer", "hammer", "hammers", "hammer", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "whip", "whip", "whips", "whip", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "pick", "jab", "jabs", "pick", { 3.4, 3.6, 3.8 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "bite", "bite", "bites", "bite", { 2.2, 2.4, 2.6 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "claw", "claw", "claws", "claw", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "kick", "kick", "kicks", "kick", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "fire", "burn", "burns", "fire", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_FIRE, TRUE },
+	{ "vampire claws", "claw", "claws", "claw", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "crush", "crush", "crushes", "blow", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "hit", "hit", "hits", "hit", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "magic fire", "blast", "blasts", "blast", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "lightning staff", "zap", "zaps", "staff", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "burn staff", "burn", "burns", "staff", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "agony staff", "agonize", "agonizes", "staff", { 3.3, 3.6, 3.9 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic frost", "chill", "chills", "frost", { 4.1, 4.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic shock", "shock", "shocks", "shock", { 2.6, 2.8, 3.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic light", "flash", "flashes", "light", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "sting", "sting", "stings", "sting", { 3.6, 3.8, 4.0 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "swipe", "swipe", "swipes", "swipe", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "tail swipe", "swipe", "swipes", "tail swipe", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "peck", "peck", "pecks", "peck", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "gore", "gore", "gores", "gore", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "mana blast", "blast", "blasts", "blash", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
+	{ "bow", "shoot", "shoots", "shot", { 2.2, 2.6, 3.2 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "crossbow", "shoot", "shoots", "shot", { 3.7, 3.9, 4.3 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "pistol", "shoot", "shoots", "shot", { 2.0, 2.4, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "musket", "shoot", "shoots", "shot", { 3.6, 3.8, 4.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE }
 };
 
 
 // basic speed is the theoretical average weapon speed without wits/haste,
 // and is used to apply bonus-physical/magical evenly by adjusting for speed
 const double basic_speed = 4.0;	// seconds between attacks
-
-
-// missile speeds
-const double missile_weapon_speed[] = {
-	3.0,
-	2.4,
-	2.0,
-	
-	// terminate the list
-	-1
-};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2311,6 +2181,8 @@ const char *olc_flag_bits[] = {
 	"!QUESTS",
 	"!SOCIALS",
 	"!FACTIONS",
+	"!GENERICS",
+	"!SHOPS",
 	"\n"
 };
 
@@ -2339,6 +2211,8 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"quest",
 	"social",
 	"faction",
+	"generic",
+	"shop",
 	"\n"
 };
 
@@ -2355,6 +2229,7 @@ const char *quest_flags[] = {
 	"DAILY",
 	"EMPIRE-ONLY",
 	"NO-GUESTS",
+	"TUTORIAL",
 	"\n"
 };
 
@@ -2381,6 +2256,7 @@ const char *quest_reward_types[] = {
 	"SKILL-LEVELS",	// 5
 	"QUEST-CHAIN",
 	"REPUTATION",
+	"CURRENCY",
 	"\n",
 };
 
@@ -2794,7 +2670,7 @@ const char *room_aff_bits[] = {
 const char *room_extra_types[] = {
 	"prospect empire",
 	"mine amount",
-		"unused",
+	"fire remaining",
 	"seed time",
 	"tavern type",
 	"tavern brewing time",
@@ -2810,6 +2686,7 @@ const char *room_extra_types[] = {
 	"redesignate time",
 	"ceded",
 	"mine global vnum",
+	"trench fill time",
 	"\n"
 };
 
@@ -2932,255 +2809,21 @@ const char *weather_types[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// SHOP CONSTANTS //////////////////////////////////////////////////////////
+
+// SHOP_x: shop flags
+const char *shop_flags[] = {
+	"IN-DEVELOPMENT",	// 0
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// SKILL CONSTANTS /////////////////////////////////////////////////////////
 
 // ABILF_x: ability flags
 const char *ability_flags[] = {
 	"*",
-	"\n"
-};
-
-
-/* ATYPE_x */
-const char *affect_types[] = {
-	"!RESERVED!",	// 0
-	"fly",
-	"entrancement",
-	"darkness",
-	"poisoned",
-	"boost",	// 5
-	"cut deep",
-	"sap",
-	"mana shield",
-	"foresight",
-	"earthmeld",	// 10
-	"mummify",
-	"earth armor",
-	"bestow vigor",
-	"weakness",
-	"colorburst",	// 15
-	"heartstop",
-	"phoenix rite",
-	"disarm",
-	"shocked",
-	"skybrand",  // 20
-	"counterspell",
-	"hasten",
-	"rejuvenate",
-	"entangle",
-	"radiance",	// 25
-	"inspire",
-	"jabbed",
-	"blind",
-	"healing potion",
-	"nature potion",	// 30
-	"vigor",
-	"enervate",
-	"enervate",
-	"siphon",
-	"slow",	// 35
-	"sunshock",
-	"tripping",
-	"siphoned",
-	"affect",	// 39 -- DG Scripts affect
-	"claws",	// 40
-	"deathshroud",
-	"soulmask",
-	"majesty",
-	"alacrity",
-	"nightsight", // 45
-	"death penalty",
-	"bash",
-	"terrify",
-	"stunning blow",
-	"stun immunity",	// 50
-	"war delay",
-	"unburdened",
-	"shadow kick",
-	"stagger jab",
-	"shadowcage",	// 55
-	"howl",
-	"crucial jab",
-	"diversion",
-	"shadow jab",
-	"confer",	// 60
-	"conferred",
-	"morph",
-	"whisperstride",
-	"well-fed",
-	"ablate",	// 65
-	"acidblast",
-	"astralclaw",
-	"chronoblast",
-	"dispirit",
-	"erode",	// 70
-	"scour",
-	"shadowlash",	// blind
-	"shadowlash",	// dot
-	"soulchain",
-	"thornlash",	// 75
-	"arrow to the knee",
-	"hostile delay",
-	"nature burn",
-	"\n"
-	};
-
-
-// ATYPE_x -- empty string will send no message at all
-const char *affect_wear_off_msgs[] = {
-	"!RESERVED!",	// 0
-	"You land quickly as your magical flight wears off.",
-	"You no longer feel entranced.",
-	"The blanket of darkness dissipates.",
-	"Poison fades from your system.",
-	"You suddenly feel weaker.",	// 5
-	"You're no longer bleeding from your deep cuts.",
-	"You are no longer stunned.",
-	"Your mana shield fades.",
-	"Your foresight ends.",
-	"You rise from the ground!",	// 10
-	"Your flesh returns to normal.",
-	"Your plating of earth armor fades.",
-	"Your heightened Fortitude fades.",
-	"Your weakness fades.",
-	"You are no longer distracted by colorburst.",	// 15
-	"Your vitae is no longer hindered.",
-	"Your phoenix rite expires.",
-	"You recover and are no longer disarmed.",
-	"The lightning shock wears off.",
-	"The skybrand fades.",  // 20
-	"Your counterspell expires.",
-	"Your haste fades.",
-	"The rejuvenation effect ends.",
-	"You are no longer entangled in vines.",
-	"Your radiant aura fades.",	// 25
-	"Your inspiration fades.",
-	"Your jab wound stops bleeding.",
-	"You are no longer blinded by sand.",
-	"Your healing potion effect ends.",
-	"Your nature potion effect ends.",	// 30
-	"Your vigor penalty ends.",
-	"Your stamina begins to return.",
-	"You are no longer gaining stamina from enervate.",
-	"You are no longer receiving mana from the siphon.",
-	"You no longer feel lethargic.",	// 35
-	"You are no longer blinded by the light.",
-	"Stuff isn't doing that thing anymore.",
-	"Your mana is no longer siphoned.",
-	"",	// 39 -- DG Scripts affect
-	"Your claws retract.",	// 40
-	"Your deathshroud fades.",
-	"Your soulmask fades.",
-	"You are no longer so majestic.",
-	"Your alacrity fades.",
-	"Your nightsight fades.",	// 45
-	"Your death penalty ends.",
-	"You are no longer stunned by that bash.",
-	"You are no longer terrified.",
-	"You are no longer dazed by that stunning blow.",
-	"Your stun immunity expires.",	// 50
-	"Your war delay ends and you are free to act.",
-	"You feel the weight of the world return.",
-	"You are no longer weakened by the shadow kick.",
-	"You are no longer weakened by the stagger jab.",
-	"The shadowcage fades and your focus returns.",	// 55
-	"The terrifying howl fades from your mind.",
-	"You are no longer weakened by the crucial jab.",
-	"You are no longer distracted by the diversion.",
-	"You are no longer weakened by the shadow jab.",
-	"The power you were conferred has faded.",	// 60
-	"Your conferred strength returns.",
-	"",	// morph stats -- no wear-off message
-	"Your whisperstride fades.",
-	"You no longer feel well-fed.",
-	"The ablation fades.",	// 65
-	"The acid blast wears off.",
-	"",	// astral claw
-	"Time speeds back up to normal.",
-	"Your wits return.",
-	"",	// 70, erode
-	"",	// scour
-	"Your vision returns.",
-	"",	// shadowlash-dot
-	"Your soul is unchained.",
-	"",	// 75, thornlast
-	"Your knee feels better.",
-	"Your hostile login delay ends and you are free to act.",
-	"Your nature burn eases.",
-	"\n"
-};
-
-
-// COOLDOWN_x
-const char *cooldown_types[] = {
-	"!RESERVED!",	// 0
-	"respawn",
-	"left empire",
-	"hostile flag",
-	"pvp flag",
-	"pvp quit timer",	// 5
-	"milk",
-	"shear",
-	"disarm",
-	"outrage",
-	"rescue",	// 10
-	"kick",
-	"bash",
-	"colorburst",
-	"enervate",
-	"slow",	// 15
-	"siphon",
-	"mirrorimage",
-	"sunshock",
-	"teleport home",
-	"city teleportation",	// 20
-	"rejuvenate",
-	"cleanse",
-	"lightningbolt",
-	"skybrand",
-	"entangle",	// 25
-	"heartstop",
-	"summon humans",
-	"summon animals",
-	"summon guards",
-	"summon bodyguard",	// 30
-	"summon thug",
-	"summon swift",
-	"reward",
-	"search",
-	"terrify",	// 35
-	"darkness",
-	"shadowstep",
-	"backstab",
-	"jab",
-	"blind",	// 40
-	"sap",
-	"prick",
-	"weaken",
-	"moonrise",
-	"alternate",	// 45
-	"dispel",
-	"bloodsweat",
-	"earthmeld",
-	"shadowcage",
-	"howl",	// 50
-	"diversion",
-	"rogue flag",
-	"portal sickness",
-	"whisperstride",
-	"ablate",	// 55
-	"acidblast",
-	"arclight",
-	"astralclaw",
-	"chronoblast",
-	"deathtouch",	// 60
-	"dispirit",
-	"erode",
-	"scour",
-	"shadowlash",
-	"soulchain",	// 65
-	"starstrike",
-	"thornlash",	// 67
 	"\n"
 };
 
@@ -3264,7 +2907,8 @@ const char *trig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3294,6 +2938,7 @@ const bitvector_t mtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
@@ -3322,7 +2967,8 @@ const char *otrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3330,7 +2976,7 @@ const char *otrig_types[] = {
 const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// global
 	TRIG_ARG_PERCENT,	// random
-	TRIG_ARG_OBJ_WHERE,	// command
+	TRIG_ARG_COMMAND | TRIG_ARG_OBJ_WHERE,	// command
 	NOBITS,	//
 	NOBITS,	//
 	NOBITS,	// timer
@@ -3352,6 +2998,7 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	TRIG_ARG_OBJ_WHERE,	// buy
 };
 
 
@@ -3380,7 +3027,8 @@ const char *vtrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3411,6 +3059,7 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
@@ -3439,7 +3088,8 @@ const char *wtrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3469,6 +3119,7 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
@@ -3511,6 +3162,15 @@ const bitvector_t *trig_argument_type_list[] = {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISC CONSTANTS //////////////////////////////////////////////////////////
+
+// AUTOMSG_x: automessage types
+const char *automessage_types[] = {
+	"one-time",
+	"login",
+	"repeating",
+	"\n"
+};
+
 
 // for command-interpreting
 const char *fill_words[] = {
@@ -3673,6 +3333,7 @@ const char *requirement_types[] = {
 	"REP-UNDER",
 	"WEARING",
 	"WEARING-OR-HAS",
+	"GET-CURRENCY",	// 20
 	"\n",
 };
 
@@ -3699,6 +3360,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_REPUTATION,	// faction-under
 	REQ_AMT_NONE,	// wearing
 	REQ_AMT_NONE,	// wearing-or-has
+	REQ_AMT_NUMBER,	// currency
 };
 
 
@@ -3724,6 +3386,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// faction-under
 	FALSE,	// wearing
 	FALSE,	// wearing-or-has
+	FALSE,	// currency
 };
 
 

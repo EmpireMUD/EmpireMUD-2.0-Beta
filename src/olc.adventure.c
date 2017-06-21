@@ -175,8 +175,12 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 		olc_audit(ch, OLC_AUGMENT, buf);
 		msg_to_char(ch, "Factions:\r\n");
 		olc_audit(ch, OLC_FACTION, buf);
+		msg_to_char(ch, "Generics:\r\n");
+		olc_audit(ch, OLC_GENERIC, buf);
 		msg_to_char(ch, "Globals:\r\n");
 		olc_audit(ch, OLC_GLOBAL, buf);
+		msg_to_char(ch, "Shops:\r\n");
+		olc_audit(ch, OLC_SHOP, buf);
 		msg_to_char(ch, "Vehicles:\r\n");
 		olc_audit(ch, OLC_VEHICLE, buf);
 		msg_to_char(ch, "Morphs:\r\n");

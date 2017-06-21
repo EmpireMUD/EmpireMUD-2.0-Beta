@@ -258,6 +258,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	faction_data *iter, *next_iter, *find;
 	quest_data *qiter, *next_qiter;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	char_data *mob, *next_mob;
 	int size, found;
 	bool any;
@@ -302,6 +303,18 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
+	
+	// check shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		
+		if (SHOP_ALLEGIANCE(shop) == fct) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -962,6 +975,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	char_data *mob, *next_mob, *chiter;
 	quest_data *qiter, *next_qiter;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	bool found;
 	
@@ -1016,6 +1030,15 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// remove from shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (SHOP_ALLEGIANCE(shop) == fct) {
+			SHOP_ALLEGIANCE(shop) = NULL;
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// remove from socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		// REQ_x: requirements
@@ -1055,6 +1078,13 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A faction used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(desc)) {
+			if (SHOP_ALLEGIANCE(GET_OLC_SHOP(desc)) == fct) {
+				SHOP_ALLEGIANCE(GET_OLC_SHOP(desc)) = NULL;
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_char(desc->character, "The allegiance faction for the shop you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {

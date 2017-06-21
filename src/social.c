@@ -181,7 +181,6 @@ char *list_one_social(social_data *soc, bool detail) {
 		}
 		
 		snprintf(output, sizeof(output), "[%5d] %s (%s)%s%s", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc), buf, (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT) ? " IN-DEV" : ""));
-		// TODO could show in-dev flag
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc));

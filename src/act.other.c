@@ -147,7 +147,7 @@ void adventure_unsummon(char_data *ch) {
 	
 	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
-	if (room && map && map == get_map_location_for(room)) {
+	if (room && map && GET_ROOM_VNUM(map) == (GET_MAP_LOC(room) ? GET_MAP_LOC(room)->vnum : NOTHING)) {
 		char_to_room(ch, room);
 	}
 	else {
@@ -673,14 +673,15 @@ OFFER_VALIDATE(oval_summon) {
 }
 
 OFFER_FINISH(ofin_summon) {
-	room_data *loc = real_room(offer->location), *map;
+	room_data *loc = real_room(offer->location);
 	int type = offer->data;
+	struct map_data *map;
 	
 	if (type == SUMMON_ADVENTURE) {
 		SET_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
-		map = get_map_location_for(IN_ROOM(ch));
-		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? GET_ROOM_VNUM(map) : NOWHERE;
+		map = GET_MAP_LOC(IN_ROOM(ch));
+		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? map->vnum : NOWHERE;
 	}
 	else {
 		// if they accept a normal summon out of an adventure, cancel their group summon
@@ -1366,6 +1367,62 @@ ACMD(do_alternate) {
 }
 
 
+ACMD(do_beckon) {
+	extern bool is_ignoring(char_data *ch, char_data *victim);
+	
+	char arg[MAX_INPUT_LENGTH];
+	char_data *vict;
+	bool any;
+	
+	one_argument(argument, arg);
+	if (!*arg || !str_cmp(arg, "all")) {
+		any = FALSE;
+		// beckon all
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+			if (vict == ch || is_ignoring(vict, ch) || vict->master) {
+				continue;	// nopes
+			}
+			
+			if (!IS_NPC(vict)) {
+				GET_BECKONED_BY(vict) = GET_IDNUM(REAL_CHAR(ch));	// real: may be switched imm
+			}
+			any = TRUE;
+		}
+		
+		if (any) {
+			msg_to_char(ch, "You beckon for everyone to follow you.\r\n");
+			act("$n beckons for everyone to follow $m.", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		else {
+			msg_to_char(ch, "There is nobody here to beckon.\r\n");
+		}
+	}
+	else if (!(vict = get_char_room_vis(ch, arg))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (!IS_NPC(vict) && GET_BECKONED_BY(vict) == GET_IDNUM(REAL_CHAR(ch))) {
+		act("You already beckoned $M.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (!IS_NPC(vict) && is_ignoring(vict, ch)) {
+		act("You can't beckon $M.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (vict->master == ch) {
+		act("$E is already following you.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (vict->master) {
+		act("$E is already following someone else.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else {
+		if (!IS_NPC(vict)) {
+			GET_BECKONED_BY(vict) = GET_IDNUM(REAL_CHAR(ch));	// real: may be switched imm
+		}
+		act("You beckon for $N to follow you.", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n beckons for you to follow $m.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n beckons for $N to follow $m.", FALSE, ch, NULL, vict, TO_NOTVICT);
+	}
+}
+
+
 ACMD(do_changepass) {
 	char oldpass[MAX_INPUT_LENGTH], new1[MAX_INPUT_LENGTH], new2[MAX_INPUT_LENGTH];
 	// changepass OLD NEW NEW
@@ -1503,6 +1560,7 @@ ACMD(do_dismiss) {
 
 ACMD(do_douse) {
 	void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
+	void stop_burning(room_data *room);
 	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	obj_data *obj = NULL, *iter;
@@ -1510,8 +1568,6 @@ ACMD(do_douse) {
 	vehicle_data *veh;
 	byte amount;
 	
-	int fire_extinguish_value = config_get_int("fire_extinguish_value");
-
 	// this loop finds a water container and sets obj
 	LL_FOREACH2(ch->carrying, iter, next_content) {
 		if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
@@ -1540,19 +1596,19 @@ ACMD(do_douse) {
 	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_ON_FIRE)) {
 		do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 	}
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !BUILDING_BURNING(room))
+	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !IS_BURNING(room))
 		msg_to_char(ch, "There's no fire here!\r\n");
 	else {
 		amount = GET_DRINK_CONTAINER_CONTENTS(obj);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-
-		COMPLEX_DATA(room)->burning = MIN(fire_extinguish_value, BUILDING_BURNING(room) + amount);
+		
+		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
 		act("You throw some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n throws some water from $p onto the flames!", FALSE, ch, obj, 0, TO_ROOM);
 
-		if (BUILDING_BURNING(room) >= fire_extinguish_value) {
+		if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
 			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
-			COMPLEX_DATA(room)->burning = 0;
+			stop_burning(room);
 		}
 	}
 }
@@ -1785,6 +1841,10 @@ ACMD(do_group) {
 		}
 		
 		GET_GROUP_INVITE(vict) = GET_IDNUM(ch);
+		if (!vict->master) {
+			// auto-beckon
+			GET_BECKONED_BY(vict) = GET_IDNUM(REAL_CHAR(ch));
+		}
 	}
 	else if (is_abbrev(buf, "join")) {
 		if (!(vict = is_playing(GET_GROUP_INVITE(ch)))) {

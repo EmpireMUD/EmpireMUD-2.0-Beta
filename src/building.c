@@ -42,7 +42,8 @@ extern bool can_claim(char_data *ch);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 void free_complex_data(struct complex_room_data *data);
-extern room_data *create_room();
+extern room_data *create_room(room_data *home);
+extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 void scale_item_to_level(obj_data *obj, int level);
 void stop_room_action(room_data *room, int action, int chore);
 
@@ -169,7 +170,7 @@ void complete_building(room_data *room) {
 	
 	herd_animals_out(room);
 	
-	// lastly
+	// final setup
 	if ((emp = ROOM_OWNER(room))) {
 		adjust_building_tech(emp, room, TRUE);
 		
@@ -281,9 +282,8 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 
 	// now the length of the tunnel
 	for (iter = 0; iter < length; ++iter) {
-		new_room = create_room();
+		new_room = create_room((iter <= length/2) ? entrance : exit);
 		attach_building_to_room(building_proto(RTYPE_TUNNEL), new_room, TRUE);
-		COMPLEX_DATA(new_room)->home_room = (iter <= length/2) ? entrance : exit;
 		GET_BUILDING_RESOURCES(new_room) = copy_resource_list(resources);
 		SET_BIT(ROOM_BASE_FLAGS(new_room), ROOM_AFF_INCOMPLETE);
 		SET_BIT(ROOM_AFF_FLAGS(new_room), ROOM_AFF_INCOMPLETE);
@@ -375,6 +375,7 @@ void disassociate_building(room_data *room) {
 	}
 	
 	// some extra data safely clears now
+	remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
 	remove_room_extra_data(room, ROOM_EXTRA_RUINS_ICON);
 	remove_room_extra_data(room, ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS);
@@ -384,7 +385,12 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
-
+	
+	// some event types must be canceled
+	cancel_stored_event_room(room, SEV_BURN_DOWN);
+	cancel_stored_event_room(room, SEV_TAVERN);
+	cancel_stored_event_room(room, SEV_RESET_TRIGGER);
+	
 	// disassociate inside rooms
 	for (iter = interior_room_list; iter; iter = next_iter) {
 		next_iter = iter->next_interior;
@@ -499,6 +505,31 @@ craft_data *find_building_list_entry(room_data *room, byte type) {
 	}
 	
 	return NULL;
+}
+
+/**
+* Finds a room that the player could designate here.
+*
+* @param char *name The room name to search for.
+* @param bitvector_t flags The DES_ designate flags that must match.
+* @return bld_data *The matching room (building) entry or NULL if no match.
+*/
+bld_data *find_designate_room_by_name(char *name, bitvector_t flags) {
+	bld_data *iter, *next_iter, *partial = NULL;
+	
+	HASH_ITER(hh, building_table, iter, next_iter) {
+		if (flags && !IS_SET(GET_BLD_DESIGNATE_FLAGS(iter), flags)) {
+			continue;	// not matching
+		}
+		if (!str_cmp(name, GET_BLD_NAME(iter))) {
+			return iter;	// exact match
+		}
+		else if (!partial && is_abbrev(name, GET_BLD_NAME(iter))) {
+			partial = iter;
+		}
+	}
+	
+	return partial;	// if any
 }
 
 
@@ -795,7 +826,6 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 * @param room_data *room The location being dismantled.
 */
 void process_dismantling(char_data *ch, room_data *room) {
-	extern const char *drinks[];
 	extern const char *pool_types[];
 	
 	struct resource_data *res, *find_res, *next_res, *copy;
@@ -819,7 +849,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 	if (res) {
 		// RES_x: messaging
 		switch (res->type) {
-			// RES_COMPONENT and RES_ACTION aren't possible here
+			// RES_COMPONENT, RES_ACTION, and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
 				snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
@@ -828,9 +858,9 @@ void process_dismantling(char_data *ch, room_data *room) {
 				break;
 			}
 			case RES_LIQUID: {
-				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from the structure.", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from the structure.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				snprintf(buf, sizeof(buf), "$n retrieves some %s from the structure.", drinks[res->vnum]);
+				snprintf(buf, sizeof(buf), "$n retrieves some %s from the structure.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
@@ -845,6 +875,13 @@ void process_dismantling(char_data *ch, room_data *room) {
 				snprintf(buf, sizeof(buf), "You regain %d %s point%s from the structure.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 				snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", pool_types[res->vnum]);
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_CURRENCY: {
+				snprintf(buf, sizeof(buf), "You retrieve %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
@@ -1121,7 +1158,7 @@ ACMD(do_build) {
 	bool junk, wait;
 	
 	// simple rules for ch building a given craft
-	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))) && (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying)))
+	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && (!IS_SET(GET_CRAFT_FLAGS(ttype), CRAFT_LEARNED) || has_learned_craft(ch, GET_CRAFT_VNUM(ttype))) && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))) && (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying)))
 	
 	skip_spaces(&argument);
 	
@@ -1190,7 +1227,7 @@ ACMD(do_build) {
 			if (GET_ACTION(ch) != ACT_NONE) {
 				msg_to_char(ch, "You're kinda busy right now.\r\n");
 			}
-			else if (BUILDING_BURNING(IN_ROOM(ch))) {
+			else if (IS_BURNING(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't work on a burning building!\r\n");
 			}
 			else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -1282,7 +1319,7 @@ ACMD(do_build) {
 	else if (GET_CRAFT_BUILD_TYPE(type) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(type))) {
 		msg_to_char(ch, "That build recipe is not implemented.\r\n");
 	}
-	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD)) {
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
 		return;	// the trigger should send its own message if it prevented this
 	}
 	else {
@@ -1418,7 +1455,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 	
-	if (BUILDING_BURNING(IN_ROOM(ch))) {
+	if (IS_BURNING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't dismantle a burning building!\r\n");
 		return;
 	}
@@ -1656,7 +1693,10 @@ ACMD(do_designate) {
 	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!*argument || !(type = get_building_by_name(argument, TRUE))) {
+	else if (!*argument || !(type = find_designate_room_by_name(argument, valid_des_flags))) {
+		if (*argument) {	// if any
+			msg_to_char(ch, "You can't designate a '%s' here.\r\n", argument);
+		}
 		msg_to_char(ch, "Usage: %s <room>\r\n", (subcmd == SCMD_REDESIGNATE) ? "redesignate" : "designate <direction>");
 
 		if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && (subcmd == SCMD_DESIGNATE) && GET_INSIDE_ROOMS(home) >= maxrooms) {
@@ -1739,11 +1779,10 @@ ACMD(do_designate) {
 		}
 		else {
 			// create the new room
-			new = create_room();
+			new = create_room(home);
 			create_exit(IN_ROOM(ch), new, dir, TRUE);
 			attach_building_to_room(type, new, TRUE);
 
-			COMPLEX_DATA(new)->home_room = home;
 			COMPLEX_DATA(home)->inside_rooms++;
 			
 			if (veh) {
@@ -1997,7 +2036,7 @@ ACMD(do_maintain) {
 	else if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "This building is being dismantled. Use 'dismantle' to continue instead.\r\n");
 	}
-	else if (BUILDING_BURNING(IN_ROOM(ch))) {
+	else if (IS_BURNING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {

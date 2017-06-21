@@ -36,7 +36,9 @@
 #define DB_BOOT_QST  22
 #define DB_BOOT_SOC  23
 #define DB_BOOT_FCT  24
-#define NUM_DB_BOOT_TYPES  25	// total
+#define DB_BOOT_GEN  25
+#define DB_BOOT_SHOP  26
+#define NUM_DB_BOOT_TYPES  27	// total
 
 
 // library sub-dirs
@@ -79,6 +81,7 @@
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
 #define FCT_PREFIX  LIB_WORLD"fct/"	// factions
+#define GEN_PREFIX  LIB_WORLD"gen/"	// generics
 #define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
 #define WLD_PREFIX  LIB_WORLD"wld/"	// room definitions
 #define MOB_PREFIX  LIB_WORLD"mob/"	// monster prototypes
@@ -88,6 +91,7 @@
 #define QST_PREFIX  LIB_WORLD"qst/"	// quests
 #define RMT_PREFIX  LIB_WORLD"rmt/"	// room templates
 #define SECTOR_PREFIX  LIB_WORLD"sect/"	// sect definitions
+#define SHOP_PREFIX  LIB_WORLD"shop/"	// shops
 #define SKILL_PREFIX  LIB_WORLD"skill/"	// player skills
 #define SOC_PREFIX  LIB_WORLD"soc/"	// socials
 #define TRG_PREFIX  LIB_WORLD"trg/"	// trigger files
@@ -110,6 +114,7 @@
 #define CROP_SUFFIX  ".crop"	// crop file suffix
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
 #define FCT_SUFFIX  ".fct"	// factions
+#define GEN_SUFFIX  ".gen"	// generics
 #define GLB_SUFFIX  ".glb"	// global suffix
 #define MOB_SUFFIX  ".mob"	// mob suffix for file saves
 #define MORPH_SUFFIX  ".morph"	// morph file suffix
@@ -117,6 +122,7 @@
 #define QST_SUFFIX  ".qst"	// quest file
 #define RMT_SUFFIX  ".rmt"	// room template suffix
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
+#define SHOP_SUFFIX  ".shop"	// shop file suffix
 #define SKILL_SUFFIX  ".skill"	// player skills
 #define SOC_SUFFIX  ".soc"	// social file suffix
 #define TRG_SUFFIX  ".trg"	// trigger file suffix
@@ -146,6 +152,7 @@
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 
 // etc files (non-user-modifiable libs)
+#define AUTOMESSAGE_FILE  LIB_ETC"automessages"	// the automessage system
 #define BAN_FILE  LIB_ETC"badsites"	// for the siteban system
 #define DAILY_QUEST_FILE  LIB_ETC"daily_quests"	// which quests are on/off
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
@@ -159,9 +166,8 @@
 #define POLITICAL_MAP_FILE  DATA_DIR"map-political.txt"	// for political map
 #define CITY_DATA_FILE  DATA_DIR"map-cities.txt"	// for cities on the website
 
-// world blocks: the world is split into chunks for saving and updating
+// world blocks: the world is split into chunks for saving
 #define WORLD_BLOCK_SIZE  (MAP_WIDTH * 5)	// number of rooms per .wld file
-#define NUM_WORLD_BLOCK_UPDATES  15	// world is divided into this many updates, and one fires per 30 seconds
 #define GET_WORLD_BLOCK(roomvnum)  (roomvnum == NOWHERE ? NOWHERE : (int)(roomvnum / WORLD_BLOCK_SIZE))
 
 // additional files
@@ -189,6 +195,7 @@
 struct db_boot_info_type {
 	char *prefix;
 	char *suffix;
+	bool allow_zero;
 };
 
 
@@ -336,6 +343,17 @@ extern faction_data *find_faction_by_name(char *name);
 extern faction_data *find_faction_by_vnum(any_vnum vnum);
 void free_faction(faction_data *fct);
 
+// generics
+extern generic_data *generic_table;
+extern generic_data *sorted_generics;
+void free_generic(generic_data *gen);
+extern generic_data *find_generic(any_vnum vnum, int type);
+extern generic_data *find_generic_by_name(int type, char *name, bool exact);
+extern generic_data *real_generic(any_vnum vnum);
+extern const char *get_generic_name_by_vnum(any_vnum vnum);
+extern const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);
+extern int get_generic_value_by_vnum(any_vnum vnum, int type, int pos);
+
 // globals
 extern struct global_data *globals_table;
 void free_global(struct global_data *glb);
@@ -415,6 +433,11 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect);
 extern sector_data *sector_proto(sector_vnum vnum);
 
+// shops
+extern shop_data *shop_table;
+void free_shop(shop_data *shop);
+extern shop_data *real_shop(any_vnum vnum);
+
 // skills
 extern skill_data *skill_table;
 extern skill_data *sorted_skills;
@@ -431,10 +454,23 @@ extern social_data *sorted_socials;
 extern social_data *social_proto(any_vnum vnum);
 void free_social(social_data *soc);
 
+// stored event libs
+void add_stored_event(struct stored_event **list, int type, struct event *event);
+void cancel_stored_event(struct stored_event **list, int type);
+void delete_stored_event(struct stored_event **list, int type);
+extern struct stored_event *find_stored_event(struct stored_event *list, int type);
+
+// stored event helpers
+#define add_stored_event_room(room, type, ev)  add_stored_event(&SHARED_DATA(room)->events, type, ev)
+#define cancel_stored_event_room(room, type)  cancel_stored_event(&SHARED_DATA(room)->events, type)
+#define delete_stored_event_room(room, type)  delete_stored_event(&SHARED_DATA(room)->events, type)
+#define find_stored_event_room(room, type)  find_stored_event(SHARED_DATA(room)->events, type)
+
 // triggers
 extern trig_data *trigger_table;
 extern trig_data *trigger_list;
 extern trig_data *random_triggers;
+extern trig_data *free_trigger_list;
 
 // vehicles
 extern vehicle_data *vehicle_list;
@@ -473,6 +509,7 @@ void free_exit_template(struct exit_template *ex);
 	char arg[MAX_STRING_LENGTH];
 #else
 	extern struct player_special_data dummy_mob;
+	extern struct shared_room_data ocean_shared_data;
 	extern char buf[MAX_STRING_LENGTH];
 	extern char buf1[MAX_STRING_LENGTH];
 	extern char buf2[MAX_STRING_LENGTH];

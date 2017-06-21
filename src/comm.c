@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -216,9 +217,9 @@ void msdp_update_room(char_data *ch) {
 	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
 	struct empire_city_data *city;
 	struct instance_data *inst;
+	struct island_info *island;
 	size_t buf_size, ex_size;
 	descriptor_data *desc;
-	int isle_id;
 	
 	// no work
 	if (!ch || !(desc = ch->desc)) {
@@ -232,8 +233,8 @@ void msdp_update_room(char_data *ch) {
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
 		snprintf(area_name, sizeof(area_name), "%s", city->name);
 	}
-	else if ((isle_id = GET_ISLAND_ID(IN_ROOM(ch))) != NO_ISLAND) {
-		snprintf(area_name, sizeof(area_name), "%s", get_island_name_for(isle_id, ch));
+	else if ((island = GET_ISLAND(IN_ROOM(ch)))) {
+		snprintf(area_name, sizeof(area_name), "%s", island->name);
 	}
 	else {
 		snprintf(area_name, sizeof(area_name), "Unknown");
@@ -293,8 +294,6 @@ static void msdp_update(void) {
 	extern int pick_season(room_data *room);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_total_score(empire_data *emp);
-	extern const char *affect_types[];
-	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
 	extern const char *seasons[];
@@ -336,7 +335,7 @@ static void msdp_update(void) {
 			*buf = '\0';
 			buf_size = 0;
 			for (aff = ch->affected; aff; aff = aff->next) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
 			}
 			MSDPSetTable(d, eMSDP_AFFECTS, buf);
 			
@@ -345,10 +344,10 @@ static void msdp_update(void) {
 			buf_size = 0;
 			for (dot = ch->over_time_effects; dot; dot = dot->next) {
 				// each dot has a sub-table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, affect_types[dot->type], (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
 				
 				
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%d", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%ld", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
@@ -363,7 +362,7 @@ static void msdp_update(void) {
 			buf_size = 0;
 			for (cool = ch->cooldowns; cool; cool = cool->next) {
 				if (cool->expire_time > time(0)) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, cooldown_types[cool->type], (char)MSDP_VAL, cool->expire_time - time(0));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(cool->type), (char)MSDP_VAL, cool->expire_time - time(0));
 				}
 			}
 			MSDPSetTable(d, eMSDP_COOLDOWNS, buf);
@@ -883,7 +882,9 @@ void heartbeat(int heart_pulse) {
 	void check_wars();
 	void chore_update();
 	void detect_evos_per_hour();
+	void display_automessages();
 	void extract_pending_chars();
+	void free_freeable_triggers();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
 	void output_map_to_file();
@@ -905,7 +906,6 @@ void heartbeat(int heart_pulse) {
 	void update_guard_towers();
 	void update_players_online_stats();
 	void update_trading_post();
-	void update_world();
 	void weather_and_time(int mode);
 
 	static int mins_since_crashsave = 0;
@@ -955,11 +955,8 @@ void heartbeat(int heart_pulse) {
 	}
 
 	if (HEARTBEAT(30)) {
-		update_world();
-		if (debug_log && HEARTBEAT(15)) { log("debug  9:\t%lld", microtime()); }
-		
 		update_players_online_stats();
-		if (debug_log && HEARTBEAT(15)) { log("debug  9.5:\t%lld", microtime()); }
+		if (debug_log && HEARTBEAT(15)) { log("debug  9:\t%lld", microtime()); }
 	}
 
 	if (HEARTBEAT(10)) {
@@ -1016,11 +1013,15 @@ void heartbeat(int heart_pulse) {
 
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		update_reboot();
+		if (debug_log && HEARTBEAT(15)) { log("debug 19a:\t%lld", microtime()); }
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
 			save_all_players();
-			if (debug_log && HEARTBEAT(15)) { log("debug 19:\t%lld", microtime()); }
+			if (debug_log && HEARTBEAT(15)) { log("debug 19b:\t%lld", microtime()); }
 		}
+		
+		display_automessages();
+		if (debug_log && HEARTBEAT(15)) { log("debug 19c:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
@@ -1080,6 +1081,7 @@ void heartbeat(int heart_pulse) {
 
 	/* Every pulse! Don't want them to stink the place up... */
 	extract_pending_chars();
+	free_freeable_triggers();
 
 	/* Turn this off */
 	gain_cond_messsage = FALSE;
@@ -1712,6 +1714,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_faction) {
 		free_faction(d->olc_faction);
 	}
+	if (d->olc_generic) {
+		free_generic(d->olc_generic);
+	}
 	if (d->olc_global) {
 		free_global(d->olc_global);
 	}
@@ -1723,6 +1728,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_sector) {
 		free_sector(d->olc_sector);
+	}
+	if (d->olc_shop) {
+		free_shop(d->olc_shop);
 	}
 	if (d->olc_social) {
 		free_social(d->olc_social);
@@ -1740,6 +1748,7 @@ void close_socket(descriptor_data *d) {
 
 /* Empty the queues before closing connection */
 void flush_queues(descriptor_data *d) {
+	char buf2[MAX_STRING_LENGTH];
 	int dummy;
 
 	if (d->large_outbuf) {
@@ -3843,6 +3852,7 @@ void reboot_recover(void) {
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern bool global_mute_slash_channel_joins;
 
+	char buf[MAX_STRING_LENGTH];
 	descriptor_data *d;
 	char_data *plr, *ldr;
 	FILE *fp;

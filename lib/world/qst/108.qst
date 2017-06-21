@@ -31,7 +31,7 @@ reward Empire skill levels and bonus experience.
 ~
 You have found Ranger Clara!
 ~
-11 0 0 25 -1
+12 h 0 25 -1
 A
 1 10800
 P
@@ -442,7 +442,7 @@ reward Trade skill levels and bonus experience.
 ~
 You've found Horation and the Museum of Early Man!
 ~
-13 0 0 25 -1
+14 h 0 25 -1
 A
 1 10825
 P
@@ -906,7 +906,7 @@ into the Soulstream! Look around to see who else has quests for you in here --
 different tutorials might be available based on which skills you started with.
 Don't worry, you can always learn new skills, too.
 ~
-2 0 0 25 -1
+3 h 0 25 -1
 A
 2 10850
 R

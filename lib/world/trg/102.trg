@@ -32,8 +32,39 @@ done
 Zelkab Death~
 0 f 100
 ~
-%echo% As Zelkab dies, Garlgarl steps into the nest!
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
+return 0
+eval difficulty %self.difficulty%
+eval room %self.room%
 %load% mob 10201
+eval mob %room.people%
+remote difficulty %mob.id%
+eval mob_diff %difficulty%
+if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+  eval mob_diff %mob_diff% + 1
+end
+dg_affect %mob% !ATTACK on 5
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %mob_diff% == 1
+  * Then we don't need to do anything
+elseif %mob_diff% == 2
+  nop %mob.add_mob_flag(HARD)%
+elseif %mob_diff% == 3
+  nop %mob.add_mob_flag(GROUP)%
+elseif %mob_diff% == 4
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+%scale% %mob% %mob.level%
+eval self_name %self.alias%
+eval self_name %self_name.car%
+eval mob_name %mob.alias%
+eval mob_name %mob_name.car%
+%echo% As %self_name% dies, %mob_name% steps into the nest!
 ~
 #10206
 Garlgarl Shaman Combat~
@@ -61,9 +92,41 @@ done
 Garlgarl Death~
 0 f 100
 ~
-%echo% As Garlgarl dies, Filks and Walts step into the nest!
-%load% mob 10202
-%load% mob 10203
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
+return 0
+eval difficulty %self.difficulty%
+eval room %self.room%
+eval mob_diff %difficulty%
+if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+  eval mob_diff %mob_diff% + 1
+end
+eval mob_num 10202
+while %mob_num% <= 10203
+  %load% mob %mob_num%
+  eval mob %room.people%
+  remote difficulty %mob.id%
+  dg_affect %mob% !ATTACK on 5
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+  if %mob_diff% == 1
+    * Then we don't need to do anything
+  elseif %mob_diff% == 2
+    nop %mob.add_mob_flag(HARD)%
+  elseif %mob_diff% == 3
+    nop %mob.add_mob_flag(GROUP)%
+  elseif %mob_diff% == 4
+    nop %mob.add_mob_flag(HARD)%
+    nop %mob.add_mob_flag(GROUP)%
+  end
+  %scale% %mob% %mob.level%
+  eval self_name %self.alias%
+  eval self_name %self_name.car%
+  eval mob_num %mob_num% + 1
+done
+%echo% As %self_name% dies, Filks and Walts step into the nest!
 ~
 #10208
 Filks Archer Combat~
@@ -78,6 +141,10 @@ Filks Archer Combat~
 Filks Death~
 0 f 100
 ~
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
 eval room %self.room%
 eval ch %room.people%
 eval found 0
@@ -88,8 +155,35 @@ while %ch% && !%found%
   eval ch %ch.next_in_room%
 done
 if !%found%
-  %echo% As Filks dies, Nilbog steps into the nest!
+  return 0
+  eval difficulty %self.difficulty%
+  eval room %self.room%
   %load% mob 10204
+  eval mob %room.people%
+  remote difficulty %mob.id%
+  eval mob_diff %difficulty%
+  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+    eval mob_diff %mob_diff% + 1
+  end
+  dg_affect %mob% !ATTACK on 5
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+  if %mob_diff% == 1
+    * Then we don't need to do anything
+  elseif %mob_diff% == 2
+    nop %mob.add_mob_flag(HARD)%
+  elseif %mob_diff% == 3
+    nop %mob.add_mob_flag(GROUP)%
+  elseif %mob_diff% == 4
+    nop %mob.add_mob_flag(HARD)%
+    nop %mob.add_mob_flag(GROUP)%
+  end
+  eval self_name %self.alias%
+  %scale% %mob% %mob.level%
+  eval self_name %self_name.car%
+  eval mob_name %mob.alias%
+  eval mob_name %mob_name.car%
+  %echo% As %self_name% dies, %mob_name% steps into the nest!
 end
 ~
 #10210
@@ -103,6 +197,10 @@ Walts Sapper Combat~
 Walts Death~
 0 f 100
 ~
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
 eval room %self.room%
 eval ch %room.people%
 eval found 0
@@ -113,8 +211,35 @@ while %ch% && !%found%
   eval ch %ch.next_in_room%
 done
 if !%found%
-  %echo% As Walts dies, Nilbog steps into the nest!
+  return 0
+  eval difficulty %self.difficulty%
+  eval room %self.room%
   %load% mob 10204
+  eval mob %room.people%
+  remote difficulty %mob.id%
+  eval mob_diff %difficulty%
+  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+    eval mob_diff %mob_diff% + 1
+  end
+  dg_affect %mob% !ATTACK on 5
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+  if %mob_diff% == 1
+    * Then we don't need to do anything
+  elseif %mob_diff% == 2
+    nop %mob.add_mob_flag(HARD)%
+  elseif %mob_diff% == 3
+    nop %mob.add_mob_flag(GROUP)%
+  elseif %mob_diff% == 4
+    nop %mob.add_mob_flag(HARD)%
+    nop %mob.add_mob_flag(GROUP)%
+  end
+  %scale% %mob% %mob.level%
+  eval self_name %self.alias%
+  eval self_name %self_name.car%
+  eval mob_name %mob.alias%
+  eval mob_name %mob_name.car%
+  %echo% As %self_name% dies, %mob_name% steps into the nest!
 end
 ~
 #10212
@@ -141,8 +266,39 @@ done
 Nilbog Death~
 0 f 100
 ~
-%echo% As Nilbog dies, Furl steps into the nest!
+if %self.mob_flagged(UNDEAD)%
+  * This is probably a summoned copy.
+  halt
+end
+return 0
+eval difficulty %self.difficulty%
+eval room %self.room%
 %load% mob 10205
+eval mob %room.people%
+remote difficulty %mob.id%
+eval mob_diff %difficulty%
+if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+  eval mob_diff %mob_diff% + 1
+end
+dg_affect %mob% !ATTACK on 5
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %mob_diff% == 1
+  * Then we don't need to do anything
+elseif %mob_diff% == 2
+  nop %mob.add_mob_flag(HARD)%
+elseif %mob_diff% == 3
+  nop %mob.add_mob_flag(GROUP)%
+elseif %mob_diff% == 4
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+%scale% %mob% %mob.level%
+eval self_name %self.alias%
+eval self_name %self_name.car%
+eval mob_name %mob.alias%
+eval mob_name %mob_name.car%
+%echo% As %self_name% dies, %mob_name% steps into the nest!
 ~
 #10214
 Furl War Shaman Combat~
@@ -162,14 +318,6 @@ switch %random.4%
     skybrand
   break
 done
-~
-#10215
-Furl Death Rarespawn~
-0 f 5
-~
-%echo% As Furl dies, you notice his trusty mount enter the nest!
-%load% mob 10206
-%adventurecomplete%
 ~
 #10216
 Filks Respawn~
@@ -233,15 +381,17 @@ set fighting 0
 eval person %room.people%
 while %person%
   if %person.vnum% == 10202
-    if %person.fighting%
+    if %person.fighting% || %person.mob_flagged(UNDEAD)%
       set fighting 1
     end
+    eval goblin %person%
     set filks_present 1
   elseif %person.vnum% == 10203
-    if %person.fighting%
+    if %person.fighting% || %person.mob_flagged(UNDEAD)%
       set fighting 1
     end
     set walts_present 1
+    eval goblin %person%
   end
   eval person %person.next_in_room%
 done
@@ -260,6 +410,26 @@ elseif %walts_present% && !%filks_present% && !%fighting%
   if %new_mob.vnum% == 10202
     %echo% %new_mob.name% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
+  end
+end
+if %new_mob%
+  eval difficulty %goblin.difficulty%
+  remote difficulty %new_mob.id%
+  eval mob_diff %difficulty%
+  if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
+    eval mob_diff %mob_diff% + 1
+  end
+  nop %new_mob.remove_mob_flag(HARD)%
+  nop %new_mob.remove_mob_flag(GROUP)%
+  if %mob_diff% == 1
+    * Then we don't need to do anything
+  elseif %mob_diff% == 2
+    nop %new_mob.add_mob_flag(HARD)%
+  elseif %mob_diff% == 3
+    nop %new_mob.add_mob_flag(GROUP)%
+  elseif %mob_diff% == 4
+    nop %new_mob.add_mob_flag(HARD)%
+    nop %new_mob.add_mob_flag(GROUP)%
   end
 end
 ~
@@ -846,72 +1016,6 @@ if (%self.fighting% || %self.disabled%)
   halt
 end
 %aggro% %actor%
-~
-#10272
-Primeval salesman list~
-0 c 0
-list~
-%send% %actor% %self.name% sells crafting patterns for 1000 coins each. Each
-%send% %actor% pattern is reusable, but you need the correct ability to use it.
-%send% %actor% To purchase a pattern, use '&cbuy <name>&0'.
-%send% %actor%  - &caxe&0: a primordial axe (Deadly Weapons, 2-hand melee weapon)
-%send% %actor%  - &cspear&0: the dracosaur bone spear (Deadly Weapons, tank weapon)
-%send% %actor%  - &cstaff&0: the jeweled bone staff (Powerful Staves, caster weapon)
-%send% %actor%  - &crobe&0: a dracosaur scale robe (Magical Vestments, healer armor)
-%send% %actor%  - &cscale boots&0: dracosaur scale boots (Imperial Armors, medium armor boots)
-%send% %actor%  - &cprimordial boots&0: a pair of primordial boots (Imperial Armors, heavy armor boots)
-%send% %actor%  - &cgauntlets&0: a pair of dracosaur scale gauntlets (Dangerous Leathers, leather armor gloves)
-%send% %actor%  - &ctome&0: the Tome of the Primordium (Master Craftsman, caster offhand)
-%send% %actor%  - &ccrown&0: the bone crown of the primeval (Jewelry, Greatness headgear)
-~
-#10273
-Primeval salesman buy~
-0 c 0
-buy~
-eval vnum -1
-set named a thing
-if (!%arg%)
-  %send% %actor% Type 'list' to see what's available.
-  halt
-elseif axe /= %arg%
-  eval vnum 10269
-  set named the primordial axe pattern
-elseif spear /= %arg%
-  eval vnum 10271
-  set named the dracosaur bone spear pattern
-elseif staff /= %arg%
-  eval vnum 10273
-  set named the jeweled bone staff pattern
-elseif robe /= %arg%
-  eval vnum 10275
-  set named the dracosaur scale robe pattern
-elseif scale boots /= %arg%
-  eval vnum 10277
-  set named the dracosaur scale boots pattern
-elseif primordial boots /= %arg%
-  eval vnum 10279
-  set named the primordial boots pattern
-elseif gauntlets /= %arg%
-  eval vnum 10281
-  set named the dracosaur scale gauntlets pattern
-elseif tome /= %arg%
-  eval vnum 10283
-  set named the Tome of the Primordium schematic
-elseif crown /= %arg%
-  eval vnum 10285
-  set named the bone crown pattern
-else
-  %send% %actor% They don't seem to sell '%arg%' here.
-  halt
-end
-if !%actor.can_afford(1000)%
-  %send% %actor% %self.name% tells you, 'You'll need 1000 coins to buy that.'
-  halt
-end
-nop %actor.charge_coins(1000)%
-%load% obj %vnum% %actor% inv
-%send% %actor% You buy %named% for 1000 coins.
-%echoaround% %actor% %actor.name% buys %named%.
 ~
 #10274
 Primeval environment~

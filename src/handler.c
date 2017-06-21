@@ -24,6 +24,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 #include "vnums.h"
 
 /**
@@ -34,12 +35,14 @@
 *   Character Targeting Handlers
 *   Coin Handlers
 *   Cooldown Handlers
+*   Currency Handlers
 *   Empire Handlers
 *   Empire Targeting Handlers
 *   Follow Handlers
 *   Group Handlers
 *   Help Handlers
 *   Interaction Handlers
+*   Learned Craft Handlers
 *   Lore Handlers
 *   Mob Tagging Handlers
 *   Mount Handlers
@@ -65,9 +68,7 @@
 */
 
 // externs
-extern const char *affect_wear_off_msgs[];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *drinks[];
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
 const struct wear_data_type wear_data[NUM_WEARS];
@@ -81,6 +82,7 @@ void scale_item_to_level(obj_data *obj, int level);
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
+void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
 // local file scope variables
 static int extractions_pending = 0;
@@ -89,14 +91,50 @@ static int extractions_pending = 0;
  //////////////////////////////////////////////////////////////////////////////
 //// AFFECT HANDLERS /////////////////////////////////////////////////////////
 
+// expiry event handler for rooms
+EVENTFUNC(room_affect_expire_event) {
+	struct room_expire_event_data *expire_data = (struct room_expire_event_data *)event_obj;
+	struct affected_type *af;
+	generic_data *gen;
+	room_data *room;
+	
+	// grab data and free it
+	room = expire_data->room;
+	af = expire_data->affect;
+	free(expire_data);
+	
+	// cancel this first
+	af->expire_event = NULL;
+	
+	if ((af->type > 0)) {
+		if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
+			if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
+				act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
+			}
+		}
+	}
+	affect_remove_room(room, af);
+	
+	// do not reenqueue
+	return 0;
+}
+
+
+// frees memory when room expiry is canceled
+EVENT_CANCEL_FUNC(cancel_room_expire_event) {
+	struct room_expire_event_data *data = (struct room_expire_event_data *)event_obj;
+	free(data);
+}
+
+
 /**
 * Call affect_remove with every af of "type"
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_ const
+* @param any_vnum type Any ATYPE_ const/vnum
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char(char_data *ch, int type, bool show_msg) {
+void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *hjp, *next;
 	bool shown = FALSE;
@@ -130,11 +168,11 @@ void affect_from_char(char_data *ch, int type, bool show_msg) {
 * Calls affect_remove on every affect of type "type" with location "apply".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_ const to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param int apply Any APPLY_ const to match.
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg) {
+void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE;
 
@@ -155,11 +193,11 @@ void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg
 * Calls affect_remove on every affect of type "type" that sets AFF flag "bits".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_ const to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bool show_msg) {
+void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE;
 
@@ -180,11 +218,11 @@ void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bo
 * Calls affect_remove on every affect of type "type" with location "apply".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_ const to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param char_data *caster The person whose affects to remove.
 * @param bool show_msg If TRUE, will send the wears-off message.
 */
-void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool show_msg) {
+void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster, bool show_msg) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE;
 	
@@ -227,9 +265,9 @@ void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool sho
 * Call affect_remove_room to remove all effects of "type"
 *
 * @param room_data *room The location to remove affects from.
-* @param int type Any ATYPE_ const
+* @param any_vnum type Any ATYPE_ const/vnum
 */
-void affect_from_room(room_data *room, int type) {
+void affect_from_room(room_data *room, any_vnum type) {
 	struct affected_type *hjp, *next;
 
 	for (hjp = ROOM_AFFECTS(room); hjp; hjp = next) {
@@ -246,19 +284,20 @@ void affect_from_room(room_data *room, int type) {
 * "bits".
 *
 * @param room_data *rom The room to remove affects from.
-* @param int type Any ATYPE_ const to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
 * @param bool show_msg If TRUE, shows the wear-off message.
 */
-void affect_from_room_by_bitvector(room_data *room, int type, bitvector_t bits, bool show_msg) {
+void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
+	generic_data *gen;
 	bool shown = FALSE;
 	
 	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
-			if (show_msg && !shown) {
-				if (*affect_wear_off_msgs[aff->type] && ROOM_PEOPLE(room)) {
-					act(affect_wear_off_msgs[aff->type], FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+			if (show_msg && !shown && (gen = find_generic(aff->type, GENERIC_AFFECT))) {
+				if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
+					act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
 				shown = TRUE;
 			}
@@ -537,30 +576,36 @@ void affect_remove(char_data *ch, struct affected_type *af) {
 void affect_remove_room(room_data *room, struct affected_type *af) {
 	struct affected_type *temp;
 
-	// no effects on the room?
-	if (ROOM_AFFECTS(room) == NULL) {
+	// only prevent basic errors
+	if (!room || !af) {
 		return;
 	}
-
+	
+	if (af->expire_event) {
+		event_cancel(af->expire_event, cancel_room_expire_event);
+	}
+	
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
-	// restore base flags, in case we removed one of them
-	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
-
+	
 	REMOVE_FROM_LIST(af, ROOM_AFFECTS(room), next);
 	free(af);
+	
+	affect_total_room(room);
 }
 
 
 /**
-* Insert an affect_type in a char_data structure
-*  Automatically sets apropriate bits and apply's
+* Insert an affect_type in a char_data structure. Automatically sets apropriate
+* bits and applies.
+*
+* NOTE: This version does not send the apply message.
 *
 * Caution: this duplicates af (because of how it used to load from the pfile)
 *
 * @param char_data *ch The person to add the affect to
 * @param struct affected_type *af The affect to add.
 */
-void affect_to_char(char_data *ch, struct affected_type *af) {
+void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 	struct affected_type *affected_alloc;
 
 	CREATE(affected_alloc, struct affected_type, 1);
@@ -571,6 +616,29 @@ void affect_to_char(char_data *ch, struct affected_type *af) {
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
+}
+
+
+/**
+* Insert an affect_type in a char_data structure. Automatically sets apropriate
+* bits and applies.
+*
+* Caution: this duplicates af (because of how it used to load from the pfile)
+*
+* @param char_data *ch The person to add the affect to
+* @param struct affected_type *af The affect to add.
+*/
+void affect_to_char(char_data *ch, struct affected_type *af) {
+	generic_data *gen = find_generic(af->type, GENERIC_AFFECT);
+	
+	if (gen && GET_AFFECT_APPLY_TO_CHAR(gen)) {
+		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen)) {
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_CHAR);
+	}
+	
+	affect_to_char_silent(ch, af);
 }
 
 
@@ -590,8 +658,11 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	*affected_alloc = *af;
 	affected_alloc->next = ROOM_AFFECTS(room);
 	ROOM_AFFECTS(room) = affected_alloc;
-
-	SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
+	
+	SET_BIT(ROOM_AFF_FLAGS(room), affected_alloc->bitvector);
+	schedule_room_affect_expire(room, affected_alloc);
+	
+	affect_total_room(room);
 }
 
 
@@ -728,11 +799,26 @@ void affect_total(char_data *ch) {
 
 
 /**
+* Ensures a room's affects are up-to-date.
+*
+* @param room_data *room The room to check.
+*/
+void affect_total_room(room_data *room) {
+	struct affected_type *af;
+	
+	ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
+	LL_FOREACH(ROOM_AFFECTS(room), af) {
+		SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
+	}
+}
+
+
+/**
 * @param char_data *ch The person to check
-* @param int type Any ATYPE_ const
+* @param any_vnum type Any ATYPE_ const/vnum
 * @return bool TRUE if ch is affected by anything with matching type
 */
-bool affected_by_spell(char_data *ch, int type) {
+bool affected_by_spell(char_data *ch, any_vnum type) {
 	struct over_time_effect_type *dot;
 	struct affected_type *hjp;
 	bool found = FALSE;
@@ -758,11 +844,11 @@ bool affected_by_spell(char_data *ch, int type) {
 * Matches both an ATYPE_ and an APPLY_ on an effect.
 *
 * @param char_data *ch The character to check
-* @param int type the ATYPE_ flag
+* @param any_vnum type the ATYPE_ const/vnum
 * @param int apply the APPLY_ flag
 * @return bool TRUE if an effect matches both conditions
 */
-bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
+bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply) {
 	struct affected_type *hjp;
 	bool found = FALSE;
 
@@ -779,7 +865,7 @@ bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
 /**
 * Create an affect that modifies a trait.
 *
-* @param int type ATYPE_
+* @param any_vnum type ATYPE_ const/vnum
 * @param int duration in 5-second ticks
 * @param int location APPLY_
 * @param int modifier +/- amount
@@ -787,7 +873,7 @@ bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
 * @param char_data *cast_by The caster who made the effect (may be NULL; use the person themselves for penalty effects as those won't cleanse).
 * @return struct affected_type* The created af
 */
-struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by) {
+struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by) {
 	struct affected_type *af;
 	
 	CREATE(af, struct affected_type, 1);
@@ -804,14 +890,14 @@ struct affected_type *create_aff(int type, int duration, int location, int modif
 
 /**
 * @param char_data *ch Person receiving the DoT.
-* @param sh_int type ATYPE_ spell that caused it.
+* @param any_vnum type ATYPE_ const/vnum that caused it.
 * @param sh_int duration Affect time, in 5-second intervals.
 * @param sh_int damage_type DAM_ type.
 * @param sh_int damage How much damage to do per 5-seconds.
 * @param sh_int max_stack Number of times this can stack when re-applied before it expires.
 * @param sh_int char_data *cast_by The caster.
 */
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
+void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
 	struct over_time_effect_type *iter, *dot;
 	bool found = FALSE;
 	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
@@ -860,10 +946,10 @@ void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
 
 /**
 * @param room_data *room The room to check
-* @param int type Any ATYPE_ const
+* @param any_vnum type Any ATYPE_ const/vnum
 * @return bool TRUE if the room is affected by the spell
 */
-bool room_affected_by_spell(room_data *room, int type) {
+bool room_affected_by_spell(room_data *room, any_vnum type) {
 	struct affected_type *hjp;
 	bool found = FALSE;
 
@@ -878,14 +964,38 @@ bool room_affected_by_spell(room_data *room, int type) {
 
 
 /**
+* Schedules the event handler for a room's affect expiration.
+*
+* @param room_data *room The room with the effect on it.
+* @param struct affected_type *af The affect (already on the room) to set up expiry for.
+*/
+void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
+	struct room_expire_event_data *expire_data;
+	
+	if (!af->expire_event && af->duration != UNLIMITED) {
+		// create the event
+		CREATE(expire_data, struct room_expire_event_data, 1);
+		expire_data->room = room;
+		expire_data->affect = af;
+		
+		af->expire_event = event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
+	}
+}
+
+
+/**
 * Shows the affect-wear-off message for a given type.
 *
 * @param char_data *ch The person wearing off of.
-* @param int atype The ATYPE_ affect type.
+* @param any_vnum atype The ATYPE_ affect type.
 */
-void show_wear_off_msg(char_data *ch, int atype) {
-	if (*affect_wear_off_msgs[atype] && ch->desc) {
-		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[atype]);
+void show_wear_off_msg(char_data *ch, any_vnum atype) {
+	generic_data *gen = find_generic(atype, GENERIC_AFFECT);
+	if (gen && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc) {
+		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
+	}
+	if (gen && GET_AFFECT_WEAR_OFF_TO_ROOM(gen)) {
+		act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -1297,6 +1407,7 @@ void char_from_room(char_data *ch) {
 * @param room_data *room The place to put 'em
 */
 void char_to_room(char_data *ch, room_data *room) {
+	void check_instance_is_loaded(struct instance_data *inst);
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern int lock_instance_level(room_data *room, int level);
@@ -1305,12 +1416,17 @@ void char_to_room(char_data *ch, room_data *room) {
 	
 	int pos;
 	obj_data *obj;
-	struct instance_data *inst;
+	struct instance_data *inst = NULL;
 
 	if (!ch || !room) {
 		log("SYSERR: Illegal value(s) passed to char_to_room. (Room :%p, Ch: %p)", room, ch);
 	}
 	else {
+		// check if it needs an instance setup (before putting the character there)
+		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE))) {
+			check_instance_is_loaded(inst);
+		}
+		
 		// sanitation: remove them from the old room first
 		if (IN_ROOM(ch)) {
 			char_from_room(ch);
@@ -1338,7 +1454,7 @@ void char_to_room(char_data *ch, room_data *room) {
 		}
 		
 		// look for an instance to lock
-		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst = find_instance_by_room(room, FALSE))) {
+		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst || (inst = find_instance_by_room(room, FALSE)))) {
 			if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_ENTER) && !IS_IMMORTAL(ch)) {
 				lock_instance_level(room, determine_best_scale_level(ch, TRUE));
 			}
@@ -2235,12 +2351,17 @@ int total_coins(char_data *ch) {
 * two durations is kept.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_.
+* @param any_vnum type Any cooldown vnum.
 * @param int seconds_duration How long it lasts.
 */
-void add_cooldown(char_data *ch, int type, int seconds_duration) {
+void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	struct cooldown_data *cool;
 	bool found = FALSE;
+	
+	if (!find_generic(type, GENERIC_COOLDOWN)) {
+		log("SYSERR: add_cooldown called with invalid cooldown vnum %d", type);
+		return;
+	}
 	
 	// check for existing
 	for (cool = ch->cooldowns; cool && !found; cool = cool->next) {
@@ -2266,10 +2387,10 @@ void add_cooldown(char_data *ch, int type, int seconds_duration) {
 * does not have that ability on cooldown.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_.
+* @param any_vnum type Any cooldown vnum.
 * @return int The time remaining on the cooldown (in seconds), or 0.
 */
-int get_cooldown_time(char_data *ch, int type) {
+int get_cooldown_time(char_data *ch, any_vnum type) {
 	struct cooldown_data *cool;
 	int remain = 0;
 	
@@ -2301,9 +2422,9 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 * Removes any cooldowns of a given type from the character.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_.
+* @param any_vnum type Any cooldown vnum.
 */
-void remove_cooldown_by_type(char_data *ch, int type) {
+void remove_cooldown_by_type(char_data *ch, any_vnum type) {
 	struct cooldown_data *cool, *next_cool;
 	
 	for (cool = ch->cooldowns; cool; cool = next_cool) {
@@ -2313,6 +2434,68 @@ void remove_cooldown_by_type(char_data *ch, int type) {
 			remove_cooldown(ch, cool);
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CURRENCY HANDLERS ///////////////////////////////////////////////////////
+
+/**
+* Adds (or removes) adventure currencies for the player.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The currency (generic) vnum.
+* @param int amount The amount to add (or remove).
+* @return int The player's new total.
+*/
+int add_currency(char_data *ch, any_vnum vnum, int amount) {
+	struct player_currency *cur;
+	
+	if (IS_NPC(ch) || !find_generic(vnum, GENERIC_CURRENCY)) {
+		return 0;
+	}
+	if (amount == 0) {
+		return get_currency(ch, vnum);
+	}
+	
+	HASH_FIND_INT(GET_CURRENCIES(ch), &vnum, cur);
+	if (!cur) {
+		CREATE(cur, struct player_currency, 1);
+		cur->vnum = vnum;
+		HASH_ADD_INT(GET_CURRENCIES(ch), vnum, cur);
+	}
+	
+	SAFE_ADD(cur->amount, amount, 0, INT_MAX, FALSE);
+	qt_change_currency(ch, vnum, cur->amount);
+	
+	// housecleaning
+	if (cur->amount == 0) {
+		HASH_DEL(GET_CURRENCIES(ch), cur);
+		free(cur);
+		return 0;
+	}
+	else {
+		return cur->amount;
+	}
+}
+
+
+/**
+* Checks a player's adventure currency.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The currency (generic) vnum.
+* @return int The amount the player has.
+*/
+int get_currency(char_data *ch, any_vnum vnum) {
+	struct player_currency *cur;
+	
+	if (IS_NPC(ch)) {
+		return 0;
+	}
+	
+	HASH_FIND_INT(GET_CURRENCIES(ch), &vnum, cur);
+	return cur ? cur->amount : 0;
 }
 
 
@@ -2429,17 +2612,15 @@ struct empire_political_data *find_relation(empire_data *from, empire_data *to) 
 * @return struct empire_territory_data* the territory data, or NULL if not found
 */
 struct empire_territory_data *find_territory_entry(empire_data *emp, room_data *room) {
-	struct empire_territory_data *found = NULL, *ter_iter;
+	struct empire_territory_data *ter;
+	room_vnum vnum = GET_ROOM_VNUM(room);
 	
 	if (emp) {
-		for (ter_iter = EMPIRE_TERRITORY_LIST(emp); ter_iter && !found; ter_iter = ter_iter->next) {
-			if (ter_iter->room == room) {
-				found = ter_iter;
-			}
-		}
+		HASH_FIND_INT(EMPIRE_TERRITORY_LIST(emp), &vnum, ter);
+		return ter;	// if any
 	}
 	
-	return found;
+	return NULL;
 }
 
 
@@ -2500,8 +2681,10 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 * @param room_data *room The room to abandon.
 */
 void perform_abandon_room(room_data *room) {
+	void check_tavern_setup(room_data *room);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
+	void schedule_check_unload(room_data *room, bool offset);
 	
 	empire_data *emp = ROOM_OWNER(room);
 	struct empire_territory_data *ter;
@@ -2525,7 +2708,7 @@ void perform_abandon_room(room_data *room) {
 			}
 		}
 		// territory list
-		if (BELONGS_IN_TERRITORY_LIST(room) && (ter = find_territory_entry(emp, room))) {
+		if ((ter = find_territory_entry(emp, room))) {
 			delete_territory_entry(emp, ter);
 		}
 		
@@ -2544,9 +2727,17 @@ void perform_abandon_room(room_data *room) {
 		COMPLEX_DATA(room)->private_owner = NOBODY;
 	}
 	
+	// reschedule unload check now that it's unowned
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		schedule_check_unload(room, FALSE);
+	}
+	
 	// if a city center is abandoned, destroy it
 	if (IS_CITY_CENTER(room)) {
 		disassociate_building(room);
+	}
+	else {	// other building types
+		check_tavern_setup(room);
 	}
 }
 
@@ -2588,6 +2779,9 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
 	}
+	
+	// claimed rooms are never unloadable anyway
+	cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
 }
 
 
@@ -3191,6 +3385,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	
 	bool any = FALSE, done_cumulative = FALSE;
 	struct global_data *glb, *next_glb, *choose_last;
+	struct instance_data *inst;
 	int cumulative_prc;
 	adv_data *adv;
 	
@@ -3199,7 +3394,8 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		return FALSE;
 	}
 	
-	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
+	inst = real_instance(MOB_INSTANCE_ID(mob));
+	adv = inst ? inst->adventure : NULL;
 	cumulative_prc = number(1, 10000);
 	choose_last = NULL;
 
@@ -3232,7 +3428,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		}
 		
 		// check adventure-only -- late-matching because it does more work than other conditions
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && (!adv || get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv)) {
 			continue;
 		}
 		
@@ -3346,6 +3542,69 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	}
 	
 	return success;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LEARNED CRAFT HANDLERS //////////////////////////////////////////////////
+
+/**
+* Adds a craft vnum to a player's learned list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to learn.
+*/
+void add_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	if (!pcd) {
+		CREATE(pcd, struct player_craft_data, 1);
+		pcd->vnum = vnum;
+		HASH_ADD_INT(GET_LEARNED_CRAFTS(ch), vnum, pcd);
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to check.
+* @return bool TRUE if the player has learned it.
+*/
+bool has_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return TRUE;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	return pcd ? TRUE : FALSE;
+}
+
+
+/**
+* Removes a craft vnum from a player's learned list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to forget.
+*/
+void remove_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	if (pcd) {
+		HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
+		free(pcd);
+	}
 }
 
 
@@ -3801,6 +4060,7 @@ void add_to_object_list(obj_data *obj) {
 obj_data *copy_warehouse_obj(obj_data *input) {
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
 
+	struct trig_var_data *var, *copy;
 	obj_data *obj, *proto;
 	trig_data *trig;
 	int iter;
@@ -3835,7 +4095,13 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 			add_trigger(SCRIPT(obj), read_trigger(GET_TRIG_VNUM(trig)), -1);
 		}
 		
-		// TODO should also copy variables, if they have been made to save to file yet
+		LL_FOREACH(SCRIPT(input)->global_vars, var) {
+			CREATE(copy, struct trig_var_data, 1);
+			copy->name = str_dup(var->name);
+			copy->value = str_dup(var->value);
+			copy->context = var->context;
+			LL_APPEND(SCRIPT(obj)->global_vars, copy);
+		}
 	}
 	
 	// pointer copies
@@ -3881,7 +4147,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 * @param obj_data *obj The object to empty.
 */
 void empty_obj_before_extract(obj_data *obj) {
-	void get_check_money(char_data *ch, obj_data *obj);
+	bool get_check_money(char_data *ch, obj_data *obj);
 	
 	obj_data *jj, *next_thing;
 	
@@ -3958,8 +4224,10 @@ void extract_obj(obj_data *obj) {
 * @return obj_data* The new object.
 */
 obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
+	struct trig_var_data *var, *copy;
 	struct obj_binding *bind;
 	obj_data *proto, *new;
+	trig_data *trig;
 	int iter;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
@@ -4006,8 +4274,8 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	
 	// certain things that must always copy over
 	switch (GET_OBJ_TYPE(new)) {
-		case ITEM_ARROW: {
-			GET_OBJ_VAL(new, VAL_ARROW_QUANTITY) = GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY);
+		case ITEM_AMMO: {
+			GET_OBJ_VAL(new, VAL_AMMO_QUANTITY) = GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY);
 			break;
 		}
 		case ITEM_BOOK: {
@@ -4036,6 +4304,24 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		}
 	}
 	
+	// copy only existing scripts
+	if (SCRIPT(obj)) {
+		if (!SCRIPT(new)) {
+			create_script_data(new, OBJ_TRIGGER);
+		}
+
+		for (trig = TRIGGERS(SCRIPT(obj)); trig; trig = trig->next) {
+			add_trigger(SCRIPT(new), read_trigger(GET_TRIG_VNUM(trig)), -1);
+		}
+		
+		LL_FOREACH(SCRIPT(obj)->global_vars, var) {
+			CREATE(copy, struct trig_var_data, 1);
+			copy->name = str_dup(var->name);
+			copy->value = str_dup(var->value);
+			copy->context = var->context;
+			LL_APPEND(SCRIPT(new)->global_vars, copy);
+		}
+	}
 
 	if (scale_level > 0) {
 		scale_item_to_level(new, scale_level);
@@ -5509,6 +5795,10 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 				add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
 				break;
 			}
+			case REQ_GET_CURRENCY: {
+				add_currency(ch, req->vnum, req->needed);
+				break;
+			}
 		}
 	}
 	
@@ -5603,6 +5893,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 		switch(req->type) {
 			case REQ_COMPLETED_QUEST: {
 				if (!has_completed_quest(ch, req->vnum, instance ? instance->id : NOTHING)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_GET_CURRENCY: {
+				if (get_currency(ch, req->vnum) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -5800,6 +6096,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			snprintf(output, sizeof(output), "Get object%s: %dx %s%s", PLURAL(req->needed), req->needed, vnum, get_obj_name_by_proto(req->vnum));
 			break;
 		}
+		case REQ_GET_CURRENCY: {
+			snprintf(output, sizeof(output), "Get currency: %d %s%s", req->needed, vnum, get_generic_string_by_vnum(req->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(req->needed)));
+			break;
+		}
 		case REQ_KILL_MOB: {
 			snprintf(output, sizeof(output), "Kill %dx mob%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_mob_name_by_proto(req->vnum));
 			break;
@@ -5875,7 +6175,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		default: {
-			sprintf(buf, "Unknown condition");
+			sprintf(output, "Unknown condition");
 			break;
 		}
 	}
@@ -5902,6 +6202,11 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 void add_depletion(room_data *room, int type, bool multiple) {
 	struct depletion_data *dep;
 	bool found = FALSE;
+	
+	// shortcut: oceans are undepletable
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		return;
+	}
 	
 	for (dep = ROOM_DEPLETION(room); dep && !found; dep = dep->next) {
 		if (dep->type == type) {
@@ -5946,16 +6251,26 @@ int get_depletion(room_data *room, int type) {
 * @param room_data *room where
 * @param int type DPLTN_
 */
-void remove_depletion(room_data *room, int type) {
-	struct depletion_data *dep, *next_dep, *temp;
+void remove_depletion_from_list(struct depletion_data **list, int type) {
+	struct depletion_data *dep, *next_dep;
 	
-	for (dep = ROOM_DEPLETION(room); dep; dep = next_dep) {
-		next_dep = dep->next;
-		
+	LL_FOREACH_SAFE(*list, dep, next_dep) {
 		if (dep->type == type) {
-			REMOVE_FROM_LIST(dep, ROOM_DEPLETION(room), next);
+			LL_DELETE(*list, dep);
+			free(dep);
 		}
 	}
+}
+
+
+/**
+* Removes all depletion data for a certain type from the room.
+*
+* @param room_data *room where
+* @param int type DPLTN_
+*/
+void remove_depletion(room_data *room, int type) {
+	remove_depletion_from_list(&ROOM_DEPLETION(room), type);
 }
 
 
@@ -5969,6 +6284,11 @@ void remove_depletion(room_data *room, int type) {
 void set_depletion(room_data *room, int type, int value) {
 	struct depletion_data *dep;
 	bool found = FALSE;
+	
+	// shortcut: oceans are undepletable
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		return;
+	}
 	
 	// shortcut
 	if (value <= 0) {
@@ -6111,70 +6431,69 @@ void detach_building_from_room(room_data *room) {
 /**
 * Adds to (or creates) a room extra data value.
 *
-* @param room_data *room The room to modify data on.
-* @param int type The ROOM_EXTRA_x type to update.
+* @param room_extra_data **list The extra data list to modify.
+* @param int type The ROOM_EXTRA_ type to update.
 * @param int add_value The amount to add (or subtract) to the value.
 */
-void add_to_room_extra_data(room_data *room, int type, int add_value) {
+void add_to_extra_data(struct room_extra_data **list, int type, int add_value) {
 	struct room_extra_data *red;
 	
-	if ((red = find_room_extra_data(room, type))) {
+	if ((red = find_extra_data(*list, type))) {
 		SAFE_ADD(red->value, add_value, INT_MIN, INT_MAX, TRUE);
 		
 		// delete zeroes for cleanliness
 		if (red->value == 0) {
-			remove_room_extra_data(room, type);
+			remove_extra_data(list, type);
 		}
 	}
 	else {
-		set_room_extra_data(room, type, add_value);
+		set_extra_data(list, type, add_value);
 	}
 }
 
 
 /**
-* Finds an extra data object by type.
+* Finds an extra data ptr by type.
 *
-* @param room_data *room The room to check.
-* @param int type Any ROOM_EXTRA_x type.
+* @param struct room_extra_data *list The list of extra data to check.
+* @param int type Any ROOM_EXTRA_ type.
 * @return struct room_extra_data* The matching entry, or NULL.
 */
-struct room_extra_data *find_room_extra_data(room_data *room, int type) {
+struct room_extra_data *find_extra_data(struct room_extra_data *list, int type) {
 	struct room_extra_data *red;
-	HASH_FIND_INT(room->extra_data, &type, red);
+	HASH_FIND_INT(list, &type, red);
 	return red;
 }
 
 
 /**
-* Gets the value of an extra data type for a room; defaults to 0 if none is set.
+* Gets the value of an extra data type; defaults to 0 if none is set.
 *
-* @param room_data *room The room to check.
-* @param int type The ROOM_EXTRA_x type to check.
+* @param struct room_extra_data *list The list to get data from.
+* @param int type The ROOM_EXTRA_ type to check.
 * @return int The value of that type (default: 0).
 */
-int get_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *red = find_room_extra_data(room, type);
+int get_extra_data(struct room_extra_data *list, int type) {
+	struct room_extra_data *red = find_extra_data(list, type);
 	return (red ? red->value : 0);
 }
 
-
 /**
-* Multiplies an existing room extra data value by a number.
+* Multiplies an existing extra data value by a number.
 *
-* @param room_data *room The room to modify data on.
-* @param int type The ROOM_EXTRA_x type to update.
+* @param struct room_extra_data **list The list to multiple an entry in.
+* @param int type The ROOM_EXTRA_ type to update.
 * @param double multiplier How much to multiply the value by.
 */
-void multiply_room_extra_data(room_data *room, int type, double multiplier) {
+void multiply_extra_data(struct room_extra_data **list, int type, double multiplier) {
 	struct room_extra_data *red;
 	
-	if ((red = find_room_extra_data(room, type))) {
+	if ((red = find_extra_data(*list, type))) {
 		red->value = (int) (multiplier * red->value);
 		
 		// delete zeroes for cleanliness
 		if (red->value == 0) {
-			remove_room_extra_data(room, type);
+			remove_extra_data(list, type);
 		}
 	}
 	// does nothing if it doesn't exist; 0*X=0
@@ -6182,15 +6501,15 @@ void multiply_room_extra_data(room_data *room, int type, double multiplier) {
 
 
 /**
-* Removes any extra data of a given type from the room.
+* Removes any extra data of a given type from the list.
 *
-* @param room_data *room The room to remove from.
-* @param int type The ROOM_EXTRA_x type to remove.
+* @param struct room_extra_data **list The list to remove from.
+* @param int type The ROOM_EXTRA_ type to remove.
 */
-void remove_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *red = find_room_extra_data(room, type);
+void remove_extra_data(struct room_extra_data **list, int type) {
+	struct room_extra_data *red = find_extra_data(*list, type);
 	if (red) {
-		HASH_DEL(room->extra_data, red);
+		HASH_DEL(*list, red);
 		free(red);
 	}
 }
@@ -6199,18 +6518,18 @@ void remove_room_extra_data(room_data *room, int type) {
 /**
 * Sets an extra data value to a specific number, overriding any old value.
 *
-* @param room_data *room The room to set.
-* @param int type Any ROOM_EXTRA_x type.
+* @param struct room_extra_data **list The list to set data in.
+* @param int type Any ROOM_EXTRA_ type.
 * @param int value The value to set it to.
 */
-void set_room_extra_data(room_data *room, int type, int value) {
-	struct room_extra_data *red = find_room_extra_data(room, type);
+void set_extra_data(struct room_extra_data **list, int type, int value) {
+	struct room_extra_data *red = find_extra_data(*list, type);
 	
 	// create if needed
 	if (!red) {
 		CREATE(red, struct room_extra_data, 1);
 		red->type = type;
-		HASH_ADD_INT(room->extra_data, type, red);
+		HASH_ADD_INT(*list, type, red);
 	}
 	
 	red->value = value;
@@ -7443,6 +7762,8 @@ void vehicle_from_room(vehicle_data *veh) {
 * @param room_data *room The room to put it in.
 */
 void vehicle_to_room(vehicle_data *veh, room_data *room) {
+	struct vehicle_room_list *vrl;
+	
 	if (!veh || !room) {
 		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
 		return;
@@ -7455,6 +7776,14 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	LL_PREPEND2(ROOM_VEHICLES(room), veh, next_in_room);
 	IN_ROOM(veh) = room;
 	VEH_LAST_MOVE_TIME(veh) = time(0);
+	
+	// update island ids
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(room);
+		GET_ISLAND(vrl->room) = GET_ISLAND(room);
+		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(room);
+	
+	}
 }
 
 

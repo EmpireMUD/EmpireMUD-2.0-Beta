@@ -23,6 +23,7 @@
 #include "handler.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -632,6 +633,7 @@ void mobile_activity(void) {
 
 					// track to next room
 					for (track = ROOM_TRACKS(IN_ROOM(ch)); !found && track; track = track->next) {
+						// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
 						if (track->player_id == purs->idnum) {
 							found = TRUE;
 							dir = track->dir;
@@ -1082,7 +1084,7 @@ void spawn_mobs_from_center(room_data *center) {
 	int mob_spawn_radius = config_get_int("mob_spawn_radius");
 	
 	// always start on the map
-	center = get_map_location_for(center);
+	center = (GET_MAP_LOC(center) ? real_room(GET_MAP_LOC(center)->vnum) : NULL);
 	
 	// skip if we didn't find a map location
 	if (!center || GET_ROOM_VNUM(center) >= MAP_SIZE) {
@@ -1286,9 +1288,19 @@ void scale_mob_to_level(char_data *mob, int level) {
 
 	// health
 	value = (1.5 * low_level) + (3.25 * mid_level) + (5.0 * high_level) + (12 * over_level);
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 4.5 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 5.5 : 1.0;
+	target = 40.0;	// max multiplier of health flags
+	if (MOB_FLAGGED(mob, MOB_GROUP) && MOB_FLAGGED(mob, MOB_HARD)) {	// boss
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (1.0 * target) : (0.75 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_GROUP)) {
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (0.65 * target) : (0.5 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_HARD)) {
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (0.25 * target) : (0.1 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_TANK)) {
+		value *= (0.05 * target);
+	}
 	mob->points.max_pools[HEALTH] = MAX(1, (int) ceil(value));
 	
 	// move

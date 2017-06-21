@@ -9,6 +9,14 @@ nails. There are currently no objects which fill this type.
 
 See also: COMPONENT
 #
+ARROW ARROWS AMMUNITION AMMO
+
+In ranged combat, you will automatically use the best ammunition (e.g. arrows)
+in your inventory. But you can also give a preference with the 'use' command,
+which will cause you to use that type of arrow first.
+
+See also: USE
+#
 BONES "BONE COMPONENT"
 
 Bone (component)

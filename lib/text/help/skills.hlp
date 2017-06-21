@@ -431,9 +431,17 @@ have matching arrows in your inventory. You will attack with your arrows
 one at a time, while the target runs at you. Once the target reaches you,
 you will draw your weapon and begin melee battle. 
 
+If you shoot someone who also has a ranged weapon, or if they're fighting
+someone else, you can stay at range indefinitely. You can manually cancel
+ranged combat by typing 'approach'.
+
+Use the 'use' command to set a default arrow (or other ammo) type.
+
 Example:  
 
   > shoot deer 
+
+See also: APPROACH, USE
 #
 SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 

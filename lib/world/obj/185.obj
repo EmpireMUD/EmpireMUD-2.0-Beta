@@ -191,11 +191,11 @@ pattern fearsome jaguar armor~
 a fearsome jaguar armor pattern~
 A fearsome jaguar armor pattern is lying here.~
    You can use this to make a suit of armor that will let you fight with the
-ferocity and stamina of a jaguar.
-Forge (Imperial Armors, crafting level 125): fearsome jaguar armor
+ferocity and stamina of a jaguar. It teaches you to forge fearsome jaguar
+armor.
 ~
-3 o a 3
-0 0 0
+7 0 a 4
+18517 0 0
 0 0
 S
 #18519
@@ -232,11 +232,11 @@ S
 pattern red coyote armor~
 a red coyote armor pattern~
 A red coyote armor pattern is lying here.~
-Unleash your inner coyote and prowl the night with your pack!
-Sew (Dangerous Leathers, crafting level 125): red coyote armor
+   Unleash your inner coyote and prowl the night with your pack! It teaches you
+to sew red coyote armor.
 ~
-3 o a 4
-0 0 0
+7 0 a 5
+18519 0 0
 0 0
 S
 #18521
@@ -276,11 +276,10 @@ a feathered serpent armor pattern~
 A feathered serpent armor pattern is lying here.~
    You can use this to craft a set of armor based on the great feathered
 serpent deity of the jungle. It won't help you fly, but it will give your magic
-a light touch, like the wind.
-Sew (Magical Vestments, crafting level 125): feathered serpent armor
+a light touch, like the wind. It teaches you to sew feathered serpent armor.
 ~
-3 o a 5
-0 0 0
+7 0 a 6
+18521 0 0
 0 0
 S
 #18523
@@ -318,11 +317,11 @@ pattern eagle warrior armor~
 an eagle warrior armor pattern~
 An eagle warrior armor pattern is lying here.~
    You can use these instructions to craft a set of armor fit for a powerful
-war shaman! Unfortunately, it won't help you fly.
-Sew (Magical Vestments, crafting level 125): eagle warrior armor
+war shaman! Unfortunately, it won't help you fly. It teaches you to sew eagle
+warrior armor.
 ~
-3 o a 6
-0 0 0
+7 0 a 7
+18523 0 0
 0 0
 S
 #18525
@@ -362,11 +361,10 @@ a blue chameleon armor pattern~
 A blue chameleon armor pattern is lying here.~
    You can use this pattern to craft a suit of combat armor based on a
 chameleon! It probably won't make you invisible, but at least it will look
-cool.
-Forge (Imperial Armors, crafting level 125): blue chameleon armor
+cool. It teaches you to forge blue chameleon armor.
 ~
-3 o a 6
-0 0 0
+7 o a 8
+18525 0 0
 0 0
 S
 #18527
@@ -624,22 +622,9 @@ A jungle temple token is lying here.~
    This token, redeemable for rewards at the Lost Temple adventure's shop, will
 be automatically stored in your pouch when taken.
 ~
-3 p a 9
-0 0 0
+12 p a 10
+1 18500 0
 7 0
-T 18542
-S
-#18543
-pouch jungle temple tokens~
-a pouch of jungle temple tokens~
-A pouch of jungle temple tokens is lying here.~
-   This pouch holds tokens redeemable for rewards at the Lost Temple adventure's
-shop. Use 'count tokens' to count them.
-~
-3 p a 8
-0 0 0
-7 0
-T 18543
 S
 #18544
 chance boss loot~

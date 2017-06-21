@@ -1,0 +1,62 @@
+#2908
+carriage imperial~
+an imperial carriage~
+An imperial carriage is parked here.~
+   This carriage is made from wood but highlighted in glimmering imperium. It
+looks like it has lots of storage space, perfect for the traveling monarch.
+~
+~
+bfhio 19 36 500 2
+C
+100 200
+D
+2908 0 0
+R
+19 1 1 0
+R
+20 1 1 0
+S
+#2916
+caravan heroic~
+a heroic caravan~
+A heroic caravan of adventurers is parked here.~
+   The caravan is made up of several massive carriages, some chained to each
+other and the rest pulled by their own steeds. The caravan is made from exotic
+wood and well-appointed with golden highlights, and surely belongs to the
+world's most successful adventurers.
+~
+&V{][}~
+bfio 19 128 500 6
+C
+200 300
+D
+2916 0 0
+R
+19 1 1 0
+R
+20 1 1 0
+T 2916
+S
+#2917
+galleon heroic~
+a heroic galleon~
+A heroic galleon of adventurers is floating here.~
+   The galleon is an absolutely massive ship, large enough to be a city in
+itself. It appears to be made from some exotic wood, and sits higher in the
+water than an ordinary ship.
+~
+&p<&u44&0&p>~
+ciktu 20 128 800 0
+C
+200 300
+D
+5522 10 opq
+R
+16 2 1 0
+R
+19 2 1 0
+R
+26 2 1 0
+T 2917
+S
+$

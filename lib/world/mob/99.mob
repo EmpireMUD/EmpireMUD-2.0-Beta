@@ -5,6 +5,18 @@ An adorable puppy is whining at you.
 ~
 1 1 bdoD n
 0 0 0 9
+M
+0
+$n wags $s tail and yips.~
+M
+0
+$n trips over $s own paws and does a little roll.~
+M
+0
+$n sniffs inquisitively at your ankles.~
+M
+0
+$n runs in circles, chasing $s own tail.~
 T 9901
 T 9902
 S
@@ -15,6 +27,24 @@ A cute kitten is winding its way between your legs.
 ~
 1 1 bdoD n
 0 0 0 9
+M
+0
+$n mews plaintively.~
+M
+0
+$n purrs contentedly.~
+M
+0
+$n nudges your leg.~
+M
+0
+$n attempts to climb up your leg.~
+M
+0
+$n stares soulfully into your eyes.~
+M
+0
+$n looks around, seemingly disinterested.~
 T 9901
 T 9902
 S
@@ -25,6 +55,15 @@ A tiny pixie is flitting around.
 ~
 1 1 bdoD mn
 0 0 18 22
+M
+0
+$n twirls in the air like a ballerina.~
+M
+0
+$n flies in quick circles around you, trailing sparkles.~
+M
+0
+$n stares at you with bright, inquisitive eyes...~
 T 9901
 T 9902
 S
@@ -35,6 +74,18 @@ A tiny fawn is staggering around.
 ~
 1 1 bdoD n
 0 0 14 11
+M
+0
+$n staggers around on its tiny little legs.~
+M
+0
+$n stares at you with deep, soulful eyes.~
+M
+0
+$n nuzzles your leg.~
+M
+0
+$n bleats at you.~
 T 9901
 T 9902
 S
@@ -45,6 +96,15 @@ A bear cub is rearing up playfully.
 ~
 1 1 bdoD n
 0 0 0 9
+M
+0
+$n licks your hand.~
+M
+0
+$n makes a strange chortling sound.~
+M
+0
+$n scratches the ground with $s claws.~
 T 9901
 T 9902
 S
@@ -55,6 +115,18 @@ A wolf pup is panting and wagging its tail.
 ~
 1 1 bdoD n
 0 0 0 9
+M
+0
+$n tries to howl, but it comes out as a squeak.~
+M
+0
+$n wags $s tail and yips.~
+M
+0
+$n sniffs inquisitively at your ankles.~
+M
+0
+$n crouches down, then suddenly pounces on your boot.~
 T 9901
 T 9902
 S
@@ -65,6 +137,15 @@ A tame hummingbird flits around you.
 ~
 1 1 bdoD mn
 0 0 2 26
+M
+0
+$n hovers in front of your face for a moment, wings flapping furiously.~
+M
+0
+$n darts around, chirping quietly.~
+M
+0
+$n lands on your shoulder and looks around.~
 T 9901
 T 9902
 S
@@ -75,6 +156,21 @@ A colorful butterfly is fluttering around here.
 ~
 1 1 bdoD mn
 0 0 18 22
+M
+0
+$n flaps its wings, and you wonder if $e's causing a storm on the other side of the world.~
+M
+0
+Light reflects off $n's wings, and they shine with all the colors of the rainbow.~
+M
+0
+$n flaps its wings.~
+M
+0
+$n flaps its wings.~
+M
+0
+$n's wings shimmer with iridescent light.~
 T 9901
 T 9902
 S
@@ -85,6 +181,12 @@ A cuddly cobra is winding itself around your leg.
 ~
 1 1 bdoD n
 0 0 5 9
+M
+0
+$n hisses.~
+M
+0
+$n angles its head and examines you with one eye.~
 T 9901
 T 9902
 S
@@ -95,6 +197,18 @@ A bitsy bat is flapping around here.
 ~
 1 1 bdoD mn
 0 0 2 9
+M
+0
+$n makes an adorable squeaking noise.~
+M
+0
+$n lands on the top of your head and looks around.~
+M
+0
+$n flaps in circles around you.~
+M
+0
+$n looks around for something to hang from.~
 T 9901
 T 9902
 S
@@ -105,6 +219,15 @@ A flying fish swims happily past you.
 ~
 1 1 bdoD mn
 0 0 6 9
+M
+0
+$n blows a stream of bubbles.~
+M
+0
+$n makes a 'glub glub' noise.~
+M
+0
+$n darts around you with a flick of its fin.~
 T 9901
 T 9902
 S
@@ -115,6 +238,27 @@ A friendly firefly is flying happily around here.
 ~
 1 1 bdoD mn
 0 0 6 22
+M
+0
+$n emits four short flashes, then a brief pause, then two more short flashes.~
+M
+0
+$n flies in a circle around you, glowing brightly.~
+M
+0
+$n gives off a complex series of long and short flashes.~
+M
+0
+$n flashes brightly.~
+M
+0
+$n flashes brightly.~
+M
+0
+$n glows softly.~
+M
+0
+$n glows softly.~
 T 9901
 T 9902
 S
@@ -125,6 +269,24 @@ A tame fire spirit is blazing away here.
 ~
 1 1 bdoD mn
 0 0 2 16
+M
+0
+$n crackles and sparks.~
+M
+0
+$n sizzles and smokes.~
+M
+0
+$n burns brightly.~
+M
+1
+Some spirits just want to watch the world burn. Like me!~
+M
+1
+We didn't start the fire. But isn't it awesome?!~
+M
+0
+$n conjures a small fire in the air and gazes into it, entranced.~
 T 9901
 T 9902
 S
@@ -135,6 +297,24 @@ A tame ice spirit is freezing the air here.
 ~
 1 1 bdoD mn
 0 0 2 20
+M
+0
+$n stares at you frostily.~
+M
+0
+$n's snowy skin glitters in the light.~
+M
+0
+$n waves a hand and summons a tiny blizzard above your head.~
+M
+0
+$n starts throwing tiny snowballs at you.~
+M
+1
+Snow is so cool...~
+M
+1
+I wish it could be winter forever...~
 T 9901
 T 9902
 S
@@ -145,6 +325,27 @@ A tame storm spirit is sparking and crackling here.
 ~
 1 1 bdoD mn
 0 0 2 21
+M
+0
+$n crackles and sparks.~
+M
+0
+$n poses dramatically, and there is a distant rumble of thunder.~
+M
+0
+$n brushes your skin, and you feel a faint tingle.~
+M
+0
+$n flits to and fro, flying as fast as lightning.~
+M
+0
+$n flies in a circle, and summons a tiny storm cloud.~
+M
+1
+Ahh... rain is so soothing...~
+M
+1
+Lightning and thunder are so exciting. Crash! Grr...~
 T 9901
 T 9902
 S
@@ -155,6 +356,21 @@ A tame earth spirit is levitating pebbles here.
 ~
 1 1 bdoD mn
 0 0 2 5
+M
+0
+$n sits in silent concentration.~
+M
+0
+$n burrows into the ground and vanishes, then emerges nearby.~
+M
+0
+$n stamps its foot, and a faint tremor runs through the earth.~
+M
+1
+Our ancestor Namazu stirs only on the first of January...~
+M
+0
+$n floats in the air, surrounded by a spinning ring of pebbles.~
 T 9901
 T 9902
 S
@@ -165,6 +381,33 @@ A lost spirit is wandering aimlessly here.
 ~
 1 1 bdoD mn
 0 0 2 21
+M
+0
+You wonder if $n would feel like a pillow if you could touch it.~
+M
+0
+You wonder if $n tastes like a marshmallow.~
+M
+0
+$n dances aimlessly in the sky.~
+M
+0
+$n dances aimlessly in the sky.~
+M
+0
+$n floats in a slow circle around you.~
+M
+0
+$n floats in a slow circle around you.~
+M
+0
+$n floats in a slow circle around you.~
+M
+0
+$n glows faintly, emitting an aura of confusion.~
+M
+0
+$n glows faintly, emitting an aura of confusion.~
 T 9901
 T 9902
 S
@@ -175,6 +418,21 @@ A little lizard is scuttling around here.
 ~
 1 1 bdoD n
 0 0 7 9
+M
+0
+$n stands still for a moment and starts doing push-ups.~
+M
+0
+$n stares intently at you.~
+M
+0
+$n flicks its tail to and fro.~
+M
+0
+$n flicks its tail and hisses.~
+M
+0
+$n hisses quietly.~
 T 9901
 T 9902
 S
@@ -185,6 +443,24 @@ A dwarf-kobold brandishes its tiny scimitar at you!
 ~
 1 1 bdoD n
 0 0 11 1
+M
+1
+Stand and deliver!~
+M
+1
+Your money or your life!~
+M
+1
+You take the high road and I'll take your wallet!~
+M
+1
+This is a hold-up!~
+M
+0
+$n flourishes $s scimitar dramatically.~
+M
+0
+$n attempts to glare menacingly at you, but the result is adorable.~
 T 9901
 T 9902
 S
@@ -195,6 +471,15 @@ You have found a cute bug.
 ~
 1 1 bdoD mn
 0 0 8 9
+M
+0
+$n starts flying around, then suddenly crashes.~
+M
+0
+$n suddenly disappears and reappears nearby.~
+M
+0
+$n walks right through your leg and appears on the other side.~
 T 9901
 T 9902
 S
@@ -205,6 +490,30 @@ A pet rock is sitting here.
 ~
 1 1 bdoD n
 0 0 15 5
+M
+0
+You stare hard at $n, trying to figure out if it's moving.~
+M
+0
+$n stares lovingly at its master.~
+M
+0
+You almost trip over $n.~
+M
+0
+$n sits on the ground, unmoving.~
+M
+0
+$n sits on the ground, unmoving.~
+M
+0
+$n hops in a little circle.~
+M
+0
+$n shifts slightly.~
+M
+0
+$n shifts slightly.~
 T 9901
 T 9902
 S
@@ -215,6 +524,24 @@ A cute little shrub is growing here.
 ~
 1 1 bdoD n
 0 0 9 7
+M
+0
+$n waves happily at you.~
+M
+0
+$n shuffles around.~
+M
+0
+$n rotates on the spot, as if looking around.~
+M
+0
+$n pokes you in the shin.~
+M
+0
+The cute little shrub blows innocently in the wind.~
+M
+0
+The cute little shrub blows innocently in the wind.~
 T 9901
 T 9902
 S
@@ -250,6 +577,21 @@ A prehistoric bug has been unearthed.
 ~
 1 1 bdoD mn
 0 0 2 15
+M
+0
+$n starts flying around...~
+M
+0
+$n starts flying around...~
+M
+0
+$n starts flying around...~
+M
+0
+$n starts flying around... and crashes!~
+M
+0
+You wonder how long $n has been around.~
 T 9901
 T 9902
 S
@@ -262,7 +604,10 @@ A bald beagle hops along the ground, trying to take flight.
 0 0 15 9
 M
 0
-$n tries to screech like an eagle, but it comes out as a high whine.~
+$n tries to screech like an eagle, but it comes out as a high wine.~
+M
+0
+$n walks up to you and begs, clearly hunting for a tasty threat.~
 T 9901
 T 9902
 S
@@ -271,9 +616,35 @@ snark great white~
 a great white snark~
 A great white snark drags itself slowly along the ground.
 ~
-0 0 bdoD n
+1 1 bdoD n
 0 0 17 9
+M
+1
+Land sharks, the wizard said... What a grate idea, he said...~
+M
+0
+$n circlets below you!~
+M
+0
+$n circlets below you!~
+M
+0
+$n circlets below you!~
+M
+0
+$n seams to be having trouble breathing in the air.~
 T 9901
 T 9902
+S
+#9926
+Heisenbug notorious~
+the notorious Heisenbug~
+You have discovered the notorious Heisenbug!
+~
+1 1 bdoD mn
+0 0 8 9
+T 9901
+T 9902
+T 9926
 S
 $

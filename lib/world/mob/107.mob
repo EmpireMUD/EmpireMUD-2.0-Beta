@@ -317,7 +317,7 @@ M
 $n shivers uncomfortably.~
 M
 1
-Nynar sell bug potion for 30 coin! (type 'buy potion')~
+Nynar sell bug potion for 50 coin! (type 'buy potion')~
 M
 0
 $n scratches $mself all over.~
@@ -325,7 +325,6 @@ M
 1
 Never going back there.~
 T 10756
-T 10752
 S
 #10755
 meena miner goblin~
@@ -350,7 +349,6 @@ M
 1
 Meena should have been a major.~
 T 10756
-T 10752
 S
 #10756
 goblin webbed goblin-shaped cocoon~
@@ -389,7 +387,6 @@ M
 0
 $n coughs so hard a lump of coal comes out.~
 T 10756
-T 10752
 S
 #10758
 Hanx miner~
@@ -411,6 +408,5 @@ M
 0
 $n ties some sticks together with an old piece of twine.~
 T 10756
-T 10752
 S
 $

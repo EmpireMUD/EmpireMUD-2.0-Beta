@@ -390,7 +390,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 */
 bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, int mode) {
 	extern bool can_take_obj(char_data *ch, obj_data *obj);
-	void get_check_money(char_data *ch, obj_data *obj);
+	bool get_check_money(char_data *ch, obj_data *obj);
 
 	if (!bind_ok(obj, ch)) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -1393,7 +1393,7 @@ ACMD(do_dispatch) {
 	}
 	
 	// destination validation
-	else if (GET_ISLAND_ID(IN_ROOM(veh)) == NO_ISLAND) {
+	else if (!GET_ISLAND(IN_ROOM(veh))) {
 		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
 	}
 	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {

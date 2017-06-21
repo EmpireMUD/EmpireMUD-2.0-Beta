@@ -1,5 +1,6 @@
 Various game binary files in this directory:
 
+automessages - Global messages configured in-game with 'automessage'.
 badsites - Ban data.
 daily_quests - Which cycled dailies are 'turned on'.
 exp_cycle - The timestamp of the last daily skill reset.

@@ -604,4 +604,47 @@ else
   %damage% %actor% 25
 end
 ~
+#9066
+Nerf bat random debuffs~
+0 bw 15
+~
+eval effect %random.4%
+switch %effect%
+  case 1
+    %echo% %self.name% brushes you with its wings. and you feel lethargic.
+  break
+  case 2
+    %echo% %self.name% squeaks, and you feel your strength desert you.
+  end
+  case 3
+    %echo% %self.name% scratches you with a claw, and you feel fragile.
+  break
+  case 4
+    %echo% %self.name% bats at you with its wing, and you feel clumsy.
+  break
+done
+eval person %room.people%
+while %person%
+  if %person.is_pc%
+    switch %effect%
+      case 1
+        dg_affect #9066 %person% SLOW on 120
+      break
+      case 2
+        dg_affect #9066 %person% BONUS-PHYSICAL -10 120
+        dg_affect #9066 %person% BONUS-MAGICAL -10 120
+      break
+      case 3
+        dg_affect #9066 %person% RESIST-PHYSICAL -10 120
+        dg_affect #9066 %person% RESIST-MAGICAL -10 120
+      break
+      case 4
+        dg_affect #9066 %person% TO-HIT -25 120
+        dg_affect #9066 %person% DODGE -25 120
+      break
+    done
+  end
+  eval person %person.next_in_room%
+done
+~
 $

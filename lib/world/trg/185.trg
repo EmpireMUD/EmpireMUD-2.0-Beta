@@ -5,6 +5,10 @@ Sun King combat~
 eval heroic_mode %self.mob_flagged(GROUP)%
 * Count combat script cycles until enrage
 * 1 cycle should be 30 seconds
+if %self.cooldown(18501)%
+  halt
+end
+nop %self.set_cooldown(18501, 30)%
 if %heroic_mode%
   * Start scaling up immediately, game over at 15 minutes
   eval soft_enrage_cycles 1
@@ -50,7 +54,7 @@ if %enraged%
   if %random.4% == 4
     %echo% As %self.name% fights, the pallor of death fades from %self.hisher% skin!
   end
-  dg_affect %self% BONUS-MAGICAL 10 3600
+  dg_affect #18502 %self% BONUS-MAGICAL 10 3600
 end
 * Start of regular combat script:
 switch %random.4%
@@ -63,13 +67,12 @@ switch %random.4%
     %send% %actor% &r%self.name% unleashes a blast of green fire at you, causing %adj% burns!&0
     %echoaround% %actor% %self.name% unleashes a blast of green fire at %actor.name%, causing %adj% burns!
     if %heroic_mode%
-      %dot% %actor% 500 15 fire
+      %dot% #18503 %actor% 500 15 fire
       %damage% %actor% 150 fire
     else
-      %dot% %actor% 200 15 fire
+      %dot% #18503 %actor% 200 15 fire
       %damage% %actor% 100 fire
     end
-    wait 30 sec
   break
   * Emerald flame wave AoE
   case 2
@@ -85,7 +88,6 @@ switch %random.4%
       %aoe% 50 fire
       %damage% %self% -200
     end
-    wait 27 sec
   break
   * Mana drain + spirit bomb
   case 3
@@ -127,7 +129,7 @@ switch %random.4%
       eval damage_scale %total_drained% / 2
       %send% %actor% &r%self.name% hurls the stolen mana at you as a huge energy blast, which sends you flying!
       %echoaround% %actor% %self.name% hurls the stolen mana at %actor.name% in the form of a huge energy blast, sending %actor.himher% flying!
-      dg_affect %actor% STUNNED on 10
+      dg_affect #18504 %actor% STUNNED on 10
       %damage% %actor% %damage_scale% magical
       if %damage_scale% >= 600
         %echo% &rThe energy blast explodes!
@@ -139,7 +141,6 @@ switch %random.4%
       %echoaround% %actor% %self.name% hurls the stolen mana at %actor.name% in the form of an energy blast!
       %damage% %actor% 100
     end
-    wait 7 sec
   break
   * Power word stun
   case 4
@@ -169,8 +170,8 @@ switch %random.4%
         if !%person.trigger_counterspell%
           %send% %person% You fall to your knees as your body stops responding to your commands!
           %echoaround% %person% %person.name% falls to %person.hisher% knees, stunned.
-          dg_affect %person% DODGE -50 10
-          dg_affect %person% STUNNED on 5
+          dg_affect #18506 %person% DODGE -50 10
+          dg_affect #18505 %person% STUNNED on 5
         else
           %send% %person% Your counterspell protects you from %self.name%'s word of power!
           %echoaround% %person% %person.name% doesn't seem to be affected!
@@ -182,7 +183,6 @@ switch %random.4%
         eval person %person.next_in_room%
       end
     done
-    wait 27 sec
   break
 done
 ~
@@ -190,6 +190,10 @@ done
 Serpent Lord combat~
 0 k 100
 ~
+if %self.cooldown(18501)%
+  halt
+end
+nop %self.set_cooldown(18501, 30)%
 eval heroic_mode %self.mob_flagged(GROUP)%
 eval attack %random.4%
 switch %attack%
@@ -215,7 +219,6 @@ switch %attack%
       eval cycles_left %cycles_left% - 1
     done
     %echo% %self.name% finishes %self.hisher% blade dance.
-    wait 15 sec
   break
   case 2
     * Naga Venom
@@ -230,15 +233,14 @@ switch %attack%
     if %heroic_mode%
       %damage% %actor% 150
       %send% %actor% You suddenly feel a bone-deep numbness...
-      %dot% %actor% 300 15 poison
-      dg_affect %actor% STUNNED on 5
+      %dot% #18508 %actor% 300 15 poison
+      dg_affect #18507 %actor% STUNNED on 5
     else
       %damage% %actor% 100
       %send% %actor% The pain of the bite numbs...
-      %dot% %actor% 100 30 poison
-      dg_affect %actor% SLOW on 10
+      %dot% #18508 %actor% 100 30 poison
+      dg_affect #18507 %actor% SLOW on 10
     end
-    wait 30 sec
   break
   case 3
     * Powerful Blow
@@ -253,15 +255,14 @@ switch %attack%
     %send% %actor% You are stunned by %self.name%'s powerful blow!
     if %heroic_mode%
       %damage% %actor% 150 physical
-      dg_affect %actor% STUNNED on 10
+      dg_affect #18509 %actor% STUNNED on 10
       %send% %actor% %self.name%'s powerful blow sends your weapon flying!
       %echoaround% %actor% %self.name%'s powerful blow sends %actor.name%'s weapon flying!
-      dg_affect %actor% DISARM on 30
+      dg_affect #18510 %actor% DISARM on 30
     else
       %damage% %actor% 75 physical
-      dg_affect %actor% STUNNED on 5
+      dg_affect #18509 %actor% STUNNED on 5
     end
-    wait 30 sec
   break
   case 4
     * Mirage
@@ -289,7 +290,6 @@ switch %attack%
         %echo% Could not find summon.
       end
     done
-    wait 30 sec
   break
 done
 ~
@@ -297,6 +297,10 @@ done
 Quetzalcoatl combat~
 0 k 100
 ~
+if %self.cooldown(18501)%
+  halt
+end
+nop %self.set_cooldown(18501, 30)%
 eval heroic_mode %self.mob_flagged(GROUP)%
 eval attack %random.4%
 switch %attack%
@@ -314,7 +318,7 @@ switch %attack%
       while %person%
         eval test %%self.is_enemy(%person%)%%
         if %test%
-          dg_affect %person% BLIND on 10
+          dg_affect #18511 %person% BLIND on 10
         end
         eval person %person.next_in_room%
       done
@@ -322,7 +326,7 @@ switch %attack%
       %send% %actor% &r%self.name%'s jeweled feathers flash brightly, blinding you!
       %echoaround% %actor% %self.name%'s jeweled feathers flash brightly, blinding %actor.name%!
       %damage% %actor% 25 magical
-      dg_affect %actor% BLIND on 10
+      dg_affect #18511 %actor% BLIND on 10
     end
   break
   case 2
@@ -333,10 +337,10 @@ switch %attack%
     eval dodge_magnitude %self.level%/5
     eval heal_magnitude %self.level%/2
     %echo% %self.name% dances on the wind, becoming harder to hit!
-    dg_affect %self% DODGE %dodge_magnitude% 30
+    dg_affect #18512 %self% DODGE %dodge_magnitude% 30
     if %heroic_mode%
       %echo% As %self.name% dances, %self.hisher% wounds close!
-      dg_affect %self% HEAL-OVER-TIME %heal_magnitude% 30
+      dg_affect #18512 %self% HEAL-OVER-TIME %heal_magnitude% 30
     end
   break
   case 3
@@ -350,13 +354,13 @@ switch %attack%
     while %person%
       eval test %%self.is_enemy(%person%)%%
       if %test%
-        dg_affect %person% DISARM on 15
+        dg_affect #18513 %person% DISARM on 15
       end
       eval person %person.next_in_room%
     done
     if %heroic_mode%
       %echo% %self.name% tumbles through the air faster than before!
-      dg_affect %self% HASTE on 30
+      dg_affect #18514 %self% HASTE on 30
     end
   break
   case 4
@@ -383,7 +387,6 @@ switch %attack%
     end
   break
 done
-wait 30 sec
 ~
 #18503
 Jungle Temple Trash fight~
@@ -918,108 +921,6 @@ end
 %send% %actor% You need to deal with %self.name% before you can climb back up!
 return 0
 ~
-#18517
-Jungle Temple shop list - archaeologist~
-0 c 0
-list~
-* List of items
-%send% %actor% %self.name% sells the following items for jungle temple tokens:
-%send% %actor% - riding jaguar whistle (14 tokens, land mount)
-%send% %actor% - sea serpent whistle (16 tokens, aquatic mount)
-%send% %actor% - feathered serpent whistle (40 tokens, flying mount)
-%send% %actor% - jaguar cub whistle (24 tokens, minipet)
-%send% %actor% - jaguar charm (18 tokens, Animal Morphs disguise morph)
-%send% %actor% - fearsome jaguar armor pattern (20 tokens, tank armor)
-%send% %actor% - red coyote armor pattern (20 tokens, melee armor)
-%send% %actor% - feathered serpent armor pattern (20 tokens, healer armor)
-%send% %actor% - eagle warrior armor pattern (20 tokens, caster armor)
-%send% %actor% - blue chameleon armor pattern (20 tokens, pvp armor)
-~
-#18518
-Jungle Temple shop buy - archaeologist~
-0 c 0
-buy~
-eval vnum -1
-eval cost 0
-set named a thing
-eval currency jungletemple_tokens
-eval test %%actor.varexists(%currency%)%%
-if !%test%
-  %send% %actor% You don't have any of this shop's currency!
-  halt
-end
-if (!%arg%)
-  %send% %actor% Type 'list' to see what's available.
-  halt
-  * Disambiguate
-elseif jaguar /= %arg%
-  %send% %actor% Jaguar charm or jaguar cub whistle?
-  halt
-elseif feathered serpent /= %arg%
-  %send% %actor% Feathered serpent whistle or feathered serpent armor pattern?
-  halt
-  * Mounts and pets etc
-elseif riding jaguar whistle /= %arg%
-  eval vnum 18512
-  eval cost 14
-  set named a riding jaguar whistle
-elseif sea serpent whistle /= %arg%
-  eval vnum 18513
-  eval cost 16
-  set named a sea serpent whistle
-elseif feathered serpent whistle /= %arg%
-  eval vnum 18514
-  eval cost 40
-  set named a feathered serpent whistle
-elseif jaguar cub whistle /= %arg%
-  eval vnum 18515
-  eval cost 24
-  set named a jaguar cub whistle
-elseif jaguar charm /= %arg%
-  eval vnum 18516
-  eval cost 18
-  set named a jaguar charm
-  * Crafts
-elseif fearsome jaguar armor pattern /= %arg%
-  eval vnum 18518
-  eval cost 20
-  set named the fearsome jaguar armor pattern
-elseif red coyote armor pattern /= %arg%
-  eval vnum 18520
-  eval cost 20
-  set named the red coyote armor pattern
-elseif feathered serpent armor pattern /= %arg%
-  eval vnum 18522
-  eval cost 20
-  set named feathered serpent armor pattern
-elseif eagle warrior armor pattern /= %arg%
-  eval vnum 18524
-  eval cost 20
-  set named the eagle warrior armor pattern
-elseif blue chameleon armor pattern /= %arg%
-  eval vnum 18526
-  eval cost 20
-  set named the blue chameleon armor pattern
-else
-  %send% %actor% They don't seem to sell '%arg%' here.
-  halt
-end
-eval var %%actor.%currency%%%
-eval test %var% >= %cost%
-eval correct_noun tokens
-if %cost% == 1
-  eval correct_noun token
-end
-if !%test%
-  %send% %actor% %self.name% tells you, 'You'll need %cost% jungle temple %correct_noun% to buy that.'
-  halt
-end
-eval %currency% %var%-%cost%
-remote %currency% %actor.id%
-%load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy %named% for %cost% jungle temple %correct_noun%.
-%echoaround% %actor% %actor.name% buys %named%.
-~
 #18519
 Jungle Temple boss death - drop tokens~
 0 f 100
@@ -1033,19 +934,7 @@ while %person%
     * You get a token, and you get a token, and YOU get a token!
     %send% %person% As %self.name% dies, a jungle temple token falls to the ground!
     %send% %person% You take the newly created token.
-    if !%person.inventory(18543)%
-      %load% obj 18543 %person% inv
-      %send% %person% You find a pouch to store your jungle temple tokens in.
-    end
-    eval test %%person.varexists(%var_name%)%%
-    if %test%
-      eval val %%person.%var_name%%%
-      eval %var_name% %val%+1
-      remote %var_name% %person.id%
-    else
-      eval %var_name% 1
-      remote %var_name% %person.id%
-    end
+    nop %person.give_currency(18500, 1)%
     * Now purge summons
   elseif %person.vnum% == 18506
     %purge% %person% $n slithers away.
@@ -1098,8 +987,9 @@ eval room7 %room6.east(room)%
 Jungle Temple adventure cleanup building replacer~
 2 e 100
 ~
+eval instance_cleared (%instance.loaded% && !%instance.mob(18500)%
 eval dir %room.exit_dir%
-if !%instance.mob(18500)%
+if %instance_cleared%
   if %dir%
     %build% %room% 18501 %dir%
   end
@@ -1122,63 +1012,6 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
   remote enrage_counter %self.id%
   %restore% %self%
   %echo% %self.name% settles down to rest.
-end
-~
-#18542
-Jungle token load/purge~
-1 gn 100
-~
-eval var_name jungletemple_tokens
-if !%actor%
-  eval actor %self.carried_by%
-else
-  %send% %actor% You take %self.shortdesc%.
-  %echoaround% %actor% %actor.name% takes %self.shortdesc%.
-  return 0
-end
-if %actor%
-  if %actor.is_npc%
-    * Oops
-    halt
-  end
-  if !%actor.inventory(18543)%
-    %load% obj 18543 %actor% inv
-    %send% %actor% You find a pouch to store your ancient temple tokens in.
-  end
-  eval test %%actor.varexists(%var_name%)%%
-  if %test%
-    eval val %%actor.%var_name%%%
-    eval %var_name% %val%+1
-    remote %var_name% %actor.id%
-  else
-    eval %var_name% 1
-    remote %var_name% %actor.id%
-  end
-  %purge% %self%
-end
-~
-#18543
-Jungle temple tokens count~
-1 c 2
-count~
-eval test %%actor.obj_target(%arg%)%%
-if %self% != %test%
-  return 0
-  halt
-end
-eval var_name jungletemple_tokens
-%send% %actor% You count %self.shortdesc%.
-eval test %%actor.varexists(%var_name%)%%
-%echoaround% %actor% %actor.name% counts %self.shortdesc%.
-if %test%
-  eval count %%actor.%var_name%%%
-  if %count% == 1
-    %send% %actor% You have one token.
-  else
-    %send% %actor% You have %count% tokens.
-  end
-else
-  %send% %actor% You have no tokens.
 end
 ~
 #18544

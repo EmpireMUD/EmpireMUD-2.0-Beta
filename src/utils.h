@@ -29,6 +29,7 @@
 *   Empire Utils
 *   Faction Utils
 *   Fight Utils
+*   Generic Utils
 *   Global Utils
 *   Map Utils
 *   Memory Utils
@@ -41,6 +42,7 @@
 *   Room Utils
 *   Room Template Utils
 *   Sector Utils
+*   Shop Utils
 *   Skill Utils
 *   Social Utils
 *   String Utils
@@ -198,6 +200,7 @@
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
 #define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
+#define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
 #define GET_BLD_YEARLY_MAINTENANCE(bld)  ((bld)->yearly_maintenance)
 
 
@@ -350,6 +353,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (get_skill_level((ch), SKILL_NATURAL_MAGIC) > 0 || get_skill_level((ch), SKILL_HIGH_SORCERY) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (get_skill_level((ch), SKILL_VAMPIRE) > 0))
+#define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? (((ch)->master && !IS_NPC((ch)->master)) ? PRF_FLAGGED((ch)->master, PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
 
 // helpers
@@ -446,6 +450,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
 #define GET_OLC_FACTION(desc)  ((desc)->olc_faction)
+#define GET_OLC_GENERIC(desc)  ((desc)->olc_generic)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
@@ -453,6 +458,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_QUEST(desc)  ((desc)->olc_quest)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
+#define GET_OLC_SHOP(desc)  ((desc)->olc_shop)
 #define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
 #define GET_OLC_SOCIAL(desc)  ((desc)->olc_social)
 #define GET_OLC_TRIGGER(desc)  ((desc)->olc_trigger)
@@ -539,6 +545,62 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 //// FIGHT UTILS /////////////////////////////////////////////////////////////
 
 #define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GENERIC UTILS ///////////////////////////////////////////////////////////
+
+#define GEN_VNUM(gen)  ((gen)->vnum)
+#define GEN_FLAGS(gen)  ((gen)->flags)
+#define GEN_NAME(gen)  ((gen)->name)
+#define GEN_STRING(gen, pos)  ((gen)->string[(pos)])
+#define GEN_TYPE(gen)  ((gen)->type)
+#define GEN_VALUE(gen, pos)  ((gen)->value[(pos)])
+
+
+// helpers
+#define GEN_FLAGGED(gen, flag)  IS_SET(GEN_FLAGS(gen), (flag))
+
+
+// GENERIC_x: value definitions and getters
+
+// GENERIC_LIQUID
+#define GSTR_LIQUID_NAME  0
+#define GSTR_LIQUID_COLOR  1
+#define GET_LIQUID_NAME(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_NAME) : "")
+#define GET_LIQUID_COLOR(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_COLOR) : "")
+#define GET_LIQUID_DRUNK(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), DRUNK) : 0)
+#define GET_LIQUID_FULL(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), FULL) : 0)
+#define GET_LIQUID_THIRST(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), THIRST) : 0)
+
+// GENERIC_ACTION
+#define GSTR_ACTION_BUILD_TO_CHAR  0
+#define GSTR_ACTION_BUILD_TO_ROOM  1
+#define GSTR_ACTION_CRAFT_TO_CHAR  2
+#define GSTR_ACTION_CRAFT_TO_ROOM  3
+#define GSTR_ACTION_REPAIR_TO_CHAR  4
+#define GSTR_ACTION_REPAIR_TO_ROOM  5
+
+// GENERIC_COOLDOWN
+#define GSTR_COOLDOWN_WEAR_OFF  0
+#define GET_COOLDOWN_WEAR_OFF(gen)  (GEN_TYPE(gen) == GENERIC_COOLDOWN ? GEN_STRING((gen), GSTR_COOLDOWN_WEAR_OFF) : NULL)
+
+// GENERIC_AFFECT
+#define GSTR_AFFECT_WEAR_OFF_TO_CHAR  0
+#define GSTR_AFFECT_WEAR_OFF_TO_ROOM  1
+#define GSTR_AFFECT_APPLY_TO_CHAR  2
+#define GSTR_AFFECT_APPLY_TO_ROOM  3
+#define GET_AFFECT_WEAR_OFF_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_CHAR) : NULL)
+#define GET_AFFECT_WEAR_OFF_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_ROOM) : NULL)
+#define GET_AFFECT_APPLY_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_CHAR) : NULL)
+#define GET_AFFECT_APPLY_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_ROOM) : NULL)
+
+// GENERIC_CURRENCY
+#define GSTR_CURRENCY_SINGULAR  0
+#define GSTR_CURRENCY_PLURAL  1
+#define GET_CURRENCY_SINGULAR(gen)  (GEN_TYPE(gen) == GENERIC_CURRENCY ? GEN_STRING((gen), GSTR_CURRENCY_SINGULAR) : NULL)
+#define GET_CURRENCY_PLURAL(gen)  (GEN_TYPE(gen) == GENERIC_CURRENCY ? GEN_STRING((gen), GSTR_CURRENCY_PLURAL) : NULL)
+#define WHICH_CURRENCY(amt)  (((amt) == 1) ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -644,6 +706,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MOB_TO_DODGE(ch)  ((ch)->mob_specials.to_dodge)
 #define MOB_TO_HIT(ch)  ((ch)->mob_specials.to_hit)
 #define MOB_QUEST_LOOKUPS(ch)  ((ch)->quest_lookups)
+#define MOB_SHOP_LOOKUPS(ch)  ((ch)->shop_lookups)
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
@@ -693,6 +756,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_MAX_SCALE_LEVEL(obj)  ((obj)->obj_flags.max_scale_level)
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->obj_flags.min_scale_level)
 #define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->quest_lookups)
+#define GET_OBJ_SHOP_LOOKUPS(obj)  ((obj)->shop_lookups)
 #define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->obj_flags.requires_quest)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
@@ -721,7 +785,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
 
 // for stacking, sotring, etc
-#define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IS_ARROW(obj))
+#define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IS_AMMO(obj))
 #define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
 #define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && !IS_STOLEN(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP)
@@ -744,6 +808,12 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VAL_POISON_CHARGES  1
 #define GET_POISON_TYPE(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_TYPE) : NOTHING)
 #define GET_POISON_CHARGES(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_CHARGES) : 0)
+
+// ITEM_RECIPE
+#define IS_RECIPE(obj)  (GET_OBJ_TYPE(obj) == ITEM_RECIPE)
+#define VAL_RECIPE_VNUM  0
+#define GET_RECIPE_VNUM(obj)  (IS_RECIPE(obj) ? GET_OBJ_VAL((obj), VAL_RECIPE_VNUM) : NOTHING)
+
 
 // ITEM_WEAPON
 #define IS_WEAPON(obj)  (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
@@ -807,6 +877,13 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_COINS_AMOUNT(obj)  (IS_COINS(obj) ? GET_OBJ_VAL((obj), VAL_COINS_AMOUNT) : 0)
 #define GET_COINS_EMPIRE_ID(obj)  (IS_COINS(obj) ? GET_OBJ_VAL((obj), VAL_COINS_EMPIRE_ID) : 0)
 
+// ITEM_CURRENCY
+#define IS_CURRENCY(obj)  (GET_OBJ_TYPE(obj) == ITEM_CURRENCY)
+#define VAL_CURRENCY_AMOUNT  0
+#define VAL_CURRENCY_VNUM  1
+#define GET_CURRENCY_AMOUNT(obj)  (IS_CURRENCY(obj) ? GET_OBJ_VAL((obj), VAL_CURRENCY_AMOUNT) : 0)
+#define GET_CURRENCY_VNUM(obj)  (IS_CURRENCY(obj) ? GET_OBJ_VAL((obj), VAL_CURRENCY_VNUM) : 0)
+
 // ITEM_MAIL
 
 // ITEM_WEALTH
@@ -818,21 +895,21 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // ITEM_MISSILE_WEAPON
 #define IS_MISSILE_WEAPON(obj)  (GET_OBJ_TYPE(obj) == ITEM_MISSILE_WEAPON)
-#define VAL_MISSILE_WEAPON_SPEED  0
+#define VAL_MISSILE_WEAPON_TYPE  0	// attack type
 #define VAL_MISSILE_WEAPON_DAMAGE  1
-#define VAL_MISSILE_WEAPON_TYPE  2
-#define GET_MISSILE_WEAPON_SPEED(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_SPEED) : 0)
+#define VAL_MISSILE_WEAPON_AMMO_TYPE  2
+#define GET_MISSILE_WEAPON_TYPE(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_TYPE) : 0)
 #define GET_MISSILE_WEAPON_DAMAGE(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_DAMAGE) : 0)
-#define GET_MISSILE_WEAPON_TYPE(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_TYPE) : NOTHING)
+#define GET_MISSILE_WEAPON_AMMO_TYPE(obj)  (IS_MISSILE_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_MISSILE_WEAPON_AMMO_TYPE) : NOTHING)
 
-// ITEM_ARROW
-#define IS_ARROW(obj)  (GET_OBJ_TYPE(obj) == ITEM_ARROW)
-#define VAL_ARROW_QUANTITY  0
-#define VAL_ARROW_DAMAGE_BONUS  1
-#define VAL_ARROW_TYPE  2
-#define GET_ARROW_DAMAGE_BONUS(obj)  (IS_ARROW(obj) ? GET_OBJ_VAL((obj), VAL_ARROW_DAMAGE_BONUS) : 0)
-#define GET_ARROW_TYPE(obj)  (IS_ARROW(obj) ? GET_OBJ_VAL((obj), VAL_ARROW_TYPE) : NOTHING)
-#define GET_ARROW_QUANTITY(obj)  (IS_ARROW(obj) ? GET_OBJ_VAL((obj), VAL_ARROW_QUANTITY) : 0)
+// ITEM_AMMO
+#define IS_AMMO(obj)  (GET_OBJ_TYPE(obj) == ITEM_AMMO)
+#define VAL_AMMO_QUANTITY  0
+#define VAL_AMMO_DAMAGE_BONUS  1
+#define VAL_AMMO_TYPE  2
+#define GET_AMMO_DAMAGE_BONUS(obj)  (IS_AMMO(obj) ? GET_OBJ_VAL((obj), VAL_AMMO_DAMAGE_BONUS) : 0)
+#define GET_AMMO_TYPE(obj)  (IS_AMMO(obj) ? GET_OBJ_VAL((obj), VAL_AMMO_TYPE) : NOTHING)
+#define GET_AMMO_QUANTITY(obj)  (IS_AMMO(obj) ? GET_OBJ_VAL((obj), VAL_AMMO_QUANTITY) : 0)
 
 // ITEM_INSTRUMENT
 #define IS_INSTRUMENT(obj)  (GET_OBJ_TYPE(obj) == ITEM_INSTRUMENT)
@@ -882,7 +959,9 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_ADVENTURE_SUMMON_RETURN_MAP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_map))
 #define GET_ALIASES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->aliases))
 #define GET_APPARENT_AGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->apparent_age))
+#define GET_AUTOMESSAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->automessages))
 #define GET_BAD_PWS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->bad_pws))
+#define GET_BECKONED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->beckoned_by))
 #define GET_BONUS_TRAITS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->bonus_traits))
 #define GET_CLASS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->character_class))
 #define GET_CLASS_PROGRESSION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_progression))
@@ -894,6 +973,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_CONFUSED_DIR(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->confused_dir))
 #define GET_CREATION_ALT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->create_alt_id))
 #define GET_CREATION_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_host))
+#define GET_CURRENCIES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->currencies))
 #define GET_CURRENT_SKILL_SET(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->current_skill_set))
 #define GET_CUSTOM_COLOR(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->custom_colors[(pos)]))
 #define GET_DAILY_BONUS_EXPERIENCE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_bonus_experience))
@@ -922,6 +1002,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
 #define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
 #define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tip))
+#define GET_LEARNED_CRAFTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->learned_crafts))
 #define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room))
 #define GET_LOAD_ROOM_CHECK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room_check))
 #define GET_MAIL_PENDING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mail_pending))
@@ -961,6 +1042,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define REBOOT_CONF(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reboot_conf))
 #define REREAD_EMPIRE_TECH_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->reread_empire_tech_on_login))
 #define RESTORE_ON_LOGIN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->restore_on_login))
+#define USING_AMMO(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->using_ammo))
 #define USING_POISON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->using_poison))
 
 // helpers
@@ -1025,21 +1107,18 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // basic room data
 #define GET_ROOM_VNUM(room)  ((room)->vnum)
-#define ROOM_AFF_FLAGS(room)  ((room)->affects)
 #define ROOM_AFFECTS(room)  ((room)->af)
-#define ROOM_BASE_FLAGS(room)  ((room)->base_affects)
 #define ROOM_CONTENTS(room)  ((room)->contents)
 #define ROOM_CROP(room)  ((room)->crop_type)
-#define ROOM_DEPLETION(room)  ((room)->depletion)
 #define ROOM_LAST_SPAWN_TIME(room)  ((room)->last_spawn_time)
 #define ROOM_LIGHTS(room)  ((room)->light)
 #define BASE_SECT(room)  ((room)->base_sector)
 #define ROOM_OWNER(room)  ((room)->owner)
 #define ROOM_PEOPLE(room)  ((room)->people)
-#define ROOM_TRACKS(room)  ((room)->tracks)
 #define ROOM_VEHICLES(room)  ((room)->vehicles)
 #define SECT(room)  ((room)->sector_type)
 #define GET_EXITS_HERE(room)  ((room)->exits_here)
+#define GET_MAP_LOC(room)  ((room)->map_loc)
 
 
 // room->complex data
@@ -1047,7 +1126,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_BUILDING(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->bld_ptr : NULL)
 #define GET_ROOM_TEMPLATE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->rmt_ptr : NULL)
 #define IN_VEHICLE_IN_ROOM(room)  (GET_ROOM_VEHICLE(room) ? IN_ROOM(GET_ROOM_VEHICLE(room)) : room)
-#define BUILDING_BURNING(room)  (COMPLEX_DATA(HOME_ROOM(room)) ? COMPLEX_DATA(HOME_ROOM(room))->burning : 0)
+#define BUILDING_BURN_DOWN_TIME(room)  (COMPLEX_DATA(HOME_ROOM(room)) ? COMPLEX_DATA(HOME_ROOM(room))->burn_down_time : 0)
 #define BUILDING_DAMAGE(room)  (COMPLEX_DATA(HOME_ROOM(room)) ? COMPLEX_DATA(HOME_ROOM(room))->damage : 0)
 #define BUILDING_ENTRANCE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->entrance : NO_DIR)
 #define BUILDING_RESOURCES(room)  (COMPLEX_DATA(room) ? GET_BUILDING_RESOURCES(room) : NULL)
@@ -1056,10 +1135,25 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_BUILT_WITH(room)  (COMPLEX_DATA(room)->built_with)
 #define GET_INSIDE_ROOMS(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->inside_rooms : 0)
 #define HOME_ROOM(room)  ((COMPLEX_DATA(room) && COMPLEX_DATA(room)->home_room) ? COMPLEX_DATA(room)->home_room : (room))
+#define IS_BURNING(room)  (BUILDING_BURN_DOWN_TIME(room) > 0)
 #define IS_COMPLETE(room)  (!IS_INCOMPLETE(room) && !IS_DISMANTLING(room))
 #define ROOM_PATRON(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->patron : NOBODY)
 #define ROOM_PRIVATE_OWNER(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->private_owner : NOBODY)
 #define ROOM_INSTANCE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->instance : NULL)
+
+
+// shared data
+#define SHARED_DATA(room)  ((room)->shared)
+#define ROOM_AFF_FLAGS(room)  (SHARED_DATA(room)->affects)
+#define ROOM_BASE_FLAGS(room)  (SHARED_DATA(room)->base_affects)
+#define ROOM_CUSTOM_DESCRIPTION(room)  (SHARED_DATA(room)->description)
+#define ROOM_CUSTOM_ICON(room)  (SHARED_DATA(room)->icon)
+#define ROOM_CUSTOM_NAME(room)  (SHARED_DATA(room)->name)
+#define ROOM_DEPLETION(room)  (SHARED_DATA(room)->depletion)
+#define ROOM_EXTRA_DATA(room)  (SHARED_DATA(room)->extra_data)
+#define ROOM_TRACKS(room)  (SHARED_DATA(room)->tracks)
+#define GET_ISLAND(room)  (SHARED_DATA(room)->island_ptr)
+#define GET_ISLAND_ID(room)  (SHARED_DATA(room)->island_id)
 
 
 // exits
@@ -1069,11 +1163,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // building data by room
 #define BLD_MAX_ROOMS(room)  (GET_BUILDING(HOME_ROOM(room)) ? GET_BLD_EXTRA_ROOMS(GET_BUILDING(HOME_ROOM(room))) : 0)
 #define BLD_BASE_AFFECTS(room)  (GET_BUILDING(HOME_ROOM(room)) ? GET_BLD_BASE_AFFECTS(GET_BUILDING(HOME_ROOM(room))) : NOBITS)
-
-// customs
-#define ROOM_CUSTOM_NAME(room)  ((room)->name)
-#define ROOM_CUSTOM_ICON(room)  ((room)->icon)
-#define ROOM_CUSTOM_DESCRIPTION(room)  ((room)->description)
 
 // definitions
 #define BLD_ALLOWS_MOUNTS(room)  (ROOM_IS_CLOSED(room) ? (ROOM_BLD_FLAGGED((room), BLD_ALLOW_MOUNTS | BLD_OPEN) || RMT_FLAGGED((room), RMT_OUTDOOR)) : TRUE)
@@ -1086,7 +1175,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_LIGHT(room)  (!MAGIC_DARKNESS(room) && WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room))
 #define IS_REAL_LIGHT(room)  (!MAGIC_DARKNESS(room) && (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room))))
 #define IS_RUINS(room)  (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED || BUILDING_VNUM(room) == BUILDING_RUINS_FLOODED)	// TODO: some new designation for ruins and a more procedural way to set it up or configure it in-game?
-#define ISLAND_FLAGGED(room, flag)  ((GET_ISLAND_ID(room) != NO_ISLAND) ? IS_SET(get_island(GET_ISLAND_ID(room), TRUE)->flags, (flag)) : FALSE)
+#define ISLAND_FLAGGED(room, flag)  (GET_ISLAND(room) ? IS_SET(GET_ISLAND(room)->flags, (flag)) : FALSE)
 #define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DARK))
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || HAS_FUNCTION((room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
@@ -1115,10 +1204,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_SECT_FLAGGED(room, flg)  SECT_FLAGGED(SECT(room), (flg))
 #define SHIFT_CHAR_DIR(ch, room, dir)  SHIFT_DIR((room), confused_dirs[get_north_for_char(ch)][0][(dir)])
 #define SHIFT_DIR(room, dir)  real_shift((room), shift_dir[(dir)][0], shift_dir[(dir)][1])
-
-// island info
-extern int GET_ISLAND_ID(room_data *room);	// formerly #define GET_ISLAND_ID(room)  (get_map_location_for(room)->island)
-void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a room_data property
 
 // room types
 #define IS_ADVENTURE_ROOM(room)  ROOM_SECT_FLAGGED((room), SECTF_ADVENTURE)
@@ -1150,6 +1235,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define GET_RMT_EXITS(rmt)  ((rmt)->exits)
 #define GET_RMT_INTERACTIONS(rmt)  ((rmt)->interactions)
 #define GET_RMT_QUEST_LOOKUPS(rmt)  ((rmt)->quest_lookups)
+#define GET_RMT_SHOP_LOOKUPS(rmt)  ((rmt)->shop_lookups)
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
 
 
@@ -1173,6 +1259,22 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 
 // utils
 #define SECT_FLAGGED(sct, flg)  (IS_SET(GET_SECT_FLAGS(sct), (flg)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SHOP UTILS //////////////////////////////////////////////////////////////
+
+#define SHOP_VNUM(shop)  ((shop)->vnum)
+#define SHOP_ALLEGIANCE(shop)  ((shop)->allegiance)
+#define SHOP_CLOSE_TIME(shop)  ((shop)->close_time)
+#define SHOP_FLAGS(shop)  ((shop)->flags)
+#define SHOP_ITEMS(shop)  ((shop)->items)
+#define SHOP_LOCATIONS(shop)  ((shop)->locations)
+#define SHOP_NAME(shop)  ((shop)->name)
+#define SHOP_OPEN_TIME(shop)  ((shop)->open_time)
+
+// helpers
+#define SHOP_FLAGGED(shop, flag)  IS_SET(SHOP_FLAGS(shop), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1474,6 +1576,7 @@ void qt_change_skill_level(char_data *ch, any_vnum skl);
 void qt_drop_obj(char_data *ch, obj_data *obj);
 void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vnum), any_vnum vnum);
 void qt_gain_building(char_data *ch, any_vnum vnum);
+void qt_change_currency(char_data *ch, any_vnum vnum, int total);
 void qt_gain_vehicle(char_data *ch, any_vnum vnum);
 void qt_get_obj(char_data *ch, obj_data *obj);
 void qt_kill_mob(char_data *ch, char_data *mob);
@@ -1512,6 +1615,11 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
 
 // supplementary math
 #define ABSOLUTE(x)  ((x < 0) ? ((x) * -1) : (x))
+
+
+// time: converts 0-23 to 1-12am, 1-12pm
+#define TIME_TO_12H(time)  ((time) > 12 ? (time) - 12 : ((time) == 0 ? 12 : (time)))
+#define AM_PM(time)  (time < 12 ? "am" : "pm")
 
 
 /* undefine MAX and MIN so that our macros are used instead */

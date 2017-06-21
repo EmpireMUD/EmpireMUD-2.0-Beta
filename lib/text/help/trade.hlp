@@ -317,6 +317,18 @@ With this ability, you can make the following fine pottery items:
 
 See also: POTTERY, MASTER CRAFTSMAN
 #
+FLETCHING
+
+Fletching (Trade ability)
+
+Mastery ability:  Master Craftsman
+Command:  craft [number] <type of arrows>
+
+This ability will allow you to craft better arrows. These arrows are not yet
+implemented.
+
+See also: CRAFT
+#
 FORGE
 
 Forge (Trade ability)
@@ -659,14 +671,16 @@ plated onto powerful magical objects.
 
 See also: FORGE, METALS, MINE, SEW, SMELT
 #
-PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS"
+PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS" SCHEMATICS DESIGNS
 
-Some items can be found in adventures which allow you to use crafting recipes as
-long as you own them. These are usually called 'patterns'. Crafts from patterns
-are not limited by the levels of your skills or the ability used to make them.
+Some items can be found in adventures which teach you new crafting recipes.
+These are usually called 'patterns', 'designs', 'schematics', or 'recipes'.
+Crafts from patterns are not limited by the levels of your skills or the
+ability used to make them.
 
-The level of the crafted item is based on your crafting level, but many patterns
-have their own upper limit. Usually the pattern will mention if there's a limit.
+The level of the crafted item is based on your crafting level, but many
+patterns have their own upper limit. Usually the pattern will mention if
+there's a limit.
   
 You can see the level range of the item a pattern makes on its info display.
 
@@ -759,6 +773,10 @@ Usage:  recipes <item>
 This command allows you to see which recipes (forge, craft, cook, etc) you
 know that require a given item. It also shows which augments (enchant, hone)
 you know that require the item.
+
+'Recipe' is also a term used for some items that teach you new crafts or foods.
+
+See also: LEARN
 #
 REFORGE REFASHION
 

@@ -106,7 +106,7 @@ OLC_MODULE(mapedit_build) {
 
 
 OLC_MODULE(mapedit_decay) {
-	void annual_update_map_tile(room_data *room);	// db.world.c
+	void annual_update_map_tile(struct map_data *tile);	// db.world.c
 	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	
@@ -115,7 +115,7 @@ OLC_MODULE(mapedit_decay) {
 	}
 	else {
 		msg_to_char(ch, "Ok.\r\n");
-		annual_update_map_tile(room);
+		annual_update_map_tile(&(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]));
 	}
 }
 
@@ -123,6 +123,7 @@ OLC_MODULE(mapedit_decay) {
 OLC_MODULE(mapedit_terrain) {
 	extern crop_data *get_crop_by_name(char *name);
 	extern sector_data *get_sect_by_name(char *name);
+	void finish_trench(room_data *room);
 	
 	struct empire_city_data *city, *temp;
 	empire_data *emp;
@@ -192,6 +193,10 @@ OLC_MODULE(mapedit_terrain) {
 		if (IS_ROAD(IN_ROOM(ch))) {
 			change_base_sector(IN_ROOM(ch), old_sect);
 		}
+		
+		if (sect && SECT_FLAGGED(sect, SECTF_IS_TRENCH)) {
+			finish_trench(IN_ROOM(ch));
+		}
 	}
 }
 
@@ -208,6 +213,32 @@ OLC_MODULE(mapedit_complete_room) {
 	
 	complete_building(IN_ROOM(ch));
 	msg_to_char(ch, "Complete.\r\n");
+}
+
+
+OLC_MODULE(mapedit_grow) {
+	sector_data *preserve;
+	struct evolution_data *evo;
+	
+	// percentage is checked in the evolution data
+	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
+		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
+		
+		// messaging based on whether or not it's choppable
+		msg_to_char(ch, "You cause the room to grow around you.\r\n");
+		act("$n causes the room to grow around you.", FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		change_terrain(IN_ROOM(ch), evo->becomes);
+		if (preserve) {
+			change_base_sector(IN_ROOM(ch), preserve);
+		}
+		
+		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
+		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
+	}
+	else {
+		msg_to_char(ch, "There's nothing to grow here (or a random growth chance failed).\r\n");
+	}
 }
 
 
@@ -410,7 +441,7 @@ OLC_MODULE(mapedit_ruin) {
 
 OLC_MODULE(mapedit_exits) {
 	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
-	extern room_data *create_room();
+	extern room_data *create_room(room_data *home);
 	extern const char *dirs[];
 	extern room_vnum find_free_vnum();
 	extern const int rev_dir[];
@@ -442,7 +473,7 @@ OLC_MODULE(mapedit_exits) {
 		msg_to_char(ch, "An exit already exists in that direction in the target room.\r\n");
 	else {
 		if (new) {
-			to_room = create_room();
+			to_room = create_room(HOME_ROOM(IN_ROOM(ch)));
 			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room, TRUE);
 			
 			// TODO this is done in several different things that add rooms, and could be moved to a function -paul 7/14/2016
@@ -452,8 +483,6 @@ OLC_MODULE(mapedit_exits) {
 				add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(IN_ROOM(ch)));
 			}
 			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
-			
-			COMPLEX_DATA(to_room)->home_room = HOME_ROOM(IN_ROOM(ch));
 			
 			if (ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
 				perform_claim_room(to_room, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
@@ -530,7 +559,7 @@ OLC_MODULE(mapedit_naturalize) {
 		LL_FOREACH(land_map, map) {
 			room = real_real_room(map->vnum);	// may or may not exist
 			
-			if (island && map->island != island_id) {
+			if (island && map->shared->island_id != island_id) {
 				continue;
 			}
 			if (room && ROOM_OWNER(room)) {
@@ -650,7 +679,7 @@ OLC_MODULE(mapedit_remember) {
 		
 		// check all land tiles
 		LL_FOREACH(land_map, map) {
-			if (map->island != island_id) {
+			if (map->shared->island_id != island_id) {
 				continue;
 			}
 			if (SECT_FLAGGED(map->sector_type, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {

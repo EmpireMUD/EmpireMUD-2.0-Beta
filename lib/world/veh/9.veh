@@ -115,7 +115,7 @@ to the edge of the water, 'sit' in it, and then type 'sail <direction>'.
 ~
 cfghlnu 3 3 0 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #921
 caravan brightly-painted painted wooden~
@@ -148,7 +148,7 @@ You can 'drag' the raft to the edge of the water, 'sit' on it, then type 'sail
 ~
 cfhlnu 3 3 0 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #952
 caravel lateen-rigged~

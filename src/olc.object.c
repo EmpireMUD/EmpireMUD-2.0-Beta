@@ -37,7 +37,6 @@ extern const char *armor_types[NUM_ARMOR_TYPES+1];
 extern const char *component_flags[];
 extern const char *component_types[];
 extern const char *container_bits[];
-extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *interact_types[];
 extern const char *item_types[];
@@ -184,6 +183,17 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
+		case ITEM_CURRENCY: {
+			if (GET_CURRENCY_AMOUNT(obj) == 0) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Currency amount not set");
+				problem = TRUE;
+			}
+			if (!find_generic(GET_CURRENCY_VNUM(obj), GENERIC_CURRENCY)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Currency vnum not set");
+				problem = TRUE;
+			}
+			break;
+		}
 		case ITEM_WEAPON: {
 			if (GET_WEAPON_TYPE(obj) == TYPE_RESERVED) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type not set");
@@ -223,9 +233,9 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
-		case ITEM_ARROW: {
-			if (GET_ARROW_QUANTITY(obj) == 0) {
-				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Arrow quantity not set");
+		case ITEM_AMMO: {
+			if (GET_AMMO_QUANTITY(obj) == 0) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Ammo quantity not set");
 				problem = TRUE;
 			}
 			break;
@@ -240,6 +250,18 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		case ITEM_POISON: {
 			if (GET_POISON_CHARGES(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Poison charges not set");
+				problem = TRUE;
+			}
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *craft = craft_proto(GET_RECIPE_VNUM(obj));
+			if (GET_RECIPE_VNUM(obj) <= 0 || !craft) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Invalid recipe vnum");
+				problem = TRUE;
+			}
+			if (craft && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Recipe is not set LEARNED");
 				problem = TRUE;
 			}
 			break;
@@ -389,8 +411,9 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+	extern bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
-	extern bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum);
+	extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
 	void save_trading_post();
 
@@ -409,6 +432,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
 	room_data *room, *next_room;
+	shop_data *shop, *next_shop;
 	empire_data *emp, *next_emp;
 	social_data *soc, *next_soc;
 	char_data *mob, *next_mob;
@@ -455,10 +479,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		
 		if (GET_BUILT_WITH(room)) {
-			remove_obj_from_resource_list(&GET_BUILT_WITH(room), vnum);
+			remove_thing_from_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, vnum);
 		}
 		if (GET_BUILDING_RESOURCES(room)) {
-			remove_obj_from_resource_list(&GET_BUILDING_RESOURCES(room), vnum);
+			remove_thing_from_resource_list(&GET_BUILDING_RESOURCES(room), RES_OBJECT, vnum);
 			
 			if (!GET_BUILDING_RESOURCES(room)) {
 				// removing this resource finished the building
@@ -475,7 +499,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// remove from live resource lists: vehicle maintenance
 	LL_FOREACH(vehicle_list, veh) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
-			remove_obj_from_resource_list(&VEH_NEEDS_RESOURCES(veh), vnum);
+			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), RES_OBJECT, vnum);
 			
 			if (!VEH_NEEDS_RESOURCES(veh)) {
 				// removing the resource finished the vehicle
@@ -573,7 +597,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found = TRUE;
 		}
 		
-		found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(aug), vnum);
+		found |= remove_thing_from_resource_list(&GET_AUG_RESOURCES(aug), RES_OBJECT, vnum);
 		
 		if (found) {
 			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
@@ -584,7 +608,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
-		found |= remove_obj_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), vnum);
+		found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), RES_OBJECT, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -603,7 +627,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found = TRUE;
 		}
 		
-		found |= remove_obj_from_resource_list(&GET_CRAFT_RESOURCES(craft), vnum);
+		found |= remove_thing_from_resource_list(&GET_CRAFT_RESOURCES(craft), RES_OBJECT, vnum);
 		
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
@@ -693,6 +717,17 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_OBJECT, vnum);
+		found |= delete_shop_item_from_list(&SHOP_ITEMS(shop), vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_GET_OBJECT, vnum);
@@ -707,7 +742,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), vnum);
+		found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), RES_OBJECT, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -716,7 +751,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// olc editor updates
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (desc->character && !IS_NPC(desc->character) && GET_ACTION_RESOURCES(desc->character)) {
-			remove_obj_from_resource_list(&GET_ACTION_RESOURCES(desc->character), vnum);
+			remove_thing_from_resource_list(&GET_ACTION_RESOURCES(desc->character), RES_OBJECT, vnum);
 		}
 		
 		if (GET_OLC_ADVENTURE(desc)) {
@@ -751,7 +786,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				found = TRUE;
 			}
 			
-			found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), vnum);
+			found |= remove_thing_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), RES_OBJECT, vnum);
 			
 			if (found) {
 				SET_BIT(GET_AUG_FLAGS(GET_OLC_AUGMENT(desc)), AUG_IN_DEVELOPMENT);
@@ -761,7 +796,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_OLC_BUILDING(desc)->interactions, TYPE_OBJ, vnum);
-			found |= remove_obj_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), vnum);
+			found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), RES_OBJECT, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used in the building you're editing was deleted.\r\n");
 			}
@@ -778,7 +813,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				found = TRUE;
 			}
 			
-			found |= remove_obj_from_resource_list(&GET_OLC_CRAFT(desc)->resources, vnum);
+			found |= remove_thing_from_resource_list(&GET_OLC_CRAFT(desc)->resources, RES_OBJECT, vnum);
 		
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
@@ -849,6 +884,15 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the sector you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_SHOP(desc)) {
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_OBJECT, vnum);
+			found |= delete_shop_item_from_list(&SHOP_ITEMS(GET_OLC_SHOP(desc)), vnum);
+			
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An object used by the shop you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_SOCIAL(desc)) {
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_GET_OBJECT, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_WEARING, vnum);
@@ -860,7 +904,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), vnum);
+			found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used for maintenance for the vehicle you're editing was deleted.\r\n");
 			}
@@ -1136,6 +1180,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
+	extern bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char buf[MAX_STRING_LENGTH];
@@ -1154,6 +1199,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	social_data *soc, *next_soc;
 	struct archetype_gear *gear;
 	crop_data *crop, *next_crop;
+	shop_data *shop, *next_shop;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
@@ -1202,7 +1248,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 		}
 		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
@@ -1218,6 +1264,13 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			}
+		}
+		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 	}
@@ -1236,7 +1289,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -1352,6 +1405,20 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_OBJECT, vnum);
+		any |= find_shop_item_in_list(SHOP_ITEMS(shop), vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+		}
+	}
+	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		if (size >= sizeof(buf)) {
@@ -1371,7 +1438,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
 		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
@@ -1460,6 +1527,7 @@ void save_olc_object(descriptor_data *desc) {
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
 	struct quest_lookup *ql;
+	struct shop_lookup *sl;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -1532,12 +1600,14 @@ void save_olc_object(descriptor_data *desc) {
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	ql = proto->quest_lookups;	// save lookups
+	sl = proto->shop_lookups;
 	
 	*proto = *obj;
 	proto->vnum = vnum;	// ensure correct vnum
 	
 	proto->hh = hh;	// restore hash handle
 	proto->quest_lookups = ql;	// restore lookups
+	proto->shop_lookups = sl;
 	
 	// remove the reference to this so it won't be free'd
 	GET_OBJ_APPLIES(obj) = NULL;
@@ -1694,6 +1764,11 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			// empire number is not supported -- it will always use OTHER_COIN
 			break;
 		}
+		case ITEM_CURRENCY: {
+			sprintf(storage + strlen(storage), "<&ycurrency&0> %d %s\r\n", GET_CURRENCY_VNUM(obj), get_generic_name_by_vnum(GET_CURRENCY_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<&ycoinamount&0> %d\r\n", GET_CURRENCY_AMOUNT(obj));
+			break;
+		}
 		case ITEM_CORPSE: {
 			sprintf(storage + strlen(storage), "<&ycorpseof&0> %d %s\r\n", GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
 			break;
@@ -1713,7 +1788,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_DRINKCON: {
 			sprintf(storage + strlen(storage), "<&ycapacity&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CAPACITY(obj), PLURAL(GET_DRINK_CONTAINER_CAPACITY(obj)));
 			sprintf(storage + strlen(storage), "<&ycontents&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
-			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", get_generic_name_by_vnum(GET_DRINK_CONTAINER_TYPE(obj)));
 			break;
 		}
 		case ITEM_FOOD: {
@@ -1725,15 +1800,16 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
-			sprintf(storage + strlen(storage), "<&ymissilespeed&0> %.2f\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(obj)]);
-			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), get_base_dps(obj));
-			sprintf(storage + strlen(storage), "<&yarrowtype&0> %c\r\n", 'A' + GET_MISSILE_WEAPON_TYPE(obj));
+			sprintf(storage + strlen(storage), "<&yweapontype&0> %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %s+%.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			sprintf(storage + strlen(storage), "<&yammotype&0> %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(obj));
 			break;
 		}
-		case ITEM_ARROW: {
-			sprintf(storage + strlen(storage), "<&yquantity&0> %d\r\n", GET_ARROW_QUANTITY(obj));
-			sprintf(storage + strlen(storage), "<&ydamage&0> %+d\r\n", GET_ARROW_DAMAGE_BONUS(obj));
-			sprintf(storage + strlen(storage), "<&yarrowtype&0> %c\r\n", 'A' + GET_ARROW_TYPE(obj));
+		case ITEM_AMMO: {
+			sprintf(storage + strlen(storage), "<&yquantity&0> %d\r\n", GET_AMMO_QUANTITY(obj));
+			sprintf(storage + strlen(storage), "<&ydamage&0> %+d\r\n", GET_AMMO_DAMAGE_BONUS(obj));
+			sprintf(storage + strlen(storage), "<&yammotype&0> %c\r\n", 'A' + GET_AMMO_TYPE(obj));
+			sprintf(storage + strlen(storage), "NOTE: Positive applies become negative debuffs (see HELP AMMO ITEM)\r\n");
 			break;
 		}
 		case ITEM_PACK: {
@@ -1748,6 +1824,11 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_POISON: {
 			sprintf(storage + strlen(storage), "<&ypoison&0> %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			sprintf(storage + strlen(storage), "<&ycharges&0> %d\r\n", GET_POISON_CHARGES(obj));
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
+			sprintf(storage + strlen(storage), "<&yrecipe&0> %d %s\r\n", GET_RECIPE_VNUM(obj), cft ? GET_CRAFT_NAME(cft) : "none");
 			break;
 		}
 		case ITEM_ARMOR: {
@@ -2111,7 +2192,7 @@ OLC_MODULE(oedit_armortype) {
 }
 
 
-OLC_MODULE(oedit_arrowtype) {
+OLC_MODULE(oedit_ammotype) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int slot = NOTHING;
 	char val;
@@ -2119,24 +2200,24 @@ OLC_MODULE(oedit_arrowtype) {
 	// this chooses the VAL slot and validates the type
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_MISSILE_WEAPON: {
-			slot = VAL_MISSILE_WEAPON_TYPE;
+			slot = VAL_MISSILE_WEAPON_AMMO_TYPE;
 			break;
 		}
-		case ITEM_ARROW: {
-			slot = VAL_ARROW_TYPE;
+		case ITEM_AMMO: {
+			slot = VAL_AMMO_TYPE;
 			break;
 		}
 	}
 	
 	if (slot == NOTHING) {
-		msg_to_char(ch, "You can only set arrowtype for missile weapons and arrows.\r\n");
+		msg_to_char(ch, "You can only set ammotype for missile weapons and ammo.\r\n");
 	}
 	else if (strlen(argument) > 1 || (val = UPPER(*argument)) < 'A' || val > 'Z') {
-		msg_to_char(ch, "Arrowtype must by a letter from A to Z.\r\n");
+		msg_to_char(ch, "Ammotype must by a letter from A to Z.\r\n");
 	}
 	else {
 		GET_OBJ_VAL(obj, slot) = val - 'A';
-		msg_to_char(ch, "You set the arrowtype to %c.\r\n", val);
+		msg_to_char(ch, "You set the ammotype to %c.\r\n", val);
 	}
 }
 
@@ -2217,13 +2298,24 @@ OLC_MODULE(oedit_charges) {
 
 OLC_MODULE(oedit_coinamount) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	int pos;
 	
-	if (!IS_COINS(obj)) {
-		msg_to_char(ch, "You can only set this on coins.\r\n");
+	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_COINS: {
+			pos = VAL_COINS_AMOUNT;
+			break;
+		}
+		case ITEM_CURRENCY: {
+			pos = VAL_CURRENCY_AMOUNT;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only set this on coins or currency.\r\n");
+			return;
+		}
 	}
-	else {
-		GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = olc_process_number(ch, argument, "coin amount", "coinamount", 0, MAX_COIN, GET_OBJ_VAL(obj, VAL_COINS_AMOUNT));
-	}
+	
+	GET_OBJ_VAL(obj, pos) = olc_process_number(ch, argument, "coin amount", "coinamount", 0, MAX_COIN, GET_OBJ_VAL(obj, pos));
 }
 
 
@@ -2291,6 +2383,23 @@ OLC_MODULE(oedit_corpseof) {
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+		}
+	}
+}
+
+
+OLC_MODULE(oedit_currency) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	any_vnum old = GET_CURRENCY_VNUM(obj);
+	
+	if (!IS_CURRENCY(obj)) {
+		msg_to_char(ch, "You can only set that on a currency object.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = olc_process_number(ch, argument, "currency vnum", "currency", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM));
+		if (GET_CURRENCY_VNUM(obj) != old && !find_generic(GET_CURRENCY_VNUM(obj), GENERIC_CURRENCY)) {
+			msg_to_char(ch, "%d is not a currency generic. Old value restored.\r\n", GET_CURRENCY_VNUM(obj));
+			GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = old;
 		}
 	}
 }
@@ -2451,8 +2560,8 @@ OLC_MODULE(oedit_damage) {
 			showdps = TRUE;
 			break;
 		}
-		case ITEM_ARROW: {
-			slot = VAL_ARROW_DAMAGE_BONUS;
+		case ITEM_AMMO: {
+			slot = VAL_AMMO_DAMAGE_BONUS;
 			break;
 		}
 	}
@@ -2507,12 +2616,22 @@ OLC_MODULE(oedit_keywords) {
 
 OLC_MODULE(oedit_liquid) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	any_vnum old;
 	
 	if (!IS_DRINK_CONTAINER(obj)) {
 		msg_to_char(ch, "You can only set liquid on a drink container.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = olc_process_type(ch, argument, "liquid", "liquid", drinks, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+		old = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
+		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+
+		if (!find_generic(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE), GENERIC_LIQUID)) {
+			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = old;
+		}
+		else {
+			msg_to_char(ch, "It now contains %s.\r\n", get_generic_name_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE)));
+		}
 	}
 }
 
@@ -2541,39 +2660,6 @@ OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
 	GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
-}
-
-
-OLC_MODULE(oedit_missilespeed) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	static char **speed_types = NULL;
-	int iter, count;
-	
-	// this does not have a const char** list .. build one the first time
-	if (!speed_types) {
-		// count types
-		count = 0;
-		for (iter = 0; missile_weapon_speed[iter] > 0; ++iter) {
-			++count;
-		}
-	
-		CREATE(speed_types, char*, count+1);
-		
-		for (iter = 0; iter < count; ++iter) {
-			sprintf(buf, "%.2f", missile_weapon_speed[iter]);
-			speed_types[iter] = str_dup(buf);
-		}
-		
-		// must terminate
-		speed_types[count] = str_dup("\n");
-	}
-
-	if (!IS_MISSILE_WEAPON(obj)) {
-		msg_to_char(ch, "You can only set missilespeed type on a missile weapon.\r\n");
-	}
-	else {
-		GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_SPEED) = olc_process_type(ch, argument, "missile speed", "missilespeed", (const char**)speed_types, GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_SPEED));
-	}
 }
 
 
@@ -2677,11 +2763,115 @@ OLC_MODULE(oedit_potionscale) {
 OLC_MODULE(oedit_quantity) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	if (!IS_ARROW(obj)) {
+	if (!IS_AMMO(obj)) {
 		msg_to_char(ch, "You can't set quantity on this type of item.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY));
+		GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY));
+	}
+}
+
+
+OLC_MODULE(oedit_quick_recipe) {
+	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
+	extern const char *craft_types[];
+	
+	char new_vnum_arg[MAX_INPUT_LENGTH], from_vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], cmd[256];
+	any_vnum new_vnum, from_vnum;
+	craft_data *cft;
+	obj_data *obj;
+	
+	argument = any_one_arg(argument, new_vnum_arg);
+	argument = any_one_arg(argument, from_vnum_arg);
+	skip_spaces(&argument);
+	
+	if (!*new_vnum_arg || !*from_vnum_arg) {
+		msg_to_char(ch, "Usage: .quickrecipe <new vnum> <craft vnum> [pattern | design | etc]\r\n");
+		return;
+	}
+	if (!isdigit(*new_vnum_arg) || (new_vnum = atoi(new_vnum_arg)) < 0 || new_vnum > MAX_VNUM) {
+		msg_to_char(ch, "You must pick a valid vnum between 0 and %d.\r\n", MAX_VNUM);
+		return;
+	}
+	if (obj_proto(new_vnum)) {
+		msg_to_char(ch, "There is already an object with that vnum.\r\n");
+		return;
+	}
+	if (!isdigit(*from_vnum_arg) || (from_vnum = atoi(from_vnum_arg)) < 0 || from_vnum > MAX_VNUM) {
+		msg_to_char(ch, "You must pick a valid vnum between 0 and %d.\r\n", MAX_VNUM);
+		return;
+	}
+	if (!(cft = craft_proto(from_vnum))) {
+		msg_to_char(ch, "There is no craft with that vnum.\r\n");
+		return;
+	}
+	if (!CRAFT_FLAGGED(cft, CRAFT_LEARNED)) {
+		msg_to_char(ch, "The craft must have the LEARNED flag to do that.\r\n");
+		return;
+	}
+	if (!can_start_olc_edit(ch, OLC_OBJECT, new_vnum)) {
+		return;	// sends own message
+	}
+	
+	// create it
+	obj = GET_OLC_OBJECT(ch->desc) = setup_olc_object(NULL);
+	GET_OBJ_TYPE(obj) = ITEM_RECIPE;
+	GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = GET_CRAFT_VNUM(cft);
+	
+	// keywords
+	snprintf(buf, sizeof(buf), "%s %s", (*argument ? argument : "recipe"), GET_CRAFT_NAME(cft));
+	if (GET_OBJ_KEYWORDS(obj)) {
+		free(GET_OBJ_KEYWORDS(obj));
+	}
+	GET_OBJ_KEYWORDS(obj) = str_dup(buf);
+	
+	// short desc
+	snprintf(buf, sizeof(buf), "the %s %s", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
+	if (GET_OBJ_SHORT_DESC(obj)) {
+		free(GET_OBJ_SHORT_DESC(obj));
+	}
+	GET_OBJ_SHORT_DESC(obj) = str_dup(buf);
+	
+	// long desc
+	snprintf(buf, sizeof(buf), "The %s %s is on the ground.", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
+	if (GET_OBJ_LONG_DESC(obj)) {
+		free(GET_OBJ_LONG_DESC(obj));
+	}
+	GET_OBJ_LONG_DESC(obj) = str_dup(buf);
+	
+	// look desc
+	strcpy(cmd, craft_types[GET_CRAFT_TYPE(cft)]);
+	snprintf(buf, sizeof(buf), "This %s will teach you to %s: %s.\r\n", (*argument ? argument : "recipe"), strtolower(cmd), GET_CRAFT_NAME(cft));
+	if (GET_OBJ_ACTION_DESC(obj)) {
+		free(GET_OBJ_ACTION_DESC(obj));
+	}
+	GET_OBJ_ACTION_DESC(obj) = str_dup(buf);
+	
+	// SUCCESS
+	msg_to_char(ch, "You create a quick recipe %d:\r\n", new_vnum);
+	GET_OLC_TYPE(ch->desc) = OLC_OBJECT;
+	GET_OLC_VNUM(ch->desc) = new_vnum;
+	
+	// ensure some data
+	GET_OBJ_VNUM(GET_OLC_OBJECT(ch->desc)) = new_vnum;
+	olc_show_object(ch);
+}
+
+
+OLC_MODULE(oedit_recipe) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	any_vnum old = GET_RECIPE_VNUM(obj);
+	craft_data *cft;
+	
+	if (!IS_RECIPE(obj)) {
+		msg_to_char(ch, "You can only set that on a recipe object.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = olc_process_number(ch, argument, "recipe vnum", "recipe", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_RECIPE_VNUM));
+		if (GET_RECIPE_VNUM(obj) != old && (!(cft = craft_proto(GET_RECIPE_VNUM(obj))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED))) {
+			msg_to_char(ch, "%d is not a learned recipe. Old value restored.\r\n", GET_RECIPE_VNUM(obj));
+			GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = old;
+		}
 	}
 }
 
@@ -2906,6 +3096,10 @@ OLC_MODULE(oedit_type) {
 				GET_OBJ_VAL(obj, VAL_COINS_EMPIRE_ID) = OTHER_COIN;
 				break;
 			}
+			case ITEM_CURRENCY: {
+				GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = NOTHING;
+				break;
+			}
 			case ITEM_PORTAL: {
 				GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM) = NOTHING;
 				break;
@@ -2972,13 +3166,24 @@ OLC_MODULE(oedit_wealth) {
 
 OLC_MODULE(oedit_weapontype) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	int pos = 0;
 	
-	if (GET_OBJ_TYPE(obj) != ITEM_WEAPON) {
-		msg_to_char(ch, "You can only set weapontype on a weapon.\r\n");
+	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_WEAPON: {
+			pos = VAL_WEAPON_TYPE;
+			break;
+		}
+		case ITEM_MISSILE_WEAPON: {
+			pos = VAL_MISSILE_WEAPON_TYPE;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only set weapontype on a weapon.\r\n");
+			return;
+		}
 	}
-	else {
-		GET_OBJ_VAL(obj, VAL_WEAPON_TYPE) = olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, VAL_WEAPON_TYPE));
-	}
+	
+	GET_OBJ_VAL(obj, pos) = olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, pos));
 }
 
 

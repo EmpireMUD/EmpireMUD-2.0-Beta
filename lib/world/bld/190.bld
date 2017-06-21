@@ -1,0 +1,49 @@
+#19000
+Hag Swamp Hut~
+A Crude Hut~
+&c~&0()&c~~
+128 0 bR 0
+0 0 0 -1
+D
+   As you wade through the sweltering swamp, you pull back a tree branch to
+reveal a crude hut that stands on tall stilts above the swamp. The stilts are
+made from solid logs and have been etched to resemble the legs of a bird. The
+construction is simple, and you wonder who would live in such a place.
+~
+S
+#19047
+Walking Hut~
+Inside the Walking Hut~
+&0[  ]~
+1 0 a 0
+0 1 0 -1
+C
+cook, disembark, sleep~
+D
+   The hut is crudely made with rough-hewn planks of exotic tropical wood. The
+ceiling is thatched, but leaking in places. Every plank that makes up the floor
+is carved with a magical symbol, each different from the rest. A stone
+fireplace rests in the corner.
+~
+E
+fireplace~
+   The fireplace must be enchanted because this hut looks so flammable you're
+afraid to click your boots together.
+~
+F
+dG
+T 19048
+S
+#19048
+Walking Hut Porch~
+The Porch~
+&0[  ]~
+1 0 aHR 0
+0 0 0 -1
+C
+drive, disembark~
+D
+You are standing on the porch of the walking hut.
+~
+S
+$

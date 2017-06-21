@@ -761,7 +761,7 @@ void read_book(char_data *ch, obj_data *obj) {
 	else if (!(book = book_proto(GET_BOOK_ID(obj)))) {
 		msg_to_char(ch, "The book is old and badly damaged; you can't read it.\r\n");
 	}
-	else if (!consume_otrigger(obj, ch, OCMD_READ)) {
+	else if (!consume_otrigger(obj, ch, OCMD_READ, NULL)) {
 		return;
 	}
 	else {

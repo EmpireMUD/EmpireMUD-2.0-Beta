@@ -61,9 +61,11 @@ ACMD(do_affects);
 ACMD(do_alacrity);
 ACMD(do_alias);
 ACMD(do_alternate);
+ACMD(do_approach);
 ACMD(do_approve);
 ACMD(do_assist);
 ACMD(do_at);
+ACMD(do_automessage);
 ACMD(do_autostore);
 ACMD(do_autowiz);
 ACMD(do_avoid);
@@ -73,6 +75,7 @@ ACMD(do_ban);
 ACMD(do_barde);
 ACMD(do_bash);
 ACMD(do_bathe);
+ACMD(do_beckon);
 ACMD(do_bite);
 ACMD(do_blind);
 ACMD(do_bloodsweat);
@@ -80,10 +83,12 @@ ACMD(do_board);
 ACMD(do_boost);
 ACMD(do_breakreply);
 ACMD(do_build);
+ACMD(do_buy);
 ACMD(do_butcher);
 
 ACMD(do_cede);
 ACMD(do_changepass);
+ACMD(do_charge);
 ACMD(do_chip);
 ACMD(do_chop);
 ACMD(do_circle);
@@ -236,13 +241,17 @@ ACMD(do_jab);
 
 ACMD(do_keep);
 ACMD(do_kick);
+ACMD(do_kite);
 
 ACMD(do_land);
 ACMD(do_last);
 ACMD(do_lay);
 ACMD(do_lead);
+ACMD(do_learn);
+ACMD(do_learned);
 ACMD(do_library);
 ACMD(do_light);
+ACMD(do_list);
 ACMD(do_load);
 ACMD(do_load_vehicle);
 ACMD(do_look);
@@ -254,6 +263,7 @@ ACMD(do_manashield);
 ACMD(do_mapout);
 ACMD(do_mapsize);
 ACMD(do_mark);
+ACMD(do_messages);
 ACMD(do_meters);
 ACMD(do_milk);
 ACMD(do_mine);
@@ -557,12 +567,15 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "alacrity", POS_RESTING, do_alacrity, NO_MIN, CTYPE_SKILL, ABIL_ALACRITY ),
 	SIMPLE_CMD( "alternate", POS_DEAD, do_alternate, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "affects", POS_DEAD, do_affects, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "approach", POS_FIGHTING, do_approach, NO_MIN, CTYPE_COMBAT ),
 	STANDARD_CMD( "approve", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_APPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	STANDARD_CMD( "arclight", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ARCLIGHT, CTYPE_COMBAT, NOBITS, ABIL_ARCLIGHT ),
 	SIMPLE_CMD( "assist", POS_FIGHTING, do_assist, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "ask", POS_RESTING, do_spec_comm, NO_MIN, CTYPE_COMM, SCMD_ASK ),
 	STANDARD_CMD( "astralclaw", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ASTRALCLAW, CTYPE_COMBAT, NOBITS, ABIL_ASTRALCLAW ),
 	SIMPLE_CMD( "autostore", POS_RESTING, do_autostore, LVL_CIMPL, CTYPE_IMMORTAL ),
+	GRANT_CMD( "automessage", POS_DEAD, do_automessage, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_AUTOMESSAGE),
+	GRANT_CMD( "automsg", POS_DEAD, do_automessage, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_AUTOMESSAGE),
 	SIMPLE_CMD( "autowiz", POS_DEAD, do_autowiz, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "avoid", POS_STANDING, do_avoid, NO_MIN, CTYPE_MOVE ),
 
@@ -572,6 +585,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "barde", POS_STANDING, do_barde, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, ABIL_BARDE ),
 	ABILITY_CMD( "bash", POS_FIGHTING, do_bash, NO_MIN, CTYPE_COMBAT, ABIL_BASH ),
 	SIMPLE_CMD( "bathe", POS_STANDING, do_bathe, NO_MIN, CTYPE_MOVE ),
+	SIMPLE_CMD( "beckon", POS_RESTING, do_beckon, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "bite", POS_FIGHTING, do_bite, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, ABIL_BITE ),
 	ABILITY_CMD( "blind", POS_FIGHTING, do_blind, NO_MIN, CTYPE_COMBAT, ABIL_BLIND ),
 	ABILITY_CMD( "bloodsweat", POS_SLEEPING, do_bloodsweat, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWEAT ),
@@ -580,6 +594,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "bookedit", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	STANDARD_CMD( "brew", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_BREW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "breakreply", POS_DEAD, do_breakreply, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "buy", POS_RESTING, do_buy, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "bug", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_BUG ),
 	ABILITY_CMD( "butcher", POS_STANDING, do_butcher, NO_MIN, CTYPE_SKILL, ABIL_BUTCHER ),
 
@@ -588,6 +603,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "cede", POS_DEAD, do_cede, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "chant", POS_STANDING, do_ritual, NO_MIN, NO_GRANTS, SCMD_CHANT, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "changepass", POS_DEAD, do_changepass, NO_MIN, CTYPE_UTIL ),
+	ABILITY_CMD( "charge", POS_FIGHTING, do_charge, NO_MIN, CTYPE_COMBAT, ABIL_CHARGE ),
 	STANDARD_CMD( "chip", POS_STANDING, do_chip, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "chronoblast", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_CHRONOBLAST, CTYPE_COMBAT, NOBITS, ABIL_CHRONOBLAST ),
 	SIMPLE_CMD( "circle", POS_STANDING, do_circle, NO_MIN, CTYPE_MOVE ),
@@ -602,7 +618,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "clearabilities", POS_DEAD, do_clearabilities, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_CLEARABILITIES ),
 	SCMD_CMD( "close", POS_SITTING, do_gen_door, NO_MIN, CTYPE_MOVE, SCMD_CLOSE ),
 	SCMD_CMD( "cls", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_CLEAR ),
-	SIMPLE_CMD( "coins", POS_DEAD, do_coins, NO_MIN, CTYPE_UTIL ),
+	SCMD_CMD( "coins", POS_DEAD, do_coins, NO_MIN, CTYPE_UTIL, TRUE ),
 	ABILITY_CMD( "collapse", POS_STANDING, do_collapse, NO_MIN, CTYPE_SKILL, ABIL_PORTAL_MASTER ),
 	ABILITY_CMD( "colorburst", POS_FIGHTING, do_colorburst, NO_MIN, CTYPE_COMBAT, ABIL_COLORBURST ),
 	SIMPLE_CMD( "combine", POS_RESTING, do_combine, NO_MIN, CTYPE_UTIL ),
@@ -725,7 +741,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "godhistory", POS_DEAD, do_history, LVL_GOD, CTYPE_COMM, CHANNEL_HISTORY_GOD ),
 	SCMD_CMD( "ghistory", POS_DEAD, do_history, LVL_GOD, CTYPE_COMM, CHANNEL_HISTORY_GOD ),
 	SCMD_CMD( "godlist", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_GODLIST ),
-	SIMPLE_CMD( "gold", POS_DEAD, do_coins, NO_MIN, CTYPE_UTIL ),
+	SCMD_CMD( "gold", POS_DEAD, do_coins, NO_MIN, CTYPE_UTIL, TRUE ),
 	SIMPLE_CMD( "grab", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "group", POS_DEAD, do_group, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "gsay", POS_DEAD, do_gsay, NO_MIN, CTYPE_COMM ),
@@ -771,12 +787,16 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "kill", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "keep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_KEEP ),
 	ABILITY_CMD( "kick", POS_FIGHTING, do_kick, NO_MIN, CTYPE_COMBAT, ABIL_KICK ),
+	ABILITY_CMD( "kite", POS_FIGHTING, do_kite, NO_MIN, CTYPE_COMBAT, ABIL_KITE ),
 
 	SCMD_CMD( "look", POS_RESTING, do_look, NO_MIN, CTYPE_UTIL, SCMD_LOOK ),
 	STANDARD_CMD( "lay", POS_STANDING, do_lay, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "land", POS_FIGHTING, do_land, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "last", POS_DEAD, do_last, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "lead", POS_STANDING, do_lead, NO_MIN, CTYPE_MOVE ),
+	SIMPLE_CMD( "learn", POS_STANDING, do_learn, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "learned", POS_DEAD, do_learned, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "list", POS_SITTING, do_list, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "light", POS_SITTING, do_light, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "lightningbolt", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_LIGHTNINGBOLT, CTYPE_COMBAT, NOBITS, ABIL_LIGHTNINGBOLT ),
 	SCMD_CMD( "library", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_LIBRARY ),
@@ -794,6 +814,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "mark", POS_RESTING, do_mark, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "meters", POS_DEAD, do_meters, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "melt", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SMELT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "messages", POS_DEAD, do_messages, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "mine", POS_STANDING, do_mine, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "mill", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MILL, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "milk", POS_STANDING, do_milk, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -920,7 +941,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "sheathe", POS_RESTING, do_sheathe, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "ship", POS_RESTING, do_ship, NO_MIN, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "shoot", POS_STANDING, do_shoot, NO_MIN, CTYPE_COMBAT ),
+	SIMPLE_CMD( "shoot", POS_FIGHTING, do_shoot, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "shout", POS_RESTING, do_pub_comm, NO_MIN, CTYPE_COMM, SCMD_SHOUT ),
 	SIMPLE_CMD( "show", POS_DEAD, do_show, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "shutdown", POS_DEAD, do_reboot, LVL_CIMPL, GRANT_SHUTDOWN, SCMD_SHUTDOWN, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
@@ -1146,9 +1167,12 @@ void command_interpreter(char_data *ch, char *argument) {
 		// found!
 		break;
 	}
-
-	if (!IS_SET(cmd_info[cmd].flags, CMD_STAY_HIDDEN | CMD_UNHIDE_AFTER))
+	
+	// reveal hidden
+	if (AFF_FLAGGED(ch, AFF_HIDE) && !IS_SET(cmd_info[cmd].flags, CMD_STAY_HIDDEN | CMD_UNHIDE_AFTER)) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
+	}
 
 	if (*cmd_info[cmd].command == '\n' && check_social(ch, argument, FALSE))
 		return;
@@ -1264,6 +1288,7 @@ void free_alias(struct alias_data *a) {
 #define NUM_TOKENS       9
 
 void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data *a) {
+	char buf[MAX_STRING_LENGTH];
 	struct txt_q temp_queue;
 	char *tokens[NUM_TOKENS], *temp, *write_point;
 	int num_of_tokens = 0, num;
@@ -1646,6 +1671,8 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
+	char buf[MAX_STRING_LENGTH];
+	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1980,6 +2007,7 @@ void send_motd(descriptor_data *d) {
 * @param int bad_pws Number of bad password attempts, which sometimes must be retrieved and cleared ahead of time.
 */
 void send_login_motd(descriptor_data *desc, int bad_pws) {
+	char buf[MAX_STRING_LENGTH];
 	send_motd(desc);
 	MXPSendTag(desc, "<VERSION>");
 	
@@ -2175,6 +2203,7 @@ int _parse_name(char *arg, char *name) {
 */
 void nanny(descriptor_data *d, char *arg) {
 	void check_delayed_load(char_data *ch);
+	void display_automessages_on_login(char_data *ch);
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
@@ -2677,6 +2706,8 @@ void nanny(descriptor_data *d, char *arg) {
 			if (GET_LOYALTY(d->character) && EMPIRE_MOTD(GET_LOYALTY(d->character))) {
 				msg_to_char(d->character, "Empire MOTD:\r\n%s\r\n", EMPIRE_MOTD(GET_LOYALTY(d->character)));
 			}
+			
+			display_automessages_on_login(d->character);
 			
 			display_tip_to_char(d->character);
 			

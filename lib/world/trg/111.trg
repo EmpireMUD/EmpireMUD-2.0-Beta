@@ -690,6 +690,10 @@ if (%self.aff_flagged(ENTANGLED)% || %self.disabled%)
   halt
 end
 eval target %random.enemy%
+if !%target%
+  * In case of blindness
+  eval target %actor%
+end
 %send% %target% %self.name% encircles you and constricts!
 %echoaround% %target% %self.name% encircles %target.name% and constricts %target.himher%!
 dg_affect %target% STUNNED on 15

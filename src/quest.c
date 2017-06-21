@@ -195,14 +195,14 @@ void copy_quest_progress(struct req_data *to_list, struct req_data *from_list) {
 * @return int The number of completed buildings with that vnum, owned by emp.
 */
 int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	int count = 0;	// ah ah ah
 	
 	if (!emp || vnum == NOTHING) {
 		return count;
 	}
 	
-	LL_FOREACH(EMPIRE_TERRITORY_LIST(emp), ter) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
 			continue;
 		}
@@ -452,6 +452,10 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			snprintf(output, sizeof(output), "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
 			break;
 		}
+		case QR_CURRENCY: {
+			snprintf(output, sizeof(output), "%d %s", reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(reward->amount)));
+			break;
+		}
 		case QR_OBJECT: {
 			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, skip_filler(get_obj_name_by_proto(reward->vnum)));
 			break;
@@ -605,6 +609,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				}
 				
 				task->current += count_quest_objects(ch, task->vnum, FALSE);
+				break;
+			}
+			case REQ_GET_CURRENCY: {
+				task->current = get_currency(ch, task->vnum);
 				break;
 			}
 		}
@@ -1071,6 +1079,10 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_MOBILE, GET_MOB_VNUM(mob))) {
 			continue;
 		}
+		// hide tutorials
+		if (QUEST_FLAGGED(ql->quest, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			continue;
+		}
 		// hide dailies
 		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
 			continue;
@@ -1130,6 +1142,10 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 	LL_FOREACH(GET_OBJ_QUEST_LOOKUPS(obj), ql) {
 		// make sure they're a giver
 		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			continue;
+		}
+		// hide tutorials
+		if (QUEST_FLAGGED(ql->quest, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
 			continue;
 		}
 		// hide dailies
@@ -1196,6 +1212,10 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 		LL_FOREACH(list[iter], ql) {
 			// make sure they're a giver
 			if (iter == 0 && !find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(room)))) {
+				continue;
+			}
+			// hide tutorials
+			if (QUEST_FLAGGED(ql->quest, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
 				continue;
 			}
 			if (iter == 1 && !find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)))) {
@@ -1676,6 +1696,31 @@ void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vn
 		
 		// call it
 		(func)(ch, vnum);
+	}
+}
+
+
+/**
+* Quest Tracker: ch gains/loses currency
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The generic currency vnum.
+* @param int total The new value of the currency.
+*/
+void qt_change_currency(char_data *ch, any_vnum vnum, int total) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_GET_CURRENCY && task->vnum == vnum) {
+				task->current = total;
+			}
+		}
 	}
 }
 
@@ -2308,6 +2353,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 	quest_data *quest = quest_proto(vnum);
 	quest_data *qiter, *next_qiter;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	int size, found;
 	bool any;
 	
@@ -2338,6 +2384,20 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
+	
+	// on other shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QG_x: shop types
+		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_QUEST, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -2420,6 +2480,13 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 					quest_data *from_qst = quest_proto(vnum);
 					if (from_qst) {
 						copyfrom = (is_abbrev(field_arg, "starts") ? QUEST_STARTS_AT(from_qst) : QUEST_ENDS_AT(from_qst));
+					}
+					break;
+				}
+				case OLC_SHOP: {
+					shop_data *from_shp = real_shop(vnum);
+					if (from_shp) {
+						copyfrom = SHOP_LOCATIONS(from_shp);
 					}
 					break;
 				}
@@ -3286,6 +3353,7 @@ quest_data *create_quest_table_entry(any_vnum vnum) {
 void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *qiter, *next_qiter;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	char_data *chiter;
 	bool found;
@@ -3335,6 +3403,17 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		// QG_x: quest types
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_QUEST, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		// REQ_x: quest types
@@ -3365,6 +3444,15 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "Another quest used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(desc)) {
+			// QG_x: quest types
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_QUEST, vnum);
+		
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A quest used by the shop you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {
@@ -3992,6 +4080,20 @@ OLC_MODULE(qedit_rewards) {
 					}
 					break;	
 				}
+				case QR_CURRENCY: {
+					if (!*vnum_arg) {
+						msg_to_char(ch, "Usage: rewards add currency <amount> <generic vnum>\r\n");
+						return;
+					}
+					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid generic vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if (find_generic(vnum, GENERIC_CURRENCY)) {
+						ok = TRUE;
+					}
+					break;
+				}
 				case QR_OBJECT: {
 					if (!*vnum_arg) {
 						msg_to_char(ch, "Usage: rewards add object <amount> <object vnum>\r\n");
@@ -4125,6 +4227,16 @@ OLC_MODULE(qedit_rewards) {
 						return;
 					}
 					break;	
+				}
+				case QR_CURRENCY: {
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid currency vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if (find_generic(vnum, GENERIC_CURRENCY)) {
+						ok = TRUE;
+					}
+					break;
 				}
 				case QR_OBJECT: {
 					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {

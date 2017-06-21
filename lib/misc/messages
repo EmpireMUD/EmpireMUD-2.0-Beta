@@ -835,6 +835,126 @@ $N makes playful animal shapes with the mana you blast at $M.
 $n blasts you with mana, which you form into playful animal shapes.
 $N maakes playful animal shapes with a blast of mana from $n.
 
+* Bow (shoot)
+M
+ 29
+Your arrow pierces $N's heart, killing $M!
+An arrow shot by $n pierces your heart, killing you!
+An arrow shot by $n pierces $N's heart, killing $M!
+Your arrow whistles past $N harmlessly.
+You hear a whistle as $n's arrow flies past you harmlessly.
+$N steps aside as $n's arrow whistles past $M.
+#
+#
+#
+Your arrow flies wildly, dodging $N by way of magic.
+$n's arrow flies wildly through the air, missing you completely.
+$n's arrow dances around $N, but doesn't manage to hit $M.
+M
+ 29
+Your arrow pierces $N's eye socket, killing $M instantly!
+An arrow shot by $n pierces your eye socket, killing you instantly!
+An arrow shot by $n pierces $N's eye socket, killing $M instantly!
+Your arrow hits the ground near $N's feet.
+An arrow from $n strikes the ground near your feet.
+$N watches as an arrow from $n strikes the ground near $S feet.
+#
+#
+#
+Your arrow flies wildly, dodging $N by way of magic.
+$n's arrow flies wildly through the air, missing you completely.
+$n's arrow dances around $N, but doesn't manage to hit $M.
+
+* Crossbow (shoot)
+M
+ 30
+You shoot a bolt straight through $N's neck, and $E falls over dead.
+$n shoots a bolt straight through your neck, and it's the last thing you see.
+$n shoots a bolt straight through $N's neck, and $E falls over dead.
+You shoot a bolt over $N's shoulder.
+$n shoots a bolt straight over your shoulder.
+$n shoots a bolt straight over $N's shoulder.
+#
+#
+#
+Your bolt stops just short of $N, and falls straight to the ground.
+$n's bolt stops just short of you, and falls straight to the ground.
+$n's bolt stops just short of $N, and falls straight to the ground.
+M
+ 30
+Your bolt hits $N in the spleen, sending $M to an early grave.
+$n shoots a bolt in your spleen, sending you to an early grave.
+$n shoots a $N in the spleen, spending $M to an early grave.
+Your bolt barely grazes $N.
+A bolt from $n barely grazes you.
+A bolt from $n barely grazes $N.
+#
+#
+#
+Your bolt stops just short of $N, and falls straight to the ground.
+$n's bolt stops just short of you, and falls straight to the ground.
+$n's bolt stops just short of $N, and falls straight to the ground.
+
+* Pistol (shoot)
+M
+ 31
+$N clutches $S chest as your shot pierces it, killing $M.
+You clutch your chest as a shot from $n burns through you, and it's the last thing you see.
+$n shoots $N in the chest, killing $M.
+Your shot flies off into the air, completely missing $N.
+$n shoots at you, but misses widely.
+$n shoots at $N, but misses completely.
+#
+#
+#
+Your bullet stops in midair before $N.
+A bullet from $n stops in midair before you.
+A bullet from $n stops in midair before $N.
+M
+ 31
+You shoot $N right between the eyes, dropping $M to the ground!
+The last thing you see is $n, shooting you right between the eyes!
+A well-aimed shot from $n strikes $N right between the eyes, dropping $M to the ground!
+Your shot at $N only manages to raise a plume of dirt at $S feet.
+A shot from $n raises a plume of dirt near your feet.
+A poorly-aimed shot from $n raises a plume of dirt near $N's feet.
+#
+#
+#
+Your bullet stops in midair before $N.
+A bullet from $n stops in midair before you.
+A bullet from $n stops in midair before $N.
+
+* Musket (shoot)
+M
+ 32
+$N's chest explodes as your clever shot blasts through $S sternum!
+Your chest explodes as a clever shot from $n blasts through your sternum!
+$N's chest explodes after a clever shot from $n!
+Your shot flies off into the air, completely missing $N.
+$n shoots at you, but misses widely.
+$n shoots at $N, but misses completely.
+#
+#
+#
+Your bullet stops in midair before $N.
+A bullet from $n stops in midair before you.
+A bullet from $n stops in midair before $N.
+M
+ 32
+Your shot rips through $N's leg, opening a major artery and killing $M almost instantly!
+A shot from $n rips painfully through your leg, and you bleed out before you can take action!
+A loud shot from $n rips through $N's leg, opening a major artery and killing $M almost instantly!
+Your shot at $N only manages to raise a plume of dirt at $S feet.
+A shot from $n raises a plume of dirt near your feet.
+A poorly-aimed shot from $n raises a plume of dirt near $N's feet.
+#
+#
+#
+Your bullet stops in midair before $N.
+A bullet from $n stops in midair before you.
+A bullet from $n stops in midair before $N.
+
 * Suffering
 M
  50
@@ -923,7 +1043,7 @@ You hear a dull thud as an arrow pierces $N in the stomach!
 #
 #
 
-* Arrow
+* Arrow (no longer used because bows use normal attack types now)
 M
  53
 Your arrow pierces $N's heart, killing $M!
@@ -1001,7 +1121,7 @@ You wince in pain as the sun scorches your unliving flesh!
 #
 #
 
-* Searing poison
+* Searing poison (no longer used because searing poison is scripted now)
 M
  57
 $N winces in pain and falls over dead from your searing poison!
@@ -1068,23 +1188,23 @@ $n shoots a lightning bolt at $N, but misses.
 * Physical DoT
 M
  61
-$N bleeds out from $s open wounds, and dies.
+$N bleeds out from $S open wounds, and dies.
 You bleed out from your open wounds and die.
-$N bleeds out from $s open wounds, and dies.
+$N bleeds out from $S open wounds, and dies.
 #
 #
 #
-$N winces in pain from $s open wounds.
+$N winces in pain from $S open wounds.
 You wince in pain from your open wounds.
-$N winces in pain from $s open wounds.
+$N winces in pain from $S open wounds.
 #
 #
 #
 M
  61
-$N succumbs to $s open wounds, and dies.
+$N succumbs to $S open wounds, and dies.
 You succumb to your open wounds and die.
-$N succumbs to $s open wounds, and dies.
+$N succumbs to $S open wounds, and dies.
 #
 #
 #
