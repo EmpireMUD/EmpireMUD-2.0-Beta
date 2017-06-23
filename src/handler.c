@@ -4802,6 +4802,9 @@ void obj_from_obj(obj_data *obj) {
 		REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
 
 		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
+		if (obj_from->carried_by) {
+			IS_CARRYING_N(obj_from->carried_by) -= obj_carry_size(obj);
+		}
 
 		obj->in_obj = NULL;
 		obj->next_content = NULL;
@@ -5013,9 +5016,12 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 	}
 	else {
 		check_obj_in_void(obj);
-	
+		
 		GET_OBJ_CARRYING_N(obj_to) += obj_carry_size(obj);
-
+		if (obj_to->carried_by) {
+			IS_CARRYING_N(obj_to->carried_by) += obj_carry_size(obj);
+		}
+		
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
 		
