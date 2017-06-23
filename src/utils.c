@@ -2077,7 +2077,7 @@ double rate_item(obj_data *obj) {
 * Gives a character the appropriate amount of command lag (wait time).
 *
 * @param char_data *ch The person to give command lag to.
-* @param int wait_type A WAIT_x const to help determine wait time.
+* @param int wait_type A WAIT_ const to help determine wait time.
 */
 void command_lag(char_data *ch, int wait_type) {
 	extern const int universal_wait;

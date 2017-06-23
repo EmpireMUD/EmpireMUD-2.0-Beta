@@ -101,7 +101,7 @@ ref:
 # gcc -MM)
 
 abilities.o: abilities.c conf.h sysdep.h structs.h protocol.h uthash.h \
-  utils.h interpreter.h db.h comm.h olc.h skills.h handler.h
+  utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
 	$(CC) -c $(CFLAGS) abilities.c
 act.action.o: act.action.c conf.h sysdep.h structs.h uthash.h utils.h \
   db.h comm.h handler.h interpreter.h skills.h vnums.h dg_scripts.h

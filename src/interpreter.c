@@ -44,6 +44,7 @@ extern struct archetype_menu_type archetype_menu[];
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
+bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void set_creation_state(descriptor_data *d, int state);
 void show_bonus_trait_menu(char_data *ch);
 
@@ -622,7 +623,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "collapse", POS_STANDING, do_collapse, NO_MIN, CTYPE_SKILL, ABIL_PORTAL_MASTER ),
 	ABILITY_CMD( "colorburst", POS_FIGHTING, do_colorburst, NO_MIN, CTYPE_COMBAT, ABIL_COLORBURST ),
 	SIMPLE_CMD( "combine", POS_RESTING, do_combine, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "command", POS_STANDING, do_command, NO_MIN, CTYPE_SKILL, ABIL_COMMAND ),
+	ABILITY_CMD( "command", POS_STANDING, do_command, NO_MIN, CTYPE_SKILL, ABIL_VAMP_COMMAND ),
 	SCMD_CMD( "commands", POS_DEAD, do_commands, NO_MIN, CTYPE_UTIL, SCMD_COMMANDS ),
 	SIMPLE_CMD( "consider", POS_RESTING, do_consider, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "config", POS_DEAD, do_config, LVL_CIMPL, CTYPE_IMMORTAL ),
@@ -1112,6 +1113,7 @@ cpp_extern const struct command_info cmd_info[] = {
  * then calls the appropriate function.
  */
 void command_interpreter(char_data *ch, char *argument) {
+	extern bool check_ability(char_data *ch, char *string, bool exact);
 	extern bool check_social(char_data *ch, char *string, bool exact);
 	int cmd, length, iter;
 	char *line;
@@ -1173,9 +1175,17 @@ void command_interpreter(char_data *ch, char *argument) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
 	}
-
-	if (*cmd_info[cmd].command == '\n' && check_social(ch, argument, FALSE))
+	
+	if (*cmd_info[cmd].command == '\n' && check_ability(ch, argument, FALSE)) {
 		return;
+	}
+	else if (*cmd_info[cmd].command == '\n' && check_social(ch, argument, FALSE)) {
+		return;
+	}
+	else if (strlen(arg) < strlen(cmd_info[cmd].command) && check_ability(ch, argument, TRUE)) {
+		// If the player abbreviated the actual command, and what they typed is an exact match for a ability, do the ability instead.
+		return;
+	}
 	else if (strlen(arg) < strlen(cmd_info[cmd].command) && check_social(ch, argument, TRUE)) {
 		// If the player abbreviated the actual command ("nod" for
 		// nodismantle), and what they typed is an exact match for a social,
@@ -1190,42 +1200,23 @@ void command_interpreter(char_data *ch, char *argument) {
 		// otherwise, no match
 		send_config_msg(ch, "huh_string");
 	}
-	else if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_FROZEN))
-		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
+	
+	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype == CTYPE_COMBAT || cmd_info[cmd].ctype == CTYPE_SKILL || cmd_info[cmd].ctype == CTYPE_BUILD))) {
+		// sent own error message
+	}
+	else if (GET_FEEDING_FROM(ch) && cmd_info[cmd].minimum_position >= POS_SLEEPING && cmd_info[cmd].command_pointer != do_bite) {
+		msg_to_char(ch, "You can't do that while feeding!\r\n");
+	}
+	else if (IS_NPC(ch) && cmd_info[cmd].minimum_level >= LVL_GOD) {
+		send_to_char("You can't use immortal commands while switched.\r\n", ch);
+	}
 	else if (IS_SET(cmd_info[cmd].flags, CMD_NOT_RP) && !IS_NPC(ch) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_RP)) {
 		msg_to_char(ch, "You can't do that while role-playing!\r\n");
 	}
-	else if (IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS) && CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
-		msg_to_char(ch, "You can't do that in this form!\r\n");
-	}
-	else if (IS_INJURED(ch, INJ_STAKED) && cmd_info[cmd].minimum_position >= POS_SLEEPING && !IS_IMMORTAL(ch))
-		msg_to_char(ch, "You can't do that while staked!\r\n");
-	else if (AFF_FLAGGED(ch, AFF_STUNNED) && cmd_info[cmd].minimum_position >= POS_SLEEPING && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You can't do that while stunned!\r\n");
-	}
-	else if (AFF_FLAGGED(ch, AFF_EARTHMELD) && cmd_info[cmd].minimum_position >= POS_SLEEPING)
-		msg_to_char(ch, "You can't do that while in earthmeld.\r\n");
-	else if (AFF_FLAGGED(ch, AFF_MUMMIFY) && cmd_info[cmd].minimum_position >= POS_SLEEPING)
-		msg_to_char(ch, "You can't do that while mummified.\r\n");
-	else if (AFF_FLAGGED(ch, AFF_DEATHSHROUD) && cmd_info[cmd].minimum_position >= POS_SLEEPING)
-		msg_to_char(ch, "You can't do that while in deathshroud!\r\n");
-	else if (GET_FED_ON_BY(ch) && cmd_info[cmd].minimum_position >= POS_SLEEPING)
-		msg_to_char(ch, "The ecstasy of the fangs in your flesh is too enchanting to do that...\r\n");
-	else if (GET_FEEDING_FROM(ch) && cmd_info[cmd].minimum_position >= POS_SLEEPING && cmd_info[cmd].command_pointer != do_bite)
-		msg_to_char(ch, "You can't do that while feeding!\r\n");
-	else if (cmd_info[cmd].command_pointer == NULL)
+	else if (cmd_info[cmd].command_pointer == NULL) {
 		send_to_char("Sorry, that command hasn't been implemented yet.\r\n", ch);
-	else if (IS_NPC(ch) && cmd_info[cmd].minimum_level >= LVL_GOD)
-		send_to_char("You can't use immortal commands while switched.\r\n", ch);
-	else if (IS_INJURED(ch, INJ_TIED) && cmd_info[cmd].minimum_position >= POS_SLEEPING)
-		msg_to_char(ch, "You're tied up!\r\n");
-	else if (AFF_FLAGGED(ch, AFF_NO_ATTACK) && !IS_NPC(ch) && (cmd_info[cmd].ctype == CTYPE_COMBAT || cmd_info[cmd].ctype == CTYPE_SKILL || cmd_info[cmd].ctype == CTYPE_BUILD)) {
-		msg_to_char(ch, "You can't do that in this state.\r\n");
 	}
-	else if (GET_POS(ch) < cmd_info[cmd].minimum_position) {
-		send_low_pos_msg(ch);
-	}
-
+	
 	// Command trigger (3/3): exact match on abbreviated command
 	else if (check_command_trigger(ch, (char*)cmd_info[cmd].command, line, CMDTRG_EXACT)) {
 		return;
@@ -1452,6 +1443,61 @@ ACMD(do_alias) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPER FUNCTIONS ////////////////////////////////////////////////////////
+
+/**
+* Checks that a player can take a certain action (like a command).
+*
+* @param char_data *ch The character trying to act.
+* @param int min_pos The minimum allowed POS_ const.
+* @param bool allow_animal If FALSE, players can't do this in an animal morph.
+* @param bool allow_invulnerable If FALSE, players can't do this while un-attackable.
+* @return bool TRUE if the character can act, FALSE (with error msg) if not
+*/
+bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable) {
+	if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_FROZEN)) {
+		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
+	}
+	else if (!allow_animal && CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+		msg_to_char(ch, "You can't do that in this form!\r\n");
+	}
+	else if (IS_INJURED(ch, INJ_STAKED) && min_pos >= POS_SLEEPING && !IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "You can't do that while staked!\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_STUNNED) && min_pos >= POS_SLEEPING && !IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "You can't do that while stunned!\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_EARTHMELD) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that while in earthmeld.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_MUMMIFY) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that while mummified.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_DEATHSHROUD) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that while in deathshroud!\r\n");
+	}
+	else if (GET_FEEDING_FROM(ch) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that right now!\r\n");
+	}
+	else if (GET_FED_ON_BY(ch) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "The ecstasy of the fangs in your flesh is too enchanting to do that...\r\n");
+	}
+	else if (IS_INJURED(ch, INJ_TIED) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You're tied up!\r\n");
+	}
+	else if (!allow_invulnerable && AFF_FLAGGED(ch, AFF_NO_ATTACK) && !IS_NPC(ch)) {
+		msg_to_char(ch, "You can't do that in this state.\r\n");
+	}
+	else if (GET_POS(ch) < min_pos) {
+		send_low_pos_msg(ch);
+	}
+	else {
+		return TRUE;	// success
+	}
+	
+	// must have failed
+	return FALSE;
+}
+
 
 /**
 * Sends a message telling the character their position is too low to perform

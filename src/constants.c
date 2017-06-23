@@ -23,6 +23,7 @@
 /**
 * Contents:
 *   EmpireMUD Constants
+*   Ability Constants
 *   Adventure Constants
 *   Archetype Constants
 *   Augment Constants
@@ -102,6 +103,56 @@ const char *reboot_strings[] = {
 
 // for the reboot_control -- SCMD_REBOOT, SCMD_SHUTDOWN
 const char *reboot_type[] = { "reboot", "shutdown" };
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY CONSTANTS ///////////////////////////////////////////////////////
+
+// ABILF_x: ability flags
+const char *ability_flags[] = {
+	"VIOLENT",
+	"COUNTERSPELLABLE",
+	"\n"
+};
+
+
+// ABILT_x: ability type flags
+const char *ability_type_flags[] = {
+	"DAMAGE",	// 0
+	"AFFECTS",
+	"UNAFFECTS",
+	"POINTS",
+	"ALTER-OBJS",
+	"GROUPS",	// 5
+	"MASSES",
+	"AREAS",
+	"SUMMONS",
+	"CREATIONS",
+	"MANUAL",	// 10
+	"ROOMS",
+	"CRAFT",
+	"\n"
+};
+
+
+// ATAR_x: ability targeting flags
+const char *ability_target_flags[] = {
+	"IGNORE",	// 0
+	"CHAR-ROOM",
+	"CHAR-WORLD",
+	"CHAR-CLOSEST",
+	"FIGHT-SELF",
+	"FIGHT-VICTIM",	// 5
+	"SELF-ONLY",
+	"NOT-SELF",
+	"OBJ-INV",
+	"OBJ-ROOM",
+	"OBJ-WORLD",	// 10
+	"OBJ-EQUIP",
+	"VEH-ROOM",
+	"VEH-WORLD",
+	"\n"
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2821,13 +2872,6 @@ const char *shop_flags[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// SKILL CONSTANTS /////////////////////////////////////////////////////////
 
-// ABILF_x: ability flags
-const char *ability_flags[] = {
-	"*",
-	"\n"
-};
-
-
 // DAM_x damage types
 const char *damage_types[] = {
 	"physical",
@@ -3472,5 +3516,18 @@ const char *vehicle_flags[] = {
 	"ON-FIRE",
 	"!LOAD-ONTO-VEHICLE",
 	"VISIBLE-IN-DARK",	// 20
+	"\n"
+};
+
+
+// WAIT_x: Wait types for the command_lag() function.
+const char *wait_types[] = {
+	"NONE",	// 0
+	"ABILITY",
+	"COMBAT-ABILITY",
+	"COMBAT-SPELL",
+	"MOVEMENT",
+	"SPELL",	// 5
+	"OTHER",
 	"\n"
 };

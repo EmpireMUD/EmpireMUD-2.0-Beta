@@ -540,7 +540,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 * @param int cost_amount Mana (or whatever) amount required, if any.
 * @param int cooldown_type Any COOLDOWN_ const to apply (NOTHING for none).
 * @param int cooldown_time Cooldown duration, if any.
-* @param int wait_type Any WAIT_x const or WAIT_NONE for no command lag.
+* @param int wait_type Any WAIT_ const or WAIT_NONE for no command lag.
 */
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type) {
 	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0) {

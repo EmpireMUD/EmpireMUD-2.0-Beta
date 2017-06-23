@@ -16,6 +16,7 @@
 *   Basic Types and Consts
 *   #define Section
 *     Miscellaneous Defines
+*     Ability Defines
 *     Adventure Defines
 *     Archetype Defines
 *     Augment Defines
@@ -253,10 +254,6 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS DEFINES ///////////////////////////////////////////////////
 
-// ABILF_x: ability flags
-#define ABILF_UNUSED  BIT(0)	// a. ??? placeholder
-
-
 // Modifier constants used with obj affects ('A' fields), player affect types, etc
 #define APPLY_NONE  0	// No effect
 #define APPLY_STRENGTH  1	// Apply to strength
@@ -410,6 +407,51 @@ typedef struct vehicle_data vehicle_data;
 #define TPD_EXPIRED  BIT(2)	// ended without sale
 #define TPD_OBJ_PENDING  BIT(3)	// obj not received
 #define TPD_COINS_PENDING  BIT(4)	// coins not received
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY DEFINES /////////////////////////////////////////////////////////
+
+// ABILF_x: ability flags
+#define ABILF_VIOLENT  BIT(0)	// a. hostile ability (can't target self, etc)
+#define ABILF_COUNTERSPELLABLE  BIT(1)	// b. can be counterspelled
+
+
+// ABILT_x: ability type flags
+#define ABILT_DAMAGE  BIT(0)
+#define ABILT_AFFECTS  BIT(1)
+#define ABILT_UNAFFECTS  BIT(2)
+#define ABILT_POINTS  BIT(3)
+#define ABILT_ALTER_OBJS  BIT(4)
+#define ABILT_GROUPS  BIT(5)
+#define ABILT_MASSES  BIT(6)
+#define ABILT_AREAS  BIT(7)
+#define ABILT_SUMMONS  BIT(8)
+#define ABILT_CREATIONS  BIT(9)
+#define ABILT_MANUAL  BIT(10)
+#define ABILT_ROOMS  BIT(11)
+#define ABILT_CRAFT  BIT(12)	// related to crafting/building
+
+
+// ATAR_x: ability targeting flags
+#define ATAR_IGNORE	BIT(0)	// ignore target
+#define ATAR_CHAR_ROOM	BIT(1)	// pc/npc in room
+#define ATAR_CHAR_WORLD  BIT(2)	// pc/npc in the world
+#define ATAR_CHAR_CLOSEST  BIT(3)	// closest pc/npc in the world
+#define ATAR_FIGHT_SELF  BIT(4)	// if fighting and no arg, targets self
+#define ATAR_FIGHT_VICT  BIT(5)	// if fighting and no arg, targets opponent
+#define ATAR_SELF_ONLY  BIT(6)	// targets self if no arg, and only allows self
+#define ATAR_NOT_SELF  BIT(7)	// target is any other char, always use with e.g. TAR_CHAR_ROOM
+#define ATAR_OBJ_INV  BIT(8)	// object in inventory
+#define ATAR_OBJ_ROOM  BIT(9)	// object in the room
+#define ATAR_OBJ_WORLD  BIT(10)	// object in the world
+#define ATAR_OBJ_EQUIP  BIT(11)	// object held/equipped
+#define ATAR_VEH_ROOM  BIT(12)	// vehicle in the room
+#define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
+
+
+// RUN_ABIL_x: modes for activating abilities
+#define RUN_ABIL_NORMAL  0	// normal command activation
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1798,14 +1840,14 @@ typedef struct vehicle_data vehicle_data;
 #define SYS_EMPIRE  BIT(11)	// empire-related logs
 
 
-// Wait types for the command_lag() function.
-#define WAIT_NONE  -1	// for functions that require a wait_type
-#define WAIT_ABILITY  0	// general abilities
-#define WAIT_COMBAT_ABILITY  1	// ability that does damage or affects combat
-#define WAIT_COMBAT_SPELL  2	// spell that does damage or affects combat (except healing)
-#define WAIT_MOVEMENT  3	// normal move lag
-#define WAIT_SPELL  4	// general spells
-#define WAIT_OTHER  5	// not covered by other categories
+// WAIT_x: Wait types for the command_lag() function.
+#define WAIT_NONE  0	// for functions that require a wait_type
+#define WAIT_ABILITY  1	// general abilities
+#define WAIT_COMBAT_ABILITY  2	// ability that does damage or affects combat
+#define WAIT_COMBAT_SPELL  3	// spell that does damage or affects combat (except healing)
+#define WAIT_MOVEMENT  4	// normal move lag
+#define WAIT_SPELL  5	// general spells
+#define WAIT_OTHER  6	// not covered by other categories
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2172,8 +2214,23 @@ struct ability_data {
 	any_vnum vnum;
 	char *name;
 	
+	// properties
 	bitvector_t flags;	// ABILF_ flags
+	bitvector_t types;	// ABILT_ flags
 	any_vnum mastery_abil;	// used for crafting abilities
+	
+	// command-related data
+	char *command;	// if ability has a command
+	byte min_position;	// to use the command
+	bitvector_t targets;	// ATAR_ flags
+	int cost_type;	// HEALTH, MANA, etc.
+	int cost;	// amount of h/v/m
+	any_vnum cooldown;	// generic cooldown if any
+	int cooldown_secs;	// how long to cooldown, if any
+	int wait_type;	// WAIT_ flag
+	
+	// type-specific data
+	any_vnum affect_vnum;	// which affect for buffs/debuffs
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup

@@ -48,9 +48,18 @@ OLC_MODULE(olc_set_max_vnum);
 OLC_MODULE(olc_set_min_vnum);
 
 // ability modules
+OLC_MODULE(abiledit_cdtime);
+OLC_MODULE(abiledit_command);
+OLC_MODULE(abiledit_cooldown);
+OLC_MODULE(abiledit_cost);
+OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_flags);
 OLC_MODULE(abiledit_masteryability);
+OLC_MODULE(abiledit_minposition);
 OLC_MODULE(abiledit_name);
+OLC_MODULE(abiledit_targets);
+OLC_MODULE(abiledit_types);
+OLC_MODULE(abiledit_waittype);
 
 // adventure zone modules
 OLC_MODULE(advedit_author);
@@ -524,8 +533,18 @@ const struct olc_command_data olc_data[] = {
 	{ "setmaxvnum", olc_set_max_vnum, NOBITS, NOBITS },
 	
 	// ability commands
+	{ "cdtime", abiledit_cdtime, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "command", abiledit_command, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "cooldown", abiledit_cooldown, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "cost", abiledit_cost, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "costtype", abiledit_costtype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "minposition", abiledit_minposition, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "targets", abiledit_targets, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "types", abiledit_types, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "waittype", abiledit_waittype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
 	
 	// adventure zones
