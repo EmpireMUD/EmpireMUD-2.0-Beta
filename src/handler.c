@@ -4741,6 +4741,10 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		if (IN_ROOM(ch) && OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))++;
 		}
+		
+		if (IS_CONTAINER(obj)) {
+			IS_CARRYING_N(ch) += obj_carry_size(obj);
+		}
 
 		if (wear_data[pos].count_stats) {
 			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
@@ -4804,6 +4808,9 @@ void obj_from_obj(obj_data *obj) {
 		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 		if (obj_from->carried_by) {
 			IS_CARRYING_N(obj_from->carried_by) -= obj_carry_size(obj);
+		}
+		if (obj_from->worn_by && IS_CONTAINER(obj_from)) {
+			IS_CARRYING_N(obj_from->worn_by) -= obj_carry_size(obj);
 		}
 
 		obj->in_obj = NULL;
@@ -5021,6 +5028,9 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		if (obj_to->carried_by) {
 			IS_CARRYING_N(obj_to->carried_by) += obj_carry_size(obj);
 		}
+		if (obj_to->worn_by && IS_CONTAINER(obj_to)) {
+			IS_CARRYING_N(obj_to->worn_by) += obj_carry_size(obj);
+		}
 		
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
@@ -5155,6 +5165,10 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		// adjust lights
 		if (IN_ROOM(ch) && OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))--;
+		}
+		
+		if (IS_CONTAINER(obj)) {
+			IS_CARRYING_N(ch) -= obj_carry_size(obj);
 		}
 
 		// actual remove
