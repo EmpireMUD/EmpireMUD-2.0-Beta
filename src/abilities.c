@@ -41,9 +41,11 @@ const char *default_ability_name = "Unnamed Ability";
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 
 // external consts
+extern const char *ability_custom_types[];
 extern const char *ability_flags[];
 extern const char *ability_target_flags[];
 extern const char *ability_type_flags[];
+extern const char *apply_types[];
 extern const char *pool_types[];
 extern const char *position_types[];
 extern const char *wait_types[];
@@ -845,7 +847,7 @@ void free_ability(ability_data *abil) {
 void parse_ability(FILE *fl, any_vnum vnum) {
 	char line[256], error[256], str_in[256], str_in2[256];
 	ability_data *abil, *find;
-	int int_in[6];
+	int int_in[7];
 	
 	CREATE(abil, ability_data, 1);
 	clear_ability(abil);
@@ -890,7 +892,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'C': {	// command info
-				if (!get_line(fl, line) || sscanf(line, "%s %d %s %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5]) != 8) {
+				if (!get_line(fl, line) || sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 9) {
 					log("SYSERR: Format error in C line of %s", error);
 					exit(1);
 				}
@@ -905,7 +907,8 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				ABIL_COST(abil) = int_in[2];
 				ABIL_COOLDOWN(abil) = int_in[3];
 				ABIL_COOLDOWN_SECS(abil) = int_in[4];
-				ABIL_WAIT_TYPE(abil) = int_in[5];
+				ABIL_LINKED_TRAIT(abil) = int_in[5];
+				ABIL_WAIT_TYPE(abil) = int_in[6];
 				break;
 			}
 			
@@ -996,8 +999,8 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	fprintf(fl, "%s %s %d\n", temp, temp2, ABIL_MASTERY_ABIL(abil));
 
 	// 'C' command
-	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil)) {
-		fprintf(fl, "C\n%s %d %s %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
+		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
 	}
 	
 	// end
@@ -1275,6 +1278,7 @@ void save_olc_ability(descriptor_data *desc) {
 		free(ABIL_COMMAND(abil));	// don't allow empty
 		ABIL_COMMAND(abil) = NULL;
 	}
+	free_custom_messages(ABIL_CUSTOM_MSGS(proto));
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
@@ -1312,6 +1316,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 		// copy things that are pointers
 		ABIL_NAME(new) = ABIL_NAME(input) ? str_dup(ABIL_NAME(input)) : NULL;
 		ABIL_COMMAND(new) = ABIL_COMMAND(input) ? str_dup(ABIL_COMMAND(input)) : NULL;
+		ABIL_CUSTOM_MSGS(new) = copy_custom_messages(ABIL_CUSTOM_MSGS(input));
 	}
 	else {
 		// brand new: some defaults
@@ -1361,6 +1366,8 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 void olc_show_ability(char_data *ch) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct custom_message *custm;
+	int count;
 	
 	if (!abil) {
 		return;
@@ -1380,24 +1387,30 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
 	// command-related portion
-	sprintf(buf + strlen(buf), "<\tycommand\t0> %s\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "(none)");
-	if (ABIL_COMMAND(abil)) {
-		sprintf(buf + strlen(buf), "<\tyminposition\t0> %s (minimum)\r\n", position_types[ABIL_MIN_POS(abil)]);
+	if (!ABIL_COMMAND(abil)) {
+		sprintf(buf + strlen(buf), "<\tycommand\t0> (not a command)\r\n");
+	}
+	else {
+		sprintf(buf + strlen(buf), "<\tycommand\t0> %s, <\tyminposition\t0> %s (minimum)\r\n", ABIL_COMMAND(abil), position_types[ABIL_MIN_POS(abil)]);
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
 		sprintf(buf + strlen(buf), "<\tytargets\t0> %s\r\n", lbuf);
-		sprintf(buf + strlen(buf), "<\tycost\t0> %d\r\n", ABIL_COST(abil));
-		sprintf(buf + strlen(buf), "<\tycosttype\t0> %s\r\n", pool_types[ABIL_COST_TYPE(abil)]);
-		
-		sprintf(buf + strlen(buf), "<\tycooldown\t0> [%d] %s\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)));
-		if (ABIL_COOLDOWN(abil) != NOTHING) {
-			sprintf(buf + strlen(buf), "<\tycdtime\t0> %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-		}
-		
-		sprintf(buf + strlen(buf), "<\tywaittype\t0> %s\r\n", wait_types[ABIL_WAIT_TYPE(abil)]);
+		sprintf(buf + strlen(buf), "<\tycost\t0> %d, <\tycosttype\t0> %s\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+		sprintf(buf + strlen(buf), "<\tycooldown\t0> [%d] %s, <\tycdtime\t0> %d second%s\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		sprintf(buf + strlen(buf), "<\tywaittype\t0> %s, <\tylinkedtrait\t0> %s\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 		
 		// type-specific data
-		//any_vnum affect_vnum;	// which affect for buffs/debuffs
-		///
+		if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
+/*			<shortduration>, <longduration>
+			<affecttype>
+			<affect flags>
+*/		}
+	}
+	
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
+	count = 0;
+	LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
+		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, ability_custom_types[custm->type], custm->msg);
 	}
 	
 	page_string(ch->desc, buf, TRUE);
@@ -1520,6 +1533,18 @@ OLC_MODULE(abiledit_costtype) {
 OLC_MODULE(abiledit_flags) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);	
 	ABIL_FLAGS(abil) = olc_process_flag(ch, argument, "ability", "flags", ability_flags, ABIL_FLAGS(abil));
+}
+
+
+OLC_MODULE(abiledit_linkedtrait) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_LINKED_TRAIT(abil) = olc_process_type(ch, argument, "linked trait", "linkedtrait", apply_types, ABIL_LINKED_TRAIT(abil));
+	}
 }
 
 

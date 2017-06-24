@@ -254,7 +254,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS DEFINES ///////////////////////////////////////////////////
 
-// Modifier constants used with obj affects ('A' fields), player affect types, etc
+// APPLY_x: Modifier const used with obj affects ('A' fields), player affects, etc
 #define APPLY_NONE  0	// No effect
 #define APPLY_STRENGTH  1	// Apply to strength
 #define APPLY_DEXTERITY  2	// Apply to dexterity
@@ -448,6 +448,10 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_OBJ_EQUIP  BIT(11)	// object held/equipped
 #define ATAR_VEH_ROOM  BIT(12)	// vehicle in the room
 #define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
+
+
+// ABIL_CUSTOM_x: custom message types
+#define ABIL_CUSTOM_UNUSED  0
 
 
 // RUN_ABIL_x: modes for activating abilities
@@ -2228,6 +2232,8 @@ struct ability_data {
 	any_vnum cooldown;	// generic cooldown if any
 	int cooldown_secs;	// how long to cooldown, if any
 	int wait_type;	// WAIT_ flag
+	int linked_trait;	// APPLY_ type that this scales with
+	struct custom_message *custom_msgs;	// any custom messages
 	
 	// type-specific data
 	any_vnum affect_vnum;	// which affect for buffs/debuffs
@@ -2948,7 +2954,7 @@ struct mob_special_data {
 };
 
 
-// for mobs/objs custom action messages
+// for mobs/objs/abils custom action messages
 struct custom_message {
 	int type;	// OBJ_CUSTOM_ or MOB_CUSTOM_
 	char *msg;
