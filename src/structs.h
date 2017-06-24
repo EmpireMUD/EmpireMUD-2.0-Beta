@@ -44,6 +44,7 @@
 *     Maxima and Limits
 *   Structs Section
 *     Miscellaneous Structs
+*     Ability Structs
 *     Adventure Structs
 *     Archetype Structs
 *     Augment Structs
@@ -2213,40 +2214,6 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS STRUCTS ///////////////////////////////////////////////////
 
-// abilities.c
-struct ability_data {
-	any_vnum vnum;
-	char *name;
-	
-	// properties
-	bitvector_t flags;	// ABILF_ flags
-	bitvector_t types;	// ABILT_ flags
-	any_vnum mastery_abil;	// used for crafting abilities
-	
-	// command-related data
-	char *command;	// if ability has a command
-	byte min_position;	// to use the command
-	bitvector_t targets;	// ATAR_ flags
-	int cost_type;	// HEALTH, MANA, etc.
-	int cost;	// amount of h/v/m
-	any_vnum cooldown;	// generic cooldown if any
-	int cooldown_secs;	// how long to cooldown, if any
-	int wait_type;	// WAIT_ flag
-	int linked_trait;	// APPLY_ type that this scales with
-	struct custom_message *custom_msgs;	// any custom messages
-	
-	// type-specific data
-	any_vnum affect_vnum;	// which affect for buffs/debuffs
-	
-	// live cached (not saved) data:
-	skill_data *assigned_skill;	// skill for reverse-lookup
-	int skill_level;	// level of that skill required
-	
-	UT_hash_handle hh;	// ability_table hash handle
-	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
-};
-
-
 // apply types for augments and morphs
 struct apply_data {
 	int location;	// APPLY_
@@ -2584,6 +2551,52 @@ struct trading_post_data {
 	empire_vnum coin_type;	// empire vnum or OTHER_COIN for buy/post coins
 	
 	struct trading_post_data *next;	// LL
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY STRUCTS /////////////////////////////////////////////////////////
+
+// abilities.c
+struct ability_data {
+	any_vnum vnum;
+	char *name;
+	
+	// properties
+	bitvector_t flags;	// ABILF_ flags
+	any_vnum mastery_abil;	// used for crafting abilities
+	struct ability_type *type_list;	// types with properties
+	
+	// command-related data
+	char *command;	// if ability has a command
+	byte min_position;	// to use the command
+	bitvector_t targets;	// ATAR_ flags
+	int cost_type;	// HEALTH, MANA, etc.
+	int cost;	// amount of h/v/m
+	any_vnum cooldown;	// generic cooldown if any
+	int cooldown_secs;	// how long to cooldown, if any
+	int wait_type;	// WAIT_ flag
+	int linked_trait;	// APPLY_ type that this scales with
+	struct custom_message *custom_msgs;	// any custom messages
+	
+	// type-specific data
+	any_vnum affect_vnum;	// which affect for buffs/debuffs
+	
+	// live cached (not saved) data:
+	skill_data *assigned_skill;	// skill for reverse-lookup
+	int skill_level;	// level of that skill required
+	bitvector_t types;	// summary of ABILT_ flags
+	
+	UT_hash_handle hh;	// ability_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
+};
+
+
+// determines the weight for each type, to affect scaling
+struct ability_type {
+	bitvector_t type;	// a single ABILT_ flag
+	int weight;	// how much weight to give that type
+	struct ability_type *next;
 };
 
 

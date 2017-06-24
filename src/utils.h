@@ -108,6 +108,7 @@
 #define ABIL_NAME(abil)  ((abil)->name)
 #define ABIL_SKILL_LEVEL(abil)  ((abil)->skill_level)
 #define ABIL_TARGETS(abil)  ((abil)->targets)
+#define ABIL_TYPE_LIST(abil)  ((abil)->type_list)
 #define ABIL_TYPES(abil)  ((abil)->types)
 #define ABIL_VNUM(abil)  ((abil)->vnum)
 #define ABIL_WAIT_TYPE(abil)  ((abil)->wait_type)

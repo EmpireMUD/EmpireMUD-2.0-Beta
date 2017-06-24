@@ -57,6 +57,44 @@ extern const char *wait_types[];
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* This function adds a type to the ability's type list, and updates the summary
+* type flags.
+*
+* @param ability_data *abil Which ability we're adding a type to.
+* @param bitvector_t type Which ABILT_ flag.
+* @param int weight How much weight it gets (for scaling).
+*/
+void add_type_to_ability(ability_data *abil, bitvector_t type, int weight) {
+	bitvector_t total = NOBITS;
+	struct ability_type *at;
+	bool found = FALSE;
+	
+	if (!type) {
+		return;
+	}
+	
+	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+		total |= at->type;
+		
+		if (at->type == type) {
+			at->weight = weight;
+			found = TRUE;
+		}
+	}
+	
+	if (!found) {
+		CREATE(at, struct ability_type, 1);
+		at->type = type;
+		at->weight = weight;
+		LL_APPEND(ABIL_TYPE_LIST(abil), at);
+	}
+	
+	total |= type;
+	ABIL_TYPES(abil) = total;	// summarize flags
+}
+
+
+/**
 * Audits abilities on startup.
 */
 void check_abilities(void) {
@@ -187,6 +225,28 @@ char *get_ability_name_by_vnum(any_vnum vnum) {
 
 
 /**
+* Displays the list of types for an ability.
+*
+* @param struct ability_type *list Pointer to the start of a list of types.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_ability_type_display(struct ability_type *list, char *save_buffer) {
+	struct ability_type *at;
+	char lbuf[256];
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(list, at) {
+		sprintbit(at->type, ability_type_flags, lbuf, TRUE);
+		sprintf(save_buffer + strlen(save_buffer), " %d. %s(%d)\r\n", ++count, lbuf, at->weight);
+	}
+	if (count == 0) {
+		strcat(save_buffer, " none\r\n");
+	}
+}
+
+
+/**
 * @param ability_data *abil An ability to check.
 * @return bool TRUE if that ability is assigned to any class, or FALSE if not.
 */
@@ -206,6 +266,29 @@ bool is_class_ability(ability_data *abil) {
 	}
 	
 	return FALSE;	// no match
+}
+
+
+/**
+* Removes a type from an ability and re-summarizes the type flags.
+*
+* @param ability_data *abil The ability to remove a type from.
+* @param bitvector_t type The ABILT_ flag to remove.
+*/
+void remove_type_from_ability(ability_data *abil, bitvector_t type) {
+	struct ability_type *at, *next_at;
+	bitvector_t total = NOBITS;
+	
+	LL_FOREACH_SAFE(ABIL_TYPE_LIST(abil), at, next_at) {
+		if (at->type == type) {
+			LL_DELETE(ABIL_TYPE_LIST(abil), at);
+			free(at);
+		}
+		else {
+			total |= at->type;
+		}
+	}
+	ABIL_TYPES(abil) = total;	// summarize flags
 }
 
 
@@ -871,17 +954,12 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 		log("SYSERR: Missing line 2 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %s %d", str_in, str_in2, &int_in[0]) != 3) {
-		// old format
-		strcpy(str_in2, "0");
-		if (sscanf(line, "%s %d", str_in, &int_in[0]) != 2) {
-			log("SYSERR: Format error in line 2 of %s", error);
-			exit(1);
-		}
+	if (sscanf(line, "%s %d", str_in, &int_in[0]) != 3) {
+		log("SYSERR: Format error in line 2 of %s", error);
+		exit(1);
 	}
 	
 	ABIL_FLAGS(abil) = asciiflag_conv(str_in);
-	ABIL_TYPES(abil) = asciiflag_conv(str_in2);
 	ABIL_MASTERY_ABIL(abil) = int_in[0];
 	
 	// optionals
@@ -909,6 +987,15 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				ABIL_COOLDOWN_SECS(abil) = int_in[4];
 				ABIL_LINKED_TRAIT(abil) = int_in[5];
 				ABIL_WAIT_TYPE(abil) = int_in[6];
+				break;
+			}
+			
+			case 'T': {	// type
+				if (sscanf(line, "T %s %d", str_in, &int_in[0]) != 2) {
+					log("SYSERR: Format error in T line of %s", error);
+					exit(1);
+				}
+				add_type_to_ability(abil, asciiflag_conv(str_in), int_in[0]);
 				break;
 			}
 			
@@ -981,7 +1068,8 @@ void write_ability_index(FILE *fl) {
 * @param ability_data *abil The thing to save.
 */
 void write_ability_to_file(FILE *fl, ability_data *abil) {
-	char temp[256], temp2[256];
+	struct ability_type *at;
+	char temp[256];
 	
 	if (!fl || !abil) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_ability_to_file called without %s", !fl ? "file" : "ability");
@@ -993,14 +1081,18 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	// 1: name
 	fprintf(fl, "%s~\n", NULLSAFE(ABIL_NAME(abil)));
 	
-	// 2: flags types mastery-abil
+	// 2: flags mastery-abil
 	strcpy(temp, bitv_to_alpha(ABIL_FLAGS(abil)));
-	strcpy(temp2, bitv_to_alpha(ABIL_TYPES(abil)));
-	fprintf(fl, "%s %s %d\n", temp, temp2, ABIL_MASTERY_ABIL(abil));
+	fprintf(fl, "%s %d\n", temp, ABIL_MASTERY_ABIL(abil));
 
 	// 'C' command
 	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
 		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
+	}
+	
+	// 'T' types
+	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+		fprintf(fl, "T %s %d\n", bitv_to_alpha(at->type), at->weight);
 	}
 	
 	// end
@@ -1350,6 +1442,9 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 
 	size += snprintf(buf + size, sizeof(buf) - size, "Mastery ability: [\ty%d\t0] \ty%s\t0\r\n", ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	
+	get_ability_type_display(ABIL_TYPE_LIST(abil), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Types:\r\n%s", part);
+	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
@@ -1378,8 +1473,8 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(ABIL_NAME(abil)));
 	
-	sprintbit(ABIL_TYPES(abil), ability_type_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tytypes\t0> %s\r\n", lbuf);
+	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf);
+	sprintf(buf + strlen(buf), "<\tytypes\t0> (add, change, remove)\r\n%s", lbuf);
 	
 	sprintf(buf + strlen(buf), "<\tymasteryability\t0> %d %s\r\n", ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	
@@ -1607,7 +1702,100 @@ OLC_MODULE(abiledit_targets) {
 
 OLC_MODULE(abiledit_types) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_TYPES(abil) = olc_process_flag(ch, argument, "type", "types", ability_type_flags, ABIL_TYPES(abil));
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], *weight_arg;
+	struct ability_type *at, *change;
+	int num, iter, typeid, weight;
+	bool found;
+	
+	// arg1 arg2
+	half_chop(argument, arg1, arg2);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which type (number)?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			while ((at = ABIL_TYPE_LIST(abil))) {
+				remove_type_from_ability(abil, at->type);
+			}
+			msg_to_char(ch, "You remove all the types.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid type number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+				if (--num == 0) {
+					found = TRUE;
+					msg_to_char(ch, "You remove type #%d.\r\n", atoi(arg2));
+					remove_type_from_ability(abil, at->type);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid type number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		weight_arg = any_one_word(arg2, arg);
+		
+		if (!*arg || !*weight_arg) {
+			msg_to_char(ch, "Usage: types add <type> <weight>\r\n");
+		}
+		else if ((typeid = search_block(arg, ability_type_flags, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
+		}
+		else if (!isdigit(*weight_arg) || (weight = atoi(weight_arg)) < 1) {
+			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
+		}
+		else {
+			add_type_to_ability(abil, BIT(typeid), weight);
+			sprintbit(BIT(typeid), ability_type_flags, buf, TRUE);
+			msg_to_char(ch, "You add a type: %s(%d)\r\n", buf, weight);
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*val_arg || !isdigit(*val_arg)) {
+			msg_to_char(ch, "Usage: types change <number> <weight>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+			if (--num == 0) {
+				change = at;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid type number.\r\n");
+		}
+		else if ((weight = atoi(val_arg)) < 1) {
+			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
+		}
+		else {
+			change->weight = weight;
+			msg_to_char(ch, "Type %d changed to weight: %d\r\n", atoi(num_arg), weight);
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: types add <type> <weight>\r\n");
+		msg_to_char(ch, "Usage: types change <number> <weight>\r\n");
+		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
+		msg_to_char(ch, "Available types:\r\n");
+		for (iter = 0; *ability_type_flags[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %s\r\n", ability_type_flags[iter]);
+		}
+	}
 }
 
 
