@@ -1758,6 +1758,7 @@ OLC_MODULE(abiledit_types) {
 	}
 	else if (is_abbrev(arg1, "add")) {
 		weight_arg = any_one_word(arg2, arg);
+		skip_spaces(&weight_arg);
 		
 		if (!*arg || !*weight_arg) {
 			msg_to_char(ch, "Usage: types add <type> <weight>\r\n");
