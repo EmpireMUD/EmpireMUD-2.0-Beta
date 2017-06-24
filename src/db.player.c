@@ -1062,11 +1062,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_ability_data *abildata;
 	struct player_automessage *automsg;
 	struct player_skill_data *skdata;
-	obj_data *cont_row[MAX_BAG_ROWS];
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
 	struct req_data *task;
+	obj_data **cont_row;
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
@@ -1114,6 +1114,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	}
 	
 	// prepare contaienrs for item load
+	CREATE(cont_row, obj_data*, MAX_BAG_ROWS);
 	for (iter = 0; iter < MAX_BAG_ROWS; ++iter) {
 		cont_row[iter] = NULL;
 	}
@@ -1957,6 +1958,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR));
 	}
 	
+	free(cont_row);
 	return ch;
 }
 
