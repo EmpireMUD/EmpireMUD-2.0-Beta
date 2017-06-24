@@ -106,6 +106,7 @@
 #define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
 #define ABIL_NAME(abil)  ((abil)->name)
+#define ABIL_SCALE(abil)  ((abil)->scale)
 #define ABIL_SKILL_LEVEL(abil)  ((abil)->skill_level)
 #define ABIL_TARGETS(abil)  ((abil)->targets)
 #define ABIL_TYPE_LIST(abil)  ((abil)->type_list)

@@ -58,6 +58,7 @@ OLC_MODULE(abiledit_linkedtrait);
 OLC_MODULE(abiledit_masteryability);
 OLC_MODULE(abiledit_minposition);
 OLC_MODULE(abiledit_name);
+OLC_MODULE(abiledit_scale);
 OLC_MODULE(abiledit_targets);
 OLC_MODULE(abiledit_types);
 OLC_MODULE(abiledit_waittype);
@@ -544,6 +545,7 @@ const struct olc_command_data olc_data[] = {
 	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "minposition", abiledit_minposition, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "scale", abiledit_scale, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "targets", abiledit_targets, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "types", abiledit_types, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "waittype", abiledit_waittype, OLC_ABILITY, OLC_CF_EDITOR },

@@ -897,6 +897,7 @@ void clear_ability(ability_data *abil) {
 	ABIL_MASTERY_ABIL(abil) = NOTHING;
 	ABIL_COOLDOWN(abil) = NOTHING;
 	ABIL_AFFECT_VNUM(abil) = NOTHING;
+	ABIL_SCALE(abil) = 1.0;
 }
 
 
@@ -931,6 +932,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	char line[256], error[256], str_in[256], str_in2[256];
 	ability_data *abil, *find;
 	int int_in[7];
+	double dbl_in;
 	
 	CREATE(abil, ability_data, 1);
 	clear_ability(abil);
@@ -954,13 +956,17 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 		log("SYSERR: Missing line 2 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d", str_in, &int_in[0]) != 3) {
-		log("SYSERR: Format error in line 2 of %s", error);
-		exit(1);
+	if (sscanf(line, "%s %d %lf", str_in, &int_in[0], &dbl_in) != 3) {
+		dbl_in = 1.0;
+		if (sscanf(line, "%s %d", str_in, &int_in[0]) != 2) {
+			log("SYSERR: Format error in line 2 of %s", error);
+			exit(1);
+		}
 	}
 	
 	ABIL_FLAGS(abil) = asciiflag_conv(str_in);
 	ABIL_MASTERY_ABIL(abil) = int_in[0];
+	ABIL_SCALE(abil) = dbl_in;
 	
 	// optionals
 	for (;;) {
@@ -1081,9 +1087,9 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	// 1: name
 	fprintf(fl, "%s~\n", NULLSAFE(ABIL_NAME(abil)));
 	
-	// 2: flags mastery-abil
+	// 2: flags mastery-abil scale
 	strcpy(temp, bitv_to_alpha(ABIL_FLAGS(abil)));
-	fprintf(fl, "%s %d\n", temp, ABIL_MASTERY_ABIL(abil));
+	fprintf(fl, "%s %d %.2f\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil));
 
 	// 'C' command
 	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
@@ -1477,6 +1483,7 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tytypes\t0> (add, change, remove)\r\n%s", lbuf);
 	
 	sprintf(buf + strlen(buf), "<\tymasteryability\t0> %d %s\r\n", ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	sprintf(buf + strlen(buf), "<\tyscale\t0> %d%%\r\n", (int)(ABIL_SCALE(abil) * 100));
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
@@ -1685,6 +1692,15 @@ OLC_MODULE(abiledit_minposition) {
 OLC_MODULE(abiledit_name) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_string(ch, argument, "name", &ABIL_NAME(abil));
+}
+
+
+OLC_MODULE(abiledit_scale) {
+	int scale;
+	
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	scale = olc_process_number(ch, argument, "scale", "scale", 1, 1000, ABIL_SCALE(abil) * 100);
+	ABIL_SCALE(abil) = scale / 100.0;
 }
 
 
