@@ -662,9 +662,9 @@ void auto_equip(char_data *ch, obj_data *obj, int *location) {
 * @param obj_data *obj The object.
 * @param char_data *ch The person to give/equip it to.
 * @param int location Where it should be equipped.
-* @param obj_data **cont_row[MAX_BAG_ROWS] For putting items back in containers.
+* @param obj_data ***cont_row For putting items back in containers (must be at least MAX_BAG_ROWS long).
 */
-void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data **cont_row[MAX_BAG_ROWS]) {
+void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row) {
 	obj_data *obj2;
 	int iter;
 	

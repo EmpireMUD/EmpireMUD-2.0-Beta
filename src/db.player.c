@@ -1043,7 +1043,7 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
-	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data **cont_row[MAX_BAG_ROWS]);
+	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
 	
