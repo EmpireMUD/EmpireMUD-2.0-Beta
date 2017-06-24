@@ -1043,7 +1043,7 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
-	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location);
+	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data **cont_row[MAX_BAG_ROWS]);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
 	
@@ -1062,6 +1062,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_ability_data *abildata;
 	struct player_automessage *automsg;
 	struct player_skill_data *skdata;
+	obj_data *cont_row[MAX_BAG_ROWS];
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
@@ -1112,6 +1113,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	
+	// prepare contaienrs for item load
+	for (iter = 0; iter < MAX_BAG_ROWS; ++iter) {
+		cont_row[iter] = NULL;
+	}
+	
 	// We want to read in any old lore ahead of any we've appended already.
 	// This happens if the player was loaded for an empire merge and new lore
 	// was added before delayed data.
@@ -1135,7 +1141,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case '#': {	// an item
 				sscanf(line, "#%d", &i_in[0]);
 				if ((obj = Obj_load_from_file(fl, i_in[0], &i_in[1], ch->desc ? ch : NULL))) {
-					loaded_obj_to_char(obj, ch, i_in[1]);
+					loaded_obj_to_char(obj, ch, i_in[1], &cont_row);
 				}
 				break;
 			}
