@@ -58,6 +58,7 @@ OLC_MODULE(abiledit_cost);
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_custom);
 OLC_MODULE(abiledit_flags);
+OLC_MODULE(abiledit_immunities);
 OLC_MODULE(abiledit_linkedtrait);
 OLC_MODULE(abiledit_longduration);
 OLC_MODULE(abiledit_masteryability);
@@ -551,6 +552,7 @@ const struct olc_command_data olc_data[] = {
 	{ "costtype", abiledit_costtype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "custom", abiledit_custom, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "immunities", abiledit_immunities, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "linkedtrait", abiledit_linkedtrait, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "longduration", abiledit_longduration, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },

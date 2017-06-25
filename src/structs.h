@@ -2583,6 +2583,7 @@ struct ability_data {
 	any_vnum mastery_abil;	// used for crafting abilities
 	struct ability_type *type_list;	// types with properties
 	double scale;	// effectiveness scale (1.0 = 100%)
+	bitvector_t immunities;	// AFF_ flags that block this ability
 	
 	// command-related data
 	char *command;	// if ability has a command

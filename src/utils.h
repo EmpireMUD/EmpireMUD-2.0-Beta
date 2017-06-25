@@ -105,6 +105,7 @@
 #define ABIL_COST_TYPE(abil)  ((abil)->cost_type)
 #define ABIL_CUSTOM_MSGS(abil)  ((abil)->custom_msgs)
 #define ABIL_FLAGS(abil)  ((abil)->flags)
+#define ABIL_IMMUNITIES(abil)  ((abil)->immunities)
 #define ABIL_LINKED_TRAIT(abil)  ((abil)->linked_trait)
 #define ABIL_LONG_DURATION(abil)  ((abil)->long_duration)
 #define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)

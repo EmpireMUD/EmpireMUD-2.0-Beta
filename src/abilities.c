@@ -495,13 +495,20 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 		msg_to_char(ch, "You can't %s here.\r\n", SAFE_ABIL_COMMAND(abil));
 		return 0;
 	}
-	if (cvict && cvict != ch && violent && !can_fight(ch, cvict)) {
-		act("You can't attack $N!", FALSE, ch, NULL, cvict, TO_CHAR);
-		return 0;
-	}
-	if (cvict && cvict != ch && violent && NOT_MELEE_RANGE(ch, cvict)) {
-		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-		return 0;
+	
+	if (cvict && cvict != ch && violent) {
+		if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(cvict, ABIL_IMMUNITIES(abil))) {
+			act("$N is immune to that!", FALSE, ch, NULL, cvict, TO_CHAR);
+			return 0;
+		}
+		if (!can_fight(ch, cvict)) {
+			act("You can't attack $N!", FALSE, ch, NULL, cvict, TO_CHAR);
+			return 0;
+		}
+		if (NOT_MELEE_RANGE(ch, cvict)) {
+			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+			return 0;
+		}
 	}
 	if (ABILITY_TRIGGERS(ch, cvict, ovict, ABIL_VNUM(abil))) {
 		return 0;
@@ -1263,13 +1270,14 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	// line 1: name
 	ABIL_NAME(abil) = fread_string(fl, error);
 	
-	// line 2: flags master-abil
+	// line 2: flags master-abil scale immunities
 	if (!get_line(fl, line)) {
 		log("SYSERR: Missing line 2 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %lf", str_in, &int_in[0], &dbl_in) != 3) {
-		dbl_in = 1.0;
+	if (sscanf(line, "%s %d %lf %s", str_in, &int_in[0], &dbl_in, str_in2) != 4) {
+		dbl_in = 1.0;	// default scale
+		strcpy(str_in2, "0");	// default immunities
 		if (sscanf(line, "%s %d", str_in, &int_in[0]) != 2) {
 			log("SYSERR: Format error in line 2 of %s", error);
 			exit(1);
@@ -1279,6 +1287,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	ABIL_FLAGS(abil) = asciiflag_conv(str_in);
 	ABIL_MASTERY_ABIL(abil) = int_in[0];
 	ABIL_SCALE(abil) = dbl_in;
+	ABIL_IMMUNITIES(abil) = asciiflag_conv(str_in2);
 	
 	// optionals
 	for (;;) {
@@ -1416,8 +1425,8 @@ void write_ability_index(FILE *fl) {
 void write_ability_to_file(FILE *fl, ability_data *abil) {
 	void write_applies_to_file(FILE *fl, struct apply_data *list);
 	
+	char temp[256], temp2[256];
 	struct ability_type *at;
-	char temp[256];
 	
 	if (!fl || !abil) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_ability_to_file called without %s", !fl ? "file" : "ability");
@@ -1429,9 +1438,10 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	// 1: name
 	fprintf(fl, "%s~\n", NULLSAFE(ABIL_NAME(abil)));
 	
-	// 2: flags mastery-abil scale
+	// 2: flags mastery-abil scale immunities
 	strcpy(temp, bitv_to_alpha(ABIL_FLAGS(abil)));
-	fprintf(fl, "%s %d %.2f\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil));
+	strcpy(temp2, bitv_to_alpha(ABIL_IMMUNITIES(abil)));
+	fprintf(fl, "%s %d %.2f %s\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil), temp2);
 	
 	// 'A': applies
 	write_applies_to_file(fl, ABIL_APPLIES(abil));
@@ -1807,6 +1817,9 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
+	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
+	
 	// command-related portion
 	if (!ABIL_COMMAND(abil)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
@@ -1895,6 +1908,9 @@ void olc_show_ability(char_data *ch) {
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	
+	sprintbit(ABIL_FLAGS(abil), affected_bits, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<\tyimmunities\t0> %s\r\n", lbuf);
 	
 	// command-related portion
 	if (!ABIL_COMMAND(abil)) {
@@ -2118,6 +2134,12 @@ OLC_MODULE(abiledit_custom) {
 OLC_MODULE(abiledit_flags) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);	
 	ABIL_FLAGS(abil) = olc_process_flag(ch, argument, "ability", "flags", ability_flags, ABIL_FLAGS(abil));
+}
+
+
+OLC_MODULE(abiledit_immunities) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	ABIL_IMMUNITIES(abil) = olc_process_flag(ch, argument, "immunity", "immunities", affected_bits, ABIL_IMMUNITIES(abil));
 }
 
 
