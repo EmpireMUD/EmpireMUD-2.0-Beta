@@ -2581,7 +2581,11 @@ struct ability_data {
 	struct custom_message *custom_msgs;	// any custom messages
 	
 	// type-specific data
-	any_vnum affect_vnum;	// which affect for buffs/debuffs
+	any_vnum affect_vnum;	// affects
+	int short_duration;	// affects
+	int long_duration;	// affects
+	bitvector_t affects;	// affects
+	struct obj_apply *applies;	// affects
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup

@@ -3943,7 +3943,7 @@ void parse_object(FILE *obj_f, int nr) {
 		switch (*line) {
 			case 'A':
 				if (!get_line(obj_f, line)) {
-					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric constants but file ended!", buf2);
+					log("SYSERR: Format error in 'A' field, %s\n...expecting 3 numeric constants but file ended!", buf2);
 					exit(1);
 				}
 				

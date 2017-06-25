@@ -45,7 +45,9 @@ extern const char *ability_custom_types[];
 extern const char *ability_flags[];
 extern const char *ability_target_flags[];
 extern const char *ability_type_flags[];
+extern const char *affected_bits[];
 extern const char *apply_types[];
+extern const char *apply_type_names[];
 extern const char *pool_types[];
 extern const char *position_types[];
 extern const char *wait_types[];
@@ -934,6 +936,8 @@ void free_ability(ability_data *abil) {
 void parse_ability(FILE *fl, any_vnum vnum) {
 	char line[256], error[256], str_in[256], str_in2[256];
 	ability_data *abil, *find;
+	struct obj_apply *apply;
+	bitvector_t type;
 	int int_in[7];
 	double dbl_in;
 	
@@ -978,6 +982,19 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'A': {	// applies
+				if (!get_line(fl, line) || sscanf(line, " %d %d %d ", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+					log("SYSERR: Format error in 'A' field, %s\n...expecting 3 numeric arguments\n...offending line: '%s'", error, line);
+					exit(1);
+				}
+				CREATE(apply, struct obj_apply, 1);
+				apply->location = int_in[0];
+				apply->modifier = int_in[1];
+				apply->apply_type = int_in[2];
+				LL_APPEND(ABIL_APPLIES(abil), apply);
+				break;
+			}
+			
 			case 'C': {	// command info
 				if (!get_line(fl, line) || sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 9) {
 					log("SYSERR: Format error in C line of %s", error);
@@ -1005,6 +1022,29 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 					exit(1);
 				}
 				add_type_to_ability(abil, asciiflag_conv(str_in), int_in[0]);
+				break;
+			}
+			
+			case 'X': {	// extended data (type-based)
+				type = strtoull(line+1, NULL, 10);
+				switch (type) {
+					case ABILT_AFFECTS: {
+						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
+							log("SYSERR: Format error in X%llu line of %s", type, error);
+							exit(1);
+						}
+						
+						ABIL_AFFECT_VNUM(abil) = int_in[0];
+						ABIL_SHORT_DURATION(abil) = int_in[1];
+						ABIL_LONG_DURATION(abil) = int_in[2];
+						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+						break;
+					}
+					default: {
+						log("SYSERR: Unknown flag X%llu in %s", type, error);
+						exit(1);
+					}
+				}
 				break;
 			}
 			
@@ -1078,6 +1118,7 @@ void write_ability_index(FILE *fl) {
 */
 void write_ability_to_file(FILE *fl, ability_data *abil) {
 	struct ability_type *at;
+	struct obj_apply *apply;
 	char temp[256];
 	
 	if (!fl || !abil) {
@@ -1093,10 +1134,20 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	// 2: flags mastery-abil scale
 	strcpy(temp, bitv_to_alpha(ABIL_FLAGS(abil)));
 	fprintf(fl, "%s %d %.2f\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil));
-
+	
+	// 'A' applies
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		fprintf(fl, "A\n%d %d %d\n", apply->location, apply->modifier, apply->apply_type);
+	}
+	
 	// 'C' command
 	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
 		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
+	}
+	
+	// 'X' type data
+	if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
+		fprintf(fl, "X%lld\n%d %d %d %s\n", ABILT_AFFECTS, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), bitv_to_alpha(ABIL_AFFECTS(abil)));
 	}
 	
 	// 'T' types
@@ -1500,6 +1551,7 @@ void olc_show_ability(char_data *ch) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct custom_message *custm;
+	struct obj_apply *apply;
 	int count;
 	
 	if (!abil) {
@@ -1534,10 +1586,18 @@ void olc_show_ability(char_data *ch) {
 		
 		// type-specific data
 		if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
-/*			<shortduration>, <longduration>
-			<affecttype>
-			<affect flags>
-*/		}
+			sprintf(buf + strlen(buf), "<\tyaffectvnum\t0> %d %s\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+			sprintf(buf + strlen(buf), "<\tyshortduration\t0> %d second%s, <\tylongduration\t0> %d second%s\r\n", ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
+			
+			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<\tyaffects\t0> %s\r\n", lbuf);
+			
+			count = 0;
+			sprintf(buf + strlen(buf), "Attribute Applies: <&yapply&0>\r\n");
+			LL_FOREACH(ABIL_APPLIES(abil), apply) {
+				sprintf(buf + strlen(buf), " &y%2d&0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
+			}
+		}
 	}
 	
 	// custom messages
