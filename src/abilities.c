@@ -1534,7 +1534,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 			
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
-			sprintf(buf + strlen(buf), "Affect flags: \tg%s\t0\r\n", part);
+			size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
 			
 			// applies
 			size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
