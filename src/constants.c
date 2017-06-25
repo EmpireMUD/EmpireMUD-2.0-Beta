@@ -118,19 +118,23 @@ const char *ability_flags[] = {
 
 // ABILT_x: ability type flags
 const char *ability_type_flags[] = {
-	"DAMAGE",	// 0
+	"CRAFT",	// 0
+	"BUFF",
+/*
+	"DAMAGE",
 	"AFFECTS",
 	"UNAFFECTS",
 	"POINTS",
 	"ALTER-OBJS",
-	"GROUPS",	// 5
+	"GROUPS",
 	"MASSES",
 	"AREAS",
 	"SUMMONS",
 	"CREATIONS",
-	"MANUAL",	// 10
+	"MANUAL",
 	"ROOMS",
 	"CRAFT",
+*/
 	"\n"
 };
 

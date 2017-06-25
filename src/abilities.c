@@ -1021,7 +1021,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			case 'X': {	// extended data (type-based)
 				type = strtoull(line+1, NULL, 10);
 				switch (type) {
-					case ABILT_AFFECTS: {
+					case ABILT_BUFF: {
 						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
 							log("SYSERR: Format error in X%llu line of %s", type, error);
 							exit(1);
@@ -1138,8 +1138,8 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	}
 	
 	// 'X' type data
-	if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
-		fprintf(fl, "X%lld\n%d %d %d %s\n", ABILT_AFFECTS, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), bitv_to_alpha(ABIL_AFFECTS(abil)));
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		fprintf(fl, "X%lld\n%d %d %d %s\n", ABILT_BUFF, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), bitv_to_alpha(ABIL_AFFECTS(abil)));
 	}
 	
 	// 'T' types
@@ -1516,7 +1516,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 		
 		// type-specific data
-		if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 				strcpy(part, "unlimited");
 			}
@@ -1605,7 +1605,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<\tywaittype\t0> %s, <\tylinkedtrait\t0> %s\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 		
 		// type-specific data
-		if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 			sprintf(buf + strlen(buf), "<\tyaffectvnum\t0> %d %s\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 			
 			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
@@ -1671,7 +1671,7 @@ int vnum_ability(char *searchname, char_data *ch) {
 OLC_MODULE(abiledit_affects) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_AFFECTS;
+	bitvector_t allowed_types = ABILT_BUFF;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
@@ -1686,7 +1686,7 @@ OLC_MODULE(abiledit_affectvnum) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	any_vnum old;
 	
-	bitvector_t allowed_types = ABILT_AFFECTS;
+	bitvector_t allowed_types = ABILT_BUFF;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
@@ -1832,7 +1832,7 @@ OLC_MODULE(abiledit_linkedtrait) {
 OLC_MODULE(abiledit_longduration) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_AFFECTS;
+	bitvector_t allowed_types = ABILT_BUFF;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
@@ -1904,7 +1904,7 @@ OLC_MODULE(abiledit_scale) {
 OLC_MODULE(abiledit_shortduration) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_AFFECTS;
+	bitvector_t allowed_types = ABILT_BUFF;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");

@@ -419,6 +419,9 @@ typedef struct vehicle_data vehicle_data;
 
 
 // ABILT_x: ability type flags
+#define ABILT_CRAFT  BIT(0)	// related to crafting/building
+#define ABILT_BUFF  BIT(1)
+/*
 #define ABILT_DAMAGE  BIT(0)
 #define ABILT_AFFECTS  BIT(1)
 #define ABILT_UNAFFECTS  BIT(2)
@@ -431,7 +434,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_CREATIONS  BIT(9)
 #define ABILT_MANUAL  BIT(10)
 #define ABILT_ROOMS  BIT(11)
-#define ABILT_CRAFT  BIT(12)	// related to crafting/building
+*/
 
 
 // ATAR_x: ability targeting flags
