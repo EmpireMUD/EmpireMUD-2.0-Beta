@@ -917,6 +917,9 @@ void free_ability(ability_data *abil) {
 	if (ABIL_COMMAND(abil) && (!proto || ABIL_COMMAND(abil) != ABIL_COMMAND(proto))) {
 		free(ABIL_COMMAND(abil));
 	}
+	if (ABIL_CUSTOM_MSGS(abil) && (!proto || ABIL_CUSTOM_MSGS(abil) != ABIL_CUSTOM_MSGS(proto))) {
+		free_custom_messages(ABIL_CUSTOM_MSGS(abil));
+	}
 	
 	free(abil);
 }
@@ -1629,6 +1632,14 @@ OLC_MODULE(abiledit_costtype) {
 	else {
 		ABIL_COST_TYPE(abil) = olc_process_type(ch, argument, "cost type", "costtype", pool_types, ABIL_COST_TYPE(abil));
 	}
+}
+
+
+OLC_MODULE(abiledit_custom) {
+	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	olc_process_custom_messages(ch, argument, &ABIL_CUSTOM_MSGS(abil), ability_custom_types);
 }
 
 

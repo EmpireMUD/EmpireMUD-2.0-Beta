@@ -53,6 +53,7 @@ OLC_MODULE(abiledit_command);
 OLC_MODULE(abiledit_cooldown);
 OLC_MODULE(abiledit_cost);
 OLC_MODULE(abiledit_costtype);
+OLC_MODULE(abiledit_custom);
 OLC_MODULE(abiledit_flags);
 OLC_MODULE(abiledit_linkedtrait);
 OLC_MODULE(abiledit_masteryability);
@@ -540,6 +541,7 @@ const struct olc_command_data olc_data[] = {
 	{ "cooldown", abiledit_cooldown, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "cost", abiledit_cost, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "costtype", abiledit_costtype, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "custom", abiledit_custom, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "linkedtrait", abiledit_linkedtrait, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },
@@ -5377,6 +5379,136 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 		}
 		if ((iter % 2) != 0) {
 			msg_to_char(ch, "\r\n");
+		}
+	}
+}
+
+
+/**
+* Processes adding/changing custom messages for various olc types.
+*
+* @param char_data *ch The person editing.
+* @param char *argument Text typed by the player.
+* @param struct custom_message **list Pointer to the list of custom messages.
+* @param const char **type_names List of names of valid types.
+*/
+void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct custom_message *custm, *change;
+	int num, iter, msgtype;
+	bool found;
+	
+	// arg1 arg2
+	half_chop(argument, arg1, arg2);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which custom message (number)?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			while ((custm = *list)) {
+				*list = custm->next;
+				if (custm->msg) {
+					free(custm->msg);
+				}
+				free(custm);
+			}
+			msg_to_char(ch, "You remove all the custom messages.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(*list, custm) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove custom message #%d.\r\n", atoi(arg2));
+					LL_DELETE(*list, custm);
+					free(custm);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid custom message number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		msgstr = any_one_word(arg2, arg);
+		skip_spaces(&msgstr);
+		
+		if (!*arg || !*msgstr) {
+			msg_to_char(ch, "Usage: custom add <type> <string>\r\n");
+		}
+		else if ((msgtype = search_block(arg, type_names, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
+		}
+		else {
+			delete_doubledollar(msgstr);
+			
+			CREATE(custm, struct custom_message, 1);
+
+			custm->type = msgtype;
+			custm->msg = str_dup(msgstr);
+			
+			LL_APPEND(*list, custm);
+			msg_to_char(ch, "You add a custom '%s' message:\r\n%s\r\n", type_names[custm->type], custm->msg);			
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		LL_FOREACH(*list, custm) {
+			if (--num == 0) {
+				change = custm;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((msgtype = search_block(val_arg, type_names, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+			}
+			else {
+				change->type = msgtype;
+				msg_to_char(ch, "Custom message %d changed to type %s.\r\n", atoi(num_arg), type_names[msgtype]);
+			}
+		}
+		else if (is_abbrev(type_arg, "message")) {
+			if (change->msg) {
+				free(change->msg);
+			}
+			delete_doubledollar(val_arg);
+			change->msg = str_dup(val_arg);
+			msg_to_char(ch, "Custom message %d changed to: %s\r\n", atoi(num_arg), val_arg);
+		}
+		else {
+			msg_to_char(ch, "You can only change the type or message.\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
+		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
+		msg_to_char(ch, "Available types:\r\n");
+		for (iter = 0; *type_names[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %s\r\n", type_names[iter]);
 		}
 	}
 }
