@@ -934,9 +934,10 @@ void free_ability(ability_data *abil) {
 * @param any_vnum vnum The ability vnum
 */
 void parse_ability(FILE *fl, any_vnum vnum) {
+	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
+	
 	char line[256], error[256], str_in[256], str_in2[256];
 	ability_data *abil, *find;
-	struct obj_apply *apply;
 	bitvector_t type;
 	int int_in[7];
 	double dbl_in;
@@ -983,15 +984,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'A': {	// applies
-				if (!get_line(fl, line) || sscanf(line, " %d %d %d ", &int_in[0], &int_in[1], &int_in[2]) != 3) {
-					log("SYSERR: Format error in 'A' field, %s\n...expecting 3 numeric arguments\n...offending line: '%s'", error, line);
-					exit(1);
-				}
-				CREATE(apply, struct obj_apply, 1);
-				apply->location = int_in[0];
-				apply->modifier = int_in[1];
-				apply->apply_type = int_in[2];
-				LL_APPEND(ABIL_APPLIES(abil), apply);
+				parse_apply(fl, &ABIL_APPLIES(abil), error);
 				break;
 			}
 			
@@ -1117,8 +1110,9 @@ void write_ability_index(FILE *fl) {
 * @param ability_data *abil The thing to save.
 */
 void write_ability_to_file(FILE *fl, ability_data *abil) {
+	void write_applies_to_file(FILE *fl, struct apply_data *list);
+	
 	struct ability_type *at;
-	struct obj_apply *apply;
 	char temp[256];
 	
 	if (!fl || !abil) {
@@ -1135,10 +1129,8 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	strcpy(temp, bitv_to_alpha(ABIL_FLAGS(abil)));
 	fprintf(fl, "%s %d %.2f\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil));
 	
-	// 'A' applies
-	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		fprintf(fl, "A\n%d %d %d\n", apply->location, apply->modifier, apply->apply_type);
-	}
+	// 'A': applies
+	write_applies_to_file(fl, ABIL_APPLIES(abil));
 	
 	// 'C' command
 	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
@@ -1490,9 +1482,11 @@ ability_data *setup_olc_ability(ability_data *input) {
 * @param ability_data *abil The ability to display.
 */
 void do_stat_ability(char_data *ch, ability_data *abil) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
 	struct custom_message *custm;
+	struct apply_data *app;
 	size_t size;
+	int count;
 	
 	if (!abil) {
 		return;
@@ -1523,10 +1517,36 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		
 		// type-specific data
 		if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
-/*			<shortduration>, <longduration>
-			<affecttype>
-			<affect flags>
-*/		}
+			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+				strcpy(part, "unlimited");
+			}
+			else {
+				snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
+			}
+			if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+				strcpy(part2, "unlimited");
+			}
+			else {
+				snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+			
+			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
+			sprintf(buf + strlen(buf), "Affect flags: \tg%s\t0\r\n", part);
+			
+			// applies
+			size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+			count = 0;
+			LL_FOREACH(ABIL_APPLIES(abil), app) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
+			}
+			if (!ABIL_APPLIES(abil)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "none");
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		}
 	}
 	
 	if (ABIL_CUSTOM_MSGS(abil)) {
@@ -1551,7 +1571,7 @@ void olc_show_ability(char_data *ch) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct custom_message *custm;
-	struct obj_apply *apply;
+	struct apply_data *apply;
 	int count;
 	
 	if (!abil) {
@@ -1587,15 +1607,28 @@ void olc_show_ability(char_data *ch) {
 		// type-specific data
 		if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
 			sprintf(buf + strlen(buf), "<\tyaffectvnum\t0> %d %s\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-			sprintf(buf + strlen(buf), "<\tyshortduration\t0> %d second%s, <\tylongduration\t0> %d second%s\r\n", ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
+			
+			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+				sprintf(buf + strlen(buf), "<\tyshortduration\t0> unlimited, ");
+			}
+			else {
+				sprintf(buf + strlen(buf), "<\tyshortduration\t0> %d second%s, ", ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
+			}
+			
+			if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+				sprintf(buf + strlen(buf), "<\tylongduration\t0> unlimited\r\n");
+			}
+			else {
+				sprintf(buf + strlen(buf), "<\tylongduration\t0> %d second%s\r\n", ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
+			}
 			
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<\tyaffects\t0> %s\r\n", lbuf);
 			
+			sprintf(buf + strlen(buf), "Applies: <\tyapply\t0>\r\n");
 			count = 0;
-			sprintf(buf + strlen(buf), "Attribute Applies: <&yapply&0>\r\n");
 			LL_FOREACH(ABIL_APPLIES(abil), apply) {
-				sprintf(buf + strlen(buf), " &y%2d&0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
+				sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
 			}
 		}
 	}
@@ -1634,6 +1667,52 @@ int vnum_ability(char *searchname, char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
+
+OLC_MODULE(abiledit_affects) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_AFFECTS;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else {
+		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, ABIL_AFFECTS(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_affectvnum) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	any_vnum old;
+	
+	bitvector_t allowed_types = ABILT_AFFECTS;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		ABIL_AFFECT_VNUM(abil) = NOTHING;
+		msg_to_char(ch, "It no longer has a custom affect type.\r\n");
+	}
+	else {
+		old = ABIL_AFFECT_VNUM(abil);
+		ABIL_AFFECT_VNUM(abil) = olc_process_number(ch, argument, "affect vnum", "affectvnum", 0, MAX_VNUM, ABIL_AFFECT_VNUM(abil));
+
+		if (!find_generic(ABIL_AFFECT_VNUM(abil), GENERIC_AFFECT)) {
+			msg_to_char(ch, "Invalid affect generic vnum %d. Old value restored.\r\n", ABIL_AFFECT_VNUM(abil));
+			ABIL_AFFECT_VNUM(abil) = old;
+		}
+	}
+}
+
+
+OLC_MODULE(abiledit_apply) {
+	void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	olc_process_applies(ch, argument, &ABIL_APPLIES(abil));
+}
+
 
 OLC_MODULE(abiledit_cdtime) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
@@ -1750,6 +1829,24 @@ OLC_MODULE(abiledit_linkedtrait) {
 }
 
 
+OLC_MODULE(abiledit_longduration) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_AFFECTS;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else if (is_abbrev(argument, "unlimited")) {
+		ABIL_LONG_DURATION(abil) = UNLIMITED;
+		msg_to_char(ch, "It now has unlimited long duration.\r\n");
+	}
+	else {
+		ABIL_LONG_DURATION(abil) = olc_process_number(ch, argument, "long duration", "longduration", 1, MAX_INT, ABIL_LONG_DURATION(abil));
+	}
+}
+
+
 OLC_MODULE(abiledit_masteryability) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	ability_data *find;
@@ -1801,6 +1898,24 @@ OLC_MODULE(abiledit_scale) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	scale = olc_process_number(ch, argument, "scale", "scale", 1, 1000, ABIL_SCALE(abil) * 100);
 	ABIL_SCALE(abil) = scale / 100.0;
+}
+
+
+OLC_MODULE(abiledit_shortduration) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_AFFECTS;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else if (is_abbrev(argument, "unlimited")) {
+		ABIL_SHORT_DURATION(abil) = UNLIMITED;
+		msg_to_char(ch, "It now has unlimited short duration.\r\n");
+	}
+	else {
+		ABIL_SHORT_DURATION(abil) = olc_process_number(ch, argument, "short duration", "shortduration", 1, MAX_INT, ABIL_SHORT_DURATION(abil));
+	}
 }
 
 

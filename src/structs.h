@@ -2585,7 +2585,7 @@ struct ability_data {
 	int short_duration;	// affects
 	int long_duration;	// affects
 	bitvector_t affects;	// affects
-	struct obj_apply *applies;	// affects
+	struct apply_data *applies;	// affects
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup

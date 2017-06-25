@@ -48,6 +48,9 @@ OLC_MODULE(olc_set_max_vnum);
 OLC_MODULE(olc_set_min_vnum);
 
 // ability modules
+OLC_MODULE(abiledit_affects);
+OLC_MODULE(abiledit_affectvnum);
+OLC_MODULE(abiledit_apply);
 OLC_MODULE(abiledit_cdtime);
 OLC_MODULE(abiledit_command);
 OLC_MODULE(abiledit_cooldown);
@@ -56,10 +59,12 @@ OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_custom);
 OLC_MODULE(abiledit_flags);
 OLC_MODULE(abiledit_linkedtrait);
+OLC_MODULE(abiledit_longduration);
 OLC_MODULE(abiledit_masteryability);
 OLC_MODULE(abiledit_minposition);
 OLC_MODULE(abiledit_name);
 OLC_MODULE(abiledit_scale);
+OLC_MODULE(abiledit_shortduration);
 OLC_MODULE(abiledit_targets);
 OLC_MODULE(abiledit_types);
 OLC_MODULE(abiledit_waittype);
@@ -536,6 +541,9 @@ const struct olc_command_data olc_data[] = {
 	{ "setmaxvnum", olc_set_max_vnum, NOBITS, NOBITS },
 	
 	// ability commands
+	{ "affects", abiledit_affects, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "affectvnum", abiledit_affectvnum, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "apply", abiledit_apply, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "cdtime", abiledit_cdtime, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "command", abiledit_command, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "cooldown", abiledit_cooldown, OLC_ABILITY, OLC_CF_EDITOR },
@@ -544,10 +552,12 @@ const struct olc_command_data olc_data[] = {
 	{ "custom", abiledit_custom, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "linkedtrait", abiledit_linkedtrait, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "longduration", abiledit_longduration, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "minposition", abiledit_minposition, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "scale", abiledit_scale, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "shortduration", abiledit_shortduration, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "targets", abiledit_targets, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "types", abiledit_types, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "waittype", abiledit_waittype, OLC_ABILITY, OLC_CF_EDITOR },
