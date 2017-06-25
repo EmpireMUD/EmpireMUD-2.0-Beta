@@ -90,6 +90,11 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		finish_morphing(ch, NULL);
 	}
 	
+	// generic affect abilities
+	if (affected_by_spell_from_caster(ch, ABIL_AFFECT_VNUM(abil), ch)) {
+		affect_from_char_by_caster(ch, ABIL_AFFECT_VNUM(abil), ch, TRUE);
+	}
+	
 	switch (ABIL_VNUM(abil)) {
 		case ABIL_ALACRITY: {
 			void end_alacrity(char_data *ch);
