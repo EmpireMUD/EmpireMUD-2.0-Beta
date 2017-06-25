@@ -863,6 +863,28 @@ bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply) {
 
 
 /**
+* Matches both an ATYPE or affect generic, and a caster ID.
+*
+* @param char_data *ch The person to look for an affect on.
+* @param any_vnum type The ATYPE_ const or affect generic.
+* @param char_data *caster The caster to look for.
+* @return bool TRUE if so-affected, FALSE if not.
+*/
+bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster) {
+	struct affected_type *hjp;
+	bool found = FALSE;
+	
+	for (hjp = ch->affected; hjp && !found; hjp = hjp->next) {
+		if (hjp->type == type && hjp->cast_by == CAST_BY_ID(caster)) {
+			found = TRUE;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
 * Create an affect that modifies a trait.
 *
 * @param any_vnum type ATYPE_ const/vnum
@@ -5281,21 +5303,21 @@ void free_custom_messages(struct custom_message *mes) {
 
 
 /**
-* This gets a custom message of a given type for an object. If there is more
+* This gets a custom message of a given type from a list. If there is more
 * than one message of the requested type, it returns one at random. You will
 * get back a null if there are no messages of the requested type; you can check
 * this ahead of time with has_custom_message().
 *
-* @param obj_data *obj The object.
-* @param int type The OBJ_CUSTOM_x type of message.
+* @param struct custom_message *list The list of messages to check.
+* @param int type The type const for the message.
 * @return char* The custom message, or NULL if there is none.
 */
-char *get_custom_message(obj_data *obj, int type) {
+char *get_custom_message(struct custom_message *list, int type) {
 	struct custom_message *ocm;
 	char *found = NULL;
 	int num_found = 0;
 	
-	for (ocm = obj->custom_msgs; ocm; ocm = ocm->next) {
+	LL_FOREACH(list, ocm) {
 		if (ocm->type == type) {
 			if (!number(0, num_found++) || !found) {
 				found = ocm->msg;
@@ -5308,17 +5330,18 @@ char *get_custom_message(obj_data *obj, int type) {
 
 
 /**
-* @param obj_data *obj The object to check.
-* @param int type Any OBJ_CUSTOM_x type.
+* @param struct custom_message *list The list of messages to check.
+* @param int type The type const for the message.
 * @return bool TRUE if the object has at least one message of the requested type.
 */
-bool has_custom_message(obj_data *obj, int type) {
+bool has_custom_message(struct custom_message *list, int type) {
 	struct custom_message *ocm;
 	bool found = FALSE;
 	
-	for (ocm = obj->custom_msgs; ocm && !found; ocm = ocm->next) {
+	LL_FOREACH(list, ocm) {
 		if (ocm->type == type) {
 			found = TRUE;
+			break;
 		}
 	}
 	

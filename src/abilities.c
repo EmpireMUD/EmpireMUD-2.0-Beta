@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -22,6 +24,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -38,6 +41,7 @@
 const char *default_ability_name = "Unnamed Ability";
 
 // local protos
+int do_ability_buff(char_data *ch, ability_data *abil, int level, char_data *vict);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 
 // external consts
@@ -48,11 +52,13 @@ extern const char *ability_type_flags[];
 extern const char *affected_bits[];
 extern const char *apply_types[];
 extern const char *apply_type_names[];
+extern const double apply_values[];
 extern const char *pool_types[];
 extern const char *position_types[];
 extern const char *wait_types[];
 
 // external funcs
+extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -249,6 +255,102 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer) {
 
 
 /**
+* Gives a modifier (as a decimal, like 1.0 for 100%) based on a character's
+* value in a given trait. For example, for Strength, 100% is the character's
+* maximum possible strength.
+*
+* Not all traits have a maximum, so they can't all be used this way. This
+* function returns 1.0 for traits like that.
+*
+* @param char_data *ch The character to check.
+* @param int apply Any APPLY_ type, for which trait.
+* @return double The modifier based on the trait (0 to 1.0).
+*/
+double get_trait_modifier(char_data *ch, int apply) {
+	double value = 1.0;
+	
+	// APPLY_x: char's percent of max value for a trait
+	switch (apply) {
+		case APPLY_STRENGTH: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_DEXTERITY: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_CHARISMA: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_GREATNESS: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_INTELLIGENCE: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_WITS: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_BLOCK: {
+			value = 1.0;	// TODO: move block cap calculation to a function
+			break;
+		}
+		case APPLY_TO_HIT: {
+			value = 1.0;	// TODO: move to-hit cap calculation to a function
+			break;
+		}
+		case APPLY_DODGE: {
+			value = 1.0;	// TODO: move dodge cap calculation to a function
+			break;
+		}
+		case APPLY_RESIST_PHYSICAL: {
+			value = 1.0;	// TODO: move resist-phys cap calculation to a function
+			break;
+		}
+		case APPLY_RESIST_MAGICAL: {
+			value = 1.0;	// TODO: move resist-mag cap calculation to a function
+			break;
+		}
+		
+		// types that aren't really scalable like this always give 1.0
+		default: {
+			value = 1.0;
+			break;
+		}
+	}
+	
+	return MAX(0, MIN(1.0, value));
+}
+
+
+/**
+* Determines what percent of scale points go to one of an ability's types.
+*
+* @param ability_data *abil The ability to check.
+* @param bitvector_t type The ABILT_ type to check.
+* @return double The share of scale points (as a percent, 0 to 1.0) for that type.
+*/
+double get_type_modifier(ability_data *abil, bitvector_t type) {
+	int total = 0, found = 0;
+	struct ability_type *at;
+	
+	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+		total += at->weight;
+		
+		if (at->type == type) {
+			found = at->weight;
+		}
+	}
+	
+	return (double)found / (double)MAX(total, 1);
+}
+
+
+/**
 * @param ability_data *abil An ability to check.
 * @return bool TRUE if that ability is assigned to any class, or FALSE if not.
 */
@@ -379,15 +481,21 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @return int 1 if successful, 0 if failed, -1 to cancel further ability calls
 */
 int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *cvict, obj_data *ovict, vehicle_data *vvict, int level, int casttype) {
+	char buf[MAX_STRING_LENGTH];
+	int ret_val = 0;
+	bool violent;
+	
 	if (!ch || !abil) {
 		return 0;
 	}
 	
-	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE))) {
+	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE));
+	
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && violent) {
 		msg_to_char(ch, "You can't %s here.\r\n", SAFE_ABIL_COMMAND(abil));
 		return 0;
 	}
-	if (cvict && (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) && !can_fight(ch, cvict)) {
+	if (cvict && violent && !can_fight(ch, cvict)) {
 		act("You can't attack $N!", FALSE, ch, NULL, cvict, TO_CHAR);
 		return 0;
 	}
@@ -395,15 +503,56 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 		return 0;
 	}
 	
+	// ready to start the ability:
+	
+	if (SHOULD_APPEAR(ch) && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+		appear(ch);
+	}
+	
+	// counterspell?
+	if (ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && violent && cvict && cvict != ch && trigger_counterspell(cvict)) {
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+		}
+		
+		// to vict
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT), FALSE, ch, NULL, cvict, TO_VICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, cvict, TO_VICT);
+		}
+		
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM), FALSE, ch, NULL, cvict, TO_NOTVICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, cvict, TO_NOTVICT);
+		}
+		
+		return 1;	// counts as a successful ability use
+	}
+
+	
 	/*
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
 		if (mag_damage(level, ch, cvict, abil) == -1) {
 			return -1;	// Successful and target died, don't cast again.
 		}
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
-		mag_affects(level, ch, cvict, abil);
+	*/
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		ret_val |= do_ability_buff(ch, abil, level, cvict);
 	}
+	/*
 	if (IS_SET(ABIL_TYPES(abil), ABILT_UNAFFECTS)) {
 		mag_unaffects(level, ch, cvict, abil);
 	}
@@ -497,6 +646,129 @@ bool do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 	*/
 	
 	return call_ability(ch, abil, argument, targ, obj, veh, get_approximate_level(ch), RUN_ABIL_NORMAL);
+}
+
+
+/**
+* All buff-type abilities come through here. This handles scaling and buff
+* maintenance/replacement. This function returns 0 if the ability is a toggle
+* and you're toggling it off, which keeps it from charging/cooldowning.
+*
+* @param char_data *ch The person using the ability.
+* @param ability_data *abil The ability to use.
+* @param int level What level to use it at (may be lower/higher than ch's level).
+* @param char_data *vict The target (may be == ch).
+* @return int 1 if succeeded or did something, 0 if not (or if toggled off)
+*/
+int do_ability_buff(char_data *ch, ability_data *abil, int level, char_data *vict) {
+	bool invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	struct affected_type *af;
+	struct apply_data *apply;
+	any_vnum affect_vnum;
+	double total_points, share, amt;
+	int dur, total_w;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	// toggle off?
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
+		send_config_msg(ch, "ok_string");
+		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
+		return 0;	// this prevents charging for the ability or adding a cooldown
+	}
+	
+	if (ch == vict) {	// message: targeting self
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_ROOM);
+		}
+	}
+	else {	// message: ch != vict
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		
+		// to vict
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_VICT);
+		}
+		
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_NOTVICT);
+		}
+	}
+	
+	// determine points
+	total_points = level / 100.0 * config_get_double("scale_points_at_100");
+	total_points *= get_type_modifier(abil, ABILT_BUFF);
+	total_points *= ABIL_SCALE(abil);
+	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
+		total_points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
+	}
+	// TODO: modify for role
+	
+	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
+	
+	// determine duration
+	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
+	dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
+	
+	// affect flags? cost == level 100 ability
+	if (ABIL_AFFECTS(abil)) {
+		total_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+		
+		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
+		affect_join(vict, af, 0);
+	}
+	
+	// determine share for effects
+	total_w = 0;
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		total_w += ABSOLUTE(apply->weight);
+	}
+	
+	// now create affects for each apply that we can afford
+	if (total_w > 0) {
+		LL_FOREACH(ABIL_APPLIES(abil), apply) {
+			share = total_points * (double) apply->weight / (double) total_w;
+			amt = round(share / apply_values[apply->location]);
+			if (share > 0 && amt != 0) {
+				total_points -= ABSOLUTE(share);
+				
+				af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
+				affect_join(vict, af, 0);
+			}
+		}
+	}
+	
+	return 1;
 }
 
 

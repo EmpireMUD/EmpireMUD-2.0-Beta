@@ -1784,12 +1784,12 @@ void process_music(char_data *ch) {
 		cancel_action(ch);
 	}
 	else {
-		if (has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR)) {
-			act(get_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR), FALSE, ch, obj, 0, TO_CHAR | TO_SPAMMY);
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR), FALSE, ch, obj, 0, TO_CHAR | TO_SPAMMY);
 		}
 		
-		if (has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM)) {
-			act(get_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM), FALSE, ch, obj, 0, TO_ROOM | TO_SPAMMY);
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM), FALSE, ch, obj, 0, TO_ROOM | TO_SPAMMY);
 		}
 	}
 }
@@ -2977,7 +2977,7 @@ ACMD(do_play) {
 	else if (!(obj = GET_EQ(ch, WEAR_HOLD)) || GET_OBJ_TYPE(obj) != ITEM_INSTRUMENT) {
 		msg_to_char(ch, "You need to hold an instrument to play music!\r\n");
 	}
-	else if (!has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR) || !has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM)) {
+	else if (!obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR) || !obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM)) {
 		msg_to_char(ch, "This instrument can't be played.\r\n");
 	}
 	else {

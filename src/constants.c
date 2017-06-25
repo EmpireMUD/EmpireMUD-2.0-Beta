@@ -112,6 +112,8 @@ const char *reboot_type[] = { "reboot", "shutdown" };
 const char *ability_flags[] = {
 	"VIOLENT",
 	"COUNTERSPELLABLE",
+	"TOGGLE",
+	"INVISIBLE",
 	"\n"
 };
 
@@ -161,6 +163,14 @@ const char *ability_target_flags[] = {
 
 // ABIL_CUSTOM_x
 const char *ability_custom_types[] = {
+	"self-to-char",	// 0
+	"self-to-room",
+	"targeted-to-char",
+	"targeted-to-vict",
+	"targeted-to-room",
+	"counterspell-to-char",	// 5
+	"counterspell-to-vict",
+	"counterspell-to-room",
 	"\n"
 };
 

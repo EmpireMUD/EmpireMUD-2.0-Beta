@@ -2327,23 +2327,23 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 	if (use_obj) {
 		switch (msg_type) {
 			case APPLY_RES_BUILD: {
-				if (!messaged_char && has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR)) {
-					act(get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR), FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+				if (!messaged_char && obj_has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR)) {
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR), FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
 					messaged_char = TRUE;
 				}		
-				if (!messaged_room && has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM)) {
-					act(get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+				if (!messaged_room && obj_has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM)) {
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
 					messaged_room = TRUE;
 				}
 				break;
 			}
 			case APPLY_RES_CRAFT: {
-				if (!messaged_char && has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
-					act(get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+				if (!messaged_char && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
 					messaged_char = TRUE;
 				}
-				if (!messaged_room && has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
-					act(get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+				if (!messaged_room && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
 					messaged_room = TRUE;
 				}
 				break;

@@ -416,6 +416,8 @@ typedef struct vehicle_data vehicle_data;
 // ABILF_x: ability flags
 #define ABILF_VIOLENT  BIT(0)	// a. hostile ability (can't target self, etc)
 #define ABILF_COUNTERSPELLABLE  BIT(1)	// b. can be counterspelled
+#define ABILF_TOGGLE  BIT(2)	// c. can be toggled off by re-using (buffs)
+#define ABILF_INVISIBLE  BIT(3)	// d. act messages don't show if char can't be seen
 
 
 // ABILT_x: ability type flags
@@ -455,7 +457,14 @@ typedef struct vehicle_data vehicle_data;
 
 
 // ABIL_CUSTOM_x: custom message types
-#define ABIL_CUSTOM_UNUSED  0
+#define ABIL_CUSTOM_SELF_TO_CHAR  0
+#define ABIL_CUSTOM_SELF_TO_ROOM  1
+#define ABIL_CUSTOM_TARGETED_TO_CHAR  2
+#define ABIL_CUSTOM_TARGETED_TO_VICT  3
+#define ABIL_CUSTOM_TARGETED_TO_ROOM  4
+#define ABIL_CUSTOM_COUNTERSPELL_TO_CHAR  5
+#define ABIL_CUSTOM_COUNTERSPELL_TO_VICT  6
+#define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM  7
 
 
 // RUN_ABIL_x: modes for activating abilities
