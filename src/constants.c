@@ -114,6 +114,10 @@ const char *ability_flags[] = {
 	"COUNTERSPELLABLE",
 	"TOGGLE",
 	"INVISIBLE",
+	"!ENGAGE",
+	"RANGED",
+	"!ANIMAL",
+	"!INVULNERABLE",
 	"\n"
 };
 

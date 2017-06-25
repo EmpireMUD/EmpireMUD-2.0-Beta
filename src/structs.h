@@ -418,6 +418,10 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_COUNTERSPELLABLE  BIT(1)	// b. can be counterspelled
 #define ABILF_TOGGLE  BIT(2)	// c. can be toggled off by re-using (buffs)
 #define ABILF_INVISIBLE  BIT(3)	// d. act messages don't show if char can't be seen
+#define ABILF_NO_ENGAGE  BIT(4)	// e. won't cause you to enter combat
+#define ABILF_RANGED  BIT(5)	// f. allows use in ranged combat
+#define ABILF_NO_ANIMAL  BIT(6)	// g. can't be used in animal form
+#define ABILF_NO_INVULNERABLE  BIT(7)	// h. can't be used in invulnerable form
 
 
 // ABILT_x: ability type flags

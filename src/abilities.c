@@ -41,7 +41,7 @@
 const char *default_ability_name = "Unnamed Ability";
 
 // local protos
-int do_ability_buff(char_data *ch, ability_data *abil, int level, char_data *vict);
+int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 
 // external consts
@@ -451,7 +451,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 	}
 	
 	// ok check if we can perform it
-	if (!char_can_act(ch, ABIL_MIN_POS(abil), TRUE, TRUE)) {
+	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE))) {
 		return TRUE;	// sent its own error message
 	}
 	
@@ -495,8 +495,12 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 		msg_to_char(ch, "You can't %s here.\r\n", SAFE_ABIL_COMMAND(abil));
 		return 0;
 	}
-	if (cvict && violent && !can_fight(ch, cvict)) {
+	if (cvict && cvict != ch && violent && !can_fight(ch, cvict)) {
 		act("You can't attack $N!", FALSE, ch, NULL, cvict, TO_CHAR);
+		return 0;
+	}
+	if (cvict && cvict != ch && violent && NOT_MELEE_RANGE(ch, cvict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 		return 0;
 	}
 	if (ABILITY_TRIGGERS(ch, cvict, ovict, ABIL_VNUM(abil))) {
@@ -550,7 +554,7 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 	}
 	*/
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		ret_val |= do_ability_buff(ch, abil, level, cvict);
+		ret_val |= do_buff_ability(ch, abil, level, cvict);
 	}
 	/*
 	if (IS_SET(ABIL_TYPES(abil), ABILT_UNAFFECTS)) {
@@ -595,7 +599,27 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 		}
 	}
 	*/
-
+	
+	if (ret_val > 0) {
+		// experience
+		if (!cvict || can_gain_exp_from(ch, cvict)) {
+			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+		}
+		
+		// check if should be in combat
+		if (cvict && cvict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(cvict) && !IS_DEAD(cvict)) {
+			// auto-assist if we used an ability on someone who is fighting
+			if (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && FIGHTING(cvict) && !FIGHTING(ch)) {
+				engage_combat(ch, FIGHTING(cvict), ABILITY_FLAGGED(abil, ABILF_RANGED) ? FALSE : TRUE);
+			}
+			
+			// auto-attack if used on an enemy
+			if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && CAN_SEE(cvict, ch) && !FIGHTING(cvict)) {
+				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED) ? FALSE : TRUE);
+			}
+		}
+	}
+	
 	return ret_val;
 }
 
@@ -660,12 +684,12 @@ bool do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 * @param char_data *vict The target (may be == ch).
 * @return int 1 if succeeded or did something, 0 if not (or if toggled off)
 */
-int do_ability_buff(char_data *ch, ability_data *abil, int level, char_data *vict) {
+int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict) {
 	bool invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	struct affected_type *af;
 	struct apply_data *apply;
 	any_vnum affect_vnum;
-	double total_points, share, amt;
+	double total_points, remaining_points, share, amt;
 	int dur, total_w;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
@@ -735,6 +759,7 @@ int do_ability_buff(char_data *ch, ability_data *abil, int level, char_data *vic
 	// TODO: modify for role
 	
 	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
+	remaining_points = total_points;
 	
 	// determine duration
 	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
@@ -742,7 +767,8 @@ int do_ability_buff(char_data *ch, ability_data *abil, int level, char_data *vic
 	
 	// affect flags? cost == level 100 ability
 	if (ABIL_AFFECTS(abil)) {
-		total_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+		remaining_points = MAX(0, remaining_points);
 		
 		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
 		affect_join(vict, af, 0);
@@ -758,9 +784,13 @@ int do_ability_buff(char_data *ch, ability_data *abil, int level, char_data *vic
 	if (total_w > 0) {
 		LL_FOREACH(ABIL_APPLIES(abil), apply) {
 			share = total_points * (double) apply->weight / (double) total_w;
+			if (ABSOLUTE(share) > remaining_points) {
+				share = (share < 0 ? -1 : 1) * MIN(ABSOLUTE(share), remaining_points);
+			}
 			amt = round(share / apply_values[apply->location]);
 			if (share > 0 && amt != 0) {
-				total_points -= ABSOLUTE(share);
+				remaining_points -= ABSOLUTE(share);
+				remaining_points = MAX(0, total_points);
 				
 				af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
 				affect_join(vict, af, 0);
