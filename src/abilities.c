@@ -489,10 +489,12 @@ bool do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 		msg_to_char(ch, "You cannot use that on yourself!\r\n");
 		return FALSE;
 	}
+	/* TODO: if group abilities are added
 	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
 		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
 		return FALSE;
 	}
+	*/
 	
 	return call_ability(ch, abil, argument, targ, obj, veh, get_approximate_level(ch), RUN_ABIL_NORMAL);
 }

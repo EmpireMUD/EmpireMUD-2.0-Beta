@@ -421,8 +421,8 @@ typedef struct vehicle_data vehicle_data;
 // ABILT_x: ability type flags
 #define ABILT_CRAFT  BIT(0)	// related to crafting/building
 #define ABILT_BUFF  BIT(1)
+#define ABILT_DAMAGE  BIT(2)
 /*
-#define ABILT_DAMAGE  BIT(0)
 #define ABILT_AFFECTS  BIT(1)
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)
