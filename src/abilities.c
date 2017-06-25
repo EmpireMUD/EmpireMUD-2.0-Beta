@@ -596,7 +596,7 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 	}
 	*/
 
-	return 1;
+	return ret_val;
 }
 
 
