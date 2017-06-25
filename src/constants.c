@@ -165,9 +165,9 @@ const char *ability_target_flags[] = {
 const char *ability_custom_types[] = {
 	"self-to-char",	// 0
 	"self-to-room",
-	"targeted-to-char",
-	"targeted-to-vict",
-	"targeted-to-room",
+	"targ-to-char",
+	"targ-to-vict",
+	"targ-to-room",
 	"counterspell-to-char",	// 5
 	"counterspell-to-vict",
 	"counterspell-to-room",
