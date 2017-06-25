@@ -1486,24 +1486,24 @@ ACMD(do_skills) {
 			return;
 		}
 		
-		if (!ABIL_ASSIGNED_SKILL(abil)) {
+		if (!ABIL_ASSIGNED_SKILL(abil) && !IS_IMMORTAL(ch)) {
 			msg_to_char(ch, "You cannot buy that ability.\r\n");
 			return;
 		}
 		
-		if (get_ability_points_available_for_char(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < 1 && !IS_IMMORTAL(ch)) {
+		if (ABIL_ASSIGNED_SKILL(abil) && get_ability_points_available_for_char(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < 1 && !IS_IMMORTAL(ch)) {
 			msg_to_char(ch, "You have no points available to spend in %s.\r\n", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)));
 			return;
 		}
 		
 		// check level
-		if (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < ABIL_SKILL_LEVEL(abil)) {
+		if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < ABIL_SKILL_LEVEL(abil)) {
 			msg_to_char(ch, "You need at least %d in %s to buy %s.\r\n", ABIL_SKILL_LEVEL(abil), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_NAME(abil));
 			return;
 		}
 		
 		// check pre-req
-		if ((skab = find_skill_ability(ABIL_ASSIGNED_SKILL(abil), abil)) && skab->prerequisite != NO_PREREQ && !has_ability(ch, skab->prerequisite)) {
+		if (ABIL_ASSIGNED_SKILL(abil) && (skab = find_skill_ability(ABIL_ASSIGNED_SKILL(abil), abil)) && skab->prerequisite != NO_PREREQ && !has_ability(ch, skab->prerequisite)) {
 			msg_to_char(ch, "You need to buy %s before you can buy %s.\r\n", get_ability_name_by_vnum(skab->prerequisite), ABIL_NAME(abil));
 			return;
 		}
