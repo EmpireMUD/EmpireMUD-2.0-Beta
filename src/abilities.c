@@ -1909,7 +1909,7 @@ void olc_show_ability(char_data *ch) {
 	sprintbit(ABIL_FLAGS(abil), ability_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
-	sprintbit(ABIL_FLAGS(abil), affected_bits, lbuf, TRUE);
+	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyimmunities\t0> %s\r\n", lbuf);
 	
 	// command-related portion
