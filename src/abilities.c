@@ -1440,6 +1440,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 */
 void do_stat_ability(char_data *ch, ability_data *abil) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct custom_message *custm;
 	size_t size;
 	
 	if (!abil) {
@@ -1449,13 +1450,41 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
 
-	size += snprintf(buf + size, sizeof(buf) - size, "Mastery ability: [\ty%d\t0] \ty%s\t0\r\n", ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	size += snprintf(buf + size, sizeof(buf) - size, "Scale: [\ty%d%%\t0], Mastery ability: [\ty%d\t0] \ty%s\t0\r\n", (int)(ABIL_SCALE(abil) * 100), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Types:\r\n%s", part);
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	// command-related portion
+	if (!ABIL_COMMAND(abil)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Min position: [\tc%s\t0]\r\n", ABIL_COMMAND(abil), position_types[ABIL_MIN_POS(abil)]);
+		
+		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
+		
+		// type-specific data
+		if (IS_SET(ABIL_TYPES(abil), ABILT_AFFECTS)) {
+/*			<shortduration>, <longduration>
+			<affecttype>
+			<affect flags>
+*/		}
+	}
+	
+	if (ABIL_CUSTOM_MSGS(abil)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
+		
+		LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
+		}
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }
