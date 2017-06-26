@@ -841,7 +841,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		skip_spaces(&argument);	// anything left
 		
 		// char targets
-		if (!has && (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM))) {
+		if (!has && (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY))) {
 			if ((targ = get_char_vis(ch, arg, FIND_CHAR_ROOM)) != NULL) {
 				has = TRUE;
 			}
@@ -1903,7 +1903,7 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(ABIL_NAME(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf);
-	sprintf(buf + strlen(buf), "<\tytypes\t0> %s", lbuf);
+	sprintf(buf + strlen(buf), "<\tytypes\t0> %s\r\n", lbuf);
 	
 	sprintf(buf + strlen(buf), "<\tymasteryability\t0> %d %s\r\n", ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	sprintf(buf + strlen(buf), "<\tyscale\t0> %d%%\r\n", (int)(ABIL_SCALE(abil) * 100));
@@ -2323,7 +2323,7 @@ OLC_MODULE(abiledit_types) {
 		half_chop(arg2, num_arg, val_arg);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*val_arg || !isdigit(*val_arg)) {
-			msg_to_char(ch, "Usage: types change <number> <weight>\r\n");
+			msg_to_char(ch, "Usage: types change <type> <weight>\r\n");
 			return;
 		}
 		
@@ -2350,8 +2350,8 @@ OLC_MODULE(abiledit_types) {
 	}
 	else {
 		msg_to_char(ch, "Usage: types add <type> <weight>\r\n");
-		msg_to_char(ch, "Usage: types change <number> <weight>\r\n");
-		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
+		msg_to_char(ch, "Usage: types change <type> <weight>\r\n");
+		msg_to_char(ch, "Usage: custom remove <type | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		for (iter = 0; *ability_type_flags[iter] != '\n'; ++iter) {
 			msg_to_char(ch, " %s\r\n", ability_type_flags[iter]);

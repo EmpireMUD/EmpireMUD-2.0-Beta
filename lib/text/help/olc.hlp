@@ -501,12 +501,179 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
+"ABILEDIT AFFECTS" "ABILEDIT AFFECT"
+
+Usage:  .affects [add | remove] <flag>
+
+For buff abilities, these are affect flags that are placed on the target of the
+ability.
+
+See also: AFFECT FLAGS, OLC ABILITIES
+#d
+"ABILEDIT AFFECTVNUM" "ABILEDIT AFFECT VNUM"
+
+Usage:  .affectvnum <vnum | none>
+
+For buff abilities, this determines which 'affect' (generic) to use. The affect
+determines what text is shown on the 'affects' command or when the ability
+wears off.
+
+If you don't specify an ability, it will just say 'buff' and will have no wear-
+off message.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT APPLY" "ABILEDIT APPLIES"
+
+Usage:  .apply add <value> <apply>
+        .apply change <number> <value | apply> <new value>
+        .apply remove <number | all>
+
+For buff abilities, these are the various traits that are changed by the buff.
+The values should be positive for buffs, and negative for debuffs.
+
+Unlike object applies, using a negative apply will NOT provide a bonus for the
+other positive applies.
+
+For a list of the applies, see: HELP OEDIT APPLY
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT BUFF ABILITY" "BUFF ABILITY"
+
+The BUFF ability type means that the ability gives some affects to the target.
+This includes 'debuffs', which give negative abilities to enemies.
+
+You must always set the VIOLENT flag on a debuff.
+
+Buff abilities have the following properties:
+ <&yaffectvnum&0> Which affect (generic) to use for the buff.
+ <&yshortduration&0> How long it lasts (at low level).
+ <&ylongduration&0> How long it lasts (at class level).
+ <&yaffects&0> Affect flags to set.
+ <&yapply&0> Trait modifiers to give.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT COMMAND"
+
+Usage:  .command <word | none>
+
+Adding a command makes the ability usable. Its exact use depends on what
+type(s) you set on the ability. Commands must be a single word, and should
+NEVER share the name with a game command.
+
+Players can only use this command if they have this ability. You can use
+'skill buy <your skill name>' to buy and test the ability.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT COOLDOWN" "ABILEDIT CDTIME"
+
+Usage:  .cooldown <vnum | none>
+        .cdtime <seconds>
+
+These two properties determine what cooldown an ability has, if any. The vnum
+must be a cooldown generic.
+
+Cooldowns are used to balance how powerful an ability is, by limiting how often
+it can be used.
+
+See also: COOLDOWN GENERICS, OLC ABILITIES
+#d
+"ABILEDIT COST" "ABILEDIT COSTTYPE" "ABILEDIT COST TYPE"
+
+Usage:  .cost <amount>
+        .costtype <health | move | mana | blood>
+
+These two commands determine how much it costs to use an ability. If the
+ability is free, just set the cost to 0.
+
+Costs are part of balancing an ability. A more powerful ability should have a
+higher cost.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT CRAFT ABILITY" "CRAFT ABILITY"
+
+The CRAFT ability type indicates that it is used for crafting/building items.
+There are no special ability properties for this type. This ability can be
+assigned to a craft in the .craft editor's 'requiresability' field.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT CUSTOM" "ABILEDIT CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom remove <number | all>
+
+You can set custom messages on abilities. Different types of abilities may use
+different messages; see the help files for each ability type for more info.
+These messages may use the tokens $n/$e/$s/$m for name/he/his/him for the
+player using the ability, and capitalized letters for the target.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cself-to-char&0 - Shown to the actor when the ability targets himself (or
+   targets nobody).
+ &cself-to-room&0 - Shown to the room when the ability targets self/nobody.
+ &ctarg-to-char&0 - Shown to the actor when the ability targets a character.
+ &ctarg-to-vict&0 - Shown to the victim when the ability targets a character.
+ &ctarg-to-room&0 - Shown to the rest of the room when targeting a character.
+ &ccounterspell-to-char&0 - Shown to the actor when a counterspell cancels the
+   ability.
+ &ccounterspell-to-vict&0 - Shown to the ability's victim after the counterspell.
+ &ccounterspell-to-room&0 - Shown to the room after the counterspell.
+
+See also: OLC ABILITIES, DOLLAR SIGN CODES
+#d
 "ABILEDIT FLAGS" "ABILITY FLAGS"
 
 Usage:  .flags [add | remove] <flags>
 
 The following ability flags are available:
- * - There are noflags for abilities yet
+ &cVIOLENT&0 - Causes combat; can't be used on allies. You MUST set this flag
+   on offensive abilities or ones that harm the target.
+ &cCOUNTERSPELLABLE&0 - Can trigger an opponent's counterspell (used for magic).
+ &cTOGGLE&0 - Using this ability on twice  yourself will end its affect (for free).
+ &cINVISIBLE&0 - Shows no message if the actor can't be seen, instead of 'Someone'.
+ &c!ENGAGE&0 - Will not automatically add you to combat when used.
+ &cRANGED&0 - Can be used during ranged combat without giving a melee error.
+ &c!ANIMAL&0 - Cannot be used in animal form.
+ &c!INVULNERABLE&0 - Cannot be used while invulnerable (e.g. mistform).
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT IMMUNITIES" "ABILEDIT IMMUNITY"
+
+Usage:  .immunities [add | remove] <flag>
+
+These are affect flags that make the target immune to this ability. For
+example, the !BATTLE immunity means mobs with that flag can't be targeted by
+this ability.
+
+Any affect flag can be used for this.
+
+See also: AFFECT FLAGS, OLC ABILITIES
+#d
+"ABILEDIT LINKEDTRAIT" "ABILEDIT LINKED TRAIT"
+
+Usage:  .linkedtrait <trait | none>
+
+Linking an ability to a trait makes the ability more powerful based on how
+close the actor is to his/her cap in that trait.
+
+This selector uses the same list of traits as applies, but only traits that
+have a cap will provide a bonus.
+
+The following traits cannot be used: &rHEALTH-REGEN, MOVE-REGEN, MANA-REGEN,
+AGE, MAX-MOVE, HEAL-OVER-TIME, MAX-HEALTH, MAX-MANA, INVENTORY, MAX-BLOOD,
+CRAFTING, BLOOD-UPKEEP&0
+
+See also: OLC ABILITIES
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
 
@@ -519,6 +686,15 @@ mastery abilities that result in the (superior) flag on crafts.
 Most abilities have no mastery ability.
 
 See also: OLC ABILITIES
+#d
+"ABILEDIT MINPOSITION"
+
+Usage:  .minposition <position>
+
+This is the minimum position a character must be in to use the ability. For
+most abilities, this is "resting", "fighting", or "standing".
+
+See also: POSITIONS, OLC ABILITIES
 #d
 "ABILEDIT NAME"
 
@@ -536,6 +712,80 @@ each word typed by the user is matched sequentially. For example, "hor fo"
 matches "Horrid Form".
 
 See also: OLC ABILITIES
+#d
+"ABILEDIT SCALE"
+
+Usage:  .scale <percent>
+
+This allows you to make an ability more or less powerful. Be warned: game
+balance relies on abilities being in balance with each other. If you increase
+the 'scale' on an ability, you should also increase its cost and/or cooldown.
+
+See also: ABILEDIT COOLDOWN, ABILEDIT COST, OLC ABILITIES
+#d
+"ABILEDIT SHORTDURATION" "ABILEDIT SHORT DURATION" "ABILEDIT LONGDURATION" "ABILEDIT LONG DURATION"
+
+Usage:  .shortduration <seconds>
+        .longduration <seconds>
+
+For buff abilities, this is how long the buff lasts. Short duration applies
+when the actor has the skill at a low level. Long duration is for high-level
+users and class abilities.
+
+You can also choose to set both durations to the same amount of time.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT TARGETS"
+
+Usage:  .targets [add | remove] <flag>
+
+This determines what targets an ability has. Many of these flags go together or
+modify each other. They are:
+ &cIGNORE&0 - Has no automatic targets.
+ &cCHAR-ROOM&0 - Targets a character in the room with the actor.
+ &cCHAR-WORLD&0 - Targets a character anywhere in the world.
+ &cCHAR-CLOSEST&0 - Targets the closest person with that name.
+ &yFIGHT-SELF&0 - Modifier: Targets self if no argument while fighting.
+ &yFIGHT-VICTIM&0 - Modifier: Targets victim if no argument while fighting.
+ &ySELF-ONLY&0 - Modifier: Can only target yourself.
+ &yNOT-SELF&0 - Modifier: Character target cannot be self.
+ &cOBJ-INF&0 - Targets an object in your inventory.
+ &cOBJ-ROOM&0 - Targets an object on the ground.
+ &cOBJ-WORLD&0 - Targets an object anywhere.
+ &cOBJ-EQUIP&0 - Targets an object you're wearing.
+ &cVEH-ROOM&0 - Targets a vehicle in the room.
+ &cVEH-WORLD&0 - Targets a vehicle anywhere.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT TYPES"
+
+Usage:  .types add <type> <weight>
+        .types change <type> <weight>
+        .types remove <type>
+
+Ability types determine how they behave, and open up additional editor options.
+The 'weight' of an ability type determines how many scaling points it receives,
+similar to the applies on objects, morphs, etc.
+
+The following types are available (each has its own help file):
+ &cCRAFT&0 - Used for craft/building recipes.
+ &cBUFF&0 - Puts affects on characters.
+
+See also: OLC ABILITIES, BUFF ABILITY
+#d
+"ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
+
+Usage:  .waittype <type>
+
+The wait type is how long the character has "command lag" after using this
+ability. These are standardized wait times, so you select them from a list
+based on what type of ability you're making.
+
+Choose the wait type that best fits your ability.
+
+See also: COMMAND LAG, OLC ABILITIES
 #d
 "ADVEDIT AUTHOR"
 
