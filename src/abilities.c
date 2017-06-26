@@ -2264,7 +2264,7 @@ OLC_MODULE(abiledit_types) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], *weight_arg;
 	struct ability_type *at, *next_at, *change;
-	int num, iter, typeid, weight;
+	int iter, typeid, weight;
 	bool found;
 	
 	// arg1 arg2
@@ -2322,30 +2322,35 @@ OLC_MODULE(abiledit_types) {
 	else if (is_abbrev(arg1, "change")) {
 		half_chop(arg2, num_arg, val_arg);
 		
-		if (!*num_arg || !isdigit(*num_arg) || !*val_arg || !isdigit(*val_arg)) {
+		if (!*num_arg || !*val_arg || !isdigit(*val_arg)) {
 			msg_to_char(ch, "Usage: types change <type> <weight>\r\n");
+			return;
+		}
+		if ((typeid = search_block(num_arg, ability_type_flags, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", num_arg);
 			return;
 		}
 		
 		// find which one to change
-		num = atoi(num_arg);
 		change = NULL;
 		LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
-			if (--num == 0) {
+			if (at->type == BIT(typeid)) {
 				change = at;
 				break;
 			}
 		}
 		
+		sprintbit(BIT(typeid), ability_type_flags, buf, TRUE);
+		
 		if (!change) {
-			msg_to_char(ch, "Invalid type number.\r\n");
+			msg_to_char(ch, "Invalid type.\r\n");
 		}
 		else if ((weight = atoi(val_arg)) < 1) {
 			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
 		}
 		else {
 			change->weight = weight;
-			msg_to_char(ch, "Type %d changed to weight: %d\r\n", atoi(num_arg), weight);
+			msg_to_char(ch, "Type '%s' changed to weight: %d\r\n", buf, weight);
 		}
 	}
 	else {
