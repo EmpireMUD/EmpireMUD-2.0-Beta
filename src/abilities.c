@@ -246,10 +246,10 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer) {
 	*save_buffer = '\0';
 	LL_FOREACH(list, at) {
 		sprintbit(at->type, ability_type_flags, lbuf, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), " %d. %s(%d)\r\n", ++count, lbuf, at->weight);
+		sprintf(save_buffer + strlen(save_buffer), "%s%s(%d)", (count++ > 0) ? ", " : "", lbuf, at->weight);
 	}
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		strcat(save_buffer, "none");
 	}
 }
 
@@ -1332,7 +1332,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			}
 			
 			case 'X': {	// extended data (type-based)
-				type = strtoull(line+1, NULL, 10);
+				type = asciiflag_conv(line+2);
 				switch (type) {
 					case ABILT_BUFF: {
 						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
@@ -1453,7 +1453,9 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	
 	// 'X' type data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		fprintf(fl, "X%lld\n%d %d %d %s\n", ABILT_BUFF, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), bitv_to_alpha(ABIL_AFFECTS(abil)));
+		strcpy(temp, bitv_to_alpha(ABILT_BUFF));
+		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
+		fprintf(fl, "X %s\n%d %d %d %s\n", temp, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), temp2);
 	}
 	
 	// 'T' types
@@ -1812,7 +1814,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Scale: [\ty%d%%\t0], Mastery ability: [\ty%d\t0] \ty%s\t0\r\n", (int)(ABIL_SCALE(abil) * 100), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Types:\r\n%s", part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Types: \tc%s\t0\r\n", part);
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
@@ -1901,7 +1903,7 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(ABIL_NAME(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf);
-	sprintf(buf + strlen(buf), "<\tytypes\t0> (add, change, remove)\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "<\tytypes\t0> %s", lbuf);
 	
 	sprintf(buf + strlen(buf), "<\tymasteryability\t0> %d %s\r\n", ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	sprintf(buf + strlen(buf), "<\tyscale\t0> %d%%\r\n", (int)(ABIL_SCALE(abil) * 100));
@@ -2261,7 +2263,7 @@ OLC_MODULE(abiledit_types) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], *weight_arg;
-	struct ability_type *at, *change;
+	struct ability_type *at, *next_at, *change;
 	int num, iter, typeid, weight;
 	bool found;
 	
@@ -2270,7 +2272,7 @@ OLC_MODULE(abiledit_types) {
 	
 	if (is_abbrev(arg1, "remove")) {
 		if (!*arg2) {
-			msg_to_char(ch, "Remove which type (number)?\r\n");
+			msg_to_char(ch, "Remove which type?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
 			while ((at = ABIL_TYPE_LIST(abil))) {
@@ -2278,22 +2280,23 @@ OLC_MODULE(abiledit_types) {
 			}
 			msg_to_char(ch, "You remove all the types.\r\n");
 		}
-		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
-			msg_to_char(ch, "Invalid type number.\r\n");
+		else if ((typeid = search_block(arg2, ability_type_flags, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type to remove.\r\n");
 		}
 		else {
 			found = FALSE;
-			LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
-				if (--num == 0) {
+			LL_FOREACH_SAFE(ABIL_TYPE_LIST(abil), at, next_at) {
+				if (at->type == BIT(typeid)) {
 					found = TRUE;
-					msg_to_char(ch, "You remove type #%d.\r\n", atoi(arg2));
-					remove_type_from_ability(abil, at->type);
-					break;
+					sprintbit(BIT(typeid), ability_type_flags, buf, TRUE);
+					msg_to_char(ch, "You remove %s.\r\n", buf);
+					LL_DELETE(ABIL_TYPE_LIST(abil), at);
+					free(at);
 				}
 			}
 			
 			if (!found) {
-				msg_to_char(ch, "Invalid type number.\r\n");
+				msg_to_char(ch, "None of that type to remove.\r\n");
 			}
 		}
 	}
