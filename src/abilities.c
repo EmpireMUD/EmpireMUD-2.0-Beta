@@ -770,7 +770,9 @@ int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vic
 	
 	// determine duration
 	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
-	dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
+	if (dur != UNLIMITED) {
+		dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
+	}
 	
 	// affect flags? cost == level 100 ability
 	if (ABIL_AFFECTS(abil)) {
@@ -818,7 +820,7 @@ int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vic
 * @param char *argument The typed-in args.
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;
 	char_data *targ = NULL;
 	obj_data *obj = NULL;
@@ -913,7 +915,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			has = TRUE;
 		}
 		if (!has) {
-			sprintf(buf, "%s %s?\r\n", SAFE_ABIL_COMMAND(abil), IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
+			msg_to_char(ch, "%s %s?\r\n", SAFE_ABIL_COMMAND(abil), IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
 			return;
 		}
 	}

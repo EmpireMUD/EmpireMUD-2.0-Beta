@@ -725,12 +725,15 @@ See also: ABILEDIT COOLDOWN, ABILEDIT COST, OLC ABILITIES
 #d
 "ABILEDIT SHORTDURATION" "ABILEDIT SHORT DURATION" "ABILEDIT LONGDURATION" "ABILEDIT LONG DURATION"
 
-Usage:  .shortduration <seconds>
-        .longduration <seconds>
+Usage:  .shortduration <seconds | unlimited>
+        .longduration <seconds | unlimited>
 
 For buff abilities, this is how long the buff lasts. Short duration applies
 when the actor has the skill at a low level. Long duration is for high-level
 users and class abilities.
+
+Be careful with unlimited duration buffs -- these should always be self-only
+toggles.
 
 You can also choose to set both durations to the same amount of time.
 
