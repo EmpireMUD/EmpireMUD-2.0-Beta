@@ -545,4 +545,27 @@ trick shot~
 T0
 You're no longer affected by the trick shot.~
 S
+#3082
+buff~
+4 0
+0 0 0 0
+S
+#3083
+frenzy~
+4 0
+0 0 0 0
+T0
+Your frenzy ends.~
+T1
+$n seems to calm down.~
+S
+#3084
+defend~
+4 0
+0 0 0 0
+T0
+You stop defending.~
+T1
+$n stops defending.~
+S
 $

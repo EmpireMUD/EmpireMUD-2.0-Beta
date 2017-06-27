@@ -370,6 +370,13 @@ else
   %dot% #10551 %actor% 25 75 magical 5
 end
 wait 1 s
+if !%actor% || (%actor.vnum% == %self.vnum%)
+  * Actor died during the delay
+  eval actor %self.fighting%
+  if !%actor%
+    halt
+  end
+end
 switch %random.3%
   case 1
     * Perfect Freeze
