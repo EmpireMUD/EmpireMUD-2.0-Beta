@@ -3943,7 +3943,7 @@ void parse_object(FILE *obj_f, int nr) {
 		switch (*line) {
 			case 'A':
 				if (!get_line(obj_f, line)) {
-					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric constants but file ended!", buf2);
+					log("SYSERR: Format error in 'A' field, %s\n...expecting 3 numeric constants but file ended!", buf2);
 					exit(1);
 				}
 				
@@ -4700,7 +4700,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			
 			// triggers: C V
 			LL_FOREACH(SCRIPT(room)->global_vars, tvd) {
-				if (*tvd->name == '-') { // don't save if it begins with -
+				if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 					continue;
 				}
 				
@@ -4738,7 +4738,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 						// triggers: C V type context name~
 						//           value~
 						LL_FOREACH(SCRIPT(mob)->global_vars, tvd) {
-							if (*tvd->name == '-') { // don't save if it begins with -
+							if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 								continue;
 							}
 							

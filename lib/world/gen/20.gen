@@ -481,4 +481,18 @@ charge~
 T0
 Your charge cooldown has ended.~
 S
+#2070
+frenzy~
+3 0
+0 0 0 0
+T0
+Your frenzy cooldown has ended.~
+S
+#2071
+defend~
+3 0
+0 0 0 0
+T0
+Your defend cooldown has ended.~
+S
 $

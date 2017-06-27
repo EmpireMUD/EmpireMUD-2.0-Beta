@@ -131,7 +131,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_READY_BLOOD_WEAPONS  6
 #define ABIL_BOOST  7
 #define ABIL_CLAWS  8
-#define ABIL_COMMAND  9
+#define ABIL_VAMP_COMMAND  9
 #define ABIL_TOUCH_OF_FLAME  10
 #define ABIL_DARKNESS  11
 #define ABIL_DEATHSHROUD  12

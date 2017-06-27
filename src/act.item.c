@@ -739,16 +739,16 @@ obj_data *perform_remove(char_data *ch, int pos) {
 		}
 
 		// char message
-		if (has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
-			act(get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {
 			act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		
 		// room message
-		if (has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
-			act(get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
 		}
 		else {
 			act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
@@ -936,16 +936,16 @@ INTERACTION_FUNC(separate_obj_interact) {
 */
 static void wear_message(char_data *ch, obj_data *obj, int where) {
 	// char message
-	if (wear_data[where].allow_custom_msgs && has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR)) {
-		act(get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+	if (wear_data[where].allow_custom_msgs && obj_has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR)) {
+		act(obj_get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else {
 		act(wear_data[where].wear_msg_to_char, FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	
 	// room message
-	if (wear_data[where].allow_custom_msgs && has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM)) {
-		act(get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+	if (wear_data[where].allow_custom_msgs && obj_has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM)) {
+		act(obj_get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
 	}
 	else {
 		act(wear_data[where].wear_msg_to_room, TRUE, ch, obj, NULL, TO_ROOM);
@@ -4156,8 +4156,8 @@ ACMD(do_eat) {
 	// 5. messaging
 	if (extract || subcmd == SCMD_EAT) {
 		// message to char
-		if (has_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR)) {
-			act(get_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
+		if (obj_has_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR)) {
+			act(obj_get_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You eat %s$p.", (extract ? "" : "some of "));
@@ -4165,8 +4165,8 @@ ACMD(do_eat) {
 		}
 
 		// message to room
-		if (has_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM)) {
-			act(get_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
+		if (obj_has_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM)) {
+			act(obj_get_custom_message(food, OBJ_CUSTOM_EAT_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n eats %s$p.", (extract ? "" : "some of "));

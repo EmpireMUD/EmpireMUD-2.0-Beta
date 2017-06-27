@@ -1043,7 +1043,7 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
-	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location);
+	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
 	
@@ -1066,6 +1066,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
 	struct req_data *task;
+	obj_data **cont_row;
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
@@ -1112,6 +1113,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	
+	// prepare contaienrs for item load
+	CREATE(cont_row, obj_data*, MAX_BAG_ROWS);
+	for (iter = 0; iter < MAX_BAG_ROWS; ++iter) {
+		cont_row[iter] = NULL;
+	}
+	
 	// We want to read in any old lore ahead of any we've appended already.
 	// This happens if the player was loaded for an empire merge and new lore
 	// was added before delayed data.
@@ -1135,7 +1142,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case '#': {	// an item
 				sscanf(line, "#%d", &i_in[0]);
 				if ((obj = Obj_load_from_file(fl, i_in[0], &i_in[1], ch->desc ? ch : NULL))) {
-					loaded_obj_to_char(obj, ch, i_in[1]);
+					loaded_obj_to_char(obj, ch, i_in[1], &cont_row);
 				}
 				break;
 			}
@@ -1951,6 +1958,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR));
 	}
 	
+	free(cont_row);
 	return ch;
 }
 
@@ -2628,7 +2636,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'V'
 	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
 		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
-			if (*vars->name == '-') { // don't save if it begins with -
+			if (*vars->name == '-' || !*vars->value) { // don't save if it begins with - or is empty
 				continue;
 			}
 			

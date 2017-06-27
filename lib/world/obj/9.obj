@@ -79,12 +79,12 @@ This item is deprecated.
 0 1
 S
 #908
-arrows quiver~
-a quiver of arrows~
-A quiver of arrows is lying here.~
+arrows quiver wooden~
+a quiver of wooden arrows~
+A quiver of wooden arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 l a 1
+21 lo a 3
 10 0 0
 0 0
 I 11 911 10.00 1  # LIGHT: a quiver of flaming arrows
@@ -121,7 +121,7 @@ a quiver of flaming arrows~
 A quiver of flaming arrows is burning here.~
 Keep this in your inventory while shooting your bow.
 ~
-21 c a 1
+21 co a 2
 10 1 0
 0 4
 S
@@ -260,6 +260,100 @@ This item is deprecated.
 3 e 0 5
 0 0 0
 0 1
+S
+#923
+arrows quiver flint-tipped tipped~
+a quiver of flint-tipped arrows~
+A quiver of flint-tipped arrows is lying here.~
+You can use arrows from your inventory, if you have a bow equipped.
+~
+21 mo a 5
+10 1 0
+0 0
+C
+50 75
+S
+#924
+arrows quiver iron~
+a quiver of iron arrows~
+A quiver of iron arrows is lying here.~
+You can use arrows from your inventory, if you have a bow equipped.
+~
+21 mo a 6
+20 1 0
+2 0
+C
+75 100
+S
+#925
+arrows quiver imperium bodkin~
+a quiver of imperium bodkin arrows~
+A quiver of imperium bodkin arrows is lying here.~
+You can use arrows from your inventory, if you have a bow equipped.
+~
+21 mo a 8
+60 1 0
+2 0
+A
+12 1 0
+C
+75 100
+S
+#926
+arrows quiver nocturnium channeling~
+a quiver of nocturnium channeling arrows~
+A quiver of nocturnium channeling arrows is lying here.~
+You can use arrows from your inventory, if you have a bow equipped.
+~
+21 mo a 9
+60 1 0
+2 0
+A
+24 1 0
+C
+75 100
+S
+#927
+arrows quiver flowing~
+a quiver of flowing arrows~
+A quiver of flowing arrows is lying here.~
+You can use arrows from your inventory, if you have a bow equipped.
+~
+21 mo a 10
+40 1 0
+2 0
+A
+18 1 0
+C
+75 100
+S
+#928
+arrows quiver thunderclap~
+a quiver of thunderclap arrows~
+A quiver of thunderclap arrows is lying here.~
+You can use arrows from your inventory, if you have a bow equipped.
+~
+21 mo a 11
+40 1 0
+2 0
+A
+17 1 0
+C
+75 100
+S
+#929
+arrows quiver bloodletter~
+a quiver of bloodletter arrows~
+A quiver of bloodletter arrows is lying here.~
+   You can use arrows from your inventory, if you have a bow equipped. 
+Bloodletter arrows have a chance to cause bleeding on a successful hit.
+~
+21 mo a 13
+40 1 0
+2 0
+C
+75 100
+T 929
 S
 #952
 pinnace ship small~

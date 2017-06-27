@@ -90,6 +90,11 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		finish_morphing(ch, NULL);
 	}
 	
+	// generic affect abilities
+	if (affected_by_spell_from_caster(ch, ABIL_AFFECT_VNUM(abil), ch)) {
+		affect_from_char_by_caster(ch, ABIL_AFFECT_VNUM(abil), ch, TRUE);
+	}
+	
 	switch (ABIL_VNUM(abil)) {
 		case ABIL_ALACRITY: {
 			void end_alacrity(char_data *ch);
@@ -540,7 +545,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 * @param int cost_amount Mana (or whatever) amount required, if any.
 * @param int cooldown_type Any COOLDOWN_ const to apply (NOTHING for none).
 * @param int cooldown_time Cooldown duration, if any.
-* @param int wait_type Any WAIT_x const or WAIT_NONE for no command lag.
+* @param int wait_type Any WAIT_ const or WAIT_NONE for no command lag.
 */
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type) {
 	if (cost_pool >= 0 && cost_pool < NUM_POOLS && cost_amount > 0) {
@@ -1486,24 +1491,24 @@ ACMD(do_skills) {
 			return;
 		}
 		
-		if (!ABIL_ASSIGNED_SKILL(abil)) {
+		if (!ABIL_ASSIGNED_SKILL(abil) && !IS_IMMORTAL(ch)) {
 			msg_to_char(ch, "You cannot buy that ability.\r\n");
 			return;
 		}
 		
-		if (get_ability_points_available_for_char(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < 1 && !IS_IMMORTAL(ch)) {
+		if (ABIL_ASSIGNED_SKILL(abil) && get_ability_points_available_for_char(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < 1 && !IS_IMMORTAL(ch)) {
 			msg_to_char(ch, "You have no points available to spend in %s.\r\n", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)));
 			return;
 		}
 		
 		// check level
-		if (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < ABIL_SKILL_LEVEL(abil)) {
+		if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < ABIL_SKILL_LEVEL(abil)) {
 			msg_to_char(ch, "You need at least %d in %s to buy %s.\r\n", ABIL_SKILL_LEVEL(abil), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_NAME(abil));
 			return;
 		}
 		
 		// check pre-req
-		if ((skab = find_skill_ability(ABIL_ASSIGNED_SKILL(abil), abil)) && skab->prerequisite != NO_PREREQ && !has_ability(ch, skab->prerequisite)) {
+		if (ABIL_ASSIGNED_SKILL(abil) && (skab = find_skill_ability(ABIL_ASSIGNED_SKILL(abil), abil)) && skab->prerequisite != NO_PREREQ && !has_ability(ch, skab->prerequisite)) {
 			msg_to_char(ch, "You need to buy %s before you can buy %s.\r\n", get_ability_name_by_vnum(skab->prerequisite), ABIL_NAME(abil));
 			return;
 		}

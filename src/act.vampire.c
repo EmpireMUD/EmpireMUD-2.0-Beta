@@ -925,7 +925,7 @@ ACMD(do_command) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use Command.\r\n");
 	}
-	else if (!check_vampire_ability(ch, ABIL_COMMAND, NOTHING, 0, NOTHING)) {
+	else if (!check_vampire_ability(ch, ABIL_VAMP_COMMAND, NOTHING, 0, NOTHING)) {
 		return;
 	}
 	else if (!check_vampire_sun(ch, TRUE)) {
@@ -956,7 +956,7 @@ ACMD(do_command) {
 		msg_to_char(ch, "If you wish to include your orders in a sentence, you must include the word in that sentence.\r\nFormat: command <target> <command> [sentence including command]\r\n");
 	else if (!CAN_SEE(victim, ch))
 		act("How do you intend to command $M if $E can't even see you?", FALSE, ch, 0, victim, TO_CHAR);
-	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_COMMAND)) {
+	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_VAMP_COMMAND)) {
 		return;
 	}
 	else {
@@ -969,10 +969,10 @@ ACMD(do_command) {
 		do_say(ch, argument, 0, 0);
 		
 		if (can_gain_exp_from(ch, victim)) {
-			gain_ability_exp(ch, ABIL_COMMAND, 33.4);
+			gain_ability_exp(ch, ABIL_VAMP_COMMAND, 33.4);
 		}
 
-		if (skill_check(ch, ABIL_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
+		if (skill_check(ch, ABIL_VAMP_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
 			un_charm = AFF_FLAGGED(victim, AFF_CHARM) ? FALSE : TRUE;
 			SET_BIT(AFF_FLAGS(victim), AFF_CHARM);
 			

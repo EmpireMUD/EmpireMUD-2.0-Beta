@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -21,10 +23,13 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
 *   Helpers
+*   Ability Commands
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -36,15 +41,66 @@
 const char *default_ability_name = "Unnamed Ability";
 
 // local protos
+int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict);
+void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 
 // external consts
+extern const char *ability_custom_types[];
 extern const char *ability_flags[];
+extern const char *ability_target_flags[];
+extern const char *ability_type_flags[];
+extern const char *affected_bits[];
+extern const char *apply_types[];
+extern const char *apply_type_names[];
+extern const double apply_values[];
+extern const char *pool_types[];
+extern const char *position_types[];
+extern const char *wait_types[];
 
 // external funcs
+extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* This function adds a type to the ability's type list, and updates the summary
+* type flags.
+*
+* @param ability_data *abil Which ability we're adding a type to.
+* @param bitvector_t type Which ABILT_ flag.
+* @param int weight How much weight it gets (for scaling).
+*/
+void add_type_to_ability(ability_data *abil, bitvector_t type, int weight) {
+	bitvector_t total = NOBITS;
+	struct ability_type *at;
+	bool found = FALSE;
+	
+	if (!type) {
+		return;
+	}
+	
+	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+		total |= at->type;
+		
+		if (at->type == type) {
+			at->weight = weight;
+			found = TRUE;
+		}
+	}
+	
+	if (!found) {
+		CREATE(at, struct ability_type, 1);
+		at->type = type;
+		at->weight = weight;
+		LL_APPEND(ABIL_TYPE_LIST(abil), at);
+	}
+	
+	total |= type;
+	ABIL_TYPES(abil) = total;	// summarize flags
+}
+
 
 /**
 * Audits abilities on startup.
@@ -177,6 +233,124 @@ char *get_ability_name_by_vnum(any_vnum vnum) {
 
 
 /**
+* Displays the list of types for an ability.
+*
+* @param struct ability_type *list Pointer to the start of a list of types.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_ability_type_display(struct ability_type *list, char *save_buffer) {
+	struct ability_type *at;
+	char lbuf[256];
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(list, at) {
+		sprintbit(at->type, ability_type_flags, lbuf, TRUE);
+		sprintf(save_buffer + strlen(save_buffer), "%s%s(%d)", (count++ > 0) ? ", " : "", lbuf, at->weight);
+	}
+	if (count == 0) {
+		strcat(save_buffer, "none");
+	}
+}
+
+
+/**
+* Gives a modifier (as a decimal, like 1.0 for 100%) based on a character's
+* value in a given trait. For example, for Strength, 100% is the character's
+* maximum possible strength.
+*
+* Not all traits have a maximum, so they can't all be used this way. This
+* function returns 1.0 for traits like that.
+*
+* @param char_data *ch The character to check.
+* @param int apply Any APPLY_ type, for which trait.
+* @return double The modifier based on the trait (0 to 1.0).
+*/
+double get_trait_modifier(char_data *ch, int apply) {
+	double value = 1.0;
+	
+	// APPLY_x: char's percent of max value for a trait
+	switch (apply) {
+		case APPLY_STRENGTH: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_DEXTERITY: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_CHARISMA: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_GREATNESS: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_INTELLIGENCE: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_WITS: {
+			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			break;
+		}
+		case APPLY_BLOCK: {
+			value = 1.0;	// TODO: move block cap calculation to a function
+			break;
+		}
+		case APPLY_TO_HIT: {
+			value = 1.0;	// TODO: move to-hit cap calculation to a function
+			break;
+		}
+		case APPLY_DODGE: {
+			value = 1.0;	// TODO: move dodge cap calculation to a function
+			break;
+		}
+		case APPLY_RESIST_PHYSICAL: {
+			value = 1.0;	// TODO: move resist-phys cap calculation to a function
+			break;
+		}
+		case APPLY_RESIST_MAGICAL: {
+			value = 1.0;	// TODO: move resist-mag cap calculation to a function
+			break;
+		}
+		
+		// types that aren't really scalable like this always give 1.0
+		default: {
+			value = 1.0;
+			break;
+		}
+	}
+	
+	return MAX(0, MIN(1.0, value));
+}
+
+
+/**
+* Determines what percent of scale points go to one of an ability's types.
+*
+* @param ability_data *abil The ability to check.
+* @param bitvector_t type The ABILT_ type to check.
+* @return double The share of scale points (as a percent, 0 to 1.0) for that type.
+*/
+double get_type_modifier(ability_data *abil, bitvector_t type) {
+	int total = 0, found = 0;
+	struct ability_type *at;
+	
+	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+		total += at->weight;
+		
+		if (at->type == type) {
+			found = at->weight;
+		}
+	}
+	
+	return (double)found / (double)MAX(total, 1);
+}
+
+
+/**
 * @param ability_data *abil An ability to check.
 * @return bool TRUE if that ability is assigned to any class, or FALSE if not.
 */
@@ -196,6 +370,574 @@ bool is_class_ability(ability_data *abil) {
 	}
 	
 	return FALSE;	// no match
+}
+
+
+/**
+* Removes a type from an ability and re-summarizes the type flags.
+*
+* @param ability_data *abil The ability to remove a type from.
+* @param bitvector_t type The ABILT_ flag to remove.
+*/
+void remove_type_from_ability(ability_data *abil, bitvector_t type) {
+	struct ability_type *at, *next_at;
+	bitvector_t total = NOBITS;
+	
+	LL_FOREACH_SAFE(ABIL_TYPE_LIST(abil), at, next_at) {
+		if (at->type == type) {
+			LL_DELETE(ABIL_TYPE_LIST(abil), at);
+			free(at);
+		}
+		else {
+			total |= at->type;
+		}
+	}
+	ABIL_TYPES(abil) = total;	// summarize flags
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY COMMANDS ////////////////////////////////////////////////////////
+
+/**
+* This checks if "string" is an ability's command, and performs it if so.
+*
+* @param char_data *ch The actor.
+* @param char *string The command they typed.
+* @param bool exact if TRUE, must be an exact match; FALSE can be abbrev
+* @return bool TRUE if it was an ability command and we acted; FALSE if not
+*/
+bool check_ability(char_data *ch, char *string, bool exact) {
+	extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
+	
+	char cmd[MAX_STRING_LENGTH], arg1[MAX_STRING_LENGTH];
+	ability_data *iter, *next_iter, *abil, *abbrev;
+	
+	skip_spaces(&string);
+	half_chop(string, cmd, arg1);
+	
+	if (!*cmd) {
+		return FALSE;
+	}
+	if (IS_NPC(ch) && AFF_FLAGGED(ch, AFF_ORDERED)) {
+		return FALSE;
+	}
+	
+	// look for an ability that matches
+	abil = abbrev = NULL;
+	HASH_ITER(sorted_hh, sorted_abilities, iter, next_iter) {
+		if (!ABIL_COMMAND(iter) || LOWER(*cmd) != LOWER(*ABIL_COMMAND(iter))) {
+			continue;	// no command or not matching first letter
+		}
+		if (!IS_NPC(ch) && !has_ability(ch, ABIL_VNUM(iter))) {
+			continue;	// pc does not have the ability
+		}
+		
+		// ok match string
+		if (!str_cmp(cmd, ABIL_COMMAND(iter))) {
+			abil = iter;	// found exact
+			break;
+		}
+		else if (!exact && !abbrev && is_abbrev(cmd, ABIL_COMMAND(iter))) {
+			abbrev = iter;	// partial match
+		}
+	}
+	
+	if (!abil) {
+		abil = abbrev;	// if any
+	}
+	if (!abil) {
+		return FALSE;	// did not match any anything
+	}
+	
+	// ok check if we can perform it
+	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE))) {
+		return TRUE;	// sent its own error message
+	}
+	
+	perform_ability_command(ch, abil, arg1);
+	return TRUE;
+}
+
+
+/* This function is the very heart of the entire magic system.  All invocations
+ * of all types of magic -- objects, spoken and unspoken PC and NPC spells, the
+ * works -- all come through this function eventually. This is also the entry
+ * point for non-spoken or unrestricted spells. Spellnum 0 is legal but silently
+ * ignored here, to make callers simpler. */
+
+/**
+* This function is the core of the parameterized ability system. All normal
+* ability invocations go through this function. This is also a safe entry point
+* for non-cast or unrestricted abilities.
+*
+* @param char_data *ch The person performing the ability.
+* @param ability_data *abil The ability being used.
+* @param char_data *cvict The character target, if any (may be NULL).
+* @param obj_data *ovict The object target, if any (may be NULL).
+* @param vehicle_data *vvict The vehicle target, if any (may be NULL).
+* @param int level The level to use the ability at.
+* @param int casttype SPELL_CAST, etc.
+* @return int 1 if successful, 0 if failed, -1 to cancel further ability calls
+*/
+int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *cvict, obj_data *ovict, vehicle_data *vvict, int level, int casttype) {
+	char buf[MAX_STRING_LENGTH];
+	int ret_val = 0;
+	bool violent;
+	
+	if (!ch || !abil) {
+		return 0;
+	}
+	
+	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE));
+	
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && violent) {
+		msg_to_char(ch, "You can't %s here.\r\n", SAFE_ABIL_COMMAND(abil));
+		return 0;
+	}
+	
+	if (cvict && cvict != ch && violent) {
+		if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(cvict, ABIL_IMMUNITIES(abil))) {
+			act("$N is immune to that!", FALSE, ch, NULL, cvict, TO_CHAR);
+			return 0;
+		}
+		if (!can_fight(ch, cvict)) {
+			act("You can't attack $N!", FALSE, ch, NULL, cvict, TO_CHAR);
+			return 0;
+		}
+		if (NOT_MELEE_RANGE(ch, cvict)) {
+			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+			return 0;
+		}
+	}
+	if (ABILITY_TRIGGERS(ch, cvict, ovict, ABIL_VNUM(abil))) {
+		return 0;
+	}
+	
+	// ready to start the ability:
+	
+	if (SHOULD_APPEAR(ch) && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+		appear(ch);
+	}
+	
+	// counterspell?
+	if (ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && violent && cvict && cvict != ch && trigger_counterspell(cvict)) {
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+		}
+		
+		// to vict
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT), FALSE, ch, NULL, cvict, TO_VICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, cvict, TO_VICT);
+		}
+		
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM), FALSE, ch, NULL, cvict, TO_NOTVICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, cvict, TO_NOTVICT);
+		}
+		
+		return 1;	// counts as a successful ability use
+	}
+
+	
+	/*
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+		if (mag_damage(level, ch, cvict, abil) == -1) {
+			return -1;	// Successful and target died, don't cast again.
+		}
+	}
+	*/
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		ret_val |= do_buff_ability(ch, abil, level, cvict);
+	}
+	/*
+	if (IS_SET(ABIL_TYPES(abil), ABILT_UNAFFECTS)) {
+		mag_unaffects(level, ch, cvict, abil);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_POINTS)) {
+		mag_points(level, ch, cvict, abil);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ALTER_OBJS)) {
+		mag_alter_objs(level, ch, ovict, abil);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS)) {
+		mag_groups(level, ch, abil);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_MASSES)) {
+		mag_masses(level, ch, abil);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_AREAS)) {
+		mag_areas(level, ch, abil);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMONS)) {
+		mag_summons(level, ch, ovict, abil);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_CREATIONS)) {
+		mag_creations(level, ch, abil);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOMS)) {
+		mag_rooms(level, ch, abil);
+	}
+	
+	if (IS_SET(ABIL_TYPES(abil), ABILT_MANUAL)) {
+		switch (ABIL_VNUM(abil)) {
+			case SPELL_CHARM:		MANUAL_SPELL(spell_charm); break;
+			case SPELL_CREATE_WATER:	MANUAL_SPELL(spell_create_water); break;
+			case SPELL_DETECT_POISON:	MANUAL_SPELL(spell_detect_poison); break;
+			case SPELL_ENCHANT_WEAPON:  MANUAL_SPELL(spell_enchant_weapon); break;
+			case SPELL_IDENTIFY:	MANUAL_SPELL(spell_identify); break;
+			case SPELL_LOCATE_OBJECT:   MANUAL_SPELL(spell_locate_object); break;
+			case SPELL_SUMMON:		MANUAL_SPELL(spell_summon); break;
+			case SPELL_WORD_OF_RECALL:  MANUAL_SPELL(spell_recall); break;
+			case SPELL_TELEPORT:	MANUAL_SPELL(spell_teleport); break;
+		}
+	}
+	*/
+	
+	if (ret_val > 0) {
+		// experience
+		if (!cvict || can_gain_exp_from(ch, cvict)) {
+			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+		}
+		
+		// check if should be in combat
+		if (cvict && cvict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(cvict) && !IS_DEAD(cvict)) {
+			// auto-assist if we used an ability on someone who is fighting
+			if (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && FIGHTING(cvict) && !FIGHTING(ch)) {
+				engage_combat(ch, FIGHTING(cvict), ABILITY_FLAGGED(abil, ABILF_RANGED) ? FALSE : TRUE);
+			}
+			
+			// auto-attack if used on an enemy
+			if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && CAN_SEE(cvict, ch) && !FIGHTING(cvict)) {
+				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED) ? FALSE : TRUE);
+			}
+		}
+	}
+	
+	return ret_val;
+}
+
+
+/**
+* do_ability is used generically to perform any ability, assuming we already
+* have the target char/obj/veh and most things have been validated. This checks
+* further restrictions.
+*
+* If an NPC uses an ability directly in the code, this is the correct entry
+* point for it.
+*
+* @param char_data *ch The person performing the ability.
+* @param ability_data *abil The ability being used.
+* @param char *argument Any remaining argument.
+* @param char_data *targ The char target, if any (may be NULL).
+* @param obj_data *obj The obj target, if any (may be NULL).
+* @param vehicle_data *veh The vehicle target, if any (may be NULL).
+* @return bool TRUE if succeeded, FALSE if not
+*/
+bool do_ability(char_data *ch, ability_data *abil, char *argument, char_data *targ, obj_data *obj, vehicle_data *veh) {
+	if (!ch || !abil) {
+		log("SYSERR: do_ability called without %s.", ch ? "ability" : "character");
+		return FALSE;
+	}
+	
+	if (GET_POS(ch) < ABIL_MIN_POS(abil)) {
+		send_low_pos_msg(ch);
+		return FALSE;
+	}
+	if (targ && AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == targ)) {
+		msg_to_char(ch, "You are afraid you might hurt your master!\r\n");
+		return FALSE;
+	}
+	if ((targ != ch) && IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
+		msg_to_char(ch, "You can only use that on yourself!\r\n");
+		return FALSE;
+	}
+	if ((targ == ch) && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
+		msg_to_char(ch, "You cannot use that on yourself!\r\n");
+		return FALSE;
+	}
+	/* TODO: if group abilities are added
+	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
+		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
+		return FALSE;
+	}
+	*/
+	
+	return call_ability(ch, abil, argument, targ, obj, veh, get_approximate_level(ch), RUN_ABIL_NORMAL);
+}
+
+
+/**
+* All buff-type abilities come through here. This handles scaling and buff
+* maintenance/replacement. This function returns 0 if the ability is a toggle
+* and you're toggling it off, which keeps it from charging/cooldowning.
+*
+* @param char_data *ch The person using the ability.
+* @param ability_data *abil The ability to use.
+* @param int level What level to use it at (may be lower/higher than ch's level).
+* @param char_data *vict The target (may be == ch).
+* @return int 1 if succeeded or did something, 0 if not (or if toggled off)
+*/
+int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict) {
+	bool invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	struct affected_type *af;
+	struct apply_data *apply;
+	any_vnum affect_vnum;
+	double total_points, remaining_points, share, amt;
+	int dur, total_w;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	// toggle off?
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
+		send_config_msg(ch, "ok_string");
+		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
+		return 0;	// this prevents charging for the ability or adding a cooldown
+	}
+	
+	if (ch == vict) {	// message: targeting self
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_ROOM);
+		}
+	}
+	else {	// message: ch != vict
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		
+		// to vict
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_VICT);
+		}
+		
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_NOTVICT);
+		}
+	}
+	
+	// determine points
+	total_points = level / 100.0 * config_get_double("scale_points_at_100");
+	total_points *= get_type_modifier(abil, ABILT_BUFF);
+	total_points *= ABIL_SCALE(abil);
+	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
+		total_points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
+	}
+	// TODO: modify for role
+	
+	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
+	remaining_points = total_points;
+	
+	// determine duration
+	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
+	if (dur != UNLIMITED) {
+		dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
+	}
+	
+	// affect flags? cost == level 100 ability
+	if (ABIL_AFFECTS(abil)) {
+		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+		remaining_points = MAX(0, remaining_points);
+		
+		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
+		affect_join(vict, af, 0);
+	}
+	
+	// determine share for effects
+	total_w = 0;
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		total_w += ABSOLUTE(apply->weight);
+	}
+	
+	// now create affects for each apply that we can afford
+	if (total_w > 0) {
+		LL_FOREACH(ABIL_APPLIES(abil), apply) {
+			share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
+			if (share > remaining_points) {
+				share = MIN(share, remaining_points);
+			}
+			amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
+			if (share > 0 && amt != 0) {
+				remaining_points -= share;
+				remaining_points = MAX(0, total_points);
+				
+				af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
+				affect_join(vict, af, 0);
+			}
+		}
+	}
+	
+	return 1;
+}
+
+
+/**
+* Performs an ability typed by a character. This function find the targets,
+* validates costs/cooldowns, and charges costs/cooldowns.
+*
+* @param char_data *ch The person who typed the command.
+* @param ability_data *abil The ability being used.
+* @param char *argument The typed-in args.
+*/
+void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	vehicle_data *veh = NULL;
+	char_data *targ = NULL;
+	obj_data *obj = NULL;
+	bool has = FALSE;
+	int iter;
+	
+	skip_spaces(&argument);
+	
+	// pre-validates cost, cooldown, and ability
+	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {
+		return;
+	}
+		
+	// Find the target
+	if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE)) {
+		has = TRUE;
+	}
+	else if (*argument) {
+		argument = one_argument(argument, arg);
+		skip_spaces(&argument);	// anything left
+		
+		// char targets
+		if (!has && (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY))) {
+			if ((targ = get_char_vis(ch, arg, FIND_CHAR_ROOM)) != NULL) {
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_CLOSEST)) {
+			if ((targ = find_closest_char(ch, arg, FALSE)) != NULL) {
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_WORLD)) {
+			if ((targ = get_char_vis(ch, arg, FIND_CHAR_WORLD)) != NULL) {
+				has = TRUE;
+			}
+		}
+		
+		// obj targets
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV)) {
+			if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) != NULL) {
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_EQUIP)) {
+			for (iter = 0; !has && iter < NUM_WEARS; ++iter) {
+				if (GET_EQ(ch, iter) && isname(arg, GET_EQ(ch, iter)->name)) {
+					obj = GET_EQ(ch, iter);
+					has = TRUE;
+				}
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_ROOM)) {
+			if ((obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_WORLD)) {
+			if ((obj = get_obj_vis(ch, arg)) != NULL) {
+				has = TRUE;
+			}
+		}
+		
+		// vehicle targets
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM)) {
+			if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD)) {
+			if ((veh = get_vehicle_vis(ch, arg))) {
+				has = TRUE;
+			}
+		}
+	}
+	else {	// no arg
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
+			if (FIGHTING(ch) != NULL) {
+				targ = ch;
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_VICT)) {
+			if (FIGHTING(ch) != NULL) {
+				targ = FIGHTING(ch);
+				has = TRUE;
+			}
+		}
+		// if no target specified, and the spell isn't violent, default to self
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+			targ = ch;
+			has = TRUE;
+		}
+		if (!has) {
+			snprintf(buf, sizeof(buf), "%s %s?\r\n", SAFE_ABIL_COMMAND(abil), IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
+			msg_to_char(ch, "%s", CAP(buf));
+			return;
+		}
+	}
+
+	if (has && (targ == ch) && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", SAFE_ABIL_COMMAND(abil));
+		return;
+	}
+	if (!has) {
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD)) {
+			send_config_msg(ch, "no_person");
+		}
+		else {
+			msg_to_char(ch, "There's nothing like that here.\r\n");
+		}
+		return;
+	}
+	
+	if (do_ability(ch, abil, argument, targ, obj, veh)) {
+		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+	}
 }
 
 
@@ -469,6 +1211,9 @@ void clear_ability(ability_data *abil) {
 	
 	ABIL_VNUM(abil) = NOTHING;
 	ABIL_MASTERY_ABIL(abil) = NOTHING;
+	ABIL_COOLDOWN(abil) = NOTHING;
+	ABIL_AFFECT_VNUM(abil) = NOTHING;
+	ABIL_SCALE(abil) = 1.0;
 }
 
 
@@ -485,6 +1230,12 @@ void free_ability(ability_data *abil) {
 	if (ABIL_NAME(abil) && (!proto || ABIL_NAME(abil) != ABIL_NAME(proto))) {
 		free(ABIL_NAME(abil));
 	}
+	if (ABIL_COMMAND(abil) && (!proto || ABIL_COMMAND(abil) != ABIL_COMMAND(proto))) {
+		free(ABIL_COMMAND(abil));
+	}
+	if (ABIL_CUSTOM_MSGS(abil) && (!proto || ABIL_CUSTOM_MSGS(abil) != ABIL_CUSTOM_MSGS(proto))) {
+		free_custom_messages(ABIL_CUSTOM_MSGS(abil));
+	}
 	
 	free(abil);
 }
@@ -497,9 +1248,13 @@ void free_ability(ability_data *abil) {
 * @param any_vnum vnum The ability vnum
 */
 void parse_ability(FILE *fl, any_vnum vnum) {
-	char line[256], error[256], str_in[256];
+	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
+	
+	char line[256], error[256], str_in[256], str_in2[256];
 	ability_data *abil, *find;
-	int int_in[4];
+	bitvector_t type;
+	int int_in[7];
+	double dbl_in;
 	
 	CREATE(abil, ability_data, 1);
 	clear_ability(abil);
@@ -518,15 +1273,25 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	// line 1: name
 	ABIL_NAME(abil) = fread_string(fl, error);
 	
-	// line 2: flags master-abil
-	if (!get_line(fl, line) || sscanf(line, "%s %d", str_in, &int_in[0]) != 2) {
-		log("SYSERR: Format error in line 2 of %s", error);
+	// line 2: flags master-abil scale immunities
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 2 of %s", error);
 		exit(1);
+	}
+	if (sscanf(line, "%s %d %lf %s", str_in, &int_in[0], &dbl_in, str_in2) != 4) {
+		dbl_in = 1.0;	// default scale
+		strcpy(str_in2, "0");	// default immunities
+		if (sscanf(line, "%s %d", str_in, &int_in[0]) != 2) {
+			log("SYSERR: Format error in line 2 of %s", error);
+			exit(1);
+		}
 	}
 	
 	ABIL_FLAGS(abil) = asciiflag_conv(str_in);
 	ABIL_MASTERY_ABIL(abil) = int_in[0];
-		
+	ABIL_SCALE(abil) = dbl_in;
+	ABIL_IMMUNITIES(abil) = asciiflag_conv(str_in2);
+	
 	// optionals
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -534,7 +1299,63 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
-			// no current flags
+			case 'A': {	// applies
+				parse_apply(fl, &ABIL_APPLIES(abil), error);
+				break;
+			}
+			
+			case 'C': {	// command info
+				if (!get_line(fl, line) || sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 9) {
+					log("SYSERR: Format error in C line of %s", error);
+					exit(1);
+				}
+				
+				if (ABIL_COMMAND(abil)) {
+					free(ABIL_COMMAND(abil));
+				}
+				ABIL_COMMAND(abil) = *str_in ? str_dup(str_in) : NULL;
+				ABIL_MIN_POS(abil) = int_in[0];
+				ABIL_TARGETS(abil) = asciiflag_conv(str_in2);
+				ABIL_COST_TYPE(abil) = int_in[1];
+				ABIL_COST(abil) = int_in[2];
+				ABIL_COOLDOWN(abil) = int_in[3];
+				ABIL_COOLDOWN_SECS(abil) = int_in[4];
+				ABIL_LINKED_TRAIT(abil) = int_in[5];
+				ABIL_WAIT_TYPE(abil) = int_in[6];
+				break;
+			}
+			
+			case 'T': {	// type
+				if (sscanf(line, "T %s %d", str_in, &int_in[0]) != 2) {
+					log("SYSERR: Format error in T line of %s", error);
+					exit(1);
+				}
+				add_type_to_ability(abil, asciiflag_conv(str_in), int_in[0]);
+				break;
+			}
+			
+			case 'X': {	// extended data (type-based)
+				type = asciiflag_conv(line+2);
+				switch (type) {
+					case ABILT_BUFF: {
+						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
+							log("SYSERR: Format error in X%llu line of %s", type, error);
+							exit(1);
+						}
+						
+						ABIL_AFFECT_VNUM(abil) = int_in[0];
+						ABIL_SHORT_DURATION(abil) = int_in[1];
+						ABIL_LONG_DURATION(abil) = int_in[2];
+						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+						break;
+					}
+					default: {
+						log("SYSERR: Unknown flag X%llu in %s", type, error);
+						exit(1);
+					}
+				}
+				break;
+			}
 			
 			// end
 			case 'S': {
@@ -604,7 +1425,12 @@ void write_ability_index(FILE *fl) {
 * @param FILE *fl The file to write it to.
 * @param ability_data *abil The thing to save.
 */
-void write_ability_to_file(FILE *fl, ability_data *abil) {	
+void write_ability_to_file(FILE *fl, ability_data *abil) {
+	void write_applies_to_file(FILE *fl, struct apply_data *list);
+	
+	char temp[256], temp2[256];
+	struct ability_type *at;
+	
 	if (!fl || !abil) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_ability_to_file called without %s", !fl ? "file" : "ability");
 		return;
@@ -615,8 +1441,30 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	// 1: name
 	fprintf(fl, "%s~\n", NULLSAFE(ABIL_NAME(abil)));
 	
-	// 2: flags mastery-abil
-	fprintf(fl, "%s %d\n", bitv_to_alpha(ABIL_FLAGS(abil)), ABIL_MASTERY_ABIL(abil));
+	// 2: flags mastery-abil scale immunities
+	strcpy(temp, bitv_to_alpha(ABIL_FLAGS(abil)));
+	strcpy(temp2, bitv_to_alpha(ABIL_IMMUNITIES(abil)));
+	fprintf(fl, "%s %d %.2f %s\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil), temp2);
+	
+	// 'A': applies
+	write_applies_to_file(fl, ABIL_APPLIES(abil));
+	
+	// 'C' command
+	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
+		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
+	}
+	
+	// 'X' type data
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		strcpy(temp, bitv_to_alpha(ABILT_BUFF));
+		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
+		fprintf(fl, "X %s\n%d %d %d %s\n", temp, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), temp2);
+	}
+	
+	// 'T' types
+	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+		fprintf(fl, "T %s %d\n", bitv_to_alpha(at->type), at->weight);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -878,6 +1726,9 @@ void save_olc_ability(descriptor_data *desc) {
 	if (ABIL_NAME(proto)) {
 		free(ABIL_NAME(proto));
 	}
+	if (ABIL_COMMAND(proto)) {
+		free(ABIL_COMMAND(proto));
+	}
 	
 	// sanity
 	if (!ABIL_NAME(abil) || !*ABIL_NAME(abil)) {
@@ -886,6 +1737,12 @@ void save_olc_ability(descriptor_data *desc) {
 		}
 		ABIL_NAME(abil) = str_dup(default_ability_name);
 	}
+	if (ABIL_COMMAND(abil) && !*ABIL_COMMAND(abil)) {
+		free(ABIL_COMMAND(abil));	// don't allow empty
+		ABIL_COMMAND(abil) = NULL;
+	}
+	free_custom_messages(ABIL_CUSTOM_MSGS(proto));
+	free_apply_list(ABIL_APPLIES(proto));
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
@@ -911,6 +1768,8 @@ void save_olc_ability(descriptor_data *desc) {
 * @return ability_data* The copied ability.
 */
 ability_data *setup_olc_ability(ability_data *input) {
+	extern struct apply_data *copy_apply_list(struct apply_data *input);
+	
 	ability_data *new;
 	
 	CREATE(new, ability_data, 1);
@@ -922,6 +1781,9 @@ ability_data *setup_olc_ability(ability_data *input) {
 
 		// copy things that are pointers
 		ABIL_NAME(new) = ABIL_NAME(input) ? str_dup(ABIL_NAME(input)) : NULL;
+		ABIL_COMMAND(new) = ABIL_COMMAND(input) ? str_dup(ABIL_COMMAND(input)) : NULL;
+		ABIL_CUSTOM_MSGS(new) = copy_custom_messages(ABIL_CUSTOM_MSGS(input));
+		ABIL_APPLIES(new) = copy_apply_list(ABIL_APPLIES(input));
 	}
 	else {
 		// brand new: some defaults
@@ -943,8 +1805,11 @@ ability_data *setup_olc_ability(ability_data *input) {
 * @param ability_data *abil The ability to display.
 */
 void do_stat_ability(char_data *ch, ability_data *abil) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
+	struct custom_message *custm;
+	struct apply_data *app;
 	size_t size;
+	int count;
 	
 	if (!abil) {
 		return;
@@ -953,10 +1818,70 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
 
-	size += snprintf(buf + size, sizeof(buf) - size, "Mastery ability: [\ty%d\t0] \ty%s\t0\r\n", ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	size += snprintf(buf + size, sizeof(buf) - size, "Scale: [\ty%d%%\t0], Mastery ability: [\ty%d\t0] \ty%s\t0\r\n", (int)(ABIL_SCALE(abil) * 100), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	
+	get_ability_type_display(ABIL_TYPE_LIST(abil), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Types: \tc%s\t0\r\n", part);
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
+	
+	// command-related portion
+	if (!ABIL_COMMAND(abil)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Min position: [\tc%s\t0]\r\n", ABIL_COMMAND(abil), position_types[ABIL_MIN_POS(abil)]);
+		
+		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
+		
+		// type-specific data
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+				strcpy(part, "unlimited");
+			}
+			else {
+				snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
+			}
+			if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+				strcpy(part2, "unlimited");
+			}
+			else {
+				snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+			
+			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
+			size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
+			
+			// applies
+			size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+			count = 0;
+			LL_FOREACH(ABIL_APPLIES(abil), app) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
+			}
+			if (!ABIL_APPLIES(abil)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "none");
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		}
+	}
+	
+	if (ABIL_CUSTOM_MSGS(abil)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
+		
+		LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
+		}
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -971,6 +1896,9 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 void olc_show_ability(char_data *ch) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct custom_message *custm;
+	struct apply_data *apply;
+	int count;
 	
 	if (!abil) {
 		return;
@@ -981,10 +1909,65 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(ABIL_NAME(abil)));
 	
+	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf);
+	sprintf(buf + strlen(buf), "<\tytypes\t0> %s\r\n", lbuf);
+	
 	sprintf(buf + strlen(buf), "<\tymasteryability\t0> %d %s\r\n", ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	sprintf(buf + strlen(buf), "<\tyscale\t0> %d%%\r\n", (int)(ABIL_SCALE(abil) * 100));
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	
+	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<\tyimmunities\t0> %s\r\n", lbuf);
+	
+	// command-related portion
+	if (!ABIL_COMMAND(abil)) {
+		sprintf(buf + strlen(buf), "<\tycommand\t0> (not a command)\r\n");
+	}
+	else {
+		sprintf(buf + strlen(buf), "<\tycommand\t0> %s, <\tyminposition\t0> %s (minimum)\r\n", ABIL_COMMAND(abil), position_types[ABIL_MIN_POS(abil)]);
+		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
+		sprintf(buf + strlen(buf), "<\tytargets\t0> %s\r\n", lbuf);
+		sprintf(buf + strlen(buf), "<\tycost\t0> %d, <\tycosttype\t0> %s\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+		sprintf(buf + strlen(buf), "<\tycooldown\t0> [%d] %s, <\tycdtime\t0> %d second%s\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		sprintf(buf + strlen(buf), "<\tywaittype\t0> %s, <\tylinkedtrait\t0> %s\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
+		
+		// type-specific data
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+				sprintf(buf + strlen(buf), "<\tyshortduration\t0> unlimited, ");
+			}
+			else {
+				sprintf(buf + strlen(buf), "<\tyshortduration\t0> %d second%s, ", ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
+			}
+			
+			if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+				sprintf(buf + strlen(buf), "<\tylongduration\t0> unlimited\r\n");
+			}
+			else {
+				sprintf(buf + strlen(buf), "<\tylongduration\t0> %d second%s\r\n", ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
+			}
+			
+			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<\tyaffects\t0> %s\r\n", lbuf);
+			
+			sprintf(buf + strlen(buf), "Applies: <\tyapply\t0>\r\n");
+			count = 0;
+			LL_FOREACH(ABIL_APPLIES(abil), apply) {
+				sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
+			}
+			
+			sprintf(buf + strlen(buf), "<\tyaffectvnum\t0> %d %s\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+		}
+	}
+	
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
+	count = 0;
+	LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
+		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, ability_custom_types[custm->type], custm->msg);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -1014,9 +1997,188 @@ int vnum_ability(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
+OLC_MODULE(abiledit_affects) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_BUFF;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else {
+		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, ABIL_AFFECTS(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_affectvnum) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	any_vnum old;
+	
+	bitvector_t allowed_types = ABILT_BUFF;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		ABIL_AFFECT_VNUM(abil) = NOTHING;
+		msg_to_char(ch, "It no longer has a custom affect type.\r\n");
+	}
+	else {
+		old = ABIL_AFFECT_VNUM(abil);
+		ABIL_AFFECT_VNUM(abil) = olc_process_number(ch, argument, "affect vnum", "affectvnum", 0, MAX_VNUM, ABIL_AFFECT_VNUM(abil));
+
+		if (!find_generic(ABIL_AFFECT_VNUM(abil), GENERIC_AFFECT)) {
+			msg_to_char(ch, "Invalid affect generic vnum %d. Old value restored.\r\n", ABIL_AFFECT_VNUM(abil));
+			ABIL_AFFECT_VNUM(abil) = old;
+		}
+	}
+}
+
+
+OLC_MODULE(abiledit_apply) {
+	void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	olc_process_applies(ch, argument, &ABIL_APPLIES(abil));
+}
+
+
+OLC_MODULE(abiledit_cdtime) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else if (ABIL_COOLDOWN(abil) == NOTHING) {
+		msg_to_char(ch, "Set a cooldown vnum first.\r\n");
+	}
+	else {
+		ABIL_COOLDOWN_SECS(abil) = olc_process_number(ch, argument, "cooldown time", "cdtime", 0, INT_MAX, ABIL_COOLDOWN_SECS(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_command) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!str_cmp(argument, "none")) {
+		if (ABIL_COMMAND(abil)) {
+			free(ABIL_COMMAND(abil));
+		}
+		ABIL_COMMAND(abil) = NULL;
+		
+		// clear other data
+		ABIL_TARGETS(abil) = NOBITS;
+		
+		msg_to_char(ch, "It no longer has a command.\r\n");
+	}
+	else if (strchr(argument, ' ')) {
+		msg_to_char(ch, "Commands can only be 1 word long (no spaces).\r\n");
+	}
+	else if (!isalpha(*argument)) {
+		msg_to_char(ch, "Command must start with a letter.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "command", &ABIL_COMMAND(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_cooldown) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	any_vnum old;
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		ABIL_COOLDOWN(abil) = NOTHING;
+		ABIL_COOLDOWN_SECS(abil) = 0;
+		msg_to_char(ch, "It no longer has a cooldown.\r\n");
+	}
+	else {
+		old = ABIL_COOLDOWN(abil);
+		ABIL_COOLDOWN(abil) = olc_process_number(ch, argument, "cooldown vnum", "cooldown", 0, MAX_VNUM, ABIL_COOLDOWN(abil));
+
+		if (!find_generic(ABIL_COOLDOWN(abil), GENERIC_COOLDOWN)) {
+			msg_to_char(ch, "Invalid cooldown generic vnum %d. Old value restored.\r\n", ABIL_COOLDOWN(abil));
+			ABIL_COOLDOWN(abil) = old;
+		}
+	}
+}
+
+
+OLC_MODULE(abiledit_cost) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_COST(abil) = olc_process_number(ch, argument, "cost", "cost", 0, INT_MAX, ABIL_COST(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_costtype) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_COST_TYPE(abil) = olc_process_type(ch, argument, "cost type", "costtype", pool_types, ABIL_COST_TYPE(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_custom) {
+	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	olc_process_custom_messages(ch, argument, &ABIL_CUSTOM_MSGS(abil), ability_custom_types);
+}
+
+
 OLC_MODULE(abiledit_flags) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);	
 	ABIL_FLAGS(abil) = olc_process_flag(ch, argument, "ability", "flags", ability_flags, ABIL_FLAGS(abil));
+}
+
+
+OLC_MODULE(abiledit_immunities) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	ABIL_IMMUNITIES(abil) = olc_process_flag(ch, argument, "immunity", "immunities", affected_bits, ABIL_IMMUNITIES(abil));
+}
+
+
+OLC_MODULE(abiledit_linkedtrait) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_LINKED_TRAIT(abil) = olc_process_type(ch, argument, "linked trait", "linkedtrait", apply_types, ABIL_LINKED_TRAIT(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_longduration) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_BUFF;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else if (is_abbrev(argument, "unlimited")) {
+		ABIL_LONG_DURATION(abil) = UNLIMITED;
+		msg_to_char(ch, "It now has unlimited long duration.\r\n");
+	}
+	else {
+		ABIL_LONG_DURATION(abil) = olc_process_number(ch, argument, "long duration", "longduration", 1, MAX_INT, ABIL_LONG_DURATION(abil));
+	}
 }
 
 
@@ -1047,7 +2209,176 @@ OLC_MODULE(abiledit_masteryability) {
 }
 
 
+OLC_MODULE(abiledit_minposition) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_MIN_POS(abil) = olc_process_type(ch, argument, "position", "minposition", position_types, ABIL_MIN_POS(abil));
+	}
+}
+
+
 OLC_MODULE(abiledit_name) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_string(ch, argument, "name", &ABIL_NAME(abil));
+}
+
+
+OLC_MODULE(abiledit_scale) {
+	int scale;
+	
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	scale = olc_process_number(ch, argument, "scale", "scale", 1, 1000, ABIL_SCALE(abil) * 100);
+	ABIL_SCALE(abil) = scale / 100.0;
+}
+
+
+OLC_MODULE(abiledit_shortduration) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_BUFF;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else if (is_abbrev(argument, "unlimited")) {
+		ABIL_SHORT_DURATION(abil) = UNLIMITED;
+		msg_to_char(ch, "It now has unlimited short duration.\r\n");
+	}
+	else {
+		ABIL_SHORT_DURATION(abil) = olc_process_number(ch, argument, "short duration", "shortduration", 1, MAX_INT, ABIL_SHORT_DURATION(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_targets) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_TARGETS(abil) = olc_process_flag(ch, argument, "target", "targets", ability_target_flags, ABIL_TARGETS(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_types) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], *weight_arg;
+	struct ability_type *at, *next_at, *change;
+	int iter, typeid, weight;
+	bool found;
+	
+	// arg1 arg2
+	half_chop(argument, arg1, arg2);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which type?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			while ((at = ABIL_TYPE_LIST(abil))) {
+				remove_type_from_ability(abil, at->type);
+			}
+			msg_to_char(ch, "You remove all the types.\r\n");
+		}
+		else if ((typeid = search_block(arg2, ability_type_flags, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type to remove.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH_SAFE(ABIL_TYPE_LIST(abil), at, next_at) {
+				if (at->type == BIT(typeid)) {
+					found = TRUE;
+					sprintbit(BIT(typeid), ability_type_flags, buf, TRUE);
+					msg_to_char(ch, "You remove %s.\r\n", buf);
+					LL_DELETE(ABIL_TYPE_LIST(abil), at);
+					free(at);
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "None of that type to remove.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		weight_arg = any_one_word(arg2, arg);
+		skip_spaces(&weight_arg);
+		
+		if (!*arg || !*weight_arg) {
+			msg_to_char(ch, "Usage: types add <type> <weight>\r\n");
+		}
+		else if ((typeid = search_block(arg, ability_type_flags, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
+		}
+		else if (!isdigit(*weight_arg) || (weight = atoi(weight_arg)) < 1) {
+			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
+		}
+		else {
+			add_type_to_ability(abil, BIT(typeid), weight);
+			sprintbit(BIT(typeid), ability_type_flags, buf, TRUE);
+			msg_to_char(ch, "You add a type: %s(%d)\r\n", buf, weight);
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, val_arg);
+		
+		if (!*num_arg || !*val_arg || !isdigit(*val_arg)) {
+			msg_to_char(ch, "Usage: types change <type> <weight>\r\n");
+			return;
+		}
+		if ((typeid = search_block(num_arg, ability_type_flags, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", num_arg);
+			return;
+		}
+		
+		// find which one to change
+		change = NULL;
+		LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+			if (at->type == BIT(typeid)) {
+				change = at;
+				break;
+			}
+		}
+		
+		sprintbit(BIT(typeid), ability_type_flags, buf, TRUE);
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid type.\r\n");
+		}
+		else if ((weight = atoi(val_arg)) < 1) {
+			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
+		}
+		else {
+			change->weight = weight;
+			msg_to_char(ch, "Type '%s' changed to weight: %d\r\n", buf, weight);
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: types add <type> <weight>\r\n");
+		msg_to_char(ch, "Usage: types change <type> <weight>\r\n");
+		msg_to_char(ch, "Usage: custom remove <type | all>\r\n");
+		msg_to_char(ch, "Available types:\r\n");
+		for (iter = 0; *ability_type_flags[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %s\r\n", ability_type_flags[iter]);
+		}
+	}
+}
+
+
+OLC_MODULE(abiledit_waittype) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_WAIT_TYPE(abil) = olc_process_type(ch, argument, "wait type", "waittype", wait_types, ABIL_WAIT_TYPE(abil));
+	}
 }

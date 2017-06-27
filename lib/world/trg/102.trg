@@ -32,7 +32,7 @@ done
 Zelkab Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)%
+if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -92,7 +92,7 @@ done
 Garlgarl Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)%
+if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -141,7 +141,7 @@ Filks Archer Combat~
 Filks Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)%
+if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -197,7 +197,7 @@ Walts Sapper Combat~
 Walts Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)%
+if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -266,7 +266,7 @@ done
 Nilbog Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)%
+if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end

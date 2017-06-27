@@ -76,6 +76,7 @@ void affect_total(char_data *ch);
 void affect_total_room(room_data *room);
 extern bool affected_by_spell(char_data *ch, any_vnum type);
 extern bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply);
+bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster);
 extern struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
 void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
@@ -231,8 +232,14 @@ extern obj_data *unequip_char_to_room(char_data *ch, int pos);
 // custom message handlers
 extern struct custom_message *copy_custom_messages(struct custom_message *from);
 void free_custom_messages(struct custom_message *mes);
-extern char *get_custom_message(obj_data *obj, int type);
-extern bool has_custom_message(obj_data *obj, int type);
+extern char *get_custom_message(struct custom_message *list, int type);
+extern bool has_custom_message(struct custom_message *list, int type);
+
+// custom message helpers
+#define obj_get_custom_message(obj, type)  get_custom_message(obj->custom_msgs, type)
+#define obj_has_custom_message(obj, type)  has_custom_message(obj->custom_msgs, type)
+#define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)
+#define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 
 // object targeting handlers
 extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);

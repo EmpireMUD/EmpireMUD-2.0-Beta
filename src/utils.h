@@ -94,15 +94,39 @@
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY UTILS ///////////////////////////////////////////////////////////
 
+#define ABIL_AFFECTS(abil)  ((abil)->affects)
+#define ABIL_AFFECT_VNUM(abil)  ((abil)->affect_vnum)
+#define ABIL_APPLIES(abil)  ((abil)->applies)
 #define ABIL_ASSIGNED_SKILL(abil)  ((abil)->assigned_skill)
+#define ABIL_COMMAND(abil)  ((abil)->command)
+#define ABIL_COOLDOWN(abil)  ((abil)->cooldown)
+#define ABIL_COOLDOWN_SECS(abil)  ((abil)->cooldown_secs)
+#define ABIL_COST(abil)  ((abil)->cost)
+#define ABIL_COST_TYPE(abil)  ((abil)->cost_type)
+#define ABIL_CUSTOM_MSGS(abil)  ((abil)->custom_msgs)
 #define ABIL_FLAGS(abil)  ((abil)->flags)
+#define ABIL_IMMUNITIES(abil)  ((abil)->immunities)
+#define ABIL_LINKED_TRAIT(abil)  ((abil)->linked_trait)
+#define ABIL_LONG_DURATION(abil)  ((abil)->long_duration)
 #define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)
+#define ABIL_MIN_POS(abil)  ((abil)->min_position)
 #define ABIL_NAME(abil)  ((abil)->name)
+#define ABIL_SCALE(abil)  ((abil)->scale)
+#define ABIL_SHORT_DURATION(abil)  ((abil)->short_duration)
 #define ABIL_SKILL_LEVEL(abil)  ((abil)->skill_level)
+#define ABIL_TARGETS(abil)  ((abil)->targets)
+#define ABIL_TYPES(abil)  ((abil)->types)
+#define ABIL_TYPE_LIST(abil)  ((abil)->type_list)
 #define ABIL_VNUM(abil)  ((abil)->vnum)
+#define ABIL_WAIT_TYPE(abil)  ((abil)->wait_type)
+
+
+// type-specific data
+#define ABIL_AFFECT_VNUM(abil)  ((abil)->affect_vnum)
 
 // utils
 #define ABILITY_FLAGGED(abil, flag)  IS_SET(ABIL_FLAGS(abil), (flag))
+#define SAFE_ABIL_COMMAND(abil)  (ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "something")
 
 
  //////////////////////////////////////////////////////////////////////////////

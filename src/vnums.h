@@ -294,6 +294,7 @@
 #define ATYPE_RANGED_WEAPON  3079
 #define ATYPE_CHARGE  3080
 #define ATYPE_TRICK_SHOT  3081
+#define ATYPE_BUFF  3082
 
 
 // GENERIC_COOLDOWN entires used by the code

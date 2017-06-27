@@ -582,7 +582,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 		}
 		
 		LL_FOREACH (SCRIPT(obj)->global_vars, tvd) {
-			if (*tvd->name == '-') { // don't save if it begins with -
+			if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 				continue;
 			}
 			
@@ -662,17 +662,14 @@ void auto_equip(char_data *ch, obj_data *obj, int *location) {
 * @param obj_data *obj The object.
 * @param char_data *ch The person to give/equip it to.
 * @param int location Where it should be equipped.
+* @param obj_data ***cont_row For putting items back in containers (must be at least MAX_BAG_ROWS long).
 */
-void loaded_obj_to_char(obj_data *obj, char_data *ch, int location) {
-	obj_data *obj2, *cont_row[MAX_BAG_ROWS];
+void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row) {
+	obj_data *obj2;
 	int iter;
 	
 	if (!obj || !ch) {
 		return;
-	}
-	
-	for (iter = 0; iter < MAX_BAG_ROWS; ++iter) {
-		cont_row[iter] = NULL;
 	}
 	
 	auto_equip(ch, obj, &location);
@@ -701,61 +698,61 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location) {
 	 */
 	if (location > 0) {		/* Equipped */
 		for (iter = MAX_BAG_ROWS - 1; iter > 0; --iter) {
-			if (cont_row[iter]) {	/* No container, back to inventory. */
-				for (; cont_row[iter]; cont_row[iter] = obj2) {
-					obj2 = cont_row[iter]->next_content;
-					obj_to_char(cont_row[iter], ch);
+			if ((*cont_row)[iter]) {	/* No container, back to inventory. */
+				for (; (*cont_row)[iter]; (*cont_row)[iter] = obj2) {
+					obj2 = (*cont_row)[iter]->next_content;
+					obj_to_char((*cont_row)[iter], ch);
 				}
-				cont_row[iter] = NULL;
+				(*cont_row)[iter] = NULL;
 			}
 		}
-		if (cont_row[0]) {	/* Content list existing. */
+		if ((*cont_row)[0]) {	/* Content list existing. */
 			if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CART || IS_CORPSE(obj)) {
 				/* Remove object, fill it, equip again. */
 				obj = unequip_char(ch, location - 1);
 				obj->contains = NULL;	/* Should be NULL anyway, but just in case. */
-				for (; cont_row[0]; cont_row[0] = obj2) {
-					obj2 = cont_row[0]->next_content;
-					obj_to_obj(cont_row[0], obj);
+				for (; (*cont_row)[0]; (*cont_row)[0] = obj2) {
+					obj2 = (*cont_row)[0]->next_content;
+					obj_to_obj((*cont_row)[0], obj);
 				}
 				equip_char(ch, obj, location - 1);
 			}
 			else {			/* Object isn't container, empty the list. */
-				for (; cont_row[0]; cont_row[0] = obj2) {
-					obj2 = cont_row[0]->next_content;
-					obj_to_char(cont_row[0], ch);
+				for (; (*cont_row)[0]; (*cont_row)[0] = obj2) {
+					obj2 = (*cont_row)[0]->next_content;
+					obj_to_char((*cont_row)[0], ch);
 				}
-				cont_row[0] = NULL;
+				(*cont_row)[0] = NULL;
 			}
 		}
 	}
 	else {	/* location <= 0 */
 		for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
-			if (cont_row[iter]) {	/* No container, back to inventory. */
-				for (; cont_row[iter]; cont_row[iter] = obj2) {
-					obj2 = cont_row[iter]->next_content;
-					obj_to_char(cont_row[iter], ch);
+			if ((*cont_row)[iter]) {	/* No container, back to inventory. */
+				for (; (*cont_row)[iter]; (*cont_row)[iter] = obj2) {
+					obj2 = (*cont_row)[iter]->next_content;
+					obj_to_char((*cont_row)[iter], ch);
 				}
-				cont_row[iter] = NULL;
+				(*cont_row)[iter] = NULL;
 			}
 		}
-		if (iter == -location && cont_row[iter]) {	/* Content list exists. */
+		if (iter == -location && (*cont_row)[iter]) {	/* Content list exists. */
 			if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CART || IS_CORPSE(obj)) {
 				/* Take the item, fill it, and give it back. */
 				obj_from_char(obj);
 				obj->contains = NULL;
-				for (; cont_row[iter]; cont_row[iter] = obj2) {
-					obj2 = cont_row[iter]->next_content;
-					obj_to_obj(cont_row[iter], obj);
+				for (; (*cont_row)[iter]; (*cont_row)[iter] = obj2) {
+					obj2 = (*cont_row)[iter]->next_content;
+					obj_to_obj((*cont_row)[iter], obj);
 				}
 				obj_to_char(obj, ch);	/* Add to inventory first. */
 			}
 			else {	/* Object isn't container, empty content list. */
-				for (; cont_row[iter]; cont_row[iter] = obj2) {
-					obj2 = cont_row[iter]->next_content;
-					obj_to_char(cont_row[iter], ch);
+				for (; (*cont_row)[iter]; (*cont_row)[iter] = obj2) {
+					obj2 = (*cont_row)[iter]->next_content;
+					obj_to_char((*cont_row)[iter], ch);
 				}
-				cont_row[iter] = NULL;
+				(*cont_row)[iter] = NULL;
 			}
 		}
 		if (location < 0 && location >= -MAX_BAG_ROWS) {
@@ -765,14 +762,14 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location) {
 			 * the character rented.
 			 */
 			obj_from_char(obj);
-			if ((obj2 = cont_row[-location - 1]) != NULL) {
+			if ((obj2 = (*cont_row)[-location - 1]) != NULL) {
 				while (obj2->next_content) {
 					obj2 = obj2->next_content;
 				}
 				obj2->next_content = obj;
 			}
 			else {
-				cont_row[-location - 1] = obj;
+				(*cont_row)[-location - 1] = obj;
 			}
 		}
 	}

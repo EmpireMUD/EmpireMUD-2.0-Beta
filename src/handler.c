@@ -863,6 +863,28 @@ bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply) {
 
 
 /**
+* Matches both an ATYPE or affect generic, and a caster ID.
+*
+* @param char_data *ch The person to look for an affect on.
+* @param any_vnum type The ATYPE_ const or affect generic.
+* @param char_data *caster The caster to look for.
+* @return bool TRUE if so-affected, FALSE if not.
+*/
+bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster) {
+	struct affected_type *hjp;
+	bool found = FALSE;
+	
+	for (hjp = ch->affected; hjp && !found; hjp = hjp->next) {
+		if (hjp->type == type && hjp->cast_by == CAST_BY_ID(caster)) {
+			found = TRUE;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
 * Create an affect that modifies a trait.
 *
 * @param any_vnum type ATYPE_ const/vnum
@@ -4741,6 +4763,10 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		if (IN_ROOM(ch) && OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))++;
 		}
+		
+		if (IS_CONTAINER(obj)) {
+			IS_CARRYING_N(ch) += obj_carry_size(obj);
+		}
 
 		if (wear_data[pos].count_stats) {
 			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
@@ -4802,6 +4828,12 @@ void obj_from_obj(obj_data *obj) {
 		REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
 
 		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
+		if (obj_from->carried_by) {
+			IS_CARRYING_N(obj_from->carried_by) -= obj_carry_size(obj);
+		}
+		if (obj_from->worn_by && IS_CONTAINER(obj_from)) {
+			IS_CARRYING_N(obj_from->worn_by) -= obj_carry_size(obj);
+		}
 
 		obj->in_obj = NULL;
 		obj->next_content = NULL;
@@ -5013,9 +5045,15 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 	}
 	else {
 		check_obj_in_void(obj);
-	
+		
 		GET_OBJ_CARRYING_N(obj_to) += obj_carry_size(obj);
-
+		if (obj_to->carried_by) {
+			IS_CARRYING_N(obj_to->carried_by) += obj_carry_size(obj);
+		}
+		if (obj_to->worn_by && IS_CONTAINER(obj_to)) {
+			IS_CARRYING_N(obj_to->worn_by) += obj_carry_size(obj);
+		}
+		
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
 		
@@ -5150,6 +5188,10 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		if (IN_ROOM(ch) && OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))--;
 		}
+		
+		if (IS_CONTAINER(obj)) {
+			IS_CARRYING_N(ch) -= obj_carry_size(obj);
+		}
 
 		// actual remove
 		GET_EQ(ch, pos) = NULL;
@@ -5261,21 +5303,21 @@ void free_custom_messages(struct custom_message *mes) {
 
 
 /**
-* This gets a custom message of a given type for an object. If there is more
+* This gets a custom message of a given type from a list. If there is more
 * than one message of the requested type, it returns one at random. You will
 * get back a null if there are no messages of the requested type; you can check
 * this ahead of time with has_custom_message().
 *
-* @param obj_data *obj The object.
-* @param int type The OBJ_CUSTOM_x type of message.
+* @param struct custom_message *list The list of messages to check.
+* @param int type The type const for the message.
 * @return char* The custom message, or NULL if there is none.
 */
-char *get_custom_message(obj_data *obj, int type) {
+char *get_custom_message(struct custom_message *list, int type) {
 	struct custom_message *ocm;
 	char *found = NULL;
 	int num_found = 0;
 	
-	for (ocm = obj->custom_msgs; ocm; ocm = ocm->next) {
+	LL_FOREACH(list, ocm) {
 		if (ocm->type == type) {
 			if (!number(0, num_found++) || !found) {
 				found = ocm->msg;
@@ -5288,17 +5330,18 @@ char *get_custom_message(obj_data *obj, int type) {
 
 
 /**
-* @param obj_data *obj The object to check.
-* @param int type Any OBJ_CUSTOM_x type.
+* @param struct custom_message *list The list of messages to check.
+* @param int type The type const for the message.
 * @return bool TRUE if the object has at least one message of the requested type.
 */
-bool has_custom_message(obj_data *obj, int type) {
+bool has_custom_message(struct custom_message *list, int type) {
 	struct custom_message *ocm;
 	bool found = FALSE;
 	
-	for (ocm = obj->custom_msgs; ocm && !found; ocm = ocm->next) {
+	LL_FOREACH(list, ocm) {
 		if (ocm->type == type) {
 			found = TRUE;
+			break;
 		}
 	}
 	
