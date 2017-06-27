@@ -126,8 +126,8 @@ const char *ability_flags[] = {
 const char *ability_type_flags[] = {
 	"CRAFT",	// 0
 	"BUFF",
-	"DAMAGE",
 /*
+	"DAMAGE",
 	"AFFECTS",
 	"UNAFFECTS",
 	"POINTS",
