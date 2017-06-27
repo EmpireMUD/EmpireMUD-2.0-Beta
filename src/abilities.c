@@ -820,7 +820,7 @@ int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vic
 * @param char *argument The typed-in args.
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL;
 	char_data *targ = NULL;
 	obj_data *obj = NULL;
@@ -915,7 +915,8 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			has = TRUE;
 		}
 		if (!has) {
-			msg_to_char(ch, "%s %s?\r\n", SAFE_ABIL_COMMAND(abil), IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
+			snprintf(buf, sizeof(buf), "%s %s?\r\n", SAFE_ABIL_COMMAND(abil), IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
+			msg_to_char(ch, "%s", CAP(buf));
 			return;
 		}
 	}
@@ -1741,6 +1742,7 @@ void save_olc_ability(descriptor_data *desc) {
 		ABIL_COMMAND(abil) = NULL;
 	}
 	free_custom_messages(ABIL_CUSTOM_MSGS(proto));
+	free_apply_list(ABIL_APPLIES(proto));
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
@@ -1766,6 +1768,8 @@ void save_olc_ability(descriptor_data *desc) {
 * @return ability_data* The copied ability.
 */
 ability_data *setup_olc_ability(ability_data *input) {
+	extern struct apply_data *copy_apply_list(struct apply_data *input);
+	
 	ability_data *new;
 	
 	CREATE(new, ability_data, 1);
@@ -1779,6 +1783,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 		ABIL_NAME(new) = ABIL_NAME(input) ? str_dup(ABIL_NAME(input)) : NULL;
 		ABIL_COMMAND(new) = ABIL_COMMAND(input) ? str_dup(ABIL_COMMAND(input)) : NULL;
 		ABIL_CUSTOM_MSGS(new) = copy_custom_messages(ABIL_CUSTOM_MSGS(input));
+		ABIL_APPLIES(new) = copy_apply_list(ABIL_APPLIES(input));
 	}
 	else {
 		// brand new: some defaults
