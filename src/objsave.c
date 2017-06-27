@@ -582,7 +582,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 		}
 		
 		LL_FOREACH (SCRIPT(obj)->global_vars, tvd) {
-			if (*tvd->name == '-') { // don't save if it begins with -
+			if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 				continue;
 			}
 			

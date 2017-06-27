@@ -4700,7 +4700,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			
 			// triggers: C V
 			LL_FOREACH(SCRIPT(room)->global_vars, tvd) {
-				if (*tvd->name == '-') { // don't save if it begins with -
+				if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 					continue;
 				}
 				
@@ -4738,7 +4738,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 						// triggers: C V type context name~
 						//           value~
 						LL_FOREACH(SCRIPT(mob)->global_vars, tvd) {
-							if (*tvd->name == '-') { // don't save if it begins with -
+							if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 								continue;
 							}
 							

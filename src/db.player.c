@@ -2636,7 +2636,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'V'
 	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
 		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
-			if (*vars->name == '-') { // don't save if it begins with -
+			if (*vars->name == '-' || !*vars->value) { // don't save if it begins with - or is empty
 				continue;
 			}
 			

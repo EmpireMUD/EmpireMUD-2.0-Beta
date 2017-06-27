@@ -963,7 +963,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		}
 		
 		LL_FOREACH (SCRIPT(veh)->global_vars, tvd) {
-			if (*tvd->name == '-') { // don't save if it begins with -
+			if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 				continue;
 			}
 			
