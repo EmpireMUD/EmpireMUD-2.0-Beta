@@ -790,13 +790,13 @@ int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vic
 	// now create affects for each apply that we can afford
 	if (total_w > 0) {
 		LL_FOREACH(ABIL_APPLIES(abil), apply) {
-			share = total_points * (double) apply->weight / (double) total_w;
-			if (ABSOLUTE(share) > remaining_points) {
-				share = (share < 0 ? -1 : 1) * MIN(ABSOLUTE(share), remaining_points);
+			share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
+			if (share > remaining_points) {
+				share = MIN(share, remaining_points);
 			}
-			amt = round(share / apply_values[apply->location]);
+			amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
 			if (share > 0 && amt != 0) {
-				remaining_points -= ABSOLUTE(share);
+				remaining_points -= share;
 				remaining_points = MAX(0, total_points);
 				
 				af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
