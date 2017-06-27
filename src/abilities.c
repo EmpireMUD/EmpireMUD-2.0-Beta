@@ -1928,8 +1928,6 @@ void olc_show_ability(char_data *ch) {
 		
 		// type-specific data
 		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-			sprintf(buf + strlen(buf), "<\tyaffectvnum\t0> %d %s\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-			
 			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 				sprintf(buf + strlen(buf), "<\tyshortduration\t0> unlimited, ");
 			}
@@ -1952,6 +1950,8 @@ void olc_show_ability(char_data *ch) {
 			LL_FOREACH(ABIL_APPLIES(abil), apply) {
 				sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
 			}
+			
+			sprintf(buf + strlen(buf), "<\tyaffectvnum\t0> %d %s\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 		}
 	}
 	

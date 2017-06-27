@@ -508,7 +508,7 @@ Usage:  .affects [add | remove] <flag>
 For buff abilities, these are affect flags that are placed on the target of the
 ability.
 
-See also: AFFECT FLAGS, OLC ABILITIES
+See also: AFFECT FLAGS, OLC ABILITIES, BUFF ABILITY
 #d
 "ABILEDIT AFFECTVNUM" "ABILEDIT AFFECT VNUM"
 
@@ -521,7 +521,7 @@ wears off.
 If you don't specify an ability, it will just say 'buff' and will have no wear-
 off message.
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, BUFF ABILITY
 #d
 "ABILEDIT APPLY" "ABILEDIT APPLIES"
 
@@ -537,9 +537,9 @@ other positive applies.
 
 For a list of the applies, see: HELP OEDIT APPLY
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, BUFF ABILITY
 #d
-"ABILEDIT BUFF ABILITY" "BUFF ABILITY"
+"ABILEDIT BUFF ABILITY" "BUFF ABILITY" "BUFF ABILITIES"
 
 The BUFF ability type means that the ability gives some affects to the target.
 This includes 'debuffs', which give negative abilities to enemies.
@@ -547,11 +547,11 @@ This includes 'debuffs', which give negative abilities to enemies.
 You must always set the VIOLENT flag on a debuff.
 
 Buff abilities have the following properties:
- <&yaffectvnum&0> Which affect (generic) to use for the buff.
  <&yshortduration&0> How long it lasts (at low level).
  <&ylongduration&0> How long it lasts (at class level).
  <&yaffects&0> Affect flags to set.
  <&yapply&0> Trait modifiers to give.
+ <&yaffectvnum&0> Which affect (generic) to use for the buff.
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
@@ -734,7 +734,7 @@ users and class abilities.
 
 You can also choose to set both durations to the same amount of time.
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, BUFF ABILITIES
 #d
 "ABILEDIT TARGETS"
 
@@ -750,7 +750,7 @@ modify each other. They are:
  &yFIGHT-VICTIM&0 - Modifier: Targets victim if no argument while fighting.
  &ySELF-ONLY&0 - Modifier: Can only target yourself.
  &yNOT-SELF&0 - Modifier: Character target cannot be self.
- &cOBJ-INF&0 - Targets an object in your inventory.
+ &cOBJ-INV&0 - Targets an object in your inventory.
  &cOBJ-ROOM&0 - Targets an object on the ground.
  &cOBJ-WORLD&0 - Targets an object anywhere.
  &cOBJ-EQUIP&0 - Targets an object you're wearing.
