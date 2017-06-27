@@ -135,6 +135,22 @@ longer durations, and this ability may stack up to 5 times.
 
 Gain experience when you inflict deep cuts.
 #
+DEFEND
+
+Defend (Battle ability)
+
+Usage:  defend
+Cooldown:  60 seconds
+Duration: 30 seconds / unlimited at class level
+Cost:  30 move
+
+The defend ability temporarily raises your dodge rating at the cost of your
+to-hit rating. Use it to survive in battle.
+
+At class level, this ability becomes a toggle and you can turn it off at will.
+
+Gain experience when you activate Defend.
+#
 DISARM DISARMED
 
 Disarm (Battle ability)
@@ -252,6 +268,22 @@ increases your chance of successfully fleeing from combat.
 Gain experience when you successfully flee from combat.
 
 See also: FLEE
+#
+FRENZY
+
+Frenzy (Battle ability)
+
+Usage:  frenzy
+Cooldown:  60 seconds
+Duration: 30 seconds / unlimited at class level
+Cost:  30 move
+
+The frenzy ability temporarily raises your to-hit rating at the cost of your
+dodge rating. Use it to defeat your enemies with easy.
+
+At class level, this ability becomes a toggle and you can turn it off at will.
+
+Gain experience when you activate Frenzy.
 #
 HEARTSTOP "HEART STOP"
 
@@ -380,7 +412,7 @@ This dodge bonus is reflected on your 'score'.
 Gain experience when someone tries to hit you.
 
 See also: SHIELD BLOCK, QUICK BLOCK, BLOCK ARROWS, MEDIUM ARMOR, OUTRAGE,
-    HEAVY ARMOR, RESCUE, DISARM
+    HEAVY ARMOR, RESCUE, DISARM, DEFEND
 #
 RESCUE
 
@@ -443,7 +475,7 @@ This to-hit bonus is reflected on your 'score'.
 
 Gain experience when you attack something.
 
-See also: LIGHT ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE
+See also: LIGHT ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE, FRENZY
 #
 SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
 
