@@ -1201,7 +1201,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		send_config_msg(ch, "huh_string");
 	}
 	
-	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, !IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype == CTYPE_COMBAT || cmd_info[cmd].ctype == CTYPE_SKILL || cmd_info[cmd].ctype == CTYPE_BUILD))) {
+	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, !IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype != CTYPE_COMBAT && cmd_info[cmd].ctype != CTYPE_SKILL && cmd_info[cmd].ctype != CTYPE_BUILD))) {
 		// sent own error message
 	}
 	else if (GET_FEEDING_FROM(ch) && cmd_info[cmd].minimum_position >= POS_SLEEPING && cmd_info[cmd].command_pointer != do_bite) {
