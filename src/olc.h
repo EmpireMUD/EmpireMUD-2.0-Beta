@@ -76,9 +76,9 @@
 #define OLC_FLAG_NO_GLOBAL  BIT(12)	// cannot edit globals
 #define OLC_FLAG_NO_AUGMENT  BIT(13)	// cannot edit augs
 #define OLC_FLAG_NO_ARCHETYPE  BIT(14)	// cannot edit archetypes
-#define OLC_FLAG_ABILITIES  BIT(15)	// CAN edit abilities
-#define OLC_FLAG_CLASSES  BIT(16)	// CAN edit classes
-#define OLC_FLAG_SKILLS  BIT(17)	// CAN edit skills
+#define OLC_FLAG_NO_ABILITIES  BIT(15)	// CAN edit abilities
+#define OLC_FLAG_NO_CLASSES  BIT(16)	// CAN edit classes
+#define OLC_FLAG_NO_SKILLS  BIT(17)	// CAN edit skills
 #define OLC_FLAG_NO_VEHICLES  BIT(18)	// cannot edit vehicles
 #define OLC_FLAG_NO_MORPHS  BIT(19)	// cannot edit morphs
 #define OLC_FLAG_NO_QUESTS  BIT(19)	// cannot edit quests

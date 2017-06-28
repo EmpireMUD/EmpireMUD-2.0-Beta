@@ -4303,13 +4303,13 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_SECTOR) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SECTORS)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_ABILITY) && OLC_FLAGGED(ch, OLC_FLAG_ABILITIES)) {
+		else if (IS_SET(type, OLC_ABILITY) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ABILITIES)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_CLASS) && OLC_FLAGGED(ch, OLC_FLAG_CLASSES)) {
+		else if (IS_SET(type, OLC_CLASS) && !OLC_FLAGGED(ch, OLC_FLAG_NO_CLASSES)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_SKILL) && OLC_FLAGGED(ch, OLC_FLAG_SKILLS)) {
+		else if (IS_SET(type, OLC_SKILL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SKILLS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_BOOK)) {

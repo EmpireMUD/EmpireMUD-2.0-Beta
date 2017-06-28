@@ -4745,13 +4745,16 @@ Available flags:
  - !GLOBAL -- Cannot edit globals
  - !AUGMENT -- Cannot edit augments
  - !ARCHETYPE -- Cannot edit archetypes
- - ABILITIES -- CAN edit abilities
- - CLASSES -- CAN edit classes
- - SKILLS -- CAN edit skills
+ - !ABILITIES -- Cannot edit abilities
+ - !CLASSES -- Cannot edit classes
+ - !SKILLS -- Cannot edit skills
  - !VEHICLES -- Cannot edit vehicles
  - !MORPHS -- Cannot edit morphs
  - !QUESTS -- Cannot edit quests
  - !SOCIALS -- Cannot edit socials
+ - !FACITONS -- Cannot edit factions
+ - !GENERICS - Cannot edit generics
+ - !SHOPS - Cannot edit shops
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
