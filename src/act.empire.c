@@ -2959,11 +2959,16 @@ ACMD(do_claim) {
 
 ACMD(do_defect) {
 	empire_data *e;
+	
+	skip_spaces(&argument);
 
 	if (IS_NPC(ch))
 		return;
 	else if (!(e = GET_LOYALTY(ch)))
 		msg_to_char(ch, "You don't seem to belong to any empire.\r\n");
+	else if (strcmp(argument, "CONFIRM")) {
+		msg_to_char(ch, "You must type 'defect CONFIRM' (in all caps) to leave your empire.\r\n");
+	}
 	else if (GET_IDNUM(ch) == EMPIRE_LEADER(e))
 		msg_to_char(ch, "The leader can't defect!\r\n");
 	else {
