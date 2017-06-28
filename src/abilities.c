@@ -1315,6 +1315,7 @@ void free_ability(ability_data *abil) {
 */
 void parse_ability(FILE *fl, any_vnum vnum) {
 	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
+	void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 	
 	char line[256], error[256], str_in[256], str_in2[256];
 	ability_data *abil, *find;
@@ -1388,6 +1389,11 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				ABIL_COOLDOWN_SECS(abil) = int_in[4];
 				ABIL_LINKED_TRAIT(abil) = int_in[5];
 				ABIL_WAIT_TYPE(abil) = int_in[6];
+				break;
+			}
+			
+			case 'M': {	// custom messages
+				parse_custom_message(fl, &ABIL_CUSTOM_MSGS(abil), error);
 				break;
 			}
 			
@@ -1493,6 +1499,7 @@ void write_ability_index(FILE *fl) {
 */
 void write_ability_to_file(FILE *fl, ability_data *abil) {
 	void write_applies_to_file(FILE *fl, struct apply_data *list);
+	void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 	
 	char temp[256], temp2[256];
 	struct ability_type *at;
@@ -1520,16 +1527,19 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
 	}
 	
+	// M: custom message
+	write_custom_messages_to_file(fl, 'M', ABIL_CUSTOM_MSGS(abil));
+	
+	// 'T' types
+	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+		fprintf(fl, "T %s %d\n", bitv_to_alpha(at->type), at->weight);
+	}
+	
 	// 'X' type data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		strcpy(temp, bitv_to_alpha(ABILT_BUFF));
 		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
 		fprintf(fl, "X %s\n%d %d %d %s\n", temp, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), temp2);
-	}
-	
-	// 'T' types
-	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
-		fprintf(fl, "T %s %d\n", bitv_to_alpha(at->type), at->weight);
 	}
 	
 	// end
