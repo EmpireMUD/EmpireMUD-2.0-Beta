@@ -324,8 +324,14 @@ Fletching (Trade ability)
 Mastery ability:  Master Craftsman
 Command:  craft [number] <type of arrows>
 
-This ability will allow you to craft better arrows. These arrows are not yet
-implemented.
+This ability allows you to craft better arrows. You can make:
+  flint arrows
+  iron arrows
+  imperium bodkin arrows
+  nocturnium channeling arrows
+  flowing arrows
+  thunderclap arrows
+  bloodletter arrows
 
 See also: CRAFT
 #
