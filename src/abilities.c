@@ -37,11 +37,19 @@
 *   Edit Modules
 */
 
+// passes data throughout an ability call
+struct ability_exec {
+	bool stop;	// indicates no further types should process
+	bool messaged;	// indicates the main messages have been sent
+	bool success;	// indicates the player should be charged
+	int cost;	// for types that raise the cost later
+};
+
 // local data
 const char *default_ability_name = "Unnamed Ability";
 
 // local protos
-int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict);
+void do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict, struct ability_exec *data);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 
 // external consts
@@ -59,10 +67,6 @@ extern const char *wait_types[];
 
 // external funcs
 extern bool trigger_counterspell(char_data *ch);	// spells.c
-
-// ability return codes (combinable)
-#define ABCMD_SUCCESS  BIT(0)	// charge for the ability
-#define ABCMD_STOP  BIT(1)	// prevent further ability execution
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -482,40 +486,44 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param vehicle_data *vvict The vehicle target, if any (may be NULL).
 * @param int level The level to use the ability at.
 * @param int casttype SPELL_CAST, etc.
-* @return int ABCMD_ flags to indicate how to proceed
+* @param struct ability_exec *data The execution data to pass back and forth.
 */
-int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *cvict, obj_data *ovict, vehicle_data *vvict, int level, int casttype) {
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *cvict, obj_data *ovict, vehicle_data *vvict, int level, int casttype, struct ability_exec *data) {
 	char buf[MAX_STRING_LENGTH];
-	int ret_val = NOBITS;
 	bool violent;
 	
 	if (!ch || !abil) {
-		return ret_val;
+		return;
 	}
 	
 	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE));
 	
 	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && violent) {
 		msg_to_char(ch, "You can't %s here.\r\n", SAFE_ABIL_COMMAND(abil));
-		return ABCMD_STOP;
+		data->stop = TRUE;
+		return;
 	}
 	
 	if (cvict && cvict != ch && violent) {
 		if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(cvict, ABIL_IMMUNITIES(abil))) {
 			act("$N is immune to that!", FALSE, ch, NULL, cvict, TO_CHAR);
-			return ABCMD_STOP;
+			data->stop = TRUE;
+			return;
 		}
 		if (!can_fight(ch, cvict)) {
 			act("You can't attack $N!", FALSE, ch, NULL, cvict, TO_CHAR);
-			return ABCMD_STOP;
+			data->stop = TRUE;
+			return;
 		}
 		if (NOT_MELEE_RANGE(ch, cvict)) {
 			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-			return ABCMD_STOP;
+			data->stop = TRUE;
+			return;
 		}
 	}
 	if (ABILITY_TRIGGERS(ch, cvict, ovict, ABIL_VNUM(abil))) {
-		return ABCMD_STOP;
+		data->stop = TRUE;
+		return;
 	}
 	
 	// ready to start the ability:
@@ -553,50 +561,52 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 			act(buf, FALSE, ch, NULL, cvict, TO_NOTVICT);
 		}
 		
-		return ABCMD_SUCCESS;	// counts as a successful ability use
+		data->stop = TRUE;	// prevent routines from firing
+		data->success = TRUE;	// counts as a successful ability use
 	}
 
 	
 	/*
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) && !data->stop) {
 		if (mag_damage(level, ch, cvict, abil) == -1) {
-			return ABCMD_STOP;	// Successful and target died, don't cast again.
+			data->stop = TRUE;
+			return;	// Successful and target died, don't cast again.
 		}
 	}
 	*/
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF) && !IS_SET(ret_val, ABCMD_STOP)) {
-		ret_val |= do_buff_ability(ch, abil, level, cvict);
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF) && !data->stop) {
+		do_buff_ability(ch, abil, level, cvict, data);
 	}
 	/*
-	if (IS_SET(ABIL_TYPES(abil), ABILT_UNAFFECTS) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_UNAFFECTS) && !data->stop) {
 		mag_unaffects(level, ch, cvict, abil);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_POINTS) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_POINTS) && !data->stop) {
 		mag_points(level, ch, cvict, abil);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_ALTER_OBJS) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ALTER_OBJS) && !data->stop) {
 		mag_alter_objs(level, ch, ovict, abil);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !data->stop) {
 		mag_groups(level, ch, abil);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_MASSES) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_MASSES) && !data->stop) {
 		mag_masses(level, ch, abil);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_AREAS) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_AREAS) && !data->stop) {
 		mag_areas(level, ch, abil);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMONS) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMONS) && !data->stop) {
 		mag_summons(level, ch, ovict, abil);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_CREATIONS) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_CREATIONS) && !data->stop) {
 		mag_creations(level, ch, abil);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOMS) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOMS) && !data->stop) {
 		mag_rooms(level, ch, abil);
 	}
 	
-	if (IS_SET(ABIL_TYPES(abil), ABILT_MANUAL) && !IS_SET(ret_val, ABCMD_STOP)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_MANUAL) && !data->stop) {
 		switch (ABIL_VNUM(abil)) {
 			case SPELL_CHARM:		MANUAL_SPELL(spell_charm); break;
 			case SPELL_CREATE_WATER:	MANUAL_SPELL(spell_create_water); break;
@@ -611,7 +621,7 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 	}
 	*/
 	
-	if (IS_SET(ret_val, ABCMD_SUCCESS)) {
+	if (data->success) {
 		// experience
 		if (!cvict || can_gain_exp_from(ch, cvict)) {
 			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
@@ -630,8 +640,6 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 			}
 		}
 	}
-	
-	return ret_val;
 }
 
 
@@ -649,38 +657,44 @@ int call_ability(char_data *ch, ability_data *abil, char *argument, char_data *c
 * @param char_data *targ The char target, if any (may be NULL).
 * @param obj_data *obj The obj target, if any (may be NULL).
 * @param vehicle_data *veh The vehicle target, if any (may be NULL).
-* @return int ABCMD_ flags to indicate how to proceed
+* @param struct ability_exec *data The execution data to pass back and forth.
 */
-int do_ability(char_data *ch, ability_data *abil, char *argument, char_data *targ, obj_data *obj, vehicle_data *veh) {
+void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *targ, obj_data *obj, vehicle_data *veh, struct ability_exec *data) {
 	if (!ch || !abil) {
 		log("SYSERR: do_ability called without %s.", ch ? "ability" : "character");
-		return ABCMD_STOP;
+		data->stop = TRUE;
+		return;
 	}
 	
 	if (GET_POS(ch) < ABIL_MIN_POS(abil)) {
 		send_low_pos_msg(ch);
-		return ABCMD_STOP;
+		data->stop = TRUE;
+		return;
 	}
 	if (targ && AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == targ)) {
 		msg_to_char(ch, "You are afraid you might hurt your master!\r\n");
-		return ABCMD_STOP;
+		data->stop = TRUE;
+		return;
 	}
 	if ((targ != ch) && IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
 		msg_to_char(ch, "You can only use that on yourself!\r\n");
-		return ABCMD_STOP;
+		data->stop = TRUE;
+		return;
 	}
 	if ((targ == ch) && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
 		msg_to_char(ch, "You cannot use that on yourself!\r\n");
-		return ABCMD_STOP;
+		data->stop = TRUE;
+		return;
 	}
 	/* TODO: if group abilities are added
 	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
 		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
-		return ABCMD_STOP;
+		data->stop = TRUE;
+		return;
 	}
 	*/
 	
-	return call_ability(ch, abil, argument, targ, obj, veh, get_approximate_level(ch), RUN_ABIL_NORMAL);
+	call_ability(ch, abil, argument, targ, obj, veh, get_approximate_level(ch), RUN_ABIL_NORMAL, data);
 }
 
 
@@ -693,9 +707,9 @@ int do_ability(char_data *ch, ability_data *abil, char *argument, char_data *tar
 * @param ability_data *abil The ability to use.
 * @param int level What level to use it at (may be lower/higher than ch's level).
 * @param char_data *vict The target (may be == ch).
-* @return int ABCMD_ flags to indicate how to proceed, or 0 if nothing happend and no instructions
+* @param struct ability_exec *data The execution data to pass back and forth.
 */
-int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict) {
+void do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict, struct ability_exec *data) {
 	bool invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	struct affected_type *af;
 	struct apply_data *apply;
@@ -709,12 +723,12 @@ int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vic
 	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
 		send_config_msg(ch, "ok_string");
 		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
-		return NOBITS;	// this prevents charging for the ability or adding a cooldown
+		return;	// prevent charging for the ability or adding a cooldown by not setting success
 	}
 	
 	// check costs and cooldowns now, AFTER the toggle check
 	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {
-		return NOBITS;
+		return;
 	}
 	
 	if (ch == vict) {	// message: targeting self
@@ -816,7 +830,8 @@ int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vic
 		}
 	}
 	
-	return ABCMD_SUCCESS;
+	data->success = TRUE;
+	return;
 }
 
 
@@ -830,11 +845,12 @@ int do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vic
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct ability_exec *data;
 	vehicle_data *veh = NULL;
 	char_data *targ = NULL;
 	obj_data *obj = NULL;
 	bool has = FALSE;
-	int iter, val;
+	int iter;
 	
 	skip_spaces(&argument);
 	
@@ -944,11 +960,17 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		return;
 	}
 	
-	val = do_ability(ch, abil, argument, targ, obj, veh);
+	// exec data to pass through
+	CREATE(data, struct ability_exec, 1);
+	data->cost = ABIL_COST(abil);	// base cost, may be modified
 	
-	if (IS_SET(val, ABCMD_SUCCESS)) {
-		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+	do_ability(ch, abil, argument, targ, obj, veh, data);
+	
+	if (data->success) {
+		charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
 	}
+	
+	free(data);
 }
 
 
