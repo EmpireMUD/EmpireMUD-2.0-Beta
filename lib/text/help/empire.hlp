@@ -364,7 +364,7 @@ See also: MINE, PROSPECT, RARE METALS
 #
 DEFECT
 
-Usage:  defect
+Usage:  defect CONFIRM
 
 This command allows you to exit an empire with which you are disillusioned. 
 For whatever reason you leave, make sure you get outside of the radius of all 
@@ -376,6 +376,8 @@ empire. This can help protect empires from duplicitous players.
 To transfer all members from one empire to a new one (for example, to change
 leaders or merge two empires), do not use defect. If the leader of the old
 empire pledges to the new one, all members and empire inventory will transfer.
+
+You must type 'CONFIRM' (in all caps) after the command to do this.
 
 See also: PLEDGE
 #
