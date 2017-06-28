@@ -37,19 +37,10 @@
 *   Edit Modules
 */
 
-// passes data throughout an ability call
-struct ability_exec {
-	bool stop;	// indicates no further types should process
-	bool messaged;	// indicates the main messages have been sent
-	bool success;	// indicates the player should be charged
-	int cost;	// for types that raise the cost later
-};
-
 // local data
 const char *default_ability_name = "Unnamed Ability";
 
 // local protos
-void do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict, struct ability_exec *data);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 
 // external consts
@@ -67,6 +58,28 @@ extern const char *wait_types[];
 
 // external funcs
 extern bool trigger_counterspell(char_data *ch);	// spells.c
+
+
+// ability funcs
+DO_ABIL(do_buff_ability);
+PREP_ABIL(prep_buff_ability);
+
+
+// setup for abilities
+struct {
+	bitvector_t type;	// ABILT_ const
+	PREP_ABIL(*prep_func);	// does the cost setup
+	DO_ABIL(*do_func);	// runs the ability
+} do_ability_data[] = {
+	
+	// ABILT_x: setup by type
+	{ ABILT_CRAFT, NULL, NULL },
+	{ ABILT_BUFF, prep_buff_ability, do_buff_ability },
+	// { ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
+	
+	{ NOBITS }	// this goes last
+};
+
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -237,6 +250,34 @@ ability_data *find_ability_on_skill(char *name, skill_data *skill) {
 char *get_ability_name_by_vnum(any_vnum vnum) {
 	ability_data *abil = find_ability_by_vnum(vnum);
 	return abil ? ABIL_NAME(abil) : "Unknown";
+}
+
+
+/**
+* Gets the execution data for 1 type, from a larger set of data. If it isn't
+* already in the list, this will add it.
+*
+* @param struct ability_exec *data The main data obj.
+* @param bitvector_t type The ABILT_ const.
+* @return struct ability_exec_type* The data entry (guaranteed).
+*/
+struct ability_exec_type *get_ability_type_data(struct ability_exec *data, bitvector_t type) {
+	struct ability_exec_type *iter, *aet = NULL;
+	
+	LL_FOREACH(data->types, iter) {
+		if (iter->type == type) {
+			aet = iter;
+			break;
+		}
+	}
+	
+	if (!aet) {
+		CREATE(aet, struct ability_exec_type, 1);
+		aet->type = type;
+		LL_APPEND(data->types, aet);
+	}
+	
+	return aet;
 }
 
 
@@ -490,13 +531,15 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 */
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *cvict, obj_data *ovict, vehicle_data *vvict, int level, int casttype, struct ability_exec *data) {
 	char buf[MAX_STRING_LENGTH];
-	bool violent;
+	bool violent, invis;
+	int iter;
 	
 	if (!ch || !abil) {
 		return;
 	}
 	
 	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE));
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	
 	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && violent) {
 		msg_to_char(ch, "You can't %s here.\r\n", SAFE_ABIL_COMMAND(abil));
@@ -523,6 +566,23 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	if (ABILITY_TRIGGERS(ch, cvict, ovict, ABIL_VNUM(abil))) {
 		data->stop = TRUE;
+		return;
+	}
+	
+	// determine costs and scales
+	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
+		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
+			(do_ability_data[iter].prep_func)(ch, abil, level, cvict, data);
+		}
+	}
+	
+	// early exit?
+	if (data->stop) {
+		return;
+	}
+	
+	// check costs and cooldowns now
+	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
 		return;
 	}
 	
@@ -564,59 +624,70 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		data->stop = TRUE;	// prevent routines from firing
 		data->success = TRUE;	// counts as a successful ability use
 	}
-
 	
-	/*
+	// messaging
+	if (cvict) {	// messaging with char target
+		if (ch == cvict) {	// message: targeting self
+			// to-char
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
+				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+			}
+		
+			// to room
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, NULL, cvict, TO_ROOM);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, NULL, cvict, TO_ROOM);
+			}
+		}
+		else {	// message: ch != cvict
+			// to-char
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
+				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+			}
+		
+			// to cvict
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, NULL, cvict, TO_VICT);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, NULL, cvict, TO_VICT);
+			}
+		
+			// to room
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, NULL, cvict, TO_NOTVICT);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, NULL, cvict, TO_NOTVICT);
+			}
+		}
+	}
+	
+	// run the abilities
+	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
+		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
+			(do_ability_data[iter].do_func)(ch, abil, level, cvict, data);
+		}
+	}
+	
+	/* special handling for damage... integrate this into the for() loop above
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) && !data->stop) {
 		if (mag_damage(level, ch, cvict, abil) == -1) {
 			data->stop = TRUE;
 			return;	// Successful and target died, don't cast again.
-		}
-	}
-	*/
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF) && !data->stop) {
-		do_buff_ability(ch, abil, level, cvict, data);
-	}
-	/*
-	if (IS_SET(ABIL_TYPES(abil), ABILT_UNAFFECTS) && !data->stop) {
-		mag_unaffects(level, ch, cvict, abil);
-	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_POINTS) && !data->stop) {
-		mag_points(level, ch, cvict, abil);
-	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_ALTER_OBJS) && !data->stop) {
-		mag_alter_objs(level, ch, ovict, abil);
-	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !data->stop) {
-		mag_groups(level, ch, abil);
-	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_MASSES) && !data->stop) {
-		mag_masses(level, ch, abil);
-	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_AREAS) && !data->stop) {
-		mag_areas(level, ch, abil);
-	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMONS) && !data->stop) {
-		mag_summons(level, ch, ovict, abil);
-	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_CREATIONS) && !data->stop) {
-		mag_creations(level, ch, abil);
-	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOMS) && !data->stop) {
-		mag_rooms(level, ch, abil);
-	}
-	
-	if (IS_SET(ABIL_TYPES(abil), ABILT_MANUAL) && !data->stop) {
-		switch (ABIL_VNUM(abil)) {
-			case SPELL_CHARM:		MANUAL_SPELL(spell_charm); break;
-			case SPELL_CREATE_WATER:	MANUAL_SPELL(spell_create_water); break;
-			case SPELL_DETECT_POISON:	MANUAL_SPELL(spell_detect_poison); break;
-			case SPELL_ENCHANT_WEAPON:  MANUAL_SPELL(spell_enchant_weapon); break;
-			case SPELL_IDENTIFY:	MANUAL_SPELL(spell_identify); break;
-			case SPELL_LOCATE_OBJECT:   MANUAL_SPELL(spell_locate_object); break;
-			case SPELL_SUMMON:		MANUAL_SPELL(spell_summon); break;
-			case SPELL_WORD_OF_RECALL:  MANUAL_SPELL(spell_recall); break;
-			case SPELL_TELEPORT:	MANUAL_SPELL(spell_teleport); break;
 		}
 	}
 	*/
@@ -700,17 +771,11 @@ void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 
 /**
 * All buff-type abilities come through here. This handles scaling and buff
-* maintenance/replacement. This function returns 0 if the ability is a toggle
-* and you're toggling it off, which keeps it from charging/cooldowning.
+* maintenance/replacement.
 *
-* @param char_data *ch The person using the ability.
-* @param ability_data *abil The ability to use.
-* @param int level What level to use it at (may be lower/higher than ch's level).
-* @param char_data *vict The target (may be == ch).
-* @param struct ability_exec *data The execution data to pass back and forth.
+* DO_ABIL provides: ch, abil, level, vict, data
 */
-void do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vict, struct ability_exec *data) {
-	bool invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+DO_ABIL(do_buff_ability) {
 	struct affected_type *af;
 	struct apply_data *apply;
 	any_vnum affect_vnum;
@@ -719,77 +784,12 @@ void do_buff_ability(char_data *ch, ability_data *abil, int level, char_data *vi
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
-	// toggle off?
-	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
-		send_config_msg(ch, "ok_string");
-		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
-		return;	// prevent charging for the ability or adding a cooldown by not setting success
-	}
+	total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
+	remaining_points = total_points;
 	
-	// check costs and cooldowns now, AFTER the toggle check
-	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {
+	if (total_points <= 0) {
 		return;
 	}
-	
-	if (ch == vict) {	// message: targeting self
-		// to-char
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		
-		// to room
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_ROOM);
-		}
-	}
-	else {	// message: ch != vict
-		// to-char
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
-		}
-		
-		// to vict
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_VICT);
-		}
-		
-		// to room
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_NOTVICT);
-		}
-	}
-	
-	// determine points
-	total_points = level / 100.0 * config_get_double("scale_points_at_100");
-	total_points *= get_type_modifier(abil, ABILT_BUFF);
-	total_points *= ABIL_SCALE(abil);
-	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
-		total_points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
-	}
-	// TODO: modify for role
-	
-	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
-	remaining_points = total_points;
 	
 	// determine duration
 	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
@@ -971,6 +971,39 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	
 	free(data);
+}
+
+
+/**
+* This function 'stops' if the ability is a toggle and you're toggling it off,
+* which keeps it from charging/cooldowning.
+* PREP_ABIL provides: ch, abil, level, vict, data
+*/
+PREP_ABIL(prep_buff_ability) {
+	any_vnum affect_vnum;
+	double total_points;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	// toggle off?
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
+		send_config_msg(ch, "ok_string");
+		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
+		data->stop = TRUE;
+		return;	// prevent charging for the ability or adding a cooldown by not setting success
+	}
+	
+	// determine points
+	total_points = level / 100.0 * config_get_double("scale_points_at_100");
+	total_points *= get_type_modifier(abil, ABILT_BUFF);
+	total_points *= ABIL_SCALE(abil);
+	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
+		total_points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
+	}
+	// TODO: modify for role
+	
+	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
+	get_ability_type_data(data, ABILT_BUFF)->scale_points = total_points;
 }
 
 

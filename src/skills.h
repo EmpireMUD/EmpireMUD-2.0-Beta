@@ -42,6 +42,10 @@
 // specific skill checks
 #define CHECK_MAJESTY(ch)  (AFF_FLAGGED((ch), AFF_MAJESTY) && number(0, GET_CHARISMA(ch)))
 
+// ability utils
+#define PREP_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, struct ability_exec *data)
+#define DO_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, struct ability_exec *data)
+
 
 // protos
 void add_ability(char_data *ch, ability_data *abil, bool reset_levels);
@@ -556,6 +560,25 @@ struct attack_hit_type {
 	int weapon_type;	// WEAPON_ type
 	int damage_type;	// DAM_ type
 	bool disarmable;	// whether or not disarm works
+};
+
+
+// passes data throughout an ability call
+struct ability_exec {
+	bool stop;	// indicates no further types should process
+	bool messaged;	// indicates the main messages have been sent
+	bool success;	// indicates the player should be charged
+	int cost;	// for types that raise the cost later
+	
+	struct ability_exec_type *types;	// LL of type data
+};
+
+
+// preliminary data from ability setup
+struct ability_exec_type {
+	bitvector_t type;
+	double scale_points;
+	struct ability_exec_type *next;
 };
 
 
