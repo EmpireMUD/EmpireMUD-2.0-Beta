@@ -469,6 +469,10 @@ Resetting a skill only resets your current set (see SKILL SWAP).
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
+When you use an ability, its level is limited to your level in its parent skill
+unless you have 100 in that skill, in which case it scales all the way up to
+your full level.
+
 See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
    ABILITY POINTS, SKILL SWAP, LETHEIAN ICON
 #

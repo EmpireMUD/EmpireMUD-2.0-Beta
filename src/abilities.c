@@ -731,6 +731,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
 void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *targ, obj_data *obj, vehicle_data *veh, struct ability_exec *data) {
+	int level, cap;
+	
 	if (!ch || !abil) {
 		log("SYSERR: do_ability called without %s.", ch ? "ability" : "character");
 		data->stop = TRUE;
@@ -765,7 +767,13 @@ void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 	}
 	*/
 	
-	call_ability(ch, abil, argument, targ, obj, veh, get_approximate_level(ch), RUN_ABIL_NORMAL, data);
+	// determine correct level (sometimes limited by skill level)
+	level = get_approximate_level(ch);
+	if (!IS_NPC(ch) && ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
+		level = MIN(level, cap);	// constrain by skill level
+	}
+	
+	call_ability(ch, abil, argument, targ, obj, veh, level, RUN_ABIL_NORMAL, data);
 }
 
 
