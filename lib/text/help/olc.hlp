@@ -539,6 +539,31 @@ For a list of the applies, see: HELP OEDIT APPLY
 
 See also: OLC ABILITIES, BUFF ABILITY
 #d
+"ABILEDIT ATTACKTYPE" "ABILEDIT ATTACK TYPE"
+
+Usage:  .attacktype <number>
+
+This determines the attack message that a damage ability sends. These are
+numeric values matching the game's attack messages.
+
+In the future, attack messages will be moved to an in-game editor. Until then,
+if you need a new type, ask your game administrator to add one in the
+'messages' file.
+
+Current attack types:
+ 52. execute                         53. arrow
+ 54. kick                            55. bash
+ 60. lightningbolt                   62. backstab
+ 63. sunshock                        67. ablate
+ 68. acidblast                       69. arclight
+ 70. astralclaw                      71. chronoblast
+ 72. deathtouch                      73. dispirit
+ 74. erode                           75. scour
+ 76. shadowlash                      77. soulchain
+ 78. starstrike                      79. thornlash
+
+See also: OLC ABILITIES, DAMAGE ABILITY
+#d
 "ABILEDIT BUFF ABILITY" "BUFF ABILITY" "BUFF ABILITIES"
 
 The BUFF ability type means that the ability gives some affects to the target.
@@ -634,6 +659,29 @@ Message types:
  &ccounterspell-to-room&0 - Shown to the room after the counterspell.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
+#d
+"ABILEDIT DAMAGE ABILITY" "DAMAGE ABILITY" "DAMAGE ABILITIES"
+
+The DAMAGE ability type is an ability that deals damage directly to the target,
+without a hit/dodge roll or an attack.
+
+You must always set the VIOLENT flag on a damage ability.
+
+DAmage abilities have the following properties:
+ <&yattacktype&0> Determines the attack messages.
+ <&ydamagetype&0> What type of damage it does.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT DAMAGETYPE" "ABILEDIT DAMAGE TYPE"
+
+Usage:  .damagetype <type>
+
+This determines what type of damage the ability deals. Damage type affects
+the target's ability to block, and affects which resistances protect against
+it.
+
+See also: OLC ABILITIES, DAMAGE ABILITY
 #d
 "ABILEDIT FLAGS" "ABILITY FLAGS"
 

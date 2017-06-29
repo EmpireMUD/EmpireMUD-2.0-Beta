@@ -2616,6 +2616,8 @@ struct ability_data {
 	int long_duration;	// affects
 	bitvector_t affects;	// affects
 	struct apply_data *applies;	// affects
+	int attack_type;	// damage
+	int damage_type;	// damage
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup

@@ -53,6 +53,7 @@ extern const char *affected_bits[];
 extern const char *apply_types[];
 extern const char *apply_type_names[];
 extern const double apply_values[];
+extern const char *damage_types[];
 extern const char *pool_types[];
 extern const char *position_types[];
 extern const char *wait_types[];
@@ -64,6 +65,8 @@ extern bool trigger_counterspell(char_data *ch);	// spells.c
 // ability funcs
 DO_ABIL(do_buff_ability);
 PREP_ABIL(prep_buff_ability);
+DO_ABIL(do_damage_ability);
+PREP_ABIL(prep_damage_ability);
 
 
 // setup for abilities
@@ -76,7 +79,7 @@ struct {
 	// ABILT_x: setup by type
 	{ ABILT_CRAFT, NULL, NULL },
 	{ ABILT_BUFF, prep_buff_ability, do_buff_ability },
-	// { ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
+	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -945,7 +948,23 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	data->success = TRUE;
-	return;
+}
+
+
+/**
+* All damage abilities come through here.
+*
+* DO_ABIL provides: ch, abil, level, vict, data
+*/
+DO_ABIL(do_damage_ability) {
+	int result, dmg = 1;
+	
+	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil));
+	data->success = TRUE;
+	
+	if (result < 0) {	// dedz
+		data->stop = TRUE;
+	}
 }
 
 
@@ -1123,6 +1142,30 @@ PREP_ABIL(prep_buff_ability) {
 	
 	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
 	get_ability_type_data(data, ABILT_BUFF)->scale_points = total_points;
+}
+
+
+/**
+* PREP_ABIL provides: ch, abil, level, vict, data
+*/
+PREP_ABIL(prep_damage_ability) {
+	//double total_points;
+	
+	// TODO
+	
+	/* sample from buffs:
+	// determine points
+	total_points = level / 100.0 * config_get_double("scale_points_at_100");
+	total_points *= get_type_modifier(abil, ABILT_BUFF);
+	total_points *= ABIL_SCALE(abil);
+	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
+		total_points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
+	}
+	// TODO: modify for role
+	
+	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
+	get_ability_type_data(data, ABILT_BUFF)->scale_points = total_points;
+	*/
 }
 
 
@@ -1545,7 +1588,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				switch (type) {
 					case ABILT_BUFF: {
 						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
-							log("SYSERR: Format error in X%llu line of %s", type, error);
+							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
 							exit(1);
 						}
 						
@@ -1553,6 +1596,16 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 						ABIL_SHORT_DURATION(abil) = int_in[1];
 						ABIL_LONG_DURATION(abil) = int_in[2];
 						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+						break;
+					}
+					case ABILT_DAMAGE: {
+						if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+							exit(1);
+						}
+						
+						ABIL_ATTACK_TYPE(abil) = int_in[0];
+						ABIL_DAMAGE_TYPE(abil) = int_in[1];
 						break;
 					}
 					default: {
@@ -1675,6 +1728,9 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 		strcpy(temp, bitv_to_alpha(ABILT_BUFF));
 		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
 		fprintf(fl, "X %s\n%d %d %d %s\n", temp, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), temp2);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+		fprintf(fl, "X %s\n%d %d\n", bitv_to_alpha(ABILT_DAMAGE), ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil));
 	}
 	
 	// end
@@ -2104,6 +2160,9 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 			}
 			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 		}
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0], Damage type: [\tc%s\t0]\r\n", ABIL_ATTACK_TYPE(abil), damage_types[ABIL_DAMAGE_TYPE(abil)]);
+		}
 	}
 	
 	if (ABIL_CUSTOM_MSGS(abil)) {
@@ -2194,6 +2253,10 @@ void olc_show_ability(char_data *ch) {
 			
 			sprintf(buf + strlen(buf), "<\tyaffectvnum\t0> %d %s\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 		}
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+			sprintf(buf + strlen(buf), "<\tyattacktype\t0> %d\r\n", ABIL_ATTACK_TYPE(abil));
+			sprintf(buf + strlen(buf), "<\tydamagetype\t0> %s\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
+		}
 	}
 	
 	// custom messages
@@ -2274,6 +2337,20 @@ OLC_MODULE(abiledit_apply) {
 	void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_applies(ch, argument, &ABIL_APPLIES(abil));
+}
+
+
+OLC_MODULE(abiledit_attacktype) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_DAMAGE;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else {
+		ABIL_ATTACK_TYPE(abil) = olc_process_number(ch, argument, "attack type", "attacktype", 0, MAX_VNUM, ABIL_ATTACK_TYPE(abil));
+	}
 }
 
 
@@ -2383,6 +2460,20 @@ OLC_MODULE(abiledit_custom) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	olc_process_custom_messages(ch, argument, &ABIL_CUSTOM_MSGS(abil), ability_custom_types);
+}
+
+
+OLC_MODULE(abiledit_damagetype) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_DAMAGE;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else {
+		ABIL_DAMAGE_TYPE(abil) = olc_process_type(ch, argument, "damage type", "damagetype", damage_types, ABIL_DAMAGE_TYPE(abil));
+	}
 }
 
 
