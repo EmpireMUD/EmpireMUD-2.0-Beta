@@ -581,13 +581,18 @@ it can be used.
 
 See also: COOLDOWN GENERICS, OLC ABILITIES
 #d
-"ABILEDIT COST" "ABILEDIT COSTTYPE" "ABILEDIT COST TYPE"
+"ABILEDIT COST" "ABILEDIT COSTTYPE" "ABILEDIT COST TYPE" "ABILEDIT COSTPERSCALEPOINT" "ABILEDIT COST PER SCALE POINT"
 
 Usage:  .cost <amount>
+        .costperscalepoint <amount>
         .costtype <health | move | mana | blood>
 
 These two commands determine how much it costs to use an ability. If the
 ability is free, just set the cost to 0.
+
+You can also set the cost to be based on the scale of the ability. There are
+approximately 4 scale points per 100 levels (before modifiers). This feature
+allows you to add cost to stronger abilities.
 
 Costs are part of balancing an ability. A more powerful ability should have a
 higher cost.
@@ -644,6 +649,23 @@ The following ability flags are available:
  &cRANGED&0 - Can be used during ranged combat without giving a melee error.
  &c!ANIMAL&0 - Cannot be used in animal form.
  &c!INVULNERABLE&0 - Cannot be used while invulnerable (e.g. mistform).
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT GAINHOOKS" "ABILEDIT GAIN HOOKS" "GAIN HOOKS"
+
+Usage:  .gainhooks [add | remove] <flags>
+
+This tells the ability when to trigger skill gain:
+ &cONLY-WHEN-AFFECTED&0 - Below flags will only happen when the ability's affect
+   is on.
+ &cMELEE&0 - Gains when you hit in melee combat.
+ &cRANGED&0 - Gains when you hit in ranged combat.
+ &cDODGE&0 - Gains when you dodge an attack.
+ &cBLOCK&0 - Gains when you block an attack.
+ &cTAKE-DAMAGE&0 - Gains when you take damage.
+ &cPASSIVE-FREQUENT&0 - Gains every 5 seconds.
+ &cPASSIVE_HOURLY&0 - Gains every 75 seconds (game hour).
 
 See also: OLC ABILITIES
 #d

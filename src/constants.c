@@ -179,6 +179,20 @@ const char *ability_custom_types[] = {
 };
 
 
+// AGH_x: ability gain hooks
+const char *ability_gain_hooks[] = {
+	"ONLY-WHEN-AFFECTED",	// 0
+	"MELEE",
+	"RANGED",
+	"DODGE",
+	"BLOCK",
+	"TAKE-DAMAGE",	// 5
+	"PASSIVE-FREQUENT",
+	"PASSIVE_HOURLY",
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ADVENTURE CONSTANTS /////////////////////////////////////////////////////
 

@@ -45,6 +45,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 
 // external consts
 extern const char *ability_custom_types[];
+extern const char *ability_gain_hooks[];
 extern const char *ability_flags[];
 extern const char *ability_target_flags[];
 extern const char *ability_type_flags[];
@@ -442,6 +443,55 @@ void remove_type_from_ability(ability_data *abil, bitvector_t type) {
 		}
 	}
 	ABIL_TYPES(abil) = total;	// summarize flags
+}
+
+
+/**
+* Triggers ability gains by type.
+*
+* @param char_data *ch The person to try to gain exp.
+* @param bitvector_t trigger Which AGH_ event (only 1 at a time).
+*/
+void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
+	struct ability_gain_hook *agh, *next_agh;
+	ability_data *abil;
+	double amount;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	// AGH_x: gain amount based on trigger type
+	switch (trigger) {
+		case AGH_PASSIVE_FREQUENT: {
+			amount = 0.5;
+			break;
+		}
+		case AGH_MELEE:
+		case AGH_RANGED:
+		case AGH_DODGE:
+		case AGH_BLOCK:
+		case AGH_TAKE_DAMAGE:
+		case AGH_PASSIVE_HOURLY:
+		default: {
+			amount = 2;
+			break;
+		}
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_GAIN_HOOKS(ch), agh, next_agh) {
+		if (!IS_SET(agh->triggers, trigger)) {
+			continue;	// wrong trigger type
+		}
+		if (!has_ability(ch, agh->ability)) {
+			continue;	// not currently having it
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_WHEN_AFFECTED) && (!(abil = find_ability_by_vnum(agh->ability)) || !affected_by_spell(ch, ABIL_AFFECT_VNUM(abil)))) {
+			continue;	// not currently affected
+		}
+		
+		gain_ability_exp(ch, agh->ability, amount);
+	}
 }
 
 
@@ -853,6 +903,7 @@ DO_ABIL(do_buff_ability) {
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct ability_exec_type *aet, *next_aet;
 	struct ability_exec *data;
 	vehicle_data *veh = NULL;
 	char_data *targ = NULL;
@@ -978,6 +1029,10 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
 	}
 	
+	// clean up data
+	LL_FOREACH_SAFE(data->types, aet, next_aet) {
+		free(aet);
+	}
 	free(data);
 }
 
@@ -1325,10 +1380,10 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
 	void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 	
-	char line[256], error[256], str_in[256], str_in2[256];
+	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
 	ability_data *abil, *find;
 	bitvector_t type;
-	int int_in[7];
+	int int_in[8];
 	double dbl_in;
 	
 	CREATE(abil, ability_data, 1);
@@ -1353,12 +1408,17 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 		log("SYSERR: Missing line 2 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %lf %s", str_in, &int_in[0], &dbl_in, str_in2) != 4) {
-		dbl_in = 1.0;	// default scale
-		strcpy(str_in2, "0");	// default immunities
-		if (sscanf(line, "%s %d", str_in, &int_in[0]) != 2) {
-			log("SYSERR: Format error in line 2 of %s", error);
-			exit(1);
+	
+	// line 2 is backwards-compatible with previous versions
+	if (sscanf(line, "%s %d %lf %s %s", str_in, &int_in[0], &dbl_in, str_in2, str_in3) != 5) {
+		strcpy(str_in3, "0");	// default gain hooks
+		if (sscanf(line, "%s %d %lf %s", str_in, &int_in[0], &dbl_in, str_in2) != 4) {
+			dbl_in = 1.0;	// default scale
+			strcpy(str_in2, "0");	// default immunities
+			if (sscanf(line, "%s %d", str_in, &int_in[0]) != 2) {
+				log("SYSERR: Format error in line 2 of %s", error);
+				exit(1);
+			}
 		}
 	}
 	
@@ -1380,9 +1440,18 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			}
 			
 			case 'C': {	// command info
-				if (!get_line(fl, line) || sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 9) {
-					log("SYSERR: Format error in C line of %s", error);
+				if (!get_line(fl, line)) {
+					log("SYSERR: Missing C line of %s", error);
 					exit(1);
+				}
+				
+				// backwards-compatible with older versions
+				if (sscanf(line, "%s %d %s %d %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 10) {
+					int_in[3] = 0;	// default cost-per-scale-point
+					if (sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 9) {
+						log("SYSERR: Format error in C line of %s", error);
+						exit(1);
+					}
 				}
 				
 				if (ABIL_COMMAND(abil)) {
@@ -1393,10 +1462,11 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				ABIL_TARGETS(abil) = asciiflag_conv(str_in2);
 				ABIL_COST_TYPE(abil) = int_in[1];
 				ABIL_COST(abil) = int_in[2];
-				ABIL_COOLDOWN(abil) = int_in[3];
-				ABIL_COOLDOWN_SECS(abil) = int_in[4];
-				ABIL_LINKED_TRAIT(abil) = int_in[5];
-				ABIL_WAIT_TYPE(abil) = int_in[6];
+				ABIL_COST_PER_SCALE_POINT(abil) = int_in[3];
+				ABIL_COOLDOWN(abil) = int_in[4];
+				ABIL_COOLDOWN_SECS(abil) = int_in[5];
+				ABIL_LINKED_TRAIT(abil) = int_in[6];
+				ABIL_WAIT_TYPE(abil) = int_in[7];
 				break;
 			}
 			
@@ -1509,7 +1579,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	void write_applies_to_file(FILE *fl, struct apply_data *list);
 	void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 	
-	char temp[256], temp2[256];
+	char temp[256], temp2[256], temp3[256];
 	struct ability_type *at;
 	
 	if (!fl || !abil) {
@@ -1522,17 +1592,18 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	// 1: name
 	fprintf(fl, "%s~\n", NULLSAFE(ABIL_NAME(abil)));
 	
-	// 2: flags mastery-abil scale immunities
+	// 2: flags mastery-abil scale immunities gain-hooks
 	strcpy(temp, bitv_to_alpha(ABIL_FLAGS(abil)));
 	strcpy(temp2, bitv_to_alpha(ABIL_IMMUNITIES(abil)));
-	fprintf(fl, "%s %d %.2f %s\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil), temp2);
+	strcpy(temp3, bitv_to_alpha(ABIL_GAIN_HOOKS(abil)));
+	fprintf(fl, "%s %d %.2f %s %s\n", temp, ABIL_MASTERY_ABIL(abil), ABIL_SCALE(abil), temp2, temp3);
 	
 	// 'A': applies
 	write_applies_to_file(fl, ABIL_APPLIES(abil));
 	
 	// 'C' command
-	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
-		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
+	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
+		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
 	}
 	
 	// M: custom message
@@ -1913,6 +1984,9 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
 	
+	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
+	
 	// command-related portion
 	if (!ABIL_COMMAND(abil)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
@@ -1922,7 +1996,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 		
 		// type-specific data
@@ -2005,6 +2079,9 @@ void olc_show_ability(char_data *ch) {
 	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyimmunities\t0> %s\r\n", lbuf);
 	
+	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<\tygainhooks\t0> %s\r\n", lbuf);
+	
 	// command-related portion
 	if (!ABIL_COMMAND(abil)) {
 		sprintf(buf + strlen(buf), "<\tycommand\t0> (not a command)\r\n");
@@ -2013,7 +2090,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<\tycommand\t0> %s, <\tyminposition\t0> %s (minimum)\r\n", ABIL_COMMAND(abil), position_types[ABIL_MIN_POS(abil)]);
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
 		sprintf(buf + strlen(buf), "<\tytargets\t0> %s\r\n", lbuf);
-		sprintf(buf + strlen(buf), "<\tycost\t0> %d, <\tycosttype\t0> %s\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+		sprintf(buf + strlen(buf), "<\tycost\t0> %d, <\tycostperscalepoint\t0> %d, <\tycosttype\t0> %s\r\n", ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), pool_types[ABIL_COST_TYPE(abil)]);
 		sprintf(buf + strlen(buf), "<\tycooldown\t0> [%d] %s, <\tycdtime\t0> %d second%s\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		sprintf(buf + strlen(buf), "<\tywaittype\t0> %s, <\tylinkedtrait\t0> %s\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 		
@@ -2204,6 +2281,18 @@ OLC_MODULE(abiledit_cost) {
 }
 
 
+OLC_MODULE(abiledit_costperscalepoint) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_COST_PER_SCALE_POINT(abil) = olc_process_number(ch, argument, "cost per scale point", "costperscalepoint", 0, INT_MAX, ABIL_COST_PER_SCALE_POINT(abil));
+	}
+}
+
+
 OLC_MODULE(abiledit_costtype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
@@ -2221,6 +2310,12 @@ OLC_MODULE(abiledit_custom) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	olc_process_custom_messages(ch, argument, &ABIL_CUSTOM_MSGS(abil), ability_custom_types);
+}
+
+
+OLC_MODULE(abiledit_gainhooks) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);	
+	ABIL_GAIN_HOOKS(abil) = olc_process_flag(ch, argument, "gain hook", "gainhooks", ability_gain_hooks, ABIL_GAIN_HOOKS(abil));
 }
 
 

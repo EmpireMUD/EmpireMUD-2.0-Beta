@@ -471,6 +471,17 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM  7
 
 
+// AGH_x: ability gain hooks
+#define AGH_ONLY_WHEN_AFFECTED  BIT(0)	// modifies other types: only when affected by this abil
+#define AGH_MELEE  BIT(1)	// gains when actor hits in melee
+#define AGH_RANGED  BIT(2)	// gains when actor hits at range
+#define AGH_DODGE  BIT(3)	// gains when actor dodges
+#define AGH_BLOCK  BIT(4)	// gains when actor blocks
+#define AGH_TAKE_DAMAGE  BIT(5)	// gains when hit in melee
+#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every 5
+#define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
+
+
 // RUN_ABIL_x: modes for activating abilities
 #define RUN_ABIL_NORMAL  0	// normal command activation
 
@@ -2584,6 +2595,7 @@ struct ability_data {
 	struct ability_type *type_list;	// types with properties
 	double scale;	// effectiveness scale (1.0 = 100%)
 	bitvector_t immunities;	// AFF_ flags that block this ability
+	bitvector_t gain_hooks;	// AGH_ flags
 	
 	// command-related data
 	char *command;	// if ability has a command
@@ -2591,6 +2603,7 @@ struct ability_data {
 	bitvector_t targets;	// ATAR_ flags
 	int cost_type;	// HEALTH, MANA, etc.
 	int cost;	// amount of h/v/m
+	int cost_per_scale_point;	// cost modifier when scaled
 	any_vnum cooldown;	// generic cooldown if any
 	int cooldown_secs;	// how long to cooldown, if any
 	int wait_type;	// WAIT_ flag
@@ -2611,6 +2624,14 @@ struct ability_data {
 	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
+};
+
+
+// for characters, tells an ability when to gain (other than when activated)
+struct ability_gain_hook {
+	any_vnum ability;
+	bitvector_t triggers;	// AGH_ flags
+	UT_hash_handle hh;	// GET_ABILITY_GAIN_HOOKS(ch)
 };
 
 
@@ -3406,6 +3427,7 @@ struct player_special_data {
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
+	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	
 	// tracking for specific skills
 	byte confused_dir;  // people without Navigation think this dir is north

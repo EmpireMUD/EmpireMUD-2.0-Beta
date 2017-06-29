@@ -464,6 +464,8 @@ void point_update_char(char_data *ch) {
 		gain_ability_exp(ch, ABIL_GIFT_OF_NATURE, 2);
 		gain_ability_exp(ch, ABIL_ARCANE_POWER, 2);
 		
+		run_ability_gain_hooks(ch, AGH_PASSIVE_HOURLY);
+		
 		// death count decrease after 3 minutes without a death
 		if (GET_RECENT_DEATH_COUNT(ch) > 0 && GET_LAST_DEATH_TIME(ch) + (3 * SECS_PER_REAL_MIN) < time(0)) {
 			GET_RECENT_DEATH_COUNT(ch) -= 1;
@@ -780,6 +782,8 @@ void real_update_char(char_data *ch) {
 		gain_ability_exp(ch, ABIL_PREDATOR_VISION, 0.5);
 		gain_ability_exp(ch, ABIL_BY_MOONLIGHT, 0.5);
 	}
+	
+	run_ability_gain_hooks(ch, AGH_PASSIVE_FREQUENT);
 	
 	// more thirsty?
 	if (has_ability(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST))) {
