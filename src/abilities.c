@@ -1547,7 +1547,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				// backwards-compatible with older versions
 				if (sscanf(line, "%s %d %s %d %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 10) {
 					int_in[3] = 0;	// default cost-per-scale-point
-					if (sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6]) != 9) {
+					if (sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 9) {
 						log("SYSERR: Format error in C line of %s", error);
 						exit(1);
 					}
