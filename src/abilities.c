@@ -87,6 +87,58 @@ struct {
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Adds a gain hook for an ability.
+*
+* @param char_data *ch The player to add a hook to.
+* @param ability_data *abil The ability to add a hook for.
+*/
+void add_ability_gain_hook(char_data *ch, ability_data *abil) {
+	struct ability_gain_hook *agh;
+	any_vnum vnum;
+	
+	if (!ch || IS_NPC(ch) || !abil) {
+		return;
+	}
+	
+	vnum = ABIL_VNUM(abil);
+	HASH_FIND_INT(GET_ABILITY_GAIN_HOOKS(ch), &vnum, agh);
+	if (!agh) {
+		CREATE(agh, struct ability_gain_hook, 1);
+		agh->ability = ABIL_VNUM(abil);
+		HASH_ADD_INT(GET_ABILITY_GAIN_HOOKS(ch), ability, agh);
+	}
+	
+	agh->triggers = ABIL_GAIN_HOOKS(abil);
+}
+
+
+/**
+* Sets up the gain hooks for a player's ability on login.
+*
+* @param char_data *ch The player to set up hooks for.
+*/
+void add_all_gain_hooks(char_data *ch) {
+	struct player_ability_data *abil, *next_abil;
+	bool any;
+	int iter;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+		any = FALSE;
+		for (iter = 0; iter < NUM_SKILL_SETS && !any; ++iter) {
+			if (abil->purchased[iter]) {
+				any = TRUE;
+				add_ability_gain_hook(ch, abil->ptr);
+			}
+		}
+	}
+}
+
+
+/**
 * This function adds a type to the ability's type list, and updates the summary
 * type flags.
 *

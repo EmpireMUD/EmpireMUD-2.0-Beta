@@ -401,6 +401,9 @@ void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool r
 		}
 		qt_change_ability(ch, ABIL_VNUM(abil));
 	}
+	
+	// attach gain hooks
+	add_ability_gain_hook(ch, abil);
 }
 
 

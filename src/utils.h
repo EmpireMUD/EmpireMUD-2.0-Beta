@@ -1569,6 +1569,7 @@ extern unsigned long long microtime(void);
 extern bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag);
 
 // utils from abilities.c
+void add_ability_gain_hook(char_data *ch, ability_data *abil);
 void run_ability_gain_hooks(char_data *ch, bitvector_t trigger);
 
 // utils from act.action.c
