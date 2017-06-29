@@ -1922,11 +1922,28 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 void save_olc_ability(descriptor_data *desc) {	
 	ability_data *proto, *abil = GET_OLC_ABILITY(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	struct player_ability_data *abd;
 	UT_hash_handle hh, sorted;
+	char_data *chiter;
+	int iter;
+	bool any;
 
 	// have a place to save it?
 	if (!(proto = find_ability_by_vnum(vnum))) {
 		proto = create_ability_table_entry(vnum);
+	}
+	
+	// update live players' gain hooks
+	LL_FOREACH(character_list, chiter) {
+		if (!IS_NPC(chiter) && (abd = get_ability_data(chiter, vnum, FALSE))) {
+			any = FALSE;
+			for (iter = 0; iter < NUM_SKILL_SETS && !any; ++iter) {
+				if (abd->purchased[iter]) {
+					any = TRUE;
+					add_ability_gain_hook(chiter, abd->ptr);
+				}
+			}
+		}
 	}
 	
 	// free prototype strings and pointers
