@@ -566,8 +566,8 @@ struct attack_hit_type {
 // passes data throughout an ability call
 struct ability_exec {
 	bool stop;	// indicates no further types should process
-	bool messaged;	// indicates the main messages have been sent
 	bool success;	// indicates the player should be charged
+	bool no_msg;	// indicates you shouldn't send messages
 	int cost;	// for types that raise the cost later
 	
 	struct ability_exec_type *types;	// LL of type data

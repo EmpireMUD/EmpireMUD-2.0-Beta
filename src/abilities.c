@@ -725,10 +725,11 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		
 		data->stop = TRUE;	// prevent routines from firing
 		data->success = TRUE;	// counts as a successful ability use
+		data->no_msg = TRUE;	// don't show more messages
 	}
 	
 	// messaging
-	if (cvict) {	// messaging with char target
+	if (cvict && !data->no_msg) {	// messaging with char target
 		if (ch == cvict) {	// message: targeting self
 			// to-char
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
@@ -812,6 +813,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED) ? FALSE : TRUE);
 			}
 		}
+	}
+	else if (!data->no_msg) {
+		msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
 	}
 }
 
