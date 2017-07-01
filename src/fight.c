@@ -3761,10 +3761,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						break;
 					}
 				}
-				
-				if (can_gain_exp_from(ch, vict)) {
-					gain_ability_exp(ch, ABIL_TRICK_SHOTS, 10);
-				}
 			}
 		}
 		
@@ -3777,6 +3773,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_ARCHERY, 2);
 			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
+			gain_ability_exp(ch, ABIL_TRICK_SHOTS, 2);
 			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
 				gain_ability_exp(ch, ABIL_ALACRITY, 2);
 			}
