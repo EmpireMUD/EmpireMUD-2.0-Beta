@@ -315,29 +315,6 @@ void check_should_dismount(char_data *ch) {
 
 
 /**
-* This clears the linkdead players out, and should be called before you run
-* anything that updates offline players, as players in this state can cause
-* actual problems if they reconnect.
-*/
-void eliminate_linkdead_players(void) {
-	void extract_pending_chars();
-	
-	char_data *ch, *next_ch;
-	
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
-		if (!IS_NPC(ch) && !ch->desc) {
-			perform_idle_out(ch);
-		}
-	}
-	
-	// they may be in the "pending" state
-	extract_pending_chars();
-}
-
-
-/**
 * This function restricts "crowd control" abilities to one target per room at
 * a time. You should call it any time you add an affect that should be limited.
 * All other chars in the room that have the same affect will be freed from it.

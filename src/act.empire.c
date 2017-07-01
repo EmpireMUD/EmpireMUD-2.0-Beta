@@ -53,7 +53,6 @@ extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
-void eliminate_linkdead_players();
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);

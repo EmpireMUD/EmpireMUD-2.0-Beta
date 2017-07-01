@@ -52,6 +52,7 @@
 // Room building vnums
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
 #define RTYPE_SORCERER_TOWER  5511
+#define RTYPE_EXTRACTION_PIT  5523	// a place to keep chars when they are pending extraction
 
 #define RTYPE_BEDROOM  5601
 #define RTYPE_TUNNEL  5612	// for mine complex, tunnel

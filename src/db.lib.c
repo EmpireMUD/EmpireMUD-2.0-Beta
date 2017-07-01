@@ -1489,7 +1489,6 @@ empire_data *create_empire(char_data *ch) {
 * @param empire_data *emp The empire to delete.
 */
 void delete_empire(empire_data *emp) {
-	void eliminate_linkdead_players();
 	void remove_empire_from_table(empire_data *emp);
 
 	struct empire_political_data *emp_pol, *next_pol, *temp;
@@ -1507,8 +1506,6 @@ void delete_empire(empire_data *emp) {
 	if (!emp) {
 		return;
 	}
-	
-	eliminate_linkdead_players();
 	
 	// prepare
 	log_to_empire(emp, ELOG_NONE, "This empire has been deleted");

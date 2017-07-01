@@ -1024,7 +1024,7 @@ void generate_adventure_instances(void) {
 */
 void delete_instance(struct instance_data *inst) {
 	void expire_instance_quests(struct instance_data *inst);
-	void extract_pending_chars();
+	extern room_data *get_extraction_room(void);
 	void relocate_players(room_data *room, room_data *to_room);
 	
 	struct instance_mob *im, *next_im;
@@ -1032,11 +1032,13 @@ void delete_instance(struct instance_data *inst) {
 	vehicle_data *veh, *next_veh;
 	struct instance_data *temp;
 	char_data *mob, *next_mob;
-	room_data *room;
+	room_data *room, *extraction_room;
 	int iter;
 	
 	// disable instance saving
 	instance_save_wait = TRUE;
+	
+	extraction_room = get_extraction_room();
 	
 	expire_instance_quests(inst);
 	
@@ -1071,11 +1073,11 @@ void delete_instance(struct instance_data *inst) {
 			}
 			else {
 				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+				char_to_room(mob, extraction_room);
 				extract_char(mob);
 			}
 		}
 	}
-	extract_pending_chars();
 	
 	// remove rooms
 	for (iter = 0; iter < inst->size; ++iter) {
