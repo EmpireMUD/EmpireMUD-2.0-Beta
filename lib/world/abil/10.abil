@@ -1,27 +1,39 @@
 #1001
 Frenzy~
-c -1 1.33 0
+c -1 1.33 0 abc
 A
 17 3
 A
 18 -1
 C
 frenzy 7 beg 1 30 2070 60 0 1
+M
+0
+You work yourself into a frenzy!~
+M
+1
+$n works $mself into a frenzy!~
+T b 1
 X b
 3083 30 -1 0
-T b 1
 S
 #1002
 Defend~
-c -1 1.33 0
+c -1 1.33 0 adf
 A
 18 3
 A
 17 -1
 C
 defend 7 beg 1 30 2071 60 0 1
+M
+0
+You dig in and prepare to defend!~
+M
+1
+$n digs in to defend!~
+T b 1
 X b
 3084 30 -1 0
-T b 1
 S
 $
