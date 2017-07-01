@@ -678,6 +678,11 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
 			(do_ability_data[iter].prep_func)(ch, abil, level, cvict, data);
+			
+			// adjust cost
+			if (ABIL_COST_PER_SCALE_POINT(abil)) {
+				data->cost += get_ability_type_data(data, do_ability_data[iter].type)->scale_points * ABIL_COST_PER_SCALE_POINT(abil);
+			}
 		}
 	}
 	
