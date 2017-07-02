@@ -568,6 +568,7 @@ struct ability_exec {
 	bool stop;	// indicates no further types should process
 	bool success;	// indicates the player should be charged
 	bool no_msg;	// indicates you shouldn't send messages
+	bool matching_role;	// if FALSE, no bonuses from matching role
 	int cost;	// for types that raise the cost later
 	
 	struct ability_exec_type *types;	// LL of type data

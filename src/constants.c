@@ -110,14 +110,19 @@ const char *reboot_type[] = { "reboot", "shutdown" };
 
 // ABILF_x: ability flags
 const char *ability_flags[] = {
-	"VIOLENT",
+	"VIOLENT",	// 0
 	"COUNTERSPELLABLE",
 	"TOGGLE",
 	"INVISIBLE",
 	"!ENGAGE",
-	"RANGED",
+	"RANGED",	// 5
 	"!ANIMAL",
 	"!INVULNERABLE",
+	"CASTER",
+	"HEALER",
+	"MELEE",	// 10
+	"TANK",
+	"RANGED-ONLY",
 	"\n"
 };
 

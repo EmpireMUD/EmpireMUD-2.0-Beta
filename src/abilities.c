@@ -550,6 +550,33 @@ void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
 }
 
 
+/**
+* The standard number of scaling points for an ability.
+*
+* @param char_data *ch The user of the ability.
+* @param ability_data *abil The ability being used.
+* @param int level The level we're using the ability at.
+* @param struct ability_exec *data The ability data being passed around.
+*/
+double standard_ability_scale(char_data *ch, ability_data *abil, int level, struct ability_exec *data) {
+	double points;
+	
+	// determine points
+	points = level / 100.0 * config_get_double("scale_points_at_100");
+	points *= get_type_modifier(abil, ABILT_BUFF);
+	points *= ABIL_SCALE(abil);
+	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
+		points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
+	}
+	
+	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS)) {
+		points *= data->matching_role ? 1.20 : 0.80;
+	}
+	
+	return MAX(1.0, points);	// ensure minimum of 1 point
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY COMMANDS ////////////////////////////////////////////////////////
 
@@ -663,8 +690,13 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			data->stop = TRUE;
 			return;
 		}
-		if (NOT_MELEE_RANGE(ch, cvict)) {
+		if (!ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) && NOT_MELEE_RANGE(ch, cvict)) {
 			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+			data->stop = TRUE;
+			return;
+		}
+		if (ABILITY_FLAGGED(abil, ABILF_RANGED_ONLY) && !NOT_MELEE_RANGE(ch, cvict) && FIGHTING(ch)) {
+			msg_to_char(ch, "You need to be in ranged combat to do this.\r\n");
 			data->stop = TRUE;
 			return;
 		}
@@ -813,12 +845,12 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		if (cvict && cvict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(cvict) && !IS_DEAD(cvict)) {
 			// auto-assist if we used an ability on someone who is fighting
 			if (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && FIGHTING(cvict) && !FIGHTING(ch)) {
-				engage_combat(ch, FIGHTING(cvict), ABILITY_FLAGGED(abil, ABILF_RANGED) ? FALSE : TRUE);
+				engage_combat(ch, FIGHTING(cvict), ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
 			}
 			
 			// auto-attack if used on an enemy
 			if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && CAN_SEE(cvict, ch) && !FIGHTING(cvict)) {
-				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED) ? FALSE : TRUE);
+				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
 			}
 		}
 	}
@@ -962,7 +994,24 @@ DO_ABIL(do_buff_ability) {
 * DO_ABIL provides: ch, abil, level, vict, data
 */
 DO_ABIL(do_damage_ability) {
-	int result, dmg = 1;
+	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_BUFF);
+	int result, dmg;
+	
+	dmg = subdata->scale_points * (data->matching_role ? 3 : 2);	// could go higher?
+	
+	// bonus damage if role matches
+	if (data->matching_role) {
+		switch (ABIL_DAMAGE_TYPE(abil)) {
+			case DAM_PHYSICAL: {
+				dmg += GET_BONUS_PHYSICAL(ch);
+				break;
+			}
+			case DAM_MAGICAL: {
+				dmg += GET_BONUS_MAGICAL(ch);
+				break;
+			}
+		}
+	}
 	
 	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil));
 	data->success = TRUE;
@@ -1103,6 +1152,29 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	CREATE(data, struct ability_exec, 1);
 	data->cost = ABIL_COST(abil);	// base cost, may be modified
 	
+	// detect role
+	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS)) {
+		if (ABILITY_FLAGGED(abil, ABILF_CASTER) && (GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+			data->matching_role = TRUE;
+		}
+		else if (ABILITY_FLAGGED(abil, ABILF_HEALER) && (GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+			data->matching_role = TRUE;
+		}
+		else if (ABILITY_FLAGGED(abil, ABILF_MELEE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+			data->matching_role = TRUE;
+		}
+		else if (ABILITY_FLAGGED(abil, ABILF_TANK) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+			data->matching_role = TRUE;
+		}
+		else {
+			data->matching_role = FALSE;	// does not match
+		}
+	}
+	else {
+		data->matching_role = TRUE;	// by default
+	}
+	
+	// run the ability
 	do_ability(ch, abil, argument, targ, obj, veh, data);
 	
 	if (data->success) {
@@ -1124,7 +1196,6 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 */
 PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
-	double total_points;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
@@ -1136,17 +1207,7 @@ PREP_ABIL(prep_buff_ability) {
 		return;	// prevent charging for the ability or adding a cooldown by not setting success
 	}
 	
-	// determine points
-	total_points = level / 100.0 * config_get_double("scale_points_at_100");
-	total_points *= get_type_modifier(abil, ABILT_BUFF);
-	total_points *= ABIL_SCALE(abil);
-	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
-		total_points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
-	}
-	// TODO: modify for role
-	
-	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
-	get_ability_type_data(data, ABILT_BUFF)->scale_points = total_points;
+	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, data);
 }
 
 
@@ -1154,23 +1215,7 @@ PREP_ABIL(prep_buff_ability) {
 * PREP_ABIL provides: ch, abil, level, vict, data
 */
 PREP_ABIL(prep_damage_ability) {
-	//double total_points;
-	
-	// TODO
-	
-	/* sample from buffs:
-	// determine points
-	total_points = level / 100.0 * config_get_double("scale_points_at_100");
-	total_points *= get_type_modifier(abil, ABILT_BUFF);
-	total_points *= ABIL_SCALE(abil);
-	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
-		total_points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
-	}
-	// TODO: modify for role
-	
-	total_points = MAX(1.0, total_points);	// ensure minimum of 1 point
-	get_ability_type_data(data, ABILT_BUFF)->scale_points = total_points;
-	*/
+	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, data);
 }
 
 
