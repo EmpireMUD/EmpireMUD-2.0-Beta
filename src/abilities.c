@@ -1002,7 +1002,7 @@ DO_ABIL(do_buff_ability) {
 * DO_ABIL provides: ch, abil, level, vict, data
 */
 DO_ABIL(do_damage_ability) {
-	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_BUFF);
+	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
 	int result, dmg;
 	
 	dmg = subdata->scale_points * (data->matching_role ? 3 : 2);	// could go higher?
