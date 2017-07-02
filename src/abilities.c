@@ -681,11 +681,6 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	if (cvict && cvict != ch && violent) {
-		if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(cvict, ABIL_IMMUNITIES(abil))) {
-			act("$N is immune to that!", FALSE, ch, NULL, cvict, TO_CHAR);
-			data->stop = TRUE;
-			return;
-		}
 		if (!can_fight(ch, cvict)) {
 			act("You can't attack $N!", FALSE, ch, NULL, cvict, TO_CHAR);
 			data->stop = TRUE;
@@ -950,6 +945,11 @@ DO_ABIL(do_buff_ability) {
 	remaining_points = total_points;
 	
 	if (total_points <= 0) {
+		return;
+	}
+	
+	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
 		return;
 	}
 	
