@@ -59,6 +59,7 @@ extern const char *position_types[];
 extern const char *wait_types[];
 
 // external funcs
+void check_combat_start(char_data *ch);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 
@@ -729,9 +730,16 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// ready to start the ability:
+	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+		if (SHOULD_APPEAR(ch)) {
+			appear(ch);
+		}
 	
-	if (SHOULD_APPEAR(ch) && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
-		appear(ch);
+		// start meters now, to track direct damage()
+		check_combat_start(ch);
+		if (cvict) {
+			check_combat_start(cvict);
+		}
 	}
 	
 	// counterspell?
