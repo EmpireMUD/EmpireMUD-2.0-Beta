@@ -113,6 +113,7 @@
 #define ABIL_LINKED_TRAIT(abil)  ((abil)->linked_trait)
 #define ABIL_LONG_DURATION(abil)  ((abil)->long_duration)
 #define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)
+#define ABIL_MAX_STACKS(abil)  ((abil)->max_stacks)
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
 #define ABIL_NAME(abil)  ((abil)->name)
 #define ABIL_SCALE(abil)  ((abil)->scale)

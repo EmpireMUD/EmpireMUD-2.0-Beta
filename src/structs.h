@@ -432,10 +432,10 @@ typedef struct vehicle_data vehicle_data;
 
 // ABILT_x: ability type flags
 #define ABILT_CRAFT  BIT(0)	// related to crafting/building
-#define ABILT_BUFF  BIT(1)
-#define ABILT_DAMAGE  BIT(2)
+#define ABILT_BUFF  BIT(1)	// applies an affect
+#define ABILT_DAMAGE  BIT(2)	// deals damage
+#define ABILT_DOT  BIT(3)	// damage over time effect
 /*
-#define ABILT_AFFECTS  BIT(1)
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)
 #define ABILT_ALTER_OBJS  BIT(4)
@@ -2624,6 +2624,7 @@ struct ability_data {
 	struct apply_data *applies;	// affects
 	int attack_type;	// damage
 	int damage_type;	// damage
+	int max_stacks;	// dot
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup

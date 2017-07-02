@@ -1021,6 +1021,7 @@ DO_ABIL(do_damage_ability) {
 		}
 	}
 	
+	msg_to_char(ch, "Damage: %d\r\n", dmg);
 	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil));
 	data->success = TRUE;
 	
@@ -1666,6 +1667,19 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 						ABIL_DAMAGE_TYPE(abil) = int_in[1];
 						break;
 					}
+					case ABILT_DOT: {
+						if (!get_line(fl, line) || sscanf(line, "%d %d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3], &int_in[4]) != 5) {
+							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+							exit(1);
+						}
+						
+						ABIL_AFFECT_VNUM(abil) = int_in[0];
+						ABIL_SHORT_DURATION(abil) = int_in[1];
+						ABIL_LONG_DURATION(abil) = int_in[2];
+						ABIL_DAMAGE_TYPE(abil) = int_in[3];
+						ABIL_MAX_STACKS(abil) = int_in[4];
+						break;
+					}
 					default: {
 						log("SYSERR: Unknown flag X%llu in %s", type, error);
 						exit(1);
@@ -1789,6 +1803,9 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	}
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
 		fprintf(fl, "X %s\n%d %d\n", bitv_to_alpha(ABILT_DAMAGE), ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil));
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+		fprintf(fl, "X %s\n%d %d %d %d %d\n", bitv_to_alpha(ABILT_DOT), ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), ABIL_DAMAGE_TYPE(abil), ABIL_MAX_STACKS(abil));
 	}
 	
 	// end
@@ -2711,14 +2728,15 @@ OLC_MODULE(abiledit_types) {
 	else if (is_abbrev(arg1, "add")) {
 		weight_arg = any_one_word(arg2, arg);
 		skip_spaces(&weight_arg);
+		weight = 1;	// default
 		
-		if (!*arg || !*weight_arg) {
-			msg_to_char(ch, "Usage: types add <type> <weight>\r\n");
+		if (!*arg) {
+			msg_to_char(ch, "Usage: types add <type> [weight]\r\n");
 		}
 		else if ((typeid = search_block(arg, ability_type_flags, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
 		}
-		else if (!isdigit(*weight_arg) || (weight = atoi(weight_arg)) < 1) {
+		else if (*weight_arg && (!isdigit(*weight_arg) || (weight = atoi(weight_arg)) < 1)) {
 			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
 		}
 		else {
@@ -2762,7 +2780,7 @@ OLC_MODULE(abiledit_types) {
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: types add <type> <weight>\r\n");
+		msg_to_char(ch, "Usage: types add <type> [weight]\r\n");
 		msg_to_char(ch, "Usage: types change <type> <weight>\r\n");
 		msg_to_char(ch, "Usage: custom remove <type | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");

@@ -580,6 +580,13 @@ Buff abilities have the following properties:
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
+"ABILEDIT CRAFT ABILITY" "CRAFT ABILITY" "CRAFTING ABILITY" "CRAFT ABILITIES"
+
+The CRAFT ability type indicates that an ability is only used to make crafts.
+This type of ability has no "command" or other special properties.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
 "ABILEDIT COMMAND"
 
 Usage:  .command <word | none>
@@ -839,7 +846,7 @@ See also: OLC ABILITIES
 #d
 "ABILEDIT TYPES"
 
-Usage:  .types add <type> <weight>
+Usage:  .types add <type> [weight]
         .types change <type> <weight>
         .types remove <type>
 
@@ -850,8 +857,11 @@ similar to the applies on objects, morphs, etc.
 The following types are available (each has its own help file):
  &cCRAFT&0 - Used for craft/building recipes.
  &cBUFF&0 - Puts affects on characters.
+ &cDAMAGE&0 - Deals direct damage.
+ &cDOT&0 - Adds a damage-over-time effect.
 
-See also: OLC ABILITIES, BUFF ABILITY
+See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
+   DOT ABILITY
 #d
 "ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
 
