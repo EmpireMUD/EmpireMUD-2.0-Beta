@@ -396,16 +396,18 @@ T0
 You are no longer weakened by the crucial jab.~
 S
 #3058
-shadow jab~
+diversion~
 4 0
 0 0 0 0
 T0
 You are no longer distracted by the diversion.~
 S
 #3059
-Unnamed Generic~
-0 0
+shadow jab~
+4 0
 0 0 0 0
+T0
+You are no longer affected by the shadow jab.~
 S
 #3060
 confer~
@@ -567,5 +569,10 @@ T0
 You stop defending.~
 T1
 $n stops defending.~
+S
+#3085
+DoT~
+4 0
+0 0 0 0
 S
 $
