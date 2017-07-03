@@ -296,6 +296,7 @@
 #define ATYPE_CHARGE  3080
 #define ATYPE_TRICK_SHOT  3081
 #define ATYPE_BUFF  3082
+#define ATYPE_DOT  3085
 
 
 // GENERIC_COOLDOWN entires used by the code

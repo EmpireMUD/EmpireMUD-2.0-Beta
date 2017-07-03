@@ -688,7 +688,22 @@ This determines what type of damage the ability deals. Damage type affects
 the target's ability to block, and affects which resistances protect against
 it.
 
-See also: OLC ABILITIES, DAMAGE ABILITY
+See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
+#d
+"ABILEDIT DOT ABILITY" "DOT ABILITY" "DOT ABILITIES"
+
+The DOT ability type deals damage over time. If you set the maxstacks number
+very high, you should also lower the scale property.
+
+You must always set the VIOLENT flag on a DoT.
+
+DoT abilities have the following properties:
+ <&yshortduration&0> How long it lasts (at low level).
+ <&ylongduration&0> How long it lasts (at class level).
+ <&ymaxstacks&0> How many times this DoT can stack.
+ <&yaffectvnum&0> Which affect (generic) to use for the DoT.
+
+See also: OLC ABILITIES, ABILEDIT SCALE, ABILEDIT TYPES
 #d
 "ABILEDIT FLAGS" "ABILITY FLAGS"
 
@@ -769,6 +784,19 @@ Most abilities have no mastery ability.
 
 See also: OLC ABILITIES
 #d
+"ABILEDIT MAXSTACKS" "ABILEDIT MAX STACKS"
+
+Usage:  .maxstacks <number>
+
+This is the number of times a DoT can stack. Each time the DoT would be
+applied, it refreshes the duration. It also adds 1 to the stack count, if it's
+below the maximum number. Total damage is multiplied by the stack count.
+
+If maxstacks is higher, the 'scale' property should be lower. Conversely, if
+maxstacks is low, the scale could be higher.
+
+See also: OLC ABILITIES, DOT ABILITY, ABILEDIT SCALE
+#d
 "ABILEDIT MINPOSITION"
 
 Usage:  .minposition <position>
@@ -810,16 +838,16 @@ See also: ABILEDIT COOLDOWN, ABILEDIT COST, OLC ABILITIES
 Usage:  .shortduration <seconds | unlimited>
         .longduration <seconds | unlimited>
 
-For buff abilities, this is how long the buff lasts. Short duration applies
-when the actor has the skill at a low level. Long duration is for high-level
-users and class abilities.
+For buff/dot abilities, this is how long the effect lasts. Short duration
+applies when the actor has the skill at a low level. Long duration is for
+high-level users and class abilities.
 
 Be careful with unlimited duration buffs -- these should always be self-only
-toggles.
+toggles. DoTs cannot have unlimited duration.
 
 You can also choose to set both durations to the same amount of time.
 
-See also: OLC ABILITIES, BUFF ABILITIES
+See also: OLC ABILITIES, BUFF ABILITIES, DOT ABILITIES
 #d
 "ABILEDIT TARGETS"
 

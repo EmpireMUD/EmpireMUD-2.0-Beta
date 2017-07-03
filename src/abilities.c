@@ -68,6 +68,8 @@ DO_ABIL(do_buff_ability);
 PREP_ABIL(prep_buff_ability);
 DO_ABIL(do_damage_ability);
 PREP_ABIL(prep_damage_ability);
+DO_ABIL(do_dot_ability);
+PREP_ABIL(prep_dot_ability);
 
 
 // setup for abilities
@@ -81,6 +83,7 @@ struct {
 	{ ABILT_CRAFT, NULL, NULL },
 	{ ABILT_BUFF, prep_buff_ability, do_buff_ability },
 	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
+	{ ABILT_DOT, prep_dot_ability, do_dot_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -1032,6 +1035,58 @@ DO_ABIL(do_damage_ability) {
 
 
 /**
+* All damage-over-time abilities come through here. This handles scaling and
+* stacking.
+*
+* DO_ABIL provides: ch, abil, level, vict, data
+*/
+DO_ABIL(do_dot_ability) {
+	any_vnum affect_vnum;
+	double points;
+	int dur, dmg;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_DOT;
+	
+	points = get_ability_type_data(data, ABILT_DOT)->scale_points;
+	
+	if (points <= 0) {
+		return;
+	}
+	
+	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
+		return;
+	}
+	
+	// determine duration
+	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
+	if (dur != UNLIMITED) {
+		dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
+	}
+	
+	dmg = points * (data->matching_role ? 2 : 1);
+	
+	// bonus damage if role matches
+	if (data->matching_role) {
+		switch (ABIL_DAMAGE_TYPE(abil)) {
+			case DAM_PHYSICAL: {
+				dmg += GET_BONUS_PHYSICAL(ch) / MAX(1, dur);
+				break;
+			}
+			case DAM_MAGICAL: {
+				dmg += GET_BONUS_MAGICAL(ch) / MAX(1, dur);
+				break;
+			}
+		}
+	}
+
+	dmg = MAX(1, dmg);
+	apply_dot_effect(vict, affect_vnum, dur, ABIL_DAMAGE_TYPE(abil), dmg, ABIL_MAX_STACKS(abil), ch);
+	data->success = TRUE;
+}
+
+
+/**
 * Performs an ability typed by a character. This function find the targets,
 * and pre-validates the ability.
 *
@@ -1225,6 +1280,14 @@ PREP_ABIL(prep_buff_ability) {
 */
 PREP_ABIL(prep_damage_ability) {
 	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, data);
+}
+
+
+/**
+* PREP_ABIL provides: ch, abil, level, vict, data
+*/
+PREP_ABIL(prep_dot_ability) {
+	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, data);
 }
 
 
@@ -1501,6 +1564,7 @@ void clear_ability(ability_data *abil) {
 	ABIL_COOLDOWN(abil) = NOTHING;
 	ABIL_AFFECT_VNUM(abil) = NOTHING;
 	ABIL_SCALE(abil) = 1.0;
+	ABIL_MAX_STACKS(abil) = 1;
 }
 
 
@@ -2204,7 +2268,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 		
 		// type-specific data
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
 			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 				strcpy(part, "unlimited");
 			}
@@ -2220,7 +2284,8 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
 			
 			size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-			
+		}	// end buff/dot
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
 			size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
 			
@@ -2234,10 +2299,16 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 				size += snprintf(buf + size, sizeof(buf) - size, "none");
 			}
 			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-		}
+		}	// end buff
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0], Damage type: [\tc%s\t0]\r\n", ABIL_ATTACK_TYPE(abil), damage_types[ABIL_DAMAGE_TYPE(abil)]);
-		}
+			size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0]\r\n", ABIL_ATTACK_TYPE(abil));
+		}	// end damage
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
+		}	// end damage/dot
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
+		}	// end dot
 	}
 	
 	if (ABIL_CUSTOM_MSGS(abil)) {
@@ -2302,7 +2373,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<\tywaittype\t0> %s, <\tylinkedtrait\t0> %s\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 		
 		// type-specific data
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
 			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 				sprintf(buf + strlen(buf), "<\tyshortduration\t0> unlimited, ");
 			}
@@ -2316,7 +2387,8 @@ void olc_show_ability(char_data *ch) {
 			else {
 				sprintf(buf + strlen(buf), "<\tylongduration\t0> %d second%s\r\n", ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
 			}
-			
+		}	// end buff/dot
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<\tyaffects\t0> %s\r\n", lbuf);
 			
@@ -2325,13 +2397,19 @@ void olc_show_ability(char_data *ch) {
 			LL_FOREACH(ABIL_APPLIES(abil), apply) {
 				sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
 			}
-			
+		}	// end buff
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
 			sprintf(buf + strlen(buf), "<\tyaffectvnum\t0> %d %s\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-		}
+		}	// end buff/dot
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
 			sprintf(buf + strlen(buf), "<\tyattacktype\t0> %d\r\n", ABIL_ATTACK_TYPE(abil));
+		}	// end damage
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
 			sprintf(buf + strlen(buf), "<\tydamagetype\t0> %s\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
-		}
+		}	// end damage/dot
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+			sprintf(buf + strlen(buf), "<\tymaxstacks\t0> %d\r\n", ABIL_MAX_STACKS(abil));
+		}	// end dot
 	}
 	
 	// custom messages
@@ -2387,7 +2465,7 @@ OLC_MODULE(abiledit_affectvnum) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	any_vnum old;
 	
-	bitvector_t allowed_types = ABILT_BUFF;
+	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
@@ -2541,7 +2619,7 @@ OLC_MODULE(abiledit_custom) {
 OLC_MODULE(abiledit_damagetype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_DAMAGE;
+	bitvector_t allowed_types = ABILT_DAMAGE | ABILT_DOT;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
@@ -2585,14 +2663,19 @@ OLC_MODULE(abiledit_linkedtrait) {
 OLC_MODULE(abiledit_longduration) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_BUFF;
+	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
-		ABIL_LONG_DURATION(abil) = UNLIMITED;
-		msg_to_char(ch, "It now has unlimited long duration.\r\n");
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+			msg_to_char(ch, "DoTs cannot be unlimited.\r\n");
+		}
+		else {
+			ABIL_LONG_DURATION(abil) = UNLIMITED;
+			msg_to_char(ch, "It now has unlimited long duration.\r\n");
+		}
 	}
 	else {
 		ABIL_LONG_DURATION(abil) = olc_process_number(ch, argument, "long duration", "longduration", 1, MAX_INT, ABIL_LONG_DURATION(abil));
@@ -2627,6 +2710,20 @@ OLC_MODULE(abiledit_masteryability) {
 }
 
 
+OLC_MODULE(abiledit_maxstacks) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	bitvector_t allowed_types = ABILT_DOT;
+	
+	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	}
+	else {
+		ABIL_MAX_STACKS(abil) = olc_process_number(ch, argument, "max stacks", "maxstacks", 1, 1000, ABIL_MAX_STACKS(abil));
+	}
+}
+
+
 OLC_MODULE(abiledit_minposition) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
@@ -2657,14 +2754,19 @@ OLC_MODULE(abiledit_scale) {
 OLC_MODULE(abiledit_shortduration) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_BUFF;
+	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
-		ABIL_SHORT_DURATION(abil) = UNLIMITED;
-		msg_to_char(ch, "It now has unlimited short duration.\r\n");
+		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+			msg_to_char(ch, "DoTs cannot be unlimited.\r\n");
+		}
+		else {
+			ABIL_SHORT_DURATION(abil) = UNLIMITED;
+			msg_to_char(ch, "It now has unlimited short duration.\r\n");
+		}
 	}
 	else {
 		ABIL_SHORT_DURATION(abil) = olc_process_number(ch, argument, "short duration", "shortduration", 1, MAX_INT, ABIL_SHORT_DURATION(abil));
