@@ -98,17 +98,22 @@
 #define ABIL_AFFECT_VNUM(abil)  ((abil)->affect_vnum)
 #define ABIL_APPLIES(abil)  ((abil)->applies)
 #define ABIL_ASSIGNED_SKILL(abil)  ((abil)->assigned_skill)
+#define ABIL_ATTACK_TYPE(abil)  ((abil)->attack_type)
 #define ABIL_COMMAND(abil)  ((abil)->command)
 #define ABIL_COOLDOWN(abil)  ((abil)->cooldown)
 #define ABIL_COOLDOWN_SECS(abil)  ((abil)->cooldown_secs)
 #define ABIL_COST(abil)  ((abil)->cost)
+#define ABIL_COST_PER_SCALE_POINT(abil)  ((abil)->cost_per_scale_point)
 #define ABIL_COST_TYPE(abil)  ((abil)->cost_type)
 #define ABIL_CUSTOM_MSGS(abil)  ((abil)->custom_msgs)
+#define ABIL_DAMAGE_TYPE(abil)  ((abil)->damage_type)
 #define ABIL_FLAGS(abil)  ((abil)->flags)
+#define ABIL_GAIN_HOOKS(abil)  ((abil)->gain_hooks)
 #define ABIL_IMMUNITIES(abil)  ((abil)->immunities)
 #define ABIL_LINKED_TRAIT(abil)  ((abil)->linked_trait)
 #define ABIL_LONG_DURATION(abil)  ((abil)->long_duration)
 #define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)
+#define ABIL_MAX_STACKS(abil)  ((abil)->max_stacks)
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
 #define ABIL_NAME(abil)  ((abil)->name)
 #define ABIL_SCALE(abil)  ((abil)->scale)
@@ -972,6 +977,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_get_bonus_skills))
 #define CREATION_ARCHETYPE(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype[pos]))
 #define GET_ABILITY_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ability_hash))
+#define GET_ABILITY_GAIN_HOOKS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gain_hooks))
 #define GET_ACCOUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->account))
 #define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action))
 #define GET_ACTION_CYCLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_cycle))
@@ -1564,6 +1570,10 @@ extern sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector
 // misc functions from utils.c
 extern unsigned long long microtime(void);
 extern bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag);
+
+// utils from abilities.c
+void add_ability_gain_hook(char_data *ch, ability_data *abil);
+void run_ability_gain_hooks(char_data *ch, bitvector_t trigger);
 
 // utils from act.action.c
 void cancel_action(char_data *ch);

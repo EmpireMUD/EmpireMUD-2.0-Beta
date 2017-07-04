@@ -81,6 +81,7 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
+void die_follower(char_data *ch);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
@@ -1027,7 +1028,6 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 
 /* Extract a ch completely from the world, and leave his stuff behind */
 void extract_char_final(char_data *ch) {
-	void die_follower(char_data *ch);
 	ACMD(do_return);
 
 	empire_data *rescan_emp = IS_NPC(ch) ? NULL : GET_LOYALTY(ch);
@@ -1042,11 +1042,6 @@ void extract_char_final(char_data *ch) {
 	if (!IN_ROOM(ch)) {
 		log("SYSERR: Extracting char %s not in any room. (%s, extract_char)", GET_NAME(ch), __FILE__);
 		exit(1);
-	}
-
-	// things checked for both pcs and npcs
-	if (ch->followers || ch->master) {
-		die_follower(ch);
 	}
 
 	/* Check to see if we are grouped! */
@@ -1215,10 +1210,14 @@ void extract_char(char_data *ch) {
 		}
 		++extractions_pending;
 	}
-
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch);
+	
+	// end following now
+	if (ch->followers || ch->master) {
+		die_follower(ch);
+	}
 }
 
 

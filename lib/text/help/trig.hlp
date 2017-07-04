@@ -449,13 +449,13 @@ Special Variables When using field - The variable returns:
    LOCK-LEVEL-* flags).
 &cinstance.level(lvl)&0 - Lock the instance at a given level, if it isn't
    already locked.
-&instance.loaded&0 - Checks if the instance has been fully loaded or not.
+&cinstance.loaded&0 - Checks if the instance has been fully loaded or not.
 &cinstance.load&0 - Forces loading an instance with the CAN-DELAY-LOAD. However,
    this happens automatically when a player arrives.
 &cinstance.location&0 - The map/linked location of the instance, if any.
 &cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.
 &cinstance.name&0 - Name of the adventure instance, if any.
-&cinstance.nearest(rmt vnum)&0 - Finds a given room in the nearest instance
+&cinstance.nearest_rmt(vnum)&0 - Finds a given room in the nearest instance
    that has one (only works if you aren't in a !LOCATION spot).
 &cinstance.start&0 - The entry room of the instance, if any.
 &cpeople.<vnum>&0 - This variable returns the number of people in the room 

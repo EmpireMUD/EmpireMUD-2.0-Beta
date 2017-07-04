@@ -133,7 +133,8 @@ resources quickly from one place to another. They can also be ridden on and
 driven to move around without spending moves.
 
 You can board caravans and carriages, and ride around inside them. Caravans can
-even have a few different rooms redesignated inside.
+even have a few different rooms redesignated inside. You can also usually sit
+on/in a vehicle from the outside.
 
 Storage capacities (large items count twice):
 Cart: 200 items
@@ -141,7 +142,7 @@ Carriage: 200 items, 1 room inside
 Wagon: 400 items
 Caravan: 100 items: 2 rooms inside
 
-See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE
+See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE, SIT
 #
 CLOTHING CLOTHES
 

@@ -897,9 +897,9 @@ Usage:  inventory
         inventory -w <wear location> [keywords]
         inventory -t <type> [keywords]
 
-If you're uncertain about what you're carrying, or simply want to check that
-no thieves have got to your backpack. When in a storage building, this also
-checks the stored items there.
+Use this command if you're uncertain about what you're carrying, or simply want
+to check that no thieves have got to your backpack. When in a storage building,
+this also checks the stored items there.
 
 You can also search your inventory by keyword, or use the following flags:
   &c-i&0 Identify items (e.g. levels).

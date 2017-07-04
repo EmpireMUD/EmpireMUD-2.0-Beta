@@ -110,14 +110,19 @@ const char *reboot_type[] = { "reboot", "shutdown" };
 
 // ABILF_x: ability flags
 const char *ability_flags[] = {
-	"VIOLENT",
+	"VIOLENT",	// 0
 	"COUNTERSPELLABLE",
 	"TOGGLE",
 	"INVISIBLE",
 	"!ENGAGE",
-	"RANGED",
+	"RANGED",	// 5
 	"!ANIMAL",
 	"!INVULNERABLE",
+	"CASTER",
+	"HEALER",
+	"MELEE",	// 10
+	"TANK",
+	"RANGED-ONLY",
 	"\n"
 };
 
@@ -127,8 +132,8 @@ const char *ability_type_flags[] = {
 	"CRAFT",	// 0
 	"BUFF",
 	"DAMAGE",
+	"DOT",
 /*
-	"AFFECTS",
 	"UNAFFECTS",
 	"POINTS",
 	"ALTER-OBJS",
@@ -175,6 +180,20 @@ const char *ability_custom_types[] = {
 	"counterspell-to-char",	// 5
 	"counterspell-to-vict",
 	"counterspell-to-room",
+	"\n"
+};
+
+
+// AGH_x: ability gain hooks
+const char *ability_gain_hooks[] = {
+	"ONLY-WHEN-AFFECTED",	// 0
+	"MELEE",
+	"RANGED",
+	"DODGE",
+	"BLOCK",
+	"TAKE-DAMAGE",	// 5
+	"PASSIVE-FREQUENT",
+	"PASSIVE_HOURLY",
 	"\n"
 };
 
@@ -2248,9 +2267,9 @@ const char *olc_flag_bits[] = {
 	"!GLOBAL",
 	"!AUGMENT",
 	"!ARCHETYPE",
-	"ABILITIES",
-	"CLASSES",
-	"SKILLS",
+	"!ABILITIES",
+	"!CLASSES",
+	"!SKILLS",
 	"!VEHICLES",
 	"!MORPHS",
 	"!QUESTS",

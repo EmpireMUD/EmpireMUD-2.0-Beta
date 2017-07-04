@@ -315,29 +315,6 @@ void check_should_dismount(char_data *ch) {
 
 
 /**
-* This clears the linkdead players out, and should be called before you run
-* anything that updates offline players, as players in this state can cause
-* actual problems if they reconnect.
-*/
-void eliminate_linkdead_players(void) {
-	void extract_pending_chars();
-	
-	char_data *ch, *next_ch;
-	
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
-		if (!IS_NPC(ch) && !ch->desc) {
-			perform_idle_out(ch);
-		}
-	}
-	
-	// they may be in the "pending" state
-	extract_pending_chars();
-}
-
-
-/**
 * This function restricts "crowd control" abilities to one target per room at
 * a time. You should call it any time you add an affect that should be limited.
 * All other chars in the room that have the same affect will be freed from it.
@@ -395,7 +372,7 @@ void point_update_char(char_data *ch) {
 	if (IS_NPC(ch) && !ch->desc && HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
 		count = 1;	// me
 		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
-			if (ch != chiter && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
+			if (ch != chiter && !EXTRACTED(chiter) && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
 				++count;
 			}
 		}
@@ -463,6 +440,8 @@ void point_update_char(char_data *ch) {
 		
 		gain_ability_exp(ch, ABIL_GIFT_OF_NATURE, 2);
 		gain_ability_exp(ch, ABIL_ARCANE_POWER, 2);
+		
+		run_ability_gain_hooks(ch, AGH_PASSIVE_HOURLY);
 		
 		// death count decrease after 3 minutes without a death
 		if (GET_RECENT_DEATH_COUNT(ch) > 0 && GET_LAST_DEATH_TIME(ch) + (3 * SECS_PER_REAL_MIN) < time(0)) {
@@ -780,6 +759,8 @@ void real_update_char(char_data *ch) {
 		gain_ability_exp(ch, ABIL_PREDATOR_VISION, 0.5);
 		gain_ability_exp(ch, ABIL_BY_MOONLIGHT, 0.5);
 	}
+	
+	run_ability_gain_hooks(ch, AGH_PASSIVE_FREQUENT);
 	
 	// more thirsty?
 	if (has_ability(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST))) {

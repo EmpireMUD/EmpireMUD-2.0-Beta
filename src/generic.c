@@ -243,6 +243,7 @@ char *list_one_generic(generic_data *gen, bool detail) {
 void olc_search_generic(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	generic_data *gen = real_generic(vnum);
+	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
@@ -261,6 +262,17 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of generic %d (%s):\r\n", vnum, GEN_NAME(gen));
+	
+	// abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		any = FALSE;
+		any |= (ABIL_AFFECT_VNUM(abil) == vnum);
+		any |= (ABIL_COOLDOWN(abil) == vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		}
+	}
 	
 	// augments
 	HASH_ITER(hh, augment_table, aug, next_aug) {
@@ -704,6 +716,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	struct trading_post_data *tpd, *next_tpd;
 	struct player_currency *cur, *next_cur;
 	struct empire_unique_storage *eus;
+	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
@@ -837,6 +850,23 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// now remove from prototypes
 	
+	// update abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		found = FALSE;
+		if (ABIL_AFFECT_VNUM(abil) == vnum) {
+			ABIL_AFFECT_VNUM(abil) = NOTHING;
+			found = TRUE;
+		}
+		if (ABIL_COOLDOWN(abil) == vnum) {
+			ABIL_COOLDOWN(abil) = NOTHING;
+			found = TRUE;
+		}
+		
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
+		}
+	}
+	
 	// update augments
 	HASH_ITER(hh, augment_table, aug, next_aug) {
 		if (remove_thing_from_resource_list(&GET_AUG_RESOURCES(aug), res_type, vnum)) {
@@ -916,6 +946,21 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			remove_thing_from_resource_list(&GET_ACTION_RESOURCES(desc->character), res_type, vnum);
 		}
 		
+		if (GET_OLC_ABILITY(desc)) {
+			found = FALSE;
+			if (ABIL_AFFECT_VNUM(GET_OLC_ABILITY(desc)) == vnum) {
+				ABIL_AFFECT_VNUM(GET_OLC_ABILITY(desc)) = NOTHING;
+				found = TRUE;
+			}
+			if (ABIL_COOLDOWN(GET_OLC_ABILITY(desc)) == vnum) {
+				ABIL_COOLDOWN(GET_OLC_ABILITY(desc)) = NOTHING;
+				found = TRUE;
+			}
+			
+			if (found) {
+				msg_to_char(desc->character, "A generic used by the ability you're editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_AUGMENT(desc)) {
 			if (remove_thing_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), res_type, vnum)) {
 				SET_BIT(GET_AUG_FLAGS(GET_OLC_AUGMENT(desc)), AUG_IN_DEVELOPMENT);
@@ -1468,7 +1513,7 @@ OLC_MODULE(genedit_quick_cooldown) {
 	two_arguments(argument, type_arg, vnum_arg);
 	
 	if (!*type_arg || !*vnum_arg) {
-		msg_to_char(ch, "Usage: .quickcooldown <type> <vnum>\r\n");
+		msg_to_char(ch, "Usage: .generic quickcooldown <type> <vnum>\r\n");
 		return;
 	}
 	if (!(from_type = find_olc_type(type_arg))) {

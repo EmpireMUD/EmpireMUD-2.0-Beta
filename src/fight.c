@@ -2850,6 +2850,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		// endurance (extra HP)
 		if (can_gain_exp_from(victim, ch)) {
 			gain_ability_exp(victim, ABIL_ENDURANCE, 2);
+			run_ability_gain_hooks(victim, AGH_TAKE_DAMAGE);
 		}
 
 		// armor skills
@@ -3051,7 +3052,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	extern const double basic_speed;
 	
 	struct instance_data *inst;
-	int w_type, result, bonus;
+	int w_type, result, bonus, ret_val;
 	bool success = FALSE, block = FALSE;
 	bool can_gain_skill;
 	empire_data *victim_emp;
@@ -3157,12 +3158,19 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// miss
 		combat_meter_miss(ch);
 		combat_meter_dodge(victim);
-		return damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type);
+		ret_val = damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type);
+		if (can_gain_exp_from(victim, ch)) {
+			run_ability_gain_hooks(victim, AGH_DODGE);
+		}
+		return ret_val;
 	}
 	else if (block) {
 		combat_meter_miss(ch);
 		combat_meter_block(victim);
 		block_attack(ch, victim, w_type);
+		if (can_gain_exp_from(victim, ch)) {
+			run_ability_gain_hooks(victim, AGH_BLOCK);
+		}
 		return 0;
 	}
 	else {
@@ -3201,6 +3209,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
+			if (can_gain_exp_from(ch, victim)) {
+				run_ability_gain_hooks(ch, AGH_MELEE);
+			}
+			
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
 				dam *= 1.5;
 				if (can_gain_exp_from(ch, victim)) {
@@ -3675,6 +3687,9 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 	else if (!success) {
 		damage(ch, vict, 0, GET_MISSILE_WEAPON_TYPE(weapon), DAM_PHYSICAL);
+		if (can_gain_exp_from(vict, ch)) {
+			run_ability_gain_hooks(vict, AGH_DODGE);
+		}
 	}
 	else {
 		// compute damage
@@ -3746,10 +3761,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						break;
 					}
 				}
-				
-				if (can_gain_exp_from(ch, vict)) {
-					gain_ability_exp(ch, ABIL_TRICK_SHOTS, 10);
-				}
 			}
 		}
 		
@@ -3762,9 +3773,11 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_ARCHERY, 2);
 			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
+			gain_ability_exp(ch, ABIL_TRICK_SHOTS, 2);
 			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
 				gain_ability_exp(ch, ABIL_ALACRITY, 2);
 			}
+			run_ability_gain_hooks(ch, AGH_RANGED);
 		}
 	}
 	

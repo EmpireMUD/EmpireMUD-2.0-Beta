@@ -731,6 +731,7 @@ void free_char(char_data *ch) {
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct ability_gain_hook *hook, *next_hook;
 	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
@@ -907,6 +908,9 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
+		}
+		HASH_ITER(hh, GET_ABILITY_GAIN_HOOKS(ch), hook, next_hook) {
+			free(hook);
 		}
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
 			HASH_DEL(GET_CURRENCIES(ch), cur);
@@ -3289,6 +3293,7 @@ void delete_player_character(char_data *ch) {
 * @param bool fresh If FALSE, player was already in the game, not logging in fresh.
 */
 void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
+	void add_all_gain_hooks(char_data *ch);
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
 	void clean_lore(char_data *ch);
@@ -3434,6 +3439,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// verify skills, abilities, and class and skill/gear levels are up-to-date
 	check_skills_and_abilities(ch);
 	determine_gear_level(ch);
+	add_all_gain_hooks(ch);
 	
 	SAVE_CHAR(ch);
 

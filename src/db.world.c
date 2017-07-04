@@ -77,6 +77,7 @@ int count_city_points_used(empire_data *emp);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void decustomize_room(room_data *room);
 room_vnum find_free_vnum();
+room_data *get_extraction_room();
 crop_data *get_potential_crop_for_location(room_data *location);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
@@ -354,7 +355,6 @@ room_data *create_room(room_data *home) {
 */
 void delete_room(room_data *room, bool check_exits) {
 	EVENT_CANCEL_FUNC(cancel_room_expire_event);
-	void extract_pending_chars();
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
@@ -364,6 +364,7 @@ void delete_room(room_data *room, bool check_exits) {
 	struct empire_territory_data *ter;
 	struct empire_city_data *city, *next_city;
 	room_data *rm_iter, *next_rm, *home;
+	room_data *extraction_room = NULL;
 	vehicle_data *veh, *next_veh;
 	struct instance_data *inst;
 	struct affected_type *af;
@@ -459,10 +460,15 @@ void delete_room(room_data *room, bool check_exits) {
 		if (!IS_NPC(c)) {
 			save_char(c, NULL);
 		}
+		
+		if (!extraction_room) {
+			extraction_room = get_extraction_room();
+		}
+		char_to_room(c, extraction_room);
+		
 		extract_all_items(c);
 		extract_char(c);
 	}
-	extract_pending_chars();
 
 	/* Remove the objects */
 	while (ROOM_CONTENTS(room)) {
@@ -2643,6 +2649,30 @@ room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance) {
 	}
 	
 	return to_room;
+}
+
+
+/**
+* Finds/creates the room where mobs go when extractions are pending.
+*
+* @return room_data* The extraction room.
+*/
+room_data *get_extraction_room(void) {
+	room_data *room, *iter;
+	
+	LL_FOREACH2(interior_room_list, iter, next_interior) {
+		if (GET_BUILDING(iter) && GET_BLD_VNUM(GET_BUILDING(iter)) == RTYPE_EXTRACTION_PIT) {
+			return iter;
+		}
+	}
+	
+	// did not find -- make one
+	room = create_room(NULL);
+	attach_building_to_room(building_proto(RTYPE_EXTRACTION_PIT), room, TRUE);
+	GET_ISLAND_ID(room) = NO_ISLAND;
+	GET_ISLAND(room) = NULL;
+	
+	return room;
 }
 
 

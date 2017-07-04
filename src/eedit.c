@@ -32,7 +32,6 @@
 #define EEDIT(name)		void (name)(char_data *ch, char *argument, empire_data *emp)
 
 // externs
-void eliminate_linkdead_players();
 
 // locals
 EEDIT(eedit_adjective);
@@ -689,8 +688,6 @@ EEDIT(eedit_num_ranks) {
 		msg_to_char(ch, "You must choose a number of ranks between 2 and %d.\r\n", MAX_RANKS);
 	}
 	else {
-		eliminate_linkdead_players();
-		
 		// update all players
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 			if (index->loyalty != emp) {
