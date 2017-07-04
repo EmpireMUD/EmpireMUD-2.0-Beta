@@ -2701,7 +2701,7 @@ OLC_MODULE(abiledit_masteryability) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
-			msg_to_char(ch, "It now had %s (%d) as its mastery ability.\r\n", ABIL_NAME(find), ABIL_VNUM(find));
+			msg_to_char(ch, "It now has %s (%d) as its mastery ability.\r\n", ABIL_NAME(find), ABIL_VNUM(find));
 		}
 	}
 	else {

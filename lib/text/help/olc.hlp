@@ -3890,7 +3890,7 @@ Most applies are self-explanatory:
  MAX-MOVE - move pool
  RESIST-PHYSICAL - physical damage reduction
  BLOCK - block only matters if the player has a shield
- * - not used
+ HEAL-OVER-TIME - healing even during battle
  MAX-HEALTH - health pool
  MAX-MANA - mana pool
  TO-HIT - chance to hit (%)

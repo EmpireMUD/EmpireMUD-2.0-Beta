@@ -1513,7 +1513,7 @@ OLC_MODULE(genedit_quick_cooldown) {
 	two_arguments(argument, type_arg, vnum_arg);
 	
 	if (!*type_arg || !*vnum_arg) {
-		msg_to_char(ch, "Usage: .quickcooldown <type> <vnum>\r\n");
+		msg_to_char(ch, "Usage: .generic quickcooldown <type> <vnum>\r\n");
 		return;
 	}
 	if (!(from_type = find_olc_type(type_arg))) {
