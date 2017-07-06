@@ -1011,7 +1011,7 @@ DO_ABIL(do_damage_ability) {
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
 	int result, dmg;
 	
-	dmg = subdata->scale_points * (data->matching_role ? 3 : 2);	// could go higher?
+	dmg = subdata->scale_points * (data->matching_role ? 6 : 3);	// could go higher?
 	
 	// bonus damage if role matches
 	if (data->matching_role) {
