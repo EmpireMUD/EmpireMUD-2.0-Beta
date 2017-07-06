@@ -560,14 +560,17 @@ void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
 * @param char_data *ch The user of the ability.
 * @param ability_data *abil The ability being used.
 * @param int level The level we're using the ability at.
+* @param bitvector_t type The ABILT_ to modify for, if any.
 * @param struct ability_exec *data The ability data being passed around.
 */
-double standard_ability_scale(char_data *ch, ability_data *abil, int level, struct ability_exec *data) {
+double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data) {
 	double points;
 	
 	// determine points
 	points = level / 100.0 * config_get_double("scale_points_at_100");
-	points *= get_type_modifier(abil, ABILT_BUFF);
+	if (type) {
+		points *= get_type_modifier(abil, type);
+	}
 	points *= ABIL_SCALE(abil);
 	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
 		points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
@@ -1271,7 +1274,7 @@ PREP_ABIL(prep_buff_ability) {
 		return;	// prevent charging for the ability or adding a cooldown by not setting success
 	}
 	
-	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, data);
+	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUFF, data);
 }
 
 
@@ -1279,7 +1282,7 @@ PREP_ABIL(prep_buff_ability) {
 * PREP_ABIL provides: ch, abil, level, vict, data
 */
 PREP_ABIL(prep_damage_ability) {
-	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, data);
+	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
 }
 
 
@@ -1287,7 +1290,7 @@ PREP_ABIL(prep_damage_ability) {
 * PREP_ABIL provides: ch, abil, level, vict, data
 */
 PREP_ABIL(prep_dot_ability) {
-	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, data);
+	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
 }
 
 
