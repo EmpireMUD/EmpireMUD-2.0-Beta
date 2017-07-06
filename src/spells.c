@@ -316,6 +316,7 @@ ACMD(do_damage_spell) {
 	
 	// check counterspell and then damage
 	if (!trigger_counterspell(vict)) {
+		msg_to_char(ch, "Damage: %d\r\n", dmg);
 		result = damage(ch, vict, dmg, damage_spell[type].attack_type, DAM_MAGICAL);
 		
 		// damage returns -1 on death
