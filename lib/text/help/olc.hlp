@@ -2782,6 +2782,9 @@ Each generic type has its own requirements and features. See the help file
 for each type:
  ACTION - Simple echoes performed during building (GENERIC ACTIONS)
  LIQUID - Drinkables for use in items (GENERIC LIQUIDS)
+ COOLDOWN - For use in abilities and scripts (GENERIC COOLDOWNS)
+ AFFECT - Shown on the 'affects' list, and wear-off messages (GENERIC AFFECTS)
+ CURRENCY - Used in shops and scripts (GENERIC CURRENCY)
 
 See also: OLC GENERICS
 #d
