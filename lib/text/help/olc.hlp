@@ -879,8 +879,11 @@ Usage:  .types add <type> [weight]
         .types remove <type>
 
 Ability types determine how they behave, and open up additional editor options.
-The 'weight' of an ability type determines how many scaling points it receives,
-similar to the applies on objects, morphs, etc.
+The 'weight' of an ability type determines what percentage of scaling points it
+receives, similar to the applies on objects, morphs, etc.
+
+Weights can be 0, meaning they don't take any scaling points from other types.
+Any type with a weight of 0 should still get 1 point worth of effect.
 
 The following types are available (each has its own help file):
  &cCRAFT&0 - Used for craft/building recipes.

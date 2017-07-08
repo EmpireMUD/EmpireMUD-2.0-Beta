@@ -2841,8 +2841,8 @@ OLC_MODULE(abiledit_types) {
 		else if ((typeid = search_block(arg, ability_type_flags, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
 		}
-		else if (*weight_arg && (!isdigit(*weight_arg) || (weight = atoi(weight_arg)) < 1)) {
-			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
+		else if (*weight_arg && (!isdigit(*weight_arg) || (weight = atoi(weight_arg)) < 0)) {
+			msg_to_char(ch, "Weight must be 0 or higher.\r\n");
 		}
 		else {
 			add_type_to_ability(abil, BIT(typeid), weight);
@@ -2876,8 +2876,8 @@ OLC_MODULE(abiledit_types) {
 		if (!change) {
 			msg_to_char(ch, "Invalid type.\r\n");
 		}
-		else if ((weight = atoi(val_arg)) < 1) {
-			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
+		else if ((weight = atoi(val_arg)) < 0) {
+			msg_to_char(ch, "Weight must be 0 or higher.\r\n");
 		}
 		else {
 			change->weight = weight;
