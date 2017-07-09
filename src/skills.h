@@ -189,7 +189,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_ADVANCED_WOODWORKING  59
 #define ABIL_SIEGEWORKS  60
 #define ABIL_SHIPBUILDING  61
-#define ABIL_SWIMMING  62
 #define ABIL_FORAGE  63
 #define ABIL_RIDE  64
 #define ABIL_ALL_TERRAIN_RIDING  65

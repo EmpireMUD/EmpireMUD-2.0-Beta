@@ -894,7 +894,7 @@ Available techs are:
  &cSee-Inventory&0 - Can see other players' inventories.
  &cShear-Upgrade&0 - Increases the number of items received from shear.
  &cSteal-Upgrade&0 - Can steal from vaults too.
- &cSwimming&0 - Can move on water tiles with no boat.
+ &cSwimming&0 * - Can move on water tiles with no boat.
  &cTeleport-City&0 - Teleport can target your cities (requires an ability).
  &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
  &cWhere-Upgrade&0 * - Increases the range of the 'where' command.

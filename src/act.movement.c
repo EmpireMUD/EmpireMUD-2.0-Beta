@@ -343,7 +343,7 @@ void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, int mode) {
 	}
 	
 	if (mode == MOVE_SWIM) {
-		gain_ability_exp(ch, ABIL_SWIMMING, 1);
+		gain_player_tech_exp(ch, PTECH_SWIMMING, 1);
 	}
 	
 	if (IS_RIDING(ch)) {
@@ -937,7 +937,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	// if the room we're going to is water, check for ability to move
 	if (WATER_SECT(to_room)) {
 		if (!EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch)) {
-			if (has_ability(ch, ABIL_SWIMMING) && (mode == MOVE_NORMAL || mode == MOVE_FOLLOW)) {
+			if (has_player_tech(ch, PTECH_SWIMMING) && (mode == MOVE_NORMAL || mode == MOVE_FOLLOW)) {
 				mode = MOVE_SWIM;
 			}
 			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
