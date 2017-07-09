@@ -2540,11 +2540,10 @@ SHOW(show_technology) {
 	
 	struct player_tech *ptech;
 	char one[256], line[256];
+	char_data *vict = NULL;
 	bool is_file = FALSE;
-	char_data *vict;
 	int last_tech;
 	size_t lsize;
-	bool newl;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Show technology for which player?\r\n");
@@ -2559,7 +2558,6 @@ SHOW(show_technology) {
 		last_tech = NOTHING;
 		*line = '\0';
 		lsize = 0;
-		newl = FALSE;
 		
 		LL_FOREACH(GET_TECHS(ch), ptech) {
 			if (ptech->id == last_tech) {
@@ -2585,7 +2583,7 @@ SHOW(show_technology) {
 		}
 	}
 	
-	if (is_file) {
+	if (vict && is_file) {
 		free_char(vict);
 	}
 }
