@@ -737,6 +737,28 @@ void gain_ability_exp(char_data *ch, any_vnum ability, double amount) {
 
 
 /**
+* Gains experience based on what's giving a player a certain tech.
+*
+* @param char_data *ch The player gaining exp.
+* @param int tech The PTECH_ type that's triggering.
+* @param double amount How much exp to gain.
+*/
+void gain_player_tech_exp(char_data *ch, int tech, double amount) {
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			gain_ability_exp(ch, iter->abil, amount);
+		}
+	}
+}
+
+
+/**
 * Mostly-raw skill gain/loss -- slightly more checking than set_skill(). This
 * will not pass skill cap boundaries. It will NEVER gain you from 0 either.
 *

@@ -299,7 +299,7 @@ void update_actions(void) {
 		}
 		if (IS_SET(act_flags, ACTF_FINDER) && has_player_tech(ch, PTECH_FAST_FIND)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
-			run_ability_gain_hooks(ch, NULL, AGH_FIND_ACTION);
+			gain_player_tech_exp(ch, PTECH_FAST_FIND, 0.1);
 		}
 		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
 			speed += ACTION_CYCLE_MULTIPLIER;

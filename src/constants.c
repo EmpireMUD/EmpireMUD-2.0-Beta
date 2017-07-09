@@ -204,8 +204,7 @@ const char *ability_gain_hooks[] = {
 	"PASSIVE-HOURLY",
 	"ONLY-DARK",
 	"ONLY-LIGHT",
-	"FIND-ACTION",	// 10
-	"ONLY-VS-ANIMAL",
+	"ONLY-VS-ANIMAL",	// 10
 	"\n"
 };
 

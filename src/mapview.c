@@ -1801,7 +1801,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
-	if (has_ability(ch, ABIL_MASTER_TRACKER)) {
+	if (has_player_tech(ch, PTECH_WHERE_UPGRADE)) {
 		max_distance = 75;
 	}
 	else {
@@ -1859,7 +1859,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			else {
 				msg_to_char(ch, "%-20s - %s, %d tile%s %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
 			}
-			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
+			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
 	}
 	else {			/* print only FIRST char, not all. */
@@ -1919,7 +1919,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			else {
 				msg_to_char(ch, "%-25s - %s, %d tile%s %s\r\n", PERS(found, ch, 0), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
 			}
-			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
+			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
 		else {
 			send_to_char("No-one around by that name.\r\n", ch);

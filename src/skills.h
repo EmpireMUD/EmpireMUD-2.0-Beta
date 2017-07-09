@@ -55,6 +55,7 @@ extern bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int 
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
 extern bool check_solo_role(char_data *ch);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);
+void gain_player_tech_exp(char_data *ch, int tech, double amount);
 extern bool gain_skill(char_data *ch, skill_data *skill, int amount);
 extern bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount);
 extern struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bool add_if_missing);
@@ -195,10 +196,8 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_STAMINA  66
 #define ABIL_NIGHTSIGHT  68
 #define ABIL_FIND_HERBS  70
-#define ABIL_HUNT  71
 #define ABIL_FISH  72
 #define ABIL_TRACK  73
-#define ABIL_MASTER_TRACKER  74
 #define ABIL_SATED_THIRST  75
 #define ABIL_NO_TRACE  76
 #define ABIL_RESIST_POISON  77

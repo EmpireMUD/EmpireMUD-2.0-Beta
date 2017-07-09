@@ -577,10 +577,6 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 			amount = 0.5;
 			break;
 		}
-		case AGH_FIND_ACTION: {
-			amount = 0.1;
-			break;
-		}
 		case AGH_MELEE:
 		case AGH_RANGED:
 		case AGH_DODGE:
