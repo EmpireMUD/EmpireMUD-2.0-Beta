@@ -890,6 +890,7 @@ The following types are available (each has its own help file):
  &cBUFF&0 - Puts affects on characters.
  &cDAMAGE&0 - Deals direct damage.
  &cDOT&0 - Adds a damage-over-time effect.
+ &cPLAYER-TECH&0 - Various 'techs' that players get from abilities.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY

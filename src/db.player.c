@@ -740,6 +740,7 @@ void free_char(char_data *ch) {
 	struct player_currency *cur, *next_cur;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
+	struct player_tech *ptech;
 	struct offer_data *offer;
 	struct lore_data *lore;
 	struct coin_data *coin;
@@ -923,6 +924,11 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
 			HASH_DEL(GET_MOUNT_LIST(ch), mount);
 			free(mount);
+		}
+		
+		while ((ptech = GET_TECHS(ch))) {
+			GET_TECHS(ch) = ptech->next;
+			free(ptech);
 		}
 		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));

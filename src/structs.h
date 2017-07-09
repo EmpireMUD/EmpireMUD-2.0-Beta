@@ -435,6 +435,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_BUFF  BIT(1)	// applies an affect
 #define ABILT_DAMAGE  BIT(2)	// deals damage
 #define ABILT_DOT  BIT(3)	// damage over time effect
+#define ABILT_PLAYER_TECH  BIT(4)	// some player tech feature
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)
@@ -447,6 +448,10 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_MANUAL  BIT(10)
 #define ABILT_ROOMS  BIT(11)
 */
+
+
+// ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
+#define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
 
 
 // ATAR_x: ability targeting flags
@@ -475,6 +480,10 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_COUNTERSPELL_TO_CHAR  5
 #define ABIL_CUSTOM_COUNTERSPELL_TO_VICT  6
 #define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM  7
+
+
+// ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
+#define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
 
 
 // AGH_x: ability gain hooks
@@ -1858,6 +1867,60 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
 
 
+// PTECH_x: player techs
+#define PTECH_RESERVED  0
+#define PTECH_ARMOR_HEAVY  1	// can wear heavy armor
+#define PTECH_ARMOR_LIGHT  2	// can wear light armor
+#define PTECH_ARMOR_MAGE  3	// can wear mage armor
+#define PTECH_ARMOR_MEDIUM  4	// can wear medium armor
+#define PTECH_BLOCK  5	// can use shields/block
+#define PTECH_BLOCK_RANGED  6	// can block arrows (requires block)
+#define PTECH_BLOCK_MAGICAL  7	// can block magical attacks (requires block)
+#define PTECH_BONUS_VS_ANIMALS  8	// extra damage against animals
+#define PTECH_BUTCHER  9	// can use the 'butcher' command/interaction
+#define PTECH_CUSTOMIZE_BUILDING  10	// player can customize buildings
+#define PTECH_DEEP_MINES  11	// increases mine size
+#define PTECH_DUAL_WIELD  12	// can fight with offhand weapons
+#define PTECH_ENCHANTMENT_UPGRADE  13	// enhances all enchants
+#define PTECH_FASTCASTING  14	// wits affects non-combat abilities instead of combat speed
+#define PTECH_FAST_FIND  15	// digging, gathering, panning, picking
+#define PTECH_FISH  16	// can use the 'fish' command/interaction
+#define PTECH_FORAGE  17	// can use the 'forage' command/interaction
+#define PTECH_HARVEST_UPGRADE  18	// more results from harvest
+#define PTECH_HEALING_BOOST  19	// increases healing effects
+#define PTECH_HIDE_UPGRADE  20	// improves hide and blocks search
+#define PTECH_INFILTRATE  21	// can enter buildings without permission
+#define PTECH_INFILTRATE_UPGRADE  22	// better infiltrates
+#define PTECH_LARGER_WHERE  23	// 'where' command embiggens
+#define PTECH_LIGHT_FIRE  24	// player can light torches/fires
+#define PTECH_MAP_INVIS  25	// can't be seen on the map
+#define PTECH_MILL_UPGRADE  26	// more results from milling
+#define PTECH_NAVIGATION  27	// player sees correct directions
+#define PTECH_NO_HUNGER  28	// player won't get hungry
+#define PTECH_NO_POISON  29	// immune to poison effects
+#define PTECH_NO_THIRST  30	// player won't get thirsty
+#define PTECH_NO_TRACK_CITY  31	// blocks track/where in cities/indoors
+#define PTECH_NO_TRACK_WILD  32	// blocks track/where in the wild
+#define PTECH_PICKPOCKET  33	// can use the 'pickpocket' command/interaction
+#define PTECH_POISON  34	// can use poisons in combat
+#define PTECH_POISON_UPGRADE  35	// enhances all poisons
+#define PTECH_PORTAL  36	// can open portals
+#define PTECH_PORTAL_UPGRADE  37	// can open long-distance portals
+#define PTECH_RANGED_COMBAT  38	// can use ranged weapons
+#define PTECH_RIDING  39	// player can ride mounts
+#define PTECH_RIDING_FLYING  40	// player can ride flying mounts (requires riding)
+#define PTECH_RIDING_UPGRADE  41	// no terrain restrictions on riding (requires riding)
+#define PTECH_ROUGH_TERRAIN  42	// player can cross rough-to-rough
+#define PTECH_SEE_CHARS_IN_DARK  43	// can see people in dark rooms
+#define PTECH_SEE_OBJS_IN_DARK  44	// includes vehicles
+#define PTECH_SEE_INVENTORY  45	// can see players' inventories
+#define PTECH_SHEAR_UPGRADE  46	// more results from shear
+#define PTECH_STEAL_UPGRADE  47	// can steal from vaults
+#define PTECH_SWIMMING  48	// player can enter water tiles
+#define PTECH_TELEPORT_CITY  49	// teleports can target cities
+#define PTECH_TWO_HANDED_WEAPONS  50	// can wield two-handed weapons
+
+
 // summon types for oval_summon, ofin_summon, and add_offer
 #define SUMMON_PLAYER  0	// normal "summon player" command
 #define SUMMON_ADVENTURE  1	// for adventure_summon()
@@ -2625,6 +2688,7 @@ struct ability_data {
 	int attack_type;	// damage
 	int damage_type;	// damage
 	int max_stacks;	// dot
+	struct ability_data_list *data;	// LL of additional data
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup
@@ -2633,6 +2697,15 @@ struct ability_data {
 	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
+};
+
+
+// for abilities with misc data
+struct ability_data_list {
+	int type;	// ADL_ type of data list
+	any_vnum vnum;	// number of the list entry thing
+	int misc;	// future use?
+	struct ability_data_list *next;
 };
 
 
@@ -3325,6 +3398,14 @@ struct player_slash_history {
 };
 
 
+// player techs (from abilities)
+struct player_tech {
+	int id;	// which PTECH_
+	any_vnum abil;	// which ability it came from
+	struct player_tech *next;	// LL: GET_TECHS(ch)
+};
+
+
 /*
  * Specials needed only by PCs, not NPCs.  Space for this structure is
  * not allocated in memory for NPCs, but it is for PCs.
@@ -3437,6 +3518,7 @@ struct player_special_data {
 	class_data *character_class;  // character's class as determined by top skills
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
+	struct player_tech *techs;	// techs from abilities
 	
 	// tracking for specific skills
 	byte confused_dir;  // people without Navigation think this dir is north

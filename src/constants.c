@@ -133,6 +133,7 @@ const char *ability_type_flags[] = {
 	"BUFF",
 	"DAMAGE",
 	"DOT",
+	"PLAYER-TECH",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -180,6 +181,13 @@ const char *ability_custom_types[] = {
 	"counterspell-to-char",	// 5
 	"counterspell-to-vict",
 	"counterspell-to-room",
+	"\n"
+};
+
+
+// ADL_x: for adding to ability_data_list
+const char *ability_data_types[] = {
+	"PTECH",
 	"\n"
 };
 
@@ -706,6 +714,63 @@ const char *connected_types[] = {
 	"Add bonus",
 	"Promo code?",	// 25
 	"Confirm promo",
+	"\n"
+};
+
+
+// PTECH_x: player techs
+const char *player_tech_types[] = {
+	"RESERVED",	// 0
+	"Armor-Heavy",
+	"Armor-Light",
+	"Armor-Mage",
+	"Armor-Medium",
+	"Block"	// 5
+	"Block-Ranged",
+	"Block-Magical",
+	"Bonus-vs-Animals",
+	"Butcher",
+	"Customize-Building",	// 10
+	"Deep-Mines",
+	"Dual-Wield",
+	"Enchantment-Upgrade",
+	"Fastcasting",
+	"Fast-Find",	// 15
+	"Fish",
+	"Forage",
+	"Harvest-Upgrade",
+	"Helaing-Boost",
+	"Hide-Upgrade",	// 20
+	"Infiltrate",
+	"Infiltrate-Upgrade",
+	"Larger-Where",
+	"Light-Fire",
+	"Map-Invis",	// 25
+	"Mill-Upgrade",
+	"Navigation",
+	"!Hunger",
+	"!Poison",
+	"!Thirst",	// 30
+	"!Track-City",
+	"!Track-Wild",
+	"Pickpocket",
+	"Poison",
+	"Poison-Upgrade",	// 35
+	"Portal",
+	"Portal-Upgrade",
+	"Ranged-Combat",
+	"Riding",
+	"Riding-Flying",	// 40
+	"Riding-Upgrade",
+	"Rough-Terrain",
+	"See-Chars-In-Dark",
+	"See-Objs-In-Dark",
+	"See-Inventory",	// 45
+	"Shear-Upgrade",
+	"Steal-Upgrade",
+	"Swimming",
+	"Teleport-City",
+	"Two-Handed-Weapons",	// 50
 	"\n"
 };
 
