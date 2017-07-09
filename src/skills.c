@@ -80,6 +80,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	void retract_claws(char_data *ch);
 	void undisguise(char_data *ch);	
 	
+	struct ability_data_list *adl;
 	obj_data *obj;
 	bool found = TRUE;	// inverted detection, see default below
 	
@@ -93,6 +94,42 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	// generic affect abilities
 	if (affected_by_spell_from_caster(ch, ABIL_AFFECT_VNUM(abil), ch)) {
 		affect_from_char_by_caster(ch, ABIL_AFFECT_VNUM(abil), ch, TRUE);
+	}
+	
+	// player tech losses
+	// TODO: should this set the 'found' bool? It would be unset later tho
+	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type != ADL_PLAYER_TECH) {
+				continue;	// wrong type
+			}
+			if (has_player_tech(ch, adl->vnum)) {
+				continue;	// player is still getting this tech from somewhere else
+			}
+			
+			// PTECH_x: what to do when losing the tech
+			switch (adl->vnum) {
+				case PTECH_RIDING: {
+					if (IS_RIDING(ch)) {
+						msg_to_char(ch, "You climb down from your mount.\r\n");
+						perform_dismount(ch);
+					}
+					break;
+				}
+				case PTECH_ARMOR_HEAVY:
+				case PTECH_ARMOR_LIGHT:
+				case PTECH_ARMOR_MAGE:
+				case PTECH_ARMOR_MEDIUM:
+				case PTECH_BLOCK:
+				case PTECH_FISH:
+				case PTECH_NAVIGATION:
+				case PTECH_RANGED_COMBAT:
+				case PTECH_TWO_HANDED_WEAPONS: {
+					// not yet implemented
+					break;
+				}
+			}
+		}
 	}
 	
 	switch (ABIL_VNUM(abil)) {
@@ -597,10 +634,10 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 			// whoops too low
 			for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
 				if (abil->purchased[iter]) {
+					remove_ability_by_set(ch, abil->ptr, iter, FALSE);
 					if (iter == GET_CURRENT_SKILL_SET(ch)) {
 						check_skill_sell(REAL_CHAR(ch), abil->ptr);
 					}
-					remove_ability_by_set(ch, abil->ptr, iter, FALSE);
 				}
 			}
 		}
@@ -643,8 +680,8 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 			abd = abil->ptr;
 			if (all || (ABIL_ASSIGNED_SKILL(abd) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
 				if (abil->purchased[GET_CURRENT_SKILL_SET(ch)] && ABIL_SKILL_LEVEL(abd) > 0) {
-					check_skill_sell(REAL_CHAR(ch), abil->ptr);
 					remove_ability(ch, abil->ptr, FALSE);
+					check_skill_sell(REAL_CHAR(ch), abil->ptr);
 				}
 			}
 		}
@@ -1253,6 +1290,7 @@ void mark_level_gained_from_ability(char_data *ch, ability_data *abil) {
 */
 void perform_swap_skill_sets(char_data *ch) {
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
+	void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 	
 	struct player_ability_data *plab, *next_plab;
 	int cur_set, old_set;
@@ -1281,10 +1319,12 @@ void perform_swap_skill_sets(char_data *ch) {
 		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {	// skill ability
 			if (plab->purchased[cur_set] && !plab->purchased[old_set]) {
 				// added
+				apply_ability_techs_to_player(ch, abil);
 				qt_change_ability(ch, ABIL_VNUM(abil));
 			}
 			else if (plab->purchased[old_set] && !plab->purchased[cur_set]) {
 				// removed
+				remove_player_tech(ch, ABIL_VNUM(abil));
 				check_skill_sell(ch, abil);
 				qt_change_ability(ch, ABIL_VNUM(abil));
 			}
@@ -1328,6 +1368,10 @@ void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, boo
 		
 		if (reset_levels) {
 			data->levels_gained = 0;
+		}
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH) && skill_set == GET_CURRENT_SKILL_SET(ch)) {
+			remove_player_tech(ch, ABIL_VNUM(abil));
 		}
 		
 		qt_change_ability(ch, ABIL_VNUM(abil));

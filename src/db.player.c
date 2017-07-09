@@ -3300,6 +3300,7 @@ void delete_player_character(char_data *ch) {
 */
 void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void add_all_gain_hooks(char_data *ch);
+	void apply_all_ability_techs(char_data *ch);
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
 	void clean_lore(char_data *ch);
@@ -3552,6 +3553,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	update_player_index(index, ch);
 	
 	// ensure data is up-to-date
+	apply_all_ability_techs(ch);
 	refresh_all_quests(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);

@@ -5706,6 +5706,11 @@ void remove_offers_by_type(char_data *ch, int type) {
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER TECH HANDLERS ////////////////////////////////////////////////////
 
+// Simple sorter to help display player techs
+int sort_player_techs(struct player_tech *a, struct player_tech *b) {
+	return (a->id - b->id);
+}
+
 /**
 * Adds a player tech (by ability) to the player.
 *
@@ -5733,7 +5738,7 @@ void add_player_tech(char_data *ch, any_vnum abil, int tech) {
 		CREATE(pt, struct player_tech, 1);
 		pt->id = tech;
 		pt->abil = abil;
-		LL_PREPEND(GET_TECHS(ch), pt);
+		LL_INSERT_INORDER(GET_TECHS(ch), pt, sort_player_techs);
 	}
 }
 

@@ -3467,6 +3467,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *mob_custom_types[];
 	extern const char *mob_move_types[];
 	extern const char *player_bits[];
+	extern const char *player_tech_types[];
 	extern const char *position_types[];
 	extern const char *preference_bits[];
 	extern const char *connected_types[];
@@ -3475,9 +3476,10 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern struct promo_code_list promo_codes[];
 
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
+	struct player_tech *ptech;
 	struct script_memory *mem;
 	struct cooldown_data *cool;
-	int count, i, i2, iter, diff, found = 0, val;
+	int count, i, i2, iter, diff, found = 0, val, last_tech;
 	obj_data *j;
 	struct follow_type *fol;
 	struct over_time_effect_type *dot;
@@ -3613,6 +3615,17 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "GRANTS: &g%s&0\r\n", buf2);
 		sprintbit(SYSLOG_FLAGS(k), syslog_types, buf2, TRUE);
 		msg_to_char(ch, "SYSLOGS: &c%s&0\r\n", buf2);
+		
+		// techs (slightly complicated
+		msg_to_char(ch, "Techs: &g");
+		last_tech = NOTHING;
+		LL_FOREACH(GET_TECHS(ch), ptech) {
+			if (ptech->id != last_tech) {
+				msg_to_char(ch, "%s%s", (last_tech != NOTHING) ? ", " : "", player_tech_types[ptech->id]);
+			}
+			last_tech = ptech->id;
+		}
+		msg_to_char(ch, "%s&0\r\n", (last_tech == NOTHING) ? "none" : "");
 	}
 
 	if (!is_proto) {

@@ -214,6 +214,58 @@ void add_type_to_ability(ability_data *abil, bitvector_t type, int weight) {
 
 
 /**
+* Takes the techs from an ability and applies them to a player.
+*
+* @param char_data *ch The player to apply to.
+* @param ability_data *abil The ability whose techs we'll apply.
+*/
+void apply_ability_techs_to_player(char_data *ch, ability_data *abil) {
+	struct ability_data_list *adl;
+	
+	if (IS_NPC(ch) || !IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+		return;	// no techs to apply
+	}
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_PLAYER_TECH) {
+			continue;
+		}
+		
+		// ok
+		add_player_tech(ch, ABIL_VNUM(abil), adl->vnum);
+	}
+}
+
+
+/**
+* Applies all the ability techs from a player's current skill set (e.g. upon
+* login).
+*
+* @param char_data *ch The player.
+*/
+void apply_all_ability_techs(char_data *ch) {
+	struct player_ability_data *plab, *next_plab;
+	ability_data *abil;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;
+		}
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+			apply_ability_techs_to_player(ch, abil);
+		}
+	}
+}
+
+
+/**
 * Audits abilities on startup.
 */
 void check_abilities(void) {
