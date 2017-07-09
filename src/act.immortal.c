@@ -2548,7 +2548,7 @@ SHOW(show_technology) {
 	if (!*argument) {
 		msg_to_char(ch, "Show technology for which player?\r\n");
 	}
-	else if (!(vict = find_or_load_player(arg, &is_file))) {
+	else if (!(vict = find_or_load_player(argument, &is_file))) {
 		send_config_msg(ch, "no_person");
 	}
 	else {
