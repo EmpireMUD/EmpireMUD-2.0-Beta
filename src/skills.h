@@ -193,9 +193,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_RIDE  64
 #define ABIL_ALL_TERRAIN_RIDING  65
 #define ABIL_STAMINA  66
-#define ABIL_BY_MOONLIGHT  67
 #define ABIL_NIGHTSIGHT  68
-#define ABIL_FINDER  69
 #define ABIL_FIND_HERBS  70
 #define ABIL_HUNT  71
 #define ABIL_FISH  72
@@ -351,7 +349,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_STURDY_ARMORS  222
 #define ABIL_RAWHIDE_STITCHING  223
 #define ABIL_MAGIC_ATTIRE  224
-#define ABIL_PREDATOR_VISION  225
 #define ABIL_SANGUINE_RESTORATION  226
 #define ABIL_WARD_AGAINST_MAGIC  227
 #define ABIL_NOBLE_BEARING  228

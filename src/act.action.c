@@ -297,9 +297,9 @@ void update_actions(void) {
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
 		}
-		if (IS_SET(act_flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
+		if (IS_SET(act_flags, ACTF_FINDER) && has_player_tech(ch, PTECH_FAST_FIND)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
-			gain_ability_exp(ch, ABIL_FINDER, 0.1);
+			run_ability_gain_hooks(ch, NULL, AGH_FIND_ACTION);
 		}
 		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
 			speed += ACTION_CYCLE_MULTIPLIER;

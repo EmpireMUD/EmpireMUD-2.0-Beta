@@ -52,6 +52,7 @@
 *   Custom Message Handlers
 *   Object Targeting Handlers
 *   Offer Handlers
+*   Player Tech Handlers
 *   Requirement Handlers
 *   Resource Depletion Handlers
 *   Room Handlers
@@ -5697,6 +5698,88 @@ void remove_offers_by_type(char_data *ch, int type) {
 		if (offer->type == type) {
 			REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
 			free(offer);
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PLAYER TECH HANDLERS ////////////////////////////////////////////////////
+
+/**
+* Adds a player tech (by ability) to the player.
+*
+* @param char_data *ch The player gaining a tech.
+* @param any_vnum abil The ability that's granting it.
+* @param int tech The PTECH_ to gain.
+*/
+void add_player_tech(char_data *ch, any_vnum abil, int tech) {
+	struct player_tech *iter, *pt;
+	bool found = FALSE;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->abil == abil && iter->id == tech) {
+			found = TRUE;
+			break;
+		}
+	}
+	
+	// add it
+	if (!found) {
+		CREATE(pt, struct player_tech, 1);
+		pt->id = tech;
+		pt->abil = abil;
+		LL_PREPEND(GET_TECHS(ch), pt);
+	}
+}
+
+
+/**
+* Whether or not a PC has the requested tech.
+*
+* @param char_data *ch The player.
+* @param int tech Which PTECH_ to see if he/she has.
+* @return bool TRUE if the player has it, FALSE otherwise.
+*/
+bool has_player_tech(char_data *ch, int tech) {
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			return TRUE;
+		}
+	}
+	
+	// not found
+	return FALSE;
+}
+
+
+/**
+* Removes player techs by ability.
+*
+* @param char_data *ch The player losing techs.
+* @param any_vnum abil The ability whose techs are being lost.
+*/
+void remove_player_tech(char_data *ch, any_vnum abil) {
+	struct player_tech *iter, *next;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH_SAFE(GET_TECHS(ch), iter, next) {
+		if (iter->abil == abil) {
+			LL_DELETE(GET_TECHS(ch), iter);
+			free(iter);
 		}
 	}
 }

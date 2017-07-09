@@ -2850,7 +2850,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		// endurance (extra HP)
 		if (can_gain_exp_from(victim, ch)) {
 			gain_ability_exp(victim, ABIL_ENDURANCE, 2);
-			run_ability_gain_hooks(victim, AGH_TAKE_DAMAGE);
+			run_ability_gain_hooks(victim, ch, AGH_TAKE_DAMAGE);
 		}
 
 		// armor skills
@@ -3160,7 +3160,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		combat_meter_dodge(victim);
 		ret_val = damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type);
 		if (can_gain_exp_from(victim, ch)) {
-			run_ability_gain_hooks(victim, AGH_DODGE);
+			run_ability_gain_hooks(victim, ch, AGH_DODGE);
 		}
 		return ret_val;
 	}
@@ -3169,7 +3169,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		combat_meter_block(victim);
 		block_attack(ch, victim, w_type);
 		if (can_gain_exp_from(victim, ch)) {
-			run_ability_gain_hooks(victim, AGH_BLOCK);
+			run_ability_gain_hooks(victim, ch, AGH_BLOCK);
 		}
 		return 0;
 	}
@@ -3210,7 +3210,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
 			if (can_gain_exp_from(ch, victim)) {
-				run_ability_gain_hooks(ch, AGH_MELEE);
+				run_ability_gain_hooks(ch, victim, AGH_MELEE);
 			}
 			
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
@@ -3233,14 +3233,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 			
 			// raw damage modified by hunt
-			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_ability(ch, ABIL_HUNT)) {
-				if (can_gain_exp_from(ch, victim)) {
-					gain_ability_exp(ch, ABIL_HUNT, 2);
-				}
-			
-				if (skill_check(ch, ABIL_HUNT, DIFF_EASY)) {
-					dam *= 2;
-				}
+			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_player_tech(ch, PTECH_BONUS_VS_ANIMALS)) {
+				dam *= 2;
 			}
 		
 			// raw damage modified by big game hunter
@@ -3688,7 +3682,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	else if (!success) {
 		damage(ch, vict, 0, GET_MISSILE_WEAPON_TYPE(weapon), DAM_PHYSICAL);
 		if (can_gain_exp_from(vict, ch)) {
-			run_ability_gain_hooks(vict, AGH_DODGE);
+			run_ability_gain_hooks(vict, ch, AGH_DODGE);
 		}
 	}
 	else {
@@ -3777,7 +3771,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
 				gain_ability_exp(ch, ABIL_ALACRITY, 2);
 			}
-			run_ability_gain_hooks(ch, AGH_RANGED);
+			run_ability_gain_hooks(ch, vict, AGH_RANGED);
 		}
 	}
 	

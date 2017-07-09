@@ -559,9 +559,10 @@ void remove_type_from_ability(ability_data *abil, bitvector_t type) {
 * Triggers ability gains by type.
 *
 * @param char_data *ch The person to try to gain exp.
+* @param char_data *opponent Optional: the opponent, if any (may be null).
 * @param bitvector_t trigger Which AGH_ event (only 1 at a time).
 */
-void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
+void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger) {
 	struct ability_gain_hook *agh, *next_agh;
 	ability_data *abil;
 	double amount;
@@ -574,6 +575,10 @@ void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
 	switch (trigger) {
 		case AGH_PASSIVE_FREQUENT: {
 			amount = 0.5;
+			break;
+		}
+		case AGH_FIND_ACTION: {
+			amount = 0.1;
 			break;
 		}
 		case AGH_MELEE:
@@ -603,6 +608,9 @@ void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
 		}
 		if (IS_SET(agh->triggers, AGH_ONLY_LIGHT) && IS_DARK(IN_ROOM(ch))) {
 			continue;	// not light
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_VS_ANIMAL) && (!opponent || !MOB_FLAGGED(opponent, MOB_ANIMAL))) {
+			continue;	// not an animal
 		}
 		
 		gain_ability_exp(ch, agh->ability, amount);

@@ -493,6 +493,8 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
 #define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
 #define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
+#define AGH_FIND_ACTION  BIT(10)	// triggers on a find-type action tick
+#define AGH_ONLY_VS_ANIMAL  BIT(11)	// only if the target was an animal
 
 
 // RUN_ABIL_x: modes for activating abilities

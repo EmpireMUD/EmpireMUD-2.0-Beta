@@ -751,6 +751,10 @@ This tells the ability when to trigger skill gain:
  &cTAKE-DAMAGE&0 - Gains when you take damage.
  &cPASSIVE-FREQUENT&0 - Gains every 5 seconds.
  &cPASSIVE_HOURLY&0 - Gains every 75 seconds (game hour).
+ &cONLY-DARK&0 - Only gains if it's dark here.
+ &cONLY-LIGHT&0 - Only gains if it's NOT dark here.
+ &cFIND-ACTION&0 - Gains when the player is performing a find-type action.
+ &cONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
 
 See also: OLC ABILITIES
 #d
