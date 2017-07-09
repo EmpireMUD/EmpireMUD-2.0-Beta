@@ -191,7 +191,7 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_RIDE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -343,7 +343,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_RIDE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL)) {
 		return;
 	}
 	else {

@@ -5785,6 +5785,36 @@ void remove_player_tech(char_data *ch, any_vnum abil) {
 }
 
 
+/**
+* Runs ability triggers on any ability that's giving a player a certain tech.
+* Stops if any of those triggers blocks it.
+*
+* @param char_data *ch The person using the ability.
+* @param int tech Which PTECH_ to trigger.
+* @param char_data *cvict The target of the ability, if any.
+* @param obj_data *ovict The target of the ability, if any.
+* @param bool TRUE if a trigger blocked the ability, FALSE if it's safe to proceed.
+*/
+bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict) {
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			if (ABILITY_TRIGGERS(ch, cvict, ovict, iter->abil)) {
+				return TRUE;
+			}
+		}
+	}
+	
+	// survived
+	return FALSE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// REQUIREMENT HANDLERS ////////////////////////////////////////////////////
 

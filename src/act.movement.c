@@ -347,7 +347,7 @@ void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, int mode) {
 	}
 	
 	if (IS_RIDING(ch)) {
-		gain_ability_exp(ch, ABIL_RIDE, 1);
+		gain_player_tech_exp(ch, PTECH_RIDING, 1);
 		
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH)) {
 			gain_ability_exp(ch, ABIL_ALL_TERRAIN_RIDING, 5);
