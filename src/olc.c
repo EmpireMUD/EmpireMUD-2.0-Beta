@@ -4490,7 +4490,7 @@ bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *co
 		}
 	
 		// valid bit?
-		if (bit == NOTHING) {
+		if (bit == NOTHING && (!remove || !IS_SET(existing_bits, BIT(bit)))) {
 			msg_to_char(ch, "Unknown %s flag '%s'\r\n", name, arg2);
 		}
 		else if (!remove && *flag_names[bit] == '*') {
