@@ -1709,6 +1709,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	ABIL_MASTERY_ABIL(abil) = int_in[0];
 	ABIL_SCALE(abil) = dbl_in;
 	ABIL_IMMUNITIES(abil) = asciiflag_conv(str_in2);
+	ABIL_GAIN_HOOKS(abil) = asciiflag_conv(str_in3);
 	
 	// optionals
 	for (;;) {
