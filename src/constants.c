@@ -202,6 +202,8 @@ const char *ability_gain_hooks[] = {
 	"TAKE-DAMAGE",	// 5
 	"PASSIVE-FREQUENT",
 	"PASSIVE-HOURLY",
+	"ONLY-DARK",
+	"ONLY-LIGHT",
 	"\n"
 };
 

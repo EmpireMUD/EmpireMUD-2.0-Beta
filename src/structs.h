@@ -491,6 +491,8 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_TAKE_DAMAGE  BIT(5)	// gains when hit in melee
 #define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every 5
 #define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
+#define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
+#define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
 
 
 // RUN_ABIL_x: modes for activating abilities
