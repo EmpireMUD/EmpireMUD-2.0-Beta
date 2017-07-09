@@ -2539,10 +2539,10 @@ SHOW(show_technology) {
 	extern const char *player_tech_types[];
 	
 	struct player_tech *ptech;
+	int last_tech, count = 0;
 	char one[256], line[256];
 	char_data *vict = NULL;
 	bool is_file = FALSE;
-	int last_tech;
 	size_t lsize;
 	
 	if (!*argument) {
@@ -2564,9 +2564,9 @@ SHOW(show_technology) {
 				continue;
 			}
 			
-			snprintf(one, sizeof(one), "%s, ", player_tech_types[ptech->id]);
+			snprintf(one, sizeof(one), "\t%c%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id]);
 			
-			if (strlen(one) + lsize >= 79) {
+			if (color_strlen(one) + lsize >= 79) {
 				// send line
 				msg_to_char(ch, "%s\r\n", line);
 				lsize = 0;
@@ -2574,13 +2574,14 @@ SHOW(show_technology) {
 			}
 			
 			strcat(line, one);
-			lsize += strlen(one);
+			lsize += color_strlen(one);
 			last_tech = ptech->id;
 		}
 		
 		if (*line) {
 			msg_to_char(ch, "%s\r\n", line);
 		}
+		msg_to_char(ch, "\t0");
 	}
 	
 	if (vict && is_file) {
