@@ -725,7 +725,7 @@ const char *player_tech_types[] = {
 	"Armor-Light",
 	"Armor-Mage",
 	"Armor-Medium",
-	"Block"	// 5
+	"Block",	// 5
 	"Block-Ranged",
 	"Block-Magical",
 	"Bonus-vs-Animals",
@@ -739,7 +739,7 @@ const char *player_tech_types[] = {
 	"Fish",
 	"Forage",
 	"Harvest-Upgrade",
-	"Helaing-Boost",
+	"Healing-Boost",
 	"Hide-Upgrade",	// 20
 	"Infiltrate",
 	"Infiltrate-Upgrade",
