@@ -47,6 +47,7 @@ const char *default_skill_desc = "New skill";
 extern const char *skill_flags[];
 
 // eternal functions
+void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
 void update_class(char_data *ch);
@@ -429,11 +430,15 @@ void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool r
 		if (reset_levels) {
 			data->levels_gained = 0;
 		}
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH) && skill_set == GET_CURRENT_SKILL_SET(ch)) {
+			apply_ability_techs_to_player(ch, abil);
+		}
 		qt_change_ability(ch, ABIL_VNUM(abil));
-	}
 	
-	// attach gain hooks
-	add_ability_gain_hook(ch, abil);
+		// attach gain hooks
+		add_ability_gain_hook(ch, abil);
+	}
 }
 
 
@@ -1290,7 +1295,6 @@ void mark_level_gained_from_ability(char_data *ch, ability_data *abil) {
 */
 void perform_swap_skill_sets(char_data *ch) {
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
-	void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 	
 	struct player_ability_data *plab, *next_plab;
 	int cur_set, old_set;
