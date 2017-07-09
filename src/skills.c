@@ -291,13 +291,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_RIDE: {
-			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You climb down from your mount.\r\n");
-				perform_dismount(ch);
-			}
-			break;
-		}
 		case ABIL_RITUAL_OF_BURDENS: {
 			if (affected_by_spell(ch, ATYPE_UNBURDENED)) {
 				msg_to_char(ch, "Your burdens return.\r\n");
@@ -2162,7 +2155,7 @@ void give_level_zero_abilities(char_data *ch) {
 bool has_cooking_fire(char_data *ch) {
 	obj_data *obj;
 	
-	if (!IS_NPC(ch) && has_ability(ch, ABIL_TOUCH_OF_FLAME)) {
+	if (has_player_tech(ch, PTECH_LIGHT_FIRE)) {
 		return TRUE;
 	}
 

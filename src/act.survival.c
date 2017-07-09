@@ -703,8 +703,8 @@ ACMD(do_mount) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't ride anything!\r\n");
 	}
-	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
-		// sends own msgs
+	else if (!has_player_tech(ch, PTECH_RIDING)) {
+		msg_to_char(ch, "You don't have the ability to ride anything.\r\n");
 	}
 	
 	// list requires no position

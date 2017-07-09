@@ -350,7 +350,10 @@ void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, int mode) {
 		gain_player_tech_exp(ch, PTECH_RIDING, 1);
 		
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH)) {
-			gain_ability_exp(ch, ABIL_ALL_TERRAIN_RIDING, 5);
+			gain_player_tech_exp(ch, PTECH_RIDING_UPGRADE, 5);
+		}
+		if (EFFECTIVELY_FLYING(ch)) {
+			gain_player_tech_exp(ch, PTECH_RIDING_FLYING, 5);
 		}
 	}
 	else {	// not riding
@@ -579,7 +582,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
 		return 0;
 	}
-	if (IS_RIDING(ch) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && !EFFECTIVELY_FLYING(ch)) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
@@ -598,7 +601,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 			return 0;
 		}
 	}
-	if (IS_RIDING(ch) && !has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
@@ -633,7 +636,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		return 0;
 	}
 	
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && (IS_NPC(ch) || !IS_RIDING(ch) || !has_ability(ch, ABIL_ALL_TERRAIN_RIDING)) && !has_ability(ch, ABIL_MOUNTAIN_CLIMBING) && !EFFECTIVELY_FLYING(ch)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && (IS_NPC(ch) || !IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_ability(ch, ABIL_MOUNTAIN_CLIMBING) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "You must buy the Mountain Climbing ability to cross such rough terrain.\r\n");
 		return 0;
 	}

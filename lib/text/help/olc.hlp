@@ -870,7 +870,7 @@ Available techs are:
  &cInfiltrate&0 - Allows the player to enter claimed/restricted buildings.
  &cInfiltrate-Upgrade&0 - Raises the success of infiltrate.
  &cLarger-Light-Radius&0 - Can see further in the dark.
- &cLight-Fire&0 - Can light torches/fires without any tools.
+ &cLight-Fire&0 * - Can light torches/fires without any tools.
  &cMap-Invis&0 - Can't be seen at a distance on the map.
  &cMill-Upgrade&0 - Increases the number of items received from mill.
  &cNavigation&0 - Orients the map and directions correctly.
@@ -885,9 +885,9 @@ Available techs are:
  &cPortal&0 - Can open normal portals at the correct buildings.
  &cPortal-Upgrade&0 - Can open longer-range portals (requires Portal).
  &cRanged-Combat&0 - Can use a ranged weapon.
- &cRiding&0 - Can ride/mount.
- &cRiding-Flying&0 - Can use flying mounts on all terrain (requires Riding).
- &cRiding-Upgrade&0 - Can travel on rough terrain and ocean (requires Riding).
+ &cRiding&0 * - Can ride/mount.
+ &cRiding-Flying&0 * - Can use flying mounts on all terrain (requires Riding).
+ &cRiding-Upgrade&0 * - Can travel on rough terrain and ocean (requires Riding).
  &cRough-Terrain&0 - Can travel between two rough tiles (like mountains).
  &cSee-Chars-In-Dark&0 - Can see people in the room with no light.
  &cSee-Objs-In-Dark&0 - Can see objects in the room with no light.
