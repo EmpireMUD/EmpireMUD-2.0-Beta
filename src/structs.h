@@ -450,10 +450,6 @@ typedef struct vehicle_data vehicle_data;
 */
 
 
-// ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
-#define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
-
-
 // ATAR_x: ability targeting flags
 #define ATAR_IGNORE	BIT(0)	// ignore target
 #define ATAR_CHAR_ROOM	BIT(1)	// pc/npc in room
@@ -1891,7 +1887,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_HIDE_UPGRADE  20	// improves hide and blocks search
 #define PTECH_INFILTRATE  21	// can enter buildings without permission
 #define PTECH_INFILTRATE_UPGRADE  22	// better infiltrates
-#define PTECH_LARGER_WHERE  23	// 'where' command embiggens
+#define PTECH_LARGER_LIGHT_RADIUS  23	// can see farther at night
 #define PTECH_LIGHT_FIRE  24	// player can light torches/fires
 #define PTECH_MAP_INVIS  25	// can't be seen on the map
 #define PTECH_MILL_UPGRADE  26	// more results from milling
@@ -1919,6 +1915,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_SWIMMING  48	// player can enter water tiles
 #define PTECH_TELEPORT_CITY  49	// teleports can target cities
 #define PTECH_TWO_HANDED_WEAPONS  50	// can wield two-handed weapons
+#define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

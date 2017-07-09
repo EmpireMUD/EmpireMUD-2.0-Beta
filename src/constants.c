@@ -201,7 +201,7 @@ const char *ability_gain_hooks[] = {
 	"BLOCK",
 	"TAKE-DAMAGE",	// 5
 	"PASSIVE-FREQUENT",
-	"PASSIVE_HOURLY",
+	"PASSIVE-HOURLY",
 	"\n"
 };
 
@@ -743,7 +743,7 @@ const char *player_tech_types[] = {
 	"Hide-Upgrade",	// 20
 	"Infiltrate",
 	"Infiltrate-Upgrade",
-	"Larger-Where",
+	"Larger-Light-Radius",
 	"Light-Fire",
 	"Map-Invis",	// 25
 	"Mill-Upgrade",
@@ -771,6 +771,7 @@ const char *player_tech_types[] = {
 	"Swimming",
 	"Teleport-City",
 	"Two-Handed-Weapons",	// 50
+	"Where-Upgrade",
 	"\n"
 };
 

@@ -2317,6 +2317,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 */
 void do_stat_ability(char_data *ch, ability_data *abil) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
+	struct ability_data_list *adl;
 	struct custom_message *custm;
 	struct apply_data *app;
 	size_t size;
@@ -2404,6 +2405,15 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		
 		LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
 			size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
+		}
+	}
+	
+	// data
+	if (ABIL_DATA(abil)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Extra data:\r\n");
+		count = 0;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %d. %s\r\n", ++count, ability_data_display(adl));
 		}
 	}
 	
