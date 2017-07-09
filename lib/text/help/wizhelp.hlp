@@ -924,6 +924,7 @@ skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
+technology Immort   Shows ability techs a player has.
 terrain    Immort   Shows total counts for all terrain types.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
@@ -1066,6 +1067,12 @@ Usage:  show storage [building name]
 
 Lists objects which store in the named building, or the current building if none
 is specified. Takes a name, not a virtual number.
+#e
+"SHOW TECHNOLOGY"
+
+Usage:  show technology <player>
+
+Lists all the ability techs the player has.
 #e
 "SHOW TERRAIN"
 

@@ -2535,6 +2535,62 @@ SHOW(show_players) {
 }
 
 
+SHOW(show_technology) {
+	extern const char *player_tech_types[];
+	
+	struct player_tech *ptech;
+	char one[256], line[256];
+	bool is_file = FALSE;
+	char_data *vict;
+	int last_tech;
+	size_t lsize;
+	bool newl;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Show technology for which player?\r\n");
+	}
+	else if (!(vict = find_or_load_player(arg, &is_file))) {
+		send_config_msg(ch, "no_person");
+	}
+	else {
+		// techs (slightly complicated
+		msg_to_char(ch, "Techs for %s:\r\n", GET_NAME(vict));
+		
+		last_tech = NOTHING;
+		*line = '\0';
+		lsize = 0;
+		newl = FALSE;
+		
+		LL_FOREACH(GET_TECHS(ch), ptech) {
+			if (ptech->id == last_tech) {
+				continue;
+			}
+			
+			snprintf(one, sizeof(one), "%s, ", player_tech_types[ptech->id]);
+			
+			if (strlen(one) + lsize >= 79) {
+				// send line
+				msg_to_char(ch, "%s\r\n", line);
+				lsize = 0;
+				*line = '\0';
+			}
+			
+			strcat(line, one);
+			lsize += strlen(one);
+			last_tech = ptech->id;
+		}
+		
+		if (*line) {
+			msg_to_char(ch, "%s\r\n", line);
+		}
+	}
+	
+	if (is_file) {
+		free_char(vict);
+	}
+}
+
+
 SHOW(show_terrain) {
 	extern int stats_get_crop_count(crop_data *cp);
 	extern int stats_get_sector_count(sector_data *sect);
@@ -3467,7 +3523,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *mob_custom_types[];
 	extern const char *mob_move_types[];
 	extern const char *player_bits[];
-	extern const char *player_tech_types[];
 	extern const char *position_types[];
 	extern const char *preference_bits[];
 	extern const char *connected_types[];
@@ -3476,10 +3531,9 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern struct promo_code_list promo_codes[];
 
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	struct player_tech *ptech;
 	struct script_memory *mem;
 	struct cooldown_data *cool;
-	int count, i, i2, iter, diff, found = 0, val, last_tech;
+	int count, i, i2, iter, diff, found = 0, val;
 	obj_data *j;
 	struct follow_type *fol;
 	struct over_time_effect_type *dot;
@@ -3615,17 +3669,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "GRANTS: &g%s&0\r\n", buf2);
 		sprintbit(SYSLOG_FLAGS(k), syslog_types, buf2, TRUE);
 		msg_to_char(ch, "SYSLOGS: &c%s&0\r\n", buf2);
-		
-		// techs (slightly complicated
-		msg_to_char(ch, "Techs: &g");
-		last_tech = NOTHING;
-		LL_FOREACH(GET_TECHS(ch), ptech) {
-			if (ptech->id != last_tech) {
-				msg_to_char(ch, "%s%s", (last_tech != NOTHING) ? ", " : "", player_tech_types[ptech->id]);
-			}
-			last_tech = ptech->id;
-		}
-		msg_to_char(ch, "%s&0\r\n", (last_tech == NOTHING) ? "none" : "");
 	}
 
 	if (!is_proto) {
@@ -7193,6 +7236,7 @@ ACMD(do_show) {
 		{ "data", LVL_CIMPL, show_data },
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
+		{ "technology", LVL_START_IMM, show_technology },
 
 		// last
 		{ "\n", 0, NULL }
