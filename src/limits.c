@@ -424,14 +424,9 @@ void point_update_char(char_data *ch) {
 		}
 		
 		gain_ability_exp(ch, ABIL_COMMERCE, 2);
-		gain_ability_exp(ch, ABIL_SATED_THIRST, 2);
 		
 		if (GET_MOUNT_LIST(ch)) {
 			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
-		}
-		
-		if (IS_VAMPIRE(ch)) {
-			gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
 		}
 		
 		if (affected_by_spell(ch, ATYPE_RADIANCE)) {
@@ -743,7 +738,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	/* Update conditions */
-	if (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST)) {			
+	if (has_player_tech(ch, PTECH_NO_HUNGER)) {			
 		gain_condition(ch, FULL, -1);
 	}
 	else {
@@ -761,7 +756,7 @@ void real_update_char(char_data *ch) {
 	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_FREQUENT);
 	
 	// more thirsty?
-	if (has_ability(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST))) {
+	if (has_player_tech(ch, PTECH_NO_THIRST)) {
 		gain_condition(ch, THIRST, -1);
 	}
 	else {
@@ -1820,12 +1815,12 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 	
 	// things that prevent thirst
-	if (value > 0 && condition == THIRST && (has_ability(ch, ABIL_SATED_THIRST) || has_ability(ch, ABIL_UNNATURAL_THIRST))) {
+	if (value > 0 && condition == THIRST && has_player_tech(ch, PTECH_NO_THIRST)) {
 		return;
 	}
 	
 	// things that prevent hunger
-	if (value > 0 && condition == FULL && has_ability(ch, ABIL_UNNATURAL_THIRST)) {
+	if (value > 0 && condition == FULL && has_player_tech(ch, PTECH_NO_HUNGER)) {
 		return;
 	}
 
