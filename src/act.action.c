@@ -696,7 +696,7 @@ INTERACTION_FUNC(finish_harvesting) {
 		
 	if ((cp = ROOM_CROP(inter_room)) ) {
 		// how many to get
-		num = interaction->quantity * (has_ability(ch, ABIL_MASTER_FARMER) ? 2 : 1);
+		num = interaction->quantity * (has_player_tech(ch, PTECH_HARVEST_UPGRADE) ? 2 : 1);
 		
 		// give them over
 		for (count = 0; count < num; ++count) {
@@ -1584,7 +1584,7 @@ void process_harvesting(char_data *ch) {
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
 			gain_ability_exp(ch, ABIL_CHORES, 30);
-			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
+			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
 		}
 		else {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");

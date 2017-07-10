@@ -78,11 +78,11 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 	struct track_data *track;
 	
 	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_FRESH_WATER)) {
-		if (!IS_NPC(ch) && has_ability(ch, ABIL_NO_TRACE) && valid_no_trace(room)) {
-			gain_ability_exp(ch, ABIL_NO_TRACE, 5);
+		if (!IS_NPC(ch) && has_player_tech(ch, PTECH_NO_TRACK_WILD) && valid_no_trace(room)) {
+			gain_player_tech_exp(ch, PTECH_NO_TRACK_WILD, 5);
 		}
-		else if (!IS_NPC(ch) && has_ability(ch, ABIL_UNSEEN_PASSING) && valid_unseen_passing(room)) {
-			gain_ability_exp(ch, ABIL_UNSEEN_PASSING, 5);
+		else if (!IS_NPC(ch) && has_player_tech(ch, PTECH_NO_TRACK_CITY) && valid_unseen_passing(room)) {
+			gain_player_tech_exp(ch, PTECH_NO_TRACK_CITY, 5);
 		}
 		else {
 			CREATE(track, struct track_data, 1);

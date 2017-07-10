@@ -821,8 +821,8 @@ void finish_gen_craft(char_data *ch) {
 	
 		amt = GET_CRAFT_QUANTITY(type);
 	
-		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && has_ability(ch, ABIL_MASTER_FARMER)) {
-			gain_ability_exp(ch, ABIL_MASTER_FARMER, 10);
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && has_player_tech(ch, PTECH_MILL_UPGRADE)) {
+			gain_player_tech_exp(ch, PTECH_MILL_UPGRADE, 10);
 			amt *= 2;
 		}
 

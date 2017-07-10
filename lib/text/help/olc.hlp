@@ -754,6 +754,7 @@ This tells the ability when to trigger skill gain:
  &cONLY-DARK&0 - Only gains if it's dark here.
  &cONLY-LIGHT&0 - Only gains if it's NOT dark here.
  &cONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
+ &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
 
 See also: OLC ABILITIES
 #d

@@ -494,6 +494,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
 #define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
 #define AGH_ONLY_VS_ANIMAL  BIT(10)	// only if the target was an animal
+#define AGH_VAMPIRE_FEEDING  BIT(11)	// gains when feeding
 
 
 // RUN_ABIL_x: modes for activating abilities

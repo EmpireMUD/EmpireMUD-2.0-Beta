@@ -979,16 +979,16 @@ ACMD(do_hide) {
 	command_lag(ch, WAIT_ABILITY);
 
 	for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
-		if (c != ch && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !skill_check(ch, ABIL_CLING_TO_SHADOW, DIFF_MEDIUM)) {
+		if (c != ch && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
 			msg_to_char(ch, "You can't hide with somebody watching!\r\n");
 			return;
 		}
 	}
 
 	gain_ability_exp(ch, ABIL_HIDE, 33.4);
-	gain_ability_exp(ch, ABIL_CLING_TO_SHADOW, 10);
+	gain_player_tech_exp(ch, PTECH_HIDE_UPGRADE, 10);
 
-	if (has_ability(ch, ABIL_CLING_TO_SHADOW) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
+	if (has_player_tech(ch, PTECH_HIDE_UPGRADE) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 }
@@ -1463,8 +1463,8 @@ ACMD(do_search) {
 			if (AFF_FLAGGED(targ, AFF_HIDE)) {
 					continue;
 			
-				if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
-					gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
+				if (has_player_tech(targ, PTECH_HIDE_UPGRADE)) {
+					gain_player_tech_exp(targ, PTECH_HIDE_UPGRADE, 20);
 					continue;
 				}
 
@@ -1759,7 +1759,7 @@ ACMD(do_steal) {
 			if (proto && obj_can_be_stored(proto, IN_ROOM(ch)) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
 				found = TRUE;
 				
-				if (stored_item_requires_withdraw(proto) && !has_ability(ch, ABIL_VAULTCRACKING)) {
+				if (stored_item_requires_withdraw(proto) && !has_player_tech(ch, PTECH_STEAL_UPGRADE)) {
 					msg_to_char(ch, "You can't steal that without Vaultcracking!\r\n");
 					return;
 				}
@@ -1776,7 +1776,7 @@ ACMD(do_steal) {
 					gain_ability_exp(ch, ABIL_STEAL, 50);
 				
 					if (stored_item_requires_withdraw(proto)) {
-						gain_ability_exp(ch, ABIL_VAULTCRACKING, 50);
+						gain_player_tech_exp(ch, PTECH_STEAL_UPGRADE, 50);
 					}
 
 					// save the empire

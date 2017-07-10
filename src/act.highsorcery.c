@@ -1656,7 +1656,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			subtype = GET_ROOM_VNUM(to_room);
 		}
 	}
-	else if (has_ability(ch, ABIL_CITY_TELEPORTATION) && (city = find_city_by_name(GET_LOYALTY(ch), argument))) {
+	else if (has_player_tech(ch, PTECH_TELEPORT_CITY) && (city = find_city_by_name(GET_LOYALTY(ch), argument))) {
 		subtype = GET_ROOM_VNUM(city->location);
 		
 		if (get_cooldown_time(ch, COOLDOWN_TELEPORT_CITY) > 0) {
@@ -1739,7 +1739,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		gain_ability_exp(ch, ABIL_RITUAL_OF_TELEPORTATION, 50);
 	
 		if (IS_CITY_CENTER(IN_ROOM(ch))) {
-			gain_ability_exp(ch, ABIL_CITY_TELEPORTATION, 50);
+			gain_player_tech_exp(ch, PTECH_TELEPORT_CITY, 50);
 			add_cooldown(ch, COOLDOWN_TELEPORT_CITY, 15 * SECS_PER_REAL_MIN);
 		}
 		else if (ROOM_PRIVATE_OWNER(IN_ROOM(ch)) == GET_IDNUM(ch)) {

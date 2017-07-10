@@ -195,7 +195,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_FIND_HERBS  70
 #define ABIL_FISH  72
 #define ABIL_TRACK  73
-#define ABIL_NO_TRACE  76
 #define ABIL_RESIST_POISON  77
 #define ABIL_FIND_SHELTER  79
 #define ABIL_BUTCHER  81
@@ -253,14 +252,9 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_STEAL  143
 #define ABIL_INFILTRATE  144
 #define ABIL_ESCAPE  146
-#define ABIL_APPRAISAL  147
 #define ABIL_CONCEALMENT  148
 #define ABIL_SECRET_CACHE  149
-#define ABIL_CLING_TO_SHADOW  150
-#define ABIL_UNSEEN_PASSING  151
-#define ABIL_CLOAK_OF_DARKNESS  152
 #define ABIL_SHADOWSTEP  153
-#define ABIL_VAULTCRACKING  154
 #define ABIL_JAB  155
 #define ABIL_BLIND  156
 #define ABIL_SAP  157
@@ -294,7 +288,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_ENCHANT_TOOLS  185
 #define ABIL_RITUAL_OF_DEFENSE  186
 #define ABIL_RITUAL_OF_TELEPORTATION  187
-#define ABIL_CITY_TELEPORTATION  188
 #define ABIL_PORTAL_MAGIC  189
 #define ABIL_PORTAL_MASTER  190
 #define ABIL_DEVASTATION_RITUAL  191
@@ -310,7 +303,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SKILLED_LABOR  201
 #define ABIL_FINE_POTTERY  202
 #define ABIL_MASTER_CRAFTSMAN  203
-#define ABIL_MASTER_FARMER  204
 #define ABIL_MASTER_SURVIVALIST  205
 #define ABIL_TUNNEL  206
 #define ABIL_ARCANE_POWER  207

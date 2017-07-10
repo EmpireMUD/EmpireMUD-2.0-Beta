@@ -400,7 +400,7 @@ INTERACTION_FUNC(shear_interact) {
 	command_lag(ch, WAIT_OTHER);
 			
 	amt = interaction->quantity;
-	if (has_ability(ch, ABIL_MASTER_FARMER)) {
+	if (has_player_tech(ch, PTECH_SHEAR_UPGRADE)) {
 		amt *= 2;
 	}
 	
@@ -2490,7 +2490,7 @@ ACMD(do_shear) {
 		any |= run_global_mob_interactions(ch, mob, INTERACT_SHEAR, shear_interact);
 		
 		if (any) {
-			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
+			gain_player_tech_exp(ch, PTECH_SHEAR_UPGRADE, 5);
 		}
 		else {
 			act("You can't shear $N!", FALSE, ch, NULL, mob, TO_CHAR);

@@ -365,8 +365,8 @@ bool can_see_player_in_other_room(char_data *ch, char_data *vict) {
 	
 	if (!IS_NPC(vict) && CAN_SEE(ch, vict) && WIZHIDE_OK(ch, vict) && CAN_RECOGNIZE(ch, vict)) {
 		if (compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= distance_can_see_players) {
-			if (has_ability(vict, ABIL_CLOAK_OF_DARKNESS)) {
-				gain_ability_exp(vict, ABIL_CLOAK_OF_DARKNESS, 10);
+			if (has_player_tech(vict, PTECH_MAP_INVIS)) {
+				gain_player_tech_exp(vict, PTECH_MAP_INVIS, 10);
 				return FALSE;
 			}
 			else {
@@ -1833,12 +1833,12 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (has_ability(i, ABIL_NO_TRACE) && valid_no_trace(IN_ROOM(i))) {
-				gain_ability_exp(i, ABIL_NO_TRACE, 10);
+			if (has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
 				continue;
 			}
-			if (has_ability(i, ABIL_UNSEEN_PASSING) && valid_unseen_passing(IN_ROOM(i))) {
-				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
+			if (has_player_tech(i, PTECH_NO_TRACK_CITY) && valid_unseen_passing(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_CITY, 10);
 				continue;
 			}
 			
@@ -1886,12 +1886,12 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (has_ability(i, ABIL_NO_TRACE) && valid_no_trace(IN_ROOM(i))) {
-				gain_ability_exp(i, ABIL_NO_TRACE, 10);
+			if (has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
 				continue;
 			}
-			if (has_ability(i, ABIL_UNSEEN_PASSING) && valid_unseen_passing(IN_ROOM(i))) {
-				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
+			if (has_player_tech(i, PTECH_NO_TRACK_CITY) && valid_unseen_passing(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_CITY, 10);
 				continue;
 			}
 			
