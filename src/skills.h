@@ -67,6 +67,7 @@ void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void set_skill(char_data *ch, any_vnum skill, int level);
 extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
+extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 
 // skill_check difficulties
@@ -196,20 +197,12 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_TRACK  73
 #define ABIL_NO_TRACE  76
 #define ABIL_RESIST_POISON  77
-#define ABIL_POISON_IMMUNITY  78
 #define ABIL_FIND_SHELTER  79
-#define ABIL_NAVIGATION  80
 #define ABIL_BUTCHER  81
-#define ABIL_MOUNTAIN_CLIMBING  82
 #define ABIL_PATHFINDING  83
 #define ABIL_REFLEXES  84
-#define ABIL_SHIELD_BLOCK  85
 #define ABIL_QUICK_BLOCK  86
 #define ABIL_REFORGE  87
-#define ABIL_BLOCK_ARROWS  88
-#define ABIL_LIGHT_ARMOR  89
-#define ABIL_MEDIUM_ARMOR  90
-#define ABIL_HEAVY_ARMOR  91
 #define ABIL_ENDURANCE  92
 #define ABIL_RESCUE  93
 #define ABIL_DISARM  94
@@ -218,8 +211,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_BASH  97
 #define ABIL_CUT_DEEP  98
 #define ABIL_BIG_GAME_HUNTER  99
-#define ABIL_MAGE_ARMOR  100
-#define ABIL_ARCHERY  101
 #define ABIL_QUICK_DRAW  102
 #define ABIL_FIRSTAID  103
 #define ABIL_FLEET  104
@@ -250,12 +241,10 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_RADIANCE  129
 #define ABIL_PROSPECT  130
 #define ABIL_WORKFORCE  131
-#define ABIL_DEEP_MINES  132
 #define ABIL_RARE_METALS  133
 #define ABIL_COMMERCE  134
 #define ABIL_PROMINENCE  135
 #define ABIL_INSPIRE  136
-#define ABIL_CUSTOMIZE_BUILDING  137
 #define ABIL_SUMMON_BODYGUARD  138
 #define ABIL_BARDE  139
 #define ABIL_CITY_LIGHTS  140
@@ -263,7 +252,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_PICKPOCKET  142
 #define ABIL_STEAL  143
 #define ABIL_INFILTRATE  144
-#define ABIL_IMPROVED_INFILTRATE  145
 #define ABIL_ESCAPE  146
 #define ABIL_APPRAISAL  147
 #define ABIL_CONCEALMENT  148
@@ -344,7 +332,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_RAWHIDE_STITCHING  223
 #define ABIL_MAGIC_ATTIRE  224
 #define ABIL_SANGUINE_RESTORATION  226
-#define ABIL_WARD_AGAINST_MAGIC  227
 #define ABIL_NOBLE_BEARING  228
 #define ABIL_BLOODSWEAT  229
 #define ABIL_SHADOW_KICK  231

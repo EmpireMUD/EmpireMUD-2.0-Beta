@@ -110,6 +110,41 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			
 			// PTECH_x: what to do when losing the tech
 			switch (adl->vnum) {
+				case PTECH_ARMOR_HEAVY: {
+					remove_armor_by_type(ch, ARMOR_HEAVY);
+					break;
+				}
+				case PTECH_ARMOR_LIGHT: {
+					remove_armor_by_type(ch, ARMOR_LIGHT);
+					break;
+				}
+				case PTECH_ARMOR_MAGE: {
+					remove_armor_by_type(ch, ARMOR_MAGE);
+					break;
+				}
+				case PTECH_ARMOR_MEDIUM: {
+					remove_armor_by_type(ch, ARMOR_MEDIUM);
+					break;
+				}
+				case PTECH_BLOCK: {
+					if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
+						act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
+						unequip_char_to_inventory(ch, WEAR_HOLD);
+					}
+					break;
+				}
+				case PTECH_NAVIGATION: {
+					// avoid spinning the map when they lose navigation
+					GET_CONFUSED_DIR(ch) = NORTH;
+					break;
+				}
+				case PTECH_RANGED_COMBAT: {
+					if (GET_EQ(ch, WEAR_RANGED) && IS_MISSILE_WEAPON(GET_EQ(ch, WEAR_RANGED))) {
+						act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_RANGED), NULL, TO_CHAR);
+						unequip_char_to_inventory(ch, WEAR_RANGED);
+					}
+					break;
+				}
 				case PTECH_RIDING: {
 					if (IS_RIDING(ch)) {
 						msg_to_char(ch, "You climb down from your mount.\r\n");
@@ -117,14 +152,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					}
 					break;
 				}
-				case PTECH_ARMOR_HEAVY:
-				case PTECH_ARMOR_LIGHT:
-				case PTECH_ARMOR_MAGE:
-				case PTECH_ARMOR_MEDIUM:
-				case PTECH_BLOCK:
 				case PTECH_FISH:
-				case PTECH_NAVIGATION:
-				case PTECH_RANGED_COMBAT:
 				case PTECH_TWO_HANDED_WEAPONS: {
 					// not yet implemented
 					break;
@@ -137,14 +165,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		case ABIL_ALACRITY: {
 			void end_alacrity(char_data *ch);
 			end_alacrity(ch);
-			break;
-		}
-		case ABIL_ARCHERY: {
-			if (GET_EQ(ch, WEAR_RANGED) && IS_MISSILE_WEAPON(GET_EQ(ch, WEAR_RANGED))) {
-				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_RANGED), NULL, TO_CHAR);
-				unequip_char_to_inventory(ch, WEAR_RANGED);
-				determine_gear_level(ch);
-			}
 			break;
 		}
 		case ABIL_BANSHEE: {
@@ -181,10 +201,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_CLAWS: {
 			retract_claws(ch);
-			break;
-		}
-		case ABIL_MAGE_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_MAGE);
 			break;
 		}
 		case ABIL_COUNTERSPELL: {
@@ -248,16 +264,8 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			affect_from_char_by_caster(ch, ATYPE_HASTEN, ch, TRUE);
 			break;
 		}
-		case ABIL_HEAVY_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_HEAVY);
-			break;
-		}
 		case ABIL_HONE: {
 			remove_honed_gear(ch);
-			break;
-		}
-		case ABIL_LIGHT_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_LIGHT);
 			break;
 		}
 		case ABIL_MAJESTY: {
@@ -270,10 +278,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_MANTICORE: {
 			despawn_familiar(ch, FAMILIAR_MANTICORE);
-			break;
-		}
-		case ABIL_MEDIUM_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_MEDIUM);
 			break;
 		}
 		case ABIL_MIRRORIMAGE: {
@@ -289,10 +293,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				void un_mummify(char_data *ch);
 				un_mummify(ch);
 			}
-			break;
-		}
-		case ABIL_NAVIGATION: {
-			GET_CONFUSED_DIR(ch) = NORTH;
 			break;
 		}
 		case ABIL_NIGHTSIGHT: {
@@ -344,14 +344,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_SCORPION_SHADOW);
 			break;
 		}
-		case ABIL_SHIELD_BLOCK: {
-			if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
-				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
-				unequip_char_to_inventory(ch, WEAR_HOLD);
-				determine_gear_level(ch);
-			}
-			break;
-		}
 		case ABIL_SIPHON: {
 			affect_from_char(ch, ATYPE_SIPHON, TRUE);
 			break;
@@ -373,6 +365,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 	}
 	
+	determine_gear_level(ch);
 	if (found) {
 		affect_total(ch);
 	}
@@ -1462,6 +1455,45 @@ bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
 }
 
 
+/**
+* Runs a skill check based on a tech (when you don't know the actual ability).
+*
+* @param char_data *ch The person doing the skill check.
+* @param int tech Which PTECH_ type.
+* @param int difficulty Any DIFF_ const.
+* @return bool TRUE if passed, FALSE if failed.
+*/
+bool player_tech_skill_check(char_data *ch, int tech, int difficulty) {
+	any_vnum best_abil = NOTHING;
+	struct player_tech *iter;
+	int lev, best_level = 0;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id != tech) {
+			continue;	// wrong tech
+		}
+		
+		lev = get_ability_level(ch, iter->abil);
+		
+		if (lev > best_level) {
+			best_level = lev;
+			best_abil = iter->abil;
+		}
+	}
+	
+	if (best_abil != NOTHING) {
+		return skill_check(ch, best_abil, difficulty);
+	}
+	else {
+		return FALSE;	// no abil
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CORE SKILL COMMANDS /////////////////////////////////////////////////////
 
@@ -1881,7 +1913,7 @@ bool can_gain_exp_from(char_data *ch, char_data *vict) {
 */
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	char buf[MAX_STRING_LENGTH];
-	any_vnum abil = NO_ABIL;
+	any_vnum abil = NO_ABIL, tech = NOTHING;
 	struct obj_apply *app;
 	int iter, level_min;
 	bool honed;
@@ -1896,19 +1928,19 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	if (IS_ARMOR(item)) {
 		switch (GET_ARMOR_TYPE(item)) {
 			case ARMOR_MAGE: {
-				abil = ABIL_MAGE_ARMOR;
+				tech = PTECH_ARMOR_MAGE;
 				break;
 			}
 			case ARMOR_LIGHT: {
-				abil = ABIL_LIGHT_ARMOR;
+				tech = PTECH_ARMOR_LIGHT;
 				break;
 			}
 			case ARMOR_MEDIUM: {
-				abil = ABIL_MEDIUM_ARMOR;
+				tech = PTECH_ARMOR_MEDIUM;
 				break;
 			}
 			case ARMOR_HEAVY: {
-				abil = ABIL_HEAVY_ARMOR;
+				tech = PTECH_ARMOR_HEAVY;
 				break;
 			}
 		}
@@ -1917,16 +1949,22 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 		abil = ABIL_TWO_HANDED_WEAPONS;
 	}
 	else if (IS_MISSILE_WEAPON(item)) {
-		abil = ABIL_ARCHERY;
+		tech = PTECH_RANGED_COMBAT;
 	}
 	else if (IS_SHIELD(item)) {
-		abil = ABIL_SHIELD_BLOCK;
+		tech = PTECH_BLOCK;
 	}
 	
 	if (abil != NO_ABIL && !has_ability(ch, abil)) {
 		if (send_messages) {
 			snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(abil));
 			act(buf, FALSE, ch, item, NULL, TO_CHAR);
+		}
+		return FALSE;
+	}
+	if (tech != NOTHING && !has_player_tech(ch, tech)) {
+		if (send_messages) {
+			act("You don't have the correct ability to use $p.", FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;
 	}

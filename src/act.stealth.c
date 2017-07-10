@@ -510,9 +510,9 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	GET_OBJ_VAL(obj, VAL_POISON_CHARGES) -= 1;
 	
 	// attempt immunity/resist
-	if (has_ability(vict, ABIL_POISON_IMMUNITY)) {
+	if (has_player_tech(vict, PTECH_NO_POISON)) {
 		if (can_gain_exp_from(vict, ch)) {
-			gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
+			gain_player_tech_exp(vict, PTECH_NO_POISON, 10);
 		}
 		
 		if (GET_POISON_CHARGES(obj) <= 0) {
@@ -1083,9 +1083,9 @@ ACMD(do_infiltrate) {
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		
 		gain_ability_exp(ch, ABIL_INFILTRATE, 50);
-		gain_ability_exp(ch, ABIL_IMPROVED_INFILTRATE, 50);
+		gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
 		
-		if (!has_ability(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
+		if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !skill_check(ch, ABIL_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
 			if (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) {
 				empire_skillup(emp, ABIL_LOCKS, 10);
 			}
@@ -1108,8 +1108,8 @@ ACMD(do_infiltrate) {
 		}
 
 		// chance to log
-		if (emp && !skill_check(ch, ABIL_IMPROVED_INFILTRATE, DIFF_HARD)) {
-			if (has_ability(ch, ABIL_IMPROVED_INFILTRATE)) {
+		if (emp && !player_tech_skill_check(ch, PTECH_INFILTRATE_UPGRADE, DIFF_HARD)) {
+			if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
 			}
 			else {
@@ -1611,7 +1611,7 @@ ACMD(do_shadowstep) {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWSTEP, SECS_PER_REAL_MIN, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_SHADOWSTEP, 20);
 		
-		if (infil && !has_ability(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, DIFF_HARD)) {
+		if (infil && !has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !skill_check(ch, ABIL_INFILTRATE, DIFF_HARD)) {
 			msg_to_char(ch, "You fail to shadowstep to that location.\r\n");
 		}
 		else {
@@ -1632,8 +1632,8 @@ ACMD(do_shadowstep) {
 		}
 
 		// chance to log
-		if (infil && emp && !skill_check(ch, ABIL_IMPROVED_INFILTRATE, DIFF_HARD)) {
-			if (has_ability(ch, ABIL_IMPROVED_INFILTRATE)) {
+		if (infil && emp && !player_tech_skill_check(ch, PTECH_INFILTRATE_UPGRADE, DIFF_HARD)) {
+			if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "An infiltrator has been spotted shadowstepping into (%d, %d)!", X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
 			else {
@@ -1645,7 +1645,7 @@ ACMD(do_shadowstep) {
 			// distrust just in case
 			trigger_distrust_from_stealth(ch, emp);
 			gain_ability_exp(ch, ABIL_INFILTRATE, 50);
-			gain_ability_exp(ch, ABIL_IMPROVED_INFILTRATE, 50);
+			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
 		}
 	}
 }

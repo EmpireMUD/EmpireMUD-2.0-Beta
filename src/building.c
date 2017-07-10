@@ -1540,8 +1540,8 @@ void do_customize_room(char_data *ch, char *argument) {
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (!has_ability(ch, ABIL_CUSTOMIZE_BUILDING)) {
-		msg_to_char(ch, "You require the Customize Building ability to do that.\r\n");
+	else if (!has_player_tech(ch, PTECH_CUSTOMIZE_BUILDING)) {
+		msg_to_char(ch, "You don't have the right ability to customize buildings.\r\n");
 	}
 	else if (!emp || ROOM_OWNER(IN_ROOM(ch)) != emp) {
 		msg_to_char(ch, "You must own the tile to do this.\r\n");
@@ -1576,7 +1576,7 @@ void do_customize_room(char_data *ch, char *argument) {
 				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
 			}
 			else {
-				gain_ability_exp(ch, ABIL_CUSTOMIZE_BUILDING, 33.4);
+				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
 			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
 			
@@ -1601,7 +1601,7 @@ void do_customize_room(char_data *ch, char *argument) {
 		}
 		else if (is_abbrev(arg2, "set")) {
 			if (!ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
-				gain_ability_exp(ch, ABIL_CUSTOMIZE_BUILDING, 33.4);
+				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
 			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
 			act("$n begins editing the room description.", TRUE, ch, 0, 0, TO_ROOM);
@@ -1904,7 +1904,7 @@ ACMD(do_interlink) {
 		// success!
 		create_exit(IN_ROOM(ch), to_room, dir, TRUE);
 		
-		if (has_ability(ch, ABIL_NAVIGATION)) {
+		if (HAS_NAVIGATION(ch)) {
 			msg_to_char(ch, "You interlink %s to %s (%d, %d).\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(to_room, FALSE), X_COORD(to_room), Y_COORD(to_room));
 		}
 		else {

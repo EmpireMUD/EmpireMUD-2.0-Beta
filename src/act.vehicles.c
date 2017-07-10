@@ -316,7 +316,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	
 	// message driver
 	if (VEH_DRIVER(veh)) {
-		if (has_ability(VEH_DRIVER(veh), ABIL_NAVIGATION)) {
+		if (HAS_NAVIGATION(VEH_DRIVER(veh))) {
 			snprintf(buf, sizeof(buf), "You %s $V %s (%d, %d).", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 		}
 		else {
@@ -335,7 +335,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		}
 		
 		if (VEH_SITTING_ON(veh) != VEH_DRIVER(veh)) {
-			if (has_ability(VEH_SITTING_ON(veh), ABIL_NAVIGATION)) {
+			if (HAS_NAVIGATION(VEH_SITTING_ON(veh))) {
 				snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 			}
 			else {
@@ -362,7 +362,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 			LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 				if (ch_iter->desc && ch_iter != VEH_DRIVER(veh)) {
-					if (has_ability(ch_iter, ABIL_NAVIGATION)) {
+					if (HAS_NAVIGATION(ch_iter)) {
 						snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 					}
 					else {

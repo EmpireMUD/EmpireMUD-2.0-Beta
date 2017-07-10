@@ -991,7 +991,7 @@ const int rev_dir[NUM_OF_DIRS] = {
 };
 
 
-// for ABIL_NAVIGATION: confused_dir[which dir is north][reverse][which dir to translate]
+// for PTECH_NAVIGATION: confused_dir[which dir is north][reverse][which dir to translate]
 // reverse=0 is for moving
 // reverse=1 is for which way directions are displayed (this was very confusing to figure out)
 const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS] = {
@@ -1031,7 +1031,7 @@ const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS] = {
 };
 
 
-// for ABIL_NAVIGATION: how_to_show_map[dir which is north for char][x=0,y=1]
+// for PTECH_NAVIGATION: how_to_show_map[dir which is north for char][x=0,y=1]
 // for each direction, whether the x/y coord goes from positive to negative (1) or negative to positive (-1)
 int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
 	{ -1, 1 },	// north
@@ -1041,7 +1041,7 @@ int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
 };
 
 
-// for ABIL_NAVIGATION: show_map_y_first[dir which is north for char]
+// for PTECH_NAVIGATION: show_map_y_first[dir which is north for char]
 // 1 = show y coordinate vertically, 0 = show x coord vertically
 int show_map_y_first[NUM_SIMPLE_DIRS] = {
 	1,	// N

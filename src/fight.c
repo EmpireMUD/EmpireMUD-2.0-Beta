@@ -84,7 +84,7 @@ bool check_block(char_data *ch, char_data *attacker, bool can_gain_skill) {
 	int max_block = 50;	// never pass this value
 	
 	// must have a shield and Shield Block
-	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !has_ability(ch, ABIL_SHIELD_BLOCK))) {
+	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !has_player_tech(ch, PTECH_BLOCK))) {
 		return FALSE;
 	}
 	
@@ -298,7 +298,7 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 	}
 	
 	if (can_gain_skill) {
-		gain_ability_exp(ch, ABIL_SHIELD_BLOCK, 2);
+		gain_player_tech_exp(ch, PTECH_BLOCK, 2);
 		gain_ability_exp(ch, ABIL_QUICK_BLOCK, 2);
 	}
 		
@@ -751,11 +751,11 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	}
 	
 	if (damtype == DAM_POISON) {
-		if (has_ability(victim, ABIL_POISON_IMMUNITY)) {
+		if (has_player_tech(victim, PTECH_NO_POISON)) {
 			dam = 0;
 		}
 		if (can_gain_exp_from(victim, attacker)) {
-			gain_ability_exp(victim, ABIL_POISON_IMMUNITY, 2);
+			gain_player_tech_exp(victim, PTECH_NO_POISON, 2);
 			gain_ability_exp(victim, ABIL_RESIST_POISON, 5);
 		}
 	}
@@ -2858,19 +2858,19 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING && can_gain_exp_from(victim, ch)) {
 				switch (GET_ARMOR_TYPE(GET_EQ(victim, iter))) {
 					case ARMOR_MAGE: {
-						gain_ability_exp(victim, ABIL_MAGE_ARMOR, 2);
+						gain_player_tech_exp(victim, PTECH_ARMOR_MAGE, 2);
 						break;
 					}
 					case ARMOR_LIGHT: {
-						gain_ability_exp(victim, ABIL_LIGHT_ARMOR, 2);
+						gain_player_tech_exp(victim, PTECH_ARMOR_LIGHT, 2);
 						break;
 					}
 					case ARMOR_MEDIUM: {
-						gain_ability_exp(victim, ABIL_MEDIUM_ARMOR, 2);
+						gain_player_tech_exp(victim, PTECH_ARMOR_MEDIUM, 2);
 						break;
 					}
 					case ARMOR_HEAVY: {
-						gain_ability_exp(victim, ABIL_HEAVY_ARMOR, 2);
+						gain_player_tech_exp(victim, PTECH_ARMOR_HEAVY, 2);
 						break;
 					}
 				}
@@ -3147,9 +3147,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
 			block = check_block(victim, ch, TRUE);
 		}
-		else if (has_ability(victim, ABIL_WARD_AGAINST_MAGIC) && check_solo_role(victim) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
+		else if (has_player_tech(victim, PTECH_BLOCK_MAGICAL) && check_solo_role(victim) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
 			// half-chance
 			block = check_block(victim, ch, TRUE) && !number(0, 1);
+			gain_player_tech_exp(victim, PTECH_BLOCK_MAGICAL, 2);
 		}
 	}
 
@@ -3669,10 +3670,10 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	// compute
 	success = check_hit_vs_dodge(ch, vict, FALSE);
 	
-	if (success && AWAKE(vict) && has_ability(vict, ABIL_BLOCK_ARROWS)) {
+	if (success && AWAKE(vict) && has_player_tech(vict, PTECH_BLOCK_RANGED)) {
 		block = check_block(vict, ch, TRUE);
 		if (GET_EQ(vict, WEAR_HOLD) && IS_SHIELD(GET_EQ(vict, WEAR_HOLD)) && can_gain_exp_from(vict, ch)) {
-			gain_ability_exp(vict, ABIL_BLOCK_ARROWS, 2);
+			gain_player_tech_exp(vict, PTECH_BLOCK_RANGED, 2);
 		}
 	}
 	
@@ -3765,7 +3766,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		
 		// McSkillups
 		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_ARCHERY, 2);
+			gain_player_tech_exp(ch, PTECH_RANGED_COMBAT, 2);
 			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
 			gain_ability_exp(ch, ABIL_TRICK_SHOTS, 2);
 			if (affected_by_spell(ch, ATYPE_ALACRITY)) {

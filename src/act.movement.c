@@ -358,9 +358,9 @@ void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, int mode) {
 	}
 	else {	// not riding
 		if (was_in && ROOM_SECT_FLAGGED(was_in, SECTF_ROUGH) && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
-			gain_ability_exp(ch, ABIL_MOUNTAIN_CLIMBING, 10);
+			gain_player_tech_exp(ch, PTECH_ROUGH_TERRAIN, 10);
 		}
-		gain_ability_exp(ch, ABIL_NAVIGATION, 1);
+		gain_player_tech_exp(ch, PTECH_NAVIGATION, 1);
 		
 		if (AFF_FLAGGED(ch, AFF_FLY)) {
 			gain_ability_exp(ch, ABIL_FLY, 1);
@@ -444,7 +444,7 @@ obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *f
 
 // processes the character's north
 int get_north_for_char(char_data *ch) {
-	if (IS_NPC(ch) || (has_ability(ch, ABIL_NAVIGATION) && !IS_DRUNK(ch))) {
+	if (IS_NPC(ch) || (HAS_NAVIGATION(ch) && !IS_DRUNK(ch))) {
 		return NORTH;
 	}
 	else {
@@ -636,8 +636,8 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		return 0;
 	}
 	
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && (IS_NPC(ch) || !IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_ability(ch, ABIL_MOUNTAIN_CLIMBING) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "You must buy the Mountain Climbing ability to cross such rough terrain.\r\n");
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && (IS_NPC(ch) || !IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
+		msg_to_char(ch, "You don't have the ability to cross such rough terrain.\r\n");
 		return 0;
 	}
 	
@@ -1748,7 +1748,7 @@ ACMD(do_portal) {
 				}
 				
 				// coords: navigation only
-				if (has_ability(ch, ABIL_NAVIGATION)) {
+				if (HAS_NAVIGATION(ch)) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "(%*d, %*d) ", X_PRECISION, X_COORD(room), Y_PRECISION, Y_COORD(room));
 				}
 				
