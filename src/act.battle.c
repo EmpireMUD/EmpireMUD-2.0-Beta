@@ -455,8 +455,7 @@ ACMD(do_heartstop) {
 
 ACMD(do_kick) {
 	char_data *vict;
-	int cost = 10;
-	byte dam;
+	int dam, cost = 10;
 	bool success = FALSE;
 
 	one_argument(argument, arg);
