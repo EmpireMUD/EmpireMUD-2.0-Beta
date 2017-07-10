@@ -2187,6 +2187,8 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 				found = TRUE;
 			}
 		}
+		
+		remove_player_tech(chiter, vnum);
 	}
 	
 	// update olc editors
@@ -2282,7 +2284,7 @@ void save_olc_ability(descriptor_data *desc) {
 		proto = create_ability_table_entry(vnum);
 	}
 	
-	// update live players' gain hooks
+	// update live players' gain hooks and techs
 	LL_FOREACH(character_list, chiter) {
 		if (!IS_NPC(chiter) && (abd = get_ability_data(chiter, vnum, FALSE))) {
 			any = FALSE;
@@ -2291,6 +2293,11 @@ void save_olc_ability(descriptor_data *desc) {
 					any = TRUE;
 					add_ability_gain_hook(chiter, abd->ptr);
 				}
+			}
+			
+			if (abd->purchased[GET_CURRENT_SKILL_SET(chiter)]) {
+				remove_player_tech(chiter, ABIL_VNUM(abil));
+				apply_ability_techs_to_player(chiter, abil);
 			}
 		}
 	}
