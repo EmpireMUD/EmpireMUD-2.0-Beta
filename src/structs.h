@@ -1881,7 +1881,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_CUSTOMIZE_BUILDING  10	// player can customize buildings
 #define PTECH_DEEP_MINES  11	// increases mine size
 #define PTECH_DUAL_WIELD  12	// can fight with offhand weapons
-	#define PTECH_UNUSED  13
+#define PTECH_FAST_WOOD_PROCESSING  13	// saw/scrape go faster
 #define PTECH_FASTCASTING  14	// wits affects non-combat abilities instead of combat speed
 #define PTECH_FAST_FIND  15	// digging, gathering, panning, picking
 #define PTECH_FISH  16	// can use the 'fish' command/interaction

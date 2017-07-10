@@ -961,7 +961,7 @@ void perform_saw(char_data *ch) {
 	// base
 	GET_ACTION_TIMER(ch) -= 1;
 	
-	if (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY)) {
+	if (has_player_tech(ch, PTECH_FAST_WOOD_PROCESSING)) {
 		GET_ACTION_TIMER(ch) -= 1;
 	}
 		
@@ -2154,7 +2154,7 @@ void process_scraping(char_data *ch) {
 	}
 	
 	// skilled work
-	GET_ACTION_TIMER(ch) -= 1 + (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY) ? 1 : 0);
+	GET_ACTION_TIMER(ch) -= 1 + (has_player_tech(ch, PTECH_FAST_WOOD_PROCESSING) ? 1 : 0);
 	
 	// messaging -- to player only
 	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {

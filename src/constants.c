@@ -737,7 +737,7 @@ const char *player_tech_types[] = {
 	"Customize-Building",	// 10
 	"Deep-Mines",
 	"Dual-Wield",
-	"*",
+	"Fast-Wood-Processing",
 	"Fastcasting",
 	"Fast-Find",	// 15
 	"Fish",
