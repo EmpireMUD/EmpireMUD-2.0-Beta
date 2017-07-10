@@ -336,12 +336,12 @@ const char *augment_types[] = {
 
 // AUGMENT_x (1/2): augment type data
 const struct augment_type_data augment_info[] = {
-	// noun, verb, apply-type, default-flags, greater-ability, use-obj-flag
-	{ "augment", "augment", APPLY_TYPE_NATURAL, NOBITS, NO_ABIL, NOBITS },
-	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, NOBITS, ABIL_GREATER_ENCHANTMENTS, OBJ_ENCHANTED },
-	{ "hone", "hone", APPLY_TYPE_HONED, AUG_SELF_ONLY, NO_ABIL, NOBITS },
+	// noun, verb, apply-type, default-flags, use-obj-flag
+	{ "augment", "augment", APPLY_TYPE_NATURAL, NOBITS, NOBITS },
+	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, NOBITS, OBJ_ENCHANTED },
+	{ "hone", "hone", APPLY_TYPE_HONED, AUG_SELF_ONLY, NOBITS },
 	
-	{ "\n", "\n", 0, 0, 0 }	// last
+	{ "\n", "\n", 0, 0 }	// last
 };
 
 
@@ -737,7 +737,7 @@ const char *player_tech_types[] = {
 	"Customize-Building",	// 10
 	"Deep-Mines",
 	"Dual-Wield",
-	"Enchantment-Upgrade",
+	"*",
 	"Fastcasting",
 	"Fast-Find",	// 15
 	"Fish",

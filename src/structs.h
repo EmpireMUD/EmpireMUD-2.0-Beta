@@ -1881,7 +1881,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_CUSTOMIZE_BUILDING  10	// player can customize buildings
 #define PTECH_DEEP_MINES  11	// increases mine size
 #define PTECH_DUAL_WIELD  12	// can fight with offhand weapons
-#define PTECH_ENCHANTMENT_UPGRADE  13	// enhances all enchants
+	#define PTECH_UNUSED  13
 #define PTECH_FASTCASTING  14	// wits affects non-combat abilities instead of combat speed
 #define PTECH_FAST_FIND  15	// digging, gathering, panning, picking
 #define PTECH_FISH  16	// can use the 'fish' command/interaction
@@ -2932,7 +2932,6 @@ struct augment_type_data {
 	char *verb;
 	int apply_type;	// APPLY_TYPE_x
 	bitvector_t default_flags;	// AUG_x always applied
-	int greater_abil;	// ABIL_x that boosts the scale points, or NO_ABIL
 	bitvector_t use_obj_flag;	// OBJ_: optional; used by enchants
 };
 
@@ -3842,7 +3841,7 @@ struct material_data {
 // see act.stealth.c
 struct poison_data_type {
 	char *name;
-	any_vnum ability;
+	any_vnum tech;	// PTECH_ to use it
 	
 	any_vnum atype;	// ATYPE_
 	int apply;	// APPLY_

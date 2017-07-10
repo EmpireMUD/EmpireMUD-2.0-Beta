@@ -373,7 +373,7 @@ double get_combat_speed(char_data *ch, int pos) {
 	}
 	
 	// wits: it gets .1 second faster for every 4 wits
-	if (!has_ability(ch, ABIL_FASTCASTING)) {
+	if (!has_player_tech(ch, PTECH_FASTCASTING)) {
 		base *= (1.0 - (0.025 * GET_WITS(ch)));
 	}
 	// round to .1 seconds
@@ -3315,7 +3315,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 			
 			// poison could kill too
-			if (!IS_NPC(ch) && has_ability(ch, ABIL_POISONS) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
+			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_POISON) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				if (!number(0, 1) && apply_poison(ch, victim, USING_POISON(ch)) < 0) {
 					// dedz
 					result = -1;
@@ -3587,7 +3587,7 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 		weapon = NULL;
 	}
 	
-	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_ability(ch, ABIL_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
+	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_player_tech(ch, PTECH_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
 		msg_to_char(ch, "You must be alone to use two-handed weapons in the solo role.\r\n");
 		return;
 	}
@@ -3987,7 +3987,7 @@ void frequent_combat(int pulse) {
 				}
 				
 				// still fighting and can dual-wield?
-				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
+				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_player_tech(ch, PTECH_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
 					if (GET_LAST_SWING_OFFHAND(ch) + (speed SEC_MICRO) <= timestamp) {
 						GET_LAST_SWING_OFFHAND(ch) = timestamp;

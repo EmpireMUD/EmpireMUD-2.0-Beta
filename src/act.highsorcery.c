@@ -586,8 +586,12 @@ ACMD(do_collapse) {
 	int cost = 15;
 	
 	one_argument(argument, arg);
-
-	if (!can_use_ability(ch, ABIL_PORTAL_MASTER, MANA, cost, NOTHING)) {
+	
+	if (!has_player_tech(ch, PTECH_PORTAL_UPGRADE)) {
+		msg_to_char(ch, "You don't have the correct ability to collapse portals.\r\n");
+		return;
+	}
+	if (!can_use_ability(ch, NO_ABIL, MANA, cost, NOTHING)) {
 		return;
 	}
 	
@@ -633,7 +637,7 @@ ACMD(do_collapse) {
 		extract_obj(reverse);
 	}
 	
-	gain_ability_exp(ch, ABIL_PORTAL_MASTER, 20);
+	gain_player_tech_exp(ch, PTECH_PORTAL_UPGRADE, 20);
 }
 
 

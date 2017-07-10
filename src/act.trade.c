@@ -1138,6 +1138,7 @@ ACMD(do_gen_augment) {
 	struct apply_data *app;
 	ability_data *abil;
 	augment_data *aug;
+	bool is_master;
 	obj_data *obj;
 	
 	augment_arg = one_argument(argument, target_arg);
@@ -1193,9 +1194,12 @@ ACMD(do_gen_augment) {
 			scale = MIN(scale, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 		}
 		
+		// check mastery
+		is_master = (abil && ABIL_MASTERY_ABIL(abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(abil)));
+		
 		// determine points
 		points_available = get_enchant_scale_for_char(ch, scale);
-		if (augment_info[subcmd].greater_abil && has_ability(ch, augment_info[subcmd].greater_abil)) {
+		if (is_master) {
 			points_available *= config_get_double("greater_enchantments_bonus");
 		}
 		
@@ -1287,8 +1291,8 @@ ACMD(do_gen_augment) {
 		if (GET_AUG_ABILITY(aug) != NO_ABIL) {
 			gain_ability_exp(ch, GET_AUG_ABILITY(aug), 50);
 		}
-		if (augment_info[subcmd].greater_abil != NO_ABIL) {
-			gain_ability_exp(ch, augment_info[subcmd].greater_abil, 50);
+		if (abil && is_master) {
+			gain_ability_exp(ch, ABIL_MASTERY_ABIL(abil), 50);
 		}
 		
 		command_lag(ch, WAIT_ABILITY);

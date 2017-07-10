@@ -153,7 +153,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_MAJESTY  23
 #define ABIL_MIST_FORM  24
 #define ABIL_MUMMIFY  25
-#define ABIL_TWO_HANDED_WEAPONS  26
 #define ABIL_REGENERATE  27
 #define ABIL_SUMMON_THUG  28
 #define ABIL_SNEAK  29
@@ -189,7 +188,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_ADVANCED_WOODWORKING  59
 #define ABIL_SIEGEWORKS  60
 #define ABIL_SHIPBUILDING  61
-#define ABIL_FORAGE  63
 #define ABIL_STAMINA  66
 #define ABIL_NIGHTSIGHT  68
 #define ABIL_FIND_HERBS  70
@@ -197,7 +195,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_TRACK  73
 #define ABIL_RESIST_POISON  77
 #define ABIL_FIND_SHELTER  79
-#define ABIL_BUTCHER  81
 #define ABIL_PATHFINDING  83
 #define ABIL_REFLEXES  84
 #define ABIL_QUICK_BLOCK  86
@@ -248,9 +245,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_BARDE  139
 #define ABIL_CITY_LIGHTS  140
 #define ABIL_GREAT_WALLS  141
-#define ABIL_PICKPOCKET  142
 #define ABIL_STEAL  143
-#define ABIL_INFILTRATE  144
 #define ABIL_ESCAPE  146
 #define ABIL_CONCEALMENT  148
 #define ABIL_SECRET_CACHE  149
@@ -259,8 +254,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_BLIND  156
 #define ABIL_SAP  157
 #define ABIL_DAGGER_MASTERY  158
-#define ABIL_POISONS  159
-#define ABIL_DEADLY_POISONS  160
 #define ABIL_PRICK  161
 #define ABIL_BAT_FORM  162
 #define ABIL_RITUAL_OF_BURDENS  163
@@ -281,7 +274,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SUNSHOCK  178
 #define ABIL_PHOENIX_RITE  179
 #define ABIL_DISENCHANT  180
-#define ABIL_GREATER_ENCHANTMENTS  181
 #define ABIL_DANGEROUS_LEATHERS  182
 #define ABIL_VIGOR  183
 #define ABIL_ENCHANT_ARMOR  184
@@ -308,7 +300,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_ARCANE_POWER  207
 #define ABIL_SWAMP_ENGINEERING  208
 #define ABIL_OUTRAGE  209
-#define ABIL_UNNATURAL_THIRST  210
 #define ABIL_DREAD_BLOOD_FORM  211
 #define ABIL_SAVAGE_WEREWOLF_FORM  212
 #define ABIL_TOWERING_WEREWOLF_FORM  213
@@ -316,7 +307,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_ANIMAL_FORMS  215
 #define ABIL_REFASHION  216
 #define ABIL_TRADE_ROUTES  217
-#define ABIL_DUAL_WIELD  218
 #define ABIL_RESURRECT  219
 #define ABIL_MOONRISE  220
 #define ABIL_IRON_BLADES  221
@@ -333,7 +323,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_CRUCIAL_JAB  235
 #define ABIL_DIVERSION  236
 #define ABIL_SHADOW_JAB  237
-#define ABIL_FASTCASTING  238
 #define ABIL_ANCESTRAL_HEALING  239
 #define ABIL_CONFER  240
 #define ABIL_STEELSMITH_CRAFTS  241
@@ -358,7 +347,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SKELETAL_HULK  260
 #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
-#define ABIL_HEALING_BOOST  263
 #define ABIL_EXQUISITE_WOODWORKING  264
 #define ABIL_CHANT_OF_ILLUSIONS  265
 #define ABIL_ELDER_CRAFTS  266

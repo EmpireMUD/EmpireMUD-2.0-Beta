@@ -173,7 +173,7 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	
 	// permissions
 	if (!skip_permissions && ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !can_use_room(ch, to_room, GUESTS_ALLOWED))) {
-		if (!allow_infiltrate || !has_ability(ch, ABIL_INFILTRATE)) {
+		if (!allow_infiltrate || !has_player_tech(ch, PTECH_INFILTRATE)) {
 			msg_to_char(ch, "You don't have permission to enter that.\r\n");
 			return FALSE;
 		}
@@ -472,7 +472,7 @@ void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room
 		if (is_in_city_for_empire(from, ROOM_OWNER(from), TRUE, &junk) && is_in_city_for_empire(to, ROOM_OWNER(to), TRUE, &junk)) {
 			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 2 * SECS_PER_REAL_MIN);
 		}
-		else if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
+		else if (has_player_tech(ch, PTECH_PORTAL)) {
 			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 4 * SECS_PER_REAL_MIN);
 		}
 		else {
@@ -1693,7 +1693,7 @@ ACMD(do_move) {
 
 // mortals have to portal from a certain building, immortals can do it anywhere
 ACMD(do_portal) {
-	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
+	void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
 	extern char *get_room_name(room_data *room, bool color);
 	
 	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
@@ -1754,7 +1754,7 @@ ACMD(do_portal) {
 				
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s (%s%s&0)", get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 				
-				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(room))) {
+				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(room))) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
 				}
 				
@@ -1787,8 +1787,8 @@ ACMD(do_portal) {
 	}
 
 	// ok, we have a target...
-	if (!all_access && !has_ability(ch, ABIL_PORTAL_MAGIC)  && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_PORTALS))) {
-		msg_to_char(ch, "You can only open portals if there is a portal mage in your empire.\r\n");
+	if (!all_access && !has_player_tech(ch, PTECH_PORTAL) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_PORTALS))) {
+		msg_to_char(ch, "You don't have the ability to open portals, and you aren't in an empire with that ability either.\r\n");
 		return;
 	}
 	if (target == IN_ROOM(ch)) {
@@ -1811,7 +1811,7 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open a portal to that location.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target)) {
+	if (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target)) {
 		msg_to_char(ch, "You can't open a portal to another land without a portal master in your empire.\r\n");
 		return;
 	}
@@ -1864,8 +1864,12 @@ ACMD(do_portal) {
 	load_otrigger(end);
 	
 	if (GET_LOYALTY(ch)) {
-		empire_skillup(GET_LOYALTY(ch), ABIL_PORTAL_MAGIC, 15);
-		empire_skillup(GET_LOYALTY(ch), ABIL_PORTAL_MASTER, 15);
+		empire_player_tech_skillup(GET_LOYALTY(ch), PTECH_PORTAL, 15);
+		empire_player_tech_skillup(GET_LOYALTY(ch), PTECH_PORTAL_UPGRADE, 15);
+	}
+	else {
+		gain_player_tech_exp(ch, PTECH_PORTAL, 15);
+		gain_player_tech_exp(ch, PTECH_PORTAL_UPGRADE, 15);
 	}
 	
 	command_lag(ch, WAIT_OTHER);

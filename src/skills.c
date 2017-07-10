@@ -133,6 +133,12 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					}
 					break;
 				}
+				case PTECH_FISH: {
+					if (GET_ACTION(ch) == ACT_FISHING) {
+						cancel_action(ch);
+					}
+					break;
+				}
 				case PTECH_NAVIGATION: {
 					// avoid spinning the map when they lose navigation
 					GET_CONFUSED_DIR(ch) = NORTH;
@@ -152,9 +158,11 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					}
 					break;
 				}
-				case PTECH_FISH:
 				case PTECH_TWO_HANDED_WEAPONS: {
-					// not yet implemented
+					if ((obj = GET_EQ(ch, WEAR_WIELD)) && OBJ_FLAGGED(obj, OBJ_TWO_HANDED)) {
+						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+						unequip_char_to_inventory(ch, WEAR_WIELD);
+					}
 					break;
 				}
 			}
@@ -240,12 +248,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_SABERTOOTH);
 			despawn_familiar(ch, FAMILIAR_SPHINX);
 			despawn_familiar(ch, FAMILIAR_GIANT_TORTOISE);
-			break;
-		}
-		case ABIL_FISH: {
-			if (GET_ACTION(ch) == ACT_FISHING) {
-				cancel_action(ch);
-			}
 			break;
 		}
 		case ABIL_FLY: {
@@ -719,6 +721,7 @@ int compute_bonus_exp_per_day(char_data *ch) {
 * Gives a skillup for anybody in the empire with the ability.
 *
 * @param empire_data *emp the empire to skillup
+* @param any_vnum ability Which ABIL_ to gain
 * @param double amount The amount of experience to gain
 */
 void empire_skillup(empire_data *emp, any_vnum ability, double amount) {
@@ -729,6 +732,27 @@ void empire_skillup(empire_data *emp, any_vnum ability, double amount) {
 		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
 			if (GET_LOYALTY(ch) == emp) {
 				gain_ability_exp(ch, ability, amount);
+			}
+		}
+	}
+}
+
+
+/**
+* Gives a skillup for anybody in the empire with a player tech.
+*
+* @param empire_data *emp the empire to skillup
+* @param int tech Which PTECH_ to gain on
+* @param double amount The amount of experience to gain
+*/
+void empire_player_tech_skillup(empire_data *emp, int tech, double amount) {
+	descriptor_data *d;
+	char_data *ch;
+	
+	for (d = descriptor_list; d; d = d->next) {
+		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
+			if (GET_LOYALTY(ch) == emp) {
+				gain_player_tech_exp(ch, tech, amount);
 			}
 		}
 	}
@@ -1946,7 +1970,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 		}
 	}
 	else if (OBJ_FLAGGED(item, OBJ_TWO_HANDED)) {
-		abil = ABIL_TWO_HANDED_WEAPONS;
+		tech = PTECH_TWO_HANDED_WEAPONS;
 	}
 	else if (IS_MISSILE_WEAPON(item)) {
 		tech = PTECH_RANGED_COMBAT;
