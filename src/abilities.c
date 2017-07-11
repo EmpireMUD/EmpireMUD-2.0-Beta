@@ -629,6 +629,10 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 			amount = 0.5;
 			break;
 		}
+		case AGH_MOVING: {
+			amount = 1;
+			break;
+		}
 		case AGH_VAMPIRE_FEEDING: {
 			amount = 5;
 			break;

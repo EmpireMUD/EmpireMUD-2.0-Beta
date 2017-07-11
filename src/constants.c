@@ -206,6 +206,7 @@ const char *ability_gain_hooks[] = {
 	"ONLY-LIGHT",
 	"ONLY-VS-ANIMAL",	// 10
 	"VAMPIRE-FEEDING",
+	"MOVING",
 	"\n"
 };
 
