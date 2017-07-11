@@ -2559,7 +2559,7 @@ SHOW(show_technology) {
 		*line = '\0';
 		lsize = 0;
 		
-		LL_FOREACH(GET_TECHS(ch), ptech) {
+		LL_FOREACH(GET_TECHS(vict), ptech) {
 			if (ptech->id == last_tech) {
 				continue;
 			}
