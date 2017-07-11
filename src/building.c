@@ -518,6 +518,9 @@ bld_data *find_designate_room_by_name(char *name, bitvector_t flags) {
 	bld_data *iter, *next_iter, *partial = NULL;
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
+		if (!IS_SET(GET_BLD_FLAGS(iter), BLD_ROOM)) {
+			continue;	// not designatable
+		}
 		if (flags && !IS_SET(GET_BLD_DESIGNATE_FLAGS(iter), flags)) {
 			continue;	// not matching
 		}
