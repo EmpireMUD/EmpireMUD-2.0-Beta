@@ -133,6 +133,7 @@ const char *ability_type_flags[] = {
 	"BUFF",
 	"DAMAGE",
 	"DOT",
+	"PLAYER-TECH",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -184,6 +185,13 @@ const char *ability_custom_types[] = {
 };
 
 
+// ADL_x: for adding to ability_data_list
+const char *ability_data_types[] = {
+	"PTECH",
+	"\n"
+};
+
+
 // AGH_x: ability gain hooks
 const char *ability_gain_hooks[] = {
 	"ONLY-WHEN-AFFECTED",	// 0
@@ -193,7 +201,11 @@ const char *ability_gain_hooks[] = {
 	"BLOCK",
 	"TAKE-DAMAGE",	// 5
 	"PASSIVE-FREQUENT",
-	"PASSIVE_HOURLY",
+	"PASSIVE-HOURLY",
+	"ONLY-DARK",
+	"ONLY-LIGHT",
+	"ONLY-VS-ANIMAL",	// 10
+	"VAMPIRE-FEEDING",
 	"\n"
 };
 
@@ -324,12 +336,12 @@ const char *augment_types[] = {
 
 // AUGMENT_x (1/2): augment type data
 const struct augment_type_data augment_info[] = {
-	// noun, verb, apply-type, default-flags, greater-ability, use-obj-flag
-	{ "augment", "augment", APPLY_TYPE_NATURAL, NOBITS, NO_ABIL, NOBITS },
-	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, NOBITS, ABIL_GREATER_ENCHANTMENTS, OBJ_ENCHANTED },
-	{ "hone", "hone", APPLY_TYPE_HONED, AUG_SELF_ONLY, NO_ABIL, NOBITS },
+	// noun, verb, apply-type, default-flags, use-obj-flag
+	{ "augment", "augment", APPLY_TYPE_NATURAL, NOBITS, NOBITS },
+	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, NOBITS, OBJ_ENCHANTED },
+	{ "hone", "hone", APPLY_TYPE_HONED, AUG_SELF_ONLY, NOBITS },
 	
-	{ "\n", "\n", 0, 0, 0 }	// last
+	{ "\n", "\n", 0, 0 }	// last
 };
 
 
@@ -710,6 +722,64 @@ const char *connected_types[] = {
 };
 
 
+// PTECH_x: player techs
+const char *player_tech_types[] = {
+	"RESERVED",	// 0
+	"Armor-Heavy",
+	"Armor-Light",
+	"Armor-Mage",
+	"Armor-Medium",
+	"Block",	// 5
+	"Block-Ranged",
+	"Block-Magical",
+	"Bonus-vs-Animals",
+	"Butcher",
+	"Customize-Building",	// 10
+	"Deep-Mines",
+	"Dual-Wield",
+	"Fast-Wood-Processing",
+	"Fastcasting",
+	"Fast-Find",	// 15
+	"Fish",
+	"Forage",
+	"Harvest-Upgrade",
+	"Healing-Boost",
+	"Hide-Upgrade",	// 20
+	"Infiltrate",
+	"Infiltrate-Upgrade",
+	"Larger-Light-Radius",
+	"Light-Fire",
+	"Map-Invis",	// 25
+	"Mill-Upgrade",
+	"Navigation",
+	"!Hunger",
+	"!Poison",
+	"!Thirst",	// 30
+	"!Track-City",
+	"!Track-Wild",
+	"Pickpocket",
+	"Poison",
+	"Poison-Upgrade",	// 35
+	"Portal",
+	"Portal-Upgrade",
+	"Ranged-Combat",
+	"Riding",
+	"Riding-Flying",	// 40
+	"Riding-Upgrade",
+	"Rough-Terrain",
+	"See-Chars-In-Dark",
+	"See-Objs-In-Dark",
+	"See-Inventory",	// 45
+	"Shear-Upgrade",
+	"Steal-Upgrade",
+	"Swimming",
+	"Teleport-City",
+	"Two-Handed-Weapons",	// 50
+	"Where-Upgrade",
+	"\n"
+};
+
+
 // SYS_x syslog types
 const char *syslog_types[] = {
 	"config",
@@ -922,7 +992,7 @@ const int rev_dir[NUM_OF_DIRS] = {
 };
 
 
-// for ABIL_NAVIGATION: confused_dir[which dir is north][reverse][which dir to translate]
+// for PTECH_NAVIGATION: confused_dir[which dir is north][reverse][which dir to translate]
 // reverse=0 is for moving
 // reverse=1 is for which way directions are displayed (this was very confusing to figure out)
 const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS] = {
@@ -962,7 +1032,7 @@ const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS] = {
 };
 
 
-// for ABIL_NAVIGATION: how_to_show_map[dir which is north for char][x=0,y=1]
+// for PTECH_NAVIGATION: how_to_show_map[dir which is north for char][x=0,y=1]
 // for each direction, whether the x/y coord goes from positive to negative (1) or negative to positive (-1)
 int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
 	{ -1, 1 },	// north
@@ -972,7 +1042,7 @@ int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
 };
 
 
-// for ABIL_NAVIGATION: show_map_y_first[dir which is north for char]
+// for PTECH_NAVIGATION: show_map_y_first[dir which is north for char]
 // 1 = show y coordinate vertically, 0 = show x coord vertically
 int show_map_y_first[NUM_SIMPLE_DIRS] = {
 	1,	// N

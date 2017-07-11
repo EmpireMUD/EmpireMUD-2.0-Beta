@@ -52,6 +52,7 @@
 *   Custom Message Handlers
 *   Object Targeting Handlers
 *   Offer Handlers
+*   Player Tech Handlers
 *   Requirement Handlers
 *   Resource Depletion Handlers
 *   Room Handlers
@@ -1707,6 +1708,9 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 			continue;
 		if (IS_SET(flags, FIND_CHAR_ROOM) && AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM))
 			continue;
+		if (!(IS_SET(flags, FIND_NO_DARK) && CAN_SEE_NO_DARK(ch, i)) && !CAN_SEE(ch, i)) {
+			continue;
+		}
 		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : 0) | (IS_SET(flags, FIND_NO_DARK | FIND_CHAR_WORLD) ? MATCH_GLOBAL : 0))) {
 			continue;
 		}
@@ -5699,6 +5703,123 @@ void remove_offers_by_type(char_data *ch, int type) {
 			free(offer);
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PLAYER TECH HANDLERS ////////////////////////////////////////////////////
+
+// Simple sorter to help display player techs
+int sort_player_techs(struct player_tech *a, struct player_tech *b) {
+	return (a->id - b->id);
+}
+
+/**
+* Adds a player tech (by ability) to the player.
+*
+* @param char_data *ch The player gaining a tech.
+* @param any_vnum abil The ability that's granting it.
+* @param int tech The PTECH_ to gain.
+*/
+void add_player_tech(char_data *ch, any_vnum abil, int tech) {
+	struct player_tech *iter, *pt;
+	bool found = FALSE;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->abil == abil && iter->id == tech) {
+			found = TRUE;
+			break;
+		}
+	}
+	
+	// add it
+	if (!found) {
+		CREATE(pt, struct player_tech, 1);
+		pt->id = tech;
+		pt->abil = abil;
+		LL_INSERT_INORDER(GET_TECHS(ch), pt, sort_player_techs);
+	}
+}
+
+
+/**
+* Whether or not a PC has the requested tech.
+*
+* @param char_data *ch The player.
+* @param int tech Which PTECH_ to see if he/she has.
+* @return bool TRUE if the player has it, FALSE otherwise.
+*/
+bool has_player_tech(char_data *ch, int tech) {
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			return TRUE;
+		}
+	}
+	
+	// not found
+	return FALSE;
+}
+
+
+/**
+* Removes player techs by ability.
+*
+* @param char_data *ch The player losing techs.
+* @param any_vnum abil The ability whose techs are being lost.
+*/
+void remove_player_tech(char_data *ch, any_vnum abil) {
+	struct player_tech *iter, *next;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH_SAFE(GET_TECHS(ch), iter, next) {
+		if (iter->abil == abil) {
+			LL_DELETE(GET_TECHS(ch), iter);
+			free(iter);
+		}
+	}
+}
+
+
+/**
+* Runs ability triggers on any ability that's giving a player a certain tech.
+* Stops if any of those triggers blocks it.
+*
+* @param char_data *ch The person using the ability.
+* @param int tech Which PTECH_ to trigger.
+* @param char_data *cvict The target of the ability, if any.
+* @param obj_data *ovict The target of the ability, if any.
+* @param bool TRUE if a trigger blocked the ability, FALSE if it's safe to proceed.
+*/
+bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict) {
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			if (ABILITY_TRIGGERS(ch, cvict, ovict, iter->abil)) {
+				return TRUE;
+			}
+		}
+	}
+	
+	// survived
+	return FALSE;
 }
 
 

@@ -1,401 +1,463 @@
 #100
 Mage Armor~
-0 -1
+0 -1 1.00 0 0
+D 1 3 0
+T e 1
 S
 #101
 Archery~
-0 -1
+0 -1 1.00 0 0
+D 1 38 0
+T e 1
 S
 #102
 Quick Draw~
-0 -1
+0 -1 1.00 0 0
 S
 #103
 Firstaid~
-0 -1
+0 -1 1.00 0 0
 S
 #104
 Fleet~
-0 -1
+0 -1 1.00 0 0
 S
 #105
 Finesse~
-0 -1
+0 -1 1.00 0 0
 S
 #106
 Stunning Blow~
-0 -1
+0 -1 1.00 0 0
 S
 #107
 Veintap~
-0 -1
+0 -1 1.00 0 0
 S
 #108
 Weaken~
-0 -1
+0 -1 1.00 0 0
 S
 #109
 Heal~
-0 -1
+0 -1 1.00 0 0
 S
 #110
 Heal Friend~
-0 -1
+0 -1 1.00 0 0
 S
 #111
 Heal Party~
-0 -1
+0 -1 1.00 0 0
 S
 #112
 Healing Potions~
-0 -1
+0 -1 1.00 0 0
+T a 0
 S
 #113
 Healing Elixirs~
-0 124
+0 124 1.00 0 0
+T a 0
 S
 #114
 Rejuvenate~
-0 -1
+0 -1 1.00 0 0
 S
 #115
 Purify~
-0 -1
+0 -1 1.00 0 0
 S
 #116
 Cleanse~
-0 -1
+0 -1 1.00 0 0
 S
 #117
 Ready Fireball~
-0 -1
+0 -1 1.00 0 0
 S
 #118
 Lightningbolt~
-0 -1
+abi -1 1.00 B 0
+C
+llightningbolt 0 bf 2 10 3 2023 9 8 3
+T c 8
+T d 2
+X c
+60 1
+X d
+3019 15 15 1 1
 S
 #119
 Hasten~
-0 -1
+0 -1 1.00 0 0
 S
 #120
 Counterspell~
-0 -1
+0 -1 1.00 0 0
 S
 #121
 Entangle~
-0 -1
+0 -1 1.00 0 0
 S
 #122
 Familiar~
-0 -1
+0 -1 1.00 0 0
 S
 #123
 Nature Potions~
-0 -1
+0 -1 1.00 0 0
+T a 0
 S
 #124
 Wrath of Nature Potions~
-0 113
+0 113 1.00 0 0
+T a 0
 S
 #125
 Skybrand~
-0 -1
+0 -1 1.00 0 0
 S
 #126
 Chant of Nature~
-0 -1
+0 -1 1.00 0 0
 S
 #127
 Reward~
-0 -1
+0 -1 1.00 0 0
 S
 #128
 Summon Guards~
-0 -1
+0 -1 1.00 0 0
 S
 #129
 Radiance~
-0 -1
+0 -1 1.00 0 0
 S
 #130
 Prospect~
-0 -1
+0 -1 1.00 0 0
 S
 #131
 Workforce~
-0 -1
+0 -1 1.00 0 0
 S
 #132
 Deep Mines~
-0 -1
+0 -1 1.00 0 0
+D 1 11 0
+T e 1
 S
 #133
 Rare Metals~
-0 -1
+0 -1 1.00 0 0
 S
 #134
 Commerce~
-0 -1
+0 -1 1.00 0 0
 S
 #135
 Prominence~
-0 -1
+0 -1 1.00 0 0
 S
 #136
 Inspire~
-0 -1
+0 -1 1.00 0 0
 S
 #137
 Customize Building~
-0 -1
+0 -1 1.00 0 0
+D 1 10 0
+T e 1
 S
 #138
 Summon Bodyguard~
-0 -1
+0 -1 1.00 0 0
 S
 #139
 Barde~
-0 -1
+0 -1 1.00 0 0
 S
 #140
 City Lights~
-0 -1
+0 -1 1.00 0 0
 S
 #141
 Great Walls~
-0 -1
+0 -1 1.00 0 0
+T a 0
 S
 #142
 Pickpocket~
-0 -1
+0 -1 1.00 0 0
+D 1 33 0
+T e 1
 S
 #143
 Steal~
-0 -1
+0 -1 1.00 0 0
 S
 #144
 Infiltrate~
-0 -1
+0 -1 1.00 0 0
+D 1 21 0
+T e 1
 S
 #145
 Improved Infiltrate~
-0 -1
+0 -1 1.00 0 0
+D 1 22 0
+T e 1
 S
 #146
 Escape~
-0 -1
+0 -1 1.00 0 0
 S
 #147
 Appraisal~
-0 -1
+0 -1 1.00 0 0
+D 1 45 0
+T e 1
 S
 #148
 Concealment~
-0 -1
+0 -1 1.00 0 0
 S
 #149
 Secret Cache~
-0 -1
+0 -1 1.00 0 0
+T a 0
 S
 #150
 Cling to Shadow~
-0 -1
+0 -1 1.00 0 0
+D 1 20 0
+T e 1
 S
 #151
 Unseen Passing~
-0 -1
+0 -1 1.00 0 0
+D 1 31 0
+T e 1
 S
 #152
 Cloak of Darkness~
-0 -1
+0 -1 1.00 0 0
+D 1 25 0
+T e 1
 S
 #153
 Shadowstep~
-0 -1
+0 -1 1.00 0 0
 S
 #154
 Vaultcracking~
-0 -1
+0 -1 1.00 0 0
+D 1 47 0
+T e 1
 S
 #155
 Jab~
-0 -1
+0 -1 1.00 0 0
 S
 #156
 Blind~
-0 -1
+0 -1 1.00 0 0
 S
 #157
 Sap~
-0 -1
+0 -1 1.00 0 0
 S
 #158
 Dagger Mastery~
-0 -1
+0 -1 1.00 0 0
 S
 #159
 Poisons~
-0 -1
+0 -1 1.00 0 0
+D 1 34 0
+T a 1
+T e 0
 S
 #160
 Deadly Poisons~
-0 -1
+0 -1 1.00 0 0
+D 1 35 0
+T a 1
+T e 0
 S
 #161
 Prick~
-0 -1
+0 -1 1.00 0 0
 S
 #162
 Bat Form~
-0 -1
+0 -1 1.00 0 0
 S
 #163
 Ritual of Burdens~
-0 -1
+0 -1 1.00 0 0
 S
 #164
 Staffmaking~
-0 -1
+0 -1 1.00 0 0
+T a 0
 S
 #165
 Manashield~
-0 -1
+0 -1 1.00 0 0
 S
 #166
 Foresight~
-0 -1
+0 -1 1.00 0 0
 S
 #167
 Enchant Weapons~
-0 -1
+0 181 1.00 0 0
+T a 0
 S
 #168
 Summon Swift~
-0 -1
+0 -1 1.00 0 0
 S
 #169
 Summon Materials~
-0 -1
+0 -1 1.00 0 0
 S
 #170
 Powerful Staves~
-0 -1
+0 -1 1.00 0 0
+T a 0
 S
 #171
 Staff Mastery~
-0 -1
+0 -1 1.00 0 0
 S
 #172
 Siege Ritual~
-0 -1
+0 -1 1.00 0 0
 S
 #173
 Colorburst~
-0 -1
+0 -1 1.00 0 0
 S
 #174
 Enervate~
-0 -1
+0 -1 1.00 0 0
 S
 #175
 Slow~
-0 -1
+0 -1 1.00 0 0
 S
 #176
 Siphon~
-0 -1
+0 -1 1.00 0 0
 S
 #177
 Mirrorimage~
-0 -1
+0 -1 1.00 0 0
 S
 #178
 Sunshock~
-0 -1
+0 -1 1.00 0 0
 S
 #179
 Phoenix Rite~
-0 -1
+0 -1 1.00 0 0
 S
 #180
 Disenchant~
-0 -1
+0 -1 1.00 0 0
 S
 #181
 Greater Enchantments~
-0 -1
+0 181 1.00 0 0
 S
 #182
 Dangerous Leathers~
-0 194
+0 194 1.00 0 0
+T a 0
 S
 #183
 Vigor~
-0 -1
+0 -1 1.00 0 0
 S
 #184
 Enchant Armor~
-0 -1
+0 181 1.00 0 0
+T a 0
 S
 #185
 Enchant Tools~
-0 -1
+0 181 1.00 0 0
+T a 0
 S
 #186
 Ritual of Defense~
-0 -1
+0 -1 1.00 0 0
 S
 #187
 Ritual of Teleportation~
-0 -1
+0 -1 1.00 0 0
 S
 #188
 City Teleportation~
-0 -1
+0 -1 1.00 0 0
+D 1 49 0
+T e 1
 S
 #189
 Portal Magic~
-0 -1
+0 -1 1.00 0 0
+D 1 36 0
+T e 0
 S
 #190
 Portal Master~
-0 -1
+0 -1 1.00 0 0
+D 1 37 0
+T e 0
 S
 #191
 Devastation Ritual~
-0 -1
+0 -1 1.00 0 0
 S
 #192
 Sense Life Ritual~
-0 -1
+0 -1 1.00 0 0
 S
 #193
 Ritual of Detection~
-0 -1
+0 -1 1.00 0 0
 S
 #194
 Master Tailor~
-0 -1
+0 -1 1.00 0 0
+T a 0
 S
 #195
 Master Blacksmith~
-0 -1
+0 -1 1.00 0 0
+T a 0
 S
 #196
 Deadly Weapons~
-0 195
+0 195 1.00 0 0
+T a 0
 S
 #197
 Imperial Armors~
-0 195
+0 195 1.00 0 0
+T a 0
 S
 #198
 Basic Crafts~
-0 203
+0 203 1.00 0 0
+T a 0
 S
 #199
 Magical Vestments~
-0 194
+0 194 1.00 0 0
+T a 0
 S
 $

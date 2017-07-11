@@ -55,6 +55,7 @@ extern bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int 
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
 extern bool check_solo_role(char_data *ch);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);
+void gain_player_tech_exp(char_data *ch, int tech, double amount);
 extern bool gain_skill(char_data *ch, skill_data *skill, int amount);
 extern bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount);
 extern struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bool add_if_missing);
@@ -66,6 +67,7 @@ void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void set_skill(char_data *ch, any_vnum skill, int level);
 extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
+extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 
 // skill_check difficulties
@@ -136,7 +138,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_BOOST  7
 #define ABIL_CLAWS  8
 #define ABIL_VAMP_COMMAND  9
-#define ABIL_TOUCH_OF_FLAME  10
 #define ABIL_DARKNESS  11
 #define ABIL_DEATHSHROUD  12
 #define ABIL_DISGUISE  13
@@ -152,7 +153,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_MAJESTY  23
 #define ABIL_MIST_FORM  24
 #define ABIL_MUMMIFY  25
-#define ABIL_TWO_HANDED_WEAPONS  26
 #define ABIL_REGENERATE  27
 #define ABIL_SUMMON_THUG  28
 #define ABIL_SNEAK  29
@@ -165,59 +165,18 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_HEARTSTOP  36
 #define ABIL_TASTE_BLOOD  37
 #define ABIL_BLOOD_FORTITUDE  38
-#define ABIL_ARTISANS  39
-#define ABIL_HOUSING  40
 #define ABIL_LOCKS  41
-#define ABIL_LUXURY  42
-#define ABIL_MONUMENTS  43
-#define ABIL_RAISE_ARMIES  44
-#define ABIL_SEAFARING  45
-#define ABIL_HAVENS  46
-#define ABIL_ADVANCED_TACTICS  47
-#define ABIL_GRAND_MONUMENTS  48
 #define ABIL_ROADS  49
-#define ABIL_ADVANCED_SHIPS  50
-#define ABIL_FORGE  51
-#define ABIL_WEAPONCRAFTING  52
-#define ABIL_ARMORSMITHING  53
-#define ABIL_JEWELRY  54
-#define ABIL_SEWING  55
-#define ABIL_LEATHERWORKING  56
-#define ABIL_POTTERY  57
-#define ABIL_WOODWORKING  58
-#define ABIL_ADVANCED_WOODWORKING  59
-#define ABIL_SIEGEWORKS  60
-#define ABIL_SHIPBUILDING  61
-#define ABIL_SWIMMING  62
-#define ABIL_FORAGE  63
-#define ABIL_RIDE  64
-#define ABIL_ALL_TERRAIN_RIDING  65
 #define ABIL_STAMINA  66
-#define ABIL_BY_MOONLIGHT  67
 #define ABIL_NIGHTSIGHT  68
-#define ABIL_FINDER  69
 #define ABIL_FIND_HERBS  70
-#define ABIL_HUNT  71
 #define ABIL_FISH  72
 #define ABIL_TRACK  73
-#define ABIL_MASTER_TRACKER  74
-#define ABIL_SATED_THIRST  75
-#define ABIL_NO_TRACE  76
 #define ABIL_RESIST_POISON  77
-#define ABIL_POISON_IMMUNITY  78
-#define ABIL_FIND_SHELTER  79
-#define ABIL_NAVIGATION  80
-#define ABIL_BUTCHER  81
-#define ABIL_MOUNTAIN_CLIMBING  82
 #define ABIL_PATHFINDING  83
 #define ABIL_REFLEXES  84
-#define ABIL_SHIELD_BLOCK  85
 #define ABIL_QUICK_BLOCK  86
 #define ABIL_REFORGE  87
-#define ABIL_BLOCK_ARROWS  88
-#define ABIL_LIGHT_ARMOR  89
-#define ABIL_MEDIUM_ARMOR  90
-#define ABIL_HEAVY_ARMOR  91
 #define ABIL_ENDURANCE  92
 #define ABIL_RESCUE  93
 #define ABIL_DISARM  94
@@ -226,8 +185,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_BASH  97
 #define ABIL_CUT_DEEP  98
 #define ABIL_BIG_GAME_HUNTER  99
-#define ABIL_MAGE_ARMOR  100
-#define ABIL_ARCHERY  101
 #define ABIL_QUICK_DRAW  102
 #define ABIL_FIRSTAID  103
 #define ABIL_FLEET  104
@@ -238,8 +195,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_HEAL  109
 #define ABIL_HEAL_FRIEND  110
 #define ABIL_HEAL_PARTY  111
-#define ABIL_HEALING_POTIONS  112
-#define ABIL_HEALING_ELIXIRS  113
 #define ABIL_REJUVENATE  114
 #define ABIL_PURIFY  115
 #define ABIL_CLEANSE  116
@@ -249,8 +204,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_COUNTERSPELL  120
 #define ABIL_ENTANGLE  121
 #define ABIL_FAMILIAR  122
-#define ABIL_NATURE_POTIONS  123
-#define ABIL_WRATH_OF_NATURE_POTIONS  124
 #define ABIL_SKYBRAND  125
 #define ABIL_CHANT_OF_NATURE  126
 #define ABIL_REWARD  127
@@ -258,45 +211,28 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_RADIANCE  129
 #define ABIL_PROSPECT  130
 #define ABIL_WORKFORCE  131
-#define ABIL_DEEP_MINES  132
 #define ABIL_RARE_METALS  133
 #define ABIL_COMMERCE  134
 #define ABIL_PROMINENCE  135
 #define ABIL_INSPIRE  136
-#define ABIL_CUSTOMIZE_BUILDING  137
 #define ABIL_SUMMON_BODYGUARD  138
 #define ABIL_BARDE  139
 #define ABIL_CITY_LIGHTS  140
-#define ABIL_GREAT_WALLS  141
-#define ABIL_PICKPOCKET  142
 #define ABIL_STEAL  143
-#define ABIL_INFILTRATE  144
-#define ABIL_IMPROVED_INFILTRATE  145
 #define ABIL_ESCAPE  146
-#define ABIL_APPRAISAL  147
 #define ABIL_CONCEALMENT  148
-#define ABIL_SECRET_CACHE  149
-#define ABIL_CLING_TO_SHADOW  150
-#define ABIL_UNSEEN_PASSING  151
-#define ABIL_CLOAK_OF_DARKNESS  152
 #define ABIL_SHADOWSTEP  153
-#define ABIL_VAULTCRACKING  154
 #define ABIL_JAB  155
 #define ABIL_BLIND  156
 #define ABIL_SAP  157
 #define ABIL_DAGGER_MASTERY  158
-#define ABIL_POISONS  159
-#define ABIL_DEADLY_POISONS  160
 #define ABIL_PRICK  161
 #define ABIL_BAT_FORM  162
 #define ABIL_RITUAL_OF_BURDENS  163
-#define ABIL_STAFFMAKING  164
 #define ABIL_MANASHIELD  165
 #define ABIL_FORESIGHT  166
-#define ABIL_ENCHANT_WEAPONS  167
 #define ABIL_SUMMON_SWIFT  168
 #define ABIL_SUMMON_MATERIALS  169
-#define ABIL_POWERFUL_STAVES  170
 #define ABIL_STAFF_MASTERY  171
 #define ABIL_SIEGE_RITUAL  172
 #define ABIL_COLORBURST  173
@@ -307,36 +243,19 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_SUNSHOCK  178
 #define ABIL_PHOENIX_RITE  179
 #define ABIL_DISENCHANT  180
-#define ABIL_GREATER_ENCHANTMENTS  181
-#define ABIL_DANGEROUS_LEATHERS  182
 #define ABIL_VIGOR  183
-#define ABIL_ENCHANT_ARMOR  184
-#define ABIL_ENCHANT_TOOLS  185
 #define ABIL_RITUAL_OF_DEFENSE  186
 #define ABIL_RITUAL_OF_TELEPORTATION  187
-#define ABIL_CITY_TELEPORTATION  188
 #define ABIL_PORTAL_MAGIC  189
 #define ABIL_PORTAL_MASTER  190
 #define ABIL_DEVASTATION_RITUAL  191
 #define ABIL_SENSE_LIFE_RITUAL  192
 #define ABIL_RITUAL_OF_DETECTION  193
-#define ABIL_MASTER_TAILOR  194
-#define ABIL_MASTER_BLACKSMITH  195
-#define ABIL_DEADLY_WEAPONS  196
-#define ABIL_IMPERIAL_ARMORS  197
-#define ABIL_BASIC_CRAFTS  198
-#define ABIL_MAGICAL_VESTMENTS  199
-#define ABIL_HERB_GARDENS  200
 #define ABIL_SKILLED_LABOR  201
-#define ABIL_FINE_POTTERY  202
-#define ABIL_MASTER_CRAFTSMAN  203
-#define ABIL_MASTER_FARMER  204
 #define ABIL_MASTER_SURVIVALIST  205
 #define ABIL_TUNNEL  206
 #define ABIL_ARCANE_POWER  207
-#define ABIL_SWAMP_ENGINEERING  208
 #define ABIL_OUTRAGE  209
-#define ABIL_UNNATURAL_THIRST  210
 #define ABIL_DREAD_BLOOD_FORM  211
 #define ABIL_SAVAGE_WEREWOLF_FORM  212
 #define ABIL_TOWERING_WEREWOLF_FORM  213
@@ -344,19 +263,11 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_ANIMAL_FORMS  215
 #define ABIL_REFASHION  216
 #define ABIL_TRADE_ROUTES  217
-#define ABIL_DUAL_WIELD  218
 #define ABIL_RESURRECT  219
 #define ABIL_MOONRISE  220
-#define ABIL_IRON_BLADES  221
-#define ABIL_STURDY_ARMORS  222
-#define ABIL_RAWHIDE_STITCHING  223
-#define ABIL_MAGIC_ATTIRE  224
-#define ABIL_PREDATOR_VISION  225
 #define ABIL_SANGUINE_RESTORATION  226
-#define ABIL_WARD_AGAINST_MAGIC  227
 #define ABIL_NOBLE_BEARING  228
 #define ABIL_BLOODSWEAT  229
-#define ABIL_DRAGONRIDING  230
 #define ABIL_SHADOW_KICK  231
 #define ABIL_STAGGER_JAB  232
 #define ABIL_SHADOWCAGE  233
@@ -364,18 +275,9 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_CRUCIAL_JAB  235
 #define ABIL_DIVERSION  236
 #define ABIL_SHADOW_JAB  237
-#define ABIL_FASTCASTING  238
 #define ABIL_ANCESTRAL_HEALING  239
 #define ABIL_CONFER  240
-#define ABIL_STEELSMITH_CRAFTS  241
-#define ABIL_GUILDSMAN_CRAFTS  242
-#define ABIL_ARTIFICER_CRAFTS  243
-#define ABIL_ALCHEMIST_CRAFTS  244
-#define ABIL_SMUGGLER_CRAFTS  245
-#define ABIL_TINKER_CRAFTS  246
-#define ABIL_ANTIQUARIAN_CRAFTS  247
 #define ABIL_EXARCH_CRAFTS  248
-#define ABIL_WORKFORCE_SAWING  249
 #define ABIL_GRIFFIN  250
 #define ABIL_DIRE_WOLF  251
 #define ABIL_MOON_RABBIT  252
@@ -389,15 +291,10 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_SKELETAL_HULK  260
 #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
-#define ABIL_HEALING_BOOST  263
-#define ABIL_EXQUISITE_WOODWORKING  264
 #define ABIL_CHANT_OF_ILLUSIONS  265
-#define ABIL_ELDER_CRAFTS  266
 #define ABIL_ASTRAL_WEREWOLF_FORM  267
 #define ABIL_WHISPERSTRIDE 268
 #define ABIL_WEREWOLF_FORM  269
-#define ABIL_FAMILY_RECIPES  270
-#define ABIL_GOURMET_CHEF  271
 #define ABIL_STABLEMASTER  272
 #define ABIL_ABLATE  273
 #define ABIL_ACIDBLAST  274
@@ -414,12 +311,10 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_THORNLASH  285
 #define ABIL_EVASION  286
 #define ABIL_WEAPON_PROFICIENCY  287
-#define ABIL_PRIMITIVE_CRAFTS  288
-#define ABIL_BASIC_BUILDINGS  289
+#define ABIL_PRIMITIVE_CRAFTS  288	// has hard-coded gains
 #define ABIL_CHORES  290
 #define ABIL_SCAVENGING  291
 #define ABIL_BITE  292
-#define ABIL_COOK  293
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
 #define ABIL_TRICK_SHOTS  296

@@ -45,6 +45,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 
 // external consts
 extern const char *ability_custom_types[];
+extern const char *ability_data_types[];
 extern const char *ability_gain_hooks[];
 extern const char *ability_flags[];
 extern const char *ability_target_flags[];
@@ -54,6 +55,7 @@ extern const char *apply_types[];
 extern const char *apply_type_names[];
 extern const double apply_values[];
 extern const char *damage_types[];
+extern const char *player_tech_types[];
 extern const char *pool_types[];
 extern const char *position_types[];
 extern const char *wait_types[];
@@ -84,14 +86,42 @@ struct {
 	{ ABILT_BUFF, prep_buff_ability, do_buff_ability },
 	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
 	{ ABILT_DOT, prep_dot_ability, do_dot_ability },
+	{ ABILT_PLAYER_TECH, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };
 
 
-
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* String display for one ADL item.
+*
+* @param struct ability_data_list *adl The data item to show.
+* @return char* The string to display.
+*/
+char *ability_data_display(struct ability_data_list *adl) {
+	static char output[MAX_STRING_LENGTH];
+	char temp[256];
+	
+	prettier_sprintbit(adl->type, ability_data_types, temp);
+	
+	// ADL_x: display by type
+	switch (adl->type) {
+		case ADL_PLAYER_TECH: {
+			snprintf(output, sizeof(output), "%s: %s", temp, player_tech_types[adl->vnum]);
+			break;
+		}
+		default: {
+			snprintf(output, sizeof(output), "%s: ???", temp);
+			break;
+		}
+	}
+	
+	return output;
+}
+
 
 /**
 * Adds a gain hook for an ability.
@@ -184,6 +214,58 @@ void add_type_to_ability(ability_data *abil, bitvector_t type, int weight) {
 
 
 /**
+* Takes the techs from an ability and applies them to a player.
+*
+* @param char_data *ch The player to apply to.
+* @param ability_data *abil The ability whose techs we'll apply.
+*/
+void apply_ability_techs_to_player(char_data *ch, ability_data *abil) {
+	struct ability_data_list *adl;
+	
+	if (IS_NPC(ch) || !IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+		return;	// no techs to apply
+	}
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_PLAYER_TECH) {
+			continue;
+		}
+		
+		// ok
+		add_player_tech(ch, ABIL_VNUM(abil), adl->vnum);
+	}
+}
+
+
+/**
+* Applies all the ability techs from a player's current skill set (e.g. upon
+* login).
+*
+* @param char_data *ch The player.
+*/
+void apply_all_ability_techs(char_data *ch) {
+	struct player_ability_data *plab, *next_plab;
+	ability_data *abil;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;
+		}
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+			apply_ability_techs_to_player(ch, abil);
+		}
+	}
+}
+
+
+/**
 * Audits abilities on startup.
 */
 void check_abilities(void) {
@@ -195,6 +277,26 @@ void check_abilities(void) {
 			ABIL_MASTERY_ABIL(abil) = NOTHING;
 		}
 	}
+}
+
+
+/**
+* Duplicates a list of ability data.
+*
+* @param struct ability_data_list *input The list to duplicate.
+* @return struct ability_data_list* The copy.
+*/
+struct ability_data_list *copy_data_list(struct ability_data_list *input) {
+	struct ability_data_list *list = NULL, *adl, *iter;
+	
+	LL_FOREACH(input, iter) {
+		CREATE(adl, struct ability_data_list, 1);
+		*adl = *iter;
+		adl->next = NULL;
+		LL_APPEND(list, adl);
+	}
+	
+	return list;
 }
 
 
@@ -509,9 +611,10 @@ void remove_type_from_ability(ability_data *abil, bitvector_t type) {
 * Triggers ability gains by type.
 *
 * @param char_data *ch The person to try to gain exp.
+* @param char_data *opponent Optional: the opponent, if any (may be null).
 * @param bitvector_t trigger Which AGH_ event (only 1 at a time).
 */
-void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
+void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger) {
 	struct ability_gain_hook *agh, *next_agh;
 	ability_data *abil;
 	double amount;
@@ -524,6 +627,10 @@ void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
 	switch (trigger) {
 		case AGH_PASSIVE_FREQUENT: {
 			amount = 0.5;
+			break;
+		}
+		case AGH_VAMPIRE_FEEDING: {
+			amount = 5;
 			break;
 		}
 		case AGH_MELEE:
@@ -548,6 +655,15 @@ void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
 		if (IS_SET(agh->triggers, AGH_ONLY_WHEN_AFFECTED) && (!(abil = find_ability_by_vnum(agh->ability)) || !affected_by_spell(ch, ABIL_AFFECT_VNUM(abil)))) {
 			continue;	// not currently affected
 		}
+		if (IS_SET(agh->triggers, AGH_ONLY_DARK) && !IS_DARK(IN_ROOM(ch))) {
+			continue;	// not dark
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_LIGHT) && IS_DARK(IN_ROOM(ch))) {
+			continue;	// not light
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_VS_ANIMAL) && (!opponent || !MOB_FLAGGED(opponent, MOB_ANIMAL))) {
+			continue;	// not an animal
+		}
 		
 		gain_ability_exp(ch, agh->ability, amount);
 	}
@@ -560,14 +676,17 @@ void run_ability_gain_hooks(char_data *ch, bitvector_t trigger) {
 * @param char_data *ch The user of the ability.
 * @param ability_data *abil The ability being used.
 * @param int level The level we're using the ability at.
+* @param bitvector_t type The ABILT_ to modify for, if any.
 * @param struct ability_exec *data The ability data being passed around.
 */
-double standard_ability_scale(char_data *ch, ability_data *abil, int level, struct ability_exec *data) {
+double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data) {
 	double points;
 	
 	// determine points
 	points = level / 100.0 * config_get_double("scale_points_at_100");
-	points *= get_type_modifier(abil, ABILT_BUFF);
+	if (type) {
+		points *= get_type_modifier(abil, type);
+	}
 	points *= ABIL_SCALE(abil);
 	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
 		points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
@@ -1024,7 +1143,7 @@ DO_ABIL(do_damage_ability) {
 		}
 	}
 	
-	msg_to_char(ch, "Damage: %d\r\n", dmg);
+	// msg_to_char(ch, "Damage: %d\r\n", dmg);
 	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil));
 	data->success = TRUE;
 	
@@ -1271,7 +1390,7 @@ PREP_ABIL(prep_buff_ability) {
 		return;	// prevent charging for the ability or adding a cooldown by not setting success
 	}
 	
-	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, data);
+	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUFF, data);
 }
 
 
@@ -1279,7 +1398,7 @@ PREP_ABIL(prep_buff_ability) {
 * PREP_ABIL provides: ch, abil, level, vict, data
 */
 PREP_ABIL(prep_damage_ability) {
-	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, data);
+	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
 }
 
 
@@ -1287,7 +1406,7 @@ PREP_ABIL(prep_damage_ability) {
 * PREP_ABIL provides: ch, abil, level, vict, data
 */
 PREP_ABIL(prep_dot_ability) {
-	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, data);
+	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
 }
 
 
@@ -1577,6 +1696,7 @@ void clear_ability(ability_data *abil) {
 */
 void free_ability(ability_data *abil) {
 	ability_data *proto = find_ability_by_vnum(ABIL_VNUM(abil));
+	struct ability_data_list *adl;
 	
 	if (ABIL_NAME(abil) && (!proto || ABIL_NAME(abil) != ABIL_NAME(proto))) {
 		free(ABIL_NAME(abil));
@@ -1586,6 +1706,12 @@ void free_ability(ability_data *abil) {
 	}
 	if (ABIL_CUSTOM_MSGS(abil) && (!proto || ABIL_CUSTOM_MSGS(abil) != ABIL_CUSTOM_MSGS(proto))) {
 		free_custom_messages(ABIL_CUSTOM_MSGS(abil));
+	}
+	if (ABIL_DATA(abil) && (!proto || ABIL_DATA(abil) != ABIL_DATA(proto))) {
+		while ((adl = ABIL_DATA(abil))) {
+			ABIL_DATA(abil) = adl->next;
+			free(adl);
+		}
 	}
 	
 	free(abil);
@@ -1603,6 +1729,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 	
 	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
+	struct ability_data_list *adl;
 	ability_data *abil, *find;
 	bitvector_t type;
 	int int_in[8];
@@ -1648,6 +1775,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	ABIL_MASTERY_ABIL(abil) = int_in[0];
 	ABIL_SCALE(abil) = dbl_in;
 	ABIL_IMMUNITIES(abil) = asciiflag_conv(str_in2);
+	ABIL_GAIN_HOOKS(abil) = asciiflag_conv(str_in3);
 	
 	// optionals
 	for (;;) {
@@ -1689,6 +1817,21 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				ABIL_COOLDOWN_SECS(abil) = int_in[5];
 				ABIL_LINKED_TRAIT(abil) = int_in[6];
 				ABIL_WAIT_TYPE(abil) = int_in[7];
+				break;
+			}
+			
+			case 'D': {	// data
+				if (sscanf(line, "D %d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+					log("SYSERR: Format error in D line of %s", error);
+					exit(1);
+				}
+				
+				CREATE(adl, struct ability_data_list, 1);
+				adl->type = int_in[0];
+				adl->vnum = int_in[1];
+				adl->misc = int_in[2];
+				
+				LL_APPEND(ABIL_DATA(abil), adl);
 				break;
 			}
 			
@@ -1825,6 +1968,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 	
 	char temp[256], temp2[256], temp3[256];
+	struct ability_data_list *adl;
 	struct ability_type *at;
 	
 	if (!fl || !abil) {
@@ -1849,6 +1993,11 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	// 'C' command
 	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
 		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
+	}
+	
+	// 'D' data
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		fprintf(fl, "D %d %d %d\n", adl->type, adl->vnum, adl->misc);
 	}
 	
 	// M: custom message
@@ -2038,6 +2187,8 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 				found = TRUE;
 			}
 		}
+		
+		remove_player_tech(chiter, vnum);
 	}
 	
 	// update olc editors
@@ -2122,6 +2273,7 @@ void save_olc_ability(descriptor_data *desc) {
 	ability_data *proto, *abil = GET_OLC_ABILITY(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	struct player_ability_data *abd;
+	struct ability_data_list *adl;
 	UT_hash_handle hh, sorted;
 	char_data *chiter;
 	int iter;
@@ -2132,7 +2284,7 @@ void save_olc_ability(descriptor_data *desc) {
 		proto = create_ability_table_entry(vnum);
 	}
 	
-	// update live players' gain hooks
+	// update live players' gain hooks and techs
 	LL_FOREACH(character_list, chiter) {
 		if (!IS_NPC(chiter) && (abd = get_ability_data(chiter, vnum, FALSE))) {
 			any = FALSE;
@@ -2141,6 +2293,11 @@ void save_olc_ability(descriptor_data *desc) {
 					any = TRUE;
 					add_ability_gain_hook(chiter, abd->ptr);
 				}
+			}
+			
+			if (abd->purchased[GET_CURRENT_SKILL_SET(chiter)]) {
+				remove_player_tech(chiter, ABIL_VNUM(abil));
+				apply_ability_techs_to_player(chiter, abil);
 			}
 		}
 	}
@@ -2152,6 +2309,12 @@ void save_olc_ability(descriptor_data *desc) {
 	if (ABIL_COMMAND(proto)) {
 		free(ABIL_COMMAND(proto));
 	}
+	while ((adl = ABIL_DATA(proto))) {
+		ABIL_DATA(proto) = adl->next;
+		free(adl);
+	}
+	free_custom_messages(ABIL_CUSTOM_MSGS(proto));
+	free_apply_list(ABIL_APPLIES(proto));
 	
 	// sanity
 	if (!ABIL_NAME(abil) || !*ABIL_NAME(abil)) {
@@ -2164,8 +2327,6 @@ void save_olc_ability(descriptor_data *desc) {
 		free(ABIL_COMMAND(abil));	// don't allow empty
 		ABIL_COMMAND(abil) = NULL;
 	}
-	free_custom_messages(ABIL_CUSTOM_MSGS(proto));
-	free_apply_list(ABIL_APPLIES(proto));
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
@@ -2207,6 +2368,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 		ABIL_COMMAND(new) = ABIL_COMMAND(input) ? str_dup(ABIL_COMMAND(input)) : NULL;
 		ABIL_CUSTOM_MSGS(new) = copy_custom_messages(ABIL_CUSTOM_MSGS(input));
 		ABIL_APPLIES(new) = copy_apply_list(ABIL_APPLIES(input));
+		ABIL_DATA(new) = copy_data_list(ABIL_DATA(input));
 	}
 	else {
 		// brand new: some defaults
@@ -2229,6 +2391,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 */
 void do_stat_ability(char_data *ch, ability_data *abil) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
+	struct ability_data_list *adl;
 	struct custom_message *custm;
 	struct apply_data *app;
 	size_t size;
@@ -2319,6 +2482,15 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		}
 	}
 	
+	// data
+	if (ABIL_DATA(abil)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Extra data:\r\n");
+		count = 0;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %d. %s\r\n", ++count, ability_data_display(adl));
+		}
+	}
+	
 	page_string(ch->desc, buf, TRUE);
 }
 
@@ -2332,6 +2504,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 void olc_show_ability(char_data *ch) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct ability_data_list *adl;
 	struct custom_message *custm;
 	struct apply_data *apply;
 	int count;
@@ -2417,6 +2590,13 @@ void olc_show_ability(char_data *ch) {
 	count = 0;
 	LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
 		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, ability_custom_types[custm->type], custm->msg);
+	}
+	
+	// data
+	sprintf(buf + strlen(buf), "Extra data: <&ydata&0>\r\n");
+	count = 0;
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		sprintf(buf + strlen(buf), " &y%d&0. %s\r\n", ++count, ability_data_display(adl));
 	}
 	
 	page_string(ch->desc, buf, TRUE);
@@ -2630,6 +2810,112 @@ OLC_MODULE(abiledit_damagetype) {
 }
 
 
+OLC_MODULE(abiledit_data) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], temp[256];
+	struct ability_data_list *adl, *next_adl;
+	bitvector_t allowed_types = 0;
+	int iter, num, type_id, val_id;
+	bool found;
+	
+	// determine valid types first
+	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+		allowed_types |= ADL_PLAYER_TECH;
+	}
+	
+	// arg1 arg2
+	half_chop(argument, arg1, arg2);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which data entry number?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			while ((adl = ABIL_DATA(abil))) {
+				ABIL_DATA(abil) = adl->next;
+				free(adl);
+			}
+			ABIL_DATA(abil) = NULL;
+			msg_to_char(ch, "You remove all the data.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid data number to remove.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
+				if (--num == 0) {
+					found = TRUE;
+					msg_to_char(ch, "You remove data #%d: %s\r\n", atoi(arg2), ability_data_display(adl));
+					LL_DELETE(ABIL_DATA(abil), adl);
+					free(adl);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid data number to remove.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		half_chop(arg2, type_arg, val_arg);
+		
+		if (!*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: data add <type> <name | vnum>\r\n");
+		}
+		else if ((type_id = search_block(type_arg, ability_data_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
+		}
+		else if (!IS_SET(allowed_types, BIT(type_id))) {
+			msg_to_char(ch, "This ability doesn't allow that type of data.\r\n");
+		}
+		else {
+			val_id = NOTHING;
+			
+			// ADL_x: determine which one to add
+			switch (BIT(type_id)) {
+				case ADL_PLAYER_TECH: {
+					if ((val_id = search_block(val_arg, player_tech_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Invalid player tech '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+			}
+			
+			if (val_id == NOTHING) {
+				msg_to_char(ch, "Invalid data '%s'.\r\n", val_arg);
+			}
+			else {
+				CREATE(adl, struct ability_data_list, 1);
+				adl->type = BIT(type_id);
+				adl->vnum = val_id;
+				LL_APPEND(ABIL_DATA(abil), adl);
+				
+				msg_to_char(ch, "You add data: %s\r\n", ability_data_display(adl));
+			}
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: data add <type> <name | vnum>\r\n");
+		msg_to_char(ch, "Usage: data remove <number | all>\r\n");
+		
+		found = FALSE;
+		msg_to_char(ch, "Allowed types:");
+		for (iter = 0; *ability_data_types[iter] != '\n'; ++iter) {
+			if (IS_SET(allowed_types, BIT(iter))) {
+				prettier_sprintbit(BIT(iter), ability_data_types, temp);
+				msg_to_char(ch, "%s%s", found ? ", " : " ", temp);
+				found = TRUE;
+			}
+		}
+		msg_to_char(ch, "%s\r\n", found ? "" : " none");
+	}
+}
+
+
 OLC_MODULE(abiledit_gainhooks) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);	
 	ABIL_GAIN_HOOKS(abil) = olc_process_flag(ch, argument, "gain hook", "gainhooks", ability_gain_hooks, ABIL_GAIN_HOOKS(abil));
@@ -2838,8 +3124,8 @@ OLC_MODULE(abiledit_types) {
 		else if ((typeid = search_block(arg, ability_type_flags, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
 		}
-		else if (*weight_arg && (!isdigit(*weight_arg) || (weight = atoi(weight_arg)) < 1)) {
-			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
+		else if (*weight_arg && (!isdigit(*weight_arg) || (weight = atoi(weight_arg)) < 0)) {
+			msg_to_char(ch, "Weight must be 0 or higher.\r\n");
 		}
 		else {
 			add_type_to_ability(abil, BIT(typeid), weight);
@@ -2873,8 +3159,8 @@ OLC_MODULE(abiledit_types) {
 		if (!change) {
 			msg_to_char(ch, "Invalid type.\r\n");
 		}
-		else if ((weight = atoi(val_arg)) < 1) {
-			msg_to_char(ch, "Weight must be 1 or higher.\r\n");
+		else if ((weight = atoi(val_arg)) < 0) {
+			msg_to_char(ch, "Weight must be 0 or higher.\r\n");
 		}
 		else {
 			change->weight = weight;
@@ -2884,7 +3170,7 @@ OLC_MODULE(abiledit_types) {
 	else {
 		msg_to_char(ch, "Usage: types add <type> [weight]\r\n");
 		msg_to_char(ch, "Usage: types change <type> <weight>\r\n");
-		msg_to_char(ch, "Usage: custom remove <type | all>\r\n");
+		msg_to_char(ch, "Usage: types remove <type | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
 		for (iter = 0; *ability_type_flags[iter] != '\n'; ++iter) {
 			msg_to_char(ch, " %s\r\n", ability_type_flags[iter]);

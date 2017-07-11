@@ -60,6 +60,7 @@ OLC_MODULE(abiledit_costperscalepoint);
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_custom);
 OLC_MODULE(abiledit_damagetype);
+OLC_MODULE(abiledit_data);
 OLC_MODULE(abiledit_flags);
 OLC_MODULE(abiledit_gainhooks);
 OLC_MODULE(abiledit_immunities);
@@ -555,10 +556,11 @@ const struct olc_command_data olc_data[] = {
 	{ "command", abiledit_command, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "cooldown", abiledit_cooldown, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "cost", abiledit_cost, OLC_ABILITY, OLC_CF_EDITOR },
-	{ "costperscalepoint", abiledit_cost, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "costperscalepoint", abiledit_costperscalepoint, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "costtype", abiledit_costtype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "custom", abiledit_custom, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "damagetype", abiledit_damagetype, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "data", abiledit_data, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "gainhooks", abiledit_gainhooks, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "immunities", abiledit_immunities, OLC_ABILITY, OLC_CF_EDITOR },

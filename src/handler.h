@@ -257,6 +257,12 @@ extern obj_data *get_obj_world(char *name);
 extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
 void remove_offers_by_type(char_data *ch, int type);
 
+// player tech handlers
+void add_player_tech(char_data *ch, any_vnum abil, int tech);
+extern bool has_player_tech(char_data *ch, int tech);
+void remove_player_tech(char_data *ch, any_vnum abil);
+extern bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
+
 // requirement handlers
 void free_requirements(struct req_data *list);
 

@@ -316,7 +316,7 @@ byte distance_can_see(char_data *ch) {
 	p = a + b;
 	p = MIN(5, p);
 
-	if (has_ability(ch, ABIL_BY_MOONLIGHT)) {
+	if (has_player_tech(ch, PTECH_LARGER_LIGHT_RADIUS)) {
 		p += 2;
 	}
 

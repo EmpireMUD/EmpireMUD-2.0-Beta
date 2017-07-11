@@ -337,28 +337,28 @@ const struct poison_data_type poison_data[] = {
 	// The position in this array corresponds to obj val 0
 
 	{	// 0
-		"other", ABIL_POISONS,
+		"other", PTECH_POISON,
 		0, 0, 0, 0,	// no affect
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
 	},
 
 	{	// 1
-		"weakness", ABIL_POISONS,
+		"weakness", PTECH_POISON,
 		ATYPE_POISON, APPLY_HEALTH, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
 	},
 
 	{	// 2
-		"exhaustion", ABIL_POISONS,
+		"exhaustion", PTECH_POISON,
 		ATYPE_POISON, APPLY_MOVE, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
 	},
 
 	{	// 3
-		"braindrain", ABIL_POISONS,
+		"braindrain", PTECH_POISON,
 		ATYPE_POISON, APPLY_MANA, -25, 0,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
@@ -367,35 +367,35 @@ const struct poison_data_type poison_data[] = {
 	POISONS_LINE_BREAK,	// 4
 	
 	{	// 5
-		"strength", ABIL_POISONS,
+		"strength", PTECH_POISON,
 		ATYPE_POISON, APPLY_STRENGTH, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
 	},
 	
 	{	// 6
-		"dexterity", ABIL_POISONS,
+		"dexterity", PTECH_POISON,
 		ATYPE_POISON, APPLY_DEXTERITY, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
 	},
 	
 	{	// 7
-		"charisma", ABIL_POISONS,
+		"charisma", PTECH_POISON,
 		ATYPE_POISON, APPLY_CHARISMA, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
 	},
 	
 	{	// 8
-		"intelligence", ABIL_POISONS,
+		"intelligence", PTECH_POISON,
 		ATYPE_POISON, APPLY_INTELLIGENCE, -1, 0,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
 	},
 	
 	{	// 9
-		"wits", ABIL_POISONS,
+		"wits", PTECH_POISON,
 		ATYPE_POISON, APPLY_WITS, -2, 0,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
@@ -404,21 +404,21 @@ const struct poison_data_type poison_data[] = {
 	POISONS_LINE_BREAK,	// 10
 	
 	{	// 11
-		"pain", ABIL_DEADLY_POISONS,
+		"pain", PTECH_POISON_UPGRADE,
 		0, 0, 0, 0,
 		ATYPE_POISON, 5, DAM_POISON, 2, 5,	// no dot
 		TRUE	// likely doubled due to deadly poisons
 	},
 	
 	{	// 12
-		"slow", ABIL_DEADLY_POISONS,
+		"slow", PTECH_POISON_UPGRADE,
 		ATYPE_POISON, APPLY_NONE, 0, AFF_SLOW,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
 	},
 	
 	{	// 13
-		"heartstop", ABIL_DEADLY_POISONS,
+		"heartstop", PTECH_POISON_UPGRADE,
 		ATYPE_POISON, APPLY_NONE, 0, AFF_CANT_SPEND_BLOOD,
 		0, 0, 0, 0, 0,	// no dot
 		FALSE
@@ -478,7 +478,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	}
 	
 	// ability check
-	if (poison_data[type].ability != NO_ABIL && !has_ability(ch, poison_data[type].ability)) {
+	if (poison_data[type].tech != NOTHING && !has_player_tech(ch, poison_data[type].tech)) {
 		return 0;
 	}
 
@@ -497,12 +497,12 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	
 	// GAIN SKILL NOW -- it at least attempts an application
 	if (can_gain_exp_from(ch, vict)) {
-		gain_ability_exp(ch, ABIL_POISONS, 2);
-		gain_ability_exp(ch, ABIL_DEADLY_POISONS, 2);
+		gain_player_tech_exp(ch, PTECH_POISON, 2);
+		gain_player_tech_exp(ch, PTECH_POISON_UPGRADE, 2);
 	}
 	
 	// skill check!
-	if (!skill_check(ch, ABIL_POISONS, DIFF_HARD)) {
+	if (!player_tech_skill_check(ch, PTECH_POISON, DIFF_HARD)) {
 		return 0;
 	}
 	
@@ -510,9 +510,9 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	GET_OBJ_VAL(obj, VAL_POISON_CHARGES) -= 1;
 	
 	// attempt immunity/resist
-	if (has_ability(vict, ABIL_POISON_IMMUNITY)) {
+	if (has_player_tech(vict, PTECH_NO_POISON)) {
 		if (can_gain_exp_from(vict, ch)) {
-			gain_ability_exp(vict, ABIL_POISON_IMMUNITY, 10);
+			gain_player_tech_exp(vict, PTECH_NO_POISON, 10);
 		}
 		
 		if (GET_POISON_CHARGES(obj) <= 0) {
@@ -535,7 +535,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	// atype
 	if (poison_data[type].atype > 0) {
 		
-		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].aff, ch);
+		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (has_player_tech(ch, PTECH_POISON_UPGRADE) ? 2 : 1), poison_data[type].aff, ch);
 		affect_join(vict, af, poison_data[type].allow_stack ? (AVG_DURATION|ADD_MODIFIER) : 0);
 		
 		if (!messaged) {
@@ -549,7 +549,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 	
 	// dot
 	if (poison_data[type].dot_type > 0) {
-		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (has_ability(ch, ABIL_DEADLY_POISONS) ? 2 : 1), poison_data[type].dot_max_stacks, ch);
+		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (has_player_tech(ch, PTECH_POISON_UPGRADE) ? 2 : 1), poison_data[type].dot_max_stacks, ch);
 		
 		if (!messaged) {
 			act("You feel ill as you are poisoned!", FALSE, vict, NULL, NULL, TO_CHAR);
@@ -595,7 +595,7 @@ void use_poison(char_data *ch, obj_data *obj) {
 		return;
 	}
 	
-	if (poison_data[type].ability != NO_ABIL && !has_ability(ch, poison_data[type].ability)) {
+	if (poison_data[type].tech != NOTHING && !has_player_tech(ch, poison_data[type].tech)) {
 		msg_to_char(ch, "You don't have the correct ability to use that poison.\r\n");
 		return;
 	}
@@ -672,7 +672,7 @@ ACMD(do_backstab) {
 			}
 
 			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL) > 0) {
-				if (has_ability(ch, ABIL_POISONS)) {
+				if (has_player_tech(ch, PTECH_POISON)) {
 					if (!number(0, 1) && apply_poison(ch, vict, USING_POISON(ch)) < 0) {
 						// dedz
 					}
@@ -979,16 +979,16 @@ ACMD(do_hide) {
 	command_lag(ch, WAIT_ABILITY);
 
 	for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
-		if (c != ch && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !skill_check(ch, ABIL_CLING_TO_SHADOW, DIFF_MEDIUM)) {
+		if (c != ch && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
 			msg_to_char(ch, "You can't hide with somebody watching!\r\n");
 			return;
 		}
 	}
 
 	gain_ability_exp(ch, ABIL_HIDE, 33.4);
-	gain_ability_exp(ch, ABIL_CLING_TO_SHADOW, 10);
+	gain_player_tech_exp(ch, PTECH_HIDE_UPGRADE, 10);
 
-	if (has_ability(ch, ABIL_CLING_TO_SHADOW) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
+	if (has_player_tech(ch, PTECH_HIDE_UPGRADE) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 }
@@ -1054,10 +1054,13 @@ ACMD(do_infiltrate) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use infiltrate.\r\n");
 	}
-	else if (!can_use_ability(ch, ABIL_INFILTRATE, MOVE, cost, NOTHING)) {
+	else if (!has_player_tech(ch, PTECH_INFILTRATE)) {
+		msg_to_char(ch, "You don't have the correct ability to infiltrate.\r\n");
+	}
+	else if (!can_use_ability(ch, NO_ABIL, MOVE, cost, NOTHING)) {
 		// sends own message
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_INFILTRATE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_INFILTRATE, NULL, NULL)) {
 		return;
 	}
 	else if (!*argument)
@@ -1082,10 +1085,10 @@ ACMD(do_infiltrate) {
 	else {
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		
-		gain_ability_exp(ch, ABIL_INFILTRATE, 50);
-		gain_ability_exp(ch, ABIL_IMPROVED_INFILTRATE, 50);
+		gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
+		gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
 		
-		if (!has_ability(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
+		if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
 			if (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) {
 				empire_skillup(emp, ABIL_LOCKS, 10);
 			}
@@ -1108,8 +1111,8 @@ ACMD(do_infiltrate) {
 		}
 
 		// chance to log
-		if (emp && !skill_check(ch, ABIL_IMPROVED_INFILTRATE, DIFF_HARD)) {
-			if (has_ability(ch, ABIL_IMPROVED_INFILTRATE)) {
+		if (emp && !player_tech_skill_check(ch, PTECH_INFILTRATE_UPGRADE, DIFF_HARD)) {
+			if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
 			}
 			else {
@@ -1213,7 +1216,10 @@ ACMD(do_pickpocket) {
 	if (IS_NPC(ch)) {
 		send_to_char("You have no idea how to do that.\r\n", ch);
 	}
-	else if (!can_use_ability(ch, ABIL_PICKPOCKET, NOTHING, 0, NOTHING)) {
+	else if (!has_player_tech(ch, PTECH_PICKPOCKET)) {
+		msg_to_char(ch, "You don't have the correct ability to pickpocket anybody.\r\n");
+	}
+	else if (!can_use_ability(ch, NOTHING, NOTHING, 0, NOTHING)) {
 		// sends own messages
 	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
@@ -1237,7 +1243,7 @@ ACMD(do_pickpocket) {
 	else if (FIGHTING(vict)) {
 		msg_to_char(ch, "You can't steal from someone who's fighting.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PICKPOCKET)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_PICKPOCKET, vict, NULL)) {
 		return;
 	}
 	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (AFF_FLAGGED(vict, AFF_NO_ATTACK) && !!has_interaction(vict->interactions, INTERACT_PICKPOCKET))) {
@@ -1257,7 +1263,7 @@ ACMD(do_pickpocket) {
 		
 		low_level = (get_approximate_level(ch) + 50 < get_approximate_level(vict));
 		
-		if (!low_level && (!CAN_SEE(vict, ch) || !AWAKE(vict) || AFF_FLAGGED(vict, AFF_STUNNED) || skill_check(ch, ABIL_PICKPOCKET, DIFF_EASY))) {
+		if (!low_level && (!CAN_SEE(vict, ch) || !AWAKE(vict) || AFF_FLAGGED(vict, AFF_STUNNED) || player_tech_skill_check(ch, PTECH_PICKPOCKET, DIFF_EASY))) {
 			// success!
 			SET_BIT(MOB_FLAGS(vict), MOB_PICKPOCKETED);
 			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);
@@ -1302,7 +1308,7 @@ ACMD(do_pickpocket) {
 		
 		// gain either way
 		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_PICKPOCKET, 25);
+			gain_player_tech_exp(ch, PTECH_PICKPOCKET, 25);
 		}
 		command_lag(ch, WAIT_ABILITY);
 	}
@@ -1463,8 +1469,8 @@ ACMD(do_search) {
 			if (AFF_FLAGGED(targ, AFF_HIDE)) {
 					continue;
 			
-				if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
-					gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
+				if (has_player_tech(targ, PTECH_HIDE_UPGRADE)) {
+					gain_player_tech_exp(targ, PTECH_HIDE_UPGRADE, 20);
 					continue;
 				}
 
@@ -1611,7 +1617,7 @@ ACMD(do_shadowstep) {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWSTEP, SECS_PER_REAL_MIN, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_SHADOWSTEP, 20);
 		
-		if (infil && !has_ability(ch, ABIL_IMPROVED_INFILTRATE) && !skill_check(ch, ABIL_INFILTRATE, DIFF_HARD)) {
+		if (infil && !has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
 			msg_to_char(ch, "You fail to shadowstep to that location.\r\n");
 		}
 		else {
@@ -1632,8 +1638,8 @@ ACMD(do_shadowstep) {
 		}
 
 		// chance to log
-		if (infil && emp && !skill_check(ch, ABIL_IMPROVED_INFILTRATE, DIFF_HARD)) {
-			if (has_ability(ch, ABIL_IMPROVED_INFILTRATE)) {
+		if (infil && emp && !player_tech_skill_check(ch, PTECH_INFILTRATE_UPGRADE, DIFF_HARD)) {
+			if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "An infiltrator has been spotted shadowstepping into (%d, %d)!", X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
 			else {
@@ -1644,8 +1650,8 @@ ACMD(do_shadowstep) {
 		if (infil && emp) {
 			// distrust just in case
 			trigger_distrust_from_stealth(ch, emp);
-			gain_ability_exp(ch, ABIL_INFILTRATE, 50);
-			gain_ability_exp(ch, ABIL_IMPROVED_INFILTRATE, 50);
+			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
+			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
 		}
 	}
 }
@@ -1759,7 +1765,7 @@ ACMD(do_steal) {
 			if (proto && obj_can_be_stored(proto, IN_ROOM(ch)) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
 				found = TRUE;
 				
-				if (stored_item_requires_withdraw(proto) && !has_ability(ch, ABIL_VAULTCRACKING)) {
+				if (stored_item_requires_withdraw(proto) && !has_player_tech(ch, PTECH_STEAL_UPGRADE)) {
 					msg_to_char(ch, "You can't steal that without Vaultcracking!\r\n");
 					return;
 				}
@@ -1776,7 +1782,7 @@ ACMD(do_steal) {
 					gain_ability_exp(ch, ABIL_STEAL, 50);
 				
 					if (stored_item_requires_withdraw(proto)) {
-						gain_ability_exp(ch, ABIL_VAULTCRACKING, 50);
+						gain_player_tech_exp(ch, PTECH_STEAL_UPGRADE, 50);
 					}
 
 					// save the empire

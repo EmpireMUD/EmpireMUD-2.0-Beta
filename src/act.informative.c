@@ -1065,13 +1065,13 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		}
 	
 		// show inventory
-		if (ch != i && has_ability(ch, ABIL_APPRAISAL)) {
+		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY)) {
 			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
 			if (ch != i && i->carrying) {
 				if (can_gain_exp_from(ch, i)) {
-					gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+					gain_player_tech_exp(ch, PTECH_SEE_INVENTORY, 5);
 				}
 				GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 			}
@@ -1844,7 +1844,7 @@ ACMD(do_affects) {
 	if (IS_RIDING(ch)) {
 		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
-	else if (has_ability(ch, ABIL_RIDE) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
+	else if (has_player_tech(ch, PTECH_RIDING) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
 		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
 
@@ -2560,7 +2560,7 @@ ACMD(do_mark) {
 				dist = compute_distance(mark, IN_ROOM(ch));
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), mark));
 				
-				if (has_ability(ch, ABIL_NAVIGATION)) {
+				if (HAS_NAVIGATION(ch)) {
 					msg_to_char(ch, "Your mark at (%d, %d) is %d map tile%s %s.\r\n", X_COORD(mark), Y_COORD(mark), dist, (dist == 1 ? "" : "s"), (dir == NO_DIR ? "away" : dirs[dir]));
 				}
 				else {
@@ -2731,7 +2731,7 @@ ACMD(do_nearby) {
 
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			
-				if (has_ability(ch, ABIL_NAVIGATION)) {
+				if (HAS_NAVIGATION(ch)) {
 					snprintf(line, sizeof(line), " %d %s: %s (%d, %d)\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
 				}
 				else {
@@ -2758,7 +2758,7 @@ ACMD(do_nearby) {
 				
 					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 
-					if (has_ability(ch, ABIL_NAVIGATION)) {
+					if (HAS_NAVIGATION(ch)) {
 						snprintf(line, sizeof(line), " %d %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 					}
 					else {
@@ -2801,7 +2801,7 @@ ACMD(do_nearby) {
 			// show instance
 			found = TRUE;
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
-			if (has_ability(ch, ABIL_NAVIGATION)) {
+			if (HAS_NAVIGATION(ch)) {
 				snprintf(line, sizeof(line), " %d %s: %s (%d, %d) / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst), part);
 			}
 			else {
@@ -2962,7 +2962,7 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {	
-	if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+	if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		msg_to_char(ch, "You are at: %s (%d, %d)\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {

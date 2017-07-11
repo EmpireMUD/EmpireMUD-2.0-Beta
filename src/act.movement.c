@@ -78,11 +78,11 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 	struct track_data *track;
 	
 	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_FRESH_WATER)) {
-		if (!IS_NPC(ch) && has_ability(ch, ABIL_NO_TRACE) && valid_no_trace(room)) {
-			gain_ability_exp(ch, ABIL_NO_TRACE, 5);
+		if (!IS_NPC(ch) && has_player_tech(ch, PTECH_NO_TRACK_WILD) && valid_no_trace(room)) {
+			gain_player_tech_exp(ch, PTECH_NO_TRACK_WILD, 5);
 		}
-		else if (!IS_NPC(ch) && has_ability(ch, ABIL_UNSEEN_PASSING) && valid_unseen_passing(room)) {
-			gain_ability_exp(ch, ABIL_UNSEEN_PASSING, 5);
+		else if (!IS_NPC(ch) && has_player_tech(ch, PTECH_NO_TRACK_CITY) && valid_unseen_passing(room)) {
+			gain_player_tech_exp(ch, PTECH_NO_TRACK_CITY, 5);
 		}
 		else {
 			CREATE(track, struct track_data, 1);
@@ -173,7 +173,7 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	
 	// permissions
 	if (!skip_permissions && ROOM_OWNER(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !can_use_room(ch, to_room, GUESTS_ALLOWED))) {
-		if (!allow_infiltrate || !has_ability(ch, ABIL_INFILTRATE)) {
+		if (!allow_infiltrate || !has_player_tech(ch, PTECH_INFILTRATE)) {
 			msg_to_char(ch, "You don't have permission to enter that.\r\n");
 			return FALSE;
 		}
@@ -343,21 +343,24 @@ void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, int mode) {
 	}
 	
 	if (mode == MOVE_SWIM) {
-		gain_ability_exp(ch, ABIL_SWIMMING, 1);
+		gain_player_tech_exp(ch, PTECH_SWIMMING, 1);
 	}
 	
 	if (IS_RIDING(ch)) {
-		gain_ability_exp(ch, ABIL_RIDE, 1);
+		gain_player_tech_exp(ch, PTECH_RIDING, 1);
 		
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH)) {
-			gain_ability_exp(ch, ABIL_ALL_TERRAIN_RIDING, 5);
+			gain_player_tech_exp(ch, PTECH_RIDING_UPGRADE, 5);
+		}
+		if (EFFECTIVELY_FLYING(ch)) {
+			gain_player_tech_exp(ch, PTECH_RIDING_FLYING, 5);
 		}
 	}
 	else {	// not riding
 		if (was_in && ROOM_SECT_FLAGGED(was_in, SECTF_ROUGH) && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
-			gain_ability_exp(ch, ABIL_MOUNTAIN_CLIMBING, 10);
+			gain_player_tech_exp(ch, PTECH_ROUGH_TERRAIN, 10);
 		}
-		gain_ability_exp(ch, ABIL_NAVIGATION, 1);
+		gain_player_tech_exp(ch, PTECH_NAVIGATION, 1);
 		
 		if (AFF_FLAGGED(ch, AFF_FLY)) {
 			gain_ability_exp(ch, ABIL_FLY, 1);
@@ -441,7 +444,7 @@ obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *f
 
 // processes the character's north
 int get_north_for_char(char_data *ch) {
-	if (IS_NPC(ch) || (has_ability(ch, ABIL_NAVIGATION) && !IS_DRUNK(ch))) {
+	if (IS_NPC(ch) || (HAS_NAVIGATION(ch) && !IS_DRUNK(ch))) {
 		return NORTH;
 	}
 	else {
@@ -469,7 +472,7 @@ void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room
 		if (is_in_city_for_empire(from, ROOM_OWNER(from), TRUE, &junk) && is_in_city_for_empire(to, ROOM_OWNER(to), TRUE, &junk)) {
 			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 2 * SECS_PER_REAL_MIN);
 		}
-		else if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
+		else if (has_player_tech(ch, PTECH_PORTAL)) {
 			add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, 4 * SECS_PER_REAL_MIN);
 		}
 		else {
@@ -579,7 +582,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
 		return 0;
 	}
-	if (IS_RIDING(ch) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && !EFFECTIVELY_FLYING(ch)) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
@@ -598,7 +601,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 			return 0;
 		}
 	}
-	if (IS_RIDING(ch) && !has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
@@ -633,8 +636,8 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		return 0;
 	}
 	
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && (IS_NPC(ch) || !IS_RIDING(ch) || !has_ability(ch, ABIL_ALL_TERRAIN_RIDING)) && !has_ability(ch, ABIL_MOUNTAIN_CLIMBING) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "You must buy the Mountain Climbing ability to cross such rough terrain.\r\n");
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && (IS_NPC(ch) || !IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
+		msg_to_char(ch, "You don't have the ability to cross such rough terrain.\r\n");
 		return 0;
 	}
 	
@@ -937,7 +940,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	// if the room we're going to is water, check for ability to move
 	if (WATER_SECT(to_room)) {
 		if (!EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch)) {
-			if (has_ability(ch, ABIL_SWIMMING) && (mode == MOVE_NORMAL || mode == MOVE_FOLLOW)) {
+			if (has_player_tech(ch, PTECH_SWIMMING) && (mode == MOVE_NORMAL || mode == MOVE_FOLLOW)) {
 				mode = MOVE_SWIM;
 			}
 			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
@@ -1690,7 +1693,7 @@ ACMD(do_move) {
 
 // mortals have to portal from a certain building, immortals can do it anywhere
 ACMD(do_portal) {
-	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
+	void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
 	extern char *get_room_name(room_data *room, bool color);
 	
 	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
@@ -1745,13 +1748,13 @@ ACMD(do_portal) {
 				}
 				
 				// coords: navigation only
-				if (has_ability(ch, ABIL_NAVIGATION)) {
+				if (HAS_NAVIGATION(ch)) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "(%*d, %*d) ", X_PRECISION, X_COORD(room), Y_PRECISION, Y_COORD(room));
 				}
 				
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s (%s%s&0)", get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 				
-				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(room))) {
+				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(room))) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
 				}
 				
@@ -1784,8 +1787,8 @@ ACMD(do_portal) {
 	}
 
 	// ok, we have a target...
-	if (!all_access && !has_ability(ch, ABIL_PORTAL_MAGIC)  && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_PORTALS))) {
-		msg_to_char(ch, "You can only open portals if there is a portal mage in your empire.\r\n");
+	if (!all_access && !has_player_tech(ch, PTECH_PORTAL) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_PORTALS))) {
+		msg_to_char(ch, "You don't have the ability to open portals, and you aren't in an empire with that ability either.\r\n");
 		return;
 	}
 	if (target == IN_ROOM(ch)) {
@@ -1808,7 +1811,7 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open a portal to that location.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target)) {
+	if (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target)) {
 		msg_to_char(ch, "You can't open a portal to another land without a portal master in your empire.\r\n");
 		return;
 	}
@@ -1861,8 +1864,12 @@ ACMD(do_portal) {
 	load_otrigger(end);
 	
 	if (GET_LOYALTY(ch)) {
-		empire_skillup(GET_LOYALTY(ch), ABIL_PORTAL_MAGIC, 15);
-		empire_skillup(GET_LOYALTY(ch), ABIL_PORTAL_MASTER, 15);
+		empire_player_tech_skillup(GET_LOYALTY(ch), PTECH_PORTAL, 15);
+		empire_player_tech_skillup(GET_LOYALTY(ch), PTECH_PORTAL_UPGRADE, 15);
+	}
+	else {
+		gain_player_tech_exp(ch, PTECH_PORTAL, 15);
+		gain_player_tech_exp(ch, PTECH_PORTAL_UPGRADE, 15);
 	}
 	
 	command_lag(ch, WAIT_OTHER);

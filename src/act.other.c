@@ -370,7 +370,7 @@ static void print_group(char_data *ch) {
 			
 			// show location if different
 			if (IN_ROOM(k) != IN_ROOM(ch)) {
-				if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(k), RMT_NO_LOCATION) && (IS_NPC(k) || has_ability(k, ABIL_NAVIGATION)) && X_COORD(IN_ROOM(k)) >= 0) {
+				if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(IN_ROOM(k), RMT_NO_LOCATION) && (IS_NPC(k) || HAS_NAVIGATION(k)) && X_COORD(IN_ROOM(k)) >= 0) {
 					snprintf(loc, sizeof(loc), " - %s (%d, %d)", get_room_name(IN_ROOM(k), FALSE), X_COORD(IN_ROOM(k)), Y_COORD(IN_ROOM(k)));
 				}
 				else {
@@ -400,7 +400,7 @@ INTERACTION_FUNC(shear_interact) {
 	command_lag(ch, WAIT_OTHER);
 			
 	amt = interaction->quantity;
-	if (has_ability(ch, ABIL_MASTER_FARMER)) {
+	if (has_player_tech(ch, PTECH_SHEAR_UPGRADE)) {
 		amt *= 2;
 	}
 	
@@ -525,7 +525,7 @@ void summon_player(char_data *ch, char *argument) {
 		}
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		if (has_ability(vict, ABIL_NAVIGATION)) {
+		if (HAS_NAVIGATION(vict)) {
 			snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 		}
 		else {
@@ -2490,7 +2490,7 @@ ACMD(do_shear) {
 		any |= run_global_mob_interactions(ch, mob, INTERACT_SHEAR, shear_interact);
 		
 		if (any) {
-			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
+			gain_player_tech_exp(ch, PTECH_SHEAR_UPGRADE, 5);
 		}
 		else {
 			act("You can't shear $N!", FALSE, ch, NULL, mob, TO_CHAR);

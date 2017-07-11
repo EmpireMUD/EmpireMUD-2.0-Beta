@@ -3010,7 +3010,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							int dir;
 							if ((dir = search_block(subfield, dirs, FALSE)) != NOTHING || (dir = search_block(subfield, alt_dirs, FALSE)) != NOTHING) {
-								if (IS_NPC(c) || has_ability(c, ABIL_NAVIGATION)) {
+								if (IS_NPC(c) || HAS_NAVIGATION(c)) {
 									snprintf(str, slen, "%s", dirs[dir]);	// real dir
 								}
 								else {
@@ -3547,7 +3547,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "poison_immunity")) {
-						if (has_ability(c, ABIL_POISON_IMMUNITY)) {
+						if (has_player_tech(c, PTECH_NO_POISON)) {
 							snprintf(str, slen, "1");
 						}
 						else {

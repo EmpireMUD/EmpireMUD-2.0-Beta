@@ -690,6 +690,16 @@ it.
 
 See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
 #d
+"ABILEDIT DATA"
+
+Usage:  .data add <type> <name | vnum>
+        .data remove <number | all>
+
+The 'data' field is used by different types of abilities. Available types are:
+ &cPTECH&0 - Player technologies. Used by the PLAYER-TECH ability type.
+
+See also: ABILEDIT TYPES, PLAYER TECHNOLOGIES, OLC ABILITIES
+#d
 "ABILEDIT DOT ABILITY" "DOT ABILITY" "DOT ABILITIES"
 
 The DOT ability type deals damage over time. If you set the maxstacks number
@@ -741,6 +751,10 @@ This tells the ability when to trigger skill gain:
  &cTAKE-DAMAGE&0 - Gains when you take damage.
  &cPASSIVE-FREQUENT&0 - Gains every 5 seconds.
  &cPASSIVE_HOURLY&0 - Gains every 75 seconds (game hour).
+ &cONLY-DARK&0 - Only gains if it's dark here.
+ &cONLY-LIGHT&0 - Only gains if it's NOT dark here.
+ &cONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
+ &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
 
 See also: OLC ABILITIES
 #d
@@ -823,6 +837,73 @@ matches "Horrid Form".
 
 See also: OLC ABILITIES
 #d
+"ABILEDIT PLAYER-TECH ABILITY" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
+
+Usage:  .data add ptech <type>
+
+The PLAYER-TECH ability type means that the ability gives a constant effect to
+the player. This effect is always on and has no cost. You can use more than one
+tech on the same ability. You can use these techs to build fun new abilities,
+or reconfigure existing abilities.
+
+Available techs are:
+ &cArmor-Heavy&0 * - Can wear heavy armor items (tank).
+ &cArmor-Light&0 * - Can wear light armor items (melee).
+ &cArmor-Mage&0 * - Can wear mage armor items (caster/healer).
+ &cArmor-Medium&0 * - Can wear medium armor items (solo/pvp).
+ &cBlock&0 * - Can use shields and block melee attacks with them.
+ &cBlock-Ranged&0 * - Can block ranged attacks with shields (requires Block).
+ &cBlock-Magical&0 * - Can block magical attacks with shields (requires Block).
+ &cBonus-vs-Animals&0 - Extra combat damage when the victim is an animal.
+ &cButcher&0 * - Can use the butcher command/interaction.
+ &cCustomize-Building&0 * - Can customize buildings.
+ &cDeep-Mines&0 * - Mines are 50% larger.
+ &cDual-Wield&0 - Gets an offhand attack at a reduced accuracy.
+ &c*&0 - Unused tech.
+ &cFastcasting&0 - Wits reduces lag from non-combat abilities rather than
+    improving combat speed.
+ &cFast-Find&0 * - Dig, gather, and pick are faster.
+ &cFish&0 * - Can use the fish command/interaction.
+ &cForage&0 * - Can use the forage command/interaction.
+ &cHarvest-Upgrade&0 * - Increases the number of items received from harvest.
+ &cHealing-Boost&0 - Improves all healing abilities.
+ &cHide-Upgrade&0 * - Guarantees hide and protects from normal 'search'.
+ &cInfiltrate&0 * - Allows the player to enter claimed/restricted buildings.
+ &cInfiltrate-Upgrade&0 * - Raises the success of infiltrate.
+ &cLarger-Light-Radius&0 - Can see further in the dark.
+ &cLight-Fire&0 * - Can light torches/fires without any tools.
+ &cMap-Invis&0 * - Can't be seen at a distance on the map.
+ &cMill-Upgrade&0 * - Increases the number of items received from mill.
+ &cNavigation&0 * - Orients the map and directions correctly.
+ &c!Hunger&0 - Will not get hungry.
+ &c!Poison&0 * - Total immunity to poisons.
+ &c!Thirst&0 - Will not get thirsty.
+ &c!Track-City&0 * - Leaves no tracks in the city or indoors.
+ &c!Track-Wild&0 * - Leaves no tracks in the wild, outside of cities.
+ &cPickpocket&0 * - Can use the pickpocket command/interaction.
+ &cPoison&0 * - Can use poisons in combat.
+ &cPoison-Upgrade&0 * - Improves the effect of all poisons (requires Poison).
+ &cPortal&0 * - Can open normal portals at the correct buildings.
+ &cPortal-Upgrade&0 * - Can open longer-range portals (requires Portal).
+ &cRanged-Combat&0 * - Can use a ranged weapon.
+ &cRiding&0 * - Can ride/mount.
+ &cRiding-Flying&0 * - Can use flying mounts on all terrain (requires Riding).
+ &cRiding-Upgrade&0 * - Can travel on rough terrain and ocean (requires Riding).
+ &cRough-Terrain&0 * - Can travel between two rough tiles (like mountains).
+ &cSee-Chars-In-Dark&0 - Can see people in the room with no light.
+ &cSee-Objs-In-Dark&0 - Can see objects in the room with no light.
+ &cSee-Inventory&0 * - Can see other players' inventories.
+ &cShear-Upgrade&0 * - Increases the number of items received from shear.
+ &cSteal-Upgrade&0 * - Can steal from vaults too.
+ &cSwimming&0 * - Can move on water tiles with no boat.
+ &cTeleport-City&0 * - Teleport can target your cities (requires an ability).
+ &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
+ &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
+
+* Marked techs trigger ability gains on their own without gain hooks.
+
+See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT TYPES
+#d
 "ABILEDIT SCALE"
 
 Usage:  .scale <percent>
@@ -879,17 +960,21 @@ Usage:  .types add <type> [weight]
         .types remove <type>
 
 Ability types determine how they behave, and open up additional editor options.
-The 'weight' of an ability type determines how many scaling points it receives,
-similar to the applies on objects, morphs, etc.
+The 'weight' of an ability type determines what percentage of scaling points it
+receives, similar to the applies on objects, morphs, etc.
+
+Weights can be 0, meaning they don't take any scaling points from other types.
+Any type with a weight of 0 should still get 1 point worth of effect.
 
 The following types are available (each has its own help file):
  &cCRAFT&0 - Used for craft/building recipes.
  &cBUFF&0 - Puts affects on characters.
  &cDAMAGE&0 - Deals direct damage.
  &cDOT&0 - Adds a damage-over-time effect.
+ &cPLAYER-TECH&0 - Various 'techs' that players get from abilities.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
-   DOT ABILITY
+   DOT ABILITY, PLAYER-TECH ABILITY
 #d
 "ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
 
@@ -2782,6 +2867,9 @@ Each generic type has its own requirements and features. See the help file
 for each type:
  ACTION - Simple echoes performed during building (GENERIC ACTIONS)
  LIQUID - Drinkables for use in items (GENERIC LIQUIDS)
+ COOLDOWN - For use in abilities and scripts (GENERIC COOLDOWNS)
+ AFFECT - Shown on the 'affects' list, and wear-off messages (GENERIC AFFECTS)
+ CURRENCY - Used in shops and scripts (GENERIC CURRENCY)
 
 See also: OLC GENERICS
 #d

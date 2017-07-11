@@ -365,8 +365,8 @@ bool can_see_player_in_other_room(char_data *ch, char_data *vict) {
 	
 	if (!IS_NPC(vict) && CAN_SEE(ch, vict) && WIZHIDE_OK(ch, vict) && CAN_RECOGNIZE(ch, vict)) {
 		if (compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= distance_can_see_players) {
-			if (has_ability(vict, ABIL_CLOAK_OF_DARKNESS)) {
-				gain_ability_exp(vict, ABIL_CLOAK_OF_DARKNESS, 10);
+			if (has_player_tech(vict, PTECH_MAP_INVIS)) {
+				gain_player_tech_exp(vict, PTECH_MAP_INVIS, 10);
 				return FALSE;
 			}
 			else {
@@ -596,7 +596,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		
 		sprintf(output, "[%d] %s%s%s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), advcolbuf, get_room_name(room, TRUE), veh_buf, rlbuf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
 	}
-	else if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+	else if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		// need navigation to see coords
 		sprintf(output, "%s%s%s%s %s&0\r\n", advcolbuf, get_room_name(room, TRUE), veh_buf, rlbuf, locbuf);
 	}
@@ -1801,7 +1801,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	descriptor_data *d;
 	char_data *i, *found = NULL;
 	
-	if (has_ability(ch, ABIL_MASTER_TRACKER)) {
+	if (has_player_tech(ch, PTECH_WHERE_UPGRADE)) {
 		max_distance = 75;
 	}
 	else {
@@ -1833,19 +1833,19 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (has_ability(i, ABIL_NO_TRACE) && valid_no_trace(IN_ROOM(i))) {
-				gain_ability_exp(i, ABIL_NO_TRACE, 10);
+			if (has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
 				continue;
 			}
-			if (has_ability(i, ABIL_UNSEEN_PASSING) && valid_unseen_passing(IN_ROOM(i))) {
-				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
+			if (has_player_tech(i, PTECH_NO_TRACK_CITY) && valid_unseen_passing(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_CITY, 10);
 				continue;
 			}
 			
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(i)));
 			// dist already set for us
 		
-			if (has_ability(ch, ABIL_NAVIGATION)) {
+			if (HAS_NAVIGATION(ch)) {
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(i));
 				
@@ -1859,7 +1859,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			else {
 				msg_to_char(ch, "%-20s - %s, %d tile%s %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
 			}
-			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
+			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
 	}
 	else {			/* print only FIRST char, not all. */
@@ -1886,12 +1886,12 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (has_ability(i, ABIL_NO_TRACE) && valid_no_trace(IN_ROOM(i))) {
-				gain_ability_exp(i, ABIL_NO_TRACE, 10);
+			if (has_player_tech(i, PTECH_NO_TRACK_WILD) && valid_no_trace(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_WILD, 10);
 				continue;
 			}
-			if (has_ability(i, ABIL_UNSEEN_PASSING) && valid_unseen_passing(IN_ROOM(i))) {
-				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
+			if (has_player_tech(i, PTECH_NO_TRACK_CITY) && valid_unseen_passing(IN_ROOM(i))) {
+				gain_player_tech_exp(i, PTECH_NO_TRACK_CITY, 10);
 				continue;
 			}
 			
@@ -1906,7 +1906,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(found)));
 			// distance is already set for us as 'closest'
 			
-			if (has_ability(ch, ABIL_NAVIGATION)) {
+			if (HAS_NAVIGATION(ch)) {
 				check_x = X_COORD(IN_ROOM(found));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(found));
 				if (CHECK_MAP_BOUNDS(check_x, check_y) && !RMT_FLAGGED(IN_ROOM(found), RMT_NO_LOCATION)) {
@@ -1919,7 +1919,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			else {
 				msg_to_char(ch, "%-25s - %s, %d tile%s %s\r\n", PERS(found, ch, 0), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
 			}
-			gain_ability_exp(ch, ABIL_MASTER_TRACKER, 10);
+			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
 		else {
 			send_to_char("No-one around by that name.\r\n", ch);
@@ -1943,7 +1943,7 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 	}
 
 	if (IN_ROOM(obj)) {
-		if (has_ability(ch, ABIL_NAVIGATION)) {
+		if (HAS_NAVIGATION(ch)) {
 			check_x = X_COORD(IN_ROOM(obj));	// not all locations are on the map
 			check_y = Y_COORD(IN_ROOM(obj));
 			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
@@ -2111,7 +2111,7 @@ ACMD(do_exits) {
 					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 						sprintf(buf2 + strlen(buf2), "[%d] %s%s %s\r\n", GET_ROOM_VNUM(to_room), get_room_name(to_room, FALSE), rlbuf, coords);
 					}
-					else if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(to_room, RMT_NO_LOCATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
+					else if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(to_room, RMT_NO_LOCATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
 						sprintf(buf2 + strlen(buf2), "%s%s %s\r\n", get_room_name(to_room, FALSE), rlbuf, coords);
 					}
 					else {

@@ -47,7 +47,7 @@ INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
 	int num;
 	
-	if (!skill_check(ch, ABIL_BUTCHER, DIFF_EASY)) {
+	if (!player_tech_skill_check(ch, PTECH_BUTCHER, DIFF_EASY)) {
 		return FALSE;
 	}
 	
@@ -86,9 +86,9 @@ INTERACTION_FUNC(do_one_forage) {
 	num = interaction->quantity;
 	
 	// more for skill wins
-	num += skill_check(ch, ABIL_FORAGE, DIFF_EASY) ? 1 : 0;
-	num += skill_check(ch, ABIL_FORAGE, DIFF_MEDIUM) ? 1 : 0;
-	num += skill_check(ch, ABIL_FORAGE, DIFF_HARD) ? 1 : 0;
+	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_EASY) ? 1 : 0;
+	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_MEDIUM) ? 1 : 0;
+	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_HARD) ? 1 : 0;
 	
 	for (iter = 0; iter < num; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
@@ -191,7 +191,7 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_RIDE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -343,7 +343,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_RIDE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL)) {
 		return;
 	}
 	else {
@@ -504,8 +504,12 @@ ACMD(do_butcher) {
 	obj_data *corpse;
 	
 	one_argument(argument, arg);
-
-	if (!can_use_ability(ch, ABIL_BUTCHER, NOTHING, 0, NOTHING)) {
+	
+	if (!has_player_tech(ch, PTECH_BUTCHER)) {
+		msg_to_char(ch, "You don't have the correct ability to butcher anything.\r\n");
+		return;
+	}
+	if (!can_use_ability(ch, NOTHING, NOTHING, 0, NOTHING)) {
 		return;
 	}
 	
@@ -537,7 +541,7 @@ ACMD(do_butcher) {
 	else if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need a sharp tool to butcher with.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, corpse, ABIL_BUTCHER)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER, NULL, corpse)) {
 		return;
 	}
 	else {
@@ -552,7 +556,7 @@ ACMD(do_butcher) {
 		empty_obj_before_extract(corpse);
 		extract_obj(corpse);
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_BUTCHER, 15);
+		gain_player_tech_exp(ch, PTECH_BUTCHER, 15);
 	}
 }
 
@@ -601,7 +605,10 @@ ACMD(do_fish) {
 	else if (FIGHTING(ch) && GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You can't do that now!\r\n");
 	}
-	else if (!can_use_ability(ch, ABIL_FISH, NOTHING, 0, NOTHING)) {
+	else if (!has_player_tech(ch, PTECH_FISH)) {
+		msg_to_char(ch, "You don't have the correct ability to fish for anything.\r\n");
+	}
+	else if (!can_use_ability(ch, NOTHING, NOTHING, 0, NOTHING)) {
 		// own messages
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_FISHING) {
@@ -625,7 +632,7 @@ ACMD(do_fish) {
 	else if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
 		msg_to_char(ch, "You'll need a spear to fish.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_FISH)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_FISH, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -639,7 +646,7 @@ ACMD(do_fish) {
 		msg_to_char(ch, "You begin looking for fish%s...\r\n", buf);
 		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }
@@ -650,8 +657,13 @@ ACMD(do_forage) {
 	
 	int short_depletion = config_get_int("short_depletion");
 	
-	if (!can_use_ability(ch, ABIL_FORAGE, MOVE, cost, NOTHING)) {
+	if (!has_player_tech(ch, PTECH_FORAGE)) {
+		msg_to_char(ch, "You don't have the correct ability to forage.\r\n");
 		return;
+	}
+	
+	if (!can_use_ability(ch, NOTHING, MOVE, cost, NOTHING)) {
+		return;	// just checking cost, not ability
 	}
 	
 	if (GET_ACTION(ch) != ACT_NONE) {
@@ -679,14 +691,14 @@ ACMD(do_forage) {
 		return;
 	}
 	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_FORAGE)) {
+	if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE, NULL, NULL)) {
 		return;
 	}
 
 	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage)) {
 		// success
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_FORAGE, 15);
+		gain_player_tech_exp(ch, PTECH_FORAGE, 15);
 	}
 	else {
 		msg_to_char(ch, "You don't seem to be able to find anything to forage for.\r\n");
@@ -703,8 +715,8 @@ ACMD(do_mount) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't ride anything!\r\n");
 	}
-	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
-		// sends own msgs
+	else if (!has_player_tech(ch, PTECH_RIDING)) {
+		msg_to_char(ch, "You don't have the ability to ride anything.\r\n");
 	}
 	
 	// list requires no position

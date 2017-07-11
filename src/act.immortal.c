@@ -2535,6 +2535,61 @@ SHOW(show_players) {
 }
 
 
+SHOW(show_technology) {
+	extern const char *player_tech_types[];
+	
+	struct player_tech *ptech;
+	int last_tech, count = 0;
+	char one[256], line[256];
+	char_data *vict = NULL;
+	bool is_file = FALSE;
+	size_t lsize;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Show technology for which player?\r\n");
+	}
+	else if (!(vict = find_or_load_player(argument, &is_file))) {
+		send_config_msg(ch, "no_person");
+	}
+	else {
+		// techs (slightly complicated
+		msg_to_char(ch, "Techs for %s:\r\n", GET_NAME(vict));
+		
+		last_tech = NOTHING;
+		*line = '\0';
+		lsize = 0;
+		
+		LL_FOREACH(GET_TECHS(vict), ptech) {
+			if (ptech->id == last_tech) {
+				continue;
+			}
+			
+			snprintf(one, sizeof(one), "\t%c%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id]);
+			
+			if (color_strlen(one) + lsize >= 79) {
+				// send line
+				msg_to_char(ch, "%s\r\n", line);
+				lsize = 0;
+				*line = '\0';
+			}
+			
+			strcat(line, one);
+			lsize += color_strlen(one);
+			last_tech = ptech->id;
+		}
+		
+		if (*line) {
+			msg_to_char(ch, "%s\r\n", line);
+		}
+		msg_to_char(ch, "\t0");
+	}
+	
+	if (vict && is_file) {
+		free_char(vict);
+	}
+}
+
+
 SHOW(show_terrain) {
 	extern int stats_get_crop_count(crop_data *cp);
 	extern int stats_get_sector_count(sector_data *sect);
@@ -7180,6 +7235,7 @@ ACMD(do_show) {
 		{ "data", LVL_CIMPL, show_data },
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
+		{ "technology", LVL_START_IMM, show_technology },
 
 		// last
 		{ "\n", 0, NULL }

@@ -740,6 +740,7 @@ void free_char(char_data *ch) {
 	struct player_currency *cur, *next_cur;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
+	struct player_tech *ptech;
 	struct offer_data *offer;
 	struct lore_data *lore;
 	struct coin_data *coin;
@@ -923,6 +924,11 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
 			HASH_DEL(GET_MOUNT_LIST(ch), mount);
 			free(mount);
+		}
+		
+		while ((ptech = GET_TECHS(ch))) {
+			GET_TECHS(ch) = ptech->next;
+			free(ptech);
 		}
 		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
@@ -3294,6 +3300,7 @@ void delete_player_character(char_data *ch) {
 */
 void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void add_all_gain_hooks(char_data *ch);
+	void apply_all_ability_techs(char_data *ch);
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
 	void clean_lore(char_data *ch);
@@ -3546,6 +3553,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	update_player_index(index, ch);
 	
 	// ensure data is up-to-date
+	apply_all_ability_techs(ch);
 	refresh_all_quests(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);

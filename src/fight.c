@@ -84,7 +84,7 @@ bool check_block(char_data *ch, char_data *attacker, bool can_gain_skill) {
 	int max_block = 50;	// never pass this value
 	
 	// must have a shield and Shield Block
-	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !has_ability(ch, ABIL_SHIELD_BLOCK))) {
+	if (!shield || !IS_SHIELD(shield) || (!IS_NPC(ch) && !has_player_tech(ch, PTECH_BLOCK))) {
 		return FALSE;
 	}
 	
@@ -298,7 +298,7 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 	}
 	
 	if (can_gain_skill) {
-		gain_ability_exp(ch, ABIL_SHIELD_BLOCK, 2);
+		gain_player_tech_exp(ch, PTECH_BLOCK, 2);
 		gain_ability_exp(ch, ABIL_QUICK_BLOCK, 2);
 	}
 		
@@ -373,7 +373,7 @@ double get_combat_speed(char_data *ch, int pos) {
 	}
 	
 	// wits: it gets .1 second faster for every 4 wits
-	if (!has_ability(ch, ABIL_FASTCASTING)) {
+	if (!has_player_tech(ch, PTECH_FASTCASTING)) {
 		base *= (1.0 - (0.025 * GET_WITS(ch)));
 	}
 	// round to .1 seconds
@@ -751,11 +751,11 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	}
 	
 	if (damtype == DAM_POISON) {
-		if (has_ability(victim, ABIL_POISON_IMMUNITY)) {
+		if (has_player_tech(victim, PTECH_NO_POISON)) {
 			dam = 0;
 		}
 		if (can_gain_exp_from(victim, attacker)) {
-			gain_ability_exp(victim, ABIL_POISON_IMMUNITY, 2);
+			gain_player_tech_exp(victim, PTECH_NO_POISON, 2);
 			gain_ability_exp(victim, ABIL_RESIST_POISON, 5);
 		}
 	}
@@ -1735,9 +1735,9 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// cloak of darkness
-	if (!IS_NPC(vict) && has_ability(vict, ABIL_CLOAK_OF_DARKNESS)) {
-		gain_ability_exp(vict, ABIL_CLOAK_OF_DARKNESS, 15);
-		if (!number(0, 1) && skill_check(vict, ABIL_CLOAK_OF_DARKNESS, DIFF_HARD)) {
+	if (!IS_NPC(vict) && has_player_tech(vict, PTECH_MAP_INVIS)) {
+		gain_player_tech_exp(vict, PTECH_MAP_INVIS, 15);
+		if (!number(0, 1) && player_tech_skill_check(vict, PTECH_MAP_INVIS, DIFF_HARD)) {
 			return FALSE;
 		}
 	}
@@ -2850,7 +2850,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		// endurance (extra HP)
 		if (can_gain_exp_from(victim, ch)) {
 			gain_ability_exp(victim, ABIL_ENDURANCE, 2);
-			run_ability_gain_hooks(victim, AGH_TAKE_DAMAGE);
+			run_ability_gain_hooks(victim, ch, AGH_TAKE_DAMAGE);
 		}
 
 		// armor skills
@@ -2858,19 +2858,19 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING && can_gain_exp_from(victim, ch)) {
 				switch (GET_ARMOR_TYPE(GET_EQ(victim, iter))) {
 					case ARMOR_MAGE: {
-						gain_ability_exp(victim, ABIL_MAGE_ARMOR, 2);
+						gain_player_tech_exp(victim, PTECH_ARMOR_MAGE, 2);
 						break;
 					}
 					case ARMOR_LIGHT: {
-						gain_ability_exp(victim, ABIL_LIGHT_ARMOR, 2);
+						gain_player_tech_exp(victim, PTECH_ARMOR_LIGHT, 2);
 						break;
 					}
 					case ARMOR_MEDIUM: {
-						gain_ability_exp(victim, ABIL_MEDIUM_ARMOR, 2);
+						gain_player_tech_exp(victim, PTECH_ARMOR_MEDIUM, 2);
 						break;
 					}
 					case ARMOR_HEAVY: {
-						gain_ability_exp(victim, ABIL_HEAVY_ARMOR, 2);
+						gain_player_tech_exp(victim, PTECH_ARMOR_HEAVY, 2);
 						break;
 					}
 				}
@@ -3147,9 +3147,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
 			block = check_block(victim, ch, TRUE);
 		}
-		else if (has_ability(victim, ABIL_WARD_AGAINST_MAGIC) && check_solo_role(victim) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
+		else if (has_player_tech(victim, PTECH_BLOCK_MAGICAL) && check_solo_role(victim) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
 			// half-chance
 			block = check_block(victim, ch, TRUE) && !number(0, 1);
+			gain_player_tech_exp(victim, PTECH_BLOCK_MAGICAL, 2);
 		}
 	}
 
@@ -3160,7 +3161,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		combat_meter_dodge(victim);
 		ret_val = damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type);
 		if (can_gain_exp_from(victim, ch)) {
-			run_ability_gain_hooks(victim, AGH_DODGE);
+			run_ability_gain_hooks(victim, ch, AGH_DODGE);
 		}
 		return ret_val;
 	}
@@ -3169,7 +3170,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		combat_meter_block(victim);
 		block_attack(ch, victim, w_type);
 		if (can_gain_exp_from(victim, ch)) {
-			run_ability_gain_hooks(victim, AGH_BLOCK);
+			run_ability_gain_hooks(victim, ch, AGH_BLOCK);
 		}
 		return 0;
 	}
@@ -3210,7 +3211,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
 			if (can_gain_exp_from(ch, victim)) {
-				run_ability_gain_hooks(ch, AGH_MELEE);
+				run_ability_gain_hooks(ch, victim, AGH_MELEE);
 			}
 			
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
@@ -3233,14 +3234,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 			
 			// raw damage modified by hunt
-			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_ability(ch, ABIL_HUNT)) {
-				if (can_gain_exp_from(ch, victim)) {
-					gain_ability_exp(ch, ABIL_HUNT, 2);
-				}
-			
-				if (skill_check(ch, ABIL_HUNT, DIFF_EASY)) {
-					dam *= 2;
-				}
+			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_player_tech(ch, PTECH_BONUS_VS_ANIMALS)) {
+				dam *= 2;
 			}
 		
 			// raw damage modified by big game hunter
@@ -3320,7 +3315,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 			
 			// poison could kill too
-			if (!IS_NPC(ch) && has_ability(ch, ABIL_POISONS) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
+			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_POISON) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				if (!number(0, 1) && apply_poison(ch, victim, USING_POISON(ch)) < 0) {
 					// dedz
 					result = -1;
@@ -3592,7 +3587,7 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 		weapon = NULL;
 	}
 	
-	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_ability(ch, ABIL_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
+	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_player_tech(ch, PTECH_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
 		msg_to_char(ch, "You must be alone to use two-handed weapons in the solo role.\r\n");
 		return;
 	}
@@ -3675,10 +3670,10 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	// compute
 	success = check_hit_vs_dodge(ch, vict, FALSE);
 	
-	if (success && AWAKE(vict) && has_ability(vict, ABIL_BLOCK_ARROWS)) {
+	if (success && AWAKE(vict) && has_player_tech(vict, PTECH_BLOCK_RANGED)) {
 		block = check_block(vict, ch, TRUE);
 		if (GET_EQ(vict, WEAR_HOLD) && IS_SHIELD(GET_EQ(vict, WEAR_HOLD)) && can_gain_exp_from(vict, ch)) {
-			gain_ability_exp(vict, ABIL_BLOCK_ARROWS, 2);
+			gain_player_tech_exp(vict, PTECH_BLOCK_RANGED, 2);
 		}
 	}
 	
@@ -3688,7 +3683,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	else if (!success) {
 		damage(ch, vict, 0, GET_MISSILE_WEAPON_TYPE(weapon), DAM_PHYSICAL);
 		if (can_gain_exp_from(vict, ch)) {
-			run_ability_gain_hooks(vict, AGH_DODGE);
+			run_ability_gain_hooks(vict, ch, AGH_DODGE);
 		}
 	}
 	else {
@@ -3771,13 +3766,13 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		
 		// McSkillups
 		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_ARCHERY, 2);
+			gain_player_tech_exp(ch, PTECH_RANGED_COMBAT, 2);
 			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
 			gain_ability_exp(ch, ABIL_TRICK_SHOTS, 2);
 			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
 				gain_ability_exp(ch, ABIL_ALACRITY, 2);
 			}
-			run_ability_gain_hooks(ch, AGH_RANGED);
+			run_ability_gain_hooks(ch, vict, AGH_RANGED);
 		}
 	}
 	
@@ -3992,7 +3987,7 @@ void frequent_combat(int pulse) {
 				}
 				
 				// still fighting and can dual-wield?
-				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
+				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_player_tech(ch, PTECH_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
 					if (GET_LAST_SWING_OFFHAND(ch) + (speed SEC_MICRO) <= timestamp) {
 						GET_LAST_SWING_OFFHAND(ch) = timestamp;

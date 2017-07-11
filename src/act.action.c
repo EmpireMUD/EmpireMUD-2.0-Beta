@@ -297,9 +297,9 @@ void update_actions(void) {
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
 		}
-		if (IS_SET(act_flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
+		if (IS_SET(act_flags, ACTF_FINDER) && has_player_tech(ch, PTECH_FAST_FIND)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
-			gain_ability_exp(ch, ABIL_FINDER, 0.1);
+			gain_player_tech_exp(ch, PTECH_FAST_FIND, 0.1);
 		}
 		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
@@ -696,7 +696,7 @@ INTERACTION_FUNC(finish_harvesting) {
 		
 	if ((cp = ROOM_CROP(inter_room)) ) {
 		// how many to get
-		num = interaction->quantity * (has_ability(ch, ABIL_MASTER_FARMER) ? 2 : 1);
+		num = interaction->quantity * (has_player_tech(ch, PTECH_HARVEST_UPGRADE) ? 2 : 1);
 		
 		// give them over
 		for (count = 0; count < num; ++count) {
@@ -961,7 +961,7 @@ void perform_saw(char_data *ch) {
 	// base
 	GET_ACTION_TIMER(ch) -= 1;
 	
-	if (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY)) {
+	if (has_player_tech(ch, PTECH_FAST_WOOD_PROCESSING)) {
 		GET_ACTION_TIMER(ch) -= 1;
 	}
 		
@@ -1437,7 +1437,7 @@ void process_fishing(char_data *ch) {
 		return;
 	}
 	
-	GET_ACTION_TIMER(ch) -= GET_CHARISMA(ch) + (skill_check(ch, ABIL_FISH, DIFF_MEDIUM) ? 2 : 0);
+	GET_ACTION_TIMER(ch) -= GET_CHARISMA(ch) + (player_tech_skill_check(ch, PTECH_FISH, DIFF_MEDIUM) ? 2 : 0);
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
 		switch (number(0, 10)) {
@@ -1477,10 +1477,10 @@ void process_fishing(char_data *ch) {
 			msg_to_char(ch, "You can't seem to catch anything.\r\n");
 		}
 		
-		gain_ability_exp(ch, ABIL_FISH, 15);
+		gain_player_tech_exp(ch, PTECH_FISH, 15);
 		
 		// restart action
-		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }
@@ -1584,7 +1584,7 @@ void process_harvesting(char_data *ch) {
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
 			gain_ability_exp(ch, ABIL_CHORES, 30);
-			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
+			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
 		}
 		else {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
@@ -2154,7 +2154,7 @@ void process_scraping(char_data *ch) {
 	}
 	
 	// skilled work
-	GET_ACTION_TIMER(ch) -= 1 + (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY) ? 1 : 0);
+	GET_ACTION_TIMER(ch) -= 1 + (has_player_tech(ch, PTECH_FAST_WOOD_PROCESSING) ? 1 : 0);
 	
 	// messaging -- to player only
 	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {

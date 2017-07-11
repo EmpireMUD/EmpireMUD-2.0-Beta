@@ -4696,19 +4696,19 @@ ACMD(do_keep) {
 ACMD(do_light) {
 	void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint);
 	
+	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
 	obj_data *obj, *flint = NULL;
-	bool magic = !IS_NPC(ch) && has_ability(ch, ABIL_TOUCH_OF_FLAME);
 	vehicle_data *veh;
 
 	one_argument(argument, arg);
 
-	if (!magic) {
+	if (!objless) {
 		flint = get_obj_in_list_num(o_FLINT_SET, ch->carrying);
 	}
 
 	if (!*arg)
 		msg_to_char(ch, "Light what?\r\n");
-	else if (!IS_NPC(ch) && !magic && !flint)
+	else if (!IS_NPC(ch) && !objless && !flint)
 		msg_to_char(ch, "You don't have a flint set to light that with.\r\n");
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		// try burning a vehicle
@@ -4723,10 +4723,10 @@ ACMD(do_light) {
 		msg_to_char(ch, "You can't light that!\r\n");
 	}
 	else {
-		if (magic) {
-			act("You click your fingers and $p catches fire!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n clicks $s fingers and $p catches fire!", FALSE, ch, obj, NULL, TO_ROOM);
-			gain_ability_exp(ch, ABIL_TOUCH_OF_FLAME, 15);
+		if (objless) {
+			act("You light $p on fire!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n lights $p on fire!", FALSE, ch, obj, NULL, TO_ROOM);
+			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
 		}
 		else if (flint) {
 			act("You strike $p and light $P.", FALSE, ch, flint, obj, TO_CHAR);

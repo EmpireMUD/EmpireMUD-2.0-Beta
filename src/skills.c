@@ -47,6 +47,7 @@ const char *default_skill_desc = "New skill";
 extern const char *skill_flags[];
 
 // eternal functions
+void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
 void update_class(char_data *ch);
@@ -80,6 +81,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	void retract_claws(char_data *ch);
 	void undisguise(char_data *ch);	
 	
+	struct ability_data_list *adl;
 	obj_data *obj;
 	bool found = TRUE;	// inverted detection, see default below
 	
@@ -95,18 +97,82 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		affect_from_char_by_caster(ch, ABIL_AFFECT_VNUM(abil), ch, TRUE);
 	}
 	
+	// player tech losses
+	// TODO: should this set the 'found' bool? It would be unset later tho
+	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type != ADL_PLAYER_TECH) {
+				continue;	// wrong type
+			}
+			if (has_player_tech(ch, adl->vnum)) {
+				continue;	// player is still getting this tech from somewhere else
+			}
+			
+			// PTECH_x: what to do when losing the tech
+			switch (adl->vnum) {
+				case PTECH_ARMOR_HEAVY: {
+					remove_armor_by_type(ch, ARMOR_HEAVY);
+					break;
+				}
+				case PTECH_ARMOR_LIGHT: {
+					remove_armor_by_type(ch, ARMOR_LIGHT);
+					break;
+				}
+				case PTECH_ARMOR_MAGE: {
+					remove_armor_by_type(ch, ARMOR_MAGE);
+					break;
+				}
+				case PTECH_ARMOR_MEDIUM: {
+					remove_armor_by_type(ch, ARMOR_MEDIUM);
+					break;
+				}
+				case PTECH_BLOCK: {
+					if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
+						act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
+						unequip_char_to_inventory(ch, WEAR_HOLD);
+					}
+					break;
+				}
+				case PTECH_FISH: {
+					if (GET_ACTION(ch) == ACT_FISHING) {
+						cancel_action(ch);
+					}
+					break;
+				}
+				case PTECH_NAVIGATION: {
+					// avoid spinning the map when they lose navigation
+					GET_CONFUSED_DIR(ch) = NORTH;
+					break;
+				}
+				case PTECH_RANGED_COMBAT: {
+					if (GET_EQ(ch, WEAR_RANGED) && IS_MISSILE_WEAPON(GET_EQ(ch, WEAR_RANGED))) {
+						act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_RANGED), NULL, TO_CHAR);
+						unequip_char_to_inventory(ch, WEAR_RANGED);
+					}
+					break;
+				}
+				case PTECH_RIDING: {
+					if (IS_RIDING(ch)) {
+						msg_to_char(ch, "You climb down from your mount.\r\n");
+						perform_dismount(ch);
+					}
+					break;
+				}
+				case PTECH_TWO_HANDED_WEAPONS: {
+					if ((obj = GET_EQ(ch, WEAR_WIELD)) && OBJ_FLAGGED(obj, OBJ_TWO_HANDED)) {
+						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+						unequip_char_to_inventory(ch, WEAR_WIELD);
+					}
+					break;
+				}
+			}
+		}
+	}
+	
 	switch (ABIL_VNUM(abil)) {
 		case ABIL_ALACRITY: {
 			void end_alacrity(char_data *ch);
 			end_alacrity(ch);
-			break;
-		}
-		case ABIL_ARCHERY: {
-			if (GET_EQ(ch, WEAR_RANGED) && IS_MISSILE_WEAPON(GET_EQ(ch, WEAR_RANGED))) {
-				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_RANGED), NULL, TO_CHAR);
-				unequip_char_to_inventory(ch, WEAR_RANGED);
-				determine_gear_level(ch);
-			}
 			break;
 		}
 		case ABIL_BANSHEE: {
@@ -143,10 +209,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_CLAWS: {
 			retract_claws(ch);
-			break;
-		}
-		case ABIL_MAGE_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_MAGE);
 			break;
 		}
 		case ABIL_COUNTERSPELL: {
@@ -188,12 +250,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_GIANT_TORTOISE);
 			break;
 		}
-		case ABIL_FISH: {
-			if (GET_ACTION(ch) == ACT_FISHING) {
-				cancel_action(ch);
-			}
-			break;
-		}
 		case ABIL_FLY: {
 			affect_from_char(ch, ATYPE_FLY, TRUE);
 			break;
@@ -210,16 +266,8 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			affect_from_char_by_caster(ch, ATYPE_HASTEN, ch, TRUE);
 			break;
 		}
-		case ABIL_HEAVY_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_HEAVY);
-			break;
-		}
 		case ABIL_HONE: {
 			remove_honed_gear(ch);
-			break;
-		}
-		case ABIL_LIGHT_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_LIGHT);
 			break;
 		}
 		case ABIL_MAJESTY: {
@@ -232,10 +280,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_MANTICORE: {
 			despawn_familiar(ch, FAMILIAR_MANTICORE);
-			break;
-		}
-		case ABIL_MEDIUM_ARMOR: {
-			remove_armor_by_type(ch, ARMOR_MEDIUM);
 			break;
 		}
 		case ABIL_MIRRORIMAGE: {
@@ -251,10 +295,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				void un_mummify(char_data *ch);
 				un_mummify(ch);
 			}
-			break;
-		}
-		case ABIL_NAVIGATION: {
-			GET_CONFUSED_DIR(ch) = NORTH;
 			break;
 		}
 		case ABIL_NIGHTSIGHT: {
@@ -291,13 +331,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_RIDE: {
-			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You climb down from your mount.\r\n");
-				perform_dismount(ch);
-			}
-			break;
-		}
 		case ABIL_RITUAL_OF_BURDENS: {
 			if (affected_by_spell(ch, ATYPE_UNBURDENED)) {
 				msg_to_char(ch, "Your burdens return.\r\n");
@@ -311,14 +344,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_SCORPION_SHADOW: {
 			despawn_familiar(ch, FAMILIAR_SCORPION_SHADOW);
-			break;
-		}
-		case ABIL_SHIELD_BLOCK: {
-			if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
-				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
-				unequip_char_to_inventory(ch, WEAR_HOLD);
-				determine_gear_level(ch);
-			}
 			break;
 		}
 		case ABIL_SIPHON: {
@@ -342,6 +367,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 	}
 	
+	determine_gear_level(ch);
 	if (found) {
 		affect_total(ch);
 	}
@@ -399,11 +425,15 @@ void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool r
 		if (reset_levels) {
 			data->levels_gained = 0;
 		}
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH) && skill_set == GET_CURRENT_SKILL_SET(ch)) {
+			apply_ability_techs_to_player(ch, abil);
+		}
 		qt_change_ability(ch, ABIL_VNUM(abil));
-	}
 	
-	// attach gain hooks
-	add_ability_gain_hook(ch, abil);
+		// attach gain hooks
+		add_ability_gain_hook(ch, abil);
+	}
 }
 
 
@@ -604,10 +634,10 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 			// whoops too low
 			for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
 				if (abil->purchased[iter]) {
+					remove_ability_by_set(ch, abil->ptr, iter, FALSE);
 					if (iter == GET_CURRENT_SKILL_SET(ch)) {
 						check_skill_sell(REAL_CHAR(ch), abil->ptr);
 					}
-					remove_ability_by_set(ch, abil->ptr, iter, FALSE);
 				}
 			}
 		}
@@ -650,8 +680,8 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 			abd = abil->ptr;
 			if (all || (ABIL_ASSIGNED_SKILL(abd) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
 				if (abil->purchased[GET_CURRENT_SKILL_SET(ch)] && ABIL_SKILL_LEVEL(abd) > 0) {
-					check_skill_sell(REAL_CHAR(ch), abil->ptr);
 					remove_ability(ch, abil->ptr, FALSE);
+					check_skill_sell(REAL_CHAR(ch), abil->ptr);
 				}
 			}
 		}
@@ -691,6 +721,7 @@ int compute_bonus_exp_per_day(char_data *ch) {
 * Gives a skillup for anybody in the empire with the ability.
 *
 * @param empire_data *emp the empire to skillup
+* @param any_vnum ability Which ABIL_ to gain
 * @param double amount The amount of experience to gain
 */
 void empire_skillup(empire_data *emp, any_vnum ability, double amount) {
@@ -701,6 +732,27 @@ void empire_skillup(empire_data *emp, any_vnum ability, double amount) {
 		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
 			if (GET_LOYALTY(ch) == emp) {
 				gain_ability_exp(ch, ability, amount);
+			}
+		}
+	}
+}
+
+
+/**
+* Gives a skillup for anybody in the empire with a player tech.
+*
+* @param empire_data *emp the empire to skillup
+* @param int tech Which PTECH_ to gain on
+* @param double amount The amount of experience to gain
+*/
+void empire_player_tech_skillup(empire_data *emp, int tech, double amount) {
+	descriptor_data *d;
+	char_data *ch;
+	
+	for (d = descriptor_list; d; d = d->next) {
+		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
+			if (GET_LOYALTY(ch) == emp) {
+				gain_player_tech_exp(ch, tech, amount);
 			}
 		}
 	}
@@ -732,6 +784,28 @@ void gain_ability_exp(char_data *ch, any_vnum ability, double amount) {
 	if (skill && gain_skill_exp(ch, SKILL_VNUM(skill), amount)) {
 		// increment gains from this
 		mark_level_gained_from_ability(ch, abil);
+	}
+}
+
+
+/**
+* Gains experience based on what's giving a player a certain tech.
+*
+* @param char_data *ch The player gaining exp.
+* @param int tech The PTECH_ type that's triggering.
+* @param double amount How much exp to gain.
+*/
+void gain_player_tech_exp(char_data *ch, int tech, double amount) {
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			gain_ability_exp(ch, iter->abil, amount);
+		}
 	}
 }
 
@@ -1266,10 +1340,12 @@ void perform_swap_skill_sets(char_data *ch) {
 		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {	// skill ability
 			if (plab->purchased[cur_set] && !plab->purchased[old_set]) {
 				// added
+				apply_ability_techs_to_player(ch, abil);
 				qt_change_ability(ch, ABIL_VNUM(abil));
 			}
 			else if (plab->purchased[old_set] && !plab->purchased[cur_set]) {
 				// removed
+				remove_player_tech(ch, ABIL_VNUM(abil));
 				check_skill_sell(ch, abil);
 				qt_change_ability(ch, ABIL_VNUM(abil));
 			}
@@ -1313,6 +1389,10 @@ void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, boo
 		
 		if (reset_levels) {
 			data->levels_gained = 0;
+		}
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH) && skill_set == GET_CURRENT_SKILL_SET(ch)) {
+			remove_player_tech(ch, ABIL_VNUM(abil));
 		}
 		
 		qt_change_ability(ch, ABIL_VNUM(abil));
@@ -1396,6 +1476,45 @@ bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
 	
 	// roll
 	return (number(1, 100) <= chance);
+}
+
+
+/**
+* Runs a skill check based on a tech (when you don't know the actual ability).
+*
+* @param char_data *ch The person doing the skill check.
+* @param int tech Which PTECH_ type.
+* @param int difficulty Any DIFF_ const.
+* @return bool TRUE if passed, FALSE if failed.
+*/
+bool player_tech_skill_check(char_data *ch, int tech, int difficulty) {
+	any_vnum best_abil = NOTHING;
+	struct player_tech *iter;
+	int lev, best_level = 0;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id != tech) {
+			continue;	// wrong tech
+		}
+		
+		lev = get_ability_level(ch, iter->abil);
+		
+		if (lev > best_level) {
+			best_level = lev;
+			best_abil = iter->abil;
+		}
+	}
+	
+	if (best_abil != NOTHING) {
+		return skill_check(ch, best_abil, difficulty);
+	}
+	else {
+		return FALSE;	// no abil
+	}
 }
 
 
@@ -1818,7 +1937,7 @@ bool can_gain_exp_from(char_data *ch, char_data *vict) {
 */
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	char buf[MAX_STRING_LENGTH];
-	any_vnum abil = NO_ABIL;
+	any_vnum abil = NO_ABIL, tech = NOTHING;
 	struct obj_apply *app;
 	int iter, level_min;
 	bool honed;
@@ -1833,37 +1952,43 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	if (IS_ARMOR(item)) {
 		switch (GET_ARMOR_TYPE(item)) {
 			case ARMOR_MAGE: {
-				abil = ABIL_MAGE_ARMOR;
+				tech = PTECH_ARMOR_MAGE;
 				break;
 			}
 			case ARMOR_LIGHT: {
-				abil = ABIL_LIGHT_ARMOR;
+				tech = PTECH_ARMOR_LIGHT;
 				break;
 			}
 			case ARMOR_MEDIUM: {
-				abil = ABIL_MEDIUM_ARMOR;
+				tech = PTECH_ARMOR_MEDIUM;
 				break;
 			}
 			case ARMOR_HEAVY: {
-				abil = ABIL_HEAVY_ARMOR;
+				tech = PTECH_ARMOR_HEAVY;
 				break;
 			}
 		}
 	}
 	else if (OBJ_FLAGGED(item, OBJ_TWO_HANDED)) {
-		abil = ABIL_TWO_HANDED_WEAPONS;
+		tech = PTECH_TWO_HANDED_WEAPONS;
 	}
 	else if (IS_MISSILE_WEAPON(item)) {
-		abil = ABIL_ARCHERY;
+		tech = PTECH_RANGED_COMBAT;
 	}
 	else if (IS_SHIELD(item)) {
-		abil = ABIL_SHIELD_BLOCK;
+		tech = PTECH_BLOCK;
 	}
 	
 	if (abil != NO_ABIL && !has_ability(ch, abil)) {
 		if (send_messages) {
 			snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(abil));
 			act(buf, FALSE, ch, item, NULL, TO_CHAR);
+		}
+		return FALSE;
+	}
+	if (tech != NOTHING && !has_player_tech(ch, tech)) {
+		if (send_messages) {
+			act("You don't have the correct ability to use $p.", FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;
 	}
@@ -2140,7 +2265,7 @@ void give_level_zero_abilities(char_data *ch) {
 bool has_cooking_fire(char_data *ch) {
 	obj_data *obj;
 	
-	if (!IS_NPC(ch) && has_ability(ch, ABIL_TOUCH_OF_FLAME)) {
+	if (has_player_tech(ch, PTECH_LIGHT_FIRE)) {
 		return TRUE;
 	}
 
