@@ -187,7 +187,6 @@ ACMD(do_fire);
 ACMD(do_firstaid);
 ACMD(do_fish);
 ACMD(do_flee);
-ACMD(do_fly);
 ACMD(do_follow);
 ACMD(do_forage);
 ACMD(do_force);
