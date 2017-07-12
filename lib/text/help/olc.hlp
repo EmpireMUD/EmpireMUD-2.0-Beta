@@ -1847,6 +1847,7 @@ Available functions:
  WAREHOUSE - can use the warehouse command and store unique items
  DRINK-WATER - can get water here, like a well
  COOKING-FIRE - can cook, brew, and other tasks that require a fire
+ LARGER-NEARBY - extends the radius of 'nearby'
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d

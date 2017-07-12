@@ -2650,6 +2650,7 @@ const char *function_flags[] = {
 	"WAREHOUSE",	// 30
 	"DRINK-WATER",
 	"COOKING-FIRE",
+	"LARGER-NEARBY",
 	"\n"
 };
 

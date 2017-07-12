@@ -741,6 +741,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_WAREHOUSE  BIT(30)	// can use the warehouse command and store unique items
 #define FNC_DRINK_WATER  BIT(31)	// can drink here
 #define FNC_COOKING_FIRE  BIT(32)	// can cook here
+#define FNC_LARGER_NEARBY  BIT(33)	// extends the radius of 'nearby'
 
 
  //////////////////////////////////////////////////////////////////////////////
