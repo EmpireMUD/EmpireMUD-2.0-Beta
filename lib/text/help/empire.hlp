@@ -195,9 +195,10 @@ CITY
 #
 "CITY COMMANDS"
 
-- &ccity list&0: This lists the cities already established in the empire, as well
-    as how many city points are available to spend. Immortals can specify an
-    empire to list all of its cities.
+- &ccity list [empire]&0: This lists the cities already established in the
+    empire, as well as how many city points are available to spend. You can
+    also use this command to find other empires' cities (but it can't find
+    their outposts).
 
 - &ccity found <name>&0: This founds a new city on the spot where you're standing.
     It creates a "city center" building, which is open (does not block move-

@@ -1411,12 +1411,14 @@ void list_cities(char_data *ch, char *argument) {
 	struct island_info *isle;
 	empire_data *emp;
 	int points, used, count;
-	bool pending, found = FALSE;
+	bool is_own, pending, found = FALSE;
 	room_data *rl;
+	
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	
 	any_one_word(argument, arg);
 	
-	if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
+	if (*arg) {
 		emp = get_empire_by_name(arg);
 		if (!emp) {
 			msg_to_char(ch, "Unknown empire.\r\n");
@@ -1427,13 +1429,24 @@ void list_cities(char_data *ch, char *argument) {
 		msg_to_char(ch, "You're not in an empire.\r\n");
 		return;
 	}
-
-	used = count_city_points_used(emp);
-	points = city_points_available(emp);
-	msg_to_char(ch, "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+	
+	is_own = (imm_access || emp == GET_LOYALTY(ch));
+	
+	if (is_own) {
+		used = count_city_points_used(emp);
+		points = city_points_available(emp);
+		msg_to_char(ch, "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+	}
+	else {
+		msg_to_char(ch, "Known cities for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	}
 	
 	count = 0;
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+		if (!city_type[city->type].show_to_others && !is_own) {
+			continue;	// we don't show types this low
+		}
+		
 		found = TRUE;
 		rl = city->location;
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
@@ -1447,7 +1460,7 @@ void list_cities(char_data *ch, char *argument) {
 		msg_to_char(ch, "  none\r\n");
 	}
 	
-	if (points > 0) {
+	if (points > 0 && is_own) {
 		msg_to_char(ch, "* The empire has %d city point%s available.\r\n", points, (points != 1 ? "s" : ""));
 	}
 }

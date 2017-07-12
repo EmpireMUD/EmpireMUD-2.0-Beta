@@ -1541,13 +1541,13 @@ const char *craft_types[] = {
 
 // name, icon, radius, max population
 struct city_metadata_type city_type[] = {
-	{ "outpost", "&0-&?C1&0-", 5, 10 },
-	{ "village", "&0-&?C2&0-", 10, 30 },
-	{ "city", "&0-&?C3&0-", 15, 50 },
-	{ "capital", "&0-&?C4&0-", 25, 150 },
+	{ "outpost", "&0-&?C1&0-", 5, 10, FALSE },
+	{ "village", "&0-&?C2&0-", 10, 30, TRUE },
+	{ "city", "&0-&?C3&0-", 15, 50, TRUE },
+	{ "capital", "&0-&?C4&0-", 25, 150, TRUE },
 
-	// this must go last	
-	{ "\n", "\n", 0, 0 }
+	// this must go last
+	{ "\n", "\n", 0, 0, FALSE }
 };
 
 

@@ -3822,6 +3822,7 @@ struct city_metadata_type {
 	char *icon;
 	int radius;
 	int max_population;
+	bool show_to_others;
 };
 
 

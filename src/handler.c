@@ -2927,15 +2927,23 @@ struct empire_city_data *find_closest_city(empire_data *emp, room_data *loc) {
 * Finds an empire by name/number. This prefers exact matches and also checks
 * the empire's adjective name.
 *
-* @param char *name The user input (name/number of empire)
+* @param char *raw_name The user input (name/number of empire)
 * @return empire_data *The empire, or NULL if none found.
 */
-empire_data *get_empire_by_name(char *name) {
+empire_data *get_empire_by_name(char *raw_name) {
 	empire_data *pos, *next_pos, *full_exact, *full_abbrev, *adj_exact, *adj_abbrev;
+	char name[MAX_INPUT_LENGTH];
 	int num;
 	
 	// we'll take any of these if we don't find a perfect match
 	full_exact = full_abbrev = adj_exact = adj_abbrev = NULL;
+	
+	if (*raw_name == '"') {	// strip quotes if any
+		any_one_word(raw_name, name);
+	}
+	else {
+		strcpy(name, raw_name);
+	}
 
 	if (is_number(name))
 		num = atoi(name);
