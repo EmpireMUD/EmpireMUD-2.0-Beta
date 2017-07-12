@@ -361,11 +361,9 @@ void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, int mode) {
 			gain_player_tech_exp(ch, PTECH_ROUGH_TERRAIN, 10);
 		}
 		gain_player_tech_exp(ch, PTECH_NAVIGATION, 1);
-		
-		if (AFF_FLAGGED(ch, AFF_FLY)) {
-			gain_ability_exp(ch, ABIL_FLY, 1);
-		}
 	}
+	
+	run_ability_gain_hooks(ch, NULL, AGH_MOVING);
 }
 
 

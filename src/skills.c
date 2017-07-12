@@ -250,10 +250,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_GIANT_TORTOISE);
 			break;
 		}
-		case ABIL_FLY: {
-			affect_from_char(ch, ATYPE_FLY, TRUE);
-			break;
-		}
 		case ABIL_FORESIGHT: {
 			affect_from_char_by_caster(ch, ATYPE_FORESIGHT, ch, TRUE);
 			break;

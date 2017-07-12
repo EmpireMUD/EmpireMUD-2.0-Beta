@@ -903,44 +903,6 @@ ACMD(do_familiar) {
 }
 
 
-ACMD(do_fly) {
-	struct affected_type *af;
-	int cost = 50;
-	int fly_durations[] = { 6 MUD_HOURS, 6 MUD_HOURS, 24 MUD_HOURS };
-	
-	// cancel out for free
-	if (affected_by_spell(ch, ATYPE_FLY)) {
-		msg_to_char(ch, "You stop flying and your wings fade away.\r\n");
-		act("$n lands and $s wings fade away.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_FLY, FALSE);
-		command_lag(ch, WAIT_OTHER);
-		return;
-	}
-	
-	if (!can_use_ability(ch, ABIL_FLY, MANA, cost, NOTHING)) {
-		return;
-	}
-	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "You can't fly while mounted.\r\n");
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_FLY)) {
-		return;
-	}
-	
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-	
-	af = create_flag_aff(ATYPE_FLY, CHOOSE_BY_ABILITY_LEVEL(fly_durations, ch, ABIL_FLY), AFF_FLY, ch);
-	affect_join(ch, af, 0);
-	
-	msg_to_char(ch, "You concentrate for a moment...\r\nSparkling blue wings made of pure mana erupt from your back!\r\n");
-	act("$n seems to concentrate for a moment...Sparkling blue wings made of pure mana erupt from $s back!", TRUE, ch, NULL, NULL, TO_ROOM);
-	
-	gain_ability_exp(ch, ABIL_FLY, 5);
-}
-
-
 ACMD(do_hasten) {
 	struct affected_type *af;
 	char_data *vict = ch;

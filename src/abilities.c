@@ -1391,6 +1391,8 @@ PREP_ABIL(prep_buff_ability) {
 		send_config_msg(ch, "ok_string");
 		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
 		data->stop = TRUE;
+		
+		command_lag(ch, ABIL_WAIT_TYPE(abil));
 		return;	// prevent charging for the ability or adding a cooldown by not setting success
 	}
 	
