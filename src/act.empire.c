@@ -1407,6 +1407,7 @@ bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bo
 void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
 	
+	char buf[MAX_STRING_LENGTH];
 	struct empire_city_data *city;
 	struct island_info *isle;
 	empire_data *emp;
@@ -1456,9 +1457,15 @@ void list_cities(char_data *ch, char *argument) {
 		rl = city->location;
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
 		isle = GET_ISLAND(rl);
+		++count;
 		
-		pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
-		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
+		if (is_own) {
+			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
+			msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
+		}
+		else {
+			msg_to_char(ch, "(%*d, %*d) %s, on %s (traits: %s)\r\n", X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), buf);
+		}
 	}
 	
 	if (!found) {
