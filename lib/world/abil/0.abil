@@ -4,9 +4,20 @@ Gift of Nature~
 S
 #1
 Fly~
-0 -1 1.00 0 0
+cd -1 1.00 0 am
+C
+fly 8 bg 2 50 0 -1 0 0 5
 D 1 40 0
+M
+0
+You concentrate for a moment and sparkling blue wings made of pure mana erupt from your back!~
+M
+1
+$n seems to concentrate for a moment and sparkling blue wings made of pure mana erupt from $s back!~
 T e 0
+T b 1
+X b
+3001 450 1800 m
 S
 #2
 Ancient Blood~

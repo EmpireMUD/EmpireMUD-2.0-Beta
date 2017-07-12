@@ -4,6 +4,8 @@ fly~
 0 0 0 0
 T0
 You land quickly as your magical flight wears off.~
+T1
+$n lands on the ground as $s magical flight wears off.~
 S
 #3002
 entrancement~
