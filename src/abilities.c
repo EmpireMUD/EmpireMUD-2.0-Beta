@@ -1064,6 +1064,7 @@ DO_ABIL(do_buff_ability) {
 	any_vnum affect_vnum;
 	double total_points, remaining_points, share, amt;
 	int dur, total_w;
+	bool messaged;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
@@ -1085,13 +1086,16 @@ DO_ABIL(do_buff_ability) {
 		dur = (int) ceil((double)dur / SECS_PER_REAL_UPDATE);	// convert units
 	}
 	
+	messaged = FALSE;	// to prevent duplicates
+	
 	// affect flags? cost == level 100 ability
 	if (ABIL_AFFECTS(abil)) {
 		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
 		remaining_points = MAX(0, remaining_points);
 		
 		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
-		affect_join(vict, af, 0);
+		affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
+		messaged = TRUE;
 	}
 	
 	// determine share for effects
@@ -1113,7 +1117,8 @@ DO_ABIL(do_buff_ability) {
 				remaining_points = MAX(0, total_points);
 				
 				af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
-				affect_join(vict, af, 0);
+				affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
+				messaged = TRUE;
 			}
 		}
 	}

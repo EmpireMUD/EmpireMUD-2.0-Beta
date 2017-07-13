@@ -339,14 +339,24 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 			}
 
 			affect_remove(ch, af_iter);
-			affect_to_char(ch, af);
+			if (IS_SET(flags, SILENT_AFF)) {
+				affect_to_char_silent(ch, af);
+			}
+			else {
+				affect_to_char(ch, af);
+			}
 			found = TRUE;
 			break;
 		}
 	}
 	
 	if (!found) {
-		affect_to_char(ch, af);
+		if (IS_SET(flags, SILENT_AFF)) {
+			affect_to_char_silent(ch, af);
+		}
+		else {
+			affect_to_char(ch, af);
+		}
 	}
 	
 	// affect_to_char seems to duplicate af so we must free it

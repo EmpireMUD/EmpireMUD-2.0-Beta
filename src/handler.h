@@ -18,6 +18,7 @@
 #define AVG_DURATION	BIT(1)
 #define ADD_MODIFIER	BIT(2)
 #define AVG_MODIFIER	BIT(3)
+#define SILENT_AFF		BIT(4)	// prevents messaging
 
 
 // for find_all_dots
