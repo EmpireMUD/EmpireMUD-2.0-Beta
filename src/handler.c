@@ -637,7 +637,7 @@ void affect_to_char(char_data *ch, struct affected_type *af) {
 		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
 	}
 	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen)) {
-		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_CHAR);
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 	
 	affect_to_char_silent(ch, af);

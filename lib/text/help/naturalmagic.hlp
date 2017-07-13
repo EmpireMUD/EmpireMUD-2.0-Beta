@@ -333,7 +333,8 @@ coating of earth, protecting them from some damage. It adds an amount of
 physical damage resistance equal to the caster's Natural Magic level divided by
 14, with a bonus based on Intelligence.
 
-Gains experience when you cast this spell.
+Gains experience when you cast this spell or when you take damage while using
+it.
 
 See also: RESIST-PHYSICAL
 #

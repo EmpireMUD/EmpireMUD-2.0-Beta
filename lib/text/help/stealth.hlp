@@ -501,12 +501,13 @@ Terrify (Stealth ability)
 Usage:  terrify [victim]
 Cooldown:  15 seconds
 Duration:  30 seconds
+Linked trait: Charisma
 Debuff type:  Stealth
-Cost:  15 move
+Cost:  12+ move, depending on level
 
 Use the power of the shadows to make your foes cower in fear, lowering the
-physical and magical damage they deal by an amount equal to your total level
-divided by 30. This ability has a chance of success based on your Stealth level.
+physical and magical damage they deal based on your level and stats. This
+ability has a chance of success based on your Stealth level.
 
 Gains experience when you try to terrify someone.
 #
