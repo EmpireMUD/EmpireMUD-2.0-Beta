@@ -41,6 +41,11 @@ extern int delete_all_instances(adv_data *adv);
 extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 void init_adventure(adv_data *adv);
 
+// locals
+const char *default_adv_name = "Unnamed Adventure Zone";
+const char *default_adv_author = "Unknown";
+int default_adv_reset = 30;
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -70,11 +75,11 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Bad vnum set");
 		problem = TRUE;
 	}
-	if (!str_cmp(GET_ADV_NAME(adv), "Unnamed Adventure Zone") || !*GET_ADV_NAME(adv)) {
+	if (!str_cmp(GET_ADV_NAME(adv), default_adv_name) || !*GET_ADV_NAME(adv)) {
 		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Name not set");
 		problem = TRUE;
 	}
-	if (!str_cmp(GET_ADV_AUTHOR(adv), "Unknown") || !*GET_ADV_AUTHOR(adv)) {
+	if (!str_cmp(GET_ADV_AUTHOR(adv), default_adv_author) || !*GET_ADV_AUTHOR(adv)) {
 		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Name not set");
 		problem = TRUE;
 	}
@@ -477,13 +482,13 @@ void save_olc_adventure(descriptor_data *desc) {
 		if (GET_ADV_NAME(adv)) {
 			free(GET_ADV_NAME(adv));
 		}
-		GET_ADV_NAME(adv) = str_dup("Unnamed Adventure Zone");
+		GET_ADV_NAME(adv) = str_dup(default_adv_name);
 	}
 	if (!GET_ADV_AUTHOR(adv) || !*GET_ADV_AUTHOR(adv)) {
 		if (GET_ADV_AUTHOR(adv)) {
 			free(GET_ADV_AUTHOR(adv));
 		}
-		GET_ADV_AUTHOR(adv) = str_dup("Unknown");
+		GET_ADV_AUTHOR(adv) = str_dup(default_adv_author);
 	}
 	if (GET_ADV_DESCRIPTION(adv) && !*GET_ADV_DESCRIPTION(adv)) {
 		if (GET_ADV_DESCRIPTION(adv)) {
@@ -552,8 +557,9 @@ adv_data *setup_olc_adventure(adv_data *input) {
 	}
 	else {
 		// brand new: some defaults
-		GET_ADV_NAME(new) = str_dup("Unnamed Adventure Zone");
-		GET_ADV_AUTHOR(new) = str_dup("Unknown");
+		GET_ADV_NAME(new) = str_dup(default_adv_name);
+		GET_ADV_AUTHOR(new) = str_dup(default_adv_author);
+		GET_ADV_RESET_TIME(new) = default_adv_reset;
 
 		// ensure
 		GET_ADV_FLAGS(new) |= ADV_IN_DEVELOPMENT;
@@ -598,7 +604,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 			case ADV_LINK_BUILDING_EXISTING:	// drop-thru
 			case ADV_LINK_BUILDING_NEW: {
 				bld = building_proto(rule->value);
-				sprintf(lbuf, "[&c%d&0] %s (%s)", rule->value, bld ? GET_BLD_NAME(bld) : "UNKNOWN", dirs[rule->dir]);
+				sprintf(lbuf, "[\tc%d\t0] %s (%s)", rule->value, bld ? GET_BLD_NAME(bld) : "UNKNOWN", dirs[rule->dir]);
 				
 				if (rule->type == ADV_LINK_BUILDING_NEW) {
 					sprintf(lbuf + strlen(lbuf), ", built on \"%s\"", bon);
@@ -613,11 +619,11 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 			case ADV_LINK_PORTAL_BUILDING_NEW: {
 				if (rule->type == ADV_LINK_PORTAL_WORLD) {
 					sect = sector_proto(rule->value);
-					sprintf(lbuf, "[&c%d&0] %s", rule->value, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+					sprintf(lbuf, "[\tc%d\t0] %s", rule->value, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
 				}
 				else if (rule->type == ADV_LINK_PORTAL_BUILDING_EXISTING || rule->type == ADV_LINK_PORTAL_BUILDING_NEW) {
 					bld = building_proto(rule->value);
-					sprintf(lbuf, "[&c%d&0] %s", rule->value, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+					sprintf(lbuf, "[\tc%d\t0] %s", rule->value, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 				}
 				else {
 					// should never hit this, but want to be thorough
@@ -626,8 +632,8 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 				}
 				
 				// portal objs
-				sprintf(lbuf + strlen(lbuf), ", in: [&c%d&0] %s", rule->portal_in, skip_filler(get_obj_name_by_proto(rule->portal_in)));
-				sprintf(lbuf + strlen(lbuf), ", out: [&c%d&0] %s", rule->portal_out, skip_filler(get_obj_name_by_proto(rule->portal_out)));
+				sprintf(lbuf + strlen(lbuf), ", in: [\tc%d\t0] %s", rule->portal_in, skip_filler(get_obj_name_by_proto(rule->portal_in)));
+				sprintf(lbuf + strlen(lbuf), ", out: [\tc%d\t0] %s", rule->portal_out, skip_filler(get_obj_name_by_proto(rule->portal_out)));
 
 				if (rule->type == ADV_LINK_PORTAL_BUILDING_NEW) {
 					sprintf(lbuf + strlen(lbuf), ", built on \"%s\", facing \"%s\"", bon, bfac);
@@ -649,7 +655,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 		}
 		
 		sprintbit(rule->flags, adventure_link_flags, flg, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s&g%s&0\r\n", ++count, adventure_link_types[rule->type], lbuf, (rule->flags ? ", " : ""), (rule->flags ? flg : ""));
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s&g%s\t0\r\n", ++count, adventure_link_types[rule->type], lbuf, (rule->flags ? ", " : ""), (rule->flags ? flg : ""));
 	}
 	
 	if (count == 0) {
@@ -677,21 +683,21 @@ void olc_show_adventure(char_data *ch) {
 	
 	*buf = '\0';
 
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !adventure_proto(GET_ADV_VNUM(adv)) ? "new adventure zone" : GET_ADV_NAME(adventure_proto(GET_ADV_VNUM(adv))));
-	sprintf(buf + strlen(buf), "<&ystartvnum&0> %d\r\n", GET_ADV_START_VNUM(adv));
-	sprintf(buf + strlen(buf), "<&yendvnum&0> %d\r\n", GET_ADV_END_VNUM(adv));
-	sprintf(buf + strlen(buf), "<&yname&0> %s\r\n", NULLSAFE(GET_ADV_NAME(adv)));
-	sprintf(buf + strlen(buf), "<&yauthor&0> %s\r\n", NULLSAFE(GET_ADV_AUTHOR(adv)));
-	sprintf(buf + strlen(buf), "<&ydescription&0>\r\n%s", NULLSAFE(GET_ADV_DESCRIPTION(adv)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !adventure_proto(GET_ADV_VNUM(adv)) ? "new adventure zone" : GET_ADV_NAME(adventure_proto(GET_ADV_VNUM(adv))));
+	sprintf(buf + strlen(buf), "<%sstartvnum\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_START_VNUM(adv), 0), GET_ADV_START_VNUM(adv));
+	sprintf(buf + strlen(buf), "<%sendvnum\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_END_VNUM(adv), 0), GET_ADV_END_VNUM(adv));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_ADV_NAME(adv), default_adv_name), NULLSAFE(GET_ADV_NAME(adv)));
+	sprintf(buf + strlen(buf), "<%sauthor\t0> %s\r\n", OLC_LABEL_STR(GET_ADV_AUTHOR(adv), default_adv_author), NULLSAFE(GET_ADV_AUTHOR(adv)));
+	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_ADV_DESCRIPTION(adv), ""), NULLSAFE(GET_ADV_DESCRIPTION(adv)));
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_ADV_MIN_LEVEL(adv));
-	sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_ADV_MAX_LEVEL(adv));
+	sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
+	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));
 	
-	sprintf(buf + strlen(buf), "<&ylimit&0> %d instance%s\r\n", GET_ADV_MAX_INSTANCES(adv), (GET_ADV_MAX_INSTANCES(adv) != 1 ? "s" : ""));
-	sprintf(buf + strlen(buf), "<&yplayerlimit&0> %d\r\n", GET_ADV_PLAYER_LIMIT(adv));
+	sprintf(buf + strlen(buf), "<%slimit\t0> %d instance%s\r\n", OLC_LABEL_VAL(GET_ADV_MAX_INSTANCES(adv), 1), GET_ADV_MAX_INSTANCES(adv), (GET_ADV_MAX_INSTANCES(adv) != 1 ? "s" : ""));
+	sprintf(buf + strlen(buf), "<%splayerlimit\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_PLAYER_LIMIT(adv), 0), GET_ADV_PLAYER_LIMIT(adv));
 	
 	// reset time display helper
 	if (GET_ADV_RESET_TIME(adv) > (60 * 24)) {
@@ -707,16 +713,16 @@ void olc_show_adventure(char_data *ch) {
 	else {
 		*lbuf = '\0';
 	}
-	sprintf(buf + strlen(buf), "<&yreset&0> %d minutes%s\r\n", GET_ADV_RESET_TIME(adv), lbuf);
+	sprintf(buf + strlen(buf), "<%sreset\t0> %d minutes%s\r\n", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
 
-	sprintf(buf + strlen(buf), "Linking rules: <&ylinking&0>\r\n");
+	sprintf(buf + strlen(buf), "Linking rules: <%slinking\t0>\r\n", OLC_LABEL_PTR(GET_ADV_LINKING(adv)));
 	if (GET_ADV_LINKING(adv)) {
 		get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
 		strcat(buf, lbuf);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Adventure Cleanup Scripts: <&yscript&0>\r\n");
+	sprintf(buf + strlen(buf), "Adventure Cleanup Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_ADV_SCRIPTS(adv)));
 	if (GET_ADV_SCRIPTS(adv)) {
 		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
 		strcat(buf, lbuf);

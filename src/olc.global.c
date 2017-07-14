@@ -41,6 +41,9 @@ extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
 void free_archetype_gear(struct archetype_gear *list);
 void sort_interactions(struct interaction_item **list);
 
+// locals
+const char *default_glb_name = "Unnamed Global";
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -287,7 +290,7 @@ void save_olc_global(descriptor_data *desc) {
 		if (GET_GLOBAL_NAME(glb)) {
 			free(GET_GLOBAL_NAME(glb));
 		}
-		GET_GLOBAL_NAME(glb) = str_dup("Unnamed Global");
+		GET_GLOBAL_NAME(glb) = str_dup(default_glb_name);
 	}
 
 	// save data back over the proto-type
@@ -328,7 +331,7 @@ struct global_data *setup_olc_global(struct global_data *input) {
 	}
 	else {
 		// brand new: some defaults
-		GET_GLOBAL_NAME(new) = str_dup("Unnamed Global");
+		GET_GLOBAL_NAME(new) = str_dup(default_glb_name);
 		GET_GLOBAL_FLAGS(new) = GLB_FLAG_IN_DEVELOPMENT;
 	}
 	
@@ -360,27 +363,27 @@ void olc_show_global(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !global_proto(GET_GLOBAL_VNUM(glb)) ? "new global" : GET_GLOBAL_NAME(global_proto(GET_GLOBAL_VNUM(glb))));
-	sprintf(buf + strlen(buf), "<&yname&0> %s\r\n", NULLSAFE(GET_GLOBAL_NAME(glb)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !global_proto(GET_GLOBAL_VNUM(glb)) ? "new global" : GET_GLOBAL_NAME(global_proto(GET_GLOBAL_VNUM(glb))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_GLOBAL_NAME(glb), default_glb_name), NULLSAFE(GET_GLOBAL_NAME(glb)));
 	
-	sprintf(buf + strlen(buf), "<&ytype&0> %s\r\n", global_types[GET_GLOBAL_TYPE(glb)]);
+	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE(glb), 0), global_types[GET_GLOBAL_TYPE(glb)]);
 
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_FLAGS(glb), NOBITS), lbuf);
 	
 	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {
-	if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {
-			sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+		if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {
+			sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 		}
 		else {
-			sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_GLOBAL_MIN_LEVEL(glb));
+			sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_GLOBAL_MIN_LEVEL(glb));
 		}
 	
 		if (GET_GLOBAL_MAX_LEVEL(glb) == 0) {
-			sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+			sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 		}
 		else {
-			sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
+			sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_GLOBAL_MAX_LEVEL(glb));
 		}
 	
 		// ability required
@@ -393,20 +396,20 @@ void olc_show_global(char_data *ch) {
 				sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 			}
 		}
-		sprintf(buf + strlen(buf), "<&yrequiresability&0> %s\r\n", buf1);
+		sprintf(buf + strlen(buf), "<%srequiresability\t0> %s\r\n", OLC_LABEL_PTR(abil), buf1);
 	}
 	
-	sprintf(buf + strlen(buf), "<&ypercent&0> %.2f%%\r\n", GET_GLOBAL_PERCENT(glb));
+	sprintf(buf + strlen(buf), "<%spercent\t0> %.2f%%\r\n", OLC_LABEL_VAL(GET_GLOBAL_PERCENT(glb), 100.0), GET_GLOBAL_PERCENT(glb));
 	
 	// GLOBAL_x: type-based data
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<&ymobflags&0> %s\r\n", lbuf);
+			sprintf(buf + strlen(buf), "<%smobflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<&ymobexclude&0> %s\r\n", lbuf);
+			sprintf(buf + strlen(buf), "<%smobexclude\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
 
-			sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+			sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
 			if (GET_GLOBAL_INTERACTIONS(glb)) {
 				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
 				strcat(buf, buf1);
@@ -415,12 +418,12 @@ void olc_show_global(char_data *ch) {
 		}
 		case GLOBAL_MINE_DATA: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<&ysectorflags&0> %s\r\n", lbuf);
+			sprintf(buf + strlen(buf), "<%ssectorflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<&ysectorexclude&0> %s\r\n", lbuf);
-			sprintf(buf + strlen(buf), "<&ycapacity&0> %d ore (%d-%d normal, %d-%d deep)\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5));
+			sprintf(buf + strlen(buf), "<%ssectorexclude\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
+			sprintf(buf + strlen(buf), "<%scapacity\t0> %d ore (%d-%d normal, %d-%d deep)\r\n", OLC_LABEL_VAL(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), 0), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5));
 	
-			sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+			sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
 			if (GET_GLOBAL_INTERACTIONS(glb)) {
 				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
 				strcat(buf, buf1);
@@ -430,7 +433,7 @@ void olc_show_global(char_data *ch) {
 		case GLOBAL_NEWBIE_GEAR: {			
 			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), lbuf);
-			sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n%s", GET_GLOBAL_GEAR(glb) ? lbuf : "");
+			sprintf(buf + strlen(buf), "Gear: <%sgear\t0>\r\n%s", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)), GET_GLOBAL_GEAR(glb) ? lbuf : "");
 			break;
 		}
 	}

@@ -44,6 +44,9 @@ extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 void init_room_template(room_template *rmt);
 void sort_interactions(struct interaction_item **list);
 
+// locals
+const char *default_rmt_title = "An Unnamed Room";
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -71,7 +74,7 @@ bool audit_room_template(room_template *rmt, char_data *ch) {
 		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Not part of any adventure");
 		problem = TRUE;
 	}
-	if (!strcmp(GET_RMT_TITLE(rmt), "An Unnamed Room")) {
+	if (!strcmp(GET_RMT_TITLE(rmt), default_rmt_title)) {
 		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title not set");
 		problem = TRUE;
 	}
@@ -682,7 +685,7 @@ room_template *setup_olc_room_template(room_template *input) {
 	}
 	else {
 		// brand new: some defaults
-		GET_RMT_TITLE(new) = str_dup("An Unnamed Room");
+		GET_RMT_TITLE(new) = str_dup(default_rmt_title);
 	}
 	
 	// done
@@ -829,49 +832,49 @@ void olc_show_room_template(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
-	sprintf(buf + strlen(buf), "Adventure: %d &c%s&0\r\n", adv ? GET_ADV_VNUM(adv) : NOTHING, adv ? GET_ADV_NAME(adv) : "none");
-	sprintf(buf + strlen(buf), "<&ytitle&0> %s\r\n", NULLSAFE(GET_RMT_TITLE(rmt)));
-	sprintf(buf + strlen(buf), "<&ydescription&0>\r\n%s", NULLSAFE(GET_RMT_DESC(rmt)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
+	sprintf(buf + strlen(buf), "Adventure: %d %s%s\t0\r\n", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
+	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
+	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
 	
 	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yfunctions&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_FUNCTIONS(rmt), NOBITS), lbuf);
 	
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yaffects&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_BASE_AFFECTS(rmt), NOBITS), lbuf);
 	
 	// exits
-	sprintf(buf + strlen(buf), "Exits: <&yexit&0>, <&ymatchexits&0>\r\n");
+	sprintf(buf + strlen(buf), "Exits: <%sexit\t0>, <%smatchexits\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
 	if (GET_RMT_EXITS(rmt)) {
 		get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
 		strcat(buf, lbuf);
 	}
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
 	if (GET_RMT_EX_DESCS(rmt)) {
 		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), buf1);
 		strcat(buf, buf1);
 	}
 	
-	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
 	if (GET_RMT_INTERACTIONS(rmt)) {
 		get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf1);
 		strcat(buf, buf1);
 	}
 	
 	// spawns
-	sprintf(buf + strlen(buf), "Spawns: <&yspawns&0>\r\n");
+	sprintf(buf + strlen(buf), "Spawns: <%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_RMT_SPAWNS(rmt)));
 	if (GET_RMT_SPAWNS(rmt)) {
 		get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
 		strcat(buf, lbuf);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_RMT_SCRIPTS(rmt)));
 	if (GET_RMT_SCRIPTS(rmt)) {
 		get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
 		strcat(buf, lbuf);
