@@ -1103,7 +1103,9 @@ DO_ABIL(do_buff_ability) {
 	// determine share for effects
 	total_w = 0;
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		total_w += ABSOLUTE(apply->weight);
+		if (!apply_never_scales[apply->location]) {
+			total_w += ABSOLUTE(apply->weight);
+		}
 	}
 	
 	// now create affects for each apply that we can afford

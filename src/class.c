@@ -44,6 +44,7 @@ void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bo
 int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
 // external consts
+extern const int base_player_pools[NUM_POOLS];
 extern const char *class_flags[];
 extern const char *class_role[];
 extern const char *class_role_color[];
@@ -680,8 +681,6 @@ void remove_class_from_table(class_data *cls) {
 * @param class_data *cls The class to initialize.
 */
 void clear_class(class_data *cls) {
-	extern const int base_player_pools[NUM_POOLS];
-	
 	memset((char *) cls, 0, sizeof(class_data));
 	int iter;
 	
@@ -1222,22 +1221,22 @@ void olc_show_class(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_class_by_vnum(CLASS_VNUM(cls)) ? "new class" : CLASS_NAME(find_class_by_vnum(CLASS_VNUM(cls))));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(CLASS_NAME(cls)));
-	sprintf(buf + strlen(buf), "<\tyabbrev\t0> %s\r\n", NULLSAFE(CLASS_ABBREV(cls)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_class_by_vnum(CLASS_VNUM(cls)) ? "new class" : CLASS_NAME(find_class_by_vnum(CLASS_VNUM(cls))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(CLASS_NAME(cls), default_class_name), NULLSAFE(CLASS_NAME(cls)));
+	sprintf(buf + strlen(buf), "<%sabbrev\t0> %s\r\n", OLC_LABEL_STR(CLASS_ABBREV(cls), default_class_abbrev), NULLSAFE(CLASS_ABBREV(cls)));
 	
 	sprintbit(CLASS_FLAGS(cls), class_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(CLASS_FLAGS(cls), NOBITS), lbuf);
 	
 	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, FALSE);
-	sprintf(buf + strlen(buf), "Skills required: <\tyrequires\t0>\r\n%s", CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
+	sprintf(buf + strlen(buf), "Skills required: <%srequires\t0>\r\n%s", OLC_LABEL_PTR(CLASS_SKILL_REQUIREMENTS(cls)), CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
 	
-	sprintf(buf + strlen(buf), "<\tymaxhealth\t0> %d\r\n", CLASS_POOL(cls, HEALTH));
-	sprintf(buf + strlen(buf), "<\tymaxmana\t0> %d\r\n", CLASS_POOL(cls, MANA));
-	sprintf(buf + strlen(buf), "<\tymaxmoves\t0> %d\r\n", CLASS_POOL(cls, MOVE));
+	sprintf(buf + strlen(buf), "<%smaxhealth\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, HEALTH), base_player_pools[HEALTH]), CLASS_POOL(cls, HEALTH));
+	sprintf(buf + strlen(buf), "<%smaxmana\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, MANA), base_player_pools[MANA]), CLASS_POOL(cls, MANA));
+	sprintf(buf + strlen(buf), "<%smaxmoves\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, MOVE), base_player_pools[MOVE]), CLASS_POOL(cls, MOVE));
 	
 	get_class_ability_display(CLASS_ABILITIES(cls), lbuf, NULL);
-	sprintf(buf + strlen(buf), "Class roles and abilities: <\tyrole\t0>\r\n%s%s", lbuf, *lbuf ? "\r\n" : "");
+	sprintf(buf + strlen(buf), "Class roles and abilities: <%srole\t0>\r\n%s%s", OLC_LABEL_PTR(CLASS_ABILITIES(cls)), lbuf, *lbuf ? "\r\n" : "");
 	
 	page_string(ch->desc, buf, TRUE);
 }

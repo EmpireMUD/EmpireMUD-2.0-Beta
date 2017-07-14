@@ -388,15 +388,15 @@ char *ability_color(char_data *ch, ability_data *abil) {
 	has_maxed = has_bought && (levels_gained_from_ability(ch, abil) >= GAINS_PER_ABILITY || (!ABIL_ASSIGNED_SKILL(abil) || IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) || !can_gain_skill_from(ch, abil)));
 	
 	if (has_bought && has_maxed) {
-		return "&g";
+		return "\tg";
 	}
 	if (has_bought) {
-		return "&y";
+		return "\ty";
 	}
 	if (can_buy) {
-		return "&c";
+		return "\tc";
 	}
-	return "&r";
+	return "\tr";
 }
 
 
@@ -858,21 +858,21 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 	if (any) {
 		// messaging
 		if (pos) {
-			msg_to_char(ch, "&yYou improve your %s skill to %d.&0\r\n", SKILL_NAME(skill), skdata->level);
+			msg_to_char(ch, "\tyYou improve your %s skill to %d.\t0\r\n", SKILL_NAME(skill), skdata->level);
 			
 			points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
 			if (points > 0) {
-				msg_to_char(ch, "&yYou have %d ability point%s to spend. Type 'skill %s' to see %s.&0\r\n", points, (points != 1 ? "s" : ""), SKILL_NAME(skill), (points != 1 ? "them" : "it"));
+				msg_to_char(ch, "\tyYou have %d ability point%s to spend. Type 'skill %s' to see %s.\t0\r\n", points, (points != 1 ? "s" : ""), SKILL_NAME(skill), (points != 1 ? "them" : "it"));
 			}
 			
 			// did we hit a cap? free reset!
 			if (IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill))) {
 				skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
-				msg_to_char(ch, "&yYou have earned a free skill reset in %s. Type 'skill reset %s' to use it.&0\r\n", SKILL_NAME(skill), SKILL_NAME(skill));
+				msg_to_char(ch, "\tyYou have earned a free skill reset in %s. Type 'skill reset %s' to use it.\t0\r\n", SKILL_NAME(skill), SKILL_NAME(skill));
 			}
 		}
 		else {
-			msg_to_char(ch, "&yYour %s skill drops to %d.&0\r\n", SKILL_NAME(skill), skdata->level);
+			msg_to_char(ch, "\tyYour %s skill drops to %d.\t0\r\n", SKILL_NAME(skill), skdata->level);
 		}
 		
 		// update class and progression
@@ -1149,11 +1149,11 @@ char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum pre
 		// get the proper color for this ability
 		strcpy(colorize, ability_color(ch, abil));
 		
-		sprintf(out + strlen(out), "%s(%s) %s%s&0 [%d-%d]", lbuf, (has_ability(ch, ABIL_VNUM(abil)) ? "x" : " "), colorize, ABIL_NAME(abil), skab->level, max_skill);
+		sprintf(out + strlen(out), "%s(%s) %s%s\t0 [%d-%d]", lbuf, (has_ability(ch, ABIL_VNUM(abil)) ? "x" : " "), colorize, ABIL_NAME(abil), skab->level, max_skill);
 		
 		if (has_ability(ch, ABIL_VNUM(abil))) {
 			// this is kind of a hack to quickly make sure you can still use the ability
-			if (levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY && !strcmp(colorize, "&y")) {
+			if (levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY && !strcmp(colorize, "\ty")) {
 				sprintf(out + strlen(out), " %d/%d skill points gained", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
 			}
 			else {
@@ -1257,7 +1257,7 @@ char *get_skill_row_display(char_data *ch, skill_data *skill) {
 		*exp = '\0';
 	}
 	
-	sprintf(out, "[%3d] %s%s&0%s (%s%s) - %s\r\n", (skdata ? skdata->level : 0), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "&g" : "&y", SKILL_NAME(skill), (points > 0 ? "*" : ""), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "&ymax&0" : ((skdata && skdata->noskill) ? "\trnoskill\t0" : "\tcgaining\t0"), exp, SKILL_DESC(skill));
+	sprintf(out, "[%3d] %s%s\t0%s (%s%s) - %s\r\n", (skdata ? skdata->level : 0), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tg" : "\ty", SKILL_NAME(skill), (points > 0 ? "*" : ""), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tymax\t0" : ((skdata && skdata->noskill) ? "\trnoskill\t0" : "\tcgaining\t0"), exp, SKILL_DESC(skill));
 	return out;
 }
 
@@ -1536,11 +1536,11 @@ ACMD(do_noskill) {
 	else {
 		if (skdata->noskill) {
 			skdata->noskill = FALSE;
-			msg_to_char(ch, "You will now &cbe able to gain&0 %s skill.\r\n", SKILL_NAME(skill));
+			msg_to_char(ch, "You will now \tcbe able to gain\t0 %s skill.\r\n", SKILL_NAME(skill));
 		}
 		else {
 			skdata->noskill = TRUE;
-			msg_to_char(ch, "You will &rno longer&0 gain %s skill.\r\n", SKILL_NAME(skill));
+			msg_to_char(ch, "You will \trno longer\t0 gain %s skill.\r\n", SKILL_NAME(skill));
 		}
 	}
 }
@@ -3389,19 +3389,19 @@ void olc_show_skill(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_skill_by_vnum(SKILL_VNUM(skill)) ? "new skill" : get_skill_name_by_vnum(SKILL_VNUM(skill)));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(SKILL_NAME(skill)));
-	sprintf(buf + strlen(buf), "<\tyabbrev\t0> %s\r\n", NULLSAFE(SKILL_ABBREV(skill)));
-	sprintf(buf + strlen(buf), "<\tydescription\t0> %s\r\n", NULLSAFE(SKILL_DESC(skill)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_skill_by_vnum(SKILL_VNUM(skill)) ? "new skill" : get_skill_name_by_vnum(SKILL_VNUM(skill)));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(SKILL_NAME(skill), default_skill_name), NULLSAFE(SKILL_NAME(skill)));
+	sprintf(buf + strlen(buf), "<%sabbrev\t0> %s\r\n", OLC_LABEL_STR(SKILL_ABBREV(skill), default_skill_abbrev), NULLSAFE(SKILL_ABBREV(skill)));
+	sprintf(buf + strlen(buf), "<%sdescription\t0> %s\r\n", OLC_LABEL_STR(SKILL_DESC(skill), default_skill_desc), NULLSAFE(SKILL_DESC(skill)));
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SKILL_FLAGS(skill), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", SKILL_MAX_LEVEL(skill));
-	sprintf(buf + strlen(buf), "<\tymindrop\t0> %d\r\n", SKILL_MIN_DROP_LEVEL(skill));
+	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MAX_LEVEL(skill), CLASS_SKILL_CAP), SKILL_MAX_LEVEL(skill));
+	sprintf(buf + strlen(buf), "<%smindrop\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MIN_DROP_LEVEL(skill), 0), SKILL_MIN_DROP_LEVEL(skill));
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
-	sprintf(buf + strlen(buf), "<\tytree\t0> %d %s\r\n", total, total == 1 ? "ability" : "abilities");
+	sprintf(buf + strlen(buf), "<%stree\t0> %d %s\r\n", OLC_LABEL_PTR(SKILL_ABILITIES(skill)), total, total == 1 ? "ability" : "abilities");
 	get_skill_ability_display(SKILL_ABILITIES(skill), lbuf, sizeof(lbuf));
 	if (*lbuf) {
 		sprintf(buf + strlen(buf), "%s", lbuf);
