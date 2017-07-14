@@ -41,6 +41,12 @@ extern const char *name_sets[];
 // external funcs
 extern char **get_weapon_types_string();
 
+// locals
+const char *default_mob_keywords = "mobile new";
+const char *default_mob_short = "a new mobile";
+const char *default_mob_long = "A new mobile is standing here.\r\n";
+
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -59,7 +65,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 
-	if (!str_cmp(GET_PC_NAME(mob), "mobile new")) {
+	if (!str_cmp(GET_PC_NAME(mob), default_mob_keywords)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Keywords not set");
 		problem = TRUE;
 	}
@@ -73,7 +79,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		}
 	} while (*ptr);
 	
-	if (!str_cmp(GET_SHORT_DESC(mob), "a new mobile")) {
+	if (!str_cmp(GET_SHORT_DESC(mob), default_mob_short)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc not set");
 		problem = TRUE;
 	}
@@ -100,7 +106,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		}
 	} while (*ptr);
 	
-	if (!str_cmp(GET_LONG_DESC(mob), "A new mobile is standing here.\r\n")) {
+	if (!str_cmp(GET_LONG_DESC(mob), default_mob_long)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not set");
 		problem = TRUE;
 	}
@@ -850,9 +856,9 @@ char_data *setup_olc_mobile(char_data *input) {
 	}
 	else {
 		// brand new
-		GET_PC_NAME(new) = str_dup("mobile new");
-		GET_SHORT_DESC(new) = str_dup("a new mobile");
-		GET_LONG_DESC(new) = str_dup("A new mobile is standing here.\r\n");
+		GET_PC_NAME(new) = str_dup(default_mob_keywords);
+		GET_SHORT_DESC(new) = str_dup(default_mob_short);
+		GET_LONG_DESC(new) = str_dup(default_mob_long);
 		MOB_FLAGS(new) = MOB_ISNPC;
 		MOB_ATTACK_TYPE(new) = TYPE_HIT;
 
@@ -887,52 +893,52 @@ void olc_show_mobile(char_data *ch) {
 	}
 	
 	*buf = '\0';
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !mob_proto(GET_OLC_VNUM(ch->desc)) ? "new mobile" : GET_SHORT_DESC(mob_proto(GET_OLC_VNUM(ch->desc))));
-	sprintf(buf + strlen(buf), "<&ykeywords&0> %s\r\n", GET_PC_NAME(mob));
-	sprintf(buf + strlen(buf), "<&yshortdescription&0> %s\r\n", GET_SHORT_DESC(mob));
-	sprintf(buf + strlen(buf), "<&ylongdescription&0> %s", GET_LONG_DESC(mob));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !mob_proto(GET_OLC_VNUM(ch->desc)) ? "new mobile" : GET_SHORT_DESC(mob_proto(GET_OLC_VNUM(ch->desc))));
+	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_PC_NAME(mob), default_mob_keywords), GET_PC_NAME(mob));
+	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_SHORT_DESC(mob), default_mob_short), GET_SHORT_DESC(mob));
+	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_LONG_DESC(mob), default_mob_long), GET_LONG_DESC(mob));
 	
-	sprintf(buf + strlen(buf), "<&ysex&0> %s\r\n", genders[GET_SEX(mob)]);
+	sprintf(buf + strlen(buf), "<%ssex\t0> %s\r\n", OLC_LABEL_VAL(GET_SEX(mob), 0), genders[GET_SEX(mob)]);
 	
 	sprintbit(MOB_FLAGS(mob), action_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MOB_FLAGS(mob), NOBITS), buf1);
 	
 	sprintbit(AFF_FLAGS(mob), affected_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<&yaffects&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(AFF_FLAGS(mob), NOBITS), buf1);
 
 	if (GET_MIN_SCALE_LEVEL(mob) > 0) {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_MIN_SCALE_LEVEL(mob));
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_MIN_SCALE_LEVEL(mob), 0), GET_MIN_SCALE_LEVEL(mob));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
 	if (GET_MAX_SCALE_LEVEL(mob) > 0) {	
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_MAX_SCALE_LEVEL(mob));
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_MAX_SCALE_LEVEL(mob), 0), GET_MAX_SCALE_LEVEL(mob));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<&yattack&0> %s\r\n", attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
-	sprintf(buf + strlen(buf), "<&ymovetype&0> %s\r\n", mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
-	sprintf(buf + strlen(buf), "<&ynameset&0> %s\r\n", name_sets[MOB_NAME_SET(mob)]);
-	sprintf(buf + strlen(buf), "<&yallegiance&0> %s\r\n", MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
+	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
+	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
+	sprintf(buf + strlen(buf), "<%snameset\t0> %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)]);
+	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
-	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(mob->interactions));
 	if (mob->interactions) {
 		get_interaction_display(mob->interactions, buf1);
 		strcat(buf, buf1);
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(MOB_CUSTOM_MSGS(mob)));
 	count = 0;
 	LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
-		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
+		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
 	}
 	
-	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(mob->proto_script));
 	if (mob->proto_script) {
 		get_script_display(mob->proto_script, buf1);
 		strcat(buf, buf1);

@@ -2524,93 +2524,87 @@ void olc_show_ability(char_data *ch) {
 		return;
 	}
 	
-	#define OLC_PROMPT_CHANGED  (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "c*" : "c")
-	#define OLC_PROMPT_UNCHANGED  "y"
-	#define OLC_STR_PROMPT(cur, dflt)  ((cur && strcmp(cur, dflt)) ? OLC_PROMPT_CHANGED : OLC_PROMPT_UNCHANGED)
-	#define OLC_PTR_PROMPT(ptr)  (ptr ? OLC_PROMPT_CHANGED : OLC_PROMPT_UNCHANGED)
-	#define OLC_VAL_PROMPT(val, dflt)  (val != dflt ? OLC_PROMPT_CHANGED : OLC_PROMPT_UNCHANGED)
-	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
-	sprintf(buf + strlen(buf), "<\t%sname\t0> %s\r\n", OLC_STR_PROMPT(ABIL_NAME(abil), default_ability_name), NULLSAFE(ABIL_NAME(abil)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ABIL_NAME(abil), default_ability_name), NULLSAFE(ABIL_NAME(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf);
-	sprintf(buf + strlen(buf), "<\t%stypes\t0> %s\r\n", OLC_PTR_PROMPT(ABIL_TYPE_LIST(abil)), lbuf);
+	sprintf(buf + strlen(buf), "<%stypes\t0> %s\r\n", OLC_LABEL_PTR(ABIL_TYPE_LIST(abil)), lbuf);
 	
-	sprintf(buf + strlen(buf), "<\t%smasteryability\t0> %d %s\r\n", OLC_VAL_PROMPT(ABIL_MASTERY_ABIL(abil), NOTHING), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
-	sprintf(buf + strlen(buf), "<\t%sscale\t0> %d%%\r\n", OLC_VAL_PROMPT(ABIL_SCALE(abil), 1.0), (int)(ABIL_SCALE(abil) * 100));
+	sprintf(buf + strlen(buf), "<%smasteryability\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_MASTERY_ABIL(abil), NOTHING), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	sprintf(buf + strlen(buf), "<%sscale\t0> %d%%\r\n", OLC_LABEL_VAL(ABIL_SCALE(abil), 1.0), (int)(ABIL_SCALE(abil) * 100));
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\t%sflags\t0> %s\r\n", OLC_VAL_PROMPT(ABIL_FLAGS(abil), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(ABIL_FLAGS(abil), NOBITS), lbuf);
 	
 	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\t%simmunities\t0> %s\r\n", OLC_VAL_PROMPT(ABIL_IMMUNITIES(abil), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%simmunities\t0> %s\r\n", OLC_LABEL_VAL(ABIL_IMMUNITIES(abil), NOBITS), lbuf);
 	
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\t%sgainhooks\t0> %s\r\n", OLC_VAL_PROMPT(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sgainhooks\t0> %s\r\n", OLC_LABEL_VAL(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
 	
 	// command-related portion
 	if (!ABIL_COMMAND(abil)) {
-		sprintf(buf + strlen(buf), "<\tycommand\t0> (not a command)\r\n");
+		sprintf(buf + strlen(buf), "<%scommand\t0> (not a command)\r\n", OLC_LABEL_UNCHANGED);
 	}
 	else {
-		sprintf(buf + strlen(buf), "<\tccommand\t0> %s, <\t%sminposition\t0> %s (minimum)\r\n", ABIL_COMMAND(abil), OLC_VAL_PROMPT(ABIL_MIN_POS(abil), POS_DEAD), position_types[ABIL_MIN_POS(abil)]);
+		sprintf(buf + strlen(buf), "<%scommand\t0> %s, <%sminposition\t0> %s (minimum)\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil), OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_DEAD), position_types[ABIL_MIN_POS(abil)]);
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<\t%stargets\t0> %s\r\n", OLC_VAL_PROMPT(ABIL_TARGETS(abil), NOBITS), lbuf);
-		sprintf(buf + strlen(buf), "<\t%scost\t0> %d, <\t%scostperscalepoint\t0> %d, <\t%scosttype\t0> %s\r\n", OLC_VAL_PROMPT(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_VAL_PROMPT(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_VAL_PROMPT(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
-		sprintf(buf + strlen(buf), "<\t%scooldown\t0> [%d] %s, <\t%scdtime\t0> %d second%s\r\n", OLC_VAL_PROMPT(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_VAL_PROMPT(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-		sprintf(buf + strlen(buf), "<\t%swaittype\t0> %s, <\t%slinkedtrait\t0> %s\r\n", OLC_VAL_PROMPT(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)], OLC_VAL_PROMPT(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
+		sprintf(buf + strlen(buf), "<%stargets\t0> %s\r\n", OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
+		sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
+		sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		sprintf(buf + strlen(buf), "<%swaittype\t0> %s, <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
 		
 		// type-specific data
 		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
 			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-				sprintf(buf + strlen(buf), "<\tcshortduration\t0> unlimited, ");
+				sprintf(buf + strlen(buf), "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
 			}
 			else {
-				sprintf(buf + strlen(buf), "<\t%sshortduration\t0> %d second%s, ", OLC_VAL_PROMPT(ABIL_SHORT_DURATION(abil), 0), ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
+				sprintf(buf + strlen(buf), "<%sshortduration\t0> %d second%s, ", OLC_LABEL_VAL(ABIL_SHORT_DURATION(abil), 0), ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
 			}
 			
 			if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-				sprintf(buf + strlen(buf), "<\tclongduration\t0> unlimited\r\n");
+				sprintf(buf + strlen(buf), "<%slongduration\t0> unlimited\r\n", OLC_LABEL_CHANGED);
 			}
 			else {
-				sprintf(buf + strlen(buf), "<\t%slongduration\t0> %d second%s\r\n", OLC_VAL_PROMPT(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
+				sprintf(buf + strlen(buf), "<%slongduration\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
 			}
 		}	// end buff/dot
 		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<\t%saffects\t0> %s\r\n", OLC_VAL_PROMPT(ABIL_AFFECTS(abil), NOBITS), lbuf);
+			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
 			
-			sprintf(buf + strlen(buf), "Applies: <\t%sapply\t0>\r\n", OLC_PTR_PROMPT(ABIL_APPLIES(abil)));
+			sprintf(buf + strlen(buf), "Applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(ABIL_APPLIES(abil)));
 			count = 0;
 			LL_FOREACH(ABIL_APPLIES(abil), apply) {
 				sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
 			}
 		}	// end buff
 		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
-			sprintf(buf + strlen(buf), "<\t%saffectvnum\t0> %d %s\r\n", OLC_VAL_PROMPT(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+			sprintf(buf + strlen(buf), "<%saffectvnum\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 		}	// end buff/dot
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
-			sprintf(buf + strlen(buf), "<\t%sattacktype\t0> %d\r\n", OLC_VAL_PROMPT(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil));
+			sprintf(buf + strlen(buf), "<%sattacktype\t0> %d\r\n", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil));
 		}	// end damage
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
-			sprintf(buf + strlen(buf), "<\t%sdamagetype\t0> %s\r\n", OLC_VAL_PROMPT(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
+			sprintf(buf + strlen(buf), "<%sdamagetype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
 		}	// end damage/dot
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
-			sprintf(buf + strlen(buf), "<\t%smaxstacks\t0> %d\r\n", OLC_VAL_PROMPT(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+			sprintf(buf + strlen(buf), "<%smaxstacks\t0> %d\r\n", OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
 		}	// end dot
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <\t%scustom\t0>\r\n", OLC_PTR_PROMPT(ABIL_CUSTOM_MSGS(abil)));
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(ABIL_CUSTOM_MSGS(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
 		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, ability_custom_types[custm->type], custm->msg);
 	}
 	
 	// data
-	sprintf(buf + strlen(buf), "Extra data: <\t%sdata\t0>\r\n", OLC_PTR_PROMPT(ABIL_DATA(abil)));
+	sprintf(buf + strlen(buf), "Extra data: <%sdata\t0>\r\n", OLC_LABEL_PTR(ABIL_DATA(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		sprintf(buf + strlen(buf), " \ty%d\t0. %s\r\n", ++count, ability_data_display(adl));

@@ -96,6 +96,14 @@
 #define TRIG_ARG_OBJ_WHERE  BIT(4)
 
 
+// these cause the color change on olc labels
+#define OLC_LABEL_CHANGED  (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\tc*" : "\tc")
+#define OLC_LABEL_UNCHANGED  "\ty"
+#define OLC_LABEL_STR(cur, dflt)  ((cur && strcmp(cur, dflt)) ? OLC_LABEL_CHANGED : OLC_LABEL_UNCHANGED)
+#define OLC_LABEL_PTR(ptr)  (ptr ? OLC_LABEL_CHANGED : OLC_LABEL_UNCHANGED)
+#define OLC_LABEL_VAL(val, dflt)  (val != dflt ? OLC_LABEL_CHANGED : OLC_LABEL_UNCHANGED)
+
+
 // subcommands for olc
 struct olc_command_data {
 	char *command;
