@@ -1059,6 +1059,8 @@ void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 * DO_ABIL provides: ch, abil, level, vict, data
 */
 DO_ABIL(do_buff_ability) {
+	extern const bool apply_never_scales[];
+	
 	struct affected_type *af;
 	struct apply_data *apply;
 	any_vnum affect_vnum;
@@ -1107,6 +1109,13 @@ DO_ABIL(do_buff_ability) {
 	// now create affects for each apply that we can afford
 	if (total_w > 0) {
 		LL_FOREACH(ABIL_APPLIES(abil), apply) {
+			if (apply_never_scales[apply->location]) {
+				af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
+				affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
+				messaged = TRUE;
+				continue;
+			}
+
 			share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
 			if (share > remaining_points) {
 				share = MIN(share, remaining_points);
