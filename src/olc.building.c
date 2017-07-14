@@ -43,6 +43,11 @@ void init_building(bld_data *building);
 void replace_question_color(char *input, char *color, char *output);
 void sort_interactions(struct interaction_item **list);
 
+// locals
+const char *default_building_name = "Unnamed Building";
+const char *default_building_title = "An Unnamed Building";
+const char *default_building_icon = "&0[  ]";
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -63,15 +68,15 @@ bool audit_building(bld_data *bld, char_data *ch) {
 	bool problem = FALSE;
 	trig_data *trig;
 	
-	if (!str_cmp(GET_BLD_NAME(bld), "Unnamed Building")) {
+	if (!str_cmp(GET_BLD_NAME(bld), default_building_name)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Name not set");
 		problem = TRUE;
 	}
-	if (!str_cmp(GET_BLD_TITLE(bld), "An Unnamed Building")) {
+	if (!str_cmp(GET_BLD_TITLE(bld), default_building_title)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Title not set");
 		problem = TRUE;
 	}
-	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && !str_cmp(GET_BLD_ICON(bld), "&0[  ]")) {
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && !str_cmp(GET_BLD_ICON(bld), default_building_icon)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Icon not set");
 		problem = TRUE;
 	}
@@ -617,13 +622,13 @@ void save_olc_building(descriptor_data *desc) {
 		if (GET_BLD_NAME(bdg)) {
 			free(GET_BLD_NAME(bdg));
 		}
-		GET_BLD_NAME(bdg) = str_dup("unnamed building");
+		GET_BLD_NAME(bdg) = str_dup(default_building_name);
 	}
 	if (!GET_BLD_TITLE(bdg) || !*GET_BLD_TITLE(bdg)) {
 		if (GET_BLD_TITLE(bdg)) {
 			free(GET_BLD_TITLE(bdg));
 		}
-		GET_BLD_TITLE(bdg) = str_dup("An Unnamed Building");
+		GET_BLD_TITLE(bdg) = str_dup(default_building_title);
 	}
 	if (GET_BLD_COMMANDS(bdg) && !*GET_BLD_COMMANDS(bdg)) {
 		if (GET_BLD_COMMANDS(bdg)) {
@@ -698,9 +703,9 @@ bld_data *setup_olc_building(bld_data *input) {
 	}
 	else {
 		// brand new: some defaults
-		GET_BLD_NAME(new) = str_dup("Unnamed Building");
-		GET_BLD_TITLE(new) = str_dup("An Unnamed Building");
-		GET_BLD_ICON(new) = str_dup("&0[  ]");
+		GET_BLD_NAME(new) = str_dup(default_building_name);
+		GET_BLD_TITLE(new) = str_dup(default_building_title);
+		GET_BLD_ICON(new) = str_dup(default_building_icon);
 		GET_BLD_MAX_DAMAGE(new) = 1;
 	}
 	
@@ -736,75 +741,75 @@ void olc_show_building(char_data *ch) {
 	}
 	
 	*buf = '\0';
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !building_proto(GET_BLD_VNUM(bdg)) ? "new building" : GET_BLD_NAME(building_proto(GET_BLD_VNUM(bdg))));
-	sprintf(buf + strlen(buf), "<&yname&0> %s\r\n", GET_BLD_NAME(bdg));
-	sprintf(buf + strlen(buf), "<&ytitle&0> %s\r\n", GET_BLD_TITLE(bdg));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !building_proto(GET_BLD_VNUM(bdg)) ? "new building" : GET_BLD_NAME(building_proto(GET_BLD_VNUM(bdg))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_NAME(bdg), default_building_name), GET_BLD_NAME(bdg));
+	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_TITLE(bdg), default_building_title), GET_BLD_TITLE(bdg));
 	
 	if (!is_room) {
-		replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "&0", lbuf);
-		sprintf(buf + strlen(buf), "<&yicon&0> %s&0  %s\r\n", lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+		replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "\t0", lbuf);
+		sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  %s\r\n", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
 	}
-	sprintf(buf + strlen(buf), "<&ycommands&0> %s\r\n", GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
-	sprintf(buf + strlen(buf), "<&ydescription&0>\r\n%s", GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
+	sprintf(buf + strlen(buf), "<%scommands\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_COMMANDS(bdg), ""), GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
+	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_BLD_DESC(bdg), ""), GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
 
 	if (!is_room) {
-		sprintf(buf + strlen(buf), "<&yhitpoints&0> %d\r\n", GET_BLD_MAX_DAMAGE(bdg));
-		sprintf(buf + strlen(buf), "<&yfame&0> %d\r\n", GET_BLD_FAME(bdg));
-		sprintf(buf + strlen(buf), "<&yrooms&0> %d\r\n", GET_BLD_EXTRA_ROOMS(bdg));
+		sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MAX_DAMAGE(bdg), 1), GET_BLD_MAX_DAMAGE(bdg));
+		sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_FAME(bdg), 0), GET_BLD_FAME(bdg));
+		sprintf(buf + strlen(buf), "<%srooms\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_EXTRA_ROOMS(bdg), 0), GET_BLD_EXTRA_ROOMS(bdg));
 	}
 	
-	sprintf(buf + strlen(buf), "<&ycitizens&0> %d\r\n", GET_BLD_CITIZENS(bdg));
+	sprintf(buf + strlen(buf), "<%scitizens\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_CITIZENS(bdg), 0), GET_BLD_CITIZENS(bdg));
 	
 	if (!is_room) {
-		sprintf(buf + strlen(buf), "<&ymilitary&0> %d\r\n", GET_BLD_MILITARY(bdg));
+		sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
 	}
 	
-	sprintf(buf + strlen(buf), "<&yartisan&0> [%d] %s\r\n", GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg)));
+	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg)));
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_FLAGS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yfunctions&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_FUNCTIONS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&ydesignate&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_DESIGNATE_FLAGS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yaffects&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_BASE_AFFECTS(bdg), NOBITS), lbuf);
 	
 	if (!is_room) {
-		sprintf(buf + strlen(buf), "<&yupgradesto&0> [%d] %s\r\n", GET_BLD_UPGRADES_TO(bdg), GET_BLD_UPGRADES_TO(bdg) == NOTHING ? "none" : GET_BLD_NAME(building_proto(GET_BLD_UPGRADES_TO(bdg))));
+		sprintf(buf + strlen(buf), "<%supgradesto\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_UPGRADES_TO(bdg), NOTHING), GET_BLD_UPGRADES_TO(bdg), GET_BLD_UPGRADES_TO(bdg) == NOTHING ? "none" : GET_BLD_NAME(building_proto(GET_BLD_UPGRADES_TO(bdg))));
 	}
 
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_BLD_EX_DESCS(bdg)));
 	if (GET_BLD_EX_DESCS(bdg)) {
 		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), buf1);
 		strcat(buf, buf1);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_BLD_INTERACTIONS(bdg)));
 	if (GET_BLD_INTERACTIONS(bdg)) {
 		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf1);
 		strcat(buf, buf1);
 	}
 	
 	// maintenance resources
-	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <\tyresource\t0>\r\n");
+	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_YEARLY_MAINTENANCE(bdg)));
 	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
 		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf1);
 		strcat(buf, buf1);
 	}
 
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_BLD_SCRIPTS(bdg)));
 	if (GET_BLD_SCRIPTS(bdg)) {
 		get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
 		strcat(buf, lbuf);
 	}
 	
-	sprintf(buf + strlen(buf), "<&yspawns&0>\r\n");
+	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_BLD_SPAWNS(bdg)));
 	if (GET_BLD_SPAWNS(bdg)) {
 		count = 0;
 		for (spawn = GET_BLD_SPAWNS(bdg); spawn; spawn = spawn->next) {
