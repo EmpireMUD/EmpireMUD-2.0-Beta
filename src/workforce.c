@@ -1504,6 +1504,7 @@ INTERACTION_FUNC(one_farming_chore) {
 
 
 void do_chore_farming(empire_data *emp, room_data *room) {
+	void schedule_crop_growth(struct map_data *map);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FARMING].mob);
@@ -1538,6 +1539,9 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 				
 						// we are keeping the original sect the same as it was; set the time to half the normal time
 						set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + config_get_int("planting_base_timer") / 2);
+						if (GET_MAP_LOC(room)) {
+							schedule_crop_growth(GET_MAP_LOC(room));
+						}
 					}
 					else {
 						// do we have a stored original sect?
