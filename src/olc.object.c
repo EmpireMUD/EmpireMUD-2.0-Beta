@@ -1920,7 +1920,7 @@ void olc_show_object(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%stype\t0> %s, <%smaterial\t0> %s, <%stimer\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TYPE(obj), 0), item_types[(int) GET_OBJ_TYPE(obj)], OLC_LABEL_VAL(GET_OBJ_MATERIAL(obj), 0), materials[GET_OBJ_MATERIAL(obj)].name, OLC_LABEL_VAL(GET_OBJ_TIMER(obj), 0), buf1);
 	
 	sprintbit(GET_OBJ_WEAR(obj), wear_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%swear\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_WEAR(obj), NOBITS), buf1);
+	sprintf(buf + strlen(buf), "<%swear\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE), buf1);
 	
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_EXTRA(obj), NOBITS), buf1);
