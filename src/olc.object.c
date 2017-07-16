@@ -1974,7 +1974,7 @@ void olc_show_object(char_data *ch) {
 	
 	// applies / affected[]
 	count = 0;
-	sprintf(buf + strlen(buf), "Attribute Applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_APPLIES(obj)));
+	sprintf(buf + strlen(buf), "Attribute Applies: <%sapply\t0>%s\r\n", OLC_LABEL_PTR(GET_OBJ_APPLIES(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 		sprintf(buf + strlen(buf), " \ty%2d\t0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
 	}

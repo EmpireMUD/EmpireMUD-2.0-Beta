@@ -1221,16 +1221,16 @@ void olc_show_generic(char_data *ch) {
 			break;
 		}
 		case GENERIC_COOLDOWN: {
-			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GET_COOLDOWN_WEAR_OFF(gen), ""), GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GET_COOLDOWN_WEAR_OFF(gen), ""));
+			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""), GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""));
 			break;
 		}
 		case GENERIC_AFFECT: {
-			sprintf(buf + strlen(buf), "<%sapply2char\t0> %s\r\n", OLC_LABEL_STR(GET_AFFECT_APPLY_TO_CHAR(gen), ""), GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sapply2room\t0> %s\r\n", OLC_LABEL_STR(GET_AFFECT_APPLY_TO_ROOM(gen), ""), GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), ""), GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), ""));
-			sprintf(buf + strlen(buf), "<%swearoff2room\t0> %s\r\n", OLC_LABEL_STR(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sapply2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_CHAR), ""), GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sapply2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_ROOM), ""), GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""), GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""));
+			sprintf(buf + strlen(buf), "<%swearoff2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_ROOM), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
