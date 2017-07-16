@@ -1007,29 +1007,29 @@ void olc_show_morph(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !morph_proto(MORPH_VNUM(morph)) ? "new morph" : MORPH_SHORT_DESC(morph_proto(MORPH_VNUM(morph))));
-	sprintf(buf + strlen(buf), "<\tykeywords\t0> %s\r\n", NULLSAFE(MORPH_KEYWORDS(morph)));
-	sprintf(buf + strlen(buf), "<\tyshortdescription\t0> %s\r\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
-	sprintf(buf + strlen(buf), "<\tylongdescription\t0> %s\r\n", NULLSAFE(MORPH_LONG_DESC(morph)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !morph_proto(MORPH_VNUM(morph)) ? "new morph" : MORPH_SHORT_DESC(morph_proto(MORPH_VNUM(morph))));
+	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(MORPH_KEYWORDS(morph), default_morph_keywords), NULLSAFE(MORPH_KEYWORDS(morph)));
+	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(MORPH_SHORT_DESC(morph), default_morph_short_desc), NULLSAFE(MORPH_SHORT_DESC(morph)));
+	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s\r\n", OLC_LABEL_STR(MORPH_LONG_DESC(morph), default_morph_long_desc), NULLSAFE(MORPH_LONG_DESC(morph)));
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MORPH_FLAGS(morph), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tyattack\t0> %s\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
-	sprintf(buf + strlen(buf), "<\tymovetype\t0> %s\r\n", mob_move_types[MORPH_MOVE_TYPE(morph)]);
+	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MORPH_ATTACK_TYPE(morph), 0), attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
+	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MORPH_MOVE_TYPE(morph), 0), mob_move_types[MORPH_MOVE_TYPE(morph)]);
 
 	sprintbit(MORPH_AFFECTS(morph), affected_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyaffects\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(MORPH_AFFECTS(morph), NOBITS), lbuf);
 	
 	if (MORPH_MAX_SCALE(morph) > 0) {
-		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", MORPH_MAX_SCALE(morph));
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, MORPH_MAX_SCALE(morph));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> none\r\n");
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<\tycost\t0> %d\r\n", MORPH_COST(morph));
-	sprintf(buf + strlen(buf), "<\tycosttype\t0> %s\r\n", pool_types[MORPH_COST_TYPE(morph)]);
+	sprintf(buf + strlen(buf), "<%scost\t0> %d\r\n", OLC_LABEL_VAL(MORPH_COST(morph), 0), MORPH_COST(morph));
+	sprintf(buf + strlen(buf), "<%scosttype\t0> %s\r\n", OLC_LABEL_VAL(MORPH_COST_TYPE(morph), 0), pool_types[MORPH_COST_TYPE(morph)]);
 	
 	// ability required
 	if (MORPH_ABILITY(morph) == NO_ABIL || !(abil = find_ability_by_vnum(MORPH_ABILITY(morph)))) {
@@ -1041,12 +1041,12 @@ void olc_show_morph(char_data *ch) {
 			sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 	}
-	sprintf(buf + strlen(buf), "<\tyrequiresability\t0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%srequiresability\t0> %s\r\n", OLC_LABEL_VAL(MORPH_ABILITY(morph), NO_ABIL), buf1);
 
-	sprintf(buf + strlen(buf), "<\tyrequiresobject\t0> %d - %s\r\n", MORPH_REQUIRES_OBJ(morph), MORPH_REQUIRES_OBJ(morph) == NOTHING ? "none" : get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph)));
+	sprintf(buf + strlen(buf), "<%srequiresobject\t0> %d - %s\r\n", OLC_LABEL_VAL(MORPH_REQUIRES_OBJ(morph), NOTHING), MORPH_REQUIRES_OBJ(morph), MORPH_REQUIRES_OBJ(morph) == NOTHING ? "none" : get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph)));
 	
 	// applies
-	sprintf(buf + strlen(buf), "Applies: <\tyapply\t0>\r\n");
+	sprintf(buf + strlen(buf), "Applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(MORPH_APPLIES(morph)));
 	for (app = MORPH_APPLIES(morph), num = 1; app; app = app->next, ++num) {
 		sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", num, app->weight, apply_types[app->location]);
 	}
