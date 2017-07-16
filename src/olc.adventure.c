@@ -691,7 +691,7 @@ void olc_show_adventure(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_ADV_DESCRIPTION(adv), ""), NULLSAFE(GET_ADV_DESCRIPTION(adv)));
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
 	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));

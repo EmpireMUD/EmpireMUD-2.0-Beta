@@ -369,7 +369,7 @@ void olc_show_global(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE(glb), 0), global_types[GET_GLOBAL_TYPE(glb)]);
 
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_FLAGS(glb), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT), lbuf);
 	
 	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {
 		if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {

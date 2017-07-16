@@ -3744,7 +3744,7 @@ void olc_show_quest(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(QUEST_COMPLETE_MSG(quest), default_quest_complete_msg), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
 	
 	sprintbit(QUEST_FLAGS(quest), quest_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(QUEST_FLAGS(quest), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT), lbuf);
 	
 	if (QUEST_MIN_LEVEL(quest) > 0) {
 		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, QUEST_MIN_LEVEL(quest));

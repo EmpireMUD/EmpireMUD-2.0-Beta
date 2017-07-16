@@ -3395,7 +3395,7 @@ void olc_show_skill(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sdescription\t0> %s\r\n", OLC_LABEL_STR(SKILL_DESC(skill), default_skill_desc), NULLSAFE(SKILL_DESC(skill)));
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SKILL_FLAGS(skill), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MAX_LEVEL(skill), CLASS_SKILL_CAP), SKILL_MAX_LEVEL(skill));
 	sprintf(buf + strlen(buf), "<%smindrop\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MIN_DROP_LEVEL(skill), 0), SKILL_MIN_DROP_LEVEL(skill));

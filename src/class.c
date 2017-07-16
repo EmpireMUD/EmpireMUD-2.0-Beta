@@ -1226,7 +1226,7 @@ void olc_show_class(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sabbrev\t0> %s\r\n", OLC_LABEL_STR(CLASS_ABBREV(cls), default_class_abbrev), NULLSAFE(CLASS_ABBREV(cls)));
 	
 	sprintbit(CLASS_FLAGS(cls), class_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(CLASS_FLAGS(cls), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT), lbuf);
 	
 	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, FALSE);
 	sprintf(buf + strlen(buf), "Skills required: <%srequires\t0>\r\n%s", OLC_LABEL_PTR(CLASS_SKILL_REQUIREMENTS(cls)), CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");

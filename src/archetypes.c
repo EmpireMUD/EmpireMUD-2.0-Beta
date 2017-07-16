@@ -1610,7 +1610,7 @@ void olc_show_archetype(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%slore\t0> %s [on Month Day, Year.]\r\n", OLC_LABEL_STR(GET_ARCH_LORE(arch), ""), (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ARCH_FLAGS(arch), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%smalerank\t0> %s\r\n", OLC_LABEL_STR(GET_ARCH_MALE_RANK(arch), default_archetype_rank), NULLSAFE(GET_ARCH_MALE_RANK(arch)));
 	sprintf(buf + strlen(buf), "<%sfemalerank\t0> %s\r\n", OLC_LABEL_STR(GET_ARCH_FEMALE_RANK(arch), default_archetype_rank), NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));

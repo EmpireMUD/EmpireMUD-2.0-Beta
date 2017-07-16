@@ -1103,7 +1103,7 @@ void olc_show_shop(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(SHOP_NAME(shop), default_shop_name), NULLSAFE(SHOP_NAME(shop)));
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SHOP_FLAGS(shop), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%sopens\t0> %d%s%s\r\n", OLC_LABEL_VAL(SHOP_OPEN_TIME(shop), 0), TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) ? " (always open)" : "");
 	sprintf(buf + strlen(buf), "<%scloses\t0> %d%s\r\n", OLC_LABEL_VAL(SHOP_CLOSE_TIME(shop), 0), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));

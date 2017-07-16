@@ -761,7 +761,7 @@ void olc_show_augment(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_TYPE(aug), 0), augment_types[GET_AUG_TYPE(aug)]);
 
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_FLAGS(aug), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT), lbuf);
 	
 	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%swear\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_WEAR_FLAGS(aug), NOBITS), lbuf);

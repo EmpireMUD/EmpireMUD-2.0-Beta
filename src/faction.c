@@ -1278,7 +1278,7 @@ void olc_show_faction(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(FCT_DESCRIPTION(fct), ""), NULLSAFE(FCT_DESCRIPTION(fct)));
 	
 	sprintbit(FCT_FLAGS(fct), faction_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(FCT_FLAGS(fct), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%sminreputation\t0> %s\r\n", OLC_LABEL_VAL(FCT_MIN_REP(fct), default_min_rep), get_reputation_name(FCT_MIN_REP(fct)));
 	sprintf(buf + strlen(buf), "<%smaxreputation\t0> %s\r\n", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));

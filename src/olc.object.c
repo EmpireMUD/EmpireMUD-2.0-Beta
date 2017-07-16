@@ -1764,7 +1764,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 	
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_COINS: {
-			sprintf(storage + strlen(storage), "<%scoinamount\t0> %d\r\n", OLC_LABEL_VAL(GET_COINS_AMOUNT(obj), 0), GET_COINS_AMOUNT(obj));
+			sprintf(storage + strlen(storage), "<%scoinamount\t0> %d%s\r\n", OLC_LABEL_VAL(GET_COINS_AMOUNT(obj), 0), GET_COINS_AMOUNT(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 			// empire number is not supported -- it will always use OTHER_COIN
 			break;
 		}
@@ -1779,7 +1779,12 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_WEAPON: {
 			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_WEAPON_TYPE(obj), 0), attack_hit_info[GET_WEAPON_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<%sdamage\t0> %d (speed %.2f, %s+%.2f base dps)\r\n", OLC_LABEL_VAL(GET_WEAPON_DAMAGE_BONUS(obj), 0), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_WEAPON_DAMAGE_BONUS(obj), 0), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj));
+			}
+			else {	// not scalable
+				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (speed %.2f, %s+%.2f base dps)\r\n", OLC_LABEL_VAL(GET_WEAPON_DAMAGE_BONUS(obj), 0), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			}
 			break;
 		}
 		case ITEM_CONTAINER: {
@@ -1790,7 +1795,12 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_DRINKCON: {
-			sprintf(storage + strlen(storage), "<%scapacity\t0> %d drink%s\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_CAPACITY(obj), 0), GET_DRINK_CONTAINER_CAPACITY(obj), PLURAL(GET_DRINK_CONTAINER_CAPACITY(obj)));
+			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+				sprintf(storage + strlen(storage), "<%scapacity\t0> %d (scalable)\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_CAPACITY(obj), 0), GET_DRINK_CONTAINER_CAPACITY(obj));
+			}
+			else {
+				sprintf(storage + strlen(storage), "<%scapacity\t0> %d drink%s\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_CAPACITY(obj), 0), GET_DRINK_CONTAINER_CAPACITY(obj), PLURAL(GET_DRINK_CONTAINER_CAPACITY(obj)));
+			}
 			sprintf(storage + strlen(storage), "<%scontents\t0> %d drink%s\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_CONTENTS(obj), 0), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
 			sprintf(storage + strlen(storage), "<%sliquid\t0> %d %s\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_TYPE(obj), 0), GET_DRINK_CONTAINER_TYPE(obj), get_generic_name_by_vnum(GET_DRINK_CONTAINER_TYPE(obj)));
 			break;
@@ -1805,24 +1815,29 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_MISSILE_WEAPON: {
 			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_TYPE(obj), 0), attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<%sdamage\t0> %d (speed %.2f, %s+%.2f base dps)\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_DAMAGE(obj), 0), GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_DAMAGE(obj), 0), GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj));
+			}
+			else {
+				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (speed %.2f, %s+%.2f base dps)\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_DAMAGE(obj), 0), GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			}
 			sprintf(storage + strlen(storage), "<%sammotype\t0> %c\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_AMMO_TYPE(obj), 0), 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(obj));
 			break;
 		}
 		case ITEM_AMMO: {
 			sprintf(storage + strlen(storage), "<%squantity\t0> %d\r\n", OLC_LABEL_VAL(GET_AMMO_QUANTITY(obj), 0), GET_AMMO_QUANTITY(obj));
-			sprintf(storage + strlen(storage), "<%sdamage\t0> %+d\r\n", OLC_LABEL_VAL(GET_AMMO_DAMAGE_BONUS(obj), 0), GET_AMMO_DAMAGE_BONUS(obj));
+			sprintf(storage + strlen(storage), "<%sdamage\t0> %+d%s\r\n", OLC_LABEL_VAL(GET_AMMO_DAMAGE_BONUS(obj), 0), GET_AMMO_DAMAGE_BONUS(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 			sprintf(storage + strlen(storage), "<%sammotype\t0> %c\r\n", OLC_LABEL_VAL(GET_AMMO_TYPE(obj), 0), 'A' + GET_AMMO_TYPE(obj));
 			sprintf(storage + strlen(storage), "NOTE: Positive applies become negative debuffs (see HELP AMMO ITEM)\r\n");
 			break;
 		}
 		case ITEM_PACK: {
-			sprintf(storage + strlen(storage), "<%scapacity\t0> %d object%s\r\n", OLC_LABEL_VAL(GET_PACK_CAPACITY(obj), 0), GET_PACK_CAPACITY(obj), PLURAL(GET_PACK_CAPACITY(obj)));
+			sprintf(storage + strlen(storage), "<%scapacity\t0> %d object%s%s\r\n", OLC_LABEL_VAL(GET_PACK_CAPACITY(obj), 0), GET_PACK_CAPACITY(obj), PLURAL(GET_PACK_CAPACITY(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 			break;
 		}
 		case ITEM_POTION: {
 			sprintf(storage + strlen(storage), "<%spotion\t0> %s\r\n", OLC_LABEL_VAL(GET_POTION_TYPE(obj), 0), potion_data[GET_POTION_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<%spotionscale\t0> %d\r\n", OLC_LABEL_VAL(GET_POTION_SCALE(obj), 0), GET_POTION_SCALE(obj));
+			sprintf(storage + strlen(storage), "<%spotionscale\t0> %d%s\r\n", OLC_LABEL_VAL(GET_POTION_SCALE(obj), 0), GET_POTION_SCALE(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 			break;
 		}
 		case ITEM_POISON: {

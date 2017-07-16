@@ -718,7 +718,7 @@ void olc_show_social(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%scommand\t0> %s\r\n", OLC_LABEL_STR(SOC_COMMAND(soc), default_social_command), NULLSAFE(SOC_COMMAND(soc)));
 	
 	sprintbit(SOC_FLAGS(soc), social_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SOC_FLAGS(soc), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%scharposition\t0> %s (minimum)\r\n", OLC_LABEL_VAL(SOC_MIN_CHAR_POS(soc), 0), position_types[SOC_MIN_CHAR_POS(soc)]);
 	sprintf(buf + strlen(buf), "<%stargetposition\t0> %s (minimum)\r\n", OLC_LABEL_VAL(SOC_MIN_VICT_POS(soc), 0), position_types[SOC_MIN_VICT_POS(soc)]);

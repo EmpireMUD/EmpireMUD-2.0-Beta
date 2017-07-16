@@ -1013,7 +1013,7 @@ void olc_show_morph(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s\r\n", OLC_LABEL_STR(MORPH_LONG_DESC(morph), default_morph_long_desc), NULLSAFE(MORPH_LONG_DESC(morph)));
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MORPH_FLAGS(morph), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MORPH_ATTACK_TYPE(morph), 0), attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MORPH_MOVE_TYPE(morph), 0), mob_move_types[MORPH_MOVE_TYPE(morph)]);

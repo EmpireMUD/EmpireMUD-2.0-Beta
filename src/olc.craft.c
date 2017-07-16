@@ -487,7 +487,7 @@ void olc_show_craft(char_data *ch) {
 	}
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_FLAGS(craft), NOBITS), buf1);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT), buf1);
 	
 	sprintf(buf + strlen(buf), "<%srequiresobject\t0> %d - %s\r\n", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_OBJ(craft), NOTHING), GET_CRAFT_REQUIRES_OBJ(craft), GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING ? "none" : get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 
