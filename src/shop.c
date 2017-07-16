@@ -1099,21 +1099,21 @@ void olc_show_shop(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !real_shop(SHOP_VNUM(shop)) ? "new shop" : SHOP_NAME(real_shop(SHOP_VNUM(shop))));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(SHOP_NAME(shop)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_shop(SHOP_VNUM(shop)) ? "new shop" : SHOP_NAME(real_shop(SHOP_VNUM(shop))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(SHOP_NAME(shop), default_shop_name), NULLSAFE(SHOP_NAME(shop)));
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SHOP_FLAGS(shop), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tyopens\t0> %d%s%s\r\n", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) ? " (always open)" : "");
-	sprintf(buf + strlen(buf), "<\tycloses\t0> %d%s\r\n", TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
-	sprintf(buf + strlen(buf), "<\tyallegiance\t0> %s\r\n", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	sprintf(buf + strlen(buf), "<%sopens\t0> %d%s%s\r\n", OLC_LABEL_VAL(SHOP_OPEN_TIME(shop), 0), TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) ? " (always open)" : "");
+	sprintf(buf + strlen(buf), "<%scloses\t0> %d%s\r\n", OLC_LABEL_VAL(SHOP_CLOSE_TIME(shop), 0), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(SHOP_ALLEGIANCE(shop)), SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	get_quest_giver_display(SHOP_LOCATIONS(shop), lbuf);
-	sprintf(buf + strlen(buf), "Locations: <\tylocation\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Locations: <%slocation\t0>\r\n%s", OLC_LABEL_PTR(SHOP_LOCATIONS(shop)), lbuf);
 	
 	get_shop_items_display(shop, lbuf);
-	sprintf(buf + strlen(buf), "Items: <\tyitem\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Items: <%sitem\t0>\r\n%s", OLC_LABEL_PTR(SHOP_ITEMS(shop)), lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
 }

@@ -42,6 +42,10 @@ const char *bookedit_license_display =
 "  of displaying this text in the EmpireMUD game.\r\n"
 "- EmpireMUD will never use this text for any other purpose.\r\n";
 
+const char *default_book_title = "Untitled";
+const char *default_book_item = "a book";
+const char *default_book_desc = "It appears to be a book.\r\n";
+
 
 // local protos
 void remove_book_from_table(book_data *book);
@@ -310,16 +314,16 @@ void save_olc_book(descriptor_data *desc) {
 	
 	// basic sanitation:
 	if (!book->title) {
-		book->title = str_dup("Untitled");
+		book->title = str_dup(default_book_title);
 	}
 	if (!book->byline) {
 		book->byline = str_dup("Unknown");
 	}
 	if (!book->item_name) {
-		book->item_name = str_dup("a book");
+		book->item_name = str_dup(default_book_item);
 	}
 	if (!book->item_description) {
-		book->item_description = str_dup("It appears to be a book.\r\n");
+		book->item_description = str_dup(default_book_desc);
 	}
 	for (para = book->paragraphs; para; para = para->next) {
 		if (!para->text) {
@@ -399,10 +403,10 @@ book_data *setup_olc_book(book_data *input) {
 	else {
 		// new!
 		new->vnum = NOTHING;
-		new->title = str_dup("Untitled");
+		new->title = str_dup(default_book_title);
 		new->byline = NULL;	// will set this soon
-		new->item_name = str_dup("a book");
-		new->item_description = str_dup("It appears to be a book.\r\n");
+		new->item_name = str_dup(default_book_item);
+		new->item_description = str_dup(default_book_desc);
 	}
 		
 	// done
@@ -446,28 +450,28 @@ void olc_show_book(char_data *ch) {
 	*buf = '\0';
 
 	if (imm) {
-		sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !book_proto(book->vnum) ? "new book" : book_proto(book->vnum)->title);
+		sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !book_proto(book->vnum) ? "new book" : book_proto(book->vnum)->title);
 	}
 	else {
 		sprintf(buf + strlen(buf), "\tcEmpireMUD Book Editor: %s\t0\r\n", !book_proto(book->vnum) ? "new book" : book_proto(book->vnum)->title);
 	}
 	
-	sprintf(buf + strlen(buf), "<\tytitle\t0> %s\r\n", NULLSAFE(book->title));
-	sprintf(buf + strlen(buf), "<\tybyline\t0> %s\r\n", NULLSAFE(book->byline));
-	sprintf(buf + strlen(buf), "<\tyitem\t0> %s\r\n", NULLSAFE(book->item_name));
-	sprintf(buf + strlen(buf), "<\tydescription\t0>\r\n%s", NULLSAFE(book->item_description));
+	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(book->title, default_book_title), NULLSAFE(book->title));
+	sprintf(buf + strlen(buf), "<%sbyline\t0> %s\r\n", OLC_LABEL_STR(book->byline, ""), NULLSAFE(book->byline));
+	sprintf(buf + strlen(buf), "<%sitem\t0> %s\r\n", OLC_LABEL_STR(book->item_name, default_book_item), NULLSAFE(book->item_name));
+	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(book->item_description, default_book_desc), NULLSAFE(book->item_description));
 	
 	count = 0;
 	for (para = book->paragraphs; para; para = para->next) {
 		++count;
 	}
-	sprintf(buf + strlen(buf), "<\typaragraphs\t0> %d (list, edit, new, delete)\r\n", count);
+	sprintf(buf + strlen(buf), "<%sparagraphs\t0> %d (list, edit, new, delete)\r\n", OLC_LABEL_PTR(book->paragraphs), count);
 	
 	if (imm) {
-		sprintf(buf + strlen(buf), "<\tyauthor\t0> %s\r\n", (book->author != 0 && (index = find_player_index_by_idnum(book->author))) ? index->fullname : "nobody");
+		sprintf(buf + strlen(buf), "<%sauthor\t0> %s\r\n", OLC_LABEL_VAL(book->author, 0), (book->author != 0 && (index = find_player_index_by_idnum(book->author))) ? index->fullname : "nobody");
 	}
 	else {
-		sprintf(buf + strlen(buf), "<\tylicense\t0>, <\tysave\t0>, <\tyabort\t0>\r\n");
+		sprintf(buf + strlen(buf), "<%slicense\t0>, <%ssave\t0>, <%sabort\t0>\r\n", OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED);
 	}
 	
 	page_string(ch->desc, buf, TRUE);
