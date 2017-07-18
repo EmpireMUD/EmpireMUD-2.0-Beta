@@ -148,7 +148,6 @@ ACMD(do_draw);
 ACMD(do_drink);
 ACMD(do_drop);
 
-ACMD(do_eartharmor);
 ACMD(do_earthmeld);
 ACMD(do_eat);
 ACMD(do_echo);
@@ -405,7 +404,6 @@ ACMD(do_tan);
 ACMD(do_tavern);
 ACMD(do_tedit);
 ACMD(do_tell);
-ACMD(do_terrify);
 ACMD(do_territory);
 ACMD(do_throw);
 ACMD(do_tie);
@@ -670,7 +668,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "drive", POS_SITTING, do_drive, NO_MIN, NO_GRANTS, SCMD_DRIVE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 
 	SCMD_CMD( "eat", POS_RESTING, do_eat, NO_MIN, CTYPE_UTIL, SCMD_EAT ),
-	ABILITY_CMD( "eartharmor", POS_RESTING, do_eartharmor, NO_MIN, CTYPE_SKILL, ABIL_EARTHARMOR ),
 	ABILITY_CMD( "earthmeld", POS_STUNNED, do_earthmeld, NO_MIN, CTYPE_MOVE, ABIL_EARTHMELD ),
 	STANDARD_CMD( "echo", POS_SLEEPING, do_echo, LVL_CIMPL, GRANT_ECHO, SCMD_ECHO, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	GRANT_CMD( "editnotes", POS_STANDING, do_editnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
@@ -987,7 +984,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "tedit", POS_DEAD, do_tedit, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TEDIT ),
 	SCMD_CMD( "teleport", POS_STANDING, do_goto, LVL_GOD, CTYPE_IMMORTAL, SCMD_TELEPORT ),
 	SCMD_CMD( "tellhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_TELLS ),
-	ABILITY_CMD( "terrify", POS_FIGHTING, do_terrify, NO_MIN, CTYPE_COMBAT, ABIL_TERRIFY ),
 	SIMPLE_CMD( "territory", POS_DEAD, do_territory, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "thornlash", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_THORNLASH, CTYPE_COMBAT, NOBITS, ABIL_THORNLASH ),
 	STANDARD_CMD( "throw", POS_FIGHTING, do_throw, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
