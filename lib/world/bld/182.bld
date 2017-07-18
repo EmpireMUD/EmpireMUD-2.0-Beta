@@ -15,12 +15,16 @@ The Adventurer's Guildhall~
 &t[&j@@&t]~
 96 10 jR 0
 0 0 0 18216
+C
+nearby~
 D
    The great room of the guildhall is spacious, but it has been filled with
 chairs and desks, for its far-flung members to use when they're passing through
 the city. The mahogany walls are windowless, but light is provided by glowing
 chandeliers. For so much clutter, the guildhall is surprisingly well-kept.
 ~
+F
+H
 R
 1008 1 5 0
 R
@@ -38,6 +42,8 @@ D
 unobstructed view of the city. Tables are strewn with strange trinkets and
 unusual potions, along with handwritten notes and scribbled drawings.
 ~
+F
+H
 S
 #18218
 Guildhall Basement~
@@ -50,6 +56,8 @@ D
 and supported by huge wooden pillars. The entire basement is filled with
 bookshelves, packed with copies of the guild's arcane knowledge.
 ~
+F
+H
 S
 #18219
 Guildhall Office~
@@ -62,6 +70,8 @@ D
 rest of the guildhall, it is free of clutter. Only a desk and two chairs fill
 the room, and all decoration is restricted to the walls.
 ~
+F
+H
 S
 #18220
 Guildhall Vault~
@@ -74,6 +84,8 @@ D
 new, but the shelves are already lined with fascinating and exotic items. A
 small safe is tucked in the corner, and securely locked.
 ~
+F
+H
 S
 #18221
 Strange Egg~

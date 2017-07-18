@@ -1407,16 +1407,24 @@ bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bo
 void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
 	
+	char buf[MAX_STRING_LENGTH];
 	struct empire_city_data *city;
 	struct island_info *isle;
 	empire_data *emp;
 	int points, used, count;
-	bool pending, found = FALSE;
+	bool is_own, pending, found = FALSE;
 	room_data *rl;
+	
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	
 	any_one_word(argument, arg);
 	
-	if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
+	if (*arg) {
+		if (!has_player_tech(ch, PTECH_NAVIGATION) && !imm_access) {
+			msg_to_char(ch, "You can't list cities for other empires without Navigation.\r\n");
+			return;
+		}
+		
 		emp = get_empire_by_name(arg);
 		if (!emp) {
 			msg_to_char(ch, "Unknown empire.\r\n");
@@ -1427,27 +1435,44 @@ void list_cities(char_data *ch, char *argument) {
 		msg_to_char(ch, "You're not in an empire.\r\n");
 		return;
 	}
-
-	used = count_city_points_used(emp);
-	points = city_points_available(emp);
-	msg_to_char(ch, "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+	
+	is_own = (imm_access || emp == GET_LOYALTY(ch));
+	
+	if (is_own) {
+		used = count_city_points_used(emp);
+		points = city_points_available(emp);
+		msg_to_char(ch, "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+	}
+	else {
+		msg_to_char(ch, "Known cities for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	}
 	
 	count = 0;
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+		if (!city_type[city->type].show_to_others && !is_own) {
+			continue;	// we don't show types this low
+		}
+		
 		found = TRUE;
 		rl = city->location;
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
 		isle = GET_ISLAND(rl);
+		++count;
 		
-		pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
-		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
+		if (is_own) {
+			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
+			msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
+		}
+		else {
+			msg_to_char(ch, "(%*d, %*d) %s, on %s (traits: %s)\r\n", X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), buf);
+		}
 	}
 	
 	if (!found) {
 		msg_to_char(ch, "  none\r\n");
 	}
 	
-	if (points > 0) {
+	if (points > 0 && is_own) {
 		msg_to_char(ch, "* The empire has %d city point%s available.\r\n", points, (points != 1 ? "s" : ""));
 	}
 }

@@ -495,6 +495,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
 #define AGH_ONLY_VS_ANIMAL  BIT(10)	// only if the target was an animal
 #define AGH_VAMPIRE_FEEDING  BIT(11)	// gains when feeding
+#define AGH_MOVING  BIT(12)	// gain when moving
 
 
 // RUN_ABIL_x: modes for activating abilities
@@ -740,6 +741,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_WAREHOUSE  BIT(30)	// can use the warehouse command and store unique items
 #define FNC_DRINK_WATER  BIT(31)	// can drink here
 #define FNC_COOKING_FIRE  BIT(32)	// can cook here
+#define FNC_LARGER_NEARBY  BIT(33)	// extends the radius of 'nearby'
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3821,6 +3823,7 @@ struct city_metadata_type {
 	char *icon;
 	int radius;
 	int max_population;
+	bool show_to_others;
 };
 
 

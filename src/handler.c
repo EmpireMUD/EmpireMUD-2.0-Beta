@@ -339,14 +339,24 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 			}
 
 			affect_remove(ch, af_iter);
-			affect_to_char(ch, af);
+			if (IS_SET(flags, SILENT_AFF)) {
+				affect_to_char_silent(ch, af);
+			}
+			else {
+				affect_to_char(ch, af);
+			}
 			found = TRUE;
 			break;
 		}
 	}
 	
 	if (!found) {
-		affect_to_char(ch, af);
+		if (IS_SET(flags, SILENT_AFF)) {
+			affect_to_char_silent(ch, af);
+		}
+		else {
+			affect_to_char(ch, af);
+		}
 	}
 	
 	// affect_to_char seems to duplicate af so we must free it
@@ -637,7 +647,7 @@ void affect_to_char(char_data *ch, struct affected_type *af) {
 		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
 	}
 	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen)) {
-		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_CHAR);
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 	
 	affect_to_char_silent(ch, af);
@@ -2927,15 +2937,23 @@ struct empire_city_data *find_closest_city(empire_data *emp, room_data *loc) {
 * Finds an empire by name/number. This prefers exact matches and also checks
 * the empire's adjective name.
 *
-* @param char *name The user input (name/number of empire)
+* @param char *raw_name The user input (name/number of empire)
 * @return empire_data *The empire, or NULL if none found.
 */
-empire_data *get_empire_by_name(char *name) {
+empire_data *get_empire_by_name(char *raw_name) {
 	empire_data *pos, *next_pos, *full_exact, *full_abbrev, *adj_exact, *adj_abbrev;
+	char name[MAX_INPUT_LENGTH];
 	int num;
 	
 	// we'll take any of these if we don't find a perfect match
 	full_exact = full_abbrev = adj_exact = adj_abbrev = NULL;
+	
+	if (*raw_name == '"') {	// strip quotes if any
+		any_one_word(raw_name, name);
+	}
+	else {
+		strcpy(name, raw_name);
+	}
 
 	if (is_number(name))
 		num = atoi(name);

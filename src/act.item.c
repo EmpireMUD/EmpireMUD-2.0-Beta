@@ -783,6 +783,16 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		where = wear_data[where].cascade_pos;
 	}
 	
+	// check 2h
+	if (where == WEAR_WIELD && OBJ_FLAGGED(obj, OBJ_TWO_HANDED) && GET_EQ(ch, WEAR_HOLD)) {
+		msg_to_char(ch, "You can't wield a two-handed weapon while you're holding something in your off-hand.\r\n");
+		return;
+	}
+	if (where == WEAR_HOLD && GET_EQ(ch, WEAR_WIELD) && OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TWO_HANDED)) {
+		msg_to_char(ch, "You can't hold an item while wielding a two-handed weapon.\r\n");
+		return;
+	}
+	
 	if (where == WEAR_SADDLE && !IS_RIDING(ch)) {
 		msg_to_char(ch, "You can't wear a saddle while you're not riding anything.\r\n");
 		return;

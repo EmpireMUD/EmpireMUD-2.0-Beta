@@ -713,22 +713,22 @@ void olc_show_social(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !social_proto(SOC_VNUM(soc)) ? "new social" : SOC_NAME(social_proto(SOC_VNUM(soc))));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(SOC_NAME(soc)));
-	sprintf(buf + strlen(buf), "<\tycommand\t0> %s\r\n", NULLSAFE(SOC_COMMAND(soc)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !social_proto(SOC_VNUM(soc)) ? "new social" : SOC_NAME(social_proto(SOC_VNUM(soc))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(SOC_NAME(soc), default_social_name), NULLSAFE(SOC_NAME(soc)));
+	sprintf(buf + strlen(buf), "<%scommand\t0> %s\r\n", OLC_LABEL_STR(SOC_COMMAND(soc), default_social_command), NULLSAFE(SOC_COMMAND(soc)));
 	
 	sprintbit(SOC_FLAGS(soc), social_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tycharposition\t0> %s (minimum)\r\n", position_types[SOC_MIN_CHAR_POS(soc)]);
-	sprintf(buf + strlen(buf), "<\tytargetposition\t0> %s (minimum)\r\n", position_types[SOC_MIN_VICT_POS(soc)]);
+	sprintf(buf + strlen(buf), "<%scharposition\t0> %s (minimum)\r\n", OLC_LABEL_VAL(SOC_MIN_CHAR_POS(soc), 0), position_types[SOC_MIN_CHAR_POS(soc)]);
+	sprintf(buf + strlen(buf), "<%stargetposition\t0> %s (minimum)\r\n", OLC_LABEL_VAL(SOC_MIN_VICT_POS(soc), 0), position_types[SOC_MIN_VICT_POS(soc)]);
 	
 	get_requirement_display(SOC_REQUIREMENTS(soc), lbuf);
-	sprintf(buf + strlen(buf), "Requirements: <\tyrequirements\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Requirements: <%srequirements\t0>\r\n%s", OLC_LABEL_PTR(SOC_REQUIREMENTS(soc)), lbuf);
 	
 	sprintf(buf + strlen(buf), "Messages:\r\n");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
-		sprintf(buf + strlen(buf), "%s <\ty%s\t0>: %s\r\n", social_message_types[iter][0], social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
+		sprintf(buf + strlen(buf), "%s <%s%s\t0>: %s\r\n", OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][0], social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
 	page_string(ch->desc, buf, TRUE);

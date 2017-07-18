@@ -326,14 +326,16 @@ EARTHARMOR "EARTH ARMOR"
 Eartharmor (Natural Magic ability)
 
 Usage:  eartharmor <target>
-Cost:  20 mana
+Linked trait: Intelligence
+Cost:  10+ mana, based on level
 
 This spell allows a nature mage to coat his or her allies in a powerful
 coating of earth, protecting them from some damage. It adds an amount of
 physical damage resistance equal to the caster's Natural Magic level divided by
 14, with a bonus based on Intelligence.
 
-Gains experience when you cast this spell.
+Gains experience when you cast this spell or when you take damage while using
+it.
 
 See also: RESIST-PHYSICAL
 #

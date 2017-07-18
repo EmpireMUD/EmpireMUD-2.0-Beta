@@ -3738,63 +3738,63 @@ void olc_show_quest(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !quest_proto(QUEST_VNUM(quest)) ? "new quest" : get_quest_name_by_proto(QUEST_VNUM(quest)));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(QUEST_NAME(quest)));
-	sprintf(buf + strlen(buf), "<\tydescription\t0>\r\n%s", NULLSAFE(QUEST_DESCRIPTION(quest)));
-	sprintf(buf + strlen(buf), "<\tycompletemessage\t0>\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(quest)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !quest_proto(QUEST_VNUM(quest)) ? "new quest" : get_quest_name_by_proto(QUEST_VNUM(quest)));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(QUEST_NAME(quest), default_quest_name), NULLSAFE(QUEST_NAME(quest)));
+	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(QUEST_DESCRIPTION(quest), default_quest_description), NULLSAFE(QUEST_DESCRIPTION(quest)));
+	sprintf(buf + strlen(buf), "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(QUEST_COMPLETE_MSG(quest), default_quest_complete_msg), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
 	
 	sprintbit(QUEST_FLAGS(quest), quest_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT), lbuf);
 	
 	if (QUEST_MIN_LEVEL(quest) > 0) {
-		sprintf(buf + strlen(buf), "<\tyminlevel\t0> %d\r\n", QUEST_MIN_LEVEL(quest));
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, QUEST_MIN_LEVEL(quest));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<\tyminlevel\t0> none\r\n");
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	if (QUEST_MAX_LEVEL(quest) > 0) {
-		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", QUEST_MAX_LEVEL(quest));
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, QUEST_MAX_LEVEL(quest));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> none\r\n");
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
 	get_requirement_display(QUEST_PREREQS(quest), lbuf);
-	sprintf(buf + strlen(buf), "Pre-requisites: <\typrereqs\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Pre-requisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(QUEST_PREREQS(quest)), lbuf);
 	
 	if (QUEST_REPEATABLE_AFTER(quest) == NOT_REPEATABLE) {
-		sprintf(buf + strlen(buf), "<\tyrepeat\t0> never\r\n");
+		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) > 0) {
-		sprintf(buf + strlen(buf), "<\tyrepeat\t0> %d minutes (%d:%02d:%02d)\r\n", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0), QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) == 0) {
-		sprintf(buf + strlen(buf), "<\tyrepeat\t0> immediately\r\n");
+		sprintf(buf + strlen(buf), "<%srepeat\t0> immediately\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
 	}
 	
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
 		if (QUEST_DAILY_CYCLE(quest) != NOTHING) {
-			sprintf(buf + strlen(buf), "<\tydailycycle\t0> %d\r\n", QUEST_DAILY_CYCLE(quest));
+			sprintf(buf + strlen(buf), "<%sdailycycle\t0> %d\r\n", OLC_LABEL_CHANGED, QUEST_DAILY_CYCLE(quest));
 		}
 		else {
-			sprintf(buf + strlen(buf), "<\tydailycycle\t0> none\r\n");
+			sprintf(buf + strlen(buf), "<%sdailycycle\t0> none\r\n", OLC_LABEL_UNCHANGED);
 		}
 	}
 	
 	get_quest_giver_display(QUEST_STARTS_AT(quest), lbuf);
-	sprintf(buf + strlen(buf), "Starts at: <\tystarts\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Starts at: <%sstarts\t0>\r\n%s", OLC_LABEL_PTR(QUEST_STARTS_AT(quest)), lbuf);
 	
 	get_quest_giver_display(QUEST_ENDS_AT(quest), lbuf);
-	sprintf(buf + strlen(buf), "Ends at: <\tyends\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Ends at: <%sends\t0>\r\n%s", OLC_LABEL_PTR(QUEST_ENDS_AT(quest)), lbuf);
 	
 	get_requirement_display(QUEST_TASKS(quest), lbuf);
-	sprintf(buf + strlen(buf), "Tasks: <\tytasks\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", OLC_LABEL_PTR(QUEST_TASKS(quest)), lbuf);
 	
 	get_quest_reward_display(QUEST_REWARDS(quest), lbuf);
-	sprintf(buf + strlen(buf), "Rewards: <\tyrewards\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Rewards: <%srewards\t0>\r\n%s", OLC_LABEL_PTR(QUEST_REWARDS(quest)), lbuf);
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <\tyscript\t0>\r\n");
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(QUEST_SCRIPTS(quest)));
 	if (QUEST_SCRIPTS(quest)) {
 		get_script_display(QUEST_SCRIPTS(quest), lbuf);
 		strcat(buf, lbuf);

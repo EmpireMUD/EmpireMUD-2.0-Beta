@@ -573,58 +573,6 @@ ACMD(do_counterspell) {
 }
 
 
-ACMD(do_eartharmor) {
-	struct affected_type *af;
-	char_data *vict = ch;
-	int cost = 20;
-	double amount;
-	
-	one_argument(argument, arg);
-	
-	if (!can_use_ability(ch, ABIL_EARTHARMOR, MANA, cost, NOTHING)) {
-		return;
-	}
-	
-	// targeting
-	if (!*arg) {
-		vict = ch;
-	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, ch, NULL, ABIL_EARTHARMOR)) {
-		return;
-	}
-	
-	if (SHOULD_APPEAR(ch)) {
-		appear(ch);
-	}
-	
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-	
-	// 100/14 = 7 resistance at max level
-	amount = get_ability_level(ch, ABIL_EARTHARMOR) / 14.0;
-	amount += GET_INTELLIGENCE(ch) / 3.0;
-	af = create_mod_aff(ATYPE_EARTHARMOR, 30, APPLY_RESIST_PHYSICAL, (int)amount, ch);
-	
-	if (ch == vict) {
-		msg_to_char(ch, "You form a thick layer of mana over your body, and it hardens to solid earth!\r\n");
-		act("$n forms a thick layer of mana over $s body, and it hardens to solid earth!", TRUE, ch, NULL, NULL, TO_ROOM);
-	}
-	else {
-		act("You form a thick layer of mana over $N and then harden it to solid earth!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n forms a thick layer of mana over you, and it hardens to solid earth!", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n forms a thick layer of mana over $N, and it hardens to solid earth!", FALSE, ch, NULL, vict, TO_NOTVICT);
-	}
-	
-	affect_join(vict, af, 0);
-	
-	gain_ability_exp(ch, ABIL_EARTHARMOR, 15);
-}
-
-
 ACMD(do_earthmeld) {
 	struct affected_type *af;
 	int cost = 50;
@@ -900,44 +848,6 @@ ACMD(do_familiar) {
 	}
 	
 	load_mtrigger(mob);
-}
-
-
-ACMD(do_fly) {
-	struct affected_type *af;
-	int cost = 50;
-	int fly_durations[] = { 6 MUD_HOURS, 6 MUD_HOURS, 24 MUD_HOURS };
-	
-	// cancel out for free
-	if (affected_by_spell(ch, ATYPE_FLY)) {
-		msg_to_char(ch, "You stop flying and your wings fade away.\r\n");
-		act("$n lands and $s wings fade away.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_FLY, FALSE);
-		command_lag(ch, WAIT_OTHER);
-		return;
-	}
-	
-	if (!can_use_ability(ch, ABIL_FLY, MANA, cost, NOTHING)) {
-		return;
-	}
-	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "You can't fly while mounted.\r\n");
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_FLY)) {
-		return;
-	}
-	
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-	
-	af = create_flag_aff(ATYPE_FLY, CHOOSE_BY_ABILITY_LEVEL(fly_durations, ch, ABIL_FLY), AFF_FLY, ch);
-	affect_join(ch, af, 0);
-	
-	msg_to_char(ch, "You concentrate for a moment...\r\nSparkling blue wings made of pure mana erupt from your back!\r\n");
-	act("$n seems to concentrate for a moment...Sparkling blue wings made of pure mana erupt from $s back!", TRUE, ch, NULL, NULL, TO_ROOM);
-	
-	gain_ability_exp(ch, ABIL_FLY, 5);
 }
 
 

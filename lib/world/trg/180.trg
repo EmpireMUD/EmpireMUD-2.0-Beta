@@ -282,7 +282,7 @@ if !%actor.has_resources(18097,1)%
   return 0
   halt
 end
-%send% %actor% &0All items cost 10 essence each and will be the same level as the lowest level
+%send% %actor% &0All items cost 10 essence each and will be the average level of the
 %send% %actor% &0essence spent to make them. All items are created exactly the same as if the
 %send% %actor% &0fiend dropped that item, but bound to you alone.
 %send% %actor% You can create (with 'buy <item>') any of the following items:
@@ -413,22 +413,24 @@ end
 %send% %actor% You bring the ten motes of demonic essence together with a fiery explosion!
 %echoaround% %actor% %actor.name% brings ten motes of fiery light together, causing an explosion!
 * Charge essence cost and check level to scale to
-eval lowest_level 250
+eval total_level 0
 eval essence_count 0
 while %essence_count%<10
   eval next_essence %actor.inventory(18097)%
   if !%next_essence%
+    * We accidentally ran out of essence in the middle of taking them away... oops
     %send% %actor% Something has gone horribly wrong while creating your item! Please submit a bug report containing this message.
+    eval total_level %total_level% + 250
+  else
+    eval total_level %total_level% + %next_essence.level%
+    %purge% %next_essence%
   end
-  if %next_essence.level%<%lowest_level%
-    eval lowest_level %next_essence.level%
-  end
-  %purge% %next_essence%
   eval essence_count %essence_count% + 1
 done
 * If unscaled essence was used, the level may be 0
-if %lowest_level% < 1
-  eval lowest_level 1
+eval avg_level %total_level% / 10
+if %avg_level% < 1
+  eval avg_level 1
 end
 * Create the item
 %send% %actor% You create %name%!
@@ -438,7 +440,7 @@ eval made %%actor.inventory(%vnum%)%%
 if %made%
   nop %made.flag(HARD-DROP)%
   nop %made.flag(GROUP-DROP)%
-  %scale% %made% %lowest_level%
+  %scale% %made% %avg_level%
 else
   %send% %actor% Error setting flags and scaling.
 end

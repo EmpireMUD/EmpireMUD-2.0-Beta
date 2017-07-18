@@ -1802,64 +1802,6 @@ ACMD(do_steal) {
 }
 
 
-ACMD(do_terrify) {
-	struct affected_type *af;
-	int value, cost = 15;
-	char_data *victim;
-
-	one_argument(argument, arg);
-
-	if (!can_use_ability(ch, ABIL_TERRIFY, MOVE, cost, COOLDOWN_TERRIFY)) {
-		// sends own message
-	}
-	else if (!*arg && !FIGHTING(ch))
-		msg_to_char(ch, "Terrify whom?\r\n");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)) && !(victim = FIGHTING(ch)))
-		send_config_msg(ch, "no_person");
-	else if (victim == ch) {
-		msg_to_char(ch, "If you want to terrify yourself, just think back on whether or not you've accomplished all your life goals.\r\n");
-	}
-	else if (!can_fight(ch, victim))
-		act("You can't terrify $N!", FALSE, ch, 0, victim, TO_CHAR);
-	else if (!AWAKE(victim) || IS_DEAD(victim)) {
-		msg_to_char(ch, "You can't use your shadows to terrify someone who can't even see them!\r\n");
-	}
-	else if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
-		act("$E doesn't look like $E'd be affected by that.", FALSE, ch, NULL, victim, TO_CHAR);
-	}
-	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_TERRIFY)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_TERRIFY, 15, WAIT_COMBAT_ABILITY);
-		
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-		
-		act("Shadows creep up around you and then strike out at $N!", FALSE, ch, 0, victim, TO_CHAR);
-		act("Shadows creep up around $n and then strike out at you!", FALSE, ch, 0, victim, TO_VICT);
-		act("Shadows creep up around $n and then strike out at $N!", FALSE, ch, 0, victim, TO_NOTVICT);
-		
-		if (skill_check(ch, ABIL_TERRIFY, DIFF_HARD) && !AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
-			value = round(GET_COMPUTED_LEVEL(ch) / 30);
-			af = create_mod_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, APPLY_BONUS_PHYSICAL, -value, ch);
-			affect_join(victim, af, 0);
-			af = create_mod_aff(ATYPE_TERRIFY, 0.5 * REAL_UPDATES_PER_MIN, APPLY_BONUS_MAGICAL, -value, ch);
-			affect_join(victim, af, 0);
-			
-			msg_to_char(victim, "You are terrified!\r\n");
-			act("$n is terrified!", TRUE, victim, NULL, NULL, TO_ROOM);
-		}
-		
-		engage_combat(victim, ch, TRUE);
-		if (can_gain_exp_from(ch, victim)) {
-			gain_ability_exp(ch, ABIL_TERRIFY, 15);
-		}
-	}
-}
-
-
 ACMD(do_whisperstride) {
 	struct affected_type *af;
 	int cost = 100;

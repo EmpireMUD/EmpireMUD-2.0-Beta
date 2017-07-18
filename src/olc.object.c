@@ -53,6 +53,10 @@ extern double get_base_dps(obj_data *weapon);
 extern double get_weapon_speed(obj_data *weapon);
 
 // locals
+const char *default_obj_keywords = "object new";
+const char *default_obj_short = "a new object";
+const char *default_obj_long = "A new object is sitting here.";
+
 char **get_weapon_types_string();
 
 // data
@@ -76,7 +80,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 	
-	if (!GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), "object new")) {
+	if (!GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), default_obj_keywords)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
 		problem = TRUE;
 	}
@@ -91,7 +95,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		} while (*ptr);
 	}
 	
-	if (!str_cmp(GET_OBJ_LONG_DESC(obj), "A new object is sitting here.")) {
+	if (!str_cmp(GET_OBJ_LONG_DESC(obj), default_obj_long)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not set");
 		problem = TRUE;
 	}
@@ -103,7 +107,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not capitalized");
 		problem = TRUE;
 	}
-	if (!str_cmp(GET_OBJ_SHORT_DESC(obj), "a new object")) {
+	if (!str_cmp(GET_OBJ_SHORT_DESC(obj), default_obj_short)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc not set");
 		problem = TRUE;
 	}
@@ -1726,9 +1730,9 @@ obj_data *setup_olc_object(obj_data *input) {
 	}
 	else {
 		// brand new
-		GET_OBJ_KEYWORDS(new) = str_dup("object new");
-		GET_OBJ_SHORT_DESC(new) = str_dup("a new object");
-		GET_OBJ_LONG_DESC(new) = str_dup("A new object is sitting here.");
+		GET_OBJ_KEYWORDS(new) = str_dup(default_obj_keywords);
+		GET_OBJ_SHORT_DESC(new) = str_dup(default_obj_short);
+		GET_OBJ_LONG_DESC(new) = str_dup(default_obj_long);
 		GET_OBJ_ACTION_DESC(new) = NULL;
 		GET_OBJ_WEAR(new) = ITEM_WEAR_TAKE;
 		OBJ_VERSION(new) = 1;
@@ -1760,89 +1764,104 @@ void olc_get_values_display(char_data *ch, char *storage) {
 	
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_COINS: {
-			sprintf(storage + strlen(storage), "<&ycoinamount&0> %d\r\n", GET_COINS_AMOUNT(obj));
+			sprintf(storage + strlen(storage), "<%scoinamount\t0> %d%s\r\n", OLC_LABEL_VAL(GET_COINS_AMOUNT(obj), 0), GET_COINS_AMOUNT(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 			// empire number is not supported -- it will always use OTHER_COIN
 			break;
 		}
 		case ITEM_CURRENCY: {
-			sprintf(storage + strlen(storage), "<&ycurrency&0> %d %s\r\n", GET_CURRENCY_VNUM(obj), get_generic_name_by_vnum(GET_CURRENCY_VNUM(obj)));
-			sprintf(storage + strlen(storage), "<&ycoinamount&0> %d\r\n", GET_CURRENCY_AMOUNT(obj));
+			sprintf(storage + strlen(storage), "<%scurrency\t0> %d %s\r\n", OLC_LABEL_VAL(GET_CURRENCY_VNUM(obj), NOTHING), GET_CURRENCY_VNUM(obj), get_generic_name_by_vnum(GET_CURRENCY_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<%scoinamount\t0> %d\r\n", OLC_LABEL_VAL(GET_CURRENCY_AMOUNT(obj), 0), GET_CURRENCY_AMOUNT(obj));
 			break;
 		}
 		case ITEM_CORPSE: {
-			sprintf(storage + strlen(storage), "<&ycorpseof&0> %d %s\r\n", GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<%scorpseof\t0> %d %s\r\n", OLC_LABEL_VAL(GET_CORPSE_NPC_VNUM(obj), 0), GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
 			break;
 		}
 		case ITEM_WEAPON: {
-			sprintf(storage + strlen(storage), "<&yweapontype&0> %s\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %s+%.2f base dps)\r\n", GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_WEAPON_TYPE(obj), 0), attack_hit_info[GET_WEAPON_TYPE(obj)].name);
+			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_WEAPON_DAMAGE_BONUS(obj), 0), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj));
+			}
+			else {	// not scalable
+				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (speed %.2f, %s+%.2f base dps)\r\n", OLC_LABEL_VAL(GET_WEAPON_DAMAGE_BONUS(obj), 0), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			}
 			break;
 		}
 		case ITEM_CONTAINER: {
-			sprintf(storage + strlen(storage), "<&ycapacity&0> %d object%s\r\n", GET_MAX_CONTAINER_CONTENTS(obj), PLURAL(GET_MAX_CONTAINER_CONTENTS(obj)));
+			sprintf(storage + strlen(storage), "<%scapacity\t0> %d object%s\r\n", OLC_LABEL_VAL(GET_MAX_CONTAINER_CONTENTS(obj), 0), GET_MAX_CONTAINER_CONTENTS(obj), PLURAL(GET_MAX_CONTAINER_CONTENTS(obj)));
 			
 			sprintbit(GET_CONTAINER_FLAGS(obj), container_bits, temp, TRUE);
-			sprintf(storage + strlen(storage), "<&ycontainerflags&0> %s\r\n", temp);
+			sprintf(storage + strlen(storage), "<%scontainerflags\t0> %s\r\n", OLC_LABEL_VAL(GET_CONTAINER_FLAGS(obj), NOBITS), temp);
 			break;
 		}
 		case ITEM_DRINKCON: {
-			sprintf(storage + strlen(storage), "<&ycapacity&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CAPACITY(obj), PLURAL(GET_DRINK_CONTAINER_CAPACITY(obj)));
-			sprintf(storage + strlen(storage), "<&ycontents&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
-			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", get_generic_name_by_vnum(GET_DRINK_CONTAINER_TYPE(obj)));
+			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+				sprintf(storage + strlen(storage), "<%scapacity\t0> %d (scalable)\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_CAPACITY(obj), 0), GET_DRINK_CONTAINER_CAPACITY(obj));
+			}
+			else {
+				sprintf(storage + strlen(storage), "<%scapacity\t0> %d drink%s\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_CAPACITY(obj), 0), GET_DRINK_CONTAINER_CAPACITY(obj), PLURAL(GET_DRINK_CONTAINER_CAPACITY(obj)));
+			}
+			sprintf(storage + strlen(storage), "<%scontents\t0> %d drink%s\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_CONTENTS(obj), 0), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
+			sprintf(storage + strlen(storage), "<%sliquid\t0> %d %s\r\n", OLC_LABEL_VAL(GET_DRINK_CONTAINER_TYPE(obj), 0), GET_DRINK_CONTAINER_TYPE(obj), get_generic_name_by_vnum(GET_DRINK_CONTAINER_TYPE(obj)));
 			break;
 		}
 		case ITEM_FOOD: {
-			sprintf(storage + strlen(storage), "<&yfullness&0> %d hour%s\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj), (GET_FOOD_HOURS_OF_FULLNESS(obj) != 1 ? "s" : ""));
+			sprintf(storage + strlen(storage), "<%sfullness\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_FOOD_HOURS_OF_FULLNESS(obj), 0), GET_FOOD_HOURS_OF_FULLNESS(obj), (GET_FOOD_HOURS_OF_FULLNESS(obj) != 1 ? "s" : ""));
 			break;
 		}
 		case ITEM_PORTAL: {
-			sprintf(storage + strlen(storage), "<&yroomvnum&0> %d\r\n", GET_PORTAL_TARGET_VNUM(obj));
+			sprintf(storage + strlen(storage), "<%sroomvnum\t0> %d\r\n", OLC_LABEL_VAL(GET_PORTAL_TARGET_VNUM(obj), 0), GET_PORTAL_TARGET_VNUM(obj));
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
-			sprintf(storage + strlen(storage), "<&yweapontype&0> %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %s+%.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
-			sprintf(storage + strlen(storage), "<&yammotype&0> %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(obj));
+			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_TYPE(obj), 0), attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
+			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_DAMAGE(obj), 0), GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj));
+			}
+			else {
+				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (speed %.2f, %s+%.2f base dps)\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_DAMAGE(obj), 0), GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
+			}
+			sprintf(storage + strlen(storage), "<%sammotype\t0> %c\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_AMMO_TYPE(obj), 0), 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(obj));
 			break;
 		}
 		case ITEM_AMMO: {
-			sprintf(storage + strlen(storage), "<&yquantity&0> %d\r\n", GET_AMMO_QUANTITY(obj));
-			sprintf(storage + strlen(storage), "<&ydamage&0> %+d\r\n", GET_AMMO_DAMAGE_BONUS(obj));
-			sprintf(storage + strlen(storage), "<&yammotype&0> %c\r\n", 'A' + GET_AMMO_TYPE(obj));
+			sprintf(storage + strlen(storage), "<%squantity\t0> %d\r\n", OLC_LABEL_VAL(GET_AMMO_QUANTITY(obj), 0), GET_AMMO_QUANTITY(obj));
+			sprintf(storage + strlen(storage), "<%sdamage\t0> %+d%s\r\n", OLC_LABEL_VAL(GET_AMMO_DAMAGE_BONUS(obj), 0), GET_AMMO_DAMAGE_BONUS(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
+			sprintf(storage + strlen(storage), "<%sammotype\t0> %c\r\n", OLC_LABEL_VAL(GET_AMMO_TYPE(obj), 0), 'A' + GET_AMMO_TYPE(obj));
 			sprintf(storage + strlen(storage), "NOTE: Positive applies become negative debuffs (see HELP AMMO ITEM)\r\n");
 			break;
 		}
 		case ITEM_PACK: {
-			sprintf(storage + strlen(storage), "<&ycapacity&0> %d object%s\r\n", GET_PACK_CAPACITY(obj), PLURAL(GET_PACK_CAPACITY(obj)));
+			sprintf(storage + strlen(storage), "<%scapacity\t0> %d object%s%s\r\n", OLC_LABEL_VAL(GET_PACK_CAPACITY(obj), 0), GET_PACK_CAPACITY(obj), PLURAL(GET_PACK_CAPACITY(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 			break;
 		}
 		case ITEM_POTION: {
-			sprintf(storage + strlen(storage), "<&ypotion&0> %s\r\n", potion_data[GET_POTION_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<&ypotionscale&0> %d\r\n", GET_POTION_SCALE(obj));
+			sprintf(storage + strlen(storage), "<%spotion\t0> %s\r\n", OLC_LABEL_VAL(GET_POTION_TYPE(obj), 0), potion_data[GET_POTION_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%spotionscale\t0> %d%s\r\n", OLC_LABEL_VAL(GET_POTION_SCALE(obj), 0), GET_POTION_SCALE(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 			break;
 		}
 		case ITEM_POISON: {
-			sprintf(storage + strlen(storage), "<&ypoison&0> %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<&ycharges&0> %d\r\n", GET_POISON_CHARGES(obj));
+			sprintf(storage + strlen(storage), "<%spoison\t0> %s\r\n", OLC_LABEL_VAL(GET_POISON_TYPE(obj), 0), poison_data[GET_POISON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%scharges\t0> %d\r\n", OLC_LABEL_VAL(GET_POISON_CHARGES(obj), 0), GET_POISON_CHARGES(obj));
 			break;
 		}
 		case ITEM_RECIPE: {
 			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
-			sprintf(storage + strlen(storage), "<&yrecipe&0> %d %s\r\n", GET_RECIPE_VNUM(obj), cft ? GET_CRAFT_NAME(cft) : "none");
+			sprintf(storage + strlen(storage), "<%srecipe\t0> %d %s\r\n", OLC_LABEL_VAL(GET_RECIPE_VNUM(obj), 0), GET_RECIPE_VNUM(obj), cft ? GET_CRAFT_NAME(cft) : "none");
 			break;
 		}
 		case ITEM_ARMOR: {
-			sprintf(storage + strlen(storage), "<&yarmortype&0> %s\r\n", armor_types[GET_ARMOR_TYPE(obj)]);
+			sprintf(storage + strlen(storage), "<%sarmortype\t0> %s\r\n", OLC_LABEL_VAL(GET_ARMOR_TYPE(obj), 0), armor_types[GET_ARMOR_TYPE(obj)]);
 			break;
 		}
 		case ITEM_BOOK: {
 			book = book_proto(GET_BOOK_ID(obj));
-			sprintf(storage + strlen(storage), "<&ytext&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
+			sprintf(storage + strlen(storage), "<%stext\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BOOK_ID(obj), 0), GET_BOOK_ID(obj), (book ? book->title : "not set"));
 			break;
 		}
 		case ITEM_WEALTH: {
-			sprintf(storage + strlen(storage), "<&ywealth&0> %d\r\n", GET_WEALTH_VALUE(obj));
-			sprintf(storage + strlen(storage), "<&yautomint&0> %s\r\n", offon_types[GET_WEALTH_AUTOMINT(obj)]);
+			sprintf(storage + strlen(storage), "<%swealth\t0> %d\r\n", OLC_LABEL_VAL(GET_WEALTH_VALUE(obj), 0), GET_WEALTH_VALUE(obj));
+			sprintf(storage + strlen(storage), "<%sautomint\t0> %s\r\n", OLC_LABEL_VAL(GET_WEALTH_AUTOMINT(obj), 0), offon_types[GET_WEALTH_AUTOMINT(obj)]);
 			break;
 		}
 		
@@ -1861,10 +1880,10 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		default: {
 			// don't show "value2" (val 1) if it's plantable
 			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) >= 0) {
-				sprintf(storage + strlen(storage), "<&yvalue0&0> %d, <&yvalue2&0> %d\r\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 2));
+				sprintf(storage + strlen(storage), "<%svalue0\t0> %d, <%svalue2\t0> %d\r\n", OLC_LABEL_VAL(GET_OBJ_VAL(obj, 0), 0), GET_OBJ_VAL(obj, 0), OLC_LABEL_VAL(GET_OBJ_VAL(obj, 2), 0), GET_OBJ_VAL(obj, 2));
 			}
 			else {
-				sprintf(storage + strlen(storage), "<&yvalue0&0> %d, <&yvalue1&0> %d, <&yvalue2&0> %d\r\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2));
+				sprintf(storage + strlen(storage), "<%svalue0\t0> %d, <%svalue1\t0> %d, <%svalue2\t0> %d\r\n", OLC_LABEL_VAL(GET_OBJ_VAL(obj, 0), 0), GET_OBJ_VAL(obj, 0), OLC_LABEL_VAL(GET_OBJ_VAL(obj, 1), 0), GET_OBJ_VAL(obj, 1), OLC_LABEL_VAL(GET_OBJ_VAL(obj, 2), 0), GET_OBJ_VAL(obj, 2));
 			}
 			break;
 		}
@@ -1872,7 +1891,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 	
 	// this is added for all of them
 	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) >= 0) {
-		sprintf(storage + strlen(storage), "<&yplants&0> [%d] %s\r\n", GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE))));
+		sprintf(storage + strlen(storage), "<%splants\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE), 0), GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE))));
 	}
 }
 
@@ -1900,11 +1919,11 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	*buf = '\0';
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0 (Gear rating [&c%.2f&0])\r\n", GET_OLC_VNUM(ch->desc), !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), rate_item(obj));
-	sprintf(buf + strlen(buf), "<&ykeywords&0> %s\r\n", GET_OBJ_KEYWORDS(obj));
-	sprintf(buf + strlen(buf), "<&yshortdescription&0> %s\r\n", GET_OBJ_SHORT_DESC(obj));
-	sprintf(buf + strlen(buf), "<&ylongdescription&0> %s\r\n", GET_OBJ_LONG_DESC(obj));
-	sprintf(buf + strlen(buf), "<&ylookdescription&0>\r\n%s", NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0 (Gear rating [%s%.2f\t0])\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), OLC_LABEL_CHANGED, rate_item(obj));
+	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_KEYWORDS(obj), default_obj_keywords), GET_OBJ_KEYWORDS(obj));
+	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_SHORT_DESC(obj), default_obj_short), GET_OBJ_SHORT_DESC(obj));
+	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_LONG_DESC(obj), default_obj_long), GET_OBJ_LONG_DESC(obj));
+	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(GET_OBJ_ACTION_DESC(obj), ""), NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
 	
 	if (GET_OBJ_TIMER(obj) > 0) {
 		minutes = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
@@ -1913,85 +1932,85 @@ void olc_show_object(char_data *ch) {
 	else {
 		strcpy(buf1, "none");
 	}
-	sprintf(buf + strlen(buf), "<&ytype&0> %s, <&ymaterial&0> %s, <&ytimer&0> %s\r\n", item_types[(int) GET_OBJ_TYPE(obj)], materials[GET_OBJ_MATERIAL(obj)].name, buf1);
+	sprintf(buf + strlen(buf), "<%stype\t0> %s, <%smaterial\t0> %s, <%stimer\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TYPE(obj), 0), item_types[(int) GET_OBJ_TYPE(obj)], OLC_LABEL_VAL(GET_OBJ_MATERIAL(obj), 0), materials[GET_OBJ_MATERIAL(obj)].name, OLC_LABEL_VAL(GET_OBJ_TIMER(obj), 0), buf1);
 	
 	sprintbit(GET_OBJ_WEAR(obj), wear_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<&ywear&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%swear\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE), buf1);
 	
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_EXTRA(obj), NOBITS), buf1);
 	
-	sprintf(buf + strlen(buf), "<&ycomponent&0> %s\r\n", component_types[GET_OBJ_CMP_TYPE(obj)]);
+	sprintf(buf + strlen(buf), "<%scomponent\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_CMP_TYPE(obj), 0), component_types[GET_OBJ_CMP_TYPE(obj)]);
 	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
 		prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, buf1);
-		sprintf(buf + strlen(buf), "<&ycompflags&0> %s\r\n", buf1);
+		sprintf(buf + strlen(buf), "<%scompflags\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_CMP_FLAGS(obj), NOBITS), buf1);
 	}
 	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_OBJ_MIN_SCALE_LEVEL(obj));
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_OBJ_MIN_SCALE_LEVEL(obj));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_OBJ_MAX_SCALE_LEVEL(obj));
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_OBJ_MAX_SCALE_LEVEL(obj));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-		sprintf(buf + strlen(buf), "<&yrequiresquest&0> [%d] %s\r\n", GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+		sprintf(buf + strlen(buf), "<%srequiresquest\t0> [%d] %s\r\n", OLC_LABEL_CHANGED, GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&yrequiresquest&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%srequiresquest\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
 	olc_get_values_display(ch, buf1);
 	strcat(buf, buf1);
 
 	sprintbit(GET_OBJ_AFF_FLAGS(obj), affected_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<&yaffects&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_AFF_FLAGS(obj), NOBITS), buf1);
 	
 	// applies / affected[]
 	count = 0;
-	sprintf(buf + strlen(buf), "Attribute Applies: <&yapply&0>\r\n");
+	sprintf(buf + strlen(buf), "Attribute Applies: <%sapply\t0>%s\r\n", OLC_LABEL_PTR(GET_OBJ_APPLIES(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-		sprintf(buf + strlen(buf), " &y%2d&0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
+		sprintf(buf + strlen(buf), " \ty%2d\t0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
 	}
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(obj->ex_description));
 	if (obj->ex_description) {
 		get_extra_desc_display(obj->ex_description, buf1);
 		strcat(buf, buf1);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(obj->interactions));
 	if (obj->interactions) {
 		get_interaction_display(obj->interactions, buf1);
 		strcat(buf, buf1);
 	}
 	
 	// storage
-	sprintf(buf + strlen(buf), "Storage: <&ystorage&0>\r\n");
+	sprintf(buf + strlen(buf), "Storage: <%sstorage\t0>\r\n", OLC_LABEL_PTR(obj->storage));
 	count = 0;
 	for (store = obj->storage; store; store = store->next) {
 		bld = building_proto(store->building_type);
 		
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
-		sprintf(buf + strlen(buf), " &y%d&0. [%d] %s ( %s)\r\n", ++count, GET_BLD_VNUM(bld), GET_BLD_NAME(bld), buf2);
+		sprintf(buf + strlen(buf), " \ty%d\t0. [%d] %s ( %s)\r\n", ++count, GET_BLD_VNUM(bld), GET_BLD_NAME(bld), buf2);
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(obj->custom_msgs));
 	count = 0;
 	for (ocm = obj->custom_msgs; ocm; ocm = ocm->next) {
-		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
+		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(obj->proto_script));
 	if (obj->proto_script) {
 		get_script_display(obj->proto_script, buf1);
 		strcat(buf, buf1);

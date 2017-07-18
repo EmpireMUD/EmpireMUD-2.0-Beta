@@ -46,6 +46,12 @@ Examples:
  > olc object edit 1500
  > .m list 50-60
 
+In the editor display, anything in angle brackets is also the name of the
+command to edit it. For example, <&yname&0> can be edited by typing .name and
+the name you want to set. This label changes from yellow to green if the item
+has been changed from its default. For blind players, an asterisk appears
+before the label name.
+
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
 See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
@@ -487,8 +493,9 @@ Usage:  .abil <command>
 The .olc ability editor allows you to configure the data for various abilities.
 The main properties set up here are names and mastery abilities.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP ABILEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP ABILEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -755,6 +762,7 @@ This tells the ability when to trigger skill gain:
  &cONLY-LIGHT&0 - Only gains if it's NOT dark here.
  &cONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
  &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
+ &cMOVING&0 - Gains when the player moves.
 
 See also: OLC ABILITIES
 #d
@@ -1324,8 +1332,8 @@ The .olc archetype editor is a powerful tool for creating and editing player
 archetypes (character creation options). It provides a simple in-game menu with
 contextual choices to design any archetype.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these by typing &yHELP ARCHEDIT <COMMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these by typing: &yHELP ARCHEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -1477,8 +1485,8 @@ The .olc augment editor is a powerful tool for creating and editing augments
 (which are like item enchantments). It provides a simple in-game menu with
 contextual choices to design multiple types of augments.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -1846,6 +1854,7 @@ Available functions:
  WAREHOUSE - can use the warehouse command and store unique items
  DRINK-WATER - can get water here, like a well
  COOKING-FIRE - can cook, brew, and other tasks that require a fire
+ LARGER-NEARBY - extends the radius of 'nearby'
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -2311,8 +2320,9 @@ skills. Classes can have broadly overlapping requirements (but can't be
 identical to each other), allowing players with similar sets of skills to end
 up in different classes.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP CLASSEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP CLASSEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -2571,8 +2581,9 @@ are groups that NPCs can belong to. Players gain and lose reputation with
 factions, and these reputation levels can be used to control access to quests
 and adventure content.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP FEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP FEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -2693,9 +2704,9 @@ The .olc generics editor allows you to add, edit, or delete generics from
 the system. It provides an in-game menu for controlling features like liquids
 and resource actions.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP GENEDIT
-<COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP GENEDIT <COMMAND>&0
 
 Each type of generic provides a different function, and has its own help file.
 See: GENERIC LIQUID, GENERIC ACTION, GENERIC COOLDOWN, GENERIC AFFECT,
@@ -3755,8 +3766,9 @@ Usage:  .morph <command>
 The .olc morph editor allows you to configure the data for morphs, which are
 used by players (and NPCs) to change shape.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP MORPHEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP MORPHEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4878,8 +4890,9 @@ The .olc adventure zone editor allows you to configure the data for adventure
 zones. Each adventure zone contains a set of room templates. The .adv editor
 controls meta-data about the adventure zone, such as its name and level range.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP ADVEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP ADVEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4900,8 +4913,9 @@ Usage:  .b <command>
 The .olc building editor allows you to configure the data for buildings of all
 kinds. It provides a simple in-game menu with options for the building.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP BEDIT <COMMAND>.&0
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP BEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4968,8 +4982,9 @@ The .olc craft editor allows you to create and edit craft recipes for any of
 the main crafting systems in the game. It provides a simple in-game menu with
 contextual choices to set up the recipe.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP CEDIT <COMMMAND>.&0
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP CEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4995,9 +5010,9 @@ You should set the FORAGE and HARVEST interactions on a crop, usually with a
 1x quantity and 100% chance. Orchard-type crops should also usually have a
 GATHER interaction.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP CROPEDIT
-<COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP CROPEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5022,9 +5037,9 @@ loot tables.
 Any global data that doesn't have an IN-DEVELOPMENT flag will be used by the
 live game system.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP GEDIT
-<COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP GEDIT <COMMAND>&0
 
 Each type of global provides a different function, and has its own help file.
 See: GLOBAL MINE DATA, GLOBAL MOB INTERACTIONS
@@ -5114,8 +5129,9 @@ The .olc mob editor is a tool for creating and editing mobiles. It provides a
 simple in-game menu with contextual choices to allow you to easily create new
 NPCs for your game.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP MEDIT <COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP MEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5137,8 +5153,9 @@ The .olc object editor is a powerful tool for creating and editing items. It
 provides a simple in-game menu with contextual choices to design any type of
 object.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP OEDIT <COMMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP OEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5160,8 +5177,9 @@ Usage:  .q <command>
 The .olc quest editor lets you build quests, both simple and complex. It
 provides an in-game menu for controlling every detail of the quest.
 
-All of the .olc commands are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these by typing &yHELP QEDIT <COMMAND>&0.
+All of the .olc commands are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these by typing:
+  &yHELP QEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5231,8 +5249,9 @@ its start and end numbers.
 This is NOT the editor for designatable rooms -- use .build for that (see
 HELP OLC BUILDINGS).
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP REDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP REDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5281,9 +5300,9 @@ every detail of a sector, including how it evolves over time.
 Sectors are also called terrain types, and essentially form the basis of the
 world map.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP SECTEDIT
-<COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP SECTEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5309,8 +5328,9 @@ triggers on (e.g. greeting), and then its command list.
 When editing the trigger's command text, you can use * to put a comment on a
 line, to help people reading the trigger understand what it's meant to do.
 
-All of the .olc commands are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these by typing &yHELP TRIGEDIT <COMMAND>&0.
+All of the .olc commands are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these by typing:
+  &yHELP TRIGEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5328,8 +5348,9 @@ The .olc vehicle editor gives you the freedom to create a wide range of
 vehicles. It provides an in-game menu for controlling every detail of the
 vehicle (except how to make one; that's the craft editor).
 
-All of the .olc commands are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these by typing &yHELP VEDIT <COMMAND>&0.
+All of the .olc commands are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these by typing:
+  &yHELP VEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5857,8 +5878,9 @@ mobs, objects, room templates, and buildings. Shops can sell items for coins
 or for various adventure currencies (generics). However, shops are not
 currently able to buy items.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP SHOPEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP SHOPEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5960,8 +5982,9 @@ this is to choose which abilities that skill unlocks, and at what level. This
 does not control what class a player becomes (see HELP CLASSEDIT), only which
 powers they have access to and in which order.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP SKILLEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP SKILLEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -6081,8 +6104,8 @@ The .olc social editor is a tool for creating and editing social commands
 (which are like pre-set emotes). It provides a simple in-game menu with
 contextual choices to design all types of socials.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these by typing &yHELP SOCEDIT <COMMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these by typing: &yHELP SOCEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 

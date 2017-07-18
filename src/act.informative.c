@@ -2677,7 +2677,7 @@ ACMD(do_nearby) {
 	extern int num_of_start_locs;
 	extern int *start_locs;
 	
-	int max_dist = 50;
+	int max_dist = room_has_function_and_city_ok(IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	
 	bool cities = TRUE, adventures = TRUE, starts = TRUE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];

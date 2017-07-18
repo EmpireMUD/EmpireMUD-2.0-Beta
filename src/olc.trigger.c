@@ -57,6 +57,8 @@ const char *trig_arg_phrase_type[] = {
 	"\n"
 };
 
+const char *default_trig_name = "new trigger";
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -106,7 +108,7 @@ trig_data *create_trigger_table_entry(trig_vnum vnum) {
 	add_trigger_to_table(trig);
 	
 	// simple default data (triggers cannot be nameless)
-	trig->name = str_dup("New Trigger");
+	trig->name = str_dup(default_trig_name);
 		
 	// save index and crop file now
 	save_index(DB_BOOT_TRG);
@@ -927,7 +929,7 @@ struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_stor
 		new->vnum = NOTHING;
 
 		// Set up some defaults
-		new->name = strdup("new trigger");
+		new->name = strdup(default_trig_name);
 		new->attach_type = MOB_TRIGGER;
 		new->trigger_type = NOBITS;
 
@@ -963,31 +965,31 @@ void olc_show_trigger(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !real_trigger(GET_OLC_VNUM(ch->desc)) ? "new trigger" : GET_TRIG_NAME(real_trigger(GET_OLC_VNUM(ch->desc))));
-	sprintf(buf + strlen(buf), "<&yname&0> %s\r\n", NULLSAFE(GET_TRIG_NAME(trig)));
-	sprintf(buf + strlen(buf), "<&yattaches&0> %s\r\n", trig_attach_types[trig->attach_type]);
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_trigger(GET_OLC_VNUM(ch->desc)) ? "new trigger" : GET_TRIG_NAME(real_trigger(GET_OLC_VNUM(ch->desc))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_TRIG_NAME(trig), default_trig_name), NULLSAFE(GET_TRIG_NAME(trig)));
+	sprintf(buf + strlen(buf), "<%sattaches\t0> %s\r\n", OLC_LABEL_VAL(trig->attach_type, 0), trig_attach_types[trig->attach_type]);
 	
 	sprintbit(GET_TRIG_TYPE(trig), trig_attach_type_list[trig->attach_type], trgtypes, TRUE);
-	sprintf(buf + strlen(buf), "<&ytypes&0> %s\r\n", trgtypes);
+	sprintf(buf + strlen(buf), "<%stypes\t0> %s\r\n", OLC_LABEL_VAL(GET_TRIG_TYPE(trig), NOBITS), trgtypes);
 	
 	if (IS_SET(trig_arg_types, TRIG_ARG_PERCENT)) {
-		sprintf(buf + strlen(buf), "<&ypercent&0> %d%%\r\n", trig->narg);
+		sprintf(buf + strlen(buf), "<%spercent\t0> %d%%\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_PHRASE_OR_WORDLIST)) {
-		sprintf(buf + strlen(buf), "<&yargtype&0> %s\r\n", trig_arg_phrase_type[trig->narg]);
+		sprintf(buf + strlen(buf), "<%sargtype\t0> %s\r\n", OLC_LABEL_VAL(trig->narg, 0), trig_arg_phrase_type[trig->narg]);
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_OBJ_WHERE)) {
 		sprintbit(trig->narg, trig_arg_obj_where, buf1, TRUE);
-		sprintf(buf + strlen(buf), "<&ylocation&0> %s\r\n", trig->narg ? buf1 : "none");
+		sprintf(buf + strlen(buf), "<%slocation\t0> %s\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg ? buf1 : "none");
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST)) {
-		sprintf(buf + strlen(buf), "<&ystring&0> %s\r\n", NULLSAFE(trig->arglist));
+		sprintf(buf + strlen(buf), "<%sstring\t0> %s\r\n", OLC_LABEL_STR(trig->arglist, ""), NULLSAFE(trig->arglist));
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COST)) {
-		sprintf(buf + strlen(buf), "<&ycosts&0> %d other coins\r\n", trig->narg);
+		sprintf(buf + strlen(buf), "<%scosts\t0> %d other coins\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	
-	sprintf(buf + strlen(buf), "<&ycommands&0>\r\n%s", show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
+	sprintf(buf + strlen(buf), "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
 	
 	page_string(ch->desc, buf, TRUE);
 }
