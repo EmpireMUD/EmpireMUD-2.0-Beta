@@ -46,6 +46,12 @@ Examples:
  > olc object edit 1500
  > .m list 50-60
 
+In the editor display, anything in angle brackets is also the name of the
+command to edit it. For example, <&yname&0> can be edited by typing .name and
+the name you want to set. This label changes from yellow to green if the item
+has been changed from its default. For blind players, an asterisk appears
+before the label name.
+
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
 See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
