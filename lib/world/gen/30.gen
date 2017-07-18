@@ -82,7 +82,9 @@ earth armor~
 4 0
 0 0 0 0
 T0
-Your plating of earth armor fades.~
+Your plating of earth armor crumbles to dust.~
+T1
+$n's plating of earth armor crumbles to dust.~
 S
 #3013
 bestow vigor~
@@ -333,6 +335,10 @@ terrify~
 0 0 0 0
 T0
 You are no longer terrified.~
+T2
+You are terrified!~
+T3
+$n is terrified!~
 S
 #3049
 stunning blow~

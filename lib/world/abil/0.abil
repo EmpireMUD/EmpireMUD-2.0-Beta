@@ -75,7 +75,31 @@ Earthmeld~
 S
 #15
 Eartharmor~
-0 -1 1.00 0 0
+d -1 2.00 0 af
+A
+12 1
+A
+24 1
+C
+eartharmor 5 be 2 10 1 -1 0 8 5
+M
+0
+You form a thick layer of mana over your body, and it hardens to solid earth!~
+M
+1
+$n forms a thick layer of mana over $s body, and it hardens to solid earth!~
+M
+2
+You form a thick layer of mana over $N and then harden it to solid earth!~
+M
+3
+$n forms a thick layer of mana over you, and it hardens to solid earth!~
+M
+4
+$n forms a thick layer of mana over $N, and it hardens to solid earth!~
+T b 1
+X b
+3012 150 150 0
 S
 #16
 Worm~
@@ -83,7 +107,25 @@ Worm~
 S
 #17
 Terrify~
-0 -1 1.00 0 0
+af -1 1.00 C 0
+A
+21 -1
+A
+22 -1
+C
+terrify 7 bf 1 10 1 2035 15 4 2
+M
+2
+Shadows creep up around you and then strike out at $N!~
+M
+3
+Shadows creep up around $n and then strike out at you!~
+M
+4
+Shadows creep up around $n and then strike out at $N!~
+T b 1
+X b
+3048 30 30 0
 S
 #18
 Search~
