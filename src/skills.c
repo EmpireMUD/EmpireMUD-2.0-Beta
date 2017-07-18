@@ -232,10 +232,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_EARTHARMOR: {
-			affect_from_char_by_caster(ch, ATYPE_EARTHARMOR, ch, TRUE);
-			break;
-		}
 		case ABIL_EARTHMELD: {
 			if (affected_by_spell(ch, ATYPE_EARTHMELD)) {
 				void un_earthmeld(char_data *ch);

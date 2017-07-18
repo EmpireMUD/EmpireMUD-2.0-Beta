@@ -573,58 +573,6 @@ ACMD(do_counterspell) {
 }
 
 
-ACMD(do_eartharmor) {
-	struct affected_type *af;
-	char_data *vict = ch;
-	int cost = 20;
-	double amount;
-	
-	one_argument(argument, arg);
-	
-	if (!can_use_ability(ch, ABIL_EARTHARMOR, MANA, cost, NOTHING)) {
-		return;
-	}
-	
-	// targeting
-	if (!*arg) {
-		vict = ch;
-	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, ch, NULL, ABIL_EARTHARMOR)) {
-		return;
-	}
-	
-	if (SHOULD_APPEAR(ch)) {
-		appear(ch);
-	}
-	
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-	
-	// 100/14 = 7 resistance at max level
-	amount = get_ability_level(ch, ABIL_EARTHARMOR) / 14.0;
-	amount += GET_INTELLIGENCE(ch) / 3.0;
-	af = create_mod_aff(ATYPE_EARTHARMOR, 30, APPLY_RESIST_PHYSICAL, (int)amount, ch);
-	
-	if (ch == vict) {
-		msg_to_char(ch, "You form a thick layer of mana over your body, and it hardens to solid earth!\r\n");
-		act("$n forms a thick layer of mana over $s body, and it hardens to solid earth!", TRUE, ch, NULL, NULL, TO_ROOM);
-	}
-	else {
-		act("You form a thick layer of mana over $N and then harden it to solid earth!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n forms a thick layer of mana over you, and it hardens to solid earth!", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n forms a thick layer of mana over $N, and it hardens to solid earth!", FALSE, ch, NULL, vict, TO_NOTVICT);
-	}
-	
-	affect_join(vict, af, 0);
-	
-	gain_ability_exp(ch, ABIL_EARTHARMOR, 15);
-}
-
-
 ACMD(do_earthmeld) {
 	struct affected_type *af;
 	int cost = 50;
