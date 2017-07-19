@@ -745,31 +745,6 @@ ACMD(do_mount) {
 }
 
 
-ACMD(do_nightsight) {	
-	struct affected_type *af;
-	
-	if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
-		msg_to_char(ch, "You end your nightsight.\r\n");
-		act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_NIGHTSIGHT, FALSE);
-	}
-	else if (!can_use_ability(ch, ABIL_NIGHTSIGHT, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_NIGHTSIGHT)) {
-		return;
-	}
-	else {
-		msg_to_char(ch, "You activate nightsight.\r\n");
-		act("$n's eyes flash and take on a pale red glow.", TRUE, ch, NULL, NULL, TO_ROOM);
-		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION, ch);
-		affect_join(ch, af, 0);
-	}
-
-	command_lag(ch, WAIT_ABILITY);
-}
-
-
 ACMD(do_track) {
 	extern const char *dirs[];
 	

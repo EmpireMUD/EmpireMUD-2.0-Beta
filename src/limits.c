@@ -746,12 +746,6 @@ void real_update_char(char_data *ch) {
 			gain_condition(ch, FULL, 1);
 		}
 	}
-		
-	if (IS_DARK(IN_ROOM(ch))) {
-		if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
-			gain_ability_exp(ch, ABIL_NIGHTSIGHT, 0.5);
-		}
-	}
 	
 	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_FREQUENT);
 	

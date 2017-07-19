@@ -289,14 +289,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_NIGHTSIGHT: {
-			if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
-				msg_to_char(ch, "You end your nightsight.\r\n");
-				act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
-				affect_from_char(ch, ATYPE_NIGHTSIGHT, TRUE);
-			}
-			break;
-		}
 		case ABIL_OWL_SHADOW: {
 			despawn_familiar(ch, FAMILIAR_OWL_SHADOW);
 			break;

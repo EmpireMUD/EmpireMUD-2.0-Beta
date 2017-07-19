@@ -279,7 +279,6 @@ ACMD(do_mummify);
 ACMD(do_mydescription);
 
 ACMD(do_nearby);
-ACMD(do_nightsight);
 ACMD(do_nodismantle);
 ACMD(do_noskill);
 
@@ -829,7 +828,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "mydescription", POS_STANDING, do_mydescription, NO_MIN, CTYPE_UTIL ),
 
 	SIMPLE_CMD( "nearby", POS_RESTING, do_nearby, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "nightsight", POS_RESTING, do_nightsight, NO_MIN, CTYPE_SKILL, ABIL_NIGHTSIGHT ),
 	SIMPLE_CMD( "nodismantle", POS_SLEEPING, do_nodismantle, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "noskill", POS_DEAD, do_noskill, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "notitle", POS_DEAD, do_wizutil, LVL_CIMPL, CTYPE_IMMORTAL, SCMD_NOTITLE ),
