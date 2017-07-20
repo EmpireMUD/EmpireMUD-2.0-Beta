@@ -671,6 +671,12 @@ Message types:
    ability.
  &ccounterspell-to-vict&0 - Shown to the ability's victim after the counterspell.
  &ccounterspell-to-room&0 - Shown to the room after the counterspell.
+ &cfail-self-to-char&0 - Shown to the actor when the ability fails targeting
+   himself (or targets nobody).
+ &cfail-self-to-room&0 - To the room when the ability fails targeting self/nobody.
+ &cfail-targ-to-char&0 - To the actor when the ability fails targeting a character.
+ &cfail-targ-to-vict&0 - To the victim when the ability fails targeting a character.
+ &cfail-targ-to-room&0 - To the room when it fails targeting a character.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d
@@ -706,6 +712,15 @@ The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PLAYER-TECH ability type.
 
 See also: ABILEDIT TYPES, PLAYER TECHNOLOGIES, OLC ABILITIES
+#d
+"ABILEDIT DIFFICULTY"
+
+Usage:  .difficulty <type>
+
+Some abilities have a chance to fail. This setting determines how hard the
+ability is. If an ability can fail, you should set custom fail messages.
+
+See also: ABILEDIT CUSTOM, OLC ABILITIES
 #d
 "ABILEDIT DOT ABILITY" "DOT ABILITY" "DOT ABILITIES"
 

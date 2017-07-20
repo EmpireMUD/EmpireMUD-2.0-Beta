@@ -58,6 +58,7 @@ extern const char *damage_types[];
 extern const char *player_tech_types[];
 extern const char *pool_types[];
 extern const char *position_types[];
+extern const char *skill_check_difficulty[];
 extern const char *wait_types[];
 
 // external funcs
@@ -895,6 +896,61 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		data->stop = TRUE;	// prevent routines from firing
 		data->success = TRUE;	// counts as a successful ability use
 		data->no_msg = TRUE;	// don't show more messages
+	}
+	
+	// check for FAILURE:
+	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+		if (ch == cvict || !cvict) {	// message: targeting self
+			// to-char
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
+				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+			}
+		
+			// to room
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, NULL, cvict, TO_ROOM);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, NULL, cvict, TO_ROOM);
+			}
+		}
+		else {	// message: ch != cvict
+			// to-char
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
+				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+			}
+		
+			// to cvict
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, NULL, cvict, TO_VICT);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, NULL, cvict, TO_VICT);
+			}
+		
+			// to room
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, NULL, cvict, TO_NOTVICT);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, NULL, cvict, TO_NOTVICT);
+			}
+		}
+		
+		data->success = TRUE;	// causes it to charge, skillup, and cooldown
+		data->stop = TRUE;	// prevents normal activation
+		data->no_msg = TRUE;	// prevents success message
 	}
 	
 	// messaging
@@ -1754,7 +1810,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	struct ability_data_list *adl;
 	ability_data *abil, *find;
 	bitvector_t type;
-	int int_in[8];
+	int int_in[10];
 	double dbl_in;
 	
 	CREATE(abil, ability_data, 1);
@@ -1818,11 +1874,14 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				}
 				
 				// backwards-compatible with older versions
-				if (sscanf(line, "%s %d %s %d %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 10) {
-					int_in[3] = 0;	// default cost-per-scale-point
-					if (sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 9) {
-						log("SYSERR: Format error in C line of %s", error);
-						exit(1);
+				if (sscanf(line, "%s %d %s %d %d %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7], &int_in[8]) != 11) {
+					int_in[8] = DIFF_TRIVIAL;
+					if (sscanf(line, "%s %d %s %d %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 10) {
+						int_in[3] = 0;	// default cost-per-scale-point
+						if (sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 9) {
+							log("SYSERR: Format error in C line of %s", error);
+							exit(1);
+						}
 					}
 				}
 				
@@ -1839,6 +1898,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				ABIL_COOLDOWN_SECS(abil) = int_in[5];
 				ABIL_LINKED_TRAIT(abil) = int_in[6];
 				ABIL_WAIT_TYPE(abil) = int_in[7];
+				ABIL_DIFFICULTY(abil) = int_in[8];
 				break;
 			}
 			
@@ -2013,8 +2073,8 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	write_applies_to_file(fl, ABIL_APPLIES(abil));
 	
 	// 'C' command
-	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil)) {
-		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil));
+	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
+		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil), ABIL_DIFFICULTY(abil));
 	}
 	
 	// 'D' data
@@ -2450,7 +2510,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
 		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
+		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0], Difficulty: \ty%s\t0\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)], skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
 		
 		// type-specific data
 		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
@@ -2566,6 +2626,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
 		sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		sprintf(buf + strlen(buf), "<%swaittype\t0> %s, <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
+		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
 		
 		// type-specific data
 		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
@@ -2934,6 +2995,18 @@ OLC_MODULE(abiledit_data) {
 			}
 		}
 		msg_to_char(ch, "%s\r\n", found ? "" : " none");
+	}
+}
+
+
+OLC_MODULE(abiledit_difficulty) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!ABIL_COMMAND(abil)) {
+		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	}
+	else {
+		ABIL_DIFFICULTY(abil) = olc_process_type(ch, argument, "difficulty", "difficulty", skill_check_difficulty, ABIL_DIFFICULTY(abil));
 	}
 }
 

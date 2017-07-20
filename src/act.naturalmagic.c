@@ -851,50 +851,6 @@ ACMD(do_familiar) {
 }
 
 
-ACMD(do_hasten) {
-	struct affected_type *af;
-	char_data *vict = ch;
-	int cost = 15;
-	int durations[] = { 6 MUD_HOURS, 6 MUD_HOURS, 24 MUD_HOURS };
-	
-	one_argument(argument, arg);
-	
-	if (!can_use_ability(ch, ABIL_HASTEN, MANA, cost, NOTHING)) {
-		return;
-	}
-	else if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
-	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_HASTEN)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-		
-		if (ch == vict) {
-			msg_to_char(ch, "You concentrate and veins of red mana streak down your skin.\r\n");
-			act("Veins of red mana streak down $n's skin and $e seems to move a little faster.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {
-			act("You touch $N and veins of red mana streak down $S skin.", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n touches you on the arm. Veins of red mana streak down your skin and you feel a little faster.", FALSE, ch, NULL, vict, TO_VICT);
-			act("$n touches $N on the arm. Veins of red mana streak down $S skin and $E seems to move a little faster.", FALSE, ch, NULL, vict, TO_NOTVICT);
-		}
-		
-		af = create_flag_aff(ATYPE_HASTEN, CHOOSE_BY_ABILITY_LEVEL(durations, ch, ABIL_HASTEN), AFF_HASTE, ch);
-		affect_join(vict, af, 0);
-		
-		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_HASTEN, 15);
-		}
-
-		if (FIGHTING(vict) && !FIGHTING(ch)) {
-			engage_combat(ch, FIGHTING(vict), FALSE);
-		}
-	}
-}
-
-
 /**
 * do_heal connects several abilities: ABIL_HEAL, ABIL_HEAL_FRIEND,
 * and ABIL_HEAL_PARTY. Restrictions are based on which of these the player

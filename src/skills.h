@@ -70,12 +70,13 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 
-// skill_check difficulties
-#define DIFF_EASY  0
-#define DIFF_MEDIUM  1
-#define DIFF_HARD  2
-#define DIFF_RARELY  3
-#define NUM_DIFF_TYPES  4
+// DIFF_x: skill_check difficulties
+#define DIFF_TRIVIAL  0
+#define DIFF_EASY  1
+#define DIFF_MEDIUM  2
+#define DIFF_HARD  3
+#define DIFF_RARELY  4
+#define NUM_DIFF_TYPES  5
 
 
 // SKILL_x: skill vnums
@@ -196,7 +197,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_CLEANSE  116
 #define ABIL_READY_FIREBALL  117
 #define ABIL_LIGHTNINGBOLT  118
-#define ABIL_HASTEN  119
 #define ABIL_COUNTERSPELL  120
 #define ABIL_ENTANGLE  121
 #define ABIL_FAMILIAR  122

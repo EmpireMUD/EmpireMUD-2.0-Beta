@@ -61,6 +61,7 @@ OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_custom);
 OLC_MODULE(abiledit_damagetype);
 OLC_MODULE(abiledit_data);
+OLC_MODULE(abiledit_difficulty);
 OLC_MODULE(abiledit_flags);
 OLC_MODULE(abiledit_gainhooks);
 OLC_MODULE(abiledit_immunities);
@@ -561,6 +562,7 @@ const struct olc_command_data olc_data[] = {
 	{ "custom", abiledit_custom, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "damagetype", abiledit_damagetype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "data", abiledit_data, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "difficulty", abiledit_difficulty, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "gainhooks", abiledit_gainhooks, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "immunities", abiledit_immunities, OLC_ABILITY, OLC_CF_EDITOR },

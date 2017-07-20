@@ -108,6 +108,7 @@
 #define ABIL_CUSTOM_MSGS(abil)  ((abil)->custom_msgs)
 #define ABIL_DAMAGE_TYPE(abil)  ((abil)->damage_type)
 #define ABIL_DATA(abil)  ((abil)->data)
+#define ABIL_DIFFICULTY(abil)  ((abil)->difficulty)
 #define ABIL_FLAGS(abil)  ((abil)->flags)
 #define ABIL_GAIN_HOOKS(abil)  ((abil)->gain_hooks)
 #define ABIL_IMMUNITIES(abil)  ((abil)->immunities)

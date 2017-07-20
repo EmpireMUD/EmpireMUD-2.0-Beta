@@ -254,10 +254,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_GRIFFIN);
 			break;
 		}
-		case ABIL_HASTEN: {
-			affect_from_char_by_caster(ch, ATYPE_HASTEN, ch, TRUE);
-			break;
-		}
 		case ABIL_HONE: {
 			remove_honed_gear(ch);
 			break;
@@ -1442,13 +1438,18 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 /**
 * @param char_data *ch who to check for
 * @param any_vnum ability which ABIL_x
-* @param int difficulty any DIFF_x const
+* @param int difficulty any DIFF_ const
 * @return bool TRUE for success, FALSE for fail
 */
 bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
 	extern double skill_check_difficulty_modifier[NUM_DIFF_TYPES];
 
 	int chance = get_ability_level(ch, ability);
+	
+	// always succeeds
+	if (difficulty == DIFF_TRIVIAL) {
+		return TRUE;
+	}
 
 	// players without the ability have no chance	
 	if (!IS_NPC(ch) && !has_ability(ch, ability)) {

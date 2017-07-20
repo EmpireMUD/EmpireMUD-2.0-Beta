@@ -476,6 +476,11 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_COUNTERSPELL_TO_CHAR  5
 #define ABIL_CUSTOM_COUNTERSPELL_TO_VICT  6
 #define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM  7
+#define ABIL_CUSTOM_FAIL_SELF_TO_CHAR  8
+#define ABIL_CUSTOM_FAIL_SELF_TO_ROOM  9
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR  10
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_VICT  11
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
 
 
 // ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
@@ -2680,6 +2685,7 @@ struct ability_data {
 	int cooldown_secs;	// how long to cooldown, if any
 	int wait_type;	// WAIT_ flag
 	int linked_trait;	// APPLY_ type that this scales with
+	int difficulty;	// DIFF_ type, if any
 	struct custom_message *custom_msgs;	// any custom messages
 	
 	// type-specific data
