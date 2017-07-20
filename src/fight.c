@@ -3260,9 +3260,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 					gain_ability_exp(ch, ABIL_WEAPON_PROFICIENCY, 5);
 				}
 				gain_ability_exp(ch, ABIL_FINESSE, 2);
-				if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-					gain_ability_exp(ch, ABIL_ALACRITY, 2);
-				}
 			
 				// fireball skill gain
 				if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_FIREBALL) {
@@ -3766,9 +3763,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			gain_player_tech_exp(ch, PTECH_RANGED_COMBAT, 2);
 			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
 			gain_ability_exp(ch, ABIL_TRICK_SHOTS, 2);
-			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-				gain_ability_exp(ch, ABIL_ALACRITY, 2);
-			}
 			run_ability_gain_hooks(ch, vict, AGH_RANGED);
 		}
 	}

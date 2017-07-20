@@ -155,8 +155,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SNEAK  29
 #define ABIL_SOLAR_POWER  30
 #define ABIL_SOULSIGHT  31
-#define ABIL_SOULMASK  32
-#define ABIL_ALACRITY  33
 #define ABIL_SUMMON_ANIMALS  34
 #define ABIL_SUMMON_HUMANS  35
 #define ABIL_HEARTSTOP  36
@@ -187,7 +185,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_FINESSE  105
 #define ABIL_STUNNING_BLOW  106
 #define ABIL_VEINTAP  107
-#define ABIL_WEAKEN  108
 #define ABIL_HEAL  109
 #define ABIL_HEAL_FRIEND  110
 #define ABIL_HEAL_PARTY  111

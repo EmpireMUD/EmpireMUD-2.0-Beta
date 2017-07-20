@@ -169,11 +169,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	}
 	
 	switch (ABIL_VNUM(abil)) {
-		case ABIL_ALACRITY: {
-			void end_alacrity(char_data *ch);
-			end_alacrity(ch);
-			break;
-		}
 		case ABIL_BANSHEE: {
 			despawn_familiar(ch, FAMILIAR_BANSHEE);
 			break;
@@ -331,10 +326,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_SPIRIT_WOLF: {
 			despawn_familiar(ch, FAMILIAR_SPIRIT_WOLF);
-			break;
-		}
-		case ABIL_SOULMASK: {
-			affect_from_char(ch, ATYPE_SOULMASK, TRUE);
 			break;
 		}
 		default: {

@@ -761,7 +761,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 	}
 	
 	// ok check if we can perform it
-	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE))) {
+	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
 		return TRUE;	// sent its own error message
 	}
 	
@@ -848,7 +848,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// check costs and cooldowns now
-	if (ABIL_COST_TYPE(abil) == BLOOD && (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) > 0) && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
+	if (ABIL_COST_TYPE(abil) == BLOOD && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
 		return;	// sun fail
 	}
 	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
