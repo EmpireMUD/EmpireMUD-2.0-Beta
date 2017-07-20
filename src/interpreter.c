@@ -311,7 +311,6 @@ ACMD(do_quarry);
 ACMD(do_quest);
 ACMD(do_quit);
 
-ACMD(do_radiance);
 ACMD(do_random);
 ACMD(do_read);
 ACMD(do_ready);
@@ -867,7 +866,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "quit", POS_DEAD, do_quit, NO_MIN, NO_GRANTS, SCMD_QUIT, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 
 	SIMPLE_CMD( "reply", POS_DEAD, do_reply, NO_MIN, CTYPE_COMM ),
-	ABILITY_CMD( "radiance", POS_STANDING, do_radiance, NO_MIN, CTYPE_SKILL, ABIL_RADIANCE ),
 	SIMPLE_CMD( "random", POS_SLEEPING, do_random, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "read", POS_RESTING, do_read, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "ready", POS_FIGHTING, do_ready, NO_MIN, CTYPE_COMBAT ),

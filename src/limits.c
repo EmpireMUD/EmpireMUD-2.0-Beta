@@ -429,10 +429,6 @@ void point_update_char(char_data *ch) {
 			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
 		}
 		
-		if (affected_by_spell(ch, ATYPE_RADIANCE)) {
-			gain_ability_exp(ch, ABIL_RADIANCE, 2);
-		}
-		
 		gain_ability_exp(ch, ABIL_GIFT_OF_NATURE, 2);
 		gain_ability_exp(ch, ABIL_ARCANE_POWER, 2);
 		

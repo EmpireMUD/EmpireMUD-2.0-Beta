@@ -287,10 +287,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			affect_from_char(ch, ATYPE_PHOENIX_RITE, TRUE);
 			break;
 		}
-		case ABIL_RADIANCE: {
-			affect_from_char(ch, ATYPE_RADIANCE, TRUE);
-			break;
-		}
 		case ABIL_READY_FIREBALL: {
 			if ((obj = GET_EQ(ch, WEAR_WIELD))) {
 				if (GET_OBJ_VNUM(obj) == o_FIREBALL) {

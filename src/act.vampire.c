@@ -489,7 +489,8 @@ void update_biting_char(char_data *ch) {
 
 
 void update_vampire_sun(char_data *ch) {
-	bool found = FALSE;
+	bool repeat, found = FALSE;
+	struct affected_type *af;
 	
 	// only applies if vampire and not an NPC
 	if (IS_NPC(ch) || !IS_VAMPIRE(ch) || check_vampire_sun(ch, FALSE)) {
@@ -504,10 +505,28 @@ void update_vampire_sun(char_data *ch) {
 		retract_claws(ch);
 	}
 	
+	// look for things that cause blood upkeep and remove them
+	do {
+		repeat = FALSE;
+		
+		LL_FOREACH(ch->affected, af) {
+			if (af->cast_by == CAST_BY_ID(ch) && af->location == APPLY_BLOOD_UPKEEP && af->modifier > 0) {
+				if (!found) {
+					sun_message(ch);
+					found = TRUE;
+				}
+				repeat = TRUE;	// gotta try again
+				affect_from_char(ch, af->type, TRUE);
+				break;	// this removes multiple affs so it's not safe to continue on the list
+			}
+		}
+	} while (repeat);
+	
 	// revert vampire morphs
 	if (IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_VAMPIRE_ONLY)) {
 		if (!found) {
 			sun_message(ch);
+			found = TRUE;
 		}
 		
 		// store morph name
