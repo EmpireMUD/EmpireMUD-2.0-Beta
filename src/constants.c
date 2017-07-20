@@ -123,6 +123,7 @@ const char *ability_flags[] = {
 	"MELEE",	// 10
 	"TANK",
 	"RANGED-ONLY",
+	"IGNORE-SUN",
 	"\n"
 };
 

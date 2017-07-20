@@ -756,6 +756,7 @@ The following ability flags are available:
  &cMELEE&0 - Bonus for melee role, weaker without it.
  &cTANK&0 - Bonus for tank role, weaker without it.
  &cRANGED-ONLY&0 - Cannot be used in melee combat.
+ &cIGNORE-SUN&0 - For a vampire ability, won't check sunlight.
 
 See also: OLC ABILITIES
 #d

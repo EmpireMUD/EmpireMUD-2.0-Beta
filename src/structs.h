@@ -427,6 +427,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_MELEE  BIT(10)	// k. bonus if in 'melee' role
 #define ABILF_TANK  BIT(11)	// l. bonus if in 'tank' role
 #define ABILF_RANGED_ONLY  BIT(12)	// m. requires ranged combat
+#define ABILF_IGNORE_SUN  BIT(13)	// n. vampire ability ignores sunlight
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER | ABILF_HEALER | ABILF_MELEE | ABILF_TANK)
 

@@ -63,6 +63,7 @@ extern const char *wait_types[];
 
 // external funcs
 void check_combat_start(char_data *ch);
+extern bool check_vampire_sun(char_data *ch, bool message);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 
@@ -847,6 +848,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// check costs and cooldowns now
+	if (ABIL_COST_TYPE(abil) == BLOOD && (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) > 0) && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
+		return;	// sun fail
+	}
 	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
 		return;
 	}
