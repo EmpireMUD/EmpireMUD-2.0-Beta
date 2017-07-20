@@ -148,7 +148,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_HIDE  20
 #define ABIL_HORRID_FORM  21
 #define ABIL_DISPEL  22
-#define ABIL_MAJESTY  23
 #define ABIL_MIST_FORM  24
 #define ABIL_MUMMIFY  25
 #define ABIL_REGENERATE  27

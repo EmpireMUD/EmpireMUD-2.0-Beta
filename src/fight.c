@@ -2166,9 +2166,6 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 
 	// try to hit people through majesty?
-	if (can_gain_exp_from(victim, ch)) {
-		gain_ability_exp(victim, ABIL_MAJESTY, 33.4);
-	}
 	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 		return FALSE;
 	}

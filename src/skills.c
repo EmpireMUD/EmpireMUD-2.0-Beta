@@ -74,7 +74,6 @@ int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
 */
 void check_skill_sell(char_data *ch, ability_data *abil) {
 	bool despawn_familiar(char_data *ch, mob_vnum vnum);
-	void end_majesty(char_data *ch);
 	void finish_morphing(char_data *ch, morph_data *morph);
 	void remove_armor_by_type(char_data *ch, int armor_type);
 	void remove_honed_gear(char_data *ch);
@@ -256,10 +255,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_HONE: {
 			remove_honed_gear(ch);
-			break;
-		}
-		case ABIL_MAJESTY: {
-			end_majesty(ch);
 			break;
 		}
 		case ABIL_MANASHIELD: {

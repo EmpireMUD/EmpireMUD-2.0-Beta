@@ -187,18 +187,6 @@ void end_boost(char_data *ch) {
 }
 
 
-// for do_majesty: shuts off majesty
-void end_majesty(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_MAJESTY)) {
-		affects_from_char_by_aff_flag(ch, AFF_MAJESTY, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_MAJESTY)) {
-			msg_to_char(ch, "You reduce your supernatural majesty.\r\n");
-			act("$n seems less majestic now.", TRUE, ch, 0, 0, TO_ROOM);
-		}
-	}
-}
-
-
 // max blood is set in mobfile for npc, but computed for player
 int GET_MAX_BLOOD(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
@@ -534,14 +522,6 @@ void update_vampire_sun(char_data *ch) {
 		}
 		found = TRUE;
 		retract_claws(ch);
-	}
-	
-	if (affected_by_spell(ch, ATYPE_MAJESTY)) {
-		if (!found) {
-			sun_message(ch);
-		}
-		found = TRUE;
-		end_majesty(ch);
 	}
 	
 	// revert vampire morphs
@@ -1071,37 +1051,6 @@ ACMD(do_feed) {
 		GET_BLOOD(ch) -= amt;
 		GET_BLOOD(victim) = MIN(GET_MAX_BLOOD(victim), GET_BLOOD(victim) + amt);
 	}
-}
-
-
-ACMD(do_majesty) {
-	struct affected_type *af;
-	
-	if (affected_by_spell(ch, ATYPE_MAJESTY)) {
-		end_majesty(ch);
-	}
-	else if (!check_vampire_ability(ch, ABIL_MAJESTY, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_MAJESTY)) {
-		return;
-	}
-	else {
-		msg_to_char(ch, "You create a sense of supernatural majesty about yourself.\r\n");
-		act("$n glows majestically.", TRUE, ch, 0, 0, TO_ROOM);
-
-		af = create_flag_aff(ATYPE_MAJESTY, UNLIMITED, AFF_MAJESTY, ch);
-		affect_join(ch, af, 0);
-			
-		af = create_mod_aff(ATYPE_MAJESTY, UNLIMITED, APPLY_BLOOD_UPKEEP, 3, ch);
-		affect_to_char(ch, af);
-		free(af);
-	}
-	
-	command_lag(ch, WAIT_ABILITY);
 }
 
 

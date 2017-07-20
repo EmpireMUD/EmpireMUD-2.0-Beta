@@ -1169,28 +1169,26 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	// now create affects for each apply that we can afford
-	if (total_w > 0) {
-		LL_FOREACH(ABIL_APPLIES(abil), apply) {
-			if (apply_never_scales[apply->location]) {
-				af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
-				affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
-				messaged = TRUE;
-				continue;
-			}
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		if (apply_never_scales[apply->location]) {
+			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
+			affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
+			messaged = TRUE;
+			continue;
+		}
 
-			share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
-			if (share > remaining_points) {
-				share = MIN(share, remaining_points);
-			}
-			amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
-			if (share > 0 && amt != 0) {
-				remaining_points -= share;
-				remaining_points = MAX(0, total_points);
-				
-				af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
-				affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
-				messaged = TRUE;
-			}
+		share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
+		if (share > remaining_points) {
+			share = MIN(share, remaining_points);
+		}
+		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
+		if (share > 0 && amt != 0) {
+			remaining_points -= share;
+			remaining_points = MAX(0, total_points);
+			
+			af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
+			affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
+			messaged = TRUE;
 		}
 	}
 	
