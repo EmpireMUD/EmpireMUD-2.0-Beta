@@ -914,51 +914,6 @@ ACMD(do_enervate) {
 }
 
 
-ACMD(do_foresight) {
-	struct affected_type *af;
-	char_data *vict = ch;
-	int amt, cost = 30;
-	
-	int levels[] = { 5, 10, 15 };
-	
-	one_argument(argument, arg);
-	
-	if (!can_use_ability(ch, ABIL_FORESIGHT, MANA, cost, NOTHING)) {
-		return;
-	}
-	else if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
-	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_FORESIGHT)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-		
-		if (ch == vict) {
-			msg_to_char(ch, "You pull out a grease pencil and mark each of your eyelids with an X...\r\nYou feel the gift of foresight!\r\n");
-			act("$n pulls out a grease pencil and marks each of $s eyelids with an X.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {
-			act("You pull out a grease pencil and mark each of $N's eyelids with an X, giving $M the gift of foresight.", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n marks each of your eyelids using a grease pencil...\r\nYou feel the gift of foresight!", FALSE, ch, NULL, vict, TO_VICT);
-			act("$n pulls out a grease pencil and marks each of $N's eyelids with an X.", FALSE, ch, NULL, vict, TO_NOTVICT);
-		}
-		
-		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FORESIGHT) + GET_INTELLIGENCE(ch);
-		
-		af = create_mod_aff(ATYPE_FORESIGHT, 12 MUD_HOURS, APPLY_DODGE, amt, ch);
-		affect_join(vict, af, 0);
-		
-		gain_ability_exp(ch, ABIL_FORESIGHT, 15);
-
-		if (FIGHTING(vict) && !FIGHTING(ch)) {
-			engage_combat(ch, FIGHTING(vict), FALSE);
-		}
-	}
-}
-
-
 ACMD(do_manashield) {
 	struct affected_type *af1, *af2, *af3;
 	int cost = 25;

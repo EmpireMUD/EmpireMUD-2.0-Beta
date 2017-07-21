@@ -220,7 +220,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_BAT_FORM  162
 #define ABIL_RITUAL_OF_BURDENS  163
 #define ABIL_MANASHIELD  165
-#define ABIL_FORESIGHT  166
 #define ABIL_SUMMON_SWIFT  168
 #define ABIL_SUMMON_MATERIALS  169
 #define ABIL_STAFF_MASTERY  171

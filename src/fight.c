@@ -3269,9 +3269,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		}
 		if (result >= 0 && combat_round && can_gain_skill && !IS_NPC(victim) && can_gain_exp_from(victim, ch)) {
 			gain_ability_exp(victim, ABIL_EVASION, 5);
-			if (affected_by_spell(victim, ATYPE_FORESIGHT)) {
-				gain_ability_exp(victim, ABIL_FORESIGHT, 2);
-			}
 		}
 		
 		/* check if the victim has a hitprcnt trigger */
