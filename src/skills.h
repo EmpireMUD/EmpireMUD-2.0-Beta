@@ -214,7 +214,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_CONCEALMENT  148
 #define ABIL_SHADOWSTEP  153
 #define ABIL_JAB  155
-#define ABIL_BLIND  156
 #define ABIL_SAP  157
 #define ABIL_DAGGER_MASTERY  158
 #define ABIL_PRICK  161

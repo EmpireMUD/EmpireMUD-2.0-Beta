@@ -697,59 +697,6 @@ ACMD(do_backstab) {
 }
 
 
-ACMD(do_blind) {
-	struct affected_type *af;
-	char_data *vict;
-	int cost = 15;
-
-	one_argument(argument, arg);
-
-	if (!can_use_ability(ch, ABIL_BLIND, MOVE, cost, COOLDOWN_BLIND)) {
-		// sends own messages
-	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
-		send_to_char("Blind whom?\r\n", ch);
-	}
-	else if (vict == ch) {
-		send_to_char("You shouldn't blind yourself!\r\n", ch);
-	}
-	else if (!can_fight(ch, vict)) {
-		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
-	}
-	else if (NOT_MELEE_RANGE(ch, vict)) {
-		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_BLIND)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BLIND, 10, WAIT_COMBAT_ABILITY);
-
-		if (skill_check(ch, ABIL_BLIND, DIFF_MEDIUM) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
-			act("You toss a handful of sand into $N's eyes!", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n tosses a handful of sand into your eyes!\r\n&rYou're blind!&0", FALSE, ch, NULL, vict, TO_VICT);
-			act("$n tosses a handful of sand into $N's eyes!", FALSE, ch, NULL, vict, TO_NOTVICT);
-			
-			af = create_flag_aff(ATYPE_BLIND, 2, AFF_BLIND, ch);
-			affect_join(vict, af, 0);
-		
-			engage_combat(ch, vict, TRUE);
-		}
-		else {
-			act("You toss a handful of sand at $N, but miss $S eyes!", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n tosses a handful of sand at you, but misses your eyes!", FALSE, ch, NULL, vict, TO_VICT);
-			act("$n tosses a handful of sand but misses $N's eyes!", FALSE, ch, NULL, vict, TO_NOTVICT);
-			
-			engage_combat(ch, vict, TRUE);
-		}
-		
-		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_BLIND, 15);
-		}
-	}
-}
-
-
 ACMD(do_darkness) {
 	struct affected_type *af;
 	int cost = 15;
