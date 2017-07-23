@@ -751,10 +751,10 @@ The following ability flags are available:
  &cRANGED&0 - Can be used during ranged combat without giving a melee error.
  &c!ANIMAL&0 - Cannot be used in animal form.
  &c!INVULNERABLE&0 - Cannot be used while invulnerable (e.g. mistform).
- &cCASTER&0 - Bonus for caster role, weaker without it.
- &cHEALER&0 - Bonus for healer role, weaker without it.
- &cMELEE&0 - Bonus for melee role, weaker without it.
- &cTANK&0 - Bonus for tank role, weaker without it.
+ &cCASTER-ROLE&0 - Bonus for caster role, weaker without it.
+ &cHEALER-ROLE&0 - Bonus for healer role, weaker without it.
+ &cMELEE-ROLE&0 - Bonus for melee role, weaker without it.
+ &cTANK-ROLE&0 - Bonus for tank role, weaker without it.
  &cRANGED-ONLY&0 - Cannot be used in melee combat.
  &cIGNORE-SUN&0 - For a vampire ability, won't check sunlight.
 

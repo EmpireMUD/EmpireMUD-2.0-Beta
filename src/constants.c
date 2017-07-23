@@ -118,10 +118,10 @@ const char *ability_flags[] = {
 	"RANGED",	// 5
 	"!ANIMAL",
 	"!INVULNERABLE",
-	"CASTER",
-	"HEALER",
-	"MELEE",	// 10
-	"TANK",
+	"CASTER-ROLE",
+	"HEALER-ROLE",
+	"MELEE-ROLE",	// 10
+	"TANK-ROLE",
 	"RANGED-ONLY",
 	"IGNORE-SUN",
 	"\n"
