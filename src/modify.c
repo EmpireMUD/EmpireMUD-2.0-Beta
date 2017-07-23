@@ -711,7 +711,11 @@ void parse_action(int command, char *string, descriptor_data *d) {
 			while (isalpha(string[j]) && j < 2)
 				if (string[j++] == 'a' && !indent)
 					rep_all = 1;
-			if ((s = strtok(string, "'")) == NULL) {
+			if (!*d->str) {
+				SEND_TO_Q("Nothing to replace.\r\n", d);
+				return;
+			}
+			else if ((s = strtok(string, "'")) == NULL) {
 				SEND_TO_Q("Invalid format.\r\n", d);
 				return;
 			}
