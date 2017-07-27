@@ -2043,6 +2043,28 @@ void check_skills(void) {
 
 
 /**
+* Finds an attack type by name, preferring exact matches.
+*
+* @param char *name The text to look for.
+* @return int One of the TYPE_ attack type consts.
+*/
+int get_attack_type_by_name(char *name) {
+	int iter, abbrev = NOTHING;
+	
+	for (iter = 0; iter < NUM_ATTACK_TYPES; ++iter) {
+		if (!str_cmp(name, attack_hit_info[iter].name)) {
+			return iter;	// exact
+		}
+		else if (abbrev == NOTHING && is_abbrev(name, attack_hit_info[iter].name)) {
+			abbrev = iter;
+		}
+	}
+	
+	return abbrev;	// if any
+}
+
+
+/**
 * @param char_data *ch the user
 * @return obj_data *a valid chipper, or NULL if the user has none
 */

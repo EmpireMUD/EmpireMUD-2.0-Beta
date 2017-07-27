@@ -64,6 +64,7 @@ extern const char *wait_types[];
 // external funcs
 void check_combat_start(char_data *ch);
 extern bool check_vampire_sun(char_data *ch, bool message);
+extern int get_attack_type_by_name(char *name);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 
@@ -2345,6 +2346,418 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	msg_to_char(ch, "Ability %d deleted.\r\n", vnum);
 	
 	free_ability(abil);
+}
+
+
+/**
+* Searches properties of abilities.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_abil(char_data *ch, char *argument) {
+	#define FAKE_DUR  -999	// arbitrary control number
+	
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
+	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom;
+	int count, lookup, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
+	int min_cost = NOTHING, max_cost = NOTHING, min_cost_per = NOTHING, max_cost_per = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
+	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_attack = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
+	struct ability_data_list *data;
+	ability_data *abil, *next_abil;
+	struct custom_message *cust;
+	struct apply_data *app;
+	size_t size;
+	bool found;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP ABILEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (is_abbrev(type_arg, "-affects")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
+				only_affs |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid affect flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-apply") || is_abbrev(type_arg, "-applies")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, apply_types, FALSE)) != NOTHING) {
+				find_applies |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid apply type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-attacktype")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_attack = get_attack_type_by_name(val_arg)) == NOTHING) {
+				msg_to_char(ch, "Invalid attack type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-costtype")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_cost_type = search_block(val_arg, pool_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid cost type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-custom")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, ability_custom_types, FALSE)) != NOTHING) {
+				find_custom |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid custom message type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-damagetype")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_damage = search_block(val_arg, damage_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid damage type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-difficulty")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_wait = search_block(val_arg, skill_check_difficulty, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid difficulty '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, ability_flags, FALSE)) != NOTHING) {
+				only_flags |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-gains") || is_abbrev(type_arg, "-gainhooks")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, ability_gain_hooks, FALSE)) != NOTHING) {
+				only_gains |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid gain hook '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-immunities") || is_abbrev(type_arg, "-immunity") || is_abbrev(type_arg, "immune")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
+				only_immunities |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid immunity '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-linkedtrait")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_linked = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid linked trait '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-maxcooldowntime")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (max_cd = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid cooldown time '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-mincooldowntime")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (min_cd = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid cooldown time '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-maxcost")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (max_cost = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-mincost")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (min_cost = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-maxcostperscalepoint")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (max_cost_per = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-mincostperscalepoint")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (min_cost_per = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-maxposition")) {
+			argument = any_one_word(argument, val_arg);
+			if ((max_pos = search_block(val_arg, position_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid position '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-minposition")) {
+			argument = any_one_word(argument, val_arg);
+			if ((min_pos = search_block(val_arg, position_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid position '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-maxduration")) {
+			argument = any_one_word(argument, val_arg);
+			if (is_abbrev(val_arg, "unlimited")) {
+				max_dur = UNLIMITED;
+			}
+			else if (!isdigit(*val_arg) || (max_dur = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid duration '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-minduration")) {
+			argument = any_one_word(argument, val_arg);
+			if (is_abbrev(val_arg, "unlimited")) {
+				min_dur = UNLIMITED;
+			}
+			else if (!isdigit(*val_arg) || (min_dur = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid duration '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-ptech")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_ptech = search_block(val_arg, player_tech_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid player tech '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-scale")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_scale = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid scale percent '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-scaleover")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (scale_over = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid scale-over percent '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-scaleunder")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (scale_under = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid scale-under percent '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-targets")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, ability_target_flags, FALSE)) != NOTHING) {
+				only_targets |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid target flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-type")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_type = search_block(val_arg, ability_type_flags, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-unflagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, ability_flags, FALSE)) != NOTHING) {
+				not_flagged |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-waittype")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_wait = search_block(val_arg, wait_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid wait type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Ability fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up items
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (ABIL_MIN_POS(abil) < min_pos || ABIL_MIN_POS(abil) > max_pos) {
+			continue;
+		}
+		if (only_cost_type != NOTHING && ABIL_COST_TYPE(abil) != only_cost_type) {
+			continue;
+		}
+		if (only_attack != NOTHING && ABIL_ATTACK_TYPE(abil) != only_attack) {
+			continue;
+		}
+		if (only_damage != NOTHING && ABIL_DAMAGE_TYPE(abil) != only_damage) {
+			continue;
+		}
+		if (only_diff != NOTHING && ABIL_DIFFICULTY(abil) != only_diff) {
+			continue;
+		}
+		if (only_linked != NOTHING && ABIL_LINKED_TRAIT(abil) != only_linked) {
+			continue;
+		}
+		if (only_wait != NOTHING && ABIL_WAIT_TYPE(abil) != only_wait) {
+			continue;
+		}
+		if (max_cd != NOTHING && ABIL_COOLDOWN_SECS(abil) > max_cd) {
+			continue;
+		}
+		if (min_cd != NOTHING && ABIL_COOLDOWN_SECS(abil) < min_cd) {
+			continue;
+		}
+		if (max_cost != NOTHING && ABIL_COST(abil) > max_cost) {
+			continue;
+		}
+		if (min_cost != NOTHING && ABIL_COST(abil) < min_cost) {
+			continue;
+		}
+		if (max_cost_per != NOTHING && ABIL_COST_PER_SCALE_POINT(abil) > max_cost_per) {
+			continue;
+		}
+		if (min_cost_per != NOTHING && ABIL_COST_PER_SCALE_POINT(abil) < min_cost_per) {
+			continue;
+		}
+		if (max_dur != FAKE_DUR && ABIL_SHORT_DURATION(abil) > max_dur && ABIL_LONG_DURATION(abil) > max_dur) {
+			continue;
+		}
+		if (min_dur != FAKE_DUR && ABIL_SHORT_DURATION(abil) < min_dur && ABIL_LONG_DURATION(abil) < min_dur) {
+			continue;
+		}
+		if (only_scale != NOTHING && ABIL_SCALE(abil) != only_scale) {
+			continue;
+		}
+		if (scale_over != NOTHING && ABIL_SCALE(abil) < scale_over) {
+			continue;
+		}
+		if (scale_under != NOTHING && ABIL_SCALE(abil) > scale_under) {
+			continue;
+		}
+		if (only_type != NOTHING && !IS_SET(ABIL_TYPES(abil), BIT(only_type))) {
+			continue;
+		}
+		if (not_flagged != NOBITS && ABILITY_FLAGGED(abil, not_flagged)) {
+			continue;
+		}
+		if (only_affs != NOBITS && (ABIL_AFFECTS(abil) & only_affs) != only_affs) {
+			continue;
+		}
+		if (only_flags != NOBITS && (ABIL_FLAGS(abil) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_gains != NOBITS && (ABIL_GAIN_HOOKS(abil) & only_gains) != only_gains) {
+			continue;
+		}
+		if (only_immunities != NOBITS && (ABIL_IMMUNITIES(abil) & only_immunities) != only_immunities) {
+			continue;
+		}
+		if (only_targets != NOBITS && (ABIL_TARGETS(abil) & only_targets) != only_targets) {
+			continue;
+		}
+		if (find_applies) {	// look up its applies
+			found_applies = NOBITS;
+			LL_FOREACH(ABIL_APPLIES(abil), app) {
+				found_applies |= BIT(app->location);
+			}
+			if ((find_applies & found_applies) != find_applies) {
+				continue;
+			}
+		}
+		if (find_custom) {	// look up its custom messages
+			found_custom = NOBITS;
+			LL_FOREACH(ABIL_CUSTOM_MSGS(abil), cust) {
+				found_custom |= BIT(cust->type);
+			}
+			if ((find_custom & found_custom) != find_custom) {
+				continue;
+			}
+		}
+		if (only_ptech != NOTHING) {
+			found = FALSE;
+			LL_FOREACH(ABIL_DATA(abil), data) {
+				if (data->type == ADL_PLAYER_TECH && data->vnum == only_ptech) {
+					found = TRUE;
+				}
+			}
+			if (!found) {
+				continue;
+			}
+		}
+		if (*find_keywords && !multi_isname(find_keywords, ABIL_NAME(abil)) && !multi_isname(find_keywords, NULLSAFE(ABIL_COMMAND(abil))) && !search_custom_messages(find_keywords, ABIL_CUSTOM_MSGS(abil))) {
+			continue;
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d abilities)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 
