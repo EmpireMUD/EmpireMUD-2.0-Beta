@@ -2673,13 +2673,13 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		if (min_dur != FAKE_DUR && ABIL_SHORT_DURATION(abil) < min_dur && ABIL_LONG_DURATION(abil) < min_dur) {
 			continue;
 		}
-		if (only_scale != NOTHING && ABIL_SCALE(abil) != only_scale) {
+		if (only_scale != NOTHING && (int)(ABIL_SCALE(abil) * 100) != only_scale) {
 			continue;
 		}
-		if (scale_over != NOTHING && ABIL_SCALE(abil) < scale_over) {
+		if (scale_over != NOTHING && ABIL_SCALE(abil) * 100 < scale_over) {
 			continue;
 		}
-		if (scale_under != NOTHING && ABIL_SCALE(abil) > scale_under) {
+		if (scale_under != NOTHING && ABIL_SCALE(abil) * 100 > scale_under) {
 			continue;
 		}
 		if (only_type != NOTHING && !IS_SET(ABIL_TYPES(abil), BIT(only_type))) {
