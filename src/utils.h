@@ -108,6 +108,7 @@
 #define ABIL_CUSTOM_MSGS(abil)  ((abil)->custom_msgs)
 #define ABIL_DAMAGE_TYPE(abil)  ((abil)->damage_type)
 #define ABIL_DATA(abil)  ((abil)->data)
+#define ABIL_DIFFICULTY(abil)  ((abil)->difficulty)
 #define ABIL_FLAGS(abil)  ((abil)->flags)
 #define ABIL_GAIN_HOOKS(abil)  ((abil)->gain_hooks)
 #define ABIL_IMMUNITIES(abil)  ((abil)->immunities)
@@ -1533,6 +1534,7 @@ extern bool multi_isname(const char *arg, const char *namelist);
 extern char *CAP(char *txt);
 extern char *fname(const char *namelist);
 extern char *reverse_strstr(char *haystack, char *needle);
+extern bool search_custom_messages(char *keywords, struct custom_message *list);
 extern char *str_dup(const char *source);
 extern char *str_replace(char *search, char *replace, char *subject);
 extern char *str_str(char *cs, char *ct);

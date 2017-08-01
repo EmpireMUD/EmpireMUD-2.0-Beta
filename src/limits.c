@@ -429,10 +429,6 @@ void point_update_char(char_data *ch) {
 			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
 		}
 		
-		if (affected_by_spell(ch, ATYPE_RADIANCE)) {
-			gain_ability_exp(ch, ABIL_RADIANCE, 2);
-		}
-		
 		gain_ability_exp(ch, ABIL_GIFT_OF_NATURE, 2);
 		gain_ability_exp(ch, ABIL_ARCANE_POWER, 2);
 		
@@ -744,12 +740,6 @@ void real_update_char(char_data *ch) {
 	else {
 		if (!number(0, 1)) {
 			gain_condition(ch, FULL, 1);
-		}
-	}
-		
-	if (IS_DARK(IN_ROOM(ch))) {
-		if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
-			gain_ability_exp(ch, ABIL_NIGHTSIGHT, 0.5);
 		}
 	}
 	

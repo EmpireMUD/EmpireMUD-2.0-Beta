@@ -671,6 +671,12 @@ Message types:
    ability.
  &ccounterspell-to-vict&0 - Shown to the ability's victim after the counterspell.
  &ccounterspell-to-room&0 - Shown to the room after the counterspell.
+ &cfail-self-to-char&0 - Shown to the actor when the ability fails targeting
+   himself (or targets nobody).
+ &cfail-self-to-room&0 - To the room when the ability fails targeting self/nobody.
+ &cfail-targ-to-char&0 - To the actor when the ability fails targeting a character.
+ &cfail-targ-to-vict&0 - To the victim when the ability fails targeting a character.
+ &cfail-targ-to-room&0 - To the room when it fails targeting a character.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d
@@ -707,6 +713,15 @@ The 'data' field is used by different types of abilities. Available types are:
 
 See also: ABILEDIT TYPES, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
+"ABILEDIT DIFFICULTY"
+
+Usage:  .difficulty <type>
+
+Some abilities have a chance to fail. This setting determines how hard the
+ability is. If an ability can fail, you should set custom fail messages.
+
+See also: ABILEDIT CUSTOM, OLC ABILITIES
+#d
 "ABILEDIT DOT ABILITY" "DOT ABILITY" "DOT ABILITIES"
 
 The DOT ability type deals damage over time. If you set the maxstacks number
@@ -736,13 +751,54 @@ The following ability flags are available:
  &cRANGED&0 - Can be used during ranged combat without giving a melee error.
  &c!ANIMAL&0 - Cannot be used in animal form.
  &c!INVULNERABLE&0 - Cannot be used while invulnerable (e.g. mistform).
- &cCASTER&0 - Bonus for caster role, weaker without it.
- &cHEALER&0 - Bonus for healer role, weaker without it.
- &cMELEE&0 - Bonus for melee role, weaker without it.
- &cTANK&0 - Bonus for tank role, weaker without it.
+ &cCASTER-ROLE&0 - Bonus for caster role, weaker without it.
+ &cHEALER-ROLE&0 - Bonus for healer role, weaker without it.
+ &cMELEE-ROLE&0 - Bonus for melee role, weaker without it.
+ &cTANK-ROLE&0 - Bonus for tank role, weaker without it.
  &cRANGED-ONLY&0 - Cannot be used in melee combat.
+ &cIGNORE-SUN&0 - For a vampire ability, won't check sunlight.
 
 See also: OLC ABILITIES
+#d
+"ABILEDIT FULLSEARCH"
+
+Usage:  .abil fullsearch -<field> <argument> <...>
+
+This command allows you to search for abilities matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the ability's keywords and other text.
+
+Fields:
+  &c-affects&0 - see HELP AFFECT FLAGS
+  &c-apply&0 - see HELP APPLIES
+  &c-attacktype&0 - see HELP ABILEDIT ATTACK TYPE
+  &c-costtype&0 - health, mana, move, or blood
+  &c-custom&0 - has a specific type, see HELP ABILEDIT CUSTOM
+  &c-damagetype&0 - see HELP ABILEDIT DAMAGE TYPE
+  &c-difficulty&0 - see HELP ABILEDIT DIFFICULTY
+  &c-flagged&0, &cunflagged&0 - see HELP ABILEDIT FLAGS
+  &c-gainhooks&0 - see HELP ABILEDIT GAIN HOOKS
+  &c-immunities&0 - see HELP AFFECT FLAGS
+  &c-linkedtrait&0 - see HELP APPLIES
+  &c-mincooldown&0, &c-maxcooldown&0 - cooldown time within these limits
+  &c-mincost&0, &c-maxcost&0 - base cost within these limits
+  &c-mincostperscalepoint&0, &c-maxcostperscalepoint&0 - scaled cost limits
+  &c-minduration&0, &c-maxduration&0 - short/long duration within these limits
+  &c-minposition&0, &c-maxposition&0 - required position within these limits
+  &c-ptech&0 - see HELP PTECH
+  &c-scale&0, &c-scaleunder&0, &c-scaleover&0 - scale percent within these limits
+  &c-targets&0 - see HELP ABILEDIT TARGETS
+  &c-type&0 - see HELP ABILEDIT TYPE
+  &c-waittype&0 - see HELP ABILEDIT WAIT TYPE
+
+Examples:
+ > .abil fullsearch -type PLAYER-TECH -ptech Swimming
+ > .abil fullsearch -flagged RANGED -flagged RANGED-ONLY
+ > .abil fullsearch -scaleover 50 -scaleunder 99
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all objects with the "Mini-pet Use"
+trigger, use ".t search 9900".
 #d
 "ABILEDIT GAINHOOKS" "ABILEDIT GAIN HOOKS" "GAIN HOOKS"
 
@@ -792,7 +848,7 @@ The following traits cannot be used: &rHEALTH-REGEN, MOVE-REGEN, MANA-REGEN,
 AGE, MAX-MOVE, HEAL-OVER-TIME, MAX-HEALTH, MAX-MANA, INVENTORY, MAX-BLOOD,
 CRAFTING, BLOOD-UPKEEP&0
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, APPLIES
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
 
@@ -4370,7 +4426,7 @@ Fields:
   &c-cflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
   &c-component&0 - see HELP OEDIT COMPONENT
   &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
-  &c-flagged&0, &cnotflagged&0 - see HELP OEDIT FLAGS
+  &c-flagged&0, &cunflagged&0 - see HELP OEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
   &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs

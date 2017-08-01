@@ -36,7 +36,25 @@ Veintap~
 S
 #108
 Weaken~
-0 -1 1.00 0 0
+a -1 0.50 D 0
+A
+1 -1
+A
+8 -1
+C
+weaken 0 bf 3 50 0 2043 75 0 2 0
+M
+2
+You spread your dead blood on $N...~
+M
+3
+$n spreads $s cold, dead blood on you...~
+M
+4
+$n spreads some of $s blood on $N...~
+T b 1
+X b
+3014 75 75 0
 S
 #109
 Heal~
@@ -80,7 +98,7 @@ S
 Lightningbolt~
 abi -1 1.00 B 0
 C
-llightningbolt 0 bf 2 10 3 2023 9 8 3
+llightningbolt 0 bf 2 10 3 2023 9 8 3 0
 T c 8
 T d 2
 X c
@@ -90,7 +108,27 @@ X d
 S
 #119
 Hasten~
-0 -1 1.00 0 0
+d -1 1.00 0 abc
+C
+hasten 5 0 2 15 0 -1 0 0 5 0
+M
+0
+You concentrate and veins of red mana streak down your skin.~
+M
+1
+Veins of red mana streak down $n's skin and $e seems to move a little faster.~
+M
+2
+You touch $N and veins of red mana streak down $S skin.~
+M
+3
+$n touches you on the arm. Veins of red mana streak down your skin and you feel a little faster.~
+M
+4
+$n touches $N on the arm. Veins of red mana streak down $S skin and $E seems to move a little faster.~
+T b 1
+X b
+3022 450 1800 q
 S
 #120
 Counterspell~
@@ -132,7 +170,20 @@ Summon Guards~
 S
 #129
 Radiance~
-0 -1 1.00 0 0
+cd -1 1.00 0 ah
+A
+5 2
+C
+radiance 5 bg 0 0 0 -1 0 0 1 0
+M
+0
+You project a radiant aura!~
+M
+1
+$n projects a radiant aura!~
+T b 1
+X b
+3025 -1 -1 0
 S
 #130
 Prospect~
@@ -262,7 +313,30 @@ Jab~
 S
 #156
 Blind~
-0 -1 1.00 0 0
+a -1 1.00 C 0
+C
+blind 7 bf 1 15 0 2040 10 0 2 2
+M
+2
+You toss a handful of sand into $N's eyes!~
+M
+3
+$n tosses a handful of sand into your eyes!~
+M
+4
+$n tosses a handful of sand into $N's eyes!~
+M
+10
+You toss a handful of sand at $N, but miss $S eyes!~
+M
+11
+$n tosses a handful of sand at you, but misses your eyes!~
+M
+12
+$n tosses a handful of sand but misses $N's eyes!~
+T b 1
+X b
+3028 5 10 a
 S
 #157
 Sap~
@@ -309,7 +383,29 @@ Manashield~
 S
 #166
 Foresight~
-0 -1 1.00 0 0
+0 -1 0.50 0 adf
+A
+18 1
+C
+foresight 5 be 2 30 0 -1 0 8 5 0
+M
+0
+You pull out a grease pencil and mark each of your eyelids with an X...~
+M
+1
+$n pulls out a grease pencil and marks each of $s eyelids with an X.~
+M
+2
+You pull out a grease pencil and mark each of $N's eyelids with an X, giving $M the gift of foresight.~
+M
+3
+$n marks each of your eyelids using a grease pencil...~
+M
+4
+$n pulls out a grease pencil and marks each of $N's eyelids with an X.~
+T b 1
+X b
+3009 900 900 0
 S
 #167
 Enchant Weapons~
@@ -339,7 +435,32 @@ Siege Ritual~
 S
 #173
 Colorburst~
-0 -1 1.00 0 0
+ab -1 0.50 o 0
+A
+17 -1
+C
+ccolorburst 7 bf 2 13 2 2013 30 8 3 0
+M
+5
+You fire a burst of color at $N, but $E deflects it!~
+M
+6
+$n fires a burst of color at you, but it's deflected by your counterspell!~
+M
+7
+$n fires a burst of color at $N, but $E deflects it.~
+M
+2
+You whip your hand forward and fire a burst of color at $N!~
+M
+3
+$n whips $s hand forward and fires a burst of color at you!~
+M
+4
+$n whips $s hand forward and fires a burst of color at $N!~
+T b 1
+X b
+3015 30 30 0
 S
 #174
 Enervate~

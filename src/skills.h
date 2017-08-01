@@ -70,12 +70,13 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 
-// skill_check difficulties
-#define DIFF_EASY  0
-#define DIFF_MEDIUM  1
-#define DIFF_HARD  2
-#define DIFF_RARELY  3
-#define NUM_DIFF_TYPES  4
+// DIFF_x: skill_check difficulties
+#define DIFF_TRIVIAL  0
+#define DIFF_EASY  1
+#define DIFF_MEDIUM  2
+#define DIFF_HARD  3
+#define DIFF_RARELY  4
+#define NUM_DIFF_TYPES  5
 
 
 // SKILL_x: skill vnums
@@ -147,7 +148,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_HIDE  20
 #define ABIL_HORRID_FORM  21
 #define ABIL_DISPEL  22
-#define ABIL_MAJESTY  23
 #define ABIL_MIST_FORM  24
 #define ABIL_MUMMIFY  25
 #define ABIL_REGENERATE  27
@@ -155,8 +155,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SNEAK  29
 #define ABIL_SOLAR_POWER  30
 #define ABIL_SOULSIGHT  31
-#define ABIL_SOULMASK  32
-#define ABIL_ALACRITY  33
 #define ABIL_SUMMON_ANIMALS  34
 #define ABIL_SUMMON_HUMANS  35
 #define ABIL_HEARTSTOP  36
@@ -165,7 +163,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_LOCKS  41
 #define ABIL_ROADS  49
 #define ABIL_STAMINA  66
-#define ABIL_NIGHTSIGHT  68
 #define ABIL_FIND_HERBS  70
 #define ABIL_FISH  72
 #define ABIL_TRACK  73
@@ -188,7 +185,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_FINESSE  105
 #define ABIL_STUNNING_BLOW  106
 #define ABIL_VEINTAP  107
-#define ABIL_WEAKEN  108
 #define ABIL_HEAL  109
 #define ABIL_HEAL_FRIEND  110
 #define ABIL_HEAL_PARTY  111
@@ -197,7 +193,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_CLEANSE  116
 #define ABIL_READY_FIREBALL  117
 #define ABIL_LIGHTNINGBOLT  118
-#define ABIL_HASTEN  119
 #define ABIL_COUNTERSPELL  120
 #define ABIL_ENTANGLE  121
 #define ABIL_FAMILIAR  122
@@ -205,7 +200,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_CHANT_OF_NATURE  126
 #define ABIL_REWARD  127
 #define ABIL_SUMMON_GUARDS  128
-#define ABIL_RADIANCE  129
 #define ABIL_PROSPECT  130
 #define ABIL_WORKFORCE  131
 #define ABIL_RARE_METALS  133
@@ -220,14 +214,12 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_CONCEALMENT  148
 #define ABIL_SHADOWSTEP  153
 #define ABIL_JAB  155
-#define ABIL_BLIND  156
 #define ABIL_SAP  157
 #define ABIL_DAGGER_MASTERY  158
 #define ABIL_PRICK  161
 #define ABIL_BAT_FORM  162
 #define ABIL_RITUAL_OF_BURDENS  163
 #define ABIL_MANASHIELD  165
-#define ABIL_FORESIGHT  166
 #define ABIL_SUMMON_SWIFT  168
 #define ABIL_SUMMON_MATERIALS  169
 #define ABIL_STAFF_MASTERY  171

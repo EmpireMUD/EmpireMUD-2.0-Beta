@@ -3708,6 +3708,27 @@ char *reverse_strstr(char *haystack, char *needle) {
 
 
 /**
+* Looks for certain keywords in a set of custom messages. All given keywords
+* must appear in 1 of the custom messages to be valid.
+*
+* @param char *keywords The word(s) we are looking for.
+* @param struct custom_message *list The list of custom messages to search.
+* @return bool TRUE if the keywords were found, FALSE if not.
+*/
+bool search_custom_messages(char *keywords, struct custom_message *list) {
+	struct custom_message *iter;
+	
+	LL_FOREACH(list, iter) {
+		if (iter->msg && multi_isname(keywords, iter->msg)) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// not found
+}
+
+
+/**
 * Doubles the & in a string so that color codes are displayed to the user.
 *
 * @param char *string The input string.

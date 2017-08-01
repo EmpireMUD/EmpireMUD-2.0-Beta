@@ -5024,30 +5024,6 @@ ACMD(do_publicize) {
 }
 
 
-ACMD(do_radiance) {
-	struct affected_type *af;
-	
-	if (affected_by_spell(ch, ATYPE_RADIANCE)) {
-		msg_to_char(ch, "You turn off your radiant aura.\r\n");
-		affect_from_char(ch, ATYPE_RADIANCE, FALSE);
-	}
-	else if (!can_use_ability(ch, ABIL_RADIANCE, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_RADIANCE)) {
-		return;
-	}
-	else {
-		af = create_mod_aff(ATYPE_RADIANCE, -1, APPLY_GREATNESS, 2, ch);
-		affect_join(ch, af, 0);
-		
-		msg_to_char(ch, "You project a radiant aura!\r\n");
-		act("$n projects a radiant aura!", TRUE, ch, NULL, NULL, TO_ROOM);
-		command_lag(ch, WAIT_ABILITY);
-	}
-}
-
-
 /**
 * Reclaim action tick
 *

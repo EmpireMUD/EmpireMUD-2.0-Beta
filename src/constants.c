@@ -118,11 +118,12 @@ const char *ability_flags[] = {
 	"RANGED",	// 5
 	"!ANIMAL",
 	"!INVULNERABLE",
-	"CASTER",
-	"HEALER",
-	"MELEE",	// 10
-	"TANK",
+	"CASTER-ROLE",
+	"HEALER-ROLE",
+	"MELEE-ROLE",	// 10
+	"TANK-ROLE",
 	"RANGED-ONLY",
+	"IGNORE-SUN",
 	"\n"
 };
 
@@ -181,6 +182,11 @@ const char *ability_custom_types[] = {
 	"counterspell-to-char",	// 5
 	"counterspell-to-vict",
 	"counterspell-to-room",
+	"fail-self-to-char",
+	"fail-self-to-room",
+	"fail-targ-to-char",	// 10
+	"fail-targ-to-vict",
+	"fail-targ-to-room",
 	"\n"
 };
 
@@ -2998,8 +3004,20 @@ const char *damage_types[] = {
 };
 
 
-// DIFF_x: modifiers to your skill level before a skill check
+// DIFF_x (1/2): OLC labels for how difficult a roll is
+const char *skill_check_difficulty[] = {
+	"trivial (always passes)",
+	"easy (always passes after 50 skill)",
+	"medium (always passes at 100 skill)",
+	"hard (can still fail at 100)",
+	"rare (passes 10% of the time at 100)",
+	"\n"
+};
+
+
+// DIFF_x (2/2): modifiers to your skill level before a skill check
 double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
+	100,	// trivial (always passes)
 	1.5,  // easy
 	1,  // medium
 	0.66,  // hard

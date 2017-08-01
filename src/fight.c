@@ -2166,9 +2166,6 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 
 	// try to hit people through majesty?
-	if (can_gain_exp_from(victim, ch)) {
-		gain_ability_exp(victim, ABIL_MAJESTY, 33.4);
-	}
 	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 		return FALSE;
 	}
@@ -3263,9 +3260,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 					gain_ability_exp(ch, ABIL_WEAPON_PROFICIENCY, 5);
 				}
 				gain_ability_exp(ch, ABIL_FINESSE, 2);
-				if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-					gain_ability_exp(ch, ABIL_ALACRITY, 2);
-				}
 			
 				// fireball skill gain
 				if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_FIREBALL) {
@@ -3275,9 +3269,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		}
 		if (result >= 0 && combat_round && can_gain_skill && !IS_NPC(victim) && can_gain_exp_from(victim, ch)) {
 			gain_ability_exp(victim, ABIL_EVASION, 5);
-			if (affected_by_spell(victim, ATYPE_FORESIGHT)) {
-				gain_ability_exp(victim, ABIL_FORESIGHT, 2);
-			}
 		}
 		
 		/* check if the victim has a hitprcnt trigger */
@@ -3769,9 +3760,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			gain_player_tech_exp(ch, PTECH_RANGED_COMBAT, 2);
 			gain_ability_exp(ch, ABIL_QUICK_DRAW, 2);
 			gain_ability_exp(ch, ABIL_TRICK_SHOTS, 2);
-			if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-				gain_ability_exp(ch, ABIL_ALACRITY, 2);
-			}
 			run_ability_gain_hooks(ch, vict, AGH_RANGED);
 		}
 	}

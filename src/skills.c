@@ -74,7 +74,6 @@ int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
 */
 void check_skill_sell(char_data *ch, ability_data *abil) {
 	bool despawn_familiar(char_data *ch, mob_vnum vnum);
-	void end_majesty(char_data *ch);
 	void finish_morphing(char_data *ch, morph_data *morph);
 	void remove_armor_by_type(char_data *ch, int armor_type);
 	void remove_honed_gear(char_data *ch);
@@ -170,11 +169,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	}
 	
 	switch (ABIL_VNUM(abil)) {
-		case ABIL_ALACRITY: {
-			void end_alacrity(char_data *ch);
-			end_alacrity(ch);
-			break;
-		}
 		case ABIL_BANSHEE: {
 			despawn_familiar(ch, FAMILIAR_BANSHEE);
 			break;
@@ -246,24 +240,12 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_GIANT_TORTOISE);
 			break;
 		}
-		case ABIL_FORESIGHT: {
-			affect_from_char_by_caster(ch, ATYPE_FORESIGHT, ch, TRUE);
-			break;
-		}
 		case ABIL_GRIFFIN: {
 			despawn_familiar(ch, FAMILIAR_GRIFFIN);
 			break;
 		}
-		case ABIL_HASTEN: {
-			affect_from_char_by_caster(ch, ATYPE_HASTEN, ch, TRUE);
-			break;
-		}
 		case ABIL_HONE: {
 			remove_honed_gear(ch);
-			break;
-		}
-		case ABIL_MAJESTY: {
-			end_majesty(ch);
 			break;
 		}
 		case ABIL_MANASHIELD: {
@@ -289,14 +271,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_NIGHTSIGHT: {
-			if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
-				msg_to_char(ch, "You end your nightsight.\r\n");
-				act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
-				affect_from_char(ch, ATYPE_NIGHTSIGHT, TRUE);
-			}
-			break;
-		}
 		case ABIL_OWL_SHADOW: {
 			despawn_familiar(ch, FAMILIAR_OWL_SHADOW);
 			break;
@@ -307,10 +281,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_PHOENIX_RITE: {
 			affect_from_char(ch, ATYPE_PHOENIX_RITE, TRUE);
-			break;
-		}
-		case ABIL_RADIANCE: {
-			affect_from_char(ch, ATYPE_RADIANCE, TRUE);
 			break;
 		}
 		case ABIL_READY_FIREBALL: {
@@ -348,10 +318,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_SPIRIT_WOLF: {
 			despawn_familiar(ch, FAMILIAR_SPIRIT_WOLF);
-			break;
-		}
-		case ABIL_SOULMASK: {
-			affect_from_char(ch, ATYPE_SOULMASK, TRUE);
 			break;
 		}
 		default: {
@@ -1450,13 +1416,18 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 /**
 * @param char_data *ch who to check for
 * @param any_vnum ability which ABIL_x
-* @param int difficulty any DIFF_x const
+* @param int difficulty any DIFF_ const
 * @return bool TRUE for success, FALSE for fail
 */
 bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
 	extern double skill_check_difficulty_modifier[NUM_DIFF_TYPES];
 
 	int chance = get_ability_level(ch, ability);
+	
+	// always succeeds
+	if (difficulty == DIFF_TRIVIAL) {
+		return TRUE;
+	}
 
 	// players without the ability have no chance	
 	if (!IS_NPC(ch) && !has_ability(ch, ability)) {
@@ -2068,6 +2039,28 @@ void check_skills(void) {
 		// ensure sort
 		LL_SORT(SKILL_ABILITIES(skill), sort_skill_abilities);
 	}
+}
+
+
+/**
+* Finds an attack type by name, preferring exact matches.
+*
+* @param char *name The text to look for.
+* @return int One of the TYPE_ attack type consts.
+*/
+int get_attack_type_by_name(char *name) {
+	int iter, abbrev = NOTHING;
+	
+	for (iter = 0; iter < NUM_ATTACK_TYPES; ++iter) {
+		if (!str_cmp(name, attack_hit_info[iter].name)) {
+			return iter;	// exact
+		}
+		else if (abbrev == NOTHING && is_abbrev(name, attack_hit_info[iter].name)) {
+			abbrev = iter;
+		}
+	}
+	
+	return abbrev;	// if any
 }
 
 

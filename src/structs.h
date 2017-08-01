@@ -422,13 +422,14 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_RANGED  BIT(5)	// f. allows use in ranged combat
 #define ABILF_NO_ANIMAL  BIT(6)	// g. can't be used in animal form
 #define ABILF_NO_INVULNERABLE  BIT(7)	// h. can't be used in invulnerable form
-#define ABILF_CASTER  BIT(8)	// i. bonus if in 'caster' role
-#define ABILF_HEALER  BIT(9)	// j. bonus if in 'healer' role
-#define ABILF_MELEE  BIT(10)	// k. bonus if in 'melee' role
-#define ABILF_TANK  BIT(11)	// l. bonus if in 'tank' role
+#define ABILF_CASTER_ROLE  BIT(8)	// i. bonus if in 'caster' role
+#define ABILF_HEALER_ROLE  BIT(9)	// j. bonus if in 'healer' role
+#define ABILF_MELEE_ROLE  BIT(10)	// k. bonus if in 'melee' role
+#define ABILF_TANK_ROLE  BIT(11)	// l. bonus if in 'tank' role
 #define ABILF_RANGED_ONLY  BIT(12)	// m. requires ranged combat
+#define ABILF_IGNORE_SUN  BIT(13)	// n. vampire ability ignores sunlight
 
-#define ABILITY_ROLE_FLAGS  (ABILF_CASTER | ABILF_HEALER | ABILF_MELEE | ABILF_TANK)
+#define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
 // ABILT_x: ability type flags
 #define ABILT_CRAFT  BIT(0)	// related to crafting/building
@@ -476,6 +477,11 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_COUNTERSPELL_TO_CHAR  5
 #define ABIL_CUSTOM_COUNTERSPELL_TO_VICT  6
 #define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM  7
+#define ABIL_CUSTOM_FAIL_SELF_TO_CHAR  8
+#define ABIL_CUSTOM_FAIL_SELF_TO_ROOM  9
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR  10
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_VICT  11
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
 
 
 // ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
@@ -2680,6 +2686,7 @@ struct ability_data {
 	int cooldown_secs;	// how long to cooldown, if any
 	int wait_type;	// WAIT_ flag
 	int linked_trait;	// APPLY_ type that this scales with
+	int difficulty;	// DIFF_ type, if any
 	struct custom_message *custom_msgs;	// any custom messages
 	
 	// type-specific data
