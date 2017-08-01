@@ -454,6 +454,9 @@ ACMD(do_ready) {
 	else {
 		scale_level = MIN(ch_level, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 	}
+	if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {	// ensure they'll be able to use the final item
+		scale_level = MIN(scale_level, GET_SKILL_LEVEL(ch));
+	}
 	scale_item_to_level(obj, scale_level);
 	
 	switch (ready_magic_weapon[type].cost_pool) {
