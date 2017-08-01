@@ -62,6 +62,8 @@ foresight~
 0 0 0 0
 T0
 Your foresight ends.~
+T2
+You feel the gift of foresight!~
 S
 #3010
 earthmeld~
@@ -99,6 +101,10 @@ weakness~
 0 0 0 0
 T0
 Your weakness fades.~
+T2
+You feel weak!~
+T3
+$n hunches over in pain!~
 S
 #3015
 colorburst~
@@ -176,6 +182,8 @@ radiance~
 0 0 0 0
 T0
 Your radiant aura fades.~
+T1
+$n seems less radiant.~
 S
 #3026
 inspire~
@@ -197,6 +205,8 @@ blind~
 0 0 0 0
 T0
 You are no longer blinded by sand.~
+T2
+You're blind!~
 S
 #3029
 healing potion~
@@ -299,14 +309,22 @@ majesty~
 4 0
 0 0 0 0
 T0
-You are no longer so majestic.~
+Your supernatural majesty fades.~
+T1
+$n seems less majestic now.~
 S
 #3044
 alacrity~
 4 0
 0 0 0 0
 T0
-Your alacrity fades.~
+Your supernatural alacrity fades.~
+T1
+$n seems to slow down.~
+T2
+You speed up immensely!~
+T3
+$n seems to speed up!~
 S
 #3045
 nightsight~
@@ -314,6 +332,12 @@ nightsight~
 0 0 0 0
 T0
 Your nightsight fades.~
+T1
+The glow in $n's eyes fades.~
+T2
+The world seems brighter.~
+T3
+$n's eyes flash and take on a pale red glow.~
 S
 #3046
 death penalty~

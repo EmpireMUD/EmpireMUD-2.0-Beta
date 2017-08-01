@@ -6,7 +6,7 @@ S
 Fly~
 cd -1 1.00 0 am
 C
-fly 8 bg 2 50 0 -1 0 0 5
+fly 8 bg 2 50 0 -1 0 0 5 0
 D 1 40 0
 M
 0
@@ -81,7 +81,7 @@ A
 A
 24 1
 C
-eartharmor 5 be 2 10 1 -1 0 8 5
+eartharmor 5 be 2 10 1 -1 0 8 5 0
 M
 0
 You form a thick layer of mana over your body, and it hardens to solid earth!~
@@ -113,7 +113,7 @@ A
 A
 22 -1
 C
-terrify 7 bf 1 10 1 2035 15 4 2
+terrify 7 bf 1 10 1 2035 15 4 2 2
 M
 2
 Shadows creep up around you and then strike out at $N!~
@@ -122,6 +122,15 @@ M
 Shadows creep up around $n and then strike out at you!~
 M
 4
+Shadows creep up around $n and then strike out at $N!~
+M
+10
+Shadows creep up around you and then strike out at $N!~
+M
+11
+Shadows creep up around $n and then strike out at you!~
+M
+12
 Shadows creep up around $n and then strike out at $N!~
 T b 1
 X b
@@ -149,7 +158,20 @@ Dispel~
 S
 #23
 Majesty~
-0 -1 1.00 0 0
+cd -1 1.00 0 ah
+A
+26 3
+C
+majesty 5 bg 3 0 0 -1 0 0 1 0
+M
+0
+You create a sense of supernatural majesty about yourself.~
+M
+1
+$n glows majestically.~
+T b 1
+X b
+3043 -1 -1 b
 S
 #24
 Mist Form~
@@ -187,11 +209,35 @@ Soulsight~
 S
 #32
 Soulmask~
-0 -1 1.00 0 0
+cd -1 1.00 0 ag
+C
+soulmask 5 bg 3 0 0 -1 0 0 1 0
+M
+0
+You conceal your magical aura!~
+M
+1
+$n concentrates momentarily...~
+T b 1
+X b
+3042 -1 -1 A
 S
 #33
 Alacrity~
-0 -1 1.00 0 0
+cd -1 1.00 0 abc
+A
+26 3
+C
+alacrity 5 bg 3 10 0 -1 0 0 1 0
+M
+0
+You focus your blood into your lithe muscles...~
+M
+1
+$n flexes $s muscles...~
+T b 1
+X b
+3044 -1 -1 q
 S
 #34
 Summon Animals~
@@ -367,7 +413,18 @@ T e 1
 S
 #68
 Nightsight~
-0 -1 1.00 0 0
+cd -1 1.00 0 ag
+C
+nightsight 5 bg 0 0 0 -1 0 0 1 0
+M
+0
+You concentrate for a moment...~
+M
+1
+$n concentrates for a moment.~
+T b 1
+X b
+3045 -1 -1 c
 S
 #69
 Finder~
