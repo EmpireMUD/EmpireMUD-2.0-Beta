@@ -1112,7 +1112,9 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 				break;
 			case MOVE_FOLLOW:
 				act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
-				act("$n follows you.", TRUE, ch, 0, ch->master, TO_VICT);
+				if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
+					act("$n follows you.", TRUE, ch, 0, ch->master, TO_VICT);
+				}
 				break;
 			case MOVE_EARTHMELD:
 				break;
