@@ -1618,6 +1618,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum);
 void qt_change_currency(char_data *ch, any_vnum vnum, int total);
 void qt_gain_vehicle(char_data *ch, any_vnum vnum);
 void qt_get_obj(char_data *ch, obj_data *obj);
+void qt_keep_obj(char_data *ch, obj_data *obj, bool true_for_keep);
 void qt_kill_mob(char_data *ch, char_data *mob);
 void qt_lose_building(char_data *ch, any_vnum vnum);
 void qt_lose_quest(char_data *ch, any_vnum vnum);

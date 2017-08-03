@@ -4655,9 +4655,11 @@ ACMD(do_keep) {
 				
 				if (mode == SCMD_KEEP) {
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+					qt_keep_obj(ch, obj, TRUE);
 				}
 				else {
 					REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+					qt_keep_obj(ch, obj, FALSE);
 				}
 			}
 			
@@ -4676,9 +4678,11 @@ ACMD(do_keep) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 			if (mode == SCMD_KEEP) {
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				qt_keep_obj(ch, obj, TRUE);
 			}
 			else {
 				REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
@@ -4692,9 +4696,11 @@ ACMD(do_keep) {
 		else {
 			if (mode == SCMD_KEEP) {
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				qt_keep_obj(ch, obj, TRUE);
 			}
 			else {
 				REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);

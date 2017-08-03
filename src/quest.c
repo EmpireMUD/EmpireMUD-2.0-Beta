@@ -1804,6 +1804,46 @@ void qt_get_obj(char_data *ch, obj_data *obj) {
 
 
 /**
+* Quest Tracker: ch keeps or unkeeps an item (updates quests where it would be
+* extracted.
+*
+* @param char_data *ch The player.
+* @param obj_data *obj The item.
+* @param bool true_for_keep Keeping if TRUE, un-keeping if FALSE.
+*/
+void qt_keep_obj(char_data *ch, obj_data *obj, bool true_for_keep) {
+	struct player_quest *pq;
+	struct req_data *task;
+	quest_data *qst;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		if (!(qst = quest_proto(pq->vnum)) || !QUEST_FLAGGED(qst, QST_EXTRACT_TASK_OBJECTS)) {
+			continue;	// only interested in quests that extract items
+		}
+		
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
+				task->current += (true_for_keep ? -1 : 1);
+			}
+			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
+				task->current += (true_for_keep ? -1 : 1);
+			}
+			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
+				task->current += (true_for_keep ? -1 : 1);
+			}
+			
+			// check min
+			task->current = MAX(task->current, 0);
+		}
+	}
+}
+
+
+/**
 * Quest Tracker: ch kills a mob
 *
 * @param char_data *ch The player.
