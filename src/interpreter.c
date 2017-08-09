@@ -863,7 +863,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	SIMPLE_CMD( "reply", POS_DEAD, do_reply, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "random", POS_SLEEPING, do_random, LVL_START_IMM, CTYPE_IMMORTAL ),
-	SIMPLE_CMD( "read", POS_RESTING, do_read, NO_MIN, CTYPE_COMM ),
+	SIMPLE_CMD( "read", POS_SITTING, do_read, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "ready", POS_FIGHTING, do_ready, NO_MIN, CTYPE_COMBAT ),
 	STANDARD_CMD( "reboot", POS_DEAD, do_reboot, LVL_CIMPL, GRANT_REBOOT, SCMD_REBOOT, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
 	SIMPLE_CMD( "recipes", POS_DEAD, do_recipes, NO_MIN, CTYPE_UTIL ),
