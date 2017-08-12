@@ -1934,7 +1934,7 @@ const char *item_types[] = {
 	"CORPSE",
 	"COINS",
 	"CURRENCY",
-	"*",
+	"PAINT",
 	"*MAIL",
 	"WEALTH",
 	"*CART",
@@ -2235,6 +2235,46 @@ const char *fullness[] = {
 	"about half ",
 	"more than half ",
 	""
+};
+
+
+// house painting (1/2)
+const char *paint_colors[] = {
+	"&0",	// none/normal
+	"&b",	// blue
+	"&r",	// red
+	"&y",	// yellow
+	"&g",	// green
+	"&o",	// orange
+	"&v",	// violet
+	"&a",	// azure
+	"&c",	// Cyan
+	"&j",	// Jade
+	"&l",	// Lime
+	"&m",	// Magenta
+	"&p",	// Pink
+	"&t",	// Tan
+	"\n"
+};
+
+
+// house painting (2/2)
+const char *paint_names[] = {
+	"none",
+	"Blue",
+	"Red",
+	"Yellow",
+	"Green",
+	"Orange",
+	"Violet",
+	"Azure",
+	"Cyan",
+	"Jade",
+	"Lime",
+	"Magenta",
+	"Pink",
+	"Tan",
+	"\n"
 };
 
 

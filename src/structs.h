@@ -1408,7 +1408,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_CORPSE  10	// a corpse, pc or npc
 #define ITEM_COINS  11	// stack of coins
 #define ITEM_CURRENCY  12	// adventure currency item
-	#define ITEM_UNUSED3  13
+#define ITEM_PAINT  13	// for painting buildings
 #define ITEM_MAIL  14	// mail
 #define ITEM_WEALTH  15	// item provides wealth
 #define ITEM_CART  16	// This type is mostly DEPRECATED; use vehicles instead

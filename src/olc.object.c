@@ -43,6 +43,8 @@ extern const char *item_types[];
 extern const struct material_data materials[NUM_MATERIALS];
 extern const char *obj_custom_types[];
 extern const char *offon_types[];
+extern const char *paint_colors[];
+extern const char *paint_names[];
 extern const struct poison_data_type poison_data[];
 extern const struct potion_data_type potion_data[];
 extern const char *storage_bits[];
@@ -179,6 +181,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	// ITEM_X: auditors
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_COINS: {
 			if (GET_COINS_AMOUNT(obj) == 0) {
@@ -247,6 +250,13 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		case ITEM_PACK: {
 			if (GET_PACK_CAPACITY(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Pack capacity not set");
+				problem = TRUE;
+			}
+			break;
+		}
+		case ITEM_PAINT: {
+			if (!GET_PAINT_COLOR(obj)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Paint color not set");
 				problem = TRUE;
 			}
 			break;
@@ -1762,6 +1772,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 	
 	*storage = '\0';
 	
+	// ITEM_X: editor prompts
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_COINS: {
 			sprintf(storage + strlen(storage), "<%scoinamount\t0> %d%s\r\n", OLC_LABEL_VAL(GET_COINS_AMOUNT(obj), 0), GET_COINS_AMOUNT(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
@@ -1833,6 +1844,10 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_PACK: {
 			sprintf(storage + strlen(storage), "<%scapacity\t0> %d object%s%s\r\n", OLC_LABEL_VAL(GET_PACK_CAPACITY(obj), 0), GET_PACK_CAPACITY(obj), PLURAL(GET_PACK_CAPACITY(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
+			break;
+		}
+		case ITEM_PAINT: {
+			sprintf(storage + strlen(storage), "<%spaint\t0> %s%s\t0\r\n", OLC_LABEL_VAL(GET_PAINT_COLOR(obj), 0), paint_colors[GET_PAINT_COLOR(obj)], paint_names[GET_PAINT_COLOR(obj)]);
 			break;
 		}
 		case ITEM_POTION: {
@@ -2548,6 +2563,18 @@ OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
 	GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
+}
+
+
+OLC_MODULE(oedit_paint) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (!IS_PAINT(obj)) {
+		msg_to_char(ch, "You can only set paint color on a paint object.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_PAINT_COLOR) = olc_process_type(ch, argument, "paint color", "paint", paint_colors, GET_OBJ_VAL(obj, VAL_PAINT_COLOR));
+	}
 }
 
 

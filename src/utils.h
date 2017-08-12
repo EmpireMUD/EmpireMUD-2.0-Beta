@@ -963,6 +963,11 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VAL_BOOK_ID  0
 #define GET_BOOK_ID(obj)  (IS_BOOK(obj) ? GET_OBJ_VAL((obj), VAL_BOOK_ID) : 0)
 
+// ITEM_PAINT
+#define IS_PAINT(obj)  (GET_OBJ_TYPE(obj) == ITEM_PAINT)
+#define VAL_PAINT_COLOR  0
+#define GET_PAINT_COLOR(obj)  (IS_PAINT(obj) ? GET_OBJ_VAL((obj), VAL_PAINT_COLOR) : 0)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILS ////////////////////////////////////////////////////////////

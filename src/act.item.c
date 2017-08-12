@@ -385,6 +385,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// ITEM_x: identify obj
 	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_PAINT: {
+			extern const char *paint_colors[];
+			extern const char *paint_names[];
+			msg_to_char(ch, "Paint color: %s%s\t0", paint_colors[GET_PAINT_COLOR(obj)], paint_names[GET_PAINT_COLOR(obj)]);
+			break;
+		}
 		case ITEM_POISON: {
 			extern const struct poison_data_type poison_data[];
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
