@@ -2076,7 +2076,7 @@ ACMD(do_morph) {
 	morph_data *morph, *next_morph;
 	double multiplier;
 	obj_data *obj;
-	bool normal;
+	bool normal, fast;
 	
 	// safety first: mobs must use %morph%
 	if (IS_NPC(ch)) {
@@ -2109,8 +2109,9 @@ ACMD(do_morph) {
 	
 	// initialize
 	morph = NULL;
+	fast = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING);
 	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
-	multiplier = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) ? 3.0 : 1.0;
+	multiplier = fast ? 3.0 : 1.0;
 	
 	if (normal && !IS_MORPHED(ch)) {
 		msg_to_char(ch, "You aren't morphed.\r\n");
@@ -2142,7 +2143,7 @@ ACMD(do_morph) {
 	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !IS_VAMPIRE(ch)) {
 		msg_to_char(ch, "You must be a vampire to do that.\r\n");
 	}
-	else if (morph && subcmd == SCMD_FASTMORPH && MORPH_FLAGGED(morph, MORPHF_NO_FASTMORPH)) {
+	else if (morph && fast && MORPH_FLAGGED(morph, MORPHF_NO_FASTMORPH)) {
 		msg_to_char(ch, "You cannot fastmorph into that form.\r\n");
 	}
 	else {
@@ -2159,7 +2160,7 @@ ACMD(do_morph) {
 			extract_obj(obj);
 		}
 		
-		if (IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING || subcmd == SCMD_FASTMORPH) {
+		if (IS_NPC(ch) || fast) {
 			// insta-morph!
 			finish_morphing(ch, morph);
 			command_lag(ch, WAIT_OTHER);
