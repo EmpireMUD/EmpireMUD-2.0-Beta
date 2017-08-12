@@ -2573,7 +2573,7 @@ OLC_MODULE(oedit_paint) {
 		msg_to_char(ch, "You can only set paint color on a paint object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_PAINT_COLOR) = olc_process_type(ch, argument, "paint color", "paint", paint_colors, GET_OBJ_VAL(obj, VAL_PAINT_COLOR));
+		GET_OBJ_VAL(obj, VAL_PAINT_COLOR) = olc_process_type(ch, argument, "paint color", "paint", paint_names, GET_OBJ_VAL(obj, VAL_PAINT_COLOR));
 	}
 }
 
