@@ -40,6 +40,7 @@
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
@@ -58,8 +59,6 @@ extern char *show_color_codes(char *string);
 * @param char *argument The typed argument.
 */
 void adventure_summon(char_data *ch, char *argument) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-	
 	char arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	char_data *vict;
@@ -174,6 +173,7 @@ void cancel_adventure_summon(char_data *ch) {
 		REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
 		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOTHING;
 	}
 }
 
@@ -674,12 +674,14 @@ OFFER_VALIDATE(oval_summon) {
 
 OFFER_FINISH(ofin_summon) {
 	room_data *loc = real_room(offer->location);
+	struct instance_data *inst;
 	int type = offer->data;
 	struct map_data *map;
 	
 	if (type == SUMMON_ADVENTURE) {
 		SET_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = (inst = find_instance_by_room(loc, FALSE)) ? inst->id : NOTHING;
 		map = GET_MAP_LOC(IN_ROOM(ch));
 		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? map->vnum : NOWHERE;
 	}
