@@ -196,7 +196,7 @@ ACMD(do_charge) {
 	else if (FIGHTING(ch) == vict && FIGHT_MODE(ch) == FMODE_MELEE) {
 		msg_to_char(ch, "You're already in melee range.\r\n");
 	}
-	else if (!NOT_MELEE_RANGE(ch, vict)) {
+	else if (FIGHTING(ch) && !NOT_MELEE_RANGE(ch, vict)) {
 		msg_to_char(ch, "You're already in melee range.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_ENTANGLED)) {
