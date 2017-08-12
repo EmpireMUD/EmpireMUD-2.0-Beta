@@ -348,8 +348,8 @@ void disassociate_building(room_data *room) {
 	delete_room_npcs(room, NULL);
 	
 	// remove bits including dismantle
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE);
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
+	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
 	
 	// TODO should do an affect-total here in case any of those were also added by an affect?
 
@@ -2108,6 +2108,9 @@ ACMD(do_paint) {
 	else if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't paint a building that is being dismantled.\r\n");
 	}
+	else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NO_PAINT)) {
+		msg_to_char(ch, "This building cannot be painted.\r\n");
+	}
 	else if (!*arg) {
 		msg_to_char(ch, "Paint the building with what?\r\n");
 	}
@@ -2125,10 +2128,17 @@ ACMD(do_paint) {
 			msg_to_char(ch, "Notice: You have no-paint toggled on, and won't be able to see the color.\r\n");
 		}
 		
+		if (ROOM_PAINT_COLOR(IN_ROOM(ch)) == GET_PAINT_COLOR(paint)) {
+			// same color -- brighten it
+			SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		}
+		
+		// update color
 		COMPLEX_DATA(IN_ROOM(ch))->paint_color = GET_PAINT_COLOR(paint);
-		extract_obj(paint);
 		
 		command_lag(ch, WAIT_ABILITY);
+		extract_obj(paint);
 	}
 }
 

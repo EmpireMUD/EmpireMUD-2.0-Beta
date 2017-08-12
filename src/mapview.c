@@ -866,7 +866,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (ROOM_PAINT_COLOR(IN_ROOM(ch))) {
 		strcpy(col_buf, paint_names[ROOM_PAINT_COLOR(IN_ROOM(ch))]);
 		*col_buf = LOWER(*col_buf);
-		msg_to_char(ch, "The building has been painted %s.\r\n", col_buf);
+		msg_to_char(ch, "The building has been painted %s%s.\r\n", (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
 	}
 	
 	if (emp && GET_LOYALTY(ch) == emp && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
@@ -1179,7 +1179,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	extern struct city_metadata_type city_type[];
 	
 	bool need_color_terminator = FALSE;
-	char buf[30], buf1[30], lbuf[MAX_STRING_LENGTH];
+	char buf[30], buf1[30], col_buf[256], lbuf[MAX_STRING_LENGTH];
 	struct empire_city_data *city;
 	int iter;
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
@@ -1516,7 +1516,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			sprintf(buf, "%s%s", buf2, buf1);
 		}
 		else if (painted && !show_dark) {
-			sprintf(buf, "%s%s", paint_colors[ROOM_PAINT_COLOR(to_room)], buf1);
+			strcpy(col_buf, paint_colors[ROOM_PAINT_COLOR(to_room)]);
+			if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
+				strtoupper(col_buf);
+			}
+			
+			sprintf(buf, "%s%s", col_buf, buf1);
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && !painted && show_dark) {
 			sprintf(buf, "&b%s", buf1);
