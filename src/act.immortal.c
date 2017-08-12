@@ -4172,7 +4172,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		case ITEM_PAINT: {
 			extern const char *paint_colors[];
 			extern const char *paint_names[];
-			msg_to_char(ch, "Paint color: %s%s\t0", paint_colors[GET_PAINT_COLOR(j)], paint_names[GET_PAINT_COLOR(j)]);
+			msg_to_char(ch, "Paint color: %s%s\t0\r\n", paint_colors[GET_PAINT_COLOR(j)], paint_names[GET_PAINT_COLOR(j)]);
 			break;
 		}
 		case ITEM_POTION: {

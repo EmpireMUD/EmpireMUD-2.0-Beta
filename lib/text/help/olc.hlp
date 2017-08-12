@@ -1851,6 +1851,7 @@ Available flags:
  BARRIER - can only go back the way you came, unless flying
  IN-CITY-ONLY - can only be used if in an established city
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
+ !PAINT - cannot be painted
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
  SAIL - can enter this building with a boat
@@ -4194,6 +4195,7 @@ Available components (common flags listed in parentheses):
  &ctextile&0 - cloth or fabric for crafting
  &cvegetable&0 - for cooking
  &crope&0 - for construction and harnessing animals
+ &cpaint&0 - for painting buildings
 
 See also: COMPONENT FLAGS, SHOW COMPONENTS
 #d

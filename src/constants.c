@@ -2201,6 +2201,7 @@ const char *component_types[] = {
 	"textile",
 	"vegetable",
 	"rope",
+	"paint",
 	"\n"
 };
 
@@ -2514,7 +2515,7 @@ const char *bld_flags[] = {
 	"BARRIER",	// 10
 	"IN-CITY-ONLY",
 	"LARGE-CITY-RADIUS",
-	"*MINE-DEPRECATED",
+	"!PAINT",
 	"ATTACH-ROAD",
 	"BURNABLE",	// 15
 	"*FORGE-DEPRECATED",
@@ -2877,6 +2878,7 @@ const char *room_aff_bits[] = {
 	"*!DISMANTLE",
 	"*INCOMPLETE",	// 15
 	"!TELEPORT",
+	"BRIGHT-PAINT",
 	"\n"
 };
 

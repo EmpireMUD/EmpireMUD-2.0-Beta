@@ -628,7 +628,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
 #define BLD_IN_CITY_ONLY  BIT(11)	// can only be used in-city
 #define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
-// #define BLD_UNUSED3  BIT(13)
+#define BLD_NO_PAINT  BIT(13)	// cannot be painted
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
 // #define BLD_UNUSED4  BIT(16)
@@ -1358,6 +1358,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_TEXTILE  26
 #define CMP_VEGETABLE  27
 #define CMP_ROPE  28
+#define CMP_PAINT  29
 
 
 // CMPF_x: component flags
@@ -2215,6 +2216,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)	// o. blocks normal dismantle until turned off
 #define ROOM_AFF_INCOMPLETE  BIT(15)	// p. building is incomplete
 #define ROOM_AFF_NO_TELEPORT  BIT(16)	// q. cannot teleport
+#define ROOM_AFF_BRIGHT_PAINT  BIT(17)	// r. paint is bright color
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 

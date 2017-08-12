@@ -388,7 +388,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		case ITEM_PAINT: {
 			extern const char *paint_colors[];
 			extern const char *paint_names[];
-			msg_to_char(ch, "Paint color: %s%s\t0", paint_colors[GET_PAINT_COLOR(obj)], paint_names[GET_PAINT_COLOR(obj)]);
+			msg_to_char(ch, "Paint color: %s%s\t0\r\n", paint_colors[GET_PAINT_COLOR(obj)], paint_names[GET_PAINT_COLOR(obj)]);
 			break;
 		}
 		case ITEM_POISON: {
