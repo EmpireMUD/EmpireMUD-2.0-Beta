@@ -2087,7 +2087,7 @@ ACMD(do_paint) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "Mobs can't paint.\r\n");
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		msg_to_char(ch, "You don't have permission to paint here.\r\n");
 	}
 	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
