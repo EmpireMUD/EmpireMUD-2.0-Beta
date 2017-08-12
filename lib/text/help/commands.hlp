@@ -1183,6 +1183,7 @@ Usage:  paint <using paint item>
 
 You can use the 'paint' command to color your buildings. This requires one
 paint item per building. Paint recipes generally come from world drops.
+Painting a building the same color twice will result in a brighter color.
 
 The 'unpaint' command removes the paint.
 
