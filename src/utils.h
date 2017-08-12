@@ -1177,6 +1177,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define HOME_ROOM(room)  ((COMPLEX_DATA(room) && COMPLEX_DATA(room)->home_room) ? COMPLEX_DATA(room)->home_room : (room))
 #define IS_BURNING(room)  (BUILDING_BURN_DOWN_TIME(room) > 0)
 #define IS_COMPLETE(room)  (!IS_INCOMPLETE(room) && !IS_DISMANTLING(room))
+#define ROOM_PAINT_COLOR(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->paint_color : 0)
 #define ROOM_PATRON(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->patron : NOBODY)
 #define ROOM_PRIVATE_OWNER(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->private_owner : NOBODY)
 #define ROOM_INSTANCE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->instance : NULL)

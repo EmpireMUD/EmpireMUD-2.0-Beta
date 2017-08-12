@@ -4429,7 +4429,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				COMPLEX_DATA(room)->burn_down_time = l_in;
 				COMPLEX_DATA(room)->damage = dbl_in;	// formerly t[5], which is now unused
 				COMPLEX_DATA(room)->private_owner = t[6];
-				COMPLEX_DATA(room)->disrepair = t[7];	// not currently used (initialized to 0 after b4.15)
+				COMPLEX_DATA(room)->paint_color = t[7];
 				
 				break;
 			}
@@ -4677,8 +4677,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
-		// NOTE: disrepair is not used and is always 0 after b4.15
-		fprintf(fl, "B\n%d %d %d %d %ld %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burn_down_time, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->disrepair);
+		fprintf(fl, "B\n%d %d %d %d %ld %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burn_down_time, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->paint_color);
 	}
 	
 	// C: load commands

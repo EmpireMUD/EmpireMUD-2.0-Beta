@@ -1873,6 +1873,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
 #define PRF_CLEARMETERS  BIT(31)	// automatically clears the damage meters before a new fight
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
+#define PRF_NO_PAINT  BIT(33)	// unable to see custom paint colors
 
 
 // PTECH_x: player techs
@@ -4732,6 +4733,7 @@ struct complex_room_data {
 	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
 	
+	int paint_color;	// for the 'paint' command
 	int private_owner;	// for privately-owned houses
 	
 	time_t burn_down_time;	// if >0, the timestamp when this building will burn down

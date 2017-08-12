@@ -1176,6 +1176,18 @@ Examples:
   > order puppy eat bread
   > order cityguard sleep
 #
+PAINT PAINTING UNPAINT
+
+Usage:  paint <using paint item>
+        unpaint
+
+You can use the 'paint' command to color your buildings. This requires one
+paint item per building. Paint recipes generally come from world drops.
+
+The 'unpaint' command removes the paint.
+
+You need the 'customize' privilege in your empire to paint or unpaint.
+#
 PLAY INSTRUMENTS MUSIC
 
 Speed boosts:  haste
@@ -1893,6 +1905,7 @@ Toggles:
   no-empire - will not create a new empire when you try to claim or build
   clearmeters - automatically clears your meters between combats
   tutorials - you won't see available tutorial quests if this is off
+  no-paint - turns off custom paint colors on buildings
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
