@@ -1182,12 +1182,15 @@ Usage:  paint <using paint item>
         unpaint
 
 You can use the 'paint' command to color your buildings. This requires one
-paint item per building. Paint recipes generally come from world drops.
-Painting a building the same color twice will result in a brighter color.
+paint item per building. You can learn painting recipes at the Painter's
+Workshop building, and from world drop recipes.
 
-The 'unpaint' command removes the paint.
+Painting a building the same color twice will result in a brighter color. The
+'unpaint' command removes the paint.
 
 You need the 'customize' privilege in your empire to paint or unpaint.
+
+See also: PAINTER'S WORKSHOP
 #
 PLAY INSTRUMENTS MUSIC
 

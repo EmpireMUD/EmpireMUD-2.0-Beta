@@ -597,6 +597,20 @@ The oilmaker is used to press olives and other resources into oil.
 
 See also: PRESS, STORAGE
 #
+PAINTERSWORKSHOP "PAINTERS WORKSHOP" "PAINTER'S WORKSHOP" PAINTERWORKSHOP "PAINTER WORKSHOP"
+
+(PW)  Painter's Workshop  (Luxury ability)
+
+Command:  build paintersworkshop <direction>
+Stored here:  paints
+
+This building is used to make and store paints (although you also require
+glassblowing tech to make them). Only a Master Craftsman can learn to make
+paints, and can start the quest to make paints once a painter spawns in this
+building.
+
+See also: PAINT, QUEST
+#
 PARK
 
 &g.^.&co&0  Park  (Monuments ability)

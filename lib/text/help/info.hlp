@@ -1244,4 +1244,15 @@ Wits is used for:
 
 See also: ATTRIBUTES, FASTCASTING, HEALER, SPEED
 #
+"WORLD DROP ITEMS" "WORLD DROPS"
+
+The so-called "world drops" are items that can be found in the loot from any
+mob in the world (or, more often, a subset of those mobs).
+
+For example, the patterns to make higher level weapons and armor can be found
+in the loot from any mob in the 100-200 range, or 200-300 range for the next
+tier above that.
+
+Many different types of items and recipes appear as world drops.
+#
 $
