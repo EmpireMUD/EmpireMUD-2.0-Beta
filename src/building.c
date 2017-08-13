@@ -2136,6 +2136,11 @@ ACMD(do_paint) {
 			SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
 			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
 		}
+		else {
+			// different color -- remove bright
+			REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		}
 		
 		// update color
 		COMPLEX_DATA(IN_ROOM(ch))->paint_color = GET_PAINT_COLOR(paint);
@@ -2260,6 +2265,9 @@ ACMD(do_unpaint) {
 		act("$n strips the paint from the building!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		COMPLEX_DATA(IN_ROOM(ch))->paint_color = 0;
+		REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		
 		command_lag(ch, WAIT_ABILITY);
 	}
 }
