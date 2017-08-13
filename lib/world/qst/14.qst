@@ -1,0 +1,198 @@
+#1400
+Apprentice Paint-Maker~
+   You begin an apprenticeship with the paint-maker. At the end of this
+journey, you will be able to redecorate the outside of your buildings. The
+painter sends you to learn more about pigments and chemistry at the alchemist.
+After that, you'll be able to experiment with your own paints.
+~
+With your newfound knowledge of pigments, you're ready to make some paints...
+~
+6 f 75 0 -1
+A
+1 1401
+P
+15 203 0 1
+R
+0 0 1
+R
+4 6 25
+R
+6 1401 1
+T 1401
+W
+11 0 0 1
+Z
+1 1401
+S
+#1401
+Gather Material for Pigments~
+   The next step is to make paints, but you'll need some simple materials to do
+it. Gather three basicc gems and then go talk to the painter.
+~
+Now that you've collected the materials, you should be ready to begin.
+~
+4 f 75 0 -1
+A
+1 1401
+P
+0 1400 0 1 a
+P
+15 203 0 1 a
+R
+6 1402 1
+W
+1 11 1048576 3
+Z
+1 1401
+S
+#1402
+Experiment With Paints~
+   The painter helps you with the instructions for making a simple jar of
+paint. Try making an experimental blue paint and using it to paint one of your
+buildings. It might take a few tries to get it right.
+~
+   It looks like you successfully made the blue paint! The painter also teaches
+you to make the other primary colors: red and yellow.
+~
+7 f 75 0 -1
+A
+1 1401
+P
+15 203 0 1 a
+P
+0 1401 0 1 a
+R
+0 0 1
+R
+4 6 25
+R
+6 1403 1
+T 1497
+T 1401
+W
+11 0 0 1
+Z
+1 1401
+S
+#1403
+Resupply the Painter~
+   Now that you have some understanding of paintmaking, the workshop could use
+your help refreshing its supply of paints. Craft one of each of the primary
+colors for the painter.
+~
+   The painter thanks you for the supplies and congratulates you on mastering
+primary colors.
+~
+9 df 75 0 -1
+A
+1 1401
+P
+15 203 0 1 a
+P
+0 1402 0 1 a
+R
+0 0 1
+R
+4 6 25
+R
+6 1404 1
+W
+2 1404 0 1 a
+W
+2 1402 0 1 a
+W
+2 1400 0 1 a
+Z
+1 1401
+S
+#1404
+Research Advanced Pigments at the Library~
+   Since you proved to have a knack for basic paints, the painter has decided
+to train you in more advanced colors. But first, you need to do some research
+at the nearest library.
+(Find a friendly library and type 'research' inside.)
+~
+With your newfound knowledge of pigments, you're ready to make some paints...
+~
+8 f 75 0 -1
+A
+1 1401
+P
+9 6 0 100 a
+P
+15 203 0 1 a
+P
+0 1403 0 1 a
+R
+0 0 1
+R
+4 6 25
+R
+6 1405 1
+T 1401
+W
+11 0 0 1
+Z
+1 1401
+S
+#1405
+Gather Primary Colors~
+   To make the secondary colors -- orange, green, and violet -- you will need a
+few jars of the primary colors. Craft those and you'll be ready to succeed.
+~
+Now that you've collected the materials, you should be ready to begin.
+~
+8 f 75 0 -1
+A
+1 1401
+P
+9 6 0 100 a
+P
+0 1404 0 1 a
+P
+15 203 0 1 a
+R
+6 1406 1
+T 1496
+W
+2 1404 0 2 a
+W
+2 1402 0 2 a
+W
+2 1400 0 2 a
+Z
+1 1401
+S
+#1406
+Resupply More Colors~
+   The painter needs help with one last thing. Make each secondary color and
+deliver them here, and you'll be well on your way to becoming the kingdom's
+greatest paint-maker.
+~
+   The painter congratulates you on finishing your apprenticeship. You are now
+officially a paint-maker! You can learn more colors from recipes that drop as
+loot around the world.
+~
+9 df 75 0 -1
+A
+1 1401
+P
+15 203 0 1 a
+P
+0 1405 0 1 a
+P
+9 6 0 100 a
+R
+0 0 1
+R
+5 6 1
+W
+2 1406 0 2 a
+W
+2 1408 0 2 a
+W
+2 1410 0 2 a
+Z
+1 1401
+S
+$

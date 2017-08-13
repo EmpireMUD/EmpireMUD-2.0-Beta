@@ -1,0 +1,418 @@
+#1400
+paint blue jar~
+a jar of blue paint~
+A jar of blue paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 4
+1 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1401
+recipe blue paint~
+the blue paint recipe~
+The blue paint recipe is on the ground.~
+This recipe will teach you to craft: blue paint.
+~
+7 0 a 1
+1400 0 0
+0 0
+S
+#1402
+paint red jar~
+a jar of red paint~
+A jar of red paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 5
+2 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1403
+recipe red paint~
+the red paint recipe~
+The red paint recipe is on the ground.~
+This recipe will teach you to craft: red paint.
+~
+7 0 a 1
+1402 0 0
+0 0
+S
+#1404
+paint yellow jar~
+a jar of yellow paint~
+A jar of yellow paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 6
+3 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1405
+recipe yellow paint~
+the yellow paint recipe~
+The yellow paint recipe is on the ground.~
+This recipe will teach you to craft: yellow paint.
+~
+7 0 a 1
+1404 0 0
+0 0
+S
+#1406
+paint green jar~
+a jar of green paint~
+A jar of green paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 7
+4 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1407
+recipe green paint~
+the green paint recipe~
+The green paint recipe is on the ground.~
+This recipe will teach you to craft: green paint.
+~
+7 0 a 1
+1406 0 0
+0 0
+S
+#1408
+paint orange jar~
+a jar of orange paint~
+A jar of orange paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 8
+5 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1409
+recipe orange paint~
+the orange paint recipe~
+The orange paint recipe is on the ground.~
+This recipe will teach you to craft: orange paint.
+~
+7 0 a 1
+1408 0 0
+0 0
+S
+#1410
+paint violet jar~
+a jar of violet paint~
+A jar of violet paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 9
+6 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1411
+recipe violet paint~
+the violet paint recipe~
+The violet paint recipe is on the ground.~
+This recipe will teach you to craft: violet paint.
+~
+7 0 a 1
+1410 0 0
+0 0
+S
+#1412
+paint azure jar~
+a jar of azure paint~
+A jar of azure paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 10
+7 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1413
+recipe azure paint~
+the azure paint recipe~
+The azure paint recipe is on the ground.~
+This recipe will teach you to craft: azure paint.
+~
+7 0 a 1
+1412 0 0
+0 0
+S
+#1414
+paint cyan jar~
+a jar of cyan paint~
+A jar of cyan paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 11
+8 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1415
+recipe cyan paint~
+the cyan paint recipe~
+The cyan paint recipe is on the ground.~
+This recipe will teach you to craft: cyan paint.
+~
+7 0 a 1
+1414 0 0
+0 0
+S
+#1416
+paint jade jar~
+a jar of jade paint~
+A jar of jade paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 12
+9 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1417
+recipe jade paint~
+the jade paint recipe~
+The jade paint recipe is on the ground.~
+This recipe will teach you to craft: jade paint.
+~
+7 0 a 1
+1416 0 0
+0 0
+S
+#1418
+paint lime jar~
+a jar of lime paint~
+A jar of lime paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 13
+10 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1419
+recipe lime paint~
+the lime paint recipe~
+The lime paint recipe is on the ground.~
+This recipe will teach you to craft: lime paint.
+~
+7 0 a 1
+1418 0 0
+0 0
+S
+#1420
+paint magenta jar~
+a jar of magenta paint~
+A jar of magenta paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 13
+11 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1421
+recipe magenta paint~
+the magenta paint recipe~
+The magenta paint recipe is on the ground.~
+This recipe will teach you to craft: magenta paint.
+~
+7 0 a 1
+1420 0 0
+0 0
+S
+#1422
+paint pink jar~
+a jar of pink paint~
+A jar of pink paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 13
+12 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1423
+recipe pink paint~
+the pink paint recipe~
+The pink paint recipe is on the ground.~
+This recipe will teach you to craft: pink paint.
+~
+7 0 a 1
+1422 0 0
+0 0
+S
+#1424
+paint tan jar~
+a jar of tan paint~
+A jar of tan paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 13
+13 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1425
+recipe tan paint~
+the tan paint recipe~
+The tan paint recipe is on the ground.~
+This recipe will teach you to craft: tan paint.
+~
+7 0 a 1
+1424 0 0
+0 0
+S
+#1426
+paint white jar~
+a jar of white paint~
+A jar of white paint is sitting on the ground.~
+This jar can be used to paint a building with the 'paint' command.
+~
+13 el a 15
+14 0 0
+6 0
+C
+1 1
+O
+29 u
+R
+1401 0
+S
+#1427
+recipe white paint~
+the white paint recipe~
+The white paint recipe is on the ground.~
+This recipe will teach you to craft: white paint.
+~
+7 0 a 1
+1426 0 0
+0 0
+S
+#1496
+notes research painter's painters~
+the painter's research notes~
+The painter's research notes are lying here.~
+   You still have more to learn about paint-making. Take these to a library and
+type 'research'.
+~
+3 0 a 5
+0 0 0
+0 0
+Q 1404
+T 1404
+S
+#1497
+recipe experimental painter's painters~
+the painter's experimental recipe~
+The painter's experimental recipe is lying here.~
+   The painter wants you to learn to make blue paint. You might have to
+experiment a few times. Make some paint and then use 'paint experimental' to
+use it.
+You can craft: experimental blue paint
+~
+3 0 a 4
+0 0 0
+0 0
+Q 1402
+S
+#1498
+paint experimental blue jar~
+a jar of experimental blue paint~
+A jar of experimental blue paint is lying here.~
+This is supposed to be blue, right...?
+Type 'paint experimental' to use it.
+~
+13 e a 6
+1 0 0
+6 0
+Q 1402
+T 1498
+S
+#1499
+notes research painter's painters~
+the painter's research notes~
+The painter's research notes are lying here.~
+   You have begun an apprenticeship with the painter, but you have a lot to
+learn. Take these to an alchemist or laboratory and type 'research'.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 1400
+T 1400
+S
+$
