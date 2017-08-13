@@ -2258,6 +2258,7 @@ const char *paint_colors[] = {
 	"&m",	// Magenta
 	"&p",	// Pink
 	"&t",	// Tan
+	"&w",	// White
 	"\n"
 };
 
@@ -2278,6 +2279,7 @@ const char *paint_names[] = {
 	"Magenta",
 	"Pink",
 	"Tan",
+	"White",
 	"\n"
 };
 
