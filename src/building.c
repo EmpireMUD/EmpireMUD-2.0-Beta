@@ -2120,6 +2120,9 @@ ACMD(do_paint) {
 	else if (!IS_PAINT(paint)) {
 		act("$p isn't paint!", FALSE, ch, paint, NULL, TO_CHAR);
 	}
+	else if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL)) {
+		return;	// check trigger
+	}
 	else {
 		act("You use $p to paint the building!", FALSE, ch, paint, NULL, TO_CHAR);
 		act("$n uses $p to paint the building!", FALSE, ch, paint, NULL, TO_ROOM);

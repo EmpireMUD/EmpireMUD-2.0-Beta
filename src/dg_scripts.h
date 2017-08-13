@@ -155,6 +155,7 @@
 #define OCMD_CRAFT  6
 #define OCMD_SHOOT  7
 #define OCMD_POISON  8
+#define OCMD_PAINT  9
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */
