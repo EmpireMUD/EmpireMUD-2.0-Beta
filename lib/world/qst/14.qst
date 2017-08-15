@@ -4,10 +4,11 @@ Apprentice Paint-Maker~
 journey, you will be able to redecorate the outside of your buildings. The
 painter sends you to learn more about pigments and chemistry at the alchemist.
 After that, you'll be able to experiment with your own paints.
+Type 'research' at an alchemist or laboratory to learn more.
 ~
 With your newfound knowledge of pigments, you're ready to make some paints...
 ~
-6 f 75 0 -1
+7 f 75 0 -1
 A
 1 1401
 P
@@ -27,11 +28,11 @@ S
 #1401
 Gather Material for Pigments~
    The next step is to make paints, but you'll need some simple materials to do
-it. Gather three basicc gems and then go talk to the painter.
+it. Gather three basic gems and then go talk to the painter.
 ~
 Now that you've collected the materials, you should be ready to begin.
 ~
-4 f 75 0 -1
+5 f 75 0 -1
 A
 1 1401
 P
