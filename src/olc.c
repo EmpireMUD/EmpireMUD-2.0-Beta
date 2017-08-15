@@ -321,6 +321,7 @@ OLC_MODULE(oedit_long_desc);
 OLC_MODULE(oedit_material);
 OLC_MODULE(oedit_maxlevel);
 OLC_MODULE(oedit_minlevel);
+OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
 OLC_MODULE(oedit_poison);
 OLC_MODULE(oedit_potion);
@@ -830,6 +831,7 @@ const struct olc_command_data olc_data[] = {
 	{ "material", oedit_material, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "maxlevel", oedit_maxlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "poison", oedit_poison, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "potion", oedit_potion, OLC_OBJECT, OLC_CF_EDITOR },

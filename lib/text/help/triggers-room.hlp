@@ -154,6 +154,7 @@ When using field - The variable returns:
 &cempire_name&0 - The owner empire's name, if any.
 &center_dir&0 - For map buildings, the direction you go to enter them.
 &cexit_dir&0 - For map buildings, the direction to exit them.
+&cfunction(FLAG)&0 - True if the room has a function flag on it.
 &c<dir>&0 - The list of flags affecting the exit in the specified direction: 
       north, south, up, down, fore, aft (etc). The result is either:
       %room.north(vnum)% - vnum of room in direction
@@ -172,7 +173,7 @@ When using field - The variable returns:
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning
 
 See also: EMPIRE VARS, REDIT AFFECTS, REDIT FLAGS, BEDIT FLAGS,
-  SECTEDIT BUILDFLAGS
+  SECTEDIT BUILDFLAGS, FUNCTION FLAGS
 #d
 "ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
 

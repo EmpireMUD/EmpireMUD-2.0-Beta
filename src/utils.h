@@ -963,6 +963,11 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VAL_BOOK_ID  0
 #define GET_BOOK_ID(obj)  (IS_BOOK(obj) ? GET_OBJ_VAL((obj), VAL_BOOK_ID) : 0)
 
+// ITEM_PAINT
+#define IS_PAINT(obj)  (GET_OBJ_TYPE(obj) == ITEM_PAINT)
+#define VAL_PAINT_COLOR  0
+#define GET_PAINT_COLOR(obj)  (IS_PAINT(obj) ? GET_OBJ_VAL((obj), VAL_PAINT_COLOR) : 0)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
@@ -987,6 +992,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_ACTION_TIMER(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_timer))
 #define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_vnum[(n)]))
 #define GET_ACTION_RESOURCES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_resources))
+#define GET_ADVENTURE_SUMMON_INSTANCE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_instance_id))
 #define GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_location))
 #define GET_ADVENTURE_SUMMON_RETURN_MAP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_map))
 #define GET_ALIASES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->aliases))
@@ -1171,6 +1177,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define HOME_ROOM(room)  ((COMPLEX_DATA(room) && COMPLEX_DATA(room)->home_room) ? COMPLEX_DATA(room)->home_room : (room))
 #define IS_BURNING(room)  (BUILDING_BURN_DOWN_TIME(room) > 0)
 #define IS_COMPLETE(room)  (!IS_INCOMPLETE(room) && !IS_DISMANTLING(room))
+#define ROOM_PAINT_COLOR(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->paint_color : 0)
 #define ROOM_PATRON(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->patron : NOBODY)
 #define ROOM_PRIVATE_OWNER(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->private_owner : NOBODY)
 #define ROOM_INSTANCE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->instance : NULL)
@@ -1618,6 +1625,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum);
 void qt_change_currency(char_data *ch, any_vnum vnum, int total);
 void qt_gain_vehicle(char_data *ch, any_vnum vnum);
 void qt_get_obj(char_data *ch, obj_data *obj);
+void qt_keep_obj(char_data *ch, obj_data *obj, bool true_for_keep);
 void qt_kill_mob(char_data *ch, char_data *mob);
 void qt_lose_building(char_data *ch, any_vnum vnum);
 void qt_lose_quest(char_data *ch, any_vnum vnum);

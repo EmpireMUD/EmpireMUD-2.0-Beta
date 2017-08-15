@@ -714,7 +714,7 @@ S
 #5136
 Pigeon Post~
 The Pigeon Post~
-&0[PP]~
+&0|PP|~
 10 0 pR 0
 0 0 0 263
 C
@@ -1503,7 +1503,7 @@ S
 Wall~
 A Stone Wall~
 @U&#VV@V~
-32 0 djk 0
+32 0 djkn 0
 0 0 0 -1
 R
 3 1 1 0

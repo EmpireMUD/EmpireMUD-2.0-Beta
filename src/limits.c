@@ -563,6 +563,7 @@ void real_update_char(char_data *ch) {
 	struct affected_type *af, *next_af, *immune;
 	char_data *room_ch, *next_ch, *caster;
 	char buf[MAX_STRING_LENGTH];
+	struct instance_data *inst;
 	int result, iter, type;
 	int fol_count, gain;
 	bool found, took_dot;
@@ -573,7 +574,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// first check location: this may move the player
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !find_instance_by_room(IN_ROOM(ch), FALSE)) {
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE)) || inst->id != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
 		adventure_unsummon(ch);
 	}
 	

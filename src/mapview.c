@@ -35,6 +35,10 @@
 *   Commands
 */
 
+// external vars
+extern const char *paint_colors[];
+extern const char *paint_names[];
+
 // external functions
 extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
@@ -504,7 +508,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct mappc_data_container *mappc = NULL;
 	struct mappc_data *pc, *next_pc;
 	struct empire_city_data *city;
-	char output[MAX_STRING_LENGTH], veh_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], rlbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH], advcolbuf[128];
+	char output[MAX_STRING_LENGTH], veh_buf[256], col_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], rlbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH], advcolbuf[128];
 	int s, t, mapsize, iter, check_x, check_y;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
@@ -859,6 +863,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "This area is (no-dismantle).\r\n");
 	}
 	
+	if (ROOM_PAINT_COLOR(IN_ROOM(ch))) {
+		strcpy(col_buf, paint_names[ROOM_PAINT_COLOR(IN_ROOM(ch))]);
+		*col_buf = LOWER(*col_buf);
+		msg_to_char(ch, "The building has been painted %s%s.\r\n", (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
+	}
+	
 	if (emp && GET_LOYALTY(ch) == emp && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
 		msg_to_char(ch, "Workforce will not work this tile.\r\n");
 	}
@@ -1169,13 +1179,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	extern struct city_metadata_type city_type[];
 	
 	bool need_color_terminator = FALSE;
-	char buf[30], buf1[30], lbuf[MAX_STRING_LENGTH];
+	char buf[30], buf1[30], col_buf[256], lbuf[MAX_STRING_LENGTH];
 	struct empire_city_data *city;
 	int iter;
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
 	int tileset = pick_season(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
-	bool junk, enchanted, hidden = FALSE;
+	bool junk, enchanted, hidden = FALSE, painted;
 	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
@@ -1210,6 +1220,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		crop_icon = get_icon_from_set(GET_CROP_ICONS(cp), tileset);
 		base_color = crop_icon->color;
 	}
+	
+	painted = (!IS_NPC(ch) && ROOM_PAINT_COLOR(to_room) && !PRF_FLAGGED(ch, PRF_NO_PAINT));
 
 	// start with the sector color
 	strcpy(buf, base_color);
@@ -1449,7 +1461,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		sprintf(buf, "\t0\t[B300]%s", buf1);
 		need_color_terminator = TRUE;
 	}
-	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || show_dark) {
+	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || painted || show_dark) {
 		strcpy(buf1, strip_color(buf));
 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
@@ -1503,7 +1515,15 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			
 			sprintf(buf, "%s%s", buf2, buf1);
 		}
-		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && show_dark) {
+		else if (painted && !show_dark) {
+			strcpy(col_buf, paint_colors[ROOM_PAINT_COLOR(to_room)]);
+			if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
+				strtoupper(col_buf);
+			}
+			
+			sprintf(buf, "%s%s", col_buf, buf1);
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && !painted && show_dark) {
 			sprintf(buf, "&b%s", buf1);
 		}
 		else {
@@ -1572,7 +1592,15 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
  //////////////////////////////////////////////////////////////////////////////
 //// SCREEN READER FUNCTIONS /////////////////////////////////////////////////
 
-char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
+/**
+* Gets the short name for a room, for a screenreader user.
+*
+* @param char_data *ch The person to get the view for.
+* @param room_data *from_room The room being viewed from.
+* @param room_data *to_room The room being shown.
+* @return char* The string to show.
+*/
+char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room) {
 	static char lbuf[MAX_STRING_LENGTH];
 	char temp[MAX_STRING_LENGTH];
 	crop_data *cp;
@@ -1602,12 +1630,20 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 		strcpy(temp, GET_SECT_NAME(SECT(to_room)));
 	}
 	
-	// now check custom name
-	if (ROOM_CUSTOM_NAME(to_room) && !CHECK_CHAMELEON(from_room, to_room)) {
-		sprintf(lbuf, "%s/%s", ROOM_CUSTOM_NAME(to_room), temp);
+	// start lbuf: color
+	if (ROOM_PAINT_COLOR(to_room) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) {
+		sprintf(lbuf, "%s ", paint_names[ROOM_PAINT_COLOR(to_room)]);
 	}
 	else {
-		strcpy(lbuf, temp);
+		*lbuf = '\0';
+	}
+	
+	// now check custom name
+	if (ROOM_CUSTOM_NAME(to_room) && !CHECK_CHAMELEON(from_room, to_room)) {
+		sprintf(lbuf + strlen(lbuf), "%s/%s", ROOM_CUSTOM_NAME(to_room), temp);
+	}
+	else {
+		strcat(lbuf, temp);
 	}
 	
 	return lbuf;
@@ -1658,7 +1694,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			// not dark
 		
 			// show tile type
-			strcat(roombuf, get_screenreader_room_name(origin, to_room));
+			strcat(roombuf, get_screenreader_room_name(ch, origin, to_room));
 		
 			// show mappc
 			if (SHOW_PEOPLE_IN_ROOM(to_room)) {

@@ -12,7 +12,8 @@ See also:
 
 Consume (object trigger)
 
-Supported commands:  &cdrink, eat, quaff, read, shoot, poiosn, build/craft/etc.&0
+Supported commands:  &cdrink, eat, quaff, read, shoot, poiosn, build/craft/etc,
+                     paint&0
 Argument type:  percent chance to execute
 Return value:  return 0 to prevent the consumption
 

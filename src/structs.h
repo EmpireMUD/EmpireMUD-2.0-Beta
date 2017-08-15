@@ -628,7 +628,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
 #define BLD_IN_CITY_ONLY  BIT(11)	// can only be used in-city
 #define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
-// #define BLD_UNUSED3  BIT(13)
+#define BLD_NO_PAINT  BIT(13)	// cannot be painted
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
 // #define BLD_UNUSED4  BIT(16)
@@ -1358,6 +1358,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_TEXTILE  26
 #define CMP_VEGETABLE  27
 #define CMP_ROPE  28
+#define CMP_PAINT  29
 
 
 // CMPF_x: component flags
@@ -1408,7 +1409,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_CORPSE  10	// a corpse, pc or npc
 #define ITEM_COINS  11	// stack of coins
 #define ITEM_CURRENCY  12	// adventure currency item
-	#define ITEM_UNUSED3  13
+#define ITEM_PAINT  13	// for painting buildings
 #define ITEM_MAIL  14	// mail
 #define ITEM_WEALTH  15	// item provides wealth
 #define ITEM_CART  16	// This type is mostly DEPRECATED; use vehicles instead
@@ -1873,6 +1874,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
 #define PRF_CLEARMETERS  BIT(31)	// automatically clears the damage meters before a new fight
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
+#define PRF_NO_PAINT  BIT(33)	// unable to see custom paint colors
 
 
 // PTECH_x: player techs
@@ -2214,6 +2216,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)	// o. blocks normal dismantle until turned off
 #define ROOM_AFF_INCOMPLETE  BIT(15)	// p. building is incomplete
 #define ROOM_AFF_NO_TELEPORT  BIT(16)	// q. cannot teleport
+#define ROOM_AFF_BRIGHT_PAINT  BIT(17)	// r. paint is bright color
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -3503,6 +3506,7 @@ struct player_special_data {
 	int recent_death_count;	// for death penalty
 	long last_death_time;	// for death counts
 	int last_corpse_id;	// DG Scripts obj id of last corpse
+	int adventure_summon_instance_id;	// instance summoned to
 	room_vnum adventure_summon_return_location;	// where to send a player back to if they're outside an adventure
 	room_vnum adventure_summon_return_map;	// map check location for the return loc
 	room_vnum marked_location;	// for map marking
@@ -4731,6 +4735,7 @@ struct complex_room_data {
 	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
 	
+	int paint_color;	// for the 'paint' command
 	int private_owner;	// for privately-owned houses
 	
 	time_t burn_down_time;	// if >0, the timestamp when this building will burn down

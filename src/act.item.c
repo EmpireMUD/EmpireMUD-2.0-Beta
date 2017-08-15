@@ -385,6 +385,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// ITEM_x: identify obj
 	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_PAINT: {
+			extern const char *paint_colors[];
+			extern const char *paint_names[];
+			msg_to_char(ch, "Paint color: %s%s\t0\r\n", paint_colors[GET_PAINT_COLOR(obj)], paint_names[GET_PAINT_COLOR(obj)]);
+			break;
+		}
 		case ITEM_POISON: {
 			extern const struct poison_data_type poison_data[];
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
@@ -4602,6 +4608,11 @@ ACMD(do_identify) {
 		msg_to_char(ch, "You see nothing like that here.\r\n");
 	}
 	else if (obj) {
+		if (!IS_IMMORTAL(ch) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+			// for non-immortals, ensure scaling is done
+			scale_item_to_level(obj, get_approximate_level(ch));
+		}
+		
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
 		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		identify_obj_to_char(obj, ch);
@@ -4655,9 +4666,11 @@ ACMD(do_keep) {
 				
 				if (mode == SCMD_KEEP) {
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+					qt_keep_obj(ch, obj, TRUE);
 				}
 				else {
 					REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+					qt_keep_obj(ch, obj, FALSE);
 				}
 			}
 			
@@ -4676,9 +4689,11 @@ ACMD(do_keep) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 			if (mode == SCMD_KEEP) {
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				qt_keep_obj(ch, obj, TRUE);
 			}
 			else {
 				REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
@@ -4692,9 +4707,11 @@ ACMD(do_keep) {
 		else {
 			if (mode == SCMD_KEEP) {
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				qt_keep_obj(ch, obj, TRUE);
 			}
 			else {
 				REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);

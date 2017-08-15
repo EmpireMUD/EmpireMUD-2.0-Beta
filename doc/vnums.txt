@@ -20,6 +20,7 @@ blocks that are currently in use.
 1200  Herbs, potions, and poisons
 1300  Fishing and misc crafts
   50  Skins, leather, and wool
+1400  Paints and paint recipes
 
 2000  Sewing items
 2100  Primitive gear, forge, and low leather items

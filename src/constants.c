@@ -613,6 +613,7 @@ const char *preference_bits[] = {
 	"!EMPIRE",
 	"CLEARMETERS",
 	"!TUTORIALS",
+	"!PAINT",
 	"\n"
 };
 
@@ -678,6 +679,8 @@ const struct toggle_data_type toggle_data[] = {
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
 	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
+	
+	{ "no-paint", TOG_ONOFF, PRF_NO_PAINT, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -1934,7 +1937,7 @@ const char *item_types[] = {
 	"CORPSE",
 	"COINS",
 	"CURRENCY",
-	"*",
+	"PAINT",
 	"*MAIL",
 	"WEALTH",
 	"*CART",
@@ -2198,6 +2201,7 @@ const char *component_types[] = {
 	"textile",
 	"vegetable",
 	"rope",
+	"paint",
 	"\n"
 };
 
@@ -2235,6 +2239,48 @@ const char *fullness[] = {
 	"about half ",
 	"more than half ",
 	""
+};
+
+
+// house painting (1/2)
+const char *paint_colors[] = {
+	"&0",	// none/normal
+	"&b",	// blue
+	"&r",	// red
+	"&y",	// yellow
+	"&g",	// green
+	"&o",	// orange
+	"&v",	// violet
+	"&a",	// azure
+	"&c",	// Cyan
+	"&j",	// Jade
+	"&l",	// Lime
+	"&m",	// Magenta
+	"&p",	// Pink
+	"&t",	// Tan
+	"&w",	// White
+	"\n"
+};
+
+
+// house painting (2/2)
+const char *paint_names[] = {
+	"none",
+	"Blue",
+	"Red",
+	"Yellow",
+	"Green",
+	"Orange",
+	"Violet",
+	"Azure",
+	"Cyan",
+	"Jade",
+	"Lime",
+	"Magenta",
+	"Pink",
+	"Tan",
+	"White",
+	"\n"
 };
 
 
@@ -2311,7 +2357,7 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "tail swipe", "swipe", "swipes", "tail swipe", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "peck", "peck", "pecks", "peck", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "gore", "gore", "gores", "gore", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "mana blast", "blast", "blasts", "blash", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
+	{ "mana blast", "blast", "blasts", "blast", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
 	{ "bow", "shoot", "shoots", "shot", { 2.2, 2.6, 3.2 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
 	{ "crossbow", "shoot", "shoots", "shot", { 3.7, 3.9, 4.3 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
 	{ "pistol", "shoot", "shoots", "shot", { 2.0, 2.4, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
@@ -2471,7 +2517,7 @@ const char *bld_flags[] = {
 	"BARRIER",	// 10
 	"IN-CITY-ONLY",
 	"LARGE-CITY-RADIUS",
-	"*MINE-DEPRECATED",
+	"!PAINT",
 	"ATTACH-ROAD",
 	"BURNABLE",	// 15
 	"*FORGE-DEPRECATED",
@@ -2834,6 +2880,7 @@ const char *room_aff_bits[] = {
 	"*!DISMANTLE",
 	"*INCOMPLETE",	// 15
 	"!TELEPORT",
+	"BRIGHT-PAINT",
 	"\n"
 };
 

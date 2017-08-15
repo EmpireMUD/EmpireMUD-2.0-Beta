@@ -26,6 +26,18 @@ I 14 18500 100.00 4 x  # COMBINE: a basket of papayas
 O
 9 nr
 S
+#18502
+sign~
+the sign~
+A sign has been hastily erected here.~
+   It reads, 'This site is currently being explored by the Archaeological
+Society. Please come back later when we're done disarming the traps and putting
+torches up.'
+~
+3 0 0 2
+0 0 0
+0 8064
+S
 #18506
 coins ancient pile~
 a pile of ancient coins~

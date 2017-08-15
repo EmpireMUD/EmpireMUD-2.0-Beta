@@ -1851,6 +1851,7 @@ Available flags:
  BARRIER - can only go back the way you came, unless flying
  IN-CITY-ONLY - can only be used if in an established city
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
+ !PAINT - cannot be painted
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
  SAIL - can enter this building with a boat
@@ -4194,6 +4195,7 @@ Available components (common flags listed in parentheses):
  &ctextile&0 - cloth or fabric for crafting
  &cvegetable&0 - for cooking
  &crope&0 - for construction and harnessing animals
+ &cpaint&0 - for painting buildings
 
 See also: COMPONENT FLAGS, SHOW COMPONENTS
 #d
@@ -4618,6 +4620,15 @@ anything else).
 
 See also: PLANT, OEDIT TYPE, OLC OBJECTS, VNUM
 #d
+"OEDIT PAINTS" "OEDIT PAINT COLORS"
+
+Usage:  .paint <color>
+
+This sets what color a 'paint' item uses. Type '.paint' by itself to see the
+list of available colors.
+
+See also: PAINT ITEM, OLC OBJECTS
+#d
 "OEDIT POISON"
 
 Usage:  .poison <type>
@@ -4786,6 +4797,7 @@ Available types:
  CORPSE - a corpse
  COINS - a pile of coins
  CURRENCY - a pile of adventure currency
+ PAINT - used for painting buildings
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored
  *CART - use vehicles instead
@@ -6522,6 +6534,12 @@ each other.
 
 If you want items in other slots to add inventory capacity, use the INVENTORY
 apply instead.
+#d
+"PAINT ITEM" "PAINT OBJECT"
+
+The PAINT item type is used by players to color their buildings. One paint item
+is required per building, and the item is consumed when used by the 'paint'
+command.
 #d
 "POISON ITEM" "POISON OBJECT"
 

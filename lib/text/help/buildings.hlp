@@ -597,6 +597,20 @@ The oilmaker is used to press olives and other resources into oil.
 
 See also: PRESS, STORAGE
 #
+PAINTSHOP "PAINT SHOP" "PAINTER'S WORKSHOP" "PAINTERS WORKSHOP"
+
+[PP]  Painter's Workshop  (Luxury ability)
+
+Command:  build paintshop <direction>
+Stored here:  paints
+
+This building is used to make and store paints (although you also require
+glassblowing tech to make them). Only a Master Craftsman can learn to make
+paints, and can start the quest to make paints once a painter spawns in this
+building.
+
+See also: PAINT, QUEST
+#
 PARK
 
 &g.^.&co&0  Park  (Monuments ability)
@@ -605,7 +619,7 @@ Parks are a pleasant place to spend the day.
 #
 PIGEONPOST "PIGEON POST"
 
-[PP]  Pigeon Post  (Artisans ability)
+|PP|  Pigeon Post  (Artisans ability)
 
 The Pigeon Post is a service that uses highly-trained birds to send mail across
 the world. You can receive mail anywhere, but must send it from the Post.

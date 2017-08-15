@@ -40,6 +40,7 @@
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
@@ -58,8 +59,6 @@ extern char *show_color_codes(char *string);
 * @param char *argument The typed argument.
 */
 void adventure_summon(char_data *ch, char *argument) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-	
 	char arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	char_data *vict;
@@ -174,6 +173,7 @@ void cancel_adventure_summon(char_data *ch) {
 		REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
 		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOTHING;
 	}
 }
 
@@ -674,12 +674,14 @@ OFFER_VALIDATE(oval_summon) {
 
 OFFER_FINISH(ofin_summon) {
 	room_data *loc = real_room(offer->location);
+	struct instance_data *inst;
 	int type = offer->data;
 	struct map_data *map;
 	
 	if (type == SUMMON_ADVENTURE) {
 		SET_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = (inst = find_instance_by_room(loc, FALSE)) ? inst->id : NOTHING;
 		map = GET_MAP_LOC(IN_ROOM(ch));
 		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? map->vnum : NOWHERE;
 	}
@@ -2076,7 +2078,7 @@ ACMD(do_morph) {
 	morph_data *morph, *next_morph;
 	double multiplier;
 	obj_data *obj;
-	bool normal;
+	bool normal, fast;
 	
 	// safety first: mobs must use %morph%
 	if (IS_NPC(ch)) {
@@ -2109,8 +2111,9 @@ ACMD(do_morph) {
 	
 	// initialize
 	morph = NULL;
+	fast = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING);
 	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
-	multiplier = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) ? 3.0 : 1.0;
+	multiplier = fast ? 3.0 : 1.0;
 	
 	if (normal && !IS_MORPHED(ch)) {
 		msg_to_char(ch, "You aren't morphed.\r\n");
@@ -2142,7 +2145,7 @@ ACMD(do_morph) {
 	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !IS_VAMPIRE(ch)) {
 		msg_to_char(ch, "You must be a vampire to do that.\r\n");
 	}
-	else if (morph && subcmd == SCMD_FASTMORPH && MORPH_FLAGGED(morph, MORPHF_NO_FASTMORPH)) {
+	else if (morph && fast && MORPH_FLAGGED(morph, MORPHF_NO_FASTMORPH)) {
 		msg_to_char(ch, "You cannot fastmorph into that form.\r\n");
 	}
 	else {
@@ -2159,7 +2162,7 @@ ACMD(do_morph) {
 			extract_obj(obj);
 		}
 		
-		if (IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING || subcmd == SCMD_FASTMORPH) {
+		if (IS_NPC(ch) || fast) {
 			// insta-morph!
 			finish_morphing(ch, morph);
 			command_lag(ch, WAIT_OTHER);

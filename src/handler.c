@@ -3050,11 +3050,14 @@ void stop_follower(char_data *ch) {
 
 	if (ch->master == NULL)
 		return;
-
-	act("You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR);
-	act("$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT);
-	if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
-		act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
+	
+	// only message if neither was just extracted
+	if (!EXTRACTED(ch) && !EXTRACTED(ch->master)) {
+		act("You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR);
+		act("$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT);
+		if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
+			act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
+		}
 	}
 
 	if (ch->master->followers->follower == ch) {	/* Head of follower-list? */

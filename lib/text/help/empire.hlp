@@ -61,7 +61,7 @@ The Artisans ability unlocks additional buildings.
 &c~&0--&c~&0 bridge
 (CC) carpenter
 (GG) glassblower
-[PP] pigeonpost
+|PP| pigeonpost
 (OO) oilmaker
 (TT) tailor
 [TT] tavern
@@ -846,12 +846,13 @@ Luxury (Empire ability)
 
 The Luxury ability unlocks additional buildings.
 
-[CC] cabinetofcuriosities  (rare item storage)
-.... courtyard  (in-city only)
-&g^/\^&0 trapperspost
-[&b~~&0] baths  (in-city only)
-{&c~~&0} fountain  (in-city only)
-&g.&b||&g.&0 sorcerytower  (in-city only)
+[PP]  paintshop
+[CC]  cabinetofcuriosities  (rare item storage)
+....  courtyard  (in-city only)
+&g^/\^&0  trapperspost
+[&b~~&0]  baths  (in-city only)
+{&c~~&0}  fountain  (in-city only)
+&g.&b||&g.&0  sorcerytower  (in-city only)
 V[]V  portcullis  (in-city only)
 [**]  greathall  (in-city only)
 

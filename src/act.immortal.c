@@ -4169,6 +4169,12 @@ void do_stat_object(char_data *ch, obj_data *j) {
 				msg_to_char(ch, "%d", GET_PORTAL_TARGET_VNUM(j));
 			}
 			break;
+		case ITEM_PAINT: {
+			extern const char *paint_colors[];
+			extern const char *paint_names[];
+			msg_to_char(ch, "Paint color: %s%s\t0\r\n", paint_colors[GET_PAINT_COLOR(j)], paint_names[GET_PAINT_COLOR(j)]);
+			break;
+		}
 		case ITEM_POTION: {
 			extern const struct potion_data_type potion_data[];
 			msg_to_char(ch, "Potion type: %s, Scale: %d\r\n", potion_data[GET_POTION_TYPE(j)].name, GET_POTION_SCALE(j));

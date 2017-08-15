@@ -1214,6 +1214,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						}
 					}
 				}
+				else if (PFILE_TAG(line, "Adventure Summon Instance:", length)) {
+					GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = atoi(line + length + 1);
+				}
 				else if (PFILE_TAG(line, "Adventure Summon Loc:", length)) {
 					GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = atoi(line + length + 1);
 				}
@@ -2273,6 +2276,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	if (GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) != NOWHERE) {
+		fprintf(fl, "Adventure Summon Instance: %d\n", GET_ADVENTURE_SUMMON_INSTANCE_ID(ch));
 		fprintf(fl, "Adventure Summon Loc: %d\n", GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
@@ -3183,6 +3187,7 @@ void clear_player(char_data *ch) {
 	GET_TOMB_ROOM(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOTHING;
 	GET_LAST_TELL(ch) = NOBODY;
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal

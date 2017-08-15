@@ -348,8 +348,8 @@ void disassociate_building(room_data *room) {
 	delete_room_npcs(room, NULL);
 	
 	// remove bits including dismantle
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE);
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
+	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
 	
 	// TODO should do an affect-total here in case any of those were also added by an affect?
 
@@ -2079,6 +2079,78 @@ ACMD(do_nodismantle) {
 }
 
 
+ACMD(do_paint) {
+	obj_data *paint;
+	
+	one_argument(argument, arg);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "Mobs can't paint.\r\n");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
+		msg_to_char(ch, "You don't have permission to paint here.\r\n");
+	}
+	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+		msg_to_char(ch, "You don't have permission to paint anything (customize).\r\n");
+	}
+	else if (!COMPLEX_DATA(IN_ROOM(ch)) || !IS_ANY_BUILDING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only paint buildings.\r\n");
+	}
+	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
+		msg_to_char(ch, "You need to be in the main entry room to paint the building.\r\n");
+	}
+	else if (!ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only paint an enclosed building.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Finish the building before painting it.\r\n");
+	}
+	else if (IS_DISMANTLING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't paint a building that is being dismantled.\r\n");
+	}
+	else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NO_PAINT)) {
+		msg_to_char(ch, "This building cannot be painted.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Paint the building with what?\r\n");
+	}
+	else if (!(paint = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't seem to have that paint.\r\n");
+	}
+	else if (!IS_PAINT(paint)) {
+		act("$p isn't paint!", FALSE, ch, paint, NULL, TO_CHAR);
+	}
+	else if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL)) {
+		return;	// check trigger
+	}
+	else {
+		act("You use $p to paint the building!", FALSE, ch, paint, NULL, TO_CHAR);
+		act("$n uses $p to paint the building!", FALSE, ch, paint, NULL, TO_ROOM);
+		
+		if (PRF_FLAGGED(ch, PRF_NO_PAINT)) {
+			msg_to_char(ch, "Notice: You have no-paint toggled on, and won't be able to see the color.\r\n");
+		}
+		
+		if (ROOM_PAINT_COLOR(IN_ROOM(ch)) == GET_PAINT_COLOR(paint)) {
+			// same color -- brighten it
+			SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		}
+		else {
+			// different color -- remove bright
+			REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		}
+		
+		// update color
+		COMPLEX_DATA(IN_ROOM(ch))->paint_color = GET_PAINT_COLOR(paint);
+		
+		command_lag(ch, WAIT_ABILITY);
+		extract_obj(paint);
+	}
+}
+
+
 ACMD(do_tunnel) {
 	bitvector_t exit_bld_flags = BLD_ON_PLAINS | BLD_ANY_FOREST | BLD_ON_DESERT | BLD_FACING_CROP | BLD_ON_GROVE | BLD_FACING_OPEN_BUILDING;
 	bitvector_t mountain_bld_flags = BLD_ON_MOUNTAIN;
@@ -2170,6 +2242,33 @@ ACMD(do_tunnel) {
 			msg_to_char(ch, "You designate work to begin on a tunnel to the %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
 			act("$n designates work to begin on a tunnel.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
+	}
+}
+
+
+ACMD(do_unpaint) {
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to remove the paint here.\r\n");
+	}
+	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+		msg_to_char(ch, "You don't have permission to unpaint anything (customize).\r\n");
+	}
+	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
+		msg_to_char(ch, "You need to be in the main entry room to unpaint the building.\r\n");
+	}
+	else if (!ROOM_PAINT_COLOR(IN_ROOM(ch))) {
+		msg_to_char(ch, "Nothing here is painted.\r\n");
+	}
+	
+	else {
+		act("You strip the paint from the building!", FALSE, ch, NULL, NULL, TO_CHAR);
+		act("$n strips the paint from the building!", FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		COMPLEX_DATA(IN_ROOM(ch))->paint_color = 0;
+		REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 

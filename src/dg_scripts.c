@@ -4336,6 +4336,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "fore")) {
 						direction_vars(r, FORE, subfield, str, slen);
 					}
+					else if (!str_cmp(field, "function")) {
+						extern const char *function_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, function_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", HAS_FUNCTION(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					break;
 				}
 				case 'i': {	// room.i*

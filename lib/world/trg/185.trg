@@ -945,6 +945,7 @@ while %person%
 done
 if %self.vnum% == 18500
   %adventurecomplete%
+  %at% %instance.location% %load% obj 18502
 end
 ~
 #18520
@@ -987,7 +988,14 @@ eval room7 %room6.east(room)%
 Jungle Temple adventure cleanup building replacer~
 2 e 100
 ~
-eval instance_cleared (%instance.loaded% && !%instance.mob(18500)%
+eval item %room.contents%
+while %item%
+  if %item.vnum% == 18502
+    eval instance_cleared 1
+    %purge% %item%
+  end
+  eval item %item.next_in_list%
+done
 eval dir %room.exit_dir%
 if %instance_cleared%
   if %dir%

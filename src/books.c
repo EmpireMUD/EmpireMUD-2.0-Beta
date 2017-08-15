@@ -414,7 +414,7 @@ LIBRARY_SCMD(library_browse) {
 		HASH_ITER(hh, book_table, book, next_book) {
 			for (libr = book->in_libraries; libr; libr = libr->next) {
 				if (libr->location == GET_ROOM_VNUM(IN_ROOM(ch))) {
-					sprintf(buf + strlen(buf), "%d. %s (%s)\r\n", ++count, book->title, book->byline);
+					sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, book->title, book->byline);
 				}
 			}
 		}
