@@ -178,7 +178,7 @@ bool check_solo_role(char_data *ch) {
 
 	char_data *iter;
 	
-	if (IS_NPC(ch) || GET_CLASS_ROLE(ch) != ROLE_SOLO) {
+	if (IS_NPC(ch) || GET_CLASS_ROLE(ch) != ROLE_SOLO || !IN_ROOM(ch)) {
 		return TRUE;
 	}
 	
