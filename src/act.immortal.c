@@ -3037,7 +3037,7 @@ SHOW(show_learned) {
 			}
 		
 			// show it
-			snprintf(line, sizeof(line), " %s (%s)\r\n", GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+			snprintf(line, sizeof(line), " [%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 			if (size + strlen(line) < sizeof(output)) {
 				strcat(output, line);
 				size += strlen(line);
