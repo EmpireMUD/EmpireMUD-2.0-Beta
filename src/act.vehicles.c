@@ -389,8 +389,13 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 * @return bool TRUE if successful, FALSE on fail.
 */
 bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, int mode) {
+	extern bool can_steal(char_data *ch, empire_data *emp);
 	extern bool can_take_obj(char_data *ch, obj_data *obj);
-	bool get_check_money(char_data *ch, obj_data *obj);
+	extern bool get_check_money(char_data *ch, obj_data *obj);
+	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
+	
+	bool stealing = FALSE;
+	empire_data *emp;
 
 	if (!bind_ok(obj, ch)) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -399,6 +404,20 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, NULL, TO_CHAR);
 		return FALSE;
+	}
+	
+	if ((emp = VEH_OWNER(veh)) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && (!can_use_vehicle(ch, veh, GUESTS_ALLOWED) || (VEH_INTERIOR_HOME_ROOM(veh) && !can_use_room(ch, VEH_INTERIOR_HOME_ROOM(veh), GUESTS_ALLOWED)))) {
+		stealing = TRUE;
+		
+		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
+			// sends own message
+			return FALSE;
+		}
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			// can_steal() technically checks this, but it isn't always called
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+			return FALSE;
+		}
 	}
 	
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
@@ -411,6 +430,27 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 			obj_to_char(obj, ch);
 			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR);
 			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM);
+			
+			if (stealing) {
+				if (emp && IS_IMMORTAL(ch)) {
+					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+				}
+				else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+				}
+				
+				if (!IS_IMMORTAL(ch)) {
+					GET_STOLEN_TIMER(obj) = time(0);
+					GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
+					trigger_distrust_from_stealth(ch, emp);
+					gain_ability_exp(ch, ABIL_STEAL, 50);
+				}
+			}
+			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+				// un-steal if this was the original owner
+				GET_STOLEN_TIMER(obj) = 0;
+			}
+			
 			get_check_money(ch, obj);
 			return TRUE;
 		}
