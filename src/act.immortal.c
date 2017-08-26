@@ -5314,12 +5314,10 @@ ACMD(do_autostore) {
 	else if (*arg) {
 		if ((obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM);
-			send_config_msg(ch, "ok_string");
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
 		else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
 			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM);
-			send_config_msg(ch, "ok_string");
 			
 			LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
