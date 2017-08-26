@@ -736,7 +736,8 @@ ACMD(do_tie) {
 ACMD(do_throw) {
 	extern int count_objs_in_room(room_data *room);
 	extern const int rev_dir[];
-
+	
+	char buf[MAX_STRING_LENGTH];
 	int dir = NO_DIR;
 	char_data *vict;
 	obj_data *obj = NULL;
@@ -815,6 +816,7 @@ ACMD(do_throw) {
 	
 	// throwing item abuse log
 	if (IS_IMMORTAL(ch)) {
-		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s threw %s from %s to %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), room_log_identifier(IN_ROOM(ch)), room_log_identifier(to_room));
+		strcpy(buf, room_log_identifier(to_room));	// store one in a buf because it can't show 2 different locations in 1 line
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s threw %s from %s to %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), room_log_identifier(IN_ROOM(ch)), buf);
 	}
 }
