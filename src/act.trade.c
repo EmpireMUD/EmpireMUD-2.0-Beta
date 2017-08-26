@@ -1650,7 +1650,7 @@ ACMD(do_learned) {
 		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
 			continue;	// in-dev
 		}
-		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft)) && !str_cmp(craft_types[GET_CRAFT_TYPE(craft)], argument)) {
+		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft)) && str_cmp(craft_types[GET_CRAFT_TYPE(craft)], argument)) {
 			continue;	// searched
 		}
 		
