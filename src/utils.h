@@ -1155,6 +1155,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define BASE_SECT(room)  ((room)->base_sector)
 #define ROOM_OWNER(room)  ((room)->owner)
 #define ROOM_PEOPLE(room)  ((room)->people)
+#define ROOM_UNLOAD_EVENT(room)  ((room)->unload_event)
 #define ROOM_VEHICLES(room)  ((room)->vehicles)
 #define SECT(room)  ((room)->sector_type)
 #define GET_EXITS_HERE(room)  ((room)->exits_here)

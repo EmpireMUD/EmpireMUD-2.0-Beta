@@ -1072,7 +1072,7 @@ typedef struct vehicle_data vehicle_data;
 
 // SEV_x: stored event types
 #define SEV_TRENCH_FILL  0
-#define SEV_CHECK_UNLOAD  1
+	#define SEV_UNUSED  1	// no longer used
 #define SEV_BURN_DOWN  2
 #define SEV_GROW_CROP  3
 #define SEV_TAVERN  4
@@ -4708,6 +4708,7 @@ struct room_data {
 	vehicle_data *vehicles;	// start of vehicle list (veh->next_in_room)
 	
 	struct reset_com *reset_commands;	// used only during startup
+	struct event *unload_event;	// used for un-loading of live rooms
 	
 	UT_hash_handle hh;	// hash handle for world_table
 	room_data *next_interior;	// linked list: interior_room_list
