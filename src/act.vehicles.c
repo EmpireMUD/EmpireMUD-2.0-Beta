@@ -406,7 +406,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 		return FALSE;
 	}
 	
-	if ((emp = VEH_OWNER(veh)) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && (!can_use_vehicle(ch, veh, GUESTS_ALLOWED) || (VEH_INTERIOR_HOME_ROOM(veh) && !can_use_room(ch, VEH_INTERIOR_HOME_ROOM(veh), GUESTS_ALLOWED)))) {
+	if ((emp = VEH_OWNER(veh)) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && !can_use_vehicle(ch, veh, GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
 		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
