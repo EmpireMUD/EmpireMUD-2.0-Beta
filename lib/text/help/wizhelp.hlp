@@ -87,6 +87,16 @@ This command is grantable.
 
 See also: CONFIGURE, GRANT, MESSAGES
 #d
+AUTOSTORE
+
+Usage:  autostore [target object or vehicle]
+
+This immortal command triggers an immediate autostore on the object or vehicle
+target, or on the entire room if you give no argument. This overrides the
+normal waiting period before auto-storing.
+
+For more information on the regular autostore system, try HELP AUTO STORE.
+#d
 AUTOWIZ
 
 Usage:  autowiz
