@@ -4475,7 +4475,6 @@ ACMD(do_home) {
 			clear_private_owner(GET_IDNUM(ch));
 			
 			// clear out npcs
-			// TODO should this be done for interior rooms, too?
 			if ((ter = find_territory_entry(emp, real))) {
 				while (ter->npcs) {
 					delete_territory_npc(ter, ter->npcs);
@@ -4487,9 +4486,18 @@ ACMD(do_home) {
 			// interior only
 			for (iter = interior_room_list; iter; iter = next_iter) {
 				next_iter = iter->next_interior;
+				if (HOME_ROOM(iter) != real) {
+					continue;	// this is not the room you're looking for
+				}
+				
+				if ((ter = find_territory_entry(emp, iter))) {
+					while (ter->npcs) {
+						delete_territory_npc(ter, ter->npcs);
+					}
+				}
 				
 				// TODO consider a trigger like RoomUpdate that passes a var like %update% == homeset
-				if (HOME_ROOM(iter) == real && BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
+				if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
 					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), iter);
 					load_otrigger(obj);
 				}
