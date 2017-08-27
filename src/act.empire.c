@@ -385,10 +385,7 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 	}
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-		// update it if it's populated OR it already has chore data
-		if (isle->population > 0 || isle->workforce_limit[chore]) {
-			isle->workforce_limit[chore] = limit;
-		}
+		isle->workforce_limit[chore] = limit;
 	}
 }
 
@@ -977,8 +974,8 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		// determine if any/all islands have it on
 		on = off = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-			// only count islands with territory
-			if (isle->city_terr == 0 && isle->outside_terr == 0) {
+			// only count islands with population
+			if (isle->population <= 0) {
 				continue;
 			}
 			
