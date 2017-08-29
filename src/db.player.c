@@ -3568,6 +3568,13 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		GET_LAST_TELL(ch) = NOBODY;
 	}
 	
+	// check if a building was completed while gone, to avoid a strange message
+	if (GET_ACTION(ch) == ACT_BUILDING || GET_ACTION(ch) == ACT_MAINTENANCE) {
+		if (!BUILDING_RESOURCES(IN_ROOM(ch)) && BUILDING_DAMAGE(IN_ROOM(ch)) == 0) {
+			cancel_action(ch);
+		}
+	}
+	
 	msdp_update_room(ch);
 	
 	// now is a good time to save and be sure we have a good save file

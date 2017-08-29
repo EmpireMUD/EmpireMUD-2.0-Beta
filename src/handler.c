@@ -76,6 +76,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
+EVENT_CANCEL_FUNC(cancel_room_event);
 void check_delayed_load(char_data *ch);
 void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
@@ -2816,7 +2817,10 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	}
 	
 	// claimed rooms are never unloadable anyway
-	cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
+	if (ROOM_UNLOAD_EVENT(room)) {
+		event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
+		ROOM_UNLOAD_EVENT(room) = NULL;
+	}
 }
 
 

@@ -1155,6 +1155,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define BASE_SECT(room)  ((room)->base_sector)
 #define ROOM_OWNER(room)  ((room)->owner)
 #define ROOM_PEOPLE(room)  ((room)->people)
+#define ROOM_UNLOAD_EVENT(room)  ((room)->unload_event)
 #define ROOM_VEHICLES(room)  ((room)->vehicles)
 #define SECT(room)  ((room)->sector_type)
 #define GET_EXITS_HERE(room)  ((room)->exits_here)
@@ -1484,7 +1485,7 @@ extern bool can_build_or_claim_at_war(char_data *ch, room_data *loc);
 extern bool can_use_room(char_data *ch, room_data *room, int mode);
 extern bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
 extern bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode);
-#define can_use_vehicle(ch, veh, mode)  (IS_IMMORTAL(ch) || emp_can_use_vehicle(GET_LOYALTY(ch), (veh), (mode)))
+#define can_use_vehicle(ch, veh, mode)  (IS_IMMORTAL(ch) || (emp_can_use_vehicle(GET_LOYALTY(ch), (veh), (mode)) && (!VEH_INTERIOR_HOME_ROOM(veh) || can_use_room((ch), VEH_INTERIOR_HOME_ROOM(veh), (mode)))))
 extern bool has_permission(char_data *ch, int type);
 extern bool has_tech_available(char_data *ch, int tech);
 extern bool has_tech_available_room(room_data *room, int tech);

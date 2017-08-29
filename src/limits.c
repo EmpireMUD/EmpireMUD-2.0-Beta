@@ -1234,7 +1234,7 @@ bool check_autostore(obj_data *obj, bool force) {
 	vehicle_data *in_veh;
 	room_data *real_loc;
 	obj_data *top_obj;
-	bool store, unique, full;
+	bool store, unique, full, is_home;
 	int islid;
 	
 	// easy exclusions
@@ -1251,13 +1251,11 @@ bool check_autostore(obj_data *obj, bool force) {
 	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
-	if (in_veh && !real_loc) {
-		real_loc = IN_ROOM(in_veh);
-	}
+	is_home = (real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) != NOBODY) || (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh)) != NOBODY);
 	
 	// detect owner here
 	if (!emp && in_veh) {
-		emp = VEH_OWNER(in_veh);
+		emp = VEH_OWNER(in_veh) ? VEH_OWNER(in_veh) : ROOM_OWNER(IN_ROOM(in_veh));
 	}
 	if (!emp && real_loc) {
 		emp = ROOM_OWNER(HOME_ROOM(real_loc));
@@ -1295,12 +1293,12 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (UNIQUE_OBJ_CAN_STORE(obj) && real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) == NOBODY) {
+	else if (UNIQUE_OBJ_CAN_STORE(obj) && !is_home) {
 		// store unique items but not in private homes
 		store = TRUE;
 		unique = TRUE;
 	}
-	else if (OBJ_BOUND_TO(obj) && real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
+	else if (OBJ_BOUND_TO(obj) && !is_home && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
 		// room owned, item is bound, not a private home, but not storable? junk it
 		store = TRUE;
 		// DON'T mark unique -- we are just junking it

@@ -56,6 +56,7 @@ extern int evos_per_hour;
 
 // external funcs
 void add_room_to_world_tables(room_data *room);
+EVENT_CANCEL_FUNC(cancel_room_event);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 void complete_building(room_data *room);
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
@@ -385,7 +386,10 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// delete this first
-	cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
+	if (ROOM_UNLOAD_EVENT(room)) {
+		event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
+		ROOM_UNLOAD_EVENT(room) = NULL;
+	}
 	
 	// ensure not owned (and update empire stuff if so)
 	if ((emp = ROOM_OWNER(room))) {
@@ -877,7 +881,6 @@ void schedule_map_unloads(void) {
 		}
 		
 		if (CAN_UNLOAD_MAP_ROOM(room)) {	// unload it now
-			cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
 			delete_room(room, FALSE);	// no need to check exits (CAN_UNLOAD_MAP_ROOM checks them)
 		}
 		else {	// set up unload event
@@ -2570,7 +2573,7 @@ EVENTFUNC(check_unload_room) {
 	
 	if (CAN_UNLOAD_MAP_ROOM(room)) {
 		free(data);
-		delete_stored_event_room(room, SEV_CHECK_UNLOAD);	// delete first so it doesn't free/cancel
+		ROOM_UNLOAD_EVENT(room) = NULL;
 		delete_room(room, FALSE);	// no need to check exits (CAN_UNLOAD_MAP_ROOM checks them)
 		return 0;	// do not reenqueue
 	}
@@ -2590,6 +2593,22 @@ void clear_private_owner(int id) {
 	room_data *iter, *next_iter;
 	obj_data *obj;
 	
+	// check interior rooms first
+	LL_FOREACH2(interior_room_list, iter, next_interior) {
+		if (ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == id) {
+			// TODO some way to generalize this, please
+			if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
+				remove_designate_objects(iter);
+			}
+			
+			// reset autostore timer
+			LL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
+				GET_AUTOSTORE_TIMER(obj) = time(0);
+			}
+		}
+	}
+	
+	// now actually clear it from any remaining rooms
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (COMPLEX_DATA(iter) && ROOM_PRIVATE_OWNER(iter) == id) {
 			COMPLEX_DATA(iter)->private_owner = NOBODY;
@@ -3058,10 +3077,9 @@ void ruin_one_building(room_data *room) {
 */
 void schedule_check_unload(room_data *room, bool offset) {
 	struct room_event_data *data;
-	struct event *ev;
 	double mins;
 	
-	if (!find_stored_event_room(room, SEV_CHECK_UNLOAD)) {
+	if (!ROOM_UNLOAD_EVENT(room)) {
 		CREATE(data, struct room_event_data, 1);
 		data->room = room;
 		
@@ -3069,8 +3087,7 @@ void schedule_check_unload(room_data *room, bool offset) {
 		if (offset) {
 			mins += number(-300, 300) / 100.0;
 		}
-		ev = event_create(check_unload_room, (void*)data, (mins * 60) RL_SEC);
-		add_stored_event_room(room, SEV_CHECK_UNLOAD, ev);
+		ROOM_UNLOAD_EVENT(room) = event_create(check_unload_room, (void*)data, (mins * 60) RL_SEC);
 	}
 }
 
