@@ -1056,7 +1056,7 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 	}
 	
 	if (inst->location && ROOM_OWNER(inst->location)) {
-		snprintf(owner, sizeof(owner), " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(inst->location)), EMPIRE_NAME(ROOM_OWNER(inst->location)));
+		snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(inst->location)), EMPIRE_NAME(ROOM_OWNER(inst->location)));
 	}
 	else {
 		*owner = '\0';
