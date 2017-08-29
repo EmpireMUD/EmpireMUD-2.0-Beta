@@ -1046,7 +1046,7 @@ void do_instance_reset(char_data *ch, char *argument) {
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size) {
 	extern const char *instance_flags[];
 	
-	char flg[256], info[256];
+	char flg[256], info[256], owner[MAX_STRING_LENGTH];
 
 	if (inst->level > 0) {
 		sprintf(info, " L%d", inst->level);
@@ -1054,9 +1054,16 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 	else {
 		*info = '\0';
 	}
+	
+	if (inst->location && ROOM_OWNER(inst->location)) {
+		snprintf(owner, sizeof(owner), " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(inst->location)), EMPIRE_NAME(ROOM_OWNER(inst->location)));
+	}
+	else {
+		*owner = '\0';
+	}
 
 	sprintbit(inst->flags, instance_flags, flg, TRUE);
-	snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s\r\n", number, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), inst->location ? GET_ROOM_VNUM(inst->location) : NOWHERE, inst->location ? X_COORD(inst->location) : NOWHERE, inst->location ? Y_COORD(inst->location) : NOWHERE, info, inst->flags != NOBITS ? flg : "");
+	snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), inst->location ? GET_ROOM_VNUM(inst->location) : NOWHERE, inst->location ? X_COORD(inst->location) : NOWHERE, inst->location ? Y_COORD(inst->location) : NOWHERE, info, inst->flags != NOBITS ? flg : "", owner);
 }
 
 
