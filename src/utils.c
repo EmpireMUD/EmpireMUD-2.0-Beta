@@ -4446,15 +4446,19 @@ room_data *find_load_room(char_data *ch) {
 	extern room_data *find_starting_location();
 	
 	struct empire_territory_data *ter, *next_ter;
-	room_data *rl, *rl_last_room, *found = NULL;
+	room_data *rl, *rl_last_room, *found, *map;
 	int num_found = 0;
 	sh_int island;
+	bool veh_ok;
 	
 	// preferred graveyard?
-	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
+	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
+		// check that we're not somewhere illegal (vehicle in enemy territory)
+		veh_ok = GET_MAP_LOC(IN_ROOM(ch)) && (map = real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum)) && can_use_room(ch, map, GUESTS_ALLOWED);
+		
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (room_has_function_and_city_ok(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
+		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room))) {
 			return rl;
 		}
 	}
@@ -4462,6 +4466,7 @@ room_data *find_load_room(char_data *ch) {
 	// first: look for graveyard
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
+		found = NULL;
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
 			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
