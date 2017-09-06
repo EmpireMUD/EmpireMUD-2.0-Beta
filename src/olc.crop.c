@@ -193,15 +193,18 @@ char *list_one_crop(crop_data *crop, bool detail) {
 * @param crop_vnum vnum The vnum to delete.
 */
 void olc_delete_crop(char_data *ch, crop_vnum vnum) {
+	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_crop_from_table(crop_data *crop);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
+	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
 	struct map_data *map;
 	room_data *room;
 	crop_data *crop;
 	sector_data *base = NULL;
+	bool found;
 	int count;
 	
 	if (!(crop = crop_proto(vnum))) {
@@ -239,6 +242,15 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 		}
 	}
 	
+	// adventure zones
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		found = delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_CROP, vnum);
+		
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
+		}
+	}
+	
 	// update objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) == vnum) {
@@ -249,6 +261,14 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	
 	// olc editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_ADVENTURE(desc)) {
+			found = FALSE;
+			found |= delete_link_rule_by_type_value(&(GET_OLC_ADVENTURE(desc)->linking), ADV_LINK_PORTAL_CROP, vnum);
+	
+			if (found) {
+				msg_to_desc(desc, "One or more linking rules have been removed from the adventure you are editing.\r\n");
+			}
+		}
 		if (GET_OLC_OBJECT(desc)) {
 			if (OBJ_FLAGGED(GET_OLC_OBJECT(desc), OBJ_PLANTABLE) && GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_FOOD_CROP_TYPE) == vnum) {
 				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_FOOD_CROP_TYPE) = NOTHING;
@@ -277,6 +297,8 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 void olc_search_crop(char_data *ch, crop_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	crop_data *crop = crop_proto(vnum);
+	struct adventure_link_rule *link;
+	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	int size, found;
 	
@@ -287,6 +309,23 @@ void olc_search_crop(char_data *ch, crop_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of crop %d (%s):\r\n", vnum, GET_CROP_NAME(crop));
+	
+	// adventure rules
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
+			if (link->type == ADV_LINK_PORTAL_CROP) {
+				if (link->value == vnum) {
+					++found;
+					size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					// only report once per adventure
+					break;
+				}
+			}
+		}
+	}
 	
 	// plantables
 	HASH_ITER(hh, object_table, obj, next_obj) {

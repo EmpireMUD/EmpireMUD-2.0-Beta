@@ -1180,6 +1180,20 @@ mean no two copies of the adventure will link within 50 tiles of each other.
 
 See also: ADVEDIT LINKING
 #d
+"ADVEDIT PORTAL-CROP" "ADVEDIT LINK PORTAL-CROP" "ADVEDIT LINKING PORTAL-CROP"
+
+Usage:  .linking add PORTAL-CROP <crop vnum> <portal-in vnum> <portal-out vnum> [flags]
+
+This will spawn a portal somewhere in the world, matching the crop of your
+choice. You must provide portal object vnums for the in- and out-portals, but
+it is okay if both are the same.
+
+Remember that the portals don't have to be called portals. You could use "a
+strange door in the side of the tree", and the messages would look correct
+when players type "enter door" or "enter tree".
+
+See also: ADVEDIT LINKING, VNUM
+#d
 "ADVEDIT PORTAL-WORLD" "ADVEDIT LINK PORTAL-WORLD" "ADVEDIT LINKING PORTAL-WORLD"
 
 Usage:  .linking add PORTAL-WORLD <sector vnum> <portal-in vnum> <portal-out vnum> [flags]
@@ -1268,6 +1282,7 @@ See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
  PORTAL-BDG-EXISTING: Portal appears in an existing building or interior room.
  PORTAL-BDG-NEW: Builds the building on the map and puts a portal in it (no
     interior rooms).
+ PORTAL-CROP: Portal appears on a matching crop tile.
  TIME-LIMIT: Removes instances after a certain number of minutes expire.
  NOT-NEAR-SELF: Prevent the adventure from linking near other copies of itself.
 
@@ -1275,6 +1290,7 @@ Available flags:
  CLAIMED-OK - Can link to claimed locations (default: unclaimed only).
  CITY-ONLY - Only links to claimed tiles in cities.
  !CITY - Will not link to claimed tiles in cities.
+ CLAIMED-ONLY - Will only link to claimed tiles.
 
 Portals require a portal object for both the entrance and exit (they may be
 the same object). Existing buildings may also be interior rooms, but new

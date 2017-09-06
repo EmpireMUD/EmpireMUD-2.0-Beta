@@ -242,6 +242,7 @@ const char *adventure_link_flags[] = {
 	"CLAIMED-OK",
 	"CITY-ONLY",
 	"!CITY",
+	"CLAIMED-ONLY",
 	"\n"
 };
 
@@ -255,6 +256,7 @@ const char *adventure_link_types[] = {
 	"PORTAL-BDG-NEW",
 	"TIME-LIMIT",
 	"NOT-NEAR-SELF",
+	"PORTAL-CROP",
 	"\n"
 };
 
