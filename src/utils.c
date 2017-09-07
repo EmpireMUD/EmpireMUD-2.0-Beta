@@ -4454,7 +4454,7 @@ room_data *find_load_room(char_data *ch) {
 	// preferred graveyard?
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
 		// check that we're not somewhere illegal (vehicle in enemy territory)
-		veh_ok = GET_MAP_LOC(IN_ROOM(ch)) && (map = real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum)) && can_use_room(ch, map, GUESTS_ALLOWED);
+		veh_ok = GET_MAP_LOC(rl) && (map = real_room(GET_MAP_LOC(rl)->vnum)) && can_use_room(ch, map, GUESTS_ALLOWED);
 		
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
