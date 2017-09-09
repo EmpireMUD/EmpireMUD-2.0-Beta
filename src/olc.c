@@ -4636,7 +4636,6 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		case REQ_KILL_MOB_FLAGGED: {
 			need_mob_flags = TRUE;
 			break;
-		} {
 		}
 		case REQ_OWN_BUILDING: {
 			need_bld = TRUE;
@@ -4680,6 +4679,11 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		case REQ_GET_CURRENCY: {
 			need_currency = TRUE;
+			break;
+		}
+		case REQ_GET_COINS: {
+			// need nothing?
+			break;
 		}
 	}
 	

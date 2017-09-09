@@ -370,6 +370,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_WEARING  18
 #define REQ_WEARING_OR_HAS  19
 #define REQ_GET_CURRENCY  20
+#define REQ_GET_COINS  21
+#define REQ_CAN_GAIN_SKILL  22
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types

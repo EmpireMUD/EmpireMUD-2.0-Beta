@@ -5987,6 +5987,10 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 				add_currency(ch, req->vnum, req->needed);
 				break;
 			}
+			case REQ_GET_COINS: {
+				charge_coins(ch, REAL_OTHER_COIN, req->needed, NULL);
+				break;
+			}
 		}
 	}
 	
@@ -6087,6 +6091,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			}
 			case REQ_GET_CURRENCY: {
 				if (get_currency(ch, req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_GET_COINS: {
+				if (!can_afford_coins(ch, REAL_OTHER_COIN, req->needed)) {
 					ok = FALSE;
 				}
 				break;
@@ -6286,6 +6296,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_GET_CURRENCY: {
 			snprintf(output, sizeof(output), "Get currency: %d %s%s", req->needed, vnum, get_generic_string_by_vnum(req->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(req->needed)));
+			break;
+		}
+		case REQ_GET_COINS: {
+			snprintf(output, sizeof(output), "Get misc coins: %d coins", req->needed);
 			break;
 		}
 		case REQ_KILL_MOB: {

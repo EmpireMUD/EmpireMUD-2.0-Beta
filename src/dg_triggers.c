@@ -655,12 +655,15 @@ int death_mtrigger(char_data *ch, char_data *actor) {
 	return 1;
 }
 
-void bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
+
+// returns 0 to block the bribe, 1 to allow it
+int bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
+	int ret_val;
 
 	if (!SCRIPT_CHECK(ch, MTRIG_BRIBE))
-		return;
+		return 1;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -672,10 +675,18 @@ void bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 			snprintf(buf, sizeof(buf), "%d", amount);
 			add_var(&GET_TRIG_VARS(t), "amount", buf, 0);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-			break;
+			ret_val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+			
+			if (EXTRACTED(actor) || EXTRACTED(ch) || IS_DEAD(actor) || IS_DEAD(ch)) {
+				return 0;
+			}
+			else {
+				return ret_val;
+			}
 		}
 	}
+	
+	return 1;
 }
 
 
