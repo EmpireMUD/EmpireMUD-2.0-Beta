@@ -1638,7 +1638,7 @@ void qt_change_skill_level(char_data *ch, any_vnum skl) {
 			else if (task->type == REQ_SKILL_LEVEL_UNDER && task->vnum == skl) {
 				task->current = (get_skill_level(ch, skl) <= task->needed ? task->needed : -1);	// must set below 0 because 0 is a valid needed
 			}
-			else if (task->type == REQ_CAN_GAIN_SKILL && task->vnum == skl) {
+			else if (task->type == REQ_CAN_GAIN_SKILL) {
 				task->current = check_can_gain_skill(ch, task->vnum) ? task->needed : 0;
 			}
 		}

@@ -1522,6 +1522,8 @@ ACMD(do_noskill) {
 			skdata->noskill = TRUE;
 			msg_to_char(ch, "You will \trno longer\t0 gain %s skill.\r\n", SKILL_NAME(skill));
 		}
+		
+		qt_change_skill_level(ch, skdata->vnum);
 	}
 }
 
