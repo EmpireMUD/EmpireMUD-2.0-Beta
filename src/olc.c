@@ -4646,7 +4646,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			break;
 		}
 		case REQ_SKILL_LEVEL_OVER:
-		case REQ_SKILL_LEVEL_UNDER: {
+		case REQ_SKILL_LEVEL_UNDER:
+		case REQ_CAN_GAIN_SKILL: {
 			need_skill = TRUE;
 			break;
 		}

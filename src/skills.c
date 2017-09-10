@@ -617,6 +617,19 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 
 
 /**
+* Checks if a player is allowed to gain any skill points in a given skill.
+*
+* @param char_data *ch The player.
+* @param any_vnum skill_vnum The skill to check.
+* @return bool TRUE if the player could gain; FALSE if not.
+*/
+bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum) {
+	struct player_skill_data *skdata = get_skill_data(ch, skill_vnum, TRUE);
+	return (skdata && !skdata->noskill && !IS_ANY_SKILL_CAP(ch, skill_vnum) && (skdata->level > 0 || CAN_GAIN_NEW_SKILLS(ch)));
+}
+
+
+/**
 * removes all abilities for a player in a given skill on their CURRENT skill set
 *
 * @param char_data *ch the player
@@ -2499,6 +2512,8 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_SKILL_LEVEL_OVER, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_CAN_GAIN_SKILL, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_CAN_GAIN_SKILL, vnum);
 		
 		if (any) {
 			++found;
@@ -2513,6 +2528,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		}
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_OVER, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_UNDER, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_CAN_GAIN_SKILL, vnum);
 		
 		if (any) {
 			++found;
@@ -2957,6 +2973,8 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_SKILL_LEVEL_OVER, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_CAN_GAIN_SKILL, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_CAN_GAIN_SKILL, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -2968,6 +2986,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_OVER, vnum);
 		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_UNDER, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_CAN_GAIN_SKILL, vnum);
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
@@ -3021,6 +3040,8 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_OVER, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_CAN_GAIN_SKILL, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_CAN_GAIN_SKILL, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -3030,6 +3051,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_SOCIAL(desc)) {
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_SKILL_LEVEL_OVER, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_CAN_GAIN_SKILL, vnum);
 		
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);

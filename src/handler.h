@@ -114,6 +114,7 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 void cleanup_all_coins();
 void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);
+extern int count_total_coins_as(char_data *ch, empire_data *type);
 extern obj_data *create_money(empire_data *type, int amount);
 #define decrease_coins(ch, emp, amount)  increase_coins(ch, emp, -1 * amount)
 extern double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to);

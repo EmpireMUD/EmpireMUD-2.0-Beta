@@ -5737,6 +5737,8 @@ Available tasks:
  &cWEARING-OR-HAS&0 - Player has the item either equipped or in inventory
     Note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on
  &cGET-CURRENCY&0 - Player must have an amount of adventure currency.
+ &cGET-COINS&0 - Player must get some miscellaneous coins.
+ &cCAN-GAIN-SKILL&0 - Player is able to gain a point in a skill.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 

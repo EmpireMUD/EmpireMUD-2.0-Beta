@@ -53,6 +53,7 @@ void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
 extern bool can_gain_exp_from(char_data *ch, char_data *vict);
 extern bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
+extern bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
 extern bool check_solo_role(char_data *ch);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);
 void gain_player_tech_exp(char_data *ch, int tech, double amount);
