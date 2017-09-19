@@ -39,6 +39,7 @@ See also: MTRIG CHARMED
 Bribe (mob trigger)
 
 Argument type:  minimum number of misc coins given to the mobile
+Return value:  return 0 to prevent giving the coins
 
 Bribe is triggered when a person gives coins to the mob. The type of coin is
 not considered, because all coinage is made by players and has different

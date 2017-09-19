@@ -223,7 +223,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		found = delete_link_rule_by_type_value(&GET_ADV_LINKING(adv), ADV_LINK_PORTAL_WORLD, vnum);
 		
 		if (found) {
-			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_ADV_VNUM(adv));
+			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
 	

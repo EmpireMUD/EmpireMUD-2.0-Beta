@@ -260,7 +260,7 @@ bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum port
 * This function is meant to remove link rules when the place they link is deleted.
 *
 * @param struct adventure_link_rule **list The list to remove from.
-* @param int type The ADV_LINK_x to remove.
+* @param int type The ADV_LINK_ to remove.
 * @param any_vnum value The item will only be removed if its type and value match.
 * @return bool TRUE if any links were deleted, FALSE if not
 */
@@ -286,7 +286,7 @@ bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type,
 * This function determines which parameters are needed for a bunch of the
 * "linking" options. It is used by ".linking add" and ".linking change"
 *
-* @param int type ADV_LINK_x type.
+* @param int type ADV_LINK_ type.
 * @param ... All other parameters are pointers to variables to set up based on type.
 */
 void get_advedit_linking_params(int type, int *vnum_type, bool *need_vnum, bool *need_dir, bool *need_buildon, bool *need_buildfacing, bool *need_portalin, bool *need_portalout, bool *need_num, bool *no_rooms, bool *restrict_sect) {
@@ -342,6 +342,13 @@ void get_advedit_linking_params(int type, int *vnum_type, bool *need_vnum, bool 
 			*need_buildfacing = TRUE;
 			*vnum_type = OLC_BUILDING;
 			*no_rooms = TRUE;
+			break;
+		}
+		case ADV_LINK_PORTAL_CROP: {
+			*need_vnum = TRUE;
+			*need_portalin = TRUE;
+			*need_portalout = TRUE;
+			*vnum_type = OLC_CROP;
 			break;
 		}
 		case ADV_LINK_TIME_LIMIT: {
@@ -583,6 +590,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 	struct adventure_link_rule *rule;
 	char lbuf[MAX_STRING_LENGTH], flg[MAX_STRING_LENGTH], bon[MAX_STRING_LENGTH], bfac[MAX_STRING_LENGTH];
 	sector_data *sect;
+	crop_data *crop;
 	bld_data *bld;
 	int count = 0;
 	
@@ -616,7 +624,8 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 			}
 			case ADV_LINK_PORTAL_WORLD:	// drop-thru
 			case ADV_LINK_PORTAL_BUILDING_EXISTING:	// drop-thru
-			case ADV_LINK_PORTAL_BUILDING_NEW: {
+			case ADV_LINK_PORTAL_BUILDING_NEW:	// drop-thru
+			case ADV_LINK_PORTAL_CROP: {
 				if (rule->type == ADV_LINK_PORTAL_WORLD) {
 					sect = sector_proto(rule->value);
 					sprintf(lbuf, "[\tc%d\t0] %s", rule->value, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
@@ -624,6 +633,10 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 				else if (rule->type == ADV_LINK_PORTAL_BUILDING_EXISTING || rule->type == ADV_LINK_PORTAL_BUILDING_NEW) {
 					bld = building_proto(rule->value);
 					sprintf(lbuf, "[\tc%d\t0] %s", rule->value, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+				}
+				else if (rule->type == ADV_LINK_PORTAL_CROP) {
+					crop = crop_proto(rule->value);
+					sprintf(lbuf, "[\tc%d\t0] %s", rule->value, crop ? GET_CROP_NAME(crop) : "UNKNOWN");
 				}
 				else {
 					// should never hit this, but want to be thorough
@@ -991,6 +1004,12 @@ OLC_MODULE(advedit_linking) {
 				argument = any_one_word(argument, buildfacing_arg);
 				break;
 			}
+			case ADV_LINK_PORTAL_CROP: {
+				argument = any_one_word(argument, vnum_arg);
+				argument = any_one_word(argument, portalin_arg);
+				argument = any_one_word(argument, portalout_arg);
+				break;
+			}
 			case ADV_LINK_TIME_LIMIT: {
 				argument = any_one_word(argument, num_arg);
 				break;
@@ -1050,6 +1069,10 @@ OLC_MODULE(advedit_linking) {
 				}
 				if (vnum_type == OLC_SECTOR && !sector_proto(value)) {
 					msg_to_char(ch, "Invalid sector vnum '%s'.\r\n", vnum_arg);
+					return;
+				}
+				if (vnum_type == OLC_CROP && !crop_proto(value)) {
+					msg_to_char(ch, "Invalid crop vnum '%s'.\r\n", vnum_arg);
 					return;
 				}
 				if (restrict_sect && SECT_FLAGGED(sector_proto(value), SECTF_ADVENTURE)) {
@@ -1162,6 +1185,9 @@ OLC_MODULE(advedit_linking) {
 			}
 			else if (vnum_type == OLC_SECTOR && !sector_proto(value)) {
 				msg_to_char(ch, "Invalid sector vnum '%s'.\r\n", val_arg);
+			}
+			else if (vnum_type == OLC_CROP && !crop_proto(value)) {
+				msg_to_char(ch, "Invalid crop vnum '%s'.\r\n", val_arg);
 			}
 			else if (restrict_sect && SECT_FLAGGED(sector_proto(value), SECTF_ADVENTURE)) {
 				msg_to_char(ch, "You may not use ADVENTURE-type sectors for this.\r\n");

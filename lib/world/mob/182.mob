@@ -587,4 +587,130 @@ M
 0
 $n watches you silently.~
 S
+#18280
+archsorcerer malfernes~
+Archsorcerer Malfernes~
+Archsorcerer Malfernes removes his cloak and hangs it in the air.
+~
+0 0 bdvxzBE cnCE
+1 0 0 22
+T 18296
+S
+#18282
+dragon fearsome~
+a fearsome dragon~
+A fearsome dragon coils through the halls and archways of the tower!
+~
+0 200 dghnxA choBCDEG
+0 0 5 16
+I 4 18284 33.34 1 a  # LOOT: an imaginary whistle
+I 4 18285 33.33 1 a  # LOOT: an imaginary egg
+I 4 18293 33.33 1 a  # LOOT: an imaginary seed
+M
+0
+$n spurts clouds of black smoke, which rise up to the ceiling and hang overhead.~
+M
+0
+$n gnashes at you with long, dagger teeth.~
+M
+0
+The tower shakes as $n squeezes through the halls.~
+M
+0
+Dust falls from the ceiling as $n slithers forward.~
+M
+0
+$n's shrill roar pierces the air.~
+T 18283
+S
+#18284
+dragon imaginary~
+an imaginary dragon~
+An imaginary dragon is (or isn't) flitting about.
+~
+100 125 de m
+0 0 2 10
+S
+#18285
+dragonling imaginary~
+an imaginary dragonling~
+An imaginary dragonling might be flying around above your head.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+You imagine yourself fighting a great dragon.~
+M
+0
+You imagine yourself soaring around on the back of a dragon.~
+M
+0
+You imagine what it would be like to live amongst the dragons.~
+M
+0
+You imagine yourself dancing amongst dragons.~
+M
+0
+You imagine yourself grooming a great dragon.~
+M
+0
+You imagine how wonderful it would be to have a dragon for a pet.~
+M
+0
+You imagine learning how to train your dragon.~
+T 9901
+T 9902
+S
+#18292
+planter~
+the dragon tree planter~
+The dragon tree planter is supposed to be invisible.
+~
+0 0 d dkln
+0 0 0 15
+T 18291
+S
+#18296
+tree spirit~
+the spirit of the tree~
+The spirit of the tree floats nearby.
+~
+25 50 bdo n
+0 0 0 15
+T 18287
+S
+#18297
+dragon pen~
+a pen dragon~
+A pen dragon flies around, trailing a stream of black ink.
+~
+100 200 djoxA cm
+0 0 2 27
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 1 10006 50.00 1  # SKIN: a dragon scale
+I 1 1351 100.00 2  # SKIN: a large skin
+S
+#18298
+dragon dungeon~
+a dungeon dragon~
+A dungeon dragon has gotten free!
+~
+100 200 djoxA cm
+0 0 2 27
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 1 10006 50.00 1  # SKIN: a dragon scale
+I 1 1351 100.00 2  # SKIN: a large skin
+S
+#18299
+dragon luck little~
+a little luck dragon~
+A little luck dragon twists and turns through the air.
+~
+100 200 djoxA cm
+0 0 2 27
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 1 10006 50.00 1  # SKIN: a dragon scale
+I 1 1351 100.00 2  # SKIN: a large skin
+S
 $

@@ -1485,6 +1485,9 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 			msg_to_char(ch, "You don't have enough coins!\r\n");
 			return;
 		}
+		if (!bribe_mtrigger(vict, ch, amount)) {
+			return;
+		}
 		
 		// give/take various types until done
 		remaining = amount;
@@ -1516,6 +1519,9 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 			msg_to_char(ch, "You don't have %s.\r\n", money_amount(type, amount));
 			return;
 		}
+		if (!bribe_mtrigger(vict, ch, amount)) {
+			return;
+		}
 		
 		// simple money transfer
 		decrease_coins(ch, type, amount);
@@ -1537,8 +1543,6 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 	// msg to room
 	snprintf(buf, sizeof(buf), "$n gives %s to $N.", money_desc(type, amount));
 	act(buf, TRUE, ch, NULL, vict, TO_NOTVICT);
-
-	bribe_mtrigger(vict, ch, amount);
 }
 
 

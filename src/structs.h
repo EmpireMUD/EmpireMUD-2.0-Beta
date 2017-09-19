@@ -370,6 +370,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_WEARING  18
 #define REQ_WEARING_OR_HAS  19
 #define REQ_GET_CURRENCY  20
+#define REQ_GET_COINS  21
+#define REQ_CAN_GAIN_SKILL  22
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -525,7 +527,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_CAN_DELAY_LOAD  BIT(10)	// can save memory by not instantiating till a player appears
 
 
-// adventure link rule types
+// ADV_LINK_x: adventure link rule types
 #define ADV_LINK_BUILDING_EXISTING  0
 #define ADV_LINK_BUILDING_NEW  1
 #define ADV_LINK_PORTAL_WORLD  2
@@ -533,12 +535,14 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINK_PORTAL_BUILDING_NEW  4
 #define ADV_LINK_TIME_LIMIT  5
 #define ADV_LINK_NOT_NEAR_SELF  6
+#define ADV_LINK_PORTAL_CROP  7
 
 
-// adventure link rule flags
+// ADV_LINKF_x: adventure link rule flags
 #define ADV_LINKF_CLAIMED_OK  BIT(0)	// can spawn on claimed territory
 #define ADV_LINKF_CITY_ONLY  BIT(1)	// only spawns on claimed land in cities
 #define ADV_LINKF_NO_CITY  BIT(2)	// won't spawn on claimed land in cities
+#define ADV_LINKF_CLAIMED_ONLY  BIT(2)	// ONLY spawns on claimed tiles
 
 
 // ADV_SPAWN_x: adventure spawn types
@@ -2770,8 +2774,8 @@ struct adventure_data {
 
 // how to link adventure zones
 struct adventure_link_rule {
-	int type;	// ADV_LINK_x
-	bitvector_t flags;	// ADV_LINKF_x
+	int type;	// ADV_LINK_
+	bitvector_t flags;	// ADV_LINKF_
 	
 	int value;	// e.g. building vnum, sector vnum to link from (by type)
 	obj_vnum portal_in, portal_out;	// some types use portals

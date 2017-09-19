@@ -242,6 +242,7 @@ const char *adventure_link_flags[] = {
 	"CLAIMED-OK",
 	"CITY-ONLY",
 	"!CITY",
+	"CLAIMED-ONLY",
 	"\n"
 };
 
@@ -255,6 +256,7 @@ const char *adventure_link_types[] = {
 	"PORTAL-BDG-NEW",
 	"TIME-LIMIT",
 	"NOT-NEAR-SELF",
+	"PORTAL-CROP",
 	"\n"
 };
 
@@ -3558,6 +3560,8 @@ const char *requirement_types[] = {
 	"WEARING",
 	"WEARING-OR-HAS",
 	"GET-CURRENCY",	// 20
+	"GET-COINS",
+	"CAN-GAIN-SKILL",
 	"\n",
 };
 
@@ -3584,7 +3588,9 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_REPUTATION,	// faction-under
 	REQ_AMT_NONE,	// wearing
 	REQ_AMT_NONE,	// wearing-or-has
-	REQ_AMT_NUMBER,	// currency
+	REQ_AMT_NUMBER,	// get currency
+	REQ_AMT_NUMBER,	// get coins
+	REQ_AMT_NONE,	// can gain skill
 };
 
 
@@ -3610,7 +3616,9 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// faction-under
 	FALSE,	// wearing
 	FALSE,	// wearing-or-has
-	FALSE,	// currency
+	FALSE,	// get currency
+	FALSE,	// get coins
+	FALSE,	// can gain skill
 };
 
 

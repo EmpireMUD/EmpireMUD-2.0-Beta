@@ -137,6 +137,51 @@ eval person %room.people%
 %echo% %person.name% arrives.
 %purge% %self%
 ~
+#18208
+Seeker Stone: Atlasian Tortoise~
+1 c 2
+seek~
+if !%arg%
+  %send% %actor% Seek what?
+  halt
+end
+eval room %self.room%
+if %room.rmt_flagged(!LOCATION)%
+  %send% %actor% %self.shortdesc% spins gently in a circle.
+  halt
+end
+if (guild /= %arg% || tortoise /= %arg%)
+  eval adv %instance.nearest_rmt(18200)%
+  if !%adv%
+    %send% %actor% Could not find an instance.
+    halt
+  end
+  eval room %self.room%
+  * Teleport to the instance, find the turtle, teleport back
+  %teleport% %actor% %adv%
+  eval turtle %instance.mob(18200)%
+  %teleport% %actor% %room%
+  if !%turtle%
+    %send% %actor% Something went wrong (turtle not found).
+    halt
+  end
+  %send% %actor% You hold %self.shortdesc% aloft...
+  eval real_dir %%room.direction(%turtle.room%)%%
+  eval direction %%actor.dir(%real_dir%)%%
+  eval distance %%room.distance(%turtle.room%)%%
+  %send% %actor% There is an atlasian tortoise %distance% tiles to the %direction%.
+  %echoaround% %actor% %actor.name% holds %self.shortdesc% aloft...
+else
+  return 0
+  halt
+end
+~
+#18209
+Seek Adventure: Give Seeker Stone~
+2 u 0
+~
+%load% obj 18208 %actor% inv
+~
 #18210
 Fight Club death walk~
 0 f 100
@@ -352,8 +397,7 @@ eval to_room %tricky%
 if (%actor.nohassle% || !%tricky%)
   halt
 end
-* debug
-if %room_var.vnum% != 18129 || %to_room.vnum% != 18130
+if %to_room.building% != Guildhall Vault
   halt
 end
 * stealth prereq
@@ -375,7 +419,7 @@ if %actor.skill(Stealth)% > 50
     %send% %actor% %self.name% leans in and whispers, 'Come back later, without %found.name%.'
   end
 end
-%send% %actor% %self.name% tells you, 'Hey! You can't go down there!'
+%send% %actor% %self.name% tells you, 'Hey! You can't go in there!'
 return 0
 ~
 #18220
@@ -817,5 +861,776 @@ else
   return 1
   halt
 end
+~
+#18277
+Adventurer Guild Tier 2: Give items on start~
+2 u 0
+~
+switch %questvnum%
+  case 18279
+    if %actor.completed_quest(18283)% && %actor.completed_quest(18287)% && %actor.completed_quest(18291)% && %actor.completed_quest(18295)%
+      %load% obj 18294 %actor% inv
+      eval item %actor.inventory(18294)%
+      nop %item.val0(18279)%
+    end
+  break
+  case 18281
+    %load% obj 18281 %actor% inv
+  break
+  case 18282
+    if %actor.varexists(18282_dragon_imagined)%
+      %load% obj 18294 %actor% inv
+      eval item %actor.inventory(18294)%
+      nop %item.val0(18282)%
+    else
+      %load% obj 18282 %actor% inv
+    end
+  break
+  case 18285
+    %load% obj 18286 %actor% inv
+  break
+  case 18289
+    %load% obj 18289 %actor% inv
+  break
+  case 18290
+    %load% obj 18290 %actor% inv
+  break
+done
+if %questvnum% >= 18280 && %questvnum% <= 18283 && !%actor.inventory(18280)%
+  %load% obj 18280 %actor% inv
+  eval item %actor.inventory(18280)%
+  * %send% %actor% You receive %item.shortdesc%.
+end
+if %questvnum% >= 18288 && %questvnum% <= 18291 && !%actor.inventory(18288)%
+  %load% obj 18288 %actor% inv
+  eval item %actor.inventory(18288)%
+  * %send% %actor% You receive %item.shortdesc%.
+end
+~
+#18278
+Support quest progress checker~
+2 v 0
+~
+if %actor.completed_quest(18283)% && %actor.completed_quest(18287)% && %actor.completed_quest(18291)% && %actor.completed_quest(18295)%
+  %quest% %actor% trigger 18279
+end
+~
+#18280
+Signal Malfernes~
+1 c 2
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+if !(%actor.on_quest(18280)% || %actor.on_quest(18281)% || %actor.on_quest(18282)% || %actor.on_quest(18383)%)
+  %send% %actor% You have no need to contact Malfernes right now.
+  %send% %actor% %self.shortdesc% crumbles to dust.
+  %purge% %self%
+  halt
+end
+eval room %self.room%
+if (%room.template% < 10250 || %room.template% > 10299)
+  %send% %actor% You must use this item inside a Primeval Portal adventure instance.
+  halt
+end
+eval boss %instance.mob(10252)%
+if !%boss%
+  eval boss %instance.mob(10253)%
+end
+if !%boss%
+  eval boss %instance.mob(10254)%
+end
+if !%boss%
+  if %instance.mob(18280)%
+    %send% %actor% Malfernes is already waiting for you.
+    halt
+  end
+  %send% %actor% You cannot contact Malfernes from an adventure instance that has already been cleared. Find a new one.
+  halt
+end
+eval target_room %boss.room%
+if %boss.fighting%
+  %send% %actor% You can't do that, since someone is currently fighting this adventure's boss.
+  halt
+end
+* Success
+%send% %actor% You signal Archsorcerer Malfernes, letting him know you're coming.
+%echoaround% %actor% %actor.name% waves %self.shortdesc% in the air.
+%at% %target_room% %echo% %boss.name% suddenly vanishes with a mighty bang, and is replaced by a relaxed-looking Archsorcerer Malfernes!
+%purge% %boss%
+%at% %target_room% %load% mob 18280
+%adventurecomplete%
+~
+#18281
+Use charm on chalice~
+1 c 2
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+eval chalice %actor.inventory(11131)%
+if !%chalice%
+  %send% %actor% You need to get the chalice first.
+  halt
+end
+eval room %self.room%
+if %room.template% < 11130 || %room.template% > 11159
+  %send% %actor% You need to do that inside Mill Manor.
+  halt
+end
+%send% %actor% You quickly slap %self.shortdesc% on %chalice.shortdesc%, which sparks and crackles violently before settling down.
+%echoaround% %actor% %actor.name% slaps %self.shortdesc% on %chalice.shortdesc%, which sparks and crackles violently!
+%purge% %chalice%
+%load% obj 18283 %actor% inv
+if %instance.id%
+  %adventurecomplete%
+  * swap in i11151 for the old stone marker
+  %door% i11130 east room i11151
+  %echo% You find yourself back at the stone marker, where the adventure began!
+  %teleport% adventure i11151
+end
+~
+#18282
+Imagine Dragons~
+1 c 2
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+if %actor.varexists(18282_dragon_imagined)%
+  %send% %actor% You have imagined enough dragons for one lifetime.
+  halt
+end
+eval room %self.room%
+if %self.val0%
+  * Captured a dragon
+  if %room.template% < 10031 || %room.template% > 10099
+    %send% %actor% You have already captured a dragon. Now go to Skycleave and use %self.shortdesc% to imagine a copy of it.
+    halt
+  elseif %room.template% == 10030
+    %send% %actor% Move further in past the entrance first.
+    halt
+  end
+  %load% mob 18282
+  eval dragon %room.people%
+  if %dragon.vnum% != 18282
+    %send% %actor% Something went wrong while imagining a dragon. Please submit a bug report.
+  else
+    dg_affect %dragon% !ATTACK on 300
+    %send% %actor% You imagine a mighty dragon!
+    %echoaround% %actor% %actor.name% concentrates intensely, and %dragon.name% fades into view!
+  end
+  %quest% %actor% trigger 18282
+  eval 18282_dragon_imagined 1
+  remote 18282_dragon_imagined %actor.id%
+else
+  * Trying to capture a dragon
+  eval person %room.people%
+  while %person%
+    if (%person.vnum% >= 10330 && %person.vnum% <= 10333) || %person.vnum% == 10300
+      %send% %actor% You capture an image of %person.name%!
+      nop %self.val0(1)%
+      halt
+    end
+    eval person %person.next_in_room%
+  done
+  %send% %actor% There aren't any flame dragons or wandering dragons to capture an image of here.
+end
+~
+#18283
+Imaginary dragon death~
+0 f 100
+~
+%echo% As %self.name% dies, you realize it was just a figment of your imagination.
+~
+#18286
+Net Rats for Germione~
+1 c 2
+net~
+if !%arg%
+  %send% %actor% What do you want to catch with %self.shortdesc%?
+  return 1
+  halt
+end
+eval target %%actor.char_target(%arg%)%%
+if !%target%
+  %send% %actor% They must have run away when you started waving %self.shortdesc% around, because they're not here.
+  return 1
+  halt
+end
+if %target.is_npc%
+  switch %target.vnum%
+    case 9189
+    break
+    case 10011
+    break
+    case 10012
+    break
+    case 10013
+      * Dire rat
+      %send% %actor% That's a bit big to catch in your net...
+      %send% %actor% ...but you give it a go anyway.
+    break
+    case 10450
+    break
+    case 10455
+      %send% %actor% That's a bit big to catch in your net...
+      halt
+    break
+    case 19001
+      %send% %actor% Germione would prefer if you fetched rats that aren't hers.
+      halt
+    break
+    case 19002
+      %send% %actor% Germione would prefer if you fetched rats that aren't hers.
+      halt
+    break
+    default
+      %send% %actor% That doesn't appear to be a rat.
+      halt
+    break
+  done
+  if %actor.has_resources(18287, 10)%
+    %send% %actor% You have enough rats.
+    halt
+  end
+  %send% %actor% You throw %self.shortdesc% over %target.name% and haul %target.himher% in...
+  %echoaround% %actor% %actor.name% throws %self.shortdesc% over %target.name% and hauls %target.himher% in.
+  %purge% %target%
+  %load% obj 18287 %actor% inv
+  eval item %actor.inventory(18287)%
+  %send% %actor% You get %item.shortdesc%.
+else
+  if %target% == %actor%
+    %send% %actor% You briefly ponder catching yourself with %self.shortdesc%, then think better of it.
+    return 1
+    halt
+  end
+  %send% %actor% You advance menacingly on %target.name% with %self.shortdesc%...
+  %send% %target% %actor.name% advances menacingly on you with a huge net...
+  %echoneither% %actor% %target% %actor.name% advances menacingly on %target.name% with a huge net...
+  return 1
+  halt
+end
+~
+#18287
+Fake kill tree spirit~
+0 c 0
+kill~
+eval target %%actor.char_target(%arg%)%%
+if %target% != %self%
+  return 0
+  halt
+end
+eval room %self.room%
+eval permission %%actor.canuseroom_member(%room%)%%
+if !%permission%
+  %send% %actor% You don't have permission to do that!
+  halt
+end
+%send% %actor% You strike %self.name% down...
+%echoaround% %actor% %actor.name% strikes %self.name% down...
+switch %room.sector_vnum%
+  case 18294
+    %echo% The dragon tree melts away, leaving behind an ordinary forest!
+    %terraform% %room% 4
+  break
+  case 18293
+    %echo% The field of imagination melts away, leaving behind an ordinary plain!
+    %terraform% %room% 0
+  break
+  default
+    %echo% ...but nothing seems to happen.
+  break
+done
+%purge% %self%
+~
+#18288
+Resurrect Scaldorran~
+1 c 2
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+if !(%actor.on_quest(18288) || %actor.on_quest(18289) || %actor.on_quest(18290) || %actor.on_quest(18391)%)
+  %send% %actor% You don't have anything to talk to Scaldorran about right now.
+  %send% %actor% %self.shortdesc% vanishes in a puff of smoke.
+  %purge% %self%
+  halt
+end
+eval room %self.room%
+if %room.template% != 10055
+  %send% %actor% %self.shortdesc% can only be used in Skycleave's Lich Labs.
+  halt
+end
+if %instance.mob(10048)%
+  %send% %actor% You can't use %self.shortdesc% when Scaldorran is already here.
+  halt
+end
+%load% mob 10048
+eval scaldorran %room.people%
+if %scaldorran.vnum% != 10048
+  %send% %actor% Failed to load Scaldorran. Please submit a bug report containing this message.
+end
+%send% %actor% You use %self.shortdesc% and the remains of %scaldorran.name% reform and reanimate!
+%echoaround% %actor% %actor.name% uses %self.shortdesc% and the remains of %scaldorran.name% reform and reanimate!
+dg_affect %scaldorran% !ATTACK on -1
+~
+#18289
+Bag roc egg for Scaldorran~
+1 c 2
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+eval room %self.room%
+if %room.template% != 11000
+  %send% %actor% Use this inside a roc nest.
+  halt
+end
+eval egg %room.contents%
+eval check 0
+while %egg% && !%check%
+  if %egg.vnum% == 11001
+    eval check 1
+  else
+    eval egg %egg.next_in_list%
+  end
+done
+if !%check%
+  %send% %actor% There's no egg here to steal!
+  halt
+end
+%send% %actor% You grab %egg.shortdesc% and quickly slide it into %self.shortdesc%.
+%load% obj 18291 %actor% inv
+%load% obj 11021 room
+%load% mob 11002
+eval mob %room.people%
+if %mob.vnum% != 11002
+  %send% %actor% Error loading roc. Please submit a bug report with this message.
+else
+  %force% %actor% down
+  %force% %mob% mhunt %actor%
+  %regionecho% %instance.location% 10 An angry screech echoes across the land!
+end
+%purge% %self%
+~
+#18290
+Bug Knezz's Office~
+1 c 2
+plant~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+eval room %self.room%
+if %room.template% != 10047
+  %send% %actor% You need to plant this in Knezz's room while he's not watching.
+  halt
+end
+eval knezz %instance.mob(10054)%
+if %knezz%
+  * Knezz is still here...
+  if %actor.skill(Stealth)% > 50
+    %send% %actor% You use your Stealth skill to plant %self.shortdesc% while %knezz.name% isn't watching.
+  elseif %knezz.aff_flagged(BLIND)%
+    %send% %actor% You quickly plant %self.shortdesc%, taking advantage of %knezz.name%'s temporary blindness.
+    dg_affect %actor% STUNNED on 10
+  else
+    %send% %actor% %knezz.name% would notice if you tried to plant the bug while he's watching...
+    halt
+  end
+else
+  %send% %actor% You plant %self.shortdesc% in Knezz's office.
+end
+%quest% %actor% trigger 18290
+%purge% %self%
+~
+#18291
+Plant dragon tree~
+0 i 10
+~
+eval room %self.room%
+if %room.sector_vnum% == 4
+  %echo% A great dragon tree suddenly springs from the ground nearby, eclipsing the surrounding forest!
+  %terraform% %room% 18294
+  %purge% %self%
+end
+~
+#18292
+Thirteen coded greeting~
+0 g 100
+~
+if %actor.on_quest(18292)% && !%actor.quest_triggered(18292)%
+  wait 5
+  say What always runs but never walks, often murmurs, never talks, has a bed but never sleeps, has a mouth but never eats?
+end
+~
+#18293
+Seed of Imagination plant~
+1 c 2
+plant~
+eval targ %%actor.obj_target(%arg%)%%
+if %targ% != %self%
+  return 0
+  halt
+end
+eval room %actor.room%
+if %room.sector_vnum% != 0
+  %send% %actor% You can't plant that here.
+  return 1
+  halt
+end
+eval check %%actor.canuseroom_member(%room%)%%
+if !%check%
+  %send% %actor% You don't have permission to use %self.shortdesc% here.
+  return 1
+  halt
+end
+%send% %actor% You plant %self.shortdesc%...
+%echoaround% %actor% %actor.name% plants %self.shortdesc%...
+%terraform% %room% 18293
+%echo% The plains around you shift slowly into a %room.sector%!
+%purge% %self%
+~
+#18294
+quest trigger on start~
+1 n 100
+~
+wait 1
+switch %questvnum%
+  case 18279
+    %send% %actor% You already have the support of everyone.
+    %quest% %actor% trigger 18279
+  break
+  case 18282
+    %send% %actor% You have already imagined enough dragons for one lifetime.
+    %quest% %actor% trigger 18282
+  break
+done
+%purge% %self%
+~
+#18295
+Verdant Wand: Teleport / Terraform~
+1 c 3
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+eval room_var %self.room%
+eval sectname %room_var.sector%
+eval terra 1
+if %sectname% == Scorched Woods
+  eval vnum 2
+elseif %sectname% == Scorched Grove
+  eval vnum 26
+elseif %sectname% == Scorched Plains || %sectname% == Scorched Crop
+  eval vnum 0
+elseif %sectname% == Scorched Desert || %sectname% == Scorched Desert Crop
+  eval vnum 20
+else
+  eval terra 0
+end
+* limited charges
+if (%terra% && !%self.val0%) || (!%terra% && !%self.val1%)
+  %send% %actor% %self.shortdesc% is out of charges for that ability.
+  halt
+end
+eval cycle 0
+while %cycle% >= 0
+  * Repeats until break
+  eval loc %instance.nearest_rmt(10300)%
+  * Rather than setting error in 10 places, just assume there's an error and clear it if there isn't
+  eval error 1
+  if %actor.fighting%
+    %send% %actor% You can't use %self.shortdesc% during combat.
+  elseif %actor.position% != Standing
+    %send% %actor% You need to be standing up to use %self.shortdesc%.
+  elseif !%actor.can_teleport_room% && !%terra%
+    %send% %actor% You can't teleport out of here.
+  elseif !%loc% && !%terra%
+    %send% %actor% There is no valid location to teleport to.
+  elseif %actor.aff_flagged(DISTRACTED)%
+    %send% %actor% You are too distracted to use %self.shortdesc%!
+  else
+    eval error 0
+  end
+  * Doing this AFTER checking loc exists
+  eval limit_check %%actor.can_enter_instance(%loc%)%%
+  if !%limit_check% && !%terra%
+    %send% %actor% The destination is too busy.
+    eval error 1
+  end
+  if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
+    if %cycle% > 0
+      %send% %actor% %self.shortdesc% sparks and fizzles.
+      %echoaround% %actor% %actor.name%'s trinket sparks and fizzles.
+    end
+    halt
+  end
+  switch %cycle%
+    case 0
+      %send% %actor% You touch %self.shortdesc% and the glyphs carved into it light up...
+      %echoaround% %actor% %actor.name% touches %self.shortdesc% and the glyphs carved into it light up...
+    break
+    case 1
+      %send% %actor% The glyphs on %self.shortdesc% glow a deep green and the light begins to envelop you!
+      %echoaround% %actor% The glyphs on %self.shortdesc% glow a deep green and the light begins to envelop %actor.name%!
+    break
+    case 2
+      if %terra%
+        %send% %actor% You raise %self.shortdesc% high and the scorched landscape is restored!
+        %echoaround% %actor% %actor.name% raises %self.shortdesc% high and the scorched landscape is restored!
+        %terraform% %room_var% %vnum%
+        eval charges_left %self.val0%-1
+        eval do %%self.val0(%charges_left%)%%
+        nop %do%
+        halt
+      else
+        %echoaround% %actor% %actor.name% vanishes in a flash of green light!
+        %teleport% %actor% %loc%
+        %force% %actor% look
+        %echoaround% %actor% %actor.name% appears in a flash of green light!
+        nop %actor.cancel_adventure_summon%
+        eval charges_left %self.val1%-1
+        eval do %%self.val1(%charges_left%)%%
+        nop %do%
+        halt
+      end
+    break
+  done
+  wait 5 sec
+  eval cycle %cycle% + 1
+done
+~
+#18296
+Malfernes: Guild Quest Greeting~
+0 g 100
+~
+if !%actor.on_quest(18280)% || %actor.quest_triggered(18280)% || %self.fighting% || %self.disabled%
+  halt
+end
+wait 5
+eval room %self.room%
+wait 1 sec
+eval cycles_left 5
+while %cycles_left% >= 0
+  if %self.fighting% || %self.disabled%
+    * Combat interrupts the speech
+    %echo% %self.name%'s monologue is interrupted.
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      say Did the Academy send you? Are you here to take me back? I'm not going back there!
+    break
+    case 4
+      say Oh! It was you who signalled me. Who gave you that signalling stone, the Guild? Ha!
+    break
+    case 3
+      say If that old fool Nostrazak thinks I'm supporting another guildhall, he's got another think coming.
+    break
+    case 2
+      %echo% A strange violet glow encircles %self.name%, as if some arcane magic is controlling him.
+    break
+    case 1
+      say I... could support another guildhall. I just need... a favor from you.
+    break
+    case 0
+      %echo% %self.name% blinks and seems to come out of a trance.
+      wait 1 sec
+      eval person %room.people%
+      while %person%
+        if %person.is_pc% && %person.on_quest(18280)%
+          %quest% %actor% trigger 18280
+          %quest% %actor% finish 18280
+        end
+        eval person %person.next_in_room%
+      done
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycles_left %cycles_left% - 1
+done
+~
+#18297
+Germione: Guild Quest Codeword~
+0 d 0
+friend~
+if !%actor.on_quest(18284)% || %actor.quest_triggered(18284)%
+  %send% %actor% You don't need to give %self.name% the codeword now.
+  halt
+end
+if %self.fighting% || %self.disabled%
+  halt
+end
+eval room %self.room%
+wait 1 sec
+eval cycles_left 5
+while %cycles_left% >= 0
+  if %self.fighting% || %self.disabled%
+    * Combat interrupts the speech
+    %echo% %self.name%'s monologue is interrupted.
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      say Oh, dearie, you must be from that Adventurers Guild.
+    break
+    case 4
+      say I don't really have no time for adventuring these days. I'm running a holistic rat training agency out here in these parts.
+    break
+    case 3
+      say I remember doing this silly gather-support quest, so I may as well make this one easy on you.
+    break
+    case 2
+      say And maybe afterwards, I can talk you into adopting some trained swamp rats.
+    break
+    case 1
+      say Rats really do make the best pets. I had my Measley but the poor scabber got eaten by a snake.
+    break
+    case 0
+      say Best guard dog rat I ever did have...
+      wait 1 sec
+      eval person %room.people%
+      while %person%
+        if %person.is_pc% && %person.on_quest(18284)%
+          %quest% %actor% trigger 18284
+          %quest% %actor% finish 18284
+        end
+        eval person %person.next_in_room%
+      done
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycles_left %cycles_left% - 1
+done
+~
+#18298
+Scaldorran: Guild Quest Codeword~
+0 d 0
+eternity~
+if !%actor.on_quest(18288)% || %actor.quest_triggered(18288)%
+  %send% %actor% You don't need to give %self.name% the codeword now.
+  halt
+end
+if %self.fighting% || %self.disabled%
+  halt
+end
+eval room %self.room%
+wait 1 sec
+eval cycles_left 5
+while %cycles_left% >= 0
+  if %self.fighting% || %self.disabled%
+    * Combat interrupts the speech
+    %echo% %self.name%'s monologue is interrupted.
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      %echo% %self.name%'s bony jaw hangs slack as he intones, 'Oh, you're from the which guild? Adventurers? That's the boring one.'
+    break
+    case 4
+      say The guild hasn't been so good to me. I had a lot more face left before I started working with them, if you know what I mean.
+    break
+    case 3
+      %echo% %self.name% pulls a dangling bit of skin up into place, and staples it to his face with a spell from his wand.
+    break
+    case 2
+      say I suppose I could be convinced to work with the guild again, if you could run some errands for me.
+    break
+    case 1
+      say I'll need a roc egg and I'll need some stealth work. Think you're up to it?
+    break
+    case 0
+      say Well!? Why are you just standing there? Get to it!
+      wait 1 sec
+      eval person %room.people%
+      while %person%
+        if %person.is_pc% && %person.on_quest(18288)%
+          %quest% %actor% trigger 18288
+          %quest% %actor% finish 18288
+        end
+        eval person %person.next_in_room%
+      done
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycles_left %cycles_left% - 1
+done
+~
+#18299
+Thirteen: Guild Quest Codeword~
+0 d 0
+river~
+if !%actor.on_quest(18292)% || %actor.quest_triggered(18292)%
+  %send% %actor% You don't need to give %self.name% the codeword now.
+  halt
+end
+if %self.fighting% || %self.disabled%
+  halt
+end
+eval room %self.room%
+wait 1 sec
+eval cycles_left 5
+while %cycles_left% >= 0
+  if %self.fighting% || %self.disabled%
+    * Combat interrupts the speech
+    %echo% %self.name%'s monologue is interrupted.
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      %echo% %self.name% rolls around clutching his belly, groaning with hunger. Then, slowly, he seems to realize you just answered his riddle.
+    break
+    case 4
+      %echo% %self.name% stands up, brushes himself off, and stops sucking in his gut. He doesn't actually look all that hungry.
+    break
+    case 3
+      say Oh, you're from the guild! I should have known they'd send someone. How do you like my canyon vacation home?
+    break
+    case 2
+      say Nevermind that. I'd be happy to support your guildhall. I just need you to fetch me a little nourishment...
+    break
+    case 1
+      say And maybe take care of an old friend or two.
+    break
+    case 0
+      say Are you up to it?
+      wait 1 sec
+      eval person %room.people%
+      while %person%
+        if %person.is_pc% && %person.on_quest(18292)%
+          %quest% %actor% trigger 18292
+          %quest% %actor% finish 18292
+        end
+        eval person %person.next_in_room%
+      done
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycles_left %cycles_left% - 1
+done
 ~
 $

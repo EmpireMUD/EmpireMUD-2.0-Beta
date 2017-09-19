@@ -74,6 +74,7 @@ const bool is_location_rule[] = {
 	TRUE,	// ADV_LINK_PORTAL_BUILDING_NEW
 	FALSE,	// ADV_LINK_TIME_LIMIT
 	FALSE,	// ADV_LINK_NOT_NEAR_SELF
+	TRUE,	// ADV_LINK_PORTAL_CROP
 };
 
 
@@ -592,7 +593,8 @@ void link_instance_entrance(struct instance_data *inst) {
 		}
 		case ADV_LINK_PORTAL_WORLD:
 		case ADV_LINK_PORTAL_BUILDING_EXISTING:
-		case ADV_LINK_PORTAL_BUILDING_NEW: {
+		case ADV_LINK_PORTAL_BUILDING_NEW:
+		case ADV_LINK_PORTAL_CROP: {
 			if (obj_proto(inst->rule->portal_in)) {
 				portal = read_object(inst->rule->portal_in, TRUE);
 				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->start);
@@ -719,8 +721,11 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	// things that only matter if we received/found loc
 	if (loc) {
 		// ownership check
-		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
+		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY | ADV_LINKF_CLAIMED_ONLY)) {
 			return FALSE;
+		}
+		if (!ROOM_OWNER(home) && LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_ONLY)) {
+			return FALSE;	// must be claimed
 		}
 		if (ROOM_OWNER(home) && (EMPIRE_LAST_LOGON(ROOM_OWNER(home)) + (config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK)) < time(0)) {
 			return FALSE;	// owner is timed out -- don't spawn here
@@ -805,6 +810,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	room_data *room, *next_room, *loc, *shift, *found = NULL;
 	int dir, iter, sub, num_found, pos;
 	sector_data *findsect = NULL;
+	crop_data *findcrop = NULL;
 	bool match_buildon = FALSE;
 	bld_data *findbdg = NULL, *bdg = NULL;
 	struct map_data *map;
@@ -840,6 +846,10 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 			match_buildon = TRUE;
 			break;
 		}
+		case ADV_LINK_PORTAL_CROP: {
+			findcrop = crop_proto(rule->value);
+			break;
+		}
 		default: {
 			// type not implemented or cannot be used to generate a link
 			return NULL;
@@ -847,11 +857,14 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	}
 	
 	// two ways of doing this:
-	if (findsect) {	// scan the whole map
+	if (findsect || findcrop) {	// scan the whole map
 		num_found = 0;
 		for (map = land_map; map; map = map->next) {
 			// looking for sect: fail
 			if (findsect && map->sector_type != findsect) {
+				continue;
+			}
+			if (findcrop && map->crop_type != findcrop) {
 				continue;
 			}
 			
@@ -1892,7 +1905,7 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 
 /**
 * @param adv_data *adv The adventure to search.
-* @param int type Any ADV_LINK_x const.
+* @param int type Any ADV_LINK_ const.
 * @return struct adventure_link_rule* The found rule, or NULL.
 */
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type) {

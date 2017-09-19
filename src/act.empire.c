@@ -4727,9 +4727,6 @@ ACMD(do_tomb) {
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
-		else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-			msg_to_char(ch, "You can't set your tomb in a vehicle.\r\n");
-		}
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}

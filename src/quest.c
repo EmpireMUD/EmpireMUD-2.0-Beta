@@ -615,6 +615,14 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = get_currency(ch, task->vnum);
 				break;
 			}
+			case REQ_GET_COINS: {
+				task->current = count_total_coins_as(ch, REAL_OTHER_COIN);
+				break;
+			}
+			case REQ_CAN_GAIN_SKILL: {
+				task->current = check_can_gain_skill(ch, task->vnum) ? task->needed : 0;
+				break;
+			}
 		}
 	}
 }
@@ -1630,6 +1638,9 @@ void qt_change_skill_level(char_data *ch, any_vnum skl) {
 			else if (task->type == REQ_SKILL_LEVEL_UNDER && task->vnum == skl) {
 				task->current = (get_skill_level(ch, skl) <= task->needed ? task->needed : -1);	// must set below 0 because 0 is a valid needed
 			}
+			else if (task->type == REQ_CAN_GAIN_SKILL) {
+				task->current = check_can_gain_skill(ch, task->vnum) ? task->needed : 0;
+			}
 		}
 	}
 }
@@ -1696,6 +1707,29 @@ void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vn
 		
 		// call it
 		(func)(ch, vnum);
+	}
+}
+
+
+/**
+* Quest Tracker: ch gains/loses coins
+*
+* @param char_data *ch The player.
+*/
+void qt_change_coins(char_data *ch) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_GET_COINS) {
+				task->current = count_total_coins_as(ch, REAL_OTHER_COIN);
+			}
+		}
 	}
 }
 

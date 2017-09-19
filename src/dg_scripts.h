@@ -270,7 +270,7 @@ bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode
 int death_mtrigger(char_data *ch, char_data *actor);
 void fight_mtrigger(char_data *ch);
 void hitprcnt_mtrigger(char_data *ch);
-void bribe_mtrigger(char_data *ch, char_data *actor, int amount);
+int bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 
 void complete_wtrigger(room_data *room);
 extern int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);

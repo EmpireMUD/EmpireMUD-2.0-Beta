@@ -97,6 +97,19 @@ purges itself.
 0 0
 T 18207
 S
+#18208
+stone seeker guild adventurers~
+a Guild of Adventurers seeker stone~
+A Guild of Adventurers seeker stone lies here.~
+   Use 'seek guild' to find the nearest Guild of Adventurers instance. Use
+'seek guild' to find the nearest atlasian tortoise. This stone will lead you to
+directly to the guildhall on the tortoise's back.
+~
+3 p a 6
+0 0 0
+12 0
+T 18208
+S
 #18209
 token shell chelonian single~
 a chelonian shell token~
@@ -483,5 +496,204 @@ from a city sorcerer without being noticed!
 10 0
 Q 18272
 T 18272
+S
+#18280
+stone sorcerous signalling~
+a sorcerous signalling stone~
+A sorcerous signalling stone is lying on the ground.~
+   You can 'use' this item to contact Archsorcerer Malfernes. Just make sure to
+use it before you enter his clearing so he knows you're coming.
+~
+3 p a 3
+0 0 0
+10 0
+T 18280
+S
+#18281
+talisman countercurse curse~
+a countercurse talisman~
+A countercurse talisman is lying here.~
+   Malfernes gave this to you to help you retrieve the Cursed Chalice of Mill
+Manor. Just get the chalice and 'use talisman' while you're standing in Mill
+Manor.
+~
+3 0 a 4
+0 0 0
+0 0
+Q 18281
+T 18281
+S
+#18282
+staff draconic imagination~
+the Staff of Draconic Imagination~
+The Staff of Draconic Imagination is floating before you.~
+   First, use this on a dragon to capture an image of it. Then, use it in
+Skycleave to summon an imaginary dragon. You can use it on any of the dragons
+from the Flame Dragon or Abandoned Dragon Nest adventures.
+~
+3 0 a 3
+0 0 0
+2 0
+Q 18282
+T 18282
+S
+#18283
+chalice golden~
+a golden chalice~
+There is a golden chalice here.~
+   The dark power of the Chalice of Ibn Cidious has been temporarily suppressed
+by Malfernes's enchantment. You'd better take it back to him before it wears
+off...
+~
+3 0 a 2
+0 0 0
+4 0
+Q 18281
+S
+#18284
+whistle imaginary~
+an imaginary whistle~
+An imaginary whistle might be here.~
+   This whistle might or might not summon a flying mount who might or might not
+be real, if you 'use whistle'.
+~
+3 eo a 6
+18284 0 0
+10 0
+T 10263
+S
+#18285
+egg imaginary~
+an imaginary egg~
+An imaginary egg might be here.~
+This egg lets you imagine having a pet dragon. Type 'use egg' to summon it.
+~
+3 o a 5
+18285 0 0
+10 0
+T 9900
+S
+#18286
+net ratcatcher's ratcatchers~
+a ratcatcher's net~
+A ratcatcher's net is here.~
+You can 'use net rat' to catch a rat.
+~
+3 0 a 2
+0 0 0
+0 0
+Q 18285
+T 18286
+S
+#18287
+rat bagged~
+a bagged rat~
+A bagged rat is lying here.~
+It sure squirms a lot.
+~
+3 kp a 2
+0 0 0
+7 1152
+S
+#18288
+phylactery spare Scaldorran's Scaldorrans~
+Scaldorran's spare phylactery~
+Scaldorran's spare phylactery is lying here.~
+   You can 'use' this item in the Lich Labs to resummon Scaldorran to talk to
+him, if he's dead.
+~
+3 p a 2
+0 0 0
+10 0
+T 18288
+S
+#18289
+sack padded empty~
+an empty padded sack~
+A padded sack is lying here, empty.~
+   Use this in a roc nest (while the egg is still there) to steal the egg. Get
+ready to run or fight...
+~
+3 0 a 2
+0 0 0
+11 0
+Q 18289
+T 18289
+S
+#18290
+scarab enchanted bug~
+an enchanted scarab~
+An enchanted scarab is here.~
+   This strange little scarab has been imbued with a powerful enchantment.
+According to Scaldorran, you need to 'plant' this bug in Grand High Sorcerer
+Knezz's office while Knezz isn't looking.
+~
+3 0 a 5
+0 0 0
+0 0
+T 18290
+S
+#18291
+sack egg giant~
+a giant egg sack~
+A giant egg sack is here.~
+Take this back to Scaldorran.
+~
+3 0 a 1
+0 0 0
+11 0
+Q 18289
+S
+#18293
+seed imaginary~
+an imaginary seed~
+An imaginary seed may or may not be here.~
+What a strange seed. Surely you could plant it in the plains.
+~
+3 0 a 2
+0 0 0
+10 0
+T 18293
+S
+#18294
+imagination vivid~
+a vivid imagination~
+A vivid imagination is here.~
+   This item instantly triggers completion of a couple of Guild of Adventurers
+quests, if you already meet the requirements when you start them.
+~
+3 p a 1
+0 0 0
+0 0
+T 18294
+S
+#18295
+wand verdant~
+a verdant wand~
+A verdant wand is here.~
+   You can 'use wand' to restore scorched terrain or teleport yourself to a
+flame dragon cave.
+~
+3 0 a 3
+10 1 0
+0 0
+S
+#18296
+tree dragon great~
+a great dragon tree~
+A great dragon tree lays on its side, still taller than you are.~
+   The dragon tree is truly massive! When it stood, this tree was taller than a
+castle. Now it might provide enough lumber for an entire house.
+~
+3 e a 3
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 16 124 100.00 12  # SCRAPE: a heavy log
+I 16 121 100.00 60  # SCRAPE: a stick
+I 17 125 100.00 24  # SAW: a stack of lumber
+I 17 121 100.00 60  # SAW: a stick
+R
+5118 0
 S
 $

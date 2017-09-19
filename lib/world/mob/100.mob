@@ -504,7 +504,7 @@ S
 #10048
 lich bony scaldorran~
 the lich Scaldorran~
-A bony lich is channelling a spell.
+The lich Scaldorran is channelling a spell with his bony fingers.
 ~
 70 90 bdhwxzA G
 1 0 2 16
@@ -513,6 +513,7 @@ I 4 10061 10.00 1 X  # LOOT: lich bindings
 I 4 10062 10.00 1 X  # LOOT: a tattered lich cloak
 T 10051
 T 10052
+T 18298
 S
 #10049
 skeleton rusty dusty~

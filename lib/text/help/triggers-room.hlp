@@ -141,11 +141,13 @@ When using field - The variable returns:
    is facing (compared to North). Returns the same dir if no building.
 &cbld_flagged(AFF)&0 - True if the room has a building flag on it.
 &cbuilding&0 - The name of the building on the room, if any.
+&cbuilding_vnum&0 - The vnum of the building on the room, if any.
 &ccan_build(FLAG)&0 - True if the room has the given build flags.
 &ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
 &ccoords&0 - The (x, y) location of the room on the map.
 &ccrop&0 - The name of the crop on the map room, if any.
+&ccrop_vnum&0 - The vnum of the crop on the map room, if any.
 &cdirection(target)&0 - The approximate direction to the target.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.
@@ -166,6 +168,7 @@ When using field - The variable returns:
 &cpeople&0 - The id of the first character in the room, or an empty return.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
 &csector&0 - The sector type of the room.
+&csector_vnum&0 - The sector vnum of the room.
 &ctemplate&0 - The room template vnum, if any.
 &cvehicles&0 - The id of the first vehicle in the room, if any
    (then %veh.next_in_room%).

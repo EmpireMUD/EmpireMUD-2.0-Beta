@@ -2005,6 +2005,30 @@ void coin_string(struct coin_data *list, char *storage) {
 
 
 /**
+* Counts all of a player's coins, in their value as a specific empire's coins.
+*
+* @param char_data *ch The player.
+* @param empire_data *type An empire whose coins we'll conver to.
+* @return int The player's total coins as that currency.
+*/
+int count_total_coins_as(char_data *ch, empire_data *type) {
+	struct coin_data *coin;
+	double total;
+	
+	if (IS_NPC(ch)) {
+		return 0;
+	}
+	
+	total = 0;
+	LL_FOREACH(GET_PLAYER_COINS(ch), coin) {
+		total += exchange_coin_value(coin->amount, real_empire(coin->empire_id), type);
+	}
+	
+	return round(total);
+}
+
+
+/**
 * @param empire_data *type The empire who minted the coins, or OTHER_COIN.
 * @param int amount How many coins.
 */
@@ -2272,6 +2296,11 @@ int increase_coins(char_data *ch, empire_data *emp, int amount) {
 	}
 	
 	cleanup_coins(ch);
+	
+	if (amount != 0) {
+		qt_change_coins(ch);
+	}
+	
 	return value;
 }
 
@@ -5987,6 +6016,10 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 				add_currency(ch, req->vnum, req->needed);
 				break;
 			}
+			case REQ_GET_COINS: {
+				charge_coins(ch, REAL_OTHER_COIN, req->needed, NULL);
+				break;
+			}
 		}
 	}
 	
@@ -6087,6 +6120,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			}
 			case REQ_GET_CURRENCY: {
 				if (get_currency(ch, req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_GET_COINS: {
+				if (!can_afford_coins(ch, REAL_OTHER_COIN, req->needed)) {
 					ok = FALSE;
 				}
 				break;
@@ -6207,6 +6246,10 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				
 				break;
 			}
+			case REQ_CAN_GAIN_SKILL: {
+				ok = check_can_gain_skill(ch, req->vnum);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -6288,6 +6331,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			snprintf(output, sizeof(output), "Get currency: %d %s%s", req->needed, vnum, get_generic_string_by_vnum(req->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(req->needed)));
 			break;
 		}
+		case REQ_GET_COINS: {
+			snprintf(output, sizeof(output), "Get misc coins: %d coins", req->needed);
+			break;
+		}
 		case REQ_KILL_MOB: {
 			snprintf(output, sizeof(output), "Kill %dx mob%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_mob_name_by_proto(req->vnum));
 			break;
@@ -6360,6 +6407,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_WEARING_OR_HAS: {
 			snprintf(output, sizeof(output), "Wearing or has object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_CAN_GAIN_SKILL: {
+			snprintf(output, sizeof(output), "Able to gain skill: %s%s", vnum, get_skill_name_by_vnum(req->vnum));
 			break;
 		}
 		default: {

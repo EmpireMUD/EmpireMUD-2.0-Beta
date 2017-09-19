@@ -1466,9 +1466,9 @@ while %cycle% >= 0
   * Rather than setting error in 10 places, just assume there's an error and clear it if there isn't
   eval error 1
   if %actor.fighting%
-    %send% %actor% You can't use %self.name% during combat.
+    %send% %actor% You can't use %self.shortdesc% during combat.
   elseif %actor.position% != Standing
-    %send% %actor% You need to be standing up to use %self.name%.
+    %send% %actor% You need to be standing up to use %self.shortdesc%.
   elseif !%actor.can_teleport_room%
     %send% %actor% You can't teleport out of here.
   elseif !%loc%
@@ -1484,7 +1484,7 @@ while %cycle% >= 0
     %send% %actor% The destination is too busy.
     eval error 1
   end
-  if %actor.room% != %room_var% || %self.carried_by% != %actor% || %gave_error%
+  if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
     if %cycle% > 0
       %send% %actor% %self.shortdesc% sparks and fizzles.
       %echoaround% %actor% %actor.name%'s trinket sparks and fizzles.

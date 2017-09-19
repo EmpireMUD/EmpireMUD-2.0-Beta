@@ -462,7 +462,9 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char_data *mob, *next_mob;
+	obj_data *obj, *next_obj;
 	any_vnum vnum;
+	int iter;
 	
 	if (!inst) {
 		return;
@@ -491,6 +493,29 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 				dg_owner_purged = 1;
 			}
 			extract_char(mob);
+		}
+	}
+	else if (is_abbrev(arg1, "object")) {
+		for (iter = 0; iter < inst->size; ++iter) {
+			if (!inst->room[iter]) {
+				continue;
+			}
+			
+			LL_FOREACH_SAFE2(ROOM_CONTENTS(inst->room[iter]), obj, next_obj, next_content) {
+				if (GET_OBJ_VNUM(obj) != vnum) {
+					continue;
+				}
+				
+				// found!
+				if (*argument && ROOM_PEOPLE(inst->room[iter])) {
+					act(argument, FALSE, ROOM_PEOPLE(inst->room[iter]), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+			
+				if (obj == owner) {
+					dg_owner_purged = 1;
+				}
+				extract_obj(obj);
+			}
 		}
 	}
 	else {

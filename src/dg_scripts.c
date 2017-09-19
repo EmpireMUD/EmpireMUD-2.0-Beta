@@ -4190,6 +4190,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "building_vnum")) {
+						if (GET_BUILDING(r)) {
+							snprintf(str, slen, "%d", GET_BLD_VNUM(GET_BUILDING(r)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					break;
 				}
 				case 'c': {	// room.c*
@@ -4245,6 +4253,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						crop_data *cp;
 						if ((cp = ROOM_CROP(r))) {
 							snprintf(str, slen, "%s", GET_CROP_NAME(cp));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "crop_vnum")) {
+						crop_data *cp;
+						if ((cp = ROOM_CROP(r))) {
+							snprintf(str, slen, "%d", GET_CROP_VNUM(cp));
 						}
 						else {
 							*str = '\0';
@@ -4431,6 +4448,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 's': {	// room.s*
 					if (!str_cmp(field, "sector")) {
 						snprintf(str, slen, "%s", GET_SECT_NAME(SECT(r)));
+					}
+					else if (!str_cmp(field, "sector_vnum")) {
+						snprintf(str, slen, "%d", GET_SECT_VNUM(SECT(r)));
 					}
 					else if (!str_cmp(field, "south")) {
 						direction_vars(r, SOUTH, subfield, str, slen);
