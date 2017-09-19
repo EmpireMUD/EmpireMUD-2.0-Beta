@@ -53,6 +53,35 @@ W
 Z
 1 18219
 S
+#18208
+Seek Out Fame and Adventure~
+   The barkeep takes you aside and leans over to say, 'You have the look of an
+adventurer about you. Perhaps you've heard of the Guild of Adventurers. They
+always need fresh blood. Here, take this seeker stone and use it to find the
+atlasian tortoise that the guild calls their home.'
+   You can use 'seek guild' to find directions to the nearest atlasian
+tortoise. Once you reach the tortoise, board it and enter the tavern, and
+speak with the giant dwarf who works as a bouncer upstairs.
+~
+You've found your way to the Guild of Adventurers!
+~
+2 0 50 300 -1
+A
+1 220
+P
+5 18200 0 1
+R
+0 0 5
+R
+6 18200 1
+T 18209
+W
+5 18200 0 1 a
+W
+13 18206 0 1 a
+Z
+1 18212
+S
 #18221
 My Very Own Egg~
    You have acquired an atlasian egg -- a truly rare treasure indeed! You can
@@ -701,5 +730,529 @@ W
 2 1300 0 5
 Z
 1 10452
+S
+#18277
+Speak to Nostrazak About the Guildhall~
+   Our local guildhall has forged something of a reputation for itself, but
+there has to be more we can do to improve our standing in the Guild of
+Adventurers. Travel back to headquarters at the Tipsy Tortoise Tavern and speak
+to Nostrazak the Incautious about our next step.
+~
+   You greet Nostrazak the Incautious and inquire about how to improve the
+reputation and fame of your local chapter.
+~
+3 0 0 0 -1
+A
+1 18219
+P
+16 18200 0 7 a
+P
+6 18278 0 1 a
+P
+5 18278 0 1 a
+R
+6 18278 1
+W
+13 18207 0 1
+Z
+1 18211
+S
+#18278
+Discuss Support With Your Superintendant~
+   Nostrazak pulls out a chair, turns it around, and sits backwards in it to
+talk to you -- a necessity for him, as his draconian tail no longer allows him
+to sit properly in a chair. Nostrazak explains that the Guild relies on its
+many allies throughout the world, and each local guildhall must ingratiate
+itself to those allies to ensure their support. He instructs you to return to
+your guildhall and make preparations to seek support from the High Lich
+Scaldorran, Hedge Witch Germione, Archsorcerer Malfernes, and the mysterious
+Adventurer 13.
+~
+You sit down to discuss the situation with the superintendant.
+~
+4 0 0 0 -1
+A
+1 18211
+P
+16 18200 0 7 a
+R
+6 18279 1
+W
+12 18219 0 1
+Z
+1 18219
+S
+#18279
+Gather Support For Your Guildhall~
+   The superintendant reviews Nostrazak's instructions, then retrieves a scroll
+from the desk and reads it carefully. 'Speak to our guildmage and librarian
+about finding these allies of the guild. Surely they will be able to help you.
+Return here when you have assurances of support from all four key allies:
+Scaldorran, Malfernes, Germione, and Adventurer 13.'
+~
+   You now have enough support for your guildhall from amongst the guild's
+allies. You can complete daily quests from your guildhall to reach the
+Venerated reputation level.
+~
+8 0 0 0 -1
+A
+1 18219
+P
+0 18278 0 1 a
+P
+16 18200 0 7 a
+T 18277
+W
+0 18291 0 1 a
+W
+0 18295 0 1 a
+W
+0 18283 0 1 a
+W
+0 18287 0 1 a
+Z
+1 18211
+S
+#18280
+Seek Support From Malfernes~
+   The guild has many sorcerer allies, but the strongest is Archsorcerer
+Malfernes. However, Malfernes has been missing for some time -- millions of
+years, in fact. Last time anybody saw Malfernes, he was stuck in a tem-portal
+causality loop in the Primeval era. Locate a portal to that era and seek out
+the Archsorcerer inside.
+   You receive a sorcerous signalling stone. Once you enter the portal,
+'use' the stone to signal your guild membership to Malfernes. Otherwise,
+he may attack you. You will find him at the end of the primeval forest.
+If you have trouble getting there, try bringing a tracker.
+~
+Archsorcerer Malfernes agrees to support you, in exchange for some help.
+~
+7 0 0 0 -1
+A
+1 18217
+P
+0 18278 0 1 a
+P
+0 18291 0 1 a
+R
+6 18281 1
+R
+6 18282 1
+T 18277
+W
+13 10255 0 1 a
+W
+11 0 0 1 a
+Z
+1 18280
+S
+#18281
+Fetch the Cursed Chalice of Mill Manor~
+   Archsorcerer Malfernes has long coveted powerful artifacts, but he has been
+unable to expand his collection while he's stuck in this time loop, deep in the
+distant past. You could win his support by traveling to Mill Manor, deep in the
+swamp, and solve the clues there to find the cursed chalice. Malfernes gives
+you a countercurse talisman. Once you have the chalice, 'use' the talisman to
+negate the curse so you can return the chalice to Malefernes in the Primeval.
+~
+   You have completed the quest. Malfernes takes the chalice from you and
+conjures a stream of wine from the air, filling the chalice. He takes a drink
+and then coughs, spurting wine into your face. He then tucks the chalice into
+his sleeve and makes a thoughtful face. He seems to have forgotten you're here.
+~
+5 d 0 0 -1
+A
+1 18280
+P
+0 18280 0 1 a
+R
+7 18200 1
+R
+6 18283 1
+T 18277
+W
+2 18283 0 1
+Z
+1 18280
+S
+#18282
+Imagine Dragons~
+   Archsorcerer Malfernes confides in you that he has a long-standing rivalry
+with High Sorceress Celiya after an incident involving a mutual former lover, a
+poorly-trained skeletal mammoth, and sixty -thousand barrels of manawine. But
+being trapped in the Primeval era, Malfernes is unable to continue this war of
+practical jokes. He hands you the Staff of Draconic Imagination and instructs
+you to seek out a flame dragon or a wandering dragon who has abandoned its
+nest, and 'use' the staff to capture its image. Then head to the Tower
+   You can use any dragon from the Flame Dragon or Abandoned Dragon Nest adventures.
+Skycleave and 'use' the staff again to release the image in the tower.
+   You can use any dragon from the Flame Dragon or Abandoned Dragon Nest
+adventures.
+~
+   Malfernes cackles with glee when you tell him about your escapades at the
+Tower Skycleave.
+~
+5 0 0 0 -1
+A
+1 18280
+P
+0 18280 0 1 a
+R
+7 18200 1
+R
+6 18283 1
+T 18277
+W
+11 0 0 1
+Z
+1 18280
+S
+#18283
+Support From Malfernes~
+   Having secured support from the Archsorcerer Malfernes, you're ready to
+return to your local guildhall and inform your guildmage of your success.
+~
+The guildhall appreciates your support.
+~
+6 a 0 0 -1
+A
+1 18280
+P
+0 18281 0 1 a
+P
+0 18282 0 1 a
+R
+7 18200 1
+T 18278
+W
+12 18217 0 1
+Z
+1 18217
+S
+#18284
+Seek Support From Germione~
+   Even when an adventurer retires, their affiliation with the guild continues.
+You must seek out one such former member, the hedge witch Germione, who lives in a
+hut on stilts in the swamp. Find the hut, pull down the rope ladder, and pay
+Germione a visit. Perhaps her support will be enouigh to secure your guildhall.
+~
+   The hedge witch, Germione, agrees to support you in exchange for some
+'errands'.
+~
+7 0 0 0 -1
+A
+1 18218
+P
+0 18278 0 1 a
+P
+0 18295 0 1 a
+R
+6 18285 1
+R
+6 18286 1
+W
+13 19002 0 1 a
+W
+11 0 0 1 a
+Z
+1 19000
+S
+#18285
+Germione's Ratcatcher~
+   'The secret to training swamp rats is, they can't be trained,' Germoione
+says. 'I have to import city rats and then hex them into swamp rats. You just
+can't train the real swamp rats like you can the city rats.'
+   Germione gives you a ratcatcher's net. Find an open sewer in one of your
+cities and 'net rat' to capture some rats in the sewer. You'll need 10 of them.
+~
+Germione squeals with joy to see you've brought back 10 rats.
+~
+6 d 0 0 -1
+A
+1 19000
+P
+0 18284 0 1
+R
+7 18200 1
+R
+6 18287 1
+T 18277
+W
+2 18287 0 10
+Z
+1 19000
+S
+#18286
+Vengeance for Measley~
+   Germione leans forward and wipes a tear from her eye with a grotesque
+ratskin handkerchief as she tells you the story of her favorite pet, Measley.
+As a rust-colored rat, Measely was perfect for spying on Germione's enemies
+across the realm. Perfect, that is, until poor, defenseless Measley was eaten
+by the Sun King's pet snake, Bitesaratl. Find the Lost Temple and defeat the
+Sun King to avenge precious Measely. Then, leave the temple and wait a few
+minutes for it to convert into a permanent Jungle Temple, then claim that
+temple.
+(You must leave the Lost Temple's map location in order for it to become a
+Jungle Temple.)
+~
+   Germione cries as and hugs you as you tell her the tale of your quest to
+avenge beloved Measley's death.
+~
+4 0 0 0 -1
+A
+1 19000
+P
+0 18284 0 1
+R
+7 18200 1
+R
+6 18287 1
+W
+3 18500 0 1 a
+W
+7 18501 0 1 a
+Z
+1 19000
+S
+#18287
+Support From Germione~
+   Having secured support from the hedge witch Germione, you're ready to return
+to your local guildhall and inform the librarian of your success.
+~
+You have completed the quest.
+The guildhall appreciates your support.
+~
+4 a 0 0 -1
+A
+1 19000
+P
+0 18285 0 1 a
+P
+0 18286 0 1 a
+R
+7 18200 1
+T 18278
+W
+12 18218 0 1
+Z
+1 18218
+S
+#18288
+Seek Support From Scaldorran~
+   The guild has an ally working in a mid-level position in the Tower
+Skycleave. Like many sorcery towers, Skycleave sometimes teleports around from
+place to place. But it always announces its presence, so you may be able to
+find it by asking around. Find the High Lich, Scaldorran, in the Lich Labs and
+see if you can convince him to rally support behind our guildhall.
+   You can let Scaldorran know you're from the guild by using his old codeword,
+'eternity'. Just say that to him when you find him. If you get to the Lich Labs
+and he's dead for some reason, just 'use' this spare phylactery to resurrect
+the old fool.
+~
+High Lich Scaldorran seems convinced to let you prove your worth...
+~
+11 0 0 0 -1
+A
+1 18217
+P
+0 18278 0 1 a
+R
+6 18289 1
+R
+6 18290 1
+T 18277
+W
+13 10055 0 1 a
+W
+11 0 0 1 a
+Z
+1 10048
+S
+#18289
+Procure a Roc Egg~
+   Scaldorran has a deep, eternal hunger that can never be sated by earthly
+foods -- such is the fate of all liches. But the abominable Yetsy has recently
+shared a recipe for 1000 Year Eggs, and Scaldorran only needs a good Roc egg to
+make it work. Seek out the gigantic nest of the Roc and and 'use sack' to steal
+the egg, then return it to Scaldorran to gain his favor.
+Hints:
+- Gigantic Nest adventures don't show up on 'nearby'; try 'scan'.
+- Make sure you steal the egg with 'use sack', not by doing the egg's quest.
+~
+   Scaldorran slips the roc egg into his ethereal cloak as strands of ectoplasm
+drip from his gaping maw.
+~
+6 d 0 0 -1
+A
+1 10048
+P
+0 18288 0 1
+R
+7 18200 1
+R
+6 18291 1
+T 18277
+W
+2 18291 0 1
+Z
+1 10048
+S
+#18290
+Bugging Knezz~
+   Scaldorran pulls you aside and casts a Cone of Silence around you. 'Between
+you and me,' he says, 'the Guild doesn't trust Grand High Sorcerer Knezz. I
+need you to take this enchanted bug up to his office, and plant it while he
+isn't looking. And be quick about it.'
+~
+   Scaldorran taps the tips of his fingerbones together and mutters
+'eeeeexcellent' to himself.
+~
+6 0 0 0 -1
+A
+1 10048
+P
+0 18288 0 1
+R
+7 18200 1
+R
+6 18291 1
+T 18277
+W
+11 0 0 1
+Z
+1 10048
+S
+#18291
+Support From Scaldorran~
+   Having secured support from the High Lich Scaldorran, you're ready to return
+to your local guildhall and inform your guildmage of your success.
+~
+The guildhall appreciates your support.
+~
+8 a 0 0 -1
+A
+1 10048
+P
+0 18289 0 1 a
+P
+0 18290 0 1 a
+R
+7 18200 1
+R
+6 18280 1
+T 18278
+W
+12 18217 0 1
+Z
+1 18217
+S
+#18292
+Seek Support From Adventurer 13~
+   The guild has eyes everywhere, from the courts of emperors, to the bottom of
+the canyon. One such pair of eyes belong to a man known only as Adventurer 13.
+His true identity is known only to Nostrazak and the other guild leaders, but
+he has been seen camping in Burrow Canyons. Find a canyon entrance beneath a
+mine and seek him out. He will ask you a single question to test your loyalty;
+you must say this answer aloud: River.
+~
+Adventurer 13 seems convinced you are who you say.
+~
+11 0 0 0 -1
+A
+1 18218
+P
+0 18278 0 1 a
+R
+6 18293 1
+R
+6 18294 1
+W
+13 11105 0 1 a
+W
+11 0 0 1 a
+Z
+1 11101
+S
+#18293
+Fruit of the Serene Canyon~
+   Adventurer 13 has grown quite hungry living as a hermit in Burrow Canyons.
+But no ordinary food will sate this hunger. You must travel to the serene
+canyon hidden beyond the waterfall. Doing so will not be easy. Be prepared to
+navigate the rapids to reach the canyon. Once you reach the serene canyon, you
+should be able to forage for the rare crops for Adventurer 13. (Hint: 'open
+waterfall')
+~
+Adventurer 13 eagerly takes the serene food you offer him.
+~
+5 d 0 0 -1
+A
+1 11101
+P
+0 18292 0 1
+R
+7 18200 1
+R
+6 18295 1
+W
+13 11113 0 1 a
+W
+2 11103 0 1 a
+W
+2 11105 0 1 a
+W
+2 11107 0 1 a
+Z
+1 11101
+S
+#18294
+Message for the Goblins~
+   After a long, strange story, you learn that Adventurer 13 has a
+long-standing grudge against Furl, war shaman of the goblins. It seems Furl has
+discovered the secret to immortality, allowing him to resurrect after every
+defeat. Adventurer 13 wants to you track down Furl, whose goblins are known to
+hide out in ruined buildings, and defeat him. When you do, let Furl's
+temporarily-rotting corpse know 'The Adventurers send their regards.'
+~
+   Adventurer 13 cackles with glee at the news that you have delivered his
+message to Furl.
+~
+6 0 0 0 -1
+A
+1 11101
+P
+0 18292 0 1
+R
+7 18200 1
+R
+6 18295 1
+W
+3 10205 0 1
+Z
+1 11101
+S
+#18295
+Support From Adventurer 13~
+   Having secured support from Adventurer 13, you are ready to return to your
+local guildhall and inform the librarian of your success.
+~
+You have completed the quest.
+The guildhall appreciates your support.
+~
+9 a 0 0 -1
+A
+1 11101
+P
+0 18293 0 1 a
+P
+0 18294 0 1 a
+R
+7 18200 1
+R
+6 18284 1
+T 18278
+W
+12 18218 0 1
+Z
+1 18218
 S
 $

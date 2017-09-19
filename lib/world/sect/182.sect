@@ -1,0 +1,53 @@
+#18293
+Field of Imagination~
+The Field of Imagination~
+'.' 6 1 1 0 b
+C
+dig~
+D0
+..&J^&A.~
+&A~
+D0
+.&J^&A..~
+&A~
+E
+4 0 0.01 18294
+I 5 100 50.00 1 x  # DIG: a rock
+I 5 102 50.00 1 x  # DIG: a flint stone
+I 6 10338 100.00 1  # FORAGE: a scaly dragonfruit
+M
+18299 5.00 0
+M
+18298 5.00 0
+M
+18297 5.00 0
+M
+18296 25.00 0
+S
+#18294
+Dragon Tree~
+Beneath the Great Dragon Tree~
+'^' 4 1 1 d dn
+C
+chop, dig~
+D0
+^||^~
+&J~
+E
+0 1 100.00 18293
+I 5 100 50.00 1 x  # DIG: a rock
+I 5 102 50.00 1 x  # DIG: a flint stone
+I 6 10338 100.00 1  # FORAGE: a scaly dragonfruit
+I 20 18296 100.00 1  # CHOP: a great dragon tree
+M
+18292 0.01 0
+M
+18299 5.00 0
+M
+18298 5.00 0
+M
+18297 5.00 0
+M
+18296 25.00 0
+S
+$

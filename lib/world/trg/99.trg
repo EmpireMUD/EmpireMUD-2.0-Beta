@@ -63,19 +63,26 @@ end
 Dismissable~
 0 ct 0
 dismiss~
-eval test %%actor.char_target(%arg%)%%
-if %test% != %self%
-  return 0
-  halt
+if %arg% != pet
+  eval test %%actor.char_target(%arg%)%%
+  if %test% != %self%
+    return 0
+    halt
+  end
 end
 if (%self.master% && %self.master% == %actor%)
   %send% %actor% You dismiss %self.name%.
   %echoaround %actor% %actor.name% dismisses %self.name%.
   %purge% %self%
 else
-  %send% %actor% That's not your pet.
-  return 1
-  halt
+  if %arg% == pet
+    return 0
+    halt
+  else
+    %send% %actor% That's not your pet.
+    return 1
+    halt
+  end
 end
 ~
 #9902

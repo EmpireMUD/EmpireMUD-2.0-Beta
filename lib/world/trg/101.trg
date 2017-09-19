@@ -1099,7 +1099,7 @@ if (!%instance.location% || %room.template% != 10146)
 end
 mgoto %instance.location%
 %echo% A stream of mana flows from the rift, animating %self.name%!
-detach 1016 %self.id%
+detach 10166 %self.id%
 ~
 #10167
 Monsoon thief + vampire spawn teleport/hide~

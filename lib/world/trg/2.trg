@@ -1,33 +1,16 @@
 #221
-Stealth GM Bribe coins~
-0 m 100
+Stealth GM Bribe coins: Prevent~
+0 m 0
 ~
-%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to each other.
-if (%actor.skill(Stealth)% > 0)
-  %send% %actor% %self.name% whispers, 'It looks like you're already a member of the Guild.'
-elseif (!%actor.can_gain_new_skills%)
-  %send% %actor% %self.name% whispers, 'It doesn't look like you can learn any new skills.'
-else
-  %actor.set_skill(Stealth, 1)%
-  %send% %actor% %self.name% whispers, 'I suppose I could let you into the Guild, provisionally.'
-end
+%send% %actor% %self.name% doesn't take bribes like that any more. Complete %self.hisher% quest instead.
+return 0
 ~
 #222
-Stealth GM Bribe item~
+Stealth GM Bribe item: Prevent~
 0 j 100
 ~
-%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to each other.
-if (%object.material% != GOLD)
-  %send% %actor% %self.name% whispers, 'Thanks, mate!'
-elseif (%actor.skill(Stealth)% > 0)
-  %send% %actor% %self.name% whispers, 'It looks like you're already a member of the Guild.'
-elseif (!%actor.can_gain_new_skills%)
-  %send% %actor% %self.name% whispers, 'It doesn't look like you can learn any new skills.'
-else
-  %actor.set_skill(Stealth, 1)%
-  %send% %actor% %self.name% whispers, 'I suppose I could let you into the Guild, provisionally.'
-end
-%purge% %object%
+%send% %actor% %self.name% doesn't take bribes like that any more. Complete %self.hisher% quest instead.
+return 0
 ~
 #256
 Hestian Trinket~

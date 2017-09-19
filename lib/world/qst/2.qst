@@ -4,7 +4,7 @@ The stealth guildmaster demands 100 coins before you can join the guild.
 ~
 You hand over the 100 coins.
 ~
-1 a 1 0 0
+4 d 0 0 0
 A
 1 221
 A
@@ -14,7 +14,11 @@ P
 R
 5 4 1
 W
-10 4 0 0
+22 4 0 1 a
+W
+21 0 0 100 a
+W
+10 4 0 0 a
 Z
 1 221
 Z
