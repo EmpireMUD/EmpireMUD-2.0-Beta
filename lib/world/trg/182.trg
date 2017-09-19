@@ -147,7 +147,7 @@ if !%arg%
 end
 eval room %self.room%
 if %room.rmt_flagged(!LOCATION)%
-  %send% %actor% %self.name% spins gently in a circle.
+  %send% %actor% %self.shortdesc% spins gently in a circle.
   halt
 end
 if (guild /= %arg% || tortoise /= %arg%)
@@ -1457,7 +1457,7 @@ while %cycles_left% >= 0
       while %person%
         if %person.is_pc% && %person.on_quest(18280)%
           %quest% %actor% trigger 18280
-          %quest% %actor% finish 18283
+          %quest% %actor% finish 18280
         end
         eval person %person.next_in_room%
       done
@@ -1471,7 +1471,7 @@ done
 #18297
 Germione: Guild Quest Codeword~
 0 d 0
-shibboleth~
+friend~
 if !%actor.on_quest(18284)% || %actor.quest_triggered(18284)%
   %send% %actor% You don't need to give %self.name% the codeword now.
   halt

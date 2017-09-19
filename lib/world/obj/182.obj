@@ -513,11 +513,11 @@ S
 talisman countercurse curse~
 a countercurse talisman~
 A countercurse talisman is lying here.~
-   Malfernes give this to you to help you retrieve the Cursed Chalice of Mill
+   Malfernes gave this to you to help you retrieve the Cursed Chalice of Mill
 Manor. Just get the chalice and 'use talisman' while you're standing in Mill
 Manor.
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 Q 18281

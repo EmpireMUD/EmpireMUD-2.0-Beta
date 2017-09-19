@@ -860,13 +860,15 @@ conjures a stream of wine from the air, filling the chalice. He takes a drink
 and then coughs, spurting wine into your face. He then tucks the chalice into
 his sleeve and makes a thoughtful face. He seems to have forgotten you're here.
 ~
-5 d 0 0 -1
+6 d 0 0 -1
 A
 1 18280
 P
 0 18280 0 1 a
 R
 7 18200 1
+R
+8 18200 1
 R
 6 18283 1
 T 18277
@@ -883,22 +885,23 @@ poorly-trained skeletal mammoth, and sixty -thousand barrels of manawine. But
 being trapped in the Primeval era, Malfernes is unable to continue this war of
 practical jokes. He hands you the Staff of Draconic Imagination and instructs
 you to seek out a flame dragon or a wandering dragon who has abandoned its
-nest, and 'use' the staff to capture its image. Then head to the Tower
-   You can use any dragon from the Flame Dragon or Abandoned Dragon Nest adventures.
-Skycleave and 'use' the staff again to release the image in the tower.
+nest, and 'use staff' to capture its image. Then head to the Tower Skycleave
+and 'use staff' again to release the image in the tower.
    You can use any dragon from the Flame Dragon or Abandoned Dragon Nest
 adventures.
 ~
    Malfernes cackles with glee when you tell him about your escapades at the
 Tower Skycleave.
 ~
-5 0 0 0 -1
+7 0 0 0 -1
 A
 1 18280
 P
 0 18280 0 1 a
 R
 7 18200 1
+R
+8 18200 1
 R
 6 18283 1
 T 18277
@@ -914,7 +917,7 @@ return to your local guildhall and inform your guildmage of your success.
 ~
 The guildhall appreciates your support.
 ~
-6 a 0 0 -1
+7 0 0 0 -1
 A
 1 18280
 P
@@ -935,11 +938,12 @@ Seek Support From Germione~
 You must seek out one such former member, the hedge witch Germione, who lives in a
 hut on stilts in the swamp. Find the hut, pull down the rope ladder, and pay
 Germione a visit. Perhaps her support will be enouigh to secure your guildhall.
+   Say the word 'friend' so Germione knows you come in peace.
 ~
    The hedge witch, Germione, agrees to support you in exchange for some
 'errands'.
 ~
-7 0 0 0 -1
+8 0 0 0 -1
 A
 1 18218
 P
@@ -967,13 +971,15 @@ cities and 'net rat' to capture some rats in the sewer. You'll need 10 of them.
 ~
 Germione squeals with joy to see you've brought back 10 rats.
 ~
-6 d 0 0 -1
+7 d 0 0 -1
 A
 1 19000
 P
 0 18284 0 1
 R
 7 18200 1
+R
+8 18200 1
 R
 6 18287 1
 T 18277
@@ -998,13 +1004,15 @@ Jungle Temple.)
    Germione cries as and hugs you as you tell her the tale of your quest to
 avenge beloved Measley's death.
 ~
-4 0 0 0 -1
+5 0 0 0 -1
 A
 1 19000
 P
 0 18284 0 1
 R
 7 18200 1
+R
+8 18200 1
 R
 6 18287 1
 W
@@ -1022,7 +1030,7 @@ to your local guildhall and inform the librarian of your success.
 You have completed the quest.
 The guildhall appreciates your support.
 ~
-4 a 0 0 -1
+5 0 0 0 -1
 A
 1 19000
 P
@@ -1082,13 +1090,15 @@ Hints:
    Scaldorran slips the roc egg into his ethereal cloak as strands of ectoplasm
 drip from his gaping maw.
 ~
-6 d 0 0 -1
+7 d 0 0 -1
 A
 1 10048
 P
 0 18288 0 1
 R
 7 18200 1
+R
+8 18200 1
 R
 6 18291 1
 T 18277
@@ -1107,13 +1117,15 @@ isn't looking. And be quick about it.'
    Scaldorran taps the tips of his fingerbones together and mutters
 'eeeeexcellent' to himself.
 ~
-6 0 0 0 -1
+7 0 0 0 -1
 A
 1 10048
 P
 0 18288 0 1
 R
 7 18200 1
+R
+8 18200 1
 R
 6 18291 1
 T 18277
@@ -1129,7 +1141,7 @@ to your local guildhall and inform your guildmage of your success.
 ~
 The guildhall appreciates your support.
 ~
-8 a 0 0 -1
+9 0 0 0 -1
 A
 1 10048
 P
@@ -1184,13 +1196,15 @@ waterfall')
 ~
 Adventurer 13 eagerly takes the serene food you offer him.
 ~
-5 d 0 0 -1
+6 d 0 0 -1
 A
 1 11101
 P
 0 18292 0 1
 R
 7 18200 1
+R
+8 18200 1
 R
 6 18295 1
 W
@@ -1216,13 +1230,15 @@ temporarily-rotting corpse know 'The Adventurers send their regards.'
    Adventurer 13 cackles with glee at the news that you have delivered his
 message to Furl.
 ~
-6 0 0 0 -1
+7 0 0 0 -1
 A
 1 11101
 P
 0 18292 0 1
 R
 7 18200 1
+R
+8 18200 1
 R
 6 18295 1
 W
@@ -1238,7 +1254,7 @@ local guildhall and inform the librarian of your success.
 You have completed the quest.
 The guildhall appreciates your support.
 ~
-9 a 0 0 -1
+10 0 0 0 -1
 A
 1 11101
 P
