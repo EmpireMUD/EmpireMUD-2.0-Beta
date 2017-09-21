@@ -125,8 +125,7 @@ bool valid_empire_name(char *newname) {
 	extern char *invalid_list[MAX_INVALID_NAMES];
 	extern int num_invalid;
 
-	char *ptr, buf[MAX_STRING_LENGTH];
-	char tempname[MAX_INPUT_LENGTH];
+	char *ptr, tempname[MAX_INPUT_LENGTH];
 	bool ok = TRUE;
 	int iter;
 	
@@ -136,8 +135,8 @@ bool valid_empire_name(char *newname) {
 	}
 	
 	// check fill/reserved
-	strcpy(buf, newname);
-	if (fill_word(buf) || reserved_word(buf)) {
+	strcpy(tempname, newname);
+	if (fill_word(tempname) || reserved_word(tempname)) {
 		ok = FALSE;
 	}
 	
@@ -150,10 +149,18 @@ bool valid_empire_name(char *newname) {
 		
 		// compare to banned names
 		for (iter = 0; iter < num_invalid && ok; ++iter) {
-			if (strstr(tempname, invalid_list[iter])) {
-				ok = FALSE;
+			if (*invalid_list[iter] == '%') {	// leading % means substr
+				if (strstr(tempname, invalid_list[iter] + 1)) {
+					ok = FALSE;
+				}
+			}
+			else {	// otherwise exact-match
+				if (!str_cmp(tempname, invalid_list[iter])) {
+					ok = FALSE;
+				}
 			}
 		}
+
 	}
 	
 	return ok;
