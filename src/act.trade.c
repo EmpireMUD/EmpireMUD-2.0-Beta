@@ -723,7 +723,7 @@ struct gen_craft_data_t gen_craft_data[] = {
 	
 	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
 	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire..." } },
-	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %d..." } },
+	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s..." } },
 };
 
 
