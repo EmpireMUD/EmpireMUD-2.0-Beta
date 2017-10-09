@@ -582,7 +582,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// only have to free this info if not on the map (map rooms have a pointer to the map)
-	if (GET_ROOM_VNUM(room) >= MAP_SIZE && SHARED_DATA(room)) {
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE && SHARED_DATA(room) && SHARED_DATA(room) != &ocean_shared_data) {
 		free_shared_room_data(SHARED_DATA(room));
 	}
 	
