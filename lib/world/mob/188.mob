@@ -1,0 +1,225 @@
+#18800
+spirit restless~
+a restless spirit~
+A restless spirit haunts this place.
+~
+0 0 bdho cnG
+2 0 0 15
+M
+0
+$n wails mournfully into the wind.~
+M
+0
+For an instant, you see $n's teeth as long, sharp daggers; then they vanish.~
+M
+0
+$n floats listlessly around the tomb.~
+M
+0
+$n floats listlessly around the tomb.~
+M
+0
+$n floats listlessly around the tomb.~
+S
+#18801
+centaur headless horseman man~
+the headless centaur~
+A headless horse man rears back and brandishes his sword!
+~
+25 275 bdoy 0
+1 0 12 1
+I 4 18830 12.50 1 a  # LOOT: a glowing bone shield
+I 4 18831 12.50 1 a  # LOOT: a leather batwing shield
+I 4 18832 12.50 1 a  # LOOT: the black cat's talon
+I 4 18833 12.50 1 a  # LOOT: the Tome of the Nightmare Empire
+I 4 18834 12.50 1 a  # LOOT: the Skull of Valor
+I 4 18835 12.50 1 a  # LOOT: a flaming gourd
+I 4 18836 12.50 1 a  # LOOT: an oversized candy bag
+I 4 18837 12.50 1 a  # LOOT: the headless centaur's saddle
+M
+0
+$n rears back on $s hind legs, kicking $s front legs in the air.~
+M
+0
+$n lets out a deep, toneless groan.~
+M
+0
+$n's sword glows with hellfire.~
+M
+0
+A voice in your head says, 'How dare you challenge me?'~
+M
+0
+A voice in your head says, 'You think to defeat me? Neigh!'~
+S
+#18822
+#n ghost~
+the ghost of #n~
+The ghost of #n is haunting this place.
+~
+0 0 do cmn
+0 0 27 15
+S
+#18824
+#n guard~
+guard #n~
+#n the guard is standing here.
+~
+5 125 bdouv 0
+1 0 0 1
+S
+#18826
+companion starry-eyed eyed~
+a starry-eyed companion~
+A companion stands, starry-eyed, looking around in wonder.
+~
+1 1 bdoD n
+0 0 0 15
+M
+1
+This whole kingdom seems bigger from the inside.~
+M
+1
+Imagine a very big box fitting inside a very small box.~
+M
+1
+Let me be brave. Let me be brave.~
+M
+1
+You and me, time and space. Watch us run!~
+M
+1
+Oi! Watch it!~
+M
+1
+We're running out of places to run.~
+T 9901
+T 9902
+S
+#18828
+ghost knocking~
+a knocking ghost~
+A ghost lingers in the air.
+~
+25 75 dov de
+0 0 27 28
+M
+0
+You hear a strange knocking sound.~
+M
+0
+Something is knocking in the distance.~
+M
+0
+You nearly jump out of your boots as you hear a knocking sound behind you.~
+S
+#18829
+ghost rattling~
+a rattling ghost~
+A ghost lingers in the air.
+~
+25 75 dov de
+0 0 27 28
+M
+0
+You hear a strange rattle from behind.~
+M
+0
+A sharp rattling noise pierces your ears.~
+M
+0
+The rattling of bones fills the air.~
+S
+#18830
+hand skittering disembodied~
+a skittering hand~
+A disembodied hand skitters across the floor.
+~
+25 75 dov 0
+0 0 8 15
+S
+#18839
+horse headless~
+a headless horse~
+A headless horse neighs silently in the breeze.
+~
+10 100 dej 0
+0 0 14 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+M
+0
+$n neighs silently.~
+S
+#18840
+nightmare pitch-black black~
+a nightmare~
+A pitch-black nightmare gallops across the sky.
+~
+100 150 bdej m
+0 0 12 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+S
+#18841
+ghoul little~
+a little ghoul~
+A little ghoul scampers around, spreading mischief.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+$n gasps and vanishes!~
+M
+0
+You notice $n has tied your bootlaces together.~
+M
+0
+$n fades in and out as $e runs in circles around you.~
+M
+0
+$n throws a bog roll over your head.~
+M
+0
+$n bangs a spoon against a pan.~
+M
+0
+$n digs around, as if $e's looking for something.~
+T 9901
+T 9902
+S
+#18842
+goblin mischievous~
+a mischievous goblin~
+A mischievous goblin is lurking around.
+~
+25 75 dovz 0
+0 0 9 9
+S
+#18843
+vampire skulking~
+a skulking vampire~
+A vampire is skulking in the shadows.
+~
+25 75 dovwz 0
+0 0 7 9
+T 9064
+S
+#18844
+ghost~
+a ghost~
+A ghost hangs in the air like a sheet.
+~
+25 75 dhozD v
+0 0 27 16
+S
+#18845
+half-spider spider man half-man strange creature~
+a half-spider~
+A strange creature, half-spider, half-man, stands here.
+~
+25 75 dovz v
+0 0 9 9
+S
+$
