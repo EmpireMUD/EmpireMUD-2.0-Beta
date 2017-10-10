@@ -542,7 +542,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINKF_CLAIMED_OK  BIT(0)	// can spawn on claimed territory
 #define ADV_LINKF_CITY_ONLY  BIT(1)	// only spawns on claimed land in cities
 #define ADV_LINKF_NO_CITY  BIT(2)	// won't spawn on claimed land in cities
-#define ADV_LINKF_CLAIMED_ONLY  BIT(2)	// ONLY spawns on claimed tiles
+#define ADV_LINKF_CLAIMED_ONLY  BIT(3)	// ONLY spawns on claimed tiles
 
 
 // ADV_SPAWN_x: adventure spawn types

@@ -1,4 +1,4 @@
-"LIST OF ADVENTURES THAT DON'T HAVE HELP FILES"
+"BIG LIST OF ADVENTURES THAT DON'T HAVE HELP FILES"
 [   50] Tutorial: Royal Planning Office
 [   51] Tutorial: Museum of Early Man
 [   52] Tutorial Quests
@@ -92,6 +92,28 @@ Other:
   Minipet: baby ostrich
   Mounts: lithe ostrich, trumpeter swan, tawny roc
   Vehicle: Clockwork Roc (roc-stone gear)
+#
+HALLOWEEN CANDY "HALLOWEEN CANDY" "RESTLESS SPIRIT"
+
+The Halloween game content is available during the month of October and offers
+daily quests to earn fun rewards. Each quest requires that you have achieved
+level 50 in its skill, and quests are available for several different skills.
+
+You can start all the quests from halloween candy items that you find by
+killing mobs anywhere in the world. Sacrifice any piece of candy at an enclosed
+'tomb' building to summon the restless spirit.
+
+The restless spirit sells:
+  a ghoul whistle  (6 trick tokens) - a mini-pet
+  a headless horse whistle  (6 trick tokens) - a mount
+  a nightmare whistle  (18 trick tokens) - a flying mount
+  some candy seeds  (12 trick tokens) - plants a crop
+  a costume kit  (12 trick tokens) - allows you to sew costumes
+  a mausoleum cornerstone  (18 trick tokens) - a large tomb building
+  a haunted mask  (18 trick tokens) - new morphs (some require skills)
+
+Game admins: You must enable global 18802 by removing its IN-DEV flag to turn
+on the Halloween candy drops, and disable that global when the holiday is over.
 #
 PERMAFROST "MAGITERRANEAN: PERMAFROST" "MAGITERRANEAN PERMAFROST"
 

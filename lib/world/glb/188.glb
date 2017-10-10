@@ -1,0 +1,18 @@
+#18802
+Halloween Candy drop~
+0 a 0 0 0-0
+E
+-1 50.00
+0 0 0
+I 4 18802 10.00 1 a  # LOOT: a jammy dodger
+I 4 18803 10.00 1 a  # LOOT: some candy bonkers
+I 4 18804 10.00 1 a  # LOOT: a handful of smarties
+I 4 18805 10.00 1 a  # LOOT: a full-size candy bar
+I 4 18806 10.00 1 a  # LOOT: some stolen candy
+I 4 18807 10.00 1 a  # LOOT: some pixy sticks
+I 4 18808 10.00 1 a  # LOOT: sour demon heads
+I 4 18809 10.00 1 a  # LOOT: some everlasting goblin stoppers
+I 4 18810 10.00 1 a  # LOOT: a manatomic fireball candy
+I 4 18811 10.00 1 a  # LOOT: some necro wafers
+S
+$

@@ -1,0 +1,789 @@
+#18800
+grave empty~
+an empty grave~
+A grave lies empty here.~
+~
+3 0 0 1
+0 0 0
+1 24
+S
+#18801
+lantern turnip~
+a turnip lantern~
+A turnip lantern is sitting here.~
+   The turnip has been carved into a lantern with a hideous face. People used
+to use these turnips to scare away evil spirits, but you're hoping to use this
+lantern to summon one.
+   Type 'use turnip <difficulty>' to summon the horse man.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 18801
+T 18801
+S
+#18802
+dodger jammy~
+a jammy dodger~
+A jammy dodger is lying in the dirt.~
+   This little treat looks to be some sort of biscuit or cookie. But it looks
+like someone might have dropped it, so it might be a bit dodgy. Sacrifice this
+candy in any enclosed tomb to summon a restless spirit and join in on the
+Halloween fun!
+~
+6 m a 9
+24 0 0
+0 72
+A
+18 1 0
+C
+1 1
+M
+4
+You savor $p but begin to feel dodgy.~
+M
+5
+$n savors $p.~
+T 18800
+S
+#18803
+candy bonkers~
+some candy bonkers~
+Some candy bonkers are on the ground.~
+   This candy sure packs a punch. Sacrifice this candy in any enclosed tomb to
+summon a restless spirit and join in on the Halloween fun!
+~
+6 m a 7
+24 0 0
+0 72
+A
+17 1 0
+C
+1 1
+M
+4
+You pop $p in your mouth.~
+M
+5
+$n pops $p in $s mouth.~
+T 18800
+S
+#18804
+smarties handfull~
+a handful of smarties~
+A handful of smarties have been scattered here.~
+   These tiny candies look like they're mostly sugar. Sacrifice this candy in
+any enclosed tomb to summon a restless spirit and join in on the Halloween fun!
+~
+6 m a 7
+24 0 0
+0 72
+A
+7 1 0
+C
+1 1
+T 18800
+S
+#18805
+candy bar fullsize full-size~
+a full-size candy bar~
+A full-size candy bar has been foolishly left behind.~
+   You're not even sure who still gives out full-size candy bars these days.
+Sacrifice this candy in any enclosed tomb to summon a restless spirit and join
+in on the Halloween fun!
+~
+6 m a 7
+24 0 0
+0 72
+A
+4 1 0
+C
+1 1
+T 18800
+S
+#18806
+candy stolen~
+some stolen candy~
+Some stolen candy has been dropped here.~
+   You've really increased your inventory by stealing candy. Sacrifice this
+candy in any enclosed tomb to summon a restless spirit and join in on the
+Halloween fun!
+~
+6 m a 7
+24 0 0
+0 72
+A
+19 1 0
+C
+1 1
+T 18800
+S
+#18807
+sticks pixy~
+some pixy sticks~
+Some pixy sticks are lying on the ground.~
+   These candies really get you moving -- they're pure sugar. Sacrifice this
+candy in any enclosed tomb to summon a restless spirit and join in on the
+Halloween fun!
+~
+6 m a 7
+24 0 0
+0 72
+A
+6 1 0
+C
+1 1
+T 18800
+S
+#18808
+heads demon sour~
+sour demon heads~
+Some sour demon heads have been scattered here.~
+   These candies resemble -- and are made from -- actual demon heads. The sour
+part is merely a coating, though. Sacrifice this candy in any enclosed tomb to
+summon a restless spirit and join in on the Halloween fun!
+~
+6 m a 7
+24 0 0
+0 72
+A
+20 1 0
+C
+1 1
+T 18800
+S
+#18809
+stoppers goblin everlasting lasting~
+some everlasting goblin stoppers~
+Some everlasting goblin stoppers are scattered on the ground.~
+   These candies look quite tough to chew, and large enough to choke a goblin.
+Sacrifice this candy in any enclosed tomb to summon a restless spirit and join
+in on the Halloween fun!
+~
+6 m a 9
+24 0 0
+0 72
+A
+21 1 0
+C
+1 1
+T 18800
+S
+#18810
+candy fireball ball manatomic atomic~
+a manatomic fireball candy~
+A manatomic fireball candy is hovering here.~
+   This candy is bright red and ready to explode! Sacrifice this candy in any
+enclosed tomb to summon a restless spirit and join in on the Halloween fun!
+~
+6 m a 9
+24 0 0
+0 72
+A
+22 1 0
+C
+1 1
+M
+5
+Smoke comes out of $n's ears as $e eats a manatomic fireball.~
+M
+4
+You feel as if smoke comes out of your ears as you eat $p.~
+T 18800
+S
+#18811
+wafers necro~
+some necro wafers~
+Some necro wafers are rotting on the ground.~
+   These thin, chalky candies are bad enough to raise the dead. Sacrifice this
+candy in any enclosed tomb to summon a restless spirit and join in on the
+Halloween fun!
+~
+6 m a 10
+24 0 0
+0 72
+A
+23 1 0
+C
+1 1
+T 18800
+T 18800
+S
+#18812
+costume ghost~
+a ghost costume~
+A ghost costume has been hanged here.~
+It's really just a sheet with two holes in it.
+~
+2 mo ad 3
+0 0 0
+0 0
+A
+5 1 3
+C
+0 1
+M
+12
+The ghost of $n hovers before you.~
+S
+#18813
+costume pirate~
+a pirate costume~
+A pirate costume is half-buried here.~
+   It's got a peg leg, a hook hand, an eyepatch, and a piece of fruit that
+almost looks like a parrot.
+~
+2 mo ad 4
+0 0 0
+0 0
+A
+5 1 3
+C
+0 1
+M
+12
+$n hobbles around on a peg leg.~
+S
+#18814
+costume princess~
+a princess costume~
+A princess costume is draped elegantly before you.~
+A dress with stitches this fine could only have been made by mice.
+~
+2 mo ad 4
+0 0 0
+0 0
+A
+5 1 3
+C
+0 1
+M
+12
+Princess $n smiles and waves at you.~
+S
+#18815
+costume witch~
+a witch costume~
+A witch costume sits in a puddle of water.~
+The pointed hat and fake wart really complete the costume.
+~
+2 mo ad 4
+0 0 0
+0 0
+A
+5 1 3
+C
+0 1
+M
+12
+$n waves $s broom at you and cackles maniacally!~
+S
+#18816
+costume skeleton~
+a skeleton costume~
+A skeleton costume is piled on the ground.~
+It's really just a bunch of bones and some string.
+~
+2 mo ad 4
+0 0 0
+0 0
+A
+5 1 3
+C
+0 1
+M
+12
+The skeleton of $n is rattling around the area.~
+S
+#18817
+costume wizard~
+a wizard costume~
+A wizard costume is sweeping up the floor.~
+   This wizard robe is actually quite comfortable, and seems to appreciate that
+you think so.
+~
+2 mo ad 4
+0 0 0
+0 0
+A
+5 1 3
+C
+0 1
+M
+12
+The wizard $n stands magnificently before you.~
+S
+#18818
+kit costumes~
+a costume kit~
+A costume kit is lying here.~
+   This kit contains patterns to make six different costumes (ghost, pirate,
+princess, witch, skeleton, and wizard). You can type 'learn costumes' to learn
+them all, but you'll need the Sew ability to make them.
+~
+3 p a 2
+0 0 0
+0 0
+T 18818
+S
+#18819
+trunk costume~
+a costume trunk~
+A costume trunk is sitting here.~
+   This trunk is filled with odds and ends to quickly put together a good
+costume. Type 'costume <citizen>' to put a costume onto a friendly citizen.
+~
+3 ep a 4
+18812 0 0
+0 0
+T 18819
+S
+#18820
+trunk costume empty~
+an empty costume trunk~
+An empty costume trunk is sitting here.~
+   You have received an empty costume trunk. Patterns for a set of Halloween
+costumes are etched into the sides of the trunk. Type 'sew halloweed costume
+trunk' to make the costumes you'll need to complete the quest.
+~
+3 e a 1
+0 0 0
+0 0
+Q 18819
+S
+#18821
+wand warty~
+a warty wand~
+A warty wand is here.~
+   This warty old wand is dripping with mucus and smells of 'old swamp'. The
+side is etched with the words 'polymorph <citizen>' -- you spend a moment
+wondering what that does.
+~
+3 0 a 3
+4 0 0
+0 0
+Q 18821
+T 18821
+S
+#18822
+veil~
+the veil between the worlds~
+The veil between this world and the next has been shattered!~
+As you peer through the veil, a howling demon chases you back!
+~
+3 0 0 3
+0 0 0
+10 48
+T 18822
+S
+#18823
+notes spirit ritual~
+the spirit ritual notes~
+The spirit ritual notes are here.~
+   These notes describe a powerful ritual that rends the veil between worlds,
+and brings spirits into the realm of the living. You must merely find a city
+center and type 'rite spirits'.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 18823
+T 18823
+S
+#18824
+bogroll bog roll~
+a bog roll~
+A bog roll is here.~
+   This roll of soft paper has many uses -- too many to list here. But tonight,
+its most important use is for decoration. Visit three houses in your city and
+type 'use roll' to redecorate them.
+~
+3 0 a 3
+3 0 0
+0 0
+Q 18824
+T 18824
+S
+#18825
+paper remnants white strands~
+some paper remnants~
+The house is decked in long strands of white paper.~
+This looks like someone has thrown a bog roll over the house, repeatedly!
+~
+3 0 0 2
+0 0 0
+0 144
+S
+#18826
+whistle psychic~
+a psychic whistle~
+A whistle that's slightly psychic has been left here.~
+This whistle can summon a noncombat companion!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+18826 0 0
+2 0
+T 9900
+S
+#18827
+mirror draculas dracula's~
+Dracula's mirror~
+Dracula's mirror is lying on the ground.~
+   This mirror is so cursed that you dare not look into it. It is said to have
+the power to reflect Dracula himself, although you're certain he's just a myth.
+Regardless of whether or not he is real, you have the power to type 'morph
+Dracula' while this mirror is in your possession.
+~
+3 0 a 2
+0 0 0
+8 0
+T 18827
+S
+#18828
+manor unearthly deed~
+the deed to an unearthly manor~
+The deed to an unearthly manor is here.~
+This deed allows you to build the 'unearthlymanor' house.
+~
+3 g a 3
+0 0 0
+0 0
+Q 18828
+S
+#18830
+shield bone glowing~
+a glowing bone shield~
+A glowing bone shield is resting on the ground.~
+   The shield is made from real bones, only loosely bound together by gold
+filaments. The entire thing emits a strange orange glow, barely visible in
+daylight but overpowering at night.
+~
+23 emp ao 1
+0 0 0
+14 0
+A
+2 1 0
+A
+13 4 0
+A
+18 4 0
+C
+0 275
+S
+#18831
+shield batwing wing leather~
+a leather batwing shield~
+A batwing shield is lying here.~
+   The shield is made from bat leather, layered and tempered and tanned until
+it is somehow strong enough to repel a mace. The whole shield has been crafted
+into the shape of a single large bat wing, and gives a faint violet glow in the
+dark.
+~
+23 emp ao 2
+0 0 0
+7 0
+A
+2 1 0
+A
+13 3 0
+A
+17 3 0
+C
+0 275
+S
+#18832
+talon cats cat's black~
+the black cat's talon~
+The black cat's talon is lying in the dirt.~
+   This claw appears to have come from a gigantic cat, or perhaps has grown
+larger with magic. Leather wrapped around the top forms a sort of handle, and
+the talon has been hardened with some black metal that glows red in faint
+light.
+~
+1 mp ao 4
+0 3 4
+14 0
+A
+1 1 0
+A
+21 3 0
+A
+2 1 0
+A
+9 1 0
+C
+0 275
+S
+#18833
+tome nightmare empire~
+the Tome of the Nightmare Empire~
+The Tome of the Nightmare Empire is hidden in the corner.~
+   This ancient tome, bound in human skin and sinew, pulsates with dark and
+arcane magic. In bright light, the book emits a black glow as it devours stray
+beams of light and leaves only nightmares in their place.
+~
+3 emp ao 5
+0 0 0
+14 0
+A
+8 1 0
+A
+22 4 0
+A
+2 1 0
+A
+9 1 0
+C
+0 275
+S
+#18834
+skull valor~
+the Skull of Valor~
+The Skull of Valor hovers in the air.~
+   The skull is inhuman, with ridges and crests, and teeth sharpened to a
+point. The lower jaw is missing, and the flesh is long gone. But the faint red
+glow that pulses from the skull gives you the feeling that you could kill
+anyone.
+~
+3 mp ao 6
+0 0 0
+14 0
+A
+2 1 0
+A
+17 6 0
+C
+0 275
+S
+#18835
+gourd flaming~
+a flaming gourd~
+A flaming gourd burns brightly on the ground.~
+   This old pumpkin has been carved to look like a demon, with a ball of
+wildfire placed in its mouth. It emits a pale yellow light, clearly visible in
+darkness, though it casts no light on the room.
+~
+3 emp ao 7
+0 0 0
+7 0
+A
+8 1 0
+A
+7 3 0
+A
+23 4 0
+C
+0 275
+S
+#18836
+bag candy oversized sized~
+an oversized candy bag~
+An oversized candy bag has been dropped here.~
+   This bag is stitched to look like a jack-o-lantern and looks like it could
+hold enough candy to last the winter. If only you could enchant it to hold even
+more...
+~
+24 emp ar 3
+1 0 0
+11 0
+C
+0 275
+S
+#18837
+saddle headless centaurs centaur's~
+the headless centaur's saddle~
+The headless centaur's saddle is lying here.~
+   The saddle is forged from black steel and tempered in blood such that it
+bleeds every time it rides into battle. It is said this saddle was once used to
+ride a headless centaur in the Great War.
+~
+2 emp as 2
+0 0 0
+2 0
+A
+11 5 0
+A
+6 1 0
+C
+0 275
+S
+#18839
+whistle headless horse~
+a headless horse whistle~
+A headless horse whistle is lying here.~
+This whistle will summon an eerie new mount.
+~
+3 p a 5
+18839 0 0
+14 0
+T 10263
+S
+#18840
+whistle nightmare~
+a nightmare whistle~
+A nightmare whistle dangles in the air.~
+This whistle will summon an eerie flying mount.
+~
+3 p a 6
+18840 0 0
+14 0
+T 10263
+S
+#18841
+whistle ghoul~
+a ghoul whistle~
+A ghoul whistle has been dropped here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+18841 0 0
+2 0
+T 9900
+S
+#18842
+apples candy tray~
+a tray of candy apples~
+A tray of candy apples is sitting on the ground.~
+   The apples are coated in a sweet, sticky caramel that makes them almost
+irresistible. Through some strange magic, the apples actually grow this way on
+the tree. Perhaps some clever mage has cross-bred them with caramels.
+~
+6 b a 6
+36 18842 0
+7 168
+O
+9 bgq
+R
+5114 0
+S
+#18843
+caramel piece~
+a piece of caramel~
+A piece of caramel is stuck to the ground.~
+   This little piece of fresh caramel has a stem stuck in it. Perhaps it grew
+on a tree.
+~
+6 0 a 5
+2 0 0
+7 48
+S
+#18844
+cornerstone stone mausoleum~
+a mausoleum cornerstone~
+A mausoleum cornerstone is lying here.~
+   This magnificent marble cornerstone allows you to build a 'mausoleum', a
+large tomb with multiple rooms.
+~
+3 eg a 1
+0 0 0
+1 0
+S
+#18845
+tree dead spooky~
+a dead tree~
+A spooky dead tree is laying here.~
+   This tree looks like it has been dead for some time, but you can probably
+still get some good lumber out of it.
+~
+3 e a 4
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 17 125 100.00 2  # SAW: a stack of lumber
+R
+5118 0
+S
+#18846
+seeds candy~
+some candy seeds~
+Some candy seeds are scattered here.~
+Who knows what you'd get if you planted these?
+~
+3 b a 1
+0 18842 0
+0 0
+S
+#18847
+mask haunted~
+a haunted mask~
+A haunted mask is lying here.~
+   This strange mask is carved from wood and stained pitch black. It enhances
+your existing morph abilities to grant you new forms. You can use the following
+forms, if you have the right skills:
+ goblin (no skill)
+ vampire bat (Bat Form)
+ rabid wolf (Wolf Form)
+ giant scorpion (Animal Forms, desert)
+ badger (Animal Forms, temperate)
+ giant anaconda (Animal Forms, jungle)
+
+You must take off the mask to use these morphs.
+~
+2 p ae 3
+0 0 0
+0 0
+A
+5 1 0
+S
+#18849
+dead spirits~
+the spirits of the dead~
+The spirits of the dead are appeased.~
+You must seek out a different tomb to make the rest of your sacrifices.
+~
+3 0 0 1
+0 0 0
+10 48
+S
+#18850
+instructions offering iron~
+the iron offering instructions~
+The iron offering instructions are lying here.~
+Take 10x iron ingots to 'offer' at 5 different tombs to complete this quest.
+~
+3 0 a 4
+5 175 10
+0 0
+Q 18829
+T 18848
+S
+#18851
+instructions offering brick~
+the brick offering instructions~
+The brick offering instructions are lying here.~
+   Take 10x piles of bricks to 'offer' at 5 different tombs to complete this
+quest.
+~
+3 0 a 6
+5 257 10
+0 0
+Q 18830
+T 18848
+S
+#18852
+instructions rock offering~
+the rock offering instructions~
+The rock offering instructions are lying here.~
+Take 10x rocks to 'offer' at 5 different tombs to complete this quest.
+~
+3 0 a 8
+5 100 10
+0 0
+Q 18831
+T 18848
+S
+#18853
+instructions offering stick~
+the stick offering instructions~
+The stick offering instructions are lying here.~
+Take 10x sticks to 'offer' at 5 different tombs to complete this quest.
+~
+3 0 a 7
+5 121 10
+0 0
+Q 18832
+T 18848
+S
+$

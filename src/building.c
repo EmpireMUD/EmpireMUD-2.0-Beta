@@ -985,7 +985,7 @@ void start_dismantle_building(room_data *loc) {
 	room_data *room, *next_room;
 	char_data *targ, *next_targ;
 	craft_data *type, *up_type;
-	obj_data *obj, *next_obj;
+	obj_data *obj, *next_obj, *proto;
 	bool deleted = FALSE;
 	bld_data *up_bldg;
 	bool complete = !IS_INCOMPLETE(loc);	// store now -- this gets changed part way through
@@ -1082,6 +1082,12 @@ void start_dismantle_building(room_data *loc) {
 		if (res->type != RES_OBJECT) {
 			LL_DELETE(GET_BUILDING_RESOURCES(loc), res);
 			free(res);
+		}
+		else {	// is object -- check for single_use
+			if (!(proto = obj_proto(res->vnum)) || OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
+				LL_DELETE(GET_BUILDING_RESOURCES(loc), res);
+				free(res);
+			}
 		}
 	}
 	

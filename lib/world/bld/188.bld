@@ -1,0 +1,84 @@
+#18828
+Unearthly Manor~
+An Unearthly Manor~
+&0|==|~
+48 1 fR ademn
+9 1 0 -1
+D
+   You find yourself in a parlor covered in cobwebs, though the velvet
+furniture looks well-groomed. The hardwood floors are well worn in clear paths
+across the room. The air is a little too cold, and as you watch your breath
+condense, you think you catch the reflection of someone moving out of the
+corner of your eye.
+~
+R
+18828 2 5 0
+R
+18829 1 5 0
+R
+18830 1 5 0
+R
+18831 1 5 0
+T 18828
+S
+#18829
+Great Room~
+A Faded Great Room~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+D
+   The candles in the chandelier are mere wax drippings, serving as little more
+than a place to attach a cobweb in this aged and unused great room. Though the
+ceilings are high, dust in the air catches every stray beam of light and you
+can rarely see more than a few feet in front of your face. When you hold
+perfectly still, you can feel the floorboards twitch and tremble beneath you.
+But perhaps it's just the old house settling.
+~
+M
+18828 20.00 0
+M
+18829 20.00 0
+M
+18830 5.00 0
+S
+#18830
+Earthen Cellar~
+An Earthen Cellar~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+C
+tomb~
+D
+   The ceiling is low and you must duck to avoid the beams that hold up the
+great room above, and duck further still to avoid the spiders who stalk the
+many webs that cover those beams. But the spiders above you are of little
+concern compared to the earthen floor beneath you. The ground is lumped in the
+shape of graves, too numerous to count. The light flickers for a moment, and
+you swear you hear a groan from below.
+~
+F
+B
+S
+#18844
+Mausoleum~
+A Grand Mausoleum~
+[OO]~
+128 10 e adegimn
+8 0 0 -1
+C
+tomb~
+D
+   This grand mausoleum looks as if it has been carved from a single mountain
+of marble, from floor to pillar to ceiling. Even your heartbeat echoes through
+the polished halls as no sound goes unheard in the realm of the dead. Crypts
+line both sides of the mausoleum, so well-maintained that not even a speck of
+dust is visible on their gleaming lids.
+~
+F
+B
+R
+1002 1 5 0
+S
+$

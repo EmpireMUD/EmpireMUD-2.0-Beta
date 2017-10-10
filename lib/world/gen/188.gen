@@ -1,0 +1,95 @@
+#18800
+Halloween Trick Tokens~
+5 0
+0 0 0 0
+T0
+trick token~
+T1
+trick tokens~
+S
+#18801
+Headless Centaur combat cooldown~
+3 0
+0 0 0 0
+S
+#18803
+shockwave prance~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by the headless centaur's prance.~
+S
+#18804
+neck chop~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding from the headless centaur's neck chop.~
+S
+#18826
+psychic whistle~
+3 0
+0 0 0 0
+T0
+Your psychic whistle cooldown has ended.~
+S
+#18828
+perform exorcism~
+2 0
+0 0 0 0
+T0
+You sprinkle pure water on the floor and chant in tongues...~
+T1
+$n sprinkles pure water on the floor and chants in tongues...~
+T4
+You sprinkle pure water on the floor and chant in tongues...~
+T5
+$n sprinkles pure water on the floor and chants in tongues...~
+S
+#18829
+perform exorcism~
+2 0
+0 0 0 0
+T0
+You fall into a trance and stare blankly into the void at the center of the manor...~
+T1
+$n falls into a trance and stares blankly at the wall...~
+T4
+You fall into a trance and stare blankly into the void at the center of the manor...~
+T5
+$n falls into a trance and stares blankly at the wall...~
+S
+#18830
+perform exorcism~
+2 0
+0 0 0 0
+T0
+The house shakes violently!~
+T1
+The house shakes violently!~
+T4
+The house shakes violently!~
+T5
+The house shakes violently!~
+S
+#18831
+perform exorcism~
+2 0
+0 0 0 0
+T0
+The house groans and settles, content to rest another year.~
+T1
+The house groans and settles, content to rest another year.~
+T4
+The house groans and settles, content to rest another year.~
+T5
+The house groans and settles, content to rest another year.~
+S
+#18841
+ghoul whistle~
+3 0
+0 0 0 0
+T0
+Your ghoul whistle cooldown has ended.~
+S
+$

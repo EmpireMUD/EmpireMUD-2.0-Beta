@@ -240,7 +240,7 @@ int Valid_Name(char *newname) {
 
 	/* Does the desired name contain a string in the invalid list? */
 	for (i = 0; i < num_invalid; i++) {
-		if (*invalid_list[i] == '%') {	// leading * means substr
+		if (*invalid_list[i] == '%') {	// leading % means substr
 			if (strstr(tempname, invalid_list[i] + 1)) {
 				return (0);
 			}
