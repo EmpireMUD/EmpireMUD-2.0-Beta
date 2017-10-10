@@ -3,17 +3,18 @@ Halloween: Kill the Headless Horse Man~
    A restless spirit appears to tell you: Rumors abound of a headless horse man
 terrorizing the countryside. He appears, commits his atrocities, then vanishes
 just as quickly. Take this turnip lantern and use it at a Cemetery building to
-summon the headless horse man and defeat him.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
+summon the headless horse man and defeat him. This quest will automatically
+complete when you defeat the horse man.
 ~
    You have defeated the headless horse man and saved the local villagers from
 his reign of terror. You have earned a trick token, which you can use to buy
 gifts from the restless spirit.
 ~
-7 e 0 0 -1
+10 e 0 0 -1
 A
 2 18803
+A
+2 18811
 P
 9 0 0 50
 R
@@ -27,14 +28,16 @@ W
 3 18801 0 1 a
 Z
 1 18800
+Z
+2 18800
 S
 #18819
 Halloween: Costume the Town~
    A restless spirit appears to tell you: It seems your city has become rather
 droll, and this is hardly the season for droll. Take this empty trunk and use
 the sewing pattern on the side to sew the 'Halloween costume trunk'. Once
-you've made the costumes, 'use' the trunk on 6 of your citizens to deck them
-out in festive costumes.
+you've made the costumes, type 'costume <citizen>' to use the trunk on 6 of
+your citizens and deck them out in festive costumes.
    Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
 restless spirit, where you can turn in this quest and buy rewards.
 ~
@@ -42,9 +45,11 @@ restless spirit, where you can turn in this quest and buy rewards.
 have earned a trick token, which you can use to buy gifts from the restless
 spirit.
 ~
-9 de 0 0 -1
+11 de 0 0 -1
 A
 2 18806
+A
+2 18811
 P
 9 6 0 50
 R
@@ -72,9 +77,11 @@ restless spirit, where you can turn in this quest and buy rewards.
 think of the holiday joy you've brought to your city. You have earned a trick
 token, which you can use to buy gifts from the restless spirit.
 ~
-7 e 0 0 -1
+8 e 0 0 -1
 A
 2 18810
+A
+2 18805
 P
 9 3 0 50
 R
@@ -101,9 +108,11 @@ restless spirit, where you can turn in this quest and buy rewards.
    Now everyone seems to be getting into the 'spirit' of the holiday! You have
 earned a trick token, which you can use to buy gifts from the restless spirit.
 ~
-6 e 0 0 -1
+7 e 0 0 -1
 A
 2 18804
+A
+2 18809
 P
 9 2 0 50
 R
@@ -128,9 +137,11 @@ restless spirit, where you can turn in this quest and buy rewards.
 spirit! You have earned a trick token, which you can use to buy gifts from the
 restless spirit.
 ~
-6 e 0 0 -1
+7 e 0 0 -1
 A
 2 18805
+A
+2 18802
 P
 9 4 0 50
 R
@@ -158,9 +169,11 @@ restless spirit, where you can turn in this quest and buy rewards.
    The citizens' hearts are definitely pumping now. You have earned a trick
 token, which you can use to buy gifts from the restless spirit.
 ~
-6 e 0 0 -1
+7 e 0 0 -1
 A
 2 18808
+A
+2 18806
 P
 9 7 0 50
 R
@@ -210,9 +223,11 @@ restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-3 e 0 0 -1
+4 e 0 0 -1
 A
 2 18807
+A
+2 18803
 D 18829
 P
 0 18828 0 1 a
@@ -239,9 +254,11 @@ restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-4 e 0 0 -1
+5 e 0 0 -1
 A
 2 18807
+A
+2 18803
 D 18829
 P
 0 18828 0 1 a
@@ -268,9 +285,11 @@ restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-4 e 0 0 -1
+5 e 0 0 -1
 A
 2 18807
+A
+2 18803
 D 18829
 P
 0 18828 0 1 a
@@ -297,9 +316,11 @@ restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-5 e 0 0 -1
+6 e 0 0 -1
 A
 2 18807
+A
+2 18803
 D 18829
 P
 0 18828 0 1 a

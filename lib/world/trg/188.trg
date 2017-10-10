@@ -122,7 +122,7 @@ while %cycles_left% >= 0
   end
   eval cycles_left %cycles_left% - 1
 done
-%load% mob 18801 %actor.level%
+%load% mob 18801
 %load% obj 18800 room
 eval mob %room.people%
 if %mob.vnum% != 18801
@@ -165,6 +165,133 @@ if %object.vnum% == 18802
 else
   %send% %actor% %self.name% politely declines your gift.
   return 0
+end
+~
+#18803
+Headless Centaur: Prance~
+0 k 33
+~
+if %self.cooldown(18801)%
+  halt
+end
+nop %self.set_cooldown(18801, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+%echo% %self.name% rears up and prances!
+wait 2 sec
+if %heroic_mode%
+  %echo% &r%self.name% slams %self.hisher% hooves down on the ground, creating a shockwave!
+  eval room %self.room%
+  eval person %room.people%
+  while %person%
+    eval check %%person.is_enemy(%self%)%%
+    if %check%
+      dg_affect #18803 %person% STUNNED on 5
+      %damage% %person% 50
+    end
+    eval person %person.next_in_room%
+  done
+else
+  %send% %actor% &r%self.name%'s hooves crash down on you!
+  %echoaround% %actor% %self.name%'s hooves crash down on %actor.name%!
+  %damage% %actor% 100
+end
+~
+#18804
+Headless Centaur: Neck Chop~
+0 k 50
+~
+if %self.cooldown(18801)%
+  halt
+end
+nop %self.set_cooldown(18801, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+if %heroic_mode%
+  %echo% &r%self.name% swings %self.hisher% sword in a wide arc at neck level, causing bleeding wounds!
+  %aoe% 100 physical
+  while %person%
+    eval check %%person.is_enemy(%self%)%%
+    if %check%
+      %dot% #18804 %person% 100 30 physical
+      %damage% %person% 50 physical
+    end
+    eval person %person.next_in_room%
+  done
+else
+  %send% %actor% &r%self.name% swings %self.hisher% sword, slashing at your neck and opening a bleeding wound!
+  %echoaround% %actor% %self.name% swings %self.hisher% sword, slashing at %actor.name%'s neck and opening a bleeding wound!
+  %damage% %actor% 150 physical
+  %dot% #18804 %actor% 75 30 physical
+end
+~
+#18805
+Headless Centaur: Attack-O-Lantern~
+0 k 100
+~
+if %self.cooldown(18801)%
+  halt
+end
+nop %self.set_cooldown(18801, 30)%
+eval heroic_mode %self.mob_flagged(GROUP)%
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.vnum% == 18805
+    eval lantern %person%
+  end
+  eval person %person.next_in_room%
+done
+if %lantern%
+  %echo% %self.name% urges %lantern.name% to attack faster!
+  dg_affect %lantern% HASTE on 30
+else
+  %load% mob 18805 ally
+  eval summon %room.people%
+  if %summon.vnum% == 18805
+    %echo% %self.name% thrusts %self.hisher% sword into the sky!
+    %echo% %summon.name% appears in a flash of blue fire!
+    %force% %summon% %aggro% %actor%
+  end
+end
+~
+#18806
+Headless Centaur death~
+0 f 100
+~
+eval room %self.room%
+eval person %room.people%
+set loot 0
+while %person%
+  if %person.is_pc%
+    if %person.on_quest(18801)%
+      %quest% %person% finish 18801
+      set loot 1
+    end
+  elseif %person.vnum% == 18805
+    %purge% %person% $n vanishes in a flash of blue fire!
+  end
+  eval person %person.next_in_room%
+done
+if !%loot%
+  nop %self.add_mob_flag(!LOOT)%
+end
+~
+#18807
+attack-o-lantern aoe~
+0 k 100
+~
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.vnum% == 18801
+    eval heroic_mode %person.mob_flagged(GROUP)%
+  end
+  eval person %person.next_in_room%
+done
+%echo% &rBeams of magical energy fly from %self.name%'s eyes!
+if !%heroic_mode%
+  %aoe% 25 magical
+else
+  %aoe% 50 magical
 end
 ~
 #18818
@@ -251,7 +378,7 @@ Halloween event quest items~
 2 u 0
 ~
 switch %questvnum%
-  case 18820
+  case 18819
     * trunk
     %load% obj 18820 %actor% inv
   break

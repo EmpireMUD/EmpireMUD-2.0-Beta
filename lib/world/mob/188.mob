@@ -1,7 +1,7 @@
 #18800
 spirit restless~
 a restless spirit~
-A restless spirit haunts this place.
+A restless spirit haunts this place (list).
 ~
 0 0 bdho cnG
 2 0 0 15
@@ -26,7 +26,7 @@ centaur headless horseman man~
 the headless centaur~
 A headless horse man rears back and brandishes his sword!
 ~
-25 275 bdoy 0
+25 275 bdoy c
 1 0 12 1
 I 4 18830 12.50 1 a  # LOOT: a glowing bone shield
 I 4 18831 12.50 1 a  # LOOT: a leather batwing shield
@@ -51,6 +51,19 @@ A voice in your head says, 'How dare you challenge me?'~
 M
 0
 A voice in your head says, 'You think to defeat me? Neigh!'~
+T 18806
+T 18803
+T 18804
+T 18805
+S
+#18805
+lantern attack-o-lantern~
+the attack-o-lantern~
+An attack-o-lantern is floating here.
+~
+25 275 bdhozD c
+0 0 27 28
+T 18807
 S
 #18822
 #n ghost~

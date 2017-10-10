@@ -14,8 +14,9 @@ A turnip lantern is sitting here.~
    The turnip has been carved into a lantern with a hideous face. People used
 to use these turnips to scare away evil spirits, but you're hoping to use this
 lantern to summon one.
+   Type 'use turnip <difficulty>' to summon the horse man.
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 0 0
 Q 18801
@@ -368,9 +369,9 @@ S
 veil~
 the veil between the worlds~
 The veil between this world and the next has been shattered!~
-As you peer through veil, a howling demon chases you back!
+As you peer through the veil, a howling demon chases you back!
 ~
-3 0 0 2
+3 0 0 3
 0 0 0
 10 48
 T 18822

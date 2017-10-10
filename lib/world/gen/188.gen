@@ -7,6 +7,25 @@ trick token~
 T1
 trick tokens~
 S
+#18801
+Headless Centaur combat cooldown~
+3 0
+0 0 0 0
+S
+#18803
+shockwave prance~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by the headless centaur's prance.~
+S
+#18804
+neck chop~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding from the headless centaur's neck chop.~
+S
 #18826
 psychic whistle~
 3 0
