@@ -404,6 +404,9 @@ OLC_MODULE(skilledit_flags);
 OLC_MODULE(skilledit_maxlevel);
 OLC_MODULE(skilledit_mindrop);
 OLC_MODULE(skilledit_name);
+OLC_MODULE(skilledit_showsynergies);
+OLC_MODULE(skilledit_showtree);
+OLC_MODULE(skilledit_synergy);
 OLC_MODULE(skilledit_tree);
 
 // social modules
@@ -916,7 +919,10 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", skilledit_maxlevel, OLC_SKILL, OLC_CF_EDITOR },
 	{ "mindrop", skilledit_mindrop, OLC_SKILL, OLC_CF_EDITOR },
 	{ "name", skilledit_name, OLC_SKILL, OLC_CF_EDITOR },
+	{ "synergy", skilledit_synergy, OLC_SKILL, OLC_CF_EDITOR },
 	{ "tree", skilledit_tree, OLC_SKILL, OLC_CF_EDITOR },
+	{ "showtree", skilledit_showtree, OLC_SKILL, OLC_CF_EDITOR },
+	{ "showsynergies", skilledit_showsynergies, OLC_SKILL, OLC_CF_EDITOR },
 	
 	// social commands
 	{ "charposition", socedit_charposition, OLC_SOCIAL, OLC_CF_EDITOR },
@@ -1805,6 +1811,8 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_SKILL(ch->desc) = setup_olc_skill(find_skill_by_vnum(from_vnum));
 			GET_OLC_SKILL(ch->desc)->vnum = vnum;
 			SET_BIT(GET_OLC_SKILL(ch->desc)->flags, SKILLF_IN_DEVELOPMENT);	// ensure flag
+			GET_OLC_SHOW_TREE(ch->desc) = FALSE;
+			GET_OLC_SHOW_SYNERGIES(ch->desc) = FALSE;
 			olc_show_skill(ch);
 			break;
 		}
@@ -2268,6 +2276,8 @@ OLC_MODULE(olc_edit) {
 			// this sets up either new or existing automatically
 			GET_OLC_SKILL(ch->desc) = setup_olc_skill(find_skill_by_vnum(vnum));
 			GET_OLC_SKILL(ch->desc)->vnum = vnum;
+			GET_OLC_SHOW_TREE(ch->desc) = FALSE;
+			GET_OLC_SHOW_SYNERGIES(ch->desc) = FALSE;
 			olc_show_skill(ch);
 			break;
 		}

@@ -45,6 +45,8 @@ const char *default_skill_desc = "New skill";
 
 // external consts
 extern const char *skill_flags[];
+extern const char *class_role[];
+extern const char *class_role_color[];
 
 // eternal functions
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
@@ -58,6 +60,7 @@ void clear_char_abilities(char_data *ch, any_vnum skill);
 struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil);
 int get_ability_points_available(any_vnum skill, int level);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
+void get_skill_synergy_display(struct synergy_ability *list, char *save_buffer, char_data *info_ch);
 bool green_skill_deadend(char_data *ch, any_vnum skill);
 void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
@@ -2609,6 +2612,26 @@ int sort_skills_by_data(skill_data *a, skill_data *b) {
 }
 
 
+/**
+* Sorts skill synergies by role/skill/level.
+*
+* @param struct synergy_ability *a First element.
+* @param struct synergy_ability *b Second element.
+* @return int sort code
+*/
+int sort_synergies(struct synergy_ability *a, struct synergy_ability *b) {
+	if (a->role != b->role) {
+		return (a->role - b->role);
+	}
+	else if (a->skill != b->skill) {
+		return (a->skill - b->skill);
+	}
+	else {
+		return (b->level - a->level);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DATABASE ////////////////////////////////////////////////////////////////
 
@@ -2732,8 +2755,9 @@ void free_skill(skill_data *skill) {
 void parse_skill(FILE *fl, any_vnum vnum) {
 	char line[256], error[256], str_in[256];
 	struct skill_ability *skabil;
+	struct synergy_ability *syn;
 	skill_data *skill, *find;
-	int int_in[4];
+	int int_in[5];
 	
 	CREATE(skill, skill_data, 1);
 	clear_skill(skill);
@@ -2795,6 +2819,23 @@ void parse_skill(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case 'Y': {	// synergies
+				if (sscanf(line, "Y %d %d %d %d %d\n", &int_in[0], &int_in[1], &int_in[2], &int_in[3], &int_in[4]) != 5) {
+					log("SYSERR: Format error in Y line of %s", error);
+					exit(1);
+				}
+				
+				CREATE(syn, struct synergy_ability, 1);
+				syn->role = int_in[0];
+				syn->skill = int_in[1];
+				syn->level = int_in[2];
+				syn->ability = int_in[3];
+				syn->unused = int_in[4];
+				
+				LL_APPEND(SKILL_SYNERGIES(skill), syn);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -2835,6 +2876,7 @@ void write_skill_index(FILE *fl) {
 * @param skill_data *skill The thing to save.
 */
 void write_skill_to_file(FILE *fl, skill_data *skill) {
+	struct synergy_ability *syn;
 	struct skill_ability *iter;
 	
 	if (!fl || !skill) {
@@ -2859,6 +2901,11 @@ void write_skill_to_file(FILE *fl, skill_data *skill) {
 	
 	// L: additional level data
 	fprintf(fl, "L %d %d\n", SKILL_MAX_LEVEL(skill), SKILL_MIN_DROP_LEVEL(skill));
+	
+	// Y: synergies
+	LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+		fprintf(fl, "Y %d %d %d %d %d\n", syn->role, syn->skill, syn->level, syn->ability, syn->unused);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -3355,6 +3402,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 */
 void do_stat_skill(char_data *ch, skill_data *skill) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct synergy_ability *syn;
 	struct skill_ability *skab;
 	size_t size;
 	int total;
@@ -3379,6 +3427,13 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 	if (*part) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
 	}
+
+	LL_COUNT(SKILL_SYNERGIES(skill), syn, total);
+	size += snprintf(buf + size, sizeof(buf) - size, "Synergy abilities: (%d total)\r\n", total);
+	get_skill_synergy_display(SKILL_SYNERGIES(skill), part, NULL);
+	if (*part) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -3393,6 +3448,7 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 void olc_show_skill(char_data *ch) {
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct synergy_ability *syn;
 	struct skill_ability *skab;
 	int total;
 	
@@ -3414,13 +3470,57 @@ void olc_show_skill(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%smindrop\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MIN_DROP_LEVEL(skill), 0), SKILL_MIN_DROP_LEVEL(skill));
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
-	sprintf(buf + strlen(buf), "<%stree\t0> %d %s\r\n", OLC_LABEL_PTR(SKILL_ABILITIES(skill)), total, total == 1 ? "ability" : "abilities");
-	get_skill_ability_display(SKILL_ABILITIES(skill), lbuf, sizeof(lbuf));
-	if (*lbuf) {
-		sprintf(buf + strlen(buf), "%s", lbuf);
+	sprintf(buf + strlen(buf), "<%stree\t0> %d %s (.showtree to toggle display)\r\n", OLC_LABEL_PTR(SKILL_ABILITIES(skill)), total, total == 1 ? "ability" : "abilities");
+	if (GET_OLC_SHOW_TREE(ch->desc)) {
+		get_skill_ability_display(SKILL_ABILITIES(skill), lbuf, sizeof(lbuf));
+		if (*lbuf) {
+			sprintf(buf + strlen(buf), "%s", lbuf);
+		}
+	}
+	
+	LL_COUNT(SKILL_SYNERGIES(skill), syn, total);
+	sprintf(buf + strlen(buf), "<%ssynergy\t0> %d %s (.showsynergies to toggle display)\r\n", OLC_LABEL_PTR(SKILL_SYNERGIES(skill)), total, total == 1 ? "ability" : "abilities");
+	if (GET_OLC_SHOW_SYNERGIES(ch->desc)) {
+		get_skill_synergy_display(SKILL_SYNERGIES(skill), lbuf, NULL);
+		if (*lbuf) {
+			sprintf(buf + strlen(buf), "%s", lbuf);
+		}
 	}
 	
 	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* Gets the skill synergy display for olc, stat, or other uses.
+*
+* @param struct synergy_ability *list The list of abilities to display.
+* @param char *save_buffer A buffer to store the display to.
+* @param char_data *info_ch Optional: highlights abilities this player has (or NULL).
+*/
+void get_skill_synergy_display(struct synergy_ability *list, char *save_buffer, char_data *info_ch) {
+	int count = 0, last_role = -2, last_skill = NOTHING, last_level = -1;
+	struct synergy_ability *iter;
+	ability_data *abil;
+	
+	*save_buffer = '\0';
+	
+	LL_FOREACH(list, iter) {
+		if (iter->role != last_role || iter->skill != last_skill || iter->level != last_level) {
+			sprintf(save_buffer + strlen(save_buffer), "%s %s%s\t0: %s %d: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All roles" : class_role[iter->role], get_skill_name_by_vnum(iter->skill), iter->level);
+			last_role = iter->role;
+			last_skill = iter->skill;
+			last_level = iter->level;
+			count = 0;
+		}
+		
+		if ((abil = find_ability_by_vnum(iter->ability))) {
+			sprintf(save_buffer + strlen(save_buffer), "%s%s%s\t0", (count++ > 0) ? ", " : "", (info_ch && has_ability(info_ch, iter->ability)) ? "\tg" : "", ABIL_NAME(abil));
+		}
+		else {
+			sprintf(save_buffer + strlen(save_buffer), "%s%d Unknown\t0", (count++ > 0) ? ", " : "", iter->ability);
+		}
+	}
 }
 
 
@@ -3498,6 +3598,166 @@ OLC_MODULE(skilledit_mindrop) {
 OLC_MODULE(skilledit_name) {
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
 	olc_process_string(ch, argument, "name", &SKILL_NAME(skill));
+}
+
+
+OLC_MODULE(skilledit_showsynergies) {
+	if (GET_OLC_SHOW_SYNERGIES(ch->desc)) {
+		GET_OLC_SHOW_SYNERGIES(ch->desc) = FALSE;
+	}
+	else {
+		GET_OLC_SHOW_SYNERGIES(ch->desc) = TRUE;
+	}
+	
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "Your editor will %s show the synergies.\r\n", GET_OLC_SHOW_SYNERGIES(ch->desc) ? "now" : "no longer");
+	}
+}
+
+
+OLC_MODULE(skilledit_showtree) {
+	if (GET_OLC_SHOW_TREE(ch->desc)) {
+		GET_OLC_SHOW_TREE(ch->desc) = FALSE;
+	}
+	else {
+		GET_OLC_SHOW_TREE(ch->desc) = TRUE;
+	}
+	
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "Your editor will %s show the skill tree.\r\n", GET_OLC_SHOW_TREE(ch->desc) ? "now" : "no longer");
+	}
+}
+
+
+OLC_MODULE(skilledit_synergy) {
+	skill_data *skill = GET_OLC_SKILL(ch->desc), *other;
+	char cmd_arg[MAX_INPUT_LENGTH], role_arg[MAX_INPUT_LENGTH], skl_arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH];
+	struct synergy_ability *syn, *next_syn;
+	int role = ROLE_NONE, level;
+	ability_data *abil;
+	bool all, any, all_roles;
+	
+	argument = any_one_word(argument, role_arg);
+	argument = any_one_arg(argument, cmd_arg);
+	
+	// first args
+	all_roles = !str_cmp(role_arg, "all");
+	role = all_roles ? NOTHING : search_block(role_arg, class_role, FALSE);
+	if (!all_roles && *role_arg && role == NOTHING) {
+		msg_to_char(ch, "Invalid role '%s'.\r\n", role_arg);
+		return;
+	}
+	else if (!*cmd_arg) {
+		msg_to_char(ch, "Usage: synergy <roll | all> add <skill> <level> <ability>\r\n");
+		msg_to_char(ch, "       synergy <role | all> remove <ability | all>\r\n");
+		return;
+	}
+	
+	// actual commands
+	if (is_abbrev(cmd_arg, "add")) {
+		argument = any_one_word(argument, skl_arg);
+		argument = any_one_arg(argument, lvl_arg);
+		skip_spaces(&argument);
+		strcpy(abil_arg, argument);
+		
+		if (!*skl_arg || !*lvl_arg || !*abil_arg) {
+			msg_to_char(ch, "Usage: synergy <roll | all> add <skill> <level> <ability>\r\n");
+			return;
+		}
+		else if (!(other = find_skill(skl_arg))) {
+			msg_to_char(ch, "Unknown skill '%s'.\r\n", skl_arg);
+			return;
+		}
+		else if (!(abil = find_ability(abil_arg))) {
+			msg_to_char(ch, "Unknown ability '%s'.\r\n", abil_arg);
+			return;
+		}
+		else if (ABIL_ASSIGNED_SKILL(abil)) {
+			msg_to_char(ch, "You can't assign an ability that is already assigned to a skill tree (%s).\r\n", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)));
+			return;
+		}
+		else if (!isdigit(*lvl_arg) || (level = atoi(lvl_arg)) < 1 || level > SKILL_MAX_LEVEL(other)) {
+			msg_to_char(ch, "Level must be 1-%d, '%s' given.\r\n", SKILL_MAX_LEVEL(other), lvl_arg);
+			return;
+		}
+		
+		// ensure not already on this role
+		any = FALSE;
+		LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+			if (syn->role == role && syn->ability == ABIL_VNUM(abil)) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		if (any) {
+			msg_to_char(ch, "It already has %s on the %s role.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role]);
+		}
+		else {
+			CREATE(syn, struct synergy_ability, 1);
+			syn->role = role;
+			syn->skill = SKILL_VNUM(other);
+			syn->level = level;
+			syn->ability = ABIL_VNUM(abil);
+			LL_APPEND(SKILL_SYNERGIES(skill), syn);
+			msg_to_char(ch, "You add %s to the %s role when paired with %s %d.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role], SKILL_NAME(other), level);
+		}
+		
+		// ensure sorting now
+		LL_SORT(SKILL_SYNERGIES(skill), sort_synergies);
+	}
+	else if (is_abbrev(cmd_arg, "remove")) {
+		skip_spaces(&argument);
+		strcpy(abil_arg, argument);
+		
+		if (!*abil_arg) {
+			msg_to_char(ch, "Usage: synergy <role | all> remove <ability | all>\r\n");
+			return;
+		}
+		
+		abil = find_ability(abil_arg);
+		all = !str_cmp(abil_arg, "all");
+		if (!all && !abil) {
+			msg_to_char(ch, "Invalid ability '%s'.\r\n", abil_arg);
+			return;
+		}
+		
+		any = FALSE;
+		LL_FOREACH_SAFE(SKILL_SYNERGIES(skill), syn, next_syn) {
+			if (role != NOTHING && syn->role != role) {
+				continue;
+			}
+			if (all && role == NOTHING && syn->role != role) {
+				continue;	// prevents 'trying to remove abilities from the ALL role' from removing abilities from all others
+			}
+			
+			if (all || (abil && syn->ability == ABIL_VNUM(abil))) {
+				LL_DELETE(SKILL_SYNERGIES(skill), syn);
+				free(syn);
+				any = TRUE;
+			}
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "The %s role didn't have %s.\r\n", all_roles ? "ALL" : class_role[role], all ? "any abilities" : "that ability");
+		}
+		else if (all) {
+			msg_to_char(ch, "You remove all abilities from the %s role.\r\n", all_roles ? "ALL" : class_role[role]);
+		}
+		else {
+			msg_to_char(ch, "You remove %s from the %s role.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role]);
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: synergy <roll | all> add <skill> <level> <ability>\r\n");
+		msg_to_char(ch, "       synergy <role | all> remove <ability | all>\r\n");
+	}
 }
 
 
