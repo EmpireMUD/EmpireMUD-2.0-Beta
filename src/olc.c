@@ -1811,8 +1811,6 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_SKILL(ch->desc) = setup_olc_skill(find_skill_by_vnum(from_vnum));
 			GET_OLC_SKILL(ch->desc)->vnum = vnum;
 			SET_BIT(GET_OLC_SKILL(ch->desc)->flags, SKILLF_IN_DEVELOPMENT);	// ensure flag
-			GET_OLC_SHOW_TREE(ch->desc) = FALSE;
-			GET_OLC_SHOW_SYNERGIES(ch->desc) = FALSE;
 			olc_show_skill(ch);
 			break;
 		}
@@ -2276,8 +2274,6 @@ OLC_MODULE(olc_edit) {
 			// this sets up either new or existing automatically
 			GET_OLC_SKILL(ch->desc) = setup_olc_skill(find_skill_by_vnum(vnum));
 			GET_OLC_SKILL(ch->desc)->vnum = vnum;
-			GET_OLC_SHOW_TREE(ch->desc) = FALSE;
-			GET_OLC_SHOW_SYNERGIES(ch->desc) = FALSE;
 			olc_show_skill(ch);
 			break;
 		}
