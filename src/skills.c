@@ -3694,7 +3694,7 @@ OLC_MODULE(skilledit_synergy) {
 		// ensure not already on this role
 		any = FALSE;
 		LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
-			if (syn->role == role && syn->ability == ABIL_VNUM(abil)) {
+			if (syn->role == role && syn->skill == SKILL_VNUM(other) && syn->ability == ABIL_VNUM(abil)) {
 				any = TRUE;
 				break;
 			}
