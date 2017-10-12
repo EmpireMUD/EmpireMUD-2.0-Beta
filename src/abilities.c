@@ -2014,12 +2014,17 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 void read_ability_requirements(void) {
 	struct skill_ability *iter;
 	ability_data *abil, *next_abil;
+	class_data *class, *next_class;
 	skill_data *skill, *next_skill;
+	struct synergy_ability *syn;
+	struct class_ability *clab;
 	
 	// clear existing requirements
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		ABIL_ASSIGNED_SKILL(abil) = NULL;
 		ABIL_SKILL_LEVEL(abil) = 0;
+		ABIL_IS_CLASS(abil) = FALSE;
+		ABIL_IS_SYNERGY(abil) = FALSE;
 	}
 	
 	HASH_ITER(hh, skill_table, skill, next_skill) {
@@ -2031,6 +2036,29 @@ void read_ability_requirements(void) {
 			// read assigned skill data
 			ABIL_ASSIGNED_SKILL(abil) = skill;
 			ABIL_SKILL_LEVEL(abil) = iter->level;
+		}
+		
+		LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+			if (!(abil = find_ability_by_vnum(syn->ability))) {
+				continue;
+			}
+			ABIL_IS_SYNERGY(abil) = TRUE;
+		}
+	}
+	
+	HASH_ITER(hh, class_table, class, next_class) {
+		LL_FOREACH(CLASS_ABILITIES(class), clab) {
+			if (!(abil = find_ability_by_vnum(clab->vnum))) {
+				continue;
+			}
+			ABIL_IS_CLASS(abil) = TRUE;
+		}
+	}
+	
+	// audit
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (ABIL_IS_PURCHASE(abil) && (ABIL_IS_CLASS(abil) || ABIL_IS_SYNERGY(abil))) {
+			syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: ability %d %s is set purchasable (skill tree) and class/synergy", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 }

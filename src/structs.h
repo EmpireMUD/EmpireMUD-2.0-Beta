@@ -2726,6 +2726,8 @@ struct ability_data {
 	skill_data *assigned_skill;	// skill for reverse-lookup
 	int skill_level;	// level of that skill required
 	bitvector_t types;	// summary of ABILT_ flags
+	bool is_class;	// assignment comes from a class
+	bool is_synergy;	// assignemtn comes from a synergy
 	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle

@@ -133,6 +133,9 @@
 
 // utils
 #define ABILITY_FLAGGED(abil, flag)  IS_SET(ABIL_FLAGS(abil), (flag))
+#define ABIL_IS_CLASS(abil)  ((abil)->is_class)
+#define ABIL_IS_PURCHASE(abil)  (ABIL_ASSIGNED_SKILL(abil) != NULL)
+#define ABIL_IS_SYNERGY(abil)  ((abil)->is_synergy)
 #define SAFE_ABIL_COMMAND(abil)  (ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "something")
 
 
