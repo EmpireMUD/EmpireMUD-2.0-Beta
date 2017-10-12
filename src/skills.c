@@ -2035,6 +2035,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 * Audits skills on startup. Erroring skills are set IN-DEVELOPMENT
 */
 void check_skills(void) {
+	struct synergy_ability *syn, *next_syn;
 	struct skill_ability *skab, *next_skab;
 	skill_data *skill, *next_skill;
 	bool error;
@@ -2047,6 +2048,14 @@ void check_skills(void) {
 				error = TRUE;
 				LL_DELETE(SKILL_ABILITIES(skill), skab);
 				free(skab);
+			}
+		}
+		LL_FOREACH_SAFE(SKILL_SYNERGIES(skill), syn, next_syn) {
+			if (!find_ability_by_vnum(syn->ability) || !find_skill_by_vnum(syn->skill)) {
+				log("- Skill [%d] %s has invalid synergy skill/ability %d/%d", SKILL_VNUM(skill), SKILL_NAME(skill), syn->skill, syn->ability);
+				error = TRUE;
+				LL_DELETE(SKILL_SYNERGIES(skill), syn);
+				free(syn);
 			}
 		}
 		
@@ -2465,11 +2474,12 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
-	skill_data *skill = find_skill_by_vnum(vnum);
+	skill_data *skill = find_skill_by_vnum(vnum), *sk, *next_sk;
 	archetype_data *arch, *next_arch;
 	quest_data *quest, *next_quest;
 	struct archetype_skill *arsk;
 	struct class_skill_req *clsk;
+	struct synergy_ability *syn;
 	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	int size, found;
@@ -2526,6 +2536,17 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// skills
+	HASH_ITER(hh, skill_table, sk, next_sk) {
+		LL_FOREACH(SKILL_SYNERGIES(sk), syn) {
+			if (syn->skill == vnum) {
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "SKL [%5d] %s\r\n", SKILL_VNUM(sk), SKILL_NAME(sk));
+				break;
+			}
+		}
+	}
+	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		if (size >= sizeof(buf)) {
@@ -2549,6 +2570,52 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	}
 	
 	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* Delete by vnum: synergy abilities
+*
+* @param struct synergy_ability **list Pointer to a linked list of synergies.
+* @param any_vnum vnum The vnum to delete from that list.
+* @return bool TRUE if it deleted at least one, FALSE if it wasn't in the list.
+*/
+bool remove_ability_from_synergy_abilities(struct synergy_ability **list, any_vnum abil_vnum) {
+	struct synergy_ability *iter, *next_iter;
+	bool found = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->ability == abil_vnum) {
+			LL_DELETE(*list, iter);
+			free(iter);
+			found = TRUE;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* Delete by vnum: synergy skills
+*
+* @param struct synergy_ability **list Pointer to a linked list of synergies.
+* @param any_vnum vnum The vnum to delete from that list.
+* @return bool TRUE if it deleted at least one, FALSE if it wasn't in the list.
+*/
+bool remove_skill_from_synergy_abilities(struct synergy_ability **list, any_vnum skill_vnum) {
+	struct synergy_ability *iter, *next_iter;
+	bool found = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->skill == skill_vnum) {
+			LL_DELETE(*list, iter);
+			free(iter);
+			found = TRUE;
+		}
+	}
+	
+	return found;
 }
 
 
@@ -2957,6 +3024,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	extern bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum vnum);
+	extern bool remove_skill_from_synergy_abilities(struct synergy_ability **list, any_vnum skill_vnum);
 	
 	struct player_skill_data *plsk, *next_plsk;
 	struct archetype_skill *arsk, *next_arsk;
@@ -2966,7 +3034,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	descriptor_data *desc;
-	skill_data *skill;
+	skill_data *skill, *sk, *next_sk;
 	char_data *chiter;
 	bool found;
 	
@@ -3028,6 +3096,14 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
+	// remove from other skills
+	HASH_ITER(hh, skill_table, sk, next_sk) {
+		found = remove_skill_from_synergy_abilities(&SKILL_SYNERGIES(sk), vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_SKILL, SKILL_VNUM(sk));
 		}
 	}
 	
@@ -3095,6 +3171,12 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A skill used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SKILL(desc)) {
+			found = remove_skill_from_synergy_abilities(&SKILL_SYNERGIES(GET_OLC_SKILL(desc)), vnum);
+			if (found) {
+				msg_to_desc(desc, "A synergy skill in the skill you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {

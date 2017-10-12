@@ -1580,6 +1580,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
+	struct synergy_ability *syn;
 	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	struct class_ability *clab;
@@ -1663,12 +1664,24 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	
 	// skills
 	HASH_ITER(hh, skill_table, skill, next_skill) {
+		any = FALSE;
+		
 		LL_FOREACH(SKILL_ABILITIES(skill), skab) {
 			if (skab->vnum == vnum) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SKL [%5d] %s\r\n", CLASS_VNUM(skill), CLASS_NAME(skill));
+				any = TRUE;
 				break;	// only need 1
 			}
+		}
+		LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+			if (syn->ability == vnum) {
+				any = TRUE;
+				break;	// only need 1
+			}
+		}
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SKL [%5d] %s\r\n", CLASS_VNUM(skill), CLASS_NAME(skill));
 		}
 	}
 	
@@ -2154,6 +2167,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	extern bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
 	extern bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum);
+	extern bool remove_ability_from_synergy_abilities(struct synergy_ability **list, any_vnum abil_vnum);
 	
 	struct player_ability_data *plab, *next_plab;
 	ability_data *abil, *abiter, *next_abiter;
@@ -2243,6 +2257,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	// update skills
 	HASH_ITER(hh, skill_table, skill, next_skill) {
 		found = remove_vnum_from_skill_abilities(&SKILL_ABILITIES(skill), vnum);
+		found |= remove_ability_from_synergy_abilities(&SKILL_SYNERGIES(skill), vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_SKILL, SKILL_VNUM(skill));
 		}
@@ -2325,6 +2340,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 		if (GET_OLC_SKILL(desc)) {
 			found = remove_vnum_from_skill_abilities(&SKILL_ABILITIES(GET_OLC_SKILL(desc)), vnum);
+			found |= remove_ability_from_synergy_abilities(&SKILL_SYNERGIES(GET_OLC_SKILL(desc)), vnum);
 			if (found) {
 				msg_to_desc(desc, "An ability has been deleted from the skill you're editing.\r\n");
 			}
