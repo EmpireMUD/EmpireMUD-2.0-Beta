@@ -3507,7 +3507,7 @@ void get_skill_synergy_display(struct synergy_ability *list, char *save_buffer, 
 	
 	LL_FOREACH(list, iter) {
 		if (iter->role != last_role || iter->skill != last_skill || iter->level != last_level) {
-			sprintf(save_buffer + strlen(save_buffer), "%s %s%s\t0: [%d] %s %d: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All roles" : class_role[iter->role], iter->skill, get_skill_name_by_vnum(iter->skill), iter->level);
+			sprintf(save_buffer + strlen(save_buffer), "%s %s%s: [%d] %s %d\t0: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All roles" : class_role[iter->role], iter->skill, get_skill_name_by_vnum(iter->skill), iter->level);
 			last_role = iter->role;
 			last_skill = iter->skill;
 			last_level = iter->level;
