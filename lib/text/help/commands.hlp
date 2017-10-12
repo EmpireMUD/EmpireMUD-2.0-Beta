@@ -1459,13 +1459,15 @@ Gain Roads experience when you place a road sign.
 
 See also: ROADS, WOODWORKING
 #
-ROLL
+ROLL ROLLHISTORY "ROLL HISTORY"
 
 Usage:  roll [number of dice] [size of dice]
+        rollhistory
 
 This command rolls dice for you, to determine random results. It can be used
 either in-character or out-of-character. The result will be shown to people in
-the room with you, as well as group members.
+the room with you, as well as group members. You can see recent rolls with the
+'rollhistory' command.
 
 Examples:
  > roll

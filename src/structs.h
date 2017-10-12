@@ -1662,7 +1662,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHANNEL_HISTORY_TELLS  1
 #define CHANNEL_HISTORY_SAY  2
 #define CHANNEL_HISTORY_EMPIRE  3
-#define NUM_CHANNEL_HISTORY_TYPES  4
+#define CHANNEL_HISTORY_ROLL  4
+#define NUM_CHANNEL_HISTORY_TYPES  5
 
 
 // Modes of connectedness
