@@ -194,7 +194,7 @@ If you have a saddle in your inventory, you will automatically equip it when
 you mount up. The saddle will be removed automatically when you dismount. You
 can make a simple saddle with Basic Crafts.
 
-Flying mounts require All-Terrain Riding, or Fly + Ride, or Dragonriding.
+Flying mounts require All-Terrain Riding, or Fly + Ride.
 
 Ride gains experience just from moving around while mounted, but All-Terrain
 Riding only gains experience when you cross water or mountains while mounted.
@@ -202,7 +202,7 @@ Riding only gains experience when you cross water or mountains while mounted.
 Note: The "ride" command can also be used to get onto carts and other ridable
 vehicles; this does not require any ability.
 
-See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING, MOVEMENT POINTS, STABLEMASTER
+See also: AFFECTS, BASIC CRAFTS, MOVEMENT POINTS, STABLEMASTER
 #
 MOUNTAIN "MOUNTAIN CLIMBING"
 

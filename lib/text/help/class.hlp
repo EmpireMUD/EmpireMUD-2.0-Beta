@@ -90,8 +90,6 @@ See also: CLASS, HEALER, UTILITY
 Ancient
 Vampire + Empire
 
-All: Dragonriding
-
 Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
@@ -231,7 +229,6 @@ See also: BUFF, CLASS FAMILIARS
 Duke
 Battle + Empire
 
-All: Dragonriding
 Tank: Noble Bearing
 Melee: Two-Handed Weapons
 
@@ -244,7 +241,7 @@ See also: CLASS, TANK, MELEE, UTILITY
 Elder
 Empire + Survival
 
-All: Dragonriding, Elder Crafts
+All: Elder Crafts
 
 Note: Class abilities are unfinished.
 
@@ -255,7 +252,7 @@ See also: CLASS, MELEE, UTILITY
 Exarch
 Empire + High Sorcery
 
-All: Dragonriding, Exarch Crafts
+All: Exarch Crafts
 Caster: Scour
 
 Note: Class abilities are unfinished.
@@ -281,7 +278,7 @@ See also: CLASS, TANK, HEALER
 Guildsman
 Empire + Trade
 
-All: Dragonriding, Guildsman Crafts
+All: Guildsman Crafts
 
 Note: Class abilities are unfinished.
 
@@ -329,7 +326,7 @@ See also: CLASS, CASTER
 Luminary
 Empire + Natural Magic
 
-All: Chant of Illusions, Dragonriding, Griffin (familiar),
+All: Chant of Illusions, Griffin (familiar),
    Manticore (familiar), Resurrect
 Caster: Erode
 Healer: Ancestral Healing, Fastcasting, Healing Boost
@@ -395,7 +392,7 @@ See also: CLASS, MELEE
 Powerbroker
 Empire + Stealth
 
-All: Dragonriding, Whisperstride
+All: Whisperstride
 Melee: Stagger Jab
 
 Note: Class abilities are unfinished.
