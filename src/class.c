@@ -70,6 +70,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	// helper type
 	struct assign_abil_t {
 		any_vnum vnum;	// which abil
+		ability_data *ptr;	// quick pointer
 		bool can_have;	// if the player can have it
 		UT_hash_handle hh;
 	};
@@ -107,6 +108,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		if (!aat) {
 			CREATE(aat, struct assign_abil_t, 1);
 			aat->vnum = vnum;
+			aat->ptr = abil;
 			HASH_ADD_INT(hash, vnum, aat);
 		}
 		
@@ -156,13 +158,13 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	// STEP 3: assign/remove abilities
 	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
-		if (has_ability(ch, ABIL_VNUM(abil)) && !aat->can_have) {
+		if (has_ability(ch, aat->vnum) && !aat->can_have) {
 			remove_ability(ch, abil, FALSE);
 			check_skill_sell(ch, abil);
 		}
 		// add if needed
 		if (aat->can_have) {
-			add_ability(ch, abil, FALSE);
+			add_ability(ch, aat->ptr, FALSE);
 		}
 		
 		// clean up memory
