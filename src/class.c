@@ -159,8 +159,8 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
 		if (has_ability(ch, aat->vnum) && !aat->can_have) {
-			remove_ability(ch, abil, FALSE);
-			check_skill_sell(ch, abil);
+			remove_ability(ch, aat->ptr, FALSE);
+			check_skill_sell(ch, aat->ptr);
 		}
 		// add if needed
 		if (aat->can_have) {
