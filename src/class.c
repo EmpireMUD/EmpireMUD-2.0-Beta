@@ -1639,8 +1639,9 @@ ACMD(do_role) {
 	struct player_skill_data *plsk, *next_plsk;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct synergy_ability *syn;
-	int found, iter;
 	size_t sizes[NUM_ROLES+2];
+	int found, iter;
+	bool any;
 	
 	one_argument(argument, arg);
 
@@ -1717,13 +1718,19 @@ ACMD(do_role) {
 		}
 		
 		// and show them
+		any = FALSE;
 		if (*roles[0]) {	// ALL
-			msg_to_char(ch, "All: %s\r\n", roles[0]);
+			msg_to_char(ch, " All: %s\r\n", roles[0]);
+			any = TRUE;
 		}
 		for (iter = 1; iter < NUM_ROLES+2; ++iter) {
 			if (*roles[iter]) {
 				msg_to_char(ch, " %s%s\t0: %s\r\n", class_role_color[iter-1], class_role[iter-1], roles[iter]);
+				any = TRUE;
 			}
+		}
+		if (!any) {
+			msg_to_char(ch, " none\r\n");
 		}
 	}
 }
