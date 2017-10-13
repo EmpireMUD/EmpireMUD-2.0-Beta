@@ -2452,7 +2452,7 @@ SHOW(show_skills) {
 		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
 			continue;
 		}
-		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {
+		if (ABIL_IS_PURCHASE(abil)) {
 			continue;	// only looking for non-skill abilities
 		}
 

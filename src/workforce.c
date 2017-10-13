@@ -888,8 +888,8 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_milling) {
 	}
 	// won't mill things that require classes or high skill
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
-		if (!ABIL_ASSIGNED_SKILL(abil)) {
-			return FALSE;	// class ability
+		if (!ABIL_IS_PURCHASE(abil)) {
+			return FALSE;	// only works on purchasable (normal) abilities
 		}
 		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
 			return FALSE;	// level too high
@@ -917,8 +917,8 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_pressing) {
 	}
 	// won't press things that require classes or high skill
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
-		if (!ABIL_ASSIGNED_SKILL(abil)) {
-			return FALSE;	// class ability
+		if (!ABIL_IS_PURCHASE(abil)) {
+			return FALSE;	// only purchasable (normal) abilities
 		}
 		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
 			return FALSE;	// level too high
@@ -946,8 +946,8 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_smelting) {
 	}
 	// won't smelt things that require classes or high skill
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
-		if (!ABIL_ASSIGNED_SKILL(abil)) {
-			return FALSE;	// class ability
+		if (!ABIL_IS_PURCHASE(abil)) {
+			return FALSE;	// only purchasable (normal) abilities
 		}
 		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
 			return FALSE;	// level too high
@@ -975,8 +975,8 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
 	}
 	// won't weave things that require classes or high skill
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
-		if (!ABIL_ASSIGNED_SKILL(abil)) {
-			return FALSE;	// class ability
+		if (!ABIL_IS_PURCHASE(abil)) {
+			return FALSE;	// only purchasable (normal) abilities
 		}
 		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
 			return FALSE;	// level too high

@@ -583,7 +583,7 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 		abd = abil->ptr;
 		
 		// is assigned to some skill
-		if (!ABIL_ASSIGNED_SKILL(abd)) {
+		if (!ABIL_IS_PURCHASE(abd) || !ABIL_ASSIGNED_SKILL(abd)) {
 			continue;
 		}
 		// matches requested skill
@@ -1311,7 +1311,7 @@ void perform_swap_skill_sets(char_data *ch) {
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 		abil = plab->ptr;
 		
-		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {	// skill ability
+		if (ABIL_IS_PURCHASE(abil)) {	// skill ability
 			if (plab->purchased[cur_set] && !plab->purchased[old_set]) {
 				// added
 				apply_ability_techs_to_player(ch, abil);
@@ -1594,7 +1594,7 @@ ACMD(do_skills) {
 			return;
 		}
 		
-		if (!ABIL_ASSIGNED_SKILL(abil) && !IS_IMMORTAL(ch)) {
+		if (!ABIL_IS_PURCHASE(abil) && !IS_IMMORTAL(ch)) {
 			msg_to_char(ch, "You cannot buy that ability.\r\n");
 			return;
 		}
@@ -3270,6 +3270,7 @@ void save_olc_skill(descriptor_data *desc) {
 	// update all players in case there are new level-0 abilities
 	LL_FOREACH_SAFE(character_list, ch_iter, next_ch) {
 		if (!IS_NPC(ch_iter)) {
+			update_class(ch_iter);
 			give_level_zero_abilities(ch_iter);
 		}
 	}

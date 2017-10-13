@@ -67,9 +67,20 @@ extern const char *pool_types[];
 void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	void check_skill_sell(char_data *ch, ability_data *abil);
 	
+	// helper type
+	struct assign_abil_t {
+		any_vnum vnum;	// which abil
+		bool can_have;	// if the player can have it
+		UT_hash_handle hh;
+	};
+	
+	struct assign_abil_t *hash = NULL, *aat, *next_aat;
+	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil, *next_abil;
+	struct synergy_ability *syn;
 	struct class_ability *clab;
-	bool has;
+	skill_data *skill;
+	any_vnum vnum;
 
 	// simple sanity
 	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
@@ -84,14 +95,22 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		role = GET_CLASS_ROLE(ch);
 	}
 	
-	// check all abilities
+	// STEP 1: build the initial hash of all abilities AND check the class for them
 	HASH_ITER(hh, ability_table, abil, next_abil) {
-		if (ABIL_ASSIGNED_SKILL(abil)) {
-			continue;	// class abils only
+		if (ABIL_IS_PURCHASE(abil)) {
+			continue;	// skip skill-purchase abils entirely
 		}
 		
-		// determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
-		has = FALSE;
+		// STEAP 1a: find/add an 'aat' entry
+		vnum = ABIL_VNUM(abil);
+		HASH_FIND_INT(hash, &vnum, aat);
+		if (!aat) {
+			CREATE(aat, struct assign_abil_t, 1);
+			aat->vnum = vnum;
+			HASH_ADD_INT(hash, vnum, aat);
+		}
+		
+		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
 		if (cls && GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
@@ -102,20 +121,52 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 				}
 				
 				// found it!
-				has = TRUE;
+				aat->can_have = TRUE;
 				break;
 			}
 		}
+	}
+	
+	// STEP 2: check which skill synergies the player qualifies for
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		skill = plsk->ptr;
 		
+		if (plsk->level < SKILL_MAX_LEVEL(skill)) {
+			continue;	// only skills at their max
+		}
+		
+		LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+			if (syn->role != NOTHING && syn->role != role) {
+				continue;	// wrong role
+			}
+			if (syn->level > get_skill_level(ch, syn->skill)) {
+				continue;	// level in other skill too low
+			}
+			
+			// found!
+			vnum = syn->ability;
+			HASH_FIND_INT(hash, &vnum, aat);
+			if (aat) {
+				// ONLY add it if we already had an entry
+				aat->can_have = TRUE;
+			}
+		}
+	}
+	
+	// STEP 3: assign/remove abilities
+	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
-		if (has_ability(ch, ABIL_VNUM(abil)) && !has) {
+		if (has_ability(ch, ABIL_VNUM(abil)) && !aat->can_have) {
 			remove_ability(ch, abil, FALSE);
 			check_skill_sell(ch, abil);
 		}
 		// add if needed
-		if (has) {
+		if (aat->can_have) {
 			add_ability(ch, abil, FALSE);
 		}
+		
+		// clean up memory
+		free(aat);
 	}
 }
 
@@ -1027,6 +1078,7 @@ void save_olc_class(descriptor_data *desc) {
 	class_data *proto, *cls = GET_OLC_CLASS(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted;
+	char_data *ch_iter;
 
 	// have a place to save it?
 	if (!(proto = find_class_by_vnum(vnum))) {
@@ -1056,7 +1108,7 @@ void save_olc_class(descriptor_data *desc) {
 		}
 		CLASS_ABBREV(cls) = str_dup(default_class_abbrev);
 	}
-
+	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	sorted = proto->sorted_hh;
@@ -1070,6 +1122,13 @@ void save_olc_class(descriptor_data *desc) {
 
 	// ... and re-sort
 	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
+	
+	// update all players in-game
+	LL_FOREACH(character_list, ch_iter) {
+		if (!IS_NPC(ch_iter)) {
+			update_class(ch_iter);
+		}
+	}
 }
 
 
