@@ -3975,7 +3975,7 @@ OLC_MODULE(skilledit_tree) {
 			msg_to_char(ch, "There is no such ability on this skill.\r\n");
 		}
 		else if (is_abbrev(sub_arg, "level")) {
-			if (!*argument || !isdigit(*argument) || (level = atoi(argument)) < 0) {
+			if (!*req_arg || !isdigit(*req_arg) || (level = atoi(req_arg)) < 0) {
 				msg_to_char(ch, "Set it to what level?\r\n");
 				return;
 			}
@@ -3996,11 +3996,11 @@ OLC_MODULE(skilledit_tree) {
 			}
 		}
 		else if (is_abbrev(sub_arg, "requires") || is_abbrev(sub_arg, "requirement") || is_abbrev(sub_arg, "prerequisite")) {
-			if (!*argument) {
+			if (!*req_arg) {
 				msg_to_char(ch, "Require which ability (or none)?\r\n");
 			}
-			else if (str_cmp(argument, "none") && !(requires = find_ability(argument))) {
-				msg_to_char(ch, "Invalid pre-requisite ability '%s'.\r\n", argument);
+			else if (str_cmp(req_arg, "none") && !(requires = find_ability(req_arg))) {
+				msg_to_char(ch, "Invalid pre-requisite ability '%s'.\r\n", req_arg);
 			}
 			else {
 				found = FALSE;
