@@ -192,7 +192,7 @@ See also: CHANT
 
 Each Natural Magic class has its own set of familiars. These are summoned with
 the 'familiar' command, but don't require the regular Familiar ability. Some
-class roles have different familiars than other roles in the same class. Like
+group roles have different familiars than other roles in the same class. Like
 all class abilities, you must reach skill level 100 to use these.
 
 Werewolf:
@@ -514,7 +514,7 @@ If you cast this spell with no target, it will heal yourself. Self-heals cost
 The size of your heals, and their cost, scales with your Natural Magic level
 and with your Intelligence. The Bonus-Healing trait, shown as "Healing [+X]" on
 your score, adds directly to the amount healed, but does not increase the cost.
-The Healer class role allows your character's total level to increase the
+The Healer group role allows your character's total level to increase the
 amount healed, and it also lowers the mana cost per point healed.
 
 If your target is in combat, you will join the combat upon using this ability.
@@ -734,7 +734,7 @@ Magic level and your Intelligence. The cost depends upon the amount healed.
 The Bonus-Healing attribute will also add to the amount healed, but won't
 raise the cost.
 
-The Healer class role allows your character's total level to increase the
+The Healer group role allows your character's total level to increase the
 amount healed, and it also lowers the mana cost per point healed.
 
 If you cast this spell without a target, it will target yourself.

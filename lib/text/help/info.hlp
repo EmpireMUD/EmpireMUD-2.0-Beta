@@ -483,7 +483,7 @@ Dexterity is a measure of how well your character moves, and affects how you
 function in combat.
 
 Dexterity is used for:
- - A core attribute for the melee, caster, and tank class roles.
+ - A core attribute for the melee, caster, and tank group roles.
  - Increases your chance to hit in combat.
  - Increases your chance to dodge in combat.
 
@@ -718,7 +718,7 @@ Intelligence is the measure of your character's cunning and wisdom, used to
 enhance magical spells and damage.
 
 Intelligence is used for:
- - A core attribute for the caster and healer class roles.
+ - A core attribute for the caster and healer group roles.
  - Increasing the DPS (damage per second) from magical weapons.
  - Increasing the power of healing spells.
  - Increasing the effect of many other spells.
@@ -1133,7 +1133,7 @@ Unlike some games, Strength does not affect how much you can carry (all players
 have the same base inventory size).
 
 Strength is used for:
- - A core attribute for the melee class role.
+ - A core attribute for the melee group role.
  - Increasing melee DPS (damage per second) from physical weapons.
  - Chopping and mining faster.
  - Wearing heavy armor (tank armor sometimes has -STRENGTH).

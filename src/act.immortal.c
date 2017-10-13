@@ -422,7 +422,7 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 	assign_class_abilities(ch, NULL, NOTHING);
 	
 	if (!is_file) {
-		msg_to_char(ch, "Your class role has been reset.\r\n");
+		msg_to_char(ch, "Your group role has been reset.\r\n");
 	}
 }
 

@@ -1580,10 +1580,10 @@ ACMD(do_class) {
 		// Handle role selection or display
 		
 		if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You can't set a class role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
+			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
 		}
 		else if (!*arg2) {
-			msg_to_char(ch, "Your class role is currently set to: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
+			msg_to_char(ch, "Your group role is currently set to: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
 		else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
 			msg_to_char(ch, "You can't do that while fighting!\r\n");
@@ -1610,7 +1610,7 @@ ACMD(do_class) {
 				resort_empires();
 			}
 			
-			msg_to_char(ch, "Your class role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
+			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
 	}
 	else if (*arg) {
@@ -1626,7 +1626,7 @@ ACMD(do_class) {
 			msg_to_char(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], SHOW_CLASS_NAME(ch), class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
 			
 			get_class_ability_display(CLASS_ABILITIES(GET_CLASS(ch)), buf, ch);
-			msg_to_char(ch, " Available class roles:\r\n%s%s", buf, *buf ? "\r\n" : "  none\r\n");
+			msg_to_char(ch, " Available role abilities:\r\n%s%s", buf, *buf ? "\r\n" : "  none\r\n");
 		}
 	}
 }

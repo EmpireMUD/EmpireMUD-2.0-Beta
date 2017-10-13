@@ -1,4 +1,4 @@
-CLASS "CLASS SKILLS" "CLASS ROLE" ROLE
+CLASS "CLASS SKILLS" "CLASS ROLE" ROLE "GROUP ROLE"
 
 When you specialize two skills past 75, they become your "class skills" and
 you are assigned a class. Your class determines how large your health, move,
@@ -6,17 +6,20 @@ and mana pools are. It also gives you some new abilities once you skill level
 100.
 
 Usage:  class [role <type>]
+        role [type]
 
 The class command shows your current class, role, and class abilities. You
 can also use this command to change roles. For example, "class role tank".
 You must have a role in order to gain your class's abilities, even if all of
 its roles share them.
 
-Class roles are the different tasks a class might be suited for. For example,
-if your class has both Natural Magic and Survival as its core skills, it might
-be suited to melee damage, caster damage, or healing. You can't perform all
-roles at the same time. You can change your current role using the "class role"
-command.
+Group roles are the different tasks a person might be suited for. For example,
+if your character has both Natural Magic and Survival as its core skills, it
+might be suited to melee damage, caster damage, or healing. You can't perform
+all roles at the same time.
+
+The role command lists synergy abilities and can also be used to change your
+role.
 
 &yTank&0: Takes all the damage in combat.
 &rMelee&0: Does physical damage.
@@ -25,9 +28,9 @@ command.
 &mUtility&0: Doesn't fight; builds or crafts instead.
 &wSolo&0: For playing alone; some abilities won't work in groups.
 
-The colors shown above are used to display class roles on "who" and "roster".
+The colors shown above are used to display group roles on "who" and "roster".
 
-See also: CLASS LIST, TANK, HEALER, MELEE, CASTER, UTILITY, SOLO
+See also: CLASS LIST, TANK, HEALER, MELEE, CASTER, UTILITY, SOLO, SYNERGY ABILITY
 #
 "CLASS LIST" CLASSES
 
@@ -448,9 +451,9 @@ Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
-SOLO SOLOIST "SOLO ROLE" "SOLO CLASS ROLE"
+SOLO SOLOIST "SOLO ROLE" "SOLO GROUP ROLE"
 
-The "solo" class role is for people who are going it alone and need every ounce
+The "solo" group role is for people who are going it alone and need every ounce
 of strength their class can muster. This gives them access to a broader range
 of class abilities, but those abilities will only work if the player is
 actually solo.
