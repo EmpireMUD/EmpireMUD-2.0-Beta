@@ -196,7 +196,7 @@ Intelligence. The caster should never be taking direct damage from mobs in
 combat. When choosing gear, potions, and buffs for your caster character, focus
 on the caster traits below. Other traits don't contribute to caster DPS.
 
-The class names of casters appear in &aazure&0 on the "who" list and the empire
+The skills of casters appear in &aazure&0 on the "who" list and the empire
 roster.
 
 Caster tips:
@@ -292,8 +292,8 @@ damage or taking damage. When choosing gear, potions, and buffs for your healer
 character, focus on the healer traits below. Other traits don't contribute to
 healing.
 
-The class names of healers appear in &jjade&0 on the "who" list and the
-empire roster.
+The skills of healers appear in &jjade&0 on the "who" list and the empire
+roster.
 
 Healer tips:
  - Put the tank's health in your prompt with %f/%F.
@@ -346,8 +346,8 @@ Wits, and Strength. The melee role should avoid taking damage in combat. When
 choosing gear, potions, and buffs for your melee character, focus on the
 melee traits below. Other traits don't contribute to melee DPS.
 
-The class names of melee DPS characters appear in &rred&0 on the "who" list
-and the empire roster.
+The skills of melee DPS characters appear in &rred&0 on the "who" list and the
+empire roster.
 
 Melee tips:
  - Let the tank start the fight.
@@ -477,8 +477,8 @@ need Strength or Wits, because those are related to dealing damage. When
 choosing gear, potions, and buffs for your tank character, you only need to
 worry about the tank traits listed below
 
-The class names of tanks appear in &yyellow&0 on the "who" list and the
-empire roster.
+The skills of tanks appear in &yyellow&0 on the "who" list and the empire
+roster.
 
 Tanking tips:
  - The tank should start combat with all mobs so they are hitting him, rather
@@ -524,8 +524,8 @@ Utility characters are usually noncombatants like crafters or builders. They're
 entirely capable of fighting, but they don't get the advantage that the class
 abilities of the combat roles provide.
 
-The class names of utility characters appear in &mmagenta&0 on the "who" list
-and the empire roster.
+The skills of utility characters appear in &mmagenta&0 on the "who" list and
+the empire roster.
 
 See also: CASTER, HEALER, MELEE, TANK
 #

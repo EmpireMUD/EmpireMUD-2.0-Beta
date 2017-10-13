@@ -1630,3 +1630,91 @@ ACMD(do_class) {
 		}
 	}
 }
+
+
+ACMD(do_role) {
+	void resort_empires();
+	
+	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH];
+	struct player_skill_data *plsk, *next_plsk;
+	empire_data *emp = GET_LOYALTY(ch);
+	struct synergy_ability *syn;
+	int found, iter;
+	
+	one_argument(argument, arg);
+
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You have no roles!\r\n");
+		return;
+	}
+	
+	if (*arg) {
+		// Handle role selection or display
+		
+		if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
+			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
+		}
+		else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
+			msg_to_char(ch, "You can't do that while fighting!\r\n");
+		}
+		else if (GET_POS(ch) < POS_STANDING) {
+			msg_to_char(ch, "You need to stand up first.\r\n");
+		}
+		else if ((found = search_block(arg, class_role, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Unknown role '%s'.\r\n", arg);
+		}
+		else {
+			// remove old abilities
+			if (emp) {
+				adjust_abilities_to_empire(ch, emp, FALSE);
+			}
+			
+			// change role
+			GET_CLASS_ROLE(ch) = found;
+			
+			// add new abilities
+			assign_class_abilities(ch, NULL, NOTHING);
+			if (emp) {
+				adjust_abilities_to_empire(ch, emp, TRUE);
+				resort_empires();
+			}
+			
+			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
+		}
+	}
+	else {	// no arg
+		// Display role info
+		
+		msg_to_char(ch, "%s\r\nYou are level: %d/%d/%d, role: %s%s\t0\r\n", PERS(ch, ch, TRUE), GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch), class_role_color[GET_CLASS_ROLE(ch)], class_role[(int) GET_CLASS_ROLE(ch)]);
+		msg_to_char(ch, " Available synergy abilities:\r\n");
+		
+		// init
+		for (iter = 0; iter < NUM_ROLES+2; ++iter) {
+			*roles[iter] = '\0';
+		}
+		
+		// check player's skills
+		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+			if (plsk->level < SKILL_MAX_LEVEL(plsk->ptr)) {
+				continue;	// skip ones not at max
+			}
+			
+			LL_FOREACH(SKILL_SYNERGIES(plsk->ptr), syn) {
+				if (get_skill_level(ch, syn->skill) < syn->level) {
+					continue;	// too low
+				}
+				
+				// ok found, let's append -- for roles, +1 is to account for -1 == all
+				sprintf(roles[syn->role+1] + strlen(roles[syn->role+1]), "%s%s%s\t0", (*roles[syn->role+1] ? ", " : ""), (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
+			}
+		}
+		
+		// and show them
+		if (*roles[0]) {	// ALL
+			msg_to_char(ch, "All: %s\r\n", roles[0]);
+		}
+		for (iter = 1; iter < NUM_ROLES+2; ++iter) {
+			msg_to_char(ch, "%s%s\t0: %s\r\n", class_role_color[iter-1], class_role[iter-1], roles[iter]);
+		}
+	}
+}

@@ -2775,10 +2775,42 @@ struct skill_ability *copy_skill_abilities(struct skill_ability *input) {
 
 
 /**
+* Duplicates a list of skill synergies, for editing.
+*
+* @param struct synergy_ability *input The head of the list to copy.
+* @return struct synergy_ability* The copied list.
+*/
+struct synergy_ability *copy_synergy_abilities(struct synergy_ability *input) {
+	struct synergy_ability *el, *iter, *list = NULL;
+	
+	LL_FOREACH(input, iter) {
+		CREATE(el, struct synergy_ability, 1);
+		*el = *iter;
+		el->next = NULL;
+		LL_APPEND(list, el);
+	}
+	
+	return list;
+}
+
+
+/**
 * @param struct skill_ability *list Frees the memory for this list.
 */
 void free_skill_abilities(struct skill_ability *list) {
 	struct skill_ability *tmp, *next;
+	
+	LL_FOREACH_SAFE(list, tmp, next) {
+		free(tmp);
+	}
+}
+
+
+/**
+* @param struct synergy_ability *list Frees the memory for this list.
+*/
+void free_synergy_abilities(struct synergy_ability *list) {
+	struct synergy_ability *tmp, *next;
 	
 	LL_FOREACH_SAFE(list, tmp, next) {
 		free(tmp);
@@ -2807,6 +2839,9 @@ void free_skill(skill_data *skill) {
 	}
 	if (SKILL_ABILITIES(skill) && (!proto || SKILL_ABILITIES(skill) != SKILL_ABILITIES(proto))) {
 		free_skill_abilities(SKILL_ABILITIES(skill));
+	}
+	if (SKILL_SYNERGIES(skill) && (!proto || SKILL_SYNERGIES(skill) != SKILL_SYNERGIES(proto))) {
+		free_synergy_abilities(SKILL_SYNERGIES(skill));
 	}
 	
 	free(skill);
@@ -3231,6 +3266,7 @@ void save_olc_skill(descriptor_data *desc) {
 		free(SKILL_DESC(proto));
 	}
 	free_skill_abilities(SKILL_ABILITIES(proto));
+	free_synergy_abilities(SKILL_SYNERGIES(proto));
 	
 	// sanity
 	if (!SKILL_NAME(skill) || !*SKILL_NAME(skill)) {
@@ -3298,6 +3334,7 @@ skill_data *setup_olc_skill(skill_data *input) {
 		SKILL_ABBREV(new) = SKILL_ABBREV(input) ? str_dup(SKILL_ABBREV(input)) : NULL;
 		SKILL_DESC(new) = SKILL_DESC(input) ? str_dup(SKILL_DESC(input)) : NULL;
 		SKILL_ABILITIES(new) = copy_skill_abilities(SKILL_ABILITIES(input));
+		SKILL_SYNERGIES(new) = copy_synergy_abilities(SKILL_SYNERGIES(input));
 	}
 	else {
 		// brand new: some defaults

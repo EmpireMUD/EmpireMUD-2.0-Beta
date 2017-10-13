@@ -2016,7 +2016,7 @@ Lists the people currently in the game. Some people may be invisible. Command-
 line options can be used to limit the listing. The parameters can be specified
 on the command-line in any order.
 
-The color of the player's class name (if not white) indicates their role, if
+The color of the player's main skills (if not white) indicates their role, if
 any: &aCaster&0, &jHealer&0, &yTank&0, &rMelee&0, or &mUtility&0.
 
 min-max    Specify a level range, e.g. 100-200
