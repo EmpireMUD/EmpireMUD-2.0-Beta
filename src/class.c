@@ -1635,11 +1635,13 @@ ACMD(do_class) {
 ACMD(do_role) {
 	void resort_empires();
 	
-	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct player_skill_data *plsk, *next_plsk;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct synergy_ability *syn;
+	size_t sizes[NUM_ROLES+2];
 	int found, iter;
+	bool any;
 	
 	one_argument(argument, arg);
 
@@ -1686,11 +1688,12 @@ ACMD(do_role) {
 		// Display role info
 		
 		msg_to_char(ch, "%s\r\nYou are level: %d/%d/%d, role: %s%s\t0\r\n", PERS(ch, ch, TRUE), GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch), class_role_color[GET_CLASS_ROLE(ch)], class_role[(int) GET_CLASS_ROLE(ch)]);
-		msg_to_char(ch, " Available synergy abilities:\r\n");
+		msg_to_char(ch, "Available synergy abilities:\r\n");
 		
 		// init
 		for (iter = 0; iter < NUM_ROLES+2; ++iter) {
 			*roles[iter] = '\0';
+			sizes[iter] = 0;
 		}
 		
 		// check player's skills
@@ -1705,16 +1708,29 @@ ACMD(do_role) {
 				}
 				
 				// ok found, let's append -- for roles, +1 is to account for -1 == all
-				sprintf(roles[syn->role+1] + strlen(roles[syn->role+1]), "%s%s%s\t0", (*roles[syn->role+1] ? ", " : ""), (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
+				sprintf(part, "%s%s%s\t0", (*roles[syn->role+1] ? ", " : ""), (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
+				
+				if (sizes[syn->role+1] + strlen(part) + 1 < MAX_STRING_LENGTH) {
+					strcat(roles[syn->role+1], part);
+					sizes[syn->role+1] += strlen(part);
+				}
 			}
 		}
 		
 		// and show them
+		any = FALSE;
 		if (*roles[0]) {	// ALL
-			msg_to_char(ch, "All: %s\r\n", roles[0]);
+			msg_to_char(ch, " All: %s\r\n", roles[0]);
+			any = TRUE;
 		}
 		for (iter = 1; iter < NUM_ROLES+2; ++iter) {
-			msg_to_char(ch, "%s%s\t0: %s\r\n", class_role_color[iter-1], class_role[iter-1], roles[iter]);
+			if (*roles[iter]) {
+				msg_to_char(ch, " %s%s\t0: %s\r\n", class_role_color[iter-1], class_role[iter-1], roles[iter]);
+				any = TRUE;
+			}
+		}
+		if (!any) {
+			msg_to_char(ch, " none\r\n");
 		}
 	}
 }
