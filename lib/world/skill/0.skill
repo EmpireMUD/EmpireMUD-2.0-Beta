@@ -1,6 +1,6 @@
 #0
 Battle~
-Btl~
+Bat~
 Charge confidently into combat~
 0
 A 101 -1 20
@@ -94,7 +94,7 @@ Y 6 0 100 228 0
 S
 #2
 High Sorcery~
-HiS~
+Sor~
 Learn the secrets of the imperial sorcerers~
 0
 A 207 -1 75
@@ -146,7 +146,7 @@ Y 6 7 100 283 0
 S
 #3
 Natural Magic~
-NtM~
+Nat~
 Attain mastery over the natural world~
 0
 A 215 34 50
@@ -219,7 +219,6 @@ Y 4 0 100 252 0
 Y 4 0 100 214 0
 Y 4 1 100 239 0
 Y 4 3 100 238 0
-Y 4 3 100 263 0
 Y 4 4 100 257 0
 Y 4 4 100 214 0
 Y 4 5 100 214 0
@@ -235,7 +234,6 @@ Y 6 0 100 213 0
 Y 6 1 100 280 0
 Y 6 1 100 239 0
 Y 6 2 100 275 0
-Y 6 3 100 263 0
 Y 6 4 100 267 0
 Y 6 4 100 279 0
 Y 6 4 100 257 0
@@ -310,7 +308,7 @@ Y 6 7 100 237 0
 S
 #5
 Survival~
-Srv~
+Sur~
 Make your way in the harsh wilderness~
 0
 A 65 64 75
@@ -396,7 +394,7 @@ Y -1 7 100 247 0
 S
 #7
 Vampire~
-Vmp~
+Vam~
 Feed the hunger, control the blood~
 0
 A 33 27 60
