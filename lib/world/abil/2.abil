@@ -140,12 +140,6 @@ S
 Bloodsweat~
 0 -1 1.00 0 0
 S
-#230
-Dragonriding~
-0 -1 1.00 0 0
-D 1 40 0
-T e 1
-S
 #231
 Shadow Kick~
 0 -1 1.00 0 0
@@ -437,5 +431,10 @@ S
 #298
 Fletching~
 0 203 1.00 0 0
+S
+#299
+Enchant Accessories~
+0 181 1.00 0 0
+T a 1
 S
 $
