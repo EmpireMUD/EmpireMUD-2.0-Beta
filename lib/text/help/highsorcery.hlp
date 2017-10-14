@@ -1,4 +1,4 @@
-"HIGH SORCERY"
+"HIGH SORCERY" SOR
 
 High Sorcery (skill)
 
@@ -18,7 +18,7 @@ See also: STUDY, SORCERY TOWER, RITUAL, STAFFMAKING, FORESIGHT, MANASHIELD,
 ABLATE ABLATION
 
 Ablate
-Class ability:  Battlemage
+High Sorcery Synergy Ability: 100 Battle
 
 Usage:  ablate [victim]
 Cooldown:  9 seconds
@@ -43,7 +43,7 @@ Gains experience passively over time.
 ARCLIGHT "ARC LIGHT"
 
 Arclight
-Class ability:  Archmage
+Natural Magic Synergy Ability: 100 High Sorcery
 
 Usage:  arclight [victim]
 Cooldown:  9 seconds
@@ -57,7 +57,7 @@ See also: ARCHMAGE CLASS
 CHRONOBLAST
 
 Chronoblast
-Class ability:  Artificer
+High Sorcery Synergy Ability: 100 Trade
 
 Usage:  chronoblast [victim]
 Cooldown:  6 seconds
@@ -427,7 +427,7 @@ See also: CITY TELEPORTATION, RITUAL
 SCOUR
 
 Scour
-Class ability:  Exarch
+High Sorcery Synergy Ability: 100 Empire
 
 Usage:  scour [victim]
 Cooldown:  6 seconds
@@ -442,7 +442,7 @@ See also: DOT, EXARCH CLASS
 SHADOWLASH "SHADOW LASH"
 
 Shadowlash
-Class ability:  Occultist
+High Sorcery Synergy Ability: 100 Stealth
 
 Usage:  shadowlash [victim]
 Cooldown:  9 seconds
@@ -503,7 +503,7 @@ Debuff type:  High Sorcery
 
 This ability hexes your victim with lethargy, causing them to attack more
 slowly in combat. If you're already fighting and do not specify a victim, it
-will target the person you are fighting. As a class ability, this spell's
+will target the person you are fighting. At High Sorcery 100, this spell's
 duration increases.
 
 Gain experience by casting this spell.
@@ -511,7 +511,7 @@ Gain experience by casting this spell.
 SOULCHAIN "SOUL CHAIN"
 
 Soulchain
-Class ability:  Lich
+High Sorcery Synergy Ability: 100 Vampire
 
 Usage:  soulchain [victim]
 Cooldown:  9 seconds
@@ -632,7 +632,7 @@ See also: BLIND
 THORNLASH "THORN LASH"
 
 Thornlash
-Class ability:  Theurge
+High Sorcery Synergy Ability: 100 Survival
 
 Usage:  thornlash [victim]
 Cooldown:  9 seconds

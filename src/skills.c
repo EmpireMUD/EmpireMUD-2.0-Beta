@@ -64,6 +64,7 @@ void get_skill_synergy_display(struct synergy_ability *list, char *save_buffer, 
 bool green_skill_deadend(char_data *ch, any_vnum skill);
 void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
+int sort_synergies(struct synergy_ability *a, struct synergy_ability *b);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1534,23 +1535,24 @@ ACMD(do_noskill) {
 ACMD(do_skills) {
 	void clear_char_abilities(char_data *ch, any_vnum skill);
 	
-	char arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
 	struct player_skill_data *skdata;
-	skill_data *skill, *next_skill;
+	skill_data *skill, *next_skill, *synergy[2];
+	struct synergy_ability *syn;
 	struct skill_ability *skab;
 	ability_data *abil;
-	int points, level;
+	int points, level, iter, last_role, last_level;
 	empire_data *emp;
-	bool found;
+	bool found, any, line;
 	
-	skip_spaces(&argument);
+	half_chop(argument, arg, arg2);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "As an NPC, you have no skills.\r\n");
 		return;
 	}
 	
-	if (!*argument) {
+	if (!*arg) {
 		*outbuf = '\0';
 		
 		// no argument? list all
@@ -1574,18 +1576,16 @@ ACMD(do_skills) {
 		
 		page_string(ch->desc, outbuf, 1);
 	}
-	else if (!strn_cmp(argument, "buy", 3)) {
+	else if (!str_cmp(arg, "buy")) {
 		// purchase
-		half_chop(argument, arg, lbuf);
-		
-		if (!*lbuf) {
+		if (!*arg2) {
 			msg_to_char(ch, "Usage: skills buy <ability>\r\n");
 			msg_to_char(ch, "You can see a list of abilities for each skill by typing 'skills <skill>'.\r\n");
 			return;
 		}
 		
-		if (!(abil = find_ability_by_name(lbuf))) {
-			msg_to_char(ch, "No such ability '%s'.\r\n", lbuf);
+		if (!(abil = find_ability_by_name(arg2))) {
+			msg_to_char(ch, "No such ability '%s'.\r\n", arg2);
 			return;
 		}
 		
@@ -1635,11 +1635,9 @@ ACMD(do_skills) {
 			resort_empires(FALSE);
 		}
 	}
-	else if (!strn_cmp(argument, "reset", 5)) {
+	else if (!str_cmp(arg, "reset")) {
 		// self-clear!
-		half_chop(argument, arg, lbuf);
-		
-		if (!*lbuf) {
+		if (!*arg2) {
 			msg_to_char(ch, "Usage: skills reset <skill>\r\n");
 			msg_to_char(ch, "You have free resets available in: ");
 			
@@ -1665,8 +1663,8 @@ ACMD(do_skills) {
 				msg_to_char(ch, "none\r\n");
 			}
 		}
-		else if (!(skill = find_skill_by_name(lbuf))) {
-			msg_to_char(ch, "No such skill %s.\r\n", lbuf);
+		else if (!(skill = find_skill_by_name(arg2))) {
+			msg_to_char(ch, "No such skill %s.\r\n", arg2);
 		}
 		else if (!IS_IMMORTAL(ch) && get_skill_resets(ch, SKILL_VNUM(skill)) == 0) {
 			msg_to_char(ch, "You do not have a free reset available for %s.\r\n", SKILL_NAME(skill));
@@ -1684,8 +1682,8 @@ ACMD(do_skills) {
 		// end "reset"
 		return;
 	}
-	else if (!strn_cmp(argument, "drop", 4)) {
-		half_chop(argument, arg, lbuf);	// "drop" "skill level"
+	else if (!str_cmp(arg, "drop")) {
+		strcpy(lbuf, arg2);
 		half_chop(lbuf, arg, arg2);	// "skill" "level"
 		
 		if (!*arg || !*arg2) {
@@ -1728,7 +1726,7 @@ ACMD(do_skills) {
 			SAVE_CHAR(ch);
 		}
 	}
-	else if (!str_cmp(argument, "swap")) {
+	else if (!str_cmp(arg, "swap")) {
 		if (IS_IMMORTAL(ch)) {
 			perform_swap_skill_sets(ch);
 			msg_to_char(ch, "You swap skill sets.\r\n");
@@ -1754,18 +1752,69 @@ ACMD(do_skills) {
 			act("$n prepares to swap skill sets...", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
-	else if (IS_IMMORTAL(ch) && !strn_cmp(argument, "sell", 4)) {
-		// purchase
-		half_chop(argument, arg, lbuf);
+	else if (is_abbrev(arg, "synergy") && strlen(arg) >= 3) {
+		strcpy(lbuf, arg2);
+		ptr = one_word(lbuf, arg);	// arg: 1st skill
+		one_word(ptr, arg2);	// arg2: 2nd skill
 		
-		if (!*lbuf) {
+		// validate args
+		if (!*arg || !*arg2) {
+			msg_to_char(ch, "Usage: skill synergy <skill 1> <skill 2>\r\n");
+			return;
+		}
+		if (!(synergy[0] = find_skill(arg)) || SKILL_FLAGGED(synergy[0], SKILLF_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "No such skill '%s'.\r\n", arg);
+			return;
+		}
+		if (!(synergy[1] = find_skill(arg2)) || SKILL_FLAGGED(synergy[1], SKILLF_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "No such skill '%s'.\r\n", arg2);
+			return;
+		}
+		
+		// displays
+		last_role = -2;	// -1 is all-roles
+		last_level = -1;
+		any = line = FALSE;
+		
+		msg_to_char(ch, "Synergy abilities:");
+		for (iter = 0; iter < 1; ++iter) {
+			skill_data *first = synergy[iter], *second = synergy[iter ? 0 : 1];
+			
+			LL_FOREACH(SKILL_SYNERGIES(first), syn) {
+				if (syn->skill != SKILL_VNUM(second)) {
+					continue;
+				}
+				
+				if (last_role != syn->role || last_level != syn->level) {
+					msg_to_char(ch, "\r\n %s%d %s/%d %s%s: ", PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "" : class_role_color[syn->role], SKILL_MAX_LEVEL(first), SKILL_ABBREV(first), syn->level, SKILL_ABBREV(second), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? class_role[syn->role] : "\t0");
+					last_role = syn->role;
+					last_level = syn->level;
+					line = FALSE;
+				}
+			
+				msg_to_char(ch, "%s%s%s\t0", line ? ", " : "", has_ability(ch, syn->ability) ? "\tg" : "", get_ability_name_by_vnum(syn->ability));
+				line = TRUE;
+				any = TRUE;
+			}
+		}
+		
+		if (any) {
+			msg_to_char(ch, "\r\n");
+		}
+		else {
+			msg_to_char(ch, "\r\n none\r\n");
+		}
+	}
+	else if (IS_IMMORTAL(ch) && !str_cmp(arg, "sell")) {
+		// purchase		
+		if (!*arg2) {
 			msg_to_char(ch, "Usage: skills sell <ability>\r\n");
 			msg_to_char(ch, "You can see a list of abilities for each skill by typing 'skills <skill>'.\r\n");
 			return;
 		}
 		
-		if (!(abil = find_ability_by_name(lbuf))) {
-			msg_to_char(ch, "No such ability '%s'.\r\n", lbuf);
+		if (!(abil = find_ability_by_name(arg2))) {
+			msg_to_char(ch, "No such ability '%s'.\r\n", arg2);
 			return;
 		}
 		
@@ -1791,10 +1840,11 @@ ACMD(do_skills) {
 		}
 	}
 	else {
+		sprintf(lbuf, "%s%s%s", arg, *arg2 ? " " : "", arg2);	// recombine
 		*outbuf = '\0';
 		
-		// argument: show abilities for 1 skill
-		skill = find_skill_by_name(argument);
+		// lbuf: show abilities for 1 skill
+		skill = find_skill_by_name(lbuf);
 		if (skill) {
 			// header
 			strcat(outbuf, get_skill_row_display(ch, skill));
@@ -2065,6 +2115,7 @@ void check_skills(void) {
 		
 		// ensure sort
 		LL_SORT(SKILL_ABILITIES(skill), sort_skill_abilities);
+		LL_SORT(SKILL_SYNERGIES(skill), sort_synergies);
 	}
 }
 

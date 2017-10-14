@@ -1626,7 +1626,7 @@ ACMD(do_class) {
 			msg_to_char(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], SHOW_CLASS_NAME(ch), class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
 			
 			get_class_ability_display(CLASS_ABILITIES(GET_CLASS(ch)), buf, ch);
-			msg_to_char(ch, " Available role abilities:\r\n%s%s", buf, *buf ? "\r\n" : "  none\r\n");
+			msg_to_char(ch, " Available class abilities:\r\n%s%s", buf, *buf ? "\r\n" : "  none\r\n");
 		}
 	}
 }

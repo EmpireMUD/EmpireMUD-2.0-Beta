@@ -1,4 +1,4 @@
-VAMPIRE VAMPIRES "VAMPIRE SKILL"
+VAMPIRE VAMPIRES "VAMPIRE SKILL" VAM VAMP
 
 Vampire (skill)
 
@@ -91,7 +91,7 @@ See also: ANCIENT BLOOD, SANGUINE RESTORATION, TOGGLE, UNNATURAL THIRST
 "BLOOD FORTITUDE" FORTITUDE
 
 Blood Fortitude
-Class ability:  Reaper
+Vampire Synergy Ability: 100 Battle
 Type:  passive
 
 The vampire's blood-fueled form is more resilient against physical damage.
@@ -99,7 +99,7 @@ The vampire's blood-fueled form is more resilient against physical damage.
 BLOODSWEAT "BLOOD SWEAT"
 
 Bloodsweat
-Class ability:  Reaper
+Vampire Synergy Ability: 100 Battle
 Usage:  bloodsweat
 Cost:  50 blood
 Cooldown:  30 seconds
@@ -209,7 +209,7 @@ Gains experience when activated.
 "DREAD BLOOD FORM"
 
 Dread Blood Form
-Class ability: Lich, Necromancer
+Vampire Synergy Ability: 100 High Sorcery OR 100 Natural Magic
 
 Usage:  morph dread blood
 Cost:  30 blood (90 in combat)
@@ -231,8 +231,8 @@ See also: TOGGLE
 #
 "HORRID FORM"
 
-Horrid Form 
-Class ability: Reaper, Shade, Wight
+Horrid Form
+Vampire Synergy Ability: 100 Battle OR 100 Stealth OR 100 Survival
 
 Usage:  morph horrid
 Cost:  30 blood (90 in combat)

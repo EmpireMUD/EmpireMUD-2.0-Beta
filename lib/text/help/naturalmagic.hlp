@@ -1,4 +1,4 @@
-"NATURAL MAGIC" "CHANT OF DRUIDS"
+"NATURAL MAGIC" NAT "CHANT OF DRUIDS"
 
 Natural Magic (skill)
 
@@ -24,7 +24,7 @@ See also: CHANT, CHANT OF NATURE, HEAL, CLEANSE, PURIFY, EARTHARMOR,
 ACIDBLAST "ACID BLAST"
 
 Acidblast
-Class ability:  Alchemist
+Natural Magic Synergy Ability: 100 Trade
 
 Usage:  acidblast [victim]
 Cooldown:  9 seconds
@@ -39,7 +39,7 @@ See also: ALCHEMIST CLASS
 "ANCESTRAL HEALING"
 
 Ancestral Healing
-Class ability:  Luminary
+Natural Magic Synergy Ability: 100 Empire
 
 This passive ability channels the power of your ancestors to add your Greatness
 attribute to your Bonus-Healing trait, which affects all of your healing
@@ -76,7 +76,7 @@ See also: MORPH
 ASTRALCLAW "ASTRAL CLAW"
 
 Astralclaw
-Class ability:  Werewolf
+Natural Magic Synergy Ability: 100 Battle
 
 Usage:  astralclaw [victim]
 Cooldown:  9 seconds
@@ -92,7 +92,7 @@ See also: DOT, WEREWOLF CLASS
 "BANSHEE FAMILIAR"
 
 Banshee
-Class ability:  Necromancer (healer)
+Natural Magic Synergy Ability: 100 Vampire
 Familiar type:  debuff
 
 The banshee familiar will use the following abilities in combat:
@@ -106,7 +106,7 @@ See also: DEBUFF, FAMILIAR, NECROMANCER CLASS
 "ASTRAL WEREWOLF FORM"
 
 Astral Werewolf Form
-Class ability:  Werewolf, Shadow Wolf, Feral
+Natural Magic Synergy Ability: 100 Battle OR 100 Stealth OR 100 Survival
 
 Usage:  morph astral werewolf
 Cost:  50 move (150 in combat)
@@ -118,7 +118,7 @@ See also: CASTER, MORPH
 "BASILISK FAMILIAR"
 
 Basilisk
-Class ability:  Feral
+Natural Magic Synergy Ability: 100 Survival
 Familiar type:  debuff
 
 The basilisk familiar will use the following abilities in combat:
@@ -163,7 +163,7 @@ See also: help for individual chants, like HELP CHANT OF NATURE
 Chant of Illusions
 
 Usage:  chant illusions
-Class ability:  Luminary
+Natural Magic Synergy Ability: 100 Empire
 Cost:  1 nocturnium spike and 1 iridescent iris per road
 
 This chant allows you to hide a road tile behind an illusion, making it more
@@ -248,7 +248,7 @@ See also: DISPEL
 CONFER
 
 Confer
-Class ability:  Werewolf
+Natural Magic Synergy Ability: 100 Battle
 Usage:  confer <trait> [person]
 Duration:  6 minutes
 Cost:  50 mana, 1 Strength
@@ -285,7 +285,7 @@ This ability gains experience when your counterspell is triggered.
 DEATHTOUCH "DEATH TOUCH"
 
 Deathtouch
-Class ability:  Necromancer
+Natural Magic Synergy Ability: 100 Vampire
 
 Usage:  deathtouch [victim]
 Cooldown:  6 seconds
@@ -299,7 +299,7 @@ See also: NECROMANCER CLASS
 "DIRE WOLF FAMILIAR"
 
 Dire Wolf
-Class ability:  Werewolf
+Natural Magic Synergy Ability: 100 Battle
 Familiar type:  damage
 
 The dire wolf will assist you in combat, adding to the damage against your
@@ -310,7 +310,7 @@ See also: FAMILIAR, WEREWOLF CLASS
 DISPIRIT DESPIRIT
 
 Dispirit
-Class ability:  Shadow Wolf
+Natural Magic Synergy Ability: 100 Stealth
 
 Usage:  dispirit [victim]
 Cooldown:  9 seconds
@@ -383,7 +383,7 @@ Gain experience when you cast this spell.
 ERODE
 
 Erode
-Class ability:  Luminary
+Natural Magic Synergy Ability: 100 Empire
 
 Usage:  erode [victim]
 Cooldown:  9 seconds
@@ -427,7 +427,7 @@ See also: CLASS FAMILIARS, DISMISS, ORDER
 FASTCASTING "FAST CASTING"
 
 Fastcasting
-Class ability:  All healer classes
+Requires: Natural Magic 100, Healer role
 
 With Fastcasting, your Wits attribute no longer boosts your combat speed.
 Instead, it reduces the command lag after casting non-combat spells (including
@@ -437,7 +437,7 @@ alive.
 Base command lag is 1.25 seconds, and this ability reduces it by 0.1 per 3
 Wits, down to 0.75 seconds.
 
-See also: COMMAND LAG
+See also: COMMAND LAG, HEALER
 #
 FLY FLIGHT
 
@@ -472,7 +472,7 @@ See also: ARCANE POWER
 "GRIFFIN FAMILIAR"
 
 Griffin
-Class ability:  Luminary
+Natural Magic Synergy Ability: 100 Empire
 Familiar type:  tank
 
 The griffin is a powerful familiar that will rescue party members in combat,
@@ -527,7 +527,7 @@ See also: HEALER
 "HEALING BOOST"
 
 Healing Boost
-Class ability: various
+Requires: 100 Natural Magic, Healer/Solo role
 
 This ability increases the amount healed by abilities such as Heal and
 Rejuvenate, making the user more effective at healing. This ability is
@@ -582,7 +582,7 @@ Gains experience when you cast this spell.
 "MANTICORE FAMILIAR"
 
 Manticore
-Class ability:  Luminary
+Natural Magic Synergy Ability: 100 Empire
 Familiar type:  melee
 
 The manticore will assist you in combat, adding to the damage against your
@@ -593,7 +593,7 @@ See also: FAMILIAR, LUMINARY CLASS
 "MOON RABBIT FAMILIAR"
 
 Moon Rabbit
-Class ability:  Werewolf (healer)
+Natural Magic Synergy Ability: 100 Battle
 Familiar type:  buff
 
 The moon rabbit familiar will use the following abilities in combat:
@@ -607,7 +607,7 @@ See also: BUFF, FAMILIAR, WEREWOLF CLASS
 MOONRISE
 
 Moonrise
-Class ability: Shadow Wolf
+Natural Magic Synergy Ability: 100 Stealth
 
 Usage:  moonrise <dead player>
 Cost:  200 mana
@@ -644,7 +644,7 @@ See also: BREW, HEALING ELIXIRS, QUAFF
 "OWL SHADOW FAMILIAR"
 
 Owl Shadow
-Class ability:  Shadow Wolf (healer)
+Natural Magic Synergy Ability: 100 Stealth
 Familiar type:  buff
 
 The owl shadow familiar will use the following abilities in combat:
@@ -658,7 +658,7 @@ See also: BUFF, FAMILIAR, SHADOW WOLF CLASS
 "PHOENIX FAMILIAR"
 
 Phoenix
-Class ability:  Archmage (healer)
+Natural Magic Synergy Ability: 100 High Sorcery
 Familiar type:  buff
 
 The phoenix familiar will use the following abilities in combat:
@@ -748,7 +748,8 @@ See also: HEALER
 RESURRECT RESURRECTION
 
 Resurrect
-Class ability: Alchemist, Archmage, Feral, Luminary, Necromancer, Werewolf
+Natural Magic Synergy Ability: 100 Trade OR 100 High Sorcery OR 100 Survival OR
+   100 Empire OR 100 Vampire OR 100 Battle
 
 Usage:  resurrect <dead person>
 Cost:  75 mana
@@ -762,7 +763,7 @@ See also: ACCEPT, MOONRISE, RESPAWN
 "SAGE WEREWOLF FORM"
 
 Sage Werewolf Form
-Class ability:  Werewolf, Shadow Wolf, Feral
+Natural Magic Synergy Ability: 100 Battle OR 100 Stealth OR 100 Survival
 
 Usage:  morph sage werewolf
 Cost:  50 move (150 in combat)
@@ -774,7 +775,7 @@ See also: MORPH
 "SALAMANDER FAMILIAR"
 
 Salamander
-Class ability:  Alchemist
+Natural Magic Synergy Ability: 100 Trade
 Familiar type:  buff
 
 The salamander familiar will use the following abilities in combat:
@@ -788,7 +789,7 @@ See also: BUFF, FAMILIAR, ALCHEMIST CLASS
 "SAVAGE WEREWOLF FORM"
 
 Savage Werewolf Form
-Class ability:  Werewolf, Shadow Wolf
+Natural Magic Synergy Ability: 100 Battle OR 100 Stealth
 
 Usage:  morph savage werewolf
 Cost:  50 move (150 in combat)
@@ -800,7 +801,7 @@ See also: MORPH
 "SCORPION SHADOW FAMILIAR"
 
 Scorpion Shadow
-Class ability:  Shadow Wolf (melee)
+Natural Magic Synergy Ability: 100 Stealth
 Familiar type:  debuff
 
 The scorpion shadow familiar will use the following abilities in combat:
@@ -814,7 +815,7 @@ See also: DEBUFF, FAMILIAR, SHADOW WOLF CLASS
 "SKELETAL HULK FAMILIAR"
 
 Skeletal Hulk
-Class ability:  Necromancer (caster)
+Natural Magic Synergy Ability: 100 Vampire
 Familiar type:  melee
 
 The skeletal hulk will assist you in combat, adding to the damage against your
@@ -877,7 +878,7 @@ See also: SOULMASK
 "SPIRIT WOLF FAMILIAR"
 
 Spirit Wolf
-Class ability:  Werewolf (tank)
+Natural Magic Synergy Ability: 100 Battle
 Familiar type:  debuff
 
 The spirit wolf familiar will use the following abilities in combat:
@@ -907,7 +908,7 @@ See also: ORDER
 STARSTRIKE "STAR STRIKE"
 
 Starstrike
-Class ability:  Feral
+Natural Magic Synergy Ability: 100 Survival
 
 Usage:  starstrike [victim]
 Cooldown:  9 seconds
@@ -933,7 +934,7 @@ See also: LIGHT
 "TOWERING WEREWOLF FORM"
 
 Towering Werewolf Form
-Class ability:  Werewolf, Feral
+Natural Magic Synergy Ability: 100 Battle OR 100 Survival
 
 Usage:  morph towering werewolf
 Cost:  50 move (150 in combat)
@@ -945,7 +946,7 @@ See also: MORPH
 "WEREWOLF FORM"
 
 Werewolf Form
-Class ability:  Werewolf, Shadow Wolf, Feral
+Natural Magic Synergy Ability: 100 Battle OR 100 Stealth OR 100 Survival
 
 Usage:  morph werewolf
 Cost:  50 move (150 in combat)

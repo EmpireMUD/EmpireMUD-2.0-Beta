@@ -287,7 +287,7 @@ Morphs (MORPHEDIT):
   player morph lists.
 - If you use a required object and the CONSUME-OBJ flag, be sure not to use a
   scalable item. Scalable items will refund at the wrong level.
-- If the morph requires a class ability, you should also set the CHECK-SOLO
+- If the morph requires a synergy ability, you should also set the CHECK-SOLO
   flag. This is necessary to use it in the Solo role.
 
 Objects (OEDIT):

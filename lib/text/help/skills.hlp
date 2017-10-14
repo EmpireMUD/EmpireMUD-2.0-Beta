@@ -535,6 +535,21 @@ Swapping skill sets takes 15 seconds and cannot be done in combat.
 
 See also: SKILLS, SLEEP
 #
+SYNERGY SYNERGIES "SYNERGY ABILITY" "SKILL SYNERGY"
+
+Some skills have 'synergy abilities', which are abilities you get automatically
+when you also have another skill. The required level of each skill varies for
+some synergy abilities, but they often both have to be at 100. Synergy
+abilities do not cost you an ability point. Some abilities require you to be
+in the right role.
+
+For example, with Natural Magic 100 and Battle 100, you receive Resurrect.
+
+You can type 'role' to see your current synergy abilities. Check the help files
+for the various skills for a list of synergy abilities.
+
+See also: ROLE
+#
 "TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
 You can gain skill experience and levels by using any of the "yellow" abilities
