@@ -1777,7 +1777,7 @@ ACMD(do_skills) {
 		any = line = FALSE;
 		
 		msg_to_char(ch, "Synergy abilities:");
-		for (iter = 0; iter < 1; ++iter) {
+		for (iter = 0; iter < 2; ++iter) {
 			skill_data *first = synergy[iter], *second = synergy[iter ? 0 : 1];
 			
 			LL_FOREACH(SKILL_SYNERGIES(first), syn) {
@@ -1786,7 +1786,7 @@ ACMD(do_skills) {
 				}
 				
 				if (last_role != syn->role || last_level != syn->level) {
-					msg_to_char(ch, "\r\n %s%d %s/%d %s%s: ", PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "" : class_role_color[syn->role], SKILL_MAX_LEVEL(first), SKILL_ABBREV(first), syn->level, SKILL_ABBREV(second), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? class_role[syn->role] : "\t0");
+					msg_to_char(ch, "\r\n %s%d %s/%d %s%s: ", (PRF_FLAGGED(ch, PRF_SCREEN_READER) || syn->role == -1) ? "" : class_role_color[syn->role], SKILL_MAX_LEVEL(first), SKILL_ABBREV(first), syn->level, SKILL_ABBREV(second), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? class_role[syn->role] : "\t0");
 					last_role = syn->role;
 					last_level = syn->level;
 					line = FALSE;
