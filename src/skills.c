@@ -27,6 +27,7 @@
 /**
 * Contents:
 *   End Affect When Skill Lost -- core code for shutting off effects
+*   Synergy Display Helpers
 *   Core Skill Functions
 *   Core Skill Commands
 *   Helpers
@@ -333,6 +334,130 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	if (found) {
 		affect_total(ch);
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SYNERGY DISPLAY HELPERS /////////////////////////////////////////////////
+
+// helper types and functions for creating a clean list of synergy abilities
+
+struct synergy_display_ability {
+	any_vnum vnum;	// which abil
+	struct synergy_display_ability *next;
+};
+
+
+struct synergy_display_type {
+	int role;
+	any_vnum skill[2];	// which skills in this display
+	any_vnum level[2];	// which level (corresponding to skills)
+	struct synergy_display_ability *abils;
+	
+	struct synergy_display_type *next;
+};
+
+
+/**
+* Synergy consolidation for display: Add a synergy ability to a list, only if
+* it is not already in the list.
+*
+* @param struct synergy_display_type **list A pointer to the list to add to.
+* @param int role Which role this is fore.
+* @param any_vnum skill_a First skill vnum in the pair.
+* @param int level_a Which level for skill_a.
+* @param any_vnum skill_b Second skill vnum in the pair.
+* @param int level_b Which level for skill_b.
+* @param any_vnum abil Which ability.
+*/
+void add_synergy_display_ability(struct synergy_display_type **list, int role, any_vnum skill_a, int level_a, any_vnum skill_b, int level_b, any_vnum abil) {
+	struct synergy_display_type *sdt, *iter;
+	struct synergy_display_ability *sda;
+	
+	sdt = NULL;
+	
+	LL_FOREACH(*list, iter) {
+		if (iter->role != role) {
+			continue;
+		}
+		
+		if (iter->skill[0] == skill_a && iter->level[0] == level_a && iter->skill[1] == skill_b && iter->level[1] == level_b) {
+			sdt = iter;
+		}
+		else if (iter->skill[1] == skill_a && iter->level[1] == level_a && iter->skill[0] == skill_b && iter->level[0] == level_b) {
+			sdt = iter;
+		}
+		
+		if (sdt) {
+			break;	// found!
+		}
+	}
+	
+	if (!sdt) {	// add skill pair if needed if needed
+		CREATE(sdt, struct synergy_display_type, 1);
+		sdt->role = role;
+		sdt->skill[0] = skill_a;
+		sdt->level[0] = level_a;
+		sdt->skill[1] = skill_b;
+		sdt->level[1] = level_b;
+		LL_PREPEND(*list, sdt);
+	}
+	
+	// find the ability
+	LL_SEARCH_SCALAR(sdt->abils, sda, vnum, abil);
+	if (!sda) {	// add if necessary
+		CREATE(sda, struct synergy_display_ability, 1);
+		sda->vnum = abil;
+		LL_PREPEND(sdt->abils, sda);
+	}
+}
+
+
+/**
+* Frees all the memory from a synergy display list.
+*
+* @param struct synergy_display_type *list The list to free.
+*/
+void free_synergy_display_list(struct synergy_display_type *list) {
+	struct synergy_display_ability *sda, *next_sda;
+	struct synergy_display_type *iter, *next_iter;
+	
+	LL_FOREACH_SAFE(list, iter, next_iter) {
+		LL_FOREACH_SAFE(iter->abils, sda, next_sda) {
+			free(sda);
+		}
+		free(iter);
+	}
+}
+
+
+// Simple sorter for the synergy display
+int sort_sdt_list(struct synergy_display_type *a, struct synergy_display_type *b) {
+	if (a->role != b->role) {
+		return a->role - b->role;
+	}
+	if (a->skill[0] != b->skill[0]) {
+		return a->skill[0] - b->skill[0];
+	}
+	if (a->skill[1] != b->skill[1]) {
+		return a->skill[1] - b->skill[1];
+	}
+	if (a->level[0] != b->level[0]) {
+		return b->level[0] - a->level[0];
+	}
+	if (a->level[1] != b->level[1]) {
+		return b->level[1] - a->level[1];
+	}
+	
+	return 0;	// somehow identical?
+}
+
+// Simple sorter for the synergy display abilities
+int sort_sda_list(struct synergy_display_ability *a, struct synergy_display_ability *b) {
+	char buf1[256], buf2[256];
+	strcpy(buf1, get_ability_name_by_vnum(a->vnum));
+	strcpy(buf2, get_ability_name_by_vnum(b->vnum));
+	return strcmp(buf1, buf2);
 }
 
 
@@ -1536,12 +1661,14 @@ ACMD(do_skills) {
 	void clear_char_abilities(char_data *ch, any_vnum skill);
 	
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
+	struct synergy_display_type *sdt_list = NULL, *sdt;
+	struct synergy_display_ability *sda;
 	struct player_skill_data *skdata;
 	skill_data *skill, *next_skill, *synergy[2];
 	struct synergy_ability *syn;
 	struct skill_ability *skab;
 	ability_data *abil;
-	int points, level, iter, last_role, last_level;
+	int points, level, iter;
 	empire_data *emp;
 	bool found, any, line;
 	
@@ -1771,12 +1898,7 @@ ACMD(do_skills) {
 			return;
 		}
 		
-		// displays
-		last_role = -2;	// -1 is all-roles
-		last_level = -1;
-		any = line = FALSE;
-		
-		msg_to_char(ch, "Synergy abilities:");
+		// displays: first build the list of abils
 		for (iter = 0; iter < 2; ++iter) {
 			skill_data *first = synergy[iter], *second = synergy[iter ? 0 : 1];
 			
@@ -1785,25 +1907,41 @@ ACMD(do_skills) {
 					continue;
 				}
 				
-				if (last_role != syn->role || last_level != syn->level) {
-					msg_to_char(ch, "\r\n %s%d %s/%d %s%s: ", (PRF_FLAGGED(ch, PRF_SCREEN_READER) || syn->role == -1) ? "" : class_role_color[syn->role], SKILL_MAX_LEVEL(first), SKILL_ABBREV(first), syn->level, SKILL_ABBREV(second), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? class_role[syn->role] : "\t0");
-					last_role = syn->role;
-					last_level = syn->level;
-					line = FALSE;
-				}
-			
-				msg_to_char(ch, "%s%s%s\t0", line ? ", " : "", has_ability(ch, syn->ability) ? "\tg" : "", get_ability_name_by_vnum(syn->ability));
-				line = TRUE;
-				any = TRUE;
+				add_synergy_display_ability(&sdt_list, syn->role, SKILL_VNUM(first), SKILL_MAX_LEVEL(first), SKILL_VNUM(second), syn->level, syn->ability);
 			}
 		}
 		
-		if (any) {
+		// and show it...
+		LL_SORT(sdt_list, sort_sdt_list);
+		any = FALSE;
+		
+		msg_to_char(ch, "Synergy abilities:\r\n");
+		LL_FOREACH(sdt_list, sdt) {
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				msg_to_char(ch, " %d %s/%d %s %s: ", sdt->level[0], get_skill_abbrev_by_vnum(sdt->skill[0]), sdt->level[1], get_skill_abbrev_by_vnum(sdt->skill[1]), sdt->role == NOTHING ? "(all)" : class_role[sdt->role]);
+			}
+			else {	// non-screenreader
+				msg_to_char(ch, " %s%d %s/%d %s %s\t0: ", sdt->role == NOTHING ? "\t0" : class_role_color[sdt->role], sdt->level[0], get_skill_abbrev_by_vnum(sdt->skill[0]), sdt->level[1], get_skill_abbrev_by_vnum(sdt->skill[1]), sdt->role == NOTHING ? "(all)" : class_role[sdt->role]);
+			}
+			
+			LL_SORT(sdt->abils, sort_sda_list);
+			line = FALSE;
+			LL_FOREACH(sdt->abils, sda) {
+				msg_to_char(ch, "%s%s%s\t0", line ? ", " : "", has_ability(ch, sda->vnum) ? "\tg" : "", get_ability_name_by_vnum(sda->vnum));
+				line = TRUE;
+				any = TRUE;
+			}
+			
 			msg_to_char(ch, "\r\n");
 		}
-		else {
-			msg_to_char(ch, "\r\n none\r\n");
+		
+		// done
+		if (!any) {
+		
+			msg_to_char(ch, " none\r\n");
 		}
+		
+		free_synergy_display_list(sdt_list);
 	}
 	else if (IS_IMMORTAL(ch) && !str_cmp(arg, "sell")) {
 		// purchase		

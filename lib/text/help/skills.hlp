@@ -450,6 +450,7 @@ Usage:  skills -- list all skills
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
+        skill synergy <skill 1> <skill 2> -- see list of synergy abilities
         skill swap
 
 This multi-purpose command helps you understand your skills. It shows your
