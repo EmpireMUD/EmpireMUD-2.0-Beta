@@ -287,6 +287,7 @@ static void msdp_update(void) {
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_crafting_level(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
@@ -300,7 +301,7 @@ static void msdp_update(void) {
 	
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	char_data *ch, *pOpponent, *focus;
 	bool is_ally;
@@ -372,7 +373,8 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
 			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 
-			snprintf(buf, sizeof(buf), "%s", SHOW_CLASS_NAME(ch));
+			get_player_skill_string(ch, part, FALSE);
+			snprintf(buf, sizeof(buf), "%s", part);
 			MSDPSetString(d, eMSDP_CLASS, buf);
 			
 			// skills

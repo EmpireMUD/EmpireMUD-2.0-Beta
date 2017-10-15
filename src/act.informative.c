@@ -494,7 +494,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
-	msg_to_char(to, " Class: %-17.17s", SHOW_CLASS_NAME(ch));
+	get_player_skill_string(ch, lbuf, TRUE);
+	msg_to_char(to, " Skill: %-17.17s", lbuf);
 	msg_to_char(to, " Level: %d (%d)\r\n", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
