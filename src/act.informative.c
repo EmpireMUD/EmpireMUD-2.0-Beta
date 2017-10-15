@@ -126,7 +126,10 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev) {
 	
 	*buffer = '\0';
 	
-	if (!IS_NPC(ch)) {
+	if (IS_IMMORTAL(ch)) {
+		strcpy(buffer, abbrev ? "Imm" : "Immortal");
+	}
+	else if (!IS_NPC(ch)) {
 		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
 			if (plsk->level >= CLASS_SKILL_CAP) {
 				sprintf(buffer + strlen(buffer), "%s%s", (*buffer ? (abbrev ? "/" : ", ") : ""), abbrev ? SKILL_ABBREV(plsk->ptr) : SKILL_NAME(plsk->ptr));
@@ -135,7 +138,7 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev) {
 	}
 	
 	if (!*buffer) {
-		strcpy(buffer, abbrev ? "Advn" : "Adventuring");
+		strcpy(buffer, abbrev ? "New" : "Newbie");
 	}
 }
 

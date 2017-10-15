@@ -1937,7 +1937,6 @@ ACMD(do_skills) {
 		
 		// done
 		if (!any) {
-		
 			msg_to_char(ch, " none\r\n");
 		}
 		
