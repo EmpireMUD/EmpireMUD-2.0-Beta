@@ -1388,6 +1388,20 @@ rate of 1 territory per 10 wealth, up to 3x its normal limit (for a total of
 
 See also: COMMERCE, EXCHANGE, MINT, VAULT, SECRET CACHE
 #
+WINDSTRIDE WINDSTRIDING
+
+Windstride (Empire ability)
+
+Usage:  windstride
+Cooldown:  10 minutes
+
+Windstride gives you a huge temporary boost to move regeneration, allowing you
+to reach the highest peaks of your empire with ease.
+
+If you have the Ride ability, Windstride also allows you to ride flying mounts.
+
+See also: RIDE
+#
 WITHDRAW
 
 Usage:  withdraw <number> coins
