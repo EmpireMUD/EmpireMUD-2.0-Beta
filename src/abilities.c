@@ -490,23 +490,23 @@ double get_trait_modifier(char_data *ch, int apply) {
 			break;
 		}
 		case APPLY_DEXTERITY: {
-			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			value = (double) GET_DEXTERITY(ch) / att_max(ch);
 			break;
 		}
 		case APPLY_CHARISMA: {
-			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			value = (double) GET_CHARISMA(ch) / att_max(ch);
 			break;
 		}
 		case APPLY_GREATNESS: {
-			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			value = (double) GET_GREATNESS(ch) / att_max(ch);
 			break;
 		}
 		case APPLY_INTELLIGENCE: {
-			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			value = (double) GET_INTELLIGENCE(ch) / att_max(ch);
 			break;
 		}
 		case APPLY_WITS: {
-			value = (double) GET_STRENGTH(ch) / att_max(ch);
+			value = (double) GET_WITS(ch) / att_max(ch);
 			break;
 		}
 		case APPLY_BLOCK: {
