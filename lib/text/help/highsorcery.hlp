@@ -8,12 +8,11 @@ harnessing the powerful mana that flows through the world.
 To begin the path of High Sorcery, seek out one of its lofty towers and use
 the STUDY command on the top floor.
 
-See also: STUDY, SORCERY TOWER, RITUAL, STAFFMAKING, FORESIGHT, MANASHIELD,
-    SUMMON SWIFT, DISENCHANT, COLORBURST, RITUAL OF BURDENS, PHOENIX RITE,
-    VIGOR, RITUAL OF TELEPORTATION, CITY TELEPORTATION, RITUAL OF DEFENSE,
-    PORTAL MAGIC, PORTAL MASTER, RITUAL OF SENSE LIFE, RITUAL OF DETECTION,
-    DEVASTATION RITUAL, ENCHANT, ENERVATE, SIPHON, SLOW, SUNSHOCK, MIRRORIMAGE,
-    ARCANE POWER, DISPEL, COLLAPSE
+You get additional High Sorcery abilities when you reach level 100, depending
+on which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
+See also: ROLE, SKILL, SKILL SYNERGY, STUDY
 #
 ABLATE ABLATION
 

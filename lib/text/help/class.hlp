@@ -80,20 +80,12 @@ There are two types of archetypes:
 Alchemist
 Natural Magic + Trade
 
-All: Alchemist Crafts, Resurrect, Salamander (familiar)
-Caster: Acidblast
-Healer: Fastcasting, Healing Boost
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, HEALER, UTILITY
 #
 "ANCIENT CLASS" ANCIENT ANCT
 
 Ancient
 Vampire + Empire
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -102,22 +94,12 @@ See also: CLASS, MELEE, UTILITY
 Antiquarian
 Trade + Vampire
 
-All: Antiquarian Crafts
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE, UTILITY
 #
 "ARCHMAGE CLASS" ACHM
 
 Archmage
 High Sorcery + Natural Magic
-
-All: Phoenix (familiar), Resurrect
-Caster: Arclight
-Healer: Fastcasting, Healing Boost
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, CASTER, HEALER
 #
@@ -126,22 +108,12 @@ See also: CLASS, CASTER, HEALER
 Artificer
 High Sorcery + Trade
 
-All: Artificer Crafts
-Caster: Chronoblast
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, CASTER, UTILITY
 #
 "ASSASSIN CLASS" ASSN
 
 Assassin
 Battle + Stealth
-
-All: Whisperstride
-Melee: Dual-Wield, Shadow Kick
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE
 #
@@ -150,11 +122,6 @@ See also: CLASS, MELEE
 Bandit
 Stealth + Survival
 
-All: Whisperstride
-Melee: Crucial Jab, Dual-Wield
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE
 #
 "BARBARIAN CLASS" BRBN
@@ -162,21 +129,12 @@ See also: CLASS, MELEE
 Barbarian
 Battle + Survival
 
-Tank: Ward Against Magic
-Melee: Two-Handed Weapons
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, TANK, MELEE
 #
 "BATTLEMAGE CLASS" "BATTLE MAGE CLASS" BTMG
 
 Battlemage
 Battle + High Sorcery
-
-Caster: Ablate
-
-Note: Class abilities are unfinished.
 
 See also: CLASS
 #
@@ -232,21 +190,12 @@ See also: BUFF, CLASS FAMILIARS
 Duke
 Battle + Empire
 
-Tank: Noble Bearing
-Melee: Two-Handed Weapons
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, TANK, MELEE, UTILITY
 #
 "ELDER CLASS" ELDR
 
 Elder
 Empire + Survival
-
-All: Elder Crafts
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -255,11 +204,6 @@ See also: CLASS, MELEE, UTILITY
 Exarch
 Empire + High Sorcery
 
-All: Exarch Crafts
-Caster: Scour
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, CASTER, UTILITY
 #
 "FERAL CLASS" FERL
@@ -267,23 +211,12 @@ See also: CLASS, CASTER, UTILITY
 Feral
 Natural Magic + Survival
 
-All: Basilisk (familiar), Resurrect, Werewolf Form
-Tank: Towering Werewolf Form
-Caster: Astral Werewolf Form, Starstrike
-Healer: Fastcasting, Healing Boost, Sage Werewolf Form
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, TANK, HEALER
 #
 "GUILDSMAN CLASS" GDSM
 
 Guildsman
 Empire + Trade
-
-All: Guildsman Crafts
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -318,10 +251,6 @@ See also: CASTER, MELEE, TANK
 Lich
 High Sorcery + Vampire
 
-Caster: Dread Blood Form, Soulchain
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, CASTER
 #
 "LUMINARY CLASS" LMNY
@@ -329,15 +258,8 @@ See also: CLASS, CASTER
 Luminary
 Empire + Natural Magic
 
-All: Chant of Illusions, Griffin (familiar),
-   Manticore (familiar), Resurrect
-Caster: Erode
-Healer: Ancestral Healing, Fastcasting, Healing Boost
-
 Luminary Healers gain additional healing power from Greatness and should build
 their Greatness in addition to the 4 healer traits.
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, CASTER, HEALER, UTILITY
 #
@@ -370,23 +292,12 @@ See also: CASTER, HEALER, HIT CAP, TANK
 Necromancer
 Natural Magic + Vampire
 
-All: Resurrect
-Caster: Deathtouch, Dread Blood Form, Skeletal Hulk (familiar)
-Healer: Banshee (familiar), Fastcasting, Healing Boost
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, CASTER, HEALER
 #
 "OCCULTIST CLASS" OCLT
 
 Occultist
 High Sorcery + Stealth
-
-Caster: Shadowlash
-Melee: Shadowcage
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE
 #
@@ -395,22 +306,12 @@ See also: CLASS, MELEE
 Powerbroker
 Empire + Stealth
 
-All: Whisperstride
-Melee: Stagger Jab
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE
 #
 "REAPER CLASS" REAP
 
 Reaper
 Battle + Vampire
-
-Tank: Blood Fortitude, Bloodsweat, Ward Against Magic
-Melee: Horrid Form
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, TANK, MELEE
 #
@@ -419,10 +320,6 @@ See also: CLASS, TANK, MELEE
 Shade
 Stealth + Vampire
 
-Melee: Horrid Form, Shadow Jab
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE
 #
 "SHADOW WOLF CLASS" SHWF
@@ -430,24 +327,12 @@ See also: CLASS, MELEE
 Shadow Wolf
 Natural Magic + Stealth
 
-All: Moonrise, Werewolf Form
-Melee: Howl, Savage Werewolf Form, Scorpion Shadow (familiar)
-Caster: Astral Werewolf Form, Dispirit, Scorpion Shadow (familiar)
-Healer: Fastcasting, Healing Boost, Owl Shadow (familiar), Sage Werewolf Form
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE, HEALER
 #
 "SMUGGLER CLASS" SMGL
 
 Smuggler
 Stealth + Trade
-
-All: Smuggler Crafts, Whisperstride
-Melee: Diversion, Dual-Wield
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -464,11 +349,6 @@ If another player is present, solo role abilities will not work.
 
 Steelsmith
 Battle + Trade
-
-All: Steelsmith Crafts
-Melee: Two-Handed Weapons
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -504,20 +384,12 @@ See also: BLOCK CAP, CASTER, DODGE CAP, HEALER, MELEE
 Theurge
 High Sorcery + Survival
 
-Caster: Thornlash
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, UTILITY
 #
 "TINKER CLASS" TNKR
 
 Tinker
 Survival + Trade
-
-All: Tinker Crafts
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -537,17 +409,8 @@ See also: CASTER, HEALER, MELEE, TANK
 Werewolf
 Battle + Natural Magic
 
-All: Resurrect, Werewolf Form
-Tank: Spirit Wolf (familiar), Towering Werewolf Form
-Melee: Dire Wolf (familiar), Savage Werewolf Form
-Caster: Astral Werewolf Form, Astralclaw, Dire Wolf (familiar)
-Healer: Confer, Fastcasting, Healing Boost, Moon Rabbit (familiar), Sage
-        Werewolf Form
-
 Healer Werewolves can convert Strength into buffs for themselves and their
 allies, and should build their Strength in addition to the 4 healer traits.
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, TANK, MELEE, HEALER
 #
@@ -555,10 +418,6 @@ See also: CLASS, TANK, MELEE, HEALER
 
 Wight
 Survival + Vampire
-
-Melee: Horrid Form
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE
 #

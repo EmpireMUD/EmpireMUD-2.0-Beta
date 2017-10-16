@@ -12,8 +12,12 @@ into leather.
 Many craftable items are scalable, meaning their stats depend on the level of
 the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
 
+You get additional Trade abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
-  REFORGE
+  REFORGE, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
 #
 "ADVANCED SHIPS" "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIP LIST"
 

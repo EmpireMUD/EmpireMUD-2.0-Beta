@@ -22,8 +22,13 @@ Empire is a skill, a command, and a grouping of people and land.
 
 You can learn about founding and managing empires on HELP EMPIRE GUIDE.
 
+You get additional Empire abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
 See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, CITY COMMAND,
-    ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK
+    ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK, ROLE, SKILL,
+    SKILL SYNERGY, BASIC BUILDINGS, CHORES
 #
 ABANDON
 

@@ -4,13 +4,14 @@ Stealth is the skill tree for all things secret, hidden, or shadow. Little is
 known about its practitioners. Rumors swirl of an underground group of thieves
 called the Guild, though no one dares confirm them.
 
+You can get additional Stealth abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
 (To begin your journey down the path of Stealth, try bribing the hidden guild-
 master.)
 
-See also: HIDE, SNEAK, BACKSTAB, PICKPOCKET, DISGUISE, JAB, TERRIFY,
-    DARKNESS, APPRAISAL, BLIND, VAULTCRACKING, POISONS, DEADLY POISONS,
-    SECRET CACHE, DAGGER MASTERY, CLOAK OF DARKNESS, INFILTRATE, SAP,
-    SHADOWSTEP, CONCEALMENT, ESCAPE, PRICK
+See also: ROLE, SKILL, SKILL SYNERGY
 #
 APPRAISAL
 
