@@ -153,10 +153,9 @@ Gain experience by casting this spell.
 
 See also: CLEANSE
 #
-ENCHANT ENCHANTED "ENCHANT WEAPONS" "ENCHANT ARMOR" "ENCHANT TOOLS" "ENCHANT ACCESSORIES" "ENCHANT ACCESSORY"
+ENCHANT ENCHANTED "ENCHANT WEAPONS" "ENCHANT ARMOR" "ENCHANT TOOLS"
 
-Enchant Weapons, Enchant Armor, Enchant Tools,
-   Enchant Accessories (High Sorcery abilities)
+Enchant Weapons, Enchant Armor, Enchant Tools (High Sorcery abilities)
 
 Usage:  enchant <item | person> <type>
 
@@ -185,10 +184,11 @@ Enchant Weapons:
   fury (offhand) - bonus magical, mana regen (5 lightning stone)
   venom (offhand) - bonus physical, move regen (5 bloodstone)
 
-Enchant Armor (armor slot only):
+Enchant Armor (armor, about, arms, waist, legs):
   health - health  (5 bloodstones)
   mana - mana  (5 blue irises)
   stamina - move  (5 lightning stones)
+  bloodwell - blood  (5 bloodstones)
   regeneration - health regen  (5 blue irises)
   longrunning - move regen  (5 lightning stones)
   energy - mana regen  (5 blue irises)
@@ -204,12 +204,6 @@ Enchant Armor (armor slot only):
 Enchant Tools:
   embiggening (pack) - capacity  (1 of each of the 4 gems)
   this ability also lets you enchant the crystal seed world drop
-
-Enchant Accessories (finger, neck):
-  vitality - health  (5 bloodstones)
-  vigor - move  (5 lightning stone)
-  essence - mana  (5 irises)
-  bloodwell - blood  (5 bloodstones)
 
 See also: CRAFTING LEVEL, GREATER ENCHANTMENTS, RECIPES, SHARE
 #
