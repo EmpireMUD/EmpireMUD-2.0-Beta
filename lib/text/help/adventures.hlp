@@ -45,11 +45,11 @@ Resources:
   tough dragon leather (tanned from hide)
   dragonsteel ingot (smelted from bone)
 
-Each type of pattern requires a tradesman from a specific class:
-  Mythic Forge (forge): Steelsmith, Guildsman
-  Legendary Stitching (sew): Artificer, Smuggler
-  Lore Crafts (craft): Artificer, Tinker
-  Fabled Hides (sew): Antiquarian, Alchemist
+Each type of pattern requires a tradesman with a specific skill synergy:
+  Mythic Forge (forge): 100 Trade / 75 Empire
+  Legendary Stitching (sew): 100 Trade / 75 Stealth
+  Lore Crafts (craft): 100 Trade / 75 High Sorcery
+  Fabled Hides (sew): 100 Trade / 75 Natural Magic
 
 Crafting patterns by role:
   Caster: flaming dragonbone staff, tome of dragonkind, burning dragoncloth
