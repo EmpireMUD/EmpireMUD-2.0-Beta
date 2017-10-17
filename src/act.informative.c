@@ -115,6 +115,35 @@ char *find_exdesc(char *word, struct extra_descr_data *list) {
 
 
 /**
+* Gets the list of a character's class-level skills, for use on who/whois.
+*
+* @param char_data *ch The player.
+* @param char *buffer The string to save to.
+* @param bool abbrev If TRUE, gets the short version.
+*/
+void get_player_skill_string(char_data *ch, char *buffer, bool abbrev) {
+	struct player_skill_data *plsk, *next_plsk;
+	
+	*buffer = '\0';
+	
+	if (IS_IMMORTAL(ch)) {
+		strcpy(buffer, abbrev ? "Imm" : "Immortal");
+	}
+	else if (!IS_NPC(ch)) {
+		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+			if (plsk->level >= CLASS_SKILL_CAP) {
+				sprintf(buffer + strlen(buffer), "%s%s", (*buffer ? (abbrev ? "/" : ", ") : ""), abbrev ? SKILL_ABBREV(plsk->ptr) : SKILL_NAME(plsk->ptr));
+			}
+		}
+	}
+	
+	if (!*buffer) {
+		strcpy(buffer, abbrev ? "New" : "Newbie");
+	}
+}
+
+
+/**
 * Gets the instance's best-format level range in a string like "level 10" or
 * "levels 50-75" -- this will change e.g. if the instance is scaled.
 *
@@ -468,7 +497,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
-	msg_to_char(to, " Class: %-17.17s", SHOW_CLASS_NAME(ch));
+	get_player_skill_string(ch, lbuf, TRUE);
+	msg_to_char(to, " Skill: %-17.17s", lbuf);
 	msg_to_char(to, " Level: %d (%d)\r\n", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
@@ -1548,7 +1578,7 @@ void sort_who_entries(struct who_entry **node_list, WHO_SORTER(*compare_func)) {
 */
 char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	static char out[MAX_STRING_LENGTH];
-	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], show_role[24];
+	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], show_role[24], part[MAX_STRING_LENGTH];
 	int num, size = 0;
 	
 	*out = '\0';
@@ -1566,7 +1596,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), screenreader ? "" : "\t0");
 		}
 		else {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? SHOW_CLASS_NAME(ch) : SHOW_CLASS_ABBREV(ch), screenreader ? show_role : "\t0");
+			get_player_skill_string(ch, part, TRUE);
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], part, screenreader ? show_role : "\t0");
 		}
 	}
 	
@@ -3075,6 +3106,7 @@ ACMD(do_whois) {
 	void check_delayed_load(char_data *ch);
 	extern const char *level_names[][2];
 	
+	char part[MAX_STRING_LENGTH];
 	char_data *victim = NULL;
 	bool file = FALSE;
 	int level;
@@ -3101,7 +3133,9 @@ ACMD(do_whois) {
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {
 		level = file ? GET_LAST_KNOWN_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
 		
-		msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, SHOW_CLASS_NAME(victim), class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
+		get_player_skill_string(victim, part, FALSE);
+		msg_to_char(ch, "Level: %d\r\n", level);
+		msg_to_char(ch, "Skills: %s (%s%s\t0)\r\n", part, class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
 	}
 
 	if (GET_LOYALTY(victim)) {

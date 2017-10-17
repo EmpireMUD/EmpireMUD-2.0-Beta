@@ -140,12 +140,6 @@ S
 Bloodsweat~
 0 -1 1.00 0 0
 S
-#230
-Dragonriding~
-0 -1 1.00 0 0
-D 1 40 0
-T e 1
-S
 #231
 Shadow Kick~
 0 -1 1.00 0 0
@@ -437,5 +431,24 @@ S
 #298
 Fletching~
 0 203 1.00 0 0
+S
+#299
+Windstride~
+d -1 2.50 0 ag
+A
+6 1
+C
+windstride 8 bg 0 0 0 299 600 5 1 0
+D 1 40 0
+M
+0
+You feel the wind at your back as vigor returns to your muscles!~
+M
+1
+A gust of wind whirls around $n, propelling $m forward!~
+T e 0
+T b 1
+X b
+298 30 30 0
 S
 $

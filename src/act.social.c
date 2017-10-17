@@ -447,7 +447,7 @@ ACMD(do_roll) {
 		snprintf(buf, sizeof(buf), "You roll a %d-sided die and get: %d\r\n", size, total);
 		send_to_char(buf, ch);
 		if (ch->desc) {
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, buf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_ROLL, buf);
 		}
 		
 		snprintf(buf, sizeof(buf), "$n rolls a %d-sided die and gets: %d", size, total);
@@ -463,7 +463,7 @@ ACMD(do_roll) {
 					act(buf, FALSE, ch, NULL, mem->member, TO_VICT | TO_SLEEP);
 					
 					if (mem->member->desc && mem->member->desc->last_act_message) {
-						add_to_channel_history(mem->member, CHANNEL_HISTORY_SAY, mem->member->desc->last_act_message);
+						add_to_channel_history(mem->member, CHANNEL_HISTORY_ROLL, mem->member->desc->last_act_message);
 					}
 				}
 			}
@@ -486,7 +486,7 @@ ACMD(do_roll) {
 					act(buf, FALSE, ch, NULL, mem->member, TO_VICT | TO_SLEEP);
 					
 					if (mem->member->desc && mem->member->desc->last_act_message) {
-						add_to_channel_history(mem->member, CHANNEL_HISTORY_SAY, mem->member->desc->last_act_message);
+						add_to_channel_history(mem->member, CHANNEL_HISTORY_ROLL, mem->member->desc->last_act_message);
 					}
 				}
 			}
@@ -496,7 +496,7 @@ ACMD(do_roll) {
 	// save room last-act
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (vict != ch && vict->desc && vict->desc->last_act_message) {
-			add_to_channel_history(vict, CHANNEL_HISTORY_SAY, vict->desc->last_act_message);
+			add_to_channel_history(vict, CHANNEL_HISTORY_ROLL, vict->desc->last_act_message);
 		}
 	}
 }

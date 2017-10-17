@@ -1,16 +1,17 @@
-STEALTH "STEALTH SKILL"
+STEALTH "STEALTH SKILL" STL
 
 Stealth is the skill tree for all things secret, hidden, or shadow. Little is
 known about its practitioners. Rumors swirl of an underground group of thieves
 called the Guild, though no one dares confirm them.
 
+You can get additional Stealth abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
 (To begin your journey down the path of Stealth, try bribing the hidden guild-
 master.)
 
-See also: HIDE, SNEAK, BACKSTAB, PICKPOCKET, DISGUISE, JAB, TERRIFY,
-    DARKNESS, APPRAISAL, BLIND, VAULTCRACKING, POISONS, DEADLY POISONS,
-    SECRET CACHE, DAGGER MASTERY, CLOAK OF DARKNESS, INFILTRATE, SAP,
-    SHADOWSTEP, CONCEALMENT, ESCAPE, PRICK
+See also: ROLE, SKILL, SKILL SYNERGY
 #
 APPRAISAL
 
@@ -96,7 +97,7 @@ This ability gains skill points whenever they try.
 "CRUCIAL JAB"
 
 Crucial Jab
-Class ability: Bandit
+Stealth Synergy Ability: 100 Survival
 Debuff type: Stealth
 
 Your Jab ability causes a debuff equal to your total level divided by 80 to
@@ -149,7 +150,7 @@ Gain experience by trying to disguise yourself.
 DIVERSION
 
 Diversion
-Class ability:  Smuggler
+Stealth Synergy Ability: 100 Trade
 Debuff type:  Stealth
 Cost:  50 move
 Cooldown:  30 seconds
@@ -189,8 +190,7 @@ See also: CLING TO SHADOW, SEARCH, SNEAK, SENSE LIFE RITUAL
 HOWL
 
 Howl
-Class ability:  Shadow Wolf
-Debuff type:  Stealth
+Stealth Synergy Ability: 100 Natural Magic
 Cost:  50 move
 Cooldown:  30 seconds
 Usage:  howl
@@ -371,7 +371,7 @@ See also: BUILD, VAULT
 "SHADOW JAB"
 
 Shadow Jab
-Class ability: Shade
+Stealth Synergy Ability: 100 Vampire
 Debuff type: Stealth
 
 Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
@@ -382,7 +382,7 @@ See also: JAB
 "SHADOW KICK"
 
 Shadow Kick
-Class ability:  Assassin
+Battle Synergy Ability: 100 Stealth
 Debuff type:  Battle
 
 Your Kick ability causes a penalty to physical and magical damage equal to
@@ -393,7 +393,7 @@ See also: KICK
 SHADOWCAGE "SHADOW CAGE"
 
 Shadowcage
-Class ability: Occultist
+Stealth Synergy Ability: 100 High Sorcery
 Debuff type: Stealth
 Cost: 50 move
 Cooldown: 30 seconds
@@ -445,7 +445,7 @@ See also: HIDE
 "STAGGER JAB"
 
 Stagger Jab
-Class ability: Powerbroker
+Stealth Synergy Ability: 100 Empire
 Debuff type: Stealth
 
 Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
@@ -537,7 +537,7 @@ See also: STEAL
 WHISPERSTRIDE
 
 Whisperstride
-Class ability: Assassin, Bandit, Powerbroker, Smuggler
+Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade OR 100 Empire
 Usage:  whisperstride
 Cooldown:  5 minutes
 Cost:  100 move

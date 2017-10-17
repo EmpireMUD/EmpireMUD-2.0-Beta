@@ -929,7 +929,7 @@ ACMD(do_heal) {
 
 	// amount to heal will determine the cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil));
-	if (has_player_tech(ch, PTECH_HEALING_BOOST) && check_solo_role(ch)) {
+	if ((GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO || has_player_tech(ch, PTECH_HEALING_BOOST)) && check_solo_role(ch)) {
 		amount += (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(healer_level_bonus, ch, abil));
 	}
 	bonus = total_bonus_healing(ch);
@@ -940,7 +940,7 @@ ACMD(do_heal) {
 		amount = MAX(1, amount);
 	}
 	
-	if (has_player_tech(ch, PTECH_HEALING_BOOST) && check_solo_role(ch)) {
+	if ((GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO || has_player_tech(ch, PTECH_HEALING_BOOST)) && check_solo_role(ch)) {
 		cost = amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_ratio, ch, abil);
 	}
 	else {
@@ -1218,7 +1218,7 @@ ACMD(do_rejuvenate) {
 	// amount determines cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
 	amount += round(GET_INTELLIGENCE(ch) * int_mod);
-	if (has_player_tech(ch, PTECH_HEALING_BOOST) && check_solo_role(ch)) {
+	if ((GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO || has_player_tech(ch, PTECH_HEALING_BOOST)) && check_solo_role(ch)) {
 		amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
 		cost = round(amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_mod, ch, ABIL_REJUVENATE));
 	}

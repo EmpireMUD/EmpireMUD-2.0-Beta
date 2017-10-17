@@ -1,4 +1,4 @@
-"HIGH SORCERY"
+"HIGH SORCERY" SOR
 
 High Sorcery (skill)
 
@@ -8,17 +8,16 @@ harnessing the powerful mana that flows through the world.
 To begin the path of High Sorcery, seek out one of its lofty towers and use
 the STUDY command on the top floor.
 
-See also: STUDY, SORCERY TOWER, RITUAL, STAFFMAKING, FORESIGHT, MANASHIELD,
-    SUMMON SWIFT, DISENCHANT, COLORBURST, RITUAL OF BURDENS, PHOENIX RITE,
-    VIGOR, RITUAL OF TELEPORTATION, CITY TELEPORTATION, RITUAL OF DEFENSE,
-    PORTAL MAGIC, PORTAL MASTER, RITUAL OF SENSE LIFE, RITUAL OF DETECTION,
-    DEVASTATION RITUAL, ENCHANT, ENERVATE, SIPHON, SLOW, SUNSHOCK, MIRRORIMAGE,
-    ARCANE POWER, DISPEL, COLLAPSE
+You get additional High Sorcery abilities when you reach level 100, depending
+on which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
+See also: ROLE, SKILL, SKILL SYNERGY, STUDY
 #
 ABLATE ABLATION
 
 Ablate
-Class ability:  Battlemage
+High Sorcery Synergy Ability: 100 Battle
 
 Usage:  ablate [victim]
 Cooldown:  9 seconds
@@ -43,7 +42,7 @@ Gains experience passively over time.
 ARCLIGHT "ARC LIGHT"
 
 Arclight
-Class ability:  Archmage
+Natural Magic Synergy Ability: 100 High Sorcery
 
 Usage:  arclight [victim]
 Cooldown:  9 seconds
@@ -57,7 +56,7 @@ See also: ARCHMAGE CLASS
 CHRONOBLAST
 
 Chronoblast
-Class ability:  Artificer
+High Sorcery Synergy Ability: 100 Trade
 
 Usage:  chronoblast [victim]
 Cooldown:  6 seconds
@@ -184,10 +183,11 @@ Enchant Weapons:
   fury (offhand) - bonus magical, mana regen (5 lightning stone)
   venom (offhand) - bonus physical, move regen (5 bloodstone)
 
-Enchant Armor:
+Enchant Armor (armor, about, arms, waist, legs):
   health - health  (5 bloodstones)
   mana - mana  (5 blue irises)
   stamina - move  (5 lightning stones)
+  bloodwell - blood  (5 bloodstones)
   regeneration - health regen  (5 blue irises)
   longrunning - move regen  (5 lightning stones)
   energy - mana regen  (5 blue irises)
@@ -198,7 +198,7 @@ Enchant Armor:
   spellwarding - resist-magical (5 blue irises)
   focus - to-hit (5 bloodstones)
   acrobatics - dexterity (5 lightning stones)
-  blocking (shield) - block  (5 lightning stones)
+  blocking (shield slot) - block  (5 lightning stones)
 
 Enchant Tools:
   embiggening (pack) - capacity  (1 of each of the 4 gems)
@@ -427,7 +427,7 @@ See also: CITY TELEPORTATION, RITUAL
 SCOUR
 
 Scour
-Class ability:  Exarch
+High Sorcery Synergy Ability: 100 Empire
 
 Usage:  scour [victim]
 Cooldown:  6 seconds
@@ -442,7 +442,7 @@ See also: DOT, EXARCH CLASS
 SHADOWLASH "SHADOW LASH"
 
 Shadowlash
-Class ability:  Occultist
+High Sorcery Synergy Ability: 100 Stealth
 
 Usage:  shadowlash [victim]
 Cooldown:  9 seconds
@@ -503,7 +503,7 @@ Debuff type:  High Sorcery
 
 This ability hexes your victim with lethargy, causing them to attack more
 slowly in combat. If you're already fighting and do not specify a victim, it
-will target the person you are fighting. As a class ability, this spell's
+will target the person you are fighting. At High Sorcery 100, this spell's
 duration increases.
 
 Gain experience by casting this spell.
@@ -511,7 +511,7 @@ Gain experience by casting this spell.
 SOULCHAIN "SOUL CHAIN"
 
 Soulchain
-Class ability:  Lich
+High Sorcery Synergy Ability: 100 Vampire
 
 Usage:  soulchain [victim]
 Cooldown:  9 seconds
@@ -632,7 +632,7 @@ See also: BLIND
 THORNLASH "THORN LASH"
 
 Thornlash
-Class ability:  Theurge
+High Sorcery Synergy Ability: 100 Survival
 
 Usage:  thornlash [victim]
 Cooldown:  9 seconds

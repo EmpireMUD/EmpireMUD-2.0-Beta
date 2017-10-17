@@ -450,6 +450,7 @@ Usage:  skills -- list all skills
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
+        skill synergy <skill 1> <skill 2> -- see list of synergy abilities
         skill swap
 
 This multi-purpose command helps you understand your skills. It shows your
@@ -534,6 +535,26 @@ between both sets.
 Swapping skill sets takes 15 seconds and cannot be done in combat.
 
 See also: SKILLS, SLEEP
+#
+SYNERGY SYNERGIES "SYNERGY ABILITY" "SKILL SYNERGY"
+
+Usage:  skill synergy <skill 1> <skill 2>
+
+Some skills have 'synergy abilities', which are abilities you get automatically
+when you also have another skill. The required level of each skill varies for
+some synergy abilities, but they often both have to be at 100. Synergy
+abilities do not cost you an ability point. Some abilities require you to be
+in the right role.
+
+For example, with Natural Magic 100 and Battle 100, you receive Resurrect.
+
+Typing the 'skill synergy' command will let you see synergy abilities between
+any two skills.
+
+You can type 'role' to see your current synergy abilities. Check the help files
+for the various skills for a list of synergy abilities.
+
+See also: ROLE, SKILLS
 #
 "TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 

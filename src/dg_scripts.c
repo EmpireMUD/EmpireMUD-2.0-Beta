@@ -4378,6 +4378,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							*str = '\0';
 					}
+					else if (!str_cmp(field, "in_city")) {
+						bool junk;
+						if (ROOM_OWNER(r) && is_in_city_for_empire(r, ROOM_OWNER(r), (*subfield && (atoi(subfield) || !str_cmp(subfield, "true"))), &junk)) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "in_vehicle")) {
 						if (GET_ROOM_VEHICLE(r)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(GET_ROOM_VEHICLE(r)));

@@ -1662,7 +1662,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHANNEL_HISTORY_TELLS  1
 #define CHANNEL_HISTORY_SAY  2
 #define CHANNEL_HISTORY_EMPIRE  3
-#define NUM_CHANNEL_HISTORY_TYPES  4
+#define CHANNEL_HISTORY_ROLL  4
+#define NUM_CHANNEL_HISTORY_TYPES  5
 
 
 // Modes of connectedness
@@ -2595,6 +2596,7 @@ struct skill_data {
 	int max_level;	// skill's maximum level (default 100)
 	int min_drop_level;	// how low the skill can be dropped manually (default 0)
 	struct skill_ability *abilities;	// assigned abilities
+	struct synergy_ability *synergies;	// LL of abilities gained from paired skills
 	
 	UT_hash_handle hh;	// skill_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_skills hash handle
@@ -2608,6 +2610,19 @@ struct skill_ability {
 	int level;	// skill level to get this ability
 	
 	struct skill_ability *next;	// linked list
+};
+
+
+// for abilities you gain when you have this skill at its max and another skill at <level>
+struct synergy_ability {
+	int role;	// ROLE_ const
+	any_vnum skill;	// skill required
+	int level;	// level required in that skill
+	any_vnum ability;	// ability to gain
+	
+	int unused;	// for future expansion
+	
+	struct synergy_ability *next;	// LL
 };
 
 
@@ -2711,6 +2726,8 @@ struct ability_data {
 	skill_data *assigned_skill;	// skill for reverse-lookup
 	int skill_level;	// level of that skill required
 	bitvector_t types;	// summary of ABILT_ flags
+	bool is_class;	// assignment comes from a class
+	bool is_synergy;	// assignemtn comes from a synergy
 	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
@@ -3284,6 +3301,7 @@ struct descriptor_data {
 	int olc_type;	// OLC_OBJECT, etc -- only when an editor is open
 	char *olc_storage;	// a character buffer created and used by some olc modes
 	any_vnum olc_vnum;	// vnum being edited
+	bool olc_show_tree, olc_show_synergies;	// for skill editors
 	
 	// OLC_x: olc types
 	ability_data *olc_ability;	// abil being edited

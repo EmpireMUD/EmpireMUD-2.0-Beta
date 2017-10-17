@@ -133,6 +133,9 @@
 
 // utils
 #define ABILITY_FLAGGED(abil, flag)  IS_SET(ABIL_FLAGS(abil), (flag))
+#define ABIL_IS_CLASS(abil)  ((abil)->is_class)
+#define ABIL_IS_PURCHASE(abil)  (ABIL_ASSIGNED_SKILL(abil) != NULL)
+#define ABIL_IS_SYNERGY(abil)  ((abil)->is_synergy)
 #define SAFE_ABIL_COMMAND(abil)  (ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "something")
 
 
@@ -471,6 +474,9 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_TYPE(desc)  ((desc)->olc_type)
 #define GET_OLC_VNUM(desc)  ((desc)->olc_vnum)
 #define GET_OLC_STORAGE(desc)  ((desc)->olc_storage)
+#define GET_OLC_SHOW_TREE(desc)  ((desc)->olc_show_tree)
+#define GET_OLC_SHOW_SYNERGIES(desc)  ((desc)->olc_show_synergies)
+
 #define GET_OLC_ABILITY(desc)  ((desc)->olc_ability)
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
 #define GET_OLC_ARCHETYPE(desc)  ((desc)->olc_archetype)
@@ -1097,7 +1103,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define PRF_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PRF_FLAGS(ch), (flag)))
 #define OLC_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_OLC_FLAGS(ch), (flag)))
 #define SAVE_ACCOUNT(acct)  save_library_file_for_vnum(DB_BOOT_ACCT, (acct)->id)
-#define SHOW_CLASS_ABBREV(ch)  ((!IS_NPC(ch) && GET_CLASS(ch)) ? CLASS_ABBREV(GET_CLASS(ch)) : config_get_string("default_class_abbrev"))
 #define SHOW_CLASS_NAME(ch)  ((!IS_NPC(ch) && GET_CLASS(ch)) ? CLASS_NAME(GET_CLASS(ch)) : config_get_string("default_class_name"))
 #define SHOW_FIGHT_MESSAGES(ch, bit)  (!IS_NPC(ch) && IS_SET(GET_FIGHT_MESSAGES(ch), (bit)))
 
@@ -1329,6 +1334,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define SKILL_MAX_LEVEL(skill)  ((skill)->max_level)
 #define SKILL_MIN_DROP_LEVEL(skill)  ((skill)->min_drop_level)
 #define SKILL_NAME(skill)  ((skill)->name)
+#define SKILL_SYNERGIES(skill)  ((skill)->synergies)
 #define SKILL_VNUM(skill)  ((skill)->vnum)
 
 // utils

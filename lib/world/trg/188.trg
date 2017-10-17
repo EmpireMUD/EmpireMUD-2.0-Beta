@@ -208,6 +208,8 @@ eval heroic_mode %self.mob_flagged(GROUP)%
 if %heroic_mode%
   %echo% &r%self.name% swings %self.hisher% sword in a wide arc at neck level, causing bleeding wounds!
   %aoe% 100 physical
+  eval room %self.room%
+  eval person %room.people%
   while %person%
     eval check %%person.is_enemy(%self%)%%
     if %check%

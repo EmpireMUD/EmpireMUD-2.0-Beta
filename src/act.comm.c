@@ -1026,7 +1026,7 @@ ACMD(do_gsay) {
 * Uses subcmd as which channel history.
 */
 ACMD(do_history) {
-	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats" };
+	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats", "rolls" };
 	struct channel_history_data *chd_iter;
 	bool found_crlf;
 	int pos;

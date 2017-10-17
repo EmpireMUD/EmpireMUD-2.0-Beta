@@ -163,6 +163,8 @@ When using field - The variable returns:
       %room.north(FLG)% - CLOSED LOCKED, etc.
       %room.north(room)% - room variable for room in direction
 &cid&0 - The unique id of the room.
+&cin_city&0 - For claimed land, true if the tile is in a city for the owner.
+&cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.

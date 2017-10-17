@@ -1,4 +1,4 @@
-CLASS "CLASS SKILLS" "CLASS ROLE" ROLE
+CLASS "CLASS SKILLS" "CLASS ROLE" ROLE "GROUP ROLE"
 
 When you specialize two skills past 75, they become your "class skills" and
 you are assigned a class. Your class determines how large your health, move,
@@ -6,17 +6,20 @@ and mana pools are. It also gives you some new abilities once you skill level
 100.
 
 Usage:  class [role <type>]
+        role [type]
 
 The class command shows your current class, role, and class abilities. You
 can also use this command to change roles. For example, "class role tank".
 You must have a role in order to gain your class's abilities, even if all of
 its roles share them.
 
-Class roles are the different tasks a class might be suited for. For example,
-if your class has both Natural Magic and Survival as its core skills, it might
-be suited to melee damage, caster damage, or healing. You can't perform all
-roles at the same time. You can change your current role using the "class role"
-command.
+Group roles are the different tasks a person might be suited for. For example,
+if your character has both Natural Magic and Survival as its core skills, it
+might be suited to melee damage, caster damage, or healing. You can't perform
+all roles at the same time.
+
+The role command lists synergy abilities and can also be used to change your
+role.
 
 &yTank&0: Takes all the damage in combat.
 &rMelee&0: Does physical damage.
@@ -25,9 +28,9 @@ command.
 &mUtility&0: Doesn't fight; builds or crafts instead.
 &wSolo&0: For playing alone; some abilities won't work in groups.
 
-The colors shown above are used to display class roles on "who" and "roster".
+The colors shown above are used to display group roles on "who" and "roster".
 
-See also: CLASS LIST, TANK, HEALER, MELEE, CASTER, UTILITY, SOLO
+See also: CLASS LIST, TANK, HEALER, MELEE, CASTER, UTILITY, SOLO, SYNERGY ABILITY
 #
 "CLASS LIST" CLASSES
 
@@ -77,22 +80,12 @@ There are two types of archetypes:
 Alchemist
 Natural Magic + Trade
 
-All: Alchemist Crafts, Resurrect, Salamander (familiar)
-Caster: Acidblast
-Healer: Fastcasting, Healing Boost
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, HEALER, UTILITY
 #
 "ANCIENT CLASS" ANCIENT ANCT
 
 Ancient
 Vampire + Empire
-
-All: Dragonriding
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -101,22 +94,12 @@ See also: CLASS, MELEE, UTILITY
 Antiquarian
 Trade + Vampire
 
-All: Antiquarian Crafts
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE, UTILITY
 #
 "ARCHMAGE CLASS" ACHM
 
 Archmage
 High Sorcery + Natural Magic
-
-All: Phoenix (familiar), Resurrect
-Caster: Arclight
-Healer: Fastcasting, Healing Boost
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, CASTER, HEALER
 #
@@ -125,22 +108,12 @@ See also: CLASS, CASTER, HEALER
 Artificer
 High Sorcery + Trade
 
-All: Artificer Crafts
-Caster: Chronoblast
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, CASTER, UTILITY
 #
 "ASSASSIN CLASS" ASSN
 
 Assassin
 Battle + Stealth
-
-All: Whisperstride
-Melee: Dual-Wield, Shadow Kick
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE
 #
@@ -149,11 +122,6 @@ See also: CLASS, MELEE
 Bandit
 Stealth + Survival
 
-All: Whisperstride
-Melee: Crucial Jab, Dual-Wield
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE
 #
 "BARBARIAN CLASS" BRBN
@@ -161,21 +129,12 @@ See also: CLASS, MELEE
 Barbarian
 Battle + Survival
 
-Tank: Ward Against Magic
-Melee: Two-Handed Weapons
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, TANK, MELEE
 #
 "BATTLEMAGE CLASS" "BATTLE MAGE CLASS" BTMG
 
 Battlemage
 Battle + High Sorcery
-
-Caster: Ablate
-
-Note: Class abilities are unfinished.
 
 See also: CLASS
 #
@@ -198,7 +157,7 @@ Intelligence. The caster should never be taking direct damage from mobs in
 combat. When choosing gear, potions, and buffs for your caster character, focus
 on the caster traits below. Other traits don't contribute to caster DPS.
 
-The class names of casters appear in &aazure&0 on the "who" list and the empire
+The skills of casters appear in &aazure&0 on the "who" list and the empire
 roster.
 
 Caster tips:
@@ -231,22 +190,12 @@ See also: BUFF, CLASS FAMILIARS
 Duke
 Battle + Empire
 
-All: Dragonriding
-Tank: Noble Bearing
-Melee: Two-Handed Weapons
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, TANK, MELEE, UTILITY
 #
 "ELDER CLASS" ELDR
 
 Elder
 Empire + Survival
-
-All: Dragonriding, Elder Crafts
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -255,11 +204,6 @@ See also: CLASS, MELEE, UTILITY
 Exarch
 Empire + High Sorcery
 
-All: Dragonriding, Exarch Crafts
-Caster: Scour
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, CASTER, UTILITY
 #
 "FERAL CLASS" FERL
@@ -267,23 +211,12 @@ See also: CLASS, CASTER, UTILITY
 Feral
 Natural Magic + Survival
 
-All: Basilisk (familiar), Resurrect, Werewolf Form
-Tank: Towering Werewolf Form
-Caster: Astral Werewolf Form, Starstrike
-Healer: Fastcasting, Healing Boost, Sage Werewolf Form
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, TANK, HEALER
 #
 "GUILDSMAN CLASS" GDSM
 
 Guildsman
 Empire + Trade
-
-All: Dragonriding, Guildsman Crafts
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -295,8 +228,8 @@ damage or taking damage. When choosing gear, potions, and buffs for your healer
 character, focus on the healer traits below. Other traits don't contribute to
 healing.
 
-The class names of healers appear in &jjade&0 on the "who" list and the
-empire roster.
+The skills of healers appear in &jjade&0 on the "who" list and the empire
+roster.
 
 Healer tips:
  - Put the tank's health in your prompt with %f/%F.
@@ -318,10 +251,6 @@ See also: CASTER, MELEE, TANK
 Lich
 High Sorcery + Vampire
 
-Caster: Dread Blood Form, Soulchain
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, CASTER
 #
 "LUMINARY CLASS" LMNY
@@ -329,15 +258,8 @@ See also: CLASS, CASTER
 Luminary
 Empire + Natural Magic
 
-All: Chant of Illusions, Dragonriding, Griffin (familiar),
-   Manticore (familiar), Resurrect
-Caster: Erode
-Healer: Ancestral Healing, Fastcasting, Healing Boost
-
 Luminary Healers gain additional healing power from Greatness and should build
 their Greatness in addition to the 4 healer traits.
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, CASTER, HEALER, UTILITY
 #
@@ -349,8 +271,8 @@ Wits, and Strength. The melee role should avoid taking damage in combat. When
 choosing gear, potions, and buffs for your melee character, focus on the
 melee traits below. Other traits don't contribute to melee DPS.
 
-The class names of melee DPS characters appear in &rred&0 on the "who" list
-and the empire roster.
+The skills of melee DPS characters appear in &rred&0 on the "who" list and the
+empire roster.
 
 Melee tips:
  - Let the tank start the fight.
@@ -370,23 +292,12 @@ See also: CASTER, HEALER, HIT CAP, TANK
 Necromancer
 Natural Magic + Vampire
 
-All: Resurrect
-Caster: Deathtouch, Dread Blood Form, Skeletal Hulk (familiar)
-Healer: Banshee (familiar), Fastcasting, Healing Boost
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, CASTER, HEALER
 #
 "OCCULTIST CLASS" OCLT
 
 Occultist
 High Sorcery + Stealth
-
-Caster: Shadowlash
-Melee: Shadowcage
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE
 #
@@ -395,22 +306,12 @@ See also: CLASS, MELEE
 Powerbroker
 Empire + Stealth
 
-All: Dragonriding, Whisperstride
-Melee: Stagger Jab
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE
 #
 "REAPER CLASS" REAP
 
 Reaper
 Battle + Vampire
-
-Tank: Blood Fortitude, Bloodsweat, Ward Against Magic
-Melee: Horrid Form
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, TANK, MELEE
 #
@@ -419,23 +320,12 @@ See also: CLASS, TANK, MELEE
 Shade
 Stealth + Vampire
 
-Melee: Horrid Form, Shadow Jab
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE
 #
 "SHADOW WOLF CLASS" SHWF
 
 Shadow Wolf
 Natural Magic + Stealth
-
-All: Moonrise, Werewolf Form
-Melee: Howl, Savage Werewolf Form, Scorpion Shadow (familiar)
-Caster: Astral Werewolf Form, Dispirit, Scorpion Shadow (familiar)
-Healer: Fastcasting, Healing Boost, Owl Shadow (familiar), Sage Werewolf Form
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, HEALER
 #
@@ -444,16 +334,11 @@ See also: CLASS, MELEE, HEALER
 Smuggler
 Stealth + Trade
 
-All: Smuggler Crafts, Whisperstride
-Melee: Diversion, Dual-Wield
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE, UTILITY
 #
-SOLO SOLOIST "SOLO ROLE" "SOLO CLASS ROLE"
+SOLO SOLOIST "SOLO ROLE" "SOLO GROUP ROLE"
 
-The "solo" class role is for people who are going it alone and need every ounce
+The "solo" group role is for people who are going it alone and need every ounce
 of strength their class can muster. This gives them access to a broader range
 of class abilities, but those abilities will only work if the player is
 actually solo.
@@ -465,11 +350,6 @@ If another player is present, solo role abilities will not work.
 Steelsmith
 Battle + Trade
 
-All: Steelsmith Crafts
-Melee: Two-Handed Weapons
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, MELEE, UTILITY
 #
 TANK TANKING "TANK ROLE" "TANKING ROLE" "TANK TRAITS" "TANKING ROLE"
@@ -480,8 +360,8 @@ need Strength or Wits, because those are related to dealing damage. When
 choosing gear, potions, and buffs for your tank character, you only need to
 worry about the tank traits listed below
 
-The class names of tanks appear in &yyellow&0 on the "who" list and the
-empire roster.
+The skills of tanks appear in &yyellow&0 on the "who" list and the empire
+roster.
 
 Tanking tips:
  - The tank should start combat with all mobs so they are hitting him, rather
@@ -504,20 +384,12 @@ See also: BLOCK CAP, CASTER, DODGE CAP, HEALER, MELEE
 Theurge
 High Sorcery + Survival
 
-Caster: Thornlash
-
-Note: Class abilities are unfinished.
-
 See also: CLASS, UTILITY
 #
 "TINKER CLASS" TNKR
 
 Tinker
 Survival + Trade
-
-All: Tinker Crafts
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE, UTILITY
 #
@@ -527,8 +399,8 @@ Utility characters are usually noncombatants like crafters or builders. They're
 entirely capable of fighting, but they don't get the advantage that the class
 abilities of the combat roles provide.
 
-The class names of utility characters appear in &mmagenta&0 on the "who" list
-and the empire roster.
+The skills of utility characters appear in &mmagenta&0 on the "who" list and
+the empire roster.
 
 See also: CASTER, HEALER, MELEE, TANK
 #
@@ -537,17 +409,8 @@ See also: CASTER, HEALER, MELEE, TANK
 Werewolf
 Battle + Natural Magic
 
-All: Resurrect, Werewolf Form
-Tank: Spirit Wolf (familiar), Towering Werewolf Form
-Melee: Dire Wolf (familiar), Savage Werewolf Form
-Caster: Astral Werewolf Form, Astralclaw, Dire Wolf (familiar)
-Healer: Confer, Fastcasting, Healing Boost, Moon Rabbit (familiar), Sage
-        Werewolf Form
-
 Healer Werewolves can convert Strength into buffs for themselves and their
 allies, and should build their Strength in addition to the 4 healer traits.
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, TANK, MELEE, HEALER
 #
@@ -555,10 +418,6 @@ See also: CLASS, TANK, MELEE, HEALER
 
 Wight
 Survival + Vampire
-
-Melee: Horrid Form
-
-Note: Class abilities are unfinished.
 
 See also: CLASS, MELEE
 #

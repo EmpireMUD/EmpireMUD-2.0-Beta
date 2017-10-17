@@ -287,7 +287,7 @@ Morphs (MORPHEDIT):
   player morph lists.
 - If you use a required object and the CONSUME-OBJ flag, be sure not to use a
   scalable item. Scalable items will refund at the wrong level.
-- If the morph requires a class ability, you should also set the CHECK-SOLO
+- If the morph requires a synergy ability, you should also set the CHECK-SOLO
   flag. This is necessary to use it in the Solo role.
 
 Objects (OEDIT):
@@ -6147,11 +6147,46 @@ very unique. Players will want to abbreviate them easily.
 
 See also: OLC SKILLS
 #d
+"SKILLEDIT SHOWSYNERGIES" "SKILLEDIT SHOW SYNERGIES" "SKILLEDIT SHOWSYNERGY" "SKILLEDIT SHOW SYNERGY"
+
+Usage:  .showsynergies
+
+This command will hide/show the list of synergy abilities in the skill editor.
+This toggle resets each time you log in.
+
+See also: SKILLEDIT SYNERGY, OLC SKILLS
+#d
+"SKILLEDIT SHOWTREE" "SKILLEDIT SHOW TREE"
+
+Usage:  .showtree
+
+This command will hide/show the ability tree in the skill editor. This toggle
+resets each time you log in.
+
+See also: SKILLEDIT TREE, OLC SKILLS
+#d
+"SKILLEDIT SYNERGY" "SKILLEDIT SYNERGIES"
+
+Usage:  .synergy <role | all> add <paired skill> <skill level> <ability>
+        .synergy <role | all> change <ability> <skill | level> <value>
+        .synergy <roll | all> remove <ability | all>
+        .showsynergies  (shows/hides the list of synergies)
+
+Synergy abilities are ones you get when this skill is at max level, and another
+skill is at the given skill level. The "paired skill" parameter is the name
+(or vnum) of the other required skill.
+
+You cannot use normal skill tree abilities as synergy abilities. However, an
+ability may appear in any number of synergy lists.
+
+See also: SKILLEDIT SHOWSYNERGIES, OLC SKILLS
+#d
 "SKILLEDIT TREE"
 
 Usage:  .tree add <ability> <level> [requires ability]
         .tree remove <ability | all>
         .tree change <ability> <level | requires> <new value>
+        .showtree  (shows/hides the tree)
 
 This command allows you to set up the skill tree -- the abilities players can
 purchase. Each ability requires a level. You can also set a requirement that
@@ -6164,7 +6199,7 @@ Players always get a fixed number of ability points in a skill, and you can
 use the level and prerequisite abilities to help control how many of the
 abilities a player can access.
 
-See also: ABILITY POINTS, OLC SKILLS, VNUM
+See also: ABILITY POINTS, SKILLEDIT SHOWTREE, OLC SKILLS, VNUM
 #d
 "SPECIAL ICONS" "ICON CODES"
 

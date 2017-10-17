@@ -3361,7 +3361,7 @@ void load_world_map_from_file(void) {
 	long l_in;
 	FILE *fl;
 	
-	// initialize ocean_shared_data
+	// initialize ocean_shared_data -- TODO should we clear the memory explicitly?
 	ocean_shared_data.island_id = NO_ISLAND;
 	ocean_shared_data.island_ptr = NULL;
 	ocean_shared_data.name = NULL;

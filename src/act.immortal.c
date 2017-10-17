@@ -71,6 +71,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
@@ -422,7 +423,7 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 	assign_class_abilities(ch, NULL, NOTHING);
 	
 	if (!is_file) {
-		msg_to_char(ch, "Your class role has been reset.\r\n");
+		msg_to_char(ch, "Your group role has been reset.\r\n");
 	}
 }
 
@@ -2452,7 +2453,7 @@ SHOW(show_skills) {
 		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
 			continue;
 		}
-		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {
+		if (ABIL_IS_PURCHASE(abil)) {
 			continue;	// only looking for non-skill abilities
 		}
 
@@ -2788,6 +2789,7 @@ SHOW(show_uses) {
 SHOW(show_account) {
 	player_index_data *plr_index, *index, *next_index;
 	bool file = FALSE, loaded_file = FALSE;
+	char skills[MAX_STRING_LENGTH];
 	char_data *plr = NULL, *loaded;
 	
 	if (!*argument) {
@@ -2815,17 +2817,21 @@ SHOW(show_account) {
 				continue;
 			}
 			
+			// skills name used by all 3
+			get_player_skill_string(loaded, skills, TRUE);
+			
 			if (GET_ACCOUNT(loaded) == GET_ACCOUNT(plr)) {
+				
 				if (!loaded_file) {
-					msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
+					msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 				}
 				else {
 					// not playing but same account
-					msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
+					msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 				}
 			}
 			else {
-				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), SHOW_CLASS_NAME(loaded), GET_PC_NAME(loaded));
+				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 			}
 			
 			if (loaded_file) {
@@ -3579,7 +3585,8 @@ void do_stat_character(char_data *ch, char_data *k) {
 			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
+		get_player_skill_string(k, lbuf, TRUE);
+		msg_to_char(ch, "Access Level: [&c%d&0], Class: [%s/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), lbuf, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
 		
 		msg_to_char(ch, "Archetypes:");
 		for (iter = 0, count = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {

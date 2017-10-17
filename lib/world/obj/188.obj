@@ -14,9 +14,10 @@ A turnip lantern is sitting here.~
    The turnip has been carved into a lantern with a hideous face. People used
 to use these turnips to scare away evil spirits, but you're hoping to use this
 lantern to summon one.
-   Type 'use turnip <difficulty>' to summon the horse man.
+   Type 'use turnip <difficulty>' to summon the horse man. You can choose
+Normal, Hard, Group, or Boss difficulty. The horse man is level 25-275.
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 Q 18801
@@ -435,9 +436,10 @@ the power to reflect Dracula himself, although you're certain he's just a myth.
 Regardless of whether or not he is real, you have the power to type 'morph
 Dracula' while this mirror is in your possession.
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 8 0
+Q 18827
 T 18827
 S
 #18828

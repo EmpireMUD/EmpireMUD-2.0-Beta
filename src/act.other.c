@@ -42,6 +42,7 @@ void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
+void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
@@ -335,7 +336,7 @@ static void print_group(char_data *ch) {
 	extern const char *class_role[];
 	extern const char *pool_abbrevs[];
 
-	char status[256], class[256], loc[256], alerts[256];
+	char status[256], class[256], loc[256], alerts[256], skills[256];
 	struct group_member_data *mem;
 	int iter, ssize;
 	char_data *k;
@@ -356,7 +357,8 @@ static void print_group(char_data *ch) {
 			
 			// show class section if they have one
 			if (!IS_NPC(k) && GET_CLASS(k)) {
-				snprintf(class, sizeof(class), "/%s/%s", SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)]);
+				get_player_skill_string(k, skills, TRUE);
+				snprintf(class, sizeof(class), "/%s/%s", skills, class_role[(int) GET_CLASS_ROLE(k)]);
 			}
 			else {
 				*class = '\0';
@@ -1214,7 +1216,7 @@ ACMD(do_alternate) {
 	extern const char *class_role[];
 	extern const char *class_role_color[];
 
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct account_player *plr;
 	player_index_data *index;
 	char_data *newch, *alt;
@@ -1250,11 +1252,12 @@ ACMD(do_alternate) {
 		
 			// display:
 			timed_out = member_is_timed_out_ch(alt);
+			get_player_skill_string(alt, part, TRUE);
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), SHOW_CLASS_NAME(alt), class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 			else {	// not screenreader
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], SHOW_CLASS_NAME(alt), (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 						
 			// online/not

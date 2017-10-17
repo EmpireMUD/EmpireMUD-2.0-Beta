@@ -1,4 +1,4 @@
-BATTLE "BATTLE SKILL"
+BATTLE BAT "BATTLE SKILL"
 
 Battle (skill)
 
@@ -11,8 +11,11 @@ Sparring branch: Learn to hit faster and harder, and finish the fight.
 Big Game Hunter branch: Take on the world's monsters with no fear.
 Archery branch: Strike from afar.
 
-See also: EVASION, REFLEXES, SPARRING, BIG GAME HUNTER, ARCHERY, FIRSTAID,
-FLEET, WEAPONS PROFICIENCY
+You also get additional Battle abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
+See also: EVASION, WEAPON PROFICIENCY, ROLE, SKILL, SKILL SYNERGY
 #
 AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
 
@@ -68,7 +71,7 @@ Debuff type:  Battle, Stun
 
 Bash your target with your weapon and send him flying to the ground. When you
 successfully bash, your target is briefly stunned. As a specialty ability, bash
-cannot miss. As a class ability, bash does double damage.
+cannot miss. At Battle 100, bash does double damage.
 
 Only one person in the room may be bash-stunned at a time. Using the ability on
 a second person will release the first one.
@@ -83,7 +86,7 @@ The Big Game Hunter branch of the Battle skill is for people who aren't
 satisfied with puny elephants. It's for people who want to take down the most
 dangerous game: vampires, werewolves, and mages.
 
-Big Game Hunter gives you a chance to inflict 5% (10% as a class ability) extra
+Big Game Hunter gives you a chance to inflict 5% (10% at Battle 100) extra
 damage against each of these supernaturals. It also opens up special abilities
 to help you take them down.
 
@@ -180,7 +183,7 @@ Gain experience when you try to disarm someone, even if it fails.
 "DUAL-WIELD" "DUAL WIELD"
 
 Dual-Wield
-Class ability: Assassin, Bandit, Smuggler
+Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade
 
 With this ability, you can attack with weapons in both hands (the wield and
 hold slots). Without it, you can still hold a weapon in your off-hand, but
@@ -217,7 +220,7 @@ Finesse (Battle ability)
 
 With finesse, your close-combat (non-Archery) automatic attacks happen faster,
 leading to more damage overall. As a basic ability, attacks are 10% faster. As a
-specialty ability, they are 15% faster. As a class ability, they are 20% faster.
+specialty ability, they are 15% faster. At Battle 100, they are 20% faster.
 
 The ranged (Archery) version of this ability is Quick Draw.
 
@@ -310,7 +313,7 @@ Cooldown:  6 seconds
 Cost:  10 move
 
 Kick is a special attack that does bonus damage (based on your Strength) outside
-of the combat round. As a specialty ability, it cannot miss. As a class ability,
+of the combat round. As a specialty ability, it cannot miss. At Battle 100,
 it does increased damage.
 
 Gain experience when you try to kick something.
@@ -336,7 +339,7 @@ Gain experience when you kite someone.
 "NOBLE BEARING"
 
 Noble Bearing
-Class ability: Duke
+Empire Synergy Ability: 100 Battle
 
 Damage to your character is reduced by your Greatness rating.
 #
@@ -388,7 +391,7 @@ Quick Draw (Battle ability)
 
 Shoot more arrows before your enemies reach you by learning to draw more
 quickly, leading to more damage per second. This improves your ranged combat
-speed by 25% (or 35% as a class ability).
+speed by 25% (or 35% at Battle 100).
 
 The close-combat version of this ability is Finesse. It works on all ranged
 weapons, not just arrows.
@@ -405,7 +408,7 @@ With training, your reflexes become good enough that you dodge more often.
 This ability gives at least +10 dodge automatically.
 
 As a specialty ability, it adds 5% of your total level to your dodge.
-As a class ability, it adds 10% of your total level to your dodge.
+At Battle 100, it adds 10% of your total level to your dodge.
 
 This dodge bonus is reflected on your 'score'.
 
@@ -469,7 +472,7 @@ By sparring, you can learn to hit more accurately. This ability gives at least
 +10 to-hit automatically.
 
 As a specialty ability, it adds 5% of your total level to your to-hit.
-As a class ability, it adds 10% of your total level to your to-hit.
+At Battle 100, it adds 10% of your total level to your to-hit.
 
 This to-hit bonus is reflected on your 'score'.
 
@@ -533,7 +536,7 @@ See also: DODGE, DOT
 "TWO-HANDED WEAPONS" "TWO HANDED WEAPONS" "TWOHANDED WEAPONS" "2HANDED WEAPONS" "2H"
 
 Two-Handed Weapons
-Class ability: Barbarian, Duke, Steelsmith
+Battle Synergy Ability: 100 Survival OR 100 Empire OR 100 Trade
 
 This ability allows you to use two-handed weapons. These weapons require that
 you don't have an item in your off-hand (hold) slot. Only certain powerful
@@ -545,7 +548,7 @@ the (2h) tag.
 "WARD AGAINST MAGIC" "MAGIC WARD"
 
 Ward Against Magic
-Class ability: Barbarian, Reaper
+Battle Synergy Ability: 100 Survival OR 100 Vampire
 
 This ability allows characters to block magical attacks with their shields,
 albeit at a reduced rate. Your normal block chance is halved against magical

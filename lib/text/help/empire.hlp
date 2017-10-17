@@ -1,4 +1,4 @@
-EMPIRE EMPIRES
+EMPIRE EMPIRES EMP
 
 Empire is a skill, a command, and a grouping of people and land.
 
@@ -22,8 +22,13 @@ Empire is a skill, a command, and a grouping of people and land.
 
 You can learn about founding and managing empires on HELP EMPIRE GUIDE.
 
+You get additional Empire abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
 See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, CITY COMMAND,
-    ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK
+    ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK, ROLE, SKILL,
+    SKILL SYNERGY, BASIC BUILDINGS, CHORES
 #
 ABANDON
 
@@ -430,15 +435,6 @@ cost to declare war on the empire detail page for any empire you're not in
 a non-aggression pact (or better) with.
 
 See also: EMPIRE SCORE
-#
-DRAGONRIDING "DRAGON RIDING"
-
-Dragonriding (Class ability)
-Class ability: All Empire classes
-
-Dragonriding allows you to ride flying mounts, if you have the Ride ability.
-
-See also: RIDE
 #
 DISMANTLE-MINES "DISMANTLE MINES"
 
@@ -1144,7 +1140,7 @@ ROSTER
 Usage:  roster [all]
 
 This command shows you the members of your empire and lets you know who's on-
-line and who's been gone a while. The color of the player's class name (if not
+line and who's been gone a while. The color of the player's main skills (if not
 white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
 
 If you don't use the "all" option, you won't see members who have timed out.
@@ -1396,6 +1392,20 @@ rate of 1 territory per 10 wealth, up to 3x its normal limit (for a total of
 4x).
 
 See also: COMMERCE, EXCHANGE, MINT, VAULT, SECRET CACHE
+#
+WINDSTRIDE WINDSTRIDING
+
+Windstride (Empire ability)
+
+Usage:  windstride
+Cooldown:  10 minutes
+
+Windstride gives you a huge temporary boost to move regeneration, allowing you
+to reach the highest peaks of your empire with ease.
+
+If you have the Ride ability, Windstride also allows you to ride flying mounts.
+
+See also: RIDE
 #
 WITHDRAW
 
