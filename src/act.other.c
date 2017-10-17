@@ -1963,7 +1963,7 @@ ACMD(do_herd) {
 	extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
 	extern const int rev_dir[];
 
-	struct room_direction_data *ex;
+	struct room_direction_data *ex = NULL;
 	char_data *victim;
 	int dir;
 	room_data *to_room, *was_in;
