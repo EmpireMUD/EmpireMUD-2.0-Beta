@@ -4090,8 +4090,11 @@ OLC_MODULE(skilledit_synergy) {
 		if (!any) {
 			msg_to_char(ch, "The %s role didn't have %s.\r\n", all_roles ? "ALL" : class_role[role], "that ability");
 		}
+		else if (other) {
+			msg_to_char(ch, "The %s ability on the %s role now comes from %s.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role], SKILL_NAME(other));
+		}
 		else {
-			msg_to_char(ch, "The %s ability on the %s role now comes from %s %d.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role], get_skill_name_by_vnum(syn->skill), syn->level);
+			msg_to_char(ch, "The %s ability on the %s role now come at level %d in the other skill.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role], level);
 		}
 	}
 	else if (is_abbrev(cmd_arg, "remove")) {
