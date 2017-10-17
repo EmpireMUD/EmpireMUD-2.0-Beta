@@ -3948,8 +3948,9 @@ OLC_MODULE(skilledit_showtree) {
 
 
 OLC_MODULE(skilledit_synergy) {
-	skill_data *skill = GET_OLC_SKILL(ch->desc), *other;
+	skill_data *skill = GET_OLC_SKILL(ch->desc), *other, *temp;
 	char cmd_arg[MAX_INPUT_LENGTH], role_arg[MAX_INPUT_LENGTH], skl_arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	struct synergy_ability *syn, *next_syn;
 	int role = ROLE_NONE, level;
 	ability_data *abil;
@@ -3967,6 +3968,7 @@ OLC_MODULE(skilledit_synergy) {
 	}
 	else if (!*cmd_arg) {
 		msg_to_char(ch, "Usage: synergy <roll | all> add <skill> <level> <ability>\r\n");
+		msg_to_char(ch, "       synergy <role | all> change <ability> <skill | level> <value>\r\n");
 		msg_to_char(ch, "       synergy <role | all> remove <ability | all>\r\n");
 		return;
 	}
@@ -4024,6 +4026,74 @@ OLC_MODULE(skilledit_synergy) {
 		// ensure sorting now
 		LL_SORT(SKILL_SYNERGIES(skill), sort_synergies);
 	}
+	else if (is_abbrev(cmd_arg, "change")) {
+		argument = any_one_word(argument, abil_arg);
+		argument = one_argument(argument, type_arg);
+		argument = any_one_word(argument, val_arg);
+		
+		if (!*abil_arg) {
+			msg_to_char(ch, "Usage: synergy <role | all> change <ability> <skill | level> <value>\r\n");
+			return;
+		}
+		
+		abil = find_ability(abil_arg);
+		if (!abil) {
+			msg_to_char(ch, "Invalid ability '%s'.\r\n", abil_arg);
+			return;
+		}
+		
+		// init the data we'll use
+		other = NULL;
+		level = -1;
+		
+		// check valid type
+		if (is_abbrev(type_arg, "skill")) {
+			if (!(other = find_skill(val_arg))) {
+				msg_to_char(ch, "Unknown skill '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "level")) {
+			if (!isdigit(*val_arg) || (level = atoi(val_arg)) < 1 || level > SKILL_MAX_LEVEL(other)) {
+				msg_to_char(ch, "Level must be 1-%d, '%s' given.\r\n", CLASS_SKILL_CAP, val_arg);
+				return;
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the skill or level.\r\n");
+			return;
+		}
+		
+		any = FALSE;
+		LL_FOREACH_SAFE(SKILL_SYNERGIES(skill), syn, next_syn) {
+			if (role != NOTHING && syn->role != role) {
+				continue;
+			}
+			
+			if (syn->ability == ABIL_VNUM(abil)) {
+				if (other) {
+					syn->skill = SKILL_VNUM(other);
+				}
+				else if (level != -1) {
+					if ((temp = find_skill_by_vnum(syn->skill)) && level > SKILL_MAX_LEVEL(temp)) {
+						msg_to_char(ch, "Given level %d is above the max level of %s (%d).\r\n", level, SKILL_NAME(temp), SKILL_MAX_LEVEL(temp));
+						return;
+					}
+					else {
+						syn->level = level;
+					}
+				}
+				any = TRUE;
+			}
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "The %s role didn't have %s.\r\n", all_roles ? "ALL" : class_role[role], "that ability");
+		}
+		else {
+			msg_to_char(ch, "The %s ability on the %s role now comes from %s %d.\r\n", ABIL_NAME(abil), all_roles ? "ALL" : class_role[role], get_skill_name_by_vnum(syn->skill), syn->level);
+		}
+	}
 	else if (is_abbrev(cmd_arg, "remove")) {
 		skip_spaces(&argument);
 		strcpy(abil_arg, argument);
@@ -4068,6 +4138,7 @@ OLC_MODULE(skilledit_synergy) {
 	}
 	else {
 		msg_to_char(ch, "Usage: synergy <roll | all> add <skill> <level> <ability>\r\n");
+		msg_to_char(ch, "       synergy <role | all> change <ability> <skill | level> <value>\r\n");
 		msg_to_char(ch, "       synergy <role | all> remove <ability | all>\r\n");
 	}
 }
