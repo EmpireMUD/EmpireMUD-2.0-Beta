@@ -4056,7 +4056,7 @@ OLC_MODULE(skilledit_synergy) {
 			}
 		}
 		else if (is_abbrev(type_arg, "level")) {
-			if (!isdigit(*val_arg) || (level = atoi(val_arg)) < 1 || level > SKILL_MAX_LEVEL(other)) {
+			if (!isdigit(*val_arg) || (level = atoi(val_arg)) < 1) {
 				msg_to_char(ch, "Level must be 1-%d, '%s' given.\r\n", CLASS_SKILL_CAP, val_arg);
 				return;
 			}
