@@ -5,12 +5,13 @@ terrorizing the countryside. He appears, commits his atrocities, then vanishes
 just as quickly. Take this turnip lantern and use it at a Cemetery building to
 summon the headless horse man and defeat him. This quest will automatically
 complete when you defeat the horse man.
+To summon the horse man: use lantern <normal | hard | group | boss>
 ~
    You have defeated the headless horse man and saved the local villagers from
 his reign of terror. You have earned a trick token, which you can use to buy
 gifts from the restless spirit.
 ~
-10 e 0 0 -1
+11 e 0 0 -1
 A
 2 18803
 A
@@ -189,7 +190,7 @@ S
 #18828
 Halloween: House of 100 Corpses~
    The Halloween season is upon us and in order to welcome the influx of
-witches, goblins, ghosts, and ghouls, you must build a proper haunted house. 
+witches, goblins, ghosts, and ghouls, you must build a proper haunted house.
 Take this deed and build the 'unearthlymanor' in one of your cities.
    Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
 restless spirit, where you can turn in this quest and buy rewards.
