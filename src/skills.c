@@ -3926,6 +3926,7 @@ OLC_MODULE(skilledit_showsynergies) {
 	}
 	else {
 		msg_to_char(ch, "Your editor will %s show the synergies.\r\n", GET_OLC_SHOW_SYNERGIES(ch->desc) ? "now" : "no longer");
+		olc_show_skill(ch);
 	}
 }
 
@@ -3943,6 +3944,7 @@ OLC_MODULE(skilledit_showtree) {
 	}
 	else {
 		msg_to_char(ch, "Your editor will %s show the skill tree.\r\n", GET_OLC_SHOW_TREE(ch->desc) ? "now" : "no longer");
+		olc_show_skill(ch);
 	}
 }
 
