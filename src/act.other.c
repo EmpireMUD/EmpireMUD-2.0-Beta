@@ -2007,7 +2007,7 @@ ACMD(do_herd) {
 		msg_to_char(ch, "You can't herd someone who is being led by someone else.\r\n");
 	else if (ROOM_IS_CLOSED(to_room) && !ROOM_BLD_FLAGGED(to_room, BLD_HERD))
 		msg_to_char(ch, "You can't herd an animal into a building.\r\n");
-	else if (ROOM_IS_CLOSED(to_room) && !IS_INSIDE(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+	else if (ROOM_IS_CLOSED(to_room) && (!ex || !CAN_GO(ch, ex)) && !IS_INSIDE(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 		msg_to_char(ch, "You can only herd an animal through the entrance.\r\n");
 	}
 	else {
