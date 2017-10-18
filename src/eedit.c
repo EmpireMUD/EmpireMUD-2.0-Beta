@@ -255,6 +255,10 @@ ACMD(do_eedit) {
 	
 	// find type?
 	for (iter = 0; *eedit_cmd[iter].command != '\n' && type == NOTHING; ++iter) {
+		if (!imm_access && IS_SET(eedit_cmd[iter].flags, EEDIT_FLAG_IMM_ONLY)) {
+			continue;
+		}
+		
 		if (is_abbrev(arg, eedit_cmd[iter].command)) {
 			type = iter;
 		}
@@ -282,8 +286,8 @@ ACMD(do_eedit) {
 		}
 		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
 	}
-	else if (!imm_access && IS_SET(eedit_cmd[iter].flags, EEDIT_FLAG_IMM_ONLY)) {
-		msg_to_char(ch, "You don't have permission to change admin flags on empires.\r\n");
+	else if (!imm_access && IS_SET(eedit_cmd[type].flags, EEDIT_FLAG_IMM_ONLY)) {
+		msg_to_char(ch, "You don't have permission to do that.\r\n");
 	}
 	else {
 		// pass to child function
