@@ -1091,7 +1091,7 @@ time_t get_last_killed_by_empire(char_data *ch, empire_data *emp) {
 	struct pk_data *pk;
 	time_t min = 0;
 	
-	if (!IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+	if (IS_NPC(ch) || !GET_ACCOUNT(ch)) {
 		return 0;	// le never
 	}
 	
