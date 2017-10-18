@@ -357,10 +357,8 @@ EEDIT(eedit_admin_flags) {
 	EMPIRE_ADMIN_FLAGS(emp) = olc_process_flag(ch, argument, "admin flags", NULL, empire_admin_flags, EMPIRE_ADMIN_FLAGS(emp));
 	
 	if (EMPIRE_ADMIN_FLAGS(emp) != old_flags) {
-		prettier_sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, buf);
-		msg_to_char(ch, "You change the admin flags to: \tg%s\t0", buf);
-		
 		if (emp != GET_LOYALTY(ch)) {
+			prettier_sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, buf);
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's admin flags to: %s", GET_NAME(ch), EMPIRE_NAME(emp), buf);
 		}
 	}
