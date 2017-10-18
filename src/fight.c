@@ -29,6 +29,7 @@
 * Contents:
 *   Getters / Helpers
 *   Combat Meters
+*   Player-Killed-By
 *   Death and Corpses
 *   Guard Towers
 *   Messaging
@@ -1004,6 +1005,107 @@ void combat_meter_miss(char_data *ch) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// PLAYER-KILLED-BY ////////////////////////////////////////////////////////
+
+/**
+* Marks a recent playerkill (by a PC or an empire mob).
+*
+* @param char_data *ch The player dying.
+* @param char_data *killer Who killed them.
+*/
+void add_player_kill(char_data *ch, char_data *killer) {
+	struct pk_data *iter, *data = NULL;
+	
+	if (!ch || !killer || IS_NPC(ch) || !GET_ACCOUNT(ch) || (IS_NPC(killer) && !GET_LOYALTY(killer))) {
+		return;	// nothing to track here
+	}
+	
+	// find matching data
+	if (!IS_NPC(killer)) {
+		LL_SEARCH_SCALAR(GET_ACCOUNT(ch)->killed_by, data, player_id, GET_IDNUM(killer));
+	}
+	else if (GET_LOYALTY(killer)) {	// is npc
+		LL_FOREACH(GET_ACCOUNT(ch)->killed_by, iter) {
+			if (iter->player_id == NOTHING && iter->empire == EMPIRE_VNUM(GET_LOYALTY(killer))) {
+				// found a match for no-player, same empire
+				data = iter;
+				break;
+			}
+		}
+	}
+	
+	// add data if missing
+	if (!data) {
+		CREATE(data, struct pk_data, 1);
+		data->player_id = IS_NPC(killer) ? NOTHING : GET_IDNUM(killer);
+		LL_PREPEND(GET_ACCOUNT(ch)->killed_by, data);
+	}
+	
+	// update data
+	data->empire = GET_LOYALTY(killer) ? EMPIRE_VNUM(GET_LOYALTY(killer)) : NOTHING;
+	data->killed_alt = GET_IDNUM(ch);
+	data->last_time = time(0);
+	
+	SAVE_ACCOUNT(GET_ACCOUNT(ch));
+}
+
+
+/**
+* Times out useless old pk entries (ones over ONE WEEK).
+*
+* @param char_data *ch The player to clean.
+*/
+void clean_player_kills(char_data *ch) {
+	struct pk_data *iter, *next_iter;
+	time_t now = time(0);
+	bool any = FALSE;
+	
+	if (!ch || IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+		return;	// wut
+	}
+	
+	LL_FOREACH_SAFE(GET_ACCOUNT(ch)->killed_by, iter, next_iter) {
+		if (now - iter->last_time > SECS_PER_REAL_WEEK) {
+			LL_DELETE(GET_ACCOUNT(ch)->killed_by, iter);
+			free(iter);
+			any = TRUE;
+		}
+	}
+	
+	if (any) {
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+}
+
+
+/**
+* Gets the last time a player was killed by a member of a given empire. This
+* can be used e.g. to block hostile actions. This data is only accurate for
+* ONE WEEK.
+*
+* @param char_data *ch The player to check.
+* @param empire_data *emp The empire they might have been killed by.
+* @return time_t The timestamp of the last kill by that empire, or 0 if no recent time.
+*/
+time_t get_last_killed_by_empire(char_data *ch, empire_data *emp) {
+	struct pk_data *pk;
+	time_t min = 0;
+	
+	if (!IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+		return 0;	// le never
+	}
+	
+	LL_FOREACH(GET_ACCOUNT(ch)->killed_by, pk) {
+		if (pk->empire == EMPIRE_VNUM(emp) && (min == 0 || min > pk->last_time)) {
+			min = pk->last_time;
+		}
+	}
+	
+	return min;	// may be 0
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// DEATH AND CORPSES ///////////////////////////////////////////////////////
 
 /**
@@ -1173,6 +1275,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// for players, die() ends here, until they respawn or quit
 	if (!IS_NPC(ch)) {
+		if (ch != killer) {
+			add_player_kill(ch, killer);
+		}
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
 		GET_HEALTH(ch) = MIN(GET_HEALTH(ch), -10);	// ensure negative health

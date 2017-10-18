@@ -3162,6 +3162,8 @@ struct account_data {
 	bitvector_t flags;	// ACCT_
 	char *notes;	// account notes
 	
+	struct pk_data *killed_by;	// LL of players who killed this player recently
+	
 	UT_hash_handle hh;	// account_table
 };
 
@@ -3190,6 +3192,16 @@ struct coin_data {
 	time_t last_acquired;	// helps cleanup
 	
 	struct coin_data *next;
+};
+
+
+// track who/when a player has been killed by another player
+struct pk_data {
+	int killed_alt;	// id of which alt died
+	int player_id;	// id of player who killed them
+	any_vnum empire;	// which empire the killer belonged to
+	long last_time;	// when the last kill was
+	struct pk_data *next;
 };
 
 

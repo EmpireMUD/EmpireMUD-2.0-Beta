@@ -117,8 +117,13 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 * @return TRUE if ch is capable of stealing from emp
 */
 bool can_steal(char_data *ch, empire_data *emp) {	
+	extern time_t get_last_killed_by_empire(char_data *ch, empire_data *emp);
+	
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
+	time_t timediff;
+	
+	int death_penalty_time = config_get_int("steal_death_penalty");
 	
 	// no empire = ok
 	if (!emp) {
@@ -142,6 +147,12 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	
 	if (emp == chemp) {
 		msg_to_char(ch, "You can't steal from your own empire.\r\n");
+		return FALSE;
+	}
+	
+	timediff = (death_penalty_time * SECS_PER_REAL_MIN) - (time(0) - get_last_killed_by_empire(ch, emp));
+	if (death_penalty_time && get_last_killed_by_empire(ch, emp) && timediff > 0) {
+		msg_to_char(ch, "You cannot steal from %s because they have killed you too recently (%d:%02d remain).\r\n", EMPIRE_NAME(emp), (int)(timediff / 60), (int)(timediff % 60));
 		return FALSE;
 	}
 	
