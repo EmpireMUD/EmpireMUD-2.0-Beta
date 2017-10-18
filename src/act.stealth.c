@@ -135,6 +135,11 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
+	if (chemp && EMPIRE_ADMIN_FLAGGED(chemp, EADM_NO_STEAL)) {
+		msg_to_char(ch, "Your empire has been forbidden from stealing.\r\n");
+		return FALSE;
+	}
+	
 	if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
 		msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
 		return FALSE;

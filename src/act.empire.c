@@ -42,6 +42,7 @@
 // external vars
 extern struct empire_chore_type chore_data[NUM_CHORES];
 extern struct city_metadata_type city_type[];
+extern const char *empire_admin_flags[];
 extern const char *empire_trait_types[];
 extern const char *trade_type[];
 extern const char *trade_mostleast[];
@@ -442,6 +443,8 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	if (IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "Created: %-24.24s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
+		sprintbit(EMPIRE_ADMIN_FLAGS(e), empire_admin_flags, line, TRUE);
+		msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
 	}
 	
 	if (EMPIRE_DESCRIPTION(e)) {
@@ -3197,6 +3200,9 @@ ACMD(do_diplomacy) {
 	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && config_get_bool("mutual_war_only")) {
 		msg_to_char(ch, "This EmpireMUD does not allow you to unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
 	}
+	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && EMPIRE_ADMIN_FLAGGED(ch_emp, EADM_NO_WAR)) {
+		msg_to_char(ch, "Your empire has been forbidden from declaring unilateral %s.\r\n", fname(diplo_option[type].keywords));
+	}
 	
 	// empire validation
 	else if (!*emp_arg) {
@@ -4166,6 +4172,7 @@ ACMD(do_esay) {
 
 ACMD(do_estats) {
 	empire_data *emp = GET_LOYALTY(ch);
+	char part[256];
 	
 	skip_spaces(&argument);
 	if (*argument && !(emp = get_empire_by_name(argument))) {
@@ -4185,6 +4192,11 @@ ACMD(do_estats) {
 		msg_to_char(ch, " (%s&0)", EMPIRE_ADJECTIVE(emp));
 	}
 	msg_to_char(ch, "\r\n");
+	
+	if (IS_IMMORTAL(ch)) {
+		sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, part, TRUE);
+		msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", part);
+	}
 	
 	// stats
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(emp), PLURAL(EMPIRE_MEMBERS(emp)), EMPIRE_POPULATION(emp), PLURAL(EMPIRE_POPULATION(emp)), EMPIRE_MILITARY(emp));

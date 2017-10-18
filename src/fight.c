@@ -1017,7 +1017,7 @@ void add_player_kill(char_data *ch, char_data *killer) {
 	struct pk_data *iter, *data = NULL;
 	
 	// bump up the food chain to find a player master, if possible
-	while (killer && IS_NPC(killer) && killer->master && !IS_NPC(killer->master)) {
+	while (killer && IS_NPC(killer) && killer->master) {
 		killer = killer->master;
 	}
 	

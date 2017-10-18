@@ -1592,6 +1592,14 @@ const bool show_empire_log_type[] = {
 };
 
 
+// EADM_x: empire admin flags
+const char *empire_admin_flags[] = {
+	"!WAR",
+	"!STEAL",
+	"\n"
+};
+
+
 // EUS_x -- lowercase
 const char *unique_storage_flags[] = {
 	"vault",

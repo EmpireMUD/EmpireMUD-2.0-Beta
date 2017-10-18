@@ -510,6 +510,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_CREATE_TIME(emp)  ((emp)->create_time)
 #define EMPIRE_NAME(emp)  ((emp)->name)
 #define EMPIRE_ADJECTIVE(emp)  ((emp)->adjective)
+#define EMPIRE_ADMIN_FLAGS(emp)  ((emp)->admin_flags)
 #define EMPIRE_BANNER(emp)  ((emp)->banner)
 #define EMPIRE_BANNER_HAS_UNDERLINE(emp)  ((emp)->banner_has_underline)
 #define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
@@ -548,6 +549,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
 
 // helpers
+#define EMPIRE_ADMIN_FLAGGED(emp, flag)  IS_SET(EMPIRE_ADMIN_FLAGS(emp), (flag))
 #define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
 #define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (EMPIRE_COINS(emp) * COIN_VALUE))

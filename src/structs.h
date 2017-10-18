@@ -933,8 +933,12 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE DEFINES //////////////////////////////////////////////////////////
 
+// EADM_x: empire admin flags
+#define EADM_NO_WAR  BIT(0)	// may not start a unilateral war
+#define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
 
-// empire trait flags
+
+// ETRAIT_x: empire trait flags
 #define ETRAIT_DISTRUSTFUL  BIT(0)	// hostile behavior
 
 
@@ -4102,7 +4106,8 @@ struct empire_data {
 	byte num_ranks;	// Total number of levels (maximum 20)
 	char *rank[MAX_RANKS];	// Name of each rank
 	
-	bitvector_t frontier_traits;	// ETRAIT_x
+	bitvector_t admin_flags;	// EADM_
+	bitvector_t frontier_traits;	// ETRAIT_
 	double coins;	// total coins (always in local currency)
 
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command

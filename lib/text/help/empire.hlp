@@ -465,9 +465,21 @@ Available options:
  frontiertraits - set your empire's default behavior outside of cities
 
 Ranking immortals may use the syntax:  eedit [empire] <option> <argument>
+ adminflags - immortals may set admin flags on empires
 
 See also: PRIVILEGE, EMPIRE TRAITS
 #
+"EEDIT ADMINFLAGS" "EEDIT ADMIN FLAGS" "EMPIRE ADMIN FLAGS"
+
+Usage:  eedit <empire> adminflags [add | remove] [flags]
+
+Immortals with the "EMPIRES" grant can set administrative flags on empires.
+
+ &c!WAR&0 - The empire cannot unilaterally declare war.
+ &c!STEAL&0 - The empire cannot steal from other empires.
+
+See also: GRANT
+#d
 EFIND
 
 Usage:  efind <name>
