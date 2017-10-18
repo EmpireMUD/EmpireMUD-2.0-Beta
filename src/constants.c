@@ -1596,6 +1596,7 @@ const bool show_empire_log_type[] = {
 const char *empire_admin_flags[] = {
 	"!WAR",
 	"!STEAL",
+	"CITY-CLAIMS-ONLY",
 	"\n"
 };
 

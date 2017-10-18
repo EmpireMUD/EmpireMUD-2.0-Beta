@@ -475,8 +475,9 @@ Usage:  eedit <empire> adminflags [add | remove] [flags]
 
 Immortals with the "EMPIRES" grant can set administrative flags on empires.
 
- &c!WAR&0 - The empire cannot unilaterally declare war.
- &c!STEAL&0 - The empire cannot steal from other empires.
+ &g!WAR&0 - Empire cannot unilaterally declare war.
+ &g!STEAL&0 - Empire cannot steal from other empires.
+ &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
 
 See also: GRANT
 #d

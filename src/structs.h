@@ -936,6 +936,7 @@ typedef struct vehicle_data vehicle_data;
 // EADM_x: empire admin flags
 #define EADM_NO_WAR  BIT(0)	// may not start a unilateral war
 #define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
+#define EADM_CITY_CLAIMS_ONLY  BIT(2)	// may only claim in-city
 
 
 // ETRAIT_x: empire trait flags

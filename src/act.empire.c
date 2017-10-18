@@ -2789,6 +2789,9 @@ ACMD(do_cede) {
 	else if (!is_in_city_for_empire(room, f, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory outside of cities.\r\n");
 	}
+	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && !is_in_city_for_empire(room, f, FALSE, &junk)) {
+		msg_to_char(ch, "That empire is forbidden from gaining new territory outside of a city.\r\n");
+	}
 	else if (is_at_war(f)) {
 		msg_to_char(ch, "You can't cede land to an empire that is at war.\r\n");
 	}
@@ -2891,6 +2894,9 @@ void do_claim_room(char_data *ch, room_data *room) {
 	}
 	else if (!is_in_city_for_empire(room, emp, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(emp) >= land_can_claim(emp, TRUE)) {
 		msg_to_char(ch, "You can't claim the area because you're over the 20%% of your territory that can be outside of cities.\r\n");
+	}
+	else if (EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && !is_in_city_for_empire(room, emp, FALSE, &junk)) {
+		msg_to_char(ch, "Your empire is forbidden from claiming outside of a city.\r\n");
 	}
 	else {
 		send_config_msg(ch, "ok_string");
