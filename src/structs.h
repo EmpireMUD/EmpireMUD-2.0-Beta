@@ -1776,6 +1776,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_PLAYERDELETE  BIT(37)
 #define GRANT_UNQUEST  BIT(38)
 #define GRANT_AUTOMESSAGE  BIT(39)
+#define GRANT_PEACE  BIT(40)
 
 
 // Lore types

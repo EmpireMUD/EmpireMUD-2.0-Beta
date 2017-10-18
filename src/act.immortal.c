@@ -6574,6 +6574,24 @@ ACMD(do_oset) {
 }
 
 
+ACMD(do_peace) {
+	char_data *iter, *next_iter;
+	
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+		if (FIGHTING(iter) || GET_POS(iter) == POS_FIGHTING) {
+			stop_fighting(iter);
+		}
+	}
+	
+	if (find_mortal_in_room(IN_ROOM(ch))) {
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s used peace with mortal present at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+	}
+	
+	act("You raise your hands and a feeling of peace sweeps over the room.", FALSE, ch, NULL, NULL, TO_CHAR);
+	act("$n raises $s hands and a feeling of peace enters your heart.", FALSE, ch, NULL, NULL, TO_ROOM);
+}
+
+
 ACMD(do_playerdelete) {
 	void delete_player_character(char_data *ch);
 	

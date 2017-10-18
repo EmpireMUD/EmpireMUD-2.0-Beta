@@ -540,6 +540,7 @@ const char *grant_bits[] = {
 	"playerdelete",
 	"unquest",
 	"automessage",
+	"peace",	// 40
 	"\n"
 };
 
