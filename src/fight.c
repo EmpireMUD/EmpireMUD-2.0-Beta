@@ -1016,6 +1016,11 @@ void combat_meter_miss(char_data *ch) {
 void add_player_kill(char_data *ch, char_data *killer) {
 	struct pk_data *iter, *data = NULL;
 	
+	// bump up the food chain to find a player master, if possible
+	while (killer && IS_NPC(killer) && killer->master && !IS_NPC(killer->master)) {
+		killer = killer->master;
+	}
+	
 	if (!ch || !killer || IS_NPC(ch) || !GET_ACCOUNT(ch) || (IS_NPC(killer) && !GET_LOYALTY(killer))) {
 		return;	// nothing to track here
 	}
