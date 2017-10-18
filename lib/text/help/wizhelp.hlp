@@ -655,7 +655,8 @@ PEACE
 Usage:  peace
 
 The peace command ends all combat in the room (but does not keep people from
-re-attacking). This command is grantable.
+re-attacking). Input queues are also cleared, to avoid players accidentally
+restarting combat from queued attacks. This command is grantable.
 
 See also: GRANT
 #d

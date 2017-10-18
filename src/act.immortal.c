@@ -6575,11 +6575,20 @@ ACMD(do_oset) {
 
 
 ACMD(do_peace) {
+	struct txt_block *inq, *next_inq;
 	char_data *iter, *next_iter;
 	
 	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		if (FIGHTING(iter) || GET_POS(iter) == POS_FIGHTING) {
 			stop_fighting(iter);
+		}
+		
+		if (iter != ch && iter->desc) {
+			LL_FOREACH_SAFE(iter->desc->input.head, inq, next_inq) {
+				LL_DELETE(iter->desc->input.head, inq);
+				free(inq->text);
+				free(inq);
+			}
 		}
 	}
 	
