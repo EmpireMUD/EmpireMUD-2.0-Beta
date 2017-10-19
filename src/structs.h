@@ -1006,6 +1006,27 @@ typedef struct vehicle_data vehicle_data;
 #define EUS_VAULT  BIT(0)	// requires privilege
 
 
+// OFFENSE_x: offense types
+#define OFFENSE_STEALING  0
+#define OFFENSE_ATTACKED_PLAYER  1
+#define OFFENSE_GUARD_TOWER  2
+#define OFFENSE_KILLED_PLAYER  3
+#define OFFENSE_INFILTRATED  4
+#define OFFENSE_ATTACKED_NPC  5
+#define OFFENSE_SIEGED_BUILDING  6
+#define OFFENSE_SIEGED_VEHICLE  7
+#define OFFENSE_BURNED_BUILDING  8
+#define OFFENSE_BURNED_VEHICLE  9
+#define NUM_OFFENSES  10	// total
+
+
+// OFF_x: offense flags
+#define OFF_SEEN  BIT(0)	// someone saw this happen (npc here or player nearby)
+#define OFF_WAR  BIT(1)	// happened at war (low/no hostile value)
+#define OFF_AVENGED  BIT(2)	// player was killed or empire was warred for this (removes hostile value)
+
+
+
 // Empire Privilege Levels
 #define PRIV_CLAIM  0	// Claim land
 #define PRIV_BUILD  1	// Build/Dismantle structures
