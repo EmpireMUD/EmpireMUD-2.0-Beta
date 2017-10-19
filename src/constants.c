@@ -2109,7 +2109,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.1,	// OBJ_UNIQUE
 	1.0,	// OBJ_PLANTABLE
 	1.0,	// OBJ_LIGHT
-	1.3333,	// OBJ_SUPERIOR
+	1.6,	// OBJ_SUPERIOR
 	1.0,	// OBJ_LARGE
 	1.0,	// OBJ_CREATED
 	1.0,	// OBJ_SINGLE_USE
