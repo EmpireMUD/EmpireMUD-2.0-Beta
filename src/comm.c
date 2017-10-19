@@ -2982,6 +2982,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (IS_THIRSTY(ch)) {
 						strcat(i, "\t0T");
 					}
+					if (HAS_NEW_OFFENSES(ch)) {
+						strcat(i, "\t0O");
+					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
 							strcat(i, "\tMR");
@@ -3038,6 +3041,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						else if (get_cooldown_time(ch, COOLDOWN_HOSTILE_FLAG) > 0) {
 							sprintf(i + strlen(i), "%shostile", (*i ? " " : ""));
 						}
+					}
+					if (HAS_NEW_OFFENSES(ch)) {
+						sprintf(i + strlen(i), "%soffenses", (*i ? " " : ""));
 					}
 					
 					if (!*i) {

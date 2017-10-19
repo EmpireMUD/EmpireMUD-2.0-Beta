@@ -3483,6 +3483,7 @@ struct player_special_data {
 	int promo_id;	// entry in the promo_codes table
 	int ignore_list[MAX_IGNORES];	// players who can't message you
 	int last_tell;	// idnum of last tell from
+	time_t last_offense_seen;	// timestamp of last time the player checked offenses
 	
 	// character strings
 	char *lastname;	// Last name
@@ -4091,6 +4092,19 @@ struct empire_workforce_tracker {
 };
 
 
+// for offenses committed against an empire
+struct offense_data {
+	int type;	// OFFENSE_ constant
+	any_vnum empire;	// which empire caused it (or NOTHING)
+	int player_id;	// which player caused it
+	time_t timestamp;	// when
+	int x, y;	// approximate location
+	bitvector_t flags;	// OFF_ for anonymous offenses, whether or not there was an observer
+	
+	struct offense_data *next;	// linked list
+};
+
+
 // The main data structure for the empires
 struct empire_data {
 	empire_vnum vnum;	// empire's virtual number
@@ -4120,6 +4134,7 @@ struct empire_data {
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
+	struct offense_data *offenses;
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

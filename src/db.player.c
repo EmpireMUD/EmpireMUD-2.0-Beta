@@ -1590,6 +1590,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Last Corpse Id:", length)) {
 					GET_LAST_CORPSE_ID(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Last Offense:", length)) {
+					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
+				}
 				else if (PFILE_TAG(line, "Learned Craft:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
 						add_learned_craft(ch, i_in[0]);
@@ -2427,6 +2430,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_LAST_TIP(ch)) {
 		fprintf(fl, "Last Tip: %d\n", GET_LAST_TIP(ch));
 	}
+	fprintf(fl, "Last Offense: %ld\n", GET_LAST_OFFENSE_SEEN(ch));
 	if (GET_LASTNAME(ch)) {
 		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
 	}

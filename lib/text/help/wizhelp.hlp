@@ -249,6 +249,24 @@ for entering the game, only if there are any notes to show.
 
 See also: GRANT
 #d
+ENDWAR "END WAR"
+
+Usage:  endwar [empire] [second empire]
+
+This command is used by immortals to cancel active wars. This command is part
+of the 'empires' grant. It has 3 modes:
+
+> endwar
+With no arguments, this just lists active wars.
+
+> endwar <empire>
+With one empire, it ends all wars for that empire.
+
+> endwar <empire> <second empire>
+With two arguments, it ends the war between those two empires.
+
+See also: GRANT
+#d
 FILE
 
 Usage:  file <file> <lines>

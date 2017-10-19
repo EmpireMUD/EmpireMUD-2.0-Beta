@@ -547,6 +547,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_WORKFORCE_TRACKER(emp)  ((emp)->ewt_tracker)
 #define EMPIRE_ISLANDS(emp)  ((emp)->islands)
 #define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
+#define EMPIRE_OFFENSES(emp)  ((emp)->offenses)
 
 // helpers
 #define EMPIRE_ADMIN_FLAGGED(emp, flag)  IS_SET(EMPIRE_ADMIN_FLAGS(emp), (flag))
@@ -1045,6 +1046,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_death_time))
 #define GET_LAST_DIR(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_direction))
 #define GET_LAST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_known_level))
+#define GET_LAST_OFFENSE_SEEN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_offense_seen))
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
 #define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
 #define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tip))
@@ -1095,6 +1097,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // helpers
 #define ACCOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && GET_ACCOUNT(ch) && IS_SET(GET_ACCOUNT(ch)->flags, (flag)))
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
+#define HAS_NEW_OFFENSES(ch) (!IS_NPC(ch) && GET_LOYALTY(ch) && EMPIRE_OFFENSES(GET_LOYALTY(ch)) && EMPIRE_OFFENSES(GET_LOYALTY(ch))->timestamp > GET_LAST_OFFENSE_SEEN(ch))
 #define IS_AFK(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_AFK) || ((ch)->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10))
 #define IS_GRANTED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_GRANT_FLAGS(ch), (flag)))
 #define IS_MORPHED(ch)  (GET_MORPH(ch) != NULL)

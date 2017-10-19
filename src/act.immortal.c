@@ -5836,6 +5836,90 @@ ACMD(do_editnotes) {
 }
 
 
+ACMD(do_endwar) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	empire_data *iter, *next_iter, *other, *first = NULL, *second = NULL;
+	struct empire_political_data *pol, *rev;
+	bool any, line;
+	
+	argument = any_one_word(argument, arg1);
+	argument = any_one_word(argument, arg2);
+	
+	if (!*arg1 && !*arg2) {	// no args: list active wars
+		msg_to_char(ch, "Active wars:\r\n");
+		
+		any = FALSE;
+		HASH_ITER(hh, empire_table, iter, next_iter) {
+			line = FALSE;
+			
+			LL_FOREACH(EMPIRE_DIPLOMACY(iter), pol) {
+				if (IS_SET(pol->type, DIPL_WAR) && (other = real_empire(pol->id))) {
+					if (!line) {
+						msg_to_char(ch, " %s%s\t0: ", EMPIRE_BANNER(iter), EMPIRE_NAME(iter));
+					}
+					
+					msg_to_char(ch, "%s%s%s\t0", (line ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
+					any = line = TRUE;
+				}
+			}
+			
+			if (line) {
+				msg_to_char(ch, "\r\n");
+			}
+		}
+		
+		if (!any) {
+			msg_to_char(ch, " none\r\n");
+		}
+	}	// end no-arg
+	else if (!(first = get_empire(arg1))) {
+		msg_to_char(ch, "Invalid empire '%s'.\r\n", arg1);
+	}
+	else if (*arg2 && !(second = get_empire(arg2))) {
+		msg_to_char(ch, "Invalid empire '%s'.\r\n", arg2);
+	}
+	else {	// ok now ends wars
+		any = FALSE;
+		
+		// we are guaranteed a "first" empire but not a "second"
+		LL_FOREACH(EMPIRE_DIPLOMACY(first), pol) {
+			if (second && pol->id != EMPIRE_VNUM(second)) {
+				continue;	// doing 1? or all?
+			}
+			if (!IS_SET(pol->type, DIPL_WAR)) {
+				continue;	// not war
+			}
+			
+			other = (second ? second : real_empire(pol->id));
+			
+			// remove war, set distrust
+			REMOVE_BIT(pol->type, DIPL_WAR);
+			SET_BIT(pol->type, DIPL_DISTRUST);
+			pol->start_time = time(0);
+			
+			// and back
+			if ((rev = find_relation(other, first))) {
+				REMOVE_BIT(rev->type, DIPL_WAR);
+				SET_BIT(rev->type, DIPL_DISTRUST);
+				rev->start_time = time(0);
+			}
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: DIPL: %s has ended the war between %s and %s", GET_NAME(ch), EMPIRE_NAME(first), EMPIRE_NAME(other));
+			log_to_empire(first, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(other));
+			log_to_empire(other, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(first));
+			any = TRUE;
+		}
+		
+		if (!any && second) {
+			msg_to_char(ch, "You didn't find a war to end between %s and %s.\r\n", EMPIRE_NAME(first), EMPIRE_NAME(second));
+		}
+		else if (!any) {
+			msg_to_char(ch, "%s is not at war with anybody.\r\n", EMPIRE_NAME(first));
+		}
+	}
+}
+
+
 /*
  * do_file
  *  by Haddixx <haddixx@megamed.com>
