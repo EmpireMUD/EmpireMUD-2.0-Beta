@@ -33,6 +33,7 @@
 *   Crop Lib
 *   Empire Lib
 *   Empire NPC Lib
+*   Empire Offense Lib
 *   Exit Lib
 *   Extra Description Lib
 *   Globals Lib
@@ -1779,6 +1780,12 @@ void free_empire(empire_data *emp) {
 		free(pol);
 	}
 	
+	// free offenses
+	while (EMPIRE_OFFENSES(emp)) {
+		remove_offense(emp, EMPIRE_OFFENSES(emp));
+	}
+	
+	// free strings
 	if (emp->name) {
 		free(emp->name);
 	}
@@ -2701,6 +2708,102 @@ void kill_empire_npc(char_data *ch) {
 	
 	GET_EMPIRE_NPC_DATA(ch) = NULL;
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE OFFENSE LIB //////////////////////////////////////////////////////
+
+/**
+* Adds a new offense against an empire.
+*
+* @param empire_data *emp The empire being offended.
+* @param int type Any OFFENSE_ type.
+* @param char_data *offender The person committing the offense (will use any player master of an npc).
+* @param room_data *loc Where it happened.
+* @param bitvector_t flags Any OFF_ flags that apply.
+*/
+void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags) {
+	void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender);
+	
+	struct offense_data *off;
+	
+	// try to find a player
+	while (IS_NPC(offender) && offender->master) {
+		offender = offender->master;
+	}
+	if (IS_NPC(offender)) {
+		return;	// no offense
+	}
+	
+	CREATE(off, struct offense_data, 1);
+	off->type = type;
+	off->empire = GET_LOYALTY(offender) ? EMPIRE_VNUM(GET_LOYALTY(offender)) : NOTHING;
+	off->player_id = GET_IDNUM(offender);
+	off->timestamp = time(0);
+	off->x = X_COORD(IN_ROOM(offender));
+	off->y = Y_COORD(IN_ROOM(offender));
+	off->flags = flags;
+	
+	LL_PREPEND(EMPIRE_OFFENSES(emp), off);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	
+	log_offense_to_empire(emp, off, offender);
+}
+
+
+/**
+* Clears out old offenses for all empires.
+*/
+void clean_empire_offenses(void) {
+	time_t clear_older = time(0) - SECS_PER_REAL_WEEK;
+	struct offense_data *off, *next_off;
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
+			if (off->timestamp < clear_older) {
+				remove_offense(emp, off);
+			}
+		}
+		
+		// don't really need to trigger a save. They'll either save on their
+		// own or this will get re-pruned next reboot
+	}
+}
+
+
+/**
+* If offenses should elog, this function builds and logs that.
+*
+* @param empire_data *emp The empire that was offended.
+* @param struct offense_data *off The offense to log.
+* @param char_data *offender The person who committed the offense.
+*/
+void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender) {
+	char buf[MAX_STRING_LENGTH];
+	*buf = '\0';
+	
+	// OFFENSE_x: offenses that must be logged
+	switch (off->type) {
+		// TODO
+	}
+	
+	if (*buf) {
+		log_to_empire(emp, ELOG_HOSTILITY, buf);
+	}
+}
+
+
+/**
+* Removes and frees an offense.
+*
+* @param empire_data *emp The empire to remove from.
+* @param struct offense_data *off The offense to remove.
+*/
+void remove_offense(empire_data *emp, struct offense_data *off) {
+	LL_DELETE(EMPIRE_OFFENSES(emp), off);
+	free(off);
 }
 
 

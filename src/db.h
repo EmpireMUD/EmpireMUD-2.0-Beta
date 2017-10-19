@@ -330,6 +330,11 @@ void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e);
 void save_all_empires();
 
+// empire offenses
+void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags);
+void clean_empire_offenses();
+void remove_offense(empire_data *emp, struct offense_data *off);
+
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
 
