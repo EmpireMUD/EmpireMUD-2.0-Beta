@@ -5855,7 +5855,7 @@ ACMD(do_endwar) {
 			LL_FOREACH(EMPIRE_DIPLOMACY(iter), pol) {
 				if (IS_SET(pol->type, DIPL_WAR) && (other = real_empire(pol->id))) {
 					if (!line) {
-						msg_to_char(ch, " %s%s\t0: ", EMPIRE_BANNER(iter), EMPIRE_NAME(iter));
+						msg_to_char(ch, " %s%s\t0 vs ", EMPIRE_BANNER(iter), EMPIRE_NAME(iter));
 					}
 					
 					msg_to_char(ch, "%s%s%s\t0", (line ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
