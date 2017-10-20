@@ -1028,6 +1028,11 @@ void add_player_kill(char_data *ch, char_data *killer) {
 	// find matching data
 	if (!IS_NPC(killer)) {
 		LL_SEARCH_SCALAR(GET_ACCOUNT(ch)->killed_by, data, player_id, GET_IDNUM(killer));
+		
+		// mark empire offense (always 'seen')
+		if (GET_LOYALTY(ch)) {
+			add_offense(GET_LOYALTY(ch), OFFENSE_KILLED_PLAYER, killer, IN_ROOM(killer), OFF_SEEN);
+		}
 	}
 	else if (GET_LOYALTY(killer)) {	// is npc
 		LL_FOREACH(GET_ACCOUNT(ch)->killed_by, iter) {
@@ -1704,6 +1709,9 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 		dam = 0;
 	}
 	
+	// guard towers ALWAYS see the offender
+	add_offense(emp, OFFENSE_GUARD_TOWER, ch, to_room, OFF_SEEN);
+	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
 		// slow effect (1 mud hour)
 		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1 MUD_HOURS, AFF_SLOW, ch);
@@ -1718,8 +1726,6 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 			void cancel_action(char_data *ch);
 			cancel_action(ch);
 		}
-		
-		log_to_empire(emp, ELOG_HOSTILITY, "Guard tower at (%d, %d) is shooting at an infiltrator at (%d, %d)", X_COORD(from_room), Y_COORD(from_room), X_COORD(to_room), Y_COORD(to_room));
 	}
 }
 

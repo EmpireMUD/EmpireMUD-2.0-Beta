@@ -2715,7 +2715,8 @@ void kill_empire_npc(char_data *ch) {
 //// EMPIRE OFFENSE LIB //////////////////////////////////////////////////////
 
 /**
-* Adds a new offense against an empire.
+* Adds a new offense against an empire. Note: the OFF_WAR flag is added auto-
+* matically.
 *
 * @param empire_data *emp The empire being offended.
 * @param int type Any OFFENSE_ type.
@@ -2744,6 +2745,11 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 	off->x = X_COORD(IN_ROOM(offender));
 	off->y = Y_COORD(IN_ROOM(offender));
 	off->flags = flags;
+	
+	// check for war
+	if (!IS_SET(flags, OFF_WAR) && GET_LOYALTY(offender) && has_relationship(emp, GET_LOYALTY(offender), DIPL_WAR)) {
+		off->flags |= OFF_WAR;
+	}
 	
 	LL_PREPEND(EMPIRE_OFFENSES(emp), off);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -2792,6 +2798,54 @@ void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data
 	if (*buf) {
 		log_to_empire(emp, ELOG_HOSTILITY, buf);
 	}
+}
+
+
+/**
+* Determines if someone 'saw' an offense take place. Call this after the
+* offense takes place.
+*
+* @param char_data *ch The offender.
+* @param empire_data *emp The empire being offended.
+* @param room_data *from_room Optional: If the character started out in another spot (infiltrate).
+*/
+bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room) {
+	descriptor_data *desc;
+	char_data *iter;
+	
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
+			return TRUE;	// someone here saw it
+		}
+	}
+	
+	if (from_room) {
+		LL_FOREACH2(ROOM_PEOPLE(from_room), iter, next_in_room) {
+			if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
+				return TRUE;	// someone here saw it
+			}
+		}
+	}
+	
+	// check nearby players
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !desc->character || desc->character == ch) {
+			continue;	// not a player
+		}
+		if (IS_IMMORTAL(desc->character) || !AWAKE(desc->character) || !CAN_SEE(desc->character, ch)) {
+			continue;	// can't even see them
+		}
+		if (GET_LOYALTY(desc->character) != emp && (!GET_LOYALTY(desc->character) || !has_relationship(GET_LOYALTY(desc->character), emp, DIPL_ALLIED))) {
+			continue;	// must be a member of the empire, or an ally
+		}
+		if (compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 7) {
+			continue;	// too far away
+		}
+		
+		return TRUE;	// player saw it
+	}
+	
+	return FALSE;	// nobody saw it
 }
 
 

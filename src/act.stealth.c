@@ -1007,7 +1007,7 @@ ACMD(do_howl) {
 ACMD(do_infiltrate) {
 	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 
-	room_data *to_room;
+	room_data *to_room, *was_in;
 	int dir;
 	empire_data *emp;
 	int cost = 10;
@@ -1046,6 +1046,7 @@ ACMD(do_infiltrate) {
 		// sends own message
 	}
 	else {
+		was_in = IN_ROOM(ch);
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		
 		gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
@@ -1084,7 +1085,10 @@ ACMD(do_infiltrate) {
 		}
 		
 		// distrust just in case
-		trigger_distrust_from_stealth(ch, emp);
+		if (emp) {
+			trigger_distrust_from_stealth(ch, emp);
+			add_offense(emp, OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, emp, was_in) ? OFF_SEEN : NOBITS);
+		}
 	}
 }
 
@@ -1267,6 +1271,7 @@ ACMD(do_pickpocket) {
 		
 		if (vict_emp && vict_emp != ch_emp) {
 			trigger_distrust_from_stealth(ch, vict_emp);
+			add_offense(vict_emp, OFFENSE_PICKPOCKETED, ch, IN_ROOM(ch), offense_was_seen(ch, vict_emp, NULL) ? OFF_SEEN : NOBITS);
 		}
 		
 		// gain either way
@@ -1519,6 +1524,7 @@ ACMD(do_shadowstep) {
 
 	char_data *vict = NULL;
 	empire_data *emp = NULL;
+	room_data *was_in;
 	int cost = 50;
 	bool infil = FALSE;
 
@@ -1564,6 +1570,7 @@ ACMD(do_shadowstep) {
 		msg_to_char(ch, "You can't shadowstep there.\r\n");
 	}
 	else {
+		was_in = IN_ROOM(ch);
 		infil = !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED);
 		
 		if (infil && emp && GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_WAR)) {
@@ -1615,6 +1622,7 @@ ACMD(do_shadowstep) {
 			trigger_distrust_from_stealth(ch, emp);
 			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
 			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
+			add_offense(emp, OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, emp, was_in) ? OFF_SEEN : NOBITS);
 		}
 	}
 }

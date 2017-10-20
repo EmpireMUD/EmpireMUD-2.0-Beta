@@ -1017,14 +1017,14 @@ typedef struct vehicle_data vehicle_data;
 #define OFFENSE_SIEGED_VEHICLE  7
 #define OFFENSE_BURNED_BUILDING  8
 #define OFFENSE_BURNED_VEHICLE  9
-#define NUM_OFFENSES  10	// total
+#define OFFENSE_PICKPOCKETED  10
+#define NUM_OFFENSES  11	// total
 
 
 // OFF_x: offense flags
 #define OFF_SEEN  BIT(0)	// someone saw this happen (npc here or player nearby)
 #define OFF_WAR  BIT(1)	// happened at war (low/no hostile value)
 #define OFF_AVENGED  BIT(2)	// player was killed or empire was warred for this (removes hostile value)
-
 
 
 // Empire Privilege Levels
