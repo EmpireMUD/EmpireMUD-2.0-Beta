@@ -1,0 +1,80 @@
+#12000
+Old Gods weight token~
+5 0
+0 0 0 0
+T0
+weight of the old gods~
+T1
+weight of the old gods~
+S
+#12001
+cleanse~
+2 0
+0 0 0 0
+T0
+You light a sprig of sage and cleanse the circle.~
+T1
+$n lights a sprig of sage and cleanses the circle.~
+T4
+You light a sprig of sage and cleanse the circle.~
+T5
+$n lights a sprig of sage and cleanses the circle.~
+S
+#12002
+Anat combat cooldown~
+3 0
+0 0 0 0
+S
+#12003
+Yatpan combat cooldown~
+3 0
+0 0 0 0
+S
+#12005
+Anat: Summon Yatpan cooldown~
+3 0
+0 0 0 0
+S
+#12008
+bleeding wounds~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding from Anat's assault.~
+S
+#12009
+impaled~
+4 0
+0 0 0 0
+T0
+You are no longer impaled upon Anat's spear.~
+S
+#12010
+earthshatter~
+4 0
+0 0 0 0
+T0
+You finally recover from the shockwave from Anat's hammer.~
+S
+#12011
+hawk dive~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding from Yatpan's dive attack.~
+S
+#12012
+hawk dive~
+4 0
+0 0 0 0
+T0
+You recover your weapon after Yatpan's dive attack.~
+S
+#12013
+hawk dive~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by Yatpan's dive attack.~
+S
+$

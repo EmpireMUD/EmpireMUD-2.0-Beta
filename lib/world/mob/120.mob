@@ -1,0 +1,116 @@
+#12000
+anat goddess virgin war-goddess~
+the goddess Anat~
+Anat, virgin war-goddess of old, stands fierce and bloody (difficulty).
+~
+225 325 aduyB ci
+2 0 35 1
+I 4 12004 16.67 1 a  # LOOT: the golden chain of the old god Anat
+I 4 12006 16.67 1 a  # LOOT: a vial of the blood of the old god Anat
+I 4 12008 16.67 1 a  # LOOT: an idol of the old god Anat
+I 4 12010 16.67 1 a  # LOOT: the hawk pendant of the old god Anat
+I 4 12012 16.66 1 a  # LOOT: the stone of wrath of the old god Anat
+I 4 12014 16.66 1 a  # LOOT: a vial of the winnowed grain of the old god Anat
+M
+1
+Our time will come again!~
+M
+1
+The old gods will come for you, your children, your people, even for your dead!~
+M
+1
+No one escapes my vengeance!~
+M
+1
+No one escapes my wrath!~
+M
+0
+Blood drips from Anat's dress.~
+M
+1
+I will winnow you like grain!~
+M
+1
+You will be as dust cast before me!~
+M
+1
+How dare you challenge the old gods!?~
+M
+0
+Anat shines radiantly in a dress of saffron and murex, drenched in blood.~
+M
+1
+I have killed god and man alike. What chance have the likes of you?~
+T 12003
+T 12006
+T 12001
+T 12007
+T 12008
+T 12009
+T 12010
+T 12012
+S
+#12001
+Yatpan hawk~
+the hawk Yatpan~
+The hawk Yatpan swoops in to attack!
+~
+225 325 abdhoz q
+1 0 2 27
+T 12011
+T 12013
+S
+#12016
+hawk trained~
+a trained hawk~
+A trained hawk circles overhead.
+~
+1 1 bdoD mn
+0 0 0 10
+M
+0
+$n circles overhead.~
+M
+0
+$n is watching you like a hawk.~
+M
+0
+$n bares $s talons as $e glides through the air.~
+M
+0
+$n circles overhead.~
+M
+0
+$n circles overhead.~
+T 9901
+T 9902
+S
+#12017
+anat memory~
+the memory of Anat~
+The memory of Anat, warrior-goddess of old, barely lingers in the air.
+~
+225 325 do dn
+0 0 27 15
+M
+0
+A hawk soars high overhead.~
+M
+0
+You hear the distant clanging of swords.~
+M
+0
+You can hear someone chanting a soft prayer, but you can't make out the words.~
+M
+0
+The screech of a distant hawk pierces the air.~
+S
+#12018
+hawk yatpan giant~
+the hawk Yatpan~
+The giant hawk Yatpan alights on the ground.
+~
+100 125 de m
+0 0 2 10
+S
+$

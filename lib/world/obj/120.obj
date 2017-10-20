@@ -1,0 +1,369 @@
+#12000
+anat chains~
+the chains of Anat~
+The chains of Anat lie broken on the ground (list, buy).~
+   These chains are huge, meant to bind the war-goddess Anat, the most feared
+foe of the ancient world. Anat killed men and gods alike as she walked the
+world, drenched in blood. Unfortunately, these chains are broken and it seems
+she walks the Earth again. Seek out Anat -- hopefully she hasn't gotten far.
+~
+3 0 0 3
+0 0 0
+2 1152
+S
+#12001
+idol idle graven~
+a graven idol~
+A graven idol is sitting here.~
+   This graven image appears to have been one of the Old Gods, though its face
+has been scratched off. You could use this to build a binding circle powerful
+enough to summon one of them.
+Usage: build bindingcircle
+~
+3 gp a 2
+0 0 0
+0 0
+S
+#12002
+wails mournful anat~
+the mournful wails of Anat~
+The mournful wails of Anat fill the air!~
+It seems Anat has been defeated.
+~
+3 0 0 3
+0 0 0
+10 16
+T 12005
+S
+#12003
+bindings Anats Anat's~
+Anat's bindings~
+Anat's bindings are piled here.~
+   These strange bindings were once used to imprison one of the old gods. They
+still surge with forgotten power, long lost to the world. These might be
+valuable, to the right person.
+~
+15 0 a 1
+1 0 0
+2 0
+R
+5621 0
+R
+5193 0
+S
+#12004
+chain golden old god Anat~
+the golden chain of the old god Anat~
+The golden chain of the old god Anat is dangling here.~
+   This fine golden chain is so long that it loops dozens of times around your
+neck, enough to protect your heart from mortal strikes. The chain is impossibly
+light despite the glimmer of pure gold, and pulling on it does not cause it to
+tighten.
+~
+2 amp ac 5
+0 0 0
+4 0
+A
+2 1 0
+A
+18 2 0
+A
+13 2 0
+A
+24 3 0
+A
+12 3 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+S
+#12005
+design golden chain of Anat~
+the golden chain of Anat design~
+The golden chain of Anat design is on the ground.~
+This design will teach you to forge: golden chain of Anat.
+~
+7 0 a 1
+12004 0 0
+0 0
+S
+#12006
+vial blood old god Anat~
+a vial of the blood of the old god Anat~
+A vial of the blood of the old god Anat is dangling here.~
+   This tiny glass vial contains only a single drop of blood, purported to come
+from the veins of the goddess Anat, virgin warrior of the Old World. The vial
+is suspended from a chain of gold and silver, warm to the touch, and absolutely
+bursting with mana.
+~
+2 amp ac 5
+0 0 0
+4 0
+A
+8 1 0
+A
+9 1 0
+A
+7 3 0
+A
+23 3 0
+A
+16 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+S
+#12007
+design blood of Anat~
+the blood of Anat design~
+The blood of Anat design is on the ground.~
+This design will teach you to forge: blood of Anat.
+~
+7 0 a 1
+12006 0 0
+0 0
+S
+#12008
+idol old god Anat~
+an idol of the old god Anat~
+An idol of the old god Anat is dangling here.~
+   This little graven image of Anat is made from wood, plated in gold leaf, and
+dangling from a golden necklace. Anat's arm is held high and holding an axe --
+or a club, you aren't sure.
+~
+2 amp ac 6
+0 0 0
+4 0
+A
+8 1 0
+A
+2 1 0
+A
+17 3 0
+A
+22 4 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+S
+#12009
+design idol of Anat~
+the idol of Anat design~
+The idol of Anat design is on the ground.~
+This design will teach you to forge: idol of Anat.
+~
+7 0 a 1
+12008 0 0
+0 0
+S
+#12010
+pendant hawk old god anat~
+the hawk pendant of the old god Anat~
+The hawk pendant of the old god Anat is dangling here.~
+   This golden pendant is engraved with Yatpan, attendant to Anat, in hawk
+form. The hawk's talons are extended, but its face shows the serenity that only
+a hawk can find in battle.
+~
+2 amp ac 6
+0 0 0
+4 0
+A
+1 1 0
+A
+2 1 0
+A
+17 3 0
+A
+21 4 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+S
+#12011
+design hawk pendant of Anat~
+the hawk pendant of Anat design~
+The hawk pendant of Anat design is on the ground.~
+This design will teach you to forge: hawk pendant of Anat.
+~
+7 0 a 1
+12010 0 0
+0 0
+S
+#12012
+stone wrath old god Anat~
+the stone of wrath of the old god Anat~
+The stone of wrath of the old god Anat is dangling here.~
+   This strange piece of sandstone, raw and unfinished, trembles in your hand.
+But as the trembles grow, you realize the stone is pulsing to the rhythm of
+your own heart, beating faster, and faster, and faster, until you can hear
+blood pumping in your ears and you realize the entire world will burn in your
+wake.
+~
+2 amp ac 7
+0 0 0
+4 0
+A
+2 1 0
+A
+9 1 0
+A
+17 3 0
+A
+18 3 0
+A
+12 1 0
+A
+24 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+S
+#12013
+design stone of wrath of Anat~
+the stone of wrath of Anat design~
+The stone of wrath of Anat design is on the ground.~
+This design will teach you to forge: stone of wrath of Anat.
+~
+7 0 a 1
+12012 0 0
+0 0
+S
+#12014
+vial winnowed grain old god anat~
+a vial of the winnowed grain of the old god Anat~
+A vial of the winnowed grain of the old god Anat is dangling here.~
+   This tiny glass vial holds strange gray grains, known from lore to be the
+remains of the old god Mot, slain by the warrior goddess Anat in ancient times.
+It is said that the bearer of these grains shall be a leader among men, capable
+of feats of greatness.
+~
+2 amp ac 8
+0 0 0
+4 0
+A
+11 3 0
+A
+6 2 0
+A
+19 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+S
+#12015
+recipe winnowed grain of Anat~
+the winnowed grain of Anat recipe~
+The winnowed grain of Anat recipe is on the ground.~
+This recipe will teach you to forge: winnowed grain of Anat.
+~
+7 0 a 1
+12014 0 0
+0 0
+S
+#12016
+whistle hawk~
+a hawk whistle~
+A hawk whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+12016 0 0
+2 0
+T 9900
+S
+#12017
+vestiges anat~
+the vestiges of Anat~
+The vestiges of Anat are lying here.~
+   You hold all that remains in this world of the virgin warrior-goddess Anat,
+once mighty and feared, now reduced to rags and ash. It would be a fitting end
+to build her a tomb and bury these for all time.
+Usage: build tombofanat <direction>
+~
+3 g a 2
+0 0 0
+7 0
+S
+#12018
+whistle Yatpans Yatpan's~
+Yatpan's whistle~
+Yatpan's whistle is lying here.~
+   This old wooden whistle looks like it has seen better days. But it is
+inscribed with the dual symbols of the old god Anat and her faithful attendant
+Yatpan, who takes the form of a hawk. Type 'use whistle' to summon a flying
+mount.
+~
+3 o a 9
+12018 0 0
+14 0
+T 10263
+S
+#12019
+feast anat~
+the feast of Anat~
+The feast of Anat has been set out on a cloth.~
+   This feast has meats and fruits from across the many empires, set out for
+the conquering warrior-goddess Anat.
+~
+6 m 0 6
+96 0 0
+7 336
+A
+12 1 0
+A
+24 1 0
+C
+0 350
+M
+4
+You eat the feast in the name of Anat!~
+S
+#12020
+recipe feast of Anat~
+the feast of Anat recipe~
+The feast of Anat recipe is on the ground.~
+This recipe will teach you to cook: feast of Anat.
+~
+7 0 a 1
+12019 0 0
+0 0
+S
+#12021
+dress battle old god Anat~
+the battle dress of the old god Anat~
+The battle dress of the old god Anat is lying here.~
+   These clothing, died with saffron and murex, bear the symbols of the virgin
+warrior-goddess Anat.
+~
+2 o ad 2
+0 0 0
+7 0
+A
+5 1 0
+M
+14
+The warrior-god $n stands valiantly before you!~
+M
+13
+The warrior-goddess $n stands valiantly before you!~
+S
+$

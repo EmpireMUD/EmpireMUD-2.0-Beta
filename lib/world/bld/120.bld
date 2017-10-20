@@ -1,0 +1,36 @@
+#12000
+Broken Binding Circle~
+A Broken Binding Circle~
+&0{&R**&0}~
+1000 0 bd 0
+0 0 0 -1
+S
+#12001
+Binding Circle~
+The Binding Circle~
+&0{**}~
+96 5 bdl 0
+0 0 0 -1
+R
+12001 1 5 0
+S
+#12017
+Tomb of Anat~
+The Desecrated Tomb of Anat~
+&0|&ROO&0|~
+48 4 0 ade
+4 0 0 -1
+C
+tomb~
+D
+   This old tomb is filled with the trappings of the old god, heavy with dust
+and as cold as a long-forgotten memory. The altar is clean of blood, as no
+sacrifices have been made here in many years. All you hear is the cold echo of
+a past no one remembers.
+~
+M
+12017 33.00 0
+R
+1002 2 5 0
+S
+$
