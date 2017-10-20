@@ -181,7 +181,7 @@ while %person%
   end
   eval person %person.next_in_room%
 done
-if !%self.cooldown(12004)% && !%yatpan%
+if !%self.cooldown(12005)% && !%yatpan%
   * Summon Yatpan
   shout Yatpan! Come to me!
   nop %self.set_cooldown(12005, 300)%
@@ -318,6 +318,10 @@ if %self.cooldown(12003)%
   halt
 end
 nop %self.set_cooldown(12003, 30)%
+if %self.affect(BLIND)%
+  %echo% %self.name%'s eyes flash red, and %self.hisher% vision clears!
+  dg_affect %self% BLIND off 1
+end
 eval room %self.room%
 eval person %room.people%
 while %person%
@@ -332,6 +336,10 @@ if !%anat%
   halt
 end
 eval target %random.enemy%
+if !%target%
+  %echo% %self.name% looks very confused.
+  halt
+end
 %force% %anat% say Yatpan! Strike %target.firstname% down!
 %send% %target% %self.name% screeches and dives at you!
 %echoaround% %target% %self.name% screeches and dives at %target.name%!
