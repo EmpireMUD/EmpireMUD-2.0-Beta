@@ -527,7 +527,7 @@ prompted to press any key to enter the game.
 
 See also: INVIS, VISIBLE, SET
 #d
-ISLAND "ISLAND COMMAND"
+ISLAND "ISLAND COMMAND" CONTINENT
 
 Usage:  island list [keywords]
         island rename <id> <name>
@@ -539,6 +539,8 @@ properties to them. This command is grantable.
 Island flags:
  NEWBIE - Wipes claims periodically
  !AGGRO - Prevents aggro mobs, and guard towers won't fire
+ !CUSTOMIZE - Cannot be renamed by players
+ CONTINENT - Is a whole continent (affects adventure spawns)
 
 See also: GRANT
 #d

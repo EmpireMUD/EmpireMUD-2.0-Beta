@@ -1276,21 +1276,23 @@ adventure. You can add as many linking rules as you like; it will spawn
 instances in any place that matches any rule.
 
 See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
- BDG-EXISTING: Link from an existing building or interior room.
- BDG-NEW: Builds the building on the map and links from it (no interior rooms).
- PORTAL-WORLD: Portal appears in a matching sector.
- PORTAL-BDG-EXISTING: Portal appears in an existing building or interior room.
- PORTAL-BDG-NEW: Builds the building on the map and puts a portal in it (no
+ &cBDG-EXISTING&0: Link from an existing building or interior room.
+ &cBDG-NEW&0: Builds the building on the map and links from it (no interior rooms).
+ &cPORTAL-WORLD&0: Portal appears in a matching sector.
+ &cPORTAL-BDG-EXISTING&0: Portal appears in an existing building or interior room.
+ &cPORTAL-BDG-NEW&0: Builds the building on the map and puts a portal in it (no
     interior rooms).
- PORTAL-CROP: Portal appears on a matching crop tile.
- TIME-LIMIT: Removes instances after a certain number of minutes expire.
- NOT-NEAR-SELF: Prevent the adventure from linking near other copies of itself.
+ &cPORTAL-CROP&0: Portal appears on a matching crop tile.
+ &cTIME-LIMIT&0: Removes instances after a certain number of minutes expire.
+ &cNOT-NEAR-SELF&0: Prevent the adventure from linking near other copies of itself.
 
 Available flags:
- CLAIMED-OK - Can link to claimed locations (default: unclaimed only).
- CITY-ONLY - Only links to claimed tiles in cities.
- !CITY - Will not link to claimed tiles in cities.
- CLAIMED-ONLY - Will only link to claimed tiles.
+ &cCLAIMED-OK&0 - Can link to claimed locations (default: unclaimed only).
+ &cCITY-ONLY&0 - Only links to claimed tiles in cities.
+ &c!CITY&0 - Will not link to claimed tiles in cities.
+ &cCLAIMED-ONLY&0 - Will only link to claimed tiles.
+ &cCONTINENT-ONLY&0 - Only spawns on islands with the CONTINENT flag.
+ &c!CONTINENT&0 - Will not spawn on continents.
 
 Portals require a portal object for both the entrance and exit (they may be
 the same object). Existing buildings may also be interior rooms, but new

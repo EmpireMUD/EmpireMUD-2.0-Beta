@@ -239,10 +239,12 @@ const char *adventure_flags[] = {
 
 // ADV_LINKF_x
 const char *adventure_link_flags[] = {
-	"CLAIMED-OK",
+	"CLAIMED-OK",	// 0
 	"CITY-ONLY",
 	"!CITY",
 	"CLAIMED-ONLY",
+	"CONTINENT-ONLY",
+	"!CONTINENT",	// 5
 	"\n"
 };
 
@@ -2724,6 +2726,7 @@ const char *island_bits[] = {
 	"NEWBIE",
 	"!AGGRO",
 	"!CUSTOMIZE",
+	"CONTINENT",
 	"\n"
 };
 

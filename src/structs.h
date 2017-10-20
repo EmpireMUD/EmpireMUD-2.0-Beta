@@ -543,6 +543,8 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINKF_CITY_ONLY  BIT(1)	// only spawns on claimed land in cities
 #define ADV_LINKF_NO_CITY  BIT(2)	// won't spawn on claimed land in cities
 #define ADV_LINKF_CLAIMED_ONLY  BIT(3)	// ONLY spawns on claimed tiles
+#define ADV_LINKF_CONTINENT_ONLY  BIT(4)	// only spawns on continents
+#define ADV_LINKF_NO_CONTINENT  BIT(5)	// does not spawn on continents
 
 
 // ADV_SPAWN_x: adventure spawn types
@@ -2224,6 +2226,7 @@ typedef struct vehicle_data vehicle_data;
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
 #define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
+#define ISLE_CONTINENT  BIT(3)	// d. island is a continent (usually large, affects spawns)
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
