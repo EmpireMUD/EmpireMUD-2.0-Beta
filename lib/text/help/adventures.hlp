@@ -115,6 +115,48 @@ The restless spirit sells:
 Game admins: You must enable global 18802 by removing its IN-DEV flag to turn
 on the Halloween candy drops, and disable that global when the holiday is over.
 #
+"OLD GODS" "BINDING CIRCLE"
+
+The Binding Circle adventures are a set of small 1-fight world spawns where
+you fight and defeat ancient, long-forgotten gods. These adventures spawn only
+on continents (not smaller islands) and you can find them with 'nearby'. Once
+you find the broken binding circle, the chains there will give you a hint as
+to which old god you're looking for. Use the 'where' command to find that god
+and hunt it down.
+
+Alternatively, you can build your own binding circle (using rewards from these
+adventures). Your binding circle has a chance to bind one of the old gods
+whenever the Binding Circle adventures spawn. The binding circle is not
+guaranteed to bind a god each time, but can be reused over and over again.
+
+All Old Gods adventures use the 'weight of the old gods' currency.
+
+The following old gods are available so far:
+  Anat, the warrior-goddess - HELP ANAT
+#
+"BINDING CIRCLE: ANAT" "BINDING CIRCLE ANAT" ANAT
+
+Anat, virgin warrior-goddess of old, is a fierce, battle-hardened maiden whose
+power can barely be contained by the binding chains. Anat has powerful
+necklaces for anyone who can defeat her.
+
+Anat's shop sells the following items:
+  Anat's bindings - used for the necklace crafts
+  the battle dress of the old god Anat - clothing
+  a hawk whistle - a minipet
+  Yatpan's whistle - a flying hawk mount
+  the vestiges of Anat - builds a large tomb buildling
+  a graven idol - builds a binding circle in your city
+
+The patterns and recipes in the store are:
+ golden chain of Anat - tank necklace
+ blood of Anat - healer necklace
+ idol of Anat - caster necklace
+ hawk pendant of Anat - melee necklace
+ stone of wrath of Anat - pvp/solo necklace
+ winnowed grain of Anat - empire necklace
+ feast of Anat recipe - resistance feast (requires Gourmet Chef)
+#
 PERMAFROST "MAGITERRANEAN: PERMAFROST" "MAGITERRANEAN PERMAFROST"
 
 Magiterranean: Permafrost (level 75-125 adventure)
