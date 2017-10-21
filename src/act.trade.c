@@ -1974,6 +1974,9 @@ ACMD(do_reforge) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
 			msg_to_char(ch, "It is already superior.\r\n");
 		}
+		else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP | OBJ_GROUP_DROP)) {
+			msg_to_char(ch, "You cannot make an item superior if it came from a Hard, Group, or Boss mob.\r\n");
+		}
 		else if (!proto || !OBJ_FLAGGED(proto, OBJ_SCALABLE) || !(ctype = find_craft_for_obj_vnum(GET_OBJ_VNUM(obj)))) {
 			msg_to_char(ch, "It can't be made superior.\r\n");
 		}

@@ -1905,8 +1905,8 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 
 
 RITUAL_FINISH_FUNC(perform_siege_ritual) {
-	void besiege_room(room_data *to_room, int damage);
-	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage);
+	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	extern vehicle_data *find_vehicle(int n);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
 	extern bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
@@ -1954,7 +1954,7 @@ RITUAL_FINISH_FUNC(perform_siege_ritual) {
 				trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
 			}
 			
-			besiege_room(room_targ, dam);
+			besiege_room(ch, room_targ, dam);
 			
 			if (SECT(room_targ) != secttype) {
 				msg_to_char(ch, "It is destroyed!\r\n");
@@ -1966,7 +1966,7 @@ RITUAL_FINISH_FUNC(perform_siege_ritual) {
 				trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
 			}
 			
-			besiege_vehicle(veh_targ, dam, SIEGE_MAGICAL);
+			besiege_vehicle(ch, veh_targ, dam, SIEGE_MAGICAL);
 		}
 		
 		gain_ability_exp(ch, ABIL_SIEGE_RITUAL, 33.4);

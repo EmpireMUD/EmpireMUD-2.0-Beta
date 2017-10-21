@@ -1029,8 +1029,8 @@ void add_player_kill(char_data *ch, char_data *killer) {
 	if (!IS_NPC(killer)) {
 		LL_SEARCH_SCALAR(GET_ACCOUNT(ch)->killed_by, data, player_id, GET_IDNUM(killer));
 		
-		// mark empire offense (always 'seen')
-		if (GET_LOYALTY(ch)) {
+		// mark empire offense, only if not-pvp-enabled (always 'seen')
+		if (!IS_PVP_FLAGGED(ch) && GET_LOYALTY(ch)) {
 			add_offense(GET_LOYALTY(ch), OFFENSE_KILLED_PLAYER, killer, IN_ROOM(killer), OFF_SEEN);
 		}
 	}
@@ -2470,11 +2470,11 @@ void appear(char_data *ch) {
 /**
 * For catapults, siege ritual, etc -- damages/destroys a room
 *
-* @param char_data *ch The attacker
+* @param char_data *ch Optional: The attacker (may be NULL, used for offenses)
 * @param room_data *to_room The target room
 * @param int damage How much damage to deal to the room
 */
-void besiege_room(room_data *to_room, int damage) {
+void besiege_room(char_data *attacker, room_data *to_room, int damage) {
 	static struct resource_data *default_res = NULL;
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
@@ -2502,10 +2502,10 @@ void besiege_room(room_data *to_room, int damage) {
 		return;
 	}
 
-	if (emp) {
-		log_to_empire(emp, ELOG_HOSTILITY, "Building under siege at (%d, %d)", X_COORD(to_room), Y_COORD(to_room));
+	if (attacker && emp) {
+		add_offense(emp, OFFENSE_SIEGED_BUILDING, attacker, to_room, offense_was_seen(attacker, emp, to_room) ? OFF_SEEN : NOBITS);
 	}
-
+	
 	if (IS_MAP_BUILDING(to_room)) {
 		COMPLEX_DATA(to_room)->damage += damage;
 		
@@ -2583,12 +2583,13 @@ void besiege_room(room_data *to_room, int damage) {
 /**
 * Does siege damage, which may destroy the vehicle.
 *
+* @param char_data *attacker Optional: The person sieging (may be NULL, used for offenses)
 * @param vehicle_data *veh The vehicle to damage.
 * @param int damage How much siege damage to deal.
 * @param int siege_type What SIEGE_ damage type.
 * @return bool TRUE if the target survives, FALSE if it's extracted
 */
-bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
+bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type) {
 	void fully_empty_vehicle(vehicle_data *veh);
 
 	static struct resource_data *default_res = NULL;
@@ -2604,6 +2605,10 @@ bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 	// no effect
 	if (damage <= 0) {
 		return TRUE;
+	}
+	
+	if (attacker && VEH_OWNER(veh)) {
+		add_offense(VEH_OWNER(veh), OFFENSE_SIEGED_VEHICLE, attacker, IN_ROOM(veh), offense_was_seen(attacker, VEH_OWNER(veh), IN_ROOM(veh)) ? OFF_SEEN : NOBITS);
 	}
 	
 	// deal damage

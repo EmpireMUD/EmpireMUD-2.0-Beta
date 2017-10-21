@@ -1559,6 +1559,7 @@ void real_update_obj(obj_data *obj) {
 	struct empire_political_data *pol;
 	empire_data *emp, *enemy;
 	room_data *home;
+	char_data *pyro;
 	
 	// burny
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
@@ -1576,6 +1577,10 @@ void real_update_obj(obj_data *obj) {
 						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
 					}
 					start_burning(home);
+					
+					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
+						add_offense(emp, OFFENSE_BURNED_BUILDING, pyro, IN_ROOM(pyro), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
+					}
 				}
 			}
 		}
@@ -1632,7 +1637,7 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to update.
 */
 void point_update_vehicle(vehicle_data *veh) {
-	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	
 	// autostore
 	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {
@@ -1644,7 +1649,7 @@ void point_update_vehicle(vehicle_data *veh) {
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
-		if (!besiege_vehicle(veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING)) {
+		if (!besiege_vehicle(NULL, veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING)) {
 			// extracted
 			return;
 		}
