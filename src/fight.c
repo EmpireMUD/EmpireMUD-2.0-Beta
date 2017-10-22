@@ -3576,10 +3576,10 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 	
 	// look for possible offense (if vict is in an empire and is not already fighting ch)
 	if (!IS_NPC(ch) && GET_LOYALTY(vict) && FIGHTING(vict) != ch) {
-		if (!IS_NPC(vict)) {
+		if (!IS_NPC(vict) && !IS_PVP_FLAGGED(vict)) {
 			add_offense(GET_LOYALTY(vict), OFFENSE_ATTACKED_PLAYER, ch, IN_ROOM(ch), OFF_SEEN);
 		}
-		else {
+		else if (IS_NPC(vict)) {
 			add_offense(GET_LOYALTY(vict), OFFENSE_ATTACKED_NPC, ch, IN_ROOM(ch), OFF_SEEN);
 		}
 	}
