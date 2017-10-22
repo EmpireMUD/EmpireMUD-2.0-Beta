@@ -175,8 +175,8 @@ fire_extinguish_value 120
 hostile_flag_time 60
 hostile_login_delay 30
 mutual_war_only 0
-offenses_for_free_war 200
 offense_min_to_war 0
+offenses_for_free_war 200
 rogue_flag_time 1440
 pvp_timer 5
 seconds_per_death 30
