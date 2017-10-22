@@ -1566,19 +1566,20 @@ struct city_metadata_type city_type[] = {
 
 
 // OFFENSE_x: offense definitions
+// note: weights are in relation to the offense_min_to_war and offenses_for_free_war
 struct offense_info_type offense_info[NUM_OFFENSES] = {
 	// name, weight
-	{ "stealing", 10 },	// 0
-	{ "attacked player", 4 },
+	{ "stealing", 15 },	// 0
+	{ "attacked player", 5 },
 	{ "guard tower", 1 },
-	{ "killed player", 10 },
+	{ "killed player", 15 },
 	{ "infiltrated", 10 },
 	{ "attacked npc", 1 },	// 5
-	{ "sieged building", 10 },
-	{ "sieged vehicle", 10 },
+	{ "sieged building", 15 },
+	{ "sieged vehicle", 15 },
 	{ "burned building", 5 },
 	{ "burned vehicle", 5 },
-	{ "pickpocketed", 1 },	// 10
+	{ "pickpocketed", 5 },	// 10
 };
 
 
