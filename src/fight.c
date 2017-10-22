@@ -1031,6 +1031,7 @@ void add_player_kill(char_data *ch, char_data *killer) {
 		
 		// mark empire offense, only if not-pvp-enabled (always 'seen')
 		if (!IS_PVP_FLAGGED(ch) && GET_LOYALTY(ch)) {
+			remove_recent_offenses(GET_LOYALTY(ch), OFFENSE_ATTACKED_PLAYER, killer);
 			add_offense(GET_LOYALTY(ch), OFFENSE_KILLED_PLAYER, killer, IN_ROOM(killer), OFF_SEEN);
 		}
 	}
@@ -3572,6 +3573,16 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 
 	if (FIGHTING(ch))
 		return;
+	
+	// look for possible offense (if vict is in an empire and is not already fighting ch)
+	if (!IS_NPC(ch) && GET_LOYALTY(vict) && FIGHTING(vict) != ch) {
+		if (!IS_NPC(vict)) {
+			add_offense(GET_LOYALTY(vict), OFFENSE_ATTACKED_PLAYER, ch, IN_ROOM(ch), OFF_SEEN);
+		}
+		else {
+			add_offense(GET_LOYALTY(vict), OFFENSE_ATTACKED_NPC, ch, IN_ROOM(ch), OFF_SEEN);
+		}
+	}
 
 	ch->next_fighting = combat_list;
 	combat_list = ch;

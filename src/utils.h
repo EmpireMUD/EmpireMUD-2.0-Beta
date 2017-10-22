@@ -557,6 +557,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EXPLICIT_BANNER_TERMINATOR(emp)  (EMPIRE_BANNER_HAS_UNDERLINE(emp) ? "\t0" : "")
 
 // definitions
+#define OFFENSE_HAS_WEIGHT(off)  (!IS_SET((off)->flags, OFF_AVENGED | OFF_WAR))
 #define SAME_EMPIRE(ch, vict)  (!IS_NPC(ch) && !IS_NPC(vict) && GET_LOYALTY(ch) != NULL && GET_LOYALTY(ch) == GET_LOYALTY(vict))
 
 // only some types of tiles are kept in the shortlist of territories -- particularly ones with associated chores

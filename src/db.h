@@ -333,8 +333,11 @@ void save_all_empires();
 // empire offenses
 void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags);
 void clean_empire_offenses();
+extern int get_total_offenses_from_empire(empire_data *emp, empire_data *foe);
+extern int get_total_offenses_from_char(empire_data *emp, char_data *ch);
 extern bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room);
 void remove_offense(empire_data *emp, struct offense_data *off);
+void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);

@@ -4129,6 +4129,13 @@ struct offense_data {
 };
 
 
+// offense configs - constants.c
+struct offense_info_type {
+	char *name;
+	int weight;	// how bad it is
+};
+
+
 // The main data structure for the empires
 struct empire_data {
 	empire_vnum vnum;	// empire's virtual number

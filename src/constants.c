@@ -1565,6 +1565,23 @@ struct city_metadata_type city_type[] = {
 };
 
 
+// OFFENSE_x: offense definitions
+struct offense_info_type offense_info[NUM_OFFENSES] = {
+	// name, weight
+	{ "stealing", 10 },	// 0
+	{ "attacked player", 4 },
+	{ "guard tower", 1 },
+	{ "killed player", 10 },
+	{ "infiltrated", 10 },
+	{ "attacked npc", 1 },	// 5
+	{ "sieged building", 10 },
+	{ "sieged vehicle", 10 },
+	{ "burned building", 5 },
+	{ "burned vehicle", 5 },
+	{ "pickpocketed", 1 },	// 10
+};
+
+
 // ELOG_x
 const char *empire_log_types[] = {
 	"None",

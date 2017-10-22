@@ -60,6 +60,7 @@ extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
 extern int max_automessage_id;
+extern struct offense_info_type offense_info[NUM_OFFENSES];
 extern bool world_is_sorted;
 
 // external funcs
@@ -2780,6 +2781,68 @@ void clean_empire_offenses(void) {
 
 
 /**
+* Gets the total 'weight' value of all current offenses by an empire.
+*
+* @param empire_data *emp The empire to check (who was offended).
+* @param empire_data *foe Which enemy did the offending.
+* @return int The total weight of all offenses.
+*/
+int get_total_offenses_from_empire(empire_data *emp, empire_data *foe) {
+	struct offense_data *off;
+	int total = 0;
+	
+	if (!emp || !foe) {
+		return 0;	// shortcut
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (!OFFENSE_HAS_WEIGHT(off)) {
+			continue;	// some don't count
+		}
+		if (off->empire != EMPIRE_VNUM(foe)) {
+			continue;	// wrong empire
+		}
+		
+		// ok
+		total += offense_info[off->type].weight;
+	}
+	
+	return total;
+}
+
+
+/**
+* Gets the total 'weight' value of all current offenses by a player.
+*
+* @param empire_data *emp The empire to check (who was offended).
+* @param char_data *ch The player who did the offending.
+* @return int The total weight of all offenses.
+*/
+int get_total_offenses_from_char(empire_data *emp, char_data *ch) {
+	struct offense_data *off;
+	int total = 0;
+	
+	if (!emp || !ch || IS_NPC(ch)) {
+		return 0;	// shortcut
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (!OFFENSE_HAS_WEIGHT(off)) {
+			continue;	// some don't count
+		}
+		if (off->player_id != GET_IDNUM(ch)) {
+			continue;	// wrong person
+		}
+		
+		// ok
+		total += offense_info[off->type].weight;
+	}
+	
+	return total;
+}
+
+
+/**
 * If offenses should elog, this function builds and logs that.
 *
 * @param empire_data *emp The empire that was offended.
@@ -2858,6 +2921,43 @@ bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room) {
 void remove_offense(empire_data *emp, struct offense_data *off) {
 	LL_DELETE(EMPIRE_OFFENSES(emp), off);
 	free(off);
+}
+
+
+/**
+* Sometimes one offense overrides another. This removes any recent offense
+* for a character/type combo.
+*
+* @param empire_data *emp The empire that was offended.
+* @param int type The OFFENSE_ type.
+* @param char_data *offender The person who offended.
+*/
+void remove_recent_offenses(empire_data *emp, int type, char_data *offender) {
+	struct offense_data *off, *next_off;
+	long cutoff = time(0) - (10 * SECS_PER_REAL_MIN);
+	
+	while (offender && IS_NPC(offender) && offender->master) {
+		offender = offender->master;	// climb the food chain
+	}
+	
+	if (!emp || !offender || IS_NPC(offender)) {
+		return;	// sanitation check
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
+		if (off->timestamp < cutoff) {
+			break;	// offenses are sorted reverse-chronologically and we have gone too far this time
+		}
+		if (off->type != type) {
+			continue;	// wrong type
+		}
+		if (off->player_id != GET_IDNUM(offender)) {
+			continue;	// wrong player;
+		}
+		
+		// ok:
+		remove_offense(emp, off);
+	}
 }
 
 
