@@ -12,6 +12,54 @@ Stealth GM Bribe item: Prevent~
 %send% %actor% %self.name% doesn't take bribes like that any more. Complete %self.hisher% quest instead.
 return 0
 ~
+#251
+City Guard: Reinforcements~
+0 k 50
+~
+if %self.cooldown(250)%
+  halt
+end
+eval room %self.room%
+eval person %room.people%
+set ally_guards_present 0
+while %person%
+  eval test %%person.is_enemy(%self%)%%
+  if %test% && %person.is_pc% && %person.empire% != %self.empire%
+    set found_hostile_player 1
+  elseif %person.vnum% == 251
+    eval ally_guards_present %ally_guards_present% + 1
+  end
+  eval person %person.next_in_room%
+done
+if !%found_hostile_player%
+  halt
+end
+if %ally_guards_present% >= 3
+  halt
+end
+nop %self.set_cooldown(250, 30)%
+%echo% %self.name% calls for reinforcements!
+wait 10 sec
+if !%self.fighting%
+  halt
+end
+eval count %random.3%
+eval num 1
+while %num% <= %count%
+  %load% mob 251
+  eval summon %room.people%
+  if %summon.vnum% != 251
+    %echo% %self.name% looks confused.
+    halt
+  end
+  if %self.empire%
+    %own% %summon% %self.empire%
+  end
+  %echo% %summon% arrives!
+  %force% %summon% mkill %actor%
+  eval num %num% + 1
+done
+~
 #256
 Hestian Trinket~
 1 c 2

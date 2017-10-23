@@ -202,7 +202,7 @@ else
   while %cycle% <= 3
     wait 5 sec
     %echo% &r%self.name%'s arrows rain down upon you!
-    %aoe% 150 physical
+    %aoe% 250 physical
     eval cycle %cycle% + 1
   done
 end
@@ -340,7 +340,13 @@ if !%target%
   %echo% %self.name% looks very confused.
   halt
 end
-%force% %anat% say Yatpan! Strike %target.firstname% down!
+if %target.is_pc%
+  eval target_string %target.firstname%
+else
+  eval name %target.name%
+  eval target_string the %name.cdr%
+end
+%force% %anat% say Yatpan! Strike %target_string% down!
 %send% %target% %self.name% screeches and dives at you!
 %echoaround% %target% %self.name% screeches and dives at %target.name%!
 * Give the tank time to prepare
@@ -356,9 +362,9 @@ if %anat.mob_flagged(GROUP)%
   %damage% %target% 200 physical
   if !%target.aff_flagged(!STUN)%
     * Respect stun immunity resulting from Anat's stuns
-    dg_affect #12013 %target% STUNNED on 5
+    dg_affect #12013 %target% STUNNED on 10
   end
-  dg_affect #12012 %target% DISARM on 15
+  dg_affect #12012 %target% DISARM on 30
   %dot% #12011 %target% 150 60 physical
 else
   %damage% %target% 100 physical
