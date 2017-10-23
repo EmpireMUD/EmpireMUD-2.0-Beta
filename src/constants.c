@@ -1628,6 +1628,15 @@ const char *unique_storage_flags[] = {
 };
 
 
+// OFF_x: offense flags
+const char *offense_flags[] = {
+	"SEEN",
+	"WAR",
+	"AVENGED",
+	"\n"
+};
+
+
 // TECH_x
 const char *techs[] = {
 	"Glassblowing",

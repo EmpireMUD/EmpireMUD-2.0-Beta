@@ -44,6 +44,8 @@ extern struct empire_chore_type chore_data[NUM_CHORES];
 extern struct city_metadata_type city_type[];
 extern const char *empire_admin_flags[];
 extern const char *empire_trait_types[];
+extern const char *offense_flags[];
+extern struct offense_info_type offense_info[NUM_OFFENSES];
 extern const char *trade_type[];
 extern const char *trade_mostleast[];
 extern const char *trade_overunder[];
@@ -275,6 +277,16 @@ void do_customize_island(char_data *ch, char *argument) {
 	else {
 		msg_to_char(ch, "You can customize: name\r\n");
 	}
+}
+
+
+/**
+* @param any_vnum vnum An empire vnum.
+* @return char* The empire abbreviation, or "Unknown" if no match.
+*/
+char *get_empire_abjective_by_vnum(any_vnum vnum) {
+	empire_data *emp = real_empire(vnum);
+	return emp ? EMPIRE_ADJECTIVE(emp) : "Unknown";
 }
 
 
@@ -4910,7 +4922,136 @@ ACMD(do_inspire) {
 }
 
 
-ACMD(do_pledge) {	
+// command to view offenses: show recent up to screen height; allow search
+ACMD(do_offenses) {
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	char output[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], line[MAX_STRING_LENGTH], epart[MAX_STRING_LENGTH], lpart[256], fpart[256], *argptr;
+	int search_plr = NOTHING, to_show = 15;
+	empire_data *emp, *search_emp = NULL;
+	struct offense_data *off;
+	player_index_data *index;
+	bool is_file = FALSE;
+	char_data *plr;
+	size_t size;
+	
+	bitvector_t show_flags = OFF_WAR | OFF_AVENGED;
+	
+	if (!ch->desc) {
+		return;	// don't waste effort
+	}
+	
+	// optional first arg for imms (will also see unseen names)
+	argptr = any_one_word(argument, arg);
+	if (!imm_access || !(emp = get_empire_by_name(arg))) {
+		emp = GET_LOYALTY(ch);
+		argptr = argument;
+	}
+	if (!emp) {
+		msg_to_char(ch, "You must be in an empire to view offenses.\r\n");
+		return;
+	}
+	
+	// arg processing
+	argptr = any_one_arg(argptr, arg);
+	while (*arg) {
+		if (!str_cmp(arg, "-e") || (strlen(arg) > 2 && is_abbrev(arg, "-empire"))) {
+			argptr = any_one_word(argptr, arg);
+			if (!(search_emp = get_empire_by_name(arg))) {
+				msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
+				return;
+			}
+		}
+		else if (!str_cmp(arg, "-p") || (strlen(arg) > 2 && is_abbrev(arg, "-player"))) {
+			argptr = any_one_word(argptr, arg);
+			if (!(plr = find_or_load_player(arg, &is_file))) {
+				msg_to_char(ch, "Unknown player '%s'.\r\n", arg);
+				return;
+			}
+			
+			search_plr = GET_IDNUM(plr);
+			if (plr && is_file) {
+				free_char(plr);
+			}
+		}
+		else if (!str_cmp(arg, "-n") || (strlen(arg) > 2 && is_abbrev(arg, "-number"))) {
+			argptr = any_one_word(argptr, arg);
+			if (!isdigit(*arg) || (to_show = atoi(arg)) < 1) {
+				msg_to_char(ch, "Invalid number to show '%s'.\r\n", arg);
+				return;
+			}
+		}
+		else {
+			msg_to_char(ch, "Unknown argument '%s'.\r\n", arg);
+			return;
+		}
+		
+		argptr = any_one_arg(argptr, arg);
+	}
+	
+	// start buffer
+	size = snprintf(output, sizeof(output), "Offenses for %s:\r\n", EMPIRE_NAME(emp));
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (search_emp && off->empire != EMPIRE_VNUM(search_emp)) {
+			continue;
+		}
+		if (search_plr && off->player_id != search_plr) {
+			continue;
+		}
+		
+		// ok
+		if (to_show-- < 1) {
+			break;	// done
+		}
+		
+		// build empire part
+		sprintf(epart, "%s", off->empire != NOTHING ? get_empire_abjective_by_vnum(off->empire) : "unaligned");
+		if ((IS_SET(off->flags, OFF_SEEN) || imm_access) && (index = find_player_index_by_idnum(off->player_id))) {
+			sprintf(epart + strlen(epart), " (%s)", index->fullname);
+		}
+		else {
+			strcat(epart, " (unseen)");
+		}
+		
+		// build location part
+		if (off->x != -1 && off->y != -1) {
+			sprintf(lpart, " (%d, %d)", off->x, off->y);
+		}
+		else {
+			*lpart = '\0';
+		}
+		
+		// build flag part
+		if (IS_SET(off->flags, show_flags)) {
+			prettier_sprintbit(off->flags & show_flags, offense_flags, fpart);
+		}
+		else {
+			*fpart = '\0';
+		}
+		
+		snprintf(line, sizeof(line), "%s - %s%s  %s\r\n", epart, offense_info[off->type].name, lpart, fpart);
+		
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+		}
+		else {
+			// overflow
+			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	page_string(ch->desc, output, TRUE);
+	
+	// only if no filter and own-empire
+	if (emp == GET_LOYALTY(ch) && !search_emp && search_plr == NOTHING) {
+		GET_LAST_OFFENSE_SEEN(ch) = time(0);
+	}
+}
+
+
+ACMD(do_pledge) {
 	empire_data *e, *old;
 
 	if (IS_NPC(ch))

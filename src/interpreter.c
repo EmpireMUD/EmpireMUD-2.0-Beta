@@ -278,6 +278,7 @@ ACMD(do_nearby);
 ACMD(do_nodismantle);
 ACMD(do_noskill);
 
+ACMD(do_offenses);
 ACMD(do_olc);
 ACMD(do_oset);
 ACMD(do_order);
@@ -826,6 +827,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "notitle", POS_DEAD, do_wizutil, LVL_CIMPL, CTYPE_IMMORTAL, SCMD_NOTITLE ),
 
 	SIMPLE_CMD( "order", POS_RESTING, do_order, NO_MIN, CTYPE_COMM ),
+	SIMPLE_CMD( "offenses", POS_DEAD, do_offenses, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "oset", POS_DEAD, do_oset, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_OSET ),
 	SCMD_CMD( "open", POS_SITTING, do_gen_door, NO_MIN, CTYPE_MOVE, SCMD_OPEN ),
 	SCMD_CMD( "oocsay", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),

@@ -930,6 +930,18 @@ The Monuments ability allows you to build monuments.
 
 See also: BUILD, GRAND MONUMENTS
 #
+OFFENSES
+
+Usage:  offenses [-e empire] [-p player] [-n number to show]
+
+This command shows recent offenses against your empire.
+
+You can use the %c or %C prompt codes to receive a notification when you have
+unviewed offenses.
+
+Immortals can view offenses from other empires by giving an empire name (in
+quotes if necessary) as the first argument.
+#
 PAN
 
 Usage:  pan [direction]
