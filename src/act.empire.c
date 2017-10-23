@@ -4928,9 +4928,9 @@ ACMD(do_offenses) {
 	char output[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], line[MAX_STRING_LENGTH], epart[MAX_STRING_LENGTH], lpart[256], fpart[256], *argptr;
 	int search_plr = NOTHING, to_show = 15;
 	empire_data *emp, *search_emp = NULL;
+	bool is_file = FALSE, any = FALSE;
 	struct offense_data *off;
 	player_index_data *index;
-	bool is_file = FALSE;
 	char_data *plr;
 	size_t size;
 	
@@ -5030,6 +5030,7 @@ ACMD(do_offenses) {
 		}
 		
 		snprintf(line, sizeof(line), "%s - %s%s  %s\r\n", epart, offense_info[off->type].name, lpart, fpart);
+		any = TRUE;
 		
 		if (size + strlen(line) < sizeof(output)) {
 			strcat(output, line);
@@ -5040,6 +5041,10 @@ ACMD(do_offenses) {
 			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
 			break;
 		}
+	}
+	
+	if (!any) {
+		strcat(output, " none\r\n");
 	}
 	
 	page_string(ch->desc, output, TRUE);

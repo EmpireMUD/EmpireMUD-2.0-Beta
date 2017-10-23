@@ -934,7 +934,8 @@ OFFENSES
 
 Usage:  offenses [-e empire] [-p player] [-n number to show]
 
-This command shows recent offenses against your empire.
+This command shows recent offenses against your empire. Offenses expire after
+one week (or sooner if they were done during war or were avenged).
 
 You can use the %c or %C prompt codes to receive a notification when you have
 unviewed offenses.
