@@ -1990,6 +1990,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_log_data *elog, *last_log = NULL;
+	struct offense_data *off, *last_off = NULL;
 	struct empire_city_data *city;
 	struct empire_island *isle;
 	room_data *room;
@@ -2188,6 +2189,30 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				}
 				break;
 			}
+			case 'W': {	// offenses
+				if (sscanf(line, "W %d %d %d %ld %d %d %s", &t[0], &t[1], &t[2], &long_in, &t[4], &t[5], str_in) != 7) {
+					log("SYSERR: W line of empire %d does not scan (ignoring).\r\n", emp->vnum);
+				}
+				
+				CREATE(off, struct offense_data, 1);
+				off->type = t[0];
+				off->empire = t[1];
+				off->player_id = t[2];
+				off->timestamp = long_in;
+				off->x = t[4];
+				off->y = t[5];
+				off->flags = asciiflag_conv(str_in);
+				
+				if (last_off) {
+					last_off->next = off;
+				}
+				else {
+					EMPIRE_OFFENSES(emp) = off;
+				}
+				
+				last_off = off;
+				break;
+			}
 			case 'X': { // trade
 				if (sscanf(line, "X %d %d %d %lf", &t[0], &t[1], &t[2], &dbl_in) == 4) {
 					CREATE(trade, struct empire_trade_data, 1);
@@ -2248,6 +2273,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_city_data *city;
 	struct empire_log_data *elog;
 	struct empire_npc_data *npc;
+	struct offense_data *off;
 	int iter;
 
 	if (!emp) {
@@ -2331,6 +2357,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	// avoid U (used by empire storage)
 	// avoid V (used by empire storage)
+	
+	// W: offenses
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		fprintf(fl, "W %d %d %d %ld %d %d %s\n", off->type, off->empire, off->player_id, off->timestamp, off->x, off->y, bitv_to_alpha(off->flags));
+	}
 	
 	// X: trade
 	for (trade = EMPIRE_TRADE(emp); trade; trade = trade->next) {

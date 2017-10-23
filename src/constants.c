@@ -1573,7 +1573,7 @@ struct offense_info_type offense_info[NUM_OFFENSES] = {
 	{ "attacked player", 5 },
 	{ "guard tower", 1 },
 	{ "killed player", 15 },
-	{ "infiltrated", 10 },
+	{ "infiltrated", 2 },
 	{ "attacked npc", 1 },	// 5
 	{ "sieged building", 15 },
 	{ "sieged vehicle", 15 },
