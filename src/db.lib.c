@@ -2794,13 +2794,16 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 * Clears out old offenses for all empires.
 */
 void clean_empire_offenses(void) {
-	time_t clear_older = time(0) - SECS_PER_REAL_WEEK;
+	time_t clear_older = time(0) - SECS_PER_REAL_WEEK, clear_faster = time(0) - SECS_PER_REAL_DAY;
 	struct offense_data *off, *next_off;
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
 			if (off->timestamp < clear_older) {
+				remove_offense(emp, off);
+			}
+			else if (!OFFENSE_HAS_WEIGHT(off) && off->timestamp < clear_faster) {
 				remove_offense(emp, off);
 			}
 		}

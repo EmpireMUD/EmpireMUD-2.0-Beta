@@ -1076,9 +1076,15 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 27:\t%lld", microtime()); }
 	}
 	
+	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
+		clean_empire_offenses();
+		if (debug_log && HEARTBEAT(15)) { log("debug 28:\t%lld", microtime()); }
+	}
+	
 	// this goes roughly last -- update MSDP users
 	if (HEARTBEAT(1)) {
 		msdp_update();
+		if (debug_log && HEARTBEAT(15)) { log("debug 29:\t%lld", microtime()); }
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */
