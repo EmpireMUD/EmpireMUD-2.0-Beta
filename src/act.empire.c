@@ -4925,8 +4925,8 @@ ACMD(do_inspire) {
 // command to view offenses: show recent up to screen height; allow search
 ACMD(do_offenses) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char output[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], line[MAX_STRING_LENGTH], epart[MAX_STRING_LENGTH], lpart[256], fpart[256], *argptr;
-	int search_plr = NOTHING, to_show = 15;
+	char output[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], line[MAX_STRING_LENGTH], epart[MAX_STRING_LENGTH], lpart[256], fpart[256], tpart[256], *argptr;
+	int diff, search_plr = NOTHING, to_show = 15;
 	empire_data *emp, *search_emp = NULL;
 	bool is_file = FALSE, any = FALSE;
 	struct offense_data *off;
@@ -4992,6 +4992,9 @@ ACMD(do_offenses) {
 	size = snprintf(output, sizeof(output), "Offenses for %s:\r\n", EMPIRE_NAME(emp));
 	
 	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (!IS_SET(off->flags, OFF_SEEN) && (search_emp || search_plr != NOTHING)) {
+			continue;	// can't search unseen
+		}
 		if (search_emp && off->empire != EMPIRE_VNUM(search_emp)) {
 			continue;
 		}
@@ -5005,12 +5008,14 @@ ACMD(do_offenses) {
 		}
 		
 		// build empire part
-		sprintf(epart, "%s", off->empire != NOTHING ? get_empire_abjective_by_vnum(off->empire) : "unaligned");
-		if ((IS_SET(off->flags, OFF_SEEN) || imm_access) && (index = find_player_index_by_idnum(off->player_id))) {
-			sprintf(epart + strlen(epart), " (%s)", index->fullname);
+		if (IS_SET(off->flags, OFF_SEEN) || imm_access) {
+			sprintf(epart, "%s", off->empire != NOTHING ? get_empire_abjective_by_vnum(off->empire) : "unaligned");
+			if ((index = find_player_index_by_idnum(off->player_id))) {
+				sprintf(epart + strlen(epart), " (%s)", index->fullname);
+			}
 		}
 		else {
-			strcat(epart, " (unseen)");
+			strcpy(epart, "(unseen)");
 		}
 		
 		// build location part
@@ -5029,7 +5034,23 @@ ACMD(do_offenses) {
 			*fpart = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s - %s%s  %s\r\n", epart, offense_info[off->type].name, lpart, fpart);
+		// build time
+		diff = time(0) - off->timestamp;
+		*tpart = '\0';
+		if (diff / SECS_PER_REAL_DAY > 0) {
+			sprintf(tpart + strlen(tpart), "%s%dd", (*tpart ? " "  : ""), (diff / SECS_PER_REAL_DAY));
+		}
+		diff %= SECS_PER_REAL_DAY;
+		if (diff / SECS_PER_REAL_HOUR > 0) {
+			sprintf(tpart + strlen(tpart), "%s%dh", (*tpart ? " "  : ""), (diff / SECS_PER_REAL_HOUR));
+		}
+		diff %= SECS_PER_REAL_HOUR;
+		sprintf(tpart + strlen(tpart), "%s%dm", (*tpart ? " "  : ""), (diff / SECS_PER_REAL_MIN));
+		if (*tpart) {
+			strcat(tpart, " ago");
+		}
+		
+		snprintf(line, sizeof(line), "%s %s %s%s  %s\r\n", epart, offense_info[off->type].name, tpart, lpart, fpart);
 		any = TRUE;
 		
 		if (size + strlen(line) < sizeof(output)) {

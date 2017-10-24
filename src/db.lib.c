@@ -2765,7 +2765,7 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 	while (IS_NPC(offender) && offender->master) {
 		offender = offender->master;
 	}
-	if (IS_NPC(offender)) {
+	if (IS_NPC(offender) || (GET_LOYALTY(offender) == emp)) {
 		return;	// no offense
 	}
 	
