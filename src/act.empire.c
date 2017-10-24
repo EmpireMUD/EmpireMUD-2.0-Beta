@@ -4995,7 +4995,7 @@ ACMD(do_offenses) {
 		if (search_emp && off->empire != EMPIRE_VNUM(search_emp)) {
 			continue;
 		}
-		if (search_plr && off->player_id != search_plr) {
+		if (search_plr != NOTHING && off->player_id != search_plr) {
 			continue;
 		}
 		
