@@ -1822,6 +1822,10 @@ ACMD(do_group) {
 			msg_to_char(ch, "You can't invite NPCs to a group.\r\n");
 			return;
 		}
+		else if (is_ignoring(vict, ch)) {
+			msg_to_char(ch, "You can't invite someone who is ignoring you to a group.\r\n");
+			return;
+		}
 		else if (GROUP(vict)) {
 			msg_to_char(ch, "Your target is already in a group.\r\n");
 			return;
