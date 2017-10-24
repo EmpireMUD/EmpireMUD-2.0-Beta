@@ -1873,6 +1873,7 @@ const char *versions_list[] = {
 	"b4.39",
 	"b5.1",
 	"b5.3",
+	"b5.14",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2653,6 +2654,83 @@ void b5_3_missile_update(void) {
 }
 
 
+// b5.14 refreshes superior items
+PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
+	void check_delayed_load(char_data *ch);
+	obj_data *obj, *next_obj, *new;
+	int iter;
+	
+	check_delayed_load(ch);
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter)) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	for (obj = ch->carrying; obj; obj = next_obj) {
+		next_obj = obj->next_content;
+		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+}
+
+
+// removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
+void b5_14_superior_items(void) {
+	void save_trading_post();
+
+	obj_data *obj, *next_obj, *new, *proto;
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
+		
+	log("Applying b5.14 update...");
+	
+	log(" - refreshing superiors in the object list...");
+	for (obj = object_list; obj; obj = next_obj) {
+		next_obj = obj->next;
+		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - refreshing superiors in warehouse objects...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				eus->obj = new;
+				extract_obj(obj);
+			}
+		}
+	}
+	
+	log(" - refreshing superiors in trading post objects...");
+	for (tpd = trading_list; tpd; tpd = tpd->next) {
+		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			tpd->obj = new;
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - refreshing superiors in player inventories...");
+	update_all_players(NULL, b5_14_player_superiors);
+	
+	// ensure everything gets saved this way since we won't do this again
+	save_all_empires();
+	save_trading_post();
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2871,6 +2949,9 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.3")) {
 			log("Updating to b5.3...");
 			b5_3_missile_update();
+		}
+		if (MATCH_VERSION("b5.14")) {
+			b5_14_superior_items();
 		}
 	}
 	
