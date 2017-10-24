@@ -2161,6 +2161,9 @@ void determine_gear_level(char_data *ch) {
 			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_SUPERIOR)) {
 				total += 10 * wear_data[pos].gear_level_mod;
 			}
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_ENCHANTED)) {
+				total += 10 * wear_data[pos].gear_level_mod;
+			}
 			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_HARD_DROP)) {
 				total += 10 * wear_data[pos].gear_level_mod;
 			}

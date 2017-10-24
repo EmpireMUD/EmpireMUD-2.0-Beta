@@ -157,6 +157,7 @@ ACMD(do_elog);
 ACMD(do_emotd);
 ACMD(do_empire_inventory);
 ACMD(do_empires);
+ACMD(do_endwar);
 ACMD(do_enervate);
 ACMD(do_enroll);
 ACMD(do_entangle);
@@ -277,6 +278,7 @@ ACMD(do_nearby);
 ACMD(do_nodismantle);
 ACMD(do_noskill);
 
+ACMD(do_offenses);
 ACMD(do_olc);
 ACMD(do_oset);
 ACMD(do_order);
@@ -285,6 +287,7 @@ ACMD(do_outrage);
 ACMD(do_page);
 ACMD(do_paint);
 ACMD(do_pan);
+ACMD(do_peace);
 ACMD(do_pick);
 ACMD(do_pickpocket);
 ACMD(do_plant);
@@ -677,6 +680,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "empirehistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_EMPIRE ),
 	SCMD_CMD( "ehistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_EMPIRE ),
 	STANDARD_CMD( "enchant", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_ENCHANTMENT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	GRANT_CMD( "endwar", POS_DEAD, do_endwar, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
 	ABILITY_CMD( "enervate", POS_FIGHTING, do_enervate, NO_MIN, CTYPE_COMBAT, ABIL_ENERVATE ),
 	SIMPLE_CMD( "enter", POS_STANDING, do_enter, NO_MIN, CTYPE_MOVE ),
 	ABILITY_CMD( "entangle", POS_FIGHTING, do_entangle, NO_MIN, CTYPE_COMBAT, ABIL_ENTANGLE ),
@@ -823,6 +827,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "notitle", POS_DEAD, do_wizutil, LVL_CIMPL, CTYPE_IMMORTAL, SCMD_NOTITLE ),
 
 	SIMPLE_CMD( "order", POS_RESTING, do_order, NO_MIN, CTYPE_COMM ),
+	SIMPLE_CMD( "offenses", POS_DEAD, do_offenses, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "oset", POS_DEAD, do_oset, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_OSET ),
 	SCMD_CMD( "open", POS_SITTING, do_gen_door, NO_MIN, CTYPE_MOVE, SCMD_OPEN ),
 	SCMD_CMD( "oocsay", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
@@ -836,6 +841,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "paint", POS_STANDING, do_paint, NO_MIN, CTYPE_BUILD ),
 	STANDARD_CMD( "pan", POS_STANDING, do_pan, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "party", POS_DEAD, do_group, NO_MIN, CTYPE_UTIL ),
+	GRANT_CMD( "peace", POS_DEAD, do_peace, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PEACE ),
 	STANDARD_CMD( "pick", POS_STANDING, do_pick, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "pickpocket", POS_STANDING, do_pickpocket, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "pilot", POS_SITTING, do_drive, NO_MIN, NO_GRANTS, SCMD_PILOT, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),

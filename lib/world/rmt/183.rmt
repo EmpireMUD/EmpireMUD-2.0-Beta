@@ -3,19 +3,18 @@ A Collapsed Passageway~
    You enter a tight stone passageway, which looks like it collapsed long ago.
 The walls were once carved with intricate writing, but are now too badly
 damaged to make out any of it. The rubble is partially cleared, and may have
-been knocked free by a recent earthquake.  
+been knocked free by a recent earthquake.
 ~
 bd 0 0
 D9
 ~
 0 18301
-M 0 18309 100.00 1
 S
 #18301
 A Sloping Passage~
    The passage slopes down beneath the rubble, deeper into the pyramid. As you
 explore its depths, you come to what appears to be a solid wall, blocking
-further passage.  
+further passage.
 ~
 b 0 0
 D8
@@ -27,7 +26,7 @@ S
 A Sloping Passage~
    The passage slopes down beneath the rubble, deeper into the pyramid. In the
 middle of the passage, a well-decorated wall has been pushed open, leading to a
-bright chamber beyond the darkness.  
+bright chamber beyond the darkness.
 ~
 b 0 0
 D8
@@ -48,12 +47,102 @@ A Hidden Burial Chamber~
 well-preserved. The walls are covered in ancient symbols, each painted in gold.
 The center of the room contains a glimmering sarcophagus on a dais. No light
 from the outside reaches this chamber, but the lavish gold embellishments seem
-to shine on their own.  
+to shine on their own.
 ~
 cg 0 0
 D14
 ~
 0 18302
 M 0 18300 100.00 1
+S
+#18350
+Entry~
+~
+0 0 0
+D9
+~
+0 18351
+S
+#18351
+Diff select before~
+~
+0 0 0
+D8
+~
+0 18350
+M 1 18389 100.00 1
+S
+#18352
+diff select after~
+~
+0 0 0
+D8
+~
+0 18350
+D1
+~
+0 18353
+S
+#18353
+trapped hallway~
+~
+0 0 0
+D3
+~
+0 18352
+T 18363
+T 18364
+T 18365
+T 18353
+T 18366
+S
+#18354
+puzzle temple #1~
+~
+0 0 0
+D3
+~
+0 18353
+T 18354
+S
+#18355
+puzzle temple #2~
+~
+0 0 0
+D3
+~
+0 18353
+T 18354
+S
+#18356
+puzzle temple #3~
+~
+0 0 0
+D3
+~
+0 18353
+T 18354
+S
+#18357
+puzzle temple #4~
+~
+0 0 0
+D3
+~
+0 18353
+T 18354
+S
+#18358
+Maze~
+~
+0 0 0
+S
+#18359
+Maze~
+~
+0 0 0
+D3
+~
+0 18358
 S
 $

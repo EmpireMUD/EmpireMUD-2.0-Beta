@@ -663,8 +663,8 @@ VCMD(do_vquest) {
 
 
 VCMD(do_vsiege) {
-	void besiege_room(room_data *to_room, int damage);
-	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage);
+	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -713,12 +713,12 @@ VCMD(do_vsiege) {
 	
 	if (room_targ) {
 		if (validate_siege_target_room(NULL, NULL, room_targ)) {
-			besiege_room(room_targ, dam);
+			besiege_room(NULL, room_targ, dam);
 		}
 	}
 	else if (veh_targ) {
 		self = (veh_targ == veh);
-		res = besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		res = besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL);
 		if (self && !res) {
 			dg_owner_purged = TRUE;
 		}

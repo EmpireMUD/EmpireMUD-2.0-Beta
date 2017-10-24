@@ -687,10 +687,9 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	extern bool is_entrance(room_data *room);
 	
 	room_data *home;
-	struct island_info *isle;
+	struct island_info *isle = NULL;
 	empire_data *emp;
 	char_data *ch;
-	int island_id;
 	bool junk;
 	
 	const bitvector_t no_no_flags = ROOM_AFF_DISMANTLING | ROOM_AFF_HAS_INSTANCE;
@@ -716,6 +715,19 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	// short-cut for city-only: no owner = definitely no city
 	if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY) && (!home || !ROOM_OWNER(home))) {
 		return FALSE;
+	}
+		
+	// continental or incontinental?
+	if (LINK_FLAGGED(rule, ADV_LINKF_CONTINENT_ONLY | ADV_LINKF_NO_CONTINENT)) {
+		if (!isle) {
+			isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
+		}
+		if (isle && LINK_FLAGGED(rule, ADV_LINKF_CONTINENT_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT)) {
+			return FALSE;
+		}
+		else if (isle && LINK_FLAGGED(rule, ADV_LINKF_NO_CONTINENT) && IS_SET(isle->flags, ISLE_CONTINENT)) {
+			return FALSE;
+		}
 	}
 	
 	// things that only matter if we received/found loc
@@ -756,9 +768,10 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	}
 	
 	// newbie island checks
-	island_id = map ? map->shared->island_id : GET_ISLAND_ID(loc);
-	if (island_id != NO_ISLAND) {
-		isle = get_island(island_id, TRUE);
+	if (!isle) {
+		isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
+	}
+	if (isle && isle->id != NO_ISLAND) {
 		if (IS_SET(isle->flags, ISLE_NEWBIE)) {	// is newbie island
 			if (GET_ADV_MIN_LEVEL(adv) > config_get_int("newbie_adventure_cap") && !ADVENTURE_FLAGGED(adv, ADV_NEWBIE_ONLY)) {
 				return FALSE;
@@ -1083,6 +1096,10 @@ void delete_instance(struct instance_data *inst) {
 				// just disassociate
 				MOB_INSTANCE_ID(mob) = NOTHING;
 				// shouldn't need this: subtract_instance_mob(inst, GET_MOB_VNUM(mob));
+			}
+			else if ((FIGHTING(mob) || GET_POS(mob) == POS_FIGHTING) && (!ROOM_INSTANCE(IN_ROOM(mob)) || ROOM_INSTANCE(IN_ROOM(mob)) == inst)) {
+				// delayed-despawn if fighting -- we don't want to interrupt a fight
+				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
 			}
 			else {
 				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);

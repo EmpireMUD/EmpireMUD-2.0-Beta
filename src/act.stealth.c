@@ -117,8 +117,13 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 * @return TRUE if ch is capable of stealing from emp
 */
 bool can_steal(char_data *ch, empire_data *emp) {	
+	extern time_t get_last_killed_by_empire(char_data *ch, empire_data *emp);
+	
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
+	time_t timediff;
+	
+	int death_penalty_time = config_get_int("steal_death_penalty");
 	
 	// no empire = ok
 	if (!emp) {
@@ -127,6 +132,11 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	
 	if (!has_ability(ch, ABIL_STEAL)) {
 		msg_to_char(ch, "You don't have the Steal ability.\r\n");
+		return FALSE;
+	}
+	
+	if (chemp && EMPIRE_ADMIN_FLAGGED(chemp, EADM_NO_STEAL)) {
+		msg_to_char(ch, "Your empire has been forbidden from stealing.\r\n");
 		return FALSE;
 	}
 	
@@ -142,6 +152,12 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	
 	if (emp == chemp) {
 		msg_to_char(ch, "You can't steal from your own empire.\r\n");
+		return FALSE;
+	}
+	
+	timediff = (death_penalty_time * SECS_PER_REAL_MIN) - (time(0) - get_last_killed_by_empire(ch, emp));
+	if (death_penalty_time && get_last_killed_by_empire(ch, emp) && timediff > 0) {
+		msg_to_char(ch, "You cannot steal from %s because they have killed you too recently (%d:%02d remain).\r\n", EMPIRE_NAME(emp), (int)(timediff / 60), (int)(timediff % 60));
 		return FALSE;
 	}
 	
@@ -991,7 +1007,7 @@ ACMD(do_howl) {
 ACMD(do_infiltrate) {
 	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 
-	room_data *to_room;
+	room_data *to_room, *was_in;
 	int dir;
 	empire_data *emp;
 	int cost = 10;
@@ -1030,6 +1046,7 @@ ACMD(do_infiltrate) {
 		// sends own message
 	}
 	else {
+		was_in = IN_ROOM(ch);
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		
 		gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
@@ -1068,7 +1085,10 @@ ACMD(do_infiltrate) {
 		}
 		
 		// distrust just in case
-		trigger_distrust_from_stealth(ch, emp);
+		if (emp) {
+			trigger_distrust_from_stealth(ch, emp);
+			add_offense(emp, OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, emp, was_in) ? OFF_SEEN : NOBITS);
+		}
 	}
 }
 
@@ -1251,6 +1271,7 @@ ACMD(do_pickpocket) {
 		
 		if (vict_emp && vict_emp != ch_emp) {
 			trigger_distrust_from_stealth(ch, vict_emp);
+			add_offense(vict_emp, OFFENSE_PICKPOCKETED, ch, IN_ROOM(ch), offense_was_seen(ch, vict_emp, NULL) ? OFF_SEEN : NOBITS);
 		}
 		
 		// gain either way
@@ -1503,6 +1524,7 @@ ACMD(do_shadowstep) {
 
 	char_data *vict = NULL;
 	empire_data *emp = NULL;
+	room_data *was_in;
 	int cost = 50;
 	bool infil = FALSE;
 
@@ -1548,6 +1570,7 @@ ACMD(do_shadowstep) {
 		msg_to_char(ch, "You can't shadowstep there.\r\n");
 	}
 	else {
+		was_in = IN_ROOM(ch);
 		infil = !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED);
 		
 		if (infil && emp && GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_WAR)) {
@@ -1599,6 +1622,7 @@ ACMD(do_shadowstep) {
 			trigger_distrust_from_stealth(ch, emp);
 			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
 			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
+			add_offense(emp, OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, emp, was_in) ? OFF_SEEN : NOBITS);
 		}
 	}
 }

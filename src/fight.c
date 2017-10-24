@@ -29,6 +29,7 @@
 * Contents:
 *   Getters / Helpers
 *   Combat Meters
+*   Player-Killed-By
 *   Death and Corpses
 *   Guard Towers
 *   Messaging
@@ -1004,6 +1005,122 @@ void combat_meter_miss(char_data *ch) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// PLAYER-KILLED-BY ////////////////////////////////////////////////////////
+
+/**
+* Marks a recent playerkill (by a PC or an empire mob).
+*
+* @param char_data *ch The player dying.
+* @param char_data *killer Who killed them.
+*/
+void add_player_kill(char_data *ch, char_data *killer) {
+	struct pk_data *iter, *data = NULL;
+	
+	// bump up the food chain to find a player master, if possible
+	while (killer && IS_NPC(killer) && killer->master) {
+		killer = killer->master;
+	}
+	
+	if (!ch || !killer || IS_NPC(ch) || !GET_ACCOUNT(ch) || (IS_NPC(killer) && !GET_LOYALTY(killer))) {
+		return;	// nothing to track here
+	}
+	
+	// find matching data
+	if (!IS_NPC(killer)) {
+		if (GET_LOYALTY(killer)) {
+			avenge_solo_offenses_from_player(GET_LOYALTY(killer), ch);
+		}
+		
+		LL_SEARCH_SCALAR(GET_ACCOUNT(ch)->killed_by, data, player_id, GET_IDNUM(killer));
+		
+		// mark empire offense, only if not-pvp-enabled (always 'seen')
+		if (!IS_PVP_FLAGGED(ch) && GET_LOYALTY(ch)) {
+			remove_recent_offenses(GET_LOYALTY(ch), OFFENSE_ATTACKED_PLAYER, killer);
+			add_offense(GET_LOYALTY(ch), OFFENSE_KILLED_PLAYER, killer, IN_ROOM(killer), OFF_SEEN);
+		}
+	}
+	else if (GET_LOYALTY(killer)) {	// is npc
+		LL_FOREACH(GET_ACCOUNT(ch)->killed_by, iter) {
+			if (iter->player_id == NOTHING && iter->empire == EMPIRE_VNUM(GET_LOYALTY(killer))) {
+				// found a match for no-player, same empire
+				data = iter;
+				break;
+			}
+		}
+	}
+	
+	// add data if missing
+	if (!data) {
+		CREATE(data, struct pk_data, 1);
+		data->player_id = IS_NPC(killer) ? NOTHING : GET_IDNUM(killer);
+		LL_PREPEND(GET_ACCOUNT(ch)->killed_by, data);
+	}
+	
+	// update data
+	data->empire = GET_LOYALTY(killer) ? EMPIRE_VNUM(GET_LOYALTY(killer)) : NOTHING;
+	data->killed_alt = GET_IDNUM(ch);
+	data->last_time = time(0);
+	
+	SAVE_ACCOUNT(GET_ACCOUNT(ch));
+}
+
+
+/**
+* Times out useless old pk entries (ones over ONE WEEK).
+*
+* @param char_data *ch The player to clean.
+*/
+void clean_player_kills(char_data *ch) {
+	struct pk_data *iter, *next_iter;
+	time_t now = time(0);
+	bool any = FALSE;
+	
+	if (!ch || IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+		return;	// wut
+	}
+	
+	LL_FOREACH_SAFE(GET_ACCOUNT(ch)->killed_by, iter, next_iter) {
+		if (now - iter->last_time > SECS_PER_REAL_WEEK) {
+			LL_DELETE(GET_ACCOUNT(ch)->killed_by, iter);
+			free(iter);
+			any = TRUE;
+		}
+	}
+	
+	if (any) {
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+}
+
+
+/**
+* Gets the last time a player was killed by a member of a given empire. This
+* can be used e.g. to block hostile actions. This data is only accurate for
+* ONE WEEK.
+*
+* @param char_data *ch The player to check.
+* @param empire_data *emp The empire they might have been killed by.
+* @return time_t The timestamp of the last kill by that empire, or 0 if no recent time.
+*/
+time_t get_last_killed_by_empire(char_data *ch, empire_data *emp) {
+	struct pk_data *pk;
+	time_t min = 0;
+	
+	if (IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+		return 0;	// le never
+	}
+	
+	LL_FOREACH(GET_ACCOUNT(ch)->killed_by, pk) {
+		if (pk->empire == EMPIRE_VNUM(emp) && (min == 0 || min > pk->last_time)) {
+			min = pk->last_time;
+		}
+	}
+	
+	return min;	// may be 0
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// DEATH AND CORPSES ///////////////////////////////////////////////////////
 
 /**
@@ -1173,6 +1290,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// for players, die() ends here, until they respawn or quit
 	if (!IS_NPC(ch)) {
+		if (ch != killer) {
+			add_player_kill(ch, killer);
+		}
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
 		GET_HEALTH(ch) = MIN(GET_HEALTH(ch), -10);	// ensure negative health
@@ -1594,6 +1714,9 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 		dam = 0;
 	}
 	
+	// guard towers ALWAYS see the offender
+	add_offense(emp, OFFENSE_GUARD_TOWER, ch, to_room, OFF_SEEN);
+	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
 		// slow effect (1 mud hour)
 		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1 MUD_HOURS, AFF_SLOW, ch);
@@ -1608,8 +1731,6 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 			void cancel_action(char_data *ch);
 			cancel_action(ch);
 		}
-		
-		log_to_empire(emp, ELOG_HOSTILITY, "Guard tower at (%d, %d) is shooting at an infiltrator at (%d, %d)", X_COORD(from_room), Y_COORD(from_room), X_COORD(to_room), Y_COORD(to_room));
 	}
 }
 
@@ -2354,11 +2475,11 @@ void appear(char_data *ch) {
 /**
 * For catapults, siege ritual, etc -- damages/destroys a room
 *
-* @param char_data *ch The attacker
+* @param char_data *ch Optional: The attacker (may be NULL, used for offenses)
 * @param room_data *to_room The target room
 * @param int damage How much damage to deal to the room
 */
-void besiege_room(room_data *to_room, int damage) {
+void besiege_room(char_data *attacker, room_data *to_room, int damage) {
 	static struct resource_data *default_res = NULL;
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
@@ -2386,10 +2507,10 @@ void besiege_room(room_data *to_room, int damage) {
 		return;
 	}
 
-	if (emp) {
-		log_to_empire(emp, ELOG_HOSTILITY, "Building under siege at (%d, %d)", X_COORD(to_room), Y_COORD(to_room));
+	if (attacker && emp) {
+		add_offense(emp, OFFENSE_SIEGED_BUILDING, attacker, to_room, offense_was_seen(attacker, emp, to_room) ? OFF_SEEN : NOBITS);
 	}
-
+	
 	if (IS_MAP_BUILDING(to_room)) {
 		COMPLEX_DATA(to_room)->damage += damage;
 		
@@ -2467,12 +2588,13 @@ void besiege_room(room_data *to_room, int damage) {
 /**
 * Does siege damage, which may destroy the vehicle.
 *
+* @param char_data *attacker Optional: The person sieging (may be NULL, used for offenses)
 * @param vehicle_data *veh The vehicle to damage.
 * @param int damage How much siege damage to deal.
 * @param int siege_type What SIEGE_ damage type.
 * @return bool TRUE if the target survives, FALSE if it's extracted
 */
-bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
+bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type) {
 	void fully_empty_vehicle(vehicle_data *veh);
 
 	static struct resource_data *default_res = NULL;
@@ -2488,6 +2610,10 @@ bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 	// no effect
 	if (damage <= 0) {
 		return TRUE;
+	}
+	
+	if (attacker && VEH_OWNER(veh)) {
+		add_offense(VEH_OWNER(veh), OFFENSE_SIEGED_VEHICLE, attacker, IN_ROOM(veh), offense_was_seen(attacker, VEH_OWNER(veh), IN_ROOM(veh)) ? OFF_SEEN : NOBITS);
 	}
 	
 	// deal damage
@@ -3451,6 +3577,16 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 
 	if (FIGHTING(ch))
 		return;
+	
+	// look for possible offense (if vict is in an empire and is not already fighting ch)
+	if (!IS_NPC(ch) && GET_LOYALTY(vict) && FIGHTING(vict) != ch) {
+		if (!IS_NPC(vict) && !IS_PVP_FLAGGED(vict)) {
+			add_offense(GET_LOYALTY(vict), OFFENSE_ATTACKED_PLAYER, ch, IN_ROOM(ch), OFF_SEEN);
+		}
+		else if (IS_NPC(vict)) {
+			add_offense(GET_LOYALTY(vict), OFFENSE_ATTACKED_NPC, ch, IN_ROOM(ch), OFF_SEEN);
+		}
+	}
 
 	ch->next_fighting = combat_list;
 	combat_list = ch;

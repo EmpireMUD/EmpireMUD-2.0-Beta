@@ -42,7 +42,10 @@
 // external vars
 extern struct empire_chore_type chore_data[NUM_CHORES];
 extern struct city_metadata_type city_type[];
+extern const char *empire_admin_flags[];
 extern const char *empire_trait_types[];
+extern const char *offense_flags[];
+extern struct offense_info_type offense_info[NUM_OFFENSES];
 extern const char *trade_type[];
 extern const char *trade_mostleast[];
 extern const char *trade_overunder[];
@@ -278,6 +281,16 @@ void do_customize_island(char_data *ch, char *argument) {
 
 
 /**
+* @param any_vnum vnum An empire vnum.
+* @return char* The empire abbreviation, or "Unknown" if no match.
+*/
+char *get_empire_abjective_by_vnum(any_vnum vnum) {
+	empire_data *emp = real_empire(vnum);
+	return emp ? EMPIRE_ADJECTIVE(emp) : "Unknown";
+}
+
+
+/**
 * Determines how much an empire must spend to start a war with another empire,
 * based on the configs "war_cost_max" and "war_cost_min". This is calculated
 * by the difference in score between the two empires with the maximum value at
@@ -291,7 +304,7 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 	int min = config_get_int("war_cost_min"), max = config_get_int("war_cost_max");
 	int score_e, score_v;
 	double diff, max_diff;
-	int cost;
+	int cost, offenses;
 	
 	score_e = emp ? get_total_score(emp) : 0;
 	score_v = victim ? get_total_score(victim) : 0;
@@ -303,6 +316,16 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 	
 	// simple parabola: y = ax^2 + b, a = (max-min)/max_diff^2, b = min
 	cost = (max - min) / (max_diff * max_diff) * (diff * diff) + min;
+	
+	// modify based on offenses
+	offenses = get_total_offenses_from_empire(emp, victim);
+	if (offenses >= config_get_int("offenses_for_free_war")) {
+		cost = 0;
+	}
+	else {
+		cost *= ((double) (config_get_int("offenses_for_free_war") - offenses)) / config_get_int("offenses_for_free_war");
+	}
+	
 	return cost;
 }
 
@@ -442,6 +465,8 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	if (IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "Created: %-24.24s\r\n", ctime(&EMPIRE_CREATE_TIME(e)));
+		sprintbit(EMPIRE_ADMIN_FLAGS(e), empire_admin_flags, line, TRUE);
+		msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
 	}
 	
 	if (EMPIRE_DESCRIPTION(e)) {
@@ -1615,6 +1640,7 @@ void upgrade_city(char_data *ch, char *argument) {
 #define DIPF_WAR_COST  BIT(2)	// Empire must pay to do this.
 #define DIPF_NOT_MUTUAL_WAR  BIT(3)	// Won't work if mutual_war_only is set
 #define DIPF_ALLOW_FROM_NEUTRAL  BIT(4)	// Can be used if no relations at all
+#define DIPF_REQUIRES_OFFENSE  BIT(5)	// only allowed if an offense threshold is reached ('offense_min_to_war')
 
 struct diplomacy_type {
 	char *keywords;	// keyword list (first word is displayed to players, any word matches)
@@ -1632,7 +1658,7 @@ struct diplomacy_type {
 	{ "trade trading", DIPL_TRADE, NOBITS, NOBITS, DIPF_ALLOW_FROM_NEUTRAL, "propose or accept a trade agreement" },
 	{ "distrust", DIPL_DISTRUST, ALL_DIPLS, NOBITS, DIPF_UNILATERAL, "declare that your empire distrusts, but is not at war with, another" },
 	
-	{ "war", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_UNILATERAL | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE | DIPF_NOT_MUTUAL_WAR, "declare war on an empire!" },
+	{ "war", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_UNILATERAL | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE | DIPF_NOT_MUTUAL_WAR | DIPF_REQUIRES_OFFENSE, "declare war on an empire!" },
 	{ "battle", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_REQUIRE_PRESENCE | DIPF_ALLOW_FROM_NEUTRAL, "suggest a friendly war" },
 	
 	{ "\n", NOBITS, NOBITS, NOBITS, NOBITS }	// this goes last
@@ -2786,6 +2812,9 @@ ACMD(do_cede) {
 	else if (!is_in_city_for_empire(room, f, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory outside of cities.\r\n");
 	}
+	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && !is_in_city_for_empire(room, f, FALSE, &junk)) {
+		msg_to_char(ch, "That empire is forbidden from gaining new territory outside of a city.\r\n");
+	}
 	else if (is_at_war(f)) {
 		msg_to_char(ch, "You can't cede land to an empire that is at war.\r\n");
 	}
@@ -2888,6 +2917,9 @@ void do_claim_room(char_data *ch, room_data *room) {
 	}
 	else if (!is_in_city_for_empire(room, emp, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(emp) >= land_can_claim(emp, TRUE)) {
 		msg_to_char(ch, "You can't claim the area because you're over the 20%% of your territory that can be outside of cities.\r\n");
+	}
+	else if (EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && !is_in_city_for_empire(room, emp, FALSE, &junk)) {
+		msg_to_char(ch, "Your empire is forbidden from claiming outside of a city.\r\n");
 	}
 	else {
 		send_config_msg(ch, "ok_string");
@@ -3197,6 +3229,9 @@ ACMD(do_diplomacy) {
 	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && config_get_bool("mutual_war_only")) {
 		msg_to_char(ch, "This EmpireMUD does not allow you to unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
 	}
+	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && EMPIRE_ADMIN_FLAGGED(ch_emp, EADM_NO_WAR)) {
+		msg_to_char(ch, "Your empire has been forbidden from declaring unilateral %s.\r\n", fname(diplo_option[type].keywords));
+	}
 	
 	// empire validation
 	else if (!*emp_arg) {
@@ -3250,6 +3285,9 @@ ACMD(do_diplomacy) {
 	}
 	else if (ch_pol && POL_OFFERED(ch_pol, diplo_option[type].add_bits)) {
 		msg_to_char(ch, "Your empire has already made that offer.\r\n");
+	}
+	else if (IS_SET(diplo_option[type].flags, DIPF_REQUIRES_OFFENSE) && get_total_offenses_from_empire(ch_emp, vict_emp) < config_get_int("offense_min_to_war")) {
+		msg_to_char(ch, "You can only do that to an empire with at least %d offense%s.\r\n", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")));
 	}
 	
 	// ready to go
@@ -3324,6 +3362,11 @@ ACMD(do_diplomacy) {
 		}
 		if (*vict_log) {
 			log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s", CAP(vict_log));
+		}
+		
+		// avenge all the wars!
+		if (POL_FLAGGED(ch_pol, DIPL_WAR)) {
+			avenge_offenses_from_empire(ch_emp, vict_emp);
 		}
 		
 		EMPIRE_NEEDS_SAVE(ch_emp) = TRUE;
@@ -4166,6 +4209,7 @@ ACMD(do_esay) {
 
 ACMD(do_estats) {
 	empire_data *emp = GET_LOYALTY(ch);
+	char part[256];
 	
 	skip_spaces(&argument);
 	if (*argument && !(emp = get_empire_by_name(argument))) {
@@ -4185,6 +4229,11 @@ ACMD(do_estats) {
 		msg_to_char(ch, " (%s&0)", EMPIRE_ADJECTIVE(emp));
 	}
 	msg_to_char(ch, "\r\n");
+	
+	if (IS_IMMORTAL(ch)) {
+		sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, part, TRUE);
+		msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", part);
+	}
 	
 	// stats
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(emp), PLURAL(EMPIRE_MEMBERS(emp)), EMPIRE_POPULATION(emp), PLURAL(EMPIRE_POPULATION(emp)), EMPIRE_MILITARY(emp));
@@ -4878,7 +4927,162 @@ ACMD(do_inspire) {
 }
 
 
-ACMD(do_pledge) {	
+// command to view offenses: show recent up to screen height; allow search
+ACMD(do_offenses) {
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	char output[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], line[MAX_STRING_LENGTH], epart[MAX_STRING_LENGTH], lpart[256], fpart[256], tpart[256], *argptr;
+	int diff, search_plr = NOTHING, to_show = 15;
+	empire_data *emp, *search_emp = NULL;
+	bool is_file = FALSE, any = FALSE;
+	struct offense_data *off;
+	player_index_data *index;
+	char_data *plr;
+	size_t size;
+	
+	bitvector_t show_flags = OFF_WAR | OFF_AVENGED;
+	
+	if (!ch->desc) {
+		return;	// don't waste effort
+	}
+	
+	// optional first arg for imms (will also see unseen names)
+	argptr = any_one_word(argument, arg);
+	if (!imm_access || !(emp = get_empire_by_name(arg))) {
+		emp = GET_LOYALTY(ch);
+		argptr = argument;
+	}
+	if (!emp) {
+		msg_to_char(ch, "You must be in an empire to view offenses.\r\n");
+		return;
+	}
+	
+	// arg processing
+	argptr = any_one_arg(argptr, arg);
+	while (*arg) {
+		if (!str_cmp(arg, "-e") || (strlen(arg) > 2 && is_abbrev(arg, "-empire"))) {
+			argptr = any_one_word(argptr, arg);
+			if (!(search_emp = get_empire_by_name(arg))) {
+				msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
+				return;
+			}
+		}
+		else if (!str_cmp(arg, "-p") || (strlen(arg) > 2 && is_abbrev(arg, "-player"))) {
+			argptr = any_one_word(argptr, arg);
+			if (!(plr = find_or_load_player(arg, &is_file))) {
+				msg_to_char(ch, "Unknown player '%s'.\r\n", arg);
+				return;
+			}
+			
+			search_plr = GET_IDNUM(plr);
+			if (plr && is_file) {
+				free_char(plr);
+			}
+		}
+		else if (!str_cmp(arg, "-n") || (strlen(arg) > 2 && is_abbrev(arg, "-number"))) {
+			argptr = any_one_word(argptr, arg);
+			if (!isdigit(*arg) || (to_show = atoi(arg)) < 1) {
+				msg_to_char(ch, "Invalid number to show '%s'.\r\n", arg);
+				return;
+			}
+		}
+		else {
+			msg_to_char(ch, "Unknown argument '%s'.\r\n", arg);
+			return;
+		}
+		
+		argptr = any_one_arg(argptr, arg);
+	}
+	
+	// start buffer
+	size = snprintf(output, sizeof(output), "Offenses for %s:\r\n", EMPIRE_NAME(emp));
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (!IS_SET(off->flags, OFF_SEEN) && (search_emp || search_plr != NOTHING)) {
+			continue;	// can't search unseen
+		}
+		if (search_emp && off->empire != EMPIRE_VNUM(search_emp)) {
+			continue;
+		}
+		if (search_plr != NOTHING && off->player_id != search_plr) {
+			continue;
+		}
+		
+		// ok
+		if (to_show-- < 1) {
+			break;	// done
+		}
+		
+		// build empire part
+		if (IS_SET(off->flags, OFF_SEEN) || imm_access) {
+			sprintf(epart, "%s", off->empire != NOTHING ? get_empire_abjective_by_vnum(off->empire) : "unaligned");
+			if ((index = find_player_index_by_idnum(off->player_id))) {
+				sprintf(epart + strlen(epart), " (%s)", index->fullname);
+			}
+		}
+		else {
+			strcpy(epart, "(unseen)");
+		}
+		
+		// build location part
+		if (off->x != -1 && off->y != -1) {
+			sprintf(lpart, " (%d, %d)", off->x, off->y);
+		}
+		else {
+			*lpart = '\0';
+		}
+		
+		// build flag part
+		if (IS_SET(off->flags, show_flags)) {
+			prettier_sprintbit(off->flags & show_flags, offense_flags, fpart);
+		}
+		else {
+			*fpart = '\0';
+		}
+		
+		// build time
+		diff = time(0) - off->timestamp;
+		*tpart = '\0';
+		if (diff / SECS_PER_REAL_DAY > 0) {
+			sprintf(tpart + strlen(tpart), "%s%dd", (*tpart ? " "  : ""), (diff / SECS_PER_REAL_DAY));
+		}
+		diff %= SECS_PER_REAL_DAY;
+		if (diff / SECS_PER_REAL_HOUR > 0) {
+			sprintf(tpart + strlen(tpart), "%s%dh", (*tpart ? " "  : ""), (diff / SECS_PER_REAL_HOUR));
+		}
+		diff %= SECS_PER_REAL_HOUR;
+		sprintf(tpart + strlen(tpart), "%s%dm", (*tpart ? " "  : ""), (diff / SECS_PER_REAL_MIN));
+		if (*tpart) {
+			strcat(tpart, " ago");
+		}
+		
+		snprintf(line, sizeof(line), "%s %s %s%s  %s\r\n", epart, offense_info[off->type].name, tpart, lpart, fpart);
+		any = TRUE;
+		
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+		}
+		else {
+			// overflow
+			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (!any) {
+		strcat(output, " none\r\n");
+	}
+	
+	page_string(ch->desc, output, TRUE);
+	
+	// only if no filter and own-empire
+	if (emp == GET_LOYALTY(ch) && !search_emp && search_plr == NOTHING) {
+		GET_LAST_OFFENSE_SEEN(ch) = time(0);
+	}
+}
+
+
+ACMD(do_pledge) {
 	empire_data *e, *old;
 
 	if (IS_NPC(ch))

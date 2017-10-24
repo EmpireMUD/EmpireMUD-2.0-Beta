@@ -863,6 +863,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// trigger distrust?
 	if (!following && ROOM_OWNER(was_in) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && !can_use_room(ch, was_in, GUESTS_ALLOWED)) {
 		trigger_distrust_from_stealth(ch, ROOM_OWNER(was_in));
+		add_offense(ROOM_OWNER(was_in), OFFENSE_INFILTRATED, ch, was_in, offense_was_seen(ch, ROOM_OWNER(was_in), was_in) ? OFF_SEEN : NOBITS);
 	}
 	
 	// trigger section

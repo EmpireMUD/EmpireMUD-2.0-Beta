@@ -10,4 +10,25 @@ I 0 3201 100.00 1  # BUTCHER: a slab of pork
 I 0 3201 100.00 1  # BUTCHER: a slab of pork
 I 1 1351 100.00 1  # SKIN: a large skin
 S
+#9201
+tapir forest~
+a forest tapir~
+A forest tapir is rooting around a bush.
+~
+20 30 djo 0
+0 0 0 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+S
+#9202
+capybara~
+a capybara~
+A capybara sits here, staring sideways at you.
+~
+20 30 djo 0
+0 0 0 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+S
 $

@@ -33,6 +33,7 @@
 *   Crop Lib
 *   Empire Lib
 *   Empire NPC Lib
+*   Empire Offense Lib
 *   Exit Lib
 *   Extra Description Lib
 *   Globals Lib
@@ -59,6 +60,7 @@ extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
 extern int max_automessage_id;
+extern struct offense_info_type offense_info[NUM_OFFENSES];
 extern bool world_is_sorted;
 
 // external funcs
@@ -1779,6 +1781,12 @@ void free_empire(empire_data *emp) {
 		free(pol);
 	}
 	
+	// free offenses
+	while (EMPIRE_OFFENSES(emp)) {
+		remove_offense(emp, EMPIRE_OFFENSES(emp));
+	}
+	
+	// free strings
 	if (emp->name) {
 		free(emp->name);
 	}
@@ -1982,6 +1990,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_log_data *elog, *last_log = NULL;
+	struct offense_data *off, *last_off = NULL;
 	struct empire_city_data *city;
 	struct empire_island *isle;
 	room_data *room;
@@ -2180,6 +2189,30 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				}
 				break;
 			}
+			case 'W': {	// offenses
+				if (sscanf(line, "W %d %d %d %ld %d %d %s", &t[0], &t[1], &t[2], &long_in, &t[4], &t[5], str_in) != 7) {
+					log("SYSERR: W line of empire %d does not scan (ignoring).\r\n", emp->vnum);
+				}
+				
+				CREATE(off, struct offense_data, 1);
+				off->type = t[0];
+				off->empire = t[1];
+				off->player_id = t[2];
+				off->timestamp = long_in;
+				off->x = t[4];
+				off->y = t[5];
+				off->flags = asciiflag_conv(str_in);
+				
+				if (last_off) {
+					last_off->next = off;
+				}
+				else {
+					EMPIRE_OFFENSES(emp) = off;
+				}
+				
+				last_off = off;
+				break;
+			}
 			case 'X': { // trade
 				if (sscanf(line, "X %d %d %d %lf", &t[0], &t[1], &t[2], &dbl_in) == 4) {
 					CREATE(trade, struct empire_trade_data, 1);
@@ -2240,6 +2273,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_city_data *city;
 	struct empire_log_data *elog;
 	struct empire_npc_data *npc;
+	struct offense_data *off;
 	int iter;
 
 	if (!emp) {
@@ -2323,6 +2357,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	// avoid U (used by empire storage)
 	// avoid V (used by empire storage)
+	
+	// W: offenses
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		fprintf(fl, "W %d %d %d %ld %d %d %s\n", off->type, off->empire, off->player_id, off->timestamp, off->x, off->y, bitv_to_alpha(off->flags));
+	}
 	
 	// X: trade
 	for (trade = EMPIRE_TRADE(emp); trade; trade = trade->next) {
@@ -2701,6 +2740,319 @@ void kill_empire_npc(char_data *ch) {
 	
 	GET_EMPIRE_NPC_DATA(ch) = NULL;
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE OFFENSE LIB //////////////////////////////////////////////////////
+
+/**
+* Adds a new offense against an empire. Note: the OFF_WAR flag is added auto-
+* matically.
+*
+* @param empire_data *emp The empire being offended.
+* @param int type Any OFFENSE_ type.
+* @param char_data *offender The person committing the offense (will use any player master of an npc).
+* @param room_data *loc Where it happened.
+* @param bitvector_t flags Any OFF_ flags that apply.
+*/
+void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags) {
+	void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender);
+	
+	struct offense_data *off;
+	
+	// try to find a player
+	while (IS_NPC(offender) && offender->master) {
+		offender = offender->master;
+	}
+	if (IS_NPC(offender)) {
+		return;	// no offense
+	}
+	
+	CREATE(off, struct offense_data, 1);
+	off->type = type;
+	off->empire = GET_LOYALTY(offender) ? EMPIRE_VNUM(GET_LOYALTY(offender)) : NOTHING;
+	off->player_id = GET_IDNUM(offender);
+	off->timestamp = time(0);
+	off->x = X_COORD(IN_ROOM(offender));
+	off->y = Y_COORD(IN_ROOM(offender));
+	off->flags = flags;
+	
+	// check for war
+	if (!IS_SET(flags, OFF_WAR) && GET_LOYALTY(offender) && has_relationship(emp, GET_LOYALTY(offender), DIPL_WAR)) {
+		off->flags |= OFF_WAR;
+	}
+	
+	LL_PREPEND(EMPIRE_OFFENSES(emp), off);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	
+	log_offense_to_empire(emp, off, offender);
+}
+
+
+/**
+* Marks all offenses from an empire 'avenged'.
+*
+* @param empire_data *emp The empire to mark (the Avenger).
+* @param empire_data *foe The empire whose offenses have been avenged.
+* @return int The number of offenses avenged by this.
+*/
+int avenge_offenses_from_empire(empire_data *emp, empire_data *foe) {
+	struct offense_data *off;
+	int count = 0;
+	
+	if (!emp || !foe) {
+		return 0;	// no work
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (off->empire == EMPIRE_VNUM(foe)) {
+			SET_BIT(off->flags, OFF_AVENGED);
+			++count;
+		}
+	}
+	
+	if (count) {
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+	
+	return count;
+}
+
+
+/**
+* Marks all non-empire offenses from a player 'avenged'. These are ONLY solo
+* offenses, not ones committed while in an empire.
+*
+* @param empire_data *emp The empire to mark (the Avenger).
+* @param char_data *foe The person whose offenses were avenged.
+* @return int The number of offenses avenged by this.
+*/
+int avenge_solo_offenses_from_player(empire_data *emp, char_data *foe) {
+	struct offense_data *off;
+	int count = 0;
+	
+	if (!emp || !foe || IS_NPC(foe)) {
+		return 0;	// no work
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (off->empire == NOTHING && off->player_id == GET_IDNUM(foe)) {
+			SET_BIT(off->flags, OFF_AVENGED);
+			++count;
+		}
+	}
+	
+	if (count) {
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+	
+	return count;
+}
+
+
+/**
+* Clears out old offenses for all empires.
+*/
+void clean_empire_offenses(void) {
+	time_t clear_older = time(0) - SECS_PER_REAL_WEEK, clear_faster = time(0) - SECS_PER_REAL_DAY;
+	struct offense_data *off, *next_off;
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
+			if (off->timestamp < clear_older) {
+				remove_offense(emp, off);
+			}
+			else if (!OFFENSE_HAS_WEIGHT(off) && off->timestamp < clear_faster) {
+				remove_offense(emp, off);
+			}
+		}
+		
+		// don't really need to trigger a save. They'll either save on their
+		// own or this will get re-pruned next reboot
+	}
+}
+
+
+/**
+* Gets the total 'weight' value of all current offenses by an empire.
+*
+* @param empire_data *emp The empire to check (who was offended).
+* @param empire_data *foe Which enemy did the offending.
+* @return int The total weight of all offenses.
+*/
+int get_total_offenses_from_empire(empire_data *emp, empire_data *foe) {
+	struct offense_data *off;
+	int total = 0;
+	
+	if (!emp || !foe) {
+		return 0;	// shortcut
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (!OFFENSE_HAS_WEIGHT(off)) {
+			continue;	// some don't count
+		}
+		if (off->empire != EMPIRE_VNUM(foe)) {
+			continue;	// wrong empire
+		}
+		
+		// ok
+		total += offense_info[off->type].weight;
+	}
+	
+	return total;
+}
+
+
+/**
+* Gets the total 'weight' value of all current offenses by a player.
+*
+* @param empire_data *emp The empire to check (who was offended).
+* @param char_data *ch The player who did the offending.
+* @return int The total weight of all offenses.
+*/
+int get_total_offenses_from_char(empire_data *emp, char_data *ch) {
+	struct offense_data *off;
+	int total = 0;
+	
+	if (!emp || !ch || IS_NPC(ch)) {
+		return 0;	// shortcut
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (!OFFENSE_HAS_WEIGHT(off)) {
+			continue;	// some don't count
+		}
+		if (off->player_id != GET_IDNUM(ch)) {
+			continue;	// wrong person
+		}
+		
+		// ok
+		total += offense_info[off->type].weight;
+	}
+	
+	return total;
+}
+
+
+/**
+* If offenses should elog, this function builds and logs that.
+*
+* @param empire_data *emp The empire that was offended.
+* @param struct offense_data *off The offense to log.
+* @param char_data *offender The person who committed the offense.
+*/
+void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender) {
+	char buf[MAX_STRING_LENGTH];
+	*buf = '\0';
+	
+	// OFFENSE_x: offenses that must be logged
+	switch (off->type) {
+		// TODO
+	}
+	
+	if (*buf) {
+		log_to_empire(emp, ELOG_HOSTILITY, buf);
+	}
+}
+
+
+/**
+* Determines if someone 'saw' an offense take place. Call this after the
+* offense takes place.
+*
+* @param char_data *ch The offender.
+* @param empire_data *emp The empire being offended.
+* @param room_data *from_room Optional: If the character started out in another spot (infiltrate).
+*/
+bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room) {
+	descriptor_data *desc;
+	char_data *iter;
+	
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
+			return TRUE;	// someone here saw it
+		}
+	}
+	
+	if (from_room) {
+		LL_FOREACH2(ROOM_PEOPLE(from_room), iter, next_in_room) {
+			if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
+				return TRUE;	// someone here saw it
+			}
+		}
+	}
+	
+	// check nearby players
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !desc->character || desc->character == ch) {
+			continue;	// not a player
+		}
+		if (IS_IMMORTAL(desc->character) || !AWAKE(desc->character) || !CAN_SEE(desc->character, ch)) {
+			continue;	// can't even see them
+		}
+		if (GET_LOYALTY(desc->character) != emp && (!GET_LOYALTY(desc->character) || !has_relationship(GET_LOYALTY(desc->character), emp, DIPL_ALLIED))) {
+			continue;	// must be a member of the empire, or an ally
+		}
+		if (compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 7) {
+			continue;	// too far away
+		}
+		
+		return TRUE;	// player saw it
+	}
+	
+	return FALSE;	// nobody saw it
+}
+
+
+/**
+* Removes and frees an offense.
+*
+* @param empire_data *emp The empire to remove from.
+* @param struct offense_data *off The offense to remove.
+*/
+void remove_offense(empire_data *emp, struct offense_data *off) {
+	LL_DELETE(EMPIRE_OFFENSES(emp), off);
+	free(off);
+}
+
+
+/**
+* Sometimes one offense overrides another. This removes any recent offense
+* for a character/type combo.
+*
+* @param empire_data *emp The empire that was offended.
+* @param int type The OFFENSE_ type.
+* @param char_data *offender The person who offended.
+*/
+void remove_recent_offenses(empire_data *emp, int type, char_data *offender) {
+	struct offense_data *off, *next_off;
+	long cutoff = time(0) - (10 * SECS_PER_REAL_MIN);
+	
+	while (offender && IS_NPC(offender) && offender->master) {
+		offender = offender->master;	// climb the food chain
+	}
+	
+	if (!emp || !offender || IS_NPC(offender)) {
+		return;	// sanitation check
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
+		if (off->timestamp < cutoff) {
+			break;	// offenses are sorted reverse-chronologically and we have gone too far this time
+		}
+		if (off->type != type) {
+			continue;	// wrong type
+		}
+		if (off->player_id != GET_IDNUM(offender)) {
+			continue;	// wrong player;
+		}
+		
+		// ok:
+		remove_offense(emp, off);
+	}
 }
 
 

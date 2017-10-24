@@ -465,6 +465,9 @@ There is a chance the other empire will be alerted to your location. You'll
 be marked internally as hostile for 1 hour, and become a valid PVP target. If
 you die, any items stolen in the last 30 minutes will be left on your corpse.
 
+You cannot steal from an empire if they have killed you in the last hour. This
+applies to all characters on your account.
+
 This ability has two functions:
 
 With Steal, you can pick up items from rooms that are claimed by other empires.

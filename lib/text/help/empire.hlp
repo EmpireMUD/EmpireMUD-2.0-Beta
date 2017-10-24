@@ -465,9 +465,22 @@ Available options:
  frontiertraits - set your empire's default behavior outside of cities
 
 Ranking immortals may use the syntax:  eedit [empire] <option> <argument>
+ adminflags - immortals may set admin flags on empires
 
 See also: PRIVILEGE, EMPIRE TRAITS
 #
+"EEDIT ADMINFLAGS" "EEDIT ADMIN FLAGS" "EMPIRE ADMIN FLAGS"
+
+Usage:  eedit <empire> adminflags [add | remove] [flags]
+
+Immortals with the "EMPIRES" grant can set administrative flags on empires.
+
+ &g!WAR&0 - Empire cannot unilaterally declare war.
+ &g!STEAL&0 - Empire cannot steal from other empires.
+ &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
+
+See also: GRANT
+#d
 EFIND
 
 Usage:  efind <name>
@@ -916,6 +929,19 @@ The Monuments ability allows you to build monuments.
 [[]] temple
 
 See also: BUILD, GRAND MONUMENTS
+#
+OFFENSES
+
+Usage:  offenses [-e empire] [-p player] [-n number to show]
+
+This command shows recent offenses against your empire. Offenses expire after
+one week (or sooner if they were done during war or were avenged).
+
+You can use the %c or %C prompt codes to receive a notification when you have
+unviewed offenses.
+
+Immortals can view offenses from other empires by giving an empire name (in
+quotes if necessary) as the first argument.
 #
 PAN
 
@@ -1399,6 +1425,7 @@ Windstride (Empire ability)
 
 Usage:  windstride
 Cooldown:  10 minutes
+Linked trait:  Greatness
 
 Windstride gives you a huge temporary boost to move regeneration, allowing you
 to reach the highest peaks of your empire with ease.

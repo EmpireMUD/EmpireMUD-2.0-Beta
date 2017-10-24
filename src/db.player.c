@@ -372,6 +372,8 @@ void parse_account(FILE *fl, int nr) {
 	char err_buf[MAX_STRING_LENGTH], line[256], str_in[256];
 	struct account_player *plr, *last_plr = NULL;
 	account_data *acct, *find;
+	struct pk_data *pk;
+	int int_in[3];
 	long l_in;
 	
 	// create
@@ -408,6 +410,22 @@ void parse_account(FILE *fl, int nr) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'K': {	// killed by
+				if (sscanf(line, "K %d %d %d %ld", &int_in[0], &int_in[1], &int_in[2], &l_in) != 4) {
+					log("SYSERR: Format error in K section of %s", err_buf);
+					exit(1);
+				}
+				
+				CREATE(pk, struct pk_data, 1);
+				pk->killed_alt = int_in[0];
+				pk->player_id = int_in[1];
+				pk->empire = int_in[2];
+				pk->last_time = l_in;
+				
+				// order doesn't matter right?
+				LL_PREPEND(acct->killed_by, pk);
+				break;
+			}
 			case 'P': {	// player
 				if (sscanf(line, "P %s", str_in) == 1) {
 					CREATE(plr, struct account_player, 1);
@@ -548,6 +566,7 @@ void write_account_index(FILE *fl) {
 void write_account_to_file(FILE *fl, account_data *acct) {
 	char temp[MAX_STRING_LENGTH];
 	struct account_player *plr;
+	struct pk_data *pk;
 	
 	if (!fl || !acct) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_account_to_file called without %s", !fl ? "file" : "account");
@@ -560,6 +579,11 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	strcpy(temp, NULLSAFE(acct->notes));
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
+	
+	// K: player kills
+	LL_FOREACH(acct->killed_by, pk) {
+		fprintf(fl, "K %d %d %d %ld\n", pk->killed_alt, pk->player_id, pk->empire, pk->last_time);
+	}
 	
 	// P: player
 	for (plr = acct->players; plr; plr = plr->next) {
@@ -1566,6 +1590,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Last Corpse Id:", length)) {
 					GET_LAST_CORPSE_ID(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Last Offense:", length)) {
+					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
+				}
 				else if (PFILE_TAG(line, "Learned Craft:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
 						add_learned_craft(ch, i_in[0]);
@@ -2403,6 +2430,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_LAST_TIP(ch)) {
 		fprintf(fl, "Last Tip: %d\n", GET_LAST_TIP(ch));
 	}
+	fprintf(fl, "Last Offense: %ld\n", GET_LAST_OFFENSE_SEEN(ch));
 	if (GET_LASTNAME(ch)) {
 		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
 	}
@@ -3309,6 +3337,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
 	void clean_lore(char_data *ch);
+	void clean_player_kills(char_data *ch);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
 	void give_level_zero_abilities(char_data *ch);
@@ -3499,6 +3528,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		
 		RESTORE_ON_LOGIN(ch) = FALSE;
 		clean_lore(ch);
+		clean_player_kills(ch);
 	}
 	else {
 		// ensure not dead

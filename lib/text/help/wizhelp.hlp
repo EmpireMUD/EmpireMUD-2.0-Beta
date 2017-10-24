@@ -249,6 +249,24 @@ for entering the game, only if there are any notes to show.
 
 See also: GRANT
 #d
+ENDWAR "END WAR"
+
+Usage:  endwar [empire] [second empire]
+
+This command is used by immortals to cancel active wars. This command is part
+of the 'empires' grant. It has 3 modes:
+
+> endwar
+With no arguments, this just lists active wars.
+
+> endwar <empire>
+With one empire, it ends all wars for that empire.
+
+> endwar <empire> <second empire>
+With two arguments, it ends the war between those two empires.
+
+See also: GRANT
+#d
 FILE
 
 Usage:  file <file> <lines>
@@ -509,7 +527,7 @@ prompted to press any key to enter the game.
 
 See also: INVIS, VISIBLE, SET
 #d
-ISLAND "ISLAND COMMAND"
+ISLAND "ISLAND COMMAND" CONTINENT
 
 Usage:  island list [keywords]
         island rename <id> <name>
@@ -521,6 +539,8 @@ properties to them. This command is grantable.
 Island flags:
  NEWBIE - Wipes claims periodically
  !AGGRO - Prevents aggro mobs, and guard towers won't fire
+ !CUSTOMIZE - Cannot be renamed by players
+ CONTINENT - Is a whole continent (affects adventure spawns)
 
 See also: GRANT
 #d
@@ -647,6 +667,16 @@ Examples:
   > page all GAME WILL BE SHUTTING DOWN IN 10 MINUTES
 
 Do not abuse this command.
+
+See also: GRANT
+#d
+PEACE
+
+Usage:  peace
+
+The peace command ends all combat in the room (but does not keep people from
+re-attacking). Input queues are also cleared, to avoid players accidentally
+restarting combat from queued attacks. This command is grantable.
 
 See also: GRANT
 #d

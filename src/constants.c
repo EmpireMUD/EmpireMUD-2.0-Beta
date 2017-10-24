@@ -239,10 +239,12 @@ const char *adventure_flags[] = {
 
 // ADV_LINKF_x
 const char *adventure_link_flags[] = {
-	"CLAIMED-OK",
+	"CLAIMED-OK",	// 0
 	"CITY-ONLY",
 	"!CITY",
 	"CLAIMED-ONLY",
+	"CONTINENT-ONLY",
+	"!CONTINENT",	// 5
 	"\n"
 };
 
@@ -540,6 +542,7 @@ const char *grant_bits[] = {
 	"playerdelete",
 	"unquest",
 	"automessage",
+	"peace",	// 40
 	"\n"
 };
 
@@ -1562,6 +1565,24 @@ struct city_metadata_type city_type[] = {
 };
 
 
+// OFFENSE_x: offense definitions
+// note: weights are in relation to the offense_min_to_war and offenses_for_free_war
+struct offense_info_type offense_info[NUM_OFFENSES] = {
+	// name, weight
+	{ "stealing", 15 },	// 0
+	{ "attacked player", 5 },
+	{ "guard tower", 1 },
+	{ "killed player", 15 },
+	{ "infiltrated", 2 },
+	{ "attacked npc", 1 },	// 5
+	{ "sieged building", 15 },
+	{ "sieged vehicle", 15 },
+	{ "burned building", 5 },
+	{ "burned vehicle", 5 },
+	{ "pickpocketed", 5 },	// 10
+};
+
+
 // ELOG_x
 const char *empire_log_types[] = {
 	"None",
@@ -1591,9 +1612,27 @@ const bool show_empire_log_type[] = {
 };
 
 
+// EADM_x: empire admin flags
+const char *empire_admin_flags[] = {
+	"!WAR",
+	"!STEAL",
+	"CITY-CLAIMS-ONLY",
+	"\n"
+};
+
+
 // EUS_x -- lowercase
 const char *unique_storage_flags[] = {
 	"vault",
+	"\n"
+};
+
+
+// OFF_x: offense flags
+const char *offense_flags[] = {
+	"SEEN",
+	"WAR",
+	"AVENGED",
 	"\n"
 };
 
@@ -2099,7 +2138,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.1,	// OBJ_UNIQUE
 	1.0,	// OBJ_PLANTABLE
 	1.0,	// OBJ_LIGHT
-	1.3333,	// OBJ_SUPERIOR
+	1.6,	// OBJ_SUPERIOR
 	1.0,	// OBJ_LARGE
 	1.0,	// OBJ_CREATED
 	1.0,	// OBJ_SINGLE_USE
@@ -2714,6 +2753,7 @@ const char *island_bits[] = {
 	"NEWBIE",
 	"!AGGRO",
 	"!CUSTOMIZE",
+	"CONTINENT",
 	"\n"
 };
 

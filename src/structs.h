@@ -543,6 +543,8 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINKF_CITY_ONLY  BIT(1)	// only spawns on claimed land in cities
 #define ADV_LINKF_NO_CITY  BIT(2)	// won't spawn on claimed land in cities
 #define ADV_LINKF_CLAIMED_ONLY  BIT(3)	// ONLY spawns on claimed tiles
+#define ADV_LINKF_CONTINENT_ONLY  BIT(4)	// only spawns on continents
+#define ADV_LINKF_NO_CONTINENT  BIT(5)	// does not spawn on continents
 
 
 // ADV_SPAWN_x: adventure spawn types
@@ -933,8 +935,13 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE DEFINES //////////////////////////////////////////////////////////
 
+// EADM_x: empire admin flags
+#define EADM_NO_WAR  BIT(0)	// may not start a unilateral war
+#define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
+#define EADM_CITY_CLAIMS_ONLY  BIT(2)	// may only claim in-city
 
-// empire trait flags
+
+// ETRAIT_x: empire trait flags
 #define ETRAIT_DISTRUSTFUL  BIT(0)	// hostile behavior
 
 
@@ -999,6 +1006,27 @@ typedef struct vehicle_data vehicle_data;
 
 // for empire_unique_storage->flags
 #define EUS_VAULT  BIT(0)	// requires privilege
+
+
+// OFFENSE_x: offense types
+#define OFFENSE_STEALING  0
+#define OFFENSE_ATTACKED_PLAYER  1
+#define OFFENSE_GUARD_TOWER  2
+#define OFFENSE_KILLED_PLAYER  3
+#define OFFENSE_INFILTRATED  4
+#define OFFENSE_ATTACKED_NPC  5
+#define OFFENSE_SIEGED_BUILDING  6
+#define OFFENSE_SIEGED_VEHICLE  7
+#define OFFENSE_BURNED_BUILDING  8
+#define OFFENSE_BURNED_VEHICLE  9
+#define OFFENSE_PICKPOCKETED  10
+#define NUM_OFFENSES  11	// total
+
+
+// OFF_x: offense flags
+#define OFF_SEEN  BIT(0)	// someone saw this happen (npc here or player nearby)
+#define OFF_WAR  BIT(1)	// happened at war (low/no hostile value)
+#define OFF_AVENGED  BIT(2)	// player was killed or empire was warred for this (removes hostile value)
 
 
 // Empire Privilege Levels
@@ -1776,6 +1804,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_PLAYERDELETE  BIT(37)
 #define GRANT_UNQUEST  BIT(38)
 #define GRANT_AUTOMESSAGE  BIT(39)
+#define GRANT_PEACE  BIT(40)
 
 
 // Lore types
@@ -2197,6 +2226,7 @@ typedef struct vehicle_data vehicle_data;
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
 #define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
+#define ISLE_CONTINENT  BIT(3)	// d. island is a continent (usually large, affects spawns)
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
@@ -3162,6 +3192,8 @@ struct account_data {
 	bitvector_t flags;	// ACCT_
 	char *notes;	// account notes
 	
+	struct pk_data *killed_by;	// LL of players who killed this player recently
+	
 	UT_hash_handle hh;	// account_table
 };
 
@@ -3190,6 +3222,16 @@ struct coin_data {
 	time_t last_acquired;	// helps cleanup
 	
 	struct coin_data *next;
+};
+
+
+// track who/when a player has been killed by another player
+struct pk_data {
+	int killed_alt;	// id of which alt died
+	int player_id;	// id of player who killed them
+	any_vnum empire;	// which empire the killer belonged to
+	long last_time;	// when the last kill was
+	struct pk_data *next;
 };
 
 
@@ -3465,6 +3507,7 @@ struct player_special_data {
 	int promo_id;	// entry in the promo_codes table
 	int ignore_list[MAX_IGNORES];	// players who can't message you
 	int last_tell;	// idnum of last tell from
+	time_t last_offense_seen;	// timestamp of last time the player checked offenses
 	
 	// character strings
 	char *lastname;	// Last name
@@ -4073,6 +4116,26 @@ struct empire_workforce_tracker {
 };
 
 
+// for offenses committed against an empire
+struct offense_data {
+	int type;	// OFFENSE_ constant
+	any_vnum empire;	// which empire caused it (or NOTHING)
+	int player_id;	// which player caused it
+	time_t timestamp;	// when
+	int x, y;	// approximate location
+	bitvector_t flags;	// OFF_ for anonymous offenses, whether or not there was an observer
+	
+	struct offense_data *next;	// linked list
+};
+
+
+// offense configs - constants.c
+struct offense_info_type {
+	char *name;
+	int weight;	// how bad it is
+};
+
+
 // The main data structure for the empires
 struct empire_data {
 	empire_vnum vnum;	// empire's virtual number
@@ -4089,7 +4152,8 @@ struct empire_data {
 	byte num_ranks;	// Total number of levels (maximum 20)
 	char *rank[MAX_RANKS];	// Name of each rank
 	
-	bitvector_t frontier_traits;	// ETRAIT_x
+	bitvector_t admin_flags;	// EADM_
+	bitvector_t frontier_traits;	// ETRAIT_
 	double coins;	// total coins (always in local currency)
 
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command
@@ -4101,6 +4165,7 @@ struct empire_data {
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
+	struct offense_data *offenses;
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

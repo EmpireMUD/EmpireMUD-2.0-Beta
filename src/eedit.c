@@ -35,6 +35,7 @@
 
 // locals
 EEDIT(eedit_adjective);
+EEDIT(eedit_admin_flags);
 EEDIT(eedit_banner);
 EEDIT(eedit_change_leader);
 EEDIT(eedit_description);
@@ -210,12 +211,16 @@ bool valid_rank_name(char_data *ch, char *newname) {
  //////////////////////////////////////////////////////////////////////////////
 //// CONTROL STRUCTURE ///////////////////////////////////////////////////////
 
+#define EEDIT_FLAG_IMM_ONLY  BIT(0)	// only a cimpl or granted imm can do this
+
+
 const struct {
 	char *command;
 	EEDIT(*func);
 	bitvector_t flags;
 } eedit_cmd[] = {
 	{ "adjective", eedit_adjective, NOBITS },
+	{ "adminflags", eedit_admin_flags, EEDIT_FLAG_IMM_ONLY },
 	{ "banner", eedit_banner, NOBITS },
 	{ "changeleader", eedit_change_leader, NOBITS },
 	{ "description", eedit_description, NOBITS },
@@ -250,6 +255,10 @@ ACMD(do_eedit) {
 	
 	// find type?
 	for (iter = 0; *eedit_cmd[iter].command != '\n' && type == NOTHING; ++iter) {
+		if (!imm_access && IS_SET(eedit_cmd[iter].flags, EEDIT_FLAG_IMM_ONLY)) {
+			continue;
+		}
+		
 		if (is_abbrev(arg, eedit_cmd[iter].command)) {
 			type = iter;
 		}
@@ -268,10 +277,17 @@ ACMD(do_eedit) {
 		msg_to_char(ch, "Available eedit commands: ");
 		found = FALSE;
 		for (iter = 0; *eedit_cmd[iter].command != '\n'; ++iter) {
+			if (!imm_access && IS_SET(eedit_cmd[iter].flags, EEDIT_FLAG_IMM_ONLY)) {
+				continue;
+			}
+			
 			msg_to_char(ch, "%s%s", (found ? ", " : ""), eedit_cmd[iter].command);
 			found = TRUE;
 		}
 		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
+	}
+	else if (!imm_access && IS_SET(eedit_cmd[type].flags, EEDIT_FLAG_IMM_ONLY)) {
+		msg_to_char(ch, "You don't have permission to do that.\r\n");
 	}
 	else {
 		// pass to child function
@@ -327,6 +343,23 @@ EEDIT(eedit_adjective) {
 		
 		if (emp != GET_LOYALTY(ch)) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's adjective form to %s", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_ADJECTIVE(emp));
+		}
+	}
+}
+
+
+EEDIT(eedit_admin_flags) {
+	extern const char *empire_admin_flags[];
+	
+	bitvector_t old_flags = EMPIRE_ADMIN_FLAGS(emp);
+	char buf[MAX_STRING_LENGTH];
+	
+	EMPIRE_ADMIN_FLAGS(emp) = olc_process_flag(ch, argument, "admin flags", NULL, empire_admin_flags, EMPIRE_ADMIN_FLAGS(emp));
+	
+	if (EMPIRE_ADMIN_FLAGS(emp) != old_flags) {
+		if (emp != GET_LOYALTY(ch)) {
+			prettier_sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, buf);
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's admin flags to: %s", GET_NAME(ch), EMPIRE_NAME(emp), buf);
 		}
 	}
 }

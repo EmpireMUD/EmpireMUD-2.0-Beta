@@ -500,6 +500,7 @@ void boot_world(void) {
 	log("Loading empires.");
 	index_boot(DB_BOOT_EMP);
 	clean_empire_logs();
+	clean_empire_offenses();
 	
 	// requires empires
 	log("  Renumbering rooms.");

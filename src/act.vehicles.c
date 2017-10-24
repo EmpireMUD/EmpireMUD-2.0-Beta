@@ -444,6 +444,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 					GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 					trigger_distrust_from_stealth(ch, emp);
 					gain_ability_exp(ch, ABIL_STEAL, 50);
+					add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
 				}
 			}
 			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
@@ -948,6 +949,10 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
 		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (flint ? "strikes $p and lights" : "lights"));
 		act(buf, FALSE, ch, flint, veh, TO_ROOM);
 		start_vehicle_burning(veh);
+		
+		if (VEH_OWNER(veh)) {
+			add_offense(VEH_OWNER(veh), OFFENSE_BURNED_VEHICLE, ch, IN_ROOM(ch), offense_was_seen(ch, VEH_OWNER(veh), IN_ROOM(veh)) ? OFF_SEEN : NOBITS);
+		}
 	}
 }
 
@@ -1819,8 +1824,8 @@ ACMD(do_drive) {
 
 
 ACMD(do_fire) {
-	void besiege_room(room_data *to_room, int damage);
-	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage);
+	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	
 	char veh_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *veh_targ;
@@ -1906,7 +1911,7 @@ ACMD(do_fire) {
 			}
 			
 			secttype = SECT(room_targ);
-			besiege_room(room_targ, dam);
+			besiege_room(ch, room_targ, dam);
 			
 			if (SECT(room_targ) != secttype) {
 				msg_to_char(ch, "It is destroyed!\r\n");
@@ -1925,7 +1930,7 @@ ACMD(do_fire) {
 				trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
 			}
 			
-			besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+			besiege_vehicle(ch, veh_targ, dam, SIEGE_PHYSICAL);
 		}
 		
 		// delays

@@ -185,7 +185,7 @@ hv
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -207,7 +207,7 @@ n
 M
 234 10.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -230,7 +230,7 @@ rG
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -257,7 +257,7 @@ M
 M
 233 10.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -510,7 +510,7 @@ robust, capable of supporting an entire family or more. It is ideal for the
 head of a plantation or as the seat of a small empire.
 ~
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -548,7 +548,7 @@ of wood and easily burnt, but it has the advantage of being very difficult to
 spot from afar.
 ~
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -607,7 +607,7 @@ aG
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -627,7 +627,7 @@ b
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -650,7 +650,7 @@ G
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -663,7 +663,7 @@ A Bridge Over the River~
 R
 21 1 1 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -684,7 +684,7 @@ furniture, as well as other things.
 F
 e
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -707,7 +707,7 @@ i
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -732,7 +732,7 @@ M
 M
 9024 20.00 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -755,7 +755,7 @@ y
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -799,7 +799,7 @@ M
 M
 232 1.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5138
@@ -822,7 +822,7 @@ many different and curious items.
 F
 E
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -973,7 +973,7 @@ down into the earth below.
 M
 244 20.00 c
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -997,7 +997,7 @@ l
 M
 9198 2.00 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1018,7 +1018,7 @@ state mandated by any god worthy of a temple of such stature.
 M
 244 20.00 c
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1050,7 +1050,7 @@ M
 M
 9197 2.00 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1072,7 +1072,7 @@ of larger pieces of equipment into the ship's hold.
 F
 g
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1093,7 +1093,7 @@ animals. Ships may also not be brought back in once they leave.
 F
 u
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 U
@@ -1116,7 +1116,7 @@ animals. Ships may also not be brought back in once they leave.
 F
 u
 R
-16 1 1 0
+16 1 1 1048576
 R
 21 1 1 0
 R
@@ -1174,7 +1174,7 @@ city. The roof is made of sticks and pitch, but the manor has been fireproofed
 and built to last.
 ~
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1192,7 +1192,7 @@ rotting trees and guarded by crocodiles. Inside, you find it well-constructed,
 safe, and delightfully far from civilization.
 ~
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1223,7 +1223,7 @@ M
 M
 9195 5.00 c
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1248,7 +1248,7 @@ M
 M
 236 10.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1314,7 +1314,7 @@ is supporting the stairs.
 M
 237 20.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1338,7 +1338,7 @@ portcullis gate~
 The portcullis is massive. It must take 5 men to close it.
 ~
 R
-16 2 1 0
+16 2 1 1048576
 R
 19 2 1 0
 S
@@ -1355,7 +1355,7 @@ most important parts of the castle as it shows the wealth of the king. It
 also leads to the throne room.
 ~
 R
-16 2 1 0
+16 2 1 1048576
 R
 19 2 1 0
 S
@@ -1379,7 +1379,7 @@ j
 M
 251 5.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 U
@@ -1405,7 +1405,7 @@ j
 M
 251 5.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 U
@@ -1428,7 +1428,7 @@ j
 M
 251 5.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1547,7 +1547,7 @@ C
 pick~
 I 7 1202 100.00 1  # FIND-HERB: a twig of redthorn
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1561,7 +1561,7 @@ C
 pick~
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1576,7 +1576,7 @@ pick~
 I 7 1204 50.00 1 X  # FIND-HERB: a daggerbite frond
 I 7 1203 100.00 1 X  # FIND-HERB: some magewhisper sepals
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1590,7 +1590,7 @@ C
 pick~
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1604,7 +1604,7 @@ C
 pick~
 I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1629,7 +1629,7 @@ M
 M
 254 100.00 e
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1653,7 +1653,7 @@ reads 'No Bartering'.
 F
 C
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1678,7 +1678,7 @@ D
 M
 254 33.00 c
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1722,7 +1722,7 @@ M
 R
 1004 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5186
@@ -1746,7 +1746,7 @@ M
 R
 1004 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5187
@@ -1769,7 +1769,7 @@ M
 R
 1004 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5186
@@ -1793,7 +1793,7 @@ M
 R
 1004 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5187
@@ -1841,7 +1841,7 @@ heavy stone press in the other corner extracts the precious oil.
 F
 s
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1863,7 +1863,7 @@ the dusty air blocks what little light sneaks in between the relics.
 R
 1002 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S

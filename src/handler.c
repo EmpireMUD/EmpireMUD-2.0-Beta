@@ -7483,6 +7483,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		GET_STOLEN_TIMER(obj) = time(0);
 		GET_STOLEN_FROM(obj) = EMPIRE_VNUM(emp);
 		trigger_distrust_from_stealth(ch, emp);
+		add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
 	}
 	
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
