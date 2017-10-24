@@ -58,7 +58,7 @@ end
 %restore% %mob%
 ~
 #12002
-Old God death~
+Old God death generic (unused)~
 0 f 100
 ~
 eval tokens 0
@@ -160,6 +160,40 @@ eval loc %instance.location%
 if %loc%
   %at% %loc% %load% obj 12002
 end
+eval tokens 0
+if %self.mob_flagged(GROUP)%
+  eval tokens %tokens% + 1
+  if %self.mob_flagged(HARD)%
+    eval tokens %tokens% + 1
+  end
+end
+if %tokens% == 0
+  halt
+end
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.is_pc%
+    eval name %%currency.12000(%tokens%)%%
+    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %name%!
+    if %person.level% >= (%self.level% - 75)
+      eval operation %%person.give_currency(12000, %tokens%)%%
+      nop %operation%
+      if %tokens% == 1
+        %send% %person% You take it.
+      else
+        %send% %person% You take them.
+      end
+    else
+      if %tokens% == 1
+        %send% %person% ...You try to take it, but you are too weak!
+      else
+        %send% %person% ...You try to take them, but you are too weak!
+      end
+    end
+  end
+  eval person %person.next_in_room%
+done
 ~
 #12007
 Anat: Summon Yatpan / Rain of Arrows~

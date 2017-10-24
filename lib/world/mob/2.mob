@@ -503,6 +503,7 @@ I 4 2210 10.00 1  # LOOT: a mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
 I 4 2315 10.00 1  # LOOT: a kite shield
 T 251
+T 250
 S
 #252
 guard outguard #e~
@@ -539,6 +540,8 @@ I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
 I 4 2315 10.00 1  # LOOT: a kite shield
+T 250
+T 251
 S
 #255
 sailor~
