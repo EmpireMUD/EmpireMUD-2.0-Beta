@@ -2765,7 +2765,7 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 	while (IS_NPC(offender) && offender->master) {
 		offender = offender->master;
 	}
-	if (IS_NPC(offender) || (GET_LOYALTY(offender) == emp)) {
+	if (IS_NPC(offender)) {
 		return;	// no offense
 	}
 	
@@ -2787,6 +2787,67 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	log_offense_to_empire(emp, off, offender);
+}
+
+
+/**
+* Marks all offenses from an empire 'avenged'.
+*
+* @param empire_data *emp The empire to mark (the Avenger).
+* @param empire_data *foe The empire whose offenses have been avenged.
+* @return int The number of offenses avenged by this.
+*/
+int avenge_offenses_from_empire(empire_data *emp, empire_data *foe) {
+	struct offense_data *off;
+	int count = 0;
+	
+	if (!emp || !foe) {
+		return 0;	// no work
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (off->empire == EMPIRE_VNUM(foe)) {
+			SET_BIT(off->flags, OFF_AVENGED);
+			++count;
+		}
+	}
+	
+	if (count) {
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+	
+	return count;
+}
+
+
+/**
+* Marks all non-empire offenses from a player 'avenged'. These are ONLY solo
+* offenses, not ones committed while in an empire.
+*
+* @param empire_data *emp The empire to mark (the Avenger).
+* @param char_data *foe The person whose offenses were avenged.
+* @return int The number of offenses avenged by this.
+*/
+int avenge_solo_offenses_from_player(empire_data *emp, char_data *foe) {
+	struct offense_data *off;
+	int count = 0;
+	
+	if (!emp || !foe || IS_NPC(foe)) {
+		return 0;	// no work
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (off->empire == NOTHING && off->player_id == GET_IDNUM(foe)) {
+			SET_BIT(off->flags, OFF_AVENGED);
+			++count;
+		}
+	}
+	
+	if (count) {
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+	
+	return count;
 }
 
 

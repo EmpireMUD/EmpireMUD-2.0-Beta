@@ -332,6 +332,8 @@ void save_all_empires();
 
 // empire offenses
 void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags);
+extern int avenge_offenses_from_empire(empire_data *emp, empire_data *foe);
+extern int avenge_solo_offenses_from_player(empire_data *emp, char_data *foe);
 void clean_empire_offenses();
 extern int get_total_offenses_from_empire(empire_data *emp, empire_data *foe);
 extern int get_total_offenses_from_char(empire_data *emp, char_data *ch);

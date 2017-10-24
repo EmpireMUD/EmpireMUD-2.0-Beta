@@ -3364,6 +3364,11 @@ ACMD(do_diplomacy) {
 			log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s", CAP(vict_log));
 		}
 		
+		// avenge all the wars!
+		if (POL_FLAGGED(ch_pol, DIPL_WAR)) {
+			avenge_offenses_from_empire(ch_emp, vict_emp);
+		}
+		
 		EMPIRE_NEEDS_SAVE(ch_emp) = TRUE;
 		EMPIRE_NEEDS_SAVE(vict_emp) = TRUE;
 	}

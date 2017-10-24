@@ -1027,6 +1027,10 @@ void add_player_kill(char_data *ch, char_data *killer) {
 	
 	// find matching data
 	if (!IS_NPC(killer)) {
+		if (GET_LOYALTY(killer)) {
+			avenge_solo_offenses_from_player(GET_LOYALTY(killer), ch);
+		}
+		
 		LL_SEARCH_SCALAR(GET_ACCOUNT(ch)->killed_by, data, player_id, GET_IDNUM(killer));
 		
 		// mark empire offense, only if not-pvp-enabled (always 'seen')
