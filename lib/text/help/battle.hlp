@@ -304,6 +304,20 @@ Chance of success rises based on your Battle level.
 
 Gain experience when you successfully Heartstop a vampire.
 #
+"IMPROVED REFLEXES"
+
+Improved Reflexes (Battle ability)
+
+This ability raises your dodge cap 20% higher than normal. For example, if your
+dodge cap is normally 55%, you can now go as high as 75% chance to dodge.
+
+This ability does not improve your actual chance to dodge, only allows you
+to stack more dodge bonuses from equipment and abilities.
+
+Gain experience when you dodge an attack.
+
+See also: DODGE CAP, REFLEXES
+#
 KICK
 
 Kick (Battle ability)
@@ -414,8 +428,7 @@ This dodge bonus is reflected on your 'score'.
 
 Gain experience when someone tries to hit you.
 
-See also: SHIELD BLOCK, QUICK BLOCK, BLOCK ARROWS, MEDIUM ARMOR, OUTRAGE,
-    HEAVY ARMOR, RESCUE, DISARM, DEFEND
+See also: IMPROVED REFLEXES
 #
 RESCUE
 

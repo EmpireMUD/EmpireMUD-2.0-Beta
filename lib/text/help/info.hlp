@@ -537,7 +537,7 @@ Dodge cap:
 - Add 75 to the total
 - Add +5 per Dexterity the mob has more than you
 
-See also: AFFECTS, SCORE, TO-HIT
+See also: AFFECTS, SCORE, TO-HIT, IMPROVED REFLEXES
 #
 DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME STACKS STACKING
 
