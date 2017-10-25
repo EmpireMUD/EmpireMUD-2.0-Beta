@@ -4233,7 +4233,7 @@ magical and a recipe could require the non-magical version.
 
 Available flags:
  &canimal&0 - From an animal (like animal fibers)
- &cbunch&0 - A group of things
+ &cbunch of&0 - A group of things
  &cdesert&0 - Comes from the desert (especially foods)
  &cfine&0 - High-quality
  &chard&0 - As opposed to soft
