@@ -140,6 +140,12 @@ S
 Bloodsweat~
 0 -1 1.00 0 0
 S
+#230
+Improved Reflexes~
+0 -1 1.00 0 d
+D 1 52 0
+T e 1
+S
 #231
 Shadow Kick~
 0 -1 1.00 0 0
