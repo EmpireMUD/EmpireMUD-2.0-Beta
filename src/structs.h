@@ -1964,6 +1964,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_TELEPORT_CITY  49	// teleports can target cities
 #define PTECH_TWO_HANDED_WEAPONS  50	// can wield two-handed weapons
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
+#define PTECH_DODGE_CAP  52	// improves your dodge cap
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

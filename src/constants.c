@@ -791,6 +791,7 @@ const char *player_tech_types[] = {
 	"Teleport-City",
 	"Two-Handed-Weapons",	// 50
 	"Where-Upgrade",
+	"Dodge-Cap",
 	"\n"
 };
 
