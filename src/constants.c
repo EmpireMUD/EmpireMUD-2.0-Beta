@@ -2251,7 +2251,7 @@ const char *component_types[] = {
 // CMPF_x: component flags
 const char *component_flags[] = {
 	"animal",
-	"bunch",
+	"bunch of",
 	"desert",
 	"fine",
 	"hard",
