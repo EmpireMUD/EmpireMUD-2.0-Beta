@@ -884,7 +884,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	if (MOB_FLAGGED(i, MOB_TIED))
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);
-	if (AFF_FLAGGED(i, AFF_STUNNED)) {
+	if (AFF_FLAGGED(i, AFF_STUNNED | AFF_HARD_STUNNED)) {
 		act("...$e is stunned!", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (AFF_FLAGGED(i, AFF_HIDE)) {

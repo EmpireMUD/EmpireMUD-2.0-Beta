@@ -199,7 +199,7 @@ ACMD(do_charge) {
 	else if (FIGHTING(ch) && !NOT_MELEE_RANGE(ch, vict)) {
 		msg_to_char(ch, "You're already in melee range.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_ENTANGLED)) {
+	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_ENTANGLED)) {
 		msg_to_char(ch, "You can't charge right now!\r\n");
 	}
 	else if (!can_fight(ch, vict)) {
@@ -539,7 +539,7 @@ ACMD(do_kite) {
 		if (vict == ch || FIGHTING(vict) != ch) {
 			continue;	// not hitting me
 		}
-		if (AFF_FLAGGED(vict, AFF_STUNNED | AFF_ENTANGLED)) {
+		if (AFF_FLAGGED(vict, AFF_STUNNED | AFF_HARD_STUNNED | AFF_ENTANGLED)) {
 			++kitable;	// can kite
 			continue;
 		}
