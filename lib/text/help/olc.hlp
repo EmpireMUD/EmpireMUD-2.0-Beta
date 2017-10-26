@@ -1398,6 +1398,8 @@ The following affect flags are available:
  !DRINK-BLOOD - Can't be bitten/sired by vampires.
  DISTRACTED - Cannot perform timed actions.
  HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
+ IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
+ 
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
