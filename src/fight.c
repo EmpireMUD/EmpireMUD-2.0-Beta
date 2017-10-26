@@ -2872,6 +2872,11 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	/* Only damage to self (sun) still hurts */
 	if (AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL) && damtype == DAM_PHYSICAL)
 		dam = 0;
+	
+	// full immunity
+	if (AFF_FLAGGED(victim, AFF_IMMUNE_DAMAGE)) {
+		dam = 0;
+	}
 
 	if (victim != ch) {
 		/* Start the attacker fighting the victim */

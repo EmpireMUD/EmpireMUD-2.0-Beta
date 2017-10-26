@@ -1108,6 +1108,7 @@ const char *affected_bits[] = {
 	"!DRINK-BLOOD",
 	"DISTRACTED",
 	"HARD-STUNNED",
+	"IMMUNE-DAMAGE",	// 35
 	"\n"
 };
 
@@ -1148,6 +1149,7 @@ const char *affected_bits_consider[] = {
 	"",	// !drink-blood
 	"",	// distracted
 	"",	// hard-stunned
+	"",	// 35 - immune-damage
 	"\n"
 };
 
@@ -1187,7 +1189,8 @@ const bool aff_is_bad[] = {
 	FALSE,
 	FALSE,
 	TRUE,
-	FALSE	// hard-stunned (not 'bad' because it's uncleansable)
+	FALSE,	// hard-stunned (not 'bad' because it's uncleansable)
+	FALSE,	// 35 - immune-damage
 };
 
 
