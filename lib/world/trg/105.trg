@@ -394,7 +394,7 @@ switch %random.3%
       if %test%
         dg_affect #10552 %person% SLOW on 20
         if %heroic_mode%
-          dg_affect #10552 %person% STUNNED on 5
+          dg_affect #10552 %person% HARD-STUNNED on 5
         else
           %echo% The ice shatters, but leaves a lingering chill...
         end
@@ -416,7 +416,7 @@ switch %random.3%
     if %heroic_mode%
       %aoe% 100 physical
       %damage% %actor% 400 physical
-      dg_affect #10553 %actor% STUNNED on 10
+      dg_affect #10553 %actor% HARD-STUNNED on 10
     else
       %aoe% 50 physical
       %damage% %actor% 200 physical
@@ -439,7 +439,7 @@ switch %random.3%
     end
     if !%heroic_mode%
       %echo% %self.name% steps back and folds %self.hisher% arms.
-      dg_affect %self% STUNNED on 15
+      dg_affect %self% HARD-STUNNED on 15
     end
   break
 done
@@ -495,11 +495,11 @@ switch %random.3%
       %send% %actor% You attempt to dig yourself out of the deep, painfully cold snowdrift!
       %dot% %actor% 50 20 magical
       dg_affect #10555 %actor% BLIND on 20
-      dg_affect #10555 %actor% STUNNED on 20
+      dg_affect #10555 %actor% HARD-STUNNED on 20
     else
       %send% %actor% You scramble to pull yourself out of the pile of snow.
       dg_affect #10555 %actor% BLIND on 5
-      dg_affect #10555 %actor% STUNNED on 5
+      dg_affect #10555 %actor% HARD-STUNNED on 5
     end
   break
   case 3
@@ -540,7 +540,7 @@ switch %random.3%
     %echoaround% %actor% %self.name% makes an arcane gesture at %actor.name%, and hoar frost suddenly encases %actor.himher%!
     dg_affect #10557 %actor% SLOW on 20
     if %heroic_mode%
-      dg_affect #10556 %actor% STUNNED on 5
+      dg_affect #10556 %actor% HARD-STUNNED on 5
       %dot% #10557 %actor% 100 20 magical
     else
       %dot% #10557 %actor% 75 20 magical

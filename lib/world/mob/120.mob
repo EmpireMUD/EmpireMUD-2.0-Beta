@@ -113,4 +113,55 @@ The giant hawk Yatpan alights on the ground.
 100 125 de m
 0 0 2 10
 S
+#12030
+hadad ba'al baal god~
+the god Ba'al Hadad~
+tbd
+~
+225 325 aduyB ciE
+1 0 2 1
+T 12001
+T 12003
+T 12006
+T 12030
+T 12031
+T 12032
+T 12035
+T 12036
+T 12037
+T 12038
+T 12041
+S
+#12031
+storm coming stormcloud massive~
+the Coming Storm~
+A massive stormcloud envelops and suffocates you!
+~
+225 325 bdnyA ci
+0 0 2 21
+T 12033
+T 12039
+T 12041
+S
+#12047
+bull bronze little~
+the little bronze bull~
+A little bronze bull stands with its horns held high.
+~
+1 1 bdoD dn
+0 0 0 27
+M
+0
+Smoke puffs from $n's nostrils.~
+T 9901
+T 9902
+S
+#12048
+lightning horse bolt~
+the lightning~
+A bolt of lightning in the shape of a horse appears before you.
+~
+100 125 de m
+0 0 2 21
+S
 $

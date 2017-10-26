@@ -129,7 +129,7 @@ switch %random.4%
       eval damage_scale %total_drained% / 2
       %send% %actor% &r%self.name% hurls the stolen mana at you as a huge energy blast, which sends you flying!
       %echoaround% %actor% %self.name% hurls the stolen mana at %actor.name% in the form of a huge energy blast, sending %actor.himher% flying!
-      dg_affect #18504 %actor% STUNNED on 10
+      dg_affect #18504 %actor% HARD-STUNNED on 10
       %damage% %actor% %damage_scale% magical
       if %damage_scale% >= 600
         %echo% &rThe energy blast explodes!
@@ -234,7 +234,7 @@ switch %attack%
       %damage% %actor% 150
       %send% %actor% You suddenly feel a bone-deep numbness...
       %dot% #18508 %actor% 300 15 poison
-      dg_affect #18507 %actor% STUNNED on 5
+      dg_affect #18507 %actor% HARD-STUNNED on 5
     else
       %damage% %actor% 100
       %send% %actor% The pain of the bite numbs...
@@ -255,7 +255,7 @@ switch %attack%
     %send% %actor% You are stunned by %self.name%'s powerful blow!
     if %heroic_mode%
       %damage% %actor% 150 physical
-      dg_affect #18509 %actor% STUNNED on 10
+      dg_affect #18509 %actor% HARD-STUNNED on 10
       %send% %actor% %self.name%'s powerful blow sends your weapon flying!
       %echoaround% %actor% %self.name%'s powerful blow sends %actor.name%'s weapon flying!
       dg_affect #18510 %actor% DISARM on 30

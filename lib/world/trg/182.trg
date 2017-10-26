@@ -169,7 +169,11 @@ if (guild /= %arg% || tortoise /= %arg%)
   eval real_dir %%room.direction(%turtle.room%)%%
   eval direction %%actor.dir(%real_dir%)%%
   eval distance %%room.distance(%turtle.room%)%%
-  %send% %actor% There is an atlasian tortoise %distance% tiles to the %direction%.
+  if %distance% == 0
+    %send% %actor% There is an atlasian tortoise in the room with you.
+  else
+    %send% %actor% There is an atlasian tortoise %distance% tiles to the %direction%.
+  end
   %echoaround% %actor% %actor.name% holds %self.shortdesc% aloft...
 else
   return 0
@@ -1246,7 +1250,7 @@ if %knezz%
     %send% %actor% You use your Stealth skill to plant %self.shortdesc% while %knezz.name% isn't watching.
   elseif %knezz.aff_flagged(BLIND)%
     %send% %actor% You quickly plant %self.shortdesc%, taking advantage of %knezz.name%'s temporary blindness.
-    dg_affect %actor% STUNNED on 10
+    dg_affect %actor% HARD-STUNNED on 10
   else
     %send% %actor% %knezz.name% would notice if you tried to plant the bug while he's watching...
     halt
@@ -1423,6 +1427,7 @@ Malfernes: Guild Quest Greeting~
 if !%actor.on_quest(18280)% || %actor.quest_triggered(18280)% || %self.fighting% || %self.disabled%
   halt
 end
+nop %self.add_mob_flag(SILENT)%
 wait 5
 eval room %self.room%
 wait 1 sec
@@ -1431,6 +1436,7 @@ while %cycles_left% >= 0
   if %self.fighting% || %self.disabled%
     * Combat interrupts the speech
     %echo% %self.name%'s monologue is interrupted.
+    nop %self.remove_mob_flag(SILENT)%
     halt
   end
   * Fake ritual messages
@@ -1461,6 +1467,7 @@ while %cycles_left% >= 0
         end
         eval person %person.next_in_room%
       done
+      nop %self.remove_mob_flag(SILENT)%
       halt
     break
   done
@@ -1479,6 +1486,7 @@ end
 if %self.fighting% || %self.disabled%
   halt
 end
+nop %self.add_mob_flag(SILENT)%
 eval room %self.room%
 wait 1 sec
 eval cycles_left 5
@@ -1486,6 +1494,7 @@ while %cycles_left% >= 0
   if %self.fighting% || %self.disabled%
     * Combat interrupts the speech
     %echo% %self.name%'s monologue is interrupted.
+    nop %self.remove_mob_flag(SILENT)%
     halt
   end
   * Fake ritual messages
@@ -1516,6 +1525,7 @@ while %cycles_left% >= 0
         end
         eval person %person.next_in_room%
       done
+      nop %self.remove_mob_flag(SILENT)%
       halt
     break
   done
@@ -1534,6 +1544,7 @@ end
 if %self.fighting% || %self.disabled%
   halt
 end
+nop %self.add_mob_flag(SILENT)%
 eval room %self.room%
 wait 1 sec
 eval cycles_left 5
@@ -1541,6 +1552,7 @@ while %cycles_left% >= 0
   if %self.fighting% || %self.disabled%
     * Combat interrupts the speech
     %echo% %self.name%'s monologue is interrupted.
+    nop %self.remove_mob_flag(SILENT)%
     halt
   end
   * Fake ritual messages
@@ -1571,6 +1583,7 @@ while %cycles_left% >= 0
         end
         eval person %person.next_in_room%
       done
+      nop %self.remove_mob_flag(SILENT)%
       halt
     break
   done
@@ -1589,6 +1602,7 @@ end
 if %self.fighting% || %self.disabled%
   halt
 end
+nop %self.add_mob_flag(SILENT)%
 eval room %self.room%
 wait 1 sec
 eval cycles_left 5
@@ -1596,6 +1610,7 @@ while %cycles_left% >= 0
   if %self.fighting% || %self.disabled%
     * Combat interrupts the speech
     %echo% %self.name%'s monologue is interrupted.
+    nop %self.remove_mob_flag(SILENT)%
     halt
   end
   * Fake ritual messages
@@ -1626,6 +1641,7 @@ while %cycles_left% >= 0
         end
         eval person %person.next_in_room%
       done
+      nop %self.remove_mob_flag(SILENT)%
       halt
     break
   done

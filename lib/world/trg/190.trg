@@ -66,7 +66,7 @@ eval heroic_mode %self.mob_flagged(GROUP)%
 %send% %actor% %self.name% swings %self.hisher% pestle into the side of your head!
 %echoaround% %actor% %self.name% swings %self.hisher% pestle into the side of %actor.name%'s head!
 if %heroic_mode%
-  dg_affect #19002 %actor% STUNNED on 10
+  dg_affect #19002 %actor% HARD-STUNNED on 10
 end
 %damage% %actor% 100
 ~
@@ -323,7 +323,7 @@ wait 3 sec
 %send% %target% The potion bottle shatters, and tendrils of dark energy lash out to bind your limbs!
 %echoaround% %target% The potion bottle shatters, and tendrils of dark energy lash out to bind %target.name%'s limbs!
 %send% %target% Type 'struggle' to break free!
-dg_affect #19009 %actor% STUNNED on 75
+dg_affect #19009 %actor% HARD-STUNNED on 75
 ~
 #19010
 Swamp Hag bind struggle~
@@ -660,7 +660,7 @@ end
 if %heroic_mode%
   %damage% %actor% 200 physical
   %send% %actor% You are stunned and knocked off-balance!
-  dg_affect #10202 %actor% STUNNED on 10
+  dg_affect #10202 %actor% HARD-STUNNED on 10
   dg_affect #10201 %actor% DODGE -20 20
   dg_affect #10201 %actor% TO-HIT -20 20
 else
@@ -829,7 +829,7 @@ if %heroic_mode%
   %send% %actor% Everything turns dark and confusing...
   %echoaround% %actor% %self.name% decks %actor.name% with one powerful punch!
   dg_affect #10206 %actor% BLIND on 15
-  dg_affect #10206 %actor% STUNNED on 15
+  dg_affect #10206 %actor% HARD-STUNNED on 15
 else
   %send% %actor% %self.name% hits you hard, stunning you!
   %echoaround% %actor% %self.name% hits %actor.name% hard, stunning %actor.himher%!
@@ -911,7 +911,7 @@ if %heroic_mode%
   while %person%
     eval test %%person.is_enemy(%self%)%%
     if %test%
-      dg_affect #10209 %person% STUNNED on 5
+      dg_affect #10209 %person% HARD-STUNNED on 5
     end
     eval person %person.next_in_room%
   done

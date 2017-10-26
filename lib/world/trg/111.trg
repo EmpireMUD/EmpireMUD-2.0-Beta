@@ -2,6 +2,9 @@
 Hermit Greeting~
 0 bgw 25
 ~
+if %self.mob_flagged(SILENT)%
+  halt
+end
 wait 1 sec
 say Are you going to eat that?
 ~
@@ -696,8 +699,8 @@ if !%target%
 end
 %send% %target% %self.name% encircles you and constricts!
 %echoaround% %target% %self.name% encircles %target.name% and constricts %target.himher%!
-dg_affect %target% STUNNED on 15
-dg_affect %self% STUNNED on 15
+dg_affect %target% HARD-STUNNED on 15
+dg_affect %self% HARD-STUNNED on 15
 %damage% %target% 50
 wait 5 sec
 if !%target% || !%self% || !%self.fighting%
@@ -736,8 +739,8 @@ if !%target%
 end
 %send% %target% %self.name% wraps %self.himher%self around you, mummifying you and dragging you off to blissful slumber...
 %echoaround% %target% %self.name% wraps %self.himher%self around %target.name%, mummifying %target.himher% and dragging %target.himher% off to blissful slumber...
-dg_affect %target% STUNNED on 15
-dg_affect %self% STUNNED on 15
+dg_affect %target% HARD-STUNNED on 15
+dg_affect %self% HARD-STUNNED on 15
 * prevents re-running of this script until affect ends
 wait 15 sec
 ~

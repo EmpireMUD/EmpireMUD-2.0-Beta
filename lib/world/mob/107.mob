@@ -268,7 +268,7 @@ spider widow massive~
 a massive widow spider~
 A massive widow spider eyes you from her nest.
 ~
-0 25 bcdgjy ceG
+0 25 bcdgj ceG
 2 0 8 9
 I 0 10751 100.00 1  # BUTCHER: spider meat
 I 4 10750 90.00 1  # LOOT: spider parts
@@ -282,6 +282,8 @@ I 4 10764 12.50 1 a  # LOOT: a lit spidersilk lantern
 I 4 10765 12.50 1 a  # LOOT: spidersilk slippers
 I 4 10766 12.50 1 a  # LOOT: a spidersilk mask
 T 10757
+T 10760
+T 10761
 S
 #10753
 spiderling~

@@ -391,7 +391,7 @@ A fiddle is lying here.~
 you can find the cat who has lost the fiddle, surely he will reward you. You
 can also play it as an instrument.
 ~
-22 p ao 5
+22 p ao 6
 0 0 0
 0 0
 M
@@ -406,6 +406,7 @@ You fill the air with fine music from $p.~
 M
 3
 You dance as $n plays fine music with $p.~
+T 10738
 S
 #10731
 cloak starry~
@@ -430,9 +431,10 @@ A pail is lying on the ground.~
    This pail is inscribed with the names 'Jack' and 'Jill', and surely they
 would reward you if you gave it back to them.
 ~
-5 p a 1
+5 p a 2
 32 32 0
 0 0
+T 10738
 S
 #10733
 trousers fetching pair~
@@ -457,10 +459,11 @@ A candlestick is lying here, unlit.~
 heirloom. Indeed, the base is etched with the name 'Nimble'. Perhaps if you
 could find its owner, he'd reward you.
 ~
-3 p ao 2
+3 p ao 3
 0 0 0
 13 0
 I 11 10735 100.00 1  # LIGHT: a lit candlestick
+T 10738
 S
 #10735
 candlestick lit~
@@ -470,9 +473,10 @@ A lit candlestick is sitting on the ground.~
 heirloom. Indeed, the base is etched with the name 'Nimble'. Perhaps if you
 could find its owner, he'd reward you.
 ~
-3 cp ao 3
+3 cp ao 4
 0 0 0
 13 168
+T 10738
 S
 #10736
 shoes burnt pair~
@@ -497,7 +501,7 @@ A large ham is lying in the dirt.~
 Jack Sprat and he must be going hungry without it. Perhaps he would reward you
 if you returned it.
 ~
-6 p a 5
+6 p a 6
 72 0 0
 7 336
 A
@@ -508,6 +512,7 @@ You eat the ham, carefully making sure you eat no fat.~
 M
 4
 You eat the ham, carefully making sure you eat no lean.~
+T 10738
 S
 #10738
 belt lean~
@@ -532,7 +537,7 @@ A Christmas pie is sitting on the ground.~
 markings on the pie plate, this seems to belong to Jack Horner. Perhaps he
 would reward you if you returned it to him.
 ~
-6 p a 5
+6 p a 6
 72 0 0
 7 336
 M
@@ -553,6 +558,7 @@ $n eats a Christmas pie.~
 M
 5
 $n sticks $s thumb into a Christmas pie, and pulls out a plum!~
+T 10738
 S
 #10740
 gloves plum-stained stained~
@@ -576,7 +582,7 @@ Someone has left a dish of curds and whey on the ground.~
    These curds and whey could only belong to little Miss Muffet. If you could
 find her, she might reward you for their safe return.
 ~
-6 p a 5
+6 p a 6
 72 0 0
 7 336
 M
@@ -588,6 +594,7 @@ You enjoy the curds and whey, all the while looking out for spiders.~
 M
 5
 $n enjoys some curds and whey.~
+T 10738
 S
 #10742
 spider dangling~
@@ -610,7 +617,7 @@ Some warm fleece is lying here.~
    This warm fleece is white as snow. It looks like it would protect you, a
 little bit.
 ~
-2 mp ad 7
+2 mp ad 8
 0 0 0
 11 0
 A
@@ -622,6 +629,7 @@ C
 M
 12
 $n is standing here; $s fleece is white as snow.~
+T 10738
 S
 #10744
 bell ribbon blue~
@@ -658,7 +666,7 @@ A bowl of leathery broth is sitting here.~
    This broth is hearty enough to chew! Surely it belongs to the woman who
 lives in the shoe. If you returned it, she might reward you.
 ~
-6 p a 7
+6 p a 8
 72 0 0
 7 336
 A
@@ -669,6 +677,7 @@ You chew the leathery broth for a bit, but it doesn't taste too bad.~
 M
 5
 $n chews on a leathery broth.~
+T 10738
 S
 #10747
 shoestring string spare~

@@ -572,7 +572,7 @@ else
     eval person %%person_%person_num%%%
     %send% %person% %self.name% lunges toward you, sinking %self.hisher% teeth into your neck!
     %echoaround% %person% %self.name% lunges toward %person.name%, sinking %self.hisher% teeth into %person.hisher% neck!
-    dg_affect %person% STUNNED on 10
+    dg_affect %person% HARD-STUNNED on 10
     wait 5 sec
     if %person.room% != %self.room%
       %echo% %self.name% transforms into a bat and flies away, looking confused.
@@ -873,7 +873,7 @@ if %test%
   eval arg %test%
 end
 if !%actor.is_immortal%
-  %send% %actor% You can't use %self.name%. You need to be an immortal.
+  %send% %actor% You can't use %self.shortdesc%. You need to be an immortal.
   halt
 end
 if !%instance%

@@ -40,6 +40,13 @@ magical coal lumps~
 T0
 You can build a snowman again.~
 S
+#10738
+Mother Goose teleport~
+3 0
+0 0 0 0
+T0
+Your Mother Goose teleport cooldown has ended.~
+S
 #10744
 bell on a blue ribbon~
 3 0
@@ -53,6 +60,22 @@ spider egg~
 0 0 0 0
 T0
 Your spider egg cooldown has ended.~
+S
+#10760
+bound~
+4 0
+0 0 0 0
+T0
+You break free of the web binding you.~
+T1
+$n breaks free of the web binding $m.~
+S
+#10761
+web~
+3 0
+0 0 0 0
+T0
+Your web cooldown has ended.~
 S
 #10770
 goblin coffin~

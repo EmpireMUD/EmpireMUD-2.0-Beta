@@ -77,4 +77,47 @@ hawk dive~
 T0
 You are no longer stunned by Yatpan's dive attack.~
 S
+#12030
+Ba'al Hadad attack cooldown~
+3 0
+0 0 0 0
+S
+#12031
+invulnerable~
+4 0
+0 0 0 0
+S
+#12035
+sonic roar~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by Ba'al Hadad's sonic roar.~
+S
+#12036
+bull charge~
+4 0
+0 0 0 0
+T0
+You recover from the effects of Ba'al Hadad's charge.~
+S
+#12037
+thunderbolt~
+4 0
+0 0 0 0
+S
+#12038
+thunderbolt~
+4 0
+0 0 0 0
+T0
+You are no longer blinded by Ba'al Hadad's thunderbolt.~
+S
+#12039
+bolt from the blue~
+4 0
+0 0 0 0
+T0
+You are no longer affected by that bolt from the blue.~
+S
 $

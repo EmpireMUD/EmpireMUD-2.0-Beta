@@ -494,6 +494,56 @@ switch %random.3%
     %echo% %self.name% could eat no fat. His wife could eat no lean.
   break
 ~
+#10738
+Mother Goose Teleport~
+1 c 2
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
+  %send% %actor% You can't teleport out of here.
+  halt
+end
+* once per 30 minutes
+if %actor.cooldown(10738)%
+  %send% %actor% Your %cooldown.10738% is still on cooldown!
+  halt
+end
+eval room_var %actor.room%
+%send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
+%echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
+wait 5 sec
+if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
+  halt
+end
+%send% %actor% Yellow light begins to whirl around you...
+%echoaround% %actor% Yellow light begins to whirl around %actor.name%...
+wait 5 sec
+if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
+  halt
+end
+eval destination %instance.nearest_rmt(10730)%
+if !%destination%
+  %send% %actor% Your teleport fails!
+  %echoaround% %actor% %actor.name%'s teleport fails!
+  halt
+end
+%echoaround% %actor% %actor.name% vanishes in a flourish of yellow light!
+%teleport% %actor% %destination%
+eval destination %instance.location%
+%teleport% %actor% %destination%
+%force% %actor% look
+%echoaround% %actor% %actor.name% appears in a flourish of yellow light!
+nop %actor.set_cooldown(10738, 43200)%
+nop %actor.cancel_adventure_summon%
+~
 #10739
 Jack Horner~
 0 bw 10
@@ -894,6 +944,77 @@ if %emp%
 end
 %send% %actor% You buy %named% for 50 coins.
 %echoaround% %actor% %actor.name% buys %named%.
+~
+#10760
+Widow Spider: Bind~
+0 k 100
+~
+if %self.cooldown(10761)%
+  halt
+end
+eval heroic_mode %self.mob_flagged(GROUP)%
+if !%heroic_mode%
+  halt
+end
+* Find a non-bound target
+eval target %actor%
+eval room %self.room%
+eval person %room.people%
+eval target_found 0
+eval no_targets 0
+while %target.affect(10760)% && %person%
+  eval test %%person.is_enemy(%self%)%%
+  if %person.is_pc% && %test%
+    eval target %person%
+  end
+  eval person %person.next_in_room%
+done
+if !%target%
+  * Sanity check
+  halt
+end
+if %target.affect(10760)%
+  * No valid targets
+  halt
+end
+nop %self.cooldown(10761, 15)%
+* Valid target found, start attack
+%send% %target% %self.name% twists around, pointing %self.hisher% spinneret at you...
+%echoaround% %target% %self.name% twists around, pointing %self.hisher% spinneret at %target.name%...
+wait 3 sec
+%send% %target% A stream of sticky webs flies out, binding your limbs!
+%echoaround% %target% A stream of sticky webs flies out, binding %target.name%'s limbs!
+%send% %target% Type 'struggle' to break free!
+dg_affect #10760 %actor% STUNNED on 15
+~
+#10761
+Widow Struggle Bind Struggle~
+0 c 0
+struggle~
+eval break_free_at 1
+if !%actor.affect(10760)%
+  return 0
+  halt
+end
+if !%actor.varexists(struggle_counter)%
+  eval struggle_counter 0
+  remote struggle_counter %actor.id%
+else
+  eval struggle_counter %actor.struggle_counter%
+end
+eval struggle_counter %struggle_counter% + 1
+if %struggle_counter% >= %break_free_at%
+  %send% %actor% You break free of your bindings!
+  %echoaround% %actor% %actor.name% breaks free of %actor.hisher% bindings!
+  dg_affect #10760 %actor% off
+  rdelete struggle_counter %actor.id%
+  halt
+else
+  %send% %actor% You struggle against your bindings, but fail to break free.
+  %echoaround% %actor% %actor.name% struggles against %actor.hisher% bindings!
+  remote struggle_counter %actor.id%
+  halt
+end
 ~
 #10769
 Delayed Completer~
