@@ -465,7 +465,6 @@ if %self.varexists(phase)%
     halt
   elseif %self.phase% == 2
     %echo% %self.name% is suddenly rejuvenated by the power of the storm within!
-    %damage% %self% -10000
     halt
   end
 end
@@ -474,13 +473,12 @@ end
 set phase 2
 remote phase %self.id%
 * todo: make him invincible and not just insanely hard to kill
-dg_affect #12031 %self% DODGE 10000 -1
+dg_affect #12031 %self% IMMUNE-DAMAGE on -1
 detach 12035 %self.id%
 detach 12036 %self.id%
 detach 12037 %self.id%
 detach 12038 %self.id%
 attach 12039 %self.id%
-%damage% %self% -10000
 makeuid loc room i12031
 if %loc%
   eval room %loc%
@@ -620,6 +618,11 @@ if %mob%
   if %mob.fighting%
     %send% %actor% You can't! The fight is still raging outside.
     halt
+  elseif %mob.varexists(phase)%
+    if %mob.phase% > 1
+      %send% %actor% You can't!
+      halt
+    end
   else
     eval destination %mob.room%
   end
@@ -709,7 +712,7 @@ end
 ~
 #12038
 Ba'al Hadad: Raging Storm~
-0 0 100
+0 k 100
 ~
 if %self.cooldown(12030)%
   halt
@@ -739,6 +742,7 @@ if %self.affect(BLIND)%
   dg_affect %self% BLIND off 1
 end
 %echo% %self.name% starts casting a spell!
+%echo% (Type 'interrupt'.)
 set running 1
 set interrupted 0
 remote running %self.id%
@@ -779,6 +783,10 @@ if !%self.varexists(running)%
   set running 0
   remote running %self.id%
 end
+if %actor.disabled%
+  %send% %actor% You can't do that! You're stunned!
+  halt
+end
 if %self.varexists(interrupted)%
   if %self.interrupted%
     %send% %actor% Someone beat you to it.
@@ -795,5 +803,91 @@ end
 dg_affect %actor% HARD-STUNNED on 5
 set interrupted 1
 remote interrupted %self.id%
+~
+#12049
+Call Storm~
+1 c 3
+use~
+eval test %%self.is_name(%arg%)%%
+eval target %%actor.obj_target(%arg%)%%
+if !(%test% && %self.worn_by%) && !(%target% == %self% && %self.carried_by%)
+  return 0
+  halt
+end
+if %actor.cooldown(12049)%
+  %send% %actor% Your %cooldown.12049% is on cooldown.
+  halt
+end
+eval room %actor.room%
+eval cycles_left 5
+while %cycles_left% >= 0
+  if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing) || %actor.aff_flagged(DISTRACTED)%
+    if %cycles_left% < 5
+      %echoaround% %actor% %actor.name%'s ritual is interrupted.
+      %send% %actor% Your ritual is interrupted.
+    else
+      %send% %actor% You can't do that now.
+    end
+  end
+  switch %cycles_left%
+    case 5
+      %echoaround% %actor% %actor.name% pulls out a toad-shaped totem and begins to chant...
+      %send% %actor% You pull out your monsoon totem and begin to chant...
+    break
+    case 4
+      %echoaround% %actor% %actor.name% sways as %actor.heshe% whispers strange words into the air...
+      %send% %actor% You sway as you whisper the words of the monsoon chant...
+    break
+    case 3
+      %echoaround% %actor% %actor.name%'s monsoon totem takes on a soft green glow, and the air around it seems to crackle...
+      %send% %actor% Your monsoon totem takes on a soft green glow, and the air around it crackles with electricity...
+    break
+    case 2
+      %echoaround% %actor% A tiny raincloud forms in the air around %actor.name%'s monsoon totem...
+      %send% %actor% A tiny raincloud forms in the air around your monsoon totem...
+    break
+    case 1
+      %echoaround% %actor% %actor.name% whispers into the raincloud, which grows dark and begins to rise...
+      %send% %actor% You whisper ancient words of power into the raincloud as it grows dark and begins to rise...
+    break
+    case 0
+      %echoaround% %actor% %actor.name% completes %actor.hisher% chant, and the raincloud fills the sky!
+      %send% %actor% You complete your chant, and the raincloud fills the sky!
+      %echo% Thunder rolls across the sky as heavy drops of rain begin to fall.
+      %load% obj 10144 %room%
+      halt
+    break
+  done
+  * Shortcut for immortals
+  if !%actor.nohassle%
+    wait 5 sec
+  end
+  eval cycles_left %cycles_left% - 1
+done
+~
+#12050
+Stormcloud weather~
+1 c 4
+weather~
+%send% %actor% The rainfall is so heavy you can barely see your hand in front of your face.
+~
+#12051
+Stormcloud echoes~
+1 bw 10
+~
+switch %random.4%
+  case 1
+    %echo% Lightning crawls from cloud to cloud like spiderwebs.
+  break
+  case 2
+    %echo% Rain drops like sheets from the clouds, until you can barely see where you're going.
+  break
+  case 3
+    %echo% The sky flashes as a brilliant column of lightning splits it in two.
+  break
+  case 4
+    %echo% Rolling thunder shakes you to your core.
+  break
+end
 ~
 $

@@ -120,4 +120,11 @@ bolt from the blue~
 T0
 You are no longer affected by that bolt from the blue.~
 S
+#12049
+stormcaller wand~
+3 0
+0 0 0 0
+T0
+Your stormcaller wand cooldown has ended.~
+S
 $

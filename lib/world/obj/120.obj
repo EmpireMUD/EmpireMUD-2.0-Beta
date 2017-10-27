@@ -377,7 +377,7 @@ chains ba'al baal hadad~
 the chains of Ba'al Hadad~
 The chains of Ba'al Hadad lie broken on the ground (list, buy).~
    These chains look like iron, but smell of sulfur and glow as the sun strikes
-them. It appears they once held Ba'al Hadad, storm god of the ancient world. 
+them. It appears they once held Ba'al Hadad, storm god of the ancient world.
 Ba'al Hadad brought good fortune and ill, as his storms fed crops but destroyed
 empires. Now these chains are broken, and it seems the stormlord walks the
 Earth once again. Seek him out -- he can't have gone far.
@@ -440,6 +440,16 @@ C
 225 350
 T 12004
 S
+#12035
+design bull ring of Ba'al Hadad~
+the bull ring of Ba'al Hadad design~
+The bull ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: bull ring of Ba'al Hadad.
+~
+7 0 a 1
+12034 0 0
+0 0
+S
 #12036
 ring clouded ba'al baal hadad~
 the clouded ring of Ba'al Hadad~
@@ -464,6 +474,16 @@ A
 C
 225 350
 T 12004
+S
+#12037
+design clouded ring of Ba'al Hadad~
+the clouded ring of Ba'al Hadad design~
+The clouded ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: clouded ring of Ba'al Hadad.
+~
+7 0 a 1
+12036 0 0
+0 0
 S
 #12038
 ring lightning ba'al baal hadad~
@@ -491,6 +511,16 @@ C
 225 350
 T 12004
 S
+#12039
+design lightning ring of Ba'al Hadad~
+the lightning ring of Ba'al Hadad design~
+The lightning ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: lightning ring of Ba'al Hadad.
+~
+7 0 a 1
+12038 0 0
+0 0
+S
 #12040
 ring thunderbolt bolt ba'al baal hadad~
 the thunderbolt ring of Ba'al Hadad~
@@ -516,6 +546,16 @@ A
 C
 225 350
 T 12004
+S
+#12041
+design thunderbolt ring of Ba'al Hadad~
+the thunderbolt ring of Ba'al Hadad design~
+The thunderbolt ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: thunderbolt ring of Ba'al Hadad.
+~
+7 0 a 1
+12040 0 0
+0 0
 S
 #12042
 ring hurricane Ba'al baal hadad~
@@ -546,6 +586,16 @@ C
 225 350
 T 12004
 S
+#12043
+design hurricane ring of Ba'al Hadad~
+the hurricane ring of Ba'al Hadad design~
+The hurricane ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: hurricane ring of Ba'al Hadad.
+~
+7 0 a 1
+12042 0 0
+0 0
+S
 #12044
 ring stormwashed washed ba'al baal hadad~
 the stormwashed ring of Ba'al Hadad~
@@ -573,6 +623,16 @@ C
 225 350
 T 12004
 S
+#12045
+design stormwashed ring of Ba'al Hadad~
+the stormwashed ring of Ba'al Hadad design~
+The stormwashed ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: stormwashed ring of Ba'al Hadad.
+~
+7 0 a 1
+12044 0 0
+0 0
+S
 #12047
 whistle bronze bull~
 a bronze bull whistle~
@@ -596,5 +656,53 @@ name Ba'al Hadad. Type 'use whistle' to summon a new flying mount.
 12048 0 0
 14 0
 T 10263
+S
+#12049
+stormcaller wand ba'al baal hadad~
+the stormcaller of Ba'al Hadad~
+A stormcaller wand is lying here.~
+   This wand is as solid as argentine imperium, but weighs nearly nothing,
+having been forged from a lightningbolt and bound with the southern winds. It
+bears the name of Ba'al Hadad, God of Storms. You can 'use' the stormcaller to
+call up a storm.
+~
+3 p ao 2
+0 0 0
+0 0
+T 12049
+S
+#12050
+stormcloud cloud~
+a stormcloud~
+A stormcloud hangs low in the sky, pouring ceaseless rain.~
+   This cloud is tall and dark, but unnaturally small. Its pouring rains drench
+the land only in this small area, and it doesn't seem to be moving.
+~
+3 0 0 8
+10800 0 0
+10 144
+T 10165
+T 12050
+T 12051
+S
+#12051
+tunic ugarit ba'al baal hadad~
+the Ugarit tunic of Ba'al Hadad~
+The Ugarit tunic of Ba'al Hadad is lying here.~
+   This pleated leather tunic looks primitive, to be sure. But it was made for
+a true god, and the power of the Storm is stitched into every part of it. Only
+the worthy dare wear it.
+~
+2 o ad 3
+0 0 0
+7 0
+A
+5 1 0
+M
+14
+The storm god $n hovers before you!~
+M
+13
+The storm goddess $n hovers before you!~
 S
 $
