@@ -1503,6 +1503,14 @@ WHO_SORTER(sort_who_access_level) {
 }
 
 
+WHO_SORTER(sort_who_level) {
+	if (a->computed_level != b->computed_level) {
+		return a->computed_level - b->computed_level;
+	}
+	return 0;
+}
+
+
 WHO_SORTER(sort_who_role_level) {
 	if (a->role != b->role) {
 		return a->role - b->role;
@@ -1694,7 +1702,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 	
 	// WHO_x
 	const char *who_titles[] = { "Mortals", "Gods", "Immortals" };
-	WHO_SORTER(*who_sorters[]) = { sort_who_role_level, sort_who_role_level, sort_who_access_level };
+	WHO_SORTER(*who_sorters[]) = { sort_who_level, sort_who_level, sort_who_access_level };
 
 	*whobuf = '\0';	// lines of chars
 	size = 0;	// whobuf size
