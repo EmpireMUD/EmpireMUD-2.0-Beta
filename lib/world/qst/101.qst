@@ -286,7 +286,7 @@ the finished product back to the wandering merchant.
    You hand the merchant the herbicide. His face lights up to see so much of
 it, and you can tell he's eager to douse some of the animated cacti with it.
 ~
-10 cd 75 100 1440
+11 cd 75 100 1440
 A
 1 10146
 P
@@ -311,7 +311,6 @@ R
 0 0 3
 R
 2 10169 1
-T 10142
 T 10173
 T 18259
 W
