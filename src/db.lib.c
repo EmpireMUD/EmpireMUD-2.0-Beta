@@ -8381,7 +8381,8 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	struct room_extra_data *red, *next_red;
 	char temp[MAX_STRING_LENGTH];
 	struct depletion_data *dep;
-	struct track_data *track;
+	struct track_data *track, *next_track;
+	time_t now = time(0);
 	
 	// E affects
 	if (dat->base_affects) {
@@ -8411,8 +8412,14 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	}
 	
 	// Y tracks
-	LL_FOREACH(dat->tracks, track) {
-		fprintf(fl, "Y\n%d %d %ld %d\n", track->player_id, track->mob_num, track->timestamp, track->dir);
+	LL_FOREACH_SAFE(dat->tracks, track, next_track) {
+		if (now - track->timestamp > SECS_PER_REAL_HOUR) {
+			LL_DELETE(dat->tracks, track);
+			free(track);
+		}
+		else {
+			fprintf(fl, "Y\n%d %d %ld %d\n", track->player_id, track->mob_num, track->timestamp, track->dir);
+		}
 	}
 
 	// Z: extra data
