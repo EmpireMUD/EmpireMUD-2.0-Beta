@@ -983,6 +983,8 @@ CONFIG_HANDLER(config_edit_who_list_sort) {
 
 
 CONFIG_HANDLER(config_show_who_list_sort) {
+	int iter;
+	
 	// basic sanitation
 	if (!ch || !config) {
 		log("SYSERR: config_show_who_list_sort called without %s", ch ? "config" : "ch");
@@ -991,6 +993,11 @@ CONFIG_HANDLER(config_show_who_list_sort) {
 	}
 	
 	msg_to_char(ch, "&y%s&0: %s\r\n", config->key, who_list_sort_types[config->data.int_val]);
+	
+	msg_to_char(ch, "Valid sorts are:\r\n");
+	for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
+		msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
+	}
 }
 
 
