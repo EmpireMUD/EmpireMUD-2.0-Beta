@@ -1039,7 +1039,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			}
 			
 			// auto-attack if used on an enemy
-			if (violent && CAN_SEE(cvict, ch) && !FIGHTING(cvict)) {
+			if (violent && AWAKE(cvict) && !FIGHTING(cvict)) {
 				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
 			}
 		}
