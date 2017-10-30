@@ -3116,10 +3116,11 @@ void death_log(char_data *ch, char_data *killer, int type) {
 * @param bool melee if TRUE goes straight to melee; otherwise WAITING
 */
 void engage_combat(char_data *ch, char_data *vict, bool melee) {
-	// nope
+	/* Don't bother with can-fight here -- it has certainly been pre-checked before anything that would engage combat
 	if (!can_fight(ch, vict)) {
 		return;
 	}
+	*/
 
 	// this prevents players from using things that engage combat over and over
 	if (GET_POS(vict) == POS_INCAP && GET_POS(ch) >= POS_FIGHTING) {
