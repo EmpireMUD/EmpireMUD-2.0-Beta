@@ -3116,31 +3116,40 @@ void death_log(char_data *ch, char_data *killer, int type) {
 * @param bool melee if TRUE goes straight to melee; otherwise WAITING
 */
 void engage_combat(char_data *ch, char_data *vict, bool melee) {
+	log("test: 1");
 	// nope
 	if (!can_fight(ch, vict)) {
+		log("test: 2");
 		return;
 	}
 
 	// this prevents players from using things that engage combat over and over
 	if (GET_POS(vict) == POS_INCAP && GET_POS(ch) >= POS_FIGHTING) {
+	log("test: 3");
 		perform_execute(ch, vict, TYPE_UNDEFINED, DAM_PHYSICAL);
 		return;
 	}
 	else if (GET_POS(ch) == POS_INCAP && GET_POS(vict) >= POS_FIGHTING) {
+	log("test: 4");
 		perform_execute(vict, ch, TYPE_UNDEFINED, DAM_PHYSICAL);
 		return;
 	}
+	log("test: 5");
 
 	if (!FIGHTING(ch) && AWAKE(ch)) {
+	log("test: 6");
 		set_fighting(ch, vict, melee ? FMODE_MELEE : FMODE_WAITING);
 	}
 	if (!FIGHTING(vict) && AWAKE(vict)) {
 		unsigned long long timestamp = microtime();
+	log("test: 7");
 		set_fighting(vict, ch, melee ? FMODE_MELEE : FMODE_WAITING);
 		
 		GET_LAST_SWING_MAINHAND(vict) = timestamp - (get_combat_speed(vict, WEAR_WIELD)/2 SEC_MICRO);	// half-round time offset
 		GET_LAST_SWING_OFFHAND(vict) = timestamp - (get_combat_speed(vict, WEAR_HOLD)/2 SEC_MICRO);	// half-round time offset
 	}
+	
+	log("test: 8");
 }
 
 
