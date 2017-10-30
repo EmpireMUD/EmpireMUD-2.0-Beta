@@ -816,12 +816,8 @@ void save_whole_world(void) {
 	
 	last = -1;
 	
-	log("debug 1:\t%lld", microtime());
-	
 	// must sort first
 	sort_world_table();
-	
-	log("debug 2:\t%lld", microtime());
 	
 	// open index file
 	if (need_world_index) {
@@ -829,7 +825,6 @@ void save_whole_world(void) {
 			syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write index file '%s': %s", WLD_PREFIX INDEX_FILE TEMP_SUFFIX, strerror(errno));
 			return;
 		}
-		log("debug 3:\t%lld", microtime());
 	}
 	
 	HASH_ITER(hh, world_table, iter, next_iter) {
@@ -847,7 +842,6 @@ void save_whole_world(void) {
 			}
 			fl = open_world_file(block);
 			last = block;
-			log("debug 3.5:\t%lld", microtime());
 		}
 		
 		// only save a room at all if it couldn't be unloaded
@@ -855,26 +849,21 @@ void save_whole_world(void) {
 			write_room_to_file(fl, iter);
 		}
 	}
-	log("debug 4:\t%lld", microtime());
 	
 	// cleanup
 	if (fl) {
 		save_and_close_world_file(fl, last);
-		log("debug 5:\t%lld", microtime());
 	}
 	if (index) {
 		fprintf(index, "$\n");
 		fclose(index);
 		rename(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, WLD_PREFIX INDEX_FILE);
 		need_world_index = FALSE;
-		log("debug 6:\t%lld", microtime());
 	}
 	
 	// ensure this
 	save_instances();
-	log("debug 7:\t%lld", microtime());
 	save_world_map_to_file();
-	log("debug 8:\t%lld", microtime());
 }
 
 
