@@ -165,11 +165,11 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 	
 	// modify caps based on abilities/roles
 	if (!IS_NPC(victim) || !MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP)) {
-		if (GET_CLASS_ROLE(victim) != ROLE_TANK && (GET_CLASS_ROLE(victim) != ROLE_SOLO || !check_solo_role(victim))) {
+		if (IS_NPC(victim) || (GET_CLASS_ROLE(victim) != ROLE_TANK && (GET_CLASS_ROLE(victim) != ROLE_SOLO || !check_solo_role(victim)))) {
 			min_npc_to_hit += 20;	// higher hit min if not in tank/solo-role
 			min_pc_to_hit += 20;
 		}
-		if (!has_player_tech(victim, PTECH_DODGE_CAP)) {
+		if (IS_NPC(victim) || !has_player_tech(victim, PTECH_DODGE_CAP)) {
 			min_npc_to_hit += 20;	// higher hit min if lacking dodge-cap tech
 			min_pc_to_hit += 20;
 		}
