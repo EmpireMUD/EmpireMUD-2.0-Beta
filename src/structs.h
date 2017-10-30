@@ -24,6 +24,7 @@
 *     Building Defines
 *     Character Defines
 *     Class Defines
+*     Config Defines
 *     Craft Defines
 *     Crop Defines
 *     Empire Defines
@@ -874,6 +875,14 @@ typedef struct vehicle_data vehicle_data;
 #define ROLE_UTILITY  5
 #define ROLE_SOLO  6
 #define NUM_ROLES  7
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CONFIG DEFINES //////////////////////////////////////////////////////////
+
+// WHO_LIST_SORT_x: config game who_list_sort [type]
+#define WHO_LIST_SORT_ROLE_LEVEL  0
+#define WHO_LIST_SORT_LEVEL  1
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -40,6 +40,7 @@
 *   World Configs
 *   Config System: Data
 *   Config System: Editors
+*   Config System: Custom Editors
 *   Config System: Show Funcs
 *   Config System: Handlers
 *   Config System: I/O
@@ -333,6 +334,14 @@ const char *config_types[] = {
 	"int",
 	"int array",
 	"short string",
+	"\n"
+};
+
+
+// WHO_LIST_SORT_x: config game who_list_sort [type]
+const char *who_list_sort_types[] = {
+	"role-then-level",
+	"level",
 	"\n"
 };
 
@@ -931,6 +940,57 @@ CONFIG_HANDLER(config_edit_typelist) {
 	if (changed) {
 		save_config_system();
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CONFIG SYSTEM: CUSTOM EDITORS ///////////////////////////////////////////
+
+CONFIG_HANDLER(config_edit_who_list_sort) {
+	int input, iter, old;
+	
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_edit_who_list_sort called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error editing type.\r\n");
+		return;
+	}
+	if (config->type != CONFTYPE_INT) {
+		log("SYSERR: config_edit_who_list_sort called on non-int key %s", config->key);
+		msg_to_char(ch, "Error editing type.\r\n");
+		return;
+	}
+	
+	if ((input = search_block(argument, who_list_sort_types, FALSE)) == NOTHING) {
+		msg_to_char(ch, "Invalid option '%s'. Valid sorts are:\r\n", argument);
+		for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
+		}
+		return;
+	}
+	
+	if (config->data.int_val == input) {
+		msg_to_char(ch, "It is already set to that sort.\r\n");
+		return;
+	}
+	
+	old = config->data.int_val;
+	config->data.int_val = input;
+	save_config_system();
+	syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s set %s to %s, from %s", GET_NAME(ch), config->key, who_list_sort_types[input], who_list_sort_types[old]);
+	msg_to_char(ch, "%s: set to %s, from %s.\r\n", config->key, who_list_sort_types[input], who_list_sort_types[old]);
+}
+
+
+CONFIG_HANDLER(config_show_who_list_sort) {
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_show_who_list_sort called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error showing type.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "&y%s&0: %s\r\n", config->key, who_list_sort_types[config->data.int_val]);
 }
 
 
@@ -1616,6 +1676,8 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "no_person", CONFTYPE_SHORT_STRING, "bad target error for no person");
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
 	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
+	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_INT, "what order the who-list appears in");
+		init_config_custom("who_list_sort", config_show_who_list_sort, config_edit_who_list_sort, NULL);
 
 	// actions
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");
