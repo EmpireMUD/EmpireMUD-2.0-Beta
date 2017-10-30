@@ -800,7 +800,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		return;
 	}
 	
-	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE));
+	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT));
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	
 	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && violent) {
@@ -857,7 +857,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// ready to start the ability:
-	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+	if (violent) {
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
 		}
@@ -1025,27 +1025,35 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	*/
 	
+	msg_to_char(ch, "test 1\r\n");
 	if (data->success) {
+		msg_to_char(ch, "test 2\r\n");
 		// experience
 		if (!cvict || can_gain_exp_from(ch, cvict)) {
 			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+			msg_to_char(ch, "test 3\r\n");
 		}
 		
 		// check if should be in combat
 		if (cvict && cvict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(cvict) && !IS_DEAD(cvict)) {
+			msg_to_char(ch, "test 4\r\n");
 			// auto-assist if we used an ability on someone who is fighting
-			if (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && FIGHTING(cvict) && !FIGHTING(ch)) {
+			if (!violent && FIGHTING(cvict) && !FIGHTING(ch)) {
 				engage_combat(ch, FIGHTING(cvict), ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
+				msg_to_char(ch, "test 5\r\n");
 			}
 			
 			// auto-attack if used on an enemy
-			if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && CAN_SEE(cvict, ch) && !FIGHTING(cvict)) {
+			if (violent && CAN_SEE(cvict, ch) && !FIGHTING(cvict)) {
 				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
+				msg_to_char(ch, "test 6\r\n");
 			}
 		}
+		msg_to_char(ch, "test 7\r\n");
 	}
 	else if (!data->no_msg) {
 		msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
+		msg_to_char(ch, "test 8\r\n");
 	}
 }
 
