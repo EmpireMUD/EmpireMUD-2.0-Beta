@@ -1230,7 +1230,7 @@ ACMD(do_pickpocket) {
 		
 		low_level = (get_approximate_level(ch) + 50 < get_approximate_level(vict));
 		
-		if (!low_level && (!CAN_SEE(vict, ch) || !AWAKE(vict) || AFF_FLAGGED(vict, AFF_STUNNED) || player_tech_skill_check(ch, PTECH_PICKPOCKET, DIFF_EASY))) {
+		if (!low_level && (!CAN_SEE(vict, ch) || !AWAKE(vict) || AFF_FLAGGED(vict, AFF_STUNNED | AFF_HARD_STUNNED) || player_tech_skill_check(ch, PTECH_PICKPOCKET, DIFF_EASY))) {
 			// success!
 			SET_BIT(MOB_FLAGS(vict), MOB_PICKPOCKETED);
 			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);

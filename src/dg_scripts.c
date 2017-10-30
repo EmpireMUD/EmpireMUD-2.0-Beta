@@ -1047,7 +1047,7 @@ void script_trigger_check(void) {
 			case MOB_TRIGGER: {
 				mob = (char_data *)sc->attached_to;
 				in_room = IN_ROOM(mob);
-				if (GET_POS(mob) < POS_SLEEPING || IS_DEAD(mob) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
+				if (GET_POS(mob) < POS_SLEEPING || IS_DEAD(mob) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
 					fail = TRUE;
 				}
 				if (AFF_FLAGGED(mob, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
@@ -3028,7 +3028,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "disabled")) {
 						// things which would keep a character from acting
-						if (EXTRACTED(c) || GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED)) {
+						if (EXTRACTED(c) || GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED | AFF_HARD_STUNNED)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -5756,9 +5756,14 @@ room_data *dg_room_of_obj(obj_data *obj) {
 
 /* create a UID variable from the id number */
 void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
+	
 	char junk[MAX_INPUT_LENGTH], varname[MAX_INPUT_LENGTH];
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
 	char uid[MAX_INPUT_LENGTH];
+	struct instance_data *inst;
+	char_data *mob;
 
 	*uid = '\0';
 	half_chop(cmd, junk, cmd);    /* makeuid */
@@ -5849,25 +5854,42 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				case BLD_TRIGGER:
 				case ADV_TRIGGER:
 					r = (room_data*)go;
-					if (*name) {
+					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE))) {
+						// instance lookup
+						r = find_room_template_in_instance(inst, atoi(name+1));
+					}
+					else if (*name) {
 						r = get_room(r, name);
 					}
 					break;
 				case OBJ_TRIGGER:
 					r = obj_room((obj_data*)go);
-					if (*name) {
+					if (*name == 'i' && isdigit(*(name+1)) && r && (inst = find_instance_by_room(r, FALSE))) {
+						// instance lookup
+						r = find_room_template_in_instance(inst, atoi(name+1));
+					}
+					else if (*name) {
 						r = get_room(r, name);
 					}
 					break;
 				case MOB_TRIGGER:
-					r = IN_ROOM((char_data*)go);
-					if (*name) {
+					mob = (char_data *)go;
+					r = IN_ROOM(mob);
+					if (*name == 'i' && isdigit(*(name+1)) && MOB_INSTANCE_ID(mob) != NOTHING && (inst = get_instance_by_id(MOB_INSTANCE_ID(mob)))) {
+						// instance lookup
+						r = find_room_template_in_instance(inst, atoi(name+1));
+					}
+					else if (*name) {
 						r = get_room(r, name);
 					}
 					break;
 				case VEH_TRIGGER: {
 					r = IN_ROOM((vehicle_data*)go);
-					if (*name) {
+					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE))) {
+						// instance lookup
+						r = find_room_template_in_instance(inst, atoi(name+1));
+					}
+					else if (*name) {
 						r = get_room(r, name);
 					}
 					break;

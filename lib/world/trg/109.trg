@@ -154,7 +154,7 @@ switch %random.4%
     if (%target%)
       %send% %target% &r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&0
       %echoaround% %target% %self.name% hurls a rock at %target.name% with %self.hisher% tail, stunning %target.himher% momentarily!
-      dg_affect %target% STUNNED on 10
+      dg_affect %target% HARD-STUNNED on 10
       %damage% %target% 150 physical
     end
   break
@@ -262,7 +262,7 @@ remote enrage_counter %self.id%
 if %enraged%
   if %enraged% == 2
     * Pretend to flee
-    if %self.aff_flagged(STUNNED)%
+    if %self.aff_flagged(HARD-STUNNED)%
       %echo% %self.name% shakes his head and recovers from stunning!
     end
     if %self.aff_flagged(ENTANGLED)%
@@ -317,9 +317,7 @@ switch %random.4%
     eval target %actor%
     %send% %target% %self.name% trips you and bashes you with the pommel of %self.hisher% sword, stunning you!
     %echoaround% %target% %self.name% trips %target.name% and bashes %target.himher% with the pommel of %self.hisher% sword, stunning %target.himher% momentarily!
-    if !%target.aff_flagged(STUNNED) && !%target.aff_flagged(!STUN)%
-      dg_affect %target% STUNNED on 15
-    end
+    dg_affect %target% HARD-STUNNED on 15
     %damage% %target% 75 physical
   break
   * Blind on healer (whoever has the most max mana at least)

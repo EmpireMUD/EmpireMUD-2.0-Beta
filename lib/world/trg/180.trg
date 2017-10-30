@@ -130,7 +130,7 @@ if %phase%==3
         %echoaround% %actor% The earth shakes as %self.name% punches %actor.name%, stunning %actor.himher%!
         %damage% %actor% 100 physical
         %damage% %actor% 50 fire
-        dg_affect %actor% STUNNED on 10
+        dg_affect %actor% HARD-STUNNED on 10
       else
         %send% %actor% You leap out of the way of %self.name%'s fist at the last second!
         %echoaround% %actor% %actor.name% leaps out of the way of %self.name%'s fist at the last second!

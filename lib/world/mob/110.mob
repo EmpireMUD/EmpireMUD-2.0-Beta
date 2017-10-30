@@ -68,15 +68,6 @@ A poacher is creeping through the brush.
 1 0 9 2
 T 11007
 S
-#11008
-poacher roc~
-a roc poacher~
-A roc poacher is standing here.
-~
-50 75 bdov c
-0 0 0 1
-T 11007
-S
 #11010
 spawner~
 the invisible carcass spawner~

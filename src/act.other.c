@@ -45,6 +45,7 @@ extern struct instance_data *find_matching_instance_for_shared_quest(char_data *
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
+extern bool is_ignoring(char_data *ch, char_data *victim);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_as_familiar(char_data *mob, char_data *master);
 extern char *show_color_codes(char *string);
@@ -1373,8 +1374,6 @@ ACMD(do_alternate) {
 
 
 ACMD(do_beckon) {
-	extern bool is_ignoring(char_data *ch, char_data *victim);
-	
 	char arg[MAX_INPUT_LENGTH];
 	char_data *vict;
 	bool any;
@@ -1820,6 +1819,10 @@ ACMD(do_group) {
 		}
 		else if (IS_NPC(vict)) {
 			msg_to_char(ch, "You can't invite NPCs to a group.\r\n");
+			return;
+		}
+		else if (is_ignoring(vict, ch)) {
+			msg_to_char(ch, "You can't invite someone who is ignoring you to a group.\r\n");
 			return;
 		}
 		else if (GROUP(vict)) {

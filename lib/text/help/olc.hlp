@@ -963,6 +963,7 @@ Available techs are:
  &cTeleport-City&0 * - Teleport can target your cities (requires an ability).
  &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
  &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
+ &cDodge-Cap&0 - Improves the player's maximum dodge percent.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -1396,6 +1397,8 @@ The following affect flags are available:
  !STUN - Immune to stun effects.
  !DRINK-BLOOD - Can't be bitten/sired by vampires.
  DISTRACTED - Cannot perform timed actions.
+ HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
+ IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -4232,7 +4235,7 @@ magical and a recipe could require the non-magical version.
 
 Available flags:
  &canimal&0 - From an animal (like animal fibers)
- &cbunch&0 - A group of things
+ &cbunch of&0 - A group of things
  &cdesert&0 - Comes from the desert (especially foods)
  &cfine&0 - High-quality
  &chard&0 - As opposed to soft

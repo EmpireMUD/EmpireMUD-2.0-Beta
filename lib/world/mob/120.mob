@@ -113,4 +113,108 @@ The giant hawk Yatpan alights on the ground.
 100 125 de m
 0 0 2 10
 S
+#12030
+hadad ba'al baal god~
+the god Ba'al Hadad~
+The storm god Ba'al Hadad towers over you, lightning in his eyes (difficulty).
+~
+225 325 aduyB ciE
+1 0 2 1
+I 4 12034 16.67 1 a  # LOOT: the bronze bull ring of Ba'al Hadad
+I 4 12036 16.67 1 a  # LOOT: the clouded ring of Ba'al Hadad
+I 4 12038 16.67 1 a  # LOOT: the lightning ring of Ba'al Hadad
+I 4 12040 16.67 1 a  # LOOT: the thunderbolt ring of Ba'al Hadad
+I 4 12042 16.66 1 a  # LOOT: the hurricane ring of Ba'al Hadad
+I 4 12044 16.66 1 a  # LOOT: the stormwashed ring of Ba'al Hadad
+M
+1
+Our time will come again!~
+M
+1
+The old gods will come for you, your crops, your stores, for your empire itself!~
+M
+1
+No one escapes my lightning!~
+M
+1
+No one escapes my thunderbolts!~
+M
+1
+How dare you challenge the old gods!?~
+M
+1
+You will drown in the deluge of my storms, as your ancestors did!~
+M
+0
+Stormclouds gather around Ba'al Hadad.~
+M
+0
+Lightning strikes the ground near you, sending a shiver up your spine.~
+M
+0
+Plants grow up around the feet of Ba'al Hadad as spring rains fall around him.~
+T 12001
+T 12003
+T 12006
+T 12030
+T 12031
+T 12032
+T 12035
+T 12036
+T 12037
+T 12038
+T 12041
+S
+#12031
+storm coming stormcloud massive baalhadadstormcloud~
+the Coming Storm~
+A massive stormcloud envelops and suffocates you!
+~
+225 325 bdnyA ci
+0 0 2 21
+T 12033
+T 12039
+T 12041
+S
+#12047
+bull bronze little~
+the little bronze bull~
+A little bronze bull stands with its horns held high.
+~
+1 1 bdoD dn
+0 0 0 27
+M
+0
+Smoke puffs from $n's nostrils.~
+T 9901
+T 9902
+S
+#12048
+lightning horse bolt~
+the lightning~
+A bolt of lightning in the shape of a horse appears before you.
+~
+100 125 de m
+0 0 2 21
+S
+#12052
+worshipper~
+a worshipper of the storm god~
+A worshipper of the storm god bows low, begging for rain.
+~
+40 60 dov 0
+1 0 0 21
+M
+1
+Praise be to the Stormlord!~
+M
+1
+Tut tut, looks like rain.~
+M
+1
+My Lord, bring rain to the crops!~
+M
+1
+The storm will drown this world.~
+S
 $

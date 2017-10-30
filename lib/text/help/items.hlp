@@ -37,7 +37,7 @@ The Block component is the building block of most buildings, and consists of
 stone blocks and clay bricks. Any recipes that call for (block) allow the use
 of either, while some buildings require a specific one:
 
-bunch:  clay bricks
+bunch of:  clay bricks
 single:  stone block
 
 You can quarry stone blocks from the ground at a quarry. They are used in

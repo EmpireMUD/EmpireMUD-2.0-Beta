@@ -607,4 +607,124 @@ DoT~
 4 0
 0 0 0 0
 S
+#3086
+intensified~
+4 0
+0 0 0 0
+T0
+Your intensity ends.~
+S
+#3087
+abated~
+4 0
+0 0 0 0
+T0
+You no longer feel abated.~
+T2
+Your magical abilities are abated!~
+T3
+$n seems weaker.~
+S
+#3088
+amplified~
+4 0
+0 0 0 0
+T0
+You no longer feel amplified.~
+T2
+You feel amplified!~
+S
+#3089
+beguiled~
+4 0
+0 0 0 0
+T0
+You are no longer beguiled.~
+T2
+You're beguiled!~
+T3
+$e seems beguiled.~
+S
+#3090
+undermined~
+4 0
+0 0 0 0
+T0
+You fix your armor so it is no longer undermined.~
+T2
+Your armor is undermined!~
+S
+#3091
+exhausted~
+4 0
+0 0 0 0
+T0
+You are no longer exhausted.~
+T2
+You feel exhausted!~
+S
+#3092
+withstanding~
+4 0
+0 0 0 0
+T0
+You are no longer withstanding.~
+S
+#3093
+hindered~
+4 0
+0 0 0 0
+T0
+You no longer feel hindered.~
+T2
+You feel hindered and have trouble attacking!~
+S
+#3094
+hobbled~
+4 0
+0 0 0 0
+T0
+You no longer feel hobbled.~
+T2
+You feel hobbled and have trouble casting!~
+S
+#3095
+adaptation~
+4 0
+0 0 0 0
+T0
+Your adaptation is no longer effective.~
+S
+#3096
+lacerated~
+4 0
+0 0 0 0
+T0
+Your lacerations stop aching.~
+T2
+Your open wounds make every blow hurt more.~
+S
+#3097
+infected~
+4 0
+0 0 0 0
+T0
+You no longer feel the infection burning at you.~
+T2
+You feel the infection burning away at you from the inside!~
+S
+#3098
+prepared~
+4 0
+0 0 0 0
+T0
+Your preparations expire.~
+S
+#3099
+gleaming~
+4 0
+0 0 0 0
+T0
+You are no longer gleaming.~
+S
 $

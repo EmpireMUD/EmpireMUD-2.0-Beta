@@ -24,6 +24,7 @@
 *     Building Defines
 *     Character Defines
 *     Class Defines
+*     Config Defines
 *     Craft Defines
 *     Crop Defines
 *     Empire Defines
@@ -830,6 +831,8 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 #define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire
 #define AFF_DISTRACTED  BIT(33)	// H. Player cannot perform timed actions
+#define AFF_HARD_STUNNED  BIT(34)	// I. Hard stuns are uncleansable and don't trigger stun-immunity
+#define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
 
 
 // Injury flags -- IS_INJURED
@@ -872,6 +875,14 @@ typedef struct vehicle_data vehicle_data;
 #define ROLE_UTILITY  5
 #define ROLE_SOLO  6
 #define NUM_ROLES  7
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CONFIG DEFINES //////////////////////////////////////////////////////////
+
+// WHO_LIST_SORT_x: config game who_list_sort [type]
+#define WHO_LIST_SORT_ROLE_LEVEL  0
+#define WHO_LIST_SORT_LEVEL  1
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1964,6 +1975,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_TELEPORT_CITY  49	// teleports can target cities
 #define PTECH_TWO_HANDED_WEAPONS  50	// can wield two-handed weapons
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
+#define PTECH_DODGE_CAP  52	// improves your dodge cap
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

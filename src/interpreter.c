@@ -1452,7 +1452,7 @@ bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invu
 	else if (IS_INJURED(ch, INJ_STAKED) && min_pos >= POS_SLEEPING && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't do that while staked!\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_STUNNED) && min_pos >= POS_SLEEPING && !IS_IMMORTAL(ch)) {
+	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) && min_pos >= POS_SLEEPING && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't do that while stunned!\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_EARTHMELD) && min_pos >= POS_SLEEPING) {

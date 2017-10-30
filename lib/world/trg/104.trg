@@ -193,7 +193,7 @@ else
     case 2
       %send% %actor% %self.name% stares into your eyes. You can't move!
       %echoaround% %actor% %self.name% stares into %actor.name%'s eyes. %actor.name% seems unable to move!
-      dg_affect %actor% STUNNED on 10
+      dg_affect %actor% HARD-STUNNED on 10
     break
     case 3
       %echo% %self.name% raises %self.hisher% arms and the floor begins to rumble...

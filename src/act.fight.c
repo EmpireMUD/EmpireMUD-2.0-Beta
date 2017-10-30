@@ -75,7 +75,7 @@ ACMD(do_approach) {
 	else if (FIGHT_MODE(ch) == FMODE_WAITING) {
 		msg_to_char(ch, "You're already trying to approach!\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_ENTANGLED)) {
+	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_ENTANGLED)) {
 		msg_to_char(ch, "You can't try to approach right now!\r\n");
 	}
 	else {

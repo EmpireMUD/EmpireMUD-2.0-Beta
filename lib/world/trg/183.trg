@@ -164,7 +164,7 @@ switch %random.4%
       set max_cycles 2
     end
     eval duration %max_cycles%*5
-    dg_affect %actor% STUNNED on %duration%
+    dg_affect %actor% HARD-STUNNED on %duration%
     set cycle 1
     while %cycle% <= %max_cycles%
       if %actor.health% > -10
@@ -225,7 +225,7 @@ if !%self.running%
 end
 %send% %actor% You start swimming.
 %echoaround% %actor% %actor.name% starts swimming.
-dg_affect %actor% STUNNED on 10
+dg_affect %actor% HARD-STUNNED on 10
 set swimming_%actor.id% 1
 remote swimming_%actor.id% %self.id%
 ~

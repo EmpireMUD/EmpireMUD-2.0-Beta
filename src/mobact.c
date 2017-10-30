@@ -596,7 +596,7 @@ void mobile_activity(void) {
 		next_ch = ch->next;
 		moved = FALSE;
 
-		if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED))
+		if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED))
 			continue;
 		if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED) || IS_INJURED(ch, INJ_TIED) || GET_LED_BY(ch))
 			continue;
@@ -1281,7 +1281,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 
 	// health
 	value = (1.5 * low_level) + (3.25 * mid_level) + (5.0 * high_level) + (12 * over_level);
-	target = 40.0;	// max multiplier of health flags
+	target = 45.0;	// max multiplier of health flags
 	if (MOB_FLAGGED(mob, MOB_GROUP) && MOB_FLAGGED(mob, MOB_HARD)) {	// boss
 		value *= MOB_FLAGGED(mob, MOB_TANK) ? (1.0 * target) : (0.75 * target);
 	}
@@ -1363,6 +1363,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	if (!attack_hit_info[MOB_ATTACK_TYPE(mob)].disarmable) {
 		value *= 0.7;	// disarm would cut damage in half; this brings it closer together
 	}
+	value *= 1.15;	// 15% more damage from all sources
 	mob->mob_specials.damage = MAX(1, (int) ceil(value));
 	
 	// to-hit

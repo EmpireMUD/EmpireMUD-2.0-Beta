@@ -73,7 +73,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 #define drink_ROOM  1
 
 // ONLY flags to show on identify / warehouse inv
-bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP;
+bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP | OBJ_UNIQUE;
 
 
  //////////////////////////////////////////////////////////////////////////////

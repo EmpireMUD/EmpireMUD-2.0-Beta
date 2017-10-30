@@ -185,7 +185,7 @@ if %heroic_mode%
   while %person%
     eval check %%person.is_enemy(%self%)%%
     if %check%
-      dg_affect #18803 %person% STUNNED on 5
+      dg_affect #18803 %person% HARD-STUNNED on 5
       %damage% %person% 50
     end
     eval person %person.next_in_room%

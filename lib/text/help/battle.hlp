@@ -24,6 +24,40 @@ general, these abilities only target NPCs.
 
 Examples: OUTRAGE
 #
+ABATE
+
+Usage:  abate [victim]
+Battle Synergy Ability:  75 Natural Magic
+Linked traits:  Caster role, Intelligence
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  32+ mana (varies with level)
+
+Abate reduces the magical damage dealt by your victim.
+#
+ADAPT
+
+Usage:  adapt
+Battle Synergy Ability:  75 Vampire
+Linked traits:  Melee or Caster role, Wits
+Cooldown:  6 seconds
+Duration:  6 seconds
+Cost:  5 blood
+
+Adapt boosts your physical and magical damage.
+#
+AMPLIFY
+
+Usage:  amplify
+Battle Synergy Ability:  75 High Sorcery
+Linked trait:  Caster role
+Cooldown:  6 seconds
+Duration:  6 seconds
+Cost:  32+ mana (varies with level)
+
+Amplify increases your magical damage for a short time.
+#
 ARCHERY
 
 Archery (Battle ability)
@@ -77,6 +111,18 @@ Only one person in the room may be bash-stunned at a time. Using the ability on
 a second person will release the first one.
 
 Gain experience when you try to bash something.
+#
+BEGUILE
+
+Usage:  beguile [victim]
+Battle Synergy Ability:  75 High Sorcery
+Linked traits:  Caster role, Intelligence
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  22+ mana (varies with level)
+
+Beguile lowers your victim's resistance to magical damage.
 #
 "BIG GAME HUNTER" BGH
 
@@ -214,6 +260,18 @@ Evasion (Battle ability)
 This ability is part of basic combat training and improves your ability to
 fight. It gains experience whenever someone is trying to hit you in combat.
 #
+EXHAUST
+
+Usage:  exhaust [victim]
+Battle Synergy Ability:  75 Stealth
+Linked traits:  Melee role, Charisma
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  22+ move (varies with level)
+
+Exhaust reduces the physical damage dealt by your victim.
+#
 FINESSE
 
 Finesse (Battle ability)
@@ -288,6 +346,18 @@ At class level, this ability becomes a toggle and you can turn it off at will.
 
 Gain experience when you activate Frenzy.
 #
+GLEAM
+
+Usage:  gleam
+Battle Synergy Ability:  75 Trade
+Linked traits:  Tank role
+Cooldown:  30 seconds
+Duration:  30 seconds
+Cost:  21+ move (varies with level)
+
+Your polished, gleaming armor boosts your resistance to physical and magical
+damage.
+#
 HEARTSTOP "HEART STOP"
 
 Heartstop (Battle ability)
@@ -303,6 +373,68 @@ from using their blood to activate their deadly powers!
 Chance of success rises based on your Battle level.
 
 Gain experience when you successfully Heartstop a vampire.
+#
+HINDER
+
+Usage:  hinder [victim]
+Battle Synergy Ability:  75 Survival
+Linked traits:  Tank role, Strength
+Debuff type:  Battle
+Cooldown:  6 seconds
+Duration:  6 seconds
+Cost:  22+ move (varies with level)
+
+Hinder reduces the physical damage done by your victim.
+#
+HOBBLE
+
+Usage:  hobble [victim]
+Battle Synergy Ability:  75 Survival
+Linked traits:  Tank role, Strength
+Debuff type:  Battle
+Cooldown:  6 seconds
+Duration:  6 seconds
+Cost:  8+ move (varies with level)
+
+Hobble reduces the magical damage done by your victim.
+#
+"IMPROVED REFLEXES"
+
+Improved Reflexes (Battle ability)
+
+This ability raises your dodge cap 20% higher than normal. For example, if your
+dodge cap is normally 55%, you can now go as high as 75% chance to dodge.
+
+This ability does not improve your actual chance to dodge, only allows you
+to stack more dodge bonuses from equipment and abilities.
+
+Gain experience when you dodge an attack.
+
+See also: DODGE CAP, REFLEXES
+#
+INFECT
+
+Usage:  infect [victim]
+Battle Synergy Ability:  75 Survival
+Linked traits:  Caster role, Wits
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  3 blood
+
+Infect reduces your victim's magical resistance by infecting them with your
+blood.
+#
+INTENSIFY
+
+Usage:  intensify
+Battle Synergy Ability:  75 Natural Magic
+Linked trait:  Caster role
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  21+ mana (varies with level)
+
+Intensify increases your magical damage for a short time.
 #
 KICK
 
@@ -335,6 +467,19 @@ for your opponent to run to you. Otherwise, it will move you back to ranged
 distance and start the run-in timer.
 
 Gain experience when you kite someone.
+#
+LACERATE
+
+Usage:  lacerate [victim]
+Battle Synergy Ability:  75 Survival
+Linked traits:  Melee role, Wits
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  3 blood
+
+Lacerate reduces your victim's physical resistance by opening up lots of
+tiny cuts.
 #
 "NOBLE BEARING"
 
@@ -400,6 +545,30 @@ Gain experience when you successfully hit with a ranged weapon.
 
 See also: ARCHERY, SHOOT
 #
+PREPARED
+
+Usage:  prepared
+Battle Synergy Ability:  75 Trade
+Linked traits:  Melee role
+Cooldown:  12 seconds
+Duration:  12 seconds
+Cost:  13+ move (varies with level)
+
+Being prepared for battle boosts your physical damage.
+#
+SUNDER
+
+Usage:  sunder [victim]
+Battle Synergy Ability:  75 Trade
+Linked traits:  Tank role
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  11+ move (varies with level)
+
+Sunder opens up holes in your opponent's armor, making them move vulnerable
+to physical damage.
+#
 REFLEXES
 
 Reflexes (Battle ability)
@@ -414,8 +583,7 @@ This dodge bonus is reflected on your 'score'.
 
 Gain experience when someone tries to hit you.
 
-See also: SHIELD BLOCK, QUICK BLOCK, BLOCK ARROWS, MEDIUM ARMOR, OUTRAGE,
-    HEAVY ARMOR, RESCUE, DISARM, DEFEND
+See also: IMPROVED REFLEXES
 #
 RESCUE
 
@@ -545,6 +713,18 @@ melee classes receive this ability.
 Two-handed weapons are more powerful than ordinary weapons and are marked with
 the (2h) tag.
 #
+UNDERMINE
+
+Usage:  undermine [victim]
+Battle Synergy Ability:  75 Stealth
+Linked traits:  Melee role, Charisma
+Debuff type:  Battle
+Cooldown:  30 seconds
+Duration:  30 seconds
+Cost:  42+ move (varies with level)
+
+Undermine decreases your opponent's resistance to physical damage.
+#
 "WARD AGAINST MAGIC" "MAGIC WARD"
 
 Ward Against Magic
@@ -562,5 +742,16 @@ Weapon Proficiency (Battle ability)
 
 This ability allows you to use weapons. You can gain experience with it by
 fighting with any weapon.
+#
+WITHSTAND
+
+Usage:  withstand
+Battle Synergy Ability:  75 Survival
+Linked trait:  Tank role
+Cooldown:  12 seconds
+Duration:  12 seconds
+Cost:  5+ move (varies with level)
+
+Withstand increases your physical resistance.
 #
 $

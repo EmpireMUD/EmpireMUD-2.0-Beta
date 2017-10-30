@@ -870,6 +870,11 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	dam = level / 7.0;
 	dam *= modifier;
 	
+	// full immunity
+	if (AFF_FLAGGED(vict, AFF_IMMUNE_DAMAGE)) {
+		dam = 0;
+	}
+	
 	// guarantee at least 1
 	if (modifier > 0) {
 		dam = reduce_damage_from_skills(dam, vict, killer, dam_type);	// resistance, etc

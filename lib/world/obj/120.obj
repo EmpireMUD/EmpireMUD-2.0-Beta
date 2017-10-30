@@ -60,7 +60,7 @@ neck, enough to protect your heart from mortal strikes. The chain is impossibly
 light despite the glimmer of pure gold, and pulling on it does not cause it to
 tighten.
 ~
-2 amp ac 5
+2 amp ac 6
 0 0 0
 4 0
 A
@@ -79,6 +79,7 @@ A
 5 1 3
 C
 225 350
+T 12004
 S
 #12005
 design golden chain of Anat~
@@ -99,7 +100,7 @@ from the veins of the goddess Anat, virgin warrior of the Old World. The vial
 is suspended from a chain of gold and silver, warm to the touch, and absolutely
 bursting with mana.
 ~
-2 amp ac 5
+2 amp ac 6
 0 0 0
 4 0
 A
@@ -118,6 +119,7 @@ A
 5 1 3
 C
 225 350
+T 12004
 S
 #12007
 design blood of Anat~
@@ -137,7 +139,7 @@ An idol of the old god Anat is dangling here.~
 dangling from a golden necklace. Anat's arm is held high and holding an axe --
 or a club, you aren't sure.
 ~
-2 amp ac 6
+2 amp ac 7
 0 0 0
 4 0
 A
@@ -154,6 +156,7 @@ A
 5 1 3
 C
 225 350
+T 12004
 S
 #12009
 design idol of Anat~
@@ -173,7 +176,7 @@ The hawk pendant of the old god Anat is dangling here.~
 form. The hawk's talons are extended, but its face shows the serenity that only
 a hawk can find in battle.
 ~
-2 amp ac 6
+2 amp ac 7
 0 0 0
 4 0
 A
@@ -190,6 +193,7 @@ A
 5 1 3
 C
 225 350
+T 12004
 S
 #12011
 design hawk pendant of Anat~
@@ -211,7 +215,7 @@ your own heart, beating faster, and faster, and faster, until you can hear
 blood pumping in your ears and you realize the entire world will burn in your
 wake.
 ~
-2 amp ac 7
+2 amp ac 8
 0 0 0
 4 0
 A
@@ -232,6 +236,7 @@ A
 5 1 3
 C
 225 350
+T 12004
 S
 #12013
 design stone of wrath of Anat~
@@ -252,7 +257,7 @@ remains of the old god Mot, slain by the warrior goddess Anat in ancient times.
 It is said that the bearer of these grains shall be a leader among men, capable
 of feats of greatness.
 ~
-2 amp ac 8
+2 amp ac 9
 0 0 0
 4 0
 A
@@ -267,6 +272,7 @@ A
 5 1 3
 C
 225 350
+T 12004
 S
 #12015
 recipe winnowed grain of Anat~
@@ -365,5 +371,417 @@ The warrior-god $n stands valiantly before you!~
 M
 13
 The warrior-goddess $n stands valiantly before you!~
+S
+#12030
+chains ba'al baal hadad~
+the chains of Ba'al Hadad~
+The chains of Ba'al Hadad lie broken on the ground (list, buy).~
+   These chains look like iron, but smell of sulfur and glow as the sun strikes
+them. It appears they once held Ba'al Hadad, storm god of the ancient world.
+Ba'al Hadad brought good fortune and ill, as his storms fed crops but destroyed
+empires. Now these chains are broken, and it seems the stormlord walks the
+Earth once again. Seek him out -- he can't have gone far.
+~
+3 0 0 4
+0 0 0
+2 1152
+S
+#12031
+echoes last ba'al baal hadad~
+the last echoes of Ba'al Hadad~
+The last echoes of Ba'al Hadad fill the air!~
+It would appear someone has defeated Ba'al Hadad.
+~
+3 0 0 4
+0 0 0
+10 16
+T 12005
+S
+#12032
+bindings ba'al baal hadad's hadads~
+Ba'al Hadad's bindings~
+Ba'al Hadad's bindings are piled here.~
+   These strange bindings were once used to imprison one of the old gods. They
+still surge with forgotten power, long lost to the world. These might be
+valuable, to the right person.
+~
+15 0 a 2
+1 0 0
+2 0
+R
+5621 0
+R
+5193 0
+S
+#12034
+ring bronze bull ba'al baal hadad~
+the bronze bull ring of Ba'al Hadad~
+The bronze bull ring of Ba'al Hadad is lying here.~
+   The ring has the shape of a bull, twisted into a loop to fit around your
+finger, with its horns protruding from the top. Wedge shapes pressed into the
+side spell out 'Ba'al Hadad, God of Storms'.
+~
+2 amp ab 7
+0 0 0
+4 0
+A
+18 3 0
+A
+13 3 0
+A
+24 1 0
+A
+12 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+T 12004
+S
+#12035
+design bull ring of Ba'al Hadad~
+the bull ring of Ba'al Hadad design~
+The bull ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: bull ring of Ba'al Hadad.
+~
+7 0 a 1
+12034 0 0
+0 0
+S
+#12036
+ring clouded ba'al baal hadad~
+the clouded ring of Ba'al Hadad~
+The clouded ring of Ba'al Hadad is lying here.~
+   This ring is made of clouded opal which is somehow both diffuse grey and
+shimmering white at the same time. It is pressed with cuneiform wedges to spell
+out 'Ba'al Hadad, God of Storms'.
+~
+2 amp ab 8
+0 0 0
+1 0
+A
+16 1 0
+A
+7 4 0
+A
+23 4 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+T 12004
+S
+#12037
+design clouded ring of Ba'al Hadad~
+the clouded ring of Ba'al Hadad design~
+The clouded ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: clouded ring of Ba'al Hadad.
+~
+7 0 a 1
+12036 0 0
+0 0
+S
+#12038
+ring lightning ba'al baal hadad~
+the lightning ring of Ba'al Hadad~
+The lightning ring of Ba'al Hadad is lying here.~
+   This ring feels like bronze, but it has the shape of a forking arc of
+lighting, as if frozen in time and turned to metal by some arcane craftsman.
+The inside of the ring is pressed with wedge-shaped letters that spell out
+'Ba'al Hadad, God of Storms'.
+~
+2 amp ab 9
+0 0 0
+1 0
+A
+9 1 0
+A
+17 4 0
+A
+22 4 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+T 12004
+S
+#12039
+design lightning ring of Ba'al Hadad~
+the lightning ring of Ba'al Hadad design~
+The lightning ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: lightning ring of Ba'al Hadad.
+~
+7 0 a 1
+12038 0 0
+0 0
+S
+#12040
+ring thunderbolt bolt ba'al baal hadad~
+the thunderbolt ring of Ba'al Hadad~
+The thunderbolt ring of Ba'al Hadad is lying here.~
+   This ring is made of smooth bronze, but as you run your finger over it, it
+begins to vibrate and let out an overpowering clap of thunder, as if someone
+has trapped the coming storm in this tiny artifact. The inside of the ring is
+pressed with wedge-shaped letters spelling out 'Ba'al Hadad, God of Storms'.
+~
+2 amp ab 10
+0 0 0
+1 0
+A
+9 1 0
+A
+17 4 0
+A
+21 4 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+T 12004
+S
+#12041
+design thunderbolt ring of Ba'al Hadad~
+the thunderbolt ring of Ba'al Hadad design~
+The thunderbolt ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: thunderbolt ring of Ba'al Hadad.
+~
+7 0 a 1
+12040 0 0
+0 0
+S
+#12042
+ring hurricane Ba'al baal hadad~
+the hurricane ring of Ba'al Hadad~
+The hurricane ring of Ba'al Hadad is lying here.~
+   This ring seems, at first, to be made of sandstone. But as you slip it onto
+your finger, the sand comes loose and whirls about like a hurricane, encircling
+your finger. It seems to be a totem of Ba'al Hadad, God of Storms.
+~
+2 amp ab 11
+0 0 0
+1 0
+A
+2 1 0
+A
+12 1 0
+A
+24 1 0
+A
+17 3 0
+A
+18 3 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+T 12004
+S
+#12043
+design hurricane ring of Ba'al Hadad~
+the hurricane ring of Ba'al Hadad design~
+The hurricane ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: hurricane ring of Ba'al Hadad.
+~
+7 0 a 1
+12042 0 0
+0 0
+S
+#12044
+ring stormwashed washed ba'al baal hadad~
+the stormwashed ring of Ba'al Hadad~
+The stormwashed ring of Ba'al Hadad is lying here.~
+   This small ring is made of stone, washed over and over by storms until it is
+perfectly smooth. An inscription on the inside reads 'Ba'al Hadad, God of
+Storms'.
+~
+2 amp ab 12
+0 0 0
+1 0
+A
+11 2 0
+A
+6 1 0
+A
+19 1 0
+A
+5 1 0
+A
+5 1 6
+A
+5 1 3
+C
+225 350
+T 12004
+S
+#12045
+design stormwashed ring of Ba'al Hadad~
+the stormwashed ring of Ba'al Hadad design~
+The stormwashed ring of Ba'al Hadad design is on the ground.~
+This design will teach you to forge: stormwashed ring of Ba'al Hadad.
+~
+7 0 a 1
+12044 0 0
+0 0
+S
+#12046
+jar thunder ba'al baal hadad~
+a jar of Ba'al Hadad's thunder~
+A jar of thunder is sitting on the ground.~
+   This ancient clay jar contains the pure thunder of the storm god, Ba'al
+Hadad. You could use this to craft the storm god's own chariot.
+Usage: manufacture stormcloud of Ba'al Hadad
+~
+3 0 a 2
+0 0 0
+6 0
+M
+6
+You open the jar of thunder, which swirls into the air and becomes $V!~
+M
+7
+$n opens a jar of thunder, which swirls into the air and becomes $V!~
+S
+#12047
+whistle bronze bull~
+a bronze bull whistle~
+A bronze bull whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+12047 0 0
+2 0
+T 9900
+S
+#12048
+whistle lightning~
+a lightning whistle~
+A lightning whistle is lying here.~
+   This strange bronze whistle has a lightningbolt carved on it, along with the
+name Ba'al Hadad. Type 'use whistle' to summon a new flying mount.
+~
+3 o a 10
+12048 0 0
+14 0
+T 10263
+S
+#12049
+stormcaller wand ba'al baal hadad~
+the stormcaller of Ba'al Hadad~
+A stormcaller wand is lying here.~
+   This wand is as solid as argentine imperium, but weighs nearly nothing,
+having been forged from a lightningbolt and bound with the southern winds. It
+bears the name of Ba'al Hadad, God of Storms. You can 'use' the stormcaller to
+call up a storm.
+~
+3 p ao 2
+0 0 0
+0 0
+T 12049
+S
+#12050
+stormcloud cloud~
+a stormcloud~
+A stormcloud hangs low in the sky, pouring ceaseless rain.~
+   This cloud is tall and dark, but unnaturally small. Its pouring rains drench
+the land only in this small area, and it doesn't seem to be moving.
+~
+3 0 0 8
+10800 0 0
+10 144
+T 10165
+T 12050
+T 12051
+S
+#12051
+tunic ugarit ba'al baal hadad~
+the Ugarit tunic of Ba'al Hadad~
+The Ugarit tunic of Ba'al Hadad is lying here.~
+   This pleated leather tunic looks primitive, to be sure. But it was made for
+a true god, and the power of the Storm is stitched into every part of it. Only
+the worthy dare wear it.
+~
+2 o ad 3
+0 0 0
+7 0
+A
+5 1 0
+M
+14
+The storm god $n hovers before you!~
+M
+13
+The storm goddess $n hovers before you!~
+S
+#12052
+dates bagfresh~
+a bag of fresh dates~
+A bag of dates is stacked here.~
+   Sweet dates like these have been grown for thousands of years, as they
+flourish in warm areas. You can eat these dates or plant them.
+~
+6 b a 5
+24 12052 0
+7 168
+O
+9 bc
+R
+5114 0
+S
+#12053
+seeds jar date palm~
+a jar of date palm seeds~
+A jar of date palm seeds is sitting here.~
+   This clay jar looks truly ancient. There's no telling how long these seeds
+have been sealed inside. You could probably still plant them, if you had a
+fertile desert.
+~
+3 b a 6
+0 12052 0
+7 168
+R
+5116 0
+S
+#12054
+feast ba'al baal hadad~
+the feast of Ba'al Hadad~
+The feast of Ba'al Hadad has been set out on a cloth.~
+   This feast of fruits and vegetables celebrates the many crops that the storm
+god Ba'al Hadad nourishes with his torrential rains.
+~
+6 m 0 7
+96 0 0
+7 336
+A
+9 1 0
+A
+6 1 0
+A
+7 1 0
+C
+0 350
+M
+4
+You eat the feast in the name of Ba'al Hadad!~
+S
+#12055
+recipe feast of Ba'al Hadad~
+the feast of Ba'al Hadad recipe~
+The feast of Ba'al Hadad recipe is on the ground.~
+This recipe will teach you to cook: feast of Ba'al Hadad.
+~
+7 0 a 1
+12054 0 0
+0 0
 S
 $

@@ -884,7 +884,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	if (MOB_FLAGGED(i, MOB_TIED))
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);
-	if (AFF_FLAGGED(i, AFF_STUNNED)) {
+	if (AFF_FLAGGED(i, AFF_STUNNED | AFF_HARD_STUNNED)) {
 		act("...$e is stunned!", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (AFF_FLAGGED(i, AFF_HIDE)) {
@@ -1503,6 +1503,14 @@ WHO_SORTER(sort_who_access_level) {
 }
 
 
+WHO_SORTER(sort_who_level) {
+	if (a->computed_level != b->computed_level) {
+		return a->computed_level - b->computed_level;
+	}
+	return 0;
+}
+
+
 WHO_SORTER(sort_who_role_level) {
 	if (a->role != b->role) {
 		return a->role - b->role;
@@ -1694,7 +1702,20 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 	
 	// WHO_x
 	const char *who_titles[] = { "Mortals", "Gods", "Immortals" };
-	WHO_SORTER(*who_sorters[]) = { sort_who_role_level, sort_who_role_level, sort_who_access_level };
+	WHO_SORTER(*who_sorters[3]) = { NULL, sort_who_level, sort_who_access_level };
+	
+	// set sorters
+	switch (config_get_int("who_list_sort")) {
+		case WHO_LIST_SORT_LEVEL: {
+			who_sorters[WHO_MORTALS] = sort_who_level;
+			break;
+		}
+		case WHO_LIST_SORT_ROLE_LEVEL:
+		default: {
+			who_sorters[WHO_MORTALS] = sort_who_role_level;
+			break;
+		}
+	}
 
 	*whobuf = '\0';	// lines of chars
 	size = 0;	// whobuf size

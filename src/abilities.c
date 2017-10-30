@@ -800,7 +800,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		return;
 	}
 	
-	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE));
+	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT));
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	
 	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && violent) {
@@ -857,7 +857,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// ready to start the ability:
-	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+	if (violent) {
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
 		}
@@ -1034,12 +1034,12 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		// check if should be in combat
 		if (cvict && cvict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(cvict) && !IS_DEAD(cvict)) {
 			// auto-assist if we used an ability on someone who is fighting
-			if (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && FIGHTING(cvict) && !FIGHTING(ch)) {
+			if (!violent && FIGHTING(cvict) && !FIGHTING(ch)) {
 				engage_combat(ch, FIGHTING(cvict), ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
 			}
 			
 			// auto-attack if used on an enemy
-			if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && CAN_SEE(cvict, ch) && !FIGHTING(cvict)) {
+			if (violent && AWAKE(cvict) && !FIGHTING(cvict)) {
 				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
 			}
 		}

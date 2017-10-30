@@ -705,6 +705,53 @@ while %cycles_left% >= 0
   eval cycles_left %cycles_left% - 1
 done
 ~
+#10146
+Monsoon Rift cleanup + complete~
+0 v 0
+~
+if %questvnum% != 10153
+  halt
+end
+* Start of script fragment: Monsoon cleanup
+* Iterates over a series of vnums and removes all mobs with those vnums from the instance.
+* Also cleans up the entrance portal and saguaro cactus.
+* This script fragment is duplicated in triggers: 10142, 10177, 10180
+eval loc %instance.location%
+eval obj %loc.contents%
+while %obj%
+  eval next_obj %obj.next_in_list%
+  if %obj.vnum% == 10140
+    %at% %loc% %echo% The monsoon rift closes.
+    %purge% %obj%
+  end
+  eval obj %next_obj%
+done
+* Despawn saguaro obj
+makeuid loc room i10145
+if %loc%
+  eval obj %loc.contents%
+  while %obj%
+    eval next_obj %obj.next_in_list%
+    if %obj.vnum% == 10171
+      %at% %loc% %echo% You lose track of %obj.shortdesc%.
+      %purge% %obj%
+    end
+    eval obj %next_obj%
+  done
+end
+%adventurecomplete%
+eval current_vnum 10147
+while %current_vnum% >= 10140
+  if %current_vnum% <= 10143
+    set message $n turns back into an ordinary cactus.
+  else
+    set message $n leaves.
+  end
+  %purge% instance mob %current_vnum% %message%
+  eval current_vnum %current_vnum% - 1
+done
+* End of script fragment.
+~
 #10147
 Natural Magic: Cacti quench quest start~
 2 u 100

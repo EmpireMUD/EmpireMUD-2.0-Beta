@@ -163,6 +163,18 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 		return TRUE;
 	}
 	
+	// modify caps based on abilities/roles
+	if (!IS_NPC(victim) || !MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP)) {
+		if (IS_NPC(victim) || (GET_CLASS_ROLE(victim) != ROLE_TANK && (GET_CLASS_ROLE(victim) != ROLE_SOLO || !check_solo_role(victim)))) {
+			min_npc_to_hit += 20;	// higher hit min if not in tank/solo-role
+			min_pc_to_hit += 20;
+		}
+		if (IS_NPC(victim) || !has_player_tech(victim, PTECH_DODGE_CAP)) {
+			min_npc_to_hit += 20;	// higher hit min if lacking dodge-cap tech
+			min_pc_to_hit += 20;
+		}
+	}
+	
 	if (IS_NPC(attacker)) {
 		// mob/player dodging a mob
 		// NOTE: this currently uses two different formulae in order to provide a real dodge cap for tanks vs mobs
@@ -1680,7 +1692,7 @@ obj_data *player_death(char_data *ch) {
 	// penalize after so many deaths
 	if (GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty") || (is_at_war(GET_LOYALTY(ch)) && GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty_war"))) {
 		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty")) / SECS_PER_REAL_UPDATE;
-		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
+		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 		affect_join(ch, af, ADD_DURATION);
 	}
 	
@@ -2729,7 +2741,7 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// already busy
-		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_NO_ATTACK) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch)) || GET_FEEDING_FROM(ch_iter) || GET_FED_ON_BY(ch_iter)) {
+		if (ch == ch_iter || FIGHTING(ch) == ch_iter || GET_POS(ch_iter) < POS_STANDING || FIGHTING(ch_iter) || AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED | AFF_NO_ATTACK) || IS_INJURED(ch_iter, INJ_TIED | INJ_STAKED) || !CAN_SEE(ch_iter, FIGHTING(ch)) || GET_FEEDING_FROM(ch_iter) || GET_FED_ON_BY(ch_iter)) {
 			continue;
 		}
 		
@@ -2860,6 +2872,11 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	/* Only damage to self (sun) still hurts */
 	if (AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL) && damtype == DAM_PHYSICAL)
 		dam = 0;
+	
+	// full immunity
+	if (AFF_FLAGGED(victim, AFF_IMMUNE_DAMAGE)) {
+		dam = 0;
+	}
 
 	if (victim != ch) {
 		/* Start the attacker fighting the victim */
@@ -3099,10 +3116,11 @@ void death_log(char_data *ch, char_data *killer, int type) {
 * @param bool melee if TRUE goes straight to melee; otherwise WAITING
 */
 void engage_combat(char_data *ch, char_data *vict, bool melee) {
-	// nope
+	/* Don't bother with can-fight here -- it has certainly been pre-checked before anything that would engage combat
 	if (!can_fight(ch, vict)) {
 		return;
 	}
+	*/
 
 	// this prevents players from using things that engage combat over and over
 	if (GET_POS(vict) == POS_INCAP && GET_POS(ch) >= POS_FIGHTING) {
@@ -4078,7 +4096,7 @@ void frequent_combat(int pulse) {
 		}
 		
 		// reasons you would not get a round
-		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
 			continue;
 		}
 		

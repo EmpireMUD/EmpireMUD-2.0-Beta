@@ -1020,9 +1020,11 @@ ACMD(do_mgoto) {
 
 /* lets the mobile do a command at another location. Very useful */
 ACMD(do_mat) {
+	char_data *was_fighting = FIGHTING(ch);
 	char arg[MAX_INPUT_LENGTH];
 	room_data *location = NULL, *original;
 	struct instance_data *inst;
+	int fmode = FIGHT_MODE(ch);
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -1065,6 +1067,10 @@ ACMD(do_mat) {
 	if (IN_ROOM(ch) == location) {
 		char_from_room(ch);
 		char_to_room(ch, original);
+	}
+	
+	if (was_fighting && IN_ROOM(was_fighting) == IN_ROOM(ch) && !IS_DEAD(ch) && !EXTRACTED(ch)) {
+		set_fighting(ch, was_fighting, fmode);
 	}
 }
 

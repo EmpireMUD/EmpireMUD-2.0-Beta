@@ -520,8 +520,11 @@ DODGE "DODGE CAP"
 Your Dodge rating, shown on 'score', determines how much To-Hit your opponent
 needs in order to hit you.
 
-For fighting NPCs, the highest possible dodge chance is 75%. Against players,
-it's 95%. Players' chance of hitting you is based on their to-hit score, but
+For fighting NPCs, the highest possible dodge chance is 55%. Against players,
+it's 75%. Players who aren't in tank/solo role have a lower dodge cap by 20%.
+Some abilities may change the dodge cap as well.
+
+Players' chance of hitting you is based on their to-hit score, but
 mobs are more predictable and it is possible to reach a "dodge cap", the amount
 where NPCs hit you as little as possible.
 
@@ -534,7 +537,7 @@ Dodge cap:
 - Add 75 to the total
 - Add +5 per Dexterity the mob has more than you
 
-See also: AFFECTS, SCORE, TO-HIT
+See also: AFFECTS, SCORE, TO-HIT, IMPROVED REFLEXES
 #
 DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME STACKS STACKING
 

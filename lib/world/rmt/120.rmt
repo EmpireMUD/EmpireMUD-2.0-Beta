@@ -6,4 +6,22 @@ has escaped into the world and roams once more.
 g 0 0
 M 0 12000 100.00 1
 S
+#12030
+Ba'al Hadad's Prison~
+   This ethereal prison long held the bull-horned storm god, Ba'al Hadad. But
+it seems he has escaped into the world and roams once more.
+~
+g 0 0
+M 0 12030 100.00 1
+S
+#12031
+The Heart of the Storm~
+   You have been whisked away to the center of a massive stormcloud, barely
+able to see the length of your own arm. Your skin crackles with electricity as
+lightning cascades below you, and your hair becomes wet and matted in the rain.
+(If you get stuck here after the fight, type &cflee&0.)
+~
+acgi 0 0
+T 12034
+S
 $

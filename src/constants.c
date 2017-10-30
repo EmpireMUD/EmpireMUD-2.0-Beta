@@ -791,6 +791,7 @@ const char *player_tech_types[] = {
 	"Teleport-City",
 	"Two-Handed-Weapons",	// 50
 	"Where-Upgrade",
+	"Dodge-Cap",
 	"\n"
 };
 
@@ -1106,6 +1107,8 @@ const char *affected_bits[] = {
 	"*ORDERED",
 	"!DRINK-BLOOD",
 	"DISTRACTED",
+	"HARD-STUNNED",
+	"IMMUNE-DAMAGE",	// 35
 	"\n"
 };
 
@@ -1145,6 +1148,8 @@ const char *affected_bits_consider[] = {
 	"",	// ordred
 	"",	// !drink-blood
 	"",	// distracted
+	"",	// hard-stunned
+	"",	// 35 - immune-damage
 	"\n"
 };
 
@@ -1183,7 +1188,9 @@ const bool aff_is_bad[] = {
 	FALSE,	// 30
 	FALSE,
 	FALSE,
-	TRUE
+	TRUE,
+	FALSE,	// hard-stunned (not 'bad' because it's uncleansable)
+	FALSE,	// 35 - immune-damage
 };
 
 
@@ -2250,7 +2257,7 @@ const char *component_types[] = {
 // CMPF_x: component flags
 const char *component_flags[] = {
 	"animal",
-	"bunch",
+	"bunch of",
 	"desert",
 	"fine",
 	"hard",
