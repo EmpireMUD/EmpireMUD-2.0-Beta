@@ -847,6 +847,7 @@ void save_whole_world(void) {
 			}
 			fl = open_world_file(block);
 			last = block;
+			log("debug 3.5:\t%lld", microtime());
 		}
 		
 		// only save a room at all if it couldn't be unloaded
