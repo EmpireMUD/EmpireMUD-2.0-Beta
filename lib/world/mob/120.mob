@@ -116,7 +116,7 @@ S
 #12030
 hadad ba'al baal god~
 the god Ba'al Hadad~
-The storm god Ba'al Hadad towers over you, lightning in his eyes.
+The storm god Ba'al Hadad towers over you, lightning in his eyes (difficulty).
 ~
 225 325 aduyB ciE
 1 0 2 1
@@ -166,7 +166,7 @@ T 12038
 T 12041
 S
 #12031
-storm coming stormcloud massive~
+storm coming stormcloud massive baalhadadstormcloud~
 the Coming Storm~
 A massive stormcloud envelops and suffocates you!
 ~
@@ -196,5 +196,25 @@ A bolt of lightning in the shape of a horse appears before you.
 ~
 100 125 de m
 0 0 2 21
+S
+#12052
+worshipper~
+a worshipper of the storm god~
+A worshipper of the storm god bows low, begging for rain.
+~
+40 60 dov 0
+1 0 0 21
+M
+1
+Praise be to the Stormlord!~
+M
+1
+Tut tut, looks like rain.~
+M
+1
+My Lord, bring rain to the crops!~
+M
+1
+The storm will drown this world.~
 S
 $

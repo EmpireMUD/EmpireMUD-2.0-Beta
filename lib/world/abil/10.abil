@@ -6,7 +6,7 @@ A
 A
 18 -1
 C
-frenzy 7 beg 1 30 2070 60 0 1
+frenzy 7 beg 1 30 0 2070 60 0 1 0
 M
 0
 You work yourself into a frenzy!~
@@ -25,7 +25,7 @@ A
 A
 17 -1
 C
-defend 7 beg 1 30 2071 60 0 1
+defend 7 beg 1 30 0 2071 60 0 1 0
 M
 0
 You dig in and prepare to defend!~
@@ -35,5 +35,291 @@ $n digs in to defend!~
 T b 1
 X b
 3084 30 -1 0
+S
+#1003
+Intensify~
+i -1 1.00 0 0
+A
+22 1
+C
+intensify 7 beg 2 20 1 2072 9 0 1 0
+M
+0
+You focus your rage and intensify your magic!~
+M
+1
+$n focuses $s rage and intensifies $s magic!~
+T b 1
+X b
+3086 9 9 0
+S
+#1004
+Abate~
+ai -1 1.50 h 0
+A
+22 -1
+C
+abate 7 bfh 2 30 2 2073 9 8 2 0
+M
+2
+You lunge toward $N and hit $M in the head!~
+M
+3
+$n lunges toward you and hits you in the head...~
+M
+4
+$n suddenly lunges toward $N and hits $M in the head!~
+T b 1
+X b
+3087 9 9 0
+S
+#1005
+Amplify~
+i -1 2.00 0 0
+A
+22 1
+C
+amplify 7 beg 2 30 2 2074 6 0 1 0
+M
+0
+You focus on your training in sorcery and battle...~
+M
+1
+$n stops to focus for a moment.~
+T b 1
+X b
+3088 6 6 0
+S
+#1006
+Beguile~
+ai -1 1.00 h 0
+A
+24 -1
+C
+beguile 7 bfh 2 20 2 2075 9 8 2 0
+M
+2
+You stare into $N's eyes and beguile $M!~
+M
+3
+$n stares straight into your eyes and the room seems to spin for a moment...~
+M
+4
+$n stares straight at $N...~
+T b 1
+X b
+3089 9 9 0
+S
+#1007
+Undermine~
+ak -1 1.00 h 0
+A
+12 -1
+C
+undermine 7 bfh 1 40 2 2076 30 4 2 0
+M
+2
+You stab at $N's armor, undermining it!~
+M
+4
+$n stabs at $N's armor to undermine it!~
+M
+3
+$n stabs repeatedly at your armor...~
+T b 1
+X b
+3090 30 30 0
+S
+#1008
+Exhaust~
+ak -1 1.00 h 0
+A
+21 -1
+C
+exhaust 7 bfh 1 20 2 2077 9 4 2 0
+M
+2
+You dodge in and out around $N to exhaust $M!~
+M
+3
+$n dodges in and out of combat around you...~
+M
+4
+$n dodges in and out of combat around $N!~
+T b 1
+X b
+3091 9 9 0
+S
+#1009
+Withstand~
+l -1 2.00 0 0
+A
+12 1
+C
+withstand 7 beg 1 1 4 2078 12 0 1 0
+M
+0
+You hunker down and prepare to withstand the worst...~
+M
+1
+$n hunkers down and prepares to withstand the worst attacks.~
+T b 1
+X b
+3092 12 12 0
+S
+#1010
+Hinder~
+al -1 1.00 h 0
+A
+21 -1
+C
+hinder 7 bfh 1 20 2 2079 6 1 2 0
+M
+2
+You distract $N to hinder $S attacks!~
+M
+3
+$n distracts you...~
+M
+4
+$n seems to distract $N and hinder $S attacks.~
+T b 1
+X b
+3093 6 6 0
+S
+#1011
+Hobble~
+al -1 1.00 h 0
+A
+22 -1
+C
+hobble 7 bfh 1 6 2 2080 6 1 2 0
+M
+2
+You hobble $N with a blow to the leg!~
+M
+3
+$n hits you hard in the leg!~
+M
+4
+$n hobbles $N with a blow to the leg!~
+T b 1
+X b
+3094 6 6 0
+S
+#1012
+Adapt~
+ik -1 2.00 0 0
+A
+21 1
+A
+22 1
+C
+adapt 7 beg 3 5 0 2081 6 9 1 0
+M
+0
+You focus your blood into a battle adaptation.~
+M
+1
+$n seems to focus for a moment.~
+T b 1
+X b
+3095 6 6 0
+S
+#1013
+Lacerate~
+ak -1 1.00 h 0
+A
+12 -1
+C
+lacerate 7 bfh 3 3 0 2082 9 9 2 0
+M
+2
+You swirl around $N, cutting open dozens of tiny lacerations with your nails.~
+M
+2
+$n swirls around you, cutting open dozens of tiny lacerations!~
+M
+4
+$n swirls around $N, cutting open dozens of tiny lacerations.~
+T b 1
+X b
+3096 9 9 0
+S
+#1014
+Infect~
+ai -1 1.00 h 0
+A
+24 -1
+C
+infect 7 bfh 3 3 0 2083 9 9 2 0
+M
+3
+$n jabs you with a drop of $s blood...~
+M
+4
+$n jabs $N with $s fingernail!~
+M
+2
+You jab $N with a drop of your blood on your fingernail!~
+T b 1
+X b
+3097 9 9 0
+S
+#1015
+Prepared~
+k -1 1.25 0 0
+A
+21 1
+C
+prepared 7 beg 1 12 1 2084 12 0 1 0
+M
+0
+You remember your preparations.~
+M
+1
+$n seems prepared for this.~
+T b 1
+X b
+3098 12 12 0
+S
+#1016
+Gleam~
+l -1 2.00 0 0
+A
+12 1
+A
+24 1
+C
+cleam 7 beg 1 20 1 2085 30 0 1 0
+M
+0
+Your armor gleams in the light!~
+M
+1
+$n's polished armor gleams in the light!~
+T b 1
+X b
+3099 30 30 0
+S
+#1017
+Sunder~
+al -1 1.00 h 0
+A
+12 -1
+C
+sunder 7 bfh 1 10 1 2086 9 4 2 0
+M
+2
+You grab $N's armor and sunder it!~
+M
+3
+$n grabs your armor and sunders it!~
+M
+4
+$n grabs $N's armor and sunders it!~
+T b 1
+X b
+3100 9 9 0
 S
 $

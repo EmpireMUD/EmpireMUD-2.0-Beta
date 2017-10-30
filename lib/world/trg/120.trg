@@ -468,12 +468,15 @@ if %self.varexists(phase)%
     halt
   end
 end
-%echo% %self.name% changes phase! [placeholder]
+%echo% %self.name% is surrounded by a swirling mass of storm clouds, protecting %self.himher% from your attacks!
 %echo% (Type 'enter storm')
 set phase 2
 remote phase %self.id%
 * todo: make him invincible and not just insanely hard to kill
 dg_affect #12031 %self% IMMUNE-DAMAGE on -1
+if !%self.mob_flagged(GROUP)%
+  nop %self.add_mob_flag(NO-ATTACK)%
+end
 detach 12035 %self.id%
 detach 12036 %self.id%
 detach 12037 %self.id%
@@ -487,8 +490,6 @@ else
   halt
 end
 %at% %room% %load% mob 12031
-* I've seen this script randomly break combat... can mat cause this? Am I just going crazy?
-* -Yv
 ~
 #12031
 Hadad phase reset~
@@ -532,9 +533,11 @@ if !%self.fighting% && %self.varexists(phase)%
     attach 12036 %self.id%
     attach 12037 %self.id%
     attach 12038 %self.id%
+    nop %self.remove_mob_flag(NO-ATTACK)%
   elseif %self.phase% > 2
     %echo% %self.name% is restored!
     %restore% %self%
+    nop %self.remove_mob_flag(NO-ATTACK)%
     unset phase
   end
 end
@@ -557,6 +560,7 @@ if storm /= %arg%
       %teleport% %actor% i12031
       %echoaround% %actor% %actor.name% emerges from the swirling storm clouds!
       %force% %actor% look
+      %force% %actor% kill baalhadadstormcloud
     else
       %send% %actor% You can't do that during the current phase of combat.
       return 1
@@ -588,6 +592,7 @@ if %hadad.varexists(phase)%
   end
 end
 dg_affect #12031 %hadad% off
+nop %hadad.remove_mob_flag(NO-ATTACK)%
 detach 12039 %hadad.id%
 attach 12038 %hadad.id%
 attach 12037 %hadad.id%
@@ -662,6 +667,15 @@ while %person%
   end
   eval person %person.next_in_room%
 done
+if %self.varexists(phase)%
+  if %self.phase% == 3
+    dg_affect #12040 %self% off
+    %echo% %self.name% charges forward, foaming at the mouth with rage!
+    dg_affect #12040 %self% HASTE on 30
+    dg_affect #12040 %self% BONUS-PHYSICAL 50 30
+    dg_affect #12040 %self% BONUS-MAGICAL 50 30
+  end
+end
 ~
 #12036
 Ba'al Hadad: Bull Charge~
@@ -671,17 +685,25 @@ if %self.cooldown(12030)%
   halt
 end
 nop %self.set_cooldown(12030, 30)%
-%send% %actor% %self.name% lowers %self.hisher% head and charges you!
-%echoaround% %actor% %self.name% lowers %self.hisher% head and charges %actor.name%!
+if %self.varexists(phase)%
+  if %self.phase% == 3
+    eval target %random.enemy%
+  end
+end
+if !%target%
+  eval target %actor%
+end
+%send% %target% %self.name% lowers %self.hisher% head and charges you!
+%echoaround% %target% %self.name% lowers %self.hisher% head and charges %target.name%!
 wait 2 sec
-%send% %actor% &r%self.name% crashes into you, sending you flying!
-%echoaround% %actor% %self.name% crashes into %actor.name%, sending %actor.himher% flying!
-%damage% %actor% 750 physical
+%send% %target% &r%self.name% crashes into you, sending you flying!
+%echoaround% %target% %self.name% crashes into %target.name%, sending %target.himher% flying!
+%damage% %target% 750 physical
 if %self.mob_flagged(GROUP)%
-  dg_affect #12036 %actor% HARD-STUNNED on 15
-  dg_affect #12036 %actor% DODGE -100 15
+  dg_affect #12036 %target% HARD-STUNNED on 15
+  dg_affect #12036 %target% DODGE -100 15
 else
-  dg_affect #12036 %actor% STUNNED on 10
+  dg_affect #12036 %target% STUNNED on 10
 end
 ~
 #12037
@@ -692,23 +714,34 @@ if %self.cooldown(12030)%
   halt
 end
 nop %self.set_cooldown(12030, 30)%
-eval target %random.enemy%
-if !%target%
-  eval target %actor%
+set times 1
+if %self.varexists(phase)%
+  if %self.phase% == 3
+    set times 2
+  end
 end
-%send% %target% %self.name% draws back an arm and takes aim at you...
-%echoaround% %self.name% draws back an arm and takes aim at %target.name%...
-wait 2 sec
-%send% %target% %self.name% hurls a thunderbolt at you!
-%echoaround% %target% %self.name% hurls a thunderbolt at %target.name%!
-%send% %target% &rThe thunderbolt explodes in your face!
-%echoaround% %target% The thunderbolt explodes in front of %target.name%'s face!
-%damage% %target% 350 magical
-%dot% #12037 %target% 200 30 magical
-if %self.mob_flagged(GROUP)%
-  %send% %target% You are blinded by the brightness of the blast!
-  dg_affect #12038 %target% BLIND on 15
-end
+set time 1
+while %time% <= %times%
+  eval target %random.enemy%
+  if !%target%
+    eval target %actor%
+  end
+  %send% %target% %self.name% draws back an arm and takes aim at you...
+  %echoaround% %self.name% draws back an arm and takes aim at %target.name%...
+  wait 2 sec
+  %send% %target% %self.name% hurls a thunderbolt at you!
+  %echoaround% %target% %self.name% hurls a thunderbolt at %target.name%!
+  %send% %target% &rThe thunderbolt explodes in your face!
+  %echoaround% %target% The thunderbolt explodes in front of %target.name%'s face!
+  %damage% %target% 350 magical
+  %dot% #12037 %target% 200 30 magical
+  if %self.mob_flagged(GROUP)%
+    %send% %target% You are blinded by the brightness of the blast!
+    dg_affect #12038 %target% BLIND on 15
+  end
+  eval time %time% + 1
+  wait 3 sec
+done
 ~
 #12038
 Ba'al Hadad: Raging Storm~
@@ -721,11 +754,19 @@ nop %self.set_cooldown(12030, 30)%
 %echo% %self.name% raises %self.hisher% arms to the sky and lets out a mighty bellow!
 %echo% A great storm forms overhead!
 set cycle 1
-while %cycle% <= 5
+set cycles 3
+set scale 100
+if %self.varexists(phase)%
+  if %self.phase% == 3
+    set scale 200
+    set cycles 5
+  end
+end
+while %cycle% <= %cycles%
   wait 5 sec
   %echo% &rLightning and hail rain down upon you!
   %aoe% 50 physical
-  %aoe% 100 magical
+  %aoe% %scale% magical
   eval cycle %cycle% + 1
 done
 ~
@@ -733,10 +774,10 @@ done
 Ba'al Hadad / Coming Storm: Bolt from the Blue~
 0 k 100
 ~
-if %self.cooldown(12030)%
+if %self.cooldown(13020)%
   halt
 end
-nop %self.set_cooldown(12030, 30)%
+nop %self.set_cooldown(12030, 20)%
 if %self.affect(BLIND)%
   %echo% %self.name%'s vision clears!
   dg_affect %self% BLIND off 1
@@ -819,42 +860,39 @@ if %actor.cooldown(12049)%
   halt
 end
 eval room %actor.room%
-eval cycles_left 5
+eval cycles_left 3
 while %cycles_left% >= 0
-  if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing) || %actor.aff_flagged(DISTRACTED)%
-    if %cycles_left% < 5
-      %echoaround% %actor% %actor.name%'s ritual is interrupted.
-      %send% %actor% Your ritual is interrupted.
+  eval sector_valid (!%room.building% && !%room.template%) || (%room.building% && %room.bld_flagged(OPEN)%)
+  if !%sector_valid% || %actor.room% != %room% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing) || %actor.aff_flagged(DISTRACTED)%
+    if %cycles_left% < 3
+      %echoaround% %actor% %actor.name%'s stormcall is interrupted.
+      %send% %actor% Your stormcall is interrupted.
+    elseif !%sector_valid%
+      %send% %actor% You can only use %self.shortdesc% outdoors.
     else
       %send% %actor% You can't do that now.
     end
+    halt
   end
   switch %cycles_left%
-    case 5
-      %echoaround% %actor% %actor.name% pulls out a toad-shaped totem and begins to chant...
-      %send% %actor% You pull out your monsoon totem and begin to chant...
-    break
-    case 4
-      %echoaround% %actor% %actor.name% sways as %actor.heshe% whispers strange words into the air...
-      %send% %actor% You sway as you whisper the words of the monsoon chant...
-    break
     case 3
-      %echoaround% %actor% %actor.name%'s monsoon totem takes on a soft green glow, and the air around it seems to crackle...
-      %send% %actor% Your monsoon totem takes on a soft green glow, and the air around it crackles with electricity...
+      %echoaround% %actor% %actor.name% raises the stormcaller wand high into the air...
+      %send% %actor% You raise your stormcaller wand high into the air...
     break
     case 2
-      %echoaround% %actor% A tiny raincloud forms in the air around %actor.name%'s monsoon totem...
-      %send% %actor% A tiny raincloud forms in the air around your monsoon totem...
+      %echoaround% %actor% A swirl of rain and wind shoots up from %actor.name%'s stormcaller wand...
+      %send% %actor% A swirl of rain and wind shoots up from your stormcaller wand...
     break
     case 1
-      %echoaround% %actor% %actor.name% whispers into the raincloud, which grows dark and begins to rise...
-      %send% %actor% You whisper ancient words of power into the raincloud as it grows dark and begins to rise...
+      %echoaround% %actor% %actor.name% shouts out the name of Ba'al Hadad, God of Storms!
+      %send% %actor% You shout out the name of Ba'al Hadad, God of Storms!
     break
     case 0
-      %echoaround% %actor% %actor.name% completes %actor.hisher% chant, and the raincloud fills the sky!
-      %send% %actor% You complete your chant, and the raincloud fills the sky!
-      %echo% Thunder rolls across the sky as heavy drops of rain begin to fall.
-      %load% obj 10144 %room%
+      %echo% Lightning cascades across the darkening sky...
+      %echoaround% %actor% %actor.name% falls to the ground as the stormcloud fills the sky and rain begins to fall!
+      %send% %actor% You struggle to catch your breath as the stormcloud fills the sky and rain begins to fall!
+      nop %actor.set_cooldown(12049, 300)%
+      %load% obj 12050 %room%
       halt
     break
   done

@@ -633,6 +633,24 @@ This design will teach you to forge: stormwashed ring of Ba'al Hadad.
 12044 0 0
 0 0
 S
+#12046
+jar thunder ba'al baal hadad~
+a jar of Ba'al Hadad's thunder~
+A jar of thunder is sitting on the ground.~
+   This ancient clay jar contains the pure thunder of the storm god, Ba'al
+Hadad. You could use this to craft the storm god's own chariot.
+Usage: manufacture stormcloud of Ba'al Hadad
+~
+3 0 a 2
+0 0 0
+6 0
+M
+6
+You open the jar of thunder, which swirls into the air and becomes $V!~
+M
+7
+$n opens a jar of thunder, which swirls into the air and becomes $V!~
+S
 #12047
 whistle bronze bull~
 a bronze bull whistle~
@@ -704,5 +722,66 @@ The storm god $n hovers before you!~
 M
 13
 The storm goddess $n hovers before you!~
+S
+#12052
+dates bagfresh~
+a bag of fresh dates~
+A bag of dates is stacked here.~
+   Sweet dates like these have been grown for thousands of years, as they
+flourish in warm areas. You can eat these dates or plant them.
+~
+6 b a 5
+24 12052 0
+7 168
+O
+9 bc
+R
+5114 0
+S
+#12053
+seeds jar date palm~
+a jar of date palm seeds~
+A jar of date palm seeds is sitting here.~
+   This clay jar looks truly ancient. There's no telling how long these seeds
+have been sealed inside. You could probably still plant them, if you had a
+fertile desert.
+~
+3 b a 6
+0 12052 0
+7 168
+R
+5116 0
+S
+#12054
+feast ba'al baal hadad~
+the feast of Ba'al Hadad~
+The feast of Ba'al Hadad has been set out on a cloth.~
+   This feast of fruits and vegetables celebrates the many crops that the storm
+god Ba'al Hadad nourishes with his torrential rains.
+~
+6 m 0 7
+96 0 0
+7 336
+A
+9 1 0
+A
+6 1 0
+A
+7 1 0
+C
+0 350
+M
+4
+You eat the feast in the name of Ba'al Hadad!~
+S
+#12055
+recipe feast of Ba'al Hadad~
+the feast of Ba'al Hadad recipe~
+The feast of Ba'al Hadad recipe is on the ground.~
+This recipe will teach you to cook: feast of Ba'al Hadad.
+~
+7 0 a 1
+12054 0 0
+0 0
 S
 $
