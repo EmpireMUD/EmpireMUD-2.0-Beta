@@ -117,6 +117,8 @@ on the Halloween candy drops, and disable that global when the holiday is over.
 #
 "OLD GODS" "BINDING CIRCLE"
 
+{**}
+
 The Binding Circle adventures are a set of small 1-fight world spawns where
 you fight and defeat ancient, long-forgotten gods. These adventures spawn only
 on continents (not smaller islands) and you can find them with 'nearby'. Once
@@ -133,6 +135,7 @@ All Old Gods adventures use the 'weight of the old gods' currency.
 
 The following old gods are available so far:
   Anat, the warrior-goddess - HELP ANAT
+  Ba'al Hadad, the storm god - HELP HADAD
 #
 "BINDING CIRCLE: ANAT" "BINDING CIRCLE ANAT" ANAT
 
