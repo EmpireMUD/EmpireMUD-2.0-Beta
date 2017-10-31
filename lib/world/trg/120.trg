@@ -774,7 +774,7 @@ done
 Ba'al Hadad / Coming Storm: Bolt from the Blue~
 0 k 100
 ~
-if %self.cooldown(13020)%
+if %self.cooldown(12030)%
   halt
 end
 nop %self.set_cooldown(12030, 20)%
