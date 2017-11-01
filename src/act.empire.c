@@ -5480,6 +5480,10 @@ ACMD(do_roster) {
 		
 		timed_out = member_is_timed_out_ch(member);
 		if (timed_out && !all) {
+			if (member && is_file) {
+				is_file = FALSE;
+				free_char(member);
+			}
 			continue;
 		}
 		
