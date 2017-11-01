@@ -2200,7 +2200,7 @@ SHOW(show_quests) {
 		if (IS_NPC(vict) || !GET_QUESTS(vict)) {
 			msg_to_char(ch, "%s is not on any quests.\r\n", GET_NAME(vict));
 			if (vict && file) {
-				is_file = FALSE;
+				file = FALSE;
 				free_char(vict);
 			}
 			return;
@@ -2222,7 +2222,7 @@ SHOW(show_quests) {
 		if (IS_NPC(vict) || !GET_COMPLETED_QUESTS(vict)) {
 			msg_to_char(ch, "%s has not completed any quests.\r\n", GET_NAME(vict));
 			if (vict && file) {
-				is_file = FALSE;
+				file = FALSE;
 				free_char(vict);
 			}
 			return;
