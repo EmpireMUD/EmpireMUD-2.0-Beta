@@ -2143,7 +2143,7 @@ int new_descriptor(int s) {
 		/* resolution failed */
 		if (!slow_ip) {
 			char buf[MAX_STRING_LENGTH];
-			snprintf(buf, sizeof(buf), "SYSERR: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
+			snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
 			perror(buf);
 		}
 
