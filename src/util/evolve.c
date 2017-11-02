@@ -167,6 +167,7 @@ void evolve_one(struct map_t *tile, int nearby_distance) {
 void evolve_map(int nearby_distance) {
 	struct map_t *tile;
 	sector_vnum old;
+	int changed = 0;
 	FILE *fl;
 	
 	if (!(fl = fopen(EVOLUTION_FILE, "w"))) {
@@ -181,15 +182,14 @@ void evolve_map(int nearby_distance) {
 		
 		if (tile->sector_type != old) {
 			fprintf(fl, "%d %d %d\n", tile->vnum, old, tile->sector_type);
-			printf("~");
-		}
-		else {
-			printf(".");
+			++changed;
 		}
 	}
 	
 	fprintf(fl, "$\n");
 	fclose(fl);
+	
+	printf("Changed %d tile%s\n", changed, PLURAL(changed));
 }
 
 
@@ -459,6 +459,8 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 
 			// end
 			case 'S': {
+				LL_COUNT(GET_SECT_EVOS(sect), evo, int_in[0]);
+				printf("Loaded %d %s: %d evos\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), int_in[0]);
 				return;
 			}
 			
