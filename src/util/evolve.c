@@ -113,15 +113,11 @@ void evolve_one(struct map_t *tile, int nearby_distance) {
 		return;	// no sector to evolve
 	}
 	
-	
-	printf("Trying %d (%d %s)...\n", tile->vnum, tile->sector_type, GET_SECT_NAME(original));
-	
 	// ok prepare to find one...
 	become = NOTHING;
 	
 	// run some evolutions!
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_RANDOM))) {
-		printf("hit random\n");
 		become = evo->becomes;
 	}
 	
@@ -181,11 +177,6 @@ void evolve_map(int nearby_distance) {
 	
 	LL_FOREACH(land, tile) {
 		old = tile->sector_type;
-		
-		// TODO remove this -- it's for testing
-		if (tile->vnum != 119194) {
-			continue;
-		}
 		
 		evolve_one(tile, nearby_distance);
 		
@@ -773,32 +764,16 @@ struct evolution_data *get_evo_by_type(sector_vnum sect, int type) {
 	struct evolution_data *evo, *found = NULL;
 	sector_data *st;
 	
-	if (sect == 10302) {
-		printf("checking 10302: ");
-	}
-	
 	HASH_FIND_INT(sector_table, &sect, st);
 	if (!st) {
 		return NULL;
-		if (sect == 10302) {
-			printf("no sect\n");
-		}
 	}
 	
 	// this iterates over matching types checks their percent chance until it finds one
 	for (evo = GET_SECT_EVOS(st); evo && !found; evo = evo->next) {
-		if (evo->type == type) {
-			if (sect == 10302) {
-				printf("found (%d %.2f)", evo->becomes, evo->percent);
-			}
-			if ((number(1, 10000) <= ((int) 100 * evo->percent))) {
-				found = evo;
-			}
+		if (evo->type == type && (number(1, 10000) <= ((int) 100 * evo->percent))) {
+			found = evo;
 		}
-	}
-	
-	if (sect == 10302) {
-		printf(" %d\n", found ? found->becomes : NOTHING);
 	}
 	
 	return found;
