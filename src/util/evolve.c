@@ -789,7 +789,7 @@ struct evolution_data *get_evo_by_type(sector_vnum sect, int type) {
 	for (evo = GET_SECT_EVOS(st); evo && !found; evo = evo->next) {
 		if (evo->type == type) {
 			if (sect == 10302) {
-				printf("found ");
+				printf("found (%d %.2f)", evo->becomes, evo->percent);
 			}
 			if ((number(1, 10000) <= ((int) 100 * evo->percent))) {
 				found = evo;
