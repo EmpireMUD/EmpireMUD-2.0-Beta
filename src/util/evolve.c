@@ -76,6 +76,7 @@ const int shift_dir[][2] = {
 //// PROTOTYPES //////////////////////////////////////////////////////////////
 
 int count_adjacent(struct map_t *tile, sector_vnum sect, bool count_original_sect);
+void empire_srandom(unsigned long initial_seed);
 struct evolution_data *get_evo_by_type(sector_vnum sect, int type);
 void index_boot_sectors();
 void load_base_map();
@@ -205,6 +206,7 @@ int main(int argc, char **argv) {
 		exit(0);
 	}
 	
+	empire_srandom(time(0));
 	nearby_distance = atoi(argv[1]);
 	
 	// determines if we will send a signal back to the mud
