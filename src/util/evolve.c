@@ -171,7 +171,7 @@ void evolve_map(int nearby_distance) {
 	int changed = 0;
 	FILE *fl;
 	
-	if (!(fl = fopen(EVOLUTION_FILE, "w"))) {
+	if (!(fl = fopen(EVOLUTION_FILE TEMP_SUFFIX, "w"))) {
 		printf("ERROR: Unable to open evolution file %s\n", EVOLUTION_FILE);
 		exit(1);
 	}
@@ -189,6 +189,7 @@ void evolve_map(int nearby_distance) {
 	
 	fprintf(fl, "$\n");
 	fclose(fl);
+	rename(EVOLUTION_FILE TEMP_SUFFIX, EVOLUTION_FILE);
 	
 	printf("Changed %d tile%s\n", changed, PLURAL(changed));
 }
