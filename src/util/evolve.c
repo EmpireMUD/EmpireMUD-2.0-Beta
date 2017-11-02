@@ -181,6 +181,10 @@ void evolve_map(int nearby_distance) {
 		
 		if (tile->sector_type != old) {
 			fprintf(fl, "%d %d %d\n", tile->vnum, old, tile->sector_type);
+			printf("~");
+		}
+		else {
+			printf(".");
 		}
 	}
 	
