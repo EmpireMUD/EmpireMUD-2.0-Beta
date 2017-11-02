@@ -113,6 +113,9 @@ void evolve_one(struct map_t *tile, int nearby_distance) {
 		return;	// no sector to evolve
 	}
 	
+	
+	printf("Trying %d (%d %s)...\n", tile->vnum, tile->sector_type, GET_SECT_NAME(original));
+	
 	// ok prepare to find one...
 	become = NOTHING;
 	
@@ -459,8 +462,6 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 
 			// end
 			case 'S': {
-				LL_COUNT(GET_SECT_EVOS(sect), evo, int_in[0]);
-				printf("Loaded %d %s: %d evos\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), int_in[0]);
 				return;
 			}
 			
