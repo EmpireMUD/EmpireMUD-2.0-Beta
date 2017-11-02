@@ -208,18 +208,20 @@ int main(int argc, char **argv) {
 	
 	empire_srandom(time(0));
 	nearby_distance = atoi(argv[1]);
+	printf("Using nearby distance of: %d\n", nearby_distance);
 	
 	// determines if we will send a signal back to the mud
 	if (argc == 3) {
 		pid = atoi(argv[2]);
+		printf("Will signal pid: %d\n", pid);
 	}
 	
 	// load data
 	index_boot_sectors();
-	printf("Loaded %d sectors\n", HASH_COUNT(sector_table));
+	printf("Loaded: %d sectors\n", HASH_COUNT(sector_table));
 	load_base_map();
 	LL_COUNT(land, tile, num);
-	printf("Loaded %d land tiles\n", num);
+	printf("Loaded: %d land tiles\n", num);
 	
 	// evolve data
 	evolve_map(nearby_distance);
@@ -811,7 +813,7 @@ bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance) {
 	for (x = -1 * distance; x <= distance && !found; ++x) {
 		for (y = -1 * distance; y <= distance && !found; ++y) {
 			shift = shift_tile(tile, x, y);
-			if (shift && tile->sector_type == sect && map_distance(tile, shift) <= distance) {
+			if (shift && shift->sector_type == sect && map_distance(tile, shift) <= distance) {
 				found = TRUE;
 			}
 		}
