@@ -349,10 +349,10 @@ int pick_season(room_data *room) {
 	int day_of_year = time_info.month * 30 + time_info.day;
 	
 	if (day_of_year < 6 * 30) {	// first half of year
-		if (half_y > (day_of_year * slope)) {	// first winter line
+		if (half_y >= round(day_of_year * slope)) {	// first winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
 		}
-		else if (half_y > (day_of_year * slope - 60)) {	// spring line
+		else if (half_y >= round(day_of_year * slope - 60)) {	// spring line
 			return northern ? TILESET_SPRING : TILESET_AUTUMN;
 		}
 		else {
@@ -360,10 +360,10 @@ int pick_season(room_data *room) {
 		}
 	}
 	else {	// 2nd half of year
-		if (half_y > (day_of_year * -slope + slope * 359)) {	// second winter line
+		if (half_y >= round(day_of_year * -slope + slope * 359)) {	// second winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
 		}
-		else if (half_y > (day_of_year * -slope + slope * 299)) {	// autumn line
+		else if (half_y >= round(day_of_year * -slope + slope * 299)) {	// autumn line
 			return northern ? TILESET_AUTUMN : TILESET_SPRING;
 		}
 		else {
