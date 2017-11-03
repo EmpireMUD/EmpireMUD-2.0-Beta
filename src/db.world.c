@@ -3054,7 +3054,11 @@ void output_map_to_file(void) {
 			}
 			
 			// normal map output
-			if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && world_map[x][y].crop_type) {
+			if (TRUE) {
+				extern int pick_season(room_data *room);
+				fprintf(out, "%c", room ? mapout_color_tokens[3 + pick_season(room)] : '?');
+			}
+			else if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && world_map[x][y].crop_type) {
 				fprintf(out, "%c", mapout_color_tokens[GET_CROP_MAPOUT(world_map[x][y].crop_type)]);
 			}
 			else {
