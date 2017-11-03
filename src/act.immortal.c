@@ -354,7 +354,7 @@ struct {
 	{ "b318buildings", LVL_CIMPL, util_b318_buildings },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
-	{ "evolve", LVL_START_IMM, util_evolve },
+	{ "evolve", LVL_CIMPL, util_evolve },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
@@ -466,6 +466,7 @@ ADMIN_UTIL(util_evolve) {
 	void run_external_evolutions();
 	
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used util evolve", GET_NAME(ch));
+	send_config_msg(ch, "ok_string");
 	run_external_evolutions();
 }
 

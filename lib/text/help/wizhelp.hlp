@@ -267,6 +267,22 @@ With two arguments, it ends the war between those two empires.
 
 See also: GRANT
 #d
+EVOLVE EVOLVER EVOLUTIONS
+
+The 'evolve' utility is a separate program the EmpireMUD runs once per game
+day to update the map. When the utility runs, you see two logs:
+
+[ Running map evolutions... ]
+[ Imported 44/58 map evolutions ]
+
+Not all of the evolver's suggested changes could be made. The two most common
+reasons are:
+ - the tile changed since the evolver's map data was saved (e.g. chopped)
+ - the tile turns out to be a building entrance
+
+You can manually trigger a day's worth of evolutions by typing 'util evolve',
+if your access level is high enough.
+#d
 FILE
 
 Usage:  file <file> <lines>
@@ -1346,7 +1362,7 @@ Available utilities:
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
- &cevolve&0 - Triggers map evolutions (just like a normal day).
+ &cevolve&0 - Triggers map evolutions (just like a normal day), see EVOLVER.
  &cislandsize&0 - Counts and displays tile counts for all islands.
  &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
