@@ -5811,6 +5811,8 @@ This command lets you add or remove an evolution from a sector. Evolutions are
 rules that describe how the sector changes over time. Some evolutions change
 the world periodically on their own; others are triggered by player action.
 
+Evolutions happen once per in-game day.
+
 No matter how small you set the percentages on evolutions, if they run on their
 own, they'll eventually succeed. Percentages may be set from 0.01 to 100.00.
 Evolutions are automatically sorted by type and by percentage. Only one will
