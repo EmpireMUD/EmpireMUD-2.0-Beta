@@ -848,7 +848,7 @@ void mark_workforce_delay(empire_data *emp, room_data *room, int chore) {
 	}
 	
 	// set time on entry (random)
-	entry->time = number(1, 3);
+	entry->time = number(2, 3);
 }
 
 
