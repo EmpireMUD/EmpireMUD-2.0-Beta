@@ -348,11 +348,6 @@ int pick_season(room_data *room) {
 	int half_y = ABSOLUTE(ycoord - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
 	int day_of_year = time_info.month * 30 + time_info.day;
 	
-	// adjust
-	if (!northern) {
-		half_y = y_max - half_y;
-	}
-	
 	if (day_of_year < 6 * 30) {	// first half of year
 		if (half_y >= round(day_of_year * slope)) {	// first winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
