@@ -345,7 +345,7 @@ int pick_season(room_data *room) {
 	int y_arctic = round(y_max - (config_get_double("arctic_percent") * y_max / 100));
 	int y_tropics = round(config_get_double("tropics_percent") * y_max / 100);
 	double slope = 150.0 / (y_arctic - y_tropics);	// basic slope of the seasonal gradient
-	int half_y = ABSOLUTE(ycoord - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
+	int half_y = ABSOLUTE(y_max - ycoord) - y_tropics; // simplify by moving the y axis to match the tropics line
 	int day_of_year = time_info.month * 30 + time_info.day;
 	
 	if (day_of_year < 6 * 30) {	// first half of year
