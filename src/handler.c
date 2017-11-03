@@ -3627,6 +3627,22 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
  //////////////////////////////////////////////////////////////////////////////
 //// LEARNED CRAFT HANDLERS //////////////////////////////////////////////////
 
+// for learned/show learned
+int sort_learned_recipes(struct player_craft_data *a, struct player_craft_data *b) {
+	craft_data *acr = craft_proto(a->vnum), *bcr = craft_proto(b->vnum);
+	
+	if (!acr || !bcr) {
+		return 0;
+	}
+	else if (GET_CRAFT_TYPE(acr) != GET_CRAFT_TYPE(bcr)) {
+		return GET_CRAFT_TYPE(acr) - GET_CRAFT_TYPE(bcr);
+	}
+	else {
+		return strcmp(GET_CRAFT_NAME(acr), GET_CRAFT_NAME(bcr));
+	}
+}
+
+
 /**
 * Adds a craft vnum to a player's learned list.
 *
@@ -3645,6 +3661,7 @@ void add_learned_craft(char_data *ch, any_vnum vnum) {
 		CREATE(pcd, struct player_craft_data, 1);
 		pcd->vnum = vnum;
 		HASH_ADD_INT(GET_LEARNED_CRAFTS(ch), vnum, pcd);
+		HASH_SORT(GET_LEARNED_CRAFTS(ch), sort_learned_recipes);
 	}
 }
 
