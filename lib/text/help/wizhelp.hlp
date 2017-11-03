@@ -1346,6 +1346,7 @@ Available utilities:
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
+ &cevolve&0 - Triggers map evolutions (just like a normal day).
  &cislandsize&0 - Counts and displays tile counts for all islands.
  &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.

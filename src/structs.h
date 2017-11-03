@@ -2418,6 +2418,14 @@ struct ban_list_element {
 };
 
 
+// used for the external 'evolve' tool and its imports
+struct evo_import_data {
+	room_vnum vnum;
+	sector_vnum old_sect;
+	sector_vnum new_sect;
+};
+
+
 // Extra descriptions
 struct extra_descr_data {
 	char *keyword;	// Keyword in look/examine

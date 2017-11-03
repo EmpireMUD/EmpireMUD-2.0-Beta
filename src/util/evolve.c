@@ -166,12 +166,13 @@ void evolve_one(struct map_t *tile, int nearby_distance) {
 * @param int nearby_distance The distance to count 'nearby' evos.
 */
 void evolve_map(int nearby_distance) {
+	struct evo_import_data dat;
 	struct map_t *tile;
 	sector_vnum old;
 	int changed = 0;
 	FILE *fl;
 	
-	if (!(fl = fopen(EVOLUTION_FILE TEMP_SUFFIX, "w"))) {
+	if (!(fl = fopen(EVOLUTION_FILE TEMP_SUFFIX, "wb"))) {
 		printf("ERROR: Unable to open evolution file %s\n", EVOLUTION_FILE);
 		exit(1);
 	}
@@ -182,12 +183,15 @@ void evolve_map(int nearby_distance) {
 		evolve_one(tile, nearby_distance);
 		
 		if (tile->sector_type != old) {
-			fprintf(fl, "%d %d %d\n", tile->vnum, old, tile->sector_type);
+			dat.vnum = tile->vnum;
+			dat.old_sect = old;
+			dat.new_sect = tile->sector_type;
+			
+			fwrite(&dat, sizeof(struct evo_import_data), 1, fl);
 			++changed;
 		}
 	}
 	
-	fprintf(fl, "$\n");
 	fclose(fl);
 	rename(EVOLUTION_FILE TEMP_SUFFIX, EVOLUTION_FILE);
 	

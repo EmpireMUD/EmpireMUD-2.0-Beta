@@ -76,6 +76,7 @@ extern bool is_fight_ally(char_data *ch, char_data *frenemy);
 RETSIGTYPE checkpointing(int sig);
 RETSIGTYPE hupsig(int sig);
 RETSIGTYPE reap(int sig);
+RETSIGTYPE import_evolutions(int sig);
 RETSIGTYPE unrestrict_game(int sig);
 char *make_prompt(descriptor_data *point);
 char *prompt_str(char_data *ch);
@@ -133,6 +134,7 @@ unsigned long pulse = 0;	/* number of pulses since game start */
 static bool reboot_recovery = FALSE;
 int mother_desc;
 ush_int port;
+bool do_evo_import = FALSE;	// triggered by SIGUSR1 to import evolutions
 
 // vars to prevent running multiple cycles during a missed-pulse catch-up cycle
 bool catch_up_combat = FALSE;	// frequent_combat()
@@ -883,7 +885,6 @@ void heartbeat(int heart_pulse) {
 	void check_newbie_islands();
 	void check_wars();
 	void chore_update();
-	void detect_evos_per_hour();
 	void display_automessages();
 	void extract_pending_chars();
 	void free_freeable_triggers();
@@ -891,6 +892,7 @@ void heartbeat(int heart_pulse) {
 	void generate_adventure_instances();
 	void output_map_to_file();
 	void point_update();
+	void process_import_evolutions();
 	void process_imports();
 	void prune_instances();
 	void real_update();
@@ -898,7 +900,7 @@ void heartbeat(int heart_pulse) {
 	void reduce_outside_territory();
 	void reduce_stale_empires();
 	void reset_instances();
-	void run_map_evolutions();
+	void run_external_evolutions();
 	void run_mob_echoes();
 	void sanity_check();
 	void save_data_table(bool force);
@@ -1036,8 +1038,6 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
 		if (debug_log && HEARTBEAT(15)) { log("debug 21:\t%lld", microtime()); }
-		detect_evos_per_hour();
-		if (debug_log && HEARTBEAT(15)) { log("debug 21.5:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
@@ -1058,12 +1058,14 @@ void heartbeat(int heart_pulse) {
 	}
 	
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		if (time_info.hours == 12) {
-			process_imports();
+		if (time_info.hours == 0) {
+			run_external_evolutions();
 			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
 		}
-		// evos happen every hour
-		run_map_evolutions();
+		if (time_info.hours == 12) {
+			process_imports();
+			if (debug_log && HEARTBEAT(15)) { log("debug 25.5:\t%lld", microtime()); }
+		}
 		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
 	}
 	
@@ -1079,6 +1081,13 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
 		clean_empire_offenses();
 		if (debug_log && HEARTBEAT(15)) { log("debug 28:\t%lld", microtime()); }
+	}
+	
+	// check if we've been asked to import new evolutions
+	if (do_evo_import) {
+		do_evo_import = FALSE;
+		process_import_evolutions();
+		if (debug_log && HEARTBEAT(15)) { log("debug 28.5:\t%lld", microtime()); }
 	}
 	
 	// this goes roughly last -- update MSDP users
@@ -3296,6 +3305,11 @@ char *replace_prompt_codes(char_data *ch, char *str) {
  //////////////////////////////////////////////////////////////////////////////
 //// SIGNAL PROCESSING ///////////////////////////////////////////////////////
 
+// triggers import of evolutions
+RETSIGTYPE import_evolutions(int sig) {
+	do_evo_import = TRUE;
+}
+
 RETSIGTYPE unrestrict_game(int sig) {
 	syslog(SYS_INFO, 0, TRUE, "Received SIGUSR2 - completely unrestricting game (emergent)");
 	ban_list = NULL;
@@ -3365,6 +3379,9 @@ sigfunc *my_signal(int signo, sigfunc * func) {
 void signal_setup(void) {
 	struct itimerval itime;
 	struct timeval interval;
+	
+	// user signal 1: indicates we have waiting evos to import
+	my_signal(SIGUSR1, import_evolutions);
 
 	/*
 	 * user signal 2: unrestrict game.  Used for emergencies if you lock

@@ -334,6 +334,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 ADMIN_UTIL(util_b318_buildings);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
+ADMIN_UTIL(util_evolve);
 ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
@@ -353,6 +354,7 @@ struct {
 	{ "b318buildings", LVL_CIMPL, util_b318_buildings },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
+	{ "evolve", LVL_START_IMM, util_evolve },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
@@ -457,6 +459,14 @@ ADMIN_UTIL(util_diminish) {
 		
 		msg_to_char(ch, "Diminished value: %.2f\r\n", result);
 	}
+}
+
+
+ADMIN_UTIL(util_evolve) {
+	void run_external_evolutions();
+	
+	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used util evolve", GET_NAME(ch));
+	run_external_evolutions();
 }
 
 
