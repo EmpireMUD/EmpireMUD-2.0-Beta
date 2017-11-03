@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -318,7 +320,7 @@ int pick_season(room_data *room) {
 	double tropics = config_get_double("tropics_percent") / 200.0;
 	bool northern = (ycoord >= MAP_HEIGHT/2);
 	
-	// month 0 is january
+	// month 0 is january; year is 0-359 days
 	
 	// tropics? -- take half the tropic value, convert to percent, multiply by map height
 	if (ycoord >= (tropics * MAP_HEIGHT) && ycoord <= (MAP_HEIGHT - (tropics * MAP_HEIGHT))) {
@@ -338,19 +340,39 @@ int pick_season(room_data *room) {
 		return TILESET_WINTER;
 	}
 	
-	// all other regions:
-	if (time_info.month < 2 || time_info.month > 10) {
-		return northern ? TILESET_WINTER : TILESET_SUMMER;
+	// all other regions: first split the map in half (we'll invert for the south)
+	int y_max = round(MAP_HEIGHT / 2.0);
+	int y_arctic = round(y_max - (config_get_double("arctic_percent") * y_max / 100));
+	int y_tropics = round(config_get_double("tropics_percent") * y_max / 100);
+	double slope = 150 / (y_arctic - y_tropics);	// basic slope of the seasonal gradient
+	int half_y = ABSOLUTE(ycoord - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
+	int day_of_year = time_info.month * 30 + time_info.day;
+	
+	if (day_of_year < 6 * 30) {	// first half of year
+		if (half_y > (day_of_year * slope)) {	// first winter line
+			return northern ? TILESET_WINTER : TILESET_SUMMER;
+		}
+		else if (half_y > (day_of_year * slope - 60)) {	// spring line
+			return northern ? TILESET_SPRING : TILESET_AUTUMN;
+		}
+		else {
+			return northern ? TILESET_SUMMER : TILESET_WINTER;
+		}
 	}
-	else if (time_info.month < 5) {
-		return northern ? TILESET_SPRING : TILESET_AUTUMN;
+	else {	// 2nd half of year
+		if (half_y > (day_of_year * -slope + slope * 359)) {	// second winter line
+			return northern ? TILESET_WINTER : TILESET_SUMMER;
+		}
+		else if (half_y > (day_of_year * -slope + slope * 299)) {	// autumn line
+			return northern ? TILESET_AUTUMN : TILESET_SPRING;
+		}
+		else {
+			return northern ? TILESET_SUMMER : TILESET_WINTER;
+		}
 	}
-	else if (time_info.month < 8) {
-		return northern ? TILESET_SUMMER : TILESET_WINTER;
-	}
-	else {
-		return northern ? TILESET_AUTUMN : TILESET_SPRING;
-	}
+	
+	// fail? we should never reach this
+	return TILESET_SUMMER;
 }
 
 
