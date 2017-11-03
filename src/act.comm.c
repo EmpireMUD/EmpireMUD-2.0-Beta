@@ -503,9 +503,10 @@ int top_slash_channel_id = 0;
 * !CHANNEL-JOINS preference (toggle channel-joins).
 *
 * @param struct slash_channel *chan The slash channel to announce to.
+* @param char_data *person The person being announced (for ignores).
 * @param const char *messg... String format of the messages
 */
-void announce_to_slash_channel(struct slash_channel *chan, const char *messg, ...) {
+void announce_to_slash_channel(struct slash_channel *chan, char_data *person, const char *messg, ...) {
 	struct player_slash_channel *slash;
 	char output[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	descriptor_data *d;
@@ -517,13 +518,19 @@ void announce_to_slash_channel(struct slash_channel *chan, const char *messg, ..
 		sprintf(lbuf, "[\t%c/%s\tn] %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
-			if (d->character && STATE(d) == CON_PLAYING && !PRF_FLAGGED(d->character, PRF_NO_CHANNEL_JOINS)) {
-				if ((slash = find_on_slash_channel(d->character, chan->id))) {
-					SEND_TO_Q(lbuf, d);
-					// no longer putting announcements on history
-					// process_add_to_channel_history(&(slash->history), lbuf);
-				}
+			if (!d->character || STATE(d) != CON_PLAYING) {
+				continue;
 			}
+			if (PRF_FLAGGED(d->character, PRF_NO_CHANNEL_JOINS) || is_ignoring(d->character, person)) {
+				continue;
+			}
+			if (!(slash = find_on_slash_channel(d->character, chan->id))) {
+				continue;
+			}
+			
+			SEND_TO_Q(lbuf, d);
+			// no longer putting announcements on history
+			// process_add_to_channel_history(&(slash->history), lbuf);
 		}
 
 		va_end(tArgList);
@@ -862,7 +869,7 @@ ACMD(do_slash_channel) {
 			if (!global_mute_slash_channel_joins) {
 				// announce to channel members
 				if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
-					announce_to_slash_channel(chan, "%s has joined the channel", PERS(ch, ch, TRUE));
+					announce_to_slash_channel(chan, ch, "%s has joined the channel", PERS(ch, ch, TRUE));
 				}
 				// if player wouldn't see their own join announce
 				if (GET_INVIS_LEV(ch) > LVL_MORTAL || PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS) || PRF_FLAGGED(ch, PRF_INCOGNITO)) {
@@ -891,7 +898,7 @@ ACMD(do_slash_channel) {
 			}
 			
 			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
-				announce_to_slash_channel(chan, "%s has left the channel", PERS(ch, ch, TRUE));
+				announce_to_slash_channel(chan, ch, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
 		}
 	}
