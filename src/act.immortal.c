@@ -2187,11 +2187,11 @@ SHOW(show_quests) {
 	void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
 	void show_quest_tracker(char_data *ch, struct player_quest *pq);
 	
-	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH], when[256];
 	struct player_completed_quest *pcq, *next_pcq;
 	bool file = FALSE, found = FALSE;
 	struct player_quest *pq;
-	int count, total;
+	int count, total, diff;
 	quest_data *qst;
 	char_data *vict;
 	size_t size;
@@ -2244,7 +2244,17 @@ SHOW(show_quests) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum));
+			
+			if (time(0) - pcq->last_completed < SECS_PER_REAL_DAY) {
+				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_HOUR;
+				snprintf(when, sizeof(when), "(%d hour%s ago)", diff, PLURAL(diff));
+			}
+			else {
+				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_DAY;
+				snprintf(when, sizeof(when), "(%d day%s ago)", diff, PLURAL(diff));
+			}
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
 		}
 	
 		if (ch->desc) {
