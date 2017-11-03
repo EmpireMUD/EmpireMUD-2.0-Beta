@@ -315,10 +315,11 @@ char *get_room_name(room_data *room, bool color) {
 
 // determines which tileset to use for sector color
 int pick_season(room_data *room) {
-	int ycoord = Y_COORD(room);
+	int ycoord = Y_COORD(room), y_max, y_arctic, y_tropics, half_y, day_of_year;
 	double arctic = config_get_double("arctic_percent") / 200.0;	// split in half and convert from XX.XX to .XXXX (percent)
 	double tropics = config_get_double("tropics_percent") / 200.0;
 	bool northern = (ycoord >= MAP_HEIGHT/2);
+	double slope;
 	
 	// month 0 is january; year is 0-359 days
 	
@@ -341,17 +342,19 @@ int pick_season(room_data *room) {
 	}
 	
 	// all other regions: first split the map in half (we'll invert for the south)
-	int y_max = round(MAP_HEIGHT / 2.0);
-	int y_arctic = round(y_max - (config_get_double("arctic_percent") * y_max / 100));
-	int y_tropics = round(config_get_double("tropics_percent") * y_max / 100);
-	double slope = 150.0 / (y_arctic - y_tropics);	// basic slope of the seasonal gradient
-	int half_y;	// this will be the vertical pos
-	int day_of_year = time_info.month * 30 + time_info.day;
+	y_max = round(MAP_HEIGHT / 2.0);
+	day_of_year = time_info.month * 30 + time_info.day;
 	
 	if (northern) {
+		y_arctic = round(y_max - (config_get_double("arctic_percent") * y_max / 100));
+		y_tropics = round(config_get_double("tropics_percent") * y_max / 100);
+		slope = 150.0 / (y_arctic - y_tropics);	// basic slope of the seasonal gradient
 		half_y = ABSOLUTE(ycoord - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
 	}
 	else {
+		y_arctic = round(config_get_double("arctic_percent") * y_max / 100);
+		y_tropics = round(y_max - (config_get_double("tropics_percent") * y_max / 100));
+		slope = 150.0 / (y_tropics - y_arctic);	// basic slope of the seasonal gradient
 		half_y = ycoord - y_arctic;	// adjust to remove arctic
 	}
 	
