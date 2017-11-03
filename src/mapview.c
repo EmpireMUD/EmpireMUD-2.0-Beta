@@ -323,7 +323,7 @@ int pick_season(room_data *room) {
 	// month 0 is january; year is 0-359 days
 	
 	// tropics? -- take half the tropic value, convert to percent, multiply by map height
-	if (ycoord >= (tropics * MAP_HEIGHT) && ycoord <= (MAP_HEIGHT - (tropics * MAP_HEIGHT))) {
+	if (ycoord >= round(MAP_HEIGHT/2.0) - (tropics * MAP_HEIGHT) && ycoord <= round(MAP_HEIGHT/2.0) + (tropics * MAP_HEIGHT)) {
 		if (time_info.month < 2) {
 			return TILESET_SPRING;
 		}
