@@ -1624,7 +1624,7 @@ ACMD(do_learn) {
 
 
 ACMD(do_learned) {
-	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vnum[256];
 	struct player_craft_data *pcd, *next_pcd;
 	craft_data *craft;
 	size_t size, count;
@@ -1654,8 +1654,15 @@ ACMD(do_learned) {
 			continue;	// searched
 		}
 		
+		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+			snprintf(vnum, sizeof(vnum), "[%5d]", GET_CRAFT_VNUM(craft));
+		}
+		else {
+			*vnum = '\0';
+		}
+		
 		// show it
-		snprintf(line, sizeof(line), " %s (%s)\r\n", GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+		snprintf(line, sizeof(line), "%s %s (%s)\r\n", vnum, GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 		if (size + strlen(line) < sizeof(output)) {
 			strcat(output, line);
 			size += strlen(line);
