@@ -1690,6 +1690,8 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 void free_empire(empire_data *emp) {
 	extern struct empire_territory_data *global_next_territory_entry;
 	
+	struct workforce_delay_chore *wdc, *next_wdc;
+	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store;
 	struct empire_unique_storage *eus;
@@ -1784,6 +1786,14 @@ void free_empire(empire_data *emp) {
 	// free offenses
 	while (EMPIRE_OFFENSES(emp)) {
 		remove_offense(emp, EMPIRE_OFFENSES(emp));
+	}
+	
+	// free delays
+	HASH_ITER(hh, EMPIRE_DELAYS(emp), delay, next_delay) {
+		LL_FOREACH_SAFE(delay->chores, wdc, next_wdc) {
+			free(wdc);
+		}
+		free(delay);
 	}
 	
 	// free strings

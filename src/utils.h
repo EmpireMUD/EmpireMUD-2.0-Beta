@@ -518,6 +518,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
 #define EMPIRE_COINS(emp)  ((emp)->coins)
 #define EMPIRE_PRIV(emp, num)  ((emp)->priv[(num)])
+#define EMPIRE_DELAYS(emp)  ((emp)->delays)
 #define EMPIRE_DESCRIPTION(emp)  ((emp)->description)
 #define EMPIRE_DIPLOMACY(emp)  ((emp)->diplomacy)
 #define EMPIRE_STORAGE(emp)  ((emp)->store)

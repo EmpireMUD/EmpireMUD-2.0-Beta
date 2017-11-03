@@ -4136,6 +4136,22 @@ struct empire_workforce_tracker {
 };
 
 
+// linked list of chores in the 'delay' state
+struct workforce_delay_chore {
+	int chore;
+	int time;
+	struct workforce_delay_chore *next;
+};
+
+
+// allows workforce chores to be skipped
+struct workforce_delay {
+	room_vnum location;
+	struct workforce_delay_chore *chores;
+	UT_hash_handle hh;
+};
+
+
 // for offenses committed against an empire
 struct offense_data {
 	int type;	// OFFENSE_ constant
@@ -4191,6 +4207,7 @@ struct empire_data {
 	struct empire_territory_data *territory_list;	// hash table by vnum
 	struct empire_city_data *city_list;	// linked list of cities
 	struct empire_workforce_tracker *ewt_tracker;	// workforce tracker
+	struct workforce_delay *delays;	// speeds up chore processing
 	
 	// unsaved data
 	int city_terr;	// total territory IN cities
