@@ -1733,7 +1733,7 @@ void process_minting(char_data *ch) {
 	}
 	else {
 		num = GET_ACTION_VNUM(ch, 1);
-		msg_to_char(ch, "You finish milling and receive %s!\r\n", money_amount(emp, num));
+		msg_to_char(ch, "You finish minting and receive %s!\r\n", money_amount(emp, num));
 		act("$n finishes minting some coins!", FALSE, ch, NULL, NULL, TO_ROOM);
 		increase_coins(ch, emp, num);
 		
