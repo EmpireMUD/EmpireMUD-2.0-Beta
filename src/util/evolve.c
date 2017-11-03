@@ -37,6 +37,13 @@
  //////////////////////////////////////////////////////////////////////////////
 //// LOCAL DATA //////////////////////////////////////////////////////////////
 
+// global vars (these are changed by command line args)
+int nearby_distance = 2;	// for nearby evos
+int day_of_year = 180;	// for seasons
+double arctic_percent = 6.0;	// for seasons
+double tropics_percent = 35.0;	// for seasons
+
+
 // light version of map data for this program
 struct map_t {
 	room_vnum vnum;	
@@ -82,6 +89,7 @@ void index_boot_sectors();
 void load_base_map();
 int map_distance(struct map_t *start, struct map_t *end);
 int number(int from, int to);
+int season(struct map_t *tile);
 bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance);
 struct map_t *shift_tile(struct map_t *origin, int x_shift, int y_shift);
 
@@ -96,9 +104,8 @@ void basic_mud_log(const char *format, ...) { }
 * attempt to evolve a single tile
 *
 * @param struct map_t *tile The tile to evolve.
-* @param int nearby_distance The distance to count 'nearby' evos.
 */
-void evolve_one(struct map_t *tile, int nearby_distance) {
+void evolve_one(struct map_t *tile) {
 	sector_data *original, *new_sect;
 	struct evolution_data *evo;
 	sector_vnum become, vnum;
@@ -122,30 +129,49 @@ void evolve_one(struct map_t *tile, int nearby_distance) {
 		become = evo->becomes;
 	}
 	
+	// seasons
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_SPRING)) && season(tile) == TILESET_SPRING) {
+		become = evo->becomes;
+	}
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_SUMMER)) && season(tile) == TILESET_SUMMER) {
+		become = evo->becomes;
+	}
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_AUTUMN)) && season(tile) == TILESET_AUTUMN) {
+		become = evo->becomes;
+	}
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_WINTER)) && season(tile) == TILESET_WINTER) {
+		become = evo->becomes;
+	}
+	
+	// adjacent-one
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_ADJACENT_ONE))) {
 		if (count_adjacent(tile, evo->value, TRUE) >= 1) {
 			become = evo->becomes;
 		}
 	}
 	
+	// not adjacent
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NOT_ADJACENT))) {
 		if (count_adjacent(tile, evo->value, TRUE) < 1) {
 			become = evo->becomes;
 		}
 	}
 	
+	// adjacent-many
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_ADJACENT_MANY))) {
 		if (count_adjacent(tile, evo->value, TRUE) >= 6) {
 			become = evo->becomes;
 		}
 	}
 	
+	// near sector
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NEAR_SECTOR))) {
 		if (sect_within_distance(tile, evo->value, nearby_distance)) {
 			become = evo->becomes;
 		}
 	}
 	
+	// not near sector
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR))) {
 		if (!sect_within_distance(tile, evo->value, nearby_distance)) {
 			become = evo->becomes;
@@ -162,10 +188,8 @@ void evolve_one(struct map_t *tile, int nearby_distance) {
 
 /**
 * runs the evolutions on the whole map and writes the hint file
-*
-* @param int nearby_distance The distance to count 'nearby' evos.
 */
-void evolve_map(int nearby_distance) {
+void evolve_map(void) {
 	struct evo_import_data dat;
 	struct map_t *tile;
 	sector_vnum old;
@@ -180,7 +204,7 @@ void evolve_map(int nearby_distance) {
 	LL_FOREACH(land, tile) {
 		old = tile->sector_type;
 		
-		evolve_one(tile, nearby_distance);
+		evolve_one(tile);
 		
 		if (tile->sector_type != old) {
 			dat.vnum = tile->vnum;
@@ -204,20 +228,30 @@ void evolve_map(int nearby_distance) {
 
 int main(int argc, char **argv) {
 	struct map_t *tile;
-	int num, nearby_distance, pid = 0;
+	int num, pid = 0;
 	
-	if (argc < 2 || argc > 3) {
-		printf("Format: %s <nearby distance> [pid to signal]\n", argv[0]);
+	if (argc < 5 || argc > 6) {
+		printf("Format: %s <nearby distance> <day of year> <arctic percent> <tropics percent> [pid to signal]\n", argv[0]);
 		exit(0);
 	}
 	
 	empire_srandom(time(0));
+	
 	nearby_distance = atoi(argv[1]);
 	printf("Using nearby distance of: %d\n", nearby_distance);
 	
+	day_of_year = atoi(argv[2]);
+	printf("Using day of year: %d\n", day_of_year);
+	
+	arctic_percent = atof(argv[3]);
+	printf("Using arctic percent: %.2f\n", arctic_percent);
+	
+	tropics_percent = atof(argv[4]);
+	printf("Using tropics percent: %.2f\n", tropics_percent);
+	
 	// determines if we will send a signal back to the mud
-	if (argc == 3) {
-		pid = atoi(argv[2]);
+	if (argc == 6) {
+		pid = atoi(argv[5]);
 		printf("Will signal pid: %d\n", pid);
 	}
 	
@@ -229,7 +263,7 @@ int main(int argc, char **argv) {
 	printf("Loaded: %d land tiles\n", num);
 	
 	// evolve data
-	evolve_map(nearby_distance);
+	evolve_map();
 	
 	// signal back to the mud that we're done
 	if (pid) {
@@ -766,7 +800,7 @@ bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *ne
 * returned.
 *
 * @param sector_vnum sect The sector to check.
-* @param int type The EVO_x type to get.
+* @param int type The EVO_ type to get.
 * @return struct evolution_data* The found evolution, or NULL.
 */
 struct evolution_data *get_evo_by_type(sector_vnum sect, int type) {
@@ -799,6 +833,52 @@ int map_distance(struct map_t *start, struct map_t *end) {
 	dist = (int) sqrt(dist);
 	
 	return dist;
+}
+
+
+/**
+* Calculates which season it is at a given location.
+*/
+int season(struct map_t *tile) {
+	int ycoord = MAP_Y_COORD(tile->vnum);
+	double arctic = arctic_percent / 200.0;	// split in half and convert from XX.XX to .XXXX (percent)
+	double tropics = tropics_percent / 200.0;
+	bool northern = (ycoord >= MAP_HEIGHT/2);
+	int month = day_of_year / 30;
+	
+	// month 0 is january
+	
+	// tropics? -- take half the tropic value, convert to percent, multiply by map height
+	if (ycoord >= (tropics * MAP_HEIGHT) && ycoord <= (MAP_HEIGHT - (tropics * MAP_HEIGHT))) {
+		if (month < 2) {
+			return TILESET_SPRING;
+		}
+		else if (month > 10) {
+			return TILESET_AUTUMN;
+		}
+		else {
+			return TILESET_SUMMER;
+		}
+	}
+	
+	// arctic? -- take half the arctic value, convert to percent, check map edges
+	if (ycoord <= (arctic * MAP_HEIGHT) || ycoord >= (MAP_HEIGHT - (arctic * MAP_HEIGHT))) {
+		return TILESET_WINTER;
+	}
+	
+	// all other regions:
+	if (month < 2 || month > 10) {
+		return northern ? TILESET_WINTER : TILESET_SUMMER;
+	}
+	else if (month < 5) {
+		return northern ? TILESET_SPRING : TILESET_AUTUMN;
+	}
+	else if (month < 8) {
+		return northern ? TILESET_SUMMER : TILESET_WINTER;
+	}
+	else {
+		return northern ? TILESET_AUTUMN : TILESET_SPRING;
+	}
 }
 
 

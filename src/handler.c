@@ -6933,7 +6933,7 @@ bool check_evolution_percent(struct evolution_data *evo) {
 * returned.
 *
 * @param sector_data *st The sector to check.
-* @param int type The EVO_x type to get.
+* @param int type The EVO_ type to get.
 * @return struct evolution_data* The found evolution, or NULL.
 */
 struct evolution_data *get_evolution_by_type(sector_data *st, int type) {
@@ -6956,7 +6956,7 @@ struct evolution_data *get_evolution_by_type(sector_data *st, int type) {
 
 /**
 * @param sector_data *st The sector to check.
-* @param int type The EVO_x type to check.
+* @param int type The EVO_ type to check.
 * @return bool TRUE if the sector has at least one evolution of this type.
 */
 bool has_evolution_type(sector_data *st, int type) {
@@ -6981,7 +6981,7 @@ bool has_evolution_type(sector_data *st, int type) {
 * This finds a sector that can evolve to be the argument 'in_sect'.
 *
 * @param sector_data *in_sect The sector you have already.
-* @param int evo_type Any EVO_x const.
+* @param int evo_type Any EVO_ const.
 * @return sector_data* The sector that can evolve to become in_sect, or NULL if there isn't one.
 */
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type) {

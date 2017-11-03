@@ -2665,18 +2665,22 @@ const char *designate_flags[] = {
 
 // EVO_x 1/3: world evolution names
 const char *evo_types[] = {
-	"CHOPPED-DOWN",
+	"CHOPPED-DOWN",	// 0
 	"CROP-GROWS",
 	"ADJACENT-ONE",
 	"ADJACENT-MANY",
 	"RANDOM",
-	"TRENCH-START",
+	"TRENCH-START",	// 5
 	"TRENCH-FULL",
 	"NEAR-SECTOR",
 	"PLANTS-TO",
 	"MAGIC-GROWTH",
-	"NOT-ADJACENT",
+	"NOT-ADJACENT",	// 10
 	"NOT-NEAR-SECTOR",
+	"SPRING",
+	"SUMMER",
+	"AUTUMN",
+	"WINTER",	// 15
 	"\n"
 };
 
@@ -2695,6 +2699,10 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// magic-growth
 	EVO_VAL_SECTOR,	// not-adjacent
 	EVO_VAL_SECTOR,	// not-near-sector
+	EVO_VAL_NONE,	// spring
+	EVO_VAL_NONE,	// summer
+	EVO_VAL_NONE,	// autumn
+	EVO_VAL_NONE,	// winter
 };
 
 
@@ -2712,6 +2720,10 @@ bool evo_is_over_time[] = {
 	FALSE,	// magic-growth
 	TRUE,	// not-adjacent
 	TRUE,	// not-near-sector
+	TRUE,	// spring
+	TRUE,	// summer
+	TRUE,	// autumn
+	TRUE,	// winter
 };
 
 

@@ -2208,7 +2208,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_DEPLETION_TYPES  9	// total
 
 
-// world evolutions
+// EVO_x: world evolutions
 #define EVO_CHOPPED_DOWN  0	// sect it becomes when a tree is removed, [value=# of trees]: controls chopping, chant of nature, etc
 #define EVO_CROP_GROWS  1	// e.g. 'seeded field' crop-grows to 'crop' [no value]
 #define EVO_ADJACENT_ONE  2	// called when adjacent to at least 1 of [value=sector]
@@ -2221,7 +2221,11 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_MAGIC_GROWTH  9	// called when Chant of Nature or similar is called
 #define EVO_NOT_ADJACENT  10	// called when NOT adjacent to at least 1 of [value=sector]
 #define EVO_NOT_NEAR_SECTOR  11 // called when NOT within 2 tiles of [value=sector]
-#define NUM_EVOS  12	// total
+#define EVO_SPRING  12	// triggers if it's spring
+#define EVO_SUMMER  13	// triggers if it's summer
+#define EVO_AUTUMN  14	// triggers if it's autumn
+#define EVO_WINTER  15	// triggers if it's winter
+#define NUM_EVOS  16	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0
@@ -4602,7 +4606,7 @@ struct sector_data {
 
 // for sector_data, to describe how a tile changes over time
 struct evolution_data {
-	int type;	// EVO_x
+	int type;	// EVO_
 	int value;	// used by some types, e.g. # of adjacent forests
 	double percent;	// chance of happening per zone update
 	sector_vnum becomes;	// sector to transform to

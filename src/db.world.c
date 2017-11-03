@@ -2390,7 +2390,7 @@ void process_import_evolutions(void) {
 void run_external_evolutions(void) {
 	char buf[MAX_STRING_LENGTH];
 
-	snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d &", config_get_int("nearby_sector_distance"), (int) getpid());
+	snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d %.2f %.2f %d &", config_get_int("nearby_sector_distance"), ((time_info.month * 30) + time_info.day), config_get_double("arctic_percent"), config_get_double("tropics_percent"), (int) getpid());
 	syslog(SYS_INFO, LVL_START_IMM, TRUE, "Running map evolutions...");
 	system(buf);
 }
