@@ -81,7 +81,10 @@ void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
 extern char *show_color_codes(char *string);
+extern int stats_get_crop_count(crop_data *cp);
+extern int stats_get_sector_count(sector_data *sect);
 void update_class(char_data *ch);
+void update_world_count();
 
 // locals
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size);
@@ -2519,6 +2522,31 @@ SHOW(show_commons) {
 }
 
 
+SHOW(show_crops) {
+	crop_data *crop, *next_crop;
+	int count, total, this;
+	
+	// fresh numbers
+	update_world_count();
+	
+	// output
+	total = count = 0;
+	
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		this = stats_get_crop_count(crop);
+		strcpy(buf, GET_CROP_NAME(crop));
+		msg_to_char(ch, " %6d %-20.20s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
+		total += this;
+	}
+	if (count % 2) {
+		msg_to_char(ch, "\r\n");
+	}
+	
+	msg_to_char(ch, " Total: %d\r\n", total);
+
+}
+
+
 SHOW(show_dailycycle) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	quest_data *qst, *next_qst;
@@ -2629,12 +2657,7 @@ SHOW(show_technology) {
 
 
 SHOW(show_terrain) {
-	extern int stats_get_crop_count(crop_data *cp);
-	extern int stats_get_sector_count(sector_data *sect);
-	void update_world_count();
-	
 	sector_data *sect, *next_sect;
-	crop_data *crop, *next_crop;
 	int count, total, this;
 	
 	// fresh numbers
@@ -2649,16 +2672,11 @@ SHOW(show_terrain) {
 		total += this;
 	}
 	
-	HASH_ITER(hh, crop_table, crop, next_crop) {
-		strcpy(buf, GET_CROP_NAME(crop));
-		msg_to_char(ch, " %6d %-20.20s %s", stats_get_crop_count(crop), CAP(buf), !((++count)%2) ? "\r\n" : " ");
-	}
 	if (count % 2) {
 		msg_to_char(ch, "\r\n");
 	}
 	
 	msg_to_char(ch, " Total: %d\r\n", total);
-
 }
 
 
@@ -7389,6 +7407,7 @@ ACMD(do_show) {
 		{ "stats", LVL_GOD, show_stats },
 		{ "site", LVL_ASST, show_site },
 		{ "commons", LVL_ASST, show_commons },
+		{ "crops", LVL_START_IMM, show_crops },
 		{ "players", LVL_START_IMM, show_players },
 		{ "terrain", LVL_START_IMM, show_terrain },
 		{ "account", LVL_CIMPL, show_account },
