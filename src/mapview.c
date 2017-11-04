@@ -348,23 +348,23 @@ int pick_season(room_data *room) {
 	if (northern) {
 		y_arctic = round(y_max - (config_get_double("arctic_percent") * y_max / 100));
 		y_tropics = round(config_get_double("tropics_percent") * y_max / 100);
-		a_slope = (y_arctic - y_tropics) / 120.0;	// basic slope of the seasonal gradient
-		b_slope = (y_arctic - y_tropics) / 90.0;
+		a_slope = ((y_arctic - 1) - (y_tropics + 1)) / 120.0;	// basic slope of the seasonal gradient
+		b_slope = ((y_arctic - 1) - (y_tropics + 1)) / 90.0;
 		half_y = ABSOLUTE(ycoord - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
 	}
 	else {
 		y_arctic = round(config_get_double("arctic_percent") * y_max / 100);
 		y_tropics = round(y_max - (config_get_double("tropics_percent") * y_max / 100));
-		a_slope = (y_tropics - y_arctic) / 120.0;	// basic slope of the seasonal gradient
-		b_slope = (y_tropics - y_arctic) / 90.0;
+		a_slope = ((y_tropics - 1) - (y_arctic + 1)) / 120.0;	// basic slope of the seasonal gradient
+		b_slope = ((y_tropics - 1) - (y_arctic + 1)) / 90.0;
 		half_y = ycoord - y_arctic;	// adjust to remove arctic
 	}
 	
 	if (day_of_year < 6 * 30) {	// first half of year
-		if (half_y >= round((day_of_year + 1) * a_slope)) {	// first winter line
+		if (half_y >= round((day_of_year + 0) * a_slope)) {	// first winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
 		}
-		else if (half_y >= round((day_of_year - 91) * b_slope)) {	// spring line
+		else if (half_y >= round((day_of_year - 90) * b_slope)) {	// spring line
 			return northern ? TILESET_SPRING : TILESET_AUTUMN;
 		}
 		else {
@@ -372,10 +372,10 @@ int pick_season(room_data *room) {
 		}
 	}
 	else {	// 2nd half of year
-		if (half_y >= round((day_of_year - 358) * -a_slope)) {	// second winter line
+		if (half_y >= round((day_of_year - 359) * -a_slope)) {	// second winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
 		}
-		else if (half_y >= round((day_of_year - 271) * -b_slope)) {	// autumn line
+		else if (half_y >= round((day_of_year - 270) * -b_slope)) {	// autumn line
 			return northern ? TILESET_AUTUMN : TILESET_SPRING;
 		}
 		else {
