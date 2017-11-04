@@ -62,6 +62,7 @@ extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
 
 // external functions
+extern int adjusted_instance_limit(adv_data *adv);
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
@@ -909,7 +910,7 @@ void do_instance_list_all(char_data *ch) {
 			continue;
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, GET_ADV_MAX_INSTANCES(adv));
+		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, adjusted_instance_limit(adv));
 	}
 	
 	if (ch->desc) {
@@ -3374,7 +3375,7 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 		sprintf(lbuf, "%d min", GET_ADV_RESET_TIME(adv));
 	}
 	
-	msg_to_char(ch, "Instance limit: [&c%d&0/&c%d&0], Player limit: [&c%d&0], Reset time: [&c%s&0]\r\n", count_instances(adventure_proto(GET_ADV_VNUM(adv))), GET_ADV_MAX_INSTANCES(adv), GET_ADV_PLAYER_LIMIT(adv), lbuf);
+	msg_to_char(ch, "Instance limit: [&c%d&0/&c%d&0 (&c%d&0)], Player limit: [&c%d&0], Reset time: [&c%s&0]\r\n", count_instances(adventure_proto(GET_ADV_VNUM(adv))), adjusted_instance_limit(adv), GET_ADV_MAX_INSTANCES(adv), GET_ADV_PLAYER_LIMIT(adv), lbuf);
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);

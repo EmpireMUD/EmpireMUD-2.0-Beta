@@ -526,6 +526,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
 #define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
 #define ADV_CAN_DELAY_LOAD  BIT(10)	// can save memory by not instantiating till a player appears
+#define ADV_IGNORE_WORLD_SIZE  BIT(11)	// does not adjust the instance limit
 
 
 // ADV_LINK_x: adventure link rule types

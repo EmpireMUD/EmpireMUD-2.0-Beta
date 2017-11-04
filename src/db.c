@@ -228,6 +228,7 @@ bool need_world_index = TRUE;	// used to trigger world index saving (always save
 struct island_info *island_table = NULL; // hash table for all the islands
 struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
 struct map_data *land_map = NULL;	// linked list of non-ocean
+int size_of_world = 1;	// used by the instancer to adjust instance counts
 struct shared_room_data ocean_shared_data;	// for BASIC_OCEAN tiles
 bool world_map_needs_save = TRUE;	// always do at least 1 save
 
@@ -295,6 +296,7 @@ void boot_db(void) {
 	void schedule_map_unloads();
 	void sort_commands();
 	void startup_room_reset();
+	void update_instance_world_size();
 	void verify_sectors();
 
 	log("Boot db -- BEGIN.");
@@ -399,6 +401,7 @@ void boot_db(void) {
 	
 	log("Managing world memory.");
 	schedule_map_unloads();
+	update_instance_world_size();
 	
 	// END
 	log("Boot db -- DONE.");

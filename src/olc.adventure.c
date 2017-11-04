@@ -684,6 +684,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 * @param char_data *ch The person who is editing a adventure and will see its display.
 */
 void olc_show_adventure(char_data *ch) {
+	extern int adjusted_instance_limit(adv_data *adv);
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
@@ -709,7 +710,7 @@ void olc_show_adventure(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
 	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));
 	
-	sprintf(buf + strlen(buf), "<%slimit\t0> %d instance%s\r\n", OLC_LABEL_VAL(GET_ADV_MAX_INSTANCES(adv), 1), GET_ADV_MAX_INSTANCES(adv), (GET_ADV_MAX_INSTANCES(adv) != 1 ? "s" : ""));
+	sprintf(buf + strlen(buf), "<%slimit\t0> %d instance%s (adjusts to %d)\r\n", OLC_LABEL_VAL(GET_ADV_MAX_INSTANCES(adv), 1), GET_ADV_MAX_INSTANCES(adv), (GET_ADV_MAX_INSTANCES(adv) != 1 ? "s" : ""), adjusted_instance_limit(adv));
 	sprintf(buf + strlen(buf), "<%splayerlimit\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_PLAYER_LIMIT(adv), 0), GET_ADV_PLAYER_LIMIT(adv));
 	
 	// reset time display helper

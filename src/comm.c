@@ -908,6 +908,7 @@ void heartbeat(int heart_pulse) {
 	void update_actions();
 	void update_empire_npc_data();
 	void update_guard_towers();
+	void update_instance_world_size();
 	void update_players_online_stats();
 	void update_trading_post();
 	void weather_and_time(int mode);
@@ -1081,6 +1082,8 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
 		clean_empire_offenses();
 		if (debug_log && HEARTBEAT(15)) { log("debug 28:\t%lld", microtime()); }
+		update_instance_world_size();
+		if (debug_log && HEARTBEAT(15)) { log("debug 28.2:\t%lld", microtime()); }
 	}
 	
 	// check if we've been asked to import new evolutions

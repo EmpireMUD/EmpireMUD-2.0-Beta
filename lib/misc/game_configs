@@ -190,6 +190,7 @@ war_cost_min 5000
 war_login_delay 30
 *
 * World configs
+adjust_instance_limits 1
 arctic_percent 6.000000
 default_adventure_sect 31
 default_building_sect 10

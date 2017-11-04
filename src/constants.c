@@ -222,17 +222,18 @@ const char *ability_gain_hooks[] = {
 
 // ADV_x
 const char *adventure_flags[] = {
-	"IN-DEVELOPMENT",
+	"IN-DEVELOPMENT",	// 0
 	"LOCK-LEVEL-ON-ENTER",
 	"LOCK-LEVEL-ON-COMBAT",
 	"!NEARBY",
 	"ROTATABLE",
-	"CONFUSING-RANDOMS",
+	"CONFUSING-RANDOMS",	// 5
 	"!NEWBIE",
 	"NEWBIE-ONLY",
 	"NO-MOB-CLEANUP",
 	"EMPTY-RESET-ONLY",
-	"CAN-DELAY-LOAD",
+	"CAN-DELAY-LOAD",	// 10
+	"IGNORE-WORLD-SIZE",
 	"\n"
 };
 

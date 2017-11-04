@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -33,6 +35,7 @@
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const int rev_dir[];
+extern int size_of_world;
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
@@ -1457,6 +1460,30 @@ void add_instance_mob(struct instance_data *inst, mob_vnum vnum) {
 
 
 /**
+* This function adjusts the instance limits based on the size of the game
+* world, so smaller worlds get fewer instances and larger ones get more.
+* It uses the magic number "300000" because that size was used in developing
+* the game.
+*
+* You can shut this off with the "adjust_instance_limits" config.
+*
+* @param adv_data *adv Which adventure.
+* @return int The adjusted maximum number of instances.
+*/
+int adjusted_instance_limit(adv_data *adv) {
+	int val;
+	
+	if (ADVENTURE_FLAGGED(adv, ADV_IGNORE_WORLD_SIZE) || !config_get_bool("adjust_instance_limits")) {
+		return GET_ADV_MAX_INSTANCES(adv);
+	}
+	else {
+		val = ceil((double)GET_ADV_MAX_INSTANCES(adv) * size_of_world / 300000);
+		return MAX(1, val);	// guarantee 1
+	}
+}
+
+
+/**
 * Determines if a player is eligible to enter an instance in any way.
 *
 * @param char_data *ch The person trying to enter.
@@ -1497,7 +1524,7 @@ bool can_instance(adv_data *adv) {
 		// the start vnum MUST be a room template
 		return FALSE;
 	}
-	if (count_instances(adv) >= GET_ADV_MAX_INSTANCES(adv)) {
+	if (count_instances(adv) >= adjusted_instance_limit(adv)) {
 		// never more
 		return FALSE;
 	}
@@ -1884,6 +1911,30 @@ void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum) {
 			free(im);
 		}
 	}
+}
+
+
+/**
+* This function updates the numbers that are used to adjust the number of
+* instances based on the size of the world (land tiles only).
+*/
+void update_instance_world_size(void) {
+	extern int stats_get_sector_count(sector_data *sect);
+	void update_world_count();
+	
+	sector_data *sect, *next_sect;
+	int total;
+	
+	// fresh numbers
+	update_world_count();
+	
+	// determine total land area
+	total = 0;
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		total += stats_get_sector_count(sect);
+	}
+	
+	size_of_world = MAX(1, total);	// don't allow 0
 }
 
 
