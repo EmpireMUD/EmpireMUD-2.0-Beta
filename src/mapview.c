@@ -372,7 +372,7 @@ int pick_season(room_data *room) {
 		}
 	}
 	else {	// 2nd half of year
-		if (half_y >= round((day_of_year - 357) * -a_slope)) {	// second winter line
+		if (half_y >= round((day_of_year - 360) * -a_slope)) {	// second winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
 		}
 		else if (half_y >= round((day_of_year - 268) * -b_slope)) {	// autumn line
