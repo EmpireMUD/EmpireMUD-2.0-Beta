@@ -33,6 +33,8 @@
 *  RANDOM GENERATOR
 */
 
+#define DEBUG_MODE  FALSE
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// LOCAL DATA //////////////////////////////////////////////////////////////
@@ -219,7 +221,9 @@ void evolve_map(void) {
 	fclose(fl);
 	rename(EVOLUTION_FILE TEMP_SUFFIX, EVOLUTION_FILE);
 	
-	printf("Changed %d tile%s\n", changed, PLURAL(changed));
+	if (DEBUG_MODE) {
+		printf("Changed %d tile%s\n", changed, PLURAL(changed));
+	}
 }
 
 
@@ -238,29 +242,37 @@ int main(int argc, char **argv) {
 	empire_srandom(time(0));
 	
 	nearby_distance = atoi(argv[1]);
-	printf("Using nearby distance of: %d\n", nearby_distance);
-	
 	day_of_year = atoi(argv[2]);
-	printf("Using day of year: %d\n", day_of_year);
-	
 	arctic_percent = atof(argv[3]);
-	printf("Using arctic percent: %.2f\n", arctic_percent);
-	
 	tropics_percent = atof(argv[4]);
-	printf("Using tropics percent: %.2f\n", tropics_percent);
+	
+	if (DEBUG_MODE) {
+		printf("Using nearby distance of: %d\n", nearby_distance);
+		printf("Using day of year: %d\n", day_of_year);
+		printf("Using arctic percent: %.2f\n", arctic_percent);
+		printf("Using tropics percent: %.2f\n", tropics_percent);
+	}
 	
 	// determines if we will send a signal back to the mud
 	if (argc == 6) {
 		pid = atoi(argv[5]);
-		printf("Will signal pid: %d\n", pid);
+		if (DEBUG_MODE) {
+			printf("Will signal pid: %d\n", pid);
+		}
 	}
 	
 	// load data
 	index_boot_sectors();
-	printf("Loaded: %d sectors\n", HASH_COUNT(sector_table));
+	if (DEBUG_MODE) {
+		printf("Loaded: %d sectors\n", HASH_COUNT(sector_table));
+	}
+	
 	load_base_map();
-	LL_COUNT(land, tile, num);
-	printf("Loaded: %d land tiles\n", num);
+	
+	if (DEBUG_MODE) {
+		LL_COUNT(land, tile, num); 
+		printf("Loaded: %d land tiles\n", num);
+	}
 	
 	// evolve data
 	evolve_map();
