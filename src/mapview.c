@@ -356,7 +356,7 @@ int pick_season(room_data *room) {
 		y_arctic = round(config_get_double("arctic_percent") * y_max / 100);
 		y_tropics = round(y_max - (config_get_double("tropics_percent") * y_max / 100));
 		a_slope = (y_tropics - y_arctic) / 90.0;	// basic slope of the seasonal gradient
-		a_slope = (y_tropics - y_arctic) / 60.0;
+		b_slope = (y_tropics - y_arctic) / 60.0;
 		half_y = ycoord - y_arctic;	// adjust to remove arctic
 	}
 	
