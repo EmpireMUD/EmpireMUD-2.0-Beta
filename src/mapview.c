@@ -313,7 +313,21 @@ char *get_room_name(room_data *room, bool color) {
 }
 
 
-// determines which tileset to use for sector color
+/**
+* determines which tileset to use for sector color...
+*
+* This function is designed to do 3 things using a lot of math:
+*  1. Past the arctic line, always Winter.
+*  2. Between the tropics, alternate Spring, Summer, Autumn (no Winter).
+*  3. Everywhere else, seasons are based on time of year, and gradually move
+*     North/South each day. There should always be a boundary between the
+*     Summer and Winter regions (thus all the squirrelly numbers).
+*
+* A near-copy of this function exists in util/evolve.c for map evolutions.
+*
+* @param room_data *room The room to get a season for.
+* @return int TILESET_ const for the chosen season.
+*/
 int pick_season(room_data *room) {
 	int ycoord = Y_COORD(room), y_max, y_arctic, y_tropics, half_y, day_of_year;
 	double arctic = config_get_double("arctic_percent") / 200.0;	// split in half and convert from XX.XX to .XXXX (percent)

@@ -838,22 +838,28 @@ int map_distance(struct map_t *start, struct map_t *end) {
 
 /**
 * Calculates which season it is at a given location.
+*
+* Note: This is copied from mapview.c pick_season() (with only variable changes).
+*
+* @param struct map_t *tile The tile to find a season for.
+* @return int TILESET_ const for the chosen season.
 */
 int season(struct map_t *tile) {
-	int ycoord = MAP_Y_COORD(tile->vnum);
+	int ycoord = MAP_Y_COORD(tile->vnum), y_max, y_arctic, y_tropics, half_y;
 	double arctic = arctic_percent / 200.0;	// split in half and convert from XX.XX to .XXXX (percent)
 	double tropics = tropics_percent / 200.0;
 	bool northern = (ycoord >= MAP_HEIGHT/2);
 	int month = day_of_year / 30;
+	double a_slope, b_slope;
 	
-	// month 0 is january
+	// month 0 is january; year is 0-359 days
 	
 	// tropics? -- take half the tropic value, convert to percent, multiply by map height
-	if (ycoord >= (tropics * MAP_HEIGHT) && ycoord <= (MAP_HEIGHT - (tropics * MAP_HEIGHT))) {
+	if (ycoord >= round(MAP_HEIGHT/2.0) - (tropics * MAP_HEIGHT) && ycoord <= round(MAP_HEIGHT/2.0) + (tropics * MAP_HEIGHT)) {
 		if (month < 2) {
 			return TILESET_SPRING;
 		}
-		else if (month > 10) {
+		else if (month >= 10) {
 			return TILESET_AUTUMN;
 		}
 		else {
@@ -866,19 +872,49 @@ int season(struct map_t *tile) {
 		return TILESET_WINTER;
 	}
 	
-	// all other regions:
-	if (month < 2 || month > 10) {
-		return northern ? TILESET_WINTER : TILESET_SUMMER;
-	}
-	else if (month < 5) {
-		return northern ? TILESET_SPRING : TILESET_AUTUMN;
-	}
-	else if (month < 8) {
-		return northern ? TILESET_SUMMER : TILESET_WINTER;
+	// all other regions: first split the map in half (we'll invert for the south)
+	y_max = round(MAP_HEIGHT / 2.0);
+	
+	if (northern) {
+		y_arctic = round(y_max - (arctic_percent * y_max / 100));
+		y_tropics = round(tropics_percent * y_max / 100);
+		a_slope = ((y_arctic - 1) - (y_tropics + 1)) / 120.0;	// basic slope of the seasonal gradient
+		b_slope = ((y_arctic - 1) - (y_tropics + 1)) / 90.0;
+		half_y = ABSOLUTE(ycoord - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
 	}
 	else {
-		return northern ? TILESET_AUTUMN : TILESET_SPRING;
+		y_arctic = round(arctic_percent * y_max / 100);
+		y_tropics = round(y_max - (tropics_percent * y_max / 100));
+		a_slope = ((y_tropics - 1) - (y_arctic + 1)) / 120.0;	// basic slope of the seasonal gradient
+		b_slope = ((y_tropics - 1) - (y_arctic + 1)) / 90.0;
+		half_y = ycoord - y_arctic;	// adjust to remove arctic
 	}
+	
+	if (day_of_year < 6 * 30) {	// first half of year
+		if (half_y >= round((day_of_year + 1) * a_slope)) {	// first winter line
+			return northern ? TILESET_WINTER : TILESET_SUMMER;
+		}
+		else if (half_y >= round((day_of_year - 89) * b_slope)) {	// spring line
+			return northern ? TILESET_SPRING : TILESET_AUTUMN;
+		}
+		else {
+			return northern ? TILESET_SUMMER : TILESET_WINTER;
+		}
+	}
+	else {	// 2nd half of year
+		if (half_y >= round((day_of_year - 360) * -a_slope)) {	// second winter line
+			return northern ? TILESET_WINTER : TILESET_SUMMER;
+		}
+		else if (half_y >= round((day_of_year - 268) * -b_slope)) {	// autumn line
+			return northern ? TILESET_AUTUMN : TILESET_SPRING;
+		}
+		else {
+			return northern ? TILESET_SUMMER : TILESET_WINTER;
+		}
+	}
+	
+	// fail? we should never reach this
+	return TILESET_SUMMER;
 }
 
 
