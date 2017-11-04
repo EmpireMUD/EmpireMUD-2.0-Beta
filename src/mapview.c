@@ -319,7 +319,7 @@ int pick_season(room_data *room) {
 	double arctic = config_get_double("arctic_percent") / 200.0;	// split in half and convert from XX.XX to .XXXX (percent)
 	double tropics = config_get_double("tropics_percent") / 200.0;
 	bool northern = (ycoord >= MAP_HEIGHT/2);
-	double slope;
+	double a_slope, b_slope;
 	
 	// month 0 is january; year is 0-359 days
 	
@@ -328,7 +328,7 @@ int pick_season(room_data *room) {
 		if (time_info.month < 2) {
 			return TILESET_SPRING;
 		}
-		else if (time_info.month > 10) {
+		else if (time_info.month >= 10) {
 			return TILESET_AUTUMN;
 		}
 		else {
@@ -348,21 +348,23 @@ int pick_season(room_data *room) {
 	if (northern) {
 		y_arctic = round(y_max - (config_get_double("arctic_percent") * y_max / 100));
 		y_tropics = round(config_get_double("tropics_percent") * y_max / 100);
-		slope = 150.0 / (y_arctic - y_tropics);	// basic slope of the seasonal gradient
+		a_slope = (y_arctic - y_tropics) / 90.0;	// basic slope of the seasonal gradient
+		b_slope = (y_arctic - y_tropics) / 60.0;
 		half_y = ABSOLUTE(ycoord - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
 	}
 	else {
 		y_arctic = round(config_get_double("arctic_percent") * y_max / 100);
 		y_tropics = round(y_max - (config_get_double("tropics_percent") * y_max / 100));
-		slope = 150.0 / (y_tropics - y_arctic);	// basic slope of the seasonal gradient
+		a_slope = (y_tropics - y_arctic) / 90.0;	// basic slope of the seasonal gradient
+		a_slope = (y_tropics - y_arctic) / 60.0;
 		half_y = ycoord - y_arctic;	// adjust to remove arctic
 	}
 	
 	if (day_of_year < 6 * 30) {	// first half of year
-		if (half_y >= round(day_of_year * slope)) {	// first winter line
+		if (half_y >= round((day_of_year - 30) * a_slope)) {	// first winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
 		}
-		else if (half_y >= round(day_of_year * slope - 60 * slope)) {	// spring line
+		else if (half_y >= round((day_of_year - 120) * b_slope)) {	// spring line
 			return northern ? TILESET_SPRING : TILESET_AUTUMN;
 		}
 		else {
@@ -370,10 +372,10 @@ int pick_season(room_data *room) {
 		}
 	}
 	else {	// 2nd half of year
-		if (half_y >= round(day_of_year * -slope + slope * 359)) {	// second winter line
+		if (half_y >= round((day_of_year - 359) * -a_slope)) {	// second winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
 		}
-		else if (half_y >= round(day_of_year * -slope + slope * 299)) {	// autumn line
+		else if (half_y >= round((day_of_year - 270) * -b_slope)) {	// autumn line
 			return northern ? TILESET_AUTUMN : TILESET_SPRING;
 		}
 		else {
