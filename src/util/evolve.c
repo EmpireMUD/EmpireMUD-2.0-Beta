@@ -608,9 +608,9 @@ void load_base_map(void) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			world[x][y].vnum = (y * MAP_WIDTH) + x;
 			world[x][y].island_id = NO_ISLAND;
-			world[x][y].sector_type = NOTHING;
-			world[x][y].base_sector = NOTHING;
-			world[x][y].natural_sector = NOTHING;
+			world[x][y].sector_type = BASIC_OCEAN;
+			world[x][y].base_sector = BASIC_OCEAN;
+			world[x][y].natural_sector = BASIC_OCEAN;
 			world[x][y].next = NULL;
 		}
 	}
