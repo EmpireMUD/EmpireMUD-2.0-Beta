@@ -375,7 +375,7 @@ int pick_season(room_data *room) {
 		if (half_y >= round((day_of_year - 358) * -a_slope)) {	// second winter line
 			return northern ? TILESET_WINTER : TILESET_SUMMER;
 		}
-		else if (half_y >= round((day_of_year - 269) * -b_slope)) {	// autumn line
+		else if (half_y >= round((day_of_year - 271) * -b_slope)) {	// autumn line
 			return northern ? TILESET_AUTUMN : TILESET_SPRING;
 		}
 		else {
