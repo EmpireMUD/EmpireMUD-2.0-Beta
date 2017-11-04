@@ -1462,7 +1462,7 @@ void add_instance_mob(struct instance_data *inst, mob_vnum vnum) {
 /**
 * This function adjusts the instance limits based on the size of the game
 * world, so smaller worlds get fewer instances and larger ones get more.
-* It uses the magic number "300000" because that size was used in developing
+* It uses the magic number "330000" because that size was used in developing
 * the game.
 *
 * You can shut this off with the "adjust_instance_limits" config.
@@ -1477,7 +1477,7 @@ int adjusted_instance_limit(adv_data *adv) {
 		return GET_ADV_MAX_INSTANCES(adv);
 	}
 	else {
-		val = ceil((double)GET_ADV_MAX_INSTANCES(adv) * size_of_world / 300000);
+		val = ceil((double)GET_ADV_MAX_INSTANCES(adv) * size_of_world / 330000);
 		return MAX(1, val);	// guarantee 1
 	}
 }
