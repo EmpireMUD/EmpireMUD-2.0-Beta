@@ -2218,6 +2218,8 @@ A Lake~
 D0
 ~~~~~
 &c~
+E
+15 0 25.00 33
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
 I 21 256 0.25 1 f  # FISH: a hestian trinket
@@ -2228,6 +2230,20 @@ I 21 1315 25.00 1 f  # FISH: a yellow perch
 I 21 1312 100.00 1 f  # FISH: a speckled trout
 M
 9025 5.00 d
+S
+#33
+Frozen Lake~
+A Frozen Lake~
+'~' 2 0 10 0 a
+D0
+~~~~~
+&W~
+E
+12 0 20.00 32
+E
+13 0 100.00 32
+E
+14 0 100.00 32
 S
 #70
 Irrigated Plains~

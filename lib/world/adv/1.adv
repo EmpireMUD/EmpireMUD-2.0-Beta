@@ -55,7 +55,7 @@ magi-netically modified crops into our world.
 (This adventure contains only the magical crops on the map.)
 ~
 10500 10549 5-0
-1 60 d 0
+1 60 dl 0
 L
 1 0
 10500 -1 -1
@@ -337,7 +337,7 @@ Paul Clarke~
 The mountain has opened up and lava is flowing forth at the surface!
 ~
 10190 10199 0-0
-1 0 dg 0
+1 0 dgl 0
 L
 4 0
 10190 10190 10190
@@ -413,7 +413,7 @@ tower are designed for different level ranges, so use the 'consider' command
 judiciously before you attack things.
 ~
 10030 10099 30-200
-1 240 k 0
+1 240 kl 0
 L
 1 0
 10030 -1 -1
@@ -487,7 +487,7 @@ Notes for implementors:
   the notes.
 ~
 10730 10749 0-25
-1 0 a 0
+1 0 al 0
 L
 5 0
 10080 -1 -1
@@ -511,7 +511,7 @@ Directions for implementors:
 - Make sure your newbie islands have mountains.
 ~
 10750 10774 0-25
-1 10 ehj 0
+1 10 ehjl 0
 L
 5 0
 10080 -1 -1
