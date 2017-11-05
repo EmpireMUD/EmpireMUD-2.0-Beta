@@ -15,11 +15,9 @@ adventures without helps:
 [  127] Abandoned Dragon Nest
 [  130] Volcano
 [  140] The Sewer: Ratskins
-[  141] The Sewer: Goblin Outpost
 [  160] The Tower Skycleave
 [  170] Hamlet of the Undead
 [  180] Misplaced Mother Goose
-[  181] Goblin Mines
 [  190] Winter Wonderland
 [  200] Burrow Canyons
 [  201] The Cursed Chalice of Mill Manor
@@ -29,16 +27,6 @@ adventures without helps:
 [18350] Pyramid 2
 [18450] That Dammed River
 [18460] Unstable Portal
-
-shops without helps:
-[10451] Goblin Outpost - Dryleef's Shop
-[10452] Goblin Outpost - Pimmin's Shop
-[10453] Goblin Outpost - Shivsper's Shop
-[10454] Goblin Outpost - Wargreyn's Shop
-[10754] Nynar's Potion Shop
-[10755] Meena's Pick Shop
-[10757] Blacklung's Coffin Shop
-[10758] Hanx's Raft Shop
 #
 "COLOSSAL RED DRAGON" "MYTHIC FORGE" "LEGENDARY STITCHING" "LORE CRAFTS" "FABLED HIDES" "DRAGON TOKENS"
 
@@ -103,6 +91,52 @@ Other:
   Minipet: baby ostrich
   Mounts: lithe ostrich, trumpeter swan, tawny roc
   Vehicle: Clockwork Roc (roc-stone gear)
+#
+"GOBLIN MINES"
+
+Goblin Mines (level 1-25 adventure)
+
+   The goblins have fled the mines and something tells you it's not good.
+Venture into the goblin mines and see what sends even goblins running for their
+lives! And maybe if you can find those goblins, they'll be willing to reward
+you for clearing out the mine.
+
+You can buy items from four goblins who have fled the mines. If you don't have
+any coins, try selling spider parts to Miner Nynar or spider meat to Miner
+Neena.
+
+Miner Nynar sells a bug potion (dexterity).
+Miner Meena sells a goblin pick (for mining).
+Miner Hanx sells a goblin raft (drag it to the shore and sit on it to sail).
+Blacklung, Goblin Foreman sells a goblin coffin (temporary, single-use tomb).
+#
+"GOBLIN OUTPOST" "SEWER: GOBLIN OUTPOST" "THE SEWER: GOBLIN OUTPOST"
+
+The Sewer: Goblin Outpost (level 50-100 adventure)
+
+   Strange sounds are coming from the sewer grate, and waste has been backing
+up into the streets. This can only mean one thing: Goblins! Will you buy the
+goblins' wares, or drive them from the city? This adventure sells 6 crafting
+patterns and 4 unique buildings. You can also fight the goblins solo or in
+pairs, to earn their prized gear.
+
+Dryleef, vanguard leader sells:
+  a goblin war tent - a portable home/forge
+  a goblin message post - a portable mail building
+  a goblin lab tent - a portable alchemist
+  a goblin dolmen stone - a semi-portable tomb
+
+Pimmin, goblin shaman sells:
+  the violet leopard shawl pattern - healer cloak
+  the wildfire gloves pattern - caster gloves
+
+Shivsper, goblin assassin
+  the rat-fur cloak pattern - melee cloak
+  the wooden gauntlets pattern - melee gauntlets
+
+Wargreyn, goblin blacksmith
+  the mesh cloak pattern - tank cloak
+  the heavy goblin gauntlets pattern - tank gauntlets
 #
 "GUILD OF ADVENTURERS" "ADVENTURERS GUILD" "THE GUILD OF ADVENTURERS"
 
