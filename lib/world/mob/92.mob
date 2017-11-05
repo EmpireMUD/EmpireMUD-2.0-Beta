@@ -31,4 +31,128 @@ A capybara sits here, staring sideways at you.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
+#9203
+seal harbor~
+a harbor seal~
+A harbor seal is rolling around playfully.
+~
+20 30 bdjo 0
+0 0 16 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+M
+0
+$n barks at you.~
+M
+0
+$n claps $s fins.~
+S
+#9204
+crab horseshoe~
+a horseshoe crab~
+A horseshoe crab sits at the water's edge.
+~
+10 15 bdjoz G
+0 0 8 3
+M
+0
+$n skitters around in the water.~
+M
+0
+$n makes a chittering noise.~
+S
+#9205
+iguana marine~
+a marine iguana~
+A marine iguana basks on a rock.
+~
+10 20 bdjo 0
+0 0 16 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+S
+#9206
+flamingo pink~
+a pink flamingo~
+A pink flamingo is standing on one leg.
+~
+10 20 djo m
+0 0 2 26
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+M
+0
+$n spreads $s wings and stretches.~
+M
+0
+$n sifts around for food.~
+S
+#9207
+otter river playful~
+a river otter~
+A playful river otter rolls around in the water.
+~
+15 25 djlo 0
+0 0 6 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+M
+0
+$n splashes around in the water.~
+M
+0
+$n swims in a circle around you.~
+M
+0
+$n dives for a moment, then comes back up with a fish.~
+S
+#9208
+heron tall~
+a heron~
+A tall heron pokes its beak around for food.
+~
+10 20 djo m
+0 0 2 9
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+S
+#9209
+crab mud~
+a mud crab~
+A mud crab pokes its head up.
+~
+10 15 djloz G
+0 0 6 3
+S
+#9210
+pirate salty~
+a salty pirate~
+A salty pirate stands atop a half-buried chest.
+~
+75 100 bdvyz c
+1 0 0 1
+I 4 9210 100.00 1  # LOOT: a pirate's chest
+M
+1
+Yarrrr...~
+M
+0
+$n sketches the area onto a piece of parchment.~
+M
+0
+$n tries to shift the chest deeper into the hole.~
+S
+#9211
+penguin little~
+a little penguin~
+A little penguin waddles along.
+~
+10 15 djo 0
+0 0 16 9
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+M
+0
+$n scampers past you.~
+M
+0
+$n waves $s flippers around.~
+S
 $
