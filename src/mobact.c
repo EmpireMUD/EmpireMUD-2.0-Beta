@@ -842,7 +842,7 @@ void run_mob_echoes(void) {
 		// now find a mob with a valid message
 		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 			// things that disqualify the mob
-			if (mob->desc || !IS_NPC(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
+			if (mob->desc || !IS_NPC(mob) || IS_DEAD(mob) || EXTRACTED(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
 				continue;
 			}
 			
