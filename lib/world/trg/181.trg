@@ -19,32 +19,36 @@ end
 if (%random.10% == 10 && !%self.mob_flagged(SENTINEL)%
   eval gohome 1
 end
-if (%room.sector% ~= Forest || %room.sector% == Grove) && (%logs% < %cap%) && (!%room.empire_id%)
-  * Stops the mob from wandering while it works on this tile
+if %room.sector_vnum% >= 1 && %room.sector_vnum% <= 4
   nop %self.add_mob_flag(SENTINEL)%
-  if (%room.sector% == Light Forest)
+  eval new_sector %room.sector_vnum% - 1
+  %terraform% %room% %new_sector%
+  eval logs %logs% + 1
+  if %room.sector_vnum% == 1
     %echo% %self.name% fells the last tree with a mighty crash!
-    %terraform% %room% 0
-    eval logs %logs% + 1
-  elseif (%room.sector% == Forest)
+  else
     %echo% %self.name% fells a tree with a mighty crash!
-    %terraform% %room% 1
-    eval logs %logs% + 1
-  elseif (%room.sector% == Shady Forest)
+  end
+elseif %room.sector_vnum% == 26
+  nop %self.add_mob_flag(SENTINEL)%
+  %echo% %self.name% fells two trees!
+  %terraform% %room% 20
+  eval logs %logs% + 2
+  wait 1 sec
+  %echo% The trees fall into each other with a single mighty crash!
+  cackle
+elseif %room.sector_vnum% >= 42 && %room.sector_vnum% <= 45
+  nop %self.add_mob_flag(SENTINEL)%
+  eval new_sector %room.sector_vnum% - 1
+  if %room.sector_vnum% == 44
+    set new_sector 40
+  end
+  %terraform% %room% %new_sector%
+  eval logs %logs% + 1
+  if %room.sector_vnum% == 42 || %room.sector_vnum% == 44
+    %echo% %self.name% fells the last tree with a mighty crash!
+  else
     %echo% %self.name% fells a tree with a mighty crash!
-    %terraform% %room% 2
-    eval logs %logs% + 1
-  elseif (%room.sector% == Overgrown Forest)
-    %echo% %self.name% fells a tree with a mighty crash!
-    %terraform% %room% 3
-    eval logs %logs% + 1
-  elseif (%room.sector% == Grove)
-    %echo% %self.name% fells two trees!
-    %terraform% %room% 20
-    eval logs %logs% + 2
-    wait 1 sec
-    %echo% The trees fall into each other with a single mighty crash!
-    cackle
   end
 else
   * Tile is clear, can wander now

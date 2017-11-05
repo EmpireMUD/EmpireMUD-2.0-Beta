@@ -706,7 +706,7 @@ while %cycles_left% >= 0
 done
 ~
 #10146
-Monsoon Rift cleanup + complete~
+Monsoon Rift cleanup + complete [Wandering Merchant version]~
 0 v 0
 ~
 if %questvnum% != 10153
@@ -747,10 +747,14 @@ while %current_vnum% >= 10140
   else
     set message $n leaves.
   end
-  %purge% instance mob %current_vnum% %message%
+  * Modified for merchant version to fix ordering problem
+  if %current_vnum% != %self.vnum%
+    %purge% instance mob %current_vnum% %message%
+  end
   eval current_vnum %current_vnum% - 1
 done
 * End of script fragment.
+%purge% instance mob %self.vnum% $n leaves.
 ~
 #10147
 Natural Magic: Cacti quench quest start~
