@@ -2534,7 +2534,7 @@ int add_currency(char_data *ch, any_vnum vnum, int amount) {
 	qt_change_currency(ch, vnum, cur->amount);
 	
 	// housecleaning
-	if (cur->amount == 0) {
+	if (cur->amount <= 0) {
 		HASH_DEL(GET_CURRENCIES(ch), cur);
 		free(cur);
 		return 0;
