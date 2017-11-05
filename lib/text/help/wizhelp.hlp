@@ -1437,11 +1437,11 @@ WIZHIDE
 
 Usage: toggle wizhide
 
-This command prevents you from appearing in the room to players with lower
-access levels and players without holylight. They cannot target you in the
-room, and your poofin, poofout and movement will be invisible, along with most
-other room messages you cause. Mortals will still see any messages sent
-directly to them, such as if you look at them.
+This command prevents you from appearing in the room to players (and to
+immortals who have holylight off). They cannot target you in the room, and your
+poofin, poofout and movement will be invisible, along with most other room
+messages you cause. Mortals will still see any messages sent directly to them,
+such as if you look at them.
 
 You'll still show up in the "who" list, and players can still send you tells.
 
