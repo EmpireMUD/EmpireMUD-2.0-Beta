@@ -2601,6 +2601,42 @@ SHOW(show_players) {
 }
 
 
+SHOW(show_shops) {
+	extern struct shop_temp_list *build_available_shop_list(char_data *ch);
+	void free_shop_temp_list(struct shop_temp_list *list);
+
+	struct shop_temp_list *stl, *shop_list = NULL;
+	char buf[MAX_STRING_LENGTH];
+	
+	msg_to_char(ch, "Shops here:\r\n");
+	
+	shop_list = build_available_shop_list(ch);
+	LL_FOREACH(shop_list, stl) {
+		// determine shopkeeper
+		if (stl->from_mob) {
+			snprintf(buf, sizeof(buf), " (%s)", PERS(stl->from_mob, ch, FALSE));
+		}
+		else if (stl->from_obj) {
+			snprintf(buf, sizeof(buf), " (%s)", GET_OBJ_SHORT_DESC(stl->from_obj));
+		}
+		else if (stl->from_room) {
+			strcpy(buf, " (room)");
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		msg_to_char(ch, "[%5d] %s%s%s\r\n", SHOP_VNUM(stl->shop), SHOP_NAME(stl->shop), buf, SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+	}
+	
+	if (!shop_list) {
+		msg_to_char(ch, " none\r\n");
+	}
+	
+	free_shop_temp_list(shop_list);
+}
+
+
 SHOW(show_technology) {
 	extern const char *player_tech_types[];
 	
@@ -7430,6 +7466,7 @@ ACMD(do_show) {
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },
+		{ "shops", LVL_START_IMM, show_shops },
 
 		// last
 		{ "\n", 0, NULL }
