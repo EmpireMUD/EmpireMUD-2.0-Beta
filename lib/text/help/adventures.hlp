@@ -1,4 +1,6 @@
 "BIG LIST OF ADVENTURES THAT DON'T HAVE HELP FILES"
+
+adventures without helps:
 [   50] Tutorial: Royal Planning Office
 [   51] Tutorial: Museum of Early Man
 [   52] Tutorial Quests
@@ -6,20 +8,15 @@
 [  101] Magiterranean: The Hidden Garden
 [  102] Magiterranean: Interdimensional Whirlwind
 [  103] Magiterranean: Monsoon Rift
-[  120] Mountain Cave: Red Dragon
-[  121] The Swamp Hag
 [  122] Ruins: Three Banditos
 [  123] Ruins: Thieves
 [  125] Ruins: The Goblin Challenge
 [  126] Mountain Cave: Flame Dragon
 [  127] Abandoned Dragon Nest
-[  128] Colossal Red Dragon
-[  129] A Gigantic Nest
 [  130] Volcano
 [  140] The Sewer: Ratskins
 [  141] The Sewer: Goblin Outpost
 [  160] The Tower Skycleave
-[  161] Portal to the Primeval
 [  170] Hamlet of the Undead
 [  180] Misplaced Mother Goose
 [  181] Goblin Mines
@@ -28,6 +25,20 @@
 [  201] The Cursed Chalice of Mill Manor
 [  281] Mountain Valley: Molten Fiend
 [  282] Goblin Logging Camp
+[18300] Pyramid: Hidden Chamber of Neferkare
+[18350] Pyramid 2
+[18450] That Dammed River
+[18460] Unstable Portal
+
+shops without helps:
+[10451] Goblin Outpost - Dryleef's Shop
+[10452] Goblin Outpost - Pimmin's Shop
+[10453] Goblin Outpost - Shivsper's Shop
+[10454] Goblin Outpost - Wargreyn's Shop
+[10754] Nynar's Potion Shop
+[10755] Meena's Pick Shop
+[10757] Blacklung's Coffin Shop
+[10758] Hanx's Raft Shop
 #
 "COLOSSAL RED DRAGON" "MYTHIC FORGE" "LEGENDARY STITCHING" "LORE CRAFTS" "FABLED HIDES" "DRAGON TOKENS"
 
@@ -93,6 +104,40 @@ Other:
   Mounts: lithe ostrich, trumpeter swan, tawny roc
   Vehicle: Clockwork Roc (roc-stone gear)
 #
+"GUILD OF ADVENTURERS" "ADVENTURERS GUILD" "THE GUILD OF ADVENTURERS"
+
+The Guild of Adventurers
+
+Seek out this guild, which makes its headquarters atop the giant atlasian
+tortoise. Build your own guildhall and explore quests that take you to many
+of the game's adventure zones. Rise through the ranks for power and prestige.
+(Hint: Use 'where atlasian' to find the tortoise.)
+
+The tavern shop sells:
+  a Guild of Adventurers seeker stone - finds the tortoise (Liked)
+  a baby tortoise whistle - minipet (Esteemed)
+  a ninja tortoise whistle - minipet (Venerated)
+  a tortoise trinket - teleports you to the tortoise (Venerated)
+  a dragon turtle whistle - minipet (Revered)
+  a Guild of Adventurers charter - builds a guildhall (Venerated)
+  an atlasian egg - your own atlasian tortoise (Venerated)
+
+The umbramancer sells:
+  the terrapin ring of acerbity - 100-200 caster ring (Esteemed)
+  an umbral whistle - land mount (Liked)
+
+The vampire sells:
+  the chelonian ring of extrication - 100-200 healer ring (Esteemed)
+  a sanguine whistle - land mount (Liked)
+
+The tinker sells:
+  the testudinal ring of courage - 100-200 melee ring (Esteemed)
+  a clockwork apparatus - land mount (Liked)
+
+The guildleader sells:
+  the tortoiseshell ring of mettle - 100-200 tank ring (Esteemed)
+  an imperium-clad whistle - land mount (Liked)
+#
 HALLOWEEN CANDY "HALLOWEEN CANDY" "RESTLESS SPIRIT"
 
 The Halloween game content is available during the month of October and offers
@@ -114,6 +159,31 @@ The restless spirit sells:
 
 Game admins: You must enable global 18802 by removing its IN-DEV flag to turn
 on the Halloween candy drops, and disable that global when the holiday is over.
+#
+"LOST TEMPLE" "JUNGLE TEMPLE" "THE LOST TEMPLE"
+
+The Lost Temple (level 125-175 adventure)
+
+   You have discovered an ancient, overgrown temple deep in the jungle. Surely
+its depths must hold great undiscovered treasures of an ancient civilization,
+if you're brave enough to venture below...
+   This adventure features a difficulty selector so it can be completed solo,
+or in groups of up to four. All gear looted from this adventure will be higher
+quality on harder difficulties.
+   Beware! Dungeons such as this one often have traps. &cSEARCH&0 carefully before
+advancing, or be prepared to &cJUMP&0, &cDUCK&0 or &cRUN&0 very fast.
+
+The Professor sells:
+  a riding jaguar whistle - land mount
+  a sea serpent whistle - aquatic mount
+  the feathered serpent whistle - flying mount
+  a jaguar cub whistle - minipet
+  a jaguar totem - jaguar morph (requires Animal Forms)
+  a fearsome jaguar armor pattern - tank armor
+  a red coyote armor pattern - melee armor
+  a feathered serpent armor pattern - healer armor
+  an eagle warrior armor pattern - caster armor
+  a blue chameleon armor pattern - pvp/solo armor
 #
 "OLD GODS" "BINDING CIRCLE"
 
@@ -139,6 +209,8 @@ The following old gods are available so far:
 #
 "BINDING CIRCLE: ANAT" "BINDING CIRCLE ANAT" ANAT
 
+Binding Circle: Anat (level 225-325 adventure)
+
 Anat, virgin warrior-goddess of old, is a fierce, battle-hardened maiden whose
 power can barely be contained by the binding chains. Anat has powerful
 necklaces for anyone who can defeat her.
@@ -161,6 +233,8 @@ The patterns and recipes in the store are:
   feast of Anat recipe - resistance feast (requires Gourmet Chef)
 #
 "BINDING CIRCLE: BA'AL HADAD" "BINDING CIRCLE BA'AL HADAD" "BA'AL HADAD" "BAAL HADAD" HADAD
+
+Binding Circle: Ba'al Hadad (level 225-325 adventure)
 
 Ba'al Hadad, storm god of the ancient world, is a powerful deity with mastery
 over the weather. He is not easily bound by chains. Seek him out and defeat
@@ -203,6 +277,27 @@ Craft patterns sold by the vendor outside the portal:
   Melee weapon: frozen pykrete sword
   Healer weapon: icy star of winter
   Caster weapon: glacial staff of the Maelstrom pattern
+#
+"PORTAL TO THE PRIMEVAL" "PRIMEVAL PORTAL"
+
+Portal to the Primeval (level 75-100 group adventure)
+
+   The High Sorcerers in your tower have managed to open a chronoportal into
+the past! Follow Archsorcerer Malfernes through the portal and explore the
+Primeval Era, when the ancient ancestors of the dragons ruled endless jungles.
+But beware, because it's easy to get lost and you make a delicious snack for
+the dracosaurs.
+
+The salesman sells:
+  primordial axe pattern - melee weapon
+  dracosaur bone spear pattern - tank weapon
+  jeweled bone staff pattern - caster staff weapon
+  dracosaur scale robe pattern - healer armor
+  dracosaur scale boots pattern - pvp/solo boots
+  primordial boots pattern - tank boots
+  dracosaur scale gauntlets pattern - melee gauntlets
+  Tome of the Primordium schematic - caster offhand
+  bone crown pattern - greatness crown
 #
 "SWAMP HAG" "THE SWAMP HAG"
 
