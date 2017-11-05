@@ -2459,6 +2459,8 @@ S
 Floodplains~
 A Flooded Plain~
 '~' 17 1 8 gi b
+C
+fish, pick~
 D0
 @w&?~~@e~
 &c~
@@ -2472,6 +2474,7 @@ E
 14 0 100.00 40
 E
 15 0 100.00 40
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
 I 21 256 0.25 1 f  # FISH: a hestian trinket
@@ -2489,7 +2492,7 @@ Flooded Woods~
 Some Flooded Woods~
 '~' 17 1 3 dgi n
 C
-chop~
+chop, fish, pick~
 D0
 @w&g^&?~@e~
 &c~
@@ -2509,6 +2512,7 @@ E
 E
 15 0 100.00 44
 I 6 3015 100.00 1  # FORAGE: some red berries
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 20 120 100.00 1  # CHOP: a large tree
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
@@ -2639,7 +2643,7 @@ Flooded Forest~
 A Flooded Forest~
 '~' 17 1 6 dgi n
 C
-chop~
+chop, fish, pick~
 D0
 @w&g^^@e~
 &g~
@@ -2652,6 +2656,7 @@ E
 E
 15 0 100.00 45
 I 6 3015 100.00 1  # FORAGE: some red berries
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 20 120 100.00 1  # CHOP: a large tree
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
@@ -2699,7 +2704,7 @@ I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a pile of clay
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -2847,7 +2852,7 @@ I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a pile of clay
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
