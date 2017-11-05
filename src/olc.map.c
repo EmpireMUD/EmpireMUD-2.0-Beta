@@ -86,8 +86,6 @@ OLC_MODULE(mapedit_build) {
 		disassociate_building(IN_ROOM(ch));
 		
 		construct_building(IN_ROOM(ch), GET_BLD_VNUM(bld));
-		special_building_setup(ch, IN_ROOM(ch));
-		complete_building(IN_ROOM(ch));
 		
 		if (dir != NO_DIR) {
 			create_exit(IN_ROOM(ch), SHIFT_DIR(IN_ROOM(ch), dir), dir, FALSE);
@@ -97,6 +95,9 @@ OLC_MODULE(mapedit_build) {
 			COMPLEX_DATA(IN_ROOM(ch))->entrance = rev_dir[dir];
 			herd_animals_out(IN_ROOM(ch));
 		}
+		
+		special_building_setup(ch, IN_ROOM(ch));
+		complete_building(IN_ROOM(ch));
 
 		msg_to_char(ch, "You create %s %s!\r\n", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		sprintf(buf, "$n creates %s %s!", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
