@@ -299,6 +299,14 @@ Examples:
   > idea more types of pottery
   > typo 'sence' should be spelled 'sense'
 #
+BUY LIST SHOP SHOPS
+
+Usage:  list [keywords]
+        buy <item>
+
+These commands let you list and buy items from shops. You can find shops in
+various places around the world.
+#
 CHANGEPASS CHANGEPASSWORD "CHANGE PASSWORD" PASSWORD
 
 Usage:  changepass <old pw> <new pw> <new again>
