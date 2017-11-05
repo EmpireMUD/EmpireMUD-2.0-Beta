@@ -722,7 +722,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		UT_hash_handle hh;
 	};
 
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_storage_data *store;
@@ -802,11 +802,18 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
 		if (all || einv->local > 0 || *argument) {
-			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s (%d total)\r\n", einv->local, get_obj_name_by_proto(einv->vnum), einv->total);
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", einv->vnum);
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s\r\n", einv->local, get_obj_name_by_proto(einv->vnum));
+				*vstr = '\0';
+			}
+			
+			if (einv->total > einv->local) {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->total);
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum));
 			}
 			
 			// append if room
@@ -3751,6 +3758,8 @@ ACMD(do_empires) {
 	page_string(ch->desc, output, TRUE);
 }
 
+
+// do_einventory (search hint)
 ACMD(do_empire_inventory) {
 	char error[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
 	empire_data *emp;
