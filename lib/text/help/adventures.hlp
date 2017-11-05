@@ -15,7 +15,6 @@ adventures without helps:
 [  127] Abandoned Dragon Nest
 [  130] Volcano
 [  140] The Sewer: Ratskins
-[  160] The Tower Skycleave
 [  170] Hamlet of the Undead
 [  180] Misplaced Mother Goose
 [  190] Winter Wonderland
@@ -332,6 +331,40 @@ The salesman sells:
   dracosaur scale gauntlets pattern - melee gauntlets
   Tome of the Primordium schematic - caster offhand
   bone crown pattern - greatness crown
+#
+SKYCLEAVE "SKY CLEAVE" "TOWER SKYCLEAVE" "THE TOWER SKYCLEAVE"
+
+The Tower Skycleave (adventure for various levels)
+
+   The Tower Skycleave is renowned throughout the land for its powerful
+sorcerers and unconventional research. It funds its discoveries through patents
+and tourism, and a sign out front eagerly encourages you to visit. Parts of the
+tower are designed for different level ranges, so use the 'consider' command
+judiciously before you attack things.
+
+The gift shoppe sells:
+  a skycleaver belt - +mana belt (30-50)
+  skycleaver gloves - +move gloves (30-50)
+  skycleaver armor - +hit/health medium armor (30-50)
+  a skycleaver rucksack - +intelligence pack (30-50)
+  an iridescent blue iris - gem
+  a yellow lightning stone - gem
+  a red bloodstone - gem
+  a glowing green seashell - gem
+  a skycleaver trinket - teleports you to Skycleave
+ 
+The cafe sells:
+  mug of coffee
+  glass of red wine
+
+High Sorceress Celiya sells:
+  form-fitting backpack - +hit pack (30-100)
+
+High Sorcerer Barrosh sells:
+  armored backpack - resist-physical pack (30-100)
+
+Grand High Sorcerer Knezz sells:
+  portable hole - mana-regen pack (30-100)
 #
 "SWAMP HAG" "THE SWAMP HAG"
 
