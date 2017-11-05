@@ -553,6 +553,13 @@ This command pulls one of your sheathed weapons into your main hand.
 
 See also: SHEATHE, SWAP
 #
+DRIVING-LOOK "DRIVING LOOK" "TOGGLE DRIVING-LOOK"
+
+Usage:  toggle driving-look
+
+This toggle causes you to automatically 'look' after each time you move when
+driving, piloting, or sailing a vehicle.
+#
 DROP
 
 Usage:  drop <item>
@@ -1931,6 +1938,7 @@ Toggles:
   tutorials - you won't see available tutorial quests if this is off
   no-paint - turns off custom paint colors on buildings
   extra-spacing - adds an extra blank line after you type a command
+  driving-look - automatically 'looks' after each time your vehicle moves
 
 Immortal toggles:
   wiznet - shuts off the immortal channel

@@ -1922,6 +1922,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
 #define PRF_NO_PAINT  BIT(33)	// unable to see custom paint colors
 #define PRF_EXTRA_SPACING  BIT(34)	// causes an extra crlf before command interpreter
+#define PRF_DRIVING_LOOK  BIT(35)	// auto-looks each time you move a vehicle
 
 
 // PTECH_x: player techs
