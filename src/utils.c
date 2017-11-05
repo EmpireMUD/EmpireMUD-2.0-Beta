@@ -2397,6 +2397,7 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				if (build_used_list) {
 					add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(use_obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(use_obj));
 				}
+				empty_obj_before_extract(use_obj);
 				extract_obj(use_obj);
 			}
 			break;
