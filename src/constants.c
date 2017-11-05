@@ -620,6 +620,7 @@ const char *preference_bits[] = {
 	"CLEARMETERS",
 	"!TUTORIALS",
 	"!PAINT",
+	"EXTRA-SPACING",
 	"\n"
 };
 
@@ -687,6 +688,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
 	
 	{ "no-paint", TOG_ONOFF, PRF_NO_PAINT, 0, NULL },
+	{ "extra-spacing",	TOG_ONOFF, PRF_EXTRA_SPACING, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },

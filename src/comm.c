@@ -3584,6 +3584,11 @@ void game_loop(socket_t mother_desc) {
 					d->has_prompt = 1;	/* To get newline before next cmd output. */
 				else if (perform_alias(d, comm))    /* Run it through aliasing system */
 					get_from_q(&d->input, comm, &aliased);
+				
+				if (PRF_FLAGGED(d->character, PRF_EXTRA_SPACING)) {
+					SEND_TO_Q("\r\n", d);	// for people who don't get a crlf from localecho
+				}
+				
 				command_interpreter(d->character, comm); /* Send it to interpreter */
 			}
 		}

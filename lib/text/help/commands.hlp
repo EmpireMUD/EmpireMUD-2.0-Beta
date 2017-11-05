@@ -646,6 +646,13 @@ To automatically kill your victims in combat, "toggle autokill".
 
 See also: TOGGLE, STAKE, TIE
 #
+EXTRA-SPACING "EXTRA SPACING" "TOGGLE EXTRA-SPACING"
+
+Usage:  toggle extra-spacing
+
+This toggle will insert an extra blank line after your prompt when you type
+any command. This is useful on MUD clients that don't have local echo.
+#
 EXITS
 
 Usage:  exits
@@ -1923,6 +1930,7 @@ Toggles:
   clearmeters - automatically clears your meters between combats
   tutorials - you won't see available tutorial quests if this is off
   no-paint - turns off custom paint colors on buildings
+  extra-spacing - adds an extra blank line after you type a command
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
