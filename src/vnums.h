@@ -352,6 +352,7 @@
 #define COOLDOWN_THORNLASH  2067
 #define COOLDOWN_KITE  2068
 #define COOLDOWN_CHARGE  2069
+#define COOLDOWN_PLEDGE  2087
 
 
 // LIQ_x: Some different kind of liquids (vnums of GENERIC_LIQUID)
