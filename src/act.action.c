@@ -781,15 +781,9 @@ INTERACTION_FUNC(finish_picking_herb) {
 		gain_ability_exp(ch, ABIL_FIND_HERBS, 10);
 	
 		if (!number(0, 11)) {
-			// random chance of gem
+			// random chance of gem -- TODO come up with some way to do this in-game
 			vnum = o_IRIDESCENT_IRIS;
 			num = 1;
-		}
-		else if (!number(0, 1) && find_flagged_sect_within_distance_from_room(inter_room, SECTF_FRESH_WATER, NOBITS, 1)) {
-			vnum = o_BILEBERRIES;
-		}
-		else if (!number(0, 1) && find_flagged_sect_within_distance_from_room(inter_room, SECTF_OCEAN, NOBITS, 1)) {
-			vnum = o_WHITEGRASS;
 		}
 	}
 	else {

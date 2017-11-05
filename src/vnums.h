@@ -110,12 +110,6 @@
 #define o_NOCTURNIUM_SPIKE  1119
 
 // herbs
-#define o_WHITEGRASS  1200
-#define o_FIVELEAF  1201
-#define o_REDTHORN  1202
-#define o_MAGEWHISPER  1203
-#define o_DAGGERBITE  1204
-#define o_BILEBERRIES  1205
 #define o_IRIDESCENT_IRIS  1206
 
 // misc stuff
