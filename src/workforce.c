@@ -578,6 +578,7 @@ bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room,
 */
 void chore_update(void) {
 	void ewt_free_tracker(struct empire_workforce_tracker **tracker);
+	void read_vault(empire_data *emp);
 	
 	struct empire_territory_data *ter, *next_ter;
 	vehicle_data *veh, *next_veh;
@@ -609,6 +610,8 @@ void chore_update(void) {
 				}
 			}
 			
+			
+			read_vault(emp);
 			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			
 			// no longer need this -- free up the tracker
