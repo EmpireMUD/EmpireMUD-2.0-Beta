@@ -1535,7 +1535,7 @@ D4
 \__/~
 &0~
 E
-6 0 100.00 5
+6 0 100.00 19
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1558,6 +1558,14 @@ D3
 D4
 */\*~
 &y~
+S
+#19
+Canal~
+A Canal~
+'~' 17 0 8 gi af
+D0
+@w&?~~@e~
+&c~
 S
 #20
 Desert~
@@ -1707,6 +1715,8 @@ E
 2 6 4.00 5
 E
 2 5 4.00 5
+E
+2 19 4.00 5
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
