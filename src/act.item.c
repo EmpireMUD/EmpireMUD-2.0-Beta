@@ -344,6 +344,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		}		
 		msg_to_char(ch, "\r\n");
 	}
+	if (UNIQUE_OBJ_CAN_STORE(obj)) {
+		msg_to_char(ch, "Storage location: Warehouse\r\n");
+	}
 
 	// binding section
 	if (OBJ_BOUND_TO(obj)) {
