@@ -394,7 +394,7 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		}
 	}
 	
-	if (MORPH_ABILITY(morph) == NO_ABIL && MORPH_REQUIRES_OBJ(morph) == NOTHING) {
+	if (MORPH_ABILITY(morph) == NO_ABIL && MORPH_REQUIRES_OBJ(morph) == NOTHING && !MORPH_FLAGGED(morph, MORPHF_SCRIPT_ONLY)) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Requires no ability or object");
 		problem = TRUE;
 	}

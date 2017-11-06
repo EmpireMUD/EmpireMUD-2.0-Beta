@@ -267,6 +267,22 @@ With two arguments, it ends the war between those two empires.
 
 See also: GRANT
 #d
+EVOLVE EVOLVER EVOLUTIONS
+
+The 'evolve' utility is a separate program the EmpireMUD runs once per game
+day to update the map. When the utility runs, you see two logs:
+
+[ Running map evolutions... ]
+[ Imported 44/58 map evolutions ]
+
+Not all of the evolver's suggested changes could be made. The two most common
+reasons are:
+ - the tile changed since the evolver's map data was saved (e.g. chopped)
+ - the tile turns out to be a building entrance
+
+You can manually trigger a day's worth of evolutions by typing 'util evolve',
+if your access level is high enough.
+#d
 FILE
 
 Usage:  file <file> <lines>
@@ -949,6 +965,7 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
 components Immort   Shows all items matching a component type (and flags).
+crops      Immort   Shows counts for all the crops in the world.
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
@@ -960,6 +977,7 @@ player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
+shops      Immort   Shows any shops available in your current location.
 skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
@@ -1081,6 +1099,13 @@ Usage:  show rent <player name>
 Shows the target player's inventory and equipment. Used to show the binary file
 path to their inventory data, hence the name.
 #e
+"SHOW SHOPS"
+
+Usage:  show shops
+
+Lists any shops available to you right now. Shops can come from mobs, objects,
+buildings, and room templates.
+#e
 "SHOW SKILLS"
 
 Usage:  show skills <player name> [swap]
@@ -1114,9 +1139,10 @@ Usage:  show technology <player>
 
 Lists all the ability techs the player has.
 #e
-"SHOW TERRAIN"
+"SHOW TERRAIN" "SHOW CROPS"
 
 Usage:  show terrain
+        show crops
 
 Lists the total count of each sector and crop type in the world. Buildings are
 all listed together under 'Building'.
@@ -1346,6 +1372,7 @@ Available utilities:
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
+ &cevolve&0 - Triggers map evolutions (just like a normal day), see EVOLVER.
  &cislandsize&0 - Counts and displays tile counts for all islands.
  &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
@@ -1410,11 +1437,11 @@ WIZHIDE
 
 Usage: toggle wizhide
 
-This command prevents you from appearing in the room to players with lower
-access levels and players without holylight. They cannot target you in the
-room, and your poofin, poofout and movement will be invisible, along with most
-other room messages you cause. Mortals will still see any messages sent
-directly to them, such as if you look at them.
+This command prevents you from appearing in the room to players (and to
+immortals who have holylight off). They cannot target you in the room, and your
+poofin, poofout and movement will be invisible, along with most other room
+messages you cause. Mortals will still see any messages sent directly to them,
+such as if you look at them.
 
 You'll still show up in the "who" list, and players can still send you tells.
 

@@ -317,6 +317,7 @@ void disassociate_building(room_data *room) {
 	void decustomize_room(room_data *room);
 	void delete_instance(struct instance_data *inst);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern crop_data *get_potential_crop_for_location(room_data *location);
 	void remove_designate_objects(room_data *room);
 	
 	bool was_large, was_in_city, junk;
@@ -369,6 +370,14 @@ void disassociate_building(room_data *room) {
 
 	// restore sect: this does not use change_terrain()
 	perform_change_sect(room, NULL, BASE_SECT(room));
+		
+	// also check for missing crop data
+	if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !ROOM_CROP(room)) {
+		crop_data *new_crop = get_potential_crop_for_location(room);
+		if (new_crop) {
+			set_crop_type(room, new_crop);
+		}
+	}
 	
 	if (COMPLEX_DATA(room)) {
 		COMPLEX_DATA(room)->home_room = NULL;

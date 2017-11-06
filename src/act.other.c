@@ -181,6 +181,32 @@ void cancel_adventure_summon(char_data *ch) {
 
 
 /**
+* Performs a douse on a torch/fire, if possible.
+*
+* @param char_data *ch The douser.
+* @param obj_data *obj The object to douse.
+* @param obj_data *cont The liquid container full of water.
+*/
+void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
+	if (!OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+		msg_to_char(ch, "You can't douse that -- it's not a light or fire.\r\n");
+	}
+	else if (GET_OBJ_TIMER(obj) == UNLIMITED) {
+		act("You can't seem to douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
+	else if (!CAN_WEAR(obj, ITEM_WEAR_TAKE) || (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))) {
+		msg_to_char(ch, "You can't douse that.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) = 0;
+		
+		act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
+		act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
+	}
+}
+
+
+/**
 * This quits out an old character and swaps the descriptor over to the new
 * character. Caution: The new character may already be in-game, if it was
 * linkdead.
@@ -1567,7 +1593,7 @@ ACMD(do_douse) {
 	void stop_burning(room_data *room);
 	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
-	obj_data *obj = NULL, *iter;
+	obj_data *obj = NULL, *found_obj = NULL, *iter;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	byte amount;
@@ -1592,6 +1618,9 @@ ACMD(do_douse) {
 		}
 		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
 			do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
+		}
+		else if ((found_obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (found_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+			do_douse_obj(ch, found_obj, obj);
 		}
 		else {
 			msg_to_char(ch, "You don't see %s %s to douse!\r\n", AN(arg), arg);

@@ -2534,7 +2534,7 @@ int add_currency(char_data *ch, any_vnum vnum, int amount) {
 	qt_change_currency(ch, vnum, cur->amount);
 	
 	// housecleaning
-	if (cur->amount == 0) {
+	if (cur->amount <= 0) {
 		HASH_DEL(GET_CURRENCIES(ch), cur);
 		free(cur);
 		return 0;
@@ -3627,6 +3627,22 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
  //////////////////////////////////////////////////////////////////////////////
 //// LEARNED CRAFT HANDLERS //////////////////////////////////////////////////
 
+// for learned/show learned
+int sort_learned_recipes(struct player_craft_data *a, struct player_craft_data *b) {
+	craft_data *acr = craft_proto(a->vnum), *bcr = craft_proto(b->vnum);
+	
+	if (!acr || !bcr) {
+		return 0;
+	}
+	else if (GET_CRAFT_TYPE(acr) != GET_CRAFT_TYPE(bcr)) {
+		return GET_CRAFT_TYPE(acr) - GET_CRAFT_TYPE(bcr);
+	}
+	else {
+		return strcmp(GET_CRAFT_NAME(acr), GET_CRAFT_NAME(bcr));
+	}
+}
+
+
 /**
 * Adds a craft vnum to a player's learned list.
 *
@@ -3645,6 +3661,7 @@ void add_learned_craft(char_data *ch, any_vnum vnum) {
 		CREATE(pcd, struct player_craft_data, 1);
 		pcd->vnum = vnum;
 		HASH_ADD_INT(GET_LEARNED_CRAFTS(ch), vnum, pcd);
+		HASH_SORT(GET_LEARNED_CRAFTS(ch), sort_learned_recipes);
 	}
 }
 
@@ -6916,7 +6933,7 @@ bool check_evolution_percent(struct evolution_data *evo) {
 * returned.
 *
 * @param sector_data *st The sector to check.
-* @param int type The EVO_x type to get.
+* @param int type The EVO_ type to get.
 * @return struct evolution_data* The found evolution, or NULL.
 */
 struct evolution_data *get_evolution_by_type(sector_data *st, int type) {
@@ -6939,7 +6956,7 @@ struct evolution_data *get_evolution_by_type(sector_data *st, int type) {
 
 /**
 * @param sector_data *st The sector to check.
-* @param int type The EVO_x type to check.
+* @param int type The EVO_ type to check.
 * @return bool TRUE if the sector has at least one evolution of this type.
 */
 bool has_evolution_type(sector_data *st, int type) {
@@ -6964,7 +6981,7 @@ bool has_evolution_type(sector_data *st, int type) {
 * This finds a sector that can evolve to be the argument 'in_sect'.
 *
 * @param sector_data *in_sect The sector you have already.
-* @param int evo_type Any EVO_x const.
+* @param int evo_type Any EVO_ const.
 * @return sector_data* The sector that can evolve to become in_sect, or NULL if there isn't one.
 */
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type) {

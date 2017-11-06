@@ -722,7 +722,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		UT_hash_handle hh;
 	};
 
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_storage_data *store;
@@ -802,11 +802,18 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
 		if (all || einv->local > 0 || *argument) {
-			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s (%d total)\r\n", einv->local, get_obj_name_by_proto(einv->vnum), einv->total);
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", einv->vnum);
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s\r\n", einv->local, get_obj_name_by_proto(einv->vnum));
+				*vstr = '\0';
+			}
+			
+			if (einv->total > einv->local) {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->total);
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum));
 			}
 			
 			// append if room
@@ -3751,6 +3758,8 @@ ACMD(do_empires) {
 	page_string(ch->desc, output, TRUE);
 }
 
+
+// do_einventory (search hint)
 ACMD(do_empire_inventory) {
 	char error[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
 	empire_data *emp;
@@ -5093,6 +5102,25 @@ ACMD(do_pledge) {
 	if (IS_NPC(ch)) {
 		return;
 	}
+	else if (!*argument) {
+		if ((e = real_empire(GET_PLEDGE(ch)))) {
+			msg_to_char(ch, "You have pledged to %s.\r\n", EMPIRE_NAME(e));
+		}
+		else if (GET_LOYALTY(ch)) {
+			msg_to_char(ch, "You already pledged your loyalty to %s.\r\n", EMPIRE_NAME(GET_LOYALTY(ch)));
+		}
+		else {
+			msg_to_char(ch, "You have not pledged to anybody.\r\n");
+		}
+	}
+	else if (GET_PLEDGE(ch) != NOTHING && (!str_cmp(argument, "cancel") || !str_cmp(argument, "none"))) {
+		e = real_empire(GET_PLEDGE(ch));
+		msg_to_char(ch, "You cancel your pledge to %s.\r\n", e ? EMPIRE_NAME(e) : "the empire");
+		GET_PLEDGE(ch) = NOTHING;
+		if (e) {
+			log_to_empire(e, ELOG_MEMBERS, "%s has canceld %s pledge to this empire", PERS(ch, ch, TRUE), REAL_HSHR(ch));
+		}
+	}
 	else if (!IS_APPROVED(ch) && config_get_bool("join_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
@@ -5103,7 +5131,7 @@ ACMD(do_pledge) {
 	else if (GET_LOYALTY(ch) == e) {
 		msg_to_char(ch, "You are already a member of that empire. In fact, you seem to be the most forgetful member.\r\n");
 	}
-	else if (get_cooldown_time(ch, COOLDOWN_LEFT_EMPIRE) > 0) {
+	else if (get_cooldown_time(ch, COOLDOWN_LEFT_EMPIRE) > 0 || get_cooldown_time(ch, COOLDOWN_PLEDGE) > 0) {
 		msg_to_char(ch, "You can't pledge again yet.\r\n");
 	}
 	else if ((IS_GOD(ch) || IS_IMMORTAL(ch)) && !EMPIRE_IMM_ONLY(e))
@@ -5112,6 +5140,7 @@ ACMD(do_pledge) {
 		msg_to_char(ch, "You can't join that empire.\r\n");
 	else {
 		GET_PLEDGE(ch) = EMPIRE_VNUM(e);
+		add_cooldown(ch, COOLDOWN_PLEDGE, SECS_PER_REAL_HOUR);
 		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), REAL_HSHR(ch));
 		msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
 		SAVE_CHAR(ch);
@@ -5480,6 +5509,10 @@ ACMD(do_roster) {
 		
 		timed_out = member_is_timed_out_ch(member);
 		if (timed_out && !all) {
+			if (member && is_file) {
+				is_file = FALSE;
+				free_char(member);
+			}
 			continue;
 		}
 		

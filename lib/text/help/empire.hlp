@@ -956,10 +956,11 @@ See also: DEPLETION, FORGE
 #
 PLEDGE JOIN
 
-Usage:  pledge <empire>
+Usage:  pledge <empire | cancel>
 
 Allows you to pledge your loyalty to an empire. If they find you worthy, you
-may be allowed to join.
+may be allowed to join. You can cancel your pledge if you change your mind,
+but you must wait an hour to pledge again.
 
 If the leader of one empire pledges to another empire and is enrolled, the
 entire original empire becomes a part of the second empire, including all

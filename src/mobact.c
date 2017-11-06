@@ -440,7 +440,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}
-	else if (move_type == MOB_MOVE_FLY || AFF_FLAGGED(mob, AFF_FLY)) {
+	else if (AFF_FLAGGED(mob, AFF_FLY)) {
 		ok = TRUE;
 	}
 	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)) {
@@ -842,7 +842,7 @@ void run_mob_echoes(void) {
 		// now find a mob with a valid message
 		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 			// things that disqualify the mob
-			if (mob->desc || !IS_NPC(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
+			if (mob->desc || !IS_NPC(mob) || IS_DEAD(mob) || EXTRACTED(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
 				continue;
 			}
 			

@@ -10,22 +10,22 @@ if (%instance.location% && (%room.template% == 10300 || (%room% != %instance.loc
   %echo% %self.name% flies away!
   mgoto %instance.location%
   %echo% %self.name% flies into the cave!
-elseif (%room.sector% == Crop || %room.sector% == Seeded Field || %room.sector% == Jungle Crop || %room.sector% == Jungle Field)
+elseif %room.sector_vnum% == 7 || %room.sector_vnum% == 13 || %room.sector_vnum% == 15 || %room.sector_vnum% == 16
   %echo% %self.name% scorches the crops!
   %terraform% %room% 10303
-elseif (%room.sector% == Desert Crop || %room.sector% == Sandy Field)
+elseif %room.sector_vnum% == 12 || %room.sector_vnum% == 14
   %echo% %self.name% scorches the crops!
   %terraform% %room% 10304
-elseif (%room.sector% == Desert)
+elseif %room.sector_vnum% == 20
   %echo% %self.name% scorches the desert!
   %terraform% %room% 10305
-elseif ((%room.sector% ~= Forest || %room.sector% ~= Jungle) && %room.sector% != Enchanted Forest)
+elseif (%room.sector_vnum% >= 1 && %room.sector_vnum% <= 4) || %room.sector_vnum% == 27 || %room.sector_vnum% == 28 || %room.sector_vnum% == 44 || %room.sector_vnum% == 45
   %echo% %self.name% scorches the trees!
   %terraform% %room% 10300
-elseif (%room.sector% == Grove)
+elseif %room.sector_vnum% == 26
   %echo% %self.name% scorches the grove!
   %terraform% %room% 10301
-elseif (%room.sector% == Plains)
+elseif %room.sector_vnum% == 0 || %room.sector_vnum% == 40
   %echo% %self.name% scorches the plains!
   %terraform% %room% 10302
 end

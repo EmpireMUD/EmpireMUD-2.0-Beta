@@ -61,6 +61,8 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh);
 // other locals
 int empire_chore_limit(empire_data *emp, int island_id, int chore);
 int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b);
+void mark_workforce_delay(empire_data *emp, room_data *room, int chore);
+bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 // external functions
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
@@ -134,7 +136,7 @@ int einv_interaction_chore_type = 0;
 void process_one_chore(empire_data *emp, room_data *room) {	
 	int island = GET_ISLAND_ID(room);	// just look this up once
 	
-	#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0)
+	#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
 	
 	// fire!
 	if (IS_BURNING(room) && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
@@ -576,6 +578,7 @@ bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room,
 */
 void chore_update(void) {
 	void ewt_free_tracker(struct empire_workforce_tracker **tracker);
+	void read_vault(empire_data *emp);
 	
 	struct empire_territory_data *ter, *next_ter;
 	vehicle_data *veh, *next_veh;
@@ -607,6 +610,8 @@ void chore_update(void) {
 				}
 			}
 			
+			
+			read_vault(emp);
 			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			
 			// no longer need this -- free up the tracker
@@ -811,6 +816,46 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 
 
 /**
+* Adds a workforce delay to a given room for an empire.
+*
+* @param empire_data *emp The empire.
+* @param room_data *room The location to mark it for.
+* @param int chore Which chore to mark.
+*/
+void mark_workforce_delay(empire_data *emp, room_data *room, int chore) {
+	struct workforce_delay_chore *wdc, *entry;
+	struct workforce_delay *delay;
+	room_vnum vnum;
+	
+	// find or add the delay entry
+	vnum = GET_ROOM_VNUM(room);
+	HASH_FIND_INT(EMPIRE_DELAYS(emp), &vnum, delay);
+	if (!delay) {
+		CREATE(delay, struct workforce_delay, 1);
+		delay->location = vnum;
+		HASH_ADD_INT(EMPIRE_DELAYS(emp), location, delay);
+	}
+	
+	// check if chore exists
+	entry = NULL;
+	LL_FOREACH(delay->chores, wdc) {
+		if (wdc->chore == chore) {
+			entry = wdc;
+			break;
+		}
+	}
+	if (!entry) {
+		CREATE(entry, struct workforce_delay_chore, 1);
+		entry->chore = chore;
+		LL_PREPEND(delay->chores, entry);
+	}
+	
+	// set time on entry (random)
+	entry->time = number(2, 3);
+}
+
+
+/**
 * @param empire_data *emp Empire the worker belongs to
 * @param int chore Which CHORE_
 * @param room_data *room Where to look
@@ -847,6 +892,42 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 */
 int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b) {
 	return b->amount - a->amount;
+}
+
+
+/**
+* Checks if a chore should be skipped, and decrements the delay timer if so.
+*
+* @param empire_data *emp The empire.
+* @param room_data *room The location to check.
+* @param int chore Which chore to check if delayed.
+* @return bool TRUE if the chore is delayed, FALSE if not.
+*/
+bool workforce_is_delayed(empire_data *emp, room_data *room, int chore) {
+	struct workforce_delay_chore *wdc, *next_wdc;
+	struct workforce_delay *delay;
+	room_vnum vnum;
+	
+	// find the delay entry
+	vnum = GET_ROOM_VNUM(room);
+	HASH_FIND_INT(EMPIRE_DELAYS(emp), &vnum, delay);
+	if (!delay) {
+		return FALSE;
+	}
+	
+	// check if chore exists
+	LL_FOREACH_SAFE(delay->chores, wdc, next_wdc) {
+		if (wdc->chore == chore) {
+			if (--wdc->time <= 0) {
+				LL_DELETE(delay->chores, wdc);
+				free(wdc);
+			}
+			
+			return TRUE;	// is delayed
+		}
+	}
+
+	return FALSE;
 }
 
 
@@ -1085,6 +1166,9 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else {
+		mark_workforce_delay(emp, room, chore);
+	}
 }
 
 
@@ -1113,6 +1197,9 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_BRICKMAKING);
 	}
 }
 
@@ -1197,6 +1284,9 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else {
+		mark_workforce_delay(emp, room, mode);
+	}
 }
 
 
@@ -1260,6 +1350,9 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_CHOPPING);
+	}
 }
 
 
@@ -1298,6 +1391,9 @@ void do_chore_digging(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_DIGGING);
 	}
 }
 
@@ -1368,6 +1464,9 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_BUILDING);
+	}
 }
 
 
@@ -1391,6 +1490,9 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_DISMANTLE_MINES);
 	}
 }
 
@@ -1471,6 +1573,9 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, chore);
 	}
 }
 
@@ -1578,6 +1683,9 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_FARMING);
+	}
 }
 
 
@@ -1611,6 +1719,7 @@ void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	// never mark delay on this
 }
 
 
@@ -1655,6 +1764,9 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_HERB_GARDENING);
 	}
 }
 
@@ -1728,6 +1840,9 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_MINING);
+	}
 }
 
 
@@ -1798,6 +1913,9 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_MINTING);
+	}
 }
 
 
@@ -1823,6 +1941,9 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_NAILMAKING);
 	}
 }
 
@@ -1874,6 +1995,9 @@ void do_chore_quarrying(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_QUARRYING);
 	}
 }
 
@@ -1929,6 +2053,9 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_SHEARING);
+	}
 	
 	free_exclusion_data(excl);
 }
@@ -1961,6 +2088,9 @@ void do_chore_trapping(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_TRAPPING);
 	}
 }
 

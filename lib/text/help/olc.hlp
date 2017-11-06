@@ -1120,6 +1120,7 @@ The following adventure flags are available:
  EMPTY-RESET-ONLY - Won't reset while players are inside.
  CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
     first time.
+ IGNORE-WORLD-SIZE - Won't adjust the number of instances based on the world.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -1128,9 +1129,14 @@ See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 Usage:  .limit <number>
 
 This number controls how many copies of an adventure can exist in the world
-at a time.
+at a time. The number you set here is used on default EmpireMUDs with roughly
+a 300000-tile world. Your MUD automatically adjusts the instance limit if you
+have a larger or smaller world than that.
 
-See also: OLC ADVENTURES
+If you want a fixed number of instances with no adjusting, set the
+IGNORE-WORLD-SIZE flag on the adventure.
+
+See also: ADVEDIT FLAGS, OLC ADVENTURES
 #d
 "ADVEDIT BDG-EXISTING" "ADVEDIT LINK BDG-EXISTING" "ADVEDIT LINKING BDG-EXISTING"
 
@@ -5810,6 +5816,8 @@ Usage:  .evolution add <type> [value] <percent> <becomes sector vnum>
 This command lets you add or remove an evolution from a sector. Evolutions are
 rules that describe how the sector changes over time. Some evolutions change
 the world periodically on their own; others are triggered by player action.
+
+Evolutions happen once per in-game day.
 
 No matter how small you set the percentages on evolutions, if they run on their
 own, they'll eventually succeed. Percentages may be set from 0.01 to 100.00.

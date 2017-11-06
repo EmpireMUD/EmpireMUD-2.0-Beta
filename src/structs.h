@@ -526,6 +526,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
 #define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
 #define ADV_CAN_DELAY_LOAD  BIT(10)	// can save memory by not instantiating till a player appears
+#define ADV_IGNORE_WORLD_SIZE  BIT(11)	// does not adjust the instance limit
 
 
 // ADV_LINK_x: adventure link rule types
@@ -1920,6 +1921,8 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_CLEARMETERS  BIT(31)	// automatically clears the damage meters before a new fight
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
 #define PRF_NO_PAINT  BIT(33)	// unable to see custom paint colors
+#define PRF_EXTRA_SPACING  BIT(34)	// causes an extra crlf before command interpreter
+#define PRF_DRIVING_LOOK  BIT(35)	// auto-looks each time you move a vehicle
 
 
 // PTECH_x: player techs
@@ -2208,7 +2211,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_DEPLETION_TYPES  9	// total
 
 
-// world evolutions
+// EVO_x: world evolutions
 #define EVO_CHOPPED_DOWN  0	// sect it becomes when a tree is removed, [value=# of trees]: controls chopping, chant of nature, etc
 #define EVO_CROP_GROWS  1	// e.g. 'seeded field' crop-grows to 'crop' [no value]
 #define EVO_ADJACENT_ONE  2	// called when adjacent to at least 1 of [value=sector]
@@ -2221,7 +2224,11 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_MAGIC_GROWTH  9	// called when Chant of Nature or similar is called
 #define EVO_NOT_ADJACENT  10	// called when NOT adjacent to at least 1 of [value=sector]
 #define EVO_NOT_NEAR_SECTOR  11 // called when NOT within 2 tiles of [value=sector]
-#define NUM_EVOS  12	// total
+#define EVO_SPRING  12	// triggers if it's spring
+#define EVO_SUMMER  13	// triggers if it's summer
+#define EVO_AUTUMN  14	// triggers if it's autumn
+#define EVO_WINTER  15	// triggers if it's winter
+#define NUM_EVOS  16	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0
@@ -2415,6 +2422,14 @@ struct ban_list_element {
 	char name[MAX_NAME_LENGTH+1];
 	
 	struct ban_list_element *next;
+};
+
+
+// used for the external 'evolve' tool and its imports
+struct evo_import_data {
+	room_vnum vnum;
+	sector_vnum old_sect;
+	sector_vnum new_sect;
 };
 
 
@@ -4128,6 +4143,22 @@ struct empire_workforce_tracker {
 };
 
 
+// linked list of chores in the 'delay' state
+struct workforce_delay_chore {
+	int chore;
+	int time;
+	struct workforce_delay_chore *next;
+};
+
+
+// allows workforce chores to be skipped
+struct workforce_delay {
+	room_vnum location;
+	struct workforce_delay_chore *chores;
+	UT_hash_handle hh;
+};
+
+
 // for offenses committed against an empire
 struct offense_data {
 	int type;	// OFFENSE_ constant
@@ -4183,6 +4214,7 @@ struct empire_data {
 	struct empire_territory_data *territory_list;	// hash table by vnum
 	struct empire_city_data *city_list;	// linked list of cities
 	struct empire_workforce_tracker *ewt_tracker;	// workforce tracker
+	struct workforce_delay *delays;	// speeds up chore processing
 	
 	// unsaved data
 	int city_terr;	// total territory IN cities
@@ -4577,7 +4609,7 @@ struct sector_data {
 
 // for sector_data, to describe how a tile changes over time
 struct evolution_data {
-	int type;	// EVO_x
+	int type;	// EVO_
 	int value;	// used by some types, e.g. # of adjacent forests
 	double percent;	// chance of happening per zone update
 	sector_vnum becomes;	// sector to transform to

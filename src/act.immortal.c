@@ -62,6 +62,7 @@ extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
 
 // external functions
+extern int adjusted_instance_limit(adv_data *adv);
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
@@ -80,7 +81,10 @@ void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
 extern char *show_color_codes(char *string);
+extern int stats_get_crop_count(crop_data *cp);
+extern int stats_get_sector_count(sector_data *sect);
 void update_class(char_data *ch);
+void update_world_count();
 
 // locals
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size);
@@ -334,6 +338,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 ADMIN_UTIL(util_b318_buildings);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
+ADMIN_UTIL(util_evolve);
 ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
@@ -353,6 +358,7 @@ struct {
 	{ "b318buildings", LVL_CIMPL, util_b318_buildings },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
+	{ "evolve", LVL_CIMPL, util_evolve },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
@@ -457,6 +463,15 @@ ADMIN_UTIL(util_diminish) {
 		
 		msg_to_char(ch, "Diminished value: %.2f\r\n", result);
 	}
+}
+
+
+ADMIN_UTIL(util_evolve) {
+	void run_external_evolutions();
+	
+	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used util evolve", GET_NAME(ch));
+	send_config_msg(ch, "ok_string");
+	run_external_evolutions();
 }
 
 
@@ -898,7 +913,7 @@ void do_instance_list_all(char_data *ch) {
 			continue;
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, GET_ADV_MAX_INSTANCES(adv));
+		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, adjusted_instance_limit(adv));
 	}
 	
 	if (ch->desc) {
@@ -2176,11 +2191,11 @@ SHOW(show_quests) {
 	void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
 	void show_quest_tracker(char_data *ch, struct player_quest *pq);
 	
-	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH], when[256];
 	struct player_completed_quest *pcq, *next_pcq;
 	bool file = FALSE, found = FALSE;
 	struct player_quest *pq;
-	int count, total;
+	int count, total, diff;
 	quest_data *qst;
 	char_data *vict;
 	size_t size;
@@ -2199,6 +2214,10 @@ SHOW(show_quests) {
 		check_delayed_load(vict);
 		if (IS_NPC(vict) || !GET_QUESTS(vict)) {
 			msg_to_char(ch, "%s is not on any quests.\r\n", GET_NAME(vict));
+			if (vict && file) {
+				file = FALSE;
+				free_char(vict);
+			}
 			return;
 		}
 		
@@ -2217,6 +2236,10 @@ SHOW(show_quests) {
 		check_delayed_load(vict);
 		if (IS_NPC(vict) || !GET_COMPLETED_QUESTS(vict)) {
 			msg_to_char(ch, "%s has not completed any quests.\r\n", GET_NAME(vict));
+			if (vict && file) {
+				file = FALSE;
+				free_char(vict);
+			}
 			return;
 		}
 		
@@ -2225,7 +2248,17 @@ SHOW(show_quests) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum));
+			
+			if (time(0) - pcq->last_completed < SECS_PER_REAL_DAY) {
+				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_HOUR;
+				snprintf(when, sizeof(when), "(%d hour%s ago)", diff, PLURAL(diff));
+			}
+			else {
+				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_DAY;
+				snprintf(when, sizeof(when), "(%d day%s ago)", diff, PLURAL(diff));
+			}
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
 		}
 	
 		if (ch->desc) {
@@ -2489,6 +2522,31 @@ SHOW(show_commons) {
 }
 
 
+SHOW(show_crops) {
+	crop_data *crop, *next_crop;
+	int count, total, this;
+	
+	// fresh numbers
+	update_world_count();
+	
+	// output
+	total = count = 0;
+	
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		this = stats_get_crop_count(crop);
+		strcpy(buf, GET_CROP_NAME(crop));
+		msg_to_char(ch, " %6d %-20.20s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
+		total += this;
+	}
+	if (count % 2) {
+		msg_to_char(ch, "\r\n");
+	}
+	
+	msg_to_char(ch, " Total: %d\r\n", total);
+
+}
+
+
 SHOW(show_dailycycle) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	quest_data *qst, *next_qst;
@@ -2540,6 +2598,42 @@ SHOW(show_players) {
 	}
 
 	msg_to_char(ch, "Players:\r\n %-20.20s %-9.9s %-9.9s %-9.9s %s\r\n %-20.20s %-9.9s %-9.9s %-9.9s %s\r\n%s", "Name", " Health", " Move", " Mana", "Blood", "----", "---------", "---------", "---------", "-----", buf);
+}
+
+
+SHOW(show_shops) {
+	extern struct shop_temp_list *build_available_shop_list(char_data *ch);
+	void free_shop_temp_list(struct shop_temp_list *list);
+
+	struct shop_temp_list *stl, *shop_list = NULL;
+	char buf[MAX_STRING_LENGTH];
+	
+	msg_to_char(ch, "Shops here:\r\n");
+	
+	shop_list = build_available_shop_list(ch);
+	LL_FOREACH(shop_list, stl) {
+		// determine shopkeeper
+		if (stl->from_mob) {
+			snprintf(buf, sizeof(buf), " (%s)", PERS(stl->from_mob, ch, FALSE));
+		}
+		else if (stl->from_obj) {
+			snprintf(buf, sizeof(buf), " (%s)", GET_OBJ_SHORT_DESC(stl->from_obj));
+		}
+		else if (stl->from_room) {
+			strcpy(buf, " (room)");
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		msg_to_char(ch, "[%5d] %s%s%s\r\n", SHOP_VNUM(stl->shop), SHOP_NAME(stl->shop), buf, SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+	}
+	
+	if (!shop_list) {
+		msg_to_char(ch, " none\r\n");
+	}
+	
+	free_shop_temp_list(shop_list);
 }
 
 
@@ -2599,12 +2693,7 @@ SHOW(show_technology) {
 
 
 SHOW(show_terrain) {
-	extern int stats_get_crop_count(crop_data *cp);
-	extern int stats_get_sector_count(sector_data *sect);
-	void update_world_count();
-	
 	sector_data *sect, *next_sect;
-	crop_data *crop, *next_crop;
 	int count, total, this;
 	
 	// fresh numbers
@@ -2619,16 +2708,11 @@ SHOW(show_terrain) {
 		total += this;
 	}
 	
-	HASH_ITER(hh, crop_table, crop, next_crop) {
-		strcpy(buf, GET_CROP_NAME(crop));
-		msg_to_char(ch, " %6d %-20.20s %s", stats_get_crop_count(crop), CAP(buf), !((++count)%2) ? "\r\n" : " ");
-	}
 	if (count % 2) {
 		msg_to_char(ch, "\r\n");
 	}
 	
 	msg_to_char(ch, " Total: %d\r\n", total);
-
 }
 
 
@@ -3345,7 +3429,7 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 		sprintf(lbuf, "%d min", GET_ADV_RESET_TIME(adv));
 	}
 	
-	msg_to_char(ch, "Instance limit: [&c%d&0/&c%d&0], Player limit: [&c%d&0], Reset time: [&c%s&0]\r\n", count_instances(adventure_proto(GET_ADV_VNUM(adv))), GET_ADV_MAX_INSTANCES(adv), GET_ADV_PLAYER_LIMIT(adv), lbuf);
+	msg_to_char(ch, "Instance limit: [&c%d&0/&c%d&0 (&c%d&0)], Player limit: [&c%d&0], Reset time: [&c%s&0]\r\n", count_instances(adventure_proto(GET_ADV_VNUM(adv))), adjusted_instance_limit(adv), GET_ADV_MAX_INSTANCES(adv), GET_ADV_PLAYER_LIMIT(adv), lbuf);
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
@@ -7359,6 +7443,7 @@ ACMD(do_show) {
 		{ "stats", LVL_GOD, show_stats },
 		{ "site", LVL_ASST, show_site },
 		{ "commons", LVL_ASST, show_commons },
+		{ "crops", LVL_START_IMM, show_crops },
 		{ "players", LVL_START_IMM, show_players },
 		{ "terrain", LVL_START_IMM, show_terrain },
 		{ "account", LVL_CIMPL, show_account },
@@ -7381,6 +7466,7 @@ ACMD(do_show) {
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },
+		{ "shops", LVL_START_IMM, show_shops },
 
 		// last
 		{ "\n", 0, NULL }

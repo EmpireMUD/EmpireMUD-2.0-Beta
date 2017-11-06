@@ -1858,6 +1858,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WAR, "war_login_delay", CONFTYPE_INT, "seconds a person is stunned if they log in while at war");
 
 	// world
+	init_config(CONFIG_WORLD, "adjust_instance_limits", CONFTYPE_BOOL, "raises/lowers instance counts based on world size");
 	init_config(CONFIG_WORLD, "default_interior", CONFTYPE_INT, "building room vnum to use for designate");
 		init_config_custom("default_interior", config_show_building, config_edit_building, NULL);
 	init_config(CONFIG_WORLD, "water_crop_distance", CONFTYPE_INT, "distance at which a crop marked requires-water can be planted from one");

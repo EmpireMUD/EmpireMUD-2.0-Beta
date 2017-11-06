@@ -660,6 +660,11 @@ void process_driving(char_data *ch) {
 			return;
 		}
 	}
+	
+	// not stopped by anything? auto-look each move
+	if (PRF_FLAGGED(ch, PRF_DRIVING_LOOK)) {
+		look_at_room(ch);
+	}
 }
 
 
@@ -1798,8 +1803,11 @@ ACMD(do_drive) {
 		GET_DRIVING(ch) = veh;
 		VEH_DRIVER(veh) = ch;
 		
-		if (same_dir) {
+		if (same_dir && dist > 0) {
 			msg_to_char(ch, "You will now stop after %d tiles.\r\n", dist);
+		}
+		else if (same_dir && was_driving) {
+			msg_to_char(ch, "You're already going that way.\r\n");
 		}
 		else if (was_driving) {
 			msg_to_char(ch, "You turn %s.\r\n", dirs[get_direction_for_char(ch, dir)]);

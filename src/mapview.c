@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -311,21 +313,36 @@ char *get_room_name(room_data *room, bool color) {
 }
 
 
-// determines which tileset to use for sector color
+/**
+* determines which tileset to use for sector color...
+*
+* This function is designed to do 3 things using a lot of math:
+*  1. Past the arctic line, always Winter.
+*  2. Between the tropics, alternate Spring, Summer, Autumn (no Winter).
+*  3. Everywhere else, seasons are based on time of year, and gradually move
+*     North/South each day. There should always be a boundary between the
+*     Summer and Winter regions (thus all the squirrelly numbers).
+*
+* A near-copy of this function exists in util/evolve.c for map evolutions.
+*
+* @param room_data *room The room to get a season for.
+* @return int TILESET_ const for the chosen season.
+*/
 int pick_season(room_data *room) {
-	int ycoord = Y_COORD(room);
+	int ycoord = Y_COORD(room), y_max, y_arctic, y_tropics, half_y, day_of_year;
 	double arctic = config_get_double("arctic_percent") / 200.0;	// split in half and convert from XX.XX to .XXXX (percent)
 	double tropics = config_get_double("tropics_percent") / 200.0;
 	bool northern = (ycoord >= MAP_HEIGHT/2);
+	double a_slope, b_slope;
 	
-	// month 0 is january
+	// month 0 is january; year is 0-359 days
 	
 	// tropics? -- take half the tropic value, convert to percent, multiply by map height
-	if (ycoord >= (tropics * MAP_HEIGHT) && ycoord <= (MAP_HEIGHT - (tropics * MAP_HEIGHT))) {
+	if (ycoord >= round(MAP_HEIGHT/2.0) - (tropics * MAP_HEIGHT) && ycoord <= round(MAP_HEIGHT/2.0) + (tropics * MAP_HEIGHT)) {
 		if (time_info.month < 2) {
 			return TILESET_SPRING;
 		}
-		else if (time_info.month > 10) {
+		else if (time_info.month >= 10) {
 			return TILESET_AUTUMN;
 		}
 		else {
@@ -338,19 +355,50 @@ int pick_season(room_data *room) {
 		return TILESET_WINTER;
 	}
 	
-	// all other regions:
-	if (time_info.month < 2 || time_info.month > 10) {
-		return northern ? TILESET_WINTER : TILESET_SUMMER;
-	}
-	else if (time_info.month < 5) {
-		return northern ? TILESET_SPRING : TILESET_AUTUMN;
-	}
-	else if (time_info.month < 8) {
-		return northern ? TILESET_SUMMER : TILESET_WINTER;
+	// all other regions: first split the map in half (we'll invert for the south)
+	y_max = round(MAP_HEIGHT / 2.0);
+	day_of_year = time_info.month * 30 + time_info.day;
+	
+	if (northern) {
+		y_arctic = round(y_max - (config_get_double("arctic_percent") * y_max / 100));
+		y_tropics = round(config_get_double("tropics_percent") * y_max / 100);
+		a_slope = ((y_arctic - 1) - (y_tropics + 1)) / 120.0;	// basic slope of the seasonal gradient
+		b_slope = ((y_arctic - 1) - (y_tropics + 1)) / 90.0;
+		half_y = ABSOLUTE(ycoord - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
 	}
 	else {
-		return northern ? TILESET_AUTUMN : TILESET_SPRING;
+		y_arctic = round(config_get_double("arctic_percent") * y_max / 100);
+		y_tropics = round(y_max - (config_get_double("tropics_percent") * y_max / 100));
+		a_slope = ((y_tropics - 1) - (y_arctic + 1)) / 120.0;	// basic slope of the seasonal gradient
+		b_slope = ((y_tropics - 1) - (y_arctic + 1)) / 90.0;
+		half_y = ycoord - y_arctic;	// adjust to remove arctic
 	}
+	
+	if (day_of_year < 6 * 30) {	// first half of year
+		if (half_y >= round((day_of_year + 1) * a_slope)) {	// first winter line
+			return northern ? TILESET_WINTER : TILESET_SUMMER;
+		}
+		else if (half_y >= round((day_of_year - 89) * b_slope)) {	// spring line
+			return northern ? TILESET_SPRING : TILESET_AUTUMN;
+		}
+		else {
+			return northern ? TILESET_SUMMER : TILESET_WINTER;
+		}
+	}
+	else {	// 2nd half of year
+		if (half_y >= round((day_of_year - 360) * -a_slope)) {	// second winter line
+			return northern ? TILESET_WINTER : TILESET_SUMMER;
+		}
+		else if (half_y >= round((day_of_year - 268) * -b_slope)) {	// autumn line
+			return northern ? TILESET_AUTUMN : TILESET_SPRING;
+		}
+		else {
+			return northern ? TILESET_SUMMER : TILESET_WINTER;
+		}
+	}
+	
+	// fail? we should never reach this
+	return TILESET_SUMMER;
 }
 
 

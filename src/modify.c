@@ -258,6 +258,9 @@ void string_add(descriptor_data *d, char *str) {
 					if (is_file) {
 						store_loaded_char(recip);
 					}
+					else {
+						msg_to_char(recip, "\trYou see a mail pigeon circling above you.\t0\r\n");
+					}
 				}
 				
 				SEND_TO_Q("You tie your message to a pigeon and it flies away!\r\n", d);

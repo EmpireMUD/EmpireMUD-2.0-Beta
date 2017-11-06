@@ -781,15 +781,9 @@ INTERACTION_FUNC(finish_picking_herb) {
 		gain_ability_exp(ch, ABIL_FIND_HERBS, 10);
 	
 		if (!number(0, 11)) {
-			// random chance of gem
+			// random chance of gem -- TODO come up with some way to do this in-game
 			vnum = o_IRIDESCENT_IRIS;
 			num = 1;
-		}
-		else if (!number(0, 1) && find_flagged_sect_within_distance_from_room(inter_room, SECTF_FRESH_WATER, NOBITS, 1)) {
-			vnum = o_BILEBERRIES;
-		}
-		else if (!number(0, 1) && find_flagged_sect_within_distance_from_room(inter_room, SECTF_OCEAN, NOBITS, 1)) {
-			vnum = o_WHITEGRASS;
 		}
 	}
 	else {
@@ -1733,7 +1727,7 @@ void process_minting(char_data *ch) {
 	}
 	else {
 		num = GET_ACTION_VNUM(ch, 1);
-		msg_to_char(ch, "You finish milling and receive %s!\r\n", money_amount(emp, num));
+		msg_to_char(ch, "You finish minting and receive %s!\r\n", money_amount(emp, num));
 		act("$n finishes minting some coins!", FALSE, ch, NULL, NULL, TO_ROOM);
 		increase_coins(ch, emp, num);
 		
@@ -2490,7 +2484,7 @@ ACMD(do_dig) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if ((ROOM_IS_CLOSED(IN_ROOM(ch)) || WATER_SECT(IN_ROOM(ch))) && !CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
+	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
 		send_to_char("You can't dig here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {

@@ -686,4 +686,24 @@ lettuce, or you can press them into oil.
 R
 5116 0
 S
+#3051
+urchin sea~
+a sea urchin~
+A sea urchin has been dropped here.~
+You can eat the sea urchin.
+~
+6 0 a 2
+6 0 0
+7 48
+S
+#3052
+clam~
+a clam~
+A clam has been dropped here.~
+You could eat the clam.
+~
+6 0 a 3
+6 0 0
+7 48
+S
 $

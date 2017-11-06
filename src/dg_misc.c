@@ -480,7 +480,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 	}
 	else if (is_abbrev(arg1, "mobile")) {
 		LL_FOREACH_SAFE(character_list, mob, next_mob) {
-			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob)) {
+			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob) || MOB_INSTANCE_ID(mob) != inst->id) {
 				continue;
 			}
 			

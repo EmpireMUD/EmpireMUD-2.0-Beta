@@ -1,4 +1,6 @@
 "BIG LIST OF ADVENTURES THAT DON'T HAVE HELP FILES"
+
+adventures without helps:
 [   50] Tutorial: Royal Planning Office
 [   51] Tutorial: Museum of Early Man
 [   52] Tutorial Quests
@@ -6,28 +8,24 @@
 [  101] Magiterranean: The Hidden Garden
 [  102] Magiterranean: Interdimensional Whirlwind
 [  103] Magiterranean: Monsoon Rift
-[  120] Mountain Cave: Red Dragon
-[  121] The Swamp Hag
 [  122] Ruins: Three Banditos
 [  123] Ruins: Thieves
 [  125] Ruins: The Goblin Challenge
 [  126] Mountain Cave: Flame Dragon
 [  127] Abandoned Dragon Nest
-[  128] Colossal Red Dragon
-[  129] A Gigantic Nest
 [  130] Volcano
 [  140] The Sewer: Ratskins
-[  141] The Sewer: Goblin Outpost
-[  160] The Tower Skycleave
-[  161] Portal to the Primeval
 [  170] Hamlet of the Undead
 [  180] Misplaced Mother Goose
-[  181] Goblin Mines
 [  190] Winter Wonderland
 [  200] Burrow Canyons
 [  201] The Cursed Chalice of Mill Manor
 [  281] Mountain Valley: Molten Fiend
 [  282] Goblin Logging Camp
+[18300] Pyramid: Hidden Chamber of Neferkare
+[18350] Pyramid 2
+[18450] That Dammed River
+[18460] Unstable Portal
 #
 "COLOSSAL RED DRAGON" "MYTHIC FORGE" "LEGENDARY STITCHING" "LORE CRAFTS" "FABLED HIDES" "DRAGON TOKENS"
 
@@ -93,6 +91,86 @@ Other:
   Mounts: lithe ostrich, trumpeter swan, tawny roc
   Vehicle: Clockwork Roc (roc-stone gear)
 #
+"GOBLIN MINES"
+
+Goblin Mines (level 1-25 adventure)
+
+   The goblins have fled the mines and something tells you it's not good.
+Venture into the goblin mines and see what sends even goblins running for their
+lives! And maybe if you can find those goblins, they'll be willing to reward
+you for clearing out the mine.
+
+You can buy items from four goblins who have fled the mines. If you don't have
+any coins, try selling spider parts to Miner Nynar or spider meat to Miner
+Neena.
+
+Miner Nynar sells a bug potion (dexterity).
+Miner Meena sells a goblin pick (for mining).
+Miner Hanx sells a goblin raft (drag it to the shore and sit on it to sail).
+Blacklung, Goblin Foreman sells a goblin coffin (temporary, single-use tomb).
+#
+"GOBLIN OUTPOST" "SEWER: GOBLIN OUTPOST" "THE SEWER: GOBLIN OUTPOST"
+
+The Sewer: Goblin Outpost (level 50-100 adventure)
+
+   Strange sounds are coming from the sewer grate, and waste has been backing
+up into the streets. This can only mean one thing: Goblins! Will you buy the
+goblins' wares, or drive them from the city? This adventure sells 6 crafting
+patterns and 4 unique buildings. You can also fight the goblins solo or in
+pairs, to earn their prized gear.
+
+Dryleef, vanguard leader sells:
+  a goblin war tent - a portable home/forge
+  a goblin message post - a portable mail building
+  a goblin lab tent - a portable alchemist
+  a goblin dolmen stone - a semi-portable tomb
+
+Pimmin, goblin shaman sells:
+  the violet leopard shawl pattern - healer cloak
+  the wildfire gloves pattern - caster gloves
+
+Shivsper, goblin assassin
+  the rat-fur cloak pattern - melee cloak
+  the wooden gauntlets pattern - melee gauntlets
+
+Wargreyn, goblin blacksmith
+  the mesh cloak pattern - tank cloak
+  the heavy goblin gauntlets pattern - tank gauntlets
+#
+"GUILD OF ADVENTURERS" "ADVENTURERS GUILD" "THE GUILD OF ADVENTURERS"
+
+The Guild of Adventurers
+
+Seek out this guild, which makes its headquarters atop the giant atlasian
+tortoise. Build your own guildhall and explore quests that take you to many
+of the game's adventure zones. Rise through the ranks for power and prestige.
+(Hint: Use 'where atlasian' to find the tortoise.)
+
+The tavern shop sells:
+  a Guild of Adventurers seeker stone - finds the tortoise (Liked)
+  a baby tortoise whistle - minipet (Esteemed)
+  a ninja tortoise whistle - minipet (Venerated)
+  a tortoise trinket - teleports you to the tortoise (Venerated)
+  a dragon turtle whistle - minipet (Revered)
+  a Guild of Adventurers charter - builds a guildhall (Venerated)
+  an atlasian egg - your own atlasian tortoise (Venerated)
+
+The umbramancer sells:
+  the terrapin ring of acerbity - 100-200 caster ring (Esteemed)
+  an umbral whistle - land mount (Liked)
+
+The vampire sells:
+  the chelonian ring of extrication - 100-200 healer ring (Esteemed)
+  a sanguine whistle - land mount (Liked)
+
+The tinker sells:
+  the testudinal ring of courage - 100-200 melee ring (Esteemed)
+  a clockwork apparatus - land mount (Liked)
+
+The guildleader sells:
+  the tortoiseshell ring of mettle - 100-200 tank ring (Esteemed)
+  an imperium-clad whistle - land mount (Liked)
+#
 HALLOWEEN CANDY "HALLOWEEN CANDY" "RESTLESS SPIRIT"
 
 The Halloween game content is available during the month of October and offers
@@ -115,7 +193,34 @@ The restless spirit sells:
 Game admins: You must enable global 18802 by removing its IN-DEV flag to turn
 on the Halloween candy drops, and disable that global when the holiday is over.
 #
+"LOST TEMPLE" "JUNGLE TEMPLE" "THE LOST TEMPLE"
+
+The Lost Temple (level 125-175 adventure)
+
+   You have discovered an ancient, overgrown temple deep in the jungle. Surely
+its depths must hold great undiscovered treasures of an ancient civilization,
+if you're brave enough to venture below...
+   This adventure features a difficulty selector so it can be completed solo,
+or in groups of up to four. All gear looted from this adventure will be higher
+quality on harder difficulties.
+   Beware! Dungeons such as this one often have traps. &cSEARCH&0 carefully before
+advancing, or be prepared to &cJUMP&0, &cDUCK&0 or &cRUN&0 very fast.
+
+The Professor sells:
+  a riding jaguar whistle - land mount
+  a sea serpent whistle - aquatic mount
+  the feathered serpent whistle - flying mount
+  a jaguar cub whistle - minipet
+  a jaguar totem - jaguar morph (requires Animal Forms)
+  a fearsome jaguar armor pattern - tank armor
+  a red coyote armor pattern - melee armor
+  a feathered serpent armor pattern - healer armor
+  an eagle warrior armor pattern - caster armor
+  a blue chameleon armor pattern - pvp/solo armor
+#
 "OLD GODS" "BINDING CIRCLE"
+
+{**}
 
 The Binding Circle adventures are a set of small 1-fight world spawns where
 you fight and defeat ancient, long-forgotten gods. These adventures spawn only
@@ -133,8 +238,11 @@ All Old Gods adventures use the 'weight of the old gods' currency.
 
 The following old gods are available so far:
   Anat, the warrior-goddess - HELP ANAT
+  Ba'al Hadad, the storm god - HELP HADAD
 #
 "BINDING CIRCLE: ANAT" "BINDING CIRCLE ANAT" ANAT
+
+Binding Circle: Anat (level 225-325 adventure)
 
 Anat, virgin warrior-goddess of old, is a fierce, battle-hardened maiden whose
 power can barely be contained by the binding chains. Anat has powerful
@@ -158,6 +266,8 @@ The patterns and recipes in the store are:
   feast of Anat recipe - resistance feast (requires Gourmet Chef)
 #
 "BINDING CIRCLE: BA'AL HADAD" "BINDING CIRCLE BA'AL HADAD" "BA'AL HADAD" "BAAL HADAD" HADAD
+
+Binding Circle: Ba'al Hadad (level 225-325 adventure)
 
 Ba'al Hadad, storm god of the ancient world, is a powerful deity with mastery
 over the weather. He is not easily bound by chains. Seek him out and defeat
@@ -200,6 +310,61 @@ Craft patterns sold by the vendor outside the portal:
   Melee weapon: frozen pykrete sword
   Healer weapon: icy star of winter
   Caster weapon: glacial staff of the Maelstrom pattern
+#
+"PORTAL TO THE PRIMEVAL" "PRIMEVAL PORTAL"
+
+Portal to the Primeval (level 75-100 group adventure)
+
+   The High Sorcerers in your tower have managed to open a chronoportal into
+the past! Follow Archsorcerer Malfernes through the portal and explore the
+Primeval Era, when the ancient ancestors of the dragons ruled endless jungles.
+But beware, because it's easy to get lost and you make a delicious snack for
+the dracosaurs.
+
+The salesman sells:
+  primordial axe pattern - melee weapon
+  dracosaur bone spear pattern - tank weapon
+  jeweled bone staff pattern - caster staff weapon
+  dracosaur scale robe pattern - healer armor
+  dracosaur scale boots pattern - pvp/solo boots
+  primordial boots pattern - tank boots
+  dracosaur scale gauntlets pattern - melee gauntlets
+  Tome of the Primordium schematic - caster offhand
+  bone crown pattern - greatness crown
+#
+SKYCLEAVE "SKY CLEAVE" "TOWER SKYCLEAVE" "THE TOWER SKYCLEAVE"
+
+The Tower Skycleave (adventure for various levels)
+
+   The Tower Skycleave is renowned throughout the land for its powerful
+sorcerers and unconventional research. It funds its discoveries through patents
+and tourism, and a sign out front eagerly encourages you to visit. Parts of the
+tower are designed for different level ranges, so use the 'consider' command
+judiciously before you attack things.
+
+The gift shoppe sells:
+  a skycleaver belt - +mana belt (30-50)
+  skycleaver gloves - +move gloves (30-50)
+  skycleaver armor - +hit/health medium armor (30-50)
+  a skycleaver rucksack - +intelligence pack (30-50)
+  an iridescent blue iris - gem
+  a yellow lightning stone - gem
+  a red bloodstone - gem
+  a glowing green seashell - gem
+  a skycleaver trinket - teleports you to Skycleave
+ 
+The cafe sells:
+  mug of coffee
+  glass of red wine
+
+High Sorceress Celiya sells:
+  form-fitting backpack - +hit pack (30-100)
+
+High Sorcerer Barrosh sells:
+  armored backpack - resist-physical pack (30-100)
+
+Grand High Sorcerer Knezz sells:
+  portable hole - mana-regen pack (30-100)
 #
 "SWAMP HAG" "THE SWAMP HAG"
 

@@ -299,6 +299,14 @@ Examples:
   > idea more types of pottery
   > typo 'sence' should be spelled 'sense'
 #
+BUY LIST SHOP SHOPS
+
+Usage:  list [keywords]
+        buy <item>
+
+These commands let you list and buy items from shops. You can find shops in
+various places around the world.
+#
 CHANGEPASS CHANGEPASSWORD "CHANGE PASSWORD" PASSWORD
 
 Usage:  changepass <old pw> <new pw> <new again>
@@ -511,7 +519,7 @@ See also: SHIPPING
 #
 DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
 
-Usage:  douse [vehicle]
+Usage:  douse [vehicle | light]
 
 In the event of a fire, you may douse it with water from any portable source. 
 It may take a lot of water to douse the fire, and you may have to leave and 
@@ -521,6 +529,9 @@ and destroy your structure.
 If your empire has a workforce, the fire brigade can also put out fires for
 you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
+
+If you use this on a light such as a torch or cooking fire, it will extinguish
+the light (and destroy the object).
 
 See also: COOKING FIRE, LIGHT, WORKFORCE
 #
@@ -541,6 +552,13 @@ Usage:  draw <item>
 This command pulls one of your sheathed weapons into your main hand.
 
 See also: SHEATHE, SWAP
+#
+DRIVING-LOOK "DRIVING LOOK" "TOGGLE DRIVING-LOOK"
+
+Usage:  toggle driving-look
+
+This toggle causes you to automatically 'look' after each time you move when
+driving, piloting, or sailing a vehicle.
 #
 DROP
 
@@ -634,6 +652,13 @@ staked, or tied up.
 To automatically kill your victims in combat, "toggle autokill".
 
 See also: TOGGLE, STAKE, TIE
+#
+EXTRA-SPACING "EXTRA SPACING" "TOGGLE EXTRA-SPACING"
+
+Usage:  toggle extra-spacing
+
+This toggle will insert an extra blank line after your prompt when you type
+any command. This is useful on MUD clients that don't have local echo.
 #
 EXITS
 
@@ -1912,6 +1937,8 @@ Toggles:
   clearmeters - automatically clears your meters between combats
   tutorials - you won't see available tutorial quests if this is off
   no-paint - turns off custom paint colors on buildings
+  extra-spacing - adds an extra blank line after you type a command
+  driving-look - automatically 'looks' after each time your vehicle moves
 
 Immortal toggles:
   wiznet - shuts off the immortal channel

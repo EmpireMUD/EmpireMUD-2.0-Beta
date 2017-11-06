@@ -1235,13 +1235,19 @@ obj_data *die(char_data *ch, char_data *killer) {
 	void despawn_charmies(char_data *ch);
 	void kill_empire_npc(char_data *ch);
 	
-	char_data *ch_iter, *player;
+	char_data *ch_iter, *player, *killmaster;
 	obj_data *corpse = NULL;
 	struct mob_tag *tag;
 	
 	// no need to repeat
 	if (EXTRACTED(ch)) {
 		return NULL;
+	}
+	
+	// find a player in the chain -- in case a pet kills the mob
+	killmaster = killer;
+	while (killmaster && IS_NPC(killmaster) && killmaster->master && IN_ROOM(killmaster) == IN_ROOM(killmaster->master)) {
+		killmaster = killmaster->master;
 	}
 	
 	// remove all DoTs (BEFORE phoenix)
@@ -1264,11 +1270,11 @@ obj_data *die(char_data *ch, char_data *killer) {
 	}
 	
 	// hostile activity triggers distrust unless the ch is pvp-flagged or already hostile
-	if (!IS_NPC(killer) && GET_LOYALTY(ch) && GET_LOYALTY(killer) != GET_LOYALTY(ch)) {
+	if (!IS_NPC(killmaster) && GET_LOYALTY(ch) && GET_LOYALTY(killmaster) != GET_LOYALTY(ch)) {
 		// we check the ch's master if it's an NPC and the master is a PC
 		char_data *check = (IS_NPC(ch) && ch->master && !IS_NPC(ch->master)) ? ch->master : ch;
-		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(killer)) || ROOM_OWNER(IN_ROOM(killer)) != GET_LOYALTY(killer))) {
-			trigger_distrust_from_hostile(killer, GET_LOYALTY(ch));
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(killer)) || ROOM_OWNER(IN_ROOM(killer)) != GET_LOYALTY(killmaster))) {
+			trigger_distrust_from_hostile(killmaster, GET_LOYALTY(ch));
 		}
 	}
 	
@@ -1302,8 +1308,8 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// for players, die() ends here, until they respawn or quit
 	if (!IS_NPC(ch)) {
-		if (ch != killer) {
-			add_player_kill(ch, killer);
+		if (ch != killmaster) {
+			add_player_kill(ch, killmaster);
 		}
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
@@ -1316,7 +1322,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 
 	/* To make ordinary commands work in scripts.  welcor*/  
 	GET_POS(ch) = POS_STANDING;
-	if (death_mtrigger(ch, killer)) {
+	if (death_mtrigger(ch, killmaster)) {
 		death_cry(ch);
 	}
 	GET_POS(ch) = POS_DEAD;
@@ -1343,10 +1349,10 @@ obj_data *die(char_data *ch, char_data *killer) {
 		}
 	}
 
-	drop_loot(ch, killer);
+	drop_loot(ch, killmaster);
 	if (MOB_FLAGGED(ch, MOB_UNDEAD)) {
-		if (!IS_NPC(killer) && IS_NPC(ch)) {
-			recursive_loot_set(ch->carrying, GET_IDNUM(killer), GET_LOYALTY(killer));
+		if (!IS_NPC(killmaster) && IS_NPC(ch)) {
+			recursive_loot_set(ch->carrying, GET_IDNUM(killmaster), GET_LOYALTY(killmaster));
 		}
 		while (ch->carrying) {
 			obj_to_room(ch->carrying, IN_ROOM(ch));
@@ -1357,8 +1363,8 @@ obj_data *die(char_data *ch, char_data *killer) {
 		obj_to_room(corpse, IN_ROOM(ch));
 		
 		// tag corpse
-		if (corpse && !IS_NPC(killer)) {
-			recursive_loot_set(corpse, GET_IDNUM(killer), GET_LOYALTY(killer));
+		if (corpse && !IS_NPC(killmaster)) {
+			recursive_loot_set(corpse, GET_IDNUM(killmaster), GET_LOYALTY(killmaster));
 		}
 		
 		load_otrigger(corpse);

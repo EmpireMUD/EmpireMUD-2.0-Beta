@@ -263,7 +263,7 @@
 // The big question...
 #define CAN_SEE(sub, obj)  (Global_ignore_dark ? CAN_SEE_NO_DARK(sub, obj) : CAN_SEE_DARK(sub, obj))
 
-#define WIZHIDE_OK(sub, obj)  (!IS_IMMORTAL(obj) || !PRF_FLAGGED((obj), PRF_WIZHIDE) || (!IS_NPC(sub) && GET_ACCESS_LEVEL(sub) >= GET_ACCESS_LEVEL(obj) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
+#define WIZHIDE_OK(sub, obj)  (!IS_IMMORTAL(obj) || !PRF_FLAGGED((obj), PRF_WIZHIDE) || (!IS_NPC(sub) && GET_ACCESS_LEVEL(sub) >= MIN(LVL_START_IMM, GET_ACCESS_LEVEL(obj)) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
 #define INCOGNITO_OK(sub, obj)  (!IS_IMMORTAL(obj) || IS_IMMORTAL(sub) || !PRF_FLAGGED((obj), PRF_INCOGNITO))
 
 
@@ -518,6 +518,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
 #define EMPIRE_COINS(emp)  ((emp)->coins)
 #define EMPIRE_PRIV(emp, num)  ((emp)->priv[(num)])
+#define EMPIRE_DELAYS(emp)  ((emp)->delays)
 #define EMPIRE_DESCRIPTION(emp)  ((emp)->description)
 #define EMPIRE_DIPLOMACY(emp)  ((emp)->diplomacy)
 #define EMPIRE_STORAGE(emp)  ((emp)->store)
