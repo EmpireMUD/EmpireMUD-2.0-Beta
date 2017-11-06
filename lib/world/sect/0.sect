@@ -2306,14 +2306,14 @@ On the Plains, Above the Riverbank~
 C
 dig, pick~
 D1
-@w&?..@e~
-&g~
+@w&t..@e~
+&t~
 D2
-@w&?..@e~
-&g~
+@w&t..@e~
+&t~
 D3
-@w&?..@e~
-&g~
+@w&t..@e~
+&t~
 D4
 @w&?..@e~
 &0~
@@ -2340,7 +2340,7 @@ E
 E
 11 5 10.00 0
 E
-12 0 50.00 41
+12 0 25.00 41
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a pile of clay
@@ -2481,9 +2481,9 @@ E
 E
 13 0 20.00 40
 E
-14 0 100.00 40
+14 0 20.00 40
 E
-15 0 100.00 40
+15 0 20.00 40
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
@@ -2518,9 +2518,9 @@ E
 E
 13 0 20.00 44
 E
-14 0 100.00 44
+14 0 20.00 44
 E
-15 0 100.00 44
+15 0 20.00 44
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 20 120 100.00 1  # CHOP: a large tree
@@ -2655,16 +2655,19 @@ A Flooded Forest~
 C
 chop, fish, pick~
 D0
-@w&g^^@e~
-&g~
+@w&g^&?~@e~
+&c~
+D0
+@w&?~&g^@e~
+&c~
 E
 0 0 100.00 42
 E
 13 0 20.00 45
 E
-14 0 100.00 45
+14 0 20.00 45
 E
-15 0 100.00 45
+15 0 20.00 45
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 20 120 100.00 1  # CHOP: a large tree
@@ -2693,10 +2696,10 @@ D2
 @w&?^.@e~
 &g~
 D3
-@w&y^&g.@e~
-&y~
+@w&y^&?.@e~
+&g~
 D4
-@w&0^.@e~
+@w&?Y.@e~
 &0~
 E
 0 0 100.00 40
@@ -2709,7 +2712,7 @@ E
 E
 11 5 10.00 1
 E
-12 0 50.00 42
+12 0 25.00 42
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a pile of clay
@@ -2835,20 +2838,32 @@ S
 #45
 Forest~
 A Forest, Above the Riverbank~
-'.' 14 1 3 dl n
+'^' 14 1 3 dl n
 C
 chop, dig, gather, pick~
 D1
-@w&?^^@e~
+@w&?^.@e~
+&g~
+D1
+@w&?.^@e~
 &g~
 D2
-@w&?^^@e~
+@w&?^.@e~
+&g~
+D2
+@w&?.^@e~
 &g~
 D3
-@w&?^^@e~
+@w&g.&?^@e~
+&y~
+D3
+@w&?^&g.@e~
 &y~
 D4
-@w&0^^@e~
+@w&?.Y@e~
+&0~
+D4
+@w&?Y.@e~
 &0~
 E
 0 0 100.00 44
@@ -2857,7 +2872,7 @@ E
 E
 11 5 10.00 2
 E
-12 0 50.00 43
+12 0 25.00 43
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a pile of clay
@@ -3000,6 +3015,8 @@ D4
 &0~
 E
 5 0 100.00 17
+E
+8 0 100.00 13
 E
 10 6 5.00 0
 I 5 102 9.00 1 x  # DIG: a flint stone
@@ -3153,6 +3170,8 @@ E
 5 0 100.00 22
 E
 7 5 4.00 70
+E
+8 0 100.00 14
 E
 10 6 5.00 20
 I 5 102 9.00 1 x  # DIG: a flint stone
