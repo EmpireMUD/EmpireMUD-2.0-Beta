@@ -57,6 +57,7 @@
 *  Helper Functions
 *  Map Generator Functions
 *  Bonus Features
+*  Auditing
 */
 
 
@@ -73,8 +74,9 @@ struct island_def {
 /**
 * You can configure your map here. The default map is 1800x1000 and has 330000
 * land tiles, which is roughly 18% land. If you use a smaller map, you should
-* consider using less land. More land will result in more lag during operations
-* like saving the world map.
+* consider using less land (more land will result in more lag during operations
+* like saving the world map). You should also reduce the number/size of the
+* continents if your map is smaller.
 */
 
 // how much ocean to convert to land -- THIS WILL DETERMINE HOW MUCH RAM YOUR MUD USES (330k = about 200 MB RAM)
@@ -142,6 +144,7 @@ struct island_def island_types[] = {
 
 
 // helper function protos
+void audit_crops();
 inline void change_grid(int loc, int type);
 void clear_pass(void);
 struct island_data *closest_island(int x, int y);
@@ -669,6 +672,7 @@ void output_stats(void) {
 		printf("%-10.10s: %7d %4.2f%% %s", i == 0 ? "ERROR" : terrains[i-1].name, total[i], ((double)total[i] * 100 / (double)USE_SIZE), !((i+1)%3) ? "\n" : " ");
 	printf("\n");
 	printf("Number of islands: %d\n", max_island);
+	audit_crops();
 }
 
 
@@ -1585,4 +1589,90 @@ void load_and_shift_map(int dist) {
 
 	printf("Map shifted %d on X-axis.\n", dist);
 	output_stats();	
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUDITING ////////////////////////////////////////////////////////////////
+
+// this struct is used to ensure crops in all correct parts of the map
+struct {
+	int sect;	// which crop sector to look for
+	int min_x, max_x;
+	int min_y, max_y;
+} crop_regions[] = {
+	// temperate: northern quarters
+	{ TEMPERATE_CROP, 0, USE_WIDTH/4, USE_HEIGHT/2, USE_HEIGHT },
+	{ TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT/2, USE_HEIGHT },
+	{ TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT/2, USE_HEIGHT },
+	{ TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT/2, USE_HEIGHT },
+	
+	// temperate: southern quarters
+	{ TEMPERATE_CROP, 0, USE_WIDTH/4, 0, USE_HEIGHT/2 },
+	{ TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, 0, USE_HEIGHT/2 },
+	{ TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, 0, USE_HEIGHT/2 },
+	{ TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, 0, USE_HEIGHT/2 },
+	
+	// desert: true quarters
+	{ DESERT_CROP, 0, USE_WIDTH/2, 0, USE_HEIGHT/2 },	// sw
+	{ DESERT_CROP, 0, USE_WIDTH/2, USE_HEIGHT/2, USE_HEIGHT },	// nw
+	{ DESERT_CROP, USE_WIDTH/2, USE_WIDTH, 0, USE_HEIGHT/2 },	// se
+	{ DESERT_CROP, USE_WIDTH/2, USE_WIDTH, USE_HEIGHT/2, USE_HEIGHT },	// ne
+	
+	// jungle: true quarters
+	{ JUNGLE_CROP, 0, USE_WIDTH/2, 0, USE_HEIGHT/2 },	// sw
+	{ JUNGLE_CROP, 0, USE_WIDTH/2, USE_HEIGHT/2, USE_HEIGHT },	// nw
+	{ JUNGLE_CROP, USE_WIDTH/2, USE_WIDTH, 0, USE_HEIGHT/2 },	// se
+	{ JUNGLE_CROP, USE_WIDTH/2, USE_WIDTH, USE_HEIGHT/2, USE_HEIGHT },	// ne
+
+	{ -1, -1, -1, -1, -1 }	// last
+};
+
+
+// indicates if there are problems with any crop region
+void audit_crops(void) {
+	int iter, sub, sect, missed, *counts;
+	
+	// create a place to count
+	for (sub = 0; crop_regions[sub].sect != -1; ++sub) {
+		// just counting
+	}
+	CREATE(counts, int, sub);
+	
+	// check the whole world
+	for (iter = 0; iter < USE_SIZE; iter++) {
+		if ((sect = grid[iter].type) == OCEAN) {
+			continue;
+		}
+		
+		// see if it's part of any of them
+		for (sub = 0; crop_regions[sub].sect != -1; ++sub) {
+			if (crop_regions[sub].sect != sect) {
+				continue;
+			}
+			if (X_COORD(iter) < crop_regions[sub].min_x || X_COORD(iter) >= crop_regions[sub].max_x) {
+				continue;
+			}
+			if (Y_COORD(iter) < crop_regions[sub].min_y || Y_COORD(iter) >= crop_regions[sub].max_y) {
+				continue;
+			}
+			
+			// looks good
+			++counts[sub];
+		}
+	}
+	
+	// now, did we miss any regions?
+	missed = 0;
+	for (sub = 0; crop_regions[sub].sect != -1; ++sub) {
+		if (counts[sub] == 0) {
+			++missed;
+		}
+	}
+	
+	if (missed) {
+		printf("Warning: %d crop region%s have no crop tiles.", missed, missed == 1 ? "" : "s");
+	}
+	
+	free(counts);
 }
