@@ -1303,8 +1303,8 @@ void create_islands(void) {
 	int ii;
 	
 	// build continents first
-	for (ii = 0; island_types[ii].min_radius != -1 && (USE_SIZE - total_ocean) < TARGET_LAND_SIZE; ++ii) {
-		create_one_island(&island_types[ii]);
+	for (ii = 0; continents[ii].min_radius != -1 && (USE_SIZE - total_ocean) < TARGET_LAND_SIZE; ++ii) {
+		create_one_island(&continents[ii]);
 	}
 	
 	// then fill the rest of the space with islands
