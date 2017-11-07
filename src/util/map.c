@@ -100,11 +100,11 @@ struct island_def continents[] = {
 // Additional islands: It iterates repeatedly over this list until it's out of space:
 struct island_def island_types[] = {
 	// min-radius, max-radius, cluster-distance, cluster-size
-	{ 10, 60, 45, 4 },	// medium size, cluster of 4
-	{ 10, 30, 20, 8 },	// small size, cluster of 8
-	{ 10, 30, 10, 8 },	// small size, tightly packed, cluster of 8
-	{ 10, 30, 15, 3 },	// tiny cluster
-	{ 10, 30, 15, 3 },	// tiny cluster
+//	{ 10, 60, 45, 4 },	// medium size, cluster of 4
+//	{ 10, 30, 20, 8 },	// small size, cluster of 8
+//	{ 10, 30, 10, 8 },	// small size, tightly packed, cluster of 8
+//	{ 10, 30, 15, 3 },	// tiny cluster
+//	{ 10, 30, 15, 3 },	// tiny cluster
 	
 	{ -1, -1, -1, -1 }	// last
 };
@@ -1308,7 +1308,7 @@ void create_islands(void) {
 	}
 	
 	// then fill the rest of the space with islands
-	while ((USE_SIZE - total_ocean) < TARGET_LAND_SIZE) {
+	while ((USE_SIZE - total_ocean) < TARGET_LAND_SIZE && island_types[0].min_radius != -1) {
 		for (ii = 0; island_types[ii].min_radius != -1 && (USE_SIZE - total_ocean) < TARGET_LAND_SIZE; ++ii) {
 			create_one_island(&island_types[ii]);
 		}
