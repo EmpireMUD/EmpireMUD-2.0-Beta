@@ -3738,7 +3738,7 @@ void get_icons_display(struct icon_data *list, char *save_buffer) {
 		sprintf(line, " %2d. %s: %s%s&0  %s%s&0 %s", ++count, icon_types[icon->type], icon->color, ibuf, icon->color, show_color_codes(icon->color), lbuf);
 		
 		// format column despite variable width of color codes
-		size = 30 + color_code_length(line);
+		size = 34 + color_code_length(line);
 		sprintf(lbuf, "%%-%d.%ds%%s", size, size);
 		sprintf(save_buffer + strlen(save_buffer), lbuf, line, !(count % 2) ? "\r\n" : "");
 	}
