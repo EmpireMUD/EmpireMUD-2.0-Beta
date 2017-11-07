@@ -1091,7 +1091,7 @@ void add_start_points(bool force) {
 	}
 
 	// repeat until success
-	if (count == 0) {
+	if (count == 0 && !force) {
 		add_start_points(TRUE);
 	}
 }
