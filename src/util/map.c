@@ -49,8 +49,8 @@
 
 /**
 * Contents:
-*  Config And Setup
-*  Macros
+*  Config
+*  Macros and Definitions
 *  Main Generator
 *  Random Generator
 *  Island Numbering
@@ -58,6 +58,87 @@
 *  Map Generator Functions
 *  Bonus Features
 */
+
+
+// data type for how to build islands and continents
+struct island_def {
+	int min_radius, max_radius;
+	int cluster_dist, cluster_size;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CONFIG //////////////////////////////////////////////////////////////////
+
+/**
+* You can configure your map here. The default map is 1800x1000 and has 330000
+* land tiles, which is roughly 18% land. If you use a smaller map, you should
+* consider using less land. More land will result in more lag during operations
+* like saving the world map.
+*/
+
+// how much ocean to convert to land -- THIS WILL DETERMINE HOW MUCH RAM YOUR MUD USES (330k = about 200 MB RAM)
+#define TARGET_LAND_SIZE  330000	// total land tiles
+
+
+/**
+* Define continents here. Each row in this table represents one continent,
+* which are built using clusters of land. Spacing out the clusters more will
+* result in continents that are broken up.
+*/
+struct island_def continents[] = {
+	// min-radius, max-radius, cluster-distance, cluster-size
+	{ 30, 60, 45, 16 },	// 16 clusters of 30-60 radius clumps, each up to 45 tiles apart.
+	{ 30, 60, 45, 16 },	// repeated 4 times
+	{ 30, 60, 45, 16 },
+	{ 30, 60, 45, 16 },
+	
+	{ -1, -1, -1, -1 }	// last
+};
+
+
+// Additional islands: It iterates repeatedly over this list until it's out of space:
+struct island_def island_types[] = {
+	// min-radius, max-radius, cluster-distance, cluster-size
+	{ 10, 60, 45, 4 },	// medium size, cluster of 4
+	{ 10, 30, 20, 8 },	// small size, cluster of 8
+	{ 10, 30, 10, 8 },	// small size, tightly packed, cluster of 8
+	{ 10, 30, 15, 3 },	// tiny cluster
+	{ 10, 30, 15, 3 },	// tiny cluster
+	
+	{ -1, -1, -1, -1 }	// last
+};
+
+
+// these may be the same size as the config in structs.h, or different
+#define USE_WIDTH  (MAP_WIDTH)	// from structs.h
+#define USE_HEIGHT  (MAP_HEIGHT)	// from structs.h
+
+
+// normal maps wrap in the X direction but not the Y direction, like a globe
+#define USE_WRAP_X  (WRAP_X)	// from structs.h
+#define USE_WRAP_Y  (WRAP_Y)	// from structs.h
+
+
+// it's usually best to let it place 1 start point but then create your own in-game
+#define NUM_START_POINTS  1
+
+// tundra: only used if WRAP_Y is off
+#define TUNDRA_HEIGHT  1	// tiles of tundra at top/bottom (will be half a tile higher than this number)
+
+// jungle replaces temperate terrain
+#define JUNGLE_START_PRC  30	// % up from bottom of map where jungle starts
+#define JUNGLE_END_PRC  70	// % up from bottom of map where jungle ends
+
+// desert overrides jungle
+#define DESERT_START_PRC  36.6	// % up from bottom where desert starts
+#define DESERT_END_PRC  63.3	// % up from bottom where desert ends
+
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROTOTYPES //////////////////////////////////////////////////////////////
+
 
 // helper function protos
 inline void change_grid(int loc, int type);
@@ -99,28 +180,7 @@ void load_and_shift_map(int dist);
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// CONFIG AND SETUP ////////////////////////////////////////////////////////
-
-// these may be the same size as the config in structs.h, or different
-#define USE_WIDTH  MAP_WIDTH	// from structs.h
-#define USE_HEIGHT  MAP_HEIGHT	// from structs.h
-
-#define USE_WRAP_X  WRAP_X	// from structs.h
-#define USE_WRAP_Y  WRAP_Y	// from structs.h
-
-
-// master controls
-#define TARGET_LAND_SIZE  333000	// how much ocean to convert to land -- THIS WILL DETERMINE HOW MUCH RAM YOUR MUD USES (333k = about 130 MB RAM)
-#define NUM_START_POINTS  1
-#define TUNDRA_HEIGHT  1	// tiles of tundra at top/bottom
-
-// jungle replaces temperate terrain
-#define JUNGLE_START_PRC  30	// % up from bottom of map where jungle starts
-#define JUNGLE_END_PRC  70	// % up from bottom of map where jungle ends
-
-// desert overrides jungle
-#define DESERT_START_PRC  36.6	// % up from bottom where desert starts
-#define DESERT_END_PRC  63.3	// % up from bottom where desert ends
+//// MACROS AND DEFINITIONS //////////////////////////////////////////////////
 
 // need these here
 #ifndef NULL
@@ -142,23 +202,6 @@ void load_and_shift_map(int dist);
 #define MIN(a, b)		((a) < (b) ? (a) : (b))
 
 
-// data for how to build clusters
-struct {
-	int min_radius, max_radius;
-	int cluster_dist, cluster_size;
-} island_types[] = {
-	// It iterates repeatedly over this list until it's out of space:
-	{ 30, 60, 45, 16 },	// big islands, cluster of 16 (continents)
-	{ 10, 60, 45, 4 },	// medium size, cluster of 4
-	{ 10, 30, 20, 8 },	// small size, cluster of 8
-	{ 10, 30, 10, 8 },	// small size, tightly packed, cluster of 8
-	{ 10, 30, 15, 3 },	// tiny cluster
-	{ 10, 30, 15, 3 },	// tiny cluster
-	
-	{ -1, -1, -1, -1 }	// last
-};
-
-
 // Define the terrains we're going to use
 #define PLAINS			0
 #define FOREST			1
@@ -176,7 +219,14 @@ struct {
 #define LAKE			13
 #define DESERT_CROP		14
 #define JUNGLE_CROP		15
-#define NUM_MAP_SECTS	16	/* Total */
+#define RIVERBANK_TREES	16
+#define SHORE_TREES		17
+#define SHORE_JUNGLE	18
+#define DESERT_BEACH	19
+#define CLIFF			20
+#define ESTUARY			21
+
+#define NUM_MAP_SECTS	22	/* Total */
 
 // terrain data
 struct {
@@ -185,27 +235,30 @@ struct {
 	int sector_vnum;	// for .wld file output
 	int is_land;	// for ocean or anything that doesn't connect islands
 } terrains[NUM_MAP_SECTS] = {
-	{ "b", "Plains", 0, TRUE },
+	{ "b", "Plains", 0, TRUE },	// 0
 	{ "f", "Forest", 4, TRUE },
 	{ "i", "River", 5, TRUE },
 	{ "k", "Ocean", 6, FALSE },
 	{ "q", "Mountain", 8, TRUE },
-	{ "b", "Tmp. Crop", 7, TRUE },
+	{ "b", "Temp Crop", 7, TRUE },	// 5
 	{ "m", "Desert", 20, TRUE },
 	{ "*", "Tower", 18, TRUE },
 	{ "d", "Jungle", 28, TRUE },
 	{ "j", "Oasis", 21, TRUE },
-	{ "b", "Grove", 26, TRUE },
+	{ "b", "Grove", 26, TRUE },	// 10
 	{ "e", "Swamp", 29, TRUE },
 	{ "h", "Tundra", 30, FALSE },
 	{ "i", "Lake", 32, TRUE },
-	{ "o", "Des. Crop", 12, TRUE },
-	{ "3", "Jung. Crop", 16, TRUE },
+	{ "o", "Dsrt Crop", 12, TRUE },
+	{ "3", "Jngl Crop", 16, TRUE },	// 15
+	{ "f", "Riverbank", 45, TRUE },
+	{ "f", "Shore", 54, TRUE },
+	{ "d", "Jngl Shore", 55, TRUE },
+	{ "m", "Beach", 51, TRUE },	// 20
+	{ "q", "Cliffs", 52, TRUE },
+	{ "i", "Estuary", 53, TRUE },
 };
 
-
- //////////////////////////////////////////////////////////////////////////////
-//// MACROS //////////////////////////////////////////////////////////////////
 
 // Directions
 #define NORTH			0
@@ -334,7 +387,14 @@ void create_map(void) {
 	replace_near(DESERT, PLAINS, RIVER, 2);
 	replace_near(DESERT, PLAINS, LAKE, 2);
 	replace_near(JUNGLE, SWAMP, RIVER, 2);
-	replace_near(JUNGLE, SWAMP, LAKE, 2);
+	
+	printf("Adding coasts and riverbanks...\n");
+	replace_near(PLAINS, RIVERBANK_TREES, RIVER, 1);
+	replace_near(PLAINS, SHORE_TREES, OCEAN, 1);
+	replace_near(JUNGLE, SHORE_JUNGLE, OCEAN, 1);
+	replace_near(DESERT, DESERT_BEACH, OCEAN, 1);
+	replace_near(MOUNTAIN, CLIFF, OCEAN, 1);
+	replace_near(RIVER, ESTUARY, OCEAN, 2);
 
 	// tundra if no y-wrap
 	if (!USE_WRAP_Y && TUNDRA_HEIGHT >= 1) {
@@ -1203,40 +1263,54 @@ void complete_map(void) {
 }
 
 
+// builds one island in memory
+void create_one_island(struct island_def *type) {
+	int iter, loc, dir, last_loc, attempts;
+	struct island_data *isle;
+	
+	last_loc = -1;
+	for (iter = 0; iter < type->cluster_size; ++iter) {
+		if (last_loc == -1) {
+			loc = number(0, USE_SIZE - 1);
+		}
+		else {
+			dir = number(0, NUM_DIRS-1);
+			attempts = 0;
+			do {
+				loc = shift(last_loc, shift_dir[dir][0] * number(type->cluster_dist/2, type->cluster_dist), shift_dir[dir][1] * number(type->cluster_dist/2, type->cluster_dist));
+			} while (loc == -1 && ++attempts < 50);
+			if (loc == -1) {
+				break;
+			}
+		}
+		
+		// save for later
+		last_loc = loc;
+		
+		CREATE(isle, struct island_data, 1);
+		isle->loc = loc;
+
+		isle->next = island_list;
+		island_list = isle;
+
+		land_mass(isle, type->min_radius, type->max_radius);
+	}
+}
+
+
 /* Build all of the islands in memory */
 void create_islands(void) {
-	struct island_data *isle;
-	int ii, iter, loc, dir, last_loc, attempts;
-
+	int ii;
+	
+	// build continents first
+	for (ii = 0; island_types[ii].min_radius != -1 && (USE_SIZE - total_ocean) < TARGET_LAND_SIZE; ++ii) {
+		create_one_island(&island_types[ii]);
+	}
+	
+	// then fill the rest of the space with islands
 	while ((USE_SIZE - total_ocean) < TARGET_LAND_SIZE) {
 		for (ii = 0; island_types[ii].min_radius != -1 && (USE_SIZE - total_ocean) < TARGET_LAND_SIZE; ++ii) {
-			last_loc = -1;
-			for (iter = 0; iter < island_types[ii].cluster_size; ++iter) {
-				if (last_loc == -1) {
-					loc = number(0, USE_SIZE - 1);
-				}
-				else {
-					dir = number(0, NUM_DIRS-1);
-					attempts = 0;
-					do {
-						loc = shift(last_loc, shift_dir[dir][0] * number(island_types[ii].cluster_dist/2, island_types[ii].cluster_dist), shift_dir[dir][1] * number(island_types[ii].cluster_dist/2, island_types[ii].cluster_dist));
-					} while (loc == -1 && ++attempts < 50);
-					if (loc == -1) {
-						break;
-					}
-				}
-				
-				// save for later
-				last_loc = loc;
-				
-				CREATE(isle, struct island_data, 1);
-				isle->loc = loc;
-
-				isle->next = island_list;
-				island_list = isle;
-
-				land_mass(isle, island_types[ii].min_radius, island_types[ii].max_radius);
-			}
+			create_one_island(&island_types[ii]);
 		}
 	}
 }
