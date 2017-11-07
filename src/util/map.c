@@ -88,10 +88,10 @@ struct island_def {
 */
 struct island_def continents[] = {
 	// min-radius, max-radius, cluster-distance, cluster-size
-	{ 30, 60, 35, 26 },	// 26 clusters of 30-60 radius clumps, each up to 45 tiles apart.
-	{ 30, 60, 35, 26 },	// repeated 4 times
-	{ 30, 60, 35, 26 },
-	{ 30, 60, 35, 26 },
+	{ 30, 60, 30, 40 },	// 40 clusters of 30-60 radius clumps, each up to 30 tiles apart.
+	{ 30, 60, 30, 40 },	// repeated 4 times
+	{ 30, 60, 30, 40 },
+	{ 30, 60, 30, 40 },
 	
 	{ -1, -1, -1, -1 }	// last
 };
