@@ -165,7 +165,7 @@ void add_latitude_terrain(int type, double y_start, double y_end);
 void add_mountains(struct island_data *isle);
 void add_pass(struct island_data *isle);
 void add_river(struct island_data *isle);
-void add_start_points(void);
+void add_start_points(bool force);
 void add_tundra(void);
 void center_map(void);
 void complete_map(void);
@@ -411,7 +411,7 @@ void create_map(void) {
 	// finish up the map
 	printf("Finishing map...\n");
 	complete_map();
-	add_start_points();
+	add_start_points(FALSE);
 }
 
 
@@ -1079,12 +1079,12 @@ void add_river(struct island_data *isle) {
 
 
 // adds a start location (tower)
-void add_start_points(void) {
+void add_start_points(bool force) {
 	struct island_data *isle;
 	int count = 0;
 
 	for (isle = island_list; isle && count < NUM_START_POINTS; isle = isle->next) {
-		if (!number(0, 2) && (grid[isle->loc].type == PLAINS || grid[isle->loc].type == FOREST || grid[isle->loc].type == DESERT)) {
+		if (force || (!number(0, 2) && (grid[isle->loc].type == PLAINS || grid[isle->loc].type == FOREST || grid[isle->loc].type == DESERT))) {
 			change_grid(isle->loc, TOWER);
 			count++;
 		}
@@ -1092,7 +1092,7 @@ void add_start_points(void) {
 
 	// repeat until success
 	if (count == 0) {
-		add_start_points();
+		add_start_points(TRUE);
 	}
 }
 
