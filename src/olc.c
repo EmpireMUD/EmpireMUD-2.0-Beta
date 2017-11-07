@@ -7118,6 +7118,8 @@ void smart_copy_icons(struct icon_data **addto, struct icon_data *input) {
 		
 		CREATE(new_icon, struct icon_data, 1);
 		*new_icon = *icon;
+		new_icon->icon = str_dup(NULLSAFE(icon->icon));
+		new_icon->color = str_dup(NULLSAFE(icon->color));
 		new_icon->next = NULL;
 		
 		LL_APPEND(*addto, new_icon);
