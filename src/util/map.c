@@ -1689,13 +1689,13 @@ void audit_crops(void) {
 	// now, did we miss any regions?
 	missed = 0;
 	for (sub = 0; crop_regions[sub].sect != -1; ++sub) {
-		if (counts[sub] == 0) {
+		if (counts[sub] < 50) {
 			++missed;
 		}
 	}
 	
 	if (missed) {
-		printf("Warning: %d crop region%s have no crop tiles.\n", missed, missed == 1 ? "" : "s");
+		printf("Warning: %d crop region%s have few/no crop tiles.\n", missed, missed == 1 ? "" : "s");
 	}
 	
 	free(counts);
