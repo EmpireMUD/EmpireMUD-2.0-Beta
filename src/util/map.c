@@ -130,8 +130,8 @@ struct island_def island_types[] = {
 #define TUNDRA_HEIGHT  1	// tiles of tundra at top/bottom (will be half a tile higher than this number)
 
 // jungle replaces temperate terrain -- if you change these, you should also 'configure world tropics_percent' in-game
-#define JUNGLE_START_PRC  37.5	// % up from bottom of map where jungle starts
-#define JUNGLE_END_PRC  72.5	// % up from bottom of map where jungle ends
+#define JUNGLE_START_PRC  30	// % up from bottom of map where jungle starts
+#define JUNGLE_END_PRC  70	// % up from bottom of map where jungle ends
 
 // desert overrides jungle
 #define DESERT_START_PRC  36.6	// % up from bottom where desert starts
