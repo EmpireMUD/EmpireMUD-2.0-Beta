@@ -137,9 +137,6 @@ struct island_def island_types[] = {
 #define DESERT_START_PRC  36.6	// % up from bottom where desert starts
 #define DESERT_END_PRC  63.3	// % up from bottom where desert ends
 
-// old-style rivers went coast-to-coast instead of center-to-coast
-#define USE_OLD_RIVERS  FALSE
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// PROTOTYPES //////////////////////////////////////////////////////////////
@@ -170,7 +167,6 @@ void shift_map_x(int amt);
 void add_lake_river(struct island_data *isle);
 void add_latitude_terrain(int type, double y_start, double y_end);
 void add_mountains(struct island_data *isle);
-void add_old_river(struct island_data *isle);
 void add_start_points(bool force);
 void add_tundra(void);
 void blob(int loc, int sect, int min_radius, int max_radius, bool land_only);
@@ -369,12 +365,7 @@ void create_map(void) {
 			}
 			// rare chance of river
 			if (!number(0, 2)) {
-				if (USE_OLD_RIVERS) {
-					add_old_river(isle);
-				}
-				else {
-					add_lake_river(isle);
-				}
+				add_lake_river(isle);
 			}
 		}
 		else if (IS_IN_Y_PRC_RANGE(Y_COORD(isle->loc), JUNGLE_START_PRC, JUNGLE_END_PRC)) {
@@ -383,30 +374,15 @@ void create_map(void) {
 			if (!number(0, 1)) {
 				add_mountains(isle);
 			}
-			if (USE_OLD_RIVERS) {
-				// always get extra river
-				add_old_river(isle);
-				add_old_river(isle);
-			}
-			else {
-				add_lake_river(isle);
-			}
+			add_lake_river(isle);
 		}
 		else {
 			// not jungle or desert
 			if (!isle->continent || number(0, 1)) {
 				add_mountains(isle);	// mountains less common on continents
 			}
-			if (USE_OLD_RIVERS) {
-				add_old_river(isle);
-			}
-			else if (!number(0, 1)) {	// slightly rarer
+			if (number(0, 2)) {	// 66% chance
 				add_lake_river(isle);
-			}
-			
-			// chance to add additional river
-			if (USE_OLD_RIVERS && !number(0, 2)) {
-				add_old_river(isle);
 			}
 		}
 	}
@@ -931,23 +907,20 @@ void add_latitude_terrain(int type, double y_start, double y_end) {
 
 /* Add a mountain range to an island */
 void add_mountains(struct island_data *isle) {
-	int x, y, room;
+	int x, y, room, dir, orig_dir, wind;
 	int hor, ver, to, radius;
 	int found = 0;
 	
 	clear_pass();
-
-	do {
-		x = number(-1, 1);
-		y = number(-1, 1);
-	} while (x == 0 && y == 0);
-
-	room = find_border(isle, x, y);
-	radius = isle->continent ? 3 : 2;
-
-	/* invert directions */
-	x *= -1;
-	y *= -1;
+	
+	// pick a direction for the river
+	orig_dir = dir = number(0, NUM_DIRS-1);
+	wind = 1;
+	x = shift_dir[dir][0];
+	y = shift_dir[dir][1];
+	
+	room = find_border(isle, -x, -y);	// find opposite border
+	radius = isle->continent ? number(3, 4) : 2;
 
 	while (room != -1) {
 		if (!terrains[grid[room].type].is_land)
@@ -986,7 +959,21 @@ void add_mountains(struct island_data *isle) {
 		}
 
 		/* Alter course */
-		if (!number(0, 4)) {
+		if (isle->continent) {	// continents are straighter mountains
+			// otherwise change dir ?
+			if (!number(0, 4)) {
+				if (wind == 1) {
+					wind += number(0, 1) ? 1 : -1;
+				}
+				else {
+					wind = 1;
+				}
+				dir = winding[orig_dir][wind];
+			}
+		
+			room = shift(room, shift_dir[dir][0], shift_dir[dir][1]);
+		}
+		else if (!number(0, 4)) {	// not continent: much windier
 			if (x == 0)
 				x += number(-1, 1);
 			else if (y == 0)
@@ -1055,13 +1042,18 @@ void add_lake_river(struct island_data *isle) {
 			grid[room].pass = TRUE;
 		}
 		
-		for (hor = number(-1, 0), h_end = number(1, cnt ? 2 : 1); hor <= h_end; ++hor) {
-			for (ver = number(-1, 0), v_end = number(1, cnt ? 2 : 1); ver <= v_end; ++ver) {
+		for (hor = cnt ? -1 : number(-1, 0), h_end = number(1, cnt ? 2 : 1); hor <= h_end; ++hor) {
+			for (ver = cnt ? -1 : number(-1, 0), v_end = number(1, cnt ? 2 : 1); ver <= v_end; ++ver) {
 				if (hor == 0 && ver == 0) {
 					continue;	// safe to skip self
 				}
 				
 				to = shift(room, hor, ver);
+				
+				if (grid[to].type == MOUNTAIN && (hor == -1 || hor == 2 || ver == -1 || ver == 2)) {
+					continue;	// skinnier river through mountains
+				}
+				
 				if (to != -1) {
 					// if we hit another river, stop AFTER this sect
 					if ((grid[to].type == RIVER || grid[to].type == LAKE) && !grid[to].pass) {
@@ -1092,96 +1084,6 @@ void add_lake_river(struct island_data *isle) {
 		}
 		
 		room = shift(room, shift_dir[dir][0], shift_dir[dir][1]);
-	}
-}
-
-
-/**
-* Add an old-style river to the island. These stretched from coast to coast,
-* rather than from a lake to the coast.
-*
-* @param struct island_data *isle Which island to add a river to.
-*/
-void add_old_river(struct island_data *isle) {
-	int x, y, room;
-	int hor, ver, to;
-	int found = 0;
-
-	clear_pass();
-
-	do {
-		x = number(-1, 1);
-		y = number(-1, 1);
-	} while (x == 0 && y == 0);
-
-	room = find_border(isle, x, y);
-
-	/* invert directions */
-	x *= -1;
-	y *= -1;
-
-	while (room != -1) {
-		if (!terrains[grid[room].type].is_land)
-			return;
-		
-		change_grid(room, RIVER);
-		grid[room].pass = TRUE;
-		
-		for (hor = number(-1, 0); hor <= 1; ++hor) {
-			for (ver = number(-1, 0); ver <= 1; ++ver) {
-				if (hor == 0 && ver == 0) {
-					// safe to skip self
-					continue;
-				}
-				
-				to = shift(room, hor, ver);
-				if (to != -1) {
-					// if we hit another river, stop AFTER this sect
-					if (grid[to].type == RIVER && !grid[to].pass) {
-						found = 1;
-					}
-				
-					if (terrains[grid[to].type].is_land) {
-						change_grid(to, RIVER);
-						grid[to].pass = TRUE;
-					}
-				}
-			}
-		}
-
-		if (found) {
-			return;
-		}
-
-		/* Alter course */
-		if (!number(0, 2)) {
-			if (x == 0)
-				x += number(-1, 1);
-			else if (y == 0)
-				y += number(-1, 1);
-			else if (x > 0 && y > 0) {
-				if ((y -= number(0, 1)))
-					x -= number(0, 1);
-			}
-			else if (x < 0 && y < 0) {
-				if ((y += number(0, 1)))
-					x += number(0, 1);
-			}
-			else if (x < 0 && y > 0) {
-				if ((y -= number(0, 1)))
-					x += number(0, 1);
-			}
-			else if (y < 0 && x > 0) {
-				if ((y += number(0, 1)))
-					x -= number(0, 1);
-			}
-			
-			// verify bounds to prevent leaps
-			x = MAX(-1, MIN(x, 1));
-			y = MAX(-1, MIN(y, 1));
-		}
-
-		room = shift(room, x, y);
 	}
 }
 
