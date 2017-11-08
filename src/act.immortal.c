@@ -6950,6 +6950,7 @@ ACMD(do_purge) {
 
 
 ACMD(do_random) {
+	struct map_data *map;
 	int tries;
 	room_vnum roll;
 	room_data *loc;
@@ -6957,9 +6958,13 @@ ACMD(do_random) {
 	// looks for a random non-ocean location
 	for (tries = 0; tries < 100; ++tries) {
 		roll = number(0, MAP_SIZE - 1);
-		loc = real_real_room(roll);	// use real_real_room to skip !SECT_IS_LAND_MAP
+		map = &world_map[MAP_X_COORD(roll)][MAP_Y_COORD(roll)];
 		
-		if (loc && !ROOM_IS_CLOSED(loc) && !ROOM_SECT_FLAGGED(loc, SECTF_OCEAN)) {
+		if (GET_SECT_VNUM(map->sector_type) == BASIC_OCEAN) {
+			continue;
+		}
+		
+		if ((loc = real_room(roll)) && !ROOM_IS_CLOSED(loc)) {
 			perform_goto(ch, loc);
 			return;
 		}
