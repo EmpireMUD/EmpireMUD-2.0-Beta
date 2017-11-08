@@ -322,7 +322,7 @@ const int winding[NUM_DIRS][3] = {
 /* The master grid (USE_WIDTH, USE_HEIGHT) */
 struct grid_type {
 	int type;
-	int pass;	// used to control fresh paint and prevent hideous conglomermountains
+	bool pass;	// used to control fresh paint and prevent hideous conglomermountains
 	int island_id;	// island data
 };
 
@@ -598,7 +598,7 @@ void clear_pass(void) {
 	int iter;
 	
 	for (iter = 0; iter < USE_SIZE; ++iter) {
-		grid[iter].pass = 0;
+		grid[iter].pass = FALSE;
 	}
 }
 
@@ -683,7 +683,7 @@ void init_grid(void) {
 	for (i = 0; i < USE_SIZE; i++) {
 		grid[i].type = OCEAN;
 		grid[i].island_id = -1;
-		grid[i].pass = 0;
+		grid[i].pass = FALSE;
 	}
 	total_ocean = USE_SIZE;
 }
@@ -950,14 +950,14 @@ void add_mountains(struct island_data *isle) {
 	while (room != -1) {
 		if (!terrains[grid[room].type].is_land)
 			return;
-		if (grid[room].type == MOUNTAIN && grid[room].pass == 0) {
+		if (grid[room].type == MOUNTAIN && !grid[room].pass) {
 			return;
 		}
 		
 		if (grid[room].type == PLAINS) {
 			change_grid(room, MOUNTAIN);
 		}
-		grid[room].pass = 1;
+		grid[room].pass = TRUE;
 
 		for (hor = -radius; hor <= radius; ++hor) {
 			for (ver = -radius; ver  <= radius; ++ver) {
@@ -969,11 +969,11 @@ void add_mountains(struct island_data *isle) {
 				to = shift(room, hor, ver);
 				if (to != -1 && number(0, 10) && grid[to].type == PLAINS) {
 					// if we find a mountain that already exists, we stop AFTER this round
-					if (grid[to].type == MOUNTAIN && grid[to].pass == 0) {
+					if (grid[to].type == MOUNTAIN && !grid[to].pass) {
 						found = 1;
 					}
 					change_grid(to, MOUNTAIN);
-					grid[to].pass = 1;
+					grid[to].pass = TRUE;
 				}
 			}
 		}
@@ -1091,7 +1091,7 @@ void add_lake_river(struct island_data *isle) {
 		
 		// looks good
 		change_grid(room, RIVER);
-		grid[room].pass = 1;
+		grid[room].pass = TRUE;
 		
 		for (hor = number(-1, 0), h_end = number(1, cnt ? 2 : 1); hor <= h_end; ++hor) {
 			for (ver = number(-1, 0), v_end = number(1, cnt ? 2 : 1); ver <= v_end; ++ver) {
@@ -1102,13 +1102,13 @@ void add_lake_river(struct island_data *isle) {
 				to = shift(room, hor, ver);
 				if (to != -1) {
 					// if we hit another river, stop AFTER this sect
-					if ((grid[to].type == RIVER || grid[to].type == LAKE) && grid[to].pass == 0) {
+					if ((grid[to].type == RIVER || grid[to].type == LAKE) && !grid[to].pass) {
 						stop = TRUE;
 					}
 					
 					if (terrains[grid[to].type].is_land) {
 						change_grid(to, RIVER);
-						grid[to].pass = 1;
+						grid[to].pass = TRUE;
 					}
 				}
 			}
@@ -1163,7 +1163,7 @@ void add_old_river(struct island_data *isle) {
 			return;
 		
 		change_grid(room, RIVER);
-		grid[room].pass = 1;
+		grid[room].pass = TRUE;
 		
 		for (hor = number(-1, 0); hor <= 1; ++hor) {
 			for (ver = number(-1, 0); ver <= 1; ++ver) {
@@ -1175,13 +1175,13 @@ void add_old_river(struct island_data *isle) {
 				to = shift(room, hor, ver);
 				if (to != -1) {
 					// if we hit another river, stop AFTER this sect
-					if (grid[to].type == RIVER && grid[to].pass == 0) {
+					if (grid[to].type == RIVER && !grid[to].pass) {
 						found = 1;
 					}
 				
 					if (terrains[grid[to].type].is_land) {
 						change_grid(to, RIVER);
-						grid[to].pass = 1;
+						grid[to].pass = TRUE;
 					}
 				}
 			}
@@ -1480,7 +1480,7 @@ void blob(int loc, int sect, int min_radius, int max_radius, bool land_only) {
 	// center
 	if (!land_only || terrains[grid[loc].type].is_land) {
 		change_grid(loc, sect);
-		grid[loc].pass = 1;
+		grid[loc].pass = TRUE;
 	}
 
 	width[EAST] = number(min_radius, max_radius);
@@ -1493,13 +1493,13 @@ void blob(int loc, int sect, int min_radius, int max_radius, bool land_only) {
 		for (i = 0; i <= last_n; i++) {
 			if ((to = shift(loc, j, i)) != -1 && (!land_only || terrains[grid[to].type].is_land)) {
 				change_grid(to, sect);
-				grid[to].pass = 1;
+				grid[to].pass = TRUE;
 			}
 		}
 		for (i = 0; i <= last_s; i++) {
 			if ((to = shift(loc, j, -i)) != -1 && (!land_only || terrains[grid[to].type].is_land)) {
 				change_grid(to, sect);
-				grid[to].pass = 1;
+				grid[to].pass = TRUE;
 			}
 		}
 
@@ -1514,13 +1514,13 @@ void blob(int loc, int sect, int min_radius, int max_radius, bool land_only) {
 		for (i = 0; i <= last_n; i++) {
 			if ((to = shift(loc, -j, i)) != -1 && (!land_only || terrains[grid[to].type].is_land)) {
 				change_grid(to, sect);
-				grid[to].pass = 1;
+				grid[to].pass = TRUE;
 			}
 		}
 		for (i = 0; i <= last_s; i++) {
 			if ((to = shift(loc, -j, -i)) != -1 && (!land_only || terrains[grid[to].type].is_land)) {
 				change_grid(to, sect);
-				grid[to].pass = 1;
+				grid[to].pass = TRUE;
 			}
 		}
 
