@@ -137,6 +137,9 @@ struct island_def island_types[] = {
 #define DESERT_START_PRC  36.6	// % up from bottom where desert starts
 #define DESERT_END_PRC  63.3	// % up from bottom where desert ends
 
+// old-style rivers went coast-to-coast instead of center-to-coast
+#define USE_OLD_RIVERS  FALSE
+
 #define ALSO_WRITE_WLD_FILES  FALSE	// if TRUE, will make .wld files too -- otherwise, just the base_map
 
 
@@ -166,12 +169,14 @@ inline int shift(int origin, int x_shift, int y_shift);
 void shift_map_x(int amt);
 
 // map generator protos
+void add_lake_river(struct island_data *isle);
 void add_latitude_terrain(int type, double y_start, double y_end);
 void add_mountains(struct island_data *isle);
 void add_pass(struct island_data *isle);
-void add_river(struct island_data *isle);
+void add_old_river(struct island_data *isle);
 void add_start_points(bool force);
 void add_tundra(void);
+void blob(int loc, int sect, int min_radius, int max_radius, bool land_only);
 void center_map(void);
 void complete_map(void);
 void create_islands(void);
@@ -289,6 +294,19 @@ const int shift_dir[][2] = {
 };
 
 
+// for winding rivers -- the 3 directions it can go if it was headed one of those dirs
+const int winding[NUM_DIRS][3] = {
+	{ NOWE, NORTH, NOEA },	// north
+	{ NOEA, EAST, SOEA },	// east
+	{ SOEA, SOUTH, SOWE },	// south
+	{ SOWE, WEST, NOWE },	// west
+	{ WEST, NOWE, NORTH },	// nw
+	{ NORTH, NOEA, EAST },	// ne
+	{ SOUTH, SOWE, WEST }, 	// sw
+	{ EAST, SOEA, SOUTH },	// se
+};
+
+
 // various computed sizes
 #define USE_SIZE  (USE_WIDTH * USE_HEIGHT)
 #define USE_BLOCK_SIZE  (USE_WIDTH * 5)
@@ -311,8 +329,8 @@ struct grid_type {
 
 // Island (nucleus) data structure
 struct island_data {
-	int loc;						/* Location of island in grid[]		*/
-	int width[4];					/* Maximum width of island			*/
+	int loc;		// Main location of island in grid[]
+	int width[4];		// Maximum width of island
 	bool continent;		// true if it's a continent
 
 	struct island_data *next;
@@ -352,7 +370,12 @@ void create_map(void) {
 			add_mountains(isle);
 			// rare chance of river
 			if (!number(0, 2)) {
-				add_river(isle);
+				if (USE_OLD_RIVERS) {
+					add_old_river(isle);
+				}
+				else {
+					add_lake_river(isle);
+				}
 			}
 		}
 		else if (IS_IN_Y_PRC_RANGE(Y_COORD(isle->loc), JUNGLE_START_PRC, JUNGLE_END_PRC)) {
@@ -361,18 +384,28 @@ void create_map(void) {
 			if (!number(0, 1)) {
 				add_mountains(isle);
 			}
-			// always get extra river
-			add_river(isle);
-			add_river(isle);
+			if (USE_OLD_RIVERS) {
+				// always get extra river
+				add_old_river(isle);
+				add_old_river(isle);
+			}
+			else {
+				add_lake_river(isle);
+			}
 		}
 		else {
 			// not jungle or desert
 			add_mountains(isle);
-			add_river(isle);
+			if (USE_OLD_RIVERS) {
+				add_old_river(isle);
+			}
+			else {
+				add_lake_river(isle);
+			}
 			
 			// chance to add additional river
-			if (!number(0, 2)) {
-				add_river(isle);
+			if (USE_OLD_RIVERS && !number(0, 2)) {
+				add_old_river(isle);
 			}
 		}
 
@@ -1021,8 +1054,93 @@ void add_pass(struct island_data *isle) {
 }
 
 
-/* Add a river to the island */
-void add_river(struct island_data *isle) {
+/**
+* Adds a lake in the middle and then a river coming out of it.
+*
+* @param struct island_data *isle The island to add a river to.
+*/
+void add_lake_river(struct island_data *isle) {
+	int orig_dir, dir, room, hor, ver, to, h_end, v_end, wind;
+	bool cnt = isle->continent;
+	bool stop;
+	
+	if (!terrains[grid[isle->loc].type].is_land) {
+		return;	// not on land?
+	}
+	
+	clear_pass();
+	
+	// add the lake
+	blob(isle->loc, LAKE, 2, cnt ? 5 : 3, TRUE);
+	
+	// pick a direction for the river
+	orig_dir = dir = number(0, NUM_DIRS-1);
+	wind = 1;
+	
+	room = isle->loc;
+	stop = FALSE;
+	
+	while (room != -1 && terrains[grid[room].type].is_land && !stop) {
+		// types that break out early (where rivers end)
+		if (grid[room].type == LAKE && !grid[room].pass) {
+			break;	// found a 2nd lake, stop the river
+		}
+		if (grid[room].type == RIVER && !grid[room].pass) {
+			break;	// found a 2nd river
+		}
+		
+		// looks good
+		change_grid(room, RIVER);
+		grid[room].pass = 1;
+		
+		for (hor = number(-1, 0), h_end = number(1, cnt ? 2 : 1); hor <= h_end; ++hor) {
+			for (ver = number(-1, 0), v_end = number(1, cnt ? 2 : 1); ver <= v_end; ++ver) {
+				if (hor == 0 && ver == 0) {
+					continue;	// safe to skip self
+				}
+				
+				to = shift(room, hor, ver);
+				if (to != -1) {
+					// if we hit another river, stop AFTER this sect
+					if ((grid[to].type == RIVER || grid[to].type == LAKE) && grid[to].pass == 0) {
+						stop = TRUE;
+					}
+					
+					if (terrains[grid[to].type].is_land) {
+						change_grid(to, RIVER);
+						grid[to].pass = 1;
+					}
+				}
+			}
+		}
+		
+		if (stop) {
+			break;	// hit a watery point
+		}
+		
+		// otherwise change dir ?
+		if (!number(0, 4)) {
+			if (wind == 1) {
+				wind += number(0, 1) ? 1 : -1;
+			}
+			else {
+				wind = 1;
+			}
+			dir = winding[orig_dir][wind];
+		}
+		
+		room = shift(room, shift_dir[dir][0], shift_dir[dir][1]);
+	}
+}
+
+
+/**
+* Add an old-style river to the island. These stretched from coast to coast,
+* rather than from a lake to the coast.
+*
+* @param struct island_data *isle Which island to add a river to.
+*/
+void add_old_river(struct island_data *isle) {
 	int x, y, room;
 	int hor, ver, to;
 	int found = 0;
@@ -1345,6 +1463,73 @@ void create_islands(void) {
 }
 
 
+/**
+* Blob is similar to the algorithm used for making islands, but smaller and
+* smoother. This will mark 'pass' on all the tiles it updates.
+*
+* @param int loc The location to center the blob.
+* @param int sect The sect to change to.
+* @param int min_radius The minimum width/height of the blob.
+* @param int max_radius The maximum width/height of the blob.
+* @param bool land_only If TRUE, won't convert ocean/non-land tiles.
+*/
+void blob(int loc, int sect, int min_radius, int max_radius, bool land_only) {
+	int i, j, last_s, last_n, a, b, to;
+	int width[NUM_DIRS];
+
+	// center
+	if (!land_only || terrains[grid[loc].type].is_land) {
+		change_grid(loc, sect);
+		grid[loc].pass = 1;
+	}
+
+	width[EAST] = number(min_radius, max_radius);
+	width[WEST] = number(min_radius, max_radius);
+
+	a = last_n = width[NORTH] = number(min_radius, MIN(width[EAST], width[WEST]));
+	b = last_s = width[SOUTH] = number(min_radius, MIN(width[EAST], width[WEST]));
+
+	for (j = 0; j <= width[EAST]; j++) {
+		for (i = 0; i <= last_n; i++) {
+			if ((to = shift(loc, j, i)) != -1 && (!land_only || terrains[grid[to].type].is_land)) {
+				change_grid(to, sect);
+				grid[to].pass = 1;
+			}
+		}
+		for (i = 0; i <= last_s; i++) {
+			if ((to = shift(loc, j, -i)) != -1 && (!land_only || terrains[grid[to].type].is_land)) {
+				change_grid(to, sect);
+				grid[to].pass = 1;
+			}
+		}
+
+		last_n += number(last_n <= 0 ? 0 : -1, ((width[EAST] - j) < last_n) ? -1 : 1);
+		last_s += number(last_s <= 0 ? 0 : -1, ((width[EAST] - j) < last_s) ? -1 : 1);
+	}
+
+	last_n = a;
+	last_s = b;
+
+	for (j = 0; j <= width[WEST]; j++) {
+		for (i = 0; i <= last_n; i++) {
+			if ((to = shift(loc, -j, i)) != -1 && (!land_only || terrains[grid[to].type].is_land)) {
+				change_grid(to, sect);
+				grid[to].pass = 1;
+			}
+		}
+		for (i = 0; i <= last_s; i++) {
+			if ((to = shift(loc, -j, -i)) != -1 && (!land_only || terrains[grid[to].type].is_land)) {
+				change_grid(to, sect);
+				grid[to].pass = 1;
+			}
+		}
+
+		last_n += number(last_n <= 0 ? 0 : -1, ((width[WEST] - j) < last_n) ? -1 : 1);
+		last_s += number(last_s <= 0 ? 0 : -1, ((width[WEST] - j) < last_s) ? -1 : 1);
+	}
+}
+
+
 /* Add land to an island */
 void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 	int i, j, last_s, last_n, a, b, loc;
@@ -1373,7 +1558,7 @@ void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 
 		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_n) ? -2 : 2);
 		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_s) ? -2 : 2);
-		}
+	}
 
 	last_n = a;
 	last_s = b;
