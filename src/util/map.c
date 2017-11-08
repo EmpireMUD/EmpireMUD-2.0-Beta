@@ -1050,8 +1050,10 @@ void add_lake_river(struct island_data *isle) {
 		}
 		
 		// looks good
-		change_grid(room, RIVER);
-		grid[room].pass = TRUE;
+		if (grid[room].type != LAKE) {
+			change_grid(room, RIVER);
+			grid[room].pass = TRUE;
+		}
 		
 		for (hor = number(-1, 0), h_end = number(1, cnt ? 2 : 1); hor <= h_end; ++hor) {
 			for (ver = number(-1, 0), v_end = number(1, cnt ? 2 : 1); ver <= v_end; ++ver) {
@@ -1066,7 +1068,7 @@ void add_lake_river(struct island_data *isle) {
 						stop = TRUE;
 					}
 					
-					if (terrains[grid[to].type].is_land) {
+					if (terrains[grid[to].type].is_land && grid[to].type != LAKE) {
 						change_grid(to, RIVER);
 						grid[to].pass = TRUE;
 					}
