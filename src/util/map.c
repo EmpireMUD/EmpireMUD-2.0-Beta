@@ -1838,7 +1838,7 @@ void audit_crops(void) {
 	}
 	
 	if (missed) {
-		printf("Warning: %d crop region%s have few/no crop tiles.\n", missed, missed == 1 ? "" : "s");
+		printf("Warning: %d crop region%s few/no crop tiles.\n", missed, missed == 1 ? " has" : "s have");
 	}
 	
 	free(counts);
