@@ -129,14 +129,15 @@ struct island_def island_types[] = {
 // tundra: only used if WRAP_Y is off
 #define TUNDRA_HEIGHT  1	// tiles of tundra at top/bottom (will be half a tile higher than this number)
 
-// jungle replaces temperate terrain
-#define JUNGLE_START_PRC  30	// % up from bottom of map where jungle starts
-#define JUNGLE_END_PRC  70	// % up from bottom of map where jungle ends
+// jungle replaces temperate terrain -- if you change these, you should also 'configure world tropics_percent' in-game
+#define JUNGLE_START_PRC  37.5	// % up from bottom of map where jungle starts
+#define JUNGLE_END_PRC  72.5	// % up from bottom of map where jungle ends
 
 // desert overrides jungle
 #define DESERT_START_PRC  36.6	// % up from bottom where desert starts
 #define DESERT_END_PRC  63.3	// % up from bottom where desert ends
 
+#define ALSO_WRITE_WLD_FILES  FALSE	// if TRUE, will make .wld files too -- otherwise, just the base_map
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -312,6 +313,7 @@ struct grid_type {
 struct island_data {
 	int loc;						/* Location of island in grid[]		*/
 	int width[4];					/* Maximum width of island			*/
+	bool continent;		// true if it's a continent
 
 	struct island_data *next;
 };
@@ -698,7 +700,7 @@ void print_map_graphic(void) {
 
 // outputs the .wld data files
 void print_map_to_files(void) {
-	FILE *out, *index_fl;
+	FILE *out = NULL, *index_fl, *base_fl;
 	int i, j, pos;
 	char fname[256];
 	
@@ -706,33 +708,53 @@ void print_map_to_files(void) {
 		printf("Unable to write index file!\n");
 		exit(0);
 	}
+	
+	if (!(base_fl = fopen("../base_map", "w"))) {
+		printf("Unable to write base_map file!\n");
+		exit(0);
+	}
 
 	for (i = 0; i < NUM_BLOCKS; i++) {
-		sprintf(fname, "%d.wld", i);
-		if (!(out = fopen(fname, "w"))) {
-			printf("Unable to write file %s!\n", fname);
-			exit(0);
+		if (ALSO_WRITE_WLD_FILES) {
+			sprintf(fname, "%d.wld", i);
+			if (!(out = fopen(fname, "w"))) {
+				printf("Unable to write file %s!\n", fname);
+				exit(0);
+			}
+			
+			// add to index
+			fprintf(index_fl, "%s\n", fname);
 		}
-		
-		// add to index
-		fprintf(index_fl, "%s\n", fname);
 
 		for (j = 0; j < USE_BLOCK_SIZE; j++) {
 			pos = i * USE_BLOCK_SIZE + j;
 			
 			if (grid[pos].type != OCEAN) {
-				fprintf(out, "#%d\n", pos);
-				fprintf(out, "%d %d %d\n", grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum);
-				fprintf(out, "S\n");
+				// .wld file
+				if (ALSO_WRITE_WLD_FILES) {
+					fprintf(out, "#%d\n", pos);
+					fprintf(out, "%d %d %d\n", grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum);
+					fprintf(out, "S\n");
+				}
+				
+				// base_map file
+				fprintf(base_fl, "%d %d %d %d %d %d %d\n", X_COORD(pos), Y_COORD(pos), grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum, NOTHING);
 			}
 		}
-		fprintf(out, "$~\n");
-		fclose(out);
+		
+		if (ALSO_WRITE_WLD_FILES) {
+			fprintf(out, "$~\n");
+			fclose(out);
+		}
 	}
 	
 	// end index file
 	fprintf(index_fl, "$\n");
 	fclose(index_fl);
+	
+	// end base_map file
+	fprintf(base_fl, "$\n");
+	fclose(base_fl);
 
 	return;
 }
@@ -875,7 +897,7 @@ void add_latitude_terrain(int type, double y_start, double y_end) {
 /* Add a mountain range to an island */
 void add_mountains(struct island_data *isle) {
 	int x, y, room;
-	int hor, ver, to;
+	int hor, ver, to, radius;
 	int found = 0;
 	
 	clear_pass();
@@ -886,6 +908,7 @@ void add_mountains(struct island_data *isle) {
 	} while (x == 0 && y == 0);
 
 	room = find_border(isle, x, y);
+	radius = isle->continent ? 3 : 2;
 
 	/* invert directions */
 	x *= -1;
@@ -903,10 +926,10 @@ void add_mountains(struct island_data *isle) {
 		}
 		grid[room].pass = 1;
 
-		for (hor = -2; hor <= 2; ++hor) {
-			for (ver = -2; ver  <= 2; ++ver) {
+		for (hor = -radius; hor <= radius; ++hor) {
+			for (ver = -radius; ver  <= radius; ++ver) {
 				// skip the corners to make a "rounded brush"
-				if (((hor == ver) || (hor == -1 * ver)) && (hor == -2 || hor == 2)) {
+				if (((hor == ver) || (hor == -1 * ver)) && (hor == -radius || hor == radius)) {
 					continue;
 				}
 				
@@ -1269,7 +1292,7 @@ void complete_map(void) {
 
 
 // builds one island in memory
-void create_one_island(struct island_def *type) {
+void create_one_island(struct island_def *type, bool continent) {
 	int iter, loc, dir, last_loc, attempts;
 	struct island_data *isle;
 	
@@ -1294,6 +1317,7 @@ void create_one_island(struct island_def *type) {
 		
 		CREATE(isle, struct island_data, 1);
 		isle->loc = loc;
+		isle->continent = continent;
 
 		isle->next = island_list;
 		island_list = isle;
@@ -1309,13 +1333,13 @@ void create_islands(void) {
 	
 	// build continents first
 	for (ii = 0; continents[ii].min_radius != -1 && (USE_SIZE - total_ocean) < TARGET_LAND_SIZE; ++ii) {
-		create_one_island(&continents[ii]);
+		create_one_island(&continents[ii], TRUE);
 	}
 	
 	// then fill the rest of the space with islands
 	while ((USE_SIZE - total_ocean) < TARGET_LAND_SIZE && island_types[0].min_radius != -1) {
 		for (ii = 0; island_types[ii].min_radius != -1 && (USE_SIZE - total_ocean) < TARGET_LAND_SIZE; ++ii) {
-			create_one_island(&island_types[ii]);
+			create_one_island(&island_types[ii], FALSE);
 		}
 	}
 }
