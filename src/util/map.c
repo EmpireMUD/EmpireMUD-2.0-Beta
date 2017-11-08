@@ -399,7 +399,7 @@ void create_map(void) {
 			if (USE_OLD_RIVERS) {
 				add_old_river(isle);
 			}
-			else {
+			else if (!number(0, 1)) {	// slightly rarer
 				add_lake_river(isle);
 			}
 			
