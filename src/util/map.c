@@ -172,7 +172,6 @@ void shift_map_x(int amt);
 void add_lake_river(struct island_data *isle);
 void add_latitude_terrain(int type, double y_start, double y_end);
 void add_mountains(struct island_data *isle);
-void add_pass(struct island_data *isle);
 void add_old_river(struct island_data *isle);
 void add_start_points(bool force);
 void add_tundra(void);
@@ -408,9 +407,6 @@ void create_map(void) {
 				add_old_river(isle);
 			}
 		}
-
-		// not currently adding passes
-		// add_pass(isle);
 	}
 	
 	// these really need to go in order, as they modify the map in passes
@@ -1005,48 +1001,6 @@ void add_mountains(struct island_data *isle) {
 				if ((y += number(0, 1)))
 					x -= number(0, 1);
 			}
-		}
-
-		room = shift(room, x, y);
-	}
-}
-
-
-/* Add a pass through a mountain (at random) */
-void add_pass(struct island_data *isle) {
-	int x, y, room, loc;
-	int sect = PLAINS;
-
-	do {
-		x = number(-1, 1);
-		y = number(-1, 1);
-	} while (x == 0 && y == 0);
-
-	room = find_border(isle, x, y);
-
-	/* invert directions */
-	x *= -1;
-	y *= -1;
-
-	while (room != -1) {
-		if (!terrains[grid[room].type].is_land) {
-			return;
-		}
-		if (grid[room].type == PLAINS) {
-			sect = PLAINS;
-		}
-		if (grid[room].type == DESERT) {
-			sect = DESERT;
-		}
-		if (grid[room].type == MOUNTAIN) {
-			change_grid(room, sect);
-		}
-
-		if ((loc = shift(room, 0, 1)) != -1 && grid[loc].type == MOUNTAIN) {
-			change_grid(loc, sect);
-		}
-		if ((loc = shift(room, 1, 0)) != -1 && grid[loc].type == MOUNTAIN) {
-			change_grid(loc, sect);
 		}
 
 		room = shift(room, x, y);
