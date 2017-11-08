@@ -140,8 +140,6 @@ struct island_def island_types[] = {
 // old-style rivers went coast-to-coast instead of center-to-coast
 #define USE_OLD_RIVERS  FALSE
 
-#define ALSO_WRITE_WLD_FILES  FALSE	// if TRUE, will make .wld files too -- otherwise, just the base_map
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// PROTOTYPES //////////////////////////////////////////////////////////////
@@ -421,6 +419,10 @@ void create_map(void) {
 	
 	printf("Numbering islands and fixing lakes...\n");
 	number_islands_and_fix_lakes();
+	
+	printf("Merging oases...\n");
+	replace_near(OASIS, RIVER, OCEAN, 1);
+	replace_near(OASIS, RIVER, RIVER, 1);
 	
 	printf("Irrigating from rivers...\n");
 	replace_near(DESERT, PLAINS, RIVER, 2);
@@ -734,6 +736,7 @@ void print_map_graphic(void) {
 // outputs the .wld data files
 void print_map_to_files(void) {
 	FILE *out = NULL, *index_fl, *base_fl;
+	bool first = TRUE;
 	int i, j, pos;
 	char fname[256];
 	
@@ -748,37 +751,36 @@ void print_map_to_files(void) {
 	}
 
 	for (i = 0; i < NUM_BLOCKS; i++) {
-		if (ALSO_WRITE_WLD_FILES) {
-			sprintf(fname, "%d.wld", i);
-			if (!(out = fopen(fname, "w"))) {
-				printf("Unable to write file %s!\n", fname);
-				exit(0);
-			}
-			
-			// add to index
-			fprintf(index_fl, "%s\n", fname);
+		sprintf(fname, "%d.wld", i);
+		if (!(out = fopen(fname, "w"))) {
+			printf("Unable to write file %s!\n", fname);
+			exit(0);
 		}
+		first = TRUE;
+		
+		// add to index
+		fprintf(index_fl, "%s\n", fname);
 
 		for (j = 0; j < USE_BLOCK_SIZE; j++) {
 			pos = i * USE_BLOCK_SIZE + j;
 			
-			if (grid[pos].type != OCEAN) {
+			if (grid[pos].type != OCEAN || first) {
 				// .wld file
-				if (ALSO_WRITE_WLD_FILES) {
-					fprintf(out, "#%d\n", pos);
-					fprintf(out, "%d %d %d\n", grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum);
-					fprintf(out, "S\n");
-				}
-				
+				fprintf(out, "#%d\n", pos);
+				fprintf(out, "%d %d %d\n", grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum);
+				fprintf(out, "S\n");
+				first = FALSE;	// guarantee at least 1 entry per file (even if ocean)
+			}
+			
+			if (grid[pos].type != OCEAN) {
 				// base_map file
 				fprintf(base_fl, "%d %d %d %d %d %d %d\n", X_COORD(pos), Y_COORD(pos), grid[pos].island_id, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum, terrains[grid[pos].type].sector_vnum, NOTHING);
 			}
 		}
 		
-		if (ALSO_WRITE_WLD_FILES) {
-			fprintf(out, "$~\n");
-			fclose(out);
-		}
+		// end wld file
+		fprintf(out, "$~\n");
+		fclose(out);
 	}
 	
 	// end index file
