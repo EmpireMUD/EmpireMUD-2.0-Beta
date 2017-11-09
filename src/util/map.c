@@ -358,7 +358,7 @@ void create_map(void) {
 	create_islands();
 
 	printf("Adding mountains and rivers...\n");
-	for (isle = island_list; isle; isle = isle->next) {
+	LL_FOREACH(island_list, isle) {
 		// fillings based on location (it's not desert or jungle YET, so we check prcs
 		if (IS_IN_Y_PRC_RANGE(Y_COORD(isle->loc), DESERT_START_PRC, DESERT_END_PRC)) {
 			// desert
@@ -589,11 +589,12 @@ struct island_data *closest_island(int x, int y) {
 	struct island_data *isle, *best = NULL;
 	int b = USE_SIZE;
 
-	for (isle = island_list; isle; isle = isle->next)
+	LL_FOREACH(island_list, isle) {
 		if (compute_distance(X_COORD(isle->loc), Y_COORD(isle->loc), x, y) < b) {
 			best = isle;
 			b = compute_distance(X_COORD(isle->loc), Y_COORD(isle->loc), x, y);
 		}
+	}
 
 	return best;
 }
@@ -886,6 +887,12 @@ void shift_map_x(int amt) {
 }
 
 
+// Simple vnum sorter for islands (only cares if continent)
+int sort_islands(struct island_data *a, struct island_data *b) {
+	return b->continent - a->continent;;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MAP GENERATOR FUNCTIONS /////////////////////////////////////////////////
 
@@ -1095,11 +1102,13 @@ void add_lake_river(struct island_data *isle) {
 void add_start_points(bool force) {
 	struct island_data *isle;
 	int count = 0;
-
-	for (isle = island_list; isle && count < NUM_START_POINTS; isle = isle->next) {
+	
+	LL_FOREACH(island_list, isle) {
 		if (force || (!number(0, 2) && (grid[isle->loc].type == PLAINS || grid[isle->loc].type == FOREST || grid[isle->loc].type == DESERT))) {
 			change_grid(isle->loc, TOWER);
-			count++;
+			if (++count >= NUM_START_POINTS) {
+				break;
+			}
 		}
 	}
 
@@ -1303,10 +1312,9 @@ void create_one_island(struct island_def *type, bool continent) {
 		CREATE(isle, struct island_data, 1);
 		isle->loc = loc;
 		isle->continent = continent;
-
-		isle->next = island_list;
-		island_list = isle;
-
+		
+		LL_PREPEND(island_list, isle);
+		
 		land_mass(isle, type->min_radius, type->max_radius);
 	}
 }
@@ -1327,6 +1335,8 @@ void create_islands(void) {
 			create_one_island(&island_types[ii], FALSE);
 		}
 	}
+	
+	LL_SORT(island_list, sort_islands);
 }
 
 
