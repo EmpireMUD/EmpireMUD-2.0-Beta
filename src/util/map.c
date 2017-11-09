@@ -228,8 +228,9 @@ void load_and_shift_map(int dist);
 #define DESERT_BEACH	19
 #define CLIFF			20
 #define ESTUARY			21
+#define MARSH			22
 
-#define NUM_MAP_SECTS	22	/* Total */
+#define NUM_MAP_SECTS	23	/* Total */
 
 // terrain data
 struct {
@@ -257,9 +258,10 @@ struct {
 	{ "f", "Riverbank", 45, TRUE },
 	{ "f", "Shore", 54, TRUE },
 	{ "d", "Jngl Shore", 55, TRUE },
-	{ "m", "Beach", 51, TRUE },	// 20
-	{ "q", "Cliffs", 52, TRUE },
+	{ "m", "Beach", 51, TRUE },
+	{ "q", "Cliffs", 52, TRUE },	// 20
 	{ "i", "Estuary", 53, TRUE },
+	{ "e", "Marsh", 35, TRUE },
 };
 
 
@@ -403,6 +405,7 @@ void create_map(void) {
 	printf("Irrigating from rivers...\n");
 	replace_near(DESERT, PLAINS, RIVER, 2);
 	replace_near(DESERT, PLAINS, LAKE, 2);
+	replace_near(JUNGLE, MARSH, LAKE, 1);
 	replace_near(JUNGLE, SWAMP, RIVER, 2);
 	
 	printf("Adding coasts and riverbanks...\n");
