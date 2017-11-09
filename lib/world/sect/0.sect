@@ -1958,6 +1958,8 @@ E
 E
 0 1 100.00 27
 E
+2 32 2.00 35
+E
 2 6 10.00 50
 E
 4 0 0.80 28
@@ -2063,6 +2065,8 @@ E
 0 1 50.00 27
 E
 0 1 100.00 28
+E
+2 32 2.00 35
 E
 2 6 10.00 50
 E
@@ -2323,6 +2327,87 @@ E
 9 0 50.00 27
 I 9 121 100.00 1  # GATHER: a stick
 I 20 128 100.00 1  # CHOP: a massive jungle tree
+S
+#35
+Marsh~
+A Marshy Lakeshore~
+'~' 13 3 10 aw m
+D0
+~~~&g^~
+&c~
+D0
+~~&g^&?~~
+&c~
+D0
+~&g^&?~~~
+&c~
+D0
+&g^&?~~~~
+&c~
+E
+9 0 25.00 27
+E
+10 32 4.00 27
+I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
+I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1316 25.00 1 f  # FISH: a small gator
+I 21 1314 100.00 1 f  # FISH: a fat catfish
+M
+9061 0.01 d
+M
+9162 0.50 d
+M
+9161 0.50 d
+M
+9160 0.50 ad
+M
+9017 5.00 dh
+M
+9156 15.00 dh
+M
+9151 10.00 dh
+M
+9109 15.00 dh
+M
+9106 15.00 dh
+M
+9105 15.00 bdh
+M
+9104 15.00 bdh
+M
+9006 5.00 dg
+M
+9155 15.00 dg
+M
+9107 15.00 dg
+M
+9109 15.00 dg
+M
+9114 10.00 bdg
+M
+9108 15.00 bdg
+M
+9115 10.00 adg
+M
+9159 15.00 d
+M
+9158 10.00 d
+M
+9157 10.00 d
+M
+264 10.00 ace
+M
+252 10.00 c
+M
+253 10.00 cf
+M
+9153 10.00 bc
 S
 #40
 Plains~
