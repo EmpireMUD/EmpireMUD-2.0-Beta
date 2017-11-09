@@ -814,7 +814,7 @@ SWAMPWALK "SWAMP WALK"
 
 The swamp walk, though never very stable, makes travel through the swamp
 much easier. Swamp animals may still harass you, but you will avoid random
-attacks by crocodilians.
+attacks by crocodilians. This can also be built on marshes.
 
 See also: BUILDING, SWAMP ENGINEERING
 #
@@ -825,7 +825,8 @@ SWAMPHUT "SWAMP HUT"
 Extra rooms:  3
 Citizens:  2
 
-A swamp hut is a good-sized home supported on stilts above the swamp.
+A swamp hut is a good-sized home supported on stilts above the swamp (or
+marsh).
 
 See also: DESIGNATE, SWAMP ENGINEERING
 #
@@ -837,7 +838,7 @@ Extra rooms:  5
 Citizens:  4
 
 The swamp manor is a grand house that is built only in the swamp. It is fire-
-proof and comparable to a large house.
+proof and comparable to a large house. You can also build this on marshes.
 
 See also: DESIGNATE, SWAMP ENGINEERING
 #
@@ -850,7 +851,8 @@ Citizens:  2
 Chameleon: &c~~~~&0
 
 A swamp complex is a well-hidden, large home that can only be built in the
-swamp. It is designed to be difficult to see from a distance.
+swamp. It is designed to be difficult to see from a distance. You can also
+build this on marshes.
 
 See also: DESIGNATE, SWAMP ENGINEERING
 #
@@ -858,10 +860,10 @@ SWAMPPLATFORM "SWAMP PLATFORM"
 
 &c~&0__&c~&0  Swamp Platform  (Swamp Engineering ability)
 
-By building a sturdy platform on top of swampland, you can effectively build
-"plains-only" buildings in the swamp. Once complete, the platform becomes an
-ordinary plains. If you don't build on it soon, though, the swamp will re-claim
-it.
+By building a sturdy platform on top of swampland (or marshland), you can
+effectively build "plains-only" buildings in the swamp. Once complete, the
+platform becomes an ordinary plains. If you don't build on it soon, though,
+the swamp will re-claim it.
 
 See also: SWAMP ENGINEERING
 #

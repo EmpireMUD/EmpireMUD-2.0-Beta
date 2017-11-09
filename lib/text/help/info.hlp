@@ -10,7 +10,7 @@ These are the common map icons:
  &Y....&0  Desert              &Y.&G^^&Y.&0  Desert Grove        &Y.&C~~&Y.&0  Oasis
  &y....&0  Desert              &y.&g^^&y.&0  Desert Grove        &y.&c~~&y.&0  Oasis
  &c~~~~&0  River               &b~~~~&0  Ocean               &c~~&g^&c~&0  Swamp
- &G^^^^&0  Jungle              &W,,,,&0  Arctic Tundra
+ &G^^^^&0  Jungle              &W,,,,&0  Arctic Tundra       &c~&g^&c~~&0  Marsh
 
  --+-  Road                [--]  Building            \__/  Trench
  vvvv  Fence               vxxv  Gate                VVVV  Wall

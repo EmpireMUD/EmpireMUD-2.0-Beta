@@ -2156,7 +2156,7 @@ The following flags are available:
  oasis - an oasis tile
  crops - any crop or seeded tile
  grove - a desert grove tile
- swamp - a swamp tile
+ swamp - a swamp/marsh tile
  any forest - any level of forest tile, from light forest to overgrown
  open building - a building that doesn't block the map
 
@@ -2191,7 +2191,7 @@ The following flags are available:
  oasis - an oasis tile
  crops - *** do not use for buildon
  grove - a desert grove tile
- swamp - a swamp tile
+ swamp - a swamp/marsh tile
  any forest - *** do not use for buildon
  open building - *** do not use for buildon
 
@@ -5777,7 +5777,7 @@ Available flags:
  oasis - an arid water source
  crops - any crop tile, should ONLY be used for 'buildfacing'
  grove - an arid forest tile like a desert grove
- swamp - a swamp-type tile
+ swamp - a swamp-/marsh-type tile
  any forest - a broader category of forests usually used for 'buildfacing'
  open building - does not apply to buildflags -- do not use
 
