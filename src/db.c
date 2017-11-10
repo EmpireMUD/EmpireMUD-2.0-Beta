@@ -655,7 +655,7 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 */
 void check_for_bad_buildings(void) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-	void unlink_instance_entrance(room_data *room);
+	void unlink_instance_entrance(room_data *room, bool run_cleanup);
 
 	struct obj_storage_type *store, *next_store, *temp;
 	bld_data *bld, *next_bld;
@@ -692,7 +692,7 @@ void check_for_bad_buildings(void) {
 		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room, TRUE)) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
-			unlink_instance_entrance(room);
+			unlink_instance_entrance(room, FALSE);
 		}
 		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
@@ -2550,7 +2550,7 @@ PLAYER_UPDATE_FUNC(b5_1_update_players) {
 
 // b5.1 convert resource action vnums (all resource actions += 1000)
 void b5_1_global_update(void) {
-	void delete_instance(struct instance_data *inst);	// instance.c
+	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 	
 	struct instance_data *inst, *next_inst;
 	craft_data *craft, *next_craft;
@@ -2572,7 +2572,7 @@ void b5_1_global_update(void) {
 		// delete 'em
 		LL_FOREACH_SAFE(instance_list, inst, next_inst) {
 			if (inst->adventure == adv) {
-				delete_instance(inst);
+				delete_instance(inst, FALSE);
 			}
 		}
 	}

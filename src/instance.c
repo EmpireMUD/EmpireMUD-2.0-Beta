@@ -60,7 +60,7 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 void link_instance_entrance(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
-void unlink_instance_entrance(room_data *room, struct instance_data *inst);
+void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 
 // local globals
@@ -1050,8 +1050,9 @@ void generate_adventure_instances(void) {
 * This deletes an instance but does NOT save the instance file.
 *
 * @param struct instance_data *inst The instance to delete.
+* @param bool run_cleanup If TRUE, runs cleanup scripts. If FALSE, skips this.
 */
-void delete_instance(struct instance_data *inst) {
+void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	void expire_instance_quests(struct instance_data *inst);
 	extern room_data *get_extraction_room(void);
 	void relocate_players(room_data *room, room_data *to_room);
@@ -1085,7 +1086,7 @@ void delete_instance(struct instance_data *inst) {
 		}
 	
 		// unlink from location:
-		unlink_instance_entrance(inst->location, inst);
+		unlink_instance_entrance(inst->location, inst, run_cleanup);
 	}
 	
 	// any portal in will be cleaned up by delete_room
@@ -1159,7 +1160,7 @@ int delete_all_instances(adv_data *adv) {
 		next_inst = inst->next;
 		
 		if (inst->adventure == adv) {
-			delete_instance(inst);
+			delete_instance(inst, TRUE);
 			++count;
 		}
 	}
@@ -1330,7 +1331,7 @@ void prune_instances(void) {
 		if (!inst->adventure || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!inst->start && !delayed) || !inst->location || (inst->size == 0 && !delayed) || (rule && (inst->created + 60 * rule->value) < time(0))) {
 			// well, only if empty
 			if (count_players_in_instance(inst, TRUE, NULL) == 0) {
-				delete_instance(inst);
+				delete_instance(inst, TRUE);
 				save = TRUE;
 			}
 		}
@@ -1365,8 +1366,9 @@ void prune_instances(void) {
 *
 * @param room_data *room The map (or interior) location that was the anchor for an instance.
 * @param struct instance_data *inst The instance being cleaned up.
+* @param bool run_cleanup If TRUE, runs cleanup scripts. If FALSE, skips this.
 */
-void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
+void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup) {
 	extern bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 	
 	adv_data *adv = inst->adventure;
@@ -1381,7 +1383,7 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 	REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
 	
 	// check for scripts
-	if (adv && GET_ADV_SCRIPTS(adv)) {
+	if (run_cleanup && adv && GET_ADV_SCRIPTS(adv)) {
 		// add scripts
 		LL_FOREACH(GET_ADV_SCRIPTS(adv), tpl) {
 			if (!(proto = real_trigger(tpl->vnum))) {
@@ -2176,7 +2178,7 @@ static void renum_instances(void) {
 		
 		// check bad instance
 		if (!inst->adventure || !inst->location || (!inst->start && !IS_SET(inst->flags, INST_NEEDS_LOAD))) {
-			delete_instance(inst);
+			delete_instance(inst, FALSE);
 		}
 	}
 }

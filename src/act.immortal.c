@@ -67,7 +67,7 @@ extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
-void delete_instance(struct instance_data *inst);	// instance.c
+void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
@@ -829,8 +829,6 @@ void do_instance_add(char_data *ch, char *argument) {
 
 
 void do_instance_delete(char_data *ch, char *argument) {
-	void delete_instance(struct instance_data *inst);
-	
 	struct instance_data *inst;
 	room_data *loc;
 	int num;
@@ -849,7 +847,7 @@ void do_instance_delete(char_data *ch, char *argument) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted an instance of %s at unknown location", GET_REAL_NAME(ch), GET_ADV_NAME(inst->adventure));
 			}
 			msg_to_char(ch, "Instance of %s deleted.\r\n", GET_ADV_NAME(inst->adventure));
-			delete_instance(inst);
+			delete_instance(inst, TRUE);
 			break;
 		}
 	}
@@ -876,7 +874,7 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 		
 		if (inst->adventure == adv) {
 			++count;
-			delete_instance(inst);
+			delete_instance(inst, TRUE);
 		}
 	}
 	

@@ -148,6 +148,7 @@ struct island_def island_types[] = {
 // helper function protos
 void audit_crops();
 inline void change_grid(int loc, int type);
+void cleanup_mud_files();
 void clear_pass(void);
 struct island_data *closest_island(int x, int y);
 inline int compute_distance(int x1, int y1, int x2, int y2);
@@ -357,6 +358,10 @@ int sort_real_islands(struct real_island *a, struct real_island *b) {
 		{ perror("SYSERR: malloc failure"); abort(); } } while(0)
 
 
+// relative path to the 'lib' dir
+#define LIB_PATH  "../../"
+
+
 // locals
 struct grid_type grid[USE_SIZE];	// main working grid
 int total_ocean = 0;	// keep track of ocean to speed up counts
@@ -441,7 +446,7 @@ void create_map(void) {
 	
 	// center maps if they use only x-wrap
 	if (USE_WRAP_X && !USE_WRAP_Y) {
-		printf("Centering map horizontally...\r\n");
+		printf("Centering map horizontally...\n");
 		center_map();
 	}
 	
@@ -474,6 +479,7 @@ int main(int argc, char **argv) {
 	print_map_graphic();
 	print_map_to_files();
 	print_island_file();
+	cleanup_mud_files();
 
 	printf("Done.\n");
 	output_stats();
@@ -588,6 +594,32 @@ inline void change_grid(int loc, int type) {
 	
 	if (type == OCEAN) {
 		++total_ocean;
+	}
+}
+
+
+/**
+* This does the following:
+* - delete the instance file (instances are no longer valid with new world)
+* - writes a hint file to tell the mud there is a new world map
+*/
+void cleanup_mud_files(void) {
+	FILE *fl;
+	
+	// delete instance file
+	if ((fl = fopen(LIB_PATH INSTANCE_FILE, "r"))) {
+		fclose(fl);
+		printf("Deleting old adventure instance file...\n");
+		unlink(LIB_PATH INSTANCE_FILE);
+	}
+	
+	// write new world hint
+	if ((fl = fopen(LIB_PATH NEW_WORLD_HINT_FILE, "w"))) {
+		fprintf(fl, "$\n");
+		fclose(fl);
+	}
+	else {
+		printf("Warning: unable to write new-world hint file (if you have existing empires, einv will be in the wrong place)\n");
 	}
 }
 
@@ -718,10 +750,11 @@ void print_island_file(void) {
 	int iter, id, c_count;
 	FILE *fl;
 	
-	if (!(fl = fopen("../../" ISLAND_FILE, "w"))) {
-		printf("Warning: Unable to open island file for writing\r\n");
+	if (!(fl = fopen(LIB_PATH ISLAND_FILE, "w"))) {
+		printf("Warning: Unable to open island file for writing\n");
 		return;
 	}
+	printf("Writing island file...\n");
 	
 	
 	{	// STEP 1: collate data by island id
@@ -807,7 +840,7 @@ void print_map_to_files(void) {
 		exit(0);
 	}
 	
-	if (!(base_fl = fopen("../../" WORLD_MAP_FILE, "w"))) {
+	if (!(base_fl = fopen(LIB_PATH WORLD_MAP_FILE, "w"))) {
 		printf("Unable to write base_map file!\n");
 		exit(0);
 	}
@@ -1766,6 +1799,7 @@ void load_and_shift_map(int dist) {
 	print_map_graphic();
 	print_map_to_files();
 	print_island_file();
+	cleanup_mud_files();
 
 	printf("Map shifted %d on X-axis.\n", dist);
 	output_stats();	

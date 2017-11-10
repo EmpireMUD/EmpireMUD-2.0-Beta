@@ -157,6 +157,7 @@
 #define DAILY_QUEST_FILE  LIB_ETC"daily_quests"	// which quests are on/off
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
+#define NEW_WORLD_HINT_FILE  LIB_ETC"new_world"	// if present, moves einv on startup
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
 #define VERSION_FILE  LIB_ETC"version"	// for version tracking
 
