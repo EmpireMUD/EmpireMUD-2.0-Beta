@@ -46,6 +46,7 @@
 #include "../sysdep.h"
 
 #include "../structs.h"
+#include "../db.h"
 
 /**
 * Contents:
@@ -155,6 +156,7 @@ double get_percent_type(int type);
 void init_grid(void);
 int number(int from, int to);
 void output_stats(void);
+void print_island_file();
 void print_map_graphic(void);
 void print_map_to_files(void);
 struct num_data_t *pop_ndt(void);
@@ -332,6 +334,20 @@ struct island_data {
 };
 
 
+// used for outputing the islands file
+struct real_island {
+	int id;
+	bitvector_t flags;
+	UT_hash_handle hh;
+};
+
+
+// Simple sorter for real islands by id
+int sort_real_islands(struct real_island *a, struct real_island *b) {
+	return a->id - b->id;
+}
+
+
 #define CREATE(result, type, number)  do {\
 	if ((number) * sizeof(type) <= 0)	\
 		perror("SYSERR: Zero bytes or less requested");	\
@@ -455,6 +471,7 @@ int main(int argc, char **argv) {
 
 	print_map_graphic();
 	print_map_to_files();
+	print_island_file();
 
 	printf("Done.\n");
 	output_stats();
@@ -692,6 +709,70 @@ void output_stats(void) {
 }
 
 
+// writes the islands data file
+void print_island_file(void) {
+	struct real_island *all_isles = NULL, *rli, *next_rli;
+	struct island_data *isd;
+	int iter, id, c_count;
+	FILE *fl;
+	
+	if (!(fl = fopen("../../" ISLAND_FILE, "w"))) {
+		printf("Warning: Unable to open island file for writing\r\n");
+		return;
+	}
+	
+	
+	{	// STEP 1: collate data by island id
+		// ensure we have all island ids
+		for (iter = 0; iter < USE_SIZE; ++iter) {
+			if ((id = grid[iter].island_id) == -1) {
+				continue;	// skip ocean;
+			}
+			// find island
+			HASH_FIND_INT(all_isles, &id, rli);
+			if (!rli) {
+				CREATE(rli, struct real_island, 1);
+				rli->id = id;
+				HASH_ADD_INT(all_isles, id, rli);
+			}
+		}
+		// flag continents
+		LL_FOREACH(island_list, isd) {
+			if (isd->continent && (id = grid[isd->loc].island_id) != -1) {
+				HASH_FIND_INT(all_isles, &id, rli);
+				if (rli) {
+					rli->flags |= ISLE_CONTINENT;
+				}
+			}
+		}
+		// sort
+		HASH_SORT(all_isles, sort_real_islands);
+	}
+	
+	{	// STEP 2: output islands to file
+		c_count = 0;
+		HASH_ITER(hh, all_isles, rli, next_rli) {
+			fprintf(fl, "#%d\n", rli->id);
+			if (rli->flags & ISLE_CONTINENT) {
+				// continents use their own numbering
+				fprintf(fl, "Unexplored Continent %d~\n", ++c_count);
+			}
+			else {
+				fprintf(fl, "Unexplored Island %d~\n", rli->id);
+			}
+			fprintf(fl, "%lld\n", rli->flags);
+			fprintf(fl, "S\n");
+			
+			// free as we go
+			free(rli);
+		}
+	}
+	
+	fprintf(fl, "$\n");
+	fclose(fl);
+}
+
+
 // creates the data file for the graphic map
 void print_map_graphic(void) {
 	FILE *out;
@@ -719,18 +800,18 @@ void print_map_to_files(void) {
 	int i, j, pos;
 	char fname[256];
 	
-	if (!(index_fl = fopen("index", "w"))) {
+	if (!(index_fl = fopen(INDEX_FILE, "w"))) {
 		printf("Unable to write index file!\n");
 		exit(0);
 	}
 	
-	if (!(base_fl = fopen("../base_map", "w"))) {
+	if (!(base_fl = fopen("../../" WORLD_MAP_FILE, "w"))) {
 		printf("Unable to write base_map file!\n");
 		exit(0);
 	}
 
 	for (i = 0; i < NUM_BLOCKS; i++) {
-		sprintf(fname, "%d.wld", i);
+		sprintf(fname, "%d%s", i, WLD_SUFFIX);
 		if (!(out = fopen(fname, "w"))) {
 			printf("Unable to write file %s!\n", fname);
 			exit(0);
@@ -1628,7 +1709,7 @@ void load_and_shift_map(int dist) {
 	printf("Loaded existing map...\n");
 	
 	// load in existing map
-	if (!(index = fopen("index", "r"))) {
+	if (!(index = fopen(INDEX_FILE, "r"))) {
 		printf("ERROR: Unable to load index file.\n");
 		exit(1);
 	}
@@ -1671,6 +1752,7 @@ void load_and_shift_map(int dist) {
 	
 	print_map_graphic();
 	print_map_to_files();
+	print_island_file();
 
 	printf("Map shifted %d on X-axis.\n", dist);
 	output_stats();	
