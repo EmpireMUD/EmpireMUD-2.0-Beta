@@ -941,8 +941,9 @@ int sect_to_terrain(int sect_vnum) {
 
 // pans the whole map to the right/left a given amount, for eliminating east/west edges
 void shift_map_x(int amt) {
+	struct island_data *isle;
 	struct grid_type *temp;
-	int iter, loc;
+	int iter, loc, x, y;
 	
 	CREATE(temp, struct grid_type, USE_SIZE);
 	
@@ -964,6 +965,23 @@ void shift_map_x(int amt) {
 	}
 	
 	free(temp);
+	
+	// now update the island locs
+	LL_FOREACH(island_list, isle) {
+		x = X_COORD(isle->loc);
+		y = Y_COORD(isle->loc);
+		
+		x += amt;
+		if (x < 0) {
+			x += USE_WIDTH;
+		}
+		else if (x >= USE_WIDTH) {
+			x -= USE_WIDTH;
+		}
+		
+		// convert
+		isle->loc = y * USE_HEIGHT + x;
+	}
 }
 
 
