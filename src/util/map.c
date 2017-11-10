@@ -943,7 +943,7 @@ int sect_to_terrain(int sect_vnum) {
 void shift_map_x(int amt) {
 	struct island_data *isle;
 	struct grid_type *temp;
-	int iter, loc, x, y;
+	int iter, loc;
 	
 	CREATE(temp, struct grid_type, USE_SIZE);
 	
@@ -968,19 +968,7 @@ void shift_map_x(int amt) {
 	
 	// now update the island locs
 	LL_FOREACH(island_list, isle) {
-		x = X_COORD(isle->loc);
-		y = Y_COORD(isle->loc);
-		
-		x += amt;
-		if (x < 0) {
-			x += USE_WIDTH;
-		}
-		else if (x >= USE_WIDTH) {
-			x -= USE_WIDTH;
-		}
-		
-		// convert
-		isle->loc = y * USE_HEIGHT + x;
+		isle->loc = shift(isle->loc, amt, 0);
 	}
 }
 
