@@ -66,7 +66,9 @@
 struct island_def {
 	int min_radius, max_radius;
 	int cluster_dist, cluster_size;
+	struct { int min_x, max_x, min_y, max_y; } limits;	// percents; allows constraining locations
 };
+#define NO_LIMITS  { 0, 100, 0, 100 }
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -91,9 +93,9 @@ struct island_def {
 */
 struct island_def continents[] = {
 	// min-radius, max-radius, cluster-distance, cluster-size
-	{ 30, 60, 55, 40 },	// 40 clusters of 30-60 radius clumps, each up to 55 tiles apart.
-	{ 30, 60, 55, 40 },	// repeated 3 times
-	{ 30, 60, 55, 40 },
+	{ 30, 60, 55, 40, { 0, 100, 10, 33 } },	// 40 clusters of 30-60 radius clumps, each up to 55 tiles apart.
+	{ 30, 60, 55, 40, { 0, 100, 66, 90 } },	// repeated 3 times
+	{ 30, 60, 55, 40, { 0, 100, 33, 66 } },
 	
 	{ -1, -1, -1, -1 }	// last
 };
@@ -102,15 +104,15 @@ struct island_def continents[] = {
 // Additional islands: It iterates repeatedly over this list until it's out of space:
 struct island_def island_types[] = {
 	// min-radius, max-radius, cluster-distance, cluster-size
-	{ 10, 60, 45, 4 },	// medium size, cluster of 4
-	{ 10, 30, 20, 8 },	// small size, cluster of 8
-	{ 10, 30, 10, 8 },	// small size, tightly packed, cluster of 8
-	{ 10, 30, 15, 3 },	// tiny cluster
-	{ 10, 30, 15, 3 },	// tiny cluster
+	{ 10, 60, 45, 4, NO_LIMITS },	// medium size, cluster of 4
+	{ 10, 30, 20, 8, NO_LIMITS },	// small size, cluster of 8
+	{ 10, 30, 10, 8, NO_LIMITS },	// small size, tightly packed, cluster of 8
+	{ 10, 30, 15, 3, NO_LIMITS },	// tiny cluster
+	{ 10, 30, 15, 3, NO_LIMITS },	// tiny cluster
 	
-	{ 10, 30, 30, 6 },	// chain
+	{ 10, 30, 30, 6, NO_LIMITS },	// chain
 	
-	{ -1, -1, -1, -1 }	// last
+	{ -1, -1, -1, -1, NO_LIMITS }	// last
 };
 
 
@@ -1373,13 +1375,18 @@ void complete_map(void) {
 
 // builds one island in memory
 void create_one_island(struct island_def *type, bool continent) {
-	int iter, loc, dir, last_loc, attempts;
+	int iter, loc, dir, last_loc, attempts, x, y;
 	struct island_data *isle;
 	
 	last_loc = -1;
 	for (iter = 0; iter < type->cluster_size; ++iter) {
 		if (last_loc == -1) {
-			loc = number(0, USE_SIZE - 1);
+			// find a starting point
+			do {
+				x = number(round(type->limits.min_x / 100.0 * USE_WIDTH), round(type->limits.max_x / 100.0 * USE_WIDTH)-1);
+				y = number(round(type->limits.min_y / 100.0 * USE_HEIGHT), round(type->limits.max_y / 100.0 * USE_HEIGHT)-1);
+				loc = MAP(x, y);
+			} while (loc < 0 || loc >= USE_SIZE);
 		}
 		else {
 			dir = number(0, NUM_DIRS-1);
