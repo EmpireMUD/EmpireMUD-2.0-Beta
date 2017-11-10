@@ -91,9 +91,9 @@ struct island_def {
 */
 struct island_def continents[] = {
 	// min-radius, max-radius, cluster-distance, cluster-size
-	{ 30, 60, 55, 45 },	// 45 clusters of 30-60 radius clumps, each up to 55 tiles apart.
-	{ 30, 60, 55, 45 },	// repeated 3 times
-	{ 30, 60, 55, 45 },
+	{ 30, 60, 55, 40 },	// 40 clusters of 30-60 radius clumps, each up to 55 tiles apart.
+	{ 30, 60, 55, 40 },	// repeated 3 times
+	{ 30, 60, 55, 40 },
 	
 	{ -1, -1, -1, -1 }	// last
 };
@@ -738,7 +738,7 @@ void print_island_file(void) {
 		}
 		// flag continents
 		LL_FOREACH(island_list, isd) {
-			if (isd->continent && (id = grid[isd->loc].island_id) != -1) {
+			if (isd->continent && isd->loc != -1 && (id = grid[isd->loc].island_id) != -1) {
 				HASH_FIND_INT(all_isles, &id, rli);
 				if (rli) {
 					rli->flags |= ISLE_CONTINENT;
