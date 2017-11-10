@@ -395,7 +395,7 @@ void create_map(void) {
 			add_lake_river(isle);
 		}
 		else {	// temperate (not jungle or desert)
-			if (!isle->continent || number(0, 1)) {
+			if (!isle->continent || !number(0, 2)) {
 				add_mountains(isle);	// mountains less common on continents
 			}
 			if (number(0, isle->continent ? 1 : 2)) {	// 66% chance (50% on continents)
