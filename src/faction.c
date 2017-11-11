@@ -886,6 +886,52 @@ int rep_const_to_index(int rep_const) {
 
 
 /**
+* Sets a reputation to a specific level. This will be constrained by the
+* faction's min/max reputation.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The faction to set rep with.
+* @param int rep Any REP_ constant to set it to.
+*/
+void set_reputation(char_data *ch, any_vnum vnum, int rep) {
+	int rep_idx, min_idx, max_idx, old_rep;
+	struct player_faction_data *pfd;
+	faction_data *fct;
+	
+	if (IS_NPC(ch) || rep == REP_NONE) {
+		return;
+	}
+	if (!(fct = find_faction_by_vnum(vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+		return;	// faction doesn't exist?
+	}
+	if (!(pfd = get_reputation(ch, vnum, TRUE))) {
+		return;	// unable to get a rep entry?
+	}
+	if ((rep_idx = rep_const_to_index(rep)) == NOTHING) {
+		return;	// no valid reputation?
+	}
+	
+	// bounds
+	min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+	rep_idx = MAX(rep_idx, min_idx);
+	max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+	rep_idx = MIN(rep_idx, max_idx);
+	
+	// seems ok
+	old_rep = pfd->rep;
+	
+	pfd->rep = rep;
+	pfd->value = reputation_levels[rep_idx].value;
+	
+	// and message
+	if (old_rep != pfd->rep) {
+		msg_to_char(ch, "%sYou are now %s with %s.\t0\r\n", reputation_levels[rep_idx].color, reputation_levels[rep_idx].name, FCT_NAME(fct));
+		qt_change_reputation(ch, FCT_VNUM(fct));
+	}
+}
+
+
+/**
 * Updates all of a player's REP_ consts on their factions.
 *
 * @param char_data *ch The player.
