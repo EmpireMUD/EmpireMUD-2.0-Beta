@@ -2103,7 +2103,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	
 	if ((dock = find_docks(emp, shipd->to_island))) {
 		// unload the shipment at the destination
-		if (shipd->vnum != NOTHING && shipd->amount > 0) {
+		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
 			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name);
 			add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
 		}
@@ -2113,7 +2113,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	}
 	else {
 		// no docks -- unload the shipment at home
-		if (shipd->vnum != NOTHING && shipd->amount > 0) {
+		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
 			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name);
 			add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
 		}
