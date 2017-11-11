@@ -472,6 +472,7 @@ When using field  - The variable returns:
 &criding&0 - TRUE if the character is currently mounted.
 &croom&0 - The room the actor is in as a room variable.
 &cset_cooldown(vnum, seconds)&0 - Sets the character's cooldown time.
+&cset_reputation(faction,rep)&0 - Sets reputation to a given level ("Liked").
 &cset_skill(name,level)&0 - Change a player's skill level, also gain_skill()
 &csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cskill(name)&0 - The player's level in the given skill.
