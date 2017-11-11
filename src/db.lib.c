@@ -1502,7 +1502,7 @@ void delete_empire(empire_data *emp) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
-	bool file = FALSE, save;
+	bool file = FALSE;
 	empire_vnum vnum;
 
 	if (!emp) {
@@ -1520,8 +1520,6 @@ void delete_empire(empire_data *emp) {
 
 	// things to unset on other empires
 	HASH_ITER(hh, empire_table, emp_iter, next_emp) {
-		save = FALSE;
-		
 		for (emp_pol = EMPIRE_DIPLOMACY(emp_iter); emp_pol; emp_pol = next_pol) {
 			next_pol = emp_pol->next;
 			if (emp_pol->id == vnum) {
