@@ -1371,7 +1371,7 @@ void prune_instances(void) {
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup) {
 	extern bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 	
-	adv_data *adv = inst->adventure;
+	adv_data *adv = inst ? inst->adventure : NULL;
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;
 	
