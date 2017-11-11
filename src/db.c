@@ -1870,6 +1870,7 @@ const char *versions_list[] = {
 	"b5.1",
 	"b5.3",
 	"b5.14",
+	"b5.17",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2951,6 +2952,10 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.14")) {
 			b5_14_superior_items();
+		}
+		if (MATCH_VERSION("b5.17")) {
+			log("Updating to b5.17...");
+			save_all_empires();
 		}
 	}
 	
