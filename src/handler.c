@@ -7314,7 +7314,7 @@ struct empire_storage_data *find_stored_resource(empire_data *emp, int island, o
 		HASH_FIND_INT(isle->store, &vnum, store);
 	}
 	
-	return NULL;
+	return store;
 }
 
 
