@@ -69,6 +69,15 @@ void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 
 
+// einv helper type
+struct einv_type {
+	obj_vnum vnum;
+	int local;
+	int total;
+	UT_hash_handle hh;
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
@@ -701,9 +710,15 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		// Cleaning as we use the hash.
 		HASH_DEL(eid_pi_list, eid_pi);
 		free(eid_pi);
-	}
-	
+	}	
 }
+
+
+// quick sorter for einv
+int sort_einv_list(struct einv_type *a, struct einv_type *b) {
+	return b->total - a->total;
+}
+
 
 /**
 * called by do_empire_inventory to show einv
@@ -713,14 +728,6 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	// helper type
-	struct einv_type {
-		obj_vnum vnum;
-		int local;
-		int total;
-		UT_hash_handle hh;
-	};
-
 	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
@@ -797,6 +804,8 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			HASH_ADD_INT(list, vnum, einv);
 		}
 	}
+	
+	HASH_SORT(list, sort_einv_list);
 	
 	// build output
 	size = snprintf(output, sizeof(output), "Inventory of %s%s&0 on this island:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
