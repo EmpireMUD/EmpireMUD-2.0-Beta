@@ -1471,7 +1471,7 @@ empire_data *create_empire(char_data *ch) {
 	GET_RANK(ch) = 2;
 	SAVE_CHAR(ch);
 
-	save_empire(emp);
+	save_empire(emp, TRUE);
 	save_index(DB_BOOT_EMP);
 	
 	// this will set up all the data
@@ -1527,13 +1527,8 @@ void delete_empire(empire_data *emp) {
 			if (emp_pol->id == vnum) {
 				REMOVE_FROM_LIST(emp_pol, EMPIRE_DIPLOMACY(emp_iter), next);
 				free(emp_pol);
-				save = TRUE;
+				EMPIRE_NEEDS_SAVE(emp_iter) = TRUE;
 			}
-		}
-		
-		// save at the end in case more than 1 thing changed
-		if (save) {
-			save_empire(emp_iter);
 		}
 	}
 	
@@ -1693,7 +1688,7 @@ void free_empire(empire_data *emp) {
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_city_data *city;
@@ -1704,19 +1699,14 @@ void free_empire(empire_data *emp) {
 	room_data *room;
 	int iter;
 	
-	// free island techs
+	// free islands
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_ITER(hh, isle->store, store, next_store) {
+			free(store);
+		}
 		free(isle);
 	}
 	EMPIRE_ISLANDS(emp) = NULL;
-			
-	// free storage
-	while ((store = emp->store)) {
-		emp->store = store->next;
-		store->next = NULL;
-		free(store);
-	}
-	emp->store = NULL;
 	
 	// free unique storage
 	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
@@ -1830,7 +1820,6 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	int t[10], junk;
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
-	struct empire_storage_data *store, *last_store = NULL;
 	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct shipping_data *shipd, *last_shipd = NULL;
 	obj_data *obj, *proto;
@@ -1857,19 +1846,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				// validate vnum
 				proto = obj_proto(t[0]);
 				if (proto && proto->storage) {
-					CREATE(store, struct empire_storage_data, 1);
-					store->vnum = t[0];
-					store->amount = t[1];
-					store->island = t[2];
-
-					// at end
-					if (last_store) {
-						last_store->next = store;
-					}
-					else {
-						emp->store = store;
-					}
-					last_store = store;
+					add_to_empire_storage(emp, t[2], t[0], t[1]);
 				}
 				else if (proto && !proto->storage) {
 					log("- removing %dx #%d from empire storage for %s: not storable", t[1], t[0], EMPIRE_NAME(emp));
@@ -2395,17 +2372,21 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 * @param empire_data *emp The empire whose storage to save.
 */
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
 
 	if (!emp) {
 		return;
 	}
-
-	// O: storage
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		fprintf(fl, "O\n%d %d %d\n", store->vnum, store->amount, store->island);
+	
+	// islands
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		// O: storage
+		HASH_ITER(hh, isle->store, store, next_store) {
+			fprintf(fl, "O\n%d %d %d\n", store->vnum, store->amount, isle->island);
+		}
 	}
 
 	// U: unique storage
@@ -2428,11 +2409,42 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 
 
 /**
-* Saves an empire to files: main empire file, empire storage file.
+* Writes the storage file for the empire.
 *
 * @param empire_data *emp The empire to save.
 */
-void save_empire(empire_data *emp) {
+void save_empire_storage(empire_data *emp) {
+	FILE *fl;
+	char fname[30], tempname[64];
+
+	// empire storage: only if it's already been loaded (saves may trigger sooner)
+	if (!emp || !emp->storage_loaded) {
+		return;
+	}
+	
+	sprintf(fname, "%s%d%s", STORAGE_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
+	strcpy(tempname, fname);
+	strcat(tempname, TEMP_SUFFIX);
+	if (!(fl = fopen(tempname, "w"))) {
+		log("SYSERR: Unable to write %s", tempname);
+		return;
+	}
+	write_empire_storage_to_file(fl, emp);
+	fprintf(fl, "$~\n");
+	fclose(fl);
+	rename(tempname, fname);
+	
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = FALSE;
+}
+
+
+/**
+* Saves an empire to file.
+*
+* @param empire_data *emp The empire to save.
+* @param bool save_all_parts If TRUE, also saves storage file, etc.
+*/
+void save_empire(empire_data *emp, bool save_all_parts) {
 	FILE *fl;
 	char fname[30], tempname[64];
 
@@ -2452,23 +2464,12 @@ void save_empire(empire_data *emp) {
 	fprintf(fl, "$~\n");
 	fclose(fl);
 	rename(tempname, fname);
-
-	// empire storage: only if it's already been loaded (saves may trigger sooner)
-	if (emp->storage_loaded) {
-		sprintf(fname, "%s%d%s", STORAGE_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
-		strcpy(tempname, fname);
-		strcat(tempname, TEMP_SUFFIX);
-		if (!(fl = fopen(tempname, "w"))) {
-			log("SYSERR: Unable to write %s", tempname);
-			return;
-		}
-		write_empire_storage_to_file(fl, emp);
-		fprintf(fl, "$~\n");
-		fclose(fl);
-		rename(tempname, fname);
-	}
 	
 	EMPIRE_NEEDS_SAVE(emp) = FALSE;	// done
+	
+	if (save_all_parts) {
+		save_empire_storage(emp);
+	}
 }
 
 
@@ -2479,7 +2480,7 @@ void save_all_empires(void) {
 	empire_data *iter, *next_iter;
 
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		save_empire(iter);
+		save_empire(iter, TRUE);
 	}
 }
 
@@ -2492,7 +2493,10 @@ void save_marked_empires(void) {
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (EMPIRE_NEEDS_SAVE(emp)) {
-			save_empire(emp);
+			save_empire(emp, FALSE);
+		}
+		if (EMPIRE_NEEDS_STORAGE_SAVE(emp)) {
+			save_empire_storage(emp);
 		}
 	}
 }
@@ -7759,85 +7763,6 @@ int sort_room_templates(room_template *a, room_template *b) {
 */
 int sort_sectors(void *a, void *b) {
 	return GET_SECT_VNUM((sector_data*)a) - GET_SECT_VNUM((sector_data*)b);
-}
-
-
-// for sort_storage: quick-switch of linked list positions
-static struct empire_storage_data *switch_storage_pos(struct empire_storage_data *l1, struct empire_storage_data *l2) {
-    l1->next = l2->next;
-    l2->next = l1;
-    return l2;
-}
-
-
-/**
-* This alpha-sorts an empire's storage.
-*
-* @param empire_data *emp The empire to sort.
-*/
-void sort_storage(empire_data *emp) {
-	struct empire_storage_data *start, *p, *q, *top;
-	char *a_name = NULL, *b_name = NULL;
-	obj_data *obj_a, *obj_b;
-	int a_store, b_store;
-    bool changed = TRUE;
-    
-    // [hopefully] quick macro to skip past a/an/the before comparing names
-    #define FIND_NAME_START(str)  (!strn_cmp((str), "the ", 4) ? ((str)+4) : (!strn_cmp((str), "an ", 3) ? ((str) + 3) : (!strn_cmp((str), "a ", 2) ? ((str) + 2) : (str))))
-    
-    // safety first
-    if (!emp) {
-    	return;
-    }
-    
-    start = EMPIRE_STORAGE(emp);
-
-	CREATE(top, struct empire_storage_data, 1);
-
-    top->next = start;
-    if (start && start->next) {
-    	// q is always one item behind p
-
-        while (changed) {
-            changed = FALSE;
-            q = top;
-            p = top->next;
-            while (p->next != NULL) {
-            	// determine items
-            	obj_a = obj_proto(p->vnum);
-            	obj_b = obj_proto(p->next->vnum);
-            	
-            	// only bother if the item is real (this accommodates deleted items)
-            	if (obj_a && obj_b) {
-					a_store = find_lowest_storage_loc(obj_a);
-					b_store = find_lowest_storage_loc(obj_b);
-				
-					// prepare for alpha-sorting ...
-					if (a_store == b_store) {
-						a_name = GET_OBJ_SHORT_DESC(obj_a);
-						b_name = GET_OBJ_SHORT_DESC(obj_b);
-				
-						// skip a/an/the
-						a_name = FIND_NAME_START(a_name);
-						b_name = FIND_NAME_START(b_name);
-					}
-				
-					if (a_store > b_store || (a_store == b_store && str_cmp(a_name, b_name) > 0)) {
-						q->next = switch_storage_pos(p, p->next);
-						changed = TRUE;
-					}
-				}
-				
-                q = p;
-                if (p->next) {
-                    p = p->next;
-                }
-            }
-        }
-    }
-    
-    EMPIRE_STORAGE(emp) = top->next;
-    free(top);
 }
 
 

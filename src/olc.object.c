@@ -453,7 +453,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	descriptor_data *desc;
-	bool save, found, any_trades = FALSE;
+	bool found, any_trades = FALSE;
 	
 	if (!(proto = obj_proto(vnum))) {
 		msg_to_char(ch, "There is no such object %d.\r\n", vnum);
@@ -527,14 +527,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// remove from empire inventories and trade -- DO THIS BEFORE REMOVING FROM OBJ TABLE
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		save = FALSE;
-		
 		if (delete_stored_resource(emp, vnum)) {
-			save = TRUE;
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 		}
 		
 		if (delete_unique_storage_by_vnum(emp, vnum)) {
-			save = TRUE;
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 		}
 		
 		for (trade = EMPIRE_TRADE(emp); trade; trade = next_trade) {
@@ -543,12 +541,8 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				struct empire_trade_data *temp;
 				REMOVE_FROM_LIST(trade, EMPIRE_TRADE(emp), next);
 				free(trade);	// certified
-				save = TRUE;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
-		}
-		
-		if (save) {
-			save_empire(emp);
 		}
 	}
 	

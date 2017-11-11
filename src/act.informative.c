@@ -1247,7 +1247,8 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 */
 bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) {
 	bool found = FALSE;
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *eisle;
 	obj_data *proto;
 
 	/* Must be in an empire */
@@ -1255,16 +1256,13 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 		return found;
 	}
 	
+	eisle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch)));
+	
 	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1.0 ? "s" : ""), EMPIRE_WEALTH(emp), (int) GET_TOTAL_WEALTH(emp));
 	}
-
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		// things not stored here
-		if (store->island != GET_ISLAND_ID(room)) {
-			continue;
-		}
-		
+	
+	HASH_ITER(hh, eisle->store, store, next_store) {
 		if ((proto = obj_proto(store->vnum))) {
 			if (obj_can_be_stored(proto, room)) {
 				if (!found) {

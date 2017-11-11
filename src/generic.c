@@ -729,7 +729,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	descriptor_data *desc;
 	generic_data *gen;
 	char_data *chiter;
-	bool found, save;
+	bool found;
 	int res_type;
 	
 	if (!(gen = real_generic(vnum))) {
@@ -787,18 +787,14 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// remove from live lists: unique storage of drink containers
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		save = FALSE;
 		LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if (!eus->obj) {
 				continue;
 			}
 			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(eus->obj) && GET_DRINK_CONTAINER_TYPE(eus->obj) == vnum) {
 				GET_OBJ_VAL(eus->obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			}
-		}
-		
-		if (save) {
-			save_empire(emp);
 		}
 	}
 	

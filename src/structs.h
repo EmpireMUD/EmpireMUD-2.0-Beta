@@ -4033,6 +4033,7 @@ struct empire_island {
 	// saved portion
 	int workforce_limit[NUM_CHORES];	// workforce settings
 	char *name;	// empire's local name for the island
+	struct empire_storage_data *store;	// hash table of storage here
 	
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
@@ -4078,13 +4079,11 @@ struct empire_political_data {
 };
 
 
-/* The storage structure for empires */
+// The storage structure for empire islands
 struct empire_storage_data {
 	obj_vnum vnum;	// what's stored
 	int amount;	// how much
-	int island;	// which island it's stored on
-
-	struct empire_storage_data *next;
+	UT_hash_handle hh;	// empire_island->store hash (by vnum)
 };
 
 
@@ -4204,7 +4203,6 @@ struct empire_data {
 	// linked lists
 	struct empire_political_data *diplomacy;
 	struct shipping_data *shipping_list;
-	struct empire_storage_data *store;
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
@@ -4240,6 +4238,7 @@ struct empire_data {
 	bool banner_has_underline;	// helper
 	
 	bool needs_save;	// for things that delay-save
+	bool needs_storage_save;	// for storage delay-save
 	
 	UT_hash_handle hh;	// empire_table hash handle
 };

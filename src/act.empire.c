@@ -339,31 +339,28 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 bool is_affiliated_island(empire_data *emp, int island_id) {
 	struct empire_island *isle;
 	struct empire_unique_storage *eus;
-	struct empire_storage_data *store;
 	
 	//Grab the empire_isle information.
 	isle = get_empire_island(emp,island_id);
 	
 	//Check if the empire has claimed tiles in the island.
 	if ( isle->city_terr > 0 || isle->outside_terr > 0) {
-		return true;
+		return TRUE;
 	}
 	
 	//Check if the empire has at least an item in there.
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		if (isle->island == store->island) {
-			return true;
-		}
+	if (isle->store) {
+		return TRUE;
 	}
 	
 	//Check unique storage too
 	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
 		if (isle->island == eus->island) {
-			return true;
+			return TRUE;
 		}
 	}
 	
-	return false;
+	return FALSE;
 }
 
 /**
@@ -656,8 +653,9 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		UT_hash_handle hh;
 	};
 	
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
 	struct eid_per_island *eid_pi, *eid_pi_next, *eid_pi_list = NULL;
+	struct empire_island *isle, *next_isle;
 	obj_data *proto = NULL;
 	
 	
@@ -670,24 +668,25 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		return;
 	}
 	
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
-		if ( !proto ) {
-			if (!multi_isname(argument, GET_OBJ_KEYWORDS(obj_proto(store->vnum)))) {
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_ITER(hh, isle->store, store, next_store) {
+			//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
+			if ( !proto ) {
+				if (!multi_isname(argument, GET_OBJ_KEYWORDS(obj_proto(store->vnum)))) {
+					continue;
+				} else {
+					proto = obj_proto(store->vnum);
+				}
+			}else if ( proto->vnum != store->vnum){
 				continue;
-			} else {
-				proto = obj_proto(store->vnum);
 			}
-		}else if ( proto->vnum != store->vnum){
-			continue;
+		
+			//We have a match.
+			CREATE(eid_pi, struct eid_per_island, 1);
+			eid_pi->island = isle->island;
+			eid_pi->quantity = store->amount;
+			HASH_ADD_INT(eid_pi_list, island, eid_pi);
 		}
-		
-		//We have a match.
-		CREATE(eid_pi, struct eid_per_island, 1);
-		eid_pi->island = store->island;
-		eid_pi->quantity = store->amount;
-		HASH_ADD_INT(eid_pi_list, island, eid_pi);
-		
 	}
 	if ( !proto ) {
 		msg_to_char(ch, "This empire has no item by that name.\r\n");
@@ -725,7 +724,8 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	struct shipping_data *shipd;
 	obj_data *proto = NULL;
 	size_t lsize, size;
@@ -746,36 +746,38 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	}
 	
 	// build list
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		// prototype lookup
-		if (store->vnum != last_vnum) {
-			proto = obj_proto(store->vnum);
-			last_vnum = store->vnum;
-		}
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_ITER(hh, isle->store, store, next_store) {
+			// prototype lookup
+			if (store->vnum != last_vnum) {
+				proto = obj_proto(store->vnum);
+				last_vnum = store->vnum;
+			}
+			
+			if (!proto) {
+				continue;
+			}
+			
+			// argument given but doesn't match
+			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+				continue;
+			}
+			
+			// ready to add
+			vnum = store->vnum;
+			HASH_FIND_INT(list, &vnum, einv);
+			if (!einv) {
+				CREATE(einv, struct einv_type, 1);
+				einv->vnum = vnum;
+				einv->local = einv->total = 0;
+				HASH_ADD_INT(list, vnum, einv);
+			}
 		
-		if (!proto) {
-			continue;
-		}
-		
-		// argument given but doesn't match
-		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
-			continue;
-		}
-		
-		// ready to add
-		vnum = store->vnum;
-		HASH_FIND_INT(list, &vnum, einv);
-		if (!einv) {
-			CREATE(einv, struct einv_type, 1);
-			einv->vnum = vnum;
-			einv->local = einv->total = 0;
-			HASH_ADD_INT(list, vnum, einv);
-		}
-		
-		// add
-		einv->total += store->amount;
-		if (store->island == GET_ISLAND_ID(IN_ROOM(ch))) {
-			einv->local += store->amount;
+			// add
+			SAFE_ADD(einv->total, store->amount, 0, INT_MAX, FALSE);
+			if (isle->island == GET_ISLAND_ID(IN_ROOM(ch))) {
+				SAFE_ADD(einv->local, store->amount, 0, INT_MAX, FALSE);
+			}
 		}
 	}
 	
@@ -1060,7 +1062,7 @@ void abandon_city(char_data *ch, char *argument) {
 	perform_abandon_city(emp, city, TRUE);
 	
 	read_empire_territory(emp, FALSE);
-	save_empire(emp);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -1255,7 +1257,7 @@ void downgrade_city(char_data *ch, char *argument) {
 	}
 	
 	read_empire_territory(emp, FALSE);
-	save_empire(emp);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -1384,7 +1386,7 @@ void found_city(char_data *ch, char *argument) {
 	stop_room_action(IN_ROOM(ch), ACT_PLANTING, NOTHING);
 	
 	read_empire_territory(emp, FALSE);
-	save_empire(emp);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -1632,7 +1634,7 @@ void upgrade_city(char_data *ch, char *argument) {
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
 	read_empire_territory(emp, FALSE);
-	save_empire(emp);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -2231,7 +2233,7 @@ bool extract_tavern_resources(room_data *room) {
 		}
 	}
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	return ok;
 }
 
@@ -3813,7 +3815,7 @@ ACMD(do_enroll) {
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
-	struct empire_storage_data *store, *store2;
+	struct empire_storage_data *store, *next_store;
 	struct empire_city_data *city, *next_city, *temp;
 	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
@@ -3821,7 +3823,7 @@ ACMD(do_enroll) {
 	vehicle_data *veh, *next_veh;
 	empire_data *e, *old;
 	room_data *room, *next_room;
-	int old_store, iter;
+	int iter;
 	char_data *targ = NULL, *victim, *mob;
 	bool all_zero, file = FALSE, sub_file = FALSE;
 	obj_data *obj;
@@ -3929,21 +3931,26 @@ ACMD(do_enroll) {
 				}
 			}
 			
-			// workforce: attempt a smart-copy
+			// islands
 			HASH_ITER(hh, EMPIRE_ISLANDS(old), from_isle, next_isle) {
 				isle = get_empire_island(e, from_isle->island);
 				
+				// workforce: attempt a smart-copy
 				all_zero = TRUE;
 				for (iter = 0; iter < NUM_CHORES && all_zero; ++iter) {
 					if (isle->workforce_limit[iter] != 0) {
 						all_zero = FALSE;
 					}
 				}
-				
 				if (all_zero) {	// safe to copy (no previous settings)
 					for (iter = 0; iter < NUM_CHORES; ++iter) {
 						isle->workforce_limit[iter] = from_isle->workforce_limit[iter];
 					}
+				}
+				
+				// storage
+				HASH_ITER(hh, from_isle->store, store, next_store) {
+					add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
 				}
 			}
 			
@@ -3959,24 +3966,6 @@ ACMD(do_enroll) {
 					if (vam->empire == EMPIRE_VNUM(old)) {
 						vam->empire = EMPIRE_VNUM(e);
 					}
-				}
-			}
-
-			// storage
-			for (store = EMPIRE_STORAGE(old); store; store = store->next) {
-				if (!(store2 = find_stored_resource(e, store->island, store->vnum))) {
-					CREATE(store2, struct empire_storage_data, 1);
-					store2->next = EMPIRE_STORAGE(e);
-					EMPIRE_STORAGE(e) = store2;
-					store2->vnum = store->vnum;
-					store2->island = store->island;
-				}
-
-				old_store = store2->amount;
-				store2->amount += store->amount;
-				// bounds checking
-				if (store2->amount < old_store || store2->amount > MAX_STORAGE) {
-					store2->amount = MAX_STORAGE;
 				}
 			}
 			
@@ -4595,7 +4584,7 @@ ACMD(do_islands) {
 	struct do_islands_data *item, *next_item, *list = NULL;
 	struct empire_island *eisle, *next_eisle;
 	struct empire_unique_storage *eus;
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
 	struct island_info *isle;
 	empire_data *emp;
 	room_data *room;
@@ -4628,16 +4617,16 @@ ACMD(do_islands) {
 		return;
 	}
 	
-	// mark your territory
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
+		// mark your territory
 		if (eisle->city_terr + eisle->outside_terr > 0) {
 			do_islands_has_territory(&list, eisle->island, eisle->city_terr + eisle->outside_terr);
 		}
-	}
-	
-	// compute einv
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		do_islands_add_einv(&list, store->island, store->amount);
+		
+		// mark storage
+		HASH_ITER(hh, eisle->store, store, next_store) {
+			do_islands_add_einv(&list, eisle->island, store->amount);
+		}
 	}
 	
 	// add unique storage

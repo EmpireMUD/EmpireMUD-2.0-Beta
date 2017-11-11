@@ -292,9 +292,7 @@ ACMD(do_eedit) {
 	else {
 		// pass to child function
 		(eedit_cmd[type].func)(ch, argptr, emp);
-		
-		// always save
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 

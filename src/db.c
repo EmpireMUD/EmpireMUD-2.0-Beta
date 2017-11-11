@@ -2112,6 +2112,7 @@ void b3_2_map_and_gear(void) {
 // NOTE: the cloth is not storable, so any empire with it in normal storage must have had the bug
 void b3_6_einv_fix(void) {
 	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	empire_data *emp, *next_emp;
 	obj_data *proto;
 	int total, amt;
@@ -2129,14 +2130,16 @@ void b3_6_einv_fix(void) {
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		total = 0;
-		LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
-			if (store->vnum == vnum) {
-				amt = store->amount;
-				total += amt;
-				add_to_empire_storage(emp, store->island, cloth, 4 * amt);
-				add_to_empire_storage(emp, store->island, silver, 2 * amt);
-				LL_DELETE(EMPIRE_STORAGE(emp), store);
-				free(store);
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			HASH_ITER(hh, isle->store, store, next_store) {
+				if (store->vnum == vnum) {
+					amt = store->amount;
+					total += amt;
+					add_to_empire_storage(emp, isle->island, cloth, 4 * amt);
+					add_to_empire_storage(emp, isle->island, silver, 2 * amt);
+					HASH_DEL(isle->store, store);
+					free(store);
+				}
 			}
 		}
 		

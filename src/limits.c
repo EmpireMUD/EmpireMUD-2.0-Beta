@@ -1008,7 +1008,7 @@ static void reduce_city_overage_one(empire_data *emp) {
 		perform_abandon_city(emp, city, FALSE);
 	}
 	
-	save_empire(emp);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 

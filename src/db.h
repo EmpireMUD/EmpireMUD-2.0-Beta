@@ -329,7 +329,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs);
 void read_empire_territory(empire_data *emp, bool check_tech);
 extern empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
-void save_empire(empire_data *e);
+void save_empire(empire_data *e, bool save_all_parts);
 void save_all_empires();
 
 // empire offenses

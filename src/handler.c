@@ -7071,53 +7071,30 @@ void sort_evolutions(sector_data *sect) {
 * @param int amount How much to add
 */
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount) {
-	struct empire_storage_data *temp, *store = find_stored_resource(emp, island, vnum);
+	struct empire_storage_data *store = find_stored_resource(emp, island, vnum);
+	struct empire_island *isle = get_empire_island(emp, island);
 	
-	int old;
-	
-	// nothing to do
-	if (island == NOTHING) {
-		return;
-	}
-	if (amount == 0) {
-		return;
+	if (island == NO_ISLAND || !isle || !amount) {
+		return;	// nothing to do
 	}
 	if (amount < 0 && !store) {
-		// nothing to take
-		return;
+		return;	// nothing to take
 	}
 	
-	if (!store) {
+	if (!store) {	// create storage
 		CREATE(store, struct empire_storage_data, 1);
-		store->next = EMPIRE_STORAGE(emp);
-		EMPIRE_STORAGE(emp) = store;
-
 		store->vnum = vnum;
-		store->island = island;
+		HASH_ADD_INT(isle->store, vnum, store);
 	}
 	
-	old = store->amount;
-	if (amount > 0) {
-		store->amount += amount;
-		if (store->amount > MAX_STORAGE || store->amount < old) {
-			// check wrapping
-			store->amount = MAX_STORAGE;
-		}
-	}
-	else if (amount < 0) {
-		store->amount -= amount;
-		if (store->amount < 0 || store->amount > old) {
-			// check wrapping
-			store->amount = 0;
-		}
-	}
+	SAFE_ADD(store->amount, amount, 0, MAX_STORAGE, FALSE);
 	
-	if (store && store->amount <= 0) {
-		REMOVE_FROM_LIST(store, EMPIRE_STORAGE(emp), next);
+	if (store->amount <= 0) {
+		HASH_DEL(isle->store, store);
 		free(store);
 	}
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 
@@ -7134,50 +7111,52 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 */
 bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list) {
 	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	int this, found = 0;
 	obj_data *proto;
 	
-	// can't charge a negative amount
 	if (amount < 0) {
-		return TRUE;
+		return TRUE;	// can't charge a negative amount
 	}
 	
-	LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
-		if (island != ANY_ISLAND && island != store->island) {
-			continue;
-		}
-		
-		// need obj
-		if (!(proto = obj_proto(store->vnum))) {
-			continue;
-		}
-		
-		// matching component?
-		if (GET_OBJ_CMP_TYPE(proto) != cmp_type || (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) != cmp_flags) {
-			continue;
-		}
-		
-		// ok make it so
-		this = MIN(amount, store->amount);
-		found += this;
-		SAFE_ADD(store->amount, -this, 0, INT_MAX, FALSE);
-		
-		if (build_used_list) {
-			add_to_resource_list(build_used_list, RES_OBJECT, store->vnum, this, 0);
-		}
-		
-		if (store->amount <= 0) {
-			LL_DELETE(EMPIRE_STORAGE(emp), store);
-			free(store);
-		}
-		
-		// done?
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		if (found >= amount) {
-			break;
+			break;	// done early
+		}
+		if (island != ANY_ISLAND && island != isle->island) {
+			continue;	// wrong island
+		}
+		
+		HASH_ITER(hh, isle->store, store, next_store) {
+			// need obj
+			if (!(proto = obj_proto(store->vnum))) {
+				continue;
+			}
+		
+			// matching component?
+			if (GET_OBJ_CMP_TYPE(proto) != cmp_type || (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) != cmp_flags) {
+				continue;
+			}
+		
+			// ok make it so
+			this = MIN(amount, store->amount);
+			found += this;
+			
+			if (build_used_list) {
+				add_to_resource_list(build_used_list, RES_OBJECT, store->vnum, this, 0);
+			}
+			
+			// remove it from the island AFTER being done with store->vnum
+			add_to_empire_storage(emp, isle->island, store->vnum, -this);
+		
+			// done?
+			if (found >= amount) {
+				break;
+			}
 		}
 	}
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	return (found >= amount);
 }
 
@@ -7192,49 +7171,34 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
 bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount) {
-	struct empire_storage_data *store, *next_store, *temp;
-	int old;
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store;
+	int this;
 	
-	// can't charge a negative amount
 	if (amount < 0) {
-		return TRUE;
+		return TRUE;	// can't charge a negative amount
 	}
 	
-	for (store = EMPIRE_STORAGE(emp); store; store = next_store) {
-		next_store = store->next;
-		
-		if (island != ANY_ISLAND && island != store->island) {
-			continue;
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (amount <= 0) {
+			break;	// done early
 		}
-		if (vnum != store->vnum) {
-			continue;
+		if (island != ANY_ISLAND && island != isle->island) {
+			continue;	// wrong island
 		}
 		
-		// ok?
-		old = store->amount;
-		store->amount -= amount;
-		
-		// bounds check
-		if (store->amount > old) {
-			store->amount = 0;
+		HASH_FIND_INT(isle->store, &vnum, store);
+		if (!store) {
+			continue;	// none here
 		}
 		
-		if (store->amount >= 0) {
-			// success
-			amount = 0;
-		}
-		else if (store->amount < 0) {
-			// if it went negative, credit it back to amount
-			amount -= store->amount;
-		}
-	
-		if (store->amount <= 0) {
-			REMOVE_FROM_LIST(store, EMPIRE_STORAGE(emp), next);
-			free(store);
-		}
+		this = MIN(amount, store->amount);
+		amount -= this;
+		
+		add_to_empire_storage(emp, isle->island, vnum, -this);
 	}
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	return (amount <= 0);
 }
 
@@ -7248,21 +7212,21 @@ bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amo
 * @return bool TRUE if it deleted at least 1, FALSE if it deleted 0.
 */
 bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
-	struct empire_storage_data *sto, *next_sto, *temp;
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *sto;
 	int deleted = 0;
 	
-	for (sto = EMPIRE_STORAGE(emp); sto; sto = next_sto) {
-		next_sto = sto->next;
-		
-		if (sto->vnum == vnum) {
-			deleted += sto->amount;
-			REMOVE_FROM_LIST(sto, EMPIRE_STORAGE(emp), next);
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_FIND_INT(isle->store, &vnum, sto);
+		if (sto) {
+			SAFE_ADD(deleted, sto->amount, 0, MAX_INT, FALSE);
+			HASH_DEL(isle->store, sto);
 			free(sto);
 		}
 	}
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
-	return (deleted > 0) ? TRUE : FALSE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	return (deleted > 0);
 }
 
 
@@ -7277,23 +7241,23 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 * @param int amount The number that must be available.
 */
 bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle;
 	obj_data *proto;
 	int found = 0;
 	
-	LL_FOREACH(EMPIRE_STORAGE(emp), store) {
-		if (store->island != island) {
-			continue;
-		}
-		
-		// need obj
+	if (island == NO_ISLAND || !(isle = get_empire_island(emp, island))) {
+		return FALSE;	// shortcut out
+	}
+	
+	HASH_ITER(hh, isle->store, store, next_store) {
 		if (!(proto = obj_proto(store->vnum))) {
-			continue;
+			continue;	// need obj
 		}
 		
 		// is it a match, though?
 		if (GET_OBJ_CMP_TYPE(proto) == cmp_type && (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) == cmp_flags) {
-			found += store->amount;
+			SAFE_ADD(found, store->amount, 0, MAX_INT, FALSE);
 			if (found >= amount) {
 				break;
 			}
@@ -7313,13 +7277,11 @@ bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int
 * @return struct empire_storage_data* The storage entry, or NULL if no matches.
 */
 struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords) {
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle = get_empire_island(emp, island_id);
 	obj_data *proto;
 	
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		if (store->island != island_id) {
-			continue;
-		}
+	HASH_ITER(hh, isle->store, store, next_store) {
 		if (!(proto = obj_proto(store->vnum))) {
 			continue;
 		}
@@ -7336,27 +7298,6 @@ struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, in
 
 
 /**
-* This is used by the einv sorter (sort_storage) to sort by storage locations,
-* where the order of the storage locations on the object won't matter. The
-* return value is not significant other than it can be used to compare two
-* objects and sort their storage locations.
-*
-* @param obj_data *obj Any object.
-* @return int A unique identifier for its lowest storage location.
-*/
-int find_lowest_storage_loc(obj_data *obj) {
-	struct obj_storage_type *store;
-	int loc = MAX_INT;
-	
-	for (store = obj->storage; store; store = store->next) {
-		loc = MIN(loc, store->building_type);
-	}
-	
-	return loc;
-}
-
-
-/**
 * This finds the empire_storage_data object for a given vnum in an empire,
 * IF there is any of that vnum stored to the empire.
 *
@@ -7366,12 +7307,11 @@ int find_lowest_storage_loc(obj_data *obj) {
 * @return struct empire_storage_data* A pointer to the storage object for the empire, if any (otherwise NULL).
 */
 struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum) {
-	struct empire_storage_data *store;
-
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		if (store->island == island && store->vnum == vnum) {
-			return store;
-		}
+	struct empire_storage_data *store = NULL;
+	struct empire_island *isle;
+	
+	if (island != NO_ISLAND && (isle = get_empire_island(emp, island))) {
+		HASH_FIND_INT(isle->store, &vnum, store);
 	}
 	
 	return NULL;
@@ -7387,6 +7327,7 @@ struct empire_storage_data *find_stored_resource(empire_data *emp, int island, o
 * @return int The total number the empire has stored.
 */
 int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping) {
+	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *sto;
 	struct shipping_data *shipd;
 	int count = 0;
@@ -7395,16 +7336,17 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 		return count;
 	}
 	
-	for (sto = EMPIRE_STORAGE(emp); sto; sto = sto->next) {
-		if (sto->vnum == vnum) {
-			SAFE_ADD(count, sto->amount, INT_MIN, INT_MAX, TRUE);
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_FIND_INT(isle->store, &vnum, sto);
+		if (sto) {
+			SAFE_ADD(count, sto->amount, 0, INT_MAX, FALSE);
 		}
 	}
 	
 	if (count_shipping) {
 		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
 			if (shipd->vnum == vnum) {
-				SAFE_ADD(count, shipd->amount, INT_MIN, INT_MAX, TRUE);
+				SAFE_ADD(count, shipd->amount, 0, INT_MAX, FALSE);
 			}
 		}
 	}
@@ -7442,15 +7384,18 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 * @empire_data *emp
 */
 void read_vault(empire_data *emp) {
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	obj_data *proto;
 	
 	EMPIRE_WEALTH(emp) = 0;
-
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		if ((proto = obj_proto(store->vnum))) {
-			if (IS_WEALTH_ITEM(proto)) {
-				EMPIRE_WEALTH(emp) += GET_WEALTH_VALUE(proto) * store->amount;
+	
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_ITER(hh, isle->store, store, next_store) {
+			if ((proto = obj_proto(store->vnum))) {
+				if (IS_WEALTH_ITEM(proto)) {
+					SAFE_ADD(EMPIRE_WEALTH(emp), (GET_WEALTH_VALUE(proto) * store->amount), 0, INT_MAX, FALSE);
+				}
 			}
 		}
 	}
@@ -7503,7 +7448,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
 	}
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
 	// if it ran out, return false to prevent loops
 	return (available > 0);
@@ -7524,7 +7469,7 @@ int store_resource(char_data *ch, empire_data *emp, obj_data *obj) {
 
 	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1);
 	extract_obj(obj);
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
 	return 1;
 }
@@ -7550,6 +7495,7 @@ bool stored_item_requires_withdraw(obj_data *obj) {
 	
 	return FALSE;
 }
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// UNIQUE STORAGE HANDLERS /////////////////////////////////////////////////
@@ -7580,7 +7526,7 @@ void add_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
 		EMPIRE_UNIQUE_STORAGE(emp) = eus;
 	}
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 
@@ -7613,7 +7559,7 @@ bool delete_unique_storage_by_vnum(empire_data *emp, obj_vnum vnum) {
 	}
 	
 	if (any) {
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
 	return any;
 }
@@ -7669,7 +7615,7 @@ void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
 	
 	REMOVE_FROM_LIST(eus, EMPIRE_UNIQUE_STORAGE(emp), next);
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	free(eus);
 }
 
@@ -7744,7 +7690,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		extract_obj(obj);
 	}
 	
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 

@@ -324,6 +324,7 @@ static struct empire_workforce_tracker_island *ewt_find_island(struct empire_wor
 */
 static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
+	struct empire_island *eisle, *next_eisle;
 	struct empire_workforce_tracker *tt;
 	struct empire_storage_data *store;
 	struct shipping_data *shipd;
@@ -335,26 +336,27 @@ static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_v
 		HASH_ADD_INT(EMPIRE_WORKFORCE_TRACKER(emp), vnum, tt);
 		
 		// scan for data
-		for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-			if (store->vnum == vnum) {
-				tt->total_amount += store->amount;
-				isle = ewt_find_island(tt, store->island);
-				isle->amount += store->amount;
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
+			HASH_FIND_INT(eisle->store, &vnum, store);
+			if (store) {
+				SAFE_ADD(tt->total_amount, store->amount, 0, INT_MAX, FALSE);
+				isle = ewt_find_island(tt, eisle->island);
+				SAFE_ADD(isle->amount, store->amount, 0, INT_MAX, FALSE);
 			}
 		}
 	
 		// count shipping, too
 		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
 			if (shipd->vnum == vnum) {
-				tt->total_amount += shipd->amount;
+				SAFE_ADD(tt->total_amount, shipd->amount, 0, INT_MAX, FALSE);
 				
 				if (shipd->status == SHIPPING_QUEUED) {
 					isle = ewt_find_island(tt, shipd->from_island);
-					isle->amount += shipd->amount;
+					SAFE_ADD(isle->amount, shipd->amount, 0, INT_MAX, FALSE);
 				}
 				else {
 					isle = ewt_find_island(tt, shipd->to_island);
-					isle->amount += shipd->amount;
+					SAFE_ADD(isle->amount, shipd->amount, 0, INT_MAX, FALSE);
 				}
 			}
 		}
@@ -581,6 +583,7 @@ void chore_update(void) {
 	void read_vault(empire_data *emp);
 	
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_island *eisle, *next_eisle;
 	vehicle_data *veh, *next_veh;
 	empire_data *emp, *next_emp;
 	
@@ -594,7 +597,9 @@ void chore_update(void) {
 
 		if (EMPIRE_HAS_TECH(emp, TECH_WORKFORCE)) {
 			// sort einv now to ensure it's in a useful order (most quantity first)
-			LL_SORT(EMPIRE_STORAGE(emp), sort_einv);
+			HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
+				HASH_SORT(eisle->store, sort_einv);
+			}
 			
 			// this uses a global next to avoid an issue where territory is freed mid-execution
 			global_next_territory_entry = NULL;
@@ -612,7 +617,6 @@ void chore_update(void) {
 			
 			
 			read_vault(emp);
-			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			
 			// no longer need this -- free up the tracker
 			ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
@@ -1520,14 +1524,16 @@ INTERACTION_FUNC(one_einv_interaction_chore) {
 */
 void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int interact_type) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[chore].mob);
-	struct empire_storage_data *store, *found_store = NULL;
+	struct empire_storage_data *store, *next_store, *found_store = NULL;
 	obj_data *proto, *found_proto = NULL;
 	int islid = GET_ISLAND_ID(room);
+	struct empire_island *eisle;
 	int most_found = -1;
 	
 	// look for something to process
-	LL_FOREACH(EMPIRE_STORAGE(emp), store) {
-		if (store->island != islid || store->amount < 1) {
+	eisle = get_empire_island(emp, islid);
+	HASH_ITER(hh, eisle->store, store, next_store) {
+		if (store->amount < 1) {
 			continue;
 		}
 		if (!(proto = obj_proto(store->vnum))) {
@@ -1554,12 +1560,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		if (run_interactions(worker, found_proto->interactions, interact_type, room, worker, found_proto, one_einv_interaction_chore) && found_store) {
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 			
-			found_store->amount -= 1;
-			
-			if (found_store->amount <= 0) {
-				LL_DELETE(EMPIRE_STORAGE(emp), found_store);
-				free(found_store);
-			}
+			charge_stored_resource(emp, islid, found_store->vnum, 1);
 		}
 		else {
 			// failed to hit any interactions
@@ -1847,9 +1848,10 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 
 
 void do_chore_minting(empire_data *emp, room_data *room) {
-	struct empire_storage_data *highest, *store, *temp;
+	struct empire_storage_data *highest, *store, *next_store;
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_MINTING].mob);
 	int high_amt, limit, islid = GET_ISLAND_ID(room);
+	struct empire_island *eisle = get_empire_island(emp, islid);
 	bool can_do = TRUE;
 	obj_data *orn;
 	obj_vnum vnum;
@@ -1864,11 +1866,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 		// first, find the best item to mint
 		highest = NULL;
 		high_amt = 0;
-		for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-			if (store->island != islid) {
-				continue;
-			}
-			
+		HASH_ITER(hh, eisle->store, store, next_store) {
 			orn = obj_proto(store->vnum);
 			if (orn && store->amount >= 1 && IS_WEALTH_ITEM(orn) && GET_WEALTH_VALUE(orn) > 0 && GET_WEALTH_AUTOMINT(orn)) {
 				if (highest == NULL || store->amount > high_amt) {
@@ -1888,12 +1886,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 			}
 			
 			vnum = highest->vnum;
-			highest->amount = MAX(0, highest->amount - 1);
-			
-			if (highest->amount == 0) {
-				REMOVE_FROM_LIST(highest, EMPIRE_STORAGE(emp), next);
-				free(highest);
-			}
+			charge_stored_resource(emp, islid, highest->vnum, 1);
 			
 			orn = obj_proto(vnum);	// existence of this was pre-validated
 			increase_empire_coins(emp, emp, GET_WEALTH_VALUE(orn) * (1.0/COIN_VALUE));
