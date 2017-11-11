@@ -2067,8 +2067,8 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade, *last_trade = NULL;
-	struct empire_log_data *elog, *last_log = NULL;
-	struct offense_data *off, *last_off = NULL;
+	struct empire_log_data *elog;
+	struct offense_data *off;
 	struct empire_city_data *city;
 	struct empire_island *isle;
 	room_data *room;
@@ -2192,7 +2192,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				}
 				break;
 			}
-			case 'L': {	// logs
+			case 'L': {	// NOTE: logs are here for backwards-compatibility -- they are now loaded by load_empire_logs_one
 				if (!get_line(fl, line) || sscanf(line, "%d %d", &t[0], &t[1]) != 2) {
 					log("SYSERR: Format error in L line of empire %d", vnum);
 					exit(1);
@@ -2202,16 +2202,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				elog->type = t[0];
 				elog->timestamp = (time_t) t[1];
 				elog->string = fread_string(fl, buf2);
-				elog->next = NULL;
-				
-				// append to end to preserve original order
-				if (last_log) {
-					last_log->next = elog;
-				}
-				else {
-					emp->logs = elog;
-				}
-				last_log = elog;
+				LL_APPEND(emp->logs, elog);
 				break;
 			}
 			case 'M': {	// motd
@@ -2268,7 +2259,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				}
 				break;
 			}
-			case 'W': {	// offenses
+			case 'W': {	// NOTE: offenses are here for backwards-compatibility -- they are now loaded by load_empire_logs_one
 				if (sscanf(line, "W %d %d %d %ld %d %d %s", &t[0], &t[1], &t[2], &long_in, &t[4], &t[5], str_in) != 7) {
 					log("SYSERR: W line of empire %d does not scan (ignoring).\r\n", emp->vnum);
 				}
@@ -2281,15 +2272,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				off->x = t[4];
 				off->y = t[5];
 				off->flags = asciiflag_conv(str_in);
-				
-				if (last_off) {
-					last_off->next = off;
-				}
-				else {
-					EMPIRE_OFFENSES(emp) = off;
-				}
-				
-				last_off = off;
+				LL_APPEND(EMPIRE_OFFENSES(emp), off);
 				break;
 			}
 			case 'X': { // trade
