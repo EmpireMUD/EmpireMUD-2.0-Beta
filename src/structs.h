@@ -4233,11 +4233,14 @@ struct empire_data {
 	time_t last_logon;	// time of last member's last logon
 	int scores[NUM_SCORES];	// empire score in each category
 	int sort_value;	// for score ties
-	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
 	
+	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
+	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
+	
 	bool needs_save;	// for things that delay-save
+	bool needs_logs_save;	// for logs/offenses that delay-save
 	bool needs_storage_save;	// for storage delay-save
 	
 	UT_hash_handle hh;	// empire_table hash handle

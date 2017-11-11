@@ -548,7 +548,7 @@ void boot_world(void) {
 	log("Loading instances.");
 	load_instances();
 	
-	log("Loading empire storage.");
+	log("Loading empire storage and logs.");
 	load_empire_storage();
 	
 	log("Loading daily quest cycles.");

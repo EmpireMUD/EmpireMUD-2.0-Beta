@@ -99,6 +99,7 @@
 #define HLP_PREFIX  LIB_TEXT"help/"	// for HELP <keyword>
 #define INTROS_PREFIX  LIB_TEXT"intros/"	// for intro screens
 #define BOOK_PREFIX  "books/"	// for books.c
+#define ELOG_PREFIX  LIB_EMPIRE"logs/"	// for empire logs
 #define STORAGE_PREFIX  LIB_EMPIRE"storage/"	// for empire storage
 
 // library file suffixes
