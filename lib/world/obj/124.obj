@@ -1,0 +1,163 @@
+#12400
+cave large~
+the cave~
+A large cave opens beneath a hill on the seaside (adventure).~
+The cave is hard to see until you're almost right on top of it.
+~
+8 0 0 2
+-1 0 0
+1 0
+S
+#12401
+cave exit mouth~
+the cave exit~
+The mouth of the cave opens back out to the seashore.~
+You can see the ocean.
+~
+8 0 0 3
+-1 0 0
+1 0
+T 12401
+S
+#12402
+portal swirling~
+a swirling portal~
+A swirling portal has opened in the floor, and the water is draining through it.~
+Despite how much water is flowing through the portal, the outside looks dry.
+~
+8 0 0 1
+-1 0 0
+10 0
+S
+#12404
+fillet fish~
+a fillet of fish~
+A fillet of fish is stinking on the ground.~
+   This raw fillet looks good enough to eat, but you could also cook it into
+something even better.
+~
+6 0 a 1
+6 0 0
+7 24
+O
+17 lt
+R
+5119 0
+S
+#12405
+rock large suspicious~
+the suspicious rock~
+A large, suspicious rock blocks the path (difficulty).~
+   The rock looks like it blocks the path, but on closer inspection you see
+there's an easy way around it. You just have to set the difficulty for the
+adventure to get by...
+Usage:  difficulty <normal | hard>
+~
+3 0 0 2
+0 0 0
+1 0
+T 12405
+S
+#12406
+bubble magical~
+the magical bubble~
+A magical bubble barely holds back the sea water!~
+The bubble cast by the sea witch looks like it won't hold for long.
+~
+3 0 0 2
+0 0 0
+10 0
+S
+#12407
+seaweed weed~
+some seaweed~
+Some seaweed is piled here.~
+The seaweed is a bit slimy, but edible.
+~
+6 0 a 1
+4 0 0
+0 72
+O
+27 bt
+S
+#12408
+creature sea spawner~
+a sea creature~
+A sea creature is floating here.~
+This item is supposed to summon a sea creature. You shouldn't see this.
+~
+3 0 0 1
+0 0 0
+1 0
+T 12408
+S
+#12409
+breath~
+your breath~
+Your breath is here, and it is breathtaking.~
+~
+3 p a 1
+0 0 0
+10 2
+T 12406
+S
+#12410
+fish fillet crispy~
+a crispy fillet of fish~
+A crispy fillet of fish is lying here.~
+The fish has been seasoned to perfection.
+~
+6 m a 7
+24 0 0
+7 336
+A
+2 1 0
+C
+1 1
+R
+5619 0
+S
+#12411
+garb pirate dread~
+dread pirate garb~
+Some pirate garb is lying here.~
+This is all the gear you'd need to be a fearsome pirate.
+~
+2 p ad 1
+0 0 0
+7 0
+A
+5 1 0
+M
+12
+The dread pirate $n stands with $s hands on $s hips.~
+S
+#12412
+hat tricorne black~
+a black tricorne hat~
+A black tricorne hat is lying here.~
+This fearsome naval hat would make you the envy of the many seas.
+~
+2 mp ae 2
+0 0 0
+7 0
+A
+4 1 0
+A
+5 1 3
+C
+50 175
+T 12412
+S
+#12443
+monster sea spawner~
+a sea monster~
+A sea monster is floating here.~
+This item is supposed to summon a sea creature. You shouldn't see this.
+~
+3 0 0 4
+0 0 0
+1 0
+T 12443
+S
+$

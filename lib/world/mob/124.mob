@@ -1,0 +1,395 @@
+#12400
+crab rock~
+a rock crab~
+A rock crab picks at bits of seaweed with its claws.
+~
+0 50 bdj 0
+0 0 0 10
+S
+#12401
+goblin pirate~
+a goblin pirate~
+A goblin pirate is washing the side of the ship.
+~
+0 0 bd 0
+1 0 0 1
+F 12401
+M
+1
+Always Bub have to clean the ship...~
+M
+1
+Never Smeegle doing dirty work.~
+M
+1
+Bub want grub.~
+M
+1
+Greenbeard going to be Nobeard soon.~
+M
+1
+Yo ho ho but me ain't got no rum.~
+T 12403
+S
+#12402
+deckhand hand human~
+the deckhand~
+A human deckhand is chained to the side of the ship.
+~
+0 0 bdv 0
+1 0 0 15
+M
+0
+$n swabs the deck.~
+M
+0
+$n scrubs the poop deck.~
+M
+0
+$n twitches at the sound of one of the goblins shouting.~
+M
+1
+Please free me.~
+M
+1
+Oh I'll never get back to Martha if some brave adventurer doesn't free me soon.~
+M
+1
+Any chance you could set me free?~
+M
+0
+$n yearns for freedom.~
+T 12402
+S
+#12403
+Smeegle goblin quartermaster master~
+Quartermaster Smeegle~
+Smeegle, the goblin quartermaster, is walking around with a list.
+~
+0 0 bd 0
+1 0 0 4
+F 12401
+M
+1
+Shiver me teeny timbers!~
+M
+1
+Splice the mainbrace!~
+M
+0
+$n paces back and forth on the deck.~
+M
+1
+But why is the rum gone?~
+M
+1
+Filthy humanses...~
+T 12418
+T 12419
+T 12420
+T 12421
+T 12441
+T 12403
+S
+#12404
+Hornswaggle first mate~
+First Mate Hornswaggle~
+Hornswaggle, the Golden Goblin's first mate, stands ready to fight!
+~
+0 0 bdy 0
+1 0 0 7
+F 12401
+M
+1
+If it's a fighte ye want, it's a fight ye'll get!~
+M
+1
+Thar she blows!~
+M
+1
+Don't worry, ye'll be buried at sea and forgotten!~
+M
+1
+Prepare the hempen halter!~
+T 12418
+T 12419
+T 12420
+T 12421
+T 12441
+T 12403
+S
+#12405
+Greenbeard captain~
+Captain Greenbeard~
+Captain Greenbeard stands on the aftercastle, sword held high!
+~
+0 0 bdyz 0
+1 0 0 1
+F 12401
+M
+1
+It'll be a cold day in Dobby Jonez's locker when I let the likes of ye take me treasure!~
+M
+1
+I swear to Gobseiden ye'll be buried 'neath the waves!~
+M
+1
+Make ready yer steel and come at me!~
+M
+1
+Ye'll dance the hempen jig ere daybreak!~
+T 12418
+T 12419
+T 12420
+T 12422
+T 12441
+T 12403
+S
+#12406
+Fathma goblin sorceress~
+Fathma~
+Fathma, goblin sorceress of the deep, holds her wand high!
+~
+0 0 bdxyz 0
+2 0 0 21
+F 12401
+M
+1
+I admit that in the past I've been a nasty.~
+M
+1
+You poor unfortunate soul.~
+M
+0
+$n seems to struggle to keep the air bubble from collapsing.~
+M
+0
+$n stitches tiny leaks in the air bubble with her wand.~
+M
+1
+I hope you brought some food because there is no way out of this cavern.~
+M
+1
+We're all stuck down here.~
+M
+1
+You're lucky you survived Charybdis. The last adventurers didn't make it.~
+T 12435
+T 12436
+T 12437
+T 12438
+T 12441
+T 12442
+T 12444
+S
+#12407
+#n deckhand hand human~
+deckhand #n~
+#n has been freed from his shackles.
+~
+0 0 bdv 0
+1 0 0 15
+M
+1
+Thank you for freeing me.~
+M
+1
+I can't wait to get back to Martha on the farm.~
+M
+1
+I have some old goblin junk to sell.~
+M
+0
+$n dances freely about the deck.~
+S
+#12408
+octopus blue-ringed ringed~
+a blue-ringed octopus~
+A blue-ringed octopus clings to the wall and flashes warning colors.
+~
+0 0 bdj 0
+0 0 6 7
+I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+M
+0
+$n flashes brightly at you.~
+M
+0
+$n spurts ink at you.~
+M
+0
+$n crawls toward you.~
+T 12409
+S
+#12409
+anglerfish fish toothy ball light~
+a toothy anglerfish~
+A ball of light dances in the shadows.
+~
+0 0 bdj 0
+0 0 6 9
+I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+M
+0
+The ball of light bobs back and forth.~
+M
+0
+You can't take your eyes of the mesmerizing little ball of light.~
+T 12409
+S
+#12410
+eel wolf~
+a wolf eel~
+A wolf eel pokes its head out from a crevice.
+~
+0 0 bdj 0
+0 0 6 9
+I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+M
+0
+$n snaps its jaw.~
+M
+0
+$n slithers around you and then darts back to its crevice.~
+M
+0
+$n watches you carefully.~
+T 12409
+S
+#12411
+snake sea banded~
+a banded sea snake~
+A banded sea snake coils around your legs.
+~
+0 0 bdj 0
+0 0 6 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+M
+0
+$n is a little too close for comfort.~
+T 12409
+S
+#12414
+orca war armored~
+a war orca~
+An armored war orca blocks your way!
+~
+0 0 bdjy 0
+0 0 6 9
+M
+0
+$n bares its teeth at you.~
+M
+0
+$n drifts closer and closer to you.~
+T 12409
+S
+#12415
+squid giant~
+a giant squid~
+A giant squid fills the cavern!
+~
+0 0 bdjy 0
+0 0 6 7
+I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+M
+0
+$n snaps its beak menacingly.~
+M
+0
+$n's long tentacle begins to coil around you.~
+M
+0
+$n spreads out as if to block your path.~
+T 12409
+S
+#12416
+mermidon myrmidon warrior~
+a mermidon warrior~
+A mermidon warrior aims her trident at you!
+~
+0 0 bdvy 0
+2 0 6 3
+M
+0
+$n spins her trident to block your path.~
+M
+1
+My father will hear of this.~
+M
+1
+How dare you enter this cavern, air-breather!~
+M
+1
+Tonight your name is sushi.~
+T 12409
+S
+#12419
+hydra serpent massive nine-headed~
+the Hydra~
+A massive, nine-headed serpent slithers out of the pool.
+~
+0 0 bdyA 0
+0 0 6 9
+M
+0
+Hisses echo from each of $n's heads.~
+M
+0
+$n stretches its long necks to the sides, surrounding you.~
+M
+0
+$n sniffs at your face with two of its massive heads.~
+M
+0
+Your skin starts to itch as some toxic substance fills the water.~
+M
+0
+$n moves to block the entrance.~
+T 12423
+T 12424
+T 12425
+T 12426
+T 12431
+T 12439
+T 12409
+S
+#12420
+scylla silla sylla~
+Scylla~
+Scylla floats in the center of the chamber as water swirls around her!
+~
+0 0 bdzA 0
+2 0 6 7
+M
+0
+$n circles around the chamber.~
+M
+0
+$n sings a sweet song, and your eyelids become heavy.~
+M
+0
+$n bares her sharp teeth at you.~
+M
+1
+By Lamia and Poseidon, you will die!~
+M
+1
+You have come to the wrong place.~
+M
+1
+How long can you breathe here before your lungs fill with sea water and your soul falls to Hades?~
+M
+1
+You would have died quicker to Charybdis. This is going to last a while.~
+T 12427
+T 12428
+T 12429
+T 12430
+T 12431
+T 12432
+T 12433
+T 12434
+T 12439
+S
+$
