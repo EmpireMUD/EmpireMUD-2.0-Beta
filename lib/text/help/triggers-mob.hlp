@@ -374,6 +374,7 @@ When using field  - The variable returns:
 &cclass&0 - The actor's class, as a string.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
+&ccompleted_quest_instance(vnum)&0 - Has completed it in the current instance.
 &ccooldown(vnum)&0 - Gets the character's current cooldown time (seconds).
 &ccrafting_level&0 - The actor's crafting level.
 &ccurrency(vnum)&0 - The amount of an adventure currency that a player has.
