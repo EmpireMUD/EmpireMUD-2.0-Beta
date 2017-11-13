@@ -8,6 +8,7 @@ if you are willing to explore it.
 cd 0 0
 M 1 12405 100.00 1
 M 0 12400 100.00 1
+T 12400
 S
 #12401
 Beneath a Small Ship~
@@ -110,7 +111,7 @@ Backtracking Toward the Start~
 air bubble before your breath runs out. It looks like you found the right way
 as you can hear the goblin sea witch chanting in the distance.
 ~
-bdg 0 0
+cdg 0 0
 D2
 ~
 0 12406
@@ -138,6 +139,7 @@ D14
 M 1 12408 100.00 8
 T 12413
 T 12410
+T 12407
 S
 #12409
 A Flooded Cavern~
@@ -161,6 +163,7 @@ D14
 M 1 12443 100.00 3
 T 12413
 T 12410
+T 12407
 S
 #12410
 A Flooded Cavern~
@@ -184,6 +187,7 @@ D14
 M 1 12408 100.00 8
 T 12413
 T 12410
+T 12407
 S
 #12411
 A Flooded Cavern~
@@ -207,6 +211,7 @@ D14
 M 1 12408 100.00 8
 T 12413
 T 12410
+T 12407
 S
 #12412
 A Flooded Cavern~
@@ -230,6 +235,7 @@ D14
 M 1 12408 100.00 8
 T 12413
 T 12410
+T 12407
 S
 #12413
 A Flooded Cavern~
@@ -253,6 +259,7 @@ D14
 M 1 12408 100.00 8
 T 12413
 T 12410
+T 12407
 S
 #12414
 A Flooded Cavern~
@@ -275,6 +282,7 @@ D14
 0 12413
 T 12413
 T 12410
+T 12407
 S
 #12415
 A Flooded Cavern~
@@ -298,6 +306,7 @@ D1
 M 1 12408 100.00 8
 T 12413
 T 12410
+T 12407
 S
 #12416
 A Flooded Cavern~
@@ -321,6 +330,7 @@ D14
 M 1 12408 100.00 8
 T 12413
 T 12410
+T 12407
 S
 #12417
 A Flooded Cavern~
@@ -343,6 +353,7 @@ D14
 0 12414
 T 12413
 T 12410
+T 12407
 S
 #12418
 A Flooded Cavern~
@@ -366,6 +377,7 @@ D14
 M 1 12408 100.00 8
 T 12413
 T 12410
+T 12407
 S
 #12419
 A Grand Cavern~
@@ -384,6 +396,7 @@ The pool looks briny and dark.
 ~
 M 0 12419 100.00 1
 T 12413
+T 12407
 S
 #12420
 A Grand Cavern~
@@ -391,7 +404,7 @@ A Grand Cavern~
 gold and bones, both from humans and from animals. There appears to be no exit
 from this room except the way you came.
 ~
-bg 0 0
+cg 0 0
 D2
 ~
 0 12418
@@ -403,5 +416,6 @@ you.
 ~
 M 0 12420 100.00 1
 T 12413
+T 12407
 S
 $

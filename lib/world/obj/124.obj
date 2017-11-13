@@ -11,10 +11,10 @@ S
 #12401
 cave exit mouth~
 the cave exit~
-The mouth of the cave opens back out to the seashore.~
+The mouth of the cave opens back out to the seashore (exit).~
 You can see the ocean.
 ~
-8 0 0 3
+8 0 0 4
 -1 0 0
 1 0
 T 12401
@@ -28,6 +28,17 @@ Despite how much water is flowing through the portal, the outside looks dry.
 8 0 0 1
 -1 0 0
 10 0
+S
+#12403
+barrel old~
+an old barrel~
+An old barrel is stacked here.~
+   This old barrel is stained green along the edges of its planks. The letters
+X X X X are scratched into the side.
+~
+5 ep a 2
+224 168 12402
+0 0
 S
 #12404
 fillet fish~
@@ -148,6 +159,71 @@ A
 C
 50 175
 T 12412
+S
+#12413
+pattern black tricorne hat~
+the black tricorne hat pattern~
+The black tricorne hat pattern is on the ground.~
+This pattern will teach you to sew: black tricorne hat.
+~
+7 0 a 1
+12412 0 0
+0 0
+S
+#12414
+fat orca lump~
+fat of orca~
+A lump of orca fat is lying on the ground.~
+This huge, disgusting lump of fat appears to have come from an orca.
+~
+3 k a 3
+0 0 0
+7 48
+S
+#12415
+tentacle squid~
+tentacle of squid~
+A squid tentacle is lying here.~
+This long, thin, slimy tentacle came from some unfortunate giant squid.
+~
+3 k a 4
+0 0 0
+7 48
+S
+#12416
+eye mermaid's mermaids~
+eye of mermaid~
+A mermaid's eye is lying on the ground.~
+   You're not sure who would pluck the eye from a mermaid, not what they'd use
+it for.
+~
+3 k a 3
+0 0 0
+7 48
+S
+#12417
+whistle parrot~
+a parrot whistle~
+A parrot whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+12417 0 0
+0 0
+T 9900
+S
+#12418
+conch hydra~
+a hydra conch~
+A hydra conch is lying here.~
+This conch can summon a noncombat pet!
+Type 'use conch' to summon it.
+~
+3 p a 5
+12418 0 0
+0 0
+T 9900
 S
 #12443
 monster sea spawner~

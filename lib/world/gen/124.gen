@@ -3,6 +3,38 @@ goblin pirate cave enemy ability~
 3 0
 0 0 0 0
 S
+#12402
+golden goblin grog~
+1 0
+4 2 2 0
+T0
+golden goblin grog~
+T1
+seasick green~
+S
+#12403
+goblin coins~
+5 0
+0 0 0 0
+T0
+goblin coin~
+T1
+goblin coins~
+S
+#12417
+parrot whistle~
+3 0
+0 0 0 0
+T0
+Your parrot whistle cooldown has ended.~
+S
+#12418
+hydra conch~
+3 0
+0 0 0 0
+T0
+Your hydra conch cooldown has ended.~
+S
 #12419
 ankle stab~
 4 0

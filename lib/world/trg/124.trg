@@ -75,24 +75,6 @@ while %person%
   eval person %person.next_in_room%
 done
 ~
-#12404
-Goblin speech~
-0 g 100
-~
-if %self.varexists(intro_done)%
-  if %self.intro_done%
-    halt
-  end
-end
-dg_affect %self% !ATTACK on 60
-eval intro_done 1
-remote intro_done %self.id%
-wait 5
-say Things
-wait 3 sec
-say More things
-dg_affect %self% !ATTACK off
-~
 #12405
 Underwater Cave difficulty select~
 1 c 4
@@ -177,6 +159,21 @@ if %actor.varexists(breath)%
   end
 end
 %purge% %self%
+~
+#12407
+Goblin cove: Collect seaweed~
+2 c 0
+pick~
+if %depleted%
+  %send% %actor% You can't find any seaweed here.
+  halt
+end
+set depleted 1
+global depleted
+%load% obj 12407 %actor% inv
+eval item %actor.inventory(12407)%
+%send% %actor% Searching the cavern, you find %item.shortdesc%.
+%echoaround% %actor% %actor.name% searches the cavern and finds %item.shortdesc%.
 ~
 #12408
 Goblin Cove trash spawner~
@@ -389,6 +386,15 @@ while %person%
   eval person %next_person%
 done
 ~
+#12417
+Parrot script~
+0 dt 0
+*~
+if %random.2% == 2
+  wait 5
+  say Awk! %speech%
+end
+~
 #12418
 Goblin Pirate: Flintlock Pistol~
 0 k 25
@@ -598,7 +604,7 @@ while %person%
 done
 ~
 #12429
-Scylla: Tail Slam~
+Scylla: Pressure Wave~
 0 k 50
 ~
 if %self.cooldown(12400)%
@@ -614,9 +620,10 @@ eval person %room.people%
 while %person%
   eval test %%person.is_enemy(%self%)%%
   if %test%
-    dg_affect #12429 %person% SLOW on 10
-    dg_affect #12429 %person% DODGE -25 10
-    dg_affect #12429 %person% TO-HIT -25 10
+    dg_affect #12429 %person% SLOW on 20
+    eval amount %self.level% / 5
+    dg_affect #12429 %person% RESIST-PHYSICAL -%amount% 20
+    dg_affect #12429 %person% RESIST-MAGICAL -%amount% 20
   end
   eval person %person.next_in_room%
 done
@@ -705,7 +712,7 @@ while %cycle% <= 4
   end
   eval running 1
   remote running %self.id%
-  wait 5 sec
+  wait 6 sec
   eval running 0
   remote running %self.id%
   eval room %self.room%

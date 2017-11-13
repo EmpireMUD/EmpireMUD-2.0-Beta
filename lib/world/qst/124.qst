@@ -1,0 +1,43 @@
+#12403
+Lumber for the Golden Goblin~
+This quest has no description.
+~
+You have completed the quest.
+~
+2 bcd 50 150 -1
+A
+1 12403
+P
+16 12401 0 1 a
+R
+7 12401 5
+T 12411
+W
+1 16 0 12 a
+W
+16 12401 0 1 a
+Z
+1 12403
+S
+#12404
+Nails for the Golden Goblin~
+This quest has no description.
+~
+You have completed the quest.
+~
+3 bcd 50 150 -1
+A
+1 12403
+P
+16 12401 0 1 a
+R
+7 12401 5
+T 12411
+W
+1 19 0 12 a
+W
+16 12401 0 1 a
+Z
+1 12403
+S
+$

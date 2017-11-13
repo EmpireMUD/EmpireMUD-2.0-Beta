@@ -66,7 +66,7 @@ Smeegle goblin quartermaster master~
 Quartermaster Smeegle~
 Smeegle, the goblin quartermaster, is walking around with a list.
 ~
-0 0 bd 0
+0 0 bd c
 1 0 0 4
 F 12401
 M
@@ -96,7 +96,7 @@ Hornswaggle first mate~
 First Mate Hornswaggle~
 Hornswaggle, the Golden Goblin's first mate, stands ready to fight!
 ~
-0 0 bdy 0
+0 0 bdy c
 1 0 0 7
 F 12401
 M
@@ -123,7 +123,7 @@ Greenbeard captain~
 Captain Greenbeard~
 Captain Greenbeard stands on the aftercastle, sword held high!
 ~
-0 0 bdyz 0
+0 0 bdyz c
 1 0 0 1
 F 12401
 M
@@ -150,7 +150,7 @@ Fathma goblin sorceress~
 Fathma~
 Fathma, goblin sorceress of the deep, holds her wand high!
 ~
-0 0 bdxyz 0
+0 0 bdxyz c
 2 0 0 21
 F 12401
 M
@@ -207,7 +207,7 @@ octopus blue-ringed ringed~
 a blue-ringed octopus~
 A blue-ringed octopus clings to the wall and flashes warning colors.
 ~
-0 0 bdj 0
+0 0 bdj c
 0 0 6 7
 I 0 12404 100.00 1  # BUTCHER: a fillet of fish
 M
@@ -226,7 +226,7 @@ anglerfish fish toothy ball light~
 a toothy anglerfish~
 A ball of light dances in the shadows.
 ~
-0 0 bdj 0
+0 0 bdj c
 0 0 6 9
 I 0 12404 100.00 1  # BUTCHER: a fillet of fish
 M
@@ -242,7 +242,7 @@ eel wolf~
 a wolf eel~
 A wolf eel pokes its head out from a crevice.
 ~
-0 0 bdj 0
+0 0 bdj c
 0 0 6 9
 I 0 12404 100.00 1  # BUTCHER: a fillet of fish
 M
@@ -261,7 +261,7 @@ snake sea banded~
 a banded sea snake~
 A banded sea snake coils around your legs.
 ~
-0 0 bdj 0
+0 0 bdj c
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 M
@@ -274,8 +274,9 @@ orca war armored~
 a war orca~
 An armored war orca blocks your way!
 ~
-0 0 bdjy 0
+0 0 bdjy c
 0 0 6 9
+I 4 12414 100.00 2  # LOOT: fat of orca
 M
 0
 $n bares its teeth at you.~
@@ -289,9 +290,10 @@ squid giant~
 a giant squid~
 A giant squid fills the cavern!
 ~
-0 0 bdjy 0
+0 0 bdjy c
 0 0 6 7
 I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+I 4 12415 100.00 2  # LOOT: tentacle of squid
 M
 0
 $n snaps its beak menacingly.~
@@ -308,8 +310,9 @@ mermidon myrmidon warrior~
 a mermidon warrior~
 A mermidon warrior aims her trident at you!
 ~
-0 0 bdvy 0
+0 0 bdvy c
 2 0 6 3
+I 4 12416 100.00 2  # LOOT: eye of mermaid
 M
 0
 $n spins her trident to block your path.~
@@ -324,12 +327,48 @@ M
 Tonight your name is sushi.~
 T 12409
 S
+#12417
+parrot~
+the parrot~
+A parrot with an eyepatch is watching you with its good eye.
+~
+1 1 bdoD mn
+0 0 2 9
+T 9901
+T 9902
+T 12417
+S
+#12418
+hydra tiny~
+a tiny hydra~
+A tiny hydra is rolling around on the ground.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+One of $n's heads snaps at another.~
+M
+0
+$n grows another head.~
+M
+0
+$n's many heads hiss at you in unison.~
+M
+0
+$n somersaults around your feet.~
+M
+0
+$n drools from all of its mouths.~
+T 9901
+T 9902
+S
 #12419
 hydra serpent massive nine-headed~
 the Hydra~
-A massive, nine-headed serpent slithers out of the pool.
+A massive nine-headed serpent slithers out of the pool.
 ~
-0 0 bdyA 0
+0 0 bdyA c
 0 0 6 9
 M
 0
@@ -359,7 +398,7 @@ scylla silla sylla~
 Scylla~
 Scylla floats in the center of the chamber as water swirls around her!
 ~
-0 0 bdzA 0
+0 0 bdzA c
 2 0 6 7
 M
 0
