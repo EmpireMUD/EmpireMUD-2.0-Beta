@@ -36,8 +36,8 @@ An old barrel is stacked here.~
    This old barrel is stained green along the edges of its planks. The letters
 X X X X are scratched into the side.
 ~
-5 ep a 2
-224 168 12402
+5 ep a 3
+224 224 12402
 0 0
 S
 #12404
@@ -224,6 +224,145 @@ Type 'use conch' to summon it.
 12418 0 0
 0 0
 T 9900
+S
+#12419
+feast deep-sea deepsea sea delights~
+the deep-sea feast~
+A feast of deep-sea delights has been spread here.~
+The bounty of deep-sea creatures is impressive. This feast will boost casters.
+~
+6 m 0 5
+96 0 0
+7 336
+A
+17 1 0
+A
+9 1 0
+A
+22 1 0
+C
+0 175
+M
+4
+You fill yourself on the bountiful seafood.~
+S
+#12420
+recipe deep-sea feast~
+the deep-sea feast recipe~
+The deep-sea feast recipe is on the ground.~
+This recipe will teach you to cook: deep-sea feast.
+~
+7 0 a 1
+12419 0 0
+0 0
+S
+#12422
+shell raging kraken~
+a raging kraken shell~
+A raging kraken shell is lying here.~
+   This epic seashell has the Mark of the Kraken etched into the side of it. 
+Type 'use kraken' to summon this aquatic mount.
+~
+3 p a 5
+12422 0 0
+14 0
+T 10263
+S
+#12423
+shell giant albatross~
+an albatross shell~
+A giant albatross shell is lying here.~
+   This epic seashell has the Mark of the Albatross painted on the side of it.
+Type 'use albatross' to summon this flying mount.
+~
+3 p a 6
+12423 0 0
+14 0
+T 10263
+S
+#12424
+figurehead lucky goblin~
+a lucky goblin figurehead~
+A lucky goblin figurehead is lying here.~
+   This sturdy piece of timber has been carved into a lady goblin, to be used
+in the manufacture of a goblin smuggler's hulk. These reputable ships are good
+for hiding extra cargo. You need the Advanced Ships ability and an upgraded
+shipyard.
+~
+15 e a 3
+8 0 0
+0 0
+M
+0
+You smile with goblin-like glee as you begin your goblin hulk.~
+M
+6
+You smile with goblin-like glee as you begin your goblin hulk.~
+M
+1
+$n smiles like a goblin as $e begins work on the goblin hulk.~
+M
+7
+$n smiles like a goblin as $e begins work on the goblin hulk.~
+R
+5193 0
+R
+5621 0
+S
+#12425
+sails dread goblin~
+dread goblin sails~
+The dread goblin sails are folded up here.~
+   This pile of black sails are emblazoned with a red skull and a pair of
+goblin pistols. It is sure to stoke fear in the hearts of all who see it. You
+will need the Advanced Ships ability and an upgraded shipyard to manufacture
+the goblin pirate ship.
+~
+15 e a 4
+8 0 0
+11 0
+M
+0
+You hang the dread goblin sails and begin work on the ship.~
+M
+6
+You hang the dread goblin sails and begin work on the ship.~
+M
+1
+$n hangs dread goblin sails and begins work on a ship.~
+M
+7
+$n hangs dread goblin sails and begins work on a ship.~
+R
+5193 0
+R
+5621 0
+S
+#12426
+plans dock cliffside~
+cliffside dock plans~
+There are some cliffside dock plans here.~
+   These plans allow you to build the cliffside docks. This will allow you to
+securely dock your ships where the mountains meet the sea, and these docks
+cannot be burned.
+Usage:  build cliffdocks <direction>
+~
+3 0 a 2
+0 0 0
+0 0
+S
+#12427
+plans wharf smuggler's smugglers~
+smuggler's wharf plans~
+There are some plans for a smuggler's wharf here.~
+   These plans will allow you to build a smuggler's wharf -- a docks building
+that can't be seen from a distance. You require the Seafaring ability to make
+this.
+Usage:  build smugglerswharf <direction>
+~
+3 0 a 2
+0 0 0
+0 0
 S
 #12443
 monster sea spawner~

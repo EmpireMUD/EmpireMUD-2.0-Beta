@@ -211,7 +211,7 @@ end
 Underwater cave mob block~
 0 s 100
 ~
-if (%actor.nohassle% || %direction% == south || %actor.on_quest(12406)%)
+if (%actor.nohassle% || %direction% == south || %actor.on_quest(12406)% || %actor.on_quest(12407)% || %actor.on_quest(12408)% || %actor.on_quest(12409)%)
   halt
 end
 %send% %actor% %self.name% won't let you pass!
@@ -990,7 +990,10 @@ end
 if %actor.completed_quest_instance(12408)% || %questvnum% == 12408
   set done_3 1
 end
-if %done_1% && %done_2% && %done_3%
+if %actor.completed_quest_instance(12409)% || %questvnum% == 12409
+  set done_4 1
+end
+if %done_1% && %done_2% && %done_3% && %done_4%
   * already a portal?
   eval room %self.room%
   eval obj %room.contents%

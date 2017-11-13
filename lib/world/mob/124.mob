@@ -276,6 +276,7 @@ An armored war orca blocks your way!
 ~
 0 0 bdjy c
 0 0 6 9
+I 0 3012 100.00 8  # BUTCHER: a fillet of raw meat
 I 4 12414 100.00 2  # LOOT: fat of orca
 M
 0
@@ -368,7 +369,7 @@ hydra serpent massive nine-headed~
 the Hydra~
 A massive nine-headed serpent slithers out of the pool.
 ~
-0 0 bdyA c
+0 0 bdjyA c
 0 0 6 9
 M
 0
@@ -430,5 +431,45 @@ T 12432
 T 12433
 T 12434
 T 12439
+S
+#12422
+kraken raging rages~
+a raging kraken~
+A kraken rages violently in the water!
+~
+100 125 del 0
+0 0 6 7
+I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+S
+#12423
+albatross giant~
+a giant albatross~
+A giant albatross with a saddle circles overhead!
+~
+100 125 dej m
+0 0 2 9
+I 0 3200 100.00 3  # BUTCHER: a cut of poultry
+S
+#12426
+dockmaster master goblin~
+the goblin dockmaster~
+A goblin dockmaster is pacing with a clipboard.
+~
+30 60 bdqv 0
+1 0 0 15
+M
+1
+Back to work!~
+S
+#12427
+deckhand hand goblin~
+a goblin deckhand~
+A goblin deckhand is standing here.
+~
+20 50 dqv 0
+1 0 0 15
+M
+1
+Shiver me teeny timbers!~
 S
 $
