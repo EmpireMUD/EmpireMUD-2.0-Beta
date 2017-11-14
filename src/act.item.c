@@ -2034,7 +2034,7 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	
 	// charge resources
 	charge_stored_resource(emp, from_island, vnum, number);
-	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
 	// messaging
 	isle = get_island(to_island, TRUE);
@@ -2103,7 +2103,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	
 	if ((dock = find_docks(emp, shipd->to_island))) {
 		// unload the shipment at the destination
-		if (shipd->vnum != NOTHING && shipd->amount > 0) {
+		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
 			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name);
 			add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
 		}
@@ -2113,7 +2113,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	}
 	else {
 		// no docks -- unload the shipment at home
-		if (shipd->vnum != NOTHING && shipd->amount > 0) {
+		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
 			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name);
 			add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
 		}
@@ -2501,7 +2501,7 @@ void process_shipping_one(empire_data *emp) {
 	}
 	
 	if (changed) {
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
 }
 
@@ -3450,7 +3450,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	else {
 		SAVE_CHAR(ch);
-		EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 	}
 }
 
@@ -3569,7 +3569,7 @@ void warehouse_store(char_data *ch, char *argument) {
 
 	if (done) {
 		SAVE_CHAR(ch);
-		EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 	}
 }
 
@@ -5256,8 +5256,9 @@ ACMD(do_remove) {
 }
 
 
-ACMD(do_retrieve) {	
+ACMD(do_retrieve) {
 	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle;
 	obj_data *objn;
 	int count = 0, total = 1, number, pos;
 	empire_data *emp, *room_emp = ROOM_OWNER(IN_ROOM(ch));
@@ -5278,6 +5279,10 @@ ACMD(do_retrieve) {
 	}
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
 		msg_to_char(ch, "You need to establish a trade pact to retrieve anything here.\r\n");
+		return;
+	}
+	if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You can't retrieve anything here.\r\n");
 		return;
 	}
 
@@ -5321,14 +5326,7 @@ ACMD(do_retrieve) {
 
 	/* they hit "ret all" */
 	if (!str_cmp(objname, "all")) {
-		for (store = EMPIRE_STORAGE(emp); store; store = next_store) {
-			next_store = store->next;
-			
-			// same island?
-			if (store->island != GET_ISLAND_ID(IN_ROOM(ch))) {
-				continue;
-			}
-
+		HASH_ITER(hh, isle->store, store, next_store) {
 			if ((objn = obj_proto(store->vnum)) && obj_can_be_stored(objn, IN_ROOM(ch))) {
 				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW)) {
 					msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
@@ -5348,12 +5346,9 @@ ACMD(do_retrieve) {
 	}
 	else {	// not "all"
 		pos = 0;
-		for (store = EMPIRE_STORAGE(emp); store && !found; store = next_store) {
-			next_store = store->next;
-			
-			// island check
-			if (store->island != GET_ISLAND_ID(IN_ROOM(ch))) {
-				continue;
+		HASH_ITER(hh, isle->store, store, next_store) {
+			if (found) {
+				break;
 			}
 			
 			if ((objn = obj_proto(store->vnum)) && obj_can_be_stored(objn, IN_ROOM(ch))) {
@@ -5391,10 +5386,7 @@ ACMD(do_retrieve) {
 		if (GET_LOYALTY(ch) == room_emp) {
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
 		}
-
-		/* save the empire */
-		SAVE_CHAR(ch);
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		
 		read_vault(emp);
 	}
 }
@@ -5662,7 +5654,7 @@ ACMD(do_ship) {
 			
 			REMOVE_FROM_LIST(sd, EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), next);
 			free(sd);
-			EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+			EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 			
 			done = TRUE;
 			break;	// only allow 1st match
@@ -5861,10 +5853,7 @@ ACMD(do_store) {
 		if (GET_LOYALTY(ch) == room_emp) {
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
 		}
-
-		/* save the empire */
-		SAVE_CHAR(ch);
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		
 		read_vault(emp);
 	}
 }

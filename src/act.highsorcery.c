@@ -457,12 +457,12 @@ void start_ritual(char_data *ch, int ritual) {
 * @param char *argument The typed arg.
 */
 void summon_materials(char_data *ch, char *argument) {
-	void sort_storage(empire_data *emp);
 	void read_vault(empire_data *emp);
 
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *objname;
 	struct empire_storage_data *store, *next_store;
 	int count = 0, total = 1, number, pos;
+	struct empire_island *isle;
 	empire_data *emp;
 	int cost = 2;	// * number of things to summon
 	obj_data *proto;
@@ -479,7 +479,7 @@ void summon_materials(char_data *ch, char *argument) {
 		return;
 	}
 	
-	if (!GET_ISLAND(IN_ROOM(ch))) {
+	if (!GET_ISLAND(IN_ROOM(ch)) || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You can't summon materials here.\r\n");
 		return;
 	}
@@ -518,17 +518,11 @@ void summon_materials(char_data *ch, char *argument) {
 	
 	msg_to_char(ch, "You open a tiny portal to summon materials...\r\n");
 	act("$n opens a tiny portal to summon materials...", FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	// sort first
-	sort_storage(emp);
 
 	pos = 0;
-	for (store = EMPIRE_STORAGE(emp); !found && store; store = next_store) {
-		next_store = store->next;
-		
-		// island check
-		if (store->island != GET_ISLAND_ID(IN_ROOM(ch))) {
-			continue;
+	HASH_ITER(hh, isle->store, store, next_store) {
+		if (found) {
+			break;
 		}
 		
 		proto = obj_proto(store->vnum);
@@ -564,7 +558,6 @@ void summon_materials(char_data *ch, char *argument) {
 		// save the empire
 		if (found) {
 			GET_MANA(ch) -= cost * count;	// charge only the amount retrieved
-			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			read_vault(emp);
 			gain_ability_exp(ch, ABIL_SUMMON_MATERIALS, 1);
 		}

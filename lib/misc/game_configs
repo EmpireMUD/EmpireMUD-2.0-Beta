@@ -205,7 +205,7 @@ naturalize_unclaimable 1
 nearby_sector_distance 2
 newbie_adventure_cap 25
 ocean_pool_size 1000
-tropics_percent 35.000000
+tropics_percent 40.000000
 water_crop_distance 4
 *
 * Approval configs

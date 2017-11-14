@@ -130,6 +130,7 @@
 	GET_EXITS_HERE(room) == 0 && \
 	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
 	!ROOM_SECT_FLAGGED(room, TILE_KEEP_FLAGS) && \
+	!ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
 	!ROOM_VEHICLES(room) && \
 	!ROOM_AFFECTS(room) && \
@@ -4033,6 +4034,7 @@ struct empire_island {
 	// saved portion
 	int workforce_limit[NUM_CHORES];	// workforce settings
 	char *name;	// empire's local name for the island
+	struct empire_storage_data *store;	// hash table of storage here
 	
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
@@ -4078,13 +4080,11 @@ struct empire_political_data {
 };
 
 
-/* The storage structure for empires */
+// The storage structure for empire islands
 struct empire_storage_data {
 	obj_vnum vnum;	// what's stored
 	int amount;	// how much
-	int island;	// which island it's stored on
-
-	struct empire_storage_data *next;
+	UT_hash_handle hh;	// empire_island->store hash (by vnum)
 };
 
 
@@ -4204,7 +4204,6 @@ struct empire_data {
 	// linked lists
 	struct empire_political_data *diplomacy;
 	struct shipping_data *shipping_list;
-	struct empire_storage_data *store;
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
@@ -4235,11 +4234,15 @@ struct empire_data {
 	time_t last_logon;	// time of last member's last logon
 	int scores[NUM_SCORES];	// empire score in each category
 	int sort_value;	// for score ties
-	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
 	
+	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
+	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
+	
 	bool needs_save;	// for things that delay-save
+	bool needs_logs_save;	// for logs/offenses that delay-save
+	bool needs_storage_save;	// for storage delay-save
 	
 	UT_hash_handle hh;	// empire_table hash handle
 };

@@ -471,7 +471,8 @@ void score_empires(void) {
 	
 	int iter, pos, total[NUM_SCORES], max[NUM_SCORES], num_emps = 0;
 	struct empire_political_data *pol;
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	empire_data *emp, *next_emp;
 	long long num;
 	
@@ -521,8 +522,10 @@ void score_empires(void) {
 		EMPIRE_SCORE(emp, SCORE_TECHS) = num;
 		
 		num = 0;
-		for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-			num += store->amount;
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			HASH_ITER(hh, isle->store, store, next_store) {
+				SAFE_ADD(num, store->amount, 0, MAX_INT, FALSE);
+			}
 		}
 		num /= 1000;	// for sanity of number size
 		total[SCORE_EINV] += num;
@@ -1490,7 +1493,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 			EMPIRE_LOGS(emp) = elog;
 		}
 		
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
 	}
 	
 	// show to players

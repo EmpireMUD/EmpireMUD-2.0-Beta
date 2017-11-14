@@ -1,0 +1,33 @@
+#12400
+The Golden Goblin~
+Paul Clarke and Owen Morris~
+   A group of greedy goblin pirates have become stuck in this little seaside
+cave, and need your help to repair their ship. Will you assist them with
+supplies? Or plunder their treasure for yourself?
+   This adventure is for one or two players. Bring torches (or night sight),
+and be prepared to follow the instructions on some of the boss fights.
+~
+12400 12499 50-150
+50 0 bfjk 0
+L
+2 0
+50 12400 12401
+-1 0 0
+L
+2 0
+51 12400 12401
+-1 0 0
+L
+2 0
+54 12400 12401
+-1 0 0
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+6 0
+100 -1 -1
+-1 0 0
+S
+$

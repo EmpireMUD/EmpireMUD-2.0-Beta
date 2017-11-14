@@ -1229,11 +1229,12 @@ hostile mobs. You can only use this in your empire's own territory.
 
 Using this ability will gain experience, even if you fail to summon any guards.
 #
-"SWAMP ENGINEERING"
+"SWAMP ENGINEERING" SWAMP MARSH
 
 Swamp Engineering (Empire ability)
 
-The Swamp Engineering unlocks swamp walks (roads) and swamp buildings.
+The Swamp Engineering unlocks swamp walks (roads) and swamp buildings. These
+buildings can also be built on marshes.
 
 &c~&0--&c~&0  swampwalk  (road)
 &c~&0__&c~&0  swampplatform  (creates plains)

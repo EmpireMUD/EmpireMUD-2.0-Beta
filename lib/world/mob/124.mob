@@ -1,0 +1,636 @@
+#12400
+crab seaweed-covered covered~
+a crab~
+A seaweed-covered crab is picking at bits of food with its claws.
+~
+0 50 bdj G
+0 0 0 10
+S
+#12401
+goblin pirate~
+a goblin pirate~
+A goblin pirate is washing the side of the ship.
+~
+0 0 bd 0
+1 0 0 1
+F 12401
+M
+1
+Always Bub have to clean the ship...~
+M
+1
+Never Smeegle doing dirty work.~
+M
+1
+Bub want grub.~
+M
+1
+Greenbeard going to be Nobeard soon.~
+M
+1
+Yo ho ho but me ain't got no rum.~
+T 12403
+S
+#12402
+deckhand hand human~
+the deckhand~
+A human deckhand is chained to the side of the ship.
+~
+0 0 bdv 0
+1 0 0 15
+M
+0
+$n swabs the deck.~
+M
+0
+$n scrubs the poop deck.~
+M
+0
+$n twitches at the sound of one of the goblins shouting.~
+M
+1
+Please free me.~
+M
+1
+Oh I'll never get back to Martha if some brave adventurer doesn't free me soon.~
+M
+1
+Any chance you could set me free?~
+M
+0
+$n yearns for freedom.~
+T 12402
+S
+#12403
+Smeegle goblin quartermaster master~
+Quartermaster Smeegle~
+Smeegle, the goblin quartermaster, is walking around with a list.
+~
+0 0 bd c
+1 0 0 4
+F 12401
+I 4 12411 1.50 1 x  # LOOT: dread pirate garb
+I 4 12417 1.00 1 x  # LOOT: a parrot whistle
+I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12425 0.12 1 x  # LOOT: dread goblin sails
+I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
+I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
+I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
+I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
+I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
+I 4 12456 9.60 1 x  # LOOT: pirate boarding pantaloons
+I 4 12458 9.60 1 x  # LOOT: goblin dress pantaloons
+M
+1
+Shiver me teeny timbers!~
+M
+1
+Splice the mainbrace!~
+M
+0
+$n paces back and forth on the deck.~
+M
+1
+But why is the rum gone?~
+M
+1
+Filthy humanses...~
+T 12418
+T 12419
+T 12420
+T 12421
+T 12441
+T 12403
+S
+#12404
+Hornswaggle first mate~
+First Mate Hornswaggle~
+Hornswaggle, the Golden Goblin's first mate, stands ready to fight!
+~
+0 0 bdy c
+1 0 0 7
+F 12401
+I 4 12411 1.50 1 x  # LOOT: dread pirate garb
+I 4 12417 1.00 1 x  # LOOT: a parrot whistle
+I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12425 0.12 1 x  # LOOT: dread goblin sails
+I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
+I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
+I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
+I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
+I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
+I 4 12456 9.60 1 x  # LOOT: pirate boarding pantaloons
+I 4 12458 9.60 1 x  # LOOT: goblin dress pantaloons
+M
+1
+If it's a fighte ye want, it's a fight ye'll get!~
+M
+1
+Thar she blows!~
+M
+1
+Don't worry, ye'll be buried at sea and forgotten!~
+M
+1
+Prepare the hempen halter!~
+T 12418
+T 12419
+T 12420
+T 12421
+T 12441
+T 12403
+S
+#12405
+Greenbeard captain~
+Captain Greenbeard~
+Captain Greenbeard stands on the aftercastle, sword held high!
+~
+0 0 bdyz c
+1 0 0 1
+F 12401
+I 4 12411 1.50 1 x  # LOOT: dread pirate garb
+I 4 12417 1.00 1 x  # LOOT: a parrot whistle
+I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12425 0.12 1 x  # LOOT: dread goblin sails
+I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
+I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
+I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
+I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
+I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
+I 4 12456 9.60 1 x  # LOOT: pirate boarding pantaloons
+I 4 12458 9.60 1 x  # LOOT: goblin dress pantaloons
+M
+1
+It'll be a cold day in Dobby Jonez's locker when I let the likes of ye take me treasure!~
+M
+1
+I swear to Gobseiden ye'll be buried 'neath the waves!~
+M
+1
+Make ready yer steel and come at me!~
+M
+1
+Ye'll dance the hempen jig ere daybreak!~
+T 12418
+T 12419
+T 12420
+T 12422
+T 12441
+T 12403
+S
+#12406
+Fathma goblin sorceress~
+Fathma~
+Fathma, goblin sorceress of the deep, holds her wand high!
+~
+0 0 bdxyz c
+2 0 0 21
+F 12401
+I 4 12411 1.50 1 x  # LOOT: dread pirate garb
+I 4 12417 1.00 1 x  # LOOT: a parrot whistle
+I 4 12412 1.00 1 x  # LOOT: a black tricorne hat
+I 4 12424 0.13 1 x  # LOOT: a lucky goblin figurehead
+I 4 12425 0.12 1 x  # LOOT: dread goblin sails
+I 4 12426 0.13 1 x  # LOOT: cliffside dock plans
+I 4 12427 0.12 1 x  # LOOT: smuggler's wharf plans
+I 4 12438 9.60 1 x  # LOOT: an imperium pirate hoop
+I 4 12440 9.60 1 x  # LOOT: a nocturnium pirate hoop
+I 4 12444 9.60 1 x  # LOOT: a golden pirate hoop
+I 4 12446 9.60 1 x  # LOOT: a silver pirate hoop
+I 4 12448 9.60 1 x  # LOOT: a bone hoop earring
+I 4 12450 9.60 1 x  # LOOT: heavy plated pantaloons
+I 4 12452 9.60 1 x  # LOOT: goblin scullery pantaloons
+I 4 12454 9.60 1 x  # LOOT: goblin sea-shaman pantaloons
+I 4 12456 9.60 1 x  # LOOT: pirate boarding pantaloons
+I 4 12458 9.60 1 x  # LOOT: goblin dress pantaloons
+M
+1
+I admit that in the past I've been a nasty.~
+M
+1
+You poor unfortunate soul.~
+M
+0
+$n seems to struggle to keep the air bubble from collapsing.~
+M
+0
+$n stitches tiny leaks in the air bubble with her wand.~
+M
+1
+I hope you brought some food because there is no way out of this cavern.~
+M
+1
+We're all stuck down here.~
+M
+1
+You're lucky you survived Charybdis. The last adventurers didn't make it.~
+T 12435
+T 12436
+T 12437
+T 12438
+T 12441
+T 12442
+T 12444
+S
+#12407
+#n deckhand hand human~
+deckhand #n~
+#n has been freed from his shackles.
+~
+0 0 bdv 0
+1 0 0 15
+M
+1
+Thank you for freeing me.~
+M
+1
+I can't wait to get back to Martha on the farm.~
+M
+1
+I have some old goblin junk to sell.~
+M
+0
+$n dances freely about the deck.~
+S
+#12408
+octopus blue-ringed ringed~
+a blue-ringed octopus~
+A blue-ringed octopus clings to the wall and flashes warning colors.
+~
+0 0 bdj c
+0 0 6 7
+I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+M
+0
+$n flashes brightly at you.~
+M
+0
+$n spurts ink at you.~
+M
+0
+$n crawls toward you.~
+T 12409
+S
+#12409
+anglerfish fish toothy ball light~
+a toothy anglerfish~
+A ball of light dances in the shadows.
+~
+0 0 bdj c
+0 0 6 9
+I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+M
+0
+The ball of light bobs back and forth.~
+M
+0
+You can't take your eyes of the mesmerizing little ball of light.~
+T 12409
+S
+#12410
+eel wolf~
+a wolf eel~
+A wolf eel pokes its head out from a crevice.
+~
+0 0 bdj c
+0 0 6 9
+I 0 12404 100.00 1  # BUTCHER: a fillet of fish
+M
+0
+$n snaps its jaw.~
+M
+0
+$n slithers around you and then darts back to its crevice.~
+M
+0
+$n watches you carefully.~
+T 12409
+S
+#12411
+snake sea banded~
+a banded sea snake~
+A banded sea snake coils around your legs.
+~
+0 0 bdj c
+0 0 6 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+M
+0
+$n is a little too close for comfort.~
+T 12409
+S
+#12414
+orca war armored~
+a war orca~
+An armored war orca blocks your way!
+~
+0 0 bdjy c
+0 0 6 9
+I 0 3012 100.00 8  # BUTCHER: a fillet of raw meat
+I 4 12414 100.00 2  # LOOT: fat of orca
+I 4 12428 2.00 1 x  # LOOT: a deep coral ring
+I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: a deep bone ring
+I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: a pearly sash
+I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: a band of human bones
+I 4 12418 1.00 1 x  # LOOT: a hydra conch
+I 4 12421 10.00 1 x  # LOOT: a green orca whistle
+M
+0
+$n bares its teeth at you.~
+M
+0
+$n drifts closer and closer to you.~
+T 12409
+S
+#12415
+squid giant~
+a giant squid~
+A giant squid fills the cavern!
+~
+0 0 bdjy c
+0 0 6 7
+I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+I 4 12415 100.00 2  # LOOT: tentacle of squid
+I 4 12428 2.00 1 x  # LOOT: a deep coral ring
+I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: a deep bone ring
+I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: a pearly sash
+I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: a band of human bones
+I 4 12418 1.00 1 x  # LOOT: a hydra conch
+M
+0
+$n snaps its beak menacingly.~
+M
+0
+$n's long tentacle begins to coil around you.~
+M
+0
+$n spreads out as if to block your path.~
+T 12409
+S
+#12416
+mermidon myrmidon warrior~
+a mermidon warrior~
+A mermidon warrior aims her trident at you!
+~
+0 0 bdvy c
+2 0 6 3
+I 4 12416 100.00 2  # LOOT: eye of mermaid
+I 4 12428 2.00 1 x  # LOOT: a deep coral ring
+I 4 12429 2.00 1 x  # LOOT: a deep pearl ring
+I 4 12430 2.00 1 x  # LOOT: a deep seaweed ring
+I 4 12431 2.00 1 x  # LOOT: a deep sharktooth ring
+I 4 12432 2.00 1 x  # LOOT: a deep bone ring
+I 4 12433 2.00 1 x  # LOOT: a coral-buckled girdle
+I 4 12434 2.00 1 x  # LOOT: a pearly sash
+I 4 12435 2.00 1 x  # LOOT: a seaweed cumberbund
+I 4 12436 2.00 1 x  # LOOT: a sharktooth cincture
+I 4 12437 2.00 1 x  # LOOT: a band of human bones
+I 4 12418 1.00 1 x  # LOOT: a hydra conch
+M
+0
+$n spins her trident to block your path.~
+M
+1
+My father will hear of this.~
+M
+1
+How dare you enter this cavern, air-breather!~
+M
+1
+Tonight your name is sushi.~
+T 12409
+S
+#12417
+parrot~
+the parrot~
+A parrot with an eyepatch is watching you with its good eye.
+~
+1 1 bdoD mn
+0 0 2 9
+T 9901
+T 9902
+T 12417
+S
+#12418
+hydra tiny~
+a tiny hydra~
+A tiny hydra is rolling around on the ground.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+One of $n's heads snaps at another.~
+M
+0
+$n grows another head.~
+M
+0
+$n's many heads hiss at you in unison.~
+M
+0
+$n somersaults around your feet.~
+M
+0
+$n drools from all of its mouths.~
+T 9901
+T 9902
+S
+#12419
+hydra serpent massive nine-headed~
+the Hydra~
+A massive nine-headed serpent slithers out of the pool.
+~
+0 0 bdjyA c
+0 0 6 9
+I 4 12411 1.00 1 x  # LOOT: dread pirate garb
+I 4 12422 1.00 1 x  # LOOT: a raging kraken shell
+I 4 12423 1.00 1 x  # LOOT: an albatross shell
+I 4 12418 2.00 1 x  # LOOT: a hydra conch
+I 4 12403 10.00 1 x  # LOOT: an old barrel
+I 4 12428 7.50 1 x  # LOOT: a deep coral ring
+I 4 12429 7.50 1 x  # LOOT: a deep pearl ring
+I 4 12430 7.50 1 x  # LOOT: a deep seaweed ring
+I 4 12431 7.50 1 x  # LOOT: a deep sharktooth ring
+I 4 12432 7.50 1 x  # LOOT: a deep bone ring
+I 4 12433 7.50 1 x  # LOOT: a coral-buckled girdle
+I 4 12434 7.50 1 x  # LOOT: a pearly sash
+I 4 12435 7.50 1 x  # LOOT: a seaweed cumberbund
+I 4 12436 7.50 1 x  # LOOT: a sharktooth cincture
+I 4 12437 7.50 1 x  # LOOT: a band of human bones
+I 4 12438 1.00 1 x  # LOOT: an imperium pirate hoop
+I 4 12440 1.00 1 x  # LOOT: a nocturnium pirate hoop
+I 4 12444 1.00 1 x  # LOOT: a golden pirate hoop
+I 4 12446 1.00 1 x  # LOOT: a silver pirate hoop
+I 4 12448 1.00 1 x  # LOOT: a bone hoop earring
+I 4 12450 1.00 1 x  # LOOT: heavy plated pantaloons
+I 4 12452 1.00 1 x  # LOOT: goblin scullery pantaloons
+I 4 12454 1.00 1 x  # LOOT: goblin sea-shaman pantaloons
+I 4 12456 1.00 1 x  # LOOT: pirate boarding pantaloons
+I 4 12458 1.00 1 x  # LOOT: goblin dress pantaloons
+M
+0
+Hisses echo from each of $n's heads.~
+M
+0
+$n stretches its long necks to the sides, surrounding you.~
+M
+0
+$n sniffs at your face with two of its massive heads.~
+M
+0
+Your skin starts to itch as some toxic substance fills the water.~
+M
+0
+$n moves to block the entrance.~
+T 12423
+T 12424
+T 12425
+T 12426
+T 12431
+T 12439
+T 12409
+S
+#12420
+scylla silla sylla~
+Scylla~
+Scylla floats in the center of the chamber as water swirls around her!
+~
+0 0 bdzA c
+2 0 6 7
+I 4 12411 1.00 1 x  # LOOT: dread pirate garb
+I 4 12422 1.00 1 x  # LOOT: a raging kraken shell
+I 4 12423 1.00 1 x  # LOOT: an albatross shell
+I 4 12418 2.00 1 x  # LOOT: a hydra conch
+I 4 12403 10.00 1 x  # LOOT: an old barrel
+I 4 12428 7.50 1 x  # LOOT: a deep coral ring
+I 4 12429 7.50 1 x  # LOOT: a deep pearl ring
+I 4 12430 7.50 1 x  # LOOT: a deep seaweed ring
+I 4 12431 7.50 1 x  # LOOT: a deep sharktooth ring
+I 4 12432 7.50 1 x  # LOOT: a deep bone ring
+I 4 12433 7.50 1 x  # LOOT: a coral-buckled girdle
+I 4 12434 7.50 1 x  # LOOT: a pearly sash
+I 4 12435 7.50 1 x  # LOOT: a seaweed cumberbund
+I 4 12436 7.50 1 x  # LOOT: a sharktooth cincture
+I 4 12437 7.50 1 x  # LOOT: a band of human bones
+I 4 12438 1.00 1 x  # LOOT: an imperium pirate hoop
+I 4 12440 1.00 1 x  # LOOT: a nocturnium pirate hoop
+I 4 12444 1.00 1 x  # LOOT: a golden pirate hoop
+I 4 12446 1.00 1 x  # LOOT: a silver pirate hoop
+I 4 12448 1.00 1 x  # LOOT: a bone hoop earring
+I 4 12450 1.00 1 x  # LOOT: heavy plated pantaloons
+I 4 12452 1.00 1 x  # LOOT: goblin scullery pantaloons
+I 4 12454 1.00 1 x  # LOOT: goblin sea-shaman pantaloons
+I 4 12456 1.00 1 x  # LOOT: pirate boarding pantaloons
+I 4 12458 1.00 1 x  # LOOT: goblin dress pantaloons
+M
+0
+$n circles around the chamber.~
+M
+0
+$n sings a sweet song, and your eyelids become heavy.~
+M
+0
+$n bares her sharp teeth at you.~
+M
+1
+By Lamia and Poseidon, you will die!~
+M
+1
+You have come to the wrong place.~
+M
+1
+How long can you breathe here before your lungs fill with sea water and your soul falls to Hades?~
+M
+1
+You would have died quicker to Charybdis. This is going to last a while.~
+T 12427
+T 12428
+T 12429
+T 12430
+T 12431
+T 12432
+T 12433
+T 12434
+T 12439
+S
+#12421
+orca green-tinged tinged~
+a green-tinged orca~
+A green-tinged orca is stalking you.
+~
+100 125 del 0
+0 0 6 9
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+S
+#12422
+kraken raging rages~
+a raging kraken~
+A kraken rages violently in the water!
+~
+100 125 del 0
+0 0 6 7
+I 0 12404 100.00 3  # BUTCHER: a fillet of fish
+S
+#12423
+albatross giant~
+a giant albatross~
+A giant albatross with a saddle circles overhead!
+~
+100 125 dej m
+0 0 2 9
+I 0 3200 100.00 3  # BUTCHER: a cut of poultry
+S
+#12426
+dockmaster master goblin~
+the goblin dockmaster~
+A goblin dockmaster is pacing with a clipboard.
+~
+30 60 bdqv 0
+1 0 0 15
+M
+1
+Back to work!~
+S
+#12427
+deckhand hand goblin~
+a goblin deckhand~
+A goblin deckhand is standing here.
+~
+20 50 dqv 0
+1 0 0 15
+M
+1
+Shiver me teeny timbers!~
+S
+$

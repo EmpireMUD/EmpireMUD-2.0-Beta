@@ -1694,6 +1694,7 @@ ACMD(do_steal) {
 	
 	struct empire_storage_data *store, *next_store;
 	empire_data *emp = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+	struct empire_island *isle;
 	obj_data *proto;
 	bool found = FALSE;
 	
@@ -1714,6 +1715,9 @@ ACMD(do_steal) {
 	else if (!emp) {
 		msg_to_char(ch, "Nothing is stored here that you can steal.\r\n");
 	}
+	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You can't steal anything here.\r\n");
+	}
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED)) {
 		msg_to_char(ch, "You can't steal from a building which was ceded to an empire but never used by that empire.\r\n");
 	}
@@ -1723,12 +1727,9 @@ ACMD(do_steal) {
 		}
 	}
 	else {
-		for (store = EMPIRE_STORAGE(emp); store && !found; store = next_store) {
-			next_store = store->next;
-			
-			// island check
-			if (store->island != GET_ISLAND_ID(IN_ROOM(ch))) {
-				continue;
+		HASH_ITER(hh, isle->store, store, next_store) {
+			if (found) {
+				break;
 			}
 			
 			proto = obj_proto(store->vnum);
@@ -1756,8 +1757,6 @@ ACMD(do_steal) {
 						gain_player_tech_exp(ch, PTECH_STEAL_UPGRADE, 50);
 					}
 
-					// save the empire
-					EMPIRE_NEEDS_SAVE(emp) = TRUE;
 					read_vault(emp);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait

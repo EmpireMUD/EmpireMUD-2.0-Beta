@@ -1,0 +1,65 @@
+#12424
+Smuggler's Deck~
+On the Smuggler's Deck~
+~
+0 0 aHR 0
+0 0 0 -1
+C
+disembark, sail~
+D
+You're standing on the deck of the smuggler's ship.
+~
+M
+12427 100.00 c
+S
+#12425
+Pirate Deck~
+On the Deck of the Pirate Ship~
+~
+0 0 aHR 0
+0 0 0 -1
+C
+disembark, sail~
+D
+You're standing on the deck of the pirate ship.
+~
+M
+12427 100.00 c
+S
+#12426
+Cliffside Docks~
+Some Cliffside Docks~
+@w&0==@e~
+24 0 bdD 0
+0 0 0 -1
+C
+board, load, unload~
+F
+g
+M
+12426 100.00 c
+R
+16 1 1 1048576
+R
+19 1 1 0
+S
+#12427
+Smuggler's Wharf~
+A Smuggler's Wharf~
+@w&0==@e~
+24 0 bdpD 0
+0 0 0 -1
+A
+d
+C
+board, load, unload~
+F
+g
+M
+12426 100.00 c
+R
+16 1 1 1048576
+R
+19 1 1 0
+S
+$

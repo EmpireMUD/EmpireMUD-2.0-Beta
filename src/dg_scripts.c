@@ -2982,6 +2982,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
+					else if (!str_cmp(field, "completed_quest_instance")) {
+						struct instance_data *inst = get_instance_for_script(type, go);
+						
+						if (subfield && *subfield && isdigit(*subfield) && inst) {
+							any_vnum vnum = atoi(subfield);
+							if (!IS_NPC(c) && has_completed_quest(c, vnum, inst->id)) {
+								strcpy(str, "1");
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "cooldown")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							snprintf(str, slen, "%d", get_cooldown_time(c, atoi(subfield)));
@@ -3683,6 +3699,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								strcpy(str, "1");
 							}
 						}
+					}
+					else if (!str_cmp(field, "set_reputation")) {
+						if (subfield && *subfield && !IS_NPC(c)) {
+							// %actor.has_reputation(vnum, level)%
+							char arg1[256], arg2[256];
+							faction_data *fct;
+							int rep;
+							
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING) {
+								set_reputation(c, FCT_VNUM(fct), rep);
+							}
+						}
+						strcpy(str, "1");
 					}
 					else if (!str_cmp(field, "sex"))
 						snprintf(str, slen, "%s", genders[(int)GET_SEX(c)]);

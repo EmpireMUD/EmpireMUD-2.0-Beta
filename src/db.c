@@ -548,7 +548,7 @@ void boot_world(void) {
 	log("Loading instances.");
 	load_instances();
 	
-	log("Loading empire storage.");
+	log("Loading empire storage and logs.");
 	load_empire_storage();
 	
 	log("Loading daily quest cycles.");
@@ -655,7 +655,7 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 */
 void check_for_bad_buildings(void) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-	void unlink_instance_entrance(room_data *room);
+	void unlink_instance_entrance(room_data *room, bool run_cleanup);
 
 	struct obj_storage_type *store, *next_store, *temp;
 	bld_data *bld, *next_bld;
@@ -692,7 +692,7 @@ void check_for_bad_buildings(void) {
 		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room, TRUE)) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
-			unlink_instance_entrance(room);
+			unlink_instance_entrance(room, FALSE);
 		}
 		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
@@ -1870,6 +1870,7 @@ const char *versions_list[] = {
 	"b5.1",
 	"b5.3",
 	"b5.14",
+	"b5.17",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2112,6 +2113,7 @@ void b3_2_map_and_gear(void) {
 // NOTE: the cloth is not storable, so any empire with it in normal storage must have had the bug
 void b3_6_einv_fix(void) {
 	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	empire_data *emp, *next_emp;
 	obj_data *proto;
 	int total, amt;
@@ -2129,14 +2131,16 @@ void b3_6_einv_fix(void) {
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		total = 0;
-		LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
-			if (store->vnum == vnum) {
-				amt = store->amount;
-				total += amt;
-				add_to_empire_storage(emp, store->island, cloth, 4 * amt);
-				add_to_empire_storage(emp, store->island, silver, 2 * amt);
-				LL_DELETE(EMPIRE_STORAGE(emp), store);
-				free(store);
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			HASH_ITER(hh, isle->store, store, next_store) {
+				if (store->vnum == vnum) {
+					amt = store->amount;
+					total += amt;
+					add_to_empire_storage(emp, isle->island, cloth, 4 * amt);
+					add_to_empire_storage(emp, isle->island, silver, 2 * amt);
+					HASH_DEL(isle->store, store);
+					free(store);
+				}
 			}
 		}
 		
@@ -2550,7 +2554,7 @@ PLAYER_UPDATE_FUNC(b5_1_update_players) {
 
 // b5.1 convert resource action vnums (all resource actions += 1000)
 void b5_1_global_update(void) {
-	void delete_instance(struct instance_data *inst);	// instance.c
+	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 	
 	struct instance_data *inst, *next_inst;
 	craft_data *craft, *next_craft;
@@ -2572,7 +2576,7 @@ void b5_1_global_update(void) {
 		// delete 'em
 		LL_FOREACH_SAFE(instance_list, inst, next_inst) {
 			if (inst->adventure == adv) {
-				delete_instance(inst);
+				delete_instance(inst, FALSE);
 			}
 		}
 	}
@@ -2948,6 +2952,10 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.14")) {
 			b5_14_superior_items();
+		}
+		if (MATCH_VERSION("b5.17")) {
+			log("Updating to b5.17...");
+			save_all_empires();
 		}
 	}
 	

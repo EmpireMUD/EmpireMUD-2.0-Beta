@@ -3738,7 +3738,7 @@ void get_icons_display(struct icon_data *list, char *save_buffer) {
 		sprintf(line, " %2d. %s: %s%s&0  %s%s&0 %s", ++count, icon_types[icon->type], icon->color, ibuf, icon->color, show_color_codes(icon->color), lbuf);
 		
 		// format column despite variable width of color codes
-		size = 30 + color_code_length(line);
+		size = 34 + color_code_length(line);
 		sprintf(lbuf, "%%-%d.%ds%%s", size, size);
 		sprintf(save_buffer + strlen(save_buffer), lbuf, line, !(count % 2) ? "\r\n" : "");
 	}
@@ -7118,6 +7118,8 @@ void smart_copy_icons(struct icon_data **addto, struct icon_data *input) {
 		
 		CREATE(new_icon, struct icon_data, 1);
 		*new_icon = *icon;
+		new_icon->icon = str_dup(NULLSAFE(icon->icon));
+		new_icon->color = str_dup(NULLSAFE(icon->color));
 		new_icon->next = NULL;
 		
 		LL_APPEND(*addto, new_icon);

@@ -165,7 +165,7 @@ OLC_MODULE(mapedit_terrain) {
 				free(city->name);
 			}
 			free(city);
-			save_empire(emp);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		}
 		
 		if (sect) {

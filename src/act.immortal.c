@@ -67,7 +67,7 @@ extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
-void delete_instance(struct instance_data *inst);	// instance.c
+void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
@@ -829,8 +829,6 @@ void do_instance_add(char_data *ch, char *argument) {
 
 
 void do_instance_delete(char_data *ch, char *argument) {
-	void delete_instance(struct instance_data *inst);
-	
 	struct instance_data *inst;
 	room_data *loc;
 	int num;
@@ -849,7 +847,7 @@ void do_instance_delete(char_data *ch, char *argument) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted an instance of %s at unknown location", GET_REAL_NAME(ch), GET_ADV_NAME(inst->adventure));
 			}
 			msg_to_char(ch, "Instance of %s deleted.\r\n", GET_ADV_NAME(inst->adventure));
-			delete_instance(inst);
+			delete_instance(inst, TRUE);
 			break;
 		}
 	}
@@ -876,7 +874,7 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 		
 		if (inst->adventure == adv) {
 			++count;
-			delete_instance(inst);
+			delete_instance(inst, TRUE);
 		}
 	}
 	
@@ -2088,7 +2086,8 @@ struct show_island_data *find_or_make_show_island(int island, struct show_island
 
 SHOW(show_islands) {
 	struct empire_unique_storage *uniq;
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *eisle, *next_eisle;
 	char arg[MAX_INPUT_LENGTH];
 	struct island_info *isle;
 	empire_data *emp;
@@ -2107,17 +2106,18 @@ SHOW(show_islands) {
 		msg_to_char(ch, "Island storage counts for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		
 		// collate storage info
-		for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-			if (!cur || cur->island != store->island) {
-				cur = find_or_make_show_island(store->island, &list);
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
+			cur = find_or_make_show_island(eisle->island, &list);
+			
+			HASH_ITER(hh, eisle->store, store, next_store) {
+				SAFE_ADD(cur->count, store->amount, 0, INT_MAX, FALSE);
 			}
-			SAFE_ADD(cur->count, store->amount, INT_MIN, INT_MAX, TRUE);
 		}
 		for (uniq = EMPIRE_UNIQUE_STORAGE(emp); uniq; uniq = uniq->next) {
 			if (!cur || cur->island != uniq->island) {
 				cur = find_or_make_show_island(uniq->island, &list);
 			}
-			SAFE_ADD(cur->count, uniq->amount, INT_MIN, INT_MAX, TRUE);
+			SAFE_ADD(cur->count, uniq->amount, 0, INT_MAX, FALSE);
 		}
 		
 		if (!list) {
@@ -6596,7 +6596,8 @@ ACMD(do_mapout) {
 ACMD(do_moveeinv) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	struct empire_unique_storage *unique;
-	struct empire_storage_data *store, *next_store, *temp;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *eisle;
 	int island_from, island_to, count;
 	empire_data *emp;
 	
@@ -6615,19 +6616,16 @@ ACMD(do_moveeinv) {
 	else if (!isdigit(*arg3) || (island_to = atoi(arg3)) < 0) {
 		msg_to_char(ch, "Invalid to-island '%s'.\r\n", arg2);
 	}
+	else if (island_to == island_from) {
+		msg_to_char(ch, "Those are the same island.\r\n");
+	}
 	else {
 		count = 0;
-		for (store = EMPIRE_STORAGE(emp); store; store = next_store) {
-			next_store = store->next;
-			
-			if (store->island == island_from) {
-				add_to_empire_storage(emp, island_to, store->vnum, store->amount);
-				store->island = island_to;
-				count += store->amount;
-				
-				REMOVE_FROM_LIST(store, EMPIRE_STORAGE(emp), next);
-				free(store);
-			}
+		eisle = get_empire_island(emp, island_from);
+		HASH_ITER(hh, eisle->store, store, next_store) {
+			add_to_empire_storage(emp, island_to, store->vnum, store->amount);
+			HASH_DEL(eisle->store, store);
+			free(store);
 		}
 		for (unique = EMPIRE_UNIQUE_STORAGE(emp); unique; unique = unique->next) {
 			if (unique->island == island_from) {
@@ -6639,7 +6637,7 @@ ACMD(do_moveeinv) {
 		}
 		
 		if (count != 0) {
-			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has moved %d einv items for %s from island %d to island %d", GET_REAL_NAME(ch), count, EMPIRE_NAME(emp), island_from, island_to);
 			msg_to_char(ch, "Moved %d items for %s%s&0 from island %d to island %d.\r\n", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), island_from, island_to);
 		}
@@ -6950,6 +6948,7 @@ ACMD(do_purge) {
 
 
 ACMD(do_random) {
+	struct map_data *map;
 	int tries;
 	room_vnum roll;
 	room_data *loc;
@@ -6957,9 +6956,13 @@ ACMD(do_random) {
 	// looks for a random non-ocean location
 	for (tries = 0; tries < 100; ++tries) {
 		roll = number(0, MAP_SIZE - 1);
-		loc = real_real_room(roll);	// use real_real_room to skip !SECT_IS_LAND_MAP
+		map = &world_map[MAP_X_COORD(roll)][MAP_Y_COORD(roll)];
 		
-		if (loc && !ROOM_IS_CLOSED(loc) && !ROOM_SECT_FLAGGED(loc, SECTF_OCEAN)) {
+		if (GET_SECT_VNUM(map->sector_type) == BASIC_OCEAN) {
+			continue;
+		}
+		
+		if ((loc = real_room(roll)) && !ROOM_IS_CLOSED(loc)) {
 			perform_goto(ch, loc);
 			return;
 		}

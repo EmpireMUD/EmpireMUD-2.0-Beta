@@ -232,6 +232,9 @@ Headless Centaur: Attack-O-Lantern~
 if %self.cooldown(18801)%
   halt
 end
+if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
+  halt
+end
 nop %self.set_cooldown(18801, 30)%
 eval heroic_mode %self.mob_flagged(GROUP)%
 eval room %self.room%

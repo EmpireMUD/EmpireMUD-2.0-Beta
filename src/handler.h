@@ -312,7 +312,6 @@ extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, 
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
 extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount);
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
-extern int find_lowest_storage_loc(obj_data *obj);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
 extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);
 extern bool obj_can_be_stored(obj_data *obj, room_data *loc);
@@ -379,6 +378,7 @@ extern int get_reputation_by_name(char *name);
 extern int get_reputation_value(char_data *ch, any_vnum vnum);
 extern bool has_reputation(char_data *ch, any_vnum faction, int rep);
 extern int rep_const_to_index(int rep_const);
+void set_reputation(char_data *ch, any_vnum vnum, int rep);
 
 // fight.c
 void appear(char_data *ch);

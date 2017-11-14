@@ -99,6 +99,7 @@
 #define HLP_PREFIX  LIB_TEXT"help/"	// for HELP <keyword>
 #define INTROS_PREFIX  LIB_TEXT"intros/"	// for intro screens
 #define BOOK_PREFIX  "books/"	// for books.c
+#define ELOG_PREFIX  LIB_EMPIRE"logs/"	// for empire logs
 #define STORAGE_PREFIX  LIB_EMPIRE"storage/"	// for empire storage
 
 // library file suffixes
@@ -157,6 +158,7 @@
 #define DAILY_QUEST_FILE  LIB_ETC"daily_quests"	// which quests are on/off
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
+#define NEW_WORLD_HINT_FILE  LIB_ETC"new_world"	// if present, moves einv on startup
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
 #define VERSION_FILE  LIB_ETC"version"	// for version tracking
 
@@ -328,7 +330,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs);
 void read_empire_territory(empire_data *emp, bool check_tech);
 extern empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
-void save_empire(empire_data *e);
+void save_empire(empire_data *e, bool save_all_parts);
 void save_all_empires();
 
 // empire offenses

@@ -1363,7 +1363,9 @@ void scale_mob_to_level(char_data *mob, int level) {
 	if (!attack_hit_info[MOB_ATTACK_TYPE(mob)].disarmable) {
 		value *= 0.7;	// disarm would cut damage in half; this brings it closer together
 	}
-	value *= 1.15;	// 15% more damage from all sources
+	if (!MOB_FLAGGED(mob, MOB_HARD | MOB_GROUP)) {
+		value *= 1.15;	// 15% more damage from non-Normal mobs
+	}
 	mob->mob_specials.damage = MAX(1, (int) ceil(value));
 	
 	// to-hit
