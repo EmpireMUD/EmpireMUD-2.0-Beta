@@ -83,7 +83,7 @@ struct island_def {
 */
 
 // how much ocean to convert to land -- THIS WILL DETERMINE HOW MUCH RAM YOUR MUD USES (330k = about 200 MB RAM)
-#define TARGET_LAND_SIZE  330000	// total land tiles
+#define TARGET_LAND_SIZE  325000	// total land tiles (it will always overshoot this slightly)
 
 
 /**
