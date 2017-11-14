@@ -149,7 +149,7 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 				olc_audit_msg(ch, GEN_VNUM(gen), "Liquid not set");
 				problem = TRUE;
 			}
-			if (GET_LIQUID_COLOR(gen)) {
+			if (!GET_LIQUID_COLOR(gen)) {
 				olc_audit_msg(ch, GEN_VNUM(gen), "Color not set");
 				problem = TRUE;
 			}
