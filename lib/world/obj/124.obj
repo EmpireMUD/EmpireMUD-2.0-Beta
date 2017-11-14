@@ -364,6 +364,23 @@ Usage:  build smugglerswharf <direction>
 0 0 0
 0 0
 S
+#12428
+ring deep coral~
+a deep coral ring~
+A deep coral ring is lying here.~
+   This ring is hand-crafted from deep-water coral, and bewitched with oceanic
+mana.
+~
+2 mo ab 2
+0 0 0
+4 0
+A
+2 1 0
+A
+18 3 0
+C
+50 150
+S
 #12443
 monster sea spawner~
 a sea monster~
