@@ -130,6 +130,7 @@
 	GET_EXITS_HERE(room) == 0 && \
 	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
 	!ROOM_SECT_FLAGGED(room, TILE_KEEP_FLAGS) && \
+	!ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
 	!ROOM_VEHICLES(room) && \
 	!ROOM_AFFECTS(room) && \
