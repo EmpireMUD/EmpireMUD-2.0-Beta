@@ -33,15 +33,15 @@ if %actor.has_reputation(12401,Liked)%
 end
 %send% %actor% You untie %self.name%.
 %echoaround% %actor% %actor.name% unties %self.name%.
-%echo% The goblins don't look very happy...
 nop %actor.set_reputation(12401, Despised)%
 %load% mob 12407
 %purge% %self%
 ~
 #12403
-goblin pirate death~
+Goblin Pirate death~
 0 f 100
 ~
+dg_affect %self% BLIND off
 * load new goblin?
 switch %self.vnum%
   case 12403
@@ -70,10 +70,27 @@ end
 eval person %room.people%
 while %person%
   if %person.is_pc%
+    set amount 1
+    if %self.mob_flagged(HARD)%
+      set amount 2
+    end
+    eval op %%person.give_currency(12403, %amount%)%%
+    eval name %%currency.12403(%amount%)%%
+    %send% %actor% You loot %amount% %name% from %self.name%.
+    nop %op%
     nop %person.set_reputation(12401, Despised)%
   end
   eval person %person.next_in_room%
 done
+~
+#12404
+Cove: Delayed Despawn~
+1 f 0
+~
+%adventurecomplete%
+return 0
+%echo% %self.shortdesc% stands up on small green legs and sidles away.
+%purge% %self%
 ~
 #12405
 Underwater Cave difficulty select~
@@ -135,6 +152,7 @@ done
 eval room %self.room%
 eval newroom i12401
 %door% %room% north room %newroom%
+%load% obj 12461 room
 %purge% %self%
 ~
 #12406
@@ -163,7 +181,7 @@ end
 #12407
 Goblin cove: Collect seaweed~
 2 c 0
-pick~
+pick forage~
 if %depleted%
   %send% %actor% You can't find any seaweed here.
   halt
@@ -914,13 +932,19 @@ wait 20 sec
 Golden Goblin reputation gate~
 0 s 100
 ~
-if (%actor.nohassle% || %actor.has_reputation(12401, Liked)% || (%direction% == fore && %actor.has_reputation(12401, Neutral)%))
-  if %self.vnum% == 12406
-    if %actor.has_reputation(12401, Liked)%
-      %send% %actor% As you leave, %self.name% mutters some magic words.
-      %echoaround% %actor% As %actor.name% leaves, %self.name% mutters some magic words.
-    end
+if %self.vnum% == 12406
+  if %actor.has_reputation(12401, Liked)%
+    %send% %actor% As you leave, %self.name% mutters some magic words.
+    %echoaround% %actor% As %actor.name% leaves, %self.name% mutters some magic words.
+    * In case they just finished the quest, reset their breath now
+    set breath 45
+    remote breath %actor.id%
   end
+  if %self.aff_flagged(!ATTACK)%
+    halt
+  end
+end
+if (%actor.nohassle% || %actor.has_reputation(12401, Liked)% || (%direction% == fore && %actor.has_reputation(12401, Neutral)%))
   halt
 end
 %send% %actor% %self.name% won't let you pass!
@@ -930,6 +954,7 @@ return 0
 Fathma death~
 0 f 100
 ~
+dg_affect %self% BLIND off
 eval vnum 12414
 while %vnum% <= 12416
   eval mob %%instance.mob(%vnum%)%%
@@ -940,9 +965,26 @@ while %vnum% <= 12416
   end
   eval vnum %vnum% + 1
 done
+* lose rep
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.is_pc%
+    set amount 1
+    if %self.mob_flagged(HARD)%
+      set amount 2
+    end
+    eval op %%person.give_currency(12403, %amount%)%%
+    eval name %%currency.12403(%amount%)%%
+    %send% %actor% You loot %amount% %name% from %self.name%.
+    nop %op%
+    nop %person.set_reputation(12401, Despised)%
+  end
+  eval person %person.next_in_room%
+done
 ~
 #12443
-Miniboss spawner~
+Golden Goblin underwater miniboss spawner~
 1 n 100
 ~
 eval mob_1 12413 + %random.3%
