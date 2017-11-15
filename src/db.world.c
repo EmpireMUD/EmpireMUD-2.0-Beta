@@ -2663,7 +2663,7 @@ struct empire_island *get_empire_island(empire_data *emp, int island_id) {
 
 /**
 * @param empire_data *emp An empire.
-* @return int The "main island" for the empire.
+* @return int The "main island" for the empire, or NO_ISLAND if none.
 */
 int get_main_island(empire_data *emp) {
 	struct empire_city_data *city, *biggest = NULL;
@@ -2688,8 +2688,8 @@ int get_main_island(empire_data *emp) {
 		}
 	}
 	
-	// sad: this is a default so that it goes SOMEWHERE (an imm can move it)
-	return 0;
+	// sad
+	return NO_ISLAND;
 }
 
 
