@@ -1431,8 +1431,13 @@ void check_for_new_map(void) {
 				free(city->name);
 			}
 			room = city->location;
-			if (room && IS_CITY_CENTER(room)) {
-				disassociate_building(room);
+			if (room) {
+				if (IS_CITY_CENTER(room)) {
+					disassociate_building(room);
+				}
+				if (ROOM_OWNER(room)) {
+					abandon_room(room);
+				}
 			}
 			free(city);	// no need to remove from list
 		}
