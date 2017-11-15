@@ -59,6 +59,7 @@
 extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
+extern struct empire_territory_data *global_next_territory_entry;
 extern int max_automessage_id;
 extern struct offense_info_type offense_info[NUM_OFFENSES];
 extern bool world_is_sorted;
@@ -75,6 +76,7 @@ void sort_world_table();
 // locals
 int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
+void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 empire_vnum find_free_empire_vnum(void);
 void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
@@ -83,6 +85,7 @@ void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part)
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
+PLAYER_UPDATE_FUNC(send_all_players_to_nowhere);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
 void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
@@ -1384,6 +1387,150 @@ void remove_empire_from_table(empire_data *emp) {
 
 
 /**
+* This function detects when the mud boots up on a new map, and moves all
+* empire territory to "no island" (to be moved back later). It also cleans up
+* empire data and ensures players don't log in mid-ocean.
+*/
+void check_for_new_map(void) {
+	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
+	
+	struct empire_storage_data *store, *next_store;
+	struct empire_territory_data *ter, *next_ter;
+	struct empire_city_data *city, *next_city;
+	struct shipping_data *shipd, *next_shipd;
+	struct empire_island *isle, *next_isle;
+	struct empire_unique_storage *eus;
+	empire_data *emp, *next_emp;
+	room_data *room;
+	FILE *fl;
+	
+	if (!(fl = fopen(NEW_WORLD_HINT_FILE, "r"))) {
+		return;	// no new world
+	}
+	fclose(fl);
+	
+	log("DETECT NEW WORLD MAP -- Clearing empire islands and player locations...");
+	
+	// update all empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// move unique storage
+		LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			eus->island = NO_ISLAND;	// simple move, for now
+		}
+		
+		// free shipping (and put the items back)
+		LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+			add_to_empire_storage(emp, NO_ISLAND, shipd->vnum, shipd->amount);
+			free(shipd);	// no need to remove from list
+		}
+		EMPIRE_SHIPPING_LIST(emp) = NULL;	// all entries freed
+		
+		// free cities
+		LL_FOREACH_SAFE(EMPIRE_CITY_LIST(emp), city, next_city) {
+			if (city->name) {
+				free(city->name);
+			}
+			room = city->location;
+			if (room && IS_CITY_CENTER(room)) {
+				disassociate_building(room);
+			}
+			free(city);	// no need to remove from list
+		}
+		EMPIRE_CITY_LIST(emp) = NULL;	// all entries freed
+		
+		// free territory lists and clear numbers
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+			if (ter == global_next_territory_entry) {
+				global_next_territory_entry = ter->hh.next;
+			}
+			
+			// free npcs
+			while (ter->npcs) {
+				delete_territory_npc(ter, ter->npcs);
+			}
+			
+			free(ter);	// no need to remove from list
+		}
+		EMPIRE_TERRITORY_LIST(emp) = NULL;	// all entires freed
+		
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			if (isle->island == NO_ISLAND) {
+				continue;	// we ONLY keep no-island data
+			}
+			
+			// move all inventories to nowhere
+			HASH_ITER(hh, isle->store, store, next_store) {
+				add_to_empire_storage(emp, NO_ISLAND, store->vnum, store->amount);
+				free(store);	// no need to remove from hash -- it is being freed
+			}
+			
+			// remove island data
+			if (isle->name) {
+				free(isle->name);
+			}
+			HASH_DEL(EMPIRE_ISLANDS(emp), isle);
+			free(isle);
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+	
+	// do this last in case of error
+	save_all_empires();
+	unlink(NEW_WORLD_HINT_FILE);
+	
+	// now move all player login locations to NOWHERE
+	update_all_players(NULL, send_all_players_to_nowhere);
+	
+	// rescan all empires
+	reread_empire_tech(NULL);
+}
+
+
+/**
+* This function looks for any empire inventory that's in a "no island" location
+* and moves it to the specified island. This includes unique storage.
+*
+* @param empire_data *emp The empire to move.
+* @param int new_island The ID of the island to move to.
+*/
+void check_nowhere_einv(empire_data *emp, int new_island) {
+	struct empire_storage_data *store, *next_store;
+	struct empire_unique_storage *eus;
+	struct empire_island *no_isle;
+	bool any = FALSE;
+	
+	if (!emp || new_island == NO_ISLAND) {
+		return;	// can't do
+	}
+	
+	// move basic storage
+	if ((no_isle = get_empire_island(emp, NO_ISLAND))) {
+		HASH_ITER(hh, no_isle->store, store, next_store) {
+			add_to_empire_storage(emp, new_island, store->vnum, store->amount);
+			free(store);	// no need to remove from hash
+			any = TRUE;
+		}
+		no_isle->store = NULL;
+	}
+	
+	// move unique storage
+	LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+		if (eus->island == NO_ISLAND) {
+			eus->island = new_island;	// simple move, for now
+			any = TRUE;
+		}
+	}
+	
+	if (any) {	// reporting
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+		log_to_empire(emp, ELOG_TERRITORY, "Empire inventory delivered to the new island");
+	}
+}
+
+
+/**
 * Creates a new empire with default ranks and ch as leader. The default empire
 * name is the player's name so that new players will see "This area is claimed
 * by <your name>", which fits the concept that small empires are just land
@@ -1682,8 +1829,6 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
-	extern struct empire_territory_data *global_next_territory_entry;
-	
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
@@ -2318,6 +2463,23 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 			}
 		}
 	}
+}
+
+
+// for check_for_new_map
+PLAYER_UPDATE_FUNC(send_all_players_to_nowhere) {
+	// clear these rooms
+	GET_LAST_ROOM(ch) = NOWHERE;
+	GET_LOADROOM(ch) = NOWHERE;
+	GET_LOAD_ROOM_CHECK(ch) = NOWHERE;
+	GET_MARK_LOCATION(ch) = NOWHERE;
+	GET_TOMB_ROOM(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOTHING;
+	
+	// remove loadroom flag (their loadroom is gone)
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_LOADROOM);
 }
 
 
