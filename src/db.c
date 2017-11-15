@@ -338,9 +338,6 @@ void boot_db(void) {
 
 	log("Generating player index.");
 	build_player_index();
-	
-	log(" Checking for ruined cities...");
-	check_ruined_cities();
 
 	log("Loading fight messages.");
 	load_fight_messages();
@@ -400,6 +397,9 @@ void boot_db(void) {
 	log(" Calculating territory and members.");
 	reread_empire_tech(NULL);
 	check_for_new_map();
+	
+	log(" Checking for ruined cities...");
+	check_ruined_cities();
 	
 	log("Managing world memory.");
 	schedule_map_unloads();
