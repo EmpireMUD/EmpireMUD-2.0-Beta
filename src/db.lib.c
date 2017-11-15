@@ -2224,6 +2224,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	room_data *room;
 	double dbl_in;
 	long long_in;
+	char *tmp;
 	
 	sprintf(buf2, "empire #%d", vnum);
 	
@@ -2450,8 +2451,14 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 			}
 			case 'Y': { // city				
 				if (sscanf(line, "Y %d %d %s", &t[0], &t[1], str_in) == 3) {
-					city = create_city_entry(emp, fread_string(fl, buf2), real_room(t[0]), t[1]);
-					city->traits = asciiflag_conv(str_in);
+					tmp = fread_string(fl, buf2);
+					
+					if ((room = real_room(t[0])) && IS_CITY_CENTER(room)) {
+						city = create_city_entry(emp, tmp, room, t[1]);
+						city->traits = asciiflag_conv(str_in);
+					}
+					
+					free(tmp);	// was duplicated
 				}
 				else {
 					log("SYSERR: Format error in city line of empire %d", emp->vnum);
