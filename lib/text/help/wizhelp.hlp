@@ -270,18 +270,12 @@ See also: GRANT
 EVOLVE EVOLVER EVOLUTIONS
 
 The 'evolve' utility is a separate program the EmpireMUD runs once per game
-day to update the map. When the utility runs, you see two logs:
+day to update the map. This is normally silent, but will result in logs if
+you run it manually ('util evolve') or if the evolver fails to run.
 
-[ Running map evolutions... ]
-[ Imported 44/58 map evolutions ]
-
-Not all of the evolver's suggested changes could be made. The two most common
-reasons are:
- - the tile changed since the evolver's map data was saved (e.g. chopped)
- - the tile turns out to be a building entrance
-
-You can manually trigger a day's worth of evolutions by typing 'util evolve',
-if your access level is high enough.
+If not all of the evolver's suggested changes could be made, the most likely
+reason is that the tile already changed on the mud (e.g. due to chopping) so
+the mud ignores the evolver's suggestion on that tile.
 #d
 FILE
 

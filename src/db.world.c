@@ -2329,9 +2329,12 @@ bool import_one_evo(room_vnum loc, sector_vnum old_sect, sector_vnum new_sect) {
 	if (GET_SECT_VNUM(SECT(room)) != old_sect || !sector_proto(new_sect)) {
 		return FALSE;	// incorrect/bad data
 	}
+	
+	/* -- as of b5.19, entrances DO evolve ('help unstuck' explains how players now get out of buildings with bad entrances)
 	if (is_entrance(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE)) {
 		return FALSE;	// never evolve these
 	}
+	*/
 	
 	// seems ok...
 	change_terrain(room, new_sect);
