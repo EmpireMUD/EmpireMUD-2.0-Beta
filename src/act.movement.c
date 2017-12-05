@@ -556,9 +556,18 @@ void perform_transport(char_data *ch, room_data *to_room) {
 int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check) {
 	ACMD(do_dismount);
 	
+	struct affected_type *af;
+	bool needs_help = FALSE;	// this will trigger a free fly effect if stuck
+	
 	if (WATER_SECT(to_room) && !EFFECTIVELY_SWIMMING(ch)) {
-		send_to_char("You don't know how to swim.\r\n", ch);
-		return 0;
+		if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !ROOM_IS_CLOSED(to_room)) {
+			// player may be stuck
+			needs_help = TRUE;
+		}
+		else {
+			send_to_char("You don't know how to swim.\r\n", ch);
+			return 0;
+		}
 	}
 	// water->mountain
 	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && WATER_SECT(IN_ROOM(ch))) {
@@ -651,6 +660,13 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !can_move(GET_LEADING_MOB(ch), dir, to_room, TRUE)) {
 		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		return 0;
+	}
+	
+	// were we stuck though?
+	if (needs_help) {
+		af = create_flag_aff(ATYPE_UNSTUCK, 2, AFF_FLY, ch);
+		affect_to_char(ch, af);
+		free(af);
 	}
 	
 	return 1;

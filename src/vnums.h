@@ -280,6 +280,7 @@
 #define ATYPE_TRICK_SHOT  3081
 #define ATYPE_BUFF  3082
 #define ATYPE_DOT  3085
+#define ATYPE_UNSTUCK  3101
 
 
 // GENERIC_COOLDOWN entires used by the code
