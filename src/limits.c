@@ -1333,7 +1333,9 @@ bool check_autostore(obj_data *obj, bool force) {
 				islid = get_main_island(emp);
 			}
 			
-			add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
+			if (islid != NO_ISLAND) {	// MUST be not-nowhere to autostore
+				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
+			}
 		}
 	}
 	

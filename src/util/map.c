@@ -613,7 +613,7 @@ void cleanup_mud_files(void) {
 		unlink(LIB_PATH INSTANCE_FILE);
 	}
 	
-	/** write new world hint -- COMING SOON
+	// write new world hint
 	if ((fl = fopen(LIB_PATH NEW_WORLD_HINT_FILE, "w"))) {
 		fprintf(fl, "$\n");
 		fclose(fl);
@@ -621,7 +621,6 @@ void cleanup_mud_files(void) {
 	else {
 		printf("Warning: unable to write new-world hint file (if you have existing empires, einv will be in the wrong place)\n");
 	}
-	*/
 }
 
 

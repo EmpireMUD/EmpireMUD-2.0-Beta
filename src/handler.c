@@ -7074,7 +7074,7 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 	struct empire_storage_data *store = find_stored_resource(emp, island, vnum);
 	struct empire_island *isle = get_empire_island(emp, island);
 	
-	if (island == NO_ISLAND || !isle || !amount) {
+	if (!isle || !amount) {
 		return;	// nothing to do
 	}
 	if (amount < 0 && !store) {
@@ -7310,7 +7310,7 @@ struct empire_storage_data *find_stored_resource(empire_data *emp, int island, o
 	struct empire_storage_data *store = NULL;
 	struct empire_island *isle;
 	
-	if (island != NO_ISLAND && (isle = get_empire_island(emp, island))) {
+	if ((isle = get_empire_island(emp, island))) {
 		HASH_FIND_INT(isle->store, &vnum, store);
 	}
 	

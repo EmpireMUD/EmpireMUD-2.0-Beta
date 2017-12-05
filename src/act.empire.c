@@ -1271,6 +1271,7 @@ void downgrade_city(char_data *ch, char *argument) {
 
 
 void found_city(char_data *ch, char *argument) {
+	void check_nowhere_einv(empire_data *emp, int new_island);
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	void stop_room_action(room_data *room, int action, int chore);
 	extern int num_of_start_locs;
@@ -1393,6 +1394,9 @@ void found_city(char_data *ch, char *argument) {
 	stop_room_action(IN_ROOM(ch), ACT_GATHERING, NOTHING);
 	stop_room_action(IN_ROOM(ch), ACT_HARVESTING, NOTHING);
 	stop_room_action(IN_ROOM(ch), ACT_PLANTING, NOTHING);
+	
+	// move einv here if any is lost
+	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
 	
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;

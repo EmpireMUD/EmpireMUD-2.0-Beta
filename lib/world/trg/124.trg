@@ -70,14 +70,16 @@ end
 eval person %room.people%
 while %person%
   if %person.is_pc%
-    set amount 1
-    if %self.mob_flagged(HARD)%
-      set amount 2
+    if %self.vnum% != 12401
+      set amount 1
+      if %self.mob_flagged(HARD)%
+        set amount 2
+      end
+      eval op %%person.give_currency(12403, %amount%)%%
+      eval name %%currency.12403(%amount%)%%
+      %send% %person% You loot %amount% %name% from %self.name%.
+      nop %op%
     end
-    eval op %%person.give_currency(12403, %amount%)%%
-    eval name %%currency.12403(%amount%)%%
-    %send% %actor% You loot %amount% %name% from %self.name%.
-    nop %op%
     nop %person.set_reputation(12401, Despised)%
   end
   eval person %person.next_in_room%
@@ -169,7 +171,7 @@ if %actor.varexists(breath)%
   if %breath% == 0
     %send% %actor% You are about to drown!
   elseif %breath% == 1
-    %send% %actor% You cannot hold your breath much longer! You should find air, and soon! 
+    %send% %actor% You cannot hold your breath much longer! You should find air, and soon!
   elseif %breath% < 0
     %send% %actor% &rYou are drowning!
   elseif %breath% <= 5
@@ -223,6 +225,7 @@ if (%found% == 0)
     break
   done
 end
+wait 1
 %purge% %self%
 ~
 #12409
@@ -331,6 +334,9 @@ if !%actor%
     if %person.is_pc%
       if %person.varexists(breath)%
         if %person.breath% < 0
+          if %person.is_god% || %person.is_immortal% || %person.health% < 0
+            halt
+          end
           %send% %person% &rYou are drowning!
           eval amount (%person.breath%) * (-250)
           %damage% %person% %amount%
@@ -475,7 +481,7 @@ if !%target%
 end
 %send% %target% %self.name% grabs a handful of sand from one of %self.hisher% pockets and tosses it in your eyes!
 %echoaround% %target% %self.name% grabs a handful of sand from one of %self.hisher% pockets and tosses it in %target.name%'s eyes!
-dg_affect #12421 %atarget% BLIND on 5
+dg_affect #12421 %target% BLIND on 5
 ~
 #12422
 Goblin Pirate Captain: Parrot Attack~
@@ -976,7 +982,7 @@ while %person%
     end
     eval op %%person.give_currency(12403, %amount%)%%
     eval name %%currency.12403(%amount%)%%
-    %send% %actor% You loot %amount% %name% from %self.name%.
+    %send% %person% You loot %amount% %name% from %self.name%.
     nop %op%
     nop %person.set_reputation(12401, Despised)%
   end

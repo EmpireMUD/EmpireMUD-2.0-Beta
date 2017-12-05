@@ -54,6 +54,7 @@ ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
 obj_data *has_hammer(char_data *ch);
+obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -173,29 +174,36 @@ bool can_forge(char_data *ch) {
 bool find_and_bind(char_data *ch, obj_vnum vnum) {
 	obj_data *iter, *unbound = NULL;
 	struct obj_binding *bind;
+	int list;
 	
 	if (IS_NPC(ch) || vnum == NOTHING) {
 		return TRUE;	// don't bother
 	}
 	
-	LL_FOREACH2(ch->carrying, iter, next_content) {
-		if (GET_OBJ_VNUM(iter) != vnum) {
-			continue;	// wrong obj
-		}
-		if (!OBJ_FLAGGED(iter, OBJ_BIND_FLAGS)) {
-			return TRUE;	// we found the object but it doesn't require binding
-		}
+	obj_data *search[2] = { ch->carrying, ROOM_CONTENTS(IN_ROOM(ch)) };
+	
+	for (list = 0; list < 2; ++list) {
+		LL_FOREACH2(search[list], iter, next_content) {
+			if (GET_OBJ_VNUM(iter) != vnum || !bind_ok(iter, ch)) {
+				continue;	// wrong obj
+			}
+			if (!OBJ_FLAGGED(iter, OBJ_BIND_FLAGS)) {
+				return TRUE;	// we found the object but it doesn't require binding
+			}
 		
-		// ok we have the item, see if it's bound to ch
-		LL_FOREACH(OBJ_BOUND_TO(iter), bind) {
-			if (bind->idnum == GET_IDNUM(ch)) {
-				reduce_obj_binding(iter, ch);
-				return TRUE;	// already bound to ch
+			// ok we have the item, see if it's bound to ch
+			LL_FOREACH(OBJ_BOUND_TO(iter), bind) {
+				if (bind->idnum == GET_IDNUM(ch)) {
+					reduce_obj_binding(iter, ch);
+					return TRUE;	// already bound to ch
+				}
+			}
+		
+			// if we got this far, it's not bound (only want the first unbound one)
+			if (!unbound) {
+				unbound = iter;
 			}
 		}
-		
-		// if we got this far, it's not bound
-		unbound = iter;
 	}
 	
 	if (unbound) {
@@ -234,7 +242,7 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;
 		}
-		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
 			continue;
 		}
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
@@ -491,6 +499,35 @@ obj_data *has_hammer(char_data *ch) {
 	// nope
 	msg_to_char(ch, "You need to use a hammer to do that.\r\n");
 	return NULL;
+}
+
+
+/**
+* Finds the required obj for a craft, if present, and returns it. If the item
+* is in the room, it must be bind-ok.
+*
+* @param char_data *ch The player.
+* @param obj_data vnum Which item to look for.
+* @return obj_data* The object if found, NULL if not.
+*/
+obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum) {
+	obj_data *obj;
+	
+	// inv
+	LL_FOREACH2(ch->carrying, obj, next_content) {
+		if (GET_OBJ_VNUM(obj) == vnum) {
+			return obj;
+		}
+	}
+	
+	// room
+	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+		if (GET_OBJ_VNUM(obj) == vnum && bind_ok(obj, ch)) {
+			return obj;
+		}
+	}
+	
+	return NULL;	// none
 }
 
 
@@ -1415,7 +1452,7 @@ ACMD(do_gen_craft) {
 			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 				continue;	// missing ability
 			}
-			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
+			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
 				continue;	// missing requiresobj
 			}
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
@@ -1469,7 +1506,7 @@ ACMD(do_gen_craft) {
 			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 				continue;	// no abil
 			}
-			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
+			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
 				continue;	// missing obj
 			}
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
@@ -1502,7 +1539,7 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !(found_obj = get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying))) {
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !(found_obj = has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type)))) {
 		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(type))) {
@@ -1718,7 +1755,7 @@ ACMD(do_recipes) {
 				continue;
 			}
 			
-			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
+			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
 				continue;
 			}
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
