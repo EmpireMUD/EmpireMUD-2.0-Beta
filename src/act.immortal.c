@@ -468,9 +468,11 @@ ADMIN_UTIL(util_diminish) {
 
 ADMIN_UTIL(util_evolve) {
 	void run_external_evolutions();
+	extern bool manual_evolutions;
 	
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used util evolve", GET_NAME(ch));
 	send_config_msg(ch, "ok_string");
+	manual_evolutions = TRUE;	// triggers a log
 	run_external_evolutions();
 }
 

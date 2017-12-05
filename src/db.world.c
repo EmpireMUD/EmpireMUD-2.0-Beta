@@ -2304,6 +2304,10 @@ void schedule_trench_fill(struct map_data *map) {
  //////////////////////////////////////////////////////////////////////////////
 //// EVOLUTIONS //////////////////////////////////////////////////////////////
 
+bool evolutions_pending = FALSE;	// used to trigger logs when the evolver fails
+bool manual_evolutions = FALSE;	// when an imm runs this manually, they still get a log
+
+
 // This system deals with importing evolutions from the external bin/evolve
 // program, which write the EVOLUTION_FILE (hints).
 // Prior to b5.16, evolutions were done in-game using lots of processor cycles.
@@ -2356,6 +2360,8 @@ void process_import_evolutions(void) {
 	int total, changed;
 	FILE *fl;
 	
+	evolutions_pending = FALSE;	// prevents error log
+	
 	if (!(fl = fopen(EVOLUTION_FILE, "rb"))) {
 		// no file
 		log("SYSERR: import_evolutions triggered by SIGUSR1 but no evolution file '%s' to import", EVOLUTION_FILE);
@@ -2376,7 +2382,11 @@ void process_import_evolutions(void) {
 		}
 	}
 	
-	syslog(SYS_INFO, LVL_START_IMM, TRUE, "Imported %d/%d map evolutions", changed, total);
+	// log only if it was a requested evolve
+	if (manual_evolutions) {
+		syslog(SYS_INFO, LVL_START_IMM, TRUE, "Imported %d/%d map evolutions", changed, total);
+		manual_evolutions = FALSE;
+	}
 	
 	// cleanup
 	fclose(fl);
@@ -2389,9 +2399,14 @@ void process_import_evolutions(void) {
 */
 void run_external_evolutions(void) {
 	char buf[MAX_STRING_LENGTH];
-
+	
+	if (evolutions_pending) {
+		log("SYSERR: Unable to import map evolutions: bin/evolve program does not respond");
+	}
+	
+	evolutions_pending = TRUE;
 	snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d %.2f %.2f %d &", config_get_int("nearby_sector_distance"), ((time_info.month * 30) + time_info.day), config_get_double("arctic_percent"), config_get_double("tropics_percent"), (int) getpid());
-	syslog(SYS_INFO, LVL_START_IMM, TRUE, "Running map evolutions...");
+	// syslog(SYS_INFO, LVL_START_IMM, TRUE, "Running map evolutions...");
 	system(buf);
 }
 
