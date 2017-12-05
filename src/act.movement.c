@@ -664,7 +664,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 	
 	// were we stuck though?
 	if (needs_help) {
-		af = create_flag_aff(ATYPE_UNSTUCK, 2, AFF_FLY, ch);
+		af = create_flag_aff(ATYPE_UNSTUCK, 1, AFF_FLY, ch);
 		affect_to_char(ch, af);
 		free(af);
 	}
