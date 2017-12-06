@@ -1479,7 +1479,7 @@ int adjusted_instance_limit(adv_data *adv) {
 		return GET_ADV_MAX_INSTANCES(adv);
 	}
 	else {
-		val = ceil((double)GET_ADV_MAX_INSTANCES(adv) * size_of_world / 330000);
+		val = round((double)GET_ADV_MAX_INSTANCES(adv) * size_of_world / 330000);
 		return MAX(1, val);	// guarantee 1
 	}
 }
