@@ -1873,6 +1873,7 @@ const char *versions_list[] = {
 	"b5.3",
 	"b5.14",
 	"b5.17",
+	"b5.19",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2733,6 +2734,54 @@ void b5_14_superior_items(void) {
 }
 
 
+// looks for stray flags in the world
+void b5_19_world_fix(void) {
+	struct map_data *map;
+	bitvector_t flags;
+	room_data *room;
+	bld_data *bld;
+	
+	bitvector_t flags_to_wipe = ROOM_AFF_DARK | ROOM_AFF_SILENT | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_WEATHER | ROOM_AFF_NO_TELEPORT;
+	bitvector_t empire_only_flags = ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_DISMANTLE;
+	
+	LL_FOREACH(land_map, map) {
+		if (!map->shared->affects && !map->shared->base_affects) {
+			continue;	// only looking for 'affected' tiles
+		}
+		
+		// used several times below:
+		room = real_real_room(map->vnum);
+		
+		// building affs fix
+		if (!room || !(bld = GET_BUILDING(room))) {
+			REMOVE_BIT(map->shared->base_affects, flags_to_wipe);
+			REMOVE_BIT(map->shared->affects, flags_to_wipe);
+		}
+		else {	// has a building -- look for errors
+			flags = flags_to_wipe;
+			REMOVE_BIT(flags, GET_BLD_BASE_AFFECTS(bld));
+			if (flags) {	// do not remove flags the building actually uses
+				REMOVE_BIT(ROOM_BASE_FLAGS(room), flags);
+				REMOVE_BIT(ROOM_AFF_FLAGS(room), flags);
+			}
+			affect_total_room(room);
+		}
+		
+		// empire flags (just check that these are not on unclaimed rooms)
+		if (!room || !ROOM_OWNER(room)) {
+			REMOVE_BIT(map->shared->base_affects, empire_only_flags);
+			REMOVE_BIT(map->shared->affects, empire_only_flags);
+			
+			if (room) {
+				affect_total_room(room);
+			}
+		}
+	}
+	
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2958,6 +3007,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.17")) {
 			log("Updating to b5.17...");
 			save_all_empires();
+		}
+		if (MATCH_VERSION("b5.19")) {
+			log("Updating to b5.19...");
+			b5_19_world_fix();
 		}
 	}
 	
