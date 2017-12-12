@@ -1,0 +1,189 @@
+#12600
+apprentice sorcerer's sorcerers~
+the sorcerer's apprentice~
+A sorcerer's apprentice stands in front of the rift (adventure).
+~
+0 25 bdv cn
+1 0 0 15
+I 12 12600 100.00 4  # PICKPOCKET: an elemental binding trap
+I 12 12616 10.00 1  # PICKPOCKET: a tiny broom whistle
+M
+1
+Master won't like this.~
+M
+1
+I can only hold this rift open for so long!~
+M
+1
+Shouldn't have done that...~
+M
+0
+Elemental magic streams between $n and the rift.~
+M
+0
+$n seems to be straining to hold the rift open.~
+M
+0
+The rift sputters as flames pour out of it.~
+M
+0
+You're pushed back by strong, hot winds from the rift.~
+M
+0
+The rift howls with gale-force winds!~
+T 12605
+T 12609
+S
+#12601
+elemental rocky earth~
+a rocky elemental~
+A rocky earth elemental rises from the soil.
+~
+0 25 dh c
+0 0 21 14
+I 4 12601 100.00 1  # LOOT: the essence of earth
+I 4 12612 10.00 1  # LOOT: a rolling rock whistle
+M
+0
+$n makes crunching noises as it moves.~
+M
+0
+$n rolls around in the dirt.~
+M
+0
+$n seems to be training for a fight.~
+M
+0
+$n brushes off some dirt.~
+T 12605
+T 12606
+S
+#12602
+elemental fire burning~
+a burning elemental~
+A fire elemental burns brightly!
+~
+0 25 dh c
+0 0 18 16
+I 4 12602 100.00 1  # LOOT: the essence of fire
+I 4 12613 10.00 1  # LOOT: a ball of fire whistle
+M
+0
+Embers trail behind $n.~
+M
+0
+$n eats a stick from the ground.~
+M
+0
+$n belches a plume of fire and smoke.~
+M
+0
+$n rages.~
+T 12605
+T 12606
+S
+#12603
+elemental wind tornado~
+a wind elemental~
+A wind elemental rips across the land like a tornado!
+~
+0 25 dh c
+0 0 27 21
+I 4 12603 100.00 1  # LOOT: the essence of wind
+I 4 12614 10.00 1  # LOOT: a light breeze whistle
+M
+0
+$n whirls around you!~
+M
+0
+$n stirs up dust into a swirling column.~
+M
+0
+$n spins until it is dizzy.~
+T 12605
+T 12606
+S
+#12604
+elemental water~
+a water elemental~
+A water elemental splashes about.
+~
+0 25 dh c
+0 0 10 20
+I 4 12604 100.00 1  # LOOT: the essence of water
+I 4 12615 10.00 1  # LOOT: a little puddle whistle
+M
+0
+$n splashes about gleefully.~
+M
+0
+$n splashes you!~
+T 12605
+T 12606
+S
+#12612
+rock rolling little~
+a rolling rock~
+A little rock rolls around on the ground.
+~
+1 1 bdoD n
+0 0 21 15
+M
+0
+The little rock rolls around at your feet.~
+T 9901
+T 9902
+S
+#12613
+fire ball little~
+a ball of fire~
+A little ball of fire rolls around in the air.
+~
+1 1 bdoD n
+0 0 21 15
+M
+0
+The ball of fire sputters and sparks.~
+T 9901
+T 9902
+S
+#12614
+breeze light~
+a light breeze~
+A light breeze whistles through your hair.
+~
+1 1 bdoD n
+0 0 29 15
+M
+0
+A light breeze blows peacefully around your head.~
+T 9901
+T 9902
+S
+#12615
+puddle little~
+a little puddle~
+A little puddle splashes around on the ground.
+~
+1 1 bdoD n
+0 0 10 15
+M
+0
+The little puddle splashes itself around.~
+T 9901
+T 9902
+S
+#12616
+broom tiny~
+a tiny broom~
+A tiny broom marches in circles.
+~
+1 1 bdoD n
+0 0 35 15
+M
+0
+The tiny broom splits into two smaller brooms, but the second one runs off.~
+T 9901
+T 9902
+S
+$

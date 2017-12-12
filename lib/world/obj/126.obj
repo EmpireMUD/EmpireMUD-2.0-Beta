@@ -1,0 +1,238 @@
+#12600
+trap elemental binding~
+an elemental binding trap~
+An elemental binding trap is lying here.~
+   This little iron trap is covered in tiny, painted symbols. A note attached
+to the trap indicates that you can type 'trap elemental' to capture one of the
+escaped elementals in the area.
+~
+3 kp a 3
+0 0 0
+2 48
+T 12600
+S
+#12601
+essence earth~
+the essence of earth~
+The essence of earth is piled here.~
+It's a pile of dirt.
+~
+3 k a 1
+0 0 0
+1 0
+S
+#12602
+essence fire~
+the essence of fire~
+The essence of fire is burning here.~
+It's just a wisp of flame.
+~
+3 k a 3
+0 0 0
+10 0
+S
+#12603
+essence wind~
+the essence of wind~
+The essence of wind is blowing here.~
+It's barely a breeze.
+~
+3 k a 3
+0 0 0
+10 0
+S
+#12604
+essence water~
+the essence of water~
+The essence of water is leaking on the ground.~
+It's just a trickle of water.
+~
+3 k a 4
+0 0 0
+10 0
+S
+#12605
+biscuit sorcerous~
+a sorcerous biscuit~
+A sorcerous biscuit is lying here.~
+   This flaky, crumbly biscuit is bright pink in color, a sure sign it was made
+by sorcerers.
+~
+6 m a 4
+24 0 0
+7 336
+A
+15 1 0
+C
+1 25
+S
+#12606
+necklace fire opal~
+a fire opal necklace~
+A fire opal necklace is dangling here.~
+   This elegant gold necklace features a radiant cut fire opal, pulsing with
+the burning embers of a trapped flame elemental. Some clever sorcerer has
+managed to fashion an elemental into jewelry!
+~
+2 mp ac 1
+0 0 0
+4 0
+A
+17 1 0
+C
+25 25
+S
+#12607
+bracelet seashell shell~
+a seashell bracelet~
+A seashell bracelet is lying here.~
+   The bracelet is a set of seashells, stitched together with gold thread. The
+seashells drip with warm water and have the salty scent of the ocean, as if
+enchanted. It would seem some sorcerer has bound a water elemental to the
+shells.
+~
+2 mp aj 2
+0 0 0
+4 0
+A
+16 1 0
+C
+25 25
+S
+#12608
+breastplate plate stone~
+a stone breastplate~
+A stone breastplate lies flat on the ground.~
+   This breastplate is made of solid stone, enchanted by some clever sorcerer
+to be light enough to wear. It has been bound to an earth elemental to grant it
+strength as eternal as the rocks themselves.
+~
+2 mp aq 3
+0 0 0
+1 0
+A
+15 1 0
+C
+25 25
+S
+#12609
+wind gust jar~
+a gust of wind~
+A gust of wind is trapped in a jar.~
+   You have a gust of wind, somehow trapped in a jar. A tag on the jar says you
+can release the wind (by wearing it) to benefit from the gusts of the wind
+elemental trapped inside.
+~
+2 mp ak 4
+0 0 0
+10 0
+A
+18 1 0
+C
+25 25
+S
+#12610
+despawner delayed elemental~
+the elemental despawner~
+The delayed elemental despawner is here.~
+If this is here, the adventure is ticking down.
+~
+3 0 0 2
+0 0 0
+0 48
+T 12610
+S
+#12611
+flame flickering tiny~
+a flickering flame~
+A tiny, flickering flame burns brightly on the ground.~
+This tiny spark of flame puts out a surprising amount of light!
+~
+3 c 0 2
+0 0 0
+10 10080
+C
+0 25
+S
+#12612
+whistle rock rolling~
+a rolling rock whistle~
+A rolling rock whistle is lying here.~
+   This whistle can summon a noncombat pet! These pets don't help you in
+battle, but they do help you show off your accomplishments! Type 'use whistle'
+to summon it.
+~
+3 p a 4
+12612 0 0
+2 0
+T 9900
+S
+#12613
+whistle ball fire~
+a ball of fire whistle~
+A ball of fire whistle is lying here.~
+   This whistle can summon a noncombat pet! These pets don't help you in
+battle, but they do help you show off your accomplishments! Type 'use whistle'
+to summon it.
+~
+3 p a 5
+12613 0 0
+2 0
+T 9900
+S
+#12614
+whistle light breeze~
+a light breeze whistle~
+A light breeze whistle is lying here.~
+   This whistle can summon a noncombat pet! These pets don't help you in
+battle, but they do help you show off your accomplishments! Type 'use whistle'
+to summon it.
+~
+3 p a 6
+12614 0 0
+2 0
+T 9900
+S
+#12615
+whistle puddle little~
+a little puddle whistle~
+A little puddle whistle is lying here.~
+   This whistle can summon a noncombat pet! These pets don't help you in
+battle, but they do help you show off your accomplishments! Type 'use whistle'
+to summon it.
+~
+3 p a 7
+12615 0 0
+2 0
+T 9900
+S
+#12616
+whistle broom tiny~
+a tiny broom whistle~
+A tiny broom whistle is lying here.~
+   This whistle can summon a noncombat pet! These pets don't help you in
+battle, but they do help you show off your accomplishments! Type 'use whistle'
+to summon it.
+~
+3 p a 8
+12616 0 0
+2 0
+T 9900
+S
+#12617
+pendant heartstone stone~
+a heartstone pendant~
+A heartstone pendant is hanging here.~
+   It is a red rock, perhaps jasper, carved in the shape of a heart and bound
+by sorcery to an elemental. It gives you a warm, comforted feeling when you
+wear it.
+~
+2 mp ac 2
+0 0 0
+1 0
+A
+9 1 0
+C
+25 25
+S
+$
