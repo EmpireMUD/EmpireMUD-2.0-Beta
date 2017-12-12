@@ -65,6 +65,32 @@ Dragon buildings:
   dragonstatue (dragonseye ruby): A new type of statue (Dragonslayer).
   dragonlibrary (dragonquill pen): A library with an alchemy lab inside.
 #
+"ELEMENTAL ESCAPE" "SORERER'S APPRENTICE"
+
+Elemental Escape (level 0-25 adventure)
+
+While the master sorcerer is away, he has left his trusty apprentice to
+watch this rift to the elemental plane. But it seems the apprentice wasn't
+strong enough to contain the elementals, and now four have escaped! Track down
+the elementals of earth, fire, wind, and water. Defeat them and return their
+essences to the apprentice for re-summoning.
+
+Start the apprentice's quests with 'quest start all'. There is one quest
+per elemental, and you can repeat these quests if you wait at least an hour
+after finishing them. You can purchase rewards from the apprentice with the
+'list' and 'buy' commands.  Hint: If you're a thief, try pickpocketing the
+apprentice.
+
+The sorcerer's apprentice sells:
+  a sorcerous biscuit - food
+  a stone breastplate - raises health
+  a fire opal necklace - raises to-hit
+  a gust of wind - raises dodge
+  a seashell bracelet - raises mana
+  a heartstone pendant - raises wits
+
+See also: ADVENTURE, BUY, LIST, QUEST
+#
 "GIGANTIC NEST" "A GIGANTIC NEST" "GOLDEN TALONS" "CORRUPTED TALONS"
 
 A Gigantic Nest (level 100-125 solo adventure)

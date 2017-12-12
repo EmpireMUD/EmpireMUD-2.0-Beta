@@ -6657,6 +6657,12 @@ void detach_building_from_room(room_data *room) {
 		}
 	}
 	
+	// remove building affs
+	if (GET_BLD_BASE_AFFECTS(bld)) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), GET_BLD_BASE_AFFECTS(bld));
+		REMOVE_BIT(ROOM_AFF_FLAGS(room), GET_BLD_BASE_AFFECTS(bld));
+	}
+	
 	if (SCRIPT(room)) {
 		any = FALSE;
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), trig, next_trig) {
@@ -6678,6 +6684,8 @@ void detach_building_from_room(room_data *room) {
 			extract_script(room, WLD_TRIGGER);
 		}
 	}
+	
+	affect_total_room(room);
 }
 
 

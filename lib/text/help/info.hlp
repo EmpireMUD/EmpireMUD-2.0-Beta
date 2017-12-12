@@ -1211,6 +1211,12 @@ lead them, but can store far more than you can carry alone.
 
 See also: WOODWORKING, RIDE, HARNESS, PUT, GET
 #
+UNSTUCK
+
+You gain the 'unstuck' effect if you're inside a building and try to leave it,
+but the entrance is water and you have no ability to swim or fly. This short
+effect will get you past the water.
+#
 VEHICLE VEH
 
 A vehicle (sometimes abbreviated "veh", especially in the code) is a type of
