@@ -3770,6 +3770,7 @@ const char *vehicle_flags[] = {
 	"ON-FIRE",
 	"!LOAD-ONTO-VEHICLE",
 	"VISIBLE-IN-DARK",	// 20
+	"!CLAIM",
 	"\n"
 };
 

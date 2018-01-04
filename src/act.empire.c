@@ -2965,7 +2965,10 @@ void do_claim_room(char_data *ch, room_data *room) {
 void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 	empire_data *emp = get_or_create_empire(ch);
 	
-	if (!emp) {
+	if (VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
+		msg_to_char(ch, "That cannot be claimed.\r\n");
+	}
+	else if (!emp) {
 		msg_to_char(ch, "You don't belong to any empre.\r\n");
 	}
 	else if (VEH_OWNER(veh) == emp) {

@@ -1379,7 +1379,9 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	// additional setup
 	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));
-	VEH_OWNER(veh) = GET_LOYALTY(ch);
+	if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
+		VEH_OWNER(veh) = GET_LOYALTY(ch);
+	}
 	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion
 	scale_vehicle_to_level(veh, get_craft_scale_level(ch, type));
 	
