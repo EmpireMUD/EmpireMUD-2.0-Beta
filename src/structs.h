@@ -1677,7 +1677,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_SITTING  BIT(6)	// can be sitting
 
 
-// bonus traits
+// BONUS_x: bonus traits
 #define BONUS_STRENGTH  BIT(0)
 #define BONUS_DEXTERITY  BIT(1)
 #define BONUS_CHARISMA  BIT(2)
@@ -1694,7 +1694,8 @@ typedef struct vehicle_data vehicle_data;
 #define BONUS_EXTRA_DAILY_SKILLS  BIT(13)
 #define BONUS_INVENTORY  BIT(14)
 #define BONUS_FASTER  BIT(15)
-#define NUM_BONUS_TRAITS  16
+#define BONUS_BLOOD  BIT(16)
+#define NUM_BONUS_TRAITS  17
 
 
 // types of channel histories -- act.comm.c

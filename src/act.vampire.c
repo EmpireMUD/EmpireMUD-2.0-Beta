@@ -198,6 +198,10 @@ int GET_MAX_BLOOD(char_data *ch) {
 			if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 				base *= 2;
 			}
+			
+			if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
+				base += config_get_int("pool_bonus_amount") * (1 + (get_approximate_level(ch) / 25));
+			}
 		}
 	}
 
