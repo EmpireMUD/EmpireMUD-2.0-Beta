@@ -420,6 +420,7 @@ void create_map(void) {
 	printf("Numbering islands and fixing lakes...\n");
 	number_islands_and_fix_lakes();
 	
+	// oases convert to river here (instead of canal like in-game)
 	printf("Merging oases...\n");
 	replace_near(OASIS, RIVER, OCEAN, 1);
 	replace_near(OASIS, RIVER, RIVER, 1);
