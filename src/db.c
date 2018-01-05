@@ -2814,7 +2814,7 @@ void b5_20_canal_fix(void) {
 			perform_change_base_sect(NULL, map, canl);
 			
 			// for debugging:
-			log("- updated (%d, %d) from river to canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			// log("- updated (%d, %d) from river to canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 		}
 	}
 }
