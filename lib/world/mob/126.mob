@@ -39,7 +39,7 @@ elemental rocky earth~
 a rocky elemental~
 A rocky earth elemental rises from the soil.
 ~
-0 25 dh c
+0 25 dh cG
 0 0 21 14
 I 4 12601 100.00 1  # LOOT: the essence of earth
 I 4 12612 10.00 1  # LOOT: a rolling rock whistle
@@ -63,7 +63,7 @@ elemental fire burning~
 a burning elemental~
 A fire elemental burns brightly!
 ~
-0 25 dh c
+0 25 dh cG
 0 0 18 16
 I 4 12602 100.00 1  # LOOT: the essence of fire
 I 4 12613 10.00 1  # LOOT: a ball of fire whistle
@@ -87,7 +87,7 @@ elemental wind tornado~
 a wind elemental~
 A wind elemental rips across the land like a tornado!
 ~
-0 25 dh c
+0 25 dh cG
 0 0 27 21
 I 4 12603 100.00 1  # LOOT: the essence of wind
 I 4 12614 10.00 1  # LOOT: a light breeze whistle
@@ -108,7 +108,7 @@ elemental water~
 a water elemental~
 A water elemental splashes about.
 ~
-0 25 dh c
+0 25 dh cG
 0 0 10 20
 I 4 12604 100.00 1  # LOOT: the essence of water
 I 4 12615 10.00 1  # LOOT: a little puddle whistle

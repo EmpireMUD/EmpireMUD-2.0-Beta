@@ -15,8 +15,8 @@ end
 if %target.is_pc%
   %send% %actor% That seems kind of mean, don't you think?
   halt
-elseif %target.vnum% < 12601 && %target.vnum% > 12605
-  %send% %actor% You can only use trap elementals from the rift.
+elseif %target.vnum% < 12601 || %target.vnum% > 12605
+  %send% %actor% You can only use this trap on elementals from the rift.
   halt
 elseif %target.fighting%
   %send% %actor% You can't trap someone who is fighting.

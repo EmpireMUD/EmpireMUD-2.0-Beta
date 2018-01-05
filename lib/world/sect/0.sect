@@ -1596,7 +1596,7 @@ E
 E
 5 0 100.00 22
 E
-7 5 4.00 70
+7 19 4.00 70
 E
 8 0 100.00 14
 E
@@ -1710,13 +1710,13 @@ D4
 .&c~~&?.~
 &y~
 E
-2 53 4.00 5
+2 53 4.00 19
 E
-2 6 4.00 5
+2 6 4.00 19
 E
-2 5 4.00 5
+2 5 4.00 19
 E
-2 19 4.00 5
+2 19 4.00 19
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1853,7 +1853,7 @@ E
 E
 2 6 10.00 51
 E
-7 5 0.80 71
+7 19 0.80 71
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -3285,7 +3285,7 @@ D4
 E
 5 0 100.00 22
 E
-7 5 4.00 70
+7 19 4.00 70
 E
 8 0 100.00 14
 E
@@ -3754,7 +3754,7 @@ E
 E
 9 0 50.00 71
 E
-11 5 4.00 20
+11 19 4.00 20
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
@@ -3880,7 +3880,7 @@ D4
 E
 0 1 100.00 70
 E
-11 5 4.00 26
+11 19 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
@@ -3993,7 +3993,7 @@ E
 E
 0 1 100.00 70
 E
-11 5 4.00 26
+11 19 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
