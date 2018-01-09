@@ -2965,7 +2965,10 @@ void do_claim_room(char_data *ch, room_data *room) {
 void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 	empire_data *emp = get_or_create_empire(ch);
 	
-	if (!emp) {
+	if (VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
+		msg_to_char(ch, "That cannot be claimed.\r\n");
+	}
+	else if (!emp) {
 		msg_to_char(ch, "You don't belong to any empre.\r\n");
 	}
 	else if (VEH_OWNER(veh) == emp) {
@@ -3118,8 +3121,8 @@ ACMD(do_demote) {
 		msg_to_char(ch, "That person is not in your empire.\r\n");
 	else if ((to_rank != NOTHING ? to_rank : (to_rank = GET_RANK(victim) - 1)) > GET_RANK(victim))
 		msg_to_char(ch, "Use promote for that.\r\n");
-	else if (GET_RANK(victim) > GET_RANK(ch)) {
-		msg_to_char(ch, "You can't demote someone above your rank.\r\n");
+	else if (GET_RANK(victim) >= GET_RANK(ch) && GET_RANK(ch) < EMPIRE_NUM_RANKS(e)) {
+		msg_to_char(ch, "You can't demote someone of that rank.\r\n");
 	}
 	else if (GET_IDNUM(victim) == EMPIRE_LEADER(e)) {
 		msg_to_char(ch, "You cannot demote the leader.\r\n");

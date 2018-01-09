@@ -1874,6 +1874,7 @@ const char *versions_list[] = {
 	"b5.14",
 	"b5.17",
 	"b5.19",
+	"b5.20",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2782,6 +2783,43 @@ void b5_19_world_fix(void) {
 }
 
 
+// finds old-style player-made rivers and converts them to canals
+void b5_20_canal_fix(void) {
+	struct map_data *map;
+	sector_data *canl;
+	bool change;
+	
+	int river_sect = 5;
+	int canal_sect = 19;
+	int estuary_sect = 53;
+	
+	if (!(canl = sector_proto(canal_sect))) {
+		log("SYSERR: failed to do b5_20_canal_fix because canal sector is invalid.");
+		exit(0);
+	}
+	
+	LL_FOREACH(land_map, map) {
+		// is a river but not a real river?
+		change = GET_SECT_VNUM(map->base_sector) == river_sect && GET_SECT_VNUM(map->natural_sector) != river_sect;
+		
+		// is an estuary but not a real one or natural river?
+		change |= GET_SECT_VNUM(map->base_sector) == estuary_sect && GET_SECT_VNUM(map->natural_sector) != estuary_sect && GET_SECT_VNUM(map->natural_sector) != river_sect;
+		
+		if (change) {
+			// only change current sector if currently river
+			if (map->sector_type == map->base_sector) {
+				perform_change_sect(NULL, map, canl);
+			}
+			// always change base sector (it was required to hit this condition)
+			perform_change_base_sect(NULL, map, canl);
+			
+			// for debugging:
+			// log("- updated (%d, %d) from river to canal", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3011,6 +3049,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.19")) {
 			log("Updating to b5.19...");
 			b5_19_world_fix();
+		}
+		if (MATCH_VERSION("b5.20")) {
+			log("Updating to b5.20...");
+			b5_20_canal_fix();
 		}
 	}
 	

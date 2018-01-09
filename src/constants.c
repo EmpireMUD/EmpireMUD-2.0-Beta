@@ -412,6 +412,7 @@ const char *bonus_bits[] = {
 	"EXTRA-DAILY-SKILLS",
 	"INVENTORY",
 	"FASTER",
+	"BLOOD",
 	"\n"
 };
 
@@ -434,6 +435,7 @@ const char *bonus_bit_descriptions[] = {
 	"Extra daily bonus experience",
 	"Larger inventory",
 	"Faster walking",
+	"Extra blood (for vampires)",
 	"\n"
 };
 
@@ -3768,6 +3770,7 @@ const char *vehicle_flags[] = {
 	"ON-FIRE",
 	"!LOAD-ONTO-VEHICLE",
 	"VISIBLE-IN-DARK",	// 20
+	"!CLAIM",
 	"\n"
 };
 

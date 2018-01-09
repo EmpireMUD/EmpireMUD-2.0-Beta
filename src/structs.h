@@ -1677,7 +1677,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_SITTING  BIT(6)	// can be sitting
 
 
-// bonus traits
+// BONUS_x: bonus traits
 #define BONUS_STRENGTH  BIT(0)
 #define BONUS_DEXTERITY  BIT(1)
 #define BONUS_CHARISMA  BIT(2)
@@ -1694,7 +1694,8 @@ typedef struct vehicle_data vehicle_data;
 #define BONUS_EXTRA_DAILY_SKILLS  BIT(13)
 #define BONUS_INVENTORY  BIT(14)
 #define BONUS_FASTER  BIT(15)
-#define NUM_BONUS_TRAITS  16
+#define BONUS_BLOOD  BIT(16)
+#define NUM_BONUS_TRAITS  17
 
 
 // types of channel histories -- act.comm.c
@@ -2132,6 +2133,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_ON_FIRE  BIT(18)	// s. currently on fire
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
 #define VEH_VISIBLE_IN_DARK  BIT(20)	// u. can be seen at night
+#define VEH_NO_CLAIM  BIT(21)	// v. cannot be claimed
 
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
