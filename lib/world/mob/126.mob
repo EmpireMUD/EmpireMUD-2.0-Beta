@@ -57,6 +57,8 @@ M
 $n brushes off some dirt.~
 T 12605
 T 12606
+T 12601
+T 12607
 S
 #12602
 elemental fire burning~
@@ -81,6 +83,7 @@ M
 $n rages.~
 T 12605
 T 12606
+T 12602
 S
 #12603
 elemental wind tornado~
@@ -102,6 +105,7 @@ M
 $n spins until it is dizzy.~
 T 12605
 T 12606
+T 12603
 S
 #12604
 elemental water~
@@ -120,6 +124,17 @@ M
 $n splashes you!~
 T 12605
 T 12606
+T 12604
+T 12611
+S
+#12605
+ember floating~
+a floating ember~
+An ember is floating here.
+~
+1 1 abdhnoD G
+0 0 27 16
+T 12608
 S
 #12612
 rock rolling little~
