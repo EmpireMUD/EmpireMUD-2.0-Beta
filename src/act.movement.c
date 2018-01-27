@@ -569,6 +569,13 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 			return 0;
 		}
 	}
+	
+	// check auto-swim
+	else if (!IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOSWIM) && WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch)) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_RIDING(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
+		msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
+		return 0;
+	}
+	
 	// water->mountain
 	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && WATER_SECT(IN_ROOM(ch))) {
 		if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch)) {
@@ -2077,6 +2084,36 @@ ACMD(do_stand) {
 			act("$n stops floating around, and puts $s feet on the ground.", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_STANDING;
 			break;
+	}
+}
+
+
+ACMD(do_swim) {
+	room_data *to_room;
+	int dir;
+
+	one_argument(argument, arg);
+
+	if (!*arg) {
+		msg_to_char(ch, "Which way would you like to swim?\r\n");
+	}
+	else if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't do that here.\r\n");	// map only
+	}
+	else if ((dir = parse_direction(ch, arg)) == NO_DIR) {
+		msg_to_char(ch, "That's not a direction!\r\n");
+	}
+	else if (dir >= NUM_2D_DIRS) {
+		msg_to_char(ch, "You can't swim that way!\r\n");
+	}
+	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+		msg_to_char(ch, "You can't go that way!\r\n");
+	}
+	else if (!WATER_SECT(to_room)) {
+		msg_to_char(ch, "You can only swim in the water.\r\n");
+	}
+	else {
+		do_simple_move(ch, dir, to_room, MOVE_SWIM);
 	}
 }
 
