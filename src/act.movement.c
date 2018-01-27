@@ -576,6 +576,10 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 			return 0;
 		}
 	}
+	if (!IS_SET(flags, MOVE_CLIMB | MOVE_IGNORE) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You must use 'climb' to go there.\r\n");
+		return 0;
+	}
 	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 		if (ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES)) {
 			msg_to_char(ch, "You can't enter it from this side. The entrances are from %s and %s.\r\n", from_dir[get_direction_for_char(ch, BUILDING_ENTRANCE(to_room))], from_dir[get_direction_for_char(ch, rev_dir[BUILDING_ENTRANCE(to_room)])]);
@@ -1524,6 +1528,36 @@ ACMD(do_circle) {
 			sprintf(buf, "%s", dirs[get_direction_for_char(fol->follower, dir)]);
 			do_circle(fol->follower, buf, 0, 0);
 		}
+	}
+}
+
+
+ACMD(do_climb) {
+	room_data *to_room;
+	int dir;
+
+	one_argument(argument, arg);
+
+	if (!*arg) {
+		msg_to_char(ch, "Which way would you like to climb?\r\n");
+	}
+	else if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't do that here.\r\n");	// map only
+	}
+	else if ((dir = parse_direction(ch, arg)) == NO_DIR) {
+		msg_to_char(ch, "That's not a direction!\r\n");
+	}
+	else if (dir >= NUM_2D_DIRS) {
+		msg_to_char(ch, "You can't climb that way!\r\n");
+	}
+	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+		msg_to_char(ch, "You can't go that way!\r\n");
+	}
+	else if (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH)) {
+		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
+	}
+	else {
+		do_simple_move(ch, dir, to_room, MOVE_CLIMB);
 	}
 }
 
