@@ -658,46 +658,47 @@ const char *class_role_color[] = {
 
 // PRF_x: for do_toggle, this controls the "toggle" command and these are displayed in rows of 3	
 const struct toggle_data_type toggle_data[] = {
-	// name, type, prf, level, func
-	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, NULL },
-	{ "mortlog", TOG_ONOFF, PRF_MORTLOG, 0, NULL },
-	{ "autokill", TOG_ONOFF, PRF_AUTOKILL, 0, NULL },
-	
 	// these are shown in rows of 3
-	{ "tell", TOG_OFFON, PRF_NOTELL, 0, NULL },
+	// name, type, prf, level, func
+	
+	{ "autoclimb", TOG_ONOFF, PRF_AUTOCLIMB, 0, NULL },
+	{ "screen-reader", TOG_ONOFF, PRF_SCREEN_READER, 0, NULL },
+	{ "afk", TOG_ONOFF, PRF_AFK, 0, afk_notify },
+	
+	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
 	{ "scrolling", TOG_ONOFF, PRF_SCROLLING, 0, NULL },
 	{ "bother", TOG_ONOFF, PRF_BOTHERABLE, 0, NULL },
 	
-	{ "shout", TOG_OFFON, PRF_DEAF, 0, NULL },
-	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
-	{ "political", TOG_ONOFF, PRF_POLITICAL, 0, tog_political },
+	{ "autokill", TOG_ONOFF, PRF_AUTOKILL, 0, NULL },
+	{ "action-spam", TOG_OFFON, PRF_NOSPAM, 0, NULL },
+	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
 	
 	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
-	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
-	{ "informative", TOG_ONOFF, PRF_INFORMATIVE, 0, tog_informative },
-	
-	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, tog_mapcolor },
-	{ "no-repeat", TOG_ONOFF, PRF_NOREPEAT, 0, NULL },
-	{ "screen-reader", TOG_ONOFF, PRF_SCREEN_READER, 0, NULL },
-	
-	{ "action-spam", TOG_OFFON, PRF_NOSPAM, 0, NULL },
+	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
 	{ "rp", TOG_ONOFF, PRF_RP, 0, NULL },
-	{ "afk", TOG_ONOFF, PRF_AFK, 0, afk_notify },
 	
-	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
-	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
-	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
+	{ "autoswim", TOG_ONOFF, PRF_AUTOSWIM, 0, NULL },
+	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
+	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, NULL },
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
-	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
-	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
-	
-	{ "no-paint", TOG_ONOFF, PRF_NO_PAINT, 0, NULL },
-	{ "extra-spacing",	TOG_ONOFF, PRF_EXTRA_SPACING, 0, NULL },
 	{ "driving-look", TOG_ONOFF, PRF_DRIVING_LOOK, 0, NULL },
+	{ "mortlog", TOG_ONOFF, PRF_MORTLOG, 0, NULL },
 	
-	{ "autoclimb", TOG_ONOFF, PRF_AUTOCLIMB, 0, NULL },
-	{ "autoswim", TOG_ONOFF, PRF_AUTOSWIM, 0, NULL },
+	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
+	{ "extra-spacing",	TOG_ONOFF, PRF_EXTRA_SPACING, 0, NULL },
+	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
+	
+	{ "informative", TOG_ONOFF, PRF_INFORMATIVE, 0, tog_informative },
+	{ "no-repeat", TOG_ONOFF, PRF_NOREPEAT, 0, NULL },
+	{ "tell", TOG_OFFON, PRF_NOTELL, 0, NULL },
+	
+	{ "political", TOG_ONOFF, PRF_POLITICAL, 0, tog_political },
+	{ "no-paint", TOG_ONOFF, PRF_NO_PAINT, 0, NULL },
+	{ "shout", TOG_OFFON, PRF_DEAF, 0, NULL },
+	
+	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, tog_mapcolor },
+	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
