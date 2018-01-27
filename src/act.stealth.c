@@ -1630,7 +1630,7 @@ ACMD(do_shadowstep) {
 
 /* Sneak is now sneak <direction>.  Note that entire parties may not sneak together. */
 ACMD(do_sneak) {
-	extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
+	extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 	
 	int dir;
 	bool sneaking = FALSE;
@@ -1675,7 +1675,7 @@ ACMD(do_sneak) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 
-	if (perform_move(ch, dir, FALSE, 0)) {	// should be MOVE_NORMAL
+	if (perform_move(ch, dir, NOBITS)) {
 		gain_ability_exp(ch, ABIL_SNEAK, 5);
 	}
 	

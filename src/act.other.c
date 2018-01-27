@@ -1992,7 +1992,7 @@ ACMD(do_group) {
 
 
 ACMD(do_herd) {
-	extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
+	extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 	extern const int rev_dir[];
 
 	struct room_direction_data *ex = NULL;
@@ -2045,12 +2045,12 @@ ACMD(do_herd) {
 	else {
 		was_in = IN_ROOM(ch);
 		
-		if (perform_move(victim, dir, TRUE, 0)) {
+		if (perform_move(victim, dir, MOVE_HERD)) {
 			act("You skillfully herd $N.", FALSE, ch, 0, victim, TO_CHAR);
 			act("$n skillfully herds $N.", FALSE, ch, 0, victim, TO_ROOM);
 			
 			// only attempt to move ch if they weren't moved already (e.g. by following)
-			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, FALSE, 0)) {
+			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, NOBITS)) {
 				char_to_room(victim, IN_ROOM(ch));
 			}
 		}
