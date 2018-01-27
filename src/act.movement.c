@@ -1560,7 +1560,7 @@ ACMD(do_climb) {
 	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
 		msg_to_char(ch, "You can't go that way!\r\n");
 	}
-	else if (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH)) {
+	else if (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
 		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
 	}
 	else {
@@ -2109,7 +2109,7 @@ ACMD(do_swim) {
 	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
 		msg_to_char(ch, "You can't go that way!\r\n");
 	}
-	else if (!WATER_SECT(to_room)) {
+	else if (!WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only swim in the water.\r\n");
 	}
 	else {
