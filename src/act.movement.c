@@ -967,18 +967,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		return FALSE;
 	}
 
-	// if the room we're going to is water, check for ability to move
-	if (WATER_SECT(to_room)) {
-		if (!EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch) && !IS_SET(flags, MOVE_EARTHMELD)) {
-			if (has_player_tech(ch, PTECH_SWIMMING)) {
-				flags |= MOVE_SWIM;
-			}
-			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
-				flags |= MOVE_SWIM;
-			}
-		}
-	}
-
 	// move into a barrier at all?
 	if (!IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && IS_COMPLETE(to_room) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "There is a barrier in your way.\r\n");
@@ -1007,7 +995,19 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	if (!REAL_NPC(ch) && !IS_SET(flags, MOVE_EARTHMELD) && !can_move(ch, dir, to_room, flags)) {
 		return FALSE;
 	}
-
+	
+	// detect swim and set movement type
+	if (WATER_SECT(to_room)) {
+		if (!EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch) && !IS_SET(flags, MOVE_EARTHMELD)) {
+			if (has_player_tech(ch, PTECH_SWIMMING)) {
+				flags |= MOVE_SWIM;
+			}
+			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
+				flags |= MOVE_SWIM;
+			}
+		}
+	}
+	
 	/* move points needed is avg. move loss for src and destination sect type */
 	need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, flags);
 

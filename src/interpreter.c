@@ -395,6 +395,7 @@ ACMD(do_summary);
 ACMD(do_summon);
 ACMD(do_survey);
 ACMD(do_swap);
+ACMD(do_swim);
 ACMD(do_switch);
 ACMD(do_syslog);
 
@@ -970,6 +971,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "sunshock", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SUNSHOCK, CTYPE_COMBAT, NOBITS, ABIL_SUNSHOCK ),
 	SIMPLE_CMD( "survey", POS_STANDING, do_survey, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "swap", POS_RESTING, do_swap, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "swim", POS_STANDING, do_swim, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "switch", POS_DEAD, do_switch, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SWITCH ),
 	SIMPLE_CMD( "syslog", POS_DEAD, do_syslog, LVL_START_IMM, CTYPE_IMMORTAL ),
 
