@@ -624,6 +624,8 @@ const char *preference_bits[] = {
 	"!PAINT",
 	"EXTRA-SPACING",
 	"DRIVING-LOOK",
+	"AUTOCLIMB",
+	"AUTOSWIM",
 	"\n"
 };
 
@@ -693,6 +695,9 @@ const struct toggle_data_type toggle_data[] = {
 	{ "no-paint", TOG_ONOFF, PRF_NO_PAINT, 0, NULL },
 	{ "extra-spacing",	TOG_ONOFF, PRF_EXTRA_SPACING, 0, NULL },
 	{ "driving-look", TOG_ONOFF, PRF_DRIVING_LOOK, 0, NULL },
+	
+	{ "autoclimb", TOG_ONOFF, PRF_AUTOCLIMB, 0, NULL },
+	{ "autoswim", TOG_ONOFF, PRF_AUTOSWIM, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },

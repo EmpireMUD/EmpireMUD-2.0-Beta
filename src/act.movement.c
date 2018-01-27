@@ -576,8 +576,8 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 			return 0;
 		}
 	}
-	if (!IS_SET(flags, MOVE_CLIMB | MOVE_IGNORE) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-		msg_to_char(ch, "You must use 'climb' to go there.\r\n");
+	if (!IS_SET(flags, MOVE_CLIMB | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOCLIMB) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
+		msg_to_char(ch, "You must type 'climb' to enter such rough terrain.\r\n");
 		return 0;
 	}
 	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
