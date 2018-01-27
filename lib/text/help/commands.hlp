@@ -367,6 +367,16 @@ use the toggle to automatically clear meters whenever you start a new fight.
 
 See also: METERS, TOGGLE
 #
+CLIMB
+
+Usage:  climb <direction>
+
+This command allows you to enter a mountain tile (or other rough terrain). This
+keeps you from accidentally walking onto a mountain. You can 'toggle autoclimb'
+to remove the need for this command.
+
+See also: AUTOCLIMB, MOUNTAIN CLIMBING
+#
 CLS
 
 Usage:  cls
@@ -1860,6 +1870,17 @@ trees to build more mines. You wield a pick and hold an axe, and "swap" them
 as you change back and forth between activities.
 
 See also: DRAW, SHEATH
+#
+SWIM
+
+Usage:  swim <direction>
+
+This command allows you to enter a water tile from land. You must still have
+the Swimming ability, or some other way to swim.
+
+You can turn off the need for this command with 'toggle autoswim'.
+
+See also: AUTOSWIM, SWIMMING
 #
 TELLHISTORY
 

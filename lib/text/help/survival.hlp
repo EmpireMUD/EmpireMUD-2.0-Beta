@@ -214,7 +214,15 @@ In order to cross large mountain ranges, you must learn Mountain climbing.
 It still takes a lot of energy to cross, but it's not possible at all
 otherwise.
 
+Without this ability, you can only enter the first mountain tile, but cannot
+move from mountain to mountain.
+
+To enter a mountain tile, you must type 'climb'. This prevents players from
+wasting move points by accidentally walking onto a mountain.
+
 Gains experience when you cross mountains while not riding.
+
+See also: CLIMB, AUTOCLIMB
 #
 NAVIGATION COORDINATES
 
@@ -337,7 +345,7 @@ Gains experience when you recover movement.
 
 See also: SLEEP
 #
-SWIM SWIMMING
+SWIMMING
 
 Swimming (Survival ability)
 
@@ -345,9 +353,12 @@ Swimming allows you to move through river and ocean squares without a canoe
 or ship. However, sharks are attracted to the splashing of swimmers and will
 attack you if you are in the ocean.
 
+You must type 'swim' to enter a water tile from land. This keeps players from
+wasting movement points or wandering into the mouth of a shark.
+
 Gains experience when you swim around.
 
-See also: CANOE, SHIPBUILDING
+See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM
 #
 THIRST "SATED THIRST"
 
