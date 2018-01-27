@@ -1060,7 +1060,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	else if (move_type == MOB_MOVE_WALK && (WATER_SECT(IN_ROOM(ch)) || WATER_SECT(to_room)) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_SWIM;
 	}
-	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && move_type != MOB_MOVE_FLY) {
+	else if (move_type == MOB_MOVE_WALK && (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) || ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH)) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_CLIMB;
 	}
 
