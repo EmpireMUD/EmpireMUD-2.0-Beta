@@ -1183,10 +1183,10 @@ occur in the middle or at the end, not just at the beginning).
 #e
 "SHOW ACCOUNT"
 
-Usage:  show account <player name>
+Usage:  show account <player name | account id>
 
 Shows all characters associated with the target character's account (the target
-player's alternates).
+player's alternates). You can look this up by player or by id.
 #e
 "SHOW QUESTS"
 
