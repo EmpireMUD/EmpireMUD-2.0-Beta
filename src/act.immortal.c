@@ -6239,6 +6239,10 @@ ACMD(do_gecho) {
 		for (pt = descriptor_list; pt; pt = pt->next) {
 			if (STATE(pt) == CON_PLAYING && pt->character && pt->character != ch) {
 				send_to_char(buf, pt->character);
+				
+				if (GET_ACCESS_LEVEL(pt->character) >= GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(pt->character, "(gecho by %s)\r\n", GET_REAL_NAME(ch));
+				}
 			}
 		}
 		
