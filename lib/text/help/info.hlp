@@ -1116,6 +1116,9 @@ Example:
   > /kickflip Hey guys!
   > /hist kickflip
 
+Immortals may also:  /recase <channel> <new capitalization>
+                     /echo <channel> <text>  (this requires the GECHO grant)
+
 See also: CHANNELS
 #
 SPEAR
