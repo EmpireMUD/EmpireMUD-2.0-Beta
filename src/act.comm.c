@@ -1006,9 +1006,10 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "That doesn't seem to be a change in the current letter case.\r\n");
 		}
 		else {
-			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has changed the case on /%s to /%s", GET_REAL_NAME(ch), chan->name, arg3);
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has changed the case of /%s to /%s", GET_REAL_NAME(ch), chan->name, arg3);
 			free(chan->name);
 			chan->name = str_dup(arg3);
+			chan->color = compute_slash_channel_color(arg3);
 			send_config_msg(ch, "ok_string");
 		}
 	}
