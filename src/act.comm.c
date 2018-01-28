@@ -739,7 +739,12 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 			color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH) : '0';
 
 			if (echo) {
-				sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s\tn", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
+				if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+					sprintf(lbuf, "\t%c[\t%c/%s\t%c (echo by %s%s)]: %s\tn", color, chan->color, chan->name, color, !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
+				}
+				else {	// can't see name
+					sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s\tn", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
+				}
 			}
 			else if (emote) {
 				sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s %s\tn", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", argument);
