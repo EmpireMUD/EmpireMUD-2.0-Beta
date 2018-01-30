@@ -56,7 +56,7 @@ R
 5119 0
 S
 #12405
-rock large suspicious~
+rock large suspicious path~
 the suspicious rock~
 A large, suspicious rock blocks the path (difficulty).~
    The rock looks like it blocks the path, but on closer inspection you see
@@ -64,7 +64,7 @@ there's an easy way around it. You just have to set the difficulty for the
 adventure to get by...
 Usage:  difficulty <normal | hard>
 ~
-3 0 0 2
+3 0 0 3
 0 0 0
 1 0
 T 12405
@@ -272,7 +272,7 @@ S
 shell raging kraken~
 a raging kraken shell~
 A raging kraken shell is lying here.~
-   This epic seashell has the Mark of the Kraken etched into the side of it. 
+   This epic seashell has the Mark of the Kraken etched into the side of it.
 Type 'use kraken' to summon this aquatic mount.
 ~
 3 p a 5
