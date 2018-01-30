@@ -937,13 +937,13 @@ Seek Support From Germione~
    Even when an adventurer retires, their affiliation with the guild continues.
 You must seek out one such former member, the hedge witch Germione, who lives in a
 hut on stilts in the swamp. Find the hut, pull down the rope ladder, and pay
-Germione a visit. Perhaps her support will be enouigh to secure your guildhall.
+Germione a visit. Perhaps her support will be enough to secure your guildhall.
    Say the word 'friend' so Germione knows you come in peace.
 ~
    The hedge witch, Germione, agrees to support you in exchange for some
 'errands'.
 ~
-8 0 0 0 -1
+9 0 0 0 -1
 A
 1 18218
 P
@@ -1223,14 +1223,14 @@ Message for the Goblins~
    After a long, strange story, you learn that Adventurer 13 has a
 long-standing grudge against Furl, war shaman of the goblins. It seems Furl has
 discovered the secret to immortality, allowing him to resurrect after every
-defeat. Adventurer 13 wants to you track down Furl, whose goblins are known to
+defeat. Adventurer 13 wants you to track down Furl, whose goblins are known to
 hide out in ruined buildings, and defeat him. When you do, let Furl's
 temporarily-rotting corpse know 'The Adventurers send their regards.'
 ~
    Adventurer 13 cackles with glee at the news that you have delivered his
 message to Furl.
 ~
-7 0 0 0 -1
+8 0 0 0 -1
 A
 1 11101
 P

@@ -2873,56 +2873,69 @@ SHOW(show_uses) {
 
 
 SHOW(show_account) {
-	player_index_data *plr_index, *index, *next_index;
+	player_index_data *plr_index = NULL, *index, *next_index;
 	bool file = FALSE, loaded_file = FALSE;
 	char skills[MAX_STRING_LENGTH];
 	char_data *plr = NULL, *loaded;
+	int acc_id = NOTHING;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: show account <player>\r\n");
+		return;
+	}
+	
+	// target by...
+	if (isdigit(*argument)) {
+		acc_id = atoi(argument);
 	}
 	else if (!(plr = find_or_load_player(argument, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
+		return;
 	}
-	else {
-		msg_to_char(ch, "Account characters:\r\n");
-		
-		if (!(plr_index = find_player_index_by_idnum(GET_IDNUM(plr)))) {
-			msg_to_char(ch, "Unknown error: player not in index.\r\n");
-			if (file) {
-				free_char(plr);
-			}
-			return;
+	
+	// look up index if applicable
+	if (plr && !(plr_index = find_player_index_by_idnum(GET_IDNUM(plr)))) {
+		msg_to_char(ch, "Unknown error: player not in index.\r\n");
+		if (file) {
+			free_char(plr);
+		}
+		return;
+	}
+	
+	// look up id if needed
+	if (acc_id == NOTHING && plr_index) {
+		acc_id = plr_index->account_id;
+	}
+	
+	// display:
+	msg_to_char(ch, "Account characters:\r\n");
+	
+	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+		if (index->account_id != acc_id && (!plr_index || strcmp(index->last_host, plr_index->last_host))) {
+			continue;
+		}
+		if (!(loaded = find_or_load_player(index->name, &loaded_file))) {
+			continue;
 		}
 		
-		HASH_ITER(name_hh, player_table_by_name, index, next_index) {
-			if (index->account_id != plr_index->account_id && strcmp(index->last_host, plr_index->last_host)) {
-				continue;
-			}
-			if (!(loaded = find_or_load_player(index->name, &loaded_file))) {
-				continue;
-			}
-			
-			// skills name used by all 3
-			get_player_skill_string(loaded, skills, TRUE);
-			
-			if (GET_ACCOUNT(loaded) == GET_ACCOUNT(plr)) {
-				
-				if (!loaded_file) {
-					msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
-				}
-				else {
-					// not playing but same account
-					msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded));
-				}
+		// skills name used by all 3
+		get_player_skill_string(loaded, skills, TRUE);
+		
+		if (GET_ACCOUNT(loaded)->id == acc_id) {
+			if (!loaded_file) {
+				msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 			}
 			else {
-				msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+				// not playing but same account
+				msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded));
 			}
-			
-			if (loaded_file) {
-				free_char(loaded);
-			}
+		}
+		else {
+			msg_to_char(ch, " &r[%d %s] %s (not on account)&0\r\n", loaded_file ? GET_LAST_KNOWN_LEVEL(loaded) : GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+		}
+		
+		if (loaded_file) {
+			free_char(loaded);
 		}
 	}
 	
@@ -6226,6 +6239,10 @@ ACMD(do_gecho) {
 		for (pt = descriptor_list; pt; pt = pt->next) {
 			if (STATE(pt) == CON_PLAYING && pt->character && pt->character != ch) {
 				send_to_char(buf, pt->character);
+				
+				if (GET_ACCESS_LEVEL(pt->character) >= GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(pt->character, "(gecho by %s)\r\n", GET_REAL_NAME(ch));
+				}
 			}
 		}
 		

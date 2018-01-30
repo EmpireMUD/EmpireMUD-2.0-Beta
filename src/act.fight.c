@@ -239,7 +239,7 @@ ACMD(do_execute) {
 
 
 ACMD(do_flee) {
-	extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
+	extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 	extern const bool can_flee_dir[NUM_OF_DIRS];
 	
 	int i, attempt, try;
@@ -288,7 +288,7 @@ ACMD(do_flee) {
 		if ((inside && (ex = find_exit(IN_ROOM(ch), attempt)) && CAN_GO(ch, ex)) || (!inside && to_room && (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH | SECTF_FRESH_WATER | SECTF_OCEAN) || IS_RIDING(ch)) && !ROOM_IS_CLOSED(to_room))) {
 			act("$n panics, and attempts to flee!", TRUE, ch, 0, 0, TO_ROOM);
 			was_fighting = FIGHTING(ch);
-			if (perform_move(ch, attempt, TRUE, 0)) {
+			if (perform_move(ch, attempt, NOBITS)) {
 				send_to_char("You flee head over heels.\r\n", ch);
 				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
 					gain_ability_exp(ch, ABIL_FLEET, 5);

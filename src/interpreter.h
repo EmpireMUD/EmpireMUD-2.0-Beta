@@ -234,13 +234,18 @@ struct alias_data {
 #define NUM_TOG_TYPES  2
 
 
-// movement types
-#define MOVE_NORMAL  0	// Normal move message
-#define MOVE_LEAD  1	// Leading message
-#define MOVE_FOLLOW  2	// Follower message
-#define MOVE_CIRCLE  3	// circling
-#define MOVE_EARTHMELD  4
-#define MOVE_SWIM  5	// swim skill
+// movement flags
+#define MOVE_LEAD  BIT(0)	// leading something
+#define MOVE_FOLLOW  BIT(1)	// following someone
+#define MOVE_CIRCLE  BIT(2)	// is circling a building
+#define MOVE_EARTHMELD  BIT(3)	// is earthmelded (can't be seen)
+#define MOVE_SWIM  BIT(4)	// player is swimming
+#define MOVE_CLIMB  BIT(5)	// player is climbing
+#define MOVE_HERD  BIT(6)	// mob being herded
+#define MOVE_WANDER  BIT(7)	// normal mob move
+
+// flags that ignore some move checks
+#define MOVE_IGNORE  (MOVE_LEAD | MOVE_FOLLOW | MOVE_HERD | MOVE_WANDER)
 
 
 // obj desc flags

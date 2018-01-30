@@ -51,6 +51,11 @@ nop %self.add_mob_flag(NO-ATTACK)%
 wait 10 seconds
 set running 0
 remote running %self.id%
+if %self.varexists(success)%
+  if %self.success%
+    set success 1
+  end
+end
 if %success%
   nop %self.remove_mob_flag(NO-ATTACK)%
   dg_affect #12601 %self% off
@@ -105,6 +110,7 @@ while %actor.affect(12604)%
   %echoaround% %actor% %self.name% pummels and crushes %actor.name%!
   %damage% %actor% 50 physical
   %send% %actor% (Type 'struggle' to break free.)
+  wait 5 sec
 done
 ~
 #12605
@@ -150,6 +156,10 @@ done
 Stomp earth elemental~
 0 c 0
 stomp~
+if !%self.varexists(success)%
+  set success 0
+  remote success %self.id%
+end
 if !%self.running% || %self.success%
   %send% %actor% You don't need to do that right now.
   halt
@@ -188,7 +198,7 @@ Delayed Completer~
 #12611
 Water elemental: Struggle~
 0 c 0
-~
+struggle~
 eval break_free_at 1
 if !%actor.affect(12604)%
   return 0

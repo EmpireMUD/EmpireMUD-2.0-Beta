@@ -200,18 +200,20 @@ The mortal version of this is 'mark'.
 
 See also: MARK
 #d
-ECHO GECHO SEND
+ECHO GECHO SEND /ECHO
 
 Usage:  echo <message>
         gecho <message>
         send <victim> <message>
+        /echo <channel> <message>
 
 ECHO displays a string to everyone in your room.
 GECHO displays the string to everyone in the game.
 SEND displays the string to a particular person.
+/ECHO displays the string to people on a slash channel.
 
-Regular ECHO supports @target and #item just like emote. All three of these
-commands are grantable.
+Regular ECHO supports @target and #item just like emote. All of these commands
+are grantable (/echo uses the gecho grant).
 
 Examples:
 
@@ -219,7 +221,7 @@ Examples:
   > gecho Hi, everyone in the game, isn't this annoying?
   > send rasmussen You are being watched.
 
-See also: EMOTE, GRANT
+See also: EMOTE, GRANT, SLASH CHANNEL
 #d
 EDELETE
 
@@ -1183,10 +1185,10 @@ occur in the middle or at the end, not just at the beginning).
 #e
 "SHOW ACCOUNT"
 
-Usage:  show account <player name>
+Usage:  show account <player name | account id>
 
 Shows all characters associated with the target character's account (the target
-player's alternates).
+player's alternates). You can look this up by player or by id.
 #e
 "SHOW QUESTS"
 

@@ -670,7 +670,7 @@ void finish_maintenance(char_data *ch, room_data *room) {
 * @param room_data *location The building's tile.
 */
 void herd_animals_out(room_data *location) {
-	extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
+	extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 	
 	char_data *ch_iter, *next_ch;
 	bool found_any, herd_msg = FALSE;
@@ -699,12 +699,12 @@ void herd_animals_out(room_data *location) {
 			
 				// move the mob
 				if ((!to_room || WATER_SECT(to_room)) && to_reverse && ROOM_BLD_FLAGGED(location, BLD_TWO_ENTRANCES)) {
-					if (perform_move(ch_iter, BUILDING_ENTRANCE(location), TRUE, 0)) {
+					if (perform_move(ch_iter, BUILDING_ENTRANCE(location), MOVE_HERD)) {
 						found_any = TRUE;
 					}
 				}
 				else if (to_room) {
-					if (perform_move(ch_iter, rev_dir[BUILDING_ENTRANCE(location)], TRUE, 0)) {
+					if (perform_move(ch_iter, rev_dir[BUILDING_ENTRANCE(location)], MOVE_HERD)) {
 						found_any = TRUE;
 					}
 				}

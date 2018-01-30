@@ -667,7 +667,7 @@ set struggle_counter 0
 remote struggle_counter %actor.id%
 dg_affect #12430 %actor% HARD-STUNNED on 20
 dg_affect #12428 %self% HARD-STUNNED on 20
-while %actor.affect(12430)% do
+while %actor.affect(12430)%
   %send% %actor% &r%self.name% crushes you in %self.hisher% grip!
   %damage% %actor% 150 physical
   wait 4 sec

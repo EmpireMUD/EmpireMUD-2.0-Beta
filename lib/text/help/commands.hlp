@@ -222,6 +222,15 @@ you're assisting is fighting.
 
 See also: FLEE, KILL
 #
+AUTOCLIMB
+
+Usage:  toggle autoclimb
+
+This toggle turns off the need to type 'climb' to enter mountains or other
+rough terrain.
+
+See also: CLIMB, TOGGLE
+#
 AUTOKILL
 
 Usage:  toggle autokill
@@ -234,6 +243,14 @@ Enemies with a modifier tag (see HELP CONSIDER) will always die upon reaching 0
 health, regardless of your autokill setting.
 
 See also: TOGGLE
+#
+AUTOSWIM
+
+Usage:  toggle autoswim
+
+This toggle turns off the need to type 'swim' to enter water.
+
+See also:  SWIM, TOGGLE
 #
 AVOID
 
@@ -349,6 +366,16 @@ This command clears your combat meters so you can get fresh data. Or, you can
 use the toggle to automatically clear meters whenever you start a new fight.
 
 See also: METERS, TOGGLE
+#
+CLIMB
+
+Usage:  climb <direction>
+
+This command allows you to enter a mountain tile (or other rough terrain). This
+keeps you from accidentally walking onto a mountain. You can 'toggle autoclimb'
+to remove the need for this command.
+
+See also: AUTOCLIMB, MOUNTAIN CLIMBING
 #
 CLS
 
@@ -1844,6 +1871,17 @@ as you change back and forth between activities.
 
 See also: DRAW, SHEATH
 #
+SWIM
+
+Usage:  swim <direction>
+
+This command allows you to enter a water tile from land. You must still have
+the Swimming ability, or some other way to swim.
+
+You can turn off the need for this command with 'toggle autoswim'.
+
+See also: AUTOSWIM, SWIMMING
+#
 TELLHISTORY
 
 Usage:  tellhistory
@@ -1912,33 +1950,36 @@ use it to see your current preferences, or to switch them on and off. Some
 toggles have their own help files under 'HELP TOGGLE <option>'.
 
 Toggles:
-  tell - the tell channel
-  shout - the local shout channel
-  political - shows empire colors instead of terrain colors
-  mortlog - see logs when people create characters and die
-  scrolling - scroll long text instead of paginating
-  brief - see smaller maps and no room descriptions
-  compact - no extra newlines
-  no-repeat - Some commands will say "ok" instead of typing out your message
-  autokill - don't end combat at incapacitation
-  bother - allows "bothersome" things like bite and purify
-  rp - Whether or not you are roleplaying
-  map-color - shut off color for just the map
-  pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
-  informative - informative map coloring -- HELP INFORMATIVE
   action-spam - if you turn this off, you won't see periodic action messages
-  screen-reader - see HELP SCREEN READER
   afk - Whether or not you are away-from-keyboard
-  channel-joins - blocks slash-channel join messages
-  autorecall - if you're logged out over an hour, automatically sends you home
-  stealthable - if off, you will be prevented from accidentally stealing
+  autoclimb - can enter mountains without typing 'climb'
   autodismount - will dismount you while moving, if necessary
-  no-empire - will not create a new empire when you try to claim or build
+  autokill - don't end combat at incapacitation
+  autorecall - if you're logged out over an hour, automatically sends you home
+  autoswim - can enter water without typing 'swim'
+  bother - allows "bothersome" things like bite and purify
+  brief - see smaller maps and no room descriptions
+  channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
-  tutorials - you won't see available tutorial quests if this is off
-  no-paint - turns off custom paint colors on buildings
-  extra-spacing - adds an extra blank line after you type a command
+  compact - no extra newlines
   driving-look - automatically 'looks' after each time your vehicle moves
+  extra-spacing - adds an extra blank line after you type a command
+  informative - informative map coloring -- HELP INFORMATIVE
+  map-color - shut off color for just the map
+  mortlog - see logs when people create characters and die
+  no-empire - will not create a new empire when you try to claim or build
+  no-paint - turns off custom paint colors on buildings
+  no-repeat - Some commands will say "ok" instead of typing out your message
+  political - shows empire colors instead of terrain colors
+  pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
+  rp - Whether or not you are roleplaying
+  screen-reader - see HELP SCREEN READER
+  scrolling - scroll long text instead of paginating
+  shout - the local shout channel
+  stealthable - if off, you will be prevented from accidentally stealing
+  tell - the tell channel
+  tutorials - you won't see available tutorial quests if this is off
+
 
 Immortal toggles:
   wiznet - shuts off the immortal channel

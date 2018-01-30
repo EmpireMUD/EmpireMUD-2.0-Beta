@@ -658,7 +658,15 @@ void skip_slash(char *string) {
 }
 
 
-void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *argument) {
+/**
+* Sends a message to the channel.
+*
+* @param char_data *ch The person speaking.
+* @param struct slash_channel *chan The channel to speak on.
+* @param char *argument What to say.
+* @param bool echo If TRUE, does not show the player's name.
+*/
+void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *argument, bool echo) {
 	struct player_slash_channel *slash;
 	char lbuf[MAX_STRING_LENGTH], invis_string[10];
 	descriptor_data *desc;
@@ -682,13 +690,13 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		return;
 	}
 
-	if (*argument == '*') {
+	if (*argument == '*' && !echo) {
 		emote = TRUE;
 		argument++;
 	}
 	skip_spaces(&argument);
 
-	if (GET_INVIS_LEV(ch) > 0) {
+	if (GET_INVIS_LEV(ch) > 0 && !echo) {
 		sprintf(invis_string, " (i%d)", GET_INVIS_LEV(ch));
 	}
 	else {
@@ -696,7 +704,7 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 	}
 
 	// msg to self
-	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT) && !echo) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {
@@ -707,7 +715,10 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		
 		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SLASH) : '0';
 
-		if (emote) {
+		if (echo) {
+			sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s\tn", color, chan->color, chan->name, color, invis_string, argument);
+		}
+		else if (emote) {
 			sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] $o %s\tn", color, chan->color, chan->name, color, invis_string, argument);
 		}
 		else {
@@ -727,7 +738,15 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 
 			color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH) : '0';
 
-			if (emote) {
+			if (echo) {
+				if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+					sprintf(lbuf, "\t%c[\t%c/%s\t%c (echo by %s%s)]: %s\tn", color, chan->color, chan->name, color, !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
+				}
+				else {	// can't see name
+					sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s\tn", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
+				}
+			}
+			else if (emote) {
 				sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s %s\tn", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", argument);
 			}
 			else {
@@ -755,7 +774,7 @@ ACMD(do_slash_channel) {
 	int iter;
 	bool ok, found;
 	
-	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "\n" };
+	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "\n" };
 	
 	half_chop(argument, arg, arg2);
 	
@@ -952,8 +971,55 @@ ACMD(do_slash_channel) {
 			}
 		}
 	}
+	else if (!str_cmp(arg, "echo") && IS_IMMORTAL(ch)) {
+		strcpy(buf, arg2);
+		half_chop(buf, arg2, arg3);
+		skip_slash(arg2);
+		skip_slash(arg3);
+		
+		// list players
+		if (!*arg2 || !*arg3) {
+			msg_to_char(ch, "Usage: /echo <channel> <text>\r\n");
+		}
+		else if (!(chan = find_slash_channel_by_name(arg2, TRUE))) {
+			msg_to_char(ch, "No such channel '%s'.\r\n", arg2);
+		}
+		else {
+			if (!find_on_slash_channel(ch, chan->id)) {
+				send_config_msg(ch, "ok_string");
+			}
+			speak_on_slash_channel(ch, chan, arg3, TRUE);
+		}
+	}
+	else if (!str_cmp(arg, "recase") && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_GECHO))) {
+		strcpy(buf, arg2);
+		half_chop(buf, arg2, arg3);
+		skip_slash(arg2);
+		skip_slash(arg3);
+		
+		// list players
+		if (!*arg2 || !*arg3) {
+			msg_to_char(ch, "Usage: /recase <channel> <new capitalization>\r\n");
+		}
+		else if (!(chan = find_slash_channel_by_name(arg2, TRUE))) {
+			msg_to_char(ch, "No such channel '%s'.\r\n", arg2);
+		}
+		else if (str_cmp(chan->name, arg3)) {
+			msg_to_char(ch, "You cannot change the name or spelling, only the letter case.\r\n");
+		}
+		else if (!strcmp(chan->name, arg3)) {
+			msg_to_char(ch, "That doesn't seem to be a change in the current letter case.\r\n");
+		}
+		else {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has changed the case of /%s to /%s", GET_REAL_NAME(ch), chan->name, arg3);
+			free(chan->name);
+			chan->name = str_dup(arg3);
+			chan->color = compute_slash_channel_color(arg3);
+			send_config_msg(ch, "ok_string");
+		}
+	}
 	else if ((chan = find_slash_channel_for_char(ch, arg))) {
-		speak_on_slash_channel(ch, chan, arg2);
+		speak_on_slash_channel(ch, chan, arg2, FALSE);
 	}
 	else {
 		msg_to_char(ch, "You are not on a channel called '%s'.\r\n", arg);

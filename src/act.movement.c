@@ -335,14 +335,14 @@ void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 *
 * @param char_data *ch The person moving.
 * @param room_data *was_in The room they were in before (if applicable; may be NULL).
-* @param int mode MOVE_NORMAL, etc.
+* @param bitvector_t flags MOVE_ flags that might be passed in.
 */
-void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, int mode) {
+void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, bitvector_t flags) {
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
-	if (mode == MOVE_SWIM) {
+	if (IS_SET(flags, MOVE_SWIM)) {
 		gain_player_tech_exp(ch, PTECH_SWIMMING, 1);
 	}
 	
@@ -550,10 +550,10 @@ void perform_transport(char_data *ch, room_data *to_room) {
 * @param char_data *ch The player moving.
 * @param int dir A real dir, not a confused dir.
 * @param room_data *to_room The target room.
-* @param int need_specials_check If TRUE, the player is following someone.
+* @param bitvector_t flags MOVE_ flags passed along.
 * @return int 0 for fail, 1 for success
 */
-int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check) {
+int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 	ACMD(do_dismount);
 	
 	struct affected_type *af;
@@ -569,12 +569,23 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 			return 0;
 		}
 	}
+	
+	// check auto-swim
+	else if (!IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOSWIM) && WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch)) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_RIDING(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
+		msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
+		return 0;
+	}
+	
 	// water->mountain
 	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && WATER_SECT(IN_ROOM(ch))) {
 		if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch)) {
 			send_to_char("You are unable to scale the cliff.\r\n", ch);
 			return 0;
 		}
+	}
+	if (!IS_SET(flags, MOVE_CLIMB | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOCLIMB) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
+		msg_to_char(ch, "You must type 'climb' to enter such rough terrain.\r\n");
+		return 0;
 	}
 	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 		if (ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES)) {
@@ -585,7 +596,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		}
 		return 0;
 	}
-	if (!IS_IMMORTAL(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && ROOM_IS_CLOSED(to_room) && (!need_specials_check || (ch->master && !IS_NPC(ch) && IS_NPC(ch->master)))) {
+	if (!IS_IMMORTAL(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && ROOM_IS_CLOSED(to_room) && (!IS_SET(flags, MOVE_IGNORE) || (ch->master && !IS_NPC(ch) && IS_NPC(ch->master)))) {
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
 		return 0;
 	}
@@ -657,7 +668,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		// sends own messages
 		return 0;
 	}
-	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !can_move(GET_LEADING_MOB(ch), dir, to_room, TRUE)) {
+	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !can_move(GET_LEADING_MOB(ch), dir, to_room, flags)) {
 		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		return 0;
 	}
@@ -678,10 +689,10 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 * @param room_data *from Origin room
 * @param room_data *to Destination room
 * @param int dir Which direction is being moved
-* @param int mode MOVE_NORMAL, etc
+* @param bitvector_t flags MOVE_ flags passed through.
 * @return int the move cost
 */
-int move_cost(char_data *ch, room_data *from, room_data *to, int dir, int mode) {
+int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_t flags) {
 	double need_movement, cost_from, cost_to;
 	
 	/* move points needed is avg. move loss for src and destination sect type */	
@@ -715,7 +726,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, int mode) 
 		need_movement /= 2.0;
 	}
 	
-	if (IS_RIDING(ch) || EFFECTIVELY_FLYING(ch) || mode == MOVE_EARTHMELD) {
+	if (IS_RIDING(ch) || EFFECTIVELY_FLYING(ch) || IS_SET(flags, MOVE_EARTHMELD)) {
 		need_movement /= 4.0;
 	}
 	
@@ -899,10 +910,14 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 *    1. That there is no master and no followers.
 *    2. That the direction exists.
 *
+* @param char_data *ch The person moving.
+* @param int dir The direction to move.
+* @param room_data *to_room The destination.
+* @param bitvector_t flags MOVE_ flags that might have been passed here.
 * @return bool TRUE on success, FALSE on failure
 */
-bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_specials_check, byte mode) {
-	char lbuf[MAX_STRING_LENGTH];
+bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
+	char lbuf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	room_data *was_in = IN_ROOM(ch), *from_room;
 	int need_movement, move_type, reverse = (IS_NPC(ch) || GET_LAST_DIR(ch) == NO_DIR) ? NORTH : rev_dir[(int) GET_LAST_DIR(ch)];
 	char_data *animal = NULL, *vict;
@@ -952,26 +967,14 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		return FALSE;
 	}
 
-	// if the room we're going to is water, check for ability to move
-	if (WATER_SECT(to_room)) {
-		if (!EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch)) {
-			if (has_player_tech(ch, PTECH_SWIMMING) && (mode == MOVE_NORMAL || mode == MOVE_FOLLOW)) {
-				mode = MOVE_SWIM;
-			}
-			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
-				mode = MOVE_SWIM;
-			}
-		}
-	}
-
 	// move into a barrier at all?
-	if (mode != MOVE_EARTHMELD && !REAL_NPC(ch) && (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && IS_COMPLETE(to_room) && !EFFECTIVELY_FLYING(ch)) {
+	if (!IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && IS_COMPLETE(to_room) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "There is a barrier in your way.\r\n");
 		return FALSE;
 	}
 
 	// wall-block: can only go back last-direction
-	if (mode != MOVE_EARTHMELD && !REAL_NPC(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !EFFECTIVELY_FLYING(ch)) {
+	if (!IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !EFFECTIVELY_FLYING(ch)) {
 		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER) && IS_COMPLETE(IN_ROOM(ch)) && GET_LAST_DIR(ch) != NO_DIR && dir != reverse) {
 			from_room = real_shift(IN_ROOM(ch), shift_dir[reverse][0], shift_dir[reverse][1]);
 			
@@ -984,19 +987,32 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 	
 	// unfinished tunnel
-	if ((BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TUNNEL || BUILDING_VNUM(IN_ROOM(ch)) == RTYPE_TUNNEL) && !IS_COMPLETE(IN_ROOM(ch)) && mode != MOVE_EARTHMELD && !REAL_NPC(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
+	if ((BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TUNNEL || BUILDING_VNUM(IN_ROOM(ch)) == RTYPE_TUNNEL) && !IS_COMPLETE(IN_ROOM(ch)) && !IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
 		msg_to_char(ch, "The tunnel is incomplete. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, rev_dir[(int) GET_LAST_DIR(ch)])]);
 		return FALSE;
 	}
 	
-	if (!REAL_NPC(ch) && mode != MOVE_EARTHMELD && !can_move(ch, dir, to_room, need_specials_check))
+	if (!REAL_NPC(ch) && !IS_SET(flags, MOVE_EARTHMELD) && !can_move(ch, dir, to_room, flags)) {
 		return FALSE;
-
+	}
+	
+	// detect swim and set movement type
+	if (WATER_SECT(to_room)) {
+		if (!EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch) && !IS_SET(flags, MOVE_EARTHMELD)) {
+			if (has_player_tech(ch, PTECH_SWIMMING)) {
+				flags |= MOVE_SWIM;
+			}
+			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
+				flags |= MOVE_SWIM;
+			}
+		}
+	}
+	
 	/* move points needed is avg. move loss for src and destination sect type */
-	need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, mode);
+	need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, flags);
 
 	if (GET_MOVE(ch) < need_movement && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
-		if (need_specials_check && ch->master)
+		if (IS_SET(flags, MOVE_FOLLOW) && ch->master)
 			send_to_char("You are too exhausted to follow.\r\n", ch);
 		else
 			send_to_char("You are too exhausted.\r\n", ch);
@@ -1041,10 +1057,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	else if (IS_RIDING(ch)) {
 		move_type = MOB_MOVE_RIDE;
 	}
-	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN) && move_type != MOB_MOVE_FLY) {
+	else if (move_type == MOB_MOVE_WALK && (WATER_SECT(IN_ROOM(ch)) || WATER_SECT(to_room)) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_SWIM;
 	}
-	else if (move_type == MOB_MOVE_WALK && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && move_type != MOB_MOVE_FLY) {
+	else if (move_type == MOB_MOVE_WALK && (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) || ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH)) && move_type != MOB_MOVE_FLY) {
 		move_type = MOB_MOVE_CLIMB;
 	}
 
@@ -1052,20 +1068,18 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		*buf2 = '\0';
 		
-		switch (mode) {
-			case MOVE_LEAD:
-				sprintf(buf2, "%s leads $n with %s.", HSSH(mode == MOVE_LEAD ? GET_LED_BY(ch) : ch->master), HMHR(mode == MOVE_LEAD ? GET_LED_BY(ch) : ch->master));
-				break;
-			case MOVE_FOLLOW:
-				sprintf(buf2, "$n follows %s %%s.", HMHR(mode == MOVE_LEAD ? GET_LED_BY(ch) : ch->master));
-				break;
-			case MOVE_EARTHMELD:
-				break;
-			default: {
-				// this leaves a %s for later
-				sprintf(buf2, "$n %s %%s.", mob_move_types[move_type]);
-				break;
-			}
+		if (IS_SET(flags, MOVE_EARTHMELD)) {
+			*buf2 = '\0';	// no message
+		}
+		else if (IS_SET(flags, MOVE_LEAD)) {
+			sprintf(buf2, "%s leads $n with %s.", HSSH(IS_SET(flags, MOVE_LEAD) ? GET_LED_BY(ch) : ch->master), HMHR(IS_SET(flags, MOVE_LEAD) ? GET_LED_BY(ch) : ch->master));
+		}
+		else if (IS_SET(flags, MOVE_FOLLOW)) {
+			sprintf(buf2, "$n follows %s %%s.", HMHR(IS_SET(flags, MOVE_LEAD) ? GET_LED_BY(ch) : ch->master));
+		}
+		else {
+			// this leaves a %s for later
+			sprintf(buf2, "$n %s %%s.", mob_move_types[move_type]);
 		}
 		if (*buf2 && (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT) || number(0, 4))) {
 			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
@@ -1122,42 +1136,40 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	
 	// walks-in messages
 	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
-		switch (mode) {
-			case MOVE_LEAD:
-				act("$E leads $n behind $M.", TRUE, ch, 0, GET_LED_BY(ch), TO_NOTVICT);
-				act("You lead $n behind you.", TRUE, ch, 0, GET_LED_BY(ch), TO_VICT);
-				break;
-			case MOVE_FOLLOW:
-				act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
-				if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
-					act("$n follows you.", TRUE, ch, 0, ch->master, TO_VICT);
-				}
-				break;
-			case MOVE_EARTHMELD:
-				break;
-			default: {
-				// this leaves a %s for later
-				sprintf(buf2, "$n %s %s from %%s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
+		if (IS_SET(flags, MOVE_EARTHMELD)) {
+			// no message
+		}
+		else if (IS_SET(flags, MOVE_LEAD)) {
+			act("$E leads $n behind $M.", TRUE, ch, 0, GET_LED_BY(ch), TO_NOTVICT);
+			act("You lead $n behind you.", TRUE, ch, 0, GET_LED_BY(ch), TO_VICT);
+		}
+		else if (IS_SET(flags, MOVE_FOLLOW)) {
+			act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
+			if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
+				act("$n follows you.", TRUE, ch, 0, ch->master, TO_VICT);
+			}
+		}
+		else {	// default:
+			// this leaves a %s for later
+			sprintf(buf2, "$n %s %s from %%s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
 
-				for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
-					if (vict == ch || !vict->desc) {
-						continue;
-					}
-					if (!CAN_SEE(vict, ch) || !WIZHIDE_OK(vict, ch)) {
-						continue;
-					}
-					
-					// adjust direction
-					if (strstr(buf2, "%s")) {
-						sprintf(lbuf, buf2, from_dir[get_direction_for_char(vict, dir)]);
-					}
-					else {
-						strcpy(lbuf, buf);
-					}
-
-					act(lbuf, TRUE, ch, NULL, vict, TO_VICT);
+			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+				if (vict == ch || !vict->desc) {
+					continue;
 				}
-				break;
+				if (!CAN_SEE(vict, ch) || !WIZHIDE_OK(vict, ch)) {
+					continue;
+				}
+				
+				// adjust direction
+				if (strstr(buf2, "%s")) {
+					sprintf(lbuf, buf2, from_dir[get_direction_for_char(vict, dir)]);
+				}
+				else {
+					strcpy(lbuf, buf);
+				}
+
+				act(lbuf, TRUE, ch, NULL, vict, TO_VICT);
 			}
 		}
 	}
@@ -1171,7 +1183,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		look_at_room(animal);
 	}
 
-	gain_ability_exp_from_moves(ch, was_in, mode);
+	gain_ability_exp_from_moves(ch, was_in, flags);
 	
 	// trigger section
 	entry_memory_mtrigger(ch);
@@ -1188,7 +1200,17 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 }
 
 
-int perform_move(char_data *ch, int dir, int need_specials_check, byte mode) {
+/**
+* This is the main interface for a normal move.
+* 
+* New move params as of b5.21 -- converted need_specials_check/mode to bits
+*
+* @param char_data *ch The person trying to move.
+* @param int dir Which dir to go.
+* @param bitvector_t flags Various MODE_ flags (interpreter.h)
+* @return int TRUE if the move succeeded, FALSE if not.
+*/
+int perform_move(char_data *ch, int dir, bitvector_t flags) {
 	room_data *was_in, *to_room = IN_ROOM(ch);
 	struct room_direction_data *ex;
 	struct follow_type *k, *next;
@@ -1226,7 +1248,7 @@ int perform_move(char_data *ch, int dir, int need_specials_check, byte mode) {
 	/* Store old room */
 	was_in = IN_ROOM(ch);
 
-	if (!do_simple_move(ch, dir, to_room, need_specials_check, mode))
+	if (!do_simple_move(ch, dir, to_room, flags))
 		return FALSE;
 	
 	// leading vehicle (movement validated by can_move in do_simple_move)
@@ -1243,14 +1265,14 @@ int perform_move(char_data *ch, int dir, int need_specials_check, byte mode) {
 	}
 	// leading mob (attempt move)
 	if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-		perform_move(GET_LEADING_MOB(ch), dir, TRUE, MOVE_LEAD);
+		perform_move(GET_LEADING_MOB(ch), dir, MOVE_LEAD);
 	}
 
 	for (k = ch->followers; k; k = next) {
 		next = k->next;
 		if ((IN_ROOM(k->follower) == was_in) && (GET_POS(k->follower) >= POS_STANDING)) {
 			act("You follow $N.\r\n", FALSE, k->follower, 0, ch, TO_CHAR);
-			perform_move(k->follower, dir, TRUE, MOVE_FOLLOW);
+			perform_move(k->follower, dir, MOVE_FOLLOW);
 		}
 	}
 	return TRUE;
@@ -1440,7 +1462,7 @@ ACMD(do_circle) {
 	}
 	
 	// check costs
-	need_movement = move_cost(ch, IN_ROOM(ch), found_room, dir, MOVE_NORMAL);
+	need_movement = move_cost(ch, IN_ROOM(ch), found_room, dir, MOVE_CIRCLE);
 	
 	if (GET_MOVE(ch) < need_movement && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		msg_to_char(ch, "You're too tired to circle that way.\r\n");
@@ -1513,6 +1535,36 @@ ACMD(do_circle) {
 			sprintf(buf, "%s", dirs[get_direction_for_char(fol->follower, dir)]);
 			do_circle(fol->follower, buf, 0, 0);
 		}
+	}
+}
+
+
+ACMD(do_climb) {
+	room_data *to_room;
+	int dir;
+
+	one_argument(argument, arg);
+
+	if (!*arg) {
+		msg_to_char(ch, "Which way would you like to climb?\r\n");
+	}
+	else if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't do that here.\r\n");	// map only
+	}
+	else if ((dir = parse_direction(ch, arg)) == NO_DIR) {
+		msg_to_char(ch, "That's not a direction!\r\n");
+	}
+	else if (dir >= NUM_2D_DIRS) {
+		msg_to_char(ch, "You can't climb that way!\r\n");
+	}
+	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+		msg_to_char(ch, "You can't go that way!\r\n");
+	}
+	else if (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
+		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
+	}
+	else {
+		do_simple_move(ch, dir, to_room, MOVE_CLIMB);
 	}
 }
 
@@ -1704,7 +1756,7 @@ ACMD(do_move) {
 		return;
 	}
 	
-	perform_move(ch, confused_dirs[get_north_for_char(ch)][0][subcmd], FALSE, MOVE_NORMAL);
+	perform_move(ch, confused_dirs[get_north_for_char(ch)][0][subcmd], NOBITS);
 }
 
 
@@ -2036,6 +2088,36 @@ ACMD(do_stand) {
 }
 
 
+ACMD(do_swim) {
+	room_data *to_room;
+	int dir;
+
+	one_argument(argument, arg);
+
+	if (!*arg) {
+		msg_to_char(ch, "Which way would you like to swim?\r\n");
+	}
+	else if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't do that here.\r\n");	// map only
+	}
+	else if ((dir = parse_direction(ch, arg)) == NO_DIR) {
+		msg_to_char(ch, "That's not a direction!\r\n");
+	}
+	else if (dir >= NUM_2D_DIRS) {
+		msg_to_char(ch, "You can't swim that way!\r\n");
+	}
+	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+		msg_to_char(ch, "You can't go that way!\r\n");
+	}
+	else if (!WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only swim in the water.\r\n");
+	}
+	else {
+		do_simple_move(ch, dir, to_room, MOVE_SWIM);
+	}
+}
+
+
 ACMD(do_transport) {
 	extern room_data *find_starting_location();
 	
@@ -2140,7 +2222,7 @@ ACMD(do_worm) {
 		return;
 	}
 	else {
-		do_simple_move(ch, dir, to_room, TRUE, MOVE_EARTHMELD);
+		do_simple_move(ch, dir, to_room, MOVE_EARTHMELD);
 		gain_ability_exp(ch, ABIL_WORM, 1);
 		
 		// on top of any wait from the move itself
