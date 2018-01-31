@@ -890,7 +890,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
 		}
 		else if (get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS) {
-			msg_to_char(ch, "This is the outskirts of the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
+			msg_to_char(ch, "This is the outskirts of %s%s&0.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		else {
 			msg_to_char(ch, "This area is claimed by %s%s&0.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
