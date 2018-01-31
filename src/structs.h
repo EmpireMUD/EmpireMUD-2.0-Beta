@@ -1096,6 +1096,14 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_TECHS  13
 
 
+// TER_x: territory types for empire arrays
+#define TER_TOTAL  0
+#define TER_CITY  1
+#define TER_OUTSKIRTS  2
+#define TER_FRONTIER  3
+#define NUM_TERRITORY_TYPES  4	// total
+
+
 // for empire_trade_data
 #define TRADE_EXPORT  0
 #define TRADE_IMPORT  1
@@ -4043,8 +4051,7 @@ struct empire_island {
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
-	int city_terr;	// total territory IN cities on the island
-	int outside_terr;	// total territory OUTSIDE cities on the island
+	int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	
 	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
 };
@@ -4219,11 +4226,8 @@ struct empire_data {
 	struct empire_workforce_tracker *ewt_tracker;	// workforce tracker
 	struct workforce_delay *delays;	// speeds up chore processing
 	
-	// unsaved data
-	int city_terr;	// total territory IN cities
-	int outside_terr;	// total territory OUTSIDE cities
-
 	/* Unsaved data */
+	int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	int wealth;	// computed by read_vault
 	int population;	// npc population who lives here
 	int military;	// number of soldiers

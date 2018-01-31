@@ -560,7 +560,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	int s, t, mapsize, iter, check_x, check_y;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
-	bool y_first, invert_x, invert_y, comma;
+	bool y_first, invert_x, invert_y, comma, junk;
 	struct instance_data *inst;
 	player_index_data *index;
 	room_data *to_room;
@@ -888,7 +888,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	else if (emp) {
 		if ((city = find_city(emp, room))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
-		}	
+		}
+		else if (get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS) {
+			msg_to_char(ch, "This is the outskirts of the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
+		}
 		else {
 			msg_to_char(ch, "This area is claimed by %s%s&0.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}

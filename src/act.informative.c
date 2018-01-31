@@ -3159,7 +3159,7 @@ ACMD(do_whois) {
 
 	if (GET_LOYALTY(victim)) {
 		msg_to_char(ch, "%s&0 of %s%s&0\r\n", EMPIRE_RANK(GET_LOYALTY(victim), GET_RANK(victim)-1), EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
-		msg_to_char(ch, "Territory: %d, Members: %d, Greatness: %d\r\n", EMPIRE_CITY_TERRITORY(GET_LOYALTY(victim)) + EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(victim)), EMPIRE_MEMBERS(GET_LOYALTY(victim)), EMPIRE_GREATNESS(GET_LOYALTY(victim)));
+		msg_to_char(ch, "Territory: %d, Members: %d, Greatness: %d\r\n", EMPIRE_TERRITORY(GET_LOYALTY(victim), TER_TOTAL), EMPIRE_MEMBERS(GET_LOYALTY(victim)), EMPIRE_GREATNESS(GET_LOYALTY(victim)));
 	}
 
 	if (GET_LORE(victim)) {

@@ -525,8 +525,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_LOGS(emp)  ((emp)->logs)
 #define EMPIRE_TERRITORY_LIST(emp)  ((emp)->territory_list)
 #define EMPIRE_CITY_LIST(emp)  ((emp)->city_list)
-#define EMPIRE_CITY_TERRITORY(emp)  ((emp)->city_terr)
-#define EMPIRE_OUTSIDE_TERRITORY(emp)  ((emp)->outside_terr)
+#define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
 #define EMPIRE_MILITARY(emp)  ((emp)->military)
@@ -566,6 +565,10 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define BELONGS_IN_TERRITORY_LIST(room)  (IS_ANY_BUILDING(room) || COMPLEX_DATA(room) || ROOM_SECT_FLAGGED(room, SECTF_CHORE))
 #define COUNTS_AS_TERRITORY(room)  (HOME_ROOM(room) == (room) && !GET_ROOM_VEHICLE(room))
 #define LARGE_CITY_RADIUS(room)  (ROOM_BLD_FLAGGED((room), BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED((room), SECTF_LARGE_CITY_RADIUS))
+
+// deprecated
+#define EMPIRE_CITY_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_CITY)
+#define EMPIRE_OUTSIDE_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_OUTSKIRTS)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1504,7 +1507,7 @@ extern bool has_permission(char_data *ch, int type);
 extern bool has_tech_available(char_data *ch, int tech);
 extern bool has_tech_available_room(room_data *room, int tech);
 extern bool is_at_war(empire_data *emp);
-extern int land_can_claim(empire_data *emp, bool outside_only);
+extern int land_can_claim(empire_data *emp, int ter_type);
 
 // file utilities from utils.c
 extern int get_filename(char *orig_name, char *filename, int mode);
@@ -1608,7 +1611,8 @@ void start_action(char_data *ch, int type, int timer);
 
 // utils from act.empire.c
 extern bool check_in_city_requirement(room_data *room, bool check_wait);
-extern bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon);
+extern int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
+#define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon)) == TER_CITY)	// backwards-compatibility
 
 // utils from act.informative.c
 extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);

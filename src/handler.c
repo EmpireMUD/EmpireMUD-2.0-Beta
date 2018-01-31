@@ -2753,6 +2753,7 @@ void perform_abandon_room(room_data *room) {
 	
 	empire_data *emp = ROOM_OWNER(room);
 	struct empire_territory_data *ter;
+	int ter_type;
 	bool junk;
 	
 	// updates based on owner
@@ -2763,14 +2764,13 @@ void perform_abandon_room(room_data *room) {
 		// update territory counts
 		if (COUNTS_AS_TERRITORY(room)) {
 			struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-			if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
-				EMPIRE_CITY_TERRITORY(emp) -= 1;
-				eisle->city_terr -= 1;
-			}
-			else {
-				EMPIRE_OUTSIDE_TERRITORY(emp) -= 1;
-				eisle->outside_terr -= 1;
-			}
+			ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+			
+			SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), -1, 0, INT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[ter_type], -1, 0, INT_MAX, FALSE);
+			
+			SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), -1, 0, INT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[TER_TOTAL], -1, 0, INT_MAX, FALSE);
 		}
 		// territory list
 		if ((ter = find_territory_entry(emp, room))) {
@@ -2817,6 +2817,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	
 	struct empire_territory_data *ter;
+	int ter_type;
 	bool junk;
 	
 	ROOM_OWNER(room) = emp;
@@ -2827,14 +2828,13 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	// update territory counts
 	if (COUNTS_AS_TERRITORY(room)) {
 		struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-		if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
-			EMPIRE_CITY_TERRITORY(emp) += 1;
-			eisle->city_terr += 1;
-		}
-		else {
-			EMPIRE_OUTSIDE_TERRITORY(emp) += 1;
-			eisle->outside_terr += 1;
-		}
+		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+		
+		SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), 1, 0, INT_MAX, FALSE);
+		SAFE_ADD(eisle->territory[ter_type], 1, 0, INT_MAX, FALSE);
+		
+		SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), 1, 0, INT_MAX, FALSE);
+		SAFE_ADD(eisle->territory[TER_TOTAL], 1, 0, INT_MAX, FALSE);
 	}
 	// territory list
 	if (BELONGS_IN_TERRITORY_LIST(room) && !(ter = find_territory_entry(emp, room))) {

@@ -1760,9 +1760,10 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect) {
 	bool belongs = (loc && SECT(loc) && BELONGS_IN_TERRITORY_LIST(loc));
 	struct empire_territory_data *ter;
-	bool was_large, was_in_city, junk;
+	bool was_large, junk;
 	struct sector_index_type *idx;
 	sector_data *old_sect;
+	int was_ter, is_ter;
 	
 	if (!loc && !map) {
 		log("SYSERR: perform_change_sect called without loc or map");
@@ -1780,7 +1781,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// for updating territory counts
 	was_large = (loc && SECT(loc)) ? ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) : FALSE;
-	was_in_city = (loc && ROOM_OWNER(loc)) ? is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : FALSE;
+	was_ter = (loc && ROOM_OWNER(loc)) ? get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : TER_FRONTIER;
 	
 	// preserve
 	old_sect = (loc ? SECT(loc) : map->sector_type);
@@ -1837,22 +1838,16 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	if (loc && ROOM_OWNER(loc)) {
 		if (was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
 			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
-			if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
-				// changing from in-city to not
-				EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
-				eisle->city_terr -= 1;
-				EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
-				eisle->outside_terr += 1;
-			}
-			else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
-				// changing from outside-territory to in-city
-				EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
-				eisle->city_terr -= 1;
-				EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
-				eisle->outside_terr += 1;
-			}
-			else {
-				// no relevant change
+			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk);
+			
+			if (was_ter != is_ter) {	// did territory type change?
+				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), was_ter), -1, 0, INT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[was_ter], -1, 0, INT_MAX, FALSE);
+			
+				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), is_ter), 1, 0, INT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[is_ter], 1, 0, INT_MAX, FALSE);
+				
+				// (total counts do not change)
 			}
 		}
 		if (belongs != BELONGS_IN_TERRITORY_LIST(loc)) {	// do we need to add/remove the territory entry?
@@ -2107,13 +2102,15 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 	struct empire_npc_data *npc;
 	room_data *iter, *next_iter;
 	empire_data *e, *next_e;
+	int pos, ter_type;
 	bool junk;
 
 	/* Init empires */
 	HASH_ITER(hh, empire_table, e, next_e) {
 		if (e == emp || !emp) {
-			EMPIRE_CITY_TERRITORY(e) = 0;
-			EMPIRE_OUTSIDE_TERRITORY(e) = 0;
+			for (pos = 0; pos < NUM_TERRITORY_TYPES; ++pos) {
+				EMPIRE_TERRITORY(e, pos) = 0;
+			}
 			EMPIRE_POPULATION(e) = 0;
 			
 			if (check_tech) {	// this will only be re-read if we check tech
@@ -2131,8 +2128,9 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			// reset counters
 			HASH_ITER(hh, EMPIRE_ISLANDS(e), isle, next_isle) {
 				isle->population = 0;
-				isle->city_terr = 0;
-				isle->outside_terr = 0;
+				for (pos = 0; pos < NUM_TERRITORY_TYPES; ++pos) {
+					isle->territory[pos] = 0;
+				}
 			}
 		}
 	}
@@ -2143,14 +2141,10 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			// only count each building as 1
 			if (COUNTS_AS_TERRITORY(iter)) {
 				isle = get_empire_island(e, GET_ISLAND_ID(iter));
-				if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
-					EMPIRE_CITY_TERRITORY(e) += 1;
-					isle->city_terr += 1;
-				}
-				else {
-					EMPIRE_OUTSIDE_TERRITORY(e) += 1;
-					isle->outside_terr += 1;
-				}
+				ter_type = get_territory_type_for_empire(iter, e, FALSE, &junk);
+				
+				SAFE_ADD(EMPIRE_TERRITORY(e, ter_type), 1, 0, INT_MAX, FALSE);
+				SAFE_ADD(isle->territory[ter_type], 1, 0, INT_MAX, FALSE);
 			}
 			
 			// this is only done if we are re-reading techs

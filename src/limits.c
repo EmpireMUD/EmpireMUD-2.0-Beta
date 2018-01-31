@@ -1051,16 +1051,24 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	
 	struct empire_city_data *city;
 	room_data *iter, *next_iter, *loc, *farthest;
-	int dist, this_far, far_dist;
-	bool junk;
+	int dist, this_far, far_dist, far_type, ter_type;
+	bool junk, outskirts_over, frontier_over;
 	
 	// sanity
-	if (!emp || EMPIRE_IMM_ONLY(emp) || EMPIRE_OUTSIDE_TERRITORY(emp) <= land_can_claim(emp, TRUE)) {
+	if (!emp || EMPIRE_IMM_ONLY(emp)) {
 		return;
+	}
+	
+	// see which is over
+	outskirts_over = EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > land_can_claim(emp, TER_OUTSKIRTS);
+	frontier_over = EMPIRE_TERRITORY(emp, TER_FRONTIER) > land_can_claim(emp, TER_FRONTIER);
+	if (!outskirts_over && !frontier_over) {
+		return;	// no work
 	}
 	
 	farthest = NULL;
 	far_dist = -1;	// always less
+	far_type = TER_FRONTIER;
 	
 	// check the whole map to determine the farthest outside claim
 	HASH_ITER(hh, world_table, iter, next_iter) {
@@ -1071,7 +1079,14 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		loc = HOME_ROOM(iter);
 		
 		// if owner matches AND it's not in a city
-		if (ROOM_OWNER(loc) == emp && !is_in_city_for_empire(loc, emp, FALSE, &junk)) {
+		if (ROOM_OWNER(loc) == emp && (ter_type = get_territory_type_for_empire(loc, emp, FALSE, &junk)) != TER_CITY) {
+			if (ter_type == TER_FRONTIER && !frontier_over) {
+				continue;
+			}
+			else if (ter_type == TER_OUTSKIRTS && !outskirts_over) {
+				continue;
+			}
+			
 			// check its distance from each city, find the city it's closest to
 			this_far = MAP_SIZE;
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
@@ -1085,12 +1100,13 @@ static void reduce_outside_territory_one(empire_data *emp) {
 			if (this_far > far_dist) {
 				far_dist = this_far;
 				farthest = loc;
+				far_type = ter_type;
 			}
 		}
 	}
 	
 	if (farthest) {
-		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much outside territory has been claimed", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest));
+		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much %s territory has been claimed", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest), (far_type == TER_FRONTIER) ? "frontier" : "outskirts");
 		abandon_room(farthest);
 	}
 }
@@ -1108,7 +1124,11 @@ void reduce_outside_territory(void) {
 	empire_data *iter, *next_iter;
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (!EMPIRE_IMM_ONLY(iter) && EMPIRE_OUTSIDE_TERRITORY(iter) > land_can_claim(iter, TRUE)) {
+		if (EMPIRE_IMM_ONLY(iter)) {
+			continue;	// ignore imms
+		}
+		
+		if (EMPIRE_TERRITORY(iter, TER_OUTSKIRTS) > land_can_claim(iter, TER_OUTSKIRTS) || EMPIRE_TERRITORY(iter, TER_FRONTIER) > land_can_claim(iter, TER_FRONTIER)) {
 			reduce_outside_territory_one(iter);
 		}
 	}
@@ -1123,7 +1143,7 @@ void reduce_outside_territory(void) {
 * @param empire_data *emp The empire to reduce.
 */
 static void reduce_stale_empires_one(empire_data *emp) {
-	bool outside_only = (EMPIRE_OUTSIDE_TERRITORY(emp) > 0);
+	bool outside_only = (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > 0 || EMPIRE_TERRITORY(emp, TER_FRONTIER) > 0);
 	room_data *iter, *next_iter, *found_room = NULL;
 	bool junk;
 	
@@ -1189,7 +1209,7 @@ void reduce_stale_empires(void) {
 	empire_data *iter, *next_iter;
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (!EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && (EMPIRE_OUTSIDE_TERRITORY(iter) > 0 || EMPIRE_CITY_TERRITORY(iter) > 0)) {
+		if (!EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
 			// when members hit 0, we consider the empire timed out
 			reduce_stale_empires_one(iter);
 		}

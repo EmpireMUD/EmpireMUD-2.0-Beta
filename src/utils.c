@@ -509,7 +509,7 @@ void score_empires(void) {
 		max[SCORE_WEALTH] = MAX(GET_TOTAL_WEALTH(emp), max[SCORE_WEALTH]);
 		EMPIRE_SCORE(emp, SCORE_WEALTH) = GET_TOTAL_WEALTH(emp);
 		
-		total[SCORE_TERRITORY] += (num = land_can_claim(emp, FALSE));
+		total[SCORE_TERRITORY] += (num = land_can_claim(emp, TER_TOTAL));
 		max[SCORE_TERRITORY] = MAX(num, max[SCORE_TERRITORY]);
 		EMPIRE_SCORE(emp, SCORE_TERRITORY) = num;
 		
@@ -1055,7 +1055,7 @@ bool can_claim(char_data *ch) {
 		return FALSE;
 	if (!(e = GET_LOYALTY(ch)))
 		return TRUE;
-	if (EMPIRE_CITY_TERRITORY(e) + EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, FALSE))
+	if (EMPIRE_TERRITORY(e, TER_TOTAL) >= land_can_claim(e, TER_TOTAL))
 		return FALSE;
 	if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CLAIM))
 		return FALSE;
@@ -1266,10 +1266,10 @@ bool has_tech_available_room(room_data *room, int tech) {
 * Calculates the total claimable land for an empire.
 *
 * @param empire_data *emp An empire number.
-* @param bool outside_only If TRUE, only the amount of territory that can be outside cities.
+* @param int ter_type Any TER_ to determine how much territory an empire can claim of that type.
 * @return int The total claimable land.
 */
-int land_can_claim(empire_data *emp, bool outside_only) {
+int land_can_claim(empire_data *emp, int ter_type) {
 	int from_wealth, total = 0;
 	
 	if (emp) {
@@ -1288,8 +1288,16 @@ int land_can_claim(empire_data *emp, bool outside_only) {
 		}
 	}
 	
-	if (outside_only) {
-		total *= config_get_double("land_outside_city_modifier");
+	switch (ter_type) {
+		case TER_OUTSKIRTS: {
+			total *= config_get_double("land_outside_city_modifier");
+			break;
+		}
+		case TER_FRONTIER: {
+			total *= config_get_double("land_frontier_modifier");
+			break;
+		}
+		// default: no changes
 	}
 	
 	return total;

@@ -2260,8 +2260,6 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	emp->create_time = long_in;
 	emp->num_ranks = t[1];
 	
-	emp->city_terr = 0;
-	emp->outside_terr = 0;
 	emp->members = 0;
 	emp->greatness = 0;
 	for (iter = 0; iter < NUM_TECHS; ++iter) {

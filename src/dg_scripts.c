@@ -4966,7 +4966,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'm': {	// emp.m*
 					if (!str_cmp(field, "max_territory")) {
-						snprintf(str, slen, "%d", land_can_claim(emp, FALSE));
+						snprintf(str, slen, "%d", land_can_claim(emp, TER_TOTAL));
 					}
 					else if (!str_cmp(field, "members")) {
 						snprintf(str, slen, "%d", EMPIRE_MEMBERS(emp));
@@ -5021,7 +5021,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 't': {	// emp.t*
 					if (!str_cmp(field, "territory")) {
-						snprintf(str, slen, "%d", EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp));
+						snprintf(str, slen, "%d", EMPIRE_TERRITORY(emp, TER_TOTAL));
 					}
 					break;
 				}
