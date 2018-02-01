@@ -2766,11 +2766,11 @@ void perform_abandon_room(room_data *room) {
 			struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 			ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
 			
-			SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), -1, 0, INT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[ter_type], -1, 0, INT_MAX, FALSE);
+			SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), -1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[ter_type], -1, 0, UINT_MAX, FALSE);
 			
-			SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), -1, 0, INT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[TER_TOTAL], -1, 0, INT_MAX, FALSE);
+			SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), -1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[TER_TOTAL], -1, 0, UINT_MAX, FALSE);
 		}
 		// territory list
 		if ((ter = find_territory_entry(emp, room))) {
@@ -2830,11 +2830,11 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 		struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
 		
-		SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), 1, 0, INT_MAX, FALSE);
-		SAFE_ADD(eisle->territory[ter_type], 1, 0, INT_MAX, FALSE);
+		SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), 1, 0, UINT_MAX, FALSE);
+		SAFE_ADD(eisle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
 		
-		SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), 1, 0, INT_MAX, FALSE);
-		SAFE_ADD(eisle->territory[TER_TOTAL], 1, 0, INT_MAX, FALSE);
+		SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), 1, 0, UINT_MAX, FALSE);
+		SAFE_ADD(eisle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
 	}
 	// territory list
 	if (BELONGS_IN_TERRITORY_LIST(room) && !(ter = find_territory_entry(emp, room))) {

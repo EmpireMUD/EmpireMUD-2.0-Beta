@@ -219,11 +219,11 @@ void construct_building(room_data *room, bld_vnum type) {
 		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
 		
 		if (was_ter != is_ter) {	// did territory type change?
-			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, INT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[was_ter], -1, 0, INT_MAX, FALSE);
+			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
 			
-			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, INT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[is_ter], 1, 0, INT_MAX, FALSE);
+			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 			
 			// (total territory does not change)
 		}
@@ -437,11 +437,11 @@ void disassociate_building(room_data *room) {
 		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
 		
 		if (was_ter != is_ter) {
-			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, INT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[was_ter], -1, 0, INT_MAX, FALSE);
+			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
 			
-			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, INT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[is_ter], 1, 0, INT_MAX, FALSE);
+			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 			
 			// (totals do not change)
 		}

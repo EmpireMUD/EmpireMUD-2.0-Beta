@@ -4051,7 +4051,7 @@ struct empire_island {
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
-	int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
+	unsigned int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	
 	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
 };
@@ -4227,7 +4227,7 @@ struct empire_data {
 	struct workforce_delay *delays;	// speeds up chore processing
 	
 	/* Unsaved data */
-	int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
+	unsigned int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	int wealth;	// computed by read_vault
 	int population;	// npc population who lives here
 	int military;	// number of soldiers

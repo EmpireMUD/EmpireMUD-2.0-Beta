@@ -1841,11 +1841,11 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk);
 			
 			if (was_ter != is_ter) {	// did territory type change?
-				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), was_ter), -1, 0, INT_MAX, FALSE);
-				SAFE_ADD(eisle->territory[was_ter], -1, 0, INT_MAX, FALSE);
+				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), was_ter), -1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
 			
-				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), is_ter), 1, 0, INT_MAX, FALSE);
-				SAFE_ADD(eisle->territory[is_ter], 1, 0, INT_MAX, FALSE);
+				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), is_ter), 1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 				
 				// (total counts do not change)
 			}
@@ -2143,8 +2143,11 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 				isle = get_empire_island(e, GET_ISLAND_ID(iter));
 				ter_type = get_territory_type_for_empire(iter, e, FALSE, &junk);
 				
-				SAFE_ADD(EMPIRE_TERRITORY(e, ter_type), 1, 0, INT_MAX, FALSE);
-				SAFE_ADD(isle->territory[ter_type], 1, 0, INT_MAX, FALSE);
+				SAFE_ADD(EMPIRE_TERRITORY(e, ter_type), 1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(isle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
+				
+				SAFE_ADD(EMPIRE_TERRITORY(e, TER_TOTAL), 1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(isle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
 			}
 			
 			// this is only done if we are re-reading techs
