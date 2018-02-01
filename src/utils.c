@@ -1300,6 +1300,12 @@ int land_can_claim(empire_data *emp, int ter_type) {
 		// default: no changes
 	}
 	
+	// so long as there's at least 1 active member, they get the min cap
+	if (EMPIRE_MEMBERS(emp) > 0) {
+		int min_claim_cap = config_get_int("land_min_cap");
+		total = MAX(min_claim_cap, total);
+	}
+	
 	return total;
 }
 

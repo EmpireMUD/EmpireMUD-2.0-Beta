@@ -1737,9 +1737,10 @@ void init_config_system(void) {
 
 	// empire
 	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "territory per 1 Greatness");
-	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "territory per 1 technology");	
+	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "territory per 1 technology");
 	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "territory per 1 wealth");
 	init_config(CONFIG_EMPIRE, "land_frontier_modifier", CONFTYPE_DOUBLE, "portion of land that can be far from cities");
+	init_config(CONFIG_EMPIRE, "land_min_cap", CONFTYPE_INT, "lowest possible claim cap, to prevent very low numbers");
 	init_config(CONFIG_EMPIRE, "land_outside_city_modifier", CONFTYPE_DOUBLE, "portion of land that can be in the outskirts area of cities");
 	init_config(CONFIG_EMPIRE, "building_population_timer", CONFTYPE_INT, "game hours per citizen move-in");
 	init_config(CONFIG_EMPIRE, "time_to_empire_delete", CONFTYPE_INT, "weeks until an empire is deleted");

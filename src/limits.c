@@ -1052,7 +1052,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	struct empire_city_data *city;
 	room_data *iter, *next_iter, *loc, *farthest;
 	int dist, this_far, far_dist, far_type, ter_type;
-	bool junk, outskirts_over, frontier_over;
+	bool junk, outskirts_over, frontier_over, total_over;
 	
 	// sanity
 	if (!emp || EMPIRE_IMM_ONLY(emp)) {
@@ -1062,7 +1062,8 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	// see which is over
 	outskirts_over = EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > land_can_claim(emp, TER_OUTSKIRTS);
 	frontier_over = EMPIRE_TERRITORY(emp, TER_FRONTIER) > land_can_claim(emp, TER_FRONTIER);
-	if (!outskirts_over && !frontier_over) {
+	total_over = EMPIRE_TERRITORY(emp, TER_TOTAL) > land_can_claim(emp, TER_TOTAL);
+	if (!outskirts_over && !frontier_over && !total_over) {
 		return;	// no work
 	}
 	
@@ -1080,10 +1081,10 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		
 		// if owner matches AND it's not in a city
 		if (ROOM_OWNER(loc) == emp && (ter_type = get_territory_type_for_empire(loc, emp, FALSE, &junk)) != TER_CITY) {
-			if (ter_type == TER_FRONTIER && !frontier_over) {
+			if (ter_type == TER_FRONTIER && !frontier_over && !total_over) {
 				continue;
 			}
-			else if (ter_type == TER_OUTSKIRTS && !outskirts_over) {
+			else if (ter_type == TER_OUTSKIRTS && !outskirts_over && !total_over) {
 				continue;
 			}
 			
