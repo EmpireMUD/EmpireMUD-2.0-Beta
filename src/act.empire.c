@@ -1434,11 +1434,6 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 	LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 		dist = compute_distance(loc, city->location);
 		
-		if (dist > best_dist) {
-			continue;	// found a better one already
-		}
-		// best_dist is set later, only when the result is verified
-		
 		// check radii
 		if (dist <= city_type[city->type].radius) {
 			// check wait?
@@ -1450,6 +1445,12 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 		else {
 			type = TER_FRONTIER;
 		}
+		
+		if (dist > best_dist && (last_type != TER_CITY || type != TER_CITY)) {
+			type = last_type;
+			continue;	// found a better one already
+		}
+		// best_dist is set later, only when the result is verified
 		
 		// verify city is new enough
 		if (type != TER_FRONTIER && check_wait && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + wait) > time(0)) {
