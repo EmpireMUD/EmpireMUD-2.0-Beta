@@ -1026,8 +1026,8 @@ the Empire skill.
 
 Roads count as their base terrain for most building functions, so you can
 build things facing roads, and can usually build right over a road -- but the
-road underneath will be lost. Roads count as in-city territory as far away as
-3x a city's normal radius.
+road underneath will be lost. Roads count as in-city territory when built in
+the outskirts (4x radius).
 
 Gain experience when you lay a road (but not on mountains) or put down a
 road sign.

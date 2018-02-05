@@ -1081,6 +1081,9 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		
 		// if owner matches AND it's not in a city
 		if (ROOM_OWNER(loc) == emp && (ter_type = get_territory_type_for_empire(loc, emp, FALSE, &junk)) != TER_CITY) {
+			if (ter_type == TER_CITY) {
+				continue;	// NEVER do a city, even if total is over
+			}
 			if (ter_type == TER_FRONTIER && !frontier_over && !total_over) {
 				continue;
 			}
