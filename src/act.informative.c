@@ -2918,10 +2918,10 @@ ACMD(do_survey) {
 	
 	// empire
 	if (ROOM_OWNER(IN_ROOM(ch))) {
-		if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
+		if ((ter_type = get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, &junk)) == TER_CITY && (city = find_closest_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name);
 		}
-		else if (get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, &junk) == TER_OUTSKIRTS) {
+		else if (ter_type == TER_OUTSKIRTS) {
 			msg_to_char(ch, "This is the outskirts of %s%s&0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
 		}
 		else {

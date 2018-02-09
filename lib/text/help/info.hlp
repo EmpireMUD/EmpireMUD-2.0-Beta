@@ -850,8 +850,10 @@ EmpireMUD supports the following MSDP variables:
  EMPIRE_RANK - Character's rank in the empire
  EMPIRE_TERRITORY - Empire's current territory level
  EMPIRE_TERRITORY_MAX - Empire's maximum territory
- EMPIRE_TERRITORY_OUTSIDE - Empire's current out-of-city territory
- EMPIRE_TERRITORY_OUTSIDE_MAX - Empire's maximum out-of-city territory
+ EMPIRE_TERRITORY_OUTSIDE - Empire's current outskirts territory
+ EMPIRE_TERRITORY_OUTSIDE_MAX - Empire's maximum outskirts territory
+ EMPIRE_TERRITORY_FRONTIER - Empire's current frontier territory
+ EMPIRE_TERRITORY_FRONTIER_MAX - Empire's maximum frontier territory
  EMPIRE_WEALTH - Empire's total wealth
  EMPIRE_SCORE - Empire's total score
 

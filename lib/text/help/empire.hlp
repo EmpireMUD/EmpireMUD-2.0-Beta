@@ -731,6 +731,17 @@ for that empire.
 
 See also: MAINTAIN, WORKFORCE
 #
+FRONTIER OUTSKIRTS
+
+An empire's 'frontier' is the area that's far from cities. Specifically, it's
+any area that's more than 4x a city's radius away from the city center.
+
+The area between a city's border and the frontier is called the 'outskirts'.
+For example, an outpost with radius 5 has outskirts out to 20 tiles, and the
+rest is frontier.
+
+See also: FRONTIER TRAITS
+#
 "GRAND MONUMENTS"
 
 Grand Monuments (Empire ability)
@@ -1274,6 +1285,7 @@ See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND
 "TERRITORY COMMAND"
 
 Usage:  territory [type]
+        territory [outskirts | frontier]
         territory <empire> [type]  -- immortals only
 
 The territory command will list all your territory that is outside of your
@@ -1282,7 +1294,8 @@ fewer lines. It does not list territory inside of your cities, but you can find
 a list of your cities on the "city list" command.
 
 You can optionally specify a building or terrain type and see all your tiles of
-that type.
+that type. You can also specify 'outskirts' or 'frontier' to filter out-of-city
+territory to just one of those two categories.
 
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
@@ -1364,15 +1377,15 @@ Usage:  eedit frontiertraits [add | remove] <trait(s)>
         city traits <name> [add | remove] <trait(s)>
 
 You can set your empire's traits with the eedit command. For your cities and
-the area around those cities (up to 100 tiles from the city center), you set
-traits using the city command. For frontier traits -- the traits far from your
-cities -- you use eedit.
+the outskirts around those cities (up to 4x the city's radius), you set traits
+using the city command. For frontier traits -- the traits far from your cities
+-- you use eedit.
 
  Distrustful - Your guard towers and city guard attack anyone you don't
    explicitly ally or form a non-aggression pact with. (Peace and trade agree-
    ments also count.)
 
-See also: EEDIT, CITY
+See also: EEDIT, CITY, FRONTIER, OUTSKIRTS
 #
 TUNNEL
 

@@ -557,7 +557,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct mappc_data *pc, *next_pc;
 	struct empire_city_data *city;
 	char output[MAX_STRING_LENGTH], veh_buf[256], col_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], rlbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH], advcolbuf[128];
-	int s, t, mapsize, iter, check_x, check_y;
+	int s, t, mapsize, iter, check_x, check_y, level, ter_type;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	bool y_first, invert_x, invert_y, comma, junk;
@@ -567,7 +567,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	empire_data *emp, *pcemp;
 	crop_data *cp;
 	char *strptr;
-	int level;
 	
 	// configs
 	int trench_initial_value = config_get_int("trench_initial_value");
@@ -886,14 +885,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "\r\n");
 	}
 	else if (emp) {
-		if ((city = find_city(emp, room))) {
+		if ((ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk)) == TER_CITY && (city = find_closest_city(emp, room))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
 		}
-		else if (get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS) {
-			msg_to_char(ch, "This is the outskirts of %s%s&0.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-		}
 		else {
-			msg_to_char(ch, "This area is claimed by %s%s&0.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			msg_to_char(ch, "This area is claimed by %s%s&0%s.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), (ter_type == TER_OUTSKIRTS) ? ", on the outskirts of a city" : "");
 		}
 		
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {

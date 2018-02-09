@@ -5599,8 +5599,8 @@ ACMD(do_territory) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
-	bool outside_only = TRUE, ok, junk;
-	int total, check_x, check_y;
+	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
+	int total, check_x, check_y, ter_type;
 	crop_data *crop = NULL;
 	char *remain;
 	
@@ -5628,45 +5628,64 @@ ACMD(do_territory) {
 	}
 	
 	// only if no argument (optional)
-	outside_only = *argument ? FALSE : TRUE;
+	if (*argument && is_abbrev(argument, "outskirts") && strlen(argument) >= 4) {
+		// (allow partial abbrev)
+		outskirts_only = TRUE;
+		*argument = '\0';	// don't filter by text
+	}
+	else if (*argument && is_abbrev(argument, "frontier") && strlen(argument) >= 5) {
+		// (allow partial abbrev)
+		frontier_only = TRUE;
+		*argument = '\0';	// don't filter by text
+	}
+	else {
+		outside_only = *argument ? FALSE : TRUE;
+	}
 	
 	// ready?
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
-			continue;
+			continue;	// not on map
+		}
+		if (ROOM_OWNER(iter) != emp) {
+			continue;	// not owned
+		}
+		if (outside_only && (ter_type = get_territory_type_for_empire(iter, emp, FALSE, &junk)) != TER_CITY) {
+			continue;	// not outside
+		}
+		if (outskirts_only && ter_type != TER_OUTSKIRTS) {
+			continue;	// not outskirts
+		}
+		if (frontier_only && ter_type != TER_FRONTIER) {
+			continue;	// not outskirts
 		}
 		
-		// owned by the empire?
-		if (ROOM_OWNER(iter) == emp) {
-			if (!outside_only || get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_CITY) {
-				// compare request
-				if (!*argument) {
-					ok = TRUE;
-				}
-				else if (multi_isname(argument, GET_SECT_NAME(SECT(iter)))) {
-					ok = TRUE;
-				}
-				else if (GET_BUILDING(iter) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(iter)))) {
-					ok = TRUE;
-				}
-				else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(argument, GET_CROP_NAME(crop))) {
-					ok = TRUE;
-				}
-				else if (multi_isname(argument, get_room_name(iter, FALSE))) {
-					ok = TRUE;
-				}
-				else {
-					ok = FALSE;
-				}
-				
-				if (ok) {
-					CREATE(node, struct find_territory_node, 1);
-					node->loc = iter;
-					node->count = 1;
-					node->next = node_list;
-					node_list = node;
-				}
-			}
+		// compare request
+		if (!*argument) {
+			ok = TRUE;
+		}
+		else if (multi_isname(argument, GET_SECT_NAME(SECT(iter)))) {
+			ok = TRUE;
+		}
+		else if (GET_BUILDING(iter) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(iter)))) {
+			ok = TRUE;
+		}
+		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(argument, GET_CROP_NAME(crop))) {
+			ok = TRUE;
+		}
+		else if (multi_isname(argument, get_room_name(iter, FALSE))) {
+			ok = TRUE;
+		}
+		else {
+			ok = FALSE;
+		}
+		
+		if (ok) {
+			CREATE(node, struct find_territory_node, 1);
+			node->loc = iter;
+			node->count = 1;
+			node->next = node_list;
+			node_list = node;
 		}
 	}
 	
