@@ -5644,6 +5644,8 @@ ACMD(do_territory) {
 	
 	// ready?
 	HASH_ITER(hh, world_table, iter, next_iter) {
+		ter_type = TER_CITY;	// default per cycle
+		
 		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;	// not on map
 		}
