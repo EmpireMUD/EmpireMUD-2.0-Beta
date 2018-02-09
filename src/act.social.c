@@ -164,7 +164,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 
 	if (!*buf) {
 		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_CHAR)));
-		msg_to_char(ch, hbuf);
+		send_to_char(hbuf, ch);
 		if (ch->desc) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
 		}
@@ -192,7 +192,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 	}
 	if (!(vict = get_char_room_vis(ch, buf))) {
 		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_NOT_FOUND)));
-		msg_to_char(ch, hbuf);
+		send_to_char(hbuf, ch);
 		if (ch->desc) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
 		}
@@ -205,7 +205,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		}
 		
 		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)));
-		msg_to_char(ch, hbuf);
+		send_to_char(hbuf, ch);
 		if (ch->desc) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
 		}

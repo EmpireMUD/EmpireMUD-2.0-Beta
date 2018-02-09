@@ -1441,8 +1441,7 @@ ACMD(do_spec_comm) {
 		send_config_msg(ch, "need_approval_string");
 	}
 	else if (!*buf || !*buf2) {
-		sprintf(buf, "Whom do you want to %s... and what??\r\n", action_sing);
-		msg_to_char(ch, buf);
+		msg_to_char(ch, "Whom do you want to %s... and what??\r\n", action_sing);
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))
 		msg_to_char(ch, "You speak, but no words come out!\r\n");

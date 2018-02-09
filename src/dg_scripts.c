@@ -1945,7 +1945,7 @@ void script_vlog(const char *format, va_list args) {
 
 	snprintf(temp, sizeof(temp), "SCRIPT ERR: %s", format);
 	vsnprintf(output, sizeof(output), temp, args);
-	log(output);
+	log("%s", output);
 
 	for (i = descriptor_list; i; i = i->next) {
 		if (STATE(i) != CON_PLAYING || IS_NPC(i->character)) /* switch */

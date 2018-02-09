@@ -52,7 +52,7 @@ static void Write(descriptor_t *apDescriptor, const char *apData) {
 }
 
 static void ReportBug(const char *apText) {
-	log(apText);
+	log("%s", apText);
 }
 
 static void InfoMessage(descriptor_t *apDescriptor, const char *apData) {

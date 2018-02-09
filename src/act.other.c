@@ -978,8 +978,7 @@ void do_alt_import(char_data *ch, char *argument) {
 	
 	// validate
 	if (!*arg1 || !*arg2) {
-		msg_to_char(ch, "Usage: alt import <name> <field | all>\r\n");
-		msg_to_char(ch, valid_fields);
+		msg_to_char(ch, "Usage: alt import <name> <field | all>\r\n%s", valid_fields);
 	}
 	else if (!(alt = find_or_load_player(arg1, &file))) {
 		msg_to_char(ch, "Unknown alt '%s'.\r\n", arg1);
@@ -1026,8 +1025,7 @@ void do_alt_import(char_data *ch, char *argument) {
 		alt_import_slash_channels(ch, alt);
 	}
 	else {
-		msg_to_char(ch, "Uknown field '%s'.\r\n", arg2);
-		msg_to_char(ch, valid_fields);
+		msg_to_char(ch, "Uknown field '%s'.\r\n%s", arg2, valid_fields);
 	}
 
 	// cleanup	

@@ -1161,7 +1161,7 @@ char *fread_string(FILE * fl, char *error) {
 
 		if (length + templength >= MAX_STRING_LENGTH) {
 			log("SYSERR: fread_string: string too large (db.c)");
-			log(error);
+			log("%s", error);
 			exit(1);
 		}
 		else {

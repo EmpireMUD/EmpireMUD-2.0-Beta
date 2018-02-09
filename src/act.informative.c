@@ -811,7 +811,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
 			msg_to_char(ch, "*");
 		}
-		msg_to_char(ch, GET_LONG_DESC(i));
+		send_to_char(GET_LONG_DESC(i), ch);
 	}
 	else {
 		*buf = '\0';
@@ -1088,7 +1088,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 			act("$n is using:", FALSE, i, 0, ch, TO_VICT);
 			for (j = 0; j < NUM_WEARS; j++) {
 				if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
-					msg_to_char(ch, wear_data[j].eq_prompt);
+					send_to_char(wear_data[j].eq_prompt, ch);
 					show_obj_to_char(GET_EQ(i, j), ch, OBJ_DESC_EQUIPMENT);
 				}
 			}

@@ -2518,7 +2518,7 @@ SHOW(show_commons) {
 			}
 	msg_to_char(ch, "Common sites:\r\n");
 	if (*buf)
-		msg_to_char(ch, buf);
+		send_to_char(buf, ch);
 	else
 		msg_to_char(ch, "None.\r\n");
 }

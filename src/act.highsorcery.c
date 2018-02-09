@@ -339,7 +339,7 @@ INTERACTION_FUNC(devastate_trees) {
 	obj_data *newobj;
 	int num;
 	
-	snprintf(type, sizeof(type), GET_SECT_NAME(SECT(inter_room)));
+	snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
 	strtolower(type);
 	
 	if (interaction->quantity != 1) {

@@ -676,7 +676,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				if (!PRF_FLAGGED(ch, PRF_BRIEF))
 					for (t = 1; t <= s; t++)
 						send_to_char(" ", ch);
-				msg_to_char(ch, output);
+				send_to_char(output, ch);
 			}		
 		
 			// border
@@ -818,7 +818,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		// show room: non-map
 		
 		if (show_title) {
-			msg_to_char(ch, output);
+			send_to_char(output, ch);
 		}
 		
 		if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {

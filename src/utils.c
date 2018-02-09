@@ -1586,7 +1586,7 @@ void syslog(bitvector_t type, int level, bool file, const char *str, ...) {
 	vsprintf(output, str, tArgList);
 
 	if (file) {
-		log(output);
+		log("%s", output);
 	}
 	
 	level = MAX(level, LVL_START_IMM);
@@ -2865,7 +2865,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_COINS: {
-			snprintf(output, sizeof(output), money_amount(real_empire(res->vnum), res->amount));
+			snprintf(output, sizeof(output), "%s", money_amount(real_empire(res->vnum), res->amount));
 			break;
 		}
 		case RES_CURRENCY: {

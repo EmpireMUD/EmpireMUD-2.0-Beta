@@ -1981,7 +1981,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(buf);
+			log("%s", buf);
 			exit(1);
 		}
 		switch (*line) {
@@ -2036,7 +2036,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				return;
 			}
 			default: {
-				log(buf);
+				log("%s", buf);
 				exit(1);
 			}
 		}
@@ -2067,7 +2067,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(buf);
+			log("%s", buf);
 			exit(1);
 		}
 		switch (*line) {
@@ -2158,7 +2158,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				return;
 			}
 			default: {
-				log(buf);
+				log("%s", buf);
 				exit(1);
 			}
 		}
@@ -2280,7 +2280,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(buf);
+			log("%s", buf);
 			exit(1);
 		}
 
@@ -2468,7 +2468,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 			case 'S':			/* end of empire */
 				return;
 			default: {
-				log(buf);
+				log("%s", buf);
 				exit(1);
 			}
 		}
@@ -3270,7 +3270,7 @@ void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data
 	}
 	
 	if (*buf) {
-		log_to_empire(emp, ELOG_HOSTILITY, buf);
+		log_to_empire(emp, ELOG_HOSTILITY, "%s", buf);
 	}
 }
 
@@ -5053,7 +5053,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(error_log);
+			log("%s", error_log);
 			exit(1);
 		}
 		switch (*line) {
@@ -5303,7 +5303,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				return;
 			}
 			default: {
-				log(error_log);
+				log("%s", error_log);
 				exit(1);
 			}
 		}

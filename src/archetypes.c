@@ -98,9 +98,7 @@ void add_archetype_lore(char_data *ch) {
 			free(str);
 		}
 		
-		CAP(temp);
-		
-		add_lore(ch, LORE_CREATED, temp);
+		add_lore(ch, LORE_CREATED, "%s", CAP(temp));
 	}
 }
 

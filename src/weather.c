@@ -286,13 +286,13 @@ void list_moons_to_char(char_data *ch) {
 	/* This will find the last comma and replace it with an "and" */
 	for (i = strlen(buf)-1; i > 0; i--)
 		if (buf[i] == ',') {
-			sprintf(buf1, buf + i+1);
+			sprintf(buf1, "%s", buf + i+1);
 			buf[i] = '\0';
 			strcat(buf, " and");
 			strcat(buf, buf1);
 			break;
 		}
-	msg_to_char(ch, buf);
+	send_to_char(buf, ch);
 }
 
 
