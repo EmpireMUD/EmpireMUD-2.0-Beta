@@ -5599,8 +5599,8 @@ ACMD(do_territory) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
-	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
-	int total, check_x, check_y, ter_type;
+	bool outside_only = FALSE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
+	int total, check_x, check_y;
 	crop_data *crop = NULL;
 	char *remain;
 	
@@ -5643,22 +5643,20 @@ ACMD(do_territory) {
 	}
 	
 	// ready?
-	HASH_ITER(hh, world_table, iter, next_iter) {
-		ter_type = TER_CITY;	// default per cycle
-		
+	HASH_ITER(hh, world_table, iter, next_iter) {	
 		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;	// not on map
 		}
 		if (ROOM_OWNER(iter) != emp) {
 			continue;	// not owned
 		}
-		if (outside_only && (ter_type = get_territory_type_for_empire(iter, emp, FALSE, &junk)) != TER_CITY) {
+		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_CITY) {
 			continue;	// not outside
 		}
-		if (outskirts_only && ter_type != TER_OUTSKIRTS) {
+		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_OUTSKIRTS) {
 			continue;	// not outskirts
 		}
-		if (frontier_only && ter_type != TER_FRONTIER) {
+		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_FRONTIER) {
 			continue;	// not outskirts
 		}
 		
