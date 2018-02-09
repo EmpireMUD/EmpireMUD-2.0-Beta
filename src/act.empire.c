@@ -1471,12 +1471,14 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 // for do_city
 void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
+	extern const char *alt_dirs[];
+	extern const char *dirs[];
 	
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], traits[256];
 	struct empire_city_data *city;
 	struct island_info *isle;
 	empire_data *emp;
-	int points, used, count;
+	int points, used, count, dir, dist;
 	bool is_own, pending, found = FALSE;
 	room_data *rl;
 	
@@ -1520,16 +1522,25 @@ void list_cities(char_data *ch, char *argument) {
 		
 		found = TRUE;
 		rl = city->location;
-		prettier_sprintbit(city->traits, empire_trait_types, buf);
+		if (city->traits) {
+			prettier_sprintbit(city->traits, empire_trait_types, buf);
+			snprintf(traits, sizeof(traits), "%s%s", is_own ? ", " : "", buf);
+		}
+		else {
+			*traits = '\0';
+			*buf = '\0';
+		}
 		isle = GET_ISLAND(rl);
 		++count;
 		
 		if (is_own) {
-			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
-			msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
+			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));
+			dist = compute_distance(IN_ROOM(ch), city->location);
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), city->location));
+			msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d%s), %d %s%s\r\n", count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, traits, dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), pending ? " &r(new)&0" : "");
 		}
 		else {
-			msg_to_char(ch, "(%*d, %*d) %s, on %s (traits: %s)\r\n", X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), buf);
+			msg_to_char(ch, "(%*d, %*d) %s, on %s (traits: %s)\r\n", X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), *buf ? buf : "none");
 		}
 	}
 	
