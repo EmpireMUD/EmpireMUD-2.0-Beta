@@ -5599,7 +5599,7 @@ ACMD(do_territory) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
-	bool outside_only = FALSE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
+	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
 	int total, check_x, check_y;
 	crop_data *crop = NULL;
 	char *remain;
@@ -5650,7 +5650,7 @@ ACMD(do_territory) {
 		if (ROOM_OWNER(iter) != emp) {
 			continue;	// not owned
 		}
-		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_CITY) {
+		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) == TER_CITY) {
 			continue;	// not outside
 		}
 		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_OUTSKIRTS) {
