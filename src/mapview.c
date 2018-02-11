@@ -2266,6 +2266,8 @@ ACMD(do_mapscan) {
 		if (!any) {
 			msg_to_char(ch, " %s as far as you can see.\r\n", last_isle == NO_ISLAND ? "The Ocean" : get_island_name_for(last_isle, ch));
 		}
+		
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
