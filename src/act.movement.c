@@ -35,6 +35,7 @@
 
 // external vars
 extern const struct action_data_struct action_data[];
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const int rev_dir[];
 extern const char *from_dir[];
@@ -45,6 +46,8 @@ void do_unseat_from_vehicle(char_data *ch);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
+int perform_move(char_data *ch, int dir, bitvector_t flags);
+void skip_run_filler(char **string);
 bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
 
@@ -505,6 +508,125 @@ void mark_move_time(char_data *ch) {
 
 
 /**
+* This function attempts to find the next combination of a direction and
+* distance ("40 west" or "east 15"). It will remove them from the string,
+* leaving only the remainder of the string (if anything).
+*
+* @param char_data *ch The person to parse for.
+* @param char *string The input string, which will be shortened if a direction is found and removed.
+* @param int *dir A variable to bind the next dir to.
+* @param int *dist A variable to bind the next distance to.
+* @param bool send_error If TRUE, sends an error to the player.
+* @return bool TRUE if a dir/dist was found, FALSE if it failed (errored).
+*/
+bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error) {
+	char word[MAX_INPUT_LENGTH], *tmp;
+	int pos, found_dir = -1, found_dist = -1, start_word, end_word, one_dir;
+	int mode;
+	
+	tmp = string;	// do not modify string until the end
+	skip_run_filler(&tmp);
+	
+	#define PNDFS_NO_MODE  0
+	#define PNDFS_NUMBER  1
+	#define PNDFS_WORD  2
+	
+	while (*tmp && found_dir == -1 && found_dist == -1) {
+		for (pos = 0, mode = PNDFS_NO_MODE, start_word = -1, end_word = -1; pos < strlen(tmp) && end_word == -1; ++pos) {
+			if (tmp[pos] == ',' || tmp[pos] == '-' || isspace(tmp[pos])) {
+				continue;
+			}
+		
+			switch (mode) {
+				case PNDFS_NO_MODE: {
+					if (isdigit(tmp[pos])) {
+						mode = PNDFS_NUMBER;
+						start_word = pos;
+					}
+					else if (isalpha(tmp[pos])) {
+						mode = PNDFS_WORD;
+						start_word = pos;
+					}
+					else {
+						if (send_error) {
+							msg_to_char(ch, "Unable to find a direction or distance at the start of '%s'.\r\n", tmp);
+						}
+						return FALSE;
+					}
+					break;
+				}
+				case PNDFS_NUMBER: {
+					if (!isdigit(tmp[pos])) {
+						end_word = pos;
+					}
+					break;
+				}
+				case PNDFS_WORD: {
+					if (!isalpha(tmp[pos])) {
+						end_word = pos;
+					}
+					break;
+				}
+			}
+		}
+	
+		if (start_word == -1) {
+			msg_to_char(ch, "You must specify a set of directions and distances.\r\n");
+			return FALSE;
+		}
+	
+		// pull out 'word'
+		if (end_word != -1) {	// we have a terminated word
+			strncpy(word, tmp + start_word, end_word - start_word);
+			word[end_word] = '\0';	// add terminator
+		
+			// advance the string
+			tmp += (end_word - start_word);
+			skip_run_filler(&tmp);
+		}
+		else {	// word is at the end
+			strcpy(word, tmp + start_word);
+			*tmp = '\0';	// string is now empty
+		}
+	
+		// determine if we found a distance or direction
+		if (isdigit(*word)) {
+			if (found_dist == -1) {
+				found_dist = atoi(word);
+			}
+			else {
+				if (send_error) {
+					msg_to_char(ch, "Invalid movement string: there were two numbers in a row at the beginning.\r\n");
+				}
+				return FALSE;
+			}
+		}
+		else if ((one_dir = parse_direction(ch, word)) == NO_DIR || one_dir == DIR_RANDOM) {
+			if (send_error) {
+				msg_to_char(ch, "Invalid movement string: unknown word '%s'.\r\n", word);
+			}
+			return FALSE;
+		}
+		else if (found_dir != -1) {
+			if (send_error) {
+				msg_to_char(ch, "Invalid movement string: there were two directions in a row at the beginning (you must specify a number of tiles to move in each direction).\r\n");
+			}
+			return FALSE;
+		}
+		else {
+			found_dir = one_dir;
+		}
+	}
+	
+	// ok we seem to have both a direction and a distance
+	strcpy(string, tmp);	// copy back to the original string
+	*dir = found_dir;
+	*dist = found_dist;
+	return TRUE;
+}
+
+
+/**
 * Actual transport between starting locations.
 *
 * @param char_data *ch The person to transport.
@@ -538,6 +660,67 @@ void perform_transport(char_data *ch, room_data *to_room) {
 			perform_transport(k->follower, to_room);
 		}
 	}
+}
+
+
+/**
+* Tick update for running action.
+*
+* @param char_data *ch The character doing the running.
+*/
+void process_running(char_data *ch) {
+	extern int get_north_for_char(char_data *ch);
+	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
+	
+	int dir = GET_ACTION_VNUM(ch, 0), dist;
+	bool done = FALSE;
+	
+	// translate 'dir' from the way the character THINKS he's going, to the actual way
+	dir = confused_dirs[get_north_for_char(ch)][0][dir];
+	
+	// attempt to move
+	if (!perform_move(ch, dir, NOBITS)) {
+		done = TRUE;
+	}
+	
+	// update location to prevent auto-cancel
+	GET_ACTION_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+	
+	// limited distance?
+	if (GET_ACTION_VNUM(ch, 1) > 0) {
+		GET_ACTION_VNUM(ch, 1) -= 1;
+		
+		// finished this part of the run!
+		if (GET_ACTION_VNUM(ch, 1) <= 0) {
+			if (GET_MOVEMENT_STRING(ch)) {
+				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &dir, &dist, FALSE)) {
+					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
+					GET_ACTION_VNUM(ch, 1) = dist;
+				}
+				else {	// count not get next dir/dist
+					done = TRUE;
+				}
+			}
+			else {	// no movement string
+				done = TRUE;
+			}
+		}
+	}
+	
+	if (done) {
+		msg_to_char(ch, "Your run has ended.\r\n");
+		cancel_action(ch);
+		return;
+	}
+}
+
+
+/*
+ * Function to skip over junk in a string of run commands.
+ */
+void skip_run_filler(char **string) {
+	const char *skippable = ",;-./\\";
+	for (; **string && (isspace(**string) || strchr(skippable, **string)); (*string)++);
 }
 
 
@@ -1748,7 +1931,6 @@ ACMD(do_land) {
 
 ACMD(do_move) {
 	extern int get_north_for_char(char_data *ch);
-	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 	
 	// this blocks normal moves but not flee
 	if (is_fighting(ch)) {
@@ -1976,6 +2158,59 @@ ACMD(do_rest) {
 			act("$n stops floating around, and rests.", FALSE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_RESTING;
 			break;
+	}
+}
+
+
+ACMD(do_run) {
+	bool was_running, dir_only;
+	int dir, dist = -1;
+
+	skip_run_filler(&argument);
+	dir_only = !strchr(argument, ' ');	// only 1 word
+	
+	// basics
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!*argument && GET_ACTION(ch) == ACT_RUNNING) {
+		msg_to_char(ch, "You are currently running %d tile%s %s.\r\n", GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+		if (GET_MOVEMENT_STRING(ch)) {
+			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_MOVEMENT_STRING(ch));
+		}
+	}
+	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_RUNNING) {
+		msg_to_char(ch, "You're too busy doing something else.\r\n");
+	}
+	
+	// initial parsing
+	else if (!*argument) {
+		msg_to_char(ch, "You must specify the path to run using directions and distances.\r\n");
+	}
+	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
+		// sent its own error message
+	}
+	
+	// optional direction-only parsing
+	else if (dir_only && ((dir = parse_direction(ch, argument)) == NO_DIR || dir == DIR_RANDOM)) {
+		msg_to_char(ch, "Invalid direction '%s'.\r\n", argument);
+	}
+	
+	else {
+		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
+		was_running = (GET_ACTION(ch) == ACT_RUNNING);
+		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
+		start_action(ch, ACT_RUNNING, 0);
+		GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
+		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
+		
+		if (GET_MOVEMENT_STRING(ch)) {
+			free(GET_MOVEMENT_STRING(ch));
+		}
+		GET_MOVEMENT_STRING(ch) = dir_only ? NULL : str_dup(argument);
+		
+		msg_to_char(ch, "You start running %s...\r\n", dirs[dir]);
 	}
 }
 

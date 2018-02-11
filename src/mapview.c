@@ -2249,7 +2249,7 @@ ACMD(do_mapscan) {
 		last_isle = GET_ISLAND_ID(use_room);
 		any = FALSE;
 		
-		for (dist = 1; dist <= max_dist; dist += (dist < 10 ? 1 : 10)) {
+		for (dist = 1; dist <= max_dist; dist += (dist < 10 ? 1 : (dist < 70 ? 5 : 10))) {
 			if (!(to_room = real_shift(use_room, shift_dir[dir][0] * dist, shift_dir[dir][1] * dist))) {
 				break;
 			}

@@ -1666,7 +1666,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_FILLING_IN		24
 #define ACT_RECLAIMING		25
 #define ACT_ESCAPING		26
-	#define ACT_UNUSED		27
+#define ACT_RUNNING			27
 #define ACT_RITUAL			28
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
@@ -1680,7 +1680,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_SWAP_SKILL_SETS	38
 #define ACT_MAINTENANCE		39
 
-// act flags
+// ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
 #define ACTF_HASTE  BIT(1)	// haste increases speed
 #define ACTF_FAST_CHORES  BIT(2)  // fast-chores increases speed
@@ -1688,6 +1688,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_FINDER  BIT(4)	// finder increases speed
 #define ACTF_ALWAYS_FAST  BIT(5)	// this action is always faster
 #define ACTF_SITTING  BIT(6)	// can be sitting
+#define ACTF_FASTER_BONUS  BIT(7)	// speed boost from starting bonus
 
 
 // BONUS_x: bonus traits
@@ -3616,6 +3617,7 @@ struct player_special_data {
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
 	struct resource_data *action_resources;	// temporary list for resources stored during actions
+	char *movement_string;	// for run/etc
 	
 	// locations and movement
 	room_vnum load_room;	// Which room to place char in

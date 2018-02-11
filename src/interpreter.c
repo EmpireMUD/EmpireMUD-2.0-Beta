@@ -344,6 +344,7 @@ ACMD(do_roadsign);
 ACMD(do_role);
 ACMD(do_roll);
 ACMD(do_roster);
+ACMD(do_run);
 
 ACMD(do_sacrifice);
 ACMD(do_sap);
@@ -911,6 +912,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "roll", POS_RESTING, do_roll, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "rollhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_ROLL ),
 	SIMPLE_CMD( "roster", POS_DEAD, do_roster, NO_MIN, CTYPE_EMPIRE ),
+	SIMPLE_CMD( "run", POS_STANDING, do_run, NO_MIN, CTYPE_MOVE ),
 
 	SCMD_CMD( "say", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
 	SCMD_CMD( "'", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
