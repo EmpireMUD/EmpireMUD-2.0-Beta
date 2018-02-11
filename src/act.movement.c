@@ -2163,8 +2163,8 @@ ACMD(do_rest) {
 
 
 ACMD(do_run) {
-	bool was_running, dir_only;
 	int dir, dist = -1;
+	bool dir_only;
 
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ');	// only 1 word
@@ -2199,7 +2199,6 @@ ACMD(do_run) {
 	else {
 		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
 		
-		was_running = (GET_ACTION(ch) == ACT_RUNNING);
 		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
 		start_action(ch, ACT_RUNNING, 0);
 		GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
