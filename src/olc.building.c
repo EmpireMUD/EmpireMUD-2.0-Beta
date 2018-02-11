@@ -162,6 +162,26 @@ bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum) {
 
 
 /**
+* Creates a copy of a building relation list.
+*
+* @param struct bld_relation *input_list A pointer to the start of the list to copy.
+* @return struct bld_relation* A pointer to the start of the copy list.
+*/
+struct bld_relation *copy_bld_relations(struct bld_relation *input_list) {
+	struct bld_relation *relat, *new_relat, *list = NULL;
+	
+	LL_FOREACH(input_list, relat) {
+		CREATE(new_relat, struct bld_relation, 1);
+		*new_relat = *relat;
+		new_relat->next = NULL;
+		LL_APPEND(list, new_relat);
+	}
+	
+	return list;
+}
+
+
+/**
 * Determine how many relations a building has, of a certain type.
 *
 * @param bld_data *bld The building to check.
@@ -740,6 +760,9 @@ void save_olc_building(descriptor_data *desc) {
 	if (GET_BLD_YEARLY_MAINTENANCE(proto)) {
 		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(proto));
 	}
+	if (GET_BLD_RELATIONS(proto)) {
+		free_bld_relations(GET_BLD_RELATIONS(proto));
+	}
 	
 	// sanity
 	prune_extra_descs(&GET_BLD_EX_DESCS(bdg));
@@ -810,6 +833,7 @@ bld_data *setup_olc_building(bld_data *input) {
 		GET_BLD_ICON(new) = GET_BLD_ICON(input) ? str_dup(GET_BLD_ICON(input)) : NULL;
 		GET_BLD_COMMANDS(new) = GET_BLD_COMMANDS(input) ? str_dup(GET_BLD_COMMANDS(input)) : NULL;
 		GET_BLD_DESC(new) = GET_BLD_DESC(input) ? str_dup(GET_BLD_DESC(input)) : NULL;
+		GET_BLD_RELATIONS(new) = GET_BLD_RELATIONS(input) ? copy_bld_relations(GET_BLD_RELATIONS(input)) : NULL;
 		
 		// copy extra descs
 		GET_BLD_EX_DESCS(new) = copy_extra_descs(GET_BLD_EX_DESCS(input));
