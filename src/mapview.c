@@ -2213,6 +2213,59 @@ ACMD(do_exits) {
 }
 
 
+ACMD(do_mapscan) {
+	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
+	int dir, dist, last_isle;
+	room_data *to_room;
+	bool any;
+	
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch) || !has_player_tech(ch, PTECH_NAVIGATION)) {
+		msg_to_char(ch, "You need Navigation to use mapscan.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Scan the map in which direction?\r\n");
+	}
+	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
+		msg_to_char(ch, "You can only use mapscan out on the map.\r\n");
+	}
+	else if ((!GET_ROOM_VEHICLE(IN_ROOM(ch)) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
+		msg_to_char(ch, "Scan only works out on the map.\r\n");
+	}
+	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
+		msg_to_char(ch, "Invalid direction '%s'.\r\n", argument);
+	}
+	else if (dir >= NUM_2D_DIRS) {
+		msg_to_char(ch, "You can't scan that way.\r\n");
+	}
+	else {	// success
+		msg_to_char(ch, "You scan the map to the %s and see:\r\n", dirs[dir]);
+		
+		last_isle = GET_ISLAND_ID(use_room);
+		any = FALSE;
+		
+		for (dist = 1; dist <= 500; dist += (dist <= 5 ? 1 : 10)) {
+			if (!(to_room = real_shift(use_room, shift_dir[dir][0] * dist, shift_dir[dir][1] * dist))) {
+				break;
+			}
+			if (GET_ISLAND_ID(to_room) == last_isle) {
+				continue;	// only look for changes
+			}
+			
+			// got this far?
+			last_isle = GET_ISLAND_ID(to_room);
+			msg_to_char(ch, " %d %s: %s\r\n", dist, dirs[dir], last_isle == NO_ISLAND ? "the ocean" : get_island_name_for(last_isle, ch));
+			any = TRUE;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, " %s as far as you can see\r\n", last_isle == NO_ISLAND ? "the ocean" : get_island_name_for(last_isle, ch));
+		}
+	}
+}
+
+
 ACMD(do_scan) {
 	void clear_recent_moves(char_data *ch);
 	void scan_for_tile(char_data *ch, char *argument);
