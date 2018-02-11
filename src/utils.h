@@ -222,7 +222,6 @@
 #define GET_BLD_FAME(bld)  ((bld)->fame)
 #define GET_BLD_FLAGS(bld)  ((bld)->flags)
 #define GET_BLD_FUNCTIONS(bld)  ((bld)->functions)
-#define GET_BLD_UPGRADES_TO(bld)  ((bld)->upgrades_to)
 #define GET_BLD_EX_DESCS(bld)  ((bld)->ex_description)
 #define GET_BLD_EXTRA_ROOMS(bld)  ((bld)->extra_rooms)
 #define GET_BLD_DESIGNATE_FLAGS(bld)  ((bld)->designate_flags)
@@ -230,6 +229,7 @@
 #define GET_BLD_CITIZENS(bld)  ((bld)->citizens)
 #define GET_BLD_MILITARY(bld)  ((bld)->military)
 #define GET_BLD_ARTISAN(bld)  ((bld)->artisan_vnum)
+#define GET_BLD_RELATIONS(bld)  ((bld)->relations)
 #define GET_BLD_SCRIPTS(bld)  ((bld)->proto_script)
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
@@ -1632,6 +1632,11 @@ void gain_condition(char_data *ch, int condition, int value);
 extern bool adjacent_room_is_light(room_data *room);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
+
+// utils from olc.building.c
+extern bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);
+extern int count_bld_relations(bld_data *bld, int type);
+extern char *get_bld_name_by_proto(bld_vnum vnum);
 
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);

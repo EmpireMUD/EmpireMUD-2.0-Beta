@@ -3516,6 +3516,7 @@ void do_stat_book(char_data *ch, book_data *book) {
 * @param bld_data *bdg The building to stat.
 */
 void do_stat_building(char_data *ch, bld_data *bdg) {
+	void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 	extern const char *bld_flags[];
 	extern const char *designate_flags[];
 	
@@ -3548,8 +3549,9 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	
 	msg_to_char(ch, "Citizens: [&g%d&0], Military: [&g%d&0]%s\r\n", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), buf);
 	
-	if (GET_BLD_UPGRADES_TO(bdg) != NOTHING) {
-		msg_to_char(ch, "Upgrades to: &g%d&0 &c%s&0\r\n", GET_BLD_UPGRADES_TO(bdg), GET_BLD_NAME(building_proto(GET_BLD_UPGRADES_TO(bdg))));
+	if (GET_BLD_RELATIONS(bdg)) {
+		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
+		msg_to_char(ch, "Relations:\r\n%s", lbuf);
 	}
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, buf, TRUE);

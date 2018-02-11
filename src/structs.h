@@ -692,6 +692,11 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_FACING_OPEN_BUILDING  BIT(14)
 
 
+// BLD_REL_x: relationships with other buildings
+#define BLD_REL_UPGRADES_TO  0	// upgrades to another building type
+#define BLD_REL_STORES_LIKE  1	// acts like another building for storage locations
+
+
 // tavern types
 #define BREW_NONE 0
 #define BREW_ALE  1
@@ -3117,12 +3122,22 @@ struct bld_data {
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct resource_data *yearly_maintenance;	// needed each year
+	struct bld_relation *relations;	// links to other buildings
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
 	
 	UT_hash_handle hh;	// building_table hash handle
+};
+
+
+// for relationships between buildings
+struct bld_relation {
+	int type;	// BLD_REL_
+	bld_vnum vnum;	// building vnum
+	
+	struct bld_relation *next;
 };
 
 

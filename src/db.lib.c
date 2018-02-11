@@ -587,6 +587,8 @@ void remove_building_from_table(bld_data *bld) {
 * @param bld_data *building The building to free.
 */
 void free_building(bld_data *bdg) {
+	void free_bld_relations(struct bld_relation *list);
+	
 	bld_data *proto = building_proto(GET_BLD_VNUM(bdg));
 	struct interaction_item *interact;
 	
@@ -625,6 +627,10 @@ void free_building(bld_data *bdg) {
 		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(bdg));
 	}
 	
+	if (GET_BLD_RELATIONS(bdg) && (!proto || GET_BLD_RELATIONS(bdg) != GET_BLD_RELATIONS(proto))) {
+		free_bld_relations(GET_BLD_RELATIONS(bdg));
+	}
+	
 	free(bdg);
 }
 
@@ -651,6 +657,7 @@ void init_building(bld_data *building) {
 void parse_building(FILE *fl, bld_vnum vnum) {
 	char line[256], str_in[256], str_in2[256];
 	struct spawn_info *spawn, *stemp;
+	struct bld_relation *relat;
 	bld_data *bld, *find;
 	int int_in[4];
 	double dbl_in;
@@ -783,14 +790,27 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
-			// upgrades to
-			case 'U': {
-				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
-					log("SYSERR: Format error in U line of %s", buf2);
+			case 'U': {	// relation (formerly 'upgrades to')
+				if (!get_line(fl, line)) {
+					log("SYSERR: Missing U line of %s", buf2);
 					exit(1);
 				}
+				if (sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+					if (sscanf(line, "%d", &int_in[1]) == 1) {
+						// backwards-compatible to when U was only upgrades-to
+						int_in[0] = BLD_REL_UPGRADES_TO;
+					}
+					else {	// error
+						log("SYSERR: Format error in U line of %s", buf2);
+						exit(1);
+					}
+				}
 				
-				GET_BLD_UPGRADES_TO(bld) = int_in[0];
+				CREATE(relat, struct bld_relation, 1);
+				relat->type = int_in[0];
+				relat->vnum = int_in[1];
+				
+				LL_APPEND(GET_BLD_RELATIONS(bld), relat);
 				break;
 			}
 
@@ -817,6 +837,7 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 */
 void write_building_to_file(FILE *fl, bld_data *bld) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	struct bld_relation *relat;
 	struct spawn_info *spawn;
 	
 	if (!fl || !bld) {
@@ -879,10 +900,9 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_BLD_SCRIPTS(bld));
 	
-	// U: upgrades_to
-	if (GET_BLD_UPGRADES_TO(bld) != NOTHING && building_proto(GET_BLD_UPGRADES_TO(bld))) {
-		fprintf(fl, "U\n");
-		fprintf(fl, "%d\n", GET_BLD_UPGRADES_TO(bld));
+	// U: relations (formerly upgrades_to)
+	LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
+		fprintf(fl, "U\n%d %d\n", relat->type, relat->vnum);
 	}
 	
 	// end

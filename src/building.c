@@ -547,7 +547,7 @@ bld_data *find_upgraded_from(bld_data *bb) {
 	}
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
-		if (GET_BLD_UPGRADES_TO(iter) == GET_BLD_VNUM(bb)) {
+		if (bld_has_relation(iter, BLD_REL_UPGRADES_TO, GET_BLD_VNUM(bb))) {
 			return iter;
 		}
 	}
@@ -2283,8 +2283,18 @@ ACMD(do_unpaint) {
 
 ACMD(do_upgrade) {
 	craft_data *iter, *next_iter, *type;
-	bld_vnum upgrade = GET_BLD_UPGRADES_TO(building_proto(BUILDING_VNUM(IN_ROOM(ch))));
+	char valid_list[MAX_STRING_LENGTH];
+	struct bld_relation *relat;
+	bld_data *proto, *found_bld;
+	int upgrade_count = 0;
 	bool wait, room_wait;
+	
+	// determine what kind of upgrades are available here
+	if (GET_BUILDING(IN_ROOM(ch))) {
+		upgrade_count = count_bld_relations(GET_BUILDING(IN_ROOM(ch)), BLD_REL_UPGRADES_TO);
+	}
+	
+	skip_spaces(&argument);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the upgrade command.\r\n");
@@ -2292,7 +2302,7 @@ ACMD(do_upgrade) {
 	else if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!GET_BUILDING(IN_ROOM(ch)) || (upgrade = GET_BLD_UPGRADES_TO(GET_BUILDING(IN_ROOM(ch)))) == NOTHING || !building_proto(upgrade)) {
+	else if (!GET_BUILDING(IN_ROOM(ch)) || upgrade_count == 0) {
 		msg_to_char(ch, "You can't upgrade this.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
@@ -2310,11 +2320,47 @@ ACMD(do_upgrade) {
 	else if (BUILDING_RESOURCES(IN_ROOM(ch))) {
 		msg_to_char(ch, "The building needs some work before it can be upgraded.\r\n");
 	}
-	else {
+	else {	// tentative success
+		*valid_list = '\0';	// initialize
+		found_bld = NULL;
+		
+		// attempt to figure out what we're upgrading to
+		LL_FOREACH(GET_BLD_RELATIONS(GET_BUILDING(IN_ROOM(ch))), relat) {
+			if (relat->type != BLD_REL_UPGRADES_TO || !(proto = building_proto(relat->vnum))) {
+				continue;
+			}
+			
+			// did we find a match?
+			if (*argument && multi_isname(argument, GET_BLD_NAME(proto))) {
+				found_bld = proto;
+				break;
+			}
+			else if (upgrade_count == 1) {
+				found_bld = proto;
+				break;
+			}
+			
+			// append to the valid list
+			sprintf(valid_list + strlen(valid_list), "%s%s", (*valid_list ? ", " : ""), GET_BLD_NAME(proto));
+		}
+		
+		if (!*argument && upgrade_count > 0) {
+			msg_to_char(ch, "Upgrade it to what: %s\r\n", valid_list);
+			return;
+		}
+		else if (!found_bld && !*valid_list) {
+			msg_to_char(ch, "You can't seem to upgrade anything there.\r\n");
+			return;
+		}
+		else if (!found_bld) {
+			msg_to_char(ch, "You can't upgrade it to that. Valid options are: %s\r\n", valid_list);
+			return;
+		}
+		
 		// ok, we know it's upgradeable and they have permission... now locate the upgrade craft...
 		type = NULL;
 		HASH_ITER(hh, craft_table, iter, next_iter) {
-			if (GET_CRAFT_TYPE(iter) == CRAFT_TYPE_BUILD && IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE) && upgrade == GET_CRAFT_BUILD_TYPE(iter)) {
+			if (GET_CRAFT_TYPE(iter) == CRAFT_TYPE_BUILD && IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE) && GET_CRAFT_BUILD_TYPE(iter) == GET_BLD_VNUM(found_bld)) {
 				if (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_IN_DEVELOPMENT)) {
 					type = iter;
 					break;
