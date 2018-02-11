@@ -2344,7 +2344,7 @@ ACMD(do_upgrade) {
 			sprintf(valid_list + strlen(valid_list), "%s%s", (*valid_list ? ", " : ""), GET_BLD_NAME(proto));
 		}
 		
-		if (!*argument && upgrade_count > 0) {
+		if (!*argument && upgrade_count > 1) {
 			msg_to_char(ch, "Upgrade it to what: %s\r\n", valid_list);
 			return;
 		}
