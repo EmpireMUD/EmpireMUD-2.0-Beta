@@ -1564,7 +1564,7 @@ ACMD(do_climb) {
 		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
 	}
 	else {
-		do_simple_move(ch, dir, to_room, MOVE_CLIMB);
+		perform_move(ch, dir, MOVE_CLIMB);
 	}
 }
 
@@ -2113,7 +2113,7 @@ ACMD(do_swim) {
 		msg_to_char(ch, "You can only swim in the water.\r\n");
 	}
 	else {
-		do_simple_move(ch, dir, to_room, MOVE_SWIM);
+		perform_move(ch, dir, MOVE_SWIM);
 	}
 }
 
