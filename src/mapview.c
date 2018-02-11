@@ -2214,6 +2214,8 @@ ACMD(do_exits) {
 
 
 ACMD(do_mapscan) {
+	extern const char *alt_dirs[];
+	
 	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
 	int dir, dist, last_isle;
 	room_data *to_room;
@@ -2245,7 +2247,7 @@ ACMD(do_mapscan) {
 		last_isle = GET_ISLAND_ID(use_room);
 		any = FALSE;
 		
-		for (dist = 1; dist <= 500; dist += (dist <= 5 ? 1 : 10)) {
+		for (dist = 1; dist <= 500; dist += (dist < 10 ? 1 : 10)) {
 			if (!(to_room = real_shift(use_room, shift_dir[dir][0] * dist, shift_dir[dir][1] * dist))) {
 				break;
 			}
@@ -2255,12 +2257,12 @@ ACMD(do_mapscan) {
 			
 			// got this far?
 			last_isle = GET_ISLAND_ID(to_room);
-			msg_to_char(ch, " %d %s: %s\r\n", dist, dirs[dir], last_isle == NO_ISLAND ? "the ocean" : get_island_name_for(last_isle, ch));
+			msg_to_char(ch, " %d %s: %s\r\n", dist, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]), last_isle == NO_ISLAND ? "The Ocean" : get_island_name_for(last_isle, ch));
 			any = TRUE;
 		}
 		
 		if (!any) {
-			msg_to_char(ch, " %s as far as you can see\r\n", last_isle == NO_ISLAND ? "the ocean" : get_island_name_for(last_isle, ch));
+			msg_to_char(ch, " %s as far as you can see\r\n", last_isle == NO_ISLAND ? "The Ocean" : get_island_name_for(last_isle, ch));
 		}
 	}
 }

@@ -776,6 +776,18 @@ more around level 75. Your base mana at level 100 is based on your class.
 
 See also: ARCANE POWER, CLASS, GIFT OF NATURE, SOLAR POWER
 #
+MAPSCAN "MAP SCAN"
+
+Usage:  mapscan <direction>
+
+This command allows you to find out which oceans and islands lie in a given
+direction from your current location. Use this ability if you are lost at sea
+(or on land).
+
+You must have Navigation to do this.
+
+See also: SCAN, LOOK
+#
 MOVE MOVES "MOVE POINTS" "MOVEMENT POINTS"
 
 Move points are the basic energy pool for physical effort. It takes move points
