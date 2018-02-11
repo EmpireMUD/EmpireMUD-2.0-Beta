@@ -2221,6 +2221,8 @@ ACMD(do_mapscan) {
 	room_data *to_room;
 	bool any;
 	
+	int max_dist = MIN(MAP_WIDTH, MAP_HEIGHT) / 2;
+	
 	skip_spaces(&argument);
 	
 	if (IS_NPC(ch) || !has_player_tech(ch, PTECH_NAVIGATION)) {
@@ -2247,7 +2249,7 @@ ACMD(do_mapscan) {
 		last_isle = GET_ISLAND_ID(use_room);
 		any = FALSE;
 		
-		for (dist = 1; dist <= 500; dist += (dist < 10 ? 1 : 10)) {
+		for (dist = 1; dist <= max_dist; dist += (dist < 10 ? 1 : 10)) {
 			if (!(to_room = real_shift(use_room, shift_dir[dir][0] * dist, shift_dir[dir][1] * dist))) {
 				break;
 			}
@@ -2262,7 +2264,7 @@ ACMD(do_mapscan) {
 		}
 		
 		if (!any) {
-			msg_to_char(ch, " %s as far as you can see\r\n", last_isle == NO_ISLAND ? "The Ocean" : get_island_name_for(last_isle, ch));
+			msg_to_char(ch, " %s as far as you can see.\r\n", last_isle == NO_ISLAND ? "The Ocean" : get_island_name_for(last_isle, ch));
 		}
 	}
 }

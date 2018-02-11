@@ -1062,7 +1062,7 @@ Example:
  > scan southwest
  southwest: 3x River, Swamp, Overgrown Forest, Road, Overgrown Forest, 2x Jungle
 
-See also: MAPSIZE, SCREEN-READERS
+See also: MAPSCAN, MAPSIZE, SCREEN-READERS
 #
 "SHIP ROOMS" "SHIP DESIGNATE" "DESIGNATE ON SHIPS"
 

@@ -233,12 +233,15 @@ logged out of the game for over an hour you will see a random direction as
 North.
 
 Once you learn Navigation, you'll also be able to see coordinates for map
-locations. This game uses Cartesian coordinates (x, y).
+locations. This game uses Cartesian coordinates (x, y). This ability also
+allows you to use the mapscan command.
 
 When you first buy this ability, your map may change orientations to the
 correct "North".
 
 Gains experience when you move around while not mounted.
+
+See also: MAPSCAN
 #
 NIGHTSIGHT "NIGHT SIGHT"
 
