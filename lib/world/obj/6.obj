@@ -7,13 +7,11 @@ it catches the light. Legend says that if a sorcerer were to enchant a seed
 like this with a prismatic crystal, it would grow into an entire enchanted
 forest. To enchant the seed, use 'enchant seed'. This requires Enchant Tools.
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 12 0
 R
 5164 0
-R
-5511 0
 T 600
 S
 #601
@@ -38,15 +36,13 @@ A prismatic crystal sparkles on the ground.~
    This small gem shimmers with every color of the rainbow, casting fanciful
 shadows all around. Magical gems like this one are used in many skilled crafts.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 12 0
 O
 11 gm
 R
 5164 0
-R
-5511 0
 S
 #603
 tree enchanted~
