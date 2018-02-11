@@ -7370,14 +7370,21 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 */
 bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 	struct obj_storage_type *store;
+	bld_data *bld = GET_BUILDING(loc);
+	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE) > 0) : FALSE);
 	
-	// quest items don't store
+	if (!bld) {
+		return FALSE;	// shortcut
+	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-		return FALSE;
+		return FALSE;	// quest items don't store
 	}
 	
 	for (store = obj->storage; store; store = store->next) {
-		if (BUILDING_VNUM(loc) != NOTHING && store->building_type == BUILDING_VNUM(loc)) {
+		if (store->building_type == BUILDING_VNUM(loc)) {
+			return TRUE;
+		}
+		else if (has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE, store->building_type)) {
 			return TRUE;
 		}
 	}
