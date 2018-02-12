@@ -2964,10 +2964,7 @@ ACMD(do_toggle) {
 	
 	if (!*argument) {
 		msg_to_char(ch, "Toggles:\r\n");
-		
-		if (screenreader) {
-			alphabetize_toggles();
-		}
+		alphabetize_toggles();	// in case
 		
 		iter = count = 0;
 		LL_FOREACH(alpha_tog_list, altog) {
