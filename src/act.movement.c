@@ -1358,8 +1358,14 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	
 	qt_visit_room(ch, IN_ROOM(ch));
 
+	// auto-look
 	if (ch->desc != NULL) {
-		look_at_room(ch);
+		if (IS_SET(flags, MOVE_RUN) && !PRF_FLAGGED(ch, PRF_DRIVING_LOOK)) {
+			// ?
+		}
+		else {
+			look_at_room(ch);
+		}
 	}
 	if (animal && animal->desc != NULL) {
 		look_at_room(animal);
