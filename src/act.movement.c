@@ -535,12 +535,12 @@ bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist
 	
 	while (*tmp && found_dir == -1 && found_dist == -1) {
 		for (pos = 0, mode = PNDFS_NO_MODE, start_word = -1, end_word = -1; pos < strlen(tmp) && end_word == -1; ++pos) {
-			if (tmp[pos] == ',' || tmp[pos] == '-' || isspace(tmp[pos])) {
-				continue;
-			}
-		
 			switch (mode) {
 				case PNDFS_NO_MODE: {
+					if (tmp[pos] == ',' || tmp[pos] == '-' || isspace(tmp[pos])) {
+						continue;
+					}
+					
 					if (isdigit(tmp[pos])) {
 						mode = PNDFS_NUMBER;
 						start_word = pos;
