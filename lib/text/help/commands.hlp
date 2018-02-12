@@ -1538,6 +1538,23 @@ tag next to your name on the "who" list.
 
 See also: TOGGLE
 #
+RUN RUNNING SPEEDWALK SPEED-WALK "SPEED WALK"
+
+Usage:  run <direction>
+        run <path>
+
+This command allows you to set your character moving in a given direction, or
+along a path you specify. Paths must be pairs of directions and distances which
+your character will move in order.
+
+You will run faster if you took the 'faster walking' bonus trait during
+character creation.
+
+Examples:
+ > run east
+ > run 3e 4n 7nw
+ > run east 3, north 4, northwest 7
+#
 SAIL DRIVE PILOT SAILING DRIVING PILOTING
 
 Usage:  sail <direction | portal> [distance]
@@ -1979,7 +1996,6 @@ Toggles:
   stealthable - if off, you will be prevented from accidentally stealing
   tell - the tell channel
   tutorials - you won't see available tutorial quests if this is off
-
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
