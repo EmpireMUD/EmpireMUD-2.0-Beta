@@ -1727,7 +1727,6 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "min_distance_between_ally_cities", CONFTYPE_INT, "tiles between cities belonging to allies");
 	init_config(CONFIG_CITY, "min_distance_from_city_to_starting_location", CONFTYPE_INT, "tiles between a city and a starting location");
 	init_config(CONFIG_CITY, "cities_on_newbie_islands", CONFTYPE_BOOL, "whether or not cities can be founded on newbie islands");
-	init_config(CONFIG_CITY, "city_trait_radius", CONFTYPE_INT, "tiles away that a city's traits are used instead of empire traits");
 	init_config(CONFIG_CITY, "disrepair_minor", CONFTYPE_INT, "percent of damage to show minor disrepair");
 	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "percent of damage to show major disrepair");
 	init_config(CONFIG_CITY, "disrepair_limit", CONFTYPE_INT, "years of disrepair before collapse");
@@ -1751,6 +1750,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "minutes_per_day_full", CONFTYPE_INT, "minutes played per day for full member");
 	init_config(CONFIG_EMPIRE, "member_timeout_max_threshold", CONFTYPE_INT, "hours, 1 week of playtime");
 	init_config(CONFIG_EMPIRE, "newbie_island_day_limit", CONFTYPE_INT, "number of days old an empire can be before losing newbie island claims");
+	init_config(CONFIG_EMPIRE, "outskirts_modifier", CONFTYPE_DOUBLE, "multiplier for city radius that determines outskirts");
 	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire appearing idle");
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
 	init_config(CONFIG_EMPIRE, "redesignate_time", CONFTYPE_INT, "minutes until you can redesignate a room again");

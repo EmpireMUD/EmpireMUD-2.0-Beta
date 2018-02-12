@@ -60,7 +60,6 @@ trench_initial_value -500
 bonus_city_point_techs 10
 bonus_city_point_wealth 4000
 cities_on_newbie_islands 0
-city_trait_radius 100
 disrepair_limit 10
 disrepair_limit_unfinished 2
 disrepair_major 60
@@ -87,6 +86,7 @@ member_timeout_newbie 7
 minutes_per_day_full 150
 minutes_per_day_newbie 15
 newbie_island_day_limit 7
+outskirts_modifier 4.000000
 redesignate_time 60
 time_to_empire_delete 104
 time_to_empire_emptiness 2

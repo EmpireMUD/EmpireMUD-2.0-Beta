@@ -1417,7 +1417,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 	struct empire_city_data *city;
 	int dist, best_dist = MAP_SIZE, type = TER_FRONTIER, last_type = TER_FRONTIER;
 	
-	double outskirts_multiplier = 4.0;	// distance that counts as outskirts / large-city
+	double outskirts_multiplier = config_get_double("outskirts_modifier");	// radius multiplier
 	int wait = check_wait ? config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN : 0;
 	
 	*city_too_soon = FALSE;	// init this

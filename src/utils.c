@@ -940,21 +940,29 @@ bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc) {
 * @return bool TRUE if the empire has that (those) trait(s) at loc.
 */
 bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
+	extern struct city_metadata_type city_type[];
+	
 	struct empire_city_data *city;
 	bitvector_t set = NOBITS;
+	bool near_city = FALSE;
+	
+	double outskirts_mod = config_get_double("outskirts_modifier");
 	
 	// short-circuit
 	if (!emp) {
 		return FALSE;
 	}
 	
-	// determine which location to use
-	if (loc && ((city = find_closest_city(emp, loc)) && compute_distance(loc, city->location) < config_get_int("city_trait_radius"))) {
-		set = city->traits;
+	if (loc) {	// see if it's near enough to any cities
+		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+			if (compute_distance(loc, city->location) < city_type[city->type].radius * outskirts_mod) {
+				near_city = TRUE;
+				break;	// only need 1
+			}
+		}
 	}
-	else {
-		set = EMPIRE_FRONTIER_TRAITS(emp);
-	}
+	
+	set = near_city ? city->traits : EMPIRE_FRONTIER_TRAITS(emp);
 	
 	return (IS_SET(set, trait) ? TRUE : FALSE);
 }
