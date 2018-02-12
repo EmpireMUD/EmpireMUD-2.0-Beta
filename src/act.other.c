@@ -1055,7 +1055,7 @@ struct alpha_tog *alpha_tog_list = NULL;	// LL of alphabetized toggles
 // alphabetizes the toggle list (after sorting by level)
 int sort_alpha_toggles(struct alpha_tog *a, struct alpha_tog *b) {
 	if (a->level != b->level) {
-		return b->level - a->level;
+		return a->level - b->level;
 	}
 	return str_cmp(a->name, b->name);
 }
@@ -2968,7 +2968,7 @@ ACMD(do_toggle) {
 		
 		iter = count = 0;
 		LL_FOREACH(alpha_tog_list, altog) {
-			pos = screenreader ? altog->pos : ++iter;	// shows in alpha order for SR; normal order for rest
+			pos = screenreader ? altog->pos : iter++;	// shows in alpha order for SR; normal order for rest
 			if (*toggle_data[pos].name == '\n') {
 				break;	// this should not be possible, but just in case
 			}
