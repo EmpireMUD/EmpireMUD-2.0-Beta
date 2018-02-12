@@ -1943,6 +1943,9 @@ ACMD(do_chart) {
 		}
 		
 		// ... more to come
+		// - % claimed
+		// - number of empires with claims
+		// - cities
 	}
 }
 
