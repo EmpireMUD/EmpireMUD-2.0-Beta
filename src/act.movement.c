@@ -43,6 +43,7 @@ extern const char *mob_move_types[];
 
 // external funcs
 void do_unseat_from_vehicle(char_data *ch);
+extern char *get_room_name(room_data *room, bool color);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
@@ -1362,10 +1363,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	if (ch->desc != NULL) {
 		if (IS_SET(flags, MOVE_RUN) && !PRF_FLAGGED(ch, PRF_DRIVING_LOOK)) {
 			if (has_player_tech(ch, PTECH_NAVIGATION)) {
-				msg_to_char(ch, "You run %s to (%d, %d).\r\n", dirs[get_direction_for_char(ch, dir)], X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+				msg_to_char(ch, "You run %s to %s (%d, %d).\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			}
 			else {
-				msg_to_char(ch, "You run %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+				msg_to_char(ch, "You run %s to %s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE));
 			}
 		}
 		else {	// normal look
@@ -1959,7 +1960,6 @@ ACMD(do_move) {
 // mortals have to portal from a certain building, immortals can do it anywhere
 ACMD(do_portal) {
 	void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
-	extern char *get_room_name(room_data *room, bool color);
 	
 	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
