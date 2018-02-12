@@ -1451,6 +1451,10 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 			type = last_type;
 			continue;	// found a better one already
 		}
+		else if (type == TER_FRONTIER && last_type == TER_OUTSKIRTS) {
+			type = last_type;
+			continue;	// found a better one already
+		}
 		// best_dist is set later, only when the result is verified
 		
 		// verify city is new enough
