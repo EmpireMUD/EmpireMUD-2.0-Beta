@@ -533,7 +533,7 @@ bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist
 	#define PNDFS_NUMBER  1
 	#define PNDFS_WORD  2
 	
-	while (*tmp && found_dir == -1 && found_dist == -1) {
+	while (*tmp && (found_dir == -1 || found_dist == -1)) {
 		for (pos = 0, mode = PNDFS_NO_MODE, start_word = -1, end_word = -1; pos < strlen(tmp) && end_word == -1; ++pos) {
 			switch (mode) {
 				case PNDFS_NO_MODE: {
