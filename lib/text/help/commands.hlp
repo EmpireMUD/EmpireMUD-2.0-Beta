@@ -580,13 +580,6 @@ This command pulls one of your sheathed weapons into your main hand.
 
 See also: SHEATHE, SWAP
 #
-DRIVING-LOOK "DRIVING LOOK" "TOGGLE DRIVING-LOOK"
-
-Usage:  toggle driving-look
-
-This toggle causes you to automatically 'look' after each time you move when
-driving, piloting, or sailing a vehicle.
-#
 DROP
 
 Usage:  drop <item>
@@ -1979,7 +1972,6 @@ Toggles:
   channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
-  driving-look - automatically 'looks' after each time your vehicle moves
   extra-spacing - adds an extra blank line after you type a command
   informative - informative map coloring -- HELP INFORMATIVE
   map-color - shut off color for just the map
@@ -1995,6 +1987,7 @@ Toggles:
   shout - the local shout channel
   stealthable - if off, you will be prevented from accidentally stealing
   tell - the tell channel
+  travel-look - automatically 'looks' after each run or when your vehicle moves
   tutorials - you won't see available tutorial quests if this is off
 
 Immortal toggles:
@@ -2016,6 +2009,14 @@ Usage:  toggle no-empire
 This toggle is for players who do not wish to be in any empire. The game will
 no longer create a new empire for you when you try to do things like claim
 or build.
+#
+TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
+
+Usage:  toggle travel-look
+
+This toggle causes you to automatically 'look' after each time you move when
+running or when driving, piloting, or sailing a vehicle. With this toggle off,
+you only see a short message indicating you moved.
 #
 UNLOAD UNLOADVEHICLE BOATUNLOAD
 

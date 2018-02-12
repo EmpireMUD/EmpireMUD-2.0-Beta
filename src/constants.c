@@ -623,7 +623,7 @@ const char *preference_bits[] = {
 	"!TUTORIALS",
 	"!PAINT",
 	"EXTRA-SPACING",
-	"DRIVING-LOOK",
+	"TRAVEL-LOOK",
 	"AUTOCLIMB",
 	"AUTOSWIM",
 	"\n"
@@ -682,7 +682,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, NULL },
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
-	{ "driving-look", TOG_ONOFF, PRF_DRIVING_LOOK, 0, NULL },
+	{ "travel-look", TOG_ONOFF, PRF_TRAVEL_LOOK, 0, NULL },
 	{ "mortlog", TOG_ONOFF, PRF_MORTLOG, 0, NULL },
 	
 	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },

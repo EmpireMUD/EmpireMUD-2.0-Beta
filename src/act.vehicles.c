@@ -661,7 +661,7 @@ void process_driving(char_data *ch) {
 	}
 	
 	// not stopped by anything? auto-look each move
-	if (PRF_FLAGGED(ch, PRF_DRIVING_LOOK)) {
+	if (PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
 		look_at_room(ch);
 	}
 }

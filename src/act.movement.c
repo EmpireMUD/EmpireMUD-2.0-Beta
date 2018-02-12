@@ -1361,7 +1361,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 
 	// auto-look
 	if (ch->desc != NULL) {
-		if (IS_SET(flags, MOVE_RUN) && !PRF_FLAGGED(ch, PRF_DRIVING_LOOK)) {
+		if (IS_SET(flags, MOVE_RUN) && !PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
 			if (has_player_tech(ch, PTECH_NAVIGATION)) {
 				msg_to_char(ch, "You run %s to %s (%d, %d).\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			}
