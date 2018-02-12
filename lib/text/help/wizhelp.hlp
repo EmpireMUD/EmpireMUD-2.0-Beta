@@ -543,6 +543,7 @@ ISLAND "ISLAND COMMAND" CONTINENT
 
 Usage:  island list [keywords]
         island rename <id> <name>
+        island description <id>
         island flags <id> [add | remove] <flags>
 
 This immortal command allows the game's staff to name islands and apply
@@ -554,7 +555,7 @@ Island flags:
  !CUSTOMIZE - Cannot be renamed by players
  CONTINENT - Is a whole continent (affects adventure spawns)
 
-See also: GRANT
+See also: CHART, GRANT
 #d
 LAST
 

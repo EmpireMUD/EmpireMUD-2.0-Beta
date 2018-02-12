@@ -347,6 +347,14 @@ slash-channel you are currently in.
 
 See also: SLASH-CHANNELS, TOGGLE
 #
+CHART CHARTS
+
+Usage:  chart <island>
+
+This command shows you information about any island.
+
+See also: ISLANDS, SURVEY
+#
 CIRCLE
 
 Usage:  circle <direction>
@@ -1864,7 +1872,7 @@ Usage:  survey
 
 This command gets you basic information about the room you're currently in.
 
-See also: ADVENTURE
+See also: ADVENTURE, CHART
 #
 SWAP
 

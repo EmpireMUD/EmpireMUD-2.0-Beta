@@ -300,6 +300,10 @@ typedef struct vehicle_data vehicle_data;
 #define BAN_ALL  3
 
 
+// for modify.c
+#define FORMAT_INDENT	BIT(0)
+
+
 // GLOBAL_x types for global_data
 #define GLOBAL_MOB_INTERACTIONS  0
 #define GLOBAL_MINE_DATA  1
@@ -3371,6 +3375,7 @@ struct descriptor_data {
 	size_t max_str;	// max length of editor
 	int mail_to;	// name for mail system
 	int notes_id;	// idnum of player for notes-editing
+	int island_desc_id;	// editing an island desc
 	any_vnum save_empire;	// for the text editor to know which empire to save
 	bool allow_null;	// string editor can be empty/null
 	
@@ -4942,6 +4947,7 @@ struct depletion_data {
 struct island_info {
 	any_vnum id;	// game-assigned, permanent id
 	char *name;	// global name for the island
+	char *desc;	// description of the island
 	bitvector_t flags;	// ISLE_ flags
 	
 	// computed data

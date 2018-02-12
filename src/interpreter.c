@@ -88,6 +88,7 @@ ACMD(do_butcher);
 ACMD(do_cede);
 ACMD(do_changepass);
 ACMD(do_charge);
+ACMD(do_chart);
 ACMD(do_chip);
 ACMD(do_chop);
 ACMD(do_circle);
@@ -599,6 +600,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "cd", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "cede", POS_DEAD, do_cede, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "chant", POS_STANDING, do_ritual, NO_MIN, NO_GRANTS, SCMD_CHANT, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "chart", POS_DEAD, do_chart, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "changepass", POS_DEAD, do_changepass, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "charge", POS_FIGHTING, do_charge, NO_MIN, CTYPE_COMBAT, ABIL_CHARGE ),
 	STANDARD_CMD( "chip", POS_STANDING, do_chip, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),

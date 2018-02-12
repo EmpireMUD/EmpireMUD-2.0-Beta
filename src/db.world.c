@@ -38,6 +38,7 @@
 *   Territory
 *   Trench Filling
 *   Evolutions
+*   Island Descriptions
 *   Helpers
 *   Map Output
 *   World Map System
@@ -2408,6 +2409,130 @@ void run_external_evolutions(void) {
 	snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d %.2f %.2f %d &", config_get_int("nearby_sector_distance"), ((time_info.month * 30) + time_info.day), config_get_double("arctic_percent"), config_get_double("tropics_percent"), (int) getpid());
 	// syslog(SYS_INFO, LVL_START_IMM, TRUE, "Running map evolutions...");
 	system(buf);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ISLAND DESCRIPTIONS /////////////////////////////////////////////////////
+
+struct genisdesc_isle {
+	int id;
+	struct genisdesc_terrain *ters;
+	UT_hash_handle hh;
+};
+
+struct genisdesc_terrain {
+	any_vnum vnum;
+	int count;
+	UT_hash_handle hh;
+};
+
+
+// quick sorter for tiles by count
+int genisdesc_sort(struct genisdesc_terrain *a, struct genisdesc_terrain *b) {
+	return a->count - b->count;
+}
+
+
+/**
+* This generates descriptions of islands that have no description, with size
+* and terrain data.
+*/
+void generate_island_descriptions(void) {
+	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
+	void save_island_table();
+	
+	struct genisdesc_isle *isle, *next_isle, *isle_hash = NULL;
+	struct island_info *isliter, *next_isliter;
+	struct genisdesc_terrain *ter, *next_ter;
+	char buf[MAX_STRING_LENGTH];
+	struct map_data *map;
+	bool any = FALSE;
+	int temp, count;
+	double prc;
+	
+	// first determine which islands need descs
+	HASH_ITER(hh, island_table, isliter, next_isliter) {
+		if (isliter->tile_size < 1) {
+			continue;	// don't bother?
+		}
+		
+		if (!isliter->desc || !*isliter->desc) {
+			CREATE(isle, struct genisdesc_isle, 1);
+			isle->id = isliter->id;
+			HASH_ADD_INT(isle_hash, id, isle);
+		}
+	}
+	
+	if (!isle_hash) {
+		return;	// no work (no missing descs)
+	}
+	
+	// now count terrains
+	LL_FOREACH(land_map, map) {
+		// find island
+		temp = map->shared->island_id;
+		HASH_FIND_INT(isle_hash, &temp, isle);
+		if (!isle) {
+			continue;	// not looking for this island
+		}
+		
+		// mark terrain
+		temp = map->base_sector ? GET_SECT_VNUM(map->base_sector) : BASIC_OCEAN;	// in case of errors?
+		HASH_FIND_INT(isle->ters, &temp, ter);
+		if (!ter) {	// or create
+			CREATE(ter, struct genisdesc_terrain, 1);
+			ter->vnum = temp;
+			HASH_ADD_INT(isle->ters, vnum, ter);
+		}
+		
+		++ter->count;
+	}
+	
+	// build descs
+	HASH_ITER(hh, isle_hash, isle, next_isle) {
+		if (!isle->ters || !(isliter = get_island(isle->id, FALSE))) {
+			continue;	// no work?
+		}
+		
+		HASH_SORT(isle->ters, genisdesc_sort);	// by tile count
+		
+		sprintf(buf, "The island has %d map tile%s", isliter->tile_size, PLURAL(isliter->tile_size));
+		count = 0;
+		HASH_ITER(hh, isle->ters, ter, next_ter) {
+			prc = (double)ter->count / isliter->tile_size * 100.0;
+			if (prc < 1.0) {
+				continue;
+			}
+			
+			sprintf(buf + strlen(buf), "%s%d%% %s", (count == 0 ? " and is " : ", "), (int)prc, GET_SECT_NAME(sector_proto(ter->vnum)));
+			if (++count >= 10) {
+				break;
+			}
+		}
+		
+		strcat(buf, ".\r\n");
+		
+		if (isliter->desc) {
+			free(isliter->desc);
+		}
+		isliter->desc = str_dup(buf);
+		
+		format_text(&isliter->desc, (strlen(isliter->desc) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		any = TRUE;
+	}
+	
+	// and free the data
+	HASH_ITER(hh, isle_hash, isle, next_isle) {
+		HASH_ITER(hh, isle->ters, ter, next_ter) {
+			free(ter);
+		}
+		free(isle);
+	}
+	
+	if (any) {
+		save_island_table();
+	}
 }
 
 

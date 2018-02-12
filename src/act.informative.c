@@ -1910,6 +1910,43 @@ ACMD(do_affects) {
 }
 
 
+ACMD(do_chart) {
+	struct island_info *isle;
+	bool any;
+	int iter;
+	
+	skip_spaces(&argument);
+	
+	if (!*argument) {
+		msg_to_char(ch, "Get chart information on which island?\r\n");
+	}
+	else if (!(isle = get_island_by_name(ch, argument))) {
+		msg_to_char(ch, "Unknown island.\r\n");
+	}
+	else {
+		msg_to_char(ch, "Chart information for %s:\r\n", isle->name);
+		if (isle->desc) {
+			send_to_char(isle->desc, ch);
+		}
+		
+		if (has_player_tech(ch, PTECH_NAVIGATION) && isle->center != NOWHERE) {
+			msg_to_char(ch, "Approximate center: (%d, %d)\r\n", MAP_X_COORD(isle->center), MAP_Y_COORD(isle->center));
+			msg_to_char(ch, "Edges: ");
+			any = FALSE;
+			for (iter = 0; iter < NUM_SIMPLE_DIRS; ++iter) {
+				if (isle->edge[iter] != NOWHERE) {
+					msg_to_char(ch, "%s(%d, %d)", (any ? ", " : ""), MAP_X_COORD(isle->edge[iter]), MAP_Y_COORD(isle->edge[iter]));
+					any = TRUE;
+				}
+			}
+			msg_to_char(ch, "%s\r\n", any ? "" : "unknown");
+		}
+		
+		// ... more to come
+	}
+}
+
+
 // will show all currencies if the subcmd == TRUE
 ACMD(do_coins) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];

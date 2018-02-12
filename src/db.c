@@ -283,6 +283,7 @@ void boot_db(void) {
 	void check_version();
 	void delete_old_players();
 	void delete_orphaned_rooms();
+	void generate_island_descriptions();
 	void init_config_system();
 	void link_and_check_vehicles();
 	void load_automessages();
@@ -389,6 +390,9 @@ void boot_db(void) {
 	
 	log("Building shop lookup hints.");
 	build_all_shop_lookups();
+	
+	log("Ensuring all islands have descriptions.");
+	generate_island_descriptions();
 	
 	// final things...
 	log("Running reboot triggers.");

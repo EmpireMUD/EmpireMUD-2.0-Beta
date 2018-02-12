@@ -4131,6 +4131,10 @@ static struct island_info *load_one_island(FILE *fl, int id) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': {	// description
+				isle->desc = fread_string(fl, errstr);
+				break;
+			}
 			case 'S': {
 				// done
 				return isle;
@@ -4187,7 +4191,12 @@ void save_island_table(void) {
 	HASH_ITER(hh, island_table, isle, next_isle) {
 		fprintf(fl, "#%d\n", isle->id);
 		fprintf(fl, "%s~\n", NULLSAFE(isle->name));
-		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));		
+		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));
+		
+		if (isle->desc && *isle->desc) {
+			fprintf(fl, "D\n%s~\n", isle->desc);
+		}
+		
 		fprintf(fl, "S\n");
 	}
 
