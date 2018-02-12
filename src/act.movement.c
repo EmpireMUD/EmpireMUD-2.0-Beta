@@ -2194,7 +2194,7 @@ ACMD(do_run) {
 		// sent its own error message
 	}
 	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
-		msg_to_char(ch, "Unable to get direction from string '%s' %d %d.\r\n", argument, dir, dist);
+		msg_to_char(ch, "Invalid path string.\r\n");
 	}
 	
 	// optional direction-only parsing
