@@ -753,7 +753,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 	}
 	
 	// check auto-swim
-	else if (!IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOSWIM) && WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch)) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_RIDING(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
+	else if (!IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOSWIM) && WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch)) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
 		msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
 		return 0;
 	}
