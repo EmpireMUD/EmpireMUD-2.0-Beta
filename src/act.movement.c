@@ -524,6 +524,8 @@ bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist
 	int pos, found_dir = -1, found_dist = -1, start_word, end_word, one_dir;
 	int mode;
 	
+	*dir = *dist = -1;	// default/dummy
+	
 	tmp = string;	// do not modify string until the end
 	skip_run_filler(&tmp);
 	
@@ -679,12 +681,9 @@ void process_running(char_data *ch) {
 	dir = confused_dirs[get_north_for_char(ch)][0][dir];
 	
 	// attempt to move
-	if (!perform_move(ch, dir, NOBITS)) {
+	if (!perform_move(ch, dir, MOVE_RUN)) {
 		done = TRUE;
 	}
-	
-	// update location to prevent auto-cancel
-	GET_ACTION_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
 	
 	// limited distance?
 	if (GET_ACTION_VNUM(ch, 1) > 0) {
@@ -1367,6 +1366,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	}
 
 	gain_ability_exp_from_moves(ch, was_in, flags);
+	
+	if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_RUNNING && !IS_SET(flags, MOVE_RUN)) {
+		cancel_action(ch);
+	}
 	
 	// trigger section
 	entry_memory_mtrigger(ch);
@@ -2167,7 +2170,7 @@ ACMD(do_run) {
 	bool dir_only;
 
 	skip_run_filler(&argument);
-	dir_only = !strchr(argument, ' ');	// only 1 word
+	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word
 	
 	// basics
 	if (IS_NPC(ch)) {
