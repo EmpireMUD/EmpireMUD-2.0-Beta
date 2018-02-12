@@ -2430,7 +2430,7 @@ struct genisdesc_terrain {
 
 // quick sorter for tiles by count
 int genisdesc_sort(struct genisdesc_terrain *a, struct genisdesc_terrain *b) {
-	return a->count - b->count;
+	return b->count - a->count;
 }
 
 
