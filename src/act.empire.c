@@ -1447,7 +1447,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 		}
 		
 		// don't override if we already found one it's in-city for, even if it's closer-but-outskirts for another city
-		if (dist > best_dist || (last_type == TER_CITY && type != TER_CITY)) {
+		if ((dist > best_dist && last_type != TER_CITY) || (last_type == TER_CITY && type != TER_CITY)) {
 			type = last_type;
 			continue;	// found a better one already
 		}

@@ -955,7 +955,7 @@ bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
 	
 	if (loc) {	// see if it's near enough to any cities
 		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
-			if (compute_distance(loc, city->location) < city_type[city->type].radius * outskirts_mod) {
+			if (compute_distance(loc, city->location) <= city_type[city->type].radius * outskirts_mod) {
 				near_city = TRUE;
 				break;	// only need 1
 			}
