@@ -692,7 +692,7 @@ void process_running(char_data *ch) {
 		// finished this part of the run!
 		if (GET_ACTION_VNUM(ch, 1) <= 0) {
 			if (GET_MOVEMENT_STRING(ch)) {
-				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &dir, &dist, FALSE)) {
+				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &dir, &dist, FALSE) && dir != -1) {
 					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
 					GET_ACTION_VNUM(ch, 1) = dist;
 				}
@@ -2192,6 +2192,9 @@ ACMD(do_run) {
 	}
 	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
 		// sent its own error message
+	}
+	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
+		msg_to_char(ch, "Unable to get direction from string '%s' %d %d.\r\n", argument, dir, dist);
 	}
 	
 	// optional direction-only parsing
