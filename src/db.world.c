@@ -1218,6 +1218,7 @@ void update_island_names(void) {
 		
 		// look for empires with cities on the island
 		found_emp = NULL;
+		last_name = NULL;
 		count = 0;
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
