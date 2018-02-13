@@ -658,7 +658,7 @@ void process_driving(char_data *ch) {
 		// finished this part of the drive!
 		if (GET_ACTION_VNUM(ch, 1) <= 0) {
 			if (GET_MOVEMENT_STRING(ch)) {
-				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &new_dir, &dist, FALSE) && new_dir != -1 && new_dir != DIR_RANDOM && (subcmd == SCMD_PILOT || is_flat_dir[dir])) {
+				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &new_dir, &dist, FALSE) && new_dir != -1 && new_dir != DIR_RANDOM && (subcmd == SCMD_PILOT || is_flat_dir[new_dir])) {
 					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, new_dir);
 					GET_ACTION_VNUM(ch, 1) = dist;
 					
@@ -667,7 +667,7 @@ void process_driving(char_data *ch) {
 						LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 							LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 								if (ch_iter != ch && ch_iter->desc) {
-									snprintf(buf, sizeof(buf), "$V %s %s.", "turns to the", dirs[get_direction_for_char(ch_iter, dir)]);
+									snprintf(buf, sizeof(buf), "$V %s %s.", "turns to the", dirs[get_direction_for_char(ch_iter, new_dir)]);
 									act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR);
 								}
 							}
