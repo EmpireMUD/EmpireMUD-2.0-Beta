@@ -33,6 +33,7 @@
 // local protos
 
 // external consts
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const bool is_flat_dir[NUM_OF_DIRS];
@@ -43,10 +44,13 @@ extern const int rev_dir[];
 extern int count_harnessed_animals(vehicle_data *veh);
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
+extern int get_north_for_char(char_data *ch);
 extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
+extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
 extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 void scale_item_to_level(obj_data *obj, int level);
+void skip_run_filler(char **string);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -606,11 +610,11 @@ void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont
 * @param char_data *ch The character doing the driving.
 */
 void process_driving(char_data *ch) {
-	extern int get_north_for_char(char_data *ch);
-	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-	
-	int dir = GET_ACTION_VNUM(ch, 0), subcmd = GET_ACTION_VNUM(ch, 2);
+	int dir = GET_ACTION_VNUM(ch, 0), new_dir, dist, subcmd = GET_ACTION_VNUM(ch, 2);
+	struct vehicle_room_list *vrl;
+	char_data *ch_iter;
 	vehicle_data *veh;
+	bool done = FALSE;
 	
 	// translate 'dir' from the way the character THINKS he's going, to the actual way
 	dir = confused_dirs[get_north_for_char(ch)][0][dir];
@@ -651,13 +655,41 @@ void process_driving(char_data *ch) {
 	if (GET_ACTION_VNUM(ch, 1) > 0) {
 		GET_ACTION_VNUM(ch, 1) -= 1;
 		
-		// arrived!
+		// finished this part of the drive!
 		if (GET_ACTION_VNUM(ch, 1) <= 0) {
-			look_at_room(ch);	// show them where they stopped
-			msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
-			cancel_action(ch);
-			return;
+			if (GET_MOVEMENT_STRING(ch)) {
+				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &new_dir, &dist, FALSE) && new_dir != -1) {
+					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, new_dir);
+					GET_ACTION_VNUM(ch, 1) = dist;
+					
+					
+					// alert whole vehicle
+					if (new_dir != dir && VEH_ROOM_LIST(veh)) {
+						LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+							LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
+								if (ch_iter != ch && ch_iter->desc) {
+									snprintf(buf, sizeof(buf), "$V %s %s.", "turns to the", dirs[get_direction_for_char(ch_iter, dir)]);
+									act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR);
+								}
+							}
+						}
+					}
+				}
+				else {	// count not get next dir/dist
+					done = TRUE;
+				}
+			}
+			else {	// no movement string
+				done = TRUE;
+			}
 		}
+	}
+	
+	if (done) {
+		look_at_room(ch);	// show them where they stopped
+		msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
+		cancel_action(ch);
+		return;
 	}
 	
 	// not stopped by anything? auto-look each move
@@ -1710,23 +1742,26 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	struct vehicle_room_list *vrl;
-	bool was_driving, same_dir;
+	bool was_driving, same_dir, dir_only;
 	char_data *ch_iter;
 	vehicle_data *veh;
 	obj_data *portal;
 	int dir, dist = -1;
-
-	// 2nd arg (dist) is optional
-	two_arguments(argument, dir_arg, dist_arg);
+	
+	skip_run_filler(&argument);
+	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word
 	
 	// basics
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (!*dir_arg && GET_ACTION(ch) == drive_data[subcmd].action) {
-		cancel_action(ch);
+	else if (!*argument && GET_ACTION(ch) == drive_data[subcmd].action) {
+		msg_to_char(ch, "You are currently %s %d tile%s %s.\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+		if (GET_MOVEMENT_STRING(ch)) {
+			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_MOVEMENT_STRING(ch));
+		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != drive_data[subcmd].action) {
 		msg_to_char(ch, "You're too busy doing something else.\r\n");
@@ -1766,28 +1801,27 @@ ACMD(do_drive) {
 	}
 	
 	// target arg
-	else if (!*dir_arg) {
-		msg_to_char(ch, "Which direction would you like to %s?\r\n", drive_data[subcmd].command);
+	else if (!*argument) {
+		msg_to_char(ch, "You must specify a path to %s using a combination of directions and distances.\r\n", drive_data[subcmd].command);
 	}
-	else if ((dir = parse_direction(ch, dir_arg)) == NO_DIR) {
-		if ((portal = get_obj_in_list_vis(ch, dir_arg, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+	else if (dir_only && (dir = parse_direction(ch, argument)) == NO_DIR) {
+		if ((portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 			do_drive_through_portal(ch, veh, portal, subcmd);
 		}
 		else {
-			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", dir_arg, drive_data[subcmd].command);
+			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
 		}
+	}
+	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
+		// sends own error
+	}
+	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
+		msg_to_char(ch, "Invalid path string.\r\n");
 	}
 	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir, FALSE) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
 		msg_to_char(ch, "You can't %s that direction.\r\n", drive_data[subcmd].command);
 	}
-	else if (GET_ACTION(ch) == drive_data[subcmd].action && GET_ACTION_VNUM(ch, 0) == dir && !*dist_arg) {
-		msg_to_char(ch, "You are already %s that way.\r\n", drive_data[subcmd].verb);
-	}
-	else if (*dist_arg && (!isdigit(*dist_arg) || (dist = atoi(dist_arg)) < 1)) {
-		snprintf(buf, sizeof(buf), "%s how far!?\r\n", drive_data[subcmd].command);
-		CAP(buf);
-		send_to_char(buf, ch);
-	}
+	
 	else {
 		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
 		
@@ -1799,16 +1833,15 @@ ACMD(do_drive) {
 		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
 		GET_ACTION_VNUM(ch, 2) = subcmd;
 		
+		if (GET_MOVEMENT_STRING(ch)) {
+			free(GET_MOVEMENT_STRING(ch));
+		}
+		GET_MOVEMENT_STRING(ch) = dir_only ? NULL : str_dup(argument);
+		
 		GET_DRIVING(ch) = veh;
 		VEH_DRIVER(veh) = ch;
 		
-		if (same_dir && dist > 0) {
-			msg_to_char(ch, "You will now stop after %d tiles.\r\n", dist);
-		}
-		else if (same_dir && was_driving) {
-			msg_to_char(ch, "You're already going that way.\r\n");
-		}
-		else if (was_driving) {
+		if (was_driving && !same_dir) {
 			msg_to_char(ch, "You turn %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
 		}
 		else {
