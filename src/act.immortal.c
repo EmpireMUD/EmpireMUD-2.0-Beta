@@ -2518,7 +2518,7 @@ SHOW(show_commons) {
 			}
 	msg_to_char(ch, "Common sites:\r\n");
 	if (*buf)
-		msg_to_char(ch, buf);
+		send_to_char(buf, ch);
 	else
 		msg_to_char(ch, "None.\r\n");
 }
@@ -3516,6 +3516,7 @@ void do_stat_book(char_data *ch, book_data *book) {
 * @param bld_data *bdg The building to stat.
 */
 void do_stat_building(char_data *ch, bld_data *bdg) {
+	void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 	extern const char *bld_flags[];
 	extern const char *designate_flags[];
 	
@@ -3548,8 +3549,9 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	
 	msg_to_char(ch, "Citizens: [&g%d&0], Military: [&g%d&0]%s\r\n", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), buf);
 	
-	if (GET_BLD_UPGRADES_TO(bdg) != NOTHING) {
-		msg_to_char(ch, "Upgrades to: &g%d&0 &c%s&0\r\n", GET_BLD_UPGRADES_TO(bdg), GET_BLD_NAME(building_proto(GET_BLD_UPGRADES_TO(bdg))));
+	if (GET_BLD_RELATIONS(bdg)) {
+		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
+		msg_to_char(ch, "Relations:\r\n%s", lbuf);
 	}
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, buf, TRUE);
@@ -6460,6 +6462,27 @@ ACMD(do_island) {
 			save_island_table();
 		}
 	}
+	else if (is_abbrev(arg1, "description")) {
+		if (!*argument) {
+			msg_to_char(ch, "Usage: island description <id>\r\n");
+		}
+		else if (!ch->desc) {
+			msg_to_char(ch, "You can't edit text right now.\r\n");
+		}
+		else if (ch->desc->str) {
+			msg_to_char(ch, "You are already editing something else right now.\r\n");
+		}
+		else if (isdigit(*argument) && !(isle = get_island(atoi(argument), FALSE))) {
+			msg_to_char(ch, "Unknown island id '%s'.\r\n", argument);
+		}
+		else if (!isdigit(*argument) && !(isle = get_island_by_name(ch, argument))) {
+			msg_to_char(ch, "Unknown island '%s'.\r\n", argument);
+		}
+		else {
+			start_string_editor(ch->desc, "island description", &isle->desc, MAX_STRING_LENGTH, TRUE);
+			ch->desc->island_desc_id = isle->id;
+		}
+	}
 	else if (is_abbrev(arg1, "flags")) {
 		argument = one_argument(argument, arg2);
 		skip_spaces(&argument);
@@ -6488,6 +6511,7 @@ ACMD(do_island) {
 	else {
 		msg_to_char(ch, "Usage: island list [keywords]\r\n");
 		msg_to_char(ch, "       island rename <id> <name>\r\n");
+		msg_to_char(ch, "       island description <id>\r\n");
 		msg_to_char(ch, "       island flags <id> [add | remove] [flags]\r\n");
 	}
 }

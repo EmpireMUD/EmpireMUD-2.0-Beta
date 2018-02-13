@@ -58,6 +58,7 @@ void cancel_driving(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
 void cancel_morphing(char_data *ch);
+void cancel_movement_string(char_data *ch);
 void cancel_siring(char_data *ch);
 
 // process protos
@@ -92,6 +93,7 @@ void process_quarrying(char_data *ch);
 void process_reading(char_data *ch);
 void process_reclaim(char_data *ch);
 void process_repairing(char_data *ch);
+void process_running(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
 void process_start_fillin(char_data *ch);
@@ -131,7 +133,7 @@ const struct action_data_struct action_data[] = {
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_fillin, NULL },	// ACT_FILLING_IN
 	{ "reclaiming", "is reclaiming this acre!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
 	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
-		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// unused
+	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, cancel_movement_string },	// unused
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
@@ -297,6 +299,9 @@ void update_actions(void) {
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
 		}
+		if (IS_SET(act_flags, ACTF_FASTER_BONUS) && HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
+			speed += ACTION_CYCLE_MULTIPLIER;
+		}
 		if (IS_SET(act_flags, ACTF_FINDER) && has_player_tech(ch, PTECH_FAST_FIND)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
 			gain_player_tech_exp(ch, PTECH_FAST_FIND, 0.1);
@@ -420,6 +425,18 @@ void cancel_morphing(char_data *ch) {
 		obj_to_char(obj, ch);
 		load_otrigger(obj);
 	}
+}
+
+/**
+* Frees the movement string.
+*
+* @param char_data *ch The person canceling the action.
+*/
+void cancel_movement_string(char_data *ch) {
+	if (GET_MOVEMENT_STRING(ch)) {
+		free(GET_MOVEMENT_STRING(ch));
+	}
+	GET_MOVEMENT_STRING(ch) = NULL;
 }
 
 

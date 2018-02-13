@@ -322,7 +322,7 @@ switch %random.2%
     %dot% %actor% 100 60 poison
     %damage% %actor% 20 poison
   break
-done/f
+done
 ~
 #10024
 Baby dragon combat~

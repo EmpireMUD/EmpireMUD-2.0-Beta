@@ -866,6 +866,9 @@ void free_char(char_data *ch) {
 		if (GET_DISGUISED_NAME(ch)) {
 			free(GET_DISGUISED_NAME(ch));
 		}
+		if (GET_MOVEMENT_STRING(ch)) {
+			free(GET_MOVEMENT_STRING(ch));
+		}
 		
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		
@@ -1667,6 +1670,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Mount Vnum:", length)) {
 					GET_MOUNT_VNUM(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Mvstring:", length)) {
+					if (GET_MOVEMENT_STRING(ch)) {
+						free(GET_MOVEMENT_STRING(ch));
+					}
+					GET_MOVEMENT_STRING(ch) = str_dup(trim(line + length + 1));
+				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
@@ -2458,6 +2467,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_MOUNT_VNUM(ch) != NOTHING) {
 		fprintf(fl, "Mount Vnum: %d\n", GET_MOUNT_VNUM(ch));
+	}
+	if (GET_MOVEMENT_STRING(ch)) {
+		strcpy(temp, GET_MOVEMENT_STRING(ch));
+		temp[245] = '\0';	// ensure not longer than this (we would not be able to load it)
+		fprintf(fl, "Mvstring: %s\n", temp);
 	}
 	
 	// 'O'

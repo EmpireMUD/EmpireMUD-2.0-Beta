@@ -2753,6 +2753,7 @@ void perform_abandon_room(room_data *room) {
 	
 	empire_data *emp = ROOM_OWNER(room);
 	struct empire_territory_data *ter;
+	int ter_type;
 	bool junk;
 	
 	// updates based on owner
@@ -2763,14 +2764,13 @@ void perform_abandon_room(room_data *room) {
 		// update territory counts
 		if (COUNTS_AS_TERRITORY(room)) {
 			struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-			if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
-				EMPIRE_CITY_TERRITORY(emp) -= 1;
-				eisle->city_terr -= 1;
-			}
-			else {
-				EMPIRE_OUTSIDE_TERRITORY(emp) -= 1;
-				eisle->outside_terr -= 1;
-			}
+			ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+			
+			SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), -1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[ter_type], -1, 0, UINT_MAX, FALSE);
+			
+			SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), -1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[TER_TOTAL], -1, 0, UINT_MAX, FALSE);
 		}
 		// territory list
 		if ((ter = find_territory_entry(emp, room))) {
@@ -2817,6 +2817,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	
 	struct empire_territory_data *ter;
+	int ter_type;
 	bool junk;
 	
 	ROOM_OWNER(room) = emp;
@@ -2827,14 +2828,13 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	// update territory counts
 	if (COUNTS_AS_TERRITORY(room)) {
 		struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-		if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
-			EMPIRE_CITY_TERRITORY(emp) += 1;
-			eisle->city_terr += 1;
-		}
-		else {
-			EMPIRE_OUTSIDE_TERRITORY(emp) += 1;
-			eisle->outside_terr += 1;
-		}
+		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+		
+		SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), 1, 0, UINT_MAX, FALSE);
+		SAFE_ADD(eisle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
+		
+		SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), 1, 0, UINT_MAX, FALSE);
+		SAFE_ADD(eisle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
 	}
 	// territory list
 	if (BELONGS_IN_TERRITORY_LIST(room) && !(ter = find_territory_entry(emp, room))) {
@@ -7370,14 +7370,21 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 */
 bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 	struct obj_storage_type *store;
+	bld_data *bld = GET_BUILDING(loc);
+	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE) > 0) : FALSE);
 	
-	// quest items don't store
+	if (!bld) {
+		return FALSE;	// shortcut
+	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-		return FALSE;
+		return FALSE;	// quest items don't store
 	}
 	
 	for (store = obj->storage; store; store = store->next) {
-		if (BUILDING_VNUM(loc) != NOTHING && store->building_type == BUILDING_VNUM(loc)) {
+		if (store->building_type == BUILDING_VNUM(loc)) {
+			return TRUE;
+		}
+		else if (has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE, store->building_type)) {
 			return TRUE;
 		}
 	}

@@ -222,7 +222,6 @@
 #define GET_BLD_FAME(bld)  ((bld)->fame)
 #define GET_BLD_FLAGS(bld)  ((bld)->flags)
 #define GET_BLD_FUNCTIONS(bld)  ((bld)->functions)
-#define GET_BLD_UPGRADES_TO(bld)  ((bld)->upgrades_to)
 #define GET_BLD_EX_DESCS(bld)  ((bld)->ex_description)
 #define GET_BLD_EXTRA_ROOMS(bld)  ((bld)->extra_rooms)
 #define GET_BLD_DESIGNATE_FLAGS(bld)  ((bld)->designate_flags)
@@ -230,6 +229,7 @@
 #define GET_BLD_CITIZENS(bld)  ((bld)->citizens)
 #define GET_BLD_MILITARY(bld)  ((bld)->military)
 #define GET_BLD_ARTISAN(bld)  ((bld)->artisan_vnum)
+#define GET_BLD_RELATIONS(bld)  ((bld)->relations)
 #define GET_BLD_SCRIPTS(bld)  ((bld)->proto_script)
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
@@ -525,8 +525,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_LOGS(emp)  ((emp)->logs)
 #define EMPIRE_TERRITORY_LIST(emp)  ((emp)->territory_list)
 #define EMPIRE_CITY_LIST(emp)  ((emp)->city_list)
-#define EMPIRE_CITY_TERRITORY(emp)  ((emp)->city_terr)
-#define EMPIRE_OUTSIDE_TERRITORY(emp)  ((emp)->outside_terr)
+#define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
 #define EMPIRE_MILITARY(emp)  ((emp)->military)
@@ -566,6 +565,10 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define BELONGS_IN_TERRITORY_LIST(room)  (IS_ANY_BUILDING(room) || COMPLEX_DATA(room) || ROOM_SECT_FLAGGED(room, SECTF_CHORE))
 #define COUNTS_AS_TERRITORY(room)  (HOME_ROOM(room) == (room) && !GET_ROOM_VEHICLE(room))
 #define LARGE_CITY_RADIUS(room)  (ROOM_BLD_FLAGGED((room), BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED((room), SECTF_LARGE_CITY_RADIUS))
+
+// deprecated
+#define EMPIRE_CITY_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_CITY)
+#define EMPIRE_OUTSIDE_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_OUTSKIRTS)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1063,6 +1066,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_MOUNT_LIST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_list))
 #define GET_MOUNT_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_vnum))
 #define GET_MOVE_TIME(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->move_time[(pos)]))
+#define GET_MOVEMENT_STRING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->movement_string))
 #define GET_OFFERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->offers))
 #define GET_OLC_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_flags))
 #define GET_OLC_MAX_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_max_vnum))
@@ -1504,7 +1508,7 @@ extern bool has_permission(char_data *ch, int type);
 extern bool has_tech_available(char_data *ch, int tech);
 extern bool has_tech_available_room(room_data *room, int tech);
 extern bool is_at_war(empire_data *emp);
-extern int land_can_claim(empire_data *emp, bool outside_only);
+extern int land_can_claim(empire_data *emp, int ter_type);
 
 // file utilities from utils.c
 extern int get_filename(char *orig_name, char *filename, int mode);
@@ -1608,7 +1612,8 @@ void start_action(char_data *ch, int type, int timer);
 
 // utils from act.empire.c
 extern bool check_in_city_requirement(room_data *room, bool check_wait);
-extern bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon);
+extern int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
+#define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon)) == TER_CITY)	// backwards-compatibility
 
 // utils from act.informative.c
 extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
@@ -1628,6 +1633,11 @@ void gain_condition(char_data *ch, int condition, int value);
 extern bool adjacent_room_is_light(room_data *room);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
+
+// utils from olc.building.c
+extern bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);
+extern int count_bld_relations(bld_data *bld, int type);
+extern char *get_bld_name_by_proto(bld_vnum vnum);
 
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);

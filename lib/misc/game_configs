@@ -60,7 +60,6 @@ trench_initial_value -500
 bonus_city_point_techs 10
 bonus_city_point_wealth 4000
 cities_on_newbie_islands 0
-city_trait_radius 100
 disrepair_limit 10
 disrepair_limit_unfinished 2
 disrepair_major 60
@@ -75,7 +74,9 @@ players_per_city_point 2
 * Empire configs
 building_population_timer 48
 empire_log_ttl 30
-land_outside_city_modifier 0.200000
+land_frontier_modifier 0.050000
+land_min_cap 15
+land_outside_city_modifier 0.350000
 land_per_greatness 35
 land_per_tech 15
 land_per_wealth 0.100000
@@ -85,6 +86,7 @@ member_timeout_newbie 7
 minutes_per_day_full 150
 minutes_per_day_newbie 15
 newbie_island_day_limit 7
+outskirts_modifier 4.000000
 redesignate_time 60
 time_to_empire_delete 104
 time_to_empire_emptiness 2

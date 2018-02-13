@@ -1877,7 +1877,7 @@ Available flags:
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
  IN-CITY-ONLY - can only be used if in an established city
- LARGE-CITY-RADIUS - counts as in-city much further away than normal
+ LARGE-CITY-RADIUS - counts as in-city even when built in the outskirts
  !PAINT - cannot be painted
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
@@ -2015,6 +2015,22 @@ room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
 
 See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
 #d
+"BEDIT RELATIONS" "BEDIT RELATIONSHIPS"
+
+Usage:  .relation add <type> <vnum>
+        .relation change <number> vnum <value>
+        .relation copy building <from vnum>
+        .relation remove <number | all>
+
+Relations link this building to other buildings in various ways:
+
+Available relationship types:
+ &cUPGRADES-TO&0 - This building can be upgraded to that type.
+ &cSTORES-LIKE&0 - Anything that can be stored there can be stored here.
+                      (this does not include warehouses; use function flags)
+
+See also: OLC BUILDINGS
+#d
 "BEDIT RESOURCES" "BEDIT YEARLY MAINTENANCE"
 
 Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
@@ -2113,21 +2129,6 @@ Examples:
  The Eye of the World
 
 See also: OLC BUILDINGS
-#d
-"BEDIT UPGRADESTO" "BEDIT UPGRADES TO"
-
-Usage:  .upgradesto <building vnum>
-        .upgradesto none
-
-Some buildings can be upgraded into other buildings. You specify which building
-this one can upgrade to here. You must specify a valid building vnum.
-
-In order for the 'upgrade' command to actually work, you must also use the
-craft recipe editor to create a new building recipe for the upgraded building,
-and mark it as UPGRADE. This building will only need a regular craft recipe,
-and only if it's buildable.
-
-See also: OLC BUILDINGS, UPGRADE, VNUM
 #d
 "CEDIT BUILDFACING" "CEDIT BUILD FACING"
 
@@ -5874,7 +5875,7 @@ Available sector flags:
  SHOW-ON-POLITICAL-MAPOUT - Still appears on the political version of the graphical map
  MAP-BUILDING - This sector represents a building on the map; shown using building data
  INSIDE-ROOM - This sector represents an interior (designated) ROOM building
- LARGE-CITY-RADIUS - This tile counts as in-city much further away than normal
+ LARGE-CITY-RADIUS - This tile counts as in-city even in the outskirts
  OBSCURE-VISION - Players can't be seen here; also blocks guard towers
  IS-TRENCH - Sector counts as a trench and fills with water
  * - unused

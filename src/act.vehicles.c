@@ -81,8 +81,7 @@ void cancel_driving(char_data *ch) {
 	}
 	
 	snprintf(buf, sizeof(buf), "%s stops moving.\r\n", VEH_SHORT_DESC(veh));
-	CAP(buf);
-	msg_to_vehicle(veh, FALSE, buf);
+	msg_to_vehicle(veh, FALSE, "%s", CAP(buf));
 	
 	GET_DRIVING(ch) = NULL;
 	VEH_DRIVER(veh) = NULL;
@@ -662,7 +661,7 @@ void process_driving(char_data *ch) {
 	}
 	
 	// not stopped by anything? auto-look each move
-	if (PRF_FLAGGED(ch, PRF_DRIVING_LOOK)) {
+	if (PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
 		look_at_room(ch);
 	}
 }

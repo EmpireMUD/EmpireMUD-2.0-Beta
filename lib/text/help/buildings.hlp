@@ -74,7 +74,7 @@ BRIDGE
 Once completed, a bridge allows you to cross river tiles without a boat. You
 can also sail ships under the bridges. Nobody knows how.
 
-Bridges count as in-city territory as far away as 3x a city's normal radius.
+Bridges count as in-city territory even if built in the outskirts (4x radius).
 #
 BURROWHAVEN "BURROW HAVEN" "STRANGE BURROW"
 
@@ -169,8 +169,7 @@ CLAYPIT "CLAY PIT"
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
 digging on unprepared ground. You can dig more clay from them before depletion.
 
-Clay pits count as in-city territory as far away as 3x a city's normal
-radius.
+Clay pits count as in-city territory when built in the outskirts (4x radius).
 
 See also: DIG
 #
@@ -293,7 +292,7 @@ FENCE
 vvvv  Fence  (Basic Buildings)
 
 Fences will block the movement of NPCs, but not players. They count as in-city
-territory as far away as 3x a city's normal radius.
+territory even when built in the outskirts (4x radius).
 
 See also: GATE
 #

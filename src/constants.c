@@ -623,7 +623,7 @@ const char *preference_bits[] = {
 	"!TUTORIALS",
 	"!PAINT",
 	"EXTRA-SPACING",
-	"DRIVING-LOOK",
+	"TRAVEL-LOOK",
 	"AUTOCLIMB",
 	"AUTOSWIM",
 	"\n"
@@ -682,7 +682,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, NULL },
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
-	{ "driving-look", TOG_ONOFF, PRF_DRIVING_LOOK, 0, NULL },
+	{ "travel-look", TOG_ONOFF, PRF_TRAVEL_LOOK, 0, NULL },
 	{ "mortlog", TOG_ONOFF, PRF_MORTLOG, 0, NULL },
 	
 	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
@@ -1470,7 +1470,7 @@ struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits", "not agile enough" },
 	{ "Charisma", "Charisma improves your success with Stealth abilities", "not charming enough" },
 	{ "Greatness", "Greatness determines how much territory your empire can claim", "not great enough" },
-	{ "Intelligence", "Intelligence improves your magical damage and healing", "not clever" },
+	{ "Intelligence", "Intelligence improves your magical damage and healing", "not clever enough" },
 	{ "Wits", "Wits improves your speed and effectiveness in combat", "too slow" }
 };
 
@@ -2613,6 +2613,14 @@ const char *bld_flags[] = {
 	"*SHIPYARD-DEPRECATED",	// 45
 	"UPGRADED",
 	"*PRESS-DEPRECATED",
+	"\n"
+};
+
+
+// BLD_REL_x: relationships with other buildings
+const char *bld_relationship_types[] = {
+	"UPGRADES-TO",
+	"STORES-LIKE",
 	"\n"
 };
 

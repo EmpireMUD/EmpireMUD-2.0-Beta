@@ -88,6 +88,7 @@ ACMD(do_butcher);
 ACMD(do_cede);
 ACMD(do_changepass);
 ACMD(do_charge);
+ACMD(do_chart);
 ACMD(do_chip);
 ACMD(do_chop);
 ACMD(do_circle);
@@ -257,6 +258,7 @@ ACMD(do_mail);
 ACMD(do_maintain);
 ACMD(do_manashield);
 ACMD(do_mapout);
+ACMD(do_mapscan);
 ACMD(do_mapsize);
 ACMD(do_mark);
 ACMD(do_messages);
@@ -343,6 +345,7 @@ ACMD(do_roadsign);
 ACMD(do_role);
 ACMD(do_roll);
 ACMD(do_roster);
+ACMD(do_run);
 
 ACMD(do_sacrifice);
 ACMD(do_sap);
@@ -597,6 +600,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "cd", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "cede", POS_DEAD, do_cede, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "chant", POS_STANDING, do_ritual, NO_MIN, NO_GRANTS, SCMD_CHANT, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "chart", POS_DEAD, do_chart, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "changepass", POS_DEAD, do_changepass, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "charge", POS_FIGHTING, do_charge, NO_MIN, CTYPE_COMBAT, ABIL_CHARGE ),
 	STANDARD_CMD( "chip", POS_STANDING, do_chip, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -801,6 +805,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "maintain", POS_STANDING, do_maintain, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "manashield", POS_RESTING, do_manashield, NO_MIN, CTYPE_COMBAT, ABIL_MANASHIELD ),
 	STANDARD_CMD( "manufacture", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MANUFACTURE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "mapscan", POS_RESTING, do_mapscan, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "mapsize", POS_DEAD, do_mapsize, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "mapout", POS_DEAD, do_mapout, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "mark", POS_RESTING, do_mark, NO_MIN, CTYPE_UTIL ),
@@ -909,6 +914,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "roll", POS_RESTING, do_roll, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "rollhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, CHANNEL_HISTORY_ROLL ),
 	SIMPLE_CMD( "roster", POS_DEAD, do_roster, NO_MIN, CTYPE_EMPIRE ),
+	SIMPLE_CMD( "run", POS_STANDING, do_run, NO_MIN, CTYPE_MOVE ),
 
 	SCMD_CMD( "say", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
 	SCMD_CMD( "'", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),

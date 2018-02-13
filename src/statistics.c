@@ -168,7 +168,7 @@ void display_statistics_to_char(char_data *ch) {
 	// empire stats
 	territory = members = citizens = military = 0;
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		territory += EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp);
+		territory += EMPIRE_TERRITORY(emp, TER_TOTAL);
 		members += EMPIRE_MEMBERS(emp);
 		citizens += EMPIRE_POPULATION(emp);
 		military += EMPIRE_MILITARY(emp);

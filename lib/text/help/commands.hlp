@@ -347,6 +347,14 @@ slash-channel you are currently in.
 
 See also: SLASH-CHANNELS, TOGGLE
 #
+CHART CHARTS
+
+Usage:  chart <island>
+
+This command shows you information about any island.
+
+See also: ISLANDS, SURVEY
+#
 CIRCLE
 
 Usage:  circle <direction>
@@ -579,13 +587,6 @@ Usage:  draw <item>
 This command pulls one of your sheathed weapons into your main hand.
 
 See also: SHEATHE, SWAP
-#
-DRIVING-LOOK "DRIVING LOOK" "TOGGLE DRIVING-LOOK"
-
-Usage:  toggle driving-look
-
-This toggle causes you to automatically 'look' after each time you move when
-driving, piloting, or sailing a vehicle.
 #
 DROP
 
@@ -1026,8 +1027,8 @@ the Empire skill.
 
 Roads count as their base terrain for most building functions, so you can
 build things facing roads, and can usually build right over a road -- but the
-road underneath will be lost. Roads count as in-city territory as far away as
-3x a city's normal radius.
+road underneath will be lost. Roads count as in-city territory when built in
+the outskirts (4x radius).
 
 Gain experience when you lay a road (but not on mountains) or put down a
 road sign.
@@ -1538,6 +1539,23 @@ tag next to your name on the "who" list.
 
 See also: TOGGLE
 #
+RUN RUNNING SPEEDWALK SPEED-WALK "SPEED WALK"
+
+Usage:  run <direction>
+        run <path>
+
+This command allows you to set your character moving in a given direction, or
+along a path you specify. Paths must be pairs of directions and distances which
+your character will move in order.
+
+You will run faster if you took the 'faster walking' bonus trait during
+character creation.
+
+Examples:
+ > run east
+ > run 3e 4n 7nw
+ > run east 3, north 4, northwest 7
+#
 SAIL DRIVE PILOT SAILING DRIVING PILOTING
 
 Usage:  sail <direction | portal> [distance]
@@ -1854,7 +1872,7 @@ Usage:  survey
 
 This command gets you basic information about the room you're currently in.
 
-See also: ADVENTURE
+See also: ADVENTURE, CHART
 #
 SWAP
 
@@ -1962,7 +1980,6 @@ Toggles:
   channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
-  driving-look - automatically 'looks' after each time your vehicle moves
   extra-spacing - adds an extra blank line after you type a command
   informative - informative map coloring -- HELP INFORMATIVE
   map-color - shut off color for just the map
@@ -1978,8 +1995,8 @@ Toggles:
   shout - the local shout channel
   stealthable - if off, you will be prevented from accidentally stealing
   tell - the tell channel
+  travel-look - automatically 'looks' after each run or when your vehicle moves
   tutorials - you won't see available tutorial quests if this is off
-
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
@@ -2000,6 +2017,14 @@ Usage:  toggle no-empire
 This toggle is for players who do not wish to be in any empire. The game will
 no longer create a new empire for you when you try to do things like claim
 or build.
+#
+TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
+
+Usage:  toggle travel-look
+
+This toggle causes you to automatically 'look' after each time you move when
+running or when driving, piloting, or sailing a vehicle. With this toggle off,
+you only see a short message indicating you moved.
 #
 UNLOAD UNLOADVEHICLE BOATUNLOAD
 

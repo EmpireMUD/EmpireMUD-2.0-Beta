@@ -353,7 +353,7 @@ bool is_affiliated_island(empire_data *emp, int island_id) {
 	isle = get_empire_island(emp,island_id);
 	
 	//Check if the empire has claimed tiles in the island.
-	if ( isle->city_terr > 0 || isle->outside_terr > 0) {
+	if (isle->territory[TER_TOTAL] > 0) {
 		return TRUE;
 	}
 	
@@ -503,7 +503,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	prettier_sprintbit(EMPIRE_FRONTIER_TRAITS(e), empire_trait_types, buf);
 	msg_to_char(ch, "Frontier traits: %s\r\n", buf);
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
-	msg_to_char(ch, "Territory: %d in cities, %d/%d outside (%d/%d total)\r\n", EMPIRE_CITY_TERRITORY(e), EMPIRE_OUTSIDE_TERRITORY(e), land_can_claim(e, TRUE), EMPIRE_CITY_TERRITORY(e) + EMPIRE_OUTSIDE_TERRITORY(e), land_can_claim(e, FALSE));
+	msg_to_char(ch, "Territory: %d/%d (%d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(e, TER_TOTAL), land_can_claim(e, TER_TOTAL), EMPIRE_TERRITORY(e, TER_OUTSKIRTS), land_can_claim(e, TER_OUTSKIRTS), EMPIRE_TERRITORY(e, TER_FRONTIER), land_can_claim(e, TER_FRONTIER));
 	msg_to_char(ch, "Wealth: %.1f coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(e), (int) GET_TOTAL_WEALTH(e));
 	msg_to_char(ch, "Fame: %d\r\n", EMPIRE_FAME(e));
 	msg_to_char(ch, "Greatness: %d\r\n", EMPIRE_GREATNESS(e));
@@ -1091,7 +1091,7 @@ bool check_in_city_requirement(room_data *room, bool check_wait) {
 	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY)) {
 		return TRUE;
 	}
-	if (ROOM_OWNER(room) && is_in_city_for_empire(room, ROOM_OWNER(room), check_wait, &junk)) {
+	if (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), check_wait, &junk) == TER_CITY) {
 		return TRUE;
 	}
 	
@@ -1404,58 +1404,85 @@ void found_city(char_data *ch, char *argument) {
 
 
 /**
-* Determines if a location counts as in-city, and has passed the required wait
-* time since the city was founded.
+* Determines if a location counts as in-city, outskirts, or frontier. This will
+* also check the required wait time since the city was founded, if applicable.
 *
 * @param room_data *loc The location to check.
 * @param empire_data *emp The empire to check.
 * @param bool check_wait If TRUE, requires the city wait time to have passed.
-* @param bool *too_soon Will be set to TRUE if there was a city but it was founded too recently.
+* @param bool *city_too_soon Will be set to TRUE if there was a city but it was founded too recently.
 * @return bool TRUE if in-city, FALSE if not.
 */
-bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon) {
+int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon) {
 	struct empire_city_data *city;
-	int dist;
+	int dist, best_dist = MAP_SIZE, type = TER_FRONTIER, last_type = TER_FRONTIER;
 	
-	int wait = config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN;
+	double outskirts_multiplier = config_get_double("outskirts_modifier");	// radius multiplier
+	int wait = check_wait ? config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN : 0;
 	
-	*too_soon = FALSE;
+	*city_too_soon = FALSE;	// init this
 	
 	if (!emp) {
-		return FALSE;
+		return TER_FRONTIER;
 	}
 	
 	// secondary territory counts as in-city
 	if (ROOM_BLD_FLAGGED(loc, BLD_SECONDARY_TERRITORY)) {
-		return TRUE;
+		return TER_CITY;
 	}
 	
-	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+	LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 		dist = compute_distance(loc, city->location);
 		
-		if (dist <= city_type[city->type].radius || (LARGE_CITY_RADIUS(loc) && dist <= (3 * city_type[city->type].radius))) {
-			if (!check_wait || (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + wait) < time(0)) {
-				return TRUE;
-			}
-			else {
-				*too_soon = TRUE;
-			}
+		// check radii
+		if (dist <= city_type[city->type].radius) {
+			// check wait?
+			type = TER_CITY;
+		}
+		else if (dist <= (city_type[city->type].radius * outskirts_multiplier)) {
+			type = LARGE_CITY_RADIUS(loc) ? TER_CITY : TER_OUTSKIRTS;
+		}
+		else {
+			type = TER_FRONTIER;
+		}
+		
+		// don't override if we already found one it's in-city for, even if it's closer-but-outskirts for another city
+		if (type != TER_CITY && (dist > best_dist || last_type == TER_CITY)) {
+			type = last_type;
+			continue;	// found a better one already
+		}
+		else if (type == TER_FRONTIER && last_type == TER_OUTSKIRTS) {
+			type = last_type;
+			continue;	// found a better one already
+		}
+		// best_dist is set later, only when the result is verified
+		
+		// verify city is new enough
+		if (type != TER_FRONTIER && check_wait && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + wait) > time(0)) {
+			*city_too_soon = TRUE;
+			type = last_type;	// restore previous type
+		}
+		else {
+			last_type = type;	// save this for next iteration
+			best_dist = dist;	// save this for next iteration
 		}
 	}
 	
-	return FALSE;
+	return type;
 }
 
 
 // for do_city
 void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
+	extern const char *alt_dirs[];
+	extern const char *dirs[];
 	
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], traits[256];
 	struct empire_city_data *city;
 	struct island_info *isle;
 	empire_data *emp;
-	int points, used, count;
+	int points, used, count, dir, dist;
 	bool is_own, pending, found = FALSE;
 	room_data *rl;
 	
@@ -1499,16 +1526,25 @@ void list_cities(char_data *ch, char *argument) {
 		
 		found = TRUE;
 		rl = city->location;
-		prettier_sprintbit(city->traits, empire_trait_types, buf);
+		if (city->traits) {
+			prettier_sprintbit(city->traits, empire_trait_types, buf);
+			snprintf(traits, sizeof(traits), "%s%s", is_own ? ", " : "", buf);
+		}
+		else {
+			*traits = '\0';
+			*buf = '\0';
+		}
 		isle = GET_ISLAND(rl);
 		++count;
 		
 		if (is_own) {
-			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
-			msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
+			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));
+			dist = compute_distance(IN_ROOM(ch), city->location);
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), city->location));
+			msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d%s), %d %s%s\r\n", count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, traits, dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), pending ? " &r(new)&0" : "");
 		}
 		else {
-			msg_to_char(ch, "(%*d, %*d) %s, on %s (traits: %s)\r\n", X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), buf);
+			msg_to_char(ch, "(%*d, %*d) %s, on %s (traits: %s)\r\n", X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), *buf ? buf : "none");
 		}
 	}
 	
@@ -1558,7 +1594,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 				// check ownership
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					// warning: never abandon things that are still within another city
-					if (!is_in_city_for_empire(to_room, emp, FALSE, &junk)) {
+					if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
 						// check if ACTUALLY within the abandoned city
 						if (compute_distance(cityloc, to_room) <= radius) {
 							abandon_room(to_room);
@@ -2829,12 +2865,16 @@ ACMD(do_cede) {
 	else if (GET_RANK(targ) < EMPIRE_PRIV(GET_LOYALTY(targ), PRIV_CLAIM)) {
 		act("You can't cede to $M because $E doesn't have the claim privilege.", FALSE, ch, NULL, targ, TO_CHAR);
 	}
-	else if (EMPIRE_CITY_TERRITORY(f) + EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, FALSE))
+	else if (EMPIRE_TERRITORY(f, TER_TOTAL) >= land_can_claim(f, TER_TOTAL)) {
 		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", REAL_HMHR(targ), REAL_HSHR(targ));
-	else if (!is_in_city_for_empire(room, f, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
-		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory outside of cities.\r\n");
 	}
-	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && !is_in_city_for_empire(room, f, FALSE, &junk)) {
+	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(f, TER_OUTSKIRTS)  >= land_can_claim(f, TER_OUTSKIRTS)) {
+		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory on the outskirts of cities.\r\n");
+	}
+	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(f, TER_FRONTIER)  >= land_can_claim(f, TER_FRONTIER)) {
+		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory on the frontier.\r\n");
+	}
+	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, f, FALSE, &junk) != TER_CITY) {
 		msg_to_char(ch, "That empire is forbidden from gaining new territory outside of a city.\r\n");
 	}
 	else if (is_at_war(f)) {
@@ -2937,10 +2977,13 @@ void do_claim_room(char_data *ch, room_data *room) {
 	else if (!can_build_or_claim_at_war(ch, room)) {
 		msg_to_char(ch, "You can't claim while at war with the empire that controls this area.\r\n");
 	}
-	else if (!is_in_city_for_empire(room, emp, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(emp) >= land_can_claim(emp, TRUE)) {
-		msg_to_char(ch, "You can't claim the area because you're over the 20%% of your territory that can be outside of cities.\r\n");
+	else if (get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= land_can_claim(emp, TER_OUTSKIRTS)) {
+		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the outskirts of cities.\r\n", (int)(100 * config_get_double("land_outside_city_modifier")));
 	}
-	else if (EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && !is_in_city_for_empire(room, emp, FALSE, &junk)) {
+	else if (get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(emp, TER_FRONTIER) >= land_can_claim(emp, TER_FRONTIER)) {
+		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the frontier.\r\n", (int)(100 * config_get_double("land_frontier_modifier")));
+	}
+	else if (EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, emp, FALSE, &junk) != TER_CITY) {
 		msg_to_char(ch, "Your empire is forbidden from claiming outside of a city.\r\n");
 	}
 	else {
@@ -3751,14 +3794,14 @@ ACMD(do_empires) {
 		if (!more && !EMPIRE_HAS_TECH(emp, TECH_PROMINENCE)) {
 			continue;
 		}
-		if (!all && (EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp)) <= 0) {
+		if (!all && EMPIRE_TERRITORY(emp, TER_TOTAL) <= 0) {
 			continue;
 		}
 		if (!all && EMPIRE_IS_TIMED_OUT(emp)) {
 			continue;
 		}
 		
-		lsize = snprintf(line, sizeof(line), "%3d. %s%-30.30s&0  %2d  %2d  %3d  %d\r\n", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), get_total_score(emp), EMPIRE_MEMBERS(emp), EMPIRE_GREATNESS(emp), EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp));
+		lsize = snprintf(line, sizeof(line), "%3d. %s%-30.30s&0  %2d  %2d  %3d  %d\r\n", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), get_total_score(emp), EMPIRE_MEMBERS(emp), EMPIRE_GREATNESS(emp), EMPIRE_TERRITORY(emp, TER_TOTAL));
 		
 		// append if room
 		if (size + lsize < sizeof(output)) {
@@ -4252,7 +4295,7 @@ ACMD(do_estats) {
 	
 	// stats
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(emp), PLURAL(EMPIRE_MEMBERS(emp)), EMPIRE_POPULATION(emp), PLURAL(EMPIRE_POPULATION(emp)), EMPIRE_MILITARY(emp));
-	msg_to_char(ch, "Territory: %d in cities, %d/%d outside (%d/%d total)\r\n", EMPIRE_CITY_TERRITORY(emp), EMPIRE_OUTSIDE_TERRITORY(emp), land_can_claim(emp, TRUE), EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp), land_can_claim(emp, FALSE));
+	msg_to_char(ch, "Territory: %d/%d (%d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
 	msg_to_char(ch, "Wealth: %.1f coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(emp), PLURAL(EMPIRE_COINS(emp)), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(emp), (int) GET_TOTAL_WEALTH(emp));
 	msg_to_char(ch, "Fame: %d, Greatness: %d\r\n", EMPIRE_FAME(emp), EMPIRE_GREATNESS(emp));
 }
@@ -4636,8 +4679,8 @@ ACMD(do_islands) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
 		// mark your territory
-		if (eisle->city_terr + eisle->outside_terr > 0) {
-			do_islands_has_territory(&list, eisle->island, eisle->city_terr + eisle->outside_terr);
+		if (eisle->territory[TER_TOTAL] > 0) {
+			do_islands_has_territory(&list, eisle->island, eisle->territory[TER_TOTAL]);
 		}
 		
 		// mark storage
@@ -5560,7 +5603,7 @@ ACMD(do_territory) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
-	bool outside_only = TRUE, ok, junk;
+	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
 	int total, check_x, check_y;
 	crop_data *crop = NULL;
 	char *remain;
@@ -5589,45 +5632,64 @@ ACMD(do_territory) {
 	}
 	
 	// only if no argument (optional)
-	outside_only = *argument ? FALSE : TRUE;
+	if (*argument && is_abbrev(argument, "outskirts") && strlen(argument) >= 4) {
+		// (allow partial abbrev)
+		outskirts_only = TRUE;
+		*argument = '\0';	// don't filter by text
+	}
+	else if (*argument && is_abbrev(argument, "frontier") && strlen(argument) >= 5) {
+		// (allow partial abbrev)
+		frontier_only = TRUE;
+		*argument = '\0';	// don't filter by text
+	}
+	else {
+		outside_only = *argument ? FALSE : TRUE;
+	}
 	
 	// ready?
-	HASH_ITER(hh, world_table, iter, next_iter) {
+	HASH_ITER(hh, world_table, iter, next_iter) {	
 		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
-			continue;
+			continue;	// not on map
+		}
+		if (ROOM_OWNER(iter) != emp) {
+			continue;	// not owned
+		}
+		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) == TER_CITY) {
+			continue;	// not outside
+		}
+		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_OUTSKIRTS) {
+			continue;	// not outskirts
+		}
+		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk) != TER_FRONTIER) {
+			continue;	// not outskirts
 		}
 		
-		// owned by the empire?
-		if (ROOM_OWNER(iter) == emp) {
-			if (!outside_only || !is_in_city_for_empire(iter, emp, FALSE, &junk)) {
-				// compare request
-				if (!*argument) {
-					ok = TRUE;
-				}
-				else if (multi_isname(argument, GET_SECT_NAME(SECT(iter)))) {
-					ok = TRUE;
-				}
-				else if (GET_BUILDING(iter) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(iter)))) {
-					ok = TRUE;
-				}
-				else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(argument, GET_CROP_NAME(crop))) {
-					ok = TRUE;
-				}
-				else if (multi_isname(argument, get_room_name(iter, FALSE))) {
-					ok = TRUE;
-				}
-				else {
-					ok = FALSE;
-				}
-				
-				if (ok) {
-					CREATE(node, struct find_territory_node, 1);
-					node->loc = iter;
-					node->count = 1;
-					node->next = node_list;
-					node_list = node;
-				}
-			}
+		// compare request
+		if (!*argument) {
+			ok = TRUE;
+		}
+		else if (multi_isname(argument, GET_SECT_NAME(SECT(iter)))) {
+			ok = TRUE;
+		}
+		else if (GET_BUILDING(iter) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(iter)))) {
+			ok = TRUE;
+		}
+		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(argument, GET_CROP_NAME(crop))) {
+			ok = TRUE;
+		}
+		else if (multi_isname(argument, get_room_name(iter, FALSE))) {
+			ok = TRUE;
+		}
+		else {
+			ok = FALSE;
+		}
+		
+		if (ok) {
+			CREATE(node, struct find_territory_node, 1);
+			node->loc = iter;
+			node->count = 1;
+			node->next = node_list;
+			node_list = node;
 		}
 	}
 	

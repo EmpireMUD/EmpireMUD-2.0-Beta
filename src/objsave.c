@@ -993,7 +993,7 @@ void Crash_listrent(char_data *ch, char *name) {
 	msg_to_char(ch, "%s is using:\r\n", GET_NAME(victim));
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(victim, iter)) {
-			msg_to_char(ch, wear_data[iter].eq_prompt);
+			send_to_char(wear_data[iter].eq_prompt, ch);
 			show_obj_to_char(GET_EQ(victim, iter), ch, OBJ_DESC_EQUIPMENT);
 		}
 	}

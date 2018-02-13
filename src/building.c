@@ -188,7 +188,8 @@ void complete_building(room_data *room) {
 * @param bld_vnum type The building vnum to set up.
 */
 void construct_building(room_data *room, bld_vnum type) {
-	bool was_large, was_in_city, junk;
+	bool was_large, junk;
+	int was_ter, is_ter;
 	sector_data *sect;
 	
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
@@ -200,7 +201,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// for updating territory counts
 	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS);
-	was_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
+	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : TER_FRONTIER;
 	
 	sect = SECT(room);
 	change_terrain(room, config_get_int("default_building_sect"));
@@ -215,22 +216,16 @@ void construct_building(room_data *room, bld_vnum type) {
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
 		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
-		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
-			// changing from in-city to not
-			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
-			eisle->city_terr -= 1;
-			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
-			eisle->outside_terr += 1;
-		}
-		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
-			// changing from outside-territory to in-city
-			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
-			eisle->city_terr += 1;
-			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
-			eisle->outside_terr -= 1;
-		}
-		else {
-			// no relevant change
+		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
+		
+		if (was_ter != is_ter) {	// did territory type change?
+			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+			
+			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+			
+			// (total territory does not change)
 		}
 	}
 	
@@ -320,14 +315,15 @@ void disassociate_building(room_data *room) {
 	extern crop_data *get_potential_crop_for_location(room_data *location);
 	void remove_designate_objects(room_data *room);
 	
-	bool was_large, was_in_city, junk;
+	bool was_large, junk;
 	room_data *iter, *next_iter;
 	struct instance_data *inst;
 	bool deleted = FALSE;
+	int was_ter, is_ter;
 	
 	// for updating territory counts
 	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS);
-	was_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
+	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : TER_FRONTIER;
 	
 	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
@@ -438,22 +434,16 @@ void disassociate_building(room_data *room) {
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
 		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
-		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
-			// changing from in-city to not
-			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
-			eisle->city_terr -= 1;
-			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
-			eisle->outside_terr += 1;
-		}
-		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
-			// changing from outside-territory to in-city
-			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
-			eisle->city_terr += 1;
-			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
-			eisle->outside_terr -= 1;
-		}
-		else {
-			// no relevant change
+		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk);
+		
+		if (was_ter != is_ter) {
+			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+			
+			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+			
+			// (totals do not change)
 		}
 	}
 }
@@ -557,7 +547,7 @@ bld_data *find_upgraded_from(bld_data *bb) {
 	}
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
-		if (GET_BLD_UPGRADES_TO(iter) == GET_BLD_VNUM(bb)) {
+		if (bld_has_relation(iter, BLD_REL_UPGRADES_TO, GET_BLD_VNUM(bb))) {
 			return iter;
 		}
 	}
@@ -968,6 +958,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	bitvector_t tunnel_flags = 0;	// formerly ROOM_AFF_CHAMELEON;
 	
 	empire_data *emp = get_or_create_empire(ch);
+	int ter_type;
 	bool junk;
 	
 	construct_building(room, BUILDING_TUNNEL);
@@ -976,7 +967,8 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	SET_BIT(ROOM_AFF_FLAGS(room), tunnel_flags);
 	COMPLEX_DATA(room)->entrance = dir;
 	if (emp && can_claim(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
-		if (EMPIRE_OUTSIDE_TERRITORY(emp) < land_can_claim(emp, TRUE) || is_in_city_for_empire(room, emp, FALSE, &junk)) {
+		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
+		if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
 			claim_room(room, emp);
 		}
 	}
@@ -1170,7 +1162,7 @@ ACMD(do_build) {
 	room_data *to_room = NULL, *to_rev = NULL;
 	obj_data *found_obj = NULL;
 	empire_data *e = NULL;
-	int dir = NORTH;
+	int dir = NORTH, ter_type;
 	craft_data *iter, *next_iter, *type = NULL, *abbrev_match = NULL;
 	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
 	bool junk, wait;
@@ -1403,7 +1395,8 @@ ACMD(do_build) {
 	// can_claim checks total available land, but the outside is check done within this block
 	if (!ROOM_OWNER(IN_ROOM(ch)) && can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		if (e || (e = get_or_create_empire(ch))) {
-			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk)) {
+			ter_type = get_territory_type_for_empire(IN_ROOM(ch), e, FALSE, &junk);
+			if (EMPIRE_TERRITORY(e, ter_type) < land_can_claim(e, ter_type)) {
 				claim_room(IN_ROOM(ch), e);
 			}
 		}
@@ -2290,8 +2283,18 @@ ACMD(do_unpaint) {
 
 ACMD(do_upgrade) {
 	craft_data *iter, *next_iter, *type;
-	bld_vnum upgrade = GET_BLD_UPGRADES_TO(building_proto(BUILDING_VNUM(IN_ROOM(ch))));
+	char valid_list[MAX_STRING_LENGTH];
+	struct bld_relation *relat;
+	bld_data *proto, *found_bld;
+	int upgrade_count = 0;
 	bool wait, room_wait;
+	
+	// determine what kind of upgrades are available here
+	if (GET_BUILDING(IN_ROOM(ch))) {
+		upgrade_count = count_bld_relations(GET_BUILDING(IN_ROOM(ch)), BLD_REL_UPGRADES_TO);
+	}
+	
+	skip_spaces(&argument);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the upgrade command.\r\n");
@@ -2299,7 +2302,7 @@ ACMD(do_upgrade) {
 	else if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!GET_BUILDING(IN_ROOM(ch)) || (upgrade = GET_BLD_UPGRADES_TO(GET_BUILDING(IN_ROOM(ch)))) == NOTHING || !building_proto(upgrade)) {
+	else if (!GET_BUILDING(IN_ROOM(ch)) || upgrade_count == 0) {
 		msg_to_char(ch, "You can't upgrade this.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
@@ -2317,11 +2320,47 @@ ACMD(do_upgrade) {
 	else if (BUILDING_RESOURCES(IN_ROOM(ch))) {
 		msg_to_char(ch, "The building needs some work before it can be upgraded.\r\n");
 	}
-	else {
+	else {	// tentative success
+		*valid_list = '\0';	// initialize
+		found_bld = NULL;
+		
+		// attempt to figure out what we're upgrading to
+		LL_FOREACH(GET_BLD_RELATIONS(GET_BUILDING(IN_ROOM(ch))), relat) {
+			if (relat->type != BLD_REL_UPGRADES_TO || !(proto = building_proto(relat->vnum))) {
+				continue;
+			}
+			
+			// did we find a match?
+			if (*argument && multi_isname(argument, GET_BLD_NAME(proto))) {
+				found_bld = proto;
+				break;
+			}
+			else if (upgrade_count == 1) {
+				found_bld = proto;
+				break;
+			}
+			
+			// append to the valid list
+			sprintf(valid_list + strlen(valid_list), "%s%s", (*valid_list ? ", " : ""), GET_BLD_NAME(proto));
+		}
+		
+		if (!*argument && upgrade_count > 1) {
+			msg_to_char(ch, "Upgrade it to what: %s\r\n", valid_list);
+			return;
+		}
+		else if (!found_bld && !*valid_list) {
+			msg_to_char(ch, "You can't seem to upgrade anything there.\r\n");
+			return;
+		}
+		else if (!found_bld) {
+			msg_to_char(ch, "You can't upgrade it to that. Valid options are: %s\r\n", valid_list);
+			return;
+		}
+		
 		// ok, we know it's upgradeable and they have permission... now locate the upgrade craft...
 		type = NULL;
 		HASH_ITER(hh, craft_table, iter, next_iter) {
-			if (GET_CRAFT_TYPE(iter) == CRAFT_TYPE_BUILD && IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE) && upgrade == GET_CRAFT_BUILD_TYPE(iter)) {
+			if (GET_CRAFT_TYPE(iter) == CRAFT_TYPE_BUILD && IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE) && GET_CRAFT_BUILD_TYPE(iter) == GET_BLD_VNUM(found_bld)) {
 				if (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_IN_DEVELOPMENT)) {
 					type = iter;
 					break;

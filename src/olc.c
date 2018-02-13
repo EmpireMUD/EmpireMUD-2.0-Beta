@@ -142,11 +142,11 @@ OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
 OLC_MODULE(bedit_military);
 OLC_MODULE(bedit_name);
+OLC_MODULE(bedit_relations);
 OLC_MODULE(bedit_resource);
 OLC_MODULE(bedit_script);
 OLC_MODULE(bedit_spawns);
 OLC_MODULE(bedit_title);
-OLC_MODULE(bedit_upgradesto);
 
 // class modules
 OLC_MODULE(classedit_abbrev);
@@ -650,12 +650,12 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "military", bedit_military, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "name", bedit_name, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "relations", bedit_relations, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "resources", bedit_resource, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "rooms", bedit_extrarooms, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "script", bedit_script, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "spawns", bedit_spawns, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "title", bedit_title, OLC_BUILDING, OLC_CF_EDITOR },
-	{ "upgradesto", bedit_upgradesto, OLC_BUILDING, OLC_CF_EDITOR },
 	
 	// class commands
 	{ "abbrev", classedit_abbrev, OLC_CLASS, OLC_CF_EDITOR },

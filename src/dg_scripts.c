@@ -1945,7 +1945,7 @@ void script_vlog(const char *format, va_list args) {
 
 	snprintf(temp, sizeof(temp), "SCRIPT ERR: %s", format);
 	vsnprintf(output, sizeof(output), temp, args);
-	log(output);
+	log("%s", output);
 
 	for (i = descriptor_list; i; i = i->next) {
 		if (STATE(i) != CON_PLAYING || IS_NPC(i->character)) /* switch */
@@ -4966,7 +4966,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'm': {	// emp.m*
 					if (!str_cmp(field, "max_territory")) {
-						snprintf(str, slen, "%d", land_can_claim(emp, FALSE));
+						snprintf(str, slen, "%d", land_can_claim(emp, TER_TOTAL));
 					}
 					else if (!str_cmp(field, "members")) {
 						snprintf(str, slen, "%d", EMPIRE_MEMBERS(emp));
@@ -5021,7 +5021,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 't': {	// emp.t*
 					if (!str_cmp(field, "territory")) {
-						snprintf(str, slen, "%d", EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp));
+						snprintf(str, slen, "%d", EMPIRE_TERRITORY(emp, TER_TOTAL));
 					}
 					break;
 				}

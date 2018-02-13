@@ -35,6 +35,7 @@
 
 // external vars
 extern const struct action_data_struct action_data[];
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const int rev_dir[];
 extern const char *from_dir[];
@@ -42,9 +43,12 @@ extern const char *mob_move_types[];
 
 // external funcs
 void do_unseat_from_vehicle(char_data *ch);
+extern char *get_room_name(room_data *room, bool color);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
+int perform_move(char_data *ch, int dir, bitvector_t flags);
+void skip_run_filler(char **string);
 bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
 
@@ -505,6 +509,127 @@ void mark_move_time(char_data *ch) {
 
 
 /**
+* This function attempts to find the next combination of a direction and
+* distance ("40 west" or "east 15"). It will remove them from the string,
+* leaving only the remainder of the string (if anything).
+*
+* @param char_data *ch The person to parse for.
+* @param char *string The input string, which will be shortened if a direction is found and removed.
+* @param int *dir A variable to bind the next dir to.
+* @param int *dist A variable to bind the next distance to.
+* @param bool send_error If TRUE, sends an error to the player.
+* @return bool TRUE if a dir/dist was found, FALSE if it failed (errored).
+*/
+bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error) {
+	char word[MAX_INPUT_LENGTH], *tmp;
+	int pos, found_dir = -1, found_dist = -1, start_word, end_word, one_dir;
+	int mode;
+	
+	*dir = *dist = -1;	// default/dummy
+	
+	tmp = string;	// do not modify string until the end
+	skip_run_filler(&tmp);
+	
+	#define PNDFS_NO_MODE  0
+	#define PNDFS_NUMBER  1
+	#define PNDFS_WORD  2
+	
+	while (*tmp && (found_dir == -1 || found_dist == -1)) {
+		for (pos = 0, mode = PNDFS_NO_MODE, start_word = -1, end_word = -1; pos < strlen(tmp) && end_word == -1; ++pos) {
+			switch (mode) {
+				case PNDFS_NO_MODE: {
+					if (tmp[pos] == ',' || tmp[pos] == '-' || isspace(tmp[pos])) {
+						continue;
+					}
+					
+					if (isdigit(tmp[pos])) {
+						mode = PNDFS_NUMBER;
+						start_word = pos;
+					}
+					else if (isalpha(tmp[pos])) {
+						mode = PNDFS_WORD;
+						start_word = pos;
+					}
+					else {
+						if (send_error) {
+							msg_to_char(ch, "Unable to find a direction or distance at the start of '%s'.\r\n", tmp);
+						}
+						return FALSE;
+					}
+					break;
+				}
+				case PNDFS_NUMBER: {
+					if (!isdigit(tmp[pos])) {
+						end_word = pos;
+					}
+					break;
+				}
+				case PNDFS_WORD: {
+					if (!isalpha(tmp[pos])) {
+						end_word = pos;
+					}
+					break;
+				}
+			}
+		}
+	
+		if (start_word == -1) {
+			msg_to_char(ch, "You must specify a set of directions and distances.\r\n");
+			return FALSE;
+		}
+	
+		// pull out 'word'
+		if (end_word != -1) {	// we have a terminated word
+			strncpy(word, tmp + start_word, end_word - start_word);
+			word[end_word] = '\0';	// add terminator
+		
+			// advance the string
+			tmp += (end_word - start_word);
+			skip_run_filler(&tmp);
+		}
+		else {	// word is at the end
+			strcpy(word, tmp + start_word);
+			*tmp = '\0';	// string is now empty
+		}
+	
+		// determine if we found a distance or direction
+		if (isdigit(*word)) {
+			if (found_dist == -1) {
+				found_dist = atoi(word);
+			}
+			else {
+				if (send_error) {
+					msg_to_char(ch, "Invalid movement string: there were two numbers in a row at the beginning.\r\n");
+				}
+				return FALSE;
+			}
+		}
+		else if ((one_dir = parse_direction(ch, word)) == NO_DIR || one_dir == DIR_RANDOM) {
+			if (send_error) {
+				msg_to_char(ch, "Invalid movement string: unknown word '%s'.\r\n", word);
+			}
+			return FALSE;
+		}
+		else if (found_dir != -1) {
+			if (send_error) {
+				msg_to_char(ch, "Invalid movement string: there were two directions in a row at the beginning (you must specify a number of tiles to move in each direction).\r\n");
+			}
+			return FALSE;
+		}
+		else {
+			found_dir = one_dir;
+		}
+	}
+	
+	// ok we seem to have both a direction and a distance
+	strcpy(string, tmp);	// copy back to the original string
+	*dir = found_dir;
+	*dist = found_dist;
+	return TRUE;
+}
+
+
+/**
 * Actual transport between starting locations.
 *
 * @param char_data *ch The person to transport.
@@ -541,6 +666,64 @@ void perform_transport(char_data *ch, room_data *to_room) {
 }
 
 
+/**
+* Tick update for running action.
+*
+* @param char_data *ch The character doing the running.
+*/
+void process_running(char_data *ch) {
+	extern int get_north_for_char(char_data *ch);
+	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
+	
+	int dir = GET_ACTION_VNUM(ch, 0), dist;
+	bool done = FALSE;
+	
+	// translate 'dir' from the way the character THINKS he's going, to the actual way
+	dir = confused_dirs[get_north_for_char(ch)][0][dir];
+	
+	// attempt to move
+	if (!perform_move(ch, dir, MOVE_RUN)) {
+		done = TRUE;
+	}
+	
+	// limited distance?
+	if (GET_ACTION_VNUM(ch, 1) > 0) {
+		GET_ACTION_VNUM(ch, 1) -= 1;
+		
+		// finished this part of the run!
+		if (GET_ACTION_VNUM(ch, 1) <= 0) {
+			if (GET_MOVEMENT_STRING(ch)) {
+				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &dir, &dist, FALSE) && dir != -1) {
+					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
+					GET_ACTION_VNUM(ch, 1) = dist;
+				}
+				else {	// count not get next dir/dist
+					done = TRUE;
+				}
+			}
+			else {	// no movement string
+				done = TRUE;
+			}
+		}
+	}
+	
+	if (done) {
+		msg_to_char(ch, "Your run has ended.\r\n");
+		cancel_action(ch);
+		return;
+	}
+}
+
+
+/*
+ * Function to skip over junk in a string of run commands.
+ */
+void skip_run_filler(char **string) {
+	const char *skippable = ",;-./\\";
+	for (; **string && (isspace(**string) || strchr(skippable, **string)); (*string)++);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MOVE VALIDATORS /////////////////////////////////////////////////////////
 
@@ -571,7 +754,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 	}
 	
 	// check auto-swim
-	else if (!IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOSWIM) && WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch)) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_RIDING(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
+	else if (!IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOSWIM) && WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch)) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
 		msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
 		return 0;
 	}
@@ -668,7 +851,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 		// sends own messages
 		return 0;
 	}
-	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !can_move(GET_LEADING_MOB(ch), dir, to_room, flags)) {
+	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !can_move(GET_LEADING_MOB(ch), dir, to_room, flags | MOVE_LEAD)) {
 		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		return 0;
 	}
@@ -1176,14 +1359,29 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	
 	qt_visit_room(ch, IN_ROOM(ch));
 
+	// auto-look
 	if (ch->desc != NULL) {
-		look_at_room(ch);
+		if (IS_SET(flags, MOVE_RUN) && !PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
+			if (has_player_tech(ch, PTECH_NAVIGATION)) {
+				msg_to_char(ch, "You run %s to %s (%d, %d).\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+			}
+			else {
+				msg_to_char(ch, "You run %s to %s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE));
+			}
+		}
+		else {	// normal look
+			look_at_room(ch);
+		}
 	}
 	if (animal && animal->desc != NULL) {
 		look_at_room(animal);
 	}
 
 	gain_ability_exp_from_moves(ch, was_in, flags);
+	
+	if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_RUNNING && !IS_SET(flags, MOVE_RUN)) {
+		cancel_action(ch);
+	}
 	
 	// trigger section
 	entry_memory_mtrigger(ch);
@@ -1564,7 +1762,7 @@ ACMD(do_climb) {
 		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
 	}
 	else {
-		do_simple_move(ch, dir, to_room, MOVE_CLIMB);
+		perform_move(ch, dir, MOVE_CLIMB);
 	}
 }
 
@@ -1748,7 +1946,6 @@ ACMD(do_land) {
 
 ACMD(do_move) {
 	extern int get_north_for_char(char_data *ch);
-	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 	
 	// this blocks normal moves but not flee
 	if (is_fighting(ch)) {
@@ -1763,7 +1960,6 @@ ACMD(do_move) {
 // mortals have to portal from a certain building, immortals can do it anywhere
 ACMD(do_portal) {
 	void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
-	extern char *get_room_name(room_data *room, bool color);
 	
 	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
@@ -1980,6 +2176,61 @@ ACMD(do_rest) {
 }
 
 
+ACMD(do_run) {
+	int dir, dist = -1;
+	bool dir_only;
+
+	skip_run_filler(&argument);
+	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word
+	
+	// basics
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!*argument && GET_ACTION(ch) == ACT_RUNNING) {
+		msg_to_char(ch, "You are currently running %d tile%s %s.\r\n", GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+		if (GET_MOVEMENT_STRING(ch)) {
+			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_MOVEMENT_STRING(ch));
+		}
+	}
+	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_RUNNING) {
+		msg_to_char(ch, "You're too busy doing something else.\r\n");
+	}
+	
+	// initial parsing
+	else if (!*argument) {
+		msg_to_char(ch, "You must specify the path to run using directions and distances.\r\n");
+	}
+	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
+		// sent its own error message
+	}
+	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
+		msg_to_char(ch, "Invalid path string.\r\n");
+	}
+	
+	// optional direction-only parsing
+	else if (dir_only && ((dir = parse_direction(ch, argument)) == NO_DIR || dir == DIR_RANDOM)) {
+		msg_to_char(ch, "Invalid direction '%s'.\r\n", argument);
+	}
+	
+	else {
+		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
+		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
+		start_action(ch, ACT_RUNNING, 0);
+		GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
+		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
+		
+		if (GET_MOVEMENT_STRING(ch)) {
+			free(GET_MOVEMENT_STRING(ch));
+		}
+		GET_MOVEMENT_STRING(ch) = dir_only ? NULL : str_dup(argument);
+		
+		msg_to_char(ch, "You start running %s...\r\n", dirs[dir]);
+	}
+}
+
+
 ACMD(do_sit) {
 	one_argument(argument, arg);
 
@@ -2113,7 +2364,7 @@ ACMD(do_swim) {
 		msg_to_char(ch, "You can only swim in the water.\r\n");
 	}
 	else {
-		do_simple_move(ch, dir, to_room, MOVE_SWIM);
+		perform_move(ch, dir, MOVE_SWIM);
 	}
 }
 

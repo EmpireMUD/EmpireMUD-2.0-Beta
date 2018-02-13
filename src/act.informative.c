@@ -811,7 +811,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
 			msg_to_char(ch, "*");
 		}
-		msg_to_char(ch, GET_LONG_DESC(i));
+		send_to_char(GET_LONG_DESC(i), ch);
 	}
 	else {
 		*buf = '\0';
@@ -1088,7 +1088,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 			act("$n is using:", FALSE, i, 0, ch, TO_VICT);
 			for (j = 0; j < NUM_WEARS; j++) {
 				if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
-					msg_to_char(ch, wear_data[j].eq_prompt);
+					send_to_char(wear_data[j].eq_prompt, ch);
 					show_obj_to_char(GET_EQ(i, j), ch, OBJ_DESC_EQUIPMENT);
 				}
 			}
@@ -1907,6 +1907,46 @@ ACMD(do_affects) {
 	}
 
 	show_character_affects(ch, ch);
+}
+
+
+ACMD(do_chart) {
+	struct island_info *isle;
+	bool any;
+	int iter;
+	
+	skip_spaces(&argument);
+	
+	if (!*argument) {
+		msg_to_char(ch, "Get chart information on which island?\r\n");
+	}
+	else if (!(isle = get_island_by_name(ch, argument))) {
+		msg_to_char(ch, "Unknown island.\r\n");
+	}
+	else {
+		msg_to_char(ch, "Chart information for %s:\r\n", isle->name);
+		if (isle->desc) {
+			send_to_char(isle->desc, ch);
+		}
+		
+		if (has_player_tech(ch, PTECH_NAVIGATION) && isle->center != NOWHERE) {
+			msg_to_char(ch, "Approximate center: (%d, %d)\r\n", MAP_X_COORD(isle->center), MAP_Y_COORD(isle->center));
+			msg_to_char(ch, "Edges: ");
+			any = FALSE;
+			for (iter = 0; iter < NUM_SIMPLE_DIRS; ++iter) {
+				if (isle->edge[iter] != NOWHERE) {
+					msg_to_char(ch, "%s(%d, %d)", (any ? ", " : ""), MAP_X_COORD(isle->edge[iter]), MAP_Y_COORD(isle->edge[iter]));
+					any = TRUE;
+				}
+			}
+			msg_to_char(ch, "%s\r\n", any ? "" : "unknown");
+		}
+		
+		// ... more to come
+		// - % claimed
+		// - number of empires with claims
+		// - cities
+	}
 }
 
 
@@ -2901,6 +2941,8 @@ ACMD(do_survey) {
 	struct empire_city_data *city;
 	struct empire_island *eisle;
 	struct island_info *island;
+	int ter_type;
+	bool junk;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
@@ -2916,12 +2958,19 @@ ACMD(do_survey) {
 	
 	// empire
 	if (ROOM_OWNER(IN_ROOM(ch))) {
-		if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
+		if ((ter_type = get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, &junk)) == TER_CITY && (city = find_closest_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name);
-		}	
+		}
+		else if (ter_type == TER_OUTSKIRTS) {
+			msg_to_char(ch, "This is the outskirts of %s%s&0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
+		}
 		else {
 			msg_to_char(ch, "This area is claimed by %s%s&0.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
 		}
+	}
+	else if (GET_LOYALTY(ch)) {
+		ter_type = get_territory_type_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), FALSE, &junk);
+		msg_to_char(ch, "This location would be %s for your empire.\r\n", (ter_type == TER_CITY ? "in a city" : (ter_type == TER_OUTSKIRTS ? "on the outskirts of a city" : "on the frontier")));
 	}
 	
 	// building info
@@ -3159,7 +3208,7 @@ ACMD(do_whois) {
 
 	if (GET_LOYALTY(victim)) {
 		msg_to_char(ch, "%s&0 of %s%s&0\r\n", EMPIRE_RANK(GET_LOYALTY(victim), GET_RANK(victim)-1), EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
-		msg_to_char(ch, "Territory: %d, Members: %d, Greatness: %d\r\n", EMPIRE_CITY_TERRITORY(GET_LOYALTY(victim)) + EMPIRE_OUTSIDE_TERRITORY(GET_LOYALTY(victim)), EMPIRE_MEMBERS(GET_LOYALTY(victim)), EMPIRE_GREATNESS(GET_LOYALTY(victim)));
+		msg_to_char(ch, "Territory: %d, Members: %d, Greatness: %d\r\n", EMPIRE_TERRITORY(GET_LOYALTY(victim), TER_TOTAL), EMPIRE_MEMBERS(GET_LOYALTY(victim)), EMPIRE_GREATNESS(GET_LOYALTY(victim)));
 	}
 
 	if (GET_LORE(victim)) {

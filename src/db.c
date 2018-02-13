@@ -283,6 +283,7 @@ void boot_db(void) {
 	void check_version();
 	void delete_old_players();
 	void delete_orphaned_rooms();
+	void generate_island_descriptions();
 	void init_config_system();
 	void link_and_check_vehicles();
 	void load_automessages();
@@ -389,6 +390,9 @@ void boot_db(void) {
 	
 	log("Building shop lookup hints.");
 	build_all_shop_lookups();
+	
+	log("Ensuring all islands have descriptions.");
+	generate_island_descriptions();
 	
 	// final things...
 	log("Running reboot triggers.");
@@ -658,8 +662,10 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 void check_for_bad_buildings(void) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void unlink_instance_entrance(room_data *room, bool run_cleanup);
+	extern const char *bld_relationship_types[];
 
 	struct obj_storage_type *store, *next_store, *temp;
+	struct bld_relation *relat, *next_relat;
 	bld_data *bld, *next_bld;
 	room_data *room, *next_room;
 	craft_data *craft, *next_craft;
@@ -757,12 +763,15 @@ void check_for_bad_buildings(void) {
 		}
 	}
 	
-	// check buildings for upgrades: unset
+	// check buildings for bad relations: unset
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		if (GET_BLD_UPGRADES_TO(bld) != NOTHING && !building_proto(GET_BLD_UPGRADES_TO(bld))) {
-			GET_BLD_UPGRADES_TO(bld) = NOTHING;
-			log(" removing upgrade for building %d for bad building type", GET_BLD_VNUM(bld));
-			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		LL_FOREACH_SAFE(GET_BLD_RELATIONS(bld), relat, next_relat) {
+			if (relat->vnum == NOTHING || !building_proto(relat->vnum)) {
+				log(" removing %s relationship for building %d for bad building type", bld_relationship_types[relat->type], GET_BLD_VNUM(bld));
+				LL_DELETE(GET_BLD_RELATIONS(bld), relat);
+				free(relat);
+				save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+			}
 		}
 	}
 }
@@ -1161,7 +1170,7 @@ char *fread_string(FILE * fl, char *error) {
 
 		if (length + templength >= MAX_STRING_LENGTH) {
 			log("SYSERR: fread_string: string too large (db.c)");
-			log(error);
+			log("%s", error);
 			exit(1);
 		}
 		else {

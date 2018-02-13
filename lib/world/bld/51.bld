@@ -1097,7 +1097,7 @@ R
 R
 19 1 1 0
 U
-5154
+0 5154
 S
 #5154
 Great Shipyard~
@@ -1383,7 +1383,7 @@ R
 R
 19 1 1 0
 U
-5168
+0 5168
 S
 #5168
 Advanced Guard Tower~
@@ -1409,7 +1409,7 @@ R
 R
 19 1 1 0
 U
-5169
+0 5169
 S
 #5169
 Superior Guard Tower~
@@ -1683,6 +1683,8 @@ R
 19 1 1 0
 R
 3 1 1 0
+U
+1 5611
 S
 #5185
 Portal~

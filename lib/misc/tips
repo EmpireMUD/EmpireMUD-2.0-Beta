@@ -145,4 +145,6 @@ You can learn new craft recipes with the 'learn' command, and list then with 'le
 You can use 'city list <empire>' to find the locations of other empires.
 Type 'climb' to move onto mountains, or 'toggle autoclimb' to remove the need to do this.
 Type 'swim' to move into water, or 'toggle autoswim' to remove the need to do this.
+Use 'mapscan' to locate islands across the sea.
+Use 'run' to set a path and move quickly. You can 'toggle travel-look' to stop seeing rooms while running.
 $~

@@ -557,17 +557,16 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct mappc_data *pc, *next_pc;
 	struct empire_city_data *city;
 	char output[MAX_STRING_LENGTH], veh_buf[256], col_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], rlbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH], advcolbuf[128];
-	int s, t, mapsize, iter, check_x, check_y;
+	int s, t, mapsize, iter, check_x, check_y, level, ter_type;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
-	bool y_first, invert_x, invert_y, comma;
+	bool y_first, invert_x, invert_y, comma, junk;
 	struct instance_data *inst;
 	player_index_data *index;
 	room_data *to_room;
 	empire_data *emp, *pcemp;
 	crop_data *cp;
 	char *strptr;
-	int level;
 	
 	// configs
 	int trench_initial_value = config_get_int("trench_initial_value");
@@ -676,7 +675,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				if (!PRF_FLAGGED(ch, PRF_BRIEF))
 					for (t = 1; t <= s; t++)
 						send_to_char(" ", ch);
-				msg_to_char(ch, output);
+				send_to_char(output, ch);
 			}		
 		
 			// border
@@ -818,7 +817,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		// show room: non-map
 		
 		if (show_title) {
-			msg_to_char(ch, output);
+			send_to_char(output, ch);
 		}
 		
 		if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {
@@ -886,11 +885,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "\r\n");
 	}
 	else if (emp) {
-		if ((city = find_city(emp, room))) {
+		if ((ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk)) == TER_CITY && (city = find_closest_city(emp, room))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name);
-		}	
+		}
 		else {
-			msg_to_char(ch, "This area is claimed by %s%s&0.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			msg_to_char(ch, "This area is claimed by %s%s&0%s.", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), (ter_type == TER_OUTSKIRTS) ? ", on the outskirts of a city" : "");
 		}
 		
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
@@ -2210,6 +2209,65 @@ ACMD(do_exits) {
 	else {
 		// out on the map?
 		look_at_room(ch);
+	}
+}
+
+
+ACMD(do_mapscan) {
+	extern const char *alt_dirs[];
+	
+	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
+	int dir, dist, last_isle;
+	room_data *to_room;
+	bool any;
+	
+	int max_dist = MIN(MAP_WIDTH, MAP_HEIGHT) / 2;
+	
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch) || !has_player_tech(ch, PTECH_NAVIGATION)) {
+		msg_to_char(ch, "You need Navigation to use mapscan.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Scan the map in which direction?\r\n");
+	}
+	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
+		msg_to_char(ch, "You can only use mapscan out on the map.\r\n");
+	}
+	else if ((!GET_ROOM_VEHICLE(IN_ROOM(ch)) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_IS_CLOSED(IN_ROOM(ch)))) {
+		msg_to_char(ch, "Scan only works out on the map.\r\n");
+	}
+	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
+		msg_to_char(ch, "Invalid direction '%s'.\r\n", argument);
+	}
+	else if (dir >= NUM_2D_DIRS) {
+		msg_to_char(ch, "You can't scan that way.\r\n");
+	}
+	else {	// success
+		msg_to_char(ch, "You scan the map to the %s and see:\r\n", dirs[dir]);
+		
+		last_isle = GET_ISLAND_ID(use_room);
+		any = FALSE;
+		
+		for (dist = 1; dist <= max_dist; dist += (dist < 10 ? 1 : (dist < 70 ? 5 : 10))) {
+			if (!(to_room = real_shift(use_room, shift_dir[dir][0] * dist, shift_dir[dir][1] * dist))) {
+				break;
+			}
+			if (GET_ISLAND_ID(to_room) == last_isle) {
+				continue;	// only look for changes
+			}
+			
+			// got this far?
+			last_isle = GET_ISLAND_ID(to_room);
+			msg_to_char(ch, " %d %s: %s\r\n", dist, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]), last_isle == NO_ISLAND ? "The Ocean" : get_island_name_for(last_isle, ch));
+			any = TRUE;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, " %s as far as you can see.\r\n", last_isle == NO_ISLAND ? "The Ocean" : get_island_name_for(last_isle, ch));
+		}
+		
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 

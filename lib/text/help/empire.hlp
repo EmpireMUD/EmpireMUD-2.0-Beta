@@ -265,13 +265,13 @@ See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
 There are four sizes of city available. The only difference between them is
 the radius of the city.
 
- -C1-  Outpost (radius 5)
- -C2-  Village (radius 10)
- -C3-  City (radius 15)
- -C4-  Capital (radius 25)
+ -C1-  Outpost (radius 5, outskirts 20)
+ -C2-  Village (radius 10, outskirts 40)
+ -C3-  City (radius 15, outskirts 60)
+ -C4-  Capital (radius 25, outskirts 100)
 
-Some buildings, such as mines, count as in-city territory at a much larger
-radius -- 3x the normal distance from the city center.
+Some buildings, such as mines, count as in-city territory even in the outskirts
+(4x the normal distance from the city center).
 
 You can see the city radius by typing 'toggle political' and looking at the
 background highlight (on the visual map), or you can use the 'mark' command
@@ -731,6 +731,17 @@ for that empire.
 
 See also: MAINTAIN, WORKFORCE
 #
+FRONTIER OUTSKIRTS
+
+An empire's 'frontier' is the area that's far from cities. Specifically, it's
+any area that's more than 4x a city's radius away from the city center.
+
+The area between a city's border and the frontier is called the 'outskirts'.
+For example, an outpost with radius 5 has outskirts out to 20 tiles, and the
+rest is frontier.
+
+See also: FRONTIER TRAITS
+#
 "GRAND MONUMENTS"
 
 Grand Monuments (Empire ability)
@@ -835,7 +846,7 @@ all empires on the island share the same custom name for it.
 
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
-See also: CUSTOMIZE ISLAND, SURVEY
+See also: CHART, CUSTOMIZE ISLAND, SURVEY
 #
 LOCKSMITHING
 
@@ -1082,7 +1093,7 @@ anywhere else.
 If you have the "dig" workforce enabled, your citizens will only dig if you
 have a quarry.
 
-Quarries count as in-city territory as far away as 3x a city's normal radius.
+Quarries count as in-city territory when built in the outskirts (4x radius).
 
 See also: DEPLETION, DIG, CHORES
 #
@@ -1261,10 +1272,11 @@ territory is:
       only count once per empire, so two members with City Lights will not
       result in +30 territory.
 
-80% of an empire's maximum must be within the borders of its cities. Only 20%
-of your total territory can be outside of cities. Roads and some buildings, such
-as Mines, count as in-city territory up to 3x as far out as the edge of the city
-radius.
+Most territory must be location within an empire's cities. 35% of the territory
+can be on the outskirts of cities (up to 4x city radius) and only 5% can be
+on the frontier (beyond the outskirts). Both outskirts and frontier territory
+allow a minimum of 15 tiles, even if this is below 35%/5%. Roads and some
+buildings, such as Mines, count as in-city territory even in the outskirts.
 
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
@@ -1274,6 +1286,7 @@ See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND
 "TERRITORY COMMAND"
 
 Usage:  territory [type]
+        territory [outskirts | frontier]
         territory <empire> [type]  -- immortals only
 
 The territory command will list all your territory that is outside of your
@@ -1282,7 +1295,8 @@ fewer lines. It does not list territory inside of your cities, but you can find
 a list of your cities on the "city list" command.
 
 You can optionally specify a building or terrain type and see all your tiles of
-that type.
+that type. You can also specify 'outskirts' or 'frontier' to filter out-of-city
+territory to just one of those two categories.
 
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
@@ -1364,15 +1378,15 @@ Usage:  eedit frontiertraits [add | remove] <trait(s)>
         city traits <name> [add | remove] <trait(s)>
 
 You can set your empire's traits with the eedit command. For your cities and
-the area around those cities (up to 100 tiles from the city center), you set
-traits using the city command. For frontier traits -- the traits far from your
-cities -- you use eedit.
+the outskirts around those cities (up to 4x the city's radius), you set traits
+using the city command. For frontier traits -- the traits far from your cities
+-- you use eedit.
 
  Distrustful - Your guard towers and city guard attack anyone you don't
    explicitly ally or form a non-aggression pact with. (Peace and trade agree-
    ments also count.)
 
-See also: EEDIT, CITY
+See also: EEDIT, CITY, FRONTIER, OUTSKIRTS
 #
 TUNNEL
 

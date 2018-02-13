@@ -38,6 +38,7 @@
 *   Territory
 *   Trench Filling
 *   Evolutions
+*   Island Descriptions
 *   Helpers
 *   Map Output
 *   World Map System
@@ -1217,6 +1218,7 @@ void update_island_names(void) {
 		
 		// look for empires with cities on the island
 		found_emp = NULL;
+		last_name = NULL;
 		count = 0;
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
@@ -1225,9 +1227,16 @@ void update_island_names(void) {
 					
 					// if the empire HAS named the island
 					if (eisle->name) {
-						if (!last_name || !str_cmp(eisle->name, last_name)) {
-							++count;	// only count in this case
+						if (!last_name) {
 							found_emp = emp;	// found an empire with a name
+							last_name = eisle->name;
+							++count;	// only count in this case
+						}
+						else if (!str_cmp(eisle->name, last_name)) {
+							// matches last name, do nothing
+						}
+						else {
+							++count;	// does not match last name
 						}
 					}
 					else {
@@ -1760,9 +1769,10 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect) {
 	bool belongs = (loc && SECT(loc) && BELONGS_IN_TERRITORY_LIST(loc));
 	struct empire_territory_data *ter;
-	bool was_large, was_in_city, junk;
+	bool was_large, junk;
 	struct sector_index_type *idx;
 	sector_data *old_sect;
+	int was_ter, is_ter;
 	
 	if (!loc && !map) {
 		log("SYSERR: perform_change_sect called without loc or map");
@@ -1780,7 +1790,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// for updating territory counts
 	was_large = (loc && SECT(loc)) ? ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) : FALSE;
-	was_in_city = (loc && ROOM_OWNER(loc)) ? is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : FALSE;
+	was_ter = (loc && ROOM_OWNER(loc)) ? get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : TER_FRONTIER;
 	
 	// preserve
 	old_sect = (loc ? SECT(loc) : map->sector_type);
@@ -1837,22 +1847,16 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	if (loc && ROOM_OWNER(loc)) {
 		if (was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
 			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
-			if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
-				// changing from in-city to not
-				EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
-				eisle->city_terr -= 1;
-				EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
-				eisle->outside_terr += 1;
-			}
-			else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
-				// changing from outside-territory to in-city
-				EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
-				eisle->city_terr -= 1;
-				EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
-				eisle->outside_terr += 1;
-			}
-			else {
-				// no relevant change
+			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk);
+			
+			if (was_ter != is_ter) {	// did territory type change?
+				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), was_ter), -1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+			
+				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), is_ter), 1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+				
+				// (total counts do not change)
 			}
 		}
 		if (belongs != BELONGS_IN_TERRITORY_LIST(loc)) {	// do we need to add/remove the territory entry?
@@ -2107,13 +2111,15 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 	struct empire_npc_data *npc;
 	room_data *iter, *next_iter;
 	empire_data *e, *next_e;
+	int pos, ter_type;
 	bool junk;
 
 	/* Init empires */
 	HASH_ITER(hh, empire_table, e, next_e) {
 		if (e == emp || !emp) {
-			EMPIRE_CITY_TERRITORY(e) = 0;
-			EMPIRE_OUTSIDE_TERRITORY(e) = 0;
+			for (pos = 0; pos < NUM_TERRITORY_TYPES; ++pos) {
+				EMPIRE_TERRITORY(e, pos) = 0;
+			}
 			EMPIRE_POPULATION(e) = 0;
 			
 			if (check_tech) {	// this will only be re-read if we check tech
@@ -2131,8 +2137,9 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			// reset counters
 			HASH_ITER(hh, EMPIRE_ISLANDS(e), isle, next_isle) {
 				isle->population = 0;
-				isle->city_terr = 0;
-				isle->outside_terr = 0;
+				for (pos = 0; pos < NUM_TERRITORY_TYPES; ++pos) {
+					isle->territory[pos] = 0;
+				}
 			}
 		}
 	}
@@ -2143,14 +2150,13 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			// only count each building as 1
 			if (COUNTS_AS_TERRITORY(iter)) {
 				isle = get_empire_island(e, GET_ISLAND_ID(iter));
-				if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
-					EMPIRE_CITY_TERRITORY(e) += 1;
-					isle->city_terr += 1;
-				}
-				else {
-					EMPIRE_OUTSIDE_TERRITORY(e) += 1;
-					isle->outside_terr += 1;
-				}
+				ter_type = get_territory_type_for_empire(iter, e, FALSE, &junk);
+				
+				SAFE_ADD(EMPIRE_TERRITORY(e, ter_type), 1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(isle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
+				
+				SAFE_ADD(EMPIRE_TERRITORY(e, TER_TOTAL), 1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(isle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
 			}
 			
 			// this is only done if we are re-reading techs
@@ -2411,6 +2417,130 @@ void run_external_evolutions(void) {
 	snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d %.2f %.2f %d &", config_get_int("nearby_sector_distance"), ((time_info.month * 30) + time_info.day), config_get_double("arctic_percent"), config_get_double("tropics_percent"), (int) getpid());
 	// syslog(SYS_INFO, LVL_START_IMM, TRUE, "Running map evolutions...");
 	system(buf);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ISLAND DESCRIPTIONS /////////////////////////////////////////////////////
+
+struct genisdesc_isle {
+	int id;
+	struct genisdesc_terrain *ters;
+	UT_hash_handle hh;
+};
+
+struct genisdesc_terrain {
+	any_vnum vnum;
+	int count;
+	UT_hash_handle hh;
+};
+
+
+// quick sorter for tiles by count
+int genisdesc_sort(struct genisdesc_terrain *a, struct genisdesc_terrain *b) {
+	return b->count - a->count;
+}
+
+
+/**
+* This generates descriptions of islands that have no description, with size
+* and terrain data.
+*/
+void generate_island_descriptions(void) {
+	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
+	void save_island_table();
+	
+	struct genisdesc_isle *isle, *next_isle, *isle_hash = NULL;
+	struct island_info *isliter, *next_isliter;
+	struct genisdesc_terrain *ter, *next_ter;
+	char buf[MAX_STRING_LENGTH];
+	struct map_data *map;
+	bool any = FALSE;
+	int temp, count;
+	double prc;
+	
+	// first determine which islands need descs
+	HASH_ITER(hh, island_table, isliter, next_isliter) {
+		if (isliter->tile_size < 1) {
+			continue;	// don't bother?
+		}
+		
+		if (!isliter->desc || !*isliter->desc) {
+			CREATE(isle, struct genisdesc_isle, 1);
+			isle->id = isliter->id;
+			HASH_ADD_INT(isle_hash, id, isle);
+		}
+	}
+	
+	if (!isle_hash) {
+		return;	// no work (no missing descs)
+	}
+	
+	// now count terrains
+	LL_FOREACH(land_map, map) {
+		// find island
+		temp = map->shared->island_id;
+		HASH_FIND_INT(isle_hash, &temp, isle);
+		if (!isle) {
+			continue;	// not looking for this island
+		}
+		
+		// mark terrain
+		temp = map->base_sector ? GET_SECT_VNUM(map->base_sector) : BASIC_OCEAN;	// in case of errors?
+		HASH_FIND_INT(isle->ters, &temp, ter);
+		if (!ter) {	// or create
+			CREATE(ter, struct genisdesc_terrain, 1);
+			ter->vnum = temp;
+			HASH_ADD_INT(isle->ters, vnum, ter);
+		}
+		
+		++ter->count;
+	}
+	
+	// build descs
+	HASH_ITER(hh, isle_hash, isle, next_isle) {
+		if (!isle->ters || !(isliter = get_island(isle->id, FALSE))) {
+			continue;	// no work?
+		}
+		
+		HASH_SORT(isle->ters, genisdesc_sort);	// by tile count
+		
+		sprintf(buf, "The island has %d map tile%s", isliter->tile_size, PLURAL(isliter->tile_size));
+		count = 0;
+		HASH_ITER(hh, isle->ters, ter, next_ter) {
+			prc = (double)ter->count / isliter->tile_size * 100.0;
+			if (prc < 1.0) {
+				continue;
+			}
+			
+			sprintf(buf + strlen(buf), "%s%d%% %s", (count == 0 ? " and is " : ", "), (int)prc, GET_SECT_NAME(sector_proto(ter->vnum)));
+			if (++count >= 10) {
+				break;
+			}
+		}
+		
+		strcat(buf, ".\r\n");
+		
+		if (isliter->desc) {
+			free(isliter->desc);
+		}
+		isliter->desc = str_dup(buf);
+		
+		format_text(&isliter->desc, (strlen(isliter->desc) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		any = TRUE;
+	}
+	
+	// and free the data
+	HASH_ITER(hh, isle_hash, isle, next_isle) {
+		HASH_ITER(hh, isle->ters, ter, next_ter) {
+			free(ter);
+		}
+		free(isle);
+	}
+	
+	if (any) {
+		save_island_table();
+	}
 }
 
 

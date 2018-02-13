@@ -509,7 +509,7 @@ void score_empires(void) {
 		max[SCORE_WEALTH] = MAX(GET_TOTAL_WEALTH(emp), max[SCORE_WEALTH]);
 		EMPIRE_SCORE(emp, SCORE_WEALTH) = GET_TOTAL_WEALTH(emp);
 		
-		total[SCORE_TERRITORY] += (num = land_can_claim(emp, FALSE));
+		total[SCORE_TERRITORY] += (num = land_can_claim(emp, TER_TOTAL));
 		max[SCORE_TERRITORY] = MAX(num, max[SCORE_TERRITORY]);
 		EMPIRE_SCORE(emp, SCORE_TERRITORY) = num;
 		
@@ -940,21 +940,29 @@ bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc) {
 * @return bool TRUE if the empire has that (those) trait(s) at loc.
 */
 bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
+	extern struct city_metadata_type city_type[];
+	
 	struct empire_city_data *city;
 	bitvector_t set = NOBITS;
+	bool near_city = FALSE;
+	
+	double outskirts_mod = config_get_double("outskirts_modifier");
 	
 	// short-circuit
 	if (!emp) {
 		return FALSE;
 	}
 	
-	// determine which location to use
-	if (loc && ((city = find_closest_city(emp, loc)) && compute_distance(loc, city->location) < config_get_int("city_trait_radius"))) {
-		set = city->traits;
+	if (loc) {	// see if it's near enough to any cities
+		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+			if (compute_distance(loc, city->location) <= city_type[city->type].radius * outskirts_mod) {
+				near_city = TRUE;
+				break;	// only need 1
+			}
+		}
 	}
-	else {
-		set = EMPIRE_FRONTIER_TRAITS(emp);
-	}
+	
+	set = near_city ? city->traits : EMPIRE_FRONTIER_TRAITS(emp);
 	
 	return (IS_SET(set, trait) ? TRUE : FALSE);
 }
@@ -1055,7 +1063,7 @@ bool can_claim(char_data *ch) {
 		return FALSE;
 	if (!(e = GET_LOYALTY(ch)))
 		return TRUE;
-	if (EMPIRE_CITY_TERRITORY(e) + EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, FALSE))
+	if (EMPIRE_TERRITORY(e, TER_TOTAL) >= land_can_claim(e, TER_TOTAL))
 		return FALSE;
 	if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CLAIM))
 		return FALSE;
@@ -1266,10 +1274,10 @@ bool has_tech_available_room(room_data *room, int tech) {
 * Calculates the total claimable land for an empire.
 *
 * @param empire_data *emp An empire number.
-* @param bool outside_only If TRUE, only the amount of territory that can be outside cities.
+* @param int ter_type Any TER_ to determine how much territory an empire can claim of that type.
 * @return int The total claimable land.
 */
-int land_can_claim(empire_data *emp, bool outside_only) {
+int land_can_claim(empire_data *emp, int ter_type) {
 	int from_wealth, total = 0;
 	
 	if (emp) {
@@ -1288,8 +1296,22 @@ int land_can_claim(empire_data *emp, bool outside_only) {
 		}
 	}
 	
-	if (outside_only) {
-		total *= config_get_double("land_outside_city_modifier");
+	switch (ter_type) {
+		case TER_OUTSKIRTS: {
+			total *= config_get_double("land_outside_city_modifier");
+			break;
+		}
+		case TER_FRONTIER: {
+			total *= config_get_double("land_frontier_modifier");
+			break;
+		}
+		// default: no changes
+	}
+	
+	// so long as there's at least 1 active member, they get the min cap
+	if (EMPIRE_MEMBERS(emp) > 0) {
+		int min_claim_cap = config_get_int("land_min_cap");
+		total = MAX(min_claim_cap, total);
 	}
 	
 	return total;
@@ -1572,7 +1594,7 @@ void syslog(bitvector_t type, int level, bool file, const char *str, ...) {
 	vsprintf(output, str, tArgList);
 
 	if (file) {
-		log(output);
+		log("%s", output);
 	}
 	
 	level = MAX(level, LVL_START_IMM);
@@ -2851,7 +2873,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_COINS: {
-			snprintf(output, sizeof(output), money_amount(real_empire(res->vnum), res->amount));
+			snprintf(output, sizeof(output), "%s", money_amount(real_empire(res->vnum), res->amount));
 			break;
 		}
 		case RES_CURRENCY: {

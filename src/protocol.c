@@ -52,7 +52,7 @@ static void Write(descriptor_t *apDescriptor, const char *apData) {
 }
 
 static void ReportBug(const char *apText) {
-	log(apText);
+	log("%s", apText);
 }
 
 static void InfoMessage(descriptor_t *apDescriptor, const char *apData) {
@@ -187,6 +187,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_EMPIRE_TERRITORY_MAX, "EMPIRE_TERRITORY_MAX", NUMBER_READ_ONLY },
 	{ eMSDP_EMPIRE_TERRITORY_OUTSIDE, "EMPIRE_TERRITORY_OUTSIDE", NUMBER_READ_ONLY },
 	{ eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, "EMPIRE_TERRITORY_OUTSIDE_MAX", NUMBER_READ_ONLY },
+	{ eMSDP_EMPIRE_TERRITORY_FRONTIER, "EMPIRE_TERRITORY_FRONTIER", NUMBER_READ_ONLY },
+	{ eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, "EMPIRE_TERRITORY_FRONTIER_MAX", NUMBER_READ_ONLY },
 	{ eMSDP_EMPIRE_WEALTH, "EMPIRE_WEALTH", NUMBER_READ_ONLY },
 	{ eMSDP_EMPIRE_SCORE, "EMPIRE_SCORE", NUMBER_READ_ONLY },
 	

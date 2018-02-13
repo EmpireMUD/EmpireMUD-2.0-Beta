@@ -32,9 +32,12 @@
 *   Helpers
 *   Accept/Reject Helpers
 *   Alt Import
-*   Toggle Callbacks
+*   Toggle Functions
 *   Commands
 */
+
+// external vars
+extern const struct toggle_data_type toggle_data[];	// constants.c
 
 // external prototypes
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
@@ -978,8 +981,7 @@ void do_alt_import(char_data *ch, char *argument) {
 	
 	// validate
 	if (!*arg1 || !*arg2) {
-		msg_to_char(ch, "Usage: alt import <name> <field | all>\r\n");
-		msg_to_char(ch, valid_fields);
+		msg_to_char(ch, "Usage: alt import <name> <field | all>\r\n%s", valid_fields);
 	}
 	else if (!(alt = find_or_load_player(arg1, &file))) {
 		msg_to_char(ch, "Unknown alt '%s'.\r\n", arg1);
@@ -1026,8 +1028,7 @@ void do_alt_import(char_data *ch, char *argument) {
 		alt_import_slash_channels(ch, alt);
 	}
 	else {
-		msg_to_char(ch, "Uknown field '%s'.\r\n", arg2);
-		msg_to_char(ch, valid_fields);
+		msg_to_char(ch, "Uknown field '%s'.\r\n%s", arg2, valid_fields);
 	}
 
 	// cleanup	
@@ -1038,7 +1039,48 @@ void do_alt_import(char_data *ch, char *argument) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// TOGGLE CALLBACKS ////////////////////////////////////////////////////////
+//// TOGGLE FUNCTIONS ////////////////////////////////////////////////////////
+
+// for alphabetizing toggles for screenreader users
+struct alpha_tog {
+	char *name;
+	int pos;
+	int level;
+	struct alpha_tog *next;
+};
+
+struct alpha_tog *alpha_tog_list = NULL;	// LL of alphabetized toggles
+
+
+// alphabetizes the toggle list (after sorting by level)
+int sort_alpha_toggles(struct alpha_tog *a, struct alpha_tog *b) {
+	if (a->level != b->level) {
+		return a->level - b->level;
+	}
+	return str_cmp(a->name, b->name);
+}
+
+
+// ensures there is an alphabetized list of toggles, for screenreader users
+void alphabetize_toggles(void) {
+	struct alpha_tog *el;
+	int iter;
+	
+	if (alpha_tog_list) {
+		return;	// no work (do 1 time only)
+	}
+	
+	for (iter = 0; *toggle_data[iter].name != '\n'; ++iter) {
+		CREATE(el, struct alpha_tog, 1);
+		el->name = str_dup(toggle_data[iter].name);
+		el->level = toggle_data[iter].level;
+		el->pos = iter;
+		LL_PREPEND(alpha_tog_list, el);
+	}
+	
+	LL_SORT(alpha_tog_list, sort_alpha_toggles);
+}
+
 
 /**
 * toggle notifier for "toggle afk"
@@ -2897,14 +2939,13 @@ ACMD(do_title) {
 
 
 ACMD(do_toggle) {
-	extern const struct toggle_data_type toggle_data[];	// constants.c
-	
 	const char *togcols[NUM_TOG_TYPES][2] = { { "\tr", "\tg" }, { "\tg", "\tr" } };
 	const char *tognames[NUM_TOG_TYPES][2] = { { "off", "on" }, { "on", "off" } };
 	const char *imm_color = "\tc";
 	const char *clear_color = "\t0";
 
-	int iter, type = NOTHING, count, on;
+	int iter, type = NOTHING, count, on, pos;
+	struct alpha_tog *altog;
 	bool imm;
 	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
@@ -2923,16 +2964,23 @@ ACMD(do_toggle) {
 	
 	if (!*argument) {
 		msg_to_char(ch, "Toggles:\r\n");
+		alphabetize_toggles();	// in case
 		
-		for (iter = count = 0; *toggle_data[iter].name != '\n'; ++iter) {
-			if (toggle_data[iter].level <= GET_ACCESS_LEVEL(ch)) {
-				on = (PRF_FLAGGED(ch, toggle_data[iter].bit) ? 1 : 0);
-				imm = (toggle_data[iter].level >= LVL_START_IMM);
+		iter = count = 0;
+		LL_FOREACH(alpha_tog_list, altog) {
+			pos = screenreader ? altog->pos : iter++;	// shows in alpha order for SR; normal order for rest
+			if (*toggle_data[pos].name == '\n') {
+				break;	// this should not be possible, but just in case
+			}
+			
+			if (toggle_data[pos].level <= GET_ACCESS_LEVEL(ch)) {
+				on = (PRF_FLAGGED(ch, toggle_data[pos].bit) ? 1 : 0);
+				imm = (toggle_data[pos].level >= LVL_START_IMM);
 				if (screenreader) {
-					msg_to_char(ch, "%s: %s%s\r\n", toggle_data[iter].name, tognames[toggle_data[iter].type][on], imm ? " (immortal)" : "");
+					msg_to_char(ch, "%s: %s%s\r\n", toggle_data[pos].name, tognames[toggle_data[pos].type][on], imm ? " (immortal)" : "");
 				}
 				else {
-					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[iter].type][on], tognames[toggle_data[iter].type][on], imm ? imm_color : clear_color, toggle_data[iter].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
+					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[pos].type][on], tognames[toggle_data[pos].type][on], imm ? imm_color : clear_color, toggle_data[pos].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
 				}
 			}
 		}

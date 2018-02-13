@@ -587,6 +587,8 @@ void remove_building_from_table(bld_data *bld) {
 * @param bld_data *building The building to free.
 */
 void free_building(bld_data *bdg) {
+	void free_bld_relations(struct bld_relation *list);
+	
 	bld_data *proto = building_proto(GET_BLD_VNUM(bdg));
 	struct interaction_item *interact;
 	
@@ -625,6 +627,10 @@ void free_building(bld_data *bdg) {
 		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(bdg));
 	}
 	
+	if (GET_BLD_RELATIONS(bdg) && (!proto || GET_BLD_RELATIONS(bdg) != GET_BLD_RELATIONS(proto))) {
+		free_bld_relations(GET_BLD_RELATIONS(bdg));
+	}
+	
 	free(bdg);
 }
 
@@ -651,6 +657,7 @@ void init_building(bld_data *building) {
 void parse_building(FILE *fl, bld_vnum vnum) {
 	char line[256], str_in[256], str_in2[256];
 	struct spawn_info *spawn, *stemp;
+	struct bld_relation *relat;
 	bld_data *bld, *find;
 	int int_in[4];
 	double dbl_in;
@@ -783,14 +790,27 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
-			// upgrades to
-			case 'U': {
-				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
-					log("SYSERR: Format error in U line of %s", buf2);
+			case 'U': {	// relation (formerly 'upgrades to')
+				if (!get_line(fl, line)) {
+					log("SYSERR: Missing U line of %s", buf2);
 					exit(1);
 				}
+				if (sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+					if (sscanf(line, "%d", &int_in[1]) == 1) {
+						// backwards-compatible to when U was only upgrades-to
+						int_in[0] = BLD_REL_UPGRADES_TO;
+					}
+					else {	// error
+						log("SYSERR: Format error in U line of %s", buf2);
+						exit(1);
+					}
+				}
 				
-				GET_BLD_UPGRADES_TO(bld) = int_in[0];
+				CREATE(relat, struct bld_relation, 1);
+				relat->type = int_in[0];
+				relat->vnum = int_in[1];
+				
+				LL_APPEND(GET_BLD_RELATIONS(bld), relat);
 				break;
 			}
 
@@ -817,6 +837,7 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 */
 void write_building_to_file(FILE *fl, bld_data *bld) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	struct bld_relation *relat;
 	struct spawn_info *spawn;
 	
 	if (!fl || !bld) {
@@ -879,10 +900,9 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_BLD_SCRIPTS(bld));
 	
-	// U: upgrades_to
-	if (GET_BLD_UPGRADES_TO(bld) != NOTHING && building_proto(GET_BLD_UPGRADES_TO(bld))) {
-		fprintf(fl, "U\n");
-		fprintf(fl, "%d\n", GET_BLD_UPGRADES_TO(bld));
+	// U: relations (formerly upgrades_to)
+	LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
+		fprintf(fl, "U\n%d %d\n", relat->type, relat->vnum);
 	}
 	
 	// end
@@ -1981,7 +2001,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(buf);
+			log("%s", buf);
 			exit(1);
 		}
 		switch (*line) {
@@ -2036,7 +2056,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				return;
 			}
 			default: {
-				log(buf);
+				log("%s", buf);
 				exit(1);
 			}
 		}
@@ -2067,7 +2087,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(buf);
+			log("%s", buf);
 			exit(1);
 		}
 		switch (*line) {
@@ -2158,7 +2178,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				return;
 			}
 			default: {
-				log(buf);
+				log("%s", buf);
 				exit(1);
 			}
 		}
@@ -2260,8 +2280,6 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	emp->create_time = long_in;
 	emp->num_ranks = t[1];
 	
-	emp->city_terr = 0;
-	emp->outside_terr = 0;
 	emp->members = 0;
 	emp->greatness = 0;
 	for (iter = 0; iter < NUM_TECHS; ++iter) {
@@ -2282,7 +2300,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(buf);
+			log("%s", buf);
 			exit(1);
 		}
 
@@ -2470,7 +2488,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 			case 'S':			/* end of empire */
 				return;
 			default: {
-				log(buf);
+				log("%s", buf);
 				exit(1);
 			}
 		}
@@ -3272,7 +3290,7 @@ void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data
 	}
 	
 	if (*buf) {
-		log_to_empire(emp, ELOG_HOSTILITY, buf);
+		log_to_empire(emp, ELOG_HOSTILITY, "%s", buf);
 	}
 }
 
@@ -4113,6 +4131,10 @@ static struct island_info *load_one_island(FILE *fl, int id) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': {	// description
+				isle->desc = fread_string(fl, errstr);
+				break;
+			}
 			case 'S': {
 				// done
 				return isle;
@@ -4169,7 +4191,12 @@ void save_island_table(void) {
 	HASH_ITER(hh, island_table, isle, next_isle) {
 		fprintf(fl, "#%d\n", isle->id);
 		fprintf(fl, "%s~\n", NULLSAFE(isle->name));
-		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));		
+		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));
+		
+		if (isle->desc && *isle->desc) {
+			fprintf(fl, "D\n%s~\n", isle->desc);
+		}
+		
 		fprintf(fl, "S\n");
 	}
 
@@ -5055,7 +5082,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(error_log);
+			log("%s", error_log);
 			exit(1);
 		}
 		switch (*line) {
@@ -5305,7 +5332,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				return;
 			}
 			default: {
-				log(error_log);
+				log("%s", error_log);
 				exit(1);
 			}
 		}

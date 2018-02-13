@@ -300,6 +300,10 @@ typedef struct vehicle_data vehicle_data;
 #define BAN_ALL  3
 
 
+// for modify.c
+#define FORMAT_INDENT	BIT(0)
+
+
 // GLOBAL_x types for global_data
 #define GLOBAL_MOB_INTERACTIONS  0
 #define GLOBAL_MINE_DATA  1
@@ -690,6 +694,11 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_SWAMP  BIT(12)
 #define BLD_ANY_FOREST  BIT(13)
 #define BLD_FACING_OPEN_BUILDING  BIT(14)
+
+
+// BLD_REL_x: relationships with other buildings
+#define BLD_REL_UPGRADES_TO  0	// upgrades to another building type
+#define BLD_REL_STORES_LIKE  1	// acts like another building for storage locations
 
 
 // tavern types
@@ -1094,6 +1103,14 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_TRADE_ROUTES  11
 #define TECH_EXARCH_CRAFTS  12
 #define NUM_TECHS  13
+
+
+// TER_x: territory types for empire arrays
+#define TER_TOTAL  0
+#define TER_CITY  1
+#define TER_OUTSKIRTS  2
+#define TER_FRONTIER  3
+#define NUM_TERRITORY_TYPES  4	// total
 
 
 // for empire_trade_data
@@ -1653,7 +1670,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_FILLING_IN		24
 #define ACT_RECLAIMING		25
 #define ACT_ESCAPING		26
-	#define ACT_UNUSED		27
+#define ACT_RUNNING			27
 #define ACT_RITUAL			28
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
@@ -1667,7 +1684,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_SWAP_SKILL_SETS	38
 #define ACT_MAINTENANCE		39
 
-// act flags
+// ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
 #define ACTF_HASTE  BIT(1)	// haste increases speed
 #define ACTF_FAST_CHORES  BIT(2)  // fast-chores increases speed
@@ -1675,6 +1692,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_FINDER  BIT(4)	// finder increases speed
 #define ACTF_ALWAYS_FAST  BIT(5)	// this action is always faster
 #define ACTF_SITTING  BIT(6)	// can be sitting
+#define ACTF_FASTER_BONUS  BIT(7)	// speed boost from starting bonus
 
 
 // BONUS_x: bonus traits
@@ -1924,7 +1942,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
 #define PRF_NO_PAINT  BIT(33)	// unable to see custom paint colors
 #define PRF_EXTRA_SPACING  BIT(34)	// causes an extra crlf before command interpreter
-#define PRF_DRIVING_LOOK  BIT(35)	// auto-looks each time you move a vehicle
+#define PRF_TRAVEL_LOOK  BIT(35)	// auto-looks each time you run or move a vehicle
 #define PRF_AUTOCLIMB  BIT(36)	// will enter mountains without 'climb'
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
 
@@ -3109,12 +3127,22 @@ struct bld_data {
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct resource_data *yearly_maintenance;	// needed each year
+	struct bld_relation *relations;	// links to other buildings
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
 	
 	UT_hash_handle hh;	// building_table hash handle
+};
+
+
+// for relationships between buildings
+struct bld_relation {
+	int type;	// BLD_REL_
+	bld_vnum vnum;	// building vnum
+	
+	struct bld_relation *next;
 };
 
 
@@ -3347,6 +3375,7 @@ struct descriptor_data {
 	size_t max_str;	// max length of editor
 	int mail_to;	// name for mail system
 	int notes_id;	// idnum of player for notes-editing
+	int island_desc_id;	// editing an island desc
 	any_vnum save_empire;	// for the text editor to know which empire to save
 	bool allow_null;	// string editor can be empty/null
 	
@@ -3593,6 +3622,7 @@ struct player_special_data {
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
 	struct resource_data *action_resources;	// temporary list for resources stored during actions
+	char *movement_string;	// for run/etc
 	
 	// locations and movement
 	room_vnum load_room;	// Which room to place char in
@@ -4043,8 +4073,7 @@ struct empire_island {
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
-	int city_terr;	// total territory IN cities on the island
-	int outside_terr;	// total territory OUTSIDE cities on the island
+	unsigned int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	
 	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
 };
@@ -4219,11 +4248,8 @@ struct empire_data {
 	struct empire_workforce_tracker *ewt_tracker;	// workforce tracker
 	struct workforce_delay *delays;	// speeds up chore processing
 	
-	// unsaved data
-	int city_terr;	// total territory IN cities
-	int outside_terr;	// total territory OUTSIDE cities
-
 	/* Unsaved data */
+	unsigned int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	int wealth;	// computed by read_vault
 	int population;	// npc population who lives here
 	int military;	// number of soldiers
@@ -4921,6 +4947,7 @@ struct depletion_data {
 struct island_info {
 	any_vnum id;	// game-assigned, permanent id
 	char *name;	// global name for the island
+	char *desc;	// description of the island
 	bitvector_t flags;	// ISLE_ flags
 	
 	// computed data
