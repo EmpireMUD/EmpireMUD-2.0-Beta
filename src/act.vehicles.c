@@ -658,10 +658,9 @@ void process_driving(char_data *ch) {
 		// finished this part of the drive!
 		if (GET_ACTION_VNUM(ch, 1) <= 0) {
 			if (GET_MOVEMENT_STRING(ch)) {
-				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &new_dir, &dist, FALSE) && new_dir != -1) {
+				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &new_dir, &dist, FALSE) && new_dir != -1 && new_dir != DIR_RANDOM && (subcmd == SCMD_PILOT || is_flat_dir[dir])) {
 					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, new_dir);
 					GET_ACTION_VNUM(ch, 1) = dist;
-					
 					
 					// alert whole vehicle
 					if (new_dir != dir && VEH_ROOM_LIST(veh)) {
