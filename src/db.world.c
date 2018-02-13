@@ -1226,13 +1226,16 @@ void update_island_names(void) {
 					
 					// if the empire HAS named the island
 					if (eisle->name) {
-						if (!last_name || !str_cmp(eisle->name, last_name)) {
+						if (!last_name) {
 							found_emp = emp;	// found an empire with a name
-							
-							if (!last_name) {
-								last_name = eisle->name;
-								++count;	// only count in this case
-							}
+							last_name = eisle->name;
+							++count;	// only count in this case
+						}
+						else if (!str_cmp(eisle->name, last_name)) {
+							// matches last name, do nothing
+						}
+						else {
+							++count;	// does not match last name
 						}
 					}
 					else {
