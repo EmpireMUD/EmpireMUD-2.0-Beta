@@ -149,8 +149,10 @@ See also: REMOTE
 
 Cause amount points of damage to victim. Damage is automatically scaled based
 on the mob or adventure level. Modifier is a percent of the scaled damage,
-where 100 is the normal level. If modifier is negative, the player will be
-healed.
+where 100 is the normal level.
+
+If modifier is negative, the player will be healed, but you should use %heal%
+instead.
 
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
@@ -348,6 +350,20 @@ if %actor.level% < 20
 end
 %echo% %self.name% yells a Battlecry and throws himself at you.
 mkill %actor%
+#d
+%HEAL% OHEAL MHEAL WHEAL VHEAL
+
+%heal% <person> <type> [modifier]
+
+Heals a person's health, mana, moves, DoTs, or debuffs (these are the types).
+Modifier is a percent of the scaled amount, where 100 is the normal level.
+
+Examples:
+  %heal% %actor% health  - cause scaled healing
+  %heal% %actor% mana 50  - restores a smaller amount of mana
+  %heal% %self% debuffs  - remove all debuffs from self
+
+See also: %DAMAGE%
 #d
 IF ELSEIF END "ELSE IF" ELSIF
 

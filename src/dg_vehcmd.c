@@ -244,6 +244,11 @@ VCMD(do_vforce) {
 }
 
 
+VCMD(do_vheal) {	// mmmm, veal
+	script_heal(veh, VEH_TRIGGER, argument);
+}
+
+
 VCMD(do_vbuildingecho) {
 	char room_number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
 	room_data *froom, *home_room, *iter;
@@ -1084,7 +1089,7 @@ VCMD(do_dgvload) {
 
 
 VCMD(do_vdamage) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
 	int type;
@@ -1100,6 +1105,13 @@ VCMD(do_vdamage) {
 
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
+	}
+	
+	// send negatives to %heal% instead
+	if (modifier < 0) {
+		sprintf(buf, "%s health %.2f", name, -atof(modarg));
+		script_heal(veh, VEH_TRIGGER, buf);
+		return;
 	}
 
 	ch = get_char_by_vehicle(veh, name);
@@ -1588,6 +1600,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vechoaround", do_vsend, SCMD_VECHOAROUND },
 	{ "vechoneither", do_vechoneither, NO_SCMD },
 	{ "vforce", do_vforce, NO_SCMD },
+	{ "vheal", do_vheal, NO_SCMD },
 	{ "vload", do_dgvload, NO_SCMD },
 	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },

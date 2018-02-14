@@ -330,6 +330,7 @@ Objects (OEDIT):
   run additional interactions.
 - Ammo items that cause debuffs will use an 'affect' generic with the same
   vnum as the ammo, if one exists.
+- Potions should have a locked level (min equal to max) to be storable.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
@@ -4047,6 +4048,18 @@ on them.
 
 See also: AFFECT FLAGS, OLC OBJECTS
 #d
+"OEDIT AFFECTTYPE" "OEDIT AFFECT TYPE"
+
+Usage:  .affecttype <vnum>
+
+This lets you set a generic affect that will be used for the potion's benefits.
+This is how you set a custom name to appear on a player's 'affects' list.
+
+If two potions have the same affect vnum (including -1/none), one potion will
+overwrite the other's effects when quaffed.
+
+See also: GENERIC AFFECT, OLC OBJECTS
+#d
 "OEDIT APPLY" "OEDIT APPLIES" APPLIES
 
 Usage:  .apply add <value> <apply> [type]
@@ -4158,6 +4171,16 @@ For SCALABLE objects, thus number is a scalable value if it is set to a number
 other than 0.
 
 See also: ITEM SCALING, OEDIT CONTENTS, OLC OBJECTS
+#d
+"OEDIT CDTIME"
+
+Usage:  .cdtime <seconds>
+
+This optional feature specifies how long the cooldown will be, in seconds. If
+you set this field and 'cooldown', quaffing the potion will trigger a cooldown
+that blocks you from using other potions that have the same cooldown.
+
+See also: COOLDOWN GENERIC, OEDIT COOLDOWN, OLC OBJECTS
 #d
 "OEDIT CHARGES"
 
@@ -4286,6 +4309,16 @@ world. If you want an item to start out empty, set its contents to 0. If you
 want it to start out full, set it to the same amount as the capacity.
 
 See also: OEDIT CAPACITY, OLC OBJECTS
+#d
+"OEDIT COOLDOWN"
+
+Usage:  .cooldown <vnum>
+
+This optional feature specifies a cooldown generic for a potion. If you set
+this field and 'cdtime', quaffing the potion will trigger a cooldown that
+blocks you from using other potions that have the same cooldown.
+
+See also: COOLDOWN GENERIC, OEDIT CDTIME, OLC OBJECTS
 #d
 "OEDIT CORPSEOF" "OEDIT CORPSE OF"
 
@@ -6609,6 +6642,14 @@ set the portal's destination using the script that spawns it.
 
 Potions will put their applies and affects on a person when quaffed. Potions
 also fire 'consume' triggers, so you can give them custom effects with scripts.
+
+When you drink a potion, it will clear any affects from other potions that
+share the same affect vnum. If you do not set a vnum, it will use the default
+'potion' affect.
+
+In order to make potions storable, you should set their min- and max-level to
+the same number, e.g. 100-100. This allows them to be both scalable and
+storable.
 
 Note: Prior to EmpireMUD 2.0 b5.23, potions had a pre-determined list of
 effects and used custom scaling.

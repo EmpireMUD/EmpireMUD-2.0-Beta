@@ -794,6 +794,11 @@ WCMD(do_wforce) {
 }
 
 
+WCMD(do_wheal) {
+	script_heal(room, WLD_TRIGGER, argument);
+}
+
+
 WCMD(do_wown) {
 	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
 	
@@ -1187,7 +1192,7 @@ WCMD(do_wmorph) {
 
 
 WCMD(do_wdamage) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
 	int type;
@@ -1202,6 +1207,13 @@ WCMD(do_wdamage) {
 
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
+	}
+	
+	// send negatives to %heal% instead
+	if (modifier < 0) {
+		sprintf(buf, "%s health %.2f", name, -atof(modarg));
+		script_heal(room, WLD_TRIGGER, buf);
+		return;
 	}
 	
 	ch = get_char_by_room(room, name);
@@ -1528,6 +1540,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wechoaround", do_wsend, SCMD_WECHOAROUND },
 	{ "wechoneither", do_wechoneither, NO_SCMD },
 	{ "wforce", do_wforce, NO_SCMD },
+	{ "wheal", do_wheal, NO_SCMD },
 	{ "wload", do_wload, NO_SCMD },
 	{ "wmorph", do_wmorph, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },

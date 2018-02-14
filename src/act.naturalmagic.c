@@ -205,8 +205,10 @@ void apply_potion(obj_data *obj, char_data *ch) {
 		scale_item_to_level(obj, 1);	// minimum level
 	}
 	
-	// remove any old buffs
-	affect_from_char(ch, aff_type, FALSE);
+	// remove any old buffs (if adding a new one)
+	if (GET_OBJ_AFF_FLAGS(obj) || GET_OBJ_APPLIES(obj)) {
+		affect_from_char(ch, aff_type, FALSE);
+	}
 	
 	if (GET_OBJ_AFF_FLAGS(obj)) {
 		af = create_flag_aff(aff_type, 24 MUD_HOURS, GET_OBJ_AFF_FLAGS(obj), ch);
