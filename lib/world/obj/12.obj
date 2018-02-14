@@ -4,7 +4,7 @@ a handful of whitegrass~
 A handful of picked whitegrass is on the ground.~
 Whitegrass is an herb used to make potions.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 0 0
 M
@@ -17,8 +17,6 @@ O
 14 u
 R
 5130 0
-R
-5618 0
 S
 #1201
 fiveleaf leaf herbs~
@@ -26,7 +24,7 @@ some fiveleaf~
 Some fiveleaf has been left here.~
 Fiveleaf is an herb used to make potions.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 0 0
 M
@@ -39,8 +37,6 @@ O
 14 u
 R
 5130 0
-R
-5618 0
 S
 #1202
 redthorn thorn twig herbs~
@@ -48,7 +44,7 @@ a twig of redthorn~
 A twig of redthorn has been dropped here.~
 Redthorn is an herb used to make potions.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 0 0
 M
@@ -61,8 +57,6 @@ O
 14 u
 R
 5130 0
-R
-5618 0
 S
 #1203
 magewhisper whisper sepals herbs pile~
@@ -70,7 +64,7 @@ some magewhisper sepals~
 A pile of magewhisper sepals sits on the ground.~
 Magewhisper is an herb used to make potions.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 0 0
 M
@@ -83,8 +77,6 @@ O
 14 u
 R
 5130 0
-R
-5618 0
 S
 #1204
 daggerbite bite frond herbs~
@@ -92,7 +84,7 @@ a daggerbite frond~
 A daggerbite frond has been left here.~
 Daggerbite is an herb used to make potions.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 0 0
 M
@@ -105,8 +97,6 @@ O
 14 u
 R
 5130 0
-R
-5618 0
 S
 #1205
 bileberries bileberry berries berry noxious herbs~
@@ -114,7 +104,7 @@ some bileberries~
 Some noxious bileberries are lying on the ground.~
 Bileberries are an herb used to make potions.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 0 0
 M
@@ -127,8 +117,6 @@ O
 14 u
 R
 5130 0
-R
-5618 0
 S
 #1206
 iris blue iridescent~
@@ -150,9 +138,14 @@ a healing potion~
 A healing potion is sitting on the ground.~
 Quaff this swirling white potion to regain health.
 ~
-25 m a 1
-0 1 0
+25 m a 3
+-1 0 -1
 8 0
+C
+75 75
+R
+5130 0
+T 1250
 S
 #1251
 potion regeneration~
@@ -160,9 +153,15 @@ a regeneration potion~
 A regeneration potion is sitting on the ground.~
 Quaff this swirling white potion to regain health over time.
 ~
-25 m a 1
-1 1 0
+25 m a 4
+-1 0 3029
 8 0
+A
+3 1 0
+C
+75 75
+R
+5130 0
 S
 #1252
 potion stamina~
@@ -170,9 +169,14 @@ a stamina potion~
 A stamina potion is sitting on the ground.~
 Quaff this swirling yellow potion to regain movement points.
 ~
-25 m a 1
-2 1 0
+25 m a 3
+-1 0 -1
 8 0
+C
+75 75
+R
+5130 0
+T 1252
 S
 #1253
 potion longrunning running~
@@ -180,9 +184,15 @@ a potion of longrunning~
 A potion of longrunning is sitting on the ground.~
 Quaff this swirling yellow potion to regain movement points over time.
 ~
-25 m a 1
-3 1 0
+25 m a 4
+-1 0 3029
 8 0
+A
+6 1 0
+C
+75 75
+R
+5130 0
 S
 #1254
 potion mana~
@@ -190,9 +200,14 @@ a mana potion~
 A mana potion is sitting on the ground.~
 Quaff this swirling blue potion to regain mana.
 ~
-25 m a 1
-4 1 0
+25 m a 3
+-1 0 -1
 8 0
+C
+75 75
+R
+5130 0
+T 1254
 S
 #1255
 potion energy~
@@ -200,9 +215,15 @@ a potion of energy~
 A potion of energy is sitting on the ground.~
 Quaff this swirling blue potion to regain mana over time.
 ~
-25 m a 1
-5 1 0
+25 m a 4
+-1 0 3029
 8 0
+A
+7 1 0
+C
+75 75
+R
+5130 0
 S
 #1256
 potion strength~
@@ -210,9 +231,15 @@ a strength potion~
 A strength potion is sitting on the ground.~
 Quaff this swirling red potion to become stronger.
 ~
-25 m a 1
-7 1 0
+25 m a 4
+-1 0 3030
 8 0
+A
+1 1 0
+C
+75 75
+R
+5130 0
 S
 #1257
 potion dexterity~
@@ -220,9 +247,15 @@ a dexterity potion~
 A dexterity potion is sitting on the ground.~
 Quaff this swirling red potion to become more agile.
 ~
-25 m a 1
-8 1 0
+25 m a 4
+-1 0 3030
 8 0
+A
+2 1 0
+C
+75 75
+R
+5130 0
 S
 #1258
 potion charisma~
@@ -230,9 +263,15 @@ a charisma potion~
 A charisma potion is sitting on the ground.~
 Quaff this swirling red potion to become more charismatic.
 ~
-25 m a 1
-9 1 0
+25 m a 4
+-1 0 3030
 8 0
+A
+4 1 0
+C
+75 75
+R
+5130 0
 S
 #1259
 potion intelligence~
@@ -240,9 +279,15 @@ an intelligence potion~
 An intelligence potion is sitting on the ground.~
 Quaff this swirling red potion to become smarter.
 ~
-25 m a 1
-10 1 0
+25 m a 4
+-1 0 3030
 8 0
+A
+8 1 0
+C
+75 75
+R
+5130 0
 S
 #1260
 potion wits~
@@ -250,9 +295,15 @@ a wits potion~
 A wits potion is sitting on the ground.~
 Quaff this swirling red potion to gain wits.
 ~
-25 m a 1
-11 1 0
+25 m a 4
+-1 0 3030
 8 0
+A
+9 1 0
+C
+75 75
+R
+5130 0
 S
 #1261
 potion armor~
@@ -260,9 +311,15 @@ a potion of armor~
 A potion of armor is sitting on the ground.~
 Quaff this swirling red potion to gain protection from damage.
 ~
-25 m a 1
-13 1 0
+25 m a 4
+-1 0 3030
 8 0
+A
+12 1 0
+C
+100 100
+R
+5130 0
 S
 #1262
 potion haste~
@@ -270,9 +327,15 @@ a haste potion~
 A haste potion is sitting on the ground.~
 Quaff this swirling red potion to become faster.
 ~
-25 m a 1
-14 1 0
+25 m a 4
+-1 0 3030
 8 0
+B
+q
+C
+100 100
+R
+5130 0
 S
 #1263
 potion blocking~
@@ -280,9 +343,15 @@ a potion of blocking~
 A blocking potion is sitting on the ground.~
 Quaff this swirling red potion to block better.
 ~
-25 m a 1
-15 1 0
+25 m a 4
+-1 0 3030
 8 0
+A
+13 1 0
+C
+100 100
+R
+5130 0
 S
 #1264
 vial poison searing~
@@ -301,13 +370,11 @@ a vial of weakness poison~
 A vial of weakness poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 1 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1266
 vial poison exhaustion~
@@ -315,13 +382,11 @@ a vial of exhaustion poison~
 A vial of exhaustion poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 2 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1267
 vial poison braindrain drain~
@@ -329,13 +394,11 @@ a vial of brain drain poison~
 A vial of brain drain poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
+26 0 a 3
 3 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1268
 vial poison strength~
@@ -355,13 +418,11 @@ a vial of dexterity poison~
 A vial of dexterity poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 6 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1270
 vial poison charisma~
@@ -369,13 +430,11 @@ a vial of charisma poison~
 A vial of charisma poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 7 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1271
 vial poison intelligence~
@@ -383,13 +442,11 @@ a vial of intelligence poison~
 A vial of intelligence poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 8 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1272
 vial poison wits~
@@ -397,13 +454,11 @@ a vial of wits poison~
 A vial of wits poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 9 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1273
 vial poison pain~
@@ -411,13 +466,11 @@ a vial of pain poison~
 A vial of pain poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 11 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1274
 vial poison slow~
@@ -425,13 +478,11 @@ a vial of slow poison~
 A vial of slow poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 12 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1275
 vial poison heartstop~
@@ -439,13 +490,11 @@ a vial of heartstop poison~
 A vial of heartstop poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
+26 0 a 2
 13 15 0
 8 0
 R
 5130 0
-R
-5618 0
 S
 #1280
 elixir healing~
@@ -453,9 +502,14 @@ a healing elixir~
 A healing elixir is sitting here.~
 Quaff this swirling white potion to regain health.
 ~
-25 m a 1
-0 1 0
+25 m a 3
+-1 0 -1
 8 0
+C
+100 100
+R
+5130 0
+T 1250
 S
 #1281
 elixir regeneration~
@@ -463,9 +517,15 @@ a regeneration elixir~
 A regeneration elixir is sitting here.~
 Quaff this swirling white potion to regain health over time.
 ~
-25 m a 1
-1 1 0
+25 m a 4
+-1 0 3029
 8 0
+A
+3 1 0
+C
+100 100
+R
+5130 0
 S
 #1282
 elixir stamina~
@@ -473,9 +533,14 @@ a stamina elixir~
 A stamina elixir is sitting here.~
 Quaff this swirling yellow potion to regain movement points.
 ~
-25 m a 1
-2 1 0
+25 m a 3
+-1 0 -1
 8 0
+C
+100 100
+R
+5130 0
+T 1252
 S
 #1283
 elixir longrunning running~
@@ -483,9 +548,15 @@ an elixir of longrunning~
 An elixir of longrunning is lying here.~
 Quaff this swirling yellow potion to regain movement points over time.
 ~
-25 m a 1
-3 1 0
+25 m a 4
+-1 0 3029
 8 0
+A
+6 1 0
+C
+100 100
+R
+5130 0
 S
 #1284
 elixir mana~
@@ -493,9 +564,14 @@ a mana elixir~
 A mana elixir is lying here.~
 Quaff this swirling blue potion to regain mana.
 ~
-25 m a 1
-4 1 0
+25 m a 3
+-1 0 -1
 8 0
+C
+100 100
+R
+5130 0
+T 1254
 S
 #1285
 elixir energy~
@@ -503,8 +579,14 @@ an elixir of energy~
 An elixir of energy is lying here.~
 Quaff this swirling blue potion to regain mana over time.
 ~
-25 m a 1
-5 1 0
+25 m a 4
+-1 0 3029
 8 0
+A
+7 1 0
+C
+100 100
+R
+5130 0
 S
 $

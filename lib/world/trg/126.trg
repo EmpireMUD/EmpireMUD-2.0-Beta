@@ -46,6 +46,7 @@ nop %self.set_cooldown(12605, 20)%
 set running 1
 remote running %self.id%
 set success 0
+remote success %self.id%
 dg_affect #12601 %self% DODGE 50 10
 nop %self.add_mob_flag(NO-ATTACK)%
 wait 10 seconds
@@ -159,6 +160,10 @@ stomp~
 if !%self.varexists(success)%
   set success 0
   remote success %self.id%
+end
+if !%self.varexists(running)%
+  set running 0
+  remote running %self.id%
 end
 if !%self.running% || %self.success%
   %send% %actor% You don't need to do that right now.

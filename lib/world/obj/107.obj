@@ -750,9 +750,15 @@ a bug potion~
 A bug potion is sitting here.~
 This potion smells foul, but it will help you in combat.
 ~
-25 0 a 2
-8 25 0
+25 0 a 5
+-1 0 3030
 8 0
+A
+2 1 0
+C
+50 50
+R
+5130 0
 S
 #10755
 bread goblin crusty~

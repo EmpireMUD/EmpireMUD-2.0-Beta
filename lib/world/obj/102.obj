@@ -431,13 +431,11 @@ some thick aloe leaves~
 Some thick aloe leaves are lying here.~
 The aloe leaves might be made into something soothing.
 ~
-3 bl a 1
+3 bl a 2
 0 10228 0
 7 0
 R
 5130 0
-R
-5618 0
 S
 #10231
 dandelions desert~
@@ -625,11 +623,14 @@ a soothing aloe elixir~
 A soothing aloe elixir has been left here.~
 Quaff this swirling greenish potion to regain health.
 ~
-25 m a 1
-0 1 0
+25 m a 3
+-1 0 -1
 8 0
 C
-0 150
+150 150
+R
+5130 0
+T 1250
 S
 #10245
 recipe aloe~

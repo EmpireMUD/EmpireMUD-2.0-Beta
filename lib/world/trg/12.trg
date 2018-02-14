@@ -1,3 +1,21 @@
+#1250
+Basic Healing Potion~
+1 s 100
+~
+* tba
+~
+#1252
+Basic Move Potion~
+1 s 100
+~
+* tba
+~
+#1254
+Basic Mana Potion~
+1 s 100
+~
+* tba
+~
 #1264
 Searing Poison Hit~
 1 s 100

@@ -622,15 +622,13 @@ a vial of pepper spray~
 A glass vial of pepper spray has been left here.~
 This small glass vial is filled with a bright red fluid that sizzles slightly.
 ~
-26 0 a 9
+26 0 a 10
 11 15 0
 8 0
 C
 0 100
 R
 5130 0
-R
-5618 0
 S
 #3333
 jerky spicy pouch~
@@ -1116,7 +1114,7 @@ jar oil lettuce seed~
 a jar of lettuce seed oil~
 There is a jar of lettuce seed oil here.~
    The jar has a sacred seal on top, as the oil inside is primarily used in
-ceremonies. It is made from the pressed seeds of the lettuce plant.  
+ceremonies. It is made from the pressed seeds of the lettuce plant.
 ~
 3 l a 6
 0 0 0
@@ -1137,7 +1135,7 @@ salad fresh~
 a fresh salad~
 Someone has left a fresh salad on the ground.~
    The salad is made from fresh, crisp lettuce and chopped vegetables. It has
-been dressed with oil and lightly seasoned.  
+been dressed with oil and lightly seasoned.
 ~
 6 m a 5
 24 0 0
