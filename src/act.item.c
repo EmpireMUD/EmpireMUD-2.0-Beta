@@ -484,6 +484,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_POTION: {
+			if (GET_POTION_AFFECT(obj) != NOTHING) {
+				msg_to_char(ch, "Potion type: %s\r\n", get_generic_name_by_vnum(GET_POTION_AFFECT(obj)));
+			}
 			if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && GET_POTION_COOLDOWN_TIME(obj) > 0) {
 				msg_to_char(ch, "Potion cooldown: %d second%s\r\n", GET_POTION_COOLDOWN_TIME(obj), PLURAL(GET_POTION_COOLDOWN_TIME(obj)));
 			}
