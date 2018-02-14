@@ -334,7 +334,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "&0");
 	}
 
-	if (obj->storage) {
+	if (obj->storage && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		msg_to_char(ch, "Storage locations:");
 		found = 0;
 		for (store = obj->storage; store; store = store->next) {			
@@ -346,6 +346,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	if (UNIQUE_OBJ_CAN_STORE(obj)) {
 		msg_to_char(ch, "Storage location: Warehouse\r\n");
+	}
+	if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+		msg_to_char(ch, "Storage location: none (modified object)\r\n");
 	}
 
 	// binding section

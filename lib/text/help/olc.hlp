@@ -4452,6 +4452,7 @@ Available flags:
  HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
  GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
+ !STORE - cannot be stored (this is usually toggled on by scripts)
 
 See also: BINDING, OLC OBJECTS
 #d
