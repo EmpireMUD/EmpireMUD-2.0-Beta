@@ -184,94 +184,44 @@ void un_earthmeld(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// POTIONS /////////////////////////////////////////////////////////////////
 
-#define POTION_SPEC_NONE  0	// first!
-#define POTION_SPEC_HEALING  1
-#define POTION_SPEC_MOVES  2
-#define POTION_SPEC_MANA  3
-
-
-// master potion data
-const struct potion_data_type potion_data[] = {
-	
-	/**
-	* Ideas on cleaning this up and improving the potions system:
-	* - make default healing amounts here (for each pool type)
-	* - consider just attaching applies and effects to the potion object, then transferring them over on quaff
-	* - consider adding cooldown types to this table
-	*/
-
-	// WARNING: DO NOT CHANGE THE ORDER, ONLY ADD TO THE END
-	// The position in this array corresponds to obj val 0
-
-	{ "health", 0, APPLY_NONE, NOBITS, POTION_SPEC_HEALING },	// 0
-	{ "health regeneration", ATYPE_REGEN_POTION, APPLY_HEALTH_REGEN, NOBITS, POTION_SPEC_NONE },	// 1
-	{ "moves", 0, APPLY_NONE, NOBITS, POTION_SPEC_MOVES }, // 2
-	{ "move regeneration", ATYPE_REGEN_POTION, APPLY_MOVE_REGEN, NOBITS, POTION_SPEC_NONE },	// 3
-	{ "mana", 0, APPLY_NONE, NOBITS, POTION_SPEC_MANA }, // 4
-	{ "mana regeneration", ATYPE_REGEN_POTION, APPLY_MANA_REGEN, NOBITS, POTION_SPEC_NONE }, // 5
-		{ "*", 0, APPLY_NONE, NOBITS, POTION_SPEC_NONE },	// 6. UNUSED
-	{ "strength", ATYPE_NATURE_POTION, APPLY_STRENGTH, NOBITS, POTION_SPEC_NONE }, // 7
-	{ "dexterity", ATYPE_NATURE_POTION, APPLY_DEXTERITY, NOBITS, POTION_SPEC_NONE }, // 8
-	{ "charisma", ATYPE_NATURE_POTION, APPLY_CHARISMA, NOBITS, POTION_SPEC_NONE }, // 9
-	{ "intelligence", ATYPE_NATURE_POTION, APPLY_INTELLIGENCE, NOBITS, POTION_SPEC_NONE }, // 10
-	{ "wits", ATYPE_NATURE_POTION, APPLY_WITS, NOBITS, POTION_SPEC_NONE }, // 11
-		{ "*", 0, APPLY_NONE, NOBITS, POTION_SPEC_NONE },	// 12. UNUSED
-	{ "resist-physical", ATYPE_NATURE_POTION, APPLY_RESIST_PHYSICAL, NOBITS, POTION_SPEC_NONE },	// 13
-	{ "haste", ATYPE_NATURE_POTION, APPLY_NONE, AFF_HASTE, POTION_SPEC_NONE }, // 14
-	{ "block", ATYPE_NATURE_POTION, APPLY_BLOCK, NOBITS, POTION_SPEC_NONE }, // 15
-
-	// last
-	{ "\n", 0, APPLY_NONE, NOBITS, POTION_SPEC_NONE }
-};
-
-
 /**
-* Apply the actual effects of a potion.
+* Apply the actual effects of a potion. This does NOT extract the potion.
 *
+* @param obj_data *obj the potion
 * @param char_data *ch the quaffer
-* @param int type potion_data[] pos
-* @param int scale The scale level of the potion
 */
-void apply_potion(char_data *ch, int type, int scale) {
-	extern const double apply_values[];
+void apply_potion(obj_data *obj, char_data *ch) {
+	void scale_item_to_level(obj_data *obj, int level);
 	
+	any_vnum aff_type = GET_POTION_AFFECT(obj) != NOTHING ? GET_POTION_AFFECT(obj) : ATYPE_POTION;
 	struct affected_type *af;
-	int value;
-		
+	struct obj_apply *apply;
+	
 	act("A swirl of light passes over you!", FALSE, ch, NULL, NULL, TO_CHAR);
 	act("A swirl of light passes over $n!", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	// atype
-	if (potion_data[type].atype > 0) {
-		// remove any old effect
-		affect_from_char(ch, potion_data[type].atype, FALSE);
-		
-		if (potion_data[type].apply != APPLY_NONE) {
-			double points = config_get_double("potion_apply_per_100") * scale / 100.0;
-			value = MAX(1, round(points * 1.0 / apply_values[potion_data[type].apply]));
-		}
-		else {
-			value = 0;
-		}
-		
-		af = create_aff(potion_data[type].atype, 24 MUD_HOURS, potion_data[type].apply, value, potion_data[type].aff, ch);
-		affect_join(ch, af, 0);
+	// ensure scaled
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+		scale_item_to_level(obj, 1);	// minimum level
 	}
 	
-	// special cases
-	switch (potion_data[type].spec) {
-		case POTION_SPEC_HEALING: {
-			heal(ch, ch, MAX(1, config_get_double("potion_heal_scale") * scale));
-			break;
-		}
-		case POTION_SPEC_MOVES: {
-			GET_MOVE(ch) = MIN(GET_MOVE(ch) + MAX(1, config_get_double("potion_heal_scale") * scale), GET_MAX_MOVE(ch));
-			break;
-		}
-		case POTION_SPEC_MANA: {
-			GET_MANA(ch) = MIN(GET_MANA(ch) + MAX(1, config_get_double("potion_heal_scale") * scale), GET_MAX_MANA(ch));
-			break;
-		}
+	// remove any old buffs
+	affect_from_char(ch, aff_type, FALSE);
+	
+	if (GET_OBJ_AFF_FLAGS(obj)) {
+		af = create_flag_aff(aff_type, 24 MUD_HOURS, GET_OBJ_AFF_FLAGS(obj), ch);
+		affect_to_char(ch, af);
+		free(af);
+	}
+
+	LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
+		af = create_mod_aff(aff_type, 24 MUD_HOURS, apply->location, apply->modifier, ch);
+		affect_to_char(ch, af);
+		free(af);
+	}
+	
+	if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && GET_POTION_COOLDOWN_TIME(obj) > 0) {
+		add_cooldown(ch, GET_POTION_COOLDOWN_TYPE(obj), GET_POTION_COOLDOWN_TIME(obj));
 	}
 }
 
@@ -1177,6 +1127,9 @@ ACMD(do_quaff) {
 	else if (!IS_POTION(obj)) {
 		msg_to_char(ch, "You can only quaff potions.\r\n");
 	}
+	else if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && get_cooldown_time(ch, GET_POTION_COOLDOWN_TYPE(obj)) > 0) {
+		msg_to_char(ch, "You can't quaff that until your %s cooldown expires.\r\n", get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)));
+	}
 	else if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
 		/* check trigger */
 		return;
@@ -1185,7 +1138,7 @@ ACMD(do_quaff) {
 		act("You quaff $p!", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
 
-		apply_potion(ch, GET_POTION_TYPE(obj), GET_POTION_SCALE(obj));
+		apply_potion(obj, ch);
 		extract_obj(obj);
 	}	
 }

@@ -4000,16 +4000,6 @@ struct poison_data_type {
 };
 
 
-// see act.naturalmagic.c
-struct potion_data_type {
-	char *name;	// name for olc, etc
-	any_vnum atype;	// ATYPE_
-	int apply;	// APPLY_
-	bitvector_t aff;
-	int spec;	// POTION_SPEC_
-};
-
-
 // for BREW_x
 struct tavern_data_type {
 	char *name;

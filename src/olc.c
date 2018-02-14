@@ -296,17 +296,20 @@ OLC_MODULE(morphedit_shortdesc);
 // object modules
 OLC_MODULE(oedit_action_desc);
 OLC_MODULE(oedit_affects);
+OLC_MODULE(oedit_affecttype);
 OLC_MODULE(oedit_apply);
 OLC_MODULE(oedit_armortype);
 OLC_MODULE(oedit_ammotype);
 OLC_MODULE(oedit_automint);
 OLC_MODULE(oedit_capacity);
+OLC_MODULE(oedit_cdtime);
 OLC_MODULE(oedit_charges);
 OLC_MODULE(oedit_coinamount);
 OLC_MODULE(oedit_compflags);
 OLC_MODULE(oedit_component);
 OLC_MODULE(oedit_containerflags);
 OLC_MODULE(oedit_contents);
+OLC_MODULE(oedit_cooldown);
 OLC_MODULE(oedit_corpseof);
 OLC_MODULE(oedit_currency);
 OLC_MODULE(oedit_custom);
@@ -324,8 +327,6 @@ OLC_MODULE(oedit_minlevel);
 OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
 OLC_MODULE(oedit_poison);
-OLC_MODULE(oedit_potion);
-OLC_MODULE(oedit_potionscale);
 OLC_MODULE(oedit_quantity);
 OLC_MODULE(oedit_quick_recipe);
 OLC_MODULE(oedit_recipe);
@@ -808,17 +809,20 @@ const struct olc_command_data olc_data[] = {
 	
 	// object commands
 	{ "affects", oedit_affects, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "affecttype", oedit_affecttype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "apply", oedit_apply, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "armortype", oedit_armortype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "ammotype", oedit_ammotype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "automint", oedit_automint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "cdtime", oedit_cdtime, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "coinamount", oedit_coinamount, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "component", oedit_component, OLC_OBJECT, OLC_CF_EDITOR },	// deliberately before "compflags"
 	{ "compflags", oedit_compflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "containerflags", oedit_containerflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "contents", oedit_contents, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "cooldown", oedit_cooldown, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "corpseof", oedit_corpseof, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "currency", oedit_currency, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "custom", oedit_custom, OLC_OBJECT, OLC_CF_EDITOR },
@@ -837,8 +841,6 @@ const struct olc_command_data olc_data[] = {
 	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "poison", oedit_poison, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "potion", oedit_potion, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "potionscale", oedit_potionscale, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "recipe", oedit_recipe, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "requiresquest", oedit_requiresquest, OLC_OBJECT, OLC_CF_EDITOR },

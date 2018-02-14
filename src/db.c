@@ -1884,6 +1884,7 @@ const char *versions_list[] = {
 	"b5.17",
 	"b5.19",
 	"b5.20",
+	"b5.23",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2829,6 +2830,90 @@ void b5_20_canal_fix(void) {
 }
 
 
+// updates potions in player inventory
+PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
+	void check_delayed_load(char_data *ch);
+	obj_data *obj, *next_obj, *new;
+	int iter;
+	
+	check_delayed_load(ch);
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter)) && IS_POTION(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		if (IS_POTION(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+}
+
+
+// reloads and rescales all potions, and moves them from warehouse to einv if possible
+void b5_23_potion_update(void) {
+	void save_trading_post();
+	
+	struct empire_unique_storage *eus, *next_eus;
+	obj_data *obj, *next_obj, *new, *proto;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
+	
+	log("Applying b5.23 item update...");
+	
+	log(" - updating the object list...");
+	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+		if (IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - updating warehouse objects...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		LL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
+			if ((obj = eus->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+				if (proto->storage) {
+					// move to regular einv if now possible
+					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
+					remove_eus_entry(eus, emp);
+				}
+				else {	// otherwise replace with a fresh copy
+					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+					eus->obj = new;
+				}
+				
+				// either way the original is gone?
+				extract_obj(obj);
+			}
+		}
+	}
+	
+	log(" - updating trading post objects...");
+	LL_FOREACH(trading_list, tpd) {
+		if ((obj = tpd->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			tpd->obj = new;
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - updating player inventories...");
+	update_all_players(NULL, b5_23_player_potion_update);
+	
+	// ensure everything gets saved this way since we won't do this again
+	save_all_empires();
+	save_trading_post();
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3062,6 +3147,9 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.20")) {
 			log("Updating to b5.20...");
 			b5_20_canal_fix();
+		}
+		if (MATCH_VERSION("b5.23")) {
+			b5_23_potion_update();
 		}
 	}
 	

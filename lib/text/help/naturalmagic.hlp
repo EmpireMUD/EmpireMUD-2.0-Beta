@@ -47,7 +47,7 @@ abilities. This Greatness effect gets more powerful as your level goes up.
 
 The amount of Bonus-Healing added is a proportion of your Greatness: your total
 Greatness is added per 150 player levels, with a proportion of your Greatness
-for any potion under 150 levels. For example, if you are level 75, you gain
+for any portion under 150 levels. For example, if you are level 75, you gain
 half your Greatness. At level 150, it's your full Greatness. At level 300, it's
 2x Greatness.
 
