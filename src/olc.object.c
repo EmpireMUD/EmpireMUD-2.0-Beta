@@ -1844,8 +1844,8 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_POTION: {
-			sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TYPE(obj), NOTHING), GET_POTION_COOLDOWN_TYPE(obj), GET_POTION_COOLDOWN_TYPE(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)) : "no cooldown", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TIME(obj), 0), GET_POTION_COOLDOWN_TIME(obj), PLURAL(GET_POTION_COOLDOWN_TIME(obj)));
 			sprintf(buf + strlen(buf), "<%saffecttype\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_POTION_AFFECT(obj), NOTHING), GET_POTION_AFFECT(obj), GET_POTION_AFFECT(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(obj)) : "not custom");
+			sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TYPE(obj), NOTHING), GET_POTION_COOLDOWN_TYPE(obj), GET_POTION_COOLDOWN_TYPE(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)) : "no cooldown", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TIME(obj), 0), GET_POTION_COOLDOWN_TIME(obj), PLURAL(GET_POTION_COOLDOWN_TIME(obj)));
 			break;
 		}
 		case ITEM_POISON: {
