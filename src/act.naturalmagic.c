@@ -1116,6 +1116,8 @@ ACMD(do_purify) {
 
 
 ACMD(do_quaff) {
+	void scale_item_to_level(obj_data *obj, int level);
+	
 	obj_data *obj;
 	
 	one_argument(argument, arg);
@@ -1132,11 +1134,15 @@ ACMD(do_quaff) {
 	else if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && get_cooldown_time(ch, GET_POTION_COOLDOWN_TYPE(obj)) > 0) {
 		msg_to_char(ch, "You can't quaff that until your %s cooldown expires.\r\n", get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)));
 	}
-	else if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
-		/* check trigger */
-		return;
-	}
 	else {
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+			scale_item_to_level(obj, 1);	// just in case
+		}
+		
+		if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
+			return;	// check trigger last
+		}
+		
 		act("You quaff $p!", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
 

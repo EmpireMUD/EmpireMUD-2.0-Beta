@@ -1051,6 +1051,7 @@ void script_heal(void *thing, int type, char *argument) {
 	// now the real work
 	if (is_abbrev(what_arg, "health") || is_abbrev(what_arg, "hitpoints")) {
 		amount = (394 * level / 55.0 - 5580 / 11.0) * scale;
+		amount = MAX(30, amount);
 		GET_HEALTH(victim) = MIN(GET_MAX_HEALTH(victim), GET_HEALTH(victim) + amount);
 		
 		if (GET_POS(victim) < POS_SLEEPING) {
@@ -1059,10 +1060,12 @@ void script_heal(void *thing, int type, char *argument) {
 	}
 	else if (is_abbrev(what_arg, "mana")) {
 		amount = (292 * level / 55.0 - 3940 / 11.0) * scale;
+		amount = MAX(40, amount);
 		GET_MANA(victim) = MIN(GET_MAX_MANA(victim), GET_MANA(victim) + amount);
 	}
 	else if (is_abbrev(what_arg, "moves")) {
 		amount = (37 * level / 11.0 - 1950 / 11.0) * scale;
+		amount = MAX(75, amount);
 		GET_MOVE(victim) = MIN(GET_MAX_MOVE(victim), GET_MOVE(victim) + amount);
 	}
 	else if (is_abbrev(what_arg, "dots")) {
