@@ -6,7 +6,7 @@ if !%arg%
   %send% %actor% Trap whom?
   halt
 end
-eval room %self.room%
+set room %self.room%
 eval target %%actor.char_target(%arg%)%%
 if !%target%
   %send% %actor% They're not here.
@@ -26,7 +26,7 @@ else
   %echoneither% %actor% %target% %actor.name% captures %target.name% with %self.shortdesc%!
   * Essences have the same vnum as the mob
   %load% obj %target.vnum% %actor% inv
-  eval obj %actor.inventory%
+  set obj %actor.inventory%
   %send% %actor% You receive %obj.shortdesc%!
   %purge% %target%
   %purge% %self%
@@ -118,7 +118,7 @@ done
 Elemental Rift spawn~
 0 n 100
 ~
-eval room %instance.location%
+set room %instance.location%
 if !%room%
   halt
 end
@@ -146,11 +146,11 @@ Elemental Death~
 if %instance.start%
   %at% %instance.start% %load% obj 12610
 end
-eval obj %self.inventory%
+set obj %self.inventory%
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   %purge% %obj%
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 ~
 #12607
@@ -204,16 +204,16 @@ Delayed Completer~
 Water elemental: Struggle~
 0 c 0
 struggle~
-eval break_free_at 1
+set break_free_at 1
 if !%actor.affect(12604)%
   return 0
   halt
 end
 if !%actor.varexists(struggle_counter)%
-  eval struggle_counter 0
+  set struggle_counter 0
   remote struggle_counter %actor.id%
 else
-  eval struggle_counter %actor.struggle_counter%
+  set struggle_counter %actor.struggle_counter%
 end
 eval struggle_counter %struggle_counter% + 1
 if %struggle_counter% >= %break_free_at%

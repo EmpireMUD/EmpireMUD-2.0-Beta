@@ -37,12 +37,12 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   halt
 end
 return 0
-eval difficulty %self.difficulty%
-eval room %self.room%
+set difficulty %self.difficulty%
+set room %self.room%
 %load% mob 10201
-eval mob %room.people%
+set mob %room.people%
 remote difficulty %mob.id%
-eval mob_diff %difficulty%
+set mob_diff %difficulty%
 if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
   eval mob_diff %mob_diff% + 1
 end
@@ -60,10 +60,10 @@ elseif %mob_diff% == 4
   nop %mob.add_mob_flag(GROUP)%
 end
 %scale% %mob% %mob.level%
-eval self_name %self.alias%
-eval self_name %self_name.car%
-eval mob_name %mob.alias%
-eval mob_name %mob_name.car%
+set self_name %self.alias%
+set self_name %self_name.car%
+set mob_name %mob.alias%
+set mob_name %mob_name.car%
 %echo% As %self_name% dies, %mob_name% steps into the nest!
 ~
 #10206
@@ -97,16 +97,16 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   halt
 end
 return 0
-eval difficulty %self.difficulty%
-eval room %self.room%
-eval mob_diff %difficulty%
+set difficulty %self.difficulty%
+set room %self.room%
+set mob_diff %difficulty%
 if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
   eval mob_diff %mob_diff% + 1
 end
-eval mob_num 10202
+set mob_num 10202
 while %mob_num% <= 10203
   %load% mob %mob_num%
-  eval mob %room.people%
+  set mob %room.people%
   remote difficulty %mob.id%
   dg_affect %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
@@ -122,8 +122,8 @@ while %mob_num% <= 10203
     nop %mob.add_mob_flag(GROUP)%
   end
   %scale% %mob% %mob.level%
-  eval self_name %self.alias%
-  eval self_name %self_name.car%
+  set self_name %self.alias%
+  set self_name %self_name.car%
   eval mob_num %mob_num% + 1
 done
 %echo% As %self_name% dies, Filks and Walts step into the nest!
@@ -145,23 +145,23 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
-eval room %self.room%
-eval ch %room.people%
-eval found 0
+set room %self.room%
+set ch %room.people%
+set found 0
 while %ch% && !%found%
   if (%ch.vnum% == 10203)
-    eval found 1
+    set found 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if !%found%
   return 0
-  eval difficulty %self.difficulty%
-  eval room %self.room%
+  set difficulty %self.difficulty%
+  set room %self.room%
   %load% mob 10204
-  eval mob %room.people%
+  set mob %room.people%
   remote difficulty %mob.id%
-  eval mob_diff %difficulty%
+  set mob_diff %difficulty%
   if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
     eval mob_diff %mob_diff% + 1
   end
@@ -178,11 +178,11 @@ if !%found%
     nop %mob.add_mob_flag(HARD)%
     nop %mob.add_mob_flag(GROUP)%
   end
-  eval self_name %self.alias%
+  set self_name %self.alias%
   %scale% %mob% %mob.level%
-  eval self_name %self_name.car%
-  eval mob_name %mob.alias%
-  eval mob_name %mob_name.car%
+  set self_name %self_name.car%
+  set mob_name %mob.alias%
+  set mob_name %mob_name.car%
   %echo% As %self_name% dies, %mob_name% steps into the nest!
 end
 ~
@@ -201,23 +201,23 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
-eval room %self.room%
-eval ch %room.people%
-eval found 0
+set room %self.room%
+set ch %room.people%
+set found 0
 while %ch% && !%found%
   if (%ch.vnum% == 10202)
-    eval found 1
+    set found 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if !%found%
   return 0
-  eval difficulty %self.difficulty%
-  eval room %self.room%
+  set difficulty %self.difficulty%
+  set room %self.room%
   %load% mob 10204
-  eval mob %room.people%
+  set mob %room.people%
   remote difficulty %mob.id%
-  eval mob_diff %difficulty%
+  set mob_diff %difficulty%
   if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
     eval mob_diff %mob_diff% + 1
   end
@@ -235,10 +235,10 @@ if !%found%
     nop %mob.add_mob_flag(GROUP)%
   end
   %scale% %mob% %mob.level%
-  eval self_name %self.alias%
-  eval self_name %self_name.car%
-  eval mob_name %mob.alias%
-  eval mob_name %mob_name.car%
+  set self_name %self.alias%
+  set self_name %self_name.car%
+  set mob_name %mob.alias%
+  set mob_name %mob_name.car%
   %echo% As %self_name% dies, %mob_name% steps into the nest!
 end
 ~
@@ -271,12 +271,12 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   halt
 end
 return 0
-eval difficulty %self.difficulty%
-eval room %self.room%
+set difficulty %self.difficulty%
+set room %self.room%
 %load% mob 10205
-eval mob %room.people%
+set mob %room.people%
 remote difficulty %mob.id%
-eval mob_diff %difficulty%
+set mob_diff %difficulty%
 if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
   eval mob_diff %mob_diff% + 1
 end
@@ -294,10 +294,10 @@ elseif %mob_diff% == 4
   nop %mob.add_mob_flag(GROUP)%
 end
 %scale% %mob% %mob.level%
-eval self_name %self.alias%
-eval self_name %self_name.car%
-eval mob_name %mob.alias%
-eval mob_name %mob_name.car%
+set self_name %self.alias%
+set self_name %self_name.car%
+set mob_name %mob.alias%
+set mob_name %mob_name.car%
 %echo% As %self_name% dies, %mob_name% steps into the nest!
 ~
 #10214
@@ -327,14 +327,14 @@ Filks Respawn~
 if (%self.fighting% || %self.disabled%)
   halt
 end
-eval room_var %self.room%
-eval ch %room_var.people%
-eval found 0
+set room_var %self.room%
+set ch %room_var.people%
+set found 0
 while %ch% && !%found%
   if (%ch.is_npc% && %ch.vnum% == 10203)
-    eval found 1
+    set found 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if (!%found%)
   %load% mob 10203
@@ -353,14 +353,14 @@ Walts Respawn~
 if (%self.fighting% || %self.disabled%)
   halt
 end
-eval room %self.room%
-eval ch %room.people%
-eval found 0
+set room %self.room%
+set ch %room.people%
+set found 0
 while (%ch% && !%found%)
   if (%ch.vnum% == 10202)
-    eval found 1
+    set found 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if (!%found%)
   %load% mob 10202
@@ -378,27 +378,27 @@ Filks and Walts respawn~
 set filks_present 0
 set walts_present 0
 set fighting 0
-eval person %room.people%
+set person %room.people%
 while %person%
   if %person.vnum% == 10202
     if %person.fighting% || %person.mob_flagged(UNDEAD)%
       set fighting 1
     end
-    eval goblin %person%
+    set goblin %person%
     set filks_present 1
   elseif %person.vnum% == 10203
     if %person.fighting% || %person.mob_flagged(UNDEAD)%
       set fighting 1
     end
     set walts_present 1
-    eval goblin %person%
+    set goblin %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %filks_present% && !%walts_present% && !%fighting%
   * Respawn Walts
   %load% mob 10203
-  eval new_mob %room.people%
+  set new_mob %room.people%
   if %new_mob.vnum% == 10203
     %echo% %new_mob.name% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
@@ -406,16 +406,16 @@ if %filks_present% && !%walts_present% && !%fighting%
 elseif %walts_present% && !%filks_present% && !%fighting%
   * Respawn Filks
   %load% mob 10202
-  eval new_mob %room.people%
+  set new_mob %room.people%
   if %new_mob.vnum% == 10202
     %echo% %new_mob.name% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
   end
 end
 if %new_mob%
-  eval difficulty %goblin.difficulty%
+  set difficulty %goblin.difficulty%
   remote difficulty %new_mob.id%
-  eval mob_diff %difficulty%
+  set mob_diff %difficulty%
   if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
     eval mob_diff %mob_diff% + 1
   end
@@ -511,8 +511,8 @@ if (%actor.position% != Standing)
 end
 %load% m 10227
 %echo% The enchanted tumbleweed comes to life!
-eval room_var %self.room%
-eval mob %room_var.people%
+set room_var %self.room%
+set mob %room_var.people%
 if (%mob% && %mob.vnum% == 10227)
   nop %mob.unlink_instance%
 end
@@ -523,9 +523,9 @@ Gardener passive~
 0 bw 15
 ~
 if %self.varexists(msg_pos)%
-  eval msg_pos %self.msg_pos%
+  set msg_pos %self.msg_pos%
 else
-  eval msg_pos 0
+  set msg_pos 0
 end
 eval msg_pos %msg_pos% + 1
 switch %msg_pos%
@@ -543,7 +543,7 @@ switch %msg_pos%
   break
 done
 if %msg_pos% >= 4
-  eval msg_pos 0
+  set msg_pos 0
 end
 remote msg_pos %self.id%
 ~
@@ -559,12 +559,12 @@ if !(tokens /= %arg%)
   return 0
   halt
 end
-eval copper_token %actor.inventory(10234)%
+set copper_token %actor.inventory(10234)%
 if !%copper_token
   %send% %actor% You require a copper grain token to combine.
   halt
 end
-eval wooden_token %actor.inventory(10233)%
+set wooden_token %actor.inventory(10233)%
 if !%wooden_token%
   %send% %actor% You require a wooden fruit token to combine.
   halt
@@ -758,8 +758,8 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-eval room_var %self.room%
-eval mob %room_var.people%
+set room_var %self.room%
+set mob %room_var.people%
 %send% %actor% You use %self.shortdesc% and %mob.name% appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
 if (%mob% && %mob.vnum% == %self.val0%)
@@ -795,20 +795,20 @@ return 1
 Hint to 10252~
 2 c 0
 track~
-eval tofind 10252
+set tofind 10252
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
   return 0
   halt
 end
 * It's never south -- that's always backtrack
-eval north %room.north(room)%
-eval east %room.east(room)%
-eval west %room.west(room)%
-eval northeast %room.northeast(room)%
-eval northwest %room.northwest(room)%
-eval southeast %room.southeast(room)%
-eval southwest %room.southwest(room)%
+set north %room.north(room)%
+set east %room.east(room)%
+set west %room.west(room)%
+set northeast %room.northeast(room)%
+set northwest %room.northwest(room)%
+set southeast %room.southeast(room)%
+set southwest %room.southwest(room)%
 if (%north% && %north.template% == %tofind%)
   %send% %actor% You sense a trail to the north!
   return 1
@@ -836,20 +836,20 @@ end
 Hint to 10253~
 2 c 0
 track~
-eval tofind 10253
+set tofind 10253
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
   return 0
   halt
 end
 * It's never south -- that's always backtrack
-eval north %room.north(room)%
-eval east %room.east(room)%
-eval west %room.west(room)%
-eval northeast %room.northeast(room)%
-eval northwest %room.northwest(room)%
-eval southeast %room.southeast(room)%
-eval southwest %room.southwest(room)%
+set north %room.north(room)%
+set east %room.east(room)%
+set west %room.west(room)%
+set northeast %room.northeast(room)%
+set northwest %room.northwest(room)%
+set southeast %room.southeast(room)%
+set southwest %room.southwest(room)%
 if (%north% && %north.template% == %tofind%)
   %send% %actor% You sense a trail to the north!
   return 1
@@ -877,20 +877,20 @@ end
 Hint to 10254~
 2 c 0
 track~
-eval tofind 10254
+set tofind 10254
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
   return 0
   halt
 end
 * It's never south -- that's always backtrack
-eval north %room.north(room)%
-eval east %room.east(room)%
-eval west %room.west(room)%
-eval northeast %room.northeast(room)%
-eval northwest %room.northwest(room)%
-eval southeast %room.southeast(room)%
-eval southwest %room.southwest(room)%
+set north %room.north(room)%
+set east %room.east(room)%
+set west %room.west(room)%
+set northeast %room.northeast(room)%
+set northwest %room.northwest(room)%
+set southeast %room.southeast(room)%
+set southwest %room.southwest(room)%
 if (%north% && %north.template% == %tofind%)
   %send% %actor% You sense a trail to the north!
   return 1
@@ -918,20 +918,20 @@ end
 Hint to 10255~
 2 c 0
 track~
-eval tofind 10255
+set tofind 10255
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
   return 0
   halt
 end
 * It's never south -- that's always backtrack
-eval north %room.north(room)%
-eval east %room.east(room)%
-eval west %room.west(room)%
-eval northeast %room.northeast(room)%
-eval northwest %room.northwest(room)%
-eval southeast %room.southeast(room)%
-eval southwest %room.southwest(room)%
+set north %room.north(room)%
+set east %room.east(room)%
+set west %room.west(room)%
+set northeast %room.northeast(room)%
+set northwest %room.northwest(room)%
+set southeast %room.southeast(room)%
+set southwest %room.southwest(room)%
 if (%north% && %north.template% == %tofind%)
   %send% %actor% You sense a trail to the north!
   return 1

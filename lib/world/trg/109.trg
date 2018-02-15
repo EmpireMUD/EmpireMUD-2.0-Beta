@@ -2,14 +2,14 @@
 Colossal Dragon knight/thief random move~
 0 n 100
 ~
-eval room %self.room%
+set room %self.room%
 if (!%instance.location% || %room.template% != 10900)
   halt
 end
-eval room %instance.location%
+set room %instance.location%
 * Teleport out of the cave
 %echo% %self.name% vanishes!
-eval outside_dir %room.exit_dir%
+set outside_dir %room.exit_dir%
 eval outside %%room.%outside_dir%(room)%%
 mgoto %outside%
 %echo% %self.name% flees from the cave.
@@ -25,12 +25,12 @@ mmove
 Colossal Dragon knight/thief limit wander~
 0 i 100
 ~
-eval start_room %instance.location%
+set start_room %instance.location%
 if !%start_room%
   * No instance
   halt
 end
-eval room %self.room%
+set room %self.room%
 eval dist %%room.distance(%start_room%)%%
 if %dist%>30
   * Stop wandering
@@ -50,9 +50,9 @@ end
 Dragon loot load boe/bop~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if !%actor%
-  eval actor %self.worn_by%
+  set actor %self.worn_by%
 end
 if !%actor%
   halt
@@ -81,20 +81,20 @@ end
 Colossal red dragon combat + enrage~
 0 k 100
 ~
-eval soft_enrage_rounds 140
-eval hard_enrage_rounds 300
+set soft_enrage_rounds 140
+set hard_enrage_rounds 300
 * Count attacks until enrage
-eval enrage_counter 0
-eval enraged 0
+set enrage_counter 0
+set enraged 0
 if %self.varexists(enrage_counter)%
-  eval enrage_counter %self.enrage_counter%
+  set enrage_counter %self.enrage_counter%
 end
 eval enrage_counter %enrage_counter%+1
 if %enrage_counter% > %soft_enrage_rounds%
   * Start increasing damage
-  eval enraged 1
+  set enraged 1
   if %enrage_counter% > %hard_enrage_rounds%
-    eval enraged 2
+    set enraged 2
   end
   * Enrage messages
   if %enrage_counter% == %soft_enrage_rounds%
@@ -150,7 +150,7 @@ switch %random.4%
   break
   * Rock stun on random enemy
   case 4
-    eval target %random.enemy%
+    set target %random.enemy%
     if (%target%)
       %send% %target% &r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&0
       %echoaround% %target% %self.name% hurls a rock at %target.name% with %self.hisher% tail, stunning %target.himher% momentarily!
@@ -165,7 +165,7 @@ Colossal crimson dragon death~
 0 f 100
 ~
 * Make the other NPC no longer killable
-eval mob %instance.mob(10901)%
+set mob %instance.mob(10901)%
 if %mob%
   dg_affect %mob% !ATTACK on -1
 end
@@ -234,20 +234,20 @@ return 1
 Sir Vivor Combat + Enrage~
 0 k 100
 ~
-eval soft_enrage_rounds 140
-eval hard_enrage_rounds 300
+set soft_enrage_rounds 140
+set hard_enrage_rounds 300
 * Count attacks until enrage
-eval enrage_counter 0
-eval enraged 0
+set enrage_counter 0
+set enraged 0
 if %self.varexists(enrage_counter)%
-  eval enrage_counter %self.enrage_counter%
+  set enrage_counter %self.enrage_counter%
 end
 eval enrage_counter %enrage_counter%+1
 if %enrage_counter% > %soft_enrage_rounds%
   * Start increasing damage
-  eval enraged 1
+  set enraged 1
   if %enrage_counter% > %hard_enrage_rounds%
-    eval enraged 2
+    set enraged 2
   end
   * Enrage messages
   if %enrage_counter% == %soft_enrage_rounds%
@@ -289,14 +289,14 @@ end
 switch %random.4%
   * Disarm dps (whoever has most tohit)
   case 1
-    eval target %random.enemy%
-    eval person %room.people%
+    set target %random.enemy%
+    set person %room.people%
     while %person%
       eval check %%self.is_enemy(%person%)%%
       if (%person.tohit% > %target.tohit%) && %check% && !%person.aff_flagged(DISARM)%
-        eval target %person%
+        set target %person%
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
     if %target%
       if !%target.aff_flagged(DISARM)%
@@ -314,7 +314,7 @@ switch %random.4%
   break
   * Stun on tank
   case 3
-    eval target %actor%
+    set target %actor%
     %send% %target% %self.name% trips you and bashes you with the pommel of %self.hisher% sword, stunning you!
     %echoaround% %target% %self.name% trips %target.name% and bashes %target.himher% with the pommel of %self.hisher% sword, stunning %target.himher% momentarily!
     dg_affect %target% HARD-STUNNED on 15
@@ -322,14 +322,14 @@ switch %random.4%
   break
   * Blind on healer (whoever has the most max mana at least)
   case 4
-    eval target %random.enemy%
-    eval person %room.people%
+    set target %random.enemy%
+    set person %room.people%
     while %person%
       eval check %%self.is_enemy(%person%)%%
       if (%person.mana% > %target.mana%) && %check% && !%person.aff_flagged(BLIND)%
-        eval target %person%
+        set target %person%
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
     if (%target%)
       if !%target.aff_flagged(BLIND)%
@@ -344,7 +344,7 @@ Sir Vivor death~
 0 f 100
 ~
 * Make the other NPC no longer killable
-eval mob %instance.mob(10900)%
+set mob %instance.mob(10900)%
 if %mob%
   dg_affect %mob% !ATTACK on -1
 end
@@ -425,7 +425,7 @@ if %actor.on_quest(10902)%
   end
   %send% %actor% You pick %self.name%'s pocket...
   %load% obj 10945 %actor% inv
-  eval item %actor.inventory()%
+  set item %actor.inventory()%
   %send% %actor% You find %item.shortdesc%!
   return 0
   halt
@@ -449,7 +449,7 @@ return 0
 Detach must-fight~
 2 v 100
 ~
-eval dragon %instance.mob(10900)%
+set dragon %instance.mob(10900)%
 if %dragon%
   detach 10919 %dragon.id%
 end
@@ -461,12 +461,12 @@ Dragon quest spawn shopkeeper~
 if %questvnum% < 10900 || %questvnum% > 10902
   halt
 end
-eval person %room.people%
+set person %room.people%
 while %person%
   if %person.is_npc% && %person.vnum% == 10903
     halt
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 * Spawn the shopkeeper
 %load% m 10903

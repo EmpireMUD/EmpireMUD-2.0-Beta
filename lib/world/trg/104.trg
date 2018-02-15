@@ -5,7 +5,7 @@ Hamlet guard intro speech~
 if (%direction% != south)
   halt
 end
-eval intro_running 1
+set intro_running 1
 global intro_running
 wait 5
 say Oh, thank goodness, a hero!
@@ -23,7 +23,7 @@ wait 3 sec
 say To the North is Main Street. It's covered in demons, led by an actual Infernomancer. Looks to be a bit more of a challenge.
 wait 3 sec
 say Lastly, Northeast is Temple Street, overrun by the Necromancers and their risen minions. You'll need a group for that lot!
-eval intro_running 0
+set intro_running 0
 global intro_running
 ~
 #10401
@@ -40,14 +40,14 @@ Market Street trash spawner~
 1 n 100
 ~
 * Ensure no mobs here
-eval room_var %self.room%
-eval ch %room_var.people%
-eval found 0
+set room_var %self.room%
+set ch %room_var.people%
+set found 0
 while %ch% && !%found%
   if (%ch.is_npc%)
     eval found %found% + 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if (%found% == 0)
   switch %random.3%
@@ -70,14 +70,14 @@ Main Street trash spawner~
 1 n 100
 ~
 * Ensure no mobs here
-eval room_var %self.room%
-eval ch %room_var.people%
-eval found 0
+set room_var %self.room%
+set ch %room_var.people%
+set found 0
 while %ch% && !%found%
   if (%ch.is_npc%)
     eval found %found% + 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if (%found% == 0)
   switch %random.3%
@@ -99,14 +99,14 @@ Temple Street trash spawner~
 1 n 100
 ~
 * Ensure no mobs here
-eval room_var %self.room%
-eval ch %room_var.people%
-eval found 0
+set room_var %self.room%
+set ch %room_var.people%
+set found 0
 while %ch% && !%found%
   if (%ch.is_npc%)
     eval found %found% + 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if (%found% == 0)
   switch %random.3%
@@ -129,7 +129,7 @@ Mob block higher template id~
 0 s 100
 ~
 * One quick trick to get the target room
-eval room_var %self.room%
+set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
 eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
@@ -202,7 +202,7 @@ else
       %aoe% 100 physical
     break
     case 4
-      eval target %random.enemy%
+      set target %random.enemy%
       if (%target%)
         if %target.trigger_counterspell%
           %send% %target% %self.name% shoots a bolt of violet energy at you, but it breaks on your counterspell!
@@ -238,7 +238,7 @@ switch %random.2%
     end
   break
   case 2
-    eval target %random.enemy%
+    set target %random.enemy%
     if (%target%)
       %send% %target% %self.name% shoots a poisoned spine at you!
       %echoaround% %target% %self.name% shoots a poisoned spine at %target.name%!
@@ -276,7 +276,7 @@ else
       %aoe% 100 fire
     break
     case 3
-      eval target %random.enemy%
+      set target %random.enemy%
       if (%target%)
         if %target.trigger_counterspell%
           %send% %target% %self.name% hurls a flaming meteor at you, but it fizzles on your counterspell!
@@ -346,8 +346,8 @@ end
 %load% m %self.val0%
 %send% %actor% You use %self.shortdesc% and a new mount appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
-eval room_var %self.room%
-eval mob %room_var.people%
+set room_var %self.room%
+set mob %room_var.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end
@@ -414,22 +414,22 @@ done
 Dryleef purchase~
 0 c 0
 buy~
-eval vnum -1
+set vnum -1
 set named a thing
 if (!%arg%)
   %send% %actor% Type 'look sign' to see what's available.
   halt
 elseif war tent /= %arg%
-  eval vnum 10479
+  set vnum 10479
   set named a goblin war tent
 elseif message post /= %arg%
-  eval vnum 10480
+  set vnum 10480
   set named a goblin message post
 elseif lab tent /= %arg%
-  eval vnum 10481
+  set vnum 10481
   set named a goblin lab tent
 elseif dolmen stone /= %arg%
-  eval vnum 10482
+  set vnum 10482
   set named a goblin dolmen stone
 elseif ticket /= %arg% && %actor.has_item(18260)%
   * Fall through to adventurer guild quest command trigger
@@ -452,16 +452,16 @@ nop %actor.charge_coins(500)%
 Pimmin purchase~
 0 c 0
 buy~
-eval vnum -1
+set vnum -1
 set named a thing
 if (!%arg%)
   %send% %actor% Type 'look sign' to see what's available.
   halt
 elseif violet leopard shawl pattern /= %arg%
-  eval vnum 10473
+  set vnum 10473
   set named the violet leopard shawl pattern
 elseif wildfire gloves pattern /= %arg%
-  eval vnum 10474
+  set vnum 10474
   set named the wildfire gloves pattern
 else
   %send% %actor% They don't seem to sell '%arg%' here.
@@ -480,17 +480,17 @@ nop %actor.charge_coins(500)%
 Shivsper Purchase~
 0 c 0
 buy~
-eval vnum -1
+set vnum -1
 set named a thing
 set ratfur rat-fur cloak pattern
 if (!%arg%)
   %send% %actor% Type 'look sign' to see what's available.
   halt
 elseif %ratfur% /= %arg%
-  eval vnum 10475
+  set vnum 10475
   set named the rat-fur cloak pattern
 elseif wooden gauntlets pattern /= %arg%
-  eval vnum 10476
+  set vnum 10476
   set named the wooden gauntlets pattern
 else
   %send% %actor% They don't seem to sell '%arg%' here.
@@ -509,16 +509,16 @@ nop %actor.charge_coins(500)%
 Wargreyn buy~
 0 c 0
 buy~
-eval vnum -1
+set vnum -1
 set named a thing
 if (!%arg%)
   %send% %actor% Type 'look sign' to see what's available.
   halt
 elseif mesh cloak pattern /= %arg%
-  eval vnum 10477
+  set vnum 10477
   set named the mesh cloak pattern
 elseif heavy goblin gauntlets pattern /= %arg%
-  eval vnum 10478
+  set vnum 10478
   set named the heavy goblin gauntlets pattern
 else
   %send% %actor% They don't seem to sell '%arg%' here.

@@ -2,7 +2,7 @@
 No Portal Inside~
 1 n 100
 ~
-eval room %self.room%
+set room %self.room%
 if %room.template% == 11000
   * This object is inside the adventure
   %purge% %self%
@@ -14,7 +14,7 @@ end
 Add Nest Exit~
 2 n 100
 ~
-eval loc %instance.location%
+set loc %instance.location%
 if %loc%
   %door% %room% down room %loc.vnum%
 end
@@ -26,7 +26,7 @@ Smash / Steal Roc fight~
 eval healthprct (100 * %actor.health%) / %actor.maxhealth%
 if %healthprct% < 90
   * Destroy the egg
-  eval egg %actor.inventory(11053)%
+  set egg %actor.inventory(11053)%
   if %egg%
     %send% %actor% The fight with %self.name% destroys the stolen egg!
     %purge% %egg%
@@ -59,7 +59,7 @@ switch %random.4%
   break
   case 4
     %echo% %self.name% lets out a piercing screech!
-    eval ch %room.people%
+    set ch %room.people%
     while %ch%
       eval test %%self.is_enemy(%ch%)%%
       if %test%
@@ -77,7 +77,7 @@ Start Smash Quest~
 ~
 %load% mob 11000
 %load% obj 11021
-eval mob %room.people%
+set mob %room.people%
 %force% %mob% %aggro% %actor%
 ~
 #11006
@@ -93,8 +93,8 @@ Hatch/Protect Finisher~
 Cattails unclaimed decay~
 0 ab 100
 ~
-eval room %self.room%
-eval cycles_left 3
+set room %self.room%
+set cycles_left 3
 while %cycles_left% >= 0
   if (%self.room% != %room%) || %room.empire% || %room.crop% != zephyr cattails
     * We've moved or someone else harvested
@@ -137,7 +137,7 @@ Give seeds if no seeds or cattails~
 ~
 if !%actor.inventory(11008)% && !%actor.inventory(11009)%
   nop %actor.add_resources(11008, 1)%
-  eval item %actor.inventory()%
+  set item %actor.inventory()%
   %send% %actor% You find %item.shortdesc%.
 end
 ~
@@ -145,7 +145,7 @@ end
 Roc nest forage for trees~
 2 c 0
 forage~
-eval num 4
+set num 4
 %send% %actor% You forage around and find a large tree (x%num%)!
 %echoaround% %actor% %actor.name% forages around and finds a large tree (x%num%)
 eval give %%actor.add_resources(120, %num%)%%
@@ -156,29 +156,29 @@ detach 11009 %self.id%
 Scatter random corpses~
 0 b 50
 ~
-eval room %self.room%
+set room %self.room%
 eval distance %%room.distance(%instance.location%)%%
 if %distance% > 10
   mgoto %instance.location%
 end
-eval room %self.room%
-eval item %room.contents%
+set room %self.room%
+set item %room.contents%
 while %item%
   if %item.vnum% == 11022 || %item.vnum% == 11023
     * Already a corpse here
     halt
   end
-  eval item %item.next_in_list%
+  set item %item.next_in_list%
 done
 eval vnum (11022-1) + %random.2%
 %load% obj %vnum% %self.room%
-eval item %room.contents%
+set item %room.contents%
 %echo% You find %item.shortdesc% nearby!
 * Look for the corpses made variable
 if %self.varexists(corpses_made)%
   eval corpses_made %self.corpses_made% + 1
 else
-  eval corpses_made 1
+  set corpses_made 1
 end
 * Corpse limit
 if %corpses_made% >= 10
@@ -191,7 +191,7 @@ end
 Escape adventure and mmove~
 0 n 100
 ~
-eval room %self.room%
+set room %self.room%
 if (!%instance.location% || %room.template% != 11000)
   halt
 end
@@ -208,14 +208,14 @@ Roc Hatchling break egg on hatch~
 %echo% The egg begins to vibrate and crack...
 wait 1
 %echo% %self.name% hatches from the egg!
-eval room %self.room%
-eval obj %room.contents%
+set room %self.room%
+set obj %room.contents%
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   if %obj.vnum% == 11001
     %purge% %obj%
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 detach 11012 %self.id%
 ~
@@ -255,7 +255,7 @@ Stealth quest start~
 %force% %actor% down
 * Load pursuing roc (who leaves in trig 11058)
 %load% mob 11002
-eval mob %room.people%
+set mob %room.people%
 %force% %mob% mhunt %actor%
 * Alert region
 %regionecho% %instance.location% 10 An angry screech echoes across the land!
@@ -285,14 +285,14 @@ Delayed despawner remove roc egg~
 1 n 100
 ~
 wait 1
-eval room %self.room%
-eval obj %room.contents%
+set room %self.room%
+set obj %room.contents%
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   if %obj.vnum% == 11001
     %purge% %obj%
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 ~
 #11024
@@ -300,8 +300,8 @@ Combat Roc Death~
 0 f 100
 ~
 %load% mob 11001
-eval room %self.room%
-eval mob %room.people%
+set room %self.room%
+set mob %room.people%
 %echo% %mob.name% shows up just at the last second!
 ~
 #11025
@@ -341,7 +341,7 @@ otimer 24
 Clockwork Roc Interior~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -351,7 +351,7 @@ end
 if (!%inter.aft%)
   %door% %inter% aft add 11036
 end
-eval cage %inter.aft(room)%
+set cage %inter.aft(room)%
 if (%cage% && !%cage.down%)
   %door% %cage% down add 11037
 end
@@ -361,28 +361,28 @@ incredible reward replacer~
 1 n 100
 ~
 wait 1
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if %actor%
   * Roll for mount
-  eval percent_roll %random.100%
+  set percent_roll %random.100%
   if %percent_roll% <= 4
     * Minipet
-    eval vnum 11017
+    set vnum 11017
   else
     eval percent_roll %percent_roll% - 4
     if %percent_roll% <= 4
       * Land mount
-      eval vnum 11019
+      set vnum 11019
     else
       eval percent_roll %percent_roll% - 4
       if %percent_roll% <= 2
         * Sea mount
-        eval vnum 11020
+        set vnum 11020
       else
         eval percent_roll %percent_roll% - 2
         if %percent_roll% <= 2
           * Flying mount
-          eval vnum 11018
+          set vnum 11018
         else
           eval offset (%random.8%-1)*2
           eval vnum 11035 + %offset%
@@ -391,9 +391,9 @@ if %actor%
     end
   end
   if %self.level%
-    eval level %self.level%
+    set level %self.level%
   else
-    eval level 100
+    set level 100
   end
   %load% obj %vnum% %actor% inv %level%
   eval item %%actor.inventory(%vnum%)%%
@@ -413,24 +413,24 @@ end
 Stolen egg expiry~
 1 f 0
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if !%actor%
   return 1
   halt
 end
 if %actor.fighting%
   * If the egg timer expires: if the player is fighting, they lose the egg.
-  eval enemy %actor.fighting%
+  set enemy %actor.fighting%
   %send% %actor% The fight with %enemy.name% destroys the stolen egg!
   %purge% %self%
   halt
 else
   * Otherwise, spawn mob 11003, the shady thief.
   %load% mob 11003
-  eval room %actor.room%
-  eval mob %room.people%
+  set room %actor.room%
+  set mob %room.people%
   * Despawn the pursuing roc...
-  eval pursuer %instance.mob(11002)%
+  set pursuer %instance.mob(11002)%
   if %pursuer%
     %at% %pursuer.room% %echo% %self.name% flies away.
     %purge% %pursuer%

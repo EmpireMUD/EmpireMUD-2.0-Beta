@@ -5,7 +5,7 @@ Tavern Hideout Completion~
 if !%room.down(room)%
   * Add Secret Hidout
   %door% %room% down add 5510
-  eval hideout %room.down(room)%
+  set hideout %room.down(room)%
   if %hideout%
     * Close doors
     %door% %room% down flags ab
@@ -64,13 +64,13 @@ if !%basement%
   halt
 end
 * Add bedroom
-eval edir %room.bld_dir(east)%
+set edir %room.bld_dir(east)%
 eval bedroom %%basement.%edir%(room)%%
 if !%bedroom%
   %door% %basement% %edir% add 5601
 end
 * Add crypt
-eval sdir %room.bld_dir(south)%
+set sdir %room.bld_dir(south)%
 eval crypt %%basement.%sdir%(room)%%
 if !%crypt%
   %door% %basement% %sdir% add 5620
@@ -107,13 +107,13 @@ if !%basement%
   halt
 end
 * Add bedroom
-eval edir %room.bld_dir(east)%
+set edir %room.bld_dir(east)%
 eval bedroom %%basement.%edir%(room)%%
 if !%bedroom%
   %door% %basement% %edir% add 5601
 end
 * Add crypt
-eval sdir %room.bld_dir(south)%
+set sdir %room.bld_dir(south)%
 eval crypt %%basement.%sdir%(room)%%
 if !%crypt%
   %door% %basement% %sdir% add 5620

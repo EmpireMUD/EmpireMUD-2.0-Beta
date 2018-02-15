@@ -2,7 +2,7 @@
 Sun King combat~
 0 k 100
 ~
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 * Count combat script cycles until enrage
 * 1 cycle should be 30 seconds
 if %self.cooldown(18501)%
@@ -11,24 +11,24 @@ end
 nop %self.set_cooldown(18501, 30)%
 if %heroic_mode%
   * Start scaling up immediately, game over at 15 minutes
-  eval soft_enrage_cycles 1
-  eval hard_enrage_cycles 30
+  set soft_enrage_cycles 1
+  set hard_enrage_cycles 30
 else
   * Start scaling up after 5 minutes, game over at 20 minutes
-  eval soft_enrage_cycles 10
-  eval hard_enrage_cycles 40
+  set soft_enrage_cycles 10
+  set hard_enrage_cycles 40
 end
-eval enrage_counter 0
-eval enraged 0
+set enrage_counter 0
+set enraged 0
 if %self.varexists(enrage_counter)%
-  eval enrage_counter %self.enrage_counter%
+  set enrage_counter %self.enrage_counter%
 end
 eval enrage_counter %enrage_counter%+1
 if %enrage_counter% >= %soft_enrage_cycles%
   * Start increasing damage
-  eval enraged 1
+  set enraged 1
   if %enrage_counter% > %hard_enrage_cycles%
-    eval enraged 2
+    set enraged 2
   end
   * Enrage messages
   if %enrage_counter% == %soft_enrage_cycles%
@@ -92,31 +92,31 @@ switch %random.4%
   * Mana drain + spirit bomb
   case 3
     %echo% %self.name% starts drawing all the mana in the room to %self.himher%self...
-    eval cycles 4
-    eval amount 50
-    eval total_drained 0
+    set cycles 4
+    set amount 50
+    set total_drained 0
     if %heroic_mode%
-      eval amount 125
+      set amount 125
     end
     while %cycles%>0
       wait 5 sec
       eval cycles %cycles% - 1
       %echo% %self.name% draws more mana...
-      eval room %self.room%
-      eval person %room.people%
+      set room %self.room%
+      set person %room.people%
       while %person%
         if %person.is_pc%
-          eval actual_amount %amount%
-          eval mana_left %person.mana%
+          set actual_amount %amount%
+          set mana_left %person.mana%
           if %mana_left% < %amount%
-            eval actual_amount %mana_left%
+            set actual_amount %mana_left%
           end
           %send% %person% %self.name% drains %actual_amount% of your mana!
           eval total_drained %total_drained% + %actual_amount%
           eval do %%person.mana(-%actual_amount%)%%
           nop %do%
         end
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       done
     done
     %echo% %self.name% gathers the stolen mana together...
@@ -124,7 +124,7 @@ switch %random.4%
     if %heroic_mode%
       * This divisor is important; if this attack is too strong, increase it a bit
       if %damage_scale% < 100
-        eval damage_scale 100
+        set damage_scale 100
       end
       eval damage_scale %total_drained% / 2
       %send% %actor% &r%self.name% hurls the stolen mana at you as a huge energy blast, which sends you flying!
@@ -145,25 +145,25 @@ switch %random.4%
   * Power word stun
   case 4
     %echo% %self.name% raises %self.hisher% staff high and mutters an incantation...
-    eval interrupted 0
+    set interrupted 0
     wait 3 sec
     if %heroic_mode% && !%interrupted%
       * All enemies
-      eval room %self.room%
-      eval person %room.people%
-      eval multi_target 1
+      set room %self.room%
+      set person %room.people%
+      set multi_target 1
     elseif %heroic_mode% || !%interrupted%
       * Random enemy
-      eval person %random.enemy%
+      set person %random.enemy%
       if !%person%
-        eval person %actor%
+        set person %actor%
       end
-      eval multi_target 0
+      set multi_target 0
     else
       halt
     end
     %echo% %self.name% utters a word which causes ripples in the fabric of reality.
-    eval keep_going 1
+    set keep_going 1
     while %person% && %keep_going%
       eval test %%self.is_enemy(%person%)%%
       if %test%
@@ -178,9 +178,9 @@ switch %random.4%
         end
       end
       if !%multi_target%
-        eval keep_going 0
+        set keep_going 0
       else
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       end
     done
   break
@@ -194,8 +194,8 @@ if %self.cooldown(18501)%
   halt
 end
 nop %self.set_cooldown(18501, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
-eval attack %random.4%
+set heroic_mode %self.mob_flagged(GROUP)%
+set attack %random.4%
 switch %attack%
   case 1
     * Blade Dance
@@ -204,9 +204,9 @@ switch %attack%
     say I'll ssslash you all to ribbonsss!
     %echo% %self.name% starts swinging %self.hisher% blades in a graceful dance!
     if %heroic_mode%
-      eval cycles_left 5
+      set cycles_left 5
     else
-      eval cycles_left 4
+      set cycles_left 4
     end
     while %cycles_left% >= 1
       wait 3 sec
@@ -274,16 +274,16 @@ switch %attack%
     wait 3 sec
     if %heroic_mode%
       %echo% %self.name% suddenly splits into three copies!
-      eval times 2
+      set times 2
     else
       %echo% %self.name% suddenly splits in two!
-      eval times 1
+      set times 1
     end
     while %times% > 0
       %load% mob 18507 %self% %self.level%
       eval times %times% - 1
-      eval room %self.room%
-      eval summon %room.people%
+      set room %self.room%
+      set summon %room.people%
       if %summon.vnum% == 18507
         %force% %summon% %aggro% %actor%
       else
@@ -301,8 +301,8 @@ if %self.cooldown(18501)%
   halt
 end
 nop %self.set_cooldown(18501, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
-eval attack %random.4%
+set heroic_mode %self.mob_flagged(GROUP)%
+set attack %random.4%
 switch %attack%
   case 1
     * Blinding Flash
@@ -313,14 +313,14 @@ switch %attack%
     if %heroic_mode%
       %echo% &r%self.name%'s jeweled feathers flash brightly, blinding everyone!
       %aoe% 25 magical
-      eval room %self.room%
-      eval person %room.people%
+      set room %self.room%
+      set person %room.people%
       while %person%
         eval test %%self.is_enemy(%person%)%%
         if %test%
           dg_affect #18511 %person% BLIND on 10
         end
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       done
     else
       %send% %actor% &r%self.name%'s jeweled feathers flash brightly, blinding you!
@@ -349,14 +349,14 @@ switch %attack%
     * Boss: Also haste Quetzalcoatl for 30
     %echo% %self.name% flaps its wings hard, and a gale blows in from the west!
     %echo% Everyone's weapons are blown out of their hands!
-    eval room %self.room%
-    eval person %room.people%
+    set room %self.room%
+    set person %room.people%
     while %person%
       eval test %%self.is_enemy(%person%)%%
       if %test%
         dg_affect #18513 %person% DISARM on 15
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
     if %heroic_mode%
       %echo% %self.name% tumbles through the air faster than before!
@@ -369,18 +369,18 @@ switch %attack%
     * Hard: Quetzalcoatl is stunned for 10 seconds
     %echo% %self.name% produces a whistling hissing sound.
     %echo% Several snakes slither out of the undergrowth!
-    eval room %self.room%
-    eval person %room.people%
+    set room %self.room%
+    set person %room.people%
     while %person%
       eval test %%self.is_enemy(%person%)%%
       if %test%
         %load% mob 18506
-        eval summon %room.people%
+        set summon %room.people%
         if %summon.vnum% == 18506
           %force% %summon% %aggro% %person%
         end
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
     if !%heroic_mode%
       dg_affect %self% STUNNED on 10
@@ -408,11 +408,11 @@ switch %random.3%
       %echo% Green light begins to gather within %self.name%'s mouth...
     end
     wait 5
-    eval target %random.enemy%
+    set target %random.enemy%
     if !%target%
       * Blind?
       if %random.2% == 2
-        eval target %actor%
+        set target %actor%
       else
         %echo% %self.name% shoots a bolt of crackling emerald light, but misses completely.
         halt
@@ -471,7 +471,7 @@ if %actor.is_npc%
 end
 context %instance.id%
 * One quick trick to get the target room
-eval room_var %self%
+set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
 eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
@@ -481,9 +481,9 @@ if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
 end
 return 0
 * Trap triggered
-eval trap_running 1
+set trap_running 1
 global trap_running
-eval last_trap_command 0
+set last_trap_command 0
 remote last_trap_command %actor.id%
 %echoaround% %actor% %actor.name% starts walking %direction%...
 %echo% You hear a quiet click...
@@ -491,7 +491,7 @@ wait 2 sec
 %send% %actor% There is a grinding sound from the floor beneath your feet!
 %echoaround% %actor% There is a grinding sound from the floor beneath %actor.name%'s feet!
 wait 2 sec
-eval trap_running 0
+set trap_running 0
 global trap_running
 if %actor.last_trap_command% == jump && %actor.position% == Standing
   %send% %actor% You leap forward as the floor drops out from beneath your feet!
@@ -513,16 +513,16 @@ else
   %force% %actor% look
 end
 * Send NPC followers after player
-eval person %room_var.people%
+set person %room_var.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
     %echoaround% %person% %person.name% follows %actor.name%.
     %teleport% %person% %actor.room%
     %send% %actor% %person.name% follows you.
     %echoaround% %actor% %person.name% follows %actor.name%.
   end
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #18505
@@ -535,9 +535,9 @@ if %actor.is_npc%
 end
 context %instance.id%
 * One quick trick to get the target room
-eval room_var %self%
+set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
+set to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   return 1
@@ -545,9 +545,9 @@ if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
 end
 return 0
 * Trap triggered
-eval trap_running 1
+set trap_running 1
 global trap_running
-eval last_trap_command 0
+set last_trap_command 0
 remote last_trap_command %actor.id%
 %echoaround% %actor% %actor.name% starts walking %direction%...
 %echo% You hear a quiet click...
@@ -555,7 +555,7 @@ wait 2 sec
 %send% %actor% There is a metallic 'shing' from the ceiling!
 %echoaround% %actor% There is a metallic 'shing' from the ceiling above %actor.name%!
 wait 2 sec
-eval trap_running 0
+set trap_running 0
 global trap_running
 if %actor.last_trap_command% == duck && %actor.position% == Standing
   %send% %actor% You hit the floor just as a blade slices through the space you were just in!
@@ -581,16 +581,16 @@ else
   end
 end
 * Send NPC followers after player
-eval person %room_var.people%
+set person %room_var.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
     %echoaround% %person% %person.name% follows %actor.name%.
     %teleport% %person% %actor.room%
     %send% %actor% %person.name% follows you.
     %echoaround% %actor% %person.name% follows %actor.name%.
   end
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #18506
@@ -603,7 +603,7 @@ if %actor.is_npc%
 end
 context %instance.id%
 * One quick trick to get the target room
-eval room_var %self%
+set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
 eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
@@ -613,9 +613,9 @@ if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
 end
 return 0
 * Trap triggered
-eval trap_running 1
+set trap_running 1
 global trap_running
-eval last_trap_command 0
+set last_trap_command 0
 remote last_trap_command %actor.id%
 %echoaround% %actor% %actor.name% starts walking %direction%...
 %echo% You hear a quiet click...
@@ -623,7 +623,7 @@ wait 2 sec
 %send% %actor% There is a quiet swish behind you!
 %echoaround% %actor% A dart flies past, barely missing %actor.name%!
 wait 2 sec
-eval trap_running 0
+set trap_running 0
 global trap_running
 if %actor.last_trap_command% == run && %actor.position% == Standing
   %send% %actor% You dash forward, barely avoiding a hail of darts from the wall!
@@ -648,16 +648,16 @@ else
   end
 end
 * Send NPC followers after player
-eval person %room_var.people%
+set person %room_var.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
     %echoaround% %person% %person.name% follows %actor.name%.
     %teleport% %person% %actor.room%
     %send% %actor% %person.name% follows you.
     %echoaround% %actor% %person.name% follows %actor.name%.
   end
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #18507
@@ -700,21 +700,21 @@ end
 Idol-take open doors~
 1 g 100
 ~
-eval room %self.room%
+set room %self.room%
 if %room.template% != 18510
   return 1
   halt
 end
 return 0
 * Make sure the boss isn't still here, guarding the key
-eval person %room.people%
+set person %room.people%
 while %person%
   if %person.is_npc% && %person.vnum% >= 18500 && %person.vnum% <= 18502
     %send% %actor% %person.name% won't let you near %self.shortdesc%!
     return 0
     halt
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 * Take idol, open doors, message
 context %instance.id%
@@ -722,14 +722,14 @@ if %doors_open%
   return 1
   halt
 end
-eval doors_open 1
+set doors_open 1
 global doors_open
 %send% %actor% As you remove the idol from the pedestal, there is a loud, mechanical grinding sound!
 %echoaround% %actor% As %actor.name% removes the idol from the pedestal, there is a loud, mechanical grinding sound!
 %load% obj 18510
 %echo% A secret door opens up nearby!
-eval door_room i18504
-eval new_room i18511
+set door_room i18504
+set new_room i18511
 if %door_room% && %new_room%
   %door% %door_room% east room %new_room%
   %echo% A new door has opened somewhere else in the temple!
@@ -744,9 +744,9 @@ Randomly assign jungle temple traps~
 context %instance.id%
 * Pick and attach a random trap
 if %random.10% == 10
-  eval rand 0
+  set rand 0
 else
-  eval rand %random.3%
+  set rand %random.3%
 end
 switch %rand%
   case 1
@@ -820,7 +820,7 @@ Mob block higher template id~
 0 s 100
 ~
 * One quick trick to get the target room
-eval room_var %self.room%
+set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
 eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
@@ -846,21 +846,21 @@ if normal /= %arg%
   halt
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
-  eval difficulty 2
+  set difficulty 2
 elseif group /= %arg%
   %send% %actor% You can't set this adventure to that difficulty...
   return 1
   halt
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  eval difficulty 4
+  set difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
   return 1
 end
 * Clear existing difficulty flags and set new ones.
-eval vnum 18500
+set vnum 18500
 while %vnum% <= 18502
   eval mob %%instance.mob(%vnum%)%%
   if !%mob%
@@ -891,18 +891,18 @@ else
 end
 %echo% There is a brilliant burst of emerald-green light, which fades to an omnipresent eerie glow...
 %echo% The door slowly grinds open, revealing a dimly lit gallery beyond.
-eval newroom i18502
+set newroom i18502
 %at% %newroom% %load% obj 18508
-eval exitroom i18500
+set exitroom i18500
 if %exitroom%
   %door% %exitroom% north room %newroom%
 end
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   %teleport% %person% %newroom%
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #18515
@@ -925,10 +925,10 @@ return 0
 Jungle Temple boss death - drop tokens~
 0 f 100
 ~
-eval var_name jungletemple_tokens
+set var_name jungletemple_tokens
 * Tokens for everyone
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 while %person%
   if %person.is_pc%
     * You get a token, and you get a token, and YOU get a token!
@@ -941,7 +941,7 @@ while %person%
   elseif %person.vnum% == 18507
     %purge% %person% $n vanishes.
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %self.vnum% == 18500
   %adventurecomplete%
@@ -967,36 +967,36 @@ done
 Jungle temple: cleared temple interior setup~
 2 o 100
 ~
-eval room %self%
+set room %self%
 %door% %room% down add 18502
-eval room1 %room.down(room)%
+set room1 %room.down(room)%
 %door% %room1% north add 18503
-eval room2 %room1.north(room)%
+set room2 %room1.north(room)%
 %door% %room2% north add 18504
-eval room3 %room2.north(room)%
+set room3 %room2.north(room)%
 %door% %room3% north add 18505
-eval room4 %room3.north(room)%
+set room4 %room3.north(room)%
 %door% %room4% east add 18506
-eval room5 %room4.east(room)%
+set room5 %room4.east(room)%
 %door% %room5% east add 18504
-eval room6 %room5.east(room)%
+set room6 %room5.east(room)%
 %door% %room6% east add 18507
-eval room7 %room6.east(room)%
+set room7 %room6.east(room)%
 %door% %room7% east add 18508
 ~
 #18522
 Jungle Temple adventure cleanup building replacer~
 2 e 100
 ~
-eval item %room.contents%
+set item %room.contents%
 while %item%
   if %item.vnum% == 18502
-    eval instance_cleared 1
+    set instance_cleared 1
     %purge% %item%
   end
-  eval item %item.next_in_list%
+  set item %item.next_in_list%
 done
-eval dir %room.exit_dir%
+set dir %room.exit_dir%
 if %instance_cleared%
   if %dir%
     %build% %room% 18501 %dir%
@@ -1026,52 +1026,52 @@ end
 Boss loot replacer~
 1 n 100
 ~
-eval pet 18515
-eval land_mount 18512
-eval sea_mount 18513
-eval sky_mount 18514
-eval morpher 18516
-eval token_item 18542
-eval actor %self.carried_by%
+set pet 18515
+set land_mount 18512
+set sea_mount 18513
+set sky_mount 18514
+set morpher 18516
+set token_item 18542
+set actor %self.carried_by%
 if %actor%
   if %actor.mob_flagged(GROUP)%
     * Roll for mount
-    eval percent_roll %random.100%
+    set percent_roll %random.100%
     if %percent_roll% <= 2
       * Minipet
-      eval vnum %pet%
+      set vnum %pet%
     else
       eval percent_roll %percent_roll% - 2
       if %percent_roll% <= 2
         * Land mount
-        eval vnum %land_mount%
+        set vnum %land_mount%
       else
         eval percent_roll %percent_roll% - 2
         if %percent_roll% <= 2
           * Sea mount
-          eval vnum %sea_mount%
+          set vnum %sea_mount%
         else
           eval percent_roll %percent_roll% - 2
           if %percent_roll% <= 1
             * Flying mount
-            eval vnum %sky_mount%
+            set vnum %sky_mount%
           else
             eval percent_roll %percent_roll% - 1
             if %percent_roll% <= 1
               * Morpher
-              eval vnum %morpher%
+              set vnum %morpher%
             else
               * Token
-              eval vnum %token_item%
+              set vnum %token_item%
             end
           end
         end
       end
     end
     if %self.level%
-      eval level %self.level%
+      set level %self.level%
     else
-      eval level 100
+      set level 100
     end
     %load% obj %vnum% %actor% inv %level%
     eval item %%actor.inventory(%vnum%)%%

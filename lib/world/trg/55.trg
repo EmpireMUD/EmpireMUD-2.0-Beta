@@ -22,7 +22,7 @@ if %actor.has_item(5511)%
   halt
 end
 %load% obj 5511 %actor% inv
-eval item %actor.inventory(5511)%
+set item %actor.inventory(5511)%
 %send% %actor% You pick up %item.shortdesc%. Reading this would surely start you on the path of High Sorcery.
 %echoaround% %actor% %actor.name% takes %item.shortdesc%.
 ~

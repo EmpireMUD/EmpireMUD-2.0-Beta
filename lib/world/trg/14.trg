@@ -6,7 +6,7 @@ if !%actor.on_quest(1400)%
   return 0
   halt
 end
-eval room %actor.room%
+set room %actor.room%
 if !%room.function(ALCHEMIST)%
   return 0
   halt
@@ -54,7 +54,7 @@ if !%actor.on_quest(1404)%
   return 0
   halt
 end
-eval room %actor.room%
+set room %actor.room%
 if !%room.function(LIBRARY)%
   return 0
   halt
@@ -93,10 +93,10 @@ Experimental Paint consume~
 * Does not block use
 return 1
 if !%actor.varexists(painting_level)%
-  eval painting_level 0
+  set painting_level 0
   remote painting_level %actor.id%
 end
-eval painting_level %actor.painting_level%
+set painting_level %actor.painting_level%
 if %painting_level% < 2
   * Random color
   eval new_color 1 + %random.12%
@@ -105,7 +105,7 @@ if %painting_level% < 2
   remote painting_level %actor.id%
 else
   * Blue
-  eval new_color 1
+  set new_color 1
   * Quest can be completed
   %quest% %actor% trigger 1402
 end

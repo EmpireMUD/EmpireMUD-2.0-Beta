@@ -80,8 +80,8 @@ Swamp Hag reward~
 0 f 100
 ~
 %adventurecomplete%
-eval room_var %self.room%
-eval ch %room_var.people%
+set room_var %self.room%
+set ch %room_var.people%
 while %ch%
   eval test %%ch.is_ally(%actor%)%%
   if %ch.is_pc% && %test%
@@ -97,7 +97,7 @@ while %ch%
       %ch.gain_skill(Vampire,1)%
     end
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 ~
 #10104
@@ -160,16 +160,16 @@ else
     break
     case 3
       %echo% The fire envelops Jorr and then shoots out in all directions, burning everyone!
-      eval room_var %self.room%
-      eval ch %room_var.people%
+      set room_var %self.room%
+      set ch %room_var.people%
       while %ch%
-        eval next_ch %ch.next_in_room%
+        set next_ch %ch.next_in_room%
         eval test %%self.is_enemy(%ch%)%%
         if %test%
           %dot% %ch% 50 10 fire
           %damage% %ch% 30 fire
         end
-        eval ch %next_ch%
+        set ch %next_ch%
       done
     break
   done
@@ -210,8 +210,8 @@ Liza the Hound combat~
 wait 10
 switch %random.3%
   case 1
-    eval room_var %self.room%
-    eval ch %room_var.people%
+    set room_var %self.room%
+    set ch %room_var.people%
     while %ch%
       eval test %%self.is_enemy(%ch%)%%
       if %test% && %ch.maxmana% > %actor.maxmana%
@@ -220,7 +220,7 @@ switch %random.3%
         %aggro% %ch%
         halt
       end
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
   break
   case 2
@@ -304,20 +304,20 @@ Thieves spawner~
 ~
 * Warning: This script completely ignores spawn limits! Don't use it in instances that reset often
 * Set up variables: cumulative is the cumulative probability of all results so far (including the current one, found indicates we've rolled something and should stop checking
-eval cumulative 0
-eval found 0
-eval Rand %random.100%
+set cumulative 0
+set found 0
+set Rand %random.100%
 * vnums of the mobs to spawn
-eval vnumSly 10110
-eval vnumSlyBetterloot 10114
-eval vnumChiv 10111
-eval vnumThief 10112
+set vnumSly 10110
+set vnumSlyBetterloot 10114
+set vnumChiv 10111
+set vnumThief 10112
 * Probabilities of each number of non-generic thieves spawning
 * Treat this as an exclusive interaction list
-eval Double 20
-eval Single 80
+set Double 20
+set Single 80
 * Independant chance of spawning the generic thief
-eval Generic 50
+set Generic 50
 * There is probably a way to do this with a loop...
 eval cumulative %cumulative% + %Double%
 if (%Rand% <= %cumulative%) && %found% == 0
@@ -327,7 +327,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
   %load% mob %vnumSlyBetterloot%
   %echo% Sly arrives!
   * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
-  eval found 1
+  set found 1
 end
 eval cumulative %cumulative% + %Single%
 if (%Rand% <= %cumulative%) && %found% == 0
@@ -345,7 +345,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
     break
   done
   * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
-  eval found 1
+  set found 1
 end
 if %random.100% <= %Generic%
   * Spawn the generic thief
@@ -360,18 +360,18 @@ Banditos spawner~
 ~
 * Warning: This script completely ignores spawn limits! Don't use it in instances that reset often
 * Set up variables: cumulative is the cumulative probability of all results so far (including the current one, found indicates we've rolled something and should stop checking
-eval cumulative 0
-eval found 0
-eval Rand %random.100%
+set cumulative 0
+set found 0
+set Rand %random.100%
 * vnums of the mobs to spawn
-eval vnumBerk 10105
-eval vnumJorr 10106
-eval vnumTranc 10107
+set vnumBerk 10105
+set vnumJorr 10106
+set vnumTranc 10107
 * Probabilities of each number of banditos spawning
 * Treat this as an exclusive interaction list
-eval Triple 4
-eval Double 30
-eval Single 66
+set Triple 4
+set Double 30
+set Single 66
 * There is probably a way to do this with a loop...
 eval cumulative %cumulative% + %Triple%
 if (%Rand% <= %cumulative%) && %found% == 0
@@ -383,7 +383,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
   %load% mob %vnumTranc%
   %echo% Tranc arrives!
   * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
-  eval found 1
+  set found 1
 end
 eval cumulative %cumulative% + %Double%
 if (%Rand% <= %cumulative%) && %found% == 0
@@ -412,7 +412,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
     break
   done
   * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
-  eval found 1
+  set found 1
 end
 eval cumulative %cumulative% + %Single%
 if (%Rand% <= %cumulative%) && %found% == 0
@@ -435,7 +435,7 @@ if (%Rand% <= %cumulative%) && %found% == 0
     break
   done
   * Set found - if not done, this will fall through to lower blocks (Rand will still be less than cumulative)
-  eval found 1
+  set found 1
 end
 %purge% %self%
 ~
@@ -480,12 +480,12 @@ Delayed aggro greet/entry~
 if %actor%
   * Actor entered room - valid target?
   if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)%) || (%actor.is_pc% && %actor.level% > 25 && !%actor.on_quest(10147)% && !%actor.nohassle%)
-    eval target %actor%
+    set target %actor%
   end
 else
   * entry - look for valid target in room
-  eval person %room.people%
-  eval count 0
+  set person %room.people%
+  set count 0
   while %person%
     * Manage cactus population
     if %person.vnum% >= 10140 && %person.vnum% <= 10142
@@ -498,9 +498,9 @@ else
     end
     * validate
     if (%person.is_npc% && %person.mob_flagged(HUMAN)% && !%person.aff_flagged(!ATTACK)%) || (%person.is_pc% && %person.level% > 25 && !%person.on_quest(10147)% && !%person.nohassle%)
-      eval target %person%
+      set target %person%
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 end
 if !%target%
@@ -529,31 +529,31 @@ Monsoon Rift cleanup + complete~
 * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
 * Also cleans up the entrance portal and saguaro cactus.
 * This script fragment is duplicated in triggers: 10142, 10177, 10180
-eval loc %instance.location%
-eval obj %loc.contents%
+set loc %instance.location%
+set obj %loc.contents%
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   if %obj.vnum% == 10140
     %at% %loc% %echo% The monsoon rift closes.
     %purge% %obj%
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 * Despawn saguaro obj
 makeuid loc room i10145
 if %loc%
-  eval obj %loc.contents%
+  set obj %loc.contents%
   while %obj%
-    eval next_obj %obj.next_in_list%
+    set next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
       %at% %loc% %echo% You lose track of %obj.shortdesc%.
       %purge% %obj%
     end
-    eval obj %next_obj%
+    set obj %next_obj%
   done
 end
 %adventurecomplete%
-eval current_vnum 10147
+set current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
     set message $n turns back into an ordinary cactus.
@@ -625,18 +625,18 @@ if (!(monsoon /= %arg%) || %actor.position% != Standing)
   return 0
   halt
 end
-eval room %actor.room%
-eval cycles_left 5
+set room %actor.room%
+set cycles_left 5
 while %cycles_left% >= 0
   eval permission %%actor.canuseroom_member(%room%)%%
   eval sector_valid ((%room.sector% == Desert) || (%room.sector% == Grove))
-  eval cloud_present 0
-  eval object %room.contents%
+  set cloud_present 0
+  set object %room.contents%
   while %object% && !%cloud_present%
     if %object.vnum% == 10144
-      eval cloud_present 1
+      set cloud_present 1
     end
-    eval object %object.next_in_list%
+    set object %object.next_in_list%
   done
   if (%actor.room% != %room%) || !%permission% || !%sector_valid% || %cloud_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
@@ -685,7 +685,7 @@ while %cycles_left% >= 0
       if %actor.varexists(monsoon_chant_counter)%
         eval monsoon_chant_counter %actor.monsoon_chant_counter)% + 1
       else
-        eval monsoon_chant_counter 1
+        set monsoon_chant_counter 1
       end
       remote monsoon_chant_counter %actor.id%
       if %monsoon_chant_counter% >= 6
@@ -716,31 +716,31 @@ end
 * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
 * Also cleans up the entrance portal and saguaro cactus.
 * This script fragment is duplicated in triggers: 10142, 10177, 10180
-eval loc %instance.location%
-eval obj %loc.contents%
+set loc %instance.location%
+set obj %loc.contents%
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   if %obj.vnum% == 10140
     %at% %loc% %echo% The monsoon rift closes.
     %purge% %obj%
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 * Despawn saguaro obj
 makeuid loc room i10145
 if %loc%
-  eval obj %loc.contents%
+  set obj %loc.contents%
   while %obj%
-    eval next_obj %obj.next_in_list%
+    set next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
       %at% %loc% %echo% You lose track of %obj.shortdesc%.
       %purge% %obj%
     end
-    eval obj %next_obj%
+    set obj %next_obj%
   done
 end
 %adventurecomplete%
-eval current_vnum 10147
+set current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
     set message $n turns back into an ordinary cactus.
@@ -760,11 +760,11 @@ done
 Natural Magic: Cacti quench quest start~
 2 u 100
 ~
-eval monsoon_chant_counter 0
+set monsoon_chant_counter 0
 remote monsoon_chant_counter %actor.id%
 if !%actor.inventory(10143)%
   %load% obj 10143 %actor% inv
-  eval item %actor.inventory(10143)%
+  set item %actor.inventory(10143)%
   %send% %actor% You receive %item.shortdesc%.
 end
 ~
@@ -777,9 +777,9 @@ if %actor.on_quest(10147)%
   %send% %actor% You fail the quest Quench the Desert - you're supposed to water the cacti, not kill them!
 end
 * Number of attacker kills for quest completion
-eval target 4
-eval room %self.room%
-eval char %room.people%
+set target 4
+set room %self.room%
+set char %room.people%
 while %char%
   if %char.is_pc%
     if %char.on_quest(10141)%
@@ -787,7 +787,7 @@ while %char%
       if %char.varexists(monsoon_attacker_kills)%
         eval monsoon_attacker_kills %char.monsoon_attacker_kills)% + 1
       else
-        eval monsoon_attacker_kills 1
+        set monsoon_attacker_kills 1
       end
       remote monsoon_attacker_kills %char.id%
       if %monsoon_attacker_kills% >= %target%
@@ -805,7 +805,7 @@ while %char%
         * Quest start failed
       else
         * Reset attacker kill count for the new quest
-        eval monsoon_attacker_kills 1
+        set monsoon_attacker_kills 1
         remote monsoon_attacker_kills %char.id%
       end
     end
@@ -815,7 +815,7 @@ while %char%
       nop %char.bonus_exp(1)%
     end
   end
-  eval char %char.next_in_room%
+  set char %char.next_in_room%
 done
 ~
 #10149
@@ -1023,9 +1023,9 @@ if (!((monsoon /= %arg%) || (rift /= %arg%)) || %actor.position% != Standing)
   return 0
   halt
 end
-eval room %actor.room%
-eval start_cycles 5
-eval cycles_left %start_cycles%
+set room %actor.room%
+set start_cycles 5
+set cycles_left %start_cycles%
 while %cycles_left% >= 0
   eval permission %%actor.canuseroom_guest(%room%)%%
   eval location_valid (%room.building% == Tower of Sorcery || %room.building% == Top of the Tower)
@@ -1086,7 +1086,7 @@ if !%arg%
 end
 * One quick trick to get the target room
 eval direction %%actor.parse_dir(%arg%)%%
-eval room_var %self%
+set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
 if !%tricky% || (%tricky.template% < %room_var.template%)
   return 0
@@ -1107,7 +1107,7 @@ Room block higher template id without infiltrate~
 2 q 100
 ~
 * One quick trick to get the target room
-eval room_var %self%
+set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
 eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
@@ -1144,7 +1144,7 @@ dg_affect_room %self.room% !WEATHER on %self.val0%
 Cactus Spawn Teleport~
 0 n 100
 ~
-eval room %self.room%
+set room %self.room%
 if (!%instance.location% || %room.template% != 10146)
   halt
 end
@@ -1156,21 +1156,21 @@ detach 10166 %self.id%
 Monsoon thief + vampire spawn teleport/hide~
 0 n 100
 ~
-eval loc %instance.location%
+set loc %instance.location%
 if !%loc% || !%self.vampire%
-  eval loc %self.room%
+  set loc %self.room%
 end
-eval hide_again 1
-eval person %loc.people%
+set hide_again 1
+set person %loc.people%
 while %person% && %hide_again%
   if %person.is_pc% && ((%person.skill(Vampire)% > 50 && %self.vampire%) || (%person.skill(Stealth)% > 50 && !%self.vampire%))
-    eval hide_again 0
+    set hide_again 0
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
-eval person %loc.people%
+set person %loc.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   if %person% != %self% && %person.vnum% == %self.vnum%
     if !%person.aff_flagged(HIDE)%
       if %hide_again%
@@ -1179,7 +1179,7 @@ while %person%
     end
     %purge% %person%
   end
-  eval person %next_person%
+  set person %next_person%
 done
 if %loc%
   mgoto %loc%
@@ -1193,15 +1193,15 @@ Spawn Saguaro Treant~
 2 u 100
 ~
 * find and purge the saguaro obj
-eval obj %room.contents%
-eval found 0
+set obj %room.contents%
+set found 0
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   if (%obj.vnum% == 10171)
-    eval found 1
+    set found 1
     %purge% %obj%
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 if %found%
   * load treant boss
@@ -1214,54 +1214,54 @@ Monsoon reward replacer~
 ~
 * After 1 second, purge this object and load an object - rotating through the loot list
 wait 1
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if %actor.varexists(last_monsoon_loot_item)%
-  eval last_monsoon_loot_item %actor.last_monsoon_loot_item%
+  set last_monsoon_loot_item %actor.last_monsoon_loot_item%
 end
-eval next_item 0
+set next_item 0
 switch %last_monsoon_loot_item%
   case 10159
-    eval next_item 10153
+    set next_item 10153
   break
   case 10153
-    eval next_item 10160
+    set next_item 10160
   break
   case 10160
-    eval next_item 10155
+    set next_item 10155
   break
   case 10155
-    eval next_item 10167
+    set next_item 10167
   break
   case 10167
-    eval next_item 10152
+    set next_item 10152
   break
   case 10152
-    eval next_item 10168
+    set next_item 10168
   break
   case 10168
-    eval next_item 10163
+    set next_item 10163
   break
   case 10163
-    eval next_item 10165
+    set next_item 10165
   break
   case 10165
-    eval next_item 10162
+    set next_item 10162
   break
   case 10162
-    eval next_item 10166
+    set next_item 10166
   break
   default
-    eval next_item 10159
+    set next_item 10159
   break
 done
-eval level %self.level%
+set level %self.level%
 if !%level%
-  eval level %actor.level%
+  set level %actor.level%
 end
 %load% obj %next_item% %actor% inv %level%
-eval item %actor.inventory()%
+set item %actor.inventory()%
 %send% %actor% %self.shortdesc% opens, revealing %item.shortdesc%!
-eval last_monsoon_loot_item %next_item%
+set last_monsoon_loot_item %next_item%
 remote last_monsoon_loot_item %actor.id%
 %purge% %self%
 ~
@@ -1303,12 +1303,12 @@ end
 Monsoon wandering merchant leash~
 0 in 100
 ~
-eval start_room %instance.location%
+set start_room %instance.location%
 if !%start_room%
   * No instance
   halt
 end
-eval room %self.room%
+set room %self.room%
 eval dist %%room.distance(%start_room%)%%
 if %room.template% == 10146
   mgoto %start_room%
@@ -1329,9 +1329,9 @@ if !%actor.vampire%
   halt
 end
 * Infuse only at an oasis during the night. Costs 50 blood.
-eval blood %actor.blood()%
-eval room %actor.room%
-eval cost 50
+set blood %actor.blood()%
+set room %actor.room%
+set cost 50
 * Condition checking
 if %blood% < %cost%
   %send% %actor% You don't have enough blood to infuse %self.shortdesc% - it costs %cost%.
@@ -1369,8 +1369,8 @@ if %time.hour% < 7 || %time.hour% > 19
   %send% %actor% You can only perform this ritual during the day.
   halt
 end
-eval room %actor.room%
-eval cycles_left 5
+set room %actor.room%
+set cycles_left 5
 while %cycles_left% >= 0
   eval sector_valid (%room.template% == 10145)
   if (%actor.room% != %room%) || !%sector_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
@@ -1391,7 +1391,7 @@ while %cycles_left% >= 0
   switch %cycles_left%
     case 5
       * Check cost here so invalid location doesn't charge
-      eval cost 0
+      set cost 0
       if %actor.blood% < %cost%
         %send% %actor% You don't have enough blood to perform the eclipse ritual - it costs %cost%.
         halt
@@ -1433,31 +1433,31 @@ done
 * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
 * Also cleans up the entrance portal and saguaro cactus.
 * This script fragment is duplicated in triggers: 10142, 10177, 10180
-eval loc %instance.location%
-eval obj %loc.contents%
+set loc %instance.location%
+set obj %loc.contents%
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   if %obj.vnum% == 10140
     %at% %loc% %echo% The monsoon rift closes.
     %purge% %obj%
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 * Despawn saguaro obj
 makeuid loc room i10145
 if %loc%
-  eval obj %loc.contents%
+  set obj %loc.contents%
   while %obj%
-    eval next_obj %obj.next_in_list%
+    set next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
       %at% %loc% %echo% You lose track of %obj.shortdesc%.
       %purge% %obj%
     end
-    eval obj %next_obj%
+    set obj %next_obj%
   done
 end
 %adventurecomplete%
-eval current_vnum 10147
+set current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
     set message $n turns back into an ordinary cactus.
@@ -1500,17 +1500,17 @@ if (!(rift /= %arg%) || %actor.position% != Standing)
   return 0
   halt
 end
-eval room %actor.room%
-eval cycles_left 5
+set room %actor.room%
+set cycles_left 5
 while %cycles_left% >= 0
   eval sector_valid (%room.building% == Monsoon Rift)
-  eval rift_present 0
-  eval object %room.contents%
+  set rift_present 0
+  set object %room.contents%
   while %object% && !%rift_present%
     if %object.vnum% == 10140
-      eval rift_present 1
+      set rift_present 1
     end
-    eval object %object.next_in_list%
+    set object %object.next_in_list%
   done
   if (%actor.room% != %room%) || !%sector_valid% || !%rift_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
@@ -1563,31 +1563,31 @@ done
 * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
 * Also cleans up the entrance portal and saguaro cactus.
 * This script fragment is duplicated in triggers: 10142, 10177, 10180
-eval loc %instance.location%
-eval obj %loc.contents%
+set loc %instance.location%
+set obj %loc.contents%
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   if %obj.vnum% == 10140
     %at% %loc% %echo% The monsoon rift closes.
     %purge% %obj%
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 * Despawn saguaro obj
 makeuid loc room i10145
 if %loc%
-  eval obj %loc.contents%
+  set obj %loc.contents%
   while %obj%
-    eval next_obj %obj.next_in_list%
+    set next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
       %at% %loc% %echo% You lose track of %obj.shortdesc%.
       %purge% %obj%
     end
-    eval obj %next_obj%
+    set obj %next_obj%
   done
 end
 %adventurecomplete%
-eval current_vnum 10147
+set current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
     set message $n turns back into an ordinary cactus.
@@ -1619,8 +1619,8 @@ if !(%actor.on_quest(10150)%
   return 1
   halt
 end
-eval room %actor.room%
-eval cycles_left 5
+set room %actor.room%
+set cycles_left 5
 while %cycles_left% >= 0
   if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the action
@@ -1673,7 +1673,7 @@ done
 Lavaformer Spawn~
 0 n 100
 ~
-eval room %self.room%
+set room %self.room%
 if (!%instance.location% || %room.template% != 10190)
   halt
 end
@@ -1684,7 +1684,7 @@ mgoto %instance.location%
 Lavaforming~
 0 i 100
 ~
-eval room %self.room%
+set room %self.room%
 if !%instance.location%
   %purge% %self%
   halt
@@ -1706,7 +1706,7 @@ end
 Lava flow decay~
 1 f 0
 ~
-eval room %self.room%
+set room %self.room%
 if (%self.vnum% == 10192)
   if (%room.sector% != Flowing Lava)
     halt

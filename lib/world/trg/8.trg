@@ -26,18 +26,18 @@ if %actor.plr_flagged(VAMPIRE)%
 else
   %force% %actor% look self
 end
-eval room_var %actor.room%
-eval ch %room_var.people%
-eval any 0
+set room_var %actor.room%
+set ch %room_var.people%
+set any 0
 while %ch%
   if (%ch% != %actor% && (%ch.plr_flagged(VAMPIRE)% || %ch.mob_flagged(VAMPIRE)%))
     if !%any%
       %send% %actor% &0
-      eval any 1
+      set any 1
     end
     %send% %actor% Over your shoulder, you notice that %ch.name% has no reflection.
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 ~
 $

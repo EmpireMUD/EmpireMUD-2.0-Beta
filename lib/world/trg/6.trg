@@ -37,7 +37,7 @@ eval charge %%actor.mana(-%mana_cost%)%%
 %echoaround% %actor% %actor.name% enchants %self.shortdesc%!
 nop %charge%
 %load% obj %result_vnum% %actor% inv
-eval obj %actor.inventory()%
+set obj %actor.inventory()%
 %send% %actor% It becomes %obj.shortdesc%!
 %echoaround% %actor% It becomes %obj.shortdesc%!
 %purge% %self%
@@ -51,7 +51,7 @@ if %test% != %self%
   return 0
   halt
 end
-eval room %self.room%
+set room %self.room%
 if !%actor.canuseroom_member()%
   %send% %actor% You don't have permission to plant anything here.
   return 1
@@ -72,8 +72,8 @@ end
 Enchanted forest unclaimed chop~
 0 ab 100
 ~
-eval room %self.room%
-eval cycles_left 5
+set room %self.room%
+set cycles_left 5
 while %cycles_left% >= 0
   if (%self.room% != %room%) || %room.empire% || !(%room.sector% ~= Enchanted)
     * We've either moved or the room's no longer suitable for deforesting - despawn the mob
@@ -178,9 +178,9 @@ switch %random.4%
   break
   case 3
     if %self.varexists(has_duped)%
-      eval has_duped %self.has_duped%
+      set has_duped %self.has_duped%
     else
-      eval has_duped 0
+      set has_duped 0
     end
     if %has_duped% > 0
       * has already duplicated
@@ -188,12 +188,12 @@ switch %random.4%
       %purge% %self%
       halt
     else
-      eval room %self.room%
+      set room %self.room%
       * only duplicate if not in a building
       if (!%room.building%)
         %echo% %self.name% does a little backflip and splits into two bunnies!
         %load% mob 612
-        eval has_duped 1
+        set has_duped 1
         remote has_duped %self.id%
       else
         say I'm late! I'm late!
@@ -275,11 +275,11 @@ switch %random.4%
   break
   case 3
     %echo% %self.name% sneezes pixy dust all over you!
-    eval room %self.room%
-    eval ch %room.people%
+    set room %self.room%
+    set ch %room.people%
     while %ch%
       dg_affect %ch% FLY on 60
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
   break
   case 4
@@ -305,11 +305,11 @@ switch %random.4%
   break
   case 3
     %echo% %self.name% sprinkles pixy dust all over you!
-    eval room %self.room%
-    eval ch %room.people%
+    set room %self.room%
+    set ch %room.people%
     while %ch%
       dg_affect %ch% FLY on 60
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
   break
   case 4
