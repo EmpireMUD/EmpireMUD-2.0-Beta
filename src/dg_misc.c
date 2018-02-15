@@ -976,17 +976,16 @@ void script_heal(void *thing, int type, char *argument) {
 	int pos, amount, level = -1;
 	char_data *victim = NULL;
 	double scale = 100.0;
-	bool uid, done_aff;
+	bool done_aff;
 	bitvector_t bitv;
 	
 	// 3 args: target, what, scale
 	scale_arg = one_argument(argument, targ_arg);
 	scale_arg = one_argument(scale_arg, what_arg);
 	skip_spaces(&scale_arg);
-	uid = (*targ_arg == UID_CHAR);
-	if (uid) {
+	if (*targ_arg == UID_CHAR) {
 		victim = get_char(targ_arg);
-	}
+	}	// otherwise we'll determine victim later
 	
 	// determine how to log errors
 	switch (type) {
@@ -1051,7 +1050,7 @@ void script_heal(void *thing, int type, char *argument) {
 	
 	// now the real work
 	if (is_abbrev(what_arg, "health") || is_abbrev(what_arg, "hitpoints")) {
-		amount = 50;	// TODO scale it
+		amount = (394 * level / 55.0 - 5580 / 11.0) * scale;
 		GET_HEALTH(victim) = MIN(GET_MAX_HEALTH(victim), GET_HEALTH(victim) + amount);
 		
 		if (GET_POS(victim) < POS_SLEEPING) {
@@ -1059,11 +1058,11 @@ void script_heal(void *thing, int type, char *argument) {
 		}
 	}
 	else if (is_abbrev(what_arg, "mana")) {
-		amount = 50;	// TODO scale it
+		amount = (292 * level / 55.0 - 3940 / 11.0) * scale;
 		GET_MANA(victim) = MIN(GET_MAX_MANA(victim), GET_MANA(victim) + amount);
 	}
 	else if (is_abbrev(what_arg, "moves")) {
-		amount = 50;	// TODO scale it
+		amount = (37 * level / 11.0 - 1950 / 11.0) * scale;
 		GET_MOVE(victim) = MIN(GET_MAX_MOVE(victim), GET_MOVE(victim) + amount);
 	}
 	else if (is_abbrev(what_arg, "dots")) {
