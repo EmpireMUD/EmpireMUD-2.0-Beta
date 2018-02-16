@@ -73,8 +73,7 @@ end
 if %tokens% == 0
   halt
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
@@ -178,8 +177,7 @@ end
 if %tokens% == 0
   halt
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
@@ -213,8 +211,7 @@ if %self.affect(BLIND)%
   %echo% %self.name%'s eyes flash red, and %self.hisher% vision clears!
   dg_affect %self% BLIND off 1
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 12001
     set yatpan %person%
@@ -227,7 +224,7 @@ if !%self.cooldown(12005)% && !%yatpan%
   nop %self.set_cooldown(12005, 300)%
   wait 2 sec
   %load% mob 12001 ally
-  set summon %room.people%
+  set summon %self.room.people%
   if %summon.vnum% == 12001
     %echo% %summon.name% drops from the sky, holding a bow, which %self.name% takes.
     %force% %summon% %aggro% %actor%
@@ -269,8 +266,7 @@ wait 3 sec
 %dot% #12008 %actor% 250 30 physical
 wait 5 sec
 set amount 5000
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
     %send% %person% &rA fountain of blood suddenly bursts from the wounds left by %self.name%'s assault!
@@ -327,8 +323,7 @@ set running 0
 remote running %self.id%
 shout Hammer down!
 %echo% &Y%self.name% slams %self.hisher% hammer into the earth with a deafening bang, shattering the ground underfoot!
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     set test %self.varexists(jumped_%person.id%)%
@@ -361,8 +356,7 @@ if %self.affect(BLIND)%
   %echo% %self.name%'s eyes flash red, and %self.hisher% vision clears!
   dg_affect %self% BLIND off 1
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 12000
     set anat %person%
@@ -432,8 +426,7 @@ Yatpan: Unsummon Self~
 if %self.fighting%
   halt
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 12000
     set anat %person%
@@ -593,9 +586,8 @@ attach 12038 %hadad.id%
 attach 12037 %hadad.id%
 attach 12036 %hadad.id%
 attach 12035 %hadad.id%
-set room %self.room%
 set destination %hadad.room%
-set person %room.people%
+set person %self.room.people%
 %at% %destination% %echo% The eye of the storm suddenly collapses, as if destroyed from within!
 %echo% As %self.name% is destroyed, the eye of the storm collapses!
 while %person%
@@ -648,8 +640,7 @@ nop %self.set_cooldown(12030, 30)%
 wait 2 sec
 %echo% %self.name% lets out a mighty leonine roar!
 %echo% &rYou are stunned by the loudness of %self.name%'s roar!
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
     if %self.mob_flagged(GROUP)%

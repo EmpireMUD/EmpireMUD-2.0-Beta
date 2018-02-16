@@ -6,8 +6,7 @@ if !%actor.on_quest(1400)%
   return 0
   halt
 end
-set room %actor.room%
-if !%room.function(ALCHEMIST)%
+if !%actor.room.function(ALCHEMIST)%
   return 0
   halt
 end
@@ -54,8 +53,7 @@ if !%actor.on_quest(1404)%
   return 0
   halt
 end
-set room %actor.room%
-if !%room.function(LIBRARY)%
+if !%actor.room.function(LIBRARY)%
   return 0
   halt
 end

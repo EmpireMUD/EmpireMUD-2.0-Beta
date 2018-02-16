@@ -211,8 +211,7 @@ if (%chance% < 5)
 else
   * blind all
   set %count% 0
-  set room_var %self.room%
-  set target_char %room_var.people%
+  set target_char %self.room.people%
   while %target_char%
     * save next char now
     set next_target %target_char.next_in_room%
@@ -231,8 +230,7 @@ end
 Rare thief death~
 0 f 100
 ~
-set room %self.room%
-set ch %room.people%
+set ch %self.room.people%
 while %ch%
   * Combat is ended by the thief's death, so is_enemy doesn't actually work
   set ch_stealth %ch.skill(Stealth)%
@@ -254,8 +252,7 @@ Rare thief despawn~
 Thief recruiter passive~
 0 bw 5
 ~
-set room_var %self.room%
-set target_char %room_var.people%
+set target_char %self.room.people%
 while %target_char%
   if (%target_char.is_pc% && %target_char.skill(Stealth)% == 0)
     %echoaround% %target_char% %self.name% whispers something to %target_char.name%.
@@ -501,8 +498,7 @@ nop %actor.charge_coins(%cost%)%
 Teacher passive~
 0 bw 5
 ~
-set room_var %self.room%
-context %room_var.vnum%
+context %self.room.vnum%
 if (%lesson_running%)
   halt
 end
@@ -1209,8 +1205,7 @@ switch %random.4%
     %echo% %self.name% mutters some arcane words...
     wait 1 sec
     %echo% There is a flash of intense light!
-    set room_var %self.room%
-    set ch %room_var.people%
+    set ch %self.room.people%
     while %ch%
       if %self.is_enemy(%ch%)%
         %send% %ch% You are blinded!
@@ -1289,8 +1284,7 @@ switch %random.4%
   break
   case 2
     %echo% %self.name% chants a poem you don't understand...
-    set room_var %self.room%
-    set ch %room_var.people%
+    set ch %self.room.people%
     while %ch%
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
@@ -1307,8 +1301,7 @@ switch %random.4%
   break
   case 4
     %echo% %self.name% chants a poem you don't understand...
-    set room_var %self.room%
-    set ch %room_var.people%
+    set ch %self.room.people%
     while %ch%
       if %self.is_enemy(%ch%)%
         %send% %ch% You feel like you're moving through mud!

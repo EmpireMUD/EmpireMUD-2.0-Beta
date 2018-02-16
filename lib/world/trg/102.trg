@@ -38,9 +38,8 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
 end
 return 0
 set difficulty %self.difficulty%
-set room %self.room%
 %load% mob 10201
-set mob %room.people%
+set mob %self.room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
 if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
@@ -98,7 +97,6 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
 end
 return 0
 set difficulty %self.difficulty%
-set room %self.room%
 set mob_diff %difficulty%
 if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
   eval mob_diff %mob_diff% + 1
@@ -106,7 +104,7 @@ end
 set mob_num 10202
 while %mob_num% <= 10203
   %load% mob %mob_num%
-  set mob %room.people%
+  set mob %self.room.people%
   remote difficulty %mob.id%
   dg_affect %mob% !ATTACK on 5
   nop %mob.remove_mob_flag(HARD)%
@@ -145,8 +143,7 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
-set room %self.room%
-set ch %room.people%
+set ch %self.room.people%
 set found 0
 while %ch% && !%found%
   if (%ch.vnum% == 10203)
@@ -157,9 +154,8 @@ done
 if !%found%
   return 0
   set difficulty %self.difficulty%
-  set room %self.room%
   %load% mob 10204
-  set mob %room.people%
+  set mob %self.room.people%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
   if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
@@ -201,8 +197,7 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
-set room %self.room%
-set ch %room.people%
+set ch %self.room.people%
 set found 0
 while %ch% && !%found%
   if (%ch.vnum% == 10202)
@@ -213,9 +208,8 @@ done
 if !%found%
   return 0
   set difficulty %self.difficulty%
-  set room %self.room%
   %load% mob 10204
-  set mob %room.people%
+  set mob %self.room.people%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
   if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
@@ -272,9 +266,8 @@ if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
 end
 return 0
 set difficulty %self.difficulty%
-set room %self.room%
 %load% mob 10205
-set mob %room.people%
+set mob %self.room.people%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
 if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
@@ -327,8 +320,7 @@ Filks Respawn~
 if (%self.fighting% || %self.disabled%)
   halt
 end
-set room_var %self.room%
-set ch %room_var.people%
+set ch %self.room.people%
 set found 0
 while %ch% && !%found%
   if (%ch.is_npc% && %ch.vnum% == 10203)
@@ -353,8 +345,7 @@ Walts Respawn~
 if (%self.fighting% || %self.disabled%)
   halt
 end
-set room %self.room%
-set ch %room.people%
+set ch %self.room.people%
 set found 0
 while (%ch% && !%found%)
   if (%ch.vnum% == 10202)
@@ -510,8 +501,7 @@ if (%actor.position% != Standing)
 end
 %load% m 10227
 %echo% The enchanted tumbleweed comes to life!
-set room_var %self.room%
-set mob %room_var.people%
+set mob %self.room.people%
 if (%mob% && %mob.vnum% == 10227)
   nop %mob.unlink_instance%
 end
@@ -756,8 +746,7 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-set room_var %self.room%
-set mob %room_var.people%
+set mob %self.room.people%
 %send% %actor% You use %self.shortdesc% and %mob.name% appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
 if (%mob% && %mob.vnum% == %self.val0%)

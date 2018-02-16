@@ -20,8 +20,7 @@ end
 set mobs 0
 set found 0
 set found_pet 0
-set room_var %self.room%
-set ch %room_var.people%
+set ch %self.room.people%
 while %ch% && !%found%
   if (%ch.is_npc% && %ch.vnum% == %self.val0% && %ch.master% && %ch.master% == %actor%)
     set found 1
@@ -43,7 +42,7 @@ else
   %echoaround% %actor% %actor.name% uses %self.shortdesc%...
   nop %self.bind(%actor%)%
   %load% m %self.val0%
-  set pet %room_var.people%
+  set pet %self.room.people%
   if (%pet% && %pet.vnum% == %self.val0%)
     %force% %pet% mfollow %actor%
     %echo% %pet.name% appears!
@@ -84,8 +83,7 @@ Lonely Despawn~
 0 abt 5
 ~
 set count 0
-set room_var %self.room%
-set target_char %room_var.people%
+set target_char %self.room.people%
 while %target_char%
   if (%target_char.is_pc%)
     eval count %count% + 1

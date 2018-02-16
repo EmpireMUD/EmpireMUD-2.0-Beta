@@ -47,8 +47,7 @@ Songbird Animation~
 * This script is no longer used. It was replaced by custom strings.
 * songbird Animation (9148)
 * Works for 148 and 149
-set room %self.room%
-if ((%room.sector% /= Forest) || (%room.sector% /= Orchard))
+if ((%self.room.sector% /= Forest) || (%self.room.sector% /= Orchard))
   %echo% %self.name% Sings sweetly from a near by tree.
 end
 ~
@@ -58,8 +57,7 @@ woodpecker animation~
 ~
 * This script is no longer used. It was replaced by custom strings.
 * Woodpecker Animation (9150)
-set room %self.room%
-if ((%room.sector% /= Forest) || (%room.sector% /= Orchard))
+if ((%self.room.sector% /= Forest) || (%self.room.sector% /= Orchard))
   %echo% %self.name% hammers into a tree with its beak, looking for food.
 end
 ~

@@ -155,8 +155,7 @@ wait 1 sec
 wait 3 sec
 say Ho ho ho! Merry Christmas!
 wait 1 sec
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 * Gifts for everyone!
 set count 0
 while %person%
@@ -374,8 +373,7 @@ end
 %echoaround% %actor% %actor.name% finishes %actor.hisher% snowman and steps back with a satisfied nod.
 nop %actor.set_cooldown(10728, 180)%
 %load% m 10728
-set room_var %self.room%
-set mob %room_var.people%
+set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end
@@ -603,8 +601,7 @@ done
 Mother Goose spawn~
 0 n 100
 ~
-set room %self.room%
-if (!%instance.location% || %room.template% != 10730)
+if (!%instance.location% || %self.room.template% != 10730)
   halt
 end
 %echo% %self.name% vanishes!
@@ -632,8 +629,7 @@ if !%self.is_name(%arg%)%
   halt
 end
 * find Miner Nynar
-set room %actor.room%
-set iter %room.people%
+set iter %actor.room.people%
 set found 0
 while %iter% && !%found%
   if %iter.vnum% == 10754
@@ -660,8 +656,7 @@ if !%self.is_name(%arg%)%
   halt
 end
 * find Miner Nynar
-set room %actor.room%
-set iter %room.people%
+set iter %actor.room.people%
 set found 0
 while %iter% && !%found%
   if %iter.vnum% == 10755
@@ -688,8 +683,7 @@ set nynar_is_here 0
 set meena_is_here 0
 set blacklung_is_here 0
 set hanx_is_here 0
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 10754
     set nynar_is_here 1
@@ -769,7 +763,7 @@ if !%is_veh%
 else
   %load% veh %vnum% 25
   set emp %actor.empire%
-  set veh %room.vehicles%
+  set veh %self.room.vehicles%
   if %emp%
     %own% %veh% %emp%
   end
@@ -851,8 +845,7 @@ done
 Goblin Miner Spawn~
 0 n 100
 ~
-set room %self.room%
-if (!%instance.location% || %room.template% != 10750)
+if (!%instance.location% || %self.room.template% != 10750)
   halt
 end
 %echo% %self.name% flees the mine!
@@ -927,7 +920,7 @@ end
 nop %actor.charge_coins(50)%
 %load% veh %vnum% 25
 set emp %actor.empire%
-set veh %room.vehicles%
+set veh %self.room.vehicles%
 if %emp%
   %own% %veh% %emp%
 end
@@ -947,8 +940,7 @@ if !%heroic_mode%
 end
 * Find a non-bound target
 set target %actor%
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 set target_found 0
 set no_targets 0
 while %target.affect(10760)% && %person%
@@ -1031,9 +1023,8 @@ return 1
 Goblin gravesite decay timer~
 1 f 0
 ~
-set room %self.room%
-if %room.building% == Goblin Gravesite
-  %build% %room% demolish
+if %self.room.building% == Goblin Gravesite
+  %build% %self.room% demolish
 end
 ~
 #10772

@@ -102,8 +102,7 @@ switch %random.4%
       wait 5 sec
       eval cycles %cycles% - 1
       %echo% %self.name% draws more mana...
-      set room %self.room%
-      set person %room.people%
+      set person %self.room.people%
       while %person%
         if %person.is_pc%
           set actual_amount %amount%
@@ -148,8 +147,7 @@ switch %random.4%
     wait 3 sec
     if %heroic_mode% && !%interrupted%
       * All enemies
-      set room %self.room%
-      set person %room.people%
+      set person %self.room.people%
       set multi_target 1
     elseif %heroic_mode% || !%interrupted%
       * Random enemy
@@ -279,8 +277,7 @@ switch %random.4%
     while %times% > 0
       %load% mob 18507 %self% %self.level%
       eval times %times% - 1
-      set room %self.room%
-      set summon %room.people%
+      set summon %self.room.people%
       if %summon.vnum% == 18507
         %force% %summon% %aggro% %actor%
       else
@@ -309,8 +306,7 @@ switch %random.4%
     if %heroic_mode%
       %echo% &r%self.name%'s jeweled feathers flash brightly, blinding everyone!
       %aoe% 25 magical
-      set room %self.room%
-      set person %room.people%
+      set person %self.room.people%
       while %person%
         if %self.is_enemy(%person%)%
           dg_affect #18511 %person% BLIND on 10
@@ -344,8 +340,7 @@ switch %random.4%
     * Boss: Also haste Quetzalcoatl for 30
     %echo% %self.name% flaps its wings hard, and a gale blows in from the west!
     %echo% Everyone's weapons are blown out of their hands!
-    set room %self.room%
-    set person %room.people%
+    set person %self.room.people%
     while %person%
       if %self.is_enemy(%person%)%
         dg_affect #18513 %person% DISARM on 15
@@ -464,10 +459,9 @@ if %actor.is_npc%
 end
 context %instance.id%
 * One quick trick to get the target room
-set room_var %self%
-eval tricky %%room_var.%direction%(room)%%
+eval tricky %%self.%direction%(room)%%
 * Compare template ids to figure out if they're going forward or back
-if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+if (%actor.nohassle% || !%tricky% || %tricky.template% < %self.template%)
   return 1
   halt
 end
@@ -505,7 +499,7 @@ else
   %force% %actor% look
 end
 * Send NPC followers after player
-set person %room_var.people%
+set person %self.people%
 while %person%
   set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
@@ -527,10 +521,9 @@ if %actor.is_npc%
 end
 context %instance.id%
 * One quick trick to get the target room
-set room_var %self%
-eval tricky %%room_var.%direction%(room)%%
+eval tricky %%self.%direction%(room)%%
 * Compare template ids to figure out if they're going forward or back
-if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+if (%actor.nohassle% || !%tricky% || %tricky.template% < %self.template%)
   return 1
   halt
 end
@@ -572,7 +565,7 @@ else
   end
 end
 * Send NPC followers after player
-set person %room_var.people%
+set person %self.people%
 while %person%
   set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
@@ -594,10 +587,9 @@ if %actor.is_npc%
 end
 context %instance.id%
 * One quick trick to get the target room
-set room_var %self%
-eval tricky %%room_var.%direction%(room)%%
+eval tricky %%self.%direction%(room)%%
 * Compare template ids to figure out if they're going forward or back
-if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+if (%actor.nohassle% || !%tricky% || %tricky.template% < %self.template%)
   return 1
   halt
 end
@@ -638,7 +630,7 @@ else
   end
 end
 * Send NPC followers after player
-set person %room_var.people%
+set person %self.people%
 while %person%
   set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
@@ -886,8 +878,7 @@ set exitroom i18500
 if %exitroom%
   %door% %exitroom% north room %newroom%
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   set next_person %person.next_in_room%
   %teleport% %person% %newroom%
@@ -916,8 +907,7 @@ Jungle Temple boss death - drop tokens~
 ~
 set var_name jungletemple_tokens
 * Tokens for everyone
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     * You get a token, and you get a token, and YOU get a token!

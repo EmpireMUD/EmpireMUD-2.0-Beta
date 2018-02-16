@@ -24,8 +24,7 @@ if %actor.plr_flagged(VAMPIRE)%
 else
   %force% %actor% look self
 end
-set room_var %actor.room%
-set ch %room_var.people%
+set ch %actor.room.people%
 set any 0
 while %ch%
   if (%ch% != %actor% && (%ch.plr_flagged(VAMPIRE)% || %ch.mob_flagged(VAMPIRE)%))

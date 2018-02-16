@@ -148,9 +148,8 @@ done
 %send% %actor% You set the difficulty...
 %echoaround% %actor% %actor.name% sets the difficulty...
 %echo% You discover a passage hidden behind %self.shortdesc%.
-set room %self.room%
 set newroom i12401
-%door% %room% north room %newroom%
+%door% %self.room% north room %newroom%
 %load% obj 12461 room
 %purge% %self%
 ~
@@ -197,8 +196,7 @@ Goblin Cove trash spawner~
 1 n 100
 ~
 * Ensure no mobs here
-set room_var %self.room%
-set ch %room_var.people%
+set ch %self.room.people%
 set found 0
 while %ch% && !%found%
   if (%ch.is_npc%)
@@ -612,8 +610,7 @@ if %self.cooldown(12400)%
 end
 nop %self.set_cooldown(12400, 30)%
 %echo% &r%self.name%'s canine heads lash out, snarling and gnashing.
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_npc% && %person.mob_flagged(FAMILIAR)%
     %echo% %self.name%'s heads tear a chunk out of %person.name%!
@@ -636,8 +633,7 @@ nop %self.set_cooldown(12400, 30)%
 wait 3 sec
 %echo% &r%self.name%'s tentacle-tails lash out at you, blasting you with a wave of high-pressure water!
 %aoe% 50 physical
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
     dg_affect #12429 %person% SLOW on 20
@@ -735,8 +731,7 @@ while %cycle% <= 4
   wait 6 sec
   set running 0
   remote running %self.id%
-  set room %self.room%
-  set person %room.people%
+  set person %self.room.people%
   if %cycle% == 1
     %echo% %self.name%'s sword launches a barrage of ice spikes as %self.heshe% slashes!
   elseif %cycle% == 2
@@ -878,8 +873,7 @@ end
 nop %self.set_cooldown(12400, 30)%
 eval vnum 12407 + %random.4%
 %load% mob %vnum% ally
-set room %self.room%
-set summon %room.people%
+set summon %self.room.people%
 if %summon.vnum% == %vnum%
   %echo% %self.name% sends up a jet of sparkling blue mana and %summon.name% appears!
   nop %summon.add_mob_flag(UNDEAD)%
@@ -916,8 +910,7 @@ Underwater boss death: portal to exit~
 set loc %instance.location%
 set vnum %loc.vnum%
 %load% obj 12402 room
-set room %self.room%
-set portal %room.contents%
+set portal %self.room.contents%
 if %portal.vnum% == 12402
   nop %portal.val0(%vnum%)%
 end
@@ -967,8 +960,7 @@ while %vnum% <= 12416
   eval vnum %vnum% + 1
 done
 * lose rep
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     set amount 1

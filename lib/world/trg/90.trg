@@ -8,8 +8,7 @@ if (%random.2% == 2)
   %echo% %self.name% moos contentedly.
 else
   * We need the current terrain.
-  set room %self.room%
-  if (%room.sector% == Plains)
+  if (%self.room.sector% == Plains)
     %echo% %self.name% eats some grass.
   else
     %echo% %self.name% chews %self.hisher% cud.
@@ -118,8 +117,7 @@ if (%random.2% == 2)
   %echo% %self.name% baas contentedly.
 else
   * We need the current terrain.
-  set room %self.room%
-  if (%room.sector% == Plains)
+  if (%self.room.sector% == Plains)
     %echo% %self.name% eats some grass.
   else
     %echo% %self.name% chews %self.hisher% cud.
@@ -132,9 +130,8 @@ Squirrel Animation~
 ~
 * This script is no longer used. It was replaced by custom strings.
 * Get current terrain.
-set room %self.room%
 * If we are in forest, bombard players with acorns!
-if (%room.sector% ~= Forest)
+if (%self.room.sector% ~= Forest)
   %echo% %self.name% bombards you with acorns!
 end
 %echo% %self.name% chatters angrily at you for invading %self.hisher% territory!
@@ -149,8 +146,7 @@ if (%random.2% == 2)
   %echo% %self.name% moos contentedly.
 else
   * We need the current terrain.
-  set room %self.room%
-  if (%room.sector% == Plains)
+  if (%self.room.sector% == Plains)
     %echo% %self.name% eats some grass.
   else
     %echo% %self.name% chews %self.hisher% cud.
@@ -232,8 +228,7 @@ switch (%random.8%)
   break
   case 5
     * Beg
-    set room %self.room%
-    set target %room.people%
+    set target %self.room.people%
     while (%target%)
       set obj %target.inventory()%
       while (%obj%)
@@ -324,8 +319,7 @@ switch (%random.3%)
     %echo% %self.name% leaps from the shadows and dashes across your path!
   break
   case 2
-    set room %self.room%
-    if ((%room.sector% == Plains) || (%room.sector% /= Garden))
+    if ((%self.room.sector% == Plains) || (%self.room.sector% /= Garden))
       %echo% %self.name% spots a butterfly and immediately gives chase!
     else
       %echo% %self.name% meows.
@@ -348,8 +342,7 @@ Eagle Animation~
 ~
 * This script is no longer used. It was replaced by custom strings.
 * Eagle Animation (9025)
-set room %self.room%
-if (%room.sector% == River)
+if (%self.room.sector% == River)
   %echo% %self.name% dives into the water, then emerges with a fish.
   halt
 end
@@ -622,7 +615,7 @@ switch %effect%
     %echo% %self.name% bats at you with its wing, and you feel clumsy.
   break
 done
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     switch %effect%

@@ -177,8 +177,7 @@ set heroic_mode %self.mob_flagged(GROUP)%
 wait 2 sec
 if %heroic_mode%
   %echo% &r%self.name% slams %self.hisher% hooves down on the ground, creating a shockwave!
-  set room %self.room%
-  set person %room.people%
+  set person %self.room.people%
   while %person%
     if %person.is_enemy(%self%)%
       dg_affect #18803 %person% HARD-STUNNED on 5
@@ -204,8 +203,7 @@ set heroic_mode %self.mob_flagged(GROUP)%
 if %heroic_mode%
   %echo% &r%self.name% swings %self.hisher% sword in a wide arc at neck level, causing bleeding wounds!
   %aoe% 100 physical
-  set room %self.room%
-  set person %room.people%
+  set person %self.room.people%
   while %person%
     if %person.is_enemy(%self%)%
       %dot% #18804 %person% 100 30 physical
@@ -257,8 +255,7 @@ end
 Headless Centaur death~
 0 f 100
 ~
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 set loot 0
 while %person%
   if %person.is_pc%
@@ -279,8 +276,7 @@ end
 attack-o-lantern aoe~
 0 k 100
 ~
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 18801
     set heroic_mode %person.mob_flagged(GROUP)%
@@ -327,9 +323,7 @@ if !%arg%
   %send% %actor% You have %costumes_left% costumes left.
   halt
 end
-set room %self.room%
-set permission %actor.canuseroom_guest%
-if !%permission%
+if !%actor.canuseroom_guest%
   %send% %actor% You don't have permission to do that here.
   halt
 end
@@ -430,9 +424,7 @@ if !%arg%
   %send% %actor% Whom?
   halt
 end
-set room %self.room%
-set permission %actor.canuseroom_guest%
-if !%permission%
+if !%actor.canuseroom_guest%
   %send% %actor% You don't have permission to do that here.
   halt
 end

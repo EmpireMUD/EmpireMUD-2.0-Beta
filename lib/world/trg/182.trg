@@ -48,8 +48,7 @@ context %instance.id%
 if !%instance.location%
   %purge% %self%
 end
-set room %self.room%
-if %room.template%==18200
+if %self.room.template%==18200
   if %already_loaded_tortoise%
     %purge% %self%
     halt
@@ -58,7 +57,6 @@ if %room.template%==18200
     global already_loaded_tortoise
   end
   mgoto %instance.location%
-  set room %self.room%
 end
 ~
 #18204
@@ -724,8 +722,7 @@ end
 Buy goblin gala ticket~
 1 c 2
 buy~
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 set found 0
 while %person%
   if %person.vnum% == 10451
@@ -1214,8 +1211,7 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-set room %self.room%
-if %room.template% != 10047
+if %self.room.template% != 10047
   %send% %actor% You need to plant this in Knezz's room while he's not watching.
   halt
 end
@@ -1307,8 +1303,7 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-set room_var %self.room%
-set sectname %room_var.sector%
+set sectname %self.room.sector%
 set terra 1
 if %sectname% == Scorched Woods
   set vnum 2

@@ -202,8 +202,7 @@ end
 * check too many mobs
 set mobs 0
 set found 0
-set room_var %self.room%
-set ch %room_var.people%
+set ch %self.room.people%
 while %ch% && !%found%
   if (%ch.is_npc% && %ch.vnum% >= 10501 && %ch.vnum% <= 10504 && %ch.master% && %ch.master% == %actor%)
     set found 1
@@ -221,7 +220,7 @@ else
   %echoaround% %actor% %actor.name% uses %self.shortdesc%...
   eval vnum 10501 + %random.4% - 1
   %load% m %vnum%
-  set pet %room_var.people%
+  set pet %self.room.people%
   if (%pet% && %pet.vnum% == %vnum%)
     %force% %pet% mfollow %actor%
     %echo% %pet.name% appears!
@@ -382,8 +381,7 @@ switch %random.3%
     wait 3 sec
     %echo% &rThere is a blinding flash of light, and everything is encased in ice!
     %aoe% 25 magical
-    set room %self.room%
-    set person %room.people%
+    set person %self.room.people%
     while %person%
       if %person.is_enemy(%self%)%
         dg_affect #10552 %person% SLOW on 20
@@ -424,8 +422,7 @@ switch %random.3%
     %send% %actor% %self.name% forms a sword out of ice and hurls it at you!
     %echoaround% %actor% %self.name% forms a sword out of ice and hurls it at %actor.name%!
     %load% mob 10560 ally %self.level%
-    set room %self.room%
-    set summon %room.people%
+    set summon %self.room.people%
     if %summon.vnum% == 10560
       %send% %actor% %summon.name% begins attacking you with a malevolent will of %summon.hisher% own!
       %echoaround% %actor% %summon.name% begins attacking %actor.name% with a malevolent will of %summon.hisher% own!
@@ -456,8 +453,7 @@ switch %random.3%
     %echo% %self.name% raises %self.hisher% arms to the sky and starts chanting.
     wait 3 sec
     %echo% An intense blizzard suddenly forms in the violet sky above the glacier!
-    set room %self.room%
-    set person %room.people%
+    set person %self.room.people%
     eval magnitude %self.level%/5
     if !%heroic_mode%
       eval magnitude %magnitude%/2
@@ -506,8 +502,7 @@ switch %random.3%
       set summon_vnum 10562
     end
     %load% mob %summon_vnum% ally %self.level%
-    set room %self.room%
-    set summon %room.people%
+    set summon %self.room.people%
     if %summon.vnum% == %summon_vnum%
       %echo% %summon.name% soars down from the clear violet sky!
       %force% %summon% %aggro% %actor%
@@ -551,8 +546,7 @@ switch %random.3%
     if %heroic_mode%
       %echo% &rEveryone is slashed by %self.name%'s rime blades!
       %aoe% 150 physical
-      set room %self.room%
-      set person %room.people%
+      set person %self.room.people%
       while %person%
         if %person.is_enemy(%self%)%
           %send% %person% You receive dozens of painful, bleeding wounds!
@@ -610,8 +604,7 @@ switch %random.3%
   case 2
     * Snow flurry
     %echo% %self.name% kicks up a flurry of snow!
-    set room %self.room%
-    set person %room.people%
+    set person %self.room.people%
     while %person%
       if %self.is_enemy(%person%)%
         %send% %person% The snow gets in your eyes!
@@ -711,8 +704,7 @@ set exitroom i10550
 if %exitroom%
   %door% %exitroom% north room %newroom%
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   set next_person %person.next_in_room%
   %teleport% %person% %newroom%
@@ -804,8 +796,7 @@ Permafrost boss death~
 0 f 100
 ~
 * It's a token party and everyone's invited! ...No, not toking.
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     * You get a token, and you get a token, and YOU get a token!
@@ -1001,8 +992,7 @@ else
   return 1
   halt
 end
-set room %actor.room%
-set person %room.people%
+set person %actor.room.people%
 while %person%
   if %person.is_pc%
     if %person.on_quest(10550)%

@@ -282,8 +282,7 @@ set exitroom i18300
 if %exitroom%
   %door% %exitroom% down room %newroom%
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   set next_person %person.next_in_room%
   %teleport% %person% %newroom%

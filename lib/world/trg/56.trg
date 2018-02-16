@@ -12,8 +12,8 @@ Study: remove board~
 2 s 0
 ~
 set obj %room.contents%
-set next_obj %obj.next_in_list%
 while %obj%
+  set next_obj %obj.next_in_list%
   if %obj.vnum% == 1
     %purge% %obj% $p disappears.
   end

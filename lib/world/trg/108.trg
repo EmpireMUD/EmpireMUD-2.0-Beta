@@ -158,8 +158,7 @@ end
 Detect Harvest~
 1 c 3
 harvest~
-set room %actor.room%
-if %room.crop%
+if %actor.room.crop%
   %quest% %actor% trigger 10856
 end
 return 0

@@ -40,8 +40,7 @@ switch %random.4%
     * Resist buff on party
     %echo% %self.name% shines as brightly as the moon, lighting up the whole party!
     eval amount %self.level% / 20
-    set room %self.room%
-    set ch %room.people%
+    set ch %self.room.people%
     while %ch%
       if %self.is_ally(%ch%)%
         %send% %ch% You bask in %self.name%'s glow!
@@ -166,9 +165,8 @@ switch %random.4%
   case 3
     * Restore health on party
     %echo% %self.name% bursts into flames, sending a healing fire through the party!
-    set room %self.room%
     set healing_done 0
-    set ch %room.people%
+    set ch %self.room.people%
     while %ch%
       if %self.is_ally(%ch%)%
         if %ch.health% < %ch.maxhealth%
@@ -187,8 +185,7 @@ switch %random.4%
     * Bonus damage buff on party
     %echo% %self.name% bursts into flames, inspiring burning passion in the party!
     eval amount %self.level% / 30
-    set room %self.room%
-    set ch %room.people%
+    set ch %self.room.people%
     while %ch%
       if %self.is_ally(%ch%)%
         %send% %ch% You feel inspired by %self.name%'s fire!
@@ -299,8 +296,7 @@ end
 * random results 1-3
 %send% %master% Your owl shadow wraps itself around the party!
 %echoaround% %master% %master.name%'s owl shadow wraps itself around the party!
-set room %self.room%
-set ch %room.people%
+set ch %self.room.people%
 set had_effect 0
 while %ch%
   if %self.is_ally(%ch%)%
@@ -460,8 +456,7 @@ switch %random.4%
     * Damage buff on party
     %echo% %self.name% sputters and throws embers out at the whole party!
     eval amount %self.level% / 30
-    set room %self.room%
-    set ch %room.people%
+    set ch %self.room.people%
     while %ch%
       if %self.is_ally(%ch%)%
         %send% %ch% You feel yourself surge in the embers' glow!
@@ -526,8 +521,7 @@ switch %type%
     %echo% %self.name% lets out a blood-curdling wail!
   break
 done
-set room %self.room%
-set ch %room.people%
+set ch %self.room.people%
 while %ch%
   if %self.is_enemy(%ch%)%
     %send% %ch% You feel the banshee's wail strike deep into your heart!

@@ -164,8 +164,7 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-set room_var %self.room%
-set mob %room_var.people%
+set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!
   %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
@@ -230,8 +229,7 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-set room_var %self.room%
-set mob %room_var.people%
+set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   %own% %mob% %actor.empire%
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!

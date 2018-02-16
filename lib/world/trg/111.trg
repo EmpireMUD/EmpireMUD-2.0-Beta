@@ -80,8 +80,7 @@ Pegasus Fly Away~
 0 ab 5
 ~
 set count 0
-set room_var %self.room%
-set target_char %room_var.people%
+set target_char %self.room.people%
 while %target_char%
   if (%target_char.is_pc%)
     eval count %count% + 1
@@ -117,8 +116,7 @@ dg_affect %actor% slow on 30
 Lean Left~
 2 c 0
 left~
-set room_var %actor.room%
-context %room_var.vnum%
+context %actor.room.vnum%
 %send% %actor% You lean hard to the left!
 %echoaround% %actor% %actor.name% leans hard to the left!
 set lean_left 1
@@ -130,8 +128,7 @@ remote lean_right %actor.id%
 Lean Right~
 2 c 0
 right~
-set room_var %actor.room%
-context %room_var.vnum%
+context %actor.room.vnum%
 %send% %actor% You lean hard to the right!
 %echoaround% %actor% %actor.name% leans hard to the right!
 set lean_left 0
@@ -143,8 +140,7 @@ remote lean_right %actor.id%
 Duck!~
 2 c 0
 duck~
-set room_var %actor.room%
-context %room_var.vnum%
+context %actor.room.vnum%
 %send% %actor% You duck in the boat!
 %echoaround% %actor% %actor.name% ducks!
 set has_ducked 1
@@ -403,10 +399,9 @@ if (%actor.position% != Standing)
 end
 set target %self.val0%
 %load% v %target%
-* Todo: eval vehicle %room_var.first_vehicle_in_room% / etc
+* Todo: eval vehicle %self.room.first_vehicle_in_room% / etc
 * and use %vehicle.name% instead of "a rib-bone boat"
 * (see mini-pet use for an example)
-set room_var %self.room%
 %send% %actor% You use %self.shortdesc% and a rib-bone boat appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and a rib-bone boat appears!
 %purge% %self%

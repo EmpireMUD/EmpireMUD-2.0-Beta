@@ -80,8 +80,7 @@ Swamp Hag reward~
 0 f 100
 ~
 %adventurecomplete%
-set room_var %self.room%
-set ch %room_var.people%
+set ch %self.room.people%
 while %ch%
   if %ch.is_pc% && %ch.is_ally(%actor%)%
     if %ch.skill(Natural Magic)% < 50 && %ch.skill(Natural Magic)% > 0
@@ -159,8 +158,7 @@ else
     break
     case 3
       %echo% The fire envelops Jorr and then shoots out in all directions, burning everyone!
-      set room_var %self.room%
-      set ch %room_var.people%
+      set ch %self.room.people%
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
@@ -208,8 +206,7 @@ Liza the Hound combat~
 wait 10
 switch %random.3%
   case 1
-    set room_var %self.room%
-    set ch %room_var.people%
+    set ch %self.room.people%
     while %ch%
       if %self.is_enemy(%ch%)% && %ch.maxmana% > %actor.maxmana%
         %send% %ch% %self.name% is coming for you!
@@ -774,8 +771,7 @@ if %actor.on_quest(10147)%
 end
 * Number of attacker kills for quest completion
 set target 4
-set room %self.room%
-set char %room.people%
+set char %self.room.people%
 while %char%
   if %char.is_pc%
     if %char.on_quest(10141)%
@@ -1080,9 +1076,8 @@ if !%arg%
 end
 * One quick trick to get the target room
 set direction %actor.parse_dir(%arg%)%
-set room_var %self%
-eval tricky %%room_var.%direction%(room)%%
-if !%tricky% || (%tricky.template% < %room_var.template%)
+eval tricky %%self.%direction%(room)%%
+if !%tricky% || (%tricky.template% < %self.template%)
   return 0
   halt
 end
@@ -1101,14 +1096,13 @@ Room block higher template id without infiltrate~
 2 q 100
 ~
 * One quick trick to get the target room
-set room_var %self%
-eval tricky %%room_var.%direction%(room)%%
+eval tricky %%self.%direction%(room)%%
 * Compare template ids to figure out if they're going forward or back
 if %actor.nohassle%
   %send% %actor% The obstruction gives you no hassle.
   halt
 end
-if (!%tricky% || %tricky.template% < %room_var.template%)
+if (!%tricky% || %tricky.template% < %self.template%)
   halt
 end
 %send% %actor% You can't go that way without Infiltrate!
@@ -1137,8 +1131,7 @@ dg_affect_room %self.room% !WEATHER on %self.val0%
 Cactus Spawn Teleport~
 0 n 100
 ~
-set room %self.room%
-if (!%instance.location% || %room.template% != 10146)
+if (!%instance.location% || %self.room.template% != 10146)
   halt
 end
 mgoto %instance.location%
@@ -1301,14 +1294,13 @@ if !%start_room%
   * No instance
   halt
 end
-set room %self.room%
-if %room.template% == 10146
+if %self.room.template% == 10146
   mgoto %start_room%
   mmove
   mmove
   mmove
   mmove
-elseif %room.distance(%start_room%)% > 20
+elseif %self.room.distance(%start_room%)% > 20
   mgoto %start_room%
 end
 ~
@@ -1322,14 +1314,13 @@ if !%actor.vampire%
 end
 * Infuse only at an oasis during the night. Costs 50 blood.
 set blood %actor.blood()%
-set room %actor.room%
 set cost 50
 * Condition checking
 if %blood% < %cost%
   %send% %actor% You don't have enough blood to infuse %self.shortdesc% - it costs %cost%.
   halt
 end
-if %room.sector% != Oasis
+if %actor.room.sector% != Oasis
   %send% %actor% You can only infuse %self.shortdesc% at an oasis.
   halt
 end
@@ -1663,8 +1654,7 @@ done
 Lavaformer Spawn~
 0 n 100
 ~
-set room %self.room%
-if (!%instance.location% || %room.template% != 10190)
+if (!%instance.location% || %self.room.template% != 10190)
   halt
 end
 mgoto %instance.location%

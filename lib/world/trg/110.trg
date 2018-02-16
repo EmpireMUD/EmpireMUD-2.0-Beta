@@ -2,8 +2,7 @@
 No Portal Inside~
 1 n 100
 ~
-set room %self.room%
-if %room.template% == 11000
+if %self.room.template% == 11000
   * This object is inside the adventure
   %purge% %self%
 else
@@ -154,12 +153,10 @@ detach 11009 %self.id%
 Scatter random corpses~
 0 b 50
 ~
-set room %self.room%
-if %room.distance(%instance.location%)% > 10
+if %self.room.distance(%instance.location%)% > 10
   mgoto %instance.location%
 end
-set room %self.room%
-set item %room.contents%
+set item %self.room.contents%
 while %item%
   if %item.vnum% == 11022 || %item.vnum% == 11023
     * Already a corpse here
@@ -169,7 +166,7 @@ while %item%
 done
 eval vnum (11022-1) + %random.2%
 %load% obj %vnum% %self.room%
-set item %room.contents%
+set item %self.room.contents%
 %echo% You find %item.shortdesc% nearby!
 * Look for the corpses made variable
 if %self.varexists(corpses_made)%
@@ -188,8 +185,7 @@ end
 Escape adventure and mmove~
 0 n 100
 ~
-set room %self.room%
-if (!%instance.location% || %room.template% != 11000)
+if (!%instance.location% || %self.room.template% != 11000)
   halt
 end
 mgoto %instance.location%
@@ -205,8 +201,7 @@ Roc Hatchling break egg on hatch~
 %echo% The egg begins to vibrate and crack...
 wait 1
 %echo% %self.name% hatches from the egg!
-set room %self.room%
-set obj %room.contents%
+set obj %self.room.contents%
 while %obj%
   set next_obj %obj.next_in_list%
   if %obj.vnum% == 11001
@@ -282,8 +277,7 @@ Delayed despawner remove roc egg~
 1 n 100
 ~
 wait 1
-set room %self.room%
-set obj %room.contents%
+set obj %self.room.contents%
 while %obj%
   set next_obj %obj.next_in_list%
   if %obj.vnum% == 11001
@@ -297,8 +291,7 @@ Combat Roc Death~
 0 f 100
 ~
 %load% mob 11001
-set room %self.room%
-set mob %room.people%
+set mob %self.room.people%
 %echo% %mob.name% shows up just at the last second!
 ~
 #11025
@@ -423,8 +416,7 @@ if %actor.fighting%
 else
   * Otherwise, spawn mob 11003, the shady thief.
   %load% mob 11003
-  set room %actor.room%
-  set mob %room.people%
+  set mob %actor.room.people%
   * Despawn the pursuing roc...
   set pursuer %instance.mob(11002)%
   if %pursuer%

@@ -40,8 +40,7 @@ Market Street trash spawner~
 1 n 100
 ~
 * Ensure no mobs here
-set room_var %self.room%
-set ch %room_var.people%
+set ch %self.room.people%
 set found 0
 while %ch% && !%found%
   if (%ch.is_npc%)
@@ -70,8 +69,7 @@ Main Street trash spawner~
 1 n 100
 ~
 * Ensure no mobs here
-set room_var %self.room%
-set ch %room_var.people%
+set ch %self.room.people%
 set found 0
 while %ch% && !%found%
   if (%ch.is_npc%)
@@ -99,8 +97,7 @@ Temple Street trash spawner~
 1 n 100
 ~
 * Ensure no mobs here
-set room_var %self.room%
-set ch %room_var.people%
+set ch %self.room.people%
 set found 0
 while %ch% && !%found%
   if (%ch.is_npc%)
@@ -344,8 +341,7 @@ end
 %load% m %self.val0%
 %send% %actor% You use %self.shortdesc% and a new mount appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
-set room_var %self.room%
-set mob %room_var.people%
+set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end

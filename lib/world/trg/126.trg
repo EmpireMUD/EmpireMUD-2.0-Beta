@@ -6,7 +6,6 @@ if !%arg%
   %send% %actor% Trap whom?
   halt
 end
-set room %self.room%
 set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They're not here.

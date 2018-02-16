@@ -29,8 +29,7 @@ if %self.affect(BLIND)%
   %echo% %self.name%'s eyes flash blue, and %self.hisher% vision clears!
   dg_affect %self% BLIND off 1
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 19001 || %person.vnum% == 19002
     * Rat already present
@@ -47,8 +46,7 @@ if %heroic_mode%
 else
   %load% mob 19001 ally
 end
-set room %self.room%
-set summon %room.people%
+set summon %self.room.people%
 if %summon%
   %echo% %summon.name% scurries out from a cage!
   %force% %summon% %aggro% %actor%
@@ -94,8 +92,7 @@ else
   wait 2 sec
   %echo% %self.name% starts rapidly stabbing needles into the dolls on the nearby shelves!
   %echo% You feel stabbing pains in your limbs!
-  set room %self.room%
-  set person %room.people%
+  set person %self.room.people%
   while %person%
     if %self.is_enemy(%person%)%
       dg_affect #19003 %person% SLOW on 45
@@ -122,9 +119,8 @@ if %heroic_mode%
 else
   %echo% Everyone is bitten and stung by the insects!
 end
-set room %self.room%
 if %heroic_mode%
-  set person %room.people%
+  set person %self.room.people%
   while %person%
     if %person.is_pc%
       dg_affect #19004 %person% BLIND on 20
@@ -192,8 +188,7 @@ if %exitroom%
   %door% %exitroom% %exitroom.enter_dir% room %newroom%
   %door% %newroom% %exitroom.exit_dir% room %exitroom%
 end
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   set next_person %person.next_in_room%
   %teleport% %person% %newroom%
@@ -250,8 +245,7 @@ set item %room.contents%
 %adventurecomplete%
 * For each player in the room (on hard+ only):
 if %self.mob_flagged(HARD)% || %self.mob_flagged(GROUP)%
-  set room_var %self.room%
-  set ch %room_var.people%
+  set ch %self.room.people%
   while %ch%
     if %ch.is_pc%
       * Token reward
@@ -291,8 +285,7 @@ if !%heroic_mode%
 end
 * Find a non-bound target
 set target %actor%
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 set target_found 0
 set no_targets 0
 while %target.affect(19009)% && %person%
@@ -505,8 +498,7 @@ if %actor%
       else
         set level 100
       end
-      set room %self.room%
-      set person %room.people%
+      set person %self.room.people%
       while %person%
         if %person.is_pc%
           %load% obj %vnum% %actor% inv %level%
@@ -682,8 +674,7 @@ wait 3 sec
 if %heroic_mode%
   %aoe% 125 physical
   %echo% &r%self.name%'s wild swings leave bleeding wounds!
-  set room %self.room%
-  set person %room.people%
+  set person %self.room.people%
   while %person%
     if %person.is_enemy(%self%)%
       %dot% #10203 %person% 100 20 physical
@@ -735,8 +726,7 @@ if %actor.fighting% == %self%
   halt
 end
 set target 0
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% >= 10200 && %person.vnum% <= 10205 && %person.vnum% != %self.vnum% && %person.fighting% == %self.fighting%
     set target %person%
@@ -898,8 +888,7 @@ wait 5 sec
 if %heroic_mode%
   %echo% &rThe bomb explodes, stunning you!
   %aoe% 100 physical
-  set room %self.room%
-  set person %room.people%
+  set person %self.room.people%
   while %person%
     if %person.is_enemy(%self%)%
       dg_affect #10209 %person% HARD-STUNNED on 5

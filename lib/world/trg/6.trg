@@ -269,8 +269,7 @@ switch %random.4%
   break
   case 3
     %echo% %self.name% sneezes pixy dust all over you!
-    set room %self.room%
-    set ch %room.people%
+    set ch %self.room.people%
     while %ch%
       dg_affect %ch% FLY on 60
       set ch %ch.next_in_room%
@@ -299,8 +298,7 @@ switch %random.4%
   break
   case 3
     %echo% %self.name% sprinkles pixy dust all over you!
-    set room %self.room%
-    set ch %room.people%
+    set ch %self.room.people%
     while %ch%
       dg_affect %ch% FLY on 60
       set ch %ch.next_in_room%

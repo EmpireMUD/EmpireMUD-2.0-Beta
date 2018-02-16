@@ -3,8 +3,7 @@ Time Lion death 2.0~
 0 f 100
 ~
 %echo% Oh no! You've messed with the time lion and now you no longer exist!
-set room %self.room%
-set person %room.people%
+set person %self.room.people%
 while %person%
   if %person% != %self%
     %damage% %person% 10000 direct
