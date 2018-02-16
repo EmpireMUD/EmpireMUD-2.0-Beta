@@ -12,8 +12,7 @@ say Are you going to eat that?
 Hermit Food Exchange~
 0 j 100
 ~
-eval test %%self.varexists(gave%actor.id%)%%
-if %object.type% != FOOD || %test%
+if %object.type% != FOOD || %self.varexists(gave%actor.id%)%
   %send% %actor% %self.name% doesn't want %object.shortdesc%!
   %send% %actor% (You have already completed this quest in this instance.)
   return 0
@@ -394,8 +393,7 @@ end
 Vehicle Coupon Summon~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -588,8 +586,7 @@ Sarcophagus open~
 open~
 context %instance.id%
 * Did they target me?
-eval test %%self.is_name(%arg%)%%
-if %sarcophagus_running% || !(%test%)
+if %sarcophagus_running% || !%self.is_name(%arg%)%
   return 0
   halt
 end

@@ -264,8 +264,7 @@ return 0
 Molten essence identify~
 1 c 6
 identify~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   halt
 end
 return 0
@@ -436,7 +435,7 @@ end
 %send% %actor% You create %name%!
 %echoaround% %actor% %actor.name% creates %name%!
 %load% obj %vnum% %actor% inv
-eval made %%actor.inventory(%vnum%)%%
+set made %actor.inventory(%vnum%)%
 if %made%
   nop %made.flag(HARD-DROP)%
   nop %made.flag(GROUP-DROP)%

@@ -35,8 +35,7 @@ set room %self.room%
 set person %room.people%
 set ally_guards_present 0
 while %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %test% && %person.is_pc% && %person.empire% != %self.empire%
+  if %person.is_enemy(%self%)% && %person.is_pc% && %person.empire% != %self.empire%
     set found_hostile_player 1
   elseif %person.vnum% == %self.vnum%
     eval ally_guards_present %ally_guards_present% + 1
@@ -76,8 +75,7 @@ done
 Hestian Trinket~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -97,12 +95,10 @@ end
 set veh %home.in_vehicle%
 if %veh%
   set outside_room %veh.room%
-  eval test %%actor.canuseroom_guest(%outside_room%)%%
-  eval test2 %%actor.can_teleport_room(%outside_room%)%%
-  if !%test%
+  if !%actor.canuseroom_guest(%outside_room%)%
     %send% %actor% You can't teleport home to a vehicle that's parked on foreign territory you don't have permission to use!
     halt
-  elseif !%test2%
+  elseif !%actor.can_teleport_room(%outside_room%)%
     %send% %actor% You can't teleport to your home's current location.
     halt
   end
@@ -141,8 +137,7 @@ if !%arg%
   halt
 end
 set item %actor.inventory()%
-set found 0
-eval found %%actor.obj_target(%arg%)%%
+set found %actor.obj_target(%arg%)%
 if !%found%
   %send% %actor% You don't seem to have that.
   halt
@@ -162,8 +157,7 @@ end
 Trinket of Conveyance~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -207,8 +201,7 @@ Letheian Icon use~
 use~
 set item %arg.car%
 set sk %arg.cdr%
-eval test %%actor.obj_target(%item%)%%
-if (%test% != %self%) && (use /= %cmd%)
+if (%actor.obj_target(%item%)% != %self%) && (use /= %cmd%)
   return 0
   halt
 end
@@ -220,16 +213,13 @@ if (%actor.position% != Standing)
   %send% %actor% You can't do that right now.
   halt
 end
-eval test %%skill.validate(%sk%)%%
-if !%test%
+if !%skill.validate(%sk%)%
   %send% %actor% No such skill '%sk%'.
   halt
 end
-eval name %%skill.name(%sk%)%%
-%send% %actor% You use %self.shortdesc% and gain a skill reset in %name%!
+%send% %actor% You use %self.shortdesc% and gain a skill reset in %skill.name(%sk%)%!
 %echoaround% %actor% %actor.name% uses %self.shortdesc%.
-eval grant %%actor.give_skill_reset(%sk%)%%
-nop %grant%
+nop %actor.give_skill_reset(%sk%)%
 %purge% %self%
 ~
 $

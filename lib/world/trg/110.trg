@@ -61,8 +61,7 @@ switch %random.4%
     %echo% %self.name% lets out a piercing screech!
     set ch %room.people%
     while %ch%
-      eval test %%self.is_enemy(%ch%)%%
-      if %test%
+      if %self.is_enemy(%ch%)%
         dg_affect %ch% DODGE -10 10
         dg_affect %ch% TO-HIT -10 10
         %send% %actor% You are momentarily deafened by the loud noise!
@@ -148,8 +147,7 @@ forage~
 set num 4
 %send% %actor% You forage around and find a large tree (x%num%)!
 %echoaround% %actor% %actor.name% forages around and finds a large tree (x%num%)
-eval give %%actor.add_resources(120, %num%)%%
-nop %give%
+nop %actor.add_resources(120, %num%)%
 detach 11009 %self.id%
 ~
 #11010
@@ -157,8 +155,7 @@ Scatter random corpses~
 0 b 50
 ~
 set room %self.room%
-eval distance %%room.distance(%instance.location%)%%
-if %distance% > 10
+if %room.distance(%instance.location%)% > 10
   mgoto %instance.location%
 end
 set room %self.room%
@@ -396,7 +393,7 @@ if %actor%
     set level 100
   end
   %load% obj %vnum% %actor% inv %level%
-  eval item %%actor.inventory(%vnum%)%%
+  set item %actor.inventory(%vnum%)%
   %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   if %item.is_flagged(BOE)%
     nop %item.flag(BOE)%
@@ -404,8 +401,7 @@ if %actor%
   if !%item.is_flagged(BOP)%
     nop %item.flag(BOP)%
   end
-  eval do_bind %%item.bind(%actor%)%%
-  nop %do_bind%
+  nop %item.bind(%actor%)%
 end
 %purge% %self%
 ~

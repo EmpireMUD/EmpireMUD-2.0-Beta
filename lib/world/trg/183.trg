@@ -96,7 +96,7 @@ switch %random.4%
           %send% %person% You are pummeled by raging waters...
           %damage% %person% 100 physical
         end
-        eval test %%self.varexists(swimming_%person.id%)%%
+        set test %self.varexists(swimming_%person.id%)%
         if %test%
           eval test %%self.swimming_%person.id%%%
         end
@@ -136,8 +136,7 @@ switch %random.4%
       set room %self.room%
       set person %room.people%
       while %person%
-        eval check %%self.is_enemy(%person%)%%
-        if %check%
+        if %self.is_enemy(%person%)%
           if %cycle% == 1
             dg_affect %person% BLIND on 20
           end
@@ -256,7 +255,7 @@ end
 * Clear existing difficulty flags and set new ones.
 set vnum 18300
 while %vnum% <= 18300
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -382,15 +381,14 @@ if %actor%
       %load% obj %vnum% %actor% inv
       %load% obj %vnum% %actor% inv
     end
-    eval item %%actor.inventory(%vnum%)%%
+    set item %actor.inventory(%vnum%)%
     if !%item.is_flagged(GROUP-DROP)% && %vnum% >= 18300 && %vnum% <= 18303
       * flag clothes with group-drop
       nop %item.flag(GROUP-DROP)%
       %scale% %item% %level%
     end
     if %item.is_flagged(BOP)%
-      eval bind %%item.bind(%self%)%%
-      nop %bind%
+      nop %item.bind(%self%)%
     end
   end
 end
@@ -450,7 +448,7 @@ if !%arg%
   return 1
   halt
 end
-eval item %%actor.obj_target(%arg%)%%
+set item %actor.obj_target(%arg%)%
 if %item.worn_by% || !%item.carried_by%
   %send% %actor% You can only offer an item from your inventory.
   return 1
@@ -525,10 +523,9 @@ while %number% > 0
     eval iterator %iterator% + 1
   done
   %load% obj %vnum% %actor% inv
-  eval item %%actor.inventory(%vnum%)%%
+  set item %actor.inventory(%vnum%)%
   * Bind item
-  eval bind %%item.bind(%self%)%%
-  nop %bind%
+  nop %item.bind(%self%)%
   eval items_left %items_left% - 1
   eval number %number% - 1
 done
@@ -538,8 +535,7 @@ done
 Combine canopic jars~
 1 c 2
 combine~
-eval targ %%actor.obj_target(%arg%)%%
-if %targ% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -578,7 +574,6 @@ context %instance.id%
 * One quick trick to get the target room
 set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   return 1
@@ -601,7 +596,7 @@ if %actor.last_trap_command% == run && %actor.position% == Standing
   %echoaround% %actor% %actor.name% dashes forward, barely avoiding a huge stone block which falls from the ceiling!
   %send% %actor% You dive through an archway into the next room.
   %echoaround% %actor% %actor.name% dives through an archway into the next room.
-  %teleport% %actor% %to_room%
+  %teleport% %actor% %tricky%
   %echoaround% %actor% %actor.name% dives through the doorway from the previous room.
   %force% %actor% look
 else
@@ -612,7 +607,7 @@ else
   if %actor.health% > 0 && %actor.position% == Standing
     %send% %actor% You stagger forward to the next room.
     %echoaround% %actor% %actor.name% staggers through to the next room, looking dazed.
-    %teleport% %actor% %to_room%
+    %teleport% %actor% %tricky%
     %echoaround% %actor% %actor.name% staggers through the doorway from the previous room, looking dazed.
     %force% %actor% look
   end
@@ -717,7 +712,7 @@ end
 * Clear existing difficulty flags and set new ones.
 set vnum 18350
 while %vnum% <= 18350
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?

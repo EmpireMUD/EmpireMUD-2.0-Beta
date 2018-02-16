@@ -77,11 +77,9 @@ set room %self.room%
 set person %room.people%
 while %person%
   if %person.is_pc%
-    eval name %%currency.12000(%tokens%)%%
-    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %name%!
+    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
     if %person.level% >= (%self.level% - 75)
-      eval operation %%person.give_currency(12000, %tokens%)%%
-      nop %operation%
+      nop %person.give_currency(12000, %tokens%)%
       if %tokens% == 1
         %send% %person% You take it.
       else
@@ -184,11 +182,9 @@ set room %self.room%
 set person %room.people%
 while %person%
   if %person.is_pc%
-    eval name %%currency.12000(%tokens%)%%
-    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %name%!
+    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
     if %person.level% >= (%self.level% - 75)
-      eval operation %%person.give_currency(12000, %tokens%)%%
-      nop %operation%
+      nop %person.give_currency(12000, %tokens%)%
       if %tokens% == 1
         %send% %person% You take it.
       else
@@ -276,8 +272,7 @@ set amount 5000
 set room %self.room%
 set person %room.people%
 while %person%
-  eval check %%person.is_enemy(%self%)%%
-  if %check%
+  if %person.is_enemy(%self%)%
     %send% %person% &rA fountain of blood suddenly bursts from the wounds left by %self.name%'s assault!
     %damage% %person% 150
     eval amount %amount% + 1000
@@ -336,7 +331,7 @@ set room %self.room%
 set person %room.people%
 while %person%
   if %person.is_pc%
-    eval test %%self.varexists(jumped_%person.id%)%%
+    set test %self.varexists(jumped_%person.id%)%
     if %test%
       eval test %%self.jumped_%person.id%%%
     end
@@ -656,8 +651,7 @@ wait 2 sec
 set room %self.room%
 set person %room.people%
 while %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %test%
+  if %person.is_enemy(%self%)%
     if %self.mob_flagged(GROUP)%
       dg_affect #12035 %person% HARD-STUNNED on 10
     else
@@ -849,9 +843,7 @@ remote interrupted %self.id%
 Call Storm~
 1 c 3
 use~
-eval test %%self.is_name(%arg%)%%
-eval target %%actor.obj_target(%arg%)%%
-if !(%test% && %self.worn_by%) && !(%target% == %self% && %self.carried_by%)
+if !(%self.is_name(%arg%)% && %self.worn_by%) && !(%actor.obj_target(%arg%)% == %self% && %self.carried_by%)
   return 0
   halt
 end

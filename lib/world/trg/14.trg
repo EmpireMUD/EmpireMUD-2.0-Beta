@@ -109,7 +109,6 @@ else
   * Quest can be completed
   %quest% %actor% trigger 1402
 end
-eval do %%self.val0(%new_color%)%%
-nop %do%
+nop %self.val0(%new_color%)%
 ~
 $

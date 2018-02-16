@@ -138,8 +138,7 @@ done
 Dragon Whistle use~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -156,8 +155,7 @@ end
 Non-Mount Summon~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -223,8 +221,7 @@ done
 Empire Non-Mount Summon~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end

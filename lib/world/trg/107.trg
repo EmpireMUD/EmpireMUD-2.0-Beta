@@ -8,8 +8,7 @@ if (%questvnum% != 10700)
 end
 set vnum 10723
 while %vnum% <= 10726
-  eval check %%actor.inventory(%vnum%)%%
-  if !%check%
+  if !%actor.inventory(%vnum%)%
     return 1
     halt
   end
@@ -82,8 +81,7 @@ done
 Christmas Gift open~
 1 c 2
 open~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -189,8 +187,7 @@ Completer~
 Faster Hestian Trinket (snowglobe)~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -210,12 +207,10 @@ end
 set veh %home.in_vehicle%
 if %veh%
   set outside_room %veh.room%
-  eval test %%actor.canuseroom_guest(%outside_room%)%%
-  eval test2 eval test %%actor.can_teleport_room(%outside_room%)%%
-  if !%test%
+  if !%actor.canuseroom_guest(%outside_room%)%
     %send% %actor% You can't teleport home to a vehicle that's parked on foreign territory you don't have permission to use!
     halt
-  elseif !%test2%
+  elseif !%actor.can_teleport_room(%outside_room%)%
     %send% %actor% You can't teleport to your home's current location.
     halt
   end
@@ -272,8 +267,7 @@ set pets_remaining 4
 set vnum 10723
 set number 1
 while %vnum% <= 10726
-  eval cond %%actor.inventory(%vnum%)%%
-  if %cond%
+  if %actor.inventory(%vnum%)%
     eval pets_remaining %pets_remaining%-1
     set has_%vnum% 1
   else
@@ -299,7 +293,7 @@ if %actor%
   *   set level 100
   * end
   %load% obj %vnum% %actor% inv %level%
-  eval item %%actor.inventory(%vnum%)%%
+  set item %actor.inventory(%vnum%)%
   %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   if %item.is_flagged(BOE)%
     nop %item.flag(BOE)%
@@ -307,8 +301,7 @@ if %actor%
   if !%item.is_flagged(BOP)%
     nop %item.flag(BOP)%
   end
-  eval do_bind %%item.bind(%actor%)%%
-  nop %do_bind%
+  nop %item.bind(%actor%)%
 end
 %purge% %self%
 ~
@@ -316,8 +309,7 @@ end
 Magical coal use~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -327,9 +319,8 @@ if (%actor.position% != Standing)
   halt
 end
 set varname summon_%self.vnum%
-set test %actor.cooldown(10728)%
 * Cooldown
-if %test%
+if %actor.cooldown(10728)%
   %send% %actor% %self.shortdesc% is on cooldown.
   halt
 end
@@ -498,8 +489,7 @@ switch %random.3%
 Mother Goose Teleport~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -635,9 +625,8 @@ end
 Sell spider parts to Miner Nynar~
 1 c 2
 sell~
-eval test %%self.is_name(%arg%)%%
 * Test keywords
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -664,9 +653,8 @@ nop %actor.give_coins(5)%
 Sell spider meat to Miner Meena~
 1 c 2
 sell~
-eval test %%self.is_name(%arg%)%%
 * Test keywords
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -963,8 +951,7 @@ set person %room.people%
 set target_found 0
 set no_targets 0
 while %target.affect(10760)% && %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %person.is_pc% && %test%
+  if %person.is_pc% && %person.is_enemy(%self%)%
     set target %person%
   end
   set person %person.next_in_room%
@@ -1031,13 +1018,12 @@ if %command% != build
 end
 set varname tomb%self.vnum%
 * once per 6 hours
-eval test %%actor.cooldown(%self.vnum%)%%
-if %test%
+if %actor.cooldown(%self.vnum%)%
   %send% %actor% You must wait before using %self.shortdesc% again.
   return 1
   halt
 end
-eval cooldown %%actor.set_cooldown(%self.vnum%, 21600)%%
+nop %actor.set_cooldown(%self.vnum%, 21600)%
 return 1
 ~
 #10771

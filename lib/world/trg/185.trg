@@ -113,8 +113,7 @@ switch %random.4%
           end
           %send% %person% %self.name% drains %actual_amount% of your mana!
           eval total_drained %total_drained% + %actual_amount%
-          eval do %%person.mana(-%actual_amount%)%%
-          nop %do%
+          nop %person.mana(-%actual_amount%)%
         end
         set person %person.next_in_room%
       done
@@ -165,8 +164,7 @@ switch %random.4%
     %echo% %self.name% utters a word which causes ripples in the fabric of reality.
     set keep_going 1
     while %person% && %keep_going%
-      eval test %%self.is_enemy(%person%)%%
-      if %test%
+      if %self.is_enemy(%person%)%
         if !%person.trigger_counterspell%
           %send% %person% You fall to your knees as your body stops responding to your commands!
           %echoaround% %person% %person.name% falls to %person.hisher% knees, stunned.
@@ -316,8 +314,7 @@ switch %attack%
       set room %self.room%
       set person %room.people%
       while %person%
-        eval test %%self.is_enemy(%person%)%%
-        if %test%
+        if %self.is_enemy(%person%)%
           dg_affect #18511 %person% BLIND on 10
         end
         set person %person.next_in_room%
@@ -352,8 +349,7 @@ switch %attack%
     set room %self.room%
     set person %room.people%
     while %person%
-      eval test %%self.is_enemy(%person%)%%
-      if %test%
+      if %self.is_enemy(%person%)%
         dg_affect #18513 %person% DISARM on 15
       end
       set person %person.next_in_room%
@@ -372,8 +368,7 @@ switch %attack%
     set room %self.room%
     set person %room.people%
     while %person%
-      eval test %%self.is_enemy(%person%)%%
-      if %test%
+      if %self.is_enemy(%person%)%
         %load% mob 18506
         set summon %room.people%
         if %summon.vnum% == 18506
@@ -473,7 +468,6 @@ context %instance.id%
 * One quick trick to get the target room
 set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   return 1
@@ -498,7 +492,7 @@ if %actor.last_trap_command% == jump && %actor.position% == Standing
   %echoaround% %actor% %actor.name% leaps forward as a pit opens beneath %actor.hisher% feet!
   %send% %actor% You barely clear the pit, landing safely in the next room.
   %echoaround% %actor% %actor.name% barely clears the pit, landing safely in the next room.
-  %teleport% %actor% %to_room%
+  %teleport% %actor% %tricky%
   %echoaround% %actor% %actor.name% leaps through the doorway into the room!
   %force% %actor% look
 else
@@ -537,7 +531,6 @@ context %instance.id%
 * One quick trick to get the target room
 set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
-set to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   return 1
@@ -562,7 +555,7 @@ if %actor.last_trap_command% == duck && %actor.position% == Standing
   %echoaround% %actor% A blade slices through the air, barely missing %actor.name%!
   %send% %actor% You scramble forward, reaching the next room safely.
   %echoaround% %actor% %actor.name% scrambles forward, reaching the next room.
-  %teleport% %actor% %to_room%
+  %teleport% %actor% %tricky%
   %echoaround% %actor% %actor.name% scrambles through the doorway from the previous room.
   %force% %actor% look
 else
@@ -573,7 +566,7 @@ else
   if %actor.health% > 0 && %actor.position% == Standing
     %send% %actor% You quickly scramble forward to the next room.
     %echoaround% %actor% %actor.name% scrambles forward to the next room, badly wounded.
-    %teleport% %actor% %to_room%
+    %teleport% %actor% %tricky%
     %echoaround% %actor% %actor.name% scrambles through the doorway from the previous room.
     %force% %actor% look
   else
@@ -605,7 +598,6 @@ context %instance.id%
 * One quick trick to get the target room
 set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   return 1
@@ -630,7 +622,7 @@ if %actor.last_trap_command% == run && %actor.position% == Standing
   %echoaround% %actor% %actor.name% dashes forward, barely avoiding a hail of darts from the wall!
   %send% %actor% You dive through an archway into the next room.
   %echoaround% %actor% %actor.name% dives through an archway into the next room.
-  %teleport% %actor% %to_room%
+  %teleport% %actor% %tricky%
   %echoaround% %actor% %actor.name% dives through the doorway from the previous room.
   %force% %actor% look
 else
@@ -642,7 +634,7 @@ else
   if %actor.health% > 0 && %actor.position% == Standing
     %send% %actor% You quickly dive forward to the next room.
     %echoaround% %actor% %actor.name% dives forward to the next room, badly wounded.
-    %teleport% %actor% %to_room%
+    %teleport% %actor% %tricky%
     %echoaround% %actor% %actor.name% dives through the doorway from the previous room.
     %force% %actor% look
   end
@@ -822,7 +814,6 @@ Mob block higher template id~
 * One quick trick to get the target room
 set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   halt
@@ -862,7 +853,7 @@ end
 * Clear existing difficulty flags and set new ones.
 set vnum 18500
 while %vnum% <= 18502
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -1074,10 +1065,9 @@ if %actor%
       set level 100
     end
     %load% obj %vnum% %actor% inv %level%
-    eval item %%actor.inventory(%vnum%)%%
+    set item %actor.inventory(%vnum%)%
     if %item.is_flagged(BOP)%
-      eval bind %%item.bind(%self%)%%
-      nop %bind%
+      nop %item.bind(%self%)%
     end
     * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   end

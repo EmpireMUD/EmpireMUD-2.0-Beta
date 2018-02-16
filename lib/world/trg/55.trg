@@ -10,8 +10,7 @@ if !(sorcery /= %arg%)
   return 0
   halt
 end
-eval permission %%actor.canuseroom_guest(%room%)%%
-if !%permission%
+if !%actor.canuseroom_guest(%room%)%
   %send% %actor% You don't have permission to study here!
   return 1
   halt

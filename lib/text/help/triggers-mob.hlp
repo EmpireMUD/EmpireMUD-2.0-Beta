@@ -419,10 +419,7 @@ When using field  - The variable returns:
 &cinventory()&0 - Returns the id of the first item in the actors inventory or 
    the id of the first object with vnum in the subfield. If the character
    doesn't have the item, an empty string is returned. * checks for any inv. 
-&cis_ally(char)&0 - Returns true if the other character is a combat ally. Run
-   this in two steps:
-      eval test %%actor.is_ally(%char%)%%
-      if %test% ...
+&cis_ally(char)&0 - Returns true if the other character is a combat ally.
 &cis_enemy(char)&0 - Returns true if the other character is a combat enemy.
 &cis_god&0 - Returns true if the actor is a god-level player.
 &cis_hostile(on/off)&0 - If the ()'s are omitted, return value is whether or

@@ -83,8 +83,7 @@ Swamp Hag reward~
 set room_var %self.room%
 set ch %room_var.people%
 while %ch%
-  eval test %%ch.is_ally(%actor%)%%
-  if %ch.is_pc% && %test%
+  if %ch.is_pc% && %ch.is_ally(%actor%)%
     if %ch.skill(Natural Magic)% < 50 && %ch.skill(Natural Magic)% > 0
       %ch.gain_skill(Natural Magic,1)%
     elseif %ch.skill(High Sorcery)% < 50 && %ch.skill(High Sorcery)% > 0
@@ -164,8 +163,7 @@ else
       set ch %room_var.people%
       while %ch%
         set next_ch %ch.next_in_room%
-        eval test %%self.is_enemy(%ch%)%%
-        if %test%
+        if %self.is_enemy(%ch%)%
           %dot% %ch% 50 10 fire
           %damage% %ch% 30 fire
         end
@@ -213,8 +211,7 @@ switch %random.3%
     set room_var %self.room%
     set ch %room_var.people%
     while %ch%
-      eval test %%self.is_enemy(%ch%)%%
-      if %test% && %ch.maxmana% > %actor.maxmana%
+      if %self.is_enemy(%ch%)% && %ch.maxmana% > %actor.maxmana%
         %send% %ch% %self.name% is coming for you!
         %echoaround% %ch% %self.name% runs for %ch.name%!
         %aggro% %ch%
@@ -628,7 +625,6 @@ end
 set room %actor.room%
 set cycles_left 5
 while %cycles_left% >= 0
-  eval permission %%actor.canuseroom_member(%room%)%%
   eval sector_valid ((%room.sector% == Desert) || (%room.sector% == Grove))
   set cloud_present 0
   set object %room.contents%
@@ -638,12 +634,12 @@ while %cycles_left% >= 0
     end
     set object %object.next_in_list%
   done
-  if (%actor.room% != %room%) || !%permission% || !%sector_valid% || %cloud_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%actor.canuseroom_member(%room%)% || !%sector_valid% || %cloud_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 5
       %echoaround% %actor% %actor.name%'s chant is interrupted.
       %send% %actor% Your chant is interrupted.
-    elseif !%permission%
+    elseif !%actor.canuseroom_member(%room%)%
       %send% %actor% You don't have permission to use the monsoon chant here.
     elseif !%sector_valid%
       %send% %actor% You must perform the chant on a desert or grove.
@@ -986,8 +982,7 @@ Hug a Cactus~
 0 ct 0
 hug~
 * test targeting me
-eval test %%actor.char_target(%arg%)%%
-if (%test% != %self% || %actor.nohassle%)
+if (%actor.char_target(%arg%)% != %self% || %actor.nohassle%)
   return 0
   halt
 end
@@ -1027,14 +1022,13 @@ set room %actor.room%
 set start_cycles 5
 set cycles_left %start_cycles%
 while %cycles_left% >= 0
-  eval permission %%actor.canuseroom_guest(%room%)%%
   eval location_valid (%room.building% == Tower of Sorcery || %room.building% == Top of the Tower)
-  if (%actor.room% != %room%) || !%permission% || !%location_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%actor.canuseroom_guest(%room%)% || !%location_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < %start_cycles%
       %echoaround% %actor% %actor.name%'s studying is interrupted.
       %send% %actor% Your studying is interrupted.
-    elseif !%permission%
+    elseif !%actor.canuseroom_guest(%room%)%
       %send% %actor% You don't have permission to study here.
     elseif !%sector_valid%
       %send% %actor% You must study at a Tower of Sorcery.
@@ -1085,7 +1079,7 @@ if !%arg%
   halt
 end
 * One quick trick to get the target room
-eval direction %%actor.parse_dir(%arg%)%%
+set direction %actor.parse_dir(%arg%)%
 set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
 if !%tricky% || (%tricky.template% < %room_var.template%)
@@ -1109,7 +1103,6 @@ Room block higher template id without infiltrate~
 * One quick trick to get the target room
 set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if %actor.nohassle%
   %send% %actor% The obstruction gives you no hassle.
@@ -1309,14 +1302,13 @@ if !%start_room%
   halt
 end
 set room %self.room%
-eval dist %%room.distance(%start_room%)%%
 if %room.template% == 10146
   mgoto %start_room%
   mmove
   mmove
   mmove
   mmove
-elseif %dist% > 20
+elseif %room.distance(%start_room%)% > 20
   mgoto %start_room%
 end
 ~
@@ -1350,8 +1342,7 @@ if %time.hour% > 7 && %time.hour% < 19
   end
 end
 * Charge blood
-eval charge %%actor.blood(-%cost%)%%
-nop %charge%
+nop %actor.blood(-%cost%)%
 * Quest sends a message already
 %quest% %actor% trigger 10156
 %quest% %actor% finish 10156
@@ -1396,8 +1387,7 @@ while %cycles_left% >= 0
         %send% %actor% You don't have enough blood to perform the eclipse ritual - it costs %cost%.
         halt
       end
-      eval charge %%actor.blood(-%cost%)%%
-      nop %charge%
+      nop %actor.blood(-%cost%)%
       %echoaround% %actor% %actor.name% begins the eclipse ritual...
       %send% %actor% You begin the eclipse ritual...
     break
@@ -1689,8 +1679,7 @@ if !%instance.location%
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
-if (%dist% > 4)
+if (%room.distance(%instance.location%)% > 4)
   mgoto %instance.location%
 elseif (%room.sector% == Flowing Lava || %room.sector% == Cooling Lava || %room.building% == Volcano Caldera || %room.aff_flagged(*HAS-INSTANCE)%)
   * No Work

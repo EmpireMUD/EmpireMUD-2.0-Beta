@@ -130,9 +130,7 @@ Give Skinning Knife~
 Detect Heal~
 0 c 0
 heal~
-eval test %%self.is_name(%arg%)%%
-eval test2 %%actor.char_target(%arg%)%%
-if ((!%test% && %test2% != %self%) || !%actor.ability(Heal)% || !%actor.on_quest(10854)%)
+if ((!%self.is_name(%arg%)% && %actor.char_target(%arg%)% != %self%) || !%actor.ability(Heal)% || !%actor.on_quest(10854)%)
   return 0
   halt
 end

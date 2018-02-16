@@ -20,8 +20,7 @@ switch %random.4%
     %send% %targ% %self.name% shines brightly at you, and you feel replenished!
     %echoaround% %targ% %self.name% shines brightly at %targ.name%, who looks replenished!
     eval amount %self.level% * 2 / 3
-    eval adjust %%targ.mana(%amount%)%%
-    nop %adjust%
+    nop %targ.mana(%amount%)%
     wait 25 sec
   break
   case 2
@@ -44,8 +43,7 @@ switch %random.4%
     set room %self.room%
     set ch %room.people%
     while %ch%
-      eval test %%self.is_ally(%ch%)%%
-      if %test%
+      if %self.is_ally(%ch%)%
         %send% %ch% You bask in %self.name%'s glow!
         dg_affect #505 %ch% RESIST-PHYSICAL %amount% 30
         dg_affect #505 %ch% RESIST-MAGICAL %amount% 30
@@ -62,8 +60,7 @@ switch %random.4%
       halt
     end
     set targ %enemy.fighting%
-    eval test %%self.is_ally(%targ%)%%
-    if (!%targ% || !%test%)
+    if (!%targ% || !%self.is_ally(%targ%)%)
       %echo% %self.name% glows and purrs.
       halt
     end
@@ -153,8 +150,7 @@ switch %random.4%
       halt
     end
     set targ %enemy.fighting%
-    eval test %%self.is_ally(%targ%)%%
-    if (!%targ% || !%test%)
+    if (!%targ% || !%self.is_ally(%targ%)%)
       %echo% %self.name% flickers and burns.
       halt
     end
@@ -174,8 +170,7 @@ switch %random.4%
     set healing_done 0
     set ch %room.people%
     while %ch%
-      eval test %%self.is_ally(%ch%)%%
-      if %test%
+      if %self.is_ally(%ch%)%
         if %ch.health% < %ch.maxhealth%
           %send% %ch% You feel warmed by %self.name%'s fire!
           %damage% %ch% -50
@@ -195,8 +190,7 @@ switch %random.4%
     set room %self.room%
     set ch %room.people%
     while %ch%
-      eval test %%self.is_ally(%ch%)%%
-      if %test%
+      if %self.is_ally(%ch%)%
         %send% %ch% You feel inspired by %self.name%'s fire!
         dg_affect #509 %ch% BONUS-MAGICAL %amount% 30
         dg_affect #509 %ch% BONUS-PHYSICAL %amount% 30
@@ -286,8 +280,7 @@ if (%type% == 4)
     halt
   end
   set targ %enemy.fighting%
-  eval test %%self.is_ally(%targ%)%%
-  if (!%targ% || !%test%)
+  if (!%targ% || !%self.is_ally(%targ%)%)
     %echoaround% %master% %master.name%'s shadow seems to flap its wings.
     halt
   end
@@ -310,8 +303,7 @@ set room %self.room%
 set ch %room.people%
 set had_effect 0
 while %ch%
-  eval test %%self.is_ally(%ch%)%%
-  if %test%
+  if %self.is_ally(%ch%)%
     switch %type%
       case 1
         * Rejuvenate all allies
@@ -326,8 +318,7 @@ while %ch%
         end
         %send% %ch% You feel the invigorating darkness restore your stamina!
         eval amount %self.level% / 5
-        eval adjust %%targ.move(%amount%)%%
-        nop %adjust%
+        nop %targ.move(%amount%)%
       break
       case 3
         * Wits buff on all allies
@@ -363,8 +354,7 @@ if (%type% == 4)
     halt
   end
   set targ %enemy.fighting%
-  eval test %%self.is_ally(%targ%)%%
-  if (!%targ% || !%test%)
+  if (!%targ% || !%self.is_ally(%targ%)%)
     %echo% %self.name% flicks its tongue and whips its tail.
     halt
   end
@@ -438,8 +428,7 @@ switch %random.4%
       halt
     end
     set targ %enemy.fighting%
-    eval test %%self.is_ally(%targ%)%%
-    if (!%targ% || !%test%)
+    if (!%targ% || !%self.is_ally(%targ%)%)
       %echo% %self.name% sizzles and simmers.
       halt
     end
@@ -457,8 +446,7 @@ switch %random.4%
       halt
     end
     set targ %enemy.fighting%
-    eval test %%self.is_ally(%targ%)%%
-    if (!%targ% || !%test%)
+    if (!%targ% || !%self.is_ally(%targ%)%)
       %echo% %self.name% sizzles and simmers.
       halt
     end
@@ -475,8 +463,7 @@ switch %random.4%
     set room %self.room%
     set ch %room.people%
     while %ch%
-      eval test %%self.is_ally(%ch%)%%
-      if %test%
+      if %self.is_ally(%ch%)%
         %send% %ch% You feel yourself surge in the embers' glow!
         dg_affect #513 %ch% BONUS-MAGICAL %amount% 30
         dg_affect #513 %ch% BONUS-PHYSICAL %amount% 30
@@ -542,8 +529,7 @@ done
 set room %self.room%
 set ch %room.people%
 while %ch%
-  eval test %%self.is_enemy(%ch%)%%
-  if %test%
+  if %self.is_enemy(%ch%)%
     %send% %ch% You feel the banshee's wail strike deep into your heart!
     switch %type%
       case 1

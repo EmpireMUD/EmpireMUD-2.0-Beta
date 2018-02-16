@@ -7,8 +7,7 @@ if !%instance.location%
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
-if (%dist% > 5)
+if (%room.distance(%instance.location%)% > 5)
   mgoto %instance.location%
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
@@ -55,7 +54,7 @@ if !%instance.location%
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
+set dist %room.distance(%instance.location%)%
 if (%dist% > 2)
   %echo% %self.name% scrambles into a hole in the dam and returns to %self.hisher% lodge.
   mgoto %instance.location%
@@ -101,8 +100,7 @@ done
 set targ %instance.location%
 set num %targ.vnum%
 set item %new_room.contents%
-eval op %%item.val0(%num%)%%
-nop %op%
+nop %item.val0(%num%)%
 * Retarget the outside portal to the new room
 set loc %instance.location%
 set item %loc.contents%
@@ -110,8 +108,7 @@ while %item%
   if %item.vnum% == 18460
     set targ %new_room%
     set num %targ.vnum%
-    eval op %%item.val0(%num%)%%
-    nop %op%
+    nop %item.val0(%num%)%
   end
   set item %item.next_in_list%
 done
@@ -146,12 +143,12 @@ while %person%
       * Get vnum of item to give
       set vnum %room.template%
       * Do they already have it?
-      eval item %%person.inventory(%vnum%)%%
+      set item %person.inventory(%vnum%)%
       if !%item%
         * Give them the item
         %load% obj %vnum% %person% inv
         * Message
-        eval item %%person.inventory(%vnum%)%%
+        set item %person.inventory(%vnum%)%
         if %item%
           %send% %person% You discover %item.shortdesc%!
         end
@@ -184,12 +181,12 @@ while %person%
     end
     if %person.is_immortal%
       set vnum 18495
-      eval item %%person.inventory(%vnum%)%%
+      set item %person.inventory(%vnum%)%
       if !%item%
         * Give them the item
         %load% obj %vnum% %person% inv
         * Message
-        eval item %%person.inventory(%vnum%)%%
+        set item %person.inventory(%vnum%)%
         if %item%
           %send% %person% You create %item.shortdesc% for yourself.
         end
@@ -911,8 +908,7 @@ done
 set targ %instance.location%
 set num %targ.vnum%
 set item %new_room.contents%
-eval op %%item.val0(%num%)%%
-nop %op%
+nop %item.val0(%num%)%
 * Retarget the outside portal to the new room
 set loc %instance.location%
 set item %loc.contents%
@@ -920,8 +916,7 @@ while %item%
   if %item.vnum% == 18460
     set targ %new_room%
     set num %targ.vnum%
-    eval op %%item.val0(%num%)%%
-    nop %op%
+    nop %item.val0(%num%)%
   end
   set item %item.next_in_list%
 done

@@ -54,11 +54,11 @@ if !%study%
   %door% %firsthall% %room.enter_dir% add 5608
 end
 * Add basement tunnel
-eval basement %%firsthall.down(room)%%
+set basement %firsthall.down(room)%
 if !%basement%
   %door% %firsthall% down add 5612
 end
-eval basement %%firsthall.down(room)%%
+set basement %firsthall.down(room)%
 if !%basement%
   * Failed to add
   halt
@@ -97,11 +97,11 @@ if !%study%
   %door% %firsthall% %room.enter_dir% add 5608
 end
 * Add basement tunnel
-eval basement %%firsthall.down(room)%%
+set basement %firsthall.down(room)%
 if !%basement%
   %door% %firsthall% down add 5612
 end
-eval basement %%firsthall.down(room)%%
+set basement %firsthall.down(room)%
 if !%basement%
   * Failed to add
   halt

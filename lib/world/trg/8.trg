@@ -2,8 +2,7 @@
 Tarnished mirror look~
 1 c 3
 look~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -14,8 +13,7 @@ end
 Looking Glass reflection~
 1 c 3
 look~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end

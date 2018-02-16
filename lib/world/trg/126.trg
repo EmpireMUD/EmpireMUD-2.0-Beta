@@ -7,7 +7,7 @@ if !%arg%
   halt
 end
 set room %self.room%
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They're not here.
   halt

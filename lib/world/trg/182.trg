@@ -2,8 +2,7 @@
 Atlas turtle board~
 0 c 0
 board~
-eval helper %%actor.char_target(%arg%)%%
-if %helper% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -166,13 +165,12 @@ if (guild /= %arg% || tortoise /= %arg%)
     halt
   end
   %send% %actor% You hold %self.shortdesc% aloft...
-  eval real_dir %%room.direction(%turtle.room%)%%
-  eval direction %%actor.dir(%real_dir%)%%
-  eval distance %%room.distance(%turtle.room%)%%
+  set real_dir %room.direction(%turtle.room%)%
+  set distance %room.distance(%turtle.room%)%
   if %distance% == 0
     %send% %actor% There is an atlasian tortoise in the room with you.
   else
-    %send% %actor% There is an atlasian tortoise %distance% tiles to the %direction%.
+    %send% %actor% There is an atlasian tortoise %distance% tiles to the %actor.dir(%real_dir%)%.
   end
   %echoaround% %actor% %actor.name% holds %self.shortdesc% aloft...
 else
@@ -248,13 +246,11 @@ Mob block higher template id - faction reputation Liked~
 * One quick trick to get the target room
 set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   halt
 end
-eval test %%actor.has_reputation(%self.allegiance%,Liked)%%
-if %test%
+if %actor.has_reputation(%self.allegiance%,Liked)%
   %send% %actor% %self.name% lets you pass.
   return 1
   halt
@@ -284,8 +280,7 @@ set object %room.contents%
 Tortoise Trinket teleporter~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -315,8 +310,7 @@ while %cycle% >= 0
     set error 0
   end
   * Doing this AFTER checking loc exists
-  eval limit_check %%actor.can_enter_instance(%loc%)%%
-  if !%limit_check%
+  if !%actor.can_enter_instance(%loc%)%
     %send% %actor% The destination is too busy.
     set error 1
   end
@@ -356,13 +350,11 @@ Adventurer's Guildhall~
 2 o 100
 ~
 * Add basement
-eval basement %%room.down(room)%%
-if !%basement%
+if !%room.down(room)%
   %door% %room% down add 18218
 end
 * Add tower
-eval tower %%room.up(room)%%
-if !%tower%
+if !%room.up(room)%
   %door% %room% up add 18217
 end
 * Add office
@@ -396,12 +388,11 @@ Adventuring guild block vault~
 * One quick trick to get the target room
 set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky%)
   halt
 end
-if %to_room.building% != Guildhall Vault
+if %tricky.building% != Guildhall Vault
   halt
 end
 * stealth prereq
@@ -436,8 +427,7 @@ Egg Timeout~
 Atlasian egg fake plant~
 1 c 2
 plant~
-eval targ %%actor.obj_target(%arg%)%%
-if %targ% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -452,8 +442,7 @@ if !%actor.on_quest(18221)%
   return 1
   halt
 end
-eval check %%actor.canuseroom_member(%room%)%%
-if !%check%
+if !%actor.canuseroom_member(%room%)%
   %send% %actor% You don't have permission to use %self.shortdesc% here.
   return 1
   halt
@@ -543,8 +532,7 @@ Consider / Kill Death~
 0 c 0
 consider kill~
 * Target check
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -571,8 +559,7 @@ if %arg.car% == list || %arg.car% == swap ||  %arg.car% == release
   halt
 end
 * Target check
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -595,8 +582,7 @@ if %arg.car% == list || %arg.car% == swap ||  %arg.car% == release
   halt
 end
 * Target check
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -617,7 +603,7 @@ if !%arg%
   return 1
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They must have ran away when you started waving %self.shortdesc% around, because they're not here.
   return 1
@@ -796,12 +782,11 @@ end
 Frost Siphon: use~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg.car%)%%
-if %test% != %self%
+if %actor.obj_target(%arg.car%)% != %self%
   return 0
   halt
 end
-eval target %%actor.char_target(%arg.cdr%)%%
+set target %actor.char_target(%arg.cdr%)%
 if !%target%
   %send% %actor% You don't see a '%arg.cdr%' here.
   halt
@@ -812,8 +797,7 @@ if %target.vnum% != 10551 && %target.vnum% != 10552
   halt
 end
 set valid 1
-eval check_var %%actor.varexists(guild_siphoned_%target.vnum%)%%
-if %check_var%
+if %actor.varexists(guild_siphoned_%target.vnum%)%
   eval check %%actor.guild_siphoned_%target.vnum%%%
   if %check%
     %send% %actor% You've already siphoned energy from %target.name%.
@@ -835,7 +819,7 @@ end
 Fake pickpocket~
 1 c 2
 pickpocket~
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   * Invalid target
   return 0
@@ -923,8 +907,7 @@ end
 Signal Malfernes~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -971,8 +954,7 @@ end
 Use charm on chalice~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1002,8 +984,7 @@ end
 Imagine Dragons~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1062,7 +1043,7 @@ if !%arg%
   return 1
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They must have run away when you started waving %self.shortdesc% around, because they're not here.
   return 1
@@ -1127,14 +1108,12 @@ end
 Fake kill tree spirit~
 0 c 0
 kill~
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
 set room %self.room%
-eval permission %%actor.canuseroom_member(%room%)%%
-if !%permission%
+if !%actor.canuseroom_member(%room%)%
   %send% %actor% You don't have permission to do that!
   halt
 end
@@ -1159,8 +1138,7 @@ done
 Resurrect Scaldorran~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1192,8 +1170,7 @@ dg_affect %scaldorran% !ATTACK on -1
 Bag roc egg for Scaldorran~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1233,8 +1210,7 @@ end
 Bug Knezz's Office~
 1 c 2
 plant~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1285,8 +1261,7 @@ end
 Seed of Imagination plant~
 1 c 2
 plant~
-eval targ %%actor.obj_target(%arg%)%%
-if %targ% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1296,8 +1271,7 @@ if %room.sector_vnum% != 0
   return 1
   halt
 end
-eval check %%actor.canuseroom_member(%room%)%%
-if !%check%
+if !%actor.canuseroom_member(%room%)%
   %send% %actor% You don't have permission to use %self.shortdesc% here.
   return 1
   halt
@@ -1329,8 +1303,7 @@ done
 Verdant Wand: Teleport / Terraform~
 1 c 3
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1373,8 +1346,7 @@ while %cycle% >= 0
     set error 0
   end
   * Doing this AFTER checking loc exists
-  eval limit_check %%actor.can_enter_instance(%loc%)%%
-  if !%limit_check% && !%terra%
+  if !%actor.can_enter_instance(%loc%)% && !%terra%
     %send% %actor% The destination is too busy.
     set error 1
   end
@@ -1400,8 +1372,7 @@ while %cycle% >= 0
         %echoaround% %actor% %actor.name% raises %self.shortdesc% high and the scorched landscape is restored!
         %terraform% %room_var% %vnum%
         eval charges_left %self.val0%-1
-        eval do %%self.val0(%charges_left%)%%
-        nop %do%
+        nop %self.val0(%charges_left%)%
         halt
       else
         %echoaround% %actor% %actor.name% vanishes in a flash of green light!
@@ -1410,8 +1381,7 @@ while %cycle% >= 0
         %echoaround% %actor% %actor.name% appears in a flash of green light!
         nop %actor.cancel_adventure_summon%
         eval charges_left %self.val1%-1
-        eval do %%self.val1(%charges_left%)%%
-        nop %do%
+        nop %self.val1(%charges_left%)%
         halt
       end
     break

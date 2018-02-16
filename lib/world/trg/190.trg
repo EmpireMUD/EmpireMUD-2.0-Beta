@@ -97,8 +97,7 @@ else
   set room %self.room%
   set person %room.people%
   while %person%
-    eval test %%self.is_enemy(%person%)%%
-    if %test%
+    if %self.is_enemy(%person%)%
       dg_affect #19003 %person% SLOW on 45
       %dot% #19003 %person% 75 45 magical 1
     end
@@ -165,7 +164,7 @@ end
 * Clear existing difficulty flags and set new ones.
 set vnum 19000
 while %vnum% <= 19000
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -271,8 +270,7 @@ if %self.mob_flagged(HARD)% || %self.mob_flagged(GROUP)%
         set pronoun it
       end
       %send% %ch% Searching the room, you find %string%! You take %pronoun%.
-      eval tokens %%ch.give_currency(19000, %token_amount%)%%
-      nop %tokens%
+      nop %ch.give_currency(19000, %token_amount%)%
       * Random item is handled by the loot replacer.
     end
     set ch %ch.next_in_room%
@@ -298,8 +296,7 @@ set person %room.people%
 set target_found 0
 set no_targets 0
 while %target.affect(19009)% && %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %person.is_pc% && %test%
+  if %person.is_pc% && %person.is_enemy(%self%)%
     set target %person%
   end
   set person %person.next_in_room%
@@ -513,10 +510,9 @@ if %actor%
       while %person%
         if %person.is_pc%
           %load% obj %vnum% %actor% inv %level%
-          eval item %%actor.inventory(%vnum%)%%
+          set item %actor.inventory(%vnum%)%
           if %item.is_flagged(BOP)%
-            eval bind %%item.bind(%self%)%%
-            nop %bind%
+            nop %item.bind(%self%)%
           end
         end
         set person %person.next_in_room%
@@ -550,7 +546,7 @@ if !%arg%
   return 0
   halt
 end
-eval target %%actor.obj_target(%arg%)%%
+set target %actor.obj_target(%arg%)%
 if %target.type% != DRINKCON
   * You can't fill [item]!
   return 0
@@ -566,10 +562,8 @@ if %target.val1% > 0 && %target.val2% != %liquid_num%
 end
 %send% %actor% You fill %target.shortdesc% with %name%.
 %echoaround% %actor% %actor.name% fills %target.shortdesc% with %name%.
-eval set_type %%target.val2(%liquid_num%)%%
-eval set_quantity %%target.val1(%target.val0%)%%
-nop %set_type%
-nop %set_quantity%
+nop %target.val2(%liquid_num%)%
+nop %target.val1(%target.val0%)%
 ~
 #19060
 Goblin Challenge 2.0 Difficulty Selector~
@@ -611,8 +605,7 @@ else
   return 1
 end
 * Scale adventure
-eval scale_inst %%instance.level(%level%)%%
-nop %scale_inst%
+nop %instance.level(%level%)%
 * Load mob, apply difficulty setting
 %load% mob 10200
 set mob %room.people%
@@ -692,8 +685,7 @@ if %heroic_mode%
   set room %self.room%
   set person %room.people%
   while %person%
-    eval test %%person.is_enemy(%self%)%%
-    if %test%
+    if %person.is_enemy(%self%)%
       %dot% #10203 %person% 100 20 physical
     end
     set person %person.next_in_room%
@@ -909,8 +901,7 @@ if %heroic_mode%
   set room %self.room%
   set person %room.people%
   while %person%
-    eval test %%person.is_enemy(%self%)%%
-    if %test%
+    if %person.is_enemy(%self%)%
       dg_affect #10209 %person% HARD-STUNNED on 5
     end
     set person %person.next_in_room%
@@ -971,8 +962,7 @@ if %goblin% || !%heroic_mode% || !%hard%
     %aoe% 100 magical
     set person %room.people%
     while %person%
-      eval test %%person.is_enemy(%self%)%%
-      if %test%
+      if %person.is_enemy(%self%)%
         %dot% #10221 %person% 75 30 magical
         dg_affect #10211 %person% SLOW on 30
       end

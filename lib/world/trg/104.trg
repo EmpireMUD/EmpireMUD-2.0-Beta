@@ -130,10 +130,9 @@ Mob block higher template id~
 ~
 * One quick trick to get the target room
 set room_var %self.room%
-eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
+eval to_room %%room_var.%direction%(room)%%
 * Compare template ids to figure out if they're going forward or back
-if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+if (%actor.nohassle% || !%to_room% || %to_room.template% < %room_var.template%)
   halt
 end
 %send% %actor% You can't seem to get past %self.name%!
@@ -334,8 +333,7 @@ end
 Mount summon use~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end

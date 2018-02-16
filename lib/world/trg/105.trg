@@ -73,8 +73,7 @@ if !%instance.location%
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
-if (%room.template% == 10500 || %dist% > 3 || %room.building% == Fence || %room.building% == Wall)
+if (%room.template% == 10500 || %room.distance(%instance.location%)% > 3 || %room.building% == Fence || %room.building% == Wall)
   %echo% %self.name% vanishes in a swirl of leaf-green mana!
   mgoto %instance.location%
   %echo% %self.name% appears in a swirl of leaf-green mana!
@@ -141,18 +140,16 @@ Dragontooth Sceptre Summon~
 1 c 1
 use~
 * Check this item was the one used
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
 * Cooldown
 set varname summon%target%
-eval test %%actor.varexists(%varname%)%%
 * Change this if trigger vnum != mob vnum
 set target %self.vnum%
 * once per 30 minutes
-if %test%
+if %actor.varexists(%varname%)%
   eval tt %%actor.%varname%%%
   if (%timestamp% - %tt%) < 1800
     eval diff (%tt% - %timestamp%) + 1800
@@ -194,8 +191,7 @@ end
 Puppy Plant use~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -290,8 +286,7 @@ end
 Dragonstooth sceptre equip first~
 1 c 6
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -390,8 +385,7 @@ switch %random.3%
     set room %self.room%
     set person %room.people%
     while %person%
-      eval test %%person.is_enemy(%self%)%%
-      if %test%
+      if %person.is_enemy(%self%)%
         dg_affect #10552 %person% SLOW on 20
         if %heroic_mode%
           dg_affect #10552 %person% HARD-STUNNED on 5
@@ -469,8 +463,7 @@ switch %random.3%
       eval magnitude %magnitude%/2
     end
     while %person%
-      eval test %%person.is_enemy(%self%)%%
-      if %test%
+      if %person.is_enemy(%self%)%
         if %heroic_mode%
           %send% %person% &rYou are chilled to the bone, and can barely see!
           %dot% %person% 50 20 magical
@@ -561,8 +554,7 @@ switch %random.3%
       set room %self.room%
       set person %room.people%
       while %person%
-        eval test %%person.is_enemy(%self%)%%
-        if %test%
+        if %person.is_enemy(%self%)%
           %send% %person% You receive dozens of painful, bleeding wounds!
           %dot% #10558 %person% 100 20 physical
         end
@@ -621,8 +613,7 @@ switch %random.3%
     set room %self.room%
     set person %room.people%
     while %person%
-      eval test %%self.is_enemy(%person%)%%
-      if %test%
+      if %self.is_enemy(%person%)%
         %send% %person% The snow gets in your eyes!
         * 7 ~ 13
         eval amnt (%self.level%/10)
@@ -691,7 +682,7 @@ end
 * Clear existing difficulty flags and set new ones.
 set vnum 10550
 while %vnum% <= 10552
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -740,10 +731,9 @@ Frosty trash block higher template id~
 ~
 * One quick trick to get the target room
 set room_var %self.room%
-eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
+eval to_room %%room_var.%direction%(room)%%
 * Compare template ids to figure out if they're going forward or back
-if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+if (%actor.nohassle% || !%to_room% || %to_room.template% < %room_var.template%)
   halt
 end
 if %actor.aff_flagged(SNEAK)%
@@ -762,12 +752,11 @@ if !%instance.location%
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
-if (%dist% > 2)
+if (%room.distance(%instance.location%)% > 2)
   mgoto %instance.location%
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
-elseif (%room.sector% == River && %dist% <= 2)
+elseif (%room.sector% == River && %room.distance(%instance.location%)% <= 2)
   %terraform% %room% 10550
   %echo% The river freezes over!
 end
@@ -789,8 +778,7 @@ mmove
 Frost flower fake plant~
 1 c 2
 plant~
-eval targ %%actor.obj_target(%arg%)%%
-if %targ% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -799,8 +787,7 @@ if %room.sector% != Overgrown Forest
   return 0
   halt
 end
-eval check %%actor.canuseroom_member(%room%)%%
-if !%check%
+if !%actor.canuseroom_member(%room%)%
   %send% %actor% You don't have permission to use %self.shortdesc% here.
   return 1
   halt
@@ -968,10 +955,9 @@ if %actor%
       set level 100
     end
     %load% obj %vnum% %actor% inv %level%
-    eval item %%actor.inventory(%vnum%)%%
+    set item %actor.inventory(%vnum%)%
     if %item.is_flagged(BOP)%
-      eval bind %%item.bind(%self%)%%
-      nop %bind%
+      nop %item.bind(%self%)%
     end
     * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   end
@@ -992,7 +978,7 @@ if !%arg%
   return 1
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They must have fled from your awesome power, because they're not here.
   return 1

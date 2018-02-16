@@ -57,8 +57,7 @@ Herd Cats~
 0 c 0
 herd~
 * test targeting me
-eval test %%actor.char_target(%arg.car%)%%
-if %test% != %self%
+if %actor.char_target(%arg.car%)% != %self%
   return 0
   halt
 end
@@ -370,7 +369,7 @@ done
 Butcher detect~
 1 c 3
 butcher~
-eval target %%actor.obj_target(%arg%)%%
+set target %actor.obj_target(%arg%)%
 if !%target%
   * Invalid target
   return 0
@@ -424,7 +423,7 @@ halt
 Fake pickpocket~
 1 c 2
 pickpocket~
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   * Invalid target
   return 0
@@ -515,7 +514,7 @@ Postmaster quest start~
 ~
 eval vnum 9041+%random.3%
 %load% obj %vnum% %actor% inv
-eval item %%actor.inventory(%vnum%)%%
+set item %actor.inventory(%vnum%)%
 %send% %actor% You receive %item.shortdesc%.
 ~
 #9043

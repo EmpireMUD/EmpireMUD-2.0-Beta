@@ -2,9 +2,7 @@
 Mini-pet Use~
 1 c 3
 use~
-eval targ %%actor.obj_target(%arg%)%%
-eval test %%self.is_name(%arg%)%%
-if %targ% != %self% && !(%test% && %self.worn_by%)
+if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_by%)
   return 0
   halt
 end
@@ -13,9 +11,8 @@ if (%actor.position% != Standing)
   halt
 end
 set varname minipet%self.val0%
-eval test %%actor.cooldown(%self.val0%)%%
 * once per 30 minutes
-if %test%
+if %actor.cooldown(%self.val0%)%
   %send% %actor% %self.shortdesc% is on cooldown.
   halt
 end
@@ -44,15 +41,13 @@ elseif %mobs% > 4
 else
   %send% %actor% You use %self.shortdesc%...
   %echoaround% %actor% %actor.name% uses %self.shortdesc%...
-  eval bind %%self.bind(%actor%)%%
-  nop %bind%
+  nop %self.bind(%actor%)%
   %load% m %self.val0%
   set pet %room_var.people%
   if (%pet% && %pet.vnum% == %self.val0%)
     %force% %pet% mfollow %actor%
     %echo% %pet.name% appears!
-    eval cooldown %%actor.set_cooldown(%self.val0%, 1800)%%
-    nop %cooldown%
+    nop %actor.set_cooldown(%self.val0%, 1800)%
     dg_affect %pet% *CHARM on -1
     nop %pet.add_mob_flag(!EXP)%
     nop %pet.unlink_instance%
@@ -64,8 +59,7 @@ Dismissable~
 0 ct 0
 dismiss~
 if %arg% != pet
-  eval test %%actor.char_target(%arg%)%%
-  if %test% != %self%
+  if %actor.char_target(%arg%)% != %self%
     return 0
     halt
   end

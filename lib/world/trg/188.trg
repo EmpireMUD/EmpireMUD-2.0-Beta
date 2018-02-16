@@ -4,8 +4,7 @@ Summon ghost with candy~
 sacrifice~
 * discard arguments after the first
 set arg %arg.car%
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -43,9 +42,7 @@ if !%arg%
   return 0
   halt
 end
-set arg1 %arg.car%
-eval target %%actor.obj_target(%arg1%)%%
-if %target% != %self%
+if %actor.obj_target(%arg.car%)% != %self%
   return 0
   halt
 end
@@ -183,8 +180,7 @@ if %heroic_mode%
   set room %self.room%
   set person %room.people%
   while %person%
-    eval check %%person.is_enemy(%self%)%%
-    if %check%
+    if %person.is_enemy(%self%)%
       dg_affect #18803 %person% HARD-STUNNED on 5
       %damage% %person% 50
     end
@@ -211,8 +207,7 @@ if %heroic_mode%
   set room %self.room%
   set person %room.people%
   while %person%
-    eval check %%person.is_enemy(%self%)%%
-    if %check%
+    if %person.is_enemy(%self%)%
       %dot% #18804 %person% 100 30 physical
       %damage% %person% 50 physical
     end
@@ -303,8 +298,7 @@ end
 Learn Halloween Costumes~
 1 c 2
 learn~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -315,7 +309,7 @@ end
 %send% %actor% You learn how to make Halloween costumes.
 set craft_vnum 18812
 while %craft_vnum% <= 18817
-  eval learn %%actor.add_learned(%craft_vnum%)%%
+  nop %actor.add_learned(%craft_vnum%)%
   eval craft_vnum %craft_vnum% + 1
 done
 ~
@@ -339,7 +333,7 @@ if !%permission%
   %send% %actor% You don't have permission to do that here.
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They're not here.
   halt
@@ -373,8 +367,7 @@ else
     %quest% %actor% trigger 18819
     nop %self.val0(0)%
   else
-    eval operate %%self.val0(%costume_vnum%)%%
-    nop %operate%
+    nop %self.val0(%costume_vnum%)%
   end
 end
 ~
@@ -443,7 +436,7 @@ if !%permission%
   %send% %actor% You don't have permission to do that here.
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They're not here.
   halt
@@ -468,8 +461,7 @@ else
   if %charges% == 0
     %quest% %actor% trigger 18821
   end
-  eval operate %%self.val0(%charges%)%%
-  nop %operate%
+  nop %self.val0(%charges%)%
 end
 ~
 #18822
@@ -561,8 +553,7 @@ done
 toiletpaper houses~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -650,8 +641,7 @@ else
     %quest% %actor% trigger 18824
   end
   eval charges %charges% - 1
-  eval operate %%self.val0(%charges%)%%
-  nop %operate%
+  nop %self.val0(%charges%)%
 end
 ~
 #18827
@@ -668,7 +658,7 @@ if !%arg%
   return 1
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% It must have worked, because they're not here!
   return 1
@@ -695,7 +685,7 @@ else
     %send% %actor% You have scared enough citizens... but you can keep going if you want to.
     %quest% %actor% trigger 18827
   end
-  eval operate %%self.val0(%times%)%%
+  nop %self.val0(%times%)%
 end
 ~
 #18828
@@ -713,8 +703,7 @@ if !%greatrm%
   halt
 end
 * Add cellar
-eval basement %%greatrm.down(room)%%
-if !%basement%
+if !%greatrm.down(room)%
   %door% %greatrm% down add 18830
 end
 detach 18828 %self.id%
@@ -750,20 +739,17 @@ if %sacrifices_left% < 1
 end
 * actual sacrifice
 set sacrifice_vnum %self.val1%
-eval has_items %%actor.has_resources(%sacrifice_vnum%, %sacrifice_amount%)%%
-if !%has_items%
+if !%actor.has_resources(%sacrifice_vnum%, %sacrifice_amount%)%
   %send% %actor% You don't have the items required for this sacrifice...
   halt
 end
-eval item %%actor.inventory(%sacrifice_vnum%)%%
+set item %actor.inventory(%sacrifice_vnum%)%
 set item_name %item.shortdesc%
 %send% %actor% You offer up %item_name% (x%sacrifice_amount%) to appease the spirits of the dead...
 %echoaround% %actor% %actor.name% offers up %item_name% (x%sacrifice_amount%) to appease the spirits of the dead...
-eval take %%actor.add_resources(%sacrifice_vnum%, -%sacrifice_amount%)%%
-nop %take%
+nop %actor.add_resources(%sacrifice_vnum%, -%sacrifice_amount%)%
 eval sacrifices_left %sacrifices_left% - 1
-eval op %%self.val0(%sacrifices_left%)%%
-nop %op%
+nop %self.val0(%sacrifices_left%)%
 if %sacrifices_left% == 0
   set first_quest 18828
   set last_quest 18832

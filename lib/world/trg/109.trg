@@ -31,8 +31,7 @@ if !%start_room%
   halt
 end
 set room %self.room%
-eval dist %%room.distance(%start_room%)%%
-if %dist%>30
+if %room.distance(%start_room%)% > 30
   * Stop wandering
   %echo% %self.name% stops wandering around.
   nop %self.add_mob_flag(SENTINEL)%
@@ -292,8 +291,7 @@ switch %random.4%
     set target %random.enemy%
     set person %room.people%
     while %person%
-      eval check %%self.is_enemy(%person%)%%
-      if (%person.tohit% > %target.tohit%) && %check% && !%person.aff_flagged(DISARM)%
+      if (%person.tohit% > %target.tohit%) && %self.is_enemy(%person%)% && !%person.aff_flagged(DISARM)%
         set target %person%
       end
       set person %person.next_in_room%
@@ -325,8 +323,7 @@ switch %random.4%
     set target %random.enemy%
     set person %room.people%
     while %person%
-      eval check %%self.is_enemy(%person%)%%
-      if (%person.mana% > %target.mana%) && %check% && !%person.aff_flagged(BLIND)%
+      if (%person.mana% > %target.mana%) && %self.is_enemy(%person%)% && !%person.aff_flagged(BLIND)%
         set target %person%
       end
       set person %person.next_in_room%

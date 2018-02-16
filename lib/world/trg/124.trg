@@ -22,8 +22,7 @@ exit leave~
 free deckhand~
 0 c 0
 free~
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -75,10 +74,8 @@ while %person%
       if %self.mob_flagged(HARD)%
         set amount 2
       end
-      eval op %%person.give_currency(12403, %amount%)%%
-      eval name %%currency.12403(%amount%)%%
-      %send% %person% You loot %amount% %name% from %self.name%.
-      nop %op%
+      %send% %person% You loot %amount% %currency.12403(%amount%)% from %self.name%.
+      nop %person.give_currency(12403, %amount%)%
     end
     nop %person.set_reputation(12401, Despised)%
   end
@@ -128,7 +125,7 @@ while %vnum% <= 12420
   if %vnum% == 12407
     set vnum 12419
   end
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -286,7 +283,7 @@ quest complete: no kill~
 ~
 set vnum 12401
 while %vnum% <= 12406
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if %mob%
     dg_affect %mob% !ATTACK on -1
   end
@@ -642,8 +639,7 @@ wait 3 sec
 set room %self.room%
 set person %room.people%
 while %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %test%
+  if %person.is_enemy(%self%)%
     dg_affect #12429 %person% SLOW on 20
     eval amount %self.level% / 5
     dg_affect #12429 %person% RESIST-PHYSICAL -%amount% 20
@@ -752,7 +748,7 @@ while %cycle% <= 4
   end
   while %person%
     if %person.is_pc%
-      eval act %%self.varexists(last_action_%person.id%)%%
+      set act %self.varexists(last_action_%person.id%)%
       if %act%
         eval act %%self.last_action_%person.id%%%
       end
@@ -923,8 +919,7 @@ set vnum %loc.vnum%
 set room %self.room%
 set portal %room.contents%
 if %portal.vnum% == 12402
-  eval op %%portal.val0(%vnum%)%%
-  nop %op%
+  nop %portal.val0(%vnum%)%
 end
 ~
 #12440
@@ -963,7 +958,7 @@ Fathma death~
 dg_affect %self% BLIND off
 set vnum 12414
 while %vnum% <= 12416
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if %mob%
     set room %mob.room%
     %purge% %mob% $n vanishes.
@@ -980,10 +975,8 @@ while %person%
     if %self.mob_flagged(HARD)%
       set amount 2
     end
-    eval op %%person.give_currency(12403, %amount%)%%
-    eval name %%currency.12403(%amount%)%%
-    %send% %person% You loot %amount% %name% from %self.name%.
-    nop %op%
+    %send% %person% You loot %amount% %currency.12403(%amount%)% from %self.name%.
+    nop %person.give_currency(12403, %amount%)%
     nop %person.set_reputation(12401, Despised)%
   end
   set person %person.next_in_room%
@@ -1058,8 +1051,7 @@ if %done_1% && %done_2% && %done_3% && %done_4%
   %load% obj 12402 room
   set portal %room.contents%
   if %portal.vnum% == 12402
-    eval op %%portal.val0(%vnum%)%%
-    nop %op%
+    nop %portal.val0(%vnum%)%
   end
 end
 ~

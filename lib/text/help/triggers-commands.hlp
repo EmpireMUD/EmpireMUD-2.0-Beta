@@ -472,11 +472,6 @@ legally on lines that do not need to process the result.
 Examples:
   * this will award the actor with 10 coins
   nop %actor.give_coins(10)%
-
-Here is a workaround to use a variable:
-  *nop workaround
-  eval making %%self.give_coins(%coins%)%%
-  nop %making%
 #d
 %MORPH% MMORPH OMORPH VMORPH WMORPH
 

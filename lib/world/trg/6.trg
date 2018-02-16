@@ -2,8 +2,7 @@
 Seed enchantment~
 1 c 2
 enchant~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -13,8 +12,7 @@ set cost_item_count 1
 set ability_required Enchant Tools
 set mana_cost 100
 set result_vnum 601
-eval check %%actor.ability(%ability_required%)%%
-if !%check%
+if !%actor.ability(%ability_required%)%
   %send% %actor% You need %ability_required% to enchant %self.shortdesc%.
   return 1
   halt
@@ -24,18 +22,15 @@ if %actor.mana% < %mana_cost%
   return 1
   halt
 end
-eval check %%actor.has_resources(%cost_item_vnum%, %cost_item_count%)%%
-if !%check%
+if !%actor.has_resources(%cost_item_vnum%, %cost_item_count%)%
   %send% %actor% You need %cost_item_name% (x%cost_item_count%) to enchant %self.shortdesc%.
   return 1
   halt
 end
-eval charge %%actor.add_resources(%cost_item_vnum%,-%cost_item_count%)%%
-nop %charge%
-eval charge %%actor.mana(-%mana_cost%)%%
+nop %actor.add_resources(%cost_item_vnum%,-%cost_item_count%)%
 %send% %actor% You enchant %self.shortdesc%!
 %echoaround% %actor% %actor.name% enchants %self.shortdesc%!
-nop %charge%
+nop %actor.mana(-%mana_cost%)%
 %load% obj %result_vnum% %actor% inv
 set obj %actor.inventory()%
 %send% %actor% It becomes %obj.shortdesc%!
@@ -46,8 +41,7 @@ set obj %actor.inventory()%
 Enchanted seed plant~
 1 c 2
 plant~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end

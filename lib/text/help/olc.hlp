@@ -2643,8 +2643,7 @@ because gaining/losing even 1 reputation point can bump a player out of the
 endcaps.
 
 Testing reputation against the mob's faction:
-eval test %%actor.has_reputation(%self.allegiance%,Liked)%%
-if %!test%
+if !%actor.has_reputation(%self.allegiance%,Liked)%
   %send% %actor% You must be Liked by %self.faction_name%!
   return 0
 end
