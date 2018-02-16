@@ -229,7 +229,7 @@ switch %random.3%
     %send% %actor% %self.name% sinks her teeth into your leg! You don't feel so good.
     %echoaround% %actor% %self.name% sinks her teeth into %actor.name%'s leg! %actor.name% doesn't look so good.
     dg_affect %actor% MANA-REGEN -5 20
-  done
+  break
 done
 ~
 #10110
@@ -612,7 +612,7 @@ switch %random.4%
   case 4
     %echo% Rolling thunder shakes the rain-soaked desert.
   break
-end
+done
 ~
 #10145
 Monsoon totem fake chant command~
@@ -839,7 +839,7 @@ switch %random.3%
     %echo% %self.name% joins a swarm of bats overhead.
     %purge% %self%
   break
-end
+done
 ~
 #10151
 Gila monster emotes~
@@ -859,7 +859,7 @@ switch %random.3%
     %echo% %self.name% crawls into a burrow in the ground.
     %purge% %self%
   break
-end
+done
 ~
 #10152
 Armadillo emotes~
@@ -879,7 +879,7 @@ switch %random.3%
   case 3
     %echo% %self.name% scampers around in the dirt.
   break
-end
+done
 ~
 #10153
 Cactus wren emotes~
@@ -898,7 +898,7 @@ switch %random.3%
   case 3
     %echo% %self.name% pokes its head out from its home in a cactus.
   break
-end
+done
 ~
 #10154
 Antelope squirrel emotes~
@@ -917,7 +917,7 @@ switch %random.3%
   case 3
     %echo% %self.name% scurries into the shade and hugs the cool ground.
   break
-end
+done
 ~
 #10155
 Bighorn sheep emotes~
@@ -937,7 +937,7 @@ switch %random.3%
   case 3
     %echo% %self.name% chews thoughtfully on a stray branch from a shrub.
   break
-end
+done
 ~
 #10156
 Coati emotes~
@@ -956,7 +956,7 @@ switch %random.3%
   case 3
     %echo% %self.name% struts around with its long tail held straight up.
   break
-end
+done
 ~
 #10157
 Monsoon room environment~
@@ -975,7 +975,7 @@ switch %random.4%
   case 4
     %echo% Rolling thunder shakes the rain-soaked desert.
   break
-end
+done
 ~
 #10158
 Hug a Cactus~
@@ -1008,7 +1008,7 @@ switch %random.3%
   case 3
     %echo% You find %self.name% sitting dangerously close to your leg.
   break
-end
+done
 ~
 #10160
 Monsoon sorcery quest study command~

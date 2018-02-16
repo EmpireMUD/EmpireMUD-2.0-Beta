@@ -193,8 +193,7 @@ if %self.cooldown(18501)%
 end
 nop %self.set_cooldown(18501, 30)%
 set heroic_mode %self.mob_flagged(GROUP)%
-set attack %random.4%
-switch %attack%
+switch %random.4%
   case 1
     * Blade Dance
     * Hard: 100% AoE damage, 25% at a time
@@ -300,8 +299,7 @@ if %self.cooldown(18501)%
 end
 nop %self.set_cooldown(18501, 30)%
 set heroic_mode %self.mob_flagged(GROUP)%
-set attack %random.4%
-switch %attack%
+switch %random.4%
   case 1
     * Blinding Flash
     * Hard: Blind tank for 10 seconds, 25% damage

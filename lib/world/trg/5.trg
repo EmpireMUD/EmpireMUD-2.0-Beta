@@ -85,7 +85,7 @@ if !%targ%
   %echo% You feel a chill as %self.name%'s howl echoes out through the air!
   halt
 end
-switch 4
+switch %random.4%
   case 1
     * Dexterity debuff on enemy
     %send% %targ% %self.name% flashes brightly and shoots a bolt of lightning at you!

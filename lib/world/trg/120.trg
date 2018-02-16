@@ -918,6 +918,6 @@ switch %random.4%
   case 4
     %echo% Rolling thunder shakes you to your core.
   break
-end
+done
 ~
 $

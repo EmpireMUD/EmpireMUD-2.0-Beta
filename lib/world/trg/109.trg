@@ -157,7 +157,7 @@ switch %random.4%
       %damage% %target% 150 physical
     end
   break
-end
+done
 ~
 #10906
 Colossal crimson dragon death~
@@ -197,7 +197,7 @@ switch %random.4%
   case 4
     %echo% The cave shakes as %self.name% grumbles something that sounds like 'vivor'.
   break
-end
+done
 ~
 #10908
 Enrage Buff/Counter Reset~
@@ -374,7 +374,7 @@ switch %random.4%
   case 4
     say Mama said there'd be dragons like this...
   break
-end
+done
 ~
 #10913
 Bangles the thief environmental~
@@ -393,7 +393,7 @@ switch %random.4%
   case 4
     say Friends call me Crash Bangles.
   break
-end
+done
 ~
 #10914
 Delayed spawn announcement~
@@ -485,7 +485,7 @@ switch %random.4%
   case 4
     %echo% Smoke bellows from the statue!
   break
-end
+done
 ~
 #10926
 Add Laboratory on Build~

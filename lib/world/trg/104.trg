@@ -168,7 +168,7 @@ switch %random.4%
   case 4
     %echo% The stench of death permeates the air.
   break
-end
+done
 ~
 #10409
 Necromancer combat~
@@ -308,7 +308,7 @@ switch %random.4%
   case 4
     say There's a skeletal mammoth in the town square!
   break
-end
+done
 ~
 #10417
 Shambling Zombie env~
@@ -327,7 +327,7 @@ switch %random.4%
   case 4
     say Brrrnnnn...
   break
-end
+done
 ~
 #10418
 Mount summon use~

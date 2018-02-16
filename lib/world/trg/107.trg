@@ -484,6 +484,7 @@ switch %random.3%
   case 3
     %echo% %self.name% could eat no fat. His wife could eat no lean.
   break
+done
 ~
 #10738
 Mother Goose Teleport~

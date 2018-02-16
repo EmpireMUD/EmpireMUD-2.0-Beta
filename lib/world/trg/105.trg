@@ -1052,8 +1052,7 @@ Gem ice melt~
 ~
 set actor %self.carried_by%
 set object nothing
-set gem %random.4%
-switch %gem%
+switch %random.4%
   case 1
     * iris
     set object an iridescent blue iris

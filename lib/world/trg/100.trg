@@ -71,7 +71,7 @@ switch %random.4%
   case 4
     %echo% Your footprints seem to vanish behind you.
   break
-end
+done
 ~
 #10006
 Spawn Red Dragon Mount~
@@ -118,7 +118,7 @@ switch %random.4%
       %damage% %target% 50 physical
     end
   break
-end
+done
 ~
 #10011
 Sewer Environment~
@@ -179,8 +179,7 @@ dg_affect %actor% SLOW on 60
 Dire rat combat~
 0 k 10
 ~
-set chance %random.3%
-switch %chance%
+switch %random.3%
   * Slow bite
   case 1
     %send% %actor% %self.name% bites into your flesh, and you don't feel so good.
@@ -345,8 +344,7 @@ end
 Rat hunter/rare thief combat~
 0 k 10
 ~
-set chance %random.5%
-switch %chance%
+switch %random.5%
   * Kick
   case 1
     kick
@@ -711,8 +709,7 @@ done
 Goblin combat~
 0 k 10
 ~
-set chance %random.3%
-if %chance% < 3
+if %random.3% < 3
   %send% %actor% %self.name% stabs you in the leg with a goblin shortsword!
   %echoaround% %actor% %self.name% stabs %actor.name% in the leg with a goblin shortsword!
   %damage% %actor% 20 physical

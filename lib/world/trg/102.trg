@@ -369,7 +369,7 @@ if (!%found%)
     %echo% %filks.name% respawns.
     nop %filks.add_mob_flag(!LOOT)%
   end
-end/f
+end
 ~
 #10218
 Filks and Walts respawn~
