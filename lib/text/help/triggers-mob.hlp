@@ -301,7 +301,7 @@ See the help files on those commands for more info.
 
 Mobs can trigger on the following events:
 
-&cGlobal&0 - Can happen even without players present (combine with Random).
+&cGlobal&0 - Modifier: Random trigger can happen even without players present.
 &cRandom&0 - Triggers randomly when players are around.
 &cCommand&0 - Responds to a player command.
 &cSpeech&0 - Responds to player speech.
@@ -320,7 +320,7 @@ Mobs can trigger on the following events:
 &cLeave&0 - Triggers when a visible person tries to leave.
 &cLeave-All&0 - Triggers when ANY person tries to leave.
 &cDoor&0 - Triggers when a player interacts with a door in the room.
-&cFight-Charmed&0 - Triggers during combat rounds even when charmed.
+&cCharmed&0 - Modifier: random/fight triggers work even when charmed.
 &cStart-Quest&0 - Triggers when a player tries to start a quest.
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 &cPlayer-in-Room&0 - Modifier: trigger requires a player present.

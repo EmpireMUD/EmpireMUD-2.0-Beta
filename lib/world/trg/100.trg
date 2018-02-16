@@ -222,7 +222,7 @@ else
     set target_char %next_target%
   done
   if %count% > 1
-    detach %self% 10016
+    detach 10016 %self.id%
   end
 end
 ~
@@ -288,9 +288,9 @@ City Official rewards~
 set target %random.char%
 if (%target.is_pc% && %target.has_resources(10013,10)%)
   say Ah, %target.name%, you've done my job for me. Here, have some money.
-  nop %target.coins(100)%
+  nop %target.give_coins(100)%
   %send% %target% %actor.name% gives you 100 coins.
-  detach %self% 10022
+  detach 10022 %self.id%
 end
 ~
 #10023
@@ -373,7 +373,7 @@ Cheese Drop Rat Summon~
 wait 2 sec
 %echo% A rat appears and gobbles up the cheese!
 %load% m 10011
-%purge% %self.name%
+%purge% %self%
 ~
 #10027
 Nest miniboss spawn/despawn~
