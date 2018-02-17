@@ -512,11 +512,10 @@ Gardener passive~
 0 bw 15
 ~
 if %self.varexists(msg_pos)%
-  set msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  set msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% carefully waters the plants.

@@ -946,11 +946,10 @@ Otherworlder guard passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  set msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  set msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     say We found the otherworlders in a damaged ovaloid of some kind.
@@ -992,11 +991,10 @@ Lich passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  set msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  set msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% makes a skeleton dance like a puppet.
@@ -1076,11 +1074,10 @@ Celiya passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  set msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  set msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% sits in her chair.
@@ -1155,11 +1152,10 @@ Barrosh passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  set msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  set msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% stops concentrating for a moment, and several hovering objects fall.
@@ -1246,11 +1242,10 @@ Knezz passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  set msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
   set msg_pos 0
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% reads some correspondence at %self.hisher% desk.
