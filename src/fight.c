@@ -3095,7 +3095,6 @@ void death_log(char_data *ch, char_data *killer, int type) {
 	}
 
 	if (ch == killer && has_killer) {
-		free(msg);
 		syslog(SYS_ERROR, 0, TRUE, "Unusual error in death_log(): ch == killer, but combat attack type passed");
 		msg = "%s has been killed at";
 		has_killer = FALSE;
