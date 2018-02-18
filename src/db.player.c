@@ -3924,11 +3924,6 @@ void start_new_character(char_data *ch) {
 		// only approve the character automatically
 		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
 	}
-	
-	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-	GET_MOVE(ch) = GET_MAX_MOVE(ch);
-	GET_MANA(ch) = GET_MAX_MANA(ch);
-	GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 
 	/* Standard conditions */
 	GET_COND(ch, THIRST) = 0;
@@ -3995,7 +3990,6 @@ void start_new_character(char_data *ch) {
 			// special case for vampire
 			if (sk->skill == SKILL_VAMPIRE && !IS_VAMPIRE(ch)) {
 				make_vampire(ch, TRUE);
-				GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 			}
 		}
 		
@@ -4079,6 +4073,12 @@ void start_new_character(char_data *ch) {
 	
 	// set up class/level data
 	update_class(ch);
+	
+	// restore pools (last, in case they changed during bonus traits or somewhere)
+	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
+	GET_MOVE(ch) = GET_MAX_MOVE(ch);
+	GET_MANA(ch) = GET_MAX_MANA(ch);
+	GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);
