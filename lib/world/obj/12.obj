@@ -19,12 +19,12 @@ R
 5130 0
 S
 #1201
-fiveleaf leaf herbs~
-some fiveleaf~
-Some fiveleaf has been left here.~
+fiveleaf leaf herbs sack~
+a sack of fiveleaf~
+A sack of fiveleaf is lying on the ground.~
 Fiveleaf is an herb used to make potions.
 ~
-3 l a 4
+3 l a 5
 0 0 0
 0 0
 M
@@ -132,14 +132,99 @@ O
 R
 5164 0
 S
+#1210
+jar whitegrass distilled herbs~
+a jar of distilled whitegrass~
+A jar of distilled whitegrass has been left here.~
+This is a distilled herb used to brew advanced potions.
+~
+3 0 a 4
+0 0 0
+8 0
+O
+14 m
+R
+5130 0
+S
+#1211
+jar resin fiveleaf leaf herbs~
+a jar of fiveleaf resin~
+A jar of fiveleaf resin has been left here.~
+This is a distilled herb used to brew advanced potions.
+~
+3 0 a 6
+0 0 0
+8 0
+O
+14 m
+R
+5130 0
+S
+#1212
+jar extract redthorn thorn herbs~
+a jar of redthorn extract~
+A jar of redthorn extract has been left here.~
+This is a distilled herb used to brew advanced potions.
+~
+3 0 a 7
+0 0 0
+8 0
+O
+14 m
+R
+5130 0
+S
+#1213
+jar essence magewhisper whisper herbs~
+a jar of magewhisper essence~
+A jar of magewhisper essence has been left here.~
+This is a distilled herb used to brew advanced potions.
+~
+3 0 a 7
+0 0 0
+8 0
+O
+14 m
+R
+5130 0
+S
+#1214
+jar daggerbite bite concentrated herbs~
+a jar of concentrated daggerbite~
+A jar of concentrated daggerbite has been left here.~
+This is a distilled herb used to brew advanced potions.
+~
+3 0 a 8
+0 0 0
+8 0
+O
+14 m
+R
+5130 0
+S
+#1215
+jar bileberry berry juice herbs~
+a jar of bileberry juice~
+A jar of bileberry juice has been left here.~
+This is a distilled herb used to brew advanced potions.
+~
+25 0 a 11
+-1 0 -1
+8 0
+O
+14 m
+R
+5130 0
+S
 #1250
-potion healing~
+potion healing healing-potion~
 a healing potion~
 A healing potion is sitting on the ground.~
-Quaff this swirling white potion to regain health.
+   Quaff this swirling white potion to regain health. Hint: create an alias for
+'quaff healing-potion' to make sure you target the right potion.
 ~
-25 m a 3
--1 0 -1
+25 m a 5
+1250 30 -1
 8 0
 C
 75 75
@@ -164,13 +249,14 @@ R
 5130 0
 S
 #1252
-potion stamina~
+potion stamina stamina-potion~
 a stamina potion~
 A stamina potion is sitting on the ground.~
-Quaff this swirling yellow potion to regain movement points.
+   Quaff this swirling yellow potion to regain movement points. Hint: create an
+alias for 'quaff stamina-potion' to make sure you target the right potion.
 ~
-25 m a 3
--1 0 -1
+25 m a 5
+1252 30 -1
 8 0
 C
 75 75
@@ -195,13 +281,14 @@ R
 5130 0
 S
 #1254
-potion mana~
+potion mana mana-potion~
 a mana potion~
 A mana potion is sitting on the ground.~
-Quaff this swirling blue potion to regain mana.
+   Quaff this swirling blue potion to regain mana. Hint: create an alias for
+'quaff mana-potion' to make sure you target the right potion.
 ~
-25 m a 3
--1 0 -1
+25 m a 5
+1254 30 -1
 8 0
 C
 75 75
@@ -497,13 +584,14 @@ R
 5130 0
 S
 #1280
-elixir healing~
+elixir healing healing-elixir~
 a healing elixir~
 A healing elixir is sitting here.~
-Quaff this swirling white potion to regain health.
+   Quaff this swirling white potion to regain health. Hint: create an alias for
+'quaff healing-elixir' to make sure you target the right potion.
 ~
-25 m a 3
--1 0 -1
+25 m a 4
+1250 30 -1
 8 0
 C
 100 100
@@ -528,13 +616,14 @@ R
 5130 0
 S
 #1282
-elixir stamina~
+elixir stamina stamina-elixir~
 a stamina elixir~
 A stamina elixir is sitting here.~
-Quaff this swirling yellow potion to regain movement points.
+   Quaff this swirling yellow potion to regain movement points. Hint: create an
+alias for 'quaff stamina-elixir' to make sure you target the right potion.
 ~
-25 m a 3
--1 0 -1
+25 m a 5
+1252 30 -1
 8 0
 C
 100 100
@@ -559,13 +648,14 @@ R
 5130 0
 S
 #1284
-elixir mana~
+elixir mana mana-elixir~
 a mana elixir~
 A mana elixir is lying here.~
-Quaff this swirling blue potion to regain mana.
+   Quaff this swirling blue potion to regain mana. Hint: create an alias for
+'quaff mana-elixir' to make sure you target the right potion.
 ~
-25 m a 3
--1 0 -1
+25 m a 4
+1254 30 -1
 8 0
 C
 100 100

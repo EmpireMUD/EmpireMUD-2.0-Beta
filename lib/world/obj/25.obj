@@ -276,4 +276,36 @@ This design will teach you to craft: heroic unicorn wand of healing.
 2514 0 0
 0 0
 S
+#2516
+potion imperial medicament imperial-medicament~
+an imperial potion of medicament~
+An imperial potion of medicament is on the ground.~
+   This fine crystal vial is sealed with shining white wax, protecting the
+swirling potion within. Hint: create an alias for 'quaff imperial-medicament'
+to make sure you target the right potion.
+~
+25 m a 8
+-1 0 3030
+8 0
+A
+8 1 0
+A
+7 1 0
+A
+23 3 0
+C
+200 200
+R
+5130 0
+S
+#2517
+formula imperial medicament potion~
+the imperial medicament potion formula~
+The imperial medicament potion formula is on the ground.~
+This formula will teach you to brew: imperial medicament potion.
+~
+7 0 a 1
+2516 0 0
+0 0
+S
 $

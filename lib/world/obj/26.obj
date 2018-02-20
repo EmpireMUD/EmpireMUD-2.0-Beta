@@ -270,4 +270,36 @@ This design will teach you to forge: heroic naga fang.
 2614 0 0
 0 0
 S
+#2616
+potion imperial ferocity imperial-ferocity~
+an imperial potion of ferocity~
+An imperial potion of ferocity is on the ground.~
+   This fine crystal vial is sealed with blood red wax, protecting the swirling
+potion within. Hint: create an alias for 'quaff imperial-ferocity' to make sure
+you target the right potion.
+~
+25 m a 9
+-1 0 3030
+8 0
+A
+1 1 0
+A
+17 2 0
+A
+21 2 0
+C
+200 200
+R
+5130 0
+S
+#2617
+formula imperial ferocity potion~
+the imperial ferocity potion formula~
+The imperial ferocity potion formula is on the ground.~
+This formula will teach you to brew: imperial ferocity potion.
+~
+7 0 a 1
+2616 0 0
+0 0
+S
 $

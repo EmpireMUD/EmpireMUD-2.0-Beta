@@ -81,4 +81,11 @@ if (!%inter.down(room)%)
 end
 detach 2917 %self.id%
 ~
+#2926
+Debuff Cleansing Potion~
+1 s 100
+~
+%heal% %actor% debuffs
+%heal% %actor% dots
+~
 $

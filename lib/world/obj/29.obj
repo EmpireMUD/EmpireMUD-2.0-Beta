@@ -208,4 +208,141 @@ This schematic will teach you to manufacture: heroic galleon.
 2917 0 0
 0 0
 S
+#2918
+potion imperial healing imperial-healing~
+an imperial healing potion~
+An imperial healing potion is on the ground.~
+   This fine crystal vial is sealed with golden wax, protecting the swirling
+white potion within. Hint: create an alias for 'quaff imperial-healing' to make
+sure you target the right potion.
+~
+25 m a 6
+1250 30 -1
+8 0
+C
+200 200
+R
+5130 0
+T 1250
+S
+#2919
+formula imperial healing potion~
+the imperial healing potion formula~
+The imperial healing potion formula is on the ground.~
+This formula will teach you to brew: imperial healing potion.
+~
+7 0 a 1
+2918 0 0
+0 0
+S
+#2920
+potion stamina imperial imperial-stamina~
+an imperial stamina potion~
+An imperial stamina potion is on the ground.~
+   This fine crystal vial is sealed with red wax, protecting the swirling
+yellow potion within. Hint: create an alias for 'quaff imperial-stamina' to
+make sure you target the right potion.
+~
+25 m a 6
+1252 30 -1
+8 0
+C
+200 200
+R
+5130 0
+T 1252
+S
+#2921
+formula imperial stamina potion~
+the imperial stamina potion formula~
+The imperial stamina potion formula is on the ground.~
+This formula will teach you to brew: imperial stamina potion.
+~
+7 0 a 1
+2920 0 0
+0 0
+S
+#2922
+potion mana imperial imperial-mana~
+an imperial mana potion~
+An imperial mana potion is on the ground.~
+   This fine crystal vial is sealed with pearly white wax, protecting the
+swirling blue potion within. Hint: create an alias for 'quaff imperial-mana' to
+make sure you target the right potion.
+~
+25 m a 6
+1254 30 -1
+8 0
+C
+200 200
+R
+5130 0
+T 1254
+S
+#2923
+formula imperial mana potion~
+the imperial mana potion formula~
+The imperial mana potion formula is on the ground.~
+This formula will teach you to brew: imperial mana potion.
+~
+7 0 a 1
+2922 0 0
+0 0
+S
+#2924
+potion imperial wayfarers wayfarer's imperial-wayfarers imperial-wayfarer's~
+an imperial wayfarer's potion~
+An imperial wayfarer's potion is on the ground.~
+   This fine crystal vial is sealed with cotton and wax, protecting the
+swirling potion within. Hint: create an alias for 'quaff imperial-wayfarers' to
+make sure you target the right potion.
+~
+25 m a 13
+-1 0 3030
+8 0
+A
+6 3 0
+A
+11 2 0
+C
+200 200
+R
+5130 0
+S
+#2925
+formula imperial wayfarer's potion~
+the imperial wayfarer's potion formula~
+The imperial wayfarer's potion formula is on the ground.~
+This formula will teach you to brew: imperial wayfarer's potion.
+~
+7 0 a 1
+2924 0 0
+0 0
+S
+#2926
+potion imperial hex-purging imperial-hex-purging hexpurging imperial-hexpurging~
+an imperial hex-purging potion~
+An imperial hex-purging potion is on the ground.~
+   This fine crystal vial is sealed with beeswax, protecting the swirling
+potion within. Hint: create an alias for 'quaff imperial-hex-purging' to make
+sure you target the right potion.
+~
+25 m a 14
+-1 0 3030
+8 0
+C
+200 200
+R
+5130 0
+S
+#2927
+formula imperial hex-purging potion~
+the imperial hex-purging potion formula~
+The imperial hex-purging potion formula is on the ground.~
+This formula will teach you to brew: imperial hex-purging potion.
+~
+7 0 a 1
+2926 0 0
+0 0
+S
 $
