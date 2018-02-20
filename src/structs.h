@@ -1558,6 +1558,7 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_HARD_DROP  BIT(22)	// w. dropped by a 'hard' mob
 #define OBJ_GROUP_DROP  BIT(23)	// x. dropped by a 'group' mob
 #define OBJ_GENERIC_DROP  BIT(24)	// y. blocks the hard/group drop flags
+#define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
 
@@ -3997,16 +3998,6 @@ struct poison_data_type {
 	int dot_max_stacks;	// how high the dot can stack
 	
 	bool allow_stack;	// whether or not it can stack
-};
-
-
-// see act.naturalmagic.c
-struct potion_data_type {
-	char *name;	// name for olc, etc
-	any_vnum atype;	// ATYPE_
-	int apply;	// APPLY_
-	bitvector_t aff;
-	int spec;	// POTION_SPEC_
 };
 
 

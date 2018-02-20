@@ -2,12 +2,11 @@
 Atlas turtle board~
 0 c 0
 board~
-eval helper %%actor.char_target(%arg%)%%
-if %helper% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room i18201
+set room i18201
 if !%instance.start%
   %echo% %self.name% disappears! Or... was it ever there in the first place?
   %purge% %self%
@@ -35,7 +34,7 @@ end
 City tortoise entry~
 0 i 100
 ~
-eval room %self.room%
+set room %self.room%
 %regionecho% %room% -7 The footfalls of %self.name% shake the earth as %self.heshe% moves to %room.coords%.
 wait 5
 %echo% %self.name% looms large over the scenery. It's so large that it carries
@@ -49,17 +48,15 @@ context %instance.id%
 if !%instance.location%
   %purge% %self%
 end
-eval room %self.room%
-if %room.template%==18200
+if %self.room.template%==18200
   if %already_loaded_tortoise%
     %purge% %self%
     halt
   else
-    eval already_loaded_tortoise 1
+    set already_loaded_tortoise 1
     global already_loaded_tortoise
   end
   mgoto %instance.location%
-  eval room %self.room%
 end
 ~
 #18204
@@ -71,12 +68,12 @@ if %cmd.mudcommand% != disembark
   halt
 end
 * go to the turtle
-eval turtle %instance.mob(18200)%
-eval target %turtle.room%
+set turtle %instance.mob(18200)%
+set target %turtle.room%
 if %turtle%
-  eval target %turtle.room%
+  set target %turtle.room%
 else
-  eval target %startloc%
+  set target %startloc%
   %adventurecomplete%
 end
 %send% %actor% You disembark from the turtle.
@@ -91,11 +88,11 @@ City turtle look out~
 look~
 if %cmd.mudcommand% == look && out == %arg%
   %send% %actor% Looking over the side of the turtle, you see...
-  eval turtle %instance.mob(18200)%
+  set turtle %instance.mob(18200)%
   if %turtle%
-    eval target %turtle.room%
+    set target %turtle.room%
   else
-    eval target %startloc%
+    set target %startloc%
     %adventurecomplete%
   end
   %teleport% %actor% %target%
@@ -117,23 +114,23 @@ Tavern Patron Spawner~
 1 n 100
 ~
 set message $n leaves.
-eval room %self.room%
+set room %self.room%
 * Common patron
 %purge% instance mob 18201 %message%
-eval current_vnum 18236
+set current_vnum 18236
 * Weird patrons
 while %current_vnum% <= 18240
   %purge% instance mob %current_vnum% %message%
   eval current_vnum %current_vnum% + 1
 done
 * Spawn new patrons
-eval weird_patron_vnum 18236
+set weird_patron_vnum 18236
 eval weird_patron_vnum (%weird_patron_vnum% - 1) + %random.4%
 %load% mob 18201
-eval person %room.people%
+set person %room.people%
 %echo% %person.name% arrives.
 %load% mob %weird_patron_vnum%
-eval person %room.people%
+set person %room.people%
 %echo% %person.name% arrives.
 %purge% %self%
 ~
@@ -145,34 +142,33 @@ if !%arg%
   %send% %actor% Seek what?
   halt
 end
-eval room %self.room%
+set room %self.room%
 if %room.rmt_flagged(!LOCATION)%
   %send% %actor% %self.shortdesc% spins gently in a circle.
   halt
 end
 if (guild /= %arg% || tortoise /= %arg%)
-  eval adv %instance.nearest_rmt(18200)%
+  set adv %instance.nearest_rmt(18200)%
   if !%adv%
     %send% %actor% Could not find an instance.
     halt
   end
-  eval room %self.room%
+  set room %self.room%
   * Teleport to the instance, find the turtle, teleport back
   %teleport% %actor% %adv%
-  eval turtle %instance.mob(18200)%
+  set turtle %instance.mob(18200)%
   %teleport% %actor% %room%
   if !%turtle%
     %send% %actor% Something went wrong (turtle not found).
     halt
   end
   %send% %actor% You hold %self.shortdesc% aloft...
-  eval real_dir %%room.direction(%turtle.room%)%%
-  eval direction %%actor.dir(%real_dir%)%%
-  eval distance %%room.distance(%turtle.room%)%%
+  set real_dir %room.direction(%turtle.room%)%
+  set distance %room.distance(%turtle.room%)%
   if %distance% == 0
     %send% %actor% There is an atlasian tortoise in the room with you.
   else
-    %send% %actor% There is an atlasian tortoise %distance% tiles to the %direction%.
+    %send% %actor% There is an atlasian tortoise %distance% tiles to the %actor.dir(%real_dir%)%.
   end
   %echoaround% %actor% %actor.name% holds %self.shortdesc% aloft...
 else
@@ -201,20 +197,20 @@ Fight Club spawner~
 2 bg 50
 ~
 wait 5
-eval ch %room.people%
-eval found_turtles 0
-eval found_mooks 0
-eval last_mook 0
+set ch %room.people%
+set found_turtles 0
+set found_mooks 0
+set last_mook 0
 while %ch%
   if !%ch.is_pc%
     if (%ch.vnum% == 18204 || %ch.vnum% == 18205 || %ch.vnum% == 18206 || %ch.vnum% == 18207)
       eval found_turtles %found_turtles% + 1
     elseif (%ch.vnum% == 18203)
       eval found_mooks %found_mooks% + 1
-      eval last_mook %ch%
+      set last_mook %ch%
     end
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if (%found_turtles% > 0)
   halt
@@ -246,15 +242,13 @@ Mob block higher template id - faction reputation Liked~
 0 s 100
 ~
 * One quick trick to get the target room
-eval room_var %self.room%
+set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   halt
 end
-eval test %%actor.has_reputation(%self.allegiance%,Liked)%%
-if %test%
+if %actor.has_reputation(%self.allegiance%,Liked)%
   %send% %actor% %self.name% lets you pass.
   return 1
   halt
@@ -266,41 +260,40 @@ return 0
 Adventurer guild cornucopia reset~
 2 f 100
 ~
-eval item_vnum 18204
+set item_vnum 18204
 * Find the existing item
-eval object %room.contents%
+set object %room.contents%
 while %object%
-  eval next_obj %object.next_in_list%
+  set next_obj %object.next_in_list%
   if %object.vnum% == %item_vnum%
     %purge% %object%
   end
-  eval object %next_obj%
+  set object %next_obj%
 done
 %load% obj 18204
-eval object %room.contents%
+set object %room.contents%
 %echo% %object.shortdesc% is refreshed!
 ~
 #18214
 Tortoise Trinket teleporter~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room_var %self.room%
+set room_var %self.room%
 * once per 60 minutes
 if %actor.cooldown(18214)%
   %send% %actor% Your %cooldown.18214% is on cooldown.
   halt
 end
-eval cycle 0
+set cycle 0
 while %cycle% >= 0
   * Repeats until break
-  eval loc %instance.nearest_rmt(18201)%
+  set loc %instance.nearest_rmt(18201)%
   * Rather than setting error in 10 places, just assume there's an error and clear it if there isn't
-  eval error 1
+  set error 1
   if %actor.fighting%
     %send% %actor% You can't use %self.name% during combat.
   elseif %actor.position% != Standing
@@ -312,13 +305,12 @@ while %cycle% >= 0
   elseif %actor.aff_flagged(DISTRACTED)%
     %send% %actor% You are too distracted to use %self.shortdesc%!
   else
-    eval error 0
+    set error 0
   end
   * Doing this AFTER checking loc exists
-  eval limit_check %%actor.can_enter_instance(%loc%)%%
-  if !%limit_check%
+  if !%actor.can_enter_instance(%loc%)%
     %send% %actor% The destination is too busy.
-    eval error 1
+    set error 1
   end
   if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
     if %cycle% > 0
@@ -356,13 +348,11 @@ Adventurer's Guildhall~
 2 o 100
 ~
 * Add basement
-eval basement %%room.down(room)%%
-if !%basement%
+if !%room.down(room)%
   %door% %room% down add 18218
 end
 * Add tower
-eval tower %%room.up(room)%%
-if !%tower%
+if !%room.up(room)%
   %door% %room% up add 18217
 end
 * Add office
@@ -376,7 +366,7 @@ if !%office%
   halt
 end
 * Add vault
-eval edir %room.bld_dir(east)%
+set edir %room.bld_dir(east)%
 eval vault %%office.%edir%(room)%%
 if !%vault%
   %door% %office% %edir% add 18220
@@ -394,26 +384,25 @@ Adventuring guild block vault~
 0 s 100
 ~
 * One quick trick to get the target room
-eval room_var %self.room%
+set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky%)
   halt
 end
-if %to_room.building% != Guildhall Vault
+if %tricky.building% != Guildhall Vault
   halt
 end
 * stealth prereq
 if %actor.skill(Stealth)% > 50
   * alone prereq
-  eval found 0
-  eval person %room_var.people%
+  set found 0
+  set person %room_var.people%
   while %person%
     if %person.is_pc% && (%person% != %actor%)
-      eval found %person%
+      set found %person%
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
   if !%found%
     %send% %actor% %self.name% lets you pass.
@@ -436,12 +425,11 @@ Egg Timeout~
 Atlasian egg fake plant~
 1 c 2
 plant~
-eval targ %%actor.obj_target(%arg%)%%
-if %targ% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room %actor.room%
+set room %actor.room%
 if (%room.sector% != Plains && %room.sector% != Desert) || %room.building%
   %send% %actor% You can't plant %self.shortdesc% here.
   return 1
@@ -452,8 +440,7 @@ if !%actor.on_quest(18221)%
   return 1
   halt
 end
-eval check %%actor.canuseroom_member(%room%)%%
-if !%check%
+if !%actor.canuseroom_member(%room%)%
   %send% %actor% You don't have permission to use %self.shortdesc% here.
   return 1
   halt
@@ -490,13 +477,13 @@ if !(%room.building% ~= Egg)
 end
 return 1
 %echoaround% %actor% %actor.name% builds a magewood fire around the egg, and lights it!
-eval obj %room.contents%
+set obj %room.contents%
 while %obj%
-  eval next_obj %obj.next_in_list%
+  set next_obj %obj.next_in_list%
   if (%obj.vnum% == 18222)
     %purge% %obj%
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 %load% obj 18223
 %build% %room% 18223
@@ -505,13 +492,13 @@ done
 Tortoise Vehicle Setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if %inter%
   * add house
   if (!%inter.aft%)
     %door% %inter% aft add 18225
   end
-  eval house %inter.aft(room)%
+  set house %inter.aft(room)%
   if %house%
     * add bedroom
     if (!%house.starboard%)
@@ -529,9 +516,9 @@ detach 18224 %self.id%
 Atlasian Turtle Egg: Hatch~
 1 f 0
 ~
-eval room %self.room%
+set room %self.room%
 %load% veh 18224
-eval tortoise %room.vehicles%
+set tortoise %room.vehicles%
 %echo% The huge atlasian egg cracks open, and %tortoise.shortdesc% pokes its head out!
 %own% %tortoise% %room.empire%
 %build% %room% demolish
@@ -543,8 +530,7 @@ Consider / Kill Death~
 0 c 0
 consider kill~
 * Target check
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -571,12 +557,11 @@ if %arg.car% == list || %arg.car% == swap ||  %arg.car% == release
   halt
 end
 * Target check
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
-eval rep_check %actor.has_reputation(18200, Liked)%
+set rep_check %actor.has_reputation(18200, Liked)%
 if !%rep_check%
   %send% %actor% You must be at least Liked by the Adventurer's Guild to ride %self.name%.
   return 1
@@ -595,12 +580,11 @@ if %arg.car% == list || %arg.car% == swap ||  %arg.car% == release
   halt
 end
 * Target check
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
-eval rep_check %actor.has_reputation(18200, Venerated)%
+set rep_check %actor.has_reputation(18200, Venerated)%
 if !%rep_check%
   %send% %actor% You must be at least Venerated by the Adventurer's Guild to ride %self.name%.
   return 1
@@ -617,7 +601,7 @@ if !%arg%
   return 1
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They must have ran away when you started waving %self.shortdesc% around, because they're not here.
   return 1
@@ -677,8 +661,8 @@ if !(%actor.on_quest(18258)%
   return 1
   halt
 end
-eval room %actor.room%
-eval cycles_left 5
+set room %actor.room%
+set cycles_left 5
 while %cycles_left% >= 0
   if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled%
     * We've either moved or the room's no longer suitable for the action
@@ -738,26 +722,25 @@ end
 Buy goblin gala ticket~
 1 c 2
 buy~
-eval room %self.room%
-eval person %room.people%
-eval found 0
+set person %self.room.people%
+set found 0
 while %person%
   if %person.vnum% == 10451
-    eval found 1
+    set found 1
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if !%found%
   return 0
   halt
 end
-eval vnum -1
+set vnum -1
 set named a thing
 if (!%arg%)
   return 0
   halt
 elseif ticket /= %arg%
-  eval vnum 18261
+  set vnum 18261
   set named a goblin gala ticket
   if %actor.inventory(18261)%
     %send% %actor% You already have one!
@@ -796,12 +779,11 @@ end
 Frost Siphon: use~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg.car%)%%
-if %test% != %self%
+if %actor.obj_target(%arg.car%)% != %self%
   return 0
   halt
 end
-eval target %actor.char_target(%arg.cdr%)%%
+set target %actor.char_target(%arg.cdr%)%
 if !%target%
   %send% %actor% You don't see a '%arg.cdr%' here.
   halt
@@ -812,8 +794,7 @@ if %target.vnum% != 10551 && %target.vnum% != 10552
   halt
 end
 set valid 1
-eval check_var %%actor.varexists(guild_siphoned_%target.vnum%)%%
-if %check_var%
+if %actor.varexists(guild_siphoned_%target.vnum%)%
   eval check %%actor.guild_siphoned_%target.vnum%%%
   if %check%
     %send% %actor% You've already siphoned energy from %target.name%.
@@ -835,7 +816,7 @@ end
 Fake pickpocket~
 1 c 2
 pickpocket~
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   * Invalid target
   return 0
@@ -859,7 +840,7 @@ if 0
 else
   %send% %actor% You pick %target.name%'s pocket...
   %load% obj 18210 %actor% inv
-  eval item %actor.inventory()%
+  set item %actor.inventory()%
   %send% %actor% You find %item.shortdesc%!
   %actor.add_resources(18272, -1)%
   return 1
@@ -874,7 +855,7 @@ switch %questvnum%
   case 18279
     if %actor.completed_quest(18283)% && %actor.completed_quest(18287)% && %actor.completed_quest(18291)% && %actor.completed_quest(18295)%
       %load% obj 18294 %actor% inv
-      eval item %actor.inventory(18294)%
+      set item %actor.inventory(18294)%
       nop %item.val0(18279)%
     end
   break
@@ -884,7 +865,7 @@ switch %questvnum%
   case 18282
     if %actor.varexists(18282_dragon_imagined)%
       %load% obj 18294 %actor% inv
-      eval item %actor.inventory(18294)%
+      set item %actor.inventory(18294)%
       nop %item.val0(18282)%
     else
       %load% obj 18282 %actor% inv
@@ -902,12 +883,12 @@ switch %questvnum%
 done
 if %questvnum% >= 18280 && %questvnum% <= 18283 && !%actor.inventory(18280)%
   %load% obj 18280 %actor% inv
-  eval item %actor.inventory(18280)%
+  set item %actor.inventory(18280)%
   * %send% %actor% You receive %item.shortdesc%.
 end
 if %questvnum% >= 18288 && %questvnum% <= 18291 && !%actor.inventory(18288)%
   %load% obj 18288 %actor% inv
-  eval item %actor.inventory(18288)%
+  set item %actor.inventory(18288)%
   * %send% %actor% You receive %item.shortdesc%.
 end
 ~
@@ -923,8 +904,7 @@ end
 Signal Malfernes~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -934,17 +914,17 @@ if !(%actor.on_quest(18280)% || %actor.on_quest(18281)% || %actor.on_quest(18282
   %purge% %self%
   halt
 end
-eval room %self.room%
+set room %self.room%
 if (%room.template% < 10250 || %room.template% > 10299)
   %send% %actor% You must use this item inside a Primeval Portal adventure instance.
   halt
 end
-eval boss %instance.mob(10252)%
+set boss %instance.mob(10252)%
 if !%boss%
-  eval boss %instance.mob(10253)%
+  set boss %instance.mob(10253)%
 end
 if !%boss%
-  eval boss %instance.mob(10254)%
+  set boss %instance.mob(10254)%
 end
 if !%boss%
   if %instance.mob(18280)%
@@ -954,7 +934,7 @@ if !%boss%
   %send% %actor% You cannot contact Malfernes from an adventure instance that has already been cleared. Find a new one.
   halt
 end
-eval target_room %boss.room%
+set target_room %boss.room%
 if %boss.fighting%
   %send% %actor% You can't do that, since someone is currently fighting this adventure's boss.
   halt
@@ -971,17 +951,16 @@ end
 Use charm on chalice~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval chalice %actor.inventory(11131)%
+set chalice %actor.inventory(11131)%
 if !%chalice%
   %send% %actor% You need to get the chalice first.
   halt
 end
-eval room %self.room%
+set room %self.room%
 if %room.template% < 11130 || %room.template% > 11159
   %send% %actor% You need to do that inside Mill Manor.
   halt
@@ -1002,8 +981,7 @@ end
 Imagine Dragons~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1011,7 +989,7 @@ if %actor.varexists(18282_dragon_imagined)%
   %send% %actor% You have imagined enough dragons for one lifetime.
   halt
 end
-eval room %self.room%
+set room %self.room%
 if %self.val0%
   * Captured a dragon
   if %room.template% < 10031 || %room.template% > 10099
@@ -1022,7 +1000,7 @@ if %self.val0%
     halt
   end
   %load% mob 18282
-  eval dragon %room.people%
+  set dragon %room.people%
   if %dragon.vnum% != 18282
     %send% %actor% Something went wrong while imagining a dragon. Please submit a bug report.
   else
@@ -1031,18 +1009,18 @@ if %self.val0%
     %echoaround% %actor% %actor.name% concentrates intensely, and %dragon.name% fades into view!
   end
   %quest% %actor% trigger 18282
-  eval 18282_dragon_imagined 1
+  set 18282_dragon_imagined 1
   remote 18282_dragon_imagined %actor.id%
 else
   * Trying to capture a dragon
-  eval person %room.people%
+  set person %room.people%
   while %person%
     if (%person.vnum% >= 10330 && %person.vnum% <= 10333) || %person.vnum% == 10300
       %send% %actor% You capture an image of %person.name%!
       nop %self.val0(1)%
       halt
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
   %send% %actor% There aren't any flame dragons or wandering dragons to capture an image of here.
 end
@@ -1062,7 +1040,7 @@ if !%arg%
   return 1
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They must have run away when you started waving %self.shortdesc% around, because they're not here.
   return 1
@@ -1108,7 +1086,7 @@ if %target.is_npc%
   %echoaround% %actor% %actor.name% throws %self.shortdesc% over %target.name% and hauls %target.himher% in.
   %purge% %target%
   %load% obj 18287 %actor% inv
-  eval item %actor.inventory(18287)%
+  set item %actor.inventory(18287)%
   %send% %actor% You get %item.shortdesc%.
 else
   if %target% == %actor%
@@ -1127,14 +1105,12 @@ end
 Fake kill tree spirit~
 0 c 0
 kill~
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room %self.room%
-eval permission %%actor.canuseroom_member(%room%)%%
-if !%permission%
+set room %self.room%
+if !%actor.canuseroom_member(%room%)%
   %send% %actor% You don't have permission to do that!
   halt
 end
@@ -1159,8 +1135,7 @@ done
 Resurrect Scaldorran~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -1170,7 +1145,7 @@ if !(%actor.on_quest(18288) || %actor.on_quest(18289) || %actor.on_quest(18290) 
   %purge% %self%
   halt
 end
-eval room %self.room%
+set room %self.room%
 if %room.template% != 10055
   %send% %actor% %self.shortdesc% can only be used in Skycleave's Lich Labs.
   halt
@@ -1180,7 +1155,7 @@ if %instance.mob(10048)%
   halt
 end
 %load% mob 10048
-eval scaldorran %room.people%
+set scaldorran %room.people%
 if %scaldorran.vnum% != 10048
   %send% %actor% Failed to load Scaldorran. Please submit a bug report containing this message.
 end
@@ -1192,23 +1167,22 @@ dg_affect %scaldorran% !ATTACK on -1
 Bag roc egg for Scaldorran~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room %self.room%
+set room %self.room%
 if %room.template% != 11000
   %send% %actor% Use this inside a roc nest.
   halt
 end
-eval egg %room.contents%
-eval check 0
+set egg %room.contents%
+set check 0
 while %egg% && !%check%
   if %egg.vnum% == 11001
-    eval check 1
+    set check 1
   else
-    eval egg %egg.next_in_list%
+    set egg %egg.next_in_list%
   end
 done
 if !%check%
@@ -1219,7 +1193,7 @@ end
 %load% obj 18291 %actor% inv
 %load% obj 11021 room
 %load% mob 11002
-eval mob %room.people%
+set mob %room.people%
 if %mob.vnum% != 11002
   %send% %actor% Error loading roc. Please submit a bug report with this message.
 else
@@ -1233,17 +1207,15 @@ end
 Bug Knezz's Office~
 1 c 2
 plant~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room %self.room%
-if %room.template% != 10047
+if %self.room.template% != 10047
   %send% %actor% You need to plant this in Knezz's room while he's not watching.
   halt
 end
-eval knezz %instance.mob(10054)%
+set knezz %instance.mob(10054)%
 if %knezz%
   * Knezz is still here...
   if %actor.skill(Stealth)% > 50
@@ -1265,7 +1237,7 @@ end
 Plant dragon tree~
 0 i 10
 ~
-eval room %self.room%
+set room %self.room%
 if %room.sector_vnum% == 4
   %echo% A great dragon tree suddenly springs from the ground nearby, eclipsing the surrounding forest!
   %terraform% %room% 18294
@@ -1285,19 +1257,17 @@ end
 Seed of Imagination plant~
 1 c 2
 plant~
-eval targ %%actor.obj_target(%arg%)%%
-if %targ% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room %actor.room%
+set room %actor.room%
 if %room.sector_vnum% != 0
   %send% %actor% You can't plant that here.
   return 1
   halt
 end
-eval check %%actor.canuseroom_member(%room%)%%
-if !%check%
+if !%actor.canuseroom_member(%room%)%
   %send% %actor% You don't have permission to use %self.shortdesc% here.
   return 1
   halt
@@ -1329,36 +1299,34 @@ done
 Verdant Wand: Teleport / Terraform~
 1 c 3
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room_var %self.room%
-eval sectname %room_var.sector%
-eval terra 1
+set sectname %self.room.sector%
+set terra 1
 if %sectname% == Scorched Woods
-  eval vnum 2
+  set vnum 2
 elseif %sectname% == Scorched Grove
-  eval vnum 26
+  set vnum 26
 elseif %sectname% == Scorched Plains || %sectname% == Scorched Crop
-  eval vnum 0
+  set vnum 0
 elseif %sectname% == Scorched Desert || %sectname% == Scorched Desert Crop
-  eval vnum 20
+  set vnum 20
 else
-  eval terra 0
+  set terra 0
 end
 * limited charges
 if (%terra% && !%self.val0%) || (!%terra% && !%self.val1%)
   %send% %actor% %self.shortdesc% is out of charges for that ability.
   halt
 end
-eval cycle 0
+set cycle 0
 while %cycle% >= 0
   * Repeats until break
-  eval loc %instance.nearest_rmt(10300)%
+  set loc %instance.nearest_rmt(10300)%
   * Rather than setting error in 10 places, just assume there's an error and clear it if there isn't
-  eval error 1
+  set error 1
   if %actor.fighting%
     %send% %actor% You can't use %self.shortdesc% during combat.
   elseif %actor.position% != Standing
@@ -1370,13 +1338,12 @@ while %cycle% >= 0
   elseif %actor.aff_flagged(DISTRACTED)%
     %send% %actor% You are too distracted to use %self.shortdesc%!
   else
-    eval error 0
+    set error 0
   end
   * Doing this AFTER checking loc exists
-  eval limit_check %%actor.can_enter_instance(%loc%)%%
-  if !%limit_check% && !%terra%
+  if !%actor.can_enter_instance(%loc%)% && !%terra%
     %send% %actor% The destination is too busy.
-    eval error 1
+    set error 1
   end
   if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
     if %cycle% > 0
@@ -1400,8 +1367,7 @@ while %cycle% >= 0
         %echoaround% %actor% %actor.name% raises %self.shortdesc% high and the scorched landscape is restored!
         %terraform% %room_var% %vnum%
         eval charges_left %self.val0%-1
-        eval do %%self.val0(%charges_left%)%%
-        nop %do%
+        nop %self.val0(%charges_left%)%
         halt
       else
         %echoaround% %actor% %actor.name% vanishes in a flash of green light!
@@ -1410,8 +1376,7 @@ while %cycle% >= 0
         %echoaround% %actor% %actor.name% appears in a flash of green light!
         nop %actor.cancel_adventure_summon%
         eval charges_left %self.val1%-1
-        eval do %%self.val1(%charges_left%)%%
-        nop %do%
+        nop %self.val1(%charges_left%)%
         halt
       end
     break
@@ -1429,9 +1394,9 @@ if !%actor.on_quest(18280)% || %actor.quest_triggered(18280)% || %self.fighting%
 end
 nop %self.add_mob_flag(SILENT)%
 wait 5
-eval room %self.room%
+set room %self.room%
 wait 1 sec
-eval cycles_left 5
+set cycles_left 5
 while %cycles_left% >= 0
   if %self.fighting% || %self.disabled%
     * Combat interrupts the speech
@@ -1459,13 +1424,13 @@ while %cycles_left% >= 0
     case 0
       %echo% %self.name% blinks and seems to come out of a trance.
       wait 1 sec
-      eval person %room.people%
+      set person %room.people%
       while %person%
         if %person.is_pc% && %person.on_quest(18280)%
           %quest% %actor% trigger 18280
           %quest% %actor% finish 18280
         end
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       done
       nop %self.remove_mob_flag(SILENT)%
       halt
@@ -1487,9 +1452,9 @@ if %self.fighting% || %self.disabled%
   halt
 end
 nop %self.add_mob_flag(SILENT)%
-eval room %self.room%
+set room %self.room%
 wait 1 sec
-eval cycles_left 5
+set cycles_left 5
 while %cycles_left% >= 0
   if %self.fighting% || %self.disabled%
     * Combat interrupts the speech
@@ -1517,13 +1482,13 @@ while %cycles_left% >= 0
     case 0
       say Best guard dog rat I ever did have...
       wait 1 sec
-      eval person %room.people%
+      set person %room.people%
       while %person%
         if %person.is_pc% && %person.on_quest(18284)%
           %quest% %actor% trigger 18284
           %quest% %actor% finish 18284
         end
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       done
       nop %self.remove_mob_flag(SILENT)%
       halt
@@ -1545,9 +1510,9 @@ if %self.fighting% || %self.disabled%
   halt
 end
 nop %self.add_mob_flag(SILENT)%
-eval room %self.room%
+set room %self.room%
 wait 1 sec
-eval cycles_left 5
+set cycles_left 5
 while %cycles_left% >= 0
   if %self.fighting% || %self.disabled%
     * Combat interrupts the speech
@@ -1575,13 +1540,13 @@ while %cycles_left% >= 0
     case 0
       say Well!? Why are you just standing there? Get to it!
       wait 1 sec
-      eval person %room.people%
+      set person %room.people%
       while %person%
         if %person.is_pc% && %person.on_quest(18288)%
           %quest% %actor% trigger 18288
           %quest% %actor% finish 18288
         end
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       done
       nop %self.remove_mob_flag(SILENT)%
       halt
@@ -1603,9 +1568,9 @@ if %self.fighting% || %self.disabled%
   halt
 end
 nop %self.add_mob_flag(SILENT)%
-eval room %self.room%
+set room %self.room%
 wait 1 sec
-eval cycles_left 5
+set cycles_left 5
 while %cycles_left% >= 0
   if %self.fighting% || %self.disabled%
     * Combat interrupts the speech
@@ -1633,13 +1598,13 @@ while %cycles_left% >= 0
     case 0
       say Are you up to it?
       wait 1 sec
-      eval person %room.people%
+      set person %room.people%
       while %person%
         if %person.is_pc% && %person.on_quest(18292)%
           %quest% %actor% trigger 18292
           %quest% %actor% finish 18292
         end
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       done
       nop %self.remove_mob_flag(SILENT)%
       halt

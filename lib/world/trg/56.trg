@@ -3,7 +3,7 @@ Study: create board~
 2 o 100
 ~
 %load% obj 1
-eval board %room.contents%
+set board %room.contents%
 %echo% %board.shortdesc% appears.
 detach 5608 %self.id%
 ~
@@ -11,13 +11,13 @@ detach 5608 %self.id%
 Study: remove board~
 2 s 0
 ~
-eval obj %room.contents%
-eval next_obj %obj.next_in_list%
+set obj %room.contents%
 while %obj%
+  set next_obj %obj.next_in_list%
   if %obj.vnum% == 1
     %purge% %obj% $p disappears.
   end
-  eval obj %next_obj%
+  set obj %next_obj%
 done
 ~
 $

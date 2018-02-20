@@ -56,6 +56,7 @@ void update_class(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
+void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
@@ -3307,6 +3308,7 @@ void delete_player_character(char_data *ch) {
 	}
 	
 	clear_private_owner(GET_IDNUM(ch));
+	purge_bound_items(GET_IDNUM(ch));
 
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {
@@ -3801,6 +3803,27 @@ void init_player(char_data *ch) {
 
 
 /**
+* When a character is deleted, also clean up items bound to only them.
+*
+* @param int idnum The idnum to clear bound objects for.
+*/
+void purge_bound_items(int idnum) {
+	obj_data *obj, *next_obj;
+	
+	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+		if (obj->bound_to && obj->bound_to->idnum == idnum && !obj->bound_to->next) {
+			// bound to exactly 1 idnum and it's this one
+			if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+				act("$p vanishes with a wisp of smoke.", FALSE, NULL, obj, NULL, TO_ROOM);
+			}
+			
+			extract_obj(obj);
+		}
+	}
+}
+
+
+/**
 * clear some of the the working variables of a char.
 *
 * I'm not sure if most of this is really necessary anymore -pc
@@ -3924,11 +3947,6 @@ void start_new_character(char_data *ch) {
 		// only approve the character automatically
 		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
 	}
-	
-	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-	GET_MOVE(ch) = GET_MAX_MOVE(ch);
-	GET_MANA(ch) = GET_MAX_MANA(ch);
-	GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 
 	/* Standard conditions */
 	GET_COND(ch, THIRST) = 0;
@@ -3995,7 +4013,6 @@ void start_new_character(char_data *ch) {
 			// special case for vampire
 			if (sk->skill == SKILL_VAMPIRE && !IS_VAMPIRE(ch)) {
 				make_vampire(ch, TRUE);
-				GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 			}
 		}
 		
@@ -4079,6 +4096,12 @@ void start_new_character(char_data *ch) {
 	
 	// set up class/level data
 	update_class(ch);
+	
+	// restore pools (last, in case they changed during bonus traits or somewhere)
+	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
+	GET_MOVE(ch) = GET_MAX_MOVE(ch);
+	GET_MANA(ch) = GET_MAX_MANA(ch);
+	GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);

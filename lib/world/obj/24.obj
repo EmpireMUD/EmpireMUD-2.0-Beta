@@ -253,4 +253,36 @@ This design will teach you to forge: heroic griffin shield.
 2414 0 0
 0 0
 S
+#2416
+potion imperial fortitude imperial-fortitude~
+an imperial potion of fortitude~
+An imperial potion of fortitude is on the ground.~
+   This fine crystal vial is sealed with gleaming imperium wax, protecting the
+swirling potion within. Hint: create an alias for 'quaff imperial-fortitude' to
+make sure you target the right potion.
+~
+25 m a 6
+-1 0 3030
+8 0
+A
+2 1 0
+A
+18 2 0
+A
+13 2 0
+C
+200 200
+R
+5130 0
+S
+#2417
+formula imperial fortitude potion~
+the imperial fortitude potion formula~
+The imperial fortitude potion formula is on the ground.~
+This formula will teach you to brew: imperial fortitude potion.
+~
+7 0 a 1
+2416 0 0
+0 0
+S
 $

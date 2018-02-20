@@ -8,7 +8,7 @@ end
 switch %random.4%
   case 1
     * Restore mana on master
-    eval targ %self.master%
+    set targ %self.master%
     if !%targ%
       %echo% %self.name% glows and purrs.
       halt
@@ -20,13 +20,12 @@ switch %random.4%
     %send% %targ% %self.name% shines brightly at you, and you feel replenished!
     %echoaround% %targ% %self.name% shines brightly at %targ.name%, who looks replenished!
     eval amount %self.level% * 2 / 3
-    eval adjust %%targ.mana(%amount%)%%
-    nop %adjust%
+    nop %targ.mana(%amount%)%
     wait 25 sec
   break
   case 2
     * Mana regen buff on master
-    eval targ %self.master%
+    set targ %self.master%
     if !%targ%
       %echo% %self.name% glows and purrs.
       halt
@@ -41,29 +40,26 @@ switch %random.4%
     * Resist buff on party
     %echo% %self.name% shines as brightly as the moon, lighting up the whole party!
     eval amount %self.level% / 20
-    eval room %self.room%
-    eval ch %room.people%
+    set ch %self.room.people%
     while %ch%
-      eval test %%self.is_ally(%ch%)%%
-      if %test%
+      if %self.is_ally(%ch%)%
         %send% %ch% You bask in %self.name%'s glow!
         dg_affect #505 %ch% RESIST-PHYSICAL %amount% 30
         dg_affect #505 %ch% RESIST-MAGICAL %amount% 30
       end
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
     wait 25 sec
   break
   case 4
     * Resist buff on tank
-    eval enemy %self.fighting%
+    set enemy %self.fighting%
     if !%enemy%
       %echo% %self.name% glows and purrs.
       halt
     end
-    eval targ %enemy.fighting%
-    eval test %%self.is_ally(%targ%)%%
-    if (!%targ% || !%test%)
+    set targ %enemy.fighting%
+    if (!%targ% || !%self.is_ally(%targ%)%)
       %echo% %self.name% glows and purrs.
       halt
     end
@@ -83,12 +79,12 @@ Spirit Wolf Familiar Debuffs~
 if %self.disabled%
   halt
 end
-eval targ %random.enemy%
+set targ %random.enemy%
 if !%targ%
   %echo% You feel a chill as %self.name%'s howl echoes out through the air!
   halt
 end
-switch 4
+switch %random.4%
   case 1
     * Dexterity debuff on enemy
     %send% %targ% %self.name% flashes brightly and shoots a bolt of lightning at you!
@@ -118,7 +114,7 @@ switch 4
     %send% %targ% %self.name% bites into you, your skin sizzling from the ghost energy!
     %echoaround% %targ% %self.name% bites into %targ.name%, %targ.hisher% skin sizzling from the ghost energy!
     * Damage is scaled by the script engine, no need to mess with it
-    eval amount 100
+    set amount 100
     %dot% #508 %targ% %amount% 30 magical 1
     wait 25 sec
   break
@@ -134,7 +130,7 @@ end
 switch %random.4%
   case 1
     * Bonus-healing buff on master
-    eval targ %self.master%
+    set targ %self.master%
     if !%targ%
       %echo% %self.name% flickers and burns.
       halt
@@ -147,14 +143,13 @@ switch %random.4%
   break
   case 2
     * Restore health on tank
-    eval enemy %self.fighting%
+    set enemy %self.fighting%
     if !%enemy%
       %echo% %self.name% flickers and burns.
       halt
     end
-    eval targ %enemy.fighting%
-    eval test %%self.is_ally(%targ%)%%
-    if (!%targ% || !%test%)
+    set targ %enemy.fighting%
+    if (!%targ% || !%self.is_ally(%targ%)%)
       %echo% %self.name% flickers and burns.
       halt
     end
@@ -170,19 +165,17 @@ switch %random.4%
   case 3
     * Restore health on party
     %echo% %self.name% bursts into flames, sending a healing fire through the party!
-    eval room %self.room%
-    eval healing_done 0
-    eval ch %room.people%
+    set healing_done 0
+    set ch %self.room.people%
     while %ch%
-      eval test %%self.is_ally(%ch%)%%
-      if %test%
+      if %self.is_ally(%ch%)%
         if %ch.health% < %ch.maxhealth%
           %send% %ch% You feel warmed by %self.name%'s fire!
           %damage% %ch% -50
-          eval healing_done 1
+          set healing_done 1
         end
       end
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
     if %healing_done%
       wait 25 sec
@@ -192,16 +185,14 @@ switch %random.4%
     * Bonus damage buff on party
     %echo% %self.name% bursts into flames, inspiring burning passion in the party!
     eval amount %self.level% / 30
-    eval room %self.room%
-    eval ch %room.people%
+    set ch %self.room.people%
     while %ch%
-      eval test %%self.is_ally(%ch%)%%
-      if %test%
+      if %self.is_ally(%ch%)%
         %send% %ch% You feel inspired by %self.name%'s fire!
         dg_affect #509 %ch% BONUS-MAGICAL %amount% 30
         dg_affect #509 %ch% BONUS-PHYSICAL %amount% 30
       end
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
     wait 25 sec
   break
@@ -214,13 +205,13 @@ Scorpion Shadow Familiar Debuffs~
 if %self.disabled%
   halt
 end
-eval master %self.master%
+set master %self.master%
 if !%master%
   %echo% %self.name% shrinks into the shadows and vanishes.
   %purge% %self%
   halt
 end
-eval targ %random.enemy%
+set targ %random.enemy%
 if !%targ%
   %echo% %master.name%'s scorpion shadow twists and coils from the darkness.
   halt
@@ -270,24 +261,23 @@ Owl Shadow Familiar Buffs~
 if %self.disabled%
   halt
 end
-eval master %self.master%
+set master %self.master%
 if !%master%
   %echo% %self.name% shrinks into the shadows and vanishes.
   %purge% %self%
   halt
 end
-eval type %random.4%
+set type %random.4%
 * only one of these does not target party
 if (%type% == 4)
   * Dodge buff on one ally
-  eval enemy %self.fighting%
+  set enemy %self.fighting%
   if !%enemy%
     %echoaround% %master% %master.name%'s shadow seems to flap its wings.
     halt
   end
-  eval targ %enemy.fighting%
-  eval test %%self.is_ally(%targ%)%%
-  if (!%targ% || !%test%)
+  set targ %enemy.fighting%
+  if (!%targ% || !%self.is_ally(%targ%)%)
     %echoaround% %master% %master.name%'s shadow seems to flap its wings.
     halt
   end
@@ -306,12 +296,10 @@ end
 * random results 1-3
 %send% %master% Your owl shadow wraps itself around the party!
 %echoaround% %master% %master.name%'s owl shadow wraps itself around the party!
-eval room %self.room%
-eval ch %room.people%
-eval had_effect 0
+set ch %self.room.people%
+set had_effect 0
 while %ch%
-  eval test %%self.is_ally(%ch%)%%
-  if %test%
+  if %self.is_ally(%ch%)%
     switch %type%
       case 1
         * Rejuvenate all allies
@@ -322,12 +310,11 @@ while %ch%
       case 2
         * Restore move on all allies
         if %ch.move()% < %ch.maxmove%
-          eval had_effect 1
+          set had_effect 1
         end
         %send% %ch% You feel the invigorating darkness restore your stamina!
         eval amount %self.level% / 5
-        eval adjust %%targ.move(%amount%)%%
-        nop %adjust%
+        nop %targ.move(%amount%)%
       break
       case 3
         * Wits buff on all allies
@@ -337,7 +324,7 @@ while %ch%
       break
     done
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if %type% == 2 && %had_effect%
   wait 25 sec
@@ -353,18 +340,17 @@ Basilisk Familiar Debuffs~
 if %self.disabled%
   halt
 end
-eval type %random.4%
+set type %random.4%
 * one type hits tank only
 if (%type% == 4)
   * Block buff on tank
-  eval enemy %self.fighting%
+  set enemy %self.fighting%
   if !%enemy%
     %echo% %self.name% flicks its tongue and whips its tail.
     halt
   end
-  eval targ %enemy.fighting%
-  eval test %%self.is_ally(%targ%)%%
-  if (!%targ% || !%test%)
+  set targ %enemy.fighting%
+  if (!%targ% || !%self.is_ally(%targ%)%)
     %echo% %self.name% flicks its tongue and whips its tail.
     halt
   end
@@ -376,7 +362,7 @@ if (%type% == 4)
   halt
 end
 * other 3 types hit the enemy
-eval targ %random.enemy%
+set targ %random.enemy%
 if !%targ%
   %echo% %self.name% flicks its tongue and whips its tail.
   halt
@@ -419,7 +405,7 @@ end
 switch %random.4%
   case 1
     * Short, LARGE bonus-healing buff on master
-    eval targ %self.master%
+    set targ %self.master%
     if !%targ%
       %echo% %self.name% sizzles and simmers.
       halt
@@ -432,14 +418,13 @@ switch %random.4%
   break
   case 2
     * Short, large heal-over-time on tank
-    eval enemy %self.fighting%
+    set enemy %self.fighting%
     if !%enemy%
       %echo% %self.name% sizzles and simmers.
       halt
     end
-    eval targ %enemy.fighting%
-    eval test %%self.is_ally(%targ%)%%
-    if (!%targ% || !%test%)
+    set targ %enemy.fighting%
+    if (!%targ% || !%self.is_ally(%targ%)%)
       %echo% %self.name% sizzles and simmers.
       halt
     end
@@ -451,14 +436,13 @@ switch %random.4%
   break
   case 3
     * Dodge buff on tank
-    eval enemy %self.fighting%
+    set enemy %self.fighting%
     if !%enemy%
       %echo% %self.name% sizzles and simmers.
       halt
     end
-    eval targ %enemy.fighting%
-    eval test %%self.is_ally(%targ%)%%
-    if (!%targ% || !%test%)
+    set targ %enemy.fighting%
+    if (!%targ% || !%self.is_ally(%targ%)%)
       %echo% %self.name% sizzles and simmers.
       halt
     end
@@ -472,16 +456,14 @@ switch %random.4%
     * Damage buff on party
     %echo% %self.name% sputters and throws embers out at the whole party!
     eval amount %self.level% / 30
-    eval room %self.room%
-    eval ch %room.people%
+    set ch %self.room.people%
     while %ch%
-      eval test %%self.is_ally(%ch%)%%
-      if %test%
+      if %self.is_ally(%ch%)%
         %send% %ch% You feel yourself surge in the embers' glow!
         dg_affect #513 %ch% BONUS-MAGICAL %amount% 30
         dg_affect #513 %ch% BONUS-PHYSICAL %amount% 30
       end
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
     wait 25 sec
   break
@@ -494,7 +476,7 @@ hide~
 * never block command
 return 0
 * master only
-eval master %self.master%
+set master %self.master%
 if !%master%
   halt
 end
@@ -517,7 +499,7 @@ Banshee Familiar Debuffs~
 if %self.disabled%
   halt
 end
-eval type %random.4%
+set type %random.4%
 switch %type%
   case 1
     * Resist debuff
@@ -539,11 +521,9 @@ switch %type%
     %echo% %self.name% lets out a blood-curdling wail!
   break
 done
-eval room %self.room%
-eval ch %room.people%
+set ch %self.room.people%
 while %ch%
-  eval test %%self.is_enemy(%ch%)%%
-  if %test%
+  if %self.is_enemy(%ch%)%
     %send% %ch% You feel the banshee's wail strike deep into your heart!
     switch %type%
       case 1
@@ -562,7 +542,7 @@ while %ch%
       break
     done
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 wait 25 sec
 ~

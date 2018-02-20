@@ -2118,6 +2118,7 @@ const char *extra_bits[] = {
 	"HARD-DROP",
 	"GROUP-DROP",
 	"GENERIC-DROP",
+	"!STORE",
 	"\n"
 };
 
@@ -2149,6 +2150,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// hard-drop
 	"",	// group-drop
 	"",	// generic-drop
+	"",	// no-store
 	"\n"
 };
 
@@ -2179,7 +2181,8 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_NO_AUTOSTORE
 	1.2,	// OBJ_HARD_DROP
 	1.4,	// OBJ_GROUP_DROP
-	1.0	// OBJ_GENERIC_DROP
+	1.0,	// OBJ_GENERIC_DROP
+	1.0	// OBJ_NO_STORE
 };
 
 

@@ -1,0 +1,22 @@
+#1250
+healing potion~
+3 0
+0 0 0 0
+T0
+Your healing potion cooldown has ended.~
+S
+#1252
+stamina potion~
+3 0
+0 0 0 0
+T0
+Your stamina potion cooldown has ended.~
+S
+#1254
+mana potion~
+3 0
+0 0 0 0
+T0
+Your mana potion cooldown has ended.~
+S
+$

@@ -269,4 +269,36 @@ This design will teach you to craft: heroic pegasus shoe.
 2714 0 0
 0 0
 S
+#2716
+potion imperial magister's magisters imperial-magisters imperial-magister's~
+an imperial magister's potion~
+An imperial magister's potion is on the ground.~
+   This fine crystal vial is sealed with shimmering blue wax, protecting the
+swirling potion within. Hint: create an alias for 'quaff imperial-magisters' to
+make sure you target the right potion.
+~
+25 m a 10
+-1 0 3030
+8 0
+A
+8 1 0
+A
+17 2 0
+A
+22 2 0
+C
+200 200
+R
+5130 0
+S
+#2717
+formula imperial magister's potion~
+the imperial magister's potion formula~
+The imperial magister's potion formula is on the ground.~
+This formula will teach you to brew: imperial magister's potion.
+~
+7 0 a 1
+2716 0 0
+0 0
+S
 $

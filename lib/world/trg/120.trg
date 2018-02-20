@@ -2,15 +2,15 @@
 Purge hint on cleanup~
 2 e 100
 ~
-eval item %room.contents%
+set item %room.contents%
 while %item%
-  eval next_item %item.next_in_list%
+  set next_item %item.next_in_list%
   if %item.vnum% == 12000
     %purge% %item%
   elseif %item.vnum% == 12030
     %purge% %item%
   end
-  eval item %next_item%
+  set item %next_item%
 done
 ~
 #12001
@@ -30,18 +30,18 @@ end
 %send% %actor% You set the difficulty...
 %echoaround% %actor% %actor.name% sets the difficulty...
 if hard /= %arg%
-  eval difficulty 2
+  set difficulty 2
 elseif group /= %arg%
-  eval difficulty 3
+  set difficulty 3
 elseif boss /= %arg%
-  eval difficulty 4
+  set difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure. (Hard, Group or Boss)
   halt
   return 1
 end
 * Clear existing difficulty flags and set new ones.
-eval mob %self%
+set mob %self%
 nop %mob.remove_mob_flag(HARD)%
 nop %mob.remove_mob_flag(GROUP)%
 if %difficulty% == 1
@@ -63,7 +63,7 @@ end
 Old God death generic (unused)~
 0 f 100
 ~
-eval tokens 0
+set tokens 0
 if %self.mob_flagged(GROUP)%
   eval tokens %tokens% + 1
   if %self.mob_flagged(HARD)%
@@ -73,15 +73,12 @@ end
 if %tokens% == 0
   halt
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
-    eval name %%currency.12000(%tokens%)%%
-    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %name%!
+    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
     if %person.level% >= (%self.level% - 75)
-      eval operation %%person.give_currency(12000, %tokens%)%%
-      nop %operation%
+      nop %person.give_currency(12000, %tokens%)%
       if %tokens% == 1
         %send% %person% You take it.
       else
@@ -95,14 +92,14 @@ while %person%
       end
     end
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12003
 Old God load event~
 0 n 100
 ~
-eval loc %instance.location%
+set loc %instance.location%
 if !%loc%
   halt
 end
@@ -125,9 +122,9 @@ end
 Old Gods loot load boe/bop~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if !%actor%
-  eval actor %self.worn_by%
+  set actor %self.worn_by%
 end
 if !%actor%
   halt
@@ -162,7 +159,7 @@ Old Gods delayed despawn~
 Old God death~
 0 f 100
 ~
-eval loc %instance.location%
+set loc %instance.location%
 if %loc%
   if %self.vnum% == 12000
     %at% %loc% %load% obj 12002
@@ -170,7 +167,7 @@ if %loc%
     %at% %loc% %load% obj 12031
   end
 end
-eval tokens 0
+set tokens 0
 if %self.mob_flagged(GROUP)%
   eval tokens %tokens% + 1
   if %self.mob_flagged(HARD)%
@@ -180,15 +177,12 @@ end
 if %tokens% == 0
   halt
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
-    eval name %%currency.12000(%tokens%)%%
-    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %name%!
+    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
     if %person.level% >= (%self.level% - 75)
-      eval operation %%person.give_currency(12000, %tokens%)%%
-      nop %operation%
+      nop %person.give_currency(12000, %tokens%)%
       if %tokens% == 1
         %send% %person% You take it.
       else
@@ -202,7 +196,7 @@ while %person%
       end
     end
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12007
@@ -217,13 +211,12 @@ if %self.affect(BLIND)%
   %echo% %self.name%'s eyes flash red, and %self.hisher% vision clears!
   dg_affect %self% BLIND off 1
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 12001
-    eval yatpan %person%
+    set yatpan %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if !%self.cooldown(12005)% && !%yatpan%
   * Summon Yatpan
@@ -231,7 +224,7 @@ if !%self.cooldown(12005)% && !%yatpan%
   nop %self.set_cooldown(12005, 300)%
   wait 2 sec
   %load% mob 12001 ally
-  eval summon %room.people%
+  set summon %self.room.people%
   if %summon.vnum% == 12001
     %echo% %summon.name% drops from the sky, holding a bow, which %self.name% takes.
     %force% %summon% %aggro% %actor%
@@ -242,7 +235,7 @@ else
   dg_affect %self% STUNNED on 5
   wait 2 sec
   %echo% %self.name% nocks hundreds of arrows and fires them into the air with blinding speed!
-  eval cycle 1
+  set cycle 1
   while %cycle% <= 3
     wait 5 sec
     %echo% &r%self.name%'s arrows rain down upon you!
@@ -272,17 +265,15 @@ wait 3 sec
 %damage% %actor% 300 physical
 %dot% #12008 %actor% 250 30 physical
 wait 5 sec
-eval amount 5000
-eval room %self.room%
-eval person %room.people%
+set amount 5000
+set person %self.room.people%
 while %person%
-  eval check %%person.is_enemy(%self%)%%
-  if %check%
+  if %person.is_enemy(%self%)%
     %send% %person% &rA fountain of blood suddenly bursts from the wounds left by %self.name%'s assault!
     %damage% %person% 150
     eval amount %amount% + 1000
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 %echo% %self.name% bathes in the blood of %self.hisher% enemies, and %self.hisher% wounds close!
 %damage% %self% -%amount%
@@ -325,18 +316,17 @@ nop %self.set_cooldown(12002, 30)%
 dg_affect %self% HARD-STUNNED on 10
 wait 1 sec
 %echo% &Y%self.name% raises her hammer overhead... (Jump now!)
-eval running 1
+set running 1
 remote running %self.id%
 wait 10 sec
-eval running 0
+set running 0
 remote running %self.id%
 shout Hammer down!
 %echo% &Y%self.name% slams %self.hisher% hammer into the earth with a deafening bang, shattering the ground underfoot!
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
-    eval test %%self.varexists(jumped_%person.id%)%%
+    set test %self.varexists(jumped_%person.id%)%
     if %test%
       eval test %%self.jumped_%person.id%%%
     end
@@ -351,7 +341,7 @@ while %person%
       unset jumped_%person.id%
     end
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12011
@@ -366,29 +356,28 @@ if %self.affect(BLIND)%
   %echo% %self.name%'s eyes flash red, and %self.hisher% vision clears!
   dg_affect %self% BLIND off 1
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 12000
-    eval anat %person%
+    set anat %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if !%anat%
   %echo% %self.name% gives a mournful screech, and vanishes in a flash of light!
   %purge% %self%
   halt
 end
-eval target %random.enemy%
+set target %random.enemy%
 if !%target%
   %echo% %self.name% looks very confused.
   halt
 end
 if %target.is_pc%
-  eval target_string %target.firstname%
+  set target_string %target.firstname%
 else
-  eval name %target.name%
-  eval target_string the %name.cdr%
+  set name %target.name%
+  set target_string the %name.cdr%
 end
 %force% %anat% say Yatpan! Strike %target_string% down!
 %send% %target% %self.name% screeches and dives at you!
@@ -437,13 +426,12 @@ Yatpan: Unsummon Self~
 if %self.fighting%
   halt
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 12000
-    eval anat %person%
+    set anat %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if !%anat%
   %echo% %self.name% gives a mournful screech, and vanishes in a flash of light!
@@ -484,7 +472,7 @@ detach 12038 %self.id%
 attach 12039 %self.id%
 makeuid loc room i12031
 if %loc%
-  eval room %loc%
+  set room %loc%
 else
   %echo% Error finding storm chamber; please report a bug.
   halt
@@ -502,14 +490,14 @@ if !%self.fighting% && %self.varexists(phase)%
     * Uh oh
     makeuid loc room i12031
     if %loc%
-      eval room %loc%
+      set room %loc%
     else
       %echo% Error finding storm chamber; please report a bug.
       halt
     end
-    eval person %room.people%
+    set person %room.people%
     while %person%
-      eval next_person %person.next_in_room%
+      set next_person %person.next_in_room%
       if %person.is_pc%
         %send% %person% %self.name% turns his gaze inward upon you!
         %send% %person% &rA torrent of lightning flows through you, blasting you out of the eye of the storm!
@@ -523,7 +511,7 @@ if !%self.fighting% && %self.varexists(phase)%
         %echo% %person.name% is expelled from the storm chamber.
         %teleport% %person% %self%
       end
-      eval person %next_person%
+      set person %next_person%
     done
     dg_affect #12031 %self% off
     %restore% %self%
@@ -580,7 +568,7 @@ end
 Hadad: Coming Storm death~
 0 f 100
 ~
-eval hadad %instance.mob(12030)%
+set hadad %instance.mob(12030)%
 if !%hadad%
   %echo% Ba'al Hadad is missing. Please report a bug.
   halt
@@ -598,27 +586,26 @@ attach 12038 %hadad.id%
 attach 12037 %hadad.id%
 attach 12036 %hadad.id%
 attach 12035 %hadad.id%
-eval room %self.room%
-eval destination %hadad.room%
-eval person %room.people%
+set destination %hadad.room%
+set person %self.room.people%
 %at% %destination% %echo% The eye of the storm suddenly collapses, as if destroyed from within!
 %echo% As %self.name% is destroyed, the eye of the storm collapses!
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   if %person.is_pc% || (%person.is_npc% && %person.master%)
     %send% %person% You are expelled from the eye of the storm!
     %echoaround% %person% %person.name% is expelled from the eye of the storm!
     %teleport% %person% %destination%
     %echoaround% %person% %person.name% is expelled from the eye of the storm!
   end
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #12034
 Storm Chamber: Flee~
 2 c 0
 flee~
-eval mob %instance.mob(12030)%
+set mob %instance.mob(12030)%
 if %mob%
   if %mob.fighting%
     %send% %actor% You can't! The fight is still raging outside.
@@ -629,10 +616,10 @@ if %mob%
       halt
     end
   else
-    eval destination %mob.room%
+    set destination %mob.room%
   end
 else
-  eval destination %instance.location%
+  set destination %instance.location%
 end
 %send% %actor% You flee from the heart of the storm.
 %echoaround% %actor% %actor.name% flees from the heart of the storm.
@@ -653,11 +640,9 @@ nop %self.set_cooldown(12030, 30)%
 wait 2 sec
 %echo% %self.name% lets out a mighty leonine roar!
 %echo% &rYou are stunned by the loudness of %self.name%'s roar!
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %test%
+  if %person.is_enemy(%self%)%
     if %self.mob_flagged(GROUP)%
       dg_affect #12035 %person% HARD-STUNNED on 10
     else
@@ -665,7 +650,7 @@ while %person%
     end
     %damage% %person% 150 physical
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %self.varexists(phase)%
   if %self.phase% == 3
@@ -687,11 +672,11 @@ end
 nop %self.set_cooldown(12030, 30)%
 if %self.varexists(phase)%
   if %self.phase% == 3
-    eval target %random.enemy%
+    set target %random.enemy%
   end
 end
 if !%target%
-  eval target %actor%
+  set target %actor%
 end
 %send% %target% %self.name% lowers %self.hisher% head and charges you!
 %echoaround% %target% %self.name% lowers %self.hisher% head and charges %target.name%!
@@ -722,9 +707,9 @@ if %self.varexists(phase)%
 end
 set time 1
 while %time% <= %times%
-  eval target %random.enemy%
+  set target %random.enemy%
   if !%target%
-    eval target %actor%
+    set target %actor%
   end
   %send% %target% %self.name% draws back an arm and takes aim at you...
   %echoaround% %self.name% draws back an arm and takes aim at %target.name%...
@@ -799,12 +784,12 @@ unset running
 unset interrupted
 %echo% %self.name%'s spell goes off... but nothing seems to happen.
 if %self.vnum% == 12030
-  eval ally %instance.mob(12031)%
+  set ally %instance.mob(12031)%
 else
-  eval ally %instance.mob(12030)%
+  set ally %instance.mob(12030)%
 end
 if %ally%
-  eval target %ally.fighting%
+  set target %ally.fighting%
   if %target%
     %send% %target% &rA bolt of lightning flies out of nowhere and strikes you!
     %echoaround% %target% A bolt of lightning flies out of nowhere and strikes %target.name%!
@@ -849,9 +834,7 @@ remote interrupted %self.id%
 Call Storm~
 1 c 3
 use~
-eval test %%self.is_name(%arg%)%%
-eval target %%actor.obj_target(%arg%)%%
-if !(%test% && %self.worn_by%) && !(%target% == %self% && %self.carried_by%)
+if !(%self.is_name(%arg%)% && %self.worn_by%) && !(%actor.obj_target(%arg%)% == %self% && %self.carried_by%)
   return 0
   halt
 end
@@ -859,8 +842,8 @@ if %actor.cooldown(12049)%
   %send% %actor% Your %cooldown.12049% is on cooldown.
   halt
 end
-eval room %actor.room%
-eval cycles_left 3
+set room %actor.room%
+set cycles_left 3
 while %cycles_left% >= 0
   eval sector_valid (!%room.building% && !%room.template%) || (%room.building% && %room.bld_flagged(OPEN)%)
   if !%sector_valid% || %actor.room% != %room% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing) || %actor.aff_flagged(DISTRACTED)%
@@ -926,6 +909,6 @@ switch %random.4%
   case 4
     %echo% Rolling thunder shakes you to your core.
   break
-end
+done
 ~
 $

@@ -29,17 +29,16 @@ if %self.affect(BLIND)%
   %echo% %self.name%'s eyes flash blue, and %self.hisher% vision clears!
   dg_affect %self% BLIND off 1
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 19001 || %person.vnum% == 19002
     * Rat already present
     halt
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 nop %self.set_cooldown(19001, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% reaches under the bed and opens a cage.
 wait 1 sec
 if %heroic_mode%
@@ -47,8 +46,7 @@ if %heroic_mode%
 else
   %load% mob 19001 ally
 end
-eval room %self.room%
-eval summon %room.people%
+set summon %self.room.people%
 if %summon%
   %echo% %summon.name% scurries out from a cage!
   %force% %summon% %aggro% %actor%
@@ -62,7 +60,7 @@ if %self.cooldown(19001)%
   halt
 end
 nop %self.set_cooldown(19001, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %send% %actor% %self.name% swings %self.hisher% pestle into the side of your head!
 %echoaround% %actor% %self.name% swings %self.hisher% pestle into the side of %actor.name%'s head!
 if %heroic_mode%
@@ -78,7 +76,7 @@ if %self.cooldown(19001)%
   halt
 end
 nop %self.set_cooldown(19001, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 if !%heroic_mode%
   %echo% %self.name% grabs a doll off a nearby shelf...
   %send% %actor% The doll looks like you!
@@ -94,15 +92,13 @@ else
   wait 2 sec
   %echo% %self.name% starts rapidly stabbing needles into the dolls on the nearby shelves!
   %echo% You feel stabbing pains in your limbs!
-  eval room %self.room%
-  eval person %room.people%
+  set person %self.room.people%
   while %person%
-    eval test %%self.is_enemy(%person%)%%
-    if %test%
+    if %self.is_enemy(%person%)%
       dg_affect #19003 %person% SLOW on 45
       %dot% #19003 %person% 75 45 magical 1
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 end
 ~
@@ -114,7 +110,7 @@ if %self.cooldown(19001)%
   halt
 end
 nop %self.set_cooldown(19001, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% throws open a small window.
 wait 3 sec
 %echo% A swarm of biting insects fills the room!
@@ -123,14 +119,13 @@ if %heroic_mode%
 else
   %echo% Everyone is bitten and stung by the insects!
 end
-eval room %self.room%
 if %heroic_mode%
-  eval person %room.people%
+  set person %self.room.people%
   while %person%
     if %person.is_pc%
       dg_affect #19004 %person% BLIND on 20
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
   %aoe% 100 physical
 end
@@ -147,25 +142,25 @@ end
 * TODO: Check nobody's in the adventure before changing difficulty
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
-  eval difficulty 1
+  set difficulty 1
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
-  eval difficulty 2
+  set difficulty 2
 elseif group /= %arg%
   %echo% Setting difficulty to Group...
-  eval difficulty 3
+  set difficulty 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  eval difficulty 4
+  set difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
   return 1
 end
 * Clear existing difficulty flags and set new ones.
-eval vnum 19000
+set vnum 19000
 while %vnum% <= 19000
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -187,18 +182,17 @@ while %vnum% <= 19000
 done
 %send% %actor% You tug on a hanging rope, and a rope ladder unfolds and drops from the ceiling...
 %echoaround% %actor% %actor.name% tugs on a hanging rope, and a rope ladder unfolds and drops from the ceiling...
-eval newroom i19001
-eval exitroom %instance.location%
+set newroom i19001
+set exitroom %instance.location%
 if %exitroom%
   %door% %exitroom% %exitroom.enter_dir% room %newroom%
   %door% %newroom% %exitroom.exit_dir% room %exitroom%
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   %teleport% %person% %newroom%
-  eval person %next_person%
+  set person %next_person%
 done
 otimer 24
 ~
@@ -212,9 +206,9 @@ Swamp Hag delayed despawn~
 Swamp Hag load BoP->BoE~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if !%actor%
-  eval actor %self.worn_by%
+  set actor %self.worn_by%
 end
 if !%actor%
   halt
@@ -245,18 +239,17 @@ Swamp Hag 2.0 Death~
 ~
 * Crystal ball
 %load% obj 19000
-eval item %room.contents%
+set item %room.contents%
 %echo% As %self.name% falls to the ground, %self.heshe% pulls a cloth off the table, revealing a crystal ball!
 * Mark the adventure as complete
 %adventurecomplete%
 * For each player in the room (on hard+ only):
 if %self.mob_flagged(HARD)% || %self.mob_flagged(GROUP)%
-  eval room_var %self.room%
-  eval ch %room_var.people%
+  set ch %self.room.people%
   while %ch%
     if %ch.is_pc%
       * Token reward
-      eval token_amount 1
+      set token_amount 1
       if %self.mob_flagged(GROUP)%
         eval token_amount %token_amount% * 2
         if %self.mob_flagged(HARD)%
@@ -264,18 +257,17 @@ if %self.mob_flagged(HARD)% || %self.mob_flagged(GROUP)%
         end
       end
       if %token_amount% > 1
-        eval string %token_amount% %currency.19000(2)%
+        set string %token_amount% %currency.19000(2)%
         set pronoun them
       else
-        eval string a %currency.19000(1)%
+        set string a %currency.19000(1)%
         set pronoun it
       end
       %send% %ch% Searching the room, you find %string%! You take %pronoun%.
-      eval tokens %%ch.give_currency(19000, %token_amount%)%%
-      nop %tokens%
+      nop %ch.give_currency(19000, %token_amount%)%
       * Random item is handled by the loot replacer.
     end
-    eval ch %ch.next_in_room%
+    set ch %ch.next_in_room%
   done
 end
 return 0
@@ -287,22 +279,20 @@ Swamp Hag 2.0 group: Bind ~
 if %self.cooldown(19001)%
   halt
 end
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 if !%heroic_mode%
   halt
 end
 * Find a non-bound target
-eval target %actor%
-eval room %self.room%
-eval person %room.people%
-eval target_found 0
-eval no_targets 0
+set target %actor%
+set person %self.room.people%
+set target_found 0
+set no_targets 0
 while %target.affect(19009)% && %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %person.is_pc% && %test%
-    eval target %person%
+  if %person.is_pc% && %person.is_enemy(%self%)%
+    set target %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if !%target%
   * Sanity check
@@ -329,7 +319,7 @@ dg_affect #19009 %actor% HARD-STUNNED on 75
 Swamp Hag bind struggle~
 0 c 0
 struggle~
-eval break_free_at 3
+set break_free_at 3
 if !%actor.affect(19009)%
   return 0
   halt
@@ -340,10 +330,10 @@ if %actor.cooldown(19010)%
 end
 nop %actor.set_cooldown(19010, 3)%
 if !%actor.varexists(struggle_counter)%
-  eval struggle_counter 0
+  set struggle_counter 0
   remote struggle_counter %actor.id%
 else
-  eval struggle_counter %actor.struggle_counter%
+  set struggle_counter %actor.struggle_counter%
 end
 eval struggle_counter %struggle_counter% + 1
 if %struggle_counter% >= %break_free_at%
@@ -394,9 +384,9 @@ Swamp Rat Combat 2.0~
 * Scale up (group only)
 if %self.vnum% == 19002
   if %self.varexists(enrage_counter)%
-    eval enrage_counter %self.enrage_counter%
+    set enrage_counter %self.enrage_counter%
   else
-    eval enrage_counter 0
+    set enrage_counter 0
   end
   eval enrage_counter %enrage_counter% + 1
   dg_affect #19014 %self% off
@@ -407,7 +397,7 @@ if %self.vnum% == 19002
     %echo% %self.name% seems to grow slightly!
   end
   if %enrage_counter% == 100
-    eval master %self.master%
+    set master %self.master%
     if %master%
       %force% %master% shout Magic wand, make my monster groooooooow!
       %echo% %master.name% smacks %self.name% with her pestle.
@@ -434,64 +424,64 @@ wait 30 sec
 Swamp Hag 2.0 loot replacer~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if %actor%
   if %actor.mob_flagged(HARD)% || %actor.mob_flagged(GROUP)%
     * Swamp water
     %load% obj 19001 %actor% inv
     * Roll for drop
-    eval percent_roll %random.100%
+    set percent_roll %random.100%
     if %percent_roll% <= 2
       * Minipet
-      eval vnum 19007
+      set vnum 19007
     else
       eval percent_roll %percent_roll% - 2
       if %percent_roll% <= 2
         * Land mount
-        eval vnum 19008
+        set vnum 19008
       else
         eval percent_roll %percent_roll% - 2
         if %percent_roll% <= 2
           * Sea mount
-          eval vnum 19009
+          set vnum 19009
         else
           eval percent_roll %percent_roll% - 2
           if %percent_roll% <= 1
             * Flying mount
-            eval vnum 19010
+            set vnum 19010
           else
             eval percent_roll %percent_roll% - 1
             if %percent_roll% <= 1
               * Morpher
-              eval vnum 19040
+              set vnum 19040
             else
               eval percent_roll %percent_roll% - 1
               if %percent_roll% <= 1
                 * Seed
-                eval vnum 19041
+                set vnum 19041
               else
                 eval percent_roll %percent_roll% - 1
                 if %percent_roll% <= 1
                   * Coffee
-                  eval vnum 19048
+                  set vnum 19048
                 else
                   eval percent_roll %percent_roll% - 1
                   if %percent_roll% <= 1
                     * Feathers
-                    eval vnum 19004
+                    set vnum 19004
                   else
                     eval percent_roll %percent_roll% - 1
                     if %percent_roll% <= 1
                       * Clothing
-                      eval vnum 19006
+                      set vnum 19006
                     else
                       eval percent_roll %percent_roll% - 1
                       if %percent_roll% <= 1
                         * Shoes
-                        eval vnum 19038
+                        set vnum 19038
                       else
                         * Nothing
-                        eval vnum -1
+                        set vnum -1
                       end
                     end
                   end
@@ -504,22 +494,20 @@ if %actor%
     end
     if %vnum% > 0
       if %self.level%
-        eval level %self.level%
+        set level %self.level%
       else
-        eval level 100
+        set level 100
       end
-      eval room %self.room%
-      eval person %room.people%
+      set person %self.room.people%
       while %person%
         if %person.is_pc%
           %load% obj %vnum% %actor% inv %level%
-          eval item %%actor.inventory(%vnum%)%%
+          set item %actor.inventory(%vnum%)%
           if %item.is_flagged(BOP)%
-            eval bind %%item.bind(%self%)%%
-            nop %bind%
+            nop %item.bind(%self%)%
           end
         end
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       done
     end
   end
@@ -530,7 +518,7 @@ end
 Walking Hut setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -543,14 +531,14 @@ detach 19047 %self.id%
 Swamp hag hut: Fill with Coffee~
 2 c 0
 fill~
-eval liquid_num 19048
+set liquid_num 19048
 set name hag's coffee
 if !%arg%
   * Fill what?
   return 0
   halt
 end
-eval target %%actor.obj_target(%arg%)%%
+set target %actor.obj_target(%arg%)%
 if %target.type% != DRINKCON
   * You can't fill [item]!
   return 0
@@ -566,44 +554,42 @@ if %target.val1% > 0 && %target.val2% != %liquid_num%
 end
 %send% %actor% You fill %target.shortdesc% with %name%.
 %echoaround% %actor% %actor.name% fills %target.shortdesc% with %name%.
-eval set_type %%target.val2(%liquid_num%)%%
-eval set_quantity %target.val1(%target.val0%)%%
-nop %set_type%
-nop %set_quantity%
+nop %target.val2(%liquid_num%)%
+nop %target.val1(%target.val0%)%
 ~
 #19060
 Goblin Challenge 2.0 Difficulty Selector~
 1 c 4
 difficulty~
-eval room %self.room%
+set room %self.room%
 if !%arg%
   %send% %actor% You must specify a level of difficulty.
   return 1
   halt
 end
 * TODO: Check nobody's in the adventure before changing difficulty
-eval level 50
-eval person %room.people%
+set level 50
+set person %room.people%
 while %person%
   if %person.level% > %level%
-    eval level %person.level%
+    set level %person.level%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if easy /= %arg%
   %echo% Setting difficulty to Easy...
-  eval difficulty 1
+  set difficulty 1
   if %level% > 100
-    eval level 100
+    set level 100
   end
 elseif medium /= %arg%
   %echo% Setting difficulty to Medium...
-  eval difficulty 2
+  set difficulty 2
 elseif difficult /= %arg%
   %echo% Setting difficulty to Difficult...
-  eval difficulty 3
+  set difficulty 3
   if %level% < 100
-    eval level 100
+    set level 100
   end
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
@@ -611,13 +597,12 @@ else
   return 1
 end
 * Scale adventure
-eval scale_inst %%instance.level(%level%)%%
-nop %scale_inst%
+nop %instance.level(%level%)%
 * Load mob, apply difficulty setting
 %load% mob 10200
-eval mob %room.people%
+set mob %room.people%
 remote difficulty %mob.id%
-eval mob_diff %difficulty%
+set mob_diff %difficulty%
 if %mob.vnum% >= 10204 && %mob.vnum% <= 10205
   eval mob_diff %mob_diff% + 1
 end
@@ -652,7 +637,7 @@ nop %self.set_cooldown(10200, 30)%
 * Group only -- boss only for Nilbog
 if %self.mob_flagged(GROUP)%
   if %self.mob_flagged(HARD)% || %self.vnum% != 10204
-    eval heroic_mode 1
+    set heroic_mode 1
   end
 end
 %send% %actor% %self.name% raises %self.hisher% weapon high and deals you a powerful blow!
@@ -680,7 +665,7 @@ end
 nop %self.set_cooldown(10200, 30)%
 if %self.mob_flagged(GROUP)%
   if %self.mob_flagged(HARD)% || %self.vnum% != 10204
-    eval heroic_mode 1
+    set heroic_mode 1
   end
 end
 %echo% %self.name% starts spinning in circles!
@@ -689,14 +674,12 @@ wait 3 sec
 if %heroic_mode%
   %aoe% 125 physical
   %echo% &r%self.name%'s wild swings leave bleeding wounds!
-  eval room %self.room%
-  eval person %room.people%
+  set person %self.room.people%
   while %person%
-    eval test %%person.is_enemy(%self%)%%
-    if %test%
+    if %person.is_enemy(%self%)%
       %dot% #10203 %person% 100 20 physical
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 else
   %aoe% 75 physical
@@ -713,7 +696,7 @@ if %actor.fighting% == %self%
   halt
 end
 nop %self.set_cooldown(10200, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 if !%heroic_mode%
   %send% %actor% You spot %self.name% trying to sneak around behind you...
 end
@@ -742,20 +725,19 @@ end
 if %actor.fighting% == %self%
   halt
 end
-eval target 0
-eval room %self.room%
-eval person %room.people%
+set target 0
+set person %self.room.people%
 while %person%
   if %person.vnum% >= 10200 && %person.vnum% <= 10205 && %person.vnum% != %self.vnum% && %person.fighting% == %self.fighting%
-    eval target %person%
+    set target %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if !%target%
   halt
 end
 nop %self.set_cooldown(10200, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %send% %actor% %self.name% flanks you as you attack %target.name%, leaving you vulnerable!
 %echoaround %actor% %self.name% and %target.name% flank %actor.name%, giving %self.name% an advantage!
 if %heroic_mode%
@@ -772,7 +754,7 @@ if %self.cooldown(10200)%
   halt
 end
 nop %self.set_cooldown(10200, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %send% %actor% %self.name% splashes goblinfire at you, causing serious burns!
 %echoaround% %actor% %self.name% splashes goblinfire at %actor.name%, causing serious burns!
 if %heroic_mode%
@@ -793,16 +775,16 @@ end
 nop %self.set_cooldown(10200, 30)%
 if %self.mob_flagged(GROUP)%
   if %self.mob_flagged(HARD)% || %self.vnum% != 10205
-    eval heroic_mode 1
+    set heroic_mode 1
   end
 end
 %echo% %self.name% begins spinning spirals of flame...
 if %heroic_mode%
-  eval cycles 5
+  set cycles 5
 else
-  eval cycles 1
+  set cycles 1
 end
-eval cycle 1
+set cycle 1
 while %cycle% <= %cycles%
   wait 3 sec
   %echo% &r%self.name% unleashes a flame spiral!
@@ -820,7 +802,7 @@ if %self.cooldown(10200)%
   halt
 end
 nop %self.set_cooldown(10200, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% draws back %self.hisher% fist for a mighty blow...
 wait 3 sec
 if %heroic_mode%
@@ -845,7 +827,7 @@ if %self.cooldown(10200)%
   halt
 end
 nop %self.set_cooldown(10200, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% starts searching for something...
 wait 5 sec
 if %self.disabled%
@@ -870,10 +852,10 @@ if %self.cooldown(10200)%
   halt
 end
 nop %self.set_cooldown(10200, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
-eval target %random.enemy%
+set heroic_mode %self.mob_flagged(GROUP)%
+set target %random.enemy%
 if !%target%
-  eval target %actor%
+  set target %actor%
 end
 if !%target%
   halt
@@ -899,21 +881,19 @@ if %self.cooldown(10200)%
   halt
 end
 nop %self.set_cooldown(10200, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %echo% Walts runs to the edge of the nest and pulls out a bomb!
 wait 5 sec
 %echo% %self.name% hurls the bomb at you!
 if %heroic_mode%
   %echo% &rThe bomb explodes, stunning you!
   %aoe% 100 physical
-  eval room %self.room%
-  eval person %room.people%
+  set person %self.room.people%
   while %person%
-    eval test %%person.is_enemy(%self%)%%
-    if %test%
+    if %person.is_enemy(%self%)%
       dg_affect #10209 %person% HARD-STUNNED on 5
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 else
   %echo% &rThe bomb explodes!
@@ -928,7 +908,7 @@ if %self.cooldown(10200)%
   halt
 end
 nop %self.set_cooldown(10200, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 if %heroic_mode%
   %echo% %self.name% raises %self.hisher% tarnished shield and strikes from behind it.
   eval magnitude %self.level%/2
@@ -951,32 +931,31 @@ Furl: Spellstorm / Moonrise~
 if %self.cooldown(10200)%
   halt
 end
-eval goblin 0
-eval room %self.room%
-eval person %room.people%
+set goblin 0
+set room %self.room%
+set person %room.people%
 while %person%
   if %person.vnum% >= 10200 && %person.vnum% <= 10205 && %person.vnum% != %self.vnum%
-    eval goblin %person%
+    set goblin %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 nop %self.set_cooldown(10200, 30)%
 %echo% %self.name% starts casting a spell...
 wait 3 sec
-eval heroic_mode %self.mob_flagged(GROUP)%
-eval hard %self.mob_flagged(HARD)%
+set heroic_mode %self.mob_flagged(GROUP)%
+set hard %self.mob_flagged(HARD)%
 if %goblin% || !%heroic_mode% || !%hard%
   if %heroic_mode%
     %echo% &r%self.name% unleashes a storm of uncontrolled magical energy!
     %aoe% 100 magical
-    eval person %room.people%
+    set person %room.people%
     while %person%
-      eval test %%person.is_enemy(%self%)%%
-      if %test%
+      if %person.is_enemy(%self%)%
         %dot% #10221 %person% 75 30 magical
         dg_affect #10211 %person% SLOW on 30
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
   else
     %send% %actor% &r%self.name% unleashes a bolt of uncontrolled magical energy, which strikes you!
@@ -992,12 +971,12 @@ if %goblin% || !%heroic_mode% || !%hard%
 else
   eval vnum 10200 + %random.5% - 1
   %load% mob %vnum% ally %self.level%
-  eval mob %room.people%
+  set mob %room.people%
   %echo% %self.name% slams %self.hisher% staff into the ground.
-  eval str_name %mob.alias%
-  eval str_name %str_name.car%
+  set str_name %mob.alias%
+  set str_name %str_name.car%
   shout Get up, lazy %str_name%! We still fighting!
-  eval difficulty 1
+  set difficulty 1
   remote difficulty %mob.id%
   nop %mob.add_mob_flag(SPAWNED)%
   nop %mob.add_mob_flag(!LOOT)%

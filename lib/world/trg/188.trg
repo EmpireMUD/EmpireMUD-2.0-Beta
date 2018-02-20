@@ -3,20 +3,19 @@ Summon ghost with candy~
 1 c 2
 sacrifice~
 * discard arguments after the first
-eval arg %arg.car%
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+set arg %arg.car%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 while %person%
   if %person.vnum% == 18800
     %send% %actor% %person.name% is already here.
     halt
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %room.function(TOMB)% && !%room.bld_flagged(OPEN)% && %room.complete%
   * OK
@@ -27,7 +26,7 @@ end
 %send% %actor% You toss %self.shortdesc% into an open grave...
 %echoaround% %actor% %actor.name% tosses %self.shortdesc% into an open grave...
 %load% mob 18800
-eval mob %room.people%
+set mob %room.people%
 if %mob.vnum% != 18800
   %echo% Something went wrong.
   halt
@@ -43,48 +42,46 @@ if !%arg%
   return 0
   halt
 end
-eval arg1 %arg.car%
-eval target %%actor.obj_target(%arg1%)%%
-if %target% != %self%
+if %actor.obj_target(%arg.car%)% != %self%
   return 0
   halt
 end
 set found_grave 0
-eval room %self.room%
+set room %self.room%
 if !%room.function(TOMB)% || !%room.bld_flagged(OPEN)% || !%room.complete%
   %send% %actor% You can only do that at an outdoor tomb building.
   halt
 end
-eval item %room.contents%
+set item %room.contents%
 while %item%
   if %item.vnum% == 18800
     set found_grave 1
   end
-  eval item %item.next_in_list%
+  set item %item.next_in_list%
 done
 if %found_grave%
   %send% %actor% You cannot summon another Headless Horse Man here yet.
   halt
 end
-eval arg2 %arg.cdr%
+set arg2 %arg.cdr%
 if !%arg2%
   %send% %actor% What difficulty would you like to summon the Headless Horse Man at? (Normal, Hard, Group or Boss)
   return 1
   halt
 end
-eval arg %arg2%
+set arg %arg2%
 if normal /= %arg%
   %send% %actor% Setting difficulty to Normal...
-  eval difficulty 1
+  set difficulty 1
 elseif hard /= %arg%
   %send% %actor% Setting difficulty to Hard...
-  eval difficulty 2
+  set difficulty 2
 elseif group /= %arg%
   %send% %actor% Setting difficulty to Group...
-  eval difficulty 3
+  set difficulty 3
 elseif boss /= %arg%
   %send% %actor% Setting difficulty to Boss...
-  eval difficulty 4
+  set difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
@@ -124,7 +121,7 @@ while %cycles_left% >= 0
 done
 %load% mob 18801
 %load% obj 18800 room
-eval mob %room.people%
+set mob %room.people%
 if %mob.vnum% != 18801
   %echo% Something went wrong...
   halt
@@ -159,7 +156,7 @@ if %object.vnum% == 18802
   say Oh! Thank you.
   wait 5
   %load% obj 18826 %actor% inventory
-  eval item %actor.inventory(18826)%
+  set item %actor.inventory(18826)%
   %send% %actor% %self.name% gives you %item.shortdesc%!
   %echoaround% %actor% %self.name% gives %actor.name% %item.shortdesc%!
 else
@@ -175,20 +172,18 @@ if %self.cooldown(18801)%
   halt
 end
 nop %self.set_cooldown(18801, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% rears up and prances!
 wait 2 sec
 if %heroic_mode%
   %echo% &r%self.name% slams %self.hisher% hooves down on the ground, creating a shockwave!
-  eval room %self.room%
-  eval person %room.people%
+  set person %self.room.people%
   while %person%
-    eval check %%person.is_enemy(%self%)%%
-    if %check%
+    if %person.is_enemy(%self%)%
       dg_affect #18803 %person% HARD-STUNNED on 5
       %damage% %person% 50
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 else
   %send% %actor% &r%self.name%'s hooves crash down on you!
@@ -204,19 +199,17 @@ if %self.cooldown(18801)%
   halt
 end
 nop %self.set_cooldown(18801, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 if %heroic_mode%
   %echo% &r%self.name% swings %self.hisher% sword in a wide arc at neck level, causing bleeding wounds!
   %aoe% 100 physical
-  eval room %self.room%
-  eval person %room.people%
+  set person %self.room.people%
   while %person%
-    eval check %%person.is_enemy(%self%)%%
-    if %check%
+    if %person.is_enemy(%self%)%
       %dot% #18804 %person% 100 30 physical
       %damage% %person% 50 physical
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 else
   %send% %actor% &r%self.name% swings %self.hisher% sword, slashing at your neck and opening a bleeding wound!
@@ -236,21 +229,21 @@ if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
   halt
 end
 nop %self.set_cooldown(18801, 30)%
-eval heroic_mode %self.mob_flagged(GROUP)%
-eval room %self.room%
-eval person %room.people%
+set heroic_mode %self.mob_flagged(GROUP)%
+set room %self.room%
+set person %room.people%
 while %person%
   if %person.vnum% == 18805
-    eval lantern %person%
+    set lantern %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %lantern%
   %echo% %self.name% urges %lantern.name% to attack faster!
   dg_affect %lantern% HASTE on 30
 else
   %load% mob 18805 ally
-  eval summon %room.people%
+  set summon %room.people%
   if %summon.vnum% == 18805
     %echo% %self.name% thrusts %self.hisher% sword into the sky!
     %echo% %summon.name% appears in a flash of blue fire!
@@ -262,8 +255,7 @@ end
 Headless Centaur death~
 0 f 100
 ~
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 set loot 0
 while %person%
   if %person.is_pc%
@@ -274,7 +266,7 @@ while %person%
   elseif %person.vnum% == 18805
     %purge% %person% $n vanishes in a flash of blue fire!
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if !%loot%
   nop %self.add_mob_flag(!LOOT)%
@@ -284,13 +276,12 @@ end
 attack-o-lantern aoe~
 0 k 100
 ~
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.vnum% == 18801
-    eval heroic_mode %person.mob_flagged(GROUP)%
+    set heroic_mode %person.mob_flagged(GROUP)%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 %echo% &rBeams of magical energy fly from %self.name%'s eyes!
 if !%heroic_mode%
@@ -303,8 +294,7 @@ end
 Learn Halloween Costumes~
 1 c 2
 learn~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -315,7 +305,7 @@ end
 %send% %actor% You learn how to make Halloween costumes.
 set craft_vnum 18812
 while %craft_vnum% <= 18817
-  eval learn %%actor.add_learned(%craft_vnum%)%%
+  nop %actor.add_learned(%craft_vnum%)%
   eval craft_vnum %craft_vnum% + 1
 done
 ~
@@ -333,13 +323,11 @@ if !%arg%
   %send% %actor% You have %costumes_left% costumes left.
   halt
 end
-eval room %self.room%
-eval permission %actor.canuseroom_guest%
-if !%permission%
+if !%actor.canuseroom_guest%
   %send% %actor% You don't have permission to do that here.
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They're not here.
   halt
@@ -363,8 +351,8 @@ elseif %target.morph%
   %send% %actor% You can't put a costume on %target.name%.
   halt
 else
-  eval prev_name %target.name%
-  eval costume_vnum %self.val0%
+  set prev_name %target.name%
+  set costume_vnum %self.val0%
   %morph% %target% %costume_vnum%
   %send% %actor% You dress up %prev_name% as %target.name%!
   %echoaround% %actor% %actor.name% dresses up %prev_name% as %target.name%!
@@ -373,8 +361,7 @@ else
     %quest% %actor% trigger 18819
     nop %self.val0(0)%
   else
-    eval operate %%self.val0(%costume_vnum%)%%
-    nop %operate%
+    nop %self.val0(%costume_vnum%)%
   end
 end
 ~
@@ -437,13 +424,11 @@ if !%arg%
   %send% %actor% Whom?
   halt
 end
-eval room %self.room%
-eval permission %actor.canuseroom_guest%
-if !%permission%
+if !%actor.canuseroom_guest%
   %send% %actor% You don't have permission to do that here.
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They're not here.
   halt
@@ -458,27 +443,26 @@ elseif %target.morph%
   %send% %actor% You can't use %self.shortdesc% on people who are already disguised or transformed.
   halt
 else
-  eval prev_name %target.name%
-  eval costume_vnum 18821
+  set prev_name %target.name%
+  set costume_vnum 18821
   %morph% %target% %costume_vnum%
   %send% %actor% You wave %self.shortdesc% at %prev_name%, who turns into %target.name%!
   %echoaround% %actor% %actor.name% waves %self.shortdesc% at %prev_name%, who turns into %target.name%!
-  eval charges %self.val0%
+  set charges %self.val0%
   eval charges %charges% - 1
   if %charges% == 0
     %quest% %actor% trigger 18821
   end
-  eval operate %%self.val0(%charges%)%%
-  nop %operate%
+  nop %self.val0(%charges%)%
 end
 ~
 #18822
 spawn ghosts~
 1 b 25
 ~
-eval room %self.room%
+set room %self.room%
 * room population check
-eval person %room.people%
+set person %room.people%
 set ghosts 0
 set people 0
 while %person%
@@ -486,13 +470,13 @@ while %person%
   if %person.vnum% == 18822
     eval ghosts %ghosts% + 1
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %people% > 5 || %ghosts% > 0
   halt
 end
 %load% mob 18822
-eval mob %room.people%
+set mob %room.people%
 if %mob.vnum% == 18822
   %echo% %mob.name% emerges from %self.shortdesc%!
 end
@@ -505,8 +489,8 @@ if !(spirits /= %arg%)
   return 0
   halt
 end
-eval room %actor.room%
-eval cycles_left 5
+set room %actor.room%
+set cycles_left 5
 while %cycles_left% >= 0
   eval sector_valid (%room.building_vnum% == 5009)
   if (%actor.room% != %room%) || !%sector_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
@@ -561,8 +545,7 @@ done
 toiletpaper houses~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -570,16 +553,16 @@ if %self.val0% < 1
   %send% %actor% %self.shortdesc% has run out.
   halt
 end
-eval room %self.room%
-eval item %room.contents%
+set room %self.room%
+set item %room.contents%
 while %item%
   if %item.vnum% == 18825
     %send% %actor% Someone has beaten you to this house.
     halt
   end
-  eval item %item.next_in_list%
+  set item %item.next_in_list%
 done
-eval vnum %room.building_vnum%
+set vnum %room.building_vnum%
 if !%vnum%
   %send% %actor% You can only use %self.shortdesc% inside a house.
   halt
@@ -628,14 +611,14 @@ done
 %echoaround% %actor% %actor.name% starts applying %self.shortdesc% to the walls of the building...
 wait 1 sec
 * Skill check
-eval chance %random.100%
+set chance %random.100%
 if %chance% > %actor.skill(Stealth)%
   * Fail
   %send% %actor% You hear someone approaching!
   wait 1 sec
   %at% %room% %echo% A guard arrives!
   %at% %room% %load% mob 18824 %actor.level%
-  eval guard %room.people%
+  set guard %room.people%
   if %guard.vnum% == 18824
     %force% %guard% mhunt %actor%
   end
@@ -644,14 +627,13 @@ else
   %echoaround% %actor% %actor.name% finishes bogrolling the building.
   %send% %actor% Your Stealth skill ensures nobody notices your mischief.
   %load% obj 18825 room
-  eval charges %self.val0%
+  set charges %self.val0%
   if %charges% == 1
     %send% %actor% %self.shortdesc% runs out!
     %quest% %actor% trigger 18824
   end
   eval charges %charges% - 1
-  eval operate %%self.val0(%charges%)%%
-  nop %operate%
+  nop %self.val0(%charges%)%
 end
 ~
 #18827
@@ -668,7 +650,7 @@ if !%arg%
   return 1
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% It must have worked, because they're not here!
   return 1
@@ -695,7 +677,7 @@ else
     %send% %actor% You have scared enough citizens... but you can keep going if you want to.
     %quest% %actor% trigger 18827
   end
-  eval operate %%self.val0(%times%)%%
+  nop %self.val0(%times%)%
 end
 ~
 #18828
@@ -713,8 +695,7 @@ if !%greatrm%
   halt
 end
 * Add cellar
-eval basement %%greatrm.down(room)%%
-if !%basement%
+if !%greatrm.down(room)%
   %door% %greatrm% down add 18830
 end
 detach 18828 %self.id%
@@ -727,46 +708,43 @@ offer~
 * Sacrifices remaining; Sacrifice item vnum; ?
 set sacrifice_amount %self.val2%
 set found_grave 0
-eval room %self.room%
+set room %self.room%
 if !%room.function(TOMB)% || !%room.complete%
   %send% %actor% You can only do that at a tomb building.
   halt
 end
-eval item %room.contents%
+set item %room.contents%
 while %item%
   if %item.vnum% == 18849
     set found_grave 1
   end
-  eval item %item.next_in_list%
+  set item %item.next_in_list%
 done
 if %found_grave%
   %send% %actor% Someone has already appeased the spirits at this tomb.
   halt
 end
-eval sacrifices_left %self.val0%
+set sacrifices_left %self.val0%
 if %sacrifices_left% < 1
   %send% %actor% You have already appeased the spirits of the dead. Return and hand in the quest.
   halt
 end
 * actual sacrifice
-eval sacrifice_vnum %self.val1%
-eval has_items %%actor.has_resources(%sacrifice_vnum%, %sacrifice_amount%)%%
-if !%has_items%
+set sacrifice_vnum %self.val1%
+if !%actor.has_resources(%sacrifice_vnum%, %sacrifice_amount%)%
   %send% %actor% You don't have the items required for this sacrifice...
   halt
 end
-eval item %%actor.inventory(%sacrifice_vnum%)%%
-eval item_name %item.shortdesc%
+set item %actor.inventory(%sacrifice_vnum%)%
+set item_name %item.shortdesc%
 %send% %actor% You offer up %item_name% (x%sacrifice_amount%) to appease the spirits of the dead...
 %echoaround% %actor% %actor.name% offers up %item_name% (x%sacrifice_amount%) to appease the spirits of the dead...
-eval take %%actor.add_resources(%sacrifice_vnum%, -%sacrifice_amount%)%%
-nop %take%
+nop %actor.add_resources(%sacrifice_vnum%, -%sacrifice_amount%)%
 eval sacrifices_left %sacrifices_left% - 1
-eval op %%self.val0(%sacrifices_left%)%%
-nop %op%
+nop %self.val0(%sacrifices_left%)%
 if %sacrifices_left% == 0
-  eval first_quest 18828
-  eval last_quest 18832
+  set first_quest 18828
+  set last_quest 18832
   while %first_quest% <= %last_quest%
     %quest% %actor% trigger %first_quest%
     eval first_quest %first_quest% + 1

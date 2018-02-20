@@ -4291,8 +4291,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_POTION: {
-			extern const struct potion_data_type potion_data[];
-			msg_to_char(ch, "Potion type: %s, Scale: %d\r\n", potion_data[GET_POTION_TYPE(j)].name, GET_POTION_SCALE(j));
+			msg_to_char(ch, "Potion affect type: [%d] %s\r\n", GET_POTION_AFFECT(j), GET_POTION_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(j)) : "not custom");
+			msg_to_char(ch, "Potion cooldown: [%d] %s, %d second%s\r\n", GET_POTION_COOLDOWN_TYPE(j), GET_POTION_COOLDOWN_TYPE(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(j)) : "no cooldown", GET_POTION_COOLDOWN_TIME(j), PLURAL(GET_POTION_COOLDOWN_TIME(j)));
 			break;
 		}
 		case ITEM_WEALTH: {

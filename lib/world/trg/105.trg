@@ -15,43 +15,43 @@ Magiterranean Terracrop~
 * pick a crop -- use start of time as jan 1, 2015: 1420070400
 * 2628288 seconds in a month
 eval month ((%timestamp% - 1420070400) / 2628288) // 12
-eval vnum -1
+set vnum -1
 switch (%month% + 1)
   case 1
-    eval vnum 10501
+    set vnum 10501
   break
   case 2
-    eval vnum 10508
+    set vnum 10508
   break
   case 3
-    eval vnum 10504
+    set vnum 10504
   break
   case 4
-    eval vnum 10505
+    set vnum 10505
   break
   case 5
-    eval vnum 10511
+    set vnum 10511
   break
   case 6
-    eval vnum 10503
+    set vnum 10503
   break
   case 7
-    eval vnum 10507
+    set vnum 10507
   break
   case 8
-    eval vnum 10509
+    set vnum 10509
   break
   case 9
-    eval vnum 10500
+    set vnum 10500
   break
   case 10
-    eval vnum 10502
+    set vnum 10502
   break
   case 11
-    eval vnum 10510
+    set vnum 10510
   break
   case 12
-    eval vnum 10506
+    set vnum 10506
   break
 done
 if (%vnum% == -1)
@@ -64,17 +64,16 @@ if %self.varexists(starting_crop_vnum)%
     set month_change 1
   end
 else
-  eval starting_crop_vnum %vnum%
+  set starting_crop_vnum %vnum%
   remote starting_crop_vnum %self.id%
 end
-eval room %self.room%
+set room %self.room%
 if !%instance.location%
   %echo% %self.name% vanishes in a swirl of leaf-green mana!
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
-if (%room.template% == 10500 || %dist% > 3 || %room.building% == Fence || %room.building% == Wall)
+if (%room.template% == 10500 || %room.distance(%instance.location%)% > 3 || %room.building% == Fence || %room.building% == Wall)
   %echo% %self.name% vanishes in a swirl of leaf-green mana!
   mgoto %instance.location%
   %echo% %self.name% appears in a swirl of leaf-green mana!
@@ -117,7 +116,7 @@ dg_affect %actor% STONED on 900
 Puppy receive treat~
 0 j 100
 ~
-eval treat 10528
+set treat 10528
 if %object.vnum% == %treat%
   %echo% %self.name% chomps down happily on %object.shortdesc%!
   %purge% %object%
@@ -141,18 +140,16 @@ Dragontooth Sceptre Summon~
 1 c 1
 use~
 * Check this item was the one used
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
 * Cooldown
-eval varname summon%target%
-eval test %%actor.varexists(%varname%)%%
+set varname summon%target%
 * Change this if trigger vnum != mob vnum
-eval target %self.vnum%
+set target %self.vnum%
 * once per 30 minutes
-if %test%
+if %actor.varexists(%varname%)%
   eval tt %%actor.%varname%%%
   if (%timestamp% - %tt%) < 1800
     eval diff (%tt% - %timestamp%) + 1800
@@ -172,7 +169,7 @@ if (%actor.position% != Standing)
   halt
 end
 * We now only allow summoning of these on claimed tiles
-eval room_var %self.room%
+set room_var %self.room%
 if %room_var.empire% != %actor.empire%
   %send% %actor% You can only summon skeleton guards on your own territory.
   return 1
@@ -180,13 +177,13 @@ if %room_var.empire% != %actor.empire%
 end
 * Summon and message
 %load% m %target%
-eval mob %room_var.people%
+set mob %room_var.people%
 if (%mob% && %mob.vnum% == %target%)
   %own% %mob% %actor.empire%
   %send% %actor% You raise %self.shortdesc% high in the air, then drive it into the ground!
   %echoaround% %actor% %actor.name% raises %self.shortdesc% high in the air, then drives it into the ground!
   %echo% %mob.name% bursts from the ground!
-  eval %varname% %timestamp%
+  set %varname% %timestamp%
   remote %varname% %actor.id%
 end
 ~
@@ -194,8 +191,7 @@ end
 Puppy Plant use~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -204,17 +200,16 @@ if (%actor.position% != Standing)
   halt
 end
 * check too many mobs
-eval mobs 0
-eval found 0
-eval room_var %self.room%
-eval ch %room_var.people%
+set mobs 0
+set found 0
+set ch %self.room.people%
 while %ch% && !%found%
   if (%ch.is_npc% && %ch.vnum% >= 10501 && %ch.vnum% <= 10504 && %ch.master% && %ch.master% == %actor%)
-    eval found 1
+    set found 1
   elseif %ch.is_npc%
     eval mobs %mobs% + 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if %found%
   %send% %actor% You already have a puppy plant pet.
@@ -225,7 +220,7 @@ else
   %echoaround% %actor% %actor.name% uses %self.shortdesc%...
   eval vnum 10501 + %random.4% - 1
   %load% m %vnum%
-  eval pet %room_var.people%
+  set pet %self.room.people%
   if (%pet% && %pet.vnum% == %vnum%)
     %force% %pet% mfollow %actor%
     %echo% %pet.name% appears!
@@ -240,43 +235,43 @@ Interdimensional Whirlwind Cleanup~
 * pick a crop -- use start of time as jan 1, 2015: 1420070400
 * 2628288 seconds in a month
 eval month ((%timestamp% - 1420070400) / 2628288) // 12
-eval vnum -1
+set vnum -1
 switch (%month% + 1)
   case 1
-    eval vnum 10501
+    set vnum 10501
   break
   case 2
-    eval vnum 10508
+    set vnum 10508
   break
   case 3
-    eval vnum 10504
+    set vnum 10504
   break
   case 4
-    eval vnum 10505
+    set vnum 10505
   break
   case 5
-    eval vnum 10511
+    set vnum 10511
   break
   case 6
-    eval vnum 10503
+    set vnum 10503
   break
   case 7
-    eval vnum 10507
+    set vnum 10507
   break
   case 8
-    eval vnum 10509
+    set vnum 10509
   break
   case 9
-    eval vnum 10500
+    set vnum 10500
   break
   case 10
-    eval vnum 10502
+    set vnum 10502
   break
   case 11
-    eval vnum 10510
+    set vnum 10510
   break
   case 12
-    eval vnum 10506
+    set vnum 10506
   break
 done
 if (%vnum% == -1)
@@ -290,8 +285,7 @@ end
 Dragonstooth sceptre equip first~
 1 c 6
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -302,35 +296,35 @@ return 1
 Gemfruit decay~
 1 f 0
 ~
-eval actor %self.carried_by%
-eval gem 0
+set actor %self.carried_by%
+set gem 0
 if %actor%
   if %actor.is_pc%
     if %random.4% != 1
-      eval gem %random.4%
+      set gem %random.4%
     end
   end
 end
-eval object nothing
+set object nothing
 switch %gem%
   case 1
     * iris
-    eval object an iridescent blue iris
+    set object an iridescent blue iris
     %load% o 1206 %self.carried_by%
   break
   case 2
     * bloodstone
-    eval object a red bloodstone
+    set object a red bloodstone
     %load% o 104 %self.carried_by%
   break
   case 3
     * seashell
-    eval object a glowing green seashell
+    set object a glowing green seashell
     %load% o 1300 %self.carried_by%
   break
   case 4
     * lightning stone
-    eval object a yellow lightning stone
+    set object a yellow lightning stone
     %load% o 103 %self.carried_by%
   break
   default
@@ -355,7 +349,7 @@ if %self.affect(BLIND)%
   %echo% %self.name%'s eyes flash blue, and %self.hisher% vision clears!
   dg_affect %self% BLIND off 1
 end
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 * Always uses this ability:
 * Bitter Cold
 * Stacking DoT on tank
@@ -372,7 +366,7 @@ end
 wait 1 s
 if !%actor% || (%actor.vnum% == %self.vnum%)
   * Actor died during the delay
-  eval actor %self.fighting%
+  set actor %self.fighting%
   if !%actor%
     halt
   end
@@ -387,11 +381,9 @@ switch %random.3%
     wait 3 sec
     %echo% &rThere is a blinding flash of light, and everything is encased in ice!
     %aoe% 25 magical
-    eval room %self.room%
-    eval person %room.people%
+    set person %self.room.people%
     while %person%
-      eval test %%person.is_enemy(%self%)%%
-      if %test%
+      if %person.is_enemy(%self%)%
         dg_affect #10552 %person% SLOW on 20
         if %heroic_mode%
           dg_affect #10552 %person% HARD-STUNNED on 5
@@ -399,7 +391,7 @@ switch %random.3%
           %echo% The ice shatters, but leaves a lingering chill...
         end
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
   break
   case 2
@@ -430,8 +422,7 @@ switch %random.3%
     %send% %actor% %self.name% forms a sword out of ice and hurls it at you!
     %echoaround% %actor% %self.name% forms a sword out of ice and hurls it at %actor.name%!
     %load% mob 10560 ally %self.level%
-    eval room %self.room%
-    eval summon %room.people%
+    set summon %self.room.people%
     if %summon.vnum% == 10560
       %send% %actor% %summon.name% begins attacking you with a malevolent will of %summon.hisher% own!
       %echoaround% %actor% %summon.name% begins attacking %actor.name% with a malevolent will of %summon.hisher% own!
@@ -452,7 +443,7 @@ Permafrost Cryomancer combat~
 if %self.cooldown(10560)%
   halt
 end
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 switch %random.3%
   case 1
     * Blizzard
@@ -462,15 +453,13 @@ switch %random.3%
     %echo% %self.name% raises %self.hisher% arms to the sky and starts chanting.
     wait 3 sec
     %echo% An intense blizzard suddenly forms in the violet sky above the glacier!
-    eval room %self.room%
-    eval person %room.people%
+    set person %self.room.people%
     eval magnitude %self.level%/5
     if !%heroic_mode%
       eval magnitude %magnitude%/2
     end
     while %person%
-      eval test %%person.is_enemy(%self%)%%
-      if %test%
+      if %person.is_enemy(%self%)%
         if %heroic_mode%
           %send% %person% &rYou are chilled to the bone, and can barely see!
           %dot% %person% 50 20 magical
@@ -480,7 +469,7 @@ switch %random.3%
           dg_affect #10554 %person% TO-HIT -%magnitude% 20
         end
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
   break
   case 2
@@ -508,13 +497,12 @@ switch %random.3%
     * Summon a permanent ice elemental (DPS flag)
     %echo% %self.name% puts %self.hisher% fingers to %self.hisher% mouth and releases a piercing whistle!
     if !%heroic_mode%
-      eval summon_vnum 10561
+      set summon_vnum 10561
     else
-      eval summon_vnum 10562
+      set summon_vnum 10562
     end
     %load% mob %summon_vnum% ally %self.level%
-    eval room %self.room%
-    eval summon %room.people%
+    set summon %self.room.people%
     if %summon.vnum% == %summon_vnum%
       %echo% %summon.name% soars down from the clear violet sky!
       %force% %summon% %aggro% %actor%
@@ -530,7 +518,7 @@ Permafrost Rime Mage Combat~
 if %self.cooldown(10560)%
   halt
 end
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 switch %random.3%
   case 1
     * Freezing Touch (targets tank)
@@ -558,15 +546,13 @@ switch %random.3%
     if %heroic_mode%
       %echo% &rEveryone is slashed by %self.name%'s rime blades!
       %aoe% 150 physical
-      eval room %self.room%
-      eval person %room.people%
+      set person %self.room.people%
       while %person%
-        eval test %%person.is_enemy(%self%)%%
-        if %test%
+        if %person.is_enemy(%self%)%
           %send% %person% You receive dozens of painful, bleeding wounds!
           %dot% #10558 %person% 100 20 physical
         end
-        eval person %person.next_in_room%
+        set person %person.next_in_room%
       done
     else
       %send% %actor% &rThe rime blades slash you, opening dozens of painful, bleeding wounds!
@@ -618,11 +604,9 @@ switch %random.3%
   case 2
     * Snow flurry
     %echo% %self.name% kicks up a flurry of snow!
-    eval room %self.room%
-    eval person %room.people%
+    set person %self.room.people%
     while %person%
-      eval test %%self.is_enemy(%person%)%%
-      if %test%
+      if %self.is_enemy(%person%)%
         %send% %person% The snow gets in your eyes!
         * 7 ~ 13
         eval amnt (%self.level%/10)
@@ -630,7 +614,7 @@ switch %random.3%
           dg_affect %person% TO-HIT -%amnt% 15
         end
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
   break
   case 3
@@ -673,25 +657,25 @@ end
 * TODO: Check nobody's in the adventure before changing difficulty
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
-  eval difficulty 1
+  set difficulty 1
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
-  eval difficulty 2
+  set difficulty 2
 elseif group /= %arg%
   %echo% Setting difficulty to Group...
-  eval difficulty 3
+  set difficulty 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  eval difficulty 4
+  set difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
   return 1
 end
 * Clear existing difficulty flags and set new ones.
-eval vnum 10550
+set vnum 10550
 while %vnum% <= 10552
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -712,20 +696,19 @@ while %vnum% <= 10552
   eval vnum %vnum% + 1
 done
 %echo% The glacier cracks and splits, revealing two paths.
-eval newroom i10552
+set newroom i10552
 if %newroom%
   %at% %newroom% %load% obj 10555
 end
-eval exitroom i10550
+set exitroom i10550
 if %exitroom%
   %door% %exitroom% north room %newroom%
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   %teleport% %person% %newroom%
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #10555
@@ -739,11 +722,10 @@ Frosty trash block higher template id~
 0 s 100
 ~
 * One quick trick to get the target room
-eval room_var %self.room%
-eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
+set room_var %self.room%
+eval to_room %%room_var.%direction%(room)%%
 * Compare template ids to figure out if they're going forward or back
-if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+if (%actor.nohassle% || !%to_room% || %to_room.template% < %room_var.template%)
   halt
 end
 if %actor.aff_flagged(SNEAK)%
@@ -757,17 +739,16 @@ return 0
 River freezer~
 0 i 100
 ~
-eval room %self.room%
+set room %self.room%
 if !%instance.location%
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
-if (%dist% > 2)
+if (%room.distance(%instance.location%)% > 2)
   mgoto %instance.location%
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
-elseif (%room.sector% == River && %dist% <= 2)
+elseif (%room.sector% == River && %room.distance(%instance.location%)% <= 2)
   %terraform% %room% 10550
   %echo% The river freezes over!
 end
@@ -789,18 +770,16 @@ mmove
 Frost flower fake plant~
 1 c 2
 plant~
-eval targ %%actor.obj_target(%arg%)%%
-if %targ% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room %actor.room%
+set room %actor.room%
 if %room.sector% != Overgrown Forest
   return 0
   halt
 end
-eval check %%actor.canuseroom_member(%room%)%%
-if !%check%
+if !%actor.canuseroom_member(%room%)%
   %send% %actor% You don't have permission to use %self.shortdesc% here.
   return 1
   halt
@@ -817,8 +796,7 @@ Permafrost boss death~
 0 f 100
 ~
 * It's a token party and everyone's invited! ...No, not toking.
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     * You get a token, and you get a token, and YOU get a token!
@@ -826,12 +804,12 @@ while %person%
     %send% %person% You take the newly created token.
     nop %person.give_currency(10550, 1)%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 * Was this Aquilo?
 if %self.vnum% == 10550
   * Quietly stop freezing the river outside
-  eval mob %instance.mob(10559)%
+  set mob %instance.mob(10559)%
   if %mob%
     %purge% %mob%
   end
@@ -886,7 +864,7 @@ end
 Polar Wind ship setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -902,7 +880,7 @@ detach 10566 %self.id%
 Permafrost store appear-check~
 0 hw 100
 ~
-eval cheapest_item_cost 14
+set cheapest_item_cost 14
 if !%actor.is_pc%
   halt
 end
@@ -920,42 +898,42 @@ end
 Boss loot replacer~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if %actor%
   if %actor.mob_flagged(GROUP)%
     * Roll for mount
-    eval percent_roll %random.100%
+    set percent_roll %random.100%
     if %percent_roll% <= 2
       * Minipet
-      eval vnum 10567
+      set vnum 10567
     else
       eval percent_roll %percent_roll% - 2
       if %percent_roll% <= 2
         * Land mount
-        eval vnum 10564
+        set vnum 10564
       else
         eval percent_roll %percent_roll% - 2
         if %percent_roll% <= 2
           * Sea mount
-          eval vnum 10565
+          set vnum 10565
         else
           eval percent_roll %percent_roll% - 2
           if %percent_roll% <= 1
             * Flying mount
-            eval vnum 10566
+            set vnum 10566
           else
             eval percent_roll %percent_roll% - 1
             if %percent_roll% <= 1
               * Morpher
-              eval vnum 10568
+              set vnum 10568
             else
               eval percent_roll %percent_roll% - 1
               if %percent_roll% <= 1
                 * Vehicle pattern item
-                eval vnum 10569
+                set vnum 10569
               else
                 * Token
-                eval vnum 10557
+                set vnum 10557
               end
             end
           end
@@ -963,15 +941,14 @@ if %actor%
       end
     end
     if %self.level%
-      eval level %self.level%
+      set level %self.level%
     else
-      eval level 100
+      set level 100
     end
     %load% obj %vnum% %actor% inv %level%
-    eval item %%actor.inventory(%vnum%)%%
+    set item %actor.inventory(%vnum%)%
     if %item.is_flagged(BOP)%
-      eval bind %%item.bind(%self%)%%
-      nop %bind%
+      nop %item.bind(%self%)%
     end
     * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   end
@@ -992,7 +969,7 @@ if !%arg%
   return 1
   halt
 end
-eval target %%actor.char_target(%arg%)%%
+set target %actor.char_target(%arg%)%
 if !%target%
   %send% %actor% They must have fled from your awesome power, because they're not here.
   return 1
@@ -1015,15 +992,14 @@ else
   return 1
   halt
 end
-eval room %actor.room%
-eval person %room.people%
+set person %actor.room.people%
 while %person%
   if %person.is_pc%
     if %person.on_quest(10550)%
       if %person.varexists(permafrost_mobs_iced)%
         eval permafrost_mobs_iced %person.permafrost_mobs_iced% + 1
       else
-        eval permafrost_mobs_iced 1
+        set permafrost_mobs_iced 1
       end
       remote permafrost_mobs_iced %person.id%
       if %permafrost_mobs_iced% >= 6
@@ -1032,7 +1008,7 @@ while %person%
       end
     end
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #10594
@@ -1056,7 +1032,7 @@ done
 Pacify the Permafrost quest start~
 2 u 100
 ~
-eval permafrost_mobs_iced 0
+set permafrost_mobs_iced 0
 remote permafrost_mobs_iced %actor.id%
 %load% obj 10593 %actor% inv
 ~
@@ -1064,28 +1040,27 @@ remote permafrost_mobs_iced %actor.id%
 Gem ice melt~
 1 f 0
 ~
-eval actor %self.carried_by%
-eval object nothing
-eval gem %random.4%
-switch %gem%
+set actor %self.carried_by%
+set object nothing
+switch %random.4%
   case 1
     * iris
-    eval object an iridescent blue iris
+    set object an iridescent blue iris
     %load% o 1206 %actor%
   break
   case 2
     * bloodstone
-    eval object a red bloodstone
+    set object a red bloodstone
     %load% o 104 %actor%
   break
   case 3
     * seashell
-    eval object a glowing green seashell
+    set object a glowing green seashell
     %load% o 1300 %actor%
   break
   case 4
     * lightning stone
-    eval object a yellow lightning stone
+    set object a yellow lightning stone
     %load% o 103 %actor%
   break
   default
@@ -1127,8 +1102,8 @@ if %actor.blood()% <= 50
   return 1
   halt
 end
-eval room %actor.room%
-eval cycles_left 5
+set room %actor.room%
+set cycles_left 5
 while %cycles_left% >= 0
   if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the action

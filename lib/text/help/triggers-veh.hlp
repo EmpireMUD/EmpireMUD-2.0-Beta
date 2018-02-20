@@ -39,6 +39,7 @@ help files for more info):
 &c%echoaround%&0 - Sends a message to all but one target.
 &c%echoneither%&0 - Sends a message to all but two people.
 &c%force%&0 - Forces a person to execute a command.
+&c%heal%&0 - Restores health/move/etc.
 &c%load%&0 - Loads a mob, object, etc.
 &c%morph%&0 - Causes a person to morph.
 &c%own%&0 - Changes ownership on something.

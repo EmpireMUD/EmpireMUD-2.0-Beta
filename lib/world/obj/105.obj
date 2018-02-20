@@ -298,11 +298,14 @@ a magic mushroom potion~
 A magic mushroom potion is sitting here.~
 This foul-smelling mana potion is made from magic mushrooms.
 ~
-25 m a 4
-4 1 0
+25 m a 6
+-1 0 -1
 8 0
 C
-0 200
+150 150
+R
+5130 0
+T 1254
 S
 #10518
 fig unripe~

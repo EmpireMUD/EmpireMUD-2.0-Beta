@@ -330,6 +330,7 @@ Objects (OEDIT):
   run additional interactions.
 - Ammo items that cause debuffs will use an 'affect' generic with the same
   vnum as the ammo, if one exists.
+- Potions should have a locked level (min equal to max) to be storable.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
@@ -2642,8 +2643,7 @@ because gaining/losing even 1 reputation point can bump a player out of the
 endcaps.
 
 Testing reputation against the mob's faction:
-eval test %%actor.has_reputation(%self.allegiance%,Liked)%%
-if %!test%
+if !%actor.has_reputation(%self.allegiance%,Liked)%
   %send% %actor% You must be Liked by %self.faction_name%!
   return 0
 end
@@ -3243,7 +3243,6 @@ Scaling based on item types:
  missile weapons - the "damage" value
  ammo - the "damage" value
  pack - the "capacity" value
- potion - the "potionscale" value
 
 Applies and item values of 0 are ignored and do not get any points assigned.
 
@@ -4048,6 +4047,18 @@ on them.
 
 See also: AFFECT FLAGS, OLC OBJECTS
 #d
+"OEDIT AFFECTTYPE" "OEDIT AFFECT TYPE"
+
+Usage:  .affecttype <vnum>
+
+This lets you set a generic affect that will be used for the potion's benefits.
+This is how you set a custom name to appear on a player's 'affects' list.
+
+If two potions have the same affect vnum (including -1/none), one potion will
+overwrite the other's effects when quaffed.
+
+See also: GENERIC AFFECT, OLC OBJECTS
+#d
 "OEDIT APPLY" "OEDIT APPLIES" APPLIES
 
 Usage:  .apply add <value> <apply> [type]
@@ -4159,6 +4170,16 @@ For SCALABLE objects, thus number is a scalable value if it is set to a number
 other than 0.
 
 See also: ITEM SCALING, OEDIT CONTENTS, OLC OBJECTS
+#d
+"OEDIT CDTIME"
+
+Usage:  .cdtime <seconds>
+
+This optional feature specifies how long the cooldown will be, in seconds. If
+you set this field and 'cooldown', quaffing the potion will trigger a cooldown
+that blocks you from using other potions that have the same cooldown.
+
+See also: COOLDOWN GENERIC, OEDIT COOLDOWN, OLC OBJECTS
 #d
 "OEDIT CHARGES"
 
@@ -4287,6 +4308,16 @@ world. If you want an item to start out empty, set its contents to 0. If you
 want it to start out full, set it to the same amount as the capacity.
 
 See also: OEDIT CAPACITY, OLC OBJECTS
+#d
+"OEDIT COOLDOWN"
+
+Usage:  .cooldown <vnum>
+
+This optional feature specifies a cooldown generic for a potion. If you set
+this field and 'cdtime', quaffing the potion will trigger a cooldown that
+blocks you from using other potions that have the same cooldown.
+
+See also: COOLDOWN GENERIC, OEDIT CDTIME, OLC OBJECTS
 #d
 "OEDIT CORPSEOF" "OEDIT CORPSE OF"
 
@@ -4420,6 +4451,7 @@ Available flags:
  HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
  GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
+ !STORE - cannot be stored (this is usually toggled on by scripts)
 
 See also: BINDING, OLC OBJECTS
 #d
@@ -4667,31 +4699,6 @@ Stealth skill tree, and the poison item is lost when it runs out of charges.
 Never set a poison type marked with an * (asterisk).
 
 See also: POISON, OEDIT CHARGES, OLC OBJECTS
-#d
-"OEDIT POTION"
-
-Usage:  .potion <type>
-
-This sets which type of potion the item contains. Potion items are used up
-(removed) when quaffed. Each potion type has a pre-determined effect.
-
-Never set a potion type with an * (asterisk).
-
-See also: POTION, OLC OBJECTS
-#d
-"OEDIT POTIONSCALE"
-
-Usage:  .potionscale <number>
-
-This sets the "scale level" of a potion's effects, usually corresponding to a
-player level.
-
-For SCALABLE objects, thus number is a scalable value if it is set to a number
-other than 0.
-
-Never set a potion type with an * (asterisk).
-
-See also: ITEM SCALING, POTION, OLC OBJECTS
 #d
 "OEDIT QUANTITY"
 
@@ -6633,14 +6640,19 @@ set the portal's destination using the script that spawns it.
 #d
 "POTION ITEM" "POTION OBJECT"
 
-Potions choose their effect from a pre-existing list. Some potion types, but
-not all, can be scaled using the potionscale trait.
+Potions will put their applies and affects on a person when quaffed. Potions
+also fire 'consume' triggers, so you can give them custom effects with scripts.
 
-If you don't set your potion as scalable, you can manually set the potionscale
-to a level to get that level of healing/etc.
+When you drink a potion, it will clear any affects from other potions that
+share the same affect vnum. If you do not set a vnum, it will use the default
+'potion' affect.
 
-If you do set your potion as scalable, you only need to set the potionscale to
-1 and it will scale to the correct level.
+In order to make potions storable, you should set their min- and max-level to
+the same number, e.g. 100-100. This allows them to be both scalable and
+storable.
+
+Note: Prior to EmpireMUD 2.0 b5.23, potions had a pre-determined list of
+effects and used custom scaling.
 
 Potions can only be used once, and then are lost.
 #d

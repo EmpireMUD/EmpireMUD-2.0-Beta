@@ -1458,7 +1458,7 @@ ACMD(do_mterraform) {
 
 
 ACMD(do_mdamage) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *vict;
 	int type;
@@ -1483,6 +1483,14 @@ ACMD(do_mdamage) {
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
 	}
+	
+	// send negatives to %heal% instead
+	if (modifier < 0) {
+		sprintf(buf, "%s health %.2f", name, -atof(modarg));
+		script_heal(ch, MOB_TRIGGER, buf);
+		return;
+	}
+	
 	modifier = scale_modifier_by_mob(ch, modifier);
 
 	if (*name == UID_CHAR) {
@@ -1684,6 +1692,16 @@ ACMD(do_mforce) {
 			command_interpreter(victim, argument);
 	}
 }
+
+
+ACMD(do_mheal) {
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED) || (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	script_heal(ch, MOB_TRIGGER, argument);
+}
+
 
 /* hunt for someone */
 ACMD(do_mhunt) {

@@ -11,9 +11,9 @@ eval total (%end_vnum% - %start_vnum%) + 1
 eval rand %%random.%total%%%
 eval select %start_vnum% - 1 + %rand%
 set prev_name %self.name%
-eval chance %random.10%
+set chance %random.10%
 if %chance% == 10
-  eval master %self.master%
+  set master %self.master%
   if !%master.fighting% && !%master.morph%
     eval select %select% - 10
     set prev_name %master.name%
@@ -30,18 +30,18 @@ end
 Heroic Caravan Setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
 if (!%inter.aft(room)%)
   * add cooking
   %door% %inter% aft add 2915
-  eval next %inter.aft(room)%
+  set next %inter.aft(room)%
   if (%next% && !%next.aft(room)%)
     * add bedroom
     %door% %next% aft add 2914
-    eval next %next.aft(room)%
+    set next %next.aft(room)%
     if (%next% && !%next.aft(room)%)
       * add smithy
       %door% %next% aft add 2913
@@ -54,7 +54,7 @@ detach 2916 %self.id%
 Heroic Galleon Setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -69,7 +69,7 @@ end
 if (!%inter.down(room)%)
   * add below deck
   %door% %inter% down add 5503
-  eval hold %inter.down(room)%
+  set hold %inter.down(room)%
   if (%hold% && !%hold.aft(room)%)
     * add mail
     %door% %hold% aft add 2911
@@ -80,5 +80,12 @@ if (!%inter.down(room)%)
   end
 end
 detach 2917 %self.id%
+~
+#2926
+Debuff Cleansing Potion~
+1 s 100
+~
+%heal% %actor% debuffs
+%heal% %actor% dots
 ~
 $

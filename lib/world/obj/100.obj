@@ -330,9 +330,15 @@ a vial of sewage~
 A grimy vial is lying here.~
 You wouldn't quaff this vial on purpose, if you knew where it came from.
 ~
-25 m a 2
-8 0 0
+25 m a 5
+-1 0 3030
 8 8064
+A
+2 1 0
+C
+50 50
+R
+5130 0
 S
 #10025
 hat ratsnest nest dirty~
@@ -678,9 +684,15 @@ a vial of pixy dust~
 A vial of pixy dust is lying here.~
 The vial contains a sparkly green substance.
 ~
-25 0 a 1
-14 0 0
+25 0 a 4
+-1 0 3030
 8 0
+B
+q
+C
+50 50
+R
+5130 0
 S
 #10053
 sword glass~

@@ -2,7 +2,7 @@
 Caravan setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -25,7 +25,7 @@ set scale 100
 Caravel setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter% || %inter.aft%)
   halt
 end
@@ -36,7 +36,7 @@ detach 952 %self.id%
 Cog setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter% || %inter.down%)
   halt
 end
@@ -47,7 +47,7 @@ detach 953 %self.id%
 Longship setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter% || %inter.aft%)
   halt
 end
@@ -58,7 +58,7 @@ detach 954 %self.id%
 Brigantine setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -74,7 +74,7 @@ detach 955 %self.id%
 Carrack setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -90,7 +90,7 @@ detach 956 %self.id%
 Hulk setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end

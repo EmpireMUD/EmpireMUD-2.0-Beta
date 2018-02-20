@@ -334,7 +334,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "&0");
 	}
 
-	if (obj->storage) {
+	if (obj->storage && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		msg_to_char(ch, "Storage locations:");
 		found = 0;
 		for (store = obj->storage; store; store = store->next) {			
@@ -346,6 +346,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	if (UNIQUE_OBJ_CAN_STORE(obj)) {
 		msg_to_char(ch, "Storage location: Warehouse\r\n");
+	}
+	if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+		msg_to_char(ch, "Storage location: none (modified object)\r\n");
 	}
 
 	// binding section
@@ -484,8 +487,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_POTION: {
-			extern const struct potion_data_type potion_data[];
-			msg_to_char(ch, "Potion type: %s (%d)\r\n", potion_data[GET_POTION_TYPE(obj)].name, GET_POTION_SCALE(obj));
+			if (GET_POTION_AFFECT(obj) != NOTHING) {
+				msg_to_char(ch, "Potion type: %s\r\n", get_generic_name_by_vnum(GET_POTION_AFFECT(obj)));
+			}
+			if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && GET_POTION_COOLDOWN_TIME(obj) > 0) {
+				msg_to_char(ch, "Potion cooldown: %d second%s\r\n", GET_POTION_COOLDOWN_TIME(obj), PLURAL(GET_POTION_COOLDOWN_TIME(obj)));
+			}
 			break;
 		}
 		case ITEM_WEALTH: {
@@ -1814,10 +1821,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 			SHARE_OR_BONUS(GET_PACK_CAPACITY(obj));
 			break;
 		}
-		case ITEM_POTION: {
-			SHARE_OR_BONUS(GET_POTION_SCALE(obj));
-			break;
-		}
 	}
 	
 	// anything to scale?
@@ -1917,16 +1920,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 				points_to_give -= (this_share * GET_PACK_CAPACITY(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_PACK_CAPACITY) = amt;
-			// negatives aren't really possible here
-			break;
-		}
-		case ITEM_POTION: {
-			// aiming for a scale of 100 at 100 -- and eliminate the wear_pos_modifier since potions are almost always WEAR_TAKE
-			amt = (int)round(this_share * GET_POTION_SCALE(obj) * (100.0 / scale_points_at_100) / wear_pos_modifier[wear_significance[ITEM_WEAR_TAKE]]);
-			if (amt > 0) {
-				points_to_give -= (this_share * GET_POTION_SCALE(obj));
-			}
-			GET_OBJ_VAL(obj, VAL_POTION_SCALE) = amt;
 			// negatives aren't really possible here
 			break;
 		}

@@ -5,7 +5,7 @@ Reset rep on entry~
 if %actor.is_pc%
   eval test %%visited_%actor.id%%%
   if !%test%
-    eval visited_%actor.id% 1
+    set visited_%actor.id% 1
     global visited_%actor.id%
     * %send% %actor% You have not visited this instance before, so your reputation with [faction] has been reset to 0.
     nop %actor.set_reputation(12401, Neutral)%
@@ -22,8 +22,7 @@ exit leave~
 free deckhand~
 0 c 0
 free~
-eval target %%actor.char_target(%arg%)%%
-if %target% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -53,10 +52,10 @@ switch %self.vnum%
   case 12405
   break
 done
-eval room %self.room%
+set room %self.room%
 if %vnum%
   %load% mob %vnum%
-  eval summon %room.people%
+  set summon %room.people%
   if %summon.vnum% == %vnum%
     if %self.mob_flagged(HARD)%
       nop %summon.add_mob_flag(HARD)%
@@ -67,7 +66,7 @@ if %vnum%
   end
 end
 * lose rep
-eval person %room.people%
+set person %room.people%
 while %person%
   if %person.is_pc%
     if %self.vnum% != 12401
@@ -75,14 +74,12 @@ while %person%
       if %self.mob_flagged(HARD)%
         set amount 2
       end
-      eval op %%person.give_currency(12403, %amount%)%%
-      eval name %%currency.12403(%amount%)%%
-      %send% %person% You loot %amount% %name% from %self.name%.
-      nop %op%
+      %send% %person% You loot %amount% %currency.12403(%amount%)% from %self.name%.
+      nop %person.give_currency(12403, %amount%)%
     end
     nop %person.set_reputation(12401, Despised)%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12404
@@ -105,10 +102,10 @@ if !%arg%
 end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
-  eval difficulty 1
+  set difficulty 1
 elseif hard /= %arg%
   %echo% Setting difficulty to Hard...
-  eval difficulty 2
+  set difficulty 2
 elseif group /= %arg%
   %send% %actor% You can't set this adventure to that difficulty...
   return 1
@@ -123,12 +120,12 @@ else
   return 1
 end
 * Clear existing difficulty flags and set new ones.
-eval vnum 12403
+set vnum 12403
 while %vnum% <= 12420
   if %vnum% == 12407
-    eval vnum 12419
+    set vnum 12419
   end
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -151,9 +148,8 @@ done
 %send% %actor% You set the difficulty...
 %echoaround% %actor% %actor.name% sets the difficulty...
 %echo% You discover a passage hidden behind %self.shortdesc%.
-eval room %self.room%
-eval newroom i12401
-%door% %room% north room %newroom%
+set newroom i12401
+%door% %self.room% north room %newroom%
 %load% obj 12461 room
 %purge% %self%
 ~
@@ -161,10 +157,10 @@ eval newroom i12401
 breath messaging~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 wait 1
 if %actor.varexists(breath)%
-  eval breath %actor.breath%
+  set breath %actor.breath%
   if %breath% == 10 && %instance.mob(12406)% && %actor.has_reputation(12401, Liked)%
     %send% %actor% The sea hag's magic is running out! You need to find some air to let it recharge!
   end
@@ -191,7 +187,7 @@ end
 set depleted 1
 global depleted
 %load% obj 12407 %actor% inv
-eval item %actor.inventory(12407)%
+set item %actor.inventory(12407)%
 %send% %actor% Searching the cavern, you find %item.shortdesc%.
 %echoaround% %actor% %actor.name% searches the cavern and finds %item.shortdesc%.
 ~
@@ -200,14 +196,13 @@ Goblin Cove trash spawner~
 1 n 100
 ~
 * Ensure no mobs here
-eval room_var %self.room%
-eval ch %room_var.people%
-eval found 0
+set ch %self.room.people%
+set found 0
 while %ch% && !%found%
   if (%ch.is_npc%)
     eval found %found% + 1
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if (%found% == 0)
   switch %random.4%
@@ -249,14 +244,14 @@ if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   halt
 end
 * It's never south -- that's always backtrack
-eval north %room.north(room)%
-eval east %room.east(room)%
-eval west %room.west(room)%
-eval south %room.south(room)%
-eval northeast %room.northeast(room)%
-eval northwest %room.northwest(room)%
-eval southeast %room.southeast(room)%
-eval southwest %room.southwest(room)%
+set north %room.north(room)%
+set east %room.east(room)%
+set west %room.west(room)%
+set south %room.south(room)%
+set northeast %room.northeast(room)%
+set northwest %room.northwest(room)%
+set southeast %room.southeast(room)%
+set southwest %room.southwest(room)%
 set result 0
 if (%north% && %north.template% >= %tofind%)
   set result north
@@ -284,9 +279,9 @@ end
 quest complete: no kill~
 2 v 0
 ~
-eval vnum 12401
+set vnum 12401
 while %vnum% <= 12406
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if %mob%
     dg_affect %mob% !ATTACK on -1
   end
@@ -297,9 +292,9 @@ done
 Goblin Cove loot load boe/bop~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if !%actor%
-  eval actor %self.worn_by%
+  set actor %self.worn_by%
 end
 if !%actor%
   halt
@@ -329,7 +324,7 @@ Underwater~
 2 bgw 100
 ~
 if !%actor%
-  eval person %room.people%
+  set person %room.people%
   while %person%
     if %person.is_pc%
       if %person.varexists(breath)%
@@ -343,7 +338,7 @@ if !%actor%
         end
       end
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
   halt
 end
@@ -351,10 +346,10 @@ if %actor.is_npc%
   halt
 end
 if !%actor.varexists(breath)%
-  eval breath 3
+  set breath 3
   remote breath %actor.id%
 end
-eval breath %actor.breath%
+set breath %actor.breath%
 eval breath %breath% - 1
 if %breath% < 0
   eval amount (%breath%) * (-250)
@@ -368,9 +363,9 @@ Air Supply~
 2 g 100
 ~
 * change based on quest, etc
-eval breath 8
+set breath 8
 if %instance.mob(12406)% && %actor.has_reputation(12401, Liked)%
-  eval breath 45
+  set breath 45
 end
 if %actor.varexists(breath)%
   if %actor.breath% < %breath%
@@ -400,14 +395,14 @@ wait 5 sec
 %echo% The powerful current pulls you deeper and deeper beneath the surface!
 wait 5 sec
 %echo% After an indeterminate amount of time, you find yourself in a small pocket of air...
-eval person %room.people%
+set person %room.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   %echoaround% %person% %person.name% washes up nearby.
   %teleport% %person% i12406
   %force% %person% look
   %echoaround% %person% %person.name% washes up nearby.
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #12417
@@ -427,9 +422,9 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-eval target %random.enemy%
+set target %random.enemy%
 if !%target%
-  eval target %actor%
+  set target %actor%
 end
 %send% %target% %self.name% draws a flintlock pistol and takes aim at you!
 %echoaround% %target% %self.name% draws a flintlock pistol and takes aim at %target.name%!
@@ -475,9 +470,9 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-eval target %random.enemy%
+set target %random.enemy%
 if !%target%
-  eval target %actor%
+  set target %actor%
 end
 %send% %target% %self.name% grabs a handful of sand from one of %self.hisher% pockets and tosses it in your eyes!
 %echoaround% %target% %self.name% grabs a handful of sand from one of %self.hisher% pockets and tosses it in %target.name%'s eyes!
@@ -615,8 +610,7 @@ if %self.cooldown(12400)%
 end
 nop %self.set_cooldown(12400, 30)%
 %echo% &r%self.name%'s canine heads lash out, snarling and gnashing.
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_npc% && %person.mob_flagged(FAMILIAR)%
     %echo% %self.name%'s heads tear a chunk out of %person.name%!
@@ -624,7 +618,7 @@ while %person%
   elseif %person% != %self%
     %damage% %person% 100
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12429
@@ -639,17 +633,15 @@ nop %self.set_cooldown(12400, 30)%
 wait 3 sec
 %echo% &r%self.name%'s tentacle-tails lash out at you, blasting you with a wave of high-pressure water!
 %aoe% 50 physical
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %test%
+  if %person.is_enemy(%self%)%
     dg_affect #12429 %person% SLOW on 20
     eval amount %self.level% / 5
     dg_affect #12429 %person% RESIST-PHYSICAL -%amount% 20
     dg_affect #12429 %person% RESIST-MAGICAL -%amount% 20
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12430
@@ -677,7 +669,7 @@ done
 Hydra/Scylla Grip Struggle~
 0 c 0
 struggle~
-eval break_free_at 2
+set break_free_at 2
 if !%actor.affect(12430)%
   return 0
   halt
@@ -688,10 +680,10 @@ if %actor.cooldown(12431)%
 end
 nop %actor.set_cooldown(12431, 3)%
 if !%actor.varexists(struggle_counter)%
-  eval struggle_counter 0
+  set struggle_counter 0
   remote struggle_counter %actor.id%
 else
-  eval struggle_counter %actor.struggle_counter%
+  set struggle_counter %actor.struggle_counter%
 end
 eval struggle_counter %struggle_counter% + 1
 if %struggle_counter% >= %break_free_at%
@@ -717,7 +709,7 @@ if %self.varexists(phase)%
 end
 dg_affect #12432 %self% IMMUNE-DAMAGE on -1
 dg_affect #12432 %self% HARD-STUNNED on -1
-eval phase 2
+set phase 2
 remote phase %self.id%
 %echo% %self.name% holds out %self.hisher% arm, and a sword made of ice appears in %self.hisher% outstretched hand!
 %echo% Get ready to dodge! Type 'up', 'down', 'left' and 'right' to evade %self.name%'s attacks.
@@ -734,13 +726,12 @@ while %cycle% <= 4
   elseif %cycle% == 4
     %echo% &Y%self.name% hurls %self.hisher% sword at the stone floor of the cave!
   end
-  eval running 1
+  set running 1
   remote running %self.id%
   wait 6 sec
-  eval running 0
+  set running 0
   remote running %self.id%
-  eval room %self.room%
-  eval person %room.people%
+  set person %self.room.people%
   if %cycle% == 1
     %echo% %self.name%'s sword launches a barrage of ice spikes as %self.heshe% slashes!
   elseif %cycle% == 2
@@ -752,7 +743,7 @@ while %cycle% <= 4
   end
   while %person%
     if %person.is_pc%
-      eval act %%self.varexists(last_action_%person.id%)%%
+      set act %self.varexists(last_action_%person.id%)%
       if %act%
         eval act %%self.last_action_%person.id%%%
       end
@@ -762,7 +753,7 @@ while %cycle% <= 4
       else
         %send% %person% &rYou are struck by %self.name%'s attack!
         %echoaround% %person% %person.name% is struck by %self.name%'s attack!
-        eval test %actor.affect(12433)%
+        set test %actor.affect(12433)%
         if %test%
           %send% %person% &rYou are encased in a block of ice!
           %echoaround% %person% %person.name% is encased in a block of ice!
@@ -777,14 +768,14 @@ while %cycle% <= 4
         end
       end
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
   eval cycle %cycle% + 1
 done
 wait 1 sec
 dg_affect #12432 %self% off
 if %self.fighting%
-  eval phase 3
+  set phase 3
   remote phase %self.id%
 else
   %restore% %self%
@@ -882,8 +873,7 @@ end
 nop %self.set_cooldown(12400, 30)%
 eval vnum 12407 + %random.4%
 %load% mob %vnum% ally
-eval room %self.room%
-eval summon %room.people%
+set summon %self.room.people%
 if %summon.vnum% == %vnum%
   %echo% %self.name% sends up a jet of sparkling blue mana and %summon.name% appears!
   nop %summon.add_mob_flag(UNDEAD)%
@@ -902,9 +892,9 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-eval target %random.enemy%
+set target %random.enemy%
 if !%target%
-  eval target %actor%
+  set target %actor%
 end
 %send% %target% &r%self.name% blasts you with a ball of icy energy.
 %echoaround% %target% %self.name% blasts %target.name% with a ball of icy energy.
@@ -917,14 +907,12 @@ Underwater boss death: portal to exit~
 0 f 100
 ~
 %echo% As you slay %self.name%, a portal opens nearby.
-eval loc %instance.location%
-eval vnum %loc.vnum%
+set loc %instance.location%
+set vnum %loc.vnum%
 %load% obj 12402 room
-eval room %self.room%
-eval portal %room.contents%
+set portal %self.room.contents%
 if %portal.vnum% == 12402
-  eval op %%portal.val0(%vnum%)%%
-  nop %op%
+  nop %portal.val0(%vnum%)%
 end
 ~
 #12440
@@ -961,32 +949,29 @@ Fathma death~
 0 f 100
 ~
 dg_affect %self% BLIND off
-eval vnum 12414
+set vnum 12414
 while %vnum% <= 12416
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if %mob%
-    eval room %mob.room%
+    set room %mob.room%
     %purge% %mob% $n vanishes.
     %load% obj 12408 %room%
   end
   eval vnum %vnum% + 1
 done
 * lose rep
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
   if %person.is_pc%
     set amount 1
     if %self.mob_flagged(HARD)%
       set amount 2
     end
-    eval op %%person.give_currency(12403, %amount%)%%
-    eval name %%currency.12403(%amount%)%%
-    %send% %person% You loot %amount% %name% from %self.name%.
-    nop %op%
+    %send% %person% You loot %amount% %currency.12403(%amount%)% from %self.name%.
+    nop %person.give_currency(12403, %amount%)%
     nop %person.set_reputation(12401, Despised)%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12443
@@ -996,27 +981,27 @@ Golden Goblin underwater miniboss spawner~
 eval mob_1 12413 + %random.3%
 if %mob_1% == 12414
   if %random.2%==2
-    eval mob_2 12415
-    eval mob_3 12416
+    set mob_2 12415
+    set mob_3 12416
   else
-    eval mob_2 12416
-    eval mob_3 12415
+    set mob_2 12416
+    set mob_3 12415
   end
 elseif %mob_1% == 12415
   if %random.2% == 2
-    eval mob_2 12414
-    eval mob_3 12416
+    set mob_2 12414
+    set mob_3 12416
   else
-    eval mob_2 12416
-    eval mob_3 12414
+    set mob_2 12416
+    set mob_3 12414
   end
 else
   if %random.2% == 2
-    eval mob_2 12415
-    eval mob_3 12414
+    set mob_2 12415
+    set mob_3 12414
   else
-    eval mob_2 12414
-    eval mob_3 12415
+    set mob_2 12414
+    set mob_3 12415
   end
 end
 %at% i12409 %load% mob %mob_1%
@@ -1043,23 +1028,22 @@ if %actor.completed_quest_instance(12409)% || %questvnum% == 12409
 end
 if %done_1% && %done_2% && %done_3% && %done_4%
   * already a portal?
-  eval room %self.room%
-  eval obj %room.contents%
+  set room %self.room%
+  set obj %room.contents%
   while %obj%
     if %obj.vnum% == 12402
       halt
     end
-    eval obj %obj.next_in_list%
+    set obj %obj.next_in_list%
   done
   wait 1
   %echo% %self.name% waves %self.hisher% hand and creates a portal!
-  eval loc %instance.location%
-  eval vnum %loc.vnum%
+  set loc %instance.location%
+  set vnum %loc.vnum%
   %load% obj 12402 room
-  eval portal %room.contents%
+  set portal %room.contents%
   if %portal.vnum% == 12402
-    eval op %%portal.val0(%vnum%)%%
-    nop %op%
+    nop %portal.val0(%vnum%)%
   end
 end
 ~

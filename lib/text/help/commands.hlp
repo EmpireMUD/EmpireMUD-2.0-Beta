@@ -1558,25 +1558,31 @@ Examples:
 #
 SAIL DRIVE PILOT SAILING DRIVING PILOTING
 
-Usage:  sail <direction | portal> [distance]
-        drive <direction | portal> [distance]
-        pilot <direction | portal> [distance]
+Usage:  sail <direction | path | portal>
+        drive <direction | path | portal>
+        pilot <direction | path | portal>
 
 These three commands are used to control ships, carriages, and other vehicles.
 Which command you use depends upon the type of vehicle. Travel in this manner
 is usually slow, but does not require movement points. You need to either be
 sitting on the vehicle, or inside of it and able to see out, to do this.
 
+You can use 'stop' to cancel travel at any time. If you don't like seeing the
+messages each time the ship moves, you can 'toggle action-spam' (unless you
+are the pilot).
+
+You can either specify a direction by itself, or a path. Paths must be pairs of
+directions and distances which your character will move in order.
+
+Examples:
+ > drive east
+ > sail 3e 4n 7nw
+ > pilot east 3, north 4, northwest 7
+
 Many vehicles cannot move through portals.
 
-If you specify a distance, you will only travel that many tiles. If not, you
-will continue to move until you hit an obstacle.
-
-You can use 'stop' to cancel travel at any time. If you don't like seeing the
-messages each time the ship moves, you can 'toggle action-spam'.
-
 See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
-STOP, TOGGLE
+STOP, TOGGLE, RUN
 #
 SAVE
 

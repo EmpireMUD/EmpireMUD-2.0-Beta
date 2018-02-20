@@ -2,13 +2,12 @@
 Rising water terraformer~
 0 i 100
 ~
-eval room %self.room%
+set room %self.room%
 if !%instance.location%
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
-if (%dist% > 5)
+if (%room.distance(%instance.location%)% > 5)
   mgoto %instance.location%
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
@@ -30,7 +29,7 @@ end
 Dire beaver spawn~
 0 n 100
 ~
-eval room %self.room%
+set room %self.room%
 if (!%instance.location% || %room.template% != 18450)
   halt
 end
@@ -50,12 +49,12 @@ Beaver dam cleanup~
 Beaver dam construction~
 0 i 100
 ~
-eval room %self.room%
+set room %self.room%
 if !%instance.location%
   %purge% %self%
   halt
 end
-eval dist %%room.distance(%instance.location%)%%
+set dist %room.distance(%instance.location%)%
 if (%dist% > 2)
   %echo% %self.name% scrambles into a hole in the dam and returns to %self.hisher% lodge.
   mgoto %instance.location%
@@ -74,7 +73,7 @@ Dire beaver death: stop flooding~
 if !%instance%
   halt
 end
-eval mob %instance.mob(18451)%
+set mob %instance.mob(18451)%
 if %mob%
   %echo% The rising water stops.
   %purge% %mob%
@@ -89,31 +88,29 @@ eval room_vnum 18461 + %random.11%
 makeuid new_room room i%room_vnum%
 %door% %room% down room %new_room%
 * Move the inside portal object to the other room
-eval item %room.contents%
+set item %room.contents%
 while %item%
-  eval next_item %item.next_in_list%
+  set next_item %item.next_in_list%
   if %item.vnum% == 18461
     %purge% %item%
   end
-  eval item %next_item%
+  set item %next_item%
 done
 %at% %new_room% %load% obj 18461
-eval targ %instance.location%
-eval num %targ.vnum%
-eval item %new_room.contents%
-eval op %%item.val0(%num%)%%
-nop %op%
+set targ %instance.location%
+set num %targ.vnum%
+set item %new_room.contents%
+nop %item.val0(%num%)%
 * Retarget the outside portal to the new room
-eval loc %instance.location%
-eval item %loc.contents%
+set loc %instance.location%
+set item %loc.contents%
 while %item%
   if %item.vnum% == 18460
-    eval targ %new_room%
-    eval num %targ.vnum%
-    eval op %%item.val0(%num%)%%
-    nop %op%
+    set targ %new_room%
+    set num %targ.vnum%
+    nop %item.val0(%num%)%
   end
-  eval item %item.next_in_list%
+  set item %item.next_in_list%
 done
 ~
 #18461
@@ -134,69 +131,69 @@ Give gift on entry~
 context %instance.id%
 * Don't message until after the room description shows
 wait 1
-eval person %room.people%
+set person %room.people%
 while %person%
   if %person.is_pc%
     * Only once per instance
     eval check %%given_item_%person.id%%%
     if !%check%
-      eval given_item_%person.id% 1
+      set given_item_%person.id% 1
       global given_item_%person.id%
       * Give everyone a pet
       * Get vnum of item to give
-      eval vnum %room.template%
+      set vnum %room.template%
       * Do they already have it?
-      eval item %%person.inventory(%vnum%)%%
+      set item %person.inventory(%vnum%)%
       if !%item%
         * Give them the item
         %load% obj %vnum% %person% inv
         * Message
-        eval item %%person.inventory(%vnum%)%%
+        set item %person.inventory(%vnum%)%
         if %item%
           %send% %person% You discover %item.shortdesc%!
         end
       end
       * Chance of a rare mount
       * Roll for mount
-      eval vnum 0
-      eval percent_roll %random.100%
+      set vnum 0
+      set percent_roll %random.100%
       if %percent_roll% <= 2
         * Land mount
-        eval vnum 18497
+        set vnum 18497
       else
         eval percent_roll %percent_roll% - 2
         if %percent_roll% <= 2
           * Sea mount
-          eval vnum 18498
+          set vnum 18498
         else
           eval percent_roll %percent_roll% - 2
           if %percent_roll% <= 1
             * Flying mount
-            eval vnum 18499
+            set vnum 18499
           end
         end
       end
       if %vnum% != 0
         %load% obj %vnum% %person% inv
-        eval item %person.inventory()%
+        set item %person.inventory()%
         %send% %person% You are lucky! You have discovered a rare item: %item.shortdesc%!
       end
     end
     if %person.is_immortal%
-      eval vnum 18495
-      eval item %%person.inventory(%vnum%)%%
+      set vnum 18495
+      set item %person.inventory(%vnum%)%
       if !%item%
         * Give them the item
         %load% obj %vnum% %person% inv
         * Message
-        eval item %%person.inventory(%vnum%)%%
+        set item %person.inventory(%vnum%)%
         if %item%
           %send% %person% You create %item.shortdesc% for yourself.
         end
       end
     end
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #18463
@@ -237,20 +234,20 @@ switch %random.3%
     %echo% You hear the distant scream of a spelunker falling into a pit.
   break
   case 3
-    eval obj %room.contents%
+    set obj %room.contents%
     while %obj%
       if %obj.vnum% == 18486
         halt
       end
-      eval obj %obj.next_in_list%
+      set obj %obj.next_in_list%
     done
-    eval person %room.people%
+    set person %room.people%
     while %person%
-      eval obj %person.inventory(18486)%
+      set obj %person.inventory(18486)%
       if %obj%
         halt
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
     %echo% A little dwarf just walked around a corner, saw you, threw a little axe at you which missed, cursed, and ran away.
     %load% obj 18486 25
@@ -261,9 +258,8 @@ done
 Unstable env~
 2 bw 10
 ~
-eval num %random.5%
+set num %random.5%
 if %num% == 1
-  eval context %instance.id%
   switch %random.5%
     case 1
       set material living wood
@@ -285,26 +281,26 @@ if %num% == 1
     set current_material wooden planks
   end
   %echo% The walls suddenly change from %current_material% to %material%.
-  eval current_material %material%
+  set current_material %material%
   global current_material
 elseif %num% == 2
-  eval animal_num 1
+  set animal_num 1
   while %animal_num% <= 2
     switch %random.5%
       case 1
-        eval animal_%animal_num% a horse
+        set animal_%animal_num% a horse
       break
       case 2
-        eval animal_%animal_num% a sheep
+        set animal_%animal_num% a sheep
       break
       case 3
-        eval animal_%animal_num% a pig
+        set animal_%animal_num% a pig
       break
       case 4
-        eval animal_%animal_num% a cow
+        set animal_%animal_num% a cow
       break
       case 5
-        eval animal_%animal_num% a chicken
+        set animal_%animal_num% a chicken
       break
     done
     eval animal_num %animal_num% + 1
@@ -318,7 +314,7 @@ elseif %num% == 3
   %echo% The straw on the floor ripples and shifts like grass in the wind.
 elseif %num% == 4
   %echo% The stable briefly cracks open, and you glimpse infinity.
-  eval person %room.people%
+  set person %room.people%
   while %person%
     if %person.is_pc%
       if !%person.aff_flagged(!STUN)%
@@ -326,7 +322,7 @@ elseif %num% == 4
         dg_affect %person% STUNNED on 5
       end
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 elseif %num% == 5
   %echo% The unstable fabric of reality ripples, distorting your surroundings like a heat haze...
@@ -367,14 +363,14 @@ Sparkle sparkle~
 if %time.hour% < 7 || %time.hour% > 19
   halt
 end
-eval num_people 0
-eval person %room.people%
+set num_people 0
+set person %room.people%
 while %person%
   if %person.is_pc% && %person.vampire%
     eval num_people %num_people% + 1
-    eval person_%num_people% %person%
+    set person_%num_people% %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %num_people% == 0
   * Oops, no vampires.
@@ -390,14 +386,14 @@ Oregon Trail env + dysentery~
 2 bw 10
 ~
 * Choose a random living player...
-eval num_people 0
-eval person %room.people%
+set num_people 0
+set person %room.people%
 while %person%
   if %person.is_pc% && %person.health% > 0
     eval num_people %num_people% + 1
-    eval person_%num_people% %person%
+    set person_%num_people% %person%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %num_people% == 0
   * Oops. There aren't any.
@@ -407,7 +403,7 @@ else
   eval person %%person_%person_num%%%
   %send% %person% [ You have dysentery. ]
   %echoaround% %person% [ %person.name% has dysentery. ]
-  eval level %person.level%
+  set level %person.level%
   if %level% < 10
     set level 10
   end
@@ -419,7 +415,7 @@ end
 "Leave" random direction~
 0 ab 25
 ~
-eval direction_num %random.4%
+set direction_num %random.4%
 switch %direction_num%
   case 1
     set direction north
@@ -441,7 +437,7 @@ done
 "Arrive from" random direction~
 2 bw 33
 ~
-eval direction_num %random.4%
+set direction_num %random.4%
 switch %direction_num%
   case 1
     set direction north
@@ -457,15 +453,15 @@ switch %direction_num%
   break
 done
 eval vnum 18481+%random.3%
-eval person %room.people%
+set person %room.people%
 while %person%
   if %person.vnum% == %vnum%
     halt
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 %load% mob %vnum%
-eval mob %room.people%
+set mob %room.people%
 %echo% %mob.name% %mob.movetype% up from the %direction%.
 ~
 #18487
@@ -511,16 +507,16 @@ Load vampire on enter~
 ~
 return 1
 wait 5
-eval players 0
-eval already_present 0
-eval person %room.people%
+set players 0
+set already_present 0
+set person %room.people%
 while %person%
   if %person.vnum% == 18489
-    eval already_present 1
+    set already_present 1
   elseif %person.is_pc%
     eval players %players% + 1
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %players% == 0 || %already_present%
   halt
@@ -533,7 +529,7 @@ detach 18488 %self.id%
 EmpireMUD 1.0 Vampire Attack~
 0 n 100
 ~
-eval room %self.room%
+set room %self.room%
 set dawn 7
 set dusk 19
 visible
@@ -551,14 +547,14 @@ if %time.hour% >= %dawn% && %time.hour% <= %dusk%
   halt
 else
   * Choose a random non-vampire...
-  eval num_people 0
-  eval person %room.people%
+  set num_people 0
+  set person %room.people%
   while %person%
     if %person.is_pc% && !%person.vampire()%
       eval num_people %num_people% + 1
-      eval person_%num_people% %person%
+      set person_%num_people% %person%
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
   if %num_people% == 0
     * Oops. There aren't any.
@@ -727,7 +723,7 @@ DeLorean outta nowhere~
 wait 3 sec
 %echo% A strangely-dressed old man steps out of the strange silver chariot.
 %load% mob 18491
-eval mob %self.people%
+set mob %self.people%
 if %mob%
   nop %mob.add_mob_flag(SILENT)%
 end
@@ -755,20 +751,20 @@ else
   done
 end
 wait 2 sec
-eval person %self.people%
+set person %self.people%
 while %person%
   if %person.is_pc% && !%person.inventory(18490)%
     %load% obj 18490 %person% inv
-    eval item %person.inventory(18490)%
+    set item %person.inventory(18490)%
     if %item%
       %send% %person% %mob.name% says, 'Oh! These are yours.'
       %send% %person% %mob.name% gives you %item.shortdesc%.
     end
   elseif %person.vnum% == 18492
-    eval doctor %person%
+    set doctor %person%
     nop %doctor.add_mob_flag(SILENT)%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %doctor%
   wait 2 sec
@@ -791,7 +787,7 @@ wait 1 sec
 wait 3 sec
 %echo% A strange man steps out of the box.
 %load% mob 18492
-eval mob %self.people%
+set mob %self.people%
 if %mob%
   nop %mob.add_mob_flag(SILENT)%
 end
@@ -822,19 +818,19 @@ else
   done
 end
 wait 2 sec
-eval person %self.people%
+set person %self.people%
 while %person%
   if %person.is_pc% && !%person.inventory(18493)%
     %load% obj 18493 %person% inv
-    eval item %person.inventory(18493)%
+    set item %person.inventory(18493)%
     if %item%
       %send% %person% %mob.name% gives you %item.shortdesc%.
     end
   elseif %person.vnum% == 18491
-    eval doc_brown %person%
+    set doc_brown %person%
     nop %doc_brown.add_mob_flag(SILENT)%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if %doc_brown%
   wait 2 sec
@@ -881,14 +877,14 @@ if !%instance%
   return 1
   halt
 end
-eval start_room %instance.start%
+set start_room %instance.start%
 if %start_room.template% != 18460
   %send% %actor% You need to be in an Unstable Portal instance to use %self.shortdesc%.
   return 1
   halt
 end
 * Get a room for the inside of the portal
-eval room_vnum %arg%
+set room_vnum %arg%
 if %room_vnum% < 18462 || %room_vnum% > 18499
   %send% %actor% Invalid room vnum.
   return 1
@@ -901,30 +897,28 @@ if !%new_room%
 end
 %door% %start_room% down room %new_room%
 * Make sure we don't add a duplicate portal
-eval item %new_room.contents%
+set item %new_room.contents%
 while %item%
   if %item.vnum% == 18461
     %purge% %item%
   end
-  eval item %item.next_in_list%
+  set item %item.next_in_list%
 done
 %at% %new_room% %load% obj 18461
-eval targ %instance.location%
-eval num %targ.vnum%
-eval item %new_room.contents%
-eval op %%item.val0(%num%)%%
-nop %op%
+set targ %instance.location%
+set num %targ.vnum%
+set item %new_room.contents%
+nop %item.val0(%num%)%
 * Retarget the outside portal to the new room
-eval loc %instance.location%
-eval item %loc.contents%
+set loc %instance.location%
+set item %loc.contents%
 while %item%
   if %item.vnum% == 18460
-    eval targ %new_room%
-    eval num %targ.vnum%
-    eval op %%item.val0(%num%)%%
-    nop %op%
+    set targ %new_room%
+    set num %targ.vnum%
+    nop %item.val0(%num%)%
   end
-  eval item %item.next_in_list%
+  set item %item.next_in_list%
 done
 %send% %actor% You link the unstable portal to %new_room.name%.
 %echoaround% %actor% %actor.name% links the unstable portal to %new_room.name%.

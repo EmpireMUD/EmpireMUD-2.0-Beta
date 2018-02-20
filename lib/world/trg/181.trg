@@ -6,18 +6,18 @@ if %self.fighting%
   halt
 end
 if !%self.varexists(logs)%
-  eval logs 1
+  set logs 1
   remote logs %self.id%
 end
-eval logs %self.logs%
-eval room %self.room%
-eval gohome 0
-eval cap 30
+set logs %self.logs%
+set room %self.room%
+set gohome 0
+set cap 30
 if (%room.template% == 18100)
-  eval gohome 1
+  set gohome 1
 end
 if (%random.10% == 10 && !%self.mob_flagged(SENTINEL)%
-  eval gohome 1
+  set gohome 1
 end
 if %room.sector_vnum% >= 1 && %room.sector_vnum% <= 4
   nop %self.add_mob_flag(SENTINEL)%
@@ -71,14 +71,14 @@ Lumberjack drop logs~
 0 f 100
 ~
 if !%self.varexists(logs)%
-  eval logs 1
+  set logs 1
   remote logs %self.id%
 end
-eval loot 124
-eval i 0
-eval logs %self.logs%
+set loot 124
+set i 0
+set logs %self.logs%
 if %logs% > 50
-  eval logs 50
+  set logs 50
 end
 while %i% < %logs%
   eval i %i% + 1

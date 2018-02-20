@@ -47,8 +47,7 @@ Songbird Animation~
 * This script is no longer used. It was replaced by custom strings.
 * songbird Animation (9148)
 * Works for 148 and 149
-eval room %self.room%
-if ((%room.sector% /= Forest) || (%room.sector% /= Orchard))
+if ((%self.room.sector% /= Forest) || (%self.room.sector% /= Orchard))
   %echo% %self.name% Sings sweetly from a near by tree.
 end
 ~
@@ -58,8 +57,7 @@ woodpecker animation~
 ~
 * This script is no longer used. It was replaced by custom strings.
 * Woodpecker Animation (9150)
-eval room %self.room%
-if ((%room.sector% /= Forest) || (%room.sector% /= Orchard))
+if ((%self.room.sector% /= Forest) || (%self.room.sector% /= Orchard))
   %echo% %self.name% hammers into a tree with its beak, looking for food.
 end
 ~
@@ -73,13 +71,13 @@ end
 if %actor.varexists(penguins_killed)%
   eval penguins_killed %actor.penguins_killed% + 1
 else
-  eval penguins_killed 1
+  set penguins_killed 1
 end
 if %penguins_killed% > 5 && %random.2% == 2
   %load% mob 9187
   %echo% Suddenly, the Emperor of Penguins appears!
   * reset it
-  eval penguins_killed 0
+  set penguins_killed 0
 end
 remote penguins_killed %actor.id%
 ~

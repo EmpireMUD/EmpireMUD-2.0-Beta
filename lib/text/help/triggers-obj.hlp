@@ -112,6 +112,7 @@ help files for more info):
 &c%echoaround%&0 - Sends a message to all but one target.
 &c%echoneither%&0 - Sends a message to all but two people.
 &c%force%&0 - Forces a person to execute a command.
+&c%heal%&0 - Restores health/move/etc.
 &c%load%&0 - Loads a mob, object, etc.
 &c%morph%&0 - Causes a person to morph.
 &c%own%&0 - Changes ownership on something.
@@ -161,7 +162,7 @@ All object scripts provide the &c%self%&0 variable.
 
 When using field  - The variable returns:
 &cbind(person)&0 - Binds the item to a player (or "nobody" to unbind it). You
-   can copy another object's whole binding list with %%newobj.bind(%obj%)%%.
+   can copy another object's whole binding list with %newobj.bind(%obj%)%.
 &ccan_wear(flag)&0 - True if the object has the given wear flag (HELP OEDIT WEAR).
 &ccarried_by&0 - The id of the character carrying the object, or an empty return.
 &ccontents&0 - Gives the first object in a container.

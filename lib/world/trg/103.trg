@@ -5,7 +5,7 @@ Flame Dragon Terrorize~
 if (%self.fighting% || %self.disabled%)
   halt
 end
-eval room %self.room%
+set room %self.room%
 if (%instance.location% && (%room.template% == 10300 || (%room% != %instance.location% && %random.10% == 10)))
   %echo% %self.name% flies away!
   mgoto %instance.location%
@@ -34,7 +34,7 @@ end
 Flame Dragon combat~
 0 k 5
 ~
-eval chance %random.3%
+set chance %random.3%
 if (chance < 3)
   * Searing burns on tank
   %send% %actor% %self.name% spits fire at you, causing searing burns!
@@ -97,7 +97,7 @@ Abandoned Dragon Fly Home~
 if (%self.fighting% || %self.disabled%)
   halt
 end
-eval room %self.room%
+set room %self.room%
 if (%instance.location% && %room% != %instance.location% && (%room.template% == 10330 || %room.sector% == Ocean))
   %echo% %self.name% flies away!
   mgoto %instance.location%
@@ -138,8 +138,7 @@ done
 Dragon Whistle use~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -156,8 +155,7 @@ end
 Non-Mount Summon~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -166,8 +164,7 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-eval room_var %self.room%
-eval mob %room_var.people%
+set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!
   %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
@@ -186,7 +183,7 @@ if (%random.2% == 2)
   %echo% %self.name% releases a demonic moo, and fire spurts from %self.hisher% nostrils.
 else
   * We need the current terrain.
-  eval room %self.room%
+  set room %self.room%
   if (%room.sector% == Plains || %room.sector% ~= Forest)
     %echo% %self.name% scorches some grass, and eats it.
   else
@@ -223,8 +220,7 @@ done
 Empire Non-Mount Summon~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -233,8 +229,7 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-eval room_var %self.room%
-eval mob %room_var.people%
+set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   %own% %mob% %actor.empire%
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!

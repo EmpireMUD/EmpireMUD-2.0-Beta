@@ -832,8 +832,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IS_AMMO(obj))
-#define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
-#define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && !IS_STOLEN(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
+#define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
+#define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && !IS_STOLEN(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP)
 #define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (IS_STOLEN(o1) == IS_STOLEN(o2)))
 
@@ -843,10 +843,12 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // ITEM_POTION
 #define IS_POTION(obj)  (GET_OBJ_TYPE(obj) == ITEM_POTION)
-#define VAL_POTION_TYPE  0
-#define VAL_POTION_SCALE  1
-#define GET_POTION_TYPE(obj)  (IS_POTION(obj) ? GET_OBJ_VAL((obj), VAL_POTION_TYPE) : NOTHING)
-#define GET_POTION_SCALE(obj)  (IS_POTION(obj) ? GET_OBJ_VAL((obj), VAL_POTION_SCALE) : 0)
+#define VAL_POTION_COOLDOWN_TYPE  0
+#define VAL_POTION_COOLDOWN_TIME  1
+#define VAL_POTION_AFFECT  2
+#define GET_POTION_COOLDOWN_TYPE(obj)  (IS_POTION(obj) ? GET_OBJ_VAL((obj), VAL_POTION_COOLDOWN_TYPE) : NOTHING)
+#define GET_POTION_COOLDOWN_TIME(obj)  (IS_POTION(obj) ? GET_OBJ_VAL((obj), VAL_POTION_COOLDOWN_TIME) : NOTHING)
+#define GET_POTION_AFFECT(obj)  (IS_POTION(obj) ? GET_OBJ_VAL((obj), VAL_POTION_AFFECT) : 0)
 
 // ITEM_POISON
 #define IS_POISON(obj)  (GET_OBJ_TYPE(obj) == ITEM_POISON)

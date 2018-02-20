@@ -46,7 +46,6 @@ extern const char *offon_types[];
 extern const char *paint_colors[];
 extern const char *paint_names[];
 extern const struct poison_data_type poison_data[];
-extern const struct potion_data_type potion_data[];
 extern const char *storage_bits[];
 extern const char *wear_bits[];
 
@@ -172,12 +171,16 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "No maximum scale level on non-adventure obj");
 		problem = TRUE;
 	}
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && obj->storage) {
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && obj->storage && GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_OBJ_MIN_SCALE_LEVEL(obj)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has storage locations");
 		problem = TRUE;
 	}
 	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && !OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has no bind flags");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Object has !STORE - this flag is meaningless on a prototype");
 		problem = TRUE;
 	}
 	
@@ -1845,8 +1848,8 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_POTION: {
-			sprintf(storage + strlen(storage), "<%spotion\t0> %s\r\n", OLC_LABEL_VAL(GET_POTION_TYPE(obj), 0), potion_data[GET_POTION_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<%spotionscale\t0> %d%s\r\n", OLC_LABEL_VAL(GET_POTION_SCALE(obj), 0), GET_POTION_SCALE(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
+			sprintf(buf + strlen(buf), "<%saffecttype\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_POTION_AFFECT(obj), NOTHING), GET_POTION_AFFECT(obj), GET_POTION_AFFECT(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(obj)) : "not custom");
+			sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TYPE(obj), NOTHING), GET_POTION_COOLDOWN_TYPE(obj), GET_POTION_COOLDOWN_TYPE(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)) : "no cooldown", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TIME(obj), 0), GET_POTION_COOLDOWN_TIME(obj), PLURAL(GET_POTION_COOLDOWN_TIME(obj)));
 			break;
 		}
 		case ITEM_POISON: {
@@ -2048,6 +2051,32 @@ OLC_MODULE(oedit_action_desc) {
 OLC_MODULE(oedit_affects) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	GET_OBJ_AFF_FLAGS(obj) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, GET_OBJ_AFF_FLAGS(obj));
+}
+
+
+OLC_MODULE(oedit_affecttype) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	any_vnum old;
+	
+	if (!IS_POTION(obj)) {
+		msg_to_char(ch, "You can only set affect type on a potion.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = NOTHING;
+		msg_to_char(ch, "It now has no custom affect type.\r\n");
+	}
+	else {
+		old = GET_OBJ_VAL(obj, VAL_POTION_AFFECT);
+		GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = olc_process_number(ch, argument, "affect vnum", "affecttype", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_POTION_AFFECT));
+
+		if (!find_generic(GET_OBJ_VAL(obj, VAL_POTION_AFFECT), GENERIC_AFFECT)) {
+			msg_to_char(ch, "Invalid affect generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_POTION_AFFECT));
+			GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = old;
+		}
+		else {
+			msg_to_char(ch, "Affect type set to [%d] %s.\r\n", GET_OBJ_VAL(obj, VAL_POTION_AFFECT), get_generic_name_by_vnum(GET_OBJ_VAL(obj, VAL_POTION_AFFECT)));
+		}
+	}
 }
 
 
@@ -2312,6 +2341,13 @@ OLC_MODULE(oedit_capacity) {
 }
 
 
+OLC_MODULE(oedit_cdtime) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TIME) = olc_process_number(ch, argument, "cooldown time", "cdtime", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TIME));
+}
+
+
 OLC_MODULE(oedit_charges) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
@@ -2392,6 +2428,32 @@ OLC_MODULE(oedit_contents) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = olc_process_number(ch, argument, "contents", "contents", 0, GET_DRINK_CONTAINER_CAPACITY(obj), GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS));
+	}
+}
+
+
+OLC_MODULE(oedit_cooldown) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	any_vnum old;
+	
+	if (!IS_POTION(obj)) {
+		msg_to_char(ch, "You can only set cooldown type on a potion.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = NOTHING;
+		msg_to_char(ch, "It now has no cooldown type.\r\n");
+	}
+	else {
+		old = GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE);
+		GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = olc_process_number(ch, argument, "cooldown vnum", "cooldown", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE));
+
+		if (!find_generic(GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE), GENERIC_COOLDOWN)) {
+			msg_to_char(ch, "Invalid cooldown generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE));
+			GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = old;
+		}
+		else {
+			msg_to_char(ch, "Cooldown type set to [%d] %s.\r\n", GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE), get_generic_name_by_vnum(GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE)));
+		}
 	}
 }
 
@@ -2621,50 +2683,6 @@ OLC_MODULE(oedit_poison) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_POISON_TYPE) = olc_process_type(ch, argument, "poison", "poison", (const char**)poison_types, GET_OBJ_VAL(obj, VAL_POISON_TYPE));
-	}
-}
-
-
-OLC_MODULE(oedit_potion) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	static char **potion_types = NULL;
-	int iter, count;
-	
-	// this does not have a const char** list .. build one the first time
-	if (!potion_types) {
-		// count types
-		count = 0;
-		for (iter = 0; *potion_data[iter].name != '\n'; ++iter) {
-			++count;
-		}
-	
-		CREATE(potion_types, char*, count+1);
-		
-		for (iter = 0; iter < count; ++iter) {
-			potion_types[iter] = str_dup(potion_data[iter].name);
-		}
-		
-		// must terminate
-		potion_types[count] = str_dup("\n");
-	}
-
-	if (!IS_POTION(obj)) {
-		msg_to_char(ch, "You can only set potion type on a potion object.\r\n");
-	}
-	else {
-		GET_OBJ_VAL(obj, VAL_POTION_TYPE) = olc_process_type(ch, argument, "potion", "potion", (const char**)potion_types, GET_OBJ_VAL(obj, VAL_POTION_TYPE));
-	}
-}
-
-
-OLC_MODULE(oedit_potionscale) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	
-	if (!IS_POTION(obj)) {
-		msg_to_char(ch, "You can't set potionscale on this type of item.\r\n");
-	}
-	else {
-		GET_OBJ_VAL(obj, VAL_POTION_SCALE) = olc_process_number(ch, argument, "potion scale", "potionscale", 0, 1000, GET_OBJ_VAL(obj, VAL_POTION_SCALE));
 	}
 }
 
@@ -3015,6 +3033,11 @@ OLC_MODULE(oedit_type) {
 			}
 			case ITEM_WEAPON: {
 				GET_OBJ_VAL(obj, VAL_WEAPON_TYPE) = TYPE_SLASH;
+				break;
+			}
+			case ITEM_POTION: {
+				GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = NOTHING;
+				GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = NOTHING;
 				break;
 			}
 			default: {

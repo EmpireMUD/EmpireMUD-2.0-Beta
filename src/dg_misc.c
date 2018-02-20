@@ -951,3 +951,153 @@ void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam
 	// add the affect
 	apply_dot_effect(vict, atype, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks), cast_by);
 }
+
+
+/**
+* Central processor for %heal% -- this is used to restore scaled health/move/
+* mana, and (optionally) to remove debuffs and dots.
+*
+* Expected parameters in the string: <target> <what to heal> [scale modifier]
+* Example: %self% mana 100
+*
+* @param void *thing The thing calling the script (mob, room, obj, veh)
+* @param int type What type "thing" is (MOB_TRIGGER, etc)
+* @param char *argument The text passed to the command.
+*/
+void script_heal(void *thing, int type, char *argument) {
+	extern char_data *get_char_by_room(room_data *room, char *name);
+	extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
+	extern int get_room_scale_level(room_data *room, char_data *targ);
+	extern const double apply_values[];
+	extern const bool aff_is_bad[];
+	
+	char targ_arg[MAX_INPUT_LENGTH], what_arg[MAX_INPUT_LENGTH], *scale_arg, log_root[MAX_STRING_LENGTH];
+	struct affected_type *aff, *next_aff;
+	int pos, amount, level = -1;
+	char_data *victim = NULL;
+	double scale = 100.0;
+	bool done_aff;
+	bitvector_t bitv;
+	
+	// 3 args: target, what, scale
+	scale_arg = one_argument(argument, targ_arg);
+	scale_arg = one_argument(scale_arg, what_arg);
+	skip_spaces(&scale_arg);
+	if (*targ_arg == UID_CHAR) {
+		victim = get_char(targ_arg);
+	}	// otherwise we'll determine victim later
+	
+	// determine how to log errors
+	switch (type) {
+		case MOB_TRIGGER: {
+			level = get_approximate_level((char_data*)thing);
+			if (!victim) {
+				victim = get_char_room_vis((char_data*)thing, targ_arg);
+			}
+			
+			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT((char_data*)thing), GET_MOB_VNUM((char_data*)thing));
+			break;
+		}
+		case OBJ_TRIGGER: {
+			level = GET_OBJ_CURRENT_SCALE_LEVEL((obj_data*)thing);
+			if (!victim) {
+				victim = get_char_by_obj((obj_data*)thing, targ_arg);
+			}
+			
+			snprintf(log_root, sizeof(log_root), "Obj (%s, VNum %d)::", GET_OBJ_SHORT_DESC((obj_data*)thing), GET_OBJ_VNUM((obj_data*)thing));
+			break;
+		}
+		case VEH_TRIGGER: {
+			level = VEH_SCALE_LEVEL((vehicle_data*)thing);
+			if (!victim) {
+				victim = get_char_by_vehicle((vehicle_data*)thing, targ_arg);
+			}
+			
+			snprintf(log_root, sizeof(log_root), "Veh (%s, VNum %d)::", VEH_SHORT_DESC((vehicle_data*)thing), VEH_VNUM((vehicle_data*)thing));
+			break;
+		}
+		case WLD_TRIGGER:
+		default: {
+			level = get_room_scale_level((room_data*)thing, NULL);
+			if (!victim) {
+				victim = get_char_by_room((room_data*)thing, targ_arg);
+			}
+			
+			snprintf(log_root, sizeof(log_root), "Room %d ::", GET_ROOM_VNUM((room_data*)thing));
+			break;
+		}
+	}
+	
+	if (!*targ_arg || !*what_arg) {
+		script_log("%s script_heal: Invalid arguments: %s", log_root, argument);
+		return;
+	}
+	if (level < 0) {
+		script_log("%s script_heal: Unable to detect level", log_root);
+		return;
+	}
+	if (!victim) {
+		script_log("%s script_heal: Unable to find target: %s", log_root, targ_arg);
+		return;
+	}
+	
+	// process scale arg (optional)
+	if (*scale_arg && (scale = atof(scale_arg)) < 1) {
+		script_log("%s script_heal: Invalid scale argument: %s", log_root, scale_arg);
+		return;
+	}
+	scale /= 100.0;	// convert to percent
+	
+	// now the real work
+	if (is_abbrev(what_arg, "health") || is_abbrev(what_arg, "hitpoints")) {
+		amount = (394 * level / 55.0 - 5580 / 11.0) * scale;
+		amount = MAX(30, amount);
+		GET_HEALTH(victim) = MIN(GET_MAX_HEALTH(victim), GET_HEALTH(victim) + amount);
+		
+		if (GET_POS(victim) < POS_SLEEPING) {
+			GET_POS(victim) = POS_STANDING;
+		}
+	}
+	else if (is_abbrev(what_arg, "mana")) {
+		amount = (292 * level / 55.0 - 3940 / 11.0) * scale;
+		amount = MAX(40, amount);
+		GET_MANA(victim) = MIN(GET_MAX_MANA(victim), GET_MANA(victim) + amount);
+	}
+	else if (is_abbrev(what_arg, "moves")) {
+		amount = (37 * level / 11.0 - 1950 / 11.0) * scale;
+		amount = MAX(75, amount);
+		GET_MOVE(victim) = MIN(GET_MAX_MOVE(victim), GET_MOVE(victim) + amount);
+	}
+	else if (is_abbrev(what_arg, "dots")) {
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+	}
+	else if (is_abbrev(what_arg, "debuffs")) {
+	
+		LL_FOREACH_SAFE(victim->affected, aff, next_aff) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(victim)) {
+				continue;
+			}
+			
+			done_aff = FALSE;
+			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+				affect_remove(victim, aff);
+				done_aff = TRUE;
+			}
+			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
+				// check each bit
+				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+						affect_remove(victim, aff);
+						done_aff = TRUE;
+					}
+				}
+			}
+		}
+	}
+	else {
+		script_log("%s script_heal: Invalid thing to heal: %s", log_root, what_arg);
+	}
+}

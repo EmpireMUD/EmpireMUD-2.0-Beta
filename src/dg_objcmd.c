@@ -250,6 +250,11 @@ OCMD(do_oforce) {
 }
 
 
+OCMD(do_oheal) {
+	script_heal(obj, OBJ_TRIGGER, argument);
+}
+
+
 OCMD(do_obuildingecho) {
 	room_data *froom, *home_room, *iter;
 	room_data *orm = obj_room(obj);
@@ -1269,7 +1274,7 @@ OCMD(do_dgoload) {
 
 
 OCMD(do_odamage) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
 	int type;
@@ -1285,6 +1290,13 @@ OCMD(do_odamage) {
 
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
+	}
+	
+	// send negatives to %heal% instead
+	if (modifier < 0) {
+		sprintf(buf, "%s health %.2f", name, -atof(modarg));
+		script_heal(obj, OBJ_TRIGGER, buf);
+		return;
 	}
 
 	ch = get_char_by_obj(obj, name);
@@ -1667,6 +1679,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oechoaround", do_osend, SCMD_OECHOAROUND },
 	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
+	{ "oheal", do_oheal, NO_SCMD },
 	{ "oload", do_dgoload, NO_SCMD },
 	{ "omorph", do_omorph, NO_SCMD },
 	{ "oown", do_oown, NO_SCMD },

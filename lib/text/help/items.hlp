@@ -162,6 +162,22 @@ The first tier of crafter items comes at level 100:
 See also: ARTIFICER, CRAFT, ENCHANT, FORGE, GUILDSMAN, SCORE, SEW, STEELSMITH,
    TINKER
 #
+"DISTILLED HERBS" "ADVANCED HERBS" "HERB JARS" "JAR HERBS"
+
+Distilled herbs are herbs that have been processed to make them more potent, so
+that you can make more powerful potions. You must have the 'Healing Elixirs'
+ability to 'brew' these from herbs.
+
+The distilled herbs are:
+ distilled whitegrass
+ fiveleaf resin
+ redthorn extract
+ magewhisper essence
+ concentrated daggerbite
+ bileberry juice
+
+See also: FIND HERBS, HEALING ELIXIRS
+#
 "DROP FLAGS" "LOOT QUALITY FLAGS" "HARD DROP" "GROUP DROP" "GENERIC DROP" HARD-DROP GROUP-DROP GENERIC-DROP 
 
 Items dropped by enemies intended for larger groups are usually slightly more
@@ -319,9 +335,16 @@ Herb (component)
 Used for:  potions, poisons, crafting
 
 The herb component type covers all the herbs which can be found using the Find
-Herbs ability. Most recipes call for a specific herb, though.
+Herbs ability. Most recipes call for a specific herb, though. The basic herbs
+are:
+ whitegrass
+ fiveleaf
+ redthorn
+ magewhisper
+ daggerbite
+ bileberries
 
-See also: COMPONENT, FIND HERBS, MIX, BREW
+See also: COMPONENT, DISTILLED HERBS, FIND HERBS, MIX, BREW
 #
 "IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
 
@@ -630,7 +653,6 @@ Masterwork abilities:
   Forge - Master Blacksmith
   Pottery - Master Craftsman
   Woodworking - Master Craftsman
-  Healing Elixirs and Wrath of Nature Potions are masterworks if you have both
 
 See also: SCALABLE CRAFTS
 #

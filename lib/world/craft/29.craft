@@ -172,4 +172,65 @@ R
 R
 2037 6 0 0
 S
+#2918
+imperial healing potion~
+2918 1
+6 113 fq 3 -1
+L
+175
+R
+1210 3 0 0
+R
+1300 1 0 0
+S
+#2920
+imperial stamina potion~
+2920 1
+6 113 fq 3 -1
+L
+175
+R
+1212 2 0 0
+R
+1211 1 0 0
+R
+103 1 0 0
+S
+#2922
+imperial mana potion~
+2922 1
+6 113 fq 3 -1
+L
+175
+R
+1213 2 0 0
+R
+1211 1 0 0
+R
+1206 1 0 0
+S
+#2924
+imperial wayfarer's potion~
+2924 1
+6 124 fq 3 -1
+L
+175
+R
+1213 2 0 0
+R
+1215 1 0 0
+R
+103 1 0 0
+S
+#2926
+imperial hex-purging potion~
+2926 1
+6 124 fq 3 -1
+L
+175
+R
+1210 3 0 0
+R
+1300 1 0 0
+S
 $

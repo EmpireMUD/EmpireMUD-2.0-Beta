@@ -24,7 +24,7 @@ Wildling combat: Nasty Bite~
 Druid combat~
 0 k 10
 ~
-eval chance %random.3%
+set chance %random.3%
 if (%chance% < 3)
   lightningbolt
 else
@@ -38,7 +38,7 @@ end
 Archdruid combat: frost~
 0 k 10
 ~
-eval chance %random.3%
+set chance %random.3%
 if (chance < 3)
   * Arctic chill on tank
   %send% %actor% &r%self.name% draws moisture from the air and hits you with an arctic chill!&0
@@ -71,7 +71,7 @@ switch %random.4%
   case 4
     %echo% Your footprints seem to vanish behind you.
   break
-end
+done
 ~
 #10006
 Spawn Red Dragon Mount~
@@ -110,7 +110,7 @@ switch %random.4%
   break
   * Rock stun on random enemy
   case 4
-    eval target %random.enemy%
+    set target %random.enemy%
     if (%target%)
       %send% %target% &r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&0
       %echoaround% %target% %self.name% hurls a rock at %target.name% with %self.hisher% tail, stunning %target.himher% momentarily!
@@ -118,7 +118,7 @@ switch %random.4%
       %damage% %target% 50 physical
     end
   break
-end
+done
 ~
 #10011
 Sewer Environment~
@@ -150,8 +150,7 @@ say I could use some more rat skins, if you have any.
 Ratskins's reward~
 0 c 100
 trade~
-eval test %%self.varexists(gave%actor.id%)%%
-if %test%
+if %self.varexists(gave%actor.id%)%
   %send% %actor% You have already completed this quest in this adventure.
   halt
 end
@@ -161,7 +160,7 @@ if (%actor.has_resources(10013,15)%)
   %load% o 10015 %actor% inv
   %send% %actor% %self.name% gives you the ratskin totem.
   %echoaround% %actor% %self.name% gives %actor.name% the ratskin totem.
-  eval gave%actor.id% 1
+  set gave%actor.id% 1
   remote gave%actor.id% %self.id%
 else
   say What I'm looking for is 15 rat skins.
@@ -180,8 +179,7 @@ dg_affect %actor% SLOW on 60
 Dire rat combat~
 0 k 10
 ~
-eval chance %random.3%
-switch %chance%
+switch %random.3%
   * Slow bite
   case 1
     %send% %actor% %self.name% bites into your flesh, and you don't feel so good.
@@ -206,27 +204,25 @@ done
 Urchin combat~
 0 k 10
 ~
-eval chance %random.5%
+set chance %random.5%
 if (%chance% < 5)
   * blind tank
   blind %actor.name%
 else
   * blind all
-  eval %count% 0
-  eval room_var %self.room%
-  eval target_char %room_var.people%
+  set %count% 0
+  set target_char %self.room.people%
   while %target_char%
     * save next char now
-    eval next_target %target_char.next_in_room%
-    eval test %%self.is_enemy(%target_char%)%%
-    if (%test%)
+    set next_target %target_char.next_in_room%
+    if %self.is_enemy(%target_char%)%
       blind %target_char%.name
       eval count %count% + 1
     end
-    eval target_char %next_target%
+    set target_char %next_target%
   done
   if %count% > 1
-    detach %self% 10016
+    detach 10016 %self.id%
   end
 end
 ~
@@ -234,18 +230,16 @@ end
 Rare thief death~
 0 f 100
 ~
-eval room %self.room%
-eval ch %room.people%
+set ch %self.room.people%
 while %ch%
   * Combat is ended by the thief's death, so is_enemy doesn't actually work
-  eval test %%ch.is_ally(%actor%)%%
-  eval ch_stealth %ch.skill(Stealth)%
+  set ch_stealth %ch.skill(Stealth)%
   eval can_gain (%ch_stealth% != 0) && (%ch_stealth% != 50) && (%ch_stealth% != 75) && (%ch_stealth% != 100)
-  if (%ch.is_pc% && %test% && %can_gain% && !%ch.noskill(Stealth)%)
+  if (%ch.is_pc% && %ch.is_ally(%actor%)% && %can_gain% && !%ch.noskill(Stealth)%)
     %send% %actor% You learn a bit about Stealth from watching %self.name% fight.
     nop %ch.gain_skill(Stealth, 1)%
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 ~
 #10018
@@ -258,8 +252,7 @@ Rare thief despawn~
 Thief recruiter passive~
 0 bw 5
 ~
-set room_var %self.room%
-set target_char %room_var.people%
+set target_char %self.room.people%
 while %target_char%
   if (%target_char.is_pc% && %target_char.skill(Stealth)% == 0)
     %echoaround% %target_char% %self.name% whispers something to %target_char.name%.
@@ -292,12 +285,12 @@ City Official rewards~
 0 bw 30
 ~
 * Rewards some gold when a player has ratskins in their inventory.
-eval target %random%
+set target %random.char%
 if (%target.is_pc% && %target.has_resources(10013,10)%)
   say Ah, %target.name%, you've done my job for me. Here, have some money.
-  nop %target.coins(100)%
+  nop %target.give_coins(100)%
   %send% %target% %actor.name% gives you 100 coins.
-  detach %self% 10022
+  detach 10022 %self.id%
 end
 ~
 #10023
@@ -307,7 +300,7 @@ Spider combat~
 switch %random.2%
   * Webby on random enemy
   case 1
-    eval target %random.enemy%
+    set target %random.enemy%
     if (%target%)
       %send% %target% %self.name% shoots a web at you, anchoring you to the ground!
       %echoaround% %target% %self.name% shoots a web at %target.name%, anchoring %target.himher% to the ground!
@@ -328,7 +321,7 @@ done
 Baby dragon combat~
 0 k 10
 ~
-eval chance %random.3%
+set chance %random.3%
 if (chance < 3)
   * Fire spurt on tank
   %send% %actor% %self.name% spurts fire at you, causing searing burns!
@@ -348,8 +341,7 @@ end
 Rat hunter/rare thief combat~
 0 k 10
 ~
-eval chance %random.5%
-switch %chance%
+switch %random.5%
   * Kick
   case 1
     kick
@@ -381,28 +373,28 @@ Cheese Drop Rat Summon~
 wait 2 sec
 %echo% A rat appears and gobbles up the cheese!
 %load% m 10011
-%purge% %self.name%
+%purge% %self%
 ~
 #10027
 Nest miniboss spawn/despawn~
 2 f 100
 ~
 * Get rid of the old miniboss
-eval ch %room.people%
+set ch %room.people%
 while %ch%
-  eval next_ch %ch.next_in_room%
+  set next_ch %ch.next_in_room%
   if (%ch.vnum% == 10018 || %ch.vnum% == 10019 || %ch.vnum% == 10020)
     if !(%ch.fighting%)
       %echo% %ch.name% leaves to hunt somewhere else.
       %purge% %ch%
     end
   end
-  eval ch %next_ch%
+  set ch %next_ch%
 done
 * Spawn a new one
 eval vnum 10017+%random.3%
 %load% mob %vnum%
-eval person %self.people%
+set person %self.people%
 %echo% %person.name% arrives.
 ~
 #10030
@@ -475,31 +467,29 @@ done
 Barista purchase~
 0 c 0
 buy~
-eval vnum -1
-eval cost 0
-eval named drink
+set vnum -1
+set cost 0
+set named drink
 if (!%arg%)
   %send% %actor% You can buy coffee for 5 coins or wine for 15 coins.
   halt
 elseif coffee /= %arg%
-  eval vnum 10033
-  eval cost 5
-  eval named mug of coffee
+  set vnum 10033
+  set cost 5
+  set named mug of coffee
 elseif wine /= %arg%
-  eval vnum 10032
-  eval cost 15
-  eval named glass of wine
+  set vnum 10032
+  set cost 15
+  set named glass of wine
 else
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end
-eval test %%actor.can_afford(%cost%)%%
-if !%test%
+if !%actor.can_afford(%cost%)%
   %send% %actor% %self.name% tells you, 'You'll need %cost% coins to buy that.'
   halt
 end
-eval charge %%actor.charge_coins(%cost%)%%
-nop %charge%
+nop %actor.charge_coins(%cost%)%
 %load% obj %vnum% %actor% inv
 %send% %actor% You buy a %named% for %cost% coins.
 %echoaround% %actor% %actor.name% buys a %named%.
@@ -508,8 +498,7 @@ nop %charge%
 Teacher passive~
 0 bw 5
 ~
-eval room_var %self.room%
-context %room_var.vnum%
+context %self.room.vnum%
 if (%lesson_running%)
   halt
 end
@@ -544,9 +533,9 @@ if !(%actor.has_resources(10037,1)%)
   %send% %actor% You need a greater skystone to purchase a lesson.
   halt
 end
-eval room_var %self.room%
+set room_var %self.room%
 context %room_var.vnum%
-eval lesson_running 1
+set lesson_running 1
 global lesson_running
 nop %actor.add_resources(10037,-1)%
 %send% %actor% You trade a greater skystone for a lesson.
@@ -580,7 +569,7 @@ end
 if (%actor.skill(High Sorcery)% < 50)
   nop %actor.gain_skill(High Sorcery,1)%
 end
-eval lesson_running 0
+set lesson_running 0
 global lesson_running
 ~
 #10036
@@ -602,68 +591,66 @@ list~
 Skycleave Cashier purchase~
 0 c 0
 buy~
-eval vnum -1
-eval cost 0
+set vnum -1
+set cost 0
 set currency skystones
 set currency_vnum 10036
-eval named a thing
-eval keyw skycleaver
+set named a thing
+set keyw skycleaver
 if (!%arg%)
   %send% %actor% Type 'list' to see what's available.
   halt
 elseif belt /= %arg%
-  eval vnum 10038
-  eval cost 8
-  eval named a skycleaver belt
+  set vnum 10038
+  set cost 8
+  set named a skycleaver belt
 elseif gloves /= %arg%
-  eval vnum 10039
-  eval cost 5
-  eval named skycleaver gloves
+  set vnum 10039
+  set cost 5
+  set named skycleaver gloves
 elseif armor /= %arg%
-  eval vnum 10040
-  eval cost 14
-  eval named skycleaver armor
+  set vnum 10040
+  set cost 14
+  set named skycleaver armor
 elseif rucksack /= %arg%
-  eval vnum 10041
-  eval cost 10
-  eval named a skycleaver rucksack
+  set vnum 10041
+  set cost 10
+  set named a skycleaver rucksack
 elseif iris /= %arg%
-  eval vnum 1206
-  eval cost 2
-  eval named an iridescent blue iris
-  eval keyw iris
+  set vnum 1206
+  set cost 2
+  set named an iridescent blue iris
+  set keyw iris
 elseif lightningstone /= %arg%
-  eval vnum 103
-  eval cost 2
-  eval named a yellow lightning stone
-  eval keyw lightning
+  set vnum 103
+  set cost 2
+  set named a yellow lightning stone
+  set keyw lightning
 elseif bloodstone /= %arg%
-  eval vnum 104
-  eval cost 2
-  eval named a red bloodstone
-  eval keyw bloodstone
+  set vnum 104
+  set cost 2
+  set named a red bloodstone
+  set keyw bloodstone
 elseif seashell /= %arg%
-  eval vnum 1300
-  eval cost 2
-  eval named a glowing green seashell
-  eval keyw seashell
+  set vnum 1300
+  set cost 2
+  set named a glowing green seashell
+  set keyw seashell
 elseif trinket /= %arg%
-  eval vnum 10079
-  eval cost 10
-  eval named a skycleaver trinket
+  set vnum 10079
+  set cost 10
+  set named a skycleaver trinket
   set currency greater skystones
   set currency_vnum 10037
 else
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end
-eval test %%actor.has_resources(%currency_vnum%,%cost%)%%
-if !%test%
+if !%actor.has_resources(%currency_vnum%,%cost%)%
   %send% %actor% %self.name% tells you, 'You'll need %cost% %currency% to buy that.'
   halt
 end
-eval charge %%actor.add_resources(%currency_vnum%,-%cost%)%%
-nop %charge%
+nop %actor.add_resources(%currency_vnum%,-%cost%)%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% %currency%.
 %echoaround% %actor% %actor.name% buys %named%.
@@ -718,8 +705,7 @@ done
 Goblin combat~
 0 k 10
 ~
-eval chance %random.3%
-if %chance% < 3
+if %random.3% < 3
   %send% %actor% %self.name% stabs you in the leg with a goblin shortsword!
   %echoaround% %actor% %self.name% stabs %actor.name% in the leg with a goblin shortsword!
   %damage% %actor% 20 physical
@@ -749,9 +735,9 @@ if %pixy_race_wager% && !%race_stage%
   if !%pixy_race_running% && %last_race_time% + 30 < %timestamp%
     %echo% Wagering time is over. The race is about to begin!
     unset pixy_race_wager
-    eval pixy_race_running 1
+    set pixy_race_running 1
     global pixy_race_running
-    eval race_stage 0
+    set race_stage 0
     global race_stage
   elseif %random.3% == 3
     %echo% There's still time to wager! Type 'wager <1, 2, or 3> <amount>' to place a bet.
@@ -762,9 +748,9 @@ if !%last_race_time% || %last_race_time% + 300 < %timestamp%
   %echo% The pixies are lining up to race! You can see #1 Caterkiller, #2 Needleknife,
   %echo% and #3 Marrowgnaw flutter up to the starting line. Place your wagers now
   %echo% by typing 'wager <1, 2, or 3> <amount>'.
-  eval pixy_race_wager 1
+  set pixy_race_wager 1
   global pixy_race_wager
-  eval last_race_time %timestamp%
+  set last_race_time %timestamp%
   global last_race_time
 end
 ~
@@ -783,21 +769,19 @@ elseif %actor.varexists(pixy_wager)% && %actor.varexists(pixy_choice)%
   %send% %actor% You have already wagered %actor.pixy_wager% on #%actor.pixy_choice%.
   halt
 end
-eval pixy_choice %arg.car%
+set pixy_choice %arg.car%
 eval pixy_wager %arg.cdr% + 0
 if !%arg% || !%pixy_choice% || !%pixy_wager% || (%pixy_choice% != 1 && %pixy_choice% != 2 && %pixy_choice% != 3)
   %send% %actor% Usage: wager <1, 2, or 3> <amount>
   halt
 end
-eval test %%actor.can_afford(%pixy_wager%)%%
-if !%test%
+if !%actor.can_afford(%pixy_wager%)%
   %send% %actor% You can't seem to afford that wager.
   halt
 end
 remote pixy_wager %actor.id%
 remote pixy_choice %actor.id%
-eval charge %%actor.charge_coins(%pixy_wager%)%%
-nop %charge%
+nop %actor.charge_coins(%pixy_wager%)%
 %send% %actor% You place a wager on #%pixy_choice%, for %pixy_wager% coins.
 %echoaround% %actor% %actor.name% places a wager.
 ~
@@ -810,7 +794,7 @@ if !%pixy_race_running% || (%race_stage% && %race_stage% > 0)
   return 0
   halt
 end
-eval race_stage 1
+set race_stage 1
 global race_stage
 wait 1 sec
 %echo% And they're off!
@@ -865,7 +849,7 @@ wait 10
 wait 10
 %echo% It's anybody's race...
 wait 10
-eval winner %random.3%
+set winner %random.3%
 switch %winner%
   case 1
     %echo% It's #1 Caterkiller by less than an inch!
@@ -878,22 +862,21 @@ switch %winner%
   break
 done
 wait 1 sec
-eval ch %room.people%
+set ch %room.people%
 while %ch%
   if %ch.varexists(pixy_choice)%
     if %ch.pixy_choice% == %winner%
       eval amt %ch.pixy_wager% * 3
       %send% %ch% Your pixy won! You earn %amt% coins!
       %echoaround% %ch% %ch.name% has won %ch.hisher% bet!
-      eval adjust %%ch.give_coins(%amt%)%%
-      nop %adjust%
+      nop %ch.give_coins(%amt%)%
     elseif %ch.varexists(pixy_choice)%
       %send% %ch% Your pixy lost the race.
     end
     rdelete pixy_choice %ch.id%
     rdelete pixy_wager %ch.id%
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 unset race_stage
 unset pixy_race_running
@@ -963,11 +946,10 @@ Otherworlder guard passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  eval msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  eval msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     say We found the otherworlders in a damaged ovaloid of some kind.
@@ -983,7 +965,7 @@ switch %msg_pos%
   break
 done
 if %msg_pos% >= 4
-  eval msg_pos 0
+  set msg_pos 0
 end
 remote msg_pos %self.id%
 ~
@@ -1009,11 +991,10 @@ Lich passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  eval msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  eval msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% makes a skeleton dance like a puppet.
@@ -1029,7 +1010,7 @@ switch %msg_pos%
   break
 done
 if %msg_pos% >= 4
-  eval msg_pos 0
+  set msg_pos 0
 end
 remote msg_pos %self.id%
 ~
@@ -1093,11 +1074,10 @@ Celiya passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  eval msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  eval msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% sits in her chair.
@@ -1113,7 +1093,7 @@ switch %msg_pos%
   break
 done
 if %msg_pos% >= 4
-  eval msg_pos 0
+  set msg_pos 0
 end
 remote msg_pos %self.id%
 ~
@@ -1146,10 +1126,10 @@ Celiya buy~
 0 c 0
 buy~
 command: buy
-eval vnum 10066
-eval cost 5
-eval named a form-fitting backpack
-eval keyw backpack
+set vnum 10066
+set cost 5
+set named a form-fitting backpack
+set keyw backpack
 if (!%arg%)
   %send% %actor% %self.name% sells %named% for %cost% greater skystones.
   %send% %actor% Type 'buy backpack' to purchase one.
@@ -1158,13 +1138,11 @@ elseif !(backpack /= %arg% || formfitting /= %arg%)
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end
-eval test %%actor.has_resources(10037,%cost%)%%
-if !%test%
+if !%actor.has_resources(10037,%cost%)%
   %send% %actor% %self.name% tells you, 'You'll need %cost% greater skystones to buy that.'
   halt
 end
-eval charge %%actor.add_resources(10037,-%cost%)%%
-nop %charge%
+nop %actor.add_resources(10037,-%cost%)%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% greater skystones.
 %echoaround% %actor% %actor.name% buys %named%.
@@ -1174,11 +1152,10 @@ Barrosh passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  eval msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  eval msg_pos 0
+  set msg_pos 1
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% stops concentrating for a moment, and several hovering objects fall.
@@ -1194,7 +1171,7 @@ switch %msg_pos%
   break
 done
 if %msg_pos% >= 4
-  eval msg_pos 0
+  set msg_pos 0
 end
 remote msg_pos %self.id%
 ~
@@ -1224,15 +1201,13 @@ switch %random.4%
     %echo% %self.name% mutters some arcane words...
     wait 1 sec
     %echo% There is a flash of intense light!
-    eval room_var %self.room%
-    eval ch %room_var.people%
+    set ch %self.room.people%
     while %ch%
-      eval test %%self.is_enemy(%ch%)%%
-      if %test%
+      if %self.is_enemy(%ch%)%
         %send% %ch% You are blinded!
         dg_affect %ch% BLIND on 10
       end
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
   break
 done
@@ -1241,10 +1216,10 @@ done
 Barrosh buy~
 0 c 0
 buy~
-eval vnum 10065
-eval cost 5
-eval named an armored backpack
-eval keyw backpack
+set vnum 10065
+set cost 5
+set named an armored backpack
+set keyw backpack
 if (!%arg%)
   %send% %actor% %self.name% sells %named% for %cost% greater skystones.
   %send% %actor% Type 'buy backpack' to purchase one.
@@ -1253,13 +1228,11 @@ elseif !(backpack /= %arg% || form-fitting /= %arg%)
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end
-eval test %%actor.has_resources(10037,%cost%)%%
-if !%test%
+if !%actor.has_resources(10037,%cost%)%
   %send% %actor% %self.name% tells you, 'You'll need %cost% greater skystones to buy that.'
   halt
 end
-eval charge %%actor.add_resources(10037,-%cost%)%%
-nop %charge%
+nop %actor.add_resources(10037,-%cost%)%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% greater skystones.
 %echoaround% %actor% %actor.name% buys %named%.
@@ -1269,11 +1242,10 @@ Knezz passive~
 0 bw 5
 ~
 if %self.varexists(msg_pos)%
-  eval msg_pos %self.msg_pos%
+  eval msg_pos %self.msg_pos% + 1
 else
-  eval msg_pos 0
+  set msg_pos 0
 end
-eval msg_pos %msg_pos% + 1
 switch %msg_pos%
   case 1
     %echo% %self.name% reads some correspondence at %self.hisher% desk.
@@ -1289,7 +1261,7 @@ switch %msg_pos%
   break
 done
 if %msg_pos% >= 4
-  eval msg_pos 0
+  set msg_pos 0
 end
 remote msg_pos %self.id%
 ~
@@ -1307,16 +1279,14 @@ switch %random.4%
   break
   case 2
     %echo% %self.name% chants a poem you don't understand...
-    eval room_var %self.room%
-    eval ch %room_var.people%
+    set ch %self.room.people%
     while %ch%
-      eval next_ch %ch.next_in_room%
-      eval test %%self.is_enemy(%ch%)%%
-      if %test%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
         %send% %ch% Your insides begin to burn!
         %dot% %ch% 50 10 magical
       end
-      eval ch %next_ch%
+      set ch %next_ch%
     done
   break
   case 3
@@ -1326,15 +1296,13 @@ switch %random.4%
   break
   case 4
     %echo% %self.name% chants a poem you don't understand...
-    eval room_var %self.room%
-    eval ch %room_var.people%
+    set ch %self.room.people%
     while %ch%
-      eval test %%self.is_enemy(%ch%)%%
-      if %test%
+      if %self.is_enemy(%ch%)%
         %send% %ch% You feel like you're moving through mud!
         dg_affect %ch% SLOW on 20
       end
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
   break
 done
@@ -1343,10 +1311,10 @@ done
 Knezz buy~
 0 c 0
 buy~
-eval vnum 10067
-eval cost 5
-eval named a portable hole
-eval keyw portable
+set vnum 10067
+set cost 5
+set named a portable hole
+set keyw portable
 if (!%arg%)
   %send% %actor% %self.name% sells %named% for %cost% greater skystones.
   %send% %actor% Type 'buy backpack' to purchase one.
@@ -1355,13 +1323,11 @@ elseif !(backpack /= %arg% || form-fitting /= %arg%)
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end
-eval test %%actor.has_resources(10037,%cost%)%%
-if !%test%
+if !%actor.has_resources(10037,%cost%)%
   %send% %actor% %self.name% tells you, 'You'll need %cost% greater skystones to buy that.'
   halt
 end
-eval charge %%actor.add_resources(10037,-%cost%)%%
-nop %charge%
+nop %actor.add_resources(10037,-%cost%)%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% greater skystones.
 %echoaround% %actor% %actor.name% buys %named%.
@@ -1404,8 +1370,7 @@ done
 Skystone combine~
 1 c 2
 combine~
-eval test %%self.is_name(%arg%)%%
-if !(%test)
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -1422,8 +1387,7 @@ nop %actor.add_resources(10036,-5)%
 Greater skystone split~
 1 c 2
 split~
-eval test %%self.is_name(%arg%)%%
-if !(%test%)
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -1448,23 +1412,22 @@ end
 Skycleaver Trinket teleport~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room_var %self.room%
+set room_var %self.room%
 * once per 60 minutes
 if %actor.cooldown(10079)%
   %send% %actor% Your %cooldown.10079% is on cooldown.
   halt
 end
-eval cycle 0
+set cycle 0
 while %cycle% >= 0
   * Repeats until break
-  eval loc %instance.nearest_rmt(10030)%
+  set loc %instance.nearest_rmt(10030)%
   * Rather than setting error in 10 places, just assume there's an error and clear it if there isn't
-  eval error 1
+  set error 1
   if %actor.fighting%
     %send% %actor% You can't use %self.shortdesc% during combat.
   elseif %actor.position% != Standing
@@ -1476,13 +1439,12 @@ while %cycle% >= 0
   elseif %actor.aff_flagged(DISTRACTED)%
     %send% %actor% You are too distracted to use %self.shortdesc%!
   else
-    eval error 0
+    set error 0
   end
   * Doing this AFTER checking loc exists
-  eval limit_check %%actor.can_enter_instance(%loc%)%%
-  if !%limit_check%
+  if !%actor.can_enter_instance(%loc%)%
     %send% %actor% The destination is too busy.
-    eval error 1
+    set error 1
   end
   if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
     if %cycle% > 0
@@ -1507,8 +1469,7 @@ while %cycle% >= 0
       %echoaround% %actor% %actor.name% appears in a flash of blue light!
       nop %actor.set_cooldown(10079, 3600)%
       nop %actor.cancel_adventure_summon%
-      eval bind %%self.bind(%actor%)%%
-      nop %bind%
+      nop %self.bind(%actor%)%
       halt
     break
   done

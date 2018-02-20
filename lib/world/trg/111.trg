@@ -12,8 +12,7 @@ say Are you going to eat that?
 Hermit Food Exchange~
 0 j 100
 ~
-eval test %%self.varexists(gave%actor.id%)%%
-if %object.type% != FOOD || %test%
+if %object.type% != FOOD || %self.varexists(gave%actor.id%)%
   %send% %actor% %self.name% doesn't want %object.shortdesc%!
   %send% %actor% (You have already completed this quest in this instance.)
   return 0
@@ -28,7 +27,7 @@ if %object.type% == FOOD
   %load% o 11100 %actor% inventory
   %echo% %self.name% gleefully eats %object.shortdesc%!
   mjunk %object.name%
-  eval gave%actor.id% 1
+  set gave%actor.id% 1
   remote gave%actor.id% %self.id%
 end
 ~
@@ -49,9 +48,9 @@ if !(%actor.is_pc%)
 end
 * Get current befriend value or set to 0
 if (%actor.varexists(befriend_pegasus)%)
-  eval befriend_pegasus %actor.befriend_pegasus%
+  set befriend_pegasus %actor.befriend_pegasus%
 else
-  eval befriend_pegasus 0
+  set befriend_pegasus 0
 end
 * Add value
 eval befriend_pegasus %befriend_pegasus% + 1
@@ -68,7 +67,7 @@ else
   %send% %actor% It looks like you could ride %self.himher%!
   mjunk all
   * reset to 0
-  eval befriend_pegasus 0
+  set befriend_pegasus 0
   remote befriend_pegasus %actor.id%
   * Switcheroo
   %load% mob 11104
@@ -80,14 +79,13 @@ end
 Pegasus Fly Away~
 0 ab 5
 ~
-eval count 0
-eval room_var %self.room%
-eval target_char %room_var.people%
+set count 0
+set target_char %self.room.people%
 while %target_char%
   if (%target_char.is_pc%)
     eval count %count% + 1
   end
-  eval target_char %target_char.next_in_room%
+  set target_char %target_char.next_in_room%
 done
 * Depsawn if no players present
 if %count% < 1
@@ -118,37 +116,34 @@ dg_affect %actor% slow on 30
 Lean Left~
 2 c 0
 left~
-eval room_var %actor.room%
-context %room_var.vnum%
+context %actor.room.vnum%
 %send% %actor% You lean hard to the left!
 %echoaround% %actor% %actor.name% leans hard to the left!
-eval lean_left 1
+set lean_left 1
 remote lean_left %actor.id%
-eval lean_right 0
+set lean_right 0
 remote lean_right %actor.id%
 ~
 #11107
 Lean Right~
 2 c 0
 right~
-eval room_var %actor.room%
-context %room_var.vnum%
+context %actor.room.vnum%
 %send% %actor% You lean hard to the right!
 %echoaround% %actor% %actor.name% leans hard to the right!
-eval lean_left 0
+set lean_left 0
 remote lean_left %actor.id%
-eval lean_right 1
+set lean_right 1
 remote lean_right %actor.id%
 ~
 #11108
 Duck!~
 2 c 0
 duck~
-eval room_var %actor.room%
-context %room_var.vnum%
+context %actor.room.vnum%
 %send% %actor% You duck in the boat!
 %echoaround% %actor% %actor.name% ducks!
-eval has_ducked 1
+set has_ducked 1
 remote has_ducked %actor.id%
 ~
 #11109
@@ -156,7 +151,7 @@ Rapids Start 11112~
 2 g 100
 ~
 wait 1 sec
-eval room_var %actor.room%
+set room_var %actor.room%
 %echo% The boat begins to accelerate!
 wait 10 sec
 if (%actor.room% != %room_var%)
@@ -169,9 +164,9 @@ Rock Obstacle 11120~
 2 g 100
 ~
 if %actor.is_pc%
-  eval lean_left 0
+  set lean_left 0
   remote lean_left %actor.id%
-  eval lean_right 0
+  set lean_right 0
   remote lean_right %actor.id%
 end
 wait 1 sec
@@ -183,9 +178,9 @@ else
   %echo% &RA huge rock is coming up on the right! Which way should you lean?&0
 end
 wait 8 sec
-eval correct 0
-eval fail 0
-eval ch %room.people%
+set correct 0
+set fail 0
+set ch %room.people%
 while %ch%
   if %ch.is_pc% && !%ch.nohassle%
     set this_loop_correct 0
@@ -208,20 +203,20 @@ while %ch%
       eval fail %fail% + 1
     end
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if %correct% > %fail%
   %echo% The boat leans away from the huge rock!
   %teleport% all i11121
 else
   %echo% The boat smacks into the rock, hurling you out of the rapids!
-  eval ch %room.people%
+  set ch %room.people%
   while %ch%
-    eval next_ch %ch.next_in_room%
+    set next_ch %ch.next_in_room%
     %teleport% %ch% i11123
     %force% %ch% look
     %damage% %ch% 25
-    eval ch %next_ch%
+    set ch %next_ch%
   done
 end
 ~
@@ -230,16 +225,16 @@ Tree Branch 11121~
 2 g 100
 ~
 if %actor.is_pc%
-  eval has_ducked 0
+  set has_ducked 0
   remote has_ducked %actor.id%
 end
 wait 1 sec
 %echo% &RThe boat is coming up on a low-hanging tree branch!&0
 wait 8 sec
-eval ch %room.people%
-eval wins 0
+set ch %room.people%
+set wins 0
 while %ch%
-  eval next_ch %ch.next_in_room%
+  set next_ch %ch.next_in_room%
   if %ch.is_pc%
     set ducked 0
     if %ch.varexists(has_ducked)%
@@ -257,7 +252,7 @@ while %ch%
       eval wins %wins% + 1
     end
   end
-  eval ch %next_ch%
+  set ch %next_ch%
 done
 * send npcs to fail room if no players won
 if !(%wins%)
@@ -271,9 +266,9 @@ Narrow Opening 11122~
 2 g 100
 ~
 if %actor.is_pc%
-  eval lean_left 0
+  set lean_left 0
   remote lean_left %actor.id%
-  eval lean_right 0
+  set lean_right 0
   remote lean_right %actor.id%
 end
 wait 1 sec
@@ -285,9 +280,9 @@ else
   %echo% &RThere is a narrow opening on the right! Which way should you lean?&0
 end
 wait 8 sec
-eval correct 0
-eval fail 0
-eval ch %room.people%
+set correct 0
+set fail 0
+set ch %room.people%
 while %ch%
   if %ch.is_pc% && !%ch.nohassle%
     set this_loop_correct 0
@@ -310,7 +305,7 @@ while %ch%
       eval fail %fail% + 1
     end
   end
-  eval ch %ch.next_in_room%
+  set ch %ch.next_in_room%
 done
 if %correct% > %fail%
   %echo% The boat leans into the narrow opening!
@@ -318,13 +313,13 @@ if %correct% > %fail%
   %at% i11113 %force% all look
 else
   %echo% The boat misses the narrow opening, hurling you out of the rapids!
-  eval ch %room.people%
+  set ch %room.people%
   while %ch%
-    eval next_ch %ch.next_in_room%
+    set next_ch %ch.next_in_room%
     %teleport% %ch% i11123
     %force% %ch% look
     %damage% %ch% 25
-    eval ch %next_ch%
+    set ch %next_ch%
   done
 end
 ~
@@ -394,8 +389,7 @@ end
 Vehicle Coupon Summon~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   return 0
   halt
 end
@@ -403,12 +397,11 @@ if (%actor.position% != Standing)
   %send% %actor% You can't do that right now.
   halt
 end
-eval target %self.val0%
+set target %self.val0%
 %load% v %target%
-* Todo: eval vehicle %room_var.first_vehicle_in_room% / etc
+* Todo: eval vehicle %self.room.first_vehicle_in_room% / etc
 * and use %vehicle.name% instead of "a rib-bone boat"
 * (see mini-pet use for an example)
-eval room_var %self.room%
 %send% %actor% You use %self.shortdesc% and a rib-bone boat appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and a rib-bone boat appears!
 %purge% %self%
@@ -428,18 +421,18 @@ if !%actor.is_pc%
   halt
 end
 makeuid atroom room i11142
-eval found 0
-eval exists 0
-eval ch %atroom.people%
+set found 0
+set exists 0
+set ch %atroom.people%
 while %ch%
-  eval next_ch %ch.next_in_room%
+  set next_ch %ch.next_in_room%
   if %ch.vnum% == 11135
     %purge% %ch%
-    eval found 1
+    set found 1
   elseif %ch.vnum% == 11136
-    eval exists 1
+    set exists 1
   end
-  eval ch %next_ch%
+  set ch %next_ch%
 done
 if %found% && !%exists%
   %at% i11142 wload mob 11136
@@ -456,7 +449,7 @@ if !(garden /= %arg%)
 end
 * Load current position
 if !%hex_box_open%
-  eval hex_box_open 0
+  set hex_box_open 0
 end
 * Message
 %send% %actor% You push the image of the garden on the side of %self.shortdesc%.
@@ -469,13 +462,13 @@ if %hex_box_open% != 0
   else
     %send% %actor% ... nothing seems to happen.
   end
-  eval hex_box_open 0
+  set hex_box_open 0
   global hex_box_open
   halt
 end
 %send% %actor% To your surprise, the image of the garden begins to glow!
 %echoaround% %actor% To %actor.name%'s surprise, the image of the garden begins to glow!
-eval hex_box_open 1
+set hex_box_open 1
 global hex_box_open
 ~
 #11132
@@ -489,7 +482,7 @@ if !(mill /= %arg%)
 end
 * Load current position
 if !%hex_box_open%
-  eval hex_box_open 0
+  set hex_box_open 0
 end
 * Message
 %send% %actor% You push the image of the mill on the side of %self.shortdesc%.
@@ -502,13 +495,13 @@ if %hex_box_open% != 1
   else
     %send% %actor% ... nothing seems to happen.
   end
-  eval hex_box_open 0
+  set hex_box_open 0
   global hex_box_open
   halt
 end
 %send% %actor% The image of the mill begins to glow!
 %echoaround% %actor% The image of the mill begins to glow!
-eval hex_box_open 2
+set hex_box_open 2
 global hex_box_open
 ~
 #11133
@@ -522,7 +515,7 @@ if !(stable /= %arg%)
 end
 * Load current position
 if !%hex_box_open%
-  eval hex_box_open 0
+  set hex_box_open 0
 end
 * Message
 %send% %actor% You push the image of the stable on the side of %self.shortdesc%.
@@ -535,13 +528,13 @@ if %hex_box_open% != 2
   else
     %send% %actor% ... nothing seems to happen.
   end
-  eval hex_box_open 0
+  set hex_box_open 0
   global hex_box_open
   halt
 end
 %send% %actor% The image of the stable begins to glow!
 %echoaround% %actor% The image of the stable begins to glow!
-eval hex_box_open 3
+set hex_box_open 3
 global hex_box_open
 ~
 #11134
@@ -555,7 +548,7 @@ if !(estate /= %arg%)
 end
 * Load current position
 if !%hex_box_open%
-  eval hex_box_open 0
+  set hex_box_open 0
 end
 * Message
 %send% %actor% You push the image of the estate on the side of %self.shortdesc%.
@@ -568,7 +561,7 @@ if %hex_box_open% != 3
   else
     %send% %actor% ... nothing seems to happen.
   end
-  eval hex_box_open 0
+  set hex_box_open 0
   global hex_box_open
   halt
 end
@@ -588,12 +581,11 @@ Sarcophagus open~
 open~
 context %instance.id%
 * Did they target me?
-eval test %%self.is_name(%arg%)%%
-if %sarcophagus_running% || !(%test%)
+if %sarcophagus_running% || !%self.is_name(%arg%)%
   return 0
   halt
 end
-eval sarcophagus_running 1
+set sarcophagus_running 1
 global sarcophagus_running
 %send% %actor% You cautiously open %self.shortdesc%...
 %echoaround% %actor% %actor.name% cautiously opens %self.shortdesc%...
@@ -603,28 +595,28 @@ global sarcophagus_running
 makeuid snake mob titanaconda
 %force% %snake% %aggro% %actor%
 %purge% %self%
-eval sarcophagus_running 0
+set sarcophagus_running 0
 global sarcophagus_running
 ~
 #11136
 Chalice combine~
 1 b 100
 ~
-eval found_cutting 0
-eval found_pod 0
-eval found_berries 0
-eval found_redthorn 0
-eval iter %self.contents%
+set found_cutting 0
+set found_pod 0
+set found_berries 0
+set found_redthorn 0
+set iter %self.contents%
 while %iter%
-  eval next_iter %iter.next_in_list%
+  set next_iter %iter.next_in_list%
   if (%iter.vnum% == 11142)
-    eval found_cutting 1
+    set found_cutting 1
   elseif (%iter.vnum% == 11143)
-    eval found_pod 1
+    set found_pod 1
   elseif (%iter.vnum% == 11144)
-    eval found_berries 1
+    set found_berries 1
   elseif (%iter.vnum% == 1202)
-    eval found_redthorn 1
+    set found_redthorn 1
   else
     * not one of our ingredients -- destroy it
     if %self.carried_by%
@@ -634,7 +626,7 @@ while %iter%
     end
     %purge% %iter%
   end
-  eval iter %next_iter%
+  set iter %next_iter%
 done
 * Victory against chalice!
 if (%found_cutting% == 1 && %found_pod% == 1 && %found_berries% == 1 && %found_redthorn% == 1)
@@ -692,10 +684,10 @@ Titanaconda combat~
 if (%self.aff_flagged(ENTANGLED)% || %self.disabled%)
   halt
 end
-eval target %random.enemy%
+set target %random.enemy%
 if !%target%
   * In case of blindness
-  eval target %actor%
+  set target %actor%
 end
 %send% %target% %self.name% encircles you and constricts!
 %echoaround% %target% %self.name% encircles %target.name% and constricts %target.himher%!
@@ -733,7 +725,7 @@ Sleeping Ivy combat~
 if (%self.aff_flagged(ENTANGLED)% || %self.disabled%)
   halt
 end
-eval target %random.enemy%
+set target %random.enemy%
 if !%target%
   halt
 end
@@ -748,7 +740,7 @@ wait 15 sec
 Lulling songbird combat~
 0 k 20
 ~
-eval target %random.enemy%
+set target %random.enemy%
 if %target%
   %send% %target% %self.name% sings a sweet tune, lulling you and making you sluggish!
   %echoaround% %target% %self.name% sings a sweet tune, lulling %target.name% and making %target.himher% sluggish!

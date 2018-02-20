@@ -31,17 +31,16 @@ City Guard: Reinforcements~
 if %self.cooldown(250)%
   halt
 end
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 set ally_guards_present 0
 while %person%
-  eval test %%person.is_enemy(%self%)%%
-  if %test% && %person.is_pc% && %person.empire% != %self.empire%
+  if %person.is_enemy(%self%)% && %person.is_pc% && %person.empire% != %self.empire%
     set found_hostile_player 1
   elseif %person.vnum% == %self.vnum%
     eval ally_guards_present %ally_guards_present% + 1
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 if !%found_hostile_player%
   halt
@@ -55,11 +54,11 @@ wait 10 sec
 if !%self.fighting%
   halt
 end
-eval count %random.3%
-eval num 1
+set count %random.3%
+set num 1
 while %num% <= %count%
   %load% mob %self.vnum%
-  eval summon %room.people%
+  set summon %room.people%
   if %summon.vnum% != %self.vnum%
     %echo% %self.name% looks confused.
     halt
@@ -76,8 +75,7 @@ done
 Hestian Trinket~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -89,20 +87,18 @@ if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   %send% %actor% You can't teleport out of here.
   halt
 end
-eval home %actor.home%
+set home %actor.home%
 if !%home%
   %send% %actor% You have no home to teleport back to with this trinket.
   halt
 end
-eval veh %home.in_vehicle%
+set veh %home.in_vehicle%
 if %veh%
-  eval outside_room %veh.room%
-  eval test %%actor.canuseroom_guest(%outside_room%)%%
-  eval test2 eval test %%actor.can_teleport_room(%outside_room%)%%
-  if !%test%
+  set outside_room %veh.room%
+  if !%actor.canuseroom_guest(%outside_room%)%
     %send% %actor% You can't teleport home to a vehicle that's parked on foreign territory you don't have permission to use!
     halt
-  elseif !%test2%
+  elseif !%actor.can_teleport_room(%outside_room%)%
     %send% %actor% You can't teleport to your home's current location.
     halt
   end
@@ -112,7 +108,7 @@ if %actor.cooldown(256)%
   %send% %actor% Your %cooldown.256% is on cooldown!
   halt
 end
-eval room_var %actor.room%
+set room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
 %echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
 wait 5 sec
@@ -140,9 +136,8 @@ if !%arg%
   %send% %actor% Smoke what?
   halt
 end
-eval item %actor.inventory()%
-eval found 0
-eval found %%actor.obj_target(%arg%)%%
+set item %actor.inventory()%
+set found %actor.obj_target(%arg%)%
 if !%found%
   %send% %actor% You don't seem to have that.
   halt
@@ -162,8 +157,7 @@ end
 Trinket of Conveyance~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -180,7 +174,7 @@ if %actor.cooldown(262)%
   %send% %actor% Your %cooldown.262% is still on cooldown!
   halt
 end
-eval room_var %actor.room%
+set room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
 %echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
 wait 5 sec
@@ -205,10 +199,9 @@ nop %actor.cancel_adventure_summon%
 Letheian Icon use~
 1 c 2
 use~
-eval item %arg.car%
-eval sk %arg.cdr%
-eval test %%actor.obj_target(%item%)%%
-if (%test% != %self%) && (use /= %cmd%)
+set item %arg.car%
+set sk %arg.cdr%
+if (%actor.obj_target(%item%)% != %self%) && (use /= %cmd%)
   return 0
   halt
 end
@@ -220,16 +213,13 @@ if (%actor.position% != Standing)
   %send% %actor% You can't do that right now.
   halt
 end
-eval test %%skill.validate(%sk%)%%
-if !%test%
+if !%skill.validate(%sk%)%
   %send% %actor% No such skill '%sk%'.
   halt
 end
-eval name %%skill.name(%sk%)%%
-%send% %actor% You use %self.shortdesc% and gain a skill reset in %name%!
+%send% %actor% You use %self.shortdesc% and gain a skill reset in %skill.name(%sk%)%!
 %echoaround% %actor% %actor.name% uses %self.shortdesc%.
-eval grant %%actor.give_skill_reset(%sk%)%%
-nop %grant%
+nop %actor.give_skill_reset(%sk%)%
 %purge% %self%
 ~
 $
