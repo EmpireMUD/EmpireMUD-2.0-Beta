@@ -50,7 +50,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3013 100.00 1  # FORAGE: a handful of nuts
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 M
 237 5.00 ce
 M
@@ -206,7 +206,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -360,7 +360,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -488,7 +488,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -630,7 +630,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -1200,7 +1200,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3003 100.00 1  # FORAGE: a handful of grain
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 M
 9037 5.00 dh
 M
@@ -2165,6 +2165,8 @@ E
 9 0 25.00 27
 E
 11 5 4.00 27
+E
+15 0 5.00 34
 I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
@@ -3760,7 +3762,7 @@ I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
-I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
 M
 9040 0.01 d
@@ -3886,7 +3888,7 @@ I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
-I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 50.00 2 c  # CHOP: a large tree
@@ -3999,7 +4001,7 @@ I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
-I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
 I 9 121 100.00 1  # GATHER: a stick
 M
