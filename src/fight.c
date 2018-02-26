@@ -3817,6 +3817,12 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		return;
 	}
 	
+	// update ammo
+	if (best) {
+		GET_OBJ_VAL(best, VAL_AMMO_QUANTITY) -= 1;
+		SET_BIT(GET_OBJ_EXTRA(best), OBJ_NO_STORE);	// can no longer be stored
+	}
+	
 	// compute
 	success = check_hit_vs_dodge(ch, vict, FALSE);
 	
@@ -3925,7 +3931,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
 	if (purge && best) {
-		GET_OBJ_VAL(best, VAL_AMMO_QUANTITY) -= 1;
 		if (GET_AMMO_QUANTITY(best) <= 0) {
 			extract_obj(best);
 		}

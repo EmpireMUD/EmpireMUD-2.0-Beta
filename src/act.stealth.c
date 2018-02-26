@@ -381,6 +381,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	struct obj_apply *apply;
 	bool messaged = FALSE;
 	obj_data *obj;
+	double mod;
 	
 	if (IS_NPC(ch) || IS_GOD(vict) || IS_IMMORTAL(vict)) {
 		return 0;
@@ -441,6 +442,8 @@ int apply_poison(char_data *ch, char_data *vict) {
 	
 	// OK GO:
 	
+	mod = has_player_tech(ch, PTECH_POISON_UPGRADE) ? 1.5 : 1.0;
+	
 	// ensure scaled
 	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 		scale_item_to_level(obj, 1);	// minimum level
@@ -452,7 +455,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	if (GET_OBJ_AFF_FLAGS(obj)) {
-		af = create_flag_aff(aff_type, 2 MUD_HOURS, GET_OBJ_AFF_FLAGS(obj), ch);
+		af = create_flag_aff(aff_type, 1 MUD_HOURS, GET_OBJ_AFF_FLAGS(obj), ch);
 		affect_to_char(vict, af);
 		free(af);
 		
@@ -464,7 +467,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
-		af = create_mod_aff(aff_type, 2 MUD_HOURS, apply->location, apply->modifier, ch);
+		af = create_mod_aff(aff_type, 1 MUD_HOURS, apply->location, round(apply->modifier * mod), ch);
 		affect_to_char(vict, af);
 		free(af);
 		
