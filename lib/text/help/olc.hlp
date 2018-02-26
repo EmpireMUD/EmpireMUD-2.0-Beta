@@ -4051,11 +4051,17 @@ See also: AFFECT FLAGS, OLC OBJECTS
 
 Usage:  .affecttype <vnum>
 
-This lets you set a generic affect that will be used for the potion's benefits.
+This lets you set a generic affect that will be used for the item's benefits.
 This is how you set a custom name to appear on a player's 'affects' list.
 
-If two potions have the same affect vnum (including -1/none), one potion will
-overwrite the other's effects when quaffed.
+Potions: If two potions have the same affect vnum (including -1/none), one
+potion will overwrite the other's effects when quaffed.
+
+Poisons: If two poisons have the same affect type AND came from the same
+poisoner, a new affect will overwrite an older one.
+
+NOTE: This affecttype only applies if the poison/potion has applies or aff
+flags. Any affects applied by a script will not inherit this type.
 
 See also: GENERIC AFFECT, OLC OBJECTS
 #d
@@ -4688,17 +4694,6 @@ This sets what color a 'paint' item uses. Type '.paint' by itself to see the
 list of available colors.
 
 See also: PAINT ITEM, OLC OBJECTS
-#d
-"OEDIT POISON"
-
-Usage:  .poison <type>
-
-This sets which type of poison the item contains. Poisons are used by the
-Stealth skill tree, and the poison item is lost when it runs out of charges.
-
-Never set a poison type marked with an * (asterisk).
-
-See also: POISON, OEDIT CHARGES, OLC OBJECTS
 #d
 "OEDIT QUANTITY"
 
@@ -6483,13 +6478,9 @@ If the ammo is scalable, its damage bonus will scale. Ammo only fires out of
 the player's inventory.
 
 If there are any applies, they will become debuffs on the enemy when hit by
-the ammo. These applies need to be positive, not negative, to be debuffs.
+the ammo. For example, a -1 STR on the ammo becomes -1 STR on the victim.
 If there is an 'affect' generic with the same vnum as the ammo item, it will
 be used for the debuff.
-
-NOTE: Positive applies on ammo lead to negative debuffs on enemies. The
-ammo applies must be positive in order for the scaling engine to handle them
-correctly.
 #d
 "BOARD ITEM" "BOARD OBJECT"
 

@@ -3257,6 +3257,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "has_tech")) {
+						if (subfield && *subfield) {
+							extern const char *player_tech_types[];
+							int pos;
+							
+							if ((pos = search_block(subfield, player_tech_types, FALSE)) != NOTHING) {
+								snprintf(str, slen, "%d", has_player_tech(c, pos) ? 1 : 0);
+							}
+							else {
+								*str = '\0';
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					
 					else if (!str_cmp(field, "hisher"))
 						snprintf(str, slen, "%s", HSHR(c));

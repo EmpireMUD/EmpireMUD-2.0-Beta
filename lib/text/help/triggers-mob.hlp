@@ -407,6 +407,7 @@ When using field  - The variable returns:
    much reputation with the given faction.
 &chas_resources(vnum,amt)&0 - Whether or not the player has <amt> of object <vnum>
    available in the inventory/room.
+&chas_tech(ptech)&0 - Character has a given tech (see &yHELP PTECH&0)
 &chealth&0 - The current hit points of the actor.
 &cheshe&0 - Returns the correct pronoun (he/she/it).
 &chimher&0 - Returns the correct pronoun (him/her/it).

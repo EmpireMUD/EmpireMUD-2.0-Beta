@@ -1561,6 +1561,7 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
@@ -3665,7 +3666,7 @@ struct player_special_data {
 	byte confused_dir;  // people without Navigation think this dir is north
 	char *disguised_name;	// verbatim copy of name -- grabs custom mob names and empire names
 	byte disguised_sex;	// sex of the mob you're disguised as
-	byte using_poison;	// poison preference for Stealth
+	any_vnum using_poison;	// poison preference for Stealth
 	any_vnum using_ammo;	// preferred ranged ammo
 
 	// mount info
@@ -3977,27 +3978,6 @@ struct empire_chore_type {
 struct material_data {
 	char *name;
 	bool floats;
-};
-
-
-// see act.stealth.c
-struct poison_data_type {
-	char *name;
-	any_vnum tech;	// PTECH_ to use it
-	
-	any_vnum atype;	// ATYPE_
-	int apply;	// APPLY_
-	int mod;	// +/- value
-	bitvector_t aff;
-	
-	// dot affect
-	any_vnum dot_type;	// ATYPE_, -1 for none
-	int dot_duration;	// time for the dot
-	int dot_damage_type;	// DAM_ for the dot
-	int dot_damage;	// damage for the dot
-	int dot_max_stacks;	// how high the dot can stack
-	
-	bool allow_stack;	// whether or not it can stack
 };
 
 

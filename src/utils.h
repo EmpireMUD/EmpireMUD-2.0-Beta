@@ -852,10 +852,10 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // ITEM_POISON
 #define IS_POISON(obj)  (GET_OBJ_TYPE(obj) == ITEM_POISON)
-#define VAL_POISON_TYPE  0
 #define VAL_POISON_CHARGES  1
-#define GET_POISON_TYPE(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_TYPE) : NOTHING)
+#define VAL_POISON_AFFECT  2
 #define GET_POISON_CHARGES(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_CHARGES) : 0)
+#define GET_POISON_AFFECT(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_AFFECT) : NOTHING)
 
 // ITEM_RECIPE
 #define IS_RECIPE(obj)  (GET_OBJ_TYPE(obj) == ITEM_RECIPE)

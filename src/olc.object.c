@@ -45,7 +45,6 @@ extern const char *obj_custom_types[];
 extern const char *offon_types[];
 extern const char *paint_colors[];
 extern const char *paint_names[];
-extern const struct poison_data_type poison_data[];
 extern const char *storage_bits[];
 extern const char *wear_bits[];
 
@@ -1836,7 +1835,6 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			sprintf(storage + strlen(storage), "<%squantity\t0> %d\r\n", OLC_LABEL_VAL(GET_AMMO_QUANTITY(obj), 0), GET_AMMO_QUANTITY(obj));
 			sprintf(storage + strlen(storage), "<%sdamage\t0> %+d%s\r\n", OLC_LABEL_VAL(GET_AMMO_DAMAGE_BONUS(obj), 0), GET_AMMO_DAMAGE_BONUS(obj), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 			sprintf(storage + strlen(storage), "<%sammotype\t0> %c\r\n", OLC_LABEL_VAL(GET_AMMO_TYPE(obj), 0), 'A' + GET_AMMO_TYPE(obj));
-			sprintf(storage + strlen(storage), "NOTE: Positive applies become negative debuffs (see HELP AMMO ITEM)\r\n");
 			break;
 		}
 		case ITEM_PACK: {
@@ -1848,12 +1846,12 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_POTION: {
-			sprintf(buf + strlen(buf), "<%saffecttype\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_POTION_AFFECT(obj), NOTHING), GET_POTION_AFFECT(obj), GET_POTION_AFFECT(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(obj)) : "not custom");
-			sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TYPE(obj), NOTHING), GET_POTION_COOLDOWN_TYPE(obj), GET_POTION_COOLDOWN_TYPE(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)) : "no cooldown", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TIME(obj), 0), GET_POTION_COOLDOWN_TIME(obj), PLURAL(GET_POTION_COOLDOWN_TIME(obj)));
+			sprintf(storage + strlen(storage), "<%saffecttype\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_POTION_AFFECT(obj), NOTHING), GET_POTION_AFFECT(obj), GET_POTION_AFFECT(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(obj)) : "not custom");
+			sprintf(storage + strlen(storage), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TYPE(obj), NOTHING), GET_POTION_COOLDOWN_TYPE(obj), GET_POTION_COOLDOWN_TYPE(obj) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)) : "no cooldown", OLC_LABEL_VAL(GET_POTION_COOLDOWN_TIME(obj), 0), GET_POTION_COOLDOWN_TIME(obj), PLURAL(GET_POTION_COOLDOWN_TIME(obj)));
 			break;
 		}
 		case ITEM_POISON: {
-			sprintf(storage + strlen(storage), "<%spoison\t0> %s\r\n", OLC_LABEL_VAL(GET_POISON_TYPE(obj), 0), poison_data[GET_POISON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%saffecttype\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_POISON_AFFECT(obj), NOTHING), GET_POISON_AFFECT(obj), GET_POISON_AFFECT(obj) != NOTHING ? get_generic_name_by_vnum(GET_POISON_AFFECT(obj)) : "not custom");
 			sprintf(storage + strlen(storage), "<%scharges\t0> %d\r\n", OLC_LABEL_VAL(GET_POISON_CHARGES(obj), 0), GET_POISON_CHARGES(obj));
 			break;
 		}
@@ -2057,24 +2055,37 @@ OLC_MODULE(oedit_affects) {
 OLC_MODULE(oedit_affecttype) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	any_vnum old;
+	int pos;
 	
-	if (!IS_POTION(obj)) {
-		msg_to_char(ch, "You can only set affect type on a potion.\r\n");
+	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_POTION: {
+			pos = VAL_POTION_AFFECT;
+			break;
+		}
+		case ITEM_POISON: {
+			pos = VAL_POISON_AFFECT;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can't set an affecttype on this type of item.\r\n");
+			return;
+		}
 	}
-	else if (!str_cmp(argument, "none")) {
-		GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = NOTHING;
+	
+	if (!str_cmp(argument, "none")) {
+		GET_OBJ_VAL(obj, pos) = NOTHING;
 		msg_to_char(ch, "It now has no custom affect type.\r\n");
 	}
 	else {
-		old = GET_OBJ_VAL(obj, VAL_POTION_AFFECT);
-		GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = olc_process_number(ch, argument, "affect vnum", "affecttype", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_POTION_AFFECT));
+		old = GET_OBJ_VAL(obj, pos);
+		GET_OBJ_VAL(obj, pos) = olc_process_number(ch, argument, "affect vnum", "affecttype", 0, MAX_VNUM, GET_OBJ_VAL(obj, pos));
 
-		if (!find_generic(GET_OBJ_VAL(obj, VAL_POTION_AFFECT), GENERIC_AFFECT)) {
-			msg_to_char(ch, "Invalid affect generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_POTION_AFFECT));
-			GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = old;
+		if (!find_generic(GET_OBJ_VAL(obj, pos), GENERIC_AFFECT)) {
+			msg_to_char(ch, "Invalid affect generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, pos));
+			GET_OBJ_VAL(obj, pos) = old;
 		}
 		else {
-			msg_to_char(ch, "Affect type set to [%d] %s.\r\n", GET_OBJ_VAL(obj, VAL_POTION_AFFECT), get_generic_name_by_vnum(GET_OBJ_VAL(obj, VAL_POTION_AFFECT)));
+			msg_to_char(ch, "Affect type set to [%d] %s.\r\n", GET_OBJ_VAL(obj, pos), get_generic_name_by_vnum(GET_OBJ_VAL(obj, pos)));
 		}
 	}
 }
@@ -2655,38 +2666,6 @@ OLC_MODULE(oedit_plants) {
 }
 
 
-OLC_MODULE(oedit_poison) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	static char **poison_types = NULL;
-	int iter, count;
-	
-	// this does not have a const char** list .. build one the first time
-	if (!poison_types) {
-		// count types
-		count = 0;
-		for (iter = 0; *poison_data[iter].name != '\n'; ++iter) {
-			++count;
-		}
-	
-		CREATE(poison_types, char*, count+1);
-		
-		for (iter = 0; iter < count; ++iter) {
-			poison_types[iter] = str_dup(poison_data[iter].name);
-		}
-		
-		// must terminate
-		poison_types[count] = str_dup("\n");
-	}
-	
-	if (!IS_POISON(obj)) {
-		msg_to_char(ch, "You can only set poison type on a poison object.\r\n");
-	}
-	else {
-		GET_OBJ_VAL(obj, VAL_POISON_TYPE) = olc_process_type(ch, argument, "poison", "poison", (const char**)poison_types, GET_OBJ_VAL(obj, VAL_POISON_TYPE));
-	}
-}
-
-
 OLC_MODULE(oedit_quantity) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
@@ -3038,6 +3017,10 @@ OLC_MODULE(oedit_type) {
 			case ITEM_POTION: {
 				GET_OBJ_VAL(obj, VAL_POTION_COOLDOWN_TYPE) = NOTHING;
 				GET_OBJ_VAL(obj, VAL_POTION_AFFECT) = NOTHING;
+				break;
+			}
+			case ITEM_POISON: {
+				GET_OBJ_VAL(obj, VAL_POISON_AFFECT) = NOTHING;
 				break;
 			}
 			default: {
