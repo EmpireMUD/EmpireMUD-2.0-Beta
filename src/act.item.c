@@ -1683,7 +1683,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	int total_share, bonus, iter, amt;
 	int room_lev = 0, room_min = 0, room_max = 0, sig;
-	double share, this_share, points_to_give, per_point;
+	double share, this_share, points_to_give, per_point, base_mod = 1.0;
 	room_data *room = NULL;
 	obj_data *top_obj, *proto;
 	struct obj_apply *apply, *next_apply, *temp;
@@ -1700,9 +1700,13 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// gather info from the item
 	switch (GET_OBJ_TYPE(obj)) {
-		case ITEM_AMMO:
+		case ITEM_AMMO:{
+			scale_negative = TRUE;
+			break;
+		}
 		case ITEM_POISON: {
 			scale_negative = TRUE;
+			base_mod = 0.75;
 			break;
 		}
 	}
@@ -1862,6 +1866,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		}
 	}
 	points_to_give *= wear_pos_modifier[sig];
+	points_to_give *= base_mod;	// final modifier
 	
 	// ok get ready
 	points_to_give = MAX(1.0, points_to_give);	// minimum of 1 point
