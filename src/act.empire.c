@@ -1010,6 +1010,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	int iter, only_chore = NOTHING;
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
+	bool any = FALSE;
 	room_data *room;
 	size_t size;
 	
@@ -1017,7 +1018,11 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		return;	// nothing to show
 	}
 	if (!EMPIRE_WORKFORCE_LOG(emp)) {
-		msg_to_char(ch, "No workforce data available. Either you have no chores active, no claimed land to work, or the game may have rebooted recently.\r\n");
+		msg_to_char(ch, "No workforce problems found. Possible reasons include:\r\n");
+		msg_to_char(ch, "- All your workers are working successfully.\r\n");
+		msg_to_char(ch, "- You have no chores active.\r\n");
+		msg_to_char(ch, "- You have no claimed workable land (check nowork settings).\r\n");
+		msg_to_char(ch, "- The game may have rebooted recently and there is no data.\r\n");
 		return;
 	}
 	
@@ -1055,6 +1060,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		}
 		
 		snprintf(line, sizeof(line), " (%*d, %*d) %s: %s\r\n", X_PRECISION, MAP_X_COORD(wf_log->loc), Y_PRECISION, MAP_Y_COORD(wf_log->loc), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem]);
+		any = TRUE;
 		
 		if (strlen(line) + size < sizeof(buf)) {
 			strcat(buf, line);
@@ -1066,7 +1072,12 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		}
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	if (any) {
+		page_string(ch->desc, buf, TRUE);
+	}
+	else {
+		msg_to_char(ch, "No matching workforce problems found.\r\n");
+	}
 }
 
 
