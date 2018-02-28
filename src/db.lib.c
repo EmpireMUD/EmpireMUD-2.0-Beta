@@ -1864,6 +1864,7 @@ void free_empire(empire_data *emp) {
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
 	struct empire_log_data *elog;
+	struct workforce_log *wf_log;
 	struct shipping_data *shipd;
 	room_data *room;
 	int iter;
@@ -1953,6 +1954,12 @@ void free_empire(empire_data *emp) {
 			free(wdc);
 		}
 		free(delay);
+	}
+	
+	// free workforce log
+	while ((wf_log = EMPIRE_WORKFORCE_LOG(emp))) {
+		EMPIRE_WORKFORCE_LOG(emp) = wf_log->next;
+		free(wf_log);
 	}
 	
 	// free strings

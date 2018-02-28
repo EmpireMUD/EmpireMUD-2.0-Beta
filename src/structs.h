@@ -1124,6 +1124,15 @@ typedef struct vehicle_data vehicle_data;
 #define MEMBERS_AND_ALLIES  2
 
 
+// WF_PROB_x: Workforce problem logging
+#define WF_PROB_NO_WORKERS  0	// no citizens available
+#define WF_PROB_OVER_LIMIT  1	// too many items
+#define WF_PROB_DEPLETED  2	// tile is out of resources
+#define WF_PROB_NO_RESOURCES  3	// nothing to craft/build with
+#define WF_PROB_ALREADY_SHEARED  4	// mob sheared too recently
+#define WF_PROB_DELAYED  5	// delayed by a previous failure
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT DEFINES ///////////////////////////////////////////////////////////
 
@@ -4183,6 +4192,15 @@ struct offense_info_type {
 };
 
 
+// temporarily logs any errors that come up during workforce
+struct workforce_log {
+	any_vnum loc;	// don't store room itself -- may not be in memory later
+	int chore;	// CHORE_ const
+	int problem;	// WF_PROB_ const
+	struct workforce_log *next;
+};
+
+
 // The main data structure for the empires
 struct empire_data {
 	empire_vnum vnum;	// empire's virtual number
@@ -4237,6 +4255,7 @@ struct empire_data {
 	int sort_value;	// for score ties
 	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
+	struct workforce_log *wf_log;	// errors with workforce
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them

@@ -997,6 +997,58 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 
 
 /**
+* Shows why the empire's workforce didn't work last time.
+*
+* @param empire_data *emp The empire to check.
+* @param char_data *ch The person checking.
+*/
+void show_workforce_why(empire_data *emp, char_data *ch) {
+	extern const char *wf_problem_types[];
+	
+	char buf[MAX_STRING_LENGTH * 2], line[256];
+	struct workforce_log *wf_log;
+	room_vnum only_loc = NOWHERE;
+	int only_chore = NOTHING;
+	size_t size;
+	
+	if (!ch->desc) {
+		return;	// nothing to show
+	}
+	if (!EMPIRE_WORKFORCE_LOG(emp)) {
+		msg_to_char(ch, "No workforce data available. Either you have no chores active, no claimed land to work, or the game may have rebooted recently.\r\n");
+		return;
+	}
+	
+	// argument handling
+	// TODO
+	
+	// show all data
+	size = snprintf(buf, sizeof(buf), "Recent workforce problems:\r\n");
+	LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
+		if (only_loc != NOWHERE && only_loc != wf_log->loc) {
+			continue;	// not here
+		}
+		if (only_chore != NOTHING && only_chore != wf_log->chore) {
+			continue;	// wrong chore
+		}
+		
+		snprintf(line, sizeof(line), " (%*d, %*d) %s: %s\r\n", X_PRECISION, MAP_X_COORD(wf_log->loc), Y_PRECISION, MAP_Y_COORD(wf_log->loc), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem]);
+		
+		if (strlen(line) + size < sizeof(buf)) {
+			strcat(buf, line);
+			size += strlen(line);
+		}
+		else {
+			snprintf(buf + size, sizeof(buf) - size, "***OVERFLOW***\r\n");
+			break;
+		}
+	}
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
 * Shows current workforce settings for an empire, to a character.
 *
 * @param empire_data *emp The empire whose settings to show.
@@ -5787,6 +5839,9 @@ ACMD(do_workforce) {
 			here = true;
 		}
 		show_workforce_where(emp, ch, here);
+	}
+	else if (!str_cmp(arg, "why")) {
+		show_workforce_why(emp, ch);
 	}
 	// everything below requires privileges
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
