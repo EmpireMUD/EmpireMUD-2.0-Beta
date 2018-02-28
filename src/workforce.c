@@ -61,8 +61,8 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh);
 // other locals
 int empire_chore_limit(empire_data *emp, int island_id, int chore);
 int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b);
-void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem);
-void mark_workforce_delay(empire_data *emp, room_data *room, int chore);
+void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem, bool is_delay);
+void mark_workforce_delay(empire_data *emp, room_data *room, int chore, int problem);
 bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 // external functions
@@ -835,8 +835,9 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 * @param room_data *room The location.
 * @param int chore Any CHORE_ const.
 * @param int problem Any WF_PROB_ const.
+* @param bool is_delay If TRUE, marks it as a repeat-problem due to workforce delays.
 */
-void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem) {
+void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem, bool is_delay) {
 	struct workforce_log *wf_log;
 	
 	if (!emp || !room) {
@@ -847,6 +848,7 @@ void log_workforce_problem(empire_data *emp, room_data *room, int chore, int pro
 	wf_log->loc = GET_ROOM_VNUM(room);
 	wf_log->chore = chore;
 	wf_log->problem = problem;
+	wf_log->delayed = is_delay;
 	
 	LL_PREPEND(EMPIRE_WORKFORCE_LOG(emp), wf_log);
 }
@@ -858,8 +860,9 @@ void log_workforce_problem(empire_data *emp, room_data *room, int chore, int pro
 * @param empire_data *emp The empire.
 * @param room_data *room The location to mark it for.
 * @param int chore Which chore to mark.
+* @param int problem Which WF_PROB_ const might be the issue (pass NOTHING if n/a).
 */
-void mark_workforce_delay(empire_data *emp, room_data *room, int chore) {
+void mark_workforce_delay(empire_data *emp, room_data *room, int chore, int problem) {
 	struct workforce_delay_chore *wdc, *entry;
 	struct workforce_delay *delay;
 	room_vnum vnum;
@@ -889,6 +892,7 @@ void mark_workforce_delay(empire_data *emp, room_data *room, int chore) {
 	
 	// set time on entry (random)
 	entry->time = number(2, 3);
+	entry->problem = problem;
 }
 
 
@@ -916,7 +920,7 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 		REMOVE_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
 	}
 	else {
-		log_workforce_problem(emp, room, chore, WF_PROB_NO_WORKERS);
+		log_workforce_problem(emp, room, chore, WF_PROB_NO_WORKERS, FALSE);
 	}
 	
 	return mob;
@@ -946,6 +950,7 @@ int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b) {
 bool workforce_is_delayed(empire_data *emp, room_data *room, int chore) {
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay;
+	int problem = WF_PROB_DELAYED;
 	bool delayed = FALSE;
 	room_vnum vnum;
 	
@@ -959,6 +964,10 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore) {
 	// check if chore exists
 	LL_FOREACH_SAFE(delay->chores, wdc, next_wdc) {
 		if (wdc->chore == chore) {
+			if (wdc->problem != NOTHING) {
+				problem = wdc->problem;	// inherit if possible
+			}
+			
 			if (--wdc->time <= 0) {
 				LL_DELETE(delay->chores, wdc);
 				free(wdc);
@@ -970,7 +979,7 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore) {
 	}
 	
 	if (delayed) {
-		log_workforce_problem(emp, room, chore, WF_PROB_DELAYED);
+		log_workforce_problem(emp, room, chore, problem, TRUE);
 	}
 	
 	return delayed;
@@ -1218,15 +1227,15 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, chore);
+		mark_workforce_delay(emp, room, chore, any_no_res ? WF_PROB_NO_RESOURCES : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (!done_any) {
 		if (any_over_limit) {
-			log_workforce_problem(emp, room, chore, WF_PROB_OVER_LIMIT);
+			log_workforce_problem(emp, room, chore, WF_PROB_OVER_LIMIT, FALSE);
 		}
 		if (any_no_res) {
-			log_workforce_problem(emp, room, chore, WF_PROB_NO_RESOURCES);
+			log_workforce_problem(emp, room, chore, WF_PROB_NO_RESOURCES, FALSE);
 		}
 	}
 }
@@ -1261,14 +1270,14 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_BRICKMAKING);
+		mark_workforce_delay(emp, room, CHORE_BRICKMAKING, !has_clay ? WF_PROB_NO_RESOURCES : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (!has_clay) {
-		log_workforce_problem(emp, room, CHORE_BRICKMAKING, WF_PROB_NO_RESOURCES);
+		log_workforce_problem(emp, room, CHORE_BRICKMAKING, WF_PROB_NO_RESOURCES, FALSE);
 	}
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_BRICKMAKING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_BRICKMAKING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -1354,11 +1363,11 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, mode);
+		mark_workforce_delay(emp, room, mode, WF_PROB_NO_RESOURCES);
 	}
 	
 	if (!can_do) {
-		log_workforce_problem(emp, room, mode, WF_PROB_NO_RESOURCES);
+		log_workforce_problem(emp, room, mode, WF_PROB_NO_RESOURCES, FALSE);
 	}
 }
 
@@ -1426,14 +1435,14 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_CHOPPING);
+		mark_workforce_delay(emp, room, CHORE_CHOPPING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_CHOPPING, WF_PROB_DEPLETED);
+		log_workforce_problem(emp, room, CHORE_CHOPPING, WF_PROB_DEPLETED, FALSE);
 	}
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_CHOPPING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_CHOPPING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -1476,14 +1485,14 @@ void do_chore_digging(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_DIGGING);
+		mark_workforce_delay(emp, room, CHORE_DIGGING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_DIGGING, WF_PROB_DEPLETED);
+		log_workforce_problem(emp, room, CHORE_DIGGING, WF_PROB_DEPLETED, FALSE);
 	}
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_DIGGING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_DIGGING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -1555,7 +1564,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_BUILDING);
+		mark_workforce_delay(emp, room, CHORE_BUILDING, NOTHING);
 	}
 }
 
@@ -1582,7 +1591,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_DISMANTLE_MINES);
+		mark_workforce_delay(emp, room, CHORE_DISMANTLE_MINES, NOTHING);
 	}
 }
 
@@ -1666,16 +1675,16 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, chore);
+		mark_workforce_delay(emp, room, chore, any_over_limit ? WF_PROB_OVER_LIMIT : WF_PROB_NO_RESOURCES);
 	}
 	
 	// problem logging
 	if (!done_any) {
 		if (any_over_limit) {
-			log_workforce_problem(emp, room, chore, WF_PROB_OVER_LIMIT);
+			log_workforce_problem(emp, room, chore, WF_PROB_OVER_LIMIT, FALSE);
 		}
 		else {
-			log_workforce_problem(emp, room, chore, WF_PROB_NO_RESOURCES);
+			log_workforce_problem(emp, room, chore, WF_PROB_NO_RESOURCES, FALSE);
 		}
 	}
 }
@@ -1785,11 +1794,11 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_FARMING);
+		mark_workforce_delay(emp, room, CHORE_FARMING, WF_PROB_OVER_LIMIT);
 	}
 	
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_FARMING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_FARMING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -1872,14 +1881,14 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_HERB_GARDENING);
+		mark_workforce_delay(emp, room, CHORE_HERB_GARDENING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_DEPLETED);
+		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_DEPLETED, FALSE);
 	}
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -1956,14 +1965,14 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_MINING);
+		mark_workforce_delay(emp, room, CHORE_MINING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_MINING, WF_PROB_DEPLETED);
+		log_workforce_problem(emp, room, CHORE_MINING, WF_PROB_DEPLETED, FALSE);
 	}
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_MINING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_MINING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -1979,7 +1988,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 	
 	limit = empire_chore_limit(emp, islid, CHORE_MINTING);
 	if (EMPIRE_COINS(emp) >= MAX_COIN || (limit != WORKFORCE_UNLIMITED && EMPIRE_COINS(emp) >= limit)) {
-		log_workforce_problem(emp, room, CHORE_MINTING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_MINTING, WF_PROB_OVER_LIMIT, FALSE);
 		can_do = FALSE;
 	}
 	
@@ -2020,7 +2029,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 		else {
 			// nothing remains: mark for despawn
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			log_workforce_problem(emp, room, CHORE_MINTING, WF_PROB_NO_RESOURCES);
+			log_workforce_problem(emp, room, CHORE_MINTING, WF_PROB_NO_RESOURCES, FALSE);
 		}
 	}
 	else if (highest && can_do) {
@@ -2030,7 +2039,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_MINTING);
+		mark_workforce_delay(emp, room, CHORE_MINTING, WF_PROB_OVER_LIMIT);
 	}
 }
 
@@ -2061,14 +2070,14 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_NAILMAKING);
+		mark_workforce_delay(emp, room, CHORE_NAILMAKING, !has_metal ? WF_PROB_NO_RESOURCES : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (!has_metal) {
-		log_workforce_problem(emp, room, CHORE_NAILMAKING, WF_PROB_NO_RESOURCES);
+		log_workforce_problem(emp, room, CHORE_NAILMAKING, WF_PROB_NO_RESOURCES, FALSE);
 	}
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_NAILMAKING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_NAILMAKING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -2123,14 +2132,14 @@ void do_chore_quarrying(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_QUARRYING);
+		mark_workforce_delay(emp, room, CHORE_QUARRYING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_QUARRYING, WF_PROB_DEPLETED);
+		log_workforce_problem(emp, room, CHORE_QUARRYING, WF_PROB_DEPLETED, FALSE);
 	}
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_QUARRYING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_QUARRYING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -2200,15 +2209,15 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_SHEARING);
+		mark_workforce_delay(emp, room, CHORE_SHEARING, any_already_sheared ? WF_PROB_ALREADY_SHEARED : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (!done_any) {
 		if (any_already_sheared) {
-			log_workforce_problem(emp, room, CHORE_SHEARING, WF_PROB_ALREADY_SHEARED);
+			log_workforce_problem(emp, room, CHORE_SHEARING, WF_PROB_ALREADY_SHEARED, FALSE);
 		}
 		if (any_over_limit) {
-			log_workforce_problem(emp, room, CHORE_SHEARING, WF_PROB_OVER_LIMIT);
+			log_workforce_problem(emp, room, CHORE_SHEARING, WF_PROB_OVER_LIMIT, FALSE);
 		}
 	}
 	
@@ -2246,14 +2255,14 @@ void do_chore_trapping(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_TRAPPING);
+		mark_workforce_delay(emp, room, CHORE_TRAPPING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_TRAPPING, WF_PROB_DEPLETED);
+		log_workforce_problem(emp, room, CHORE_TRAPPING, WF_PROB_DEPLETED, FALSE);
 	}
 	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_TRAPPING, WF_PROB_OVER_LIMIT);
+		log_workforce_problem(emp, room, CHORE_TRAPPING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -2333,6 +2342,6 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	if (!can_do) {
-		log_workforce_problem(emp, IN_ROOM(veh), CHORE_REPAIR_VEHICLES, WF_PROB_NO_RESOURCES);
+		log_workforce_problem(emp, IN_ROOM(veh), CHORE_REPAIR_VEHICLES, WF_PROB_NO_RESOURCES, FALSE);
 	}
 }

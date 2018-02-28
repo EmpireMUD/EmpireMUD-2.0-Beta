@@ -4160,6 +4160,7 @@ struct empire_workforce_tracker {
 struct workforce_delay_chore {
 	int chore;
 	int time;
+	int problem;
 	struct workforce_delay_chore *next;
 };
 
@@ -4197,6 +4198,7 @@ struct workforce_log {
 	any_vnum loc;	// don't store room itself -- may not be in memory later
 	int chore;	// CHORE_ const
 	int problem;	// WF_PROB_ const
+	bool delayed;	// whether this is a delay-repeat or not
 	struct workforce_log *next;
 };
 
