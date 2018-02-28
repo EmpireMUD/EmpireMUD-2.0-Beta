@@ -1587,6 +1587,9 @@ Some possible reasons include:
  already sheared - Sheep sheared too recently.
  delayed - There was a recent problem and workforce must wait to resume.
 
+If a chore is marked "delayed", that means it failed on a previous attempt and
+hasn't tried again yet. Chores are delayed by a few hours when they fail.
+
 See also: WORKFORCE
 #
 $
