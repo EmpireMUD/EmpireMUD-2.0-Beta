@@ -1467,6 +1467,7 @@ Workforce, Skilled Labor (Empire abilities)
 Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
         workforce where [here]
+        workforce why [chore | location | here]
         workforce copy <island name>
 
 Once at least one member of an empire has the Workforce ability, the empire's
@@ -1506,7 +1507,7 @@ The Workforce ability gains experience when most workforce chores are done
 The Skilled Labor ability gains experience when skilled chores are done while
 you are online.
 
-See also: WORKFORCE CHORES, WORKFORCE WHERE, NO-WORK
+See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK
 #
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
@@ -1568,6 +1569,23 @@ This command will show you how many of your citizens are working on each
 active workforce chore right now.
 
 If you use the "here" argument, it will only check the island you're on.
+
+See also: WORKFORCE
+#
+"WORKFORCE WHY"
+
+Usage:  workforce why [chore]
+        workforce why [location | here]
+
+This command will tell you why your workforce didn't work during the last hour.
+
+Some possible reasons include:
+ no workers - Make sure there are available citizens within 20 tiles.
+ over limit - You have too much of what the chore would produce.
+ depleted - The location is temporarily depleted.
+ no resources - You are missing the items needed to build/craft.
+ already sheared - Sheep sheared too recently.
+ delayed - There was a recent problem and workforce must wait to resume.
 
 See also: WORKFORCE
 #

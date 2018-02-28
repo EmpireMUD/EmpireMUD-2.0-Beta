@@ -1001,14 +1001,16 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 *
 * @param empire_data *emp The empire to check.
 * @param char_data *ch The person checking.
+* @param char *argument Any more args.
 */
-void show_workforce_why(empire_data *emp, char_data *ch) {
+void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	extern const char *wf_problem_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], line[256];
+	int iter, only_chore = NOTHING;
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
-	int only_chore = NOTHING;
+	room_data *room;
 	size_t size;
 	
 	if (!ch->desc) {
@@ -1020,7 +1022,27 @@ void show_workforce_why(empire_data *emp, char_data *ch) {
 	}
 	
 	// argument handling
-	// TODO
+	skip_spaces(&argument);
+	if (*argument) {
+		for (iter = 0; iter < NUM_CHORES; ++iter) {	// find chore?
+			if (is_abbrev(argument, chore_data[iter].name)) {
+				only_chore = iter;
+				break;
+			}
+		}
+		if (only_chore == NOTHING) {	// find location?
+			if (!str_cmp(argument, "here")) {
+				only_loc = GET_ROOM_VNUM(IN_ROOM(ch));
+			}
+			else if ((room = find_target_room(ch, argument))) {
+				only_loc = GET_ROOM_VNUM(room);
+			}
+			else {
+				msg_to_char(ch, "Unknown argument '%s'. You can specify a chore or location.\r\n", argument);
+				return;
+			}
+		}
+	}
 	
 	// show all data
 	size = snprintf(buf, sizeof(buf), "Recent workforce problems:\r\n");
@@ -5841,7 +5863,7 @@ ACMD(do_workforce) {
 		show_workforce_where(emp, ch, here);
 	}
 	else if (!str_cmp(arg, "why")) {
-		show_workforce_why(emp, ch);
+		show_workforce_why(emp, ch, argument);
 	}
 	// everything below requires privileges
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
