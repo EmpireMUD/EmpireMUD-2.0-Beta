@@ -67,6 +67,7 @@ bool is_affiliated_island(empire_data *emp, int island_id);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+int sort_workforce_log(struct workforce_log *a, struct workforce_log *b);
 
 
 // einv helper type
@@ -1007,7 +1008,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	extern const char *wf_problem_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], line[256];
-	int iter, only_chore = NOTHING;
+	int iter, only_chore = NOTHING, last_chore, last_problem, count;
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
 	bool any = FALSE;
@@ -1025,6 +1026,8 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		msg_to_char(ch, "- The game may have rebooted recently and there is no data.\r\n");
 		return;
 	}
+	
+	LL_SORT(EMPIRE_WORKFORCE_LOG(emp), sort_workforce_log);
 	
 	// argument handling
 	skip_spaces(&argument);
@@ -1051,24 +1054,53 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	
 	// show all data
 	size = snprintf(buf, sizeof(buf), "Recent workforce problems:\r\n");
-	LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
-		if (only_loc != NOWHERE && only_loc != wf_log->loc) {
-			continue;	// not here
-		}
-		if (only_chore != NOTHING && only_chore != wf_log->chore) {
-			continue;	// wrong chore
-		}
+	
+	if (*argument) {	// normal display
+		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
+			if (only_loc != NOWHERE && only_loc != wf_log->loc) {
+				continue;	// not here
+			}
+			if (only_chore != NOTHING && only_chore != wf_log->chore) {
+				continue;	// wrong chore
+			}
 		
-		snprintf(line, sizeof(line), " (%*d, %*d) %s: %s%s\r\n", X_PRECISION, MAP_X_COORD(wf_log->loc), Y_PRECISION, MAP_Y_COORD(wf_log->loc), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
-		any = TRUE;
+			snprintf(line, sizeof(line), " (%*d, %*d) %s: %s%s\r\n", X_PRECISION, MAP_X_COORD(wf_log->loc), Y_PRECISION, MAP_Y_COORD(wf_log->loc), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
+			any = TRUE;
 		
-		if (strlen(line) + size < sizeof(buf)) {
-			strcat(buf, line);
-			size += strlen(line);
+			if (strlen(line) + size < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				snprintf(buf + size, sizeof(buf) - size, "***OVERFLOW***\r\n");
+				break;
+			}
 		}
-		else {
-			snprintf(buf + size, sizeof(buf) - size, "***OVERFLOW***\r\n");
-			break;
+	}
+	else {	// grouped display (no-arg)
+		last_chore = last_problem = NOTHING;	// init
+		any = TRUE;	// this is guaranteed for this mode
+		
+		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
+			// count similar
+			last_chore = wf_log->chore;
+			last_problem = wf_log->problem;
+			count = 1;
+			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem) {
+				++count;
+				wf_log = wf_log->next;	// advance past identical entries
+			}
+			
+			snprintf(line, sizeof(line), " %s: %s (%d)\r\n", chore_data[last_chore].name, wf_problem_types[last_problem], count);
+			
+			if (strlen(line) + size < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				snprintf(buf + size, sizeof(buf) - size, "***OVERFLOW***\r\n");
+				break;
+			}
 		}
 	}
 	
@@ -1121,6 +1153,20 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 	}
 	if (iter % 3 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 		msg_to_char(ch, "\r\n");
+	}
+}
+
+
+// simple sorter for workforce-why
+int sort_workforce_log(struct workforce_log *a, struct workforce_log *b) {
+	if (a->chore != b->chore) {
+		return a->chore - b->chore;
+	}
+	else if (a->problem != b->problem) {
+		return a->problem - b->problem;
+	}
+	else {	// just sort by coords
+		return b->loc - a->loc;
 	}
 }
 
