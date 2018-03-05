@@ -162,7 +162,9 @@ When using field - The variable returns:
       north, south, up, down, fore, aft (etc). The result is either:
       %room.north(vnum)% - vnum of room in direction
       %room.north(FLG)% - CLOSED LOCKED, etc.
-      %room.north(room)% - room variable for room in direction
+      %room.north(room)% - room variable for room in direction (may be inside
+         or on the map, depending on available exits and location)
+      %room.north(map)% - room variable for the map location in the dir
 &cid&0 - The unique id of the room.
 &cin_city&0 - For claimed land, true if the tile is in a city for the owner.
 &cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
