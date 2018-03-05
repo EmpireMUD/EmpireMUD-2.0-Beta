@@ -2134,13 +2134,13 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 			sprintbit(ex->exit_info ,exit_bits, str, TRUE);
 		}
 	}
-	else if (!ROOM_IS_CLOSED(room) && dir < NUM_2D_DIRS) {	// map dirs
+	else if ((!ROOM_IS_CLOSED(room) && dir < NUM_2D_DIRS) || (subfield && !str_cmp(subfield, "map"))) {	// map dirs
 		room_data *to_room = SHIFT_DIR(room, dir);
 		if (to_room && subfield && *subfield) {
 			if (!str_cmp(subfield, "vnum")) {
 				snprintf(str, slen, "%d", GET_ROOM_VNUM(to_room));
 			}
-			else if (!str_cmp(subfield, "room")) {
+			else if (!str_cmp(subfield, "room") || !str_cmp(subfield, "map")) {
 				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(to_room) + ROOM_ID_BASE);
 			}
 		}
