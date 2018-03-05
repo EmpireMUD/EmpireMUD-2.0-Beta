@@ -1067,7 +1067,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			snprintf(line, sizeof(line), " (%*d, %*d) %s: %s%s\r\n", X_PRECISION, MAP_X_COORD(wf_log->loc), Y_PRECISION, MAP_Y_COORD(wf_log->loc), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
 		
-			if (strlen(line) + size < sizeof(buf)) {
+			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
 				strcat(buf, line);
 				size += strlen(line);
 			}
@@ -1093,7 +1093,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			
 			snprintf(line, sizeof(line), " %s: %s (%d)\r\n", chore_data[last_chore].name, wf_problem_types[last_problem], count);
 			
-			if (strlen(line) + size < sizeof(buf)) {
+			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
 				strcat(buf, line);
 				size += strlen(line);
 			}
