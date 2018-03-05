@@ -2113,7 +2113,7 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 		return;
 	}
 
-	if ((ex = find_exit(room, dir))) {	// normal exit
+	if ((ex = find_exit(room, dir)) && (!subfield || str_cmp(subfield, "map"))) {	// normal exit
 		if (subfield && *subfield) {
 			if (!str_cmp(subfield, "vnum")) {
 				snprintf(str, slen, "%d", ex->to_room);
@@ -2134,7 +2134,7 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 			sprintbit(ex->exit_info ,exit_bits, str, TRUE);
 		}
 	}
-	else if ((!ROOM_IS_CLOSED(room) && dir < NUM_2D_DIRS) || (subfield && !str_cmp(subfield, "map"))) {	// map dirs
+	else if (dir < NUM_2D_DIRS && (!ROOM_IS_CLOSED(room) || !str_cmp(NULLSAFE(subfield), "map"))) {	// map dirs
 		room_data *to_room = SHIFT_DIR(room, dir);
 		if (to_room && subfield && *subfield) {
 			if (!str_cmp(subfield, "vnum")) {
