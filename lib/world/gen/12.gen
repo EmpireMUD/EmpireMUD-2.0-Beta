@@ -19,4 +19,11 @@ mana potion~
 T0
 Your mana potion cooldown has ended.~
 S
+#1273
+pain poison~
+4 0
+0 0 0 0
+T0
+You no longer feel the pain poison in your system.~
+S
 $

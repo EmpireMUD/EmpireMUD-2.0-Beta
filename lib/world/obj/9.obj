@@ -291,11 +291,11 @@ a quiver of imperium bodkin arrows~
 A quiver of imperium bodkin arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 8
+21 mo a 9
 60 1 0
 2 0
 A
-12 1 0
+12 -1 0
 C
 75 100
 S
@@ -305,11 +305,11 @@ a quiver of nocturnium channeling arrows~
 A quiver of nocturnium channeling arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 9
+21 mo a 10
 60 1 0
 2 0
 A
-24 1 0
+24 -1 0
 C
 75 100
 S
@@ -319,11 +319,11 @@ a quiver of flowing arrows~
 A quiver of flowing arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 10
+21 mo a 11
 40 1 0
 2 0
 A
-18 1 0
+18 -1 0
 C
 75 100
 S
@@ -333,11 +333,11 @@ a quiver of thunderclap arrows~
 A quiver of thunderclap arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 11
+21 mo a 12
 40 1 0
 2 0
 A
-17 1 0
+17 -1 0
 C
 75 100
 S
@@ -345,7 +345,7 @@ S
 arrows quiver bloodletter~
 a quiver of bloodletter arrows~
 A quiver of bloodletter arrows is lying here.~
-   You can use arrows from your inventory, if you have a bow equipped. 
+   You can use arrows from your inventory, if you have a bow equipped.
 Bloodletter arrows have a chance to cause bleeding on a successful hit.
 ~
 21 mo a 13

@@ -446,9 +446,13 @@ a vial of searing poison~
 A vial of searing poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-0 15 0
+26 0 a 5
+0 15 -1
 8 0
+C
+100 100
+R
+5130 0
 T 1264
 S
 #1265
@@ -457,9 +461,13 @@ a vial of weakness poison~
 A vial of weakness poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-1 15 0
+26 m a 6
+0 15 3004
 8 0
+A
+15 -1 0
+C
+100 100
 R
 5130 0
 S
@@ -469,9 +477,13 @@ a vial of exhaustion poison~
 A vial of exhaustion poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-2 15 0
+26 m a 5
+0 15 3004
 8 0
+A
+11 -1 0
+C
+100 100
 R
 5130 0
 S
@@ -481,9 +493,13 @@ a vial of brain drain poison~
 A vial of brain drain poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 3
-3 15 0
+26 m a 6
+0 15 3004
 8 0
+A
+16 -1 0
+C
+100 100
 R
 5130 0
 S
@@ -493,9 +509,13 @@ a vial of strength poison~
 A vial of strength poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 1
-5 15 0
+26 m a 5
+0 15 3004
 8 0
+A
+1 -1 0
+C
+100 100
 R
 5130 0
 S
@@ -505,9 +525,13 @@ a vial of dexterity poison~
 A vial of dexterity poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-6 15 0
+26 m a 4
+0 15 -1
 8 0
+A
+2 -1 0
+C
+100 100
 R
 5130 0
 S
@@ -517,9 +541,13 @@ a vial of charisma poison~
 A vial of charisma poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-7 15 0
+26 m a 4
+0 15 -1
 8 0
+A
+4 -1 0
+C
+100 100
 R
 5130 0
 S
@@ -529,9 +557,13 @@ a vial of intelligence poison~
 A vial of intelligence poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-8 15 0
+26 m a 4
+0 15 -1
 8 0
+A
+8 -1 0
+C
+100 100
 R
 5130 0
 S
@@ -541,9 +573,13 @@ a vial of wits poison~
 A vial of wits poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-9 15 0
+26 m a 4
+0 15 -1
 8 0
+A
+9 -1 0
+C
+100 100
 R
 5130 0
 S
@@ -553,11 +589,14 @@ a vial of pain poison~
 A vial of pain poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-11 15 0
+26 0 a 5
+0 15 -1
 8 0
+C
+100 100
 R
 5130 0
+T 1273
 S
 #1274
 vial poison slow~
@@ -565,9 +604,13 @@ a vial of slow poison~
 A vial of slow poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-12 15 0
+26 m a 4
+0 15 -1
 8 0
+B
+s
+C
+100 100
 R
 5130 0
 S
@@ -577,9 +620,13 @@ a vial of heartstop poison~
 A vial of heartstop poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 2
-13 15 0
+26 m a 4
+0 15 -1
 8 0
+B
+v
+C
+100 100
 R
 5130 0
 S
