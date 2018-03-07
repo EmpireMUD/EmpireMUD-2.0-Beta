@@ -2554,7 +2554,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (USING_AMMO(ch)) {
 		fprintf(fl, "Using Ammo: %d\n", USING_AMMO(ch));
 	}
-	if (USING_POISON(ch)) {
+	if (USING_POISON(ch) != NOTHING) {
 		fprintf(fl, "Using Poison: %d\n", USING_POISON(ch));
 	}
 	

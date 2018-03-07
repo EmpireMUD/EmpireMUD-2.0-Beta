@@ -154,9 +154,14 @@ a pouch of viper venom~
 A pouch of viper venom rests nearby.~
 This small pouch of viper venom could come in handy.
 ~
-26 0 a 2
-11 30 0
+26 m a 4
+0 15 -1
 7 0
+C
+125 125
+R
+5193 0
+T 1273
 S
 #11112
 pouch skink saliva~
@@ -164,9 +169,15 @@ a pouch of skink saliva~
 A pouch of skink saliva rests nearby.~
 This small pouch of skink saliva could come in handy.
 ~
-26 0 a 2
-1 30 0
+26 m a 3
+0 15 -1
 7 0
+A
+15 -1 0
+C
+125 125
+R
+5193 0
 S
 #11113
 stone glowing green serpent~

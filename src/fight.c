@@ -3194,7 +3194,7 @@ void heal(char_data *ch, char_data *vict, int amount) {
 */
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	void add_pursuit(char_data *ch, char_data *target);
-	extern int apply_poison(char_data *ch, char_data *vict, int type);
+	extern int apply_poison(char_data *ch, char_data *vict);
 	extern const double basic_speed;
 	
 	struct instance_data *inst;
@@ -3456,7 +3456,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			
 			// poison could kill too
 			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_POISON) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
-				if (!number(0, 1) && apply_poison(ch, victim, USING_POISON(ch)) < 0) {
+				if (!number(0, 1) && apply_poison(ch, victim) < 0) {
 					// dedz
 					result = -1;
 				}
@@ -3817,6 +3817,12 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		return;
 	}
 	
+	// update ammo
+	if (best) {
+		GET_OBJ_VAL(best, VAL_AMMO_QUANTITY) -= 1;
+		SET_BIT(GET_OBJ_EXTRA(best), OBJ_NO_STORE);	// can no longer be stored
+	}
+	
 	// compute
 	success = check_hit_vs_dodge(ch, vict, FALSE);
 	
@@ -3862,7 +3868,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 				}
 			
 				LL_FOREACH(GET_OBJ_APPLIES(best), apply) {
-					af = create_mod_aff(atype, 1, apply->location, -1 * apply->modifier, ch);
+					af = create_mod_aff(atype, 1, apply->location, apply->modifier, ch);
 					affect_to_char(vict, af);
 					free(af);
 				}
@@ -3925,7 +3931,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
 	if (purge && best) {
-		GET_OBJ_VAL(best, VAL_AMMO_QUANTITY) -= 1;
 		if (GET_AMMO_QUANTITY(best) <= 0) {
 			extract_obj(best);
 		}

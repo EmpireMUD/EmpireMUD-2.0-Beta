@@ -326,7 +326,6 @@ OLC_MODULE(oedit_maxlevel);
 OLC_MODULE(oedit_minlevel);
 OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
-OLC_MODULE(oedit_poison);
 OLC_MODULE(oedit_quantity);
 OLC_MODULE(oedit_quick_recipe);
 OLC_MODULE(oedit_recipe);
@@ -840,7 +839,6 @@ const struct olc_command_data olc_data[] = {
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "poison", oedit_poison, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "recipe", oedit_recipe, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "requiresquest", oedit_requiresquest, OLC_OBJECT, OLC_CF_EDITOR },

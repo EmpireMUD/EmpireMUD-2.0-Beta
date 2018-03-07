@@ -1746,6 +1746,18 @@ const char *trade_overunder[] = {
 };
 
 
+// WF_PROB_x: Workforce problem logging
+const char *wf_problem_types[] = {
+	"no workers",
+	"over limit",
+	"depleted",
+	"no resources",
+	"already sheared",
+	"delayed",
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// FACTION CONSTANTS ///////////////////////////////////////////////////////
 

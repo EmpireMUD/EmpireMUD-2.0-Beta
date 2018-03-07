@@ -1124,6 +1124,15 @@ typedef struct vehicle_data vehicle_data;
 #define MEMBERS_AND_ALLIES  2
 
 
+// WF_PROB_x: Workforce problem logging
+#define WF_PROB_NO_WORKERS  0	// no citizens available
+#define WF_PROB_OVER_LIMIT  1	// too many items
+#define WF_PROB_DEPLETED  2	// tile is out of resources
+#define WF_PROB_NO_RESOURCES  3	// nothing to craft/build with
+#define WF_PROB_ALREADY_SHEARED  4	// mob sheared too recently
+#define WF_PROB_DELAYED  5	// delayed by a previous failure
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT DEFINES ///////////////////////////////////////////////////////////
 
@@ -1561,6 +1570,7 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
@@ -3665,7 +3675,7 @@ struct player_special_data {
 	byte confused_dir;  // people without Navigation think this dir is north
 	char *disguised_name;	// verbatim copy of name -- grabs custom mob names and empire names
 	byte disguised_sex;	// sex of the mob you're disguised as
-	byte using_poison;	// poison preference for Stealth
+	any_vnum using_poison;	// poison preference for Stealth
 	any_vnum using_ammo;	// preferred ranged ammo
 
 	// mount info
@@ -3980,27 +3990,6 @@ struct material_data {
 };
 
 
-// see act.stealth.c
-struct poison_data_type {
-	char *name;
-	any_vnum tech;	// PTECH_ to use it
-	
-	any_vnum atype;	// ATYPE_
-	int apply;	// APPLY_
-	int mod;	// +/- value
-	bitvector_t aff;
-	
-	// dot affect
-	any_vnum dot_type;	// ATYPE_, -1 for none
-	int dot_duration;	// time for the dot
-	int dot_damage_type;	// DAM_ for the dot
-	int dot_damage;	// damage for the dot
-	int dot_max_stacks;	// how high the dot can stack
-	
-	bool allow_stack;	// whether or not it can stack
-};
-
-
 // for BREW_x
 struct tavern_data_type {
 	char *name;
@@ -4171,6 +4160,7 @@ struct empire_workforce_tracker {
 struct workforce_delay_chore {
 	int chore;
 	int time;
+	int problem;
 	struct workforce_delay_chore *next;
 };
 
@@ -4200,6 +4190,16 @@ struct offense_data {
 struct offense_info_type {
 	char *name;
 	int weight;	// how bad it is
+};
+
+
+// temporarily logs any errors that come up during workforce
+struct workforce_log {
+	any_vnum loc;	// don't store room itself -- may not be in memory later
+	int chore;	// CHORE_ const
+	int problem;	// WF_PROB_ const
+	bool delayed;	// whether this is a delay-repeat or not
+	struct workforce_log *next;
 };
 
 
@@ -4257,6 +4257,7 @@ struct empire_data {
 	int sort_value;	// for score ties
 	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
+	struct workforce_log *wf_log;	// errors with workforce
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them

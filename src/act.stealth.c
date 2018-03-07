@@ -41,8 +41,8 @@ extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 void scale_item_to_level(obj_data *obj, int level);
 
 // locals
-int apply_poison(char_data *ch, char_data *vict, int type);
-obj_data *find_poison_by_type(obj_data *list, int type);
+int apply_poison(char_data *ch, char_data *vict);
+obj_data *find_poison_by_vnum(obj_data *list, any_vnum vnum);
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 
@@ -344,125 +344,22 @@ bool valid_unseen_passing(room_data *room) {
  //////////////////////////////////////////////////////////////////////////////
 //// POISONS /////////////////////////////////////////////////////////////////
 
-#define POISONS_LINE_BREAK  { "*", NO_ABIL,  0, 0, 0, 0, 0, 0, 0, 0,	0, FALSE }
-
-// master potion data
-const struct poison_data_type poison_data[] = {
-
-	// WARNING: DO NOT CHANGE THE ORDER, ONLY ADD TO THE END
-	// The position in this array corresponds to obj val 0
-
-	{	// 0
-		"other", PTECH_POISON,
-		0, 0, 0, 0,	// no affect
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-
-	{	// 1
-		"weakness", PTECH_POISON,
-		ATYPE_POISON, APPLY_HEALTH, -25, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-
-	{	// 2
-		"exhaustion", PTECH_POISON,
-		ATYPE_POISON, APPLY_MOVE, -25, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-
-	{	// 3
-		"braindrain", PTECH_POISON,
-		ATYPE_POISON, APPLY_MANA, -25, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-	
-	POISONS_LINE_BREAK,	// 4
-	
-	{	// 5
-		"strength", PTECH_POISON,
-		ATYPE_POISON, APPLY_STRENGTH, -1, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-	
-	{	// 6
-		"dexterity", PTECH_POISON,
-		ATYPE_POISON, APPLY_DEXTERITY, -1, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-	
-	{	// 7
-		"charisma", PTECH_POISON,
-		ATYPE_POISON, APPLY_CHARISMA, -1, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-	
-	{	// 8
-		"intelligence", PTECH_POISON,
-		ATYPE_POISON, APPLY_INTELLIGENCE, -1, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-	
-	{	// 9
-		"wits", PTECH_POISON,
-		ATYPE_POISON, APPLY_WITS, -2, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-	
-	POISONS_LINE_BREAK,	// 10
-	
-	{	// 11
-		"pain", PTECH_POISON_UPGRADE,
-		0, 0, 0, 0,
-		ATYPE_POISON, 5, DAM_POISON, 2, 5,	// no dot
-		TRUE	// likely doubled due to deadly poisons
-	},
-	
-	{	// 12
-		"slow", PTECH_POISON_UPGRADE,
-		ATYPE_POISON, APPLY_NONE, 0, AFF_SLOW,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-	
-	{	// 13
-		"heartstop", PTECH_POISON_UPGRADE,
-		ATYPE_POISON, APPLY_NONE, 0, AFF_CANT_SPEND_BLOOD,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	},
-
-	// END
-	{
-		"\n", NO_ABIL,
-		0, 0, 0, 0,
-		0, 0, 0, 0, 0,	// no dot
-		FALSE
-	}
-};
-
-
 /**
-* finds a matching poison object in an object list
+* finds a matching poison object in an object list, preferring the one with the
+* fewest charges.
 *
 * @param obj_data *list ch->carrying, e.g.
-* @param int type any poison_data pos
+* @param any_vnum vnum The poison vnum to look for.
 * @return obj_data *the poison, if found
 */
-obj_data *find_poison_by_type(obj_data *list, int type) {
+obj_data *find_poison_by_vnum(obj_data *list, any_vnum vnum) {
 	obj_data *obj, *found = NULL;
 	
-	for (obj = list; obj && !found; obj = obj->next_content) {
-		if (GET_POISON_TYPE(obj) == type) {
-			found = obj;
+	LL_FOREACH2(list, obj, next_content) {
+		if (IS_POISON(obj) && GET_OBJ_VNUM(obj) == vnum) {
+			if (!found || GET_POISON_CHARGES(obj) < GET_POISON_CHARGES(found)) {
+				found = obj;
+			}
 		}
 	}
 	
@@ -474,41 +371,35 @@ obj_data *find_poison_by_type(obj_data *list, int type) {
 * Apply the actual effects of a poison. This also makes sure there's some
 * available, and manages the object.
 *
-* @param char_data *ch the person being poisoned
-* @param int type poison_data[] pos
+* @param char_data *ch the person doing the poisoning
+* @param char_data *vict the person being poisoned
 * @return -1 if poison killed the person, 0 if no hit at all, >0 if hit
 */
-int apply_poison(char_data *ch, char_data *vict, int type) {
-	obj_data *obj;
+int apply_poison(char_data *ch, char_data *vict) {
+	int aff_type = ATYPE_POISON, result = 0;
 	struct affected_type *af;
+	struct obj_apply *apply;
 	bool messaged = FALSE;
-	int result = 0;
+	obj_data *obj;
+	double mod;
 	
-	if (IS_NPC(ch) || type < 0) {
-		return 0;
-	}
-	
-	// has poison?
-	if (!(obj = find_poison_by_type(ch->carrying, type))) {
-		return 0;
-	}
-	
-	// ability check
-	if (poison_data[type].tech != NOTHING && !has_player_tech(ch, poison_data[type].tech)) {
-		return 0;
-	}
-
-	// stack check?
-	if (poison_data[type].atype > 0 && !poison_data[type].allow_stack && affected_by_spell_and_apply(vict, poison_data[type].atype, poison_data[type].apply)) {
+	if (IS_NPC(ch) || IS_GOD(vict) || IS_IMMORTAL(vict)) {
 		return 0;
 	}
 	
 	if (AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH)) {
-		return 0;
+		return 0;	// immune to stealth debuffs
 	}
 	
-	if (IS_GOD(vict) || IS_IMMORTAL(vict)) {
-		return 0;
+	if (!(obj = find_poison_by_vnum(ch->carrying, USING_POISON(ch)))) {
+		return 0;	// out of poison
+	}
+	
+	// update aff type
+	aff_type = GET_POISON_AFFECT(obj) != NOTHING ? GET_POISON_AFFECT(obj) : ATYPE_POTION;
+
+	if (affected_by_spell_from_caster(vict, aff_type, ch)) {
+		return 0;	// stack check: don't waste charges
 	}
 	
 	// GAIN SKILL NOW -- it at least attempts an application
@@ -522,8 +413,9 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 		return 0;
 	}
 	
-	// applied -- charge a charge
+	// applied -- charge a charge (can no longer be stored)
 	GET_OBJ_VAL(obj, VAL_POISON_CHARGES) -= 1;
+	SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
 	
 	// attempt immunity/resist
 	if (has_player_tech(vict, PTECH_NO_POISON)) {
@@ -547,33 +439,43 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 			return 0;
 		}
 	}
-
-	// atype
-	if (poison_data[type].atype > 0) {
-		
-		af = create_aff(poison_data[type].atype, 2 MUD_HOURS, poison_data[type].apply, poison_data[type].mod * (has_player_tech(ch, PTECH_POISON_UPGRADE) ? 2 : 1), poison_data[type].aff, ch);
-		affect_join(vict, af, poison_data[type].allow_stack ? (AVG_DURATION|ADD_MODIFIER) : 0);
-		
-		if (!messaged) {
-			act("You feel ill as you are poisoned!", FALSE, vict, NULL, NULL, TO_CHAR);
-			act("$n looks ill as $e is poisoned!", FALSE, vict, NULL, NULL, TO_ROOM);
-			messaged = TRUE;
-		}
-		
-		result = 1;
+	
+	// OK GO:
+	
+	mod = has_player_tech(ch, PTECH_POISON_UPGRADE) ? 1.5 : 1.0;
+	
+	// ensure scaled
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+		scale_item_to_level(obj, 1);	// minimum level
 	}
 	
-	// dot
-	if (poison_data[type].dot_type > 0) {
-		apply_dot_effect(vict, poison_data[type].dot_type, poison_data[type].dot_duration, poison_data[type].dot_damage_type, poison_data[type].dot_damage * (has_player_tech(ch, PTECH_POISON_UPGRADE) ? 2 : 1), poison_data[type].dot_max_stacks, ch);
+	// remove any old buffs (if adding a new one)
+	if (GET_OBJ_AFF_FLAGS(obj) || GET_OBJ_APPLIES(obj)) {
+		affect_from_char_by_caster(vict, aff_type, ch, FALSE);
+	}
+	
+	if (GET_OBJ_AFF_FLAGS(obj)) {
+		af = create_flag_aff(aff_type, 1 MUD_HOURS, GET_OBJ_AFF_FLAGS(obj), ch);
+		affect_to_char(vict, af);
+		free(af);
 		
 		if (!messaged) {
 			act("You feel ill as you are poisoned!", FALSE, vict, NULL, NULL, TO_CHAR);
 			act("$n looks ill as $e is poisoned!", FALSE, vict, NULL, NULL, TO_ROOM);
 			messaged = TRUE;
 		}
+	}
+	
+	LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
+		af = create_mod_aff(aff_type, 1 MUD_HOURS, apply->location, round(apply->modifier * mod), ch);
+		affect_to_char(vict, af);
+		free(af);
 		
-		result = 1;
+		if (!messaged) {
+			act("You feel ill as you are poisoned!", FALSE, vict, NULL, NULL, TO_CHAR);
+			act("$n looks ill as $e is poisoned!", FALSE, vict, NULL, NULL, TO_ROOM);
+			messaged = TRUE;
+		}
 	}
 	
 	// mark result if there's a consume trigger
@@ -592,6 +494,7 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 		}
 	}
 	
+	// either way
 	return result;
 }
 
@@ -603,21 +506,17 @@ int apply_poison(char_data *ch, char_data *vict, int type) {
 * @param obj_data *obj the poison
 */
 void use_poison(char_data *ch, obj_data *obj) {
-	int type = GET_POISON_TYPE(obj);
-	
-	if (!IS_POISON(obj)) {
+	if (!has_player_tech(ch, PTECH_POISON)) {
+		msg_to_char(ch, "You don't have the correct ability to use poisons.\r\n");
+	}
+	else if (!IS_POISON(obj)) {
 		// ??? shouldn't ever get here
 		act("$p isn't even a poison.", FALSE, ch, obj, NULL, TO_CHAR);
-		return;
 	}
-	
-	if (poison_data[type].tech != NOTHING && !has_player_tech(ch, poison_data[type].tech)) {
-		msg_to_char(ch, "You don't have the correct ability to use that poison.\r\n");
-		return;
+	else {
+		USING_POISON(ch) = GET_OBJ_VNUM(obj);
+		act("You are now using $p as your poison.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	
-	USING_POISON(ch) = type;
-	act("You are now using $p as your poison.", FALSE, ch, obj, NULL, TO_CHAR);
 }
 
 
@@ -689,7 +588,7 @@ ACMD(do_backstab) {
 
 			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL) > 0) {
 				if (has_player_tech(ch, PTECH_POISON)) {
-					if (!number(0, 1) && apply_poison(ch, vict, USING_POISON(ch)) < 0) {
+					if (!number(0, 1) && apply_poison(ch, vict) < 0) {
 						// dedz
 					}
 				}
@@ -1286,7 +1185,6 @@ ACMD(do_pickpocket) {
 ACMD(do_prick) {
 	char_data *vict = FIGHTING(ch);
 	int cost = 10;
-	int type = IS_NPC(ch) ? NOTHING : USING_POISON(ch);
 	
 	one_argument(argument, arg);
 
@@ -1305,7 +1203,7 @@ ACMD(do_prick) {
 	else if (!can_fight(ch, vict)) {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
 	}
-	else if (!find_poison_by_type(ch->carrying, type)) {
+	else if (!find_poison_by_vnum(ch->carrying, USING_POISON(ch))) {
 		msg_to_char(ch, "You seem to be out of poison.\r\n");
 	}
 	else if (GET_MOVE(ch) < cost) {
@@ -1329,7 +1227,7 @@ ACMD(do_prick) {
 		act("$n pricks $N with poison!", TRUE, ch, NULL, vict, TO_NOTVICT);
 
 		// possibly fatal
-		if (apply_poison(ch, vict, type) == 0) {
+		if (apply_poison(ch, vict) == 0) {
 			msg_to_char(ch, "It seems to have no effect.\r\n");
 		}
 		

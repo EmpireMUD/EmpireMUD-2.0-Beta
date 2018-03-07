@@ -52,7 +52,7 @@ D3
 .&j^&?..~
 &g~
 D4
-.^..~
+.&j^&?..~
 &0~
 E
 0 1 100.00 0
@@ -63,7 +63,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 10558 100.00 1  # CHOP: a spruce tree
 M
@@ -198,41 +198,41 @@ An Evergreen Forest~
 C
 chop, dig, gather, pick~
 D1
-&j^^&?..~
-&g~
+^^&g..~
+&j~
 D1
-.&j^^&?.~
-&g~
+&g.&?^^&g.~
+&j~
 D1
-..&j^^~
-&g~
+&g..&?^^~
+&j~
 D2
-&j^^&?..~
-&g~
+^^&g..~
+&j~
 D2
-.&j^^&?.~
-&g~
+&g.&?^^&g.~
+&j~
 D2
-..&j^^~
-&g~
+&g..&?^^~
+&j~
 D3
-&j^^&?..~
-&g~
+^^&g..~
+&j~
 D3
-.&j^^&?.~
-&g~
+&g.&?^^&g.~
+&j~
 D3
-..&j^^~
-&g~
+&g..&?^^~
+&j~
 D4
-^^..~
-&0~
+^^&0..~
+&j~
 D4
-.^^.~
-&0~
+&0.&?^^&0.~
+&j~
 D4
-..^^~
-&0~
+&0..&?^^~
+&j~
 E
 0 1 100.00 10562
 E
@@ -242,7 +242,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 10558 100.00 1  # CHOP: a spruce tree
 M
@@ -349,17 +349,17 @@ An Overgrown Evergreen Forest~
 C
 chop, dig, gather, pick~
 D1
-&j^^&?.&j^~
-&g~
+^^&g.&?^~
+&j~
 D2
-&j^^&?.&j^~
-&g~
+^^&g.&?^~
+&j~
 D3
-&j^^&?.&j^~
-&g~
+^^&g.&?^~
+&j~
 D4
-^^.^~
-&0~
+^^&0.&?^~
+&j~
 E
 0 1 100.00 10563
 E
@@ -369,7 +369,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 10558 100.00 1  # CHOP: a spruce tree
 M
@@ -474,13 +474,13 @@ D3
 &j~
 D4
 ^^^^~
-&0~
+&j~
 E
 0 1 100.00 10564
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 10558 100.00 1  # CHOP: a spruce tree
 M

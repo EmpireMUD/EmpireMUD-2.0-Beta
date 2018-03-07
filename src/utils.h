@@ -549,6 +549,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_ISLANDS(emp)  ((emp)->islands)
 #define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
 #define EMPIRE_OFFENSES(emp)  ((emp)->offenses)
+#define EMPIRE_WORKFORCE_LOG(emp)  ((emp)->wf_log)
 
 // helpers
 #define EMPIRE_ADMIN_FLAGGED(emp, flag)  IS_SET(EMPIRE_ADMIN_FLAGS(emp), (flag))
@@ -852,10 +853,10 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // ITEM_POISON
 #define IS_POISON(obj)  (GET_OBJ_TYPE(obj) == ITEM_POISON)
-#define VAL_POISON_TYPE  0
 #define VAL_POISON_CHARGES  1
-#define GET_POISON_TYPE(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_TYPE) : NOTHING)
+#define VAL_POISON_AFFECT  2
 #define GET_POISON_CHARGES(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_CHARGES) : 0)
+#define GET_POISON_AFFECT(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_AFFECT) : NOTHING)
 
 // ITEM_RECIPE
 #define IS_RECIPE(obj)  (GET_OBJ_TYPE(obj) == ITEM_RECIPE)

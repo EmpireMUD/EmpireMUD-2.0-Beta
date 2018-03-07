@@ -622,13 +622,14 @@ a vial of pepper spray~
 A glass vial of pepper spray has been left here.~
 This small glass vial is filled with a bright red fluid that sizzles slightly.
 ~
-26 0 a 10
-11 15 0
+26 0 a 13
+0 15 -1
 8 0
 C
-0 100
+125 125
 R
 5130 0
+T 1273
 S
 #3333
 jerky spicy pouch~

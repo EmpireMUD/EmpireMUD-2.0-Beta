@@ -2113,7 +2113,7 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 		return;
 	}
 
-	if ((ex = find_exit(room, dir))) {	// normal exit
+	if ((ex = find_exit(room, dir)) && (!subfield || str_cmp(subfield, "map"))) {	// normal exit
 		if (subfield && *subfield) {
 			if (!str_cmp(subfield, "vnum")) {
 				snprintf(str, slen, "%d", ex->to_room);
@@ -2134,13 +2134,13 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 			sprintbit(ex->exit_info ,exit_bits, str, TRUE);
 		}
 	}
-	else if (!ROOM_IS_CLOSED(room) && dir < NUM_2D_DIRS) {	// map dirs
+	else if (dir < NUM_2D_DIRS && (!ROOM_IS_CLOSED(room) || !str_cmp(NULLSAFE(subfield), "map"))) {	// map dirs
 		room_data *to_room = SHIFT_DIR(room, dir);
 		if (to_room && subfield && *subfield) {
 			if (!str_cmp(subfield, "vnum")) {
 				snprintf(str, slen, "%d", GET_ROOM_VNUM(to_room));
 			}
-			else if (!str_cmp(subfield, "room")) {
+			else if (!str_cmp(subfield, "room") || !str_cmp(subfield, "map")) {
 				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(to_room) + ROOM_ID_BASE);
 			}
 		}
@@ -3255,6 +3255,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						// all other cases...
 						if (*str != '1') {							
 							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "has_tech")) {
+						if (subfield && *subfield) {
+							extern const char *player_tech_types[];
+							int pos;
+							
+							if ((pos = search_block(subfield, player_tech_types, FALSE)) != NOTHING) {
+								snprintf(str, slen, "%d", has_player_tech(c, pos) ? 1 : 0);
+							}
+							else {
+								*str = '\0';
+							}
+						}
+						else {
+							*str = '\0';
 						}
 					}
 					

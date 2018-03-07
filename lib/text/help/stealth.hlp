@@ -279,7 +279,8 @@ correct poison. Each time your weapon hits your opponent, you have a chance to
 envenom them with your chosen poison. When the vial runs out of poison, it will
 be removed from your inventory.
 
-All vials have 15 charges. Deadly Poisons doubles the effects of most poisons.
+All vials have 15 charges. The Deadly Poisons ability makes all your poisons
+50% more powerful (when the poison is applied; you won't see it on identify).
 Poisons only work with sharp weapons. Poisons also count as Stealth debuffs,
 and some NPCs are immune.
 
@@ -288,20 +289,15 @@ is resisted. You need to have these abilities in order both to create and to
 use the poisons.
 
 Basic Poisons:
-  searing  +5 damage
-  weakness  -25 health
-  exhaustion  -25 move
-  braindrain  -25 mana
-  strength  -1 strength
-  dexterity  -1 dexterity
-  charisma  -1 charisma
-  intelligence  -1 intelligence
-  wits  -2 wits
+  searing  (deals more damage)         weakness  (lowers max health)
+  exhaustion  (lowers max moves)       braindrain  (lowers max mana)
+  strength                             dexterity
+  charisma                             intelligence 
+  wits
 
 Deadly Poisons:
-  pain  4 damage-over-time
-  slow  slower combat rate
-  heartstop  vampires can't spend blood
+  pain  (deals damage over time)       slow  (slower attacks and movement)
+  heartstop  (vampires can't spend blood)
 
 See also: CRAFTING LEVEL, RESIST POISON, RESOURCES, KEEP, CRAFT INFO, RECIPES
 #

@@ -2598,6 +2598,12 @@ EVENTFUNC(check_unload_room) {
 	// grab data but don't free
 	room = data->room;
 	
+	if (!room) {	// somehow
+		log("SYSERR: check_unload_room called with null room");
+		free(data);
+		return 0;
+	}
+	
 	if (CAN_UNLOAD_MAP_ROOM(room)) {
 		free(data);
 		ROOM_UNLOAD_EVENT(room) = NULL;

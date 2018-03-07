@@ -4094,7 +4094,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
-	extern const struct poison_data_type poison_data[];
 	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	int found;
@@ -4197,7 +4196,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_POISON: {
-			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
+			msg_to_char(ch, "Poison affect type: [%d] %s\r\n", GET_POISON_AFFECT(j), GET_POISON_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POISON_AFFECT(j)) : "not custom");
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
 			break;
 		}
