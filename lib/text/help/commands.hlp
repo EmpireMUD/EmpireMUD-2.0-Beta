@@ -353,6 +353,10 @@ Usage:  chart <island>
 
 This command shows you information about any island.
 
+If any land is claimed, the three empires with the most claims are listed
+(in descending order). All empires with cities are listed below that, although
+only one city is listed per empire. Outposts are not listed.
+
 See also: ISLANDS, SURVEY
 #
 CIRCLE
