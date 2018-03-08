@@ -258,7 +258,7 @@ void chart_add_city(struct chart_territory **hash, empire_data *emp, struct empi
 	}
 	
 	// is it the largest city?
-	if (!ct->largest_city || city_type[ct->largest_city->type].radius > city_type[city->type].radius) {
+	if (!ct->largest_city || city_type[ct->largest_city->type].radius < city_type[city->type].radius) {
 		ct->largest_city = city;
 	}
 }
@@ -2061,7 +2061,7 @@ ACMD(do_chart) {
 			num = 0;
 			HASH_ITER(hh, hash, citer, next_citer) {
 				msg_to_char(ch, "%s%s%s\t0", (num > 0 ? ", " : ""), EMPIRE_BANNER(citer->emp), EMPIRE_NAME(citer->emp));
-				if (++num > 3) {
+				if (++num >= 3) {
 					break;
 				}
 			}
@@ -2082,10 +2082,10 @@ ACMD(do_chart) {
 			}
 			
 			if (has_player_tech(ch, PTECH_NAVIGATION)) {
-				msg_to_char(ch, " The %s%s\t %s of %s (%d, %d)\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name, X_COORD(citer->largest_city->location), Y_COORD(citer->largest_city->location));
+				msg_to_char(ch, " The %s%s\t0 %s of %s (%d, %d)\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name, X_COORD(citer->largest_city->location), Y_COORD(citer->largest_city->location));
 			}
 			else {
-				msg_to_char(ch, " The %s%s\t %s of %s\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name);
+				msg_to_char(ch, " The %s%s\t0 %s of %s\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name);
 			}
 		}
 		
