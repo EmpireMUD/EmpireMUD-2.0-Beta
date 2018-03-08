@@ -2039,8 +2039,10 @@ ACMD(do_chart) {
 				continue;
 			}
 			
-			chart_add_territory(&hash, emp, e_isle->territory[TER_TOTAL]);
-			total_claims += e_isle->territory[TER_TOTAL];
+			if (e_isle->territory[TER_TOTAL] > 0) {
+				chart_add_territory(&hash, emp, e_isle->territory[TER_TOTAL]);
+				total_claims += e_isle->territory[TER_TOTAL];
+			}
 			
 			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 				if (GET_ISLAND(city->location) != isle) {
