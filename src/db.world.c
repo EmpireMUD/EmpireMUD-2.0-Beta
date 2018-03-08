@@ -3112,6 +3112,11 @@ void schedule_check_unload(room_data *room, bool offset) {
 	struct room_event_data *data;
 	double mins;
 	
+	if (!room) {	// somehow
+		log("SYSERR: schedule_check_unload called with null room");
+		return;
+	}
+	
 	if (!ROOM_UNLOAD_EVENT(room)) {
 		CREATE(data, struct room_event_data, 1);
 		data->room = room;
