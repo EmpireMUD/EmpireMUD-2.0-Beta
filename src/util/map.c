@@ -20,15 +20,11 @@
 *  2. run ./map
 *  2a. you may have to "chmod u+x map" to run it
 *  2b. you may need to raise the stack size limit: ulimit -s <limit>
-*  2c. this will generate new .wld files and a new index -- you must to delete
-*      your lib/world/base_map file or it will combine with your new .wld files
+*  2c. this will generate new .wld files, a new index, and a new base_map
 *  3. make sure the stats output looks good
 *  4. you can use the map.txt data file with your map.php image generator to
 *     see if the world looks good to you
 *  5. when you're happy with it, start up the mud
-*
-*  NOTE: A new version of the map generator which creates the base_map file
-*  itself is planned for EmpireMUD 2.0b5.
 *
 * Bonus feature: shift an existing map east/west
 *  1. generate a new map (do NOT use this on a live game map)
@@ -92,7 +88,7 @@ struct island_def {
 * result in continents that are broken up.
 */
 struct island_def continents[] = {
-	// min-radius, max-radius, cluster-distance, cluster-size
+	// min-radius, max-radius, cluster-distance, cluster-size, { x-min, x-max, y-min, y-max }
 	{ 30, 60, 55, 40, { 0, 100, 10, 33 } },	// 40 clusters of 30-60 radius clumps, each up to 55 tiles apart.
 	{ 30, 60, 55, 40, { 0, 100, 66, 90 } },	// repeated 3 times
 	{ 30, 60, 55, 40, { 0, 100, 33, 66 } },
