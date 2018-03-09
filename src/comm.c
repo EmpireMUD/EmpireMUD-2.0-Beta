@@ -3242,7 +3242,16 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'a': {	// action
-					strcpy(i, action_data[!IS_NPC(ch) ? GET_ACTION(ch) : ACT_NONE].name);
+					if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
+						strcpy(i, action_data[GET_ACTION(ch)].name);
+					}
+					else if (GET_FEEDING_FROM(ch)) {
+						strcpy(i, "feeding");
+					}
+					else {
+						*i = '\0';
+					}
+					
 					tmp = i;
 					break;
 				}
