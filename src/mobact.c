@@ -467,7 +467,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	// overrides: things that cancel previous oks
 	
 	// non-humans won't enter buildings
-	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE)) {
+	if (!MOB_FLAGGED(mob, MOB_HUMAN) && ROOM_IS_CLOSED(to_room) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE)) {
 		ok = FALSE;
 	}
 	
