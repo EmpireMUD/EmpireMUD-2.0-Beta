@@ -654,7 +654,7 @@ ACMD(do_entangle) {
 		af = create_aff(ATYPE_ENTANGLE, 6, APPLY_DEXTERITY, -1, AFF_ENTANGLED, ch);
 		affect_join(vict, af, 0);
 
-		engage_combat(ch, vict, FALSE);
+		engage_combat(ch, vict, TRUE);
 		
 		// release other entangleds here
 		limit_crowd_control(vict, ATYPE_ENTANGLE);
@@ -1374,7 +1374,7 @@ ACMD(do_skybrand) {
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
 		
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, dmg, 3, ch);
-		engage_combat(ch, vict, FALSE);
+		engage_combat(ch, vict, TRUE);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {
