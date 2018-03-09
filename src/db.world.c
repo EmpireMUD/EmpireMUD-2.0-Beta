@@ -598,17 +598,13 @@ void delete_room(room_data *room, bool check_exits) {
 void fill_trench(room_data *room) {	
 	char lbuf[MAX_INPUT_LENGTH];
 	struct evolution_data *evo;
-	sector_data *base;
 	
 	if ((evo = get_evolution_by_type(SECT(room), EVO_TRENCH_FULL)) != NULL) {
 		if (ROOM_PEOPLE(room)) {
 			sprintf(lbuf, "The trench is full! It is now a %s!", GET_SECT_NAME(sector_proto(evo->becomes)));
 			act(lbuf, FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 		}
-		
-		base = BASE_SECT(room);
 		change_terrain(room, evo->becomes);
-		change_base_sector(room, base);	// preserve base sect
 		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME);
 	}
 }
@@ -769,9 +765,9 @@ void untrench_room(room_data *room) {
 	stop_room_action(room, ACT_EXCAVATING, NOTHING);
 	
 	map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
-	if (SECT(room) !=  map->base_sector) {
+	if (SECT(room) !=  map->natural_sector) {
 		// return to nature
-		to_sect = map->base_sector;
+		to_sect = map->natural_sector;
 	}
 	else {
 		// de-evolve sect

@@ -2227,7 +2227,7 @@ void process_siring(char_data *ch) {
 * @param char_data *ch The person trying to fill in.
 */
 void process_start_fillin(char_data *ch) {
-	sector_data *old_sect, *base;
+	sector_data *old_sect;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
 		// someone already finished the start-fillin
@@ -2265,9 +2265,7 @@ void process_start_fillin(char_data *ch) {
 		msg_to_char(ch, "You block off the water and begin to fill in the trench.\r\n");
 		
 		// set it up
-		base = BASE_SECT(IN_ROOM(ch));
 		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(old_sect));
-		change_base_sector(IN_ROOM(ch), base);	// preserve base
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
 	}
 	else {
@@ -2519,7 +2517,6 @@ ACMD(do_excavate) {
 	extern bool is_entrance(room_data *room);
 	
 	struct evolution_data *evo;
-	sector_data *original_sect;
 	
 	if (GET_ACTION(ch) == ACT_EXCAVATING) {
 		msg_to_char(ch, "You stop the excavation.\r\n");
@@ -2571,10 +2568,7 @@ ACMD(do_excavate) {
 		act("$n begins excavating a trench.", FALSE, ch, 0, 0, TO_ROOM);
 
 		// Set up the trench
-		original_sect = SECT(IN_ROOM(ch));
 		change_terrain(IN_ROOM(ch), evo->becomes);
-		change_base_sector(IN_ROOM(ch), original_sect);	// preserve this for un-trenching
-		
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_initial_value"));
 	}
 }
