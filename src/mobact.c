@@ -466,8 +466,8 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	
 	// overrides: things that cancel previous oks
 	
-	// non-humans won't enter buildings
-	if (!MOB_FLAGGED(mob, MOB_HUMAN) && ROOM_IS_CLOSED(to_room) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE)) {
+	// non-humans won't enter buildings (open buildings only count if finished)
+	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE) && (!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) || IS_COMPLETE(to_room))) {
 		ok = FALSE;
 	}
 	
@@ -542,8 +542,8 @@ bool try_mobile_movement(char_data *ch) {
 				to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
 				
 				if (to_room && mob_can_move_to_sect(ch, to_room) && ROOM_PRIVATE_OWNER(to_room) == NOBODY) {
-					// this IF comes from act.movement and really needs to be generalized
-					if (!IS_COMPLETE(to_room) || (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))) {
+					// check building and entrances
+					if ((!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) && !IS_COMPLETE(to_room)) || (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))) {
 						// can't go that way
 					}
 					else if (validate_mobile_move(ch, dir, to_room)) {
