@@ -2581,14 +2581,15 @@ void abandon_room(room_data *room) {
 		clear_private_owner(ROOM_PRIVATE_OWNER(room));
 	}
 	
-	perform_abandon_room(room);
-	
 	// inside
 	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 		if (HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
 	}
+	
+	// do room itself last -- this fixes a bug where citizens weren't deducted because the home room was already abandoned
+	perform_abandon_room(room);
 }
 
 
