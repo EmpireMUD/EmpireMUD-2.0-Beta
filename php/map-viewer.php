@@ -84,6 +84,7 @@ body {
 	border-right: 1px solid red;
 	width: <?= 100 * $scale ?>px;
 	height: <?= $height ?>px;
+	z-index: 5;
 }
 
 .hor {
@@ -93,6 +94,7 @@ body {
 	border-bottom: 1px solid red;
 	width: <?= $width ?>px;
 	height: <?= 100 * $scale ?>px;
+	z-index: 5;
 }
 
 .equator {
@@ -142,6 +144,7 @@ body {
 	border: 1px outset gray;
 	display: none;
 	cursor: default;
+	z-index: 10;
 }
 
 </style>
