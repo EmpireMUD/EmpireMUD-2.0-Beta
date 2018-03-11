@@ -1514,7 +1514,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Set the last name to what (or \"off\")?\r\n");
 			return 0;
 		}
-		else if (!str_cmp(val_arg, "off")) {
+		else if (!strcmp(val_arg, "off") || !strcmp(val_arg, "none")) {
 			if (GET_LASTNAME(vict) != NULL)
 				free(GET_LASTNAME(vict));
 			GET_LASTNAME(vict) = NULL;
