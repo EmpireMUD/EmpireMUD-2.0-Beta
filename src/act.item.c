@@ -2007,8 +2007,8 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 		if (sd->from_island != from_island || sd->to_island != to_island) {
 			continue;
 		}
-		if (sd->status != SHIPPING_QUEUED) {
-			continue;
+		if (sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) {
+			continue;	// can combine only with those 2
 		}
 		
 		// found one to add to!
@@ -2371,7 +2371,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 		newd->amount = shipd->amount - (size_avail - capacity);	// only what's left
 		newd->from_island = shipd->from_island;
 		newd->to_island = shipd->to_island;
-		newd->status = SHIPPING_QUEUED;
+		newd->status = SHIPPING_WAITING_FOR_SHIP;	// at this point, definitely waiting
 		newd->status_time = shipd->status_time;
 		newd->ship_origin = NOWHERE;
 		newd->shipping_id = -1;
@@ -2460,7 +2460,8 @@ void process_shipping_one(empire_data *emp) {
 		next_shipd = shipd->next;
 		
 		switch (shipd->status) {
-			case SHIPPING_QUEUED: {
+			case SHIPPING_QUEUED:	// both these are 'waiting' states
+			case SHIPPING_WAITING_FOR_SHIP: {
 				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island) {
 					// attempt to find a(nother) ship
 					last_ship = find_free_ship(emp, shipd);
@@ -2480,6 +2481,9 @@ void process_shipping_one(empire_data *emp) {
 						sail_shipment(emp, last_ship);
 						last_ship = NULL;
 					}
+				}
+				else {	// did not find a ship
+					shipd->status = SHIPPING_WAITING_FOR_SHIP;
 				}
 				break;
 			}
@@ -2502,7 +2506,7 @@ void process_shipping_one(empire_data *emp) {
 	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
 		next_shipd = shipd->next;
 		
-		if (shipd->status == SHIPPING_QUEUED && shipd->shipping_id != -1) {
+		if ((shipd->status == SHIPPING_QUEUED || shipd->status == SHIPPING_WAITING_FOR_SHIP) && shipd->shipping_id != -1) {
 			vehicle_data *boat = find_ship_by_shipping_id(emp, shipd->shipping_id);
 			if (boat) {
 				sail_shipment(emp, boat);
@@ -5550,7 +5554,7 @@ ACMD(do_ship) {
 	size_t size;
 	
 	// SHIPPING_x
-	const char *status_type[] = { "waiting for ship", "en route", "delivered", "\n" };
+	const char *status_type[] = { "preparing", "en route", "delivered", "waiting for ship", "\n" };
 	
 	argument = any_one_word(argument, arg1);	// command
 	argument = any_one_word(argument, arg2);	// number or keywords
@@ -5642,7 +5646,7 @@ ACMD(do_ship) {
 		// find a matching entry
 		done = FALSE;
 		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
-			if (sd->status != SHIPPING_QUEUED || sd->shipping_id != -1) {
+			if ((sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) || sd->shipping_id != -1) {
 				continue;	// never cancel one in progress
 			}
 			if (sd->from_island != GET_ISLAND_ID(IN_ROOM(ch))) {

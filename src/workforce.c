@@ -348,7 +348,7 @@ static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_v
 			if (shipd->vnum == vnum) {
 				SAFE_ADD(tt->total_amount, shipd->amount, 0, INT_MAX, FALSE);
 				
-				if (shipd->status == SHIPPING_QUEUED) {
+				if (shipd->status == SHIPPING_QUEUED || shipd->status == SHIPPING_WAITING_FOR_SHIP) {
 					isle = ewt_find_island(tt, shipd->from_island);
 					SAFE_ADD(isle->amount, shipd->amount, 0, INT_MAX, FALSE);
 				}
