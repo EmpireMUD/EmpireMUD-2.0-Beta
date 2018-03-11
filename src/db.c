@@ -1887,6 +1887,7 @@ const char *versions_list[] = {
 	"b5.20",
 	"b5.23",
 	"b5.24",
+	"b5.25",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3000,6 +3001,27 @@ void b5_24_poison_update(void) {
 }
 
 
+// sets dummy data on existing trenches/canals to prevent issues with new un-trenching code on existing games
+void b5_25_trench_update(void) {
+	struct map_data *map;
+	int count = 0;
+	
+	any_vnum canal = 19;
+	
+	log("Applying b5.25 trench update...");
+	
+	LL_FOREACH(land_map, map) {
+		if (GET_SECT_VNUM(map->sector_type) == canal || GET_SECT_VNUM(map->base_sector) == canal || SECT_FLAGGED(map->sector_type, SECTF_IS_TRENCH) || SECT_FLAGGED(map->base_sector, SECTF_IS_TRENCH)) {
+			// set this to NOTHING since we don't know the original type, and '0' would result in all trenches un-trenching to plains
+			set_extra_data(&map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR, NOTHING);
+			++count;
+		}
+	}
+	
+	log("- updated %d tile%s", count, PLURAL(count));
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3239,6 +3261,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.24")) {
 			b5_24_poison_update();
+		}
+		if (MATCH_VERSION("b5.25")) {
+			b5_25_trench_update();
 		}
 	}
 	

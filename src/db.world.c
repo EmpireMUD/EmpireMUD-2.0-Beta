@@ -765,18 +765,25 @@ void untrench_room(room_data *room) {
 	stop_room_action(room, ACT_EXCAVATING, NOTHING);
 	
 	map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
-	if (SECT(room) !=  map->natural_sector) {
-		// return to nature
-		to_sect = map->natural_sector;
-	}
-	else {
-		// de-evolve sect
-		to_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_TRENCH_START);
+	
+	to_sect = sector_proto(get_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR));
+	
+	if (!to_sect) {	// backup plan
+		if (SECT(room) != map->natural_sector) {
+			// return to nature
+			to_sect = map->natural_sector;
+		}
+		else {
+			// de-evolve sect
+			to_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_TRENCH_START);
+		}
 	}
 	
 	if (to_sect) {
 		change_terrain(room, GET_SECT_VNUM(to_sect));
 	}
+	
+	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 }
 
 
@@ -1179,6 +1186,9 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		if (ROOM_PEOPLE(room)) {
 			act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
+		
+		// no longer need this
+		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 	}
 	else {
 		perform_change_sect(NULL, tile, tile->natural_sector);
@@ -1191,6 +1201,9 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		else {
 			tile->crop_type = NULL;
 		}
+		
+		// no longer need this
+		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 	}
 	
 	return 1;

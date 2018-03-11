@@ -2330,6 +2330,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_CEDED  16	// used to mark that a room was ceded to someone and never used by the empire, to prevent cede+steal
 #define ROOM_EXTRA_MINE_GLB_VNUM  17
 #define ROOM_EXTRA_TRENCH_FILL_TIME  18  // when the trench will be filled
+#define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
 
 
 // number of different appearances

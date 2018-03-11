@@ -2517,6 +2517,7 @@ ACMD(do_excavate) {
 	extern bool is_entrance(room_data *room);
 	
 	struct evolution_data *evo;
+	sector_data *orig;
 	
 	if (GET_ACTION(ch) == ACT_EXCAVATING) {
 		msg_to_char(ch, "You stop the excavation.\r\n");
@@ -2568,8 +2569,11 @@ ACMD(do_excavate) {
 		act("$n begins excavating a trench.", FALSE, ch, 0, 0, TO_ROOM);
 
 		// Set up the trench
+		orig = SECT(IN_ROOM(ch));
 		change_terrain(IN_ROOM(ch), evo->becomes);
+		
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_initial_value"));
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR, GET_SECT_VNUM(orig));
 	}
 }
 
