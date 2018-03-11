@@ -5645,18 +5645,26 @@ ACMD(do_roster) {
 	bool timed_out, is_file = FALSE;
 	int days, hours, size;
 	char_data *member;
-	bool all = FALSE;
+	bool all = FALSE, imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	
+	skip_spaces(&argument);
 	
 	// imm usage: roster ["empire"] [all]
 	// mortal usage: roster [all]
 	
+	// override for imm args: roster <empire> (with no quotes and no -all)
+	if (imm_access && (e = get_empire_by_name(argument))) {
+		*argument = '\0';	// clear further args and accept the empire name as-is
+	}
+	
+	// normal arg processing
 	while (*argument) {
 		argument = any_one_word(argument, arg);
 		
 		if (!str_cmp(arg, "all") || is_abbrev(arg, "-all")) {
 			all = TRUE;
 		}
-		else if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
+		else if (*arg && imm_access) {
 			if (!(e = get_empire_by_name(arg))) {
 				msg_to_char(ch, "Unknown empire.\r\n");
 				return;
