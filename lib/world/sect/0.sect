@@ -2966,16 +2966,28 @@ A Forest, Above the Riverbank~
 C
 chop, dig, gather, pick~
 D1
-@w&?^^@e~
-&g~
+@w&g^&?.@e~
+&t~
+D1
+@w&?.&g^@e~
+&t~
 D2
-@w&?^^@e~
-&g~
+@w&g^&?.@e~
+&t~
+D2
+@w&?.&g^@e~
+&t~
 D3
-@w&?^^@e~
-&y~
+@w&y^&?.@e~
+&t~
+D3
+@w&?.&y^@e~
+&t~
 D4
-@w&?YY@e~
+@w&?Y.@e~
+&0~
+D4
+@w&?.Y@e~
 &0~
 E
 0 0 100.00 44
