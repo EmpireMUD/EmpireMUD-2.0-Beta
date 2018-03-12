@@ -22,6 +22,9 @@ end
 if %room.sector_vnum% >= 1 && %room.sector_vnum% <= 4
   nop %self.add_mob_flag(SENTINEL)%
   eval new_sector %room.sector_vnum% - 1
+  if %new_sector% == 0
+    set new_sector 18100
+  end
   %terraform% %room% %new_sector%
   eval logs %logs% + 1
   if %room.sector_vnum% == 1
