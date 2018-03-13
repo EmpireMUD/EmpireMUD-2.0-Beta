@@ -2548,7 +2548,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	size_t size, lsize;
 	vehicle_data *veh;
 	crop_data *crop;
-	bool ok;
+	bool ok, claimed, unclaimed;
 	
 	skip_spaces(&argument);
 	
@@ -2565,6 +2565,8 @@ void scan_for_tile(char_data *ch, char *argument) {
 	}
 
 	mapsize = get_map_radius(ch);
+	claimed = !str_cmp(argument, "claimed") || !str_cmp(argument, "claim");
+	unclaimed = !str_cmp(argument, "unclaimed") || !str_cmp(argument, "unclaim");
 	
 	for (x = -mapsize; x <= mapsize; ++x) {
 		for (y = -mapsize; y <= mapsize; ++y) {
@@ -2584,7 +2586,13 @@ void scan_for_tile(char_data *ch, char *argument) {
 			
 			// validate tile
 			ok = FALSE;
-			if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
+			if (claimed && ROOM_OWNER(room)) {
+				ok = TRUE;
+			}
+			else if (unclaimed && !ROOM_OWNER(room)) {
+				ok = TRUE;
+			}
+			else if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
 				ok = TRUE;
 			}
 			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room))) && !CHECK_CHAMELEON(map, room)) {
