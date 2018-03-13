@@ -3003,6 +3003,7 @@ const char *room_extra_types[] = {
 	"ceded",
 	"mine global vnum",
 	"trench fill time",
+	"trench original sector",
 	"\n"
 };
 

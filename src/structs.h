@@ -387,10 +387,11 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_AMT_REPUTATION  3	// uses a faction reputation
 
 
-// for the shipping system
-#define SHIPPING_QUEUED  0	// waiting for a ship
+// SHIPPING_x: for the shipping system
+#define SHIPPING_QUEUED  0	// has not been processed yet
 #define SHIPPING_EN_ROUTE  1	// waiting to deliver
 #define SHIPPING_DELIVERED  2	// indicates the ship has been delivered and these can be offloaded to the destination
+#define SHIPPING_WAITING_FOR_SHIP  3	// waiting for a ship
 
 
 // SKILLF_x: skill flags
@@ -2330,6 +2331,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_CEDED  16	// used to mark that a room was ceded to someone and never used by the empire, to prevent cede+steal
 #define ROOM_EXTRA_MINE_GLB_VNUM  17
 #define ROOM_EXTRA_TRENCH_FILL_TIME  18  // when the trench will be filled
+#define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
 
 
 // number of different appearances
@@ -2667,7 +2669,7 @@ struct shipping_data {
 	int amount;
 	int from_island;
 	int to_island;
-	int status;	// SHIPPING_x
+	int status;	// SHIPPING_
 	long status_time;	// when it gained that status
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
 	int shipping_id;	// VEH_SHIPPING_ID() of ship

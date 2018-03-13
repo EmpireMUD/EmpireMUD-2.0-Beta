@@ -242,6 +242,8 @@ void string_add(descriptor_data *d, char *str) {
 	if (action) {
 		if (STATE(d) == CON_PLAYING && PLR_FLAGGED(d->character, PLR_MAILING)) {
 			if (action == STRINGADD_SAVE && *d->str) {
+				SEND_TO_Q("You tie your message to a pigeon and it flies away!\r\n", d);
+				
 				if ((index = find_player_index_by_idnum(d->mail_to)) && (recip = find_or_load_player(index->name, &is_file))) {
 					check_delayed_load(recip);	// need to delay-load them to save mail
 					
@@ -262,8 +264,6 @@ void string_add(descriptor_data *d, char *str) {
 						msg_to_char(recip, "\trYou see a mail pigeon circling above you.\t0\r\n");
 					}
 				}
-				
-				SEND_TO_Q("You tie your message to a pigeon and it flies away!\r\n", d);
 			}
 			else {
 				SEND_TO_Q("Mail aborted.\r\n", d);

@@ -196,7 +196,11 @@ OLC_MODULE(mapedit_terrain) {
 		}
 		
 		if (sect && SECT_FLAGGED(sect, SECTF_IS_TRENCH)) {
-			finish_trench(IN_ROOM(ch));
+			finish_trench(IN_ROOM(ch));	// fills it or schedules it
+			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR, GET_SECT_VNUM(old_sect));
+		}
+		else {
+			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 		}
 	}
 }
@@ -585,6 +589,9 @@ OLC_MODULE(mapedit_naturalize) {
 				if (ROOM_OWNER(room)) {
 					deactivate_workforce_room(ROOM_OWNER(room), room);
 				}
+				
+				// no longer need this
+				remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 			}
 			else {
 				perform_change_sect(NULL, map, map->natural_sector);
@@ -597,6 +604,9 @@ OLC_MODULE(mapedit_naturalize) {
 				else {
 					map->crop_type = NULL;
 				}
+		
+				// no longer need this
+				remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 			}
 			++count;
 		}
@@ -620,6 +630,9 @@ OLC_MODULE(mapedit_naturalize) {
 		if (ROOM_OWNER(IN_ROOM(ch))) {
 			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 		}
+		
+		// no longer need this
+		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 		
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have naturalized the sector for this tile.\r\n");

@@ -27,6 +27,7 @@
 /**
 * Contents:
 *   Helpers
+*   Chart Functions
 *   Look Assist Functions
 *   Character Display Functions
 *   Object Display Functions
@@ -219,6 +220,91 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 	}
 	
 	return found;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CHART FUNCTIONS /////////////////////////////////////////////////////////
+
+// temporary helper type for do_chart
+struct chart_territory {
+	any_vnum empire_id;	// for quick hashing
+	empire_data *emp;	// which empire
+	int tiles;	// count of territory
+	struct empire_city_data *largest_city;	// only realy need 1 per empire
+	
+	UT_hash_handle hh;	// hashed by id
+};
+
+
+/**
+* Marks a city for the empire (only the largest).
+*
+* @param struct chart_territory **hash Pointer to the hash to add to.
+* @param empire_data *emp The empire with territory.
+* @param struct empire_city_data *city The city to add (if largest).
+*/
+void chart_add_city(struct chart_territory **hash, empire_data *emp, struct empire_city_data *city) {
+	any_vnum eid = EMPIRE_VNUM(emp);
+	struct chart_territory *ct;
+	
+	HASH_FIND_INT(*hash, &eid, ct);
+	if (!ct) {
+		CREATE(ct, struct chart_territory, 1);
+		ct->empire_id = eid;
+		ct->emp = emp;
+		
+		HASH_ADD_INT(*hash, empire_id, ct);
+	}
+	
+	// is it the largest city?
+	if (!ct->largest_city || city_type[ct->largest_city->type].radius < city_type[city->type].radius) {
+		ct->largest_city = city;
+	}
+}
+
+
+/**
+* Marks territory for the empire.
+*
+* @param struct chart_territory **hash Pointer to the hash to add to.
+* @param empire_data *emp The empire with territory.
+* @param int amount How much territory.
+*/
+void chart_add_territory(struct chart_territory **hash, empire_data *emp, int amount) {
+	any_vnum eid = EMPIRE_VNUM(emp);
+	struct chart_territory *ct;
+	
+	HASH_FIND_INT(*hash, &eid, ct);
+	if (!ct) {
+		CREATE(ct, struct chart_territory, 1);
+		ct->empire_id = eid;
+		ct->emp = emp;
+		
+		HASH_ADD_INT(*hash, empire_id, ct);
+	}
+	
+	ct->tiles = MAX(ct->tiles, amount);
+}
+
+
+/**
+* Free up the memory of the temporary chart data.
+*
+* @param struct chart_territory *hash The data to free.
+*/
+void free_chart_hash(struct chart_territory *hash) {
+	struct chart_territory *ct, *next_ct;
+	
+	HASH_ITER(hh, hash, ct, next_ct) {
+		free(ct);
+	}
+}
+
+
+// Simple vnum sorter for do_chart
+int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
+	return b->tiles - a->tiles;
 }
 
 
@@ -1911,9 +1997,13 @@ ACMD(do_affects) {
 
 
 ACMD(do_chart) {
+	struct chart_territory *citer, *next_citer, *hash = NULL;
+	struct empire_city_data *city;
+	struct empire_island *e_isle;
+	empire_data *emp, *next_emp;
+	int iter, total_claims, num;
 	struct island_info *isle;
-	bool any;
-	int iter;
+	bool any, city_prompt;
 	
 	skip_spaces(&argument);
 	
@@ -1942,10 +2032,66 @@ ACMD(do_chart) {
 			msg_to_char(ch, "%s\r\n", any ? "" : "unknown");
 		}
 		
-		// ... more to come
-		// - % claimed
-		// - number of empires with claims
-		// - cities
+		// collect empire data on the island
+		total_claims = 0;
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (!(e_isle = get_empire_island(emp, isle->id))) {
+				continue;
+			}
+			
+			if (e_isle->territory[TER_TOTAL] > 0) {
+				chart_add_territory(&hash, emp, e_isle->territory[TER_TOTAL]);
+				total_claims += e_isle->territory[TER_TOTAL];
+			}
+			
+			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+				if (GET_ISLAND(city->location) != isle) {
+					continue;
+				}
+				
+				chart_add_city(&hash, emp, city);
+			}
+		}
+		
+		HASH_SORT(hash, sort_chart_hash);
+		
+		// claim info
+		if (total_claims > 0 && isle->tile_size > 0) {
+			msg_to_char(ch, "Percent claimed: %d%%, Largest empires: ", (total_claims * 100 / isle->tile_size));
+			
+			// only show some (largest, per sort_chart_hash)
+			num = 0;
+			HASH_ITER(hh, hash, citer, next_citer) {
+				msg_to_char(ch, "%s%s%s\t0", (num > 0 ? ", " : ""), EMPIRE_BANNER(citer->emp), EMPIRE_NAME(citer->emp));
+				if (++num >= 3) {
+					break;
+				}
+			}
+			msg_to_char(ch, "\r\n");
+		}
+		
+		// cities
+		city_prompt = FALSE;
+		
+		HASH_ITER(hh, hash, citer, next_citer) {
+			if (!citer->largest_city || !city_type[citer->largest_city->type].show_to_others) {
+				continue;
+			}
+			
+			if (!city_prompt) {
+				msg_to_char(ch, "Notable cities:\r\n");
+				city_prompt = TRUE;
+			}
+			
+			if (has_player_tech(ch, PTECH_NAVIGATION)) {
+				msg_to_char(ch, " The %s%s\t0 %s of %s (%d, %d)\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name, X_COORD(citer->largest_city->location), Y_COORD(citer->largest_city->location));
+			}
+			else {
+				msg_to_char(ch, " The %s%s\t0 %s of %s\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name);
+			}
+		}
+		
+		free_chart_hash(hash);
 	}
 }
 

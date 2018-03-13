@@ -197,14 +197,19 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 	else if (GET_OBJ_TIMER(obj) == UNLIMITED) {
 		act("You can't seem to douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (!CAN_WEAR(obj, ITEM_WEAR_TAKE) || (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))) {
-		msg_to_char(ch, "You can't douse that.\r\n");
+	else if (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You can't douse anything here.\r\n");
 	}
 	else {
 		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) = 0;
 		
 		act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
 		act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
+		
+		// run the timer trigger, same as if it timed out
+		if (timer_otrigger(obj)) {
+			extract_obj(obj);	// unless prevented by the trigger
+		}
 	}
 }
 
