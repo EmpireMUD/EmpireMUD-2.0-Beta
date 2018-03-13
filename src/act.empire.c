@@ -40,8 +40,10 @@
 */
 
 // external vars
+extern const char *alt_dirs[];
 extern struct empire_chore_type chore_data[NUM_CHORES];
 extern struct city_metadata_type city_type[];
+extern const char *dirs[];
 extern const char *empire_admin_flags[];
 extern const char *empire_trait_types[];
 extern const char *offense_flags[];
@@ -1606,8 +1608,6 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 // for do_city
 void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
-	extern const char *alt_dirs[];
-	extern const char *dirs[];
 	
 	char buf[MAX_STRING_LENGTH], traits[256];
 	struct empire_city_data *city;
@@ -2538,10 +2538,9 @@ void scan_for_tile(char_data *ch, char *argument) {
 	extern byte distance_can_see(char_data *ch);
 	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
-	extern const char *dirs[];
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
-	int dir, dist, mapsize, total, x, y, check_x, check_y;
+	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
 	char output[MAX_STRING_LENGTH], line[128];
 	struct map_data *map_loc;
 	room_data *map, *room;
@@ -2627,42 +2626,53 @@ void scan_for_tile(char_data *ch, char *argument) {
 
 	if (node_list) {
 		sort_territory_node_list_by_distance(IN_ROOM(ch), &node_list);
-		node_list = reduce_territory_node_list(node_list);
 		
 		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
 		
 		// display and free the nodes
-		total = 0;
+		total = over_count = 0;
 		for (node = node_list; node; node = next_node) {
 			next_node = node->next;
 			total += node->count;
 			
-			// territory can be off the map (e.g. ships) and get a -1 here
-			check_x = X_COORD(node->loc);
-			check_y = Y_COORD(node->loc);
-			
-			dist = compute_distance(IN_ROOM(ch), node->loc);
-			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
-			
-			if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_NAVIGATION(ch)) {
-				lsize = snprintf(line, sizeof(line), "%2d tile%s %s (%d, %d) - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), check_x, check_y, get_room_name(node->loc, FALSE));
+			if (over_count) {
+				++over_count;
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "%2d tile%s %s - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(node->loc, FALSE));
-			}
+				// territory can be off the map (e.g. ships) and get a -1 here
+				check_x = X_COORD(node->loc);
+				check_y = Y_COORD(node->loc);
 			
-			if (node->count > 1) {
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
-			}
+				dist = compute_distance(IN_ROOM(ch), node->loc);
+				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
 			
-			if (size + lsize + 32 < sizeof(output)) {
-				size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+				if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_NAVIGATION(ch)) {
+					lsize = snprintf(line, sizeof(line), "%2d %s: %s (%d, %d)", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE), check_x, check_y);
+				}
+				else {
+					lsize = snprintf(line, sizeof(line), "%2d %s: %s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE));
+				}
+			
+				if (node->count > 1) {
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
+				}
+			
+				if (size + lsize + 100 < sizeof(output)) {
+					size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+				}
+				else {
+					++over_count;
+				}
 			}
 			
 			free(node);
 		}
 		
 		node_list = NULL;
+		
+		if (over_count) {
+			size += snprintf(output + size, sizeof(output) - size, "... and %d more tile%s\r\n", over_count, PLURAL(over_count));
+		}
 		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
 		page_string(ch->desc, output, TRUE);
 	}
