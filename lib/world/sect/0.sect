@@ -871,16 +871,16 @@ C
 dig, harvest~
 D1
 ????~
-&y~
+&g~
 D2
 ????~
-&y~
+&g~
 D3
 ????~
-&y~
+&g~
 D4
 ????~
-&y~
+&0~
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1086,13 +1086,13 @@ C
 dig, harvest~
 D1
 ????~
-&y~
+&Y~
 D2
 ????~
 &y~
 D3
 ????~
-&y~
+&Y~
 D4
 ????~
 &y~
@@ -1439,16 +1439,16 @@ C
 harvest~
 D1
 ????~
-&y~
+&g~
 D2
 ????~
-&y~
+&g~
 D3
 ????~
-&y~
+&g~
 D4
 ????~
-&y~
+&g~
 M
 9061 0.01 d
 M
