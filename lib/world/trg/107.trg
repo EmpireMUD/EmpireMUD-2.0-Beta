@@ -549,6 +549,25 @@ switch %random.3%
   break
 done
 ~
+#10740
+Mother goose mutually exclusive quests~
+2 v 0
+~
+switch %questvnum%
+  case 10732
+    %quest% %actor% drop 10733
+  break
+  case 10733
+    %quest% %actor% drop 10732
+  break
+  case 10734
+    %quest% %actor% drop 10735
+  break
+  case 10735
+    %quest% %actor% drop 10734
+  break
+done
+~
 #10741
 Miss Muffet~
 0 bw 10
@@ -580,6 +599,61 @@ switch %random.3%
     %echo% %self.name% seems to have lost her bell.
   break
 done
+~
+#10744
+Mini-pet use - little lamb bell version~
+1 c 3
+ring~
+if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_by%)
+  return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+set varname minipet%self.val0%
+* once per 30 minutes
+if %actor.cooldown(%self.val0%)%
+  %send% %actor% %self.shortdesc% is on cooldown.
+  halt
+end
+* check too many mobs
+set mobs 0
+set found 0
+set found_pet 0
+set ch %self.room.people%
+while %ch% && !%found%
+  if (%ch.is_npc% && %ch.vnum% == %self.val0% && %ch.master% && %ch.master% == %actor%)
+    set found 1
+  elseif (%ch.is_npc% && %ch.master% && %ch.master% == %actor% && !%ch.mob_flagged(FAMILIAR)%)
+    set found_pet 1
+  elseif %ch.is_npc%
+    eval mobs %mobs% + 1
+  end
+  set ch %ch.next_in_room%
+done
+if %found%
+  %send% %actor% You already have this mini-pet.
+elseif %found_pet% then
+  %send% %actor% You already have another non-familiar follower.
+elseif %mobs% > 4
+  %send% %actor% There are too many mobs here already.
+else
+  %send% %actor% You ring %self.shortdesc%...
+  %echoaround% %actor% %actor.name% rings %self.shortdesc%...
+  nop %self.bind(%actor%)%
+  %load% m %self.val0%
+  set pet %self.room.people%
+  if (%pet% && %pet.vnum% == %self.val0%)
+    %force% %pet% mfollow %actor%
+    %echo% %pet.name% appears!
+    nop %actor.set_cooldown(%self.val0%, 1800)%
+    dg_affect %pet% *CHARM on -1
+    nop %pet.add_mob_flag(!EXP)%
+    nop %pet.unlink_instance%
+  end
+end
 ~
 #10746
 Old Woman who lived in a shoe~
