@@ -2536,12 +2536,13 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 */
 void scan_for_tile(char_data *ch, char *argument) {
 	extern byte distance_can_see(char_data *ch);
+	void get_informative_tile_string(char_data *ch, room_data *room, char *buffer);
 	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
-	char output[MAX_STRING_LENGTH], line[128];
+	char output[MAX_STRING_LENGTH], line[128], info[256];
 	struct map_data *map_loc;
 	room_data *map, *room;
 	size_t size, lsize;
@@ -2651,6 +2652,16 @@ void scan_for_tile(char_data *ch, char *argument) {
 				}
 				else {
 					lsize = snprintf(line, sizeof(line), "%2d %s: %s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE));
+				}
+				
+				if (PRF_FLAGGED(ch, PRF_POLITICAL) && ROOM_OWNER(node->loc)) {
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(node->loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(node->loc)));
+				}
+				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+					get_informative_tile_string(ch, node->loc, info);
+					if (*info) {
+						lsize += snprintf(line + lsize, sizeof(line) - lsize, " [%s]", info);
+					}
 				}
 			
 				if (node->count > 1) {
