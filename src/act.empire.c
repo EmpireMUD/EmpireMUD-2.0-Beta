@@ -2585,6 +2585,11 @@ void scan_for_tile(char_data *ch, char *argument) {
 				continue;
 			}
 			
+			// chameleon check
+			if (!IS_IMMORTAL(ch) && CHECK_CHAMELEON(map, room)) {
+				continue;	// just don't show it
+			}
+			
 			// validate tile
 			ok = FALSE;
 			if (claimed && ROOM_OWNER(room)) {
@@ -2599,13 +2604,13 @@ void scan_for_tile(char_data *ch, char *argument) {
 			else if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
 				ok = TRUE;
 			}
-			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room))) && !CHECK_CHAMELEON(map, room)) {
+			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
 				ok = TRUE;
 			}
 			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(room)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 				ok = TRUE;
 			}
-			else if (multi_isname(argument, get_room_name(room, FALSE)) && !CHECK_CHAMELEON(map, room)) {
+			else if (multi_isname(argument, get_room_name(room, FALSE))) {
 				ok = TRUE;
 			}
 			else {
