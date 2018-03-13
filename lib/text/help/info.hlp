@@ -1054,19 +1054,22 @@ SCAN
 
 Usage:  scan <direction>
         scan <tile/vehicle name>
+        scan <claimed/unclaimed>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
 mapsize.
 
 You can also scan for nearby tiles matching a given keyword, such as a crop,
-building, or vehicle name. It will scan a distance up to your mapsize.
+building, or vehicle name. It will scan a distance up to your mapsize. Vehicles
+can only be seen with this command if they are large enough to show up on the
+map.
 
 Example:
  > scan southwest
  southwest: 3x River, Swamp, Overgrown Forest, Road, Overgrown Forest, 2x Jungle
 
-See also: MAPSCAN, MAPSIZE, SCREEN-READERS
+See also: MAPSCAN, MAPSIZE, SCREEN-READERS, INFORMATIVE, POLITICAL
 #
 "SHIP ROOMS" "SHIP DESIGNATE" "DESIGNATE ON SHIPS"
 
