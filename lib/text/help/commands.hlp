@@ -54,7 +54,7 @@ player who sent the offer logs off, you cannot accept the offer.
 #
 ACTION-SPAM ACTIONSPAM "ACTION SPAM"
 
-Usage:  toggle action-spam
+Usage:  toggle action-spam [on/off]
 
 This toggles disable the periodic messages of various continuous actions, like
 crafting and some chores. You will still see messages when these tasks are
@@ -75,7 +75,7 @@ See also: SCORE
 #
 AFK "AFK TOGGLE"
 
-Usage:  toggle afk
+Usage:  toggle afk [on/off]
 
 This toggle causes a small &r(AFK)&0 flag to appear after your title on the
 "who" list, indicating to other players that you are away-from-keyboard. You
@@ -224,7 +224,7 @@ See also: FLEE, KILL
 #
 AUTOCLIMB
 
-Usage:  toggle autoclimb
+Usage:  toggle autoclimb [on/off]
 
 This toggle turns off the need to type 'climb' to enter mountains or other
 rough terrain.
@@ -233,7 +233,7 @@ See also: CLIMB, TOGGLE
 #
 AUTOKILL
 
-Usage:  toggle autokill
+Usage:  toggle autokill [on/off]
 
 Use this toggle if you don't want to kill your opponent in combat, and you'll
 stop attacking when they drop into unconsciousness. They will still need help,
@@ -246,7 +246,7 @@ See also: TOGGLE
 #
 AUTOSWIM
 
-Usage:  toggle autoswim
+Usage:  toggle autoswim [on/off]
 
 This toggle turns off the need to type 'swim' to enter water.
 
@@ -294,7 +294,7 @@ See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
 BRIEF
 
-Usage:  toggle brief
+Usage:  toggle brief [on/off]
 
 This toggle turns off room descriptions and shrinks the map display from 15 by
 15 to 7 by 7. It reduces disconnects from buffer overflows for people moving
@@ -340,7 +340,7 @@ else.
 #
 CHANNEL-JOINS CHANNELJOINS "CHANNEL JOINS"
 
-Usage:  toggle channel-joins
+Usage:  toggle channel-joins [on/off]
 
 This toggles the messages which display when a player joins or leaves a
 slash-channel you are currently in.
@@ -416,7 +416,7 @@ See also: SOCIALS
 #
 COMPACT
 
-Usage:  toggle compact
+Usage:  toggle compact [on/off]
 
 This command toggles the extra blank line output to your screen after each
 command. Useful if you have a small display.
@@ -687,7 +687,7 @@ See also: TOGGLE, STAKE, TIE
 #
 EXTRA-SPACING "EXTRA SPACING" "TOGGLE EXTRA-SPACING"
 
-Usage:  toggle extra-spacing
+Usage:  toggle extra-spacing [on/off]
 
 This toggle will insert an extra blank line after your prompt when you type
 any command. This is useful on MUD clients that don't have local echo.
@@ -908,7 +908,7 @@ See also: EIDENTIFY
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
-Usage:  toggle informative
+Usage:  toggle informative [on/off]
 
 Informative map mode shows you details about your buildings.
 
@@ -1164,7 +1164,7 @@ See also: CLEARMETERS
 #
 MORTLOG
 
-Usage:  toggle mortlog
+Usage:  toggle mortlog [on/off]
 
 This will give you periodic updates, such as when a player logs in, leaves, or
 dies. It's useful in keeping up on current events. Mortlog is colored cyan.
@@ -1191,7 +1191,7 @@ See also: TEXT EDITOR
 #
 NOREPEAT NO-REPEAT "NO REPEAT"
 
-Usage:  toggle no-repeat
+Usage:  toggle no-repeat [on/off]
 
 This command toggles whether or not you see your communication echoed back to
 you (i.e., from commands such as SAY, SHOUT, /OOC, etc). Useful if you have
@@ -1201,7 +1201,7 @@ See also: TOGGLE
 #
 NOTELL "NO TELL" "TOGGLE TELL"
 
-Usage:  toggle tell
+Usage:  toggle tell [on/off]
 
 Use this toggle if you wish to prevent other players from using "tell" to
 communicate with you. (notell) will appear after your name in the WHO list if
@@ -1263,7 +1263,7 @@ See also: HOLD, TIMED ACTION
 #
 POLITICAL "POLITICAL VIEW" "TOGGLE POLITICAL"
 
-Usage:  toggle political
+Usage:  toggle political [on/off]
 
 This toggle changes your map colors from environmental to political. You will
 see each acre colored with the banner of the empire who owns it.
@@ -1536,7 +1536,7 @@ Examples:
 #
 RP "RP TOGGLE"
 
-Usage:  toggle rp
+Usage:  toggle rp [on/off]
 
 This toggle indicates to others that you are currently roleplaying with a &m(RP)&0
 tag next to your name on the "who" list.
@@ -1695,7 +1695,7 @@ See also: DISPLAY, SCAN, TOGGLE, MAPSIZE
 #
 SCROLLING
 
-Usage:  toggle scrolling
+Usage:  toggle scrolling [on/off]
 
 This toggle turns off the page breaks sent when a character receives a long
 amount of information. The information is sent all at once, as preferred by
@@ -1812,7 +1812,7 @@ See also: EMOTE
 #
 STEALTHABLE
 
-Usage:  toggle stealthable
+Usage:  toggle stealthable [on/off]
 
 This toggle prevents you from accidentally performing stealth actions (for
 example picking up an item on another empire's territory). It must be enabled
@@ -1971,7 +1971,7 @@ See also: WHO
 #
 TOGGLE TOGGLES
 
-Usage:  toggle [type]
+Usage:  toggle [type] [on/off]
 
 This command is the master switchboard for various preference toggles. You can
 use it to see your current preferences, or to switch them on and off. Some
@@ -2022,7 +2022,7 @@ See also: FIGHT MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 
-Usage:  toggle no-empire
+Usage:  toggle no-empire [on/off]
 
 This toggle is for players who do not wish to be in any empire. The game will
 no longer create a new empire for you when you try to do things like claim
@@ -2030,7 +2030,7 @@ or build.
 #
 TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
 
-Usage:  toggle travel-look
+Usage:  toggle travel-look [on/off]
 
 This toggle causes you to automatically 'look' after each time you move when
 running or when driving, piloting, or sailing a vehicle. With this toggle off,

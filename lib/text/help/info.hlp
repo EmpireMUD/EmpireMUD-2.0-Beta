@@ -115,7 +115,7 @@ See also: DODGE, DPS, EMPIRE GREATNESS, SPEED, TO-HIT
 #
 AUTORECALL "AUTO-RECALL" "AUTO RECALL" "TOGGLE AUTORECALL"
 
-Usage:  toggle autorecall
+Usage:  toggle autorecall [on/off]
 
 If you turn on the autorecall toggle, your character will be sent home (or to
 a tower of souls, if you have no home) when you're logged off over an hour.
