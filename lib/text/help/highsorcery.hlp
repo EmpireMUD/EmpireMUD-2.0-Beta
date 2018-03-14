@@ -332,8 +332,8 @@ Portal Master (High Sorcery ability)
 Command:  collapse <portal>
 Cost:  15 mana
 
-Becoming a Portal Master removes the range limit on your empire's portals.
-It also allows you to collapse portals yourself.
+Becoming a Portal Master removes the same-island-only limit on your empire's
+portals. It also allows you to collapse portals yourself.
 
 You can gain Portal Master skill whenever someone in your empire opens a
 portal, and whenever you collapse a portal.
