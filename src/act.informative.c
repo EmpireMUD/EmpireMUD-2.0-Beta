@@ -2968,10 +2968,10 @@ ACMD(do_nearby) {
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			
 				if (HAS_NAVIGATION(ch)) {
-					snprintf(line, sizeof(line), " %d %s: %s (%d, %d)\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
+					snprintf(line, sizeof(line), " %2d %s: %s (%d, %d)\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
 				}
 				else {
-					snprintf(line, sizeof(line), " %d %s: %s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE));
+					snprintf(line, sizeof(line), " %2d %s: %s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE));
 				}
 				
 				if (size + strlen(line) < sizeof(buf)) {
