@@ -4314,7 +4314,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	 */
 
 	if (j->contains) {
-		sprintf(buf, "\r\nContents:&g");
+		sprintf(buf, "Contents:&g");
 		for (found = 0, j2 = j->contains; j2; j2 = j2->next_content) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j2, ch, OBJ_DESC_SHORT));
 			strcat(buf, buf2);
