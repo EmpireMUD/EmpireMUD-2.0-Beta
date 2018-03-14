@@ -1297,7 +1297,8 @@ a list of your cities on the "city list" command.
 
 You can optionally specify a building or terrain type and see all your tiles of
 that type. You can also specify 'outskirts' or 'frontier' to filter out-of-city
-territory to just one of those two categories.
+territory to just one of those two categories. You can also type 'territory
+building' to get a list of all your buildings.
 
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
