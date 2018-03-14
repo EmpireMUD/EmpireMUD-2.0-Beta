@@ -313,7 +313,6 @@ influence. The empire can now gain additional territory from its Wealth, up to
 this ability to gain the benefit. There is no additional benefit to more members
 having it.
 
-
 Commerce also allows you to build the mint building, and mint your own coins:
 
 [MM] mint
@@ -1164,8 +1163,6 @@ reward must go to a different member of the empire. However, if two leaders
 have Reward, they may both choose to reward the same member.
 
 Each Reward gives a member of your empire +5 bonus experience for the day.
-Just like regular bonus experience, it will expire at the end of the day if
-it isn't used.
 
 You cannot reward yourself or your alts.
 

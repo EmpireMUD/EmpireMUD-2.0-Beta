@@ -185,15 +185,15 @@ void display_statistics_to_char(char_data *ch) {
 			++count;
 		}
 	}
-	msg_to_char(ch, "Unique Creatures:   %3d     Total Mobs:         %d\r\n", HASH_COUNT(mobile_table), count);
+	msg_to_char(ch, "Unique Creatures:   %4d    Total Mobs:         %d\r\n", HASH_COUNT(mobile_table), count);
 
 	// objs
 	LL_COUNT(object_list, obj, count);
-	msg_to_char(ch, "Unique Objects:     %3d     Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
+	msg_to_char(ch, "Unique Objects:     %4d    Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
 	
 	// vehicles
 	LL_COUNT(vehicle_list, veh, count);
-	msg_to_char(ch, "Unique Vehicles:    %3d     Total Vehicles:     %d\r\n", HASH_COUNT(vehicle_table), count);
+	msg_to_char(ch, "Unique Vehicles:    %4d    Total Vehicles:     %d\r\n", HASH_COUNT(vehicle_table), count);
 }
 
 
