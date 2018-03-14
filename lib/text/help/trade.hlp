@@ -848,8 +848,8 @@ Command:  sew [number] <item>
           sew info <item>
 
 The art of sewing is one of the oldest and simplest trade skills, but it also
-makes some of the finest clothing and the lightest armor. The only resource
-required for sewing is skin.
+makes some of the finest clothing and the lightest armor. The only resources
+required for sewing are skins or cloth.
 
 For a list of clothing items you can sew, see HELP CLOTHING.
 
