@@ -3358,6 +3358,21 @@ ACMD(do_who) {
 }
 
 
+ACMD(do_whoami) {
+	char real[256], curr[256];
+	
+	strcpy(curr, PERS(ch, ch, FALSE));
+	strcpy(real, PERS(ch, ch, TRUE));
+	
+	if (strcmp(curr, real)) {	// different
+		msg_to_char(ch, "%s (%s)\r\n", curr, real);
+	}
+	else {
+		msg_to_char(ch, "%s\r\n", real);
+	}
+}
+
+
 ACMD(do_whois) {
 	void check_delayed_load(char_data *ch);
 	extern const char *level_names[][2];

@@ -1268,6 +1268,14 @@ coordinates (if applicable).
 
 See also: LOOK
 #
+WHOAMI "WHO AM I"
+
+Usage:  whoami
+
+This simple command tells you which character you're playing.
+
+See also: ALTERNATE
+#
 WITS WIT
 
 Wits (mental attribute)
