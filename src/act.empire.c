@@ -2531,6 +2531,12 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 /**
 * Scans within the character's mapsize for matching tiles.
 *
+* Note: There is a minor exploit with chameleon buildings here: If you scan
+* for claimed and unclaimed, then add the total tiles, if it's lower than your
+* expected total tile count, chameleon tiles are missing (chameleon tiles out
+* of range are not shown for any mortal's scan). But there's not really a clean
+* solution to this without a ton of code. -pc 3/13/2018
+*
 * @param char_data *ch The player.
 * @param char_data *argument The tile to search for.
 */
@@ -2671,7 +2677,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 					lsize = snprintf(line, sizeof(line), "%2d %s: %s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE));
 				}
 				
-				if (PRF_FLAGGED(ch, PRF_POLITICAL) && ROOM_OWNER(node->loc)) {
+				if ((PRF_FLAGGED(ch, PRF_POLITICAL) || claimed || foreign) && ROOM_OWNER(node->loc)) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(node->loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(node->loc)));
 				}
 				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {

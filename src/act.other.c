@@ -2950,6 +2950,7 @@ ACMD(do_toggle) {
 	const char *clear_color = "\t0";
 
 	int iter, type = NOTHING, count, on, pos;
+	char arg[MAX_INPUT_LENGTH];
 	struct alpha_tog *altog;
 	bool imm;
 	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
@@ -2958,16 +2959,17 @@ ACMD(do_toggle) {
 		msg_to_char(ch, "NPCs do not have toggles.\r\n");
 		return;
 	}
-
+	
+	argument = any_one_arg(argument, arg);
 	skip_spaces(&argument);
 	
 	for (iter = 0; *toggle_data[iter].name != '\n' && type == NOTHING; ++iter) {
-		if (toggle_data[iter].level <= GET_ACCESS_LEVEL(ch) && is_abbrev(argument, toggle_data[iter].name)) {
+		if (toggle_data[iter].level <= GET_ACCESS_LEVEL(ch) && is_abbrev(arg, toggle_data[iter].name)) {
 			type = iter;
 		}
 	}
 	
-	if (!*argument) {
+	if (!*arg) {
 		msg_to_char(ch, "Toggles:\r\n");
 		alphabetize_toggles();	// in case
 		
@@ -2995,10 +2997,30 @@ ACMD(do_toggle) {
 		}
 	}
 	else if (type == NOTHING) {
-		msg_to_char(ch, "Unknown toggle '%s'.\r\n", argument);
+		msg_to_char(ch, "Unknown toggle '%s'.\r\n", arg);
 	}
 	else {
-		on = PRF_TOG_CHK(ch, toggle_data[type].bit);
+		// check for optional on/off arg
+		if (!str_cmp(argument, "on")) {
+			if (toggle_data[type].type == TOG_ONOFF) {
+				SET_BIT(PRF_FLAGS(ch), toggle_data[type].bit);
+			}
+			else {
+				REMOVE_BIT(PRF_FLAGS(ch), toggle_data[type].bit);
+			}
+		}
+		else if (!str_cmp(argument, "off")) {
+			if (toggle_data[type].type == TOG_ONOFF) {
+				REMOVE_BIT(PRF_FLAGS(ch), toggle_data[type].bit);
+			}
+			else {
+				SET_BIT(PRF_FLAGS(ch), toggle_data[type].bit);
+			}
+		}
+		else {	// neither on nor off specified
+			on = PRF_TOG_CHK(ch, toggle_data[type].bit);
+		}
+		
 		on = PRF_FLAGGED(ch, toggle_data[type].bit) ? 1 : 0;
 		
 		// special case for pvp toggle
