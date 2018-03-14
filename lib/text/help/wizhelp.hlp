@@ -1419,8 +1419,8 @@ Valid types are: adventure, ability, archetype, augment, building, book, craft,
 
 Examples:
 
-  > vstat obj 3000
-  > vstat mob 3001
+  > vstat obj 125
+  > vstat mob 247
 
 See also: LOAD, STAT, VNUM
 #d

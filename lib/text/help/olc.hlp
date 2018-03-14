@@ -3838,11 +3838,18 @@ shop.
 To create a pet whistle (or other summoner item), attach script 9900 (Mini-pet
 Use) to an object and set its <value0> to the mini-pet mob's vnum.
 
+You must also create a generic cooldown with the same vnum as the item, used
+to keep it from being resummoned.
+
 Mini-pet mobs should have the following traits:
  - Flags: SENTINEL SPAWNED !LOOT (and ISNPC)
  - Affects: !ATTACK
  - Scripts: 9901 (Dismissable), 9902 (Lonely Despawn)
+ - Value0: The vnum of the mob
+ - A cooldown generic with the same vnum as the mini-pet whistle
  - Adorable custom messages (optional)
+
+See also: GENERIC COOLDOWN
 #d
 MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
 

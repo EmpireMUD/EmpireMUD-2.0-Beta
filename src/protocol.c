@@ -2562,7 +2562,7 @@ static const char *GetMSSP_Areas() {
 
 static const char *GetMSSP_Classes() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", NUM_CLASSES);
+	strcpy(buf, "1");
 	return buf;
 }
 

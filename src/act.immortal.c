@@ -5618,7 +5618,7 @@ ACMD(do_dc) {
 ACMD(do_distance) {
 	char arg[MAX_INPUT_LENGTH];
 	room_data *target;
-	int dir;
+	int dir, dist;
 	
 	one_word(argument, arg);
 	
@@ -5630,7 +5630,8 @@ ACMD(do_distance) {
 	}
 	else {	
 		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), target));
-		msg_to_char(ch, "Distance to (%d, %d): %d tiles %s.\r\n", X_COORD(target), Y_COORD(target), compute_distance(IN_ROOM(ch), target), (dir == NO_DIR ? "away" : dirs[dir]));
+		dist = compute_distance(IN_ROOM(ch), target);
+		msg_to_char(ch, "Distance to (%d, %d): %d tile%s %s.\r\n", X_COORD(target), Y_COORD(target), dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]));
 	}
 }
 
