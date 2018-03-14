@@ -1,6 +1,6 @@
 ALCHEMIST
 
-(Disambiguation: Did you mean HELP ALCHEMIST CLASS ?)
+(Disambiguation: Did you mean HELP ALCHEMIST CRAFTS ?)
 
 (AA)  Alchemist  (Artisans ability)
 
@@ -235,7 +235,7 @@ Empire Synergy Ability: 100 Survival
 This ability allows you to build the following buildings:
   &y.&c__&y.&0 drainage  (built on oasis)
 
-See also: BUILD, ELDER CLASS
+See also: BUILD
 #
 "EXARCH CRAFTS"
 
@@ -248,7 +248,7 @@ This ability allows you to build the following buildings:
 Allows the following workforce options:
   nexus-crystals - Also requires Skilled Labor
 
-See also: BUILD, EXARCH CLASS, SKILLED LABOR
+See also: BUILD, SKILLED LABOR
 #
 GRAVE GRAVES "GRAVE MARKER"
 

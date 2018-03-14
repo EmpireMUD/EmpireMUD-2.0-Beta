@@ -66,14 +66,14 @@ See also: CRAFT, LAND VEHICLES
 Alchemist Crafts
 Trade Synergy Ability: 100 Natural Magic
 
-This ability will contain any crafts for the Alchemist class.
+This ability will contain any crafts for the Alchemist synergy.
 #
 "ANTIQUARIAN CRAFTS"
 
 Antiquarian Crafts
 Trade Synergy Ability: 100 Vampire
 
-This ability will contain any crafts for the Antiquarian class.
+This ability will contain any crafts for the Antiquarian synergy.
 #
 ARMORSMITHING ARMORCRAFTING
 
@@ -950,7 +950,7 @@ See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
 Smuggler Crafts
 Trade Synergy Ability: 100 Stealth
 
-This ability will contain any crafts for the Smuggler class.
+This ability will contain any crafts for the Stealth/Trade synergies.
 #
 "STEELSMITH CRAFTS"
 

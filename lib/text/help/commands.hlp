@@ -1517,6 +1517,31 @@ Gain Roads experience when you place a road sign.
 
 See also: ROADS, WOODWORKING
 #
+ROLE "GROUP ROLE" "CLASS ROLE"
+
+Usage:  role [type]
+
+The role command shows your role, other available roles, and synergy abilities
+that go with those roles. You can also use this command to change roles. For
+example, "role tank". You must have a role in order to gain your synergy
+abilities, even if all of its roles share them.
+
+Group roles are the different tasks a person might be suited for. For example,
+if your character has both Natural Magic and Survival as its core skills, it
+might be suited to melee damage, caster damage, or healing. You can't perform
+all roles at the same time.
+
+&yTank&0: Takes all the damage in combat.
+&rMelee&0: Does physical damage.
+&aCaster&0: Does magical damage.
+&jHealer&0: Keeps the group alive.
+&mUtility&0: Doesn't fight; builds or crafts instead.
+&wSolo&0: For playing alone; some abilities won't work in groups.
+
+The colors shown above are used to display group roles on "who" and "roster".
+
+See also: TANK, HEALER, MELEE, CASTER, UTILITY, SOLO, SYNERGY ABILITY
+#
 ROLL ROLLHISTORY "ROLL HISTORY"
 
 Usage:  roll [number of dice] [size of dice]
@@ -1636,9 +1661,9 @@ Usage:  score
 The score command provides you all the important information about your
 character, including health and attributes.
 
-Your class is determined by your top two skills, and you first receive a class
-when both of these skills are past 75. The level shown on score is your total
-level, with your skill level shown in parentheses.
+Your top two skills are dsplayed, if both of these skills are past 75. The
+level shown on score is your total level, with your skill level shown in
+parentheses.
 
 Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/5s
 The first number (50) is your current health, the second (100) is your maximum

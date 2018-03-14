@@ -26,8 +26,6 @@ Debuff type:  High Sorcery
 
 Ablate deals damage to your victim and will cause bits of his armor to burn
 off, leaving him less resistant to physical damage.
-
-See also: BATTLEMAGE CLASS
 #
 "ARCANE POWER"
 
@@ -50,8 +48,6 @@ Cost:  based on damage
 
 Arclight is the Archmage's best magical attack. It deals direct damage to the
 target.
-
-See also: ARCHMAGE CLASS
 #
 CHRONOBLAST
 
@@ -65,8 +61,6 @@ Debuff type:  High Sorcery
 
 Chronoblast uses the artificer's knowledge of clocks to slow down the enemy,
 and the transition into a slower time frame deals serious magical damage.
-
-See also: ARTIFICER CLASS
 #
 "CITY TELEPORTATION"
 
@@ -437,7 +431,7 @@ Debuff type:  High Sorcery
 Scour will scrub away at your opponent, damaging them magically over time (in
 addition to damage with the initial hit). This DoT stacks up to 5 times.
 
-See also: DOT, EXARCH CLASS
+See also: DOT
 #
 SHADOWLASH "SHADOW LASH"
 
@@ -453,7 +447,7 @@ Shadowlash calls forth a tentacle of pure shadow, which wraps itself around
 your victim's head for both instantaneous and lasting damage. It also blinds
 your victim briefly. The DoT effect stacks up to 3 times.
 
-See also: DOT, OCCULTIST CLASS
+See also: DOT
 #
 "SIEGE RITUAL"
 
@@ -520,8 +514,6 @@ Debuff type:  High Sorcery
 
 Soulchain wraps the victim in a painful spiritual binding, sapping his
 intelligence as well as dealing magical damage.
-
-See also: LICH CLASS
 #
 STAFFMAKING "STAFF MAKING" STAFF STAVES "POWERFUL STAVES"
 

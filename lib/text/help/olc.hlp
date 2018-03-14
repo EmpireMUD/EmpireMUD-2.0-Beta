@@ -169,9 +169,8 @@ Buildings (BEDIT):
   never run again.
 
 Classes (CLASSEDIT):
-- By convention, stock EmpireMUD has one class for every pair of level 100
-  skills. This leaves no room for adding more classes unless you are re-
-  designing that entire notion.
+- EmpireMUD is not currently using 'classes' at all, but they are still
+  included as features for muds that want to implement them.
 - A player will get assigned the class with the most matching skills, so adding
   a 100/100/75 class would give them a more specific version of the 100/100.
 - Abilities can be on more than one class and more than one role within a class

@@ -610,7 +610,7 @@ others perceive you.
 Greatness is used for:
  - Increasing the amount of territory your empire can control.
  - Increasing your empire's score and ranking.
- - Certain class abilities such as Noble Bearing.
+ - Certain synergy abilities such as Noble Bearing.
 
 Empires also have a Greatness rating, equal to the total Greatness of their
 members. However, if you have multiple alts (your other characters) in the same
@@ -630,8 +630,8 @@ See also: BASIC CRAFTS, FORGE
 HEALTH "HIT POINTS" HITPOINTS HP "HEALTH POINTS" "HEALTH POOL"
 
 The health pool is the amount of damage you can take before being knocked out.
-All players begin with 50 health points and starts to rise around level 80.
-Your base health at level 100 is based on your class.
+All players begin with 50 health points. Some abilities and items give you more
+health, and you can enchant your gear to get even more.
 
 If you're knocked out with 0 health, you will die without assistance.
 
@@ -772,8 +772,8 @@ Do not try to get out of a fight by breaking link. You will likely still die.
 MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
 
 The mana pool is the amount of magical energy you can channel before you must
-stop to recover some. All players begin with 50 mana points and start to gain
-more around level 75. Your base mana at level 100 is based on your class.
+stop to recover some. All players begin with 50 mana points. Some abilities and
+gear give you a larger mana pool, and you can enchant gear to get even more.
 
 See also: ARCANE POWER, CLASS, GIFT OF NATURE, SOLAR POWER
 #
@@ -798,10 +798,10 @@ Move points are the basic energy pool for physical effort. It takes move points
 to walk around, and it takes move points to use many physical abilities like
 Kick or Shadowstep.
 
-All players begin with 100 move points and start to gain more around level 75.
-Your base move points at level 100 is based on your class. The easiest ways to
-get more move points at any level are to make a walking stick or a good pair of
-shoes.
+All players begin with 100 move points. The easiest ways to get more move
+points at any level are to make a walking stick or a good pair of shoes. You
+can also find certain abilities and gear that give more moves, and you can
+enchant gear to get even more.
 
 See also: FLY, RIDE, STAMINA, VIGOR
 #
