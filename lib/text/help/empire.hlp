@@ -784,6 +784,10 @@ you're in. Only the empire leaders can clear homes they don't own.
 Once you choose your home, you can teleport back to it using the Hestian
 Trinket. See your local potter to make this sacred emblem of the home.
 
+Only buildings that normally house citizens can be set as homes. This does not
+include buildings where adding a bedroom grants a citizen, if the building
+itself doesn't house citizens.
+
 See also: FINE POTTERY
 #
 HOUSING CITIZENS "HOUSING BUILDINGS"
