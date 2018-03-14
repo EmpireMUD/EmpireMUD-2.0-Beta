@@ -1957,7 +1957,7 @@ ACMD(do_lay) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))
-		msg_to_char(ch, "You can't lay road here!\r\n");
+		msg_to_char(ch, "You can't lay road in someone else's territory!\r\n");
 	else if (!has_permission(ch, PRIV_BUILD))
 		msg_to_char(ch, "You don't have permission to lay road.\r\n");
 	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && !SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_ROADS)) {
@@ -1985,7 +1985,7 @@ ACMD(do_lay) {
 		msg_to_char(ch, "Road data has not been set up for this game.\r\n");
 	}
 	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_LAY_ROAD))
-		msg_to_char(ch, "You can't lay road here!\r\n");
+		msg_to_char(ch, "You can't lay a road here!\r\n");
 	else if (!has_resources(ch, cost, TRUE, TRUE)) {
 		// sends own messages
 	}
