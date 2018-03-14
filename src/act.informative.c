@@ -3093,6 +3093,10 @@ ACMD(do_no_cmd) {
 			msg_to_char(ch, "EmpireMUD doesn't have a 'wimpy' command.\r\n");
 			break;
 		}
+		case NOCMD_TOGGLE: {
+			msg_to_char(ch, "EmpireMUD doesn't that command by itself. Use 'toggle' instead.\r\n");
+			break;
+		}
 		default: {
 			send_config_msg(ch, "huh_string");
 			break;

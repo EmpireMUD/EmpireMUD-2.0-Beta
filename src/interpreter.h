@@ -213,6 +213,7 @@ struct alias_data {
 #define NOCMD_REPORT  6
 #define NOCMD_UNGROUP  7
 #define NOCMD_WIMPY  8
+#define NOCMD_TOGGLE  9
 
 // do_prompt
 #define SCMD_PROMPT  0
