@@ -213,11 +213,13 @@ LIGHT TORCH
 Usage:  light <item | vehicle>
 
 To light something, you must have a flint set. You may light sticks to create
-torches. You can also light trees or logs to make camp fires.
+torches. You can also light trees or logs to make camp fires. Dropping a torch
+(or lighting a fire) may burn down the building it's in, if it's unowned or you
+are at war with the owner.
 
-You can also burn down some vehicles with this command.
+You can also burn down some vehicles with the 'light' command.
 
-See also: COOKING FIRE, DOUSE
+See also: COOKING FIRE, DOUSE, THROW
 #
 MILK
 
