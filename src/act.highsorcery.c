@@ -718,7 +718,7 @@ ACMD(do_disenchant) {
 		msg_to_char(ch, "Disenchant what?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You seem to have lost your %s.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_DISENCHANT)) {
 		return;
