@@ -2039,7 +2039,7 @@ ACMD(do_group) {
 			msg_to_char(ch, "The flag options are: anonymous\r\n");
 	}
 	else {
-		msg_to_char(ch, "You must specify a group option, or type HELP GROUP for more info.\r\n");		
+		msg_to_char(ch, "Invalid group option. See HELP GROUP for more info.\r\n");		
 	}
 }
 

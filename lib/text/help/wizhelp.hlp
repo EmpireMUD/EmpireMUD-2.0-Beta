@@ -1273,6 +1273,8 @@ See also: VSTAT
 #d
 SWITCH
 
+(Disambiguation: See also HELP SWITCH STATEMENT for the scripting command.)
+
 Usage:  switch <monster>
 
 SWITCH is used to take over the body of mobiles; useful for interactive

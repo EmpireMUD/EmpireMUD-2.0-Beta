@@ -1832,7 +1832,7 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_REFERRAL: {
-			SEND_TO_Q("\r\nWhere did you hear about us (optional): ", d);
+			SEND_TO_Q("\r\nWhere did you hear about us (optional, but please mention which website or friend): ", d);
 			break;
 		}
 		case CON_FINISH_CREATION: {

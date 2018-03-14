@@ -6549,6 +6549,10 @@ scalable in order to automatically determine how many drinks it will hold.
 Other drink containers are like fountains, as no-take objects in the room
 which can provide very large amounts of liquid to players. These shouldn't
 be scalable, and you can set the capacity as high as you like.
+
+Note: Unlike other items, if there is a 'timer' on a drink container, it will
+only cause the liquid inside to go bad and be poured out, rather than purging
+the whole container.
 #d
 "FOOD ITEM" "FOOD OBJECT"
 
