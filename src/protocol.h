@@ -130,6 +130,7 @@ typedef enum {
 	eMSDP_SNIPPET_VERSION,
 	
 	// Character
+	eMSDP_GENDER,
 	eMSDP_HEALTH,
 	eMSDP_HEALTH_MAX,
 	eMSDP_HEALTH_REGEN,

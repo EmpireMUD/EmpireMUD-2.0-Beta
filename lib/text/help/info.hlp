@@ -818,7 +818,8 @@ EmpireMUD supports the following MSDP variables:
  CHARACTER_NAME - The character's full name
  SERVER_ID - The name of the MUD
  SNIPPET_VERSION - Version of KaVir's protocol snippet used for MSDP
-
+ 
+ GENDER - Current gender
  HEALTH - Current health
  HEALTH_MAX - Maximum health
  HEALTH_REGEN - Health regained per 5 seconds

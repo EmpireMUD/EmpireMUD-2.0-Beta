@@ -1109,7 +1109,10 @@ void afk_notify(char_data *ch) {
 */
 void tog_informative(char_data *ch) {
 	if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-		REMOVE_BIT(PRF_FLAGS(ch), PRF_POLITICAL | PRF_NOMAPCOL);
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_POLITICAL);
+		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			REMOVE_BIT(PRF_FLAGS(ch), PRF_NOMAPCOL);
+		}
 	}
 }
 
@@ -1133,7 +1136,10 @@ void tog_mapcolor(char_data *ch) {
 */
 void tog_political(char_data *ch) {
 	if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
-		REMOVE_BIT(PRF_FLAGS(ch), PRF_INFORMATIVE | PRF_NOMAPCOL);
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_INFORMATIVE);
+		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			REMOVE_BIT(PRF_FLAGS(ch), PRF_NOMAPCOL);
+		}
 	}
 }
 
