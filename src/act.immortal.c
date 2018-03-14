@@ -1561,7 +1561,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		// this indicates a change
 		if (new != old) {
-			sprintbit(new, grant_bits, buf, TRUE);
+			prettier_sprintbit(new, grant_bits, buf);
 			sprintf(output, "%s now has grants: %s", GET_NAME(vict), buf);
 		}
 		else {
@@ -3779,7 +3779,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "PRF: &g%s&0\r\n", buf2);
 		sprintbit(GET_BONUS_TRAITS(k), bonus_bits, buf2, TRUE);
 		msg_to_char(ch, "BONUS: &c%s&0\r\n", buf2);
-		sprintbit(GET_GRANT_FLAGS(k), grant_bits, buf2, TRUE);
+		prettier_sprintbit(GET_GRANT_FLAGS(k), grant_bits, buf2);
 		msg_to_char(ch, "GRANTS: &g%s&0\r\n", buf2);
 		sprintbit(SYSLOG_FLAGS(k), syslog_types, buf2, TRUE);
 		msg_to_char(ch, "SYSLOGS: &c%s&0\r\n", buf2);
