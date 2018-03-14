@@ -821,7 +821,7 @@ An item must be in your inventory to reforge it. However, if another player
 
 See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #
-"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES" "ITEM SCALING" OBJECT SCALING"
+"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES" "ITEM SCALING" "OBJECT SCALING"
 
 Many craftable items (including things made with brew, craft, forge, and sew)
 are scalable, which means they change in power and attributes based on the
