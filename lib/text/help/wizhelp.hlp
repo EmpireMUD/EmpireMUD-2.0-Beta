@@ -693,7 +693,7 @@ restarting combat from queued attacks. This command is grantable.
 
 See also: GRANT
 #d
-PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER"
+PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER" DELETEPLAYER PLRDELETE
 
 Usage:  playerdelete <name> CONFIRM
 
