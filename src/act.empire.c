@@ -4089,6 +4089,9 @@ ACMD(do_enroll) {
 		msg_to_char(ch, "You can't enroll animals!\r\n");
 	else if (ch == targ)
 		msg_to_char(ch, "You're already in the empire!\r\n");
+	else if (GET_LOYALTY(targ) == e) {
+		act("$E is already a member of this empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
+	}
 	else if (GET_PLEDGE(targ) != EMPIRE_VNUM(e))
 		act("$E has not pledged $Mself to your empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
 	else if ((old = GET_LOYALTY(targ)) && EMPIRE_LEADER(old) != GET_IDNUM(targ))

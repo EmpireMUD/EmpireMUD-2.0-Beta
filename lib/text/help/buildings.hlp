@@ -596,11 +596,11 @@ The oilmaker is used to press olives and other resources into oil.
 
 See also: PRESS, STORAGE
 #
-PAINTSHOP "PAINT SHOP" "PAINTER'S WORKSHOP" "PAINTERS WORKSHOP"
+PAINTER PAINTSHOP "PAINT SHOP" "PAINTER'S WORKSHOP" "PAINTERS WORKSHOP"
 
 [PP]  Painter's Workshop  (Luxury ability)
 
-Command:  build paintshop <direction>
+Command:  build painter <direction>
 Stored here:  paints
 
 This building is used to make and store paints (although you also require
