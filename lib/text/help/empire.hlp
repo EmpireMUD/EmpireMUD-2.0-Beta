@@ -630,18 +630,18 @@ Speed boosts:  Faster Chores bonus, haste
 
 Using a shovel, your own strength, and a lot of time, you can excavate a
 trench from a desert or plains. Once the trench is complete, it will begin
-to fill with water. Eventually, it becomes a river.
+to fill with water. Eventually, it becomes a canal.
 
 The "fillin" command is the opposite of excavate: it fills trenches in until
 they are ordinary plains or desert again. It will also work on a player-created
-oasis or river. It takes 1 minute to begin a fillin on a completed trench; if
+oasis or canal. It takes 1 minute to begin a fillin on a completed trench; if
 you cancel the action or are interrupted, you must start the minute over.
 
 You can only excavate and fill in on claimed land.
 
-When a desert trench fills with water, it will become an Oasis instead of a
-river. Oases convert into rivers if they are adjacent to other rivers or to
-oceans.
+When a desert trench fills with water, it will become an oasis instead of a
+canal. Oases convert into canals if they are adjacent to other canals or water
+sources.
 
 There are three ways to fill a finished trench with water:
  - If there is more water adjacent, the trench will fill quickly.
