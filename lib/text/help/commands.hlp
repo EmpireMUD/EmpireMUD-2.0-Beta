@@ -994,10 +994,11 @@ Examples:
 
 See also: COINS, DROP
 #
-KILL HIT
+KILL HIT MURDER
 
 Usage:  kill <victim>
         hit <victim>
+        murder <victim>
 
 A good way to start a fight.
 
