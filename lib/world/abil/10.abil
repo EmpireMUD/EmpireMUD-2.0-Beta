@@ -237,11 +237,11 @@ M
 2
 You swirl around $N, cutting open dozens of tiny lacerations with your nails.~
 M
-2
-$n swirls around you, cutting open dozens of tiny lacerations!~
-M
 4
 $n swirls around $N, cutting open dozens of tiny lacerations.~
+M
+3
+$n swirls around you, cutting open dozens of tiny lacerations!~
 T b 1
 X b
 3096 9 9 0

@@ -597,9 +597,10 @@ goggles clockwork pair~
 clockwork goggles~
 A pair of clockwork goggles are lying here.~
    Fitted with several lenses for different distances and magnifications, these
-goggles make precision craftsmanship much easier. And protect your eyes.
+goggles make precision craftsmanship much easier. And protect your eyes. This
+is a tier 1 crafting item.
 ~
-2 p ae 8
+2 p ae 9
 0 0 0
 8 0
 A
@@ -612,9 +613,10 @@ tunic guildmasters guildmaster's~
 a guildmaster's tunic~
 A guildmaster has left his tunic here.~
    This tunic is finely embroidered with the symbol of a craftsman's guild on
-the front. It is also fireproof, and resists stains.
+the front. It is also fireproof, and resists stains. This is a tier 1 crafting
+item.
 ~
-2 p ad 8
+2 p ad 9
 0 0 0
 11 0
 A
@@ -630,9 +632,10 @@ belt utility~
 a utility belt~
 A utility belt has been discarded here.~
    This sturdy leather belt is specially designed to let you keep your own
-weight in tools within your reach while keeping both hands free.
+weight in tools within your reach while keeping both hands free. This is a tier
+1 crafting item.
 ~
-2 p al 8
+2 p al 9
 0 0 0
 7 0
 A
@@ -645,9 +648,9 @@ multitool folding steel~
 a steel multitool~
 A folding steel multitool is lying here.~
    This amazing multi-purpose folding tool has attachments for almost every
-conceivable purpose. It even has a corkscrew!
+conceivable purpose. It even has a corkscrew! This is a tier 1 crafting item.
 ~
-3 p ao 8
+3 p ao 9
 0 0 0
 2 0
 A
@@ -804,9 +807,10 @@ cap cleansing chemist's chemists~
 a chemist's cleansing cap~
 A chemist's cleansing cap lies discarded here.~
    This stylish leather cap has a flip-down visor which doubles as an air
-purifier to protect you from noxious alchemical fumes!
+purifier to protect you from noxious alchemical fumes! This is a tier 2
+crafting item.
 ~
-2 p ae 11
+2 p ae 12
 0 0 0
 7 0
 A
@@ -819,9 +823,9 @@ apparatus arcane antiquated~
 an antiquated arcane apparatus~
 An antiquated arcane apparatus lies forgotten here.~
    This strange device, made in the image of an ancient relic, helps guide your
-movements while crafting.
+movements while crafting. This is a tier 2 crafting item.
 ~
-2 p ao 6
+2 p ao 7
 0 0 0
 3 0
 A
@@ -834,9 +838,9 @@ sash smuggling silk superb~
 a superb smuggling sash~
 A superb silk sash is lying here.~
    This innocent-looking cloth belt has dozens and dozens of hidden pouches
-sewn into the inside of the fabric!
+sewn into the inside of the fabric! This is a tier 2 crafting item.
 ~
-2 p al 5
+2 p al 6
 0 0 0
 11 0
 A
@@ -849,10 +853,10 @@ trappings tinker's tinkers traveling~
 a traveling tinker's trappings~
 A traveling tinker's trappings are lying here.~
    This awkward-looking assembly of mechanical arms, clamps, and tiny tables
-attached to a traveler's outfit would probably let you work very efficiently
-on the move if you knew how to use it.
+attached to a traveler's outfit would probably let you work very efficiently on
+the move if you knew how to use it. This is a tier 2 crafting item.
 ~
-2 p ad 7
+2 p ad 8
 0 0 0
 2 0
 A
