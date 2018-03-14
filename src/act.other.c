@@ -1120,7 +1120,7 @@ void tog_informative(char_data *ch) {
 * @param char_data *ch The player.
 */
 void tog_mapcolor(char_data *ch) {
-	if (PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
+	if (PRF_FLAGGED(ch, PRF_NOMAPCOL) && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 		REMOVE_BIT(PRF_FLAGS(ch), PRF_POLITICAL | PRF_INFORMATIVE);
 	}
 }
