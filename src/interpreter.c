@@ -1062,6 +1062,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "wiznet", POS_DEAD, do_pub_comm, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_WIZNET ),
 	SCMD_CMD( ";", POS_DEAD, do_pub_comm, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_WIZNET ),
 	SCMD_CMD( "wizhelp", POS_DEAD, do_commands, LVL_GOD, CTYPE_IMMORTAL, SCMD_WIZHELP ),
+	SCMD_CMD( "wizhistory", POS_DEAD, do_history, LVL_GOD, CTYPE_COMM, CHANNEL_HISTORY_GOD ),
 	SCMD_CMD( "wizlist", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_WIZLIST ),
 	GRANT_CMD( "wizlock", POS_DEAD, do_wizlock, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_WIZLOCK ),
 	SIMPLE_CMD( "workforce", POS_DEAD, do_workforce, NO_MIN, CTYPE_EMPIRE ),
