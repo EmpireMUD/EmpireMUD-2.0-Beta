@@ -279,12 +279,9 @@ the result of the immediate evaluation of the provided expression. There also
 exists a "set" command, with the same syntax. Set differs in that the expression
 is not evaluated until each time the variable is accessed.
 
-Example:
-* this example immediately evaluates the expression below and stores the result
-* in %result%:
-eval result %self.health% * 100 / %self.maxhealth% 
-say My hitpoint percentage is %result%.
-* this result will not change after the evaluation even if %self.health% changes.
+Use 'eval' instead of 'set' when:
+ - There is math in the text:  eval var %input% + 3
+ - There are nested variables:  eval to_room %%from_room.%direction%(room)%%
 
 See also: TRIG-SET
 #d
@@ -657,13 +654,16 @@ the provided expression, which will be evaluated when the variable is accessed.
 There also exists an "eval" command, with the same syntax. Eval differs in that 
 the expression is evaluated immediately.
 
-Example:
-* this example sets the value of result to '%self.health% * 100 / %self.maxhealth%'
-set result %self.health% * 100 / %self.maxhealth% 
-* The %result% var now works as a 'function' every time it's accessed.
-say My hitpoint percentage is %result%.
-%damage% %self% 30
-say My hitpoint percentage is %result%.
+Note: Variables in %percents% will still be evaluated BEFORE the 'set' happens,
+so "set health %self.health%" will set the %health% variable to a number,
+which won't change no matter how many times you call %health%. Stock DG Scripts
+contained an example about using 'set' to calculate hitpoints before and after
+a %damage% effect; this example was incorrect and will not work.
+
+Use 'set' instead of 'eval' when:
+ - There is no math in the value:  set to_room %self.room%
+ - The value is a multi-word phrase:  set objname the wand of enchantment
+ - The value contains a '-' that isn't a minus:  set objname the gob-smacker
 
 See also: EVAL
 #d
