@@ -468,7 +468,7 @@ S
 Permafrost: Grandma's Rhubarb Pie~
    Ever since we discovered rhubarb growing outside of the Permafrost portals,
 tavern patrons haven't been able to get enough of it. In fact, the Guild has
-run out of pies again. Collect some rhubarb and back four pies for the guild.
+run out of pies again. Collect some rhubarb and bake four pies for the guild.
 If you don't have any rhubarb fields, try foraging outside one of the portals.
 ~
    Four rhubarb pies! The tavernkeep will be elated. Here's your share of the
@@ -853,7 +853,7 @@ unable to expand his collection while he's stuck in this time loop, deep in the
 distant past. You could win his support by traveling to Mill Manor, deep in the
 swamp, and solve the clues there to find the cursed chalice. Malfernes gives
 you a countercurse talisman. Once you have the chalice, 'use' the talisman to
-negate the curse so you can return the chalice to Malefernes in the Primeval.
+negate the curse so you can return the chalice to Malfernes in the Primeval.
 ~
    You have completed the quest. Malfernes takes the chalice from you and
 conjures a stream of wine from the air, filling the chalice. He takes a drink
@@ -887,8 +887,6 @@ practical jokes. He hands you the Staff of Draconic Imagination and instructs
 you to seek out a flame dragon or a wandering dragon who has abandoned its
 nest, and 'use staff' to capture its image. Then head to the Tower Skycleave
 and 'use staff' again to release the image in the tower.
-   You can use any dragon from the Flame Dragon or Abandoned Dragon Nest
-adventures.
 ~
    Malfernes cackles with glee when you tell him about your escapades at the
 Tower Skycleave.
@@ -1001,8 +999,8 @@ temple.
 (You must leave the Lost Temple's map location in order for it to become a
 Jungle Temple.)
 ~
-   Germione cries as and hugs you as you tell her the tale of your quest to
-avenge beloved Measley's death.
+   Germione cries and hugs you as you tell her the tale of your quest to avenge
+beloved Measley's death.
 ~
 5 0 0 0 -1
 A
@@ -1081,8 +1079,8 @@ Procure a Roc Egg~
    Scaldorran has a deep, eternal hunger that can never be sated by earthly
 foods -- such is the fate of all liches. But the abominable Yetsy has recently
 shared a recipe for 1000 Year Eggs, and Scaldorran only needs a good Roc egg to
-make it work. Seek out the gigantic nest of the Roc and and 'use sack' to steal
-the egg, then return it to Scaldorran to gain his favor.
+make it work. Seek out the gigantic nest of the Roc and 'use sack' to steal the
+egg, then return it to Scaldorran to gain his favor.
 Hints:
 - Gigantic Nest adventures don't show up on 'nearby'; try 'scan'.
 - Make sure you steal the egg with 'use sack', not by doing the egg's quest.
