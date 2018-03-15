@@ -224,7 +224,7 @@ BOARDS READ WRITE RESPOND
 
 Usage:  look board
         write <headline>
-        read <number>
+        read <number | book>
         respond <number> <headline>
         remove <number>
 
@@ -232,6 +232,8 @@ Bulletin boards are the forum of inter-player communication on the MUD. There
 are different bulletin boards for different purposes -- for example, a
 standard mortal board and a board for immortals. Naturally, not all players
 may be allowed to read all types of boards.
+
+The 'read' command is also used to read books.
 
 Example:
 
@@ -241,7 +243,7 @@ Example:
   > read 6
   > remove 6
 
-See also: MAIL
+See also: BOOKS, MAIL
 #
 "BONUS TRAITS" BONUSES
 
@@ -1034,6 +1036,18 @@ that's magic resistance). This trait is similar to the "soak" trait from older
 versions of EmpireMUD.
 
 See also: RESIST-MAGICAL, SCORE
+#
+"ROUGH TERRAIN" "ROUGH TILE" ROUGH
+
+Areas of the map that are particularly hard to cross are referred to as 'rough
+terrain'. This includes mountains and the arctic tundra. Because of this
+difficulty, the game requires you to type 'climb <direction>' to move onto the
+first rough tile.
+
+Moving from one tile with rough terrain to another requires the Mountain
+Climbing ability, or flight.
+
+See also: CLIMB, MOUNTAIN CLIMBING
 #
 SCALING "MOB SCALING" "SCALING MOBS"
 

@@ -72,6 +72,20 @@ but don't deal or take damage.
 
 See also: BUFF, SYNERGY FAMILIARS
 #
+DPS "DAMAGE PER SECOND"
+
+The term DPS means 'damage per second'. This is a way of comparing the total
+damage dealt by two people using different weapons and abilities. For example,
+a slow weapon with high damage might really being dealing the same amount
+overall as a fast weapon with low damage.
+
+DPS can also refer to the members of a group whose role is to deal damage, as
+opposed to tanking or healing.
+
+You can see your effective DPS using the 'meters' command.
+
+See also: MELEE DPS, CASTER DPS, METERS
+#
 HEALER HEALING "HEALER ROLE" "HEALING ROLE" "HEALER TRAITS" "HEALING TRAITS"
 
 The healer is the group member who keeps the others alive. Healers focus on
