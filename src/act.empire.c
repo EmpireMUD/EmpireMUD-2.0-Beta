@@ -5700,7 +5700,7 @@ ACMD(do_roster) {
 	// mortal usage: roster [all]
 	
 	// override for imm args: roster <empire> (with no quotes and no -all)
-	if (imm_access && (e = get_empire_by_name(argument))) {
+	if (imm_access && *argument && (e = get_empire_by_name(argument))) {
 		*argument = '\0';	// clear further args and accept the empire name as-is
 	}
 	
