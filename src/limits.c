@@ -1213,6 +1213,13 @@ void reduce_stale_empires(void) {
 	empire_data *iter, *next_iter;
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
+		// check if we need to rescan
+		if (EMPIRE_MEMBERS(iter) > 0 && EMPIRE_NEXT_TIMEOUT(iter) != 0 && EMPIRE_NEXT_TIMEOUT(iter) <= time(0)) {
+			syslog(SYS_INFO, 0, TRUE, "Debug: Rescanning empire %s based on timeout", EMPIRE_NAME(iter));
+			reread_empire_tech(iter);
+		}
+		
+		// check overages
 		if (!EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
 			// when members hit 0, we consider the empire timed out
 			reduce_stale_empires_one(iter);

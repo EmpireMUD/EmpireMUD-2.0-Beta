@@ -55,7 +55,7 @@ void update_class(char_data *ch);
 // local protos
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
-static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
+time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
@@ -2005,7 +2005,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	// Players who have been out for 1 hour get a free restore
 	RESTORE_ON_LOGIN(ch) = (((int) (time(0) - ch->prev_logon)) >= 1 * SECS_PER_REAL_HOUR);
 	if (GET_LOYALTY(ch)) {
-		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR));
+		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || get_member_timeout_time(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR) <= time(0));
 	}
 	
 	free(cont_row);
@@ -4153,15 +4153,15 @@ static void add_to_account_list(struct empire_member_reader_data **list, empire_
 
 
 /**
-* Determines is an empire member is timed out based on his playtime, creation
+* Determines when an empire member is timed out based on his playtime, creation
 * time, and last login.
 *
 * @param time_t created The player character's birth time.
 * @param time_t last_login The player's last login time.
 * @param double played_hours Number of hours the player has played, total.
-* @return bool TRUE if the member has timed out and should not be counted; FALSE if they're ok.
+* @return time_t The timestamp when the member would time out (may be past, present, or future).
 */
-static bool member_is_timed_out(time_t created, time_t last_login, double played_hours) {
+time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours) {
 	int member_timeout_full = config_get_int("member_timeout_full") * SECS_PER_REAL_DAY;
 	int member_timeout_newbie = config_get_int("member_timeout_newbie") * SECS_PER_REAL_DAY;
 	int minutes_per_day_full = config_get_int("minutes_per_day_full");
@@ -4199,24 +4199,35 @@ static bool member_is_timed_out(time_t created, time_t last_login, double played
 
 
 /**
-* Calls member_is_timed_out() using a player_index_data.
+* Calls get_member_timeout_time() using a player_index_data.
 *
 * @param player_index_data *index A pointer to the playertable entry.
 * @return bool TRUE if the member has timed out and should not be counted; FALSE if they're ok.
 */
 bool member_is_timed_out_index(player_index_data *index) {
-	return member_is_timed_out(index->birth, index->last_logon, ((double)index->played) / SECS_PER_REAL_HOUR);
+	return get_member_timeout_time(index->birth, index->last_logon, ((double)index->played) / SECS_PER_REAL_HOUR) <= time(0);
 }
 
 
 /**
-* Calls member_is_timed_out() using a char_data.
+* Calls get_member_timeout_time() using a char_data.
+*
+* @param char_data *ch A character to compute timeout on.
+* @return time_t When the member would time out (past/present/future).
+*/
+time_t get_member_timeout_ch(char_data *ch) {
+	return get_member_timeout_time(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
+}
+
+
+/**
+* Calls get_member_timeout_time() using a char_data.
 *
 * @param char_data *ch A character to compute timeout on.
 * @return bool TRUE if the member has timed out and should not be counted; FALSE if they're ok.
 */
 bool member_is_timed_out_ch(char_data *ch) {
-	return member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
+	return get_member_timeout_ch(ch) <= time(0);
 }
 
 
@@ -4236,7 +4247,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	player_index_data *index, *next_index;
 	empire_data *e, *emp, *next_emp;
 	char_data *ch;
-	time_t logon;
+	time_t logon, curtime = time(0), timeout;
 	bool is_file;
 
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -4247,6 +4258,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_TOTAL_PLAYTIME(emp) = 0;
 			EMPIRE_LAST_LOGON(emp) = 0;
 			EMPIRE_IMM_ONLY(emp) = 0;
+			EMPIRE_NEXT_TIMEOUT(emp) = 0;
 		}
 	}
 	
@@ -4277,7 +4289,9 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_TOTAL_MEMBER_COUNT(e) += 1;
 			
 			// only count players who have logged on in recent history
-			if (!is_file || !member_is_timed_out_ch(ch)) {
+			timeout = get_member_timeout_ch(ch);
+			
+			if (!is_file || timeout > curtime) {
 				add_to_account_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_GREATNESS(ch));
 				
 				// not account-restricted
@@ -4286,6 +4300,11 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 				if (read_techs) {
 					adjust_abilities_to_empire(ch, e, TRUE);
 				}
+			}
+			
+			// update next timeout check
+			if (timeout > curtime) {
+				EMPIRE_NEXT_TIMEOUT(e) = MIN(EMPIRE_NEXT_TIMEOUT(e), timeout);
 			}
 		}
 		

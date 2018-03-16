@@ -4260,6 +4260,7 @@ struct empire_data {
 	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
 	struct workforce_log *wf_log;	// errors with workforce
+	time_t next_timeout;	// for triggering rescans
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
