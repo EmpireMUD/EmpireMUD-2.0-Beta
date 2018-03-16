@@ -4168,7 +4168,7 @@ time_t get_member_timeout_time(time_t created, time_t last_login, double played_
 	int minutes_per_day_newbie = config_get_int("minutes_per_day_newbie");
 
 	if (played_hours >= config_get_int("member_timeout_max_threshold")) {
-		return (last_login + member_timeout_full) < time(0);
+		return (last_login + member_timeout_full);
 	}
 	else {
 		double days_played = (double)(time(0) - created) / SECS_PER_REAL_DAY;
@@ -4177,7 +4177,7 @@ time_t get_member_timeout_time(time_t created, time_t last_login, double played_
 		
 		// when playtime drops this low, the character is ALWAYS timed out
 		if (avg_min_per_day <= 1) {
-			return TRUE;
+			return last_login;
 		}
 		
 		if (avg_min_per_day >= minutes_per_day_full) {
@@ -4193,7 +4193,7 @@ time_t get_member_timeout_time(time_t created, time_t last_login, double played_
 			timeout = member_timeout_newbie + (prc * scale);
 		}
 		
-		return (last_login + timeout) < time(0);
+		return (last_login + timeout);
 	}
 }
 
