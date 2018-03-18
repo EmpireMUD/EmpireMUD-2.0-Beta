@@ -371,10 +371,10 @@ S
 #10225
 hole~
 a hole, hidden behind the plants~
-It looks like there's a hole hidden behind the plants.~
-It looks like there's more to the garden!
+It looks like there's a hole hidden behind the plants. (adventure)~
+It looks like there's more to the garden! Enter the hole to check it out.
 ~
-8 j 0 1
+8 j 0 3
 10225 0 0
 0 0
 S
