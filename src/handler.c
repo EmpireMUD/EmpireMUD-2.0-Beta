@@ -1441,6 +1441,7 @@ void char_from_room(char_data *ch) {
 */
 void char_to_room(char_data *ch, room_data *room) {
 	void check_instance_is_loaded(struct instance_data *inst);
+	void check_island_levels(room_data *location, int level);
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern int lock_instance_level(room_data *room, int level);
@@ -1479,6 +1480,10 @@ void char_to_room(char_data *ch, room_data *room) {
 			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 				ROOM_LIGHTS(room)++;
 			}
+		}
+		
+		if (!IS_NPC(ch) && !IS_IMMORTAL(ch)) {
+			check_island_levels(room, (int) GET_COMPUTED_LEVEL(ch));
 		}
 
 		// check npc spawns whenever a player is places in a room

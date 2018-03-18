@@ -6417,10 +6417,10 @@ ACMD(do_island) {
 			
 			center = real_room(isle->center);
 			
-			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size);
+			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d, levels %d-%d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size, isle->min_level, isle->max_level);
 			if (isle->flags) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), " %s", flags);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), ", %s", flags);
 			}
 			
 			if (strlen(line) + outsize < sizeof(output)) {

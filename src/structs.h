@@ -4261,6 +4261,8 @@ struct empire_data {
 	bool banner_has_underline;	// helper
 	struct workforce_log *wf_log;	// errors with workforce
 	time_t next_timeout;	// for triggering rescans
+	int min_level;	// minimum level in the empire
+	int max_level;	// maximum level in the empire
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
@@ -4946,6 +4948,8 @@ struct island_info {
 	bitvector_t flags;	// ISLE_ flags
 	
 	// computed data
+	int min_level;	// of players on the island
+	int max_level;	// determined at startup and on-move
 	int tile_size;
 	room_vnum center;
 	room_vnum edge[NUM_SIMPLE_DIRS];	// edges

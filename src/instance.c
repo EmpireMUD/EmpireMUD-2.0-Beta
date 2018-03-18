@@ -775,6 +775,16 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
 	}
 	if (isle && isle->id != NO_ISLAND) {
+		if (!IS_SET(isle->flags, ISLE_CONTINENT)) {	// not continent: check levels
+			if (GET_ADV_MIN_LEVEL(adv) > 0 && (!isle->max_level || isle->max_level + 50 < GET_ADV_MIN_LEVEL(adv))) {
+				// island's max level is more than 50 below the adventure's minimum
+				return FALSE;
+			}
+			if (GET_ADV_MAX_LEVEL(adv) > 0 && isle->min_level > GET_ADV_MAX_LEVEL(adv) + 50) {
+				// island's min level is more than 50 above the adventure's maximum level
+				return FALSE;
+			}
+		}
 		if (IS_SET(isle->flags, ISLE_NEWBIE)) {	// is newbie island
 			if (GET_ADV_MIN_LEVEL(adv) > config_get_int("newbie_adventure_cap") && !ADVENTURE_FLAGGED(adv, ADV_NEWBIE_ONLY)) {
 				return FALSE;

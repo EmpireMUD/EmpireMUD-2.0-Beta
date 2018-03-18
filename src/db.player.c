@@ -4249,6 +4249,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	char_data *ch;
 	time_t logon, curtime = time(0), timeout;
 	bool is_file;
+	int level;
 
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!only_empire || emp == only_empire) {
@@ -4259,6 +4260,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_LAST_LOGON(emp) = 0;
 			EMPIRE_IMM_ONLY(emp) = 0;
 			EMPIRE_NEXT_TIMEOUT(emp) = 0;
+			EMPIRE_MIN_LEVEL(emp) = 0;
+			EMPIRE_MAX_LEVEL(emp) = 0;
 		}
 	}
 	
@@ -4296,6 +4299,11 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 				
 				// not account-restricted
 				EMPIRE_TOTAL_PLAYTIME(e) += (ch->player.time.played / SECS_PER_REAL_HOUR);
+				level = (int) GET_COMPUTED_LEVEL(ch);
+				if (!EMPIRE_MIN_LEVEL(e) || level < EMPIRE_MIN_LEVEL(e)) {
+					EMPIRE_MIN_LEVEL(e) = level;
+				}
+				EMPIRE_MAX_LEVEL(e) = MAX(EMPIRE_MAX_LEVEL(e), level);
 
 				if (read_techs) {
 					adjust_abilities_to_empire(ch, e, TRUE);
