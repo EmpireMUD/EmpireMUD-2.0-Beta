@@ -3209,7 +3209,7 @@ void setup_island_levels(void) {
 	
 	// mark empire locations
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (!EMPIRE_MEMBERS(emp) || !EMPIRE_CITY_LIST(emp) || EMPIRE_MAX_LEVEL(emp) == 0) {
+		if (!EMPIRE_MEMBERS(emp) || !EMPIRE_CITY_LIST(emp) || EMPIRE_MAX_LEVEL(emp) == 0 || EMPIRE_IS_TIMED_OUT(emp)) {
 			continue;	// no locations/levels to mark
 		}
 		

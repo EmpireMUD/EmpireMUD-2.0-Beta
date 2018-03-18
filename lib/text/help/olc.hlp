@@ -1123,6 +1123,7 @@ The following adventure flags are available:
  CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
     first time.
  IGNORE-WORLD-SIZE - Won't adjust the number of instances based on the world.
+ IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -1323,6 +1324,8 @@ These are set in terms of players' composite level (the level number given by
 their skills and gear).
 
 Adventures whose minimum level is over 25 will not spawn on newbie islands.
+Islands will only spawn adventures that are within 50 levels of the players
+who live on/visit those islands (but continents spawn all levels).
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 
