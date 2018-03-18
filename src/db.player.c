@@ -4299,7 +4299,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 				
 				// not account-restricted
 				EMPIRE_TOTAL_PLAYTIME(e) += (ch->player.time.played / SECS_PER_REAL_HOUR);
-				level = (int) GET_COMPUTED_LEVEL(ch);
+				level = is_file ? GET_HIGHEST_KNOWN_LEVEL(ch) : (int) GET_COMPUTED_LEVEL(ch);
 				if (!EMPIRE_MIN_LEVEL(e) || level < EMPIRE_MIN_LEVEL(e)) {
 					EMPIRE_MIN_LEVEL(e) = level;
 				}
