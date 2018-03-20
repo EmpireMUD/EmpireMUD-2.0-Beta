@@ -1212,12 +1212,12 @@ static void reduce_stale_empires_one(empire_data *emp) {
 void reduce_stale_empires(void) {
 	empire_data *iter, *next_iter;
 	
-	syslog(SYS_INFO, 0, TRUE, "Debug: Starting reduce_stale_empires");
+	// syslog(SYS_INFO, 0, TRUE, "Debug: Starting reduce_stale_empires");
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		// check if we need to rescan
 		if (EMPIRE_MEMBERS(iter) > 0 && EMPIRE_NEXT_TIMEOUT(iter) != 0 && EMPIRE_NEXT_TIMEOUT(iter) <= time(0)) {
-			syslog(SYS_INFO, 0, TRUE, "Debug: Rescanning empire %s based on timeout", EMPIRE_NAME(iter));
+			// syslog(SYS_INFO, 0, TRUE, "Debug: Rescanning empire %s based on timeout", EMPIRE_NAME(iter));
 			reread_empire_tech(iter);
 		}
 		
