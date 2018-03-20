@@ -20,7 +20,7 @@ I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -54,7 +54,7 @@ I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -89,7 +89,7 @@ I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -126,7 +126,7 @@ I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -164,7 +164,7 @@ I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -179,10 +179,10 @@ S
 #10005
 A Hidden Thicket~
    The thicket opens into a small, hidden clearing in the trees. It looks like
-you have stumbled upon a wildling nest. Bits of spiky black fur a stuck against
-the brambles of plants in a location that was carefully selected to keep
-interlopers out. It is unwise to stay long, as the wildlings who made the nest
-are likely to return.
+you have stumbled upon a wildling nest. Bits of spiky black fur are stuck
+against the brambles of plants in a location that was carefully selected to
+keep interlopers out. It is unwise to stay long, as the wildlings who made the
+nest are likely to return.
 ~
 ad 0 0
 D14
@@ -198,7 +198,7 @@ I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond

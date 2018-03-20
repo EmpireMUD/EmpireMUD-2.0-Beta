@@ -1,142 +1,29 @@
-CLASS "CLASS SKILLS" "CLASS ROLE" ROLE "GROUP ROLE"
+CLASS CLASSES "CLASS SKILLS"
 
-When you specialize two skills past 75, they become your "class skills" and
-you are assigned a class. Your class determines how large your health, move,
-and mana pools are. It also gives you some new abilities once you skill level
-100.
+Usage:  class  (command deprecated)
 
-Usage:  class [role <type>]
-        role [type]
+EmpireMUD does not currently use classes. However, the code base includes a
+feature where classes can be defined as certain combinations of high-level
+skills.
 
-The class command shows your current class, role, and class abilities. You
-can also use this command to change roles. For example, "class role tank".
-You must have a role in order to gain your class's abilities, even if all of
-its roles share them.
+Some help files refer to "class skills", meaning "a skill in the 76-100 range".
+This is very similar to the "synergies" feature which was designed to replace
+classes.
 
-Group roles are the different tasks a person might be suited for. For example,
-if your character has both Natural Magic and Survival as its core skills, it
-might be suited to melee damage, caster damage, or healing. You can't perform
-all roles at the same time.
-
-The role command lists synergy abilities and can also be used to change your
-role.
-
-&yTank&0: Takes all the damage in combat.
-&rMelee&0: Does physical damage.
-&aCaster&0: Does magical damage.
-&jHealer&0: Keeps the group alive.
-&mUtility&0: Doesn't fight; builds or crafts instead.
-&wSolo&0: For playing alone; some abilities won't work in groups.
-
-The colors shown above are used to display group roles on "who" and "roster".
-
-See also: CLASS LIST, TANK, HEALER, MELEE, CASTER, UTILITY, SOLO, SYNERGY ABILITY
-#
-"CLASS LIST" CLASSES
-
-(Disambiguation: Did you mean HELP CLASS ?)
-
-Classes - see HELP <NAME> CLASS
--------------------------------
-Battle: Duke (Empire), Battlemage (High Sorcery), Werewolf (Natural Magic),
-        Assassin (Stealth), Barbarian (Survival), Steelsmith (Trade),
-        Reaper (Vampire)
-Empire: Duke (Battle), Exarch (High Sorcery), Luminary (Natural Magic),
-        Powerbroker (Stealth), Elder (Survival), Guildsman (Trade),
-        Ancient (Vampire)
-High Sorcery: Battlemage (Battle), Exarch (Empire), Archmage (Natural Magic),
-        Occultist (Stealth), Theurge (Survival), Artificer (Trade),
-        Lich (Vampire)
-Natural Magic: Werewolf (Battle), Luminary (Empire), Archmage (High Sorcery),
-        Shadow Wolf (Stealth), Feral (Survival), Alchemist (Trade),
-        Necromancer (Vampire)
-Stealth: Assassin (Battle), Powerbroker (Empire), Occultist (High Sorcery),
-        Shadow Wolf (Natural Magic), Bandit (Survival), Smuggler (Trade),
-        Shade (Vampire)
-Survival: Barbarian (Battle), Elder (Empire), Theurge (High Sorcery),
-        Feral (Natural Magic), Bandit (Stealth), Tinker (Trade),
-        Wight (Vampire)
-Trade: Steelsmith (Battle), Guildsman (Empire), Artificer (High Sorcery),
-        Alchemist (Natural Magic), Smuggler (Stealth), Tinker (Survival),
-        Antiquarian (Vampire)
-Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
-        (Natural Magic), Shade (Stealth), Wight (Survival), Antiquarian (Trade)
-
-See also: CLASS
+An EmpireMUD could choose to use classes by adding some new ones in OLC.
+Players will automatically be assigned any class that matches their skills,
+but the class is not currently displayed anywhere.
 #
 ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS" ORIGIN HOBBY
 
 All player characters start with some gear, low attributes, and at least 30
 skill points. Generally, one attribute will be 3, two will be 1, and the rest
-all 2s. Starting archetype does not limit your skills or class choices in any
-way.
+all 2s. Starting archetype does not limit your skills or character choices in
+any meaningful way.
 
 There are two types of archetypes:
 - Origins: Your character's background and upbringing.
 - Hobbies: Bonus skills for your character.
-#
-"ALCHEMIST CLASS" ALCH
-
-Alchemist
-Natural Magic + Trade
-
-See also: CLASS, HEALER, UTILITY
-#
-"ANCIENT CLASS" ANCIENT ANCT
-
-Ancient
-Vampire + Empire
-
-See also: CLASS, MELEE, UTILITY
-#
-"ANTIQUARIAN CLASS" ANTQ
-
-Antiquarian
-Trade + Vampire
-
-See also: CLASS, MELEE, UTILITY
-#
-"ARCHMAGE CLASS" ACHM
-
-Archmage
-High Sorcery + Natural Magic
-
-See also: CLASS, CASTER, HEALER
-#
-"ARTIFICER CLASS" ARTF
-
-Artificer
-High Sorcery + Trade
-
-See also: CLASS, CASTER, UTILITY
-#
-"ASSASSIN CLASS" ASSN
-
-Assassin
-Battle + Stealth
-
-See also: CLASS, MELEE
-#
-"BANDIT CLASS" BNDT
-
-Bandit
-Stealth + Survival
-
-See also: CLASS, MELEE
-#
-"BARBARIAN CLASS" BRBN
-
-Barbarian
-Battle + Survival
-
-See also: CLASS, TANK, MELEE
-#
-"BATTLEMAGE CLASS" "BATTLE MAGE CLASS" BTMG
-
-Battlemage
-Battle + High Sorcery
-
-See also: CLASS
 #
 BUFF "BUFF ROLE" "BUFFS ROLE" "BUFFER ROLE"
 
@@ -147,7 +34,7 @@ role like healer or caster.
 Some familiars perform only the buff role -- they cast spells on the party but
 don't deal or take damage.
 
-See also: CLASS FAMILIARS, DEBUFF
+See also: SYNERGY FAMILIARS, DEBUFF
 #
 CASTER "CASTER ROLE" "MAGIC DPS" "CASTER DPS" "CASTER TRAITS"
 
@@ -183,42 +70,21 @@ melee or tank.
 Some familiars perform only the debuff role -- they cast spells on the enemy
 but don't deal or take damage.
 
-See also: BUFF, CLASS FAMILIARS
+See also: BUFF, SYNERGY FAMILIARS
 #
-"DUKE CLASS" DUKE
+DPS "DAMAGE PER SECOND"
 
-Duke
-Battle + Empire
+The term DPS means 'damage per second'. This is a way of comparing the total
+damage dealt by two people using different weapons and abilities. For example,
+a slow weapon with high damage might really being dealing the same amount
+overall as a fast weapon with low damage.
 
-See also: CLASS, TANK, MELEE, UTILITY
-#
-"ELDER CLASS" ELDR
+DPS can also refer to the members of a group whose role is to deal damage, as
+opposed to tanking or healing.
 
-Elder
-Empire + Survival
+You can see your effective DPS using the 'meters' command.
 
-See also: CLASS, MELEE, UTILITY
-#
-"EXARCH CLASS" EXRC
-
-Exarch
-Empire + High Sorcery
-
-See also: CLASS, CASTER, UTILITY
-#
-"FERAL CLASS" FERL
-
-Feral
-Natural Magic + Survival
-
-See also: CLASS, TANK, HEALER
-#
-"GUILDSMAN CLASS" GDSM
-
-Guildsman
-Empire + Trade
-
-See also: CLASS, MELEE, UTILITY
+See also: MELEE DPS, CASTER DPS, METERS
 #
 HEALER HEALING "HEALER ROLE" "HEALING ROLE" "HEALER TRAITS" "HEALING TRAITS"
 
@@ -242,26 +108,9 @@ Healer traits:
  - Mana-Regen: Ensures you have enough mana to keep the group alive.
  - Wits: Allows you to cast faster with Fastcasting.
  - Bonus-Healing: Raises the size of your heals without raising the cost.
- - Misc*: Each healer class has a unique trait requirement.
+ - Misc*: Each healer synergy has a unique trait requirement.
 
 See also: CASTER, MELEE, TANK
-#
-"LICH CLASS"
-
-Lich
-High Sorcery + Vampire
-
-See also: CLASS, CASTER
-#
-"LUMINARY CLASS" LMNY
-
-Luminary
-Empire + Natural Magic
-
-Luminary Healers gain additional healing power from Greatness and should build
-their Greatness in addition to the 4 healer traits.
-
-See also: CLASS, CASTER, HEALER, UTILITY
 #
 MELEE "MELEE ROLE" "DPS ROLE" "MELEE DPS ROLE" "MELEE TRAITS"
 
@@ -287,70 +136,14 @@ Melee traits:
 
 See also: CASTER, HEALER, HIT CAP, TANK
 #
-"NECROMANCER CLASS" NECR
-
-Necromancer
-Natural Magic + Vampire
-
-See also: CLASS, CASTER, HEALER
-#
-"OCCULTIST CLASS" OCLT
-
-Occultist
-High Sorcery + Stealth
-
-See also: CLASS, MELEE
-#
-"POWERBROKER CLASS" "POWER BROKER CLASS" PWBK
-
-Powerbroker
-Empire + Stealth
-
-See also: CLASS, MELEE
-#
-"REAPER CLASS" REAP
-
-Reaper
-Battle + Vampire
-
-See also: CLASS, TANK, MELEE
-#
-"SHADE CLASS" SHDE
-
-Shade
-Stealth + Vampire
-
-See also: CLASS, MELEE
-#
-"SHADOW WOLF CLASS" SHWF
-
-Shadow Wolf
-Natural Magic + Stealth
-
-See also: CLASS, MELEE, HEALER
-#
-"SMUGGLER CLASS" SMGL
-
-Smuggler
-Stealth + Trade
-
-See also: CLASS, MELEE, UTILITY
-#
 SOLO SOLOIST "SOLO ROLE" "SOLO GROUP ROLE"
 
 The "solo" group role is for people who are going it alone and need every ounce
-of strength their class can muster. This gives them access to a broader range
-of class abilities, but those abilities will only work if the player is
+of strength their character can muster. This gives them access to a broader
+range of synergy abilities, but those abilities will only work if the player is
 actually solo.
 
 If another player is present, solo role abilities will not work.
-#
-"STEELSMITH CLASS" "STEEL SMITH CLASS" SMTH
-
-Steelsmith
-Battle + Trade
-
-See also: CLASS, MELEE, UTILITY
 #
 TANK TANKING "TANK ROLE" "TANKING ROLE" "TANK TRAITS" "TANKING ROLE"
 
@@ -379,46 +172,15 @@ Tank traits:
 
 See also: BLOCK CAP, CASTER, DODGE CAP, HEALER, MELEE
 #
-"THEURGE CLASS" THRG
-
-Theurge
-High Sorcery + Survival
-
-See also: CLASS, UTILITY
-#
-"TINKER CLASS" TNKR
-
-Tinker
-Survival + Trade
-
-See also: CLASS, MELEE, UTILITY
-#
 "UTILITY ROLE"
 
 Utility characters are usually noncombatants like crafters or builders. They're
-entirely capable of fighting, but they don't get the advantage that the class
+entirely capable of fighting, but they don't get the advantage that the synergy
 abilities of the combat roles provide.
 
 The skills of utility characters appear in &mmagenta&0 on the "who" list and
 the empire roster.
 
 See also: CASTER, HEALER, MELEE, TANK
-#
-"WEREWOLF CLASS" WWLF
-
-Werewolf
-Battle + Natural Magic
-
-Healer Werewolves can convert Strength into buffs for themselves and their
-allies, and should build their Strength in addition to the 4 healer traits.
-
-See also: CLASS, TANK, MELEE, HEALER
-#
-"WIGHT CLASS" WGHT
-
-Wight
-Survival + Vampire
-
-See also: CLASS, MELEE
 #
 $~

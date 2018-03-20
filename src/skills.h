@@ -95,40 +95,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define NO_PREREQ  NO_ABIL
 
 
-// combo classes (class_data)
-#define CLASS_NONE  0	// RESERVED
-#define CLASS_DUKE  1
-#define CLASS_BATTLEMAGE  2
-#define CLASS_WEREWOLF  3
-#define CLASS_ASSASSIN  4
-#define CLASS_BARBARIAN  5
-#define CLASS_STEELSMITH  6
-#define CLASS_REAPER  7
-#define CLASS_EXARCH  8
-#define CLASS_LUMINARY  9
-#define CLASS_POWERBROKER  10
-#define CLASS_ELDER  11
-#define CLASS_GUILDSMAN  12
-#define CLASS_VAMPIRE_EMPIRE  13
-#define CLASS_ARCHMAGE  14
-#define CLASS_OCCULTIST  15
-#define CLASS_THEURGE  16
-#define CLASS_ARTIFICER  17
-#define CLASS_LICH  18
-#define CLASS_ORACLE  19
-#define CLASS_MYSTIC  20
-#define CLASS_ALCHEMIST  21
-#define CLASS_NECROMANCER  22
-#define CLASS_BANDIT  23
-#define CLASS_SMUGGLER  24
-#define CLASS_SHADE  25
-#define CLASS_TINKER  26
-#define CLASS_WIGHT  27
-#define CLASS_ANTIQUARIAN  28
-
-#define NUM_CLASSES  29	// total
-
-
 // ABIL_x: ability vnums
 #define ABIL_GIFT_OF_NATURE  0
 #define ABIL_ANCIENT_BLOOD  2

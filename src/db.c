@@ -296,6 +296,7 @@ void boot_db(void) {
 	int run_convert_vehicle_list();
 	void run_reboot_triggers();
 	void schedule_map_unloads();
+	void setup_island_levels();
 	void sort_commands();
 	void startup_room_reset();
 	void update_instance_world_size();
@@ -401,6 +402,7 @@ void boot_db(void) {
 	log(" Calculating territory and members.");
 	reread_empire_tech(NULL);
 	check_for_new_map();
+	setup_island_levels();
 	
 	log(" Checking for ruined cities...");
 	check_ruined_cities();

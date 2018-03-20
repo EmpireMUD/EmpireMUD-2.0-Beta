@@ -241,7 +241,7 @@ A Noisy Stable~
 10 0 bgpR 0
 0 0 0 213
 C
-harness, herd, inventory, milk, mount, retrieve, shear, store~
+harness, herd, inventory, milk, mount, shear~
 D
    The air is thick here in the livery. It smells strongly of animal manure
 and feed, almost enough to make you flee out through the door. There are many
@@ -1602,7 +1602,7 @@ A Shady Garden~
 0 0 0 -1
 C
 pick~
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 R
 16 1 1 1048576
 R

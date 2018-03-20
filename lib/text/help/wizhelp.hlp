@@ -426,7 +426,7 @@ Guidelines for having an Immortal character -- you should read it.
 #d
 HASSLE NOHASSLE "NO HASSLE"
 
-Usage:  toggle hassle
+Usage:  toggle hassle [on/off]
 
 Prevents you from activating command triggers and stops mobs from fighting you.
 This toggle is also used by some other triggers to check if you're an immortal
@@ -436,7 +436,7 @@ See also: TOGGLE
 #d
 HOLYLIGHT "TOGGLE HOLYLIGHT"
 
-Usage:  toggle holylight
+Usage:  toggle holylight [on/off]
 
 A toggle which allows you to see:
    Invisible people and objects, even if you don't have 'detect invisibility'
@@ -464,7 +464,7 @@ See also: FORGIVE, GRANT, STAT, THIEF
 #d
 IDLE-OUT IDLEOUT "IDLE OUT"
 
-Usage:  toggle idle-out
+Usage:  toggle idle-out [on/off]
 
 This immortal toggle prevents you from being disconnected due to long periods
 of inactivity. You can still idle out if you lose your link.
@@ -641,7 +641,7 @@ See also: TITLE
 #d
 NOWIZNET "NO WIZNET"
 
-Usage:  toggle wiznet
+Usage:  toggle wiznet [on/off]
 
 Allows you to hear or ignore messages coming over the wiznet.
 
@@ -693,7 +693,7 @@ restarting combat from queued attacks. This command is grantable.
 
 See also: GRANT
 #d
-PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER"
+PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER" DELETEPLAYER PLRDELETE
 
 Usage:  playerdelete <name> CONFIRM
 
@@ -839,7 +839,7 @@ See also: SWITCH
 #d
 ROOMFLAGS "TOGGLE ROOMFLAGS" "ROOM FLAGS"
 
-Usage:  toggle roomflags
+Usage:  toggle roomflags [on/off]
 
 This immortal toggle allows you to see flags and vnums on the "look" command.
 
@@ -1273,6 +1273,8 @@ See also: VSTAT
 #d
 SWITCH
 
+(Disambiguation: See also HELP SWITCH STATEMENT for the scripting command.)
+
 Usage:  switch <monster>
 
 SWITCH is used to take over the body of mobiles; useful for interactive
@@ -1419,8 +1421,8 @@ Valid types are: adventure, ability, archetype, augment, building, book, craft,
 
 Examples:
 
-  > vstat obj 3000
-  > vstat mob 3001
+  > vstat obj 125
+  > vstat mob 247
 
 See also: LOAD, STAT, VNUM
 #d

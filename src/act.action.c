@@ -2750,7 +2750,7 @@ ACMD(do_mine) {
 		msg_to_char(ch, "The mine is depleted, you find nothing of use.\r\n");
 	}
 	else if (!GET_EQ(ch, WEAR_WIELD) || ((GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_PICK) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_HANDAXE)) {
-		msg_to_char(ch, "You don't have a tool suitable for mining.\r\n");
+		msg_to_char(ch, "You aren't wielding a tool suitable for mining.\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to mine anything here.\r\n");

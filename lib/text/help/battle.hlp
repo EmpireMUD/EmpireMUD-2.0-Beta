@@ -163,6 +163,7 @@ Charge (Battle ability)
 
 Cost:  50 move
 Cooldown:  3 minutes
+Usage:  charge [target]
 
 This ability allows you to charge directly into melee range. It can only be
 used if you're in ranged combat (or running into melee) or aren't in combat
@@ -566,7 +567,7 @@ Cooldown:  9 seconds
 Duration:  9 seconds
 Cost:  11+ move (varies with level)
 
-Sunder opens up holes in your opponent's armor, making them move vulnerable
+Sunder opens up holes in your opponent's armor, making them more vulnerable
 to physical damage.
 #
 REFLEXES
@@ -708,7 +709,7 @@ Battle Synergy Ability: 100 Survival OR 100 Empire OR 100 Trade
 
 This ability allows you to use two-handed weapons. These weapons require that
 you don't have an item in your off-hand (hold) slot. Only certain powerful
-melee classes receive this ability.
+melee synergies receive this ability.
 
 Two-handed weapons are more powerful than ordinary weapons and are marked with
 the (2h) tag.

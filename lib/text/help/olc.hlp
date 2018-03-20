@@ -169,9 +169,8 @@ Buildings (BEDIT):
   never run again.
 
 Classes (CLASSEDIT):
-- By convention, stock EmpireMUD has one class for every pair of level 100
-  skills. This leaves no room for adding more classes unless you are re-
-  designing that entire notion.
+- EmpireMUD is not currently using 'classes' at all, but they are still
+  included as features for muds that want to implement them.
 - A player will get assigned the class with the most matching skills, so adding
   a 100/100/75 class would give them a more specific version of the 100/100.
 - Abilities can be on more than one class and more than one role within a class
@@ -1124,6 +1123,7 @@ The following adventure flags are available:
  CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
     first time.
  IGNORE-WORLD-SIZE - Won't adjust the number of instances based on the world.
+ IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -1324,6 +1324,8 @@ These are set in terms of players' composite level (the level number given by
 their skills and gear).
 
 Adventures whose minimum level is over 25 will not spawn on newbie islands.
+Islands will only spawn adventures that are within 50 levels of the players
+who live on/visit those islands (but continents spawn all levels).
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 
@@ -3838,11 +3840,18 @@ shop.
 To create a pet whistle (or other summoner item), attach script 9900 (Mini-pet
 Use) to an object and set its <value0> to the mini-pet mob's vnum.
 
+You must also create a generic cooldown with the same vnum as the item, used
+to keep it from being resummoned.
+
 Mini-pet mobs should have the following traits:
  - Flags: SENTINEL SPAWNED !LOOT (and ISNPC)
  - Affects: !ATTACK
  - Scripts: 9901 (Dismissable), 9902 (Lonely Despawn)
+ - Value0: The vnum of the mob
+ - A cooldown generic with the same vnum as the mini-pet whistle
  - Adorable custom messages (optional)
+
+See also: GENERIC COOLDOWN
 #d
 MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
 
@@ -4038,6 +4047,90 @@ despawns.
 
 To create a mount whistle, attach script 10263 (Mount whistle use) to an
 object, and set the object's <value0> field to the vnum of the mount.
+#d
+"OBJECT VALUES" "OBJ VALUES" "OBJECT VALS" "OBJ VALS" OBJVALS "ITEM VALUES"
+
+The 'object values' are 3 multi-purpose numbers attached to each object. These
+values have a different meaning depending on the type of the object. Each of
+these values can be changed by scripts and by normal use (like poison charges
+going down). Not all item types use the values at all. Here are ones that do:
+
+Ammo:
+ 0 - remaining number of shots
+ 1 - damage bonus (scalable)
+ 2 - ammo type (must match type on the missile weapon)
+
+Armor:
+ 0 - armor type (0 mage, 1 light, 2 medium, 3 heavy)
+
+Book:
+ 0 - vnum for the book text (from the book editor)
+
+Coins:
+ 0 - amount (scalable)
+ 1 - empire vnum (or -1 for misc coins)
+
+Container:
+ 0 - max contents
+ 1 - container flags (1 = closable, 2 = closed, 3 = both)
+
+Corpse:
+ 0 - idnum/vnum of the corpse (players are negative; npc vnums are positive)
+ 1 - unused
+ 2 - corpse flags (1 = eaten, 2 = skinned, 4 = human)
+
+Currency:
+ 0 - amount
+ 1 - generic currency vnum
+
+Drink Container:
+ 0 - max capacity (scalable)
+ 1 - current amount
+ 2 - generic liquid vnum
+
+Food:
+ 0 - hours of fullness
+ 1 - crop vnum (if plantable)
+
+Missile Weapon:
+ 0 - attack type (see ATTACK TYPES)
+ 1 - bonus damage (if scalable, this is the weight to scale the damage)
+ 2 - ammo type (must match type on the ammo object)
+
+Other:
+ - does not use the values, but allows them to be used for scripting
+ - if the item is PLANTABLE, value 1 is the crop vnum
+
+Pack:
+ 0 - inventory bonus (scalable)
+
+Paint:
+ 0 - paint color (see PAINT ITEM)
+
+Poison:
+ 1 - poison charges remaining
+ 2 - generic affect vnum (optional, defaults to 3004 poisoned)
+
+Portal:
+ 0 - target room vnum (real vnum, not template)
+     Note: for adventure portals, this is the room template vnum instead UNTIL
+     the portal has been loaded into the world, when it becomes the real vnum
+
+Potions:
+ 0 - generic cooldown vnum (optional)
+ 1 - cooldown time in seconds (optional)
+ 2 - generic affect vnum (optional, defaults to 3102 potion)
+
+Recipe:
+ 0 - craft vnum to learn from this recipe
+
+Wealth:
+ 0 - treasure value
+ 1 - automint (if 0, workforce won't mint this)
+
+Weapon:
+ 1 - bonus damage (if scalable, this is the weight to scale the damage)
+ 2 - attack type (see ATTACK TYPES)
 #d
 "OEDIT AFFECTS"
 
@@ -6469,6 +6562,9 @@ Medium armor is for PVP or solo adventuring, and should give both DPS and
 
 Heavy armor should always include -WITS, -STRENGTH, or other melee penalties.
    It should only include tank traits otherwise.
+
+Object values:
+ 0 - armor type (0 mage, 1 light, 2 medium, 3 heavy)
 #d
 "AMMO ITEM" "AMMO OBJECT" "ARROW ITEM" "ARROW OBJECT"
 
@@ -6483,6 +6579,11 @@ If there are any applies, they will become debuffs on the enemy when hit by
 the ammo. For example, a -1 STR on the ammo becomes -1 STR on the victim.
 If there is an 'affect' generic with the same vnum as the ammo item, it will
 be used for the debuff.
+
+Object values:
+ 0 - remaining number of shots
+ 1 - damage bonus (scalable)
+ 2 - ammo type (must match type on the missile weapon)
 #d
 "BOARD ITEM" "BOARD OBJECT"
 
@@ -6496,6 +6597,9 @@ system. You can spawn books in adventures by writing them in the book editor,
 then assigning their book ID to a book object in your adventure zone. The
 data from the book editor will override your short description, long desc-
 ription, and look description.
+
+Object values:
+ 0 - vnum for the book text (from the book editor)
 #d
 "COINS ITEM" "COINS OBJECT" "COIN ITEM" "COIN OBJECT"
 
@@ -6508,6 +6612,10 @@ If your coin item is scalable, the coin value will be set by the scaling system
 based on the player's level.
 
 This should not be confused with the WEALTH item type.
+
+Object values:
+ 0 - amount (scalable)
+ 1 - empire vnum (or -1 for misc coins)
 #d
 "CONTAINER ITEM" "CONTAINER OBJECT"
 
@@ -6516,6 +6624,10 @@ be used on the ground. If you want to raise inventory capacity, use the PACK
 item type instead.
 
 If you want to make a cart (or other movable container), use a vehicle instead.
+
+Object values:
+ 0 - max contents
+ 1 - container flags (1 = closable, 2 = closed, 3 = both)
 #d
 "CORPSE ITEM" "CORPSE OBJECT"
 
@@ -6523,12 +6635,22 @@ EmpireMUD does not currently allow content builders to add actual corpse
 objects. You can use the CONTAINER item type if you don't set it as take-able,
 or else you can use OTHER but won't be able to put items inside the corpse.
 
-This item type itself is reserved for code use.
+This item type itself is reserved for code use. Use an OTHER item to make fake
+corpses.
+
+Object values:
+ 0 - idnum/vnum of the corpse (players are negative; npc vnums are positive)
+ 1 - unused
+ 2 - corpse flags (1 = eaten, 2 = skinned, 4 = human)
 #d
 "CURRENCY ITEM" "CURRENCY OBJECT"
 
 Currency items represent a pile of adventure currency. The name of the currency
 is defined by a generic.
+
+Object values:
+ 0 - amount
+ 1 - generic currency vnum
 
 See also: GENERIC CURRENCY
 #d
@@ -6543,6 +6665,15 @@ scalable in order to automatically determine how many drinks it will hold.
 Other drink containers are like fountains, as no-take objects in the room
 which can provide very large amounts of liquid to players. These shouldn't
 be scalable, and you can set the capacity as high as you like.
+
+Note: Unlike other items, if there is a 'timer' on a drink container, it will
+only cause the liquid inside to go bad and be poured out, rather than purging
+the whole container.
+
+Object values:
+ 0 - max capacity (scalable)
+ 1 - current amount
+ 2 - generic liquid vnum
 #d
 "FOOD ITEM" "FOOD OBJECT"
 
@@ -6552,6 +6683,10 @@ ness, only if it's harder to make or acquire. Simple foods received from the
 forage or pick command should be short-lived and low-fullness no matter what
 they represent. Something that takes several ingredients and a Trade ability
 could last much longer.
+
+Object values:
+ 0 - hours of fullness
+ 1 - crop vnum (if plantable)
 #d
 "INSTRUMENT ITEM" "INSTRUMENT OBJECT"
 
@@ -6579,6 +6714,11 @@ inventory.
 
 If the missile weapon is scalable, it will scale its own damage bonus.
 
+Object values:
+ 0 - attack type (see ATTACK TYPES)
+ 1 - bonus damage (if scalable, this is the weight to scale the damage)
+ 2 - ammo type (must match type on the ammo object)
+
 See also: AMMO ITEM
 #d
 "OTHER ITEM" "OTHER OBJECT"
@@ -6587,6 +6727,10 @@ This is used for items that don't have another applicable type. It has no
 base requirements to use it, and can represent almost anything. This type also
 gives you access to edit the object's 3 generic values, which may be useful
 for scripting.
+
+Object values:
+ - does not use the values, but allows them to be used for scripting
+ - if the item is PLANTABLE, value 1 is the crop vnum
 #d
 "PACK ITEM" "PACK OBJECT"
 
@@ -6601,12 +6745,33 @@ each other.
 
 If you want items in other slots to add inventory capacity, use the INVENTORY
 apply instead.
+
+Object values:
+ 0 - inventory bonus (scalable)
 #d
 "PAINT ITEM" "PAINT OBJECT"
 
 The PAINT item type is used by players to color their buildings. One paint item
 is required per building, and the item is consumed when used by the 'paint'
 command.
+
+Object values:
+ 0 - paint color
+     0 none
+     1 Blue
+     2 Red
+     3 Yellow
+     4 Green
+     5 Orange
+     6 Violet
+     7 Azure
+     8 Cyan
+     9 Jade
+    10 Lime
+    11 Magenta
+    12 Pink
+    13 Tan
+    14 White
 #d
 "POISON ITEM" "POISON OBJECT"
 
@@ -6615,6 +6780,10 @@ have one active poison at a time.
 
 Each time a poison is applied to a target, the poison object loses 1 charge,
 until it is used up and discarded completely.
+
+Object values:
+ 1 - poison charges remaining
+ 2 - generic affect vnum (optional, defaults to 3004 poisoned)
 #d
 "PORTAL ITEM" "PORTAL OBJECT"
 
@@ -6630,6 +6799,11 @@ vnum.
 
 You could also spawn portals using scripts. In this case, you should usually
 set the portal's destination using the script that spawns it.
+
+Object values:
+ 0 - target room vnum (real vnum, not template)
+     Note: for adventure portals, this is the room template vnum instead UNTIL
+     the portal has been loaded into the world, when it becomes the real vnum
 #d
 "POTION ITEM" "POTION OBJECT"
 
@@ -6648,6 +6822,11 @@ Note: Prior to EmpireMUD 2.0 b5.23, potions had a pre-determined list of
 effects and used custom scaling.
 
 Potions can only be used once, and then are lost.
+
+Object values:
+ 0 - generic cooldown vnum (optional)
+ 1 - cooldown time in seconds (optional)
+ 2 - generic affect vnum (optional, defaults to 3102 potion)
 #d
 "RECIPE ITEM" "RECIPE OBJECT"
 
@@ -6656,6 +6835,9 @@ must also create the craft entry, which must have the LEARNED flag. Only
 players who learn the recipe from an item can make that craft.
 
 You can make recipes even faster with the quickrecipe command.
+
+Object values:
+ 0 - craft vnum to learn from this recipe
 
 See also: OEDIT QUICKRECIPE
 #d
@@ -6997,6 +7179,10 @@ like the COINS type is, but they can be minted into coins by players with a
 mint. Wealth items contribute to an empire's total wealth when they are stored.
 
 This item type has no effect unless the item is stored in normal storage.
+
+Object values:
+ 0 - treasure value
+ 1 - automint (if 0, workforce won't mint this)
 #d
 "WEAPON ITEM" "WEAPON OBJECT"
 
@@ -7017,6 +7203,10 @@ Notes:
   avoid pre-enchanted ones.
 - The SLOW and FAST flags affect the rate of attack, but neither is really a
   bonus or penalty. They just help create more weapon diversity.
+
+Object values:
+ 1 - bonus damage (if scalable, this is the weight to scale the damage)
+ 2 - attack type (see ATTACK TYPES)
 #d
 "WORN ITEM" "WORN OBJECT"
 

@@ -2139,7 +2139,7 @@ ACMD(do_load_vehicle) {
 		msg_to_char(ch, "Usage: load <mob | vehicle | all> <onto vehicle>\r\n");
 	}
 	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
-		msg_to_char(ch, "You don't see %s %s here.\r\n", arg2, AN(arg2));
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
 	}
 	else if (!VEH_IS_COMPLETE(cont)) {
 		msg_to_char(ch, "You must finish constructing it before anything can be loaded %sto it.\r\n", IN_OR_ON(cont));

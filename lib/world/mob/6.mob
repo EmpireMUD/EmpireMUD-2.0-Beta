@@ -18,7 +18,18 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 607 100.00 2  # SKIN: a shimmering hide
 I 3 611 100.00 1 X  # BARDE: a talking warhorse
-T 610
+M
+1
+I've been trying to buy a bamboo harvester, but nobody wants to talk to a horse.~
+M
+1
+Why the short face?~
+M
+1
+Of course, of course.~
+M
+1
+Have you seen Wilbur?~
 S
 #611
 warhorse horse armored talking~
@@ -58,7 +69,18 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 607 100.00 2  # SKIN: a shimmering hide
-T 613
+M
+0
+$n sings, 'Look for the bear necessities, the simple bear necessities. Forget about your worries and your strife...'~
+M
+0
+$n dances around, humming to $mself.~
+M
+0
+$n sings, 'Now when you pick a pawpaw, or a prickly pear, and you prick a raw paw, well, next time beware!'~
+M
+1
+I don't know what all the hullabaloo is about a singing bear.~
 S
 #614
 tree walking~

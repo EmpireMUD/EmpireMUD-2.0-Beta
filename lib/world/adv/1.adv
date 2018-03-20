@@ -5,6 +5,8 @@ Paul Clarke~
 a place where the forces of nature run deep, and interlopers are unwelcome.
 The grove is but a small part of the greater realm, and can be found in deep
 forests.
+   Enter the portal, but be prepared for both unfriendly druids and hidden
+predators as you explore the otherworldly forest of the Magiterranean.
 ~
 10000 10005 1-75
 50 0 k 0
@@ -27,7 +29,7 @@ druids! You can do this quest alone or with friends, but there's no combat
 here. This adventure is for farmers and gardeners.
 ~
 10225 10249 15-0
-5 0 k 0
+5 0 km 0
 L
 3 a
 5179 10225 10225
@@ -55,7 +57,7 @@ magi-netically modified crops into our world.
 (This adventure contains only the magical crops on the map.)
 ~
 10500 10549 5-0
-1 60 dl 0
+1 60 dlm 0
 L
 1 0
 10500 -1 -1
@@ -355,6 +357,8 @@ Paul Clarke~
 closely together. Sewers squirrel away the dirtiest parts of society, keeping
 the foul stench of mankind's unmentionable waste out of sight, and out of mind.
 But the sewer attracts two more of society's unwanted: the poor, and the rats.
+   Enter the sewer and see if you can help out the people who dwell within. If
+not, perhaps you can at least clear out the rats.
 ~
 10011 10027 1-50
 30 30 bek 0
@@ -502,8 +506,8 @@ Goblin Mines~
 Paul Clarke~
    The goblins have fled the mines and something tells you it's not good.
 Venture into the goblin mines and see what sends even goblins running for their
-lives! And maybe if you can find those goblins, they'll be willing to reward
-you for clearing out the mine.
+lives! And maybe if you can find those goblins running around outside, they'll
+be willing to reward you for clearing out the mine.
 
 Directions for implementors:
 - Increase the instance limit to the number of newbie islands in your game.

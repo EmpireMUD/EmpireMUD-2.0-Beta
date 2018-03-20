@@ -1,5 +1,7 @@
 TRADE "TRADE SKILL" TRD
 
+(Disambiguation: did you mean HELP TRADE COMMAND ?)
+
 Trade (skill)
 
 The Trade skill contains abilities for collecting, crafting, and trading goods
@@ -66,14 +68,14 @@ See also: CRAFT, LAND VEHICLES
 Alchemist Crafts
 Trade Synergy Ability: 100 Natural Magic
 
-This ability will contain any crafts for the Alchemist class.
+This ability will contain any crafts for the Alchemist synergy.
 #
 "ANTIQUARIAN CRAFTS"
 
 Antiquarian Crafts
 Trade Synergy Ability: 100 Vampire
 
-This ability will contain any crafts for the Antiquarian class.
+This ability will contain any crafts for the Antiquarian synergy.
 #
 ARMORSMITHING ARMORCRAFTING
 
@@ -821,7 +823,7 @@ An item must be in your inventory to reforge it. However, if another player
 
 See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #
-"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES" "ITEM SCALING" OBJECT SCALING"
+"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES" "ITEM SCALING" "OBJECT SCALING"
 
 Many craftable items (including things made with brew, craft, forge, and sew)
 are scalable, which means they change in power and attributes based on the
@@ -848,8 +850,8 @@ Command:  sew [number] <item>
           sew info <item>
 
 The art of sewing is one of the oldest and simplest trade skills, but it also
-makes some of the finest clothing and the lightest armor. The only resource
-required for sewing is skin.
+makes some of the finest clothing and the lightest armor. The only resources
+required for sewing are skins or cloth.
 
 For a list of clothing items you can sew, see HELP CLOTHING.
 
@@ -950,7 +952,7 @@ See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
 Smuggler Crafts
 Trade Synergy Ability: 100 Stealth
 
-This ability will contain any crafts for the Smuggler class.
+This ability will contain any crafts for the Stealth/Trade synergies.
 #
 "STEELSMITH CRAFTS"
 

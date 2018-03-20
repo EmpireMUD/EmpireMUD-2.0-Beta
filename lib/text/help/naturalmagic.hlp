@@ -33,8 +33,6 @@ Debuff type:  Natural Magic
 
 An alchemist can create a magical acid blast, injuring her victim as well as
 decreasing the victim's magical resistance.
-
-See also: ALCHEMIST CLASS
 #
 "ANCESTRAL HEALING"
 
@@ -87,7 +85,7 @@ By striking out with astral claws, the werewolf deals magical damage at a
 distance. These claw strikes also rip open the victim's flesh, dealing physical
 damage over time. This DoT effect stacks up to 3 times.
 
-See also: DOT, WEREWOLF CLASS
+See also: DOT
 #
 "BANSHEE FAMILIAR"
 
@@ -101,7 +99,7 @@ The banshee familiar will use the following abilities in combat:
 - Heart-wrenching wail: -(level/30) Bonus-Physical/Magical on enemies (30 sec)
 - Blood-curdling wail: Magical DoT on enemies (30 sec)
 
-See also: DEBUFF, FAMILIAR, NECROMANCER CLASS
+See also: DEBUFF, FAMILIAR
 #
 "ASTRAL WEREWOLF FORM"
 
@@ -127,7 +125,7 @@ The basilisk familiar will use the following abilities in combat:
 - Basalt gaze: -(2+level/100) Wits on enemy (30 sec)
 - Granite gaze: -(15+level/25) To-Hit on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR, FERAL CLASS
+See also: DEBUFF, FAMILIAR
 #
 BREW
 
@@ -188,42 +186,42 @@ if you successfully grow something with it.
 
 See also: CHANT
 #
-"CLASS FAMILIARS"
+"CLASS FAMILIARS" "SYNERGY FAMILIARS"
 
-Each Natural Magic class has its own set of familiars. These are summoned with
-the 'familiar' command, but don't require the regular Familiar ability. Some
-group roles have different familiars than other roles in the same class. Like
-all class abilities, you must reach skill level 100 to use these.
+Each Natural Magic synergy has its own set of familiars. These are summoned
+with the 'familiar' command, but don't require the regular Familiar ability.
+Some group roles have different familiars than other roles. Like all synergy
+abilities, you must reach maximum level in both skills to use these:
 
-Werewolf:
+Battle synergy:
   Spirit Wolf (tank) - Will debuff the enemy.
   Dire Wolf (melee) - Attacks the enemy.
   Moon Rabbit (healer) - Buffs the party.
 
-Luminary:
+Empire synergy:
   Manticore - Attacks the enemy.
   Griffin - Tanks for the party.
 
-Archmage:
+High Sorcery synergy:
   Phoenix (healer) - Buffs the party.
   Caster has no familiar of its own.
 
-Shadow Wolf:
+Stealth synergy:
   Scorpion Shadow (melee) - Debuffs the enemy.
   Owl Shadow (healer) - Buffs the party.
 
-Feral:
+Survival synergy:
   Basilisk - Debuffs the enemy.
 
-Alchemist:
+Trade synergy:
   Salamander - Buffs the party.
 
-Necromancer:
+Vampire synergy:
   Skeletal Hulk (caster) - Attacks the enemy.
   Banshee (healer) - Debuffs the enemy.
 
 See also: HELP <NAME> FAMILIAR
-See also: CLASSES, FAMILIAR, MIRROR IMAGE
+See also: SYNERGIES, FAMILIAR, MIRROR IMAGE
 #
 CLEANSE
 
@@ -293,8 +291,6 @@ Cost:  based on damage
 
 This fast spell deals instant damage to your victim, as the very essence of
 death seeps into him.
-
-See also: NECROMANCER CLASS
 #
 "DIRE WOLF FAMILIAR"
 
@@ -305,7 +301,7 @@ Familiar type:  damage
 The dire wolf will assist you in combat, adding to the damage against your
 enemy.
 
-See also: FAMILIAR, WEREWOLF CLASS
+See also: FAMILIAR
 #
 DISPIRIT DESPIRIT
 
@@ -318,8 +314,6 @@ Cost:  based on damage
 Debuff type:  Natural Magic
 
 Dispirit drains the opponent's wits, causing him pain and anguish as it does.
-
-See also: SHADOW WOLF CLASS
 #
 EARTHARMOR "EARTH ARMOR"
 
@@ -394,7 +388,7 @@ Erode causes the victim's skin to dry up and shed, like a cliffside in the
 wind. It causes great pain immediately, then continues to deal magical damage
 over time. This DoT effect stacks up to 3 times.
 
-See also: DOT, LUMINARY CLASS
+See also: DOT
 #
 FAMILIAR
 
@@ -419,10 +413,10 @@ Available familiars:
   giant tortoise - A stronger tank who deals no damage, but protects better.
     (requires 100)
 
-Each natural magic class has its own familiars, too. Use "dismiss" to get rid
+Each natural magic synergy has its own familiars, too. Use "dismiss" to get rid
 of your familiar.
 
-See also: CLASS FAMILIARS, DISMISS, ORDER
+See also: SYNERGY FAMILIARS, DISMISS, ORDER
 #
 FASTCASTING "FAST CASTING"
 
@@ -478,7 +472,7 @@ Familiar type:  tank
 The griffin is a powerful familiar that will rescue party members in combat,
 and tank for them.
 
-See also: FAMILIAR, LUMINARY CLASS
+See also: FAMILIAR
 #
 HASTEN HASTE
 
@@ -588,7 +582,7 @@ Familiar type:  melee
 The manticore will assist you in combat, adding to the damage against your
 enemy.
 
-See also: FAMILIAR, LUMINARY CLASS
+See also: FAMILIAR
 #
 "MOON RABBIT FAMILIAR"
 
@@ -602,7 +596,7 @@ The moon rabbit familiar will use the following abilities in combat:
 - Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
 - Moon's protection: +(level/5) Resist-Physical/Magical on the tank (30 sec)
 
-See also: BUFF, FAMILIAR, WEREWOLF CLASS
+See also: BUFF, FAMILIAR
 #
 MOONRISE
 
@@ -652,7 +646,7 @@ The owl shadow familiar will use the following abilities in combat:
 - Invigorating Darkness: +(level/5) Move points on party (instant)
 - Brilliant Darkness: +(1+level/100) Wits on party (30 sec)
 
-See also: BUFF, FAMILIAR, SHADOW WOLF CLASS
+See also: BUFF, FAMILIAR
 #
 "PHOENIX FAMILIAR"
 
@@ -666,7 +660,7 @@ The phoenix familiar will use the following abilities in combat:
 - Healing Fire: smaller heal for the whole party (instant)
 - Burning Passion: +(level/30) bonus physical/magical damage to party (30 sec)
 
-See also: BUFF, FAMILIAR, ARCHMAGE CLASS
+See also: BUFF, FAMILIAR
 #
 PURIFY
 
@@ -783,7 +777,7 @@ The salamander familiar will use the following abilities in combat:
 - Guardian flames: +(15+level/25) Dodge on tank (10 sec)
 - Ember surge: +(level/30) Bonus-Physical/Magical on party (30 sec)
 
-See also: BUFF, FAMILIAR, ALCHEMIST CLASS
+See also: BUFF, FAMILIAR
 #
 "SAVAGE WEREWOLF FORM"
 
@@ -809,7 +803,7 @@ The scorpion shadow familiar will use the following abilities in combat:
 - Numbing Venom: -(2+level/100) Wits on enemy (30 sec)
 - Agonizing Venom: Poison DoT on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR, SHADOW WOLF CLASS
+See also: DEBUFF, FAMILIAR
 #
 "SKELETAL HULK FAMILIAR"
 
@@ -820,7 +814,7 @@ Familiar type:  melee
 The skeletal hulk will assist you in combat, adding to the damage against your
 enemy.
 
-See also: FAMILIAR, NECROMANCER CLASS
+See also: FAMILIAR
 #
 SKYBRAND
 
@@ -851,8 +845,8 @@ Solar Power (Natural Magic ability)
 
 Nature mages can learn to draw mana from the sunlight, as plants do. With this
 ability, mana regeneration doubles as long as it's sunny. This ability scales
-with your Natural Magic skill, and as a class skill it works even without the
-sun.
+with your Natural Magic skill, and as a level 76+ skill it works even without
+the sun.
 
 Solar Power gains experience every time you benefit from its effect. The sun
 is up from 7am to 7pm each day (every other 15 minutes of gameplay).
@@ -886,7 +880,7 @@ The spirit wolf familiar will use the following abilities in combat:
 - Bark/Blurred Vision: -(15+level/25) To-Hit on enemy (30 sec)
 - Bite/Ghost Energy: Magical DoT on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR, WEREWOLF CLASS
+See also: DEBUFF, FAMILIAR
 #
 "SUMMON ANIMALS"
 
@@ -915,8 +909,6 @@ Cost:  based on damage
 
 Starstrike calls down meteors from the heavens, dealing incredible damage to
 your victim!
-
-See also: FERAL CLASS
 #
 "TOUCH OF FLAME"
 

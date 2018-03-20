@@ -1301,8 +1301,11 @@ ACMD(do_build) {
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to build that.\r\n", GET_CRAFT_MIN_LEVEL(type));
 	}
-	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE)) {
-		msg_to_char(ch, "You can't build here.\r\n");
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
+		msg_to_char(ch, "You can't build on unclaimable land.\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
+		msg_to_char(ch, "You can't build here until the adventure is gone.\r\n");
 	}
 	else if (!can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't build here while at war with the empire that controls this area.\r\n");
@@ -1957,7 +1960,7 @@ ACMD(do_lay) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))
-		msg_to_char(ch, "You can't lay road here!\r\n");
+		msg_to_char(ch, "You can't lay road in someone else's territory!\r\n");
 	else if (!has_permission(ch, PRIV_BUILD))
 		msg_to_char(ch, "You don't have permission to lay road.\r\n");
 	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && !SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_ROADS)) {
@@ -1985,7 +1988,7 @@ ACMD(do_lay) {
 		msg_to_char(ch, "Road data has not been set up for this game.\r\n");
 	}
 	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_LAY_ROAD))
-		msg_to_char(ch, "You can't lay road here!\r\n");
+		msg_to_char(ch, "You can't lay a road here!\r\n");
 	else if (!has_resources(ch, cost, TRUE, TRUE)) {
 		// sends own messages
 	}

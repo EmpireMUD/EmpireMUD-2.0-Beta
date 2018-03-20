@@ -57,6 +57,7 @@ The following things will speed up various chores:
    play (music), excavate, pick, scrape, fillin, saw, quarry
 - Shovel: dig
 - Weapon damage: chop, mine
+- Superior tool: craft, forge
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
 #
@@ -115,7 +116,7 @@ See also: DODGE, DPS, EMPIRE GREATNESS, SPEED, TO-HIT
 #
 AUTORECALL "AUTO-RECALL" "AUTO RECALL" "TOGGLE AUTORECALL"
 
-Usage:  toggle autorecall
+Usage:  toggle autorecall [on/off]
 
 If you turn on the autorecall toggle, your character will be sent home (or to
 a tower of souls, if you have no home) when you're logged off over an hour.
@@ -223,7 +224,7 @@ BOARDS READ WRITE RESPOND
 
 Usage:  look board
         write <headline>
-        read <number>
+        read <number | book>
         respond <number> <headline>
         remove <number>
 
@@ -231,6 +232,8 @@ Bulletin boards are the forum of inter-player communication on the MUD. There
 are different bulletin boards for different purposes -- for example, a
 standard mortal board and a board for immortals. Naturally, not all players
 may be allowed to read all types of boards.
+
+The 'read' command is also used to read books.
 
 Example:
 
@@ -240,7 +243,7 @@ Example:
   > read 6
   > remove 6
 
-See also: MAIL
+See also: BOOKS, MAIL
 #
 "BONUS TRAITS" BONUSES
 
@@ -610,7 +613,7 @@ others perceive you.
 Greatness is used for:
  - Increasing the amount of territory your empire can control.
  - Increasing your empire's score and ranking.
- - Certain class abilities such as Noble Bearing.
+ - Certain synergy abilities such as Noble Bearing.
 
 Empires also have a Greatness rating, equal to the total Greatness of their
 members. However, if you have multiple alts (your other characters) in the same
@@ -630,8 +633,8 @@ See also: BASIC CRAFTS, FORGE
 HEALTH "HIT POINTS" HITPOINTS HP "HEALTH POINTS" "HEALTH POOL"
 
 The health pool is the amount of damage you can take before being knocked out.
-All players begin with 50 health points and starts to rise around level 80.
-Your base health at level 100 is based on your class.
+All players begin with 50 health points. Some abilities and items give you more
+health, and you can enchant your gear to get even more.
 
 If you're knocked out with 0 health, you will die without assistance.
 
@@ -752,7 +755,7 @@ Composite level: This is the sum of your skill and gear levels. It is the
    "score".
 
 Note: Until level 100, you must be in the same level range as an item
-   (1-50, 50-75, 75-100, or 101+) or higher to equip it. After level 100, you
+   (1-50, 50-75, 75-100, or 100+) or higher to equip it. After level 100, you
    can't use gear that's more than 25 levels above you (50 for BoP items). Your
    highest recent level is used, so you should still be able to remove all your
    gear and re-equip it.
@@ -772,8 +775,8 @@ Do not try to get out of a fight by breaking link. You will likely still die.
 MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
 
 The mana pool is the amount of magical energy you can channel before you must
-stop to recover some. All players begin with 50 mana points and start to gain
-more around level 75. Your base mana at level 100 is based on your class.
+stop to recover some. All players begin with 50 mana points. Some abilities and
+gear give you a larger mana pool, and you can enchant gear to get even more.
 
 See also: ARCANE POWER, CLASS, GIFT OF NATURE, SOLAR POWER
 #
@@ -798,10 +801,10 @@ Move points are the basic energy pool for physical effort. It takes move points
 to walk around, and it takes move points to use many physical abilities like
 Kick or Shadowstep.
 
-All players begin with 100 move points and start to gain more around level 75.
-Your base move points at level 100 is based on your class. The easiest ways to
-get more move points at any level are to make a walking stick or a good pair of
-shoes.
+All players begin with 100 move points. The easiest ways to get more move
+points at any level are to make a walking stick or a good pair of shoes. You
+can also find certain abilities and gear that give more moves, and you can
+enchant gear to get even more.
 
 See also: FLY, RIDE, STAMINA, VIGOR
 #
@@ -818,7 +821,8 @@ EmpireMUD supports the following MSDP variables:
  CHARACTER_NAME - The character's full name
  SERVER_ID - The name of the MUD
  SNIPPET_VERSION - Version of KaVir's protocol snippet used for MSDP
-
+ 
+ GENDER - Current gender
  HEALTH - Current health
  HEALTH_MAX - Maximum health
  HEALTH_REGEN - Health regained per 5 seconds
@@ -1033,6 +1037,18 @@ versions of EmpireMUD.
 
 See also: RESIST-MAGICAL, SCORE
 #
+"ROUGH TERRAIN" "ROUGH TILE" ROUGH
+
+Areas of the map that are particularly hard to cross are referred to as 'rough
+terrain'. This includes mountains and the arctic tundra. Because of this
+difficulty, the game requires you to type 'climb <direction>' to move onto the
+first rough tile.
+
+Moving from one tile with rough terrain to another requires the Mountain
+Climbing ability, or flight.
+
+See also: CLIMB, MOUNTAIN CLIMBING
+#
 SCALING "MOB SCALING" "SCALING MOBS"
 
 EmpireMUD uses a system of mob-scaling where mobs are procedurally adjusted
@@ -1054,19 +1070,26 @@ SCAN
 
 Usage:  scan <direction>
         scan <tile/vehicle name>
+        scan <claimed/unclaimed/foreign>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
 mapsize.
 
 You can also scan for nearby tiles matching a given keyword, such as a crop,
-building, or vehicle name. It will scan a distance up to your mapsize.
+building, or vehicle name. It will scan a distance up to your mapsize. Vehicles
+can only be seen with this command if they are large enough to show up on the
+map.
+
+You can get extra information if you have the 'political' or 'informative'
+toggles turned on. Scanning for 'foreign' tiles will show ones owned by empires
+other than your own.
 
 Example:
  > scan southwest
  southwest: 3x River, Swamp, Overgrown Forest, Road, Overgrown Forest, 2x Jungle
 
-See also: MAPSCAN, MAPSIZE, SCREEN-READERS
+See also: MAPSCAN, MAPSIZE, SCREEN-READERS, INFORMATIVE, POLITICAL
 #
 "SHIP ROOMS" "SHIP DESIGNATE" "DESIGNATE ON SHIPS"
 
@@ -1259,6 +1282,14 @@ available when you type "look", but this version shows only the room name and
 coordinates (if applicable).
 
 See also: LOOK
+#
+WHOAMI "WHO AM I"
+
+Usage:  whoami
+
+This simple command tells you which character you're playing.
+
+See also: ALTERNATE
 #
 WITS WIT
 

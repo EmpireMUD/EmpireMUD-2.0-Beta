@@ -199,9 +199,10 @@ S
 beehive hive~
 a large beehive~
 A large beehive has been left here.~
-You can sap honey or extract wax from the beehive.
+   Beehives are used to set up apiaries, where your citizens can tend bees to
+provide honey for your empire's food and crafts.
 ~
-3 e a 2
+3 e a 3
 0 0 0
 0 0
 M
@@ -210,6 +211,8 @@ You set up $p.~
 M
 1
 $n sets up $p.~
+R
+5131 0
 S
 #917
 throne broken~

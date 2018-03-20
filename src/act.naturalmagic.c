@@ -570,6 +570,10 @@ ACMD(do_earthmeld) {
 		return;
 	}
 	
+	if (GET_POS(ch) == POS_FIGHTING) {
+		msg_to_char(ch, "You can't do that while fighting!\r\n");
+		return;
+	}
 	if (GET_POS(ch) < POS_STANDING) {
 		msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		return;

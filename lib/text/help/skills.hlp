@@ -111,9 +111,6 @@ Speed boosts:  Faster Chores bonus, Finder ability, haste, shovel
 This lets you claw at the ground until you find something useful. Among
 things that may be found, rocks, flint, and clay are the most common.
 
-Using a shovel or having the Finder ability will each cut your dig time in
-half.
-
 See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL, SCAVENGING
 #
 DISMANTLE
@@ -213,11 +210,13 @@ LIGHT TORCH
 Usage:  light <item | vehicle>
 
 To light something, you must have a flint set. You may light sticks to create
-torches. You can also light trees or logs to make camp fires.
+torches. You can also light trees or logs to make camp fires. Dropping a torch
+(or lighting a fire) may burn down the building it's in, if it's unowned or you
+are at war with the owner.
 
-You can also burn down some vehicles with this command.
+You can also burn down some vehicles with the 'light' command.
 
-See also: COOKING FIRE, DOUSE
+See also: COOKING FIRE, DOUSE, THROW
 #
 MILK
 
@@ -482,8 +481,8 @@ See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
 Skills are capped at certain levels to limit the number of abilities any one
 character can have. When you reach 50 or 75 in a skill, you will stop gaining
 points in that skill. To choose that skill for further advancement as one of
-your specialty or class skills, use the "specialize" command. This will get you
-a free level in the skill.
+your specialty or synergy skills, use the "specialize" command. This will get
+you a free level in the skill.
 
 * You can have two skills at 100. These are your class skills.
   These skills will get 16 abilities each.
@@ -598,7 +597,7 @@ Usage:  specialize <skill>
 
 This command allows you to choose which skills become your class skills and
 specialties. You can only specialize a skill that's at 50 (the basic skill cap)
-or 75 (the specialty skill cap). Doing this will gain you a free point in the
+or 75 (the specialty skill cap). Doing this will gain you a free level in the
 skill and allow you to continue leveling it.
 
 NOTE: This is a temporary command. In the future, we intend to use quests and

@@ -1561,7 +1561,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		// this indicates a change
 		if (new != old) {
-			sprintbit(new, grant_bits, buf, TRUE);
+			prettier_sprintbit(new, grant_bits, buf);
 			sprintf(output, "%s now has grants: %s", GET_NAME(vict), buf);
 		}
 		else {
@@ -3779,7 +3779,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "PRF: &g%s&0\r\n", buf2);
 		sprintbit(GET_BONUS_TRAITS(k), bonus_bits, buf2, TRUE);
 		msg_to_char(ch, "BONUS: &c%s&0\r\n", buf2);
-		sprintbit(GET_GRANT_FLAGS(k), grant_bits, buf2, TRUE);
+		prettier_sprintbit(GET_GRANT_FLAGS(k), grant_bits, buf2);
 		msg_to_char(ch, "GRANTS: &g%s&0\r\n", buf2);
 		sprintbit(SYSLOG_FLAGS(k), syslog_types, buf2, TRUE);
 		msg_to_char(ch, "SYSLOGS: &c%s&0\r\n", buf2);
@@ -4314,7 +4314,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	 */
 
 	if (j->contains) {
-		sprintf(buf, "\r\nContents:&g");
+		sprintf(buf, "Contents:&g");
 		for (found = 0, j2 = j->contains; j2; j2 = j2->next_content) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j2, ch, OBJ_DESC_SHORT));
 			strcat(buf, buf2);
@@ -5618,7 +5618,7 @@ ACMD(do_dc) {
 ACMD(do_distance) {
 	char arg[MAX_INPUT_LENGTH];
 	room_data *target;
-	int dir;
+	int dir, dist;
 	
 	one_word(argument, arg);
 	
@@ -5630,7 +5630,8 @@ ACMD(do_distance) {
 	}
 	else {	
 		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), target));
-		msg_to_char(ch, "Distance to (%d, %d): %d tiles %s.\r\n", X_COORD(target), Y_COORD(target), compute_distance(IN_ROOM(ch), target), (dir == NO_DIR ? "away" : dirs[dir]));
+		dist = compute_distance(IN_ROOM(ch), target);
+		msg_to_char(ch, "Distance to (%d, %d): %d tile%s %s.\r\n", X_COORD(target), Y_COORD(target), dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]));
 	}
 }
 
@@ -6416,10 +6417,10 @@ ACMD(do_island) {
 			
 			center = real_room(isle->center);
 			
-			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size);
+			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d, levels %d-%d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size, isle->min_level, isle->max_level);
 			if (isle->flags) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), " %s", flags);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), ", %s", flags);
 			}
 			
 			if (strlen(line) + outsize < sizeof(output)) {

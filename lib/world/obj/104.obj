@@ -519,20 +519,20 @@ S
 #10450
 grate sewer~
 an open sewer grate~
-The sewer grate is propped open.~
+The sewer grate is propped open. (adventure)~
 The sewer grate is propped open and you can hear sounds coming from beneath.
 ~
-8 0 0 2
+8 0 0 3
 -1 0 0
 2 0
 S
 #10451
 grate sewer exit ladder~
 the exit~
-A ladder leads up to the sewer's exit.~
+A ladder leads up to the sewer's exit. (climb)~
 The scent of fresh air wafts down from the sewer's exit.
 ~
-8 0 0 3
+8 0 0 4
 -1 0 0
 2 0
 T 10450

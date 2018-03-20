@@ -1,6 +1,6 @@
 ALCHEMIST
 
-(Disambiguation: Did you mean HELP ALCHEMIST CLASS ?)
+(Disambiguation: Did you mean HELP ALCHEMIST CRAFTS ?)
 
 (AA)  Alchemist  (Artisans ability)
 
@@ -21,7 +21,7 @@ wax for the empire. Some crafts require that the empire have access to these
 resources, and you can only make those crafts if you are in the territory of
 an empire with apiaries.
 
-Apiaries are made by Advanced Woodworking.
+Beehives are made by Advanced Woodworking.
 
 See also: ADVANCED WOODWORKING
 #
@@ -235,7 +235,7 @@ Empire Synergy Ability: 100 Survival
 This ability allows you to build the following buildings:
   &y.&c__&y.&0 drainage  (built on oasis)
 
-See also: BUILD, ELDER CLASS
+See also: BUILD
 #
 "EXARCH CRAFTS"
 
@@ -248,7 +248,7 @@ This ability allows you to build the following buildings:
 Allows the following workforce options:
   nexus-crystals - Also requires Skilled Labor
 
-See also: BUILD, EXARCH CLASS, SKILLED LABOR
+See also: BUILD, SKILLED LABOR
 #
 GRAVE GRAVES "GRAVE MARKER"
 
@@ -546,6 +546,8 @@ MOUNTAINOUTPOST "MOUNTAIN OUTPOST"
 
 &y.&0/\&y.&0  Mountain Outpost  (Raise Armies ability)
 
+Military:  5
+
 A mountain outpost is a safe place constructed in the middle of the mountains.
 It has no other purpose.
 #
@@ -596,11 +598,11 @@ The oilmaker is used to press olives and other resources into oil.
 
 See also: PRESS, STORAGE
 #
-PAINTSHOP "PAINT SHOP" "PAINTER'S WORKSHOP" "PAINTERS WORKSHOP"
+PAINTER PAINTSHOP "PAINT SHOP" "PAINTER'S WORKSHOP" "PAINTERS WORKSHOP"
 
 [PP]  Painter's Workshop  (Luxury ability)
 
-Command:  build paintshop <direction>
+Command:  build painter <direction>
 Stored here:  paints
 
 This building is used to make and store paints (although you also require

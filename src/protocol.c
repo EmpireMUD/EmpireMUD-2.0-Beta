@@ -129,6 +129,7 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_SNIPPET_VERSION, "SNIPPET_VERSION", NUMBER_READ_ONLY_SET_TO(SNIPPET_VERSION) },
 	
 	/* Character */
+	{ eMSDP_GENDER, "GENDER", STRING_READ_ONLY },
 	{ eMSDP_HEALTH, "HEALTH", NUMBER_READ_ONLY },
 	{ eMSDP_HEALTH_MAX, "HEALTH_MAX", NUMBER_READ_ONLY },
 	{ eMSDP_HEALTH_REGEN, "HEALTH_REGEN", NUMBER_READ_ONLY },
@@ -2561,7 +2562,7 @@ static const char *GetMSSP_Areas() {
 
 static const char *GetMSSP_Classes() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", NUM_CLASSES);
+	strcpy(buf, "1");
 	return buf;
 }
 

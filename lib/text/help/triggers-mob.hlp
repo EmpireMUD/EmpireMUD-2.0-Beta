@@ -204,7 +204,7 @@ Examples:
   mgoto Rumble
   mgoto fountain
 #d
-MHUNT %HUNT% HUNT 
+MHUNT %HUNT%
 
 Usage:  mhunt <victim>
 

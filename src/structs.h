@@ -533,6 +533,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
 #define ADV_CAN_DELAY_LOAD  BIT(10)	// can save memory by not instantiating till a player appears
 #define ADV_IGNORE_WORLD_SIZE  BIT(11)	// does not adjust the instance limit
+#define ADV_IGNORE_ISLAND_LEVELS  BIT(12)	// does not skip islands with no players in the level range
 
 
 // ADV_LINK_x: adventure link rule types
@@ -4260,6 +4261,9 @@ struct empire_data {
 	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
 	struct workforce_log *wf_log;	// errors with workforce
+	time_t next_timeout;	// for triggering rescans
+	int min_level;	// minimum level in the empire
+	int max_level;	// maximum level in the empire
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
@@ -4945,6 +4949,8 @@ struct island_info {
 	bitvector_t flags;	// ISLE_ flags
 	
 	// computed data
+	int min_level;	// of players on the island
+	int max_level;	// determined at startup and on-move
 	int tile_size;
 	room_vnum center;
 	room_vnum edge[NUM_SIMPLE_DIRS];	// edges

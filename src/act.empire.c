@@ -40,8 +40,10 @@
 */
 
 // external vars
+extern const char *alt_dirs[];
 extern struct empire_chore_type chore_data[NUM_CHORES];
 extern struct city_metadata_type city_type[];
+extern const char *dirs[];
 extern const char *empire_admin_flags[];
 extern const char *empire_trait_types[];
 extern const char *offense_flags[];
@@ -505,7 +507,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	msg_to_char(ch, "Frontier traits: %s\r\n", buf);
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
 	msg_to_char(ch, "Territory: %d/%d (%d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(e, TER_TOTAL), land_can_claim(e, TER_TOTAL), EMPIRE_TERRITORY(e, TER_OUTSKIRTS), land_can_claim(e, TER_OUTSKIRTS), EMPIRE_TERRITORY(e, TER_FRONTIER), land_can_claim(e, TER_FRONTIER));
-	msg_to_char(ch, "Wealth: %.1f coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(e), (int) GET_TOTAL_WEALTH(e));
+	msg_to_char(ch, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)\r\n", (int) GET_TOTAL_WEALTH(e), EMPIRE_WEALTH(e), EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
 	msg_to_char(ch, "Fame: %d\r\n", EMPIRE_FAME(e));
 	msg_to_char(ch, "Greatness: %d\r\n", EMPIRE_GREATNESS(e));
 	
@@ -1606,8 +1608,6 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 // for do_city
 void list_cities(char_data *ch, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
-	extern const char *alt_dirs[];
-	extern const char *dirs[];
 	
 	char buf[MAX_STRING_LENGTH], traits[256];
 	struct empire_city_data *city;
@@ -2531,24 +2531,30 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 /**
 * Scans within the character's mapsize for matching tiles.
 *
+* Note: There is a minor exploit with chameleon buildings here: If you scan
+* for claimed and unclaimed, then add the total tiles, if it's lower than your
+* expected total tile count, chameleon tiles are missing (chameleon tiles out
+* of range are not shown for any mortal's scan). But there's not really a clean
+* solution to this without a ton of code. -pc 3/13/2018
+*
 * @param char_data *ch The player.
 * @param char_data *argument The tile to search for.
 */
 void scan_for_tile(char_data *ch, char *argument) {
 	extern byte distance_can_see(char_data *ch);
+	void get_informative_tile_string(char_data *ch, room_data *room, char *buffer);
 	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
-	extern const char *dirs[];
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
-	int dir, dist, mapsize, total, x, y, check_x, check_y;
-	char output[MAX_STRING_LENGTH], line[128];
+	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
+	char output[MAX_STRING_LENGTH], line[128], info[256];
 	struct map_data *map_loc;
 	room_data *map, *room;
 	size_t size, lsize;
 	vehicle_data *veh;
 	crop_data *crop;
-	bool ok;
+	bool ok, claimed, unclaimed, foreign;
 	
 	skip_spaces(&argument);
 	
@@ -2565,6 +2571,9 @@ void scan_for_tile(char_data *ch, char *argument) {
 	}
 
 	mapsize = get_map_radius(ch);
+	claimed = !str_cmp(argument, "claimed") || !str_cmp(argument, "claim");
+	unclaimed = !str_cmp(argument, "unclaimed") || !str_cmp(argument, "unclaim");
+	foreign = !str_cmp(argument, "foreign");
 	
 	for (x = -mapsize; x <= mapsize; ++x) {
 		for (y = -mapsize; y <= mapsize; ++y) {
@@ -2582,18 +2591,32 @@ void scan_for_tile(char_data *ch, char *argument) {
 				continue;
 			}
 			
+			// chameleon check
+			if (!IS_IMMORTAL(ch) && CHECK_CHAMELEON(map, room)) {
+				continue;	// just don't show it
+			}
+			
 			// validate tile
 			ok = FALSE;
-			if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
+			if (claimed && ROOM_OWNER(room)) {
 				ok = TRUE;
 			}
-			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room))) && !CHECK_CHAMELEON(map, room)) {
+			else if (unclaimed && !ROOM_OWNER(room)) {
+				ok = TRUE;
+			}
+			else if (foreign && ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+				ok = TRUE;
+			}
+			else if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
+				ok = TRUE;
+			}
+			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
 				ok = TRUE;
 			}
 			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(room)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 				ok = TRUE;
 			}
-			else if (multi_isname(argument, get_room_name(room, FALSE)) && !CHECK_CHAMELEON(map, room)) {
+			else if (multi_isname(argument, get_room_name(room, FALSE))) {
 				ok = TRUE;
 			}
 			else {
@@ -2627,42 +2650,63 @@ void scan_for_tile(char_data *ch, char *argument) {
 
 	if (node_list) {
 		sort_territory_node_list_by_distance(IN_ROOM(ch), &node_list);
-		node_list = reduce_territory_node_list(node_list);
 		
 		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
 		
 		// display and free the nodes
-		total = 0;
+		total = over_count = 0;
 		for (node = node_list; node; node = next_node) {
 			next_node = node->next;
 			total += node->count;
 			
-			// territory can be off the map (e.g. ships) and get a -1 here
-			check_x = X_COORD(node->loc);
-			check_y = Y_COORD(node->loc);
-			
-			dist = compute_distance(IN_ROOM(ch), node->loc);
-			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
-			
-			if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_NAVIGATION(ch)) {
-				lsize = snprintf(line, sizeof(line), "%2d tile%s %s (%d, %d) - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), check_x, check_y, get_room_name(node->loc, FALSE));
+			if (over_count) {
+				++over_count;
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "%2d tile%s %s - %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(node->loc, FALSE));
-			}
+				// territory can be off the map (e.g. ships) and get a -1 here
+				check_x = X_COORD(node->loc);
+				check_y = Y_COORD(node->loc);
 			
-			if (node->count > 1) {
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
-			}
+				dist = compute_distance(IN_ROOM(ch), node->loc);
+				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
 			
-			if (size + lsize + 32 < sizeof(output)) {
-				size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+				if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_NAVIGATION(ch)) {
+					lsize = snprintf(line, sizeof(line), "%2d %s: %s (%d, %d)", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE), check_x, check_y);
+				}
+				else {
+					lsize = snprintf(line, sizeof(line), "%2d %s: %s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE));
+				}
+				
+				if ((PRF_FLAGGED(ch, PRF_POLITICAL) || claimed || foreign) && ROOM_OWNER(node->loc)) {
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(node->loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(node->loc)));
+				}
+				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+					get_informative_tile_string(ch, node->loc, info);
+					if (*info) {
+						lsize += snprintf(line + lsize, sizeof(line) - lsize, " [%s]", info);
+					}
+				}
+			
+				if (node->count > 1) {
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
+				}
+			
+				if (size + lsize + 100 < sizeof(output)) {
+					size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+				}
+				else {
+					++over_count;
+				}
 			}
 			
 			free(node);
 		}
 		
 		node_list = NULL;
+		
+		if (over_count) {
+			size += snprintf(output + size, sizeof(output) - size, "... and %d more tile%s\r\n", over_count, PLURAL(over_count));
+		}
 		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
 		page_string(ch->desc, output, TRUE);
 	}
@@ -4045,6 +4089,9 @@ ACMD(do_enroll) {
 		msg_to_char(ch, "You can't enroll animals!\r\n");
 	else if (ch == targ)
 		msg_to_char(ch, "You're already in the empire!\r\n");
+	else if (GET_LOYALTY(targ) == e) {
+		act("$E is already a member of this empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
+	}
 	else if (GET_PLEDGE(targ) != EMPIRE_VNUM(e))
 		act("$E has not pledged $Mself to your empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
 	else if ((old = GET_LOYALTY(targ)) && EMPIRE_LEADER(old) != GET_IDNUM(targ))
@@ -4427,7 +4474,7 @@ ACMD(do_estats) {
 	// stats
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(emp), PLURAL(EMPIRE_MEMBERS(emp)), EMPIRE_POPULATION(emp), PLURAL(EMPIRE_POPULATION(emp)), EMPIRE_MILITARY(emp));
 	msg_to_char(ch, "Territory: %d/%d (%d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
-	msg_to_char(ch, "Wealth: %.1f coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(emp), PLURAL(EMPIRE_COINS(emp)), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(emp), (int) GET_TOTAL_WEALTH(emp));
+	msg_to_char(ch, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)\r\n", (int) GET_TOTAL_WEALTH(emp), EMPIRE_WEALTH(emp), EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
 	msg_to_char(ch, "Fame: %d, Greatness: %d\r\n", EMPIRE_FAME(emp), EMPIRE_GREATNESS(emp));
 }
 
@@ -5653,7 +5700,7 @@ ACMD(do_roster) {
 	// mortal usage: roster [all]
 	
 	// override for imm args: roster <empire> (with no quotes and no -all)
-	if (imm_access && (e = get_empire_by_name(argument))) {
+	if (imm_access && *argument && (e = get_empire_by_name(argument))) {
 		*argument = '\0';	// clear further args and accept the empire name as-is
 	}
 	

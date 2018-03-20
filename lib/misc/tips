@@ -122,7 +122,7 @@ You can use 'fmessages' to turn off spammy combat text.
 You can use 'fprompt' to set a different prompt for combat.
 You can write your own books at the library.
 You can have more than one mount, but you have to switch them at a stable.
-You can abbreviate most things include commands and names.
+You can abbreviate most things including commands and names.
 If you've typed too many commands and are waiting for them to happen, you can use + to insert a command at the front of the list.
 If you've typed too many commands and are waiting for them to happen, you can type -- to clear them all out of the queue.
 The only way to remove seeded fields is with Devastation Ritual.

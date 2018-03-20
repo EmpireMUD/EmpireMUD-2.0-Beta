@@ -234,6 +234,7 @@ const char *adventure_flags[] = {
 	"EMPTY-RESET-ONLY",
 	"CAN-DELAY-LOAD",	// 10
 	"IGNORE-WORLD-SIZE",
+	"IGNORE-ISLAND-LEVELS",
 	"\n"
 };
 

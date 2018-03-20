@@ -298,6 +298,7 @@ static void msdp_update(void) {
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_total_score(empire_data *emp);
 	extern const char *damage_types[];
+	extern const char *genders[];
 	extern const double hit_per_dex;
 	extern const char *seasons[];
 	
@@ -320,7 +321,8 @@ static void msdp_update(void) {
 
 			MSDPSetString(d, eMSDP_ACCOUNT_NAME, GET_NAME(ch));
 			MSDPSetString(d, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
-
+			
+			MSDPSetString(d, eMSDP_GENDER, genders[GET_SEX(ch)]);
 			MSDPSetNumber(d, eMSDP_HEALTH, GET_HEALTH(ch));
 			MSDPSetNumber(d, eMSDP_HEALTH_MAX, GET_MAX_HEALTH(ch));
 			MSDPSetNumber(d, eMSDP_HEALTH_REGEN, health_gain(ch, TRUE));

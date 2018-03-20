@@ -204,6 +204,17 @@ struct alias_data {
 #define SCMD_MORPH  0
 #define SCMD_FASTMORPH  1
 
+// do_no_cmd
+#define NOCMD_CAST  1
+#define NOCMD_GOSSIP  2
+#define NOCMD_LEVELS  3
+#define NOCMD_PRACTICE  4
+#define NOCMD_RENT  5
+#define NOCMD_REPORT  6
+#define NOCMD_UNGROUP  7
+#define NOCMD_WIMPY  8
+#define NOCMD_TOGGLE  9
+
 // do_prompt
 #define SCMD_PROMPT  0
 #define SCMD_FPROMPT  1

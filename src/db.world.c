@@ -2603,6 +2603,24 @@ void check_all_exits(void) {
 }
 
 
+/**
+* Ensures an island has the right min/max player levels marked.
+*
+* @param room_data *location Where to check.
+* @param int level The level to mark.
+*/
+void check_island_levels(room_data *location, int level) {
+	struct island_info *isle = location ? GET_ISLAND(location) : NULL;
+	
+	if (isle) {
+		if (level > 0 && (!isle->min_level || level < isle->min_level)) {
+			isle->min_level = level;
+		}
+		isle->max_level = MAX(isle->max_level, level);
+	}
+}
+
+
 // checks if the room can be unloaded, and does it
 EVENTFUNC(check_unload_room) {
 	struct room_event_data *data = (struct room_event_data *)event_obj;
@@ -3165,6 +3183,47 @@ void schedule_crop_growth(struct map_data *map) {
 		
 		ev = event_create(grow_crop_event, data, (when - time(0)) * PASSES_PER_SEC);
 		add_stored_event(&map->shared->events, SEV_GROW_CROP, ev);
+	}
+}
+
+
+/**
+* Assigns level data to islands based on empires with cities there
+* (at startup).
+*/
+void setup_island_levels(void) {
+	struct island_info *isle, *next_isle;
+	struct empire_city_data *city;
+	empire_data *emp, *next_emp;
+	
+	// initialize
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		if (IS_SET(isle->flags, ISLE_NEWBIE)) {
+			isle->min_level = 1;	// ensure newbies get adventures
+			isle->max_level = 1;
+		}
+		else {
+			isle->min_level = isle->max_level = 0;
+		}
+	}
+	
+	// mark empire locations
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (!EMPIRE_MEMBERS(emp) || !EMPIRE_CITY_LIST(emp) || EMPIRE_MAX_LEVEL(emp) == 0 || EMPIRE_IS_TIMED_OUT(emp)) {
+			continue;	// no locations/levels to mark
+		}
+		
+		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+			if (!(isle = GET_ISLAND(city->location))) {
+				continue;	// somehow
+			}
+			
+			// assign levels
+			if (EMPIRE_MIN_LEVEL(emp) > 0 && (!isle->min_level || EMPIRE_MIN_LEVEL(emp) < isle->min_level)) {
+				isle->min_level = EMPIRE_MIN_LEVEL(emp);
+			}
+			isle->max_level = MAX(EMPIRE_MAX_LEVEL(emp), isle->max_level);
+		}
 	}
 }
 

@@ -2968,10 +2968,10 @@ ACMD(do_nearby) {
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			
 				if (HAS_NAVIGATION(ch)) {
-					snprintf(line, sizeof(line), " %d %s: %s (%d, %d)\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
+					snprintf(line, sizeof(line), " %2d %s: %s (%d, %d)\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
 				}
 				else {
-					snprintf(line, sizeof(line), " %d %s: %s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE));
+					snprintf(line, sizeof(line), " %2d %s: %s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE));
 				}
 				
 				if (size + strlen(line) < sizeof(buf)) {
@@ -3056,6 +3056,52 @@ ACMD(do_nearby) {
 	}
 	
 	page_string(ch->desc, buf, TRUE);
+}
+
+
+ACMD(do_no_cmd) {
+	switch (subcmd) {
+		case NOCMD_CAST: {
+			msg_to_char(ch, "EmpireMUD doesn't use the 'cast' command. You use most abilities by typing their name.\r\n");
+			break;
+		}
+		case NOCMD_GOSSIP: {
+			msg_to_char(ch, "EmpireMUD doesn't have a gossip channel. Try the /ooc channel, or type /list to see which global channels you're on.\r\n");
+			break;
+		}
+		case NOCMD_LEVELS: {
+			msg_to_char(ch, "EmpireMUD uses skills and gear to determine your level, not experience points. See HELP LEVELS for more info.\r\n");
+			break;
+		}
+		case NOCMD_PRACTICE: {
+			msg_to_char(ch, "EmpireMUD doesn't use 'practices' for skill gain. Type 'skills' or check out HELP SKILLS for more info.\r\n");
+			break;
+		}
+		case NOCMD_RENT: {
+			msg_to_char(ch, "EmpireMUD doesn't require you to rent or save your character anywhere. You usually log back in right where you quit.\r\n");
+			break;
+		}
+		case NOCMD_REPORT: {
+			msg_to_char(ch, "EmpireMUD doesn't have a 'report' command.\r\n");
+			break;
+		}
+		case NOCMD_UNGROUP: {
+			msg_to_char(ch, "EmpireMUD doesn't have an 'ungroup' command. Use 'group leave' or 'group kick'.\r\n");
+			break;
+		}
+		case NOCMD_WIMPY: {
+			msg_to_char(ch, "EmpireMUD doesn't have a 'wimpy' command.\r\n");
+			break;
+		}
+		case NOCMD_TOGGLE: {
+			msg_to_char(ch, "EmpireMUD doesn't that command by itself. Use 'toggle' instead.\r\n");
+			break;
+		}
+		default: {
+			send_config_msg(ch, "huh_string");
+			break;
+		}
+	}
 }
 
 
@@ -3312,6 +3358,21 @@ ACMD(do_who) {
 	else {
 		/* Didn't find a match to set parameters */
 		msg_to_char(ch, "You don't see anyone like that.\r\n");
+	}
+}
+
+
+ACMD(do_whoami) {
+	char real[256], curr[256];
+	
+	strcpy(curr, PERS(ch, ch, FALSE));
+	strcpy(real, PERS(ch, ch, TRUE));
+	
+	if (strcmp(curr, real)) {	// different
+		msg_to_char(ch, "%s (%s)\r\n", curr, real);
+	}
+	else {
+		msg_to_char(ch, "%s\r\n", real);
 	}
 }
 

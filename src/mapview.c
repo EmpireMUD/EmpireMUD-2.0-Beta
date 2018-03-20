@@ -181,6 +181,45 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 
 
 /**
+* Gets basic info about the tile to be shown on 'toggle informative' displays.
+*
+* @param char_data *ch Optional: The person looking (for immortal-only data).
+* @param room_data *room The location to check.
+* @param char *buffer A string to store the result to.
+*/
+void get_informative_tile_string(char_data *ch, room_data *room, char *buffer) {
+	*buffer = '\0';
+
+	if (IS_DISMANTLING(room)) {
+		sprintf(buffer + strlen(buffer), "%sdismantling", *buffer ? ", " : "");
+	}
+	else if (!IS_COMPLETE(room)) {
+		sprintf(buffer + strlen(buffer), "%sunfinished", *buffer ? ", " :"");
+	}
+	if (HAS_MAJOR_DISREPAIR(room)) {
+		sprintf(buffer + strlen(buffer), "%sbad disrepair", *buffer ? ", " :"");
+	}
+	else if (HAS_MINOR_DISREPAIR(room)) {
+		sprintf(buffer + strlen(buffer), "%sdisrepair", *buffer ? ", " :"");
+	}
+	if (IS_COMPLETE(room) && room_has_function_and_city_ok(room, FNC_MINE)) {
+		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
+			sprintf(buffer + strlen(buffer), "%shas ore", *buffer ? ", " :"");
+		}
+		else {
+			sprintf(buffer + strlen(buffer), "%sdepleted", *buffer ? ", " :"");
+		}
+	}
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
+		sprintf(buffer + strlen(buffer), "%sno-work", *buffer ? ", " :"");
+	}
+	if (ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) {
+		sprintf(buffer + strlen(buffer), "%schameleon", *buffer ? ", " :"");
+	}
+}
+
+
+/**
 * Detects the player's effective map radius size -- how far away the player
 * can see, as displayed on the map. This is controlled by the 'mapsize'
 * command, which actually sets the diameter.
@@ -1774,35 +1813,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		
 			// show status (informative)
 			if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-				*infobuf = '\0';
-			
-				if (IS_DISMANTLING(to_room)) {
-					sprintf(infobuf + strlen(infobuf), "%sdismantling", *infobuf ? ", " : "");
-				}
-				else if (!IS_COMPLETE(to_room)) {
-					sprintf(infobuf + strlen(infobuf), "%sunfinished", *infobuf ? ", " :"");
-				}
-				if (HAS_MAJOR_DISREPAIR(to_room)) {
-					sprintf(infobuf + strlen(infobuf), "%sbad disrepair", *infobuf ? ", " :"");
-				}
-				else if (HAS_MINOR_DISREPAIR(to_room)) {
-					sprintf(infobuf + strlen(infobuf), "%sdisrepair", *infobuf ? ", " :"");
-				}
-				if (IS_COMPLETE(to_room) && room_has_function_and_city_ok(to_room, FNC_MINE)) {
-					if (get_room_extra_data(to_room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
-						sprintf(infobuf + strlen(infobuf), "%shas ore", *infobuf ? ", " :"");
-					}
-					else {
-						sprintf(infobuf + strlen(infobuf), "%sdepleted", *infobuf ? ", " :"");
-					}
-				}
-				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
-					sprintf(infobuf + strlen(infobuf), "%sno-work", *infobuf ? ", " :"");
-				}
-				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && IS_IMMORTAL(ch)) {
-					sprintf(infobuf + strlen(infobuf), "%schameleon", *infobuf ? ", " :"");
-				}
-			
+				get_informative_tile_string(ch, to_room, infobuf);
 				if (*infobuf) {
 					sprintf(roombuf + strlen(roombuf), " [%s]", infobuf);
 				}

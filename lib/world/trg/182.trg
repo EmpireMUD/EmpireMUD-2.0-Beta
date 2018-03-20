@@ -167,6 +167,8 @@ if (guild /= %arg% || tortoise /= %arg%)
   set distance %room.distance(%turtle.room%)%
   if %distance% == 0
     %send% %actor% There is an atlasian tortoise in the room with you.
+  elseif %distance% == 1
+    %send% %actor% There is an atlasian tortoise %distance% tile to the %actor.dir(%real_dir%)%.
   else
     %send% %actor% There is an atlasian tortoise %distance% tiles to the %actor.dir(%real_dir%)%.
   end

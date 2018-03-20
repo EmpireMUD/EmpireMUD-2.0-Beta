@@ -114,6 +114,7 @@ done
 Talking Horse script~
 0 bw 10
 ~
+* This script is no longer in use, and has been replaced with custom messages.
 if %self.disabled%
   halt
 end
@@ -203,6 +204,7 @@ done
 Singing Bear script~
 0 bw 10
 ~
+* This is deprecated, replaced by mob custom strings.
 if %self.disabled%
   halt
 end
