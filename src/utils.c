@@ -591,9 +591,11 @@ void score_empires(void) {
 			num = 0;
 			
 			// score_levels[] terminates with a -1 but I don't trust doubles enough to do anything other than >= 0 here
-			for (pos = 0; score_levels[pos] >= 0; ++pos) {
-				if (EMPIRE_SCORE(emp, iter) >= (empire_score_average[iter] * score_levels[pos])) {
-					++num;
+			if (EMPIRE_SCORE(emp, iter) > 0) {
+				for (pos = 0; score_levels[pos] >= 0; ++pos) {
+					if (EMPIRE_SCORE(emp, iter) >= (empire_score_average[iter] * score_levels[pos])) {
+						++num;
+					}
 				}
 			}
 			
