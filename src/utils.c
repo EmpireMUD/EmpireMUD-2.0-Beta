@@ -460,23 +460,31 @@ void resort_empires(bool force) {
 	}
 }
 
-	
+
+// score_empires helper type
 struct scemp_type {
 	int value;
-	struct scemp_type *next, *prev;	// DL
+	struct scemp_type *next;	// LL
 };
 
 
+// score_empires sorter
 int compare_scemp(struct scemp_type *a, struct scemp_type *b) {
 	return a->value - b->value;
 }
 
 
+/**
+* score_empires helper adder: inserts a value in order
+*
+* @param struct scemp_type **list A pointer to the list to add to.
+* @param int value The number to add to the list.
+*/
 static inline void add_scemp(struct scemp_type **list, int value) {
 	struct scemp_type *scemp;
 	CREATE(scemp, struct scemp_type, 1);
 	scemp->value = value;
-	DL_INSERT_INORDER(*list, scemp, compare_scemp);
+	LL_INSERT_INORDER(*list, scemp, compare_scemp);
 }
 
 
@@ -573,7 +581,7 @@ void score_empires(void) {
 	median = MIN(num_emps, median);
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
 		pos = 0;
-		DL_FOREACH_SAFE(lists[iter], scemp, next_scemp) {
+		LL_FOREACH_SAFE(lists[iter], scemp, next_scemp) {
 			if (pos++ == median) {
 				empire_score_average[iter] = scemp->value;
 			}
