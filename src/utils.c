@@ -460,6 +460,25 @@ void resort_empires(bool force) {
 	}
 }
 
+	
+struct scemp_type {
+	int value;
+	struct scemp_type *next, *prev;	// DL
+};
+
+
+int compare_scemp(struct scemp_type *a, struct scemp_type *b) {
+	return a->value - b->value;
+}
+
+
+static inline void add_scemp(struct scemp_type **list, int value) {
+	struct scemp_type *scemp;
+	CREATE(scemp, struct scemp_type, 1);
+	scemp->value = value;
+	DL_INSERT_INORDER(*list, scemp, compare_scemp);
+}
+
 
 /**
 * This function assigns scores to all empires so they can be ranked on the
@@ -469,7 +488,8 @@ void score_empires(void) {
 	extern double empire_score_average[NUM_SCORES];
 	extern const double score_levels[];
 	
-	int iter, pos, total[NUM_SCORES], max[NUM_SCORES], num_emps = 0;
+	struct scemp_type *scemp, *next_scemp, *lists[NUM_SCORES];
+	int iter, pos, median, num_emps = 0;
 	struct empire_political_data *pol;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
@@ -480,9 +500,8 @@ void score_empires(void) {
 
 	// clear data	
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
-		total[iter] = 0;
+		lists[iter] = NULL;
 		empire_score_average[iter] = 0;
-		max[iter] = 0;
 	}
 	
 	// clear scores first
@@ -505,20 +524,16 @@ void score_empires(void) {
 		++num_emps;
 		
 		// detect scores -- and store later for easy comparison
-		total[SCORE_WEALTH] += GET_TOTAL_WEALTH(emp);
-		max[SCORE_WEALTH] = MAX(GET_TOTAL_WEALTH(emp), max[SCORE_WEALTH]);
+		add_scemp(&lists[SCORE_WEALTH], GET_TOTAL_WEALTH(emp));
 		EMPIRE_SCORE(emp, SCORE_WEALTH) = GET_TOTAL_WEALTH(emp);
 		
-		total[SCORE_TERRITORY] += (num = land_can_claim(emp, TER_TOTAL));
-		max[SCORE_TERRITORY] = MAX(num, max[SCORE_TERRITORY]);
+		add_scemp(&lists[SCORE_TERRITORY], (num = land_can_claim(emp, TER_TOTAL)));
 		EMPIRE_SCORE(emp, SCORE_TERRITORY) = num;
 		
-		total[SCORE_MEMBERS] += EMPIRE_MEMBERS(emp);
-		max[SCORE_MEMBERS] = MAX(EMPIRE_MEMBERS(emp), max[SCORE_MEMBERS]);
+		add_scemp(&lists[SCORE_MEMBERS], EMPIRE_MEMBERS(emp));
 		EMPIRE_SCORE(emp, SCORE_MEMBERS) = EMPIRE_MEMBERS(emp);
 		
-		total[SCORE_TECHS] += (num = count_tech(emp));
-		max[SCORE_TECHS] = MAX(num, max[SCORE_TECHS]);
+		add_scemp(&lists[SCORE_TECHS], (num = count_tech(emp)));
 		EMPIRE_SCORE(emp, SCORE_TECHS) = num;
 		
 		num = 0;
@@ -528,12 +543,10 @@ void score_empires(void) {
 			}
 		}
 		num /= 1000;	// for sanity of number size
-		total[SCORE_EINV] += num;
-		max[SCORE_EINV] = MAX(num, max[SCORE_EINV]);
+		add_scemp(&lists[SCORE_EINV], num);
 		EMPIRE_SCORE(emp, SCORE_EINV) = num;
 		
-		total[SCORE_GREATNESS] += EMPIRE_GREATNESS(emp);
-		max[SCORE_GREATNESS] = MAX(EMPIRE_GREATNESS(emp), max[SCORE_GREATNESS]);
+		add_scemp(&lists[SCORE_GREATNESS], EMPIRE_GREATNESS(emp));
 		EMPIRE_SCORE(emp, SCORE_GREATNESS) = EMPIRE_GREATNESS(emp);
 		
 		num = 0;
@@ -542,26 +555,30 @@ void score_empires(void) {
 				++num;
 			}
 		}
-		total[SCORE_DIPLOMACY] += num;
-		max[SCORE_DIPLOMACY] = MAX(num, max[SCORE_DIPLOMACY]);
+		add_scemp(&lists[SCORE_DIPLOMACY], num);
 		EMPIRE_SCORE(emp, SCORE_DIPLOMACY) = num;
 		
-		total[SCORE_FAME] += EMPIRE_FAME(emp);
-		max[SCORE_FAME] = MAX(EMPIRE_FAME(emp), max[SCORE_FAME]);
+		add_scemp(&lists[SCORE_FAME], EMPIRE_FAME(emp));
 		EMPIRE_SCORE(emp, SCORE_FAME) = EMPIRE_FAME(emp);
 		
-		total[SCORE_MILITARY] += EMPIRE_MILITARY(emp);
-		max[SCORE_MILITARY] = MAX(EMPIRE_MILITARY(emp), max[SCORE_MILITARY]);
+		add_scemp(&lists[SCORE_MILITARY], EMPIRE_MILITARY(emp));
 		EMPIRE_SCORE(emp, SCORE_MILITARY) = EMPIRE_MILITARY(emp);
 		
-		total[SCORE_PLAYTIME] += EMPIRE_TOTAL_PLAYTIME(emp);
-		max[SCORE_PLAYTIME] = MAX(EMPIRE_TOTAL_PLAYTIME(emp), max[SCORE_PLAYTIME]);
+		add_scemp(&lists[SCORE_PLAYTIME], EMPIRE_TOTAL_PLAYTIME(emp));
 		EMPIRE_SCORE(emp, SCORE_PLAYTIME) = EMPIRE_TOTAL_PLAYTIME(emp);
 	}
 	
-	// determine avgs
+	// determine medians and free lists
+	median = num_emps / 2 + 1;
+	median = MIN(num_emps, median);
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
-		empire_score_average[iter] = ((double) total[iter]) / MAX(1, num_emps);
+		pos = 0;
+		DL_FOREACH_SAFE(lists[iter], scemp, next_scemp) {
+			if (pos++ == median) {
+				empire_score_average[iter] = scemp->value;
+			}
+			free(scemp);
+		}
 	}
 	
 	// apply scores to empires based on how they fared
