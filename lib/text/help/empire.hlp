@@ -580,7 +580,9 @@ Each score is based on how far an empire is above or below the average rating
 in that category. For example, if the average empire has 2 members, any empire
 with that many members gets 5 points in the "Members" score.
 
-You can see average numbers by typing "mudstats empires".
+You can see average numbers by typing "mudstats empires". All score averages
+are medians. Inventory is how many thousands of items you have; all other
+average numbers are simple counts.
 
 See also: MUDSTATS
 #
