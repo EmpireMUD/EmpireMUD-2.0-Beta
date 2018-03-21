@@ -209,10 +209,10 @@ void mudstats_empires(char_data *ch, char *argument) {
 	
 	int iter;
 	
-	msg_to_char(ch, "Empire score averages:\r\n");
+	msg_to_char(ch, "Empire score medians:\r\n");
 	
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
-		msg_to_char(ch, " %s: %.3f\r\n", score_type[iter], empire_score_average[iter]);
+		msg_to_char(ch, " %s: %d\r\n", score_type[iter], (int) empire_score_average[iter]);
 	}
 }
 
