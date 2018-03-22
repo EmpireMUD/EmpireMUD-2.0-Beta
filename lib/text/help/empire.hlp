@@ -249,8 +249,13 @@ There is a 60-minute waiting period between when you found a city, and when it
 counts as a city for things like City Teleportation, certain buildings such as
 the Great Hall, for guard towers, and for some other game rules.
 
-You can get additional city points from accruing at least 4000 wealth, for
-achieving Prominence, and for having at least 10 technologies.
+City points come from:
+ - 1 point per 2 members (rounded up)
+ - 1 point for having at least 4000 wealth
+ - 1 point for Prominence
+ - 1 point for having at least 10 technologies
+ - 1 point for being over 50 escore
+ - 1 point for having a capital city and being over 75 escore
 
 EmpireMUD periodically checks if cities are completely empty and, if so,
 will remove the city center and refund the city point. This helps keep the map
@@ -258,17 +263,17 @@ clean, and you can prevent it by making sure there is at least one building in
 your city.
 
 See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
-  TERRITORY, WEALTH
+  TERRITORY, WEALTH, ESCORE
 #
 "CITY TYPES" OUTPOST VILLAGE CAPITAL
 
 There are four sizes of city available. The only difference between them is
 the radius of the city.
 
- -C1-  Outpost (radius 5, outskirts 20)
- -C2-  Village (radius 10, outskirts 40)
- -C3-  City (radius 15, outskirts 60)
- -C4-  Capital (radius 25, outskirts 100)
+ -C1-  Outpost (radius 5, outskirts 20, max population 10)
+ -C2-  Village (radius 10, outskirts 40, max pop 30)
+ -C3-  City (radius 15, outskirts 60, max pop 50)
+ -C4-  Capital (radius 25, outskirts 100, max pop 150)
 
 Some buildings, such as mines, count as in-city territory even in the outskirts
 (4x the normal distance from the city center).

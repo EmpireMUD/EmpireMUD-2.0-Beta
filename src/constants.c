@@ -1574,12 +1574,12 @@ const char *craft_types[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE CONSTANTS ////////////////////////////////////////////////////////
 
-// name, icon, radius, max population
+// name, icon, radius, max population, show-to-others, is-capital
 struct city_metadata_type city_type[] = {
-	{ "outpost", "&0-&?C1&0-", 5, 10, FALSE },
-	{ "village", "&0-&?C2&0-", 10, 30, TRUE },
-	{ "city", "&0-&?C3&0-", 15, 50, TRUE },
-	{ "capital", "&0-&?C4&0-", 25, 150, TRUE },
+	{ "outpost", "&0-&?C1&0-", 5, 10, FALSE, FALSE },
+	{ "village", "&0-&?C2&0-", 10, 30, TRUE, FALSE },
+	{ "city", "&0-&?C3&0-", 15, 50, TRUE, FALSE },
+	{ "capital", "&0-&?C4&0-", 25, 150, TRUE, TRUE },
 
 	// this must go last
 	{ "\n", "\n", 0, 0, FALSE }

@@ -3976,6 +3976,7 @@ struct city_metadata_type {
 	int radius;
 	int max_population;
 	bool show_to_others;
+	bool is_capital;
 };
 
 
