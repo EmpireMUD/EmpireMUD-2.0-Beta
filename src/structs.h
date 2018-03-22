@@ -4218,6 +4218,7 @@ struct empire_data {
 	char *motd;	// Empire MOTD
 	
 	long create_time;	// when it was founded
+	long city_overage_warning_time;	// if the empire has been warned
 
 	byte num_ranks;	// Total number of levels (maximum 20)
 	char *rank[MAX_RANKS];	// Name of each rank

@@ -1025,6 +1025,7 @@ void reduce_city_overages(void) {
 	
 	empire_data *iter, *next_iter;
 	int used, points;
+	time_t overage_timeout = time(0) - (config_get_int("city_overage_timeout") * SECS_PER_REAL_HOUR);
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		// only bother on !imm empires that have MORE than one city (they can always keep the last one)
@@ -1032,9 +1033,24 @@ void reduce_city_overages(void) {
 			used = count_city_points_used(iter);
 			points = city_points_available(iter);
 			
-			// cutoff for keeping cities is being at 2x currently-earned points
-			if (used > (2 * (points + used))) {
-				reduce_city_overage_one(iter);
+			if (points >= 0) {	// no overage
+				// remove warning time, if any
+				EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) = 0;
+			}
+			else {	// over on points
+				
+				if (EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) == 0) {
+					EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) = time(0);
+					log_to_empire(iter, ELOG_TERRITORY, "Your empire is using more city points than it has available and will abandon one soon");
+				}
+				else if (EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) <= overage_timeout) {
+					// time's up
+					reduce_city_overage_one(iter);
+				}
+				else {
+					// still over -- log again
+					log_to_empire(iter, ELOG_TERRITORY, "Your empire is using more city points than it has available and will abandon one soon");
+				}
 			}
 		}
 	}
