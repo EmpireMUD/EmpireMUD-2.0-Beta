@@ -270,10 +270,10 @@ See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
 There are four sizes of city available. The only difference between them is
 the radius of the city.
 
- -C1-  Outpost (radius 5, outskirts 20, max population 10)
- -C2-  Village (radius 10, outskirts 40, max pop 30)
- -C3-  City (radius 15, outskirts 60, max pop 50)
- -C4-  Capital (radius 25, outskirts 100, max pop 150)
+ -C1-  Outpost (radius 5, outskirts 20)
+ -C2-  Village (radius 10, outskirts 40)
+ -C3-  City (radius 15, outskirts 60)
+ -C4-  Capital (radius 25, outskirts 100)
 
 Some buildings, such as mines, count as in-city territory even in the outskirts
 (4x the normal distance from the city center).
