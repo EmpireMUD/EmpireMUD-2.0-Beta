@@ -1024,13 +1024,13 @@ void reduce_city_overages(void) {
 	extern int count_city_points_used(empire_data *emp);
 	
 	empire_data *iter, *next_iter;
-	int used, points;
+	int points;
+	
 	time_t overage_timeout = time(0) - (config_get_int("city_overage_timeout") * SECS_PER_REAL_HOUR);
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		// only bother on !imm empires that have MORE than one city (they can always keep the last one)
 		if (!EMPIRE_IMM_ONLY(iter) && count_cities(iter) > 1) {
-			used = count_city_points_used(iter);
 			points = city_points_available(iter);
 			
 			if (points >= 0) {	// no overage
