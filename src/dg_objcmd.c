@@ -266,7 +266,7 @@ OCMD(do_obuildingecho) {
 	if (!*room_number || !*msg) {
 		obj_log(obj, "obuildingecho called with too few args");
 	}
-	else if (!(froom = get_room(orm, arg))) {
+	else if (!(froom = get_room(orm, room_number))) {
 		obj_log(obj, "obuildingecho called with invalid target");
 	}
 	else {
