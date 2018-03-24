@@ -1,0 +1,19 @@
+#12504
+Hire the Rival Adventurer~
+   The adventurer stops hacking at the colossus for a moment to size you up. 
+You consider attacking for a moment, but decide it might be best to work
+together. The adventurer agrees, for a price.
+~
+The adventurer agrees to follow you.
+~
+3 bcd 100 200 -1
+A
+4 12515
+W
+21 0 0 100 a
+W
+1 17 0 1 a
+Z
+1 12504
+S
+$
