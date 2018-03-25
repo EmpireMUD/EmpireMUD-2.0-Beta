@@ -15,6 +15,7 @@ if !%instance.start%
   halt
 end
 eval room i12501
+set start_room %actor.room%
 %echoaround% %actor% %actor.name% starts climbing up %self.name%'s leg...
 %teleport% %actor% %room%
 %echoaround% %actor% %actor.name% climbs up from the ground below.
@@ -22,6 +23,17 @@ eval room i12501
 %force% %actor% look
 eval room2 i12500
 %at% %room2% %load% obj 12504
+set person %start_room.people%
+while %person%
+  if %person.is_npc% && %person.master% == %actor%
+    %echoaround% %person% %person.name% follows %actor.name%.
+    %teleport% %person% %actor.room%
+    %echoneither% %person% %actor% %person.name% follows %actor.name%.
+    %send% %actor% %person.name% follows you.
+    %send% %person% You follow %actor.name%.
+  end
+  set person %person.next_in_room%
+done
 ~
 #12501
 Disembark colossus~
@@ -31,6 +43,7 @@ eval colossus %instance.mob(12500)%
 if !%colossus%
   eval colossus %instance.mob(12501)%
 end
+set room %actor.room%
 if %colossus%
   %send% %actor% You drop down from your perch on %colossus.name% to the ground below.
   %echoaround% %actor% %actor.name% drops down from %actor.hisher% perch on %colossus.name% to the ground below.
@@ -44,6 +57,17 @@ else
   %echoaround% %actor% %actor% drops down out of nowhere.
   %force% %actor% look
 end
+set person %room.people%
+while %person%
+  if %person.is_npc% && %person.master% == %actor%
+    %echoaround% %person% %person.name% follows %actor.name%.
+    %teleport% %person% %actor.room%
+    %echoneither% %person% %actor% %person.name% follows %actor.name%.
+    %send% %actor% %person.name% follows you.
+    %send% %person% You follow %actor.name%.
+  end
+  set person %person.next_in_room%
+done
 ~
 #12502
 Colossus random attacks~
@@ -428,6 +452,13 @@ Colossus move announcement~
 0 i 100
 ~
 eval room %self.room%
+if %room.distance(%instance.location%)% > 20
+  %echo% %self.name% hastily backtracks.
+  return 0
+  wait 1
+  %echo% %self.name% hastily backtracks.
+  halt
+end
 %regionecho% %room% -7 The footfalls of %self.name% shake the earth as %self.heshe% moves to %room.coords%.
 ~
 #12518
@@ -494,14 +525,13 @@ Colossus death~
 ~
 set tokens 0
 if !%self.varexists(parts_destroyed)%
+  set tokens 6
+elseif %self.parts_destroyed% == 1
+  set tokens 5
+elseif (%self.mob_flagged(GROUP)%
   set tokens 4
 else
-  if %self.mob_flagged(GROUP)%
-    eval tokens %tokens% + 2
-  end
-  if %self.mob_flagged(HARD)%
-    eval tokens %tokens% + 1
-  end
+  set tokens 2
 end
 if %tokens% > 0
   eval room %self.room%
@@ -565,6 +595,20 @@ if %self.varexists(running)%
     remote dodged_%actor.id% %self.id%
   end
 end
+~
+#12526
+drop Hire/bribe quest on adv death~
+0 f 100
+~
+set person %self.room.people%
+while %person%
+  if %person.is_pc%
+    if %person.on_quest(12504)%
+      %quest% %person% drop 12504
+    end
+  end
+  set person %person.next_in_room%
+done
 ~
 #12527
 Adventurer bribe~
@@ -706,11 +750,8 @@ if %colossus%
       nop %colossus.remove_mob_flag(GROUP)%
       nop %colossus.add_mob_flag(HARD)%
     break
-    case 5
-      nop %colossus.remove_mob_flag(GROUP)%
-      nop %colossus.remove_mob_flag(HARD)%
-    break
   done
+  %scale% %colossus% %colossus.level%
 end
 * End of script fragment
 ~
@@ -729,6 +770,10 @@ if %self.varexists(cycle)%
   set cycle %self.cycle%
 else
   set cycle 1
+end
+if %cycle% >= 10
+  %echo% An explosion rocks %self.name%!
+  %damage% %self% 10000 direct
 end
 * choose a 'correct action'
 set color_1 red
@@ -785,8 +830,8 @@ if %success% && !%failure%
   eval cycle %cycle% + 1
   remote cycle %self.id%
   if %cycle% >= 10
-    %echo% %self.name% is rocked by a powerful explosion!
-    %damage% %self% 10000 direct
+    say Access granted. Disengaging embiggening circuit...
+    dg_affect %self% !ATTACK off
   end
 else
   %echo% %self.name% releases a blast of lightning!
@@ -879,6 +924,24 @@ remote parts_destroyed %new_colossus.id%
 %purge% %colossus% $n is rocked by an explosion, and suddenly shrinks!
 %teleport% adventure %target_room%
 %at% %target_room% %echo% Everyone who was climbing on the colossus falls off!
+~
+#12536
+Adventurer quest start act~
+0 e 0
+you~
+if %self.fighting%
+  halt
+end
+wait 5
+say You know, I could help you out here... for a price.
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.is_pc%
+    %quest% %person% start 12504
+  end
+  eval person %person.next_in_room%
+done
 ~
 #12547
 Clockwork Colossus super-loot~
@@ -1049,34 +1112,18 @@ end
 if %normal%
   %load% obj 12550 %actor% inv %level%
   eval item %%actor.inventory(12550)%%
-  if %item.is_flagged(BOP)%
-    eval bind %%item.bind(%self%)%%
-    nop %bind%
-  end
 end
 if %basic%
   %load% obj 12549 %actor% inv %level%
   eval item %%actor.inventory(12549)%%
-  if %item.is_flagged(BOP)%
-    eval bind %%item.bind(%self%)%%
-    nop %bind%
-  end
 end
 if %premium%
   %load% obj 12548 %actor% inv %level%
   eval item %%actor.inventory(12548)%%
-  if %item.is_flagged(BOP)%
-    eval bind %%item.bind(%self%)%%
-    nop %bind%
-  end
 end
 if %super%
   %load% obj 12547 %actor% inv %level%
   eval item %%actor.inventory(12547)%%
-  if %item.is_flagged(BOP)%
-    eval bind %%item.bind(%self%)%%
-    nop %bind%
-  end
 end
 * give scraps
 while %scraps% > 0
@@ -1090,7 +1137,7 @@ wait 1
 #12552
 Open belt panel~
 1 c 4
-open~
+open pry~
 eval target %%actor.obj_target(%arg%)%%
 if %target% != %self%
   return 0
@@ -1170,6 +1217,7 @@ if %color% and %correct_color%
           break
           * 5 is only when the master controller breaks
         done
+        %scale% %colossus% %colossus.level%
       end
       * End of script fragment
       %purge% %self%
@@ -1301,12 +1349,12 @@ while %cycles_left% >= 0
       halt
     end
   end
+  eval cycles_left %cycles_left% - 1
   eval message_self %%message_%message_num%_self%%
   eval message_other %%message_%message_num%_other%%
-  %send% %actor% %message_self%
-  %echoaround% %actor% %message_other%
-  eval cycles_left %cycles_left% - 1
   if %cycles_left% >= 0
+    %send% %actor% %message_self%
+    %echoaround% %actor% %message_other%
     wait 5 sec
   end
 done
@@ -1325,6 +1373,8 @@ if !%first_chant%
 end
 * quest complete?
 if %first_chant% == %last_chant% && %second_chant% == %chant_num%
+  %send% %actor% %message_self%
+  %echoaround% %actor% %message_other%
   rdelete first_chant %colossus.id%
   rdelete second_chant %colossus.id%
   rdelete last_chant %colossus.id%
@@ -1336,11 +1386,10 @@ if %first_chant% == %last_chant% && %second_chant% == %chant_num%
     dg_affect #12501 %colossus% off
     if !%colossus.varexists(parts_destroyed)%
       set parts_destroyed 1
-      remote parts_destroyed %colossus.id%
     else
       eval parts_destroyed %colossus.parts_destroyed% + 1
-      remote parts_destroyed %colossus.id%
     end
+    remote parts_destroyed %colossus.id%
     switch %parts_destroyed%
       case 3
         nop %colossus.add_mob_flag(GROUP)%
@@ -1351,15 +1400,22 @@ if %first_chant% == %last_chant% && %second_chant% == %chant_num%
         nop %colossus.add_mob_flag(HARD)%
       break
     done
+    %scale% %colossus% %colossus.level%
   end
   * End of script fragment
 else
+  if %chant_num% == %first_chant%
+    %send% %actor% %message_self%
+    %echoaround% %actor% %message_other%
+  else
+    %echo% Nothing seems to happen.
+  end
   set last_chant %chant_num%
   remote last_chant %colossus.id%
 end
 ~
 #12556
-Colossus chant hint~
+Scrawled words -- colossus leg chant hint~
 1 c 4
 look~
 if %actor.obj_target(%arg%)% != %self%
@@ -1381,8 +1437,19 @@ if %colossus.varexists(first_chant)%
   %send% %actor% 'First, perform %chant%.
   eval chant %%chant_%colossus.second_chant%%%
   %send% %actor% Then, perform %chant%.'
+  %send% %actor% Underneath is scrawled, 'Chant book is hidden behind a gear'. (Try 'search'.)
 else
   %send% %actor% The words have been rendered illegible by damage to the colossus.
 end
+~
+#12557
+Colossus: Search leg alcove for book~
+2 c 0
+search~
+%load% obj 12560 %actor% inv
+set obj %actor.inventory(12560)%
+%send% %actor% Searching the room, you find %obj.shortdesc% stuffed behind a broken gear.
+%echoaround% %actor% %actor.name% searches the room and finds %obj.shortdesc%.
+detach 12557 %self.id%
 ~
 $

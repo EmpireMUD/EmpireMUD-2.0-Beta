@@ -873,11 +873,11 @@ the panel~
 An open panel above the belt contains exposed wires.~
    As the panel bursts open, you see three exposed wires: red, green, and blue.
 Each of the wires has a diagram over it, perhaps indicating what it does. The
-red wire is labeled with a large spider. The green wire depicts a person
+red wire is labeled with a large dragonfly. The green wire depicts a person
 running. The blue wire shows what appears to be a clockwork brain. Use 'cut
 <red, green, or blue>' to choose one.
 ~
-3 0 0 5
+3 0 0 6
 0 0 0
 2 0
 T 12553
