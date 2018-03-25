@@ -12,6 +12,12 @@ T 12518
 T 12517
 T 12520
 T 12521
+T 12505
+T 12506
+T 12507
+T 12508
+T 12509
+T 12510
 S
 #12501
 colossus clockwork miniature~
@@ -24,13 +30,19 @@ I 4 12551 100.00 1  # LOOT: the clockwork loot controller
 T 12518
 T 12520
 T 12521
+T 12505
+T 12506
+T 12507
+T 12508
+T 12509
+T 12510
 S
 #12502
 spider clockwork~
 a clockwork spider~
 A clockwork spider walks slowly down the colossus.
 ~
-100 200 bdjy G
+100 200 bdj G
 0 0 0 21
 I 0 12507 100.00 1  # BUTCHER: a piece of brass scrap metal
 I 4 12507 100.00 1  # LOOT: a piece of brass scrap metal
@@ -41,7 +53,7 @@ magpie angry~
 an angry magpie~
 A magpie is stealing bits of wire from the colossus.
 ~
-100 200 bdjz cmG
+100 200 bdj cmG
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 4 12506 75.00 1 x  # LOOT: some salvaged copper wire

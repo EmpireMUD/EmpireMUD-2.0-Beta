@@ -94,14 +94,14 @@ if !%self.running%
   %send% %actor% There's nothing to dodge.
   halt
 end
-%send% %actor% You scramble quickly out of the way of the attack.
-%echoaround% %actor% %actor.name% scrambles out of the way of the attack.
+%send% %actor% You prepare to dodge the eye lasers.
+%echoaround% %actor% %actor.name% prepares to dodge the eye lasers.
 set dodged_%actor.id% 1
 remote dodged_%actor.id% %self.id%
 ~
 #12505
 Colossus Fight: Lightning Punch (right arm)~
-0 k 20
+0 k 16
 ~
 if %self.cooldown(12502)%
   halt
@@ -116,10 +116,13 @@ else
     set parts_destroyed %self.parts_destroyed%
   end
   if %parts_destroyed% < 2
-    * Tee hee
-    nop %self.set_cooldown(12502, 15)%
+    if %parts_destroyed% == 0
+      * Tee hee
+      nop %self.set_cooldown(12502, 15)%
+    end
     %echo% %self.name% draws back %self.hisher% right arm, lightning flickering around %self.hisher% clenched fist!
     wait 3 sec
+    set actor %self.fighting%
     %send% %actor% &r%self.name%'s lightning-charged punch smashes into you with a thunderous boom, sending you flying!
     %echoaround% %actor% %self.name%'s lightning-charged punch smashes into %actor.name% with a thunderous boom, sending %actor.himher% flying!
     %damage% %actor% 600 physical
@@ -132,6 +135,7 @@ else
   else
     %echo% %self.name% draws back %self.hisher% right arm, lightning flickering around %self.hisher% clenched fist!
     wait 3 sec
+    set actor %self.fighting%
     %send% %actor% &r%self.name%'s lightning-charged punch crashes into you, stunning you!
     %echoaround% %actor% %self.name%'s lightning-charged punch crashes into %actor.name%, stunning %actor.himher%!
     %damage% %actor% 200 physical
@@ -158,8 +162,10 @@ else
     set parts_destroyed %self.parts_destroyed%
   end
   if %parts_destroyed% < 2
-    * Tee hee
-    nop %self.set_cooldown(12502, 15)%
+    if %parts_destroyed% == 0
+      * Tee hee
+      nop %self.set_cooldown(12502, 15)%
+    end
     %echo% %self.name% raises %self.hisher% left arm, and a massive blade extends from %self.hisher% clenched fist.
     wait 3 sec
     if %actor.is_pc%
@@ -190,8 +196,73 @@ else
 end
 ~
 #12507
-Colossus Fight: Leg Stomp~
+Colossus Fight: Rocket Barrage~
 0 k 25
+~
+if %self.cooldown(12502)%
+  halt
+end
+nop %self.set_cooldown(12502, 30)%
+if %self.varexists(parts_destroyed)%
+  set parts_destroyed %self.parts_destroyed%
+end
+if %parts_destroyed% < 2
+  if %parts_destroyed% == 0
+    * Tee hee
+    nop %self.set_cooldown(12502, 15)%
+  end
+  %echo% %self.name%'s shoulder-mounted cannons fill the sky with dozens of fiery projectiles!
+  set cycle 1
+  while %cycle% <= 3
+    wait 3 sec
+    %echo% &r%self.name%'s missile barrage rains from the sky, exploding all around you!
+    %aoe% 200 physical
+    %aoe% 200 fire
+    eval cycle %cycle% + 1
+  done
+else
+  %echo% %self.name%'s shoulder-mounted cannons fire a barrage of fiery projectiles into the sky!
+  wait 3 sec
+  %echo% &r%self.name%'s missile barrage rains from the sky, exploding all around you!
+  %aoe% 100 physical
+  %aoe% 100 fire
+end
+~
+#12508
+Colossus Fight: Maintenance Spiders~
+0 k 33
+~
+if %self.cooldown(12502)%
+  halt
+end
+if %self.health% == %self.maxhealth%
+  halt
+end
+nop %self.set_cooldown(12502, 30)%
+if %self.varexists(parts_destroyed)%
+  set parts_destroyed %self.parts_destroyed%
+end
+if %parts_destroyed% < 2
+  if %parts_destroyed% == 0
+    * Tee hee
+    nop %self.set_cooldown(12502, 15)%
+  end
+  %echo% A small army of clockwork spiders swarms over %self.name%'s body, repairing it!
+  %heal% %self% health 400
+  eval magnitude (%self.level% - 50) * 5
+  dg_affect #12508 %self% HEAL-OVER-TIME %magnitude% 30
+else
+  %echo% A handful of clockwork spiders scuttle out of %self.name%'s body and begin to repair it!
+  eval magnitude (%self.level% - 50)
+  if %self.vnum% == 12500
+    eval magnitude %magnitude% * 2
+  end
+  dg_affect #12508 %self% HEAL-OVER-TIME %magnitude% 30
+end
+~
+#12509
+Colossus Fight: Leg Stomp~
+0 k 50
 ~
 if %self.cooldown(12502)%
   halt
@@ -209,31 +280,94 @@ if %self.vnum% == 12501
   dg_affect #12509 %actor% STUNNED on 5
 else
   if %parts_destroyed% < 2
-    * Tee hee
-    nop %self.set_cooldown(12502, 20)%
+    if %parts_destroyed% == 0
+      * Tee hee
+      nop %self.set_cooldown(12502, 20)%
+    end
     %echo% %self.name% raises one leg high in the air, pistons shifting as %self.heshe% gathers power...
     wait 3 sec
-    %send% %actor% &r%self.name% brings %self.hisher% foot down on top of you with an earth-shaking crash.
+    set actor %self.fighting%
+    %send% %actor% &r%self.name% brings %self.hisher% foot down on top of you with an earth-shaking crash!
     %echoaround% %actor% %self.name% brings %self.hisher% foot down on top of %actor.name% with an earth-shaking crash!
-    %damage% %actor% 1000 physical
+    %damage% %actor% 400 physical
     dg_affect #12509 %actor% HARD-STUNNED on 15
     dg_affect #12509 %actor% DODGE -100 15
     dg_affect #12509 %self% HARD-STUNNED on 5
     wait 3 sec
+    dg_affect #12509 %self% off
+    if %actor% != %self.fighting%
+      halt
+    end
     %echo% There is a mighty boom as %self.name% releases %self.hisher% gathered power into the ground beneath %self.hisher% foot!
     %send% %actor% &rThe force of %self.name%'s foot pressing down on you explosively redoubles, hammering you deeper into the ground!
-    %damage% %actor% 1500 physical
+    %damage% %actor% 800 physical
     %echoaround% %actor% &rThe force of %self.name%'s stomp knocks you off your feet!
     eval person %room.people%
     while %person%
       if %person.is_enemy(%self%)% && %person% != %actor%
-        %damage% %person% 300
         dg_affect #12509 %person% HARD-STUNNED on 5
+        %damage% %person% 200 physical
       end
       eval person %person.next_in_room%
     done
   else
-    * TODO NORMAL VERSION
+    %echo% %self.name% raises one leg high in the air...
+    wait 3 sec
+    set actor %self.fighting%
+    %send% %actor% &r%self.name% brings %self.hisher% foot down on top of you, pinning you to the ground!
+    %echoaround% %actor% %self.name% brings %self.hisher% foot down on top of %actor.name%, pinning %actor.himher% to the ground!
+    %damage% %actor% 400 physical
+    dg_affect #12509 %actor% HARD-STUNNED on 10
+    dg_affect #12509 %actor% DODGE -50 10
+  end
+end
+~
+#12510
+Colossus Fight: Eye Lasers~
+0 k 100
+~
+if %self.cooldown(12502)%
+  halt
+end
+nop %self.set_cooldown(12502, 30)%
+if %self.varexists(parts_destroyed)%
+  set parts_destroyed %self.parts_destroyed%
+end
+set target %random.enemy%
+* Only start if not blinded
+if !%target%
+  nop %self.set_cooldown(12502, 0)%
+  halt
+end
+if %parts_destroyed% < 2
+  if %parts_destroyed% == 0
+    * Tee hee
+    nop %self.set_cooldown(12502, 15)%
+  end
+  %send% %target% %self.name% glares at you, and %self.hisher% eyes begin to glow red!
+  %echoaround% %target% %self.name% glares at %target.name%, and %self.hisher% eyes begin to glow red!
+  wait 3 sec
+  if !%target% || %target.room% != %self.room%
+    set target %self.fighting%
+  end
+  %send% %target% &rThere is a blinding flash of light, and you feel unbearable heat and pain!
+  %echoaround% %target% Beams of crimson energy fly from %self.name%'s eyes, engulfing %target.name% and setting %target.himher% ablaze!
+  %damage% %target% 250 magical
+  %damage% %target% 250 fire
+  dg_affect #12510 %target% BLIND on 15
+  %dot% #12510 %target% 600 15 fire
+else
+  %send% %target% %self.name% glares at you, and %self.hisher% eyes begin to glow red!
+  %echoaround% %target% %self.name% glares at %target.name%, and %self.hisher% eyes begin to glow red!
+  wait 3 sec
+  if !%target% || %target.room% != %self.room%
+    set target %self.fighting%
+  end
+  %send% %target% &rBeams of crimson energy fly from %self.name%'s eyes, cutting into you!
+  %echoaround% %target% Beams of crimson energy fly from %self.name%'s eyes, cutting into %target.name%!
+  %damage% %target% 75 magical
+  %damage% %target% 75 fire
+end
 ~
 #12513
 Colossus mob block higher room~
@@ -286,6 +420,8 @@ if %second_chant% == %first_chant%
 end
 remote first_chant %self.id%
 remote second_chant %self.id%
+* these buffs are removed when a component is damaged
+dg_affect #12501 %self% TO-HIT 500 -1
 ~
 #12517
 Colossus move announcement~
@@ -342,6 +478,12 @@ if %helper% != %self%
 end
 if %self.varexists(parts_destroyed)%
   %send% %actor% %self.parts_destroyed% of %self.name%'s major components have been destroyed.
+  if !%instance.mob(12508)%
+    %send% %actor% %self.name%'s left arm has been badly damaged.
+  end
+  if !%instance.mob(12509)%
+    %send% %actor% %self.name%'s right arm has been badly damaged.
+  end
 else
   %send% %actor% All of %self.name%'s major components are intact.
 end
@@ -442,7 +584,7 @@ if %questvnum% == 12504
 end
 ~
 #12528
-Colossus left arm combat~
+Colossus arm combat~
 0 k 100
 ~
 if %self.cooldown(12502)%
@@ -540,13 +682,14 @@ else
 end
 ~
 #12531
-Colossus left arm death~
+Colossus arm death~
 0 f 100
 ~
 %echo% The destruction of %self.name% weakens the colossus!
 * Start of script fragment: colossus damage updater
 eval colossus %instance.mob(12500)%
 if %colossus%
+  dg_affect #12501 %colossus% off
   if !%colossus.varexists(parts_destroyed)%
     set parts_destroyed 1
     remote parts_destroyed %colossus.id%
@@ -1008,6 +1151,7 @@ if %color% and %correct_color%
       * Start of script fragment: colossus damage updater
       eval colossus %instance.mob(12500)%
       if %colossus%
+        dg_affect #12501 %colossus% off
         if !%colossus.varexists(parts_destroyed)%
           set parts_destroyed 1
           remote parts_destroyed %colossus.id%
@@ -1024,10 +1168,7 @@ if %color% and %correct_color%
             nop %colossus.remove_mob_flag(GROUP)%
             nop %colossus.add_mob_flag(HARD)%
           break
-          case 5
-            nop %colossus.remove_mob_flag(GROUP)%
-            nop %colossus.remove_mob_flag(HARD)%
-          break
+          * 5 is only when the master controller breaks
         done
       end
       * End of script fragment
@@ -1052,7 +1193,7 @@ if %color% and %correct_color%
   else
     %send% %actor% &rThe open panel blasts you with lightning!
     %echoaround% %actor% The open panel blasts %actor.name% with lightning!
-    %damage% %actor% 150 magical
+    %damage% %actor% 300 magical
     %send% %actor% Your spasming hands lose purchase on the colossus!
     %echoaround% %actor% %actor.name% falls off the colossus, twitching and spasming!
     eval colossus %instance.mob(12500)%
@@ -1192,6 +1333,7 @@ if %first_chant% == %last_chant% && %second_chant% == %chant_num%
   * Start of script fragment: colossus damage updater
   eval colossus %instance.mob(12500)%
   if %colossus%
+    dg_affect #12501 %colossus% off
     if !%colossus.varexists(parts_destroyed)%
       set parts_destroyed 1
       remote parts_destroyed %colossus.id%
@@ -1207,10 +1349,6 @@ if %first_chant% == %last_chant% && %second_chant% == %chant_num%
       case 4
         nop %colossus.remove_mob_flag(GROUP)%
         nop %colossus.add_mob_flag(HARD)%
-      break
-      case 5
-        nop %colossus.remove_mob_flag(GROUP)%
-        nop %colossus.remove_mob_flag(HARD)%
       break
     done
   end
