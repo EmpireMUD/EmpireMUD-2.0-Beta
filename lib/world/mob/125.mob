@@ -1,0 +1,182 @@
+#12500
+colossus clockwork enormous~
+the clockwork colossus~
+An enormous clockwork colossus towers over you (adventure).
+~
+100 200 dkuyzAB c
+0 0 26 14
+I 4 12551 100.00 1  # LOOT: the clockwork loot controller
+T 12516
+T 12500
+T 12518
+T 12517
+T 12520
+T 12521
+T 12505
+T 12506
+T 12507
+T 12508
+T 12509
+T 12510
+S
+#12501
+colossus clockwork miniature~
+the clockwork colossus~
+A miniature clockwork colossus stomps toward you!
+~
+100 200 dkuyz c
+0 0 26 5
+I 4 12551 100.00 1  # LOOT: the clockwork loot controller
+T 12518
+T 12520
+T 12521
+T 12505
+T 12506
+T 12507
+T 12508
+T 12509
+T 12510
+S
+#12502
+spider clockwork~
+a clockwork spider~
+A clockwork spider walks slowly down the colossus.
+~
+100 200 bdj G
+0 0 0 21
+I 0 12507 100.00 1  # BUTCHER: a piece of brass scrap metal
+I 4 12507 100.00 1  # LOOT: a piece of brass scrap metal
+T 12513
+S
+#12503
+magpie angry~
+an angry magpie~
+A magpie is stealing bits of wire from the colossus.
+~
+100 200 bdj cmG
+0 0 2 26
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 4 12506 75.00 1 x  # LOOT: some salvaged copper wire
+I 4 12506 25.00 2 x  # LOOT: some salvaged copper wire
+T 12513
+S
+#12504
+adventurer #n~
+the other adventurer~
+An adventurer is hacking at the colossus's gears with an old axe.
+~
+100 200 bdpvyz cm
+0 0 0 2
+T 12513
+T 12527
+T 12515
+S
+#12505
+goblin junk dealer~
+the goblin junk dealer~
+A goblin junk dealer sorts through the wreckage (list).
+~
+100 200 bdo 0
+1 0 0 15
+M
+1
+That was a big one, weren't he?~
+M
+1
+Scrap for days!~
+M
+0
+$n pries parts off the colossus.~
+M
+1
+Lots more where that came from.~
+M
+1
+Soon I'll have enough parts to build my own.~
+S
+#12506
+lasers eye~
+eye lasers~
+Eye lasers are being fired at here.
+~
+0 0 bd cl
+0 0 0 15
+T 12503
+T 12502
+T 12525
+S
+#12507
+controller master apparatus~
+the master controller apparatus~
+The master controller apparatus is here.
+~
+0 0 bdnF 0
+0 0 0 15
+T 12532
+T 12533
+T 12534
+T 12535
+S
+#12508
+arm left colossal~
+the colossal arm~
+The left arm sways as the colossus moves.
+~
+0 0 dhy c
+0 0 0 14
+I 4 12503 100.00 1  # LOOT: the destroyed left arm
+T 12528
+T 12529
+T 12531
+S
+#12509
+arm right colossal~
+the colossal arm~
+The right arm sways as the colossus moves.
+~
+0 0 dhy c
+0 0 0 5
+I 4 12502 100.00 1  # LOOT: the crippled right arm
+T 12528
+T 12529
+T 12531
+S
+#12510
+magpie clockwork~
+a clockwork magpie~
+A clockwork magpie cocks its head and looks at you quizzically.
+~
+1 1 bdoD mn
+0 0 2 26
+M
+0
+$n chatters to itself.~
+M
+0
+$n pokes around for shiny things.~
+M
+0
+$n preens its brass feathers.~
+M
+0
+$n caws ominously.~
+T 9901
+T 9902
+S
+#12511
+elephant clockwork great~
+a clockwork elephant~
+A great clockwork elephant towers over you.
+~
+100 125 dey 0
+0 0 26 27
+S
+#12512
+eagle clockwork~
+a clockwork eagle~
+A clockwork eagle is perched here, watching.
+~
+100 125 de m
+0 0 2 10
+S
+$
