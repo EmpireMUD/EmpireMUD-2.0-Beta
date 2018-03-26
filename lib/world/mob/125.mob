@@ -42,7 +42,7 @@ spider clockwork~
 a clockwork spider~
 A clockwork spider walks slowly down the colossus.
 ~
-100 200 bdj G
+100 200 bdj GK
 0 0 0 21
 I 0 12507 100.00 1  # BUTCHER: a piece of brass scrap metal
 I 4 12507 100.00 1  # LOOT: a piece of brass scrap metal
@@ -53,7 +53,7 @@ magpie angry~
 an angry magpie~
 A magpie is stealing bits of wire from the colossus.
 ~
-100 200 bdj cmG
+100 200 bdj cmGK
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 4 12506 75.00 1 x  # LOOT: some salvaged copper wire
@@ -102,7 +102,7 @@ lasers eye~
 eye lasers~
 Eye lasers are being fired at here.
 ~
-0 0 bd cl
+0 0 bd clK
 0 0 0 15
 T 12503
 T 12502
@@ -113,7 +113,7 @@ controller master apparatus~
 the master controller apparatus~
 The master controller apparatus is here.
 ~
-0 0 bdnF 0
+0 0 bdnF K
 0 0 0 15
 T 12532
 T 12533
@@ -126,7 +126,7 @@ arm left colossal~
 the colossal arm~
 The left arm sways as the colossus moves.
 ~
-0 0 dhy c
+0 0 dhy cK
 0 0 0 14
 I 4 12503 100.00 1  # LOOT: the destroyed left arm
 T 12528
@@ -138,7 +138,7 @@ arm right colossal~
 the colossal arm~
 The right arm sways as the colossus moves.
 ~
-0 0 dhy c
+0 0 dhy cK
 0 0 0 5
 I 4 12502 100.00 1  # LOOT: the crippled right arm
 T 12528
