@@ -869,7 +869,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	
 	dam = level / 7.0;
 	if (level > 100) {
-		dam *= 1.0 + (level / 5.0);
+		dam *= 1.0 + (level / 500.0);
 	}
 	dam *= modifier;
 	
