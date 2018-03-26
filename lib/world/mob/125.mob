@@ -3,7 +3,7 @@ colossus clockwork enormous~
 the clockwork colossus~
 An enormous clockwork colossus towers over you (adventure).
 ~
-100 200 dkuyzAB c
+100 200 dkuyzAB cG
 0 0 26 14
 I 4 12551 100.00 1  # LOOT: the clockwork loot controller
 T 12516
@@ -24,7 +24,7 @@ colossus clockwork miniature~
 the clockwork colossus~
 A miniature clockwork colossus stomps toward you!
 ~
-100 200 dkuyz c
+100 200 dkuyz cG
 0 0 26 5
 I 4 12551 100.00 1  # LOOT: the clockwork loot controller
 T 12518
@@ -53,7 +53,7 @@ magpie angry~
 an angry magpie~
 A magpie is stealing bits of wire from the colossus.
 ~
-100 200 bdj cmGK
+100 200 bdj cmK
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 4 12506 75.00 1 x  # LOOT: some salvaged copper wire
@@ -113,7 +113,7 @@ controller master apparatus~
 the master controller apparatus~
 The master controller apparatus is here.
 ~
-0 0 bdnF K
+0 0 bdnF GK
 0 0 0 15
 T 12532
 T 12533
@@ -126,7 +126,7 @@ arm left colossal~
 the colossal arm~
 The left arm sways as the colossus moves.
 ~
-0 0 dhy cK
+0 0 dhy cGK
 0 0 0 14
 I 4 12503 100.00 1  # LOOT: the destroyed left arm
 T 12528
@@ -138,7 +138,7 @@ arm right colossal~
 the colossal arm~
 The right arm sways as the colossus moves.
 ~
-0 0 dhy cK
+0 0 dhy cGK
 0 0 0 5
 I 4 12502 100.00 1  # LOOT: the crippled right arm
 T 12528
@@ -150,7 +150,7 @@ magpie clockwork~
 a clockwork magpie~
 A clockwork magpie cocks its head and looks at you quizzically.
 ~
-1 1 bdoD mn
+1 1 bdoD mnG
 0 0 2 26
 M
 0
@@ -172,7 +172,7 @@ elephant clockwork great~
 a clockwork elephant~
 A great clockwork elephant towers over you.
 ~
-100 125 dey 0
+100 125 dey G
 0 0 26 27
 S
 #12512
@@ -180,7 +180,7 @@ eagle clockwork~
 a clockwork eagle~
 A clockwork eagle is perched here, watching.
 ~
-100 125 de m
+100 125 de mG
 0 0 2 10
 S
 $

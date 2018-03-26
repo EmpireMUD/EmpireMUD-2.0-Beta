@@ -423,6 +423,9 @@ eval mob %room.people%
 Adventurer quest start~
 0 bw 10
 ~
+if %self.fighting%
+  halt
+end
 say You know, I could help you out here... for a price.
 eval room %self.room%
 eval person %room.people%
@@ -1003,7 +1006,7 @@ done
 ~
 #12538
 Other adventurer load~
-0 n 100
+0 nx 100
 ~
 %morph% %self% 12504
 ~
