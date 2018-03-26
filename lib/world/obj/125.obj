@@ -941,7 +941,7 @@ water.
 2 0
 S
 #12560
-book old stuck chants goblin~
+book old stuck chants goblin chantbookcolossus~
 an old book of goblin chants~
 There's an old book stuck here, perhaps left behind by an adventurer.~
    This book is made of ratty, green leather. The stitching must have required
@@ -953,10 +953,11 @@ languages are magical? Four chants are still legible in the old book:
  - Lightning: A spell to call down a lightning strike.
  - Rats: A spell to summon friendly rats.
 ~
-3 k a 5
+3 k a 7
 0 0 0
 0 0
 T 12555
+T 12558
 S
 #12561
 words scrawled~

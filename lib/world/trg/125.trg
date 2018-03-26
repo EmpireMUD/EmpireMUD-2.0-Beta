@@ -25,6 +25,7 @@ eval room2 i12500
 %at% %room2% %load% obj 12504
 set person %start_room.people%
 while %person%
+  set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
     %echoaround% %person% %person.name% follows %actor.name%.
     %teleport% %person% %actor.room%
@@ -32,7 +33,7 @@ while %person%
     %send% %actor% %person.name% follows you.
     %send% %person% You follow %actor.name%.
   end
-  set person %person.next_in_room%
+  set person %next_person%
 done
 ~
 #12501
@@ -59,6 +60,7 @@ else
 end
 set person %room.people%
 while %person%
+  set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
     %echoaround% %person% %person.name% follows %actor.name%.
     %teleport% %person% %actor.room%
@@ -66,18 +68,18 @@ while %person%
     %send% %actor% %person.name% follows you.
     %send% %person% You follow %actor.name%.
   end
-  set person %person.next_in_room%
+  set person %next_person%
 done
 ~
 #12502
-Colossus random attacks~
+Colossus eye lasers~
 0 bw 15
 ~
 eval mob %instance.mob(12500)%
 if !%mob%
   halt
 end
-%echo% The colossus glares at you and its eyes begin to glow! (dodge)
+%echo% The colossus glowers at you and its eyes begin to glow! (dodge)
 set running 1
 remote running %self.id%
 wait 5 sec
@@ -177,7 +179,7 @@ if %self.cooldown(12502)%
   halt
 end
 nop %self.set_cooldown(12502, 30)%
-if !%instance.mob(12509)%
+if !%instance.mob(12508)%
   %send% %actor% %self.name% flails at you with %self.hisher% damaged right arm!
   %echoaround% %actor% %self.name% flails at %actor.name% with %self.hisher% damaged left arm!
   %damage% %actor% 150 physical
@@ -325,14 +327,14 @@ else
     %echo% There is a mighty boom as %self.name% releases %self.hisher% gathered power into the ground beneath %self.hisher% foot!
     %send% %actor% &rThe force of %self.name%'s foot pressing down on you explosively redoubles, hammering you deeper into the ground!
     %damage% %actor% 800 physical
-    %echoaround% %actor% &rThe force of %self.name%'s stomp knocks you off your feet!
-    eval person %room.people%
+    set person %room.people%
     while %person%
-      if %person.is_enemy(%self%)% && %person% != %actor%
+      if (%person.is_enemy(%self%)% || %self.is_enemy(%person%)%) && %person% != %actor%
+        %send% %person% &rThe force of %self.name%'s stomp knocks you off your feet!
         dg_affect #12509 %person% HARD-STUNNED on 5
         %damage% %person% 200 physical
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
   else
     %echo% %self.name% raises one leg high in the air...
@@ -368,8 +370,8 @@ if %parts_destroyed% < 2
     * Tee hee
     nop %self.set_cooldown(12502, 15)%
   end
-  %send% %target% %self.name% glares at you, and %self.hisher% eyes begin to glow red!
-  %echoaround% %target% %self.name% glares at %target.name%, and %self.hisher% eyes begin to glow red!
+  %send% %target% %self.name% glowers at you, and %self.hisher% eyes begin to glow red!
+  %echoaround% %target% %self.name% glowers at %target.name%, and %self.hisher% eyes begin to glow red!
   wait 3 sec
   if !%target% || %target.room% != %self.room%
     set target %self.fighting%
@@ -381,8 +383,8 @@ if %parts_destroyed% < 2
   dg_affect #12510 %target% BLIND on 15
   %dot% #12510 %target% 600 15 fire
 else
-  %send% %target% %self.name% glares at you, and %self.hisher% eyes begin to glow red!
-  %echoaround% %target% %self.name% glares at %target.name%, and %self.hisher% eyes begin to glow red!
+  %send% %target% %self.name% glowers at you, and %self.hisher% eyes begin to glow red!
+  %echoaround% %target% %self.name% glowers at %target.name%, and %self.hisher% eyes begin to glow red!
   wait 3 sec
   if !%target% || %target.room% != %self.room%
     set target %self.fighting%
@@ -508,7 +510,11 @@ if %helper% != %self%
   halt
 end
 if %self.varexists(parts_destroyed)%
-  %send% %actor% %self.parts_destroyed% of %self.name%'s major components have been destroyed.
+  if %parts_destroyed% == 1
+    %send% %actor% 1 of %self.name%'s major components has been destroyed.
+  else
+    %send% %actor% %self.parts_destroyed% of %self.name%'s major components have been destroyed.
+  end
   if !%instance.mob(12508)%
     %send% %actor% %self.name%'s left arm has been badly damaged.
   end
@@ -624,7 +630,7 @@ if %questvnum% == 12504
   mfollow %actor%
   dg_affect %self% *CHARM on -1
   nop %self.add_mob_flag(SPAWNED)%
-  %morph% %self% 12504
+  %morph% %self% normal
 end
 ~
 #12528
@@ -757,7 +763,7 @@ end
 ~
 #12532
 Colossus Master Controller dance~
-0 b 100
+0 bw 100
 ~
 if !%self.varexists(active)%
   halt
@@ -773,7 +779,8 @@ else
 end
 if %cycle% >= 10
   %echo% An explosion rocks %self.name%!
-  %damage% %self% 10000 direct
+  %damage% %self% 99999 direct
+  halt
 end
 * choose a 'correct action'
 set color_1 red
@@ -791,7 +798,7 @@ end
 say %message%
 set running 1
 remote running %self.id%
-wait 6 sec
+wait 10 sec
 set running 0
 remote running %self.id%
 set room %self.room%
@@ -866,9 +873,9 @@ if sabotage /= %cmd%
     %send% %actor% You still need to destroy %remaining% more vital components before you can sabotage the master controller.
     halt
   end
+  say User not authenticated. Prepare for authentication sequence. Do as the controller commands!
   set active 1
   remote active %self.id%
-  %aggro% %actor%
   halt
 end
 if !%self.varexists(running)%
@@ -921,9 +928,9 @@ set target_room %colossus.room%
 set parts_destroyed 5
 set new_colossus %target_room.people%
 remote parts_destroyed %new_colossus.id%
-%purge% %colossus% $n is rocked by an explosion, and suddenly shrinks!
 %teleport% adventure %target_room%
 %at% %target_room% %echo% Everyone who was climbing on the colossus falls off!
+%purge% %colossus% $n is rocked by an explosion, and suddenly shrinks!
 ~
 #12536
 Adventurer quest start act~
@@ -942,6 +949,63 @@ while %person%
   end
   eval person %person.next_in_room%
 done
+~
+#12537
+Master Controller Greeting~
+0 h 100
+~
+wait 1
+* Detect colossus
+set colossus %instance.mob(12500)%
+if !%colossus%
+  halt
+end
+if !%colossus.varexists(parts_destroyed)%
+  set parts_destroyed 0
+else
+  set parts_destroyed %colossus.parts_destroyed%
+end
+* Loop over messages
+set cycle 0
+while %cycle% < 6 && !%self.varexists(active)%
+  switch %cycle%
+    case 0
+      say Intruders! Intruders!
+    break
+    case 1
+      if (%parts_destroyed% < 4)
+        %echo% Lights flash all over the master controller apparatus.
+      else
+        say How did you get in here, tiny adventurers?
+      end
+    break
+    case 2
+      if (%parts_destroyed% < 4)
+        say No matter, you'll never get into my controls! I have too much power!
+        halt
+      else
+        say No matter, you'll never... error...
+      end
+    break
+    case 3
+      %echo% Lights flash all over the master controller apparatus, turning from green to red.
+    break
+    case 4
+      say Error... power levels are dangerously low.
+    break
+    case 5
+      %echo% With most of the colossus disabled, its master controller apparatus looks ripe for sabotage.
+    break
+  done
+  wait 2 sec
+  eval cycle %cycle% + 1
+done
+~
+#12538
+Other adventurer load~
+0 n 100
+~
+%morph% %self% 12504
 ~
 #12547
 Clockwork Colossus super-loot~
@@ -1451,5 +1515,15 @@ set obj %actor.inventory(12560)%
 %send% %actor% Searching the room, you find %obj.shortdesc% stuffed behind a broken gear.
 %echoaround% %actor% %actor.name% searches the room and finds %obj.shortdesc%.
 detach 12557 %self.id%
+~
+#12558
+Colossus chant book fake read~
+1 c 2
+read~
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
+%force% %actor% look chantbookcolossus
 ~
 $

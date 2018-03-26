@@ -63,7 +63,7 @@ S
 #12504
 adventurer #n~
 the other adventurer~
-An adventurer is hacking at the colossus's gears with an old axe.
+An adventurer is resting here, polishing an axe.
 ~
 100 200 bdpvyz cm
 0 0 0 2
@@ -72,6 +72,7 @@ T 12527
 T 12515
 T 12536
 T 12526
+T 12538
 S
 #12505
 goblin junk dealer~
@@ -118,6 +119,7 @@ T 12532
 T 12533
 T 12534
 T 12535
+T 12537
 S
 #12508
 arm left colossal~
