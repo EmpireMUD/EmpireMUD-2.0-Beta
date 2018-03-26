@@ -566,7 +566,7 @@ void real_update_char(char_data *ch) {
 	struct instance_data *inst;
 	int result, iter, type;
 	int fol_count, gain;
-	bool found, took_dot;
+	bool found, took_dot, msg;
 	
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
@@ -821,10 +821,13 @@ void real_update_char(char_data *ch) {
 
 	if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
 		sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
+		msg = !CHAR_MORPH_FLAGGED(ch, MORPHF_NO_MORPH_MESSAGE);
 
 		perform_morph(ch, NULL);
-
-		act(buf, TRUE, ch, 0, 0, TO_ROOM);
+		
+		if (msg) {
+			act(buf, TRUE, ch, 0, 0, TO_ROOM);
+		}
 		msg_to_char(ch, "You revert to normal!\r\n");
 	}
 

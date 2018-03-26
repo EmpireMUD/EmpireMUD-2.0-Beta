@@ -3498,6 +3498,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	bool revert = TRUE;
 	char_data *m;
 	obj_data *weapon;
+	bool msg;
 
 	/* stop_fighting() is split around here to help with exp */
 
@@ -3537,9 +3538,13 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 
 	if (revert && IS_MORPHED(victim)) {
 		sprintf(buf, "%s reverts into $n!", PERS(victim, victim, FALSE));
+		msg = !CHAR_MORPH_FLAGGED(victim, MORPHF_NO_MORPH_MESSAGE);
 
 		perform_morph(victim, NULL);
-		act(buf, TRUE, victim, 0, 0, TO_ROOM);
+		
+		if (msg) {
+			act(buf, TRUE, victim, 0, 0, TO_ROOM);
+		}
 	}
 	
 	if (ch == victim) {

@@ -1881,6 +1881,7 @@ typedef struct vehicle_data vehicle_data;
 #define MORPHF_GENDER_NEUTRAL  BIT(9)	// j. causes an "it" instead of him/her
 #define MORPHF_CONSUME_OBJ  BIT(10)	// k. uses up the requiresobj
 #define MORPHF_NO_FASTMORPH  BIT(11)	// l. cannot fastmorph into this form
+#define MORPHF_NO_MORPH_MESSAGE  BIT(12)	// m. does not inform of auto-unmorph
 
 
 // MOUNT_x: mount flags -- MOUNT_FLAGGED(ch, flag)

@@ -3630,6 +3630,7 @@ const char *morph_flags[] = {
 	"GENDER-NEUTRAL",
 	"CONSUME-OBJ",	// 10
 	"!FASTMORPH",
+	"!MORPH-MESSAGE",
 	"\n"
 };
 
