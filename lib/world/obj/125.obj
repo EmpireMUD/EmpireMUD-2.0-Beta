@@ -458,7 +458,7 @@ A clockwork wristplate has fallen here.~
 using tiny gears to move damages plates to the sides and put stronger plates in
 the path your opponent's weapon.
 ~
-27 mp aj 14
+27 mp aj 15
 3 0 0
 2 0
 A
@@ -468,7 +468,7 @@ A
 A
 12 1 0
 C
-100 200
+100 225
 T 12530
 S
 #12530
@@ -489,7 +489,7 @@ A set of cogwheel bangles is lying on the ground.~
 white with mana. The center of each wheel is just large enough to fit on your
 wrist.
 ~
-27 mp aj 15
+27 mp aj 16
 0 0 0
 2 0
 A
@@ -499,7 +499,7 @@ A
 A
 23 3 0
 C
-100 200
+100 225
 T 12530
 S
 #12532
@@ -521,7 +521,7 @@ has been soaked in some kind of mystic oil that seems to be enhancing the
 magical properties of the silk. The scarf appears to be embroidered with
 unusual symbols, but you cannot read them.
 ~
-27 mp aj 16
+27 mp aj 17
 0 0 0
 11 0
 A
@@ -531,7 +531,7 @@ A
 A
 22 3 0
 C
-100 200
+100 225
 T 12530
 S
 #12534
@@ -552,7 +552,7 @@ A black powder wristband is lying here.~
 powder. Arcane words have been scratched into the inside of the band, and seem
 to pulse with heat against your skin, but you cannot read the words.
 ~
-27 mp aj 17
+27 mp aj 18
 1 0 0
 2 0
 A
@@ -562,7 +562,7 @@ A
 A
 21 3 0
 C
-100 200
+100 225
 T 12530
 S
 #12536
@@ -777,7 +777,7 @@ a clockwork super-loot box~
 A super-loot box is here.~
 Replaces with a super-loot item for boss+ difficulty.
 ~
-3 0 a 1
+3 p a 2
 0 0 0
 0 0
 T 12547
@@ -788,7 +788,7 @@ a clockwork premium loot box~
 A premium loot box is here.~
 Replaces with premium loot for harder difficulties.
 ~
-3 0 a 2
+3 p a 3
 0 0 0
 0 0
 T 12548
@@ -799,7 +799,7 @@ a clockwork BoP loot box~
 A clockwork BoP loot box is here.~
 Replaces with one of the BoP items. Used on most difficulties.
 ~
-3 0 a 3
+3 p a 4
 0 0 0
 0 0
 T 12549
@@ -810,7 +810,7 @@ a normal clockwork loot box~
 A normal clockwork loot box is here.~
 Replaces with loot for players doing the adventure on 'normal'.
 ~
-3 0 a 5
+3 p a 6
 0 0 0
 0 0
 T 12550
@@ -821,7 +821,7 @@ the clockwork loot controller~
 The clockwork loot controller is here.~
 This loads the correct loot boxes based on difficulty.
 ~
-3 0 a 6
+3 p a 7
 0 0 0
 0 0
 T 12551
