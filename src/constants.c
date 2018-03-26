@@ -1123,6 +1123,7 @@ const char *affected_bits[] = {
 	"DISTRACTED",
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
+	"!WHERE",
 	"\n"
 };
 
@@ -1164,6 +1165,7 @@ const char *affected_bits_consider[] = {
 	"",	// distracted
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
+	"",	// !where
 	"\n"
 };
 
@@ -1205,6 +1207,7 @@ const bool aff_is_bad[] = {
 	TRUE,
 	FALSE,	// hard-stunned (not 'bad' because it's uncleansable)
 	FALSE,	// 35 - immune-damage
+	FALSE,
 };
 
 

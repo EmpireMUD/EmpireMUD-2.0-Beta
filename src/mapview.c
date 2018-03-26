@@ -1909,7 +1909,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		for (d = descriptor_list; d; d = d->next) {
 			if (STATE(d) != CON_PLAYING || !(i = d->character) || IS_NPC(i) || ch == i || !IN_ROOM(i))
 				continue;
-			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i) || !WIZHIDE_OK(ch, i))
+			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i) || !WIZHIDE_OK(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
 				continue;
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
@@ -1960,7 +1960,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		found = NULL;
 		closest = MAP_SIZE;
 		for (i = character_list; i; i = i->next) {
-			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i) || !CAN_SEE(ch, i))
+			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i) || !CAN_SEE(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
 				continue;
 			if (!multi_isname(arg, GET_PC_NAME(i)))
 				continue;
