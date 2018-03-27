@@ -3094,7 +3094,7 @@ ACMD(do_no_cmd) {
 			break;
 		}
 		case NOCMD_TOGGLE: {
-			msg_to_char(ch, "EmpireMUD doesn't that command by itself. Use 'toggle' instead.\r\n");
+			msg_to_char(ch, "EmpireMUD doesn't have that command by itself. Use 'toggle' instead.\r\n");
 			break;
 		}
 		default: {
