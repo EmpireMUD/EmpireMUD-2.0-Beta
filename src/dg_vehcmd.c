@@ -260,7 +260,7 @@ VCMD(do_vbuildingecho) {
 	if (!*room_number || !*msg) {
 		veh_log(veh, "vbuildingecho called with too few args");
 	}
-	else if (!(froom = get_room(orm, arg))) {
+	else if (!(froom = get_room(orm, room_number))) {
 		veh_log(veh, "vbuildingecho called with invalid target");
 	}
 	else {
@@ -1549,8 +1549,7 @@ VCMD(do_vscale) {
 			scale_item_to_level(otarg, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
-			scale_item_to_level(fresh, level);
+			fresh = fresh_copy_obj(otarg, level);
 			swap_obj_for_obj(otarg, fresh);
 			extract_obj(otarg);
 		}

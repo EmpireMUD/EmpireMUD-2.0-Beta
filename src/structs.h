@@ -846,6 +846,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_DISTRACTED  BIT(33)	// H. Player cannot perform timed actions
 #define AFF_HARD_STUNNED  BIT(34)	// I. Hard stuns are uncleansable and don't trigger stun-immunity
 #define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
+#define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
 
 
 // Injury flags -- IS_INJURED
@@ -1881,6 +1882,7 @@ typedef struct vehicle_data vehicle_data;
 #define MORPHF_GENDER_NEUTRAL  BIT(9)	// j. causes an "it" instead of him/her
 #define MORPHF_CONSUME_OBJ  BIT(10)	// k. uses up the requiresobj
 #define MORPHF_NO_FASTMORPH  BIT(11)	// l. cannot fastmorph into this form
+#define MORPHF_NO_MORPH_MESSAGE  BIT(12)	// m. does not inform of auto-unmorph
 
 
 // MOUNT_x: mount flags -- MOUNT_FLAGGED(ch, flag)
@@ -3974,8 +3976,8 @@ struct city_metadata_type {
 	char *name;
 	char *icon;
 	int radius;
-	int max_population;
 	bool show_to_others;
+	bool is_capital;
 };
 
 
@@ -4218,6 +4220,7 @@ struct empire_data {
 	char *motd;	// Empire MOTD
 	
 	long create_time;	// when it was founded
+	long city_overage_warning_time;	// if the empire has been warned
 
 	byte num_ranks;	// Total number of levels (maximum 20)
 	char *rank[MAX_RANKS];	// Name of each rank

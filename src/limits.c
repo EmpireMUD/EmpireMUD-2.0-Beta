@@ -566,7 +566,7 @@ void real_update_char(char_data *ch) {
 	struct instance_data *inst;
 	int result, iter, type;
 	int fol_count, gain;
-	bool found, took_dot;
+	bool found, took_dot, msg;
 	
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
@@ -821,10 +821,13 @@ void real_update_char(char_data *ch) {
 
 	if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
 		sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
+		msg = !CHAR_MORPH_FLAGGED(ch, MORPHF_NO_MORPH_MESSAGE);
 
 		perform_morph(ch, NULL);
-
-		act(buf, TRUE, ch, 0, 0, TO_ROOM);
+		
+		if (msg) {
+			act(buf, TRUE, ch, 0, 0, TO_ROOM);
+		}
 		msg_to_char(ch, "You revert to normal!\r\n");
 	}
 
@@ -1024,17 +1027,33 @@ void reduce_city_overages(void) {
 	extern int count_city_points_used(empire_data *emp);
 	
 	empire_data *iter, *next_iter;
-	int used, points;
+	int points;
+	
+	time_t overage_timeout = time(0) - (config_get_int("city_overage_timeout") * SECS_PER_REAL_HOUR);
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		// only bother on !imm empires that have MORE than one city (they can always keep the last one)
 		if (!EMPIRE_IMM_ONLY(iter) && count_cities(iter) > 1) {
-			used = count_city_points_used(iter);
 			points = city_points_available(iter);
 			
-			// cutoff for keeping cities is being at 2x currently-earned points
-			if (used > (2 * (points + used))) {
-				reduce_city_overage_one(iter);
+			if (points >= 0) {	// no overage
+				// remove warning time, if any
+				EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) = 0;
+			}
+			else {	// over on points
+				
+				if (EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) == 0) {
+					EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) = time(0);
+					log_to_empire(iter, ELOG_TERRITORY, "Your empire is using more city points than it has available and will abandon one soon");
+				}
+				else if (EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) <= overage_timeout) {
+					// time's up
+					reduce_city_overage_one(iter);
+				}
+				else {
+					// still over -- log again
+					log_to_empire(iter, ELOG_TERRITORY, "Your empire is using more city points than it has available and will abandon one soon");
+				}
 			}
 		}
 	}

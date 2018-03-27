@@ -249,8 +249,13 @@ There is a 60-minute waiting period between when you found a city, and when it
 counts as a city for things like City Teleportation, certain buildings such as
 the Great Hall, for guard towers, and for some other game rules.
 
-You can get additional city points from accruing at least 4000 wealth, for
-achieving Prominence, and for having at least 10 technologies.
+City points come from:
+ - 1 point per 2 members (rounded up)
+ - 1 point for having at least 4000 wealth
+ - 1 point for Prominence
+ - 1 point for having at least 10 technologies
+ - 1 point for being over 50 escore
+ - 1 point for having a capital city and being over 75 escore
 
 EmpireMUD periodically checks if cities are completely empty and, if so,
 will remove the city center and refund the city point. This helps keep the map
@@ -258,7 +263,7 @@ clean, and you can prevent it by making sure there is at least one building in
 your city.
 
 See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
-  TERRITORY, WEALTH
+  TERRITORY, WEALTH, ESCORE
 #
 "CITY TYPES" OUTPOST VILLAGE CAPITAL
 
@@ -580,7 +585,9 @@ Each score is based on how far an empire is above or below the average rating
 in that category. For example, if the average empire has 2 members, any empire
 with that many members gets 5 points in the "Members" score.
 
-You can see average numbers by typing "mudstats empires".
+You can see average numbers by typing "mudstats empires". All score averages
+are medians. Inventory is how many thousands of items you have; all other
+average numbers are simple counts.
 
 See also: MUDSTATS
 #

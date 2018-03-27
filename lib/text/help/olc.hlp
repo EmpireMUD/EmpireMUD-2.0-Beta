@@ -1410,6 +1410,7 @@ The following affect flags are available:
  DISTRACTED - Cannot perform timed actions.
  HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
  IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
+ !WHERE - Cannot be found using the 'where' command.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -3935,6 +3936,7 @@ The following morph flags are available:
  GENDER-NEUTRAL - Shows as "it" instead of he/she/him/her.
  CONSUME-OBJ - Will use up the requiresobj to morph.
  !FASTMORPH - This morph won't work with 'fastmorph'.
+ !MORPH-MESSAGE - Shows no message to the room when forced to un-morph.
 
 See also: OLC MORPHS
 #d

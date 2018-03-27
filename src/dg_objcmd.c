@@ -266,7 +266,7 @@ OCMD(do_obuildingecho) {
 	if (!*room_number || !*msg) {
 		obj_log(obj, "obuildingecho called with too few args");
 	}
-	else if (!(froom = get_room(orm, arg))) {
+	else if (!(froom = get_room(orm, room_number))) {
 		obj_log(obj, "obuildingecho called with invalid target");
 	}
 	else {
@@ -1116,6 +1116,7 @@ OCMD(do_oterraform) {
 
 
 OCMD(do_dgoload) {
+	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1185,6 +1186,11 @@ OCMD(do_dgoload) {
 		
 			// must scale now if possible
 			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			
+			// copy existing bindings
+			if (OBJ_FLAGGED(object, OBJ_BIND_FLAGS) && OBJ_BOUND_TO(obj)) {
+				OBJ_BOUND_TO(object) = copy_obj_bindings(OBJ_BOUND_TO(obj));
+			}
 
 			load_otrigger(object);
 			return;
@@ -1214,6 +1220,11 @@ OCMD(do_dgoload) {
 		else {
 			// default
 			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		}
+		
+		// copy existing bindings
+		if (OBJ_FLAGGED(object, OBJ_BIND_FLAGS) && OBJ_BOUND_TO(obj)) {
+			OBJ_BOUND_TO(object) = copy_obj_bindings(OBJ_BOUND_TO(obj));
 		}
 		
 		if (in_room) {	// load in the room
@@ -1646,8 +1657,7 @@ OCMD(do_oscale) {
 			scale_item_to_level(otarg, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
-			scale_item_to_level(fresh, level);
+			fresh = fresh_copy_obj(otarg, level);
 			swap_obj_for_obj(otarg, fresh);
 			if (otarg == obj) {
 				dg_owner_purged = 1;

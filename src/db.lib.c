@@ -2316,6 +2316,25 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				EMPIRE_DESCRIPTION(emp) = fread_string(fl, buf2);
 				break;
 			}
+			case 'B': {	// misc data
+				if (sscanf(line, "B %d %ld", &t[0], &long_in) != 2) {
+					log("SYSERR: Bad format in B tag of empire %d!", vnum);
+					exit(1);
+				}
+				
+				switch (t[0]) {
+					case 1: {
+						EMPIRE_CITY_OVERAGE_WARNING_TIME(emp) = long_in;
+						break;
+					}
+					default: {
+						log("SYSERR: Bad data type %d in B tag of empire %d!", t[0], vnum);
+						exit(1);
+					}
+				}
+				
+				break;
+			}
 			case 'C': { // chore
 				if (sscanf(line, "C %d %d %d", &t[0], &t[1], &t[2]) == 3) {
 					if (t[1] >= 0 && t[1] < NUM_CHORES && (isle = get_empire_island(emp, t[0]))) {
@@ -2552,6 +2571,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		strcpy(temp, EMPIRE_DESCRIPTION(emp));
 		strip_crlf(temp);
 		fprintf(fl, "A\n%s~\n", temp);
+	}
+	
+	// B: misc data
+	if (EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)) {
+		fprintf(fl, "B 1 %ld\n", EMPIRE_CITY_OVERAGE_WARNING_TIME(emp));
 	}
 
 	// C: chores
