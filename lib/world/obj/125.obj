@@ -970,4 +970,16 @@ Someone has scrawled some words onto the side of the alcove.
 2 0
 T 12556
 S
+#12562
+key master clockwork~
+the clockwork master key~
+The clockwork master key is lying here. (debug item)~
+   You can 'use' this master key to damage the clockwork colossus. It only
+works for immortals.
+~
+3 0 a 1
+0 0 0
+2 0
+T 12562
+S
 $

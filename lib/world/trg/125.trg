@@ -440,17 +440,21 @@ done
 Colossus load~
 0 n 100
 ~
-mgoto %instance.location%
-%echo% %self.name% appears.
-set first_chant %random.4%
-set second_chant %random.3%
-if %second_chant% == %first_chant%
-  set second_chant 4
+if %self.room.template% == 12500
+  mgoto %instance.location%
+  %echo% %self.name% appears.
+  set first_chant %random.4%
+  set second_chant %random.3%
+  if %second_chant% == %first_chant%
+    set second_chant 4
+  end
+  remote first_chant %self.id%
+  remote second_chant %self.id%
 end
-remote first_chant %self.id%
-remote second_chant %self.id%
-* these buffs are removed when a component is damaged
-dg_affect #12501 %self% TO-HIT 500 -1
+if !%self.affect(12501)%
+  * these buffs are removed when a component is damaged
+  dg_affect #12501 %self% TO-HIT 500 -1
+end
 ~
 #12517
 Colossus move announcement~
@@ -714,6 +718,14 @@ end
 if !%actor%
   halt
 end
+if %actor% && %actor.is_npc%
+  if %actor.mob_flagged(HARD)% && !%self.is_flagged(HARD-DROP)%
+    nop %self.flag(HARD-DROP)%
+  end
+  if %actor.mob_flagged(GROUP)% && !%self.is_flagged(GROUP-DROP)%
+    nop %self.flag(GROUP-DROP)%
+  end
+end
 if %actor% && %actor.is_pc%
   * Item was crafted
   if %self.is_flagged(BOP)%
@@ -732,6 +744,10 @@ else
   if %self.is_flagged(BOE)%
     nop %self.flag(BOE)%
   end
+end
+if %actor% && %actor.is_npc%
+  wait 0
+  %scale% %self% %self.level%
 end
 ~
 #12531
@@ -771,10 +787,6 @@ Colossus Master Controller dance~
 if !%self.varexists(active)%
   halt
 end
-if %self.cooldown(12502)%
-  halt
-end
-nop %self.set_cooldown(12502, 15)%
 if %self.varexists(cycle)%
   set cycle %self.cycle%
 else
@@ -857,8 +869,8 @@ Colossus Master Controller dance commands~
 0 c 0
 pull sabotage~
 if sabotage /= %cmd%
-  if !%self.aff_flagged(!ATTACK)%
-    %send% %actor% Just attack it.
+  if %self.varexists(active)%
+    %send% %actor% It's already being sabotaged.
     halt
   end
   set colossus %instance.mob(12500)%
@@ -913,7 +925,7 @@ end
 ~
 #12534
 Colossus Master Controller load~
-0 n 100
+0 nx 100
 ~
 dg_affect %self% !ATTACK on -1
 ~
@@ -1008,7 +1020,9 @@ done
 Other adventurer load~
 0 nx 100
 ~
-%morph% %self% 12504
+if %self.room.template% == 12504
+  %morph% %self% 12504
+end
 ~
 #12547
 Clockwork Colossus super-loot~
@@ -1528,5 +1542,55 @@ if %actor.obj_target(%arg%)% != %self%
   halt
 end
 %force% %actor% look chantbookcolossus
+~
+#12562
+Clockwork Colossus debug tool~
+1 c 2
+use~
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
+if !%actor.is_immortal%
+  halt
+end
+* Start of script fragment: colossus damage updater
+eval colossus %instance.mob(12500)%
+if %colossus%
+  %send% %actor% You turn %self.shortdesc%...
+  %echoaround% %actor% %actor.name% turns %self.shortdesc%...
+  %buildingecho% %instance.start% A shudder runs through the colossus!
+  %at% %colossus.room% %echo% A shudder runs through the colossus!
+  dg_affect #12501 %colossus% off
+  if !%colossus.varexists(parts_destroyed)%
+    set parts_destroyed 1
+    remote parts_destroyed %colossus.id%
+  else
+    eval parts_destroyed %colossus.parts_destroyed% + 1
+    remote parts_destroyed %colossus.id%
+  end
+  switch %parts_destroyed%
+    case 3
+      nop %colossus.add_mob_flag(GROUP)%
+      nop %colossus.remove_mob_flag(HARD)%
+    break
+    case 4
+      nop %colossus.remove_mob_flag(GROUP)%
+      nop %colossus.add_mob_flag(HARD)%
+    break
+  done
+  %scale% %colossus% %colossus.level%
+else
+  %send% %actor% Colossus not found.
+  halt
+end
+* End of script fragment
+if %parts_destroyed% == 5 && %colossus%
+  set room %colossus.room%
+  %at% %room% %load% mob 12501
+  set new_colossus %room.people%
+  remote parts_destroyed %new_colossus.id%
+  %purge% %colossus% $n abruptly shrinks!
+end
 ~
 $
