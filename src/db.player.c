@@ -1291,7 +1291,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					last_alias = alias;
 				}
 				else if (PFILE_TAG(line, "Apparent Age:", length)) {
-					GET_APPARENT_AGE(ch) = atoi(line + length + 1);
+					ch->player_specials->apparent_age = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Archetype:", length)) {
 					// NOTE: This tag is outdated and these are now stored as 'Creation Archetype'
@@ -3464,8 +3464,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 
 	/* fail-safe */
-	if (IS_VAMPIRE(ch) && GET_APPARENT_AGE(ch) <= 0)
-		GET_APPARENT_AGE(ch) = 25;
+	if (IS_VAMPIRE(ch) && GET_APPARENT_AGE(ch) <= 0) {
+		ch->player_specials->apparent_age = 25;
+	}
 
 	// add to lists
 	ch->next = character_list;
