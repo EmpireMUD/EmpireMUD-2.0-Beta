@@ -805,7 +805,8 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_RESIST_MAGICAL  10	// damage reduction
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
-#define NUM_EXTRA_ATTRIBUTES  13
+#define ATT_AGE_MODIFIER  13	// +/- age
+#define NUM_EXTRA_ATTRIBUTES  14
 
 
 // AFF_x: Affect bits

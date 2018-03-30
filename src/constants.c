@@ -479,6 +479,7 @@ const char *extra_attribute_types[] = {
 	"Resist-Magical",	// 10
 	"Crafting-Bonus",
 	"Blood-Upkeep",
+	"Age",
 	"\n"
 };
 
