@@ -2910,31 +2910,6 @@ struct empire_needs *get_empire_needs(empire_data *emp, int island, int type) {
 
 
 /**
-* Determines if an empires 'needs' any resources on any island.
-* 
-* @param empire_data *emp The empire to check needs for.
-* @param int island Which island (id) to check needs for in that empire.
-* @return bool TRUE if any needs are present.
-*/
-bool empire_has_any_needs(empire_data *emp, int island) {
-	struct empire_needs *needs, *next_needs;
-	struct empire_island *isle;
-	
-	if (!emp || !(isle = get_empire_island(emp, island))) {
-		return FALSE;
-	}
-	
-	HASH_ITER(hh, isle->needs, needs, next_needs) {
-		if (needs->needed > 0) {
-			return TRUE;
-		}
-	}
-	
-	return FALSE;
-}
-
-
-/**
 * Determines if a given island has a certain status on its 'needs' for the
 * empire.
 * 

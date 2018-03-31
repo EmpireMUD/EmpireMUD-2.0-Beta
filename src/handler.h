@@ -152,7 +152,6 @@ void perform_claim_room(room_data *room, empire_data *emp);
 // empire needs handlers
 void add_empire_needs(empire_data *emp, int island, int type, int amount);
 extern struct empire_needs *get_empire_needs(empire_data *emp, int island, int type);
-extern bool empire_has_any_needs(empire_data *emp, int island);
 extern bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t status);
 
 // empire targeting handlers

@@ -1351,8 +1351,8 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	}
 	else {
 		REMOVE_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
-		if (init > 0) {
-			log_to_empire(emp, ELOG_TERRITORY, "Fed %d workers on %s", init, eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
+		if (init > 0) {	// TODO: this log is temproary
+			log_to_empire(emp, ELOG_TERRITORY, "Fed %d items to workers for %d hour%s of work on %s", init/24, init, PLURAL(init), eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
 		}
 	}
 	
