@@ -4061,6 +4061,7 @@ ACMD(do_enroll) {
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *next_store;
 	struct empire_city_data *city, *next_city, *temp;
+	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
 	struct vehicle_attached_mob *vam;
@@ -4202,7 +4203,7 @@ ACMD(do_enroll) {
 				
 				// needs
 				HASH_ITER(hh, from_isle->needs, needs, next_needs) {
-					add_empire_needs(e, from_isle->island, needs->type, needs->amount);
+					add_empire_needs(e, from_isle->island, needs->type, needs->needed);
 				}
 			}
 			
