@@ -4199,6 +4199,11 @@ ACMD(do_enroll) {
 				HASH_ITER(hh, from_isle->store, store, next_store) {
 					add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
 				}
+				
+				// needs
+				HASH_ITER(hh, from_isle->needs, needs, next_needs) {
+					add_empire_needs(e, from_isle->island, needs->type, needs->amount);
+				}
 			}
 			
 			// convert shipping (before doing vehicles)

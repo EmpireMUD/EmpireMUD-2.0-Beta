@@ -1283,7 +1283,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	
 	struct empire_storage_data *store, *next_store;
 	bool any = TRUE, vault = FALSE;
-	int amount, init, max;
+	int amount, init, max, items = 0;
 	obj_data *obj;
 	
 	init = needs->needed;
@@ -1330,6 +1330,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			// amount we could take
 			if (amount > 0) {
 				any = TRUE;
+				items += amount;
 				add_to_empire_storage(emp, eisle->island, store->vnum, -amount);
 			}
 		}
@@ -1352,7 +1353,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	else {
 		REMOVE_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
 		if (init > 0) {	// TODO: this log is temproary
-			log_to_empire(emp, ELOG_TERRITORY, "Fed %d items to workers for %d hour%s of work on %s", init/24, init, PLURAL(init), eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
+			log_to_empire(emp, ELOG_TERRITORY, "Fed %d items to workers for %d hour%s of work on %s", items, init, PLURAL(init), eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
 		}
 	}
 	

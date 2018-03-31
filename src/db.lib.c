@@ -1860,6 +1860,7 @@ void free_empire(empire_data *emp) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_needs *needs, *next_needs;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
@@ -1871,6 +1872,9 @@ void free_empire(empire_data *emp) {
 	
 	// free islands
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_ITER(hh, isle->needs, needs, next_needs) {
+			free(needs);
+		}
 		HASH_ITER(hh, isle->store, store, next_store) {
 			free(store);
 		}
