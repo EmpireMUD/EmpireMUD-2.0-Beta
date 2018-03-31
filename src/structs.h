@@ -1030,6 +1030,14 @@ typedef struct vehicle_data vehicle_data;
 #define ELOG_SHIPPING  8	// shipments via do_ship
 
 
+// ENEED_x: empire need types
+#define ENEED_WORKFORCE  0	// food for workforce
+
+
+// ENEED_STATUS_x: empire need statuses
+#define ENEED_STATUS_UNSUPPLIED  BIT(0)	// a. empire failed to supply this type
+
+
 // for empire_unique_storage->flags
 #define EUS_VAULT  BIT(0)	// requires privilege
 
@@ -4055,6 +4063,8 @@ struct empire_island {
 	int workforce_limit[NUM_CHORES];	// workforce settings
 	char *name;	// empire's local name for the island
 	struct empire_storage_data *store;	// hash table of storage here
+	bool store_is_sorted;	// TRUE if the storage hasn't changed order
+	struct empire_needs *needs;	// hash of stuff needed
 	
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
@@ -4071,6 +4081,15 @@ struct empire_log_data {
 	char *string;
 	
 	struct empire_log_data *next;
+};
+
+
+// data related to what an empire needs (on an island)
+struct empire_needs {
+	int type;	// ENEED_ const
+	int needed;	// how much currently needed
+	bitvector_t status;	// ENEED_STATUS_ const
+	UT_hash_handle hh;	// hashed by type
 };
 
 

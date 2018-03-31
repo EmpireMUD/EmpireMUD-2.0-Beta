@@ -1009,8 +1009,9 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	extern const char *wf_problem_types[];
 	
-	char buf[MAX_STRING_LENGTH * 2], line[256];
+	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256];
 	int iter, only_chore = NOTHING, last_chore, last_problem, count;
+	struct empire_island *isle, *next_isle;
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
 	bool any = FALSE;
@@ -1020,7 +1021,16 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	if (!ch->desc) {
 		return;	// nothing to show
 	}
-	if (!EMPIRE_WORKFORCE_LOG(emp)) {
+	
+	// check for starving workforces
+	*unsupplied = '\0';
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (isle->population > 0 && empire_has_needs_status(emp, isle->island, ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED)) {
+			sprintf(unsupplied + strlen(unsupplied), " Your workforce on %s is starving!\r\n", get_island_name_for(isle->island, ch));
+		}
+	}
+	
+	if (!EMPIRE_WORKFORCE_LOG(emp) && !*unsupplied) {
 		msg_to_char(ch, "No workforce problems found. Possible reasons include:\r\n");
 		msg_to_char(ch, "- All your workers are working successfully.\r\n");
 		msg_to_char(ch, "- You have no chores active.\r\n");
@@ -1055,7 +1065,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	}
 	
 	// show all data
-	size = snprintf(buf, sizeof(buf), "Recent workforce problems:\r\n");
+	size = snprintf(buf, sizeof(buf), "Recent workforce problems:\r\n%s", unsupplied);
 	
 	if (*argument) {	// normal display
 		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {

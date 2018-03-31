@@ -37,6 +37,7 @@
 *   Cooldown Handlers
 *   Currency Handlers
 *   Empire Handlers
+*   Empire Needs Handlers
 *   Empire Targeting Handlers
 *   Follow Handlers
 *   Group Handlers
@@ -2856,6 +2857,96 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 		event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
 		ROOM_UNLOAD_EVENT(room) = NULL;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE NEEDS HANDLERS ///////////////////////////////////////////////////
+
+/**
+* Marks needed items of a given type, on the island.
+*
+* @param empire_data *emp The empire to mark needs for.
+* @param int island Which island (id) to mark needs for in that empire.
+* @param int Which ENEED_ const type.
+* @param int The amount needed.
+*/
+void add_empire_needs(empire_data *emp, int island, int type, int amount) {
+	struct empire_needs *need = get_empire_needs(emp, island, type);
+	if (need) {
+		SAFE_ADD(need->needed, amount, 0, INT_MAX, FALSE);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
+/**
+* Gets the 'needs' entry by type, for an empire+island combo. It will create
+* the entry if _needed_.
+*
+* @param empire_data *emp The empire to fetch needs for.
+* @param int island Which island (id) to fetch needs for in that empire.
+* @param int Which ENEED_ const to fetch data for.
+* @return struct empire_needs* The needs data.
+*/
+struct empire_needs *get_empire_needs(empire_data *emp, int island, int type) {
+	struct empire_island *isle;
+	struct empire_needs *need;
+	
+	if (!emp || !(isle = get_empire_island(emp, island))) {
+		log("SYSERR: get_empire_needs called without valid %s", emp ? "island" : "empire");
+		return NULL;	// somehow
+	}
+	
+	HASH_FIND_INT(isle->needs, &type, need);
+	if (!need) {
+		CREATE(need, struct empire_needs, 1);
+		need->type = type;
+		HASH_ADD_INT(isle->needs, type, need);
+	}
+	
+	return need;
+}
+
+
+/**
+* Determines if an empires 'needs' any resources on any island.
+* 
+* @param empire_data *emp The empire to check needs for.
+* @param int island Which island (id) to check needs for in that empire.
+* @return bool TRUE if any needs are present.
+*/
+bool empire_has_any_needs(empire_data *emp, int island) {
+	struct empire_needs *needs, *next_needs;
+	struct empire_island *isle;
+	
+	if (!emp || !(isle = get_empire_island(emp, island))) {
+		return FALSE;
+	}
+	
+	HASH_ITER(hh, isle->needs, needs, next_needs) {
+		if (needs->needed > 0) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
+* Determines if a given island has a certain status on its 'needs' for the
+* empire.
+* 
+* @param empire_data *emp The empire to check needs for.
+* @param int island Which island (id) to check needs for in that empire.
+* @param int Which ENEED_ const type.
+* @param bitvector_t status Which ENEED_STATUS_ flags to check for.
+* @return bool TRUE if all those flags are marked on the needs, FALSE if not.
+*/
+bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t status) {
+	struct empire_needs *need = get_empire_needs(emp, island, type);
+	return need ? ((need->status & status) == status) : FALSE;
 }
 
 
@@ -7108,6 +7199,7 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 		free(store);
 	}
 	
+	isle->store_is_sorted = FALSE;
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 

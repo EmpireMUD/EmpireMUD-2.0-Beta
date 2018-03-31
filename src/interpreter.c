@@ -651,7 +651,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "dedicate", POS_STANDING, do_dedicate, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "demote", POS_DEAD, do_demote, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "deposit", POS_STANDING, do_deposit, NO_MIN, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "defect", POS_DEAD, do_defect, NO_MIN, CTYPE_EMPIRE ),
+	STANDARD_CMD( "defect", POS_DEAD, do_defect, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ABBREV, NO_ABIL ),
 	SCMD_CMD( "designate", POS_STANDING, do_designate, NO_MIN, CTYPE_BUILD, SCMD_DESIGNATE ),
 	SIMPLE_CMD( "diagnose", POS_RESTING, do_diagnose, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "diplomacy", POS_DEAD, do_diplomacy, NO_MIN, CTYPE_EMPIRE ),

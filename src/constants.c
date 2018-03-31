@@ -1646,6 +1646,20 @@ const char *empire_admin_flags[] = {
 };
 
 
+// ENEED_x: empire need types
+const char *empire_needs_types[] = {
+	"food for workforce",
+	"\n"
+};
+
+
+// ENEED_STATUS_x: empire statuses
+const char *empire_needs_status[] = {
+	"UNSUPPLIED",
+	"\n"
+};
+
+
 // EUS_x -- lowercase
 const char *unique_storage_flags[] = {
 	"vault",

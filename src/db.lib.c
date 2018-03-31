@@ -2245,6 +2245,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_log_data *elog;
+	struct empire_needs *need;
 	struct offense_data *off;
 	struct empire_city_data *city;
 	struct empire_island *isle;
@@ -2385,6 +2386,20 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				if ((isle = get_empire_island(emp, atoi(line+1)))) {
 					isle->name = fread_string(fl, buf2);
 				}
+				break;
+			}
+			case 'J': {	// island data
+				if (sscanf(line, "J %d %d %d %s", &t[0], &t[1], &t[2], str_in) != 4) {
+					log("SYSERR: Expected 4 args in J line of empire %d", vnum);
+					exit(0);
+				}
+				
+				// find or add
+				need = get_empire_needs(emp, t[0], t[1]);
+				
+				need->needed = t[2];
+				need->status = asciiflag_conv(str_in);
+				
 				break;
 			}
 			case 'L': {	// NOTE: logs are here for backwards-compatibility -- they are now loaded by load_empire_logs_one
@@ -2549,6 +2564,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_needs *need, *next_need;
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
 	struct empire_npc_data *npc;
@@ -2595,10 +2611,15 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// E: extra data
 	fprintf(fl, "E\n%s %.1f\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), EMPIRE_COINS(emp));
 	
-	// I: island names
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		// I: island names
 		if (isle->name) {
 			fprintf(fl, "I%d\n%s~\n", isle->island, isle->name);
+		}
+		
+		// J: island data
+		HASH_ITER(hh, isle->needs, need, next_need) {
+			fprintf(fl, "J %d %d %d %s\n", isle->island, need->type, need->needed, bitv_to_alpha(need->status));
 		}
 	}
 	

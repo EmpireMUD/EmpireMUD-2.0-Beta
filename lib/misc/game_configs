@@ -36,7 +36,7 @@ fishing_timer 40
 garden_depletion 440
 gather_base_timer 4
 gather_depletion 50
-harvest_timer 20
+harvest_timer 24
 high_depletion 250
 max_chore_resource 200
 max_chore_resource_over_total 25
