@@ -614,13 +614,15 @@ void chore_update(void) {
 				eisle->store_is_sorted = TRUE;
 			}
 			
-			// run needs
-			HASH_ITER(hh, eisle->needs, needs, next_needs) {
-				if (needs->needed > 0) {
-					update_empire_needs(emp, eisle, needs);
-				}
-				else {
-					REMOVE_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
+			// run needs (some hours)
+			if (time_info.hours == 8 || time_info.hours == 20) {
+				HASH_ITER(hh, eisle->needs, needs, next_needs) {
+					if (needs->needed > 0) {
+						update_empire_needs(emp, eisle, needs);
+					}
+					else {
+						REMOVE_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
+					}
 				}
 			}
 		}
