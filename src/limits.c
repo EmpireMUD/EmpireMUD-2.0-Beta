@@ -1291,6 +1291,9 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	while (needs->needed > 0 && any) {
 		any = FALSE;	// ensure we charged any item this cycle
 		HASH_ITER(hh, eisle->store, store, next_store) {
+			if (needs->needed < 1) {
+				break;	// done early
+			}
 			if (store->amount < 1 || !(obj = obj_proto(store->vnum))) {
 				continue;
 			}
@@ -1348,7 +1351,9 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	}
 	else {
 		REMOVE_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
-		log_to_empire(emp, ELOG_TERRITORY, "Fed %d workers on %s", init, eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
+		if (init > 0) {
+			log_to_empire(emp, ELOG_TERRITORY, "Fed %d workers on %s", init, eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
+		}
 	}
 	
 	if (vault) {
