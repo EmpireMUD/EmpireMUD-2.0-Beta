@@ -932,6 +932,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	extern char *get_room_name(room_data *room, bool color);
 	
 	struct resource_data *old_list;
+	sector_data *old_sect;
 	int trenched, amount;
 	empire_data *emp;
 	room_data *room;
@@ -1019,6 +1020,15 @@ void annual_update_map_tile(struct map_data *tile) {
 				act("The trench collapses!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 			}
 		}
+	}
+	// randomly un-trench abandoned canals
+	if ((!room || !ROOM_OWNER(room)) && number(1, 100) <= 2 && tile->sector_type != tile->natural_sector && (old_sect = reverse_lookup_evolution_for_sector(tile->sector_type, EVO_TRENCH_FULL))) {
+		if (!room) {
+			room = real_room(tile->vnum);	// neeed room in memory
+		}
+		
+		change_terrain(room, GET_SECT_VNUM(old_sect));
+		set_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, -1);
 	}
 	
 	// clean mine data from anything that's not currently a mine
