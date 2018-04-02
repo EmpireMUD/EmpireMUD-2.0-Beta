@@ -217,7 +217,7 @@ OLC_MODULE(mapedit_complete_room) {
 	}
 	
 	complete_building(IN_ROOM(ch));
-	msg_to_char(ch, "Complete.\r\n");
+	act("The building knits itself together out of the ether.", FALSE, ch, NULL, NULL, TO_CHAR | TO_ROOM);
 }
 
 
