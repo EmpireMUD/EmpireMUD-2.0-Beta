@@ -4897,7 +4897,7 @@ ACMD(do_list) {
 			}
 			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				sprintf(vstr, "[%5d] ", SHOP_VNUM(stl->shop));
+				sprintf(vstr, "[%5d] ", GET_OBJ_VNUM(obj));
 			}
 			else {
 				*vstr = '\0';
