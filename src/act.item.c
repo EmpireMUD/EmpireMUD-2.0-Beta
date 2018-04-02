@@ -4798,7 +4798,7 @@ ACMD(do_light) {
 
 
 ACMD(do_list) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH], vstr[128];
 	struct shop_temp_list *stl, *shop_list = NULL;
 	struct shop_item *item;
 	bool any, this;
@@ -4860,16 +4860,23 @@ ACMD(do_list) {
 					*rep = '\0';
 				}
 				
+				if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+					sprintf(vstr, "[%5d] ", SHOP_VNUM(stl->shop));
+				}
+				else {
+					*vstr = '\0';
+				}
+				
 				if (stl->from_mob) {
 					strcpy(tmp, PERS(stl->from_mob, ch, FALSE));
-					snprintf(line, sizeof(line), "%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), rep, matching);
+					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_obj) {
 					strcpy(tmp, GET_OBJ_SHORT_DESC(stl->from_obj));
-					snprintf(line, sizeof(line), "%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), rep, matching);
+					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else {
-					snprintf(line, sizeof(line), "%sYou can %sbuy%s%s:\r\n", (*buf ? "\r\n" : ""), (*buf ? "also " : ""), rep, matching);
+					snprintf(line, sizeof(line), "%s%sYou can %sbuy%s%s:\r\n", (*buf ? "\r\n" : ""), vstr, (*buf ? "also " : ""), rep, matching);
 				}
 				
 				if (size + strlen(line) < sizeof(buf)) {
@@ -4889,7 +4896,14 @@ ACMD(do_list) {
 				*rep = '\0';
 			}
 			
-			snprintf(line, sizeof(line), " - %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", SHOP_VNUM(stl->shop));
+			}
+			else {
+				*vstr = '\0';
+			}
+			
+			snprintf(line, sizeof(line), " - %s%s (%d %s%s)\r\n", vstr, GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
