@@ -296,9 +296,9 @@ if %self.mob_flagged(GROUP)%
   dg_affect #12009 %actor% HARD-STUNNED on 15
   %dot% #12009 %actor% 500 15 physical
 else
-  %damage% %actor% 750 physical
+  %damage% %actor% 500 physical
   dg_affect #12009 %actor% HARD-STUNNED on 10
-  %dot% #12009 %actor% 300 15 physical
+  %dot% #12009 %actor% 300 10 physical
 end
 wait 3 sec
 %send% %actor% %self.name% releases %self.hisher% spear, allowing you to slump to the ground.
@@ -683,11 +683,12 @@ end
 wait 2 sec
 %send% %target% &r%self.name% crashes into you, sending you flying!
 %echoaround% %target% %self.name% crashes into %target.name%, sending %target.himher% flying!
-%damage% %target% 750 physical
 if %self.mob_flagged(GROUP)%
+  %damage% %target% 750 physical
   dg_affect #12036 %target% HARD-STUNNED on 15
   dg_affect #12036 %target% DODGE -100 15
 else
+  %damage% %target% 500 physical
   dg_affect #12036 %target% STUNNED on 10
 end
 ~
