@@ -479,6 +479,7 @@ const char *extra_attribute_types[] = {
 	"Resist-Magical",	// 10
 	"Crafting-Bonus",
 	"Blood-Upkeep",
+	"Age",
 	"\n"
 };
 
@@ -1607,7 +1608,7 @@ struct offense_info_type offense_info[NUM_OFFENSES] = {
 };
 
 
-// ELOG_x
+// ELOG_x (1/3)
 const char *empire_log_types[] = {
 	"None",
 	"Admin",
@@ -1618,11 +1619,12 @@ const char *empire_log_types[] = {
 	"Trade",
 	"Logins",
 	"Shipping",
+	"Workforce",
 	"\n"
 };
 
 
-// ELOG_x: Whether or not logs are shown to players online
+// ELOG_x (2/3): Whether or not logs are shown to players online
 const bool show_empire_log_type[] = {
 	TRUE,	// none
 	TRUE,	// admin
@@ -1632,7 +1634,23 @@ const bool show_empire_log_type[] = {
 	TRUE,	// territory
 	FALSE,	// trade
 	TRUE,	// logins
-	FALSE	// shipments
+	FALSE,	// shipments
+	FALSE,	// workforce
+};
+
+
+// ELOG_x (3/3): Whether or not logs are shown on the base 'elog' command
+const bool empire_log_request_only[] = {
+	FALSE,	// none
+	FALSE,	// admin
+	FALSE,	// diplo
+	FALSE,	// hostility
+	FALSE,	// members
+	FALSE,	// territory
+	FALSE,	// trade
+	TRUE,	// logins
+	FALSE,	// shipments
+	TRUE,	// workforce
 };
 
 
@@ -1641,6 +1659,20 @@ const char *empire_admin_flags[] = {
 	"!WAR",
 	"!STEAL",
 	"CITY-CLAIMS-ONLY",
+	"\n"
+};
+
+
+// ENEED_x: empire need types
+const char *empire_needs_types[] = {
+	"food for workforce",
+	"\n"
+};
+
+
+// ENEED_STATUS_x: empire statuses
+const char *empire_needs_status[] = {
+	"UNSUPPLIED",
 	"\n"
 };
 

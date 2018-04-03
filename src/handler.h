@@ -149,6 +149,11 @@ extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_emp
 void perform_abandon_room(room_data *room);
 void perform_claim_room(room_data *room, empire_data *emp);
 
+// empire needs handlers
+void add_empire_needs(empire_data *emp, int island, int type, int amount);
+extern struct empire_needs *get_empire_needs(empire_data *emp, int island, int type);
+extern bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t status);
+
 // empire targeting handlers
 extern struct empire_city_data *find_city(empire_data *emp, room_data *loc);
 extern struct empire_city_data *find_city_entry(empire_data *emp, room_data *location);

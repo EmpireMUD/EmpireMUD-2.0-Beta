@@ -380,8 +380,8 @@ if %parts_destroyed% < 2
   %echoaround% %target% Beams of crimson energy fly from %self.name%'s eyes, engulfing %target.name% and setting %target.himher% ablaze!
   %damage% %target% 250 magical
   %damage% %target% 250 fire
-  dg_affect #12510 %target% BLIND on 15
-  %dot% #12510 %target% 600 15 fire
+  dg_affect #12511 %target% BLIND on 15
+  %dot% #12511 %target% 600 15 fire
 else
   %send% %target% %self.name% glowers at you, and %self.hisher% eyes begin to glow red!
   %echoaround% %target% %self.name% glowers at %target.name%, and %self.hisher% eyes begin to glow red!

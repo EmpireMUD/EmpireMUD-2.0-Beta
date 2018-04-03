@@ -1188,7 +1188,7 @@ OCMD(do_dgoload) {
 			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			
 			// copy existing bindings
-			if (OBJ_FLAGGED(object, OBJ_BIND_FLAGS) && OBJ_BOUND_TO(obj)) {
+			if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP) && OBJ_BOUND_TO(obj)) {
 				OBJ_BOUND_TO(object) = copy_obj_bindings(OBJ_BOUND_TO(obj));
 			}
 
@@ -1223,7 +1223,7 @@ OCMD(do_dgoload) {
 		}
 		
 		// copy existing bindings
-		if (OBJ_FLAGGED(object, OBJ_BIND_FLAGS) && OBJ_BOUND_TO(obj)) {
+		if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP) && OBJ_BOUND_TO(obj)) {
 			OBJ_BOUND_TO(object) = copy_obj_bindings(OBJ_BOUND_TO(obj));
 		}
 		

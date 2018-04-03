@@ -522,10 +522,12 @@ Log types are:
  Admin - Logs related to empire editing.
  Diplomacy - Logs related to diplomacy.
  Hostility - Logs related to war and stealth.
+ Logins - This log is always empty because logins aren't saved.
  Members - Logs related to promotions, defections, and other member changes.
  Shipping - Logs related to shipping.
  Territory - Logs such as cede, and city commands.
  Trade - Logs related to empire trades.
+ Workforce - Shows logs of food consumption (shown only on request).
  
 See also: PRIVILEGE
 #
@@ -1491,7 +1493,9 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
 Once at least one member of an empire has the Workforce ability, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
 enable or disable each specific task using the "workforce" command. The work-
-force is generally much slower than a player would be at the same task.
+force is generally much slower than a player would be at the same task. Most
+workforce chores consume food from your empire's inventory. Food is collected
+at 8pm each day.
 
 Typing "workforce" without a "type" after it will show you which workforce
 chores are currently enabled. Empire leaders can set the minimum rank to change
@@ -1538,7 +1542,7 @@ Workforce types:
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.
-  &yfarming:&0 NPCs will harvest crops.
+  &yfarming:&0 NPCs will harvest crops. Costs no food.
   &yreplanting:&0 after farming crops, NPCs will replant them.
   &ymaintenance:&0 NPCs will keep buildings maintained.
   &ymining:&0 NPCs will mine your mines.
@@ -1549,8 +1553,8 @@ Workforce types:
   &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
   &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &ybrickmaking:&0 NPCs will make bricks at the potter.
-  &yabandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
-  &cherb-gardening (skilled):&0 NPCS will gather herbs in gardens.
+  &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
+  &cherb-gardening (skilled):&0 NPCs will gather herbs in gardens.
   &yfire brigade:&0 NPCs will put out fires.
   &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
   &ytanning:&0 NPCs will tan skins into leather.
@@ -1565,7 +1569,8 @@ Workforce types:
   &yrepair-vehicles&0: Will keep vehicles maintained.
   &yoilmaking:&0 Will press oil.
   
-Items marked (skilled) require the Skilled Labor ability.
+Items marked (skilled) require the Skilled Labor ability. Skilled Labor chores
+tend to cost more food.
 
 See also: EXARCH CRAFTS, WORKFORCE
 #

@@ -46,6 +46,13 @@ T0
 You recover from the colossus's mighty boot.~
 S
 #12510
+clockwork magpie whistle~
+3 0
+0 0 0 0
+T0
+Your clockwork magpie cooldown has ended.~
+S
+#12511
 colossal beam~
 4 0
 0 0 0 0

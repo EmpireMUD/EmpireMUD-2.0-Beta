@@ -1757,7 +1757,13 @@ ACMD(do_drive) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*argument && GET_ACTION(ch) == drive_data[subcmd].action) {
-		msg_to_char(ch, "You are currently %s %d tile%s %s.\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+		if (GET_ACTION_VNUM(ch, 1) == -1) {
+			msg_to_char(ch, "You are currently %s %s.\r\n", drive_data[subcmd].verb, dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+		}
+		else {
+			msg_to_char(ch, "You are currently %s %d tile%s %s.\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+		}
+		
 		if (GET_MOVEMENT_STRING(ch)) {
 			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_MOVEMENT_STRING(ch));
 		}

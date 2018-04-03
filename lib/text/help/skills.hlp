@@ -188,22 +188,26 @@ HERD HERDING
 
 Usage:  herd <animal> <direction>
 
-This command is useful in herding animals into stables and fenced-in areas.
+This command is useful in herding animals into stables or out of the way. For
+mountable creatures or ones that are pulling carts, try 'lead' instead.
+
+See also: LEAD
 #
 LEAD 
 
-Usage:  lead [vehicle]
+Usage:  lead [mount | vehicle]
 
 The lead command is used to move vehicles around. Once you are leading a
 vehicle, it will move with you until type "lead" again to stop. Some vehicles
-need you to harness animals to them before they can move.
+need you to harness animals to them before they can move. You can also lead
+any animal which is mountable.
 
 Some vehicles can't be led.
 
 Example:  
   > lead horse 
 
-See also: BOARD, DRAG, HARNESS
+See also: BOARD, DRAG, HARNESS, HERD
 #
 LIGHT TORCH
 

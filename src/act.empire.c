@@ -1009,8 +1009,9 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	extern const char *wf_problem_types[];
 	
-	char buf[MAX_STRING_LENGTH * 2], line[256];
+	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256];
 	int iter, only_chore = NOTHING, last_chore, last_problem, count;
+	struct empire_island *isle, *next_isle;
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
 	bool any = FALSE;
@@ -1020,7 +1021,16 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	if (!ch->desc) {
 		return;	// nothing to show
 	}
-	if (!EMPIRE_WORKFORCE_LOG(emp)) {
+	
+	// check for starving workforces
+	*unsupplied = '\0';
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (isle->population > 0 && empire_has_needs_status(emp, isle->island, ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED)) {
+			sprintf(unsupplied + strlen(unsupplied), " Your workforce on %s is starving!\r\n", get_island_name_for(isle->island, ch));
+		}
+	}
+	
+	if (!EMPIRE_WORKFORCE_LOG(emp) && !*unsupplied) {
 		msg_to_char(ch, "No workforce problems found. Possible reasons include:\r\n");
 		msg_to_char(ch, "- All your workers are working successfully.\r\n");
 		msg_to_char(ch, "- You have no chores active.\r\n");
@@ -1055,7 +1065,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	}
 	
 	// show all data
-	size = snprintf(buf, sizeof(buf), "Recent workforce problems:\r\n");
+	size = snprintf(buf, sizeof(buf), "Recent workforce problems:\r\n%s", unsupplied);
 	
 	if (*argument) {	// normal display
 		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
@@ -3743,6 +3753,7 @@ ACMD(do_efind) {
 // syntax: elog [empire] [type] [lines]
 ACMD(do_elog) {
 	extern const char *empire_log_types[];
+	extern const bool empire_log_request_only[];
 	
 	char *argptr, *tempptr, *time_s, buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	int iter, count, type = NOTHING, lines = -1;
@@ -3818,6 +3829,9 @@ ACMD(do_elog) {
 	// ok, ready to show logs: count total matching logs
 	count = 0;
 	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+		if (type == NOTHING && empire_log_request_only[elog->type]) {
+			continue;	// this type is request-only
+		}
 		if (type == NOTHING || elog->type == type) {
 			++count;
 		}
@@ -3827,6 +3841,9 @@ ACMD(do_elog) {
 	
 	// now show the LAST [lines] log entries (show if remaining-lines<=0)
 	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+		if (type == NOTHING && empire_log_request_only[elog->type]) {
+			continue;	// this type is request-only
+		}
 		if (type == NOTHING || elog->type == type) {
 			if (count-- - lines <= 0) {
 				logtime = elog->timestamp;
@@ -4051,6 +4068,7 @@ ACMD(do_enroll) {
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *next_store;
 	struct empire_city_data *city, *next_city, *temp;
+	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
 	struct vehicle_attached_mob *vam;
@@ -4188,6 +4206,11 @@ ACMD(do_enroll) {
 				// storage
 				HASH_ITER(hh, from_isle->store, store, next_store) {
 					add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
+				}
+				
+				// needs
+				HASH_ITER(hh, from_isle->needs, needs, next_needs) {
+					add_empire_needs(e, from_isle->island, needs->type, needs->needed);
 				}
 			}
 			

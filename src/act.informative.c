@@ -590,7 +590,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// row 1 col 3: levels
 
 	// row 2 col 1
-	if (IS_VAMPIRE(ch) && GET_REAL_AGE(ch) > GET_AGE(ch)) {
+	if (GET_AGE_MODIFIER(ch) || (IS_VAMPIRE(ch) && GET_REAL_AGE(ch) != GET_AGE(ch))) {
 		sprintf(buf, "%d/%d years", GET_AGE(ch), GET_REAL_AGE(ch));
 	}
 	else {
@@ -3094,7 +3094,7 @@ ACMD(do_no_cmd) {
 			break;
 		}
 		case NOCMD_TOGGLE: {
-			msg_to_char(ch, "EmpireMUD doesn't that command by itself. Use 'toggle' instead.\r\n");
+			msg_to_char(ch, "EmpireMUD doesn't have that command by itself. Use 'toggle' instead.\r\n");
 			break;
 		}
 		default: {

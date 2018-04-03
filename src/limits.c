@@ -1269,6 +1269,97 @@ bool should_delete_empire(empire_data *emp) {
 }
 
 
+/**
+* Processes needs for a given empire/island/need. This generally involves
+* taking resources, and will set the UNSUPPLIED flag if there aren't enough.
+*
+* @param empire_data *emp Which empire.
+* @param struct empire_island *eisle The island being processed for needs.
+* @param struct empire_needs *needs The current 'needs' to process.
+*/
+void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs) {
+	void deactivate_workforce_island(empire_data *emp, int island_id);
+	void read_vault(empire_data *emp);
+	
+	struct empire_storage_data *store, *next_store;
+	struct island_info *island = get_island(eisle->island, TRUE);
+	bool any = TRUE, vault = FALSE;
+	int amount, max;
+	obj_data *obj;
+	
+	while (needs->needed > 0 && any) {
+		any = FALSE;	// ensure we charged any item this cycle
+		HASH_ITER(hh, eisle->store, store, next_store) {
+			if (needs->needed < 1) {
+				break;	// done early
+			}
+			if (store->amount < 1 || !(obj = obj_proto(store->vnum))) {
+				continue;
+			}
+			
+			amount = 0;
+			
+			// ENEED_x: processing the item
+			switch (needs->type) {
+				case ENEED_WORKFORCE: {
+					if (IS_FOOD(obj)) {
+						if (GET_FOOD_HOURS_OF_FULLNESS(obj) > needs->needed) {
+							amount = 1;
+							needs->needed = 0;
+						}
+						else {	// need more than 1
+							amount = ceil((double) needs->needed / GET_FOOD_HOURS_OF_FULLNESS(obj));
+							max = MAX(100, store->amount / 4);
+							amount = MIN(amount, store->amount);
+							amount = MIN(amount, max);	// don't take more than this of any 1 thing per cycle
+							SAFE_ADD(needs->needed, -(amount * GET_FOOD_HOURS_OF_FULLNESS(obj)), 0, INT_MAX, FALSE);
+						}
+					}
+					break;
+				}
+				default: {
+					// type not implemented
+					
+					// Note for implementation:
+					// if (IS_WEALTH(obj)) { vault = TRUE; }
+					break;
+				}
+			}
+			
+			// amount we could take
+			if (amount > 0) {
+				any = TRUE;
+				add_to_empire_storage(emp, eisle->island, store->vnum, -amount);
+				log_to_empire(emp, ELOG_WORKFORCE, "Consumed %s (x%d) on %s", GET_OBJ_SHORT_DESC(obj), amount, eisle->name ? eisle->name : island->name);
+			}
+		}
+	}
+	
+	if (needs->needed > 0) {
+		if (!IS_SET(needs->status, ENEED_STATUS_UNSUPPLIED)) {
+			// ENEED_x: logging the problem
+			switch (needs->type) {
+				case ENEED_WORKFORCE: {
+					// this logs to TRADE because otherwise members won't see it
+					log_to_empire(emp, ELOG_TRADE, "Your workforce on %s is starving!", eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
+					deactivate_workforce_island(emp, eisle->island);
+					break;
+				}
+			}
+			
+			SET_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
+		}
+	}
+	else {
+		REMOVE_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
+	}
+	
+	if (vault) {
+		read_vault(emp);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT LIMITS ///////////////////////////////////////////////////////////
 

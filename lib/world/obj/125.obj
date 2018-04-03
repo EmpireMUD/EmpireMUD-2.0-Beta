@@ -195,9 +195,10 @@ A brass messenger bag is hanging here.~
    This odd little messenger bag is made from tiny brass plates, interlinked
 with wire in a way that allows it to stretch as you put more items inside.
 ~
-24 mp ar 4
+24 mp ar 5
 1 0 0
 11 0
+T 12530
 S
 #12516
 saddle brass tall~
@@ -207,13 +208,14 @@ A tall brass saddle is racked here.~
 it fits mounts of varying sizes. Cogs on the back of the saddle spin even at an
 idle, though you can see no practical purpose.
 ~
-2 emp as 3
+2 emp as 4
 0 0 0
 2 0
 A
 11 3 0
 A
 6 1 0
+T 12530
 S
 #12517
 shoes clockwork pair~
@@ -222,13 +224,14 @@ A pair of clockwork shoes is lying here.~
    These shoes each have a little key on the back. Once wound, the shoes
 practically walk themselves.
 ~
-2 mp ag 1
+2 mp ag 2
 0 0 0
 2 0
 A
 11 3 0
 A
 6 2 0
+T 12530
 S
 #12518
 cannon lower clockwork~
@@ -238,12 +241,13 @@ A clockwork lower cannon was left here.~
 This piece of advanced weaponry accelerates brass cannonballs using a series of
 gears.
 ~
-20 emp ap 2
+20 emp ap 3
 32 4 1
 2 0
 A
 17 1 0
 T 12522
+T 12530
 S
 #12519
 suit clockwork embiggening~

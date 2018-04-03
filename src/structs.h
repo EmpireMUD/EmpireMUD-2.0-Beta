@@ -805,7 +805,8 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_RESIST_MAGICAL  10	// damage reduction
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
-#define NUM_EXTRA_ATTRIBUTES  13
+#define ATT_AGE_MODIFIER  13	// +/- age
+#define NUM_EXTRA_ATTRIBUTES  14
 
 
 // AFF_x: Affect bits
@@ -1017,7 +1018,7 @@ typedef struct vehicle_data vehicle_data;
 #define CORE_DIPLS  ALL_DIPLS_EXCEPT(DIPL_TRADE)
 
 
-// empire_log_data types
+// ELOG_x: empire_log_data types
 #define ELOG_NONE  0	// does not log to file
 #define ELOG_ADMIN  1	// administrative changes
 #define ELOG_DIPLOMACY  2	// all diplomacy commands
@@ -1027,6 +1028,15 @@ typedef struct vehicle_data vehicle_data;
 #define ELOG_TRADE  6	// auto-trades
 #define ELOG_LOGINS  7	// login/out/alt (does not save to file)
 #define ELOG_SHIPPING  8	// shipments via do_ship
+#define ELOG_WORKFORCE  9	// reporting related to workforce (does not echo, does not display unless requested)
+
+
+// ENEED_x: empire need types
+#define ENEED_WORKFORCE  0	// food for workforce
+
+
+// ENEED_STATUS_x: empire need statuses
+#define ENEED_STATUS_UNSUPPLIED  BIT(0)	// a. empire failed to supply this type
 
 
 // for empire_unique_storage->flags
@@ -4054,6 +4064,8 @@ struct empire_island {
 	int workforce_limit[NUM_CHORES];	// workforce settings
 	char *name;	// empire's local name for the island
 	struct empire_storage_data *store;	// hash table of storage here
+	bool store_is_sorted;	// TRUE if the storage hasn't changed order
+	struct empire_needs *needs;	// hash of stuff needed
 	
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
@@ -4065,11 +4077,20 @@ struct empire_island {
 
 
 struct empire_log_data {
-	int type;	// ELOG_x
+	int type;	// ELOG_
 	time_t timestamp;
 	char *string;
 	
 	struct empire_log_data *next;
+};
+
+
+// data related to what an empire needs (on an island)
+struct empire_needs {
+	int type;	// ENEED_ const
+	int needed;	// how much currently needed
+	bitvector_t status;	// ENEED_STATUS_ const
+	UT_hash_handle hh;	// hashed by type
 };
 
 

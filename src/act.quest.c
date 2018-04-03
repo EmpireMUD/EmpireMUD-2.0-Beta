@@ -876,7 +876,7 @@ QCMD(qcmd_group) {
 
 QCMD(qcmd_info) {
 	extern char *quest_giver_string(struct quest_giver *giver, bool show_vnums);
-	char buf[MAX_STRING_LENGTH], *buf2;
+	char buf[MAX_STRING_LENGTH], *buf2, vstr[128];
 	struct instance_data *inst;
 	struct quest_giver *giver;
 	struct player_quest *pq;
@@ -890,15 +890,22 @@ QCMD(qcmd_info) {
 		msg_to_char(ch, "You don't see a quest called '%s' here.\r\n", argument);
 	}
 	else {
+		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+			sprintf(vstr, "[%5d] ", QUEST_VNUM(qst));
+		}
+		else {
+			*vstr = '\0';
+		}
+		
 		pq = is_on_quest(ch, QUEST_VNUM(qst));
 		
 		// title
 		if (pq) {
 			count_quest_tasks(pq, &complete, &total);
-			msg_to_char(ch, "%s%s\t0 (%d/%d task%s)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
+			msg_to_char(ch, "%s%s%s\t0 (%d/%d task%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
 		}
 		else {
-			msg_to_char(ch, "%s%s\t0 (not on quest)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+			msg_to_char(ch, "%s%s%s\t0 (not on quest)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 		}
 		
 		send_to_char(NULLSAFE(QUEST_DESCRIPTION(qst)), ch);
@@ -938,7 +945,7 @@ QCMD(qcmd_info) {
 
 
 QCMD(qcmd_list) {
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], vstr[128];
 	struct player_quest *pq;
 	quest_data *proto;
 	int count, total;
@@ -953,7 +960,13 @@ QCMD(qcmd_list) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		count_quest_tasks(pq, &count, &total);
 		if ((proto = quest_proto(pq->vnum))) {
-			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d task%s%s)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), QUEST_FLAGGED(proto, QST_DAILY) ? "; daily" : "");
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", QUEST_VNUM(proto));
+			}
+			else {
+				*vstr = '\0';
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s%s\t0 (%d/%d task%s%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), QUEST_FLAGGED(proto, QST_DAILY) ? "; daily" : "");
 		}
 	}
 	
@@ -1029,7 +1042,7 @@ QCMD(qcmd_share) {
 QCMD(qcmd_start) {
 	struct quest_temp_list *qtl, *quest_list = NULL;
 	struct instance_data *inst = NULL;
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], vstr[128];
 	quest_data *qst;
 	bool any;
 	
@@ -1052,8 +1065,15 @@ QCMD(qcmd_start) {
 			else {
 				*buf = '\0';
 			}
-		
-			msg_to_char(ch, "  %s%s%s%s\t0\r\n", QUEST_LEVEL_COLOR(ch, qtl->quest), QUEST_NAME(qtl->quest), buf, QUEST_FLAGGED(qtl->quest, QST_DAILY) ? " (daily)" : "");
+			
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", QUEST_VNUM(qtl->quest));
+			}
+			else {
+				*vstr = '\0';
+			}
+			
+			msg_to_char(ch, "  %s%s%s%s%s\t0\r\n", vstr, QUEST_LEVEL_COLOR(ch, qtl->quest), QUEST_NAME(qtl->quest), buf, QUEST_FLAGGED(qtl->quest, QST_DAILY) ? " (daily)" : "");
 		}
 	
 		if (!any) {

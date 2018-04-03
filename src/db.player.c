@@ -4374,7 +4374,15 @@ PROMO_APPLY(promo_skillups) {
 	
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
 		if (skill->level > 0) {
-			set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
+			if (get_skill_level(ch, skill->vnum) < BASIC_SKILL_CAP) {
+				set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
+			}
+			else if (get_skill_level(ch, skill->vnum) < SPECIALTY_SKILL_CAP) {
+				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level * 1.5));
+			}
+			else {
+				set_skill(ch, skill->vnum, MIN(CLASS_SKILL_CAP, skill->level * 1.5));
+			}
 		}
 	}
 }
