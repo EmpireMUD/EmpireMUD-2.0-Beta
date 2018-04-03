@@ -1531,7 +1531,8 @@ The Workforce ability gains experience when most workforce chores are done
 The Skilled Labor ability gains experience when skilled chores are done while
 you are online.
 
-See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK
+See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
+          WORKFORCE KEEP
 #
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
@@ -1575,6 +1576,23 @@ Items marked (skilled) require the Skilled Labor ability. Skilled Labor chores
 tend to cost more food.
 
 See also: EXARCH CRAFTS, WORKFORCE
+#
+"WORKFORCE KEEP"
+
+Usage:  workforce keep <item name>
+
+This command will prevent your workers from using/eating an item in your
+empire's inventory. You can specify more than one keyword if you're having
+trouble targeting the right item.
+
+This command only affects the island you are currently on. Using this command
+again on the item will turn off 'keep'.
+
+Examples:
+ > workforce keep stick
+ > workforce keep spruce lumber
+
+See also: WORKFORCE
 #
 "WORKFORCE NO-WORK" "WORKFORCE NOWORK" NO-WORK NOWORK
 
