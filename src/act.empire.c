@@ -826,7 +826,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s [%d total]\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "", einv->total);
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "", einv->total);
 			}
 			else {
 				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "");

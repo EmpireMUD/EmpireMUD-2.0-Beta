@@ -1549,7 +1549,7 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 	char lbuf[MAX_INPUT_LENGTH];
 	
 	if (total > store->amount || show_zero) {
-		sprintf(lbuf, " [%d total]", total);
+		sprintf(lbuf, " (%d total)", total);
 	}
 	else {
 		*lbuf = '\0';
