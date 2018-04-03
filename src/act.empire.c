@@ -6033,6 +6033,8 @@ ACMD(do_workforce) {
 			
 			found = TRUE;
 			msg_to_char(ch, "Your workforce will %s keep all its '%s' on this island.\r\n", store->keep ? "no longer" : "now", skip_filler(GET_OBJ_SHORT_DESC(proto)));
+			store->keep = store->keep ? FALSE : TRUE;
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			break;
 		}
 		
