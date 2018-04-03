@@ -1018,7 +1018,7 @@ typedef struct vehicle_data vehicle_data;
 #define CORE_DIPLS  ALL_DIPLS_EXCEPT(DIPL_TRADE)
 
 
-// empire_log_data types
+// ELOG_x: empire_log_data types
 #define ELOG_NONE  0	// does not log to file
 #define ELOG_ADMIN  1	// administrative changes
 #define ELOG_DIPLOMACY  2	// all diplomacy commands
@@ -1028,6 +1028,7 @@ typedef struct vehicle_data vehicle_data;
 #define ELOG_TRADE  6	// auto-trades
 #define ELOG_LOGINS  7	// login/out/alt (does not save to file)
 #define ELOG_SHIPPING  8	// shipments via do_ship
+#define ELOG_WORKFORCE  9	// reporting related to workforce (does not echo, does not display unless requested)
 
 
 // ENEED_x: empire need types
@@ -4076,7 +4077,7 @@ struct empire_island {
 
 
 struct empire_log_data {
-	int type;	// ELOG_x
+	int type;	// ELOG_
 	time_t timestamp;
 	char *string;
 	

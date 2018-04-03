@@ -1505,7 +1505,7 @@ void basic_mud_log(const char *format, ...) {
 * ELOG_NONE/ELOG_LOGINS types, which are displayed but not stored.
 *
 * @param empire_data *emp Which empire to log to.
-* @param int type ELOG_x
+* @param int type ELOG_
 * @param const char *str The va-arg format ...
 */
 void log_to_empire(empire_data *emp, int type, const char *str, ...) {

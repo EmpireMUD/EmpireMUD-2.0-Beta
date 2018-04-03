@@ -3753,6 +3753,7 @@ ACMD(do_efind) {
 // syntax: elog [empire] [type] [lines]
 ACMD(do_elog) {
 	extern const char *empire_log_types[];
+	extern const bool empire_log_request_only[];
 	
 	char *argptr, *tempptr, *time_s, buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	int iter, count, type = NOTHING, lines = -1;
@@ -3828,6 +3829,9 @@ ACMD(do_elog) {
 	// ok, ready to show logs: count total matching logs
 	count = 0;
 	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+		if (type == NOTHING && empire_log_request_only[elog->type]) {
+			continue;	// this type is request-only
+		}
 		if (type == NOTHING || elog->type == type) {
 			++count;
 		}
@@ -3837,6 +3841,9 @@ ACMD(do_elog) {
 	
 	// now show the LAST [lines] log entries (show if remaining-lines<=0)
 	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+		if (type == NOTHING && empire_log_request_only[elog->type]) {
+			continue;	// this type is request-only
+		}
 		if (type == NOTHING || elog->type == type) {
 			if (count-- - lines <= 0) {
 				logtime = elog->timestamp;

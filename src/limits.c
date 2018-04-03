@@ -1282,11 +1282,10 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	void read_vault(empire_data *emp);
 	
 	struct empire_storage_data *store, *next_store;
+	struct island_info *island = get_island(eisle->island, TRUE);
 	bool any = TRUE, vault = FALSE;
-	int amount, init, max, items = 0;
+	int amount, max;
 	obj_data *obj;
-	
-	init = needs->needed;
 	
 	while (needs->needed > 0 && any) {
 		any = FALSE;	// ensure we charged any item this cycle
@@ -1330,8 +1329,8 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			// amount we could take
 			if (amount > 0) {
 				any = TRUE;
-				items += amount;
 				add_to_empire_storage(emp, eisle->island, store->vnum, -amount);
+				log_to_empire(emp, ELOG_WORKFORCE, "Workforce consumed %s (x%d) on %s", GET_OBJ_SHORT_DESC(obj), amount, eisle->name ? eisle->name : island->name);
 			}
 		}
 	}
@@ -1352,10 +1351,6 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	}
 	else {
 		REMOVE_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
-		if (init > 0) {
-			// optional debug logging
-			//log_to_empire(emp, ELOG_TERRITORY, "Fed %d item%s to workers for %d hour%s of work on %s", items, PLURAL(items), init, PLURAL(init), eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
-		}
 	}
 	
 	if (vault) {
