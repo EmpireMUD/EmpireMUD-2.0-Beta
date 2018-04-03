@@ -1330,7 +1330,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			if (amount > 0) {
 				any = TRUE;
 				add_to_empire_storage(emp, eisle->island, store->vnum, -amount);
-				log_to_empire(emp, ELOG_WORKFORCE, "Workforce consumed %s (x%d) on %s", GET_OBJ_SHORT_DESC(obj), amount, eisle->name ? eisle->name : island->name);
+				log_to_empire(emp, ELOG_WORKFORCE, "Consumed %s (x%d) on %s", GET_OBJ_SHORT_DESC(obj), amount, eisle->name ? eisle->name : island->name);
 			}
 		}
 	}
@@ -1340,7 +1340,8 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			// ENEED_x: logging the problem
 			switch (needs->type) {
 				case ENEED_WORKFORCE: {
-					log_to_empire(emp, ELOG_TERRITORY, "Your workforce on %s is starving!", eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
+					// this logs to TRADE because otherwise members won't see it
+					log_to_empire(emp, ELOG_TRADE, "Your workforce on %s is starving!", eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
 					deactivate_workforce_island(emp, eisle->island);
 					break;
 				}
