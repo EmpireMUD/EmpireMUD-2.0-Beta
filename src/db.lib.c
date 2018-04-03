@@ -2087,6 +2087,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
 	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct shipping_data *shipd, *last_shipd = NULL;
+	struct empire_storage_data *store;
 	obj_data *obj, *proto;
 	
 	if (!fl || !emp) {
@@ -2103,15 +2104,27 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 		}
 		switch (*line) {
 			case 'O': {	// storage
-				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
+				if (!get_line(fl, line)) {
 					log("SYSERR: Storage data for empire %d was incomplete", EMPIRE_VNUM(emp));
 					exit(1);
+				}
+				if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+					t[3] = 0;	// !keep
+					if (sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
+						log("SYSERR: Bad storage data for empire %d", EMPIRE_VNUM(emp));
+						exit(1);
+					}
 				}
 				
 				// validate vnum
 				proto = obj_proto(t[0]);
 				if (proto && proto->storage) {
 					add_to_empire_storage(emp, t[2], t[0], t[1]);
+					
+					// check keep
+					if (t[3] && (store = find_stored_resource(emp, t[2], t[0]))) {
+						store->keep = TRUE;
+					}
 				}
 				else if (proto && !proto->storage) {
 					log("- removing %dx #%d from empire storage for %s: not storable", t[1], t[0], EMPIRE_NAME(emp));
@@ -2729,7 +2742,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		// O: storage
 		HASH_ITER(hh, isle->store, store, next_store) {
-			fprintf(fl, "O\n%d %d %d\n", store->vnum, store->amount, isle->island);
+			fprintf(fl, "O\n%d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep ? 1 : 0);
 		}
 	}
 

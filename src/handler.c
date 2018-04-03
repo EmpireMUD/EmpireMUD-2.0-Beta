@@ -7187,10 +7187,11 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 * @param int cmp_type Which CMP_ type to charge
 * @param int cmp_flags Required CMPF_ flags to match on the component
 * @param int amount How much to charge*
+* @param bool use_kept If TRUE, will use items with the 'keep' flag instead of ignorning them
 * @param struct resource_data **build_used_list Optional: A place to store the exact item used, e.g. for later dismantling. (NULL if none)
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
-bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list) {
+bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool use_kept, struct resource_data **build_used_list) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
 	int this, found = 0;
@@ -7209,6 +7210,10 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->keep && !use_kept) {
+				continue;
+			}
+			
 			// need obj
 			if (!(proto = obj_proto(store->vnum))) {
 				continue;
@@ -7320,8 +7325,9 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 * @param int cmp_type Any CMP_ type.
 * @param int cmp_flags Any CMPF_ flags to match all of.
 * @param int amount The number that must be available.
+* @param bool include_kept If TRUE, ignores the 'keep' flag and will use kept items.
 */
-bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool include_kept) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle;
 	obj_data *proto;
@@ -7332,6 +7338,10 @@ bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int
 	}
 	
 	HASH_ITER(hh, isle->store, store, next_store) {
+		if (store->keep && !include_kept) {
+			continue;
+		}
+		
 		if (!(proto = obj_proto(store->vnum))) {
 			continue;	// need obj
 		}

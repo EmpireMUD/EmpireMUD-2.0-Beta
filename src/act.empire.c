@@ -77,6 +77,7 @@ struct einv_type {
 	obj_vnum vnum;
 	int local;
 	int total;
+	bool keep;
 	UT_hash_handle hh;
 };
 
@@ -787,6 +788,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			SAFE_ADD(einv->total, store->amount, 0, INT_MAX, FALSE);
 			if (isle->island == GET_ISLAND_ID(IN_ROOM(ch))) {
 				SAFE_ADD(einv->local, store->amount, 0, INT_MAX, FALSE);
+				einv->keep = store->keep;
 			}
 		}
 	}
@@ -824,10 +826,10 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->total);
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s [%d total]\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "", einv->total);
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum));
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "");
 			}
 			
 			// append if room
@@ -5368,7 +5370,7 @@ ACMD(do_pledge) {
 		msg_to_char(ch, "You cancel your pledge to %s.\r\n", e ? EMPIRE_NAME(e) : "the empire");
 		GET_PLEDGE(ch) = NOTHING;
 		if (e) {
-			log_to_empire(e, ELOG_MEMBERS, "%s has canceld %s pledge to this empire", PERS(ch, ch, TRUE), REAL_HSHR(ch));
+			log_to_empire(e, ELOG_MEMBERS, "%s has canceled %s pledge to this empire", PERS(ch, ch, TRUE), REAL_HSHR(ch));
 		}
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("join_empire_approval")) {
@@ -5967,10 +5969,13 @@ ACMD(do_unpublicize) {
 
 ACMD(do_workforce) {
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
+	struct empire_storage_data *store, *next_store;
 	struct island_info *island = NULL;
-	bool all = FALSE, here = FALSE;
+	bool all = FALSE, here = FALSE, found;
+	struct empire_island *eisle;
 	int iter, type, limit = 0;
 	empire_data *emp;
+	obj_data *proto;
 	
 	argument = any_one_arg(argument, arg);
 
@@ -6004,6 +6009,36 @@ ACMD(do_workforce) {
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
 		// this doesn't use has_permission because that would check if the current room is owned
 		msg_to_char(ch, "You don't have permission to set up the workforce.\r\n");
+	}
+	else if (is_abbrev(arg, "keep")) {
+		skip_spaces(&argument);
+		
+		if (!*argument) {
+			msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
+			return;
+		}
+		if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(eisle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
+			msg_to_char(ch, "You can't tell workforce to keep items if you're not on any island.\r\n");
+			return;
+		}
+		
+		found = FALSE;
+		HASH_ITER(hh, eisle->store, store, next_store) {
+			if (!(proto = obj_proto(store->vnum))) {
+				continue;
+			}
+			if (!multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+				continue;
+			}
+			
+			found = TRUE;
+			msg_to_char(ch, "Your workforce will %s keep all its '%s' on this island.\r\n", store->keep ? "no longer" : "now", skip_filler(GET_OBJ_SHORT_DESC(proto)));
+			break;
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
+		}
 	}
 	else if (is_abbrev(arg, "nowork") || is_abbrev(arg, "no-work")) {
 		// special case: toggle no-work on this tile

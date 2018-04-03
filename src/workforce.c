@@ -1231,10 +1231,10 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 				// can ONLY do crafts that use objects/components
 				has_res = FALSE;
 			}
-			else if (res->type == RES_OBJECT && (!(store = find_stored_resource(emp, islid, res->vnum)) || store->amount < res->amount)) {
+			else if (res->type == RES_OBJECT && (!(store = find_stored_resource(emp, islid, res->vnum)) || store->keep || store->amount < res->amount)) {
 				has_res = FALSE;
 			}
-			else if (res->type == RES_COMPONENT && !empire_can_afford_component(emp, islid, res->vnum, res->misc, res->amount)) {
+			else if (res->type == RES_COMPONENT && !empire_can_afford_component(emp, islid, res->vnum, res->misc, res->amount, FALSE)) {
 				// this actually requires all of the component be the same type -- it won't mix component types
 				has_res = FALSE;
 			}
@@ -1261,7 +1261,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 				charge_stored_resource(emp, islid, res->vnum, res->amount);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, res->misc, res->amount, NULL);
+				charge_stored_component(emp, islid, res->vnum, res->misc, res->amount, FALSE, NULL);
 			}
 		}
 		
@@ -1310,14 +1310,14 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BRICKMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_BRICKMAKING, o_BRICKS);
-	bool has_clay = empire_can_afford_component(emp, islid, CMP_CLAY, NOBITS, 2);
+	bool has_clay = empire_can_afford_component(emp, islid, CMP_CLAY, NOBITS, 2, FALSE);
 	bool can_do = can_gain && has_clay;
 	
 	if (worker && can_do) {
 		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
 		ewt_mark_resource_worker(emp, room, o_BRICKS);
 		
-		charge_stored_component(emp, islid, CMP_CLAY, NOBITS, 2, NULL);
+		charge_stored_component(emp, islid, CMP_CLAY, NOBITS, 2, FALSE, NULL);
 		add_to_empire_storage(emp, islid, o_BRICKS, 1);
 		
 		act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM);
@@ -1368,10 +1368,10 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	}
 	else if ((res = BUILDING_RESOURCES(room))) {
 		// RES_x: can only process some types in this way
-		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->amount > 0) {
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && !store->keep && store->amount > 0) {
 			can_do = TRUE;
 		}
-		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1)) {
+		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_ACTION) {
@@ -1391,7 +1391,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 				charge_stored_resource(emp, islid, res->vnum, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, res->misc, 1, &GET_BUILT_WITH(room));
+				charge_stored_component(emp, islid, res->vnum, res->misc, 1, FALSE, &GET_BUILT_WITH(room));
 			}
 			
 			res->amount -= 1;
@@ -1700,7 +1700,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 	// look for something to process
 	eisle = get_empire_island(emp, islid);
 	HASH_ITER(hh, eisle->store, store, next_store) {
-		if (store->amount < 1) {
+		if (store->amount < 1 || store->keep) {
 			continue;
 		}
 		if (!(proto = obj_proto(store->vnum))) {
@@ -2076,6 +2076,10 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 		highest = NULL;
 		high_amt = 0;
 		HASH_ITER(hh, eisle->store, store, next_store) {
+			if (store->keep) {
+				continue;
+			}
+			
 			orn = obj_proto(store->vnum);
 			if (orn && store->amount >= 1 && IS_WEALTH_ITEM(orn) && GET_WEALTH_VALUE(orn) > 0 && GET_WEALTH_AUTOMINT(orn)) {
 				if (highest == NULL || store->amount > high_amt) {
@@ -2128,14 +2132,14 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_NAILMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_NAILMAKING, o_NAILS);
-	bool has_metal = empire_can_afford_component(emp, islid, CMP_METAL, CMPF_COMMON, 1);
+	bool has_metal = empire_can_afford_component(emp, islid, CMP_METAL, CMPF_COMMON, 1, FALSE);
 	bool can_do = can_gain && has_metal;
 	
 	if (worker && can_do) {
 		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
 		ewt_mark_resource_worker(emp, room, o_NAILS);
 		
-		charge_stored_component(emp, islid, CMP_METAL, CMPF_COMMON, 1, NULL);
+		charge_stored_component(emp, islid, CMP_METAL, CMPF_COMMON, 1, FALSE, NULL);
 		add_to_empire_storage(emp, islid, o_NAILS, 4);
 		
 		act("$n finishes a pouch of nails.", FALSE, worker, NULL, NULL, TO_ROOM);
@@ -2383,10 +2387,10 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	
 	if ((res = VEH_NEEDS_RESOURCES(veh))) {
 		// RES_x: can ONLY do it if it requires an object, component, or action
-		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->amount > 0) {
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && !store->keep && store->amount > 0) {
 			can_do = TRUE;
 		}
-		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1)) {
+		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_ACTION) {
@@ -2404,7 +2408,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 				charge_stored_resource(emp, islid, res->vnum, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, res->misc, 1, NULL);
+				charge_stored_component(emp, islid, res->vnum, res->misc, 1, FALSE, NULL);
 			}
 			// apply it
 			res->amount -= 1;

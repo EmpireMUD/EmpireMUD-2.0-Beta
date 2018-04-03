@@ -4123,6 +4123,7 @@ struct empire_political_data {
 struct empire_storage_data {
 	obj_vnum vnum;	// what's stored
 	int amount;	// how much
+	bool keep;	// if TRUE, workforce will ignore it
 	UT_hash_handle hh;	// empire_island->store hash (by vnum)
 };
 

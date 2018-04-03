@@ -1293,7 +1293,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			if (needs->needed < 1) {
 				break;	// done early
 			}
-			if (store->amount < 1 || !(obj = obj_proto(store->vnum))) {
+			if (store->keep || store->amount < 1 || !(obj = obj_proto(store->vnum))) {
 				continue;
 			}
 			
