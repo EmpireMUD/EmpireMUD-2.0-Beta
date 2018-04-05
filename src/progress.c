@@ -64,6 +64,25 @@ char *get_progress_name_by_proto(any_vnum vnum) {
 }
 
 
+/**
+* Gets the display for a progress list.
+*
+* @param struct progress_list *list Pointer to the start of a list.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_progress_list_display(struct progress_list *list, char *save_buffer) {
+	struct progress_list *item;
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(list, item) {
+		sprintf(save_buffer + strlen(save_buffer), "%2d. [%d] %s\r\n", ++count, item->vnum, get_progress_name_by_proto(item->vnum));
+	}
+	
+	// empty list not shown
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
@@ -636,7 +655,8 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 	
-	// TODO prereq display
+	get_progress_list_display(PRG_PREREQS(prg), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Prerequisites:\r\n%s", *part ? part : " none\r\n");
 	
 	get_requirement_display(PRG_TASKS(prg), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
@@ -673,7 +693,8 @@ void olc_show_progress(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%svalue\t0> %d point%s\r\n", OLC_LABEL_VAL(PRG_VALUE(prg), 0), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
 	sprintf(buf + strlen(buf), "<%scost\t0> %d point%s\r\n", OLC_LABEL_VAL(PRG_COST(prg), 0), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 	
-	// TODO prereq display
+	get_progress_list_display(PRG_PREREQS(prg), lbuf);
+	sprintf(buf + strlen(buf), "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
 	
 	get_requirement_display(PRG_TASKS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
