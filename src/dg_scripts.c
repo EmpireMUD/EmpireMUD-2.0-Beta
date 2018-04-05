@@ -6466,11 +6466,13 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 					cl = cl->original;
 					loops++;   
 					GET_TRIG_LOOPS(trig)++;
+					/* This actually breaks multiple types of triggers -kh
 					if (loops == 30) {
 						process_wait(go, trig, type, "wait 1", cl);
 						depth--;
 						return ret_val;
 					}
+					*/
 					if (GET_TRIG_LOOPS(trig) >= 100) {
 						script_log("Trigger VNum %d has looped 100 times!!!",
 						GET_TRIG_VNUM(trig));
