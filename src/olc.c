@@ -5007,7 +5007,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		argument = any_one_arg(argument, field_arg);	// tasks/prereqs field to copy
 		
 		if (!*type_arg || !*vnum_arg) {
-			msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks | prereqs]\r\n", command);
+			msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks | prereqs (quests only)]\r\n", command);
 		}
 		else if ((findtype = find_olc_type(type_arg)) == 0) {
 			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
