@@ -775,7 +775,7 @@ OLC_MODULE(progedit_prereqs) {
 		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
 		
 		if (!*vnum_arg) {
-			msg_to_char(ch, "Usage: copy <from vnum>\r\n");
+			msg_to_char(ch, "Usage: prereqs copy <from vnum>\r\n");
 		}
 		else if (!isdigit(*vnum_arg)) {
 			msg_to_char(ch, "Copy from which progression goal?\r\n");
@@ -826,7 +826,7 @@ OLC_MODULE(progedit_prereqs) {
 		argument = any_one_arg(argument, vnum_arg);
 		
 		if (!*vnum_arg ) {
-			msg_to_char(ch, "Usage: prereqs add vnum\r\n");
+			msg_to_char(ch, "Usage: prereqs add <vnum>\r\n");
 		}
 		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0 || !real_progress(vnum)) {
 			msg_to_char(ch, "Invalid progression vnum '%s'.\r\n", vnum_arg);
@@ -856,7 +856,7 @@ OLC_MODULE(progedit_name) {
 
 OLC_MODULE(progedit_tasks) {
 	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
-	olc_process_requirements(ch, argument, &PRG_TASKS(prg), "task", TRUE);
+	olc_process_requirements(ch, argument, &PRG_TASKS(prg), "tasks", TRUE);
 }
 
 

@@ -5024,6 +5024,13 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			copyfrom = NULL;
 			
 			switch (findtype) {
+				case OLC_PROGRESS: {
+					progress_data *from_prg = real_progress(vnum);
+					if (from_prg) {
+						copyfrom = PRG_TASKS(from_prg);
+					}
+					break;
+				}
 				case OLC_QUEST: {
 					// requires tasks/preqeqs
 					if (!*field_arg || (!is_abbrev(field_arg, "tasks") && !is_abbrev(field_arg, "prereqs"))) {
