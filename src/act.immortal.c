@@ -8260,6 +8260,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No morphs by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "progression")) {
+		extern int vnum_progress(char *searchname, char_data *ch);
+		if (!vnum_progress(buf2, ch)) {
+			msg_to_char(ch, "No progression goals by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "quest")) {
 		extern int vnum_quest(char *searchname, char_data *ch);
 		if (!vnum_quest(buf2, ch)) {
@@ -8457,6 +8463,15 @@ ACMD(do_vstat) {
 		obj = read_object(number, TRUE);
 		do_stat_object(ch, obj);
 		extract_obj(obj);
+	}
+	else if (is_abbrev(buf, "progression")) {
+		void do_stat_progress(char_data *ch, progress_data *prg);
+		progress_data *prg = real_progress(number);
+		if (!prg) {
+			msg_to_char(ch, "There is no progression goal with that number.\r\n");
+			return;
+		}
+		do_stat_progress(ch, prg);
 	}
 	else if (is_abbrev(buf, "quest")) {
 		void do_stat_quest(char_data *ch, quest_data *quest);

@@ -36,8 +36,9 @@ OBJFILES = abilities.o act.action.o act.battle.o act.comm.o act.empire.o \
 	interpreter.o limits.o mail.o mapview.o mobact.o modify.o morph.o \
 	objsave.o olc.adventure.o olc.building.o olc.o olc.craft.o olc.crop.o \
 	olc.global.o olc.map.o olc.mobile.o olc.object.o olc.roomtemplate.o \
-	olc.sector.o olc.trigger.o protocol.o quest.o random.o shop.o skills.o \
-	social.o spells.o statistics.o utils.o vehicles.o weather.o workforce.o
+	olc.sector.o olc.trigger.o progress.o protocol.o quest.o random.o shop.o \
+	skills.o social.o spells.o statistics.o utils.o vehicles.o weather.o \
+	workforce.o
 
 CXREF_FILES = abilities.c act.action.c act.battle.c act.comm.c act.empire.c \
 	act.fight.c act.god.c act.highsorcery.c act.immortal.c act.informative.c \
@@ -51,8 +52,9 @@ CXREF_FILES = abilities.c act.action.c act.battle.c act.comm.c act.empire.c \
 	interpreter.c limits.c mail.c mapview.c mobact.c modify.c morph.c \
 	objsave.c olc.adventure.c olc.building.c olc.c olc.craft.c olc.crop.c \
 	olc.global.c olc.map.c olc.mobile.c olc.object.c olc.roomtemplate.c \
-	olc.sector.c olc.trigger.c protocol.c quest.c random.c shop.c skills.c \
-	social.c spells.c statistics.c utils.c vehicles.c weather.c workforce.c
+	olc.sector.c olc.trigger.c progress.c protocol.c quest.c random.c shop.c \
+	skills.c social.c spells.c statistics.c utils.c vehicles.c weather.c \
+	workforce.c
 
 default: all
 
@@ -327,6 +329,9 @@ olc.sector.o: olc.sector.c conf.h sysdep.h structs.h uthash.h utils.h \
 olc.trigger.o: olc.trigger.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h db.h comm.h olc.h handler.h dg_scripts.h dg_event.h
 	$(CC) -c $(CFLAGS) olc.trigger.c
+progress.o: progress.c conf.h sysdep.h structs.h protocol.h uthash.h \
+  utlist.h utils.h interpreter.h db.h comm.h olc.h skills.h handler.h
+	$(CC) -c $(CFLAGS) progress.c
 protocol.o: protocol.c conf.h sysdep.h comm.h protocol.h structs.h utils.h \
   handler.h db.h skills.h dg_scripts.h
 	$(CC) -c $(CFLAGS) protocol.c

@@ -1731,6 +1731,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_morph) {
 		free_morph(d->olc_morph);
 	}
+	if (d->olc_progress) {
+		free_progress(d->olc_progress);
+	}
 	if (d->olc_building) {
 		free_building(d->olc_building);
 	}

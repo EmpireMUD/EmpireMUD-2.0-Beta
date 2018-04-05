@@ -2665,6 +2665,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	skill_data *skill = find_skill_by_vnum(vnum), *sk, *next_sk;
 	archetype_data *arch, *next_arch;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	struct archetype_skill *arsk;
 	struct class_skill_req *clsk;
 	struct synergy_ability *syn;
@@ -2700,6 +2701,22 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "CLS [%5d] %s\r\n", CLASS_VNUM(cls), CLASS_NAME(cls));
 				break;	// only need 1
 			}
+		}
+	}
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_SKILL_LEVEL_OVER, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_SKILL_LEVEL_UNDER, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_CAN_GAIN_SKILL, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -3254,6 +3271,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	archetype_data *arch, *next_arch;
 	ability_data *abil, *next_abil;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	descriptor_data *desc;
@@ -3301,6 +3319,19 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		if (found) {
 			SET_BIT(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CLASS, CLASS_VNUM(cls));
+		}
+	}
+	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_SKILL_LEVEL_OVER, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_SKILL_LEVEL_UNDER, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_CAN_GAIN_SKILL, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
 		}
 	}
 	
@@ -3378,6 +3409,16 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 			found = remove_vnum_from_class_skill_reqs(&CLASS_SKILL_REQUIREMENTS(GET_OLC_CLASS(desc)), vnum);
 			if (found) {
 				msg_to_desc(desc, "A skill requirement has been deleted from the class you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_SKILL_LEVEL_OVER, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_CAN_GAIN_SKILL, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A skill requirement has been deleted from the progression goal you're editing.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {

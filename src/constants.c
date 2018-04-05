@@ -38,6 +38,7 @@
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
+*   Progress Constants
 *   Quest Constants
 *   Room/World Constants
 *   Shop Constants
@@ -2512,6 +2513,7 @@ const char *olc_flag_bits[] = {
 	"!FACTIONS",
 	"!GENERICS",
 	"!SHOPS",
+	"ALLOW-PROGRESS",
 	"\n"
 };
 
@@ -2542,6 +2544,26 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"faction",
 	"generic",
 	"shop",
+	"progression",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS CONSTANTS //////////////////////////////////////////////////////
+
+// PROGRESS_x: progress types
+const char *progress_types[] = {
+	"UNDEFINED",
+	"Commerce",
+	"\n"
+};
+
+
+// PRG_x: progress flags
+const char *progress_flags[] = {
+	"IN-DEV",
+	"PURCHASABLE",
 	"\n"
 };
 

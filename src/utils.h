@@ -38,6 +38,7 @@
 *   Object Utils
 *   Objval Utils
 *   Player Utils
+*   Progress Utils
 *   Quest Utils
 *   Room Utils
 *   Room Template Utils
@@ -493,6 +494,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
 #define GET_OLC_OBJECT(desc)  ((desc)->olc_object)
+#define GET_OLC_PROGRESS(desc)  ((desc)->olc_progress)
 #define GET_OLC_QUEST(desc)  ((desc)->olc_quest)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
@@ -1141,6 +1143,22 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
 #define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS UTILS //////////////////////////////////////////////////////////
+
+#define PRG_VNUM(prg)  ((prg)->vnum)
+#define PRG_COST(prg)  ((prg)->cost)
+#define PRG_DESCRIPTION(prg)  ((prg)->description)
+#define PRG_FLAGS(prg)  ((prg)->flags)
+#define PRG_NAME(prg)  ((prg)->name)
+#define PRG_PREREQS(prg)  ((prg)->prereqs)
+#define PRG_TASKS(prg)  ((prg)->tasks)
+#define PRG_TYPE(prg)  ((prg)->type)
+#define PRG_VALUE(prg)  ((prg)->value)
+
+#define PRG_FLAGGED(prg, flg)  IS_SET(PRG_FLAGS(prg), (flg))
 
 
  //////////////////////////////////////////////////////////////////////////////

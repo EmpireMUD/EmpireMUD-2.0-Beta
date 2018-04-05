@@ -35,6 +35,7 @@
 *     Mobile Defines
 *     Object Defines
 *     Player Defines
+*     Progress Defines
 *     Quest Defines
 *     Sector Defines
 *     Shop Defines
@@ -65,6 +66,7 @@
 *     Game Structs
 *     Generic Structs
 *     Object Structs
+*     Progress Structs
 *     Quest Structs
 *     Sector Structs
 *     Shop Structs
@@ -239,6 +241,7 @@ typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
 typedef struct player_index_data player_index_data;
+typedef struct progress_data progress_data;
 typedef struct quest_data quest_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
@@ -2059,6 +2062,19 @@ typedef struct vehicle_data vehicle_data;
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS DEFINES ////////////////////////////////////////////////////////
+
+// PROGRESS_x: progress types
+#define PROGRESS_UNDEFINED  0	// base/unset
+#define PROGRESS_COMMERCE  1
+
+
+// PRG_x: progress flags
+#define PRG_IN_DEVELOPMENT  BIT(0)	// not available to players
+#define PRG_PURCHASABLE  BIT(1)	// can buy it
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// QUEST DEFINES ///////////////////////////////////////////////////////////
 
 // QST_x: quest flags
@@ -3448,6 +3464,7 @@ struct descriptor_data {
 	faction_data *olc_faction;	// faction being edited
 	generic_data *olc_generic;	// generic being edited
 	struct global_data *olc_global;	// global being edited
+	progress_data *olc_progress;	// prg being edited
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
@@ -4538,6 +4555,37 @@ struct obj_storage_type {
 	int flags;	// STORAGE_x
 	
 	struct obj_storage_type *next;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS STRUCTS ////////////////////////////////////////////////////////
+
+// master progression goal
+struct progress_data {
+	any_vnum vnum;
+	
+	char *name;
+	char *description;
+	
+	int type;	// PROGRESS_ const
+	bitvector_t flags;	// PRG_ flags
+	int value;	// points
+	int cost;	// in points
+	
+	// lists
+	struct progress_list *prereqs;	// linked list of requires progress
+	struct req_data *tasks;	// linked list of tasks to complete
+	
+	UT_hash_handle hh;	// progress_table
+	UT_hash_handle sorted_hh;	// sorted_progress
+};
+
+
+// basic list of progressions
+struct progress_list {
+	any_vnum vnum;
+	struct progress_list *next;	// linked list
 };
 
 

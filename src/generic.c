@@ -246,6 +246,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	shop_data *shop, *next_shop;
@@ -329,7 +330,21 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
-	}
+	
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_GET_CURRENCY, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+		}
+	}}
 	
 	// check quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
@@ -476,8 +491,6 @@ void free_generic(generic_data *gen) {
 * @param any_vnum vnum The generic vnum
 */
 void parse_generic(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256], *ptr;
 	generic_data *gen, *find;
 	int int_in[4];
@@ -719,6 +732,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
@@ -908,6 +922,17 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_GET_CURRENCY, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
+		}
+	}
+	
 	// remove from quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		// REQ_x, QR_x: quest types
@@ -992,6 +1017,14 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			if (found) {
 				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 				msg_to_char(desc->character, "The liquid used by the object you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_GET_CURRENCY, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A generic currency used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {

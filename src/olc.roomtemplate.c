@@ -299,6 +299,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	void remove_room_template_from_table(room_template *rmt);
 	
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	room_data *room, *next_room;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
@@ -323,6 +324,17 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	// save index and room template file now
 	save_index(DB_BOOT_RMT);
 	save_library_file_for_vnum(DB_BOOT_RMT, vnum);
+	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
+		}
+	}
 	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
@@ -374,6 +386,14 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	
 	// remove templates from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A room template used by the progression goal you're editing has been deleted.\r\n");
+			}
+		}
 		if (GET_OLC_QUEST(desc)) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_ROOM_TEMPLATE, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_ROOM_TEMPLATE, vnum);
@@ -427,6 +447,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	struct exit_template *ex;
@@ -447,6 +468,20 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		if (IS_PORTAL(obj) && GET_PORTAL_TARGET_VNUM(obj) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	

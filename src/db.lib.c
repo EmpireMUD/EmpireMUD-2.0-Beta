@@ -6404,6 +6404,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_book(FILE *fl, int book_id);
 	void parse_class(FILE *fl, any_vnum vnum);
 	void parse_morph(FILE *fl, any_vnum vnum);
+	void parse_progress(FILE *fl, any_vnum vnum);
 	void parse_quest(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
 	void parse_social(FILE *fl, any_vnum vnum);
@@ -6413,7 +6414,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop", "progress" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -6494,6 +6495,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					break;
 				case DB_BOOT_MORPH: {
 					parse_morph(fl, nr);
+					break;
+				}
+				case DB_BOOT_PRG: {
+					parse_progress(fl, nr);
 					break;
 				}
 				case DB_BOOT_EMP:
@@ -6697,6 +6702,11 @@ void index_boot(int mode) {
 			log("   %d name lists.", rec_count);
 			break;
 		}
+		case DB_BOOT_PRG: {
+   			size[0] = sizeof(progress_data) * rec_count;
+			log("   %d progression goals, %d bytes in prototypes.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_OBJ:
 			size[0] = sizeof(obj_data) * rec_count;
 			log("   %d objs, %d bytes in prototypes.", rec_count, size[0]);
@@ -6772,6 +6782,7 @@ void index_boot(int mode) {
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
 			case DB_BOOT_MORPH:
+			case DB_BOOT_PRG:
 			case DB_BOOT_EMP:
 			case DB_BOOT_BOOKS:
 			case DB_BOOT_QST:
@@ -6975,6 +6986,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, object_table, obj, next_obj) {
 				if (GET_OBJ_VNUM(obj) >= (zone * 100) && GET_OBJ_VNUM(obj) <= (zone * 100 + 99)) {
 					write_obj_to_file(fl, obj);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_PRG: {
+			void write_progress_to_file(FILE *fl, progress_data *prg);
+			progress_data *prg, *next_prg;
+			HASH_ITER(hh, progress_table, prg, next_prg) {
+				if (PRG_VNUM(prg) >= (zone * 100) && PRG_VNUM(prg) <= (zone * 100 + 99)) {
+					write_progress_to_file(fl, prg);
 				}
 			}
 			break;
@@ -7352,6 +7373,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_OBJ: {
 			write_object_index(fl);
+			break;
+		}
+		case DB_BOOT_PRG: {
+			void write_progress_index(FILE *fl);
+			write_progress_index(fl);
 			break;
 		}
 		case DB_BOOT_QST: {
