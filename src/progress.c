@@ -1069,9 +1069,9 @@ OLC_MODULE(progedit_perks) {
 		skip_spaces(&argument);
 		
 		if (!*arg || !*argument) {
-			msg_to_char(ch, "Usage: perks add <type> <name/value>\r\nValid types:");
+			msg_to_char(ch, "Usage: perks add <type> <name/value>\r\nValid types:\r\n");
 			for (num = 0; *progress_perk_types[num] != '\n'; ++num) {
-				msg_to_char(ch, " %s\r\n", progress_perk_types[num]);
+				msg_to_char(ch, "  %s\r\n", progress_perk_types[num]);
 			}
 		}
 		else if ((ptype = search_block(arg, progress_perk_types, FALSE)) == NOTHING) {
