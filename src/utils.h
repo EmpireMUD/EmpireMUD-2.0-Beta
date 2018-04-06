@@ -1155,6 +1155,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define PRG_NAME(prg)  ((prg)->name)
 #define PRG_PREREQS(prg)  ((prg)->prereqs)
 #define PRG_TASKS(prg)  ((prg)->tasks)
+#define PRG_TECHS(prg)  ((prg)->techs)
 #define PRG_TYPE(prg)  ((prg)->type)
 #define PRG_VALUE(prg)  ((prg)->value)
 

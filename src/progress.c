@@ -39,6 +39,7 @@ const char *default_progress_name = "Unnamed Goal";
 // external consts
 extern const char *progress_flags[];
 extern const char *progress_types[];
+extern const char *techs[];
 
 // external funcs
 void get_requirement_display(struct req_data *list, char *save_buffer);
@@ -77,6 +78,27 @@ void get_progress_list_display(struct progress_list *list, char *save_buffer) {
 	*save_buffer = '\0';
 	LL_FOREACH(list, item) {
 		sprintf(save_buffer + strlen(save_buffer), "%2d. [%d] %s\r\n", ++count, item->vnum, get_progress_name_by_proto(item->vnum));
+	}
+	
+	// empty list not shown
+}
+
+
+/**
+* Gets the display for techs on a progress goal.
+*
+* @param struct progress_tech *list Pointer to the start of a list of techs.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_progress_techs_display(struct progress_tech *list, char *save_buffer) {
+	char buf[MAX_STRING_LENGTH];
+	struct progress_tech *item;
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(list, item) {
+		sprinttype(item->tech, techs, buf);
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, buf);
 	}
 	
 	// empty list not shown
@@ -199,6 +221,37 @@ void smart_copy_progress_prereqs(struct progress_list **to_list, struct progress
 }
 
 
+/**
+* Copies entries from one list into another, only if they are not already in
+* the to_list.
+*
+* @param struct progress_list **to_list A pointer to the destination list.
+* @param struct progress_list *from_list The list to copy from.
+*/
+void smart_copy_progress_techs(struct progress_tech **to_list, struct progress_tech *from_list) {
+	struct progress_tech *iter, *search, *ent;
+	bool found;
+	
+	LL_FOREACH(from_list, iter) {
+		// ensure not already in list
+		found = FALSE;
+		LL_FOREACH(*to_list, search) {
+			if (search->tech == iter->tech) {
+				found = TRUE;
+				break;
+			}
+		}
+		
+		// add it
+		if (!found) {
+			CREATE(ent, struct progress_tech, 1);
+			ent->tech = iter->tech;
+			LL_APPEND(*to_list, ent);
+		}
+	}
+}
+
+
 // Complex sorter for sorted_progress
 int sort_progress_by_data(progress_data *a, progress_data *b) {
 	// TODO
@@ -277,7 +330,26 @@ struct progress_list *copy_progress_list(struct progress_list *input) {
 	
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct progress_list, 1);
-		el->vnum = iter->vnum;
+		*el = *iter;
+		LL_APPEND(list, el);
+	}
+	
+	return list;
+}
+
+
+/**
+* Duplicates a list of 'struct progress_tech'.
+*
+* @param struct progress_tech *input The list to duplicate.
+* @return struct progress_tech* The copied list.
+*/
+struct progress_tech *copy_progress_techs(struct progress_tech *input) {
+	struct progress_tech *iter, *el, *list = NULL;
+	
+	LL_FOREACH(input, iter) {
+		CREATE(el, struct progress_tech, 1);
+		*el = *iter;
 		LL_APPEND(list, el);
 	}
 	
@@ -292,6 +364,20 @@ struct progress_list *copy_progress_list(struct progress_list *input) {
 */
 void free_progress_list(struct progress_list *list) {
 	struct progress_list *pl;
+	while ((pl = list)) {
+		list = list->next;
+		free(pl);
+	}
+}
+
+
+/**
+* Frees memory for a list of 'struct progress_tech'.
+*
+* @param struct progress_tech *list The linked list to free.
+*/
+void free_progress_techs(struct progress_tech *list) {
+	struct progress_tech *pl;
 	while ((pl = list)) {
 		list = list->next;
 		free(pl);
@@ -321,6 +407,9 @@ void free_progress(progress_data *prg) {
 	if (PRG_TASKS(prg) && (!proto || PRG_TASKS(prg) != PRG_TASKS(proto))) {
 		free_requirements(PRG_TASKS(prg));
 	}
+	if (PRG_TECHS(prg) && (!proto || PRG_TECHS(prg) != PRG_TECHS(proto))) {
+		free_progress_techs(PRG_TECHS(prg));
+	}
 	
 	free(prg);
 }
@@ -336,6 +425,7 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
 	
 	char line[256], error[256], str_in[256];
+	struct progress_tech *tech;
 	progress_data *prg, *find;
 	struct progress_list *pl;
 	int int_in[4];
@@ -389,6 +479,19 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 			}
 			case 'W': {	// tasks / work
 				parse_requirement(fl, &PRG_TASKS(prg), error);
+				break;
+			}
+			case 'X': {	// techs
+				if (sscanf(line, "X %d", &int_in[0]) != 1) {
+					log("SYSERR: Format error in X line of %s", error);
+					exit(1);
+				}
+				
+				if (int_in[0] >= 0 && int_in[0] < NUM_TECHS) {
+					CREATE(tech, struct progress_tech, 1);
+					tech->tech = int_in[0];
+					LL_APPEND(PRG_TECHS(prg), tech);
+				}
 				break;
 			}
 			
@@ -451,6 +554,7 @@ void write_progress_to_file(FILE *fl, progress_data *prg) {
 	void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
 	
 	char temp[MAX_STRING_LENGTH];
+	struct progress_tech *tech;
 	struct progress_list *pl;
 	
 	if (!fl || !prg) {
@@ -478,6 +582,11 @@ void write_progress_to_file(FILE *fl, progress_data *prg) {
 	
 	// W. tasks (work)
 	write_requirements_to_file(fl, 'W', PRG_TASKS(prg));
+	
+	// X. techs (reserve T in case triggers)
+	LL_FOREACH(PRG_TECHS(prg), tech) {
+		fprintf(fl, "X %d\n", tech->tech);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -572,6 +681,7 @@ void save_olc_progress(descriptor_data *desc) {
 	}
 	free_progress_list(PRG_PREREQS(proto));
 	free_requirements(PRG_TASKS(proto));
+	free_progress_techs(PRG_TECHS(proto));
 	
 	// sanity
 	if (!PRG_NAME(prg) || !*PRG_NAME(prg)) {
@@ -621,6 +731,7 @@ progress_data *setup_olc_progress(progress_data *input) {
 		PRG_DESCRIPTION(new) = PRG_DESCRIPTION(input) ? str_dup(PRG_DESCRIPTION(input)) : NULL;
 		PRG_PREREQS(new) = copy_progress_list(PRG_PREREQS(input));
 		PRG_TASKS(new) = copy_requirements(PRG_TASKS(input));
+		PRG_TECHS(new) = copy_progress_techs(PRG_TECHS(input));
 	}
 	else {
 		// brand new: some defaults
@@ -661,6 +772,9 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	get_requirement_display(PRG_TASKS(prg), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
 	
+	get_progress_techs_display(PRG_TECHS(prg), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Techs:\r\n%s", *part ? part : " none\r\n");
+	
 	page_string(ch->desc, buf, TRUE);
 }
 
@@ -698,6 +812,9 @@ void olc_show_progress(char_data *ch) {
 	
 	get_requirement_display(PRG_TASKS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+	
+	get_progress_techs_display(PRG_TECHS(prg), lbuf);
+	sprintf(buf + strlen(buf), "Techs: <%stechs\t0>\r\n%s", OLC_LABEL_PTR(PRG_TECHS(prg)), lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -857,6 +974,96 @@ OLC_MODULE(progedit_name) {
 OLC_MODULE(progedit_tasks) {
 	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
 	olc_process_requirements(ch, argument, &PRG_TASKS(prg), "tasks", TRUE);
+}
+
+
+OLC_MODULE(progedit_techs) {
+	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
+
+	char cmd_arg[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct progress_tech *item, *iter;
+	any_vnum vnum;
+	bool found;
+	int num;
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: .techs copy <from vnum>
+		argument = any_one_arg(argument, arg);	// any vnum for that type
+		
+		if (!*arg) {
+			msg_to_char(ch, "Usage: techs copy <from vnum>\r\n");
+		}
+		else if (!isdigit(*arg)) {
+			msg_to_char(ch, "Copy techs from which progression goal?\r\n");
+		}
+		else if ((vnum = atoi(arg)) < 0 || !real_progress(vnum)) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			smart_copy_progress_techs(&PRG_TECHS(prg), PRG_TECHS(real_progress(vnum)));
+			msg_to_char(ch, "Copied techs from progression %d.\r\n", vnum);
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: .techs remove <number | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which tech (number)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_progress_techs(PRG_TECHS(prg));
+			PRG_TECHS(prg) = NULL;
+			msg_to_char(ch, "You remove all the techs.\r\n");
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid tech number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(PRG_TECHS(prg), iter) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					sprinttype(iter->tech, techs, buf);
+					msg_to_char(ch, "You remove the '%s' tech.\r\n", buf);
+					LL_DELETE(PRG_TECHS(prg), iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid tech number.\r\n");
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: .techs add <name>
+		argument = any_one_arg(argument, arg);
+		
+		if (!*arg ) {
+			msg_to_char(ch, "Usage: techs add <name>\r\n");
+		}
+		else if ((vnum = search_block(arg, techs, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Unknown tech '%s'.\r\n", arg);
+		}
+		else {
+			// success
+			CREATE(item, struct progress_tech, 1);
+			item->tech = vnum;
+			LL_APPEND(PRG_TECHS(prg), item);
+			
+			msg_to_char(ch, "You add the '%s' tech.\r\n", techs[vnum]);
+		}
+	}	// end 'add'
+	else {
+		msg_to_char(ch, "Usage: techs add <vnum>\r\n");
+		msg_to_char(ch, "Usage: techs copy <from vnum>\r\n");
+		msg_to_char(ch, "Usage: techs remove <number | all>\r\n");
+	}
 }
 
 

@@ -4576,6 +4576,7 @@ struct progress_data {
 	// lists
 	struct progress_list *prereqs;	// linked list of requires progress
 	struct req_data *tasks;	// linked list of tasks to complete
+	struct progress_tech *techs;	// linked list of techs granted
 	
 	UT_hash_handle hh;	// progress_table
 	UT_hash_handle sorted_hh;	// sorted_progress
@@ -4586,6 +4587,13 @@ struct progress_data {
 struct progress_list {
 	any_vnum vnum;
 	struct progress_list *next;	// linked list
+};
+
+
+// for a linked list of techs that a progression goal gives
+struct progress_tech {
+	int tech;	// TECH_x
+	struct progress_tech *next;
 };
 
 
