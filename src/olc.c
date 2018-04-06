@@ -349,9 +349,9 @@ OLC_MODULE(progedit_cost);
 OLC_MODULE(progedit_description);
 OLC_MODULE(progedit_flags);
 OLC_MODULE(progedit_name);
+OLC_MODULE(progedit_perks);
 OLC_MODULE(progedit_prereqs);
 OLC_MODULE(progedit_tasks);
-OLC_MODULE(progedit_techs);
 OLC_MODULE(progedit_type);
 OLC_MODULE(progedit_value);
 
@@ -877,9 +877,9 @@ const struct olc_command_data olc_data[] = {
 	{ "description", progedit_description, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "flags", progedit_flags, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "name", progedit_name, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "perks", progedit_perks, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "prereqs", progedit_prereqs, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "tasks", progedit_tasks, OLC_PROGRESS, OLC_CF_EDITOR },
-	{ "techs", progedit_techs, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "type", progedit_type, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "value", progedit_value, OLC_PROGRESS, OLC_CF_EDITOR },
 	

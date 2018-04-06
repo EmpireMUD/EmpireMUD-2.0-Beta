@@ -38,6 +38,7 @@ const char *default_progress_name = "Unnamed Goal";
 
 // external consts
 extern const char *progress_flags[];
+extern const char *progress_perk_types[];
 extern const char *progress_types[];
 extern const char *techs[];
 
@@ -85,20 +86,44 @@ void get_progress_list_display(struct progress_list *list, char *save_buffer) {
 
 
 /**
-* Gets the display for techs on a progress goal.
+* The display for a single perk.
 *
-* @param struct progress_tech *list Pointer to the start of a list of techs.
+* @param struct progress_perk *perk The perk to get display text for.
+*/
+char *get_one_perk_display(struct progress_perk *perk) {
+	static char save_buffer[MAX_STRING_LENGTH];
+	
+	*save_buffer = '\0';
+	
+	// PRG_PERK_x: displays for each type
+	switch (perk->type) {
+		case PRG_PERK_TECH: {
+			sprinttype(perk->value, techs, save_buffer);
+			break;
+		}
+		default: {
+			strcpy(save_buffer, "UNKNOWN");
+			break;
+		}
+	}
+	
+	return save_buffer;
+}
+
+
+/**
+* Gets the display for perks on a progress goal.
+*
+* @param struct progress_perk *list Pointer to the start of a list of perks.
 * @param char *save_buffer A buffer to store the result to.
 */
-void get_progress_techs_display(struct progress_tech *list, char *save_buffer) {
-	char buf[MAX_STRING_LENGTH];
-	struct progress_tech *item;
+void get_progress_perks_display(struct progress_perk *list, char *save_buffer) {
+	struct progress_perk *item;
 	int count = 0;
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, item) {
-		sprinttype(item->tech, techs, buf);
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, buf);
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, get_one_perk_display(item));
 	}
 	
 	// empty list not shown
@@ -214,7 +239,7 @@ void smart_copy_progress_prereqs(struct progress_list **to_list, struct progress
 		// add it
 		if (!found) {
 			CREATE(ent, struct progress_list, 1);
-			ent->vnum = iter->vnum;
+			*ent = *iter;
 			LL_APPEND(*to_list, ent);
 		}
 	}
@@ -228,15 +253,15 @@ void smart_copy_progress_prereqs(struct progress_list **to_list, struct progress
 * @param struct progress_list **to_list A pointer to the destination list.
 * @param struct progress_list *from_list The list to copy from.
 */
-void smart_copy_progress_techs(struct progress_tech **to_list, struct progress_tech *from_list) {
-	struct progress_tech *iter, *search, *ent;
+void smart_copy_progress_perks(struct progress_perk **to_list, struct progress_perk *from_list) {
+	struct progress_perk *iter, *search, *ent;
 	bool found;
 	
 	LL_FOREACH(from_list, iter) {
 		// ensure not already in list
 		found = FALSE;
 		LL_FOREACH(*to_list, search) {
-			if (search->tech == iter->tech) {
+			if (search->type == iter->type && search->value == iter->value) {
 				found = TRUE;
 				break;
 			}
@@ -244,8 +269,8 @@ void smart_copy_progress_techs(struct progress_tech **to_list, struct progress_t
 		
 		// add it
 		if (!found) {
-			CREATE(ent, struct progress_tech, 1);
-			ent->tech = iter->tech;
+			CREATE(ent, struct progress_perk, 1);
+			*ent = *iter;
 			LL_APPEND(*to_list, ent);
 		}
 	}
@@ -339,16 +364,16 @@ struct progress_list *copy_progress_list(struct progress_list *input) {
 
 
 /**
-* Duplicates a list of 'struct progress_tech'.
+* Duplicates a list of 'struct progress_perk'.
 *
-* @param struct progress_tech *input The list to duplicate.
-* @return struct progress_tech* The copied list.
+* @param struct progress_perk *input The list to duplicate.
+* @return struct progress_perk* The copied list.
 */
-struct progress_tech *copy_progress_techs(struct progress_tech *input) {
-	struct progress_tech *iter, *el, *list = NULL;
+struct progress_perk *copy_progress_perks(struct progress_perk *input) {
+	struct progress_perk *iter, *el, *list = NULL;
 	
 	LL_FOREACH(input, iter) {
-		CREATE(el, struct progress_tech, 1);
+		CREATE(el, struct progress_perk, 1);
 		*el = *iter;
 		LL_APPEND(list, el);
 	}
@@ -372,12 +397,12 @@ void free_progress_list(struct progress_list *list) {
 
 
 /**
-* Frees memory for a list of 'struct progress_tech'.
+* Frees memory for a list of 'struct progress_perk'.
 *
-* @param struct progress_tech *list The linked list to free.
+* @param struct progress_perk *list The linked list to free.
 */
-void free_progress_techs(struct progress_tech *list) {
-	struct progress_tech *pl;
+void free_progress_perks(struct progress_perk *list) {
+	struct progress_perk *pl;
 	while ((pl = list)) {
 		list = list->next;
 		free(pl);
@@ -407,8 +432,8 @@ void free_progress(progress_data *prg) {
 	if (PRG_TASKS(prg) && (!proto || PRG_TASKS(prg) != PRG_TASKS(proto))) {
 		free_requirements(PRG_TASKS(prg));
 	}
-	if (PRG_TECHS(prg) && (!proto || PRG_TECHS(prg) != PRG_TECHS(proto))) {
-		free_progress_techs(PRG_TECHS(prg));
+	if (PRG_PERKS(prg) && (!proto || PRG_PERKS(prg) != PRG_PERKS(proto))) {
+		free_progress_perks(PRG_PERKS(prg));
 	}
 	
 	free(prg);
@@ -425,7 +450,7 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
 	
 	char line[256], error[256], str_in[256];
-	struct progress_tech *tech;
+	struct progress_perk *perk;
 	progress_data *prg, *find;
 	struct progress_list *pl;
 	int int_in[4];
@@ -466,6 +491,18 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'K': {	// perks
+				if (sscanf(line, "K %d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in K line of %s", error);
+					exit(1);
+				}
+				
+				CREATE(perk, struct progress_perk, 1);
+				perk->type = int_in[0];
+				perk->value = int_in[1];
+				LL_APPEND(PRG_PERKS(prg), perk);
+				break;
+			}
 			case 'P': {	// prereqs
 				if (sscanf(line, "P %d", &int_in[0]) != 1) {
 					log("SYSERR: Format error in P line of %s", error);
@@ -479,19 +516,6 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 			}
 			case 'W': {	// tasks / work
 				parse_requirement(fl, &PRG_TASKS(prg), error);
-				break;
-			}
-			case 'X': {	// techs
-				if (sscanf(line, "X %d", &int_in[0]) != 1) {
-					log("SYSERR: Format error in X line of %s", error);
-					exit(1);
-				}
-				
-				if (int_in[0] >= 0 && int_in[0] < NUM_TECHS) {
-					CREATE(tech, struct progress_tech, 1);
-					tech->tech = int_in[0];
-					LL_APPEND(PRG_TECHS(prg), tech);
-				}
 				break;
 			}
 			
@@ -554,7 +578,7 @@ void write_progress_to_file(FILE *fl, progress_data *prg) {
 	void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
 	
 	char temp[MAX_STRING_LENGTH];
-	struct progress_tech *tech;
+	struct progress_perk *perk;
 	struct progress_list *pl;
 	
 	if (!fl || !prg) {
@@ -575,6 +599,11 @@ void write_progress_to_file(FILE *fl, progress_data *prg) {
 	// 3. type cost value flags
 	fprintf(fl, "%d %d %d %s\n", PRG_TYPE(prg), PRG_COST(prg), PRG_VALUE(prg), bitv_to_alpha(PRG_FLAGS(prg)));
 	
+	// K. perks
+	LL_FOREACH(PRG_PERKS(prg), perk) {
+		fprintf(fl, "K %d %d\n", perk->type, perk->value);
+	}
+	
 	// P: prereqs
 	LL_FOREACH(PRG_PREREQS(prg), pl) {
 		fprintf(fl, "P %d\n", pl->vnum);
@@ -582,11 +611,6 @@ void write_progress_to_file(FILE *fl, progress_data *prg) {
 	
 	// W. tasks (work)
 	write_requirements_to_file(fl, 'W', PRG_TASKS(prg));
-	
-	// X. techs (reserve T in case triggers)
-	LL_FOREACH(PRG_TECHS(prg), tech) {
-		fprintf(fl, "X %d\n", tech->tech);
-	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -681,7 +705,7 @@ void save_olc_progress(descriptor_data *desc) {
 	}
 	free_progress_list(PRG_PREREQS(proto));
 	free_requirements(PRG_TASKS(proto));
-	free_progress_techs(PRG_TECHS(proto));
+	free_progress_perks(PRG_PERKS(proto));
 	
 	// sanity
 	if (!PRG_NAME(prg) || !*PRG_NAME(prg)) {
@@ -731,7 +755,7 @@ progress_data *setup_olc_progress(progress_data *input) {
 		PRG_DESCRIPTION(new) = PRG_DESCRIPTION(input) ? str_dup(PRG_DESCRIPTION(input)) : NULL;
 		PRG_PREREQS(new) = copy_progress_list(PRG_PREREQS(input));
 		PRG_TASKS(new) = copy_requirements(PRG_TASKS(input));
-		PRG_TECHS(new) = copy_progress_techs(PRG_TECHS(input));
+		PRG_PERKS(new) = copy_progress_perks(PRG_PERKS(input));
 	}
 	else {
 		// brand new: some defaults
@@ -772,8 +796,8 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	get_requirement_display(PRG_TASKS(prg), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
 	
-	get_progress_techs_display(PRG_TECHS(prg), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Techs:\r\n%s", *part ? part : " none\r\n");
+	get_progress_perks_display(PRG_PERKS(prg), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Perks:\r\n%s", *part ? part : " none\r\n");
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -813,8 +837,8 @@ void olc_show_progress(char_data *ch) {
 	get_requirement_display(PRG_TASKS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
 	
-	get_progress_techs_display(PRG_TECHS(prg), lbuf);
-	sprintf(buf + strlen(buf), "Techs: <%stechs\t0>\r\n%s", OLC_LABEL_PTR(PRG_TECHS(prg)), lbuf);
+	get_progress_perks_display(PRG_PERKS(prg), lbuf);
+	sprintf(buf + strlen(buf), "Perks: <%sperks\t0>\r\n%s", OLC_LABEL_PTR(PRG_PERKS(prg)), lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -977,92 +1001,112 @@ OLC_MODULE(progedit_tasks) {
 }
 
 
-OLC_MODULE(progedit_techs) {
+OLC_MODULE(progedit_perks) {
 	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
 
-	char cmd_arg[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	struct progress_tech *item, *iter;
-	any_vnum vnum;
+	char cmd_arg[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
+	struct progress_perk *item, *iter;
+	any_vnum vnum = NOTHING;
+	int num, ptype;
 	bool found;
-	int num;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
 	
 	if (is_abbrev(cmd_arg, "copy")) {
-		// usage: .techs copy <from vnum>
+		// usage: .perks copy <from vnum>
 		argument = any_one_arg(argument, arg);	// any vnum for that type
 		
 		if (!*arg) {
-			msg_to_char(ch, "Usage: techs copy <from vnum>\r\n");
+			msg_to_char(ch, "Usage: perks copy <from vnum>\r\n");
 		}
 		else if (!isdigit(*arg)) {
-			msg_to_char(ch, "Copy techs from which progression goal?\r\n");
+			msg_to_char(ch, "Copy perks from which progression goal?\r\n");
 		}
 		else if ((vnum = atoi(arg)) < 0 || !real_progress(vnum)) {
 			msg_to_char(ch, "Invalid vnum.\r\n");
 		}
 		else {
-			smart_copy_progress_techs(&PRG_TECHS(prg), PRG_TECHS(real_progress(vnum)));
-			msg_to_char(ch, "Copied techs from progression %d.\r\n", vnum);
+			smart_copy_progress_perks(&PRG_PERKS(prg), PRG_PERKS(real_progress(vnum)));
+			msg_to_char(ch, "Copied perks from progression %d.\r\n", vnum);
 		}
 	}	// end 'copy'
 	else if (is_abbrev(cmd_arg, "remove")) {
-		// usage: .techs remove <number | all>
+		// usage: .perks remove <number | all>
 		skip_spaces(&argument);	// only arg is number
 		
 		if (!*argument) {
-			msg_to_char(ch, "Remove which tech (number)?\r\n");
+			msg_to_char(ch, "Remove which perk (number)?\r\n");
 		}
 		else if (!str_cmp(argument, "all")) {
-			free_progress_techs(PRG_TECHS(prg));
-			PRG_TECHS(prg) = NULL;
-			msg_to_char(ch, "You remove all the techs.\r\n");
+			free_progress_perks(PRG_PERKS(prg));
+			PRG_PERKS(prg) = NULL;
+			msg_to_char(ch, "You remove all the perks.\r\n");
 		}
 		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
-			msg_to_char(ch, "Invalid tech number.\r\n");
+			msg_to_char(ch, "Invalid perk number.\r\n");
 		}
 		else {
 			found = FALSE;
-			LL_FOREACH(PRG_TECHS(prg), iter) {
+			LL_FOREACH(PRG_PERKS(prg), iter) {
 				if (--num == 0) {
 					found = TRUE;
 					
-					sprinttype(iter->tech, techs, buf);
-					msg_to_char(ch, "You remove the '%s' tech.\r\n", buf);
-					LL_DELETE(PRG_TECHS(prg), iter);
+					msg_to_char(ch, "You remove the perk: %s\r\n", get_one_perk_display(iter));
+					LL_DELETE(PRG_PERKS(prg), iter);
 					free(iter);
 					break;
 				}
 			}
 			
 			if (!found) {
-				msg_to_char(ch, "Invalid tech number.\r\n");
+				msg_to_char(ch, "Invalid perk number.\r\n");
 			}
 		}
 	}	// end 'remove'
 	else if (is_abbrev(cmd_arg, "add")) {
-		// usage: .techs add <name>
+		// usage: .perks add <type> <name/value>
 		argument = any_one_arg(argument, arg);
+		skip_spaces(&argument);
 		
-		if (!*arg ) {
-			msg_to_char(ch, "Usage: techs add <name>\r\n");
+		if (!*arg || !*argument) {
+			msg_to_char(ch, "Usage: perks add <type> <name/value>\r\nValid types:");
+			for (num = 0; *progress_perk_types[num] != '\n'; ++num) {
+				msg_to_char(ch, " %s\r\n", progress_perk_types[num]);
+			}
 		}
-		else if ((vnum = search_block(arg, techs, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Unknown tech '%s'.\r\n", arg);
+		else if ((ptype = search_block(arg, progress_perk_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid perk type '%s'.\r\n", arg);
 		}
 		else {
-			// success
-			CREATE(item, struct progress_tech, 1);
-			item->tech = vnum;
-			LL_APPEND(PRG_TECHS(prg), item);
+			// PRG_PERK_x: process value (argument) -- set 'vnum'
+			switch (ptype) {
+				case PRG_PERK_TECH: {
+					if ((vnum = search_block(argument, techs, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown tech '%s'.\r\n", arg);
+						return;
+					}
+					// otherwise ok
+					break;
+				}
+				default: {
+					msg_to_char(ch, "That type is not yet implemented.\r\n");
+					break;
+				}
+			}
 			
-			msg_to_char(ch, "You add the '%s' tech.\r\n", techs[vnum]);
+			// success
+			CREATE(item, struct progress_perk, 1);
+			item->type = ptype;
+			item->value = vnum;
+			LL_APPEND(PRG_PERKS(prg), item);
+			
+			msg_to_char(ch, "You add the perk: %s\r\n", get_one_perk_display(item));
 		}
 	}	// end 'add'
 	else {
-		msg_to_char(ch, "Usage: techs add <vnum>\r\n");
-		msg_to_char(ch, "Usage: techs copy <from vnum>\r\n");
-		msg_to_char(ch, "Usage: techs remove <number | all>\r\n");
+		msg_to_char(ch, "Usage: perks add <type> <name/value>\r\n");
+		msg_to_char(ch, "Usage: perks copy <from vnum>\r\n");
+		msg_to_char(ch, "Usage: perks remove <number | all>\r\n");
 	}
 }
 

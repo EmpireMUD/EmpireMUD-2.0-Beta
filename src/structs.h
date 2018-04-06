@@ -2074,6 +2074,10 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_PURCHASABLE  BIT(1)	// can buy it
 
 
+// PRG_PERK_x: progress perks
+#define PRG_PERK_TECH  0	// grants a technology
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// QUEST DEFINES ///////////////////////////////////////////////////////////
 
@@ -4576,7 +4580,7 @@ struct progress_data {
 	// lists
 	struct progress_list *prereqs;	// linked list of requires progress
 	struct req_data *tasks;	// linked list of tasks to complete
-	struct progress_tech *techs;	// linked list of techs granted
+	struct progress_perk *perks;	// linked list of perks granted
 	
 	UT_hash_handle hh;	// progress_table
 	UT_hash_handle sorted_hh;	// sorted_progress
@@ -4590,10 +4594,11 @@ struct progress_list {
 };
 
 
-// for a linked list of techs that a progression goal gives
-struct progress_tech {
-	int tech;	// TECH_x
-	struct progress_tech *next;
+// for a linked list of things you get from a progression goal
+struct progress_perk {
+	int type;	// PRG_PERK_ const
+	int value;
+	struct progress_perk *next;
 };
 
 
