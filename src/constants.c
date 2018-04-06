@@ -2562,7 +2562,7 @@ const char *progress_types[] = {
 
 // PRG_x: progress flags
 const char *progress_flags[] = {
-	"IN-DEV",
+	"IN-DEVELOPMENT",
 	"PURCHASABLE",
 	"\n"
 };
