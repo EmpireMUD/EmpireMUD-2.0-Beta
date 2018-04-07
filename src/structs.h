@@ -970,6 +970,12 @@ typedef struct vehicle_data vehicle_data;
 #define EADM_CITY_CLAIMS_ONLY  BIT(2)	// may only claim in-city
 
 
+// EATT_x: empire attributes
+#define EATT_TERRITORY_PER_GREATNESS  0	// how many you get each
+#define EATT_CITY_POINTS  1	// bonus city points
+#define NUM_EMPIRE_ATTRIBUTES  2	// total
+
+
 // ETRAIT_x: empire trait flags
 #define ETRAIT_DISTRUSTFUL  BIT(0)	// hostile behavior
 
@@ -4077,6 +4083,25 @@ struct empire_city_data {
 };
 
 
+// hash of goals completed by the empire
+struct empire_completed_goal {
+	any_vnum vnum;	// which progress goal
+	time_t when;
+	
+	UT_hash_handle hh;	// stored in empire's hash table
+};
+
+
+// current progress goals
+struct empire_goal {
+	any_vnum vnum;	// which progress goal
+	ush_int version;	// for auto-updating
+	struct req_data *tracker;	// tasks to track
+	
+	struct empire_goal *next;	// linked list
+};
+
+
 // per-island data for the empire
 struct empire_island {
 	int island;	// which island id
@@ -4268,6 +4293,7 @@ struct empire_data {
 	byte num_ranks;	// Total number of levels (maximum 20)
 	char *rank[MAX_RANKS];	// Name of each rank
 	
+	int attributes[NUM_EMPIRE_ATTRIBUTES];	// misc attributes
 	bitvector_t admin_flags;	// EADM_
 	bitvector_t frontier_traits;	// ETRAIT_
 	double coins;	// total coins (always in local currency)
@@ -4281,6 +4307,8 @@ struct empire_data {
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
 	struct offense_data *offenses;
+	struct empire_goal *goals;	// current goal trackers
+	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -4572,6 +4600,7 @@ struct progress_data {
 	char *name;
 	char *description;
 	
+	int version;	// for auto-updating
 	int type;	// PROGRESS_ const
 	bitvector_t flags;	// PRG_ flags
 	int value;	// points

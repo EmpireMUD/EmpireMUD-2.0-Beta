@@ -58,6 +58,7 @@
 // external variables
 extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
+extern const int empire_attribute_defaults[NUM_EMPIRE_ATTRIBUTES];
 extern struct player_special_data dummy_mob;
 extern struct empire_territory_data *global_next_territory_entry;
 extern int max_automessage_id;
@@ -1611,6 +1612,10 @@ empire_data *create_empire(char_data *ch) {
 	sprintf(colorcode, "&%c", colorlist[number(0, num_colors-1)]);	// pick random color
 	EMPIRE_BANNER(emp) = str_dup(colorcode);
 	
+	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		EMPIRE_ATTRIBUTE(emp, iter) = empire_attribute_defaults[iter];
+	}
+	
 	EMPIRE_CREATE_TIME(emp) = time(0);
 
 	// member data
@@ -1854,6 +1859,9 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
+	void free_empire_goals(struct empire_goal *list);
+	void free_empire_completed_goals(struct empire_completed_goal *hash);
+	
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
@@ -1965,6 +1973,10 @@ void free_empire(empire_data *emp) {
 		EMPIRE_WORKFORCE_LOG(emp) = wf_log->next;
 		free(wf_log);
 	}
+	
+	// free goals
+	free_empire_goals(EMPIRE_GOALS(emp));
+	free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
 	
 	// free strings
 	if (emp->name) {
@@ -2261,20 +2273,29 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade, *last_trade = NULL;
+	struct empire_goal *egoal, *last_egoal = NULL;
+	struct empire_completed_goal *ecg;
 	struct empire_log_data *elog;
 	struct empire_needs *need;
 	struct offense_data *off;
 	struct empire_city_data *city;
 	struct empire_island *isle;
+	struct req_data *task;
+	bitvector_t bit_in;
 	room_data *room;
 	double dbl_in;
 	long long_in;
-	char *tmp;
+	char *tmp, c_in;
 	
 	sprintf(buf2, "empire #%d", vnum);
 	
+	// init
 	CREATE(emp, empire_data, 1);
 	emp->vnum = vnum;
+	
+	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		EMPIRE_ATTRIBUTE(emp, iter) = empire_attribute_defaults[iter];
+	}
 
 	HASH_FIND_INT(empire_table, &vnum, find);
 	if (find) {
@@ -2397,6 +2418,74 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				
 				emp->frontier_traits = asciiflag_conv(str_in);
 				emp->coins = dbl_in;
+				break;
+			}
+			case 'G': {	// goals (sub-divided by a 2nd letter)
+				switch (*(line + 1)) {
+					case 'C': {	// completed
+						if (sscanf(line, "GC %d %ld", &t[0], &long_in) != 2) {
+							log("SYSERR: Format error in GC line of empire %d", vnum);
+							// non-fatal
+							break;
+						}
+						
+						HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &t[0], ecg);
+						if (!ecg) {
+							CREATE(ecg, struct empire_completed_goal, 1);
+							ecg->vnum = t[0];
+							HASH_ADD_INT(EMPIRE_COMPLETED_GOALS(emp), vnum, ecg);
+						}
+						ecg->when = long_in;
+						break;
+					}
+					case 'G': {	// goal in progress
+						if (sscanf(line, "GG %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GG line of empire %d", vnum);
+							// fatal because it could mess up trackers
+							exit(1);
+						}
+						
+						CREATE(egoal, struct empire_goal, 1);
+						egoal->vnum = t[0];
+						egoal->version = t[1];
+						LL_APPEND(EMPIRE_GOALS(emp), egoal);
+						
+						last_egoal = egoal;
+						break;
+					}
+					case 'T': {	// tracker for last goal
+						if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in) == 6) {
+							// found group
+						}
+						else if (last_egoal && sscanf(line, "GT %d %d %lld %d %d", &t[0], &t[1], &bit_in, &t[2], &t[3]) == 5) {
+							c_in = 0;	// no group given
+						}
+						else {
+							log("SYSERR: Format error in GT line of empire %d", vnum);
+							// bad format but not fatal
+							if (last_egoal) {
+								--last_egoal->version;	// forces a refresh by putting the version out of date
+							}
+							break;
+						}
+					
+						CREATE(task, struct req_data, 1);
+						task->type = t[0];
+						task->vnum = t[1];
+						task->misc = bit_in;
+						task->needed = t[2];
+						task->current = t[3];
+						task->group = c_in;
+					
+						LL_APPEND(last_egoal->tracker, task);
+						break;
+					}
+					default: {
+						log("SYSERR: Unknown G line in empire %d: %s", vnum, line);
+						// safe to continue though
+						break;
+					}
+				}
 				break;
 			}
 			case 'I': {	// island name
@@ -2542,6 +2631,17 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				
 				break;
 			}
+			case 'Z': { // attribute
+				if (sscanf(line, "Z%d %d", &t[0], &t[1]) != 2) {
+					log("SYSERR: Format error in Z line of empire %d.\r\n", emp->vnum);
+					exit(1);
+				}
+				
+				if (t[0] >= 0 && t[0] < NUM_EMPIRE_ATTRIBUTES) {
+					EMPIRE_ATTRIBUTE(emp, t[0]) = t[1];
+				}
+				break;
+			}
 
 			case 'S':			/* end of empire */
 				return;
@@ -2581,10 +2681,13 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_completed_goal *ecg, *next_ecg;
 	struct empire_needs *need, *next_need;
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
 	struct empire_npc_data *npc;
+	struct empire_goal *egoal;
+	struct req_data *task;
 	int iter;
 
 	if (!emp) {
@@ -2628,6 +2731,21 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// E: extra data
 	fprintf(fl, "E\n%s %.1f\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), EMPIRE_COINS(emp));
 	
+	// G: progression goals, tasks, and completed
+	LL_FOREACH(EMPIRE_GOALS(emp), egoal) {
+		// GG goal in progress
+		fprintf(fl, "GG %d %d\n", egoal->vnum, egoal->version);
+		
+		// GT goal tracker
+		LL_FOREACH(egoal->tracker, task) {
+			fprintf(fl, "GT %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
+		}
+	}
+	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+		// GC completed goal
+		fprintf(fl, "GC %d %ld\n", ecg->vnum, ecg->when);
+	}
+	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		// I: island names
 		if (isle->name) {
@@ -2655,11 +2773,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// P: privs
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter)
 		fprintf(fl, "P%d\n%d\n", iter, EMPIRE_PRIV(emp, iter));
-
+	
 	// R: ranks
 	for (iter = 0; iter < emp->num_ranks; ++iter)
 		fprintf(fl, "R%d\n%s~\n", iter, EMPIRE_RANK(emp, iter));
-
+	
 	// T: territory buildings
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		fprintf(fl, "T %d %d\n", ter->vnum, ter->population_timer);
@@ -2682,6 +2800,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// Y: cities
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 		fprintf(fl, "Y %d %d %s\n%s~\n", GET_ROOM_VNUM(city->location), city->type, bitv_to_alpha(city->traits), city->name);
+	}
+	
+	// Z: attributes
+	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		fprintf(fl, "Z%d %d\n", iter, EMPIRE_ATTRIBUTE(emp, iter));
 	}
 
 	fprintf(fl, "S\n");

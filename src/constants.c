@@ -1664,6 +1664,21 @@ const char *empire_admin_flags[] = {
 };
 
 
+// EATT_x (1/2): empire attributes
+const char *empire_attributes[] = {
+	"Territory per Greatness",
+	"City Points",
+	"\n"
+};
+
+
+// EATT_x (2/2): defaults for empire attributes
+const int empire_attribute_defaults[NUM_EMPIRE_ATTRIBUTES] = {
+	15,
+	1
+};
+
+
 // ENEED_x: empire need types
 const char *empire_needs_types[] = {
 	"food for workforce",

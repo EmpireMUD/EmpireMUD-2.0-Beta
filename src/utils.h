@@ -514,6 +514,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_NAME(emp)  ((emp)->name)
 #define EMPIRE_ADJECTIVE(emp)  ((emp)->adjective)
 #define EMPIRE_ADMIN_FLAGS(emp)  ((emp)->admin_flags)
+#define EMPIRE_ATTRIBUTE(emp, att)  ((emp)->attributes[(att)])
 #define EMPIRE_BANNER(emp)  ((emp)->banner)
 #define EMPIRE_BANNER_HAS_UNDERLINE(emp)  ((emp)->banner_has_underline)
 #define EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)  ((emp)->city_overage_warning_time)
@@ -521,10 +522,12 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
 #define EMPIRE_COINS(emp)  ((emp)->coins)
+#define EMPIRE_COMPLETED_GOALS(emp)  ((emp)->completed_goals)
 #define EMPIRE_PRIV(emp, num)  ((emp)->priv[(num)])
 #define EMPIRE_DELAYS(emp)  ((emp)->delays)
 #define EMPIRE_DESCRIPTION(emp)  ((emp)->description)
 #define EMPIRE_DIPLOMACY(emp)  ((emp)->diplomacy)
+#define EMPIRE_GOALS(emp)  ((emp)->goals)
 #define EMPIRE_TRADE(emp)  ((emp)->trade)
 #define EMPIRE_LOGS(emp)  ((emp)->logs)
 #define EMPIRE_TERRITORY_LIST(emp)  ((emp)->territory_list)
@@ -1158,6 +1161,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define PRG_TASKS(prg)  ((prg)->tasks)
 #define PRG_TYPE(prg)  ((prg)->type)
 #define PRG_VALUE(prg)  ((prg)->value)
+#define PRG_VERSION(prg)  ((prg)->version)
 
 #define PRG_FLAGGED(prg, flg)  IS_SET(PRG_FLAGS(prg), (flg))
 

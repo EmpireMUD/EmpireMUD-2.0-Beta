@@ -26,6 +26,7 @@
 /**
 * Contents:
 *   Helpers
+*   Empire Helpers
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -127,6 +128,37 @@ void get_progress_perks_display(struct progress_perk *list, char *save_buffer) {
 	}
 	
 	// empty list not shown
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE HELPERS //////////////////////////////////////////////////////////
+
+/**
+* Frees a list of empire goal entries.
+*
+* struct empire_goal *list The list to free.
+*/
+void free_empire_goals(struct empire_goal *list) {
+	struct empire_goal *eg;
+	while ((eg = list)) {
+		list = list->next;
+		free_requirements(eg->tracker);
+		free(eg);
+	}
+}
+
+
+/**
+* Frees a hash of completed empire goals.
+* 
+* struct empire_completed_goal *hash The set to free.
+*/
+void free_empire_completed_goals(struct empire_completed_goal *hash) {
+	struct empire_completed_goal *ecg, *next;
+	HASH_ITER(hh, hash, ecg, next) {
+		free(ecg);
+	}
 }
 
 
@@ -279,8 +311,15 @@ void smart_copy_progress_perks(struct progress_perk **to_list, struct progress_p
 
 // Complex sorter for sorted_progress
 int sort_progress_by_data(progress_data *a, progress_data *b) {
-	// TODO
-	return PRG_VNUM(a) - PRG_VNUM(b);
+	if (PRG_TYPE(a) != PRG_TYPE(b)) {
+		return PRG_TYPE(a) = PRG_TYPE(b);
+	}
+	else if (PRG_FLAGGED(a, PRG_PURCHASABLE) != PRG_FLAGGED(b, PRG_PURCHASABLE)) {
+		return PRG_FLAGGED(a, PRG_PURCHASABLE) ? 1 : -1;
+	}
+	else {
+		return str_cmp(PRG_NAME(a), PRG_NAME(b));
+	}
 }
 
 
@@ -473,15 +512,16 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 	PRG_NAME(prg) = fread_string(fl, error);
 	PRG_DESCRIPTION(prg) = fread_string(fl, error);
 	
-	// line 3: type cost value flags
-	if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
+	// line 3: version type cost value flags
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d %s", &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in) != 5) {
 		log("SYSERR: Format error in line 3 of %s", error);
 		exit(1);
 	}
 	
-	PRG_TYPE(prg) = int_in[0];
-	PRG_COST(prg) = int_in[1];
-	PRG_VALUE(prg) = int_in[2];
+	PRG_VERSION(prg) = int_in[0];
+	PRG_TYPE(prg) = int_in[1];
+	PRG_COST(prg) = int_in[2];
+	PRG_VALUE(prg) = int_in[3];
 	PRG_FLAGS(prg) = asciiflag_conv(str_in);
 	
 	// optionals
@@ -596,8 +636,8 @@ void write_progress_to_file(FILE *fl, progress_data *prg) {
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
 	
-	// 3. type cost value flags
-	fprintf(fl, "%d %d %d %s\n", PRG_TYPE(prg), PRG_COST(prg), PRG_VALUE(prg), bitv_to_alpha(PRG_FLAGS(prg)));
+	// 3. version type cost value flags
+	fprintf(fl, "%d %d %d %d %s\n", PRG_VERSION(prg), PRG_TYPE(prg), PRG_COST(prg), PRG_VALUE(prg), bitv_to_alpha(PRG_FLAGS(prg)));
 	
 	// K. perks
 	LL_FOREACH(PRG_PERKS(prg), perk) {
@@ -756,11 +796,15 @@ progress_data *setup_olc_progress(progress_data *input) {
 		PRG_PREREQS(new) = copy_progress_list(PRG_PREREQS(input));
 		PRG_TASKS(new) = copy_requirements(PRG_TASKS(input));
 		PRG_PERKS(new) = copy_progress_perks(PRG_PERKS(input));
+		
+		PRG_VERSION(new) += 1;
 	}
 	else {
 		// brand new: some defaults
 		PRG_NAME(new) = str_dup(default_progress_name);
 		PRG_FLAGS(new) = PRG_IN_DEVELOPMENT;
+		
+		PRG_VERSION(new) = 1;
 	}
 	
 	// done
@@ -828,14 +872,20 @@ void olc_show_progress(char_data *ch) {
 	sprintbit(PRG_FLAGS(prg), progress_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%svalue\t0> %d point%s\r\n", OLC_LABEL_VAL(PRG_VALUE(prg), 0), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
-	sprintf(buf + strlen(buf), "<%scost\t0> %d point%s\r\n", OLC_LABEL_VAL(PRG_COST(prg), 0), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+	if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		sprintf(buf + strlen(buf), "<%scost\t0> %d point%s\r\n", OLC_LABEL_VAL(PRG_COST(prg), 0), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+	}
+	if (PRG_VALUE(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		sprintf(buf + strlen(buf), "<%svalue\t0> %d point%s\r\n", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_VAL(PRG_VALUE(prg), 0), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
+	}
 	
 	get_progress_list_display(PRG_PREREQS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
 	
-	get_requirement_display(PRG_TASKS(prg), lbuf);
-	sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		get_requirement_display(PRG_TASKS(prg), lbuf);
+		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+	}
 	
 	get_progress_perks_display(PRG_PERKS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Perks: <%sperks\t0>\r\n%s", OLC_LABEL_PTR(PRG_PERKS(prg)), lbuf);
@@ -870,7 +920,13 @@ int vnum_progress(char *searchname, char_data *ch) {
 
 OLC_MODULE(progedit_cost) {
 	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
-	PRG_COST(prg) = olc_process_number(ch, argument, "point cost", "cost", 0, INT_MAX, PRG_COST(prg));
+	
+	if (!PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		msg_to_char(ch, "You cannot set the cost without the PURCHASABLE flag.\r\n");
+	}
+	else {
+		PRG_COST(prg) = olc_process_number(ch, argument, "point cost", "cost", 0, INT_MAX, PRG_COST(prg));
+	}
 }
 
 
@@ -896,6 +952,11 @@ OLC_MODULE(progedit_flags) {
 	if (had_indev && !PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+	}
+	
+	// remove cost if !purchase
+	if (!PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		PRG_COST(prg) = 0;
 	}
 }
 
