@@ -303,6 +303,7 @@ ACMD(do_poofset);
 ACMD(do_portal);
 ACMD(do_pour);
 ACMD(do_prick);
+ACMD(do_progress);
 ACMD(do_promote);
 ACMD(do_prompt);
 ACMD(do_prospect);
@@ -874,6 +875,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "pour", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_POUR ),
 	STANDARD_CMD( "press", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_PRESS, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "prick", POS_FIGHTING, do_prick, NO_MIN, CTYPE_COMBAT, ABIL_PRICK ),
+	SIMPLE_CMD( "progress", POS_DEAD, do_progress, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "promote", POS_DEAD, do_promote, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "prompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_PROMPT ),
 	STANDARD_CMD( "prospect", POS_STANDING, do_prospect, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, ABIL_PROSPECT ),

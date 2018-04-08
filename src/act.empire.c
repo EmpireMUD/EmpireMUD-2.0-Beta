@@ -5400,6 +5400,65 @@ ACMD(do_pledge) {
 }
 
 
+ACMD(do_progress) {
+	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
+	extern const char *progress_types[];
+	
+	char buf[MAX_STRING_LENGTH * 2];
+	empire_data *emp = GET_LOYALTY(ch);
+	struct empire_completed_goal *ecg, *next_ecg;
+	struct empire_goal *goal;
+	progress_data *prg;
+	int cat;
+	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES];
+	
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch) || !emp) {
+		msg_to_char(ch, "You need to be in an empire to check progress.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "%s%s\t0 has %d progress points available (%d total earned).\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), 0, 0);
+		msg_to_char(ch, "Goals\r\n");
+		
+		// show current categories and their goal counts
+		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
+			counts[cat] = 0;
+			compl[cat] = 0;
+		}
+		LL_FOREACH(EMPIRE_GOALS(emp), goal) {
+			if ((prg = real_progress(goal->vnum))) {
+				++counts[PRG_TYPE(prg)];
+			}
+		}
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+			if ((prg = real_progress(ecg->vnum))) {
+				++compl[PRG_TYPE(prg)];
+			}
+		}
+		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
+			msg_to_char(ch, " %s: %d current goal%s, %d completed\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat]);
+		}
+	}
+	else if ((cat = search_block(argument, progress_types, FALSE))) {
+		// show current progress in that category
+		msg_to_char(ch, "category view not finished\r\n");
+	}
+	else if ((prg = find_current_progress_goal_by_name(emp, argument))) {
+		// show 1 goal
+		msg_to_char(ch, "goal view incomplete\r\n");
+	}
+	else if (is_abbrev(argument, "completed")) {
+		// show completed goals (optionally: by category)
+		msg_to_char(ch, "completed view not started\r\n");
+	}
+	else {
+		// show usage
+		msg_to_char(ch, "Usage not written.\r\n");
+	}
+}
+
+
 ACMD(do_promote) {
 	empire_data *e = GET_LOYALTY(ch);
 	int to_rank = NOTHING;

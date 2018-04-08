@@ -1345,6 +1345,13 @@ Examples:
 
 See also: FILL, TRENCH
 #
+PROGRESS
+
+Usage:  progress [category | completed | goal name]
+
+This command shows your empire's current progress points, progression goals,
+and information about those goals.
+#
 PROMPT FPROMPT "FIGHT PROMPT" "COMBAT PROMPT"
 
 Usage:  prompt <string | off | default>

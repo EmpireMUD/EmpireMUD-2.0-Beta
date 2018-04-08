@@ -2073,6 +2073,7 @@ typedef struct vehicle_data vehicle_data;
 // PROGRESS_x: progress types
 #define PROGRESS_UNDEFINED  0	// base/unset
 #define PROGRESS_COMMERCE  1
+#define NUM_PROGRESS_TYPES  2	// total
 
 
 // PRG_x: progress flags

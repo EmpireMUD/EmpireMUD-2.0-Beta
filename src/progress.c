@@ -54,6 +54,38 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Finds a goal the empire is currently on. This allows multi-word abbrevs, and
+* prefers exact matches.
+*
+* @param empire_data *emp The empire to check.
+* @param char *name The name to look for.
+*/
+progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) {
+	progress_data *prg, *partial = NULL;
+	struct empire_goal *goal;
+	
+	if (!emp || !*name) {
+		return NULL;
+	}
+	
+	LL_FOREACH(EMPIRE_GOALS(emp), goal) {
+		if (!(prg = real_progress(goal->vnum))) {
+			continue;
+		}
+		
+		if (!str_cmp(name, PRG_NAME(prg))) {
+			return prg;	// exact match
+		}
+		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
+			partial = prg;
+		}
+	}
+	
+	return partial;	// if any
+}
+
+
+/**
 * Quick way to turn a vnum into a name, safely.
 *
 * @param any_vnum vnum The progression vnum to look up.
