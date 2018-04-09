@@ -1969,10 +1969,12 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 				if (task->type == REQ_KILL_MOB_FLAGGED && (MOB_FLAGS(mob) & task->misc) == task->misc) {
 					++task->current;
 					EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+					TRIGGER_CHECK_GOAL_COMPLETE(GET_LOYALTY(ch));
 				}
 				else if (task->type == REQ_KILL_MOB && GET_MOB_VNUM(mob) == task->vnum) {
 					++task->current;
 					EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+					TRIGGER_CHECK_GOAL_COMPLETE(GET_LOYALTY(ch));
 				}
 			}
 		}

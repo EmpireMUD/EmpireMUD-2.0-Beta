@@ -890,6 +890,7 @@ void heartbeat(int heart_pulse) {
 	void check_idle_passwords();
 	void check_newbie_islands();
 	void check_progress_refresh();
+	void check_goals_complete();
 	void check_wars();
 	void chore_update();
 	void display_automessages();
@@ -1106,6 +1107,8 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 29:\t%lld", microtime()); }
 		check_progress_refresh();
 		if (debug_log && HEARTBEAT(15)) { log("debug 30:\t%lld", microtime()); }
+		check_goals_complete();
+		if (debug_log && HEARTBEAT(15)) { log("debug 31:\t%lld", microtime()); }
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */

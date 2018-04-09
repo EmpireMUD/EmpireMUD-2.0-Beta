@@ -380,6 +380,33 @@ void check_for_eligible_goals(empire_data *emp) {
 
 
 /**
+* Checks all empires for complete goals.
+*/
+void check_goals_complete(void) {
+	if (check_completed_goals) {
+		struct empire_goal *goal, *next_goal;
+		empire_data *emp, *next_emp;
+		int complete, total;
+		
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (EMPIRE_CHECK_GOAL_COMPLETE(emp)) {
+				EMPIRE_CHECK_GOAL_COMPLETE(emp) = FALSE;
+				
+				HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+					count_quest_tasks(goal->tracker, &complete, &total);
+					if (complete == total) {
+						complete_goal(emp, goal);
+					}
+				}
+			}
+		}
+		
+		check_completed_goals = FALSE;
+	}
+}
+
+
+/**
 * Does a full refresh on all empires' goals and updates them all.
 */
 void check_progress_refresh(void) {
@@ -667,6 +694,9 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 			}
 		}
 	}
+	
+	// check it
+	TRIGGER_CHECK_GOAL_COMPLETE(emp);
 }
 
 
@@ -743,6 +773,7 @@ void et_change_coins(empire_data *emp, int amount) {
 			if (task->type == REQ_GET_COINS) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_CHECK_GOAL_COMPLETE(emp);
 			}
 		}
 	}
@@ -764,6 +795,7 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				++task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_CHECK_GOAL_COMPLETE(emp);
 			}
 		}
 	}
@@ -785,6 +817,7 @@ void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
 				++task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_CHECK_GOAL_COMPLETE(emp);
 			}
 		}
 	}
@@ -807,14 +840,17 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount) {
 			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_CHECK_GOAL_COMPLETE(emp);
 			}
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_CHECK_GOAL_COMPLETE(emp);
 			}
 			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_CHECK_GOAL_COMPLETE(emp);
 			}
 		}
 	}
@@ -836,6 +872,7 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				--task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_CHECK_GOAL_COMPLETE(emp);
 				
 				// check min
 				task->current = MAX(task->current, 0);
@@ -861,6 +898,7 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
 				--task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_CHECK_GOAL_COMPLETE(emp);
 				
 				// check min
 				task->current = MAX(task->current, 0);

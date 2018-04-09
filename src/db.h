@@ -435,6 +435,7 @@ extern char_data *is_playing(int id);
 extern progress_data *progress_table;
 extern progress_data *sorted_progress;
 extern bool need_progress_refresh;
+extern bool check_completed_goals;
 extern char *get_progress_name_by_proto(any_vnum vnum);
 extern progress_data *real_progress(any_vnum vnum);
 void free_progress(progress_data *prg);

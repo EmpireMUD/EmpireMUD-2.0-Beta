@@ -4344,6 +4344,7 @@ struct empire_data {
 	time_t next_timeout;	// for triggering rescans
 	int min_level;	// minimum level in the empire
 	int max_level;	// maximum level in the empire
+	bool check_goal_complete;	// tells the mud to check for a complete goal
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them

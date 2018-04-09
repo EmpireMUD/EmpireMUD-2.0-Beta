@@ -167,6 +167,7 @@ struct group_data *group_list = NULL;	// global LL of groups
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
 progress_data *sorted_progress = NULL;	// hashed by vnum, sorted by type/data
 bool need_progress_refresh = FALSE;	// triggers an update of all empires' trackers
+bool check_completed_goals = FALSE;	// triggers full goal check
 
 // quests
 struct quest_data *quest_table = NULL;
