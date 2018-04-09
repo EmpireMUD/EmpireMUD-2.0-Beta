@@ -387,7 +387,7 @@ void check_progress_refresh(void) {
 		empire_data *emp, *next_emp;
 		
 		HASH_ITER(hh, empire_table, emp, next_emp) {
-			refresh_empire_goals(emp, FALSE);
+			refresh_empire_goals(emp, NOTHING);
 		}
 		
 		need_progress_refresh = FALSE;
