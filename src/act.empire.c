@@ -5480,7 +5480,7 @@ ACMD(do_progress) {
 		
 		page_string(ch->desc, buf, TRUE);
 	}
-	else if ((cat = search_block(argument, progress_types, FALSE))) {
+	else if ((cat = search_block(argument, progress_types, FALSE)) != NOTHING) {
 		// show current progress in that category
 		msg_to_char(ch, "category view not finished\r\n");
 	}
