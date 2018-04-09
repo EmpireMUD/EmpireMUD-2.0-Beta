@@ -5536,6 +5536,9 @@ ACMD(do_progress) {
 		// TODO show completed goals (optionally: by category)
 		msg_to_char(ch, "completed view not started\r\n");
 	}
+	
+	// TODO purchase
+	
 	else {
 		// TODO show usage
 		msg_to_char(ch, "Usage not written.\r\n");
