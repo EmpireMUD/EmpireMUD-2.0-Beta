@@ -1654,7 +1654,7 @@ const bool empire_log_request_only[] = {
 	TRUE,	// logins
 	FALSE,	// shipments
 	TRUE,	// workforce
-	TRUE,	// progress
+	FALSE,	// progress
 };
 
 
