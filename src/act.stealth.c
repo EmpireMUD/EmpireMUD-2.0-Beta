@@ -1153,7 +1153,7 @@ ACMD(do_pickpocket) {
 		else {
 			// oops... put these back
 			if (coins > 0 && GET_LOYALTY(vict)) {
-				EMPIRE_COINS(GET_LOYALTY(vict)) += coins;
+				increase_empire_coins(GET_LOYALTY(vict), GET_LOYALTY(vict), coins);
 			}
 			
 			if (!AWAKE(vict)) {

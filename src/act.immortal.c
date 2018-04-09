@@ -2190,7 +2190,7 @@ SHOW(show_player) {
 
 
 SHOW(show_quests) {
-	void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	void show_quest_tracker(char_data *ch, struct player_quest *pq);
 	
 	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH], when[256];
@@ -2225,7 +2225,7 @@ SHOW(show_quests) {
 		
 		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
-			count_quest_tasks(pq, &count, &total);
+			count_quest_tasks(pq->tracker, &count, &total);
 			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
 		}
 	

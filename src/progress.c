@@ -27,6 +27,7 @@
 * Contents:
 *   Helpers
 *   Empire Helpers
+*   Empire Trackers
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -44,14 +45,92 @@ extern const char *progress_types[];
 extern const char *techs[];
 
 // external funcs
+extern struct req_data *copy_requirements(struct req_data *from);
+extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 
 // local funcs
+void complete_goal(empire_data *emp, struct empire_goal *goal);
+bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
+void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
+void refresh_empire_goals(empire_data *emp);
+void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
+struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Counts how many items an empire has in storage which match a component flag.
+*
+* @param empire_data *emp The empire.
+* @param int type The CMP_ type.
+* @param bitvector_t flags The CMPF_ flags (optional; all flags must be present to match).
+* @return int The number of matching items.
+*/
+int count_empire_components(empire_data *emp, int type, bitvector_t flags) {
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
+	obj_data *proto;
+	int count = 0;
+	
+	if (!emp) {
+		return 0;	// safety first
+	}
+	
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->amount < 1 || !(proto = obj_proto(store->vnum))) {
+				continue;
+			}
+			
+			if (GET_OBJ_CMP_TYPE(proto) != type) {
+				continue;
+			}
+			if ((GET_OBJ_CMP_FLAGS(proto) & flags) != flags) {
+				continue;
+			}
+			
+			// safe!
+			SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
+		}
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts how many items an empire has in storage.
+*
+* @param empire_data *emp The empire.
+* @param obj_vnum vnum The vnum of the item to look for.
+* @return int The number of matching items.
+*/
+int count_empire_objects(empire_data *emp, obj_vnum vnum) {
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
+	int count = 0;
+	
+	if (!emp) {
+		return 0;	// safety first
+	}
+	
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->vnum == vnum) {
+				SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
+			}
+		}
+	}
+	
+	return count;
+}
+
 
 /**
 * Finds a goal the empire is currently on. This allows multi-word abbrevs, and
@@ -61,14 +140,14 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 * @param char *name The name to look for.
 */
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) {
+	struct empire_goal *goal, *next_goal;
 	progress_data *prg, *partial = NULL;
-	struct empire_goal *goal;
 	
 	if (!emp || !*name) {
 		return NULL;
 	}
 	
-	LL_FOREACH(EMPIRE_GOALS(emp), goal) {
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		if (!(prg = real_progress(goal->vnum))) {
 			continue;
 		}
@@ -167,14 +246,234 @@ void get_progress_perks_display(struct progress_perk *list, char *save_buffer) {
 //// EMPIRE HELPERS //////////////////////////////////////////////////////////
 
 /**
-* Frees a list of empire goal entries.
+* Marks one goal completed at the current timestamp.
 *
-* struct empire_goal *list The list to free.
+* @param empire_data *emp The empire completing the goal.
+* @param any_vnum vnum The progression goal they completed.
 */
-void free_empire_goals(struct empire_goal *list) {
-	struct empire_goal *eg;
-	while ((eg = list)) {
-		list = list->next;
+void add_completed_goal(empire_data *emp, any_vnum vnum) {
+	struct empire_completed_goal *ecg;
+	
+	if (!emp || vnum == NOTHING) {
+		return;
+	}
+	
+	HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
+	if (!ecg) {
+		CREATE(ecg, struct empire_completed_goal, 1);
+		ecg->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_COMPLETED_GOALS(emp), vnum, ecg);
+	}
+	ecg->when = time(0);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+/**
+* Applies (or removes) a progress goal to an empire. This does NOT validate
+* whether or not the empire has it.
+*
+* This is called by:
+* - complete_goal
+* - purchase_goal
+*
+* @param empire_data *emp The empire apply it to.
+* @param progress_data *prg Which goal is being aplied (or removed).
+* @param bool add If TRUE, applies it. If FALSE, reverses it.
+*/
+void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
+	struct progress_perk *perk;
+	
+	if (!emp || !prg) {
+		return;	// sanitation
+	}
+	
+	// apply points/cost
+	if (PRG_VALUE(prg)) {
+		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
+		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
+	}
+	if (PRG_COST(prg)) {
+		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? -PRG_COST(prg) : PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
+	}
+	
+	// PRG_PERK_x: apply perks
+	LL_FOREACH(PRG_PERKS(prg), perk) {
+		switch (perk->type) {
+			case PRG_PERK_TECH: {
+				if (perk->value >= 0 && perk->value < NUM_TECHS) {
+					SAFE_ADD(EMPIRE_TECH(emp, perk->value), (add ? 1 : -1), 0, INT_MAX, TRUE);
+				}
+				break;
+			}
+		}
+	}
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+/**
+* Removes, then frees, one goal from an empire.
+*
+* @param empire_data *emp The empire whose goal it is.
+* @param struct empire_goal *goal The goal to cancel/free.
+*/
+void cancel_empire_goal(empire_data *emp, struct empire_goal *goal) {
+	if (!emp || !goal) {
+		return;
+	}
+	
+	HASH_DEL(EMPIRE_GOALS(emp), goal);
+	free_requirements(goal->tracker);
+	free(goal);
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+/**
+* Looks for any goals the empire is now eligible for. If it finds one, it adds
+* it, updates the tracker, and will achieve it immediately if it's finished.
+*
+* @param empire_data *emp Which empire to check.
+*/
+void check_for_eligible_goals(empire_data *emp) {
+	progress_data *prg, *next_prg;
+	struct empire_goal *goal;
+	int complete, total;
+	any_vnum vnum;
+	
+	if (!emp) {
+		return;
+	}
+	
+	// check all goals
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		vnum = PRG_VNUM(prg);
+		
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
+			continue;
+		}
+		if (get_current_goal(emp, vnum)) {
+			continue;	// already on it
+		}
+		if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			continue;	// already completed it
+		}
+		if (!empire_meets_goal_prereqs(emp, prg)) {
+			continue;	// not eligible
+		}
+		
+		// MADE IT!
+		if ((goal = start_empire_goal(emp, prg))) {
+			refresh_one_goal_tracker(emp, goal);
+			
+			// check if complete
+			count_quest_tasks(goal->tracker, &complete, &total);
+			if (complete == total) {
+				complete_goal(emp, goal);
+			}
+		}
+	}
+}
+
+
+/**
+* Does a full refresh on all empires' goals and updates them all.
+*/
+void check_progress_refresh(void) {
+	if (need_progress_refresh) {
+		empire_data *emp, *next_emp;
+		
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			refresh_empire_goals(emp);
+		}
+		
+		need_progress_refresh = FALSE;
+	}
+}
+
+
+/**
+* This function changes an in-progress goal to a completed one. It does not
+* validate that the goal is complete.
+* 
+* @param empire_data *emp The empire who has completed the goal.
+* @param struct empire_goal *goal The goal being completed (will be removed/freed).
+*/
+void complete_goal(empire_data *emp, struct empire_goal *goal) {
+	progress_data *prg;
+	
+	if (!emp || !goal) {
+		return;	// somehow
+	}
+	if (!(prg = real_progress(goal->vnum))) {
+		cancel_empire_goal(emp, goal);
+		return;	// no data
+	}
+	
+	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
+	
+	add_completed_goal(emp, goal->vnum);
+	cancel_empire_goal(emp, goal);
+	
+	apply_progress_to_empire(emp, prg, TRUE);
+	check_for_eligible_goals(emp);
+}
+
+
+/**
+* Determines if an empire has already completed a goal and returns the time-
+* stamp if so.
+*
+* @param empire_data *emp Which empire.
+* @param any_vnum vnum Which progression goal.
+* @return time_t timestamp if they have completed it, 0 (FALSE) if not.
+*/
+time_t empire_has_completed_goal(empire_data *emp, any_vnum vnum) {
+	struct empire_completed_goal *ecg;
+	
+	if (emp && vnum != NOTHING) {
+		HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
+		return ecg ? ecg->when : 0;
+	}
+	return 0;
+}
+
+
+/**
+* Checks if an empire has completed all the prereqs to qualify for a goal.
+*
+* @param empire_data *emp The empire to check.
+* @param progress_data *prg The progression goal to validate.
+* @return bool TRUE if the empire qualifies, FALSE if not.
+*/
+bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg) {
+	struct progress_list *iter;
+	
+	if (!emp || !prg) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(PRG_PREREQS(prg), iter) {
+		if (!empire_has_completed_goal(emp, iter->vnum)) {
+			return FALSE;
+		}
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* Frees a hash of empire goal entries.
+*
+* struct empire_goal *hash The set to free.
+*/
+void free_empire_goals(struct empire_goal *hash) {
+	struct empire_goal *eg, *next;
+	HASH_ITER(hh, hash, eg, next) {
 		free_requirements(eg->tracker);
 		free(eg);
 	}
@@ -190,6 +489,377 @@ void free_empire_completed_goals(struct empire_completed_goal *hash) {
 	struct empire_completed_goal *ecg, *next;
 	HASH_ITER(hh, hash, ecg, next) {
 		free(ecg);
+	}
+}
+
+
+/**
+* Finds the entry for a goal the empire is currently on, if they are on it.
+*
+* @param empire_data *emp Which empire.
+* @param any_vnum vnum The goal to look for.
+* @return struct empire_goal* The empire's goal entry, if they are on it. NULL if not.
+*/
+struct empire_goal *get_current_goal(empire_data *emp, any_vnum vnum) {
+	struct empire_goal *goal = NULL;
+	if (emp) {
+		HASH_FIND_INT(EMPIRE_GOALS(emp), &vnum, goal);
+	}
+	return goal;	// if any
+}
+
+
+/**
+* Call this function to buy a goal with the PURCHASABLE flag. This function
+* does not validate prereqs or point availability. It only does the work.
+*
+* @param empire_data *emp Which empire is purchasing it.
+* @param progress_data *prg The progression goal being purchased.
+* @param char_data *purchased_by Optional: The person doing the purchasing (for the elog).
+*/
+void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by) {
+	if (!emp || !prg) {
+		return;	// nothing to do
+	}
+	if (!PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		log("SYSERR: purchase_goal called for non-purchasable goal %d", PRG_VNUM(prg));
+		return;
+	}
+	
+	if (purchased_by) {
+		log_to_empire(emp, ELOG_PROGRESS, "%s purchased: %s", PERS(purchased_by, purchased_by, TRUE), PRG_NAME(prg));
+	}
+	else {
+		log_to_empire(emp, ELOG_PROGRESS, "Purchased: %s", PRG_NAME(prg));
+	}
+	
+	add_completed_goal(emp, PRG_VNUM(prg));
+	apply_progress_to_empire(emp, prg, TRUE);
+	check_for_eligible_goals(emp);
+}
+
+
+/**
+* Refreshes the goals and checks progress on them, for 1 empire.
+*
+* @param empire_data *emp The empire to refresh.
+*/
+void refresh_empire_goals(empire_data *emp) {
+	struct empire_completed_goal *ecg;
+	progress_data *prg, *next_prg;
+	struct empire_goal *goal;
+	int complete, total;
+	any_vnum vnum;
+	bool skip;
+	
+	if (!emp) {
+		return;
+	}
+	
+	// check all goals
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		vnum = PRG_VNUM(prg);
+		goal = get_current_goal(emp, vnum);	// maybe -- if they have the goal already
+		skip = FALSE;
+		
+		// remove if not allowed to track it
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
+			if (goal) {
+				cancel_empire_goal(emp, goal);
+			}
+			skip = TRUE;
+		}
+		
+		// remove from completed if in-dev
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+			HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
+			if (ecg) {
+				HASH_DEL(EMPIRE_COMPLETED_GOALS(emp), ecg);
+				free(ecg);
+			}
+			skip = TRUE;
+		}
+		
+		if (skip) {
+			// do not attempt to add the goal if we marked it skip
+			continue;
+		}
+		
+		// check if they SHOULD be on it
+		if (!goal && !empire_has_completed_goal(emp, PRG_VNUM(prg)) && empire_meets_goal_prereqs(emp, prg)) {
+			goal = start_empire_goal(emp, prg);
+		}
+		// check if they SHOULDN'T
+		if (goal && empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			cancel_empire_goal(emp, goal);
+			goal = NULL;
+		}
+		
+		// check version
+		if (goal && goal->version != PRG_VERSION(prg)) {
+			goal->version = PRG_VERSION(prg);
+			free_requirements(goal->tracker);
+			goal->tracker = copy_requirements(PRG_TASKS(prg));
+		}
+		
+		if (goal) {	// check if the goal is now complete
+			refresh_one_goal_tracker(emp, goal);
+			
+			// check if complete
+			count_quest_tasks(goal->tracker, &complete, &total);
+			if (complete == total) {
+				complete_goal(emp, goal);
+			}
+		}
+	}
+}
+
+
+/**
+* Re-counts a goal tracker for the empire. Not all task types are refreshable
+* (e.g. mob kills) and those are not affected by this function.
+*
+* @param empire_data *emp The empire whose tracker it is.
+* @param struct empire_goal *goal The goal to refresh.
+*/
+void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
+	struct req_data *task;
+	
+	if (!emp || !goal) {
+		return;	// safety first
+	}
+	
+	LL_FOREACH(goal->tracker, task) {
+		// REQ_x: refreshable/empire types only
+		switch (task->type) {
+			case REQ_GET_COMPONENT: {
+				task->current = count_empire_components(emp, task->vnum, task->misc);
+				break;
+			}
+			case REQ_GET_OBJECT: {
+				task->current = count_empire_objects(emp, task->vnum);
+				break;
+			}
+			case REQ_OWN_BUILDING: {
+				task->current = count_owned_buildings(emp, task->vnum);
+				break;
+			}
+			case REQ_OWN_VEHICLE: {
+				task->current = count_owned_vehicles(emp, task->vnum);
+				break;
+			}
+			case REQ_GET_COINS: {
+				task->current = EMPIRE_COINS(emp);
+				break;
+			}
+			
+			// otherwise...
+			default: {
+				// this type is impossible for empires, so we will always count it as done
+				task->current = task->needed;
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Starts a goal for an empire, and creates a tracker for it.
+*
+* @param empire_data *emp Which empire to add the goal to.
+* @param progress_data *prg The data for the goal.
+* @return struct empire_goal* The goal entry (may be NULL if bad input is passed).
+*/
+struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg) {
+	struct empire_goal *goal;
+	
+	if (!emp || !prg) {
+		return NULL;	// basic sanitation
+	}
+	if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
+		return goal;	// already on it
+	}
+	
+	CREATE(goal, struct empire_goal, 1);
+	goal->vnum = PRG_VNUM(prg);
+	goal->version = PRG_VERSION(prg);
+	goal->tracker = copy_requirements(PRG_TASKS(prg));
+	
+	HASH_ADD_INT(EMPIRE_GOALS(emp), vnum, goal);
+	refresh_one_goal_tracker(emp, goal);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	
+	return goal;
+}
+
+
+/**
+* Runs at startup to ensure no goals were deleted while the mud was down.
+*/
+void verify_empire_goals(void) {
+	empire_data *emp, *next_emp;
+	
+	struct empire_completed_goal *ecg, *next_ecg;
+	struct empire_goal *goal, *next_goal;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			if (!real_progress(goal->vnum)) {
+				cancel_empire_goal(emp, goal);
+			}
+		}
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+			if (!real_progress(ecg->vnum)) {
+				HASH_DEL(EMPIRE_COMPLETED_GOALS(emp), ecg);
+				free(ecg);
+			}
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE TRACKERS /////////////////////////////////////////////////////////
+
+/**
+* Empire Tracker: empire gains/loses coins
+*
+* @param empire_data *emp The empire.
+* @param int amount How many coins gained/lost
+*/
+void et_change_coins(empire_data *emp, int amount) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_GET_COINS) {
+				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			}
+		}
+	}
+}
+
+
+/**
+* Empire Tracker: empire gets a building
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The building vnum.
+*/
+void et_gain_building(empire_data *emp, any_vnum vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				++task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			}
+		}
+	}
+}
+
+
+/**
+* Empire Tracker: empire gets a vehicle
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The vehicle vnum.
+*/
+void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+				++task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			}
+		}
+	}
+}
+
+
+/**
+* Empire Tracker: empire obtains/loses items
+*
+* @param empire_data *emp The empire.
+* @param obj_data *obj The item.
+* @param int amount How many of it (may be positive or negative).
+*/
+void et_get_obj(empire_data *emp, obj_data *obj, int amount) {
+	struct empire_goal *goal, *next;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
+				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			}
+			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
+				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			}
+			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
+				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			}
+		}
+	}
+}
+
+
+/**
+* Empire Tracker: empire loses/dismantles a building
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The building vnum.
+*/
+void et_lose_building(empire_data *emp, any_vnum vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				--task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+		}
+	}
+}
+
+
+/**
+
+* Empire Tracker: empire gets a building
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The vehicle vnum.
+*/
+void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+				--task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+		}
 	}
 }
 
@@ -811,8 +1481,6 @@ void save_olc_progress(descriptor_data *desc) {
 * @return progress_data* The copied progress.
 */
 progress_data *setup_olc_progress(progress_data *input) {
-	extern struct req_data *copy_requirements(struct req_data *from);
-	
 	progress_data *new;
 	
 	CREATE(new, progress_data, 1);

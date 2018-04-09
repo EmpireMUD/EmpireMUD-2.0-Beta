@@ -2848,6 +2848,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
 		
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
+			et_lose_vehicle(emp, VEH_VNUM(veh));
 		}
 	}
 }
@@ -3222,6 +3223,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 		
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
+			et_gain_vehicle(emp, VEH_VNUM(veh));
 		}
 	}
 }
@@ -3555,7 +3557,7 @@ ACMD(do_diplomacy) {
 		}
 		
 		if (war_cost > 0) {
-			EMPIRE_COINS(ch_emp) -= war_cost;
+			increase_empire_coins(ch_emp, ch_emp, -war_cost);
 		}
 		
 		*ch_log = '\0';	// leave trailing punctuation off of ch_log (for war cost)
@@ -4065,6 +4067,8 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
+	void refresh_empire_goals(empire_data *emp);
+	
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
@@ -4309,6 +4313,10 @@ ACMD(do_enroll) {
 			
 			// Delete the old empire
 			delete_empire(old);
+			
+			// update goal trackers
+			refresh_empire_goals(e);
+			
 			save_empire(e, TRUE);
 		}
 		
@@ -5404,29 +5412,42 @@ ACMD(do_progress) {
 	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 	extern const char *progress_types[];
 	
-	char buf[MAX_STRING_LENGTH * 2];
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *ptr;
+	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES];
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_completed_goal *ecg, *next_ecg;
-	struct empire_goal *goal;
+	struct empire_goal *goal, *next_goal;
 	progress_data *prg;
-	int cat;
-	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES];
+	int cat, total;
 	
+	strcpy(buf, argument);
+	if (*argument && imm_access) {
+		ptr = any_one_word(argument, arg);
+		if ((emp = get_empire_by_name(arg))) {
+			// WAS an empire
+			argument = ptr;
+		}
+		else {
+			// was not an empire arg
+			strcpy(argument, buf);	// same length as before
+			emp = GET_LOYALTY(ch);
+		}
+	}
 	skip_spaces(&argument);
 	
 	if (IS_NPC(ch) || !emp) {
 		msg_to_char(ch, "You need to be in an empire to check progress.\r\n");
 	}
 	else if (!*argument) {
-		msg_to_char(ch, "%s%s\t0 has %d progress points available (%d total earned).\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), 0, 0);
-		msg_to_char(ch, "Goals\r\n");
-		
 		// show current categories and their goal counts
+		total = 0;
 		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
 			counts[cat] = 0;
 			compl[cat] = 0;
+			total += EMPIRE_PROGRESS_POINTS(emp, cat);
 		}
-		LL_FOREACH(EMPIRE_GOALS(emp), goal) {
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 			if ((prg = real_progress(goal->vnum))) {
 				++counts[PRG_TYPE(prg)];
 			}
@@ -5436,8 +5457,12 @@ ACMD(do_progress) {
 				++compl[PRG_TYPE(prg)];
 			}
 		}
+		
+		msg_to_char(ch, "%s%s\t0 has %d progress points available (%d total earned).\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_PROGRESS_POOL(emp), total);
+		msg_to_char(ch, "Goals:\r\n");
+		
 		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
-			msg_to_char(ch, " %s: %d current goal%s, %d completed\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat]);
+			msg_to_char(ch, " %s (%d): %d current goal%s, %d completed\r\n", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat), counts[cat], PLURAL(counts[cat]), compl[cat]);
 		}
 	}
 	else if ((cat = search_block(argument, progress_types, FALSE))) {

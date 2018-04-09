@@ -163,8 +163,7 @@ int mob_coins(char_data *mob) {
 		
 		if ((emp = GET_LOYALTY(mob))) {
 			amt = MIN(amt, EMPIRE_COINS(emp));
-			EMPIRE_COINS(emp) -= amt;
-			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			increase_empire_coins(emp, emp, -amt);
 		}
 	}
 	

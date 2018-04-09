@@ -307,6 +307,7 @@ void boot_db(void) {
 	void sort_commands();
 	void startup_room_reset();
 	void update_instance_world_size();
+	void verify_empire_goals();
 	void verify_sectors();
 
 	log("Boot db -- BEGIN.");
@@ -410,6 +411,8 @@ void boot_db(void) {
 	reread_empire_tech(NULL);
 	check_for_new_map();
 	setup_island_levels();
+	verify_empire_goals();
+	need_progress_refresh = TRUE;
 	
 	log(" Checking for ruined cities...");
 	check_ruined_cities();

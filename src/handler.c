@@ -2735,10 +2735,12 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 	
 	if (amount < 0) {
 		SAFE_ADD(EMPIRE_COINS(emp_gaining), amount, 0, MAX_COIN, FALSE);
+		et_change_coins(emp_gaining, amount);
 	}
 	else {
 		if ((local = exchange_coin_value(amount, coin_empire, emp_gaining)) > 0) {
 			SAFE_ADD(EMPIRE_COINS(emp_gaining), local, 0, MAX_COIN, FALSE);
+			et_change_coins(emp_gaining, local);
 		}
 	}
 
@@ -2787,6 +2789,7 @@ void perform_abandon_room(room_data *room) {
 		// quest tracker for members
 		if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 			qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+			et_lose_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 		}
 	}
 	
@@ -2850,6 +2853,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	
 	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+		et_gain_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 	
 	// claimed rooms are never unloadable anyway
@@ -7176,6 +7180,8 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 	
 	isle->store_is_sorted = FALSE;
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	
+	et_get_obj(emp, obj_proto(vnum), amount);
 }
 
 

@@ -971,7 +971,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // EATT_x: empire attributes
-#define EATT_TERRITORY_PER_GREATNESS  0	// how many you get each
+#define EATT_PROGRESS_POOL  0	// spendable progress points
 #define EATT_CITY_POINTS  1	// bonus city points
 #define NUM_EMPIRE_ATTRIBUTES  2	// total
 
@@ -1038,6 +1038,7 @@ typedef struct vehicle_data vehicle_data;
 #define ELOG_LOGINS  7	// login/out/alt (does not save to file)
 #define ELOG_SHIPPING  8	// shipments via do_ship
 #define ELOG_WORKFORCE  9	// reporting related to workforce (does not echo, does not display unless requested)
+#define ELOG_PROGRESS  10	// empire progression goals
 
 
 // ENEED_x: empire need types
@@ -2072,8 +2073,11 @@ typedef struct vehicle_data vehicle_data;
 
 // PROGRESS_x: progress types
 #define PROGRESS_UNDEFINED  0	// base/unset
-#define PROGRESS_COMMERCE  1
-#define NUM_PROGRESS_TYPES  2	// total
+#define PROGRESS_COMMUNITY  1
+#define PROGRESS_INDUSTRY  2
+#define PROGRESS_DEFENSE  3
+#define PROGRESS_PROGRESS  4
+#define NUM_PROGRESS_TYPES  5	// total
 
 
 // PRG_x: progress flags
@@ -4099,7 +4103,7 @@ struct empire_goal {
 	ush_int version;	// for auto-updating
 	struct req_data *tracker;	// tasks to track
 	
-	struct empire_goal *next;	// linked list
+	UT_hash_handle hh;	// hashed by vnum
 };
 
 
@@ -4295,6 +4299,7 @@ struct empire_data {
 	char *rank[MAX_RANKS];	// Name of each rank
 	
 	int attributes[NUM_EMPIRE_ATTRIBUTES];	// misc attributes
+	int progress_points[NUM_PROGRESS_TYPES];	// empire's points in each category
 	bitvector_t admin_flags;	// EADM_
 	bitvector_t frontier_traits;	// ETRAIT_
 	double coins;	// total coins (always in local currency)
@@ -4308,7 +4313,7 @@ struct empire_data {
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
 	struct offense_data *offenses;
-	struct empire_goal *goals;	// current goal trackers
+	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	
 	// unsaved data

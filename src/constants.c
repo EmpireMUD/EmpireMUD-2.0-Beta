@@ -1621,6 +1621,7 @@ const char *empire_log_types[] = {
 	"Logins",
 	"Shipping",
 	"Workforce",
+	"Progress",
 	"\n"
 };
 
@@ -1637,6 +1638,7 @@ const bool show_empire_log_type[] = {
 	TRUE,	// logins
 	FALSE,	// shipments
 	FALSE,	// workforce
+	TRUE,	// progress
 };
 
 
@@ -1652,6 +1654,7 @@ const bool empire_log_request_only[] = {
 	TRUE,	// logins
 	FALSE,	// shipments
 	TRUE,	// workforce
+	TRUE,	// progress
 };
 
 
@@ -1666,7 +1669,7 @@ const char *empire_admin_flags[] = {
 
 // EATT_x (1/2): empire attributes
 const char *empire_attributes[] = {
-	"Territory per Greatness",
+	"Progress Pool",
 	"City Points",
 	"\n"
 };
@@ -1674,8 +1677,8 @@ const char *empire_attributes[] = {
 
 // EATT_x (2/2): defaults for empire attributes
 const int empire_attribute_defaults[NUM_EMPIRE_ATTRIBUTES] = {
-	15,
-	1
+	0,	// progress pool
+	1,	// city points
 };
 
 
@@ -2570,7 +2573,10 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 // PROGRESS_x: progress types
 const char *progress_types[] = {
 	"UNDEFINED",
-	"Commerce",
+	"Community",
+	"Industry",
+	"Defense",
+	"Progress",
 	"\n"
 };
 

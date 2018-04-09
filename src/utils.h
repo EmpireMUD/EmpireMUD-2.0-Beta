@@ -543,6 +543,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_NEEDS_LOGS_SAVE(emp)  ((emp)->needs_logs_save)
 #define EMPIRE_NEEDS_STORAGE_SAVE(emp)  ((emp)->needs_storage_save)
 #define EMPIRE_NEXT_TIMEOUT(emp)  ((emp)->next_timeout)
+#define EMPIRE_PROGRESS_POINTS(emp, type)  ((emp)->progress_points[(type)])
+#define EMPIRE_PROGRESS_POOL(emp)  EMPIRE_ATTRIBUTE((emp), EATT_PROGRESS_POOL)
 #define EMPIRE_GREATNESS(emp)  ((emp)->greatness)
 #define EMPIRE_TECH(emp, num)  ((emp)->tech[(num)])
 #define EMPIRE_MEMBERS(emp)  ((emp)->members)
@@ -1694,6 +1696,14 @@ void qt_triggered_task(char_data *ch, any_vnum vnum);
 void qt_untrigger_task(char_data *ch, any_vnum vnum);
 void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
+
+// utils from progress.c
+void et_change_coins(empire_data *emp, int amount);
+void et_gain_building(empire_data *emp, any_vnum vnum);
+void et_gain_vehicle(empire_data *emp, any_vnum vnum);
+void et_get_obj(empire_data *emp, obj_data *obj, int amount);
+void et_lose_building(empire_data *emp, any_vnum vnum);
+void et_lose_vehicle(empire_data *emp, any_vnum vnum);
 
 // utils from vehicles.c
 extern char *get_vehicle_name_by_proto(obj_vnum vnum);

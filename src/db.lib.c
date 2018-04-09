@@ -1859,7 +1859,7 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
-	void free_empire_goals(struct empire_goal *list);
+	void free_empire_goals(struct empire_goal *hash);
 	void free_empire_completed_goals(struct empire_completed_goal *hash);
 	
 	struct workforce_delay_chore *wdc, *next_wdc;
@@ -2422,7 +2422,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 			}
 			case 'G': {	// goals (sub-divided by a 2nd letter)
 				switch (*(line + 1)) {
-					case 'C': {	// completed
+					case 'C': {	// GC: completed
 						if (sscanf(line, "GC %d %ld", &t[0], &long_in) != 2) {
 							log("SYSERR: Format error in GC line of empire %d", vnum);
 							// non-fatal
@@ -2438,22 +2438,37 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						ecg->when = long_in;
 						break;
 					}
-					case 'G': {	// goal in progress
+					case 'G': {	// GG: goal in progress
 						if (sscanf(line, "GG %d %d", &t[0], &t[1]) != 2) {
 							log("SYSERR: Format error in GG line of empire %d", vnum);
 							// fatal because it could mess up trackers
 							exit(1);
 						}
 						
-						CREATE(egoal, struct empire_goal, 1);
-						egoal->vnum = t[0];
+						HASH_FIND_INT(EMPIRE_GOALS(emp), &t[0], egoal);
+						if (!egoal) {
+							CREATE(egoal, struct empire_goal, 1);
+							egoal->vnum = t[0];
+							HASH_ADD_INT(EMPIRE_GOALS(emp), vnum, egoal);
+						}
 						egoal->version = t[1];
-						LL_APPEND(EMPIRE_GOALS(emp), egoal);
 						
 						last_egoal = egoal;
 						break;
 					}
-					case 'T': {	// tracker for last goal
+					case 'P': {	// GP: goal points (progress points)
+						if (sscanf(line, "GP %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GP line of empire %d", vnum);
+							// non-fatal
+							break;
+						}
+						
+						if (t[0] >= 0 && t[0] < NUM_PROGRESS_TYPES) {
+							EMPIRE_PROGRESS_POINTS(emp, t[0]) = t[1];
+						}
+						break;
+					}
+					case 'T': {	// GT: tracker for last goal
 						if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in) == 6) {
 							// found group
 						}
@@ -2682,11 +2697,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_completed_goal *ecg, *next_ecg;
+	struct empire_goal *egoal, *next_egoal;
 	struct empire_needs *need, *next_need;
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
 	struct empire_npc_data *npc;
-	struct empire_goal *egoal;
 	struct req_data *task;
 	int iter;
 
@@ -2732,7 +2747,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	fprintf(fl, "E\n%s %.1f\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), EMPIRE_COINS(emp));
 	
 	// G: progression goals, tasks, and completed
-	LL_FOREACH(EMPIRE_GOALS(emp), egoal) {
+	HASH_ITER(hh, EMPIRE_GOALS(emp), egoal, next_egoal) {
 		// GG goal in progress
 		fprintf(fl, "GG %d %d\n", egoal->vnum, egoal->version);
 		
@@ -2744,6 +2759,12 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
 		// GC completed goal
 		fprintf(fl, "GC %d %ld\n", ecg->vnum, ecg->when);
+	}
+	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+		// GP goal points (progress points)
+		if (EMPIRE_PROGRESS_POINTS(emp, iter)) {
+			fprintf(fl, "GP %d %d\n", iter, EMPIRE_PROGRESS_POINTS(emp, iter));
+		}
 	}
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {

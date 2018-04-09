@@ -410,6 +410,12 @@ void perform_morph(char_data *ch, morph_data *morph);
 
 // objsave.c
 
+// progress.c
+void cancel_empire_goal(empire_data *emp, struct empire_goal *goal);
+extern struct empire_goal *get_current_goal(empire_data *emp, any_vnum vnum);
+extern time_t empire_has_completed_goal(empire_data *emp, any_vnum vnum);
+
+
 /**
 * This crash-saves all players in the game.
 */

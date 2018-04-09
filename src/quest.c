@@ -56,7 +56,7 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern struct req_data *copy_requirements(struct req_data *from);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+void count_quest_tasks(struct req_data *list, int *complete, int *total);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
@@ -1300,7 +1300,7 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 			continue;
 		}
 		
-		count_quest_tasks(pq, &complete, &total);
+		count_quest_tasks(pq->tracker, &complete, &total);
 		if (complete < total) {
 			continue;
 		}
@@ -1354,7 +1354,7 @@ bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_li
 			continue;	// room permissions
 		}
 		
-		count_quest_tasks(pq, &complete, &total);
+		count_quest_tasks(pq->tracker, &complete, &total);
 		if (complete < total) {
 			continue;
 		}
@@ -1415,7 +1415,7 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 				continue;
 			}
 		
-			count_quest_tasks(pq, &complete, &total);
+			count_quest_tasks(pq->tracker, &complete, &total);
 			if (complete < total) {
 				continue;
 			}
@@ -1891,6 +1891,7 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 		return;
 	}
 	
+	// player trackers
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_KILL_MOB_FLAGGED && (MOB_FLAGS(mob) & task->misc) == task->misc) {
@@ -1898,6 +1899,23 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 			}
 			else if (task->type == REQ_KILL_MOB && GET_MOB_VNUM(mob) == task->vnum) {
 				++task->current;
+			}
+		}
+	}
+	
+	// empire trackers
+	if (GET_LOYALTY(ch)) {
+		struct empire_goal *goal, *next_goal;
+		HASH_ITER(hh, EMPIRE_GOALS(GET_LOYALTY(ch)), goal, next_goal) {
+			LL_FOREACH(goal->tracker, task) {
+				if (task->type == REQ_KILL_MOB_FLAGGED && (MOB_FLAGS(mob) & task->misc) == task->misc) {
+					++task->current;
+					EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+				}
+				else if (task->type == REQ_KILL_MOB && GET_MOB_VNUM(mob) == task->vnum) {
+					++task->current;
+					EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+				}
 			}
 		}
 	}
