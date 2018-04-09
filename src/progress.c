@@ -1020,7 +1020,7 @@ void smart_copy_progress_perks(struct progress_perk **to_list, struct progress_p
 // Complex sorter for sorted_progress
 int sort_progress_by_data(progress_data *a, progress_data *b) {
 	if (PRG_TYPE(a) != PRG_TYPE(b)) {
-		return PRG_TYPE(a) = PRG_TYPE(b);
+		return PRG_TYPE(a) - PRG_TYPE(b);
 	}
 	else if (PRG_FLAGGED(a, PRG_PURCHASABLE) != PRG_FLAGGED(b, PRG_PURCHASABLE)) {
 		return PRG_FLAGGED(a, PRG_PURCHASABLE) ? 1 : -1;
