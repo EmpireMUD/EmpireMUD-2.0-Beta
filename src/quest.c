@@ -354,6 +354,64 @@ char *get_quest_name_by_proto(any_vnum vnum) {
 
 
 /**
+* Builds the tracker display for requirements.
+*
+* @param struct req_data *tracker The tracker to show.
+* @param char *save_buffer The string to save it to.
+*/
+void get_tracker_display(struct req_data *tracker, char *save_buffer) {
+	extern const bool requirement_amt_type[];
+	
+	int lefthand, count = 0, sub = 0;
+	char buf[MAX_STRING_LENGTH];
+	struct req_data *task;
+	char last_group = 0;
+	
+	*save_buffer = '\0';
+	
+	LL_FOREACH(tracker, task) {
+		if (last_group != task->group) {
+			if (task->group) {
+				sprintf(save_buffer + strlen(save_buffer), "  %sAll of:\r\n", (count > 0 ? "or " : ""));
+			}
+			last_group = task->group;
+			sub = 0;
+		}
+		
+		++count;	// total iterations
+		++sub;	// iterations inside this sub-group
+		
+		// REQ_AMT_x: display based on amount type
+		switch (requirement_amt_type[task->type]) {
+			case REQ_AMT_NUMBER: {
+				lefthand = task->current;
+				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
+				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
+				sprintf(buf, " (%d/%d)", lefthand, task->needed);
+				break;
+			}
+			case REQ_AMT_REPUTATION:
+			case REQ_AMT_THRESHOLD:
+			case REQ_AMT_NONE: {
+				if (task->current >= task->needed) {
+					strcpy(buf, " (complete)");
+				}
+				else {
+					strcpy(buf, " (not complete)");
+				}
+				break;
+			}
+			default: {
+				*buf = '\0';
+				break;
+			}
+		}
+		sprintf(save_buffer + strlen(save_buffer), "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE), buf);
+	}
+}
+
+
+/**
 * Gets standard string display like "4x lumber" for a quest giver (starts/ends
 * at).
 *

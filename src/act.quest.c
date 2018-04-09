@@ -576,54 +576,11 @@ char *show_daily_quest_line(char_data *ch) {
 * @param struct player_quest *pq The quest to show the tracker for.
 */
 void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	extern const bool requirement_amt_type[];
-	
-	int lefthand, count = 0, sub = 0;
+	void get_tracker_display(struct req_data *tracker, char *save_buffer);
 	char buf[MAX_STRING_LENGTH];
-	struct req_data *task;
-	char last_group = 0;
 	
-	msg_to_char(ch, "Quest Tracker:\r\n");
-	
-	LL_FOREACH(pq->tracker, task) {
-		if (last_group != task->group) {
-			if (task->group) {
-				msg_to_char(ch, "  %sAll of:\r\n", (count > 0 ? "or " : ""));
-			}
-			last_group = task->group;
-			sub = 0;
-		}
-		
-		++count;	// total iterations
-		++sub;	// iterations inside this sub-group
-		
-		// REQ_AMT_x: display based on amount type
-		switch (requirement_amt_type[task->type]) {
-			case REQ_AMT_NUMBER: {
-				lefthand = task->current;
-				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
-				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
-				sprintf(buf, " (%d/%d)", lefthand, task->needed);
-				break;
-			}
-			case REQ_AMT_REPUTATION:
-			case REQ_AMT_THRESHOLD:
-			case REQ_AMT_NONE: {
-				if (task->current >= task->needed) {
-					strcpy(buf, " (complete)");
-				}
-				else {
-					strcpy(buf, " (not complete)");
-				}
-				break;
-			}
-			default: {
-				*buf = '\0';
-				break;
-			}
-		}
-		msg_to_char(ch, "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE), buf);
-	}
+	get_tracker_display(pq->tracker, buf);
+	msg_to_char(ch, "Quest Tracker:\r\n%s", buf);
 }
 
 

@@ -5410,16 +5410,18 @@ ACMD(do_pledge) {
 
 ACMD(do_progress) {
 	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
+	void get_tracker_display(struct req_data *tracker, char *save_buffer);
 	extern const char *progress_types[];
 	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *ptr;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], *ptr;
 	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES];
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct empire_goal *goal, *next_goal;
 	progress_data *prg;
 	int cat, total;
+	size_t size;
 	
 	strcpy(buf, argument);
 	if (*argument && imm_access) {
@@ -5438,6 +5440,9 @@ ACMD(do_progress) {
 	
 	if (IS_NPC(ch) || !emp) {
 		msg_to_char(ch, "You need to be in an empire to check progress.\r\n");
+	}
+	else if (!ch->desc) {
+		// nothing to compute/show
 	}
 	else if (!*argument) {
 		// show current categories and their goal counts
@@ -5458,12 +5463,22 @@ ACMD(do_progress) {
 			}
 		}
 		
-		msg_to_char(ch, "%s%s\t0 has %d progress points available (%d total earned).\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_PROGRESS_POOL(emp), total);
-		msg_to_char(ch, "Goals:\r\n");
+		size = snprintf(buf, sizeof(buf), "%s%s\t0 has %d progress points available (%d total earned).\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_PROGRESS_POOL(emp), total);
 		
-		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
-			msg_to_char(ch, " %s (%d): %d current goal%s, %d completed\r\n", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat), counts[cat], PLURAL(counts[cat]), compl[cat]);
+		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
+			snprintf(line, sizeof(line), " %s (%d): %d current goal%s, %d completed\r\n", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat), counts[cat], PLURAL(counts[cat]), compl[cat]);
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+				break;
+			}
 		}
+		
+		page_string(ch->desc, buf, TRUE);
 	}
 	else if ((cat = search_block(argument, progress_types, FALSE))) {
 		// show current progress in that category
@@ -5471,7 +5486,14 @@ ACMD(do_progress) {
 	}
 	else if ((prg = find_current_progress_goal_by_name(emp, argument))) {
 		// show 1 goal
-		msg_to_char(ch, "goal view incomplete\r\n");
+		msg_to_char(ch, "%s\r\n%s", PRG_NAME(prg), PRG_DESCRIPTION(prg));
+		
+		// TODO show cost/value/rewards
+		
+		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
+			get_tracker_display(goal->tracker, buf);
+			msg_to_char(ch, "Progress:\r\n%s", buf);
+		}
 	}
 	else if (is_abbrev(argument, "completed")) {
 		// show completed goals (optionally: by category)
