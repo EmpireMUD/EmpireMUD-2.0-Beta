@@ -56,7 +56,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 void complete_goal(empire_data *emp, struct empire_goal *goal);
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
-void refresh_empire_goals(empire_data *emp);
+void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
 struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
 
@@ -387,7 +387,7 @@ void check_progress_refresh(void) {
 		empire_data *emp, *next_emp;
 		
 		HASH_ITER(hh, empire_table, emp, next_emp) {
-			refresh_empire_goals(emp);
+			refresh_empire_goals(emp, FALSE);
 		}
 		
 		need_progress_refresh = FALSE;
@@ -543,8 +543,9 @@ void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by
 * Refreshes the goals and checks progress on them, for 1 empire.
 *
 * @param empire_data *emp The empire to refresh.
+* @param any_vnum only_vnum Optional: If provided, only checks and refreshes 1 goal (NOTHING = all vnums).
 */
-void refresh_empire_goals(empire_data *emp) {
+void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 	struct empire_completed_goal *ecg;
 	progress_data *prg, *next_prg;
 	struct empire_goal *goal;
@@ -559,6 +560,10 @@ void refresh_empire_goals(empire_data *emp) {
 	// check all goals
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		vnum = PRG_VNUM(prg);
+		if (only_vnum != NOTHING && only_vnum != vnum) {
+			continue;
+		}
+		
 		goal = get_current_goal(emp, vnum);	// maybe -- if they have the goal already
 		skip = FALSE;
 		
@@ -574,6 +579,7 @@ void refresh_empire_goals(empire_data *emp) {
 		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
 			HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
 			if (ecg) {
+				apply_progress_to_empire(emp, prg, FALSE);	// strip perks
 				HASH_DEL(EMPIRE_COMPLETED_GOALS(emp), ecg);
 				free(ecg);
 			}
@@ -1431,11 +1437,19 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 void save_olc_progress(descriptor_data *desc) {	
 	progress_data *proto, *prg = GET_OLC_PROGRESS(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	empire_data *emp, *next_emp;
 	UT_hash_handle hh, sorted;
 
 	// have a place to save it?
 	if (!(proto = real_progress(vnum))) {
 		proto = create_progress_table_entry(vnum);
+	}
+	
+	// existing empires: strip perks if they have them
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (empire_has_completed_goal(emp, vnum)) {
+			apply_progress_to_empire(emp, proto, FALSE);
+		}
 	}
 	
 	// free prototype strings and pointers
@@ -1471,6 +1485,17 @@ void save_olc_progress(descriptor_data *desc) {
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_PRG, vnum);
+	
+	// existing empires: update all trackers
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (empire_has_completed_goal(emp, vnum)) {
+			// re-apply even if it will be removed
+			apply_progress_to_empire(emp, proto, TRUE);
+		}
+		
+		// trigger a full refresh
+		refresh_empire_goals(emp, vnum);
+	}
 }
 
 

@@ -4067,7 +4067,7 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
-	void refresh_empire_goals(empire_data *emp);
+	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
@@ -4315,7 +4315,7 @@ ACMD(do_enroll) {
 			delete_empire(old);
 			
 			// update goal trackers
-			refresh_empire_goals(e);
+			refresh_empire_goals(e, NOTHING);
 			
 			save_empire(e, TRUE);
 		}

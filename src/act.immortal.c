@@ -648,6 +648,8 @@ ADMIN_UTIL(util_redo_islands) {
 
 
 ADMIN_UTIL(util_rescan) {
+	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
+	
 	empire_data *emp;
 	
 	if (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES)) {
@@ -667,6 +669,7 @@ ADMIN_UTIL(util_rescan) {
 	else {
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
 		reread_empire_tech(emp);
+		refresh_empire_goals(emp, NOTHING);
 		send_config_msg(ch, "ok_string");
 	}
 }
