@@ -5468,6 +5468,7 @@ ACMD(do_pledge) {
 
 ACMD(do_progress) {
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
+	extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 	extern progress_data *find_progress_goal_by_name(char *name);
 	void get_progress_perks_display(struct progress_perk *list, char *save_buffer);
@@ -5480,7 +5481,7 @@ ACMD(do_progress) {
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct empire_goal *goal, *next_goal;
 	int cat, total, complete, num;
-	progress_data *prg;
+	progress_data *prg, *next_prg;
 	size_t size;
 	time_t when;
 	bool any;
@@ -5591,6 +5592,38 @@ ACMD(do_progress) {
 		
 		page_string(ch->desc, buf, TRUE);
 	}
+	else if (is_abbrev(arg, "completed")) {
+		// check category request
+		cat = *arg2 ? search_block(arg2, progress_types, FALSE) : NOTHING;
+		if (cat == PROGRESS_UNDEFINED) {
+			cat = NOTHING;
+		}
+		
+		show_completed_goals(ch, emp, cat);
+	}
+	else if (is_abbrev(arg, "purchase") || !str_cmp(arg, "buy")) {
+		if (!*arg2) {	// display all purchasable goals
+			size = snprintf(buf, sizeof(buf), "Available progression goals:\r\n");
+			
+			HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
+				if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+					continue;
+				}
+				if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+					continue;
+				}
+				if (!empire_meets_goal_prereqs(emp, prg)) {
+					continue;
+				}
+				
+				// seems ok
+				snprintf(line, sizeof(line), " %s (%d point%s)", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+				// TODO working here
+			}
+			
+			return;
+		}
+	}
 	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument))) {
 		// show 1 goal
 		msg_to_char(ch, "%s\r\n%s", PRG_NAME(prg), NULLSAFE(PRG_DESCRIPTION(prg)));
@@ -5602,7 +5635,7 @@ ACMD(do_progress) {
 			msg_to_char(ch, "Cost: %d point%s\r\n", PRG_COST(prg), PLURAL(PRG_COST(prg)));
 		}
 		
-		if ((when = empire_has_completed_goal(emp, PRG_VNUM(prg)))) {
+		if ((when = when_empire_completed_goal(emp, PRG_VNUM(prg))) > 0) {
 			when = time(0) - when;	// diff
 			if ((when / SECS_PER_REAL_DAY) >= 1) {
 				num = round((double)when / SECS_PER_REAL_DAY);
@@ -5626,17 +5659,6 @@ ACMD(do_progress) {
 			msg_to_char(ch, "Progress:\r\n%s", buf);
 		}
 	}
-	else if (is_abbrev(arg, "completed")) {
-		// check category request
-		cat = *arg2 ? search_block(arg2, progress_types, FALSE) : NOTHING;
-		if (cat == PROGRESS_UNDEFINED) {
-			cat = NOTHING;
-		}
-		
-		show_completed_goals(ch, emp, cat);
-	}
-	
-	// TODO purchase
 	
 	else {
 		msg_to_char(ch, "Unknown progress command or goal '%s'.\r\n", argument);

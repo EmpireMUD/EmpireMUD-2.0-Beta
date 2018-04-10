@@ -484,21 +484,20 @@ void complete_goal(empire_data *emp, struct empire_goal *goal) {
 
 
 /**
-* Determines if an empire has already completed a goal and returns the time-
-* stamp if so.
+* Determines if an empire has already completed a goal.
 *
 * @param empire_data *emp Which empire.
 * @param any_vnum vnum Which progression goal.
-* @return time_t timestamp if they have completed it, 0 (FALSE) if not.
+* @return bool TRUE if they have, FALSE if not.
 */
-time_t empire_has_completed_goal(empire_data *emp, any_vnum vnum) {
+bool empire_has_completed_goal(empire_data *emp, any_vnum vnum) {
 	struct empire_completed_goal *ecg;
 	
 	if (emp && vnum != NOTHING) {
 		HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
-		return ecg ? ecg->when : 0;
+		return ecg ? TRUE : FALSE;
 	}
-	return 0;
+	return FALSE;
 }
 
 
@@ -832,6 +831,25 @@ void verify_empire_goals(void) {
 			}
 		}
 	}
+}
+
+
+/**
+* Determines if an empire has already completed a goal and returns the time-
+* stamp if so.
+*
+* @param empire_data *emp Which empire.
+* @param any_vnum vnum Which progression goal.
+* @return time_t timestamp if they have completed it, 0 (FALSE) if not.
+*/
+time_t when_empire_completed_goal(empire_data *emp, any_vnum vnum) {
+	struct empire_completed_goal *ecg;
+	
+	if (emp && vnum != NOTHING) {
+		HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
+		return ecg ? ecg->when : 0;
+	}
+	return 0;
 }
 
 
@@ -1786,6 +1804,9 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	size += snprintf(buf + size, sizeof(buf) - size, "%s", NULLSAFE(PRG_DESCRIPTION(prg)));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+	
+	sprintbit(PRG_FLAGS(prg), progress_flags, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
 	get_progress_list_display(PRG_PREREQS(prg), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Prerequisites:\r\n%s", *part ? part : " none\r\n");
