@@ -165,6 +165,32 @@ progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name) 
 
 
 /**
+* Finds a goal from the list. This allows multi-word abbrevs, and  prefers
+* exact matches.
+*
+* @param char *name The name to look for.
+*/
+progress_data *find_progress_goal_by_name(char *name) {
+	progress_data *prg, *next_prg, *partial = NULL;
+	
+	if (!*name) {
+		return NULL;
+	}
+	
+	HASH_ITER(hh, sorted_progress, prg, next_prg) {
+		if (!str_cmp(name, PRG_NAME(prg))) {
+			return prg;	// exact match
+		}
+		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
+			partial = prg;
+		}
+	}
+	
+	return partial;	// if any
+}
+
+
+/**
 * Quick way to turn a vnum into a name, safely.
 *
 * @param any_vnum vnum The progression vnum to look up.
