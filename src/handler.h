@@ -312,10 +312,10 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 
 // storage handlers
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
-extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list);
+extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool use_kept, struct resource_data **build_used_list);
 extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
-extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount);
+extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool include_kept);
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
 extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);
@@ -409,6 +409,12 @@ extern int limit_crowd_control(char_data *victim, int atype);
 void perform_morph(char_data *ch, morph_data *morph);
 
 // objsave.c
+
+// progress.c
+void cancel_empire_goal(empire_data *emp, struct empire_goal *goal);
+extern struct empire_goal *get_current_goal(empire_data *emp, any_vnum vnum);
+extern time_t empire_has_completed_goal(empire_data *emp, any_vnum vnum);
+
 
 /**
 * This crash-saves all players in the game.

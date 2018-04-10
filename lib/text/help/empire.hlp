@@ -1489,6 +1489,7 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce where [here]
         workforce why [chore | location | here]
         workforce copy <island name>
+        workforce keep <item name>
 
 Once at least one member of an empire has the Workforce ability, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1512,7 +1513,8 @@ limit on each island. Not all chores use the numeric limit (for example, the
 abandon-* toggles don't use the limit).
 
 You can use the "workforce copy" command to copy the workforce limit
-configuration of another island into the island you are currently in.
+configuration of another island into the island you are currently in. Using
+"workforce keep" will prevent your workforce from using any of an item.
 
 Note: Your workforce will only do chores if your empire has less than 200 of
 the resource provided by the chore. For example, miners won't do any work in
@@ -1529,7 +1531,8 @@ The Workforce ability gains experience when most workforce chores are done
 The Skilled Labor ability gains experience when skilled chores are done while
 you are online.
 
-See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK
+See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
+          WORKFORCE KEEP
 #
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
@@ -1573,6 +1576,23 @@ Items marked (skilled) require the Skilled Labor ability. Skilled Labor chores
 tend to cost more food.
 
 See also: EXARCH CRAFTS, WORKFORCE
+#
+"WORKFORCE KEEP"
+
+Usage:  workforce keep <item name>
+
+This command will prevent your workers from using/eating an item in your
+empire's inventory. You can specify more than one keyword if you're having
+trouble targeting the right item.
+
+This command only affects the island you are currently on. Using this command
+again on the item will turn off 'keep'.
+
+Examples:
+ > workforce keep stick
+ > workforce keep spruce lumber
+
+See also: WORKFORCE
 #
 "WORKFORCE NO-WORK" "WORKFORCE NOWORK" NO-WORK NOWORK
 

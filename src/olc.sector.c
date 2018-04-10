@@ -144,6 +144,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	descriptor_data *desc;
 	adv_data *adv, *next_adv;
@@ -227,6 +228,17 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		}
 	}
 	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_VISIT_SECTOR, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
+		}
+	}
+	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_VISIT_SECTOR, vnum);
@@ -262,6 +274,14 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	
 			if (found) {
 				msg_to_desc(desc, "One or more linking rules have been removed from the adventure you are editing.\r\n");
+			}
+		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_VISIT_SECTOR, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A sector used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
@@ -309,6 +329,7 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	struct evolution_data *evo;
 	sector_data *real, *sect, *next_sect;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	adv_data *adv, *next_adv;
 	int size, found;
@@ -337,6 +358,20 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 					break;
 				}
 			}
+		}
+	}
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_SECTOR, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	

@@ -303,6 +303,7 @@ ACMD(do_poofset);
 ACMD(do_portal);
 ACMD(do_pour);
 ACMD(do_prick);
+ACMD(do_progress);
 ACMD(do_promote);
 ACMD(do_prompt);
 ACMD(do_prospect);
@@ -423,6 +424,7 @@ ACMD(do_tunnel);
 
 ACMD(do_unban);
 ACMD(do_unbind);
+ACMD(do_ungoal);
 ACMD(do_unharness);
 ACMD(do_unload_vehicle);
 ACMD(do_unpublicize);
@@ -874,6 +876,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "pour", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_POUR ),
 	STANDARD_CMD( "press", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_PRESS, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "prick", POS_FIGHTING, do_prick, NO_MIN, CTYPE_COMBAT, ABIL_PRICK ),
+	SIMPLE_CMD( "progress", POS_DEAD, do_progress, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "promote", POS_DEAD, do_promote, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "prompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_PROMPT ),
 	STANDARD_CMD( "prospect", POS_STANDING, do_prospect, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, ABIL_PROSPECT ),
@@ -1020,6 +1023,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	STANDARD_CMD( "unapprove", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_UNAPPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	GRANT_CMD( "unbind", POS_SLEEPING, do_unbind, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNBIND ),
+	GRANT_CMD( "ungoal", POS_DEAD, do_ungoal, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNGOAL ),
 	STANDARD_CMD( "unharness", POS_STANDING, do_unharness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
 	STANDARD_CMD( "unload", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),

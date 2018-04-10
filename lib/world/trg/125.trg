@@ -1,7 +1,7 @@
 #12500
 Board / climb colossus~
 0 c 0
-climb board enter~
+climb board enter up~
 if !(climb /= %cmd%)
   eval helper %%actor.char_target(%arg%)%%
   if %helper% != %self%
@@ -151,21 +151,21 @@ else
     set actor %self.fighting%
     %send% %actor% &r%self.name%'s lightning-charged punch smashes into you with a thunderous boom, sending you flying!
     %echoaround% %actor% %self.name%'s lightning-charged punch smashes into %actor.name% with a thunderous boom, sending %actor.himher% flying!
-    %damage% %actor% 600 physical
-    %damage% %actor% 400 magical
+    %damage% %actor% 500 physical
+    %damage% %actor% 350 magical
     dg_affect #12505 %actor% HARD-STUNNED on 15
     dg_affect #12505 %actor% DODGE -100 15
     dg_affect #12505 %actor% RESIST-PHYSICAL -50 15
     %echo% &rBlasts of lightning fly from the impact of %self.name%'s fist against the ground!
-    %aoe% 300 magical
+    %aoe% 150 magical
   else
     %echo% %self.name% draws back %self.hisher% right arm, lightning flickering around %self.hisher% clenched fist!
     wait 3 sec
     set actor %self.fighting%
     %send% %actor% &r%self.name%'s lightning-charged punch crashes into you, stunning you!
     %echoaround% %actor% %self.name%'s lightning-charged punch crashes into %actor.name%, stunning %actor.himher%!
-    %damage% %actor% 200 physical
-    %damage% %actor% 100 magical
+    %damage% %actor% 150 physical
+    %damage% %actor% 75 magical
     dg_affect #12505 %actor% STUNNED on 10
     dg_affect #12505 %actor% DODGE -50 10
   end
@@ -198,7 +198,7 @@ else
       * PC
       %send% %actor% &r%self.name%'s slashes at you with %self.hisher% retractable blade, rending your armor and causing mortal injury!
       %echoaround% %actor% %self.name%'s slashes at %actor.name% with %self.hisher% retractable blade, rending %actor.hisher% armor and causing mortal injury!
-      %damage% %actor% 1200 physical
+      %damage% %actor% 900 physical
       %dot% #12506 %actor% 1000 15 physical 1
       dg_affect #12506 %actor% RESIST-PHYSICAL -50 15
     else
@@ -214,7 +214,7 @@ else
     wait 3 sec
     %send% %actor% &r%self.name%'s slashes at you with %self.hisher% retractable blade, opening bleeding wounds!
     %echoaround% %actor% %self.name%'s slashes at %actor.name% with %self.hisher% retractable blade, opening bleeding wounds!
-    %damage% %actor% 400 physical
+    %damage% %actor% 300 physical
     %dot% #12506 %actor% 200 15 physical 1
     wait 1 sec
     %echo% %self.name%'s retractable blade slides back into its fist.
@@ -242,16 +242,16 @@ if %parts_destroyed% < 2
   while %cycle% <= 3
     wait 3 sec
     %echo% &r%self.name%'s missile barrage rains from the sky, exploding all around you!
-    %aoe% 200 physical
-    %aoe% 200 fire
+    %aoe% 125 physical
+    %aoe% 125 fire
     eval cycle %cycle% + 1
   done
 else
   %echo% %self.name%'s shoulder-mounted cannons fire a barrage of fiery projectiles into the sky!
   wait 3 sec
   %echo% &r%self.name%'s missile barrage rains from the sky, exploding all around you!
-  %aoe% 100 physical
-  %aoe% 100 fire
+  %aoe% 50 physical
+  %aoe% 50 fire
 end
 ~
 #12508
@@ -315,7 +315,7 @@ else
     set actor %self.fighting%
     %send% %actor% &r%self.name% brings %self.hisher% foot down on top of you with an earth-shaking crash!
     %echoaround% %actor% %self.name% brings %self.hisher% foot down on top of %actor.name% with an earth-shaking crash!
-    %damage% %actor% 400 physical
+    %damage% %actor% 300 physical
     dg_affect #12509 %actor% HARD-STUNNED on 15
     dg_affect #12509 %actor% DODGE -100 15
     dg_affect #12509 %self% HARD-STUNNED on 5
@@ -326,13 +326,13 @@ else
     end
     %echo% There is a mighty boom as %self.name% releases %self.hisher% gathered power into the ground beneath %self.hisher% foot!
     %send% %actor% &rThe force of %self.name%'s foot pressing down on you explosively redoubles, hammering you deeper into the ground!
-    %damage% %actor% 800 physical
+    %damage% %actor% 600 physical
     set person %room.people%
     while %person%
       if (%person.is_enemy(%self%)% || %self.is_enemy(%person%)%) && %person% != %actor%
         %send% %person% &rThe force of %self.name%'s stomp knocks you off your feet!
         dg_affect #12509 %person% HARD-STUNNED on 5
-        %damage% %person% 200 physical
+        %damage% %person% 100 physical
       end
       set person %person.next_in_room%
     done
@@ -342,7 +342,7 @@ else
     set actor %self.fighting%
     %send% %actor% &r%self.name% brings %self.hisher% foot down on top of you, pinning you to the ground!
     %echoaround% %actor% %self.name% brings %self.hisher% foot down on top of %actor.name%, pinning %actor.himher% to the ground!
-    %damage% %actor% 400 physical
+    %damage% %actor% 300 physical
     dg_affect #12509 %actor% HARD-STUNNED on 10
     dg_affect #12509 %actor% DODGE -50 10
   end
@@ -378,8 +378,8 @@ if %parts_destroyed% < 2
   end
   %send% %target% &rThere is a blinding flash of light, and you feel unbearable heat and pain!
   %echoaround% %target% Beams of crimson energy fly from %self.name%'s eyes, engulfing %target.name% and setting %target.himher% ablaze!
-  %damage% %target% 250 magical
-  %damage% %target% 250 fire
+  %damage% %target% 200 magical
+  %damage% %target% 200 fire
   dg_affect #12511 %target% BLIND on 15
   %dot% #12511 %target% 600 15 fire
 else
@@ -848,7 +848,7 @@ if !%found_person%
   halt
 end
 if %success% && !%failure%
-  %echo% A red light on the side of %self.name% goes green.
+  emote A red light on the side of %self.name% goes green.
   eval cycle %cycle% + 1
   remote cycle %self.id%
   if %cycle% >= 10
@@ -856,12 +856,19 @@ if %success% && !%failure%
     dg_affect %self% !ATTACK off
   end
 else
-  %echo% %self.name% releases a blast of lightning!
-  %aoe% 100 magical
   if %cycle% > 0
+    emote A green light on the side of %self.name% goes red.
     eval cycle %cycle% - 1
     remote cycle %self.id%
   end
+  %echo% &r%self.name% releases a blast of lightning!
+  set person %room.people%
+  while %person%
+    if %person.is_pc%
+      %damage% %person% 100 magical
+    end
+    set person %person.next_in_room%
+  done
 end
 ~
 #12533
@@ -885,7 +892,11 @@ if sabotage /= %cmd%
   end
   if %parts_destroyed% < 4
     eval remaining 4 - %parts_destroyed%
-    %send% %actor% You still need to destroy %remaining% more vital components before you can sabotage the master controller.
+    set plural components
+    if %remaining% == 1
+      set plural component
+    end
+    %send% %actor% You still need to destroy %remaining% more vital %plural% before you can sabotage the master controller.
     halt
   end
   say User not authenticated. Prepare for authentication sequence. Do as the controller commands!

@@ -1579,6 +1579,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	morph_data *morph, *next_morph;
 	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
+	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
 	struct synergy_ability *syn;
 	social_data *soc, *next_soc;
@@ -1644,6 +1645,20 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (MORPH_ABILITY(morph) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+		}
+	}
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_HAVE_ABILITY, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -2204,6 +2219,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	morph_data *morph, *next_morph;
 	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
+	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
 	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
@@ -2268,6 +2284,17 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			MORPH_ABILITY(morph) = NOTHING;
 			SET_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
+		}
+	}
+	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_HAVE_ABILITY, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
 		}
 	}
 	
@@ -2355,6 +2382,14 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			if (MORPH_ABILITY(GET_OLC_MORPH(desc)) == vnum) {
 				MORPH_ABILITY(GET_OLC_MORPH(desc)) = NOTHING;
 				msg_to_desc(desc, "The required ability has been deleted from the morph you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_HAVE_ABILITY, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An ability used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {

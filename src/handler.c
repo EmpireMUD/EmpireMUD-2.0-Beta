@@ -2735,10 +2735,12 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 	
 	if (amount < 0) {
 		SAFE_ADD(EMPIRE_COINS(emp_gaining), amount, 0, MAX_COIN, FALSE);
+		et_change_coins(emp_gaining, amount);
 	}
 	else {
 		if ((local = exchange_coin_value(amount, coin_empire, emp_gaining)) > 0) {
 			SAFE_ADD(EMPIRE_COINS(emp_gaining), local, 0, MAX_COIN, FALSE);
+			et_change_coins(emp_gaining, local);
 		}
 	}
 
@@ -2787,6 +2789,7 @@ void perform_abandon_room(room_data *room) {
 		// quest tracker for members
 		if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 			qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+			et_lose_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 		}
 	}
 	
@@ -2850,6 +2853,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	
 	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+		et_gain_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 	
 	// claimed rooms are never unloadable anyway
@@ -7176,6 +7180,8 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 	
 	isle->store_is_sorted = FALSE;
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	
+	et_get_obj(emp, obj_proto(vnum), amount);
 }
 
 
@@ -7187,10 +7193,11 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 * @param int cmp_type Which CMP_ type to charge
 * @param int cmp_flags Required CMPF_ flags to match on the component
 * @param int amount How much to charge*
+* @param bool use_kept If TRUE, will use items with the 'keep' flag instead of ignorning them
 * @param struct resource_data **build_used_list Optional: A place to store the exact item used, e.g. for later dismantling. (NULL if none)
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
-bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list) {
+bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool use_kept, struct resource_data **build_used_list) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
 	int this, found = 0;
@@ -7209,6 +7216,10 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->keep && !use_kept) {
+				continue;
+			}
+			
 			// need obj
 			if (!(proto = obj_proto(store->vnum))) {
 				continue;
@@ -7320,8 +7331,9 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 * @param int cmp_type Any CMP_ type.
 * @param int cmp_flags Any CMPF_ flags to match all of.
 * @param int amount The number that must be available.
+* @param bool include_kept If TRUE, ignores the 'keep' flag and will use kept items.
 */
-bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool include_kept) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle;
 	obj_data *proto;
@@ -7332,6 +7344,10 @@ bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int
 	}
 	
 	HASH_ITER(hh, isle->store, store, next_store) {
+		if (store->keep && !include_kept) {
+			continue;
+		}
+		
 		if (!(proto = obj_proto(store->vnum))) {
 			continue;	// need obj
 		}

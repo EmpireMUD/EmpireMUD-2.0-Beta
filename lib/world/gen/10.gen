@@ -151,4 +151,21 @@ You organize $V.~
 T5
 $n organizes $V.~
 S
+#1009
+shovel soot~
+2 0
+0 0 0 0
+T0
+You shovel soot out of the furnace.~
+T1
+$n shovels soot out of the furnace.~
+T2
+You shovel soot out of $V's furnace.~
+T3
+$n shovels soot out of $V's furnace.~
+T4
+You shovel soot out of $V's furnace.~
+T5
+$n shovels soot out of $V's furnace.~
+S
 $

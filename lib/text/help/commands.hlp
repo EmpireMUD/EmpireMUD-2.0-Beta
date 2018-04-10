@@ -1345,6 +1345,21 @@ Examples:
 
 See also: FILL, TRENCH
 #
+PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
+
+Usage:  progress [category]
+        progress [goal name]
+        progress completed [category]
+
+This command shows your empire's current progress points, progression goals,
+and information about those goals. As your empire earns progress points, it can
+spend them to unlock new perks.
+
+Progression goals are automatically unlocked when your empires meets all the
+requirements. Use 'elog progress' to see previous goal achievements.
+
+See also: ELOG
+#
 PROMPT FPROMPT "FIGHT PROMPT" "COMBAT PROMPT"
 
 Usage:  prompt <string | off | default>

@@ -163,6 +163,12 @@ int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
 
+// progress
+progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
+progress_data *sorted_progress = NULL;	// hashed by vnum, sorted by type/data
+bool need_progress_refresh = FALSE;	// triggers an update of all empires' trackers
+bool check_completed_goals = FALSE;	// triggers full goal check
+
 // quests
 struct quest_data *quest_table = NULL;
 
@@ -235,6 +241,7 @@ bool world_map_needs_save = TRUE;	// always do at least 1 save
 
 // DB_BOOT_x
 struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
+	// prefix, suffix, allow-zero-of-it
 	{ WLD_PREFIX, WLD_SUFFIX, TRUE },	// DB_BOOT_WLD
 	{ MOB_PREFIX, MOB_SUFFIX, FALSE },	// DB_BOOT_MOB
 	{ OBJ_PREFIX, OBJ_SUFFIX, FALSE },	// DB_BOOT_OBJ
@@ -262,6 +269,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ FCT_PREFIX, FCT_SUFFIX, TRUE },	// DB_BOOT_FCT
 	{ GEN_PREFIX, GEN_SUFFIX, TRUE },	// DB_BOOT_GEN
 	{ SHOP_PREFIX, SHOP_SUFFIX, TRUE },	// DB_BOOT_SHOP
+	{ PRG_PREFIX, PRG_SUFFIX, TRUE },	// DB_BOOT_PRG
 };
 
 
@@ -300,6 +308,7 @@ void boot_db(void) {
 	void sort_commands();
 	void startup_room_reset();
 	void update_instance_world_size();
+	void verify_empire_goals();
 	void verify_sectors();
 
 	log("Boot db -- BEGIN.");
@@ -403,6 +412,8 @@ void boot_db(void) {
 	reread_empire_tech(NULL);
 	check_for_new_map();
 	setup_island_levels();
+	verify_empire_goals();
+	need_progress_refresh = TRUE;
 	
 	log(" Checking for ruined cities...");
 	check_ruined_cities();
@@ -549,6 +560,9 @@ void boot_world(void) {
 	
 	log("Loading morphs.");
 	index_boot(DB_BOOT_MORPH);
+	
+	log("Loading empire progression.");
+	index_boot(DB_BOOT_PRG);
 	
 	log("Loading socials.");
 	index_boot(DB_BOOT_SOC);

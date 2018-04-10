@@ -38,6 +38,7 @@
 *   Object Utils
 *   Objval Utils
 *   Player Utils
+*   Progress Utils
 *   Quest Utils
 *   Room Utils
 *   Room Template Utils
@@ -493,6 +494,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
 #define GET_OLC_OBJECT(desc)  ((desc)->olc_object)
+#define GET_OLC_PROGRESS(desc)  ((desc)->olc_progress)
 #define GET_OLC_QUEST(desc)  ((desc)->olc_quest)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
@@ -512,17 +514,21 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_NAME(emp)  ((emp)->name)
 #define EMPIRE_ADJECTIVE(emp)  ((emp)->adjective)
 #define EMPIRE_ADMIN_FLAGS(emp)  ((emp)->admin_flags)
+#define EMPIRE_ATTRIBUTE(emp, att)  ((emp)->attributes[(att)])
 #define EMPIRE_BANNER(emp)  ((emp)->banner)
 #define EMPIRE_BANNER_HAS_UNDERLINE(emp)  ((emp)->banner_has_underline)
+#define EMPIRE_CHECK_GOAL_COMPLETE(emp)  ((emp)->check_goal_complete)
 #define EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)  ((emp)->city_overage_warning_time)
 #define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
 #define EMPIRE_COINS(emp)  ((emp)->coins)
+#define EMPIRE_COMPLETED_GOALS(emp)  ((emp)->completed_goals)
 #define EMPIRE_PRIV(emp, num)  ((emp)->priv[(num)])
 #define EMPIRE_DELAYS(emp)  ((emp)->delays)
 #define EMPIRE_DESCRIPTION(emp)  ((emp)->description)
 #define EMPIRE_DIPLOMACY(emp)  ((emp)->diplomacy)
+#define EMPIRE_GOALS(emp)  ((emp)->goals)
 #define EMPIRE_TRADE(emp)  ((emp)->trade)
 #define EMPIRE_LOGS(emp)  ((emp)->logs)
 #define EMPIRE_TERRITORY_LIST(emp)  ((emp)->territory_list)
@@ -538,6 +544,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_NEEDS_LOGS_SAVE(emp)  ((emp)->needs_logs_save)
 #define EMPIRE_NEEDS_STORAGE_SAVE(emp)  ((emp)->needs_storage_save)
 #define EMPIRE_NEXT_TIMEOUT(emp)  ((emp)->next_timeout)
+#define EMPIRE_PROGRESS_POINTS(emp, type)  ((emp)->progress_points[(type)])
+#define EMPIRE_PROGRESS_POOL(emp)  EMPIRE_ATTRIBUTE((emp), EATT_PROGRESS_POOL)
 #define EMPIRE_GREATNESS(emp)  ((emp)->greatness)
 #define EMPIRE_TECH(emp, num)  ((emp)->tech[(num)])
 #define EMPIRE_MEMBERS(emp)  ((emp)->members)
@@ -562,6 +570,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (EMPIRE_COINS(emp) * COIN_VALUE))
 #define EXPLICIT_BANNER_TERMINATOR(emp)  (EMPIRE_BANNER_HAS_UNDERLINE(emp) ? "\t0" : "")
+#define TRIGGER_CHECK_GOAL_COMPLETE(emp)  { check_completed_goals = EMPIRE_CHECK_GOAL_COMPLETE(emp) = TRUE; }
 
 // definitions
 #define OFFENSE_HAS_WEIGHT(off)  (!IS_SET((off)->flags, OFF_AVENGED | OFF_WAR))
@@ -1144,6 +1153,24 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS UTILS //////////////////////////////////////////////////////////
+
+#define PRG_VNUM(prg)  ((prg)->vnum)
+#define PRG_COST(prg)  ((prg)->cost)
+#define PRG_DESCRIPTION(prg)  ((prg)->description)
+#define PRG_FLAGS(prg)  ((prg)->flags)
+#define PRG_NAME(prg)  ((prg)->name)
+#define PRG_PERKS(prg)  ((prg)->perks)
+#define PRG_PREREQS(prg)  ((prg)->prereqs)
+#define PRG_TASKS(prg)  ((prg)->tasks)
+#define PRG_TYPE(prg)  ((prg)->type)
+#define PRG_VALUE(prg)  ((prg)->value)
+#define PRG_VERSION(prg)  ((prg)->version)
+
+#define PRG_FLAGGED(prg, flg)  IS_SET(PRG_FLAGS(prg), (flg))
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// QUEST UTILS /////////////////////////////////////////////////////////////
 
 #define QUEST_VNUM(quest)  ((quest)->vnum)
@@ -1671,6 +1698,14 @@ void qt_triggered_task(char_data *ch, any_vnum vnum);
 void qt_untrigger_task(char_data *ch, any_vnum vnum);
 void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
+
+// utils from progress.c
+void et_change_coins(empire_data *emp, int amount);
+void et_gain_building(empire_data *emp, any_vnum vnum);
+void et_gain_vehicle(empire_data *emp, any_vnum vnum);
+void et_get_obj(empire_data *emp, obj_data *obj, int amount);
+void et_lose_building(empire_data *emp, any_vnum vnum);
+void et_lose_vehicle(empire_data *emp, any_vnum vnum);
 
 // utils from vehicles.c
 extern char *get_vehicle_name_by_proto(obj_vnum vnum);

@@ -3597,12 +3597,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'q': {	// char.q*
 					if (!str_cmp(field, "quest_finished")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+							void count_quest_tasks(struct req_data *list, int *complete, int *total);
 							any_vnum vnum = atoi(subfield);
 							struct player_quest *pq;
 							int complete, total;
 							if (!IS_NPC(c) && (pq = is_on_quest(c, vnum))) {
-								count_quest_tasks(pq, &complete, &total);
+								count_quest_tasks(pq->tracker, &complete, &total);
 								if (complete >= total) {
 									strcpy(str, "1");
 								}
@@ -3617,7 +3617,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "quest_triggered")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
 							any_vnum vnum = atoi(subfield);
 							struct player_quest *pq;
 							struct req_data *task;
@@ -6466,11 +6465,13 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 					cl = cl->original;
 					loops++;   
 					GET_TRIG_LOOPS(trig)++;
+					/* This actually breaks multiple types of triggers -kh
 					if (loops == 30) {
 						process_wait(go, trig, type, "wait 1", cl);
 						depth--;
 						return ret_val;
 					}
+					*/
 					if (GET_TRIG_LOOPS(trig) >= 100) {
 						script_log("Trigger VNum %d has looped 100 times!!!",
 						GET_TRIG_VNUM(trig));

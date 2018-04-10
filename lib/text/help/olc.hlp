@@ -24,6 +24,7 @@ Available types are:
  .g - globals                    .gen - generics
  .m - mobiles                    .map - map tiles/interiors
  .morph - morphs                 .o - objects
+ .prog - empire progression gaol
  .q - quests                     .r - room templates
  .sect - map sectors             .shop - shops
  .skill - skills                 .soc - socials
@@ -79,6 +80,7 @@ glb - global
 mob - mobile/npc
 mph - morph
 npc - non-player character (mob)
+prog/prg - empire progression goal
 obj - object
 qst - quest
 rmt - room template
@@ -330,6 +332,9 @@ Objects (OEDIT):
 - Ammo items that cause debuffs will use an 'affect' generic with the same
   vnum as the ammo, if one exists.
 - Potions should have a locked level (min equal to max) to be storable.
+
+Empire Progress Goals (PROGEDIT):
+- Goals that are PURCHASABLE should not have cost or tasks.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
@@ -5559,6 +5564,146 @@ Example vehicle settings:
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
+PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
+
+Usage:  .prog <command>
+        .command
+
+The .olc progression editor allows you to configure goals, which empires can
+complete in exchange for rewards. Some goals are unlocked by completing tasks,
+and others can be purchased for a cost.
+
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP SHOPEDIT <COMMAND>&0
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .prog edit 123
+> .name Test Goal
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"PROGEDIT COST"
+
+Usage:  .cost <points>
+
+This determines how many progress points it costs to buy this progression. You
+only set the cost on goals marked PURCHASABLE. A purchasable goal should not
+have any tasks (but can still have prerequisites).
+
+See also: OLC PROGRESS, PROGEDIT VALUE, PROGEDIT FLAGS
+#d
+"PROGEDIT DESCRIPTION"
+
+Usage:  .description
+
+This command will open the string editor. The progress goal's description
+should be short and concise. It should give the player a basic idea of how to
+achieve the goal. It does not need to mention the reward.
+
+See also: OLC PROGRESS, STRING EDITOR
+#d
+"PROGEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following progress goal flags are available:
+ IN-DEVELOPMENT - Empires cannot start or complete this goal.
+ PURCHASABLE - This goal is purchased, not unlocked by tasks.
+
+See also: OLC PROGRESS
+#d
+"PROGEDIT NAME"
+
+Usage:  .name <name>
+
+A progress goal needs a unique name, but it should also be simple enough for
+a player to type.
+
+Tips:
+- Avoid starting with "A" or "The" if possible.
+- Write the name like a book title: Every Word Capitalized
+- No ending punctuation
+
+See also: OLC PROGRESS
+#d
+"PROGEDIT PERKS"
+
+Usage: perks add <type> <name/value>
+       perks copy <from vnum>
+       perks remove <number | all>
+
+Perks are the rewards for unlocking a goal. Perks are permanent, and are never
+lost even if the empire no longer qualifies for the goal that gave them.
+
+Perk types:
+ Technology - Grants an empire technology.
+
+Note: To grant progress points for a goal, set the 'value'.
+
+See also: OLC PROGRESS, PROGEDIT VALUE
+#d
+"PROGEDIT PREREQS" "PROGEDIT PREREQUISITES"
+
+Usage:  .prereqs add <vnum>
+        .prereqs copy <from vnum>
+        .prereqs remove <number | all>
+
+This setting allows you to make some progression goals dependent upon others,
+forming a "tree" of unlockable goals. You can require as many preqreqs as you
+like, but if you require none, the goal will be open to all empires.
+
+See also: OLC PROGRESS
+#d
+"PROGEDIT TASKS" "PROGEDIT REQUIREMENTS"
+
+Usage:  .tasks add <type> <vnum> [group]
+        .tasks change <number> <amount | group | vnum> <value>
+        .tasks copy <from type> <from vnum> [tasks/prereqs (quests only)]
+        .tasks remove <number | all>
+
+These are the tasks that must be completed in order to unlock the progression
+goal's rewards. This uses the same system of requirements as quests and
+socials, but some of the tasks do not apply to progression gaols.
+
+See HELP REQUIREMENTS for more information about requirements. Just like with
+other requirements, if you don't group tasks, a goal can be completed by
+finishing any of them. Group names are always a single case-sensitive letter.
+
+Task types that do not apply to empire progression:
+ &rCOMPLETED-QUEST, NOT-COMPLETED-QUEST, NOT-ON-QUEST, SKILL-LEVEL-OVER,
+ SKILL-LEVEL-UNDER, TRIGGERED, VISIT-BUILDING, VISIT-ROOM-TEMPLATE,
+ VISIT-SECTOR, HAVE-ABILITY, REP-OVER, REP-UNDER, WEARING, WEARING-OR-HAS,
+ GET-CURRENCY, CAN-GAIN-SKILL&0
+
+See also: OLC PROGRESS, REQUIREMENTS
+#d
+"PROGEDIT TYPE"
+
+Usage:  .type <type>
+
+This sets the type (or tree) that this particular goal belongs to. The current
+types are:
+
+???
+
+See also: OLC PROGRESS
+#d
+"PROGEDIT VALUE"
+
+Usage:  .value <points>
+
+This sets how many progress points the goal is worth when it is finished.
+Only set this on progression goals that have tasks, not ones that are flagged
+PURCAHSABLE.
+
+See also: OLC PROGRESS, PROGEDIT COST, PROGEDIT FLAGS
+#d
 "QEDIT COMPLETEMESSAGE" "QEDIT COMPLETE MESSAGE"
 
 Usage:  .completemessage
@@ -5809,7 +5954,7 @@ REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIR
 
 Usage:  .<field> add <type> <vnum> [group]
         .<field> change <number> <amount | group | vnum> <value>
-        .<field> copy <from type> <from vnum> [tasks/prereqs]
+        .<field> copy <from type> <from vnum> [tasks/prereqs (quests only)]
         .<field> remove <number | all>
 
 Requirement lists are used to determine if a character is eligible for some-

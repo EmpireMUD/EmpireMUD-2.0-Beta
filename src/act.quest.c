@@ -316,12 +316,15 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 * Returns the complete/total numbers for the quest tasks the player is
 * closest to completing. If a quest has multiple "or" conditions, it picks
 * the best one.
+*
+* This function also works on empire progression goals, and any other list
+* of tracked requirements.
 * 
-* @param struct player_quest *pq The player-quest entry to count.
+* @param struct req_data *list The list of requirements to check.
 * @param int *complete A variable to store the # of complete tasks.
 * @param int *total A vartiable to store the total # of tasks.
 */
-void count_quest_tasks(struct player_quest *pq, int *complete, int *total) {
+void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 	// helper struct
 	struct count_quest_data {
 		int group;	// converted from "char"
@@ -338,7 +341,7 @@ void count_quest_tasks(struct player_quest *pq, int *complete, int *total) {
 	// prepare data
 	*complete = *total = 0;
 	
-	LL_FOREACH(pq->tracker, task) {
+	LL_FOREACH(list, task) {
 		if (!task->group) {	// ungrouped "or" tasks
 			if (task->current >= task->needed) {
 				// found a complete "or"
@@ -573,54 +576,11 @@ char *show_daily_quest_line(char_data *ch) {
 * @param struct player_quest *pq The quest to show the tracker for.
 */
 void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	extern const bool requirement_amt_type[];
-	
-	int lefthand, count = 0, sub = 0;
+	void get_tracker_display(struct req_data *tracker, char *save_buffer);
 	char buf[MAX_STRING_LENGTH];
-	struct req_data *task;
-	char last_group = 0;
 	
-	msg_to_char(ch, "Quest Tracker:\r\n");
-	
-	LL_FOREACH(pq->tracker, task) {
-		if (last_group != task->group) {
-			if (task->group) {
-				msg_to_char(ch, "  %sAll of:\r\n", (count > 0 ? "or " : ""));
-			}
-			last_group = task->group;
-			sub = 0;
-		}
-		
-		++count;	// total iterations
-		++sub;	// iterations inside this sub-group
-		
-		// REQ_AMT_x: display based on amount type
-		switch (requirement_amt_type[task->type]) {
-			case REQ_AMT_NUMBER: {
-				lefthand = task->current;
-				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
-				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
-				sprintf(buf, " (%d/%d)", lefthand, task->needed);
-				break;
-			}
-			case REQ_AMT_REPUTATION:
-			case REQ_AMT_THRESHOLD:
-			case REQ_AMT_NONE: {
-				if (task->current >= task->needed) {
-					strcpy(buf, " (complete)");
-				}
-				else {
-					strcpy(buf, " (not complete)");
-				}
-				break;
-			}
-			default: {
-				*buf = '\0';
-				break;
-			}
-		}
-		msg_to_char(ch, "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE), buf);
-	}
+	get_tracker_display(pq->tracker, buf);
+	msg_to_char(ch, "Quest Tracker:\r\n%s", buf);
 }
 
 
@@ -665,7 +625,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	refresh_one_quest_tracker(ch, pq);
 	qt_start_quest(ch, QUEST_VNUM(qst));
 	
-	count_quest_tasks(pq, &count, &total);
+	count_quest_tasks(pq->tracker, &count, &total);
 	if (count == total) {
 		msg_to_char(ch, "You already meet the requirements for %s%s\t0.\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 	}
@@ -733,7 +693,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	}
 	
 	// preliminary completeness check
-	count_quest_tasks(pq, &complete, &total);
+	count_quest_tasks(pq->tracker, &complete, &total);
 	if (complete < total) {
 		if (show_errors) {
 			msg_to_char(ch, "That quest is not complete.\r\n");
@@ -757,7 +717,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	
 	// 3rd check after refreshing tasks
 	refresh_one_quest_tracker(ch, pq);
-	count_quest_tasks(pq, &complete, &total);
+	count_quest_tasks(pq->tracker, &complete, &total);
 	if (complete < total) {
 		if (show_errors) {
 			msg_to_char(ch, "That quest is not complete.\r\n");
@@ -850,7 +810,7 @@ QCMD(qcmd_group) {
 			friend = mem->member;
 			
 			if (!IS_NPC(friend) && friend != ch && (fq = is_on_quest(friend, pq->vnum))) {
-				count_quest_tasks(fq, &count, &total);
+				count_quest_tasks(fq->tracker, &count, &total);
 				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s%s (%d/%d)", (any ? ", " : ""), GET_NAME(friend), count, total);
 				any = TRUE;
 			}
@@ -901,7 +861,7 @@ QCMD(qcmd_info) {
 		
 		// title
 		if (pq) {
-			count_quest_tasks(pq, &complete, &total);
+			count_quest_tasks(pq->tracker, &complete, &total);
 			msg_to_char(ch, "%s%s%s\t0 (%d/%d task%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
 		}
 		else {
@@ -958,7 +918,7 @@ QCMD(qcmd_list) {
 	
 	size = snprintf(buf, sizeof(buf), "Your quests:\r\n");
 	LL_FOREACH(GET_QUESTS(ch), pq) {
-		count_quest_tasks(pq, &count, &total);
+		count_quest_tasks(pq->tracker, &count, &total);
 		if ((proto = quest_proto(pq->vnum))) {
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", QUEST_VNUM(proto));

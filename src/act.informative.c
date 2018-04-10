@@ -1555,7 +1555,7 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 		*lbuf = '\0';
 	}
 	
-	msg_to_char(ch, "(%4d) %s%s\r\n", (show_zero ? 0 : store->amount), get_obj_name_by_proto(store->vnum), lbuf);
+	msg_to_char(ch, "(%4d) %s%s%s\r\n", (show_zero ? 0 : store->amount), get_obj_name_by_proto(store->vnum), store->keep ? " (keep)" : "", lbuf);
 }
 
 

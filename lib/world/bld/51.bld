@@ -185,9 +185,9 @@ hv
 M
 241 15.00 ce
 R
-16 1 1 1048576
+1009 1 5 0
 R
-19 1 1 0
+16 1 1 1048576
 S
 #5109
 Mill~
@@ -241,7 +241,7 @@ A Noisy Stable~
 10 0 bgpR 0
 0 0 0 213
 C
-harness, herd, inventory, milk, mount, shear~
+harness, herd, milk, mount, shear~
 D
    The air is thick here in the livery. It smells strongly of animal manure
 and feed, almost enough to make you flee out through the door. There are many
@@ -318,7 +318,7 @@ the storage. The foundry helps empires to clean up their untidy land.
 F
 v
 R
-1002 1 5 0
+1009 1 5 0
 R
 25 1 1 0
 S

@@ -38,7 +38,8 @@
 #define DB_BOOT_FCT  24
 #define DB_BOOT_GEN  25
 #define DB_BOOT_SHOP  26
-#define NUM_DB_BOOT_TYPES  27	// total
+#define DB_BOOT_PRG  27
+#define NUM_DB_BOOT_TYPES  28	// total
 
 
 // library sub-dirs
@@ -88,6 +89,7 @@
 #define MORPH_PREFIX  LIB_WORLD"morph/"	// morphs
 #define NAMES_PREFIX  LIB_TEXT"names/"	// mob namelists
 #define OBJ_PREFIX  LIB_WORLD"obj/"	// object prototypes
+#define PRG_PREFIX  LIB_WORLD"prg/"	// empire progress
 #define QST_PREFIX  LIB_WORLD"qst/"	// quests
 #define RMT_PREFIX  LIB_WORLD"rmt/"	// room templates
 #define SECTOR_PREFIX  LIB_WORLD"sect/"	// sect definitions
@@ -120,6 +122,7 @@
 #define MOB_SUFFIX  ".mob"	// mob suffix for file saves
 #define MORPH_SUFFIX  ".morph"	// morph file suffix
 #define OBJ_SUFFIX  ".obj"	// obj suffix for file saves
+#define PRG_SUFFIX  ".prg"	// empire progress suffix
 #define QST_SUFFIX  ".qst"	// quest file
 #define RMT_SUFFIX  ".rmt"	// room template suffix
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
@@ -427,6 +430,15 @@ extern struct group_data *group_list;
 extern char_data *find_player_in_room_by_id(room_data *room, int id);
 extern char_data *is_at_menu(int id);
 extern char_data *is_playing(int id);
+
+// progress
+extern progress_data *progress_table;
+extern progress_data *sorted_progress;
+extern bool need_progress_refresh;
+extern bool check_completed_goals;
+extern char *get_progress_name_by_proto(any_vnum vnum);
+extern progress_data *real_progress(any_vnum vnum);
+void free_progress(progress_data *prg);
 
 // quests
 extern struct quest_data *quest_table;

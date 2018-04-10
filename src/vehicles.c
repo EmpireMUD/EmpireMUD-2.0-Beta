@@ -732,6 +732,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh = vehicle_proto(vnum);
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
 	struct adventure_spawn *asp;
@@ -751,6 +752,20 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_VEHICLE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -1872,6 +1887,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
 	descriptor_data *desc;
@@ -1912,6 +1928,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
 		}
 	}
 	
@@ -1956,6 +1983,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {

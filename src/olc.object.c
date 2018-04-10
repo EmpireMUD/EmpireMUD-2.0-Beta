@@ -444,6 +444,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
@@ -692,6 +693,19 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_GET_OBJECT, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_WEARING, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_WEARING_OR_HAS, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
+		}
+	}
+	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_OBJECT, vnum);
@@ -863,6 +877,16 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found = delete_from_interaction_list(&GET_OLC_OBJECT(desc)->interactions, TYPE_OBJ, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the item you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_GET_OBJECT, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_WEARING, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_WEARING_OR_HAS, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An object used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
@@ -1202,6 +1226,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	augment_data *aug, *next_aug;
@@ -1360,6 +1385,22 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
+		}
+	}
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_GET_OBJECT, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_WEARING, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_WEARING_OR_HAS, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	

@@ -176,6 +176,7 @@ void complete_building(room_data *room) {
 		
 		if (GET_BUILDING(room)) {
 			qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+			et_gain_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 		}
 	}
 }
@@ -327,6 +328,7 @@ void disassociate_building(room_data *room) {
 	
 	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+		et_lose_building(ROOM_OWNER(room), GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 	
 	if (ROOM_OWNER(room)) {
@@ -1101,6 +1103,7 @@ void start_dismantle_building(room_data *loc) {
 	
 	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
 		qt_empire_players(ROOM_OWNER(loc), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(loc)));
+		et_gain_building(ROOM_OWNER(loc), GET_BLD_VNUM(GET_BUILDING(loc)));
 	}
 	
 	stop_room_action(loc, ACT_DIGGING, CHORE_DIGGING);

@@ -58,6 +58,7 @@
 // external variables
 extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
+extern const int empire_attribute_defaults[NUM_EMPIRE_ATTRIBUTES];
 extern struct player_special_data dummy_mob;
 extern struct empire_territory_data *global_next_territory_entry;
 extern int max_automessage_id;
@@ -1611,6 +1612,10 @@ empire_data *create_empire(char_data *ch) {
 	sprintf(colorcode, "&%c", colorlist[number(0, num_colors-1)]);	// pick random color
 	EMPIRE_BANNER(emp) = str_dup(colorcode);
 	
+	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		EMPIRE_ATTRIBUTE(emp, iter) = empire_attribute_defaults[iter];
+	}
+	
 	EMPIRE_CREATE_TIME(emp) = time(0);
 
 	// member data
@@ -1854,6 +1859,9 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
+	void free_empire_goals(struct empire_goal *hash);
+	void free_empire_completed_goals(struct empire_completed_goal *hash);
+	
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
@@ -1965,6 +1973,10 @@ void free_empire(empire_data *emp) {
 		EMPIRE_WORKFORCE_LOG(emp) = wf_log->next;
 		free(wf_log);
 	}
+	
+	// free goals
+	free_empire_goals(EMPIRE_GOALS(emp));
+	free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
 	
 	// free strings
 	if (emp->name) {
@@ -2087,6 +2099,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
 	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct shipping_data *shipd, *last_shipd = NULL;
+	struct empire_storage_data *store;
 	obj_data *obj, *proto;
 	
 	if (!fl || !emp) {
@@ -2103,15 +2116,27 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 		}
 		switch (*line) {
 			case 'O': {	// storage
-				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
+				if (!get_line(fl, line)) {
 					log("SYSERR: Storage data for empire %d was incomplete", EMPIRE_VNUM(emp));
 					exit(1);
+				}
+				if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+					t[3] = 0;	// !keep
+					if (sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
+						log("SYSERR: Bad storage data for empire %d", EMPIRE_VNUM(emp));
+						exit(1);
+					}
 				}
 				
 				// validate vnum
 				proto = obj_proto(t[0]);
 				if (proto && proto->storage) {
 					add_to_empire_storage(emp, t[2], t[0], t[1]);
+					
+					// check keep
+					if (t[3] && (store = find_stored_resource(emp, t[2], t[0]))) {
+						store->keep = TRUE;
+					}
 				}
 				else if (proto && !proto->storage) {
 					log("- removing %dx #%d from empire storage for %s: not storable", t[1], t[0], EMPIRE_NAME(emp));
@@ -2248,20 +2273,29 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade, *last_trade = NULL;
+	struct empire_goal *egoal, *last_egoal = NULL;
+	struct empire_completed_goal *ecg;
 	struct empire_log_data *elog;
 	struct empire_needs *need;
 	struct offense_data *off;
 	struct empire_city_data *city;
 	struct empire_island *isle;
+	struct req_data *task;
+	bitvector_t bit_in;
 	room_data *room;
 	double dbl_in;
 	long long_in;
-	char *tmp;
+	char *tmp, c_in;
 	
 	sprintf(buf2, "empire #%d", vnum);
 	
+	// init
 	CREATE(emp, empire_data, 1);
 	emp->vnum = vnum;
+	
+	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		EMPIRE_ATTRIBUTE(emp, iter) = empire_attribute_defaults[iter];
+	}
 
 	HASH_FIND_INT(empire_table, &vnum, find);
 	if (find) {
@@ -2384,6 +2418,89 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				
 				emp->frontier_traits = asciiflag_conv(str_in);
 				emp->coins = dbl_in;
+				break;
+			}
+			case 'G': {	// goals (sub-divided by a 2nd letter)
+				switch (*(line + 1)) {
+					case 'C': {	// GC: completed
+						if (sscanf(line, "GC %d %ld", &t[0], &long_in) != 2) {
+							log("SYSERR: Format error in GC line of empire %d", vnum);
+							// non-fatal
+							break;
+						}
+						
+						HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &t[0], ecg);
+						if (!ecg) {
+							CREATE(ecg, struct empire_completed_goal, 1);
+							ecg->vnum = t[0];
+							HASH_ADD_INT(EMPIRE_COMPLETED_GOALS(emp), vnum, ecg);
+						}
+						ecg->when = long_in;
+						break;
+					}
+					case 'G': {	// GG: goal in progress
+						if (sscanf(line, "GG %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GG line of empire %d", vnum);
+							// fatal because it could mess up trackers
+							exit(1);
+						}
+						
+						HASH_FIND_INT(EMPIRE_GOALS(emp), &t[0], egoal);
+						if (!egoal) {
+							CREATE(egoal, struct empire_goal, 1);
+							egoal->vnum = t[0];
+							HASH_ADD_INT(EMPIRE_GOALS(emp), vnum, egoal);
+						}
+						egoal->version = t[1];
+						
+						last_egoal = egoal;
+						break;
+					}
+					case 'P': {	// GP: goal points (progress points)
+						if (sscanf(line, "GP %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GP line of empire %d", vnum);
+							// non-fatal
+							break;
+						}
+						
+						if (t[0] >= 0 && t[0] < NUM_PROGRESS_TYPES) {
+							EMPIRE_PROGRESS_POINTS(emp, t[0]) = t[1];
+						}
+						break;
+					}
+					case 'T': {	// GT: tracker for last goal
+						if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in) == 6) {
+							// found group
+						}
+						else if (last_egoal && sscanf(line, "GT %d %d %lld %d %d", &t[0], &t[1], &bit_in, &t[2], &t[3]) == 5) {
+							c_in = 0;	// no group given
+						}
+						else {
+							log("SYSERR: Format error in GT line of empire %d", vnum);
+							// bad format but not fatal
+							if (last_egoal) {
+								--last_egoal->version;	// forces a refresh by putting the version out of date
+							}
+							break;
+						}
+					
+						CREATE(task, struct req_data, 1);
+						task->type = t[0];
+						task->vnum = t[1];
+						task->misc = bit_in;
+						task->needed = t[2];
+						task->current = t[3];
+						task->group = c_in;
+					
+						LL_APPEND(last_egoal->tracker, task);
+						break;
+					}
+					default: {
+						log("SYSERR: Unknown G line in empire %d: %s", vnum, line);
+						// safe to continue though
+						break;
+					}
+				}
 				break;
 			}
 			case 'I': {	// island name
@@ -2529,6 +2646,17 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				
 				break;
 			}
+			case 'Z': { // attribute
+				if (sscanf(line, "Z%d %d", &t[0], &t[1]) != 2) {
+					log("SYSERR: Format error in Z line of empire %d.\r\n", emp->vnum);
+					exit(1);
+				}
+				
+				if (t[0] >= 0 && t[0] < NUM_EMPIRE_ATTRIBUTES) {
+					EMPIRE_ATTRIBUTE(emp, t[0]) = t[1];
+				}
+				break;
+			}
 
 			case 'S':			/* end of empire */
 				return;
@@ -2568,10 +2696,13 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_completed_goal *ecg, *next_ecg;
+	struct empire_goal *egoal, *next_egoal;
 	struct empire_needs *need, *next_need;
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
 	struct empire_npc_data *npc;
+	struct req_data *task;
 	int iter;
 
 	if (!emp) {
@@ -2615,6 +2746,27 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// E: extra data
 	fprintf(fl, "E\n%s %.1f\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), EMPIRE_COINS(emp));
 	
+	// G: progression goals, tasks, and completed
+	HASH_ITER(hh, EMPIRE_GOALS(emp), egoal, next_egoal) {
+		// GG goal in progress
+		fprintf(fl, "GG %d %d\n", egoal->vnum, egoal->version);
+		
+		// GT goal tracker
+		LL_FOREACH(egoal->tracker, task) {
+			fprintf(fl, "GT %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
+		}
+	}
+	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+		// GC completed goal
+		fprintf(fl, "GC %d %ld\n", ecg->vnum, ecg->when);
+	}
+	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+		// GP goal points (progress points)
+		if (EMPIRE_PROGRESS_POINTS(emp, iter)) {
+			fprintf(fl, "GP %d %d\n", iter, EMPIRE_PROGRESS_POINTS(emp, iter));
+		}
+	}
+	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		// I: island names
 		if (isle->name) {
@@ -2642,11 +2794,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// P: privs
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter)
 		fprintf(fl, "P%d\n%d\n", iter, EMPIRE_PRIV(emp, iter));
-
+	
 	// R: ranks
 	for (iter = 0; iter < emp->num_ranks; ++iter)
 		fprintf(fl, "R%d\n%s~\n", iter, EMPIRE_RANK(emp, iter));
-
+	
 	// T: territory buildings
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		fprintf(fl, "T %d %d\n", ter->vnum, ter->population_timer);
@@ -2669,6 +2821,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// Y: cities
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 		fprintf(fl, "Y %d %d %s\n%s~\n", GET_ROOM_VNUM(city->location), city->type, bitv_to_alpha(city->traits), city->name);
+	}
+	
+	// Z: attributes
+	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		fprintf(fl, "Z%d %d\n", iter, EMPIRE_ATTRIBUTE(emp, iter));
 	}
 
 	fprintf(fl, "S\n");
@@ -2729,7 +2886,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		// O: storage
 		HASH_ITER(hh, isle->store, store, next_store) {
-			fprintf(fl, "O\n%d %d %d\n", store->vnum, store->amount, isle->island);
+			fprintf(fl, "O\n%d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep ? 1 : 0);
 		}
 	}
 
@@ -6391,6 +6548,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_book(FILE *fl, int book_id);
 	void parse_class(FILE *fl, any_vnum vnum);
 	void parse_morph(FILE *fl, any_vnum vnum);
+	void parse_progress(FILE *fl, any_vnum vnum);
 	void parse_quest(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
 	void parse_social(FILE *fl, any_vnum vnum);
@@ -6400,7 +6558,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop", "progress" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -6481,6 +6639,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					break;
 				case DB_BOOT_MORPH: {
 					parse_morph(fl, nr);
+					break;
+				}
+				case DB_BOOT_PRG: {
+					parse_progress(fl, nr);
 					break;
 				}
 				case DB_BOOT_EMP:
@@ -6684,6 +6846,11 @@ void index_boot(int mode) {
 			log("   %d name lists.", rec_count);
 			break;
 		}
+		case DB_BOOT_PRG: {
+   			size[0] = sizeof(progress_data) * rec_count;
+			log("   %d progression goals, %d bytes in prototypes.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_OBJ:
 			size[0] = sizeof(obj_data) * rec_count;
 			log("   %d objs, %d bytes in prototypes.", rec_count, size[0]);
@@ -6759,6 +6926,7 @@ void index_boot(int mode) {
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
 			case DB_BOOT_MORPH:
+			case DB_BOOT_PRG:
 			case DB_BOOT_EMP:
 			case DB_BOOT_BOOKS:
 			case DB_BOOT_QST:
@@ -6962,6 +7130,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, object_table, obj, next_obj) {
 				if (GET_OBJ_VNUM(obj) >= (zone * 100) && GET_OBJ_VNUM(obj) <= (zone * 100 + 99)) {
 					write_obj_to_file(fl, obj);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_PRG: {
+			void write_progress_to_file(FILE *fl, progress_data *prg);
+			progress_data *prg, *next_prg;
+			HASH_ITER(hh, progress_table, prg, next_prg) {
+				if (PRG_VNUM(prg) >= (zone * 100) && PRG_VNUM(prg) <= (zone * 100 + 99)) {
+					write_progress_to_file(fl, prg);
 				}
 			}
 			break;
@@ -7339,6 +7517,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_OBJ: {
 			write_object_index(fl);
+			break;
+		}
+		case DB_BOOT_PRG: {
+			void write_progress_index(FILE *fl);
+			write_progress_index(fl);
 			break;
 		}
 		case DB_BOOT_QST: {

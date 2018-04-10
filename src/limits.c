@@ -1293,7 +1293,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			if (needs->needed < 1) {
 				break;	// done early
 			}
-			if (store->amount < 1 || !(obj = obj_proto(store->vnum))) {
+			if (store->keep || store->amount < 1 || !(obj = obj_proto(store->vnum))) {
 				continue;
 			}
 			
@@ -1341,7 +1341,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			switch (needs->type) {
 				case ENEED_WORKFORCE: {
 					// this logs to TRADE because otherwise members won't see it
-					log_to_empire(emp, ELOG_TRADE, "Your workforce on %s is starving!", eisle->name ? eisle->name : get_island(eisle->island, TRUE)->name);
+					log_to_empire(emp, ELOG_TRADE, "Your workforce on %s is starving!", eisle->name ? eisle->name : island->name);
 					deactivate_workforce_island(emp, eisle->island);
 					break;
 				}

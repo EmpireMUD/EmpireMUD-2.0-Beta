@@ -104,9 +104,9 @@ switch %random.4%
           %send% %person% &rYou are drowned by the rising waters!
           %echoaround% %person% %person.name% sinks beneath the rising waters!
           if %heroic_mode%
-            %damage% %person% 750 direct
-          else
             %damage% %person% 500 direct
+          else
+            %damage% %person% 250 direct
           end
         else
           %send% %person% You barely keep your head above the water!
@@ -118,9 +118,9 @@ switch %random.4%
     done
     %echo% %self.name% looks rejuvenated by the water!
     if %heroic_mode%
-      %damage% %self% -2000
+      %damage% %self% -1000
     else
-      %damage% %self% -300
+      %damage% %self% -150
     end
     wait 3 sec
     %echo% The water level starts to lower...
@@ -140,7 +140,7 @@ switch %random.4%
           if %cycle% == 1
             dg_affect %person% BLIND on 20
           end
-          %damage% %person% 50 physical
+          %damage% %person% 40 physical
         end
         eval person %person.next_in_room%
       done
@@ -169,7 +169,7 @@ switch %random.4%
       if %actor.health% > -10
         %send% %actor% &r%self.name%'s bandages tighten around you, trying to squeeze the life out of you!
         %echoaround% %actor% %self.name%'s bandages tighten around %actor.name%!
-        %damage% %actor% 200 physical
+        %damage% %actor% 150 physical
         wait 5 sec
       end
       eval cycle %cycle% + 1
@@ -398,7 +398,7 @@ Scarab special attack~
 0 k 100
 ~
 %echo% &rEveryone is bitten and stung by %self.name%!
-%aoe% 100 physical
+%aoe% 75 physical
 ~
 #18309
 Wander Mummy~

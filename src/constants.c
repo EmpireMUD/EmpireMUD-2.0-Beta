@@ -38,6 +38,7 @@
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
+*   Progress Constants
 *   Quest Constants
 *   Room/World Constants
 *   Shop Constants
@@ -548,6 +549,7 @@ const char *grant_bits[] = {
 	"unquest",
 	"automessage",
 	"peace",	// 40
+	"ungoal",
 	"\n"
 };
 
@@ -1620,6 +1622,7 @@ const char *empire_log_types[] = {
 	"Logins",
 	"Shipping",
 	"Workforce",
+	"Progress",
 	"\n"
 };
 
@@ -1636,6 +1639,7 @@ const bool show_empire_log_type[] = {
 	TRUE,	// logins
 	FALSE,	// shipments
 	FALSE,	// workforce
+	TRUE,	// progress
 };
 
 
@@ -1651,6 +1655,7 @@ const bool empire_log_request_only[] = {
 	TRUE,	// logins
 	FALSE,	// shipments
 	TRUE,	// workforce
+	FALSE,	// progress
 };
 
 
@@ -1660,6 +1665,21 @@ const char *empire_admin_flags[] = {
 	"!STEAL",
 	"CITY-CLAIMS-ONLY",
 	"\n"
+};
+
+
+// EATT_x (1/2): empire attributes
+const char *empire_attributes[] = {
+	"Progress Pool",
+	"City Points",
+	"\n"
+};
+
+
+// EATT_x (2/2): defaults for empire attributes
+const int empire_attribute_defaults[NUM_EMPIRE_ATTRIBUTES] = {
+	0,	// progress pool
+	1,	// city points
 };
 
 
@@ -2512,6 +2532,7 @@ const char *olc_flag_bits[] = {
 	"!FACTIONS",
 	"!GENERICS",
 	"!SHOPS",
+	"ALLOW-PROGRESS",
 	"\n"
 };
 
@@ -2542,6 +2563,36 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"faction",
 	"generic",
 	"shop",
+	"progression",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS CONSTANTS //////////////////////////////////////////////////////
+
+// PROGRESS_x: progress types
+const char *progress_types[] = {
+	"UNDEFINED",
+	"Community",
+	"Industry",
+	"Defense",
+	"Progress",
+	"\n"
+};
+
+
+// PRG_x: progress flags
+const char *progress_flags[] = {
+	"IN-DEVELOPMENT",
+	"PURCHASABLE",
+	"\n"
+};
+
+
+// PRG_PERK_x: progress perk types
+const char *progress_perk_types[] = {
+	"Technology",
 	"\n"
 };
 

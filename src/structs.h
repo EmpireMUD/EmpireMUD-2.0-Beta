@@ -35,6 +35,7 @@
 *     Mobile Defines
 *     Object Defines
 *     Player Defines
+*     Progress Defines
 *     Quest Defines
 *     Sector Defines
 *     Shop Defines
@@ -65,6 +66,7 @@
 *     Game Structs
 *     Generic Structs
 *     Object Structs
+*     Progress Structs
 *     Quest Structs
 *     Sector Structs
 *     Shop Structs
@@ -239,6 +241,7 @@ typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
 typedef struct player_index_data player_index_data;
+typedef struct progress_data progress_data;
 typedef struct quest_data quest_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
@@ -967,6 +970,12 @@ typedef struct vehicle_data vehicle_data;
 #define EADM_CITY_CLAIMS_ONLY  BIT(2)	// may only claim in-city
 
 
+// EATT_x: empire attributes
+#define EATT_PROGRESS_POOL  0	// spendable progress points
+#define EATT_CITY_POINTS  1	// bonus city points
+#define NUM_EMPIRE_ATTRIBUTES  2	// total
+
+
 // ETRAIT_x: empire trait flags
 #define ETRAIT_DISTRUSTFUL  BIT(0)	// hostile behavior
 
@@ -1029,6 +1038,7 @@ typedef struct vehicle_data vehicle_data;
 #define ELOG_LOGINS  7	// login/out/alt (does not save to file)
 #define ELOG_SHIPPING  8	// shipments via do_ship
 #define ELOG_WORKFORCE  9	// reporting related to workforce (does not echo, does not display unless requested)
+#define ELOG_PROGRESS  10	// empire progression goals
 
 
 // ENEED_x: empire need types
@@ -1861,6 +1871,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_UNQUEST  BIT(38)
 #define GRANT_AUTOMESSAGE  BIT(39)
 #define GRANT_PEACE  BIT(40)
+#define GRANT_UNGOAL  BIT(41)
 
 
 // Lore types
@@ -2056,6 +2067,27 @@ typedef struct vehicle_data vehicle_data;
 #define WAIT_MOVEMENT  4	// normal move lag
 #define WAIT_SPELL  5	// general spells
 #define WAIT_OTHER  6	// not covered by other categories
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS DEFINES ////////////////////////////////////////////////////////
+
+// PROGRESS_x: progress types
+#define PROGRESS_UNDEFINED  0	// base/unset
+#define PROGRESS_COMMUNITY  1
+#define PROGRESS_INDUSTRY  2
+#define PROGRESS_DEFENSE  3
+#define PROGRESS_PROGRESS  4
+#define NUM_PROGRESS_TYPES  5	// total
+
+
+// PRG_x: progress flags
+#define PRG_IN_DEVELOPMENT  BIT(0)	// not available to players
+#define PRG_PURCHASABLE  BIT(1)	// can buy it
+
+
+// PRG_PERK_x: progress perks
+#define PRG_PERK_TECH  0	// grants a technology
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3448,6 +3480,7 @@ struct descriptor_data {
 	faction_data *olc_faction;	// faction being edited
 	generic_data *olc_generic;	// generic being edited
 	struct global_data *olc_global;	// global being edited
+	progress_data *olc_progress;	// prg being edited
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
@@ -4056,6 +4089,25 @@ struct empire_city_data {
 };
 
 
+// hash of goals completed by the empire
+struct empire_completed_goal {
+	any_vnum vnum;	// which progress goal
+	time_t when;
+	
+	UT_hash_handle hh;	// stored in empire's hash table
+};
+
+
+// current progress goals
+struct empire_goal {
+	any_vnum vnum;	// which progress goal
+	ush_int version;	// for auto-updating
+	struct req_data *tracker;	// tasks to track
+	
+	UT_hash_handle hh;	// hashed by vnum
+};
+
+
 // per-island data for the empire
 struct empire_island {
 	int island;	// which island id
@@ -4123,6 +4175,7 @@ struct empire_political_data {
 struct empire_storage_data {
 	obj_vnum vnum;	// what's stored
 	int amount;	// how much
+	bool keep;	// if TRUE, workforce will ignore it
 	UT_hash_handle hh;	// empire_island->store hash (by vnum)
 };
 
@@ -4246,6 +4299,8 @@ struct empire_data {
 	byte num_ranks;	// Total number of levels (maximum 20)
 	char *rank[MAX_RANKS];	// Name of each rank
 	
+	int attributes[NUM_EMPIRE_ATTRIBUTES];	// misc attributes
+	int progress_points[NUM_PROGRESS_TYPES];	// empire's points in each category
 	bitvector_t admin_flags;	// EADM_
 	bitvector_t frontier_traits;	// ETRAIT_
 	double coins;	// total coins (always in local currency)
@@ -4259,6 +4314,8 @@ struct empire_data {
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
 	struct offense_data *offenses;
+	struct empire_goal *goals;	// current goal trackers (hash by vnum)
+	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -4288,6 +4345,7 @@ struct empire_data {
 	time_t next_timeout;	// for triggering rescans
 	int min_level;	// minimum level in the empire
 	int max_level;	// maximum level in the empire
+	bool check_goal_complete;	// tells the mud to check for a complete goal
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
@@ -4537,6 +4595,47 @@ struct obj_storage_type {
 	int flags;	// STORAGE_x
 	
 	struct obj_storage_type *next;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS STRUCTS ////////////////////////////////////////////////////////
+
+// master progression goal
+struct progress_data {
+	any_vnum vnum;
+	
+	char *name;
+	char *description;
+	
+	int version;	// for auto-updating
+	int type;	// PROGRESS_ const
+	bitvector_t flags;	// PRG_ flags
+	int value;	// points
+	int cost;	// in points
+	
+	// lists
+	struct progress_list *prereqs;	// linked list of requires progress
+	struct req_data *tasks;	// linked list of tasks to complete
+	struct progress_perk *perks;	// linked list of perks granted
+	
+	UT_hash_handle hh;	// progress_table
+	UT_hash_handle sorted_hh;	// sorted_progress
+};
+
+
+// basic list of progressions
+struct progress_list {
+	any_vnum vnum;
+	struct progress_list *next;	// linked list
+};
+
+
+// for a linked list of things you get from a progression goal
+struct progress_perk {
+	int type;	// PRG_PERK_ const
+	int value;
+	struct progress_perk *next;
 };
 
 

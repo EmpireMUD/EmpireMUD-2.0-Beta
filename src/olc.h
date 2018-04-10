@@ -51,7 +51,8 @@
 #define OLC_FACTION  BIT(21)
 #define OLC_GENERIC  BIT(22)
 #define OLC_SHOP  BIT(23)
-#define NUM_OLC_TYPES  24
+#define OLC_PROGRESS  BIT(24)
+#define NUM_OLC_TYPES  25
 
 
 // olc command flags
@@ -86,6 +87,7 @@
 #define OLC_FLAG_NO_FACTIONS  BIT(21)	// cannot edit factions
 #define OLC_FLAG_NO_GENERICS  BIT(21)	// cannot edit generics
 #define OLC_FLAG_NO_SHOPS  BIT(22)	// cannot edit shops
+#define OLC_FLAG_ALLOW_PROGRESS  BIT(23)	// CAN edit progress
 
 
 // for trigger editing

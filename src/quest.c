@@ -56,7 +56,7 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern struct req_data *copy_requirements(struct req_data *from);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+void count_quest_tasks(struct req_data *list, int *complete, int *total);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
@@ -350,6 +350,64 @@ void expire_instance_quests(struct instance_data *inst) {
 char *get_quest_name_by_proto(any_vnum vnum) {
 	quest_data *proto = quest_proto(vnum);
 	return proto ? QUEST_NAME(proto) : "UNKNOWN";
+}
+
+
+/**
+* Builds the tracker display for requirements.
+*
+* @param struct req_data *tracker The tracker to show.
+* @param char *save_buffer The string to save it to.
+*/
+void get_tracker_display(struct req_data *tracker, char *save_buffer) {
+	extern const bool requirement_amt_type[];
+	
+	int lefthand, count = 0, sub = 0;
+	char buf[MAX_STRING_LENGTH];
+	struct req_data *task;
+	char last_group = 0;
+	
+	*save_buffer = '\0';
+	
+	LL_FOREACH(tracker, task) {
+		if (last_group != task->group) {
+			if (task->group) {
+				sprintf(save_buffer + strlen(save_buffer), "  %sAll of:\r\n", (count > 0 ? "or " : ""));
+			}
+			last_group = task->group;
+			sub = 0;
+		}
+		
+		++count;	// total iterations
+		++sub;	// iterations inside this sub-group
+		
+		// REQ_AMT_x: display based on amount type
+		switch (requirement_amt_type[task->type]) {
+			case REQ_AMT_NUMBER: {
+				lefthand = task->current;
+				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
+				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
+				sprintf(buf, " (%d/%d)", lefthand, task->needed);
+				break;
+			}
+			case REQ_AMT_REPUTATION:
+			case REQ_AMT_THRESHOLD:
+			case REQ_AMT_NONE: {
+				if (task->current >= task->needed) {
+					strcpy(buf, " (complete)");
+				}
+				else {
+					strcpy(buf, " (not complete)");
+				}
+				break;
+			}
+			default: {
+				*buf = '\0';
+				break;
+			}
+		}
+		sprintf(save_buffer + strlen(save_buffer), "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE), buf);
+	}
 }
 
 
@@ -1300,7 +1358,7 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 			continue;
 		}
 		
-		count_quest_tasks(pq, &complete, &total);
+		count_quest_tasks(pq->tracker, &complete, &total);
 		if (complete < total) {
 			continue;
 		}
@@ -1354,7 +1412,7 @@ bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_li
 			continue;	// room permissions
 		}
 		
-		count_quest_tasks(pq, &complete, &total);
+		count_quest_tasks(pq->tracker, &complete, &total);
 		if (complete < total) {
 			continue;
 		}
@@ -1415,7 +1473,7 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 				continue;
 			}
 		
-			count_quest_tasks(pq, &complete, &total);
+			count_quest_tasks(pq->tracker, &complete, &total);
 			if (complete < total) {
 				continue;
 			}
@@ -1891,6 +1949,7 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 		return;
 	}
 	
+	// player trackers
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_KILL_MOB_FLAGGED && (MOB_FLAGS(mob) & task->misc) == task->misc) {
@@ -1898,6 +1957,25 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 			}
 			else if (task->type == REQ_KILL_MOB && GET_MOB_VNUM(mob) == task->vnum) {
 				++task->current;
+			}
+		}
+	}
+	
+	// empire trackers
+	if (GET_LOYALTY(ch)) {
+		struct empire_goal *goal, *next_goal;
+		HASH_ITER(hh, EMPIRE_GOALS(GET_LOYALTY(ch)), goal, next_goal) {
+			LL_FOREACH(goal->tracker, task) {
+				if (task->type == REQ_KILL_MOB_FLAGGED && (MOB_FLAGS(mob) & task->misc) == task->misc) {
+					++task->current;
+					EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+					TRIGGER_CHECK_GOAL_COMPLETE(GET_LOYALTY(ch));
+				}
+				else if (task->type == REQ_KILL_MOB && GET_MOB_VNUM(mob) == task->vnum) {
+					++task->current;
+					EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+					TRIGGER_CHECK_GOAL_COMPLETE(GET_LOYALTY(ch));
+				}
 			}
 		}
 	}
@@ -2426,6 +2504,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	quest_data *quest = quest_proto(vnum);
 	quest_data *qiter, *next_qiter;
+	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	int size, found;
@@ -2438,6 +2517,22 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of quest %d (%s):\r\n", vnum, QUEST_NAME(quest));
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+		}
+	}
 	
 	// on other quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
@@ -3426,6 +3521,7 @@ quest_data *create_quest_table_entry(any_vnum vnum) {
 */
 void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *qiter, *next_qiter;
+	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	descriptor_data *desc;
@@ -3457,6 +3553,19 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	
 	// delete from lookups
 	add_or_remove_all_quest_lookups_for(quest, FALSE);
+	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
+		}
+	}
 	
 	// update other quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
@@ -3503,6 +3612,16 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	
 	// remove from from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_ON_QUEST, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A quest used by the progression goal you're editing has been deleted.\r\n");
+			}
+		}
 		if (GET_OLC_QUEST(desc)) {
 			// REQ_x, QR_x: quest types
 			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);

@@ -152,10 +152,10 @@ if %phase%==3
           %send% %target% A tornado of harmless smoke briefly surrounds you!
           %echoaround %target% A tornado of harmless smoke briefly surrounds %target%!
         else
-          %send% %target% &rYour body bursts into unquenchable flames!&0
-          %echoaround% %target% %target.name%'s body bursts into unquenchable flames!
+          %send% %target% &rYour body bursts into infernal flames!&0
+          %echoaround% %target% %target.name%'s body bursts into infernal flames!
           %damage% %target% 25 fire
-          %dot% %target% 100 300 fire
+          %dot% %target% 300 30 fire
         end
       end
     break
@@ -169,13 +169,13 @@ if %phase%==3
       %echo% &RThe platform starts shaking beneath your feet!&0
       wait 5 sec
       %echo% &rWaves of fire flood the room!&0
-      %aoe% 150 fire
+      %aoe% 100 fire
       wait 5 sec
       %echo% &rA barrage of sharp rocks falls from the ceiling!&0
-      %aoe% 150 physical
+      %aoe% 100 physical
       wait 5 sec
       %echo% &rThe floating motes of mana in the air transform into ethereal blades!&0
-      %aoe% 100 magical
+      %aoe% 50 magical
       %aoe% 50 physical
       wait 5 sec
       %echo% %self.name% sinks back into the lava...

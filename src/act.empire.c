@@ -48,6 +48,7 @@ extern const char *empire_admin_flags[];
 extern const char *empire_trait_types[];
 extern const char *offense_flags[];
 extern struct offense_info_type offense_info[NUM_OFFENSES];
+extern const char *progress_types[];
 extern const char *trade_type[];
 extern const char *trade_mostleast[];
 extern const char *trade_overunder[];
@@ -77,6 +78,7 @@ struct einv_type {
 	obj_vnum vnum;
 	int local;
 	int total;
+	bool keep;
 	UT_hash_handle hh;
 };
 
@@ -418,6 +420,63 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		isle->workforce_limit[chore] = limit;
+	}
+}
+
+
+/**
+* Displays all gaols completed by the empire.
+*
+* @param char_data *ch The player to show them to.
+* @parma empire_data *emp The empire whose goals to show.
+* @param int only_type Optional: A PROGRESS_ type to show exclusively (NOTHING = all types).
+*/
+void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	progress_data *prg, *next_prg;
+	int count = 0;
+	size_t size;
+	
+	if (only_type == NOTHING) {
+		size = snprintf(buf, sizeof(buf), "%s%s\t0 has completed:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "%s%s\t0 has completed the following %s goals:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), progress_types[only_type]);
+	}
+	
+	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (only_type != NOTHING && PRG_TYPE(prg) != only_type) {
+			continue;
+		}
+		if (!empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			continue;
+		}
+		
+		// looks good
+		snprintf(line, sizeof(line), " %-35.35s%s", PRG_NAME(prg), !(++count % 2) ? "\r\n" : "");
+		
+		if (size + strlen(line) < sizeof(buf)) {
+			strcat(buf, line);
+			size += strlen(line);
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+			break;
+		}
+	}
+	
+	if (!count) {
+		size += snprintf(buf + size, sizeof(buf) - size, " no goals\r\n");
+	}
+	else if (size + 2 < sizeof(buf) && count % 2) {
+		strcat(buf, "\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
 	}
 }
 
@@ -787,6 +846,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			SAFE_ADD(einv->total, store->amount, 0, INT_MAX, FALSE);
 			if (isle->island == GET_ISLAND_ID(IN_ROOM(ch))) {
 				SAFE_ADD(einv->local, store->amount, 0, INT_MAX, FALSE);
+				einv->keep = store->keep;
 			}
 		}
 	}
@@ -824,10 +884,10 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->total);
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "", einv->total);
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum));
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "");
 			}
 			
 			// append if room
@@ -2846,6 +2906,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
 		
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
+			et_lose_vehicle(emp, VEH_VNUM(veh));
 		}
 	}
 }
@@ -3220,6 +3281,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 		
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
+			et_gain_vehicle(emp, VEH_VNUM(veh));
 		}
 	}
 }
@@ -3553,7 +3615,7 @@ ACMD(do_diplomacy) {
 		}
 		
 		if (war_cost > 0) {
-			EMPIRE_COINS(ch_emp) -= war_cost;
+			increase_empire_coins(ch_emp, ch_emp, -war_cost);
 		}
 		
 		*ch_log = '\0';	// leave trailing punctuation off of ch_log (for war cost)
@@ -4063,6 +4125,8 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
+	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
+	
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
@@ -4307,6 +4371,10 @@ ACMD(do_enroll) {
 			
 			// Delete the old empire
 			delete_empire(old);
+			
+			// update goal trackers
+			refresh_empire_goals(e, NOTHING);
+			
 			save_empire(e, TRUE);
 		}
 		
@@ -5368,7 +5436,7 @@ ACMD(do_pledge) {
 		msg_to_char(ch, "You cancel your pledge to %s.\r\n", e ? EMPIRE_NAME(e) : "the empire");
 		GET_PLEDGE(ch) = NOTHING;
 		if (e) {
-			log_to_empire(e, ELOG_MEMBERS, "%s has canceld %s pledge to this empire", PERS(ch, ch, TRUE), REAL_HSHR(ch));
+			log_to_empire(e, ELOG_MEMBERS, "%s has canceled %s pledge to this empire", PERS(ch, ch, TRUE), REAL_HSHR(ch));
 		}
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("join_empire_approval")) {
@@ -5394,6 +5462,187 @@ ACMD(do_pledge) {
 		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), REAL_HSHR(ch));
 		msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
 		SAVE_CHAR(ch);
+	}
+}
+
+
+ACMD(do_progress) {
+	void count_quest_tasks(struct req_data *list, int *complete, int *total);
+	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
+	extern progress_data *find_progress_goal_by_name(char *name);
+	void get_progress_perks_display(struct progress_perk *list, char *save_buffer);
+	void get_tracker_display(struct req_data *tracker, char *save_buffer);
+	
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], *arg2, *ptr;
+	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES];
+	empire_data *emp = GET_LOYALTY(ch);
+	struct empire_completed_goal *ecg, *next_ecg;
+	struct empire_goal *goal, *next_goal;
+	int cat, total, complete, num;
+	progress_data *prg;
+	size_t size;
+	time_t when;
+	bool any;
+	
+	strcpy(buf, argument);
+	if (*argument && imm_access) {
+		ptr = any_one_word(argument, arg);
+		if ((emp = get_empire_by_name(arg))) {
+			// WAS an empire
+			argument = ptr;
+		}
+		else {
+			// was not an empire arg
+			strcpy(argument, buf);	// same length as before
+			emp = GET_LOYALTY(ch);
+		}
+	}
+	skip_spaces(&argument);
+	
+	// optional split into arg/arg2 (argument preserves the whole thing)
+	arg2 = any_one_word(argument, arg);
+	skip_spaces(&arg2);
+	
+	if (IS_NPC(ch) || !emp) {
+		msg_to_char(ch, "You need to be in an empire to check progress.\r\n");
+	}
+	else if (!ch->desc) {
+		// nothing to compute/show
+	}
+	else if (!*argument) {
+		// show current categories and their goal counts
+		total = 0;
+		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
+			counts[cat] = 0;
+			compl[cat] = 0;
+			total += EMPIRE_PROGRESS_POINTS(emp, cat);
+		}
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			if ((prg = real_progress(goal->vnum))) {
+				++counts[PRG_TYPE(prg)];
+			}
+		}
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+			if ((prg = real_progress(ecg->vnum))) {
+				++compl[PRG_TYPE(prg)];
+			}
+		}
+		
+		size = snprintf(buf, sizeof(buf), "%s%s\t0 has %d progress points available (%d total earned).\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_PROGRESS_POOL(emp), total);
+		
+		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
+			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+				break;
+			}
+		}
+		
+		page_string(ch->desc, buf, TRUE);
+	}
+	else if (((cat = search_block(argument, progress_types, FALSE)) != NOTHING || (cat = search_block(arg, progress_types, FALSE)) != NOTHING) && cat != PROGRESS_UNDEFINED) {
+		// show completed goals instead?
+		if (is_abbrev(arg2, "completed") && strlen(arg2) > 3) {
+			show_completed_goals(ch, emp, cat);
+			return;
+		}
+		
+		// show current progress in that category
+		size = snprintf(buf, sizeof(buf), "%s goals:\r\n", progress_types[cat]);
+		
+		// show current goals
+		any = 0;
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			if (!(prg = real_progress(goal->vnum)) || PRG_TYPE(prg) != cat) {
+				continue;
+			}
+			
+			count_quest_tasks(goal->tracker, &complete, &total);
+			snprintf(line, sizeof(line), "- %s, %d point%s (%d/%d)\r\n", PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total);
+			any = TRUE;
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+				break;
+			}
+		}
+		if (!any) {
+			size += snprintf(buf + size, sizeof(buf) - size, "- No active goals\r\n");
+		}
+		
+		// number of completed goals
+		total = 0;
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+			if ((prg = real_progress(ecg->vnum)) && PRG_TYPE(prg) == cat) {
+				++total;
+			}
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "- Completed goals: %d\r\n", total);
+		
+		page_string(ch->desc, buf, TRUE);
+	}
+	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument))) {
+		// show 1 goal
+		msg_to_char(ch, "%s\r\n%s", PRG_NAME(prg), NULLSAFE(PRG_DESCRIPTION(prg)));
+		
+		if (PRG_VALUE(prg) > 0) {
+			msg_to_char(ch, "Value: %d point%s\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
+		}
+		if (PRG_COST(prg) > 0) {
+			msg_to_char(ch, "Cost: %d point%s\r\n", PRG_COST(prg), PLURAL(PRG_COST(prg)));
+		}
+		
+		if ((when = empire_has_completed_goal(emp, PRG_VNUM(prg)))) {
+			when = time(0) - when;	// diff
+			if ((when / SECS_PER_REAL_DAY) >= 1) {
+				num = round((double)when / SECS_PER_REAL_DAY);
+				sprintf(buf, "%d day%s ago", num, PLURAL(num));
+			}
+			else if ((when / SECS_PER_REAL_HOUR) >= 1) {
+				num = round((double)when / SECS_PER_REAL_HOUR);
+				sprintf(buf, "%d hour%s ago", num, PLURAL(num));
+			}
+			else {
+				strcpy(buf, "recently");
+			}
+			msg_to_char(ch, "Completed %s.\r\n", buf);
+		}
+		if (PRG_PERKS(prg)) {
+			get_progress_perks_display(PRG_PERKS(prg), buf);
+			msg_to_char(ch, "Rewards:\r\n%s", buf);
+		}
+		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
+			get_tracker_display(goal->tracker, buf);
+			msg_to_char(ch, "Progress:\r\n%s", buf);
+		}
+	}
+	else if (is_abbrev(arg, "completed")) {
+		// check category request
+		cat = *arg2 ? search_block(arg2, progress_types, FALSE) : NOTHING;
+		if (cat == PROGRESS_UNDEFINED) {
+			cat = NOTHING;
+		}
+		
+		show_completed_goals(ch, emp, cat);
+	}
+	
+	// TODO purchase
+	
+	else {
+		msg_to_char(ch, "Unknown progress command or goal '%s'.\r\n", argument);
+		msg_to_char(ch, "Usage: progress [category]\r\n");
+		msg_to_char(ch, "       progress [goal name]\r\n");
+		msg_to_char(ch, "       progress completed\r\n");
 	}
 }
 
@@ -5967,10 +6216,13 @@ ACMD(do_unpublicize) {
 
 ACMD(do_workforce) {
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
+	struct empire_storage_data *store, *next_store;
 	struct island_info *island = NULL;
-	bool all = FALSE, here = FALSE;
+	bool all = FALSE, here = FALSE, found;
+	struct empire_island *eisle;
 	int iter, type, limit = 0;
 	empire_data *emp;
+	obj_data *proto;
 	
 	argument = any_one_arg(argument, arg);
 
@@ -6004,6 +6256,38 @@ ACMD(do_workforce) {
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
 		// this doesn't use has_permission because that would check if the current room is owned
 		msg_to_char(ch, "You don't have permission to set up the workforce.\r\n");
+	}
+	else if (is_abbrev(arg, "keep")) {
+		skip_spaces(&argument);
+		
+		if (!*argument) {
+			msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
+			return;
+		}
+		if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(eisle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
+			msg_to_char(ch, "You can't tell workforce to keep items if you're not on any island.\r\n");
+			return;
+		}
+		
+		found = FALSE;
+		HASH_ITER(hh, eisle->store, store, next_store) {
+			if (!(proto = obj_proto(store->vnum))) {
+				continue;
+			}
+			if (!multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+				continue;
+			}
+			
+			found = TRUE;
+			msg_to_char(ch, "Your workforce will %s keep all its '%s' on this island.\r\n", store->keep ? "no longer" : "now", skip_filler(GET_OBJ_SHORT_DESC(proto)));
+			store->keep = store->keep ? FALSE : TRUE;
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			break;
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
+		}
 	}
 	else if (is_abbrev(arg, "nowork") || is_abbrev(arg, "no-work")) {
 		// special case: toggle no-work on this tile
