@@ -1417,6 +1417,7 @@ void check_for_new_map(void) {
 	
 	struct empire_storage_data *store, *next_store;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_trade_data *trade, *next_trade;
 	struct empire_city_data *city, *next_city;
 	struct shipping_data *shipd, *next_shipd;
 	struct empire_island *isle, *next_isle;
@@ -1445,6 +1446,12 @@ void check_for_new_map(void) {
 			free(shipd);	// no need to remove from list
 		}
 		EMPIRE_SHIPPING_LIST(emp) = NULL;	// all entries freed
+		
+		// free trade (no longer relevant)
+		LL_FOREACH_SAFE(EMPIRE_TRADE(emp), trade, next_trade) {
+			free(trade);
+		}
+		EMPIRE_TRADE(emp) = NULL;
 		
 		// free cities
 		LL_FOREACH_SAFE(EMPIRE_CITY_LIST(emp), city, next_city) {
