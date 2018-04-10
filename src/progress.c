@@ -598,6 +598,7 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
 			if (goal) {
 				cancel_empire_goal(emp, goal);
+				goal = NULL;
 			}
 			skip = TRUE;
 		}
@@ -610,6 +611,13 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 				HASH_DEL(EMPIRE_COMPLETED_GOALS(emp), ecg);
 				free(ecg);
 			}
+			skip = TRUE;
+		}
+		
+		// remove if no longer meets the pre-reqs
+		if (goal && !empire_meets_goal_prereqs(emp, prg)) {
+			cancel_empire_goal(emp, goal);
+			goal = NULL;
 			skip = TRUE;
 		}
 		
@@ -969,7 +977,8 @@ char *list_one_progress(progress_data *prg, bool detail) {
 */
 void olc_search_progress(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
-	progress_data *prg = real_progress(vnum);
+	progress_data *prg = real_progress(vnum), *iter, *next_iter;
+	struct progress_list *pl;
 	int size, found;
 	
 	if (!prg) {
@@ -980,7 +989,16 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of progression %d (%s):\r\n", vnum, PRG_NAME(prg));
 	
-	// none yet
+	// other progresses
+	HASH_ITER(hh, progress_table, iter, next_iter) {
+		LL_FOREACH(PRG_PREREQS(iter), pl) {
+			if (pl->vnum == vnum) {
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(iter), PRG_NAME(iter));
+				break;
+			}
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
@@ -1442,14 +1460,33 @@ progress_data *create_progress_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_progress(char_data *ch, any_vnum vnum) {
-	progress_data *prg;
+	progress_data *prg, *iter, *next_iter;
+	struct progress_list *pl, *next_pl;
+	struct empire_completed_goal *egc;
+	empire_data *emp, *next_emp;
+	struct empire_goal *goal;
+	descriptor_data *desc;
+	bool any;
 	
 	if (!(prg = real_progress(vnum))) {
 		msg_to_char(ch, "There is no such progress entry %d.\r\n", vnum);
 		return;
 	}
 	
-	// removing live instances goes here
+	// removing live instances
+	if (!PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if ((goal = get_current_goal(emp, vnum))) {
+				cancel_empire_goal(emp, goal);
+			}
+			
+			HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, egc);
+			if (egc) {
+				HASH_DEL(EMPIRE_COMPLETED_GOALS(emp), egc);
+				free(egc);
+			}
+		}
+	}
 	
 	// remove it from the hash table first
 	remove_progress_from_table(prg);
@@ -1458,7 +1495,44 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_PRG);
 	save_library_file_for_vnum(DB_BOOT_PRG, vnum);
 	
-	// removing from prototypes goes here
+	// removing from prototypes goes here:
+	
+	// other progresses
+	HASH_ITER(hh, progress_table, iter, next_iter) {
+		any = FALSE;
+		LL_FOREACH_SAFE(PRG_PREREQS(iter), pl, next_pl) {
+			if (pl->vnum == vnum) {
+				LL_DELETE(PRG_PREREQS(iter), pl);
+				free(pl);
+				any = TRUE;
+			}
+		}
+		
+		if (any) {
+			SET_BIT(PRG_FLAGS(iter), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(iter));
+			need_progress_refresh = TRUE;
+		}
+	}
+	
+	// remove from from active editors
+	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_PROGRESS(desc)) {
+			any = FALSE;
+			LL_FOREACH_SAFE(PRG_PREREQS(GET_OLC_PROGRESS(desc)), pl, next_pl) {
+				if (pl->vnum == vnum) {
+					LL_DELETE(PRG_PREREQS(GET_OLC_PROGRESS(desc)), pl);
+					free(pl);
+					any = TRUE;
+				}
+			}
+		
+			if (any) {
+				SET_BIT(PRG_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A progression goal used as a prerequisite by the goal you're editing has been deleted.\r\n");
+			}
+		}
+	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted progress entry %d", GET_NAME(ch), vnum);
 	msg_to_char(ch, "Progress entry %d deleted.\r\n", vnum);
