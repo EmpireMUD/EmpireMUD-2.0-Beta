@@ -73,19 +73,23 @@ if !%instance.location%
   %purge% %self%
   halt
 end
+if %room.sector_vnum% <= 4 || (%room.sector_vnum% >= 40 && %room.sector_vnum% <= 45) || %room.sector_vnum% == 50 || (%room.sector_vnum% >= 54 && %room.sector_vnum% <= 56)
+  * valid, plains/forest or shore-jungle (55)
+  set sector_valid 1
+elseif %room.sector_vnum% == 7 || %room.sector_vnum% == 13 || %room.sector_vnum% == 15 || %room.sector_vnum% == 16 || %room.sector_vnum% == 27 || %room.sector_vnum% == 28 || %room.sector_vnum% == 34
+  * valid, jungle / crop
+  set sector_valid 1
+end
 if (%room.template% == 10500 || %room.distance(%instance.location%)% > 3 || %room.building% == Fence || %room.building% == Wall)
   %echo% %self.name% vanishes in a swirl of leaf-green mana!
   mgoto %instance.location%
   %echo% %self.name% appears in a swirl of leaf-green mana!
   halt
-elseif (%room.empire_id% || (%room.sector% != Plains && %room.sector% != Crop && %room.sector% != Seeded Field && %room.sector% != Jungle Crop && %room.sector% != Jungle Field && !(%room.sector% ~= Forest) && !(%room.sector% ~= Jungle)))
+elseif %room.empire_id% || (%room.crop_vnum% >= 10500 && %room.crop_vnum% <= 10549)
+  * Claimed or already a whirlwind crop
+  set no_work 1
+elseif !%sector_valid%
   * No Work
-  set no_work 1
-elseif (%room.sector% ~= Crop && (%room.crop% == glowkra || %room.crop% == spadebrush || %room.crop% == magic mushrooms || %room.crop% == pudding figs || %room.crop% == dragonsteeth || %room.crop% == giant beanstalks))
-  * No Work -- split in 2 parts for line length limit
-  set no_work 1
-elseif (%room.sector% ~= Crop && (%room.crop% == axeroot || %room.crop% == puppy plants || %room.crop% == gemfruit || %room.crop% == bladegrass || %room.crop% == pickthorn || %room.crop% == vigilant vines))
-  * No Work -- split in 2 parts for line length limit
   set no_work 1
 end
 if !%no_work%
@@ -232,54 +236,45 @@ end
 Interdimensional Whirlwind Cleanup~
 2 e 100
 ~
-* pick a crop -- use start of time as jan 1, 2015: 1420070400
-* 2628288 seconds in a month
-eval month ((%timestamp% - 1420070400) / 2628288) // 12
-set vnum -1
-switch (%month% + 1)
-  case 1
-    set vnum 10501
-  break
-  case 2
-    set vnum 10508
-  break
-  case 3
-    set vnum 10504
-  break
-  case 4
-    set vnum 10505
-  break
-  case 5
-    set vnum 10511
-  break
-  case 6
-    set vnum 10503
-  break
-  case 7
-    set vnum 10507
-  break
-  case 8
-    set vnum 10509
-  break
-  case 9
-    set vnum 10500
-  break
-  case 10
-    set vnum 10502
-  break
-  case 11
-    set vnum 10510
-  break
-  case 12
-    set vnum 10506
-  break
+set main_direction_1 west
+set main_direction_2 east
+set branch_direction_1 north
+set branch_direction_2 south
+set dir_var 1
+eval row_direction %%main_direction_%dir_var%%%
+set row_room %room%
+set loop 1
+* mirror left/right
+while %dir_var% <= 2
+  * terraform horizontally
+  while %room.distance(%row_room%)% <= 3
+    * %regionecho% %room% 5 %row_room.sector% @ %row_room.coords%
+    if ((%row_room.crop_vnum% >= 10500) && (%row_room.crop_vnum% <= 10549) && (!%row_room.empire_id%)) && %row_room% != %room%
+      %terraform% %row_room% 0
+    end
+    set branch_dir_var 1
+    * mirror up/down
+    while %branch_dir_var% <= 2
+      eval column_direction %%branch_direction_%branch_dir_var%%%
+      eval target_room %%row_room.%column_direction%(map)%%
+      * terraform vertically
+      while %target_room% && %room.distance(%target_room%)% <= 3
+        * %regionecho% %room% 5 %target_room.sector% @ %target_room.coords%
+        if ((%target_room.crop_vnum% >= 10500) && (%target_room.crop_vnum% <= 10549) && (!%target_room.empire_id%))
+          %terraform% %target_room% 0
+        end
+        eval target_room %%target_room.%column_direction%(map)%%
+      done
+      eval branch_dir_var %branch_dir_var% + 1
+    done
+    eval row_room %%row_room.%row_direction%(map)%%
+  done
+  eval dir_var %dir_var% + 1
+  eval row_direction %%main_direction_%dir_var%%%
+  eval row_room %%room.%row_direction%(map)%%
 done
-if (%vnum% == -1)
-  halt
-end
-* do!
-%terracrop% %room% %vnum%
-%echo% As the whirlwind fades away, crops burst from the soil here!
+%regionecho% %room% -3 The nearby whirlwind implodes, sucking in the crops surrounding it.
+%terraform% %room% 0
 ~
 #10508
 Dragonstooth sceptre equip first~

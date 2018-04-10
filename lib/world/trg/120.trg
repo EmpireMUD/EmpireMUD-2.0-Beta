@@ -239,7 +239,7 @@ else
   while %cycle% <= 3
     wait 5 sec
     %echo% &r%self.name%'s arrows rain down upon you!
-    %aoe% 250 physical
+    %aoe% 100 physical
     eval cycle %cycle% + 1
   done
 end
@@ -261,17 +261,19 @@ wait 3 sec
 %echo% &r%self.name% charges forward, hacking and slicing at everyone!
 %send% %actor% &rYou take the brunt of %self.name%'s assault!
 %echoaround% %actor% %actor.name% takes the brunt of %self.name%'s assault!
-%aoe% 50 physical
-%damage% %actor% 300 physical
-%dot% #12008 %actor% 250 30 physical
+%aoe% 25 physical
+%damage% %actor% 200 physical
+%dot% #12008 %actor% 150 30 physical
 wait 5 sec
-set amount 5000
+set amount 1000
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
     %send% %person% &rA fountain of blood suddenly bursts from the wounds left by %self.name%'s assault!
-    %damage% %person% 150
-    eval amount %amount% + 1000
+    %damage% %person% 100
+    if %self.mob_flagged(GROUP)%
+      eval amount %amount% + 250
+    end
   end
   set person %person.next_in_room%
 done
@@ -292,13 +294,13 @@ wait 2 sec
 %send% %actor% &r%self.name% drives %self.hisher% spear through your chest, impaling you upon it!
 %echoaround% %actor% %self.name% drives %self.hisher% spear through %actor.name%'s chest, impaling %actor.himher% upon it!
 if %self.mob_flagged(GROUP)%
-  %damage% %actor% 1000 physical
-  dg_affect #12009 %actor% HARD-STUNNED on 15
-  %dot% #12009 %actor% 500 15 physical
-else
   %damage% %actor% 500 physical
+  dg_affect #12009 %actor% HARD-STUNNED on 15
+  %dot% #12009 %actor% 400 15 physical
+else
+  %damage% %actor% 250 physical
   dg_affect #12009 %actor% HARD-STUNNED on 10
-  %dot% #12009 %actor% 300 10 physical
+  %dot% #12009 %actor% 200 10 physical
 end
 wait 3 sec
 %send% %actor% %self.name% releases %self.hisher% spear, allowing you to slump to the ground.
@@ -684,11 +686,11 @@ wait 2 sec
 %send% %target% &r%self.name% crashes into you, sending you flying!
 %echoaround% %target% %self.name% crashes into %target.name%, sending %target.himher% flying!
 if %self.mob_flagged(GROUP)%
-  %damage% %target% 750 physical
+  %damage% %target% 400 physical
   dg_affect #12036 %target% HARD-STUNNED on 15
   dg_affect #12036 %target% DODGE -100 15
 else
-  %damage% %target% 500 physical
+  %damage% %target% 200 physical
   dg_affect #12036 %target% STUNNED on 10
 end
 ~
@@ -719,7 +721,7 @@ while %time% <= %times%
   %echoaround% %target% %self.name% hurls a thunderbolt at %target.name%!
   %send% %target% &rThe thunderbolt explodes in your face!
   %echoaround% %target% The thunderbolt explodes in front of %target.name%'s face!
-  %damage% %target% 350 magical
+  %damage% %target% 150 magical
   %dot% #12037 %target% 200 30 magical
   if %self.mob_flagged(GROUP)%
     %send% %target% You are blinded by the brightness of the blast!
@@ -741,17 +743,17 @@ nop %self.set_cooldown(12030, 30)%
 %echo% A great storm forms overhead!
 set cycle 1
 set cycles 3
-set scale 100
+set scale 50
 if %self.varexists(phase)%
   if %self.phase% == 3
-    set scale 200
+    set scale 100
     set cycles 5
   end
 end
 while %cycle% <= %cycles%
   wait 5 sec
   %echo% &rLightning and hail rain down upon you!
-  %aoe% 50 physical
+  %aoe% 25 physical
   %aoe% %scale% magical
   eval cycle %cycle% + 1
 done
@@ -794,7 +796,7 @@ if %ally%
   if %target%
     %send% %target% &rA bolt of lightning flies out of nowhere and strikes you!
     %echoaround% %target% A bolt of lightning flies out of nowhere and strikes %target.name%!
-    %damage% %target% 1500 magical
+    %damage% %target% 500 magical
     dg_affect #12039 %target% HARD-STUNNED on 10
     dg_affect #12039 %target% BLIND on 10
     halt
