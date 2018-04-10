@@ -471,6 +471,9 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 	if (!count) {
 		size += snprintf(buf + size, sizeof(buf) - size, " no goals\r\n");
 	}
+	else if (size + 2 < sizeof(buf) && count % 2) {
+		strcat(buf, "\r\n");
+	}
 	
 	if (ch->desc) {
 		page_string(ch->desc, buf, TRUE);
