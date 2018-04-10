@@ -8017,7 +8017,7 @@ ACMD(do_unbind) {
 
 
 ACMD(do_ungoal) {
-	void check_for_eligible_goals(empire_data *emp);
+	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void remove_completed_goal(empire_data *emp, any_vnum vnum);
 	
 	char emp_arg[MAX_INPUT_LENGTH], prg_arg[MAX_INPUT_LENGTH];
@@ -8059,7 +8059,7 @@ ACMD(do_ungoal) {
 				++count;
 			}
 			
-			check_for_eligible_goals(emp);
+			refresh_empire_goals(emp, NOTHING);
 		}
 		
 		if (all) {
