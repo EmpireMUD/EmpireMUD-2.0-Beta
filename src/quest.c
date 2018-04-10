@@ -782,6 +782,11 @@ void remove_quest_items_by_quest(char_data *ch, any_vnum vnum) {
 	obj_data *obj, *next_obj;
 	int iter;
 	
+	if (vnum == NOTHING) {
+		syslog(SYS_ERROR, LVL_CIMPL, TRUE, "SYSERR: remove_quest_items_by_quest called with NOTHING vnum, which would remove ALL non-quest items");
+		return;
+	}
+	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && GET_OBJ_REQUIRES_QUEST(obj) == vnum) {
 			extract_obj(obj);

@@ -764,9 +764,9 @@ void perform_reboot(void) {
 		}
 		
 		SAVE_CHAR(och);
-		extract_all_items(och);
 		
 		// extract is not actually necessary since we're rebooting, right?
+		// extract_all_items(och);
 		// extract_char(och);
 	}
 

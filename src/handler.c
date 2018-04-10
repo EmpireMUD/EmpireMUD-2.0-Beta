@@ -1053,7 +1053,7 @@ void extract_char_final(char_data *ch) {
 	
 	// sanitation checks
 	if (!IN_ROOM(ch)) {
-		log("SYSERR: Extracting char %s not in any room. (%s, extract_char)", GET_NAME(ch), __FILE__);
+		log("SYSERR: Extracting char %s not in any room. (%s, extract_char_final)", GET_NAME(ch), __FILE__);
 		exit(1);
 	}
 

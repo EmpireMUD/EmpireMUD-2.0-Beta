@@ -460,14 +460,15 @@ void delete_room(room_data *room, bool check_exits) {
 	// Remove remaining chars
 	for (c = ROOM_PEOPLE(room); c; c = next_c) {
 		next_c = c->next_in_room;
-		if (!IS_NPC(c)) {
-			save_char(c, NULL);
-		}
 		
 		if (!extraction_room) {
 			extraction_room = get_extraction_room();
 		}
 		char_to_room(c, extraction_room);
+		
+		if (!IS_NPC(c)) {
+			save_char(c, NULL);
+		}
 		
 		extract_all_items(c);
 		extract_char(c);
