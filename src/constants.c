@@ -2586,6 +2586,7 @@ const char *progress_types[] = {
 const char *progress_flags[] = {
 	"IN-DEVELOPMENT",
 	"PURCHASABLE",
+	"SCRIPT-ONLY",
 	"\n"
 };
 

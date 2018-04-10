@@ -309,6 +309,7 @@ void add_completed_goal(empire_data *emp, any_vnum vnum) {
 * This is called by:
 * - complete_goal
 * - purchase_goal
+* - script_reward_goal
 *
 * @param empire_data *emp The empire apply it to.
 * @param progress_data *prg Which goal is being aplied (or removed).
@@ -385,7 +386,7 @@ void check_for_eligible_goals(empire_data *emp) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		vnum = PRG_VNUM(prg);
 		
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
 			continue;
 		}
 		if (get_current_goal(emp, vnum)) {
@@ -625,7 +626,7 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 		skip = FALSE;
 		
 		// remove if not allowed to track it
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
 			if (goal) {
 				cancel_empire_goal(emp, goal);
 				goal = NULL;
@@ -756,6 +757,26 @@ void remove_completed_goal(empire_data *emp, any_vnum vnum) {
 		free(ecg);
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
+}
+
+
+/**
+* Call this function to reward an empire with a SCRIPT-ONLY progress goal. This
+* function does not validate prereqs or point availability. It only does the
+* work.
+*
+* @param empire_data *emp Which empire is being rewarded.
+* @param progress_data *prg The progression goal being added.
+*/
+void script_reward_goal(empire_data *emp, progress_data *prg) {
+	if (!emp || !prg) {
+		return;	// nothing to do
+	}
+	
+	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
+	
+	add_completed_goal(emp, PRG_VNUM(prg));
+	check_for_eligible_goals(emp);
 }
 
 
@@ -1014,6 +1035,15 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with SCRIPT-ONLY");
+		problem = TRUE;
+	}
+	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && (PRG_COST(prg) || PRG_TASKS(prg))) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "SCRIPT-ONLY set with cost and/or tasks");
+		problem = TRUE;
+	}
+	
 	LL_FOREACH(PRG_PREREQS(prg), iter) {
 		if (iter->vnum == PRG_VNUM(prg)) {
 			olc_audit_msg(ch, PRG_VNUM(prg), "Has self as prerequisite");
@@ -1168,6 +1198,9 @@ int sort_progress_by_data(progress_data *a, progress_data *b) {
 	}
 	else if (PRG_FLAGGED(a, PRG_PURCHASABLE) != PRG_FLAGGED(b, PRG_PURCHASABLE)) {
 		return PRG_FLAGGED(a, PRG_PURCHASABLE) ? 1 : -1;
+	}
+	else if (PRG_FLAGGED(a, PRG_SCRIPT_ONLY) != PRG_FLAGGED(b, PRG_SCRIPT_ONLY)) {
+		return PRG_FLAGGED(a, PRG_SCRIPT_ONLY) ? 1 : -1;
 	}
 	else {
 		return str_cmp(PRG_NAME(a), PRG_NAME(b));
@@ -1802,9 +1835,9 @@ void olc_show_progress(char_data *ch) {
 	get_progress_list_display(PRG_PREREQS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
 	
-	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
 		get_requirement_display(PRG_TASKS(prg), lbuf);
-		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE | PRG_SCRIPT_ONLY) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
 	}
 	
 	get_progress_perks_display(PRG_PERKS(prg), lbuf);

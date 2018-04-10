@@ -2082,8 +2082,9 @@ typedef struct vehicle_data vehicle_data;
 
 
 // PRG_x: progress flags
-#define PRG_IN_DEVELOPMENT  BIT(0)	// not available to players
-#define PRG_PURCHASABLE  BIT(1)	// can buy it
+#define PRG_IN_DEVELOPMENT  BIT(0)	// a. not available to players
+#define PRG_PURCHASABLE  BIT(1)	// b. can buy it
+#define PRG_SCRIPT_ONLY  BIT(2)	// c. cannot buy/achieve it
 
 
 // PRG_PERK_x: progress perks
