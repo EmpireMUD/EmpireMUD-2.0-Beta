@@ -5239,6 +5239,10 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 					if (dots > 0) {
 						*subfield_p = '\0';
 						find_replacement(go, sc, trig, type, var, field, subfield, repl_str, sizeof(repl_str));
+						
+						// reset subfield -- this fixes a dg scripts error where subfields would continue concatenating
+						subfield_p = subfield;
+						
 						if (*repl_str) {   
 							snprintf(tmp2, sizeof(tmp2), "eval tmpvr %s", repl_str); //temp var
 							process_eval(go, sc, trig, type, tmp2);
@@ -5281,6 +5285,9 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 			len = strlen(repl_str);
 			buf += len;
 			left -= len;
+			
+			// reset subfield -- this fixes a dg scripts error where subfields would continue concatenating
+			subfield_p = subfield;
 		} /* else if *p .. */
 	} /* while *p .. */ 
 }
