@@ -8068,6 +8068,7 @@ ACMD(do_unprogress) {
 			}
 			else {
 				msg_to_char(ch, "Goal removed from %d empire%s.\r\n", count, PLURAL(count));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has removed progress goal %d from %d empire%s", GET_REAL_NAME(ch), PRG_VNUM(prg), count, PLURAL(count));
 			}
 		}
 		else if (count < 1) {
@@ -8075,6 +8076,7 @@ ACMD(do_unprogress) {
 		}
 		else {
 			msg_to_char(ch, "Goal removed from %s.\r\n", only ? EMPIRE_NAME(only) : "UNKNOWN");
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has removed progress goal %d from %s", GET_REAL_NAME(ch), PRG_VNUM(prg), only ? EMPIRE_NAME(only) : "UNKNOWN");
 		}
 	}
 }
