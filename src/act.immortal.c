@@ -8051,12 +8051,14 @@ ACMD(do_ungoal) {
 			if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
 				++count;
 				cancel_empire_goal(emp, goal);
+				msg_to_char(ch, "Remove active: %s\r\n", EMPIRE_NAME(emp));
 			}
 			
 			// found completed goal?
 			if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
 				remove_completed_goal(emp, PRG_VNUM(prg));
 				++count;
+				msg_to_char(ch, "Remove completed: %s\r\n", EMPIRE_NAME(emp));
 			}
 			
 			check_for_eligible_goals(emp);
