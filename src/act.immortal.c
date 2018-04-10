@@ -8016,6 +8016,70 @@ ACMD(do_unbind) {
 }
 
 
+ACMD(do_ungoal) {
+	void check_for_eligible_goals(empire_data *emp);
+	void remove_completed_goal(empire_data *emp, any_vnum vnum);
+	
+	char emp_arg[MAX_INPUT_LENGTH], prg_arg[MAX_INPUT_LENGTH];
+	empire_data *emp, *next_emp, *only = NULL;
+	struct empire_goal *goal;
+	progress_data *prg;
+	int count;
+	bool all;
+	
+	argument = any_one_word(argument, emp_arg);
+	argument = any_one_arg(argument, prg_arg);
+	all = !str_cmp(emp_arg, "all");
+	
+	if (!*emp_arg && !*prg_arg) {
+		msg_to_char(ch, "Usage: ungoal <empire | all> <goal vnum>\r\n");
+	}
+	else if (!all && !(only = get_empire_by_name(emp_arg))) {
+		msg_to_char(ch, "Invalid empire '%s'.\r\n", emp_arg);
+	}
+	else if (!isdigit(*prg_arg) || !(prg = real_progress(atoi(prg_arg)))) {
+		msg_to_char(ch, "Invalid progression vnum '%s'.\r\n", prg_arg);
+	}
+	else {
+		count = 0;
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (!all && emp != only) {
+				continue;	// only doing one?
+			}
+			
+			// found current goal?
+			if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
+				++count;
+				cancel_empire_goal(emp, goal);
+			}
+			
+			// found completed goal?
+			if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+				remove_completed_goal(emp, PRG_VNUM(prg));
+				++count;
+			}
+			
+			check_for_eligible_goals(emp);
+		}
+		
+		if (all) {
+			if (count < 1) {
+				msg_to_char(ch, "No empires have that goal.\r\n");
+			}
+			else {
+				msg_to_char(ch, "Goal removed from %d empire%s.\r\n", count, PLURAL(count));
+			}
+		}
+		else if (count < 1) {
+			msg_to_char(ch, "%s does not have that goal.\r\n", only ? EMPIRE_NAME(only) : "UNKNOWN");
+		}
+		else {
+			msg_to_char(ch, "Goal removed from %s.\r\n", only ? EMPIRE_NAME(only) : "UNKNOWN");
+		}
+	}
+}
+
+
 ACMD(do_unquest) {
 	void drop_quest(char_data *ch, struct player_quest *pq);
 	

@@ -1324,6 +1324,16 @@ command is grantable.
 
 See also: BINDING, GRANT
 #d
+UNGOAL
+
+Usage:  ungoal <empire | all> <goal vnum>
+
+This command removes a goal from all empires' trackers and completion lists.
+However, they will immediately receive the goal again if they still qualify
+for it.
+
+See also: PROGRESS
+#d
 UNQUEST
 
 Usage:  unquest <player> <quest vnum>

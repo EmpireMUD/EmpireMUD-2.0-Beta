@@ -53,11 +53,13 @@ void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 
 // local funcs
+void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add);
 void complete_goal(empire_data *emp, struct empire_goal *goal);
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
 void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
+void remove_completed_goal(empire_data *emp, any_vnum vnum);
 struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
 
 
@@ -279,6 +281,7 @@ void get_progress_perks_display(struct progress_perk *list, char *save_buffer) {
 */
 void add_completed_goal(empire_data *emp, any_vnum vnum) {
 	struct empire_completed_goal *ecg;
+	progress_data *prg;
 	
 	if (!emp || vnum == NOTHING) {
 		return;
@@ -289,6 +292,10 @@ void add_completed_goal(empire_data *emp, any_vnum vnum) {
 		CREATE(ecg, struct empire_completed_goal, 1);
 		ecg->vnum = vnum;
 		HASH_ADD_INT(EMPIRE_COMPLETED_GOALS(emp), vnum, ecg);
+		
+		if ((prg = real_progress(vnum))) {
+			apply_progress_to_empire(emp, prg, TRUE);
+		}
 	}
 	ecg->when = time(0);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -471,7 +478,6 @@ void complete_goal(empire_data *emp, struct empire_goal *goal) {
 	add_completed_goal(emp, goal->vnum);
 	cancel_empire_goal(emp, goal);
 	
-	apply_progress_to_empire(emp, prg, TRUE);
 	check_for_eligible_goals(emp);
 }
 
@@ -587,7 +593,6 @@ void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by
 	}
 	
 	add_completed_goal(emp, PRG_VNUM(prg));
-	apply_progress_to_empire(emp, prg, TRUE);
 	check_for_eligible_goals(emp);
 }
 
@@ -599,7 +604,6 @@ void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by
 * @param any_vnum only_vnum Optional: If provided, only checks and refreshes 1 goal (NOTHING = all vnums).
 */
 void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
-	struct empire_completed_goal *ecg;
 	progress_data *prg, *next_prg;
 	struct empire_goal *goal;
 	int complete, total;
@@ -630,13 +634,8 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 		}
 		
 		// remove from completed if in-dev
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
-			HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
-			if (ecg) {
-				apply_progress_to_empire(emp, prg, FALSE);	// strip perks
-				HASH_DEL(EMPIRE_COMPLETED_GOALS(emp), ecg);
-				free(ecg);
-			}
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) && empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			remove_completed_goal(emp, PRG_VNUM(prg));
 			skip = TRUE;
 		}
 		
@@ -731,6 +730,28 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 	
 	// check it
 	TRIGGER_CHECK_GOAL_COMPLETE(emp);
+}
+
+
+/**
+* Removes completion of a goal, if present.
+*
+* @param empire_data *emp The empire un-completing the goal.
+* @param any_vnum vnum The progression goal to lose.
+*/
+void remove_completed_goal(empire_data *emp, any_vnum vnum) {
+	struct empire_completed_goal *ecg;
+	progress_data *prg;
+	
+	HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
+	if (ecg) {
+		if ((prg = real_progress(vnum))) {
+			apply_progress_to_empire(emp, prg, FALSE);	// strip perks
+		}
+		HASH_DEL(EMPIRE_COMPLETED_GOALS(emp), ecg);
+		free(ecg);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
 }
 
 
@@ -1488,7 +1509,6 @@ progress_data *create_progress_table_entry(any_vnum vnum) {
 void olc_delete_progress(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *iter, *next_iter;
 	struct progress_list *pl, *next_pl;
-	struct empire_completed_goal *egc;
 	empire_data *emp, *next_emp;
 	struct empire_goal *goal;
 	descriptor_data *desc;
@@ -1506,11 +1526,7 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 				cancel_empire_goal(emp, goal);
 			}
 			
-			HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, egc);
-			if (egc) {
-				HASH_DEL(EMPIRE_COMPLETED_GOALS(emp), egc);
-				free(egc);
-			}
+			remove_completed_goal(emp, vnum);
 		}
 	}
 	
