@@ -177,7 +177,7 @@ progress_data *find_progress_goal_by_name(char *name) {
 		return NULL;
 	}
 	
-	HASH_ITER(hh, sorted_progress, prg, next_prg) {
+	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
 		if (!str_cmp(name, PRG_NAME(prg))) {
 			return prg;	// exact match
 		}

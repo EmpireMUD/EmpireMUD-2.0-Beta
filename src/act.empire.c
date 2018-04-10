@@ -444,7 +444,7 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 		size = snprintf(buf, sizeof(buf), "%s%s\t0 has completed the following %s goals:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), progress_types[only_type]);
 	}
 	
-	HASH_ITER(hh, sorted_progress, prg, next_prg) {
+	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
 		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
 			continue;
 		}
