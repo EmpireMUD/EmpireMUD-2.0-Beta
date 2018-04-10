@@ -5411,6 +5411,7 @@ ACMD(do_pledge) {
 ACMD(do_progress) {
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
+	void get_progress_perks_display(struct progress_perk *list, char *save_buffer);
 	void get_tracker_display(struct req_data *tracker, char *save_buffer);
 	extern const char *progress_types[];
 	
@@ -5420,9 +5421,10 @@ ACMD(do_progress) {
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct empire_goal *goal, *next_goal;
-	int cat, total, complete;
+	int cat, total, complete, num;
 	progress_data *prg;
 	size_t size;
+	time_t when;
 	bool any;
 	
 	strcpy(buf, argument);
@@ -5468,7 +5470,7 @@ ACMD(do_progress) {
 		size = snprintf(buf, sizeof(buf), "%s%s\t0 has %d progress points available (%d total earned).\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_PROGRESS_POOL(emp), total);
 		
 		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
-			snprintf(line, sizeof(line), " %s [%d]: %d current goal%s, %d completed\r\n", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat), counts[cat], PLURAL(counts[cat]), compl[cat]);
+			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
@@ -5484,7 +5486,7 @@ ACMD(do_progress) {
 	}
 	else if ((cat = search_block(argument, progress_types, FALSE)) != NOTHING && cat != PROGRESS_UNDEFINED) {
 		// show current progress in that category
-		size = snprintf(buf, sizeof(buf), "%s [%d] goals:\r\n", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
+		size = snprintf(buf, sizeof(buf), "%s goals:\r\n", progress_types[cat]);
 		
 		// show current goals
 		any = 0;
@@ -5494,7 +5496,7 @@ ACMD(do_progress) {
 			}
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
-			snprintf(line, sizeof(line), "- %s [%d] (%d/%d)\r\n", PRG_NAME(prg), PRG_VALUE(prg), complete, total);
+			snprintf(line, sizeof(line), "- %s, %d point%s (%d/%d)\r\n", PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total);
 			any = TRUE;
 			
 			if (size + strlen(line) < sizeof(buf)) {
@@ -5507,7 +5509,7 @@ ACMD(do_progress) {
 			}
 		}
 		if (!any) {
-			size += snprintf(buf + size, sizeof(buf) - size, "- none\r\n");
+			size += snprintf(buf + size, sizeof(buf) - size, "- No active goals\r\n");
 		}
 		
 		// number of completed goals
@@ -5525,8 +5527,32 @@ ACMD(do_progress) {
 		// show 1 goal
 		msg_to_char(ch, "%s\r\n%s", PRG_NAME(prg), NULLSAFE(PRG_DESCRIPTION(prg)));
 		
-		// TODO show cost/value/rewards
+		if (PRG_VALUE(prg) > 0) {
+			msg_to_char(ch, "Value: %d point%s\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
+		}
+		if (PRG_COST(prg) > 0) {
+			msg_to_char(ch, "Cost: %d point%s\r\n", PRG_COST(prg), PLURAL(PRG_COST(prg)));
+		}
 		
+		if ((when = empire_has_completed_goal(emp, PRG_VNUM(prg)))) {
+			when = time(0) - when;	// diff
+			if ((when / SECS_PER_REAL_DAY) >= 1) {
+				num = round((double)when / SECS_PER_REAL_DAY);
+				sprintf(buf, "%d day%s ago", num, PLURAL(num));
+			}
+			else if ((when / SECS_PER_REAL_HOUR) >= 1) {
+				num = round((double)when / SECS_PER_REAL_HOUR);
+				sprintf(buf, "%d hour%s ago", num, PLURAL(num));
+			}
+			else {
+				strcpy(buf, "recently");
+			}
+			msg_to_char(ch, "Completed %s.\r\n", buf);
+		}
+		if (PRG_PERKS(prg)) {
+			get_progress_perks_display(PRG_PERKS(prg), buf);
+			msg_to_char(ch, "Rewards:\r\n%s", buf);
+		}
 		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
 			get_tracker_display(goal->tracker, buf);
 			msg_to_char(ch, "Progress:\r\n%s", buf);
@@ -5540,8 +5566,10 @@ ACMD(do_progress) {
 	// TODO purchase
 	
 	else {
-		// TODO show usage
-		msg_to_char(ch, "Usage not written.\r\n");
+		msg_to_char(ch, "Unknown progress command or goal '%s'.\r\n", argument);
+		msg_to_char(ch, "Usage: progress [category]\r\n");
+		msg_to_char(ch, "       progress [goal name]\r\n");
+		msg_to_char(ch, "       progress completed\r\n");
 	}
 }
 
