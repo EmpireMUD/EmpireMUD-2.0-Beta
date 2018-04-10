@@ -5078,7 +5078,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 								
 								snprintf(str, slen, "%d", (!empire_has_completed_goal(emp, vnum) && empire_meets_goal_prereqs(emp, prg)) ? 1 : 0);
-								strcpy(str, "1");
 							}
 							else {
 								strcpy(str, "0");
