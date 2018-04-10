@@ -1077,7 +1077,7 @@ char *list_one_progress(progress_data *prg, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		snprintf(output, sizeof(output), "[%5d] %s (%s)%s", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
