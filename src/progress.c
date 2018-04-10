@@ -645,6 +645,10 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 			goal = NULL;
 			skip = TRUE;
 		}
+		else if (empire_has_completed_goal(emp, PRG_VNUM(prg)) && !empire_meets_goal_prereqs(emp, prg)) {
+			remove_completed_goal(emp, PRG_VNUM(prg));
+			skip = TRUE;
+		}
 		
 		if (skip) {
 			// do not attempt to add the goal if we marked it skip
@@ -974,6 +978,8 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_progress(progress_data *prg, char_data *ch) {
+	struct progress_list *iter, *sub;
+	progress_data *other;
 	bool problem = FALSE;
 	
 	if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
@@ -985,10 +991,45 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "No name set");
 		problem = TRUE;
 	}
+	if (ispunct(*(PRG_NAME(prg) + strlen(PRG_NAME(prg)) - 1))) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "Name ends with punctuation");
+		problem = TRUE;
+	}
 	
 	if (!PRG_DESCRIPTION(prg) || !*PRG_DESCRIPTION(prg)) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "No description set");
 		problem = TRUE;
+	}
+	
+	if (PRG_FLAGGED(prg, PRG_PURCHASABLE) && (PRG_VALUE(prg) || PRG_TASKS(prg))) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with value and/or tasks");
+		problem = TRUE;
+	}
+	if (PRG_FLAGGED(prg, PRG_PURCHASABLE) && !PRG_COST(prg)) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with zero cost");
+		problem = TRUE;
+	}
+	if (PRG_COST(prg) && PRG_VALUE(prg)) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "Both cost and value set");
+		problem = TRUE;
+	}
+	
+	LL_FOREACH(PRG_PREREQS(prg), iter) {
+		if (iter->vnum == PRG_VNUM(prg)) {
+			olc_audit_msg(ch, PRG_VNUM(prg), "Has self as prerequisite");
+			problem = TRUE;
+			break;	// only once
+		}
+		else if ((other = real_progress(iter->vnum))) {
+			// check for a back-prereq
+			LL_FOREACH(PRG_PREREQS(other), sub) {
+				if (sub->vnum == PRG_VNUM(prg)) {
+					olc_audit_msg(ch, PRG_VNUM(prg), "Circular prerequisites");
+					problem = TRUE;
+					break;	// only once
+				}
+			}
+		}
 	}
 	
 	return problem;
