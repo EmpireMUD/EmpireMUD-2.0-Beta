@@ -549,6 +549,7 @@ const char *grant_bits[] = {
 	"unquest",
 	"automessage",
 	"peace",	// 40
+	"ungoal",
 	"\n"
 };
 
