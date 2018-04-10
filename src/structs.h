@@ -4307,6 +4307,7 @@ struct empire_data {
 	double coins;	// total coins (always in local currency)
 
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command
+	int base_tech[NUM_TECHS];	// TECH_ from rewards (not added by buildings or players)
 
 	// linked lists
 	struct empire_political_data *diplomacy;
@@ -4330,7 +4331,7 @@ struct empire_data {
 	int population;	// npc population who lives here
 	int military;	// number of soldiers
 	int greatness;	// total greatness of members
-	int tech[NUM_TECHS];	// TECH_x, detected from buildings and abilities
+	int tech[NUM_TECHS];	// TECH_, detected from buildings and abilities
 	struct empire_island *islands;	// empire island data hash
 	int members;	// Number of members, calculated at boot time
 	int total_member_count;	// Total number of members including timeouts and dupes

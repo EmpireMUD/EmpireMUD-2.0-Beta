@@ -2078,12 +2078,12 @@ void clear_empire_techs(empire_data *emp) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
 			for (sub = 0; sub < NUM_TECHS; ++sub) {
 				isle->population = 0;
-				isle->tech[sub] = 0;
+				isle->tech[sub] = EMPIRE_BASE_TECH(iter, sub);
 			}
 		}
 		// main techs
 		for (sub = 0; sub < NUM_TECHS; ++sub) {
-			EMPIRE_TECH(iter, sub) = 0;
+			EMPIRE_TECH(iter, sub) = EMPIRE_BASE_TECH(iter, sub);
 		}
 	}
 }

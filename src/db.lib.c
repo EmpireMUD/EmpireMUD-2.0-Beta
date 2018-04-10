@@ -2427,6 +2427,17 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				emp->coins = dbl_in;
 				break;
 			}
+			case 'F': {	// base tech
+				if (sscanf(line, "F %d %d", &t[0], &t[1]) != 2) {
+					log("SYSERR: Bad format in F tag of empire %d!", vnum);
+					exit(1);
+				}
+				
+				if (t[0] >= 0 && t[0] < NUM_TECHS) {
+					EMPIRE_BASE_TECH(emp, t[0]) = t[1];
+				}
+				break;
+			}
 			case 'G': {	// goals (sub-divided by a 2nd letter)
 				switch (*(line + 1)) {
 					case 'C': {	// GC: completed
@@ -2752,6 +2763,13 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	// E: extra data
 	fprintf(fl, "E\n%s %.1f\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), EMPIRE_COINS(emp));
+	
+	// F: base techs
+	for (iter = 0; iter < NUM_TECHS; ++iter) {
+		if (EMPIRE_BASE_TECH(emp, iter) > 0) {
+			fprintf(fl, "F %d %d\n", iter, EMPIRE_BASE_TECH(emp, iter));
+		}
+	}
 	
 	// G: progression goals, tasks, and completed
 	HASH_ITER(hh, EMPIRE_GOALS(emp), egoal, next_egoal) {
