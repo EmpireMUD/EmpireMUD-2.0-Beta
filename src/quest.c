@@ -783,7 +783,7 @@ void remove_quest_items_by_quest(char_data *ch, any_vnum vnum) {
 	int iter;
 	
 	if (vnum == NOTHING) {
-		syslog(SYS_ERROR, LVL_CIMPL, TRUE, "SYSERR: remove_quest_items_by_quest called with NOTHING vnum, which would remove ALL non-quest items");
+		syslog(SYS_ERROR, LVL_CIMPL, TRUE, "SYSERR: remove_quest_items_by_quest called with NOTHING vnum, which would remove ALL non-quest items (%s)", GET_NAME(ch));
 		return;
 	}
 	

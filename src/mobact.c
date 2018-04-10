@@ -890,6 +890,10 @@ void despawn_mob(char_data *ch) {
 	obj_data *obj, *next_obj;
 	int iter;
 	
+	if (!IS_NPC(ch)) {
+		return;	// safety check
+	}
+	
 	// empty inventory and equipment
 	for (obj = ch->carrying; obj != NULL; obj = next_obj) {
 		next_obj = obj->next_content;
