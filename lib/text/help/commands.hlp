@@ -1359,6 +1359,7 @@ Progression goals are automatically unlocked when your empires meets all the
 requirements. Use 'elog progress' to see previous goal achievements.
 
 See also: ELOG
+Immortals see also: UNPROGRESS
 #
 PROMPT FPROMPT "FIGHT PROMPT" "COMBAT PROMPT"
 

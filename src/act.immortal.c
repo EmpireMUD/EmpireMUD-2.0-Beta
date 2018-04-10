@@ -8016,7 +8016,7 @@ ACMD(do_unbind) {
 }
 
 
-ACMD(do_ungoal) {
+ACMD(do_unprogress) {
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void remove_completed_goal(empire_data *emp, any_vnum vnum);
 	
@@ -8032,7 +8032,7 @@ ACMD(do_ungoal) {
 	all = !str_cmp(emp_arg, "all");
 	
 	if (!*emp_arg && !*prg_arg) {
-		msg_to_char(ch, "Usage: ungoal <empire | all> <goal vnum>\r\n");
+		msg_to_char(ch, "Usage: unprogress <empire | all> <goal vnum>\r\n");
 	}
 	else if (!all && !(only = get_empire_by_name(emp_arg))) {
 		msg_to_char(ch, "Invalid empire '%s'.\r\n", emp_arg);
