@@ -335,6 +335,8 @@ Objects (OEDIT):
 
 Empire Progress Goals (PROGEDIT):
 - Goals that are PURCHASABLE should not have cost or tasks.
+- Do not use goal names starting with 'Buy', 'Completed', or any progress type.
+  Players may not be able to get info on them using the 'progress' command.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
@@ -5630,8 +5632,11 @@ Tips:
 - Avoid starting with "A" or "The" if possible.
 - Write the name like a book title: Every Word Capitalized
 - No ending punctuation
+- Do not start the name with "Buy", "Completed", or one of the type names as
+  players may not be able to get info on those goals due to conflicts in the
+  'progress' command.
 
-See also: OLC PROGRESS
+See also: OLC PROGRESS, PROGEDIT TYPES
 #d
 "PROGEDIT PERKS"
 
