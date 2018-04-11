@@ -5721,7 +5721,7 @@ ACMD(do_progress) {
 	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument))) {
 		// show 1 goal
 		if (IS_IMMORTAL(ch)) {
-			sprintf(vstr, "[%5d] ", PRG_VNUM(prg));
+			sprintf(vstr, "[%d] ", PRG_VNUM(prg));
 		}
 		else {
 			*vstr = '\0';
