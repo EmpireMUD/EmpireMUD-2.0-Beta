@@ -1074,7 +1074,7 @@ typedef struct vehicle_data vehicle_data;
 #define OFF_AVENGED  BIT(2)	// player was killed or empire was warred for this (removes hostile value)
 
 
-// Empire Privilege Levels
+// PRIV_x: Empire Privilege Levels
 #define PRIV_CLAIM  0	// Claim land
 #define PRIV_BUILD  1	// Build/Dismantle structures
 #define PRIV_HARVEST  2	// Harvest/plant things
@@ -1094,7 +1094,8 @@ typedef struct vehicle_data vehicle_data;
 #define PRIV_HOMES  16	// can set a home
 #define PRIV_STORAGE  17	// can retrieve from storage
 #define PRIV_WAREHOUSE  18	// can retrieve from warehouse
-#define NUM_PRIVILEGES  19	// total
+#define PRIV_PROGRESS  19	// can buy/manage progression goals
+#define NUM_PRIVILEGES  20	// total
 
 
 // for empire scores (e.g. sorting)

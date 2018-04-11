@@ -1206,7 +1206,7 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 * Checks the room to see if ch has permission.
 *
 * @param char_data *ch
-* @param int type PRIV_x
+* @param int type PRIV_
 * @return bool TRUE if it's ok
 */
 bool has_permission(char_data *ch, int type) {

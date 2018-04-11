@@ -5471,8 +5471,10 @@ ACMD(do_progress) {
 	extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 	extern progress_data *find_progress_goal_by_name(char *name);
+	extern progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
 	void get_progress_perks_display(struct progress_perk *list, char *save_buffer);
 	void get_tracker_display(struct req_data *tracker, char *save_buffer);
+	void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
 	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], *arg2, *ptr;
@@ -5597,7 +5599,7 @@ ACMD(do_progress) {
 			}
 			
 			// seems ok
-			snprintf(line, sizeof(line), " Buy: %s (for %d point%s)", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			snprintf(line, sizeof(line), "+ Buy: %s (for %d point%s)\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 			any = TRUE;
 		
 			if (size + strlen(line) < sizeof(buf)) {
@@ -5630,9 +5632,9 @@ ACMD(do_progress) {
 		
 		show_completed_goals(ch, emp, cat);
 	}
-	else if (is_abbrev(arg, "purchase") || !str_cmp(arg, "buy")) {
+	else if (!str_cmp(arg, "buy")) {
 		if (!*arg2) {	// display all purchasable goals
-			size = snprintf(buf, sizeof(buf), "Available progression goals:\r\n");
+			size = snprintf(buf, sizeof(buf), "Available progression goals (%d progress point%s):\r\n", EMPIRE_PROGRESS_POOL(emp), PLURAL(EMPIRE_PROGRESS_POOL(emp)));
 			
 			any = FALSE;
 			HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
@@ -5647,7 +5649,7 @@ ACMD(do_progress) {
 				}
 				
 				// seems ok
-				snprintf(line, sizeof(line), " %s (%d point%s)", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+				snprintf(line, sizeof(line), "+ %s (%d point%s)\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 				any = TRUE;
 			
 				if (size + strlen(line) < sizeof(buf)) {
@@ -5668,7 +5670,25 @@ ACMD(do_progress) {
 			return;
 		}
 		
-		// TODO: purchase by name (arg2)
+		// purchase by name
+		if (!(prg = find_purchasable_goal_by_name(emp, arg2))) {
+			msg_to_char(ch, "No available progress by that name.\r\n");
+		}
+		else if (!PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+			// should not be able to hit this condition
+			msg_to_char(ch, "'%s' cannot be purchased.\r\n", PRG_NAME(prg));
+		}
+		else if (EMPIRE_PROGRESS_POOL(emp) < PRG_COST(prg)) {
+			msg_to_char(ch, "You need %d more progress point%s to afford %s.\r\n", (PRG_COST(prg) - EMPIRE_PROGRESS_POOL(emp)), PLURAL(PRG_COST(prg) - EMPIRE_PROGRESS_POOL(emp)), PRG_NAME(prg));
+		}
+		else if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
+			// only if same-empire: immortals with imm-access can override this
+			msg_to_char(ch, "You don't have permission to purchase progression goals.\r\n");
+		}
+		else {
+			purchase_goal(emp, prg, ch);
+			msg_to_char(ch, "You purchase %s for %d progress point%s.\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+		}
 	}
 	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument))) {
 		// show 1 goal
@@ -5710,6 +5730,7 @@ ACMD(do_progress) {
 		msg_to_char(ch, "Unknown progress command or goal '%s'.\r\n", argument);
 		msg_to_char(ch, "Usage: progress [category]\r\n");
 		msg_to_char(ch, "       progress [goal name]\r\n");
+		msg_to_char(ch, "       progress buy [goal name]\r\n");
 		msg_to_char(ch, "       progress completed\r\n");
 	}
 }

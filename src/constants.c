@@ -1760,6 +1760,7 @@ const char *priv[] = {
 	"homes",
 	"storage",
 	"warehouse",
+	"progress",
 	"\n"
 };
 

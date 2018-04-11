@@ -180,6 +180,47 @@ progress_data *find_progress_goal_by_name(char *name) {
 	}
 	
 	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		if (!str_cmp(name, PRG_NAME(prg))) {
+			return prg;	// exact match
+		}
+		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
+			partial = prg;
+		}
+	}
+	
+	return partial;	// if any
+}
+
+
+/**
+* Finds a goal from the list. This allows multi-word abbrevs, and  prefers
+* exact matches. Only goals the empire can possibly purchase are listed.
+*
+* @param emp empire_data *emp The one that must be able to purchase it.
+* @param char *name The name to look for.
+*/
+progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name) {
+	progress_data *prg, *next_prg, *partial = NULL;
+	
+	if (!emp || !*name) {
+		return NULL;
+	}
+	
+	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+			continue;
+		}
+		if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			continue;
+		}
+		if (!empire_meets_goal_prereqs(emp, prg)) {
+			continue;
+		}
+		
 		if (!str_cmp(name, PRG_NAME(prg))) {
 			return prg;	// exact match
 		}
