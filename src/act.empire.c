@@ -5599,7 +5599,7 @@ ACMD(do_progress) {
 			}
 			
 			// seems ok
-			snprintf(line, sizeof(line), "+ Buy: %s (for %d point%s)\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			snprintf(line, sizeof(line), "+ Available: %s (for %d point%s)\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 			any = TRUE;
 		
 			if (size + strlen(line) < sizeof(buf)) {
