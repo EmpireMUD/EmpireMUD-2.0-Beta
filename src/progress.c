@@ -1026,6 +1026,11 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (PRG_TYPE(prg) == PROGRESS_UNDEFINED) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "Type not set");
+		problem = TRUE;
+	}
+	
 	if (!PRG_NAME(prg) || !*PRG_NAME(prg) || !str_cmp(PRG_NAME(prg), default_progress_name)) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "No name set");
 		problem = TRUE;

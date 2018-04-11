@@ -5581,6 +5581,35 @@ ACMD(do_progress) {
 			size += snprintf(buf + size, sizeof(buf) - size, "- No active goals\r\n");
 		}
 		
+		// purchasable
+		HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
+			if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+				continue;
+			}
+			if (PRG_TYPE(prg) != cat) {
+				continue;
+			}
+			if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+				continue;
+			}
+			if (!empire_meets_goal_prereqs(emp, prg)) {
+				continue;
+			}
+			
+			// seems ok
+			snprintf(line, sizeof(line), " Buy: %s (for %d point%s)", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			any = TRUE;
+		
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+				break;
+			}
+		}
+		
 		// number of completed goals
 		total = 0;
 		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
@@ -5605,6 +5634,7 @@ ACMD(do_progress) {
 		if (!*arg2) {	// display all purchasable goals
 			size = snprintf(buf, sizeof(buf), "Available progression goals:\r\n");
 			
+			any = FALSE;
 			HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
 				if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 					continue;
@@ -5618,11 +5648,27 @@ ACMD(do_progress) {
 				
 				// seems ok
 				snprintf(line, sizeof(line), " %s (%d point%s)", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
-				// TODO working here
+				any = TRUE;
+			
+				if (size + strlen(line) < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+					break;
+				}
 			}
 			
+			if (!any) {
+				strcat(buf, " none\r\n");	// always room in the buffer if so
+			}
+			
+			page_string(ch->desc, buf, TRUE);
 			return;
 		}
+		
+		// TODO: purchase by name (arg2)
 	}
 	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument))) {
 		// show 1 goal
