@@ -988,6 +988,7 @@ commons    Asst     Shows players currently connected from duplicate sites.
 site       Asst     Shows all players with a specific site segment.
 account    Co-Impl  Shows all the alts associated with a given player.
 data       Co-Impl  Shows data stored in the global data system
+piles      Co-Impl  Shows rooms with too many items piled up.
 
 Each of these commands has its own help file (for example, HELP SHOW STATS)
 
@@ -1072,6 +1073,13 @@ See also: SET LEARNED
 Usage:  show notes <player name>
 
 Shows immortal notes for the target player's account.
+#e
+"SHOW PILES"
+
+Usage:  show piles [max size]
+
+This shows rooms which have more than 100 items in them (or whatever pile size
+you specify).
 #e
 "SHOW PLAYER"
 

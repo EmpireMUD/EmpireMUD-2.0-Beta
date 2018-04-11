@@ -2154,6 +2154,50 @@ SHOW(show_islands) {
 }
 
 
+SHOW(show_piles) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	room_data *room, *next_room;
+	int count, max = 100;
+	obj_data *obj;
+	size_t size;
+	bool any;
+	
+	if (*argument && isdigit(*argument)) {
+		max = atoi(argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Piles of %d item%s or more:\r\n", max, PLURAL(max));
+	
+	any = FALSE;
+	HASH_ITER(hh, world_table, room, next_room) {
+		count = 0;
+		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+			++count;
+		}
+		
+		if (count >= max) {
+			snprintf(line, sizeof(line), "[%d] %s: %d item%s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count));
+			any = TRUE;
+			
+			if (size + strlen(line) + 18 < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+				break;
+			}
+		}
+	}
+	
+	if (!any) {
+		strcat(buf, " none\r\n");
+	}
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
 SHOW(show_player) {
 	char birth[80], lastlog[80];
 	double days_played, avg_min_per_day;
@@ -7516,6 +7560,7 @@ ACMD(do_show) {
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },
 		{ "shops", LVL_START_IMM, show_shops },
+		{ "piles", LVL_CIMPL, show_piles },
 
 		// last
 		{ "\n", 0, NULL }

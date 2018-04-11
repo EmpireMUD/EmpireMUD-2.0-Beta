@@ -465,7 +465,7 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 		
 		snprintf(line, sizeof(line), " %s%-30.30s%s", vstr, PRG_NAME(prg), !(++count % 2) ? "\r\n" : "");
 		
-		if (size + strlen(line) < sizeof(buf)) {
+		if (size + strlen(line) + 18 < sizeof(buf)) {
 			strcat(buf, line);
 			size += strlen(line);
 		}
@@ -5544,7 +5544,7 @@ ACMD(do_progress) {
 		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
 			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
 			
-			if (size + strlen(line) < sizeof(buf)) {
+			if (size + strlen(line) + 18 < sizeof(buf)) {
 				strcat(buf, line);
 				size += strlen(line);
 			}
@@ -5584,7 +5584,7 @@ ACMD(do_progress) {
 			snprintf(line, sizeof(line), "- %s%s, %d point%s (%d/%d)\r\n", vstr, PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total);
 			any = TRUE;
 			
-			if (size + strlen(line) < sizeof(buf)) {
+			if (size + strlen(line) + 18 < sizeof(buf)) {
 				strcat(buf, line);
 				size += strlen(line);
 			}
@@ -5623,7 +5623,7 @@ ACMD(do_progress) {
 			snprintf(line, sizeof(line), "+ Available: %s%s (for %d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 			any = TRUE;
 		
-			if (size + strlen(line) < sizeof(buf)) {
+			if (size + strlen(line) + 18 < sizeof(buf)) {
 				strcat(buf, line);
 				size += strlen(line);
 			}
@@ -5680,7 +5680,7 @@ ACMD(do_progress) {
 				snprintf(line, sizeof(line), "+ %s%s (%d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 				any = TRUE;
 			
-				if (size + strlen(line) < sizeof(buf)) {
+				if (size + strlen(line) + 18 < sizeof(buf)) {
 					strcat(buf, line);
 					size += strlen(line);
 				}
