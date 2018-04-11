@@ -432,7 +432,7 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 * @param int only_type Optional: A PROGRESS_ type to show exclusively (NOTHING = all types).
 */
 void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], vstr[256];
 	progress_data *prg, *next_prg;
 	int count = 0;
 	size_t size;
@@ -456,7 +456,14 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 		}
 		
 		// looks good
-		snprintf(line, sizeof(line), " %-35.35s%s", PRG_NAME(prg), !(++count % 2) ? "\r\n" : "");
+		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+			sprintf(vstr, "[%5d] ", PRG_VNUM(prg));
+		}
+		else {
+			*vstr = '\0';
+		}
+		
+		snprintf(line, sizeof(line), " %s%-30.30s%s", vstr, PRG_NAME(prg), !(++count % 2) ? "\r\n" : "");
 		
 		if (size + strlen(line) < sizeof(buf)) {
 			strcat(buf, line);
@@ -5477,7 +5484,7 @@ ACMD(do_progress) {
 	void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
 	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], *arg2, *ptr;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], vstr[256], *arg2, *ptr;
 	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES];
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_completed_goal *ecg, *next_ecg;
@@ -5566,8 +5573,15 @@ ACMD(do_progress) {
 				continue;
 			}
 			
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", goal->vnum);
+			}
+			else {
+				*vstr = '\0';
+			}
+			
 			count_quest_tasks(goal->tracker, &complete, &total);
-			snprintf(line, sizeof(line), "- %s, %d point%s (%d/%d)\r\n", PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total);
+			snprintf(line, sizeof(line), "- %s%s, %d point%s (%d/%d)\r\n", vstr, PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total);
 			any = TRUE;
 			
 			if (size + strlen(line) < sizeof(buf)) {
@@ -5599,7 +5613,14 @@ ACMD(do_progress) {
 			}
 			
 			// seems ok
-			snprintf(line, sizeof(line), "+ Available: %s (for %d point%s)\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", PRG_VNUM(prg));
+			}
+			else {
+				*vstr = '\0';
+			}
+			
+			snprintf(line, sizeof(line), "+ Available: %s%s (for %d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 			any = TRUE;
 		
 			if (size + strlen(line) < sizeof(buf)) {
@@ -5649,7 +5670,14 @@ ACMD(do_progress) {
 				}
 				
 				// seems ok
-				snprintf(line, sizeof(line), "+ %s (%d point%s)\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+				if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+					sprintf(vstr, "[%5d] ", PRG_VNUM(prg));
+				}
+				else {
+					*vstr = '\0';
+				}
+				
+				snprintf(line, sizeof(line), "+ %s%s (%d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 				any = TRUE;
 			
 				if (size + strlen(line) < sizeof(buf)) {
@@ -5692,7 +5720,14 @@ ACMD(do_progress) {
 	}
 	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument))) {
 		// show 1 goal
-		msg_to_char(ch, "%s\r\n%s", PRG_NAME(prg), NULLSAFE(PRG_DESCRIPTION(prg)));
+		if (IS_IMMORTAL(ch)) {
+			sprintf(vstr, "[%5d] ", PRG_VNUM(prg));
+		}
+		else {
+			*vstr = '\0';
+		}
+		
+		msg_to_char(ch, "%s%s\r\n%s", vstr, PRG_NAME(prg), NULLSAFE(PRG_DESCRIPTION(prg)));
 		
 		if (PRG_VALUE(prg) > 0) {
 			msg_to_char(ch, "Value: %d point%s\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
