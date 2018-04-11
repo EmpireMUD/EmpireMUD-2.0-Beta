@@ -359,6 +359,7 @@ void add_completed_goal(empire_data *emp, any_vnum vnum) {
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 	struct empire_island *isle, *next_isle;
 	struct progress_perk *perk;
+	int *ptr;
 	
 	if (!emp || !prg) {
 		return;	// sanitation
@@ -378,13 +379,16 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 		switch (perk->type) {
 			case PRG_PERK_TECH: {
 				if (perk->value >= 0 && perk->value < NUM_TECHS) {
-					// update base tech, which saves
-					SAFE_ADD(EMPIRE_BASE_TECH(emp, perk->value), (add ? 1 : -1), 0, INT_MAX, TRUE);
+					// update base tech, which saves: this section uses int pointers because some compilers warn about SAFE_ADD here.
+					ptr = &EMPIRE_BASE_TECH(emp, perk->value);
+					SAFE_ADD(*ptr, (add ? 1 : -1), 0, INT_MAX, TRUE);
 					
 					// also update current-tech
-					SAFE_ADD(EMPIRE_TECH(emp, perk->value), (add ? 1 : -1), 0, INT_MAX, TRUE);
+					ptr = &EMPIRE_TECH(emp, perk->value);
+					SAFE_ADD(*ptr, (add ? 1 : -1), 0, INT_MAX, TRUE);
 					HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-						SAFE_ADD(isle->tech[perk->value], (add ? 1 : -1), 0, INT_MAX, TRUE);
+						ptr = &(isle->tech[perk->value]);
+						SAFE_ADD(*ptr, (add ? 1 : -1), 0, INT_MAX, TRUE);
 					}
 				}
 				break;
