@@ -107,6 +107,71 @@ int count_empire_components(empire_data *emp, int type, bitvector_t flags) {
 
 
 /**
+* Counts how many different crops an empire has stored, based on the <plants>
+* field and the PLANTABLE flag.
+*
+* @param empire_data *emp The empire to check.
+* @param int max_needed Optional: Saves processing by stopping if it hits this number (-1 to count ALL).
+* @param int only_island Optional: Only checks for crops on 1 island (NO_ISLAND for all).
+*/
+int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island) {
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
+	obj_data *obj;
+	any_vnum vnum;
+	int count = 0;
+	
+	// helper type
+	struct tmp_crop_data {
+		any_vnum crop;
+		UT_hash_handle hh;
+	};
+	struct tmp_crop_data *tcd, *next_tcd, *hash = NULL;
+	
+	if (!emp || max_needed == 0) {
+		return 0;
+	}
+	
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (only_island != NO_ISLAND && only_island != isle->island) {
+			continue; // only_island requested
+		}
+		
+		HASH_ITER(hh, isle->store, store, next_store) {
+			if (!(obj = obj_proto(store->vnum))) {
+				continue;
+			}
+			if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
+				continue;
+			}
+			
+			vnum = GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE);
+			HASH_FIND_INT(hash, &vnum, tcd);
+			if (!tcd) {
+				++count;	// found a unique
+				CREATE(tcd, struct tmp_crop_data, 1);
+				tcd->crop = vnum;
+				HASH_ADD_INT(hash, crop, tcd);
+			}
+			// else: not unique
+			
+			if (max_needed != -1 && count >= max_needed) {
+				break;	// done early
+			}
+		}
+	}
+	
+	// free temporary data
+	HASH_ITER(hh, hash, tcd, next_tcd) {
+		HASH_DEL(hash, tcd);
+		free(tcd);
+	}
+	
+	return count;
+}
+
+
+/**
 * Counts how many items an empire has in storage.
 *
 * @param empire_data *emp The empire.
@@ -769,6 +834,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 			}
 			case REQ_GET_COINS: {
 				task->current = EMPIRE_COINS(emp);
+				break;
+			}
+			case REQ_CROP_VARIETY: {
+				task->current = count_empire_crop_variety(emp, task->needed, NO_ISLAND);
 				break;
 			}
 			

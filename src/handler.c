@@ -6032,6 +6032,8 @@ bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnu
 * @param struct req_data *list The items to lose (other task types are ignored).
 */
 void extract_required_items(char_data *ch, struct req_data *list) {
+	void extract_crop_variety(char_data *ch, int amount);
+	
 	// helper type
 	struct extract_items_data {
 		int group;	// cast from char
@@ -6113,6 +6115,10 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 				charge_coins(ch, REAL_OTHER_COIN, req->needed, NULL);
 				break;
 			}
+			case REQ_CROP_VARIETY: {
+				extract_crop_variety(ch, req->needed);
+				break;
+			}
 		}
 	}
 	
@@ -6162,6 +6168,7 @@ void free_requirements(struct req_data *list) {
 * @return bool TRUE if the character meets those requirements, FALSE if not.
 */
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
+	extern int count_crop_variety_in_list(obj_data *list);
 	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
@@ -6340,7 +6347,15 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				break;
 			}
 			case REQ_CAN_GAIN_SKILL: {
-				ok = check_can_gain_skill(ch, req->vnum);
+				if (!check_can_gain_skill(ch, req->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_CROP_VARIETY: {
+				if (count_crop_variety_in_list(ch->carrying) < req->needed) {
+					ok = FALSE;
+				}
 				break;
 			}
 			
@@ -6504,6 +6519,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_CAN_GAIN_SKILL: {
 			snprintf(output, sizeof(output), "Able to gain skill: %s%s", vnum, get_skill_name_by_vnum(req->vnum));
+			break;
+		}
+		case REQ_CROP_VARIETY: {
+			snprintf(output, sizeof(output), "Have produce from %d%s crop%s", req->needed, req->needed > 1 ? " different" : "", PLURAL(req->needed));
 			break;
 		}
 		default: {

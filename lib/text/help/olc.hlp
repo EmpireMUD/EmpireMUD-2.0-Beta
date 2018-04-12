@@ -6001,6 +6001,7 @@ Available tasks:
  &cGET-CURRENCY&0 - Player must have an amount of adventure currency.
  &cGET-COINS&0 - Player must get some miscellaneous coins.
  &cCAN-GAIN-SKILL&0 - Player is able to gain a point in a skill.
+ &cCROP-VARIETY&0 - Needs produce from a number of different crops.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 

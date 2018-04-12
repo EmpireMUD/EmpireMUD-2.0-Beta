@@ -55,8 +55,6 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 // external funcs
 extern struct req_data *copy_requirements(struct req_data *from);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
-extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-void count_quest_tasks(struct req_data *list, int *complete, int *total);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
@@ -74,6 +72,8 @@ extern char *requirement_string(struct req_data *req, bool show_vnums);
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
+int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+void count_quest_tasks(struct req_data *list, int *complete, int *total);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_player_quests(struct player_quest *list);
 void free_quest_givers(struct quest_giver *list);
@@ -184,6 +184,50 @@ void copy_quest_progress(struct req_data *to_list, struct req_data *from_list) {
 			to_iter->current = MAX(to_iter->current, from_iter->current);
 		}
 	}
+}
+
+
+/**
+* Counts how many different crops a list of items has, based on the <plants>
+* field and the PLANTABLE flag.
+*
+* @param obj_data *list The set of items to search for crops.
+*/
+int count_crop_variety_in_list(obj_data *list) {
+	obj_data *obj;
+	any_vnum vnum;
+	int count = 0;
+	
+	// helper type
+	struct tmp_crop_data {
+		any_vnum crop;
+		UT_hash_handle hh;
+	};
+	struct tmp_crop_data *tcd, *next_tcd, *hash = NULL;
+	
+	LL_FOREACH2(list, obj, next_content) {
+		if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
+			continue;
+		}
+		
+		vnum = GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE);
+		HASH_FIND_INT(hash, &vnum, tcd);
+		if (!tcd) {
+			++count;	// found a unique
+			CREATE(tcd, struct tmp_crop_data, 1);
+			tcd->crop = vnum;
+			HASH_ADD_INT(hash, crop, tcd);
+		}
+		// else: not unique
+	}
+	
+	// free temporary data
+	HASH_ITER(hh, hash, tcd, next_tcd) {
+		HASH_DEL(hash, tcd);
+		free(tcd);
+	}
+	
+	return count;
 }
 
 
@@ -337,6 +381,54 @@ void expire_instance_quests(struct instance_data *inst) {
 			msg_to_char(ch, "You fail %s because the adventure instance ended.\r\n", QUEST_NAME(quest));
 			drop_quest(ch, pq);
 		}
+	}
+}
+
+
+/**
+* For REQ_CROP_VARIETY on quest tasks, takes away 1 of each crop.
+*
+* @param char_data *ch The person whose inventory has the crops.
+* @param int amount How many unique crops are needed.
+*/
+void extract_crop_variety(char_data *ch, int amount) {
+	obj_data *obj, *next_obj;
+	any_vnum vnum;
+	int count = 0;
+	
+	// helper type
+	struct tmp_crop_data {
+		any_vnum crop;
+		UT_hash_handle hh;
+	};
+	struct tmp_crop_data *tcd, *next_tcd, *hash = NULL;
+	
+	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
+			continue;
+		}
+		
+		vnum = GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE);
+		HASH_FIND_INT(hash, &vnum, tcd);
+		if (!tcd) {
+			++count;	// found a unique
+			CREATE(tcd, struct tmp_crop_data, 1);
+			tcd->crop = vnum;
+			HASH_ADD_INT(hash, crop, tcd);
+			
+			extract_obj(obj);
+		}
+		// else: not unique
+		
+		if (count >= amount) {
+			break;	// done!
+		}
+	}
+	
+	// free temporary data
+	HASH_ITER(hh, hash, tcd, next_tcd) {
+		HASH_DEL(hash, tcd);
+		free(tcd);
 	}
 }
 
@@ -679,6 +771,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_CAN_GAIN_SKILL: {
 				task->current = check_can_gain_skill(ch, task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_CROP_VARIETY: {
+				task->current = count_crop_variety_in_list(ch->carrying);
 				break;
 			}
 		}
@@ -1720,6 +1816,7 @@ void qt_change_skill_level(char_data *ch, any_vnum skl) {
 void qt_drop_obj(char_data *ch, obj_data *obj) {
 	struct player_quest *pq;
 	struct req_data *task;
+	int crop_var = -1;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -1735,6 +1832,13 @@ void qt_drop_obj(char_data *ch, obj_data *obj) {
 			}
 			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
 				--task->current;
+			}
+			else if (task->type == REQ_CROP_VARIETY && OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
+				if (crop_var == -1) {
+					// update look this up once
+					crop_var = count_crop_variety_in_list(ch->carrying);
+				}
+				task->current = crop_var;
 			}
 			
 			// check min
@@ -1879,6 +1983,7 @@ void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
 void qt_get_obj(char_data *ch, obj_data *obj) {
 	struct player_quest *pq;
 	struct req_data *task;
+	int crop_var = -1;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -1894,6 +1999,13 @@ void qt_get_obj(char_data *ch, obj_data *obj) {
 			}
 			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
 				++task->current;
+			}
+			else if (task->type == REQ_CROP_VARIETY && OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
+				if (crop_var == -1) {
+					// update look this up once
+					crop_var = count_crop_variety_in_list(ch->carrying);
+				}
+				task->current = crop_var;
 			}
 		}
 	}

@@ -3748,6 +3748,7 @@ const char *requirement_types[] = {
 	"GET-CURRENCY",	// 20
 	"GET-COINS",
 	"CAN-GAIN-SKILL",
+	"CROP-VARIETY",
 	"\n",
 };
 
@@ -3777,6 +3778,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// get currency
 	REQ_AMT_NUMBER,	// get coins
 	REQ_AMT_NONE,	// can gain skill
+	REQ_AMT_NUMBER,	// crop variety
 };
 
 
@@ -3805,6 +3807,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// get currency
 	FALSE,	// get coins
 	FALSE,	// can gain skill
+	FALSE,	// crop variety
 };
 
 
