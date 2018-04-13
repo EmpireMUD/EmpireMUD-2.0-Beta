@@ -1141,6 +1141,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	
 	// other stuff to free
 	HASH_ITER(hh, inst->mob_counts, im, next_im) {
+		HASH_DEL(inst->mob_counts, im);
 		free(im);
 	}
 	

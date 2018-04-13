@@ -472,6 +472,7 @@ void free_faction_relations(struct faction_relation *hash) {
 	struct faction_relation *tmp, *next;
 	
 	HASH_ITER(hh, hash, tmp, next) {
+		HASH_DEL(hash, tmp);
 		free(tmp);
 	}
 }

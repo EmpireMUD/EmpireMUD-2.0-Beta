@@ -6084,6 +6084,7 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 		}
 		
 		// free data now
+		HASH_DEL(eid_list, eid);
 		free(eid);
 	}
 	
@@ -6387,6 +6388,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			}
 			
 			// free memory
+			HASH_DEL(mrd_list, mrd);
 			free(mrd);
 		}
 	}

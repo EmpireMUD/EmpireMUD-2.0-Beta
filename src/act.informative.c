@@ -297,6 +297,7 @@ void free_chart_hash(struct chart_territory *hash) {
 	struct chart_territory *ct, *next_ct;
 	
 	HASH_ITER(hh, hash, ct, next_ct) {
+		HASH_DEL(hash, ct);
 		free(ct);
 	}
 }

@@ -954,6 +954,7 @@ void setup_daily_quest_cycles(int only_cycle) {
 	
 	// free data
 	HASH_ITER(hh, list, entry, next_entry) {
+		HASH_DEL(list, entry);
 		free(entry);
 	}
 	
@@ -3143,6 +3144,7 @@ struct quest_reward *copy_quest_rewards(struct quest_reward *from) {
 void free_player_completed_quests(struct player_completed_quest **hash) {
 	struct player_completed_quest *pcq, *next_pcq;
 	HASH_ITER(hh, *hash, pcq, next_pcq) {
+		HASH_DEL(*hash, pcq);
 		free(pcq);
 	}
 	*hash = NULL;

@@ -796,6 +796,7 @@ void print_island_file(void) {
 			fprintf(fl, "S\n");
 			
 			// free as we go
+			HASH_DEL(all_isles, rli);
 			free(rli);
 		}
 	}

@@ -4094,8 +4094,10 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 				olc_audit_msg(ch, vnum, "Interaction %s exclusion set '%c' totals %.2f%%", interact_types[as->type], (char)at->code, at->percent);
 				problem = TRUE;
 			}
+			HASH_DEL(as->set, at);
 			free(at);
 		}
+		HASH_DEL(set, as);
 		free(as);
 	}
 	

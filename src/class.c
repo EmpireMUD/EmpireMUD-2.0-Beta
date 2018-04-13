@@ -168,6 +168,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		}
 		
 		// clean up memory
+		HASH_DEL(hash, aat);
 		free(aat);
 	}
 }

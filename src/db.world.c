@@ -2577,8 +2577,10 @@ void generate_island_descriptions(void) {
 	// and free the data
 	HASH_ITER(hh, isle_hash, isle, next_isle) {
 		HASH_ITER(hh, isle->ters, ter, next_ter) {
+			HASH_DEL(isle->ters, ter);
 			free(ter);
 		}
+		HASH_DEL(isle_hash, isle);
 		free(isle);
 	}
 	

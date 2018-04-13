@@ -648,6 +648,7 @@ void free_empire_goals(struct empire_goal *hash) {
 	struct empire_goal *eg, *next;
 	HASH_ITER(hh, hash, eg, next) {
 		free_requirements(eg->tracker);
+		HASH_DEL(hash, eg);
 		free(eg);
 	}
 }
@@ -661,6 +662,7 @@ void free_empire_goals(struct empire_goal *hash) {
 void free_empire_completed_goals(struct empire_completed_goal *hash) {
 	struct empire_completed_goal *ecg, *next;
 	HASH_ITER(hh, hash, ecg, next) {
+		HASH_DEL(hash, ecg);
 		free(ecg);
 	}
 }

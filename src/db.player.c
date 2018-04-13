@@ -902,6 +902,7 @@ void free_char(char_data *ch) {
 				}
 				free(history);
 			}
+			HASH_DEL(GET_SLASH_HISTORY(ch), slash_hist);
 			free(slash_hist);
 		}
 		
@@ -939,6 +940,7 @@ void free_char(char_data *ch) {
 			free(abil);
 		}
 		HASH_ITER(hh, GET_ABILITY_GAIN_HOOKS(ch), hook, next_hook) {
+			HASH_DEL(GET_ABILITY_GAIN_HOOKS(ch), hook);
 			free(hook);
 		}
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {

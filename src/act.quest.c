@@ -386,6 +386,7 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 		}
 		
 		// clean up data
+		HASH_DEL(cqd_list, cqd);
 		free(cqd);
 	}
 	

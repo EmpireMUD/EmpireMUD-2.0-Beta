@@ -1482,7 +1482,8 @@ void check_for_new_map(void) {
 				delete_territory_npc(ter, ter->npcs);
 			}
 			
-			free(ter);	// no need to remove from list
+			HASH_DEL(EMPIRE_TERRITORY_LIST(emp), ter);
+			free(ter);
 		}
 		EMPIRE_TERRITORY_LIST(emp) = NULL;	// all entires freed
 		
@@ -1494,7 +1495,8 @@ void check_for_new_map(void) {
 			// move all inventories to nowhere
 			HASH_ITER(hh, isle->store, store, next_store) {
 				add_to_empire_storage(emp, NO_ISLAND, store->vnum, store->amount);
-				free(store);	// no need to remove from hash -- it is being freed
+				HASH_DEL(isle->store, store);
+				free(store);
 			}
 			
 			// remove island data
@@ -1542,7 +1544,8 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 	if ((no_isle = get_empire_island(emp, NO_ISLAND))) {
 		HASH_ITER(hh, no_isle->store, store, next_store) {
 			add_to_empire_storage(emp, new_island, store->vnum, store->amount);
-			free(store);	// no need to remove from hash
+			HASH_DEL(no_isle->store, store);
+			free(store);
 			any = TRUE;
 		}
 		no_isle->store = NULL;
@@ -1888,11 +1891,14 @@ void free_empire(empire_data *emp) {
 	// free islands
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->needs, needs, next_needs) {
+			HASH_DEL(isle->needs, needs);
 			free(needs);
 		}
 		HASH_ITER(hh, isle->store, store, next_store) {
+			HASH_DEL(isle->store, store);
 			free(store);
 		}
+		HASH_DEL(EMPIRE_ISLANDS(emp), isle);
 		free(isle);
 	}
 	EMPIRE_ISLANDS(emp) = NULL;
@@ -1953,6 +1959,7 @@ void free_empire(empire_data *emp) {
 			delete_territory_npc(ter, ter->npcs);
 		}
 		
+		HASH_DEL(EMPIRE_TERRITORY_LIST(emp), ter);
 		free(ter);
 	}
 	
@@ -1972,6 +1979,7 @@ void free_empire(empire_data *emp) {
 		LL_FOREACH_SAFE(delay->chores, wdc, next_wdc) {
 			free(wdc);
 		}
+		HASH_DEL(EMPIRE_DELAYS(emp), delay);
 		free(delay);
 	}
 	
@@ -8597,6 +8605,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 		free(dep);
 	}
 	HASH_ITER(hh, data->extra_data, room_ex, next_room_ex) {
+		HASH_DEL(data->extra_data, room_ex);
 		free(room_ex);
 	}
 	while ((track = data->tracks)) {
