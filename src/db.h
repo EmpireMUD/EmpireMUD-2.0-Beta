@@ -325,6 +325,7 @@ extern descriptor_data *descriptor_list;
 // empires
 extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
+extern bool check_delayed_refresh;
 void delete_empire(empire_data *emp);
 extern struct empire_island *get_empire_island(empire_data *emp, int island_id);
 extern empire_data *get_or_create_empire(char_data *ch);
@@ -435,7 +436,6 @@ extern char_data *is_playing(int id);
 extern progress_data *progress_table;
 extern progress_data *sorted_progress;
 extern bool need_progress_refresh;
-extern bool check_completed_goals;
 extern char *get_progress_name_by_proto(any_vnum vnum);
 extern progress_data *real_progress(any_vnum vnum);
 void free_progress(progress_data *prg);

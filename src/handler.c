@@ -7197,12 +7197,13 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 	if (store->amount <= 0) {
 		HASH_DEL(isle->store, store);
 		free(store);
+		store = NULL;
 	}
 	
 	isle->store_is_sorted = FALSE;
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
-	et_get_obj(emp, obj_proto(vnum), amount);
+	et_get_obj(emp, obj_proto(vnum), amount, store ? store->amount : 0);
 }
 
 

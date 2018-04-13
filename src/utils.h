@@ -518,8 +518,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_BANNER(emp)  ((emp)->banner)
 #define EMPIRE_BANNER_HAS_UNDERLINE(emp)  ((emp)->banner_has_underline)
 #define EMPIRE_BASE_TECH(emp, num)  ((emp)->base_tech[(num)])
-#define EMPIRE_CHECK_GOAL_COMPLETE(emp)  ((emp)->check_goal_complete)
 #define EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)  ((emp)->city_overage_warning_time)
+#define EMPIRE_DELAYED_REFRESH(emp)  ((emp)->delayed_refresh)
 #define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
@@ -571,7 +571,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (EMPIRE_COINS(emp) * COIN_VALUE))
 #define EXPLICIT_BANNER_TERMINATOR(emp)  (EMPIRE_BANNER_HAS_UNDERLINE(emp) ? "\t0" : "")
-#define TRIGGER_CHECK_GOAL_COMPLETE(emp)  { check_completed_goals = EMPIRE_CHECK_GOAL_COMPLETE(emp) = TRUE; }
+#define TRIGGER_DELAYED_REFRESH(emp, flag)  { SET_BIT(EMPIRE_DELAYED_REFRESH(emp), (flag)); check_delayed_refresh = TRUE; }
 
 // definitions
 #define OFFENSE_HAS_WEIGHT(off)  (!IS_SET((off)->flags, OFF_AVENGED | OFF_WAR))
@@ -1704,7 +1704,7 @@ void qt_wear_obj(char_data *ch, obj_data *obj);
 void et_change_coins(empire_data *emp, int amount);
 void et_gain_building(empire_data *emp, any_vnum vnum);
 void et_gain_vehicle(empire_data *emp, any_vnum vnum);
-void et_get_obj(empire_data *emp, obj_data *obj, int amount);
+void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total);
 void et_lose_building(empire_data *emp, any_vnum vnum);
 void et_lose_vehicle(empire_data *emp, any_vnum vnum);
 

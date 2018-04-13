@@ -965,6 +965,11 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE DEFINES //////////////////////////////////////////////////////////
 
+// DELAY_REFRESH_x: flags indicating something on the empire needs a refresh
+#define DELAY_REFRESH_CROP_VARIETY  BIT(0)	// refreshes specific progress goals
+#define DELAY_REFRESH_GOAL_COMPLETE  BIT(1)	// checks for finished progress
+
+
 // EADM_x: empire admin flags
 #define EADM_NO_WAR  BIT(0)	// may not start a unilateral war
 #define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
@@ -4349,7 +4354,7 @@ struct empire_data {
 	time_t next_timeout;	// for triggering rescans
 	int min_level;	// minimum level in the empire
 	int max_level;	// maximum level in the empire
-	bool check_goal_complete;	// tells the mud to check for a complete goal
+	bitvector_t delayed_refresh;	// things that are requesting an update
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them

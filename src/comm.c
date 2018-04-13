@@ -890,7 +890,6 @@ void heartbeat(int heart_pulse) {
 	void check_idle_passwords();
 	void check_newbie_islands();
 	void check_progress_refresh();
-	void check_goals_complete();
 	void check_wars();
 	void chore_update();
 	void display_automessages();
@@ -908,6 +907,7 @@ void heartbeat(int heart_pulse) {
 	void reduce_outside_territory();
 	void reduce_stale_empires();
 	void reset_instances();
+	void run_delayed_refresh();
 	void run_external_evolutions();
 	void run_mob_echoes();
 	void sanity_check();
@@ -1107,7 +1107,7 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 29:\t%lld", microtime()); }
 		check_progress_refresh();
 		if (debug_log && HEARTBEAT(15)) { log("debug 30:\t%lld", microtime()); }
-		check_goals_complete();
+		run_delayed_refresh();
 		if (debug_log && HEARTBEAT(15)) { log("debug 31:\t%lld", microtime()); }
 	}
 

@@ -104,6 +104,7 @@ crop_data *crop_table = NULL;	// crop hash table
 empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
+bool check_delayed_refresh = FALSE;	// triggers multiple refreshes
 
 // factions
 faction_data *faction_table = NULL;	// main hash (hh)
@@ -167,7 +168,6 @@ struct group_data *group_list = NULL;	// global LL of groups
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
 progress_data *sorted_progress = NULL;	// hashed by vnum, sorted by type/data
 bool need_progress_refresh = FALSE;	// triggers an update of all empires' trackers
-bool check_completed_goals = FALSE;	// triggers full goal check
 
 // quests
 struct quest_data *quest_table = NULL;
