@@ -6171,6 +6171,7 @@ void free_requirements(struct req_data *list) {
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
 	extern int count_crop_variety_in_list(obj_data *list);
 	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+	extern int count_owned_homes(empire_data *emp);
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
@@ -6359,6 +6360,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_OWN_HOMES: {
+				if (!GET_LOYALTY(ch) || count_owned_homes(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -6525,6 +6532,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_CROP_VARIETY: {
 			snprintf(output, sizeof(output), "Have produce from %d%s crop%s", req->needed, req->needed > 1 ? " different" : "", PLURAL(req->needed));
+			break;
+		}
+		case REQ_OWN_HOMES: {
+			snprintf(output, sizeof(output), "Own %dx home%s for citizens", req->needed, PLURAL(req->needed));
 			break;
 		}
 		default: {

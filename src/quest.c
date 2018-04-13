@@ -54,7 +54,6 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
 extern struct req_data *copy_requirements(struct req_data *from);
-extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
@@ -72,6 +71,8 @@ extern char *requirement_string(struct req_data *req, bool show_vnums);
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
+int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+int count_owned_homes(empire_data *emp);
 int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
@@ -252,6 +253,39 @@ int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
 		}
 		if (GET_BLD_VNUM(GET_BUILDING(ter->room)) != vnum) {
 			continue;
+		}
+		
+		// found
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
+* Number of citizen homes owned by an empire.
+*
+* @param empire_data *emp Any empire.
+* @return int The number of completed homes owned by emp.
+*/
+int count_owned_homes(empire_data *emp) {
+	struct empire_territory_data *ter, *next_ter;
+	int count = 0;	// ah ah ah
+	
+	if (!emp) {
+		return count;
+	}
+	
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
+			continue;	// must be a completed building
+		}
+		if (!IS_MAP_BUILDING(ter->room)) {
+			continue;	// don't count interiors
+		}
+		if (GET_BLD_CITIZENS(GET_BUILDING(ter->room)) < 1) {
+			continue;	// must have a citizen
 		}
 		
 		// found
@@ -775,6 +809,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_CROP_VARIETY: {
 				task->current = count_crop_variety_in_list(ch->carrying);
+				break;
+			}
+			case REQ_OWN_HOMES: {
+				task->current = count_owned_homes(GET_LOYALTY(ch));
 				break;
 			}
 		}

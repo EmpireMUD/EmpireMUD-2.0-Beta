@@ -47,6 +47,7 @@ extern const char *techs[];
 // external funcs
 extern struct req_data *copy_requirements(struct req_data *from);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+extern int count_owned_homes(empire_data *emp);;
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void get_requirement_display(struct req_data *list, char *save_buffer);
@@ -813,6 +814,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 			}
 			case REQ_CROP_VARIETY: {
 				task->current = count_empire_crop_variety(emp, task->needed, NO_ISLAND);
+				break;
+			}
+			case REQ_OWN_HOMES: {
+				task->current = count_owned_homes(emp);
 				break;
 			}
 			

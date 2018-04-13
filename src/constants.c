@@ -3749,6 +3749,7 @@ const char *requirement_types[] = {
 	"GET-COINS",
 	"CAN-GAIN-SKILL",
 	"CROP-VARIETY",
+	"OWN-HOMES",
 	"\n",
 };
 
@@ -3779,6 +3780,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// get coins
 	REQ_AMT_NONE,	// can gain skill
 	REQ_AMT_NUMBER,	// crop variety
+	REQ_AMT_NUMBER,	// own homes
 };
 
 
@@ -3808,6 +3810,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// get coins
 	FALSE,	// can gain skill
 	FALSE,	// crop variety
+	FALSE,	// own homes
 };
 
 
