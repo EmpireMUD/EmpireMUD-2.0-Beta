@@ -463,7 +463,12 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 			*vstr = '\0';
 		}
 		
-		snprintf(line, sizeof(line), " %s%-30.30s%s", vstr, PRG_NAME(prg), !(++count % 2) ? "\r\n" : "");
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			snprintf(line, sizeof(line), " %s%s\r\n", vstr, PRG_NAME(prg));
+		}
+		else {
+			snprintf(line, sizeof(line), " %s%-30.30s%s", vstr, PRG_NAME(prg), !(++count % 2) ? "\r\n" : "");
+		}
 		
 		if (size + strlen(line) + 18 < sizeof(buf)) {
 			strcat(buf, line);
@@ -478,7 +483,7 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 	if (!count) {
 		size += snprintf(buf + size, sizeof(buf) - size, " no goals\r\n");
 	}
-	else if (size + 2 < sizeof(buf) && count % 2) {
+	else if (size + 2 < sizeof(buf) && count % 2 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 		strcat(buf, "\r\n");
 	}
 	
