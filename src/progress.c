@@ -2227,7 +2227,7 @@ OLC_MODULE(progedit_perks) {
 			switch (ptype) {
 				case PRG_PERK_TECH: {
 					if ((vnum = search_block(argument, techs, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown tech '%s'.\r\n", arg);
+						msg_to_char(ch, "Unknown tech '%s'.\r\n", argument);
 						return;
 					}
 					// otherwise ok
