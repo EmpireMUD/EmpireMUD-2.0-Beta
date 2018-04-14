@@ -1449,9 +1449,7 @@ void stop_burning(room_data *room) {
 int city_points_available(empire_data *emp) {
 	extern int get_total_score(empire_data *emp);
 	
-	struct empire_city_data *city;
 	int score, points = 0;
-	bool has;
 	
 	if (emp) {
 		points = 1;
@@ -1463,18 +1461,7 @@ int city_points_available(empire_data *emp) {
 		score = get_total_score(emp);
 		points += (score >= 50) ? 1 : 0;
 		
-		// bonus point at 75 IF there is a capital
-		if (score >= 75) {
-			has = FALSE;
-			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
-				if (city_type[city->type].is_capital) {
-					has = TRUE;
-					break;
-				}
-			}
-			
-			points += (has ? 1 : 0);
-		}
+		points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
 
 		// minus any used points
 		points -= count_city_points_used(emp);
