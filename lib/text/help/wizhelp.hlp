@@ -972,6 +972,7 @@ learned    Immort   Shows you learned recipes.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
+progress   Immort   Shows how many empires have completed a progress goal.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
 shops      Immort   Shows any shops available in your current location.
@@ -1096,6 +1097,12 @@ Shows the names and current and max health, moves, mana and blood of all online
 players. Not to be confused with SHOW PLAYER.
 
 See also: USERS
+#e
+"SHOW PROGRESS"
+
+Usage:  show progress <goal>
+
+This shows how many empires have completed a given progression goal.
 #e
 "SHOW RENT"
 

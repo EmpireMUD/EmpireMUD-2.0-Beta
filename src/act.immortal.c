@@ -2236,6 +2236,56 @@ SHOW(show_player) {
 }
 
 
+SHOW(show_progress) {
+	extern progress_data *find_progress_goal_by_name(char *name);
+	
+	int total = 0, active = 0, active_completed = 0, total_completed = 0;
+	empire_data *emp, *next_emp;
+	progress_data *prg;
+	bool t_o;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Show completion of which progression goal?\r\n");
+	}
+	else if ((isdigit(*argument) && !(prg = real_progress(atoi(argument)))) || (!isdigit(*argument) && !(prg = find_progress_goal_by_name(argument)))) {
+		msg_to_char(ch, "Unknown goal '%s'.\r\n", argument);
+	}
+	else {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (EMPIRE_IMM_ONLY(emp)) {
+				continue;	// safe to skip these
+			}
+			
+			++total;
+			
+			if (!(t_o = EMPIRE_IS_TIMED_OUT(emp))) {
+				++active;
+			}
+			
+			if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+				++total_completed;
+				if (!t_o) {
+					++active_completed;
+				}
+			}
+		}
+		
+		if (total == 0) {
+			msg_to_char(ch, "No player empires found; nobody has completed that goal.\r\n");
+		}
+		else {
+			msg_to_char(ch, "%d completed that goal out of %d total empire%s (%d%%).\r\n", total_completed, total, PLURAL(total), (total_completed * 100 / total));
+		}
+		if (active == 0) {
+			msg_to_char(ch, "No active empires found.\r\n");
+		}
+		else {
+			msg_to_char(ch, "%d active empire%s completed that goal out of %d total active (%d%%).\r\n", active_completed, PLURAL(active_completed), active, (active_completed * 100 / active));
+		}
+	}
+}
+
+
 SHOW(show_quests) {
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	void show_quest_tracker(char_data *ch, struct player_quest *pq);
@@ -7561,6 +7611,7 @@ ACMD(do_show) {
 		{ "technology", LVL_START_IMM, show_technology },
 		{ "shops", LVL_START_IMM, show_shops },
 		{ "piles", LVL_CIMPL, show_piles },
+		{ "progress", LVL_START_IMM, show_progress },
 
 		// last
 		{ "\n", 0, NULL }
