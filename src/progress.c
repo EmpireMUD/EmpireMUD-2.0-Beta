@@ -87,7 +87,7 @@ int count_empire_components(empire_data *emp, int type, bitvector_t flags) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (store->amount < 1 || !(proto = obj_proto(store->vnum))) {
+			if (store->amount < 1 || !(proto = store->proto)) {
 				continue;
 			}
 			
@@ -139,7 +139,7 @@ int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island)
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (!(obj = obj_proto(store->vnum))) {
+			if (!(obj = store->proto)) {
 				continue;
 			}
 			if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {

@@ -1703,7 +1703,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		if (store->amount < 1 || store->keep) {
 			continue;
 		}
-		if (!(proto = obj_proto(store->vnum))) {
+		if (!(proto = store->proto)) {
 			continue;
 		}
 		if (!has_interaction(proto->interactions, interact_type)) {
@@ -2080,7 +2080,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 				continue;
 			}
 			
-			orn = obj_proto(store->vnum);
+			orn = store->proto;
 			if (orn && store->amount >= 1 && IS_WEALTH_ITEM(orn) && GET_WEALTH_VALUE(orn) > 0 && GET_WEALTH_AUTOMINT(orn)) {
 				if (highest == NULL || store->amount > high_amt) {
 					highest = store;

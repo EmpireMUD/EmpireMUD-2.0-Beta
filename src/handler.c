@@ -7216,6 +7216,7 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 	if (!store) {	// create storage
 		CREATE(store, struct empire_storage_data, 1);
 		store->vnum = vnum;
+		store->proto = obj_proto(vnum);
 		HASH_ADD_INT(isle->store, vnum, store);
 	}
 	
@@ -7270,7 +7271,7 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 			}
 			
 			// need obj
-			if (!(proto = obj_proto(store->vnum))) {
+			if (!(proto = store->proto)) {
 				continue;
 			}
 		
@@ -7397,7 +7398,7 @@ bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int
 			continue;
 		}
 		
-		if (!(proto = obj_proto(store->vnum))) {
+		if (!(proto = store->proto)) {
 			continue;	// need obj
 		}
 		
@@ -7428,7 +7429,7 @@ struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, in
 	obj_data *proto;
 	
 	HASH_ITER(hh, isle->store, store, next_store) {
-		if (!(proto = obj_proto(store->vnum))) {
+		if (!(proto = store->proto)) {
 			continue;
 		}
 		if (!multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {
@@ -7545,7 +7546,7 @@ void read_vault(empire_data *emp) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if ((proto = obj_proto(store->vnum))) {
+			if ((proto = store->proto)) {
 				if (IS_WEALTH_ITEM(proto)) {
 					SAFE_ADD(EMPIRE_WEALTH(emp), (GET_WEALTH_VALUE(proto) * store->amount), 0, INT_MAX, FALSE);
 				}
@@ -7572,7 +7573,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	obj_data *obj, *proto;
 	int available;
 
-	proto = obj_proto(store->vnum);
+	proto = store->proto;
 	
 	// somehow
 	if (!proto) {

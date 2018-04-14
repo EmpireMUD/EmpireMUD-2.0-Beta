@@ -4184,6 +4184,7 @@ struct empire_political_data {
 // The storage structure for empire islands
 struct empire_storage_data {
 	obj_vnum vnum;	// what's stored
+	obj_data *proto;	// pointer to the obj proto
 	int amount;	// how much
 	bool keep;	// if TRUE, workforce will ignore it
 	UT_hash_handle hh;	// empire_island->store hash (by vnum)

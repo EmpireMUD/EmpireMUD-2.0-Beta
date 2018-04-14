@@ -764,10 +764,10 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		HASH_ITER(hh, isle->store, store, next_store) {
 			//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
 			if ( !proto ) {
-				if (!multi_isname(argument, GET_OBJ_KEYWORDS(obj_proto(store->vnum)))) {
+				if (!multi_isname(argument, GET_OBJ_KEYWORDS(store->proto))) {
 					continue;
 				} else {
-					proto = obj_proto(store->vnum);
+					proto = store->proto;
 				}
 			}else if ( proto->vnum != store->vnum){
 				continue;
@@ -840,7 +840,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		HASH_ITER(hh, isle->store, store, next_store) {
 			// prototype lookup
 			if (store->vnum != last_vnum) {
-				proto = obj_proto(store->vnum);
+				proto = store->proto;
 				last_vnum = store->vnum;
 			}
 			
@@ -6413,7 +6413,7 @@ ACMD(do_workforce) {
 		
 		found = FALSE;
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			if (!(proto = obj_proto(store->vnum))) {
+			if (!(proto = store->proto)) {
 				continue;
 			}
 			if (!multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {

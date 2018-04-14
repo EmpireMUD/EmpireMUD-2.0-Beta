@@ -1630,7 +1630,7 @@ ACMD(do_steal) {
 				break;
 			}
 			
-			proto = obj_proto(store->vnum);
+			proto = store->proto;
 			
 			if (proto && obj_can_be_stored(proto, IN_ROOM(ch)) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
 				found = TRUE;
