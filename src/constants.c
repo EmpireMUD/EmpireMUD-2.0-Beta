@@ -2585,9 +2585,10 @@ const char *progress_flags[] = {
 };
 
 
-// PRG_PERK_x: progress perk types
+// PRG_PERK_x: progress perk types (should be all 1 word)
 const char *progress_perk_types[] = {
 	"Technology",
+	"City-points",
 	"\n"
 };
 

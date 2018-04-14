@@ -348,6 +348,10 @@ char *get_one_perk_display(struct progress_perk *perk) {
 			sprinttype(perk->value, techs, save_buffer);
 			break;
 		}
+		case PRG_PERK_CITY_POINTS: {
+			sprintf(save_buffer, "%d city point%s", perk->value, PLURAL(perk->value));
+			break;
+		}
 		default: {
 			strcpy(save_buffer, "UNKNOWN");
 			break;
@@ -454,6 +458,10 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 						isle->tech[perk->value] += (add ? 1 : -1);
 					}
 				}
+				break;
+			}
+			case PRG_PERK_CITY_POINTS: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
 		}
@@ -2284,8 +2292,14 @@ OLC_MODULE(progedit_perks) {
 						msg_to_char(ch, "Unknown tech '%s'.\r\n", argument);
 						return;
 					}
-					// otherwise ok
-					break;
+					break;	// otherwise ok
+				}
+				case PRG_PERK_CITY_POINTS: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid number of city points '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
 				}
 				default: {
 					msg_to_char(ch, "That type is not yet implemented.\r\n");

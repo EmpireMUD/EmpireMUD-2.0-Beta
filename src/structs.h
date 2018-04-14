@@ -2098,6 +2098,7 @@ typedef struct vehicle_data vehicle_data;
 
 // PRG_PERK_x: progress perks
 #define PRG_PERK_TECH  0	// grants a technology
+#define PRG_PERK_CITY_POINTS  1	// grants more city points
 
 
  //////////////////////////////////////////////////////////////////////////////
