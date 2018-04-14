@@ -237,6 +237,15 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	if (emp && SECT_FLAGGED(st, SECTF_NO_CLAIM)) {
 		abandon_room(room);
 	}
+	
+	// update requirement trackers
+	if (emp) {
+		qt_empire_players(emp, qt_lose_tile_sector, GET_SECT_VNUM(old_sect));
+		et_lose_tile_sector(emp, GET_SECT_VNUM(old_sect));
+		
+		qt_empire_players(emp, qt_gain_tile_sector, GET_SECT_VNUM(st));
+		et_gain_tile_sector(emp, GET_SECT_VNUM(st));
+	}
 }
 
 

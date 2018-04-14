@@ -2787,6 +2787,8 @@ void perform_abandon_room(room_data *room) {
 		}
 		
 		// quest tracker for members
+		qt_empire_players(emp, qt_lose_tile_sector, GET_SECT_VNUM(SECT(room)));
+		et_lose_tile_sector(emp, GET_SECT_VNUM(SECT(room)));
 		if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 			qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
 			et_lose_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
@@ -2851,6 +2853,8 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 		ter = create_territory_entry(emp, room);
 	}
 	
+	qt_empire_players(emp, qt_gain_tile_sector, GET_SECT_VNUM(SECT(room)));
+	et_gain_tile_sector(emp, GET_SECT_VNUM(SECT(room)));
 	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
 		et_gain_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
@@ -6172,6 +6176,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 	extern int count_crop_variety_in_list(obj_data *list);
 	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 	extern int count_owned_homes(empire_data *emp);
+	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
@@ -6366,6 +6371,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_OWN_SECTOR: {
+				if (!GET_LOYALTY(ch) || count_owned_sector(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -6536,6 +6547,11 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_OWN_HOMES: {
 			snprintf(output, sizeof(output), "Own %dx home%s for citizens", req->needed, PLURAL(req->needed));
+			break;
+		}
+		case REQ_OWN_SECTOR: {
+			sector_data *sect = sector_proto(req->vnum);
+			snprintf(output, sizeof(output), "Own %dx tile%s of: %s%s", req->needed, PLURAL(req->needed), vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
 			break;
 		}
 		default: {

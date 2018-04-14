@@ -297,6 +297,34 @@ int count_owned_homes(empire_data *emp) {
 
 
 /**
+* Number of sector tiles owned by an empire.
+*
+* @param empire_data *emp Any empire.
+* @param sector_vnum vnum The sector to search for.
+* @return int The number of tiles with that sector vnum, owned by emp.
+*/
+int count_owned_sector(empire_data *emp, sector_vnum vnum) {
+	struct empire_territory_data *ter, *next_ter;
+	int count = 0;	// ah ah ah
+	
+	if (!emp || vnum == NOTHING) {
+		return count;
+	}
+	
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (GET_SECT_VNUM(SECT(ter->room)) != vnum) {
+			continue;
+		}
+		
+		// found
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
 * Number of vehicles owned by an empire.
 *
 * @param empire_data *emp Any empire.
@@ -813,6 +841,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_OWN_HOMES: {
 				task->current = count_owned_homes(GET_LOYALTY(ch));
+				break;
+			}
+			case REQ_OWN_SECTOR: {
+				task->current = count_owned_sector(GET_LOYALTY(ch), task->vnum);
 				break;
 			}
 		}
@@ -1990,6 +2022,30 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 
 
 /**
+* Quest Tracker: ch gets a new tile, by sector
+*
+* @param char_data *ch The player.
+* @param sector_vnum vnum The sector vnum.
+*/
+void qt_gain_tile_sector(char_data *ch, sector_vnum vnum) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
+				++task->current;
+			}
+		}
+	}
+}
+
+
+/**
 * Quest Tracker: ch gets a vehicle
 *
 * @param char_data *ch The player.
@@ -2184,6 +2240,33 @@ void qt_lose_quest(char_data *ch, any_vnum vnum) {
 			if (task->type == REQ_NOT_ON_QUEST && task->vnum == vnum) {
 				task->current = task->needed;
 			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch loses a tile, by sector
+*
+* @param char_data *ch The player.
+* @param sector_vnum vnum The sector vnum.
+*/
+void qt_lose_tile_sector(char_data *ch, sector_vnum vnum) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
+				--task->current;
+			}
+			
+			// check min
+			task->current = MAX(task->current, 0);
 		}
 	}
 }

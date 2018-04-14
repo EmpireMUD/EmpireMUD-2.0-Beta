@@ -784,6 +784,8 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 * @param struct empire_goal *goal The goal to refresh.
 */
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
+	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
+	
 	struct req_data *task;
 	
 	if (!emp || !goal) {
@@ -819,6 +821,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 			}
 			case REQ_OWN_HOMES: {
 				task->current = count_owned_homes(emp);
+				break;
+			}
+			case REQ_OWN_SECTOR: {
+				task->current = count_owned_sector(emp, task->vnum);
 				break;
 			}
 			
@@ -1000,6 +1006,28 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 
 
 /**
+* Empire Tracker: empire gets a tile, by sector (in general)
+*
+* @param empire_data *emp The empire.
+* @param sector_vnum vnum The sector vnum.
+*/
+void et_gain_tile_sector(empire_data *emp, sector_vnum vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
+				++task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+}
+
+
+/**
 * Empire Tracker: empire gets a vehicle
 *
 * @param empire_data *emp The empire.
@@ -1074,6 +1102,31 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				--task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+		}
+	}
+}
+
+
+/**
+* Empire Tracker: empire loses a tile, by sector.
+*
+* @param empire_data *emp The empire.
+* @param sector_vnum vnum The sector vnum.
+*/
+void et_lose_tile_sector(empire_data *emp, sector_vnum vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
 				--task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
