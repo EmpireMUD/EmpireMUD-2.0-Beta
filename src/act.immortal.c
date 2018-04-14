@@ -347,6 +347,7 @@ ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
+ADMIN_UTIL(util_wipeprogress);
 ADMIN_UTIL(util_yearly);
 
 
@@ -367,6 +368,7 @@ struct {
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
+	{ "wipeprogress", LVL_CIMPL, util_wipeprogress },
 	{ "yearly", LVL_CIMPL, util_yearly },
 
 	// last
@@ -722,6 +724,25 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+}
+
+
+ADMIN_UTIL(util_wipeprogress) {
+	void full_reset_empire_progress(empire_data *only_emp);
+	
+	empire_data *emp = NULL;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Usage: util wipeprogress <empire | all>\r\n");
+	}
+	else if (str_cmp(argument, "all") && !(emp = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire '%s'.\r\n", argument);
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has wiped empire progress for %s", GET_REAL_NAME(ch), emp ? EMPIRE_NAME(emp) : "all empires");
+		msg_to_char(ch, "Okay...\r\n");
+		full_reset_empire_progress(emp);	// if NULL, does ALL
+	}
 }
 
 

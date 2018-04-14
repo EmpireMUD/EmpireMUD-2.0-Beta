@@ -28,6 +28,7 @@
 *   Helpers
 *   Empire Helpers
 *   Empire Trackers
+*   The Nuclear Option
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -1169,6 +1170,60 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 				task->current = MAX(task->current, 0);
 			}
 		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// THE NUCLEAR OPTION //////////////////////////////////////////////////////
+
+/**
+* Fully resets empire progression for 1 or all empires.
+*
+* @param empire_data *only_emp Optional: If provided, only does that 1 empire. Otherwise does all of them.
+*/
+void full_reset_empire_progress(empire_data *only_emp) {
+	empire_data *emp, *next_emp;
+	int iter;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (only_emp && emp != only_emp) {
+			continue;	// only doing one
+		}
+		
+		// wipe all goals (don't bother cancelling or refunding anything)
+		free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
+		EMPIRE_COMPLETED_GOALS(emp) = NULL;
+		free_empire_goals(EMPIRE_GOALS(emp));
+		EMPIRE_GOALS(emp) = NULL;
+		
+		// wipe techs
+		for (iter = 0; iter < NUM_TECHS; ++iter) {
+			EMPIRE_BASE_TECH(emp, iter) = 0;
+		}
+		
+		// wipe attributes
+		for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+			EMPIRE_ATTRIBUTE(emp, iter) = 0;
+		}
+		
+		// wipe points
+		for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+			EMPIRE_PROGRESS_POINTS(emp, iter) = 0;
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		
+		if (only_emp) {	// refresh now if it's just this one
+			reread_empire_tech(emp);
+			refresh_empire_goals(emp, NOTHING);
+		}
+	}
+	
+	if (!only_emp) {	// refresh all empires
+		reread_empire_tech(NULL);
+		need_progress_refresh = TRUE;
+		check_progress_refresh();	// call it now, don't wait
 	}
 }
 
