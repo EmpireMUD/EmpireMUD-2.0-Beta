@@ -5553,7 +5553,7 @@ ACMD(do_progress) {
 			}
 		}
 		
-		size = snprintf(buf, sizeof(buf), "%s%s\t0 has %d progress points available (%d total earned).\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_PROGRESS_POOL(emp), total);
+		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 		
 		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
 			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
@@ -5567,6 +5567,8 @@ ACMD(do_progress) {
 				break;
 			}
 		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
 		
 		page_string(ch->desc, buf, TRUE);
 	}
