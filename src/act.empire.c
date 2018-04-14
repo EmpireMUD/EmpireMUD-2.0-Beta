@@ -5765,6 +5765,10 @@ ACMD(do_progress) {
 			}
 			msg_to_char(ch, "Completed %s.\r\n", buf);
 		}
+		else if (!empire_meets_goal_prereqs(emp, prg)) {
+			msg_to_char(ch, "You have not met the prerequisites for this goal.\r\n");
+		}
+		
 		if (PRG_PERKS(prg)) {
 			get_progress_perks_display(PRG_PERKS(prg), buf);
 			msg_to_char(ch, "Rewards:\r\n%s", buf);
