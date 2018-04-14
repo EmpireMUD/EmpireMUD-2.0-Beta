@@ -431,11 +431,12 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 	}
 	
 	// apply points/cost
-	if (PRG_VALUE(prg)) {
+	if (PRG_VALUE(prg)) {	// adds to point total and pool
 		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 	}
-	if (PRG_COST(prg)) {
+	if (PRG_COST(prg)) {	// adds to point total, subtracts from pool
+		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_COST(prg) : -PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
 		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? -PRG_COST(prg) : PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
 	}
 	

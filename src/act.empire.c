@@ -505,7 +505,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	extern const char *techs[];
 	
 	struct empire_political_data *emp_pol;
-	int iter, sub, found_rank;
+	int iter, sub, found_rank, total;
 	empire_data *other, *emp_iter, *next_emp;
 	bool found, is_own_empire, comma;
 	player_index_data *index;
@@ -602,7 +602,16 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			break;
 		}
 	}
-
+	
+	// progress points by category
+	total = 0;
+	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
+		total += EMPIRE_PROGRESS_POINTS(e, iter);
+		msg_to_char(ch, "%s: %d, ", progress_types[iter], EMPIRE_PROGRESS_POINTS(e, iter));
+	}
+	msg_to_char(ch, "Total: %d\r\n", total);
+	
+	// Score
 	msg_to_char(ch, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
 	for (iter = 0, comma = FALSE; iter < NUM_SCORES; ++iter) {
 		sprinttype(iter, score_type, buf);
