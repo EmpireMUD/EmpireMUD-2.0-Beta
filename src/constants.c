@@ -1668,18 +1668,11 @@ const char *empire_admin_flags[] = {
 };
 
 
-// EATT_x (1/2): empire attributes
+// EATT_x: empire attributes
 const char *empire_attributes[] = {
 	"Progress Pool",
-	"City Points",
+	"Bonus City Points",
 	"\n"
-};
-
-
-// EATT_x (2/2): defaults for empire attributes
-const int empire_attribute_defaults[NUM_EMPIRE_ATTRIBUTES] = {
-	0,	// progress pool
-	1,	// city points
 };
 
 

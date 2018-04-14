@@ -1904,6 +1904,7 @@ const char *versions_list[] = {
 	"b5.23",
 	"b5.24",
 	"b5.25",
+	"b5.30",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3038,6 +3039,36 @@ void b5_25_trench_update(void) {
 }
 
 
+// fixes some empire data
+void b5_30_empire_update(void) {
+	struct empire_trade_data *trade, *next_trade;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	int iter;
+	
+	log("Applying b5.30 empire update...");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// fixes an issue where some numbers were defaulted higher -- these attributes are not even used prior to b5.30
+		for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+			EMPIRE_ATTRIBUTE(emp, iter) = 0;
+		}
+		
+		// fixes an older issue with trade data -- unstorable items
+		LL_FOREACH_SAFE(EMPIRE_TRADE(emp), trade, next_trade) {
+			if (!(proto = obj_proto(trade->vnum)) || !proto->storage) {
+				LL_DELETE(EMPIRE_TRADE(emp), trade);
+			}
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+	
+	save_all_empires();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3280,6 +3311,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.25")) {
 			b5_25_trench_update();
+		}
+		if (MATCH_VERSION("b5.30")) {
+			b5_30_empire_update();
 		}
 	}
 	

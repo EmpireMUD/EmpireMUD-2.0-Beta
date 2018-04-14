@@ -980,7 +980,7 @@ typedef struct vehicle_data vehicle_data;
 
 // EATT_x: empire attributes
 #define EATT_PROGRESS_POOL  0	// spendable progress points
-#define EATT_CITY_POINTS  1	// bonus city points
+#define EATT_BONUS_CITY_POINTS  1	// extra city points
 #define NUM_EMPIRE_ATTRIBUTES  2	// total
 
 

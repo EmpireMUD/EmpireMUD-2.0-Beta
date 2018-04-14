@@ -58,7 +58,6 @@
 // external variables
 extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
-extern const int empire_attribute_defaults[NUM_EMPIRE_ATTRIBUTES];
 extern struct player_special_data dummy_mob;
 extern struct empire_territory_data *global_next_territory_entry;
 extern int max_automessage_id;
@@ -1622,10 +1621,6 @@ empire_data *create_empire(char_data *ch) {
 	sprintf(colorcode, "&%c", colorlist[number(0, num_colors-1)]);	// pick random color
 	EMPIRE_BANNER(emp) = str_dup(colorcode);
 	
-	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
-		EMPIRE_ATTRIBUTE(emp, iter) = empire_attribute_defaults[iter];
-	}
-	
 	EMPIRE_CREATE_TIME(emp) = time(0);
 
 	// member data
@@ -2307,10 +2302,6 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	// init
 	CREATE(emp, empire_data, 1);
 	emp->vnum = vnum;
-	
-	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
-		EMPIRE_ATTRIBUTE(emp, iter) = empire_attribute_defaults[iter];
-	}
 
 	HASH_FIND_INT(empire_table, &vnum, find);
 	if (find) {
