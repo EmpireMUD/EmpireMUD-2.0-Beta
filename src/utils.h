@@ -1635,6 +1635,7 @@ extern room_data *straight_line(room_data *origin, room_data *destination, int i
 extern sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags);
 
 // misc functions from utils.c
+extern char *simple_time_since(time_t when);
 extern unsigned long long microtime(void);
 extern bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag);
 

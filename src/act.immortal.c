@@ -740,7 +740,7 @@ ADMIN_UTIL(util_wipeprogress) {
 	}
 	else {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has wiped empire progress for %s", GET_REAL_NAME(ch), emp ? EMPIRE_NAME(emp) : "all empires");
-		msg_to_char(ch, "Okay...\r\n");
+		send_config_msg(ch, "ok_string");
 		full_reset_empire_progress(emp);	// if NULL, does ALL
 	}
 }

@@ -1126,7 +1126,7 @@ ACMD(do_history) {
 			}
 			
 			// send message
-			msg_to_char(ch, "%s\tn%s", chd_iter->message, (found_crlf ? "" : "\r\n"));
+			msg_to_char(ch, "%s: %s\tn%s", simple_time_since(chd_iter->timestamp), chd_iter->message, (found_crlf ? "" : "\r\n"));
 		}
 	}
 }

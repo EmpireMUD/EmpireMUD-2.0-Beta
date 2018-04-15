@@ -5065,6 +5065,36 @@ char *shared_by(obj_data *obj, char_data *ch) {
 
 
 /**
+* Simple, short display for number of days/hours/minutes/seconds since an
+* event. It only shows the largest of those groups, so something 26 hours ago
+* is '1d' and something 100 seconds ago is '2m'.
+*
+* @param time_t when The timestamp.
+* @return char* The short string.
+*/
+char *simple_time_since(time_t when) {
+	static char output[80];
+	double calc;
+	int diff;
+	
+	diff = time(0) - when;
+	if ((calc = diff / SECS_PER_REAL_DAY) > 1.0) {
+		sprintf(output, "%dd", round(calc));
+	}
+	else if ((calc = diff / SECS_PER_REAL_HOUR) > 1.0) {
+		sprintf(output, "%dh", round(calc));
+	}
+	else if ((calc = diff / SECS_PER_REAL_MIN) > 1.0) {
+		sprintf(output, "%dm", round(calc));
+	}
+	else {
+		sprintf(output, "%ds", diff);
+	}
+	return output;
+}
+
+
+/**
 * @return unsigned long long The current timestamp as microtime (1 million per second)
 */
 unsigned long long microtime(void) {

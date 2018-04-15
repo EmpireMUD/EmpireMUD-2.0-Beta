@@ -3838,11 +3838,10 @@ ACMD(do_elog) {
 	extern const char *empire_log_types[];
 	extern const bool empire_log_request_only[];
 	
-	char *argptr, *tempptr, *time_s, buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char *argptr, *tempptr, buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	int iter, count, type = NOTHING, lines = -1;
 	struct empire_log_data *elog;
 	empire_data *emp = NULL;
-	time_t logtime;
 	bool found;
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	
@@ -3929,9 +3928,7 @@ ACMD(do_elog) {
 		}
 		if (type == NOTHING || elog->type == type) {
 			if (count-- - lines <= 0) {
-				logtime = elog->timestamp;
-				time_s = asctime(localtime(&logtime));
-				sprintf(line, "%-20.20s: %s&0\r\n", time_s + 4, strip_color(elog->string));
+				sprintf(line, "%s: %s&0\r\n", simple_time_since(elog->timestamp), strip_color(elog->string));
 				
 				if (strlen(buf) + strlen(line) < MAX_STRING_LENGTH) {
 					strcat(buf, line);
