@@ -5565,7 +5565,7 @@ ACMD(do_progress) {
 			}
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+		size += snprintf(buf + size, sizeof(buf) - size, " Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
 		
 		page_string(ch->desc, buf, TRUE);
 	}
