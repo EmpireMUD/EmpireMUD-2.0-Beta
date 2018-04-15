@@ -961,12 +961,7 @@ ACMD(do_slash_channel) {
 			HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
 			if (psh) {
 				LL_FOREACH(psh->history, hist) {
-					send_to_char(hist->message, ch);
-			
-					// check for newline
-					if (hist->message[strlen(hist->message) - 1] != '\n') {
-						send_to_char("\r\n", ch);
-					}
+					msg_to_char(ch, "%s: %s%s", simple_time_since(hist->timestamp), hist->message, (hist->message[strlen(hist->message) - 1] != '\n') ? "\r\n" : "");
 				}
 			}
 		}

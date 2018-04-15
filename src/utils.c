@@ -5074,21 +5074,20 @@ char *shared_by(obj_data *obj, char_data *ch) {
 */
 char *simple_time_since(time_t when) {
 	static char output[80];
-	double calc;
-	int diff;
+	double calc, diff;
 	
 	diff = time(0) - when;
 	if ((calc = diff / SECS_PER_REAL_DAY) > 1.0) {
-		sprintf(output, "%dd", round(calc));
+		sprintf(output, "%dd", (int) round(calc));
 	}
 	else if ((calc = diff / SECS_PER_REAL_HOUR) > 1.0) {
-		sprintf(output, "%dh", round(calc));
+		sprintf(output, "%dh", (int) round(calc));
 	}
 	else if ((calc = diff / SECS_PER_REAL_MIN) > 1.0) {
-		sprintf(output, "%dm", round(calc));
+		sprintf(output, "%dm", (int) round(calc));
 	}
 	else {
-		sprintf(output, "%ds", diff);
+		sprintf(output, "%ds", (int) diff);
 	}
 	return output;
 }
