@@ -5077,7 +5077,13 @@ char *simple_time_since(time_t when) {
 	double calc, diff;
 	
 	diff = time(0) - when;
-	if ((calc = diff / SECS_PER_REAL_DAY) > 1.0) {
+	if ((calc = diff / SECS_PER_REAL_YEAR) > 1.0) {
+		sprintf(output, "%dy", (int) round(calc));
+	}
+	else if ((calc = diff / SECS_PER_REAL_WEEK) > 1.0) {
+		sprintf(output, "%dw", (int) round(calc));
+	}
+	else if ((calc = diff / SECS_PER_REAL_DAY) > 1.0) {
 		sprintf(output, "%dd", (int) round(calc));
 	}
 	else if ((calc = diff / SECS_PER_REAL_HOUR) > 1.0) {
