@@ -2571,7 +2571,7 @@ const char *progress_types[] = {
 	"Community",
 	"Industry",
 	"Defense",
-	"Advancement",
+	"Prestige",
 	"\n"
 };
 
