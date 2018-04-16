@@ -265,6 +265,9 @@ $(document).ready(function() {
 		else if (c == 'c' || c == 'C') {
 			$("#cities").click();
 		}
+		else if (c == 'x' || c == 'X') {
+			$("#pixelate").click();
+		}
 	});
 
 	$("#map").bind("mouseover mouseout mousemove", function(e) {
