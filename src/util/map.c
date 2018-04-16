@@ -231,39 +231,42 @@ void load_and_shift_map(int dist);
 #define CLIFF			20
 #define ESTUARY			21
 #define MARSH			22
+#define SHALLOWS		23
 
-#define NUM_MAP_SECTS	23	/* Total */
+#define NUM_MAP_SECTS	24	/* Total */
 
 // terrain data
 struct {
 	char *mapout_icon;	// 1-char icon for map data file output
 	char *name;	// string name for stats list
 	int sector_vnum;	// for .wld file output
-	int is_land;	// for ocean or anything that doesn't connect islands
+	int is_land;	// for ocean/tundra/shallows
+	int connects_island;	// determines island numbering
 } terrains[NUM_MAP_SECTS] = {
-	{ "b", "Plains", 0, TRUE },	// 0
-	{ "f", "Forest", 4, TRUE },
-	{ "i", "River", 5, TRUE },
-	{ "k", "Ocean", 6, FALSE },
-	{ "q", "Mountain", 8, TRUE },
-	{ "b", "Temp Crop", 7, TRUE },	// 5
-	{ "m", "Desert", 20, TRUE },
-	{ "*", "Tower", 18, TRUE },
-	{ "d", "Jungle", 28, TRUE },
-	{ "j", "Oasis", 21, TRUE },
-	{ "b", "Grove", 26, TRUE },	// 10
-	{ "e", "Swamp", 29, TRUE },
-	{ "h", "Tundra", 30, FALSE },
-	{ "i", "Lake", 32, TRUE },
-	{ "o", "Dsrt Crop", 12, TRUE },
-	{ "3", "Jngl Crop", 16, TRUE },	// 15
-	{ "f", "Riverbank", 45, TRUE },
-	{ "f", "Shore", 54, TRUE },
-	{ "d", "Jngl Shore", 55, TRUE },
-	{ "m", "Beach", 51, TRUE },
-	{ "q", "Cliffs", 52, TRUE },	// 20
-	{ "i", "Estuary", 53, TRUE },
-	{ "e", "Marsh", 35, TRUE },
+	{ "b", "Plains", 0, TRUE, TRUE },	// 0
+	{ "f", "Forest", 4, TRUE, TRUE },
+	{ "i", "River", 5, TRUE, TRUE },
+	{ "k", "Ocean", 6, FALSE, FALSE },
+	{ "q", "Mountain", 8, TRUE, TRUE },
+	{ "b", "Temp Crop", 7, TRUE, TRUE },	// 5
+	{ "m", "Desert", 20, TRUE, TRUE },
+	{ "*", "Tower", 18, TRUE, TRUE },
+	{ "d", "Jungle", 28, TRUE, TRUE },
+	{ "j", "Oasis", 21, TRUE, TRUE },
+	{ "b", "Grove", 26, TRUE, TRUE },	// 10
+	{ "e", "Swamp", 29, TRUE, TRUE },
+	{ "h", "Tundra", 30, FALSE, FALSE },
+	{ "i", "Lake", 32, TRUE, TRUE },
+	{ "o", "Dsrt Crop", 12, TRUE, TRUE },
+	{ "3", "Jngl Crop", 16, TRUE, TRUE },	// 15
+	{ "f", "Riverbank", 45, TRUE, TRUE },
+	{ "f", "Shore", 54, TRUE, TRUE },
+	{ "d", "Jngl Shore", 55, TRUE, TRUE },
+	{ "m", "Beach", 51, TRUE, TRUE },
+	{ "q", "Cliffs", 52, TRUE, TRUE },	// 20
+	{ "j", "Estuary", 53, TRUE, TRUE },
+	{ "e", "Marsh", 35, TRUE, TRUE },
+	{ "j", "Shallows", 57, FALSE, TRUE },
 };
 
 
@@ -1277,7 +1280,7 @@ void center_map(void) {
 				printf("ERROR: center_map got bad loc %d (%d, %d)\n", loc, x, y);
 			}
 			
-			if (terrains[grid[loc].type].is_land) {
+			if (terrains[grid[loc].type].connects_island) {
 				vsize[x] += 1;
 			}
 		}
@@ -1605,7 +1608,7 @@ void number_islands_and_fix_lakes(void) {
 	// find and create basic stack
 	for (iter = 0; iter < USE_SIZE; ++iter) {
 		if (grid[iter].island_id == 0) {
-			if (terrains[grid[iter].type].is_land) {
+			if (terrains[grid[iter].type].connects_island) {
 				use_id = ++top_id;
 				use_land = TRUE;
 			}
@@ -1628,7 +1631,7 @@ void number_islands_and_fix_lakes(void) {
 					for (y = -1; y <= 1; ++y) {
 						if (x != 0 || y != 0) {
 							pos = shift(ndt->loc, x, y);
-							if (pos != -1 && grid[pos].island_id == old && terrains[grid[pos].type].is_land == use_land) {
+							if (pos != -1 && grid[pos].island_id == old && terrains[grid[pos].type].connects_island == use_land) {
 								push_ndt(pos);
 							}
 						}
