@@ -174,6 +174,7 @@ void blob(int loc, int sect, int min_radius, int max_radius, bool land_only);
 void center_map(void);
 void complete_map(void);
 void create_islands(void);
+void finish_islands();
 void land_mass(struct island_data *isle, int min_radius, int max_radius);
 void number_islands_and_fix_lakes();
 void replace_near(int from, int to, int near, int dist);
@@ -422,6 +423,7 @@ void create_map(void) {
 	
 	printf("Numbering islands and fixing lakes...\n");
 	number_islands_and_fix_lakes();
+	finish_islands();
 	
 	// oases convert to river here (instead of canal like in-game)
 	printf("Merging oases...\n");
@@ -1656,6 +1658,39 @@ void number_islands_and_fix_lakes(void) {
 	// should only take 1 second time
 	if (changed) {
 		number_islands_and_fix_lakes();
+	}
+}
+
+
+// fixes island ids on shallows and similar
+void finish_islands(void) {
+	int x, y, pos, iter, use_id;
+	struct num_data_t *ndt;
+	
+	// find and create basic stack
+	for (iter = 0; iter < USE_SIZE; ++iter) {
+		if (grid[iter].island_id < 1) {
+			continue;	// looking for land
+		}
+		
+		use_id = grid[iter].island_id;
+		
+		push_ndt(iter);
+		while ((ndt = pop_ndt())) {
+			grid[ndt->loc].island_id = use_id;
+			
+			for (x = -1; x <= 1; ++x) {
+				for (y = -1; y <= 1; ++y) {
+					if (x != 0 || y != 0) {
+						pos = shift(ndt->loc, x, y);
+						if (pos != -1 && grid[pos].island_id < 1 && terrains[grid[pos].type].connects_island) {
+							push_ndt(pos);
+						}
+					}
+				}
+			}
+			free(ndt);
+		}
 	}
 }
 
