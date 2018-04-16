@@ -379,7 +379,10 @@ void create_map(void) {
 	// make a ton of plains islands
 	printf("Generating islands with %d total land target...\n", TARGET_LAND_SIZE);
 	create_islands();
-
+	
+	printf("Adding shallow seas...\n");
+	replace_very_near(PLAINS, SHALLOWS, OCEAN);
+	
 	printf("Adding mountains and rivers...\n");
 	LL_FOREACH(island_list, isle) {
 		// fillings based on location (it's not desert or jungle YET, so we check prcs
