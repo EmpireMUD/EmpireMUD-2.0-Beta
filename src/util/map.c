@@ -1664,8 +1664,7 @@ void number_islands_and_fix_lakes(void) {
 
 // fixes island ids on shallows and similar
 void finish_islands(void) {
-	int x, y, pos, iter, use_id;
-	struct num_data_t *ndt;
+	int x, y, pos, iter, use_id, changed = FALSE;
 	
 	// find and create basic stack
 	for (iter = 0; iter < USE_SIZE; ++iter) {
@@ -1675,22 +1674,22 @@ void finish_islands(void) {
 		
 		use_id = grid[iter].island_id;
 		
-		push_ndt(iter);
-		while ((ndt = pop_ndt())) {
-			grid[ndt->loc].island_id = use_id;
-			
-			for (x = -1; x <= 1; ++x) {
-				for (y = -1; y <= 1; ++y) {
-					if (x != 0 || y != 0) {
-						pos = shift(ndt->loc, x, y);
-						if (pos != -1 && grid[pos].island_id < 1 && terrains[grid[pos].type].connects_island) {
-							push_ndt(pos);
-						}
+		for (x = -1; x <= 1; ++x) {
+			for (y = -1; y <= 1; ++y) {
+				if (x != 0 || y != 0) {
+					pos = shift(iter, x, y);
+					if (pos != -1 && grid[pos].island_id < 1 && terrains[grid[pos].type].connects_island) {
+						grid[pos].island_id = use_id;
+						changed = TRUE;
 					}
 				}
 			}
-			free(ndt);
 		}
+	}
+	
+	// re-run until it finds none
+	if (changed) {
+		finish_islands();
 	}
 }
 
