@@ -1706,7 +1706,7 @@ void replace_very_near(int from, int to, int near) {
 			if (grid[at].type == from) {
 				found = 0;
 				for (hor = -1; hor <= 1 && !found; ++hor) {
-					for (ver = -1; ver <= dis1 && !found; ++ver) {
+					for (ver = -1; ver <= 1 && !found; ++ver) {
 						if (hor != 0 && ver != 0) {
 							continue;	// only straighta-adjacent, no diagonals
 						}
