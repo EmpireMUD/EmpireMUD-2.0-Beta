@@ -1674,8 +1674,8 @@ void finish_islands(void) {
 		
 		use_id = grid[iter].island_id;
 		
-		for (x = -1; x <= 1; ++x) {
-			for (y = -1; y <= 1; ++y) {
+		for (x = 1; x >= -1; --x) {
+			for (y = 1; y >= -1; --y) {
 				if (x != 0 || y != 0) {
 					pos = shift(iter, x, y);
 					if (pos != -1 && grid[pos].island_id < 1 && terrains[grid[pos].type].connects_island) {
