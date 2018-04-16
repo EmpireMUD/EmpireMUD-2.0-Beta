@@ -1677,8 +1677,9 @@ void finish_islands(int pass) {
 		
 		use_id = grid[iter].island_id;
 		
-		for (x = -1; x <= 1; ++x) {
-			for (y = -1; y <= 1; ++y) {
+		// x and y backwards to prevent over-association as it works its way up the map
+		for (x = 1; x >= -1; --x) {
+			for (y = 1; y >= -1; --y) {
 				if (x != 0 || y != 0) {
 					pos = shift(iter, x, y);
 					if (pos != -1 && grid[pos].island_id < 1 && terrains[grid[pos].type].connects_island) {
