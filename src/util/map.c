@@ -1611,7 +1611,7 @@ void number_islands_and_fix_lakes(void) {
 	// find and create basic stack
 	for (iter = 0; iter < USE_SIZE; ++iter) {
 		if (grid[iter].island_id == 0) {
-			if (terrains[grid[iter].type].connects_island) {
+			if (terrains[grid[iter].type].is_land) {
 				use_id = ++top_id;
 				use_land = TRUE;
 			}
@@ -1634,7 +1634,7 @@ void number_islands_and_fix_lakes(void) {
 					for (y = -1; y <= 1; ++y) {
 						if (x != 0 || y != 0) {
 							pos = shift(ndt->loc, x, y);
-							if (pos != -1 && grid[pos].island_id == old && terrains[grid[pos].type].connects_island == use_land) {
+							if (pos != -1 && grid[pos].island_id == old && terrains[grid[pos].type].is_land == use_land) {
 								push_ndt(pos);
 							}
 						}
