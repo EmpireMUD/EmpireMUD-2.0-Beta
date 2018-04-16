@@ -427,7 +427,7 @@ void create_map(void) {
 	
 	// oases convert to river here (instead of canal like in-game)
 	printf("Merging oases...\n");
-	replace_near(OASIS, RIVER, OCEAN, 1);
+	replace_near(OASIS, RIVER, SHALLOWS, 1);
 	replace_near(OASIS, RIVER, RIVER, 1);
 	
 	printf("Irrigating from rivers...\n");
@@ -438,11 +438,11 @@ void create_map(void) {
 	
 	printf("Adding coasts and riverbanks...\n");
 	replace_near(PLAINS, RIVERBANK_TREES, RIVER, 1);
-	replace_near(PLAINS, SHORE_TREES, OCEAN, 1);
-	replace_near(JUNGLE, SHORE_JUNGLE, OCEAN, 1);
-	replace_near(DESERT, DESERT_BEACH, OCEAN, 1);
-	replace_near(MOUNTAIN, CLIFF, OCEAN, 1);
-	replace_near(RIVER, ESTUARY, OCEAN, 2);
+	replace_near(PLAINS, SHORE_TREES, SHALLOWS, 1);
+	replace_near(JUNGLE, SHORE_JUNGLE, SHALLOWS, 1);
+	replace_near(DESERT, DESERT_BEACH, SHALLOWS, 1);
+	replace_near(MOUNTAIN, CLIFF, SHALLOWS, 1);
+	replace_near(RIVER, ESTUARY, SHALLOWS, 2);
 
 	// tundra if no y-wrap
 	if (!USE_WRAP_Y && TUNDRA_HEIGHT >= 1) {
