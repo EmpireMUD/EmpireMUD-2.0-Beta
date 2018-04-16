@@ -177,6 +177,7 @@ void create_islands(void);
 void land_mass(struct island_data *isle, int min_radius, int max_radius);
 void number_islands_and_fix_lakes();
 void replace_near(int from, int to, int near, int dist);
+void replace_very_near(int from, int to, int near);
 void splotch(int room, int type, struct island_data *isle);
 
 // bonus feature protos
@@ -1545,7 +1546,7 @@ void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 	a = last_n = isle->width[NORTH] = number(min_radius, MIN(isle->width[EAST], isle->width[WEST]));
 	b = last_s = isle->width[SOUTH] = number(min_radius, MIN(isle->width[EAST], isle->width[WEST]));
 
-	for (j = 0; j <= isle->width[EAST]; j++) {
+	for (j = 0; j <= isle->width[EAST] || (last_n + last_s) > 8; j++) {
 		for (i = 0; i <= last_n; i++) {
 			if ((loc = shift(isle->loc, j, i)) != -1) {
 				change_grid(loc, sect);
@@ -1557,14 +1558,17 @@ void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 			}
 		}
 
-		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_n) ? -2 : 2);
-		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_s) ? -2 : 2);
+		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_n) ? 0 : 2);
+		last_n = MAX(0, last_n);
+		
+		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_s) ? 0 : 2);
+		last_s = MAX(0, last_s);
 	}
 
 	last_n = a;
 	last_s = b;
 
-	for (j = 0; j <= isle->width[WEST]; j++) {
+	for (j = 0; j <= isle->width[WEST] || (last_n + last_s) > 8; j++) {
 		for (i = 0; i <= last_n; i++) {
 			if ((loc = shift(isle->loc, -j, i)) != -1) {
 				change_grid(loc, sect);
@@ -1576,8 +1580,11 @@ void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 			}
 		}
 
-		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[WEST] - j) < last_n) ? -2 : 2);
-		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[WEST] - j) < last_s) ? -2 : 2);
+		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[WEST] - j) < last_n) ? 0 : 2);
+		last_n = MAX(0, last_n);
+		
+		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[WEST] - j) < last_s) ? 0 : 2);
+		last_s = MAX(0, last_s);
 	}
 }
 
@@ -1670,6 +1677,43 @@ void replace_near(int from, int to, int near, int dist) {
 						loc = shift(at, hor, ver);
 						
 						if (loc != -1 && grid[loc].type == near && compute_distance(X_COORD(at), Y_COORD(at), X_COORD(loc), Y_COORD(loc)) <= dist) {
+							change_grid(at, to);
+							found = 1;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* Similar to replace_near but does not accept diagonals as adjacent.
+* 
+* @param int from Terrain to convert from.
+* @param int to Terrain to convert to.
+* @param int near Terrain it must be near.
+*/
+void replace_very_near(int from, int to, int near) {
+	int x, y, hor, ver, at, loc;
+	int found;
+	
+	for (x = 0; x < USE_WIDTH; ++x) {
+		for (y = 0; y < USE_HEIGHT; ++y) {
+			at = MAP(x, y);
+			
+			if (grid[at].type == from) {
+				found = 0;
+				for (hor = -1; hor <= 1 && !found; ++hor) {
+					for (ver = -1; ver <= dis1 && !found; ++ver) {
+						if (hor != 0 && ver != 0) {
+							continue;	// only straighta-adjacent, no diagonals
+						}
+						
+						loc = shift(at, hor, ver);
+						
+						if (loc != -1 && grid[loc].type == near) {
 							change_grid(at, to);
 							found = 1;
 						}
