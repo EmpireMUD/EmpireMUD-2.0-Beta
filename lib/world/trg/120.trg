@@ -239,7 +239,7 @@ else
   while %cycle% <= 3
     wait 5 sec
     %echo% &r%self.name%'s arrows rain down upon you!
-    %aoe% 100 physical
+    %aoe% 85 physical
     eval cycle %cycle% + 1
   done
 end
@@ -258,6 +258,13 @@ dg_affect %self% STUNNED on 5
 wait 2 sec
 %echo% %self.name% raises her axe over one shoulder in a two-handed grip...
 wait 3 sec
+if %self.aff_flagged(ENTANGLE)%
+  %echoaround% %actor% &r%self.name% hacks at you between attempts to free %self.himher%self from the entanglement!
+  %echoaround% %actor% %self.name% hacks at %actor.name% between attempts to free %self.himher%self from the entanglement.
+  %damage% %actor% 250 physical
+  %dot% #12008 %actor% 150 30 physical
+  halt
+end
 %echo% &r%self.name% charges forward, hacking and slicing at everyone!
 %send% %actor% &rYou take the brunt of %self.name%'s assault!
 %echoaround% %actor% %actor.name% takes the brunt of %self.name%'s assault!
@@ -265,20 +272,26 @@ wait 3 sec
 %damage% %actor% 200 physical
 %dot% #12008 %actor% 150 30 physical
 wait 5 sec
-set amount 1000
+set amount 100
+if %self.mob_flagged(GROUP)%
+  set amount 200
+  if %self.mob_flagged(HARD)%
+    set amount 300
+  end
+end
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
     %send% %person% &rA fountain of blood suddenly bursts from the wounds left by %self.name%'s assault!
     %damage% %person% 100
     if %self.mob_flagged(GROUP)%
-      eval amount %amount% + 250
+      eval amount %amount% + 75
     end
   end
   set person %person.next_in_room%
 done
 %echo% %self.name% bathes in the blood of %self.hisher% enemies, and %self.hisher% wounds close!
-%damage% %self% -%amount%
+%heal% %self% health %amount%
 ~
 #12009
 Anat: Impale~
@@ -794,12 +807,20 @@ end
 if %ally%
   set target %ally.fighting%
   if %target%
-    %send% %target% &rA bolt of lightning flies out of nowhere and strikes you!
-    %echoaround% %target% A bolt of lightning flies out of nowhere and strikes %target.name%!
-    %damage% %target% 500 magical
-    dg_affect #12039 %target% HARD-STUNNED on 10
-    dg_affect #12039 %target% BLIND on 10
-    halt
+    if %target.trigger_counterspell%
+      %send% %target% A bolt of lightning flies out of nowhere and explodes against your counterspell!
+      %send% %target% &rThe bolt's explosion burns you!
+      %echoaround% %target% A bolt of lightning flies out of nowhere and explodes in front of %target.name%!
+      %damage% %target% 75 magical
+      halt
+    else
+      %send% %target% &rA bolt of lightning flies out of nowhere and strikes you!
+      %echoaround% %target% A bolt of lightning flies out of nowhere and strikes %target.name%!
+      %damage% %target% 500 magical
+      dg_affect #12039 %target% HARD-STUNNED on 10
+      dg_affect #12039 %target% BLIND on 10
+      halt
+    end
   end
 end
 * no ally, or no target
