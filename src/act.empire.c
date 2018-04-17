@@ -419,7 +419,9 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 	}
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-		isle->workforce_limit[chore] = limit;
+		if (isle->island != NO_ISLAND) {
+			isle->workforce_limit[chore] = limit;
+		}
 	}
 }
 
@@ -955,9 +957,11 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 	
 	found = FALSE;
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-		// skip island if nothing to show
 		if (isle->population <= 0 && isle->workforce_limit[chore] == 0) {
-			continue;
+			continue;	// skip island if nothing to show
+		}
+		if (isle->island == NO_ISLAND) {
+			continue;	// don't show no-island
 		}
 		
 		// look up island data (for name)
