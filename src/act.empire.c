@@ -3846,6 +3846,7 @@ ACMD(do_elog) {
 	int iter, count, type = NOTHING, lines = -1;
 	struct empire_log_data *elog;
 	empire_data *emp = NULL;
+	size_t size;
 	bool found;
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	
@@ -3923,7 +3924,7 @@ ACMD(do_elog) {
 		}
 	}
 	
-	sprintf(buf, "%s logs for %s:\r\n", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
+	size = snprintf(buf, sizeof(buf), "%s logs for %s:\r\n", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
 	
 	// now show the LAST [lines] log entries (show if remaining-lines<=0)
 	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
@@ -3932,10 +3933,11 @@ ACMD(do_elog) {
 		}
 		if (type == NOTHING || elog->type == type) {
 			if (count-- - lines <= 0) {
-				sprintf(line, "%3s: %s&0\r\n", simple_time_since(elog->timestamp), strip_color(elog->string));
+				snprintf(line, sizeof(line), "%3s: %s&0\r\n", simple_time_since(elog->timestamp), strip_color(elog->string));
 				
-				if (strlen(buf) + strlen(line) < MAX_STRING_LENGTH) {
+				if (size + strlen(line) + 10 < MAX_STRING_LENGTH) {
 					strcat(buf, line);
+					size += strlen(line);
 				}
 				else {
 					strcat(buf, "OVERFLOW\r\n");
