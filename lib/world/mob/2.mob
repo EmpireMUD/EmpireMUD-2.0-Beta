@@ -720,4 +720,12 @@ S
 20 50 bdqv 0
 1 0 0 6
 S
+#277
+#n supervisor~
+supervisor #n~
+Supervisor #n is surveying the area.
+~
+20 50 bdqv 0
+0 0 0 15
+S
 $
