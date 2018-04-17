@@ -538,6 +538,40 @@ void announce_to_slash_channel(struct slash_channel *chan, char_data *person, co
 }
 
 
+/**
+* Checks if a slash-channel is now empty, and deletes it.
+*
+* @param struct slash_channel *chan The channel to check/delete.
+*/
+void check_empty_slash_channel(struct slash_channel *chan) {
+	char_data *ch;
+	int count = 0;
+	
+	LL_FOREACH(character_list, ch) {
+		if (IS_NPC(ch)) {
+			continue;
+		}
+		if (!(find_on_slash_channel(ch, chan->id))) {
+			continue;
+		}
+		
+		++count;
+		break;	// only need 1
+	}
+	
+	if (!count) {	// delete the channel
+		LL_DELETE(slash_channel_list, chan);
+		if (chan->name) {
+			free(chan->name);
+		}
+		if (chan->lc_name) {
+			free(chan->lc_name);
+		}
+		free(chan);
+	}
+}
+
+
 // picks a deterministic color based on name
 char compute_slash_channel_color(char *name) {
 	char *colors = "rgbymcaLoYjtRvGBlMCAJpOPTV";
@@ -919,6 +953,8 @@ ACMD(do_slash_channel) {
 			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 				announce_to_slash_channel(chan, ch, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
+			
+			check_empty_slash_channel(chan);
 		}
 	}
 	else if (!str_cmp(arg, "who")) {
