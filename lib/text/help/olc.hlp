@@ -2174,6 +2174,7 @@ The following flags are available:
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers
  &cestuary&0 - where the river meets the sea
+ &clake&0 - a lake tile
 
 See also: OLC CRAFTS
 #d
@@ -2214,6 +2215,7 @@ The following flags are available:
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers
  &cestuary&0 - where the river meets the sea
+ &clake&0 - a lake tile
 
 See also: CEDIT BUILDFACING, OLC CRAFTS
 #d
@@ -6046,6 +6048,7 @@ Available flags:
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers
  &cestuary&0 - where the river meets the sea
+ &clake&0 - a lake tile
 
 Note: When adding these flags to adventure linking rules, they all have to
 be added in one line, so you can't type multiple words. Try abbreviating them

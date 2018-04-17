@@ -707,6 +707,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_COAST  BIT(17)
 #define BLD_ON_RIVERBANK  BIT(18)
 #define BLD_ON_ESTUARY  BIT(19)
+#define BLD_ON_LAKE  BIT(20)
 
 
 // BLD_REL_x: relationships with other buildings

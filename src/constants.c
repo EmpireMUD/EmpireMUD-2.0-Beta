@@ -2642,26 +2642,27 @@ const char *quest_reward_types[] = {
 
 // BLD_ON_x
 const char *bld_on_flags[] = {
-	"water",
+	"water",	// 0
 	"plains",
 	"mountain",
 	"full-forest",
 	"desert",
-	"river",
+	"river",	// 5
 	"jungle",
 	"not-player-made",
 	"ocean",
 	"oasis",
-	"crops",
+	"crops",	// 10
 	"grove",
 	"swamp",
 	"any-forest",
 	"open-building",
-	"basic-facing",
+	"basic-facing",	// 15
 	"shallow-sea",
 	"coast",
 	"riverbank",
 	"estuary",
+	"lake",	// 20
 	"\n"
 };
 
