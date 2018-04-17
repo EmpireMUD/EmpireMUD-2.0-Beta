@@ -297,6 +297,7 @@ void free_chart_hash(struct chart_territory *hash) {
 	struct chart_territory *ct, *next_ct;
 	
 	HASH_ITER(hh, hash, ct, next_ct) {
+		HASH_DEL(hash, ct);
 		free(ct);
 	}
 }
@@ -1349,7 +1350,7 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 	}
 	
 	HASH_ITER(hh, eisle->store, store, next_store) {
-		if ((proto = obj_proto(store->vnum))) {
+		if ((proto = store->proto)) {
 			if (obj_can_be_stored(proto, room)) {
 				if (!found) {
 					msg_to_char(ch, "\r\n%s inventory available here:\r\n", EMPIRE_ADJECTIVE(emp));

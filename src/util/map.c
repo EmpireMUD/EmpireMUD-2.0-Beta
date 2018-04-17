@@ -174,9 +174,11 @@ void blob(int loc, int sect, int min_radius, int max_radius, bool land_only);
 void center_map(void);
 void complete_map(void);
 void create_islands(void);
+void finish_islands(int pass);
 void land_mass(struct island_data *isle, int min_radius, int max_radius);
 void number_islands_and_fix_lakes();
 void replace_near(int from, int to, int near, int dist);
+void replace_very_near(int from, int to, int near);
 void splotch(int room, int type, struct island_data *isle);
 
 // bonus feature protos
@@ -230,39 +232,42 @@ void load_and_shift_map(int dist);
 #define CLIFF			20
 #define ESTUARY			21
 #define MARSH			22
+#define SHALLOWS		23
 
-#define NUM_MAP_SECTS	23	/* Total */
+#define NUM_MAP_SECTS	24	/* Total */
 
 // terrain data
 struct {
 	char *mapout_icon;	// 1-char icon for map data file output
 	char *name;	// string name for stats list
 	int sector_vnum;	// for .wld file output
-	int is_land;	// for ocean or anything that doesn't connect islands
+	int is_land;	// for ocean/tundra/shallows
+	int connects_island;	// determines island numbering
 } terrains[NUM_MAP_SECTS] = {
-	{ "b", "Plains", 0, TRUE },	// 0
-	{ "f", "Forest", 4, TRUE },
-	{ "i", "River", 5, TRUE },
-	{ "k", "Ocean", 6, FALSE },
-	{ "q", "Mountain", 8, TRUE },
-	{ "b", "Temp Crop", 7, TRUE },	// 5
-	{ "m", "Desert", 20, TRUE },
-	{ "*", "Tower", 18, TRUE },
-	{ "d", "Jungle", 28, TRUE },
-	{ "j", "Oasis", 21, TRUE },
-	{ "b", "Grove", 26, TRUE },	// 10
-	{ "e", "Swamp", 29, TRUE },
-	{ "h", "Tundra", 30, FALSE },
-	{ "i", "Lake", 32, TRUE },
-	{ "o", "Dsrt Crop", 12, TRUE },
-	{ "3", "Jngl Crop", 16, TRUE },	// 15
-	{ "f", "Riverbank", 45, TRUE },
-	{ "f", "Shore", 54, TRUE },
-	{ "d", "Jngl Shore", 55, TRUE },
-	{ "m", "Beach", 51, TRUE },
-	{ "q", "Cliffs", 52, TRUE },	// 20
-	{ "i", "Estuary", 53, TRUE },
-	{ "e", "Marsh", 35, TRUE },
+	{ "b", "Plains", 0, TRUE, TRUE },	// 0
+	{ "f", "Forest", 4, TRUE, TRUE },
+	{ "i", "River", 5, TRUE, TRUE },
+	{ "k", "Ocean", 6, FALSE, FALSE },
+	{ "q", "Mountain", 8, TRUE, TRUE },
+	{ "b", "Temp Crop", 7, TRUE, TRUE },	// 5
+	{ "m", "Desert", 20, TRUE, TRUE },
+	{ "*", "Tower", 18, TRUE, TRUE },
+	{ "d", "Jungle", 28, TRUE, TRUE },
+	{ "j", "Oasis", 21, TRUE, TRUE },
+	{ "b", "Grove", 26, TRUE, TRUE },	// 10
+	{ "e", "Swamp", 29, TRUE, TRUE },
+	{ "h", "Tundra", 30, FALSE, FALSE },
+	{ "i", "Lake", 32, TRUE, TRUE },
+	{ "o", "Dsrt Crop", 12, TRUE, TRUE },
+	{ "3", "Jngl Crop", 16, TRUE, TRUE },	// 15
+	{ "f", "Riverbank", 45, TRUE, TRUE },
+	{ "f", "Shore", 54, TRUE, TRUE },
+	{ "d", "Jngl Shore", 55, TRUE, TRUE },
+	{ "m", "Beach", 51, TRUE, TRUE },
+	{ "q", "Cliffs", 52, TRUE, TRUE },	// 20
+	{ "j", "Estuary", 53, TRUE, TRUE },
+	{ "e", "Marsh", 35, TRUE, TRUE },
+	{ "j", "Shallows", 57, FALSE, TRUE },
 };
 
 
@@ -375,7 +380,10 @@ void create_map(void) {
 	// make a ton of plains islands
 	printf("Generating islands with %d total land target...\n", TARGET_LAND_SIZE);
 	create_islands();
-
+	
+	printf("Adding shallow seas...\n");
+	replace_very_near(PLAINS, SHALLOWS, OCEAN);
+	
 	printf("Adding mountains and rivers...\n");
 	LL_FOREACH(island_list, isle) {
 		// fillings based on location (it's not desert or jungle YET, so we check prcs
@@ -415,10 +423,11 @@ void create_map(void) {
 	
 	printf("Numbering islands and fixing lakes...\n");
 	number_islands_and_fix_lakes();
+	finish_islands(0);
 	
 	// oases convert to river here (instead of canal like in-game)
 	printf("Merging oases...\n");
-	replace_near(OASIS, RIVER, OCEAN, 1);
+	replace_near(OASIS, RIVER, SHALLOWS, 1);
 	replace_near(OASIS, RIVER, RIVER, 1);
 	
 	printf("Irrigating from rivers...\n");
@@ -429,11 +438,11 @@ void create_map(void) {
 	
 	printf("Adding coasts and riverbanks...\n");
 	replace_near(PLAINS, RIVERBANK_TREES, RIVER, 1);
-	replace_near(PLAINS, SHORE_TREES, OCEAN, 1);
-	replace_near(JUNGLE, SHORE_JUNGLE, OCEAN, 1);
-	replace_near(DESERT, DESERT_BEACH, OCEAN, 1);
-	replace_near(MOUNTAIN, CLIFF, OCEAN, 1);
-	replace_near(RIVER, ESTUARY, OCEAN, 2);
+	replace_near(PLAINS, SHORE_TREES, SHALLOWS, 1);
+	replace_near(JUNGLE, SHORE_JUNGLE, SHALLOWS, 1);
+	replace_near(DESERT, DESERT_BEACH, SHALLOWS, 1);
+	replace_near(MOUNTAIN, CLIFF, SHALLOWS, 1);
+	replace_near(RIVER, ESTUARY, SHALLOWS, 2);
 
 	// tundra if no y-wrap
 	if (!USE_WRAP_Y && TUNDRA_HEIGHT >= 1) {
@@ -796,6 +805,7 @@ void print_island_file(void) {
 			fprintf(fl, "S\n");
 			
 			// free as we go
+			HASH_DEL(all_isles, rli);
 			free(rli);
 		}
 	}
@@ -1275,7 +1285,7 @@ void center_map(void) {
 				printf("ERROR: center_map got bad loc %d (%d, %d)\n", loc, x, y);
 			}
 			
-			if (terrains[grid[loc].type].is_land) {
+			if (terrains[grid[loc].type].connects_island) {
 				vsize[x] += 1;
 			}
 		}
@@ -1544,7 +1554,7 @@ void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 	a = last_n = isle->width[NORTH] = number(min_radius, MIN(isle->width[EAST], isle->width[WEST]));
 	b = last_s = isle->width[SOUTH] = number(min_radius, MIN(isle->width[EAST], isle->width[WEST]));
 
-	for (j = 0; j <= isle->width[EAST]; j++) {
+	for (j = 0; j <= isle->width[EAST] || (last_n + last_s) > 8; j++) {
 		for (i = 0; i <= last_n; i++) {
 			if ((loc = shift(isle->loc, j, i)) != -1) {
 				change_grid(loc, sect);
@@ -1556,14 +1566,17 @@ void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 			}
 		}
 
-		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_n) ? -2 : 2);
-		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_s) ? -2 : 2);
+		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_n) ? 0 : 2);
+		last_n = MAX(0, last_n);
+		
+		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[EAST] - j) < last_s) ? 0 : 2);
+		last_s = MAX(0, last_s);
 	}
 
 	last_n = a;
 	last_s = b;
 
-	for (j = 0; j <= isle->width[WEST]; j++) {
+	for (j = 0; j <= isle->width[WEST] || (last_n + last_s) > 8; j++) {
 		for (i = 0; i <= last_n; i++) {
 			if ((loc = shift(isle->loc, -j, i)) != -1) {
 				change_grid(loc, sect);
@@ -1575,8 +1588,11 @@ void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 			}
 		}
 
-		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[WEST] - j) < last_n) ? -2 : 2);
-		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[WEST] - j) < last_s) ? -2 : 2);
+		last_n += number(last_n <= 0 ? 0 : -2, ((isle->width[WEST] - j) < last_n) ? 0 : 2);
+		last_n = MAX(0, last_n);
+		
+		last_s += number(last_s <= 0 ? 0 : -2, ((isle->width[WEST] - j) < last_s) ? 0 : 2);
+		last_s = MAX(0, last_s);
 	}
 }
 
@@ -1646,6 +1662,42 @@ void number_islands_and_fix_lakes(void) {
 }
 
 
+// fixes island ids on shallows and similar
+void finish_islands(int pass) {
+	int x, y, pos, iter, use_id, changed = FALSE;
+	
+	// find and create basic stack
+	for (iter = 0; iter < USE_SIZE; ++iter) {
+		if (grid[iter].island_id < 1) {
+			continue;	// looking for land
+		}
+		if (pass < 1 && !terrains[grid[iter].type].is_land) {
+			continue;	// on initial pass, ONLY do land tiles
+		}
+		
+		use_id = grid[iter].island_id;
+		
+		// x and y backwards to prevent over-association as it works its way up the map
+		for (x = 1; x >= -1; --x) {
+			for (y = 1; y >= -1; --y) {
+				if (x != 0 || y != 0) {
+					pos = shift(iter, x, y);
+					if (pos != -1 && grid[pos].island_id < 1 && terrains[grid[pos].type].connects_island) {
+						grid[pos].island_id = use_id;
+						changed = TRUE;
+					}
+				}
+			}
+		}
+	}
+	
+	// re-run until it finds none
+	if (changed || !pass) {
+		finish_islands(pass + 1);
+	}
+}
+
+
 /**
 * Convert terrain from one thing to another near other terrain.
 * 
@@ -1669,6 +1721,43 @@ void replace_near(int from, int to, int near, int dist) {
 						loc = shift(at, hor, ver);
 						
 						if (loc != -1 && grid[loc].type == near && compute_distance(X_COORD(at), Y_COORD(at), X_COORD(loc), Y_COORD(loc)) <= dist) {
+							change_grid(at, to);
+							found = 1;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* Similar to replace_near but does not accept diagonals as adjacent.
+* 
+* @param int from Terrain to convert from.
+* @param int to Terrain to convert to.
+* @param int near Terrain it must be near.
+*/
+void replace_very_near(int from, int to, int near) {
+	int x, y, hor, ver, at, loc;
+	int found;
+	
+	for (x = 0; x < USE_WIDTH; ++x) {
+		for (y = 0; y < USE_HEIGHT; ++y) {
+			at = MAP(x, y);
+			
+			if (grid[at].type == from) {
+				found = 0;
+				for (hor = -1; hor <= 1 && !found; ++hor) {
+					for (ver = -1; ver <= 1 && !found; ++ver) {
+						if (hor != 0 && ver != 0) {
+							continue;	// only straighta-adjacent, no diagonals
+						}
+						
+						loc = shift(at, hor, ver);
+						
+						if (loc != -1 && grid[loc].type == near) {
 							change_grid(at, to);
 							found = 1;
 						}

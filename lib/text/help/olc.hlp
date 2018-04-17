@@ -335,6 +335,8 @@ Objects (OEDIT):
 
 Empire Progress Goals (PROGEDIT):
 - Goals that are PURCHASABLE should not have cost or tasks.
+- Do not use goal names starting with 'Buy', 'Completed', or any progress type.
+  Players may not be able to get info on them using the 'progress' command.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
@@ -5615,6 +5617,7 @@ Usage:  .flags [add | remove] <flags>
 The following progress goal flags are available:
  IN-DEVELOPMENT - Empires cannot start or complete this goal.
  PURCHASABLE - This goal is purchased, not unlocked by tasks.
+ SCRIPT-ONLY - For scripts; cannot be purchased or earned.
 
 See also: OLC PROGRESS
 #d
@@ -5629,8 +5632,11 @@ Tips:
 - Avoid starting with "A" or "The" if possible.
 - Write the name like a book title: Every Word Capitalized
 - No ending punctuation
+- Do not start the name with "Buy", "Completed", or one of the type names as
+  players may not be able to get info on those goals due to conflicts in the
+  'progress' command.
 
-See also: OLC PROGRESS
+See also: OLC PROGRESS, PROGEDIT TYPES
 #d
 "PROGEDIT PERKS"
 
@@ -5643,6 +5649,7 @@ lost even if the empire no longer qualifies for the goal that gave them.
 
 Perk types:
  Technology - Grants an empire technology.
+ City-points - Grants one or more city points.
 
 Note: To grant progress points for a goal, set the 'value'.
 
@@ -5995,6 +6002,9 @@ Available tasks:
  &cGET-CURRENCY&0 - Player must have an amount of adventure currency.
  &cGET-COINS&0 - Player must get some miscellaneous coins.
  &cCAN-GAIN-SKILL&0 - Player is able to gain a point in a skill.
+ &cCROP-VARIETY&0 - Needs produce from a number of different crops.
+ &cOWN-HOMES&0 - Empire must have enough citizen homes.
+ &cOWN-SECTOR&0 - Empire must own enough tiles of this sector type.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 

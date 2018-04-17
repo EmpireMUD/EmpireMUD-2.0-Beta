@@ -57,6 +57,7 @@ extern const char *wtrig_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
+void check_for_eligible_goals(empire_data *emp);	// progress.c
 extern int count_harnessed_animals(vehicle_data *veh);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
@@ -4913,7 +4914,29 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {	// emp.a*
-					if (!str_cmp(field, "adjective")) {
+					if (!str_cmp(field, "add_progress")) {
+						if (subfield && *subfield) {
+							progress_data *prg;
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
+								if (!empire_has_completed_goal(emp, vnum)) {
+									void script_reward_goal(empire_data *emp, progress_data *prg);
+									script_reward_goal(emp, prg);
+									check_for_eligible_goals(emp);
+								}
+								strcpy(str, "1");
+							}
+							else {
+								script_log("Trigger: %s, VNum %d. add_progress called with invalid vnum '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "adjective")) {
 						snprintf(str, slen, "%s", EMPIRE_ADJECTIVE(emp));
 					}
 					break;
@@ -4949,7 +4972,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// emp.h*
-					if (!str_cmp(field, "has_tech")) {
+					if (!str_cmp(field, "has_progress")) {
+						if (subfield && *subfield) {
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING) {
+								snprintf(str, slen, "%d", empire_has_completed_goal(emp, vnum) ? 1 : 0);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "has_tech")) {
 						if (subfield && *subfield) {
 							extern const char *techs[];
 							int pos;
@@ -4971,6 +5009,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "id")) {
 						// this is scripting id
 						snprintf(str, slen, "%d", EMPIRE_VNUM(emp) + EMPIRE_ID_BASE);
+					}
+					else if (!str_cmp(field, "is_on_progress")) {
+						if (subfield && *subfield) {
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING) {
+								snprintf(str, slen, "%d", get_current_goal(emp, vnum) ? 1 : 0);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
 					}
 					break;
 				}
@@ -5015,6 +5068,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'q': {	// emp.q*
+					if (!str_cmp(field, "qualifies_for_progress")) {
+						if (subfield && *subfield) {
+							progress_data *prg;
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
+								extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
+								
+								snprintf(str, slen, "%d", (!empire_has_completed_goal(emp, vnum) && empire_meets_goal_prereqs(emp, prg)) ? 1 : 0);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					break;
+				}
 				case 'r': {	// emp.r*
 					if (!str_cmp(field, "rank")) {
 						if (subfield && *subfield) {
@@ -5024,6 +5098,31 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 							else {
 								*str = '\0';
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "remove_progress")) {
+						if (subfield && *subfield) {
+							struct empire_goal *goal;
+							progress_data *prg;
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
+								if (empire_has_completed_goal(emp, vnum)) {
+									void remove_completed_goal(empire_data *emp, any_vnum vnum);
+									remove_completed_goal(emp, vnum);
+								}
+								if ((goal = get_current_goal(emp, vnum))) {
+									cancel_empire_goal(emp, goal);
+								}
+								strcpy(str, "1");
+								check_for_eligible_goals(emp);
+							}
+							else {
+								strcpy(str, "0");
 							}
 						}
 						else {
@@ -5139,6 +5238,10 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 					if (dots > 0) {
 						*subfield_p = '\0';
 						find_replacement(go, sc, trig, type, var, field, subfield, repl_str, sizeof(repl_str));
+						
+						// reset subfield -- this fixes a dg scripts error where subfields would continue concatenating
+						subfield_p = subfield;
+						
 						if (*repl_str) {   
 							snprintf(tmp2, sizeof(tmp2), "eval tmpvr %s", repl_str); //temp var
 							process_eval(go, sc, trig, type, tmp2);
@@ -5181,6 +5284,9 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 			len = strlen(repl_str);
 			buf += len;
 			left -= len;
+			
+			// reset subfield -- this fixes a dg scripts error where subfields would continue concatenating
+			subfield_p = subfield;
 		} /* else if *p .. */
 	} /* while *p .. */ 
 }

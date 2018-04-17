@@ -21,6 +21,12 @@ E
 E
 2 604 0.04 602
 E
+2 55 0.80 27
+E
+2 54 0.80 1
+E
+2 45 0.80 1
+E
 2 28 0.80 27
 E
 2 29 0.80 27
@@ -29,7 +35,7 @@ E
 E
 2 53 5.00 56
 E
-2 6 10.00 50
+2 57 10.00 50
 E
 2 5 10.00 40
 E
@@ -193,7 +199,7 @@ E
 E
 2 53 5.00 56
 E
-2 6 10.00 50
+2 57 10.00 50
 E
 2 5 10.00 44
 E
@@ -347,7 +353,7 @@ E
 E
 2 53 5.00 56
 E
-2 6 10.00 50
+2 57 10.00 50
 E
 2 5 10.00 45
 E
@@ -475,7 +481,7 @@ E
 E
 2 53 5.00 56
 E
-2 6 10.00 50
+2 57 10.00 50
 E
 2 5 10.00 45
 E
@@ -619,7 +625,7 @@ E
 E
 2 53 5.00 56
 E
-2 6 10.00 50
+2 57 10.00 50
 E
 2 5 10.00 45
 E
@@ -733,7 +739,7 @@ D4
 ~~~~~
 &c~
 E
-7 6 1.00 53
+7 57 1.00 53
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
 I 21 256 0.25 1 f  # FISH: a hestian trinket
@@ -940,7 +946,7 @@ D4
 /\/\~
 &y~
 E
-2 6 10.00 52
+2 57 10.00 52
 I 5 104 8.00 1 X  # DIG: a red bloodstone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1588,7 +1594,7 @@ D4
 E
 2 21 2.00 26
 E
-2 6 10.00 51
+2 57 10.00 51
 E
 3 20 0.28 26
 E
@@ -1709,6 +1715,8 @@ D3
 D4
 .&c~~&?.~
 &y~
+E
+2 57 4.00 19
 E
 2 53 4.00 19
 E
@@ -1851,7 +1859,7 @@ D0
 E
 0 1 100.00 20
 E
-2 6 10.00 51
+2 57 10.00 51
 E
 7 19 0.80 71
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
@@ -1960,7 +1968,7 @@ E
 E
 2 32 2.00 35
 E
-2 6 10.00 50
+2 57 10.00 50
 E
 4 0 0.80 28
 E
@@ -2068,7 +2076,7 @@ E
 E
 2 32 2.00 35
 E
-2 6 10.00 50
+2 57 10.00 50
 E
 7 5 2.00 29
 E
@@ -2431,6 +2439,10 @@ D4
 &0~
 E
 2 604 0.04 602
+E
+2 54 0.80 44
+E
+2 45 0.80 44
 E
 2 28 0.80 27
 E
@@ -3138,6 +3150,10 @@ D4
 ....~
 &0~
 E
+2 55 0.80 55
+E
+2 54 0.80 54
+E
 2 28 0.80 55
 E
 2 4 0.80 54
@@ -3148,7 +3164,7 @@ E
 E
 8 0 100.00 13
 E
-10 6 5.00 0
+10 57 5.00 0
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a pile of clay
@@ -3303,7 +3319,7 @@ E
 E
 8 0 100.00 14
 E
-10 6 5.00 20
+10 57 5.00 20
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a pile of clay
@@ -3418,7 +3434,7 @@ D4
 /\/\~
 &y~
 E
-10 6 5.00 8
+10 57 5.00 8
 I 5 104 8.00 1 X  # DIG: a red bloodstone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -3453,7 +3469,7 @@ D0
 ~~~~~
 &a~
 E
-11 6 5.00 5
+11 57 5.00 5
 I 21 3052 8.00 1 f  # FISH: a clam
 I 21 3051 8.00 1 f  # FISH: a sea urchin
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
@@ -3487,19 +3503,31 @@ chop, dig, gather, pick~
 D1
 .^..~
 &g~
+D1
+..^.~
+&g~
 D2
 .^..~
+&g~
+D2
+..^.~
 &g~
 D3
 .&y^&?..~
 &g~
+D3
+..&y^&?.~
+&g~
 D4
 .&W^&?..~
+&0~
+D4
+..&W^&?.~
 &0~
 E
 0 1 100.00 50
 E
-10 6 5.00 1
+10 57 5.00 1
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a pile of clay
@@ -3650,7 +3678,7 @@ E
 E
 8 0 100.00 15
 E
-10 6 5.00 27
+10 57 5.00 27
 I 6 3051 50.00 1 x  # FORAGE: a sea urchin
 I 6 3052 50.00 1 x  # FORAGE: a clam
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
@@ -3885,6 +3913,24 @@ M
 9211 10.00 h
 M
 9210 0.03 0
+S
+#57
+Shallow Sea~
+The Shallow Sea, Near the Coast~
+'~' 18 0 10 h ai
+D0
+~~~~~
+&a~
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1302 25.00 1 f  # FISH: a giant linefish
+I 21 1303 25.00 1 f  # FISH: a magenta arrowfish
+I 21 1301 100.00 1 f  # FISH: a striped barbfish
+M
+9171 1.00 d
 S
 #70
 Irrigated Plains~
@@ -4156,8 +4202,6 @@ D0
 &g.&?^&g.&?^~
 &G~
 E
-0 2 50.00 70
-E
 0 1 100.00 70
 E
 11 19 4.00 26
@@ -4169,6 +4213,8 @@ I 6 3014 100.00 1  # FORAGE: some dry beans
 I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
 I 9 121 100.00 1  # GATHER: a stick
+I 20 128 50.00 1 c  # CHOP: a massive jungle tree
+I 20 128 50.00 2 c  # CHOP: a massive jungle tree
 M
 9040 0.01 d
 M

@@ -104,6 +104,7 @@ crop_data *crop_table = NULL;	// crop hash table
 empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
+bool check_delayed_refresh = FALSE;	// triggers multiple refreshes
 
 // factions
 faction_data *faction_table = NULL;	// main hash (hh)
@@ -167,7 +168,6 @@ struct group_data *group_list = NULL;	// global LL of groups
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
 progress_data *sorted_progress = NULL;	// hashed by vnum, sorted by type/data
 bool need_progress_refresh = FALSE;	// triggers an update of all empires' trackers
-bool check_completed_goals = FALSE;	// triggers full goal check
 
 // quests
 struct quest_data *quest_table = NULL;
@@ -1488,6 +1488,7 @@ void number_island(struct map_data *map, int island) {
 	struct map_data *tile;
 	
 	map->shared->island_id = island;
+	map->shared->island_ptr = get_island(island, TRUE);
 	
 	// check neighboring tiles
 	for (x = -1; x <= 1; ++x) {
@@ -1904,6 +1905,7 @@ const char *versions_list[] = {
 	"b5.23",
 	"b5.24",
 	"b5.25",
+	"b5.30",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3038,6 +3040,36 @@ void b5_25_trench_update(void) {
 }
 
 
+// fixes some empire data
+void b5_30_empire_update(void) {
+	struct empire_trade_data *trade, *next_trade;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	int iter;
+	
+	log("Applying b5.30 empire update...");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// fixes an issue where some numbers were defaulted higher -- these attributes are not even used prior to b5.30
+		for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+			EMPIRE_ATTRIBUTE(emp, iter) = 0;
+		}
+		
+		// fixes an older issue with trade data -- unstorable items
+		LL_FOREACH_SAFE(EMPIRE_TRADE(emp), trade, next_trade) {
+			if (!(proto = obj_proto(trade->vnum)) || !proto->storage) {
+				LL_DELETE(EMPIRE_TRADE(emp), trade);
+			}
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+	
+	save_all_empires();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3280,6 +3312,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.25")) {
 			b5_25_trench_update();
+		}
+		if (MATCH_VERSION("b5.30")) {
+			b5_30_empire_update();
 		}
 	}
 	

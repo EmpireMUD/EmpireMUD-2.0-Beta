@@ -1103,7 +1103,7 @@ void start_dismantle_building(room_data *loc) {
 	
 	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
 		qt_empire_players(ROOM_OWNER(loc), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(loc)));
-		et_gain_building(ROOM_OWNER(loc), GET_BLD_VNUM(GET_BUILDING(loc)));
+		et_lose_building(ROOM_OWNER(loc), GET_BLD_VNUM(GET_BUILDING(loc)));
 	}
 	
 	stop_room_action(loc, ACT_DIGGING, CHORE_DIGGING);

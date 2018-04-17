@@ -178,6 +178,21 @@ void change_terrain(room_data *room, sector_vnum sect) {
 		new_crop = get_potential_crop_for_location(room);
 	}
 	
+	// need land-map update?
+	if (st != old_sect && SECT_IS_LAND_MAP(st) != SECT_IS_LAND_MAP(old_sect)) {
+		map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
+		if (SECT_IS_LAND_MAP(st)) {
+			// add to land_map (at the start is fine)
+			map->next = land_map;
+			land_map = map;
+		}
+		else {
+			// remove from land_map
+			REMOVE_FROM_LIST(map, land_map, next);
+			// do NOT free map -- it's a pointer to something in world_map
+		}
+	}
+	
 	// change sect
 	perform_change_sect(room, NULL, st);
 	perform_change_base_sect(room, NULL, st);
@@ -215,21 +230,6 @@ void change_terrain(room_data *room, sector_vnum sect) {
 		setup_start_locations();
 	}
 	
-	// need land-map update?
-	if (st != old_sect && SECT_IS_LAND_MAP(st) != SECT_IS_LAND_MAP(old_sect)) {
-		map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
-		if (SECT_IS_LAND_MAP(st)) {
-			// add to land_map (at the start is fine)
-			map->next = land_map;
-			land_map = map;
-		}
-		else {
-			// remove from land_map
-			REMOVE_FROM_LIST(map, land_map, next);
-			// do NOT free map -- it's a pointer to something in world_map
-		}
-	}
-	
 	// for later
 	emp = ROOM_OWNER(room);
 	
@@ -237,6 +237,86 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	if (emp && SECT_FLAGGED(st, SECTF_NO_CLAIM)) {
 		abandon_room(room);
 	}
+	
+	// update requirement trackers
+	if (emp) {
+		qt_empire_players(emp, qt_lose_tile_sector, GET_SECT_VNUM(old_sect));
+		et_lose_tile_sector(emp, GET_SECT_VNUM(old_sect));
+		
+		qt_empire_players(emp, qt_gain_tile_sector, GET_SECT_VNUM(st));
+		et_gain_tile_sector(emp, GET_SECT_VNUM(st));
+	}
+}
+
+
+/**
+* Ensures a room or map tile has an island id/pointer -- to be called after the
+* terrain is changed for any reason. This will add/remove the points and will
+* update the island's tile count.
+*
+* @param room_data *room The map room data. (must provide room OR map)
+* @param struct map_data *map The map tile data. (must provide room OR map)
+*/
+void check_island_assignment(room_data *room, struct map_data *map) {
+	void number_and_count_islands(bool reset);
+	
+	struct island_info **island;
+	struct map_data *to_map;
+	int x, y, new_x, new_y;
+	sector_data *sect;
+	int iter, *id;
+	
+	if (!room && !map) {
+		return;
+	}
+	if (room && GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		return;
+	}
+	
+	sect = room ? SECT(room) : map->sector_type;
+	island = room ? &GET_ISLAND(room) : &map->shared->island_ptr;
+	id = room ? &GET_ISLAND_ID(room) : &map->shared->island_id;
+	x = room ? X_COORD(room) : MAP_X_COORD(map->vnum);
+	y = room ? Y_COORD(room) : MAP_Y_COORD(map->vnum);
+	
+	// room is NOT on an island
+	if (SECT_FLAGGED(sect, SECTF_NON_ISLAND)) {
+		if (*island != NULL) {
+			(*island)->tile_size -= 1;
+			*island = NULL;
+		}
+		if (*id != NO_ISLAND) {
+			*id = NO_ISLAND;
+		}
+		return;
+	}
+	
+	// if we already have an island, we're done now
+	if (*island) {
+		return;
+	}
+	
+	// try to detect an island nearby
+	for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
+		if (!get_coord_shift(x, y, shift_dir[iter][0], shift_dir[iter][1], &new_x, &new_y)) {
+			continue;	// no room that way
+		}
+		if (!(to_map = &(world_map[new_x][new_y]))) {
+			continue;	// unable to get map tile in that dir
+		}
+		if (!to_map->shared->island_ptr) {
+			continue;	// no island to copy
+		}
+		
+		// found one!
+		*id = to_map->shared->island_id;
+		*island = to_map->shared->island_ptr;
+		(*island)->tile_size += 1;
+		return;	// done
+	}
+	
+	// if we get this far, it was not able to detect an island -- make a new one
+	number_and_count_islands(FALSE);
 }
 
 
@@ -460,14 +540,15 @@ void delete_room(room_data *room, bool check_exits) {
 	// Remove remaining chars
 	for (c = ROOM_PEOPLE(room); c; c = next_c) {
 		next_c = c->next_in_room;
-		if (!IS_NPC(c)) {
-			save_char(c, NULL);
-		}
 		
 		if (!extraction_room) {
 			extraction_room = get_extraction_room();
 		}
 		char_to_room(c, extraction_room);
+		
+		if (!IS_NPC(c)) {
+			save_char(c, NULL);
+		}
 		
 		extract_all_items(c);
 		extract_char(c);
@@ -1439,9 +1520,7 @@ void stop_burning(room_data *room) {
 int city_points_available(empire_data *emp) {
 	extern int get_total_score(empire_data *emp);
 	
-	struct empire_city_data *city;
 	int score, points = 0;
-	bool has;
 	
 	if (emp) {
 		points = 1;
@@ -1453,18 +1532,7 @@ int city_points_available(empire_data *emp) {
 		score = get_total_score(emp);
 		points += (score >= 50) ? 1 : 0;
 		
-		// bonus point at 75 IF there is a capital
-		if (score >= 75) {
-			has = FALSE;
-			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
-				if (city_type[city->type].is_capital) {
-					has = TRUE;
-					break;
-				}
-			}
-			
-			points += (has ? 1 : 0);
-		}
+		points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
 
 		// minus any used points
 		points -= count_city_points_used(emp);
@@ -1911,6 +1979,9 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 			}
 		}
 	}
+	
+	// make sure its island status is correct
+	check_island_assignment(loc, map);
 }
 
 
@@ -2077,12 +2148,12 @@ void clear_empire_techs(empire_data *emp) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
 			for (sub = 0; sub < NUM_TECHS; ++sub) {
 				isle->population = 0;
-				isle->tech[sub] = 0;
+				isle->tech[sub] = EMPIRE_BASE_TECH(iter, sub);
 			}
 		}
 		// main techs
 		for (sub = 0; sub < NUM_TECHS; ++sub) {
-			EMPIRE_TECH(iter, sub) = 0;
+			EMPIRE_TECH(iter, sub) = EMPIRE_BASE_TECH(iter, sub);
 		}
 	}
 }
@@ -2576,8 +2647,10 @@ void generate_island_descriptions(void) {
 	// and free the data
 	HASH_ITER(hh, isle_hash, isle, next_isle) {
 		HASH_ITER(hh, isle->ters, ter, next_ter) {
+			HASH_DEL(isle->ters, ter);
 			free(ter);
 		}
+		HASH_DEL(isle_hash, isle);
 		free(isle);
 	}
 	

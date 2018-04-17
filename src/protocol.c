@@ -118,7 +118,7 @@ static const char s_Gauge5[] = "\005\002Opponent\002darkred\002OPPONENT_HEALTH\0
 #define NUMBER_IN_THE_RANGE(x,y)   false, true,  false, false,  x,  y,  0, NULL
 #define BOOLEAN_SET_TO(x)          false, true,  false, false,  0,  1,  x, NULL
 #define STRING_WITH_LENGTH_OF(x,y) true,  true,  false, false,  x,  y,  0, NULL
-#define STRING_WRITE_ONCE(x,y)     true,  true,  true,  false, -1, -1,  0, NULL
+#define STRING_WRITE_ONCE(x,y)     true,  true,  true,  false,  x,  y,  0, NULL
 #define STRING_GUI(x)              true,  false, false, true,  -1, -1,  0, x
 
 static variable_name_t VariableNameTable[eMSDP_MAX+1] = {

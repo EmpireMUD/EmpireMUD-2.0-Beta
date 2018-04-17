@@ -28,6 +28,7 @@
 *   Helpers
 *   Empire Helpers
 *   Empire Trackers
+*   The Nuclear Option
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -47,6 +48,7 @@ extern const char *techs[];
 // external funcs
 extern struct req_data *copy_requirements(struct req_data *from);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+extern int count_owned_homes(empire_data *emp);;
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void get_requirement_display(struct req_data *list, char *save_buffer);
@@ -86,7 +88,7 @@ int count_empire_components(empire_data *emp, int type, bitvector_t flags) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (store->amount < 1 || !(proto = obj_proto(store->vnum))) {
+			if (store->amount < 1 || !(proto = store->proto)) {
 				continue;
 			}
 			
@@ -100,6 +102,71 @@ int count_empire_components(empire_data *emp, int type, bitvector_t flags) {
 			// safe!
 			SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
 		}
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts how many different crops an empire has stored, based on the <plants>
+* field and the PLANTABLE flag.
+*
+* @param empire_data *emp The empire to check.
+* @param int max_needed Optional: Saves processing by stopping if it hits this number (-1 to count ALL).
+* @param int only_island Optional: Only checks for crops on 1 island (NO_ISLAND for all).
+*/
+int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island) {
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
+	obj_data *obj;
+	any_vnum vnum;
+	int count = 0;
+	
+	// helper type
+	struct tmp_crop_data {
+		any_vnum crop;
+		UT_hash_handle hh;
+	};
+	struct tmp_crop_data *tcd, *next_tcd, *hash = NULL;
+	
+	if (!emp || max_needed == 0) {
+		return 0;
+	}
+	
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (only_island != NO_ISLAND && only_island != isle->island) {
+			continue; // only_island requested
+		}
+		
+		HASH_ITER(hh, isle->store, store, next_store) {
+			if (!(obj = store->proto)) {
+				continue;
+			}
+			if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
+				continue;
+			}
+			
+			vnum = GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE);
+			HASH_FIND_INT(hash, &vnum, tcd);
+			if (!tcd) {
+				++count;	// found a unique
+				CREATE(tcd, struct tmp_crop_data, 1);
+				tcd->crop = vnum;
+				HASH_ADD_INT(hash, crop, tcd);
+			}
+			// else: not unique
+			
+			if (max_needed != -1 && count >= max_needed) {
+				break;	// done early
+			}
+		}
+	}
+	
+	// free temporary data
+	HASH_ITER(hh, hash, tcd, next_tcd) {
+		HASH_DEL(hash, tcd);
+		free(tcd);
 	}
 	
 	return count;
@@ -180,6 +247,47 @@ progress_data *find_progress_goal_by_name(char *name) {
 	}
 	
 	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		if (!str_cmp(name, PRG_NAME(prg))) {
+			return prg;	// exact match
+		}
+		else if (!partial && is_multiword_abbrev(name, PRG_NAME(prg))) {
+			partial = prg;
+		}
+	}
+	
+	return partial;	// if any
+}
+
+
+/**
+* Finds a goal from the list. This allows multi-word abbrevs, and  prefers
+* exact matches. Only goals the empire can possibly purchase are listed.
+*
+* @param emp empire_data *emp The one that must be able to purchase it.
+* @param char *name The name to look for.
+*/
+progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name) {
+	progress_data *prg, *next_prg, *partial = NULL;
+	
+	if (!emp || !*name) {
+		return NULL;
+	}
+	
+	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+			continue;
+		}
+		if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			continue;
+		}
+		if (!empire_meets_goal_prereqs(emp, prg)) {
+			continue;
+		}
+		
 		if (!str_cmp(name, PRG_NAME(prg))) {
 			return prg;	// exact match
 		}
@@ -239,6 +347,10 @@ char *get_one_perk_display(struct progress_perk *perk) {
 	switch (perk->type) {
 		case PRG_PERK_TECH: {
 			sprinttype(perk->value, techs, save_buffer);
+			break;
+		}
+		case PRG_PERK_CITY_POINTS: {
+			sprintf(save_buffer, "%d city point%s", perk->value, PLURAL(perk->value));
 			break;
 		}
 		default: {
@@ -309,12 +421,14 @@ void add_completed_goal(empire_data *emp, any_vnum vnum) {
 * This is called by:
 * - complete_goal
 * - purchase_goal
+* - script_reward_goal
 *
 * @param empire_data *emp The empire apply it to.
 * @param progress_data *prg Which goal is being aplied (or removed).
 * @param bool add If TRUE, applies it. If FALSE, reverses it.
 */
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
+	struct empire_island *isle, *next_isle;
 	struct progress_perk *perk;
 	
 	if (!emp || !prg) {
@@ -322,11 +436,12 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 	}
 	
 	// apply points/cost
-	if (PRG_VALUE(prg)) {
+	if (PRG_VALUE(prg)) {	// adds to point total and pool
 		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 	}
-	if (PRG_COST(prg)) {
+	if (PRG_COST(prg)) {	// adds to point total, subtracts from pool
+		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_COST(prg) : -PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
 		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? -PRG_COST(prg) : PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
 	}
 	
@@ -335,8 +450,19 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 		switch (perk->type) {
 			case PRG_PERK_TECH: {
 				if (perk->value >= 0 && perk->value < NUM_TECHS) {
-					SAFE_ADD(EMPIRE_TECH(emp, perk->value), (add ? 1 : -1), 0, INT_MAX, TRUE);
+					// update base tech, which saves
+					EMPIRE_BASE_TECH(emp, perk->value) += (add ? 1 : -1);
+					
+					// also update current-tech
+					EMPIRE_TECH(emp, perk->value) += (add ? 1 : -1);
+					HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+						isle->tech[perk->value] += (add ? 1 : -1);
+					}
 				}
+				break;
+			}
+			case PRG_PERK_CITY_POINTS: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
 		}
@@ -385,7 +511,7 @@ void check_for_eligible_goals(empire_data *emp) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		vnum = PRG_VNUM(prg);
 		
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
 			continue;
 		}
 		if (get_current_goal(emp, vnum)) {
@@ -408,33 +534,6 @@ void check_for_eligible_goals(empire_data *emp) {
 				complete_goal(emp, goal);
 			}
 		}
-	}
-}
-
-
-/**
-* Checks all empires for complete goals.
-*/
-void check_goals_complete(void) {
-	if (check_completed_goals) {
-		struct empire_goal *goal, *next_goal;
-		empire_data *emp, *next_emp;
-		int complete, total;
-		
-		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (EMPIRE_CHECK_GOAL_COMPLETE(emp)) {
-				EMPIRE_CHECK_GOAL_COMPLETE(emp) = FALSE;
-				
-				HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
-					count_quest_tasks(goal->tracker, &complete, &total);
-					if (complete == total) {
-						complete_goal(emp, goal);
-					}
-				}
-			}
-		}
-		
-		check_completed_goals = FALSE;
 	}
 }
 
@@ -483,21 +582,20 @@ void complete_goal(empire_data *emp, struct empire_goal *goal) {
 
 
 /**
-* Determines if an empire has already completed a goal and returns the time-
-* stamp if so.
+* Determines if an empire has already completed a goal.
 *
 * @param empire_data *emp Which empire.
 * @param any_vnum vnum Which progression goal.
-* @return time_t timestamp if they have completed it, 0 (FALSE) if not.
+* @return bool TRUE if they have, FALSE if not.
 */
-time_t empire_has_completed_goal(empire_data *emp, any_vnum vnum) {
+bool empire_has_completed_goal(empire_data *emp, any_vnum vnum) {
 	struct empire_completed_goal *ecg;
 	
 	if (emp && vnum != NOTHING) {
 		HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
-		return ecg ? ecg->when : 0;
+		return ecg ? TRUE : FALSE;
 	}
-	return 0;
+	return FALSE;
 }
 
 
@@ -534,6 +632,7 @@ void free_empire_goals(struct empire_goal *hash) {
 	struct empire_goal *eg, *next;
 	HASH_ITER(hh, hash, eg, next) {
 		free_requirements(eg->tracker);
+		HASH_DEL(hash, eg);
 		free(eg);
 	}
 }
@@ -547,6 +646,7 @@ void free_empire_goals(struct empire_goal *hash) {
 void free_empire_completed_goals(struct empire_completed_goal *hash) {
 	struct empire_completed_goal *ecg, *next;
 	HASH_ITER(hh, hash, ecg, next) {
+		HASH_DEL(hash, ecg);
 		free(ecg);
 	}
 }
@@ -625,7 +725,7 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 		skip = FALSE;
 		
 		// remove if not allowed to track it
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
 			if (goal) {
 				cancel_empire_goal(emp, goal);
 				goal = NULL;
@@ -643,6 +743,10 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 		if (goal && !empire_meets_goal_prereqs(emp, prg)) {
 			cancel_empire_goal(emp, goal);
 			goal = NULL;
+			skip = TRUE;
+		}
+		else if (empire_has_completed_goal(emp, PRG_VNUM(prg)) && !empire_meets_goal_prereqs(emp, prg)) {
+			remove_completed_goal(emp, PRG_VNUM(prg));
 			skip = TRUE;
 		}
 		
@@ -689,6 +793,8 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 * @param struct empire_goal *goal The goal to refresh.
 */
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
+	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
+	
 	struct req_data *task;
 	
 	if (!emp || !goal) {
@@ -718,6 +824,18 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = EMPIRE_COINS(emp);
 				break;
 			}
+			case REQ_CROP_VARIETY: {
+				task->current = count_empire_crop_variety(emp, task->needed, NO_ISLAND);
+				break;
+			}
+			case REQ_OWN_HOMES: {
+				task->current = count_owned_homes(emp);
+				break;
+			}
+			case REQ_OWN_SECTOR: {
+				task->current = count_owned_sector(emp, task->vnum);
+				break;
+			}
 			
 			// otherwise...
 			default: {
@@ -729,7 +847,7 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 	}
 	
 	// check it
-	TRIGGER_CHECK_GOAL_COMPLETE(emp);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 }
 
 
@@ -752,6 +870,26 @@ void remove_completed_goal(empire_data *emp, any_vnum vnum) {
 		free(ecg);
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
+}
+
+
+/**
+* Call this function to reward an empire with a SCRIPT-ONLY progress goal. This
+* function does not validate prereqs or point availability. It only does the
+* work.
+*
+* @param empire_data *emp Which empire is being rewarded.
+* @param progress_data *prg The progression goal being added.
+*/
+void script_reward_goal(empire_data *emp, progress_data *prg) {
+	if (!emp || !prg) {
+		return;	// nothing to do
+	}
+	
+	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
+	
+	add_completed_goal(emp, PRG_VNUM(prg));
+	check_for_eligible_goals(emp);
 }
 
 
@@ -810,6 +948,25 @@ void verify_empire_goals(void) {
 }
 
 
+/**
+* Determines if an empire has already completed a goal and returns the time-
+* stamp if so.
+*
+* @param empire_data *emp Which empire.
+* @param any_vnum vnum Which progression goal.
+* @return time_t timestamp if they have completed it, 0 (FALSE) if not.
+*/
+time_t when_empire_completed_goal(empire_data *emp, any_vnum vnum) {
+	struct empire_completed_goal *ecg;
+	
+	if (emp && vnum != NOTHING) {
+		HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &vnum, ecg);
+		return ecg ? ecg->when : 0;
+	}
+	return 0;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE TRACKERS /////////////////////////////////////////////////////////
 
@@ -828,7 +985,7 @@ void et_change_coins(empire_data *emp, int amount) {
 			if (task->type == REQ_GET_COINS) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_CHECK_GOAL_COMPLETE(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
 	}
@@ -850,7 +1007,29 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				++task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_CHECK_GOAL_COMPLETE(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+}
+
+
+/**
+* Empire Tracker: empire gets a tile, by sector (in general)
+*
+* @param empire_data *emp The empire.
+* @param sector_vnum vnum The sector vnum.
+*/
+void et_gain_tile_sector(empire_data *emp, sector_vnum vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
+				++task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
 	}
@@ -872,7 +1051,7 @@ void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
 				++task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_CHECK_GOAL_COMPLETE(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
 	}
@@ -885,8 +1064,9 @@ void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
 * @param empire_data *emp The empire.
 * @param obj_data *obj The item.
 * @param int amount How many of it (may be positive or negative).
+* @param int new_total How many the empire now has (on just the island where it was stored) -- this may save processing in some cases.
 */
-void et_get_obj(empire_data *emp, obj_data *obj, int amount) {
+void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 	struct empire_goal *goal, *next;
 	struct req_data *task;
 	
@@ -895,17 +1075,23 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount) {
 			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_CHECK_GOAL_COMPLETE(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_CHECK_GOAL_COMPLETE(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_CHECK_GOAL_COMPLETE(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_CROP_VARIETY && OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
+				if (new_total == 0 || new_total == amount) {
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_CROP_VARIETY);
+				}
+				// else: having/not-having it did not change, so no need to redetect
 			}
 		}
 	}
@@ -927,7 +1113,32 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				--task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_CHECK_GOAL_COMPLETE(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+		}
+	}
+}
+
+
+/**
+* Empire Tracker: empire loses a tile, by sector.
+*
+* @param empire_data *emp The empire.
+* @param sector_vnum vnum The sector vnum.
+*/
+void et_lose_tile_sector(empire_data *emp, sector_vnum vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
+				--task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
 				task->current = MAX(task->current, 0);
@@ -953,12 +1164,66 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
 				--task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_CHECK_GOAL_COMPLETE(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
 				task->current = MAX(task->current, 0);
 			}
 		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// THE NUCLEAR OPTION //////////////////////////////////////////////////////
+
+/**
+* Fully resets empire progression for 1 or all empires.
+*
+* @param empire_data *only_emp Optional: If provided, only does that 1 empire. Otherwise does all of them.
+*/
+void full_reset_empire_progress(empire_data *only_emp) {
+	empire_data *emp, *next_emp;
+	int iter;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (only_emp && emp != only_emp) {
+			continue;	// only doing one
+		}
+		
+		// wipe all goals (don't bother cancelling or refunding anything)
+		free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
+		EMPIRE_COMPLETED_GOALS(emp) = NULL;
+		free_empire_goals(EMPIRE_GOALS(emp));
+		EMPIRE_GOALS(emp) = NULL;
+		
+		// wipe techs
+		for (iter = 0; iter < NUM_TECHS; ++iter) {
+			EMPIRE_BASE_TECH(emp, iter) = 0;
+		}
+		
+		// wipe attributes
+		for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+			EMPIRE_ATTRIBUTE(emp, iter) = 0;
+		}
+		
+		// wipe points
+		for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+			EMPIRE_PROGRESS_POINTS(emp, iter) = 0;
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		
+		if (only_emp) {	// refresh now if it's just this one
+			reread_empire_tech(emp);
+			refresh_empire_goals(emp, NOTHING);
+		}
+	}
+	
+	if (!only_emp) {	// refresh all empires
+		reread_empire_tech(NULL);
+		need_progress_refresh = TRUE;
+		check_progress_refresh();	// call it now, don't wait
 	}
 }
 
@@ -974,6 +1239,8 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_progress(progress_data *prg, char_data *ch) {
+	struct progress_list *iter, *sub;
+	progress_data *other;
 	bool problem = FALSE;
 	
 	if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
@@ -981,14 +1248,63 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (PRG_TYPE(prg) == PROGRESS_UNDEFINED) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "Type not set");
+		problem = TRUE;
+	}
+	
 	if (!PRG_NAME(prg) || !*PRG_NAME(prg) || !str_cmp(PRG_NAME(prg), default_progress_name)) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "No name set");
+		problem = TRUE;
+	}
+	if (ispunct(*(PRG_NAME(prg) + strlen(PRG_NAME(prg)) - 1))) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "Name ends with punctuation");
 		problem = TRUE;
 	}
 	
 	if (!PRG_DESCRIPTION(prg) || !*PRG_DESCRIPTION(prg)) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "No description set");
 		problem = TRUE;
+	}
+	
+	if (PRG_FLAGGED(prg, PRG_PURCHASABLE) && (PRG_VALUE(prg) || PRG_TASKS(prg))) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with value and/or tasks");
+		problem = TRUE;
+	}
+	if (PRG_FLAGGED(prg, PRG_PURCHASABLE) && !PRG_COST(prg)) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with zero cost");
+		problem = TRUE;
+	}
+	if (PRG_COST(prg) && PRG_VALUE(prg)) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "Both cost and value set");
+		problem = TRUE;
+	}
+	
+	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with SCRIPT-ONLY");
+		problem = TRUE;
+	}
+	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && (PRG_COST(prg) || PRG_TASKS(prg))) {
+		olc_audit_msg(ch, PRG_VNUM(prg), "SCRIPT-ONLY set with cost and/or tasks");
+		problem = TRUE;
+	}
+	
+	LL_FOREACH(PRG_PREREQS(prg), iter) {
+		if (iter->vnum == PRG_VNUM(prg)) {
+			olc_audit_msg(ch, PRG_VNUM(prg), "Has self as prerequisite");
+			problem = TRUE;
+			break;	// only once
+		}
+		else if ((other = real_progress(iter->vnum))) {
+			// check for a back-prereq
+			LL_FOREACH(PRG_PREREQS(other), sub) {
+				if (sub->vnum == PRG_VNUM(prg)) {
+					olc_audit_msg(ch, PRG_VNUM(prg), "Circular prerequisites");
+					problem = TRUE;
+					break;	// only once
+				}
+			}
+		}
 	}
 	
 	return problem;
@@ -1006,7 +1322,7 @@ char *list_one_progress(progress_data *prg, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		snprintf(output, sizeof(output), "[%5d] %s (%s)%s", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
@@ -1127,6 +1443,9 @@ int sort_progress_by_data(progress_data *a, progress_data *b) {
 	}
 	else if (PRG_FLAGGED(a, PRG_PURCHASABLE) != PRG_FLAGGED(b, PRG_PURCHASABLE)) {
 		return PRG_FLAGGED(a, PRG_PURCHASABLE) ? 1 : -1;
+	}
+	else if (PRG_FLAGGED(a, PRG_SCRIPT_ONLY) != PRG_FLAGGED(b, PRG_SCRIPT_ONLY)) {
+		return PRG_FLAGGED(a, PRG_SCRIPT_ONLY) ? 1 : -1;
 	}
 	else {
 		return str_cmp(PRG_NAME(a), PRG_NAME(b));
@@ -1713,6 +2032,9 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 	
+	sprintbit(PRG_FLAGS(prg), progress_flags, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
 	get_progress_list_display(PRG_PREREQS(prg), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Prerequisites:\r\n%s", *part ? part : " none\r\n");
 	
@@ -1761,9 +2083,9 @@ void olc_show_progress(char_data *ch) {
 	get_progress_list_display(PRG_PREREQS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
 	
-	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
 		get_requirement_display(PRG_TASKS(prg), lbuf);
-		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE | PRG_SCRIPT_ONLY) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
 	}
 	
 	get_progress_perks_display(PRG_PERKS(prg), lbuf);
@@ -2022,11 +2344,17 @@ OLC_MODULE(progedit_perks) {
 			switch (ptype) {
 				case PRG_PERK_TECH: {
 					if ((vnum = search_block(argument, techs, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown tech '%s'.\r\n", arg);
+						msg_to_char(ch, "Unknown tech '%s'.\r\n", argument);
 						return;
 					}
-					// otherwise ok
-					break;
+					break;	// otherwise ok
+				}
+				case PRG_PERK_CITY_POINTS: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid number of city points '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
 				}
 				default: {
 					msg_to_char(ch, "That type is not yet implemented.\r\n");

@@ -347,6 +347,7 @@ ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
+ADMIN_UTIL(util_wipeprogress);
 ADMIN_UTIL(util_yearly);
 
 
@@ -367,6 +368,7 @@ struct {
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
+	{ "wipeprogress", LVL_CIMPL, util_wipeprogress },
 	{ "yearly", LVL_CIMPL, util_yearly },
 
 	// last
@@ -722,6 +724,25 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+}
+
+
+ADMIN_UTIL(util_wipeprogress) {
+	void full_reset_empire_progress(empire_data *only_emp);
+	
+	empire_data *emp = NULL;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Usage: util wipeprogress <empire | all>\r\n");
+	}
+	else if (str_cmp(argument, "all") && !(emp = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire '%s'.\r\n", argument);
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has wiped empire progress for %s", GET_REAL_NAME(ch), emp ? EMPIRE_NAME(emp) : "all empires");
+		send_config_msg(ch, "ok_string");
+		full_reset_empire_progress(emp);	// if NULL, does ALL
+	}
 }
 
 
@@ -2154,6 +2175,50 @@ SHOW(show_islands) {
 }
 
 
+SHOW(show_piles) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	room_data *room, *next_room;
+	int count, max = 100;
+	obj_data *obj;
+	size_t size;
+	bool any;
+	
+	if (*argument && isdigit(*argument)) {
+		max = atoi(argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Piles of %d item%s or more:\r\n", max, PLURAL(max));
+	
+	any = FALSE;
+	HASH_ITER(hh, world_table, room, next_room) {
+		count = 0;
+		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+			++count;
+		}
+		
+		if (count >= max) {
+			snprintf(line, sizeof(line), "[%d] %s: %d item%s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count));
+			any = TRUE;
+			
+			if (size + strlen(line) + 18 < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+				break;
+			}
+		}
+	}
+	
+	if (!any) {
+		strcat(buf, " none\r\n");
+	}
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
 SHOW(show_player) {
 	char birth[80], lastlog[80];
 	double days_played, avg_min_per_day;
@@ -2188,6 +2253,56 @@ SHOW(show_player) {
 	
 	if (file) {
 		free_char(plr);
+	}
+}
+
+
+SHOW(show_progress) {
+	extern progress_data *find_progress_goal_by_name(char *name);
+	
+	int total = 0, active = 0, active_completed = 0, total_completed = 0;
+	empire_data *emp, *next_emp;
+	progress_data *prg;
+	bool t_o;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Show completion of which progression goal?\r\n");
+	}
+	else if ((isdigit(*argument) && !(prg = real_progress(atoi(argument)))) || (!isdigit(*argument) && !(prg = find_progress_goal_by_name(argument)))) {
+		msg_to_char(ch, "Unknown goal '%s'.\r\n", argument);
+	}
+	else {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (EMPIRE_IMM_ONLY(emp)) {
+				continue;	// safe to skip these
+			}
+			
+			++total;
+			
+			if (!(t_o = EMPIRE_IS_TIMED_OUT(emp))) {
+				++active;
+			}
+			
+			if (empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+				++total_completed;
+				if (!t_o) {
+					++active_completed;
+				}
+			}
+		}
+		
+		if (total == 0) {
+			msg_to_char(ch, "No player empires found; nobody has completed that goal.\r\n");
+		}
+		else {
+			msg_to_char(ch, "%d completed that goal out of %d total empire%s (%d%%).\r\n", total_completed, total, PLURAL(total), (total_completed * 100 / total));
+		}
+		if (active == 0) {
+			msg_to_char(ch, "No active empires found.\r\n");
+		}
+		else {
+			msg_to_char(ch, "%d active empire%s completed that goal out of %d total active (%d%%).\r\n", active_completed, PLURAL(active_completed), active, (active_completed * 100 / active));
+		}
 	}
 }
 
@@ -7516,6 +7631,8 @@ ACMD(do_show) {
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },
 		{ "shops", LVL_START_IMM, show_shops },
+		{ "piles", LVL_CIMPL, show_piles },
+		{ "progress", LVL_START_IMM, show_progress },
 
 		// last
 		{ "\n", 0, NULL }
@@ -8016,7 +8133,7 @@ ACMD(do_unbind) {
 }
 
 
-ACMD(do_ungoal) {
+ACMD(do_unprogress) {
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void remove_completed_goal(empire_data *emp, any_vnum vnum);
 	
@@ -8032,7 +8149,7 @@ ACMD(do_ungoal) {
 	all = !str_cmp(emp_arg, "all");
 	
 	if (!*emp_arg && !*prg_arg) {
-		msg_to_char(ch, "Usage: ungoal <empire | all> <goal vnum>\r\n");
+		msg_to_char(ch, "Usage: unprogress <empire | all> <goal vnum>\r\n");
 	}
 	else if (!all && !(only = get_empire_by_name(emp_arg))) {
 		msg_to_char(ch, "Invalid empire '%s'.\r\n", emp_arg);
@@ -8068,6 +8185,7 @@ ACMD(do_ungoal) {
 			}
 			else {
 				msg_to_char(ch, "Goal removed from %d empire%s.\r\n", count, PLURAL(count));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has removed progress goal %d from %d empire%s", GET_REAL_NAME(ch), PRG_VNUM(prg), count, PLURAL(count));
 			}
 		}
 		else if (count < 1) {
@@ -8075,6 +8193,7 @@ ACMD(do_ungoal) {
 		}
 		else {
 			msg_to_char(ch, "Goal removed from %s.\r\n", only ? EMPIRE_NAME(only) : "UNKNOWN");
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has removed progress goal %d from %s", GET_REAL_NAME(ch), PRG_VNUM(prg), only ? EMPIRE_NAME(only) : "UNKNOWN");
 		}
 	}
 }

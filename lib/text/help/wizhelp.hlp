@@ -972,6 +972,7 @@ learned    Immort   Shows you learned recipes.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
+progress   Immort   Shows how many empires have completed a progress goal.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
 shops      Immort   Shows any shops available in your current location.
@@ -988,6 +989,7 @@ commons    Asst     Shows players currently connected from duplicate sites.
 site       Asst     Shows all players with a specific site segment.
 account    Co-Impl  Shows all the alts associated with a given player.
 data       Co-Impl  Shows data stored in the global data system
+piles      Co-Impl  Shows rooms with too many items piled up.
 
 Each of these commands has its own help file (for example, HELP SHOW STATS)
 
@@ -1073,6 +1075,13 @@ Usage:  show notes <player name>
 
 Shows immortal notes for the target player's account.
 #e
+"SHOW PILES"
+
+Usage:  show piles [max size]
+
+This shows rooms which have more than 100 items in them (or whatever pile size
+you specify).
+#e
 "SHOW PLAYER"
 
 Usage:  show player <player name>
@@ -1088,6 +1097,12 @@ Shows the names and current and max health, moves, mana and blood of all online
 players. Not to be confused with SHOW PLAYER.
 
 See also: USERS
+#e
+"SHOW PROGRESS"
+
+Usage:  show progress <goal>
+
+This shows how many empires have completed a given progression goal.
 #e
 "SHOW RENT"
 
@@ -1324,13 +1339,13 @@ command is grantable.
 
 See also: BINDING, GRANT
 #d
-UNGOAL
+UNPROGRESS
 
-Usage:  ungoal <empire | all> <goal vnum>
+Usage:  unprogress <empire | all> <goal vnum>
 
-This command removes a goal from all empires' trackers and completion lists.
-However, they will immediately receive the goal again if they still qualify
-for it. This command is grantable.
+This command removes a progression goal from all empires' trackers and
+completion lists. However, they will immediately receive the goal again if they
+still qualify for it. This command is grantable.
 
 See also: GRANT, PROGRESS
 #d
@@ -1393,6 +1408,7 @@ Available utilities:
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.
+ &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
  &cyearly&0 - Runs a full annual update on the world.
 #d
 VNUM

@@ -525,7 +525,7 @@ void summon_materials(char_data *ch, char *argument) {
 			break;
 		}
 		
-		proto = obj_proto(store->vnum);
+		proto = store->proto;
 		if (proto && multi_isname(objname, GET_OBJ_KEYWORDS(proto)) && (++pos == number)) {
 			found = TRUE;
 			

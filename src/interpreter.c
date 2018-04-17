@@ -424,12 +424,12 @@ ACMD(do_tunnel);
 
 ACMD(do_unban);
 ACMD(do_unbind);
-ACMD(do_ungoal);
 ACMD(do_unharness);
 ACMD(do_unload_vehicle);
 ACMD(do_unpublicize);
 ACMD(do_unquest);
 ACMD(do_unpaint);
+ACMD(do_unprogress);
 ACMD(do_unshare);
 ACMD(do_upgrade);
 ACMD(do_use);
@@ -1023,7 +1023,6 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	STANDARD_CMD( "unapprove", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_UNAPPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	GRANT_CMD( "unbind", POS_SLEEPING, do_unbind, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNBIND ),
-	GRANT_CMD( "ungoal", POS_DEAD, do_ungoal, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNGOAL ),
 	STANDARD_CMD( "unharness", POS_STANDING, do_unharness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
 	STANDARD_CMD( "unload", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
@@ -1034,6 +1033,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "unban", POS_DEAD, do_unban, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_BAN ),
 	SIMPLE_CMD( "unpublicize", POS_DEAD, do_unpublicize, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "unpaint", POS_STANDING, do_unpaint, NO_MIN, CTYPE_BUILD ),
+	GRANT_CMD( "unprogress", POS_DEAD, do_unprogress, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNPROGRESS ),
 	SIMPLE_CMD( "unshare", POS_RESTING, do_unshare, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "uptime", POS_DEAD, do_date, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_UPTIME ),
 	SIMPLE_CMD( "upgrade", POS_STANDING, do_upgrade, NO_MIN, CTYPE_BUILD ),

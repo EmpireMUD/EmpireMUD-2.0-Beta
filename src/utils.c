@@ -380,6 +380,54 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1) {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE UTILS ////////////////////////////////////////////////////////////
 
+/**
+* Checks all empires for delayed-refresh commands.
+*/
+void run_delayed_refresh(void) {
+	void complete_goal(empire_data *emp, struct empire_goal *goal);
+	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
+	void count_quest_tasks(struct req_data *list, int *complete, int *total);
+	
+	if (check_delayed_refresh) {
+		struct empire_goal *goal, *next_goal;
+		int complete, total, crop_var;
+		empire_data *emp, *next_emp;
+		struct req_data *task;
+		
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			crop_var = -1;
+			
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_CROP_VARIETY)) {
+				HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+					LL_FOREACH(goal->tracker, task) {
+						if (task->type == REQ_CROP_VARIETY) {
+							if (crop_var == -1) {
+								// only look up once per empire
+								crop_var = count_empire_crop_variety(emp, task->needed, NO_ISLAND);
+							}
+							task->current = crop_var;
+							TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+						}
+					}
+				}
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_GOAL_COMPLETE)) {
+				HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+					count_quest_tasks(goal->tracker, &complete, &total);
+					if (complete == total) {
+						complete_goal(emp, goal);
+					}
+				}
+			}
+			
+			// clear this
+			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
+		}
+		
+		check_delayed_refresh = FALSE;
+	}
+}
+
 
 /**
 * @param empire_data *emp
@@ -1206,7 +1254,7 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 * Checks the room to see if ch has permission.
 *
 * @param char_data *ch
-* @param int type PRIV_x
+* @param int type PRIV_
 * @return bool TRUE if it's ok
 */
 bool has_permission(char_data *ch, int type) {
@@ -5013,6 +5061,41 @@ char *shared_by(obj_data *obj, char_data *ch) {
 	else {
 		return "";
 	}
+}
+
+
+/**
+* Simple, short display for number of days/hours/minutes/seconds since an
+* event. It only shows the largest of those groups, so something 26 hours ago
+* is '1d' and something 100 seconds ago is '2m'.
+*
+* @param time_t when The timestamp.
+* @return char* The short string.
+*/
+char *simple_time_since(time_t when) {
+	static char output[80];
+	double calc, diff;
+	
+	diff = time(0) - when;
+	if ((calc = diff / SECS_PER_REAL_YEAR) > 1.0) {
+		sprintf(output, "%dy", (int) round(calc));
+	}
+	else if ((calc = diff / SECS_PER_REAL_WEEK) > 1.0) {
+		sprintf(output, "%dw", (int) round(calc));
+	}
+	else if ((calc = diff / SECS_PER_REAL_DAY) > 1.0) {
+		sprintf(output, "%dd", (int) round(calc));
+	}
+	else if ((calc = diff / SECS_PER_REAL_HOUR) > 1.0) {
+		sprintf(output, "%dh", (int) round(calc));
+	}
+	else if ((calc = diff / SECS_PER_REAL_MIN) > 1.0) {
+		sprintf(output, "%dm", (int) round(calc));
+	}
+	else {
+		sprintf(output, "%ds", (int) diff);
+	}
+	return output;
 }
 
 

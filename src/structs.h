@@ -381,6 +381,9 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_GET_CURRENCY  20
 #define REQ_GET_COINS  21
 #define REQ_CAN_GAIN_SKILL  22
+#define REQ_CROP_VARIETY  23
+#define REQ_OWN_HOMES  24
+#define REQ_OWN_SECTOR  25
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -964,6 +967,11 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE DEFINES //////////////////////////////////////////////////////////
 
+// DELAY_REFRESH_x: flags indicating something on the empire needs a refresh
+#define DELAY_REFRESH_CROP_VARIETY  BIT(0)	// refreshes specific progress goals
+#define DELAY_REFRESH_GOAL_COMPLETE  BIT(1)	// checks for finished progress
+
+
 // EADM_x: empire admin flags
 #define EADM_NO_WAR  BIT(0)	// may not start a unilateral war
 #define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
@@ -972,7 +980,7 @@ typedef struct vehicle_data vehicle_data;
 
 // EATT_x: empire attributes
 #define EATT_PROGRESS_POOL  0	// spendable progress points
-#define EATT_CITY_POINTS  1	// bonus city points
+#define EATT_BONUS_CITY_POINTS  1	// extra city points
 #define NUM_EMPIRE_ATTRIBUTES  2	// total
 
 
@@ -1074,7 +1082,7 @@ typedef struct vehicle_data vehicle_data;
 #define OFF_AVENGED  BIT(2)	// player was killed or empire was warred for this (removes hostile value)
 
 
-// Empire Privilege Levels
+// PRIV_x: Empire Privilege Levels
 #define PRIV_CLAIM  0	// Claim land
 #define PRIV_BUILD  1	// Build/Dismantle structures
 #define PRIV_HARVEST  2	// Harvest/plant things
@@ -1094,7 +1102,8 @@ typedef struct vehicle_data vehicle_data;
 #define PRIV_HOMES  16	// can set a home
 #define PRIV_STORAGE  17	// can retrieve from storage
 #define PRIV_WAREHOUSE  18	// can retrieve from warehouse
-#define NUM_PRIVILEGES  19	// total
+#define PRIV_PROGRESS  19	// can buy/manage progression goals
+#define NUM_PRIVILEGES  20	// total
 
 
 // for empire scores (e.g. sorting)
@@ -1871,7 +1880,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_UNQUEST  BIT(38)
 #define GRANT_AUTOMESSAGE  BIT(39)
 #define GRANT_PEACE  BIT(40)
-#define GRANT_UNGOAL  BIT(41)
+#define GRANT_UNPROGRESS  BIT(41)
 
 
 // Lore types
@@ -2082,12 +2091,14 @@ typedef struct vehicle_data vehicle_data;
 
 
 // PRG_x: progress flags
-#define PRG_IN_DEVELOPMENT  BIT(0)	// not available to players
-#define PRG_PURCHASABLE  BIT(1)	// can buy it
+#define PRG_IN_DEVELOPMENT  BIT(0)	// a. not available to players
+#define PRG_PURCHASABLE  BIT(1)	// b. can buy it
+#define PRG_SCRIPT_ONLY  BIT(2)	// c. cannot buy/achieve it
 
 
 // PRG_PERK_x: progress perks
 #define PRG_PERK_TECH  0	// grants a technology
+#define PRG_PERK_CITY_POINTS  1	// grants more city points
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4174,6 +4185,7 @@ struct empire_political_data {
 // The storage structure for empire islands
 struct empire_storage_data {
 	obj_vnum vnum;	// what's stored
+	obj_data *proto;	// pointer to the obj proto
 	int amount;	// how much
 	bool keep;	// if TRUE, workforce will ignore it
 	UT_hash_handle hh;	// empire_island->store hash (by vnum)
@@ -4306,6 +4318,7 @@ struct empire_data {
 	double coins;	// total coins (always in local currency)
 
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command
+	int base_tech[NUM_TECHS];	// TECH_ from rewards (not added by buildings or players)
 
 	// linked lists
 	struct empire_political_data *diplomacy;
@@ -4329,7 +4342,7 @@ struct empire_data {
 	int population;	// npc population who lives here
 	int military;	// number of soldiers
 	int greatness;	// total greatness of members
-	int tech[NUM_TECHS];	// TECH_x, detected from buildings and abilities
+	int tech[NUM_TECHS];	// TECH_, detected from buildings and abilities
 	struct empire_island *islands;	// empire island data hash
 	int members;	// Number of members, calculated at boot time
 	int total_member_count;	// Total number of members including timeouts and dupes
@@ -4345,7 +4358,7 @@ struct empire_data {
 	time_t next_timeout;	// for triggering rescans
 	int min_level;	// minimum level in the empire
 	int max_level;	// maximum level in the empire
-	bool check_goal_complete;	// tells the mud to check for a complete goal
+	bitvector_t delayed_refresh;	// things that are requesting an update
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them

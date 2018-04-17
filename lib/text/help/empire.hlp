@@ -253,7 +253,7 @@ City points come from:
  - 1 point for Prominence
  - 1 point for having at least 10 technologies
  - 1 point for being over 50 escore
- - 1 point for having a capital city and being over 75 escore
+ - 1 point from progression rewards
 
 EmpireMUD periodically checks if cities are completely empty and, if so,
 will remove the city center and refund the city point. This helps keep the map
@@ -1040,6 +1040,7 @@ Privileges:
   homes: can set a home
   storage: can retrieve from storage buildings
   warehouse: can retrieve unique items from the warehouse
+  progress: can buy progression goals
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #

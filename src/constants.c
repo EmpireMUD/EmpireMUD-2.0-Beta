@@ -549,7 +549,7 @@ const char *grant_bits[] = {
 	"unquest",
 	"automessage",
 	"peace",	// 40
-	"ungoal",
+	"unprogress",
 	"\n"
 };
 
@@ -1668,18 +1668,11 @@ const char *empire_admin_flags[] = {
 };
 
 
-// EATT_x (1/2): empire attributes
+// EATT_x: empire attributes
 const char *empire_attributes[] = {
 	"Progress Pool",
-	"City Points",
+	"Bonus City Points",
 	"\n"
-};
-
-
-// EATT_x (2/2): defaults for empire attributes
-const int empire_attribute_defaults[NUM_EMPIRE_ATTRIBUTES] = {
-	0,	// progress pool
-	1,	// city points
 };
 
 
@@ -1760,6 +1753,7 @@ const char *priv[] = {
 	"homes",
 	"storage",
 	"warehouse",
+	"progress",
 	"\n"
 };
 
@@ -2577,7 +2571,7 @@ const char *progress_types[] = {
 	"Community",
 	"Industry",
 	"Defense",
-	"Progress",
+	"Prestige",
 	"\n"
 };
 
@@ -2586,13 +2580,15 @@ const char *progress_types[] = {
 const char *progress_flags[] = {
 	"IN-DEVELOPMENT",
 	"PURCHASABLE",
+	"SCRIPT-ONLY",
 	"\n"
 };
 
 
-// PRG_PERK_x: progress perk types
+// PRG_PERK_x: progress perk types (should be all 1 word)
 const char *progress_perk_types[] = {
 	"Technology",
+	"City-points",
 	"\n"
 };
 
@@ -3746,6 +3742,9 @@ const char *requirement_types[] = {
 	"GET-CURRENCY",	// 20
 	"GET-COINS",
 	"CAN-GAIN-SKILL",
+	"CROP-VARIETY",
+	"OWN-HOMES",
+	"OWN-SECTOR",	// 25
 	"\n",
 };
 
@@ -3775,6 +3774,9 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// get currency
 	REQ_AMT_NUMBER,	// get coins
 	REQ_AMT_NONE,	// can gain skill
+	REQ_AMT_NUMBER,	// crop variety
+	REQ_AMT_NUMBER,	// own homes
+	REQ_AMT_NUMBER,	// own sector
 };
 
 
@@ -3803,6 +3805,9 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// get currency
 	FALSE,	// get coins
 	FALSE,	// can gain skill
+	FALSE,	// crop variety
+	FALSE,	// own homes
+	FALSE,	// own sector
 };
 
 

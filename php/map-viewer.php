@@ -147,6 +147,17 @@ body {
 	z-index: 10;
 }
 
+.pixelated {
+	image-rendering:optimizeSpeed;
+	image-rendering:-moz-crisp-edges;
+	image-rendering:-o-crisp-edges;
+	image-rendering:-webkit-optimize-contrast;
+	image-rendering:optimize-contrast;
+	image-rendering:crisp-edges;
+	image-rendering:pixelated;
+	-ms-interpolation-mode:nearest-neighbor;
+}
+
 </style>
 </head>
 <body>
@@ -155,6 +166,7 @@ body {
 	<div title="Press 'p' to toggle the political map."><input type="checkbox" id="pol" name="pol" /> <label for="pol">Political Map</label></div>
 	<div title="Press 'g' to toggle the grid."><input type="checkbox" id="grid" name="grid" /> <label for="grid">Grid</label></div>
 	<div title="Press 'c' to toggle cities."><input type="checkbox" id="cities" name="cities" /> <label for="cities">Cities</label></div>
+	<div title="Press 'x' to toggle pixelation while zoomed."><input type="checkbox" id="pixelate" name="pixelate" /> <label for="pixelate">Pixelate When Zoomed</label></div>
 	<div style="clear: both;"></div>
 </div>
 <div id="coords"></div>
@@ -211,11 +223,20 @@ function checkcities() {
 		$(".city").hide();
 	}
 }
+function checkpixelate() {
+	if ($("#pixelate").prop("checked")) {
+		$(".wld").addClass("pixelated");
+	}
+	else {
+		$(".wld").removeClass("pixelated");
+	}
+}
 
 $(document).ready(function() {
 	checkmap();
 	checkgrid();
 	checkcities();
+	checkpixelate();
 
 	$("#pol").click(function() {
 		checkmap();
@@ -229,6 +250,10 @@ $(document).ready(function() {
 		checkcities();
 	});
 	
+	$("#pixelate").click(function() {
+		checkpixelate();
+	});
+	
 	$(document).keypress(function(e) {
 		var c = String.fromCharCode(e.which);
 		if (c == 'p' || c == 'P') {
@@ -239,6 +264,9 @@ $(document).ready(function() {
 		}
 		else if (c == 'c' || c == 'C') {
 			$("#cities").click();
+		}
+		else if (c == 'x' || c == 'X') {
+			$("#pixelate").click();
 		}
 	});
 
