@@ -805,7 +805,7 @@ ACMD(do_slash_channel) {
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	descriptor_data *desc;
 	char_data *vict;
-	int iter;
+	int iter, count;
 	bool ok, found;
 	
 	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "\n" };
@@ -868,6 +868,16 @@ ACMD(do_slash_channel) {
 		}
 	}
 	else if (!str_cmp(arg, "join")) {
+		// check safety limit
+		count = 0;
+		LL_FOREACH(GET_SLASH_CHANNELS(ch), slash) {
+			++count;
+		}
+		if (count > 30) {
+			msg_to_char(ch, "You cannot be on more than 30 slash-channels at a time.\r\n");
+			return;
+		}
+		
 		// join channel: just first word
 		skip_slash(arg2);
 		any_one_arg(arg2, arg3);
