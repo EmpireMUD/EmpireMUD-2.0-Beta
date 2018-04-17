@@ -178,6 +178,21 @@ void change_terrain(room_data *room, sector_vnum sect) {
 		new_crop = get_potential_crop_for_location(room);
 	}
 	
+	// need land-map update?
+	if (st != old_sect && SECT_IS_LAND_MAP(st) != SECT_IS_LAND_MAP(old_sect)) {
+		map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
+		if (SECT_IS_LAND_MAP(st)) {
+			// add to land_map (at the start is fine)
+			map->next = land_map;
+			land_map = map;
+		}
+		else {
+			// remove from land_map
+			REMOVE_FROM_LIST(map, land_map, next);
+			// do NOT free map -- it's a pointer to something in world_map
+		}
+	}
+	
 	// change sect
 	perform_change_sect(room, NULL, st);
 	perform_change_base_sect(room, NULL, st);
@@ -213,21 +228,6 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	// need start locations update?
 	if (SECT_FLAGGED(old_sect, SECTF_START_LOCATION) != SECT_FLAGGED(st, SECTF_START_LOCATION)) {
 		setup_start_locations();
-	}
-	
-	// need land-map update?
-	if (st != old_sect && SECT_IS_LAND_MAP(st) != SECT_IS_LAND_MAP(old_sect)) {
-		map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
-		if (SECT_IS_LAND_MAP(st)) {
-			// add to land_map (at the start is fine)
-			map->next = land_map;
-			land_map = map;
-		}
-		else {
-			// remove from land_map
-			REMOVE_FROM_LIST(map, land_map, next);
-			// do NOT free map -- it's a pointer to something in world_map
-		}
 	}
 	
 	// for later

@@ -1488,6 +1488,7 @@ void number_island(struct map_data *map, int island) {
 	struct map_data *tile;
 	
 	map->shared->island_id = island;
+	map->shared->island_ptr = get_island(island, TRUE);
 	
 	// check neighboring tiles
 	for (x = -1; x <= 1; ++x) {
