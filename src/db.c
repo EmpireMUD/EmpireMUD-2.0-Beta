@@ -514,7 +514,6 @@ void boot_world(void) {
 	// requires rooms
 	log("Loading empires.");
 	index_boot(DB_BOOT_EMP);
-	clean_empire_logs();
 	clean_empire_offenses();
 	
 	// requires empires
@@ -572,6 +571,7 @@ void boot_world(void) {
 	
 	log("Loading empire storage and logs.");
 	load_empire_storage();
+	clean_empire_logs();
 	
 	log("Loading daily quest cycles.");
 	load_daily_quest_file();
