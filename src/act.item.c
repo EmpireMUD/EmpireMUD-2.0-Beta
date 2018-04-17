@@ -694,7 +694,7 @@ static bool perform_exchange(char_data *ch, obj_data *obj, empire_data *emp) {
 static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 	char_data *mort;
 	
-	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
+	if (!drop_otrigger(obj, ch, DROP_TRIG_PUT)) {	// also takes care of obj purging self
 		return 0;
 	}
 	
@@ -1000,11 +1000,11 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	bool logged;
 	int size;
 	
-	if (!drop_otrigger(obj, ch)) {
+	if (!drop_otrigger(obj, ch, mode == SCMD_JUNK ? DROP_TRIG_JUNK : DROP_TRIG_DROP)) {
 		return 0;
 	}
 
-	if ((mode == SCMD_DROP) && !drop_wtrigger(obj, ch)) {
+	if ((mode == SCMD_DROP) && !drop_wtrigger(obj, ch, DROP_TRIG_DROP)) {
 		return 0;
 	}
 	
@@ -1104,7 +1104,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			obj = create_money(type, amount);
 			obj_to_char(obj, ch);	// temporarily
 
-			if (!drop_wtrigger(obj, ch)) {
+			if (!drop_wtrigger(obj, ch, DROP_TRIG_DROP)) {
 				// stays in inventory, which is odd, but better than the alternative (a crash if the script purged the object and we extract it here)
 				return;
 			}

@@ -1131,7 +1131,12 @@ int remove_otrigger(obj_data *obj, char_data *actor) {
 }
 
 
-int drop_otrigger(obj_data *obj, char_data *actor) {
+/**
+* @param obj_data *obj The object being dropped/put/etc.
+* @param char_data *actor The person doing.
+* @param int mode Any DROP_TRIG_ type.
+*/
+int drop_otrigger(obj_data *obj, char_data *actor, int mode) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val;
@@ -1143,6 +1148,30 @@ int drop_otrigger(obj_data *obj, char_data *actor) {
 		if (TRIGGER_CHECK(t, OTRIG_DROP) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			
+			switch (mode) {
+				case DROP_TRIG_DROP: {
+					add_var(&GET_TRIG_VARS(t), "command", "drop", 0);
+					break;
+				}
+				case DROP_TRIG_JUNK: {
+					add_var(&GET_TRIG_VARS(t), "command", "junk", 0);
+					break;
+				}
+				case DROP_TRIG_PUT: {
+					add_var(&GET_TRIG_VARS(t), "command", "put", 0);
+					break;
+				}
+				case DROP_TRIG_SACRIFICE: {
+					add_var(&GET_TRIG_VARS(t), "command", "sacrifice", 0);
+					break;
+				}
+				default: {
+					add_var(&GET_TRIG_VARS(t), "command", "unknown", 0);
+					break;
+				}
+			}
+			
 			sdd.o = obj;
 			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
 			obj = sdd.o;
@@ -1713,7 +1742,13 @@ void speech_wtrigger(char_data *actor, char *str) {
 	}
 }
 
-int drop_wtrigger(obj_data *obj, char_data *actor) {
+
+/**
+* @param obj_data *obj The object being dropped/put/etc.
+* @param char_data *actor The person doing.
+* @param int mode Any DROP_TRIG_ type.
+*/
+int drop_wtrigger(obj_data *obj, char_data *actor, int mode) {
 	room_data *room;
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
@@ -1730,6 +1765,30 @@ int drop_wtrigger(obj_data *obj, char_data *actor) {
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			ADD_UID_VAR(buf, t, obj_script_id(obj), "object", 0);
+			
+			switch (mode) {
+				case DROP_TRIG_DROP: {
+					add_var(&GET_TRIG_VARS(t), "command", "drop", 0);
+					break;
+				}
+				case DROP_TRIG_JUNK: {
+					add_var(&GET_TRIG_VARS(t), "command", "junk", 0);
+					break;
+				}
+				case DROP_TRIG_PUT: {
+					add_var(&GET_TRIG_VARS(t), "command", "put", 0);
+					break;
+				}
+				case DROP_TRIG_SACRIFICE: {
+					add_var(&GET_TRIG_VARS(t), "command", "sacrifice", 0);
+					break;
+				}
+				default: {
+					add_var(&GET_TRIG_VARS(t), "command", "unknown", 0);
+					break;
+				}
+			}
+			
 			sdd.r = room;
 			ret_val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
 			if (ret_val && obj->carried_by != actor)

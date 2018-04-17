@@ -131,13 +131,14 @@ Return value:  return 0 to prevent the drop
 
 As an object trigger, this is activated any time a character attempts to drop
 the object. As a room trigger, it happens when an object is dropped in the
-room.
+room. This trigger also fires on put, junk, and sacrifice.
 
 The object trigger includes putting the object into a container or vehicle.
 
 Variables:
   &c%actor%&0 - The character attempting to drop the object.
-  &c%object%&0 - The object the character is attempting to drop (room trigger).
+  &c%object%&0 - The object the character is attempting to drop (room trigger).\
+  &c%command%&0 - drop, junk, put, sacrifice.
   &c%self%&0 - The item being dropped (object trigger).
 #d
 "EMPIRE VARS" "EMPIRE VARIABLES" EMP-VARS EMPIRE-VARS TRIGEDIT-EMP-VAR TRIGEDIT-VARIABLES-EMPIRES
