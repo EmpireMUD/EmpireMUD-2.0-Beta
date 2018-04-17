@@ -3,7 +3,7 @@ hut~
 -1 1
 8 289 0 1 -1
 B
-5100 b bdeklmno
+5100 b op
 R
 25 20 1 0
 S
@@ -12,7 +12,7 @@ cabin~
 -1 1
 8 289 0 1 -1
 B
-5101 b bdeklmno
+5101 b op
 R
 21 6 1 0
 S
@@ -21,7 +21,7 @@ house~
 -1 1
 8 289 0 1 -1
 B
-5102 b bdeklmno
+5102 b op
 R
 21 4 1 0
 R
@@ -32,7 +32,7 @@ mudhut~
 -1 1
 8 289 0 1 -1
 B
-5103 e bdeklmno
+5103 e op
 R
 25 10 1 0
 R
@@ -43,7 +43,7 @@ pueblo~
 -1 1
 8 289 0 1 -1
 B
-5104 e bdeklmno
+5104 e op
 R
 21 6 1 0
 R
@@ -54,7 +54,7 @@ cliffdwelling~
 -1 1
 8 289 0 1 -1
 B
-5105 c bcdeklmno
+5105 c cop
 R
 21 10 1 0
 R
@@ -78,7 +78,7 @@ mine~
 -1 1
 8 289 0 1 -1
 B
-5107 c bcdeklmno
+5107 c cop
 R
 21 4 1 0
 S
@@ -87,7 +87,7 @@ forge~
 -1 1
 8 289 0 1 -1
 B
-5108 be bdeklmno
+5108 be op
 R
 21 4 1 0
 R
@@ -102,7 +102,7 @@ mill~
 -1 1
 8 289 0 1 -1
 B
-5109 be bdeklmno
+5109 be op
 R
 21 4 1 0
 R
@@ -115,7 +115,7 @@ potter~
 -1 1
 8 289 0 1 -1
 B
-5110 be bdeklmno
+5110 be op
 R
 21 4 1 0
 R
@@ -128,7 +128,7 @@ stable~
 -1 1
 8 289 0 1 -1
 B
-5111 be bdeklmno
+5111 be op
 R
 21 8 1 0
 R
@@ -161,7 +161,7 @@ cannery~
 -1 1
 8 289 0 1 -1
 B
-5114 be bdeklmno
+5114 be op
 R
 25 20 1 0
 S
@@ -170,7 +170,7 @@ foundry~
 -1 1
 8 289 0 1 -1
 B
-5115 be bdeklmno
+5115 be op
 R
 25 20 1 0
 S
@@ -179,7 +179,7 @@ granary~
 -1 1
 8 289 0 1 -1
 B
-5116 be bdeklmno
+5116 be op
 R
 25 20 1 0
 S
@@ -206,7 +206,7 @@ smokehouse~
 -1 1
 8 289 0 1 -1
 B
-5119 be bdeklmno
+5119 be op
 R
 25 20 1 0
 S
@@ -215,7 +215,7 @@ tannery~
 -1 1
 8 289 0 1 -1
 B
-5120 be bdeklmno
+5120 be op
 R
 25 20 1 0
 S
@@ -224,7 +224,7 @@ utilityshed~
 -1 1
 8 289 0 1 -1
 B
-5121 be bdeklmno
+5121 be op
 R
 25 20 1 0
 S
@@ -255,7 +255,7 @@ stonehouse~
 -1 1
 8 40 0 1 -1
 B
-5124 be bdeklmno
+5124 be op
 R
 16 6 1 0
 R
@@ -266,7 +266,7 @@ largehouse~
 -1 1
 8 40 0 1 -1
 B
-5125 be bdeklmno
+5125 be op
 R
 16 4 1 0
 R
@@ -279,7 +279,7 @@ treehouse~
 -1 1
 8 40 0 1 -1
 B
-5126 d bdeklmno
+5126 d op
 R
 16 6 1 0
 R
@@ -290,7 +290,7 @@ treecomplex~
 -1 1
 8 40 0 1 -1
 B
-5127 d bdeklmno
+5127 d op
 R
 16 20 1 0
 R
@@ -301,7 +301,7 @@ undergroundcomplex~
 -1 1
 8 40 0 1 -1
 B
-5128 be bdeklmno
+5128 be op
 R
 3 2 1 0
 R
@@ -314,7 +314,7 @@ minecomplex~
 -1 1
 8 40 0 1 -1
 B
-5129 c bcdeklmno
+5129 c cop
 R
 16 30 1 0
 R
@@ -325,7 +325,7 @@ alchemist~
 -1 1
 8 39 0 1 -1
 B
-5130 be bdeklmno
+5130 be op
 R
 16 4 1 0
 R
@@ -338,7 +338,7 @@ apiary~
 -1 1
 8 39 0 1 -1
 B
-5131 be bdeklmno
+5131 be op
 R
 16 12 1 0
 R
@@ -351,7 +351,7 @@ bakery~
 -1 1
 8 39 0 1 -1
 B
-5132 be bdeklmno
+5132 be op
 R
 16 4 1 0
 R
@@ -364,7 +364,7 @@ bridge~
 -1 1
 8 39 0 1 -1
 B
-5133 f 0
+5133 f op
 R
 3 8 1 0
 R
@@ -377,7 +377,7 @@ carpenter~
 -1 1
 8 39 0 1 -1
 B
-5134 be bdeklmno
+5134 be op
 R
 16 4 1 0
 R
@@ -390,7 +390,7 @@ glassblower~
 -1 1
 8 39 0 1 -1
 B
-5135 be bdeklmno
+5135 be op
 R
 16 4 1 0
 R
@@ -403,7 +403,7 @@ pigeonpost~
 -1 1
 8 39 0 1 -1
 B
-5136 be bdeklmno
+5136 be op
 R
 16 12 1 0
 R
@@ -414,7 +414,7 @@ tailor~
 -1 1
 8 39 0 1 -1
 B
-5137 be bdeklmno
+5137 be op
 R
 16 4 1 0
 R
@@ -427,7 +427,7 @@ tavern~
 -1 1
 8 39 0 1 -1
 B
-5138 be bdeklmno
+5138 be op
 R
 16 10 1 0
 R
@@ -444,7 +444,7 @@ warehouse~
 -1 1
 8 39 0 1 -1
 B
-5139 be bdeklmno
+5139 be op
 R
 16 20 1 0
 R
@@ -515,7 +515,7 @@ tomb~
 -1 1
 8 43 0 1 -1
 B
-5146 be bdeklmno
+5146 be op
 R
 16 4 1 0
 R
@@ -528,7 +528,7 @@ shrine~
 -1 1
 8 43 0 1 -1
 B
-5147 be bdeklmno
+5147 be op
 R
 16 4 1 0
 R
@@ -541,7 +541,7 @@ temple~
 -1 1
 8 43 0 1 -1
 B
-5148 be bdeklmno
+5148 be op
 R
 16 12 1 0
 R
@@ -554,7 +554,7 @@ library~
 -1 1
 8 48 0 1 -1
 B
-5149 be bdeklmno
+5149 be op
 R
 16 100 1 0
 R
@@ -567,7 +567,7 @@ hightemple~
 -1 1
 8 48 0 1 -1
 B
-5150 be bdeklmno
+5150 be op
 R
 16 24 1 0
 R
@@ -580,7 +580,7 @@ pyramid~
 -1 1
 8 48 0 1 -1
 B
-5151 e bdeklmno
+5151 e op
 R
 16 100 1 0
 R
@@ -650,7 +650,7 @@ swamphut~
 -1 1
 8 208 0 1 -1
 B
-5157 m bdeklmno
+5157 m mop
 R
 16 20 1 0
 R
@@ -663,7 +663,7 @@ swampmanor~
 -1 1
 8 208 0 1 -1
 B
-5158 m bdeklmno
+5158 m mop
 R
 16 30 1 0
 R
@@ -676,7 +676,7 @@ swampcomplex~
 -1 1
 8 208 0 1 -1
 B
-5159 m bdeklmno
+5159 m mop
 R
 16 40 1 0
 R
@@ -700,7 +700,7 @@ trapperspost~
 -1 1
 8 42 0 1 -1
 B
-5161 del bdeklmno
+5161 del op
 R
 16 18 1 0
 R
@@ -713,7 +713,7 @@ baths~
 -1 1
 8 42 0 1 -1
 B
-5162 be bdeklmno
+5162 be op
 R
 3 4 1 8192
 R
@@ -737,7 +737,7 @@ sorcerytower~
 -1 1
 8 42 m 1 -1
 B
-5164 be bdeklmno
+5164 be op
 R
 16 80 1 0
 R
@@ -752,7 +752,7 @@ portcullis~
 -1 1
 8 42 m 1 -1
 B
-5165 be bdeklmno
+5165 be op
 R
 16 60 1 0
 R
@@ -765,7 +765,7 @@ greathall~
 -1 1
 8 42 m 1 -1
 B
-5166 be bdeklmno
+5166 be op
 R
 16 60 1 0
 R
@@ -778,7 +778,7 @@ guardtower~
 -1 1
 8 44 m 1 -1
 B
-5167 be bdeklmno
+5167 be op
 R
 16 12 1 0
 R
@@ -789,7 +789,7 @@ upgraded guard tower~
 -1 1
 8 47 km 1 -1
 B
-5168 be bdeklmno
+5168 be op
 R
 16 12 1 0
 R
@@ -800,7 +800,7 @@ upgraded guard tower 2~
 -1 1
 8 47 km 1 -1
 B
-5169 be bdeklmno
+5169 be op
 R
 16 24 1 0
 R
@@ -811,7 +811,7 @@ mountainoutpost~
 -1 1
 8 44 0 1 -1
 B
-5170 c bcdeklmno
+5170 c cop
 R
 16 12 1 0
 R
@@ -822,7 +822,7 @@ barracks~
 -1 1
 8 44 0 1 -1
 B
-5171 be bdeklmno
+5171 be op
 R
 16 40 1 0
 R
@@ -835,7 +835,7 @@ trainingyard~
 -1 1
 8 44 0 1 -1
 B
-5172 be bdeklmno
+5172 be op
 R
 16 40 1 0
 R
@@ -848,7 +848,7 @@ gatehouse~
 -1 1
 8 44 0 1 -1
 B
-5173 be bdeklmno
+5173 be op
 R
 16 10 1 0
 R
@@ -881,7 +881,7 @@ rivergate~
 -1 1
 8 141 0 1 -1
 B
-5176 f f
+5176 f ftu
 R
 16 20 1 0
 R
@@ -943,7 +943,7 @@ estuarygarden~
 -1 1
 8 200 0 1 -1
 B
-5180 f i
+5180 t 0
 R
 16 12 1 0
 R
@@ -973,7 +973,7 @@ mint~
 -1 0
 8 134 0 1 -1
 B
-5182 be bdeklmno
+5182 be op
 R
 16 12 1 0
 R
@@ -988,7 +988,7 @@ tradingpost~
 -1 1
 8 217 0 1 -1
 B
-5183 be bdeklmno
+5183 be op
 R
 16 12 1 0
 R
@@ -999,7 +999,7 @@ secretcache~
 -1 1
 8 149 0 1 -1
 B
-5184 be bdeklmno
+5184 be op
 R
 16 20 1 0
 R
@@ -1027,7 +1027,7 @@ househaven~
 -1 1
 8 46 0 1 -1
 B
-5186 b bdeklmno
+5186 b op
 R
 16 8 1 0
 R
@@ -1040,7 +1040,7 @@ burrowhaven~
 -1 1
 8 46 0 1 -1
 B
-5187 d bdeklmno
+5187 d op
 R
 16 12 1 0
 R
@@ -1053,7 +1053,7 @@ pueblohaven~
 -1 1
 8 46 0 1 -1
 B
-5188 e bdeklmno
+5188 e op
 R
 16 4 1 0
 R
@@ -1066,7 +1066,7 @@ cavehaven~
 -1 1
 8 46 0 1 -1
 B
-5189 c bdeklmno
+5189 c op
 R
 16 30 1 0
 R
@@ -1107,7 +1107,7 @@ oilmaker~
 -1 1
 8 39 0 1 -1
 B
-5192 be bdeklmno
+5192 be op
 R
 21 4 1 0
 R
@@ -1122,7 +1122,7 @@ cabinetofcuriosities~
 -1 1
 8 42 0 1 -1
 B
-5193 be bdeklmno
+5193 be op
 R
 16 4 1 0
 R

@@ -1,7 +1,7 @@
 #600
 Enchanted Saplings~
 Some Enchanted Saplings~
-',' 35 1 2 0 0
+',' 35 1 2 0 p
 C
 chant nature~
 D0
@@ -13,7 +13,7 @@ S
 #601
 Clear-Cut Enchanted Forest~
 A Clear-Cut Enchanted Forest~
-'.' 35 1 2 0 0
+'.' 35 1 2 0 p
 C
 dig~
 D1
@@ -99,7 +99,7 @@ S
 #602
 Enchanted Copse~
 An Enchanted Copse~
-'^' 35 1 4 d 0
+'^' 35 1 4 d p
 C
 chop, dig~
 D1
@@ -204,7 +204,7 @@ S
 #603
 Enchanted Woods~
 The Enchanted Woods~
-'^' 35 1 6 d 0
+'^' 35 1 6 d p
 C
 chop, dig~
 D1
@@ -321,7 +321,7 @@ S
 #604
 Enchanted Forest~
 The Enchanted Forest~
-'^' 35 1 8 d 0
+'^' 35 1 8 d p
 C
 chop, dig~
 D1
@@ -592,7 +592,7 @@ S
 #605
 Dead Forest~
 The Dead Forest~
-'^' 36 1 8 d 0
+'^' 36 1 8 d np
 C
 chop, dig~
 D1

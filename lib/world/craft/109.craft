@@ -202,7 +202,7 @@ butchertent~
 -1 1
 8 42 0 1 10923
 B
-10923 bce bdeklmno
+10923 bce op
 R
 21 20 1 0
 R
@@ -215,7 +215,7 @@ dragoncave~
 -1 1
 8 42 0 1 10924
 B
-10924 c bcdeklmno
+10924 c cop
 R
 21 20 1 0
 R
@@ -230,7 +230,7 @@ dragonstatue~
 -1 1
 8 48 0 1 10925
 B
-10925 bce 0
+10925 bce op
 R
 16 24 1 0
 R
@@ -243,7 +243,7 @@ dragonlibrary~
 -1 1
 8 48 0 1 10926
 B
-10926 bce bdeklmno
+10926 bce op
 R
 16 120 1 0
 R

@@ -1,7 +1,7 @@
 #0
 Plains~
 The Open Plains~
-'.' 10 1 2 l b
+'.' 10 1 2 l bp
 C
 dig, pick~
 D1
@@ -179,7 +179,7 @@ S
 #1
 Light Forest~
 A Light Forest~
-'.' 14 1 2 dl n
+'.' 14 1 2 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -333,7 +333,7 @@ S
 #2
 Forest~
 A Forest~
-'^' 14 1 3 dl n
+'^' 14 1 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -461,7 +461,7 @@ S
 #3
 Shady Forest~
 A Shady Forest~
-'^' 14 1 4 dl n
+'^' 14 1 4 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -579,7 +579,7 @@ S
 #4
 Overgrown Forest~
 An Overgrown Forest~
-'^' 14 1 5 dl dn
+'^' 14 1 5 dl dnp
 C
 chop, dig, gather, pick~
 D1
@@ -872,7 +872,7 @@ S
 #7
 Crop~
 A Crop~
-'.' 10 1 3 djk k
+'.' 10 1 3 djk kp
 C
 dig, harvest~
 D1
@@ -976,7 +976,7 @@ S
 #9
 Road~
 On a Road~
-'-' 26 0 1 mr o
+'-' 26 0 1 mr op
 D1
 ----~
 &0~
@@ -1087,7 +1087,7 @@ S
 #12
 Desert Crop~
 A Desert Crop~
-'.' 21 2 3 djk k
+'.' 21 2 3 djk kp
 C
 dig, harvest~
 D1
@@ -1193,7 +1193,7 @@ S
 #13
 Seeded Field~
 A Seeded Field~
-',' 10 1 3 j k
+',' 10 1 3 j kp
 C
 dig~
 D0
@@ -1255,7 +1255,7 @@ S
 #14
 Sandy Field~
 A Sandy Field~
-',' 21 2 3 j k
+',' 21 2 3 j kp
 C
 dig~
 D0
@@ -1358,7 +1358,7 @@ S
 #15
 Jungle Field~
 A Jungle Field~
-',' 12 3 3 j k
+',' 12 3 3 j kp
 C
 gather~
 D0
@@ -1440,7 +1440,7 @@ S
 #16
 Jungle Crop~
 A Jungle Crop~
-'.' 12 3 3 djk k
+'.' 12 3 3 djk kp
 C
 harvest~
 D1
@@ -1576,7 +1576,7 @@ S
 #20
 Desert~
 An Arid Desert~
-'.' 21 2 2 l e
+'.' 21 2 2 l ep
 C
 dig~
 D1
@@ -1700,7 +1700,7 @@ S
 #21
 Oasis~
 A Sparkling Oasis~
-'~' 18 2 6 iw jo
+'~' 18 2 6 iw jop
 C
 dig, drink, fill, gather, pick~
 D1
@@ -1844,7 +1844,7 @@ S
 #26
 Grove~
 A Shady Desert Grove~
-'^' 10 2 6 adl l
+'^' 10 2 6 adl lp
 C
 chop, dig, gather, pick~
 D0
@@ -2286,7 +2286,7 @@ S
 #32
 Lake~
 A Lake~
-'~' 17 0 10 gi a
+'~' 17 0 10 gi au
 D0
 ~~~~~
 &c~
@@ -2422,7 +2422,7 @@ S
 #40
 Plains~
 On the Plains, Above the Riverbank~
-'.' 10 1 1 l b
+'.' 10 1 1 l bps
 C
 dig, pick~
 D1
@@ -2592,7 +2592,7 @@ S
 #41
 Floodplains~
 A Flooded Plain~
-'~' 17 1 8 gi b
+'~' 17 1 8 gi ps
 C
 fish, pick~
 D0
@@ -2624,7 +2624,7 @@ S
 #42
 Flooded Woods~
 Some Flooded Woods~
-'~' 17 1 3 dgi n
+'~' 17 1 3 dgi ps
 C
 chop, fish, pick~
 D0
@@ -2775,7 +2775,7 @@ S
 #43
 Flooded Forest~
 A Flooded Forest~
-'~' 17 1 6 dgi n
+'~' 17 1 6 dgi ps
 C
 chop, fish, pick~
 D0
@@ -2810,7 +2810,7 @@ S
 #44
 Light Forest~
 Some Trees on the Riverbank~
-'.' 14 1 2 dl n
+'.' 14 1 2 dl nps
 C
 chop, dig, gather, pick~
 D1
@@ -2974,7 +2974,7 @@ S
 #45
 Forest~
 A Forest, Above the Riverbank~
-'^' 14 1 3 dl n
+'^' 14 1 3 dl nps
 C
 chop, dig, gather, pick~
 D1
@@ -3134,7 +3134,7 @@ S
 #50
 Shore~
 Along the Shore~
-'.' 10 1 2 l b
+'.' 10 1 2 l bpr
 C
 dig, pick~
 D1
@@ -3297,7 +3297,7 @@ S
 #51
 Beach~
 A Sandy Beach~
-'.' 21 2 2 l e
+'.' 21 2 2 l epr
 C
 dig, pick~
 D1
@@ -3464,7 +3464,7 @@ S
 #53
 Estuary~
 An Estuary~
-'~' 18 0 10 g afi
+'~' 18 0 10 g afit
 D0
 ~~~~~
 &a~
@@ -3497,7 +3497,7 @@ S
 #54
 Light Forest~
 A Tree by the Shore~
-'.' 14 1 2 dl n
+'.' 14 1 2 dl npr
 C
 chop, dig, gather, pick~
 D1
@@ -3764,7 +3764,7 @@ S
 #56
 Shore~
 The Shore of the Estuary~
-'.' 37 1 2 l b
+'.' 37 1 2 l bprs
 C
 dig, pick~
 D1
@@ -3917,7 +3917,7 @@ S
 #57
 Shallow Sea~
 The Shallow Sea, Near the Coast~
-'~' 18 0 10 h ai
+'~' 18 0 10 h aiq
 D0
 ~~~~~
 &a~
@@ -3935,7 +3935,7 @@ S
 #70
 Irrigated Plains~
 An Irrigated Plain~
-'.' 10 1 2 l b
+'.' 10 1 2 l bp
 C
 dig, pick~
 D1
@@ -4063,7 +4063,7 @@ S
 #71
 Irrigated Forest~
 A Marshy Forest~
-'^' 14 1 3 dl n
+'^' 14 1 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -4192,7 +4192,7 @@ S
 #72
 Irrigated Jungle~
 A Marshy Jungle~
-'^' 14 3 3 d n
+'^' 14 3 3 d g
 C
 chop, dig, gather, pick~
 D0

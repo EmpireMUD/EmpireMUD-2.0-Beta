@@ -1,7 +1,7 @@
 #18293
 Field of Imagination~
 The Field of Imagination~
-'.' 6 1 1 0 b
+'.' 6 1 1 0 bp
 C
 dig~
 D0
@@ -27,7 +27,7 @@ S
 #18294
 Dragon Tree~
 Beneath the Great Dragon Tree~
-'^' 4 1 1 d dn
+'^' 4 1 1 d dnp
 C
 chop, dig~
 D0

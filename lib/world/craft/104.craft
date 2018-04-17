@@ -81,7 +81,7 @@ goblinwartent~
 -1 0
 8 289 0 1 10479
 B
-10479 be bdeklmno
+10479 be op
 R
 16 8 1 0
 R
@@ -94,7 +94,7 @@ goblinmessagepost~
 -1 0
 8 289 0 1 10480
 B
-10480 bdel 0
+10480 bdel op
 R
 3200 1 0 0
 S
@@ -103,7 +103,7 @@ goblinlabtent~
 -1 0
 8 289 0 1 10481
 B
-10481 be bdeklmno
+10481 be op
 R
 16 4 1 0
 R
@@ -114,7 +114,7 @@ goblindolmen~
 -1 0
 8 289 0 1 10482
 B
-10482 be bdeklmno
+10482 be op
 R
 3 3 1 8192
 R
