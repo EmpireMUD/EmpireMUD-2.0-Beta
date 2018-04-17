@@ -90,7 +90,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "building", BUILDER },
 	{ "farming", FARMER },
-	{ "replanting", FARMER },
+	{ "replanting", NOTHING },
 	{ "chopping", FELLER },
 	{ "maintenance", REPAIRMAN },
 	{ "mining", MINER },
@@ -718,7 +718,7 @@ void deactivate_workforce_island(empire_data *emp, int island_id) {
 		// see if (it's a workforce mob
 		found = FALSE;
 		for (iter = 0; iter < NUM_CHORES && !found; ++iter) {
-			if (chore_data[iter].mob == GET_MOB_VNUM(mob)) {
+			if (chore_data[iter].mob != NOTHING && chore_data[iter].mob == GET_MOB_VNUM(mob)) {
 				found = TRUE;
 			}
 		}
@@ -749,7 +749,7 @@ void deactivate_workforce_room(empire_data *emp, room_data *room) {
 			// check it's a workforce mob
 			match = FALSE;
 			for (iter = 0; iter < NUM_CHORES && !match; ++iter) {
-				if (GET_MOB_VNUM(mob) == chore_data[iter].mob) {
+				if (chore_data[iter].mob != NOTHING && GET_MOB_VNUM(mob) == chore_data[iter].mob) {
 					match = TRUE;
 				}
 			}
