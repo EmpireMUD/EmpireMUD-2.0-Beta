@@ -2146,7 +2146,6 @@ See also: OLC BUILDINGS
 "CEDIT BUILDFACING" "CEDIT BUILD FACING"
 
 Usage:  .buildfacing [add | remove] <flags>
-        .buildfacing generic
 
 This command sets the rules for the tile a building must face. If the building
 is an "open" building (one that doesn't take players off the map), it doesn't
@@ -2154,25 +2153,27 @@ require a buildfacing at all. However, if an "open" building has a buildfacing,
 the game engine will still require a facing direction when it is built. This
 allows you to require that quarries are built next to mountains, for example.
 
-You can also set ".buildfacing generic", which sets a pre-defined list of
-buildfacing flags that many buildings are allowed to face.
-
 The following flags are available:
- water - any ocean or river tile
- plains - a plains or a road that was built on plains
- mountain - a mountain or mountain path
- full forest - an overgrown forest (^^^^) or other full forest
- desert - a desert or a road that was built on desert
- river - a river tile
- jungle - any jungle tile
- not player made - can't be (e.g.) a river tile made by a player
- ocean - an ocean tile
- oasis - an oasis tile
- crops - any crop or seeded tile
- grove - a desert grove tile
- swamp - a swamp/marsh tile
- any forest - any level of forest tile, from light forest to overgrown
- open building - a building that doesn't block the map
+ &cwater&0 - any ocean or river tile
+ &cplains&0 - a plains or a road that was built on plains
+ &cmountain&0 - a mountain or mountain path
+ &cfull-forest&0 - an overgrown forest (^^^^) or other full forest
+ &cdesert&0 - a desert or a road that was built on desert
+ &criver&0 - a river tile
+ &cjungle&0 - any jungle tile
+ &cnot-player-made&0 - can't be (e.g.) a river tile made by a player
+ &cocean&0 - an ocean tile
+ &coasis&0 - an oasis tile
+ &ccrops&0 - any crop or seeded tile
+ &cgrove&0 - a desert grove tile
+ &cswamp&0 - a swamp/marsh tile
+ &cany-forest&0 - any level of forest tile, from light forest to overgrown
+ &copen-building&0 - a building that doesn't block the map
+ &cbasic-facing&0 - for buildings that can face any clear tile
+ &cshallow-sea&0 - the area around islands
+ &ccoast&0 - the land on the ocean coastline
+ &criverbank&0 - the land on the edge of rivers
+ &cestuary&0 - where the river meets the sea
 
 See also: OLC CRAFTS
 #d
@@ -2193,21 +2194,26 @@ This sets the types of terrain that a building craft may be built upon. You
 must set at least one flag.
 
 The following flags are available:
- water - any ocean or river tile
- plains - a plains or a road that was built on plains
- mountain - a mountain or mountain path
- full forest - an overgrown forest (^^^^) or other full forest
- desert - a desert or a road that was built on desert
- river - a river tile
- jungle - any jungle tile
- not player made - can't be (e.g.) a river tile made by a player
- ocean - an ocean tile
- oasis - an oasis tile
- crops - *** do not use for buildon
- grove - a desert grove tile
- swamp - a swamp/marsh tile
- any forest - *** do not use for buildon
- open building - *** do not use for buildon
+ &cwater&0 - any ocean or river tile
+ &cplains&0 - a plains or a road that was built on plains
+ &cmountain&0 - a mountain or mountain path
+ &cfull-forest&0 - an overgrown forest (^^^^) or other full forest
+ &cdesert&0 - a desert or a road that was built on desert
+ &criver&0 - a river tile
+ &cjungle&0 - any jungle tile
+ &cnot-player-made&0 - can't be (e.g.) a river tile made by a player
+ &cocean&0 - an ocean tile
+ &coasis&0 - an oasis tile
+ &ccrops&0 - *** do not use for buildon
+ &cgrove&0 - a desert grove tile
+ &cswamp&0 - a swamp/marsh tile
+ &cany-forest&0 - *** do not use for buildon
+ &copen-building&0 - *** do not use for buildon
+ &cbasic-facing&0 - *** do not use for buildon
+ &cshallow-sea&0 - the area around islands
+ &ccoast&0 - the land on the ocean coastline
+ &criverbank&0 - the land on the edge of rivers
+ &cestuary&0 - where the river meets the sea
 
 See also: CEDIT BUILDFACING, OLC CRAFTS
 #d
@@ -6020,21 +6026,26 @@ to build. A building may be built on this sector if at least one flag from its
 'buildon' appears in the sector's 'buildflags'.
 
 Available flags:
- water - any type of water tile
- plains - a flat, temperate sector like plains
- mountain - a rough tile like a mountain
- full forest - a temperate forest of various types
- desert - a flat, arid sector
- river - a fresh-water sector
- jungle - any jungle tile
- not player made - DO NOT SET on .buildflags
- ocean - a salt-water tile
- oasis - an arid water source
- crops - any crop tile, should ONLY be used for 'buildfacing'
- grove - an arid forest tile like a desert grove
- swamp - a swamp-/marsh-type tile
- any forest - a broader category of forests usually used for 'buildfacing'
- open building - does not apply to buildflags -- do not use
+ &cwater&0 - any type of water tile
+ &cplains&0 - a flat, temperate sector like plains
+ &cmountain&0 - a rough tile like a mountain
+ &cfull-forest&0 - a temperate forest of various types
+ &cdesert&0 - a flat, arid sector
+ &criver&0 - a fresh-water sector
+ &cjungle&0 - any jungle tile
+ &cnot-player-made&0 - DO NOT SET on .buildflags
+ &cocean&0 - a salt-water tile
+ &coasis&0 - an arid water source
+ &ccrops&0 - any crop tile, should ONLY be used for 'buildfacing'
+ &cgrove&0 - an arid forest tile like a desert grove
+ &cswamp&0 - a swamp-/marsh-type tile
+ &cany-forest&0 - a broader category of forests usually used for 'buildfacing'
+ &copen-building&0 - does not apply to buildflags -- do not use
+ &cbasic-facing&0 - for buildings that can face any clear tile
+ &cshallow-sea&0 - the area around islands
+ &ccoast&0 - the land on the ocean coastline
+ &criverbank&0 - the land on the edge of rivers
+ &cestuary&0 - where the river meets the sea
 
 Note: When adding these flags to adventure linking rules, they all have to
 be added in one line, so you can't type multiple words. Try abbreviating them

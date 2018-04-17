@@ -86,7 +86,7 @@ void special_building_setup(char_data *ch, room_data *room) {
 
 /**
 * @param room_data *room The map location to check
-* @param bitvector_t flags BLD_ON_x
+* @param bitvector_t flags BLD_ON_
 * @return TRUE if valid, FALSE if not
 */
 bool can_build_on(room_data *room, bitvector_t flags) {

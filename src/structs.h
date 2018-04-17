@@ -686,7 +686,7 @@ typedef struct vehicle_data vehicle_data;
 // #define BLD_UNUSED26  BIT(47)
 
 
-// Terrain flags for do_build -- these match up with build_on flags for building crafts
+// BLD_ON_x: Terrain flags for do_build -- these match up with build_on flags for building crafts
 #define BLD_ON_WATER  BIT(0)
 #define BLD_ON_PLAINS  BIT(1)
 #define BLD_ON_MOUNTAIN  BIT(2)
@@ -702,6 +702,11 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_SWAMP  BIT(12)
 #define BLD_ANY_FOREST  BIT(13)
 #define BLD_FACING_OPEN_BUILDING  BIT(14)
+#define BLD_ON_BASIC_FACING  BIT(15)
+#define BLD_ON_SHALLOW_SEA  BIT(16)
+#define BLD_ON_COAST  BIT(17)
+#define BLD_ON_RIVERBANK  BIT(18)
+#define BLD_ON_ESTUARY  BIT(19)
 
 
 // BLD_REL_x: relationships with other buildings
@@ -3956,8 +3961,8 @@ struct craft_data {
 	
 	// for buildings:
 	any_vnum build_type;	// a building vnum (maybe something else too?)
-	bitvector_t build_on;	// BLD_ON_x flags for the tile it's built upon
-	bitvector_t build_facing;	// BLD_ON_x flags for the tile it's facing
+	bitvector_t build_on;	// BLD_ON_ flags for the tile it's built upon
+	bitvector_t build_facing;	// BLD_ON_ flags for the tile it's facing
 	
 	obj_vnum requires_obj;	// only shows up if you have the item
 	struct resource_data *resources;	// linked list

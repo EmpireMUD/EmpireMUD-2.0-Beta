@@ -542,16 +542,6 @@ OLC_MODULE(cedit_buildfacing) {
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
 		msg_to_char(ch, "You can only set that property on a building.\r\n");
 	}
-	else if (!str_cmp(argument, "generic")) {
-		GET_CRAFT_BUILD_FACING(craft) = config_get_bitvector("generic_facing");
-		
-		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			send_config_msg(ch, "ok_string");
-		}
-		else {
-			msg_to_char(ch, "This recipe has been set to use generic facing.\r\n");
-		}
-	}
 	else {
 		GET_CRAFT_BUILD_FACING(craft) = olc_process_flag(ch, argument, "build-facing", "buildfacing", bld_on_flags, GET_CRAFT_BUILD_FACING(craft));
 	}
