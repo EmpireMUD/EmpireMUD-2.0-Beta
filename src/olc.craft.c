@@ -185,7 +185,7 @@ char *list_one_craft(craft_data *craft, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
