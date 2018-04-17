@@ -250,6 +250,77 @@ void change_terrain(room_data *room, sector_vnum sect) {
 
 
 /**
+* Ensures a room or map tile has an island id/pointer -- to be called after the
+* terrain is changed for any reason. This will add/remove the points and will
+* update the island's tile count.
+*
+* @param room_data *room The map room data. (must provide room OR map)
+* @param struct map_data *map The map tile data. (must provide room OR map)
+*/
+void check_island_assignment(room_data *room, struct map_data *map) {
+	void number_and_count_islands(bool reset);
+	
+	struct island_info **island;
+	struct map_data *to_map;
+	int x, y, new_x, new_y;
+	sector_data *sect;
+	int iter, *id;
+	
+	if (!room && !map) {
+		return;
+	}
+	if (room && GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		return;
+	}
+	
+	sect = room ? SECT(room) : map->sector_type;
+	island = room ? &GET_ISLAND(room) : &map->shared->island_ptr;
+	id = room ? &GET_ISLAND_ID(room) : &map->shared->island_id;
+	x = room ? X_COORD(room) : MAP_X_COORD(map->vnum);
+	y = room ? Y_COORD(room) : MAP_Y_COORD(map->vnum);
+	
+	// room is NOT on an island
+	if (SECT_FLAGGED(sect, SECTF_NON_ISLAND)) {
+		if (*island != NULL) {
+			(*island)->tile_size -= 1;
+			*island = NULL;
+		}
+		if (*id != NO_ISLAND) {
+			*id = NO_ISLAND;
+		}
+		return;
+	}
+	
+	// if we already have an island, we're done now
+	if (*island) {
+		return;
+	}
+	
+	// try to detect an island nearby
+	for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
+		if (!get_coord_shift(x, y, shift_dir[iter][0], shift_dir[iter][1], &new_x, &new_y)) {
+			continue;	// no room that way
+		}
+		if (!(to_map = &(world_map[new_x][new_y]))) {
+			continue;	// unable to get map tile in that dir
+		}
+		if (!to_map->shared->island_ptr) {
+			continue;	// no island to copy
+		}
+		
+		// found one!
+		*id = to_map->shared->island_id;
+		*island = to_map->shared->island_ptr;
+		(*island)->tile_size += 1;
+		return;	// done
+	}
+	
+	// if we get this far, it was not able to detect an island -- make a new one
+	number_and_count_islands(FALSE);
+}
+
+
+/**
 * Adds an exit to a world room, and optionally adds the return exit.
 *
 * @param room_data *from The room to link from.
@@ -1908,6 +1979,9 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 			}
 		}
 	}
+	
+	// make sure its island status is correct
+	check_island_assignment(loc, map);
 }
 
 
