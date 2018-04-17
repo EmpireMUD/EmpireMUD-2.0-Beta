@@ -109,7 +109,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "tanning", TANNER },
 	{ "shearing", SHEARER },
 	{ "minting", COIN_MAKER },
-	{ "dismantle-mines", BUILDER },
+	{ "dismantle-mines", MINE_SUPERVISOR },
 	{ "abandon-chopped", NOTHING },
 	{ "abandon-farmed", NOTHING },
 	{ "nexus-crystals", APPRENTICE_EXARCH },
