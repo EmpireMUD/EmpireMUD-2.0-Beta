@@ -3184,6 +3184,7 @@ void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
 	bld_data *bld = GET_BUILDING(room);
 	int dir = BUILDING_ENTRANCE(room);
+	vehicle_data *veh, *next_veh;
 	char buf[MAX_STRING_LENGTH];
 	room_data *to_room;
 	bld_vnum type;
@@ -3194,6 +3195,13 @@ void ruin_one_building(room_data *room) {
 	
 	if (ROOM_PEOPLE(room)) {
 		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
+	
+	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
+			extract_vehicle(veh);
+		}
 	}
 	
 	// create ruins building
