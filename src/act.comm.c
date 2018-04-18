@@ -1007,7 +1007,7 @@ ACMD(do_slash_channel) {
 			HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
 			if (psh) {
 				LL_FOREACH(psh->history, hist) {
-					msg_to_char(ch, "%3s: %s%s", simple_time_since(hist->timestamp), hist->message, (hist->message[strlen(hist->message) - 1] != '\n') ? "\r\n" : "");
+					msg_to_char(ch, "%3s:%s%s", simple_time_since(hist->timestamp), hist->message, (hist->message[strlen(hist->message) - 1] != '\n') ? "\r\n" : "");
 				}
 			}
 		}
@@ -1167,7 +1167,7 @@ ACMD(do_history) {
 			}
 			
 			// send message
-			msg_to_char(ch, "%3s: %s\tn%s", simple_time_since(chd_iter->timestamp), chd_iter->message, (found_crlf ? "" : "\r\n"));
+			msg_to_char(ch, "%3s:%s\tn%s", simple_time_since(chd_iter->timestamp), chd_iter->message, (found_crlf ? "" : "\r\n"));
 		}
 	}
 }
