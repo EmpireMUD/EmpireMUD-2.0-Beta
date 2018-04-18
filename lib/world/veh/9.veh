@@ -67,7 +67,7 @@ There is a wooden chair here.~
 You can sit on the chair.
 ~
 ~
-fghln 19 1 0 0
+fghlnv 19 1 0 0
 S
 #905
 bench wooden~
@@ -76,7 +76,7 @@ There is a wooden bench here.~
 You can sit on the bench.
 ~
 ~
-fhln 19 1 0 0
+fhlnv 19 1 0 0
 S
 #906
 table long~
@@ -85,7 +85,7 @@ There is a long table here.~
 Tables are merely for decoration.
 ~
 ~
-hln 19 1 0 0
+hlnv 19 1 0 0
 S
 #907
 stool wooden~
@@ -94,7 +94,7 @@ There is a wooden stool here.~
 You can sit on the stool.
 ~
 ~
-fhln 19 1 0 0
+fhlnv 19 1 0 0
 S
 #917
 throne~
@@ -103,7 +103,7 @@ There is a throne at the head of the room.~
 You can sit on the throne.
 ~
 ~
-fhln 19 1 0 0
+fhlnv 19 1 0 0
 S
 #920
 canoe wooden~
