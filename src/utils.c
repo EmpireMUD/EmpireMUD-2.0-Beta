@@ -1353,7 +1353,7 @@ bool has_tech_available_room(room_data *room, int tech) {
 * @return int The total claimable land.
 */
 int land_can_claim(empire_data *emp, int ter_type) {
-	int from_wealth, total = 0;
+	int from_wealth, out_t, total = 0;
 	
 	if (emp) {
 		total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
@@ -1377,7 +1377,16 @@ int land_can_claim(empire_data *emp, int ter_type) {
 			break;
 		}
 		case TER_FRONTIER: {
+			// frontier total will shrink if outskirts total is over
+			out_t = total * config_get_double("land_outside_city_modifier");
+			
 			total *= config_get_double("land_frontier_modifier");
+			
+			if (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > out_t) {
+				total -= (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - out_t);
+				total = MAX(0, total);
+			}
+			
 			break;
 		}
 		// default: no changes

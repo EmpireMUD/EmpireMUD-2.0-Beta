@@ -1079,7 +1079,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	}
 	
 	// see which is over
-	outskirts_over = EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > land_can_claim(emp, TER_OUTSKIRTS);
+	outskirts_over = EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > OUTSKIRTS_CLAIMS_AVAILABLE(emp);
 	frontier_over = EMPIRE_TERRITORY(emp, TER_FRONTIER) > land_can_claim(emp, TER_FRONTIER);
 	total_over = EMPIRE_TERRITORY(emp, TER_TOTAL) > land_can_claim(emp, TER_TOTAL);
 	if (!outskirts_over && !frontier_over && !total_over) {
@@ -1151,7 +1151,7 @@ void reduce_outside_territory(void) {
 			continue;	// ignore imms
 		}
 		
-		if (EMPIRE_TERRITORY(iter, TER_OUTSKIRTS) > land_can_claim(iter, TER_OUTSKIRTS) || EMPIRE_TERRITORY(iter, TER_FRONTIER) > land_can_claim(iter, TER_FRONTIER)) {
+		if (EMPIRE_TERRITORY(iter, TER_OUTSKIRTS) > OUTSKIRTS_CLAIMS_AVAILABLE(iter) || EMPIRE_TERRITORY(iter, TER_FRONTIER) > land_can_claim(iter, TER_FRONTIER)) {
 			reduce_outside_territory_one(iter);
 		}
 	}

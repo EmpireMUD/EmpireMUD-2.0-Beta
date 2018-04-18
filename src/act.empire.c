@@ -3139,10 +3139,10 @@ ACMD(do_cede) {
 	else if (EMPIRE_TERRITORY(f, TER_TOTAL) >= land_can_claim(f, TER_TOTAL)) {
 		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", REAL_HMHR(targ), REAL_HSHR(targ));
 	}
-	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(f, TER_OUTSKIRTS)  >= land_can_claim(f, TER_OUTSKIRTS)) {
+	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(f, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(f)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory on the outskirts of cities.\r\n");
 	}
-	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(f, TER_FRONTIER)  >= land_can_claim(f, TER_FRONTIER)) {
+	else if (get_territory_type_for_empire(room, f, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(f, TER_FRONTIER) >= land_can_claim(f, TER_FRONTIER)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory on the frontier.\r\n");
 	}
 	else if (EMPIRE_ADMIN_FLAGGED(f, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, f, FALSE, &junk) != TER_CITY) {
@@ -3248,7 +3248,7 @@ void do_claim_room(char_data *ch, room_data *room) {
 	else if (!can_build_or_claim_at_war(ch, room)) {
 		msg_to_char(ch, "You can't claim while at war with the empire that controls this area.\r\n");
 	}
-	else if (get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= land_can_claim(emp, TER_OUTSKIRTS)) {
+	else if (get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(emp)) {
 		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the outskirts of cities.\r\n", (int)(100 * config_get_double("land_outside_city_modifier")));
 	}
 	else if (get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(emp, TER_FRONTIER) >= land_can_claim(emp, TER_FRONTIER)) {
