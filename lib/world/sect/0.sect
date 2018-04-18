@@ -946,6 +946,8 @@ D4
 /\/\~
 &y~
 E
+2 32 10.00 58
+E
 2 57 10.00 52
 I 5 104 8.00 1 X  # DIG: a red bloodstone
 I 5 102 9.00 1 X  # DIG: a flint stone
@@ -3931,6 +3933,150 @@ I 21 1303 25.00 1 f  # FISH: a magenta arrowfish
 I 21 1301 100.00 1 f  # FISH: a striped barbfish
 M
 9171 1.00 d
+S
+#58
+Foothills~
+In the Foothills, By a Lake~
+'.' 10 1 4 l bp
+C
+dig, pick~
+D1
+....~
+&g~
+D2
+....~
+&g~
+D3
+....~
+&g~
+D4
+....~
+&0~
+E
+8 0 100.00 13
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+M
+237 5.00 ce
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+240 6.00 bc
+M
+9153 10.00 bc
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+246 0.30 ad
+M
+247 0.10 d
+M
+248 1.00 bd
+M
+250 0.10 ad
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9200 5.00 d
 S
 #70
 Irrigated Plains~
