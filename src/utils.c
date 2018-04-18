@@ -5066,35 +5066,50 @@ char *shared_by(obj_data *obj, char_data *ch) {
 
 /**
 * Simple, short display for number of days/hours/minutes/seconds since an
-* event. It only shows the largest of those groups, so something 26 hours ago
-* is '1d' and something 100 seconds ago is '2m'.
+* event. It only shows the largest 2 of those groups, so something 26 hours ago
+* is '1d2h' and something 100 seconds ago is '1m40s'.
 *
 * @param time_t when The timestamp.
 * @return char* The short string.
 */
 char *simple_time_since(time_t when) {
 	static char output[80];
-	double calc, diff;
+	int diff, parts;
 	
+	parts = 0;
 	diff = time(0) - when;
-	if ((calc = diff / SECS_PER_REAL_YEAR) > 1.0) {
-		sprintf(output, "%dy", (int) round(calc));
+	*output = '\0';
+	
+	if (diff > SECS_PER_REAL_YEAR && parts < 2) {
+		sprintf(output + strlen(output), "%*dy", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_YEAR));
+		diff %= SECS_PER_REAL_YEAR;
+		++parts;
 	}
-	else if ((calc = diff / SECS_PER_REAL_WEEK) > 1.0) {
-		sprintf(output, "%dw", (int) round(calc));
+	if (diff > SECS_PER_REAL_WEEK && parts < 2) {
+		sprintf(output + strlen(output), "%*dw", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_WEEK));
+		diff %= SECS_PER_REAL_WEEK;
+		++parts;
 	}
-	else if ((calc = diff / SECS_PER_REAL_DAY) > 1.0) {
-		sprintf(output, "%dd", (int) round(calc));
+	if (diff > SECS_PER_REAL_DAY && parts < 2) {
+		sprintf(output + strlen(output), "%*dd", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_DAY));
+		diff %= SECS_PER_REAL_DAY;
+		++parts;
 	}
-	else if ((calc = diff / SECS_PER_REAL_HOUR) > 1.0) {
-		sprintf(output, "%dh", (int) round(calc));
+	if (diff > SECS_PER_REAL_HOUR && parts < 2) {
+		sprintf(output + strlen(output), "%*dh", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_HOUR));
+		diff %= SECS_PER_REAL_HOUR;
+		++parts;
 	}
-	else if ((calc = diff / SECS_PER_REAL_MIN) > 1.0) {
-		sprintf(output, "%dm", (int) round(calc));
+	if (diff > SECS_PER_REAL_MIN && parts < 2) {
+		sprintf(output + strlen(output), "%*dm", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_MIN));
+		diff %= SECS_PER_REAL_MIN;
+		++parts;
 	}
-	else {
-		sprintf(output, "%ds", (int) diff);
+	if (diff > 0 && parts < 2) {
+		sprintf(output + strlen(output), "%*ds", parts ? 1 : 2, diff);
+		++parts;
 	}
+	
 	return output;
 }
 
