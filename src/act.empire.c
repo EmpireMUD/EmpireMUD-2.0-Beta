@@ -4072,7 +4072,7 @@ ACMD(do_empires) {
 		if (!more && !EMPIRE_HAS_TECH(emp, TECH_PROMINENCE)) {
 			continue;
 		}
-		if (!all && EMPIRE_TERRITORY(emp, TER_TOTAL) <= 0) {
+		if (!all && EMPIRE_TERRITORY(emp, TER_TOTAL) <= 0 && !EMPIRE_HAS_TECH(emp, TECH_PROMINENCE)) {
 			continue;
 		}
 		if (!all && EMPIRE_IS_TIMED_OUT(emp)) {
