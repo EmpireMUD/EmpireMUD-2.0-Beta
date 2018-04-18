@@ -1012,7 +1012,7 @@ ACMD(do_slash_channel) {
 			}
 		}
 	}
-	else if (!str_cmp(arg, "echo") && IS_IMMORTAL(ch)) {
+	else if (!str_cmp(arg, "echo") && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_GECHO))) {
 		strcpy(buf, arg2);
 		half_chop(buf, arg2, arg3);
 		skip_slash(arg2);
@@ -1032,7 +1032,7 @@ ACMD(do_slash_channel) {
 			speak_on_slash_channel(ch, chan, arg3, TRUE);
 		}
 	}
-	else if (!str_cmp(arg, "recase") && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_GECHO))) {
+	else if (!str_cmp(arg, "recase") && IS_IMMORTAL(ch)) {
 		strcpy(buf, arg2);
 		half_chop(buf, arg2, arg3);
 		skip_slash(arg2);
