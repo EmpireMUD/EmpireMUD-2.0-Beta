@@ -1354,6 +1354,8 @@ bool has_tech_available_room(room_data *room, int tech) {
 */
 int land_can_claim(empire_data *emp, int ter_type) {
 	int from_wealth, out_t = 0, fron_t = 0, total = 0, min_cap = 0;
+	double outskirts_mod = config_get_double("land_outside_city_modifier");
+	double frontier_mod = config_get_double("land_frontier_modifier");
 	
 	if (!emp) {
 		return 0;
@@ -1386,9 +1388,9 @@ int land_can_claim(empire_data *emp, int ter_type) {
 		return total;	// shortcut -- no further work
 	}
 	
-	out_t = total * config_get_double("land_outside_city_modifier");
+	out_t = total * (outskirts_mod + frontier_mod);
 	out_t = MAX(out_t, min_cap);
-	fron_t = total * config_get_double("land_frontier_modifier");
+	fron_t = total * frontier_mod;
 	fron_t = MAX(fron_t, min_cap);
 	
 	// check cascading categories
@@ -1400,8 +1402,8 @@ int land_can_claim(empire_data *emp, int ter_type) {
 		fron_t -= (EMPIRE_TERRITORY(emp, TER_CITY) + EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - (total - fron_t));
 		fron_t = MAX(0, fron_t);
 	}
-	if (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > out_t) {
-		fron_t -= (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - out_t);
+	if (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > out_t - fron_t) {
+		fron_t -= (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - (out_t - fron_t));
 		fron_t = MAX(0, fron_t);
 	}
 	
