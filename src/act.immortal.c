@@ -1190,6 +1190,7 @@ struct set_struct {
 		{ "drunk",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "hunger",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "thirst",		LVL_START_IMM, 	BOTH, 	MISC },
+		{ "account",	LVL_START_IMM,	PC,		MISC },
 		{ "access",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
@@ -1208,7 +1209,6 @@ struct set_struct {
 		{ "multi-char",	LVL_START_IMM,	PC,		BINARY },	// deliberately after multi-ip, which is more common
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
 		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
-		{ "account",	LVL_START_IMM,	PC,		MISC },
 		{ "bonustrait",	LVL_START_IMM,	PC,		MISC },
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
