@@ -568,7 +568,7 @@ void score_empires(void) {
 		EMPIRE_SORT_VALUE(emp) = 0;
 	}
 	
-	#define SCORE_SKIP_EMPIRE(ee)  (EMPIRE_IMM_ONLY(ee) || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
+	#define SCORE_SKIP_EMPIRE(ee)  (EMPIRE_IMM_ONLY(ee) || EMPIRE_MEMBERS(ee) == 0 || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
 
 	// build data
 	HASH_ITER(hh, empire_table, emp, next_emp) {
