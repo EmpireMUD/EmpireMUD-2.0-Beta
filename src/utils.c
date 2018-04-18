@@ -1353,7 +1353,7 @@ bool has_tech_available_room(room_data *room, int tech) {
 * @return int The total claimable land.
 */
 int land_can_claim(empire_data *emp, int ter_type) {
-	int from_wealth, out_t = 0, fron_t = 0, total = 0, min_cap = 0;
+	int cur, from_wealth, out_t = 0, fron_t = 0, total = 0, min_cap = 0;
 	double outskirts_mod = config_get_double("land_outside_city_modifier");
 	double frontier_mod = config_get_double("land_frontier_modifier");
 	
@@ -1409,6 +1409,10 @@ int land_can_claim(empire_data *emp, int ter_type) {
 	
 	switch (ter_type) {
 		case TER_OUTSKIRTS: {
+			// subtract out currently-used frontier, as that territory is shared with outskirts
+			cur = MIN(fron_t, EMPIRE_TERRITORY(emp, TER_FRONTIER));
+			out_t -= cur;
+			
 			return out_t;
 		}
 		case TER_FRONTIER: {
