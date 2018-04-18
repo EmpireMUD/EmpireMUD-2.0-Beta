@@ -1353,52 +1353,70 @@ bool has_tech_available_room(room_data *room, int tech) {
 * @return int The total claimable land.
 */
 int land_can_claim(empire_data *emp, int ter_type) {
-	int from_wealth, out_t, total = 0;
+	int from_wealth, out_t = 0, fron_t = 0, total = 0, min_cap = 0;
 	
-	if (emp) {
-		total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
-		total += count_tech(emp) * config_get_int("land_per_tech");
+	if (!emp) {
+		return 0;
+	}
+	
+	
+	// so long as there's at least 1 active member, they get the min cap
+	if (EMPIRE_MEMBERS(emp) > 0) {
+		min_cap = config_get_int("land_min_cap");
+	}
+	
+	// basics
+	total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
+	total += count_tech(emp) * config_get_int("land_per_tech");
+	
+	if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
+		// diminishes by an amount equal to non-wealth territory
+		from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
 		
-		if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-			// diminishes by an amount equal to non-wealth territory
-			from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
-			
-			// limited to 3x non-wealth territory
-			from_wealth = MIN(from_wealth, total * 3);
-			
-			// for a total of 4x
-			total += from_wealth;
-		}
+		// limited to 3x non-wealth territory
+		from_wealth = MIN(from_wealth, total * 3);
+		
+		// for a total of 4x
+		total += from_wealth;
+	}
+	
+	// determine specific caps and apply minimum
+	total = MAX(total, min_cap);
+	if (ter_type == TER_TOTAL) {
+		return total;	// shortcut -- no further work
+	}
+	
+	out_t = total * config_get_double("land_outside_city_modifier");
+	out_t = MAX(out_t, min_cap);
+	fron_t = total * config_get_double("land_frontier_modifier");
+	fron_t = MAX(out_t, min_cap);
+	
+	// check cascading categories
+	if (EMPIRE_TERRITORY(emp, TER_CITY) > (total - out_t)) {
+		out_t -= (EMPIRE_TERRITORY(emp, TER_CITY) - (total - out_t));
+		out_t = MAX(0, out_t);
+	}
+	if (EMPIRE_TERRITORY(emp, TER_CITY) + EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > (total - fron_t)) {
+		fron_t -= (EMPIRE_TERRITORY(emp, TER_CITY) + EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - (total - fron_t));
+		fron_t = MAX(0, fron_t);
+	}
+	if (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > out_t) {
+		fron_t -= (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - out_t);
+		fron_t = MAX(0, fron_t);
 	}
 	
 	switch (ter_type) {
 		case TER_OUTSKIRTS: {
-			total *= config_get_double("land_outside_city_modifier");
-			break;
+			return out_t;
 		}
 		case TER_FRONTIER: {
-			// frontier total will shrink if outskirts total is over
-			out_t = total * config_get_double("land_outside_city_modifier");
-			
-			total *= config_get_double("land_frontier_modifier");
-			
-			if (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > out_t) {
-				total -= (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - out_t);
-				total = MAX(0, total);
-			}
-			
-			break;
+			return fron_t;
 		}
 		// default: no changes
+		default: {
+			return total;
+		}
 	}
-	
-	// so long as there's at least 1 active member, they get the min cap
-	if (EMPIRE_MEMBERS(emp) > 0) {
-		int min_claim_cap = config_get_int("land_min_cap");
-		total = MAX(min_claim_cap, total);
-	}
-	
-	return total;
 }
 
 
