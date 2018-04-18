@@ -1384,7 +1384,7 @@ int land_can_claim(empire_data *emp, int ter_type) {
 	
 	// determine specific caps and apply minimum
 	total = MAX(total, min_cap);
-	if (ter_type == TER_TOTAL) {
+	if (ter_type == TER_TOTAL || ter_type == TER_CITY) {
 		return total;	// shortcut -- no further work
 	}
 	
