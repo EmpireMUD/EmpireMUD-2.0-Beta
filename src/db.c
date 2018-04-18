@@ -282,6 +282,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 */
 void boot_db(void) {
 	void Read_Invalid_List();
+	void abandon_lost_vehicles();
 	void boot_world();
 	void build_all_quest_lookups();
 	void build_all_shop_lookups();
@@ -408,7 +409,7 @@ void boot_db(void) {
 	log("Running reboot triggers.");
 	run_reboot_triggers();
 	
-	log(" Calculating territory and members.");
+	log(" Calculating empire data.");
 	reread_empire_tech(NULL);
 	check_for_new_map();
 	setup_island_levels();
@@ -417,6 +418,9 @@ void boot_db(void) {
 	
 	log(" Checking for ruined cities...");
 	check_ruined_cities();
+	
+	log(" Abandoning lost vehicles...");
+	abandon_lost_vehicles();
 	
 	log("Managing world memory.");
 	schedule_map_unloads();
