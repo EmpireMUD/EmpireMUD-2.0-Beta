@@ -926,14 +926,19 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 void check_ruined_cities(void) {
 	struct empire_city_data *city, *next_city;
 	empire_data *emp, *next_emp;
+	bool any = FALSE;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!EMPIRE_IMM_ONLY(emp)) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
 				next_city = city->next;
-				check_one_city_for_ruin(emp, city);
+				any |= check_one_city_for_ruin(emp, city);
 			}
 		}
+	}
+	
+	if (any) {
+		read_empire_territory(NULL, FALSE);
 	}
 }
 
