@@ -1286,16 +1286,22 @@ territory is:
       only count once per empire, so two members with City Lights will not
       result in +30 territory.
 
-Most territory must be location within an empire's cities. 35% of the territory
-can be on the outskirts of cities (up to 4x city radius) and only 5% can be
-on the frontier (beyond the outskirts). Both outskirts and frontier territory
-allow a minimum of 15 tiles, even if this is below 35%/5%. Roads and some
-buildings, such as Mines, count as in-city territory even in the outskirts.
+Most territory must be location within an empire's cities. 40% of your total
+territory can be on the outskirts of cities (up to 4x city radius), and 5% of
+that can be on frontier (beyond the outskirts) -- if you claim more than 35% of
+your territory in the outskirts, less than 5% will be available for frontier
+claims. The 'estats' command shows how much territory of each type you can
+currently claim (note: claiming more than 60% of your total in-city will cause
+your outskirts to show a lower cap because that's all the land that is
+available).
+
+Roads and some buildings, such as Mines, count as in-city territory even in the
+outskirts.
 
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
-See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND
+See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 
