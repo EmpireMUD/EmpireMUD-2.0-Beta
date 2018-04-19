@@ -887,30 +887,46 @@ void do_instance_delete(char_data *ch, char *argument) {
 
 void do_instance_delete_all(char_data *ch, char *argument) {
 	struct instance_data *inst, *next_inst;
+	descriptor_data *desc;
 	adv_vnum vnum;
 	adv_data *adv;
 	int count = 0;
+	bool all;
 	
-	if (!*argument || !isdigit(*argument) || (vnum = atoi(argument)) < 0 || !(adv = adventure_proto(vnum))) {
-		msg_to_char(ch, "Invalid adventure vnum '%s'.\r\n", *argument ? argument : "<blank>");
+	if (!*argument) {
+		msg_to_char(ch, "Usage: instance deleteall <adventure vnum | all>\r\n");
 		return;
+	}
+	
+	all = !str_cmp(argument, "all");
+	if (!all && (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || !(adv = adventure_proto(vnum)))) {
+		msg_to_char(ch, "Invalid adventure vnum '%s'.\r\n", argument);
+		return;
+	}
+	
+	// warn players of lag on 'all'
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) == CON_PLAYING && desc->character) {
+			write_to_descriptor(desc->descriptor, "The game is performing a brief update... this will take a moment.\r\n");
+			desc->has_prompt = FALSE;
+		}
 	}
 	
 	for (inst = instance_list; inst; inst = next_inst) {
 		next_inst = inst->next;
 		
-		if (inst->adventure == adv) {
+		if (all || inst->adventure == adv) {
 			++count;
 			delete_instance(inst, TRUE);
 		}
 	}
 	
 	if (count > 0) {
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instance%s of %s", GET_REAL_NAME(ch), count, PLURAL(count), GET_ADV_NAME(adv));
-		msg_to_char(ch, "%d instance%s of '%s' deleted.\r\n", count, PLURAL(count), GET_ADV_NAME(adv));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instance%s of %s", GET_REAL_NAME(ch), count, PLURAL(count), all ? "adventures" : GET_ADV_NAME(adv));
+		msg_to_char(ch, "%d instance%s of '%s' deleted.\r\n", count, PLURAL(count), all ? "adventures" : GET_ADV_NAME(adv));
 	}
 	else {
-		msg_to_char(ch, "No instances of '%s' found.\r\n", GET_ADV_NAME(adv));
+		msg_to_char(ch, "No instances of %s found.\r\n", all ? "any adventures" : GET_ADV_NAME(adv));
 	}
 }
 
