@@ -502,7 +502,7 @@ and, optionally, provide a distance. The instance command is grantable.
 The 'delete' command deletes by number in the list.
 
 The 'deleteall' command removes all instances for a given adventure zone
-(by vnum).
+(by vnum). You can delete ALL instances in the game with 'inst deleteall all'.
 
 The 'reset' command will force a zone reset on the instance you're in or the
 instance number you target.
