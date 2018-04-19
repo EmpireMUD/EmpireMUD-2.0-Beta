@@ -1286,11 +1286,10 @@ territory is:
       only count once per empire, so two members with City Lights will not
       result in +30 territory.
 
-Most territory must be location within an empire's cities. 40% of your total
-territory can be on the outskirts of cities (up to 4x city radius), and 5% of
-that can be on frontier (beyond the outskirts) -- if you claim more than 35% of
-your territory in the outskirts, less than 5% will be available for frontier
-claims. The 'estats' command shows how much territory of each type you can
+Most territory must be location within an empire's cities. 35% of your total
+territory can be on the outskirts of cities (up to 4x city radius), and another
+5% of the territory can be either outskirts or on the frontier (beyond the
+outskirts). The 'estats' command shows how much territory of each type you can
 currently claim (note: claiming more than 60% of your total in-city will cause
 your outskirts to show a lower cap because that's all the land that is
 available).
