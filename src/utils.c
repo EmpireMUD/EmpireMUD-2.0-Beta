@@ -1017,7 +1017,7 @@ void expire_old_politics(void) {
 		}
 		
 		LL_FOREACH_SAFE(EMPIRE_DIPLOMACY(emp), pol, next_pol) {
-			if ((other = real_empire(pol->id))) {
+			if ((other = real_empire(pol->id)) && other != emp) {
 				if (pol->type != NOBITS) {
 					log_to_empire(emp, ELOG_DIPLOMACY, "Diplomatic relations with %s have ended because your empire is in ruins", EMPIRE_NAME(other));
 					log_to_empire(other, ELOG_DIPLOMACY, "Diplomatic relations with %s have ended because that empire is in ruins", EMPIRE_NAME(emp));
