@@ -889,7 +889,7 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 	struct instance_data *inst, *next_inst;
 	descriptor_data *desc;
 	adv_vnum vnum;
-	adv_data *adv;
+	adv_data *adv = NULL;
 	int count = 0;
 	bool all;
 	
