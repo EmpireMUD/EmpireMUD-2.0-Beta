@@ -292,6 +292,7 @@ void boot_db(void) {
 	void check_version();
 	void delete_old_players();
 	void delete_orphaned_rooms();
+	void expire_old_politics();
 	void generate_island_descriptions();
 	void init_config_system();
 	void link_and_check_vehicles();
@@ -413,6 +414,7 @@ void boot_db(void) {
 	reread_empire_tech(NULL);
 	check_for_new_map();
 	setup_island_levels();
+	expire_old_politics();
 	verify_empire_goals();
 	need_progress_refresh = TRUE;
 	

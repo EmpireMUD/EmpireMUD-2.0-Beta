@@ -1005,6 +1005,40 @@ bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc) {
 
 
 /**
+* Clears out old diplomacy to keep things clean and simple.
+*/
+void expire_old_politics(void) {
+	empire_data *emp, *next_emp, *other;
+	struct empire_political_data *pol, *next_pol, *find_pol;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (!EMPIRE_IS_TIMED_OUT(emp) || EMPIRE_MEMBERS(emp) > 0 || EMPIRE_TERRITORY(emp, TER_TOTAL) > 0) {
+			continue;
+		}
+		
+		LL_FOREACH_SAFE(EMPIRE_DIPLOMACY(emp), pol, next_pol) {
+			if ((other = real_empire(pol->id))) {
+				if (pol->type != NOBITS) {
+					log_to_empire(emp, ELOG_DIPLOMACY, "Diplomatic relations with %s have ended because your empire is in ruins", EMPIRE_NAME(other));
+					log_to_empire(other, ELOG_DIPLOMACY, "Diplomatic relations with %s have ended because that empire is in ruins", EMPIRE_NAME(emp));
+				}
+				if ((find_pol = find_relation(other, emp))) {
+					LL_DELETE(EMPIRE_DIPLOMACY(other), find_pol);
+					free(find_pol);
+				}
+				EMPIRE_NEEDS_SAVE(other) = TRUE;
+			}
+			
+			LL_DELETE(EMPIRE_DIPLOMACY(emp), pol);
+			free(pol);
+			
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+/**
 * Determines if an empire has a trait set at a certain location. It auto-
 * matically detects if the location is covered by a city's traits or the
 * empire's frontier traits.
