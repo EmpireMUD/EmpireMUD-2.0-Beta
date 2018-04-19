@@ -234,7 +234,8 @@ Finish Quest triggers in the room. It will also run Finish Quest triggers
 attached to the quest itself.
 
 The quest's triggers always run LAST, allowing them to be sure that no other
-trigger already prevented the quest turn-in.
+trigger already prevented the quest turn-in. Do not use the 'wait' command in
+triggers attached to quests -- see HELP WAIT.
 
 Variables:
   &c%actor%&0 - The character finishing the quest.
@@ -523,14 +524,15 @@ triggers in the room. It will also run Start Quest triggers attached to the
 quest itself.
 
 The quest's triggers always run LAST, allowing them to be sure that no other
-trigger already prevented the quest start.
+trigger already prevented the quest start. Do not use the 'wait' command in
+triggers attached to quests -- see HELP WAIT.
 
 Variables:
   &c%actor%&0 - The character trying to get the quest.
   &c%questvnum%&0 - The vnum of the quest to start.
   &c%questname%&0 - The name of the quest to start.
 
-See also: FINISH QUEST TRIGGER
+See also: FINISH QUEST TRIGGER, WAIT
 #d
 "TEXT VARIABLES" "TEXT VARS" TRIGEDIT-VARIABLES-TEXTS TEXT-VAR TRIGEDIT-TEXT-VAR
 

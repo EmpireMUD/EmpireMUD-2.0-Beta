@@ -3816,9 +3816,10 @@ should get the updated script list right away.
 
 Note: Adventure scripts will only work if they are the Adventure Cleanup type.
 Note: Only room triggers can be added to quests.
+Note: Neither quest nor adventure scripts can use 'wait' statements.
 
 See also: OLC BUILDINGS, OLC MOBILES, OLC OBJECTS, OLC QUESTS, OLC TRIGGERS,
-   OLC VEHICLES, VNUM
+   OLC VEHICLES, VNUM, WAIT
 #d
 "MEDIT SEX"
 

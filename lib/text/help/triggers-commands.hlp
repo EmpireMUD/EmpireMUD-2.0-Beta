@@ -19,6 +19,10 @@ negative modifier causes healing instead.
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
 
+When used by a mob's script, %aoe% only hits characters who are 'enemies',
+which generally only works in combat. Other versions of %aoe% will hit anybody
+in the room, regardless of combat.
+
 Examples:
   %aoe% 100  - group damage
   %aoe% -20    - group healing
@@ -894,6 +898,9 @@ use the wait command.
 
 Note: A trigger won't fire again while it's still in a 'wait', so be careful
 using this on Greet triggers.
+Note: Triggers attached to adventures or quests must not use 'wait', because
+those triggers only exist long enough to run, and will cancel themselves when
+they hit a 'wait'.
 
 Examples:
   say GET OUT! NOW!

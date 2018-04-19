@@ -21,9 +21,12 @@ or change the room in some way, you should return 0 to stop triggers.
 
 Note: This trigger ONLY works when attached to an adventure directly.
 Note: You won't have access to %instance% variable information anymore.
+Note: Do not use the 'wait' command in triggers attached to adventures.
 
 Variables:
   &c%room%&0 - The room it was activated on.
+
+See also: WAIT
 #d
 "COMPLETE TRIGGER" "RTRIG COMPLETE" TRIGEDIT-ROOM-COMPLETE TRIGEDIT-COMPLETE TRIG-COMPLETE
 
