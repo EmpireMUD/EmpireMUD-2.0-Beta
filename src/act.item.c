@@ -2399,7 +2399,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 /**
 * This function attempts to find the ship for a particular shipment, and send
 * it to the room of your choice (may be the destination OR origin). The
-* shipment's ship homeroom will be set to NOWHERE, to avoid re-moving ships.
+* shipment's shipping id will be set to -1, to avoid re-moving ships.
 *
 * @param empire_data *emp The empire whose shipment it is.
 * @param struct shipping_data *shipd The shipment data.
@@ -2434,7 +2434,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	
 	VEH_SHIPPING_ID(boat) = -1;
 	
-	// remove the ship homeroom from all shipments that were on this ship (including this one)
+	// remove the shipping id from all shipments that were on this ship (including this one)
 	old = shipd->shipping_id;
 	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
 		if (iter->shipping_id == old) {
