@@ -729,6 +729,72 @@ Example:
 
 See also: GOTO
 #e
+"PREMIUM COMMANDS" "IMMORTAL COMMANDS" "MORTAL COMMANDS WITH IMMORTAL FEATURES"
+
+Some mortal commands have additional features when used by immortals.
+
+any immortal:
+- alternate: no cooldown when alternating to an immortal
+- blood upkeep: immortals never pay blood upkeep
+- /check: lists all channels (not just common ones)
+- consider: do not trigger automatic scaling
+- drop: can drop quest items
+- empires: can look up with 'empires -v <vnum>'
+- empires: can see vnum and creation time on empire details
+- estats: can see admin flags
+- fill: fills drink containers with water from no source
+- forge: doesn't require a forge building
+- gear: no level requirements
+- get: does not trigger item binding
+- get: immortals have few restrictions on stealing, and don't trigger distrust
+- give: can be given bound items
+- instances: can always enter an instance despite player limits; does not count toward the limit
+- look at: can see items through conceal
+- look out: works from all rooms
+- look: can see people's real identity while disguised/morphed
+- mail: can mail anywhere
+- mount: can ride ANY npc (results may be unexpected on named mobs)
+- moving: can still move while overburdened or exhausted
+- prompt/display: additional options available
+- pursuit: mobs won't pursue imms
+- quit: not restricted by pvp timer
+- refashion: doesn't require a tailor
+- reply: still works after the target alternates
+- score: can target others
+- shops, quests, crafts, socials, morphs: Can use things with IN-DEV on them
+- skill buy: doesn't need points to buy abilities
+- skill reset: all resets are free
+- skill sell: immortals can sell individual abilities
+- skill swap: instantaneous rather than delayed
+- solo: imms don't count against the solo role for players
+- toggle informative: can see chameleon buildings on informative and scan
+- trade: can use the trading post anywhere
+- /who: works on channels you're not on
+
+Commands with features for Co-Implementors:
+- /echo: can echo to slash-channels (or lower level, with the gecho grant)
+- create: does not require resources (load grant)
+- portal: can be used anywhere (transfer grant)
+- The ability to edit all vnums in OLC
+
+Empire commands that work differently for Co-Implementors, or for any immortal
+with the 'empire' grant:
+- empire: full detailed empire view
+- city list: can see all details on any empire's city
+- eedit: optional first arg to specify which empire
+- einv: optional first arg to specify which empire
+- elog: optional first arg to specify which empire
+- findmaint: optional first arg to specify which empire
+- islands: optional first arg to specify which empire
+- import/export: optional first arg to specify which empire
+- offenses: optional first arg to specify which empire
+- progress: optional first arg to specify which empire
+- roster: optional first arg to specify which empire
+- territory: optional first arg to specify which empire
+- warehouse: optional first arg to specify which empire
+
+See also: GRANT
+#e
 PURGE
 
 Usage:  purge [name]
