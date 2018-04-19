@@ -6556,7 +6556,7 @@ ACMD(do_island) {
 		argument = one_argument(argument, arg2);
 		skip_spaces(&argument);
 		
-		if (!*arg2 || !*argument || !isdigit(*arg2)) {
+		if (!*arg2 || !*argument || (!isdigit(*arg2) && strcmp(arg2, "-1"))) {
 			msg_to_char(ch, "Usage: island rename <id> <name>\r\n");
 		}
 		else if (!(isle = get_island(atoi(arg2), FALSE))) {

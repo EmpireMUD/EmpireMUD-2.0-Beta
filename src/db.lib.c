@@ -4199,7 +4199,14 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 		CREATE(isle, struct island_info, 1);
 		// ensure good data
 		isle->id = island_id;
-		sprintf(buf, "Unexplored Island %d", island_id);
+		
+		if (island_id != NO_ISLAND) {
+			sprintf(buf, "Unexplored Island %d", island_id);
+		}
+		else {
+			strcpy(buf, "The Ocean");
+		}
+		
 		isle->name = str_dup(buf);
 		isle->flags = NOBITS;
 		isle->tile_size = 0;
