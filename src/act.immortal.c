@@ -68,6 +68,7 @@ void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
+void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.item.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
@@ -7048,6 +7049,9 @@ ACMD(do_poofset) {
 
 
 ACMD(do_purge) {
+	void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
+	
+	struct shipping_data *shipd, *next_shipd;
 	char_data *vict, *next_v;
 	vehicle_data *veh;
 	obj_data *obj;
@@ -7080,7 +7084,19 @@ ACMD(do_purge) {
 			extract_obj(obj);
 		}
 		else if ((veh = get_vehicle_in_room_vis(ch, buf))) {
+			// finish the shipment before transferring or purging a vehicle
+			if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
+				LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+					if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
+						deliver_shipment(VEH_OWNER(veh), shipd);
+					}
+				}
+			}
+			
 			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
+				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			}
 			extract_vehicle(veh);
 		}
 		else {
@@ -8016,6 +8032,7 @@ ACMD(do_tedit) {
 
 // do_transfer <- search alias because why is it called do_trans? -pc
 ACMD(do_trans) {
+	struct shipping_data *shipd, *next_shipd;
 	descriptor_data *i;
 	char_data *victim;
 	room_data *to_room = IN_ROOM(ch);
@@ -8092,6 +8109,15 @@ ACMD(do_trans) {
 	}
 	else if ((veh = get_vehicle_vis(ch, buf))) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(to_room));
+	
+		// finish the shipment before transferring
+		if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
+			LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+				if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
+					deliver_shipment(VEH_OWNER(veh), shipd);
+				}
+			}
+		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
