@@ -3314,6 +3314,7 @@ void delete_player_character(char_data *ch) {
 
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {
+		log_to_empire(emp, ELOG_MEMBERS, "%s has left the empire", PERS(ch, ch, TRUE));
 		GET_LOYALTY(ch) = NULL;
 		GET_RANK(ch) = 0;
 	}
