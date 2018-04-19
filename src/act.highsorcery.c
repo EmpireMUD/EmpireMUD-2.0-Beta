@@ -549,7 +549,7 @@ void summon_materials(char_data *ch, char *argument) {
 	
 	if (found && count < total && count > 0) {
 		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
-			msg_to_char(ch, "Your arms are full but you managed to summon %d.\r\n", count);
+			msg_to_char(ch, "You managed to summon %d.\r\n", count);
 		}
 		else {
 			msg_to_char(ch, "There weren't enough, but you managed to summon %d.\r\n", count);
