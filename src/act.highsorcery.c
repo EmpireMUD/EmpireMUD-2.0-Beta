@@ -461,12 +461,12 @@ void summon_materials(char_data *ch, char *argument) {
 
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *objname;
 	struct empire_storage_data *store, *next_store;
-	int count = 0, total = 1, number, pos;
+	int count = 0, total = 1, number, pos, carry;
 	struct empire_island *isle;
 	empire_data *emp;
 	int cost = 2;	// * number of things to summon
 	obj_data *proto;
-	bool found = FALSE;
+	bool one, found = FALSE;
 
 	half_chop(argument, arg1, arg2);
 	
@@ -535,9 +535,13 @@ void summon_materials(char_data *ch, char *argument) {
 			}
 			
 			while (count < total && store->amount > 0) {
-				++count;	// we always get one while this is looping
-				if (!retrieve_resource(ch, emp, store, FALSE)) {
-					break;	// no more to get after this
+				carry = IS_CARRYING_N(ch);
+				one = retrieve_resource(ch, emp, store, FALSE);
+				if (IS_CARRYING_N(ch) > carry) {
+					++count;	// got one
+				}
+				if (!one) {
+					break;	// done with this loop
 				}
 			}
 		}
