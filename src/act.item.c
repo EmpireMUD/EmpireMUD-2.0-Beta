@@ -3504,6 +3504,7 @@ void warehouse_store(char_data *ch, char *argument) {
 	
 	// possible #
 	tmp = any_one_arg(argument, numarg);
+	skip_spaces(&tmp);
 	if (*numarg && is_number(numarg)) {
 		total = atoi(numarg);
 		if (total < 1) {
@@ -3512,11 +3513,11 @@ void warehouse_store(char_data *ch, char *argument) {
 		}
 		argument = tmp;
 	}
-	else if (*argument && *numarg && !str_cmp(numarg, "all")) {
+	else if (*tmp && *numarg && !str_cmp(numarg, "all")) {
 		total = CAN_CARRY_N(ch) + 1;
 		argument = tmp;
 	}
-	else if (!*argument && !str_cmp(numarg, "all")) {
+	else if (!*tmp && !str_cmp(numarg, "all")) {
 		total = CAN_CARRY_N(ch);
 		argument = numarg;
 	}
