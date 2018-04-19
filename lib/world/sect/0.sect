@@ -1527,7 +1527,7 @@ S
 #17
 Trench~
 A Trench~
-'_' 24 1 4 t 0
+'.' 24 1 4 t 0
 C
 dig, excavate, fillin, pour~
 D1
@@ -1822,7 +1822,7 @@ S
 #22
 Sandy Trench~
 A Sandy Trench~
-'_' 24 2 4 t 0
+'.' 24 2 4 t 0
 C
 dig, excavate, fillin, pour~
 D1

@@ -2,8 +2,9 @@
 Glowkra consume~
 1 s 100
 ~
+* This script is no longer used. The glowkra has a buff food affect instead.
 if !(eat /= %command%)
-halt
+  halt
 end
 %send% %actor% As you consume %self.shortdesc%, your skin starts to glow slightly.
 dg_affect %actor% INFRA on 300
