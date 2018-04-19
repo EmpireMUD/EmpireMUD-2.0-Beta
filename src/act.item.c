@@ -3516,6 +3516,10 @@ void warehouse_store(char_data *ch, char *argument) {
 		total = CAN_CARRY_N(ch) + 1;
 		argument = tmp;
 	}
+	else if (!*argument && !str_cmp(numarg, "all")) {
+		total = CAN_CARRY_N(ch);
+		argument = numarg;
+	}
 	
 	// argument may have moved for numarg
 	skip_spaces(&argument);
