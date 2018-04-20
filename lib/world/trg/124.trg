@@ -753,7 +753,7 @@ while %cycle% <= 4
       else
         %send% %person% &rYou are struck by %self.name%'s attack!
         %echoaround% %person% %person.name% is struck by %self.name%'s attack!
-        set test %actor.affect(12433)%
+        set test %person.affect(12433)%
         if %test%
           %send% %person% &rYou are encased in a block of ice!
           %echoaround% %person% %person.name% is encased in a block of ice!
