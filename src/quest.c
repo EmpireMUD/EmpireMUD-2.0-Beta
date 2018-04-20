@@ -4627,7 +4627,7 @@ OLC_MODULE(qedit_rewards) {
 		if (!change) {
 			msg_to_char(ch, "Invalid reward number.\r\n");
 		}
-		else if (is_abbrev(field_arg, "amount")) {
+		else if (is_abbrev(field_arg, "amount") || is_abbrev(field_arg, "quantity")) {
 			if (!isdigit(*vnum_arg) || (num = atoi(vnum_arg)) < 0) {
 				msg_to_char(ch, "Invalid amount '%s'.\r\n", vnum_arg);
 				return;
