@@ -2293,7 +2293,10 @@ ACMD(do_scan) {
 	
 	skip_spaces(&argument);
 	
-	if (!*argument) {
+	if (AFF_FLAGGED(ch, AFF_BLIND)) {
+		msg_to_char(ch, "You can't see a damned thing, you're blind!\r\n");
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
 	}
 	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room
