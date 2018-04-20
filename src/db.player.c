@@ -2175,7 +2175,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 		if (index->last_host) {
 			free(index->last_host);
 		}
-		index->last_host = str_dup(ch->desc ? ch->desc->host : ch->prev_host);
+		index->last_host = str_dup((ch->desc && !PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO)) ? ch->desc->host : ch->prev_host);
 	}
 }
 
