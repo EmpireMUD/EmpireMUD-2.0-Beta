@@ -1271,9 +1271,8 @@ int sort_workforce_log(struct workforce_log *a, struct workforce_log *b) {
  //////////////////////////////////////////////////////////////////////////////
 //// CITY HELPERS ////////////////////////////////////////////////////////////
 
-void abandon_city(char_data *ch, char *argument) {	
+void abandon_city(char_data *ch, empire_data *emp, char *argument) {	
 	struct empire_city_data *city;
-	empire_data *emp = GET_LOYALTY(ch);
 	
 	skip_spaces(&argument);
 	
@@ -1282,7 +1281,7 @@ void abandon_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You aren't a member of an empire.\r\n");
 		return;
 	}
-	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
+	if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
 		msg_to_char(ch, "You don't have permission to abandon cities.\r\n");
 		return;
 	}
@@ -1291,11 +1290,12 @@ void abandon_city(char_data *ch, char *argument) {
 		return;
 	}
 	if (!(city = find_city_by_name(emp, argument))) {
-		msg_to_char(ch, "Your empire has no city by that name.\r\n");
+		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has abandoned %s", PERS(ch, ch, 1), city->name);
+	send_config_msg(ch, "ok_string");
 	perform_abandon_city(emp, city, TRUE);
 	
 	read_empire_territory(emp, FALSE);
@@ -1327,8 +1327,7 @@ bool check_in_city_requirement(room_data *room, bool check_wait) {
 }
 
 
-void city_traits(char_data *ch, char *argument) {	
-	empire_data *emp = GET_LOYALTY(ch);
+void city_traits(char_data *ch, empire_data *emp, char *argument) {	
 	struct empire_city_data *city;
 	bitvector_t old;
 	
@@ -1340,7 +1339,7 @@ void city_traits(char_data *ch, char *argument) {
 		msg_to_char(ch, "You aren't in an empire.\r\n");
 		return;
 	}
-	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
+	if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
 		msg_to_char(ch, "You don't have permission to change cities.\r\n");
 		return;
 	}
@@ -1349,7 +1348,7 @@ void city_traits(char_data *ch, char *argument) {
 		return;
 	}
 	if (!(city = find_city_by_name(emp, arg))) {
-		msg_to_char(ch, "Your empire has no city by that name.\r\n");
+		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
 
@@ -1359,14 +1358,14 @@ void city_traits(char_data *ch, char *argument) {
 	if (city->traits != old) {
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed city traits for %s to %s", PERS(ch, ch, 1), city->name, buf);
+		send_config_msg(ch, "ok_string");
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
 
-void claim_city(char_data *ch, char *argument) {
+void claim_city(char_data *ch, empire_data *emp, char *argument) {
 	char arg1[MAX_INPUT_LENGTH];
-	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_city_data *city;
 	int x, y, radius;
 	room_data *iter, *next_iter, *to_room, *center, *home;
@@ -1400,7 +1399,7 @@ void claim_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You aren't even in an empire.\r\n");
 		return;
 	}
-	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CLAIM)) {
+	if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CLAIM)) {
 		msg_to_char(ch, "You don't have permission to claim territory.\r\n");
 		return;
 	}
@@ -1409,7 +1408,7 @@ void claim_city(char_data *ch, char *argument) {
 		return;
 	}
 	if (!(city = find_city_by_name(emp, arg1))) {
-		msg_to_char(ch, "Your empire has no city by that name.\r\n");
+		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
 	if (!can_claim(ch)) {
@@ -1460,8 +1459,7 @@ void claim_city(char_data *ch, char *argument) {
 }
 
 
-void downgrade_city(char_data *ch, char *argument) {
-	empire_data *emp = GET_LOYALTY(ch);
+void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_city_data *city;
 	
 	skip_spaces(&argument);
@@ -1471,7 +1469,7 @@ void downgrade_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't downgrade any cities right now.\r\n");
 		return;
 	}
-	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
+	if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
 		msg_to_char(ch, "You don't have permission to downgrade cities.\r\n");
 		return;
 	}
@@ -1480,7 +1478,7 @@ void downgrade_city(char_data *ch, char *argument) {
 		return;
 	}
 	if (!(city = find_city_by_name(emp, argument))) {
-		msg_to_char(ch, "Your empire has no city by that name.\r\n");
+		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
 
@@ -1493,19 +1491,19 @@ void downgrade_city(char_data *ch, char *argument) {
 		perform_abandon_city(emp, city, FALSE);
 	}
 	
+	send_config_msg(ch, "ok_string");
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
-void found_city(char_data *ch, char *argument) {
+void found_city(char_data *ch, empire_data *emp, char *argument) {
 	void check_nowhere_einv(empire_data *emp, int new_island);
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	void stop_room_action(room_data *room, int action, int chore);
 	extern int num_of_start_locs;
 	extern int *start_locs;
 	
-	empire_data *emp = get_or_create_empire(ch);
 	empire_data *emp_iter, *next_emp;
 	struct island_info *isle;
 	int iter, dist;
@@ -1520,12 +1518,16 @@ void found_city(char_data *ch, char *argument) {
 	
 	skip_spaces(&argument);
 	
+	if (!emp) {
+		emp = get_or_create_empire(ch);
+	}
+	
 	// check legality
 	if (!emp || city_points_available(emp) < 1) {
-		msg_to_char(ch, "You can't found any cities right now.\r\n");
+		msg_to_char(ch, "%s can't found any cities right now.\r\n", (!emp || emp == GET_LOYALTY(ch)) ? "You" : "That empire");
 		return;
 	}
-	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
+	if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
 		msg_to_char(ch, "You don't have permission to found cities.\r\n");
 		return;
 	}
@@ -1614,6 +1616,8 @@ void found_city(char_data *ch, char *argument) {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has founded %s", PERS(ch, ch, 1), city->name);
 	}
 	
+	send_config_msg(ch, "ok_string");
+	
 	stop_room_action(IN_ROOM(ch), ACT_CHOPPING, CHORE_CHOPPING);
 	stop_room_action(IN_ROOM(ch), ACT_PICKING, CHORE_FARMING);
 	stop_room_action(IN_ROOM(ch), ACT_DIGGING, NOTHING);
@@ -1701,13 +1705,12 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 
 
 // for do_city
-void list_cities(char_data *ch, char *argument) {
+void list_cities(char_data *ch, empire_data *emp, char *argument) {
 	extern int count_city_points_used(empire_data *emp);
 	
 	char buf[MAX_STRING_LENGTH], traits[256];
 	struct empire_city_data *city;
 	struct island_info *isle;
-	empire_data *emp;
 	int points, used, count, dir, dist;
 	bool is_own, pending, found = FALSE;
 	room_data *rl;
@@ -1728,7 +1731,7 @@ void list_cities(char_data *ch, char *argument) {
 			return;
 		}
 	}
-	else if ((emp = GET_LOYALTY(ch)) == NULL) {
+	else if (!emp && (emp = GET_LOYALTY(ch)) == NULL) {
 		msg_to_char(ch, "You're not in an empire.\r\n");
 		return;
 	}
@@ -1836,9 +1839,8 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 }
 
 
-void rename_city(char_data *ch, char *argument) {
+void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	char newname[MAX_INPUT_LENGTH];
-	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_city_data *city;
 
 	half_chop(argument, arg, newname);
@@ -1848,7 +1850,7 @@ void rename_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You aren't in an empire.\r\n");
 		return;
 	}
-	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
+	if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
 		msg_to_char(ch, "You don't have permission to rename cities.\r\n");
 		return;
 	}
@@ -1857,7 +1859,7 @@ void rename_city(char_data *ch, char *argument) {
 		return;
 	}
 	if (!(city = find_city_by_name(emp, arg))) {
-		msg_to_char(ch, "Your empire has no city by that name.\r\n");
+		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
 	if (color_code_length(newname) > 0) {
@@ -1870,6 +1872,7 @@ void rename_city(char_data *ch, char *argument) {
 	}
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has renamed %s to %s", PERS(ch, ch, 1), city->name, newname);
+	send_config_msg(ch, "ok_string");
 	
 	free(city->name);
 	city->name = str_dup(newname);
@@ -1877,8 +1880,7 @@ void rename_city(char_data *ch, char *argument) {
 }
 
 
-void upgrade_city(char_data *ch, char *argument) {	
-	empire_data *emp = GET_LOYALTY(ch);
+void upgrade_city(char_data *ch, empire_data *emp, char *argument) {	
 	struct empire_city_data *city;
 	
 	skip_spaces(&argument);
@@ -1888,7 +1890,7 @@ void upgrade_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't upgrade any cities right now.\r\n");
 		return;
 	}
-	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
+	if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CITIES)) {
 		msg_to_char(ch, "You don't have permission to upgrade cities.\r\n");
 		return;
 	}
@@ -1897,7 +1899,7 @@ void upgrade_city(char_data *ch, char *argument) {
 		return;
 	}
 	if (!(city = find_city_by_name(emp, argument))) {
-		msg_to_char(ch, "Your empire has no city by that name.\r\n");
+		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
 	if (*city_type[city->type+1].name == '\n') {
@@ -1908,6 +1910,7 @@ void upgrade_city(char_data *ch, char *argument) {
 	city->type++;
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
+	send_config_msg(ch, "ok_string");
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
@@ -3173,7 +3176,16 @@ ACMD(do_cede) {
 
 
 ACMD(do_city) {
-	char arg1[MAX_INPUT_LENGTH];
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	char arg1[MAX_INPUT_LENGTH], *argptr;
+	empire_data *emp = GET_LOYALTY(ch);
+	
+	// optional first arg (empire) and empire detection
+	argptr = any_one_word(argument, arg1);
+	if (!imm_access || !(emp = get_empire_by_name(arg1))) {
+		emp = GET_LOYALTY(ch);
+		argptr = argument;
+	}
 
 	half_chop(argument, arg, arg1);
 	
@@ -3181,32 +3193,32 @@ ACMD(do_city) {
 		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
 	}
 	else if (is_abbrev(arg, "list")) {
-		list_cities(ch, arg1);
+		list_cities(ch, emp, arg1);
 	}
 	// all other options require manage-empire
 	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
 	else if (is_abbrev(arg, "found")) {
-		found_city(ch, arg1);
+		found_city(ch, emp, arg1);
 	}
 	else if (is_abbrev(arg, "upgrade")) {
-		upgrade_city(ch, arg1);
+		upgrade_city(ch, emp, arg1);
 	}
 	else if (is_abbrev(arg, "downgrade")) {
-		downgrade_city(ch, arg1);
+		downgrade_city(ch, emp, arg1);
 	}
 	else if (is_abbrev(arg, "abandon")) {
-		abandon_city(ch, arg1);
+		abandon_city(ch, emp, arg1);
 	}
 	else if (is_abbrev(arg, "claim")) {
-		claim_city(ch, arg1);
+		claim_city(ch, emp, arg1);
 	}
 	else if (is_abbrev(arg, "rename")) {
-		rename_city(ch, arg1);
+		rename_city(ch, emp, arg1);
 	}
 	else if (is_abbrev(arg, "traits")) {
-		city_traits(ch, arg1);
+		city_traits(ch, emp, arg1);
 	}
 	else {
 		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
