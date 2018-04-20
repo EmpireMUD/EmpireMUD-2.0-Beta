@@ -2214,27 +2214,30 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					exit(0);
 				}
 				
-				CREATE(shipd, struct shipping_data, 1);
-				shipd->vnum = t[0];
-				shipd->amount = t[1];
-				shipd->from_island = t[2];
-				shipd->to_island = t[3];
-				shipd->status = t[4];
-				shipd->status_time = l_in;
-				shipd->shipping_id = t[5];
-				shipd->ship_origin = t[6];
-				shipd->next = NULL;
+				if (obj_proto(t[0])) {
+					CREATE(shipd, struct shipping_data, 1);
+					shipd->vnum = t[0];
+					shipd->amount = t[1];
+					shipd->from_island = t[2];
+					shipd->to_island = t[3];
+					shipd->status = t[4];
+					shipd->status_time = l_in;
+					shipd->shipping_id = t[5];
+					shipd->ship_origin = t[6];
+					shipd->next = NULL;
 				
-				EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
+					EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
 
-				// append to end
-				if (last_shipd) {
-					last_shipd->next = shipd;
+					// append to end
+					if (last_shipd) {
+						last_shipd->next = shipd;
+					}
+					else {
+						EMPIRE_SHIPPING_LIST(emp) = shipd;
+					}
+					last_shipd = shipd;
 				}
-				else {
-					EMPIRE_SHIPPING_LIST(emp) = shipd;
-				}
-				last_shipd = shipd;
+				// else: don't bother warning, just drop it if the obj doesn't exist
 				break;
 			}
 
