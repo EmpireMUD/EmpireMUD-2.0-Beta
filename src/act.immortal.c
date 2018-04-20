@@ -558,7 +558,8 @@ ADMIN_UTIL(util_playerdump) {
 			plr = NULL;
 		}
 	}
-
+	
+	fclose(fl);
 	msg_to_char(ch, "Ok.\r\n");
 }
 
