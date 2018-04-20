@@ -1566,6 +1566,24 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 
 
 /**
+* Checks all empires to ensure they have no "missing" einv in the no-island
+* state. This is meant to be run at startup but can be re-run as needed.
+*/
+void check_nowhere_einv_all(void) {
+	extern int get_main_island(empire_data *emp);
+	
+	empire_data *emp, *next_emp;
+	int island;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if ((island = get_main_island(emp)) != NO_ISLAND) {
+			check_nowhere_einv(emp, island);
+		}
+	}
+}
+
+
+/**
 * Creates a new empire with default ranks and ch as leader. The default empire
 * name is the player's name so that new players will see "This area is claimed
 * by <your name>", which fits the concept that small empires are just land
