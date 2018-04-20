@@ -281,6 +281,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	player_index_data *index;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH], *temp;
+	obj_data *proto;
 	crop_data *cp;
 	bld_data *bld;
 	int found;
@@ -291,6 +292,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	if (!obj || !ch || !ch->desc) {
 		return;
 	}
+	
+	// used by some things later
+	proto = obj_proto(GET_OBJ_VNUM(obj));
 	
 	// determine location
 	if (IN_ROOM(obj)) {
@@ -363,7 +367,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "\r\n");
 	}
 	
-	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0 && proto && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
 		msg_to_char(ch, "Level: %d\r\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 	}
 	
