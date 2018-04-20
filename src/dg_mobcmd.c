@@ -1555,12 +1555,18 @@ ACMD(do_maoe) {
 	modifier = scale_modifier_by_mob(ch, modifier);
 	
 	level = get_approximate_level(ch);
-	for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_vict) {
-		next_vict = vict->next_in_room;
-		
-		if (ch != vict && is_fight_enemy(ch, vict)) {
-			script_damage(vict, ch, level, type, modifier);
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_vict, next_in_room) {
+		if (ch == vict) {
+			continue;
 		}
+		if (FIGHTING(ch) && !is_fight_enemy(ch, vict)) {
+			continue;	// in combat, only hit enemies
+		}
+		if (!FIGHTING(ch) && !IS_NPC(vict)) {
+			continue;	// out of combat, only hit players
+		}
+		
+		script_damage(vict, ch, level, type, modifier);
 	}
 }
 

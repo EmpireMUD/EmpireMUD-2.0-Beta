@@ -20,8 +20,8 @@ You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
 
 When used by a mob's script, %aoe% only hits characters who are 'enemies',
-which generally only works in combat. Other versions of %aoe% will hit anybody
-in the room, regardless of combat.
+if the mob is in combat. Otherwise, it will hit all player characters. Non-mob
+versions of %aoe% hit ALL characters.
 
 Examples:
   %aoe% 100  - group damage
