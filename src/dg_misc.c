@@ -983,8 +983,8 @@ void script_heal(void *thing, int type, char *argument) {
 	bitvector_t bitv;
 	
 	// 3 args: target, what, scale
-	scale_arg = one_argument(argument, targ_arg);
-	scale_arg = one_argument(scale_arg, what_arg);
+	scale_arg = any_one_arg(argument, targ_arg);
+	scale_arg = any_one_arg(scale_arg, what_arg);
 	skip_spaces(&scale_arg);
 	if (*targ_arg == UID_CHAR) {
 		victim = get_char(targ_arg);
