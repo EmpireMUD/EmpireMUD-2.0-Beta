@@ -3933,7 +3933,7 @@ ACMD(do_elog) {
 		}
 		if (type == NOTHING || elog->type == type) {
 			if (count-- - lines <= 0) {
-				snprintf(line, sizeof(line), "%3s:%s&0\r\n", simple_time_since(elog->timestamp), strip_color(elog->string));
+				snprintf(line, sizeof(line), "%3s: %s&0\r\n", simple_time_since(elog->timestamp), strip_color(elog->string));
 				
 				if (size + strlen(line) + 10 < MAX_STRING_LENGTH) {
 					strcat(buf, line);
