@@ -1124,6 +1124,25 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 }
 
 
+void do_instance_spawn(char_data *ch, char *argument) {
+	void generate_adventure_instances();
+	int num = 1;
+	
+	if (*argument && isdigit(*argument)) {
+		num = atoi(argument);
+	}
+	if (num < 1 || num > 100) {
+		msg_to_char(ch, "You may only run 1-100 spawn cycles.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "Running %d instance spawn cycle%s...\r\n", num, PLURAL(num));
+	while (num-- > 0) {
+		generate_adventure_instances();
+	}
+}
+
+
 void do_instance_test(char_data *ch, char *argument) {
 	struct adventure_link_rule rule;
 	bool found = FALSE;
@@ -6469,7 +6488,7 @@ ACMD(do_instance) {
 			++count;
 		}
 		
-		msg_to_char(ch, "Usage: instance <list | add | delete | deleteall | nearby | reset | test> [argument]\r\n");
+		msg_to_char(ch, "Usage: instance <list | add | delete | deleteall | nearby | reset | spawn | test> [argument]\r\n");
 		msg_to_char(ch, "There are %d live instances.\r\n", count);
 	}
 	else if (is_abbrev(arg, "list")) {
@@ -6489,6 +6508,9 @@ ACMD(do_instance) {
 	}
 	else if (is_abbrev(arg, "reset")) {
 		do_instance_reset(ch, argument);
+	}
+	else if (is_abbrev(arg, "spawn")) {
+		do_instance_spawn(ch, argument);
 	}
 	else if (is_abbrev(arg, "test")) {
 		do_instance_test(ch, argument);

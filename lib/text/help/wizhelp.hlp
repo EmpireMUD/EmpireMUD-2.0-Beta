@@ -492,7 +492,7 @@ See also: INVIS, TOGGLE, WIZHIDE
 #d
 INSTANCE INSTANCES
 
-Usage:  instance <list | add | delete | deleteall | nearby | reset | test> [argument]
+Usage:  instance <list | add | delete | deleteall | nearby | reset | spawn | test> [argument]
 
 This command allows immortals to list and manage adventure zone instances.
 The 'list' command can be used to see all instances, or all instances for one
@@ -506,6 +506,10 @@ The 'deleteall' command removes all instances for a given adventure zone
 
 The 'reset' command will force a zone reset on the instance you're in or the
 instance number you target.
+
+The 'spawn' command runs 1 (or more) instance spawn cycles, attempting to
+generate an instance of the next adventure in the queue that isn't already at
+its limit. You can specify the number of cycles to run.
 
 The 'test' command will link an instance to the room you're in, using a generic
 portal, even if that instance cannot be linked.
