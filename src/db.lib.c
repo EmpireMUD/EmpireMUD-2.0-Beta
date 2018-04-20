@@ -2407,8 +2407,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				emp_pol->type = t[1];
 				emp_pol->offer = t[2];
 				emp_pol->start_time = t[3];
-				emp_pol->next = emp->diplomacy;
-				emp->diplomacy = emp_pol;
+				LL_APPEND(emp->diplomacy, emp_pol);
 				break;
 			}
 			case 'E': {	// extra data
