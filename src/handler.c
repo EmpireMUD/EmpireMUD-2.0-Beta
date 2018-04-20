@@ -4064,6 +4064,11 @@ void free_mob_tags(struct mob_tag **list) {
 void tag_mob(char_data *mob, char_data *player) {
 	struct group_member_data *mem;
 	
+	// find top player -- if it's a familiar or charmie of some kind
+	while (player && IS_NPC(player) && player->master && IN_ROOM(player) == IN_ROOM(player->master)) {
+		player = player->master;
+	}
+	
 	// simple sanity
 	if (!mob || !player || mob == player || !IS_NPC(mob) || IS_NPC(player)) {
 		return;
