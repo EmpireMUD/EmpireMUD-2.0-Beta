@@ -6824,6 +6824,7 @@ ACMD(do_moveeinv) {
 		count = 0;
 		eisle = get_empire_island(emp, island_from);
 		HASH_ITER(hh, eisle->store, store, next_store) {
+			count += store->amount;
 			add_to_empire_storage(emp, island_to, store->vnum, store->amount);
 			HASH_DEL(eisle->store, store);
 			free(store);
