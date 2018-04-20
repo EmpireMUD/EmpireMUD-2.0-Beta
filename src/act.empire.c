@@ -2687,7 +2687,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			}
 			
 			// chameleon check
-			if (!IS_IMMORTAL(ch) && CHECK_CHAMELEON(map, room)) {
+			if (!IS_IMMORTAL(ch) && (!GET_LOYALTY(ch) || ROOM_OWNER(room) != GET_LOYALTY(ch)) && CHECK_CHAMELEON(map, room)) {
 				continue;	// just don't show it
 			}
 			
