@@ -3177,7 +3177,7 @@ ACMD(do_cede) {
 
 ACMD(do_city) {
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
-	char arg1[MAX_INPUT_LENGTH], *argptr;
+	char arg1[MAX_INPUT_LENGTH], *argptr = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
 	
 	// optional first arg (empire) and empire detection
@@ -3187,7 +3187,7 @@ ACMD(do_city) {
 		argptr = argument;
 	}
 
-	half_chop(argument, arg, arg1);
+	half_chop(argptr, arg, arg1);
 	
 	if (!*arg) {
 		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
