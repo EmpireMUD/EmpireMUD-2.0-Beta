@@ -2122,7 +2122,7 @@ ACMD(do_coins) {
 				*vstr = '\0';
 			}
 			
-			snprintf(line, sizeof(line), "%3d %s%s\r\n", cur->amount, vstr, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+			snprintf(line, sizeof(line), "%s%3d %s\r\n", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
