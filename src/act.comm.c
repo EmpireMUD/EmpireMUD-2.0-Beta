@@ -309,7 +309,7 @@ void remove_ignore(char_data *ch, int idnum) {
 
 // uses subcmd as a position in the pub_comm array
 ACMD(do_pub_comm) {
-	char msgbuf[MAX_STRING_LENGTH], someonebuf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char msgbuf[MAX_STRING_LENGTH], someonebuf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], recog[MAX_STRING_LENGTH];
 	char level_string[10], invis_string[10];
 	descriptor_data *desc;
 	bool emote = FALSE;
@@ -409,17 +409,18 @@ ACMD(do_pub_comm) {
 			}
 		}
 		
-		// message to others:		
+		// message to others: (build msgbuf, recog, and someonebuf)
 		switch (pub_comm[subcmd].type) {
 			case PUB_COMM_GLOBAL:
 			case PUB_COMM_SHORT_RANGE: {
 				// leading color code is handled later
 				
+				sprintf(msgbuf, "$n%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 				if (IS_DISGUISED(ch) || IS_MORPHED(ch)) {
-					sprintf(msgbuf, "$n ($o)%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					sprintf(recog, "$n ($o)%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 				}
 				else {
-					sprintf(msgbuf, "$n%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					strcpy(recog, msgbuf);
 				}
 				
 				// invis version
@@ -430,10 +431,12 @@ ACMD(do_pub_comm) {
 			default: {
 				if (emote) {
 					sprintf(msgbuf, "[%s%s\tn%s%s] $o %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+					strcpy(recog, msgbuf);
 					sprintf(someonebuf, "[%s%s\tn%s] Someone %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
 				}
 				else {
 					sprintf(msgbuf, "[%s%s\tn $o%s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+					strcpy(recog, msgbuf);
 					sprintf(someonebuf, "[%s%s\tn Someone%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
 				}
 				break;
@@ -461,7 +464,12 @@ ACMD(do_pub_comm) {
 							
 							// send message
 							if (CAN_SEE_NO_DARK(desc->character, ch)) {
-								act(msgbuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && (IS_IMMORTAL(desc->character) || CAN_RECOGNIZE(desc->character, ch))) {
+									act(recog, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								}
+								else {
+									act(msgbuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								}
 							}
 							else {
 								act(someonebuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
