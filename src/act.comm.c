@@ -1382,7 +1382,7 @@ ACMD(do_reply) {
 
 ACMD(do_say) {
 	char_data *c;
-	char lbuf[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH], recog[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	int ctype = (subcmd == SCMD_OOCSAY ? CUSTOM_COLOR_OOCSAY : CUSTOM_COLOR_SAY);
 	char color;
 	
@@ -1402,6 +1402,7 @@ ACMD(do_say) {
 		
 		// this leaves in a "%c" used for a color code
 		sprintf(string, "$n says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
+		sprintf(recog, "$n ($o) says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
 		
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
 			if (REAL_NPC(c) || ch == c || is_ignoring(c, ch))
@@ -1415,7 +1416,13 @@ ACMD(do_say) {
 			color = (!IS_NPC(c) && GET_CUSTOM_COLOR(c, ctype)) ? GET_CUSTOM_COLOR(c, ctype) : '0';
 			msg_to_char(c, "\t%c", color);
 			
-			sprintf(buf, string, color);
+			if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && (IS_IMMORTAL(c) || CAN_RECOGNIZE(c, ch))) {
+				sprintf(buf, recog, color);
+			}
+			else {
+				sprintf(buf, string, color);
+			}
+			
 			act(buf, FALSE, ch, 0, c, TO_VICT | DG_NO_TRIG);
 			
 			// channel history
