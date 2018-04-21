@@ -69,11 +69,13 @@ A spirit token is lying here.~
 Collect enough tokens and receive a reward. You can find the portal to the
 Soulstream at the Tower of Souls. If you're having trouble getting back there,
 try using a trinket of conveyance.
+   This item has been upgraded to a type of currency, so it won't take up
+an inventory slot anymore. Drop or get this token to convert it!
 ~
-3 p a 2
+3 p a 3
 0 0 0
 14 0
-Q 10859
+T 10859
 S
 #10853
 knife stone skinning~
