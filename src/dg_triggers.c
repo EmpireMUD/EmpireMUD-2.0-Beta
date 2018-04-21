@@ -1955,7 +1955,7 @@ bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode
 	}
 	
 	// never override the toggle command for immortals
-	if (IS_IMMORTAL(actor) && is_abbrev(cmd, "toggle")) {
+	if (IS_IMMORTAL(actor) && is_abbrev(cmd, "toggles")) {
 		return cont;
 	}
 
