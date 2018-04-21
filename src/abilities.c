@@ -3440,6 +3440,7 @@ OLC_MODULE(abiledit_data) {
 	bool found;
 	
 	// determine valid types first
+	allowed_types |= ADL_EFFECT;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
 		allowed_types |= ADL_PLAYER_TECH;
 	}
