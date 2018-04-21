@@ -2099,7 +2099,7 @@ ACMD(do_chart) {
 
 // will show all currencies if the subcmd == TRUE
 ACMD(do_coins) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vstr[64];
 	struct player_currency *cur, *next_cur;
 	size_t size;
 	
@@ -2115,7 +2115,14 @@ ACMD(do_coins) {
 		size += snprintf(buf + size, sizeof(buf) - size, "You also have:\r\n");
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
-			snprintf(line, sizeof(line), "%3d %s\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", cur->vnum);
+			}
+			else {
+				*vstr = '\0';
+			}
+			
+			snprintf(line, sizeof(line), "%3d %s%s\r\n", cur->amount, vstr, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
