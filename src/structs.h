@@ -499,8 +499,13 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
 
 
+// ABIL_EFFECT_x: things that happen when an ability is used
+#define ABIL_EFFECT_DISMOUNT  0	// player is dismounted
+
+
 // ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
 #define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
+#define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
 
 
 // AGH_x: ability gain hooks

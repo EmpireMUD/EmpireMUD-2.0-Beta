@@ -195,6 +195,14 @@ const char *ability_custom_types[] = {
 // ADL_x: for adding to ability_data_list
 const char *ability_data_types[] = {
 	"PTECH",
+	"EFFECT",
+	"\n"
+};
+
+
+// ABIL_EFFECT_x: things that happen when an ability is used
+const char *ability_effects[] = {
+	"dismount",	// 0
 	"\n"
 };
 

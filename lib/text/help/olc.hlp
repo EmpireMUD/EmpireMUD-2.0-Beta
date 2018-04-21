@@ -719,8 +719,9 @@ Usage:  .data add <type> <name | vnum>
 
 The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PLAYER-TECH ability type.
+ &cEFFECT&0 - Something happens when the ability activates. See ABILITY EFFECTS
 
-See also: ABILEDIT TYPES, PLAYER TECHNOLOGIES, OLC ABILITIES
+See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
 "ABILEDIT DIFFICULTY"
 
@@ -1061,6 +1062,14 @@ based on what type of ability you're making.
 Choose the wait type that best fits your ability.
 
 See also: COMMAND LAG, OLC ABILITIES
+#d
+"ABILITY EFFECTS"
+
+Some abilities have 'effects' which happen when the ability is activated.
+Available effect types are:
+ &cdismount&0 - the player will be dismounted
+
+See also: ABILEDIT DATA
 #d
 "ADVEDIT AUTHOR"
 
