@@ -256,13 +256,15 @@ A clockwork embiggening suit is lying here.~
    This suit is made from the embiggening circuit of a clockwork colossus,
 although it's much less big at the moment.
 ~
-2 mpy ad 1
+2 mpy ad 2
 0 0 0
 2 0
 A
 5 1 0
 A
 15 1 0
+C
+100 200
 M
 12
 The colossal $n towers over you!~
