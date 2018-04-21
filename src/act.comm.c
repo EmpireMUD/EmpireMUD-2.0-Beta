@@ -452,7 +452,8 @@ ACMD(do_pub_comm) {
 							// special color handling for non-ooc channels
 							if (pub_comm[subcmd].type != PUB_COMM_OOC) {
 								// use act() so that nobody gets the color code that wouldn't get the rest of the string
-								act(pub_comm[subcmd].color, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								//act(pub_comm[subcmd].color, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								send_to_char(pub_comm[subcmd].color, desc->character);
 							}
 							
 							// channel history
@@ -477,6 +478,10 @@ ACMD(do_pub_comm) {
 								}
 								
 								add_to_channel_history(desc->character, pub_comm[subcmd].history, lbuf);
+							}
+							else {
+								// color terminator if they somehow missed the rest of the string
+								send_to_char("\t0", desc->character);
 							}
 						}
 					}
