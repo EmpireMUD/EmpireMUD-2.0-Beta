@@ -59,6 +59,7 @@ extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
+extern bool empire_can_claim(empire_data *emp);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
@@ -1411,15 +1412,15 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
-	if (!can_claim(ch)) {
-		msg_to_char(ch, "You can't claim any more land.\r\n");
+	if ((emp == GET_LOYALTY(ch) && !can_claim(ch)) || !empire_can_claim(emp)) {
+		msg_to_char(ch, "%s can't claim any more land.\r\n", emp == GET_LOYALTY(ch) ? "You" : "The empire");
 		return;
 	}
 
 	center = city->location;
 	radius = city_type[city->type].radius;
 	for (x = -1 * radius; x <= radius; ++x) {
-		for (y = -1 * radius; y <= radius && can_claim(ch); ++y) {
+		for (y = -1 * radius; y <= radius && empire_can_claim(emp); ++y) {
 			to_room = real_shift(center, x, y);
 			
 			if (!to_room || compute_distance(center, to_room) > radius) {

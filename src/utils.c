@@ -58,6 +58,7 @@ void send_char_pos(char_data *ch, int dam);
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
+bool empire_can_claim(empire_data *emp);
 bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
@@ -1166,17 +1167,15 @@ bool is_trading_with(empire_data *emp, empire_data *partner) {
 * @return bool TRUE if the player is allowed to claim.
 */
 bool can_claim(char_data *ch) {
-	empire_data *e;
-
-	if (IS_NPC(ch))
-		return FALSE;
-	if (!(e = GET_LOYALTY(ch)))
-		return TRUE;
-	if (EMPIRE_TERRITORY(e, TER_TOTAL) >= land_can_claim(e, TER_TOTAL))
-		return FALSE;
-	if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CLAIM))
-		return FALSE;
-	return TRUE;
+	if (IS_NPC(ch)) {
+		return FALSE;	// npcs never claim
+	}
+	if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {
+		return FALSE;	// rank too low
+	}
+	
+	// and check the empire itself
+	return empire_can_claim(GET_LOYALTY(ch));
 }
 
 
@@ -1281,6 +1280,25 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 	
 	// newp
 	return FALSE;
+}
+
+
+/**
+* Determines if an empire can currently claim land.
+*
+* @param empire_data *emp The empire.
+* @return bool TRUE if the empire is allowed to claim.
+*/
+bool empire_can_claim(empire_data *emp) {
+	if (!emp) {	// theoretically, no empire == you can found one...
+		return TRUE;
+	}
+	if (EMPIRE_TERRITORY(emp, TER_TOTAL) >= land_can_claim(emp, TER_TOTAL)) {
+		return FALSE;	// too much territory
+	}
+	
+	// seems ok
+	return TRUE;
 }
 
 
