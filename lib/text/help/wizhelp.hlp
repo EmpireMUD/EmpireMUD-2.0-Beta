@@ -424,13 +424,16 @@ Usage:  handbook
 
 Guidelines for having an Immortal character -- you should read it.
 #d
-HASSLE NOHASSLE "NO HASSLE"
+HASSLE NOHASSLE "NO HASSLE" "TOGGLE HASSLE"
 
 Usage:  toggle hassle [on/off]
 
-Prevents you from activating command triggers and stops mobs from fighting you.
-This toggle is also used by some other triggers to check if you're an immortal
-who doesn't want to be interfered with.
+Prevents you from activating command triggers and stops aggro mobs from
+attacking you. This toggle is also used by some other triggers to check if
+you're an immortal who doesn't want to be interfered with.
+
+Note: An immortal can always 'toggle hassle off' even if a command trigger
+tries to prevent it. This keeps immortals from being trapped by triggers.
 
 See also: TOGGLE
 #d
