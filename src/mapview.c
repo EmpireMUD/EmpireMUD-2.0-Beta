@@ -858,15 +858,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	else {
 		// show room: non-map
-		
-		if (show_title) {
-			send_to_char(output, ch);
-		}
-		
 		if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {
 			send_to_char("It is pitch black...\r\n", ch);
 		}
 		else {
+			if (show_title) {
+				send_to_char(output, ch);
+			}
+			
 			// description
 			if (!PRF_FLAGGED(ch, PRF_BRIEF) && (strptr = get_room_description(room))) {
 				msg_to_char(ch, "%s", strptr);
