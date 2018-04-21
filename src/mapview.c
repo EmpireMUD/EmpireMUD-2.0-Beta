@@ -699,9 +699,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		// map rooms:
 		
 		if (MAGIC_DARKNESS(room) && !CAN_SEE_IN_DARK_ROOM(ch, room)) {
-			if (show_title) {
-				send_to_char(output, ch);
-			}
+			// no title
 			send_to_char("It is pitch black...\r\n", ch);
 		}
 		else if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {

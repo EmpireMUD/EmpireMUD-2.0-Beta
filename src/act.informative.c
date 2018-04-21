@@ -2704,10 +2704,14 @@ ACMD(do_look) {
 		send_to_char("You can't see anything but stars!\r\n", ch);
 	else if (AFF_FLAGGED(ch, AFF_BLIND))
 		send_to_char("You can't see a damned thing, you're blind!\r\n", ch);
+	
+	/* prior to b5.31, this block gave an abbreviated version of look_at_room, which isn't necessary
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		send_to_char("It is pitch black...\r\n", ch);
-		list_char_to_char(ROOM_PEOPLE(IN_ROOM(ch)), ch);	/* glowing red eyes */
+		list_char_to_char(ROOM_PEOPLE(IN_ROOM(ch)), ch);	// glowing red eyes
 	}
+	*/
+	
 	else {
 		half_chop(argument, arg, arg2);
 
