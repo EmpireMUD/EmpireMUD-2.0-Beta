@@ -4132,6 +4132,9 @@ struct empire_member_reader_data {
 
 // simple sorter for the member-reading data
 int sort_emrd(struct empire_member_reader_data *a, struct empire_member_reader_data *b) {
+	if (EMPIRE_VNUM(a->empire) != EMPIRE_VNUM(b->empire)) {
+		return EMPIRE_VNUM(a->empire) - EMPIRE_VNUM(b->empire);
+	}
 	if (a->account_id != b->account_id) {
 		return a->account_id - b->account_id;
 	}
@@ -4261,7 +4264,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	char_data *ch;
 	time_t logon, curtime = time(0), timeout;
 	bool is_file;
-	int level, last_account, acct_greatness;
+	int level, last_account, last_empire, acct_greatness;
 
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!only_empire || emp == only_empire) {
@@ -4335,14 +4338,16 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	
 	// vars for processing accounts
 	last_account = -1;
+	last_empire = -1;
 	acct_greatness = 0;
 	
 	// this list is pre-sorted by account, then greatness (descending), then player id
 	while ((emrd = account_list)) {
 		index = find_player_index_by_idnum(emrd->player_id);
-		if (last_account != emrd->account_id) {
-			// found a new account: the first player is always the highest greatness
+		if (last_account != emrd->account_id || last_empire != EMPIRE_VNUM(emrd->empire)) {
+			// found a new account/empire: the first player is always the highest greatness
 			last_account = emrd->account_id;
+			last_empire = EMPIRE_VNUM(emrd->empire);
 			acct_greatness = emrd->greatness;
 			
 			EMPIRE_MEMBERS(emrd->empire) += 1;
