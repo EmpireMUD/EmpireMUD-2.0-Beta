@@ -398,6 +398,7 @@ void run_delayed_refresh(void) {
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			crop_var = -1;
 			
+			// DELAY_REFRESH_x: effects of various rereshes
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_CROP_VARIETY)) {
 				HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 					LL_FOREACH(goal->tracker, task) {
@@ -419,6 +420,9 @@ void run_delayed_refresh(void) {
 						complete_goal(emp, goal);
 					}
 				}
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MEMBERS)) {
+				read_empire_members(emp, FALSE);
 			}
 			
 			// clear this

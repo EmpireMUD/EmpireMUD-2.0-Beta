@@ -981,6 +981,7 @@ typedef struct vehicle_data vehicle_data;
 // DELAY_REFRESH_x: flags indicating something on the empire needs a refresh
 #define DELAY_REFRESH_CROP_VARIETY  BIT(0)	// refreshes specific progress goals
 #define DELAY_REFRESH_GOAL_COMPLETE  BIT(1)	// checks for finished progress
+#define DELAY_REFRESH_MEMBERS  BIT(2)	// re-reads empire member data
 
 
 // EADM_x: empire admin flags
@@ -3391,6 +3392,9 @@ struct player_index_data {
 	empire_data *loyalty;	// empire, if any
 	int rank;	// empire rank
 	char *last_host;	// last known host
+	
+	bool contributing_greatness;	// whether or not this alt is currently contributing greatness to their empire
+	int greatness_threshold;	// level at which this alt would start/stop contributing greatness
 	
 	UT_hash_handle idnum_hh;	// player_table_by_idnum
 	UT_hash_handle name_hh;	// player_table_by_name

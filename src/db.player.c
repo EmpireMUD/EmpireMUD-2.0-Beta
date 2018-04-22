@@ -4120,44 +4120,47 @@ void start_new_character(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE PLAYER MANAGEMENT ////////////////////////////////////////////////
 
-// this is used to ensure each account only contributes once to the empire
+// tracks players in an empire to determine which one contributes greatness
 struct empire_member_reader_data {
 	empire_data *empire;
 	int account_id;
+	int player_id;
 	int greatness;
-	
 	struct empire_member_reader_data *next;
 };
 
 
+// simple sorter for the member-reading data
+int sort_emrd(struct empire_member_reader_data *a, struct empire_member_reader_data *b) {
+	if (a->account_id != b->account_id) {
+		return a->account_id - b->account_id;
+	}
+	if (a->greatness != b->greatness) {
+		return b->greatness - a->greatness;
+	}
+	return a->player_id - b->player_id;
+}
+
+
 /**
-* Add a given user's data to the account list of accounts on the empire member reader data
+* Add a given user's data to the account list on the empire member reader data
 *
 * @param struct empire_member_reader_data **list A pointer to the existing list.
 * @param int empire which empire entry the player is in
 * @param int account_id which account id the player has
+* @param int player_id the id of the player contributing
 * @param int greatness the player's greatness
 */
-static void add_to_account_list(struct empire_member_reader_data **list, empire_data *empire, int account_id, int greatness) {
+void add_to_emrd_list(struct empire_member_reader_data **list, empire_data *empire, int account_id, int player_id, int greatness) {
 	struct empire_member_reader_data *emrd;
-	bool found = FALSE;
 	
-	for (emrd = *list; emrd && !found; emrd = emrd->next) {
-		if (emrd->empire == empire && emrd->account_id == account_id) {
-			found = TRUE;
-			emrd->greatness = MAX(emrd->greatness, greatness);
-		}
-	}
+	CREATE(emrd, struct empire_member_reader_data, 1);
+	emrd->empire = empire;
+	emrd->account_id = account_id;
+	emrd->player_id = player_id;
+	emrd->greatness = greatness;
 	
-	if (!found) {
-		CREATE(emrd, struct empire_member_reader_data, 1);
-		emrd->empire = empire;
-		emrd->account_id = account_id;
-		emrd->greatness = greatness;
-		
-		emrd->next = *list;
-		*list = emrd;
-	}
+	LL_INSERT_INORDER(*list, emrd, sort_emrd);
 }
 
 
@@ -4258,7 +4261,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	char_data *ch;
 	time_t logon, curtime = time(0), timeout;
 	bool is_file;
-	int level;
+	int level, last_account, acct_greatness;
 
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!only_empire || emp == only_empire) {
@@ -4304,7 +4307,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			timeout = get_member_timeout_ch(ch);
 			
 			if (!is_file || timeout > curtime) {
-				add_to_account_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_GREATNESS(ch));
+				add_to_emrd_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_IDNUM(ch), GET_GREATNESS(ch));
 				
 				// not account-restricted
 				EMPIRE_TOTAL_PLAYTIME(e) += (ch->player.time.played / SECS_PER_REAL_HOUR);
@@ -4330,11 +4333,33 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 	}
 	
-	// now apply the best from each account, and clear out the list
+	// vars for processing accounts
+	last_account = -1;
+	acct_greatness = 0;
+	
+	// this list is pre-sorted by account, then greatness (descending), then player id
 	while ((emrd = account_list)) {
-		EMPIRE_MEMBERS(emrd->empire) += 1;
-		EMPIRE_GREATNESS(emrd->empire) += emrd->greatness;
+		index = find_player_index_by_idnum(emrd->player_id);
+		if (last_account != emrd->account_id) {
+			// found a new account: the first player is always the highest greatness
+			last_account = emrd->account_id;
+			acct_greatness = emrd->greatness;
+			
+			EMPIRE_MEMBERS(emrd->empire) += 1;
+			EMPIRE_GREATNESS(emrd->empire) += emrd->greatness;
+			index->contributing_greatness = TRUE;
+			
+			// will re-calculate if it drops below this
+			index->greatness_threshold = emrd->next ? emrd->next->greatness : 0;
+		}
+		else {	// same account again
+			index->contributing_greatness = FALSE;
+			
+			// will re-calculate if it rises above this
+			index->greatness_threshold = acct_greatness;
+		}
 		
+		// free data
 		account_list = emrd->next;
 		free(emrd);
 	}

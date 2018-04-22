@@ -379,7 +379,6 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	empire_data *emp = GET_LOYALTY(ch);
 	// int diff, orig;
 	
 	if (add) {
@@ -407,13 +406,28 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_CHARISMA:
 			SAFE_ADD(GET_CHARISMA(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
-		case APPLY_GREATNESS:
+		case APPLY_GREATNESS: {
+			empire_data *emp = GET_LOYALTY(ch);
+			player_index_data *index;
+			
 			// only update greatness if ch is in a room (playing)
-			if (!IS_NPC(ch) && emp && IN_ROOM(ch)) {
+			if (!IS_NPC(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch))) && index->contributing_greatness) {
 				EMPIRE_GREATNESS(emp) += mod;
 			}
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
+			
+			// check bounds for empire contributions
+			if (emp && index) {
+				if (index->contributing_greatness && GET_GREATNESS(ch) < index->greatness_threshold) {
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
+				}
+				else if (!index->contributing_greatness && GET_GREATNESS(ch) > index->greatness_threshold) {
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
+				}
+			}
+			
 			break;
+		}
 		case APPLY_INTELLIGENCE:
 			SAFE_ADD(GET_INTELLIGENCE(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
