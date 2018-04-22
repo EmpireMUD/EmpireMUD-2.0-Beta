@@ -1399,7 +1399,6 @@ void perform_idle_out(char_data *ch) {
 	
 	if (emp) {
 		extract_pending_chars();	// ensure char is gone
-		// read_empire_members(emp, FALSE);
 	}
 }
 

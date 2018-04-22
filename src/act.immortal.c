@@ -1380,7 +1380,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		affect_total(vict);
 		if (emp) {
-			read_empire_members(emp, FALSE);
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
 		}
 	}
 	else if SET_CASE("intelligence") {
@@ -1868,7 +1868,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		
 		if ((emp = GET_LOYALTY(vict))) {
-			read_empire_members(emp, FALSE);
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
 		}
 	}
 
