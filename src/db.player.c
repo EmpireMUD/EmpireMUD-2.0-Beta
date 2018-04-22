@@ -3572,7 +3572,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		}
 		else {
 			// reread members to adjust greatness
-			read_empire_members(emp, FALSE);
+			// read_empire_members(emp, FALSE);
 		}
 	}
 	
