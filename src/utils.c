@@ -389,9 +389,6 @@ void run_delayed_refresh(void) {
 	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	
-	empire_data *refresh_one_members = NULL;
-	bool refresh_all_members = FALSE;
-	
 	if (check_delayed_refresh) {
 		struct empire_goal *goal, *next_goal;
 		int complete, total, crop_var;
@@ -425,28 +422,13 @@ void run_delayed_refresh(void) {
 				}
 			}
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MEMBERS)) {
-				// refresh these later -- to optimize for number of times the refresh is called
-				if (refresh_one_members) {
-					refresh_all_members = TRUE;
-				}
-				else {
-					refresh_one_members = emp;
-				}
+				read_empire_members(emp, FALSE);
 			}
 			
 			// clear this
 			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
 		}
 		
-		// check if we need to refresh members (delayed to avoid multiple scans)
-		if (refresh_all_members) {
-			read_empire_members(NULL, FALSE);
-		}
-		else if (refresh_one_members) {
-			read_empire_members(refresh_one_members, FALSE);
-		}
-		
-		// and done!
 		check_delayed_refresh = FALSE;
 	}
 }
