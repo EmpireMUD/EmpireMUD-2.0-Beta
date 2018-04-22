@@ -1062,6 +1062,9 @@ void extract_char_final(char_data *ch) {
 		log("SYSERR: Extracting char %s not in any room. (%s, extract_char_final)", GET_NAME(ch), __FILE__);
 		exit(1);
 	}
+	
+	// shut this off -- no need to total during an extract
+	pause_affect_total = TRUE;
 
 	/* Check to see if we are grouped! */
 	if (GROUP(ch)) {
@@ -1193,10 +1196,12 @@ void extract_char_final(char_data *ch) {
 		free_char(ch);
 	}
 	
+	pause_affect_total = FALSE;
+	
 	// update empire numbers -- only if we detected empire membership back at the beginning
 	// this prevents incorrect greatness or other traits on logout
 	if (rescan_emp) {
-		TRIGGER_DELAYED_REFRESH(rescan_emp, DELAY_REFRESH_MEMBERS);
+		//TRIGGER_DELAYED_REFRESH(rescan_emp, DELAY_REFRESH_MEMBERS);
 	}
 }
 
