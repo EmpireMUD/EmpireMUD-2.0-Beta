@@ -407,25 +407,11 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_CHARISMA(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
 		case APPLY_GREATNESS: {
-			empire_data *emp = GET_LOYALTY(ch);
-			player_index_data *index = NULL;
-			
-			// only update greatness if ch is in a room (playing)
-			if (!IS_NPC(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch))) && index->contributing_greatness) {
-				EMPIRE_GREATNESS(emp) += mod;
+			player_index_data *index;
+			if (!IS_NPC(ch) && GET_LOYALTY(ch) && (index = find_player_index_by_idnum(GET_IDNUM(ch))) && index->contributing_greatness) {
+				EMPIRE_GREATNESS(GET_LOYALTY(ch)) += mod;
 			}
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
-			
-			// check bounds for empire contributions
-			if (emp && index) {
-				if (index->contributing_greatness && GET_GREATNESS(ch) < index->greatness_threshold) {
-					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
-				}
-				else if (!index->contributing_greatness && GET_GREATNESS(ch) > index->greatness_threshold) {
-					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
-				}
-			}
-			
 			break;
 		}
 		case APPLY_INTELLIGENCE:
@@ -705,6 +691,7 @@ void affect_total(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
 
 	struct affected_type *af;
+	player_index_data *index;
 	int i, iter, level;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct obj_apply *apply;
@@ -718,11 +705,6 @@ void affect_total(char_data *ch) {
 	mana = GET_MANA(ch);
 	level = get_approximate_level(ch);
 	
-	// only update greatness if ch is in a room (playing)
-	if (!IS_NPC(ch) && emp && IN_ROOM(ch)) {
-		EMPIRE_GREATNESS(emp) -= GET_GREATNESS(ch);
-	}
-
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
 			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
@@ -803,11 +785,6 @@ void affect_total(char_data *ch) {
 		GET_ATT(ch, iter) = MAX(0, MIN(GET_ATT(ch, iter), att_max(ch)));
 	}
 	
-	// only update greatness if ch is in a room (playing)
-	if (!IS_NPC(ch) && emp && IN_ROOM(ch)) {
-		EMPIRE_GREATNESS(emp) += GET_GREATNESS(ch);
-	}
-	
 	// limit this
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
 	
@@ -823,6 +800,16 @@ void affect_total(char_data *ch) {
 	
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
+	
+	// check greatness thresholds
+	if (!IS_NPC(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
+		if (index->contributing_greatness && GET_GREATNESS(ch) < index->greatness_threshold) {
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
+		}
+		else if (!index->contributing_greatness && GET_GREATNESS(ch) > index->greatness_threshold) {
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
+		}
+	}
 }
 
 
