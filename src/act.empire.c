@@ -467,6 +467,7 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 		}
 		
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			++count;
 			snprintf(line, sizeof(line), " %s%s\r\n", vstr, PRG_NAME(prg));
 		}
 		else {
