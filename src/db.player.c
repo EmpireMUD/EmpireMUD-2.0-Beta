@@ -3571,8 +3571,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 			REREAD_EMPIRE_TECH_ON_LOGIN(ch) = FALSE;
 		}
 		else {
-			// reread members to adjust greatness
-			// read_empire_members(emp, FALSE);
+			// reread members to adjust greatness: trigger a delayed refresh because multiple things may trigger it at once
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
 		}
 	}
 	

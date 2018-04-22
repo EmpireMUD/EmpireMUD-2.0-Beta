@@ -1204,7 +1204,7 @@ void extract_char_final(char_data *ch) {
 	// update empire numbers -- only if we detected empire membership back at the beginning
 	// this prevents incorrect greatness or other traits on logout
 	if (rescan_emp) {
-		// read_empire_members(rescan_emp, FALSE);
+		TRIGGER_DELAYED_REFRESH(rescan_emp, DELAY_REFRESH_MEMBERS);
 	}
 }
 
