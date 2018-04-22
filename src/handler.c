@@ -408,7 +408,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		case APPLY_GREATNESS: {
 			empire_data *emp = GET_LOYALTY(ch);
-			player_index_data *index;
+			player_index_data *index = NULL;
 			
 			// only update greatness if ch is in a room (playing)
 			if (!IS_NPC(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch))) && index->contributing_greatness) {
