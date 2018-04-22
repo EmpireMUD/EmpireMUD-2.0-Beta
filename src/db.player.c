@@ -4350,7 +4350,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			index->contributing_greatness = TRUE;
 			
 			// will re-calculate if it drops below this
-			index->greatness_threshold = emrd->next ? emrd->next->greatness : 0;
+			index->greatness_threshold = (emrd->next && emrd->next->empire == emrd->empire) ? emrd->next->greatness : 0;
 		}
 		else {	// same account again
 			index->contributing_greatness = FALSE;

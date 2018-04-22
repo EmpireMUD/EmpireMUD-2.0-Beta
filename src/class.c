@@ -1573,7 +1573,7 @@ OLC_MODULE(classedit_role) {
 //// COMMANDS ///////////////////////////////////////////////////////////////
 
 ACMD(do_class) {
-	void resort_empires();
+	void resort_empires(bool force);
 	
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
@@ -1615,7 +1615,7 @@ ACMD(do_class) {
 			assign_class_abilities(ch, NULL, NOTHING);
 			if (emp) {
 				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires();
+				resort_empires(FALSE);
 			}
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
@@ -1641,7 +1641,7 @@ ACMD(do_class) {
 
 
 ACMD(do_role) {
-	void resort_empires();
+	void resort_empires(bool force);
 	
 	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct player_skill_data *plsk, *next_plsk;
@@ -1686,7 +1686,7 @@ ACMD(do_role) {
 			assign_class_abilities(ch, NULL, NOTHING);
 			if (emp) {
 				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires();
+				resort_empires(FALSE);
 			}
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
