@@ -699,6 +699,11 @@ void affect_total(char_data *ch) {
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
+	// this prevents over-totaling
+	if (pause_affect_total) {
+		return;
+	}
+	
 	// save these for later -- they shouldn't change during an affect_total
 	health = GET_HEALTH(ch);
 	move = GET_MOVE(ch);
