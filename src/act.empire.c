@@ -433,18 +433,19 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 * @param char_data *ch The player to show them to.
 * @parma empire_data *emp The empire whose goals to show.
 * @param int only_type Optional: A PROGRESS_ type to show exclusively (NOTHING = all types).
+* @param bool purchases If TRUE, shows bought goals; if FALSE shows completed goals.
 */
-void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
+void show_completed_goals(char_data *ch, empire_data *emp, int only_type, bool purchased) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], vstr[256];
 	progress_data *prg, *next_prg;
 	int count = 0;
 	size_t size;
 	
 	if (only_type == NOTHING) {
-		size = snprintf(buf, sizeof(buf), "%s%s\t0 has completed:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		size = snprintf(buf, sizeof(buf), "%s%s\t0 has %s:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), purchased ? "purchased" : "completed");
 	}
 	else {
-		size = snprintf(buf, sizeof(buf), "%s%s\t0 has completed the following %s goals:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), progress_types[only_type]);
+		size = snprintf(buf, sizeof(buf), "%s%s\t0 has %s the following %s %s:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), purchased ? "purchased" : "completed", progress_types[only_type], purchased ? "rewards" : "goals");
 	}
 	
 	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
@@ -455,6 +456,12 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 			continue;
 		}
 		if (!empire_has_completed_goal(emp, PRG_VNUM(prg))) {
+			continue;
+		}
+		if (purchased && !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+			continue;
+		}
+		else if (!purchased && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 			continue;
 		}
 		
@@ -485,7 +492,7 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type) {
 	}
 	
 	if (!count) {
-		size += snprintf(buf + size, sizeof(buf) - size, " no goals\r\n");
+		size += snprintf(buf + size, sizeof(buf) - size, " no %s\r\n", purchased ? "rewards" : "goals");
 	}
 	else if (size + 2 < sizeof(buf) && count % 2 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 		strcat(buf, "\r\n");
@@ -5602,7 +5609,11 @@ ACMD(do_progress) {
 	else if (((cat = search_block(argument, progress_types, FALSE)) != NOTHING || (cat = search_block(arg, progress_types, FALSE)) != NOTHING) && cat != PROGRESS_UNDEFINED) {
 		// show completed goals instead?
 		if (is_abbrev(arg2, "completed") && strlen(arg2) > 3) {
-			show_completed_goals(ch, emp, cat);
+			show_completed_goals(ch, emp, cat, FALSE);
+			return;
+		}
+		else if (is_abbrev(arg2, "purchased") && strlen(arg2) > 3) {
+			show_completed_goals(ch, emp, cat, TRUE);
 			return;
 		}
 		
@@ -5683,7 +5694,7 @@ ACMD(do_progress) {
 				++total;
 			}
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "- Completed goals: %d\r\n", total);
+		size += snprintf(buf + size, sizeof(buf) - size, "- Completed goals and rewards: %d\r\n", total);
 		
 		page_string(ch->desc, buf, TRUE);
 	}
@@ -5694,11 +5705,20 @@ ACMD(do_progress) {
 			cat = NOTHING;
 		}
 		
-		show_completed_goals(ch, emp, cat);
+		show_completed_goals(ch, emp, cat, FALSE);
+	}
+	else if (is_abbrev(arg, "purchased")) {
+		// check category request
+		cat = *arg2 ? search_block(arg2, progress_types, FALSE) : NOTHING;
+		if (cat == PROGRESS_UNDEFINED) {
+			cat = NOTHING;
+		}
+		
+		show_completed_goals(ch, emp, cat, TRUE);
 	}
 	else if (!str_cmp(arg, "buy")) {
 		if (!*arg2) {	// display all purchasable goals
-			size = snprintf(buf, sizeof(buf), "Available progression goals (%d progress point%s):\r\n", EMPIRE_PROGRESS_POOL(emp), PLURAL(EMPIRE_PROGRESS_POOL(emp)));
+			size = snprintf(buf, sizeof(buf), "Available progression rewards (%d progress point%s):\r\n", EMPIRE_PROGRESS_POOL(emp), PLURAL(EMPIRE_PROGRESS_POOL(emp)));
 			
 			any = FALSE;
 			HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
@@ -5813,7 +5833,7 @@ ACMD(do_progress) {
 		msg_to_char(ch, "Usage: progress [category]\r\n");
 		msg_to_char(ch, "       progress [goal name]\r\n");
 		msg_to_char(ch, "       progress buy [goal name]\r\n");
-		msg_to_char(ch, "       progress completed\r\n");
+		msg_to_char(ch, "       progress <completed | purchased>\r\n");
 	}
 }
 
