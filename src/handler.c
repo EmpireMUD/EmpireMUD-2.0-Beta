@@ -1394,8 +1394,11 @@ void perform_idle_out(char_data *ch) {
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
+	
+	pause_affect_total = TRUE;	// save unnecessary processing
 	extract_all_items(ch);
 	extract_char(ch);
+	pause_affect_total = FALSE;
 	
 	if (emp) {
 		extract_pending_chars();	// ensure char is gone

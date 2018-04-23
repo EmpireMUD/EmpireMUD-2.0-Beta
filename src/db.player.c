@@ -3380,6 +3380,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	player_index_data *index;
 	empire_data *emp;
 	int iter, duration;
+	
+	pause_affect_total = TRUE;	// prevent unnecessary totaling
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
@@ -3639,6 +3641,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// now is a good time to save and be sure we have a good save file
 	SAVE_CHAR(ch);
+	
+	pause_affect_total = FALSE;
+	affect_total(ch);
 }
 
 

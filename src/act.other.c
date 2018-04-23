@@ -2471,9 +2471,10 @@ ACMD(do_quit) {
 		
 		display_statistics_to_char(ch);
 		
-		// this will disconnect the descriptor
+		pause_affect_total = TRUE;	// prevent unneeded affect_totals
 		extract_all_items(ch);
-		extract_char(ch);
+		extract_char(ch);	// this will disconnect the descriptor
+		pause_affect_total = FALSE;
 	}
 }
 
