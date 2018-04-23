@@ -603,6 +603,9 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 void extract_all_items(char_data *ch) {
 	int iter;
 	
+	// it's no longer safe to save the delay file -- saving it after extracting items results in losing all items
+	DONT_SAVE_DELAY(ch) = TRUE;
+	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter)) {
 			Crash_extract_objs(GET_EQ(ch, iter));

@@ -3774,6 +3774,7 @@ struct player_special_data {
 	struct combat_meters meters;	// combat meter data
 	
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
+	bool dont_save_delay;	// marked when a player is partially unloaded, to prevent accidentally saving a delay file with no gear
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
 	bool reread_empire_tech_on_login;	// mark the player to trigger empire tech re-read on entering the game
 };

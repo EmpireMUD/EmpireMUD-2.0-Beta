@@ -742,6 +742,9 @@ void check_delayed_load(char_data *ch) {
 	fclose(fl);	
 	
 	update_reputations(ch);
+	
+	// definitely safe to save delay file
+	DONT_SAVE_DELAY(ch) = FALSE;
 }
 
 
@@ -2075,7 +2078,7 @@ void save_char(char_data *ch, room_data *load_room) {
 	rename(tempname, filename);
 	
 	// delayed data?
-	if (!NEEDS_DELAYED_LOAD(ch)) {
+	if (!NEEDS_DELAYED_LOAD(ch) && !DONT_SAVE_DELAY(ch)) {
 		if (!get_filename(GET_PC_NAME(ch), filename, DELAYED_FILE)) {
 			log("SYSERR: save_char: Unable to get delayed filename for '%s'", GET_PC_NAME(ch));
 			return;
