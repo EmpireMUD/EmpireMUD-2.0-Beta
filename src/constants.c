@@ -1812,6 +1812,7 @@ const char *wf_problem_types[] = {
 	"no resources",
 	"already sheared",
 	"delayed",
+	"out of city",
 	"\n"
 };
 

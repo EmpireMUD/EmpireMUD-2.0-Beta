@@ -88,34 +88,36 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 
 // CHORE_x
 struct empire_chore_type chore_data[NUM_CHORES] = {
-	{ "building", BUILDER },
-	{ "farming", FARMER },
-	{ "replanting", NOTHING },
-	{ "chopping", FELLER },
-	{ "maintenance", REPAIRMAN },
-	{ "mining", MINER },
-	{ "digging", DIGGER },
-	{ "sawing", SAWYER },
-	{ "scraping", SCRAPER },
-	{ "smelting", SMELTER },
-	{ "weaving", WEAVER },
-	{ "quarrying", STONECUTTER },
-	{ "nailmaking", NAILMAKER },
-	{ "brickmaking", BRICKMAKER },
-	{ "abandon-dismantled", NOTHING },
-	{ "herb-gardening", GARDENER },
-	{ "fire brigade", FIRE_BRIGADE },
-	{ "trapping", TRAPPER },
-	{ "tanning", TANNER },
-	{ "shearing", SHEARER },
-	{ "minting", COIN_MAKER },
-	{ "dismantle-mines", MINE_SUPERVISOR },
-	{ "abandon-chopped", NOTHING },
-	{ "abandon-farmed", NOTHING },
-	{ "nexus-crystals", APPRENTICE_EXARCH },
-	{ "milling", MILL_WORKER },
-	{ "repair-vehicles", VEHICLE_REPAIRMAN },
-	{ "oilmaking", PRESS_WORKER },
+	// name, npc vnum, hidden
+	{ "building", BUILDER, FALSE },
+	{ "farming", FARMER, FALSE },
+	{ "replanting", NOTHING, FALSE },
+	{ "chopping", FELLER, FALSE },
+	{ "maintenance", REPAIRMAN, FALSE },
+	{ "mining", MINER, FALSE },
+	{ "digging", DIGGER, FALSE },
+	{ "sawing", SAWYER, FALSE },
+	{ "scraping", SCRAPER, FALSE },
+	{ "smelting", SMELTER, FALSE },
+	{ "weaving", WEAVER, FALSE },
+	{ "quarrying", STONECUTTER, FALSE },
+	{ "nailmaking", NAILMAKER, FALSE },
+	{ "brickmaking", BRICKMAKER, FALSE },
+	{ "abandon-dismantled", NOTHING, FALSE },
+	{ "herb-gardening", GARDENER, FALSE },
+	{ "fire brigade", FIRE_BRIGADE, FALSE },
+	{ "trapping", TRAPPER, FALSE },
+	{ "tanning", TANNER, FALSE },
+	{ "shearing", SHEARER, FALSE },
+	{ "minting", COIN_MAKER, FALSE },
+	{ "dismantle-mines", MINE_SUPERVISOR, FALSE },
+	{ "abandon-chopped", NOTHING, FALSE },
+	{ "abandon-farmed", NOTHING, FALSE },
+	{ "nexus-crystals", APPRENTICE_EXARCH, FALSE },
+	{ "milling", MILL_WORKER, FALSE },
+	{ "repair-vehicles", VEHICLE_REPAIRMAN, FALSE },
+	{ "oilmaking", PRESS_WORKER, FALSE },
+	{ "general", NOTHING, TRUE },
 };
 
 
@@ -140,12 +142,12 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
 	
 	// wait wait don't work here (unless burning)
-	if ((ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK | ROOM_AFF_HAS_INSTANCE) || !check_in_city_requirement(room, TRUE)) && !IS_BURNING(room)) {
+	if ((ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK | ROOM_AFF_HAS_INSTANCE)) && !IS_BURNING(room)) {
 		return;
 	}
 	
 	// DO FIRST: crops (never blocked by workforce starvation)
-	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && CHORE_ACTIVE(CHORE_FARMING)) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && CHORE_ACTIVE(CHORE_FARMING) && !IS_BURNING(room)) {
 		do_chore_farming(emp, room);
 		return;
 	}
@@ -160,6 +162,12 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	// fire!
 	if (IS_BURNING(room) && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
 		do_chore_fire_brigade(emp, room);
+		return;
+	}
+	
+	// everything other than fire: doesn't meet in-city requirement on building
+	if (!!check_in_city_requirement(room, TRUE)) {
+		log_workforce_problem(emp, room, CHORE_FARMING, WF_PROB_OUT_OF_CITY, FALSE);
 		return;
 	}
 	

@@ -950,8 +950,13 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 	size_t size;
 	bool found;
 	
-	if (!emp || chore < 0 || chore >= NUM_CHORES) {
+	if (!emp) {
 		msg_to_char(ch, "No workforce is set up.\r\n");
+		return;
+	}
+	if (chore < 0 || chore >= NUM_CHORES || chore_data[chore].hidden) {
+		msg_to_char(ch, "Invalid chore.\r\n");
+		return;
 	}
 	
 	size = snprintf(buf, sizeof(buf), "%s workforce setup for %s%s&0:\r\n", chore_data[chore].name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
@@ -1132,6 +1137,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	skip_spaces(&argument);
 	if (*argument) {
 		for (iter = 0; iter < NUM_CHORES; ++iter) {	// find chore?
+			// allows hidden
 			if (is_abbrev(argument, chore_data[iter].name)) {
 				only_chore = iter;
 				break;
@@ -1230,6 +1236,10 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 	msg_to_char(ch, "Workforce setup for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	for (iter = 0; iter < NUM_CHORES; ++iter) {
+		if (chore_data[iter].hidden) {
+			continue;	// skip hidden here
+		}
+		
 		// determine if any/all islands have it on
 		on = off = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -6485,6 +6495,9 @@ ACMD(do_workforce) {
 	else {	// <chore>: show/change type
 		// find chore
 		for (iter = 0, type = NOTHING; iter < NUM_CHORES && type == NOTHING; ++iter) {
+			if (chore_data[iter].hidden) {
+				continue;	 // skip hidden
+			}
 			if (is_abbrev(arg, chore_data[iter].name)) {
 				type = iter;
 			}

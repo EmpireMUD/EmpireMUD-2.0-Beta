@@ -1636,6 +1636,7 @@ Some possible reasons include:
  no resources - You are missing the items needed to build/craft.
  already sheared - Sheep sheared too recently.
  delayed - There was a recent problem and workforce must wait to resume.
+ out of city - The building must be inside a city.
 
 If a chore is marked "delayed", that means it failed on a previous attempt and
 hasn't tried again yet. Chores are delayed by a few hours when they fail.

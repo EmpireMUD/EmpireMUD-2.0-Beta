@@ -1029,7 +1029,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_MILLING  25
 #define CHORE_REPAIR_VEHICLES  26
 #define CHORE_OILMAKING  27
-#define NUM_CHORES  28		// total
+#define CHORE_GENERAL  28	// for reporting problems
+#define NUM_CHORES  29		// total
 
 
 /* Diplomacy types */
@@ -1175,6 +1176,7 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_NO_RESOURCES  3	// nothing to craft/build with
 #define WF_PROB_ALREADY_SHEARED  4	// mob sheared too recently
 #define WF_PROB_DELAYED  5	// delayed by a previous failure
+#define WF_PROB_OUT_OF_CITY  6	// building requires in-city
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4054,6 +4056,7 @@ struct city_metadata_type {
 struct empire_chore_type {
 	char *name;
 	mob_vnum mob;
+	bool hidden;	// won't show in the main chores list
 };
 
 
