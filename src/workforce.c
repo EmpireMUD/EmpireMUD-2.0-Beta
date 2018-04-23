@@ -166,7 +166,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// everything other than fire: doesn't meet in-city requirement on building
-	if (!!check_in_city_requirement(room, TRUE)) {
+	if (!check_in_city_requirement(room, TRUE)) {
 		log_workforce_problem(emp, room, CHORE_FARMING, WF_PROB_OUT_OF_CITY, FALSE);
 		return;
 	}
