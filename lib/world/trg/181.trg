@@ -72,7 +72,7 @@ if !%self.varexists(logs)%
   set logs 1
   remote logs %self.id%
 end
-set loot 120
+set loot 124
 set logs %self.logs%
 if %logs% > 75
   set logs 75
