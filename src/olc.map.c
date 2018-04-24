@@ -160,6 +160,7 @@ OLC_MODULE(mapedit_terrain) {
 
 		// delete city center?
 		if (IS_CITY_CENTER(IN_ROOM(ch)) && emp && (city = find_city_entry(emp, IN_ROOM(ch)))) {
+			log_to_empire(emp, ELOG_TERRITORY, "%s was lost", city->name);
 			REMOVE_FROM_LIST(city, EMPIRE_CITY_LIST(emp), next);
 			if (city->name) {
 				free(city->name);

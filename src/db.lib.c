@@ -2294,7 +2294,6 @@ void load_empire_storage(void) {
 */
 void parse_empire(FILE *fl, empire_vnum vnum) {
 	void assign_old_workforce_chore(empire_data *emp, int chore);
-	void complete_building(room_data *room);
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	extern struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
@@ -2671,16 +2670,13 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				if (sscanf(line, "Y %d %d %s", &t[0], &t[1], str_in) == 3) {
 					tmp = fread_string(fl, buf2);
 					
-					if ((room = real_room(t[0]))) {
+					if ((room = real_room(t[0])) && IS_CITY_CENTER(room)) {
 						city = create_city_entry(emp, tmp, room, t[1]);
 						city->traits = asciiflag_conv(str_in);
-						
-						// check building exists
-						if (!IS_CITY_CENTER(room)) {
-							construct_building(room, BUILDING_CITY_CENTER);
-							set_room_extra_data(room, ROOM_EXTRA_FOUND_TIME, time(0));
-							complete_building(room);
-						}
+					}
+					else if (room) {
+						// no city center -- just lose the city
+						log_to_empire(emp, ELOG_TERRITORY, "%s was lost", tmp);
 					}
 					
 					free(tmp);	// was duplicated
