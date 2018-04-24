@@ -4179,6 +4179,7 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
+	void refresh_all_quests(char_data *ch);
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	
 	struct empire_island *from_isle, *next_isle, *isle;
@@ -4393,8 +4394,12 @@ ACMD(do_enroll) {
 			// move territory over
 			HASH_ITER(hh, world_table, room, next_room) {
 				if (ROOM_OWNER(room) == old) {
-					abandon_room(room);
-					claim_room(room, e);
+					// just change owner
+					ROOM_OWNER(room) = e;
+					
+					// this may have been the cause of city centers abandoning during a move
+					// abandon_room(room);
+					// claim_room(room, e);
 				}
 			}
 			
@@ -4419,6 +4424,13 @@ ACMD(do_enroll) {
 			refresh_empire_goals(e, NOTHING);
 			
 			save_empire(e, TRUE);
+			
+			// need to update quests too
+			LL_FOREACH(character_list, victim) {
+				if (GET_LOYALTY(victim) == e) {
+					refresh_all_quests(victim);
+				}
+			}
 		}
 		
 		// targ still around when we got this far?
