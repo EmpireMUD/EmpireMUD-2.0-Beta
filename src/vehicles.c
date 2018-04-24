@@ -60,6 +60,40 @@ extern bool validate_icon(char *icon);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Cancels vehicle ownership on vehicles whose empires are gone, allowing those
+* vehicles to be cleaned up by players.
+*/
+void abandon_lost_vehicles(void) {
+	vehicle_data *veh;
+	empire_data *emp;
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (!(emp = VEH_OWNER(veh))) {
+			continue;	// only looking to abandon owned vehs
+		}
+		if (EMPIRE_IMM_ONLY(emp)) {
+			continue;	// imm empire vehicles could be disastrous
+		}
+		if (EMPIRE_MEMBERS(emp) > 0 || EMPIRE_TERRITORY(emp, TER_TOTAL) > 0) {
+			continue;	// skip empires that still have territory or members
+		}
+		
+		// found!
+		VEH_OWNER(veh) = NULL;
+		
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+		}
+		
+		if (VEH_IS_COMPLETE(veh)) {
+			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
+			et_lose_vehicle(emp, VEH_VNUM(veh));
+		}
+	}
+}
+
+
+/**
 * @param vehicle_data *veh Any vehicle instance.
 * @return int The number of animals harnessed to it.
 */

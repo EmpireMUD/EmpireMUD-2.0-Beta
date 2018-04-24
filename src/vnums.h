@@ -198,6 +198,7 @@
 #define VEHICLE_REPAIRMAN  273
 #define OVERSEER  274
 #define PRESS_WORKER  276
+#define MINE_SUPERVISOR  277
 
 
  //////////////////////////////////////////////////////////////////////////////

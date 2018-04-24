@@ -233,8 +233,9 @@ void load_and_shift_map(int dist);
 #define ESTUARY			21
 #define MARSH			22
 #define SHALLOWS		23
+#define FOOTHILLS		24
 
-#define NUM_MAP_SECTS	24	/* Total */
+#define NUM_MAP_SECTS	25	/* Total */
 
 // terrain data
 struct {
@@ -268,6 +269,7 @@ struct {
 	{ "j", "Estuary", 53, TRUE, TRUE },
 	{ "e", "Marsh", 35, TRUE, TRUE },
 	{ "j", "Shallows", 57, FALSE, TRUE },
+	{ "b", "Foothills", 58, TRUE, TRUE },
 };
 
 
@@ -415,15 +417,16 @@ void create_map(void) {
 		}
 	}
 	
+	printf("Numbering islands and fixing lakes...\n");
+	number_islands_and_fix_lakes();
+	finish_islands(0);
+	replace_near(MOUNTAIN, FOOTHILLS, LAKE, 1);
+	
 	// these really need to go in order, as they modify the map in passes
 	printf("Adding desert...\n");
 	add_latitude_terrain(DESERT, DESERT_START_PRC, DESERT_END_PRC);
 	printf("Adding jungle...\n");
 	add_latitude_terrain(JUNGLE, JUNGLE_START_PRC, JUNGLE_END_PRC);
-	
-	printf("Numbering islands and fixing lakes...\n");
-	number_islands_and_fix_lakes();
-	finish_islands(0);
 	
 	// oases convert to river here (instead of canal like in-game)
 	printf("Merging oases...\n");

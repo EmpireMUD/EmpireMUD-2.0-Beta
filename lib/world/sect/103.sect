@@ -1,7 +1,7 @@
 #10300
 Scorched Woods~
 The Scorched Woods~
-'^' 3 1 4 0 0
+'^' 3 1 4 0 p
 D0
 &r.&y^&r..~
 &y~
@@ -53,7 +53,7 @@ S
 #10301
 Scorched Grove~
 The Scorched Grove~
-'.' 3 2 4 0 0
+'.' 3 2 4 0 p
 D0
 &r.&y^&r..~
 &y~
@@ -105,12 +105,14 @@ S
 #10302
 Scorched Plains~
 The Scorched Plains~
-'.' 3 1 4 0 0
+'.' 3 1 4 0 p
 D0
 ....~
 &r~
 E
-4 0 0.30 0
+4 0 0.20 7
+E
+4 0 0.20 0
 E
 9 0 75.00 1
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
@@ -146,7 +148,7 @@ S
 #10303
 Scorched Crop~
 The Scorched Crops~
-'.' 3 1 4 0 0
+'.' 3 1 4 0 p
 D0
 ....~
 &r~
@@ -189,7 +191,7 @@ S
 #10304
 Scorched Desert Crop~
 The Scorched Crops~
-'.' 3 2 4 0 0
+'.' 3 2 4 0 p
 D0
 ....~
 &r~
@@ -232,7 +234,7 @@ S
 #10305
 Scorched Desert~
 The Scorched Desert~
-'.' 3 2 4 0 0
+'.' 3 2 4 0 p
 D0
 ....~
 &r~

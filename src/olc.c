@@ -5162,7 +5162,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		if (!change) {
 			msg_to_char(ch, "Invalid %s number.\r\n", command);
 		}
-		else if (is_abbrev(field_arg, "amount")) {
+		else if (is_abbrev(field_arg, "amount") || is_abbrev(field_arg, "value") || is_abbrev(field_arg, "quantity")) {
 			if (requirement_amt_type[change->type] == REQ_AMT_REPUTATION && (num = get_reputation_by_name(argument)) == NOTHING) {
 				msg_to_char(ch, "Invalid reputation '%s'.\r\n", argument);
 				return;
@@ -5504,7 +5504,7 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 		if (!change) {
 			msg_to_char(ch, "Invalid apply number.\r\n");
 		}
-		else if (is_abbrev(type_arg, "value")) {
+		else if (is_abbrev(type_arg, "value") || is_abbrev(type_arg, "amount") || is_abbrev(type_arg, "quantity")) {
 			num = atoi(val_arg);
 			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
 				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
@@ -6312,7 +6312,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				msg_to_char(ch, "Interaction %d type changed to %s.\r\n", atoi(arg2), interact_types[loc]);
 			}
 		}
-		else if (is_abbrev(arg3, "quantity")) {
+		else if (is_abbrev(arg3, "quantity") || is_abbrev(arg3, "amount")) {
 			if ((num = atoi(arg4)) < 1 || num >= 1000) {
 				msg_to_char(ch, "You must choose a quantity between 1 and 1000.\r\n");
 			}
@@ -6643,7 +6643,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 		if (!change) {
 			msg_to_char(ch, "Invalid resource number.\r\n");
 		}
-		else if (is_abbrev(arg3, "quantity")) {
+		else if (is_abbrev(arg3, "quantity") || is_abbrev(arg3, "amount")) {
 			if (vnum < 1 || vnum > 10000) {
 				msg_to_char(ch, "You must specify a quantity between 1 and 10000.\r\n");
 			}

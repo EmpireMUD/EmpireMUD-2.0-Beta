@@ -2099,7 +2099,7 @@ ACMD(do_chart) {
 
 // will show all currencies if the subcmd == TRUE
 ACMD(do_coins) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vstr[64];
 	struct player_currency *cur, *next_cur;
 	size_t size;
 	
@@ -2115,7 +2115,14 @@ ACMD(do_coins) {
 		size += snprintf(buf + size, sizeof(buf) - size, "You also have:\r\n");
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
-			snprintf(line, sizeof(line), "%3d %s\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", cur->vnum);
+			}
+			else {
+				*vstr = '\0';
+			}
+			
+			snprintf(line, sizeof(line), "%s%3d %s\r\n", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
@@ -2697,10 +2704,14 @@ ACMD(do_look) {
 		send_to_char("You can't see anything but stars!\r\n", ch);
 	else if (AFF_FLAGGED(ch, AFF_BLIND))
 		send_to_char("You can't see a damned thing, you're blind!\r\n", ch);
+	
+	/* prior to b5.31, this block gave an abbreviated version of look_at_room, which isn't necessary
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		send_to_char("It is pitch black...\r\n", ch);
-		list_char_to_char(ROOM_PEOPLE(IN_ROOM(ch)), ch);	/* glowing red eyes */
+		list_char_to_char(ROOM_PEOPLE(IN_ROOM(ch)), ch);	// glowing red eyes
 	}
+	*/
+	
 	else {
 		half_chop(argument, arg, arg2);
 
@@ -3142,10 +3153,10 @@ ACMD(do_survey) {
 	if ((island = GET_ISLAND(IN_ROOM(ch)))) {
 		// find out if it has a local name
 		if (GET_LOYALTY(ch) && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
-			msg_to_char(ch, "Location: %s (%s)%s\r\n", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+			msg_to_char(ch, "Location: %s (%s)%s%s\r\n", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
 		}
 		else {
-			msg_to_char(ch, "Location: %s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+			msg_to_char(ch, "Location: %s%s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
 		}
 	}
 	
@@ -3155,7 +3166,7 @@ ACMD(do_survey) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name);
 		}
 		else if (ter_type == TER_OUTSKIRTS) {
-			msg_to_char(ch, "This is the outskirts of %s%s&0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
+			msg_to_char(ch, "This is the outskirts of %s%s&0.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
 		}
 		else {
 			msg_to_char(ch, "This area is claimed by %s%s&0.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));

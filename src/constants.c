@@ -195,6 +195,14 @@ const char *ability_custom_types[] = {
 // ADL_x: for adding to ability_data_list
 const char *ability_data_types[] = {
 	"PTECH",
+	"EFFECT",
+	"\n"
+};
+
+
+// ABIL_EFFECT_x: things that happen when an ability is used
+const char *ability_effects[] = {
+	"dismount",	// 0
 	"\n"
 };
 
@@ -1804,6 +1812,7 @@ const char *wf_problem_types[] = {
 	"no resources",
 	"already sheared",
 	"delayed",
+	"out of city",
 	"\n"
 };
 
@@ -2642,21 +2651,27 @@ const char *quest_reward_types[] = {
 
 // BLD_ON_x
 const char *bld_on_flags[] = {
-	"water",
+	"water",	// 0
 	"plains",
 	"mountain",
-	"full forest",
+	"full-forest",
 	"desert",
-	"river",
+	"river",	// 5
 	"jungle",
-	"not player made",
+	"not-player-made",
 	"ocean",
 	"oasis",
-	"crops",
+	"crops",	// 10
 	"grove",
 	"swamp",
-	"any forest",
-	"open building",
+	"any-forest",
+	"open-building",
+	"basic-facing",	// 15
+	"shallow-sea",
+	"coast",
+	"riverbank",
+	"estuary",
+	"lake",	// 20
 	"\n"
 };
 

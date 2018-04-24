@@ -6,11 +6,12 @@ These are the common map icons:
  <&u44&0>  ship or boat
 
  &g....&0  Plains              &g^^^^&0  Forest              &y/\/\&0  Mountain
- ....  Plains              YYYY  Forest              &y^^&r^&R^&0  Forest
+ ....  Plains              &W^^^^&0  Forest              &y^^&r^&R^&0  Forest
  &Y....&0  Desert              &Y.&G^^&Y.&0  Desert Grove        &Y.&C~~&Y.&0  Oasis
  &y....&0  Desert              &y.&g^^&y.&0  Desert Grove        &y.&c~~&y.&0  Oasis
- &c~~~~&0  River               &b~~~~&0  Ocean               &c~~&g^&c~&0  Swamp
- &G^^^^&0  Jungle              &W,,,,&0  Arctic Tundra       &c~&g^&c~~&0  Marsh
+ &c~~~~&0  River               &b~~~~&0  Ocean               &a~~~~&0  Estuary/Shallows
+ &c~&t..&c~&0  Riverbank           &c~&g^&t.&c~&0  Riverbank           &c~~&g^&c~&0  Swamp/Marsh
+ &G^^^^&0  Jungle              &W,,,,&0  Arctic Tundra       &0
 
  --+-  Road                [--]  Building            \__/  Trench
  vvvv  Fence               vxxv  Gate                VVVV  Wall
@@ -60,6 +61,13 @@ The following things will speed up various chores:
 - Superior tool: craft, forge
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
+#
+AGGRO AGGR AGGRESSIVE
+
+Some mobs are aggressive and will attack players on sight. The Majesty ability
+can reduce the chances of being attacked by aggro mobs.
+
+See also: MAJESTY
 #
 APPROVAL AUTHORIZATION AUTHORIZED APPROVED
 

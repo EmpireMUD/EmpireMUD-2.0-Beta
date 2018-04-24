@@ -698,7 +698,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!ROOM_IS_CLOSED(room) || look_out) {
 		// map rooms:
 		
-		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		if (MAGIC_DARKNESS(room) && !CAN_SEE_IN_DARK_ROOM(ch, room)) {
+			// no title
+			send_to_char("It is pitch black...\r\n", ch);
+		}
+		else if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			if (show_title) {
 				send_to_char(output, ch);
 			}
@@ -854,15 +858,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	else {
 		// show room: non-map
-		
-		if (show_title) {
-			send_to_char(output, ch);
-		}
-		
 		if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {
 			send_to_char("It is pitch black...\r\n", ch);
 		}
 		else {
+			if (show_title) {
+				send_to_char(output, ch);
+			}
+			
 			// description
 			if (!PRF_FLAGGED(ch, PRF_BRIEF) && (strptr = get_room_description(room))) {
 				msg_to_char(ch, "%s", strptr);
@@ -2293,7 +2296,10 @@ ACMD(do_scan) {
 	
 	skip_spaces(&argument);
 	
-	if (!*argument) {
+	if (AFF_FLAGGED(ch, AFF_BLIND)) {
+		msg_to_char(ch, "You can't see a damned thing, you're blind!\r\n");
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
 	}
 	else if (!use_room || IS_ADVENTURE_ROOM(use_room) || ROOM_IS_CLOSED(use_room)) {	// check map room

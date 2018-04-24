@@ -499,8 +499,13 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
 
 
+// ABIL_EFFECT_x: things that happen when an ability is used
+#define ABIL_EFFECT_DISMOUNT  0	// player is dismounted
+
+
 // ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
 #define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
+#define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
 
 
 // AGH_x: ability gain hooks
@@ -686,7 +691,7 @@ typedef struct vehicle_data vehicle_data;
 // #define BLD_UNUSED26  BIT(47)
 
 
-// Terrain flags for do_build -- these match up with build_on flags for building crafts
+// BLD_ON_x: Terrain flags for do_build -- these match up with build_on flags for building crafts
 #define BLD_ON_WATER  BIT(0)
 #define BLD_ON_PLAINS  BIT(1)
 #define BLD_ON_MOUNTAIN  BIT(2)
@@ -702,6 +707,12 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_SWAMP  BIT(12)
 #define BLD_ANY_FOREST  BIT(13)
 #define BLD_FACING_OPEN_BUILDING  BIT(14)
+#define BLD_ON_BASIC_FACING  BIT(15)
+#define BLD_ON_SHALLOW_SEA  BIT(16)
+#define BLD_ON_COAST  BIT(17)
+#define BLD_ON_RIVERBANK  BIT(18)
+#define BLD_ON_ESTUARY  BIT(19)
+#define BLD_ON_LAKE  BIT(20)
 
 
 // BLD_REL_x: relationships with other buildings
@@ -970,6 +981,7 @@ typedef struct vehicle_data vehicle_data;
 // DELAY_REFRESH_x: flags indicating something on the empire needs a refresh
 #define DELAY_REFRESH_CROP_VARIETY  BIT(0)	// refreshes specific progress goals
 #define DELAY_REFRESH_GOAL_COMPLETE  BIT(1)	// checks for finished progress
+#define DELAY_REFRESH_MEMBERS  BIT(2)	// re-reads empire member data
 
 
 // EADM_x: empire admin flags
@@ -1017,7 +1029,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_MILLING  25
 #define CHORE_REPAIR_VEHICLES  26
 #define CHORE_OILMAKING  27
-#define NUM_CHORES  28		// total
+#define CHORE_GENERAL  28	// for reporting problems
+#define NUM_CHORES  29		// total
 
 
 /* Diplomacy types */
@@ -1163,6 +1176,7 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_NO_RESOURCES  3	// nothing to craft/build with
 #define WF_PROB_ALREADY_SHEARED  4	// mob sheared too recently
 #define WF_PROB_DELAYED  5	// delayed by a previous failure
+#define WF_PROB_OUT_OF_CITY  6	// building requires in-city
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3381,6 +3395,9 @@ struct player_index_data {
 	int rank;	// empire rank
 	char *last_host;	// last known host
 	
+	bool contributing_greatness;	// whether or not this alt is currently contributing greatness to their empire
+	int greatness_threshold;	// level at which this alt would start/stop contributing greatness
+	
 	UT_hash_handle idnum_hh;	// player_table_by_idnum
 	UT_hash_handle name_hh;	// player_table_by_name
 };
@@ -3757,6 +3774,7 @@ struct player_special_data {
 	struct combat_meters meters;	// combat meter data
 	
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
+	bool dont_save_delay;	// marked when a player is partially unloaded, to prevent accidentally saving a delay file with no gear
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
 	bool reread_empire_tech_on_login;	// mark the player to trigger empire tech re-read on entering the game
 };
@@ -3956,8 +3974,8 @@ struct craft_data {
 	
 	// for buildings:
 	any_vnum build_type;	// a building vnum (maybe something else too?)
-	bitvector_t build_on;	// BLD_ON_x flags for the tile it's built upon
-	bitvector_t build_facing;	// BLD_ON_x flags for the tile it's facing
+	bitvector_t build_on;	// BLD_ON_ flags for the tile it's built upon
+	bitvector_t build_facing;	// BLD_ON_ flags for the tile it's facing
 	
 	obj_vnum requires_obj;	// only shows up if you have the item
 	struct resource_data *resources;	// linked list
@@ -4039,6 +4057,7 @@ struct city_metadata_type {
 struct empire_chore_type {
 	char *name;
 	mob_vnum mob;
+	bool hidden;	// won't show in the main chores list
 };
 
 

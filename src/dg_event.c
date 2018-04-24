@@ -96,6 +96,11 @@ void event_process(void) {
 		** event function.
 		*/
 		the_event->q_el = NULL;
+		
+		if (!the_event->func) {
+			log("SYSERR: Attempt to call an event with a null function.");
+			free(the_event);
+		}
 
 		/* call event func, reenqueue event if retval > 0 */
 		if ((new_time = (the_event->func)(the_event->event_obj)) > 0)

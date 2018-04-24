@@ -5685,8 +5685,9 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 /* processes a script set command */
 void process_set(struct script_data *sc, trig_data *trig, char *cmd) {
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], *value;
-
-	value = two_arguments(cmd, arg, name);
+	
+	value = any_one_arg(cmd, arg);
+	value = any_one_arg(value, name);
 
 	skip_spaces(&value);
 
@@ -5704,8 +5705,8 @@ void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, c
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
 	char result[MAX_INPUT_LENGTH], *expr;
 
-	expr = one_argument(cmd, arg); /* cut off 'eval' */
-	expr = one_argument(expr, name); /* cut off name */
+	expr = any_one_arg(cmd, arg); /* cut off 'eval' */
+	expr = any_one_arg(expr, name); /* cut off name */
 
 	skip_spaces(&expr);
 
@@ -6141,7 +6142,8 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	obj_data *obj;
 
 	line = any_one_arg(cmd, arg);
-	two_arguments(line, buf, buf2);
+	line = any_one_arg(line, buf);
+	line = any_one_arg(line, buf2);
 	var = buf;
 	uid_p = buf2;
 	skip_spaces(&var);
@@ -6217,7 +6219,8 @@ ACMD(do_vdelete) {
 	char_data *mob;
 	obj_data *obj;
 
-	argument = two_arguments(argument, buf, buf2);
+	argument = any_one_arg(argument, buf);
+	argument = any_one_arg(argument, buf2);
 	var = buf;
 	uid_p = buf2;
 	skip_spaces(&var);
@@ -6305,7 +6308,8 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	obj_data *obj;
 
 	line = any_one_arg(cmd, arg);
-	two_arguments(line, buf, buf2);
+	line = any_one_arg(line, buf);
+	line = any_one_arg(line, buf2);
 	var = buf;
 	uid_p = buf2;
 	skip_spaces(&var);

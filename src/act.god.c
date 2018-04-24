@@ -54,6 +54,9 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 		act("$p: you can't sacrifice quest items.", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
+	if (!drop_otrigger(obj, ch, DROP_TRIG_SACRIFICE) || !drop_wtrigger(obj, ch, DROP_TRIG_SACRIFICE)) {
+		return 0;
+	}
 	
 	/* Determine monument bonus */
 	if (ROOM_PATRON(IN_ROOM(ch)) == GET_IDNUM(god)) {

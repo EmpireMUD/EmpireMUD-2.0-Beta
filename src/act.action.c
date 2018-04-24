@@ -614,6 +614,7 @@ INTERACTION_FUNC(finish_digging) {
 	// depleted? (uses rock for all types except clay)
 	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
 		msg_to_char(ch, "The ground is too hard and there doesn't seem to be anything useful to dig up here.\r\n");
+		return FALSE;
 	}
 	else {
 		for (num = 0; num < interaction->quantity; ++num) {
@@ -1217,7 +1218,7 @@ void process_digging(char_data *ch) {
 		}
 		else {
 			msg_to_char(ch, "You don't seem to be able to find anything to dig for.\r\n");
-			start_digging(ch);
+			cancel_action(ch);
 		}
 	}
 	else {

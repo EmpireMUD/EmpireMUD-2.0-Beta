@@ -57,10 +57,10 @@ W
 S
 #31
 Watchful Eye~
-   Built 8 guard towers (of the same type) to protect your city. Be sure to
+   Build 8 guard towers (of the same type) to protect your city. Be sure to
 claim the guard towers.
 ~
-1 3 0 40 0
+2 3 0 40 0
 W
 7 5167 0 8
 W

@@ -742,6 +742,9 @@ void check_delayed_load(char_data *ch) {
 	fclose(fl);	
 	
 	update_reputations(ch);
+	
+	// definitely safe to save delay file
+	DONT_SAVE_DELAY(ch) = FALSE;
 }
 
 
@@ -2075,7 +2078,7 @@ void save_char(char_data *ch, room_data *load_room) {
 	rename(tempname, filename);
 	
 	// delayed data?
-	if (!NEEDS_DELAYED_LOAD(ch)) {
+	if (!NEEDS_DELAYED_LOAD(ch) && !DONT_SAVE_DELAY(ch)) {
 		if (!get_filename(GET_PC_NAME(ch), filename, DELAYED_FILE)) {
 			log("SYSERR: save_char: Unable to get delayed filename for '%s'", GET_PC_NAME(ch));
 			return;
@@ -2175,7 +2178,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 		if (index->last_host) {
 			free(index->last_host);
 		}
-		index->last_host = str_dup(ch->desc ? ch->desc->host : ch->prev_host);
+		index->last_host = str_dup((ch->desc && !PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO)) ? ch->desc->host : ch->prev_host);
 	}
 }
 
@@ -2216,6 +2219,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		log("SYSERR: write_player_primary_data_to_file called with NPC");
 		return;
 	}
+	
+	// prevent MANY additional affect_totals
+	pause_affect_total = TRUE;
 	
 	// save these for later, as they are sometimes changed by removing and re-adding gear
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
@@ -2593,7 +2599,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
 	
-	// affect_total(ch); // unnecessary, I think (?)
+	// resume affect totals and run it
+	pause_affect_total = FALSE;
+	affect_total(ch);	// not 100% sure this function needs this, but at least now it only does it once -pc 4/22/18
 }
 
 
@@ -3314,6 +3322,7 @@ void delete_player_character(char_data *ch) {
 
 	// Check the empire
 	if ((emp = GET_LOYALTY(ch)) != NULL) {
+		log_to_empire(emp, ELOG_MEMBERS, "%s has left the empire", PERS(ch, ch, TRUE));
 		GET_LOYALTY(ch) = NULL;
 		GET_RANK(ch) = 0;
 	}
@@ -3374,6 +3383,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	player_index_data *index;
 	empire_data *emp;
 	int iter, duration;
+	
+	pause_affect_total = TRUE;	// prevent unnecessary totaling
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
@@ -3570,16 +3581,22 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 			REREAD_EMPIRE_TECH_ON_LOGIN(ch) = FALSE;
 		}
 		else {
-			// reread members to adjust greatness
-			read_empire_members(emp, FALSE);
+			// reread members to adjust greatness: trigger a delayed refresh because multiple things may trigger it at once
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
 		}
 	}
 	
 	// remove stale coins
 	cleanup_coins(ch);
 	
-	// verify abils -- TODO should this remove/re-add abilities for the empire? do class abilities affect that?
+	// verify abils
+	if (emp) {
+		adjust_abilities_to_empire(ch, emp, FALSE);
+	}
 	assign_class_abilities(ch, NULL, NOTHING);
+	if (emp) {
+		adjust_abilities_to_empire(ch, emp, TRUE);
+	}
 	give_level_zero_abilities(ch);
 	
 	if (!IS_IMMORTAL(ch)) {
@@ -3627,6 +3644,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// now is a good time to save and be sure we have a good save file
 	SAVE_CHAR(ch);
+	
+	pause_affect_total = FALSE;
+	affect_total(ch);
 }
 
 
@@ -4113,44 +4133,50 @@ void start_new_character(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE PLAYER MANAGEMENT ////////////////////////////////////////////////
 
-// this is used to ensure each account only contributes once to the empire
+// tracks players in an empire to determine which one contributes greatness
 struct empire_member_reader_data {
 	empire_data *empire;
 	int account_id;
+	int player_id;
 	int greatness;
-	
 	struct empire_member_reader_data *next;
 };
 
 
+// simple sorter for the member-reading data
+int sort_emrd(struct empire_member_reader_data *a, struct empire_member_reader_data *b) {
+	if (EMPIRE_VNUM(a->empire) != EMPIRE_VNUM(b->empire)) {
+		return EMPIRE_VNUM(a->empire) - EMPIRE_VNUM(b->empire);
+	}
+	if (a->account_id != b->account_id) {
+		return a->account_id - b->account_id;
+	}
+	if (a->greatness != b->greatness) {
+		return b->greatness - a->greatness;
+	}
+	return a->player_id - b->player_id;
+}
+
+
 /**
-* Add a given user's data to the account list of accounts on the empire member reader data
+* Add a given user's data to the account list on the empire member reader data
 *
 * @param struct empire_member_reader_data **list A pointer to the existing list.
 * @param int empire which empire entry the player is in
 * @param int account_id which account id the player has
+* @param int player_id the id of the player contributing
 * @param int greatness the player's greatness
 */
-static void add_to_account_list(struct empire_member_reader_data **list, empire_data *empire, int account_id, int greatness) {
+void add_to_emrd_list(struct empire_member_reader_data **list, empire_data *empire, int account_id, int player_id, int greatness) {
 	struct empire_member_reader_data *emrd;
-	bool found = FALSE;
 	
-	for (emrd = *list; emrd && !found; emrd = emrd->next) {
-		if (emrd->empire == empire && emrd->account_id == account_id) {
-			found = TRUE;
-			emrd->greatness = MAX(emrd->greatness, greatness);
-		}
-	}
+	CREATE(emrd, struct empire_member_reader_data, 1);
+	emrd->empire = empire;
+	emrd->account_id = account_id;
+	emrd->player_id = player_id;
+	emrd->greatness = greatness;
 	
-	if (!found) {
-		CREATE(emrd, struct empire_member_reader_data, 1);
-		emrd->empire = empire;
-		emrd->account_id = account_id;
-		emrd->greatness = greatness;
-		
-		emrd->next = *list;
-		*list = emrd;
-	}
+	LL_INSERT_INORDER(*list, emrd, sort_emrd);
 }
 
 
@@ -4251,7 +4277,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	char_data *ch;
 	time_t logon, curtime = time(0), timeout;
 	bool is_file;
-	int level;
+	int level, last_account, last_empire, acct_greatness;
 
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!only_empire || emp == only_empire) {
@@ -4297,7 +4323,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			timeout = get_member_timeout_ch(ch);
 			
 			if (!is_file || timeout > curtime) {
-				add_to_account_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_GREATNESS(ch));
+				add_to_emrd_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_IDNUM(ch), GET_GREATNESS(ch));
 				
 				// not account-restricted
 				EMPIRE_TOTAL_PLAYTIME(e) += (ch->player.time.played / SECS_PER_REAL_HOUR);
@@ -4323,11 +4349,35 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 	}
 	
-	// now apply the best from each account, and clear out the list
+	// vars for processing accounts
+	last_account = -1;
+	last_empire = -1;
+	acct_greatness = 0;
+	
+	// this list is pre-sorted by account, then greatness (descending), then player id
 	while ((emrd = account_list)) {
-		EMPIRE_MEMBERS(emrd->empire) += 1;
-		EMPIRE_GREATNESS(emrd->empire) += emrd->greatness;
+		index = find_player_index_by_idnum(emrd->player_id);
+		if (last_account != emrd->account_id || last_empire != EMPIRE_VNUM(emrd->empire)) {
+			// found a new account/empire: the first player is always the highest greatness
+			last_account = emrd->account_id;
+			last_empire = EMPIRE_VNUM(emrd->empire);
+			acct_greatness = emrd->greatness;
+			
+			EMPIRE_MEMBERS(emrd->empire) += 1;
+			EMPIRE_GREATNESS(emrd->empire) += emrd->greatness;
+			index->contributing_greatness = TRUE;
+			
+			// will re-calculate if it drops below this
+			index->greatness_threshold = (emrd->next && emrd->next->empire == emrd->empire) ? emrd->next->greatness : 0;
+		}
+		else {	// same account again
+			index->contributing_greatness = FALSE;
+			
+			// will re-calculate if it rises above this
+			index->greatness_threshold = acct_greatness;
+		}
 		
+		// free data
 		account_list = emrd->next;
 		free(emrd);
 	}

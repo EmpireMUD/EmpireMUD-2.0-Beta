@@ -248,7 +248,7 @@
 
 
 #define MORT_CAN_SEE_NO_DARK(sub, obj)  (INVIS_OK(sub, obj))
-#define MORT_CAN_SEE_LIGHT(sub, obj)  (LIGHT_OK(sub) || (IN_ROOM(sub) == IN_ROOM(obj) && has_player_tech((sub), PTECH_SEE_CHARS_IN_DARK)))
+#define MORT_CAN_SEE_LIGHT(sub, obj)  (LIGHT_OK(sub) || (!AFF_FLAGGED(sub, AFF_BLIND) && IN_ROOM(sub) == IN_ROOM(obj) && has_player_tech((sub), PTECH_SEE_CHARS_IN_DARK) && (!MAGIC_DARKNESS(IN_ROOM(sub)) || CAN_SEE_IN_MAGIC_DARKNESS(sub))))
 #define MORT_CAN_SEE(sub, obj)  (MORT_CAN_SEE_LIGHT(sub, obj) && MORT_CAN_SEE_NO_DARK(sub, obj))
 
 #define IMM_CAN_SEE(sub, obj)  (MORT_CAN_SEE(sub, obj) || (!IS_NPC(sub) && PRF_FLAGGED(sub, PRF_HOLYLIGHT)))
@@ -272,7 +272,7 @@
 //// CAN SEE OBJ UTILS ///////////////////////////////////////////////////////
 
 #define CAN_SEE_OBJ_CARRIER(sub, obj)  ((!obj->carried_by || CAN_SEE(sub, obj->carried_by)) && (!obj->worn_by || CAN_SEE(sub, obj->worn_by)))
-#define MORT_CAN_SEE_OBJ(sub, obj)  ((LIGHT_OK(sub) || obj->worn_by == sub || obj->carried_by == sub || (IN_ROOM(sub) == IN_ROOM(obj) && has_player_tech((sub), PTECH_SEE_OBJS_IN_DARK))) && CAN_SEE_OBJ_CARRIER(sub, obj))
+#define MORT_CAN_SEE_OBJ(sub, obj)  ((LIGHT_OK(sub) || obj->worn_by == sub || obj->carried_by == sub || (IN_ROOM(sub) == IN_ROOM(obj) && !AFF_FLAGGED((sub), AFF_BLIND) && has_player_tech((sub), PTECH_SEE_OBJS_IN_DARK) && (!MAGIC_DARKNESS(IN_ROOM(sub)) || CAN_SEE_IN_MAGIC_DARKNESS(sub)))) && CAN_SEE_OBJ_CARRIER(sub, obj))
 #define CAN_SEE_OBJ(sub, obj)  (MORT_CAN_SEE_OBJ(sub, obj) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
 
 
@@ -571,6 +571,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (EMPIRE_COINS(emp) * COIN_VALUE))
 #define EXPLICIT_BANNER_TERMINATOR(emp)  (EMPIRE_BANNER_HAS_UNDERLINE(emp) ? "\t0" : "")
+#define OUTSKIRTS_CLAIMS_AVAILABLE(emp)  (land_can_claim((emp), TER_OUTSKIRTS) + land_can_claim((emp), TER_FRONTIER) - EMPIRE_TERRITORY((emp), TER_FRONTIER))
 #define TRIGGER_DELAYED_REFRESH(emp, flag)  { SET_BIT(EMPIRE_DELAYED_REFRESH(emp), (flag)); check_delayed_refresh = TRUE; }
 
 // definitions
@@ -1016,6 +1017,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_gain_new_skills))
 #define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_get_bonus_skills))
 #define CREATION_ARCHETYPE(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype[pos]))
+#define DONT_SAVE_DELAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->dont_save_delay))
 #define GET_ABILITY_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ability_hash))
 #define GET_ABILITY_GAIN_HOOKS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gain_hooks))
 #define GET_ACCOUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->account))
@@ -1268,14 +1270,14 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)
 #define IS_DARK(room)  (MAGIC_DARKNESS(room) || (!IS_ANY_BUILDING(room) && ROOM_LIGHTS(room) == 0 && (!ROOM_OWNER(room) || !EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) && !RMT_FLAGGED((room), RMT_LIGHT) && (weather_info.sunlight == SUN_DARK || RMT_FLAGGED((room), RMT_DARK))))
 #define IS_LIGHT(room)  (!MAGIC_DARKNESS(room) && WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room))
-#define IS_REAL_LIGHT(room)  (!MAGIC_DARKNESS(room) && (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room))))
+#define IS_REAL_LIGHT(room)  (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room)))
 #define IS_RUINS(room)  (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED || BUILDING_VNUM(room) == BUILDING_RUINS_FLOODED)	// TODO: some new designation for ruins and a more procedural way to set it up or configure it in-game?
 #define ISLAND_FLAGGED(room, flag)  (GET_ISLAND(room) ? IS_SET(GET_ISLAND(room)->flags, (flag)) : FALSE)
 #define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DARK))
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || HAS_FUNCTION((room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
-#define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || adjacent_room_is_light(room) || IS_ANY_BUILDING(room))
+#define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (RMT_FLAGGED((room), RMT_LIGHT) || IS_ANY_BUILDING(room) || !IS_DARK(room) || adjacent_room_is_light(room))
 
 // interaction checks (leading up to CAN_INTERACT_ROOM)
 #define BLD_CAN_INTERACT_ROOM(room, type)  (GET_BUILDING(room) && has_interaction(GET_BLD_INTERACTIONS(GET_BUILDING(room)), (type)))

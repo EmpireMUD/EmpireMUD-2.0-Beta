@@ -459,7 +459,7 @@ end
 nop %self.set_cooldown(12400, 30)%
 %echo% %self.name% pulls a canteen of goblin grog from somewhere and tips %self.hisher% head back, drinking deeply.
 %echo% %self.name% fights with renewed strength!
-%damage% %self% -100
+%heal% %self% health 75
 dg_affect #12420 %self% HASTE on 10
 ~
 #12421
@@ -595,7 +595,7 @@ end
 nop %self.set_cooldown(12400, 30)%
 %echo% %self.name% is surrounded by a shimmering blue light!
 %echo% %self.name% is healed and strengthened!
-%damage% %self% -250
+%heal% %self% health 75
 eval amount %self.level%/10
 dg_affect #12427 %self% BONUS-PHYSICAL %amount% 30
 dg_affect #12427 %self% BONUS-MAGICAL %amount% 30
@@ -753,7 +753,7 @@ while %cycle% <= 4
       else
         %send% %person% &rYou are struck by %self.name%'s attack!
         %echoaround% %person% %person.name% is struck by %self.name%'s attack!
-        set test %actor.affect(12433)%
+        set test %person.affect(12433)%
         if %test%
           %send% %person% &rYou are encased in a block of ice!
           %echoaround% %person% %person.name% is encased in a block of ice!
@@ -859,9 +859,8 @@ nop %self.set_cooldown(12400, 30)%
 %echo% %self.name% chants and waves %self.hisher% arms!
 wait 5 sec
 %echo% %self.name% is restored!
-%damage% %self% -1000
-cleanse
-dispel
+%heal% %self% health 100
+%heal% %self% debuffs
 ~
 #12437
 Fathma: Familiar~

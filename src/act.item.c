@@ -281,6 +281,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	player_index_data *index;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH], *temp;
+	obj_data *proto;
 	crop_data *cp;
 	bld_data *bld;
 	int found;
@@ -291,6 +292,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	if (!obj || !ch || !ch->desc) {
 		return;
 	}
+	
+	// used by some things later
+	proto = obj_proto(GET_OBJ_VNUM(obj));
 	
 	// determine location
 	if (IN_ROOM(obj)) {
@@ -363,7 +367,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "\r\n");
 	}
 	
-	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0 && proto && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
 		msg_to_char(ch, "Level: %d\r\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 	}
 	
@@ -694,7 +698,7 @@ static bool perform_exchange(char_data *ch, obj_data *obj, empire_data *emp) {
 static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 	char_data *mort;
 	
-	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
+	if (!drop_otrigger(obj, ch, DROP_TRIG_PUT)) {	// also takes care of obj purging self
 		return 0;
 	}
 	
@@ -1000,11 +1004,11 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	bool logged;
 	int size;
 	
-	if (!drop_otrigger(obj, ch)) {
+	if (!drop_otrigger(obj, ch, mode == SCMD_JUNK ? DROP_TRIG_JUNK : DROP_TRIG_DROP)) {
 		return 0;
 	}
 
-	if ((mode == SCMD_DROP) && !drop_wtrigger(obj, ch)) {
+	if ((mode == SCMD_DROP) && !drop_wtrigger(obj, ch, DROP_TRIG_DROP)) {
 		return 0;
 	}
 	
@@ -1104,7 +1108,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			obj = create_money(type, amount);
 			obj_to_char(obj, ch);	// temporarily
 
-			if (!drop_wtrigger(obj, ch)) {
+			if (!drop_wtrigger(obj, ch, DROP_TRIG_DROP)) {
 				// stays in inventory, which is odd, but better than the alternative (a crash if the script purged the object and we extract it here)
 				return;
 			}
@@ -2399,7 +2403,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 /**
 * This function attempts to find the ship for a particular shipment, and send
 * it to the room of your choice (may be the destination OR origin). The
-* shipment's ship homeroom will be set to NOWHERE, to avoid re-moving ships.
+* shipment's shipping id will be set to -1, to avoid re-moving ships.
 *
 * @param empire_data *emp The empire whose shipment it is.
 * @param struct shipping_data *shipd The shipment data.
@@ -2434,7 +2438,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	
 	VEH_SHIPPING_ID(boat) = -1;
 	
-	// remove the ship homeroom from all shipments that were on this ship (including this one)
+	// remove the shipping id from all shipments that were on this ship (including this one)
 	old = shipd->shipping_id;
 	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
 		if (iter->shipping_id == old) {
@@ -3504,6 +3508,7 @@ void warehouse_store(char_data *ch, char *argument) {
 	
 	// possible #
 	tmp = any_one_arg(argument, numarg);
+	skip_spaces(&tmp);
 	if (*numarg && is_number(numarg)) {
 		total = atoi(numarg);
 		if (total < 1) {
@@ -3512,9 +3517,13 @@ void warehouse_store(char_data *ch, char *argument) {
 		}
 		argument = tmp;
 	}
-	else if (*argument && *numarg && !str_cmp(numarg, "all")) {
+	else if (*tmp && *numarg && !str_cmp(numarg, "all")) {
 		total = CAN_CARRY_N(ch) + 1;
 		argument = tmp;
+	}
+	else if (!*tmp && !str_cmp(numarg, "all")) {
+		total = CAN_CARRY_N(ch);
+		argument = numarg;
 	}
 	
 	// argument may have moved for numarg

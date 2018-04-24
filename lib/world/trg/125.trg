@@ -573,6 +573,17 @@ else
   %load% obj 12508
   %load% obj 12508
 end
+  if %actor.mob_flagged(HARD)% && !%self.is_flagged(HARD-DROP)%
+    nop %self.flag(HARD-DROP)%
+  end
+  if %actor.mob_flagged(GROUP)% && !%self.is_flagged(GROUP-DROP)%
+    nop %self.flag(GROUP-DROP)%
+  end
+end
+if %actor% && %actor.is_npc%
+  wait 0
+  %scale% %self% %self.level%
+end
 ~
 #12523
 Delayed Completer~

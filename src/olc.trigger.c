@@ -494,7 +494,10 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
 		
-		if (is_abbrev(type_arg, "-attaches")) {
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		else if (is_abbrev(type_arg, "-attaches")) {
 			argument = any_one_word(argument, val_arg);
 			if ((only_attaches = search_block(val_arg, trig_attach_types, FALSE)) == NOTHING) {
 				msg_to_char(ch, "Invalid attach type '%s'.\r\n", val_arg);

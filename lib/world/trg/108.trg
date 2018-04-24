@@ -201,4 +201,13 @@ if %room.template% == 10850
   end
 end
 ~
+#10859
+Convert Spirit Token~
+1 gh 100
+~
+%send% %actor% Your spirit token vanishes and can now be found on the 'coins' command.
+%actor.give_currency(10852,1)%
+%purge% %self%
+return 0
+~
 $

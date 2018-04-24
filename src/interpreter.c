@@ -226,7 +226,6 @@ ACMD(do_ignore);
 ACMD(do_import);
 ACMD(do_infiltrate);
 ACMD(do_instance);
-ACMD(do_info);
 ACMD(do_inspire);
 ACMD(do_insult);
 ACMD(do_interlink);
@@ -802,8 +801,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "lead", POS_STANDING, do_lead, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "learn", POS_STANDING, do_learn, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "learned", POS_DEAD, do_learned, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "list", POS_SITTING, do_list, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "light", POS_SITTING, do_light, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "list", POS_SITTING, do_list, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "lightningbolt", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_LIGHTNINGBOLT, CTYPE_COMBAT, NOBITS, ABIL_LIGHTNINGBOLT ),
 	SCMD_CMD( "library", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_LIBRARY ),
 	GRANT_CMD( "load", POS_DEAD, do_load, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_LOAD ),

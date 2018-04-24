@@ -1118,6 +1118,9 @@ void heartbeat(int heart_pulse) {
 	/* Turn this off */
 	gain_cond_messsage = FALSE;
 	
+	// prevent accidentally leaving this on
+	pause_affect_total = FALSE;
+	
 	// check for immediate reboot
 	if (reboot_control.immediate == TRUE) {
 		perform_reboot();

@@ -461,12 +461,12 @@ void summon_materials(char_data *ch, char *argument) {
 
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *objname;
 	struct empire_storage_data *store, *next_store;
-	int count = 0, total = 1, number, pos;
+	int count = 0, total = 1, number, pos, carry;
 	struct empire_island *isle;
 	empire_data *emp;
 	int cost = 2;	// * number of things to summon
 	obj_data *proto;
-	bool found = FALSE;
+	bool one, found = FALSE;
 
 	half_chop(argument, arg1, arg2);
 	
@@ -535,21 +535,35 @@ void summon_materials(char_data *ch, char *argument) {
 			}
 			
 			while (count < total && store->amount > 0) {
-				++count;	// we always get one while this is looping
-				if (!retrieve_resource(ch, emp, store, FALSE)) {
-					break;	// no more to get after this
+				carry = IS_CARRYING_N(ch);
+				one = retrieve_resource(ch, emp, store, FALSE);
+				if (IS_CARRYING_N(ch) > carry) {
+					++count;	// got one
+				}
+				if (!one) {
+					break;	// done with this loop
 				}
 			}
 		}
 	}
 	
 	if (found && count < total && count > 0) {
-		msg_to_char(ch, "There weren't enough, but you managed to summon %d.\r\n", count);
+		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
+			msg_to_char(ch, "You managed to summon %d.\r\n", count);
+		}
+		else {
+			msg_to_char(ch, "There weren't enough, but you managed to summon %d.\r\n", count);
+		}
 	}
 	
 	// result messages
 	if (!found) {
-		msg_to_char(ch, "Nothing like that is stored around here.\r\n");
+		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
+			msg_to_char(ch, "Your arms are full.\r\n");
+		}
+		else {
+			msg_to_char(ch, "Nothing like that is stored around here.\r\n");
+		}
 	}
 	else if (count == 0) {
 		// they must have gotten an error message

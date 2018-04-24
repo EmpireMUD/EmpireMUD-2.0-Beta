@@ -249,6 +249,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
+	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
@@ -369,6 +370,19 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_CURRENCY, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -737,6 +751,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	empire_data *emp, *next_emp;
+	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
@@ -954,6 +969,16 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_GET_CURRENCY, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), res_type, vnum)) {
@@ -1041,6 +1066,14 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_SHOP(desc)) {
 			if (find_currency_in_shop_item_list(SHOP_ITEMS(GET_OLC_SHOP(desc)), vnum)) {
 				msg_to_char(desc->character, "One of the currencies used for the shop you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_GET_CURRENCY, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A currency required by the social you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {

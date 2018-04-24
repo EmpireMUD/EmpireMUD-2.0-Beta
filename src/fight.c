@@ -1238,6 +1238,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	char_data *ch_iter, *player, *killmaster;
 	obj_data *corpse = NULL;
 	struct mob_tag *tag;
+	int iter;
 	
 	// no need to repeat
 	if (EXTRACTED(ch)) {
@@ -1351,6 +1352,15 @@ obj_data *die(char_data *ch, char_data *killer) {
 
 	drop_loot(ch, killmaster);
 	if (MOB_FLAGGED(ch, MOB_UNDEAD)) {
+		// remove any gear
+		for (iter = 0; iter < NUM_WEARS; ++iter) {
+			if (GET_EQ(ch, iter)) {
+				remove_otrigger(GET_EQ(ch, iter), ch);
+				if (GET_EQ(ch, iter)) {	// if it wasn't lost to a trigger
+					obj_to_char(unequip_char(ch, iter), ch);
+				}
+			}
+		}
 		if (!IS_NPC(killmaster) && IS_NPC(ch)) {
 			recursive_loot_set(ch->carrying, GET_IDNUM(killmaster), GET_LOYALTY(killmaster));
 		}
@@ -1523,7 +1533,9 @@ obj_data *make_corpse(char_data *ch) {
 		for (i = 0; i < NUM_WEARS; i++) {
 			if (GET_EQ(ch, i)) {
 				remove_otrigger(GET_EQ(ch, i), ch);
-				obj_to_obj(unequip_char(ch, i), corpse);
+				if (GET_EQ(ch, i)) {	// if it wasn't eaten by a trigger
+					obj_to_obj(unequip_char(ch, i), corpse);
+				}
 			}
 		}
 		

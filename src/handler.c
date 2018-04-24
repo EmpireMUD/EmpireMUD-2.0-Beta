@@ -379,7 +379,6 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	empire_data *emp = GET_LOYALTY(ch);
 	// int diff, orig;
 	
 	if (add) {
@@ -407,13 +406,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_CHARISMA:
 			SAFE_ADD(GET_CHARISMA(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
-		case APPLY_GREATNESS:
-			// only update greatness if ch is in a room (playing)
-			if (!IS_NPC(ch) && emp && IN_ROOM(ch)) {
-				EMPIRE_GREATNESS(emp) += mod;
+		case APPLY_GREATNESS: {
+			player_index_data *index;
+			if (!IS_NPC(ch) && GET_LOYALTY(ch) && (index = find_player_index_by_idnum(GET_IDNUM(ch))) && index->contributing_greatness) {
+				EMPIRE_GREATNESS(GET_LOYALTY(ch)) += mod;
 			}
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
+		}
 		case APPLY_INTELLIGENCE:
 			SAFE_ADD(GET_INTELLIGENCE(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
@@ -691,6 +691,7 @@ void affect_total(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
 
 	struct affected_type *af;
+	player_index_data *index;
 	int i, iter, level;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct obj_apply *apply;
@@ -698,17 +699,17 @@ void affect_total(char_data *ch) {
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
+	// this prevents over-totaling
+	if (pause_affect_total) {
+		return;
+	}
+	
 	// save these for later -- they shouldn't change during an affect_total
 	health = GET_HEALTH(ch);
 	move = GET_MOVE(ch);
 	mana = GET_MANA(ch);
 	level = get_approximate_level(ch);
 	
-	// only update greatness if ch is in a room (playing)
-	if (!IS_NPC(ch) && emp && IN_ROOM(ch)) {
-		EMPIRE_GREATNESS(emp) -= GET_GREATNESS(ch);
-	}
-
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
 			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
@@ -789,11 +790,6 @@ void affect_total(char_data *ch) {
 		GET_ATT(ch, iter) = MAX(0, MIN(GET_ATT(ch, iter), att_max(ch)));
 	}
 	
-	// only update greatness if ch is in a room (playing)
-	if (!IS_NPC(ch) && emp && IN_ROOM(ch)) {
-		EMPIRE_GREATNESS(emp) += GET_GREATNESS(ch);
-	}
-	
 	// limit this
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
 	
@@ -809,6 +805,16 @@ void affect_total(char_data *ch) {
 	
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
+	
+	// check greatness thresholds
+	if (!IS_NPC(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
+		if (index->contributing_greatness && GET_GREATNESS(ch) < index->greatness_threshold) {
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
+		}
+		else if (!index->contributing_greatness && GET_GREATNESS(ch) > index->greatness_threshold) {
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
+		}
+	}
 }
 
 
@@ -1056,6 +1062,9 @@ void extract_char_final(char_data *ch) {
 		log("SYSERR: Extracting char %s not in any room. (%s, extract_char_final)", GET_NAME(ch), __FILE__);
 		exit(1);
 	}
+	
+	// shut this off -- no need to total during an extract
+	pause_affect_total = TRUE;
 
 	/* Check to see if we are grouped! */
 	if (GROUP(ch)) {
@@ -1187,10 +1196,12 @@ void extract_char_final(char_data *ch) {
 		free_char(ch);
 	}
 	
+	pause_affect_total = FALSE;
+	
 	// update empire numbers -- only if we detected empire membership back at the beginning
 	// this prevents incorrect greatness or other traits on logout
 	if (rescan_emp) {
-		read_empire_members(rescan_emp, FALSE);
+		TRIGGER_DELAYED_REFRESH(rescan_emp, DELAY_REFRESH_MEMBERS);
 	}
 }
 
@@ -1383,12 +1394,14 @@ void perform_idle_out(char_data *ch) {
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
+	
+	pause_affect_total = TRUE;	// save unnecessary processing
 	extract_all_items(ch);
 	extract_char(ch);
+	pause_affect_total = FALSE;
 	
 	if (emp) {
 		extract_pending_chars();	// ensure char is gone
-		read_empire_members(emp, FALSE);
 	}
 }
 
@@ -4063,6 +4076,11 @@ void free_mob_tags(struct mob_tag **list) {
 */
 void tag_mob(char_data *mob, char_data *player) {
 	struct group_member_data *mem;
+	
+	// find top player -- if it's a familiar or charmie of some kind
+	while (player && IS_NPC(player) && player->master && IN_ROOM(player) == IN_ROOM(player->master)) {
+		player = player->master;
+	}
 	
 	// simple sanity
 	if (!mob || !player || mob == player || !IS_NPC(mob) || IS_NPC(player)) {

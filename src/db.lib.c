@@ -1566,6 +1566,24 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 
 
 /**
+* Checks all empires to ensure they have no "missing" einv in the no-island
+* state. This is meant to be run at startup but can be re-run as needed.
+*/
+void check_nowhere_einv_all(void) {
+	extern int get_main_island(empire_data *emp);
+	
+	empire_data *emp, *next_emp;
+	int island;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if ((island = get_main_island(emp)) != NO_ISLAND) {
+			check_nowhere_einv(emp, island);
+		}
+	}
+}
+
+
+/**
 * Creates a new empire with default ranks and ch as leader. The default empire
 * name is the player's name so that new players will see "This area is claimed
 * by <your name>", which fits the concept that small empires are just land
@@ -2196,27 +2214,30 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					exit(0);
 				}
 				
-				CREATE(shipd, struct shipping_data, 1);
-				shipd->vnum = t[0];
-				shipd->amount = t[1];
-				shipd->from_island = t[2];
-				shipd->to_island = t[3];
-				shipd->status = t[4];
-				shipd->status_time = l_in;
-				shipd->shipping_id = t[5];
-				shipd->ship_origin = t[6];
-				shipd->next = NULL;
+				if (obj_proto(t[0])) {
+					CREATE(shipd, struct shipping_data, 1);
+					shipd->vnum = t[0];
+					shipd->amount = t[1];
+					shipd->from_island = t[2];
+					shipd->to_island = t[3];
+					shipd->status = t[4];
+					shipd->status_time = l_in;
+					shipd->shipping_id = t[5];
+					shipd->ship_origin = t[6];
+					shipd->next = NULL;
 				
-				EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
+					EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
 
-				// append to end
-				if (last_shipd) {
-					last_shipd->next = shipd;
+					// append to end
+					if (last_shipd) {
+						last_shipd->next = shipd;
+					}
+					else {
+						EMPIRE_SHIPPING_LIST(emp) = shipd;
+					}
+					last_shipd = shipd;
 				}
-				else {
-					EMPIRE_SHIPPING_LIST(emp) = shipd;
-				}
-				last_shipd = shipd;
+				// else: don't bother warning, just drop it if the obj doesn't exist
 				break;
 			}
 
@@ -2407,8 +2428,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				emp_pol->type = t[1];
 				emp_pol->offer = t[2];
 				emp_pol->start_time = t[3];
-				emp_pol->next = emp->diplomacy;
-				emp->diplomacy = emp_pol;
+				LL_APPEND(emp->diplomacy, emp_pol);
 				break;
 			}
 			case 'E': {	// extra data
@@ -4199,7 +4219,14 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 		CREATE(isle, struct island_info, 1);
 		// ensure good data
 		isle->id = island_id;
-		sprintf(buf, "Unexplored Island %d", island_id);
+		
+		if (island_id != NO_ISLAND) {
+			sprintf(buf, "Unexplored Island %d", island_id);
+		}
+		else {
+			strcpy(buf, "The Ocean");
+		}
+		
 		isle->name = str_dup(buf);
 		isle->flags = NOBITS;
 		isle->tile_size = 0;

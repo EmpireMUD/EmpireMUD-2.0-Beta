@@ -85,7 +85,8 @@ command that triggered it, return 0 and the player will see the normal result
 of their command.
 
 Note: High level Immortals can only use command triggers when the "hassle"
-   toggle is on.
+   toggle is on. You can always "toggle hassle" as an immortal, even if a
+   command trigger tries to prevent it.
 Note: Command triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 Note: If you trigger on a real game command, you should use the entire word
@@ -131,13 +132,14 @@ Return value:  return 0 to prevent the drop
 
 As an object trigger, this is activated any time a character attempts to drop
 the object. As a room trigger, it happens when an object is dropped in the
-room.
+room. This trigger also fires on put, junk, and sacrifice.
 
 The object trigger includes putting the object into a container or vehicle.
 
 Variables:
   &c%actor%&0 - The character attempting to drop the object.
-  &c%object%&0 - The object the character is attempting to drop (room trigger).
+  &c%object%&0 - The object the character is attempting to drop (room trigger).\
+  &c%command%&0 - drop, junk, put, sacrifice.
   &c%self%&0 - The item being dropped (object trigger).
 #d
 "EMPIRE VARS" "EMPIRE VARIABLES" EMP-VARS EMPIRE-VARS TRIGEDIT-EMP-VAR TRIGEDIT-VARIABLES-EMPIRES
@@ -233,7 +235,8 @@ Finish Quest triggers in the room. It will also run Finish Quest triggers
 attached to the quest itself.
 
 The quest's triggers always run LAST, allowing them to be sure that no other
-trigger already prevented the quest turn-in.
+trigger already prevented the quest turn-in. Do not use the 'wait' command in
+triggers attached to quests -- see HELP WAIT.
 
 Variables:
   &c%actor%&0 - The character finishing the quest.
@@ -522,14 +525,15 @@ triggers in the room. It will also run Start Quest triggers attached to the
 quest itself.
 
 The quest's triggers always run LAST, allowing them to be sure that no other
-trigger already prevented the quest start.
+trigger already prevented the quest start. Do not use the 'wait' command in
+triggers attached to quests -- see HELP WAIT.
 
 Variables:
   &c%actor%&0 - The character trying to get the quest.
   &c%questvnum%&0 - The vnum of the quest to start.
   &c%questname%&0 - The name of the quest to start.
 
-See also: FINISH QUEST TRIGGER
+See also: FINISH QUEST TRIGGER, WAIT
 #d
 "TEXT VARIABLES" "TEXT VARS" TRIGEDIT-VARIABLES-TEXTS TEXT-VAR TRIGEDIT-TEXT-VAR
 

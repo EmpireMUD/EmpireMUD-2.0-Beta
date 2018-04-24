@@ -12,11 +12,10 @@ end
 set logs %self.logs%
 set room %self.room%
 set gohome 0
-set cap 30
 if (%room.template% == 18100)
   set gohome 1
 end
-if (%random.10% == 10 && !%self.mob_flagged(SENTINEL)%
+if %self.room.distance(%instance.location%)% > 8 && !%self.mob_flagged(SENTINEL)%
   set gohome 1
 end
 if %room.sector_vnum% >= 1 && %room.sector_vnum% <= 4
@@ -62,10 +61,6 @@ if (%gohome% && %instance.location%)
   %echo% %self.name% heads back to %self.hisher% camp!
   %teleport% %self% %instance.location%
   %echo% %self.name% returns to the camp!
-  if (%logs% > 15 && %random.5%==5)
-    %echo% %self.name% drops off a log at the camp.
-    eval logs %logs%-1
-  end
 end
 remote logs %self.id%
 ~
@@ -78,14 +73,21 @@ if !%self.varexists(logs)%
   remote logs %self.id%
 end
 set loot 124
-set i 0
 set logs %self.logs%
-if %logs% > 50
-  set logs 50
+if %logs% > 75
+  set logs 75
 end
-while %i% < %logs%
-  eval i %i% + 1
+while %logs% >= 5
   %load% obj %loot%
+  %load% obj %loot%
+  %load% obj %loot%
+  %load% obj %loot%
+  %load% obj %loot%
+  eval logs %logs% - 5
+done
+while %logs% > 0
+  %load% obj %loot%
+  eval logs %logs% - 1
 done
 if !%instance.start%
   halt

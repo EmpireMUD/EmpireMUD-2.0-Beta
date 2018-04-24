@@ -58,6 +58,7 @@ void send_char_pos(char_data *ch, int dam);
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
+bool empire_can_claim(empire_data *emp);
 bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
@@ -397,6 +398,7 @@ void run_delayed_refresh(void) {
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			crop_var = -1;
 			
+			// DELAY_REFRESH_x: effects of various rereshes
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_CROP_VARIETY)) {
 				HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 					LL_FOREACH(goal->tracker, task) {
@@ -418,6 +420,9 @@ void run_delayed_refresh(void) {
 						complete_goal(emp, goal);
 					}
 				}
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MEMBERS)) {
+				read_empire_members(emp, FALSE);
 			}
 			
 			// clear this
@@ -568,7 +573,7 @@ void score_empires(void) {
 		EMPIRE_SORT_VALUE(emp) = 0;
 	}
 	
-	#define SCORE_SKIP_EMPIRE(ee)  (EMPIRE_IMM_ONLY(ee) || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
+	#define SCORE_SKIP_EMPIRE(ee)  (EMPIRE_IMM_ONLY(ee) || EMPIRE_MEMBERS(ee) == 0 || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
 
 	// build data
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -1005,6 +1010,40 @@ bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc) {
 
 
 /**
+* Clears out old diplomacy to keep things clean and simple.
+*/
+void expire_old_politics(void) {
+	empire_data *emp, *next_emp, *other;
+	struct empire_political_data *pol, *next_pol, *find_pol;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (!EMPIRE_IS_TIMED_OUT(emp) || EMPIRE_MEMBERS(emp) > 0 || EMPIRE_TERRITORY(emp, TER_TOTAL) > 0) {
+			continue;
+		}
+		
+		LL_FOREACH_SAFE(EMPIRE_DIPLOMACY(emp), pol, next_pol) {
+			if ((other = real_empire(pol->id)) && other != emp) {
+				if (pol->type != NOBITS) {
+					log_to_empire(emp, ELOG_DIPLOMACY, "Diplomatic relations with %s have ended because your empire is in ruins", EMPIRE_NAME(other));
+					log_to_empire(other, ELOG_DIPLOMACY, "Diplomatic relations with %s have ended because that empire is in ruins", EMPIRE_NAME(emp));
+				}
+				if ((find_pol = find_relation(other, emp))) {
+					LL_DELETE(EMPIRE_DIPLOMACY(other), find_pol);
+					free(find_pol);
+				}
+				EMPIRE_NEEDS_SAVE(other) = TRUE;
+			}
+			
+			LL_DELETE(EMPIRE_DIPLOMACY(emp), pol);
+			free(pol);
+			
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+/**
 * Determines if an empire has a trait set at a certain location. It auto-
 * matically detects if the location is covered by a city's traits or the
 * empire's frontier traits.
@@ -1132,17 +1171,15 @@ bool is_trading_with(empire_data *emp, empire_data *partner) {
 * @return bool TRUE if the player is allowed to claim.
 */
 bool can_claim(char_data *ch) {
-	empire_data *e;
-
-	if (IS_NPC(ch))
-		return FALSE;
-	if (!(e = GET_LOYALTY(ch)))
-		return TRUE;
-	if (EMPIRE_TERRITORY(e, TER_TOTAL) >= land_can_claim(e, TER_TOTAL))
-		return FALSE;
-	if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CLAIM))
-		return FALSE;
-	return TRUE;
+	if (IS_NPC(ch)) {
+		return FALSE;	// npcs never claim
+	}
+	if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {
+		return FALSE;	// rank too low
+	}
+	
+	// and check the empire itself
+	return empire_can_claim(GET_LOYALTY(ch));
 }
 
 
@@ -1251,6 +1288,25 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 
 
 /**
+* Determines if an empire can currently claim land.
+*
+* @param empire_data *emp The empire.
+* @return bool TRUE if the empire is allowed to claim.
+*/
+bool empire_can_claim(empire_data *emp) {
+	if (!emp) {	// theoretically, no empire == you can found one...
+		return TRUE;
+	}
+	if (EMPIRE_TERRITORY(emp, TER_TOTAL) >= land_can_claim(emp, TER_TOTAL)) {
+		return FALSE;	// too much territory
+	}
+	
+	// seems ok
+	return TRUE;
+}
+
+
+/**
 * Checks the room to see if ch has permission.
 *
 * @param char_data *ch
@@ -1353,43 +1409,76 @@ bool has_tech_available_room(room_data *room, int tech) {
 * @return int The total claimable land.
 */
 int land_can_claim(empire_data *emp, int ter_type) {
-	int from_wealth, total = 0;
+	int cur, from_wealth, out_t = 0, fron_t = 0, total = 0, min_cap = 0;
+	double outskirts_mod = config_get_double("land_outside_city_modifier");
+	double frontier_mod = config_get_double("land_frontier_modifier");
 	
-	if (emp) {
-		total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
-		total += count_tech(emp) * config_get_int("land_per_tech");
+	if (!emp) {
+		return 0;
+	}
+	
+	
+	// so long as there's at least 1 active member, they get the min cap
+	if (EMPIRE_MEMBERS(emp) > 0) {
+		min_cap = config_get_int("land_min_cap");
+	}
+	
+	// basics
+	total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
+	total += count_tech(emp) * config_get_int("land_per_tech");
+	
+	if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
+		// diminishes by an amount equal to non-wealth territory
+		from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
 		
-		if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-			// diminishes by an amount equal to non-wealth territory
-			from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
-			
-			// limited to 3x non-wealth territory
-			from_wealth = MIN(from_wealth, total * 3);
-			
-			// for a total of 4x
-			total += from_wealth;
-		}
+		// limited to 3x non-wealth territory
+		from_wealth = MIN(from_wealth, total * 3);
+		
+		// for a total of 4x
+		total += from_wealth;
+	}
+	
+	// determine specific caps and apply minimum
+	total = MAX(total, min_cap);
+	if (ter_type == TER_TOTAL || ter_type == TER_CITY) {
+		return total;	// shortcut -- no further work
+	}
+	
+	out_t = total * (outskirts_mod + frontier_mod);
+	out_t = MAX(out_t, min_cap);
+	fron_t = total * frontier_mod;
+	fron_t = MAX(fron_t, min_cap);
+	
+	// check cascading categories
+	if (EMPIRE_TERRITORY(emp, TER_CITY) > (total - out_t)) {
+		out_t -= (EMPIRE_TERRITORY(emp, TER_CITY) - (total - out_t));
+		out_t = MAX(0, out_t);
+	}
+	if (EMPIRE_TERRITORY(emp, TER_CITY) + EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > (total - fron_t)) {
+		fron_t -= (EMPIRE_TERRITORY(emp, TER_CITY) + EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - (total - fron_t));
+		fron_t = MAX(0, fron_t);
+	}
+	if (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > out_t - fron_t) {
+		fron_t -= (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - (out_t - fron_t));
+		fron_t = MAX(0, fron_t);
 	}
 	
 	switch (ter_type) {
 		case TER_OUTSKIRTS: {
-			total *= config_get_double("land_outside_city_modifier");
-			break;
+			// subtract out currently-used frontier, as that territory is shared with outskirts
+			cur = MIN(fron_t, EMPIRE_TERRITORY(emp, TER_FRONTIER));
+			out_t -= cur;
+			
+			return out_t;
 		}
 		case TER_FRONTIER: {
-			total *= config_get_double("land_frontier_modifier");
-			break;
+			return fron_t;
 		}
 		// default: no changes
+		default: {
+			return total;
+		}
 	}
-	
-	// so long as there's at least 1 active member, they get the min cap
-	if (EMPIRE_MEMBERS(emp) > 0) {
-		int min_claim_cap = config_get_int("land_min_cap");
-		total = MAX(min_claim_cap, total);
-	}
-	
-	return total;
 }
 
 
@@ -5066,35 +5155,50 @@ char *shared_by(obj_data *obj, char_data *ch) {
 
 /**
 * Simple, short display for number of days/hours/minutes/seconds since an
-* event. It only shows the largest of those groups, so something 26 hours ago
-* is '1d' and something 100 seconds ago is '2m'.
+* event. It only shows the largest 2 of those groups, so something 26 hours ago
+* is '1d2h' and something 100 seconds ago is '1m40s'.
 *
 * @param time_t when The timestamp.
 * @return char* The short string.
 */
 char *simple_time_since(time_t when) {
 	static char output[80];
-	double calc, diff;
+	int diff, parts;
 	
+	parts = 0;
 	diff = time(0) - when;
-	if ((calc = diff / SECS_PER_REAL_YEAR) > 1.0) {
-		sprintf(output, "%dy", (int) round(calc));
+	*output = '\0';
+	
+	if (diff > SECS_PER_REAL_YEAR && parts < 2) {
+		sprintf(output + strlen(output), "%*dy", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_YEAR));
+		diff %= SECS_PER_REAL_YEAR;
+		++parts;
 	}
-	else if ((calc = diff / SECS_PER_REAL_WEEK) > 1.0) {
-		sprintf(output, "%dw", (int) round(calc));
+	if (diff > SECS_PER_REAL_WEEK && parts < 2) {
+		sprintf(output + strlen(output), "%*dw", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_WEEK));
+		diff %= SECS_PER_REAL_WEEK;
+		++parts;
 	}
-	else if ((calc = diff / SECS_PER_REAL_DAY) > 1.0) {
-		sprintf(output, "%dd", (int) round(calc));
+	if (diff > SECS_PER_REAL_DAY && parts < 2) {
+		sprintf(output + strlen(output), "%*dd", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_DAY));
+		diff %= SECS_PER_REAL_DAY;
+		++parts;
 	}
-	else if ((calc = diff / SECS_PER_REAL_HOUR) > 1.0) {
-		sprintf(output, "%dh", (int) round(calc));
+	if (diff > SECS_PER_REAL_HOUR && parts < 2) {
+		sprintf(output + strlen(output), "%*dh", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_HOUR));
+		diff %= SECS_PER_REAL_HOUR;
+		++parts;
 	}
-	else if ((calc = diff / SECS_PER_REAL_MIN) > 1.0) {
-		sprintf(output, "%dm", (int) round(calc));
+	if (diff > SECS_PER_REAL_MIN && parts < 2) {
+		sprintf(output + strlen(output), "%*dm", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_MIN));
+		diff %= SECS_PER_REAL_MIN;
+		++parts;
 	}
-	else {
-		sprintf(output, "%ds", (int) diff);
+	if (diff > 0 && parts < 2) {
+		sprintf(output + strlen(output), "%*ds", parts ? 1 : 2, diff);
+		++parts;
 	}
+	
 	return output;
 }
 

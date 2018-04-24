@@ -169,6 +169,13 @@
 #define CMDTRG_ABBREV  1
 
 
+// for drop triggers: which command dropped it
+#define DROP_TRIG_DROP  0
+#define DROP_TRIG_JUNK  1
+#define DROP_TRIG_SACRIFICE  2
+#define DROP_TRIG_PUT  3
+
+
 /* one line of the trigger */
 struct cmdlist_element {
 	char *cmd;				/* one line of a trigger */
@@ -254,10 +261,10 @@ int greet_mtrigger(char_data *actor, int dir);
 int entry_mtrigger(char_data *ch);
 void entry_memory_mtrigger(char_data *ch);
 int enter_wtrigger(room_data *room, char_data *actor, int dir);
-int drop_otrigger(obj_data *obj, char_data *actor);
+int drop_otrigger(obj_data *obj, char_data *actor, int mode);
 int timer_otrigger(obj_data *obj);
 int get_otrigger(obj_data *obj, char_data *actor);
-int drop_wtrigger(obj_data *obj, char_data *actor);
+int drop_wtrigger(obj_data *obj, char_data *actor, int mode);
 int give_otrigger(obj_data *obj, char_data *actor, char_data *victim);
 int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj);
 int wear_otrigger(obj_data *obj, char_data *actor, int where);

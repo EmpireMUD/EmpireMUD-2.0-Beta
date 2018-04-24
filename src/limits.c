@@ -292,7 +292,7 @@ void check_should_dismount(char_data *ch) {
 	else if (IS_MORPHED(ch)) {
 		ok = FALSE;
 	}
-	else if (IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
+	else if ((IS_COMPLETE(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_CLOSED)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
 		ok = FALSE;
 	}
 	else if (GET_SITTING_ON(ch)) {
@@ -926,14 +926,19 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 void check_ruined_cities(void) {
 	struct empire_city_data *city, *next_city;
 	empire_data *emp, *next_emp;
+	bool any = FALSE;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!EMPIRE_IMM_ONLY(emp)) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
 				next_city = city->next;
-				check_one_city_for_ruin(emp, city);
+				any |= check_one_city_for_ruin(emp, city);
 			}
 		}
+	}
+	
+	if (any) {
+		read_empire_territory(NULL, FALSE);
 	}
 }
 
@@ -1079,7 +1084,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	}
 	
 	// see which is over
-	outskirts_over = EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > land_can_claim(emp, TER_OUTSKIRTS);
+	outskirts_over = EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > OUTSKIRTS_CLAIMS_AVAILABLE(emp);
 	frontier_over = EMPIRE_TERRITORY(emp, TER_FRONTIER) > land_can_claim(emp, TER_FRONTIER);
 	total_over = EMPIRE_TERRITORY(emp, TER_TOTAL) > land_can_claim(emp, TER_TOTAL);
 	if (!outskirts_over && !frontier_over && !total_over) {
@@ -1151,7 +1156,7 @@ void reduce_outside_territory(void) {
 			continue;	// ignore imms
 		}
 		
-		if (EMPIRE_TERRITORY(iter, TER_OUTSKIRTS) > land_can_claim(iter, TER_OUTSKIRTS) || EMPIRE_TERRITORY(iter, TER_FRONTIER) > land_can_claim(iter, TER_FRONTIER)) {
+		if (EMPIRE_TERRITORY(iter, TER_OUTSKIRTS) > OUTSKIRTS_CLAIMS_AVAILABLE(iter) || EMPIRE_TERRITORY(iter, TER_FRONTIER) > land_can_claim(iter, TER_FRONTIER)) {
 			reduce_outside_territory_one(iter);
 		}
 	}

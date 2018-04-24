@@ -46,6 +46,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 // external consts
 extern const char *ability_custom_types[];
 extern const char *ability_data_types[];
+extern const char *ability_effects[];
 extern const char *ability_gain_hooks[];
 extern const char *ability_flags[];
 extern const char *ability_target_flags[];
@@ -114,6 +115,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 	switch (adl->type) {
 		case ADL_PLAYER_TECH: {
 			snprintf(output, sizeof(output), "%s: %s", temp, player_tech_types[adl->vnum]);
+			break;
+		}
+		case ADL_EFFECT: {
+			snprintf(output, sizeof(output), "%s: %s", temp, ability_effects[adl->vnum]);
 			break;
 		}
 		default: {
@@ -711,6 +716,40 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 //// ABILITY COMMANDS ////////////////////////////////////////////////////////
 
 /**
+* For abilities with 'effects' data, this function manages them. This function
+* is silent unless an effect happens.
+*
+* @param ability_dta *abil The ability being used.
+* @param char_data *ch The character using the ability.
+*/
+void apply_ability_effects(ability_data *abil, char_data *ch) {
+	struct ability_data_list *data;
+	
+	if (!abil || !ch) {
+		return;	// no harm
+	}
+	
+	LL_FOREACH(ABIL_DATA(abil), data) {
+		if (data->type != ADL_EFFECT) {
+			continue;
+		}
+		
+		// ABIL_EFFECT_x: applying the effect
+		switch (data->vnum) {
+			case ABIL_EFFECT_DISMOUNT: {
+				if (IS_RIDING(ch)) {
+					msg_to_char(ch, "You climb down from your mount.\r\n");
+					act("$n climbs down from $s mount.", TRUE, ch, NULL, NULL, TO_ROOM);
+					perform_dismount(ch);
+				}
+				break;
+			}
+		}
+	}
+}
+
+
+/**
 * This checks if "string" is an ability's command, and performs it if so.
 *
 * @param char_data *ch The actor.
@@ -869,6 +908,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		}
 	}
 	
+	// locked in! apply the effects
+	apply_ability_effects(abil, ch);
+	
 	// counterspell?
 	if (ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && violent && cvict && cvict != ch && trigger_counterspell(cvict)) {
 		// to-char
@@ -1016,7 +1058,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		}
 	}
 	
-	/* special handling for damage... integrate this into the for() loop above
+	/* special handling for damage... integrate this into the for() loop above -- don't forget about exp tho
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) && !data->stop) {
 		if (mag_damage(level, ch, cvict, abil) == -1) {
 			data->stop = TRUE;
@@ -2461,7 +2503,10 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
 		
-		if (is_abbrev(type_arg, "-affects")) {
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		else if (is_abbrev(type_arg, "-affects")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
 				only_affs |= BIT(lookup);
@@ -3398,6 +3443,7 @@ OLC_MODULE(abiledit_data) {
 	bool found;
 	
 	// determine valid types first
+	allowed_types |= ADL_EFFECT;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
 		allowed_types |= ADL_PLAYER_TECH;
 	}
@@ -3457,6 +3503,13 @@ OLC_MODULE(abiledit_data) {
 				case ADL_PLAYER_TECH: {
 					if ((val_id = search_block(val_arg, player_tech_types, FALSE)) == NOTHING) {
 						msg_to_char(ch, "Invalid player tech '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				case ADL_EFFECT: {
+					if ((val_id = search_block(val_arg, ability_effects, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Invalid ability effect '%s'.\r\n", val_arg);
 						return;
 					}
 					break;

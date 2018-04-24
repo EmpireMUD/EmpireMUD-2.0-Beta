@@ -663,7 +663,7 @@ while %person%
     else
       dg_affect #12035 %person% STUNNED on 5
     end
-    %damage% %person% 150 physical
+    %damage% %person% 125 physical
   end
   set person %person.next_in_room%
 done
@@ -696,6 +696,15 @@ end
 %send% %target% %self.name% lowers %self.hisher% head and charges you!
 %echoaround% %target% %self.name% lowers %self.hisher% head and charges %target.name%!
 wait 2 sec
+if !%self.fighting%
+  halt
+end
+if (%self.aff_flagged(ENTANGLED)% || %target.room% != %self.room%) && (%target% != %self.fighting%)
+  %send% %target% Unable to reach you, %self.name% turns %self.hisher% attention to %self.fighting.name%!
+  %send% %self.fighting% Unable to reach %target.name%, %self.name% turns %self.hisher% attention to you!
+  %echoneither% %self.fighting% %target% Unable to reach %target.name%, %self.name% turns %self.hisher% attention to %self.fighting.name%!
+  set target %self.fighting%
+end
 %send% %target% &r%self.name% crashes into you, sending you flying!
 %echoaround% %target% %self.name% crashes into %target.name%, sending %target.himher% flying!
 if %self.mob_flagged(GROUP)%
@@ -734,7 +743,7 @@ while %time% <= %times%
   %echoaround% %target% %self.name% hurls a thunderbolt at %target.name%!
   %send% %target% &rThe thunderbolt explodes in your face!
   %echoaround% %target% The thunderbolt explodes in front of %target.name%'s face!
-  %damage% %target% 150 magical
+  %damage% %target% 100 magical
   %dot% #12037 %target% 200 30 magical
   if %self.mob_flagged(GROUP)%
     %send% %target% You are blinded by the brightness of the blast!
@@ -816,7 +825,11 @@ if %ally%
     else
       %send% %target% &rA bolt of lightning flies out of nowhere and strikes you!
       %echoaround% %target% A bolt of lightning flies out of nowhere and strikes %target.name%!
-      %damage% %target% 500 magical
+      if %self.vnum% == 12030
+        %damage% %target% 200 magical
+      else
+        %damage% %target% 300 magical
+      end
       dg_affect #12039 %target% HARD-STUNNED on 10
       dg_affect #12039 %target% BLIND on 10
       halt

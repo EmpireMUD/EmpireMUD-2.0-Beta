@@ -36,10 +36,124 @@ M
 M
 10558 5.00 0
 S
+#10551
+Frozen Estuary~
+A Frozen Estuary~
+'~' 2 0 25 0 0
+D0
+~~~~~
+&W~
+E
+4 0 5.00 53
+E
+9 0 100.00 53
+I 6 10562 95.00 1 F  # FORAGE: a handful of red and green seeds
+I 6 10563 5.00 1 F  # FORAGE: a seed of pure ice
+M
+9172 5.00 g
+M
+9173 5.00 ag
+M
+9177 5.00 g
+M
+9178 0.03 g
+M
+9179 15.00 g
+M
+9182 5.00 g
+M
+9186 5.00 0
+M
+9171 5.00 0
+M
+9185 5.00 h
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+#10552
+Frozen Canal~
+A Frozen Canal~
+'~' 2 0 25 0 0
+D0
+~~~~~
+&W~
+E
+4 0 5.00 19
+E
+9 0 100.00 19
+I 6 10562 95.00 1 F  # FORAGE: a handful of red and green seeds
+I 6 10563 5.00 1 F  # FORAGE: a seed of pure ice
+M
+9172 5.00 g
+M
+9173 5.00 ag
+M
+9177 5.00 g
+M
+9178 0.03 g
+M
+9179 15.00 g
+M
+9182 5.00 g
+M
+9186 5.00 0
+M
+9171 5.00 0
+M
+9185 5.00 h
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+#10553
+Frozen Lake~
+A Frozen Lake~
+'~' 2 0 25 0 0
+D0
+~~~~~
+&W~
+E
+4 0 5.00 32
+E
+9 0 100.00 32
+I 6 10562 95.00 1 F  # FORAGE: a handful of red and green seeds
+I 6 10563 5.00 1 F  # FORAGE: a seed of pure ice
+M
+9172 5.00 g
+M
+9173 5.00 ag
+M
+9177 5.00 g
+M
+9178 0.03 g
+M
+9179 15.00 g
+M
+9182 5.00 g
+M
+9186 5.00 0
+M
+9171 5.00 0
+M
+9185 5.00 h
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
 #10562
 Thin Evergreen Forest~
 A Thin Evergreen Forest~
-'.' 33 1 3 dl n
+'.' 33 1 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -194,7 +308,7 @@ S
 #10563
 Evergreen Forest~
 An Evergreen Forest~
-'^' 33 1 4 dl n
+'^' 33 1 4 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -345,7 +459,7 @@ S
 #10564
 Overgrown Evergreen Forest~
 An Overgrown Evergreen Forest~
-'^' 33 1 5 dl n
+'^' 33 1 5 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -460,7 +574,7 @@ S
 #10565
 Thick Evergreen Forest~
 A Thick Evergreen Forest~
-'^' 33 1 6 dl dn
+'^' 33 1 6 dl dnp
 C
 chop, dig, gather, pick~
 D1

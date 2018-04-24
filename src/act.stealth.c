@@ -841,7 +841,7 @@ ACMD(do_hide) {
 	command_lag(ch, WAIT_ABILITY);
 
 	for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
-		if (c != ch && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
+		if (c != ch && (c->master != ch || !AFF_FLAGGED(c, AFF_CHARM)) && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
 			msg_to_char(ch, "You can't hide with somebody watching!\r\n");
 			return;
 		}
@@ -1037,7 +1037,7 @@ ACMD(do_jab) {
 			act("$n moves in close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_NOTVICT);
 		}
 		
-		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0) {
+		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
 			apply_dot_effect(vict, ATYPE_JABBED, 3, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
 			
 			if (has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_STEALTH) && check_solo_role(ch)) {

@@ -68,6 +68,7 @@ void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
+void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.item.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
@@ -557,7 +558,8 @@ ADMIN_UTIL(util_playerdump) {
 			plr = NULL;
 		}
 	}
-
+	
+	fclose(fl);
 	msg_to_char(ch, "Ok.\r\n");
 }
 
@@ -886,30 +888,46 @@ void do_instance_delete(char_data *ch, char *argument) {
 
 void do_instance_delete_all(char_data *ch, char *argument) {
 	struct instance_data *inst, *next_inst;
+	descriptor_data *desc;
 	adv_vnum vnum;
-	adv_data *adv;
+	adv_data *adv = NULL;
 	int count = 0;
+	bool all;
 	
-	if (!*argument || !isdigit(*argument) || (vnum = atoi(argument)) < 0 || !(adv = adventure_proto(vnum))) {
-		msg_to_char(ch, "Invalid adventure vnum '%s'.\r\n", *argument ? argument : "<blank>");
+	if (!*argument) {
+		msg_to_char(ch, "Usage: instance deleteall <adventure vnum | all>\r\n");
 		return;
+	}
+	
+	all = !str_cmp(argument, "all");
+	if (!all && (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || !(adv = adventure_proto(vnum)))) {
+		msg_to_char(ch, "Invalid adventure vnum '%s'.\r\n", argument);
+		return;
+	}
+	
+	// warn players of lag on 'all'
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) == CON_PLAYING && desc->character) {
+			write_to_descriptor(desc->descriptor, "The game is performing a brief update... this will take a moment.\r\n");
+			desc->has_prompt = FALSE;
+		}
 	}
 	
 	for (inst = instance_list; inst; inst = next_inst) {
 		next_inst = inst->next;
 		
-		if (inst->adventure == adv) {
+		if (all || inst->adventure == adv) {
 			++count;
 			delete_instance(inst, TRUE);
 		}
 	}
 	
 	if (count > 0) {
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instance%s of %s", GET_REAL_NAME(ch), count, PLURAL(count), GET_ADV_NAME(adv));
-		msg_to_char(ch, "%d instance%s of '%s' deleted.\r\n", count, PLURAL(count), GET_ADV_NAME(adv));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instance%s of %s", GET_REAL_NAME(ch), count, PLURAL(count), all ? "adventures" : GET_ADV_NAME(adv));
+		msg_to_char(ch, "%d instance%s of '%s' deleted.\r\n", count, PLURAL(count), all ? "adventures" : GET_ADV_NAME(adv));
 	}
 	else {
-		msg_to_char(ch, "No instances of '%s' found.\r\n", GET_ADV_NAME(adv));
+		msg_to_char(ch, "No instances of %s found.\r\n", all ? "any adventures" : GET_ADV_NAME(adv));
 	}
 }
 
@@ -1107,6 +1125,25 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 }
 
 
+void do_instance_spawn(char_data *ch, char *argument) {
+	void generate_adventure_instances();
+	int num = 1;
+	
+	if (*argument && isdigit(*argument)) {
+		num = atoi(argument);
+	}
+	if (num < 1 || num > 100) {
+		msg_to_char(ch, "You may only run 1-100 spawn cycles.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "Running %d instance spawn cycle%s...\r\n", num, PLURAL(num));
+	while (num-- > 0) {
+		generate_adventure_instances();
+	}
+}
+
+
 void do_instance_test(char_data *ch, char *argument) {
 	struct adventure_link_rule rule;
 	bool found = FALSE;
@@ -1190,6 +1227,7 @@ struct set_struct {
 		{ "drunk",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "hunger",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "thirst",		LVL_START_IMM, 	BOTH, 	MISC },
+		{ "account",	LVL_START_IMM,	PC,		MISC },
 		{ "access",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
@@ -1208,7 +1246,6 @@ struct set_struct {
 		{ "multi-char",	LVL_START_IMM,	PC,		BINARY },	// deliberately after multi-ip, which is more common
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
 		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
-		{ "account",	LVL_START_IMM,	PC,		MISC },
 		{ "bonustrait",	LVL_START_IMM,	PC,		MISC },
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
@@ -1343,7 +1380,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		affect_total(vict);
 		if (emp) {
-			read_empire_members(emp, FALSE);
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
 		}
 	}
 	else if SET_CASE("intelligence") {
@@ -1831,7 +1868,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		
 		if ((emp = GET_LOYALTY(vict))) {
-			read_empire_members(emp, FALSE);
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
 		}
 	}
 
@@ -6452,7 +6489,7 @@ ACMD(do_instance) {
 			++count;
 		}
 		
-		msg_to_char(ch, "Usage: instance <list | add | delete | deleteall | nearby | reset | test> [argument]\r\n");
+		msg_to_char(ch, "Usage: instance <list | add | delete | deleteall | nearby | reset | spawn | test> [argument]\r\n");
 		msg_to_char(ch, "There are %d live instances.\r\n", count);
 	}
 	else if (is_abbrev(arg, "list")) {
@@ -6472,6 +6509,9 @@ ACMD(do_instance) {
 	}
 	else if (is_abbrev(arg, "reset")) {
 		do_instance_reset(ch, argument);
+	}
+	else if (is_abbrev(arg, "spawn")) {
+		do_instance_spawn(ch, argument);
 	}
 	else if (is_abbrev(arg, "test")) {
 		do_instance_test(ch, argument);
@@ -6556,7 +6596,7 @@ ACMD(do_island) {
 		argument = one_argument(argument, arg2);
 		skip_spaces(&argument);
 		
-		if (!*arg2 || !*argument || !isdigit(*arg2)) {
+		if (!*arg2 || !*argument || (!isdigit(*arg2) && strcmp(arg2, "-1"))) {
 			msg_to_char(ch, "Usage: island rename <id> <name>\r\n");
 		}
 		else if (!(isle = get_island(atoi(arg2), FALSE))) {
@@ -6784,6 +6824,7 @@ ACMD(do_moveeinv) {
 		count = 0;
 		eisle = get_empire_island(emp, island_from);
 		HASH_ITER(hh, eisle->store, store, next_store) {
+			count += store->amount;
 			add_to_empire_storage(emp, island_to, store->vnum, store->amount);
 			HASH_DEL(eisle->store, store);
 			free(store);
@@ -7048,6 +7089,9 @@ ACMD(do_poofset) {
 
 
 ACMD(do_purge) {
+	void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
+	
+	struct shipping_data *shipd, *next_shipd;
 	char_data *vict, *next_v;
 	vehicle_data *veh;
 	obj_data *obj;
@@ -7080,7 +7124,19 @@ ACMD(do_purge) {
 			extract_obj(obj);
 		}
 		else if ((veh = get_vehicle_in_room_vis(ch, buf))) {
+			// finish the shipment before transferring or purging a vehicle
+			if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
+				LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+					if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
+						deliver_shipment(VEH_OWNER(veh), shipd);
+					}
+				}
+			}
+			
 			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
+				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			}
 			extract_vehicle(veh);
 		}
 		else {
@@ -8016,6 +8072,7 @@ ACMD(do_tedit) {
 
 // do_transfer <- search alias because why is it called do_trans? -pc
 ACMD(do_trans) {
+	struct shipping_data *shipd, *next_shipd;
 	descriptor_data *i;
 	char_data *victim;
 	room_data *to_room = IN_ROOM(ch);
@@ -8092,6 +8149,15 @@ ACMD(do_trans) {
 	}
 	else if ((veh = get_vehicle_vis(ch, buf))) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(to_room));
+	
+		// finish the shipment before transferring
+		if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
+			LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+				if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
+					deliver_shipment(VEH_OWNER(veh), shipd);
+				}
+			}
+		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);

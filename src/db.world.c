@@ -679,10 +679,12 @@ void delete_room(room_data *room, bool check_exits) {
 void fill_trench(room_data *room) {	
 	char lbuf[MAX_INPUT_LENGTH];
 	struct evolution_data *evo;
+	sector_data *sect;
 	
 	if ((evo = get_evolution_by_type(SECT(room), EVO_TRENCH_FULL)) != NULL) {
 		if (ROOM_PEOPLE(room)) {
-			sprintf(lbuf, "The trench is full! It is now a %s!", GET_SECT_NAME(sector_proto(evo->becomes)));
+			sect = sector_proto(evo->becomes);
+			sprintf(lbuf, "The trench is full! It is now %s %s!", sect ? AN(GET_SECT_NAME(sect)) : "something", sect ? GET_SECT_NAME(sect) : "else");
 			act(lbuf, FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 		}
 		change_terrain(room, evo->becomes);
@@ -3182,6 +3184,7 @@ void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
 	bld_data *bld = GET_BUILDING(room);
 	int dir = BUILDING_ENTRANCE(room);
+	vehicle_data *veh, *next_veh;
 	char buf[MAX_STRING_LENGTH];
 	room_data *to_room;
 	bld_vnum type;
@@ -3192,6 +3195,13 @@ void ruin_one_building(room_data *room) {
 	
 	if (ROOM_PEOPLE(room)) {
 		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
+	
+	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
+			extract_vehicle(veh);
+		}
 	}
 	
 	// create ruins building

@@ -43,7 +43,7 @@ S
 #n the bodyguard~
 #n the bodyguard is standing here.
 ~
-0 0 bdpquv cm
+0 0 bdpqvG cm
 1 0 0 1
 S
 #206
@@ -675,7 +675,7 @@ S
 #271
 #n apprentice exarch~
 apprentice exarch #n~
-Apprentice Exarch #n is working on a nexus crystal.
+Apprentice exarch #n is working on a nexus crystal.
 ~
 20 50 bdqv 0
 1 0 0 16
@@ -719,5 +719,13 @@ S
 ~
 20 50 bdqv 0
 1 0 0 6
+S
+#277
+#n supervisor~
+supervisor #n~
+Supervisor #n is surveying the area.
+~
+20 50 bdqv 0
+0 0 0 15
 S
 $

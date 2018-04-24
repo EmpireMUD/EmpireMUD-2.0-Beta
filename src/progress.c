@@ -1070,6 +1070,10 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 	struct empire_goal *goal, *next;
 	struct req_data *task;
 	
+	if (!emp || !obj) {
+		return;	// basic safety
+	}
+	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {

@@ -40,9 +40,11 @@ A jar of pickled glowkra is shining away.~
    This jar contains freshly pickled glowkra pods. It's bright enough to light
 the way at night.
 ~
-6 c a 4
-48 0 0
+6 c a 5
+12 0 0
 8 336
+B
+c
 C
 0 10
 M
@@ -53,7 +55,6 @@ M
 $n pops a glowing pod into $s mouth from $p.~
 R
 5114 0
-T 10500
 S
 #10503
 gumbo glowkra seafood plate~

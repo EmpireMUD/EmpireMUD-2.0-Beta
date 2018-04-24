@@ -2,8 +2,9 @@
 Glowkra consume~
 1 s 100
 ~
+* This script is no longer used. The glowkra has a buff food affect instead.
 if !(eat /= %command%)
-halt
+  halt
 end
 %send% %actor% As you consume %self.shortdesc%, your skin starts to glow slightly.
 dg_affect %actor% INFRA on 300
@@ -743,9 +744,18 @@ if (%room.distance(%instance.location%)% > 2)
   mgoto %instance.location%
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
-elseif (%room.sector% == River && %room.distance(%instance.location%)% <= 2)
+elseif (%room.sector% == River)
   %terraform% %room% 10550
   %echo% The river freezes over!
+elseif (%room.sector% == Estuary)
+  %terraform% %room% 10551
+  %echo% The estuary freezes over!
+elseif (%room.sector% == Canal)
+  %terraform% %room% 10552
+  %echo% The canal freezes over!
+elseif (%room.sector% == Lake)
+  %terraform% %room% 10553
+  %echo% The lake freezes over!
 end
 ~
 #10560

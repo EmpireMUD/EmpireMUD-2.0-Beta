@@ -163,6 +163,7 @@ player_index_data *player_table_by_name = NULL;	// hash table by name
 int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
+bool pause_affect_total = FALSE;	// helps prevent unnecessary calls to affect_total
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
@@ -282,15 +283,18 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 */
 void boot_db(void) {
 	void Read_Invalid_List();
+	void abandon_lost_vehicles();
 	void boot_world();
 	void build_all_quest_lookups();
 	void build_all_shop_lookups();
 	void build_player_index();
 	void check_for_new_map();
+	void check_nowhere_einv_all();
 	void check_ruined_cities();
 	void check_version();
 	void delete_old_players();
 	void delete_orphaned_rooms();
+	void expire_old_politics();
 	void generate_island_descriptions();
 	void init_config_system();
 	void link_and_check_vehicles();
@@ -408,15 +412,20 @@ void boot_db(void) {
 	log("Running reboot triggers.");
 	run_reboot_triggers();
 	
-	log(" Calculating territory and members.");
+	log(" Calculating empire data.");
 	reread_empire_tech(NULL);
 	check_for_new_map();
 	setup_island_levels();
+	expire_old_politics();
+	check_nowhere_einv_all();
 	verify_empire_goals();
 	need_progress_refresh = TRUE;
 	
 	log(" Checking for ruined cities...");
 	check_ruined_cities();
+	
+	log(" Abandoning lost vehicles...");
+	abandon_lost_vehicles();
 	
 	log("Managing world memory.");
 	schedule_map_unloads();
@@ -514,7 +523,6 @@ void boot_world(void) {
 	// requires rooms
 	log("Loading empires.");
 	index_boot(DB_BOOT_EMP);
-	clean_empire_logs();
 	clean_empire_offenses();
 	
 	// requires empires
@@ -572,6 +580,7 @@ void boot_world(void) {
 	
 	log("Loading empire storage and logs.");
 	load_empire_storage();
+	clean_empire_logs();
 	
 	log("Loading daily quest cycles.");
 	load_daily_quest_file();

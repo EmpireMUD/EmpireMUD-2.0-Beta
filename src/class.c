@@ -424,9 +424,6 @@ void update_class(char_data *ch) {
 	if (best_class != old_class) {
 		GET_CLASS_ROLE(ch) = ROLE_NONE;
 	}
-	
-	GET_CLASS(ch) = best_class;
-	assign_class_abilities(ch, NULL, NOTHING);
 			
 	// total up best X skills
 	best_total = 0;
@@ -445,6 +442,16 @@ void update_class(char_data *ch) {
 	}
 	else {
 		GET_CLASS_PROGRESSION(ch) = 0;
+	}
+	
+	// set class and assign abilities
+	GET_CLASS(ch) = best_class;
+	if (GET_LOYALTY(ch)) {
+		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
+	}
+	assign_class_abilities(ch, NULL, NOTHING);
+	if (GET_LOYALTY(ch)) {
+		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
 	}
 	
 	if (GET_CLASS(ch) != old_class || GET_SKILL_LEVEL(ch) != old_level) {
@@ -1566,7 +1573,7 @@ OLC_MODULE(classedit_role) {
 //// COMMANDS ///////////////////////////////////////////////////////////////
 
 ACMD(do_class) {
-	void resort_empires();
+	void resort_empires(bool force);
 	
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
@@ -1608,7 +1615,7 @@ ACMD(do_class) {
 			assign_class_abilities(ch, NULL, NOTHING);
 			if (emp) {
 				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires();
+				resort_empires(FALSE);
 			}
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
@@ -1634,7 +1641,7 @@ ACMD(do_class) {
 
 
 ACMD(do_role) {
-	void resort_empires();
+	void resort_empires(bool force);
 	
 	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct player_skill_data *plsk, *next_plsk;
@@ -1679,7 +1686,7 @@ ACMD(do_role) {
 			assign_class_abilities(ch, NULL, NOTHING);
 			if (emp) {
 				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires();
+				resort_empires(FALSE);
 			}
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);

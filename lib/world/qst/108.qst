@@ -937,7 +937,7 @@ need to learn the Ritual of Burdens.
 ~
 You have performed a ritual and satisfied the Spirit of Order!
 ~
-7 0 0 25 -1
+8 0 0 25 -1
 A
 1 10851
 P
@@ -951,7 +951,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 W
@@ -972,7 +972,7 @@ can find. When you have a rock and a flint, return to the Spirit of the Wild.
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
 Navigation' to improve your map.
 ~
-7 d 0 25 -1
+8 d 0 25 -1
 A
 1 10852
 P
@@ -986,7 +986,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 W
@@ -1012,7 +1012,7 @@ how to use it.
 ~
 You have satisfied the Spirit of the Hunt!
 ~
-6 d 0 25 -1
+7 d 0 25 -1
 A
 1 10853
 P
@@ -1026,7 +1026,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 T 10853
@@ -1050,7 +1050,7 @@ Heal.
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.
 ~
-14 0 0 25 -1
+15 0 0 25 -1
 A
 1 10854
 P
@@ -1064,7 +1064,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 W
@@ -1092,7 +1092,7 @@ worry, you'll get better at it as you level up.
 ~
 You have satisfied the Spirit of Darkness with your stealth.
 ~
-11 0 0 25 -1
+12 0 0 25 -1
 A
 1 10855
 P
@@ -1106,7 +1106,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 W
@@ -1131,7 +1131,7 @@ stone scythe for this quest, but most sharp weapons can be used to harvest.
 ~
 You have satisfied the Spirit of Progress.
 ~
-11 0 0 25 -1
+12 0 0 25 -1
 A
 1 10856
 P
@@ -1145,7 +1145,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 R
@@ -1165,12 +1165,14 @@ blood. Leave the Soulstream and find something with a beating heart to feast
 from. Knock out your victim in combat ('toggle autokill' will make you stop
 combat before killing your victim), then 'bite' them and drain some blood.
 When you have done this, return to the Spirit of Blood.
+Note: This quest will now show as 'complete' until you re-enter the
+Soulstream.
 ~
    You have satisfied the Spirit of Blood! Drinking the blood of live creatures
 is enough to gain Vampire skill up to level 15. After that, buy and use Vampire
 abilities to become a sanguine master.
 ~
-10 0 0 25 -1
+12 0 0 25 -1
 A
 1 10857
 P
@@ -1184,7 +1186,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 T 10857
@@ -1210,7 +1212,7 @@ you, because you never know when you'll want to cook food or brew a potion.
 make a torch by typing 'light stick', or to make a cooking fire with 'light
 tree'.
 ~
-9 0 0 25 -1
+10 0 0 25 -1
 A
 1 10858
 P
@@ -1224,7 +1226,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 R
@@ -1240,20 +1242,24 @@ S
 Complete More Tutorials~
    Complete more of the tutorials in the Soulstream in order to earn enough
 spirit tokens for a special reward. Once you have four of the tokens, you can
-finish this quest anywhere. You can find tutorials for each skill tree, so long
-as you're between levels 1 and 49 in that tree.
+finish this quest at the Soulstream portal, or at any city center. Type 'coins'
+to see how many of the spirit tokens you have.
 ~
    Congratulations! You've completed enough Soulstream tutorials to earn a
 special companion! Take this spirit bell, and use it any time you want to
 summon your non-combat minipet.
 ~
-5 0 0 25 -1
+6 0 0 25 -1
 R
 2 10859 1
 W
-2 10852 0 4
+20 10852 0 4
 Z
-2 10852
+2 10850
+Z
+2 10851
+Z
+0 5009
 S
 #10860
 Empire: Find The Pageboy~

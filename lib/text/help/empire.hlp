@@ -631,7 +631,7 @@ Examples:
  > etalk #high_lord Hi, High Lords!
  > etalk #lord *bows before the other lords.
 #
-EXCAVATE EXCAVATION TRENCH MOAT FILLIN
+EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
 
 Usage:  excavate
         fillin
@@ -647,7 +647,8 @@ they are ordinary plains or desert again. It will also work on a player-created
 oasis or canal. It takes 1 minute to begin a fillin on a completed trench; if
 you cancel the action or are interrupted, you must start the minute over.
 
-You can only excavate and fill in on claimed land.
+You can only excavate and fill in on claimed land. If you abandon your claim to
+a canal or trench, it will slowly fill in over time.
 
 When a desert trench fills with water, it will become an oasis instead of a
 canal. Oases convert into canals if they are adjacent to other canals or water
@@ -660,7 +661,7 @@ There are three ways to fill a finished trench with water:
 
 An unfinished trench will not fill with water.
 
-See also: CLAIM, OASIS DRAINAGE
+See also: CANAL, CLAIM, OASIS DRAINAGE
 #
 EXCHANGE
 
@@ -1286,16 +1287,21 @@ territory is:
       only count once per empire, so two members with City Lights will not
       result in +30 territory.
 
-Most territory must be location within an empire's cities. 35% of the territory
-can be on the outskirts of cities (up to 4x city radius) and only 5% can be
-on the frontier (beyond the outskirts). Both outskirts and frontier territory
-allow a minimum of 15 tiles, even if this is below 35%/5%. Roads and some
-buildings, such as Mines, count as in-city territory even in the outskirts.
+Most territory must be location within an empire's cities. 35% of your total
+territory can be on the outskirts of cities (up to 4x city radius), and another
+5% of the territory can be either outskirts or on the frontier (beyond the
+outskirts). The 'estats' command shows how much territory of each type you can
+currently claim (note: claiming more than 60% of your total in-city will cause
+your outskirts to show a lower cap because that's all the land that is
+available).
+
+Roads and some buildings, such as Mines, count as in-city territory even in the
+outskirts.
 
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
-See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND
+See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 
@@ -1630,6 +1636,7 @@ Some possible reasons include:
  no resources - You are missing the items needed to build/craft.
  already sheared - Sheep sheared too recently.
  delayed - There was a recent problem and workforce must wait to resume.
+ out of city - The building must be inside a city.
 
 If a chore is marked "delayed", that means it failed on a previous attempt and
 hasn't tried again yet. Chores are delayed by a few hours when they fail.
