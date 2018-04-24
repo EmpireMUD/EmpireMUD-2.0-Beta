@@ -1814,7 +1814,6 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 * @param bool full_abandon If TRUE, abandons the city's entire area.
 */
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon) {
-	struct empire_city_data *temp;
 	room_data *cityloc, *to_room;
 	int x, y, radius;
 	bool junk;
@@ -1827,7 +1826,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 	if (IS_CITY_CENTER(cityloc)) {
 		disassociate_building(cityloc);
 	}
-	REMOVE_FROM_LIST(city, EMPIRE_CITY_LIST(emp), next);
+	LL_DELETE(EMPIRE_CITY_LIST(emp), city);
 	if (city->name) {
 		free(city->name);
 	}
@@ -4186,7 +4185,7 @@ ACMD(do_enroll) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *next_store;
-	struct empire_city_data *city, *next_city, *temp;
+	struct empire_city_data *city, *next_city;
 	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
@@ -4254,6 +4253,8 @@ ACMD(do_enroll) {
 
 		// move data over
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
+			log_to_empire(e, ELOG_DIPLOMACY, "%s merged into this empire", EMPIRE_NAME(old));
+			
 			// attempt to estimate the new member count so cities and territory transfer correctly
 			// note: may over-estimate if some players already had alts in both empires
 			EMPIRE_MEMBERS(e) += EMPIRE_MEMBERS(old);
@@ -4364,28 +4365,15 @@ ACMD(do_enroll) {
 			}
 			
 			// cities
-			for (city = EMPIRE_CITY_LIST(old); city; city = next_city) {
-				next_city = city->next;
-				
+			LL_FOREACH_SAFE(EMPIRE_CITY_LIST(old), city, next_city) {
 				if (city_points_available(e) >= (city->type + 1)) {
-					// remove from old empire
-					REMOVE_FROM_LIST(city, EMPIRE_CITY_LIST(old), next);
-					city->next = NULL;
-					
-					// add to new empire
-					if (EMPIRE_CITY_LIST(e)) {
-						temp = EMPIRE_CITY_LIST(e);
-						while (temp->next) {
-							temp = temp->next;
-						}
-						temp->next = city;
-					}
-					else {
-						EMPIRE_CITY_LIST(e) = city;
-					}
+					// can keep city
+					LL_DELETE(EMPIRE_CITY_LIST(old), city);
+					LL_APPEND(EMPIRE_CITY_LIST(e), city);
 				}
 				else {
 					// no room for this city
+					log_to_empire(e, ELOG_TERRITORY, "%s is no longer a city because there was no room for it in this empire", city->name);
 					perform_abandon_city(old, city, FALSE);
 				}
 			}
