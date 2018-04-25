@@ -3275,7 +3275,7 @@ SHOW(show_learned) {
 	craft_data *craft;
 	bool file = FALSE;
 	
-	argument = one_argument(argument, arg);
+	argument = one_word(argument, arg);
 	skip_spaces(&argument);
 	
 	if (!*arg) {
