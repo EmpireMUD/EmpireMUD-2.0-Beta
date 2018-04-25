@@ -1039,11 +1039,10 @@ road sign.
 
 See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
-LEARN LEARNED LEARNING ELEARNED
+LEARN LEARNED LEARNING
 
 Usage:  learn <recipe>
         learned [search terms]
-        elearned [search terms]
 
 You can learn a recipe (including patterns, schematics, and designs) from an
 item that teaches it. This gives you permanent access to that craft recipe
@@ -1052,8 +1051,7 @@ item that teaches it. This gives you permanent access to that craft recipe
 Learning a recipe will consume the recipe item.
 
 You can see your learned recipes with the 'learned' command and, optionally,
-can filter the results. To see recipes learned by your whole empire, use
-'elearned'. Empire recipes come from progression goals.
+can filter the results. Empire recipes come from progression goals.
 
 See also: RECIPES, PROGRESS
 #

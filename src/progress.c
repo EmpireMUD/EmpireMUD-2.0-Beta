@@ -2395,7 +2395,7 @@ OLC_MODULE(progedit_perks) {
 				}
 				case PRG_PERK_CRAFT: {
 					craft_data *craft;
-					if (!isdigit(*argument) || (vnum = atoi(argument) < 0) || !(craft = craft_proto(vnum))) {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || !(craft = craft_proto(vnum))) {
 						msg_to_char(ch, "Invalid craft vnum '%s'.\r\n", argument);
 						return;
 					}
