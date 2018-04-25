@@ -289,6 +289,7 @@ void boot_db(void) {
 	void build_all_shop_lookups();
 	void build_player_index();
 	void check_for_new_map();
+	void check_learned_empire_crafts();
 	void check_nowhere_einv_all();
 	void check_ruined_cities();
 	void check_version();
@@ -417,6 +418,7 @@ void boot_db(void) {
 	check_for_new_map();
 	setup_island_levels();
 	expire_old_politics();
+	check_learned_empire_crafts();
 	check_nowhere_einv_all();
 	verify_empire_goals();
 	need_progress_refresh = TRUE;

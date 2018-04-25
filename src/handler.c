@@ -3760,6 +3760,41 @@ void add_learned_craft(char_data *ch, any_vnum vnum) {
 
 
 /**
+* Adds a craft vnum to an empire's learned list -- this is stackable, so
+* learning it more than once just adds to the count.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The craft vnum to learn.
+*/
+void add_learned_craft_empire(empire_data *emp, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &vnum, pcd);
+	if (!pcd) {
+		CREATE(pcd, struct player_craft_data, 1);
+		pcd->vnum = vnum;
+		pcd->count = 0;
+		HASH_ADD_INT(EMPIRE_LEARNED_CRAFTS(emp), vnum, pcd);
+		HASH_SORT(EMPIRE_LEARNED_CRAFTS(emp), sort_learned_recipes);
+	}
+	++pcd->count;
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+/**
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The craft vnum to check.
+* @return bool TRUE if the empire has learned it.
+*/
+bool empire_has_learned_craft(empire_data *emp, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &vnum, pcd);
+	return pcd ? TRUE : FALSE;
+}
+
+
+/**
 * @param char_data *ch The player.
 * @param any_vnum vnum The craft vnum to check.
 * @return bool TRUE if the player has learned it.
@@ -3772,7 +3807,11 @@ bool has_learned_craft(char_data *ch, any_vnum vnum) {
 	}
 	
 	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
-	return pcd ? TRUE : FALSE;
+	
+	if (pcd || (GET_LOYALTY(ch) && empire_has_learned_craft(GET_LOYALTY(ch), vnum))) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
 
@@ -3793,6 +3832,29 @@ void remove_learned_craft(char_data *ch, any_vnum vnum) {
 	if (pcd) {
 		HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
 		free(pcd);
+	}
+}
+
+
+/**
+* Loses a craft in the learned list. If the craft was learned from more than
+* 1 source, this only reduces the source count instead.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The craft vnum to forget.
+* @param bool full_remove If TRUE, fully removes the entry. Otherwise decrements by 1 and removes if 0.
+*/
+void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove) {
+	struct player_craft_data *pcd;
+	
+	HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &vnum, pcd);
+	if (pcd) {
+		--pcd->count;
+		if (pcd->count < 1 || full_remove) {
+			HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
+			free(pcd);
+		}
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 

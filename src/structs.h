@@ -2113,6 +2113,7 @@ typedef struct vehicle_data vehicle_data;
 // PRG_PERK_x: progress perks
 #define PRG_PERK_TECH  0	// grants a technology
 #define PRG_PERK_CITY_POINTS  1	// grants more city points
+#define PRG_PERK_CRAFT  2	// grants a recipe
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3568,9 +3569,10 @@ struct player_automessage {
 };
 
 
-// for permanently learning crafts
+// for permanently learning crafts (also used by empires)
 struct player_craft_data {
 	any_vnum vnum;	// vnum of the learned craft
+	int count;	// for empires only, number of things giving this craft
 	UT_hash_handle hh;	// player's learned_crafts hash
 };
 
@@ -4348,6 +4350,7 @@ struct empire_data {
 	struct offense_data *offenses;
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
+	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

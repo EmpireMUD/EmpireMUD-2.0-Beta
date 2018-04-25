@@ -1673,17 +1673,21 @@ ACMD(do_learned) {
 		msg_to_char(ch, "Mobs never learn.\r\n");
 		return;
 	}
+	if (subcmd == SCMD_E_LEARNED && !GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You are not in an empire.\r\n");
+		return;
+	}
 	
 	skip_spaces(&argument);
 	if (*argument) {
-		size = snprintf(output, sizeof(output), "Learned recipes matching '%s':\r\n", argument);
+		size = snprintf(output, sizeof(output), "%s recipes matching '%s':\r\n", subcmd == SCMD_LEARNED ? "Learned" : "Empire", argument);
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Learned recipes:\r\n");
+		size = snprintf(output, sizeof(output), "%s recipes:\r\n", subcmd == SCMD_LEARNED ? "Learned" : "Empire");
 	}
 	
 	count = 0;
-	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+	HASH_ITER(hh, (subcmd == SCMD_LEARNED ? GET_LEARNED_CRAFTS(ch) : EMPIRE_LEARNED_CRAFTS(GET_LOYALTY(ch))), pcd, next_pcd) {
 		if (!(craft = craft_proto(pcd->vnum))) {
 			continue;	// no craft?
 		}

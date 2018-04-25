@@ -2280,7 +2280,7 @@ Available flags:
  VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
  SHIPYARD - requires being at a shipyard
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
- LEARNED - requires the player 'learn' a recipe to use it
+ LEARNED - requires the player/empire 'learn' a recipe to use it
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -5668,6 +5668,7 @@ lost even if the empire no longer qualifies for the goal that gave them.
 Perk types:
  Technology - Grants an empire technology.
  City-points - Grants one or more city points.
+ Craft - Grants a LEARNED craft recipe to the entire empire.
 
 Note: To grant progress points for a goal, set the 'value'.
 

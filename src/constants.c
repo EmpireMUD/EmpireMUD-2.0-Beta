@@ -2598,6 +2598,7 @@ const char *progress_flags[] = {
 const char *progress_perk_types[] = {
 	"Technology",
 	"City-points",
+	"Craft",
 	"\n"
 };
 

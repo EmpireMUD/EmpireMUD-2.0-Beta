@@ -3106,6 +3106,26 @@ void check_learned_crafts(char_data *ch) {
 
 
 /**
+* Checks that all empires' learned crafts are valid, and removes bad entries.
+*/
+void check_learned_empire_crafts(void) {
+	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
+	
+	struct player_craft_data *pcd, *next_pcd;
+	empire_data *emp, *next_emp;
+	craft_data *craft;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
+			if (!(craft = craft_proto(pcd->vnum)) || !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+				remove_learned_craft_empire(emp, pcd->vnum, TRUE);
+			}
+		}
+	}
+}
+
+
+/**
 * Checks that all a player's currencies are valid.
 *
 * @param char_data *ch The player to check.

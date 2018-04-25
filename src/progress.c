@@ -53,6 +53,7 @@ extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
+void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 
 // local funcs
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add);
@@ -339,7 +340,10 @@ void get_progress_list_display(struct progress_list *list, char *save_buffer) {
 * @param struct progress_perk *perk The perk to get display text for.
 */
 char *get_one_perk_display(struct progress_perk *perk) {
+	extern const char *craft_types[];
+	
 	static char save_buffer[MAX_STRING_LENGTH];
+	craft_data *craft;
 	
 	*save_buffer = '\0';
 	
@@ -351,6 +355,15 @@ char *get_one_perk_display(struct progress_perk *perk) {
 		}
 		case PRG_PERK_CITY_POINTS: {
 			sprintf(save_buffer, "%d city point%s", perk->value, PLURAL(perk->value));
+			break;
+		}
+		case PRG_PERK_CRAFT: {
+			if ((craft = craft_proto(perk->value))) {
+				sprintf(save_buffer, "%s: %s", craft_types[GET_CRAFT_TYPE(craft)], GET_CRAFT_NAME(craft));
+			}
+			else {
+				strcpy(save_buffer, "UNKNOWN");
+			}
 			break;
 		}
 		default: {
@@ -463,6 +476,18 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 			}
 			case PRG_PERK_CITY_POINTS: {
 				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
+				break;
+			}
+			case PRG_PERK_CRAFT: {
+				void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
+				void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
+				
+				if (add) {
+					add_learned_craft_empire(emp, perk->value);
+				}
+				else {
+					remove_learned_craft_empire(emp, perk->value, FALSE);
+				}
 				break;
 			}
 		}
@@ -1187,6 +1212,9 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 * @param empire_data *only_emp Optional: If provided, only does that 1 empire. Otherwise does all of them.
 */
 void full_reset_empire_progress(empire_data *only_emp) {
+	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
+	
+	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp, *next_emp;
 	int iter;
 	
@@ -1214,6 +1242,11 @@ void full_reset_empire_progress(empire_data *only_emp) {
 		// wipe points
 		for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
 			EMPIRE_PROGRESS_POINTS(emp, iter) = 0;
+		}
+		
+		/// wipe learned recipes
+		HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
+			remove_learned_craft_empire(emp, pcd->vnum, TRUE);
 		}
 		
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -2356,6 +2389,18 @@ OLC_MODULE(progedit_perks) {
 				case PRG_PERK_CITY_POINTS: {
 					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
 						msg_to_char(ch, "Invalid number of city points '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_CRAFT: {
+					craft_data *craft;
+					if (!isdigit(*argument) || (vnum = atoi(argument) < 0) || !(craft = craft_proto(vnum))) {
+						msg_to_char(ch, "Invalid craft vnum '%s'.\r\n", argument);
+						return;
+					}
+					else if (!CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+						msg_to_char(ch, "You must pick a craft with the LEARNED flag.\r\n");
 						return;
 					}
 					break;	// otherwise ok
