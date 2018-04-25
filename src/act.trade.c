@@ -1755,7 +1755,7 @@ ACMD(do_learned) {
 					strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
 					break;
 				}
-				l_size = snprintf(line, sizeof(line), "%s", GET_CRAFT_NAME(craft));
+				l_size = snprintf(line, sizeof(line), "   %s", GET_CRAFT_NAME(craft));
 				comma = TRUE;
 			}
 			else {	// room on this line
