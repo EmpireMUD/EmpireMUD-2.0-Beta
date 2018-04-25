@@ -1667,10 +1667,10 @@ ACMD(do_learn) {
 
 
 ACMD(do_learned) {
-	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], temp[256];
 	struct player_craft_data *pcd, *next_pcd, *lists[2];
 	int l_pos, width, last_type;
-	bool is_emp, overflow;
+	bool is_emp, overflow, comma;
 	craft_data *craft;
 	size_t size, l_size, count;
 	
@@ -1703,6 +1703,7 @@ ACMD(do_learned) {
 	for (l_pos = 0, is_emp = FALSE; l_pos < 2 && !overflow; ++l_pos, is_emp = TRUE) {
 		last_type = -1;	// reset each loop
 		*line = '\0';
+		comma = FALSE;
 		
 		HASH_ITER(hh, lists[l_pos], pcd, next_pcd) {
 			if (!(craft = craft_proto(pcd->vnum))) {
@@ -1715,7 +1716,10 @@ ACMD(do_learned) {
 				continue;	// searched
 			}
 			
-			// ok: check start of line
+			// ok:
+			++count;
+			
+			// check start of line
 			if (last_type == -1 || last_type != GET_CRAFT_TYPE(craft)) {
 				// append line now
 				if (*line) {
@@ -1732,7 +1736,11 @@ ACMD(do_learned) {
 				
 				// prepare new line
 				last_type = GET_CRAFT_TYPE(craft);
-				l_size = snprintf(line, sizeof(line), "%s%s: ", craft_types[last_type], is_emp ? " (empire)" : "");
+				strcpy(temp, craft_types[last_type]);
+				strtolower(temp);
+				ucwords(temp);
+				l_size = snprintf(line, sizeof(line), "%s%s:", temp, is_emp ? " (empire)" : "");
+				comma = FALSE;
 			}
 			
 			// check line limit
@@ -1748,9 +1756,11 @@ ACMD(do_learned) {
 					break;
 				}
 				l_size = snprintf(line, sizeof(line), "%s", GET_CRAFT_NAME(craft));
+				comma = TRUE;
 			}
 			else {	// room on this line
-				l_size += snprintf(line + l_size, sizeof(line) - l_size, ", %s", GET_CRAFT_NAME(craft));
+				l_size += snprintf(line + l_size, sizeof(line) - l_size, "%s%s", comma ? ", " : " ", GET_CRAFT_NAME(craft));
+				comma = TRUE;
 			}
 		}
 		
