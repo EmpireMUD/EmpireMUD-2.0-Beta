@@ -2216,7 +2216,8 @@ SHOW(show_piles) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	room_data *room, *next_room;
 	int count, max = 100;
-	obj_data *obj;
+	obj_data *obj, *sub;
+	vehicle_data *veh;
 	size_t size;
 	bool any;
 	
@@ -2231,6 +2232,15 @@ SHOW(show_piles) {
 		count = 0;
 		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
 			++count;
+			
+			LL_FOREACH2(obj->contains, sub, next_content) {
+				++count;
+			}
+		}
+		LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			LL_FOREACH2(VEH_CONTAINS(veh), sub, next_content) {
+				++count;
+			}
 		}
 		
 		if (count >= max) {
