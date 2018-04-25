@@ -886,7 +886,7 @@ ACMD(do_slash_channel) {
 		LL_FOREACH(GET_SLASH_CHANNELS(ch), slash) {
 			++count;
 		}
-		if (count > 30) {
+		if (count > 30 && !IS_IMMORTAL(ch)) {
 			msg_to_char(ch, "You cannot be on more than 30 slash-channels at a time.\r\n");
 			return;
 		}
