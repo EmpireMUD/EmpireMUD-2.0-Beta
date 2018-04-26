@@ -152,6 +152,24 @@ while you sleep.
 
 When you're done with the shelter, be sure to dismantle and abandon it.
 #
+CELESTIALFORGE "CELESTIAL FORGE"
+
+[FF]  Celestial Forge  (Grand Monuments ability)
+
+Command:  shatter <item to destroy>
+Fame:  5
+
+The celestial forge is a place not only to forge gear, but to destroy gear you
+no longer need and recycle it into shards. The number and type of shards you
+get are based on the level and quality of the item.
+
+You can see how many shards you have by typing 'currency'.
+
+The shards do not yet have a purpose, but in the future they will allow you to
+enhance your gear or buy other items.
+
+See also: CURRENCY
+#
 CEMETERY
 
 .i.i  Cemetery  (Monuments ability)
