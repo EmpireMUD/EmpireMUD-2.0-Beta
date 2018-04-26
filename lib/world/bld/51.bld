@@ -1892,4 +1892,26 @@ M
 R
 1002 1 5 0
 S
+#5195
+Celestial Forge~
+The Celestial Forge~
+&0[  ]~
+48 5 0 0
+0 0 0 -1
+C
+shatter <item to destroy>~
+D
+   The towering stone walls of the celestial forge are offset just enough that
+light comes cascading through thousands of crevices, forming stars that dance
+around the room as the sun crosses the sky. The forge is so hot that you begin
+sweating instantly, unable to escape the powerful furnace.
+~
+F
+hv
+R
+3 2 1 0
+R
+1007 1 5 0
+T 5195
+S
 $
