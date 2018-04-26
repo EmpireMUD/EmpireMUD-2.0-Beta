@@ -707,7 +707,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_SWAMP  BIT(12)
 #define BLD_ANY_FOREST  BIT(13)
 #define BLD_FACING_OPEN_BUILDING  BIT(14)
-#define BLD_ON_BASIC_FACING  BIT(15)
+#define BLD_ON_FLAT_TERRAIN  BIT(15)	// for facing-only
 #define BLD_ON_SHALLOW_SEA  BIT(16)
 #define BLD_ON_COAST  BIT(17)
 #define BLD_ON_RIVERBANK  BIT(18)

@@ -96,6 +96,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates building with different vnum");
 			problem = TRUE;
 		}
+		if (IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING | BLD_ANY_FOREST)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building has invalid build-on flags!");
+			problem = TRUE;
+		}
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {	// vehicles only
 		if (GET_CRAFT_OBJECT(craft) == NOTHING || !vehicle_proto(GET_CRAFT_OBJECT(craft))) {

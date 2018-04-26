@@ -2667,7 +2667,7 @@ const char *bld_on_flags[] = {
 	"swamp",
 	"any-forest",
 	"open-building",
-	"basic-facing",	// 15
+	"flat-terrain",	// 15
 	"shallow-sea",
 	"coast",
 	"riverbank",

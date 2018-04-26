@@ -2178,7 +2178,7 @@ The following flags are available:
  &cswamp&0 - a swamp/marsh tile
  &cany-forest&0 - any level of forest tile, from light forest to overgrown
  &copen-building&0 - a building that doesn't block the map
- &cbasic-facing&0 - for buildings that can face any clear tile
+ &cflat-terrain&0 - for buildings that can face most flat tiles
  &cshallow-sea&0 - the area around islands
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers
@@ -2214,12 +2214,12 @@ The following flags are available:
  &cnot-player-made&0 - can't be (e.g.) a river tile made by a player
  &cocean&0 - an ocean tile
  &coasis&0 - an oasis tile
- &ccrops&0 - *** do not use for buildon
+ &rcrops&0 - *** do not use for buildon
  &cgrove&0 - a desert grove tile
  &cswamp&0 - a swamp/marsh tile
- &cany-forest&0 - *** do not use for buildon
- &copen-building&0 - *** do not use for buildon
- &cbasic-facing&0 - *** do not use for buildon
+ &rany-forest&0 - *** do not use for buildon
+ &ropen-building&0 - *** do not use for buildon
+ &rflat-terrain&0 - *** do not use for buildon (ONLY for facing)
  &cshallow-sea&0 - the area around islands
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers
@@ -6054,7 +6054,7 @@ Available flags:
  &cswamp&0 - a swamp-/marsh-type tile
  &cany-forest&0 - a broader category of forests usually used for 'buildfacing'
  &copen-building&0 - does not apply to buildflags -- do not use
- &cbasic-facing&0 - for buildings that can face any clear tile
+ &cflat-terrain&0 - for buildings that can face any flat terrain
  &cshallow-sea&0 - the area around islands
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers

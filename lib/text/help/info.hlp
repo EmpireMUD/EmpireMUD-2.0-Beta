@@ -610,6 +610,13 @@ Most crops are used to make food and drink. Some, like cotton, have other uses.
 
 See also: CHOP, COOK, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
 #
+"FLAT TERRAIN" FLAT-TERRAIN
+
+When a building says it must be built facing "flat-terrain", this refers to
+most regular land tiles, including plains, forest, desert, crops, and roads.
+
+Mountains, rivers, lakes, oceans, jungles, and swamps are not valid.
+#
 GREATNESS GRT
 
 Greatness (social attribute)
