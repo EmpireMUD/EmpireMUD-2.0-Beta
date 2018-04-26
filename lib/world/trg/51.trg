@@ -146,8 +146,8 @@ if !%target.wearable%
   halt
 end
 * 26 ~ 200
+eval level_modified %target.level% + 25
 eval level_in_range (%level_modified% // 100)
-eval mod (%target.level% // 100)
 if %level_in_range% == 0
   set level_in_range 100
 end
@@ -159,22 +159,21 @@ if %target.is_flagged(GROUP-DROP)%
   eval shard_value %shard_value% + 50
 end
 * 0~75: 5100
-76~175: 5101
-176~275: 5102
-276~375: 5103
-* 301: --
+* 76~175: 5101
+* 176~275: 5102
+* 276~375: 5103
 eval shard_type 5100 + ((%level_modified%-1) / 100)
 eval currency_name %%currency.%shard_type%%%
 if !%currency_name% || %currency_name% == UNKNOWN
   %send% %actor% %target.shortdesc% is too high level to convert into any current type of shards!
   halt
 end
-if %shard_value% < 1 || %target.quest%
+if %shard_value% < 1 || %target.quest% || %target.level% < 25
   %send% %actor% %target.shortdesc% can't be converted into shards.
   halt
 end
-%send% %actor% You crush %target.shortdesc% into %shard_value% %currency_name%.
-%echoaround% %actor% %actor.name% crushes %target.shortdesc% into %currency_name%.
+%send% %actor% You shatter %target.shortdesc% into %shard_value% %currency_name%.
+%echoaround% %actor% %actor.name% shatteres %target.shortdesc% into %currency_name%.
 eval money %%actor.give_currency(%shard_type%, %shard_value%)%%
 nop %money%
 %purge% %target%
