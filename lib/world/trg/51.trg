@@ -173,7 +173,7 @@ if %shard_value% < 1 || %target.quest% || %target.level% < 25
   halt
 end
 %send% %actor% You shatter %target.shortdesc% into %shard_value% %currency_name%.
-%echoaround% %actor% %actor.name% shatteres %target.shortdesc% into %currency_name%.
+%echoaround% %actor% %actor.name% shatters %target.shortdesc% into %currency_name%.
 eval money %%actor.give_currency(%shard_type%, %shard_value%)%%
 nop %money%
 %purge% %target%
