@@ -1022,7 +1022,7 @@ void start_dismantle_building(room_data *loc) {
 				next_obj = obj->next_content;
 				obj_to_room(obj, loc);
 			}
-			for (targ = ROOM_PEOPLE(loc); targ; targ = next_targ) {
+			for (targ = ROOM_PEOPLE(room); targ; targ = next_targ) {
 				next_targ = targ->next_in_room;
 				if (!IS_NPC(targ)) {
 					GET_LAST_DIR(targ) = NO_DIR;
