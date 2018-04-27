@@ -6005,6 +6005,7 @@ Available tasks:
  &cNOT-COMPLETED-QUEST&0 - Has not completed a certain quest.
  &cNOT-ON-QUEST&0 - Is not currently on a certain quest.
  &cOWN-BUILDING&0 - Empire has a certain building.
+ &cOWN-BUILDING-FUNCTION&0 - Empire has a building with a given function flag.
  &cOWN-VEHICLE&0 - Empire has a certain vehicle.
  &cSKILL-LEVEL-OVER&0 - Player has a certain skill at least this high.
  &cSKILL-LEVEL-UNDER&0 - Player has a certain skill no higher than this.

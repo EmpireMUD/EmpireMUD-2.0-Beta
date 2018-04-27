@@ -6255,6 +6255,7 @@ void free_requirements(struct req_data *list) {
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
 	extern int count_crop_variety_in_list(obj_data *list);
 	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
 	extern int count_owned_homes(empire_data *emp);
 	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
@@ -6349,6 +6350,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			}
 			case REQ_OWN_BUILDING: {
 				if (!GET_LOYALTY(ch) || count_owned_buildings(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_OWN_BUILDING_FUNCTION: {
+				if (!GET_LOYALTY(ch) || count_owned_buildings_by_function(GET_LOYALTY(ch), req->misc) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -6505,6 +6512,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 */
 char *requirement_string(struct req_data *req, bool show_vnums) {
 	extern const char *action_bits[];
+	extern const char *function_flags[];
 	
 	char vnum[256], lbuf[256];
 	static char output[256];
@@ -6564,6 +6572,12 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		case REQ_OWN_BUILDING: {
 			bld_data *bld = building_proto(req->vnum);
 			snprintf(output, sizeof(output), "Own %dx building%s: %s%s", req->needed, PLURAL(req->needed), vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			break;
+		}
+		case REQ_OWN_BUILDING_FUNCTION: {
+			sprintbit(req->misc, function_flags, lbuf, TRUE);
+			// does not show vnum
+			snprintf(output, sizeof(output), "Own %dx building%s with: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_OWN_VEHICLE: {

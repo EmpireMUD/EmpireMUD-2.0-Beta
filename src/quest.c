@@ -264,6 +264,37 @@ int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
 
 
 /**
+* Number of buildings owned by an empire that have a specific set of function flag(s).
+*
+* @param empire_data *emp Any empire.
+* @param bitvector_t flags One or more flags to check for (if there's more than one flag, it has to have ALL of them).
+* @return int The number of completed buildings with the flag(s), owned by emp.
+*/
+int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags) {
+	struct empire_territory_data *ter, *next_ter;
+	int count = 0;	// ah ah ah
+	
+	if (!emp || flags == NOBITS) {
+		return count;
+	}
+	
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
+			continue;
+		}
+		if ((GET_BLD_FUNCTIONS(GET_BUILDING(ter->room)) & flags) != flags) {
+			continue;
+		}
+		
+		// found
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
 * Number of citizen homes owned by an empire.
 *
 * @param empire_data *emp Any empire.
@@ -740,6 +771,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_OWN_BUILDING: {
 				task->current = count_owned_buildings(GET_LOYALTY(ch), task->vnum);
+				break;
+			}
+			case REQ_OWN_BUILDING_FUNCTION: {
+				task->current = count_owned_buildings_by_function(GET_LOYALTY(ch), task->misc);
 				break;
 			}
 			case REQ_OWN_VEHICLE: {
@@ -2006,6 +2041,7 @@ void qt_change_currency(char_data *ch, any_vnum vnum, int total) {
 void qt_gain_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct req_data *task;
+	bld_data *bld;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -2014,6 +2050,9 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				++task->current;
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
 			}
 		}
@@ -2203,6 +2242,7 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 void qt_lose_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct req_data *task;
+	bld_data *bld;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -2211,6 +2251,9 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				--task->current;
 			}
 			

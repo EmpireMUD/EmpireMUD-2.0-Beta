@@ -384,6 +384,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_CROP_VARIETY  23
 #define REQ_OWN_HOMES  24
 #define REQ_OWN_SECTOR  25
+#define REQ_OWN_BUILDING_FUNCTION  26
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types

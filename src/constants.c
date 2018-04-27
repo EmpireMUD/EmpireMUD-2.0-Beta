@@ -3761,6 +3761,7 @@ const char *requirement_types[] = {
 	"CROP-VARIETY",
 	"OWN-HOMES",
 	"OWN-SECTOR",	// 25
+	"OWN-BUILDING-FUNCTION",
 	"\n",
 };
 

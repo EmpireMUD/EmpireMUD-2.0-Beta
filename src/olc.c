@@ -4706,13 +4706,14 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	extern const char *action_bits[];
 	extern const char *component_flags[];
 	extern const char *component_types[];
+	extern const char *function_flags[];
 	
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
-	bool need_currency = FALSE;
+	bool need_currency = FALSE, need_func_flags = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -4747,6 +4748,10 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		case REQ_OWN_BUILDING: {
 			need_bld = TRUE;
+			break;
+		}
+		case REQ_OWN_BUILDING_FUNCTION: {
+			need_func_flags = TRUE;
 			break;
 		}
 		case REQ_OWN_VEHICLE: {
@@ -4882,6 +4887,13 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			return FALSE;
 		}
 		*vnum = FCT_VNUM(fct);
+	}
+	if (need_func_flags) {
+		*misc = olc_process_flag(ch, argument, "function", "", function_flags, NOBITS);
+		if (!*misc) {
+			msg_to_char(ch, "You must provide function flags.\r\n");
+			return FALSE;
+		}
 	}
 	if (need_mob) {
 		argument = any_one_arg(argument, arg);

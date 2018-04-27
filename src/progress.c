@@ -818,6 +818,7 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 * @param struct empire_goal *goal The goal to refresh.
 */
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
+	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
 	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
 	
 	struct req_data *task;
@@ -839,6 +840,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 			}
 			case REQ_OWN_BUILDING: {
 				task->current = count_owned_buildings(emp, task->vnum);
+				break;
+			}
+			case REQ_OWN_BUILDING_FUNCTION: {
+				task->current = count_owned_buildings_by_function(emp, task->misc);
 				break;
 			}
 			case REQ_OWN_VEHICLE: {
@@ -1026,10 +1031,16 @@ void et_change_coins(empire_data *emp, int amount) {
 void et_gain_building(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
+	bld_data *bld;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				++task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
@@ -1136,16 +1147,21 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 void et_lose_building(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
+	bld_data *bld;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				--task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
 				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+				--task->current;
+				task->current = MAX(task->current, 0);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
 		}
 	}
