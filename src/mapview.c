@@ -2032,7 +2032,7 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 		sprintf(buf, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 	}
 	else {
-		sprintf(buf, "%33s", " - ");
+		sprintf(buf, "%34s", " - ");
 	}
 	
 	if (obj->proto_script) {
@@ -2061,8 +2061,18 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 		send_to_char(buf, ch);
 	}
 	else if (obj->in_vehicle) {
-		sprintf(buf + strlen(buf), "inside %s\r\n", get_vehicle_short_desc(obj->in_vehicle, ch));
+		sprintf(buf + strlen(buf), "inside %s%s\r\n", get_vehicle_short_desc(obj->in_vehicle, ch), recur ? ", which is" : " ");
 		send_to_char(buf, ch);
+		if (recur) {
+			check_x = X_COORD(IN_ROOM(obj->in_vehicle));	// not all locations are on the map
+			check_y = Y_COORD(IN_ROOM(obj->in_vehicle));
+			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+				sprintf(buf + strlen(buf), "%34s[%d] (%d, %d) %s\r\n", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), check_x, check_y, get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
+			}
+			else {
+				sprintf(buf + strlen(buf), "%34s[%d] (unknown) %s\r\n", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
+			}
+		}
 	}
 	else if (obj->worn_by) {
 		sprintf(buf + strlen(buf), "worn by %s\r\n", PERS(obj->worn_by, ch, 1));
