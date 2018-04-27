@@ -86,18 +86,16 @@ See also: COLOR, EMPIRE, POLITICAL, EEDIT
 #
 BARDE BARDING "ARMORED HORSE"
 
-Barde (Empire ability)
+Usage:  barde <mount>
 Location:  stable
 Cost:  10x (common metal)
 
 Barding allows you to put armor on your noble steeds. This makes them less
-vulnerable to attack, and more impressive to look upon. Most mounts can be
+vulnerable to attack, and more impressive to look upon. Many mounts can be
 barded. You can only barde mounts in a stable. You cannot remove barding from
 mounts.
 
 Barded mounts will not de-spawn like normal animals.
-
-Gain experience when you barde something.
 
 See also: RIDE, STABLE
 #

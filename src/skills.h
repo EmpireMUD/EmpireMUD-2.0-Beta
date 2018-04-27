@@ -174,7 +174,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_PROMINENCE  135
 #define ABIL_INSPIRE  136
 #define ABIL_SUMMON_BODYGUARD  138
-#define ABIL_BARDE  139
+// formerly: ABIL_BARDE  139
 #define ABIL_CITY_LIGHTS  140
 #define ABIL_STEAL  143
 #define ABIL_ESCAPE  146

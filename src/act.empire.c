@@ -3017,10 +3017,7 @@ ACMD(do_barde) {
 	
 	one_argument(argument, arg);
 
-	if (!can_use_ability(ch, ABIL_BARDE, NOTHING, 0, NOTHING)) {
-		// nope
-	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
@@ -3037,9 +3034,6 @@ ACMD(do_barde) {
 	else if (GET_LED_BY(mob)) {
 		act("You can't barde $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_BARDE)) {
-		return;
-	}
 	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE)) {
 		// messages itself
 	}
@@ -3053,7 +3047,6 @@ ACMD(do_barde) {
 					act("You strap heavy armor onto $N.", FALSE, ch, NULL, mob, TO_CHAR);
 					act("$n straps heavy armor onto $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
 					
-					gain_ability_exp(ch, ABIL_BARDE, 50);
 					command_lag(ch, WAIT_ABILITY);
 					found = TRUE;
 				}
