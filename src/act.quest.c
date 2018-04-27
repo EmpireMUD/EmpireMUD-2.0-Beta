@@ -338,6 +338,11 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 	struct req_data *task;
 	bool done = FALSE;
 	
+	if (!list) {	// shortcut for no tasks
+		*complete = *total = 1;
+		return;
+	}
+	
 	// prepare data
 	*complete = *total = 0;
 	
