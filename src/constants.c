@@ -3764,6 +3764,7 @@ const char *requirement_types[] = {
 	"OWN-SECTOR",	// 25
 	"OWN-BUILDING-FUNCTION",
 	"OWN-VEHICLE-FLAGGED",
+	"EMPIRE-WEALTH",
 	"\n",
 };
 
@@ -3798,6 +3799,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// own sector
 	REQ_AMT_NUMBER,	// own building function
 	REQ_AMT_NUMBER,	// own vehicle flagged
+	REQ_AMT_NUMBER,	// empire wealth
 };
 
 
@@ -3831,6 +3833,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// own sector
 	FALSE,	// own building function
 	FALSE,	// own vehicle flagged
+	FALSE,	// empire wealth
 };
 
 

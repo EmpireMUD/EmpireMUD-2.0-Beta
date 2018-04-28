@@ -6027,6 +6027,7 @@ Available tasks:
  &cCROP-VARIETY&0 - Needs produce from a number of different crops.
  &cOWN-HOMES&0 - Empire must have enough citizen homes.
  &cOWN-SECTOR&0 - Empire must own enough tiles of this sector type.
+ &cEMPIRE-WEALTH&0 - Empire must have a certain amount of wealth.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 

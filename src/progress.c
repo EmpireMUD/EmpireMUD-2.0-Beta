@@ -871,6 +871,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_owned_sector(emp, task->vnum);
 				break;
 			}
+			case REQ_EMPIRE_WEALTH: {
+				task->current = GET_TOTAL_WEALTH(emp);
+				break;
+			}
 			
 			// otherwise...
 			default: {
@@ -1022,8 +1026,16 @@ void et_change_coins(empire_data *emp, int amount) {
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
+			else if (task->type == REQ_EMPIRE_WEALTH) {
+				task->current = GET_TOTAL_WEALTH(emp);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
 		}
 	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_wealth, amount);
 }
 
 

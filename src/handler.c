@@ -6471,6 +6471,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_EMPIRE_WEALTH: {
+				if (!GET_LOYALTY(ch) || GET_TOTAL_WEALTH(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -6660,6 +6666,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		case REQ_OWN_SECTOR: {
 			sector_data *sect = sector_proto(req->vnum);
 			snprintf(output, sizeof(output), "Own %dx tile%s of: %s%s", req->needed, PLURAL(req->needed), vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+			break;
+		}
+		case REQ_EMPIRE_WEALTH: {
+			snprintf(output, sizeof(output), "Have empire wealth over: %d", req->needed);
 			break;
 		}
 		default: {
@@ -7648,6 +7658,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 void read_vault(empire_data *emp) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
+	int old = EMPIRE_WEALTH(emp);
 	obj_data *proto;
 	
 	EMPIRE_WEALTH(emp) = 0;
@@ -7660,6 +7671,10 @@ void read_vault(empire_data *emp) {
 				}
 			}
 		}
+	}
+	
+	if (old != EMPIRE_WEALTH(emp)) {
+		et_change_coins(emp, 0);	// will trigger wealth-based goals to reread
 	}
 }
 

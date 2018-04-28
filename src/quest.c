@@ -918,6 +918,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = count_owned_sector(GET_LOYALTY(ch), task->vnum);
 				break;
 			}
+			case REQ_EMPIRE_WEALTH: {
+				task->current = GET_LOYALTY(ch) ? GET_TOTAL_WEALTH(GET_LOYALTY(ch)) : 0;
+				break;
+			}
 		}
 	}
 }
@@ -2062,6 +2066,30 @@ void qt_change_currency(char_data *ch, any_vnum vnum, int total) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_GET_CURRENCY && task->vnum == vnum) {
 				task->current = total;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire wealth changes
+*
+* @param char_data *ch The player.
+* @param any_vnum amount Change in wealth (may be 0; reread anyway).
+*/
+void qt_empire_wealth(char_data *ch, any_vnum amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_EMPIRE_WEALTH) {
+				task->current = GET_LOYALTY(ch) ? GET_TOTAL_WEALTH(GET_LOYALTY(ch)) : 0;
 			}
 		}
 	}
