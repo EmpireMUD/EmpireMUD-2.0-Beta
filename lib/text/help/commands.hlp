@@ -1885,12 +1885,8 @@ to try again, so don't just spam the struggle command over and over.
 #
 "SUGGESTED ALIASES" "ALIAS SUGGESTIONS"
 
-Here are some suggested aliases. Some of them, like "loot", may involve an
-ability you don't have. You can either modify the alias to not have "butcher"
-at the end, or you can just ignore the warning message until you get Butcher.
-The rest of the loot alias will still work.
-
-Have a useful alias? Submit it with the "idea" command.
+Here are some suggested aliases. Have a useful alias? Submit it with the "idea"
+command.
 
 Feel free to copy and paste the alias commands below, or modify them as you
 like:

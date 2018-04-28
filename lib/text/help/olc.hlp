@@ -277,7 +277,7 @@ Mobs (MEDIT):
   players working very hard, or perhaps 2 extremely good players.
 - A mob with HARD and GROUP is a major boss fight and may take a lot of work
   even for a full 4-player group.
-- ANIMAL mobs will take double damage from players with Hunt.
+- ANIMAL mobs will take double damage from players with Huntsman.
 - Consider using a must-fight script (like a Leave trigger with "return 0")
   rather than the AGGR flag.
 - If your mob spawns in a dark adventure, strongly consider giving it INFRA.

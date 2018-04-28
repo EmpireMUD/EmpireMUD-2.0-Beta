@@ -16,17 +16,15 @@ See also: SCAVENGING, ROLE, SKILL, SKILL SYNERGY
 #
 BUTCHER
 
-Butcher (Survival ability)
-
 Usage:  butcher <corpse>
 
 With a little practice, you can butcher a corpse into smaller cuts of meat.
 This command succeeds about 60% of the time unskilled, and 100% of the time
-with the Butcher ability.
+with the Huntsman ability.
 
 Gains experience when you butcher something.
 
-See also: SKIN COMMAND
+See also: HUNTSMAN, SKIN COMMAND
 #
 "BY MOONLIGHT"
 
@@ -153,15 +151,18 @@ gardens.
 
 See also: BUILD, FIND HERBS, WORKFORCE, SKILLED LABOR
 #
-HUNT HUNTING "HUNT ABILITY"
+HUNTSMAN HUNT HUNTING "HUNTSMAN ABILITY"
 
-Hunt (Survival ability)
+Huntsman (Survival ability)
 
-Those with the Hunt ability deal twice as much damage to animals. This ability
-has a chance to not activate at low levels.
+Those with the Huntsman ability deal twice as much damage to animals. This
+ability has a chance to not activate at low levels.
 
-Gains experience when you hit an animal.
+Huntsmen (and women) also get a 100% chance to skin or butcher corpses.
 
+Gains experience when you hit an animal, or skin or butcher a corpse.
+
+See also: SKIN, BUTCHER
 Immortals see also: MHUNT
 #
 "MASTER SURVIVALIST" SURVIVALIST
