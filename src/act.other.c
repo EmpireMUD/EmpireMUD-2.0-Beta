@@ -471,8 +471,8 @@ INTERACTION_FUNC(skin_interact) {
 	obj_data *obj = NULL;
 	int num;
 	
-	if (!has_player_tech(ch, PTECH_SKINNING_UPGRADE) && !number(0, 1)) {
-		return FALSE;	// 50% failure unskilled
+	if (!has_player_tech(ch, PTECH_SKINNING_UPGRADE) && number(1, 100) > 60) {
+		return FALSE;	// 60% failure unskilled
 	}
 		
 	for (num = 0; num < interaction->quantity; ++num) {

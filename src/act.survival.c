@@ -47,8 +47,8 @@ INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
 	int num;
 	
-	if (!has_player_tech(ch, PTECH_BUTCHER_UPGRADE) && !number(0, 1)) {
-		return FALSE;	// 50% chance of failure without the ability
+	if (!has_player_tech(ch, PTECH_BUTCHER_UPGRADE) && number(1, 100) > 60) {
+		return FALSE;	// 60% chance of failure without the ability
 	}
 	
 	for (num = 0; num < interaction->quantity; ++num) {

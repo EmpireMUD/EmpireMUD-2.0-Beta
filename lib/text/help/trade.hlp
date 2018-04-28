@@ -935,8 +935,8 @@ Usage:  skin <corpse>
 
 You can skin a fresh corpse to get usable material, which can later be turned
 into good equipment. Some corpses cannot be skinned, especially severely
-damaged and putrid ones. This command succeeds 50% of the time unskilled, or
-100% of the time with the Butcher ability.
+damaged and putrid ones. This command succeeds about 60% of the time unskilled,
+or 100% of the time with the Butcher ability.
 
 Possible results from skinning and example animals:
   small skin: rabbit, squirrel
