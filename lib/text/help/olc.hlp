@@ -929,7 +929,7 @@ Available techs are:
  &cBlock-Ranged&0 * - Can block ranged attacks with shields (requires Block).
  &cBlock-Magical&0 * - Can block magical attacks with shields (requires Block).
  &cBonus-vs-Animals&0 - Extra combat damage when the victim is an animal.
- &cButcher&0 * - Can use the butcher command/interaction.
+ &cButcher-Upgrade&0 * - Butcher always succeeds.
  &cCustomize-Building&0 * - Can customize buildings.
  &cDeep-Mines&0 * - Mines are 50% larger.
  &cDual-Wield&0 - Gets an offhand attack at a reduced accuracy.
@@ -974,6 +974,7 @@ Available techs are:
  &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
  &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
  &cDodge-Cap&0 - Improves the player's maximum dodge percent.
+ &cSkinning-Upgrade&0 - Skinning always succeeds.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -6007,6 +6008,7 @@ Available tasks:
  &cOWN-BUILDING&0 - Empire has a certain building.
  &cOWN-BUILDING-FUNCTION&0 - Empire has a building with a given function flag.
  &cOWN-VEHICLE&0 - Empire has a certain vehicle.
+ &cOWN-VEHICLE-FLAGGED&0 - Empire has a vehicle with specific flags.
  &cSKILL-LEVEL-OVER&0 - Player has a certain skill at least this high.
  &cSKILL-LEVEL-UNDER&0 - Player has a certain skill no higher than this.
  &cTRIGGERED &r*&0&0 - Activated by a %quest% command in a trigger.

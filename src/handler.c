@@ -6259,6 +6259,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 	extern int count_owned_homes(empire_data *emp);
 	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+	extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 	
@@ -6362,6 +6363,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			}
 			case REQ_OWN_VEHICLE: {
 				if (!GET_LOYALTY(ch) || count_owned_vehicles(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_OWN_VEHICLE_FLAGGED: {
+				if (!GET_LOYALTY(ch) || count_owned_vehicles_by_flags(GET_LOYALTY(ch), req->misc) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -6513,6 +6520,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 char *requirement_string(struct req_data *req, bool show_vnums) {
 	extern const char *action_bits[];
 	extern const char *function_flags[];
+	extern const char *vehicle_flags[];
 	
 	char vnum[256], lbuf[256];
 	static char output[256];
@@ -6582,6 +6590,12 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_OWN_VEHICLE: {
 			snprintf(output, sizeof(output), "Own %dx vehicle%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_vehicle_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_OWN_VEHICLE_FLAGGED: {
+			sprintbit(req->misc, vehicle_flags, lbuf, TRUE);
+			// does not show vnum
+			snprintf(output, sizeof(output), "Own %dx vehicle%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_SKILL_LEVEL_OVER: {

@@ -1226,7 +1226,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	}
 	
 	if (!any) {
-		size += snprintf(buf + size, sizeof(buf) - size, " no archetypes %s\r\n", (all || basic) ? "available to list" : "with those keywords");
+		size += snprintf(buf + size, sizeof(buf) - size, " There are no archetypes %s.\r\n", (all || basic) ? "available to list" : "with those keywords");
 	}
 	
 	if (*buf) {

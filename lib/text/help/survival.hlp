@@ -21,9 +21,12 @@ Butcher (Survival ability)
 Usage:  butcher <corpse>
 
 With a little practice, you can butcher a corpse into smaller cuts of meat.
-This ability can fail at low skill levels, giving you less meat (or none).
+This command succeeds 50% of the time unskilled, and 100% of the time with the
+Butcher ability.
 
 Gains experience when you butcher something.
+
+See also: SKIN COMMAND
 #
 "BY MOONLIGHT"
 

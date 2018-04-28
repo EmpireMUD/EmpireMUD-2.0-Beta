@@ -385,6 +385,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_OWN_HOMES  24
 #define REQ_OWN_SECTOR  25
 #define REQ_OWN_BUILDING_FUNCTION  26
+#define REQ_OWN_VEHICLE_FLAGGED  27
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -2017,7 +2018,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_BLOCK_RANGED  6	// can block arrows (requires block)
 #define PTECH_BLOCK_MAGICAL  7	// can block magical attacks (requires block)
 #define PTECH_BONUS_VS_ANIMALS  8	// extra damage against animals
-#define PTECH_BUTCHER  9	// can use the 'butcher' command/interaction
+#define PTECH_BUTCHER_UPGRADE  9	// butcher always succeeds
 #define PTECH_CUSTOMIZE_BUILDING  10	// player can customize buildings
 #define PTECH_DEEP_MINES  11	// increases mine size
 #define PTECH_DUAL_WIELD  12	// can fight with offhand weapons
@@ -2061,6 +2062,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_TWO_HANDED_WEAPONS  50	// can wield two-handed weapons
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
 #define PTECH_DODGE_CAP  52	// improves your dodge cap
+#define PTECH_SKINNING_UPGRADE  53	// skinning always succeeds
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

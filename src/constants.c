@@ -773,7 +773,7 @@ const char *player_tech_types[] = {
 	"Block-Ranged",
 	"Block-Magical",
 	"Bonus-vs-Animals",
-	"Butcher",
+	"Butcher-Upgrade",
 	"Customize-Building",	// 10
 	"Deep-Mines",
 	"Dual-Wield",
@@ -817,6 +817,7 @@ const char *player_tech_types[] = {
 	"Two-Handed-Weapons",	// 50
 	"Where-Upgrade",
 	"Dodge-Cap",
+	"Skinning-Upgrade",
 	"\n"
 };
 
@@ -3762,6 +3763,7 @@ const char *requirement_types[] = {
 	"OWN-HOMES",
 	"OWN-SECTOR",	// 25
 	"OWN-BUILDING-FUNCTION",
+	"OWN-VEHICLE-FLAGGED",
 	"\n",
 };
 
@@ -3794,6 +3796,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// crop variety
 	REQ_AMT_NUMBER,	// own homes
 	REQ_AMT_NUMBER,	// own sector
+	REQ_AMT_NUMBER,	// own building function
+	REQ_AMT_NUMBER,	// own vehicle flagged
 };
 
 
@@ -3825,6 +3829,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// crop variety
 	FALSE,	// own homes
 	FALSE,	// own sector
+	FALSE,	// own building function
+	FALSE,	// own vehicle flagged
 };
 
 

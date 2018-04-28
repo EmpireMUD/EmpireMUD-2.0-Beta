@@ -47,8 +47,8 @@ INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
 	int num;
 	
-	if (!player_tech_skill_check(ch, PTECH_BUTCHER, DIFF_EASY)) {
-		return FALSE;
+	if (!has_player_tech(ch, PTECH_BUTCHER_UPGRADE) && !number(0, 1)) {
+		return FALSE;	// 50% chance of failure without the ability
 	}
 	
 	for (num = 0; num < interaction->quantity; ++num) {
@@ -505,14 +505,6 @@ ACMD(do_butcher) {
 	
 	one_argument(argument, arg);
 	
-	if (!has_player_tech(ch, PTECH_BUTCHER)) {
-		msg_to_char(ch, "You don't have the correct ability to butcher anything.\r\n");
-		return;
-	}
-	if (!can_use_ability(ch, NOTHING, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	
 	if (!*arg) {
 		msg_to_char(ch, "What would you like to butcher?\r\n");
 		return;
@@ -541,12 +533,13 @@ ACMD(do_butcher) {
 	else if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need a sharp tool to butcher with.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER, NULL, corpse)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse)) {
 		return;
 	}
 	else {
 		if (run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, butcher_interact)) {
 			// success
+			gain_player_tech_exp(ch, PTECH_BUTCHER_UPGRADE, 15);
 		}
 		else {
 			act("You butcher $p but get no useful meat.", FALSE, ch, corpse, NULL, TO_CHAR);
@@ -555,8 +548,7 @@ ACMD(do_butcher) {
 		
 		empty_obj_before_extract(corpse);
 		extract_obj(corpse);
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_ABILITY);
-		gain_player_tech_exp(ch, PTECH_BUTCHER, 15);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
