@@ -9,6 +9,17 @@ if %command% == sacrifice
 end
 return 1
 ~
+#9801
+Read looks at target~
+1 c 6
+read~
+if %actor.obj_target(%arg%)% == %self%
+  %force% %actor% look %arg%
+  return 1
+else
+  return 0
+end
+~
 #9850
 Equip imm-only~
 1 j 0

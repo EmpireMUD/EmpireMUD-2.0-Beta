@@ -73,7 +73,6 @@ Lead your empire to greatness~
 0
 A 47 44 80
 A 39 -1 25
-A 139 -1 20
 A 289 -1 0
 A 290 -1 0
 A 140 49 35
@@ -328,7 +327,6 @@ Sur~
 Make your way in the harsh wilderness~
 0
 A 65 64 75
-A 81 -1 1
 A 67 -1 50
 A 70 69 50
 A 79 -1 20
@@ -336,7 +334,7 @@ A 69 -1 40
 A 72 -1 10
 A 63 -1 15
 A 200 70 60
-A 71 81 10
+A 71 -1 20
 A 205 -1 95
 A 74 73 80
 A 82 -1 35

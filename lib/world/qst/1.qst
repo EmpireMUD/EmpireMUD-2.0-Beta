@@ -277,14 +277,14 @@ S
 Torch Tutorial~
    You've found a stick! These could be used to light up the night, but only if
 you get a flint set. Here's how to make your torch:
- 1. Get a flint set ('dig rock' until you get a flint, and follow its quest).
+ 1. Get a flint set ('dig' until you get a flint, and follow its quest).
  2. Use the flint set (light stick).
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
    Now that you have a torch, you'll be able to find your way around in the
 dark! Torches don't last long though, so keep your flint set handy.
 ~
-3 h 0 15 -1
+4 h 0 15 -1
 A
 2 121
 P
