@@ -1186,6 +1186,7 @@ ACMD(do_history) {
 		char buf[MAX_INPUT_LENGTH];
 		snprintf(buf, sizeof(buf), "history %s", argument);
 		do_slash_channel(ch, buf, 0, 0);
+		return;
 	}
 	else if (subcmd == SCMD_HISTORY) {
 		if (!*argument) {
