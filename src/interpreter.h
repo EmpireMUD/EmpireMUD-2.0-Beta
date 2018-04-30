@@ -174,6 +174,14 @@ struct alias_data {
 #define SCMD_POOFIN		0
 #define SCMD_POOFOUT	1
 
+// do_history
+#define SCMD_HISTORY  0
+#define SCMD_GOD_HISTORY  1
+#define SCMD_TELL_HISTORY  2
+#define SCMD_SAY_HISTORY  3
+#define SCMD_EMPIRE_HISTORY  4
+#define SCMD_ROLL_HISTORY  5
+
 /* do_hit */
 #define SCMD_HIT		0
 #define SCMD_MURDER		1

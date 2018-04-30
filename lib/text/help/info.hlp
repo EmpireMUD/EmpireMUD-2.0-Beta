@@ -657,18 +657,20 @@ See also: CLASS, DEATH, ENDURANCE
 #
 HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
 
-You can see chat history for various channels with the following commands:
-  SAYHISTORY - say, oocsay, gsay, emote, socials
-  TELLHISTORY - tells and replies
-  EHISTORY - etalk
-  /HISTORY <channel> - slash-channels
+Usage:  history <say | tell | /<channel> | empire | rolls>
+        history immortal
 
-Immortals also have:
-  GHISTORY - godnet, wiznet
+This command will show any of the various channel histories. Each channel also
+has a separate command, such as tellhistory for tells, which is identical to
+typing 'history tells'.
+
+Group-says, emotes, and socials also appear on 'say' history.
 
 Your chat history only contains messages that you were connected and in-game
 for. History messages last for up to 24 hours, but only the last 20 messages
 are stored.
+
+See also: SAYHISTORY, TELLHISTORY, EHISTORY, GHISTORY, /HISTORY
 #
 HOSTILE ROGUE THIEF
 
