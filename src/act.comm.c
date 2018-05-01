@@ -886,7 +886,7 @@ ACMD(do_slash_channel) {
 		LL_FOREACH(GET_SLASH_CHANNELS(ch), slash) {
 			++count;
 		}
-		if (count > 30) {
+		if (count > 30 && !IS_IMMORTAL(ch)) {
 			msg_to_char(ch, "You cannot be on more than 30 slash-channels at a time.\r\n");
 			return;
 		}
@@ -1150,38 +1150,82 @@ ACMD(do_gsay) {
 
 
 /**
-* Uses subcmd as which channel history.
+* Uses subcmd for different histories.
 */
 ACMD(do_history) {
 	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats", "rolls" };
 	struct channel_history_data *chd_iter;
 	bool found_crlf;
-	int pos;
+	int pos, type = NO_HISTORY;
 	
-	if (!REAL_NPC(ch)) {
-		msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[subcmd]);
+	if (REAL_NPC(ch)) {
+		return;	// nothing to show
+	}
 	
-		for (chd_iter = GET_HISTORY(REAL_CHAR(ch), subcmd); chd_iter; chd_iter = chd_iter->next) {
-			// verify has newline
-			pos = strlen(chd_iter->message) - 1;
-			found_crlf = FALSE;
-			while (pos > 0 && !found_crlf) {
-				if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n') {	
-					found_crlf = TRUE;
-				}
-				else if (chd_iter->message[pos] == '&' || chd_iter->message[pos-1] == '&') {
-					// probably color code
-					--pos;
-				}
-				else {
-					// found something not a crlf or a color code
-					break;
-				}
-			}
-			
-			// send message
-			msg_to_char(ch, "%3s: %s\tn%s", simple_time_since(chd_iter->timestamp), chd_iter->message, (found_crlf ? "" : "\r\n"));
+	skip_spaces(&argument);
+	
+	// determine type
+	if (subcmd == SCMD_GOD_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "godnet") || is_abbrev(argument, "wiznet") || is_abbrev(argument, "immortal")))) {
+		type = CHANNEL_HISTORY_GOD;
+	}
+	else if (subcmd == SCMD_TELL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(argument, "tells"))) {
+		type = CHANNEL_HISTORY_TELLS;
+	}
+	else if (subcmd == SCMD_SAY_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "says") || is_abbrev(argument, "group") || is_abbrev(argument, "gsays") || is_abbrev(argument, "emotes") || is_abbrev(argument, "socials")))) {
+		type = CHANNEL_HISTORY_SAY;
+	}
+	else if (subcmd == SCMD_EMPIRE_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "empire") || is_abbrev(argument, "esays") || is_abbrev(argument, "etalks")))) {
+		type = CHANNEL_HISTORY_EMPIRE;
+	}
+	else if (subcmd == SCMD_ROLL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(argument, "rolls"))) {
+		type = CHANNEL_HISTORY_ROLL;
+	}
+	else if (subcmd == SCMD_HISTORY && *argument == '/') {
+		// forward to /history
+		ACMD(do_slash_channel);
+		char buf[MAX_INPUT_LENGTH];
+		snprintf(buf, sizeof(buf), "history %s", argument);
+		do_slash_channel(ch, buf, 0, 0);
+		return;
+	}
+	else if (subcmd == SCMD_HISTORY) {
+		if (!*argument) {
+			msg_to_char(ch, "Usage: history <say | tell | /<channel> | empire | rolls%s>\r\n", IS_IMMORTAL(ch) ? " | immortal" : (IS_GOD(ch) ? " | god" : ""));
 		}
+		else {
+			msg_to_char(ch, "Invalid history channel.\r\n");
+		}
+		return;	// fail either way
+	}
+	
+	if (type == NO_HISTORY) {
+		msg_to_char(ch, "No history to show.\r\n");
+		return;
+	}
+	
+	// show a history
+	msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[type]);
+
+	for (chd_iter = GET_HISTORY(REAL_CHAR(ch), type); chd_iter; chd_iter = chd_iter->next) {
+		// verify has newline
+		pos = strlen(chd_iter->message) - 1;
+		found_crlf = FALSE;
+		while (pos > 0 && !found_crlf) {
+			if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n') {	
+				found_crlf = TRUE;
+			}
+			else if (chd_iter->message[pos] == '&' || chd_iter->message[pos-1] == '&') {
+				// probably color code
+				--pos;
+			}
+			else {
+				// found something not a crlf or a color code
+				break;
+			}
+		}
+		
+		// send message
+		msg_to_char(ch, "%3s: %s\tn%s", simple_time_since(chd_iter->timestamp), chd_iter->message, (found_crlf ? "" : "\r\n"));
 	}
 }
 

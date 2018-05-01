@@ -438,9 +438,11 @@ Find Herbs~
 0 -1 1.00 0 0
 S
 #71
-Hunt~
+Huntsman~
 0 -1 1.00 0 bk
 D 1 8 0
+D 1 9 0
+D 1 53 0
 T e 1
 S
 #72

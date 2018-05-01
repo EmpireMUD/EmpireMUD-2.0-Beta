@@ -1891,6 +1891,7 @@ void free_empire(empire_data *emp) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter, *next_ter;
+	struct player_craft_data *pcd, *next_pcd;
 	struct empire_needs *needs, *next_needs;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
@@ -1944,6 +1945,12 @@ void free_empire(empire_data *emp) {
 		
 		emp->city_list = city->next;
 		free(city);
+	}
+	
+	// free learned crafts
+	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
+		HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
+		free(pcd);
 	}
 	
 	// free trades
@@ -2306,6 +2313,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_goal *egoal, *last_egoal = NULL;
 	struct empire_completed_goal *ecg;
+	struct player_craft_data *pcd;
 	struct empire_log_data *elog;
 	struct empire_needs *need;
 	struct offense_data *off;
@@ -2493,6 +2501,24 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						last_egoal = egoal;
 						break;
 					}
+					case 'L': {	// GL: learned crafts
+						if (sscanf(line, "GL %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GL line of empire %d", vnum);
+							// not fatal
+							break;
+						}
+						
+						if (t[1] > 0) {
+							HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &t[0], pcd);
+							if (!pcd) {
+								CREATE(pcd, struct player_craft_data, 1);
+								pcd->vnum = t[0];
+								pcd->count = t[1];
+								HASH_ADD_INT(EMPIRE_LEARNED_CRAFTS(emp), vnum, pcd);
+							}
+						}
+						break;
+					}
 					case 'P': {	// GP: goal points (progress points)
 						if (sscanf(line, "GP %d %d", &t[0], &t[1]) != 2) {
 							log("SYSERR: Format error in GP line of empire %d", vnum);
@@ -2674,6 +2700,10 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						city = create_city_entry(emp, tmp, room, t[1]);
 						city->traits = asciiflag_conv(str_in);
 					}
+					else if (room) {
+						// no city center -- just lose the city
+						log_to_empire(emp, ELOG_TERRITORY, "%s was lost", tmp);
+					}
 					
 					free(tmp);	// was duplicated
 				}
@@ -2734,6 +2764,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_completed_goal *ecg, *next_ecg;
+	struct player_craft_data *pcd, *next_pcd;
 	struct empire_goal *egoal, *next_egoal;
 	struct empire_needs *need, *next_need;
 	struct empire_trade_data *trade;
@@ -2803,6 +2834,10 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
 		// GC completed goal
 		fprintf(fl, "GC %d %ld\n", ecg->vnum, ecg->when);
+	}
+	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
+		// GL learned crafts
+		fprintf(fl, "GL %d %d\n", pcd->vnum, pcd->count);
 	}
 	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
 		// GP goal points (progress points)

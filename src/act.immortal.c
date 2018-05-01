@@ -2216,7 +2216,8 @@ SHOW(show_piles) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	room_data *room, *next_room;
 	int count, max = 100;
-	obj_data *obj;
+	obj_data *obj, *sub;
+	vehicle_data *veh;
 	size_t size;
 	bool any;
 	
@@ -2231,6 +2232,15 @@ SHOW(show_piles) {
 		count = 0;
 		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
 			++count;
+			
+			LL_FOREACH2(obj->contains, sub, next_content) {
+				++count;
+			}
+		}
+		LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			LL_FOREACH2(VEH_CONTAINS(veh), sub, next_content) {
+				++count;
+			}
 		}
 		
 		if (count >= max) {
@@ -3269,30 +3279,31 @@ SHOW(show_currency) {
 SHOW(show_learned) {
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
+	empire_data *emp = NULL;
 	char_data *plr = NULL;
 	size_t size, count;
 	craft_data *craft;
 	bool file = FALSE;
 	
-	argument = one_argument(argument, arg);
+	argument = one_word(argument, arg);
 	skip_spaces(&argument);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Usage: show learned <player>\r\n");
+		msg_to_char(ch, "Usage: show learned <player | empire>\r\n");
 	}
-	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+	else if (!(plr = find_or_load_player(arg, &file)) && !(emp = get_empire_by_name(arg))) {
+		send_to_char("There is no such player or empire.\r\n", ch);
 	}
-	else {
+	else {	// plr OR emp is guaranteed
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", GET_NAME(plr));
+			size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
 		}
 		
 		count = 0;
-		HASH_ITER(hh, GET_LEARNED_CRAFTS(plr), pcd, next_pcd) {
+		HASH_ITER(hh, (plr ? GET_LEARNED_CRAFTS(plr) : EMPIRE_LEARNED_CRAFTS(emp)), pcd, next_pcd) {
 			if (!(craft = craft_proto(pcd->vnum))) {
 				continue;	// no craft?
 			}

@@ -610,6 +610,13 @@ Most crops are used to make food and drink. Some, like cotton, have other uses.
 
 See also: CHOP, COOK, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
 #
+"FLAT TERRAIN" FLAT-TERRAIN
+
+When a building says it must be built facing "flat-terrain", this refers to
+most regular land tiles, including plains, forest, desert, crops, and roads.
+
+Mountains, rivers, lakes, oceans, jungles, and swamps are not valid.
+#
 GREATNESS GRT
 
 Greatness (social attribute)
@@ -650,18 +657,20 @@ See also: CLASS, DEATH, ENDURANCE
 #
 HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
 
-You can see chat history for various channels with the following commands:
-  SAYHISTORY - say, oocsay, gsay, emote, socials
-  TELLHISTORY - tells and replies
-  EHISTORY - etalk
-  /HISTORY <channel> - slash-channels
+Usage:  history <say | tell | /<channel> | empire | rolls>
+        history immortal
 
-Immortals also have:
-  GHISTORY - godnet, wiznet
+This command will show any of the various channel histories. Each channel also
+has a separate command, such as tellhistory for tells, which is identical to
+typing 'history tells'.
+
+Group-says, emotes, and socials also appear on 'say' history.
 
 Your chat history only contains messages that you were connected and in-game
 for. History messages last for up to 24 hours, but only the last 20 messages
 are stored.
+
+See also: SAYHISTORY, TELLHISTORY, EHISTORY, GHISTORY, /HISTORY
 #
 HOSTILE ROGUE THIEF
 

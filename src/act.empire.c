@@ -1814,7 +1814,6 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 * @param bool full_abandon If TRUE, abandons the city's entire area.
 */
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon) {
-	struct empire_city_data *temp;
 	room_data *cityloc, *to_room;
 	int x, y, radius;
 	bool junk;
@@ -1827,7 +1826,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 	if (IS_CITY_CENTER(cityloc)) {
 		disassociate_building(cityloc);
 	}
-	REMOVE_FROM_LIST(city, EMPIRE_CITY_LIST(emp), next);
+	LL_DELETE(EMPIRE_CITY_LIST(emp), city);
 	if (city->name) {
 		free(city->name);
 	}
@@ -3018,10 +3017,7 @@ ACMD(do_barde) {
 	
 	one_argument(argument, arg);
 
-	if (!can_use_ability(ch, ABIL_BARDE, NOTHING, 0, NOTHING)) {
-		// nope
-	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
@@ -3038,9 +3034,6 @@ ACMD(do_barde) {
 	else if (GET_LED_BY(mob)) {
 		act("You can't barde $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_BARDE)) {
-		return;
-	}
 	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE)) {
 		// messages itself
 	}
@@ -3054,7 +3047,6 @@ ACMD(do_barde) {
 					act("You strap heavy armor onto $N.", FALSE, ch, NULL, mob, TO_CHAR);
 					act("$n straps heavy armor onto $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
 					
-					gain_ability_exp(ch, ABIL_BARDE, 50);
 					command_lag(ch, WAIT_ABILITY);
 					found = TRUE;
 				}
@@ -4180,13 +4172,14 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
+	void refresh_all_quests(char_data *ch);
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *next_store;
-	struct empire_city_data *city, *next_city, *temp;
+	struct empire_city_data *city, *next_city;
 	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
@@ -4254,6 +4247,8 @@ ACMD(do_enroll) {
 
 		// move data over
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
+			log_to_empire(e, ELOG_DIPLOMACY, "%s merged into this empire", EMPIRE_NAME(old));
+			
 			// attempt to estimate the new member count so cities and territory transfer correctly
 			// note: may over-estimate if some players already had alts in both empires
 			EMPIRE_MEMBERS(e) += EMPIRE_MEMBERS(old);
@@ -4364,28 +4359,15 @@ ACMD(do_enroll) {
 			}
 			
 			// cities
-			for (city = EMPIRE_CITY_LIST(old); city; city = next_city) {
-				next_city = city->next;
-				
+			LL_FOREACH_SAFE(EMPIRE_CITY_LIST(old), city, next_city) {
 				if (city_points_available(e) >= (city->type + 1)) {
-					// remove from old empire
-					REMOVE_FROM_LIST(city, EMPIRE_CITY_LIST(old), next);
-					city->next = NULL;
-					
-					// add to new empire
-					if (EMPIRE_CITY_LIST(e)) {
-						temp = EMPIRE_CITY_LIST(e);
-						while (temp->next) {
-							temp = temp->next;
-						}
-						temp->next = city;
-					}
-					else {
-						EMPIRE_CITY_LIST(e) = city;
-					}
+					// can keep city
+					LL_DELETE(EMPIRE_CITY_LIST(old), city);
+					LL_APPEND(EMPIRE_CITY_LIST(e), city);
 				}
 				else {
 					// no room for this city
+					log_to_empire(e, ELOG_TERRITORY, "%s is no longer a city because there was no room for it in this empire", city->name);
 					perform_abandon_city(old, city, FALSE);
 				}
 			}
@@ -4405,8 +4387,12 @@ ACMD(do_enroll) {
 			// move territory over
 			HASH_ITER(hh, world_table, room, next_room) {
 				if (ROOM_OWNER(room) == old) {
-					abandon_room(room);
-					claim_room(room, e);
+					// just change owner
+					ROOM_OWNER(room) = e;
+					
+					// this may have been the cause of city centers abandoning during a move
+					// abandon_room(room);
+					// claim_room(room, e);
 				}
 			}
 			
@@ -4431,6 +4417,13 @@ ACMD(do_enroll) {
 			refresh_empire_goals(e, NOTHING);
 			
 			save_empire(e, TRUE);
+			
+			// need to update quests too
+			LL_FOREACH(character_list, victim) {
+				if (GET_LOYALTY(victim) == e) {
+					refresh_all_quests(victim);
+				}
+			}
 		}
 		
 		// targ still around when we got this far?

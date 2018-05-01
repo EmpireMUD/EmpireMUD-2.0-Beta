@@ -470,9 +470,10 @@ INTERACTION_FUNC(skin_interact) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
 	int num;
-
-	SET_BIT(GET_OBJ_VAL(inter_item, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
-	command_lag(ch, WAIT_OTHER);
+	
+	if (!has_player_tech(ch, PTECH_SKINNING_UPGRADE) && number(1, 100) > 60) {
+		return FALSE;	// 60% failure unskilled
+	}
 		
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
@@ -2623,8 +2624,14 @@ ACMD(do_skin) {
 	else {
 		// run it
 		if (!run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, skin_interact)) {
-			msg_to_char(ch, "There isn't anything you can skin from that corpse.\r\n");
+			act("You try to skin $p but get nothing useful.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
+		else {
+			gain_player_tech_exp(ch, PTECH_SKINNING_UPGRADE, 15);
+		}
+		
+		SET_BIT(GET_OBJ_VAL(obj, VAL_CORPSE_FLAGS), CORPSE_SKINNED);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 

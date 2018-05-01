@@ -773,7 +773,7 @@ const char *player_tech_types[] = {
 	"Block-Ranged",
 	"Block-Magical",
 	"Bonus-vs-Animals",
-	"Butcher",
+	"Butcher-Upgrade",
 	"Customize-Building",	// 10
 	"Deep-Mines",
 	"Dual-Wield",
@@ -817,6 +817,7 @@ const char *player_tech_types[] = {
 	"Two-Handed-Weapons",	// 50
 	"Where-Upgrade",
 	"Dodge-Cap",
+	"Skinning-Upgrade",
 	"\n"
 };
 
@@ -2598,6 +2599,7 @@ const char *progress_flags[] = {
 const char *progress_perk_types[] = {
 	"Technology",
 	"City-points",
+	"Craft",
 	"\n"
 };
 
@@ -2666,7 +2668,7 @@ const char *bld_on_flags[] = {
 	"swamp",
 	"any-forest",
 	"open-building",
-	"basic-facing",	// 15
+	"flat-terrain",	// 15
 	"shallow-sea",
 	"coast",
 	"riverbank",
@@ -3760,6 +3762,9 @@ const char *requirement_types[] = {
 	"CROP-VARIETY",
 	"OWN-HOMES",
 	"OWN-SECTOR",	// 25
+	"OWN-BUILDING-FUNCTION",
+	"OWN-VEHICLE-FLAGGED",
+	"EMPIRE-WEALTH",
 	"\n",
 };
 
@@ -3792,6 +3797,9 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// crop variety
 	REQ_AMT_NUMBER,	// own homes
 	REQ_AMT_NUMBER,	// own sector
+	REQ_AMT_NUMBER,	// own building function
+	REQ_AMT_NUMBER,	// own vehicle flagged
+	REQ_AMT_NUMBER,	// empire wealth
 };
 
 
@@ -3823,6 +3831,9 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// crop variety
 	FALSE,	// own homes
 	FALSE,	// own sector
+	FALSE,	// own building function
+	FALSE,	// own vehicle flagged
+	FALSE,	// empire wealth
 };
 
 

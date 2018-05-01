@@ -480,6 +480,7 @@ void delete_room(room_data *room, bool check_exits) {
 		LL_FOREACH_SAFE(EMPIRE_CITY_LIST(emp), city, next_city) {
 			if (city->location == room) {
 				// ... this should not be possible, but just in case ...
+				log_to_empire(emp, ELOG_TERRITORY, "%s was lost", city->name);
 				perform_abandon_city(emp, city, FALSE);
 			}
 		}

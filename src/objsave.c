@@ -604,7 +604,9 @@ void extract_all_items(char_data *ch) {
 	int iter;
 	
 	// it's no longer safe to save the delay file -- saving it after extracting items results in losing all items
-	DONT_SAVE_DELAY(ch) = TRUE;
+	if (!IS_NPC(ch)) {
+		DONT_SAVE_DELAY(ch) = TRUE;
+	}
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter)) {

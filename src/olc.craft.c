@@ -96,6 +96,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates building with different vnum");
 			problem = TRUE;
 		}
+		if (IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING | BLD_ANY_FOREST)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building has invalid build-on flags!");
+			problem = TRUE;
+		}
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {	// vehicles only
 		if (GET_CRAFT_OBJECT(craft) == NOTHING || !vehicle_proto(GET_CRAFT_OBJECT(craft))) {
@@ -204,7 +208,10 @@ char *list_one_craft(craft_data *craft, bool detail) {
 void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	void cancel_gen_craft(char_data *ch);
 	void remove_craft_from_table(craft_data *craft);
+	void remove_learned_craft(char_data *ch, any_vnum vnum);
+	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 	
+	empire_data *emp, *next_emp;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
 	craft_data *craft;
@@ -222,10 +229,23 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	
 	// find players who are crafting it and stop them (BEFORE removing from table)
 	for (iter = character_list; iter; iter = iter->next) {
-		if (!IS_NPC(iter) && GET_ACTION(iter) == ACT_GEN_CRAFT && GET_ACTION_VNUM(iter, 0) == GET_CRAFT_VNUM(craft)) {
+		if (IS_NPC(ch)) {
+			continue;
+		}
+		
+		// currently crafting
+		if (GET_ACTION(iter) == ACT_GEN_CRAFT && GET_ACTION_VNUM(iter, 0) == GET_CRAFT_VNUM(craft)) {
 			msg_to_char(iter, "The craft you were making has been deleted.\r\n");
 			cancel_gen_craft(iter);
 		}
+		
+		// possibly learned
+		remove_learned_craft(ch, vnum);
+	}
+	
+	// find empires who had this in their learned list
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		remove_learned_craft_empire(emp, vnum, TRUE);
 	}
 	
 	// remove from table -- nothing else to check here

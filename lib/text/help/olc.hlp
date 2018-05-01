@@ -277,7 +277,7 @@ Mobs (MEDIT):
   players working very hard, or perhaps 2 extremely good players.
 - A mob with HARD and GROUP is a major boss fight and may take a lot of work
   even for a full 4-player group.
-- ANIMAL mobs will take double damage from players with Hunt.
+- ANIMAL mobs will take double damage from players with Huntsman.
 - Consider using a must-fight script (like a Leave trigger with "return 0")
   rather than the AGGR flag.
 - If your mob spawns in a dark adventure, strongly consider giving it INFRA.
@@ -929,7 +929,7 @@ Available techs are:
  &cBlock-Ranged&0 * - Can block ranged attacks with shields (requires Block).
  &cBlock-Magical&0 * - Can block magical attacks with shields (requires Block).
  &cBonus-vs-Animals&0 - Extra combat damage when the victim is an animal.
- &cButcher&0 * - Can use the butcher command/interaction.
+ &cButcher-Upgrade&0 * - Butcher always succeeds.
  &cCustomize-Building&0 * - Can customize buildings.
  &cDeep-Mines&0 * - Mines are 50% larger.
  &cDual-Wield&0 - Gets an offhand attack at a reduced accuracy.
@@ -974,6 +974,7 @@ Available techs are:
  &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
  &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
  &cDodge-Cap&0 - Improves the player's maximum dodge percent.
+ &cSkinning-Upgrade&0 - Skinning always succeeds.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -2178,7 +2179,7 @@ The following flags are available:
  &cswamp&0 - a swamp/marsh tile
  &cany-forest&0 - any level of forest tile, from light forest to overgrown
  &copen-building&0 - a building that doesn't block the map
- &cbasic-facing&0 - for buildings that can face any clear tile
+ &cflat-terrain&0 - for buildings that can face most flat tiles
  &cshallow-sea&0 - the area around islands
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers
@@ -2214,12 +2215,12 @@ The following flags are available:
  &cnot-player-made&0 - can't be (e.g.) a river tile made by a player
  &cocean&0 - an ocean tile
  &coasis&0 - an oasis tile
- &ccrops&0 - *** do not use for buildon
+ &rcrops&0 - *** do not use for buildon
  &cgrove&0 - a desert grove tile
  &cswamp&0 - a swamp/marsh tile
- &cany-forest&0 - *** do not use for buildon
- &copen-building&0 - *** do not use for buildon
- &cbasic-facing&0 - *** do not use for buildon
+ &rany-forest&0 - *** do not use for buildon
+ &ropen-building&0 - *** do not use for buildon
+ &rflat-terrain&0 - *** do not use for buildon (ONLY for facing)
  &cshallow-sea&0 - the area around islands
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers
@@ -2280,7 +2281,7 @@ Available flags:
  VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
  SHIPYARD - requires being at a shipyard
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
- LEARNED - requires the player 'learn' a recipe to use it
+ LEARNED - requires the player/empire 'learn' a recipe to use it
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -5668,6 +5669,7 @@ lost even if the empire no longer qualifies for the goal that gave them.
 Perk types:
  Technology - Grants an empire technology.
  City-points - Grants one or more city points.
+ Craft - Grants a LEARNED craft recipe to the entire empire.
 
 Note: To grant progress points for a goal, set the 'value'.
 
@@ -6004,7 +6006,9 @@ Available tasks:
  &cNOT-COMPLETED-QUEST&0 - Has not completed a certain quest.
  &cNOT-ON-QUEST&0 - Is not currently on a certain quest.
  &cOWN-BUILDING&0 - Empire has a certain building.
+ &cOWN-BUILDING-FUNCTION&0 - Empire has a building with a given function flag.
  &cOWN-VEHICLE&0 - Empire has a certain vehicle.
+ &cOWN-VEHICLE-FLAGGED&0 - Empire has a vehicle with specific flags.
  &cSKILL-LEVEL-OVER&0 - Player has a certain skill at least this high.
  &cSKILL-LEVEL-UNDER&0 - Player has a certain skill no higher than this.
  &cTRIGGERED &r*&0&0 - Activated by a %quest% command in a trigger.
@@ -6023,6 +6027,7 @@ Available tasks:
  &cCROP-VARIETY&0 - Needs produce from a number of different crops.
  &cOWN-HOMES&0 - Empire must have enough citizen homes.
  &cOWN-SECTOR&0 - Empire must own enough tiles of this sector type.
+ &cEMPIRE-WEALTH&0 - Empire must have a certain amount of wealth.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 
@@ -6053,7 +6058,7 @@ Available flags:
  &cswamp&0 - a swamp-/marsh-type tile
  &cany-forest&0 - a broader category of forests usually used for 'buildfacing'
  &copen-building&0 - does not apply to buildflags -- do not use
- &cbasic-facing&0 - for buildings that can face any clear tile
+ &cflat-terrain&0 - for buildings that can face any flat terrain
  &cshallow-sea&0 - the area around islands
  &ccoast&0 - the land on the ocean coastline
  &criverbank&0 - the land on the edge of rivers

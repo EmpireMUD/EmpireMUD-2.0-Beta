@@ -50,9 +50,11 @@ extern struct req_data *copy_requirements(struct req_data *from);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_homes(empire_data *emp);;
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
+void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 
 // local funcs
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add);
@@ -339,7 +341,10 @@ void get_progress_list_display(struct progress_list *list, char *save_buffer) {
 * @param struct progress_perk *perk The perk to get display text for.
 */
 char *get_one_perk_display(struct progress_perk *perk) {
+	extern const char *craft_types[];
+	
 	static char save_buffer[MAX_STRING_LENGTH];
+	craft_data *craft;
 	
 	*save_buffer = '\0';
 	
@@ -351,6 +356,15 @@ char *get_one_perk_display(struct progress_perk *perk) {
 		}
 		case PRG_PERK_CITY_POINTS: {
 			sprintf(save_buffer, "%d city point%s", perk->value, PLURAL(perk->value));
+			break;
+		}
+		case PRG_PERK_CRAFT: {
+			if ((craft = craft_proto(perk->value))) {
+				sprintf(save_buffer, "%s: %s", craft_types[GET_CRAFT_TYPE(craft)], GET_CRAFT_NAME(craft));
+			}
+			else {
+				strcpy(save_buffer, "UNKNOWN");
+			}
 			break;
 		}
 		default: {
@@ -463,6 +477,18 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 			}
 			case PRG_PERK_CITY_POINTS: {
 				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
+				break;
+			}
+			case PRG_PERK_CRAFT: {
+				void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
+				void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
+				
+				if (add) {
+					add_learned_craft_empire(emp, perk->value);
+				}
+				else {
+					remove_learned_craft_empire(emp, perk->value, FALSE);
+				}
 				break;
 			}
 		}
@@ -793,6 +819,7 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 * @param struct empire_goal *goal The goal to refresh.
 */
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
+	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
 	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
 	
 	struct req_data *task;
@@ -816,8 +843,16 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_owned_buildings(emp, task->vnum);
 				break;
 			}
+			case REQ_OWN_BUILDING_FUNCTION: {
+				task->current = count_owned_buildings_by_function(emp, task->misc);
+				break;
+			}
 			case REQ_OWN_VEHICLE: {
 				task->current = count_owned_vehicles(emp, task->vnum);
+				break;
+			}
+			case REQ_OWN_VEHICLE_FLAGGED: {
+				task->current = count_owned_vehicles_by_flags(emp, task->misc);
 				break;
 			}
 			case REQ_GET_COINS: {
@@ -834,6 +869,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 			}
 			case REQ_OWN_SECTOR: {
 				task->current = count_owned_sector(emp, task->vnum);
+				break;
+			}
+			case REQ_EMPIRE_WEALTH: {
+				task->current = GET_TOTAL_WEALTH(emp);
 				break;
 			}
 			
@@ -987,8 +1026,16 @@ void et_change_coins(empire_data *emp, int amount) {
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
+			else if (task->type == REQ_EMPIRE_WEALTH) {
+				task->current = GET_TOTAL_WEALTH(emp);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
 		}
 	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_wealth, amount);
 }
 
 
@@ -1001,10 +1048,16 @@ void et_change_coins(empire_data *emp, int amount) {
 void et_gain_building(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
+	bld_data *bld;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				++task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
@@ -1045,10 +1098,16 @@ void et_gain_tile_sector(empire_data *emp, sector_vnum vnum) {
 void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
+	vehicle_data *veh;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+				++task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				++task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
@@ -1111,16 +1170,21 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 void et_lose_building(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
+	bld_data *bld;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				--task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
-				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
 				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+				--task->current;
+				task->current = MAX(task->current, 0);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
 		}
 	}
@@ -1162,10 +1226,19 @@ void et_lose_tile_sector(empire_data *emp, sector_vnum vnum) {
 void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
+	vehicle_data *veh;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+				--task->current;
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				--task->current;
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
@@ -1187,6 +1260,9 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 * @param empire_data *only_emp Optional: If provided, only does that 1 empire. Otherwise does all of them.
 */
 void full_reset_empire_progress(empire_data *only_emp) {
+	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
+	
+	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp, *next_emp;
 	int iter;
 	
@@ -1214,6 +1290,11 @@ void full_reset_empire_progress(empire_data *only_emp) {
 		// wipe points
 		for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
 			EMPIRE_PROGRESS_POINTS(emp, iter) = 0;
+		}
+		
+		/// wipe learned recipes
+		HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
+			remove_learned_craft_empire(emp, pcd->vnum, TRUE);
 		}
 		
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -2356,6 +2437,18 @@ OLC_MODULE(progedit_perks) {
 				case PRG_PERK_CITY_POINTS: {
 					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
 						msg_to_char(ch, "Invalid number of city points '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_CRAFT: {
+					craft_data *craft;
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || !(craft = craft_proto(vnum))) {
+						msg_to_char(ch, "Invalid craft vnum '%s'.\r\n", argument);
+						return;
+					}
+					else if (!CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+						msg_to_char(ch, "You must pick a craft with the LEARNED flag.\r\n");
 						return;
 					}
 					break;	// otherwise ok

@@ -384,6 +384,9 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_CROP_VARIETY  23
 #define REQ_OWN_HOMES  24
 #define REQ_OWN_SECTOR  25
+#define REQ_OWN_BUILDING_FUNCTION  26
+#define REQ_OWN_VEHICLE_FLAGGED  27
+#define REQ_EMPIRE_WEALTH  28
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -707,7 +710,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_SWAMP  BIT(12)
 #define BLD_ANY_FOREST  BIT(13)
 #define BLD_FACING_OPEN_BUILDING  BIT(14)
-#define BLD_ON_BASIC_FACING  BIT(15)
+#define BLD_ON_FLAT_TERRAIN  BIT(15)	// for facing-only
 #define BLD_ON_SHALLOW_SEA  BIT(16)
 #define BLD_ON_COAST  BIT(17)
 #define BLD_ON_RIVERBANK  BIT(18)
@@ -2016,7 +2019,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_BLOCK_RANGED  6	// can block arrows (requires block)
 #define PTECH_BLOCK_MAGICAL  7	// can block magical attacks (requires block)
 #define PTECH_BONUS_VS_ANIMALS  8	// extra damage against animals
-#define PTECH_BUTCHER  9	// can use the 'butcher' command/interaction
+#define PTECH_BUTCHER_UPGRADE  9	// butcher always succeeds
 #define PTECH_CUSTOMIZE_BUILDING  10	// player can customize buildings
 #define PTECH_DEEP_MINES  11	// increases mine size
 #define PTECH_DUAL_WIELD  12	// can fight with offhand weapons
@@ -2060,6 +2063,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_TWO_HANDED_WEAPONS  50	// can wield two-handed weapons
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
 #define PTECH_DODGE_CAP  52	// improves your dodge cap
+#define PTECH_SKINNING_UPGRADE  53	// skinning always succeeds
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2113,6 +2117,7 @@ typedef struct vehicle_data vehicle_data;
 // PRG_PERK_x: progress perks
 #define PRG_PERK_TECH  0	// grants a technology
 #define PRG_PERK_CITY_POINTS  1	// grants more city points
+#define PRG_PERK_CRAFT  2	// grants a recipe
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3568,9 +3573,10 @@ struct player_automessage {
 };
 
 
-// for permanently learning crafts
+// for permanently learning crafts (also used by empires)
 struct player_craft_data {
 	any_vnum vnum;	// vnum of the learned craft
+	int count;	// for empires only, number of things giving this craft
 	UT_hash_handle hh;	// player's learned_crafts hash
 };
 
@@ -4348,6 +4354,7 @@ struct empire_data {
 	struct offense_data *offenses;
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
+	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

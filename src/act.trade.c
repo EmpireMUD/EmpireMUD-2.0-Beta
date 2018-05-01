@@ -1663,15 +1663,23 @@ ACMD(do_learn) {
 }
 
 
+
+
+
 ACMD(do_learned) {
-	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vnum[256];
-	struct player_craft_data *pcd, *next_pcd;
+	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], temp[256];
+	struct player_craft_data *pcd, *next_pcd, *lists[2];
+	int l_pos, width, last_type;
+	bool is_emp, overflow, comma;
 	craft_data *craft;
-	size_t size, count;
+	size_t size, l_size, count;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "Mobs never learn.\r\n");
 		return;
+	}
+	if (!ch->desc) {
+		return;	// no point, nothing to show
 	}
 	
 	skip_spaces(&argument);
@@ -1682,37 +1690,91 @@ ACMD(do_learned) {
 		size = snprintf(output, sizeof(output), "Learned recipes:\r\n");
 	}
 	
+	// detect width for how wide the lists can go
+	width = (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) ? ch->desc->pProtocol->ScreenWidth : 80;
+	width = MIN(width, sizeof(line) - 2);
+	
+	// search 2 lists
+	overflow = FALSE;
 	count = 0;
-	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
-		if (!(craft = craft_proto(pcd->vnum))) {
-			continue;	// no craft?
-		}
-		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
-			continue;	// in-dev
-		}
-		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft)) && str_cmp(craft_types[GET_CRAFT_TYPE(craft)], argument)) {
-			continue;	// searched
-		}
+	lists[0] = GET_LEARNED_CRAFTS(ch);
+	lists[1] = GET_LOYALTY(ch) ? EMPIRE_LEARNED_CRAFTS(GET_LOYALTY(ch)) : NULL;
+	
+	for (l_pos = 0, is_emp = FALSE; l_pos < 2 && !overflow; ++l_pos, is_emp = TRUE) {
+		last_type = -1;	// reset each loop
+		*line = '\0';
+		comma = FALSE;
 		
-		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-			snprintf(vnum, sizeof(vnum), "[%5d]", GET_CRAFT_VNUM(craft));
-		}
-		else {
-			*vnum = '\0';
-		}
-		
-		// show it
-		snprintf(line, sizeof(line), "%s %s (%s)\r\n", vnum, GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
-		if (size + strlen(line) < sizeof(output)) {
-			strcat(output, line);
-			size += strlen(line);
-			++count;
-		}
-		else {
-			if (size + 10 < sizeof(output)) {
-				strcat(output, "OVERFLOW\r\n");
+		HASH_ITER(hh, lists[l_pos], pcd, next_pcd) {
+			if (!(craft = craft_proto(pcd->vnum))) {
+				continue;	// no craft?
 			}
-			break;
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+				continue;	// in-dev
+			}
+			if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft)) && str_cmp(craft_types[GET_CRAFT_TYPE(craft)], argument)) {
+				continue;	// searched
+			}
+			
+			// ok:
+			++count;
+			
+			// check start of line
+			if (last_type == -1 || last_type != GET_CRAFT_TYPE(craft)) {
+				// append line now
+				if (*line) {
+					if (size + strlen(line) + 12 < sizeof(output)) {
+						strcat(output, line);
+						strcat(output, "\r\n");
+						size += strlen(line) + 2;
+					}
+					else {
+						overflow = TRUE;
+						strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
+					}
+				}
+				
+				// prepare new line
+				last_type = GET_CRAFT_TYPE(craft);
+				strcpy(temp, craft_types[last_type]);
+				strtolower(temp);
+				ucwords(temp);
+				l_size = snprintf(line, sizeof(line), "%s%s:", temp, is_emp ? " (empire)" : "");
+				comma = FALSE;
+			}
+			
+			// check line limit
+			if (l_size + strlen(GET_CRAFT_NAME(craft)) + 3 > width) {
+				if (size + strlen(line) + 13 < sizeof(output)) {
+					strcat(output, line);
+					strcat(output, ",\r\n");
+					size += strlen(line) + 3;
+				}
+				else {
+					overflow = TRUE;
+					strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
+					break;
+				}
+				l_size = snprintf(line, sizeof(line), "   %s", GET_CRAFT_NAME(craft));
+				comma = TRUE;
+			}
+			else {	// room on this line
+				l_size += snprintf(line + l_size, sizeof(line) - l_size, "%s%s", comma ? ", " : " ", GET_CRAFT_NAME(craft));
+				comma = TRUE;
+			}
+		}
+		
+		// check for trailing text
+		if (*line) {
+			if (size + strlen(line) + 12 < sizeof(output)) {
+				strcat(output, line);
+				strcat(output, "\r\n");
+				size += strlen(line) + 2;
+			}
+			else {
+				overflow = TRUE;
+				strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
+			}
 		}
 	}
 	

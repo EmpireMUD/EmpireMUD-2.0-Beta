@@ -338,6 +338,11 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 	struct req_data *task;
 	bool done = FALSE;
 	
+	if (!list) {	// shortcut for no tasks
+		*complete = *total = 1;
+		return;
+	}
+	
 	// prepare data
 	*complete = *total = 0;
 	
@@ -1061,6 +1066,13 @@ QCMD(qcmd_start) {
 		quest_list = build_available_quest_list(ch);
 		any = FALSE;
 		LL_FOREACH(quest_list, qtl) {
+			if (get_approximate_level(ch) + 50 < QUEST_MIN_LEVEL(qtl->quest)) {
+				continue;	// must validate level
+			}
+			if (QUEST_FLAGGED(qtl->quest, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+				continue;	// too many dailies
+			}
+			
 			// must re-check prereqs
 			if (!is_on_quest(ch, QUEST_VNUM(qtl->quest)) && char_meets_prereqs(ch, qtl->quest, qtl->instance)) {
 				if (any) {

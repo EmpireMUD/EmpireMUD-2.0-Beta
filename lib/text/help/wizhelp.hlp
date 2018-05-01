@@ -1136,9 +1136,10 @@ See also: ISLANDS, MOVEEINV
 #e
 "SHOW LEARNED"
 
-Usage:  show learned <player> [search phrase]
+Usage:  show learned <player | empire> [search phrase]
 
-Shows you the recipes learned by a player.
+Shows you the recipes learned by a player or empire. For multi-word empire
+names, use "quotation marks".
 
 See also: SET LEARNED
 #e

@@ -3760,6 +3760,41 @@ void add_learned_craft(char_data *ch, any_vnum vnum) {
 
 
 /**
+* Adds a craft vnum to an empire's learned list -- this is stackable, so
+* learning it more than once just adds to the count.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The craft vnum to learn.
+*/
+void add_learned_craft_empire(empire_data *emp, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &vnum, pcd);
+	if (!pcd) {
+		CREATE(pcd, struct player_craft_data, 1);
+		pcd->vnum = vnum;
+		pcd->count = 0;
+		HASH_ADD_INT(EMPIRE_LEARNED_CRAFTS(emp), vnum, pcd);
+		HASH_SORT(EMPIRE_LEARNED_CRAFTS(emp), sort_learned_recipes);
+	}
+	++pcd->count;
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+/**
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The craft vnum to check.
+* @return bool TRUE if the empire has learned it.
+*/
+bool empire_has_learned_craft(empire_data *emp, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &vnum, pcd);
+	return pcd ? TRUE : FALSE;
+}
+
+
+/**
 * @param char_data *ch The player.
 * @param any_vnum vnum The craft vnum to check.
 * @return bool TRUE if the player has learned it.
@@ -3772,7 +3807,11 @@ bool has_learned_craft(char_data *ch, any_vnum vnum) {
 	}
 	
 	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
-	return pcd ? TRUE : FALSE;
+	
+	if (pcd || (GET_LOYALTY(ch) && empire_has_learned_craft(GET_LOYALTY(ch), vnum))) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
 
@@ -3793,6 +3832,29 @@ void remove_learned_craft(char_data *ch, any_vnum vnum) {
 	if (pcd) {
 		HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
 		free(pcd);
+	}
+}
+
+
+/**
+* Loses a craft in the learned list. If the craft was learned from more than
+* 1 source, this only reduces the source count instead.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The craft vnum to forget.
+* @param bool full_remove If TRUE, fully removes the entry. Otherwise decrements by 1 and removes if 0.
+*/
+void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove) {
+	struct player_craft_data *pcd;
+	
+	HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &vnum, pcd);
+	if (pcd) {
+		--pcd->count;
+		if (pcd->count < 1 || full_remove) {
+			HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
+			free(pcd);
+		}
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
@@ -6193,9 +6255,11 @@ void free_requirements(struct req_data *list) {
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
 	extern int count_crop_variety_in_list(obj_data *list);
 	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
 	extern int count_owned_homes(empire_data *emp);
 	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+	extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 	
@@ -6291,8 +6355,20 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_OWN_BUILDING_FUNCTION: {
+				if (!GET_LOYALTY(ch) || count_owned_buildings_by_function(GET_LOYALTY(ch), req->misc) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			case REQ_OWN_VEHICLE: {
 				if (!GET_LOYALTY(ch) || count_owned_vehicles(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_OWN_VEHICLE_FLAGGED: {
+				if (!GET_LOYALTY(ch) || count_owned_vehicles_by_flags(GET_LOYALTY(ch), req->misc) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -6395,6 +6471,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_EMPIRE_WEALTH: {
+				if (!GET_LOYALTY(ch) || GET_TOTAL_WEALTH(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -6443,6 +6525,8 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 */
 char *requirement_string(struct req_data *req, bool show_vnums) {
 	extern const char *action_bits[];
+	extern const char *function_flags[];
+	extern const char *vehicle_flags[];
 	
 	char vnum[256], lbuf[256];
 	static char output[256];
@@ -6504,8 +6588,20 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			snprintf(output, sizeof(output), "Own %dx building%s: %s%s", req->needed, PLURAL(req->needed), vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 			break;
 		}
+		case REQ_OWN_BUILDING_FUNCTION: {
+			sprintbit(req->misc, function_flags, lbuf, TRUE);
+			// does not show vnum
+			snprintf(output, sizeof(output), "Own %dx building%s with: %s", req->needed, PLURAL(req->needed), lbuf);
+			break;
+		}
 		case REQ_OWN_VEHICLE: {
 			snprintf(output, sizeof(output), "Own %dx vehicle%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_vehicle_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_OWN_VEHICLE_FLAGGED: {
+			sprintbit(req->misc, vehicle_flags, lbuf, TRUE);
+			// does not show vnum
+			snprintf(output, sizeof(output), "Own %dx vehicle%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_SKILL_LEVEL_OVER: {
@@ -6570,6 +6666,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		case REQ_OWN_SECTOR: {
 			sector_data *sect = sector_proto(req->vnum);
 			snprintf(output, sizeof(output), "Own %dx tile%s of: %s%s", req->needed, PLURAL(req->needed), vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+			break;
+		}
+		case REQ_EMPIRE_WEALTH: {
+			snprintf(output, sizeof(output), "Have empire wealth over: %d", req->needed);
 			break;
 		}
 		default: {
@@ -7558,6 +7658,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 void read_vault(empire_data *emp) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
+	int old = EMPIRE_WEALTH(emp);
 	obj_data *proto;
 	
 	EMPIRE_WEALTH(emp) = 0;
@@ -7570,6 +7671,10 @@ void read_vault(empire_data *emp) {
 				}
 			}
 		}
+	}
+	
+	if (old != EMPIRE_WEALTH(emp)) {
+		et_change_coins(emp, 0);	// will trigger wealth-based goals to reread
 	}
 }
 

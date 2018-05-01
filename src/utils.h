@@ -537,6 +537,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
+#define EMPIRE_LEARNED_CRAFTS(emp)  ((emp)->learned_crafts)
 #define EMPIRE_MILITARY(emp)  ((emp)->military)
 #define EMPIRE_MAX_LEVEL(emp)  ((emp)->max_level)
 #define EMPIRE_MIN_LEVEL(emp)  ((emp)->min_level)
@@ -1689,6 +1690,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum);
 void qt_gain_tile_sector(char_data *ch, sector_vnum vnum);
 void qt_change_coins(char_data *ch);
 void qt_change_currency(char_data *ch, any_vnum vnum, int total);
+void qt_empire_wealth(char_data *ch, any_vnum amount);
 void qt_gain_vehicle(char_data *ch, any_vnum vnum);
 void qt_get_obj(char_data *ch, obj_data *obj);
 void qt_keep_obj(char_data *ch, obj_data *obj, bool true_for_keep);

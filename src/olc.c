@@ -4706,13 +4706,15 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	extern const char *action_bits[];
 	extern const char *component_flags[];
 	extern const char *component_types[];
+	extern const char *function_flags[];
+	extern const char *vehicle_flags[];
 	
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
-	bool need_currency = FALSE;
+	bool need_currency = FALSE, need_func_flags = FALSE, need_veh_flags = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -4749,8 +4751,16 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_bld = TRUE;
 			break;
 		}
+		case REQ_OWN_BUILDING_FUNCTION: {
+			need_func_flags = TRUE;
+			break;
+		}
 		case REQ_OWN_VEHICLE: {
 			need_veh = TRUE;
+			break;
+		}
+		case REQ_OWN_VEHICLE_FLAGGED: {
+			need_veh_flags = TRUE;
 			break;
 		}
 		case REQ_SKILL_LEVEL_OVER:
@@ -4796,6 +4806,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		case REQ_OWN_HOMES:
 		case REQ_CROP_VARIETY:
+		case REQ_EMPIRE_WEALTH:
 		case REQ_GET_COINS: {
 			// need nothing?
 			break;
@@ -4883,6 +4894,13 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		*vnum = FCT_VNUM(fct);
 	}
+	if (need_func_flags) {
+		*misc = olc_process_flag(ch, argument, "function", "", function_flags, NOBITS);
+		if (!*misc) {
+			msg_to_char(ch, "You must provide function flags.\r\n");
+			return FALSE;
+		}
+	}
 	if (need_mob) {
 		argument = any_one_arg(argument, arg);
 		if (!*arg) {
@@ -4964,6 +4982,13 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !vehicle_proto(*vnum)) {
 			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_veh_flags) {
+		*misc = olc_process_flag(ch, argument, "vehicle", "", vehicle_flags, NOBITS);
+		if (!*misc) {
+			msg_to_char(ch, "You must provide vehicle flags.\r\n");
 			return FALSE;
 		}
 	}

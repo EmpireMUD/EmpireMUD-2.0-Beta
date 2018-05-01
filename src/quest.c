@@ -74,6 +74,7 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 int count_owned_homes(empire_data *emp);
 int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_player_quests(struct player_quest *list);
@@ -264,6 +265,37 @@ int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
 
 
 /**
+* Number of buildings owned by an empire that have a specific set of function flag(s).
+*
+* @param empire_data *emp Any empire.
+* @param bitvector_t flags One or more flags to check for (if there's more than one flag, it has to have ALL of them).
+* @return int The number of completed buildings with the flag(s), owned by emp.
+*/
+int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags) {
+	struct empire_territory_data *ter, *next_ter;
+	int count = 0;	// ah ah ah
+	
+	if (!emp || flags == NOBITS) {
+		return count;
+	}
+	
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
+			continue;
+		}
+		if ((GET_BLD_FUNCTIONS(GET_BUILDING(ter->room)) & flags) != flags) {
+			continue;
+		}
+		
+		// found
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
 * Number of citizen homes owned by an empire.
 *
 * @param empire_data *emp Any empire.
@@ -344,6 +376,37 @@ int count_owned_vehicles(empire_data *emp, any_vnum vnum) {
 			continue;
 		}
 		if (VEH_VNUM(veh) != vnum) {
+			continue;
+		}
+		
+		// found
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
+* Number of vehicles with specific flag(s) owned by an empire.
+*
+* @param empire_data *emp Any empire.
+* @param bitvector_t flags The flag(s) to match (all flags must be present).
+* @return int The number of completed vehicles that match, owned by emp.
+*/
+int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
+	vehicle_data *veh;
+	int count = 0;
+	
+	if (!emp || flags == NOBITS) {
+		return count;
+	}
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+			continue;
+		}
+		if ((VEH_FLAGS(veh) & flags) == flags) {
 			continue;
 		}
 		
@@ -742,8 +805,16 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = count_owned_buildings(GET_LOYALTY(ch), task->vnum);
 				break;
 			}
+			case REQ_OWN_BUILDING_FUNCTION: {
+				task->current = count_owned_buildings_by_function(GET_LOYALTY(ch), task->misc);
+				break;
+			}
 			case REQ_OWN_VEHICLE: {
 				task->current = count_owned_vehicles(GET_LOYALTY(ch), task->vnum);
+				break;
+			}
+			case REQ_OWN_VEHICLE_FLAGGED: {
+				task->current = count_owned_vehicles_by_flags(GET_LOYALTY(ch), task->misc);
 				break;
 			}
 			case REQ_SKILL_LEVEL_OVER: {
@@ -845,6 +916,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_OWN_SECTOR: {
 				task->current = count_owned_sector(GET_LOYALTY(ch), task->vnum);
+				break;
+			}
+			case REQ_EMPIRE_WEALTH: {
+				task->current = GET_LOYALTY(ch) ? GET_TOTAL_WEALTH(GET_LOYALTY(ch)) : 0;
 				break;
 			}
 		}
@@ -1998,12 +2073,12 @@ void qt_change_currency(char_data *ch, any_vnum vnum, int total) {
 
 
 /**
-* Quest Tracker: ch gets a building
+* Quest Tracker: empire wealth changes
 *
 * @param char_data *ch The player.
-* @param any_vnum vnum The building vnum.
+* @param any_vnum amount Change in wealth (may be 0; reread anyway).
 */
-void qt_gain_building(char_data *ch, any_vnum vnum) {
+void qt_empire_wealth(char_data *ch, any_vnum amount) {
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -2013,7 +2088,35 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_EMPIRE_WEALTH) {
+				task->current = GET_LOYALTY(ch) ? GET_TOTAL_WEALTH(GET_LOYALTY(ch)) : 0;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch gets a building
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The building vnum.
+*/
+void qt_gain_building(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct req_data *task;
+	bld_data *bld;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				++task->current;
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
 			}
 		}
@@ -2054,6 +2157,7 @@ void qt_gain_tile_sector(char_data *ch, sector_vnum vnum) {
 void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct req_data *task;
+	vehicle_data *veh;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -2062,6 +2166,9 @@ void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+				++task->current;
+			}
+			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				++task->current;
 			}
 		}
@@ -2203,6 +2310,7 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 void qt_lose_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct req_data *task;
+	bld_data *bld;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -2211,6 +2319,9 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				--task->current;
 			}
 			
@@ -2281,6 +2392,7 @@ void qt_lose_tile_sector(char_data *ch, sector_vnum vnum) {
 void qt_lose_vehicle(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct req_data *task;
+	vehicle_data *veh;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -2289,6 +2401,9 @@ void qt_lose_vehicle(char_data *ch, any_vnum vnum) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				--task->current;
 			}
 			
