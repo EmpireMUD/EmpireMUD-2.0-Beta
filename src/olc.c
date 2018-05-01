@@ -4895,7 +4895,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		*vnum = FCT_VNUM(fct);
 	}
 	if (need_func_flags) {
-		*misc = olc_process_flag(ch, argument, "function", "", function_flags, NOBITS);
+		argument = any_one_word(argument, arg);
+		*misc = olc_process_flag(ch, arg, "function", "", function_flags, NOBITS);
 		if (!*misc) {
 			msg_to_char(ch, "You must provide function flags.\r\n");
 			return FALSE;
@@ -4913,7 +4914,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 	}
 	if (need_mob_flags) {
-		*misc = olc_process_flag(ch, argument, "mob", "", action_bits, NOBITS);
+		argument = any_one_word(argument, arg);
+		*misc = olc_process_flag(ch, arg, "mob", "", action_bits, NOBITS);
 		if (!*misc) {
 			msg_to_char(ch, "You must provide mob flags.\r\n");
 			return FALSE;
@@ -4986,7 +4988,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 	}
 	if (need_veh_flags) {
-		*misc = olc_process_flag(ch, argument, "vehicle", "", vehicle_flags, NOBITS);
+		argument = any_one_word(argument, arg);
+		*misc = olc_process_flag(ch, arg, "vehicle", "", vehicle_flags, NOBITS);
 		if (!*misc) {
 			msg_to_char(ch, "You must provide vehicle flags.\r\n");
 			return FALSE;
