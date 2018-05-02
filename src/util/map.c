@@ -1975,7 +1975,7 @@ void audit_crops(void) {
 	missed = 0;
 	for (sub = 0; crop_regions[sub].sect != -1; ++sub) {
 		if (counts[sub] < 50) {
-			printf("%s: %d crop tile%s\n", crop_regions[sub].name, counts[sub], counts[sub] == 1 ? "" : "s");
+			printf("Warning: %s has %d crop tile%s\n", crop_regions[sub].name, counts[sub], counts[sub] == 1 ? "" : "s");
 			++missed;
 		}
 	}
