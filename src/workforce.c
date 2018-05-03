@@ -866,7 +866,7 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 			if ((rm = ter_iter->room) && GET_ISLAND_ID(loc) == GET_ISLAND_ID(rm) && compute_distance(loc, rm) <= chore_distance) {
 				// iterate over population
 				for (npc_iter = ter_iter->npcs; npc_iter; npc_iter = npc_iter->next) {
-					// only use citizens for laber
+					// only use citizens for labor
 					if (npc_iter->vnum == CITIZEN_MALE || npc_iter->vnum == CITIZEN_FEMALE) {
 						if (!backup && npc_iter->mob && GET_MOB_VNUM(npc_iter->mob) == npc_iter->vnum && !FIGHTING(npc_iter->mob)) {
 							// already has a mob? save as backup (also making sure the npc's mob is just a citizen not a laborer)
