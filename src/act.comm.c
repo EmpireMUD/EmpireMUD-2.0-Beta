@@ -821,7 +821,7 @@ ACMD(do_slash_channel) {
 	int iter, count;
 	bool ok, found;
 	
-	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "\n" };
+	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "echo", "\n" };
 	
 	half_chop(argument, arg, arg2);
 	
