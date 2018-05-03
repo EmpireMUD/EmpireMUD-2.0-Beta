@@ -4728,16 +4728,16 @@ void do_stat_room(char_data *ch) {
 		*buf = '\0';
 		LL_FOREACH(ter->npcs, npc) {
 			if (npc->mob) {
-				sprintf(buf + strlen(buf), "%s[%d] /ty%s/t0", *buf ? ", " : "", GET_MOB_VNUM(npc->mob), GET_SHORT_DESC(npc->mob));
+				sprintf(buf + strlen(buf), "%s[%d] \ty%s\t0", *buf ? ", " : "", GET_MOB_VNUM(npc->mob), GET_SHORT_DESC(npc->mob));
 			}
 			else if ((k = mob_proto(npc->vnum))) {
 				name_set = get_best_name_list(MOB_NAME_SET(k), npc->sex);
 				nstr = str_replace("#n", name_set->names[npc->name], GET_SHORT_DESC(k));
-				sprintf(buf + strlen(buf), "%s[%d] /tc%s/t0", *buf ? ", " : "", npc->vnum, nstr);
+				sprintf(buf + strlen(buf), "%s[%d] \tc%s\t0", *buf ? ", " : "", npc->vnum, nstr);
 				free(nstr);
 			}
 			else {
-				sprintf(buf + strlen(buf), "%s[%d] /trUNKNOWN/t0", *buf ? ", " : "", npc->vnum);
+				sprintf(buf + strlen(buf), "%s[%d] \trUNKNOWN\t0", *buf ? ", " : "", npc->vnum);
 			}
 		}
 		
