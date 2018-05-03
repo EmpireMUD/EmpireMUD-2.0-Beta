@@ -3020,6 +3020,9 @@ ACMD(do_prospect) {
 	else if (!ROOM_CAN_MINE(IN_ROOM(ch))) {
 		send_to_char("You can't prospect here.\r\n", ch);
 	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to prospect here.\r\n");
+	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_PROSPECT)) {
 		return;
 	}
