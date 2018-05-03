@@ -849,6 +849,8 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 * @return struct empire_npc_data* The npc who will help, or NULL.
 */
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc) {
+	void extract_pending_chars();
+	
 	struct empire_territory_data *ter_iter, *next_ter;
 	struct empire_npc_data *backup = NULL, *npc_iter;
 	room_data *rm;
@@ -885,6 +887,7 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 		if (backup->mob) {
 			act("$n leaves to go to work.", TRUE, backup->mob, NULL, NULL, TO_ROOM);
 			extract_char(backup->mob);
+			extract_pending_chars();	// ensure char is gone
 			backup->mob = NULL;
 		}
 		
