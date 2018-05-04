@@ -406,7 +406,7 @@ int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
 		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
 			continue;
 		}
-		if ((VEH_FLAGS(veh) & flags) == flags) {
+		if ((VEH_FLAGS(veh) & flags) != flags) {
 			continue;
 		}
 		
