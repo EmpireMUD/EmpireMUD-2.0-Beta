@@ -5526,11 +5526,11 @@ ACMD(do_progress) {
 	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], vstr[256], *arg2, *ptr;
-	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES];
+	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES], buy[NUM_PROGRESS_TYPES];
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct empire_goal *goal, *next_goal;
-	int cat, total, complete, num;
+	int cat, total, complete, bought, num;
 	progress_data *prg, *next_prg;
 	size_t size;
 	time_t when;
@@ -5567,6 +5567,7 @@ ACMD(do_progress) {
 		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
 			counts[cat] = 0;
 			compl[cat] = 0;
+			buy[cat] = 0;
 			total += EMPIRE_PROGRESS_POINTS(emp, cat);
 		}
 		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
@@ -5576,14 +5577,19 @@ ACMD(do_progress) {
 		}
 		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
 			if ((prg = real_progress(ecg->vnum))) {
-				++compl[PRG_TYPE(prg)];
+				if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+					++buy[PRG_TYPE(prg)];
+				}
+				else {
+					++compl[PRG_TYPE(prg)];
+				}
 			}
 		}
 		
 		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 		
 		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
-			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
+			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d bought, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {
 				strcat(buf, line);
@@ -5681,13 +5687,18 @@ ACMD(do_progress) {
 		}
 		
 		// number of completed goals
-		total = 0;
+		complete = bought = 0;
 		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
 			if ((prg = real_progress(ecg->vnum)) && PRG_TYPE(prg) == cat) {
-				++total;
+				if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+					++bought;
+				}
+				else {
+					++complete;
+				}
 			}
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "- Completed goals and rewards: %d\r\n", total);
+		size += snprintf(buf + size, sizeof(buf) - size, "- %d completed goals, %d rewards bought\r\n", complete, bought);
 		
 		page_string(ch->desc, buf, TRUE);
 	}
