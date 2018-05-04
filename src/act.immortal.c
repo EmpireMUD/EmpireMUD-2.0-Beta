@@ -4551,12 +4551,13 @@ void do_stat_object(char_data *ch, obj_data *j) {
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
 	extern const char *instance_flags[];
 	extern const char *room_extra_types[];
 	
-	char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
+	char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH], *nstr;
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	int found, num;
@@ -4567,6 +4568,9 @@ void do_stat_room(char_data *ch) {
 	empire_data *emp;
 	struct affected_type *aff;
 	struct room_extra_data *red, *next_red;
+	struct generic_name_data *name_set;
+	struct empire_territory_data *ter;
+	struct empire_npc_data *npc;
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
@@ -4718,6 +4722,30 @@ void do_stat_room(char_data *ch) {
 			send_to_char(strcat(buf, "\r\n"), ch);
 		send_to_char("&0", ch);
 	}
+	
+	// empire citizens
+	if (ROOM_OWNER(IN_ROOM(ch)) && (ter = find_territory_entry(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch))) && ter->npcs) {
+		*buf = '\0';
+		LL_FOREACH(ter->npcs, npc) {
+			if (npc->mob) {
+				sprintf(buf + strlen(buf), "%s[%d] \ty%s\t0", *buf ? ", " : "", GET_MOB_VNUM(npc->mob), GET_SHORT_DESC(npc->mob));
+			}
+			else if ((k = mob_proto(npc->vnum))) {
+				name_set = get_best_name_list(MOB_NAME_SET(k), npc->sex);
+				nstr = str_replace("#n", name_set->names[npc->name], GET_SHORT_DESC(k));
+				sprintf(buf + strlen(buf), "%s[%d] \tc%s\t0", *buf ? ", " : "", npc->vnum, nstr);
+				free(nstr);
+			}
+			else {
+				sprintf(buf + strlen(buf), "%s[%d] \trUNKNOWN\t0", *buf ? ", " : "", npc->vnum);
+			}
+		}
+		
+		if (*buf) {
+			msg_to_char(ch, "Citizens: %s\r\n", buf);
+		}
+	}
+	
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
 		struct room_direction_data *ex;
 		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {

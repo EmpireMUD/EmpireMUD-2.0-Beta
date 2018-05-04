@@ -1900,40 +1900,41 @@ void load_and_shift_map(int dist) {
 
 // this struct is used to ensure crops in all correct parts of the map
 struct {
+	char *name;
 	int sect;	// which crop sector to look for
 	int min_x, max_x;
 	int min_y, max_y;
 } crop_regions[] = {
 	// temperate: northern quarters
-	{ TEMPERATE_CROP, 0, USE_WIDTH/4, USE_HEIGHT*2/3, USE_HEIGHT },
-	{ TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT*2/3, USE_HEIGHT },
-	{ TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT*2/3, USE_HEIGHT },
-	{ TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT*2/3, USE_HEIGHT },
+	{ "Temperate NW", TEMPERATE_CROP, 0, USE_WIDTH/4, USE_HEIGHT*2/3, USE_HEIGHT },
+	{ "Temperate NNW", TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT*2/3, USE_HEIGHT },
+	{ "Temperate NNE", TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT*2/3, USE_HEIGHT },
+	{ "Temperate NE", TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT*2/3, USE_HEIGHT },
 	
 	// temperate: mid quarters
-	{ TEMPERATE_CROP, 0, USE_WIDTH/4, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
-	{ TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
-	{ TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
-	{ TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
+	{ "Temperate Mid-W", TEMPERATE_CROP, 0, USE_WIDTH/4, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
+	{ "Temperate Mid-Mid-W", TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
+	{ "Temperate Mid-Mid-E", TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
+	{ "Temperate Mid-E", TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
 	
 	// temperate: southern quarters
-	{ TEMPERATE_CROP, 0, USE_WIDTH/4, 0, USE_HEIGHT*1/3 },
-	{ TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, 0, USE_HEIGHT*1/3 },
-	{ TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, 0, USE_HEIGHT*1/3 },
-	{ TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, 0, USE_HEIGHT*1/3 },
+	{ "Temperate SW", TEMPERATE_CROP, 0, USE_WIDTH/4, 0, USE_HEIGHT*1/3 },
+	{ "Temperate SSW", TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, 0, USE_HEIGHT*1/3 },
+	{ "Temperate SSE", TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, 0, USE_HEIGHT*1/3 },
+	{ "Temperate SE", TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, 0, USE_HEIGHT*1/3 },
 	
 	// desert: requires a special zone in the middle; no east/west difference
-	{ DESERT_CROP, 0, USE_WIDTH, 0, USE_HEIGHT*45/100 },	// bottom part
-	{ DESERT_CROP, 0, USE_WIDTH, USE_HEIGHT*45/100, USE_HEIGHT*54/100 },	// middle
-	{ DESERT_CROP, 0, USE_WIDTH, USE_HEIGHT*54/100, USE_HEIGHT },	// top part
+	{ "Desert S", DESERT_CROP, 0, USE_WIDTH, 0, USE_HEIGHT*45/100 },	// bottom part
+	{ "Desert M", DESERT_CROP, 0, USE_WIDTH, USE_HEIGHT*45/100, USE_HEIGHT*54/100 },	// middle
+	{ "Desert N", DESERT_CROP, 0, USE_WIDTH, USE_HEIGHT*54/100, USE_HEIGHT },	// top part
 	
 	// jungle: true quarters
-	{ JUNGLE_CROP, 0, USE_WIDTH/2, 0, USE_HEIGHT/2 },	// sw
-	{ JUNGLE_CROP, 0, USE_WIDTH/2, USE_HEIGHT/2, USE_HEIGHT },	// nw
-	{ JUNGLE_CROP, USE_WIDTH/2, USE_WIDTH, 0, USE_HEIGHT/2 },	// se
-	{ JUNGLE_CROP, USE_WIDTH/2, USE_WIDTH, USE_HEIGHT/2, USE_HEIGHT },	// ne
+	{ "Jungle SW", JUNGLE_CROP, 0, USE_WIDTH/2, 0, USE_HEIGHT/2 },	// sw
+	{ "Jungle NW", JUNGLE_CROP, 0, USE_WIDTH/2, USE_HEIGHT/2, USE_HEIGHT },	// nw
+	{ "Jungle SE", JUNGLE_CROP, USE_WIDTH/2, USE_WIDTH, 0, USE_HEIGHT/2 },	// se
+	{ "Jungle NE", JUNGLE_CROP, USE_WIDTH/2, USE_WIDTH, USE_HEIGHT/2, USE_HEIGHT },	// ne
 
-	{ -1, -1, -1, -1, -1 }	// last
+	{ "\n", -1, -1, -1, -1, -1 }	// last
 };
 
 
@@ -1974,12 +1975,14 @@ void audit_crops(void) {
 	missed = 0;
 	for (sub = 0; crop_regions[sub].sect != -1; ++sub) {
 		if (counts[sub] < 50) {
+			printf("Warning: %s has %d crop tile%s\n", crop_regions[sub].name, counts[sub], counts[sub] == 1 ? "" : "s");
 			++missed;
 		}
 	}
 	
 	if (missed) {
-		printf("Warning: %d crop region%s few/no crop tiles.\n", missed, missed == 1 ? " has" : "s have");
+		// now warning above instead
+		// printf("Warning: %d crop region%s few/no crop tiles.\n", missed, missed == 1 ? " has" : "s have");
 	}
 	
 	free(counts);

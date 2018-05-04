@@ -4595,8 +4595,15 @@ ACMD(do_grab) {
 	else if (!*arg)
 		send_to_char("Hold what?\r\n", ch);
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-		send_to_char(buf, ch);
+		if (GET_EQ(ch, WEAR_HOLD) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_HOLD))) {
+			msg_to_char(ch, "It looks like you're already holding it!\r\n");
+		}
+		else if (GET_EQ(ch, WEAR_RANGED) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_RANGED))) {
+			msg_to_char(ch, "It looks like you're already holding it!\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		}
 	}
 	else if (!can_wear_item(ch, obj, TRUE)) {
 		// sends own messages
@@ -6156,8 +6163,12 @@ ACMD(do_wield) {
 		send_to_char("Wield what?\r\n", ch);
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-		send_to_char(buf, ch);
+		if (GET_EQ(ch, WEAR_WIELD) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_WIELD))) {
+			msg_to_char(ch, "It looks like you're already wielding it!\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		}
 	}
 	else if (!CAN_WEAR(obj, ITEM_WEAR_WIELD)) {
 		send_to_char("You can't wield that.\r\n", ch);

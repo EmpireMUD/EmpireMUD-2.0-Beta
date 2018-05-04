@@ -6002,13 +6002,13 @@ Available tasks:
          .requirement add get-component 3 skin "" a
  &cGET-OBJECT&0 - Must have items.
  &cKILL-MOB &r*&0&0 - Must kill a certain mob.
- &cKILL-MOB-FLAGGED &r*&0&0 - Must kill mobs with certain flags.
+ &cKILL-MOB-FLAGGED &r*&0^ - Must kill mobs with certain flags.
  &cNOT-COMPLETED-QUEST&0 - Has not completed a certain quest.
  &cNOT-ON-QUEST&0 - Is not currently on a certain quest.
  &cOWN-BUILDING&0 - Empire has a certain building.
- &cOWN-BUILDING-FUNCTION&0 - Empire has a building with a given function flag.
+ &cOWN-BUILDING-FUNCTION&0^ - Empire has a building with a given function flag.
  &cOWN-VEHICLE&0 - Empire has a certain vehicle.
- &cOWN-VEHICLE-FLAGGED&0 - Empire has a vehicle with specific flags.
+ &cOWN-VEHICLE-FLAGGED&0^ - Empire has a vehicle with specific flags.
  &cSKILL-LEVEL-OVER&0 - Player has a certain skill at least this high.
  &cSKILL-LEVEL-UNDER&0 - Player has a certain skill no higher than this.
  &cTRIGGERED &r*&0&0 - Activated by a %quest% command in a trigger.
@@ -6030,6 +6030,8 @@ Available tasks:
  &cEMPIRE-WEALTH&0 - Empire must have a certain amount of wealth.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
+^ If a type requires flags and you use more than one flag, you MUST put the
+  flags in "quotation marks".
 
 See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%
 #d
