@@ -4480,6 +4480,7 @@ void load_islands(void) {
 */
 void save_island_table(void) {
 	struct island_info *isle, *next_isle;
+	char temp[MAX_STRING_LENGTH];
 	FILE *fl;
 	
 	if (!(fl = fopen(ISLAND_FILE TEMP_SUFFIX, "w"))) {
@@ -4493,7 +4494,9 @@ void save_island_table(void) {
 		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));
 		
 		if (isle->desc && *isle->desc) {
-			fprintf(fl, "D\n%s~\n", isle->desc);
+			strcpy(temp, isle->desc);
+			strip_crlf(temp);
+			fprintf(fl, "D\n%s~\n", temp);
 		}
 		
 		fprintf(fl, "S\n");
