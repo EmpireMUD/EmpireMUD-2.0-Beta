@@ -1412,6 +1412,7 @@ void remove_empire_from_table(empire_data *emp) {
 * empire data and ensures players don't log in mid-ocean.
 */
 void check_for_new_map(void) {
+	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 	
 	struct empire_storage_data *store, *next_store;
@@ -1420,6 +1421,7 @@ void check_for_new_map(void) {
 	struct empire_city_data *city, *next_city;
 	struct shipping_data *shipd, *next_shipd;
 	struct empire_island *isle, *next_isle;
+	struct instance_data *inst, *next_inst;
 	struct empire_unique_storage *eus;
 	empire_data *emp, *next_emp;
 	room_data *room;
@@ -1431,6 +1433,11 @@ void check_for_new_map(void) {
 	fclose(fl);
 	
 	log("DETECT NEW WORLD MAP -- Clearing empire islands and player locations...");
+	
+	// ensure no instances in the instance list-- their locations SHOULD be all gone anyway
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		delete_instance(inst, FALSE);
+	}
 	
 	// update all empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
