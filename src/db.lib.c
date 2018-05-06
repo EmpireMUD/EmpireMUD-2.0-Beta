@@ -1436,7 +1436,14 @@ void check_for_new_map(void) {
 	
 	// ensure no instances in the instance list-- their locations SHOULD be all gone anyway
 	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
-		delete_instance(inst, FALSE);
+		if (inst->room) {
+			free(inst->room);
+		}
+		if (inst->mob_counts) {
+			free(inst->mob_counts);
+		}
+		LL_DELETE(instance_list, inst);
+		free(inst);
 	}
 	
 	// update all empires
