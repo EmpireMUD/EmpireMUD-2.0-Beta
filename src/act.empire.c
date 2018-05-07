@@ -524,7 +524,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	// for displaying diplomacy below
 	struct diplomacy_display_data {
-		bitvector_t type;	// DIPL_x
+		bitvector_t type;	// DIPL_
 		char *name; // "Offering XXX to empire"
 		char *text;	// "XXX empire, empire, empire"
 		bool offers_only;	// only shows separately if it's an offer
@@ -3688,6 +3688,9 @@ ACMD(do_diplomacy) {
 			snprintf(vict_log, sizeof(vict_log), "%s has declared %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
 			syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s (%s) has declared %s with %s", EMPIRE_NAME(ch_emp), GET_NAME(ch), fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			msg_to_char(ch, "You have declared %s with %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			
+			et_change_diplomacy(ch_emp);
+			et_change_diplomacy(vict_emp);
 		}
 		else if (POL_OFFERED(vict_pol, diplo_option[type].add_bits)) {
 			// accept
@@ -3704,6 +3707,9 @@ ACMD(do_diplomacy) {
 			snprintf(vict_log, sizeof(vict_log), "%s has accepted %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
 			syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s (%s) has accepted %s with %s", EMPIRE_NAME(ch_emp), GET_NAME(ch), fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			msg_to_char(ch, "You have accepted %s with %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			
+			et_change_diplomacy(ch_emp);
+			et_change_diplomacy(vict_emp);
 		}
 		else {
 			// offer

@@ -388,6 +388,9 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_OWN_BUILDING_FUNCTION  26
 #define REQ_OWN_VEHICLE_FLAGGED  27
 #define REQ_EMPIRE_WEALTH  28
+#define REQ_EMPIRE_FAME  29
+#define REQ_EMPIRE_GREATNESS  30
+#define REQ_DIPLOMACY  31
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -1038,7 +1041,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_CHORES  29		// total
 
 
-/* Diplomacy types */
+// DIPL_x: Diplomacy types
 #define DIPL_PEACE  BIT(0)	// At peace
 #define DIPL_WAR  BIT(1)	// At war
 #define DIPL_ALLIED  BIT(3)	// In an alliance

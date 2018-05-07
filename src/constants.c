@@ -1601,6 +1601,19 @@ struct city_metadata_type city_type[] = {
 };
 
 
+// DIPL_x: Diplomacy types
+const char *diplomacy_flags[] = {
+	"peace",
+	"war",
+	"allied",
+	"nonaggression",
+	"trade",
+	"distrust",
+	"truce",
+	"\n"
+};
+
+
 // OFFENSE_x: offense definitions
 // note: weights are in relation to the offense_min_to_war and offenses_for_free_war
 struct offense_info_type offense_info[NUM_OFFENSES] = {
@@ -3770,6 +3783,9 @@ const char *requirement_types[] = {
 	"OWN-BUILDING-FUNCTION",
 	"OWN-VEHICLE-FLAGGED",
 	"EMPIRE-WEALTH",
+	"EMPIRE-FAME",
+	"EMPIRE-GREATNESS",
+	"DIPLOMACY",
 	"\n",
 };
 
@@ -3805,6 +3821,9 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// own building function
 	REQ_AMT_NUMBER,	// own vehicle flagged
 	REQ_AMT_NUMBER,	// empire wealth
+	REQ_AMT_NUMBER,	// empire fame
+	REQ_AMT_NUMBER,	// empire greatness
+	REQ_AMT_NUMBER,	// diplomacy
 };
 
 
@@ -3839,6 +3858,9 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// own building function
 	FALSE,	// own vehicle flagged
 	FALSE,	// empire wealth
+	FALSE,	// empire fame
+	FALSE,	// empire greatness
+	FALSE,	// diplomacy
 };
 
 

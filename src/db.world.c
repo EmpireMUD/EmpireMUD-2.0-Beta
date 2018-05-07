@@ -2130,7 +2130,11 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room)) * amt;
-	EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
+	
+	if (GET_BLD_FAME(GET_BUILDING(room)) != 0) {
+		EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
+		et_change_fame(emp);
+	}
 }
 
 

@@ -1740,6 +1740,8 @@ void delete_empire(empire_data *emp) {
 			if (emp_pol->id == vnum) {
 				REMOVE_FROM_LIST(emp_pol, EMPIRE_DIPLOMACY(emp_iter), next);
 				free(emp_pol);
+				
+				et_change_diplomacy(emp_iter);
 				EMPIRE_NEEDS_SAVE(emp_iter) = TRUE;
 			}
 		}

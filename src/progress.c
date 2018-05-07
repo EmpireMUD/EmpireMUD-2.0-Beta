@@ -71,6 +71,31 @@ struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Counts the number of matching diplomatic relations an empire has. If more
+* than one flag is passed, ALL flags must be present to match.
+*
+* @param empire_data *emp Which empire to check.
+* @param bitvector_t dip_flags Which flag(s) to match.
+*/
+int count_diplomacy(empire_data *emp, bitvector_t dip_flags) {
+	struct empire_political_data *pol;
+	int count = 0;
+	
+	if (!emp || !dip_flags) {
+		return count;
+	}
+	
+	LL_FOREACH(EMPIRE_DIPLOMACY(emp), pol) {
+		if ((pol->type & dip_flags) == dip_flags) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
 * Counts how many items an empire has in storage which match a component flag.
 *
 * @param empire_data *emp The empire.
@@ -883,6 +908,18 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = GET_TOTAL_WEALTH(emp);
 				break;
 			}
+			case REQ_EMPIRE_FAME: {
+				task->current = EMPIRE_FAME(emp);
+				break;
+			}
+			case REQ_EMPIRE_GREATNESS: {
+				task->current = EMPIRE_GREATNESS(emp);
+				break;
+			}
+			case REQ_DIPLOMACY: {
+				task->current = count_diplomacy(emp, task->misc);
+				break;
+			}
 			
 			// otherwise...
 			default: {
@@ -1044,6 +1081,78 @@ void et_change_coins(empire_data *emp, int amount) {
 	
 	// members online
 	qt_empire_players(emp, qt_empire_wealth, amount);
+}
+
+
+/**
+* Empire Tracker: empire changes diplomatic relations
+*
+* @param empire_data *emp The empire.
+*/
+void et_change_diplomacy(empire_data *emp) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_DIPLOMACY) {
+				task->current = count_diplomacy(emp, task->misc);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_diplomacy, 0);
+}
+
+
+/**
+* Empire Tracker: empire gains/loses fame
+*
+* @param empire_data *emp The empire.
+*/
+void et_change_fame(empire_data *emp) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_EMPIRE_FAME) {
+				task->current = EMPIRE_FAME(emp);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_fame, 0);
+}
+
+
+/**
+* Empire Tracker: empire gains/loses greatness
+*
+* @param empire_data *emp The empire.
+*/
+void et_change_greatness(empire_data *emp) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_EMPIRE_GREATNESS) {
+				task->current = EMPIRE_GREATNESS(emp);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_greatness, 0);
 }
 
 

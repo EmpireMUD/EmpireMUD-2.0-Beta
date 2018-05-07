@@ -6030,6 +6030,9 @@ Available tasks:
  &cOWN-HOMES&0 - Empire must have enough citizen homes.
  &cOWN-SECTOR&0 - Empire must own enough tiles of this sector type.
  &cEMPIRE-WEALTH&0 - Empire must have a certain amount of wealth.
+ &cEMPIRE-FAME&0 - Empire must have a certain amount of fame.
+ &cEMPIRE-GREATNESS&0 - Empire must have a certain amount of greatness.
+ &cDIPLOMACY&0 - Empire must have a number of matching diplomatic relations.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

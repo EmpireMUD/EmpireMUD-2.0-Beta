@@ -1381,6 +1381,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		affect_total(vict);
 		if (emp) {
 			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
+			et_change_greatness(emp);
 		}
 	}
 	else if SET_CASE("intelligence") {

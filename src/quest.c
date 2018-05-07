@@ -53,6 +53,7 @@ extern const char *requirement_types[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
+extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 extern struct req_data *copy_requirements(struct req_data *from);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
@@ -920,6 +921,18 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_EMPIRE_WEALTH: {
 				task->current = GET_LOYALTY(ch) ? GET_TOTAL_WEALTH(GET_LOYALTY(ch)) : 0;
+				break;
+			}
+			case REQ_EMPIRE_FAME: {
+				task->current = GET_LOYALTY(ch) ? EMPIRE_FAME(GET_LOYALTY(ch)) : 0;
+				break;
+			}
+			case REQ_EMPIRE_GREATNESS: {
+				task->current = GET_LOYALTY(ch) ? EMPIRE_GREATNESS(GET_LOYALTY(ch)) : 0;
+				break;
+			}
+			case REQ_DIPLOMACY: {
+				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
 				break;
 			}
 		}
@@ -1989,6 +2002,78 @@ void qt_drop_obj(char_data *ch, obj_data *obj) {
 			
 			// check min
 			task->current = MAX(task->current, 0);
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire diplomacy changes
+*
+* @param char_data *ch The player.
+* @param any_vnum amount (ignored, required by function pointer call).
+*/
+void qt_empire_diplomacy(char_data *ch, any_vnum amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_DIPLOMACY) {
+				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire fame changes
+*
+* @param char_data *ch The player.
+* @param any_vnum amount Change in fame (usually 0, but this parameter is required -- we rescan the empire instead).
+*/
+void qt_empire_fame(char_data *ch, any_vnum amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_EMPIRE_FAME) {
+				task->current = GET_LOYALTY(ch) ? EMPIRE_FAME(GET_LOYALTY(ch)) : 0;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire greatness changes
+*
+* @param char_data *ch The player.
+* @param any_vnum amount Change in greatness (usually 0, but this parameter is required -- we rescan the empire instead).
+*/
+void qt_empire_greatness(char_data *ch, any_vnum amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_EMPIRE_GREATNESS) {
+				task->current = GET_LOYALTY(ch) ? EMPIRE_GREATNESS(GET_LOYALTY(ch)) : 0;
+			}
 		}
 	}
 }

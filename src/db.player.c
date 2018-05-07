@@ -4412,6 +4412,9 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 				break;
 			}
 		}
+		else if (!only_empire || emp == only_empire) {	// refresh
+			et_change_greatness(emp);
+		}
 	}
 	
 	// re-sort now only if we aren't reading techs (this hints that we're also reading territory)

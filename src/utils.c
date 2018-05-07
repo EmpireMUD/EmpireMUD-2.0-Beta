@@ -926,7 +926,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 *
 * @param char_data *ch_a One character.
 * @param char_data *ch_b Another character.
-* @param bitvector_t dipl_bits Any DIPL_x flags.
+* @param bitvector_t dipl_bits Any DIPL_ flags.
 * @return bool TRUE if the characters have the requested diplomacy.
 */
 bool char_has_relationship(char_data *ch_a, char_data *ch_b, bitvector_t dipl_bits) {
@@ -1085,7 +1085,7 @@ bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
 /**
 * @param empire_data *emp one empire
 * @param empire_data *fremp other empire
-* @param bitvector_t diplomacy DIPL_x
+* @param bitvector_t diplomacy DIPL_
 * @return TRUE if emp and fremp have the given diplomacy with each other
 */
 bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t diplomacy) {
