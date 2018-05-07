@@ -1425,11 +1425,9 @@ int land_can_claim(empire_data *emp, int ter_type) {
 	
 	// basics
 	total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
-	total += count_tech(emp) * config_get_int("land_per_tech");
 	
-	if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-		// diminishes by an amount equal to non-wealth territory
-		from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
+	if (EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH) > 0) {
+		from_wealth = GET_TOTAL_WEALTH(emp) / 100.0 * EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH);
 		
 		// limited to 3x non-wealth territory
 		from_wealth = MIN(from_wealth, total * 3);

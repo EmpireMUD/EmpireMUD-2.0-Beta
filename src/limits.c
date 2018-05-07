@@ -423,8 +423,6 @@ void point_update_char(char_data *ch) {
 			gain_ability_exp(ch, ABIL_DAYWALKING, 2);
 		}
 		
-		gain_ability_exp(ch, ABIL_COMMERCE, 2);
-		
 		if (GET_MOUNT_LIST(ch)) {
 			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
 		}

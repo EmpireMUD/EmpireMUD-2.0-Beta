@@ -1695,6 +1695,7 @@ const char *empire_attributes[] = {
 	"Progress Pool",
 	"Bonus City Points",
 	"Max City Size",
+	"Tty per 100 Wealth",
 	"\n"
 };
 
@@ -2617,6 +2618,7 @@ const char *progress_perk_types[] = {
 	"City-points",
 	"Craft",
 	"Max-city-size",
+	"Territory-from-wealth",
 	"\n"
 };
 

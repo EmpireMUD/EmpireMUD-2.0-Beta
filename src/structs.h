@@ -1001,7 +1001,8 @@ typedef struct vehicle_data vehicle_data;
 #define EATT_PROGRESS_POOL  0	// spendable progress points
 #define EATT_BONUS_CITY_POINTS  1	// extra city points
 #define EATT_MAX_CITY_SIZE  2	// how big the empire's cities can go (number of upgrades)
-#define NUM_EMPIRE_ATTRIBUTES  3	// total
+#define EATT_TERRITORY_PER_100_WEALTH  3	// number of tiles gained per 100 wealth
+#define NUM_EMPIRE_ATTRIBUTES  4	// total
 
 
 // ETRAIT_x: empire trait flags
@@ -1149,7 +1150,7 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_SEAPORT  4
 #define TECH_WORKFORCE  5
 #define TECH_PROMINENCE  6
-#define TECH_COMMERCE  7
+// unused: #define TECH_COMMERCE  7
 #define TECH_PORTALS  8
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10
@@ -2126,6 +2127,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_PERK_CITY_POINTS  1	// grants more city points
 #define PRG_PERK_CRAFT  2	// grants a recipe
 #define PRG_PERK_MAX_CITY_SIZE  3	// increases max city size
+#define PRG_PERK_TERRITORY_FROM_WEALTH  4	// increases territory from wealth
 
 
  //////////////////////////////////////////////////////////////////////////////

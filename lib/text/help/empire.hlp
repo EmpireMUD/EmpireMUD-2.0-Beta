@@ -1271,19 +1271,15 @@ TERRITORY
 
 (Disambiguation: Did you mean HELP TERRITORY COMMAND ?)
 
-Each empire is limited in how much territory it can claim. The formula for
-territory is:
-
-(Greatness x 35) + (Wealth / 10) + (Technologies x 15)
+Each empire is limited in how much territory it can claim. The amount of
+territory is based on empire progression, members, and other factors. You can
+see this broken down on the empire details.
 
 * Greatness: This is the total Greatness of all members.
-* Wealth: Only empires with the Commerce tech can gain territory from Wealth.
-      You can gain wealth by storing precious metals in your vault. The amount
-      of territory from wealth is not linear. Max territory from commerce is
-      equal to 3x normal territory.
-* Technologies: Each technology you unlock (e.g. City Lights) gives 15. These
-      only count once per empire, so two members with City Lights will not
-      result in +30 territory.
+* Wealth: After unlocking the correct progression rewards, wealth contributes
+      to territory. You can gain wealth by storing precious metals in your
+      vault. The amount of territory from wealth is not linear. Max territory
+      from commerce is equal to 3x normal territory.
 
 Most territory must be location within an empire's cities. 35% of your total
 territory can be on the outskirts of cities (up to 4x city radius), and another

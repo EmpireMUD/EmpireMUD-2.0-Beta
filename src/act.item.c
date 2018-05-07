@@ -4293,9 +4293,6 @@ ACMD(do_exchange) {
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "This building does not belong to any empire, and can't exchange coins.\r\n");
 	}
-	else if (!EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-		msg_to_char(ch, "This empire does not have Commerce, and cannot exchange coins.\r\n");
-	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to exchange anything here.\r\n");
 	}

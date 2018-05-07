@@ -1737,8 +1737,6 @@ void init_config_system(void) {
 
 	// empire
 	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "territory per 1 Greatness");
-	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "territory per 1 technology");
-	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "territory per 1 wealth");
 	init_config(CONFIG_EMPIRE, "land_frontier_modifier", CONFTYPE_DOUBLE, "portion of land that can be far from cities");
 	init_config(CONFIG_EMPIRE, "land_min_cap", CONFTYPE_INT, "lowest possible claim cap, to prevent very low numbers");
 	init_config(CONFIG_EMPIRE, "land_outside_city_modifier", CONFTYPE_DOUBLE, "portion of land that can be in the outskirts area of cities");
@@ -1755,6 +1753,9 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire appearing idle");
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
 	init_config(CONFIG_EMPIRE, "redesignate_time", CONFTYPE_INT, "minutes until you can redesignate a room again");
+
+	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "deprecated: do not set");
+	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "deprecated: do not set");
 
 	// items
 	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");

@@ -2789,9 +2789,6 @@ ACMD(do_mint) {
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "This mint does not belong to any empire, and can't make coins.\r\n");
 	}
-	else if (!EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-		msg_to_char(ch, "This empire does not have Commerce, and cannot mint coins.\r\n");
-	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to mint here.\r\n");
 	}
