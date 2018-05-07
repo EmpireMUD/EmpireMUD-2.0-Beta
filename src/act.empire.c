@@ -1920,6 +1920,10 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
+	if (city->type >= EMPIRE_ATTRIBUTE(emp, EATT_MAX_CITY_SIZE)) {
+		msg_to_char(ch, "Your empire cannot upgrade that city. Unlock larger city sizes through empire progression.\r\n");
+		return;
+	}
 	if (*city_type[city->type+1].name == '\n') {
 		msg_to_char(ch, "That city is already at the maximum level.\r\n");
 		return;

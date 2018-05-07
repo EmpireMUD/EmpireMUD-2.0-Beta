@@ -264,8 +264,11 @@ See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
 #
 "CITY TYPES" OUTPOST VILLAGE CAPITAL
 
-There are four sizes of city available. The only difference between them is
-the radius of the city.
+Usage:  city <upgrade | downgrade> <city name/number>
+
+There are four sizes of city available, but your empire must unlock larger
+city sizes through the progression system before you can upgrade to them. The
+only difference between them is the radius of the in-city territory.
 
  -C1-  Outpost (radius 5, outskirts 20)
  -C2-  Village (radius 10, outskirts 40)

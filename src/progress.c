@@ -367,6 +367,10 @@ char *get_one_perk_display(struct progress_perk *perk) {
 			}
 			break;
 		}
+		case PRG_PERK_MAX_CITY_SIZE: {
+			sprintf(save_buffer, "%+d max city size", perk->value);
+			break;
+		}
 		default: {
 			strcpy(save_buffer, "UNKNOWN");
 			break;
@@ -477,6 +481,10 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 			}
 			case PRG_PERK_CITY_POINTS: {
 				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
+				break;
+			}
+			case PRG_PERK_MAX_CITY_SIZE: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_MAX_CITY_SIZE), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
 			case PRG_PERK_CRAFT: {
@@ -2437,6 +2445,13 @@ OLC_MODULE(progedit_perks) {
 				case PRG_PERK_CITY_POINTS: {
 					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
 						msg_to_char(ch, "Invalid number of city points '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_MAX_CITY_SIZE: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid number of city sizes '%s'.\r\n", argument);
 						return;
 					}
 					break;	// otherwise ok

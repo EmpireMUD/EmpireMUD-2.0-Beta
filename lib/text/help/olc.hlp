@@ -5671,6 +5671,7 @@ Perk types:
  Technology - Grants an empire technology.
  City-points - Grants one or more city points.
  Craft - Grants a LEARNED craft recipe to the entire empire.
+ Max-city-size - Increases how large the empire can upgrade its cities.
 
 Note: To grant progress points for a goal, set the 'value'.
 

@@ -1681,6 +1681,7 @@ const char *empire_admin_flags[] = {
 const char *empire_attributes[] = {
 	"Progress Pool",
 	"Bonus City Points",
+	"Max City Size",
 	"\n"
 };
 
@@ -2602,6 +2603,7 @@ const char *progress_perk_types[] = {
 	"Technology",
 	"City-points",
 	"Craft",
+	"Max-city-size",
 	"\n"
 };
 
