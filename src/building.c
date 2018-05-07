@@ -1966,10 +1966,6 @@ ACMD(do_lay) {
 		msg_to_char(ch, "You can't lay road in someone else's territory!\r\n");
 	else if (!has_permission(ch, PRIV_BUILD))
 		msg_to_char(ch, "You don't have permission to lay road.\r\n");
-	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && !SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_ROADS)) {
-		// not rough requires Roads
-		msg_to_char(ch, "You don't have the skill to properly do that.\r\n");
-	}
 	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_PATHFINDING)) {
 		// rough requires Pathfinding
 		msg_to_char(ch, "You don't have the skill to properly do that.\r\n");
@@ -2004,9 +2000,6 @@ ACMD(do_lay) {
 		// skillup before sect change
 		if (SECT_FLAGGED(check_sect, SECTF_ROUGH)) {
 			gain_ability_exp(ch, ABIL_PATHFINDING, 15);
-		}
-		else {
-			gain_ability_exp(ch, ABIL_ROADS, 15);
 		}
 				
 		// change it over

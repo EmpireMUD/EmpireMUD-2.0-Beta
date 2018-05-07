@@ -128,7 +128,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_TASTE_BLOOD  37
 #define ABIL_BLOOD_FORTITUDE  38
 #define ABIL_LOCKS  41
-#define ABIL_ROADS  49
+// formerly: #define ABIL_ROADS  49
 #define ABIL_STAMINA  66
 #define ABIL_FIND_HERBS  70
 #define ABIL_FISH  72
@@ -169,7 +169,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SUMMON_GUARDS  128
 // formerly: #define ABIL_PROSPECT  130
 #define ABIL_WORKFORCE  131
-#define ABIL_RARE_METALS  133
+// formerly: #define ABIL_RARE_METALS  133
 #define ABIL_COMMERCE  134
 #define ABIL_PROMINENCE  135
 #define ABIL_INSPIRE  136

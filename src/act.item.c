@@ -5449,11 +5449,8 @@ ACMD(do_roadsign) {
 	else if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (get_skill_level(ch, SKILL_EMPIRE) <= BASIC_SKILL_CAP) {
-		msg_to_char(ch, "You need the Roads ability and an Empire skill of at least %d to set up road signs.\r\n", BASIC_SKILL_CAP+1);
-	}
-	else if (!has_ability(ch, ABIL_ROADS)) {
-		msg_to_char(ch, "You require the Roads ability to set up road signs.\r\n");
+	else if (!has_player_tech(ch, PTECH_CUSTOMIZE_BUILDING)) {
+		msg_to_char(ch, "You require the Customize Building ability to set up road signs.\r\n");
 	}
 	else if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only put up a roadsign on finished roads.\r\n");
@@ -5484,7 +5481,7 @@ ACMD(do_roadsign) {
 			msg_to_char(ch, "The old sign has been replaced.\r\n");
 		}
 
-		gain_ability_exp(ch, ABIL_ROADS, 33.4);
+		gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 		extract_obj(sign);
 	}
 }

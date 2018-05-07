@@ -341,9 +341,11 @@ When editing a custom description, you can use /fi to add linebreaks and indent
 the first line. Generally descriptions look best in the 3-9 line range. You can
 use /h to get more information on editor commands, and /s to save and exit.
 
+This ability also allows you to put up roadsigns.
+
 Gain experience by customizing buildings.
 
-See also: STRING EDITOR
+See also: STRING EDITOR, ROADSIGN
 #
 DEDICATE
 
