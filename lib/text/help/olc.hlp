@@ -3032,6 +3032,7 @@ Available flags:
  CHOOSE-LAST - The first choose-last global that passes the percent check will
     be saved for later, and only used if no other global succeeds. This can
     be used to create 100% "choose if nothing else passes" final cases.
+ RARE - Requires a special flag, e.g. Rare Metals for mine type.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d

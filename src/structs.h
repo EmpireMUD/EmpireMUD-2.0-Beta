@@ -318,6 +318,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLB_FLAG_ADVENTURE_ONLY  BIT(1)	// does not apply outside same-adventure
 #define GLB_FLAG_CUMULATIVE_PERCENT  BIT(2)	// accumulates percent with other valid globals instead of its own percent
 #define GLB_FLAG_CHOOSE_LAST  BIT(3)	// the first choose-last global that passes is saved for later, if nothing else is chosen
+#define GLB_FLAG_RARE  BIT(4)	// a rare result (has various definitions by type)
 
 
 // Group Defines
@@ -1136,7 +1137,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_SCORES  10	// total
 
 
-// Technologies
+// TECH_x: Technologies
 #define TECH_GLASSBLOWING  0
 #define TECH_CITY_LIGHTS  1
 #define TECH_LOCKS  2
@@ -1150,7 +1151,9 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_SKILLED_LABOR  10
 #define TECH_TRADE_ROUTES  11
 #define TECH_EXARCH_CRAFTS  12
-#define NUM_TECHS  13
+#define TECH_DEEP_MINES  13
+#define TECH_RARE_METALS  14
+#define NUM_TECHS  15
 
 
 // TER_x: territory types for empire arrays
@@ -2577,7 +2580,7 @@ struct global_data {
 	any_vnum vnum;
 	char *name;	// descriptive text
 	int type;	// GLOBAL_x
-	bitvector_t flags;	// GLB_FLAG_x flags
+	bitvector_t flags;	// GLB_FLAG_ flags
 	int value[NUM_GLB_VAL_POSITIONS];	// misc vals
 	
 	// constraints

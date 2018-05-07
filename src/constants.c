@@ -1730,6 +1730,8 @@ const char *techs[] = {
 	"Skilled Labor",
 	"Trade Routes",
 	"Exarch Crafts",
+	"Deep Mines",
+	"Rare Metals",
 	"\n"
 };
 
@@ -3623,6 +3625,7 @@ const char *global_flags[] = {
 	"ADVENTURE-ONLY",
 	"CUMULATIVE-PRC",
 	"CHOOSE-LAST",
+	"RARE",
 	"\n"
 };
 

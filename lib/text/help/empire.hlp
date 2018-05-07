@@ -356,19 +356,19 @@ To find buildings that can be dedicated, try 'helpsearch dedicate'.
 #
 "DEEP MINES"
 
-Deep Mines (Empire ability)
+Deep Mines (Empire technology)
 
-Mines you dig or prospect will have roughly 50% more ore. You must be the first
-player to build a mine or prospect on a given mountain tile (at least, since
-the last mountain reset), otherwise your deep mines ability will have no effect.
+Mines your empire digs or prospects will have 50% more ore. You must be the
+first empire to build a mine or prospect on a given mountain tile (at least,
+since the last mountain reset), otherwise your deep mines technology will have
+no effect.
+
 Mines will only display as 'deep' if, thanks to this bonus, they have more ore
 than the normal maximum.
 
 Once you have started a mine on (or prospected) a given mountain tile, it will
 remain a deep mine unless the mountain is reset at the end of the year. For
 more information on mountain resets, see HELP MINE.
-
-Gain experience when a tile benefits from your ability.
 
 See also: MINE, PROSPECT, RARE METALS
 #
@@ -1062,20 +1062,16 @@ See also: EMPIRES, CITIES
 #
 PROSPECT
 
-Prospect (Empire ability)
-
 Usage:  prospect
 
-A skilled prospector can determine what minerals are in the ground without
-exploratory mining.
+A good prospector can determine what minerals are in the ground without
+exploratory mining. If your empire has Deep Mines or Rare Metals and are the
+first person to prospect a mountain tile (since the last mountain reset), that
+tile will benefit from your Deep Mines and/or Rare Metals until the next
+mountain reset. For more info on mountain resets, see HELP MINE.
 
-If you have Deep Mines or Rare Metals and are the first person to prospect a
-mountain tile (since the last mountain reset), that tile will benefit from your
-Deep Mines and/or Rare Metals until the next mountain reset. For more info on
-mountain resets, see HELP MINE.
-
-Gain experience when you finish prospecting a tile. Prospecting happens
-instantly if your empire was the last one to prospect the tile.
+Prospecting happens instantly if your empire was the last one to prospect the
+tile.
 
 See also: MINE, DEEP MINES, RARE METALS
 #
@@ -1143,18 +1139,16 @@ See also: BUILD, ADVANCED TACTICS, UPGRADE
 #
 "RARE METALS"
 
-Rare Metals (Empire ability)
+Rare Metals (Empire technology)
 
-You learn to find the most valuable mining locations in each part of the
-mountain. Mines you build or prospect have a chance to find rare metals. If you
-were not the first person to mine or prospect a mountain tile (since the last
-mountain reset), your rare metals ability does not apply.
+Your empire has learned to find the most valuable mining locations in each part
+of the mountain. Mines you build or prospect have a chance to find rare metals.
+If you were not the first person to mine or prospect a mountain tile (since the
+last mountain reset), your rare metals ability does not apply.
 
 Once you have started a mine (or prospected) a given mountain tile, it will
 keep its current metal type unless the mountain is reset at the end of the
 year. For more information on mountain resets, see HELP MINE.
-
-Gain experience whenever you are the first to find a rare metal tile.
 
 See also: MINE, DEEP MINES, PROSPECT
 #
@@ -1369,6 +1363,8 @@ Available technologies are:
  - Skilled Labor: the workforce can perform even more chores
  - Trade Routes: lets you set up trade with other empires
  - Exarch Crafts: your workforce can craft nexus crystals
+ - Deep Mines: Mines will be 50% deeper than normal.
+ - Rare Metals: Mines can have rare metals.
 
 * some technologies only function on the same island as the building that
   provides them

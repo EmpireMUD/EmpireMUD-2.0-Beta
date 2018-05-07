@@ -1337,7 +1337,7 @@ bool has_permission(char_data *ch, int type) {
 * It takes the location into account, not just the tech flags.
 *
 * @param char_data *ch acting character, although this is location-based
-* @param int tech TECH_x id
+* @param int tech TECH_ id
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available(char_data *ch, int tech) {

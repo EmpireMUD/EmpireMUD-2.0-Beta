@@ -753,6 +753,9 @@ void init_mine(room_data *room, char_data *ch) {
 		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
 			continue;
 		}
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
+			continue;	// missing rare metals
+		}
 		
 		// level limits
 		if (GET_GLOBAL_MIN_LEVEL(glb) > 0 && (!ch || GET_COMPUTED_LEVEL(ch) < GET_GLOBAL_MIN_LEVEL(glb))) {
@@ -819,7 +822,7 @@ void init_mine(room_data *room, char_data *ch) {
 		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(found));
 		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE)));
 		
-		if (ch && has_player_tech(ch, PTECH_DEEP_MINES)) {
+		if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
 			multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
 		}

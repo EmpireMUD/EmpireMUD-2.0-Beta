@@ -2016,8 +2016,6 @@ void process_prospecting(char_data *ch) {
 			
 			show_prospect_result(ch, IN_ROOM(ch));
 			act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
-			
-			gain_ability_exp(ch, ABIL_PROSPECT, 15);
 			break;
 		}
 	}
@@ -3011,8 +3009,8 @@ ACMD(do_prospect) {
 		act("$n stops prospecting.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (IS_NPC(ch) || !has_ability(ch, ABIL_PROSPECT)) {
-		msg_to_char(ch, "You need to buy the Prospect ability before you can use it.\r\n");
+	else if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't prospect.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
@@ -3022,9 +3020,6 @@ ACMD(do_prospect) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to prospect here.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_PROSPECT)) {
-		return;
 	}
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0 && GET_LOYALTY(ch) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You see evidence that someone has already prospected this area...\r\n");
