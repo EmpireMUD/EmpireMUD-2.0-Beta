@@ -2122,7 +2122,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_PERK_TECH  0	// grants a technology
 #define PRG_PERK_CITY_POINTS  1	// grants more city points
 #define PRG_PERK_CRAFT  2	// grants a recipe
-#define PRG_PERK_MAX_CITY_SIZE  2	// increases max city size
+#define PRG_PERK_MAX_CITY_SIZE  3	// increases max city size
 
 
  //////////////////////////////////////////////////////////////////////////////
