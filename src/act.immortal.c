@@ -4213,7 +4213,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	int iter, found_rank, total, len;
 	player_index_data *index;
 	char line[256];
-	bool comma;
+	bool any;
 	
 	// determine rank by iterating over the sorted empire list
 	found_rank = 0;
@@ -4234,13 +4234,20 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	msg_to_char(ch, "Frontier traits: \tc%s\t0\r\n", line);
 
 	msg_to_char(ch, "Technology: \tg");
-	for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
+	for (iter = 0, len = 0, any = FALSE; iter < NUM_TECHS; ++iter) {
 		if (EMPIRE_HAS_TECH(emp, iter)) {
-			msg_to_char(ch, "%s%s", (comma ? ", " : ""), techs[iter]);
-			comma = TRUE;
+			any = TRUE;
+			if (len > 0 && len + strlen(techs[iter]) + 3 >= 80) {	// new line
+				msg_to_char(ch, ",\r\n%s", techs[iter]);
+				len = strlen(techs[iter]);
+			}
+			else {	// same line
+				msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", techs[iter]);
+				len += strlen(techs[iter]) + 2;
+			}
 		}
 	}
-	if (!comma) {
+	if (!any) {
 		msg_to_char(ch, "none");
 	}
 	msg_to_char(ch, "\t0\r\n");	// end tech
@@ -4255,7 +4262,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	total = 0;
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(emp, iter);
-		msg_to_char(ch, "%s: [\tc%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
+		msg_to_char(ch, "%s: [\ty%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
 	}
 	msg_to_char(ch, "Total: [\ty%d\t0]\r\n", total);
 	
@@ -4265,9 +4272,10 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		
 		if (len > 0 && len + strlen(line) + 2 >= 80) {	// start new line
 			msg_to_char(ch, "\r\n%s", line);
+			len = strlen(line);
 		}
-		else {
-			msg_to_char(ch, ", %s", line);
+		else {	// same line
+			msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", line);
 			len += strlen(line) + 2;
 		}
 	}
