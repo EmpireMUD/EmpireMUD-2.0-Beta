@@ -78,7 +78,7 @@ empire_log_ttl 30
 land_frontier_modifier 0.050000
 land_min_cap 15
 land_outside_city_modifier 0.350000
-land_per_greatness 35
+land_per_greatness 15
 land_per_tech 15
 land_per_wealth 0.100000
 member_timeout_full 120
