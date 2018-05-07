@@ -4204,43 +4204,16 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	extern int get_total_score(empire_data *emp);
 	
 	extern const char *empire_admin_flags[];
+	extern const char *empire_attributes[];
 	extern const char *empire_trait_types[];
 	extern const char *progress_types[];
-	extern const char *score_type[];
 	extern const char *techs[];
 	
 	empire_data *emp_iter, *next_emp;
-	int iter, found_rank, total;
+	int iter, found_rank, total, len;
 	player_index_data *index;
 	char line[256];
 	bool comma;
-	
-	msg_to_char(ch, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
-	msg_to_char(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Ranks: [\tc%d\t0]\r\n", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), EMPIRE_NUM_RANKS(emp));
-	
-	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
-	msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
-	
-	sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, line, TRUE);
-	msg_to_char(ch, "Frontier traits: \tc%s\t0\r\n", line);
-	
-	msg_to_char(ch, "Members: [\tc%d\t0/\tc%d\t0], Citizens: [\tc%d\t0], Military: [\tc%d\t0]\r\n", EMPIRE_MEMBERS(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp), EMPIRE_POPULATION(emp), EMPIRE_MILITARY(emp));
-	msg_to_char(ch, "Territory: %d/%d (%d in-city, %d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_CITY), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
-
-	msg_to_char(ch, "Wealth: [\ty%d\t0], Treasure: [\ty%d\t0], Coins: [\ty%.1f\t0]\r\n", (int) GET_TOTAL_WEALTH(emp), EMPIRE_WEALTH(emp), EMPIRE_COINS(emp));
-	msg_to_char(ch, "Greatness: [\tc%d\t0], Fame: [\tc%d\t0]\r\n", EMPIRE_GREATNESS(emp), EMPIRE_FAME(emp));
-	
-	msg_to_char(ch, "Technology: ");
-	for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
-		if (EMPIRE_HAS_TECH(emp, iter)) {
-			msg_to_char(ch, "%s%s", (comma ? ", " : ""), techs[iter]);
-			comma = TRUE;
-		}
-	}
-	if (!comma) {
-		msg_to_char(ch, "none");
-	}
-	msg_to_char(ch, "\r\n");
 	
 	// determine rank by iterating over the sorted empire list
 	found_rank = 0;
@@ -4251,22 +4224,56 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		}
 	}
 	
+	msg_to_char(ch, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
+	msg_to_char(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]\r\n", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
+	
+	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
+	msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
+	
+	sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, line, TRUE);
+	msg_to_char(ch, "Frontier traits: \tc%s\t0\r\n", line);
+
+	msg_to_char(ch, "Technology: \tg");
+	for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
+		if (EMPIRE_HAS_TECH(emp, iter)) {
+			msg_to_char(ch, "%s%s", (comma ? ", " : ""), techs[iter]);
+			comma = TRUE;
+		}
+	}
+	if (!comma) {
+		msg_to_char(ch, "none");
+	}
+	msg_to_char(ch, "\t0\r\n");	// end tech
+	
+	msg_to_char(ch, "Members: [\tc%d\t0/\tc%d\t0], Citizens: [\tc%d\t0], Military: [\tc%d\t0]\r\n", EMPIRE_MEMBERS(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp), EMPIRE_POPULATION(emp), EMPIRE_MILITARY(emp));
+	msg_to_char(ch, "Territory: %d/%d (%d in-city, %d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_CITY), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
+
+	msg_to_char(ch, "Wealth: [\ty%d\t0], Treasure: [\ty%d\t0], Coins: [\ty%.1f\t0]\r\n", (int) GET_TOTAL_WEALTH(emp), EMPIRE_WEALTH(emp), EMPIRE_COINS(emp));
+	msg_to_char(ch, "Greatness: [\tc%d\t0], Fame: [\tc%d\t0]\r\n", EMPIRE_GREATNESS(emp), EMPIRE_FAME(emp));
+	
 	// progress points by category
 	total = 0;
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(emp, iter);
-		msg_to_char(ch, "%s: %d, ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
+		msg_to_char(ch, "%s: [\tc%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
 	}
-	msg_to_char(ch, "Total: %d\r\n", total);
+	msg_to_char(ch, "Total: [\ty%d\t0]\r\n", total);
 	
-	// Score
-	msg_to_char(ch, "Score: %d, ranked #%d (", get_total_score(emp), found_rank);
-	for (iter = 0, comma = FALSE; iter < NUM_SCORES; ++iter) {
-		sprinttype(iter, score_type, buf);
-		msg_to_char(ch, "%s%s %d", (comma ? ", " : ""), buf, EMPIRE_SCORE(emp, iter));
-		comma = TRUE;
+	// attributes
+	for (iter = 0, len = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		sprintf(line, "%s: [\tc%d\t0]", empire_attributes[iter], EMPIRE_ATTRIBUTE(emp, iter));
+		
+		if (len > 0 && len + strlen(line) + 2 >= 80) {	// start new line
+			msg_to_char(ch, "\r\n%s", line);
+		}
+		else {
+			msg_to_char(ch, ", %s", line);
+			len += strlen(line) + 2;
+		}
 	}
-	msg_to_char(ch, ")\r\n");
+	if (len > 0) {
+		msg_to_char(ch, "\r\n");
+	}
 }
 
 
