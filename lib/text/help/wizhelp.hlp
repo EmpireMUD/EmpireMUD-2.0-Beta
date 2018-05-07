@@ -1357,6 +1357,7 @@ Examples:
   > stat mobile wolf
   > stat file niandra
   > stat object shawl
+  > stat empire 1
 
 See also: VSTAT
 #d
@@ -1517,9 +1518,9 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, faction, global, generic, mob, morph, obj, 
-                 progress, quest, roomtemplate, sector, shop, skill, social,
-                 trigger, vehicle
+                class, crop, empire, faction, global, generic, mob, morph, obj, 
+                progress, quest, roomtemplate, sector, shop, skill, social,
+                trigger, vehicle
 
 Examples:
 
