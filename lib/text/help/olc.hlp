@@ -5672,7 +5672,8 @@ Perk types:
  City-points - Grants one or more city points.
  Craft - Grants a LEARNED craft recipe to the entire empire.
  Max-city-size - Increases how large the empire can upgrade its cities.
- Territory-from-wealth - Increases territory-per-100-wealth.
+ Wealth-territory-per-100 - Increases territory-per-100-wealth.
+ Greatness-territory - Increases territory per greatness point.
 
 Note: To grant progress points for a goal, set the 'value' field instead.
 

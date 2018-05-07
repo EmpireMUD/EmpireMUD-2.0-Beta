@@ -397,7 +397,11 @@ char *get_one_perk_display(struct progress_perk *perk) {
 			break;
 		}
 		case PRG_PERK_TERRITORY_FROM_WEALTH: {
-			sprintf(save_buffer, "%+d territory per 100 wealth");
+			sprintf(save_buffer, "%+d territory per 100 wealth", perk->value);
+			break;
+		}
+		case PRG_PERK_TERRITORY_PER_GREATNESS: {
+			sprintf(save_buffer, "%+d territory per greatness", perk->value);
 			break;
 		}
 		default: {
@@ -518,6 +522,10 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 			}
 			case PRG_PERK_TERRITORY_FROM_WEALTH: {
 				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
+				break;
+			}
+			case PRG_PERK_TERRITORY_PER_GREATNESS: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_GREATNESS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
 			case PRG_PERK_CRAFT: {
@@ -2576,6 +2584,13 @@ OLC_MODULE(progedit_perks) {
 				case PRG_PERK_TERRITORY_FROM_WEALTH: {
 					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
 						msg_to_char(ch, "Invalid number of territory per 100 wealth '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_TERRITORY_PER_GREATNESS: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid number of territory per greatness '%s'.\r\n", argument);
 						return;
 					}
 					break;	// otherwise ok

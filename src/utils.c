@@ -1424,7 +1424,7 @@ int land_can_claim(empire_data *emp, int ter_type) {
 	}
 	
 	// basics
-	total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
+	total += EMPIRE_GREATNESS(emp) * (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_GREATNESS));
 	
 	if (EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH) > 0) {
 		from_wealth = GET_TOTAL_WEALTH(emp) / 100.0 * EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH);
