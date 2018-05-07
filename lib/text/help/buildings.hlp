@@ -92,7 +92,7 @@ See also: DESIGNATE
 #
 CABIN
 
-(--)  Cabin  (Basic Buildings)
+(--)  Cabin  (Build ability)
 
 Citizens:  2
 
@@ -108,7 +108,7 @@ See also:  LUXURY, STORAGE, TROPHY ROOM
 #
 CANNERY
 
-{CC}  Cannery  (Basic Buildings)
+{CC}  Cannery  (Build ability)
 
 Stored here:  fruits
 
@@ -182,7 +182,7 @@ See also: STARTING LOCATION, TOMB
 #
 CLAYPIT "CLAY PIT"
 
-&y|__|&0  Clay Pit  (Basic Buildings)
+&y|__|&0  Clay Pit  (Build ability)
 
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
 digging on unprepared ground. You can dig more clay from them before depletion.
@@ -193,7 +193,7 @@ See also: DIG
 #
 CLIFFDWELLING "CLIFF DWELLING"
 
-&y[==]&0  Cliff Dwelling  (Basic Buildings)
+&y[==]&0  Cliff Dwelling  (Build ability)
 
 Extra rooms:  3, interlink
 Citizens:  2
@@ -297,7 +297,7 @@ See also: DESIGNATE, PORTCULLIS, INTERLINK
 #
 FAMILYGRAVESITE "FAMILY GRAVESITE"
 
-..x.  Family Gravesite (Basic Buildings ability)
+..x.  Family Gravesite (Build ability)
 
 The family gravesite is a small tomb (respawn point) that you can build inside
 your cities. It can't be built outside of an established city, and won't work
@@ -307,7 +307,7 @@ See also: TOMB
 #
 FENCE
 
-vvvv  Fence  (Basic Buildings)
+vvvv  Fence  (Build ability)
 
 Fences will block the movement of NPCs, but not players. They count as in-city
 territory even when built in the outskirts (4x radius).
@@ -316,7 +316,7 @@ See also: GATE
 #
 FOUNDRY
 
-{FF}  Foundry  (Basic Buildings)
+{FF}  Foundry  (Build ability)
 
 Stored here:  metals
 
@@ -338,7 +338,7 @@ See also: DRINK, FILL
 #
 GATE
 
-.xx.  vxxv  Gate  (Basic Buildings)
+.xx.  vxxv  Gate  (Build ability)
 
 A gate is an entrance for a fence. Since players are not blocked by fences,
 the gate is purely decorative.
@@ -368,7 +368,7 @@ territory of an empire that has a glass blower in order to do certain crafts.
 #
 GRANARY
 
-{GG}  Granary  (Basic Buildings)
+{GG}  Granary  (Build ability)
 
 Stored here:  grains
 
@@ -380,7 +380,7 @@ See also: STORAGE
 #
 GRAVELPIT "GRAVEL PIT"
 
-{PP}  Gravel Pit  (Basic Buildings)
+{PP}  Gravel Pit  (Build ability)
 
 Stored here:  rocks and stone
 
@@ -453,7 +453,7 @@ See also: DEDICATE
 #
 HOUSE "SMALL HOUSE"
 
-(==)  House  (Basic Buildings)
+(==)  House  (Build ability)
 
 Extra rooms:  2
 Citizens:  2
@@ -479,7 +479,7 @@ See also: DESIGNATE
 #
 HUT "SMALL HUT"
 
-&g.&0()&g.&0  Hut  (Basic Buildings)
+&g.&0()&g.&0  Hut  (Build ability)
 
 Citizens:  1
 
@@ -529,7 +529,7 @@ See also: DESIGNATE
 #
 LUMBERYARD "LUMBER YARD"
 
-{LL}  Lumber Yard  (Basic Buildings)
+{LL}  Lumber Yard  (Build ability)
 
 Stored here:  trees and wood
 
@@ -571,7 +571,7 @@ It has no other purpose.
 #
 MUDHUT "MUD HUT"
 
-&y.&0()&y.&0  Mud Hut  (Basic Buildings)
+&y.&0()&y.&0  Mud Hut  (Build ability)
 
 Citizens:  1
 
@@ -661,7 +661,7 @@ See also: DESIGNATE, GREAT HALL, INTERLINK
 #
 PUEBLO
 
-&y.&0[]&y.&0  Pueblo  (Basic Buildings)
+&y.&0[]&y.&0  Pueblo  (Build ability)
 
 Citizens:  2
 Extra rooms:  2
@@ -773,7 +773,7 @@ See also: DEDICATE
 #
 SMOKEHOUSE "SMOKE HOUSE"
 
-{SS}  Smoke House  (Basic Buildings)
+{SS}  Smoke House  (Build ability)
 
 Features: cooking fire
 Stored here:  meats
@@ -786,7 +786,7 @@ See also: STORAGE
 #
 STABLE
 
-(SS)  Stable  (Basic Buildings)
+(SS)  Stable  (Build ability)
 
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.
@@ -902,7 +902,7 @@ See also: STORAGE, WEAVE
 #
 TANNERY
 
-{TT}  Tannery  (Basic Buildings)
+{TT}  Tannery  (Build ability)
 
 Stored here:  skins, furs, and leathers
 Command:  tan
@@ -1095,7 +1095,7 @@ See also: DESIGNATE
 #
 UTILITYSHED "UTILITY SHED" TOOLSHED "TOOL SHED"
 
-{UU}  Utility Shed  (Basic Buildings)
+{UU}  Utility Shed  (Build ability)
 
 Stored here:  tools
 
@@ -1122,7 +1122,7 @@ See also: CIRCLE, GATEHOUSE, GREAT WALLS, RITUAL OF DEFENSE
 #
 WELL
 
-(&c~~&0)  Well  (Basic Buildings)
+(&c~~&0)  Well  (Build ability)
 
 Wells provide water for your little settlement.
 

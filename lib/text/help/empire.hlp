@@ -28,7 +28,7 @@ which set of skills to use.
 
 See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, CITY COMMAND,
     ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK, ROLE, SKILL,
-    SKILL SYNERGY, BASIC BUILDINGS, CHORES
+    SKILL SYNERGY, CHORES
 #
 ABANDON
 
@@ -101,6 +101,8 @@ See also: RIDE, STABLE
 #
 BUILD BUILDING "BASIC BUILDINGS"
 
+Build (Trade ability)
+
 Usage:  build <building> [direction]
         build <monument> <god>
         build info <building>
@@ -153,9 +155,7 @@ Basic buildings:
 
 For more information on building your first house, see HELP HOUSING GUIDE.
 
-See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, ARTISANS, LUXURY, MONUMENTS,
-   SEAFARING, GRAND MONUMENTS, HOUSING, LOCKSMITHING, RAISE ARMIES, DISMANTLE,
-   ADVANCED TACTICS, ROADS, HAVENS, SWAMP ENGINEERING, GREAT WALLS, DESIGNATE,
+See also: BUILD INFO, ARCHITECT, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE,
    RECIPES
 #
 CEDE
@@ -1098,7 +1098,7 @@ QUARRY
 Quarry (Chores ability)
 
 Command:  quarry
-Building:  |__|  Quarry  (Basic Buildings)
+Building:  |__|  Quarry  (Build ability)
 Speed boosts:  Faster Chores bonus, haste
 
 A quarry must be built on plains or desert, facing a mountain. Quarries are a

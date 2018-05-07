@@ -233,7 +233,7 @@ MILL MILLING
 
 Mill (Chores ability)
 
-Building:  (MM)  Mill  (Basic Buildings)
+Building:  (MM)  Mill  (Build ability)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>
@@ -250,7 +250,7 @@ MINE MINES
 
 Mine (Chores ability)
 
-Building:  &y/&0[]&y\&0  Mine  (Basic Buildings)
+Building:  &y/&0[]&y\&0  Mine  (Build ability)
 Speed boosts:  Faster Chores bonus, haste, higher pick damage, higher Strength
 Command:  mine
 

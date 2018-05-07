@@ -77,6 +77,15 @@ Trade Synergy Ability: 100 Vampire
 
 This ability will contain any crafts for the Antiquarian synergy.
 #
+ARCHITECT "ARCHITECT ABILITY"
+
+Architect (Trade ability)
+
+This ability allows you to build more advanced buildings. It is required by
+most of the new building schematics you can learn throughout the game.
+
+See also: BUILD, LEARN
+#
 ARMORSMITHING ARMORCRAFTING
 
 Armorsmithing (Trade ability)
@@ -347,7 +356,7 @@ FORGE
 
 Forge (Trade ability)
 
-Building:  (FF)  Forge  (Basic Buildings)
+Building:  (FF)  Forge  (Build ability)
 Tool:  hammer
 Commands:  forge [number] <item>
            forge info <item>
