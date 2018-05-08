@@ -229,7 +229,6 @@ City points come from:
  - 1 point per 2 members (rounded up)
  - 1 point for having at least 4000 wealth
  - 1 point for having at least 10 technologies
- - 1 point for being over 50 escore
  - 1 point from progression rewards
 
 EmpireMUD periodically checks if cities are completely empty and, if so,
@@ -239,7 +238,7 @@ your city. You will also start to lose cities after 1 week if your empire
 shrinks and you no longer have enough city points available.
 
 See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, TECHNOLOGY, TERRITORY,
-  WEALTH, ESCORE
+  WEALTH
 #
 "CITY TYPES" OUTPOST VILLAGE CAPITAL
 
