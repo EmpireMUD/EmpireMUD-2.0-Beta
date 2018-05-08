@@ -784,24 +784,6 @@ itself doesn't house citizens.
 
 See also: FINE POTTERY
 #
-HOUSING CITIZENS "HOUSING BUILDINGS"
-
-Housing (Empire ability)
-
-The Housing ability unlocks additional buildings. These buildings hold more
-citizens than the smaller houses that don't require this ability. People will
-move into a house at a rate of one person per two game days, until the
-house is full.
-
-[--] stonehouse
-[==] largehouse
-&g^&0()&g^&0 treehouse  (chameleon)
-&g^&0[]&g^&0 treecomplex  (chameleon)
-&g.&0()&g.&0 undergroundcomplex  (chameleon)
-&y/&0[]&y\&0 minecomplex
-
-See also: BUILD, HOME, WORKFORCE
-#
 INSPIRE
 
 Inspire (Empire ability)

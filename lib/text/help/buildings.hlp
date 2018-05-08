@@ -518,7 +518,7 @@ When you're done with the shelter, be sure to dismantle and abandon it.
 #
 LARGEHOUSE "LARGE HOUSE"
 
-[==]  Large House  (Housing ability)
+[==]  Large House  (Homestead goal)
 
 Extra rooms:  5
 Citizens:  4
@@ -549,7 +549,7 @@ A megalith is a giant stone which inspires reverence and awe.
 #
 MINECOMPLEX "MINE COMPLEX"
 
-&y/&0[]&y\&0  Mine Complex  (Housing ability)
+&y/&0[]&y\&0  Mine Complex  (Homestead goal)
 
 Extra rooms:  7, interlink
 Special rooms:  tunnel
@@ -817,7 +817,7 @@ steps to a great monument, or merely the main street of a town on a hillside.
 #
 STONEHOUSE "STONE HOUSE"
 
-[--]  Stone House  (Housing ability)
+[--]  Stone House  (Homestead goal)
 
 Extra rooms:  3
 Citizens:  2
@@ -1034,7 +1034,7 @@ See also: DEPLETION, WORKFORCE, SKILLED LABOR
 #
 TREECOMPLEX "TREE COMPLEX"
 
-&g^[]^&0  Tree Complex  (Housing ability)
+&g^[]^&0  Tree Complex  (Homestead goal)
 
 Extra rooms:  7, interlink
 Special rooms:  skybridge
@@ -1049,7 +1049,7 @@ See also: DESIGNATE
 #
 TREEHOUSE "TREE HOUSE"
 
-&g^()^&0  Tree House  (Housing ability)
+&g^()^&0  Tree House  (Homestead goal)
 
 Extra rooms:  3
 Special rooms:  skybridge
@@ -1081,7 +1081,7 @@ See also: CABINET OF CURIOSITIES, STORAGE
 #
 UNDERGROUNDCOMPLEX "UNDERGROUND COMPLEX" "UNDERGROUND PASSAGE"
 
-&g.&0()&g.&0  Underground Complex  (Housing ability)
+&g.&0()&g.&0  Underground Complex  (Homestead goal)
 
 Extra rooms:  7, interlink
 Special rooms:  tunnel
