@@ -2835,6 +2835,10 @@ bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum
 			free(iter);
 			found = TRUE;
 		}
+		else if (iter->prerequisite == vnum) {
+			iter->prerequisite = NOTHING;	// drop prereq
+			found = TRUE;
+		}
 	}
 	
 	return found;
