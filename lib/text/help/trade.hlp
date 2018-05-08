@@ -164,6 +164,26 @@ Caravan: 100 items: 2 rooms inside
 
 See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE, SIT
 #
+CHORES CHORE
+
+Chores (Trade ability)
+
+Doing simple chores will help you raise your Trade skill at low levels.
+
+Chores include:
+  chop                      press *
+  harvest                   quarry
+  mill *                    saw
+  mine *                    scrape
+  mint                      smelt *
+  plant
+
+* Most common recipes/types give Chores experience, but some recipes may not.
+  (try 'smelt info iron ingot', for example, to see what ability it uses)
+
+See also: ACTIONS, CHOP, HARVEST, MILL, MINE, MINT, PLANT, PRESS, QUARRY, SAW,
+SCRAPE, SMELT
+#
 CLOTHING CLOTHES
 
 These are items you can sew and wear, but which have no affect on your stats.

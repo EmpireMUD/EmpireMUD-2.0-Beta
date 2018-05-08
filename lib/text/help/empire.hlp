@@ -172,26 +172,6 @@ empire that is at war.
 
 See also: CLAIM, POLICY, PRIVILEGE, ABANDON, TOGGLE
 #
-CHORES CHORE
-
-Chores (Empire ability)
-
-Doing simple chores will help you raise your Empire skill at low levels.
-
-Chores include:
-  chop                      press *
-  harvest                   quarry
-  mill *                    saw
-  mine *                    scrape
-  mint                      smelt *
-  plant
-
-* Most common recipes/types give Chores experience, but some recipes may not.
-  (try 'smelt info iron ingot', for example, to see what ability it uses)
-
-See also: ACTIONS, CHOP, HARVEST, MILL, MINE, MINT, PLANT, PRESS, QUARRY, SAW,
-SCRAPE, SMELT
-#
 CITY
 
 (Disambiguation: Did you mean HELP CITY INFORMATION or HELP CITY COMMANDS ?)
