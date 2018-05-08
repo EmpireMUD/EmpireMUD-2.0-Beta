@@ -561,9 +561,6 @@ void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 	if (has_ability(ch, ABIL_LOCKS)) {
 		EMPIRE_TECH(emp, TECH_LOCKS) += mod;
 	}
-	if (has_ability(ch, ABIL_PROMINENCE)) {
-		EMPIRE_TECH(emp, TECH_PROMINENCE) += mod;
-	}
 	if (has_ability(ch, ABIL_CITY_LIGHTS)) {
 		EMPIRE_TECH(emp, TECH_CITY_LIGHTS) += mod;
 	}

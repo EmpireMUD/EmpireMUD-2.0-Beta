@@ -410,9 +410,8 @@ void point_update_char(char_data *ch) {
 			msg_to_char(ch, "You are starving!\r\n");
 		}
 	
-		// in an empire with Prominence?
+		// in an empire?
 		if (emp) {
-			gain_ability_exp(ch, ABIL_PROMINENCE, 2);
 			gain_ability_exp(ch, ABIL_LOCKS, 1);
 		}
 		// city lights after dark

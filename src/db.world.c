@@ -1524,20 +1524,11 @@ void stop_burning(room_data *room) {
 * @return int how many city points emp has to spend
 */
 int city_points_available(empire_data *emp) {
-	extern int get_total_score(empire_data *emp);
-	
-	int score, points = 0;
+	int points = 0;
 	
 	if (emp) {
 		points = 1;
-		points += (EMPIRE_HAS_TECH(emp, TECH_PROMINENCE) ? 1 : 0);
 		points += ((EMPIRE_MEMBERS(emp) - 1) / config_get_int("players_per_city_point"));
-		points += (GET_TOTAL_WEALTH(emp) >= config_get_int("bonus_city_point_wealth")) ? 1 : 0;
-		points += (count_tech(emp) >= config_get_int("bonus_city_point_techs")) ? 1 : 0;
-		
-		score = get_total_score(emp);
-		points += (score >= 50) ? 1 : 0;
-		
 		points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
 
 		// minus any used points

@@ -1721,8 +1721,6 @@ void init_config_system(void) {
 
 	// cities
 	init_config(CONFIG_CITY, "players_per_city_point", CONFTYPE_INT, "how many members you need to earn each city point");
-	init_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT, "amount of empire wealth that earns you an extra city point");
-	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "number of techs for an extra city point");
 	init_config(CONFIG_CITY, "min_distance_between_cities", CONFTYPE_INT, "tiles between city centers");
 	init_config(CONFIG_CITY, "min_distance_between_ally_cities", CONFTYPE_INT, "tiles between cities belonging to allies");
 	init_config(CONFIG_CITY, "min_distance_from_city_to_starting_location", CONFTYPE_INT, "tiles between a city and a starting location");
@@ -1734,6 +1732,9 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "disrepair_limit_unfinished", CONFTYPE_INT, "years of disrepair before unfinished buildings collapse");
 	init_config(CONFIG_CITY, "max_out_of_city_portal", CONFTYPE_INT, "maximum distance a portal can travel outside of a city");
 	init_config(CONFIG_CITY, "minutes_to_full_city", CONFTYPE_INT, "time it takes for a city to count for in-city-only tasks");
+	
+	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "deprecated: do not set");
+	init_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT, "deprecated: do not set");
 
 	// empire
 	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "base territory per 1 Greatness");

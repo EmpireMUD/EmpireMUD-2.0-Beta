@@ -228,7 +228,6 @@ the Great Hall, for guard towers, and for some other game rules.
 City points come from:
  - 1 point per 2 members (rounded up)
  - 1 point for having at least 4000 wealth
- - 1 point for Prominence
  - 1 point for having at least 10 technologies
  - 1 point for being over 50 escore
  - 1 point from progression rewards
@@ -239,8 +238,8 @@ clean, and you can prevent it by making sure there is at least one building in
 your city. You will also start to lose cities after 1 week if your empire
 shrinks and you no longer have enough city points available.
 
-See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
-  TERRITORY, WEALTH, ESCORE
+See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, TECHNOLOGY, TERRITORY,
+  WEALTH, ESCORE
 #
 "CITY TYPES" OUTPOST VILLAGE CAPITAL
 
@@ -1029,22 +1028,6 @@ Privileges:
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #
-PROMINENCE
-
-Prominence (Empire ability)
-
-Buying this ability allows your empire to appear on the exclusive list of
-Prominent Empires -- shown when players type "empires" without -m or -a.
-
-Prominent Empires also get a bonus city point.
-
-There is no benefit to more than 1 person in an empire purchasing this
-ability.
-
-Gain experience passively as long as you're in an empire.
-
-See also: EMPIRES, CITIES
-#
 PROSPECT
 
 Usage:  prospect
@@ -1337,7 +1320,7 @@ Available technologies are:
  - Apiaries*: lets you cook with honey and craft with wax
  - Seaport*: you have a dock!
  - Workforce: citizens will do chores for the empire
- - Prominence: the empire appears on the main list, and has an extra city
+ - Prominence: the empire appears on the main list
  - Citizens: people will move into homes and bedrooms in your empire
  - Portals: members of the empire can open portals
  - Master Portals: the empire's portals have unlimited range
