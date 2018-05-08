@@ -551,7 +551,6 @@ void score_empires(void) {
 	
 	struct scemp_type *scemp, *next_scemp, *lists[NUM_SCORES];
 	int iter, pos, median, num_emps = 0;
-	struct empire_political_data *pol;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
 	empire_data *emp, *next_emp;
