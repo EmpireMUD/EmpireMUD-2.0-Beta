@@ -976,6 +976,7 @@ ACMD(do_heal) {
 	
 	if (abil != NO_ABIL && will_gain) {
 		gain_ability_exp(ch, abil, gain);
+		gain_ability_exp(ch, ABIL_ANCESTRAL_HEALING, gain);	// triggers on all heals
 	}
 }
 
@@ -1224,6 +1225,7 @@ ACMD(do_rejuvenate) {
 	
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, ABIL_REJUVENATE, 15);
+		gain_ability_exp(ch, ABIL_ANCESTRAL_HEALING, 15);
 	}
 
 	if (FIGHTING(vict) && !FIGHTING(ch)) {
