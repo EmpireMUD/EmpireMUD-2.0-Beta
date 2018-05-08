@@ -1151,7 +1151,7 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_SEAPORT  4
 #define TECH_WORKFORCE  5
 #define TECH_PROMINENCE  6
-// unused: #define TECH_COMMERCE  7
+#define TECH_CITIZENS  7
 #define TECH_PORTALS  8
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10

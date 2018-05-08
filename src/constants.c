@@ -1740,7 +1740,7 @@ const char *techs[] = {
 	"Seaport",
 	"Workforce",
 	"Prominence",
-	"Commerce",
+	"Citizens",
 	"Portals",
 	"Master Portals",
 	"Skilled Labor",

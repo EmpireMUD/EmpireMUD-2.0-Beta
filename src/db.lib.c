@@ -3217,7 +3217,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 	char_data *proto;
 	mob_vnum artisan;
 	
-	if (!room || !(emp = ROOM_OWNER(room)) || (!ter && !(ter = find_territory_entry(emp, room)))) {
+	if (!room || !(emp = ROOM_OWNER(room)) || !EMPIRE_HAS_TECH(emp, TECH_CITIZENS) || (!ter && !(ter = find_territory_entry(emp, room)))) {
 		return;	// no work
 	}
 	if (!IS_COMPLETE(room) || ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
