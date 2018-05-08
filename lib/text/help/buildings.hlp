@@ -100,11 +100,11 @@ A cabin is slightly larger than a hut, but still contains just one room.
 #
 "CABINET OF CURIOSITIES" CABINETOFCURIOSITIES CURIOS
 
-[CC]  Cabinet of Curiosities  (Luxury ability)
+[CC]  Cabinet of Curiosities  (Architect ability)
 
 This building stores the rare items that are found in various adventures.
 
-See also:  LUXURY, STORAGE, TROPHY ROOM
+See also:  STORAGE, TROPHY ROOM
 #
 CANNERY
 
@@ -206,7 +206,7 @@ See also: DESIGNATE
 #
 COURTYARD "COURT YARD"
 
-....  Courtyard  (Luxury ability)
+....  Courtyard  (Architect ability)
 
 The courtyard is a well-appointed open space, well-planted and with fine
 paving stones. It is well-maintained and forests will not grow upon it.
@@ -328,7 +328,7 @@ See also: SMELT, STORAGE
 #
 FOUNTAIN
 
-{&c~~&0}  Fountain  (Luxury ability)
+{&c~~&0}  Fountain  (Architect ability)
 
 Fountains provide water, like a well.
 

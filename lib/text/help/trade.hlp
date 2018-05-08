@@ -84,6 +84,11 @@ Architect (Trade ability)
 This ability allows you to build more advanced buildings. It is required by
 most of the new building schematics you can learn throughout the game.
 
+It also lets you build:
+  [CC]  cabinetofcuriosities
+  ....  courtyard
+  {&c~~&0}  fountain
+
 See also: BUILD, LEARN
 #
 ARMORSMITHING ARMORCRAFTING
@@ -407,16 +412,6 @@ You can make the following gourmet recipes:
   seafood feast (caster)
 
 See also: BUFF FOOD, COOKING FIRE
-#
-"GUILDSMAN CRAFTS"
-
-Guildsman Crafts
-Trade Synergy Ability: 100 Trade
-
-Weave items:
-  guild patterned cloth  (crafter item)
-
-See also: WEAVE
 #
 "HERBCLOTH WEAVING" "SPARKFIBER CLOTH" "MANASILK CLOTH"
 
