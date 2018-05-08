@@ -441,7 +441,7 @@ See also: HIDE
 "STAGGER JAB"
 
 Stagger Jab
-Stealth Synergy Ability: 100 Empire
+Stealth Synergy Ability: 100 Battle
 Debuff type: Stealth
 
 Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
@@ -537,7 +537,7 @@ See also: STEAL
 WHISPERSTRIDE
 
 Whisperstride
-Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade OR 100 Empire
+Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade
 Usage:  whisperstride
 Cooldown:  5 minutes
 Cost:  100 move
