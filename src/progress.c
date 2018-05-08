@@ -47,6 +47,7 @@ extern const char *techs[];
 
 // external funcs
 extern struct req_data *copy_requirements(struct req_data *from);
+extern int count_cities(empire_data *emp);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_homes(empire_data *emp);;
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
@@ -936,6 +937,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_diplomacy(emp, task->misc);
 				break;
 			}
+			case REQ_HAVE_CITY: {
+				task->current = count_cities(emp);
+				break;
+			}
 			
 			// otherwise...
 			default: {
@@ -1071,6 +1076,29 @@ time_t when_empire_completed_goal(empire_data *emp, any_vnum vnum) {
 //// EMPIRE TRACKERS /////////////////////////////////////////////////////////
 
 /**
+* Empire Tracker: empire changes number/size of ciies
+*
+* @param empire_data *emp The empire.
+*/
+void et_change_cities(empire_data *emp) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_HAVE_CITY) {
+				task->current = count_cities(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_cities, 0);
+}
+
+
+/**
 * Empire Tracker: empire gains/loses coins
 *
 * @param empire_data *emp The empire.
@@ -1084,12 +1112,10 @@ void et_change_coins(empire_data *emp, int amount) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_GET_COINS) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_EMPIRE_WEALTH) {
 				task->current = GET_TOTAL_WEALTH(emp);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1113,7 +1139,6 @@ void et_change_diplomacy(empire_data *emp) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_DIPLOMACY) {
 				task->current = count_diplomacy(emp, task->misc);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1137,7 +1162,6 @@ void et_change_fame(empire_data *emp) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_EMPIRE_FAME) {
 				task->current = EMPIRE_FAME(emp);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1161,7 +1185,6 @@ void et_change_greatness(empire_data *emp) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_EMPIRE_GREATNESS) {
 				task->current = EMPIRE_GREATNESS(emp);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1187,12 +1210,10 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1214,7 +1235,6 @@ void et_gain_tile_sector(empire_data *emp, sector_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1237,12 +1257,10 @@ void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1270,17 +1288,14 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_CROP_VARIETY && OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
@@ -1309,7 +1324,6 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				--task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				
 				// check min
 				task->current = MAX(task->current, 0);
@@ -1317,7 +1331,6 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				--task->current;
 				task->current = MAX(task->current, 0);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
 		}
 	}
@@ -1338,7 +1351,6 @@ void et_lose_tile_sector(empire_data *emp, sector_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
 				--task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
@@ -1365,7 +1377,6 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
 				--task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
@@ -1373,7 +1384,6 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				--task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min

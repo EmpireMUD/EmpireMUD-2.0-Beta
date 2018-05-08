@@ -6254,6 +6254,7 @@ void free_requirements(struct req_data *list) {
 * @return bool TRUE if the character meets those requirements, FALSE if not.
 */
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
+	extern int count_cities(empire_data *emp);
 	extern int count_crop_variety_in_list(obj_data *list);
 	extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
@@ -6497,6 +6498,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_HAVE_CITY: {
+				if (!GET_LOYALTY(ch) || count_cities(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -6704,6 +6711,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		case REQ_DIPLOMACY: {
 			sprintbit(req->misc, diplomacy_flags, lbuf, TRUE);
 			snprintf(output, sizeof(output), "Have diplomatic relations: %dx %s", req->needed, lbuf);
+			break;
+		}
+		case REQ_HAVE_CITY: {
+			snprintf(output, sizeof(output), "Have %d cit%s", req->needed, req->needed == 1 ? "y" : "ies");
 			break;
 		}
 		default: {

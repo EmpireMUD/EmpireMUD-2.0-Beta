@@ -391,6 +391,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_EMPIRE_FAME  29
 #define REQ_EMPIRE_GREATNESS  30
 #define REQ_DIPLOMACY  31
+#define REQ_HAVE_CITY  32
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types

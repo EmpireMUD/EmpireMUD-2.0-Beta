@@ -3788,8 +3788,9 @@ const char *requirement_types[] = {
 	"OWN-VEHICLE-FLAGGED",
 	"EMPIRE-WEALTH",
 	"EMPIRE-FAME",
-	"EMPIRE-GREATNESS",
+	"EMPIRE-GREATNESS",	// 30
 	"DIPLOMACY",
+	"HAVE-CITY",
 	"\n",
 };
 
@@ -3828,6 +3829,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// empire fame
 	REQ_AMT_NUMBER,	// empire greatness
 	REQ_AMT_NUMBER,	// diplomacy
+	REQ_AMT_NUMBER,	// have city
 };
 
 
@@ -3865,6 +3867,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// empire fame
 	FALSE,	// empire greatness
 	FALSE,	// diplomacy
+	FALSE,	// have city
 };
 
 

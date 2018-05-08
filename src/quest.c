@@ -53,6 +53,7 @@ extern const char *requirement_types[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
+extern int count_cities(empire_data *emp);
 extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 extern struct req_data *copy_requirements(struct req_data *from);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
@@ -933,6 +934,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_DIPLOMACY: {
 				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
+				break;
+			}
+			case REQ_HAVE_CITY: {
+				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 				break;
 			}
 		}
@@ -2002,6 +2007,30 @@ void qt_drop_obj(char_data *ch, obj_data *obj) {
 			
 			// check min
 			task->current = MAX(task->current, 0);
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire cities change
+*
+* @param char_data *ch The player.
+* @param any_vnum amount (ignored, required by function pointer call).
+*/
+void qt_empire_cities(char_data *ch, any_vnum amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_DIPLOMACY) {
+				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
+			}
 		}
 	}
 }

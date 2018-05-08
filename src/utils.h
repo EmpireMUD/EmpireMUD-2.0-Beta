@@ -1685,6 +1685,7 @@ void qt_change_ability(char_data *ch, any_vnum abil);
 void qt_change_reputation(char_data *ch, any_vnum faction);
 void qt_change_skill_level(char_data *ch, any_vnum skl);
 void qt_drop_obj(char_data *ch, obj_data *obj);
+void qt_empire_cities(char_data *ch, any_vnum amount);
 void qt_empire_diplomacy(char_data *ch, any_vnum amount);
 void qt_empire_fame(char_data *ch, any_vnum amount);
 void qt_empire_greatness(char_data *ch, any_vnum amount);
@@ -1711,6 +1712,7 @@ void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
 
 // utils from progress.c
+void et_change_cities(empire_data *emp);
 void et_change_coins(empire_data *emp, int amount);
 void et_change_diplomacy(empire_data *emp);
 void et_change_fame(empire_data *emp);

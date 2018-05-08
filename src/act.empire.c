@@ -1319,6 +1319,8 @@ void abandon_city(char_data *ch, empire_data *emp, char *argument) {
 	
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	
+	et_change_cities(emp);
 }
 
 
@@ -1504,6 +1506,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	if (city->type > 0) {
 		city->type--;
 		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
+		et_change_cities(emp);
 	}
 	else {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s - it is no longer a city", PERS(ch, ch, 1), city->name);
@@ -1651,6 +1654,8 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	
+	et_change_cities(emp);
 }
 
 
@@ -1854,6 +1859,8 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 	else {
 		abandon_room(cityloc);
 	}
+	
+	et_change_cities(emp);
 }
 
 
@@ -1934,6 +1941,7 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
 	send_config_msg(ch, "ok_string");
 	read_empire_territory(emp, FALSE);
+	et_change_cities(emp);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
