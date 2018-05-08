@@ -594,8 +594,8 @@ void score_empires(void) {
 		add_scemp(&lists[SCORE_MEMBERS], EMPIRE_MEMBERS(emp));
 		EMPIRE_SCORE(emp, SCORE_MEMBERS) = EMPIRE_MEMBERS(emp);
 		
-		add_scemp(&lists[SCORE_TECHS], (num = count_tech(emp)));
-		EMPIRE_SCORE(emp, SCORE_TECHS) = num;
+		add_scemp(&lists[SCORE_COMMUNITY], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_COMMUNITY)));
+		EMPIRE_SCORE(emp, SCORE_COMMUNITY) = num;
 		
 		num = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -604,26 +604,20 @@ void score_empires(void) {
 			}
 		}
 		num /= 1000;	// for sanity of number size
-		add_scemp(&lists[SCORE_EINV], num);
-		EMPIRE_SCORE(emp, SCORE_EINV) = num;
+		add_scemp(&lists[SCORE_INVENTORY], num);
+		EMPIRE_SCORE(emp, SCORE_INVENTORY) = num;
 		
 		add_scemp(&lists[SCORE_GREATNESS], EMPIRE_GREATNESS(emp));
 		EMPIRE_SCORE(emp, SCORE_GREATNESS) = EMPIRE_GREATNESS(emp);
 		
-		num = 0;
-		for (pol = EMPIRE_DIPLOMACY(emp); pol; pol = pol->next) {
-			if (IS_SET(pol->type, DIPL_TRADE)) {
-				++num;
-			}
-		}
-		add_scemp(&lists[SCORE_DIPLOMACY], num);
-		EMPIRE_SCORE(emp, SCORE_DIPLOMACY) = num;
+		add_scemp(&lists[SCORE_INDUSTRY], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_INDUSTRY)));
+		EMPIRE_SCORE(emp, SCORE_INDUSTRY) = num;
 		
-		add_scemp(&lists[SCORE_FAME], EMPIRE_FAME(emp));
-		EMPIRE_SCORE(emp, SCORE_FAME) = EMPIRE_FAME(emp);
+		add_scemp(&lists[SCORE_PRESTIGE], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_PRESTIGE)));
+		EMPIRE_SCORE(emp, SCORE_PRESTIGE) = num;
 		
-		add_scemp(&lists[SCORE_MILITARY], EMPIRE_MILITARY(emp));
-		EMPIRE_SCORE(emp, SCORE_MILITARY) = EMPIRE_MILITARY(emp);
+		add_scemp(&lists[SCORE_DEFENSE], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_DEFENSE)));
+		EMPIRE_SCORE(emp, SCORE_DEFENSE) = num;
 		
 		add_scemp(&lists[SCORE_PLAYTIME], EMPIRE_TOTAL_PLAYTIME(emp));
 		EMPIRE_SCORE(emp, SCORE_PLAYTIME) = EMPIRE_TOTAL_PLAYTIME(emp);

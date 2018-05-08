@@ -1787,16 +1787,16 @@ const char *priv[] = {
 
 // SCORE_x -- score types
 const char *score_type[] = {
-	"Wealth",
-	"Territory",
-	"Members",
-	"Techs",
-	"Inventory",
+	"Community",
+	"Defense",
 	"Greatness",
-	"Diplomacy",
-	"Fame",
-	"Military",
+	"Industry",
+	"Inventory",
+	"Members",
 	"Playtime",
+	"Prestige",
+	"Territory",
+	"Wealth",
 	"\n"
 };
 

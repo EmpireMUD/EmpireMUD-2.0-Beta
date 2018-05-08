@@ -1129,17 +1129,17 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_PRIVILEGES  20	// total
 
 
-// for empire scores (e.g. sorting)
-#define SCORE_WEALTH  0
-#define SCORE_TERRITORY  1
-#define SCORE_MEMBERS  2
-#define SCORE_TECHS  3
-#define SCORE_EINV  4
-#define SCORE_GREATNESS  5
-#define SCORE_DIPLOMACY  6
-#define SCORE_FAME  7
-#define SCORE_MILITARY  8
-#define SCORE_PLAYTIME  9
+// SCORE_x: for empire scores (e.g. sorting)
+#define SCORE_COMMUNITY  0
+#define SCORE_DEFENSE  1
+#define SCORE_GREATNESS  2
+#define SCORE_INDUSTRY  3
+#define SCORE_INVENTORY  4
+#define SCORE_MEMBERS  5
+#define SCORE_PLAYTIME  6
+#define SCORE_PRESTIGE  7
+#define SCORE_TERRITORY  8
+#define SCORE_WEALTH  9
 #define NUM_SCORES  10	// total
 
 
@@ -2113,7 +2113,7 @@ typedef struct vehicle_data vehicle_data;
 #define PROGRESS_COMMUNITY  1
 #define PROGRESS_INDUSTRY  2
 #define PROGRESS_DEFENSE  3
-#define PROGRESS_PROGRESS  4
+#define PROGRESS_PRESTIGE  4
 #define NUM_PROGRESS_TYPES  5	// total
 
 
