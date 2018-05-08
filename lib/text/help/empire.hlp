@@ -1,6 +1,6 @@
 EMPIRE EMPIRES EMP
 
-Empire is a skill, a command, and a grouping of people and land.
+Empire is both a command and a grouping of people and land.
 
 &cEmpire (grouping)&0: Found an empire by claiming your first piece of land. Other
    players can join you to help you grow your empire, or you could join some-
@@ -11,24 +11,11 @@ Empire is a skill, a command, and a grouping of people and land.
    will give you details on that empire. You can also use -p <name> to look up
    an empire by player name. Immortals can use -v to look up an empire by vnum.
    Empires are ranked by ESCORE.
-   
-&cEmpire (skill)&0: Chopping, mining, building, and other empire chores will
-   help you get started in this skill. It contains abilities for building more
-   buildings and expanding your empire.
-   
-   You can gain your initial Empire skill by doing empire chores including:
-   chopping trees, scraping trees, planting crops, harvesting crops, mining,
-   and building.
 
 You can learn about founding and managing empires on HELP EMPIRE GUIDE.
 
-You get additional Empire abilities when you reach level 100, depending on
-which other skills you have at high levels. Use the 'role' command to choose
-which set of skills to use.
-
 See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, CITY COMMAND,
-    ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK, ROLE, SKILL,
-    SKILL SYNERGY, CHORES
+    ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK
 #
 ABANDON
 
@@ -1039,7 +1026,7 @@ See also: CLAIM, CEDE, ABANDON, UNPUBLICIZE, HOSTILE
 #
 QUARRY
 
-Quarry (Chores ability)
+Quarry (Primitive Crafts ability)
 
 Command:  quarry
 Building:  |__|  Quarry  (Build ability)
@@ -1055,7 +1042,7 @@ have a quarry.
 
 Quarries count as in-city territory when built in the outskirts (4x radius).
 
-See also: DEPLETION, DIG, CHORES
+See also: DEPLETION, DIG
 #
 RADIANCE
 

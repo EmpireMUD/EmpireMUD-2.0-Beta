@@ -998,7 +998,7 @@ void perform_saw(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
-			gain_ability_exp(ch, ABIL_CHORES, 10);
+			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 10);
 			
 			// lather, rinse, rescrape
 			do_saw(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -1166,7 +1166,7 @@ void process_chop(char_data *ch) {
 		// attempt to change terrain
 		change_chop_territory(IN_ROOM(ch));
 		
-		gain_ability_exp(ch, ABIL_CHORES, 15);
+		gain_ability_exp(ch, ABIL_SCAVENGING, 15);
 		
 		// stoppin choppin -- don't use stop_room_action because we also restart them
 		// (this includes ch)
@@ -1595,7 +1595,7 @@ void process_harvesting(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
-			gain_ability_exp(ch, ABIL_CHORES, 30);
+			gain_ability_exp(ch, ABIL_SCAVENGING, 30);
 			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
 		}
 		else {
@@ -1750,7 +1750,7 @@ void process_minting(char_data *ch) {
 		increase_coins(ch, emp, num);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		gain_ability_exp(ch, ABIL_CHORES, 30);
+		gain_ability_exp(ch, ABIL_BASIC_CRAFTS, 30);
 		
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
 			strcpy(tmp, fname(GET_OBJ_KEYWORDS(proto)));
@@ -1972,7 +1972,7 @@ void process_planting(char_data *ch) {
 		msg_to_char(ch, "You have finished planting!\r\n");
 		act("$n finishes planting!", FALSE, ch, 0, 0, TO_ROOM);
 		
-		gain_ability_exp(ch, ABIL_CHORES, 30);
+		gain_ability_exp(ch, ABIL_COOK, 30);
 		
 		GET_ACTION(ch) = ACT_NONE;
 	}
@@ -2074,7 +2074,7 @@ void process_quarrying(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, finish_quarrying)) {
-			gain_ability_exp(ch, ABIL_CHORES, 25);
+			gain_ability_exp(ch, ABIL_SCAVENGING, 25);
 		
 			add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
 			
@@ -2194,7 +2194,7 @@ void process_scraping(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
-			gain_ability_exp(ch, ABIL_CHORES, 10);
+			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 10);
 			
 			// lather, rinse, rescrape
 			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -2338,7 +2338,7 @@ void process_tanning(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success) {
-			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 20);
+			gain_ability_exp(ch, ABIL_BASIC_CRAFTS, 20);
 	
 			// repeat!
 			do_tan(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -2777,6 +2777,9 @@ ACMD(do_mint) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
+	else if (!has_ability(ch, ABIL_BASIC_CRAFTS)) {
+		msg_to_char(ch, "You need the Basic Crafts ability to mint anything.\r\n");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
@@ -3192,6 +3195,9 @@ ACMD(do_tan) {
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!has_ability(ch, ABIL_BASIC_CRAFTS)) {
+		msg_to_char(ch, "You need the Basic Crafts ability to tan anything.\r\n");
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "What would you like to tan?\r\n");

@@ -325,6 +325,9 @@ Scavenging commands:
   dig
   gather
   pick
+  chop
+  harvest
+  quarrying
 
 See also: DIG, GATHER, PICK
 #

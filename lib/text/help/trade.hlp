@@ -143,7 +143,11 @@ Basic Crafts:
   violet dye  (glassblowing)
   orange dye  (glassblowing)
 
-See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP,
+This ability also allows you to:
+  mint
+  tan
+
+See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
 PRIMITIVE CRAFTS
 #
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
@@ -167,9 +171,8 @@ See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE, SIT
 #
 CHORES CHORE
 
-Chores (Trade ability)
-
-Doing simple chores will help you raise your Trade skill at low levels.
+Doing simple chores will help you raise your Trade or Survival skill at low
+levels.
 
 Chores include:
   chop                      press *
@@ -179,7 +182,7 @@ Chores include:
   mint                      smelt *
   plant
 
-* Most common recipes/types give Chores experience, but some recipes may not.
+* Most common recipes/types give Trade experience, but some recipes may not.
   (try 'smelt info iron ingot', for example, to see what ability it uses)
 
 See also: ACTIONS, CHOP, HARVEST, MILL, MINE, MINT, PLANT, PRESS, QUARRY, SAW,
@@ -763,8 +766,13 @@ Primitive crafts:
 With Archery, you can craft:
   arrows
 
+This ability also allows you to:
+  saw
+  chip
+  scrape
+
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, RECIPES,
-BASIC CRAFTS
+BASIC CRAFTS, SAW, CHIP, SCRAPE
 #
 "PRISMATIC CRYSTALS" "PRISMATIC CRYSTAL"
 
@@ -1011,6 +1019,8 @@ Armorsmithing -> Sturdy Armors -> Imperial Armors
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, IMPERIAL ARMORS
 #
 TAN TANNING
+
+Tan (Basic Crafts ability)
 
 Usage:  tan <skin>
 Speed boosts:  Faster Chores bonus

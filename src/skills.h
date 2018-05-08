@@ -207,6 +207,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_DEVASTATION_RITUAL  191
 #define ABIL_SENSE_LIFE_RITUAL  192
 #define ABIL_RITUAL_OF_DETECTION  193
+#define ABIL_BASIC_CRAFTS  198
 #define ABIL_SKILLED_LABOR  201
 #define ABIL_MASTER_SURVIVALIST  205
 #define ABIL_TUNNEL  206
@@ -268,9 +269,10 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_EVASION  286
 #define ABIL_WEAPON_PROFICIENCY  287
 #define ABIL_PRIMITIVE_CRAFTS  288	// has hard-coded gains
-#define ABIL_CHORES  290
+// formerly: #define ABIL_CHORES  290
 #define ABIL_SCAVENGING  291
 #define ABIL_BITE  292
+#define ABIL_COOK  293
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
 #define ABIL_TRICK_SHOTS  296
