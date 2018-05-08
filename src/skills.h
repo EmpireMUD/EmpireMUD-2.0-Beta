@@ -260,8 +260,8 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_CHRONOBLAST  277
 #define ABIL_DEATHTOUCH  278
 #define ABIL_DISPIRIT  279
-#define ABIL_ERODE  280
-#define ABIL_SCOUR  281
+// formerly: #define ABIL_ERODE  280
+// formerly: #define ABIL_SCOUR  281
 #define ABIL_SHADOWLASH  282
 #define ABIL_SOULCHAIN  283
 #define ABIL_STARSTRIKE  284
@@ -352,8 +352,8 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ATTACK_CHRONOBLAST		(TYPE_SUFFERING + 21)
 #define ATTACK_DEATHTOUCH		(TYPE_SUFFERING + 22)
 #define ATTACK_DISPIRIT			(TYPE_SUFFERING + 23)
-#define ATTACK_ERODE			(TYPE_SUFFERING + 24)
-#define ATTACK_SCOUR			(TYPE_SUFFERING + 25)
+#define ATTACK_ERODE			(TYPE_SUFFERING + 24)	// currently unused
+#define ATTACK_SCOUR			(TYPE_SUFFERING + 25)	// currently unused
 #define ATTACK_SHADOWLASH		(TYPE_SUFFERING + 26)
 #define ATTACK_SOULCHAIN		(TYPE_SUFFERING + 27)
 #define ATTACK_STARSTRIKE		(TYPE_SUFFERING + 28)

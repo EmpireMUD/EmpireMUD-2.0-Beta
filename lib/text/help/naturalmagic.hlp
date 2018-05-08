@@ -36,8 +36,7 @@ decreasing the victim's magical resistance.
 #
 "ANCESTRAL HEALING"
 
-Ancestral Healing
-Natural Magic Synergy Ability: 100 Empire
+Ancestral Healing (Natural Magic ability)
 
 This passive ability channels the power of your ancestors to add your Greatness
 attribute to your Bonus-Healing trait, which affects all of your healing
@@ -373,22 +372,6 @@ Only one person in the room may be entangled at a time. Using the ability on a
 second person will release the first one.
 
 Gain experience when you cast this spell.
-#
-ERODE
-
-Erode
-Natural Magic Synergy Ability: 100 Empire
-
-Usage:  erode [victim]
-Cooldown:  9 seconds
-Cost:  based on damage
-Debuff type:  Natural Magic
-
-Erode causes the victim's skin to dry up and shed, like a cliffside in the
-wind. It causes great pain immediately, then continues to deal magical damage
-over time. This DoT effect stacks up to 3 times.
-
-See also: DOT
 #
 FAMILIAR
 

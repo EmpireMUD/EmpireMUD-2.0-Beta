@@ -418,21 +418,6 @@ Teleportation).
 
 See also: CITY TELEPORTATION, RITUAL
 #
-SCOUR
-
-Scour
-High Sorcery Synergy Ability: 100 Empire
-
-Usage:  scour [victim]
-Cooldown:  6 seconds
-Cost:  based on damage
-Debuff type:  High Sorcery
-
-Scour will scrub away at your opponent, damaging them magically over time (in
-addition to damage with the initial hit). This DoT stacks up to 5 times.
-
-See also: DOT
-#
 SHADOWLASH "SHADOW LASH"
 
 Shadowlash

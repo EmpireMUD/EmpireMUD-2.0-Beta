@@ -224,7 +224,7 @@ See also:  BOARD, LOAD, SHIPPING, UNLOAD
 #
 DRAINAGE "OASIS DRAINAGE" "DRAINED OASIS" "DRAIN OASIS" "DRAINING OASIS"
 
-&y.&c__&y.&0  Draining Oasis  (Elder Crafts ability)
+&y.&c__&y.&0  Draining Oasis  (Architect ability)
 
 By building drainage for an oasis, it can be converted into a normal desert.
 If the oasis was created using the 'excavate' command, you can alternatively use
@@ -244,16 +244,6 @@ to grow rare whitegrass in greater abundance.
 You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
-#
-"ELDER CRAFTS"
-
-Elder Crafts
-Empire Synergy Ability: 100 Survival
-
-This ability allows you to build the following buildings:
-  &y.&c__&y.&0 drainage  (built on oasis)
-
-See also: BUILD
 #
 "EXARCH CRAFTS"
 
