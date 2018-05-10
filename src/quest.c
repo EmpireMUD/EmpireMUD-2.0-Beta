@@ -2233,6 +2233,9 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
 			}
+			else if (task->type == REQ_OWN_HOMES && (bld = building_proto(vnum)) && GET_BLD_CITIZENS(bld) > 0) {
+				++task->current;
+			}
 		}
 	}
 }
@@ -2436,6 +2439,9 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 				--task->current;
 			}
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_HOMES && (bld = building_proto(vnum)) && GET_BLD_CITIZENS(bld) > 0) {
 				--task->current;
 			}
 			
