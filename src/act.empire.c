@@ -954,22 +954,29 @@ void show_new_goals(char_data *ch, empire_data *emp) {
 	struct empire_goal *goal, *next_goal;
 	char buf[MAX_STRING_LENGTH];
 	int iter, len, count;
+	progress_data *prg;
 	
-	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		count = 0;
 		msg_to_char(ch, "%s:", progress_types[iter]);
 		len = strlen(progress_types[iter]) + 1;
 		
 		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			if (!(prg = real_progress(goal->vnum))) {
+				continue;	// doesn't exist?
+			}
+			if (PRG_TYPE(prg) != iter) {
+				continue;	// wrong list
+			}
 			if ((emp != GET_LOYALTY(ch) || goal->timestamp < GET_LAST_GOAL_CHECK(ch)) && (goal->timestamp + (24 * SECS_PER_REAL_HOUR) < time(0))) {
 				continue;	// is not new
 			}
 			
 			++count;
-			strcpy(buf, get_progress_name_by_proto(goal->vnum));
+			strcpy(buf, PRG_NAME(prg));
 			if (len + strlen(buf) + 2 >= 80) {
 				msg_to_char(ch, "%s\r\n %s", count > 1 ? ", " : " ", buf);
-				len += strlen(buf) + 1;
+				len = strlen(buf) + 1;
 			}
 			else {	// fits on line
 				msg_to_char(ch, "%s%s", count > 1 ? ", " : " ", buf);
