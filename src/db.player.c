@@ -1599,6 +1599,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Last Corpse Id:", length)) {
 					GET_LAST_CORPSE_ID(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Last Goal Check:", length)) {
+					GET_LAST_GOAL_CHECK(ch) = atol(line + length + 1);
+				}
 				else if (PFILE_TAG(line, "Last Offense:", length)) {
 					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
 				}
@@ -2440,6 +2443,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	fprintf(fl, "Last Death: %ld\n", GET_LAST_DEATH_TIME(ch));
 	fprintf(fl, "Last Direction: %d\n", GET_LAST_DIR(ch));
+	fprintf(fl, "Last Goal Check: %ld\n", GET_LAST_GOAL_CHECK(ch));
 	fprintf(fl, "Last Known Level: %d\n", GET_LAST_KNOWN_LEVEL(ch));
 	fprintf(fl, "Last Room: %d\n", GET_LAST_ROOM(ch));
 	if (GET_LAST_TELL(ch) != NOBODY) {

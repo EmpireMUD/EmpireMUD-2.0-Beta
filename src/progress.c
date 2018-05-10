@@ -1019,6 +1019,7 @@ struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg) {
 	goal->vnum = PRG_VNUM(prg);
 	goal->version = PRG_VERSION(prg);
 	goal->tracker = copy_requirements(PRG_TASKS(prg));
+	goal->timestamp = time(0);
 	
 	HASH_ADD_INT(EMPIRE_GOALS(emp), vnum, goal);
 	refresh_one_goal_tracker(emp, goal);

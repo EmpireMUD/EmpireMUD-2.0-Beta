@@ -1343,6 +1343,7 @@ Usage:  progress [category]
         progress [goal name]
         progress buy [reward name]
         progress <completed | purchased> [category]
+        progress new
 
 This command shows your empire's current progress points, progression goals,
 and information about those goals. As your empire earns progress points, it can
@@ -1356,7 +1357,8 @@ Progression goals are automatically unlocked when your empires meets all the
 requirements. Use 'elog progress' to see previous goal achievements.
 
 You can buy rewards with 'rpgress buy [reward name]'. View your completed goals
-or purchased rewards with 'progress completed' and 'progress purchased'.
+or purchased rewards with 'progress completed' and 'progress purchased'. You
+can see if you have new goals with 'progress new'.
 
 See also: ELOG
 Immortals see also: UNPROGRESS

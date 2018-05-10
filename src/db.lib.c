@@ -2500,10 +2500,13 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						break;
 					}
 					case 'G': {	// GG: goal in progress
-						if (sscanf(line, "GG %d %d", &t[0], &t[1]) != 2) {
-							log("SYSERR: Format error in GG line of empire %d", vnum);
-							// fatal because it could mess up trackers
-							exit(1);
+						if (sscanf(line, "GG %d %d %ld", &t[0], &t[1], &long_in) != 3) {
+							long_in = time(0);	// backwards-compatible
+							if (sscanf(line, "GG %d %d", &t[0], &t[1]) != 2) {
+								log("SYSERR: Format error in GG line of empire %d", vnum);
+								// fatal because it could mess up trackers
+								exit(1);
+							}
 						}
 						
 						HASH_FIND_INT(EMPIRE_GOALS(emp), &t[0], egoal);
@@ -2513,6 +2516,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 							HASH_ADD_INT(EMPIRE_GOALS(emp), vnum, egoal);
 						}
 						egoal->version = t[1];
+						egoal->timestamp = long_in;
 						
 						last_egoal = egoal;
 						break;
@@ -2840,7 +2844,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// G: progression goals, tasks, and completed
 	HASH_ITER(hh, EMPIRE_GOALS(emp), egoal, next_egoal) {
 		// GG goal in progress
-		fprintf(fl, "GG %d %d\n", egoal->vnum, egoal->version);
+		fprintf(fl, "GG %d %d %ld\n", egoal->vnum, egoal->version, egoal->timestamp);
 		
 		// GT goal tracker
 		LL_FOREACH(egoal->tracker, task) {

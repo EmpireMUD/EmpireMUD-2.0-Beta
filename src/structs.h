@@ -3690,9 +3690,10 @@ struct player_special_data {
 	byte mapsize;	// how big the player likes the map
 	char custom_colors[NUM_CUSTOM_COLORS];	// for custom channel coloring, storing the letter part of the & code ('r' for &r)
 	
-	// quests
+	// quests and progression
 	struct player_quest *quests;	// quests the player is on (player_quest->next)
 	struct player_completed_quest *completed_quests;	// hash table (hh)
+	time_t last_goal_check;	// last time the player looked for new empire goals
 	
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
@@ -4152,6 +4153,7 @@ struct empire_goal {
 	any_vnum vnum;	// which progress goal
 	ush_int version;	// for auto-updating
 	struct req_data *tracker;	// tasks to track
+	time_t timestamp;	// when the goal was started
 	
 	UT_hash_handle hh;	// hashed by vnum
 };

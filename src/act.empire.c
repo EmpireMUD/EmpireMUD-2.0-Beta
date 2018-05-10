@@ -944,6 +944,48 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 
 
 /**
+* Displays recently-started empire goals to the character. This also clears
+* the last-goal-check time IF emp == ch's emp.
+*
+* @param char_data *ch The person to show it to.
+* @param empire_data *emp Which empire.
+*/
+void show_new_goals(char_data *ch, empire_data *emp) {
+	struct empire_goal *goal, *next_goal;
+	char buf[MAX_STRING_LENGTH];
+	int iter, len, count;
+	
+	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+		count = 0;
+		msg_to_char(ch, "%s:", progress_types[iter]);
+		len = strlen(progress_types[iter]) + 1;
+		
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			if ((emp != GET_LOYALTY(ch) || goal->timestamp < GET_LAST_GOAL_CHECK(ch)) && (goal->timestamp + (24 * SECS_PER_REAL_HOUR) < time(0))) {
+				continue;	// is not new
+			}
+			
+			++count;
+			strcpy(buf, get_progress_name_by_proto(goal->vnum));
+			if (len + strlen(buf) + 2 >= 80) {
+				msg_to_char(ch, "%s\r\n %s", count > 1 ? ", " : " ", buf);
+				len += strlen(buf) + 1;
+			}
+			else {	// fits on line
+				msg_to_char(ch, "%s%s", count > 1 ? ", " : " ", buf);
+				len += strlen(buf) + 2;
+			}
+		}
+		msg_to_char(ch, "%s\r\n", count ? "" : " none");
+	}
+	
+	if (GET_LOYALTY(ch) == emp) {
+		GET_LAST_GOAL_CHECK(ch) = time(0);
+	}
+}
+
+
+/**
 * Shows current workforce settings for one chore, to a character.
 *
 * @param empire_data *emp The empire whose settings to show.
@@ -5552,7 +5594,7 @@ ACMD(do_progress) {
 	progress_data *prg, *next_prg;
 	size_t size;
 	time_t when;
-	bool any;
+	bool any, new_goal;
 	
 	strcpy(buf, argument);
 	if (*argument && imm_access) {
@@ -5652,7 +5694,8 @@ ACMD(do_progress) {
 			}
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
-			snprintf(line, sizeof(line), "- %s%s, %d point%s (%d/%d)\r\n", vstr, PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total);
+			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
+			snprintf(line, sizeof(line), "- %s%s, %d point%s (%d/%d)%s\r\n", vstr, PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? " (new)" : "");
 			any = TRUE;
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {
@@ -5737,6 +5780,9 @@ ACMD(do_progress) {
 		}
 		
 		show_completed_goals(ch, emp, cat, TRUE);
+	}
+	else if (is_abbrev(arg, "new")) {
+		show_new_goals(ch, emp);
 	}
 	else if (!str_cmp(arg, "buy")) {
 		if (!*arg2) {	// display all purchasable goals
@@ -5856,6 +5902,7 @@ ACMD(do_progress) {
 		msg_to_char(ch, "       progress [goal name]\r\n");
 		msg_to_char(ch, "       progress buy [goal name]\r\n");
 		msg_to_char(ch, "       progress <completed | purchased> [category]\r\n");
+		msg_to_char(ch, "       progress new\r\n");
 	}
 }
 
