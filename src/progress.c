@@ -1217,6 +1217,10 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
+			else if (task->type == REQ_OWN_HOMES && (bld = building_proto(vnum)) && GET_BLD_CITIZENS(bld) > 0) {
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
 		}
 	}
 }
@@ -1332,6 +1336,10 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				--task->current;
 				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_HOMES && (bld = building_proto(vnum)) && GET_BLD_CITIZENS(bld) > 0) {
+				--task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
 	}
