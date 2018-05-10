@@ -1629,6 +1629,19 @@ ACMD(do_learn) {
 	else if (!*argument) {
 		msg_to_char(ch, "Learn what?\r\n");
 	}
+	else if (IS_IMMORTAL(ch) && is_number(arg)) {
+		// immortal learn: learn <vnum>
+		if (!(recipe = craft_proto(atoi(arg)))) {
+			msg_to_char(ch, "Invalid craft vnum '%s'.\r\n", arg);
+		}
+		else if (!CRAFT_FLAGGED(recipe, CRAFT_LEARNED)) {
+			msg_to_char(ch, "That is not a LEARNED-flagged craft.\r\n");
+		}
+		else {
+			add_learned_craft(ch, GET_CRAFT_VNUM(recipe));
+			msg_to_char(ch, "You have learned [%d] %s (%s).\r\n", GET_CRAFT_VNUM(recipe), GET_CRAFT_NAME(recipe), craft_types[GET_CRAFT_TYPE(recipe)]);
+		}
+	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}

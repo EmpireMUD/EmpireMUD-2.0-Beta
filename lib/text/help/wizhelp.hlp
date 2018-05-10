@@ -755,7 +755,9 @@ any immortal:
 - get: does not trigger item binding
 - get: immortals have few restrictions on stealing, and don't trigger distrust
 - give: can be given bound items
-- instances: can always enter an instance despite player limits; does not count toward the limit
+- instances: can always enter an instance despite player limits; does not count
+             toward the limit
+- learn: can specify a vnum to learn a LEARNED-flagged craft without a recipe
 - look at: can see items through conceal
 - look out: works from all rooms
 - look: can see people's real identity while disguised/morphed

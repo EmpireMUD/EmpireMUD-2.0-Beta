@@ -1045,6 +1045,8 @@ Learning a recipe will consume the recipe item.
 You can see your learned recipes with the 'learned' command and, optionally,
 can filter the results. Empire recipes come from progression goals.
 
+Immortals can 'learn <vnum>' to instantly learn and craft recipe.
+
 See also: RECIPES, PROGRESS
 #
 LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
