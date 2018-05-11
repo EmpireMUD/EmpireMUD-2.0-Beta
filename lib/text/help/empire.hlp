@@ -1196,21 +1196,6 @@ territory (based on progression), up to 3x its normal limit (for a total of
 
 See also: EXCHANGE, MINT, VAULT, SECRET CACHE
 #
-WINDSTRIDE WINDSTRIDING
-
-Windstride (Empire ability)
-
-Usage:  windstride
-Cooldown:  10 minutes
-Linked trait:  Greatness
-
-Windstride gives you a huge temporary boost to move regeneration, allowing you
-to reach the highest peaks of your empire with ease.
-
-If you have the Ride ability, Windstride also allows you to ride flying mounts.
-
-See also: RIDE
-#
 WITHDRAW
 
 Usage:  withdraw <number> coins
