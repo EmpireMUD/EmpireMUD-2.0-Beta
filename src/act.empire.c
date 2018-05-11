@@ -2007,6 +2007,7 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 #define DIPF_NOT_MUTUAL_WAR  BIT(3)	// Won't work if mutual_war_only is set
 #define DIPF_ALLOW_FROM_NEUTRAL  BIT(4)	// Can be used if no relations at all
 #define DIPF_REQUIRES_OFFENSE  BIT(5)	// only allowed if an offense threshold is reached ('offense_min_to_war')
+#define DIPF_REQUIRES_TRADE_ROUTES  BIT(6)	// requires the trade-routes tech on both sides
 
 struct diplomacy_type {
 	char *keywords;	// keyword list (first word is displayed to players, any word matches)
@@ -2021,7 +2022,7 @@ struct diplomacy_type {
 	
 	{ "alliance ally", DIPL_ALLIED, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_NONAGGR, NOBITS, "propose or accept a full alliance" },
 	{ "nonaggression pact", DIPL_NONAGGR, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_TRUCE | DIPL_PEACE, DIPF_ALLOW_FROM_NEUTRAL, "propose or accept a pact of non-aggression" },
-	{ "trade trading", DIPL_TRADE, NOBITS, NOBITS, DIPF_ALLOW_FROM_NEUTRAL, "propose or accept a trade agreement" },
+	{ "trade trading", DIPL_TRADE, NOBITS, NOBITS, DIPF_ALLOW_FROM_NEUTRAL | DIPF_REQUIRES_TRADE_ROUTES, "propose or accept a trade agreement" },
 	{ "distrust", DIPL_DISTRUST, ALL_DIPLS, NOBITS, DIPF_UNILATERAL, "declare that your empire distrusts, but is not at war with, another" },
 	
 	{ "war", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_UNILATERAL | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE | DIPF_NOT_MUTUAL_WAR | DIPF_REQUIRES_OFFENSE, "declare war on an empire!" },
@@ -3656,6 +3657,9 @@ ACMD(do_diplomacy) {
 	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && EMPIRE_ADMIN_FLAGGED(ch_emp, EADM_NO_WAR)) {
 		msg_to_char(ch, "Your empire has been forbidden from declaring unilateral %s.\r\n", fname(diplo_option[type].keywords));
 	}
+	else if (IS_SET(diplo_option[type].flags, DIPF_REQUIRES_TRADE_ROUTES) && !EMPIRE_HAS_TECH(ch_emp, TECH_TRADE_ROUTES)) {
+		msg_to_char(ch, "The empire needs the Trade Routes progression perk for you to initiate trade.\r\n");
+	}
 	
 	// empire validation
 	else if (!*emp_arg) {
@@ -3674,6 +3678,9 @@ ACMD(do_diplomacy) {
 	}
 	else if (ch_emp == vict_emp) {
 		msg_to_char(ch, "You can't engage in diplomacy with your own empire!\r\n");
+	}
+	else if (IS_SET(diplo_option[type].flags, DIPF_REQUIRES_TRADE_ROUTES) && !EMPIRE_HAS_TECH(vict_emp, TECH_TRADE_ROUTES)) {
+		msg_to_char(ch, "That empire has no Trade Routes.\r\n");
 	}
 	
 	// cancel? (has its own logic not based on current relations)
@@ -5283,7 +5290,7 @@ ACMD(do_import) {
 		msg_to_char(ch, "Immortal empires cannot trade.\r\n");
 	}
 	else if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
-		msg_to_char(ch, "The empire needs the Trade Routes technology for you to do that.\r\n");
+		msg_to_char(ch, "The empire needs the Trade Routes progression perk for you to do that.\r\n");
 	}
 	else if (is_abbrev(arg, "analyze") || is_abbrev(arg, "analysis")) {
 		do_import_analysis(ch, emp, argument, subcmd);

@@ -219,7 +219,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SAGE_WEREWOLF_FORM  214
 #define ABIL_ANIMAL_FORMS  215
 #define ABIL_REFASHION  216
-#define ABIL_TRADE_ROUTES  217
+// formerly: #define ABIL_TRADE_ROUTES  217
 #define ABIL_RESURRECT  219
 #define ABIL_MOONRISE  220
 #define ABIL_SANGUINE_RESTORATION  226

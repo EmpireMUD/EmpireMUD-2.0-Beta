@@ -252,27 +252,6 @@ with that empire.
 
 See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY
 #
-COMMERCE
-
-Commerce (Empire ability)
-
-The Commerce ability allows your empire to trade globally, increasing its
-influence. The empire can now gain additional territory from its Wealth, up to
-3x its normal limit (for a total of 4x). Only one member of the empire must have
-this ability to gain the benefit. There is no additional benefit to more members
-having it.
-
-The amount of territory you gain from wealth is not linear -- it decreases as
-you gain more.
-
-Commerce also allows you to build the mint building, and mint your own coins:
-
-[MM] mint
-
-Gain experience by building mints, and passively over time.
-
-See also: BUILD, MINT, TERRITORY, WEALTH
-#
 "CUSTOMIZE BUILDING"
 
 Customize Building (Empire ability)
@@ -357,7 +336,7 @@ You can deposit coins in your empire's vault. Foreign coins are always
 exchanged for local currency at the current exchange rate, and stored as local
 currency.
 
-See also: COMMERCE, EXCHANGE, MINT, VAULT, WITHDRAW
+See also: EXCHANGE, MINT, VAULT, WITHDRAW
 #
 DIPLOMACY PEACE WAR ALLIANCE TRUCE DISTRUST
 
@@ -639,6 +618,7 @@ Usage:  <import | export> list [empire]
         <import | export> analyze <item name>
         import add <at most cost> <under limit> <item name>
         export add <at least cost> <over limit> <item name>
+Requires:  Trade Routes goal
 
 If your empire has Trade Routes, you can set up import and export rules to
 automatically exchange goods for coins with any empire you have trade relations
@@ -660,7 +640,7 @@ another item is matching the name, try having the correct item in your own
 inventory. This command will try to match an item in your inventory before
 searching the item database.
 
-See also: COINS, TRADE ROUTES
+See also: COINS
 #
 FAME
 
@@ -1162,7 +1142,7 @@ see this broken down on the empire details.
 * Wealth: After unlocking the correct progression rewards, wealth contributes
       to territory. You can gain wealth by storing precious metals in your
       vault. The amount of territory from wealth is not linear. Max territory
-      from commerce is equal to 3x normal territory.
+      from wealth is equal to 3x normal territory.
 
 Most territory must be location within an empire's cities. 35% of your total
 territory can be on the outskirts of cities (up to 4x city radius), and another
@@ -1178,7 +1158,7 @@ outskirts.
 When an empire's members start to time out from lack of gameplay, the empire
 may start losing territory.
 
-See also: CITIES, COMMERCE, EMPIRE TIMEOUT, TERRITORY COMMAND, ESTATS
+See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 
@@ -1255,29 +1235,6 @@ Available technologies are:
 
 See also: TERRITORY
 #
-"TRADE ROUTES"
-
-Trade Routes (Empire ability)
-
-Buildings:
- [$$] tradingpost
-
-Commands:  import, export, trade
-
-Trade Routes allows the empire to automate trade with other empires. You must
-have trade relations with empires in order to import or export goods with them.
-Use the import and export commands to configure your trade rules. You can only
-import and export resources from normal storage.
-
-You can also build trading posts, which grant you access to the global trade
-of unique items.
-
-Trade Routes counts as a technology.
-
-Gain experience by building trading posts, not by trading.
-
-See also: DIPLOMACY, EXPORT, IMPORT, TECHNOLOGY, WAREHOUSE, TRADING POST
-#
 TRAITS "EMPIRE TRAITS" "CITY TRAITS" "FRONTIER TRAITS"
 
 Usage:  eedit frontiertraits [add | remove] <trait(s)>
@@ -1335,11 +1292,11 @@ WEALTH
 An empire's Wealth is determined by the amount of precious metal and coins in
 its vaults (or secret cache).
 
-With the Commerce ability, this wealth adds to the empire's territory at a
-rate of 1 territory per 10 wealth, up to 3x its normal limit (for a total of
+With the correct progression rewards, this wealth adds to the empire's
+territory (based on progression), up to 3x its normal limit (for a total of
 4x).
 
-See also: COMMERCE, EXCHANGE, MINT, VAULT, SECRET CACHE
+See also: EXCHANGE, MINT, VAULT, SECRET CACHE
 #
 WINDSTRIDE WINDSTRIDING
 
@@ -1364,7 +1321,7 @@ Privileged empire members may withdraw coins from the empire's vaults. You can
 only withdraw coins minted by that empire; no empire hoards other types of
 coins.
 
-See also: COMMERCE, DEPOSIT, EXCHANGE, MINT
+See also: DEPOSIT, EXCHANGE, MINT
 #
 WORKFORCE "SKILLED LABOR"
 

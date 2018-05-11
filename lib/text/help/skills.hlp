@@ -286,7 +286,7 @@ MINT
 
 Mint (Basic Crafts ability)
 
-Building:  [MM]  Mint  (Commerce ability)
+Building:  [MM]  Mint  (Trade Routes goal)
 Fame:  5
 Speed boosts:  Faster Chores bonus
 Command:  mint <object>
@@ -295,7 +295,7 @@ The mint building allows you to mint valuable metals into coins. Each building
 can only mint coins for the empire it belongs to. The mint command will auto-
 repeat; stopping the action will give you back the item you were minting.
 
-See also: COINS, COMMERCE, STOP
+See also: COINS, STOP
 #
 MORPH MORPHING SHAPESHIFTING FASTMORPH
 

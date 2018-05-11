@@ -555,9 +555,6 @@ void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 	if (has_ability(ch, ABIL_SKILLED_LABOR)) {
 		EMPIRE_TECH(emp, TECH_SKILLED_LABOR) += mod;
 	}
-	if (has_ability(ch, ABIL_TRADE_ROUTES)) {
-		EMPIRE_TECH(emp, TECH_TRADE_ROUTES) += mod;
-	}
 	if (has_ability(ch, ABIL_LOCKS)) {
 		EMPIRE_TECH(emp, TECH_LOCKS) += mod;
 	}
