@@ -849,7 +849,7 @@ See also: COMPONENT, COOK, FRUIT
 #
 WAREHOUSE
 
-Building:  {WW}  Warehouse  (Artisans skill)
+Building:  {WW}  Warehouse  (Foundations goal)
 
 Command:  warehouse inventory [item keywords]
           warehouse identify <item keywords>
@@ -879,6 +879,6 @@ You retrieve a short sword (x4).
 Note: Immortals can see the warehouse lists for other empires using the syntax
 "warehouse inv <empire> [keywords]".
 
-See also: ARTISANS, KEEP, RETRIEVE, STORE, VAULT
+See also: KEEP, RETRIEVE, STORE, VAULT
 #
 $

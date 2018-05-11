@@ -41,27 +41,6 @@ Guard towers may only be built or upgraded inside of cities.
 
 See also: BUILD, RAISE ARMIES
 #
-ARTISANS "ARTISAN BUILDINGS"
-
-Artisans (Empire ability)
-
-The Artisans ability unlocks additional buildings.
-
-(AA) alchemist
-{BB} apiary
-(BB) bakery
-&c~&0--&c~&0 bridge
-(CC) carpenter
-(GG) glassblower
-|PP| pigeonpost
-(OO) oilmaker
-(TT) tailor
-[TT] tavern
-{WW} warehouse
-.==. steps
-
-See also: BUILD
-#
 BANNER
 
 The empire banner can be changed with the eedit command.

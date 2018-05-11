@@ -2,7 +2,7 @@ ALCHEMIST
 
 (Disambiguation: Did you mean HELP ALCHEMIST CRAFTS ?)
 
-(AA)  Alchemist  (Artisans ability)
+(AA)  Alchemist  (Foundations goal)
 
 Stored here:  herbs, poisons
 
@@ -14,7 +14,7 @@ See also: BREW, LABORATORY, MIX, STORAGE
 #
 APIARY APIARIES
 
-{BB}  Apiary  (Artisans ability)
+{BB}  Apiary  (Foundations goal)
 
 Apiaries are used as hives for raising domestic bees. They produce honey and
 wax for the empire. Some crafts require that the empire have access to these
@@ -36,7 +36,7 @@ See also: SUMMON PLAYER
 #
 BAKERY
 
-(BB)  Bakery  (Artisans ability)
+(BB)  Bakery  (Foundations goal)
 
 The bakery is a warm, pleasant building that always smells of fresh breads.
 You can use its oven to cook all manner of foods.
@@ -69,7 +69,7 @@ See also:  BATHE
 #
 BRIDGE
 
-&c~~&0|&c~&0  Bridge  (Artisans ability)
+&c~~&0|&c~&0  Bridge  (???)
 
 Once completed, a bridge allows you to cross river tiles without a boat. You
 can also sail ships under the bridges. Nobody knows how.
@@ -120,7 +120,7 @@ See also: STORAGE
 #
 CARPENTER
 
-(CC)  Carpenter  (Artisans ability)
+(CC)  Carpenter  (Foundations goal)
 
 The carpenter is a workshop for all manner of crafts. Certain craft items,
 such as wagons, require a carpenter shop for you to build them in.
@@ -349,7 +349,7 @@ See also: INFILTRATE, PUBLICIZE, WALL
 #
 GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 
-(GG)  Glass Blower  (Artisans ability)
+(GG)  Glass Blower  (Foundations goal)
 
 The glass blower is an artisan shop that creates flasks, vials, panes, and
 many other glass items for the empire. This building's function is passive --
@@ -598,7 +598,7 @@ See also: PICK
 #
 OILMAKER "OIL MAKER"
 
-(OO)  Oilmaker  (Artisans ability)
+(OO)  Oilmaker  (Foundations goal)
 
 Stored here:  oil
 
@@ -628,7 +628,7 @@ Parks are a pleasant place to spend the day.
 #
 PIGEONPOST "PIGEON POST"
 
-|PP|  Pigeon Post  (Artisans ability)
+|PP|  Pigeon Post  (Foundations goal)
 
 The Pigeon Post is a service that uses highly-trained birds to send mail across
 the world. You can receive mail anywhere, but must send it from the Post.
@@ -800,7 +800,7 @@ See also: DEDICATE
 #
 STEPS
 
-.==.  Steps  (Artisans ability)
+.==.  Steps  (Foundations goal)
 
 Steps are similar to roads, but indicate rising terrain. These might be the
 steps to a great monument, or merely the main street of a town on a hillside.
@@ -878,7 +878,7 @@ See also: SWAMP ENGINEERING
 #
 TAILOR
 
-(TT)  Tailor  (Artisans ability)
+(TT)  Tailor  (Foundations goal)
 
 Stored here:  cotton, wool, cloth
 Command:  weave
@@ -907,7 +907,7 @@ See also: STORAGE, TAN
 #
 TAVERN
 
-Tavern building (Artisans skill)
+Tavern building (Foundations goal skill)
 
 Building:  [TT]  Tavern
 Command:  tavern [type]
