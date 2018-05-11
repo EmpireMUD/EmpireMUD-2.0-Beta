@@ -5599,6 +5599,7 @@ ACMD(do_progress) {
 	struct empire_goal *goal, *next_goal;
 	int cat, total, complete, bought, num;
 	progress_data *prg, *next_prg;
+	struct progress_list *prereq;
 	size_t size;
 	time_t when;
 	bool any, new_goal;
@@ -5865,7 +5866,7 @@ ACMD(do_progress) {
 			*vstr = '\0';
 		}
 		
-		msg_to_char(ch, "%s%s\r\n%s", vstr, PRG_NAME(prg), NULLSAFE(PRG_DESCRIPTION(prg)));
+		msg_to_char(ch, "%s%s%s\t0\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), NULLSAFE(PRG_DESCRIPTION(prg)));
 		
 		if (PRG_VALUE(prg) > 0) {
 			msg_to_char(ch, "Value: %d point%s\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
@@ -5890,7 +5891,10 @@ ACMD(do_progress) {
 			msg_to_char(ch, "Completed %s.\r\n", buf);
 		}
 		else if (!empire_meets_goal_prereqs(emp, prg)) {
-			msg_to_char(ch, "You have not met the prerequisites for this goal.\r\n");
+			msg_to_char(ch, "Requires:");
+			LL_FOREACH(PRG_PREREQS(prg), prereq) {
+				msg_to_char(ch, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "\tg" : "\ty", get_progress_name_by_proto(prereq->vnum));
+			}
 		}
 		
 		if (PRG_PERKS(prg)) {
