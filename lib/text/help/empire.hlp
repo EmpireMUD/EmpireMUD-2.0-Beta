@@ -1062,18 +1062,6 @@ High-level immortals can also target other empires with this command.
 
 See also: CLASS, WHO
 #
-SEAFARING "SEAFARING BUILDINGS"
-
-Seafaring (Empire ability)
-
-The Seafaring ability unlocks additional buildings.
-
-&b~&0==&g.&0 docks
-&b~&0()&b~&0 shipyard
-&b~&0[]&b~&0   upgraded shipyard
-
-See also: BUILD, MANUFACTURE, UPGRADE
-#
 SILVER GOLD COPPER
 
 Copper, silver, and gold are found in mines, although more rarely than iron

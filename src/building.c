@@ -2373,6 +2373,9 @@ ACMD(do_upgrade) {
 		else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
 			msg_to_char(ch, "You don't have the required ability to upgrade this building.\r\n");
 		}
+		else if (CRAFT_FLAGGED(type, CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(type))) {
+			msg_to_char(ch, "You have not learned the correct recipe to upgrade this building.\r\n");
+		}
 		else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
 			msg_to_char(ch, "You can only upgrade this building in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");
 		}

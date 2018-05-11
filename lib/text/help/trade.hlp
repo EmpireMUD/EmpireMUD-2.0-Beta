@@ -25,7 +25,7 @@ See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
 
 Advanced Ships (Trade ability)
 
-Building:  &b~&0[]&b~&0  Upgraded Shipyard (Seafaring ability)
+Building:  &b~&0[]&b~&0  Upgraded Shipyard (??? goal)
 Fame:  4
 Commands:  manufacture <ship>
            manufacture info <ship>
@@ -921,7 +921,7 @@ SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "SHIP LIST"
 
 Shipbuilding (Trade ability)
 
-Building:  &b~&0()&b~&0  Shipyard (Seafaring ability)
+Building:  &b~&0()&b~&0  Shipyard (Seafarers goal)
 Commands:  manufacture <ship>
            manufacture info <ship>
 
