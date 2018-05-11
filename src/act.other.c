@@ -2653,8 +2653,8 @@ ACMD(do_summon) {
 	const int human_vnums[] = { HUMAN_MALE_1, HUMAN_MALE_2, HUMAN_FEMALE_1, HUMAN_FEMALE_2 };
 	const int num_human_vnums = 4;
 	
-	// non-ability summons (must be unique and negative:
-	const int SUMMON_GUARDS = -10;
+	// non-ability summons (must be unique and negative):
+	#define SUMMON_GUARDS  -10
 	
 	argument = one_argument(argument, arg);
 	
