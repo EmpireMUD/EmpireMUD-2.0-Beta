@@ -414,11 +414,8 @@ void point_update_char(char_data *ch) {
 		if (emp) {
 			gain_ability_exp(ch, ABIL_LOCKS, 1);
 		}
-		// city lights after dark
-		if (weather_info.sunlight == SUN_DARK) {
-			gain_ability_exp(ch, ABIL_CITY_LIGHTS, 2);
-		}
-		else if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
+		// light-based gains
+		if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
 			gain_ability_exp(ch, ABIL_DAYWALKING, 2);
 		}
 		

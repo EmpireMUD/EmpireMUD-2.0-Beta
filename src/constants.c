@@ -1734,7 +1734,7 @@ const char *offense_flags[] = {
 // TECH_x
 const char *techs[] = {
 	"Glassblowing",
-	"Lights",
+	"City Lights",
 	"Locks",
 	"Apiaries",
 	"Seaport",

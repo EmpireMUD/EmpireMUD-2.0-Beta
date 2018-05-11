@@ -228,18 +228,6 @@ to measure distances from the center if you're using a screenreader.
 
 See also: MARK, CITY INFORMATION, CITY COMMANDS, PROGRESSION
 #
-"CITY LIGHTS"
-
-City Lights (Empire ability)
-
-When you purchase City Lights, your empire's citizens will keep all claimed
-territory well lit.
-
-There is no advantage to more than 1 member of an empire purchasing this
-ability.
-
-Gain experience passively if you're online at night.
-#
 CLAIM
 
 Usage:  claim [target]
@@ -1203,7 +1191,7 @@ effectiveness.
 
 Available technologies are:
  - Glassblowing*: allows you to craft various items which require glass
- - Lights: all claimed territory lights up at night
+ - City Lights: all claimed territory lights up at night
  - Locks: enemy infiltration is much more difficult
  - Apiaries*: lets you cook with honey and craft with wax
  - Seaport*: you have a dock!
