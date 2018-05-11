@@ -197,22 +197,23 @@ Battle synergy:
   Dire Wolf (melee) - Attacks the enemy.
   Moon Rabbit (healer) - Buffs the party.
 
-Empire synergy:
-  Manticore - Attacks the enemy.
-  Griffin - Tanks for the party.
-
 High Sorcery synergy:
+  Griffin (caster) - Tanks for the party.
   Phoenix (healer) - Buffs the party.
-  Caster has no familiar of its own.
 
 Stealth synergy:
+  Griffin (melee) - Tanks for the party.
+  Manticore (tank) - Attacks the enemy.
   Scorpion Shadow (melee) - Debuffs the enemy.
   Owl Shadow (healer) - Buffs the party.
 
 Survival synergy:
+  Griffin (caster/melee) - Tanks for the party.
   Basilisk - Debuffs the enemy.
 
 Trade synergy:
+  Griffin - Tanks for the party.
+  Manticore - Attacks the enemy.
   Salamander - Buffs the party.
 
 Vampire synergy:
@@ -449,7 +450,7 @@ See also: ARCANE POWER
 "GRIFFIN FAMILIAR"
 
 Griffin
-Natural Magic Synergy Ability: 100 Empire
+Natural Magic Synergy Ability: 100 Trade, High Sorcery, Survival, or Stealth
 Familiar type:  tank
 
 The griffin is a powerful familiar that will rescue party members in combat,
@@ -559,7 +560,7 @@ Gains experience when you cast this spell.
 "MANTICORE FAMILIAR"
 
 Manticore
-Natural Magic Synergy Ability: 100 Empire
+Natural Magic Synergy Ability: 100 Trade or Stealth
 Familiar type:  melee
 
 The manticore will assist you in combat, adding to the damage against your
