@@ -819,17 +819,17 @@ See also: DESIGNATE
 #
 SWAMPWALK "SWAMP WALK"
 
-&c~&0--&c~&0  Swamp Walk  (Swamp Engineering ability)
+&c~&0--&c~&0  Swamp Walk  (Swamp Engineering goal)
 
 The swamp walk, though never very stable, makes travel through the swamp
 much easier. Swamp animals may still harass you, but you will avoid random
 attacks by crocodilians. This can also be built on marshes.
 
-See also: BUILDING, SWAMP ENGINEERING
+See also: BUILDING
 #
 SWAMPHUT "SWAMP HUT"
 
-&c~&0/\&c~&0  Swamp Hut  (Swamp Engineering ability)
+&c~&0/\&c~&0  Swamp Hut  (Swamp Engineering goal)
 
 Extra rooms:  3
 Citizens:  2
@@ -837,11 +837,11 @@ Citizens:  2
 A swamp hut is a good-sized home supported on stilts above the swamp (or
 marsh).
 
-See also: DESIGNATE, SWAMP ENGINEERING
+See also: DESIGNATE
 #
 SWAMPMANOR "SWAMP MANOR"
 
-&c~&0[]&c~&0  Swamp Manor  (Swamp Engineering ability)
+&c~&0[]&c~&0  Swamp Manor  (Swamp Engineering goal)
 
 Extra rooms:  5
 Citizens:  4
@@ -849,11 +849,11 @@ Citizens:  4
 The swamp manor is a grand house that is built only in the swamp. It is fire-
 proof and comparable to a large house. You can also build this on marshes.
 
-See also: DESIGNATE, SWAMP ENGINEERING
+See also: DESIGNATE
 #
 SWAMPCOMPLEX "SWAMP COMPLEX"
 
-&c~&0()&c~&0  Swamp Complex  (Swamp Engineering ability)
+&c~&0()&c~&0  Swamp Complex  (Swamp Engineering goal)
 
 Extra rooms:  7, interlink
 Citizens:  2
@@ -863,11 +863,11 @@ A swamp complex is a well-hidden, large home that can only be built in the
 swamp. It is designed to be difficult to see from a distance. You can also
 build this on marshes.
 
-See also: DESIGNATE, SWAMP ENGINEERING
+See also: DESIGNATE
 #
 SWAMPPLATFORM "SWAMP PLATFORM"
 
-&c~&0__&c~&0  Swamp Platform  (Drainage Projects ability)
+&c~&0__&c~&0  Swamp Platform  (Drainage Projects goal)
 
 By building a sturdy platform on top of swampland (or marshland), you can
 effectively build "plains-only" buildings in the swamp. Once complete, the
