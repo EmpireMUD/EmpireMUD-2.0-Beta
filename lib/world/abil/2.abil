@@ -193,11 +193,6 @@ Steelsmith Crafts~
 0 -1 1.00 0 0
 T a 0
 S
-#242
-Guildsman Crafts~
-0 -1 1.00 0 0
-T a 0
-S
 #243
 Artificer Crafts~
 0 -1 1.00 0 0
@@ -300,11 +295,6 @@ S
 Chant of Illusions~
 0 -1 1.00 0 0
 S
-#266
-Elder Crafts~
-0 -1 1.00 0 0
-T a 0
-S
 #267
 Astral Werewolf Form~
 0 -1 1.00 0 0
@@ -359,14 +349,6 @@ S
 Dispirit~
 0 -1 1.00 0 0
 S
-#280
-Erode~
-0 -1 1.00 0 0
-S
-#281
-Scour~
-0 -1 1.00 0 0
-S
 #282
 Shadowlash~
 0 -1 1.00 0 0
@@ -397,13 +379,9 @@ Primitive Crafts~
 T a 0
 S
 #289
-Basic Buildings~
+Build~
 0 -1 1.00 0 0
 T a 0
-S
-#290
-Chores~
-0 -1 1.00 0 0
 S
 #291
 Scavenging~

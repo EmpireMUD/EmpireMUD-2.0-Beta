@@ -265,11 +265,6 @@ Artisans~
 0 -1 1.00 0 0
 T a 0
 S
-#40
-Housing~
-0 -1 1.00 0 0
-T a 0
-S
 #41
 Locksmithing~
 0 -1 1.00 0 0
@@ -308,10 +303,6 @@ S
 Grand Monuments~
 0 -1 1.00 0 0
 T a 0
-S
-#49
-Roads~
-0 -1 1.00 0 0
 S
 #50
 Advanced Ships~

@@ -38,7 +38,7 @@ K
 S
 #1
 Noble Birth~
-Raised to rule (Empire, Battle)~
+Raised to rule (Battle, Trade)~
 Left the manor in search of greatness~
 Lord~
 Lady~
@@ -68,9 +68,9 @@ G
 G
 21 2104  # a torch
 K
-1 20
+0 20
 K
-0 10
+6 10
 S
 #2
 Skilled Apprentice~
@@ -180,7 +180,7 @@ K
 S
 #5
 Tribal Leader~
-Rise from nothing (Empire, Survival)~
+Rise from nothing (Trade, Survival)~
 Left the tribe to seek greatness~
 Elder~
 Elder~
@@ -192,11 +192,11 @@ A
 A
 2 1
 A
-3 2
+3 3
 A
 4 2
 A
-5 3
+5 2
 G
 0 2001  # a leather hood
 G
@@ -210,9 +210,9 @@ G
 G
 21 2104  # a torch
 K
-1 15
-K
 5 15
+K
+6 15
 S
 #6
 Street Urchin~
@@ -388,7 +388,7 @@ K
 S
 #11
 Reclusive Baron~
-A vampire noble from an old family (Vampire, Empire)~
+A vampire noble from an old family (Vampire skill)~
 Became a recluse~
 Baron~
 Baroness~
@@ -418,9 +418,7 @@ G
 G
 21 2104  # a torch
 K
-7 15
-K
-1 15
+7 30
 S
 #12
 Herbalist~
