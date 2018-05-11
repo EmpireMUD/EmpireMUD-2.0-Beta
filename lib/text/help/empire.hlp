@@ -105,6 +105,8 @@ Basic buildings:
   (MM) mill
   (PP) potter
   (SS) stable
+  .&g^&?.&co&0 park
+  .{}. shrine
   vvvv fence
   vxvv gate
   {CC} cannery -- store fruits
@@ -632,11 +634,11 @@ See also: COINS
 #
 FAME
 
-Empires gain Fame by building great monuments. This trait is currently only
-used for the Fame component of empire score, and for the "Most Famous Empire"
-leaderboard (shown when you quit).
+Empires gain Fame by building great monuments. This trait is required to
+complete some progression goals, and for the "Most Famous Empire" leaderboard
+(shown when you quit).
 
-See also: EMPIRE SCORE
+See also: EMPIRE SCORE, PROGRESS
 #
 FINDMAINTENANCE "FIND MAINTENANCE"
 
@@ -679,7 +681,7 @@ The Grand Monuments ability allows you to build the largest monuments.
 [||] hightemple
 &y/^^\&0 pyramid
 
-See also: BUILD, MONUMENTS
+See also: BUILD
 #
 HAVENS "BUILD HAVENS"
 
@@ -758,7 +760,6 @@ The Luxury ability unlocks additional buildings.
 &g^/\^&0  trapperspost
 [&b~~&0]  baths  (in-city only)
 {&c~~&0}  fountain  (in-city only)
-&g.&b||&g.&0  sorcerytower  (in-city only)
 V[]V  portcullis  (in-city only)
 [**]  greathall  (in-city only)
 
@@ -809,23 +810,6 @@ Note: Players with extremely low average playtime may never count as active
 empire members.
 
 See also: ENROLL, PLEDGE, ROSTER, TERRITORY
-#
-MONUMENTS "MONUMENT BUILDINGS"
-
-Monuments (Empire ability)
-
-The Monuments ability allows you to build monuments.
-
-&g.&0}{&g.&0 statue
-<<>> henge
-&g.&0||&g.&0 megalith
-&g.&0i&g.&0i cemetery
-&g.^.&co&0 park
-[oo] tomb
-&g.&0{}&g.&0 shrine
-[[]] temple
-
-See also: BUILD, GRAND MONUMENTS
 #
 OFFENSES
 
@@ -1052,7 +1036,6 @@ The Swamp Engineering unlocks swamp walks (roads) and swamp buildings. These
 buildings can also be built on marshes.
 
 &c~&0--&c~&0  swampwalk  (road)
-&c~&0__&c~&0  swampplatform  (creates plains)
 &c~&0/\&c~&0  swamphut
 &c~&0[]&c~&0  swampmanor
 &c~&0()&c~&0  swampcomplex  (chameleon)

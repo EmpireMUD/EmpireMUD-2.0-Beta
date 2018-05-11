@@ -172,7 +172,7 @@ See also: CURRENCY
 #
 CEMETERY
 
-.i.i  Cemetery  (Monuments ability)
+.i.i  Cemetery  (Almost Famous goal)
 
 Cemeteries are a traditional place to bury the dead. When your character dies,
 you can re-spawn at a cemetery if your empire owns one on the same continent
@@ -224,7 +224,7 @@ See also:  BOARD, LOAD, SHIPPING, UNLOAD
 #
 DRAINAGE "OASIS DRAINAGE" "DRAINED OASIS" "DRAIN OASIS" "DRAINING OASIS"
 
-&y.&c__&y.&0  Draining Oasis  (Architect ability)
+&y.&c__&y.&0  Draining Oasis  (Drainage Projects goal)
 
 By building drainage for an oasis, it can be converted into a normal desert.
 If the oasis was created using the 'excavate' command, you can alternatively use
@@ -265,9 +265,9 @@ grave marker. When you build your first city, you can use this item to build
 a grave for yourself. Use the 'tomb' command to set it as your tomb, and you
 will respawn there if you die nearby. This will save you a walk back.
 
-To build a more permanent grave, learn the Monuments ability.
+You can learn to build more permanent graves later.
 
-See also: BUILD, MONUMENTS, TOMB
+See also: BUILD, TOMB
 #
 "GREAT HALL" GREATHALL
 
@@ -418,7 +418,7 @@ See also: CIRCLE, RAISE ARMIES, ADVANCED TACTICS
 #
 HENGE "STONE HENGE"
 
-<<>>  Henge (Monuments ability)
+<<>>  Henge (Henge Construction goal)
 
 Fame:  4
 
@@ -531,7 +531,7 @@ See also: STORAGE
 #
 MEGALITH
 
-&g.&0||&g.&0  Megalith  (Monuments ability)
+&g.&0||&g.&0  Megalith  (Almost Famous goal)
 
 Fame:  1
 
@@ -622,7 +622,7 @@ See also: PAINT, QUEST
 #
 PARK
 
-&g.^.&co&0  Park  (Monuments ability)
+&g.^.&co&0  Park  (Build ability)
 
 Parks are a pleasant place to spend the day.
 #
@@ -678,7 +678,7 @@ See also: DESIGNATE
 #
 PYRAMID
 
-&y/^^\&0  Pyramid  (Grand Monuments)
+&y/^^\&0  Pyramid  (Grand Monuments ability)
 
 Fame:  15
 
@@ -752,7 +752,7 @@ See also: PICK
 #
 SHRINE
 
-.{}.  Shrine  (Monuments ability)
+.{}.  Shrine  (Build ability)
 
 Fame:  1
 
@@ -789,7 +789,7 @@ See also: BARDE, MILK, SHEAR
 #
 STATUE
 
-.}{.  Statue  (Monuments ability)
+.}{.  Statue  (Almost Famous goal)
 
 Fame:  2
 
@@ -867,14 +867,12 @@ See also: DESIGNATE, SWAMP ENGINEERING
 #
 SWAMPPLATFORM "SWAMP PLATFORM"
 
-&c~&0__&c~&0  Swamp Platform  (Swamp Engineering ability)
+&c~&0__&c~&0  Swamp Platform  (Drainage Projects ability)
 
 By building a sturdy platform on top of swampland (or marshland), you can
 effectively build "plains-only" buildings in the swamp. Once complete, the
 platform becomes an ordinary plains. If you don't build on it soon, though,
 the swamp will re-claim it.
-
-See also: SWAMP ENGINEERING
 #
 TAILOR
 
@@ -929,7 +927,7 @@ Brewing takes 5 of each ingredient at a time.
 #
 TEMPLE
 
-[[]]  Temple  (Monuments ability)
+[[]]  Temple  (Almost Famous goal)
 
 Fame:  4
 
@@ -954,7 +952,7 @@ See also: PICK
 #
 TOMB
 
-[oo]  Tomb  (Monuments ability)
+[oo]  Tomb  (Almost Famous goal)
 
 Fame:  1
 
@@ -972,7 +970,7 @@ See also: CEMETERY, STARTING LOCATION
 #
 "TOWER OF SORCERY" TOWEROFSORCERY SORCERYTOWER "SORCERY TOWER"
 
-&g.&b||&g.&0  Tower of Sorcery  (Luxury ability)
+&g.&b||&g.&0  Tower of Sorcery  (Sorcery Tower Construction goal)
 
 Extra rooms:  1
 Special rooms: sorcery tower, skybridge
