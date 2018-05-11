@@ -211,6 +211,8 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	void remove_learned_craft(char_data *ch, any_vnum vnum);
 	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 	
+	struct progress_perk *perk, *next_perk;
+	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
@@ -263,12 +265,32 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 		}
 	}
 	
+	// update progression
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
+			if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
+				LL_DELETE(PRG_PERKS(prg), perk);
+				free(perk);
+				save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			}
+		}
+	}
+	
 	// olc editor updates
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_OBJECT(desc)) {
 			if (IS_RECIPE(GET_OLC_OBJECT(desc)) && GET_RECIPE_VNUM(GET_OLC_OBJECT(desc)) == vnum) {
 				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_RECIPE_VNUM) = 0;
 				msg_to_char(desc->character, "The recipe used by the item you're editing was deleted.\r\n");
+			}
+		}
+		else if (GET_OLC_PROGRESS(desc)) {
+			LL_FOREACH_SAFE(PRG_PERKS(GET_OLC_PROGRESS(desc)), perk, next_perk) {
+				if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
+					LL_DELETE(PRG_PERKS(GET_OLC_PROGRESS(desc)), perk);
+					free(perk);
+					save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(GET_OLC_PROGRESS(desc)));
+				}
 			}
 		}
 	}
@@ -289,6 +311,8 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	craft_data *craft = craft_proto(vnum);
+	struct progress_perk *perk, *next_perk;
+	progress_data *prg, *next_prg;
 	obj_data *obj, *next_obj;
 	int size, found;
 	
@@ -305,6 +329,17 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+	
+	// progression
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
+			if (perk->type == PRG_PERK_CRAFT && perk->value == vnum) {
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+				break;
+			}
 		}
 	}
 	
