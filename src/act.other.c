@@ -2644,7 +2644,7 @@ ACMD(do_summon) {
 	char_data *mob;
 	int vnum = NOTHING, ability = NO_ABIL, iter, max = 1, cost = 0;
 	empire_data *emp = NULL;
-	bool follow = FALSE, familiar = FALSE, charm = FALSE, local = FALSE;
+	bool junk, follow = FALSE, familiar = FALSE, charm = FALSE, local = FALSE;
 	int count, cooldown = NOTHING, cooldown_time = 0, cost_type = MOVE, gain = 20;
 	
 	const int animal_vnums[] = { DOG, CHICKEN, QUAIL };
@@ -2820,8 +2820,8 @@ ACMD(do_summon) {
 				msg_to_char(ch, "You must be in an empire to summon guards.\r\n");
 				return;
 			}
-			if (GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
-				msg_to_char(ch, "You can only summon guards in your empire's territory.\r\n");
+			if (GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch)) || get_territory_type_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), FALSE, &junk) == TER_FRONTIER) {
+				msg_to_char(ch, "You can only summon guards in your empire's cities and outskirts.\r\n");
 				return;
 			}
 

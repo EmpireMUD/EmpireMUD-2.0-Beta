@@ -1044,20 +1044,6 @@ empires, however, prefer to use material goods instead.
 
 See also: RARE METALS, SMELT, SEPARATE
 #
-"SUMMON GUARDS"
-
-Summon Guards (Empire ability)
-
-Usage:  summon guards
-Cooldown:  3 minutes
-Cost:  25 move
-
-This ability summons up to (Charisma / 2, rounded down) guards. They aren't
-very strong, but they count as city guards and will attack intruders and
-hostile mobs. You can only use this in your empire's own territory.
-
-Using this ability will gain experience, even if you fail to summon any guards.
-#
 "SWAMP ENGINEERING" SWAMP MARSH
 
 Swamp Engineering (Empire ability)
