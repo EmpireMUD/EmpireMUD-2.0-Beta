@@ -1160,7 +1160,8 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_EXARCH_CRAFTS  12
 #define TECH_DEEP_MINES  13
 #define TECH_RARE_METALS  14
-#define NUM_TECHS  15
+#define TECH_BONUS_EXPERIENCE  15
+#define NUM_TECHS  16
 
 
 // TER_x: territory types for empire arrays

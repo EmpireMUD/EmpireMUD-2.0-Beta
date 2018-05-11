@@ -1748,6 +1748,7 @@ const char *techs[] = {
 	"Exarch Crafts",
 	"Deep Mines",
 	"Rare Metals",
+	"Bonus Experience",
 	"\n"
 };
 

@@ -804,6 +804,10 @@ int compute_bonus_exp_per_day(char_data *ch) {
 		perdiem += config_get_int("num_bonus_trait_daily_skills");
 	}
 	
+	if (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_BONUS_EXPERIENCE)) {
+		perdiem += 5;
+	}
+	
 	return perdiem;
 }
 
