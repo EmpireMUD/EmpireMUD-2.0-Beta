@@ -594,8 +594,11 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 * use any ability. Otherwise, it supports an energy pool cost and/or cooldowns,
 * as well as checking that the player has the ability.
 *
+* This function will also provide its other functionality for non-abilities if
+* you pass NO_ABIL or a negative number to the ability parameter.
+*
 * @param char_data *ch The player or NPC.
-* @param any_vnum ability Any ABIL_ const or vnum.
+* @param any_vnum ability Any ABIL_ const or vnum (optional, may be NO_ABIL or a negative number to skip ability checks).
 * @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
 * @param int cost_amount Mana (or whatever) amount required, if any.
 * @param int cooldown_type Any COOLDOWN_ const, or NOTHING for no cooldown check.
@@ -608,7 +611,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 	int time, needs_cost;
 	
 	// purchase check first, or the rest don't make sense.
-	if (!IS_NPC(ch) && ability != NO_ABIL && !has_ability(ch, ability)) {
+	if (!IS_NPC(ch) && ability != NO_ABIL && ability >= 0 && !has_ability(ch, ability)) {
 		msg_to_char(ch, "You have not purchased the %s ability.\r\n", get_ability_name_by_vnum(ability));
 		return FALSE;
 	}
@@ -632,8 +635,8 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
 		return FALSE;
 	}
-	if ((time = get_cooldown_time(ch, cooldown_type)) > 0) {
-		snprintf(buf, sizeof(buf), "%s is still on cooldown for %d second%s.\r\n", get_ability_name_by_vnum(ability), time, (time != 1 ? "s" : ""));
+	if (cooldown_type != NOTHING && (time = get_cooldown_time(ch, cooldown_type)) > 0) {
+		snprintf(buf, sizeof(buf), "Your %s cooldown still has %d second%s.\r\n", get_generic_name_by_vnum(cooldown_type), time, (time != 1 ? "s" : ""));
 		CAP(buf);
 		send_to_char(buf, ch);
 		return FALSE;

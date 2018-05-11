@@ -1044,25 +1044,6 @@ empires, however, prefer to use material goods instead.
 
 See also: RARE METALS, SMELT, SEPARATE
 #
-"SUMMON BODYGUARD"
-
-Summon Bodyguard (Empire ability)
-
-Usage:  summon bodyguard
-Cooldown:  5 minutes
-Cost:  25 move
-
-This powerful ability allows an emperor to summon a bodyguard. The bodyguard
-is strong enough to protect against many dangerous situations. He will take
-simple orders and will rescue you in battle.
-
-The bodyguard counts as a familiar, and can be removed with the "dismiss"
-command.
-
-Gains experience when you summon your bodyguard.
-
-See also: DISMISS, ORDER
-#
 "SUMMON GUARDS"
 
 Summon Guards (Empire ability)

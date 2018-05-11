@@ -2653,6 +2653,9 @@ ACMD(do_summon) {
 	const int human_vnums[] = { HUMAN_MALE_1, HUMAN_MALE_2, HUMAN_FEMALE_1, HUMAN_FEMALE_2 };
 	const int num_human_vnums = 4;
 	
+	// non-ability summons (must be unique and negative:
+	const int SUMMON_GUARDS = -10;
+	
 	argument = one_argument(argument, arg);
 	
 	// types of summon
@@ -2674,14 +2677,14 @@ ACMD(do_summon) {
 		cooldown_time = 30;
 	}
 	else if (is_abbrev(arg, "guards")) {
-		ability = ABIL_SUMMON_GUARDS;
+		ability = SUMMON_GUARDS;
 		cooldown = COOLDOWN_SUMMON_GUARDS;
 		cooldown_time = 3 * SECS_PER_REAL_MIN;
 	}
 	else if (is_abbrev(arg, "bodyguard")) {
 		ability = ABIL_SUMMON_BODYGUARD;
 		cooldown = COOLDOWN_SUMMON_BODYGUARD;
-		cooldown_time = 5 * SECS_PER_REAL_MIN;
+		cooldown_time = 3 * SECS_PER_REAL_MIN;
 	}
 	else if (is_abbrev(arg, "thugs")) {
 		ability = ABIL_SUMMON_THUG;
@@ -2809,7 +2812,7 @@ ACMD(do_summon) {
 			local = TRUE;
 			break;
 		}
-		case ABIL_SUMMON_GUARDS: {
+		case SUMMON_GUARDS: {
 			cost = 25;
 			cost_type = MOVE;
 			
@@ -2868,7 +2871,8 @@ ACMD(do_summon) {
 		return;
 	}
 	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ability)) {
+	// check triggers only if a real ability
+	if (ability != NO_ABIL && ability >= 0 && ABILITY_TRIGGERS(ch, NULL, NULL, ability)) {
 		return;
 	}
 	
@@ -2878,7 +2882,7 @@ ACMD(do_summon) {
 	act("$n whistles loudly!", FALSE, ch, 0, 0, TO_ROOM);
 
 	for (iter = 0; iter < max; ++iter) {
-		if (skill_check(ch, ability, DIFF_MEDIUM)) {
+		if (ability == NO_ABIL || ability < 0 || skill_check(ch, ability, DIFF_MEDIUM)) {
 			mob = read_mobile(vnum, TRUE);
 			if (IS_NPC(ch)) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
@@ -2926,7 +2930,7 @@ ACMD(do_summon) {
 		}
 	}
 	
-	if (ability != NO_ABIL) {
+	if (ability != NO_ABIL && ability >= 0) {
 		gain_ability_exp(ch, ability, gain);
 	}
 }
