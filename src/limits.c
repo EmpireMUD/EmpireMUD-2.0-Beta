@@ -714,9 +714,6 @@ void real_update_char(char_data *ch) {
 			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
 		}
 		GET_DAILY_QUESTS(ch) = 0;
-		for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
-			GET_REWARDED_TODAY(ch, iter) = -1;
-		}
 		
 		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
 		

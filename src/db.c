@@ -1722,10 +1722,6 @@ void init_player_specials(char_data *ch) {
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	USING_POISON(ch) = NOTHING;
 	
-	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
-		GET_REWARDED_TODAY(ch, iter) = -1;
-	}
-	
 	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
 		CREATION_ARCHETYPE(ch, iter) = NOTHING;
 	}

@@ -2463,7 +2463,6 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
 #define MAX_REFERRED_BY_LENGTH  80
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
-#define MAX_REWARDS_PER_DAY  5	//  number of times a player can be rewarded
 #define MAX_ROOM_DESCRIPTION  4000
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_SLASH_CHANNEL_NAME_LENGTH  16
@@ -3719,7 +3718,6 @@ struct player_special_data {
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
 	ubyte daily_bonus_experience;	// boosted skill gain points
-	int rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 	int daily_quests;	// number of daily quests completed today
 
 	// action info

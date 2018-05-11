@@ -986,26 +986,6 @@ This command can be used to take ownership of a tile during war. You must be
 standing on the tile, and must already own 4 or more adjacent tiles. Reclaiming
 will take a little while, and can be interrupted by combat.
 #
-REWARD
-
-Reward (Empire ability)
-
-Usage:  reward <player>
-Cooldown:  30 seconds
-
-Great leaders can reward their loyal subjects with additional bonus experience
-each day. Each leader with Reward may only grant 5 rewards per day, and each
-reward must go to a different member of the empire. However, if two leaders
-have Reward, they may both choose to reward the same member.
-
-Each Reward gives a member of your empire +5 bonus experience for the day.
-
-You cannot reward yourself or your alts.
-
-This ability gains experience when you reward someone.
-
-See also: BONUS EXPERIENCE POINTS
-#
 ROSTER
 
 Usage:  roster [all]

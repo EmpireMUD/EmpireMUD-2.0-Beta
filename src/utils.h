@@ -1102,7 +1102,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_RECENT_DEATH_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->recent_death_count))
 #define GET_REFERRED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->referred_by))
 #define GET_RESOURCE(ch, i)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->resources[i]))
-#define GET_REWARDED_TODAY(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->rewarded_today[(pos)]))
 #define GET_SKILL_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skill_hash))
 #define GET_SKILL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skill_level))
 #define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))

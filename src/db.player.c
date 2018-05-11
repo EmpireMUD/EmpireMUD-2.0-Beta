@@ -1091,7 +1091,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
 	
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
-	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
+	int account_id = NOTHING, ignore_pos = 0;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct affected_type *af, *next_af, *af_list = NULL;
@@ -1857,9 +1857,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "Rewarded:", length)) {
-					if (reward_pos < MAX_REWARDS_PER_DAY) {
-						GET_REWARDED_TODAY(ch, reward_pos++) = atoi(line + length + 1);
-					}
+					// old data; ignore
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2521,11 +2519,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	for (iter = 0; iter < NUM_MATERIALS; ++iter) {
 		if (GET_RESOURCE(ch, iter) != 0) {
 			fprintf(fl, "Resource: %d %s\n", GET_RESOURCE(ch, iter), materials[iter].name);
-		}
-	}
-	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
-		if (GET_REWARDED_TODAY(ch, iter) > 0) {
-			fprintf(fl, "Rewarded: %d\n", GET_REWARDED_TODAY(ch, iter));
 		}
 	}
 	
@@ -3245,8 +3238,6 @@ void clean_old_history(char_data *ch) {
 * @param char_data *ch The player charater to clear.
 */
 void clear_player(char_data *ch) {
-	int iter;
-	
 	if (!ch) {
 		return;
 	}
@@ -3268,10 +3259,6 @@ void clear_player(char_data *ch) {
 	GET_LAST_TELL(ch) = NOBODY;
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
-	
-	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
-		GET_REWARDED_TODAY(ch, iter) = -1;
-	}
 }
 
 

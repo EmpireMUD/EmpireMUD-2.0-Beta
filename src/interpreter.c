@@ -340,7 +340,6 @@ ACMD(do_restore);
 ACMD(do_resurrect);
 ACMD(do_retrieve);
 ACMD(do_return);
-ACMD(do_reward);
 ACMD(do_ritual);
 ACMD(do_roadsign);
 ACMD(do_role);
@@ -917,7 +916,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "resurrect", POS_STANDING, do_resurrect, NO_MIN, CTYPE_SKILL, ABIL_RESURRECT ),
 	SIMPLE_CMD( "retrieve", POS_STANDING, do_retrieve, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "return", POS_DEAD, do_return, NO_MIN, CTYPE_IMMORTAL ),
-	ABILITY_CMD( "reward", POS_RESTING, do_reward, NO_MIN, CTYPE_SKILL, ABIL_REWARD ),
 	SIMPLE_CMD( "ride", POS_STANDING, do_mount, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "rite", POS_STANDING, do_ritual, NO_MIN, NO_GRANTS, SCMD_RITUAL, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "ritual", POS_STANDING, do_ritual, NO_MIN, NO_GRANTS, SCMD_RITUAL, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
