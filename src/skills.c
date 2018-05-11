@@ -4291,8 +4291,7 @@ OLC_MODULE(skilledit_tree) {
 				found = TRUE;
 			}
 			else if (abil && skab->prerequisite == ABIL_VNUM(abil)) {
-				LL_DELETE(SKILL_ABILITIES(skill), skab);
-				free(skab);
+				skab->prerequisite = NO_ABIL;
 				found = found_prq = TRUE;
 			}
 		}
@@ -4304,7 +4303,7 @@ OLC_MODULE(skilledit_tree) {
 			msg_to_char(ch, "You remove all abilities.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You remove the %s ability%s.\r\n", ABIL_NAME(abil), found_prq ? " (and things that required it)" : "");
+			msg_to_char(ch, "You remove the %s ability%s.\r\n", ABIL_NAME(abil), found_prq ? " (and things that required it no longer require anything)" : "");
 		}
 	}
 	else if (is_abbrev(cmd_arg, "change")) {
