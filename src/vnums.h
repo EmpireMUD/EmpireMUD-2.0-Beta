@@ -41,13 +41,14 @@
 
 #define BUILDING_STEPS  5140	// custom icons
 
-#define BUILDING_SWAMPWALK  5155
+#define BUILDING_SWAMPWALK  5155	// road icon
 
 #define BUILDING_TRAPPERS_POST  5161	// workforce.c
 
 #define BUILDING_GATEHOUSE  5173	// custom icons, rituals
 #define BUILDING_WALL  5174
 
+#define BUILDING_BOARDWALK  5206	// road icon
 
 // Room building vnums
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
