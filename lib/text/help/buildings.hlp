@@ -154,7 +154,7 @@ When you're done with the shelter, be sure to dismantle and abandon it.
 #
 CELESTIALFORGE "CELESTIAL FORGE"
 
-[FF]  Celestial Forge  (Grand Monuments ability)
+[FF]  Celestial Forge  (Renown goal)
 
 Command:  shatter <item to destroy>
 Fame:  5
@@ -431,7 +431,7 @@ See also: CHANT OF DRUIDS
 #
 HIGHTEMPLE "HIGH TEMPLE"
 
-[||]  High Temple  (Grand Monuments ability)
+[||]  High Temple  (Renown goal)
 
 Extra rooms: 5, interlink
 Fame:  10
@@ -678,7 +678,7 @@ See also: DESIGNATE
 #
 PYRAMID
 
-&y/^^\&0  Pyramid  (Grand Monuments ability)
+&y/^^\&0  Pyramid  (Renown goal)
 
 Fame:  15
 
