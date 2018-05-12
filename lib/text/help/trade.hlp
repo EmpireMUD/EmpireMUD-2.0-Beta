@@ -21,35 +21,6 @@ which set of skills to use.
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
   REFORGE, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
 #
-"ADVANCED SHIPS" "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIP LIST"
-
-Advanced Ships (Trade ability)
-
-Building:  &b~&0[]&b~&0  Upgraded Shipyard (??? goal)
-Fame:  4
-Commands:  manufacture <ship>
-           manufacture info <ship>
-
-The upgraded shipyard allows you to manufacture bigger, more powerful ships.
-
-With Advanced Ships you can manufacture:
-  Carrack
-    Type: Exploration ship (house boat)
-    Capacity: 400
-    Health: 96
-    Rooms: 8
-  Brigantine
-    Type: Warship (siege weapons)
-    Health: 128
-    Rooms: 4
-  Hulk
-    Type: Cargo ship (shipping)
-    Capacity: 1000
-    Health: 64
-    Rooms: 4
-
-See also: SHIPBUILDING, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
-#
 "ADVANCED WOODWORKING"
 
 Advanced Woodworking (Trade ability)
@@ -917,19 +888,20 @@ command.
 
 See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING, DISPATCH
 #
-SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "SHIP LIST"
+SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "SHIP LIST" "UPGRADED SHIPYARD"
 
 Shipbuilding (Trade ability)
 
 Building:  &b~&0()&b~&0  Shipyard (Seafarers goal)
+           &b~&0[]&b~&0  Upgraded Shipyard (Great Shipyard goal)
 Commands:  manufacture <ship>
            manufacture info <ship>
 
-Great ships can be created via the manufacture skill. This can only be done in
-a shipyard, and the vessel can be sailed to a dock when finished.
+Ships can be constructed via the manufacture command. This can only be done at
+a shipyard, and the vessel can be sailed to a dock when finished. You can also
+upgrade the shipyard, if your empire has this knowledge.
 
-You gain experience for the appropriate ability every time you add resources to
-a ship being manufactured.
+You gain experience every time you add resources to a ship being manufactured.
 
 With basic Shipbuilding you can manufacture:
   Caravel
