@@ -968,6 +968,9 @@ void show_new_goals(char_data *ch, empire_data *emp) {
 			if (PRG_TYPE(prg) != iter) {
 				continue;	// wrong list
 			}
+			if (PRG_FLAGGED(prg, PRG_HIDDEN)) {
+				continue;	// don't show
+			}
 			if ((emp != GET_LOYALTY(ch) || goal->timestamp < GET_LAST_GOAL_CHECK(ch)) && (goal->timestamp + (24 * SECS_PER_REAL_HOUR) < time(0))) {
 				continue;	// is not new
 			}
@@ -5646,7 +5649,7 @@ ACMD(do_progress) {
 			total += EMPIRE_PROGRESS_POINTS(emp, cat);
 		}
 		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
-			if ((prg = real_progress(goal->vnum))) {
+			if ((prg = real_progress(goal->vnum)) && !PRG_FLAGGED(prg, PRG_HIDDEN)) {
 				++counts[PRG_TYPE(prg)];
 			}
 		}
@@ -5697,7 +5700,7 @@ ACMD(do_progress) {
 		// show current goals
 		any = 0;
 		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
-			if (!(prg = real_progress(goal->vnum)) || PRG_TYPE(prg) != cat) {
+			if (!(prg = real_progress(goal->vnum)) || PRG_TYPE(prg) != cat || PRG_FLAGGED(prg, PRG_HIDDEN)) {
 				continue;
 			}
 			
@@ -5873,7 +5876,7 @@ ACMD(do_progress) {
 			*vstr = '\0';
 		}
 		
-		msg_to_char(ch, "%s%s%s\t0\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), NULLSAFE(PRG_DESCRIPTION(prg)));
+		msg_to_char(ch, "%s%s%s\t0%s\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), PRG_FLAGGED(prg, PRG_HIDDEN) ? " (hidden)" : "", NULLSAFE(PRG_DESCRIPTION(prg)));
 		
 		if (PRG_VALUE(prg) > 0) {
 			msg_to_char(ch, "Value: %d point%s\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));

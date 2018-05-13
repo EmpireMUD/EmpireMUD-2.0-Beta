@@ -1161,7 +1161,8 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_DEEP_MINES  13
 #define TECH_RARE_METALS  14
 #define TECH_BONUS_EXPERIENCE  15
-#define NUM_TECHS  16
+#define TECH_TUNNELS  16
+#define NUM_TECHS  17
 
 
 // TER_x: territory types for empire arrays
@@ -2123,6 +2124,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_IN_DEVELOPMENT  BIT(0)	// a. not available to players
 #define PRG_PURCHASABLE  BIT(1)	// b. can buy it
 #define PRG_SCRIPT_ONLY  BIT(2)	// c. cannot buy/achieve it
+#define PRG_HIDDEN  BIT(3)	// d. progress does not show up
 
 
 // PRG_PERK_x: progress perks

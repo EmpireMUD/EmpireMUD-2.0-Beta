@@ -45,7 +45,7 @@ See also: COOK
 #
 BARRACKS FORT
 
-[BB]  Barracks (Raise Armies ability)
+[BB]  Barracks (Fortifications goal)
 
 Extra rooms:  10, interlink
 Military:  20
@@ -337,7 +337,7 @@ See also: FENCE
 #
 GATEHOUSE "GATE HOUSE"
 
--==-  V||V  V\\V  Gatehouse  (Raise Armies ability)
+-==-  V||V  V\\V  Gatehouse  (Walled Town goal)
 
 The gatehouse creates a secure way through your walls. Only players who can
 infiltrate will make it through the gatehouse, and many of those will be
@@ -390,7 +390,7 @@ See also: RIVERGATE
 #
 GUARDTOWER "GUARD TOWERS" "ADVANCED GUARD TOWER" "UPGRADED GUARD TOWER" "SUPERIOR GUARD TOWER"
 
-.TT.  Guard Tower  (Raise Armies ability)
+.TT.  Guard Tower  (Guard Towers goal)
 'TT'  Advanced Tower  (Advanced Tactics ability)
 "TT"  Superior Tower (Advanced Tactics ability)
 
@@ -552,7 +552,7 @@ See also: DESIGNATE
 #
 MOUNTAINOUTPOST "MOUNTAIN OUTPOST"
 
-&y.&0/\&y.&0  Mountain Outpost  (Raise Armies ability)
+&y.&0/\&y.&0  Mountain Outpost  (Mountain Engineering goal)
 
 Military:  5
 
@@ -1000,7 +1000,7 @@ See also: TRADE COMMAND
 #
 "TRAINING YARD" TRAININGYARD YARD
 
-[  ]  Training Yard (Raise Armies ability)
+[  ]  Training Yard (Fortifications goal)
 
 Extra rooms:  10, interlink
 Military:  20
@@ -1098,7 +1098,7 @@ See also: STORAGE
 #
 WALL WALLS
 
-VVVV  Wall  (Raise Armies skill)
+VVVV  Wall  (Walled Town goal)
 
 Walls will keep most people out, so long as they are continuous. You can also
 alternate between buildings and walls and still keep people from using circle

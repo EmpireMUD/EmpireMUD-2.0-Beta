@@ -210,7 +210,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_BASIC_CRAFTS  198
 #define ABIL_SKILLED_LABOR  201
 #define ABIL_MASTER_SURVIVALIST  205
-#define ABIL_TUNNEL  206
+// formerly: #define ABIL_TUNNEL  206
 #define ABIL_ARCANE_POWER  207
 #define ABIL_OUTRAGE  209
 #define ABIL_DREAD_BLOOD_FORM  211

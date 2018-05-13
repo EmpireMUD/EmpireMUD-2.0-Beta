@@ -923,21 +923,6 @@ Quarries count as in-city territory when built in the outskirts (4x radius).
 
 See also: DEPLETION, DIG
 #
-"RAISE ARMIES" "RAISE ARMIES BUILDINGS"
-
-Raise Armies (Empire ability)
-
-The Raise Armies ability unlocks additional buildings.
-
-.TT. guardtower  (may only be built in a city)
-&y.&0/\&y.&0 mountainoutpost
-[BB] barracks
-[  ] trainingyard
-VVVV wall
-V||V gatehouse
- 
-See also: BUILD, ADVANCED TACTICS, UPGRADE
-#
 "RARE METALS"
 
 Rare Metals (Empire technology)
@@ -1083,6 +1068,7 @@ Available technologies are:
  - Deep Mines: Mines will be 50% deeper than normal.
  - Rare Metals: Mines can have rare metals.
  - Bonus Experience: Empire members get +5 bonus experience each day.
+ - Tunnels: The empire can use the 'tunnel' command.
 
 * some technologies only function on the same island as the building that
   provides them

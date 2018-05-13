@@ -2171,6 +2171,9 @@ ACMD(do_tunnel) {
 	if (!has_permission(ch, PRIV_BUILD)) {
 		msg_to_char(ch, "You do not have permission to build anything.\r\n");
 	}
+	else if (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_TUNNELS)) {
+		msg_to_char(ch, "You must be in an empire with the technology to make tunnels to do that.\r\n");
+	}
 	else if (!can_build_on(IN_ROOM(ch), exit_bld_flags)) {
 		prettier_sprintbit(exit_bld_flags, bld_on_flags, buf);
 		msg_to_char(ch, "You must start the tunnel from: %s\r\n", buf);

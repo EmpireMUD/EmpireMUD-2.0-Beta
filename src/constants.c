@@ -1749,6 +1749,7 @@ const char *techs[] = {
 	"Deep Mines",
 	"Rare Metals",
 	"Bonus Experience",
+	"Tunnels",
 	"\n"
 };
 
@@ -2610,6 +2611,7 @@ const char *progress_flags[] = {
 	"IN-DEVELOPMENT",
 	"PURCHASABLE",
 	"SCRIPT-ONLY",
+	"HIDDEN",
 	"\n"
 };
 
