@@ -54,6 +54,7 @@ extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
+extern const char *progress_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
@@ -2355,6 +2356,39 @@ SHOW(show_progress) {
 }
 
 
+SHOW(show_progression) {
+	int goals[NUM_PROGRESS_TYPES], rewards[NUM_PROGRESS_TYPES], cost[NUM_PROGRESS_TYPES], value[NUM_PROGRESS_TYPES];
+	progress_data *prg, *next_prg;
+	int iter;
+	
+	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+		// init
+		goals[iter] = rewards[iter] = cost[iter] = value[iter] = 0;
+	}
+	
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+			++rewards[PRG_TYPE(prg)];
+		}
+		else {
+			++rewards[PRG_TYPE(prg)];
+		}
+		
+		cost[PRG_TYPE(prg)] += PRG_COST(prg);
+		value[PRG_TYPE(prg)] += PRG_VALUE(prg);
+	}
+	
+	msg_to_char(ch, "Stats on active progression entries:\r\n");
+	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+		msg_to_char(ch, "%s: %d goal%s (%d point%s), %d reward%s (%d total cost)\r\n", progress_types[iter], goals[iter], PLURAL(goals[iter]), value[iter], PLURAL(value[iter]), rewards[iter], PLURAL(rewards[iter]), cost[iter]);
+	}
+}
+
+
 SHOW(show_quests) {
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	void show_quest_tracker(char_data *ch, struct player_quest *pq);
@@ -2478,7 +2512,8 @@ SHOW(show_stats) {
 	extern int total_accounts, active_accounts, active_accounts_week;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
-	int num_trigs = 0;
+	int num_trigs = 0, num_goals = 0, num_rewards = 0;
+	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
 	vehicle_data *veh;
@@ -2518,6 +2553,20 @@ SHOW(show_stats) {
 		}
 	}
 	
+	// count goals
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+			++num_rewards;
+		}
+		else {
+			++num_goals;
+		}
+	}
+	
 	update_account_stats();
 
 	msg_to_char(ch, "Current stats:\r\n");
@@ -2539,6 +2588,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
 	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
 	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
+	msg_to_char(ch, "  %6d progress goals   %6d progress rewards\r\n", num_goals, num_rewards);
 	msg_to_char(ch, "  %6d shops\r\n", HASH_COUNT(shop_table));
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
@@ -7820,6 +7870,7 @@ ACMD(do_show) {
 		{ "shops", LVL_START_IMM, show_shops },
 		{ "piles", LVL_CIMPL, show_piles },
 		{ "progress", LVL_START_IMM, show_progress },
+		{ "progression", LVL_START_IMM, show_progression },
 
 		// last
 		{ "\n", 0, NULL }

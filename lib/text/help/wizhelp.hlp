@@ -1048,6 +1048,7 @@ notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
 progress   Immort   Shows how many empires have completed a progress goal.
+progression Imort   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
 shops      Immort   Shows any shops available in your current location.
@@ -1179,6 +1180,16 @@ See also: USERS
 Usage:  show progress <goal>
 
 This shows how many empires have completed a given progression goal.
+
+See also: SHOW PROGRESSION
+#e
+"SHOW PROGRESSION"
+
+Usage:  show progression
+
+This shows stats on the number and value of goals in each progression tree.
+
+See also: SHOW PROGRESS
 #e
 "SHOW RENT"
 
