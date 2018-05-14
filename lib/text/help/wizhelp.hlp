@@ -1048,7 +1048,7 @@ notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
 progress   Immort   Shows how many empires have completed a progress goal.
-progression Imort   Shows stats on progression goals in general.
+progression Immrt   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
 shops      Immort   Shows any shops available in your current location.
@@ -1058,6 +1058,7 @@ startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 technology Immort   Shows ability techs a player has.
 terrain    Immort   Shows total counts for all terrain types.
+unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
 variables  Immort   Shows script variables on a player character.
@@ -1245,6 +1246,16 @@ Usage:  show terrain
 
 Lists the total count of each sector and crop type in the world. Buildings are
 all listed together under 'Building'.
+#e
+"SHOW UNLEARNABLE"
+
+Usage:  show unlearnable
+
+This command lists craft recipes with LEARNED flags but where there's no recipe
+or progression goal that grants them.
+
+Warning: If a craft recipe is given by a script, this command will still show
+it as unlearnable.
 #e
 "SHOW USES"
 
@@ -1496,7 +1507,6 @@ Available utilities:
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.
- &cunlearnable&0 - Shows stats on LEANRED crafts with no assignments.
  &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
  &cyearly&0 - Runs a full annual update on the world.
 #d
