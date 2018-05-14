@@ -345,6 +345,14 @@ This shows you your empire's MOTD (Message Of The Day). It is set in eedit.
 
 See also: EEDIT
 #
+"EMPIRE DETAILS"
+
+You can see details on any empire by typing 'empire <name>'.
+
+You can get shorter information with 'estats' instead.
+
+See also: EMPIRE, ESTATS
+#
 EMPIREIDENTIFY EIDENTIFY EID
 
 Usage:  empireidentify <item>
@@ -550,7 +558,7 @@ Only buildings that normally house citizens can be set as homes. This does not
 include buildings where adding a bedroom grants a citizen, if the building
 itself doesn't house citizens.
 
-See also: FINE POTTERY
+See also: CITIZENS, FINE POTTERY
 #
 ISLANDS
 

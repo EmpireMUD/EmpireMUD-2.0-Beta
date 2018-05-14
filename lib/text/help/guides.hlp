@@ -97,13 +97,13 @@ entrance to face. If you want to place your building in the woods, you can
 clear out the necessary space during the next phase.
 
 Once you've picked a nice spot, you will need your building materials. Typing
-HELP CABIN reveals that you will need a total of 6 logs for construction. That
-means you will need to find some trees, which are hopefully not too far away.
-You will want to make sure to WIELD your trusty axe and proceed to CHOP while
-in a forest tile. A fully grown forest tile will provide 4 trees, so you will
-have to clear out 2 map tiles of dense forest for all of the material. If you
-are building your CABIN in the woods, these two tiles can be for placement of
-the building.
+BUILD INFO CABIN reveals that you will need a total of 6 logs for construction.
+That means you will need to find some trees, which are hopefully not too far
+away. You will want to make sure to WIELD your trusty axe and proceed to CHOP
+while in a forest tile. A fully grown forest tile will provide 4 trees, so you
+will have to clear out 2 map tiles of dense forest for all of the material. If
+you are building your CABIN in the woods, these two tiles can be for placement
+of the building.
 
 After chopping down 6 trees, you will want to SCRAPE TREE to convert the trees
 into logs and sticks. After all the scraping, you will end up with six logs
