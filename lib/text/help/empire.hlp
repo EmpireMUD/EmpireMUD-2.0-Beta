@@ -37,82 +37,6 @@ on the political map.
 
 See also: COLOR, EMPIRE, POLITICAL, EEDIT
 #
-BARDE BARDING "ARMORED HORSE"
-
-Usage:  barde <mount>
-Location:  stable
-Cost:  10x (common metal)
-
-Barding allows you to put armor on your noble steeds. This makes them less
-vulnerable to attack, and more impressive to look upon. Many mounts can be
-barded. You can only barde mounts in a stable. You cannot remove barding from
-mounts.
-
-Barded mounts will not de-spawn like normal animals.
-
-See also: RIDE, STABLE
-#
-BUILD BUILDING "BASIC BUILDINGS"
-
-Build (Trade ability)
-
-Usage:  build <building> [direction]
-        build <monument> <god>
-        build info <building>
-
-Speed boosts:  Faster Chores bonus, haste
-
-This command is used to create buildings using raw materials. If you build a
-shrine or temple, you must specify a god to dedicate it to. Most other
-buildings require a direction that they'll face. Resources are added from left
-to right in the requirements list (you can't add nails before lumber).
-
-You can just get information on a building, like what it costs to build, by
-typing "build info <building>".
-
-You can't build on land that's inside another empire's city radius while at war
-with that empire.
-
-Until a building is completed, you can walk into and out of it freely, and you
-can't build any additional rooms inside. Once finished, nobody who is not
-loyal to your empire will be able to enter.
-
-All buildings give experience as you add materials to their construction.
-
-Basic buildings:
-  &g.&0()&g.&0 hut
-  &y.&0()&y.&0 mudhut
-  (--) cabin
-  (==) house
-  &y.&0[]&y.&0 pueblo
-  &y[==]&0 cliffdwelling
-  (&c~~&0) well
-  &y/&0[]&y\&0 mine
-  (FF) forge
-  (MM) mill
-  (PP) potter
-  (SS) stable
-  .&g^&?.&co&0 park
-  .{}. shrine
-  vvvv fence
-  vxvv gate
-  {CC} cannery -- store fruits
-  {FF} foundry -- store metals
-  {GG} granary -- store grains
-  {PP} gravelpit -- store rocks
-  {LL} lumberyard -- store lumber
-  {SS} smokehouse -- store meats
-  {TT} tannery -- store skins
-  {UU} utilityshed -- store tools
-  |__| quarry -- must be on flat land facing a mountain
-  &y|__|&0 claypit -- must be on flat land facing water
-  ..x. familygravesite -- used as a respawn point (city only)
-
-For more information on building your first house, see HELP HOUSING GUIDE.
-
-See also: BUILD INFO, ARCHITECT, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE,
-   RECIPES
-#
 CEDE
 
 Usage:  cede <person>
@@ -240,7 +164,7 @@ To find buildings that can be dedicated, try 'helpsearch dedicate'.
 #
 "DEEP MINES"
 
-Deep Mines (Empire technology)
+Deep Mines (Stockpile Iron goal)
 
 Mines your empire digs or prospects will have 50% more ore. You must be the
 first empire to build a mine or prospect on a given mountain tile (at least,
@@ -513,38 +437,6 @@ Examples:
  > etalk #high_lord Hi, High Lords!
  > etalk #lord *bows before the other lords.
 #
-EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
-
-Usage:  excavate
-        fillin
-
-Speed boosts:  Faster Chores bonus, haste
-
-Using a shovel, your own strength, and a lot of time, you can excavate a
-trench from a desert or plains. Once the trench is complete, it will begin
-to fill with water. Eventually, it becomes a canal.
-
-The "fillin" command is the opposite of excavate: it fills trenches in until
-they are ordinary plains or desert again. It will also work on a player-created
-oasis or canal. It takes 1 minute to begin a fillin on a completed trench; if
-you cancel the action or are interrupted, you must start the minute over.
-
-You can only excavate and fill in on claimed land. If you abandon your claim to
-a canal or trench, it will slowly fill in over time.
-
-When a desert trench fills with water, it will become an oasis instead of a
-canal. Oases convert into canals if they are adjacent to other canals or water
-sources.
-
-There are three ways to fill a finished trench with water:
- - If there is more water adjacent, the trench will fill quickly.
- - If you pour water out on the ground, you can fill the trench yourself.
- - If you wait long enough, it will fill with rain water on its own.
-
-An unfinished trench will not fill with water.
-
-See also: CANAL, CLAIM, OASIS DRAINAGE
-#
 EXCHANGE
 
 Usage:  exchange <item>
@@ -635,19 +527,6 @@ For example, an outpost with radius 5 has outskirts out to 20 tiles, and the
 rest is frontier.
 
 See also: FRONTIER TRAITS
-#
-HAVENS "BUILD HAVENS"
-
-Build Haven (Vampire ability)
-
-The Build Haven ability unlocks additional buildings.
-
-&g.&0[]&g.&0 househaven
-&g^&0[]&g^&0 burrowhaven  (chameleon)
-&Y.&0[]&Y.&0 pueblohaven
-&y/&0()&y\&0 cavehaven  (chameleon)
-
-See also: BUILD, VAMPIRE
 #
 HOME "HESTIAN TRINKET"
 
@@ -748,17 +627,6 @@ unviewed offenses.
 Immortals can view offenses from other empires by giving an empire name (in
 quotes if necessary) as the first argument.
 #
-PAN
-
-Usage:  pan [direction]
-Speed boosts:  Finder ability
-
-Using a simple metal pan, you can pan for gold flakes next to the river. It's
-rare to find anything, but it's something to do. You can pan an adjacent map
-tile, or the one you're standing in.
-
-See also: DEPLETION, FORGE
-#
 PLEDGE JOIN
 
 Usage:  pledge <empire | cancel>
@@ -824,21 +692,6 @@ Privileges:
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #
-PROSPECT
-
-Usage:  prospect
-
-A good prospector can determine what minerals are in the ground without
-exploratory mining. If your empire has Deep Mines or Rare Metals and are the
-first person to prospect a mountain tile (since the last mountain reset), that
-tile will benefit from your Deep Mines and/or Rare Metals until the next
-mountain reset. For more info on mountain resets, see HELP MINE.
-
-Prospecting happens instantly if your empire was the last one to prospect the
-tile.
-
-See also: MINE, DEEP MINES, RARE METALS
-#
 PUBLICIZE
 
 Usage:  publicize
@@ -851,26 +704,6 @@ If a room is made public, other players may take items from the ground without
 being marked "hostile".
 
 See also: CLAIM, CEDE, ABANDON, UNPUBLICIZE, HOSTILE
-#
-QUARRY
-
-Quarry (Primitive Crafts ability)
-
-Command:  quarry
-Building:  |__|  Quarry  (Build ability)
-Speed boosts:  Faster Chores bonus, haste
-
-A quarry must be built on plains or desert, facing a mountain. Quarries are a
-good place to dig up rocks. You can also quarry stone here using the "quarry"
-command. You will find more rocks before a quarry depletes, compared to digging
-anywhere else.
-
-If you have the "dig" workforce enabled, your citizens will only dig if you
-have a quarry.
-
-Quarries count as in-city territory when built in the outskirts (4x radius).
-
-See also: DEPLETION, DIG
 #
 "RARE METALS"
 

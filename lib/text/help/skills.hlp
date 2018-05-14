@@ -15,6 +15,21 @@ You can reset your ability purchases with "skill reset <skill>".
 
 See also: SKILLS, SKILL CAPS, DAILY BONUS EXPERIENCE
 #
+BARDE BARDING "ARMORED HORSE"
+
+Usage:  barde <mount>
+Location:  stable
+Cost:  10x (common metal)
+
+Barding allows you to put armor on your noble steeds. This makes them less
+vulnerable to attack, and more impressive to look upon. Many mounts can be
+barded. You can only barde mounts in a stable. You cannot remove barding from
+mounts.
+
+Barded mounts will not de-spawn like normal animals.
+
+See also: RIDE, STABLE
+#
 BATHE 
 
 Usage:  bathe 

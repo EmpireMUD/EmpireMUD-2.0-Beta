@@ -76,6 +76,67 @@ can also sail ships under the bridges. Nobody knows how.
 
 Bridges count as in-city territory even if built in the outskirts (4x radius).
 #
+BUILD BUILDING "BASIC BUILDINGS"
+
+Build (Trade ability)
+
+Usage:  build <building> [direction]
+        build <monument> <god>
+        build info <building>
+
+Speed boosts:  Faster Chores bonus, haste
+
+This command is used to create buildings using raw materials. If you build a
+shrine or temple, you must specify a god to dedicate it to. Most other
+buildings require a direction that they'll face. Resources are added from left
+to right in the requirements list (you can't add nails before lumber).
+
+You can just get information on a building, like what it costs to build, by
+typing "build info <building>".
+
+You can't build on land that's inside another empire's city radius while at war
+with that empire.
+
+Until a building is completed, you can walk into and out of it freely, and you
+can't build any additional rooms inside. Once finished, nobody who is not
+loyal to your empire will be able to enter.
+
+All buildings give experience as you add materials to their construction.
+
+Basic buildings:
+  &g.&0()&g.&0 hut
+  &y.&0()&y.&0 mudhut
+  (--) cabin
+  (==) house
+  &y.&0[]&y.&0 pueblo
+  &y[==]&0 cliffdwelling
+  (&c~~&0) well
+  &y/&0[]&y\&0 mine
+  (FF) forge
+  (MM) mill
+  (PP) potter
+  (SS) stable
+  .&g^&?.&co&0 park
+  .{}. shrine
+  vvvv fence
+  vxvv gate
+  {CC} cannery -- store fruits
+  {FF} foundry -- store metals
+  {GG} granary -- store grains
+  {PP} gravelpit -- store rocks
+  {LL} lumberyard -- store lumber
+  {SS} smokehouse -- store meats
+  {TT} tannery -- store skins
+  {UU} utilityshed -- store tools
+  |__| quarry -- must be on flat land facing a mountain
+  &y|__|&0 claypit -- must be on flat land facing water
+  ..x. familygravesite -- used as a respawn point (city only)
+
+For more information on building your first house, see HELP HOUSING GUIDE.
+
+See also: BUILD INFO, ARCHITECT, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE,
+   RECIPES
+#
 BURROWHAVEN "BURROW HAVEN" "STRANGE BURROW"
 
 &g^[]^&0  Burrow Haven  (Build Haven skill)

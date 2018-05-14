@@ -781,6 +781,26 @@ These gems are generally used in crafts in the 200-300 level range.
 
 See also: CRAFT
 #
+QUARRY
+
+Quarry (Primitive Crafts ability)
+
+Command:  quarry
+Building:  |__|  Quarry  (Build ability)
+Speed boosts:  Faster Chores bonus, haste
+
+A quarry must be built on plains or desert, facing a mountain. Quarries are a
+good place to dig up rocks. You can also quarry stone here using the "quarry"
+command. You will find more rocks before a quarry depletes, compared to digging
+anywhere else.
+
+If you have the "dig" workforce enabled, your citizens will only dig if you
+have a quarry.
+
+Quarries count as in-city territory when built in the outskirts (4x radius).
+
+See also: DEPLETION, DIG
+#
 "RAWHIDE STITCHING"
 
 Rawhide Stitching (Trade ability)
