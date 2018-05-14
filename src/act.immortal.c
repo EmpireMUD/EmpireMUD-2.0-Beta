@@ -2375,7 +2375,7 @@ SHOW(show_progression) {
 			++rewards[PRG_TYPE(prg)];
 		}
 		else {
-			++rewards[PRG_TYPE(prg)];
+			++goals[PRG_TYPE(prg)];
 		}
 		
 		cost[PRG_TYPE(prg)] += PRG_COST(prg);
