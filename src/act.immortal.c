@@ -2418,8 +2418,9 @@ SHOW(show_progress) {
 SHOW(show_progression) {
 	int goals[NUM_PROGRESS_TYPES], rewards[NUM_PROGRESS_TYPES], cost[NUM_PROGRESS_TYPES], value[NUM_PROGRESS_TYPES];
 	progress_data *prg, *next_prg;
-	int iter;
+	int iter, tot_v, tot_c;
 	
+	tot_v = tot_c = 0;
 	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
 		// init
 		goals[iter] = rewards[iter] = cost[iter] = value[iter] = 0;
@@ -2438,13 +2439,16 @@ SHOW(show_progression) {
 		}
 		
 		cost[PRG_TYPE(prg)] += PRG_COST(prg);
+		tot_c += PRG_COST(prg);
 		value[PRG_TYPE(prg)] += PRG_VALUE(prg);
+		tot_v += PRG_VALUE(prg);
 	}
 	
 	msg_to_char(ch, "Stats on active progression entries:\r\n");
 	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
 		msg_to_char(ch, "%s: %d goal%s (%d point%s), %d reward%s (%d total cost)\r\n", progress_types[iter], goals[iter], PLURAL(goals[iter]), value[iter], PLURAL(value[iter]), rewards[iter], PLURAL(rewards[iter]), cost[iter]);
 	}
+	msg_to_char(ch, "Total: %d point%s, %d total cost\r\n", tot_v, PLURAL(tot_v), tot_c);
 }
 
 
