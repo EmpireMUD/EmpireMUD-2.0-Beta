@@ -6422,6 +6422,7 @@ Skill flags set various properties on skills.
 
 Available flags:
  IN-DEVELOPMENT - Players can't see or gain the skill.
+ BASIC - Always shows in the list for players, even at 0.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d

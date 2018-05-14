@@ -285,7 +285,7 @@ See also:  BOARD, LOAD, SHIPPING, UNLOAD
 #
 DRAINAGE "OASIS DRAINAGE" "DRAINED OASIS" "DRAIN OASIS" "DRAINING OASIS"
 
-&y.&c__&y.&0  Draining Oasis  (Drainage Projects goal)
+&y.&c__&y.&0  Draining Oasis  (Stilt Buildings goal)
 
 By building drainage for an oasis, it can be converted into a normal desert.
 If the oasis was created using the 'excavate' command, you can alternatively use
@@ -928,7 +928,7 @@ See also: DESIGNATE
 #
 SWAMPPLATFORM "SWAMP PLATFORM"
 
-&c~&0__&c~&0  Swamp Platform  (Drainage Projects goal)
+&c~&0__&c~&0  Swamp Platform  (Stilt Buildings goal)
 
 By building a sturdy platform on top of swampland (or marshland), you can
 effectively build "plains-only" buildings in the swamp. Once complete, the

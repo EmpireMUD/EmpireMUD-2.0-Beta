@@ -1678,6 +1678,9 @@ ACMD(do_skills) {
 			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
 				continue;
 			}
+			if (!SKILL_FLAGGED(skill, SKILLF_BASIC) && get_skill_level(ch, SKILL_VNUM(skill)) < 1) {
+				continue;	// don't show non-basic skills if the player doesn't have them
+			}
 			
 			strcat(outbuf, get_skill_row_display(ch, skill));
 			if (!found && get_ability_points_available_for_char(ch, SKILL_VNUM(skill)) > 0) {
