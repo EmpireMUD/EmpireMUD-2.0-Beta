@@ -349,6 +349,7 @@ ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
+ADMIN_UTIL(util_unlearnable);
 ADMIN_UTIL(util_wipeprogress);
 ADMIN_UTIL(util_yearly);
 
@@ -370,6 +371,7 @@ struct {
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
+	{ "unlearnable", LVL_CIMPL, util_unlearnable },
 	{ "wipeprogress", LVL_CIMPL, util_wipeprogress },
 	{ "yearly", LVL_CIMPL, util_yearly },
 
@@ -727,6 +729,63 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+}
+
+
+ADMIN_UTIL(util_unlearnable) {
+	struct progress_perk *perk, *next_perk;
+	craft_data *craft, *next_craft;
+	progress_data *prg, *next_prg;
+	obj_data *obj, *next_obj;
+	bool any = FALSE, found;
+	
+	msg_to_char(ch, "Checking for unlearnable recipes with the LEARNED flag...\r\n");
+	
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (!CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+			continue;
+		}
+		
+		found = FALSE;
+		
+		// try to find it in recipes
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == GET_CRAFT_VNUM(craft)) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (found) {	// was an item recipe
+			continue;
+		}
+		
+		// try to find it in progression
+		HASH_ITER(hh, progress_table, prg, next_prg) {
+			LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
+				if (perk->type == PRG_PERK_CRAFT && perk->value == GET_CRAFT_VNUM(craft)) {
+					found = TRUE;
+					break;
+				}
+			}
+			if (found) {
+				break;
+			}
+		}
+		if (found) {	// was a progression reward
+			continue;
+		}
+		
+		// did we get this far?
+		any = TRUE;
+		msg_to_char(ch, "[%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), GET_CRAFT_ABILITY(craft) == NO_ABIL ? "no ability" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+	}
+	
+	if (any) {
+		msg_to_char(ch, "(remember, some of these may be added by scripts)\r\n");
+	}
+	else {
+		msg_to_char(ch, " none\r\n");
+	}
 }
 
 
