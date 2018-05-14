@@ -1678,7 +1678,7 @@ ACMD(do_skills) {
 			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
 				continue;
 			}
-			if (!SKILL_FLAGGED(skill, SKILLF_BASIC) && get_skill_level(ch, SKILL_VNUM(skill)) < 1) {
+			if (!SKILL_FLAGGED(skill, SKILLF_BASIC) && get_skill_level(ch, SKILL_VNUM(skill)) < 1 && get_skill_exp(ch, SKILL_VNUM(skill)) < 0.1) {
 				continue;	// don't show non-basic skills if the player doesn't have them
 			}
 			
