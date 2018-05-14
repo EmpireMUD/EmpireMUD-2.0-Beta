@@ -405,6 +405,10 @@ char *get_one_perk_display(struct progress_perk *perk) {
 			sprintf(save_buffer, "%+d territory per greatness", perk->value);
 			break;
 		}
+		case PRG_PERK_WORKFORCE_CAP: {
+			sprintf(save_buffer, "%+d workforce cap", perk->value);
+			break;
+		}
 		default: {
 			strcpy(save_buffer, "UNKNOWN");
 			break;
@@ -539,6 +543,10 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 				else {
 					remove_learned_craft_empire(emp, perk->value, FALSE);
 				}
+				break;
+			}
+			case PRG_PERK_WORKFORCE_CAP: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
 		}
@@ -2610,6 +2618,13 @@ OLC_MODULE(progedit_perks) {
 				case PRG_PERK_TERRITORY_PER_GREATNESS: {
 					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
 						msg_to_char(ch, "Invalid number of territory per greatness '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_WORKFORCE_CAP: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid amount of extra workforce cap '%s'.\r\n", argument);
 						return;
 					}
 					break;	// otherwise ok

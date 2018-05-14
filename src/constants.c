@@ -1697,6 +1697,7 @@ const char *empire_attributes[] = {
 	"Max City Size",
 	"Tty per 100 Wealth",
 	"Tty per Greatness",
+	"Workforce Cap",
 	"\n"
 };
 
@@ -2624,6 +2625,7 @@ const char *progress_perk_types[] = {
 	"Max-city-size",
 	"Wealth-territory-per-100",
 	"Greatness-territory",
+	"Workforce-cap",
 	"\n"
 };
 

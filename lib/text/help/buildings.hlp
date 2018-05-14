@@ -382,7 +382,7 @@ See also: STORAGE
 #
 "GREAT WALLS" GREATWALLS
 
-&y^&0VV&y^&0  Great Wall  (Great Walls ability)
+&y^&0VV&y^&0  Great Wall  (Great Walls goal)
 
 Great Walls function like ordinary walls, but can be built on mountains.
 
@@ -391,8 +391,8 @@ See also: RIVERGATE
 GUARDTOWER "GUARD TOWERS" "ADVANCED GUARD TOWER" "UPGRADED GUARD TOWER" "SUPERIOR GUARD TOWER"
 
 .TT.  Guard Tower  (Guard Towers goal)
-'TT'  Advanced Tower  (Advanced Tactics ability)
-"TT"  Superior Tower (Advanced Tactics ability)
+'TT'  Advanced Tower  (Defending the City goal)
+"TT"  Superior Tower (Superior Guard Towers goal)
 
 Guard towers are defensive structures that automatically shoot at foes within
 range. These are often an empire's first line of defense against intruders.
@@ -414,7 +414,7 @@ Guard towers do not block players from circling around them. For optimum
 protection, build lines of wall-tower-wall-tower-wall. The walls block the
 circle command.
 
-See also: CIRCLE, RAISE ARMIES, ADVANCED TACTICS
+See also: CIRCLE
 #
 HENGE "STONE HENGE"
 
@@ -702,7 +702,7 @@ See also: PICK
 #
 RIVERGATE "RIVER GATE"
 
-V&c||&0V  River Gate  (Great Walls ability)
+V&c||&0V  River Gate  (Great Walls goal)
 
 River Gates are like gatehouses that can be built on rivers, and allow only
 friendly ships and canoes through.

@@ -466,7 +466,7 @@ static void ewt_mark_for_interactions(empire_data *emp, room_data *room, int int
 */
 static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
-	int island_id, island_max, total_max;
+	int island_id, max;
 	struct empire_workforce_tracker *tt;
 	struct empire_island *emp_isle;
 	obj_data *proto;
@@ -482,33 +482,25 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	// data is assumed to be accurate now
 	island_id = GET_ISLAND_ID(loc);
 	isle = ewt_find_island(tt, island_id);
-
-	// determine local maxima
-	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-		island_max = config_get_int("max_chore_resource_skilled");
-	}
-	else {
-		island_max = config_get_int("max_chore_resource");
-	}
 	
-	// total max is a factor of this
-	total_max = round(island_max * diminishing_returns(EMPIRE_MEMBERS(emp), 5));
+	max = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(emp);
+	max += EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP);
 	
 	// check empire's own limit
 	if ((emp_isle = get_empire_island(emp, island_id))) {
-		if (emp_isle->workforce_limit[chore] > 0 && emp_isle->workforce_limit[chore] < island_max) {
-			island_max = emp_isle->workforce_limit[chore];
+		if (emp_isle->workforce_limit[chore] > 0 && emp_isle->workforce_limit[chore] < max) {
+			max = emp_isle->workforce_limit[chore];
 		}
 	}
 
 	// do we have too much?
-	if (tt->total_amount + tt->total_workers >= total_max) {
+	if (tt->total_amount + tt->total_workers >= max) {
 		if (isle->amount + isle->workers < config_get_int("max_chore_resource_over_total")) {
 			return TRUE;
 		}
 	}
 	else {
-		if (isle->amount + isle->workers < island_max) {
+		if (isle->amount + isle->workers < max) {
 			return TRUE;
 		}
 	}

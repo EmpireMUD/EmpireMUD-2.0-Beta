@@ -5675,6 +5675,7 @@ Perk types:
  Max-city-size - Increases how large the empire can upgrade its cities.
  Wealth-territory-per-100 - Increases territory-per-100-wealth.
  Greatness-territory - Increases territory per greatness point.
+ Workforce-cap - Raises the maximum workforce cap.
 
 Note: To grant progress points for a goal, set the 'value' field instead.
 

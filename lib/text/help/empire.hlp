@@ -28,19 +28,6 @@ It can also be used to abandon vehicles.
 
 See also: CEDE, CLAIM, PRIVILEGE, PUBLICIZE
 #
-"ADVANCED TACTICS" "ADVANCED TACTICS BUILDINGS"
-
-Advanced Tactics (Empire ability)
-
-The Advanced Tactics ability allows you to upgrade your guard towers.
-
-'TT' 1st upgrade
-"TT" 2nd upgrade
-
-Guard towers may only be built or upgraded inside of cities.
-
-See also: BUILD, RAISE ARMIES
-#
 BANNER
 
 The empire banner can be changed with the eedit command.
@@ -1125,7 +1112,8 @@ See also: DEPOSIT, EXCHANGE, MINT
 #
 WORKFORCE "SKILLED LABOR"
 
-Workforce, Skilled Labor (Empire abilities)
+Workforce (goal)
+Skilled Labor (goal)
 
 Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
@@ -1134,7 +1122,7 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce copy <island name>
         workforce keep <item name>
 
-Once at least one member of an empire has the Workforce ability, the empire's
+Once at least one member of an empire has the Workforce reward, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
 enable or disable each specific task using the "workforce" command. The work-
 force is generally much slower than a player would be at the same task. Most
@@ -1143,8 +1131,7 @@ at 8pm each day.
 
 Typing "workforce" without a "type" after it will show you which workforce
 chores are currently enabled. Empire leaders can set the minimum rank to change
-the workforce settings, and even the member with the Workforce ability may not
-be able to change those settings.
+the workforce settings.
 
 The workforce is made up of the empire's citizens (NPCs). These citizens will
 only work within 20 map tiles of their own homes, and must be on the same 
@@ -1159,20 +1146,13 @@ You can use the "workforce copy" command to copy the workforce limit
 configuration of another island into the island you are currently in. Using
 "workforce keep" will prevent your workforce from using any of an item.
 
-Note: Your workforce will only do chores if your empire has less than 200 of
-the resource provided by the chore. For example, miners won't do any work in
-iron mines if you have 200 iron ore. This does not apply to dismantling. If
-you have Skilled Labor, the cap is 750 instead. This cap is per-island. There
-is also a total cap for any given resource, which is based on the number of
-players in your empire. After passing the total cap, the locals will collect
-much less of that resource on each island.
+Note: Your workforce will only do chores if your empire has less than a certain
+amount of the resource provided by the chore. This amount is 100 per member,
+plus any additional workforce cap provided by progression goals. This does not
+apply to dismantling. Workers on each island will still collect a small amount
+of each resource if your empire is over the cap globally.
 
 See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptions.
-
-The Workforce ability gains experience when most workforce chores are done
-(including skilled ones) while you are online.
-The Skilled Labor ability gains experience when skilled chores are done while
-you are online.
 
 See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
           WORKFORCE KEEP

@@ -1004,7 +1004,8 @@ typedef struct vehicle_data vehicle_data;
 #define EATT_MAX_CITY_SIZE  2	// how big the empire's cities can go (number of upgrades)
 #define EATT_TERRITORY_PER_100_WEALTH  3	// number of tiles gained per 100 wealth
 #define EATT_TERRITORY_PER_GREATNESS  4	// bonus to ter-per-grt
-#define NUM_EMPIRE_ATTRIBUTES  5	// total
+#define EATT_WORKFORCE_CAP  5	// workforce resource cap
+#define NUM_EMPIRE_ATTRIBUTES  6	// total
 
 
 // ETRAIT_x: empire trait flags
@@ -2134,6 +2135,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_PERK_MAX_CITY_SIZE  3	// increases max city size
 #define PRG_PERK_TERRITORY_FROM_WEALTH  4	// increases territory from wealth
 #define PRG_PERK_TERRITORY_PER_GREATNESS  5	// increases territory per greatness
+#define PRG_PERK_WORKFORCE_CAP  6	// higher workforce caps
 
 
  //////////////////////////////////////////////////////////////////////////////
