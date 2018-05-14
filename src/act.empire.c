@@ -65,6 +65,7 @@ extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
+void refresh_all_quests(char_data *ch);
 
 // locals
 bool is_affiliated_island(empire_data *emp, int island_id);
@@ -589,6 +590,8 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	msg_to_char(ch, "Frontier traits: %s\r\n", buf);
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
 	msg_to_char(ch, "Territory: %d/%d (%d in-city, %d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(e, TER_TOTAL), land_can_claim(e, TER_TOTAL), EMPIRE_TERRITORY(e, TER_CITY), EMPIRE_TERRITORY(e, TER_OUTSKIRTS), land_can_claim(e, TER_OUTSKIRTS), EMPIRE_TERRITORY(e, TER_FRONTIER), land_can_claim(e, TER_FRONTIER));
+	msg_to_char(ch, "           Land per greatness: %d, Land per 100 wealth: %d\r\n", (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_GREATNESS)), EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_100_WEALTH));
+
 	msg_to_char(ch, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)\r\n", (int) GET_TOTAL_WEALTH(e), EMPIRE_WEALTH(e), EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
 	msg_to_char(ch, "Fame: %d\r\n", EMPIRE_FAME(e));
 	msg_to_char(ch, "Greatness: %d\r\n", EMPIRE_GREATNESS(e));
@@ -3467,6 +3470,7 @@ ACMD(do_defect) {
 		
 		// this will adjust the empire's player count
 		reread_empire_tech(e);
+		refresh_all_quests(ch);
 	}
 }
 
@@ -4249,7 +4253,6 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
-	void refresh_all_quests(char_data *ch);
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	
 	struct empire_island *from_isle, *next_isle, *isle;
@@ -4745,6 +4748,7 @@ ACMD(do_expel) {
 			file = FALSE;
 		}
 		else {
+			refresh_all_quests(targ);
 			SAVE_CHAR(targ);
 		}
 

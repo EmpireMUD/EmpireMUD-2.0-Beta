@@ -1609,6 +1609,7 @@ void check_nowhere_einv_all(void) {
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
 	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
+	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void resort_empires(bool force);
 
 	archetype_data *arch;
@@ -1691,6 +1692,7 @@ empire_data *create_empire(char_data *ch) {
 	
 	// this will set up all the data
 	reread_empire_tech(emp);
+	refresh_empire_goals(emp, NOTHING);
 
 	// this is a good time to sort and rank
 	resort_empires(FALSE);
