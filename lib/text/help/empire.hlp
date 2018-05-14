@@ -1195,7 +1195,7 @@ Workforce types:
   &yrepair-vehicles&0: Will keep vehicles maintained.
   &yoilmaking:&0 Will press oil.
   
-Items marked (skilled) require the Skilled Labor ability. Skilled Labor chores
+Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
 
 See also: EXARCH CRAFTS, WORKFORCE
