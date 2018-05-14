@@ -60,7 +60,7 @@ Herbs you can find:
  daggerbite - deserts
  bileberries - floodplains, riverbanks
 
-See also: HERBS, DISTILLED HERBS, HERB GARDENS, PICK
+See also: HERBS, DISTILLED HERBS, PICK
 #
 "FIND SHELTER" SHELTERS
 
@@ -129,27 +129,6 @@ Survival skill increases.
 Gains experience when you find things by foraging.
 
 See also: DEPLETION
-#
-"HERB GARDENS" GARDENS
-
-Herb Gardens (Survival ability)
-
-Command:  build <garden> [direction]
-
-The various herb gardens allow you to farm more herbs than can normally be
-picked in one spot, and if your empire has Skilled Labor, your workforce can
-use the gardens as well.
-
-&y/&r##&y\&0 terracedgarden (mountain)
-&c~&b##&c~&0 raftgarden (river)
-&G^&C##&G^&0 oasisgarden (oasis)
-&b~&0##&b~&0 estuarygarden (river facing ocean)
-&g|&y##&g|&0 shadygarden (plains or forest)
-
-Only the estuarygarden requires a direction. Gain skill by building any of the
-gardens.
-
-See also: BUILD, FIND HERBS, WORKFORCE, SKILLED LABOR
 #
 HUNTSMAN HUNT HUNTING "HUNTSMAN ABILITY"
 

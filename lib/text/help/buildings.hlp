@@ -234,7 +234,7 @@ See also: EXCAVATE
 #
 ESTUARYGARDEN "ESTUARY GARDEN"
 
-&b~&0##&b~&0  Estuary Garden  (Herb Gardens ability)
+&b~&0##&b~&0  Estuary Garden  (Luxury Resources goal)
 
 Grows:  whitegrass
 
@@ -585,7 +585,7 @@ See also: PRIVILEGES
 #
 OASISGARDEN "OASIS GARDEN"
 
-&G^&C##&G^&0  Oasis Garden  (Herb Gardens ability)
+&G^&C##&G^&0  Oasis Garden  (Luxury Resources goal)
 
 Grows:  daggerbite, magewhisper
 
@@ -689,7 +689,7 @@ See also: DEDICATE
 #
 RAFTGARDEN "RAFT GARDEN"
 
-&c~&b##&c~&0  Raft Garden  (Herb Gardens ability)
+&c~&b##&c~&0  Raft Garden  (Luxury Resources goal)
 
 Grows:  bileberries
 
@@ -739,7 +739,7 @@ See also: MAINTAIN
 #
 SHADYGARDEN "SHADY GARDEN"
 
-&g|&y##&g|&0  Shady Garden  (Herb Gardens ability)
+&g|&y##&g|&0  Shady Garden  (Luxury Resources goal)
 
 Grows:  fiveleaf
 
@@ -938,7 +938,7 @@ See also: DEDICATE
 #
 TERRACEDGARDEN "TERRACED GARDEN"
 
-&y/&r##&y\&0  Terraced Garden  (Herb Gardens ability)
+&y/&r##&y\&0  Terraced Garden  (Luxury Resources goal)
 
 Grows:  redthorn
 
@@ -1012,7 +1012,7 @@ See also: DESIGNATE, INTERLINK
 #
 TRAPPERSPOST "TRAPPERS POST" "TRAPPING POST" "TRAPPER'S POST"
 
-&g^/\^&0  Trapper's Post  (Luxury ability)
+&g^/\^&0  Trapper's Post  (Luxury Resources goal)
 
 The trapper's post is a place where trappers come to trade their skins. This
 building is required in order for your workforce to gather skins. Trapper's
