@@ -57,9 +57,10 @@ This ability allows you to build more advanced buildings. It is required by
 most of the new building schematics you can learn throughout the game.
 
 It also lets you build:
+  [&b~~&0]  baths  (in-city only)
   [CC]  cabinetofcuriosities
-  ....  courtyard
-  {&c~~&0}  fountain
+  ....  courtyard  (in-city only)
+  {&c~~&0}  fountain  (in-city only)
 
 See also: BUILD, LEARN
 #
@@ -239,6 +240,27 @@ For build, this also shows where you can build the building.
 For recipes from patterns, this also shows the level range of the recipe.
 
 See also; RESOURCES, SCALABLE CRAFTS, PATTERNS
+#
+"CUSTOMIZE BUILDING"
+
+Customize Building (Trade ability)
+
+Usage:  customize building name <name | none>
+        customize building description <set | none>
+
+Customize Building lets you change the names and descriptions of your build-
+ings. You must own the building you're trying to customize, and have permission
+from your empire.
+
+When editing a custom description, you can use /fi to add linebreaks and indent
+the first line. Generally descriptions look best in the 3-9 line range. You can
+use /h to get more information on editor commands, and /s to save and exit.
+
+This ability also allows you to put up roadsigns.
+
+Gain experience by customizing buildings.
+
+See also: STRING EDITOR, ROADSIGN
 #
 "DANGEROUS LEATHERS"
 

@@ -2328,9 +2328,9 @@ void olc_show_progress(char_data *ch) {
 	get_progress_list_display(PRG_PREREQS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
 	
-	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
+	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 		get_requirement_display(PRG_TASKS(prg), lbuf);
-		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE | PRG_SCRIPT_ONLY) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
 	}
 	
 	get_progress_perks_display(PRG_PERKS(prg), lbuf);

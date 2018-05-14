@@ -229,27 +229,6 @@ with that empire.
 
 See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY
 #
-"CUSTOMIZE BUILDING"
-
-Customize Building (Empire ability)
-
-Usage:  customize building name <name | none>
-        customize building description <set | none>
-
-Customize Building lets you change the names and descriptions of your build-
-ings. You must own the building you're trying to customize, and have permission
-from your empire.
-
-When editing a custom description, you can use /fi to add linebreaks and indent
-the first line. Generally descriptions look best in the 3-9 line range. You can
-use /h to get more information on editor commands, and /s to save and exit.
-
-This ability also allows you to put up roadsigns.
-
-Gain experience by customizing buildings.
-
-See also: STRING EDITOR, ROADSIGN
-#
 DEDICATE
 
 Usage:  dedicate <person>
@@ -709,22 +688,6 @@ all empires on the island share the same custom name for it.
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
 See also: CHART, CUSTOMIZE ISLAND, SURVEY
-#
-LUXURY "LUXURY BUILDINGS"
-
-Luxury (Empire ability)
-
-The Luxury ability unlocks additional buildings.
-
-[PP]  painter
-[CC]  cabinetofcuriosities  (rare item storage)
-....  courtyard  (in-city only)
-[&b~~&0]  baths  (in-city only)
-{&c~~&0}  fountain  (in-city only)
-V[]V  portcullis  (in-city only)
-[**]  greathall  (in-city only)
-
-See also: BUILD
 #
 MAINTAIN MAINTENANCE DISREPAIR
 

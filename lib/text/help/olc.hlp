@@ -5637,7 +5637,8 @@ Usage:  .flags [add | remove] <flags>
 The following progress goal flags are available:
  IN-DEVELOPMENT - Empires cannot start or complete this goal.
  PURCHASABLE - This goal is purchased, not unlocked by tasks.
- SCRIPT-ONLY - For scripts; cannot be purchased or earned.
+ SCRIPT-ONLY - For scripts; cannot be purchased and won't be earned unless a
+               script starts it first.
  HIDDEN - Will not show up in lists until completed.
 
 See also: OLC PROGRESS
