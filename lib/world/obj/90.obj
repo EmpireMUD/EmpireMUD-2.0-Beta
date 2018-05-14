@@ -37,7 +37,7 @@ knife barkeep's barkeeps~
 the barkeep's knife~
 The barkeep's knife has been left here.~
    The barkeep asked you to use this knife to butcher a wolf or bear and bring
-back its head.  
+back its head.
 ~
 1 p ano 3
 0 1 1
@@ -87,10 +87,10 @@ S
 letter smith undelivered~
 a letter for the smith~
 An undelivered letter is lying here.~
-   This letter needs to be delivered to the smith in your empire... But maybe
-you could take a peek.
+   This letter needs to be delivered to the smith (or forgemaster) in your
+empire... But maybe you could take a peek.
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 0 0
 Q 9042

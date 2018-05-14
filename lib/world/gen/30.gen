@@ -176,15 +176,6 @@ entangle~
 T0
 You are no longer entangled in vines.~
 S
-#3025
-radiance~
-4 0
-0 0 0 0
-T0
-Your radiant aura fades.~
-T1
-$n seems less radiant.~
-S
 #3026
 inspire~
 4 0

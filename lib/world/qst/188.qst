@@ -198,11 +198,11 @@ restless spirit, where you can turn in this quest and buy rewards.
    Now that you have a haunted house, you should be able to appease the spirits
 of the dead.
 ~
-5 0 0 0 -1
+6 0 0 0 -1
 A
 1 18800
 P
-9 1 0 50
+9 6 0 50
 R
 0 0 1
 R
@@ -224,7 +224,7 @@ restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-4 e 0 0 -1
+5 e 0 0 -1
 A
 2 18807
 A
@@ -233,7 +233,7 @@ D 18829
 P
 0 18828 0 1 a
 P
-9 1 0 50 a
+9 6 0 50 a
 R
 8 18800 1
 R
@@ -255,7 +255,7 @@ restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-5 e 0 0 -1
+6 e 0 0 -1
 A
 2 18807
 A
@@ -264,7 +264,7 @@ D 18829
 P
 0 18828 0 1 a
 P
-9 1 0 50 a
+9 6 0 50 a
 R
 8 18800 1
 R
@@ -286,7 +286,7 @@ restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-5 e 0 0 -1
+6 e 0 0 -1
 A
 2 18807
 A
@@ -295,7 +295,7 @@ D 18829
 P
 0 18828 0 1 a
 P
-9 1 0 50 a
+9 6 0 50 a
 R
 8 18800 1
 R
@@ -317,7 +317,7 @@ restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-6 e 0 0 -1
+7 e 0 0 -1
 A
 2 18807
 A
@@ -326,7 +326,7 @@ D 18829
 P
 0 18828 0 1 a
 P
-9 1 0 50 a
+9 6 0 50 a
 R
 8 18800 1
 R

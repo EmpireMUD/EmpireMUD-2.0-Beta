@@ -43,7 +43,7 @@ S
 #n the bodyguard~
 #n the bodyguard is standing here.
 ~
-0 0 bdpqvG cm
+0 125 bdpqvG cm
 1 0 0 1
 S
 #206
@@ -724,6 +724,14 @@ S
 #n supervisor~
 supervisor #n~
 Supervisor #n is surveying the area.
+~
+20 50 bdqv 0
+0 0 0 15
+S
+#278
+#n grand forgemaster~
+Grand Forgemaster #n~
+Grand Forgemaster #n is overseeing the magma crucible.
 ~
 20 50 bdqv 0
 0 0 0 15
