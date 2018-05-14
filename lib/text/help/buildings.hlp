@@ -139,7 +139,7 @@ See also: BUILD INFO, ARCHITECT, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE,
 #
 BURROWHAVEN "BURROW HAVEN" "STRANGE BURROW"
 
-&g^[]^&0  Burrow Haven  (Build Haven skill)
+&g^[]^&0  Burrow Haven  (Vampire Havens goal)
 
 Extra rooms:  6
 Special rooms:  crypt, tunnel
@@ -190,7 +190,7 @@ See also:  CRAFT, WOODWORKING
 #
 CAVEHAVEN "CAVE HAVEN" "OBSCURE CAVE"
 
-&y/&0()&y\&0  Cave Haven  (Build Haven skill)
+&y/&0()&y\&0  Cave Haven  (Vampire Havens goal)
 
 Extra rooms:  6
 Special rooms:  crypt, tunnel
@@ -517,7 +517,7 @@ See also: DESIGNATE, PUEBLO
 #
 HOUSEHAVEN "HOUSE HAVEN" "RICKETY OLD HOUSE"
 
-.[].  House Haven  (Build Haven skill)
+.[].  House Haven  (Vampire Havens goal)
 
 Extra rooms:  6
 Special rooms:  crypt
@@ -726,7 +726,7 @@ See also: DESIGNATE, HOUSE, OLD PUEBLO
 #
 PUEBLOHAVEN "PUEBLO HAVEN" "OLD PUEBLO"
 
-&y.&0[]&y.&0  Pueblo Haven  (Build Haven skill)
+&y.&0[]&y.&0  Pueblo Haven  (Vampire Havens goal)
 
 Extra rooms:  6
 Special rooms:  crypt

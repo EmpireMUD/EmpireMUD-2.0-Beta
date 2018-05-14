@@ -432,7 +432,7 @@ See also: BUFF FOOD, COOKING FIRE
 #
 "HERBCLOTH WEAVING" "SPARKFIBER CLOTH" "MANASILK CLOTH"
 
-Herbcloth Weaving (Trade ability)
+Herbcloth Weaving (goal)
 Command:  weave <sparkfiber | manasilk> cloth
 
 Skilled tradesmen can weave enchanted herbs into their textiles in order to
@@ -685,7 +685,7 @@ See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
 #
 "MOONSTONE SMELTING" "MOONSTONE ORE" MOONSTONE "ARGENTINE INGOT" "EVENTIDE INGOT"
 
-Moonstone Smelting (Trade ability)
+Moonstone Smelting (goal)
 Command:  smelt <argentine | eventide> ingot
 
 The super-rare moonstone ore is highly prized by metallurgists, and can be
@@ -769,7 +769,7 @@ BASIC CRAFTS, SAW, CHIP, SCRAPE
 #
 "PRISMATIC CRYSTALS" "PRISMATIC CRYSTAL"
 
-Prismatic Crystals (Trade ability)
+Prismatic Crystals (goal)
 Command:  craft prismatic crystal
 Cost:  100 mana
 
@@ -1057,7 +1057,7 @@ See also: FORGE
 #
 "VERDANT LEATHERS" "BRIAR HIDE" "ABSINTHIAN LEATHER"
 
-Verdant Leathers (Trade ability)
+Verdant Leathers (goal)
 Command:  craft <briar hide | absinthian leather>
 
 Certain tradesmen learn to treat fine leather with a bath of herbs, creating
