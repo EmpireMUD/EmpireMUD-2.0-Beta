@@ -173,6 +173,9 @@ When using field - The variable returns:
 &cremove_progress(vnum)&0 - Takes away a progression goal. Warning: If the empire
    still qualifies for the goal, they may instantly re-earn it. This works best
    if you only remove SCRIPT-ONLY goals.
+&cstart_progress(vnum)&0 - Begins a SCRIPT-ONLY progression goal, which will
+   also immediately auto-complete if tasks are already complete. Otherwise, it
+   will behave like a normal goal.
 &cterritory&0 - The amount of land claimed.
 &cvnum&0 - The empire's vnum.
 &cwealth&0 - The empire's total wealth (coins + treasure).

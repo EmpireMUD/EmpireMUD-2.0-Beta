@@ -59,6 +59,8 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 /* external functions */
 void check_for_eligible_goals(empire_data *emp);	// progress.c
 extern int count_harnessed_animals(vehicle_data *veh);
+void count_quest_tasks(struct req_data *list, int *complete, int *total);
+extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
@@ -3598,7 +3600,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'q': {	// char.q*
 					if (!str_cmp(field, "quest_finished")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void count_quest_tasks(struct req_data *list, int *complete, int *total);
 							any_vnum vnum = atoi(subfield);
 							struct player_quest *pq;
 							int complete, total;
@@ -5075,8 +5076,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							any_vnum vnum;
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
-								extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
-								
 								snprintf(str, slen, "%d", (!empire_has_completed_goal(emp, vnum) && empire_meets_goal_prereqs(emp, prg)) ? 1 : 0);
 							}
 							else {
@@ -5134,6 +5133,44 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 's': {	// emp.s*
+					if (!str_cmp(field, "start_progress")) {
+						if (subfield && *subfield) {
+							progress_data *prg;
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
+								if (!empire_has_completed_goal(emp, vnum) && !get_current_goal(emp, vnum) && empire_meets_goal_prereqs(emp, prg)) {
+									extern struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
+									
+									struct empire_goal *goal = start_empire_goal(emp, prg);
+									int complete, total;
+									
+									if (goal) {
+										void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
+										refresh_one_goal_tracker(emp, goal);
+									}
+									// check if complete
+									count_quest_tasks(goal->tracker, &complete, &total);
+									if (complete == total) {
+										void complete_goal(empire_data *emp, struct empire_goal *goal);
+										complete_goal(emp, goal);
+									}
+								}
+								strcpy(str, "1");
+							}
+							else {
+								script_log("Trigger: %s, VNum %d. start_progress called with invalid vnum '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					break;
+				}
+				
 				case 't': {	// emp.t*
 					if (!str_cmp(field, "territory")) {
 						snprintf(str, slen, "%d", EMPIRE_TERRITORY(emp, TER_TOTAL));
