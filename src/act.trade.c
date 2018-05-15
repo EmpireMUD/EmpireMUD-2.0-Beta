@@ -230,8 +230,6 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL;
 	craft_data *craft, *next_craft;
-	// obj_data *obj;
-	bool found;
 	
 	skip_spaces(&argument);
 	
@@ -245,24 +243,6 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
 			continue;
 		}
-		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
-			// are they holding a recipe? -- no longer requires this as of b5.34
-			found = FALSE;
-			/*
-			LL_FOREACH2(ch->carrying, obj, next_content) {
-				if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == GET_CRAFT_VNUM(craft)) {
-					found = TRUE;
-					break;
-				}
-			}
-			*/
-			if (!found) {
-				if (!unknown_abbrev) {
-					unknown_abbrev = craft;
-				}
-				continue;	// not learned
-			}
-		}
 		
 		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
 			// exact match!
@@ -275,11 +255,18 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 					unknown_abbrev = craft;
 				}
 			}
-			else if (GET_CRAFT_ABILITY(craft) == NO_ABIL || has_ability(ch, GET_CRAFT_ABILITY(craft))) {
-				known_abbrev = craft;
+			else if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+				if (!unknown_abbrev) {	// player missing ability
+					unknown_abbrev = craft;
+				}
 			}
-			else if (!unknown_abbrev) {
-				unknown_abbrev = craft;
+			else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+				if (!unknown_abbrev) {	// player missing 'learned'
+					unknown_abbrev = craft;
+				}
+			}
+			else {	// they should have access to it
+				known_abbrev = craft;
 			}
 		}
 	}
