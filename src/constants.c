@@ -1539,6 +1539,7 @@ const char *craft_flags[] = {
 	"SHIPYARD",
 	"BLD-UPGRADED",
 	"LEARNED",
+	"BY-RIVER",
 	"\n"
 };
 
@@ -1562,6 +1563,7 @@ const char *craft_flag_for_info[] = {
 	"requires shipyard",
 	"requires upgrade",
 	"",	// learned
+	"must be by a river",
 	"\n"
 };
 

@@ -250,7 +250,7 @@ MILL MILLING
 
 Mill (Basic Crafts ability)
 
-Building:  (MM)  Mill  (Build ability)
+Building:  (MM)  Mill  (must be by a river; Build ability)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>

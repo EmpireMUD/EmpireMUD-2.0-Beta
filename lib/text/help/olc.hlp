@@ -2282,6 +2282,7 @@ Available flags:
  SHIPYARD - requires being at a shipyard
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
  LEARNED - requires the player/empire 'learn' a recipe to use it
+ BY-RIVER - must be adjacent to a river
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d

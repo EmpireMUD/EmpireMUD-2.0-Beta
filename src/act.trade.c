@@ -78,6 +78,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PRESS) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a press to do that.\r\n");
 	}
+	else if (CRAFT_FLAGGED(type, CRAFT_BY_RIVER) && (!IS_OUTDOORS(ch) || !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1))) {
+		msg_to_char(ch, "You must be next to a river to do that.\r\n");
+	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}

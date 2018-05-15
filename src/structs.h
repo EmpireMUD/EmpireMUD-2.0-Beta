@@ -965,6 +965,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
+#define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 
 // list of above craft flags that require a building in some way
 #define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
