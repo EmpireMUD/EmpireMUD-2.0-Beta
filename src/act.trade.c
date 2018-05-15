@@ -230,7 +230,7 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL;
 	craft_data *craft, *next_craft;
-	obj_data *obj;
+	// obj_data *obj;
 	bool found;
 	
 	skip_spaces(&argument);
@@ -246,14 +246,16 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 			continue;
 		}
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
-			// are they holding a recipe?
+			// are they holding a recipe? -- no longer requires this as of b5.34
 			found = FALSE;
+			/*
 			LL_FOREACH2(ch->carrying, obj, next_content) {
 				if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == GET_CRAFT_VNUM(craft)) {
 					found = TRUE;
 					break;
 				}
 			}
+			*/
 			if (!found) {
 				if (!unknown_abbrev) {
 					unknown_abbrev = craft;
