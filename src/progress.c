@@ -1493,6 +1493,7 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 	struct progress_list *iter, *sub;
 	progress_data *other;
 	bool problem = FALSE;
+	int tick;
 	
 	if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "IN-DEVELOPMENT");
@@ -1511,6 +1512,12 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 	if (ispunct(*(PRG_NAME(prg) + strlen(PRG_NAME(prg)) - 1))) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "Name ends with punctuation");
 		problem = TRUE;
+	}
+	for (tick = 0; tick < NUM_PROGRESS_TYPES; ++tick) {
+		if (is_abbrev(progress_types[tick], PRG_NAME(prg)) || is_abbrev(PRG_NAME(prg), progress_types[tick])) {
+			olc_audit_msg(ch, PRG_VNUM(prg), "WARNING: Name matches a progression category, which may make lookups impossible");
+			problem = TRUE;
+		}
 	}
 	
 	if (!PRG_DESCRIPTION(prg) || !*PRG_DESCRIPTION(prg)) {
