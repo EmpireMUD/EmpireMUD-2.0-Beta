@@ -3124,10 +3124,14 @@ PLAYER_UPDATE_FUNC(b5_34_player_update) {
 
 // part of the HUGE progression update
 void b5_34_mega_update(void) {
+	void free_empire_goals(struct empire_goal *hash);
+	void free_empire_completed_goals(struct empire_completed_goal *hash);
+	
 	struct instance_data *inst, *next_inst;
 	struct empire_political_data *pol;
 	empire_data *emp, *next_emp;
 	char_data *mob, *next_mob;
+	int iter;
 	
 	// remove Spirit of Progress mob
 	LL_FOREACH_SAFE(character_list, mob, next_mob) {
@@ -3143,11 +3147,28 @@ void b5_34_mega_update(void) {
 		}
 	}
 	
-	// update empires: remove all 'trade' relations
+	// update empires:
 	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// remove all 'trade' relations
 		LL_FOREACH(EMPIRE_DIPLOMACY(emp), pol) {
 			REMOVE_BIT(pol->type, DIPL_TRADE);
 			REMOVE_BIT(pol->offer, DIPL_TRADE);
+		}
+		
+		// reset progression
+		free_empire_goals(EMPIRE_GOALS(emp));
+		EMPIRE_GOALS(emp) = NULL;
+		free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
+		EMPIRE_COMPLETED_GOALS(emp) = NULL;
+		
+		// reset points
+		for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+			EMPIRE_PROGRESS_POINTS(emp, iter) = 0;
+		}
+		
+		// reset attributes
+		for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+			EMPIRE_ATTRIBUTE(emp, iter) = 0;
 		}
 	}
 	
