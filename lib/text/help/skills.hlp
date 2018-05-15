@@ -511,10 +511,10 @@ you a free level in the skill.
 * The rest of the skills are limited to 50. These are basic skills.
   These skills will get 9 abilities each.
 
-You can get a second specialty skill (75) if you keep two of your skills at
-zero (0). Once you have fewer than two skills at zero, you can no longer choose
-to specialize an extra skill. The opposite is also true: if you specialize an
-extra skill, you'll no longer be able to gain in your last two zeroes.
+You can get a second specialty skill (75) if you keep one of your basic skills
+at zero (0). Once you have no basic skills left at zero, you can no longer
+choose to specialize an extra skill. The opposite is also true: if you
+specialize an extra skill, you'll no longer be able to gain in your last zero.
 
 You can use 'skill drop' if you want to lower one of your skills so that you
 can then start raising a different one.
