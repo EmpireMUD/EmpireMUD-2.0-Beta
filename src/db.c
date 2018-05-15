@@ -3133,6 +3133,8 @@ void b5_34_mega_update(void) {
 	char_data *mob, *next_mob;
 	int iter;
 	
+	log("Applying b5.34 progression update...");
+	
 	// remove Spirit of Progress mob
 	LL_FOREACH_SAFE(character_list, mob, next_mob) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == 10856) {
