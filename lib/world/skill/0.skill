@@ -2,7 +2,7 @@
 Battle~
 Bat~
 Charge confidently into combat~
-0
+b
 A 101 -1 20
 A 97 96 40
 A 99 -1 75
@@ -26,6 +26,7 @@ A 294 101 55
 A 89 -1 55
 A 100 -1 35
 A 90 -1 50
+A 228 1002 90
 A 5 99 90
 A 209 84 75
 A 86 85 60
@@ -70,16 +71,13 @@ Empire~
 Emp~
 This skill has been replaced by the progression system~
 0
-A 42 -1 75
 L 100 0
-Y 1 0 100 228 0
-Y 6 0 100 228 0
 S
 #2
 High Sorcery~
 Sor~
 Learn the secrets of the imperial sorcerers~
-0
+b
 A 207 -1 75
 A 188 187 65
 A 173 165 25
@@ -128,7 +126,7 @@ S
 Natural Magic~
 Nat~
 Attain mastery over the natural world~
-0
+b
 A 239 111 80
 A 215 34 50
 A 126 -1 50
@@ -238,7 +236,7 @@ S
 Stealth~
 Stl~
 Become one with the shadows and learn their secrets~
-0
+b
 A 147 142 60
 A 3 -1 10
 A 156 155 50
@@ -294,7 +292,7 @@ S
 Survival~
 Sur~
 Make your way in the harsh wilderness~
-0
+b
 A 65 64 75
 A 67 -1 50
 A 70 69 50
@@ -325,7 +323,7 @@ S
 Trade~
 Trd~
 Earn your fortune on the roads and seas~
-0
+b
 A 59 58 55
 A 300 289 75
 A 53 51 25
@@ -380,7 +378,7 @@ S
 Vampire~
 Vam~
 Feed the hunger, control the blood~
-0
+b
 A 33 27 60
 A 2 107 75
 A 162 4 85

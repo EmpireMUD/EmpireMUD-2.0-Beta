@@ -476,7 +476,7 @@ dig~
 F
 f
 I 5 100 9.00 1 X  # DIG: a rock
-I 5 101 100.00 1 X  # DIG: a pile of clay
+I 5 101 100.00 1 X  # DIG: a lump of clay
 R
 1000 1 5 0
 S
@@ -1913,5 +1913,61 @@ R
 R
 1007 1 5 0
 T 5195
+S
+#5196
+Fishery~
+A Fishery~
+&0(&a~~&0)~
+8 0 dpL 0
+0 0 0 -1
+I 21 1302 33.00 1 f  # FISH: a giant linefish
+I 21 1303 33.00 1 f  # FISH: a magenta arrowfish
+I 21 1301 100.00 1 f  # FISH: a striped barbfish
+R
+1002 1 5 0
+R
+25 1 1 0
+S
+#5197
+Stilt House~
+A House on Stilts~
+&0|==|~
+10 0 pR em
+3 2 0 -1
+D
+   The calm sounds of rippling water fill the air as you look out the window of
+this raised wooden house. Despite its high perch, the house feels stable and
+seems well-built. It makes the perfect home for a fisherman.
+~
+R
+16 1 1 0
+R
+19 1 1 0
+S
+#5198
+Coastal Shrine~
+A Coastal Shrine~
+@w&0{}@e~
+16 2 dh 0
+0 0 0 -1
+C
+dedicate~
+R
+1002 1 5 0
+R
+19 1 1 0
+S
+#5199
+Mountain Well~
+A Deep Well on the Mountain~
+&y{&c~~&y}~
+4 0 d 0
+0 0 0 -1
+C
+drink, fill~
+F
+F
+R
+1000 2 5 0
 S
 $
