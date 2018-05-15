@@ -505,7 +505,6 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 		if (MOB_FLAGGED(ch, MOB_AGGRESSIVE | MOB_CITYGUARD)) {
 			// only locks blocks aggressive/cityguard
 			if (EMPIRE_HAS_TECH(room_emp, TECH_LOCKS)) {
-				empire_skillup(room_emp, ABIL_LOCKS, 10);
 				valid = FALSE;
 			}
 		}

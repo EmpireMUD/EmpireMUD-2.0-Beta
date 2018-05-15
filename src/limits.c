@@ -409,11 +409,7 @@ void point_update_char(char_data *ch) {
 		if (IS_BLOOD_STARVED(ch)) {
 			msg_to_char(ch, "You are starving!\r\n");
 		}
-	
-		// in an empire?
-		if (emp) {
-			gain_ability_exp(ch, ABIL_LOCKS, 1);
-		}
+		
 		// light-based gains
 		if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
 			gain_ability_exp(ch, ABIL_DAYWALKING, 2);

@@ -952,9 +952,6 @@ ACMD(do_infiltrate) {
 		gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
 		
 		if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
-			if (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) {
-				empire_skillup(emp, ABIL_LOCKS, 10);
-			}
 			msg_to_char(ch, "You fail.\r\n");
 		}
 		else {

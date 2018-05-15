@@ -127,7 +127,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_HEARTSTOP  36
 #define ABIL_TASTE_BLOOD  37
 #define ABIL_BLOOD_FORTITUDE  38
-#define ABIL_LOCKS  41
+// formerly: #define ABIL_LOCKS  41
 // formerly: #define ABIL_ROADS  49
 #define ABIL_STAMINA  66
 #define ABIL_FIND_HERBS  70
