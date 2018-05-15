@@ -6486,6 +6486,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_EMPIRE_MILITARY: {
+				if (!GET_LOYALTY(ch) || EMPIRE_MILITARY(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			case REQ_EMPIRE_GREATNESS: {
 				if (!GET_LOYALTY(ch) || EMPIRE_GREATNESS(GET_LOYALTY(ch)) < req->needed) {
 					ok = FALSE;
@@ -6702,6 +6708,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_EMPIRE_FAME: {
 			snprintf(output, sizeof(output), "Have empire fame over: %d", req->needed);
+			break;
+		}
+		case REQ_EMPIRE_MILITARY: {
+			snprintf(output, sizeof(output), "Have empire military over: %d", req->needed);
 			break;
 		}
 		case REQ_EMPIRE_GREATNESS: {

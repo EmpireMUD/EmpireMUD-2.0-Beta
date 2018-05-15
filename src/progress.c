@@ -937,6 +937,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = EMPIRE_FAME(emp);
 				break;
 			}
+			case REQ_EMPIRE_MILITARY: {
+				task->current = EMPIRE_MILITARY(emp);
+				break;
+			}
 			case REQ_EMPIRE_GREATNESS: {
 				task->current = EMPIRE_GREATNESS(emp);
 				break;
@@ -1159,29 +1163,6 @@ void et_change_diplomacy(empire_data *emp) {
 
 
 /**
-* Empire Tracker: empire gains/loses fame
-*
-* @param empire_data *emp The empire.
-*/
-void et_change_fame(empire_data *emp) {
-	struct empire_goal *goal, *next_goal;
-	struct req_data *task;
-	
-	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
-		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_EMPIRE_FAME) {
-				task->current = EMPIRE_FAME(emp);
-				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
-			}
-		}
-	}
-	
-	// members online
-	qt_empire_players(emp, qt_empire_fame, 0);
-}
-
-
-/**
 * Empire Tracker: empire gains/loses greatness
 *
 * @param empire_data *emp The empire.
@@ -1213,7 +1194,11 @@ void et_change_greatness(empire_data *emp) {
 void et_gain_building(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
-	bld_data *bld;
+	bld_data *bld = building_proto(vnum);
+	
+	if (!bld) {	// no building / no work
+		return;
+	}
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
@@ -1221,12 +1206,20 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_OWN_HOMES && (bld = building_proto(vnum)) && GET_BLD_CITIZENS(bld) > 0) {
+			else if (task->type == REQ_OWN_HOMES && GET_BLD_CITIZENS(bld) > 0) {
 				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_FAME && GET_BLD_FAME(bld) != 0) {
+				task->current += GET_BLD_FAME(bld);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
+				task->current += GET_BLD_MILITARY(bld);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1331,7 +1324,11 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 void et_lose_building(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
-	bld_data *bld;
+	bld_data *bld = building_proto(vnum);
+	
+	if (!bld) {
+		return;
+	}
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
@@ -1341,13 +1338,22 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 				// check min
 				task->current = MAX(task->current, 0);
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				--task->current;
 				task->current = MAX(task->current, 0);
 			}
-			else if (task->type == REQ_OWN_HOMES && (bld = building_proto(vnum)) && GET_BLD_CITIZENS(bld) > 0) {
+			else if (task->type == REQ_OWN_HOMES && GET_BLD_CITIZENS(bld) > 0) {
 				--task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_FAME && GET_BLD_FAME(bld) != 0) {
+				task->current -= GET_BLD_FAME(bld);
+				
+				// fame could trigger if negative
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
+				task->current -= GET_BLD_MILITARY(bld);
 			}
 		}
 	}

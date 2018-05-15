@@ -4814,6 +4814,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		case REQ_CROP_VARIETY:
 		case REQ_EMPIRE_WEALTH:
 		case REQ_EMPIRE_FAME:
+		case REQ_EMPIRE_MILITARY:
 		case REQ_EMPIRE_GREATNESS:
 		case REQ_GET_COINS: {
 			// need nothing?
