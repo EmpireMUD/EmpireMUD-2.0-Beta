@@ -2589,6 +2589,10 @@ void generate_island_descriptions(void) {
 	
 	// now count terrains
 	LL_FOREACH(land_map, map) {
+		if (map->base_sector && SECT_FLAGGED(map->base_sector, SECTF_OCEAN)) {
+			continue;	// skip ocean-flagged tiles
+		}
+		
 		// find island
 		temp = map->shared->island_id;
 		HASH_FIND_INT(isle_hash, &temp, isle);
@@ -2620,7 +2624,7 @@ void generate_island_descriptions(void) {
 		count = 0;
 		HASH_ITER(hh, isle->ters, ter, next_ter) {
 			prc = (double)ter->count / isliter->tile_size * 100.0;
-			if (prc < 1.0) {
+			if (prc < 5.0) {
 				continue;
 			}
 			
