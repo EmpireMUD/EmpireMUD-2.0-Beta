@@ -258,6 +258,7 @@ Command:  mill [number] <item>
 You can mill:
   wheat into flour
   corn into cornmeal
+  oats into oatmeal
 
 You must do this at a Mill building.
 
