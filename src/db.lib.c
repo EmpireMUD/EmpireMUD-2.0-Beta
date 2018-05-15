@@ -4352,7 +4352,7 @@ struct island_info *get_island_by_name(char_data *ch, char *name) {
 			if (eisle->name && !str_cmp(name, eisle->name)) {
 				return get_island(eisle->island, TRUE);
 			}
-			else if (eisle->name && !e_abbrev && is_abbrev(name, eisle->name)) {
+			else if (eisle->name && !e_abbrev && is_multiword_abbrev(name, eisle->name)) {
 				e_abbrev = eisle;
 			}
 		}
@@ -4367,7 +4367,7 @@ struct island_info *get_island_by_name(char_data *ch, char *name) {
 		if (!str_cmp(name, isle->name)) {
 			return isle;
 		}
-		else if (!abbrev && is_abbrev(name, isle->name)) {
+		else if (!abbrev && is_multiword_abbrev(name, isle->name)) {
 			abbrev = isle;
 		}
 	}
