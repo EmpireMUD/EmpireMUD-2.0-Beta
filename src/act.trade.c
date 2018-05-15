@@ -255,6 +255,9 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 				}
 			}
 			if (!found) {
+				if (!unknown_abbrev) {
+					unknown_abbrev = craft;
+				}
 				continue;	// not learned
 			}
 		}
