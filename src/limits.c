@@ -360,7 +360,6 @@ void point_update_char(char_data *ch) {
 	struct instance_data *inst;
 	obj_data *obj, *next_obj;
 	char_data *c, *chiter;
-	empire_data *emp;
 	bool found;
 	int count;
 	
@@ -385,8 +384,6 @@ void point_update_char(char_data *ch) {
 	}
 	
 	if (!IS_NPC(ch)) {
-		emp = GET_LOYALTY(ch);
-		
 		// check bad quest items
 		remove_quest_items(ch);
 		
