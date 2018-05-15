@@ -49,6 +49,7 @@ extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 
 // external functions
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
+void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void discrete_load(FILE *fl, int mode, char *filename);
 void free_complex_data(struct complex_room_data *data);
 extern crop_data *get_potential_crop_for_location(room_data *location);
@@ -1913,6 +1914,7 @@ const char *versions_list[] = {
 	"b5.24",
 	"b5.25",
 	"b5.30",
+	"b5.34",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2596,8 +2598,6 @@ PLAYER_UPDATE_FUNC(b5_1_update_players) {
 
 // b5.1 convert resource action vnums (all resource actions += 1000)
 void b5_1_global_update(void) {
-	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
-	
 	struct instance_data *inst, *next_inst;
 	craft_data *craft, *next_craft;
 	adv_data *adv, *next_adv;
@@ -3077,6 +3077,85 @@ void b5_30_empire_update(void) {
 }
 
 
+PLAYER_UPDATE_FUNC(b5_34_player_update) {
+	void check_delayed_load(char_data *ch);
+	void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
+	
+	struct player_skill_data *skill, *next_skill;
+	struct player_ability_data *abil, *next_abil;
+	int iter;
+	
+	check_delayed_load(ch);
+	
+	// check empire skill
+	if (!IS_IMMORTAL(ch)) {
+		HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+			// delete empire skill entry
+			if (skill->vnum == 1) {
+				// gain bonus exp
+				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), skill->level, 0, UCHAR_MAX, FALSE);
+				HASH_DEL(GET_SKILL_HASH(ch), skill);
+				free(skill);
+			}
+		}
+	}
+	
+	// clear all ability purchases
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+		for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
+			remove_ability_by_set(ch, find_ability_by_vnum(abil->vnum), iter, FALSE);
+		}
+	}
+	
+	// remove cooldowns
+	while (ch->cooldowns) {
+		remove_cooldown(ch, ch->cooldowns);
+	}
+	
+	// remove all affects
+	while (ch->affected) {
+		affect_remove(ch, ch->affected);
+	}
+	while (ch->over_time_effects) {
+		dot_remove(ch, ch->over_time_effects);
+	}
+}
+
+
+// part of the HUGE progression update
+void b5_34_mega_update(void) {
+	struct instance_data *inst, *next_inst;
+	struct empire_political_data *pol;
+	empire_data *emp, *next_emp;
+	char_data *mob, *next_mob;
+	
+	// remove Spirit of Progress mob
+	LL_FOREACH_SAFE(character_list, mob, next_mob) {
+		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == 10856) {
+			extract_char(mob);
+		}
+	}
+	
+	// remove all instances of adventure 50 (was shut off by this patch)
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (inst->adventure && GET_ADV_VNUM(inst->adventure) == 50) {
+			delete_instance(inst, TRUE);
+		}
+	}
+	
+	// update empires: remove all 'trade' relations
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		LL_FOREACH(EMPIRE_DIPLOMACY(emp), pol) {
+			REMOVE_BIT(pol->type, DIPL_TRADE);
+			REMOVE_BIT(pol->offer, DIPL_TRADE);
+		}
+	}
+	
+	// and players
+	update_all_players(NULL, b5_34_player_update);
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3322,6 +3401,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.30")) {
 			b5_30_empire_update();
+		}
+		if (MATCH_VERSION("b5.34")) {
+			b5_34_mega_update();
 		}
 	}
 	
