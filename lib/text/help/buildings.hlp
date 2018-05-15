@@ -57,7 +57,7 @@ See also: DESIGNATE, INTERLINK
 #
 BATH BATHS
 
-[&b~~&0]  Baths  (Luxury ability)
+[&b~~&0]  Baths  (Architect ability)
 
 The most opulent empires construct bath houses for their citizens. These
 luxuries serve as meeting places and relaxation houses for persons of dist-
@@ -371,7 +371,7 @@ See also: BUILD, TOMB
 #
 "GREAT HALL" GREATHALL
 
-[**]  Great Hall (Luxury ability)
+[**]  Great Hall (Luxuries goal)
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
@@ -802,7 +802,7 @@ See also: MAIL
 #
 PORTCULLIS "CASTLE PORTCULLIS" CASTLE PALACE
 
-V[]V  Portcullis (Luxury ability)
+V[]V  Portcullis (Luxuries goal)
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
@@ -965,7 +965,7 @@ See also: DEDICATE
 #
 STEPS
 
-.==.  Steps  (Foundations goal)
+.==.  Steps  (Luxuries goal)
 
 Steps are similar to roads, but indicate rising terrain. These might be the
 steps to a great monument, or merely the main street of a town on a hillside.

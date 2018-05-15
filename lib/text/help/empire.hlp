@@ -958,7 +958,18 @@ of each resource if your empire is over the cap globally.
 See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptions.
 
 See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
-          WORKFORCE KEEP
+          WORKFORCE KEEP, WORKFORCE CAP
+#
+"WORKFORCE CAP"
+
+Workforce will only gather resources up to a certain limit. Workers will not
+work chores that would give you more of an item than that cap. You can see your
+workforce caps on your empire detail.
+
+You can set your own caps on chores by choosing a limit with the 'workforce'
+command.
+
+See also: WORKFORCE
 #
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
