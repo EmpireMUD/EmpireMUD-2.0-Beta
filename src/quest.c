@@ -315,7 +315,7 @@ int count_owned_homes(empire_data *emp) {
 		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
 			continue;	// must be a completed building
 		}
-		if (!IS_MAP_BUILDING(ter->room)) {
+		if (ROOM_BLD_FLAGGED(ter->room, BLD_ROOM)) {
 			continue;	// don't count interiors
 		}
 		if (GET_BLD_CITIZENS(GET_BUILDING(ter->room)) < 1) {
@@ -2213,7 +2213,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
 			}
-			else if (task->type == REQ_OWN_HOMES && GET_BLD_CITIZENS(bld) > 0) {
+			else if (task->type == REQ_OWN_HOMES && !IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_CITIZENS(bld) > 0) {
 				++task->current;
 			}
 			else if (task->type == REQ_EMPIRE_FAME && GET_BLD_FAME(bld) != 0) {
@@ -2427,7 +2427,7 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				--task->current;
 			}
-			else if (task->type == REQ_OWN_HOMES && GET_BLD_CITIZENS(bld) > 0) {
+			else if (task->type == REQ_OWN_HOMES && !IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_CITIZENS(bld) > 0) {
 				--task->current;
 			}
 			else if (task->type == REQ_EMPIRE_FAME && GET_BLD_FAME(bld) != 0) {
