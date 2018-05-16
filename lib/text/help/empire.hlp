@@ -92,8 +92,8 @@ See also: CITY INFORMATION, CITY TRAITS, CLAIM
 
 Empires are made up of cities. An empire gets 1 city point per 2 members and
 can use a city point to found a new city, or to upgrade an existing one. As
-you upgrade a city, its radius grows. 60% of an empire's territory must be
-inside its cities.
+you upgrade a city, its radius grows. Additional city points come from
+progression rewards. 60% of an empire's territory must be inside its cities.
 
 The boundaries of the city only show how far its influence reaches. You must
 still claim the territory within the borders if you want it to be part of your
@@ -103,12 +103,6 @@ don't claim it yourself.
 There is a 60-minute waiting period between when you found a city, and when it
 counts as a city for things like City Teleportation, certain buildings such as
 the Great Hall, for guard towers, and for some other game rules.
-
-City points come from:
- - 1 point per 2 members (rounded up)
- - 1 point for having at least 4000 wealth
- - 1 point for having at least 10 technologies
- - 1 point from progression rewards
 
 EmpireMUD periodically checks if cities are completely empty and, if so,
 will remove the city center and refund the city point. This helps keep the map
@@ -859,6 +853,8 @@ Available technologies are:
  - Rare Metals: Mines can have rare metals.
  - Bonus Experience: Empire members get +5 bonus experience each day.
  - Tunnels: The empire can use the 'tunnel' command.
+ - Fast Prospect: Members of the empire can prospect much faster.
+ - Fast Excavate: Members of the empire excavate much faster when in-city.
 
 * some technologies only function on the same island as the building that
   provides them

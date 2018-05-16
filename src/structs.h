@@ -1166,7 +1166,9 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_RARE_METALS  14
 #define TECH_BONUS_EXPERIENCE  15
 #define TECH_TUNNELS  16
-#define NUM_TECHS  17
+#define TECH_FAST_PROSPECT  17
+#define TECH_FAST_EXCAVATE  18
+#define NUM_TECHS  19
 
 
 // TER_x: territory types for empire arrays
@@ -1769,6 +1771,8 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_ALWAYS_FAST  BIT(5)	// this action is always faster
 #define ACTF_SITTING  BIT(6)	// can be sitting
 #define ACTF_FASTER_BONUS  BIT(7)	// speed boost from starting bonus
+#define ACTF_FAST_PROSPECT  BIT(8)	// empire tech boosts speed
+#define ACTF_FAST_EXCAVATE  BIT(9)	// empire tech boosts speed, when in-city
 
 
 // BONUS_x: bonus traits

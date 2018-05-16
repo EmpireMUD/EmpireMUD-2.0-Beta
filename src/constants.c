@@ -1753,6 +1753,8 @@ const char *techs[] = {
 	"Rare Metals",
 	"Bonus Experience",
 	"Tunnels",
+	"Fast Prospect",
+	"Fast Excavate",
 	"\n"
 };
 
