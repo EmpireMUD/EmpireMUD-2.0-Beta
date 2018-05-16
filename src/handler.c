@@ -6596,7 +6596,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_GET_COINS: {
-			snprintf(output, sizeof(output), "Get misc coins: %d coins", req->needed);
+			snprintf(output, sizeof(output), "Get coins: %d coins", req->needed);
 			break;
 		}
 		case REQ_KILL_MOB: {
