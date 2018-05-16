@@ -168,7 +168,8 @@ the components from other players.
 
 The first tier of crafter items comes at level 100:
   Head: clockwork goggles (requires a clockwork lens array from an Artificer)
-  Clothes: guildmaster tunic (requires guild-patterned cloth from a Guildsman)
+  Clothes: guildmaster tunic (requires guild-patterned cloth from an
+           Antiquarian)
   Waist: utility belt (requires some clips and buckles from a Tinker)
   Off-hand: steel multitool (needs a set of delicate tools from a Steelsmith)
 
@@ -848,7 +849,7 @@ See also: COMPONENT, COOK, FRUIT
 #
 WAREHOUSE
 
-Building:  {WW}  Warehouse  (Artisans skill)
+Building:  {WW}  Warehouse  (Foundations goal)
 
 Command:  warehouse inventory [item keywords]
           warehouse identify <item keywords>
@@ -878,6 +879,6 @@ You retrieve a short sword (x4).
 Note: Immortals can see the warehouse lists for other empires using the syntax
 "warehouse inv <empire> [keywords]".
 
-See also: ARTISANS, KEEP, RETRIEVE, STORE, VAULT
+See also: KEEP, RETRIEVE, STORE, VAULT
 #
 $

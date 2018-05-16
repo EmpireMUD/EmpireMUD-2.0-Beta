@@ -1412,6 +1412,7 @@ void remove_empire_from_table(empire_data *emp) {
 * empire data and ensures players don't log in mid-ocean.
 */
 void check_for_new_map(void) {
+	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 	
 	struct empire_storage_data *store, *next_store;
@@ -1420,6 +1421,7 @@ void check_for_new_map(void) {
 	struct empire_city_data *city, *next_city;
 	struct shipping_data *shipd, *next_shipd;
 	struct empire_island *isle, *next_isle;
+	struct instance_data *inst, *next_inst;
 	struct empire_unique_storage *eus;
 	empire_data *emp, *next_emp;
 	room_data *room;
@@ -1431,6 +1433,18 @@ void check_for_new_map(void) {
 	fclose(fl);
 	
 	log("DETECT NEW WORLD MAP -- Clearing empire islands and player locations...");
+	
+	// ensure no instances in the instance list-- their locations SHOULD be all gone anyway
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (inst->room) {
+			free(inst->room);
+		}
+		if (inst->mob_counts) {
+			free(inst->mob_counts);
+		}
+		LL_DELETE(instance_list, inst);
+		free(inst);
+	}
 	
 	// update all empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -1595,6 +1609,7 @@ void check_nowhere_einv_all(void) {
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
 	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
+	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void resort_empires(bool force);
 
 	archetype_data *arch;
@@ -1677,6 +1692,7 @@ empire_data *create_empire(char_data *ch) {
 	
 	// this will set up all the data
 	reread_empire_tech(emp);
+	refresh_empire_goals(emp, NOTHING);
 
 	// this is a good time to sort and rank
 	resort_empires(FALSE);
@@ -1726,6 +1742,8 @@ void delete_empire(empire_data *emp) {
 			if (emp_pol->id == vnum) {
 				REMOVE_FROM_LIST(emp_pol, EMPIRE_DIPLOMACY(emp_iter), next);
 				free(emp_pol);
+				
+				et_change_diplomacy(emp_iter);
 				EMPIRE_NEEDS_SAVE(emp_iter) = TRUE;
 			}
 		}
@@ -2484,10 +2502,13 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 						break;
 					}
 					case 'G': {	// GG: goal in progress
-						if (sscanf(line, "GG %d %d", &t[0], &t[1]) != 2) {
-							log("SYSERR: Format error in GG line of empire %d", vnum);
-							// fatal because it could mess up trackers
-							exit(1);
+						if (sscanf(line, "GG %d %d %ld", &t[0], &t[1], &long_in) != 3) {
+							long_in = time(0);	// backwards-compatible
+							if (sscanf(line, "GG %d %d", &t[0], &t[1]) != 2) {
+								log("SYSERR: Format error in GG line of empire %d", vnum);
+								// fatal because it could mess up trackers
+								exit(1);
+							}
 						}
 						
 						HASH_FIND_INT(EMPIRE_GOALS(emp), &t[0], egoal);
@@ -2497,6 +2518,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 							HASH_ADD_INT(EMPIRE_GOALS(emp), vnum, egoal);
 						}
 						egoal->version = t[1];
+						egoal->timestamp = long_in;
 						
 						last_egoal = egoal;
 						break;
@@ -2824,7 +2846,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// G: progression goals, tasks, and completed
 	HASH_ITER(hh, EMPIRE_GOALS(emp), egoal, next_egoal) {
 		// GG goal in progress
-		fprintf(fl, "GG %d %d\n", egoal->vnum, egoal->version);
+		fprintf(fl, "GG %d %d %ld\n", egoal->vnum, egoal->version, egoal->timestamp);
 		
 		// GT goal tracker
 		LL_FOREACH(egoal->tracker, task) {
@@ -3201,7 +3223,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 	char_data *proto;
 	mob_vnum artisan;
 	
-	if (!room || !(emp = ROOM_OWNER(room)) || (!ter && !(ter = find_territory_entry(emp, room)))) {
+	if (!room || !(emp = ROOM_OWNER(room)) || !EMPIRE_HAS_TECH(emp, TECH_CITIZENS) || (!ter && !(ter = find_territory_entry(emp, room)))) {
 		return;	// no work
 	}
 	if (!IS_COMPLETE(room) || ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
@@ -4330,7 +4352,7 @@ struct island_info *get_island_by_name(char_data *ch, char *name) {
 			if (eisle->name && !str_cmp(name, eisle->name)) {
 				return get_island(eisle->island, TRUE);
 			}
-			else if (eisle->name && !e_abbrev && is_abbrev(name, eisle->name)) {
+			else if (eisle->name && !e_abbrev && is_multiword_abbrev(name, eisle->name)) {
 				e_abbrev = eisle;
 			}
 		}
@@ -4345,7 +4367,7 @@ struct island_info *get_island_by_name(char_data *ch, char *name) {
 		if (!str_cmp(name, isle->name)) {
 			return isle;
 		}
-		else if (!abbrev && is_abbrev(name, isle->name)) {
+		else if (!abbrev && is_multiword_abbrev(name, isle->name)) {
 			abbrev = isle;
 		}
 	}
@@ -4480,6 +4502,7 @@ void load_islands(void) {
 */
 void save_island_table(void) {
 	struct island_info *isle, *next_isle;
+	char temp[MAX_STRING_LENGTH];
 	FILE *fl;
 	
 	if (!(fl = fopen(ISLAND_FILE TEMP_SUFFIX, "w"))) {
@@ -4493,7 +4516,9 @@ void save_island_table(void) {
 		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));
 		
 		if (isle->desc && *isle->desc) {
-			fprintf(fl, "D\n%s~\n", isle->desc);
+			strcpy(temp, isle->desc);
+			strip_crlf(temp);
+			fprintf(fl, "D\n%s~\n", temp);
 		}
 		
 		fprintf(fl, "S\n");

@@ -514,31 +514,34 @@ set item %actor.inventory(%vnum%)%
 Postmaster daily letter delivery~
 1 i 100
 ~
-set recipient 0
 switch %self.vnum%
   case 9042
-    * Smith
-    set recipient 212
+    * Smith / Forgemaster
+    if %victim.vnum% == 212 || %victim.vnum% == 278
+      set found 1
+    end
   break
   case 9043
     * High Sorcerer
-    set recipient 228
+    if %victim.vnum% == 228
+      set found 1
+    end
   break
   case 9044
     * Alchemist
-    set recipient 231
+    if %victim.vnum% == 231
+      set found 1
+    end
   break
 done
-set person %victim%
-eval found (%person.vnum% == %recipient% && %person.empire% == %actor.empire%)
-eval wrong_empire %person.vnum% == %recipient% && %person.empire% != %actor.empire%
-if %found%
-  %send% %actor% You give the letter to %person.name%.
+eval wrong_empire %victim.vnum% == %recipient% && %victim.empire% != %actor.empire%
+if %found% && !%wrong_empire%
+  %send% %actor% You give the letter to %victim.name%.
   %quest% %actor% trigger 9042
   return 1
   %purge% %self%
-elseif %wrong_empire%
-  %send% %actor% %person.name% does not belong to your empire.
+elseif %found% && %wrong_empire%
+  %send% %actor% %victim.name% does not belong to your empire.
   return 0
   halt
 else

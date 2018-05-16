@@ -549,27 +549,6 @@ void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 	if (has_ability(ch, ABIL_EXARCH_CRAFTS)) {
 		EMPIRE_TECH(emp, TECH_EXARCH_CRAFTS) += mod;
 	}
-	if (has_ability(ch, ABIL_WORKFORCE)) {
-		EMPIRE_TECH(emp, TECH_WORKFORCE) += mod;
-	}
-	if (has_ability(ch, ABIL_SKILLED_LABOR)) {
-		EMPIRE_TECH(emp, TECH_SKILLED_LABOR) += mod;
-	}
-	if (has_ability(ch, ABIL_TRADE_ROUTES)) {
-		EMPIRE_TECH(emp, TECH_TRADE_ROUTES) += mod;
-	}
-	if (has_ability(ch, ABIL_LOCKS)) {
-		EMPIRE_TECH(emp, TECH_LOCKS) += mod;
-	}
-	if (has_ability(ch, ABIL_PROMINENCE)) {
-		EMPIRE_TECH(emp, TECH_PROMINENCE) += mod;
-	}
-	if (has_ability(ch, ABIL_COMMERCE)) {
-		EMPIRE_TECH(emp, TECH_COMMERCE) += mod;
-	}
-	if (has_ability(ch, ABIL_CITY_LIGHTS)) {
-		EMPIRE_TECH(emp, TECH_CITY_LIGHTS) += mod;
-	}
 	if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
 		EMPIRE_TECH(emp, TECH_PORTALS) += mod;
 	}
@@ -606,8 +585,11 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 * use any ability. Otherwise, it supports an energy pool cost and/or cooldowns,
 * as well as checking that the player has the ability.
 *
+* This function will also provide its other functionality for non-abilities if
+* you pass NO_ABIL or a negative number to the ability parameter.
+*
 * @param char_data *ch The player or NPC.
-* @param any_vnum ability Any ABIL_ const or vnum.
+* @param any_vnum ability Any ABIL_ const or vnum (optional, may be NO_ABIL or a negative number to skip ability checks).
 * @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
 * @param int cost_amount Mana (or whatever) amount required, if any.
 * @param int cooldown_type Any COOLDOWN_ const, or NOTHING for no cooldown check.
@@ -620,7 +602,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 	int time, needs_cost;
 	
 	// purchase check first, or the rest don't make sense.
-	if (!IS_NPC(ch) && ability != NO_ABIL && !has_ability(ch, ability)) {
+	if (!IS_NPC(ch) && ability != NO_ABIL && ability >= 0 && !has_ability(ch, ability)) {
 		msg_to_char(ch, "You have not purchased the %s ability.\r\n", get_ability_name_by_vnum(ability));
 		return FALSE;
 	}
@@ -644,8 +626,8 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
 		return FALSE;
 	}
-	if ((time = get_cooldown_time(ch, cooldown_type)) > 0) {
-		snprintf(buf, sizeof(buf), "%s is still on cooldown for %d second%s.\r\n", get_ability_name_by_vnum(ability), time, (time != 1 ? "s" : ""));
+	if (cooldown_type != NOTHING && (time = get_cooldown_time(ch, cooldown_type)) > 0) {
+		snprintf(buf, sizeof(buf), "Your %s cooldown still has %d second%s.\r\n", get_generic_name_by_vnum(cooldown_type), time, (time != 1 ? "s" : ""));
 		CAP(buf);
 		send_to_char(buf, ch);
 		return FALSE;
@@ -811,6 +793,10 @@ int compute_bonus_exp_per_day(char_data *ch) {
 	
 	if (HAS_BONUS_TRAIT(ch, BONUS_EXTRA_DAILY_SKILLS)) {
 		perdiem += config_get_int("num_bonus_trait_daily_skills");
+	}
+	
+	if (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_BONUS_EXPERIENCE)) {
+		perdiem += 5;
 	}
 	
 	return perdiem;
@@ -1688,6 +1674,9 @@ ACMD(do_skills) {
 		HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
 			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
 				continue;
+			}
+			if (!SKILL_FLAGGED(skill, SKILLF_BASIC) && get_skill_level(ch, SKILL_VNUM(skill)) < 1 && get_skill_exp(ch, SKILL_VNUM(skill)) < 0.1) {
+				continue;	// don't show non-basic skills if the player doesn't have them
 			}
 			
 			strcat(outbuf, get_skill_row_display(ch, skill));
@@ -2839,6 +2828,10 @@ bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum
 		if (iter->vnum == vnum) {
 			LL_DELETE(*list, iter);
 			free(iter);
+			found = TRUE;
+		}
+		else if (iter->prerequisite == vnum) {
+			iter->prerequisite = NOTHING;	// drop prereq
 			found = TRUE;
 		}
 	}
@@ -4293,8 +4286,7 @@ OLC_MODULE(skilledit_tree) {
 				found = TRUE;
 			}
 			else if (abil && skab->prerequisite == ABIL_VNUM(abil)) {
-				LL_DELETE(SKILL_ABILITIES(skill), skab);
-				free(skab);
+				skab->prerequisite = NO_ABIL;
 				found = found_prq = TRUE;
 			}
 		}
@@ -4306,7 +4298,7 @@ OLC_MODULE(skilledit_tree) {
 			msg_to_char(ch, "You remove all abilities.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You remove the %s ability%s.\r\n", ABIL_NAME(abil), found_prq ? " (and things that required it)" : "");
+			msg_to_char(ch, "You remove the %s ability%s.\r\n", ABIL_NAME(abil), found_prq ? " (and things that required it no longer require anything)" : "");
 		}
 	}
 	else if (is_abbrev(cmd_arg, "change")) {

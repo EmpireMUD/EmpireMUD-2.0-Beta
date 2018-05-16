@@ -753,6 +753,9 @@ void init_mine(room_data *room, char_data *ch) {
 		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
 			continue;
 		}
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
+			continue;	// missing rare metals
+		}
 		
 		// level limits
 		if (GET_GLOBAL_MIN_LEVEL(glb) > 0 && (!ch || GET_COMPUTED_LEVEL(ch) < GET_GLOBAL_MIN_LEVEL(glb))) {
@@ -819,7 +822,7 @@ void init_mine(room_data *room, char_data *ch) {
 		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(found));
 		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE)));
 		
-		if (ch && has_player_tech(ch, PTECH_DEEP_MINES)) {
+		if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
 			multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
 		}
@@ -1521,20 +1524,11 @@ void stop_burning(room_data *room) {
 * @return int how many city points emp has to spend
 */
 int city_points_available(empire_data *emp) {
-	extern int get_total_score(empire_data *emp);
-	
-	int score, points = 0;
+	int points = 0;
 	
 	if (emp) {
 		points = 1;
-		points += (EMPIRE_HAS_TECH(emp, TECH_PROMINENCE) ? 1 : 0);
 		points += ((EMPIRE_MEMBERS(emp) - 1) / config_get_int("players_per_city_point"));
-		points += (GET_TOTAL_WEALTH(emp) >= config_get_int("bonus_city_point_wealth")) ? 1 : 0;
-		points += (count_tech(emp) >= config_get_int("bonus_city_point_techs")) ? 1 : 0;
-		
-		score = get_total_score(emp);
-		points += (score >= 50) ? 1 : 0;
-		
 		points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
 
 		// minus any used points
@@ -2595,6 +2589,10 @@ void generate_island_descriptions(void) {
 	
 	// now count terrains
 	LL_FOREACH(land_map, map) {
+		if (map->base_sector && SECT_FLAGGED(map->base_sector, SECTF_OCEAN)) {
+			continue;	// skip ocean-flagged tiles
+		}
+		
 		// find island
 		temp = map->shared->island_id;
 		HASH_FIND_INT(isle_hash, &temp, isle);
@@ -2626,7 +2624,7 @@ void generate_island_descriptions(void) {
 		count = 0;
 		HASH_ITER(hh, isle->ters, ter, next_ter) {
 			prc = (double)ter->count / isliter->tile_size * 100.0;
-			if (prc < 1.0) {
+			if (prc < 5.0) {
 				continue;
 			}
 			

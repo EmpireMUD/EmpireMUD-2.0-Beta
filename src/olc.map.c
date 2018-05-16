@@ -129,12 +129,17 @@ OLC_MODULE(mapedit_terrain) {
 	struct empire_city_data *city, *temp;
 	empire_data *emp;
 	int count;
-	sector_data *sect, *next_sect, *old_sect = NULL;
+	sector_data *sect = NULL, *next_sect, *old_sect = NULL;
 	crop_data *crop, *next_crop;
-	crop_data *cp;
+	crop_data *cp = NULL;
 	
-	sect = get_sect_by_name(argument);
-	cp = get_crop_by_name(argument);
+	if (isdigit(*argument)) {
+		sect = sector_proto(atoi(argument));
+	}
+	else {
+		sect = get_sect_by_name(argument);
+		cp = get_crop_by_name(argument);
+	}
 
 	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
 		msg_to_char(ch, "Leave the building or area first.\r\n");

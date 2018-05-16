@@ -484,10 +484,10 @@ tiny cuts.
 #
 "NOBLE BEARING"
 
-Noble Bearing
-Empire Synergy Ability: 100 Battle
+Noble Bearing (Battle ability)
 
-Damage to your character is reduced by your Greatness rating.
+Damage to your character is reduced by your Greatness rating. Gain experience
+when you take damage.
 #
 "NULL MANA"
 
@@ -682,6 +682,25 @@ SUMMARY "COMBAT SUMMARY"
 Usage:  summary
 
 This command shows a summary of you, your allies, and your enemies in combat.
+#
+"SUMMON BODYGUARD"
+
+Summon Bodyguard (Battle ability)
+
+Usage:  summon bodyguard
+Cooldown:  3 minutes
+Cost:  25 move
+
+This powerful ability allows you to summon a bodyguard. The bodyguard is strong
+enough to protect against many dangerous situations. He (or she) will take
+simple orders and will rescue you in battle.
+
+The bodyguard counts as a familiar, and can be removed with the "dismiss"
+command.
+
+Gains experience when you summon your bodyguard.
+
+See also: DISMISS, ORDER
 #
 "TRICK SHOTS"
 

@@ -551,7 +551,6 @@ void score_empires(void) {
 	
 	struct scemp_type *scemp, *next_scemp, *lists[NUM_SCORES];
 	int iter, pos, median, num_emps = 0;
-	struct empire_political_data *pol;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
 	empire_data *emp, *next_emp;
@@ -594,8 +593,8 @@ void score_empires(void) {
 		add_scemp(&lists[SCORE_MEMBERS], EMPIRE_MEMBERS(emp));
 		EMPIRE_SCORE(emp, SCORE_MEMBERS) = EMPIRE_MEMBERS(emp);
 		
-		add_scemp(&lists[SCORE_TECHS], (num = count_tech(emp)));
-		EMPIRE_SCORE(emp, SCORE_TECHS) = num;
+		add_scemp(&lists[SCORE_COMMUNITY], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_COMMUNITY)));
+		EMPIRE_SCORE(emp, SCORE_COMMUNITY) = num;
 		
 		num = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -604,26 +603,20 @@ void score_empires(void) {
 			}
 		}
 		num /= 1000;	// for sanity of number size
-		add_scemp(&lists[SCORE_EINV], num);
-		EMPIRE_SCORE(emp, SCORE_EINV) = num;
+		add_scemp(&lists[SCORE_INVENTORY], num);
+		EMPIRE_SCORE(emp, SCORE_INVENTORY) = num;
 		
 		add_scemp(&lists[SCORE_GREATNESS], EMPIRE_GREATNESS(emp));
 		EMPIRE_SCORE(emp, SCORE_GREATNESS) = EMPIRE_GREATNESS(emp);
 		
-		num = 0;
-		for (pol = EMPIRE_DIPLOMACY(emp); pol; pol = pol->next) {
-			if (IS_SET(pol->type, DIPL_TRADE)) {
-				++num;
-			}
-		}
-		add_scemp(&lists[SCORE_DIPLOMACY], num);
-		EMPIRE_SCORE(emp, SCORE_DIPLOMACY) = num;
+		add_scemp(&lists[SCORE_INDUSTRY], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_INDUSTRY)));
+		EMPIRE_SCORE(emp, SCORE_INDUSTRY) = num;
 		
-		add_scemp(&lists[SCORE_FAME], EMPIRE_FAME(emp));
-		EMPIRE_SCORE(emp, SCORE_FAME) = EMPIRE_FAME(emp);
+		add_scemp(&lists[SCORE_PRESTIGE], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_PRESTIGE)));
+		EMPIRE_SCORE(emp, SCORE_PRESTIGE) = num;
 		
-		add_scemp(&lists[SCORE_MILITARY], EMPIRE_MILITARY(emp));
-		EMPIRE_SCORE(emp, SCORE_MILITARY) = EMPIRE_MILITARY(emp);
+		add_scemp(&lists[SCORE_DEFENSE], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_DEFENSE)));
+		EMPIRE_SCORE(emp, SCORE_DEFENSE) = num;
 		
 		add_scemp(&lists[SCORE_PLAYTIME], EMPIRE_TOTAL_PLAYTIME(emp));
 		EMPIRE_SCORE(emp, SCORE_PLAYTIME) = EMPIRE_TOTAL_PLAYTIME(emp);
@@ -926,7 +919,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 *
 * @param char_data *ch_a One character.
 * @param char_data *ch_b Another character.
-* @param bitvector_t dipl_bits Any DIPL_x flags.
+* @param bitvector_t dipl_bits Any DIPL_ flags.
 * @return bool TRUE if the characters have the requested diplomacy.
 */
 bool char_has_relationship(char_data *ch_a, char_data *ch_b, bitvector_t dipl_bits) {
@@ -1085,7 +1078,7 @@ bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
 /**
 * @param empire_data *emp one empire
 * @param empire_data *fremp other empire
-* @param bitvector_t diplomacy DIPL_x
+* @param bitvector_t diplomacy DIPL_
 * @return TRUE if emp and fremp have the given diplomacy with each other
 */
 bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t diplomacy) {
@@ -1337,7 +1330,7 @@ bool has_permission(char_data *ch, int type) {
 * It takes the location into account, not just the tech flags.
 *
 * @param char_data *ch acting character, although this is location-based
-* @param int tech TECH_x id
+* @param int tech TECH_ id
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available(char_data *ch, int tech) {
@@ -1424,12 +1417,10 @@ int land_can_claim(empire_data *emp, int ter_type) {
 	}
 	
 	// basics
-	total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
-	total += count_tech(emp) * config_get_int("land_per_tech");
+	total += EMPIRE_GREATNESS(emp) * (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_GREATNESS));
 	
-	if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-		// diminishes by an amount equal to non-wealth territory
-		from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
+	if (EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH) > 0) {
+		from_wealth = GET_TOTAL_WEALTH(emp) / 100.0 * EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH);
 		
 		// limited to 3x non-wealth territory
 		from_wealth = MIN(from_wealth, total * 3);

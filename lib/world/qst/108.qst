@@ -9,7 +9,7 @@ drop this quest by typing 'quest drop See Hugo For Advice'.
 ~
 Hugo gives you some empire advice.
 ~
-13 0 0 25 0
+14 a 0 25 0
 P
 10 1 0 14
 R
@@ -31,7 +31,7 @@ reward Empire skill levels and bonus experience.
 ~
 You have found Ranger Clara!
 ~
-12 h 0 25 -1
+13 ah 0 25 -1
 A
 1 10800
 P
@@ -70,7 +70,7 @@ Note: Make sure you don't have Empire noskilled.
 want them for herself, though, so you can keep them for the next part of the
 tutorial.
 ~
-17 0 0 25 -1
+18 a 0 25 -1
 A
 1 10801
 P
@@ -100,7 +100,7 @@ done, take them to Rosemary in the planning office.
 ~
 Rosemary examines the logs you've scraped off, and gives you a nod of approval.
 ~
-14 0 0 25 -1
+15 a 0 25 -1
 A
 1 10801
 P
@@ -140,7 +140,7 @@ Rosemary wants you to take those logs and build a cabin.
 ~
 Rosemary seems pleased with your cabin.
 ~
-17 0 0 25 -1
+18 a 0 25 -1
 A
 1 10802
 P
@@ -173,7 +173,7 @@ forest, or get them by scraping trees.
 wonders aloud whether you'll be able to carry enough of them for the next part
 of the tutorial.
 ~
-17 0 0 25 -1
+18 a 0 25 -1
 A
 1 10802
 P
@@ -210,7 +210,7 @@ Return to the City Planner's office when you're done.
 ~
 Rosemary is proud of you for finishing so many buildings.
 ~
-18 0 0 25 -1
+19 a 0 25 -1
 A
 1 10802
 P
@@ -252,7 +252,7 @@ done.
 ~
 Rosemary is pleased with your progress.
 ~
-18 0 0 25 -1
+19 a 0 25 -1
 A
 1 10802
 P
@@ -290,7 +290,7 @@ some iron and smelt it into ingots, and then return to Rosemary.
 ~
 Rosemary is impressed that you got the iron so fast.
 ~
-20 0 0 25 -1
+21 a 0 25 -1
 A
 1 10802
 P
@@ -325,7 +325,7 @@ to build the whole forge.
 ~
 Rosemary inspects your building materials, and approves.
 ~
-23 0 0 25 -1
+24 a 0 25 -1
 A
 1 10802
 P
@@ -362,7 +362,7 @@ to Rosemary in the City Planning office when it's built.
    Rosemary congratulates you on building your forge. This is the end of the
 Empire tutorial. Now go forth, and rule the world!
 ~
-20 0 0 25 -1
+21 a 0 25 -1
 A
 1 10802
 P
@@ -1131,7 +1131,7 @@ stone scythe for this quest, but most sharp weapons can be used to harvest.
 ~
 You have satisfied the Spirit of Progress.
 ~
-12 0 0 25 -1
+13 a 0 25 -1
 A
 1 10856
 P
@@ -1269,7 +1269,7 @@ and he will get you started. Try using 'where pageboy' to find him.
 ~
 You've found the pageboy...
 ~
-3 0 0 25 -1
+4 a 0 25 -1
 A
 1 10856
 P

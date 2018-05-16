@@ -160,57 +160,6 @@ S
 Chant of Nature~
 0 -1 1.00 0 0
 S
-#127
-Reward~
-0 -1 1.00 0 0
-S
-#128
-Summon Guards~
-0 -1 1.00 0 0
-S
-#129
-Radiance~
-cd -1 1.00 0 ah
-A
-5 2
-C
-radiance 5 bg 0 0 0 -1 0 0 1 0
-M
-0
-You project a radiant aura!~
-M
-1
-$n projects a radiant aura!~
-T b 1
-X b
-3025 -1 -1 0
-S
-#130
-Prospect~
-0 -1 1.00 0 0
-S
-#131
-Workforce~
-0 -1 1.00 0 0
-S
-#132
-Deep Mines~
-0 -1 1.00 0 0
-D 1 11 0
-T e 1
-S
-#133
-Rare Metals~
-0 -1 1.00 0 0
-S
-#134
-Commerce~
-0 -1 1.00 0 0
-S
-#135
-Prominence~
-0 -1 1.00 0 0
-S
 #136
 Inspire~
 0 -1 1.00 0 0
@@ -224,15 +173,6 @@ S
 #138
 Summon Bodyguard~
 0 -1 1.00 0 0
-S
-#140
-City Lights~
-0 -1 1.00 0 0
-S
-#141
-Great Walls~
-0 -1 1.00 0 0
-T a 0
 S
 #142
 Pickpocket~

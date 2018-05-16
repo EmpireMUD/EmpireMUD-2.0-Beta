@@ -1298,6 +1298,9 @@ ACMD(do_build) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait)) {
 		msg_to_char(ch, "You can only build that in a city%s.\r\n", wait ? " (this city was founded too recently)" : "");
 	}
+	else if (CRAFT_FLAGGED(type, CRAFT_BY_RIVER) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
+		msg_to_char(ch, "You must build that next to a river.\r\n");
+	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
 		msg_to_char(ch, "You don't have the skill to erect that structure.\r\n");
 	}
@@ -1966,10 +1969,6 @@ ACMD(do_lay) {
 		msg_to_char(ch, "You can't lay road in someone else's territory!\r\n");
 	else if (!has_permission(ch, PRIV_BUILD))
 		msg_to_char(ch, "You don't have permission to lay road.\r\n");
-	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && !SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_ROADS)) {
-		// not rough requires Roads
-		msg_to_char(ch, "You don't have the skill to properly do that.\r\n");
-	}
 	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_PATHFINDING)) {
 		// rough requires Pathfinding
 		msg_to_char(ch, "You don't have the skill to properly do that.\r\n");
@@ -2004,9 +2003,6 @@ ACMD(do_lay) {
 		// skillup before sect change
 		if (SECT_FLAGGED(check_sect, SECTF_ROUGH)) {
 			gain_ability_exp(ch, ABIL_PATHFINDING, 15);
-		}
-		else {
-			gain_ability_exp(ch, ABIL_ROADS, 15);
 		}
 				
 		// change it over
@@ -2177,6 +2173,9 @@ ACMD(do_tunnel) {
 	
 	if (!has_permission(ch, PRIV_BUILD)) {
 		msg_to_char(ch, "You do not have permission to build anything.\r\n");
+	}
+	else if (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_TUNNELS)) {
+		msg_to_char(ch, "You must be in an empire with the technology to make tunnels to do that.\r\n");
 	}
 	else if (!can_build_on(IN_ROOM(ch), exit_bld_flags)) {
 		prettier_sprintbit(exit_bld_flags, bld_on_flags, buf);
@@ -2379,6 +2378,9 @@ ACMD(do_upgrade) {
 		}
 		else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
 			msg_to_char(ch, "You don't have the required ability to upgrade this building.\r\n");
+		}
+		else if (CRAFT_FLAGGED(type, CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(type))) {
+			msg_to_char(ch, "You have not learned the correct recipe to upgrade this building.\r\n");
 		}
 		else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
 			msg_to_char(ch, "You can only upgrade this building in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");

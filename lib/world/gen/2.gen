@@ -24,18 +24,4 @@ trinket of conveyance~
 T0
 You can now use a trinket of conveyance again.~
 S
-#298
-windstride~
-4 0
-0 0 0 0
-T0
-Your windstriding ends and your movement returns to normal.~
-S
-#299
-windstride~
-3 0
-0 0 0 0
-T0
-Your windstride cooldown has ended.~
-S
 $

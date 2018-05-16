@@ -53,6 +53,8 @@ extern const char *requirement_types[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
+extern int count_cities(empire_data *emp);
+extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 extern struct req_data *copy_requirements(struct req_data *from);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
@@ -406,7 +408,7 @@ int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
 		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
 			continue;
 		}
-		if ((VEH_FLAGS(veh) & flags) == flags) {
+		if ((VEH_FLAGS(veh) & flags) != flags) {
 			continue;
 		}
 		
@@ -920,6 +922,26 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_EMPIRE_WEALTH: {
 				task->current = GET_LOYALTY(ch) ? GET_TOTAL_WEALTH(GET_LOYALTY(ch)) : 0;
+				break;
+			}
+			case REQ_EMPIRE_FAME: {
+				task->current = GET_LOYALTY(ch) ? EMPIRE_FAME(GET_LOYALTY(ch)) : 0;
+				break;
+			}
+			case REQ_EMPIRE_MILITARY: {
+				task->current = GET_LOYALTY(ch) ? EMPIRE_MILITARY(GET_LOYALTY(ch)) : 0;
+				break;
+			}
+			case REQ_EMPIRE_GREATNESS: {
+				task->current = GET_LOYALTY(ch) ? EMPIRE_GREATNESS(GET_LOYALTY(ch)) : 0;
+				break;
+			}
+			case REQ_DIPLOMACY: {
+				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
+				break;
+			}
+			case REQ_HAVE_CITY: {
+				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 				break;
 			}
 		}
@@ -1995,6 +2017,78 @@ void qt_drop_obj(char_data *ch, obj_data *obj) {
 
 
 /**
+* Quest Tracker: empire cities change
+*
+* @param char_data *ch The player.
+* @param any_vnum amount (ignored, required by function pointer call).
+*/
+void qt_empire_cities(char_data *ch, any_vnum amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_DIPLOMACY) {
+				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire diplomacy changes
+*
+* @param char_data *ch The player.
+* @param any_vnum amount (ignored, required by function pointer call).
+*/
+void qt_empire_diplomacy(char_data *ch, any_vnum amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_DIPLOMACY) {
+				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire greatness changes
+*
+* @param char_data *ch The player.
+* @param any_vnum amount Change in greatness (usually 0, but this parameter is required -- we rescan the empire instead).
+*/
+void qt_empire_greatness(char_data *ch, any_vnum amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_EMPIRE_GREATNESS) {
+				task->current = GET_LOYALTY(ch) ? EMPIRE_GREATNESS(GET_LOYALTY(ch)) : 0;
+			}
+		}
+	}
+}
+
+
+/**
 * This can be used to call several different qt functions on all members of
 * an empire online.
 *
@@ -2105,9 +2199,9 @@ void qt_empire_wealth(char_data *ch, any_vnum amount) {
 void qt_gain_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct req_data *task;
-	bld_data *bld;
+	bld_data *bld = building_proto(vnum);
 	
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || !bld) {
 		return;
 	}
 	
@@ -2116,8 +2210,17 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				++task->current;
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
+			}
+			else if (task->type == REQ_OWN_HOMES && GET_BLD_CITIZENS(bld) > 0) {
+				++task->current;
+			}
+			else if (task->type == REQ_EMPIRE_FAME && GET_BLD_FAME(bld) != 0) {
+				task->current += GET_BLD_FAME(bld);
+			}
+			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
+				task->current += GET_BLD_MILITARY(bld);
 			}
 		}
 	}
@@ -2310,9 +2413,9 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 void qt_lose_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct req_data *task;
-	bld_data *bld;
+	bld_data *bld = building_proto(vnum);
 	
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || !bld) {
 		return;
 	}
 	
@@ -2321,8 +2424,17 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				--task->current;
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				--task->current;
+			}
+			else if (task->type == REQ_OWN_HOMES && GET_BLD_CITIZENS(bld) > 0) {
+				--task->current;
+			}
+			else if (task->type == REQ_EMPIRE_FAME && GET_BLD_FAME(bld) != 0) {
+				task->current -= GET_BLD_FAME(bld);
+			}
+			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
+				task->current -= GET_BLD_MILITARY(bld);
 			}
 			
 			// check min

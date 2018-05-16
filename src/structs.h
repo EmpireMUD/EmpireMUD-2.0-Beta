@@ -318,6 +318,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLB_FLAG_ADVENTURE_ONLY  BIT(1)	// does not apply outside same-adventure
 #define GLB_FLAG_CUMULATIVE_PERCENT  BIT(2)	// accumulates percent with other valid globals instead of its own percent
 #define GLB_FLAG_CHOOSE_LAST  BIT(3)	// the first choose-last global that passes is saved for later, if nothing else is chosen
+#define GLB_FLAG_RARE  BIT(4)	// a rare result (has various definitions by type)
 
 
 // Group Defines
@@ -387,6 +388,11 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_OWN_BUILDING_FUNCTION  26
 #define REQ_OWN_VEHICLE_FLAGGED  27
 #define REQ_EMPIRE_WEALTH  28
+#define REQ_EMPIRE_FAME  29
+#define REQ_EMPIRE_GREATNESS  30
+#define REQ_DIPLOMACY  31
+#define REQ_HAVE_CITY  32
+#define REQ_EMPIRE_MILITARY  33
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -405,6 +411,7 @@ typedef struct vehicle_data vehicle_data;
 
 // SKILLF_x: skill flags
 #define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
+#define SKILLF_BASIC  BIT(1)	// b. always shows in the list
 
 
 // mob spawn flags
@@ -958,6 +965,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
+#define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 
 // list of above craft flags that require a building in some way
 #define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
@@ -996,7 +1004,11 @@ typedef struct vehicle_data vehicle_data;
 // EATT_x: empire attributes
 #define EATT_PROGRESS_POOL  0	// spendable progress points
 #define EATT_BONUS_CITY_POINTS  1	// extra city points
-#define NUM_EMPIRE_ATTRIBUTES  2	// total
+#define EATT_MAX_CITY_SIZE  2	// how big the empire's cities can go (number of upgrades)
+#define EATT_TERRITORY_PER_100_WEALTH  3	// number of tiles gained per 100 wealth
+#define EATT_TERRITORY_PER_GREATNESS  4	// bonus to ter-per-grt
+#define EATT_WORKFORCE_CAP  5	// workforce resource cap
+#define NUM_EMPIRE_ATTRIBUTES  6	// total
 
 
 // ETRAIT_x: empire trait flags
@@ -1036,7 +1048,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_CHORES  29		// total
 
 
-/* Diplomacy types */
+// DIPL_x: Diplomacy types
 #define DIPL_PEACE  BIT(0)	// At peace
 #define DIPL_WAR  BIT(1)	// At war
 #define DIPL_ALLIED  BIT(3)	// In an alliance
@@ -1122,21 +1134,21 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_PRIVILEGES  20	// total
 
 
-// for empire scores (e.g. sorting)
-#define SCORE_WEALTH  0
-#define SCORE_TERRITORY  1
-#define SCORE_MEMBERS  2
-#define SCORE_TECHS  3
-#define SCORE_EINV  4
-#define SCORE_GREATNESS  5
-#define SCORE_DIPLOMACY  6
-#define SCORE_FAME  7
-#define SCORE_MILITARY  8
-#define SCORE_PLAYTIME  9
+// SCORE_x: for empire scores (e.g. sorting)
+#define SCORE_COMMUNITY  0
+#define SCORE_DEFENSE  1
+#define SCORE_GREATNESS  2
+#define SCORE_INDUSTRY  3
+#define SCORE_INVENTORY  4
+#define SCORE_MEMBERS  5
+#define SCORE_PLAYTIME  6
+#define SCORE_PRESTIGE  7
+#define SCORE_TERRITORY  8
+#define SCORE_WEALTH  9
 #define NUM_SCORES  10	// total
 
 
-// Technologies
+// TECH_x: Technologies
 #define TECH_GLASSBLOWING  0
 #define TECH_CITY_LIGHTS  1
 #define TECH_LOCKS  2
@@ -1144,13 +1156,19 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_SEAPORT  4
 #define TECH_WORKFORCE  5
 #define TECH_PROMINENCE  6
-#define TECH_COMMERCE  7
+#define TECH_CITIZENS  7
 #define TECH_PORTALS  8
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10
 #define TECH_TRADE_ROUTES  11
 #define TECH_EXARCH_CRAFTS  12
-#define NUM_TECHS  13
+#define TECH_DEEP_MINES  13
+#define TECH_RARE_METALS  14
+#define TECH_BONUS_EXPERIENCE  15
+#define TECH_TUNNELS  16
+#define TECH_FAST_PROSPECT  17
+#define TECH_FAST_EXCAVATE  18
+#define NUM_TECHS  19
 
 
 // TER_x: territory types for empire arrays
@@ -1753,6 +1771,8 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_ALWAYS_FAST  BIT(5)	// this action is always faster
 #define ACTF_SITTING  BIT(6)	// can be sitting
 #define ACTF_FASTER_BONUS  BIT(7)	// speed boost from starting bonus
+#define ACTF_FAST_PROSPECT  BIT(8)	// empire tech boosts speed
+#define ACTF_FAST_EXCAVATE  BIT(9)	// empire tech boosts speed, when in-city
 
 
 // BONUS_x: bonus traits
@@ -2104,7 +2124,7 @@ typedef struct vehicle_data vehicle_data;
 #define PROGRESS_COMMUNITY  1
 #define PROGRESS_INDUSTRY  2
 #define PROGRESS_DEFENSE  3
-#define PROGRESS_PROGRESS  4
+#define PROGRESS_PRESTIGE  4
 #define NUM_PROGRESS_TYPES  5	// total
 
 
@@ -2112,12 +2132,17 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_IN_DEVELOPMENT  BIT(0)	// a. not available to players
 #define PRG_PURCHASABLE  BIT(1)	// b. can buy it
 #define PRG_SCRIPT_ONLY  BIT(2)	// c. cannot buy/achieve it
+#define PRG_HIDDEN  BIT(3)	// d. progress does not show up
 
 
 // PRG_PERK_x: progress perks
 #define PRG_PERK_TECH  0	// grants a technology
 #define PRG_PERK_CITY_POINTS  1	// grants more city points
 #define PRG_PERK_CRAFT  2	// grants a recipe
+#define PRG_PERK_MAX_CITY_SIZE  3	// increases max city size
+#define PRG_PERK_TERRITORY_FROM_WEALTH  4	// increases territory from wealth
+#define PRG_PERK_TERRITORY_PER_GREATNESS  5	// increases territory per greatness
+#define PRG_PERK_WORKFORCE_CAP  6	// higher workforce caps
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2450,7 +2475,6 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
 #define MAX_REFERRED_BY_LENGTH  80
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
-#define MAX_REWARDS_PER_DAY  5	//  number of times a player can be rewarded
 #define MAX_ROOM_DESCRIPTION  4000
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_SLASH_CHANNEL_NAME_LENGTH  16
@@ -2577,7 +2601,7 @@ struct global_data {
 	any_vnum vnum;
 	char *name;	// descriptive text
 	int type;	// GLOBAL_x
-	bitvector_t flags;	// GLB_FLAG_x flags
+	bitvector_t flags;	// GLB_FLAG_ flags
 	int value[NUM_GLB_VAL_POSITIONS];	// misc vals
 	
 	// constraints
@@ -3677,9 +3701,10 @@ struct player_special_data {
 	byte mapsize;	// how big the player likes the map
 	char custom_colors[NUM_CUSTOM_COLORS];	// for custom channel coloring, storing the letter part of the & code ('r' for &r)
 	
-	// quests
+	// quests and progression
 	struct player_quest *quests;	// quests the player is on (player_quest->next)
 	struct player_completed_quest *completed_quests;	// hash table (hh)
+	time_t last_goal_check;	// last time the player looked for new empire goals
 	
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
@@ -3705,7 +3730,6 @@ struct player_special_data {
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
 	ubyte daily_bonus_experience;	// boosted skill gain points
-	int rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 	int daily_quests;	// number of daily quests completed today
 
 	// action info
@@ -4139,6 +4163,7 @@ struct empire_goal {
 	any_vnum vnum;	// which progress goal
 	ush_int version;	// for auto-updating
 	struct req_data *tracker;	// tasks to track
+	time_t timestamp;	// when the goal was started
 	
 	UT_hash_handle hh;	// hashed by vnum
 };

@@ -716,6 +716,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	if (!self) {
 		if (has_ability(victim, ABIL_NOBLE_BEARING) && check_solo_role(victim)) {
 			dam -= GET_GREATNESS(victim);
+			gain_ability_exp(victim, ABIL_NOBLE_BEARING, 15);
 		}
 		
 		// damage reduction (usually from armor/spells)

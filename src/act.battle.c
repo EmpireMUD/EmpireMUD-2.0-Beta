@@ -384,6 +384,7 @@ ACMD(do_firstaid) {
 	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + total_bonus_healing(ch));
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, ABIL_FIRSTAID, 15);
+		gain_ability_exp(ch, ABIL_ANCESTRAL_HEALING, 15);
 	}
 	GET_WAIT_STATE(ch) += 2 RL_SEC;	// plus normal command_lag
 }

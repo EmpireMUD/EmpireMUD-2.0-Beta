@@ -5,7 +5,17 @@ Moon Rabbit Familiar Buffs~
 if %self.disabled%
   halt
 end
-switch %random.4%
+if %self.cooldown(500)%
+  halt
+end
+if %self.varexists(selected_ability)%
+  set selected_ability %self.selected_ability%
+end
+if !%selected_ability%
+  set selected_ability %random.4%
+end
+nop %self.set_cooldown(500, 25)
+switch %selected_ability%
   case 1
     * Restore mana on master
     set targ %self.master%
@@ -14,14 +24,14 @@ switch %random.4%
       halt
     end
     if %targ.mana% == %targ.maxmana%
-      %echo% %self.name% glows and purrs.
+      %send% %targ% %self.name% tries to restore your mana, but it is full!
+      %echoaround% %targ% %self.name% glows and purrs.
+      nop %self.set_cooldown(500, 5)
       halt
     end
     %send% %targ% %self.name% shines brightly at you, and you feel replenished!
     %echoaround% %targ% %self.name% shines brightly at %targ.name%, who looks replenished!
-    eval amount %self.level% * 2 / 3
-    nop %targ.mana(%amount%)%
-    wait 25 sec
+    %heal% %actor% mana 100
   break
   case 2
     * Mana regen buff on master
@@ -34,7 +44,6 @@ switch %random.4%
     %echoaround% %targ% %self.name% shines brightly at %targ.name%, who looks re-energized!
     eval amount %self.level% / 10
     dg_affect #505 %targ% MANA-REGEN %amount% 30
-    wait 25 sec
   break
   case 3
     * Resist buff on party
@@ -49,7 +58,6 @@ switch %random.4%
       end
       set ch %ch.next_in_room%
     done
-    wait 25 sec
   break
   case 4
     * Resist buff on tank
@@ -68,9 +76,70 @@ switch %random.4%
     eval amount %self.level% / 5
     dg_affect #505 %targ% RESIST-PHYSICAL %amount% 30
     dg_affect #505 %targ% RESIST-MAGICAL %amount% 30
-    wait 25 sec
   break
 done
+~
+#506
+Moon Rabbit commands~
+0 ct 0
+order~
+set arg1 %arg.car%
+set arg %arg.cdr%
+set arg2 %arg.car%
+* discard the rest
+if %actor.char_target(%arg1%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.master%
+  return 0
+  halt
+end
+set ability_0 random
+set ability_1 replenish
+set ability_2 energize
+set ability_3 brightness
+set ability_4 protection
+if %ability_1% /= %arg2%
+  set selected_ability 1
+elseif %ability_2% /= %arg2%
+  set selected_ability 2
+elseif %ability_3% /= %arg2%
+  set selected_ability 3
+elseif %ability_4% /= %arg2%
+  set selected_ability 4
+elseif random /= %arg2%
+  set selected_ability 0
+  remote selected_ability %self.id%
+  %send% %actor% You order %self.name% to use abilities at random.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  halt
+elseif status /= %arg2%
+  set current_ability 0
+  if %self.varexists(selected_ability)%
+    set current_ability %self.selected_ability%
+  end
+  eval ability_name %%ability_%current_ability%%%
+  %send% %actor% %self.name% is currently using: %ability_name%.
+  %send% %actor% %self.name% has the following abilities available:
+  %send% %actor% replenish: Replenish (restore mana on master)
+  %send% %actor% energize: Re-energize (+mana-regen on master)
+  %send% %actor% brightness: Bright as the moon (+resistance on party)
+  %send% %actor% protection: Moon's protection (+resistance on tank)
+  halt
+else
+  * other command
+  return 0
+  halt
+end
+if %selected_ability%
+  remote selected_ability %self.id%
+  eval ability_name %%ability_%selected_ability%%%
+  %send% %actor% You order %self.name% to use: %ability_name%.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  return 1
+  halt
+end
 ~
 #507
 Spirit Wolf Familiar Debuffs~
@@ -79,19 +148,28 @@ Spirit Wolf Familiar Debuffs~
 if %self.disabled%
   halt
 end
+if %self.cooldown(500)%
+  halt
+end
 set targ %random.enemy%
 if !%targ%
   %echo% You feel a chill as %self.name%'s howl echoes out through the air!
   halt
 end
-switch %random.4%
+nop %self.set_cooldown(500, 25)%
+if %self.varexists(selected_ability)%
+  set selected_ability %self.selected_ability%
+end
+if !%selected_ability%
+  set selected_ability %random.4%
+end
+switch %selected_ability%
   case 1
     * Dexterity debuff on enemy
     %send% %targ% %self.name% flashes brightly and shoots a bolt of lightning at you!
     %echoaround% %targ% %self.name% flashes brightly and shoots a bolt of lightning at %targ.name%!
     eval amount %self.level% / 100
     dg_affect #507 %targ% DEXTERITY -%amount% 30
-    wait 25 sec
   break
   case 2
     * Dodge debuff on enemy
@@ -99,7 +177,6 @@ switch %random.4%
     %echoaround% %targ% %self.name% howls, followed by a clap of thunder, and %targ.name% looks deafened!
     eval amount 15 + %self.level% / 25
     dg_affect #507 %targ% DODGE -%amount% 30
-    wait 25 sec
   break
   case 3
     * Tohit debuff on enemy
@@ -107,7 +184,6 @@ switch %random.4%
     %echoaround% %targ% %self.name% barks at %targ.name%, who squints as if %targ.heshe%'s having trouble seeing!
     eval amount 15 + %self.level% / 25
     dg_affect #507 %targ% TO-HIT -%amount% 30
-    wait 25 sec
   break
   case 4
     * Magical DoT on enemy
@@ -116,9 +192,70 @@ switch %random.4%
     * Damage is scaled by the script engine, no need to mess with it
     set amount 100
     %dot% #508 %targ% %amount% 30 magical 1
-    wait 25 sec
   break
 done
+~
+#508
+Spirit Wolf commands~
+0 ct 0
+order~
+set arg1 %arg.car%
+set arg %arg.cdr%
+set arg2 %arg.car%
+* discard the rest
+if %actor.char_target(%arg1%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.master%
+  return 0
+  halt
+end
+set ability_0 random
+set ability_1 lightning
+set ability_2 thunder
+set ability_3 bark
+set ability_4 bite
+if %ability_1% /= %arg2%
+  set selected_ability 1
+elseif %ability_2% /= %arg2%
+  set selected_ability 2
+elseif %ability_3% /= %arg2%
+  set selected_ability 3
+elseif %ability_4% /= %arg2%
+  set selected_ability 4
+elseif random /= %arg2%
+  set selected_ability 0
+  remote selected_ability %self.id%
+  %send% %actor% You order %self.name% to use abilities at random.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  halt
+elseif status /= %arg2%
+  set current_ability 0
+  if %self.varexists(selected_ability)%
+    set current_ability %self.selected_ability%
+  end
+  eval ability_name %%ability_%current_ability%%%
+  %send% %actor% %self.name% is currently using: %ability_name%.
+  %send% %actor% %self.name% has the following abilities available:
+  %send% %actor% lightning: Bolt of Lightning (-dex on random enemy)
+  %send% %actor% thunder: Clap of Thunder (-dodge on random enemy)
+  %send% %actor% bark: Blurred Vision (-tohit on random enemy)
+  %send% %actor% bite: Ghost Energy (magic DoT on random enemy)
+  halt
+else
+  * other command
+  return 0
+  halt
+end
+if %selected_ability%
+  remote selected_ability %self.id%
+  eval ability_name %%ability_%selected_ability%%%
+  %send% %actor% You order %self.name% to use: %ability_name%.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  return 1
+  halt
+end
 ~
 #509
 Phoenix Familiar Buffs~
@@ -127,7 +264,17 @@ Phoenix Familiar Buffs~
 if %self.disabled%
   halt
 end
-switch %random.4%
+if %self.cooldown(500)%
+  halt
+end
+if %self.varexists(selected_ability)%
+  set selected_ability %self.selected_ability%
+end
+if !%selected_ability%
+  set selected_ability %random.4%
+end
+nop %self.set_cooldown(500, 25)
+switch %selected_ability%
   case 1
     * Bonus-healing buff on master
     set targ %self.master%
@@ -139,7 +286,6 @@ switch %random.4%
     %echoaround% %targ% Fire from %self.name% spreads over %targ.name%, who blazes with power!
     eval amount %self.level% / 20
     dg_affect #509 %targ% BONUS-HEALING %amount% 30
-    wait 25 sec
   break
   case 2
     * Restore health on tank
@@ -154,13 +300,15 @@ switch %random.4%
       halt
     end
     if %targ.health% == %targ.maxhealth%
-      %echo% %self.name% flickers and burns.
+      %send% %self.master% %self.name% tries to heal %targ.name%, but %targ.heshe% doesn't need healing.
+      %echoneither% %self.master% %targ% %self.name% flies in circles around %targ.name%.
+      %send% %targ% %self.name% flies in circles around you.
+      nop %self.set_cooldown(500, 5)%
       halt
     end
     %send% %targ% %self.name% flies into your chest, and you feel a healing warmth!
     %echoaround% %targ% %self.name% flies into %targ.name%'s chest and glows outward with a healing warmth!
-    %damage% %targ% -100
-    wait 25 sec
+    %heal% %targ% health 100
   break
   case 3
     * Restore health on party
@@ -171,14 +319,14 @@ switch %random.4%
       if %self.is_ally(%ch%)%
         if %ch.health% < %ch.maxhealth%
           %send% %ch% You feel warmed by %self.name%'s fire!
-          %damage% %ch% -50
+          %heal% %ch% health 50
           set healing_done 1
         end
       end
       set ch %ch.next_in_room%
     done
-    if %healing_done%
-      wait 25 sec
+    if !%healing_done%
+      nop %self.set_cooldown(500, 5)%
     end
   break
   case 4
@@ -194,7 +342,6 @@ switch %random.4%
       end
       set ch %ch.next_in_room%
     done
-    wait 25 sec
   break
 done
 ~
@@ -211,19 +358,28 @@ if !%master%
   %purge% %self%
   halt
 end
+if %self.cooldown(500)%
+  halt
+end
+if %self.varexists(selected_ability)%
+  set selected_ability %self.selected_ability%
+end
 set targ %random.enemy%
 if !%targ%
   %echo% %master.name%'s scorpion shadow twists and coils from the darkness.
   halt
 end
-switch %random.4%
+nop %self.set_cooldown(500, 25)%
+if !%selected_ability%
+  set selected_ability %random.4%
+end
+switch %selected_ability%
   case 1
     * Slow on enemy
     %send% %targ% %master.name%'s scorpion shadow stings you with a creeping venom!
     %send% %master% Your scorpion shadow stings %targ.name% with a creeping venom!
     %echoneither% %targ% %master% %master.name%'s scorpion shadow stings %targ.name% with a creeping venom!
     dg_affect #510 %targ% SLOW ON 30
-    wait 25 sec
   break
   case 2
     * Damage debuff on enemy
@@ -233,7 +389,6 @@ switch %random.4%
     eval amount %self.level% / 20
     dg_affect #510 %targ% BONUS-PHYSICAL -%amount% 30
     dg_affect #510 %targ% BONUS-MAGICAL -%amount% 30
-    wait 25 sec
   break
   case 3
     * Wits debuff on enemy
@@ -242,7 +397,6 @@ switch %random.4%
     %echoneither% %targ% %master% %master.name%'s scorpion shadow stings %targ.name% with numbing venom!
     eval amount 2 + %self.level% / 100
     dg_affect #510 %targ% WITS -%amount% 30
-    wait 25 sec
   break
   case 4
     * Poison DoT on enemy
@@ -250,7 +404,6 @@ switch %random.4%
     %send% %master% Your scorpion shadow stings %targ.name% with agonizing venom!
     %echoneither% %targ% %master% %master.name%'s scorpion shadow stings %targ.name% with agonizing venom!
     %dot% #510 %targ% 100 30 poison 1
-    wait 25 sec
   break
 done
 ~
@@ -261,15 +414,23 @@ Owl Shadow Familiar Buffs~
 if %self.disabled%
   halt
 end
+if %self.cooldown(500)%
+  halt
+end
 set master %self.master%
 if !%master%
   %echo% %self.name% shrinks into the shadows and vanishes.
   %purge% %self%
   halt
 end
-set type %random.4%
+if %self.varexists(selected_ability)%
+  set selected_ability %self.selected_ability%
+end
+if !%selected_ability%
+  set selected_ability %random.4%
+end
 * only one of these does not target party
-if (%type% == 4)
+if (%selected_ability% == 4)
   * Dodge buff on one ally
   set enemy %self.fighting%
   if !%enemy%
@@ -290,7 +451,7 @@ if (%type% == 4)
   %echoneither% %targ% %master% %master.name%'s owl shadow wraps its dark wings around %targ.name%, protecting %targ.himher%!
   eval amount 15 + %self.level% / 25
   dg_affect #511 %targ% DODGE %amount% 30
-  wait 25 sec
+  nop %self.set_cooldown(500, 25)%
   halt
 end
 * random results 1-3
@@ -300,7 +461,7 @@ set ch %self.room.people%
 set had_effect 0
 while %ch%
   if %self.is_ally(%ch%)%
-    switch %type%
+    switch %selected_ability%
       case 1
         * Rejuvenate all allies
         %send% %ch% You feel the healing darkness cure your injuries!
@@ -326,12 +487,11 @@ while %ch%
   end
   set ch %ch.next_in_room%
 done
-if %type% == 2 && %had_effect%
-  wait 25 sec
-else
-  wait 25 sec
+if %selected_ability% == 2 && %had_effect%
+  nop %self.set_cooldown(500, 25)%
+elseif %selected_ability% != 2
+  nop %self.set_cooldown(500, 25)%
 end
-look
 ~
 #512
 Basilisk Familiar Debuffs~
@@ -340,9 +500,17 @@ Basilisk Familiar Debuffs~
 if %self.disabled%
   halt
 end
-set type %random.4%
-* one type hits tank only
-if (%type% == 4)
+if %self.cooldown(500)%
+  halt
+end
+if %self.varexists(selected_ability)%
+  set selected_ability %self.selected_ability%
+end
+if !%selected_ability%
+  set selected_ability %random.4%
+end
+* one ability hits tank only
+if (%selected_ability% == 4)
   * Block buff on tank
   set enemy %self.fighting%
   if !%enemy%
@@ -358,16 +526,16 @@ if (%type% == 4)
   %echoaround% %targ% %self.name% unleashes its marble gaze upon %targ.name%, hardening %targ.hisher% form against attacks!
   eval amount 15 + %self.level% / 50
   dg_affect #512 %targ% BLOCK %amount% 30
-  wait 25 sec
+  nop %self.set_cooldown(500, 25)%
   halt
 end
-* other 3 types hit the enemy
+* other 3 abilities hit the enemy
 set targ %random.enemy%
 if !%targ%
   %echo% %self.name% flicks its tongue and whips its tail.
   halt
 end
-switch %type%
+switch %selected_ability%
   case 1
     * Damage debuff on random enemy
     %send% %targ% %self.name% unleashes its quartzite gaze upon you, turning you partially to stone!
@@ -375,7 +543,6 @@ switch %type%
     eval amount -1 * %self.level% / 20
     dg_affect #512 %targ% BONUS-PHYSICAL %amount% 30
     dg_affect #512 %targ% BONUS-MAGICAL %amount% 30
-    wait 25 sec
   break
   case 2
     * Wits debuff on random enemy
@@ -383,7 +550,6 @@ switch %type%
     %echoaround% %targ% %self.name% unleashes its basalt gaze upon %targ.name%, turning %targ.himher% partially to stone!
     eval amount 2 + %self.level% / 100
     dg_affect #512 %targ% WITS -%amount% 30
-    wait 25 sec
   break
   case 3
     * Tohit buff on random enemy
@@ -391,9 +557,9 @@ switch %type%
     %echoaround% %targ% %self.name% unleashes its granite gaze upon %targ.name%, turning %targ.himher% partially to stone!
     eval amount 15 + %self.level% / 25
     dg_affect #512 %targ% TO-HIT -%amount% 30
-    wait 25 sec
   break
 done
+nop %self.set_cooldown(500, 25)%
 ~
 #513
 Salamander Familiar Buffs~
@@ -402,7 +568,16 @@ Salamander Familiar Buffs~
 if %self.disabled%
   halt
 end
-switch %random.4%
+if %self.cooldown(500)%
+  halt
+end
+if %self.varexists(selected_ability)%
+  set selected_ability %self.selected_ability%
+end
+if !%selected_ability%
+  set selected_ability %random.4%
+end
+switch %selected_ability%
   case 1
     * Short, LARGE bonus-healing buff on master
     set targ %self.master%
@@ -414,7 +589,6 @@ switch %random.4%
     %echoaround% %targ% %self.name% coils around %targ.name%, granting %targ.himher% Alchemist's Fire!
     eval amount %self.level% / 4
     dg_affect #513 %targ% BONUS-HEALING %amount% 10
-    wait 25 sec
   break
   case 2
     * Short, large heal-over-time on tank
@@ -432,7 +606,6 @@ switch %random.4%
     %echoaround% %targ% %self.name% breathes its soothing flames upon %targ.name%, whose wounds begin to heal!
     eval amount %self.level% / 2
     dg_affect #513 %targ% HEAL-OVER-TIME %amount% 10
-    wait 25 sec
   break
   case 3
     * Dodge buff on tank
@@ -450,7 +623,6 @@ switch %random.4%
     %echoaround% %targ% %self.name% breathes its guardian flames upon %targ.name%, protecting %targ.himher%!
     eval amount 15 + %self.level% / 25
     dg_affect #513 %targ% DODGE %amount% 30
-    wait 25 sec
   break
   case 4
     * Damage buff on party
@@ -465,9 +637,9 @@ switch %random.4%
       end
       set ch %ch.next_in_room%
     done
-    wait 25 sec
   break
 done
+nop %self.set_cooldown(500, 25)%
 ~
 #514
 Shadow Wolf Familiars: Hide with Master~
@@ -499,8 +671,16 @@ Banshee Familiar Debuffs~
 if %self.disabled%
   halt
 end
-set type %random.4%
-switch %type%
+if %self.cooldown(500)%
+  halt
+end
+if %self.varexists(selected_ability)%
+  set selected_ability %self.selected_ability%
+end
+if !%selected_ability%
+  set selected_ability %random.4%
+end
+switch %selected_ability%
   case 1
     * Resist debuff
     %echo% %self.name% lets out a soul-shattering wail!
@@ -525,7 +705,7 @@ set ch %self.room.people%
 while %ch%
   if %self.is_enemy(%ch%)%
     %send% %ch% You feel the banshee's wail strike deep into your heart!
-    switch %type%
+    switch %selected_ability^
       case 1
         dg_affect #515 %ch% RESIST-MAGICAL %amount% 30
         dg_affect #515 %ch% RESIST-PHYSICAL %amount% 30
@@ -544,6 +724,378 @@ while %ch%
   end
   set ch %ch.next_in_room%
 done
-wait 25 sec
+nop %self.set_cooldown(500, 25)%
+~
+#516
+Phoenix commands~
+0 ct 0
+order~
+set arg1 %arg.car%
+set arg %arg.cdr%
+set arg2 %arg.car%
+* discard the rest
+if %actor.char_target(%arg1%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.master%
+  return 0
+  halt
+end
+set ability_0 random
+set ability_1 blaze
+set ability_2 warmth
+set ability_3 fire
+set ability_4 passion
+if %ability_1% /= %arg2%
+  set selected_ability 1
+elseif %ability_2% /= %arg2%
+  set selected_ability 2
+elseif %ability_3% /= %arg2%
+  set selected_ability 3
+elseif %ability_4% /= %arg2%
+  set selected_ability 4
+elseif random /= %arg2%
+  set selected_ability 0
+  remote selected_ability %self.id%
+  %send% %actor% You order %self.name% to use abilities at random.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  halt
+elseif status /= %arg2%
+  set current_ability 0
+  if %self.varexists(selected_ability)%
+    set current_ability %self.selected_ability%
+  end
+  eval ability_name %%ability_%current_ability%%%
+  %send% %actor% %self.name% is currently using: %ability_name%.
+  %send% %actor% %self.name% has the following abilities available:
+  %send% %actor% blaze: Blaze with Power (+bonus healing on master)
+  %send% %actor% warmth: Healing Warmth (heals the tank)
+  %send% %actor% fire: Healing Fire (heals the whole party)
+  %send% %actor% passion: Burning Passion (+bonus damage on party)
+  halt
+else
+  * other command
+  return 0
+  halt
+end
+if %selected_ability%
+  remote selected_ability %self.id%
+  eval ability_name %%ability_%selected_ability%%%
+  %send% %actor% You order %self.name% to use: %ability_name%.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  return 1
+  halt
+end
+~
+#517
+Scorpion Shadow commands~
+0 ct 0
+order~
+set arg1 %arg.car%
+set arg %arg.cdr%
+set arg2 %arg.car%
+* discard the rest
+if %actor.char_target(%arg1%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.master%
+  return 0
+  halt
+end
+set ability_0 random
+set ability_1 creeping
+set ability_2 shadow
+set ability_3 numbing
+set ability_4 agonizing
+if %ability_1% /= %arg2%
+  set selected_ability 1
+elseif %ability_2% /= %arg2%
+  set selected_ability 2
+elseif %ability_3% /= %arg2%
+  set selected_ability 3
+elseif %ability_4% /= %arg2%
+  set selected_ability 4
+elseif random /= %arg2%
+  set selected_ability 0
+  remote selected_ability %self.id%
+  %send% %actor% You order %self.name% to use abilities at random.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  halt
+elseif status /= %arg2%
+  set current_ability 0
+  if %self.varexists(selected_ability)%
+    set current_ability %self.selected_ability%
+  end
+  eval ability_name %%ability_%current_ability%%%
+  %send% %actor% %self.name% is currently using: %ability_name%.
+  %send% %actor% %self.name% has the following abilities available:
+  %send% %actor% creeping: Creeping Venom (slow on random enemy)
+  %send% %actor% shadow: Shadow Venom (-damage on random enemy)
+  %send% %actor% numbing: Numbing Venom (-wits on random enemy)
+  %send% %actor% agonizing: Agonizing Venom (poison DoT on random enemy)
+  halt
+else
+  * other command
+  return 0
+  halt
+end
+if %selected_ability%
+  remote selected_ability %self.id%
+  eval ability_name %%ability_%selected_ability%%%
+  %send% %actor% You order %self.name% to use: %ability_name%.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  return 1
+  halt
+end
+~
+#518
+Owl Shadow commmands~
+0 ct 0
+order~
+set arg1 %arg.car%
+set arg %arg.cdr%
+set arg2 %arg.car%
+* discard the rest
+if %actor.char_target(%arg1%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.master%
+  return 0
+  halt
+end
+set ability_0 random
+set ability_1 wings
+set ability_2 healing
+set ability_3 invigorating
+set ability_4 brilliant
+if %ability_1% /= %arg2%
+  set selected_ability 1
+elseif %ability_2% /= %arg2%
+  set selected_ability 2
+elseif %ability_3% /= %arg2%
+  set selected_ability 3
+elseif %ability_4% /= %arg2%
+  set selected_ability 4
+elseif random /= %arg2%
+  set selected_ability 0
+  remote selected_ability %self.id%
+  %send% %actor% You order %self.name% to use abilities at random.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  halt
+elseif status /= %arg2%
+  set current_ability 0
+  if %self.varexists(selected_ability)%
+    set current_ability %self.selected_ability%
+  end
+  eval ability_name %%ability_%current_ability%%%
+  %send% %actor% %self.name% is currently using: %ability_name%.
+  %send% %actor% %self.name% has the following abilities available:
+  %send% %actor% wings: Dark Wings (+dodge on tank)
+  %send% %actor% healing: Healing Darkness (heal party over time)
+  %send% %actor% invigorating: Invigorating Darkness (restore moves to party)
+  %send% %actor% brilliant: Brilliant Darkness (+wits on party)
+  halt
+else
+  * other command
+  return 0
+  halt
+end
+if %selected_ability%
+  remote selected_ability %self.id%
+  eval ability_name %%ability_%selected_ability%%%
+  %send% %actor% You order %self.name% to use: %ability_name%.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  return 1
+  halt
+end
+~
+#519
+Basilisk commands~
+0 ct 0
+order~
+set arg1 %arg.car%
+set arg %arg.cdr%
+set arg2 %arg.car%
+* discard the rest
+if %actor.char_target(%arg1%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.master%
+  return 0
+  halt
+end
+set ability_0 random
+set ability_1 marble
+set ability_2 quartzite
+set ability_3 basalt
+set ability_4 granite
+if %ability_1% /= %arg2%
+  set selected_ability 1
+elseif %ability_2% /= %arg2%
+  set selected_ability 2
+elseif %ability_3% /= %arg2%
+  set selected_ability 3
+elseif %ability_4% /= %arg2%
+  set selected_ability 4
+elseif random /= %arg2%
+  set selected_ability 0
+  remote selected_ability %self.id%
+  %send% %actor% You order %self.name% to use abilities at random.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  halt
+elseif status /= %arg2%
+  set current_ability 0
+  if %self.varexists(selected_ability)%
+    set current_ability %self.selected_ability%
+  end
+  eval ability_name %%ability_%current_ability%%%
+  %send% %actor% %self.name% is currently using: %ability_name%.
+  %send% %actor% %self.name% has the following abilities available:
+  %send% %actor% marble: Marble gaze (+block on tank)
+  %send% %actor% quartzite: Quartzite gaze (-damage on random enemy)
+  %send% %actor% basalt: Basalt gaze (-wits on random enemy)
+  %send% %actor% granite: Granite gaze (-tohit on random enemy)
+  halt
+else
+  * other command
+  return 0
+  halt
+end
+if %selected_ability%
+  remote selected_ability %self.id%
+  eval ability_name %%ability_%selected_ability%%%
+  %send% %actor% You order %self.name% to use: %ability_name%.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  return 1
+  halt
+end
+~
+#520
+Salamander commands~
+0 ct 0
+order~
+set arg1 %arg.car%
+set arg %arg.cdr%
+set arg2 %arg.car%
+* discard the rest
+if %actor.char_target(%arg1%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.master%
+  return 0
+  halt
+end
+set ability_0 random
+set ability_1 alchemy
+set ability_2 soothing
+set ability_3 guardian
+set ability_4 surge
+if %ability_1% /= %arg2%
+  set selected_ability 1
+elseif %ability_2% /= %arg2%
+  set selected_ability 2
+elseif %ability_3% /= %arg2%
+  set selected_ability 3
+elseif %ability_4% /= %arg2%
+  set selected_ability 4
+elseif random /= %arg2%
+  set selected_ability 0
+  remote selected_ability %self.id%
+  %send% %actor% You order %self.name% to use abilities at random.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  halt
+elseif status /= %arg2%
+  set current_ability 0
+  if %self.varexists(selected_ability)%
+    set current_ability %self.selected_ability%
+  end
+  eval ability_name %%ability_%current_ability%%%
+  %send% %actor% %self.name% is currently using: %ability_name%.
+  %send% %actor% %self.name% has the following abilities available:
+  %send% %actor% alchemy: Alchemist's Fire (short +bonus-healing on master)
+  %send% %actor% soothing: Soothing flames (short heal-over-time on tank)
+  %send% %actor% guardian: Guardian flames (short +dodge on tank)
+  %send% %actor% surge: Ember surge (+damage on party)
+  halt
+else
+  * other command
+  return 0
+  halt
+end
+if %selected_ability%
+  remote selected_ability %self.id%
+  eval ability_name %%ability_%selected_ability%%%
+  %send% %actor% You order %self.name% to use: %ability_name%.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  return 1
+  halt
+end
+~
+#521
+Banshee commands~
+0 ct 0
+order~
+set arg1 %arg.car%
+set arg %arg.cdr%
+set arg2 %arg.car%
+* discard the rest
+if %actor.char_target(%arg1%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.master%
+  return 0
+  halt
+end
+set ability_0 random
+set ability_1 soul
+set ability_2 terrify
+set ability_3 heart
+set ability_4 blood
+if %ability_1% /= %arg2%
+  set selected_ability 1
+elseif %ability_2% /= %arg2%
+  set selected_ability 2
+elseif %ability_3% /= %arg2%
+  set selected_ability 3
+elseif %ability_4% /= %arg2%
+  set selected_ability 4
+elseif random /= %arg2%
+  set selected_ability 0
+  remote selected_ability %self.id%
+  %send% %actor% You order %self.name% to use abilities at random.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  halt
+elseif status /= %arg2%
+  set current_ability 0
+  if %self.varexists(selected_ability)%
+    set current_ability %self.selected_ability%
+  end
+  eval ability_name %%ability_%current_ability%%%
+  %send% %actor% %self.name% is currently using: %ability_name%.
+  %send% %actor% %self.name% has the following abilities available:
+  %send% %actor% soul: Soul-shattering wail (-resist on all enemies)
+  %send% %actor% terrify: Terrifying wail (-tohit on all enemies)
+  %send% %actor% heart: Heart-wrenching wail (-damage on all enemies)
+  %send% %actor% blood: Blood-curdling wail (magical DoT on all enemies)
+  halt
+else
+  * other command
+  return 0
+  halt
+end
+if %selected_ability%
+  remote selected_ability %self.id%
+  eval ability_name %%ability_%selected_ability%%%
+  %send% %actor% You order %self.name% to use: %ability_name%.
+  %echoaround% %actor% %actor.name% gives %self.name% an order.
+  return 1
+  halt
+end
 ~
 $

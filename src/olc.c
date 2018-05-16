@@ -4704,6 +4704,7 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 */
 bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group) {
 	extern const char *action_bits[];
+	extern const char *diplomacy_flags[];
 	extern const char *component_flags[];
 	extern const char *component_types[];
 	extern const char *function_flags[];
@@ -4715,6 +4716,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
 	bool need_currency = FALSE, need_func_flags = FALSE, need_veh_flags = FALSE;
+	bool need_dip_flags = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -4804,9 +4806,16 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_sect = TRUE;
 			break;
 		}
+		case REQ_DIPLOMACY: {
+			need_dip_flags = TRUE;
+			break;
+		}
 		case REQ_OWN_HOMES:
 		case REQ_CROP_VARIETY:
 		case REQ_EMPIRE_WEALTH:
+		case REQ_EMPIRE_FAME:
+		case REQ_EMPIRE_MILITARY:
+		case REQ_EMPIRE_GREATNESS:
 		case REQ_GET_COINS: {
 			// need nothing?
 			break;
@@ -4880,6 +4889,14 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			return FALSE;
 		}
 		*vnum = GEN_VNUM(gen);
+	}
+	if (need_dip_flags) {
+		argument = any_one_word(argument, arg);
+		*misc = olc_process_flag(ch, arg, "diplomacy", "", diplomacy_flags, NOBITS);
+		if (!*misc) {
+			msg_to_char(ch, "You must provide diplomacy flags.\r\n");
+			return FALSE;
+		}
 	}
 	if (need_faction) {
 		faction_data *fct;

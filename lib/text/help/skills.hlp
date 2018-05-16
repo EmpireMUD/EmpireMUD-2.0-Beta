@@ -15,6 +15,21 @@ You can reset your ability purchases with "skill reset <skill>".
 
 See also: SKILLS, SKILL CAPS, DAILY BONUS EXPERIENCE
 #
+BARDE BARDING "ARMORED HORSE"
+
+Usage:  barde <mount>
+Location:  stable
+Cost:  10x (common metal)
+
+Barding allows you to put armor on your noble steeds. This makes them less
+vulnerable to attack, and more impressive to look upon. Many mounts can be
+barded. You can only barde mounts in a stable. You cannot remove barding from
+mounts.
+
+Barded mounts will not de-spawn like normal animals.
+
+See also: RIDE, STABLE
+#
 BATHE 
 
 Usage:  bathe 
@@ -24,6 +39,8 @@ You must bathe regularly to keep clean. If you bathe in a bath house you will
 get cleaner faster than if you were to bathe in a river.
 #
 CHIP
+
+Chip (Primitive Crafts ability)
 
 Usage:  chip <item>
 Speed boosts:  Faster Chores bonus
@@ -38,7 +55,7 @@ See also: CRAFT
 #
 CHOP
 
-Chop (Chores ability)
+Chop (Primitive Crafts ability)
 
 Usage:  chop
 Speed boosts:  Faster Chores bonus, haste, higher axe damage, higher Strength
@@ -47,7 +64,7 @@ This command allows you to chop trees in the forest. Beware, trees are a
 limited resource. Different types of forest give different qualities and
 quantities of trees. Some trees can be scraped, sawed, or lit on fire.
 
-See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT, CHORES
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT
 #
 "DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
@@ -173,7 +190,7 @@ See also: DRAG, LEAD
 #
 HARVEST HARVESTING
 
-Harvest (Chores ability)
+Harvest (Primitive Crafts ability)
 
 Usage:  harvest
 Speed boosts:  Faster Chores bonus, haste
@@ -182,7 +199,7 @@ Allows you to harvest a crop. Be careful that you also replant some,
 otherwise you'll run out of that crop quickly. You must be wielding a slashing
 or slicing weapon (sword or axe) to harvest crops.
 
-See also: PLANT, CHORES
+See also: PLANT
 #
 HERD HERDING
 
@@ -231,9 +248,9 @@ container to hold the milk. Cows can be milked once or twice per day.
 #
 MILL MILLING
 
-Mill (Chores ability)
+Mill (Basic Crafts ability)
 
-Building:  (MM)  Mill  (Basic Buildings)
+Building:  (MM)  Mill  (must be by a river; Build ability)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>
@@ -241,16 +258,17 @@ Command:  mill [number] <item>
 You can mill:
   wheat into flour
   corn into cornmeal
+  oats into oatmeal
 
 You must do this at a Mill building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, CHORES, RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES
 #
 MINE MINES
 
-Mine (Chores ability)
+Mine (Primitive Crafts ability)
 
-Building:  &y/&0[]&y\&0  Mine  (Basic Buildings)
+Building:  &y/&0[]&y\&0  Mine  (Build ability)
 Speed boosts:  Faster Chores bonus, haste, higher pick damage, higher Strength
 Command:  mine
 
@@ -278,13 +296,13 @@ Types of mines:
   imperium - only found with Rare Metals
   moonstone - only found with Rare Metals
 
-See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS, CHORES
+See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 #
 MINT
 
-Mint (Chores ability)
+Mint (Basic Crafts ability)
 
-Building:  [MM]  Mint  (Commerce ability)
+Building:  [MM]  Mint  (Trade Routes goal)
 Fame:  5
 Speed boosts:  Faster Chores bonus
 Command:  mint <object>
@@ -293,7 +311,7 @@ The mint building allows you to mint valuable metals into coins. Each building
 can only mint coins for the empire it belongs to. The mint command will auto-
 repeat; stopping the action will give you back the item you were minting.
 
-See also: COINS, COMMERCE, STOP, CHORES
+See also: COINS, STOP
 #
 MORPH MORPHING SHAPESHIFTING FASTMORPH
 
@@ -323,7 +341,7 @@ See also: SKILLS
 #
 PLANT
 
-Plant (Chores ability)
+Plant (Primitive Crafts ability)
 
 Usage:  plant <seed/food>
 Speed boosts:  Faster Chores bonus, haste
@@ -344,11 +362,11 @@ Jungle: light jungle
 Light jungle is jungle which has been partially chopped, but not reduced to
 plains.
 
-See also: CROPS, HARVEST, PICK, CHORES
+See also: CROPS, HARVEST, PICK
 #
 PRESS PRESSING OILMAKING "OIL MAKING"
 
-Press (Chores ability)
+Press (Basic Crafts ability)
 
 Command:  press [number] <item>
           press info <item>
@@ -358,8 +376,7 @@ You can press:
 
 You must do this at an Oilmaker building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CHORES, CRAFT INFO,
-  RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES
 #
 READY
 
@@ -391,7 +408,7 @@ Example:
 #
 SAW
 
-Saw (Chores ability)
+Saw (Primitive Crafts ability)
 
 Usage:  saw <item>
 Speed boosts:  Faster Chores bonus, haste
@@ -401,11 +418,11 @@ will go faster if you have the Woodworking ability.
 
 Not all types of trees can be sawed.
 
-See also: TREES, LOGS, LUMBER, CHORES
+See also: TREES, LOGS, LUMBER
 #
 SCRAPE
 
-Scrape (Chores ability)
+Scrape (Primitive Crafts ability)
 
 Usage:  scrape <item>
 Speed boosts:  Faster Chores bonus, haste
@@ -414,7 +431,7 @@ This skill is used to process some types of trees into logs.
 
 The Woodworking ability increases how fast you can scrape.
 
-See also: TREES, SAW, WOODWORKING, PILLAR, CHORES
+See also: TREES, SAW, WOODWORKING, PILLAR
 #
 SHEAR SHEARING
 
@@ -495,10 +512,10 @@ you a free level in the skill.
 * The rest of the skills are limited to 50. These are basic skills.
   These skills will get 9 abilities each.
 
-You can get a second specialty skill (75) if you keep two of your skills at
-zero (0). Once you have fewer than two skills at zero, you can no longer choose
-to specialize an extra skill. The opposite is also true: if you specialize an
-extra skill, you'll no longer be able to gain in your last two zeroes.
+You can get a second specialty skill (75) if you keep one of your basic skills
+at zero (0). Once you have no basic skills left at zero, you can no longer
+choose to specialize an extra skill. The opposite is also true: if you
+specialize an extra skill, you'll no longer be able to gain in your last zero.
 
 You can use 'skill drop' if you want to lower one of your skills so that you
 can then start raising a different one.
@@ -578,7 +595,7 @@ See also: SKILL CAPS, SPECIALIZE, SKILLS
 #
 SMELT MELT
 
-Smelt (Chores ability)
+Smelt (Basic Crafts ability)
 
 Usage:  smelt [number] <type of ingot/bar>
 Speed boosts:  Faster Chores bonus
@@ -593,7 +610,7 @@ than their raw form. To return bars to their ingot form, use 'separate'.
 Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory.
 
-See also: CRAFT INFO, METAL, SEPARATE, WEALTH, CHORES, RECIPES
+See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES
 #
 SPECIALIZE SPECIALTY
 
@@ -633,9 +650,9 @@ creatures, items, or bodyguards. Each may serve a different purpose, so you
 should consult the help file for the specific summon ability you're using.
 
 See also:
-SUMMON BODYGUARD  (Empire ability)
+SUMMON BODYGUARD  (Battle ability)
 SUMMON ANIMALS  (Natural Magic ability)
-SUMMON GUARDS  (Empire ability)
+SUMMON GUARDS  (unskilled)
 SUMMON HUMANS  (Vampire ability)
 SUMMON MATERIAlS  (High Sorcery ability)
 SUMMON PLAYER  (at an Astral Nexus)

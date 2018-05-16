@@ -674,6 +674,38 @@ empire if you give no argument.
 
 See also: EMPIRE
 #
+EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
+
+Usage:  excavate
+        fillin
+
+Speed boosts:  Faster Chores bonus, haste
+
+Using a shovel, your own strength, and a lot of time, you can excavate a
+trench from a desert or plains. Once the trench is complete, it will begin
+to fill with water. Eventually, it becomes a canal.
+
+The "fillin" command is the opposite of excavate: it fills trenches in until
+they are ordinary plains or desert again. It will also work on a player-created
+oasis or canal. It takes 1 minute to begin a fillin on a completed trench; if
+you cancel the action or are interrupted, you must start the minute over.
+
+You can only excavate and fill in on claimed land. If you abandon your claim to
+a canal or trench, it will slowly fill in over time.
+
+When a desert trench fills with water, it will become an oasis instead of a
+canal. Oases convert into canals if they are adjacent to other canals or water
+sources.
+
+There are three ways to fill a finished trench with water:
+ - If there is more water adjacent, the trench will fill quickly.
+ - If you pour water out on the ground, you can fill the trench yourself.
+ - If you wait long enough, it will fill with rain water on its own.
+
+An unfinished trench will not fill with water.
+
+See also: CANAL, CLAIM, OASIS DRAINAGE
+#
 EXECUTE
 
 Usage:  execute <victim>
@@ -1016,26 +1048,18 @@ LAY ROAD ROADS
 
 Roads: ----  ..|.  ..+-  --+.  .--.
 
-Roads (Empire)
 Usage:  lay
 Cost:  20x (rock)
 
-You may use this ability to lay rocks into the ground to form a cobblestone 
-road. Roads eliminate the small movement lag that you normally get while
-walking. They can aid in tree and crop control -- nothing will grow over the
-roads, but they will eventually decay if left unclaimed.
+You can lay rocks into the ground to form a cobblestone road. Roads eliminate
+the small movement lag that you normally get while walking. Roads will
+eventually decay if left unclaimed.
 
 The lay command is also used to pull up a road and retrieve half its rocks.
-
-The Roads ability also allows you to put up road signs, if you specialize in
-the Empire skill.
 
 Roads count as their base terrain for most building functions, so you can
 build things facing roads. Roads count as in-city territory when built in the
 outskirts (4x radius).
-
-Gain experience when you lay a road (but not on mountains) or put down a
-road sign.
 
 See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
@@ -1052,6 +1076,8 @@ Learning a recipe will consume the recipe item.
 
 You can see your learned recipes with the 'learned' command and, optionally,
 can filter the results. Empire recipes come from progression goals.
+
+Immortals can 'learn <vnum>' to instantly learn and craft recipe.
 
 See also: RECIPES, PROGRESS
 #
@@ -1249,6 +1275,17 @@ You need the 'customize' privilege in your empire to paint or unpaint.
 
 See also: COLORS, PAINTER'S WORKSHOP
 #
+PAN
+
+Usage:  pan [direction]
+Speed boosts:  Finder ability
+
+Using a simple metal pan, you can pan for gold flakes next to the river. It's
+rare to find anything, but it's something to do. You can pan an adjacent map
+tile, or the one you're standing in.
+
+See also: DEPLETION, FORGE
+#
 PLAY INSTRUMENTS MUSIC
 
 Speed boosts:  haste
@@ -1351,6 +1388,7 @@ Usage:  progress [category]
         progress [goal name]
         progress buy [reward name]
         progress <completed | purchased> [category]
+        progress new
 
 This command shows your empire's current progress points, progression goals,
 and information about those goals. As your empire earns progress points, it can
@@ -1364,7 +1402,8 @@ Progression goals are automatically unlocked when your empires meets all the
 requirements. Use 'elog progress' to see previous goal achievements.
 
 You can buy rewards with 'rpgress buy [reward name]'. View your completed goals
-or purchased rewards with 'progress completed' and 'progress purchased'.
+or purchased rewards with 'progress completed' and 'progress purchased'. You
+can see if you have new goals with 'progress new'.
 
 See also: ELOG
 Immortals see also: UNPROGRESS
@@ -1421,6 +1460,21 @@ Here are some suggested prompts:
  basic leveling with blood: |%hh %vv %mm %bb &&c%s&&0s %t [%c] %a>
 
 See also: PROMPT
+#
+PROSPECT
+
+Usage:  prospect
+
+A good prospector can determine what minerals are in the ground without
+exploratory mining. If your empire has Deep Mines or Rare Metals and are the
+first person to prospect a mountain tile (since the last mountain reset), that
+tile will benefit from your Deep Mines and/or Rare Metals until the next
+mountain reset. For more info on mountain resets, see HELP MINE.
+
+Prospecting happens instantly if your empire was the last one to prospect the
+tile.
+
+See also: MINE, DEEP MINES, RARE METALS
 #
 PUT
 
@@ -1527,18 +1581,17 @@ ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 Usage:  roadsign <message>
 Materials:  blank sign (stored in the Utility Shed)
 
-If you have the Roads ability and you have specialized in the Empire skill,
-you can use blank signs to put up signs on the side of the road. These signs
-are made by the Woodworking ability.
+If you have the Customize Building ability, you can use blank signs to put up
+signs on the side of the road. These signs are made by the Woodworking ability.
 
 The message on the sign can be no longer than 70 characters, and you can only
 set up a sign on a road, bridge, swamp walk, or mountain path. If the road is
 removed, the sign will be lost. Each road tile can only have one sign at a
 time, and using this ability again will replace the old sign.
 
-Gain Roads experience when you place a road sign.
+Gain Customize Building experience when you place a road sign.
 
-See also: ROADS, WOODWORKING
+See also: CUSTOMIZE BUILDING, WOODWORKING
 #
 ROLE "GROUP ROLE" "CLASS ROLE"
 
@@ -1907,6 +1960,16 @@ alias inf toggle informative;look
 alias pol toggle political;look
 
 See also: ALIAS, IDEA
+#
+"SUMMON GUARDS"
+
+Usage:  summon guards
+Cooldown:  3 minutes
+Cost:  25 move
+
+This ability summons up to (Charisma / 2, rounded down) guards. They aren't
+very strong, but they count as city guards and will attack intruders and
+hostile mobs. You can only use this in your empire's own cities and outskirts.
 #
 "SUMMON PLAYERS"
 

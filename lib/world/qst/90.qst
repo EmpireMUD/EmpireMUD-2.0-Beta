@@ -5,15 +5,15 @@ any type of grain (wheat, corn, oats, rice, or barley) to earn his gratitude.
 ~
 The miller takes the grain and thanks you for your help.
 ~
-4 def 1 75 -1
+6 def 1 75 -1
 A
 1 210
 P
-9 1 0 15
+9 6 0 15
 R
 0 0 1
 R
-4 1 25
+4 6 25
 W
 1 12 2 10
 Z
@@ -171,13 +171,13 @@ then return for a reward.
 ~
 The postmaster thanks you for your help.
 ~
-11 ef 0 0 -1
+15 ef 0 0 -1
 A
 1 263
 P
-7 5130 0 1 a
+26 0 1 1 a
 P
-7 5108 0 1 a
+26 0 128 1 a
 P
 7 5511 0 1 a
 R

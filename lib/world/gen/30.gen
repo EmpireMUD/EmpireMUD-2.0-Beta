@@ -176,15 +176,6 @@ entangle~
 T0
 You are no longer entangled in vines.~
 S
-#3025
-radiance~
-4 0
-0 0 0 0
-T0
-Your radiant aura fades.~
-T1
-$n seems less radiant.~
-S
 #3026
 inspire~
 4 0
@@ -506,16 +497,6 @@ dispirit~
 0 0 0 0
 T0
 Your wits return.~
-S
-#3070
-erode~
-4 0
-0 0 0 0
-S
-#3071
-scour~
-4 0
-0 0 0 0
 S
 #3072
 shadowlash~

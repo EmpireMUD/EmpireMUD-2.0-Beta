@@ -59,6 +59,7 @@ The following things will speed up various chores:
 - Shovel: dig
 - Weapon damage: chop, mine
 - Superior tool: craft, forge
+- Progression goals: excavate, prospect
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
 #
@@ -268,8 +269,6 @@ Available traits:
  Extra daily bonus experience - 5 extra daily bonus experience points
  Larger inventory - Carry 5 more small items (or 2 more large items)
  Faster walking - Half the lag from normal walking
-
-See also: CHORES
 #
 BONUS-HEALING "BONUS HEALING" "HEALING ATTRIBUTE" "HEALING TRAIT"
 
@@ -360,6 +359,18 @@ Charisma is used for:
  - Many Stealth abilities.
 
 See also: ATTRIBUTES
+#
+CITIZEN CITIZENS
+
+Citizens will move into homes in your empire once you have unlocked the
+Thriving Community goal. Adding a bedroom to any building will also allow a
+citizen to move in. It takes up to an hour (real time) for a new citizen to
+move in.
+
+Eventually your empire can learn to put citizens to work. Citizens work chores
+within 20 tiles of their homes.
+
+See also: DESIGNATE, MARK, WORKFORCE
 #
 COIN COINS COINAGE CURRENCY GOLD
 

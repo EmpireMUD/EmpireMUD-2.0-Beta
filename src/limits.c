@@ -360,7 +360,6 @@ void point_update_char(char_data *ch) {
 	struct instance_data *inst;
 	obj_data *obj, *next_obj;
 	char_data *c, *chiter;
-	empire_data *emp;
 	bool found;
 	int count;
 	
@@ -385,8 +384,6 @@ void point_update_char(char_data *ch) {
 	}
 	
 	if (!IS_NPC(ch)) {
-		emp = GET_LOYALTY(ch);
-		
 		// check bad quest items
 		remove_quest_items(ch);
 		
@@ -409,21 +406,11 @@ void point_update_char(char_data *ch) {
 		if (IS_BLOOD_STARVED(ch)) {
 			msg_to_char(ch, "You are starving!\r\n");
 		}
-	
-		// in an empire with Prominence?
-		if (emp) {
-			gain_ability_exp(ch, ABIL_PROMINENCE, 2);
-			gain_ability_exp(ch, ABIL_LOCKS, 1);
-		}
-		// city lights after dark
-		if (weather_info.sunlight == SUN_DARK) {
-			gain_ability_exp(ch, ABIL_CITY_LIGHTS, 2);
-		}
-		else if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
+		
+		// light-based gains
+		if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
 			gain_ability_exp(ch, ABIL_DAYWALKING, 2);
 		}
-		
-		gain_ability_exp(ch, ABIL_COMMERCE, 2);
 		
 		if (GET_MOUNT_LIST(ch)) {
 			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
@@ -720,9 +707,6 @@ void real_update_char(char_data *ch) {
 			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
 		}
 		GET_DAILY_QUESTS(ch) = 0;
-		for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
-			GET_REWARDED_TODAY(ch, iter) = -1;
-		}
 		
 		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
 		

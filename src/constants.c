@@ -1539,6 +1539,7 @@ const char *craft_flags[] = {
 	"SHIPYARD",
 	"BLD-UPGRADED",
 	"LEARNED",
+	"BY-RIVER",
 	"\n"
 };
 
@@ -1562,6 +1563,7 @@ const char *craft_flag_for_info[] = {
 	"requires shipyard",
 	"requires upgrade",
 	"",	// learned
+	"must be by a river",
 	"\n"
 };
 
@@ -1598,6 +1600,19 @@ struct city_metadata_type city_type[] = {
 
 	// this must go last
 	{ "\n", "\n", 0, FALSE, FALSE }
+};
+
+
+// DIPL_x: Diplomacy types
+const char *diplomacy_flags[] = {
+	"peace",
+	"war",
+	"allied",
+	"nonaggression",
+	"trade",
+	"distrust",
+	"truce",
+	"\n"
 };
 
 
@@ -1681,6 +1696,10 @@ const char *empire_admin_flags[] = {
 const char *empire_attributes[] = {
 	"Progress Pool",
 	"Bonus City Points",
+	"Max City Size",
+	"Tty per 100 Wealth",
+	"Tty per Greatness",
+	"Workforce Cap",
 	"\n"
 };
 
@@ -1718,18 +1737,24 @@ const char *offense_flags[] = {
 // TECH_x
 const char *techs[] = {
 	"Glassblowing",
-	"Lights",
+	"City Lights",
 	"Locks",
 	"Apiaries",
 	"Seaport",
 	"Workforce",
 	"Prominence",
-	"Commerce",
+	"Citizens",
 	"Portals",
 	"Master Portals",
 	"Skilled Labor",
 	"Trade Routes",
 	"Exarch Crafts",
+	"Deep Mines",
+	"Rare Metals",
+	"Bonus Experience",
+	"Tunnels",
+	"Fast Prospect",
+	"Fast Excavate",
 	"\n"
 };
 
@@ -1769,16 +1794,16 @@ const char *priv[] = {
 
 // SCORE_x -- score types
 const char *score_type[] = {
-	"Wealth",
-	"Territory",
-	"Members",
-	"Techs",
-	"Inventory",
+	"Community",
+	"Defense",
 	"Greatness",
-	"Diplomacy",
-	"Fame",
-	"Military",
+	"Industry",
+	"Inventory",
+	"Members",
 	"Playtime",
+	"Prestige",
+	"Territory",
+	"Wealth",
 	"\n"
 };
 
@@ -2591,6 +2616,7 @@ const char *progress_flags[] = {
 	"IN-DEVELOPMENT",
 	"PURCHASABLE",
 	"SCRIPT-ONLY",
+	"HIDDEN",
 	"\n"
 };
 
@@ -2600,6 +2626,10 @@ const char *progress_perk_types[] = {
 	"Technology",
 	"City-points",
 	"Craft",
+	"Max-city-size",
+	"Wealth-territory-per-100",
+	"Greatness-territory",
+	"Workforce-cap",
 	"\n"
 };
 
@@ -3273,6 +3303,7 @@ double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 // SKILLF_x: skill flags
 const char *skill_flags[] = {
 	"IN-DEVELOPMENT",
+	"BASIC",
 	"\n"
 };
 
@@ -3623,6 +3654,7 @@ const char *global_flags[] = {
 	"ADVENTURE-ONLY",
 	"CUMULATIVE-PRC",
 	"CHOOSE-LAST",
+	"RARE",
 	"\n"
 };
 
@@ -3765,6 +3797,11 @@ const char *requirement_types[] = {
 	"OWN-BUILDING-FUNCTION",
 	"OWN-VEHICLE-FLAGGED",
 	"EMPIRE-WEALTH",
+	"EMPIRE-FAME",
+	"EMPIRE-GREATNESS",	// 30
+	"DIPLOMACY",
+	"HAVE-CITY",
+	"EMPIRE-MILITARY",
 	"\n",
 };
 
@@ -3800,6 +3837,11 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// own building function
 	REQ_AMT_NUMBER,	// own vehicle flagged
 	REQ_AMT_NUMBER,	// empire wealth
+	REQ_AMT_NUMBER,	// empire fame
+	REQ_AMT_NUMBER,	// empire greatness
+	REQ_AMT_NUMBER,	// diplomacy
+	REQ_AMT_NUMBER,	// have city
+	REQ_AMT_NUMBER,	// empire military
 };
 
 
@@ -3834,6 +3876,11 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// own building function
 	FALSE,	// own vehicle flagged
 	FALSE,	// empire wealth
+	FALSE,	// empire fame
+	FALSE,	// empire greatness
+	FALSE,	// diplomacy
+	FALSE,	// have city
+	FALSE,	// empire military
 };
 
 

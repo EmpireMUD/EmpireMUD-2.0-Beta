@@ -574,7 +574,7 @@ Current attack types:
  68. acidblast                       69. arclight
  70. astralclaw                      71. chronoblast
  72. deathtouch                      73. dispirit
- 74. erode                           75. scour
+ 74. erode (unused)                  75. scour (unused)
  76. shadowlash                      77. soulchain
  78. starstrike                      79. thornlash
 
@@ -2282,6 +2282,7 @@ Available flags:
  SHIPYARD - requires being at a shipyard
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
  LEARNED - requires the player/empire 'learn' a recipe to use it
+ BY-RIVER - must be adjacent to a river
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -3032,6 +3033,7 @@ Available flags:
  CHOOSE-LAST - The first choose-last global that passes the percent check will
     be saved for later, and only used if no other global succeeds. This can
     be used to create 100% "choose if nothing else passes" final cases.
+ RARE - Requires a special flag, e.g. Rare Metals for mine type.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d
@@ -3497,11 +3499,13 @@ This command will reduce a map building to ruins.
 #d
 "MAPEDIT TERRAIN"
 
-Usage:  .map terrain <type>
+Usage:  .map terrain <type/vnum>
 
 This command allows you to change the sector type (terrain) of a map tile.
 It can be used to clear space for building an immortal's home, or to remove
 a building on the map.
+
+This command accepts sector names, crop names, or sector vnums.
 
 Example:
  > .map terrain Tower of Souls
@@ -5636,7 +5640,9 @@ Usage:  .flags [add | remove] <flags>
 The following progress goal flags are available:
  IN-DEVELOPMENT - Empires cannot start or complete this goal.
  PURCHASABLE - This goal is purchased, not unlocked by tasks.
- SCRIPT-ONLY - For scripts; cannot be purchased or earned.
+ SCRIPT-ONLY - For scripts; cannot be purchased and won't be earned unless a
+               script starts it first.
+ HIDDEN - Will not show up in lists until completed.
 
 See also: OLC PROGRESS
 #d
@@ -5670,8 +5676,12 @@ Perk types:
  Technology - Grants an empire technology.
  City-points - Grants one or more city points.
  Craft - Grants a LEARNED craft recipe to the entire empire.
+ Max-city-size - Increases how large the empire can upgrade its cities.
+ Wealth-territory-per-100 - Increases territory-per-100-wealth.
+ Greatness-territory - Increases territory per greatness point.
+ Workforce-cap - Raises the maximum workforce cap.
 
-Note: To grant progress points for a goal, set the 'value'.
+Note: To grant progress points for a goal, set the 'value' field instead.
 
 See also: OLC PROGRESS, PROGEDIT VALUE
 #d
@@ -6028,6 +6038,11 @@ Available tasks:
  &cOWN-HOMES&0 - Empire must have enough citizen homes.
  &cOWN-SECTOR&0 - Empire must own enough tiles of this sector type.
  &cEMPIRE-WEALTH&0 - Empire must have a certain amount of wealth.
+ &cEMPIRE-FAME&0 - Empire must have a certain amount of fame.
+ &cEMPIRE-GREATNESS&0 - Empire must have a certain amount of greatness.
+ &cDIPLOMACY&0 - Empire must have a number of matching diplomatic relations.
+ &cHAVE-CITY&0 - Empire must have a number of cities (of any size).
+ &cEMPIRE-MILITARY&0 - Empire must have a certain amount of military.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the
@@ -6411,6 +6426,7 @@ Skill flags set various properties on skills.
 
 Available flags:
  IN-DEVELOPMENT - Players can't see or gain the skill.
+ BASIC - Always shows in the list for players, even at 0.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d

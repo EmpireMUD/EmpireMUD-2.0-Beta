@@ -40,6 +40,7 @@ harvest_timer 24
 high_depletion 250
 max_chore_resource 200
 max_chore_resource_over_total 25
+max_chore_resource_per_member 100
 max_chore_resource_skilled 750
 mining_timer 45
 panning_timer 10
@@ -78,7 +79,7 @@ empire_log_ttl 30
 land_frontier_modifier 0.050000
 land_min_cap 15
 land_outside_city_modifier 0.350000
-land_per_greatness 35
+land_per_greatness 15
 land_per_tech 15
 land_per_wealth 0.100000
 member_timeout_full 120

@@ -755,7 +755,9 @@ any immortal:
 - get: does not trigger item binding
 - get: immortals have few restrictions on stealing, and don't trigger distrust
 - give: can be given bound items
-- instances: can always enter an instance despite player limits; does not count toward the limit
+- instances: can always enter an instance despite player limits; does not count
+             toward the limit
+- learn: can specify a vnum to learn a LEARNED-flagged craft without a recipe
 - look at: can see items through conceal
 - look out: works from all rooms
 - look: can see people's real identity while disguised/morphed
@@ -1046,6 +1048,7 @@ notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
 progress   Immort   Shows how many empires have completed a progress goal.
+progression Immrt   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
 shops      Immort   Shows any shops available in your current location.
@@ -1055,6 +1058,7 @@ startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 technology Immort   Shows ability techs a player has.
 terrain    Immort   Shows total counts for all terrain types.
+unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
 variables  Immort   Shows script variables on a player character.
@@ -1177,6 +1181,16 @@ See also: USERS
 Usage:  show progress <goal>
 
 This shows how many empires have completed a given progression goal.
+
+See also: SHOW PROGRESSION
+#e
+"SHOW PROGRESSION"
+
+Usage:  show progression
+
+This shows stats on the number and value of goals in each progression tree.
+
+See also: SHOW PROGRESS
 #e
 "SHOW RENT"
 
@@ -1232,6 +1246,16 @@ Usage:  show terrain
 
 Lists the total count of each sector and crop type in the world. Buildings are
 all listed together under 'Building'.
+#e
+"SHOW UNLEARNABLE"
+
+Usage:  show unlearnable
+
+This command lists craft recipes with LEARNED flags but where there's no recipe
+or progression goal that grants them.
+
+Warning: If a craft recipe is given by a script, this command will still show
+it as unlearnable.
 #e
 "SHOW USES"
 
@@ -1357,6 +1381,7 @@ Examples:
   > stat mobile wolf
   > stat file niandra
   > stat object shawl
+  > stat empire 1
 
 See also: VSTAT
 #d
@@ -1517,9 +1542,9 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, faction, global, generic, mob, morph, obj, 
-                 progress, quest, roomtemplate, sector, shop, skill, social,
-                 trigger, vehicle
+                class, crop, empire, faction, global, generic, mob, morph, obj, 
+                progress, quest, roomtemplate, sector, shop, skill, social,
+                trigger, vehicle
 
 Examples:
 

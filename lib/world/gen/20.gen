@@ -222,13 +222,6 @@ summon swift~
 T0
 Your summon swift cooldown has ended.~
 S
-#2033
-reward~
-3 0
-0 0 0 0
-T0
-Your reward cooldown has ended.~
-S
 #2034
 search~
 3 0
@@ -424,20 +417,6 @@ dispirit~
 0 0 0 0
 T0
 Your dispirit cooldown has ended.~
-S
-#2062
-erode~
-3 0
-0 0 0 0
-T0
-Your erode cooldown has ended.~
-S
-#2063
-scour~
-3 0
-0 0 0 0
-T0
-Your scour cooldown has ended.~
 S
 #2064
 shadowlash~

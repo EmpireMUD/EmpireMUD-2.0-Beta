@@ -344,8 +344,8 @@ void update_class(char_data *ch) {
 	over_basic = 0, over_specialty = 0;
 	at_zero = 0;
 	HASH_ITER(hh, skill_table, skill, next_skill) {
-		if (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
-			++at_zero;	// count total live skills
+		if (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT | SKILLF_BASIC)) {
+			++at_zero;	// count total live skills (ignoring non-basics)
 		}
 	}
 	

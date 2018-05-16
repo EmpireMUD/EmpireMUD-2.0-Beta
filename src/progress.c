@@ -47,6 +47,7 @@ extern const char *techs[];
 
 // external funcs
 extern struct req_data *copy_requirements(struct req_data *from);
+extern int count_cities(empire_data *emp);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_homes(empire_data *emp);;
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
@@ -69,6 +70,31 @@ struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Counts the number of matching diplomatic relations an empire has. If more
+* than one flag is passed, ALL flags must be present to match.
+*
+* @param empire_data *emp Which empire to check.
+* @param bitvector_t dip_flags Which flag(s) to match.
+*/
+int count_diplomacy(empire_data *emp, bitvector_t dip_flags) {
+	struct empire_political_data *pol;
+	int count = 0;
+	
+	if (!emp || !dip_flags) {
+		return count;
+	}
+	
+	LL_FOREACH(EMPIRE_DIPLOMACY(emp), pol) {
+		if ((pol->type & dip_flags) == dip_flags) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
 
 /**
 * Counts how many items an empire has in storage which match a component flag.
@@ -367,6 +393,22 @@ char *get_one_perk_display(struct progress_perk *perk) {
 			}
 			break;
 		}
+		case PRG_PERK_MAX_CITY_SIZE: {
+			sprintf(save_buffer, "%+d max city size", perk->value);
+			break;
+		}
+		case PRG_PERK_TERRITORY_FROM_WEALTH: {
+			sprintf(save_buffer, "%+d territory per 100 wealth", perk->value);
+			break;
+		}
+		case PRG_PERK_TERRITORY_PER_GREATNESS: {
+			sprintf(save_buffer, "%+d territory per greatness", perk->value);
+			break;
+		}
+		case PRG_PERK_WORKFORCE_CAP: {
+			sprintf(save_buffer, "%+d workforce cap", perk->value);
+			break;
+		}
 		default: {
 			strcpy(save_buffer, "UNKNOWN");
 			break;
@@ -479,6 +521,18 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
+			case PRG_PERK_MAX_CITY_SIZE: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_MAX_CITY_SIZE), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
+				break;
+			}
+			case PRG_PERK_TERRITORY_FROM_WEALTH: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
+				break;
+			}
+			case PRG_PERK_TERRITORY_PER_GREATNESS: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_GREATNESS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
+				break;
+			}
 			case PRG_PERK_CRAFT: {
 				void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
 				void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
@@ -489,6 +543,10 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 				else {
 					remove_learned_craft_empire(emp, perk->value, FALSE);
 				}
+				break;
+			}
+			case PRG_PERK_WORKFORCE_CAP: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
 		}
@@ -875,6 +933,26 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = GET_TOTAL_WEALTH(emp);
 				break;
 			}
+			case REQ_EMPIRE_FAME: {
+				task->current = EMPIRE_FAME(emp);
+				break;
+			}
+			case REQ_EMPIRE_MILITARY: {
+				task->current = EMPIRE_MILITARY(emp);
+				break;
+			}
+			case REQ_EMPIRE_GREATNESS: {
+				task->current = EMPIRE_GREATNESS(emp);
+				break;
+			}
+			case REQ_DIPLOMACY: {
+				task->current = count_diplomacy(emp, task->misc);
+				break;
+			}
+			case REQ_HAVE_CITY: {
+				task->current = count_cities(emp);
+				break;
+			}
 			
 			// otherwise...
 			default: {
@@ -953,6 +1031,7 @@ struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg) {
 	goal->vnum = PRG_VNUM(prg);
 	goal->version = PRG_VERSION(prg);
 	goal->tracker = copy_requirements(PRG_TASKS(prg));
+	goal->timestamp = time(0);
 	
 	HASH_ADD_INT(EMPIRE_GOALS(emp), vnum, goal);
 	refresh_one_goal_tracker(emp, goal);
@@ -1010,6 +1089,29 @@ time_t when_empire_completed_goal(empire_data *emp, any_vnum vnum) {
 //// EMPIRE TRACKERS /////////////////////////////////////////////////////////
 
 /**
+* Empire Tracker: empire changes number/size of ciies
+*
+* @param empire_data *emp The empire.
+*/
+void et_change_cities(empire_data *emp) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_HAVE_CITY) {
+				task->current = count_cities(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_cities, 0);
+}
+
+
+/**
 * Empire Tracker: empire gains/loses coins
 *
 * @param empire_data *emp The empire.
@@ -1023,12 +1125,10 @@ void et_change_coins(empire_data *emp, int amount) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_GET_COINS) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_EMPIRE_WEALTH) {
 				task->current = GET_TOTAL_WEALTH(emp);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1036,6 +1136,52 @@ void et_change_coins(empire_data *emp, int amount) {
 	
 	// members online
 	qt_empire_players(emp, qt_empire_wealth, amount);
+}
+
+
+/**
+* Empire Tracker: empire changes diplomatic relations
+*
+* @param empire_data *emp The empire.
+*/
+void et_change_diplomacy(empire_data *emp) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_DIPLOMACY) {
+				task->current = count_diplomacy(emp, task->misc);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_diplomacy, 0);
+}
+
+
+/**
+* Empire Tracker: empire gains/loses greatness
+*
+* @param empire_data *emp The empire.
+*/
+void et_change_greatness(empire_data *emp) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_EMPIRE_GREATNESS) {
+				task->current = EMPIRE_GREATNESS(emp);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// members online
+	qt_empire_players(emp, qt_empire_greatness, 0);
 }
 
 
@@ -1048,18 +1194,32 @@ void et_change_coins(empire_data *emp, int amount) {
 void et_gain_building(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
-	bld_data *bld;
+	bld_data *bld = building_proto(vnum);
+	
+	if (!bld) {	// no building / no work
+		return;
+	}
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_HOMES && GET_BLD_CITIZENS(bld) > 0) {
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_FAME && GET_BLD_FAME(bld) != 0) {
+				task->current += GET_BLD_FAME(bld);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
+				task->current += GET_BLD_MILITARY(bld);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1081,7 +1241,6 @@ void et_gain_tile_sector(empire_data *emp, sector_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1104,12 +1263,10 @@ void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				++task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -1137,17 +1294,14 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 			else if (task->type == REQ_CROP_VARIETY && OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
@@ -1170,21 +1324,36 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 void et_lose_building(empire_data *emp, any_vnum vnum) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
-	bld_data *bld;
+	bld_data *bld = building_proto(vnum);
+	
+	if (!bld) {
+		return;
+	}
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
 				--task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				
 				// check min
 				task->current = MAX(task->current, 0);
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (bld = building_proto(vnum)) && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
 				--task->current;
 				task->current = MAX(task->current, 0);
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			}
+			else if (task->type == REQ_OWN_HOMES && GET_BLD_CITIZENS(bld) > 0) {
+				--task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_FAME && GET_BLD_FAME(bld) != 0) {
+				task->current -= GET_BLD_FAME(bld);
+				
+				// fame could trigger if negative
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
+				task->current -= GET_BLD_MILITARY(bld);
 			}
 		}
 	}
@@ -1205,7 +1374,6 @@ void et_lose_tile_sector(empire_data *emp, sector_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
 				--task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
@@ -1232,7 +1400,6 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
 				--task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
@@ -1240,7 +1407,6 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				--task->current;
-				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
@@ -1327,6 +1493,7 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 	struct progress_list *iter, *sub;
 	progress_data *other;
 	bool problem = FALSE;
+	int tick;
 	
 	if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "IN-DEVELOPMENT");
@@ -1345,6 +1512,12 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 	if (ispunct(*(PRG_NAME(prg) + strlen(PRG_NAME(prg)) - 1))) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "Name ends with punctuation");
 		problem = TRUE;
+	}
+	for (tick = 0; tick < NUM_PROGRESS_TYPES; ++tick) {
+		if (is_abbrev(progress_types[tick], PRG_NAME(prg)) || is_abbrev(PRG_NAME(prg), progress_types[tick])) {
+			olc_audit_msg(ch, PRG_VNUM(prg), "WARNING: Name matches a progression category, which may make lookups impossible");
+			problem = TRUE;
+		}
 	}
 	
 	if (!PRG_DESCRIPTION(prg) || !*PRG_DESCRIPTION(prg)) {
@@ -2168,9 +2341,9 @@ void olc_show_progress(char_data *ch) {
 	get_progress_list_display(PRG_PREREQS(prg), lbuf);
 	sprintf(buf + strlen(buf), "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
 	
-	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
+	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 		get_requirement_display(PRG_TASKS(prg), lbuf);
-		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE | PRG_SCRIPT_ONLY) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
 	}
 	
 	get_progress_perks_display(PRG_PERKS(prg), lbuf);
@@ -2437,6 +2610,34 @@ OLC_MODULE(progedit_perks) {
 				case PRG_PERK_CITY_POINTS: {
 					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
 						msg_to_char(ch, "Invalid number of city points '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_MAX_CITY_SIZE: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid number of city sizes '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_TERRITORY_FROM_WEALTH: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid number of territory per 100 wealth '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_TERRITORY_PER_GREATNESS: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid number of territory per greatness '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_WORKFORCE_CAP: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid amount of extra workforce cap '%s'.\r\n", argument);
 						return;
 					}
 					break;	// otherwise ok

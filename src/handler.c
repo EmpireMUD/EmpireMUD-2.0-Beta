@@ -410,6 +410,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			player_index_data *index;
 			if (!IS_NPC(ch) && GET_LOYALTY(ch) && (index = find_player_index_by_idnum(GET_IDNUM(ch))) && index->contributing_greatness) {
 				EMPIRE_GREATNESS(GET_LOYALTY(ch)) += mod;
+				et_change_greatness(GET_LOYALTY(ch));
 			}
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
@@ -6253,7 +6254,9 @@ void free_requirements(struct req_data *list) {
 * @return bool TRUE if the character meets those requirements, FALSE if not.
 */
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
+	extern int count_cities(empire_data *emp);
 	extern int count_crop_variety_in_list(obj_data *list);
+	extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
 	extern int count_owned_homes(empire_data *emp);
@@ -6477,6 +6480,36 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_EMPIRE_FAME: {
+				if (!GET_LOYALTY(ch) || EMPIRE_FAME(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_EMPIRE_MILITARY: {
+				if (!GET_LOYALTY(ch) || EMPIRE_MILITARY(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_EMPIRE_GREATNESS: {
+				if (!GET_LOYALTY(ch) || EMPIRE_GREATNESS(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_DIPLOMACY: {
+				if (!GET_LOYALTY(ch) || count_diplomacy(GET_LOYALTY(ch), req->misc) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_HAVE_CITY: {
+				if (!GET_LOYALTY(ch) || count_cities(GET_LOYALTY(ch)) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -6525,6 +6558,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 */
 char *requirement_string(struct req_data *req, bool show_vnums) {
 	extern const char *action_bits[];
+	extern const char *diplomacy_flags[];
 	extern const char *function_flags[];
 	extern const char *vehicle_flags[];
 	
@@ -6562,7 +6596,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_GET_COINS: {
-			snprintf(output, sizeof(output), "Get misc coins: %d coins", req->needed);
+			snprintf(output, sizeof(output), "Get coins: %d coins", req->needed);
 			break;
 		}
 		case REQ_KILL_MOB: {
@@ -6670,6 +6704,27 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_EMPIRE_WEALTH: {
 			snprintf(output, sizeof(output), "Have empire wealth over: %d", req->needed);
+			break;
+		}
+		case REQ_EMPIRE_FAME: {
+			snprintf(output, sizeof(output), "Have empire fame over: %d", req->needed);
+			break;
+		}
+		case REQ_EMPIRE_MILITARY: {
+			snprintf(output, sizeof(output), "Have empire military over: %d", req->needed);
+			break;
+		}
+		case REQ_EMPIRE_GREATNESS: {
+			snprintf(output, sizeof(output), "Have empire greatness over: %d", req->needed);
+			break;
+		}
+		case REQ_DIPLOMACY: {
+			sprintbit(req->misc, diplomacy_flags, lbuf, TRUE);
+			snprintf(output, sizeof(output), "Have diplomatic relations: %dx %s", req->needed, lbuf);
+			break;
+		}
+		case REQ_HAVE_CITY: {
+			snprintf(output, sizeof(output), "Have %d cit%s", req->needed, req->needed == 1 ? "y" : "ies");
 			break;
 		}
 		default: {

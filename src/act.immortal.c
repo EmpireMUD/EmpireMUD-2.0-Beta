@@ -54,6 +54,7 @@ extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
+extern const char *progress_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
@@ -1381,6 +1382,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		affect_total(vict);
 		if (emp) {
 			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
+			et_change_greatness(emp);
 		}
 	}
 	else if SET_CASE("intelligence") {
@@ -2354,6 +2356,43 @@ SHOW(show_progress) {
 }
 
 
+SHOW(show_progression) {
+	int goals[NUM_PROGRESS_TYPES], rewards[NUM_PROGRESS_TYPES], cost[NUM_PROGRESS_TYPES], value[NUM_PROGRESS_TYPES];
+	progress_data *prg, *next_prg;
+	int iter, tot_v, tot_c;
+	
+	tot_v = tot_c = 0;
+	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+		// init
+		goals[iter] = rewards[iter] = cost[iter] = value[iter] = 0;
+	}
+	
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+			++rewards[PRG_TYPE(prg)];
+		}
+		else {
+			++goals[PRG_TYPE(prg)];
+		}
+		
+		cost[PRG_TYPE(prg)] += PRG_COST(prg);
+		tot_c += PRG_COST(prg);
+		value[PRG_TYPE(prg)] += PRG_VALUE(prg);
+		tot_v += PRG_VALUE(prg);
+	}
+	
+	msg_to_char(ch, "Stats on active progression entries:\r\n");
+	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+		msg_to_char(ch, "%s: %d goal%s (%d point%s), %d reward%s (%d total cost)\r\n", progress_types[iter], goals[iter], PLURAL(goals[iter]), value[iter], PLURAL(value[iter]), rewards[iter], PLURAL(rewards[iter]), cost[iter]);
+	}
+	msg_to_char(ch, "Total: %d point%s, %d total cost\r\n", tot_v, PLURAL(tot_v), tot_c);
+}
+
+
 SHOW(show_quests) {
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	void show_quest_tracker(char_data *ch, struct player_quest *pq);
@@ -2477,7 +2516,8 @@ SHOW(show_stats) {
 	extern int total_accounts, active_accounts, active_accounts_week;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
-	int num_trigs = 0;
+	int num_trigs = 0, num_goals = 0, num_rewards = 0;
+	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
 	vehicle_data *veh;
@@ -2517,6 +2557,20 @@ SHOW(show_stats) {
 		}
 	}
 	
+	// count goals
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+			++num_rewards;
+		}
+		else {
+			++num_goals;
+		}
+	}
+	
 	update_account_stats();
 
 	msg_to_char(ch, "Current stats:\r\n");
@@ -2538,6 +2592,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
 	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
 	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
+	msg_to_char(ch, "  %6d progress goals   %6d progress rewards\r\n", num_goals, num_rewards);
 	msg_to_char(ch, "  %6d shops\r\n", HASH_COUNT(shop_table));
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
@@ -2880,6 +2935,63 @@ SHOW(show_terrain) {
 	}
 	
 	msg_to_char(ch, " Total: %d\r\n", total);
+}
+
+
+SHOW(show_unlearnable) {
+	struct progress_perk *perk, *next_perk;
+	craft_data *craft, *next_craft;
+	progress_data *prg, *next_prg;
+	obj_data *obj, *next_obj;
+	bool any = FALSE, found;
+	
+	msg_to_char(ch, "Unlearnable recipes with the LEARNED flag:\r\n");
+	
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (!CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+			continue;
+		}
+		
+		found = FALSE;
+		
+		// try to find it in recipes
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == GET_CRAFT_VNUM(craft)) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (found) {	// was an item recipe
+			continue;
+		}
+		
+		// try to find it in progression
+		HASH_ITER(hh, progress_table, prg, next_prg) {
+			LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
+				if (perk->type == PRG_PERK_CRAFT && perk->value == GET_CRAFT_VNUM(craft)) {
+					found = TRUE;
+					break;
+				}
+			}
+			if (found) {
+				break;
+			}
+		}
+		if (found) {	// was a progression reward
+			continue;
+		}
+		
+		// did we get this far?
+		any = TRUE;
+		msg_to_char(ch, "[%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), GET_CRAFT_ABILITY(craft) == NO_ABIL ? "no ability" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+	}
+	
+	if (any) {
+		msg_to_char(ch, "(remember, some of these may be added by scripts)\r\n");
+	}
+	else {
+		msg_to_char(ch, " none\r\n");
+	}
 }
 
 
@@ -4191,6 +4303,97 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 	}
 	
 	show_spawn_summary_to_char(ch, GET_CROP_SPAWNS(cp));
+}
+
+
+/**
+* Shows immortal stats on an empire.
+*
+* @param char_data *ch The person viewing the stats.
+* @param empire_data *emp The empire.
+*/
+void do_stat_empire(char_data *ch, empire_data *emp) {
+	extern int get_total_score(empire_data *emp);
+	
+	extern const char *empire_admin_flags[];
+	extern const char *empire_attributes[];
+	extern const char *empire_trait_types[];
+	extern const char *progress_types[];
+	extern const char *techs[];
+	
+	empire_data *emp_iter, *next_emp;
+	int iter, found_rank, total, len;
+	player_index_data *index;
+	char line[256];
+	bool any;
+	
+	// determine rank by iterating over the sorted empire list
+	found_rank = 0;
+	HASH_ITER(hh, empire_table, emp_iter, next_emp) {
+		++found_rank;
+		if (emp == emp_iter) {
+			break;
+		}
+	}
+	
+	msg_to_char(ch, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
+	msg_to_char(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]\r\n", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
+	
+	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
+	msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
+	
+	sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, line, TRUE);
+	msg_to_char(ch, "Frontier traits: \tc%s\t0\r\n", line);
+
+	msg_to_char(ch, "Technology: \tg");
+	for (iter = 0, len = 0, any = FALSE; iter < NUM_TECHS; ++iter) {
+		if (EMPIRE_HAS_TECH(emp, iter)) {
+			any = TRUE;
+			if (len > 0 && len + strlen(techs[iter]) + 3 >= 80) {	// new line
+				msg_to_char(ch, ",\r\n%s", techs[iter]);
+				len = strlen(techs[iter]);
+			}
+			else {	// same line
+				msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", techs[iter]);
+				len += strlen(techs[iter]) + 2;
+			}
+		}
+	}
+	if (!any) {
+		msg_to_char(ch, "none");
+	}
+	msg_to_char(ch, "\t0\r\n");	// end tech
+	
+	msg_to_char(ch, "Members: [\tc%d\t0/\tc%d\t0], Citizens: [\tc%d\t0], Military: [\tc%d\t0]\r\n", EMPIRE_MEMBERS(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp), EMPIRE_POPULATION(emp), EMPIRE_MILITARY(emp));
+	msg_to_char(ch, "Territory: [\tc%d\t0/\tc%d\t0], In-City: [\tc%d\t0], Outskirts: [\tc%d\t0/\tc%d\t0], Frontier: [\tc%d\t0/\tc%d\t0]\r\n", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_CITY), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
+
+	msg_to_char(ch, "Wealth: [\ty%d\t0], Treasure: [\ty%d\t0], Coins: [\ty%.1f\t0]\r\n", (int) GET_TOTAL_WEALTH(emp), EMPIRE_WEALTH(emp), EMPIRE_COINS(emp));
+	msg_to_char(ch, "Greatness: [\tc%d\t0], Fame: [\tc%d\t0]\r\n", EMPIRE_GREATNESS(emp), EMPIRE_FAME(emp));
+	
+	// progress points by category
+	total = 0;
+	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
+		total += EMPIRE_PROGRESS_POINTS(emp, iter);
+		msg_to_char(ch, "%s: [\ty%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
+	}
+	msg_to_char(ch, "Total: [\ty%d\t0]\r\n", total);
+	
+	// attributes
+	for (iter = 0, len = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		sprintf(line, "%s: [\tc%d\t0]", empire_attributes[iter], EMPIRE_ATTRIBUTE(emp, iter));
+		
+		if (len > 0 && len + strlen(line) + 2 >= 80) {	// start new line
+			msg_to_char(ch, "\r\n%s", line);
+			len = strlen(line);
+		}
+		else {	// same line
+			msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", line);
+			len += strlen(line) + 2;
+		}
+	}
+	if (len > 0) {
+		msg_to_char(ch, "\r\n");
+	}
 }
 
 
@@ -7718,6 +7921,7 @@ ACMD(do_show) {
 		{ "variables", LVL_START_IMM, show_variables },
 		{ "components", LVL_START_IMM, show_components },
 		{ "quests", LVL_START_IMM, show_quests },
+		{ "unlearnable", LVL_START_IMM, show_unlearnable },
 		{ "uses", LVL_START_IMM, show_uses },
 		{ "factions", LVL_START_IMM, show_factions },
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
@@ -7728,6 +7932,7 @@ ACMD(do_show) {
 		{ "shops", LVL_START_IMM, show_shops },
 		{ "piles", LVL_CIMPL, show_piles },
 		{ "progress", LVL_START_IMM, show_progress },
+		{ "progression", LVL_START_IMM, show_progression },
 
 		// last
 		{ "\n", 0, NULL }
@@ -7866,6 +8071,7 @@ ACMD(do_snoop) {
 ACMD(do_stat) {
 	char_data *victim = NULL;
 	vehicle_data *veh;
+	empire_data *emp;
 	crop_data *cp;
 	obj_data *obj;
 	bool file = FALSE;
@@ -7910,6 +8116,17 @@ ACMD(do_stat) {
 		}
 		else {
 			msg_to_char(ch, "You are not on a crop tile.\r\n");
+		}
+	}
+	else if (!strn_cmp(buf1, "emp", 3) && is_abbrev(buf1, "empire")) {
+		if ((emp = get_empire_by_name(buf2))) {
+			do_stat_empire(ch, emp);
+		}
+		else if (!*buf2) {
+			msg_to_char(ch, "Get stats on which empire?\r\n");
+		}
+		else {
+			msg_to_char(ch, "Unknown empire.\r\n");
 		}
 	}
 	else if (!strn_cmp(buf1, "sect", 4) && is_abbrev(buf1, "sector")) {
@@ -8609,6 +8826,7 @@ ACMD(do_vnum) {
 
 
 ACMD(do_vstat) {
+	empire_data *emp;
 	char_data *mob;
 	obj_data *obj;
 	any_vnum number;
@@ -8699,6 +8917,17 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_crop(ch, crop);
+	}
+	else if (!strn_cmp(buf, "emp", 3) && is_abbrev(buf, "empire")) {
+		if ((emp = get_empire_by_name(buf2))) {
+			do_stat_empire(ch, emp);
+		}
+		else if (!*buf2) {
+			msg_to_char(ch, "Get stats on which empire?\r\n");
+		}
+		else {
+			msg_to_char(ch, "Unknown empire.\r\n");
+		}
 	}
 	else if (is_abbrev(buf, "faction")) {
 		void do_stat_faction(char_data *ch, faction_data *fct);

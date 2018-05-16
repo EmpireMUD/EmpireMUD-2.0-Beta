@@ -33,7 +33,7 @@
 #define CHOOSE_BY_ABILITY_LEVEL(arr, ch, abil)	(IS_CLASS_ABILITY((ch), (abil)) ? (arr)[2] : (IS_SPECIALTY_ABILITY((ch), (abil)) ? (arr)[1] : (arr)[0]))
 
 // TODO move some of this to a config
-#define ZEROES_REQUIRED_FOR_BONUS_SKILLS  2  // if you have this many skills at zero, you get BONUS_SPECIALTY_SKILLS_ALLOWED
+#define ZEROES_REQUIRED_FOR_BONUS_SKILLS  1  // if you have this many BASIC skills at zero, you get BONUS_SPECIALTY_SKILLS_ALLOWED
 
 #define NUM_CLASS_SKILLS_ALLOWED  2	// skills > SPECIALTY_SKILL_CAP
 #define NUM_SPECIALTY_SKILLS_ALLOWED  3  // skills > BASIC_SKILL_CAP
@@ -127,8 +127,8 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_HEARTSTOP  36
 #define ABIL_TASTE_BLOOD  37
 #define ABIL_BLOOD_FORTITUDE  38
-#define ABIL_LOCKS  41
-#define ABIL_ROADS  49
+// formerly: #define ABIL_LOCKS  41
+// formerly: #define ABIL_ROADS  49
 #define ABIL_STAMINA  66
 #define ABIL_FIND_HERBS  70
 #define ABIL_FISH  72
@@ -165,17 +165,17 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_FAMILIAR  122
 #define ABIL_SKYBRAND  125
 #define ABIL_CHANT_OF_NATURE  126
-#define ABIL_REWARD  127
-#define ABIL_SUMMON_GUARDS  128
-#define ABIL_PROSPECT  130
-#define ABIL_WORKFORCE  131
-#define ABIL_RARE_METALS  133
-#define ABIL_COMMERCE  134
-#define ABIL_PROMINENCE  135
+// formerly: #define ABIL_REWARD  127
+// formerly: #define ABIL_SUMMON_GUARDS  128
+// formerly: #define ABIL_PROSPECT  130
+// formerly: #define ABIL_WORKFORCE  131
+// formerly: #define ABIL_RARE_METALS  133
+// formerly: #define ABIL_COMMERCE  134
+// formerly: #define ABIL_PROMINENCE  135
 #define ABIL_INSPIRE  136
 #define ABIL_SUMMON_BODYGUARD  138
-// formerly: ABIL_BARDE  139
-#define ABIL_CITY_LIGHTS  140
+// formerly: #define ABIL_BARDE  139
+// formerly: #define ABIL_CITY_LIGHTS  140
 #define ABIL_STEAL  143
 #define ABIL_ESCAPE  146
 #define ABIL_CONCEALMENT  148
@@ -207,9 +207,10 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_DEVASTATION_RITUAL  191
 #define ABIL_SENSE_LIFE_RITUAL  192
 #define ABIL_RITUAL_OF_DETECTION  193
-#define ABIL_SKILLED_LABOR  201
+#define ABIL_BASIC_CRAFTS  198
+// formerly: #define ABIL_SKILLED_LABOR  201
 #define ABIL_MASTER_SURVIVALIST  205
-#define ABIL_TUNNEL  206
+// formerly: #define ABIL_TUNNEL  206
 #define ABIL_ARCANE_POWER  207
 #define ABIL_OUTRAGE  209
 #define ABIL_DREAD_BLOOD_FORM  211
@@ -218,7 +219,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SAGE_WEREWOLF_FORM  214
 #define ABIL_ANIMAL_FORMS  215
 #define ABIL_REFASHION  216
-#define ABIL_TRADE_ROUTES  217
+// formerly: #define ABIL_TRADE_ROUTES  217
 #define ABIL_RESURRECT  219
 #define ABIL_MOONRISE  220
 #define ABIL_SANGUINE_RESTORATION  226
@@ -259,8 +260,8 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_CHRONOBLAST  277
 #define ABIL_DEATHTOUCH  278
 #define ABIL_DISPIRIT  279
-#define ABIL_ERODE  280
-#define ABIL_SCOUR  281
+// formerly: #define ABIL_ERODE  280
+// formerly: #define ABIL_SCOUR  281
 #define ABIL_SHADOWLASH  282
 #define ABIL_SOULCHAIN  283
 #define ABIL_STARSTRIKE  284
@@ -268,9 +269,10 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_EVASION  286
 #define ABIL_WEAPON_PROFICIENCY  287
 #define ABIL_PRIMITIVE_CRAFTS  288	// has hard-coded gains
-#define ABIL_CHORES  290
+// formerly: #define ABIL_CHORES  290
 #define ABIL_SCAVENGING  291
 #define ABIL_BITE  292
+#define ABIL_COOK  293
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
 #define ABIL_TRICK_SHOTS  296
@@ -350,8 +352,8 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ATTACK_CHRONOBLAST		(TYPE_SUFFERING + 21)
 #define ATTACK_DEATHTOUCH		(TYPE_SUFFERING + 22)
 #define ATTACK_DISPIRIT			(TYPE_SUFFERING + 23)
-#define ATTACK_ERODE			(TYPE_SUFFERING + 24)
-#define ATTACK_SCOUR			(TYPE_SUFFERING + 25)
+#define ATTACK_ERODE			(TYPE_SUFFERING + 24)	// currently unused
+#define ATTACK_SCOUR			(TYPE_SUFFERING + 25)	// currently unused
 #define ATTACK_SHADOWLASH		(TYPE_SUFFERING + 26)
 #define ATTACK_SOULCHAIN		(TYPE_SUFFERING + 27)
 #define ATTACK_STARSTRIKE		(TYPE_SUFFERING + 28)

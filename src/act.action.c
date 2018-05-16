@@ -122,15 +122,15 @@ const struct action_data_struct action_data[] = {
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
-	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_excavating, NULL },	// ACT_EXCAVATING
+	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_excavating, NULL },	// ACT_EXCAVATING
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
 	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_picking, NULL },	// ACT_PICKING
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
 	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_resource_list },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
 	{ "chanting", "is chanting a strange song.", NOBITS, perform_ritual, NULL },	// ACT_CHANTING
-	{ "prospecting", "is prospecting.", NOBITS, process_prospecting, NULL },	// ACT_PROSPECTING
-	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_fillin, NULL },	// ACT_FILLING_IN
+	{ "prospecting", "is prospecting.", ACTF_FAST_PROSPECT, process_prospecting, NULL },	// ACT_PROSPECTING
+	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_fillin, NULL },	// ACT_FILLING_IN
 	{ "reclaiming", "is reclaiming this acre!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
 	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
 	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, cancel_movement_string },	// unused
@@ -242,6 +242,7 @@ void update_actions(void) {
 	craft_data *craft;
 	char_data *ch;
 	int speed;
+	bool junk;
 
 	// only players with active connections can process actions
 	for (desc = descriptor_list; desc; desc = desc->next) {
@@ -300,6 +301,12 @@ void update_actions(void) {
 			speed += ACTION_CYCLE_MULTIPLIER;
 		}
 		if (IS_SET(act_flags, ACTF_FASTER_BONUS) && HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
+			speed += ACTION_CYCLE_MULTIPLIER;
+		}
+		if (IS_SET(act_flags, ACTF_FAST_PROSPECT) && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_FAST_PROSPECT)) {
+			speed += ACTION_CYCLE_MULTIPLIER;
+		}
+		if (IS_SET(act_flags, ACTF_FAST_EXCAVATE) && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_FAST_EXCAVATE) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &junk)) {
 			speed += ACTION_CYCLE_MULTIPLIER;
 		}
 		if (IS_SET(act_flags, ACTF_FINDER) && has_player_tech(ch, PTECH_FAST_FIND)) {
@@ -998,7 +1005,7 @@ void perform_saw(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
-			gain_ability_exp(ch, ABIL_CHORES, 10);
+			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 10);
 			
 			// lather, rinse, rescrape
 			do_saw(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -1166,7 +1173,7 @@ void process_chop(char_data *ch) {
 		// attempt to change terrain
 		change_chop_territory(IN_ROOM(ch));
 		
-		gain_ability_exp(ch, ABIL_CHORES, 15);
+		gain_ability_exp(ch, ABIL_SCAVENGING, 15);
 		
 		// stoppin choppin -- don't use stop_room_action because we also restart them
 		// (this includes ch)
@@ -1595,7 +1602,7 @@ void process_harvesting(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
-			gain_ability_exp(ch, ABIL_CHORES, 30);
+			gain_ability_exp(ch, ABIL_SCAVENGING, 30);
 			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
 		}
 		else {
@@ -1750,7 +1757,7 @@ void process_minting(char_data *ch) {
 		increase_coins(ch, emp, num);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		gain_ability_exp(ch, ABIL_CHORES, 30);
+		gain_ability_exp(ch, ABIL_BASIC_CRAFTS, 30);
 		
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
 			strcpy(tmp, fname(GET_OBJ_KEYWORDS(proto)));
@@ -1972,7 +1979,7 @@ void process_planting(char_data *ch) {
 		msg_to_char(ch, "You have finished planting!\r\n");
 		act("$n finishes planting!", FALSE, ch, 0, 0, TO_ROOM);
 		
-		gain_ability_exp(ch, ABIL_CHORES, 30);
+		gain_ability_exp(ch, ABIL_COOK, 30);
 		
 		GET_ACTION(ch) = ACT_NONE;
 	}
@@ -2016,8 +2023,6 @@ void process_prospecting(char_data *ch) {
 			
 			show_prospect_result(ch, IN_ROOM(ch));
 			act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
-			
-			gain_ability_exp(ch, ABIL_PROSPECT, 15);
 			break;
 		}
 	}
@@ -2076,7 +2081,7 @@ void process_quarrying(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, finish_quarrying)) {
-			gain_ability_exp(ch, ABIL_CHORES, 25);
+			gain_ability_exp(ch, ABIL_SCAVENGING, 25);
 		
 			add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
 			
@@ -2196,7 +2201,7 @@ void process_scraping(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
-			gain_ability_exp(ch, ABIL_CHORES, 10);
+			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 10);
 			
 			// lather, rinse, rescrape
 			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -2340,7 +2345,7 @@ void process_tanning(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success) {
-			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 20);
+			gain_ability_exp(ch, ABIL_BASIC_CRAFTS, 20);
 	
 			// repeat!
 			do_tan(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -2779,6 +2784,9 @@ ACMD(do_mint) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
+	else if (!has_ability(ch, ABIL_BASIC_CRAFTS)) {
+		msg_to_char(ch, "You need the Basic Crafts ability to mint anything.\r\n");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
@@ -2790,9 +2798,6 @@ ACMD(do_mint) {
 	}
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "This mint does not belong to any empire, and can't make coins.\r\n");
-	}
-	else if (!EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-		msg_to_char(ch, "This empire does not have Commerce, and cannot mint coins.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to mint here.\r\n");
@@ -3011,8 +3016,8 @@ ACMD(do_prospect) {
 		act("$n stops prospecting.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (IS_NPC(ch) || !has_ability(ch, ABIL_PROSPECT)) {
-		msg_to_char(ch, "You need to buy the Prospect ability before you can use it.\r\n");
+	else if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't prospect.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
@@ -3022,9 +3027,6 @@ ACMD(do_prospect) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to prospect here.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_PROSPECT)) {
-		return;
 	}
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0 && GET_LOYALTY(ch) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You see evidence that someone has already prospected this area...\r\n");
@@ -3200,6 +3202,9 @@ ACMD(do_tan) {
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!has_ability(ch, ABIL_BASIC_CRAFTS)) {
+		msg_to_char(ch, "You need the Basic Crafts ability to tan anything.\r\n");
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "What would you like to tan?\r\n");

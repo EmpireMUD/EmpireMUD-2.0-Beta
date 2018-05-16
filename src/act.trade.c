@@ -78,6 +78,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PRESS) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a press to do that.\r\n");
 	}
+	else if (CRAFT_FLAGGED(type, CRAFT_BY_RIVER) && (!IS_OUTDOORS(ch) || !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1))) {
+		msg_to_char(ch, "You must be next to a river to do that.\r\n");
+	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}
@@ -230,8 +233,6 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL;
 	craft_data *craft, *next_craft;
-	obj_data *obj;
-	bool found;
 	
 	skip_spaces(&argument);
 	
@@ -245,19 +246,6 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
 			continue;
 		}
-		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
-			// are they holding a recipe?
-			found = FALSE;
-			LL_FOREACH2(ch->carrying, obj, next_content) {
-				if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == GET_CRAFT_VNUM(craft)) {
-					found = TRUE;
-					break;
-				}
-			}
-			if (!found) {
-				continue;	// not learned
-			}
-		}
 		
 		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
 			// exact match!
@@ -270,11 +258,18 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 					unknown_abbrev = craft;
 				}
 			}
-			else if (GET_CRAFT_ABILITY(craft) == NO_ABIL || has_ability(ch, GET_CRAFT_ABILITY(craft))) {
-				known_abbrev = craft;
+			else if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+				if (!unknown_abbrev) {	// player missing ability
+					unknown_abbrev = craft;
+				}
 			}
-			else if (!unknown_abbrev) {
-				unknown_abbrev = craft;
+			else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+				if (!unknown_abbrev) {	// player missing 'learned'
+					unknown_abbrev = craft;
+				}
+			}
+			else {	// they should have access to it
+				known_abbrev = craft;
 			}
 		}
 	}
@@ -1628,6 +1623,19 @@ ACMD(do_learn) {
 	}
 	else if (!*argument) {
 		msg_to_char(ch, "Learn what?\r\n");
+	}
+	else if (IS_IMMORTAL(ch) && is_number(arg)) {
+		// immortal learn: learn <vnum>
+		if (!(recipe = craft_proto(atoi(arg)))) {
+			msg_to_char(ch, "Invalid craft vnum '%s'.\r\n", arg);
+		}
+		else if (!CRAFT_FLAGGED(recipe, CRAFT_LEARNED)) {
+			msg_to_char(ch, "That is not a LEARNED-flagged craft.\r\n");
+		}
+		else {
+			add_learned_craft(ch, GET_CRAFT_VNUM(recipe));
+			msg_to_char(ch, "You have learned [%d] %s (%s).\r\n", GET_CRAFT_VNUM(recipe), GET_CRAFT_NAME(recipe), craft_types[GET_CRAFT_TYPE(recipe)]);
+		}
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);

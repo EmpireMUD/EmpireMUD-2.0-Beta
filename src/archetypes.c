@@ -1195,6 +1195,9 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	any = FALSE;
 	
 	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
+		if (ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+			continue;	// don't show in-dev
+		}
 		if (GET_ARCH_TYPE(arch) != type) {
 			continue;
 		}
