@@ -5868,7 +5868,7 @@ ACMD(do_progress) {
 		else if (EMPIRE_PROGRESS_POOL(emp) < PRG_COST(prg)) {
 			msg_to_char(ch, "You need %d more progress point%s to afford %s.\r\n", (PRG_COST(prg) - EMPIRE_PROGRESS_POOL(emp)), PLURAL(PRG_COST(prg) - EMPIRE_PROGRESS_POOL(emp)), PRG_NAME(prg));
 		}
-		else if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
+		else if (emp == GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_PROGRESS)) {
 			// only if same-empire: immortals with imm-access can override this
 			msg_to_char(ch, "You don't have permission to purchase progression goals.\r\n");
 		}
