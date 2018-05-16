@@ -129,9 +129,9 @@ OLC_MODULE(mapedit_terrain) {
 	struct empire_city_data *city, *temp;
 	empire_data *emp;
 	int count;
-	sector_data *sect, *next_sect, *old_sect = NULL;
+	sector_data *sect = NULL, *next_sect, *old_sect = NULL;
 	crop_data *crop, *next_crop;
-	crop_data *cp;
+	crop_data *cp = NULL;
 	
 	if (isdigit(*argument)) {
 		sect = sector_proto(atoi(argument));
