@@ -3499,11 +3499,13 @@ This command will reduce a map building to ruins.
 #d
 "MAPEDIT TERRAIN"
 
-Usage:  .map terrain <type>
+Usage:  .map terrain <type/vnum>
 
 This command allows you to change the sector type (terrain) of a map tile.
 It can be used to clear space for building an immortal's home, or to remove
 a building on the map.
+
+This command accepts sector names, crop names, or sector vnums.
 
 Example:
  > .map terrain Tower of Souls

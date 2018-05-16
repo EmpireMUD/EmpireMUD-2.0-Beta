@@ -133,8 +133,13 @@ OLC_MODULE(mapedit_terrain) {
 	crop_data *crop, *next_crop;
 	crop_data *cp;
 	
-	sect = get_sect_by_name(argument);
-	cp = get_crop_by_name(argument);
+	if (isdigit(*argument)) {
+		sect = sector_proto(atoi(argument));
+	}
+	else {
+		sect = get_sect_by_name(argument);
+		cp = get_crop_by_name(argument);
+	}
 
 	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
 		msg_to_char(ch, "Leave the building or area first.\r\n");
