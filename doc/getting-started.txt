@@ -84,6 +84,7 @@ The following adventures require setup:
 	[   52] Tutorial Quests
 	[  180] Misplaced Mother Goose
 	[  181] Goblin Mines
+	[12600] Elemental Escape
 	[18200] The Guild of Adventurers
 
 
