@@ -2011,7 +2011,7 @@ ACMD(do_chart) {
 	if (!*argument) {
 		msg_to_char(ch, "Get chart information on which island?\r\n");
 	}
-	else if (!(isle = get_island_by_name(ch, argument))) {
+	else if (!(isle = get_island_by_name(ch, argument)) || isle->id == NO_ISLAND) {
 		msg_to_char(ch, "Unknown island.\r\n");
 	}
 	else {
