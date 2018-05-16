@@ -1605,11 +1605,12 @@ struct city_metadata_type city_type[] = {
 
 // DIPL_x: Diplomacy types
 const char *diplomacy_flags[] = {
-	"peace",
+	"peace",	// 0
 	"war",
+	"unknown",
 	"allied",
 	"nonaggression",
-	"trade",
+	"trade",	// 5
 	"distrust",
 	"truce",
 	"\n"
