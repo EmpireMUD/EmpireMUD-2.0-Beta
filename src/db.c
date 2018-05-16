@@ -3172,10 +3172,21 @@ void b5_34_mega_update(void) {
 		for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
 			EMPIRE_ATTRIBUTE(emp, iter) = 0;
 		}
+		
+		// reset techs
+		for (iter = 0; iter < NUM_TECHS; ++iter) {
+			EMPIRE_TECH(emp, iter) = 0;
+			EMPIRE_BASE_TECH(emp, iter) = 0;
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	// and players
 	update_all_players(NULL, b5_34_player_update);
+	
+	// rescan everyone
+	reread_empire_tech(NULL);
 }
 
 
