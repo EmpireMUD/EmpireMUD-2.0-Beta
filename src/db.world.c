@@ -173,9 +173,9 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	// tear down any building data and customizations
 	disassociate_building(room);
 	
-	// need to determine a crop before we change it?
-	if (SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
-		new_crop = get_potential_crop_for_location(room);
+	// keep crop if it has one
+	if (SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && ROOM_CROP(room)) {
+		new_crop = ROOM_CROP(room);
 	}
 	
 	// need land-map update?
@@ -196,6 +196,11 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	// change sect
 	perform_change_sect(room, NULL, st);
 	perform_change_base_sect(room, NULL, st);
+	
+	// need to determine a crop?
+	if (!new_crop && SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
+		new_crop = get_potential_crop_for_location(room);
+	}
 		
 	// need room data?
 	if ((IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) && !COMPLEX_DATA(room)) {
@@ -3028,10 +3033,10 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 			if (!isle) {
 				isle = GET_ISLAND(location);
 			}
-			if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE) && IS_SET(isle->flags, ISLE_NEWBIE)) {
+			if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE) && (!isle || IS_SET(isle->flags, ISLE_NEWBIE))) {
 				continue;
 			}
-			if (CROP_FLAGGED(crop, CROPF_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_NEWBIE)) {
+			if (CROP_FLAGGED(crop, CROPF_NEWBIE_ONLY) && (!isle || !IS_SET(isle->flags, ISLE_NEWBIE))) {
 				continue;
 			}
 		}
