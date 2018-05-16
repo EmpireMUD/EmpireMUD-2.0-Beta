@@ -29,7 +29,7 @@ Thriving Community~
 Build 10 homes, and citizens will start to move in. Be sure to claim all the
 homes in order to complete this goal.
 ~
-2 1 0 5 0
+3 1 0 15 0
 K 0 7
 P 1001
 W
@@ -41,7 +41,7 @@ Booming Metropolis~
 citizens across the empire. Completing this goal will allow your empire to
 upgrade its cities to a larger size.
 ~
-2 1 0 5 0
+3 1 0 25 0
 K 3 1
 P 1002
 W
@@ -53,7 +53,7 @@ Expanding the Empire~
 workers, soldiers, and citizens. Build 100 homes across your empire (and be
 sure to claim them all) to complete this goal.
 ~
-1 1 0 5 0
+2 1 0 50 0
 P 1003
 W
 24 0 0 100
@@ -64,7 +64,7 @@ Masonry~
 must learn to build with stone if you wish to truly thrive. Build 5 stone
 houses and 5 large houses, and be sure to claim them for your empire.
 ~
-1 1 0 5 0
+2 1 0 15 0
 P 1001
 W
 7 5124 0 5 a
@@ -109,7 +109,7 @@ Road to Prosperity~
    As your empire grows, it needs a strong network of roads. Lay a total of 50
 roads to complete this goal. Don't forget to claim them.
 ~
-2 1 0 5 0
+3 1 0 15 0
 P 1011
 W
 25 9 0 50
@@ -120,7 +120,7 @@ All Roads Lead to Home~
 between them. It also benefits from roads to its mines, to the sea, and to its
 allies. Lay (and claim) at least 250 roads to complete this goal.
 ~
-3 1 0 5 0
+4 1 0 25 0
 P 1012
 W
 25 9 0 250
@@ -131,16 +131,16 @@ Making a Friend~
 another empire using the diplomacy command. Your city guards and towers will no
 longer attack each other.
 ~
-2 1 0 5 0
+3 1 0 15 0
 W
 31 0 8 1
 S
 #1021
-Community Leader~
+Leader of the Community~
    Forge non-aggression pacts with a total of 10 empires to help foster peace
 in the region. Better diplomatic relations also lead to a better exchange rate.
 ~
-1 1 0 5 0
+3 1 0 25 0
 P 1020
 W
 31 0 8 10
@@ -163,7 +163,7 @@ Forging the Future~
 Build a forge and make 50 nails. Store the nails (identify them to see where
 they store) and be sure to claim the forge to complete this goal.
 ~
-1 1 0 5 0
+2 1 0 15 0
 P 1030
 W
 26 0 128 1 a
@@ -179,7 +179,7 @@ goal will give you the ability to build the portcullis and greathall buildings,
 which serve as the entrances for castles. It also gives you steps, a nicer
 version of roads for your cities, as well as a luxury ship called the carrack.
 ~
-3 1 0 5 0
+4 1 0 15 0
 K 2 5165
 K 2 5166
 K 2 5140
@@ -192,5 +192,21 @@ W
 7 5163 0 1 a
 W
 7 5162 0 1 a
+S
+#1041
+Castle~
+   Build a castle, starting with a great hall or portcullis (or mountain hall).
+Usually castles involve interlinking more than one of these buildings and
+adding walls around them, but finishing the first great hall or portcullis will
+complete this goal.
+~
+2 1 0 25 0
+P 1040
+W
+7 5166 0 1
+W
+7 5165 0 1
+W
+7 5203 0 1
 S
 $

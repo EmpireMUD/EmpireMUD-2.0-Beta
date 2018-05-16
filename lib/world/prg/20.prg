@@ -17,7 +17,7 @@ build a Potter, where you can craft clay items faster and easier. Then make 50
 piles of clay bricks, and store them. You need to own the Potter and have all
 50 bricks in storage to complete this goal.
 ~
-1 2 0 5 0
+2 2 0 15 0
 W
 7 5110 0 1 a
 W
@@ -89,17 +89,17 @@ Artisans~
 Build a bakery, glass blower, oilmaker, tailor, and warehouse. Be sure to claim
 them to complete this goal.
 ~
-1 2 0 5 0
+3 2 0 15 0
 W
-7 5132 0 1
+7 5139 0 1 a
 W
-7 5135 0 1
+7 5137 0 1 a
 W
-7 5192 0 1
+7 5192 0 1 a
 W
-7 5137 0 1
+7 5135 0 1 a
 W
-7 5139 0 1
+7 5132 0 1 a
 S
 #2013
 Advanced Artisans~
@@ -107,26 +107,26 @@ Advanced Artisans~
 flourish. With the help of your artisans, you will be able to upgrade your
 cities to a larger size.
 ~
-4 2 0 5 0
+6 2 0 15 0
 K 3 1
 P 2012
 W
-7 5130 0 1
+7 1401 0 1 a
 W
-7 5131 0 1
+7 5134 0 1 a
 W
-7 5138 0 1
+7 5138 0 1 a
 W
-7 5134 0 1
+7 5131 0 1 a
 W
-7 1401 0 1
+7 5130 0 1 a
 S
 #2014
 Stockpile Iron~
    Build up a stockpile of iron ingots to ensure the success of your empire.
 Your reward for all this mining is the ability to dig deeper mines.
 ~
-1 2 0 5 0
+2 2 0 15 0
 K 0 13
 P 2011
 W
@@ -138,10 +138,12 @@ Cache of Resources~
 cache of critical resources for your empire. Collect 500 each of the basic
 component types: lumber, rock, block, pillar, stick, and metal. You can mix and
 match different types of each component, such as iron and copper. Completing
-this goal earns you a higher workforce cap, if you have a workforce.
+this goal earns you a higher workforce cap, if you have a workforce. You will
+also earn another city point.
 ~
-3 2 0 5 0
+6 2 0 15 0
 K 6 100
+K 1 1
 P 2011
 W
 1 18 0 500 a
@@ -160,7 +162,7 @@ S
 Rare Surplus~
 Build up small surplus of the rarer resources: leather, gems, and rare metals.
 ~
-2 2 0 5 0
+3 2 0 25 0
 P 2011
 W
 2 1206 0 50 a
@@ -185,7 +187,7 @@ Rare Stockpiles~
 resources: leather, gems, and rare metals. Completing this goal earns you a
 higher workforce cap, if you have a workforce.
 ~
-4 2 0 5 0
+5 2 0 50 0
 K 6 100
 P 2016
 W
@@ -205,6 +207,46 @@ W
 W
 2 1357 0 500 a
 S
+#2018
+Collecting Herbs~
+   A good stockpile of herbs is necessary for the health and development of an
+empire. Have 50 of each basic herb in your storage to complete this goal.
+~
+2 1 0 25 0
+P 2011
+W
+2 1200 0 50 a
+W
+2 1201 0 50 a
+W
+2 1202 0 50 a
+W
+2 1203 0 50 a
+W
+2 1204 0 50 a
+W
+2 1205 0 50 a
+S
+#2019
+Herbal Empire~
+   Ensure your empire never runs out of herbs by building up a stockpile of 500
+each in your empire's storage.
+~
+3 1 0 50 0
+P 2018
+W
+2 1200 0 500 a
+W
+2 1201 0 500 a
+W
+2 1202 0 500 a
+W
+2 1203 0 500 a
+W
+2 1204 0 500 a
+W
+2 1205 0 500 a
+S
 #2030
 Early Harvest~
    Your empire needs to grow its own food. Harvest a crop and store its produce
@@ -222,7 +264,7 @@ citizens. Collect the produce from 10 different crops to complete this goal.
 The produce must be in storage. Only plantable items count as produce for this
 goal.
 ~
-1 2 0 5 0
+2 2 0 15 0
 P 2030
 W
 23 0 0 10
@@ -234,7 +276,7 @@ the produce from 30 different crops and store it. You'll have to travel the
 world to find enough! Completing this goal earns you a higher workforce cap, if
 you have a workforce.
 ~
-2 2 0 5 0
+3 2 0 25 0
 K 6 100
 P 2031
 W
@@ -248,7 +290,7 @@ produce from 60 different crops. You will probably need to trade with other
 players to achieve this goal. Remember to store all the produce. Only plantable
 items count toward this goal.
 ~
-1 2 0 5 0
+2 2 0 50 0
 P 2032
 W
 23 0 0 60
@@ -258,7 +300,7 @@ Trade Routes~
    Your empire gains the ability to mint coins, build trading posts, make trade
 agreements with other empires, and use the import/export commands.
 ~
-1 2 5 0 b
+2 2 10 0 b
 K 0 11
 K 2 5183
 K 2 5182
@@ -271,7 +313,7 @@ the 'diplomacy' command to offer trade. The other empire uses the same command
 to accept. Completing this goal will unlock a reward of 5 extra territory per
 100 wealth (up to 3x your total wealth).
 ~
-1 2 0 5 0
+2 2 0 15 0
 K 4 5
 P 2040
 W
@@ -282,7 +324,7 @@ Trade Magnate~
    Form trade agreements with 10 other empires and become a true force in the
 trading world.
 ~
-2 2 0 5 0
+3 2 0 25 0
 K 4 5
 P 2041
 W
@@ -292,7 +334,7 @@ S
 Cargo~
 Build or buy a cargo ship -- one capable of moving goods from island to island.
 ~
-1 2 0 5 0
+2 2 0 15 0
 P 2901
 W
 27 0 512 1
@@ -302,7 +344,7 @@ Shipping Magnate~
    Build or buy ten total cargo ships to show the world the force of your
 empire's economy. This goal unlocks the hulk, an advanced cargo ship.
 ~
-2 2 0 5 0
+4 2 0 25 0
 K 2 957
 P 2050
 W

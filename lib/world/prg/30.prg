@@ -2,7 +2,7 @@
 Walled Town~
 Your empire can now build walls and gatehouses.
 ~
-1 3 5 0 b
+2 3 10 0 b
 K 2 5174
 K 2 5173
 S
@@ -25,7 +25,7 @@ Build the Barracks~
    Build a barracks in one of your cities. This improves your empire's military
 score.
 ~
-1 3 0 5 0
+2 3 0 15 0
 P 3001
 W
 7 5171 0 1
@@ -36,7 +36,7 @@ Guard Towers~
 automatically shoot at anyone your empire distrusts. Guard towers can be
 upgraded to deal more damage or to be unburnable.
 ~
-2 3 5 0 b
+3 3 50 0 b
 K 2 5167
 P 3001
 S
@@ -47,7 +47,7 @@ distrusts. Build 8 guard towers around your city (or cities) to complete this
 goal and unlock the first upgrade for your guard towers. Type 'upgrade' inside
 a guard tower to start the upgrade.
 ~
-3 3 0 5 0
+4 3 0 15 0
 K 2 5168
 P 3010
 W
@@ -59,7 +59,7 @@ Advanced Tactics~
 advanced guard towers. Completing this goal will allow you to buy the Superior
 Guard Towers reward.
 ~
-1 3 0 5 0
+2 3 0 25 0
 P 3011
 W
 7 5168 0 16
@@ -69,7 +69,7 @@ Warship~
    In order to defend your empire on the high seas, manufacture or purchase a
 ship with cannons (or other siege weapons) on board.
 ~
-1 3 0 5 0
+2 3 0 15 0
 P 2901
 W
 27 0 131076 1
@@ -79,10 +79,28 @@ Strong Fleet~
    Manufacture or purchase a total of 5 warships to unlock the brigantine, a
 larger and stronger ship.
 ~
-1 3 0 5 0
+2 3 0 25 0
 K 2 955
 P 3020
 W
 27 0 131076 5
+S
+#3030
+Vanguard~
+Build enough military buildings to reach a military score of 50 in your empire.
+~
+2 2 0 25 0
+P 3002
+W
+33 0 0 50
+S
+#3031
+Deterrence~
+Reach a military score of 150 in your empire.
+~
+2 2 0 50 0
+P 3030
+W
+33 0 0 150
 S
 $

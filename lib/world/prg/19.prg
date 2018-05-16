@@ -4,7 +4,7 @@ Henge Construction~
 megalithic stones. These henges can be used to learn the secrets of the druids
 and the path of Natural Magic.
 ~
-2 1 5 0 b
+3 1 50 0 b
 K 2 5142
 P 4001
 S
@@ -15,7 +15,7 @@ has earned this knowledge. You can build the Tower of Sorcery, which will
 attract a High Sorcerer and allow members of your empire to learn the arcane
 arts. Sorcery towers can only be built inside your cities.
 ~
-3 1 5 0 b
+4 1 50 0 b
 K 2 5164
 P 4001
 S
@@ -27,13 +27,14 @@ houses and other useful seaside structures. Building the swamp platform will
 convert a swamp tile to plains, while building drainage will convert an oasis
 to desert.
 ~
-2 1 5 0 b
+4 1 70 0 b
 K 2 5156
 K 2 5191
 K 2 5196
 K 2 5197
 K 2 5198
 K 2 5206
+P 2013
 S
 #1903
 Swamp Engineering~
@@ -42,11 +43,12 @@ empire has learned to build strong buildings amid the water and humidity. This
 reward will let you build the swampwalk, a road that can safely cross the
 swamp, as well as the swamp hut, swamp manor, and swamp complex.
 ~
-1 1 5 0 b
+3 1 70 0 b
 K 2 5155
 K 2 5157
 K 2 5158
 K 2 5159
+P 2013
 S
 #1904
 Mountain Engineering~
@@ -54,7 +56,7 @@ Mountain Engineering~
 mountains. This unlocks multiple mountain buildings and also grants you the
 'tunnel' command.
 ~
-2 1 5 0 b
+3 1 70 0 b
 K 2 5170
 K 2 5199
 K 2 5200
@@ -71,12 +73,24 @@ Vampire Havens~
 require lightproof walls. Your empire can now build four exquisite havens for
 the refined taste of its night-dwellers.
 ~
-1 1 5 0 b
+2 1 10 0 b
 K 2 5186
 K 2 5187
 K 2 5188
 K 2 5189
 P 1005
 P 1003
+S
+#1906
+Faster Excavations~
+   Everyone in your empire now excavates (and fills in) faster when in one of
+your cities. The city must be fully established (and no longer have the "new"
+tag).
+~
+1 1 70 0 b
+K 0 18
+P 1003
+P 3000
+P 2013
 S
 $

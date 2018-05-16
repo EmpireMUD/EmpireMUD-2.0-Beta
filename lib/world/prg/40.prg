@@ -19,7 +19,7 @@ Renowned~
    Gain fame for your empire through its monumental works to unlock +5
 territory per point of Greatness as well as four grand monuments.
 ~
-2 4 0 5 0
+3 4 0 15 0
 K 5 5
 K 2 5195
 K 2 5150
@@ -35,7 +35,7 @@ World Famous~
 its monuments -- and yours will be the greatest this world has known. Build
 enough monuments to reach 150 fame to complete this goal.
 ~
-1 4 0 5 0
+2 4 0 25 0
 P 4001
 W
 29 0 0 150
@@ -62,7 +62,7 @@ grow rather than chopping it down. Do this until you have 10 tiles of
 fully-grown enchanted forests. Of course, you could always scour the Earth for
 9 more crystal seeds and start your forests that way.
 ~
-1 4 0 5 0
+2 4 0 15 0
 P 4010
 W
 25 604 0 10
@@ -75,7 +75,7 @@ tiles around your enchanted forest clear and claimed, and don't over-chop the
 enchanted forest. To complete this goal, you must have 50 fully-grown enchanted
 forest tiles all at once.
 ~
-2 4 0 5 0
+3 4 0 25 0
 P 4011
 W
 25 604 0 50
@@ -86,7 +86,7 @@ Magic to Make the Sanest Man Go Mad~
 growing your forest until it reaches a staggering 100 map tiles. All 100 tiles
 must be fully-grown enchanted forests to complete this goal.
 ~
-1 4 0 5 0
+2 4 0 50 0
 P 4012
 W
 25 604 0 100
@@ -96,7 +96,7 @@ Savings~
    Perhaps your coffers aren't full to the brim, but if you can save 1000 coins
 (in your vault), you will unlock some additional wealth territory.
 ~
-1 4 0 5 0
+2 4 0 15 0
 K 4 1
 P 2040
 W
@@ -107,7 +107,7 @@ Wealthy~
    Reach 1000 total wealth to unlock this goal. Wealth is the combination of
 the value of your treasures, and 10% of your coins.
 ~
-1 4 0 5 0
+2 4 0 25 0
 K 4 1
 P 4020
 W
@@ -119,16 +119,22 @@ Full Coffers~
 the resources needed to found another city. This goal also grants more
 territory per wealth point.
 ~
-1 4 0 5 0
+2 4 0 25 0
 K 4 1
 K 1 1
 P 4021
 S
 #4023
 Rich Beyond Imagining~
+   An empire can become rich through hard work and dedication. But to become
+ludicrously rich -- rich beyond imagining -- will take considerably more. Mine
+every mountain, sell to every empire, adventure until your vault is
+overflowing. Reach 100000 wealth and be rewarded with another city point and
+additional territory.
 ~
-1 4 0 5 0
+4 4 0 50 0
 K 4 2
+K 1 1
 P 4022
 W
 28 0 0 100000

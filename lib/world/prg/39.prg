@@ -2,7 +2,7 @@
 Locksmithing~
 Your smiths make better locks. All your buildings are harder to infiltrate.
 ~
-1 3 5 0 b
+2 3 10 0 b
 K 0 2
 S
 #3901
@@ -12,7 +12,7 @@ towers deal more damage and cannot be burned down. However, they are still
 vulnerable to siege damage. Type 'upgrade' inside an advanced guard tower to
 upgrade it to superior.
 ~
-1 3 5 0 b
+2 3 70 0 b
 K 2 5169
 P 3012
 S
@@ -22,7 +22,7 @@ Defending the Empire~
 defense, alternate guard towers and walls every other tile, so your enemies
 can't circle around the towers.
 ~
-1 3 0 5 0
+2 3 0 50 0
 P 3901
 W
 7 5169 0 64
@@ -34,7 +34,7 @@ greatwall'). Aside from being built on mountains and costing more iron, they
 are otherwise identical to regular walls. You can also build river gates, which
 act like gatehouses for ships.
 ~
-1 3 5 0 b
+2 3 30 0 b
 K 2 5175
 K 2 5176
 P 3001
