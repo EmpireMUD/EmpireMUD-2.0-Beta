@@ -316,6 +316,7 @@ void disassociate_building(room_data *room) {
 	extern crop_data *get_potential_crop_for_location(room_data *location);
 	void remove_designate_objects(room_data *room);
 	
+	sector_data *old_sect = SECT(room);
 	bool was_large, junk;
 	room_data *iter, *next_iter;
 	struct instance_data *inst;
@@ -368,6 +369,15 @@ void disassociate_building(room_data *room) {
 
 	// restore sect: this does not use change_terrain()
 	perform_change_sect(room, NULL, BASE_SECT(room));
+
+	// update requirement trackers
+	if (ROOM_OWNER(room)) {
+		qt_empire_players(ROOM_OWNER(room), qt_lose_tile_sector, GET_SECT_VNUM(old_sect));
+		et_lose_tile_sector(ROOM_OWNER(room), GET_SECT_VNUM(old_sect));
+		
+		qt_empire_players(ROOM_OWNER(room), qt_gain_tile_sector, GET_SECT_VNUM(SECT(room)));
+		et_gain_tile_sector(ROOM_OWNER(room), GET_SECT_VNUM(SECT(room)));
+	}
 		
 	// also check for missing crop data
 	if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !ROOM_CROP(room)) {
