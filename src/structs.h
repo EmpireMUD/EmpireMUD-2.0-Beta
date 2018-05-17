@@ -1051,6 +1051,7 @@ typedef struct vehicle_data vehicle_data;
 // DIPL_x: Diplomacy types
 #define DIPL_PEACE  BIT(0)	// At peace
 #define DIPL_WAR  BIT(1)	// At war
+	// 2 is unused
 #define DIPL_ALLIED  BIT(3)	// In an alliance
 #define DIPL_NONAGGR  BIT(4)	// In a non-aggression pact
 #define DIPL_TRADE  BIT(5)	// Open trading
