@@ -5650,7 +5650,7 @@ ACMD(do_progress) {
 		// nothing to compute/show
 	}
 	else if (!*argument) {
-		// show current categories and their goal counts
+		// count everything
 		total = 0;
 		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
 			counts[cat] = 0;
@@ -5676,8 +5676,24 @@ ACMD(do_progress) {
 		
 		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 		
-		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
-			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d bought, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
+		// show current goals
+		any = 0;
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			if (!(prg = real_progress(goal->vnum)) || PRG_FLAGGED(prg, PRG_HIDDEN)) {
+				continue;
+			}
+			
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", goal->vnum);
+			}
+			else {
+				*vstr = '\0';
+			}
+			
+			count_quest_tasks(goal->tracker, &complete, &total);
+			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
+			snprintf(line, sizeof(line), "- %s%s (%s, %d point%s, %d/%d)%s\r\n", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? " (new)" : "");
+			any = TRUE;
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {
 				strcat(buf, line);
@@ -5687,6 +5703,9 @@ ACMD(do_progress) {
 				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
 				break;
 			}
+		}
+		if (!any) {
+			size += snprintf(buf + size, sizeof(buf) - size, "- No active goals\r\n");
 		}
 		
 		size += snprintf(buf + size, sizeof(buf) - size, " Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
@@ -5924,7 +5943,7 @@ ACMD(do_progress) {
 		// Show descendents if any
 		any = FALSE;
 		HASH_ITER(hh, progress_table, prg_iter, next_prg) {
-			if (PRG_FLAGGED(prg_iter, PRG_IN_DEVELOPMENT | PRG_SCRIPT_ONLY)) {
+			if (PRG_FLAGGED(prg_iter, PRG_IN_DEVELOPMENT | PRG_SCRIPT_ONLY | PRG_HIDDEN)) {
 				continue;	// skip these types
 			}
 			
