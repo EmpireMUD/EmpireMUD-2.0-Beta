@@ -5916,7 +5916,7 @@ ACMD(do_progress) {
 		if (PRG_PREREQS(prg)) {
 			msg_to_char(ch, "Requires:");
 			LL_FOREACH(PRG_PREREQS(prg), prereq) {
-				msg_to_char(ch, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "\tg" : "\tr", get_progress_name_by_proto(prereq->vnum));
+				msg_to_char(ch, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "" : "\tr", get_progress_name_by_proto(prereq->vnum));
 			}
 			msg_to_char(ch, "\r\n");
 		}
