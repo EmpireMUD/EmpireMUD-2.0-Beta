@@ -35,7 +35,8 @@ World Famous~
 its monuments -- and yours will be the greatest this world has known. Build
 enough monuments to reach 150 fame to complete this goal.
 ~
-2 4 0 25 0
+3 4 0 25 0
+K 7 25
 P 4001
 W
 29 0 0 150
@@ -49,10 +50,10 @@ an enchanted forest for your empire. Be sure to claim the forest right away,
 because a mysterious cult of necrovandals is known to destroy unclaimed magical
 forests. Completing this goal earns your empire more territory per greatness.
 ~
-3 4 0 5 0
+4 4 0 5 0
 K 5 5
 W
-25 602 0 1
+25 604 0 1
 S
 #4011
 Enchanted Forest~
@@ -62,7 +63,8 @@ grow rather than chopping it down. Do this until you have 10 tiles of
 fully-grown enchanted forests. Of course, you could always scour the Earth for
 9 more crystal seeds and start your forests that way.
 ~
-2 4 0 15 0
+3 4 0 15 0
+K 7 5
 P 4010
 W
 25 604 0 10
@@ -75,7 +77,8 @@ tiles around your enchanted forest clear and claimed, and don't over-chop the
 enchanted forest. To complete this goal, you must have 50 fully-grown enchanted
 forest tiles all at once.
 ~
-3 4 0 25 0
+4 4 0 25 0
+K 7 5
 P 4011
 W
 25 604 0 50
@@ -86,7 +89,8 @@ Magic to Make the Sanest Man Go Mad~
 growing your forest until it reaches a staggering 100 map tiles. All 100 tiles
 must be fully-grown enchanted forests to complete this goal.
 ~
-2 4 0 50 0
+3 4 0 50 0
+K 7 50
 P 4012
 W
 25 604 0 100
