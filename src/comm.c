@@ -141,6 +141,10 @@ bool catch_up_combat = FALSE;	// frequent_combat()
 bool catch_up_actions = FALSE;	// update_actions()
 bool catch_up_mobs = FALSE;	// mobile_activity()
 
+// vars for detecting slow IPs and preventing repeat-lag
+char **detected_slow_ips = NULL;
+int num_slow_ips = 0;
+
 /* Reboot data (default to a normal reboot once per week) */
 struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
 
@@ -162,6 +166,28 @@ struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUT
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Adds an IP address to the list of slow IPs to not look up. This persists
+* until reboot.
+*
+* @param char *ip The IP to add.
+*/
+void add_slow_ip(char *ip) {
+	if (!ip || !*ip) {
+		return;	// no work
+	}
+	
+	if (num_slow_ips > 0 && detected_slow_ips) {
+		RECREATE(detected_slow_ips, char*, num_slow_ips+1);
+	}
+	else {
+		CREATE(detected_slow_ips, char*, num_slow_ips+1);
+	}
+	
+	detected_slow_ips[num_slow_ips++] = str_dup(ip);
+}
+
 
 // wipes the last act message on the descriptor
 void clear_last_act_message(descriptor_data *desc) {
@@ -2048,6 +2074,11 @@ bool is_slow_ip(char *ip) {
 			return TRUE;
 		}
 	}
+	for (iter = 0; iter < num_slow_ips; ++iter) {
+		if (!strncmp(ip, detected_slow_ips[iter], strlen(detected_slow_ips[iter]))) {
+			return TRUE;
+		}
+	}
 	
 	return FALSE;
 }
@@ -2138,6 +2169,7 @@ int new_descriptor(int s) {
 	struct sockaddr_in peer;
 	struct hostent *from;
 	bool slow_ip;
+	time_t when;
 
 	/* accept the new connection */
 	i = sizeof(peer);
@@ -2169,12 +2201,19 @@ int new_descriptor(int s) {
 
 	/* find the sitename */
 	slow_ip = config_get_bool("nameserver_is_slow") || is_slow_ip(inet_ntoa(peer.sin_addr));
+	when = time(0);
 	if (slow_ip || !(from = gethostbyaddr((char *) &peer.sin_addr, sizeof(peer.sin_addr), AF_INET))) {
 		/* resolution failed */
 		if (!slow_ip) {
 			char buf[MAX_STRING_LENGTH];
 			snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
 			perror(buf);
+			
+			// did it take longer than 5 seconds to look up?
+			if (when + 5 < time(0)) {
+				log("- added %s to slow IP list", inet_ntoa(peer.sin_addr));
+				add_slow_ip(inet_ntoa(peer.sin_addr));
+			}
 		}
 
 		/* find the numeric site address */
