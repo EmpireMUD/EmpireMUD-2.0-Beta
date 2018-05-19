@@ -5618,11 +5618,11 @@ ACMD(do_progress) {
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct empire_goal *goal, *next_goal;
 	int cat, total, complete, bought, num;
-	progress_data *prg, *next_prg;
+	progress_data *prg, *next_prg, *prg_iter;
 	struct progress_list *prereq;
 	size_t size;
 	time_t when;
-	bool any, new_goal;
+	bool any, found, new_goal;
 	
 	strcpy(buf, argument);
 	if (*argument && imm_access) {
@@ -5896,6 +5896,7 @@ ACMD(do_progress) {
 		}
 		
 		if ((when = when_empire_completed_goal(emp, PRG_VNUM(prg))) > 0) {
+			// already done
 			when = time(0) - when;	// diff
 			if ((when / SECS_PER_REAL_DAY) >= 1) {
 				num = round((double)when / SECS_PER_REAL_DAY);
@@ -5910,11 +5911,38 @@ ACMD(do_progress) {
 			}
 			msg_to_char(ch, "Completed %s.\r\n", buf);
 		}
-		else if (!empire_meets_goal_prereqs(emp, prg)) {
+		
+		// Show prereqs:
+		if (PRG_PREREQS(prg)) {
 			msg_to_char(ch, "Requires:");
 			LL_FOREACH(PRG_PREREQS(prg), prereq) {
 				msg_to_char(ch, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "\tg" : "\tr", get_progress_name_by_proto(prereq->vnum));
 			}
+			msg_to_char(ch, "\r\n");
+		}
+		
+		// Show descendents if any
+		any = FALSE;
+		HASH_ITER(hh, progress_table, prg_iter, next_prg) {
+			if (PRG_FLAGGED(prg_iter, PRG_IN_DEVELOPMENT | PRG_SCRIPT_ONLY)) {
+				continue;	// skip these types
+			}
+			
+			// does it require this?
+			found = FALSE;
+			LL_FOREACH(PRG_PREREQS(prg_iter), prereq) {
+				if (prereq->vnum == PRG_VNUM(prg)) {
+					found = TRUE;
+					break;
+				}
+			}
+			
+			if (found) {
+				msg_to_char(ch, "%s%s", (any ? ", " : "Leads to: "), PRG_NAME(prg_iter));
+				any = TRUE;
+			}
+		}
+		if (any) {	// needs a crlf
 			msg_to_char(ch, "\r\n");
 		}
 		
