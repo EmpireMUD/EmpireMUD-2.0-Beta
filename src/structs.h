@@ -1008,7 +1008,8 @@ typedef struct vehicle_data vehicle_data;
 #define EATT_TERRITORY_PER_100_WEALTH  3	// number of tiles gained per 100 wealth
 #define EATT_TERRITORY_PER_GREATNESS  4	// bonus to ter-per-grt
 #define EATT_WORKFORCE_CAP  5	// workforce resource cap
-#define NUM_EMPIRE_ATTRIBUTES  6	// total
+#define EATT_BONUS_TERRITORY  6	// direct add to territory
+#define NUM_EMPIRE_ATTRIBUTES  7	// total
 
 
 // ETRAIT_x: empire trait flags
@@ -2144,6 +2145,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_PERK_TERRITORY_FROM_WEALTH  4	// increases territory from wealth
 #define PRG_PERK_TERRITORY_PER_GREATNESS  5	// increases territory per greatness
 #define PRG_PERK_WORKFORCE_CAP  6	// higher workforce caps
+#define PRG_PERK_TERRITORY  7	// grants bonus territory (flat rate)
 
 
  //////////////////////////////////////////////////////////////////////////////
