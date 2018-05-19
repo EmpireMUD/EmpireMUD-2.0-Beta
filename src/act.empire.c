@@ -5692,7 +5692,7 @@ ACMD(do_progress) {
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
 			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
-			snprintf(line, sizeof(line), "- %s%s (%s, %d point%s, %d/%d)%s\r\n", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? " (new)" : "");
+			snprintf(line, sizeof(line), "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)\r\n", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
 			any = TRUE;
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {
