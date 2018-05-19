@@ -1915,6 +1915,7 @@ const char *versions_list[] = {
 	"b5.25",
 	"b5.30",
 	"b5.34",
+	"b5.35",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3190,6 +3191,67 @@ void b5_34_mega_update(void) {
 }
 
 
+// fixes some progression goals
+void b5_35_progress_update(void) {
+	struct empire_completed_goal *goal, *next_goal;
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), goal, next_goal) {
+			// Some goals were changed in this patch. Need to update anybody who completed them.
+			switch (goal->vnum) {
+				case 3030: {	// Vanguard: change category
+					EMPIRE_PROGRESS_POINTS(emp, PROGRESS_INDUSTRY) -= 25;
+					EMPIRE_PROGRESS_POINTS(emp, PROGRESS_DEFENSE) += 25;
+					break;
+				}
+				case 2015: {	// Cache of Resources: remove workforce cap bonus
+					EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP) -= 100;
+					break;
+				}
+				case 2016: {	// Rare Surplus: add workforce cap bonus
+					EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP) += 100;
+					break;
+				}
+				case 4002: {	// World Famous: +25 terr
+					EMPIRE_ATTRIBUTE(emp, EATT_BONUS_TERRITORY) += 25;
+					break;
+				}
+				
+				// things that give +5 territory now
+				case 1001:	// Homestead
+				case 1004:	// Expanding the Empire
+				case 1005:	// Masonry
+				case 2001:	// Clayworks
+				case 2010:	// Storage
+				case 2012:	// Artisans
+				case 2018:	// Collecting Herbs
+				case 2019:	// Herbal Empire
+				case 2031:	// Harvest Time
+				case 3001:	// Fortifications
+				case 3002:	// Building the Barracks
+				case 3031:	// Deterrence
+				case 4011:	// Enchanted Forest
+				case 4012:	// The Magic Grows
+				{
+					EMPIRE_ATTRIBUTE(emp, EATT_BONUS_TERRITORY) += 5;
+					break;
+				}
+				
+				// +50 territory
+				case 4013:	// Magic to Make...
+				case 2033: {	// Cornucopia
+					EMPIRE_ATTRIBUTE(emp, EATT_BONUS_TERRITORY) += 50;
+					break;
+				}
+			}
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3438,6 +3500,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.34")) {
 			b5_34_mega_update();
+		}
+		if (MATCH_VERSION("b5.35")) {
+			b5_35_progress_update();
 		}
 	}
 	
