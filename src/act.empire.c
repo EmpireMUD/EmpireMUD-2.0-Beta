@@ -5708,7 +5708,7 @@ ACMD(do_progress) {
 			size += snprintf(buf + size, sizeof(buf) - size, "- No active goals\r\n");
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, " Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+		size += snprintf(buf + size, sizeof(buf) - size, "Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
 		
 		page_string(ch->desc, buf, TRUE);
 	}
@@ -5724,7 +5724,7 @@ ACMD(do_progress) {
 		}
 		
 		// show current progress in that category
-		size = snprintf(buf, sizeof(buf), "%s goals:\r\n", progress_types[cat]);
+		size = snprintf(buf, sizeof(buf), "%s goals (%d points):\r\n", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
 		
 		// show current goals
 		any = 0;
@@ -5742,7 +5742,7 @@ ACMD(do_progress) {
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
 			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
-			snprintf(line, sizeof(line), "- %s%s, %d point%s (%d/%d)%s\r\n", vstr, PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? " (new)" : "");
+			snprintf(line, sizeof(line), "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)\r\n", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
 			any = TRUE;
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {
@@ -5781,7 +5781,7 @@ ACMD(do_progress) {
 				*vstr = '\0';
 			}
 			
-			snprintf(line, sizeof(line), "+ Available: %s%s (for %d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			snprintf(line, sizeof(line), "+ Available: %s\tc%s\t0 (for %d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 			any = TRUE;
 		
 			if (size + strlen(line) + 18 < sizeof(buf)) {
