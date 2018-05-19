@@ -5643,6 +5643,31 @@ ACMD(do_progress) {
 	arg2 = any_one_word(argument, arg);
 	skip_spaces(&arg2);
 	
+	// build stats that several commands use:
+	total = 0;
+	for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
+		counts[cat] = 0;
+		compl[cat] = 0;
+		buy[cat] = 0;
+		total += EMPIRE_PROGRESS_POINTS(emp, cat);
+	}
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		if ((prg = real_progress(goal->vnum)) && !PRG_FLAGGED(prg, PRG_HIDDEN)) {
+			++counts[PRG_TYPE(prg)];
+		}
+	}
+	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+		if ((prg = real_progress(ecg->vnum))) {
+			if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+				++buy[PRG_TYPE(prg)];
+			}
+			else {
+				++compl[PRG_TYPE(prg)];
+			}
+		}
+	}
+	
+	// process args...
 	if (IS_NPC(ch) || !emp) {
 		msg_to_char(ch, "You need to be in an empire to check progress.\r\n");
 	}
@@ -5650,30 +5675,6 @@ ACMD(do_progress) {
 		// nothing to compute/show
 	}
 	else if (!*argument) {
-		// count everything
-		total = 0;
-		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
-			counts[cat] = 0;
-			compl[cat] = 0;
-			buy[cat] = 0;
-			total += EMPIRE_PROGRESS_POINTS(emp, cat);
-		}
-		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
-			if ((prg = real_progress(goal->vnum)) && !PRG_FLAGGED(prg, PRG_HIDDEN)) {
-				++counts[PRG_TYPE(prg)];
-			}
-		}
-		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
-			if ((prg = real_progress(ecg->vnum))) {
-				if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-					++buy[PRG_TYPE(prg)];
-				}
-				else {
-					++compl[PRG_TYPE(prg)];
-				}
-			}
-		}
-		
 		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 		
 		// show current goals
@@ -5830,6 +5831,26 @@ ACMD(do_progress) {
 	}
 	else if (is_abbrev(arg, "new")) {
 		show_new_goals(ch, emp);
+	}
+	else if (is_abbrev(arg, "summary")) {
+		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
+
+		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
+			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d bought, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
+
+			if (size + strlen(line) + 18 < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+				break;
+			}
+		}
+
+		size += snprintf(buf + size, sizeof(buf) - size, " Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+
+		page_string(ch->desc, buf, TRUE);
 	}
 	else if (!str_cmp(arg, "buy")) {
 		if (!*arg2) {	// display all purchasable goals
