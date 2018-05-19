@@ -5829,7 +5829,7 @@ ACMD(do_progress) {
 		
 		show_completed_goals(ch, emp, cat, TRUE);
 	}
-	else if (is_abbrev(arg, "new")) {
+	else if (!str_cmp(arg, "new")) {
 		show_new_goals(ch, emp);
 	}
 	else if (is_abbrev(arg, "summary")) {
@@ -5917,7 +5917,7 @@ ACMD(do_progress) {
 			msg_to_char(ch, "You purchase %s for %d progress point%s.\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 		}
 	}
-	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument))) {
+	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument)) || (!str_cmp(arg, "info") && ((prg = find_current_progress_goal_by_name(emp, arg2)) || (prg = find_progress_goal_by_name(arg2))))) {
 		// show 1 goal
 		if (IS_IMMORTAL(ch)) {
 			sprintf(vstr, "[%d] ", PRG_VNUM(prg));
