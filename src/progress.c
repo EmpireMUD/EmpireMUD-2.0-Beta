@@ -817,7 +817,7 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 		skip = FALSE;
 		
 		// remove if not allowed to track it
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
 			if (goal) {
 				cancel_empire_goal(emp, goal);
 				goal = NULL;
@@ -1548,10 +1548,6 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 	
 	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with SCRIPT-ONLY");
-		problem = TRUE;
-	}
-	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && (PRG_COST(prg) || PRG_TASKS(prg))) {
-		olc_audit_msg(ch, PRG_VNUM(prg), "SCRIPT-ONLY set with cost and/or tasks");
 		problem = TRUE;
 	}
 	
