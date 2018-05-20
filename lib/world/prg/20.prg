@@ -17,7 +17,8 @@ build a Potter, where you can craft clay items faster and easier. Then make 50
 piles of clay bricks, and store them. You need to own the Potter and have all
 50 bricks in storage to complete this goal.
 ~
-2 2 0 15 0
+3 2 0 15 0
+K 7 5
 W
 7 5110 0 1 a
 W
@@ -31,7 +32,8 @@ of the basic storage buildings, and be sure to claim them all to complete this
 goal. The basic storage buildings are: cannery, foundry, granary, gravel pit,
 lumber yard, smokehouse, tannery, and utility shed.
 ~
-2 2 0 5 0
+3 2 0 5 0
+K 7 5
 W
 7 5114 0 1 a
 W
@@ -89,7 +91,9 @@ Artisans~
 Build a bakery, glass blower, oilmaker, tailor, and warehouse. Be sure to claim
 them to complete this goal.
 ~
-3 2 0 15 0
+5 2 0 15 0
+K 7 5
+P 2011
 W
 7 5139 0 1 a
 W
@@ -141,8 +145,7 @@ match different types of each component, such as iron and copper. Completing
 this goal earns you a higher workforce cap, if you have a workforce. You will
 also earn another city point.
 ~
-6 2 0 15 0
-K 6 100
+7 2 0 15 0
 K 1 1
 P 2011
 W
@@ -162,7 +165,8 @@ S
 Rare Surplus~
 Build up small surplus of the rarer resources: leather, gems, and rare metals.
 ~
-3 2 0 25 0
+4 2 0 25 0
+K 6 100
 P 2011
 W
 2 1206 0 50 a
@@ -212,7 +216,8 @@ Collecting Herbs~
    A good stockpile of herbs is necessary for the health and development of an
 empire. Have 50 of each basic herb in your storage to complete this goal.
 ~
-2 1 0 25 0
+3 1 0 25 0
+K 7 5
 P 2011
 W
 2 1200 0 50 a
@@ -232,7 +237,8 @@ Herbal Empire~
    Ensure your empire never runs out of herbs by building up a stockpile of 500
 each in your empire's storage.
 ~
-3 1 0 50 0
+4 1 0 50 0
+K 7 5
 P 2018
 W
 2 1200 0 500 a
@@ -264,7 +270,8 @@ citizens. Collect the produce from 10 different crops to complete this goal.
 The produce must be in storage. Only plantable items count as produce for this
 goal.
 ~
-2 2 0 15 0
+3 2 0 15 0
+K 7 5
 P 2030
 W
 23 0 0 10
@@ -290,7 +297,8 @@ produce from 60 different crops. You will probably need to trade with other
 players to achieve this goal. Remember to store all the produce. Only plantable
 items count toward this goal.
 ~
-2 2 0 50 0
+3 2 0 50 0
+K 7 50
 P 2032
 W
 23 0 0 60
@@ -313,22 +321,22 @@ the 'diplomacy' command to offer trade. The other empire uses the same command
 to accept. Completing this goal will unlock a reward of 5 extra territory per
 100 wealth (up to 3x your total wealth).
 ~
-2 2 0 15 0
+3 2 0 15 0
 K 4 5
 P 2040
 W
-31 0 16 1
+31 0 32 1
 S
 #2042
 Trade Magnate~
    Form trade agreements with 10 other empires and become a true force in the
 trading world.
 ~
-3 2 0 25 0
+4 2 0 25 0
 K 4 5
 P 2041
 W
-31 0 16 10
+31 0 32 10
 S
 #2050
 Cargo~
@@ -344,10 +352,10 @@ Shipping Magnate~
    Build or buy ten total cargo ships to show the world the force of your
 empire's economy. This goal unlocks the hulk, an advanced cargo ship.
 ~
-4 2 0 25 0
+5 2 0 25 0
 K 2 957
 P 2050
 W
-27 0 512 10
+27 0 512 5
 S
 $

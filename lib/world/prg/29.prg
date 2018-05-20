@@ -32,9 +32,10 @@ Workforce~
 on chores or set limits on production. Workers will do chores on claimed tiles
 within 20 map tiles of their homes.
 ~
-2 2 50 0 b
+3 2 50 0 b
 K 0 5
 P 2015
+P 1002
 S
 #2904
 Skilled Labor~

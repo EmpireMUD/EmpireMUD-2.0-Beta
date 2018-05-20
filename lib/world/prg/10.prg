@@ -12,13 +12,14 @@ Homestead~
    For your empire to grow, you'll need more houses. Build (and claim) 5
 houses, of any kind to unlock new, larger homes.
 ~
-2 1 0 5 0
+3 1 0 5 0
 K 2 5124
 K 2 5125
 K 2 5126
 K 2 5127
 K 2 5128
 K 2 5129
+K 7 5
 P 1000
 W
 24 0 0 5
@@ -53,7 +54,8 @@ Expanding the Empire~
 workers, soldiers, and citizens. Build 100 homes across your empire (and be
 sure to claim them all) to complete this goal.
 ~
-2 1 0 50 0
+3 1 0 50 0
+K 7 5
 P 1003
 W
 24 0 0 100
@@ -64,7 +66,8 @@ Masonry~
 must learn to build with stone if you wish to truly thrive. Build 5 stone
 houses and 5 large houses, and be sure to claim them for your empire.
 ~
-2 1 0 15 0
+3 1 0 15 0
+K 7 5
 P 1001
 W
 7 5124 0 5 a
@@ -131,19 +134,19 @@ Making a Friend~
 another empire using the diplomacy command. Your city guards and towers will no
 longer attack each other.
 ~
-3 1 0 15 0
+5 1 0 15 0
 W
-31 0 8 1
+31 0 16 1
 S
 #1021
 Leader of the Community~
    Forge non-aggression pacts with a total of 10 empires to help foster peace
 in the region. Better diplomatic relations also lead to a better exchange rate.
 ~
-3 1 0 25 0
+4 1 0 25 0
 P 1020
 W
-31 0 8 10
+31 0 16 10
 S
 #1030
 Search For Ore~

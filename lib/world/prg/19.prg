@@ -56,7 +56,7 @@ Mountain Engineering~
 mountains. This unlocks multiple mountain buildings and also grants you the
 'tunnel' command.
 ~
-3 1 70 0 b
+4 1 70 0 b
 K 2 5170
 K 2 5199
 K 2 5200
@@ -66,6 +66,8 @@ K 2 5203
 K 2 5204
 K 2 5205
 K 0 16
+P 2013
+P 1005
 S
 #1905
 Vampire Havens~
