@@ -309,12 +309,15 @@ wait 1 sec
 say This egg is exactly what the buyer wanted. While I'm here, type list if you want to trade your corrupted talons for some goods.
 ~
 #11027
-Block Nest Entry~
+Block Nest Entry and Start Progression~
 2 g 100
 ~
 if %actor.inventory(11053)%
   %send% %actor% You can't get back into the nest right now!
   return 0
+end
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(11000)%
 end
 ~
 #11032

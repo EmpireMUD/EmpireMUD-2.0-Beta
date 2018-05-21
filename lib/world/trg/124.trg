@@ -1046,4 +1046,12 @@ if %done_1% && %done_2% && %done_3% && %done_4%
   end
 end
 ~
+#12445
+GG Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12400)%
+end
+~
 $

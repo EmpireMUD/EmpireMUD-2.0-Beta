@@ -27,13 +27,15 @@ houses and other useful seaside structures. Building the swamp platform will
 convert a swamp tile to plains, while building drainage will convert an oasis
 to desert.
 ~
-4 1 70 0 b
+5 1 70 0 b
 K 2 5156
 K 2 5191
 K 2 5196
 K 2 5197
 K 2 5198
 K 2 5206
+K 2 5207
+K 2 5208
 P 2013
 S
 #1903

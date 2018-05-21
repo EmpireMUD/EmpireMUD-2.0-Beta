@@ -22,6 +22,7 @@ section of roof.
 ~
 acd 0 0
 M 1 10116 100.00 1
+T 10109
 S
 #10110
 A Collapsed Room~
@@ -33,6 +34,7 @@ ruins.
 ac 0 0
 M 1 10110 33.00 1
 M 1 10115 100.00 1
+T 10117
 S
 #10140
 Inside the Rift~

@@ -420,6 +420,14 @@ if %random.100% == 1
   end
 end
 ~
+#18311
+Neferkare Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(18300)%
+end
+~
 #18353
 Load: Link random temple~
 2 n 100

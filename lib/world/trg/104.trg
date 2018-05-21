@@ -288,6 +288,14 @@ else
   done
 end
 ~
+#10413
+Hamlet Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10400)%
+end
+~
 #10416
 Fleeing Citizen env~
 0 bw 10
@@ -390,6 +398,14 @@ switch %random.2%
     jab
   break
 done
+~
+#10454
+GO Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10450)%
+end
 ~
 #10456
 Wargreyn combat~

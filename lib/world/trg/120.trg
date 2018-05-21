@@ -458,6 +458,22 @@ end
 nop %anat.set_cooldown(12005, 0)%
 %purge% %self%
 ~
+#12014
+Anat Start Progression: room~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12000)%
+end
+~
+#12015
+Anat Start Progression: mob~
+0 h 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12000)%
+end
+~
 #12030
 Hadad phase change: 1 to 2~
 0 l 50
@@ -838,6 +854,14 @@ if %ally%
 end
 * no ally, or no target
 ~
+#12040
+Hadad Start Progression: room~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12030)%
+end
+~
 #12041
 Ba'al Hadad / Coming Storm: Interrupt~
 0 c 0
@@ -866,6 +890,14 @@ end
 dg_affect %actor% HARD-STUNNED on 5
 set interrupted 1
 remote interrupted %self.id%
+~
+#12042
+Hadad Start Progression: mob~
+0 h 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12030)%
+end
 ~
 #12049
 Call Storm~

@@ -1915,11 +1915,15 @@ R
 T 5195
 S
 #5196
-Fishery~
-A Fishery~
+Ocean Fishery~
+A Fishery on the Coast~
 &0(&a~~&0)~
-8 0 dpL 0
+8 0 dpDL 0
 0 0 0 -1
+C
+fish~
+F
+I
 I 21 1302 33.00 1 f  # FISH: a giant linefish
 I 21 1303 33.00 1 f  # FISH: a magenta arrowfish
 I 21 1301 100.00 1 f  # FISH: a striped barbfish

@@ -345,6 +345,14 @@ while %cycle% >= 0
 done
 %echo% Something is wrong.
 ~
+#18215
+GoA Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(18200)%
+end
+~
 #18216
 Adventurer's Guildhall~
 2 o 100
@@ -983,8 +991,13 @@ end
 Imagine Dragons~
 1 c 2
 use~
-if %actor.obj_target(%arg%)% != %self%
+if %actor.obj_target(%arg.car%)% != %self%
   return 0
+  halt
+end
+if %arg.cdr%
+  %send% %actor% Usage: use staff
+  return 1
   halt
 end
 if %actor.varexists(18282_dragon_imagined)%
@@ -1225,6 +1238,9 @@ if %knezz%
   elseif %knezz.aff_flagged(BLIND)%
     %send% %actor% You quickly plant %self.shortdesc%, taking advantage of %knezz.name%'s temporary blindness.
     dg_affect %actor% HARD-STUNNED on 10
+  elseif %knezz.aff_flagged(STUNNED)% && !%knezz.fighting%
+    * Sap (presumably from an ally)
+    %send% %actor% You quickly plant the bug while %knezz.name% is stunned.
   else
     %send% %actor% %knezz.name% would notice if you tried to plant the bug while he's watching...
     halt

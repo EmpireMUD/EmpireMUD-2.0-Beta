@@ -11,6 +11,14 @@ Goblin Challenge No Flee~
 flee~
 %send% %actor% You cannot flee the Goblin Challenge!
 ~
+#10202
+GC Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10200)%
+end
+~
 #10204
 Zelkab Bruiser Combat~
 0 k 10
@@ -487,6 +495,14 @@ else
   end
 end
 ~
+#10227
+M:HG Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10225)%
+end
+~
 #10232
 Tumbleweed mount spawn~
 1 c 2
@@ -644,6 +660,14 @@ elseif !%actor.affect(slow)%
   slow
 else
   sunshock
+end
+~
+#10255
+Primeval Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10250)%
 end
 ~
 #10256

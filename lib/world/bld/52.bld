@@ -136,4 +136,40 @@ R
 R
 19 1 1 0
 S
+#5207
+River Fishery~
+A Fishery on the River~
+&0(&c~~&0)~
+8 0 dpDL 0
+0 0 0 -1
+C
+fish~
+F
+I
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+R
+1002 1 5 0
+R
+25 1 1 0
+S
+#5208
+Lake Fishery~
+A Fishery on the Lake~
+&0(&c~~&0)~
+8 0 dpDL 0
+0 0 0 -1
+C
+fish~
+F
+I
+I 21 1314 25.00 1 f  # FISH: a fat catfish
+I 21 1315 25.00 1 f  # FISH: a yellow perch
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+R
+1002 1 5 0
+R
+25 1 1 0
+S
 $

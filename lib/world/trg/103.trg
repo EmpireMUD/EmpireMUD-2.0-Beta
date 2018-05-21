@@ -30,6 +30,14 @@ elseif %room.sector_vnum% == 0 || %room.sector_vnum% == 40
   %terraform% %room% 10302
 end
 ~
+#10301
+Flame Dragon Start Progression: room~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10300)%
+end
+~
 #10302
 Flame Dragon combat~
 0 k 5
@@ -84,6 +92,14 @@ switch %random.4%
   break
 done
 ~
+#10305
+Flame Dragon Start Progression: mob~
+0 h 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10300)%
+end
+~
 #10307
 Flame dragon despawn timer~
 1 f 0
@@ -111,6 +127,22 @@ Abandoned Nest Spawner~
 eval vnum 10330 + %random.4% - 1
 %load% m %vnum%
 %purge% %self%
+~
+#10332
+Abandon Dragon Start Progression: room~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10330)%
+end
+~
+#10333
+Abandon Dragon Start Progression: mob~
+0 h 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10330)%
+end
 ~
 #10334
 Abandoned Dragon animation~

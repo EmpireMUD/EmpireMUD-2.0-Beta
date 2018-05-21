@@ -748,4 +748,12 @@ if %target%
   dg_affect %target% WITS -1 15
 end
 ~
+#11141
+MM Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(11130)%
+end
+~
 $

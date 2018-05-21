@@ -11,6 +11,7 @@ The nest is made primarily from bits of litter and the bones of food.
 ~
 M 1 19060 100.00 1
 T 10218
+T 10202
 S
 #10225
 A Little Garden~
@@ -22,6 +23,7 @@ growing in them, the fertile soil is sure to produce something delicious.
 ac 0 0
 M 0 10225 100.00 1
 T 10236
+T 10227
 S
 #10226
 The Hidden Garden~
@@ -60,7 +62,7 @@ D2
 I 6 10228 50.00 1 X  # FORAGE: a stack of cactus pads
 I 6 10229 100.00 1 X  # FORAGE: a cactus fruit
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -84,7 +86,7 @@ D3
 I 6 10226 50.00 1 X  # FORAGE: a pineapple
 I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -108,7 +110,7 @@ D0
 I 6 10227 50.00 1 X  # FORAGE: an agave heart
 I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -132,7 +134,7 @@ D1
 I 6 10230 50.00 1 X  # FORAGE: some thick aloe leaves
 I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
 I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: some fiveleaf
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
 I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
 I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
 I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
@@ -155,6 +157,7 @@ D0
 M 0 10250 100.00 1
 M 0 10251 100.00 1
 T 10274
+T 10255
 S
 #10251
 The Primeval Forest~

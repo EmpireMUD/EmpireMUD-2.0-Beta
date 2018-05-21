@@ -1,3 +1,11 @@
+#10900
+Red Dragon Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10900)%
+end
+~
 #10902
 Colossal Dragon knight/thief random move~
 0 n 100
