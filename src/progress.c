@@ -824,6 +824,9 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 			}
 			skip = TRUE;
 		}
+		if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY)) {
+			skip = TRUE;	// we don't affect script goals here
+		}
 		
 		// remove from completed if in-dev
 		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) && empire_has_completed_goal(emp, PRG_VNUM(prg))) {
@@ -962,12 +965,11 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				break;
 			}
 			
-			// otherwise...
+			/* otherwise... do nothing
 			default: {
-				// this type is impossible for empires, so we will always count it as done
-				task->current = task->needed;
 				break;
 			}
+			*/
 		}
 	}
 	
