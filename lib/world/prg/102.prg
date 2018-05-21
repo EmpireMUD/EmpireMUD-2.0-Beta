@@ -23,11 +23,11 @@ W
 S
 #10225
 Hidden Garden~
-   Explore the Hidden Garden and learn its secrets. Find four rare desert crops
-in the Magiterranean: aloe, pineapple, agave, and prickly pear. Grow and tend
-each of these crops until you have 50 of each in storage.
+   Explore the Hidden Garden and learn its secrets. Find four rare crops in the
+Magiterranean: aloe, pineapple, agave, and prickly pear. Grow and tend each of
+these crops until you have 50 of each in storage.
 ~
-1 4 0 5 c
+2 4 0 5 c
 K 7 5
 W
 2 10230 0 50 a
