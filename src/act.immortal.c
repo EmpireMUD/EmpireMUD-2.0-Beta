@@ -7053,10 +7053,10 @@ ACMD(do_moveeinv) {
 	else if (!(emp = get_empire_by_name(arg1))) {
 		msg_to_char(ch, "Invalid empire '%s'.\r\n", arg1);
 	}
-	else if (!isdigit(*arg2) || (island_from = atoi(arg2)) < 0) {
+	else if (!is_number(arg2) || (island_from = atoi(arg2)) < -1) {
 		msg_to_char(ch, "Invalid from-island '%s'.\r\n", arg2);
 	}
-	else if (!isdigit(*arg3) || (island_to = atoi(arg3)) < 0) {
+	else if (!is_number(arg3) || (island_to = atoi(arg3)) < -1) {
 		msg_to_char(ch, "Invalid to-island '%s'.\r\n", arg2);
 	}
 	else if (island_to == island_from) {

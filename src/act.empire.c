@@ -55,11 +55,13 @@ extern const char *trade_overunder[];
 
 // external funcs
 extern bool can_claim(char_data *ch);
+void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
 extern bool empire_can_claim(empire_data *emp);
+extern int get_main_island(empire_data *emp);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
@@ -1581,7 +1583,6 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 
 void found_city(char_data *ch, empire_data *emp, char *argument) {
-	void check_nowhere_einv(empire_data *emp, int new_island);
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	void stop_room_action(room_data *room, int action, int chore);
 	extern int num_of_start_locs;
@@ -4273,7 +4274,7 @@ ACMD(do_enroll) {
 	vehicle_data *veh, *next_veh;
 	empire_data *e, *old;
 	room_data *room, *next_room;
-	int iter;
+	int iter, island;
 	char_data *targ = NULL, *victim, *mob;
 	bool all_zero, file = FALSE, sub_file = FALSE;
 	obj_data *obj;
@@ -4524,6 +4525,11 @@ ACMD(do_enroll) {
 			else {
 				SAVE_CHAR(targ);
 			}
+		}
+		
+		// ensure no lost einv
+		if ((island = get_main_island(e)) != NO_ISLAND) {
+			check_nowhere_einv(e, island);
 		}
 		
 		// This will PROPERLY reset wealth and land, plus members and abilities
