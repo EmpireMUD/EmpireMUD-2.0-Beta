@@ -2792,8 +2792,8 @@ void scan_for_tile(char_data *ch, char *argument) {
 			if (claimed && ROOM_OWNER(room)) {
 				ok = TRUE;
 			}
-			else if (unclaimed && !ROOM_OWNER(room)) {
-				ok = TRUE;
+			else if (unclaimed && !ROOM_OWNER(room) && GET_ISLAND(room)) {
+				ok = TRUE;	// skip unowned AND skip ocean
 			}
 			else if (foreign && ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
 				ok = TRUE;
