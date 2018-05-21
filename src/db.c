@@ -3193,6 +3193,8 @@ void b5_34_mega_update(void) {
 
 // fixes some progression goals
 void b5_35_progress_update(void) {
+	void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
+	
 	struct empire_completed_goal *goal, *next_goal;
 	empire_data *emp, *next_emp;
 	
@@ -3215,6 +3217,11 @@ void b5_35_progress_update(void) {
 				}
 				case 4002: {	// World Famous: +25 terr
 					EMPIRE_ATTRIBUTE(emp, EATT_BONUS_TERRITORY) += 25;
+					break;
+				}
+				case 1902: {	// Stilt Buildings: +craft
+					add_learned_craft_empire(emp, 5207);	// river fishery
+					add_learned_craft_empire(emp, 5208);	// lake fishery
 					break;
 				}
 				
