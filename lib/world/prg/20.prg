@@ -59,7 +59,7 @@ lumber, block, pillar, stick, and metal ingots. You will need to have all these
 things stored at once in order to complete this goal. Completing this goal will
 allow your empire to build new artisan buildings.
 ~
-6 2 0 5 0
+7 2 0 5 0
 K 2 5130
 K 2 5131
 K 2 5132
@@ -75,15 +75,15 @@ P 2010
 W
 1 18 0 50 a
 W
-1 16 0 50 a
-W
 1 22 0 50 a
 W
 1 3 0 50 a
 W
 1 21 0 50 a
 W
-1 25 0 50 a
+1 25 0 100 a
+W
+1 16 0 100 a
 S
 #2012
 Artisans~
@@ -130,56 +130,56 @@ Stockpile Iron~
    Build up a stockpile of iron ingots to ensure the success of your empire.
 Your reward for all this mining is the ability to dig deeper mines.
 ~
-2 2 0 15 0
+3 2 0 15 0
 K 0 13
 P 2011
 W
-2 175 0 500
+2 175 0 250
 S
 #2015
 Cache of Resources~
    In order to weather the worst shortages and droughts, you must build up a
-cache of critical resources for your empire. Collect 500 each of the basic
-component types: lumber, rock, block, pillar, stick, and metal. You can mix and
-match different types of each component, such as iron and copper. Completing
-this goal earns you a higher workforce cap, if you have a workforce. You will
-also earn another city point.
+cache of critical resources for your empire. Collect a sizeable cache each of
+the basic component types: lumber, rock, block, pillar, stick, and metal. You
+can mix and match different types of each component, such as iron and copper.
+Completing this goal earns you a higher workforce cap, if you have a workforce.
+You will also earn another city point.
 ~
-7 2 0 15 0
+8 2 0 15 0
 K 1 1
 P 2011
 W
-1 18 0 500 a
+1 18 0 200 a
 W
-1 25 0 500 a
+1 21 0 200 a
 W
-1 21 0 500 a
+1 3 0 200 a
 W
-1 3 0 500 a
+1 22 0 200 a
 W
-1 22 0 500 a
+1 25 0 400 a
 W
-1 16 0 500 a
+1 16 0 400 a
 S
 #2016
 Rare Surplus~
 Build up small surplus of the rarer resources: leather, gems, and rare metals.
 ~
-4 2 0 25 0
+5 2 0 25 0
 K 6 100
 P 2011
 W
-2 1206 0 50 a
+2 1206 0 25 a
 W
-2 1300 0 50 a
+2 1300 0 25 a
 W
-2 103 0 50 a
+2 103 0 25 a
 W
-2 104 0 50 a
+2 104 0 25 a
 W
-2 177 0 50 a
+2 177 0 25 a
 W
-2 176 0 50 a
+2 176 0 25 a
 W
 2 1356 0 50 a
 W
@@ -191,25 +191,25 @@ Rare Stockpiles~
 resources: leather, gems, and rare metals. Completing this goal earns you a
 higher workforce cap, if you have a workforce.
 ~
-5 2 0 50 0
+6 2 0 50 0
 K 6 100
 P 2016
 W
-2 1206 0 500 a
+2 1206 0 150 a
 W
-2 1300 0 500 a
+2 1300 0 150 a
 W
-2 103 0 500 a
+2 103 0 150 a
 W
-2 104 0 500 a
+2 104 0 150 a
 W
-2 177 0 500 a
+2 177 0 75 a
 W
-2 176 0 500 a
+2 176 0 75 a
 W
-2 1356 0 500 a
+2 1356 0 250 a
 W
-2 1357 0 500 a
+2 1357 0 250 a
 S
 #2018
 Collecting Herbs~
