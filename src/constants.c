@@ -2932,6 +2932,7 @@ const char *function_flags[] = {
 	"DRINK-WATER",
 	"COOKING-FIRE",
 	"LARGER-NEARBY",
+	"FISHING",
 	"\n"
 };
 

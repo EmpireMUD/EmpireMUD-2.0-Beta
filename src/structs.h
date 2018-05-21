@@ -795,6 +795,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_DRINK_WATER  BIT(31)	// can drink here
 #define FNC_COOKING_FIRE  BIT(32)	// can cook here
 #define FNC_LARGER_NEARBY  BIT(33)	// extends the radius of 'nearby'
+#define FNC_FISHING  BIT(34)	// workforce can fish here
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1046,7 +1047,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_REPAIR_VEHICLES  26
 #define CHORE_OILMAKING  27
 #define CHORE_GENERAL  28	// for reporting problems
-#define NUM_CHORES  29		// total
+#define CHORE_FISHING  29
+#define NUM_CHORES  30		// total
 
 
 // DIPL_x: Diplomacy types
