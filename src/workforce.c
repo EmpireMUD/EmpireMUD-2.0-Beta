@@ -1643,14 +1643,11 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 	if (worker && can_do) {
 		start_dismantle_building(room);
 		act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);
-		
-		// if they have the building chore on, we'll keep using the mob
-		if (!empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BUILDING)) {
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else if (can_do) {
 		worker = place_chore_worker(emp, CHORE_DISMANTLE_MINES, room);
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// ensure he's always set to despawn
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
