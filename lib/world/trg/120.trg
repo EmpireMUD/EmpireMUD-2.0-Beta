@@ -887,7 +887,6 @@ if !%self.running%
 end
 %send% %actor% You trip %self.name%.
 %echoaround% %actor% %actor.name% trips %self.name%.
-dg_affect %actor% HARD-STUNNED on 5
 set interrupted 1
 remote interrupted %self.id%
 ~
