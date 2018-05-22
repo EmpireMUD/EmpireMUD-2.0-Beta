@@ -27,13 +27,15 @@ houses and other useful seaside structures. Building the swamp platform will
 convert a swamp tile to plains, while building drainage will convert an oasis
 to desert.
 ~
-4 1 70 0 b
+5 1 70 0 b
 K 2 5156
 K 2 5191
 K 2 5196
 K 2 5197
 K 2 5198
 K 2 5206
+K 2 5207
+K 2 5208
 P 2013
 S
 #1903
@@ -56,7 +58,7 @@ Mountain Engineering~
 mountains. This unlocks multiple mountain buildings and also grants you the
 'tunnel' command.
 ~
-3 1 70 0 b
+4 1 70 0 b
 K 2 5170
 K 2 5199
 K 2 5200
@@ -66,6 +68,8 @@ K 2 5203
 K 2 5204
 K 2 5205
 K 0 16
+P 2013
+P 1005
 S
 #1905
 Vampire Havens~

@@ -736,4 +736,12 @@ Grand Forgemaster #n is overseeing the magma crucible.
 20 50 bdqv 0
 0 0 0 15
 S
+#279
+#n fisherman~
+fisherman #n~
+#n is working the nets.
+~
+20 50 bdqv 0
+1 0 0 7
+S
 $

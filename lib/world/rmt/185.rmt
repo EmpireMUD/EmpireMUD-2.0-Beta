@@ -5,11 +5,12 @@ collapsing chamber at the top of the temple. The embers of a recent campfire
 smoulder in the centre of the chamber, lighting the room with a dim red glow.
 The stone walls are almost completely hidden by layers upon layers of plants.
 ~
-c 0
+c 0 0
 D0
 ~
 0 18501
 M 0 18517 100.00 1
+T 18517
 S
 #18501
 A Great Gate~
@@ -17,7 +18,7 @@ A Great Gate~
 warriors dressed as eagles and jaguars. The gate is closed; you should look for
 a way to open it. A newly made plaque nearby warns of the dangers within.
 ~
-c 0
+c 0 0
 D2
 ~
 0 18500
@@ -35,7 +36,7 @@ A Great Gate~
 warriors dressed as eagles and jaguars. The gate is open; you can advance
 deeper into the temple. A newly made plaque nearby warns of the dangers within.
 ~
-c 0
+c 0 0
 D2
 ~
 0 18500
@@ -55,7 +56,7 @@ A Suspicious Gallery~
 corridor. A faint breeze blowing through cracks in the uneven stone walls
 rustles the leaves growing on the walls, producing an eerie hissing sound.
 ~
-c 0
+c 0 0
 D2
 ~
 0 18502
@@ -77,7 +78,7 @@ penetrates this deep into the temple. Instead, an eerie green light with no
 apparent source fills the room, revealing a huge staircase leading deeper into
 the temple.
 ~
-c 0
+c 0 0
 D2
 ~
 0 18503
@@ -99,7 +100,7 @@ the falling rocks knocked a few stones loose from the floor. It looks like this
 temple is built on top of something else. Vines snake down into the green-lit
 depths below.
 ~
-c 0
+c 0 0
 D1
 ~
 0 18504
@@ -115,7 +116,7 @@ Leaves and vines line the curved stone walls. Several large shafts of light
 shine through the high, uneven ceiling of leaves and stone. Nearby, at the base
 of one such shaft of light, a grove of papaya trees is growing.
 ~
-ac 0
+ac 0 0
 D14
 ~
 0 18507
@@ -132,7 +133,7 @@ The Lower Gate~
 gate, like the one at the entrance of the temple, but much smaller. Vines have
 forced it slightly open; you could squeeze through.
 ~
-c 0
+c 0 0
 D14
 ~
 0 18506
@@ -147,7 +148,7 @@ A Suspicious Gallery~
 corridor. A faint breeze blowing through cracks in the uneven stone walls
 rustles the leaves growing on the walls, producing an eerie hissing sound.
 ~
-c 0
+c 0 0
 D0
 ~
 0 18507
@@ -169,7 +170,7 @@ temple. Nearby, you see the far side of the huge pile of rocks which blocks the
 main entrance to this area. The eerie glow seems to have spread unobstructed by
 the rocks, and fills this area as well.
 ~
-c 0
+c 0 0
 D0
 ~
 0 18508
@@ -184,7 +185,7 @@ The Ancient Treasury~
 coins are scattered around the edges of the room, and an elevated pedestal in
 the centre of the room prominently displays the greatest treasure in the room.
 ~
-c 0
+c 0 0
 D0
 ~
 0 18509
@@ -203,7 +204,7 @@ the first, but untouched by the centuries. The carvings of snakes common
 throughout the rest of the temple are replaced with a long series of carvings
 depicting a man wearing a crown shaped like a sun.
 ~
-c 0
+c 0 0
 D1
 ~
 0 18512
@@ -218,7 +219,7 @@ A Suspicious Gallery~
 corridor. A faint breeze blowing through cracks in the uneven stone walls
 rustles the leaves growing on the walls, producing an eerie hissing sound.
 ~
-c 0
+c 0 0
 D3
 ~
 0 18511
@@ -240,7 +241,7 @@ engraved with mystical symbols line the walls. A great stone throne stands
 empty on the dais at the far end of the hall. A huge painting of the sun covers
 the wall behind the throne, with a small archway in the middle.
 ~
-c 0
+c 0 0
 D3
 ~
 0 18512
@@ -256,7 +257,7 @@ chamber, bare of decoration or ornaments. Above your head, a miniature sun of
 emerald light swirls and crackles. An ornately carved stone sarcophagus lies
 open in the center of the room.
 ~
-c 0
+c 0 0
 D3
 ~
 0 18513
@@ -269,7 +270,7 @@ ill-fitted blocks and overgrown with vines. It should be easy to climb back up,
 but you may have to deal with the source of the incessant hissing sounds
 first...
 ~
-cg 0
+cg 0 0
 D8
 ~
 0 18500

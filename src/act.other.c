@@ -2642,7 +2642,7 @@ ACMD(do_summon) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char_data *mob;
-	int vnum = NOTHING, ability = NO_ABIL, iter, max = 1, cost = 0;
+	int vnum = NOTHING, ability = NO_ABIL, iter, max = 1, cost = 0, diff = DIFF_MEDIUM;
 	empire_data *emp = NULL;
 	bool junk, follow = FALSE, familiar = FALSE, charm = FALSE, local = FALSE;
 	int count, cooldown = NOTHING, cooldown_time = 0, cost_type = MOVE, gain = 20;
@@ -2850,6 +2850,7 @@ ACMD(do_summon) {
 			}
 			
 			vnum = BODYGUARD;
+			diff = DIFF_TRIVIAL;
 			follow = TRUE;
 			familiar = TRUE;
 			break;
@@ -2882,7 +2883,7 @@ ACMD(do_summon) {
 	act("$n whistles loudly!", FALSE, ch, 0, 0, TO_ROOM);
 
 	for (iter = 0; iter < max; ++iter) {
-		if (ability == NO_ABIL || ability < 0 || skill_check(ch, ability, DIFF_MEDIUM)) {
+		if (ability == NO_ABIL || ability < 0 || skill_check(ch, ability, diff)) {
 			mob = read_mobile(vnum, TRUE);
 			if (IS_NPC(ch)) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);

@@ -55,11 +55,13 @@ extern const char *trade_overunder[];
 
 // external funcs
 extern bool can_claim(char_data *ch);
+void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
 extern bool empire_can_claim(empire_data *emp);
+extern int get_main_island(empire_data *emp);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
@@ -590,7 +592,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	msg_to_char(ch, "Frontier traits: %s\r\n", buf);
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
 	msg_to_char(ch, "Territory: %d/%d (%d in-city, %d/%d outskirts, %d/%d frontier)\r\n", EMPIRE_TERRITORY(e, TER_TOTAL), land_can_claim(e, TER_TOTAL), EMPIRE_TERRITORY(e, TER_CITY), EMPIRE_TERRITORY(e, TER_OUTSKIRTS), land_can_claim(e, TER_OUTSKIRTS), EMPIRE_TERRITORY(e, TER_FRONTIER), land_can_claim(e, TER_FRONTIER));
-	msg_to_char(ch, "           Land per greatness: %d, Land per 100 wealth: %d\r\n", (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_GREATNESS)), EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_100_WEALTH));
+	msg_to_char(ch, "(Land per greatness: %d, Land per 100 wealth: %d, Bonus territory: %d)\r\n", (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_GREATNESS)), EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_100_WEALTH), EMPIRE_ATTRIBUTE(e, EATT_BONUS_TERRITORY));
 
 	msg_to_char(ch, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)\r\n", (int) GET_TOTAL_WEALTH(e), EMPIRE_WEALTH(e), EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
 	msg_to_char(ch, "Greatness: %d, Fame: %d\r\n", EMPIRE_GREATNESS(e), EMPIRE_FAME(e));
@@ -1581,7 +1583,6 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 
 void found_city(char_data *ch, empire_data *emp, char *argument) {
-	void check_nowhere_einv(empire_data *emp, int new_island);
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	void stop_room_action(room_data *room, int action, int chore);
 	extern int num_of_start_locs;
@@ -2791,8 +2792,8 @@ void scan_for_tile(char_data *ch, char *argument) {
 			if (claimed && ROOM_OWNER(room)) {
 				ok = TRUE;
 			}
-			else if (unclaimed && !ROOM_OWNER(room)) {
-				ok = TRUE;
+			else if (unclaimed && !ROOM_OWNER(room) && GET_ISLAND(room)) {
+				ok = TRUE;	// skip unowned AND skip ocean
 			}
 			else if (foreign && ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
 				ok = TRUE;
@@ -4273,7 +4274,7 @@ ACMD(do_enroll) {
 	vehicle_data *veh, *next_veh;
 	empire_data *e, *old;
 	room_data *room, *next_room;
-	int iter;
+	int iter, island;
 	char_data *targ = NULL, *victim, *mob;
 	bool all_zero, file = FALSE, sub_file = FALSE;
 	obj_data *obj;
@@ -4524,6 +4525,11 @@ ACMD(do_enroll) {
 			else {
 				SAVE_CHAR(targ);
 			}
+		}
+		
+		// ensure no lost einv
+		if ((island = get_main_island(e)) != NO_ISLAND) {
+			check_nowhere_einv(e, island);
 		}
 		
 		// This will PROPERLY reset wealth and land, plus members and abilities
@@ -5618,11 +5624,11 @@ ACMD(do_progress) {
 	struct empire_completed_goal *ecg, *next_ecg;
 	struct empire_goal *goal, *next_goal;
 	int cat, total, complete, bought, num;
-	progress_data *prg, *next_prg;
+	progress_data *prg, *next_prg, *prg_iter;
 	struct progress_list *prereq;
 	size_t size;
 	time_t when;
-	bool any, new_goal;
+	bool any, found, new_goal;
 	
 	strcpy(buf, argument);
 	if (*argument && imm_access) {
@@ -5643,6 +5649,31 @@ ACMD(do_progress) {
 	arg2 = any_one_word(argument, arg);
 	skip_spaces(&arg2);
 	
+	// build stats that several commands use:
+	total = 0;
+	for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
+		counts[cat] = 0;
+		compl[cat] = 0;
+		buy[cat] = 0;
+		total += EMPIRE_PROGRESS_POINTS(emp, cat);
+	}
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		if ((prg = real_progress(goal->vnum)) && !PRG_FLAGGED(prg, PRG_HIDDEN)) {
+			++counts[PRG_TYPE(prg)];
+		}
+	}
+	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+		if ((prg = real_progress(ecg->vnum))) {
+			if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+				++buy[PRG_TYPE(prg)];
+			}
+			else {
+				++compl[PRG_TYPE(prg)];
+			}
+		}
+	}
+	
+	// process args...
 	if (IS_NPC(ch) || !emp) {
 		msg_to_char(ch, "You need to be in an empire to check progress.\r\n");
 	}
@@ -5650,34 +5681,26 @@ ACMD(do_progress) {
 		// nothing to compute/show
 	}
 	else if (!*argument) {
-		// show current categories and their goal counts
-		total = 0;
-		for (cat = 0; cat < NUM_PROGRESS_TYPES; ++cat) {
-			counts[cat] = 0;
-			compl[cat] = 0;
-			buy[cat] = 0;
-			total += EMPIRE_PROGRESS_POINTS(emp, cat);
-		}
-		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
-			if ((prg = real_progress(goal->vnum)) && !PRG_FLAGGED(prg, PRG_HIDDEN)) {
-				++counts[PRG_TYPE(prg)];
-			}
-		}
-		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
-			if ((prg = real_progress(ecg->vnum))) {
-				if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-					++buy[PRG_TYPE(prg)];
-				}
-				else {
-					++compl[PRG_TYPE(prg)];
-				}
-			}
-		}
-		
 		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 		
-		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
-			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d bought, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
+		// show current goals
+		any = 0;
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			if (!(prg = real_progress(goal->vnum)) || PRG_FLAGGED(prg, PRG_HIDDEN)) {
+				continue;
+			}
+			
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", goal->vnum);
+			}
+			else {
+				*vstr = '\0';
+			}
+			
+			count_quest_tasks(goal->tracker, &complete, &total);
+			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
+			snprintf(line, sizeof(line), "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)\r\n", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
+			any = TRUE;
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {
 				strcat(buf, line);
@@ -5688,8 +5711,11 @@ ACMD(do_progress) {
 				break;
 			}
 		}
+		if (!any) {
+			size += snprintf(buf + size, sizeof(buf) - size, "- No active goals\r\n");
+		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, " Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+		size += snprintf(buf + size, sizeof(buf) - size, "Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
 		
 		page_string(ch->desc, buf, TRUE);
 	}
@@ -5705,7 +5731,7 @@ ACMD(do_progress) {
 		}
 		
 		// show current progress in that category
-		size = snprintf(buf, sizeof(buf), "%s goals:\r\n", progress_types[cat]);
+		size = snprintf(buf, sizeof(buf), "%s goals (%d points):\r\n", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
 		
 		// show current goals
 		any = 0;
@@ -5723,7 +5749,7 @@ ACMD(do_progress) {
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
 			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
-			snprintf(line, sizeof(line), "- %s%s, %d point%s (%d/%d)%s\r\n", vstr, PRG_NAME(prg), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? " (new)" : "");
+			snprintf(line, sizeof(line), "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)\r\n", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
 			any = TRUE;
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {
@@ -5762,7 +5788,7 @@ ACMD(do_progress) {
 				*vstr = '\0';
 			}
 			
-			snprintf(line, sizeof(line), "+ Available: %s%s (for %d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			snprintf(line, sizeof(line), "+ Available: %s\tc%s\t0 (for %d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 			any = TRUE;
 		
 			if (size + strlen(line) + 18 < sizeof(buf)) {
@@ -5809,8 +5835,28 @@ ACMD(do_progress) {
 		
 		show_completed_goals(ch, emp, cat, TRUE);
 	}
-	else if (is_abbrev(arg, "new")) {
+	else if (!str_cmp(arg, "new")) {
 		show_new_goals(ch, emp);
+	}
+	else if (is_abbrev(arg, "summary")) {
+		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
+
+		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
+			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d bought, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
+
+			if (size + strlen(line) + 18 < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
+				break;
+			}
+		}
+
+		size += snprintf(buf + size, sizeof(buf) - size, " Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+
+		page_string(ch->desc, buf, TRUE);
 	}
 	else if (!str_cmp(arg, "buy")) {
 		if (!*arg2) {	// display all purchasable goals
@@ -5877,7 +5923,7 @@ ACMD(do_progress) {
 			msg_to_char(ch, "You purchase %s for %d progress point%s.\r\n", PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 		}
 	}
-	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument))) {
+	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument)) || (!str_cmp(arg, "info") && ((prg = find_current_progress_goal_by_name(emp, arg2)) || (prg = find_progress_goal_by_name(arg2))))) {
 		// show 1 goal
 		if (IS_IMMORTAL(ch)) {
 			sprintf(vstr, "[%d] ", PRG_VNUM(prg));
@@ -5896,6 +5942,7 @@ ACMD(do_progress) {
 		}
 		
 		if ((when = when_empire_completed_goal(emp, PRG_VNUM(prg))) > 0) {
+			// already done
 			when = time(0) - when;	// diff
 			if ((when / SECS_PER_REAL_DAY) >= 1) {
 				num = round((double)when / SECS_PER_REAL_DAY);
@@ -5910,11 +5957,38 @@ ACMD(do_progress) {
 			}
 			msg_to_char(ch, "Completed %s.\r\n", buf);
 		}
-		else if (!empire_meets_goal_prereqs(emp, prg)) {
+		
+		// Show prereqs:
+		if (PRG_PREREQS(prg)) {
 			msg_to_char(ch, "Requires:");
 			LL_FOREACH(PRG_PREREQS(prg), prereq) {
-				msg_to_char(ch, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "\tg" : "\tr", get_progress_name_by_proto(prereq->vnum));
+				msg_to_char(ch, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "" : "\tr", get_progress_name_by_proto(prereq->vnum));
 			}
+			msg_to_char(ch, "\r\n");
+		}
+		
+		// Show descendents if any
+		any = FALSE;
+		HASH_ITER(hh, progress_table, prg_iter, next_prg) {
+			if (PRG_FLAGGED(prg_iter, PRG_IN_DEVELOPMENT | PRG_SCRIPT_ONLY | PRG_HIDDEN)) {
+				continue;	// skip these types
+			}
+			
+			// does it require this?
+			found = FALSE;
+			LL_FOREACH(PRG_PREREQS(prg_iter), prereq) {
+				if (prereq->vnum == PRG_VNUM(prg)) {
+					found = TRUE;
+					break;
+				}
+			}
+			
+			if (found) {
+				msg_to_char(ch, "%s%s", (any ? ", " : "Leads to: "), PRG_NAME(prg_iter));
+				any = TRUE;
+			}
+		}
+		if (any) {	// needs a crlf
 			msg_to_char(ch, "\r\n");
 		}
 		

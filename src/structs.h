@@ -795,6 +795,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_DRINK_WATER  BIT(31)	// can drink here
 #define FNC_COOKING_FIRE  BIT(32)	// can cook here
 #define FNC_LARGER_NEARBY  BIT(33)	// extends the radius of 'nearby'
+#define FNC_FISHING  BIT(34)	// workforce can fish here
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1008,7 +1009,8 @@ typedef struct vehicle_data vehicle_data;
 #define EATT_TERRITORY_PER_100_WEALTH  3	// number of tiles gained per 100 wealth
 #define EATT_TERRITORY_PER_GREATNESS  4	// bonus to ter-per-grt
 #define EATT_WORKFORCE_CAP  5	// workforce resource cap
-#define NUM_EMPIRE_ATTRIBUTES  6	// total
+#define EATT_BONUS_TERRITORY  6	// direct add to territory
+#define NUM_EMPIRE_ATTRIBUTES  7	// total
 
 
 // ETRAIT_x: empire trait flags
@@ -1045,7 +1047,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_REPAIR_VEHICLES  26
 #define CHORE_OILMAKING  27
 #define CHORE_GENERAL  28	// for reporting problems
-#define NUM_CHORES  29		// total
+#define CHORE_FISHING  29
+#define NUM_CHORES  30		// total
 
 
 // DIPL_x: Diplomacy types
@@ -2144,6 +2147,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_PERK_TERRITORY_FROM_WEALTH  4	// increases territory from wealth
 #define PRG_PERK_TERRITORY_PER_GREATNESS  5	// increases territory per greatness
 #define PRG_PERK_WORKFORCE_CAP  6	// higher workforce caps
+#define PRG_PERK_TERRITORY  7	// grants bonus territory (flat rate)
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -46,6 +46,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room);
 void do_chore_dismantle_mines(empire_data *emp, room_data *room);
 void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int interact_type);
 void do_chore_farming(empire_data *emp, room_data *room);
+void do_chore_fishing(empire_data *emp, room_data *room);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
 void do_chore_gardening(empire_data *emp, room_data *room);
 void do_chore_mining(empire_data *emp, room_data *room);
@@ -118,6 +119,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "repair-vehicles", VEHICLE_REPAIRMAN, FALSE },
 	{ "oilmaking", PRESS_WORKER, FALSE },
 	{ "general", NOTHING, TRUE },
+	{ "fishing", FISHERMAN, FALSE },
 };
 
 
@@ -234,6 +236,9 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		}
 		if (HAS_FUNCTION(room, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
 			do_chore_digging(emp, room);
+		}
+		if (HAS_FUNCTION(room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
+			do_chore_fishing(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_TRAPPING)) {
 			do_chore_trapping(emp, room);
@@ -1643,14 +1648,11 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 	if (worker && can_do) {
 		start_dismantle_building(room);
 		act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);
-		
-		// if they have the building chore on, we'll keep using the mob
-		if (!empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BUILDING)) {
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else if (can_do) {
 		worker = place_chore_worker(emp, CHORE_DISMANTLE_MINES, room);
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// ensure he's always set to despawn
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1863,6 +1865,55 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 	
 	if (!can_gain) {
 		log_workforce_problem(emp, room, CHORE_FARMING, WF_PROB_OVER_LIMIT, FALSE);
+	}
+}
+
+
+INTERACTION_FUNC(one_fishing_chore) {
+	empire_data *emp = ROOM_OWNER(inter_room);
+	
+	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_FISHING, interaction->vnum)) {
+		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
+		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
+		add_depletion(inter_room, DPLTN_FISH, TRUE);
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
+void do_chore_fishing(empire_data *emp, room_data *room) {	
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FISHING].mob);
+	bool depleted = (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) ? TRUE : FALSE;
+	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_FISHING, INTERACT_FISH);
+	bool can_do = !depleted && can_gain;
+	
+	if (CAN_INTERACT_ROOM(room, INTERACT_FISH) && can_do) {
+		// not able to ewt_mark_resource_worker() until we're inside the interact
+		if (worker) {
+			if (!run_room_interactions(worker, room, INTERACT_FISH, one_fishing_chore)) {
+				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+			}
+		}
+		else {
+			if ((worker = place_chore_worker(emp, CHORE_FISHING, room))) {
+				ewt_mark_for_interactions(emp, room, INTERACT_FISH);
+			}
+		}
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_FISHING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
+	}
+	
+	if (depleted) {
+		log_workforce_problem(emp, room, CHORE_FISHING, WF_PROB_DEPLETED, FALSE);
+	}
+	if (!can_gain) {
+		log_workforce_problem(emp, room, CHORE_FISHING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 

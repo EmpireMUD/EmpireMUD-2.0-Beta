@@ -125,6 +125,14 @@ end
 set dodged_%actor.id% 1
 remote dodged_%actor.id% %self.id%
 ~
+#12504
+CC Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12500)%
+end
+~
 #12505
 Colossus Fight: Lightning Punch (right arm)~
 0 k 16

@@ -444,4 +444,12 @@ else
   %send% %actor% Error setting flags and scaling.
 end
 ~
+#18086
+Fiend Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(18075)%
+end
+~
 $

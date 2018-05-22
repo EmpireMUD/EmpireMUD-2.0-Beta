@@ -192,6 +192,8 @@ int max_playing = 300;	// maximum number of players allowed before game starts t
 // adding their IPv4 address here will prevent the mud from doing a nameserver
 // lookup. This will do partial-matching if you omit the end of the IP address.
 // For example, "192.168." will match anything starting with that.
+// Note: as of b5.35, IPs are automatically listed after resolving slowly once
+// per uptime. -paul
 const char *slow_nameserver_ips[] = {
 	"\n"	// put this last
 };

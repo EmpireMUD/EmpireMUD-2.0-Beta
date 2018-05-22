@@ -1170,7 +1170,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	}
 	
 	// unfinished tunnel
-	if ((BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TUNNEL || BUILDING_VNUM(IN_ROOM(ch)) == RTYPE_TUNNEL) && GET_LAST_DIR(ch) != NO_DIR && !IS_COMPLETE(IN_ROOM(ch)) && !IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
+	if ((BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TUNNEL || BUILDING_VNUM(IN_ROOM(ch)) == RTYPE_TUNNEL) && (IS_NPC(ch) || GET_LAST_DIR(ch) != NO_DIR) && !IS_COMPLETE(IN_ROOM(ch)) && !IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && (!IS_NPC(ch) && dir != rev_dir[(int) GET_LAST_DIR(ch)])) {
 		msg_to_char(ch, "The tunnel is incomplete. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, rev_dir[(int) GET_LAST_DIR(ch)])]);
 		return FALSE;
 	}

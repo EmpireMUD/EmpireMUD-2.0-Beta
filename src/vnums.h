@@ -200,6 +200,7 @@
 #define OVERSEER  274
 #define PRESS_WORKER  276
 #define MINE_SUPERVISOR  277
+#define FISHERMAN  279
 
 
  //////////////////////////////////////////////////////////////////////////////

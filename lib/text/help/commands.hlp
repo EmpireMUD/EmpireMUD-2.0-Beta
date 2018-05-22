@@ -1385,9 +1385,10 @@ See also: FILL, TRENCH
 PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
 
 Usage:  progress [category]
-        progress [goal name]
+        progress [info] [goal name]
         progress buy [reward name]
         progress <completed | purchased> [category]
+        progress summary
         progress new
 
 This command shows your empire's current progress points, progression goals,

@@ -12,20 +12,22 @@ Fortifications~
 Don't forget a gatehouse so you can get in and out. Make sure to claim all the
 buildings. Completing this goal will unlock barracks and the training yard.
 ~
-2 3 0 5 0
+4 3 0 5 0
 K 2 5171
 K 2 5172
+K 7 5
 W
-7 5174 0 30
+7 5174 0 30 a
 W
-7 5173 0 1
+7 5173 0 1 a
 S
 #3002
 Build the Barracks~
    Build a barracks in one of your cities. This improves your empire's military
 score.
 ~
-2 3 0 15 0
+3 3 0 15 0
+K 7 5
 P 3001
 W
 7 5171 0 1
@@ -89,7 +91,7 @@ S
 Vanguard~
 Build enough military buildings to reach a military score of 50 in your empire.
 ~
-2 2 0 25 0
+5 3 0 25 0
 P 3002
 W
 33 0 0 50
@@ -98,7 +100,8 @@ S
 Deterrence~
 Reach a military score of 150 in your empire.
 ~
-2 2 0 50 0
+3 2 0 50 0
+K 7 5
 P 3030
 W
 33 0 0 150

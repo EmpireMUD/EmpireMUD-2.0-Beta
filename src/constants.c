@@ -1701,6 +1701,7 @@ const char *empire_attributes[] = {
 	"Tty per 100 Wealth",
 	"Tty per Greatness",
 	"Workforce Cap",
+	"Bonus Territory",
 	"\n"
 };
 
@@ -2631,6 +2632,7 @@ const char *progress_perk_types[] = {
 	"Wealth-territory-per-100",
 	"Greatness-territory",
 	"Workforce-cap",
+	"Territory",
 	"\n"
 };
 
@@ -2930,6 +2932,7 @@ const char *function_flags[] = {
 	"DRINK-WATER",
 	"COOKING-FIRE",
 	"LARGER-NEARBY",
+	"FISHING",
 	"\n"
 };
 

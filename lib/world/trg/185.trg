@@ -901,6 +901,14 @@ end
 %send% %actor% You need to deal with %self.name% before you can climb back up!
 return 0
 ~
+#18517
+LT Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(18500)%
+end
+~
 #18519
 Jungle Temple boss death - drop tokens~
 0 f 100

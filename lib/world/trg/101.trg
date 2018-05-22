@@ -229,6 +229,14 @@ switch %random.3%
   break
 done
 ~
+#10109
+Banditos Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10105)%
+end
+~
 #10110
 Egg hatch~
 1 ab 1
@@ -432,6 +440,14 @@ if (%Rand% <= %cumulative%) && %found% == 0
   set found 1
 end
 %purge% %self%
+~
+#10117
+Thieves Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(10110)%
+end
 ~
 #10140
 Cactus combat~

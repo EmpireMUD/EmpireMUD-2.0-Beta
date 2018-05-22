@@ -404,12 +404,14 @@ territory even when built in the outskirts (4x radius).
 
 See also: GATE
 #
-FISHERY
+FISHERY OCEANFISHERY RIVERFISHERY LAKEFISHERY
 
-&0(&a~~&0)  Fishery (Stilt Buildings goal)
+&0(&a~~&0)  oceanfishery (Stilt Buildings goal)
+&0(&c~~&0)  riverfishery (Stilt Buildings goal)
+&0(&c~~&0)  lakefishery (Stilt Buildings goal)
 
-You can build a fishery on the coast. It supplies more fish than a normal sea
-tile.
+You can build a fishery on the coast (ocean), on a river, or on a lake. It
+supplies more fish than a normal water tile.
 
 See also: FISH
 #

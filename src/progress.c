@@ -409,6 +409,10 @@ char *get_one_perk_display(struct progress_perk *perk) {
 			sprintf(save_buffer, "%+d workforce cap", perk->value);
 			break;
 		}
+		case PRG_PERK_TERRITORY: {
+			sprintf(save_buffer, "%+d territory", perk->value);
+			break;
+		}
 		default: {
 			strcpy(save_buffer, "UNKNOWN");
 			break;
@@ -531,6 +535,10 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 			}
 			case PRG_PERK_TERRITORY_PER_GREATNESS: {
 				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_GREATNESS), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
+				break;
+			}
+			case PRG_PERK_TERRITORY: {
+				SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_BONUS_TERRITORY), (add ? perk->value : -perk->value), 0, INT_MAX, TRUE);
 				break;
 			}
 			case PRG_PERK_CRAFT: {
@@ -809,12 +817,15 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 		skip = FALSE;
 		
 		// remove if not allowed to track it
-		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE | PRG_SCRIPT_ONLY)) {
+		if (PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT | PRG_PURCHASABLE)) {
 			if (goal) {
 				cancel_empire_goal(emp, goal);
 				goal = NULL;
 			}
 			skip = TRUE;
+		}
+		if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY)) {
+			skip = TRUE;	// we don't affect script goals here
 		}
 		
 		// remove from completed if in-dev
@@ -954,12 +965,11 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				break;
 			}
 			
-			// otherwise...
+			/* otherwise... do nothing
 			default: {
-				// this type is impossible for empires, so we will always count it as done
-				task->current = task->needed;
 				break;
 			}
+			*/
 		}
 	}
 	
@@ -1540,10 +1550,6 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 	
 	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "PURCHASABLE set with SCRIPT-ONLY");
-		problem = TRUE;
-	}
-	if (PRG_FLAGGED(prg, PRG_SCRIPT_ONLY) && (PRG_COST(prg) || PRG_TASKS(prg))) {
-		olc_audit_msg(ch, PRG_VNUM(prg), "SCRIPT-ONLY set with cost and/or tasks");
 		problem = TRUE;
 	}
 	
@@ -2624,6 +2630,13 @@ OLC_MODULE(progedit_perks) {
 				case PRG_PERK_TERRITORY_FROM_WEALTH: {
 					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
 						msg_to_char(ch, "Invalid number of territory per 100 wealth '%s'.\r\n", argument);
+						return;
+					}
+					break;	// otherwise ok
+				}
+				case PRG_PERK_TERRITORY: {
+					if (!isdigit(*argument) || (vnum = atoi(argument)) < 1) {
+						msg_to_char(ch, "Invalid amount of territory '%s'.\r\n", argument);
 						return;
 					}
 					break;	// otherwise ok

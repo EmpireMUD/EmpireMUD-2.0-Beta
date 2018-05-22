@@ -514,6 +514,14 @@ if %actor%
 end
 %purge% %self%
 ~
+#19016
+SH Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(19000)%
+end
+~
 #19047
 Walking Hut setup~
 5 n 100
