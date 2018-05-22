@@ -3198,6 +3198,8 @@ void b5_35_progress_update(void) {
 	struct empire_completed_goal *goal, *next_goal;
 	empire_data *emp, *next_emp;
 	
+	log("Applying b5.35 progression update...");
+	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), goal, next_goal) {
 			// Some goals were changed in this patch. Need to update anybody who completed them.
