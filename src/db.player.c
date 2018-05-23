@@ -1215,7 +1215,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					account_id = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Action:", length)) {
-					if (sscanf(line + length + 1, "%d %f %d %d", &i_in[0], &dbl_in, &i_in[2], &i_in[3]) == 4) {
+					if (sscanf(line + length + 1, "%d %lf %d %d", &i_in[0], &dbl_in, &i_in[2], &i_in[3]) == 4) {
 						GET_ACTION(ch) = i_in[0];
 						GET_ACTION_CYCLE(ch) = dbl_in;
 						GET_ACTION_TIMER(ch) = i_in[2];

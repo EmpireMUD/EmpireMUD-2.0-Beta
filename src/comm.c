@@ -950,7 +950,7 @@ void heartbeat(int heart_pulse) {
 	static int mins_since_crashsave = 0;
 	bool debug_log = FALSE;
 	
-	#define HEARTBEAT(x)  !(heart_pulse % ((x) * PASSES_PER_SEC))
+	#define HEARTBEAT(x)  !(heart_pulse % (int)((x) * PASSES_PER_SEC))
 	
 	// TODO go through this, arrange it better, combine anything combinable
 
