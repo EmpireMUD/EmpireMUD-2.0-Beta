@@ -241,7 +241,7 @@ void update_actions(void) {
 	bitvector_t act_flags;
 	craft_data *craft;
 	char_data *ch;
-	int speed;
+	double speed;
 	bool junk;
 
 	// only players with active connections can process actions
@@ -319,8 +319,8 @@ void update_actions(void) {
 		
 		// things that slow you down
 		if (AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
-			speed /= 2;
-			speed = MAX(1, speed);	// don't stall them completely
+			speed /= 2.0;
+			speed = MAX(1.0, speed);	// don't stall them completely
 		}
 		
 		GET_ACTION_CYCLE(ch) -= speed;

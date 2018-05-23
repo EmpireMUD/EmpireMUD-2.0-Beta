@@ -967,9 +967,11 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug  2:\t%lld", microtime()); }
 	}
 
-	if (HEARTBEAT(1)) {
+	if (HEARTBEAT(0.5)) {
 		update_actions();		
 		if (debug_log && HEARTBEAT(15)) { log("debug  3:\t%lld", microtime()); }
+	}
+	if (HEARTBEAT(1)) {
 		check_expired_cooldowns();	// descriptor list
 		if (debug_log && HEARTBEAT(15)) { log("debug  4:\t%lld", microtime()); }
 	}
