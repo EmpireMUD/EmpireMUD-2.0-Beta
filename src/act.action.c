@@ -288,33 +288,33 @@ void update_actions(void) {
 		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
-		speed = ACTION_CYCLE_MULTIPLIER;	// makes it a full second
+		speed = ACTION_CYCLE_SECOND;	// makes it a full second
 		
 		// things that modify speed...
 		if (IS_SET(act_flags, ACTF_ALWAYS_FAST)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FASTER_BONUS) && HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_PROSPECT) && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_FAST_PROSPECT)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_EXCAVATE) && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_FAST_EXCAVATE) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &junk)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FINDER) && has_player_tech(ch, PTECH_FAST_FIND)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 			gain_player_tech_exp(ch, PTECH_FAST_FIND, 0.1);
 		}
 		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		
 		// things that slow you down
