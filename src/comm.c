@@ -967,7 +967,7 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug  2:\t%lld", microtime()); }
 	}
 
-	if (HEARTBEAT(0.5)) {
+	if (HEARTBEAT(0.2)) {
 		update_actions();		
 		if (debug_log && HEARTBEAT(15)) { log("debug  3:\t%lld", microtime()); }
 	}
