@@ -5645,6 +5645,11 @@ ACMD(do_progress) {
 	}
 	skip_spaces(&argument);
 	
+	if (!emp) {
+		msg_to_char(ch, "You must be in an empire to view progress.\r\n");
+		return;
+	}
+	
 	// optional split into arg/arg2 (argument preserves the whole thing)
 	arg2 = any_one_word(argument, arg);
 	skip_spaces(&arg2);
