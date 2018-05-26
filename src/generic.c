@@ -1379,7 +1379,7 @@ OLC_MODULE(genedit_build2char) {
 			free(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR));
 		}
 		GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) = NULL;
-		msg_to_char(ch, "Build2char messsage removed.\r\n");
+		msg_to_char(ch, "Build2char message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "build2char", &GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR));
@@ -1398,7 +1398,7 @@ OLC_MODULE(genedit_build2room) {
 			free(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM));
 		}
 		GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) = NULL;
-		msg_to_char(ch, "Build2room messsage removed.\r\n");
+		msg_to_char(ch, "Build2room message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "build2room", &GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM));
@@ -1417,7 +1417,7 @@ OLC_MODULE(genedit_craft2char) {
 			free(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR));
 		}
 		GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) = NULL;
-		msg_to_char(ch, "Craft2char messsage removed.\r\n");
+		msg_to_char(ch, "Craft2char message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "craft2char", &GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR));
@@ -1436,7 +1436,7 @@ OLC_MODULE(genedit_craft2room) {
 			free(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM));
 		}
 		GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) = NULL;
-		msg_to_char(ch, "Craft2room messsage removed.\r\n");
+		msg_to_char(ch, "Craft2room message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "craft2room", &GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM));
@@ -1455,7 +1455,7 @@ OLC_MODULE(genedit_repair2char) {
 			free(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR));
 		}
 		GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) = NULL;
-		msg_to_char(ch, "Repair2char messsage removed.\r\n");
+		msg_to_char(ch, "Repair2char message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "repair2char", &GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR));
@@ -1474,7 +1474,7 @@ OLC_MODULE(genedit_repair2room) {
 			free(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM));
 		}
 		GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) = NULL;
-		msg_to_char(ch, "Repair2room messsage removed.\r\n");
+		msg_to_char(ch, "Repair2room message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "repair2room", &GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM));
@@ -1532,7 +1532,7 @@ OLC_MODULE(genedit_apply2char) {
 			free(GEN_STRING(gen, pos));
 		}
 		GEN_STRING(gen, pos) = NULL;
-		msg_to_char(ch, "Apply-to-char messsage removed.\r\n");
+		msg_to_char(ch, "Apply-to-char message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "apply2char", &GEN_STRING(gen, pos));
@@ -1560,7 +1560,7 @@ OLC_MODULE(genedit_apply2room) {
 			free(GEN_STRING(gen, pos));
 		}
 		GEN_STRING(gen, pos) = NULL;
-		msg_to_char(ch, "Apply-to-room messsage removed.\r\n");
+		msg_to_char(ch, "Apply-to-room message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "apply2room", &GEN_STRING(gen, pos));
@@ -1783,7 +1783,7 @@ OLC_MODULE(genedit_standardwearoff) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {
-		msg_to_char(ch, "Wear-off messsage changed to: %s\r\n", buf);
+		msg_to_char(ch, "Wear-off message changed to: %s\r\n", buf);
 	}
 }
 
@@ -1812,7 +1812,7 @@ OLC_MODULE(genedit_wearoff) {
 			free(GEN_STRING(gen, pos));
 		}
 		GEN_STRING(gen, pos) = NULL;
-		msg_to_char(ch, "Wear-off messsage removed.\r\n");
+		msg_to_char(ch, "Wear-off message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "wearoff", &GEN_STRING(gen, pos));
@@ -1840,7 +1840,7 @@ OLC_MODULE(genedit_wearoff2room) {
 			free(GEN_STRING(gen, pos));
 		}
 		GEN_STRING(gen, pos) = NULL;
-		msg_to_char(ch, "Wear-off-to-room messsage removed.\r\n");
+		msg_to_char(ch, "Wear-off-to-room message removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "wearoff2room", &GEN_STRING(gen, pos));

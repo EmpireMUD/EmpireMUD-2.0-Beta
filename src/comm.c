@@ -128,7 +128,7 @@ int tics_passed = 0;					/* for extern checkpointing			*/
 int scheck = 0;							/* for syntax checking mode			*/
 struct timeval null_time;				/* zero-valued time structure		*/
 FILE *logfile = NULL;					/* Where to send the log messages	*/
-bool gain_cond_messsage = FALSE;		/* gain cond send messages			*/
+bool gain_cond_message = FALSE;		/* gain cond send messages			*/
 int dg_act_check;	/* toggle for act_trigger */
 unsigned long pulse = 0;	/* number of pulses since game start */
 static bool reboot_recovery = FALSE;
@@ -956,7 +956,7 @@ void heartbeat(int heart_pulse) {
 
 	// only get a gain condition message on the hour
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		gain_cond_messsage = TRUE;
+		gain_cond_message = TRUE;
 	}
 	
 	event_process();
@@ -1142,7 +1142,7 @@ void heartbeat(int heart_pulse) {
 	free_freeable_triggers();
 
 	/* Turn this off */
-	gain_cond_messsage = FALSE;
+	gain_cond_message = FALSE;
 	
 	// prevent accidentally leaving this on
 	pause_affect_total = FALSE;

@@ -1151,7 +1151,7 @@ OLC_MODULE(shopedit_allegiance) {
 		msg_to_char(ch, "Set the shop's allegiance to which faction (or 'none')?\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
-		msg_to_char(ch, "You set its allegience to 'none'.\r\n");
+		msg_to_char(ch, "You set its allegiance to 'none'.\r\n");
 		SHOP_ALLEGIANCE(shop) = NULL;
 	}
 	else if (!(fct = find_faction(argument))) {
