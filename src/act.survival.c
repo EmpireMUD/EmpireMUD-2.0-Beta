@@ -428,8 +428,12 @@ void do_mount_swap(char_data *ch, char *argument) {
 	char_data *proto;
 	int number;
 	
-	if (!has_ability(ch, ABIL_STABLEMASTER) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!has_ability(ch, ABIL_STABLEMASTER) && !HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You can only swap mounts in a stable unless you have the Stablemaster ability.\r\n");
+		return;
+	}
+	if (!has_ability(ch, ABIL_STABLEMASTER) && !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You must complete the stable first.\r\n");
 		return;
 	}
 	if (!has_ability(ch, ABIL_STABLEMASTER) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
