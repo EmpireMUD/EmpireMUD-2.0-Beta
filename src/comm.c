@@ -1888,7 +1888,7 @@ int get_max_players(void) {
 		}
 
 		/* set the current to the maximum */
-		limit.rlim_cur = limit.rlim_max;
+		limit.rlim_cur = MIN(OPEN_MAX, limit.rlim_max);
 		if (setrlimit(RLIMIT_NOFILE, &limit) < 0) {
 			perror("SYSERR: calling setrlimit");
 			exit(1);
