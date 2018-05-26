@@ -3341,6 +3341,11 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
+				case 'I': {	// inventory (capital i)
+					sprintf(i, "%d/%d", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
+					tmp = i;
+					break;
+				}
 				case '_':
 					tmp = "\r\n";
 					break;
