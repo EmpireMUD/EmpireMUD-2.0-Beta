@@ -1999,7 +1999,7 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	bool done;
 	
 	if (!emp || from_island == NO_ISLAND || to_island == NO_ISLAND || number < 0 || vnum == NOTHING) {
-		msg_to_char(ch, "Unable to set up shipping: invalid inpue.\r\n");
+		msg_to_char(ch, "Unable to set up shipping: invalid input.\r\n");
 		return;
 	}
 	

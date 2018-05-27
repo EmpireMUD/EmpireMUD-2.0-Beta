@@ -3323,7 +3323,7 @@ void do_claim_room(char_data *ch, room_data *room) {
 	bool junk;
 	
 	if (!emp) {
-		msg_to_char(ch, "You don't belong to any empre.\r\n");
+		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (ROOM_OWNER(room) == emp) {
 		msg_to_char(ch, "Your empire already owns this area.\r\n");
@@ -3381,7 +3381,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 		msg_to_char(ch, "That cannot be claimed.\r\n");
 	}
 	else if (!emp) {
-		msg_to_char(ch, "You don't belong to any empre.\r\n");
+		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (VEH_OWNER(veh) == emp) {
 		msg_to_char(ch, "Your empire already owns that.\r\n");

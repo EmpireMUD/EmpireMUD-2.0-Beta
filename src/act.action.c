@@ -1669,8 +1669,13 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-		if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE) || get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+		if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
 			msg_to_char(ch, "You can't mine here.\r\n");
+			cancel_action(ch);
+			break;
+		}
+		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+			msg_to_char(ch, "You don't see even a hint of anything worthwhile in this depleted mine.\r\n");
 			cancel_action(ch);
 			break;
 		}

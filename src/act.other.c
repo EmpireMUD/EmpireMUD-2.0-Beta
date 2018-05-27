@@ -237,7 +237,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	empire_data *old_emp;
 	
 	if (!old || !new || !old->desc || new->desc) {
-		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
+		log("SYSERR: Attempting invalid perform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
 		return;
 	}
 
@@ -1034,7 +1034,7 @@ void do_alt_import(char_data *ch, char *argument) {
 		alt_import_slash_channels(ch, alt);
 	}
 	else {
-		msg_to_char(ch, "Uknown field '%s'.\r\n%s", arg2, valid_fields);
+		msg_to_char(ch, "Unknown field '%s'.\r\n%s", arg2, valid_fields);
 	}
 
 	// cleanup	
@@ -2305,7 +2305,7 @@ ACMD(do_order) {
 		send_to_char("You obviously suffer from schizophrenia.\r\n", ch);
 	else {
 		if (AFF_FLAGGED(ch, AFF_CHARM)) {
-			send_to_char("Your superior would not aprove of you giving orders.\r\n", ch);
+			send_to_char("Your superior would not approve of you giving orders.\r\n", ch);
 			return;
 		}
 		if (vict) {
@@ -2722,7 +2722,7 @@ ACMD(do_summon) {
 	}
 	
 	if (count > config_get_int("summon_npc_limit")) {
-		msg_to_char(ch, "There are too many npcs here to summon more.\r\n");
+		msg_to_char(ch, "There are too many NPCs here to summon more.\r\n");
 		return;
 	}
 
