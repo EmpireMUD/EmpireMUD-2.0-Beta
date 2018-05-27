@@ -4,6 +4,7 @@ An Old Mine Tunnel~
 a dank smell in the air, and the distant clatter of water. The area is cool and
 dark, and there are signs of previous visitors in the form of charred campfire
 wood.
+Commands: &cadventure&0
 ~
 bd 0 0
 D5
@@ -100,7 +101,7 @@ D8
 D1
 ~
 0 11109
-M 0 11101 50.00 1
+M 0 11101 100.00 1
 M 0 11102 80.00 10
 S
 #11106
@@ -240,7 +241,7 @@ D8
 0 11114
 I 6 11105 33.33 1 X  # FORAGE: a few blackberries
 I 6 11103 33.33 1 X  # FORAGE: a carrot
-I 6 11107 100.00 1 X  # FORAGE: a juicy pear
+I 6 11107 100.00 1 X  # FORAGE: a ripe pear
 I 8 11102 33.33 1 X  # HARVEST: a bunch of carrots
 I 8 11104 33.33 1 X  # HARVEST: a bunch of blackberries
 I 8 11106 100.00 1 X  # HARVEST: some juicy pears
@@ -412,6 +413,7 @@ a 0 0
 D1
 ~
 0 11131
+T 11141
 S
 #11131
 A Weathered Stone Marker~

@@ -23,7 +23,7 @@
 #include "olc.h"
 
 // TODO convert more of these configs to the in-game config system
-// TODO add string-array config type (default channels)
+// TODO add string-array config type (default channels, could have add/remove)
 // TODO add long-string type (fread_string; text editor)
 // TODO add double-array (empire score levels)
 
@@ -40,6 +40,7 @@
 *   World Configs
 *   Config System: Data
 *   Config System: Editors
+*   Config System: Custom Editors
 *   Config System: Show Funcs
 *   Config System: Handlers
 *   Config System: I/O
@@ -191,6 +192,8 @@ int max_playing = 300;	// maximum number of players allowed before game starts t
 // adding their IPv4 address here will prevent the mud from doing a nameserver
 // lookup. This will do partial-matching if you omit the end of the IP address.
 // For example, "192.168." will match anything starting with that.
+// Note: as of b5.35, IPs are automatically listed after resolving slowly once
+// per uptime. -paul
 const char *slow_nameserver_ips[] = {
 	"\n"	// put this last
 };
@@ -333,6 +336,14 @@ const char *config_types[] = {
 	"int",
 	"int array",
 	"short string",
+	"\n"
+};
+
+
+// WHO_LIST_SORT_x: config game who_list_sort [type]
+const char *who_list_sort_types[] = {
+	"role-then-level",
+	"level",
 	"\n"
 };
 
@@ -930,6 +941,64 @@ CONFIG_HANDLER(config_edit_typelist) {
 	
 	if (changed) {
 		save_config_system();
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CONFIG SYSTEM: CUSTOM EDITORS ///////////////////////////////////////////
+
+CONFIG_HANDLER(config_edit_who_list_sort) {
+	int input, iter, old;
+	
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_edit_who_list_sort called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error editing type.\r\n");
+		return;
+	}
+	if (config->type != CONFTYPE_INT) {
+		log("SYSERR: config_edit_who_list_sort called on non-int key %s", config->key);
+		msg_to_char(ch, "Error editing type.\r\n");
+		return;
+	}
+	
+	if ((input = search_block(argument, who_list_sort_types, FALSE)) == NOTHING) {
+		msg_to_char(ch, "Invalid option '%s'. Valid sorts are:\r\n", argument);
+		for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
+		}
+		return;
+	}
+	
+	if (config->data.int_val == input) {
+		msg_to_char(ch, "It is already set to that sort.\r\n");
+		return;
+	}
+	
+	old = config->data.int_val;
+	config->data.int_val = input;
+	save_config_system();
+	syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s set %s to %s, from %s", GET_NAME(ch), config->key, who_list_sort_types[input], who_list_sort_types[old]);
+	msg_to_char(ch, "%s: set to %s, from %s.\r\n", config->key, who_list_sort_types[input], who_list_sort_types[old]);
+}
+
+
+CONFIG_HANDLER(config_show_who_list_sort) {
+	int iter;
+	
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_show_who_list_sort called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error showing type.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "&y%s&0: %s\r\n", config->key, who_list_sort_types[config->data.int_val]);
+	
+	msg_to_char(ch, "Valid sorts are:\r\n");
+	for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
+		msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
 	}
 }
 
@@ -1596,6 +1665,7 @@ void init_config_system(void) {
 
 	// game configs
 	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use \t&[F000] and \t&[B000]");
+	init_config(CONFIG_GAME, "automessage_color", CONFTYPE_SHORT_STRING, "color code for automessage (like &&c)");
 	init_config(CONFIG_GAME, "hiring_builders", CONFTYPE_BOOL, "whether the mud is hiring builders");
 	init_config(CONFIG_GAME, "hiring_coders", CONFTYPE_BOOL, "whether the mud is hiring coders");
 	init_config(CONFIG_GAME, "mud_contact", CONFTYPE_SHORT_STRING, "email address of an admin");
@@ -1615,6 +1685,8 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "no_person", CONFTYPE_SHORT_STRING, "bad target error for no person");
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
 	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
+	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_INT, "what order the who-list appears in");
+		init_config_custom("who_list_sort", config_show_who_list_sort, config_edit_who_list_sort, NULL);
 
 	// actions
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");
@@ -1627,7 +1699,7 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "mining_timer", CONFTYPE_INT, "weapon damage to mine 1 ore");
 	init_config(CONFIG_ACTIONS, "panning_timer", CONFTYPE_INT, "ticks to pan one time");
 	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks, cut in half by Finder");
-	init_config(CONFIG_ACTIONS, "planting_base_timer", CONFTYPE_INT, "ticks; planting reduces it by half up to 3 times");
+	init_config(CONFIG_ACTIONS, "planting_base_timer", CONFTYPE_INT, "in seconds; planting reduces it by half up to 3 times");
 	init_config(CONFIG_ACTIONS, "tan_timer", CONFTYPE_INT, "ticks to tan skin, reduced by location");
 	init_config(CONFIG_ACTIONS, "chop_depletion", CONFTYPE_INT, "number of times you can chop a tile that has no chop evolution");
 	init_config(CONFIG_ACTIONS, "common_depletion", CONFTYPE_INT, "amount of resources you get from 1 tile");
@@ -1641,44 +1713,53 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resource cost");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
-	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "amount of water needed to fill a trench");
-	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "max items workforce will collect");
+	init_config(CONFIG_ACTIONS, "trench_fill_time", CONFTYPE_INT, "seconds before a trench is full");
+	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "deprecated: do not set");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_over_total", CONFTYPE_INT, "how much of a resource workers will gather if over the total cap");
-	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "workforce cap for skilled labor");
+	init_config(CONFIG_ACTIONS, "max_chore_resource_per_member", CONFTYPE_INT, "workforce resource cap per member");
+	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "deprecated: do not set");
+	
+	// TODO: deprecated
+	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "deprecated: do not set");
 
 	// cities
 	init_config(CONFIG_CITY, "players_per_city_point", CONFTYPE_INT, "how many members you need to earn each city point");
-	init_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT, "amount of empire wealth that earns you an extra city point");
-	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "number of techs for an extra city point");
 	init_config(CONFIG_CITY, "min_distance_between_cities", CONFTYPE_INT, "tiles between city centers");
 	init_config(CONFIG_CITY, "min_distance_between_ally_cities", CONFTYPE_INT, "tiles between cities belonging to allies");
 	init_config(CONFIG_CITY, "min_distance_from_city_to_starting_location", CONFTYPE_INT, "tiles between a city and a starting location");
 	init_config(CONFIG_CITY, "cities_on_newbie_islands", CONFTYPE_BOOL, "whether or not cities can be founded on newbie islands");
-	init_config(CONFIG_CITY, "city_trait_radius", CONFTYPE_INT, "tiles away that a city's traits are used instead of empire traits");
+	init_config(CONFIG_CITY, "city_overage_timeout", CONFTYPE_INT, "hours until cities decay from having too many city points spent");
 	init_config(CONFIG_CITY, "disrepair_minor", CONFTYPE_INT, "percent of damage to show minor disrepair");
 	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "percent of damage to show major disrepair");
 	init_config(CONFIG_CITY, "disrepair_limit", CONFTYPE_INT, "years of disrepair before collapse");
 	init_config(CONFIG_CITY, "disrepair_limit_unfinished", CONFTYPE_INT, "years of disrepair before unfinished buildings collapse");
 	init_config(CONFIG_CITY, "max_out_of_city_portal", CONFTYPE_INT, "maximum distance a portal can travel outside of a city");
 	init_config(CONFIG_CITY, "minutes_to_full_city", CONFTYPE_INT, "time it takes for a city to count for in-city-only tasks");
+	
+	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "deprecated: do not set");
+	init_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT, "deprecated: do not set");
 
 	// empire
-	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "territory per 1 Greatness");
-	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "territory per 1 technology");	
-	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "territory per 1 wealth");
-	init_config(CONFIG_EMPIRE, "land_outside_city_modifier", CONFTYPE_DOUBLE, "portion of land that can be outside cities");
+	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "base territory per 1 Greatness");
+	init_config(CONFIG_EMPIRE, "land_frontier_modifier", CONFTYPE_DOUBLE, "portion of land that can be far from cities");
+	init_config(CONFIG_EMPIRE, "land_min_cap", CONFTYPE_INT, "lowest possible claim cap, to prevent very low numbers");
+	init_config(CONFIG_EMPIRE, "land_outside_city_modifier", CONFTYPE_DOUBLE, "portion of land that can be in the outskirts area of cities");
 	init_config(CONFIG_EMPIRE, "building_population_timer", CONFTYPE_INT, "game hours per citizen move-in");
 	init_config(CONFIG_EMPIRE, "time_to_empire_delete", CONFTYPE_INT, "weeks until an empire is deleted");
-	init_config(CONFIG_EMPIRE, "time_to_empire_emptiness", CONFTYPE_INT, "weeks until npcs don't spawn");
+	init_config(CONFIG_EMPIRE, "time_to_empire_emptiness", CONFTYPE_INT, "weeks until NPCs don't spawn");
 	init_config(CONFIG_EMPIRE, "member_timeout_newbie", CONFTYPE_INT, "days until newbie times out");
 	init_config(CONFIG_EMPIRE, "minutes_per_day_newbie", CONFTYPE_INT, "minutes played per day for noob status");
 	init_config(CONFIG_EMPIRE, "member_timeout_full", CONFTYPE_INT, "days until full member times out");
 	init_config(CONFIG_EMPIRE, "minutes_per_day_full", CONFTYPE_INT, "minutes played per day for full member");
 	init_config(CONFIG_EMPIRE, "member_timeout_max_threshold", CONFTYPE_INT, "hours, 1 week of playtime");
 	init_config(CONFIG_EMPIRE, "newbie_island_day_limit", CONFTYPE_INT, "number of days old an empire can be before losing newbie island claims");
+	init_config(CONFIG_EMPIRE, "outskirts_modifier", CONFTYPE_DOUBLE, "multiplier for city radius that determines outskirts");
 	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire appearing idle");
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
 	init_config(CONFIG_EMPIRE, "redesignate_time", CONFTYPE_INT, "minutes until you can redesignate a room again");
+
+	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "deprecated: do not set");
+	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "deprecated: do not set");
 
 	// items
 	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
@@ -1699,7 +1780,7 @@ void init_config_system(void) {
 	init_config(CONFIG_MOBS, "mob_despawn_radius", CONFTYPE_INT, "distance from players to despawn mobs");
 	init_config(CONFIG_MOBS, "npc_follower_limit", CONFTYPE_INT, "more npc followers than this causes aggro");
 	init_config(CONFIG_MOBS, "num_duplicates_in_stable", CONFTYPE_INT, "number of npc duplicates allowed in a stable before some leave");
-	init_config(CONFIG_MOBS, "spawn_limit_per_room", CONFTYPE_INT, "max npcs that will spawn in a map room");
+	init_config(CONFIG_MOBS, "spawn_limit_per_room", CONFTYPE_INT, "max NPCs that will spawn in a map room");
 	init_config(CONFIG_MOBS, "mob_pursuit_timeout", CONFTYPE_INT, "minutes that mob pursuit memory lasts");
 	init_config(CONFIG_MOBS, "mob_pursuit_distance", CONFTYPE_INT, "distance a mob will pursue (as the crow flies)");
 	init_config(CONFIG_MOBS, "use_mob_stacking", CONFTYPE_BOOL, "whether or not mobs show as stacks on look");
@@ -1763,6 +1844,7 @@ void init_config_system(void) {
 	init_config(CONFIG_TRADE, "trading_post_fee", CONFTYPE_DOUBLE, "% cut of the sale price");
 	
 	// war
+	init_config(CONFIG_WAR, "burn_down_time", CONFTYPE_INT, "seconds it takes to burn down a building");
 	init_config(CONFIG_WAR, "fire_extinguish_value", CONFTYPE_INT, "douse this value and the fire goes out");
 	init_config(CONFIG_WAR, "pvp_timer", CONFTYPE_INT, "minutes from when you shut off pvp flag, until it's off");
 	init_config(CONFIG_WAR, "stolen_object_timer", CONFTYPE_INT, "minutes an object is considered stolen");
@@ -1772,15 +1854,19 @@ void init_config_system(void) {
 	init_config(CONFIG_WAR, "deaths_before_penalty_war", CONFTYPE_INT, "death limit while at war");
 	init_config(CONFIG_WAR, "hostile_login_delay", CONFTYPE_INT, "seconds a person is stunned if they log in in enemy territory");
 	init_config(CONFIG_WAR, "mutual_war_only", CONFTYPE_BOOL, "allows 'battle' but not 'war' diplomacy");
+	init_config(CONFIG_WAR, "offense_min_to_war", CONFTYPE_INT, "number of offense points required before war is allowed");
+	init_config(CONFIG_WAR, "offenses_for_free_war", CONFTYPE_INT, "number of offense points at which war cost drops to zero");
 	init_config(CONFIG_WAR, "rogue_flag_time", CONFTYPE_INT, "in minutes, acts like hostile flag but for non-empire players");
 	init_config(CONFIG_WAR, "seconds_per_death", CONFTYPE_INT, "how long the penalty lasts per death over the limit");
+	init_config(CONFIG_WAR, "steal_death_penalty", CONFTYPE_INT, "minutes a player cannot steal from an empire after being killed by them, 0 for none");
 	init_config(CONFIG_WAR, "stun_immunity_time", CONFTYPE_INT, "seconds a person is immune to stuns after a stun wears off");
 	init_config(CONFIG_WAR, "vehicle_siege_time", CONFTYPE_INT, "seconds between catapult/vehicle firing");
-	init_config(CONFIG_WAR, "war_cost_max", CONFTYPE_INT, "empire coins to start a war at maximum level difference");
-	init_config(CONFIG_WAR, "war_cost_min", CONFTYPE_INT, "empire coins to start a war at minimum level difference");
+	init_config(CONFIG_WAR, "war_cost_max", CONFTYPE_INT, "empire coins to start a war at maximum level difference (not counting offenses)");
+	init_config(CONFIG_WAR, "war_cost_min", CONFTYPE_INT, "empire coins to start a war at minimum level difference (not counting offenses)");
 	init_config(CONFIG_WAR, "war_login_delay", CONFTYPE_INT, "seconds a person is stunned if they log in while at war");
 
 	// world
+	init_config(CONFIG_WORLD, "adjust_instance_limits", CONFTYPE_BOOL, "raises/lowers instance counts based on world size");
 	init_config(CONFIG_WORLD, "default_interior", CONFTYPE_INT, "building room vnum to use for designate");
 		init_config_custom("default_interior", config_show_building, config_edit_building, NULL);
 	init_config(CONFIG_WORLD, "water_crop_distance", CONFTYPE_INT, "distance at which a crop marked requires-water can be planted from one");
@@ -1790,14 +1876,13 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "interlink_distance", CONFTYPE_INT, "how far apart two interlinked buildings can be");
 	init_config(CONFIG_WORLD, "interlink_river_limit", CONFTYPE_INT, "how many intervening tiles may be river");
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");
-	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "build-facing flags for generic buildings");
-		init_config_custom("generic_facing", config_show_bitvector, config_edit_bitvector, (void*)bld_on_flags);
+	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "deprecated: do not set");
 	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
 	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
 	
 	// TODO note: deprecated
-	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "how many spare ocean tiles to keep on-hand");
+	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "deprecated: do not set");
 	
 	// TODO sector types should be audited on startup to ensure they exist -pc
 	init_config(CONFIG_WORLD, "default_building_sect", CONFTYPE_INT, "vnum of sector used by build command");

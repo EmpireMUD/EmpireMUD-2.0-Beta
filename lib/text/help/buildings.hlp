@@ -1,8 +1,8 @@
 ALCHEMIST
 
-(Disambiguation: Did you mean HELP ALCHEMIST CLASS ?)
+(Disambiguation: Did you mean HELP ALCHEMIST CRAFTS ?)
 
-(AA)  Alchemist  (Artisans ability)
+(AA)  Alchemist  (Foundations goal)
 
 Stored here:  herbs, poisons
 
@@ -14,14 +14,14 @@ See also: BREW, LABORATORY, MIX, STORAGE
 #
 APIARY APIARIES
 
-{BB}  Apiary  (Artisans ability)
+{BB}  Apiary  (Foundations goal)
 
 Apiaries are used as hives for raising domestic bees. They produce honey and
 wax for the empire. Some crafts require that the empire have access to these
 resources, and you can only make those crafts if you are in the territory of
 an empire with apiaries.
 
-Apiaries are made by Advanced Woodworking.
+Beehives are made by Advanced Woodworking.
 
 See also: ADVANCED WOODWORKING
 #
@@ -36,7 +36,7 @@ See also: SUMMON PLAYER
 #
 BAKERY
 
-(BB)  Bakery  (Artisans ability)
+(BB)  Bakery  (Foundations goal)
 
 The bakery is a warm, pleasant building that always smells of fresh breads.
 You can use its oven to cook all manner of foods.
@@ -45,7 +45,7 @@ See also: COOK
 #
 BARRACKS FORT
 
-[BB]  Barracks (Raise Armies ability)
+[BB]  Barracks (Fortifications goal)
 
 Extra rooms:  10, interlink
 Military:  20
@@ -57,7 +57,7 @@ See also: DESIGNATE, INTERLINK
 #
 BATH BATHS
 
-[&b~~&0]  Baths  (Luxury ability)
+[&b~~&0]  Baths  (Architect ability)
 
 The most opulent empires construct bath houses for their citizens. These
 luxuries serve as meeting places and relaxation houses for persons of dist-
@@ -67,21 +67,110 @@ This building can only be built in a city.
 
 See also:  BATHE
 #
+BOARDWALK "BOARD WALK"
+
+&a~&0--&a~&0  Boardwalk  (Stilt Buildings goal)
+
+A nice boardwalk over the seaside or lake allows you to truly appreciate nature
+up close. It functions (and looks) like a road.
+
+Boardwalks count as in-city territory even if built in the outskirts
+(4x radius).
+
+For a road over a river, use a bridge instead.
+
+See also: BRIDGE, ROAD
+#
 BRIDGE
 
-&c~~&0|&c~&0  Bridge  (Artisans ability)
+&c~~&0|&c~&0  Bridge  (Bridges goal)
 
 Once completed, a bridge allows you to cross river tiles without a boat. You
 can also sail ships under the bridges. Nobody knows how.
 
-Bridges count as in-city territory as far away as 3x a city's normal radius.
+Bridges count as in-city territory even if built in the outskirts (4x radius).
+
+To build a road over other terrains, see boardwalk and swampwalk.
+
+See also: BOARDWALK, SWAMPWALK
+#
+BUILD BUILDING "BASIC BUILDINGS"
+
+Build (Trade ability)
+
+Usage:  build <building> [direction]
+        build <monument> <god>
+        build info <building>
+
+Speed boosts:  Faster Chores bonus, haste
+
+This command is used to create buildings using raw materials. If you build a
+shrine or temple, you must specify a god to dedicate it to. Most other
+buildings require a direction that they'll face. Resources are added from left
+to right in the requirements list (you can't add nails before lumber).
+
+You can just get information on a building, like what it costs to build, by
+typing "build info <building>".
+
+You can't build on land that's inside another empire's city radius while at war
+with that empire.
+
+Until a building is completed, you can walk into and out of it freely, and you
+can't build any additional rooms inside. Once finished, nobody who is not
+loyal to your empire will be able to enter.
+
+All buildings give experience as you add materials to their construction.
+
+Basic buildings:
+  &g.&0()&g.&0 hut
+  &y.&0()&y.&0 mudhut
+  (--) cabin
+  (==) house
+  &y.&0[]&y.&0 pueblo
+  &y[==]&0 cliffdwelling
+  (&c~~&0) well
+  &y/&0[]&y\&0 mine
+  (FF) forge
+  (MM) mill  (must be by a river)
+  (PP) potter
+  (SS) stable
+  .&g^&?.&co&0 park
+  .{}. shrine
+  vvvv fence
+  vxvv gate
+  {CC} cannery -- store fruits
+  {FF} foundry -- store metals
+  {GG} granary -- store grains
+  {PP} gravelpit -- store rocks
+  {LL} lumberyard -- store lumber
+  {SS} smokehouse -- store meats
+  {TT} tannery -- store skins
+  {UU} utilityshed -- store tools
+  |__| quarry -- must be on flat land facing a mountain
+  &y|__|&0 claypit -- must be on flat land facing water
+  ..x. familygravesite -- used as a respawn point (city only)
+
+For more information on building your first house, see HELP HOUSING GUIDE.
+
+See also: BUILD INFO, ARCHITECT, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE,
+   RECIPES
+#
+BURIALCAVERN "BURIAL CAVERN"
+
+&y/&0()&y\&0  Burial Cavern  (Mountain Engineering goal)
+
+Chameleon:  &y/\/\&0
+
+Some people prefer to be buried in hidden caves in the mountains.
+
+See also: TOMB
 #
 BURROWHAVEN "BURROW HAVEN" "STRANGE BURROW"
 
-&g^[]^&0  Burrow Haven  (Build Haven skill)
+&g^[]^&0  Burrow Haven  (Vampire Havens goal)
 
 Extra rooms:  6
-Special rooms:  crypt, tunnel, no hallway
+Special rooms:  crypt, tunnel
 Citizens:  1
 Chameleon:  &g^^^^&0
 
@@ -92,7 +181,7 @@ See also: DESIGNATE
 #
 CABIN
 
-(--)  Cabin  (Basic Buildings)
+(--)  Cabin  (Build ability)
 
 Citizens:  2
 
@@ -100,15 +189,15 @@ A cabin is slightly larger than a hut, but still contains just one room.
 #
 "CABINET OF CURIOSITIES" CABINETOFCURIOSITIES CURIOS
 
-[CC]  Cabinet of Curiosities  (Luxury ability)
+[CC]  Cabinet of Curiosities  (Architect ability)
 
 This building stores the rare items that are found in various adventures.
 
-See also:  LUXURY, STORAGE, TROPHY ROOM
+See also:  STORAGE, TROPHY ROOM
 #
 CANNERY
 
-{CC}  Cannery  (Basic Buildings)
+{CC}  Cannery  (Build ability)
 
 Stored here:  fruits
 
@@ -120,7 +209,7 @@ See also: STORAGE
 #
 CARPENTER
 
-(CC)  Carpenter  (Artisans ability)
+(CC)  Carpenter  (Foundations goal)
 
 The carpenter is a workshop for all manner of crafts. Certain craft items,
 such as wagons, require a carpenter shop for you to build them in.
@@ -129,10 +218,10 @@ See also:  CRAFT, WOODWORKING
 #
 CAVEHAVEN "CAVE HAVEN" "OBSCURE CAVE"
 
-&y/&0()&y\&0  Cave Haven  (Build Haven skill)
+&y/&0()&y\&0  Cave Haven  (Vampire Havens goal)
 
 Extra rooms:  6
-Special rooms:  crypt, tunnel, no hallway
+Special rooms:  crypt, tunnel
 Citizens:  1
 Chameleon:  &y/\/\&0
 
@@ -152,9 +241,27 @@ while you sleep.
 
 When you're done with the shelter, be sure to dismantle and abandon it.
 #
+CELESTIALFORGE "CELESTIAL FORGE"
+
+[FF]  Celestial Forge  (Renown goal)
+
+Command:  shatter <item to destroy>
+Fame:  5
+
+The celestial forge is a place not only to forge gear, but to destroy gear you
+no longer need and recycle it into shards. The number and type of shards you
+get are based on the level and quality of the item.
+
+You can see how many shards you have by typing 'coins'.
+
+The shards do not yet have a purpose, but in the future they will allow you to
+enhance your gear or buy other items.
+
+See also: CURRENCY
+#
 CEMETERY
 
-.i.i  Cemetery  (Monuments ability)
+.i.i  Cemetery  (Almost Famous goal)
 
 Cemeteries are a traditional place to bury the dead. When your character dies,
 you can re-spawn at a cemetery if your empire owns one on the same continent
@@ -164,19 +271,18 @@ See also: STARTING LOCATION, TOMB
 #
 CLAYPIT "CLAY PIT"
 
-&y|__|&0  Clay Pit  (Basic Buildings)
+&y|__|&0  Clay Pit  (Build ability)
 
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
 digging on unprepared ground. You can dig more clay from them before depletion.
 
-Clay pits count as in-city territory as far away as 3x a city's normal
-radius.
+Clay pits count as in-city territory when built in the outskirts (4x radius).
 
 See also: DIG
 #
 CLIFFDWELLING "CLIFF DWELLING"
 
-&y[==]&0  Cliff Dwelling  (Basic Buildings)
+&y[==]&0  Cliff Dwelling  (Build ability)
 
 Extra rooms:  3, interlink
 Citizens:  2
@@ -187,9 +293,20 @@ the mountain itself offers protection.
 
 See also: DESIGNATE
 #
+COASTALSHRINE "COASTAL SHRINE"
+
+&a~&0{}&a~&0  Coastal Shrine  (Stilt Buildings goal)
+
+Fame:  2
+
+Build this shrine over shallow seas to honor your favorite ocean deity. You can
+dedicate them to any player or god.
+
+See also: DEDICATE
+#
 COURTYARD "COURT YARD"
 
-....  Courtyard  (Luxury ability)
+....  Courtyard  (Architect ability)
 
 The courtyard is a well-appointed open space, well-planted and with fine
 paving stones. It is well-maintained and forests will not grow upon it.
@@ -198,7 +315,7 @@ This building can only be built in a city.
 #
 DOCK DOCKS
 
-&b~&0==&g.&0  Docks  (Seafaring ability)
+&b~&0==&g.&0  Docks  (Seafarers goal)
 
 The docks allow you a safe place to moor your ships, and are required for the
 shipping system.
@@ -207,7 +324,7 @@ See also:  BOARD, LOAD, SHIPPING, UNLOAD
 #
 DRAINAGE "OASIS DRAINAGE" "DRAINED OASIS" "DRAIN OASIS" "DRAINING OASIS"
 
-&y.&c__&y.&0  Draining Oasis  (Elder Crafts ability)
+&y.&c__&y.&0  Draining Oasis  (Stilt Buildings goal)
 
 By building drainage for an oasis, it can be converted into a normal desert.
 If the oasis was created using the 'excavate' command, you can alternatively use
@@ -217,7 +334,7 @@ See also: EXCAVATE
 #
 ESTUARYGARDEN "ESTUARY GARDEN"
 
-&b~&0##&b~&0  Estuary Garden  (Herb Gardens ability)
+&b~&0##&b~&0  Estuary Garden  (Luxury Resources goal)
 
 Grows:  whitegrass
 
@@ -228,28 +345,18 @@ You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
 #
-"ELDER CRAFTS"
-
-Elder Crafts
-Class ability:  Elder
-
-This ability allows you to build the following buildings:
-  &y.&c__&y.&0 drainage  (built on oasis)
-
-See also: BUILD, ELDER CLASS
-#
 "EXARCH CRAFTS"
 
 Exarch Crafts
-Class ability:  Exarch
+Trade Synergy Ability: 100 High Sorcery
 
 This ability allows you to build the following buildings:
   ..&C*&0. astralnexus
 
 Allows the following workforce options:
-  nexus-crystals - Also requires Skilled Labor
+  nexus-crystals - Also requires the Skilled Labor goal
 
-See also: BUILD, EXARCH CLASS, SKILLED LABOR
+See also: BUILD, SKILLED LABOR
 #
 GRAVE GRAVES "GRAVE MARKER"
 
@@ -258,13 +365,13 @@ grave marker. When you build your first city, you can use this item to build
 a grave for yourself. Use the 'tomb' command to set it as your tomb, and you
 will respawn there if you die nearby. This will save you a walk back.
 
-To build a more permanent grave, learn the Monuments ability.
+You can learn to build more permanent graves later.
 
-See also: BUILD, MONUMENTS, TOMB
+See also: BUILD, TOMB
 #
 "GREAT HALL" GREATHALL
 
-[**]  Great Hall (Luxury ability)
+[**]  Great Hall (Luxuries goal)
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
@@ -280,7 +387,7 @@ See also: DESIGNATE, PORTCULLIS, INTERLINK
 #
 FAMILYGRAVESITE "FAMILY GRAVESITE"
 
-..x.  Family Gravesite (Basic Buildings ability)
+..x.  Family Gravesite (Build ability)
 
 The family gravesite is a small tomb (respawn point) that you can build inside
 your cities. It can't be built outside of an established city, and won't work
@@ -290,16 +397,27 @@ See also: TOMB
 #
 FENCE
 
-vvvv  Fence  (Basic Buildings)
+vvvv  Fence  (Build ability)
 
 Fences will block the movement of NPCs, but not players. They count as in-city
-territory as far away as 3x a city's normal radius.
+territory even when built in the outskirts (4x radius).
 
 See also: GATE
 #
+FISHERY OCEANFISHERY RIVERFISHERY LAKEFISHERY
+
+&0(&a~~&0)  oceanfishery (Stilt Buildings goal)
+&0(&c~~&0)  riverfishery (Stilt Buildings goal)
+&0(&c~~&0)  lakefishery (Stilt Buildings goal)
+
+You can build a fishery on the coast (ocean), on a river, or on a lake. It
+supplies more fish than a normal water tile.
+
+See also: FISH
+#
 FOUNDRY
 
-{FF}  Foundry  (Basic Buildings)
+{FF}  Foundry  (Build ability)
 
 Stored here:  metals
 
@@ -311,7 +429,7 @@ See also: SMELT, STORAGE
 #
 FOUNTAIN
 
-{&c~~&0}  Fountain  (Luxury ability)
+{&c~~&0}  Fountain  (Architect ability)
 
 Fountains provide water, like a well.
 
@@ -321,7 +439,7 @@ See also: DRINK, FILL
 #
 GATE
 
-.xx.  vxxv  Gate  (Basic Buildings)
+.xx.  vxxv  Gate  (Build ability)
 
 A gate is an entrance for a fence. Since players are not blocked by fences,
 the gate is purely decorative.
@@ -330,7 +448,7 @@ See also: FENCE
 #
 GATEHOUSE "GATE HOUSE"
 
--==-  V||V  V\\V  Gatehouse  (Raise Armies ability)
+-==-  V||V  V\\V  Gatehouse  (Walled Town goal)
 
 The gatehouse creates a secure way through your walls. Only players who can
 infiltrate will make it through the gatehouse, and many of those will be
@@ -342,7 +460,7 @@ See also: INFILTRATE, PUBLICIZE, WALL
 #
 GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 
-(GG)  Glass Blower  (Artisans ability)
+(GG)  Glass Blower  (Foundations goal)
 
 The glass blower is an artisan shop that creates flasks, vials, panes, and
 many other glass items for the empire. This building's function is passive --
@@ -351,7 +469,7 @@ territory of an empire that has a glass blower in order to do certain crafts.
 #
 GRANARY
 
-{GG}  Granary  (Basic Buildings)
+{GG}  Granary  (Build ability)
 
 Stored here:  grains
 
@@ -363,7 +481,7 @@ See also: STORAGE
 #
 GRAVELPIT "GRAVEL PIT"
 
-{PP}  Gravel Pit  (Basic Buildings)
+{PP}  Gravel Pit  (Build ability)
 
 Stored here:  rocks and stone
 
@@ -375,7 +493,7 @@ See also: STORAGE
 #
 "GREAT WALLS" GREATWALLS
 
-&y^&0VV&y^&0  Great Wall  (Great Walls ability)
+&y^&0VV&y^&0  Great Wall  (Great Walls goal)
 
 Great Walls function like ordinary walls, but can be built on mountains.
 
@@ -383,9 +501,9 @@ See also: RIVERGATE
 #
 GUARDTOWER "GUARD TOWERS" "ADVANCED GUARD TOWER" "UPGRADED GUARD TOWER" "SUPERIOR GUARD TOWER"
 
-.TT.  Guard Tower  (Raise Armies ability)
-'TT'  Advanced Tower  (Advanced Tactics ability)
-"TT"  Superior Tower (Advanced Tactics ability)
+.TT.  Guard Tower  (Guard Towers goal)
+'TT'  Advanced Tower  (Defending the City goal)
+"TT"  Superior Tower (Superior Guard Towers goal)
 
 Guard towers are defensive structures that automatically shoot at foes within
 range. These are often an empire's first line of defense against intruders.
@@ -407,11 +525,11 @@ Guard towers do not block players from circling around them. For optimum
 protection, build lines of wall-tower-wall-tower-wall. The walls block the
 circle command.
 
-See also: CIRCLE, RAISE ARMIES, ADVANCED TACTICS
+See also: CIRCLE
 #
 HENGE "STONE HENGE"
 
-<<>>  Henge (Monuments ability)
+<<>>  Henge (Henge Construction goal)
 
 Fame:  4
 
@@ -424,7 +542,7 @@ See also: CHANT OF DRUIDS
 #
 HIGHTEMPLE "HIGH TEMPLE"
 
-[||]  High Temple  (Grand Monuments ability)
+[||]  High Temple  (Renown goal)
 
 Extra rooms: 5, interlink
 Fame:  10
@@ -436,7 +554,7 @@ See also: DEDICATE
 #
 HOUSE "SMALL HOUSE"
 
-(==)  House  (Basic Buildings)
+(==)  House  (Build ability)
 
 Extra rooms:  2
 Citizens:  2
@@ -449,7 +567,7 @@ See also: DESIGNATE, PUEBLO
 #
 HOUSEHAVEN "HOUSE HAVEN" "RICKETY OLD HOUSE"
 
-.[].  House Haven  (Build Haven skill)
+.[].  House Haven  (Vampire Havens goal)
 
 Extra rooms:  6
 Special rooms:  crypt
@@ -462,7 +580,7 @@ See also: DESIGNATE
 #
 HUT "SMALL HUT"
 
-&g.&0()&g.&0  Hut  (Basic Buildings)
+&g.&0()&g.&0  Hut  (Build ability)
 
 Citizens:  1
 
@@ -501,7 +619,7 @@ When you're done with the shelter, be sure to dismantle and abandon it.
 #
 LARGEHOUSE "LARGE HOUSE"
 
-[==]  Large House  (Housing ability)
+[==]  Large House  (Homestead goal)
 
 Extra rooms:  5
 Citizens:  4
@@ -512,7 +630,7 @@ See also: DESIGNATE
 #
 LUMBERYARD "LUMBER YARD"
 
-{LL}  Lumber Yard  (Basic Buildings)
+{LL}  Lumber Yard  (Build ability)
 
 Stored here:  trees and wood
 
@@ -524,7 +642,7 @@ See also: STORAGE
 #
 MEGALITH
 
-&g.&0||&g.&0  Megalith  (Monuments ability)
+&g.&0||&g.&0  Megalith  (Almost Famous goal)
 
 Fame:  1
 
@@ -532,7 +650,7 @@ A megalith is a giant stone which inspires reverence and awe.
 #
 MINECOMPLEX "MINE COMPLEX"
 
-&y/&0[]&y\&0  Mine Complex  (Housing ability)
+&y/&0[]&y\&0  Mine Complex  (Homestead goal)
 
 Extra rooms:  7, interlink
 Special rooms:  tunnel
@@ -543,16 +661,74 @@ tunnels adapted for living. These complexes can hold a large number of people.
 
 See also: DESIGNATE
 #
+MOUNTAINCRYPT "MOUNTAIN CRYPT"
+
+&y[oo]&0  Mountain Crypt  (Mountain Engineering goal)
+
+Fame: 2
+
+This crypt is constructed near the mountain peaks to bring glory to the hero
+interred within.
+
+See also: TOMB
+#
+MOUNTAINGARRISON "MOUNTAIN GARRISON"
+
+&y[BB]&0  Mountain Garrison  (Mountain Engineering gaol)
+
+Extra rooms:  10, interlink
+Military:  20
+
+House your military in the mountains, out of the reach of your enemies.
+
+See also: DESIGNATE, INTERLINK
+#
+MOUNTAINHALL "MOUNTAIN HALL"
+
+&y[**]&0  Mountain Hall  (Mountain Engineering goal)
+
+Extra rooms:  30, interlink
+Special rooms:  greathall, crypt, throne, vault, baths, laboratory, tunnel
+
+This great hall is carved into the side of the mountain, the most defensible
+type of terrain. Build your mountain empire by interlinking mountain halls and
+surrounding them with great walls.
+
+This building can only be built in a city.
+
+See also: DESIGNATE, INTERLINK
+#
+MOUNTAINLODGE "MOUNTAIN LODGE"
+
+&y(==)&0  Mountain Lodge  (Mountain Engineering goal)
+
+Extra rooms:  3
+Citizens:  2
+
+Live comfortably atop a snowy mountain with this rustic lodge.
+
+See also: HOME
+#
 MOUNTAINOUTPOST "MOUNTAIN OUTPOST"
 
-&y.&0/\&y.&0  Mountain Outpost  (Raise Armies ability)
+&y.&0/\&y.&0  Mountain Outpost  (Mountain Engineering goal)
+
+Military:  5
 
 A mountain outpost is a safe place constructed in the middle of the mountains.
 It has no other purpose.
 #
+MOUNTAINWELL "MOUNTAIN WELL"
+
+&y(&c~~&y)&0  Mountain Well  (Mountain Engineering goal)
+
+These wells provide water for your mountain settlement.
+
+See also: DRINK, FILL
+#
 MUDHUT "MUD HUT"
 
-&y.&0()&y.&0  Mud Hut  (Basic Buildings)
+&y.&0()&y.&0  Mud Hut  (Build ability)
 
 Citizens:  1
 
@@ -576,7 +752,7 @@ See also: PRIVILEGES
 #
 OASISGARDEN "OASIS GARDEN"
 
-&G^&C##&G^&0  Oasis Garden  (Herb Gardens ability)
+&G^&C##&G^&0  Oasis Garden  (Luxury Resources goal)
 
 Grows:  daggerbite, magewhisper
 
@@ -589,7 +765,7 @@ See also: PICK
 #
 OILMAKER "OIL MAKER"
 
-(OO)  Oilmaker  (Artisans ability)
+(OO)  Oilmaker  (Foundations goal)
 
 Stored here:  oil
 
@@ -597,15 +773,29 @@ The oilmaker is used to press olives and other resources into oil.
 
 See also: PRESS, STORAGE
 #
+PAINTER PAINTSHOP "PAINT SHOP" "PAINTER'S WORKSHOP" "PAINTERS WORKSHOP"
+
+[PP]  Painter's Workshop  (Foundations goal)
+
+Command:  build painter <direction>
+Stored here:  paints
+
+This building is used to make and store paints (although you also require
+glassblowing tech to make them). Only a Master Craftsman can learn to make
+paints, and can start the quest to make paints once a painter spawns in this
+building.
+
+See also: PAINT, QUEST
+#
 PARK
 
-&g.^.&co&0  Park  (Monuments ability)
+&g.^.&co&0  Park  (Build ability)
 
 Parks are a pleasant place to spend the day.
 #
 PIGEONPOST "PIGEON POST"
 
-[PP]  Pigeon Post  (Artisans ability)
+|PP|  Pigeon Post  (Foundations goal)
 
 The Pigeon Post is a service that uses highly-trained birds to send mail across
 the world. You can receive mail anywhere, but must send it from the Post.
@@ -614,7 +804,7 @@ See also: MAIL
 #
 PORTCULLIS "CASTLE PORTCULLIS" CASTLE PALACE
 
-V[]V  Portcullis (Luxury ability)
+V[]V  Portcullis (Luxuries goal)
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
@@ -628,7 +818,7 @@ See also: DESIGNATE, GREAT HALL, INTERLINK
 #
 PUEBLO
 
-&y.&0[]&y.&0  Pueblo  (Basic Buildings)
+&y.&0[]&y.&0  Pueblo  (Build ability)
 
 Citizens:  2
 Extra rooms:  2
@@ -642,7 +832,7 @@ See also: DESIGNATE, HOUSE, OLD PUEBLO
 #
 PUEBLOHAVEN "PUEBLO HAVEN" "OLD PUEBLO"
 
-&y.&0[]&y.&0  Pueblo Haven  (Build Haven skill)
+&y.&0[]&y.&0  Pueblo Haven  (Vampire Havens goal)
 
 Extra rooms:  6
 Special rooms:  crypt
@@ -655,7 +845,7 @@ See also: DESIGNATE
 #
 PYRAMID
 
-&y/^^\&0  Pyramid  (Grand Monuments)
+&y/^^\&0  Pyramid  (Renown goal)
 
 Fame:  15
 
@@ -666,7 +856,7 @@ See also: DEDICATE
 #
 RAFTGARDEN "RAFT GARDEN"
 
-&c~&b##&c~&0  Raft Garden  (Herb Gardens ability)
+&c~&b##&c~&0  Raft Garden  (Luxury Resources goal)
 
 Grows:  bileberries
 
@@ -679,7 +869,7 @@ See also: PICK
 #
 RIVERGATE "RIVER GATE"
 
-V&c||&0V  River Gate  (Great Walls ability)
+V&c||&0V  River Gate  (Great Walls goal)
 
 River Gates are like gatehouses that can be built on rivers, and allow only
 friendly ships and canoes through.
@@ -716,7 +906,7 @@ See also: MAINTAIN
 #
 SHADYGARDEN "SHADY GARDEN"
 
-&g|&y##&g|&0  Shady Garden  (Herb Gardens ability)
+&g|&y##&g|&0  Shady Garden  (Luxury Resources goal)
 
 Grows:  fiveleaf
 
@@ -729,7 +919,7 @@ See also: PICK
 #
 SHRINE
 
-.{}.  Shrine  (Monuments ability)
+.{}.  Shrine  (Build ability)
 
 Fame:  1
 
@@ -740,7 +930,7 @@ See also: DEDICATE
 #
 SMOKEHOUSE "SMOKE HOUSE"
 
-{SS}  Smoke House  (Basic Buildings)
+{SS}  Smoke House  (Build ability)
 
 Features: cooking fire
 Stored here:  meats
@@ -753,7 +943,7 @@ See also: STORAGE
 #
 STABLE
 
-(SS)  Stable  (Basic Buildings)
+(SS)  Stable  (Build ability)
 
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.
@@ -766,7 +956,7 @@ See also: BARDE, MILK, SHEAR
 #
 STATUE
 
-.}{.  Statue  (Monuments ability)
+.}{.  Statue  (Almost Famous goal)
 
 Fame:  2
 
@@ -777,14 +967,24 @@ See also: DEDICATE
 #
 STEPS
 
-.==.  Steps  (Artisans ability)
+.==.  Steps  (Luxuries goal)
 
 Steps are similar to roads, but indicate rising terrain. These might be the
 steps to a great monument, or merely the main street of a town on a hillside.
 #
+STILTHOUSE "STILT HOUSE"
+
+Extra rooms:  3
+Citizens:  2
+
+This house lets you live serenely above the water. You can build a stilt house
+on shallow ocean, river, or lake.
+
+See also: DESIGNATE, HOME
+#
 STONEHOUSE "STONE HOUSE"
 
-[--]  Stone House  (Housing ability)
+[--]  Stone House  (Homestead goal)
 
 Extra rooms:  3
 Citizens:  2
@@ -796,64 +996,64 @@ See also: DESIGNATE
 #
 SWAMPWALK "SWAMP WALK"
 
-&c~&0--&c~&0  Swamp Walk  (Swamp Engineering ability)
+&c~&0--&c~&0  Swamp Walk  (Swamp Engineering goal)
 
 The swamp walk, though never very stable, makes travel through the swamp
 much easier. Swamp animals may still harass you, but you will avoid random
-attacks by crocodilians.
+attacks by crocodilians. This can also be built on marshes.
 
-See also: BUILDING, SWAMP ENGINEERING
+See also: BUILDING
 #
 SWAMPHUT "SWAMP HUT"
 
-&c~&0/\&c~&0  Swamp Hut  (Swamp Engineering ability)
+&c~&0/\&c~&0  Swamp Hut  (Swamp Engineering goal)
 
 Extra rooms:  3
 Citizens:  2
 
-A swamp hut is a good-sized home supported on stilts above the swamp.
+A swamp hut is a good-sized home supported on stilts above the swamp (or
+marsh).
 
-See also: DESIGNATE, SWAMP ENGINEERING
+See also: DESIGNATE
 #
 SWAMPMANOR "SWAMP MANOR"
 
-&c~&0[]&c~&0  Swamp Manor  (Swamp Engineering ability)
+&c~&0[]&c~&0  Swamp Manor  (Swamp Engineering goal)
 
 Extra rooms:  5
 Citizens:  4
 
 The swamp manor is a grand house that is built only in the swamp. It is fire-
-proof and comparable to a large house.
+proof and comparable to a large house. You can also build this on marshes.
 
-See also: DESIGNATE, SWAMP ENGINEERING
+See also: DESIGNATE
 #
 SWAMPCOMPLEX "SWAMP COMPLEX"
 
-&c~&0()&c~&0  Swamp Complex  (Swamp Engineering ability)
+&c~&0()&c~&0  Swamp Complex  (Swamp Engineering goal)
 
 Extra rooms:  7, interlink
 Citizens:  2
 Chameleon: &c~~~~&0
 
 A swamp complex is a well-hidden, large home that can only be built in the
-swamp. It is designed to be difficult to see from a distance.
+swamp. It is designed to be difficult to see from a distance. You can also
+build this on marshes.
 
-See also: DESIGNATE, SWAMP ENGINEERING
+See also: DESIGNATE
 #
 SWAMPPLATFORM "SWAMP PLATFORM"
 
-&c~&0__&c~&0  Swamp Platform  (Swamp Engineering ability)
+&c~&0__&c~&0  Swamp Platform  (Stilt Buildings goal)
 
-By building a sturdy platform on top of swampland, you can effectively build
-"plains-only" buildings in the swamp. Once complete, the platform becomes an
-ordinary plains. If you don't build on it soon, though, the swamp will re-claim
-it.
-
-See also: SWAMP ENGINEERING
+By building a sturdy platform on top of swampland (or marshland), you can
+effectively build "plains-only" buildings in the swamp. Once complete, the
+platform becomes an ordinary plains. If you don't build on it soon, though,
+the swamp will re-claim it.
 #
 TAILOR
 
-(TT)  Tailor  (Artisans ability)
+(TT)  Tailor  (Foundations goal)
 
 Stored here:  cotton, wool, cloth
 Command:  weave
@@ -867,7 +1067,7 @@ See also: STORAGE, WEAVE
 #
 TANNERY
 
-{TT}  Tannery  (Basic Buildings)
+{TT}  Tannery  (Build ability)
 
 Stored here:  skins, furs, and leathers
 Command:  tan
@@ -882,7 +1082,7 @@ See also: STORAGE, TAN
 #
 TAVERN
 
-Tavern building (Artisans skill)
+Tavern building (Foundations goal skill)
 
 Building:  [TT]  Tavern
 Command:  tavern [type]
@@ -904,7 +1104,7 @@ Brewing takes 5 of each ingredient at a time.
 #
 TEMPLE
 
-[[]]  Temple  (Monuments ability)
+[[]]  Temple  (Almost Famous goal)
 
 Fame:  4
 
@@ -915,7 +1115,7 @@ See also: DEDICATE
 #
 TERRACEDGARDEN "TERRACED GARDEN"
 
-&y/&r##&y\&0  Terraced Garden  (Herb Gardens ability)
+&y/&r##&y\&0  Terraced Garden  (Luxury Resources goal)
 
 Grows:  redthorn
 
@@ -929,7 +1129,7 @@ See also: PICK
 #
 TOMB
 
-[oo]  Tomb  (Monuments ability)
+[oo]  Tomb  (Almost Famous goal)
 
 Fame:  1
 
@@ -947,7 +1147,7 @@ See also: CEMETERY, STARTING LOCATION
 #
 "TOWER OF SORCERY" TOWEROFSORCERY SORCERYTOWER "SORCERY TOWER"
 
-&g.&b||&g.&0  Tower of Sorcery  (Luxury ability)
+&g.&b||&g.&0  Tower of Sorcery  (Sorcery Tower Construction goal)
 
 Extra rooms:  1
 Special rooms: sorcery tower, skybridge
@@ -968,16 +1168,16 @@ See also: DESIGNATE, HIGH SORCERY, REDESIGNATE, STUDY
 #
 TRADINGPOST "TRADING POST"
 
-[$$]  Trading Post  (Trade Routes ability)
+[$$]  Trading Post  (Trade Routes goal)
 
 The trading post allows you to buy and sell unique items (including crafted
 gear and things from adventure zones) on the global market.
 
-See also: TRADE ROUTES, TRADE COMMAND
+See also: TRADE COMMAND
 #
 "TRAINING YARD" TRAININGYARD YARD
 
-[  ]  Training Yard (Raise Armies ability)
+[  ]  Training Yard (Fortifications goal)
 
 Extra rooms:  10, interlink
 Military:  20
@@ -989,17 +1189,17 @@ See also: DESIGNATE, INTERLINK
 #
 TRAPPERSPOST "TRAPPERS POST" "TRAPPING POST" "TRAPPER'S POST"
 
-&g^/\^&0  Trapper's Post  (Luxury ability)
+&g^/\^&0  Trapper's Post  (Luxury Resources goal)
 
 The trapper's post is a place where trappers come to trade their skins. This
-building is required in order for your workforce to gather skin. Trapper's
+building is required in order for your workforce to gather skins. Trapper's
 Posts become depleted like any other resource.
 
 See also: DEPLETION, WORKFORCE, SKILLED LABOR
 #
 TREECOMPLEX "TREE COMPLEX"
 
-&g^[]^&0  Tree Complex  (Housing ability)
+&g^[]^&0  Tree Complex  (Homestead goal)
 
 Extra rooms:  7, interlink
 Special rooms:  skybridge
@@ -1014,7 +1214,7 @@ See also: DESIGNATE
 #
 TREEHOUSE "TREE HOUSE"
 
-&g^()^&0  Tree House  (Housing ability)
+&g^()^&0  Tree House  (Homestead goal)
 
 Extra rooms:  3
 Special rooms:  skybridge
@@ -1044,12 +1244,34 @@ stores items that are found on various adventures.
 
 See also: CABINET OF CURIOSITIES, STORAGE
 #
+TUNNEL
+
+&y/&0OO&y\&0  Tunnel  (Mountain Engineering goal)
+
+Command:  tunnel <direction>
+
+This command allows you to begin construction on a tunnel through a mountain
+range. Tunnels always go in a straight line, and you can't pass through each
+part of a tunnel until it is finished. If you destroy one side of the tunnel,
+the other side will result in a dead end.
+
+To begin the tunnel, stand on flat ground (plains, desert, etc) next to the
+mountain and type "tunnel east" (or whichever way the mountain is). You must
+have permission to build on both ends of the tunnel (you can't tunnel into
+someone else's claimed land).
+
+The entrance and exit to the tunnel will be on the mountain tiles at the ends.
+
+Tunnels may be interlinked.
+
+See also: DISMANTLE, INTERLINK
+#
 UNDERGROUNDCOMPLEX "UNDERGROUND COMPLEX" "UNDERGROUND PASSAGE"
 
-&g.&0()&g.&0  Underground Complex  (Housing ability)
+&g.&0()&g.&0  Underground Complex  (Homestead goal)
 
 Extra rooms:  7, interlink
-Special rooms:  tunnel, no hallway
+Special rooms:  tunnel
 Citizens:  4
 Chameleon:  &g....&0 or &Y....&0
 
@@ -1060,7 +1282,7 @@ See also: DESIGNATE
 #
 UTILITYSHED "UTILITY SHED" TOOLSHED "TOOL SHED"
 
-{UU}  Utility Shed  (Basic Buildings)
+{UU}  Utility Shed  (Build ability)
 
 Stored here:  tools
 
@@ -1073,9 +1295,18 @@ cannot be stored here).
 
 See also: STORAGE
 #
+VOLCANICFORGE "VOLCANIC FORGE"
+
+&y(FF)&0  Volcanic Forge  (Mountain Engineering goal)
+
+This forge uses a magma chamber deep inside the mountain to smelt and shape
+powerful metals.
+
+See also: FORGE
+#
 WALL WALLS
 
-VVVV  Wall  (Raise Armies skill)
+VVVV  Wall  (Walled Town goal)
 
 Walls will keep most people out, so long as they are continuous. You can also
 alternate between buildings and walls and still keep people from using circle
@@ -1087,7 +1318,7 @@ See also: CIRCLE, GATEHOUSE, GREAT WALLS, RITUAL OF DEFENSE
 #
 WELL
 
-(&c~~&0)  Well  (Basic Buildings)
+(&c~~&0)  Well  (Build ability)
 
 Wells provide water for your little settlement.
 

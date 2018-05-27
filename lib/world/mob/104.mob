@@ -333,7 +333,6 @@ I 4 10464 5.00 1 a  # LOOT: Wargreyn's ring
 I 4 10465 5.00 1 a  # LOOT: the blacksmith's charm
 I 4 10466 5.00 1 a  # LOOT: the goblinsmith's hammer
 I 4 10467 5.00 1 a  # LOOT: a wargskull shield
-T 10457
 T 10453
 S
 #10452
@@ -347,7 +346,6 @@ I 4 10452 15.00 1 a  # LOOT: Pimmin's ring
 I 4 10453 15.00 1 a  # LOOT: a bone charm necklace
 I 4 10454 15.00 1 a  # LOOT: a chicken-bone wand
 I 4 10455 15.00 1 a  # LOOT: the goblinward tome
-T 10458
 T 10214
 S
 #10453
@@ -361,7 +359,6 @@ I 4 10458 15.00 1 a  # LOOT: Shivsper's poison ring
 I 4 10459 15.00 1 a  # LOOT: a gaudy copper chain
 I 4 10460 15.00 1 a  # LOOT: someone else's axe
 I 4 10461 15.00 1 a  # LOOT: a giant dagger
-T 10459
 T 10453
 S
 #10454
@@ -375,7 +372,6 @@ I 4 10464 15.00 1 a  # LOOT: Wargreyn's ring
 I 4 10465 15.00 1 a  # LOOT: the blacksmith's charm
 I 4 10466 15.00 1 a  # LOOT: the goblinsmith's hammer
 I 4 10467 15.00 1 a  # LOOT: a wargskull shield
-T 10460
 T 10456
 S
 #10455

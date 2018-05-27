@@ -2,7 +2,7 @@
 Caravan setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -11,11 +11,21 @@ if (!%inter.aft%)
 end
 detach 921 %self.id%
 ~
+#929
+bloodletter arrows~
+1 s 25
+~
+set scale 100
+%send% %actor% %target.name% begins to bleed from the wound left by your bloodletter arrow!
+%send% %target% You begin to bleed from the wound left by %actor.name%'s bloodletter arrow!
+%echoneither% %target% %actor% %target.name% begins to bleed from the wound left by %actor.name%'s bloodletter arrow!
+%dot% %target% %scale% 15 physical
+~
 #952
 Caravel setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter% || %inter.aft%)
   halt
 end
@@ -26,7 +36,7 @@ detach 952 %self.id%
 Cog setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter% || %inter.down%)
   halt
 end
@@ -37,7 +47,7 @@ detach 953 %self.id%
 Longship setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter% || %inter.aft%)
   halt
 end
@@ -48,7 +58,7 @@ detach 954 %self.id%
 Brigantine setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -64,7 +74,7 @@ detach 955 %self.id%
 Carrack setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end
@@ -80,7 +90,7 @@ detach 956 %self.id%
 Hulk setup~
 5 n 100
 ~
-eval inter %self.interior%
+set inter %self.interior%
 if (!%inter%)
   halt
 end

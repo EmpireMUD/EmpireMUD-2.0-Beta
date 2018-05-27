@@ -41,6 +41,12 @@ extern const char *name_sets[];
 // external funcs
 extern char **get_weapon_types_string();
 
+// locals
+const char *default_mob_keywords = "mobile new";
+const char *default_mob_short = "a new mobile";
+const char *default_mob_long = "A new mobile is standing here.\r\n";
+
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -59,7 +65,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 
-	if (!str_cmp(GET_PC_NAME(mob), "mobile new")) {
+	if (!str_cmp(GET_PC_NAME(mob), default_mob_keywords)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Keywords not set");
 		problem = TRUE;
 	}
@@ -73,7 +79,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		}
 	} while (*ptr);
 	
-	if (!str_cmp(GET_SHORT_DESC(mob), "a new mobile")) {
+	if (!str_cmp(GET_SHORT_DESC(mob), default_mob_short)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc not set");
 		problem = TRUE;
 	}
@@ -100,7 +106,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		}
 	} while (*ptr);
 	
-	if (!str_cmp(GET_LONG_DESC(mob), "A new mobile is standing here.\r\n")) {
+	if (!str_cmp(GET_LONG_DESC(mob), default_mob_long)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not set");
 		problem = TRUE;
 	}
@@ -294,9 +300,11 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	descriptor_data *desc;
 	struct global_data *glb, *next_glb;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
+	shop_data *shop, *next_shop;
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	struct mount_data *mount;
@@ -386,6 +394,17 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_KILL_MOB, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
+		}
+	}
+	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
@@ -414,6 +433,16 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found |= delete_from_interaction_list(&GET_SECT_INTERACTIONS(sect), TYPE_MOB, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
+		}
+	}
+	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_MOBILE, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
 	
@@ -454,6 +483,14 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the mob you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_KILL_MOB, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A mobile used by the progression goal you're editing has been deleted.\r\n");
+			}
+		}
 		if (GET_OLC_QUEST(desc)) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
@@ -471,6 +508,14 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 			if (delete_from_interaction_list(&GET_OLC_ROOM_TEMPLATE(desc)->interactions, TYPE_MOB, vnum)) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the room template you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(desc)) {
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_MOBILE, vnum);
+			
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A mobile used by the shop you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SECTOR(desc)) {
@@ -516,9 +561,11 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	struct interaction_item *inter;
 	struct global_data *glb, *next_glb;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
+	shop_data *shop, *next_shop;
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	int size, found;
@@ -600,6 +647,20 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_KILL_MOB, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+		}
+	}
+	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		if (size >= sizeof(buf)) {
@@ -649,6 +710,17 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_MOBILE, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+		}
+	}
+	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		if (size >= sizeof(buf)) {
@@ -683,6 +755,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	mob_vnum vnum = GET_OLC_VNUM(desc);
 	struct interaction_item *interact;
 	struct quest_lookup *ql;
+	struct shop_lookup *sl;
 	UT_hash_handle hh;
 	bool changed;
 	
@@ -771,12 +844,14 @@ void save_olc_mobile(descriptor_data *desc) {
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	ql = proto->quest_lookups;	// save lookups
+	sl = proto->shop_lookups;
 	
 	*proto = *mob;
 	proto->vnum = vnum;	// ensure correct vnum
 	
 	proto->hh = hh;	// restore hash handle
 	proto->quest_lookups = ql;	// restore lookups
+	proto->shop_lookups = sl;
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_MOB, vnum);
@@ -816,9 +891,9 @@ char_data *setup_olc_mobile(char_data *input) {
 	}
 	else {
 		// brand new
-		GET_PC_NAME(new) = str_dup("mobile new");
-		GET_SHORT_DESC(new) = str_dup("a new mobile");
-		GET_LONG_DESC(new) = str_dup("A new mobile is standing here.\r\n");
+		GET_PC_NAME(new) = str_dup(default_mob_keywords);
+		GET_SHORT_DESC(new) = str_dup(default_mob_short);
+		GET_LONG_DESC(new) = str_dup(default_mob_long);
 		MOB_FLAGS(new) = MOB_ISNPC;
 		MOB_ATTACK_TYPE(new) = TYPE_HIT;
 
@@ -853,52 +928,52 @@ void olc_show_mobile(char_data *ch) {
 	}
 	
 	*buf = '\0';
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !mob_proto(GET_OLC_VNUM(ch->desc)) ? "new mobile" : GET_SHORT_DESC(mob_proto(GET_OLC_VNUM(ch->desc))));
-	sprintf(buf + strlen(buf), "<&ykeywords&0> %s\r\n", GET_PC_NAME(mob));
-	sprintf(buf + strlen(buf), "<&yshortdescription&0> %s\r\n", GET_SHORT_DESC(mob));
-	sprintf(buf + strlen(buf), "<&ylongdescription&0> %s", GET_LONG_DESC(mob));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !mob_proto(GET_OLC_VNUM(ch->desc)) ? "new mobile" : GET_SHORT_DESC(mob_proto(GET_OLC_VNUM(ch->desc))));
+	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_PC_NAME(mob), default_mob_keywords), GET_PC_NAME(mob));
+	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_SHORT_DESC(mob), default_mob_short), GET_SHORT_DESC(mob));
+	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_LONG_DESC(mob), default_mob_long), GET_LONG_DESC(mob));
 	
-	sprintf(buf + strlen(buf), "<&ysex&0> %s\r\n", genders[GET_SEX(mob)]);
+	sprintf(buf + strlen(buf), "<%ssex\t0> %s\r\n", OLC_LABEL_VAL(GET_SEX(mob), 0), genders[GET_SEX(mob)]);
 	
 	sprintbit(MOB_FLAGS(mob), action_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MOB_FLAGS(mob), MOB_ISNPC), buf1);
 	
 	sprintbit(AFF_FLAGS(mob), affected_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<&yaffects&0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(AFF_FLAGS(mob), NOBITS), buf1);
 
 	if (GET_MIN_SCALE_LEVEL(mob) > 0) {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_MIN_SCALE_LEVEL(mob));
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_MIN_SCALE_LEVEL(mob), 0), GET_MIN_SCALE_LEVEL(mob));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
 	if (GET_MAX_SCALE_LEVEL(mob) > 0) {	
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_MAX_SCALE_LEVEL(mob));
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_MAX_SCALE_LEVEL(mob), 0), GET_MAX_SCALE_LEVEL(mob));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<&yattack&0> %s\r\n", attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
-	sprintf(buf + strlen(buf), "<&ymovetype&0> %s\r\n", mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
-	sprintf(buf + strlen(buf), "<&ynameset&0> %s\r\n", name_sets[MOB_NAME_SET(mob)]);
-	sprintf(buf + strlen(buf), "<&yallegiance&0> %s\r\n", MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
+	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), TYPE_HIT), attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
+	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
+	sprintf(buf + strlen(buf), "<%snameset\t0> %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)]);
+	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
-	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(mob->interactions));
 	if (mob->interactions) {
 		get_interaction_display(mob->interactions, buf1);
 		strcat(buf, buf1);
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(MOB_CUSTOM_MSGS(mob)));
 	count = 0;
 	LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
-		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
+		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
 	}
 	
-	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(mob->proto_script));
 	if (mob->proto_script) {
 		get_script_display(mob->proto_script, buf1);
 		strcat(buf, buf1);
@@ -925,7 +1000,7 @@ OLC_MODULE(medit_allegiance) {
 		msg_to_char(ch, "Set the mob's allegiance to which faction (or 'none')?\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
-		msg_to_char(ch, "You set its allegience to 'none'.\r\n");
+		msg_to_char(ch, "You set its allegiance to 'none'.\r\n");
 		MOB_FACTION(mob) = NULL;
 	}
 	else if (!(fct = find_faction(argument))) {
@@ -947,140 +1022,9 @@ OLC_MODULE(medit_attack) {
 
 
 OLC_MODULE(medit_custom) {
+	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
-	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct custom_message *mcm, *change, *temp;
-	int num, iter, msgtype;
-	bool found;
-	
-	// arg1 arg2
-	half_chop(argument, arg1, arg2);
-	
-	if (is_abbrev(arg1, "remove")) {
-		if (!*arg2) {
-			msg_to_char(ch, "Remove which custom message (number)?\r\n");
-		}
-		else if (!str_cmp(arg2, "all")) {
-			while ((mcm = MOB_CUSTOM_MSGS(mob))) {
-				MOB_CUSTOM_MSGS(mob) = mcm->next;
-				if (mcm->msg) {
-					free(mcm->msg);
-				}
-				free(mcm);
-			}
-			msg_to_char(ch, "You remove all the custom messages.\r\n");
-		}
-		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
-			msg_to_char(ch, "Invalid custom message number.\r\n");
-		}
-		else {
-			found = FALSE;
-			for (mcm = MOB_CUSTOM_MSGS(mob); mcm && !found; mcm = mcm->next) {
-				if (--num == 0) {
-					found = TRUE;
-					
-					msg_to_char(ch, "You remove custom message #%d.\r\n", atoi(arg2));
-					
-					REMOVE_FROM_LIST(mcm, MOB_CUSTOM_MSGS(mob), next);
-					if (mcm->msg) {
-						free(mcm->msg);
-					}
-					free(mcm);
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid custom message number.\r\n");
-			}
-		}
-	}
-	else if (is_abbrev(arg1, "add")) {
-		msgstr = any_one_word(arg2, arg);
-		skip_spaces(&msgstr);
-		
-		if (!*arg || !*msgstr) {
-			msg_to_char(ch, "Usage: custom add <type> <string>\r\n");
-		}
-		else if ((msgtype = search_block(arg, mob_custom_types, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
-		}
-		else {
-			delete_doubledollar(msgstr);
-			
-			CREATE(mcm, struct custom_message, 1);
-
-			mcm->type = msgtype;
-			mcm->msg = str_dup(msgstr);
-			mcm->next = NULL;
-			
-			// append to end
-			if (MOB_CUSTOM_MSGS(mob)) {
-				temp = MOB_CUSTOM_MSGS(mob);
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = mcm;
-			}
-			else {
-				MOB_CUSTOM_MSGS(mob) = mcm;
-			}
-			
-			msg_to_char(ch, "You add a custom '%s' message:\r\n%s\r\n", mob_custom_types[mcm->type], mcm->msg);			
-		}
-	}
-	else if (is_abbrev(arg1, "change")) {
-		half_chop(arg2, num_arg, arg1);
-		half_chop(arg1, type_arg, val_arg);
-		
-		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
-			msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
-			return;
-		}
-		
-		// find which one to change
-		num = atoi(num_arg);
-		change = NULL;
-		for (mcm = MOB_CUSTOM_MSGS(mob); mcm && !change; mcm = mcm->next) {
-			if (--num == 0) {
-				change = mcm;
-				break;
-			}
-		}
-		
-		if (!change) {
-			msg_to_char(ch, "Invalid custom message number.\r\n");
-		}
-		else if (is_abbrev(type_arg, "type")) {
-			if ((msgtype = search_block(val_arg, mob_custom_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
-			}
-			else {
-				change->type = msgtype;
-				msg_to_char(ch, "Custom message %d changed to type %s.\r\n", atoi(num_arg), mob_custom_types[msgtype]);
-			}
-		}
-		else if (is_abbrev(type_arg, "message")) {
-			if (change->msg) {
-				free(change->msg);
-			}
-			delete_doubledollar(val_arg);
-			change->msg = str_dup(val_arg);
-			msg_to_char(ch, "Custom message %d changed to: %s\r\n", atoi(num_arg), val_arg);
-		}
-		else {
-			msg_to_char(ch, "You can only change the type or message.\r\n");
-		}
-	}
-	else {
-		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
-		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
-		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
-		msg_to_char(ch, "Available types:\r\n");
-		for (iter = 0; *mob_custom_types[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %s\r\n", mob_custom_types[iter]);
-		}
-	}
+	olc_process_custom_messages(ch, argument, &MOB_CUSTOM_MSGS(mob), mob_custom_types);
 }
 
 

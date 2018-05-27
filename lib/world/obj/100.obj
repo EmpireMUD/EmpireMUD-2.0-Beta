@@ -1,13 +1,13 @@
 #10000
 portal strange green~
 a strange green portal~
-A strange green portal has opened in one of the trees!~
+A strange green portal has opened in one of the trees! (adventure)~
    The portal crackles and hisses with a strange energy that is at once natural
 and unnatural. You can't see the other side of the portal, but the way it has
 formed in a tree gives you the strange feeling that there are powerful natural
 forces at work here.
 ~
-8 0 0 1
+8 0 0 2
 0 0 0
 10 0
 S
@@ -97,13 +97,9 @@ a dragon scale~
 A dragon scale is lying on the ground.~
 The dragon scale looks like you could use it to craft something impressive.
 ~
-15 el a 3
+15 el a 4
 1 0 0
 7 0
-R
-5184 a
-R
-5621 a
 R
 5193 a
 R
@@ -172,20 +168,22 @@ S
 #10011
 grate sewer~
 an open sewer grate~
-The sewer grate is propped open.~
-The sewer grate is propped open and you can hear sounds coming from beneath.
+The sewer grate is propped open. (adventure)~
+   The sewer grate is propped open and you can hear sounds coming from beneath.
+Enter the grate to check it out.
 ~
-8 0 0 1
+8 0 0 3
 -1 0 0
 2 0
 S
 #10012
 grate sewer exit ladder~
 the exit~
-A ladder leads up to the sewer's exit.~
-The scent of fresh air wafts down from the sewer's exit.
+A ladder leads up to the sewer's exit. (climb)~
+   The scent of fresh air wafts down from the sewer's exit. You can 'enter
+exit' to leave the sewer.
 ~
-8 0 0 2
+8 0 0 3
 -1 0 0
 2 0
 T 10450
@@ -334,9 +332,15 @@ a vial of sewage~
 A grimy vial is lying here.~
 You wouldn't quaff this vial on purpose, if you knew where it came from.
 ~
-25 m a 2
-8 0 0
+25 m a 5
+-1 0 3030
 8 8064
+A
+2 1 0
+C
+50 50
+R
+5130 0
 S
 #10025
 hat ratsnest nest dirty~
@@ -682,9 +686,15 @@ a vial of pixy dust~
 A vial of pixy dust is lying here.~
 The vial contains a sparkly green substance.
 ~
-25 0 a 1
-14 0 0
+25 0 a 4
+-1 0 3030
 8 0
+B
+q
+C
+50 50
+R
+5130 0
 S
 #10053
 sword glass~

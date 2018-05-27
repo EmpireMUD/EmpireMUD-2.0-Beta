@@ -134,7 +134,7 @@ monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
 fade and lose its hold. Almost instantly, the rift begins to collapse.
 Hopefully nobody is trapped on the wrong side of it!
 ~
-9 bc 75 100 0
+13 bc 75 100 0
 A
 2 10142
 P
@@ -161,7 +161,6 @@ R
 0 0 3
 R
 2 10169 1
-T 10174
 T 18259
 W
 12 10140 0 1 a
@@ -287,7 +286,7 @@ the finished product back to the wandering merchant.
    You hand the merchant the herbicide. His face lights up to see so much of
 it, and you can tell he's eager to douse some of the animated cacti with it.
 ~
-10 cd 75 100 1440
+11 cd 75 100 1440
 A
 1 10146
 P
@@ -312,7 +311,6 @@ R
 0 0 3
 R
 2 10169 1
-T 10142
 T 10173
 T 18259
 W

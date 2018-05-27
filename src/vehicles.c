@@ -42,7 +42,7 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 // local protos
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
-extern room_data *create_room();
+extern room_data *create_room(room_data *home);
 
 // external consts
 extern const char *designate_flags[];
@@ -58,6 +58,40 @@ extern bool validate_icon(char *icon);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Cancels vehicle ownership on vehicles whose empires are gone, allowing those
+* vehicles to be cleaned up by players.
+*/
+void abandon_lost_vehicles(void) {
+	vehicle_data *veh;
+	empire_data *emp;
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (!(emp = VEH_OWNER(veh))) {
+			continue;	// only looking to abandon owned vehs
+		}
+		if (EMPIRE_IMM_ONLY(emp)) {
+			continue;	// imm empire vehicles could be disastrous
+		}
+		if (EMPIRE_MEMBERS(emp) > 0 || EMPIRE_TERRITORY(emp, TER_TOTAL) > 0) {
+			continue;	// skip empires that still have territory or members
+		}
+		
+		// found!
+		VEH_OWNER(veh) = NULL;
+		
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+		}
+		
+		if (VEH_IS_COMPLETE(veh)) {
+			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
+			et_lose_vehicle(emp, VEH_VNUM(veh));
+		}
+	}
+}
+
 
 /**
 * @param vehicle_data *veh Any vehicle instance.
@@ -167,7 +201,7 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	}
 	
 	// otherwise, create the interior
-	room = create_room();
+	room = create_room(NULL);
 	attach_building_to_room(bld, room, TRUE);
 	COMPLEX_DATA(room)->home_room = NULL;
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_IN_VEHICLE);
@@ -486,6 +520,13 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	CREATE(vrl, struct vehicle_room_list, 1);
 	vrl->room = room;
 	LL_APPEND(VEH_ROOM_LIST(veh), vrl);
+	
+	// initial island data
+	if (IN_ROOM(veh)) {
+		GET_ISLAND_ID(room) = GET_ISLAND_ID(IN_ROOM(veh));
+		GET_ISLAND(room) = GET_ISLAND(IN_ROOM(veh));
+		GET_MAP_LOC(room) = GET_MAP_LOC(IN_ROOM(veh));
+	}
 }
 
 
@@ -725,6 +766,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh = vehicle_proto(vnum);
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
 	struct adventure_spawn *asp;
@@ -744,6 +786,20 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
+	
+	// progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_VEHICLE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -956,7 +1012,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		}
 		
 		LL_FOREACH (SCRIPT(veh)->global_vars, tvd) {
-			if (*tvd->name == '-') { // don't save if it begins with -
+			if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 				continue;
 			}
 			
@@ -1865,6 +1921,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
 	descriptor_data *desc;
@@ -1905,6 +1962,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
 		}
 	}
 	
@@ -1949,6 +2017,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
@@ -2323,49 +2399,49 @@ void olc_show_vehicle(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !vehicle_proto(VEH_VNUM(veh)) ? "new vehicle" : VEH_SHORT_DESC(vehicle_proto(VEH_VNUM(veh))));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !vehicle_proto(VEH_VNUM(veh)) ? "new vehicle" : VEH_SHORT_DESC(vehicle_proto(VEH_VNUM(veh))));
 
-	sprintf(buf + strlen(buf), "<\tykeywords\t0> %s\r\n", NULLSAFE(VEH_KEYWORDS(veh)));
-	sprintf(buf + strlen(buf), "<\tyshortdescription\t0> %s\r\n", NULLSAFE(VEH_SHORT_DESC(veh)));
-	sprintf(buf + strlen(buf), "<\tylongdescription\t0>\r\n%s\r\n", NULLSAFE(VEH_LONG_DESC(veh)));
-	sprintf(buf + strlen(buf), "<\tylookdescription\t0>\r\n%s", NULLSAFE(VEH_LOOK_DESC(veh)));
-	sprintf(buf + strlen(buf), "<\tyicon\t0> %s\t0 %s\r\n", VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(VEH_KEYWORDS(veh), default_vehicle_keywords), NULLSAFE(VEH_KEYWORDS(veh)));
+	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(VEH_SHORT_DESC(veh), default_vehicle_short_desc), NULLSAFE(VEH_SHORT_DESC(veh)));
+	sprintf(buf + strlen(buf), "<%slongdescription\t0>\r\n%s\r\n", OLC_LABEL_STR(VEH_LONG_DESC(veh), default_vehicle_long_desc), NULLSAFE(VEH_LONG_DESC(veh)));
+	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LOOK_DESC(veh), ""), NULLSAFE(VEH_LOOK_DESC(veh)));
+	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(VEH_FLAGS(veh), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tyhitpoints\t0> %d\r\n", VEH_MAX_HEALTH(veh));
-	sprintf(buf + strlen(buf), "<\tymovetype\t0> %s\r\n", mob_move_types[VEH_MOVE_TYPE(veh)]);
-	sprintf(buf + strlen(buf), "<\tycapacity\t0> %d item%s\r\n", VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
-	sprintf(buf + strlen(buf), "<\tyanimalsrequired\t0> %d\r\n", VEH_ANIMALS_REQUIRED(veh));
+	sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
+	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
+	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
+	sprintf(buf + strlen(buf), "<%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
 	
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", VEH_MIN_SCALE_LEVEL(veh));
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, VEH_MIN_SCALE_LEVEL(veh));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", VEH_MAX_SCALE_LEVEL(veh));
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, VEH_MAX_SCALE_LEVEL(veh));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 
-	sprintf(buf + strlen(buf), "<\tyinteriorroom\t0> %d - %s\r\n", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
-	sprintf(buf + strlen(buf), "<\tyextrarooms\t0> %d\r\n", VEH_MAX_ROOMS(veh));
+	sprintf(buf + strlen(buf), "<%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
+	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh));
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tydesignate\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
 	
 	// maintenance resources
-	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <\tyresource\t0>\r\n");
+	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(VEH_YEARLY_MAINTENANCE(veh)));
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
 		get_resource_display(VEH_YEARLY_MAINTENANCE(veh), lbuf);
 		strcat(buf, lbuf);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(veh->proto_script));
 	if (veh->proto_script) {
 		get_script_display(veh->proto_script, lbuf);
 		strcat(buf, lbuf);

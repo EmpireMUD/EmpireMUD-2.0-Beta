@@ -56,7 +56,7 @@ C
 R
 19 1 1 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 20 1 1 0
 S
@@ -67,7 +67,7 @@ There is a wooden chair here.~
 You can sit on the chair.
 ~
 ~
-fghln 19 1 0 0
+fghlnv 19 1 0 0
 S
 #905
 bench wooden~
@@ -76,7 +76,7 @@ There is a wooden bench here.~
 You can sit on the bench.
 ~
 ~
-fhln 19 1 0 0
+fhlnv 19 1 0 0
 S
 #906
 table long~
@@ -85,7 +85,7 @@ There is a long table here.~
 Tables are merely for decoration.
 ~
 ~
-hln 19 1 0 0
+hlnv 19 1 0 0
 S
 #907
 stool wooden~
@@ -94,7 +94,7 @@ There is a wooden stool here.~
 You can sit on the stool.
 ~
 ~
-fhln 19 1 0 0
+fhlnv 19 1 0 0
 S
 #917
 throne~
@@ -103,7 +103,7 @@ There is a throne at the head of the room.~
 You can sit on the throne.
 ~
 ~
-fhln 19 1 0 0
+fhlnv 19 1 0 0
 S
 #920
 canoe wooden~
@@ -115,7 +115,7 @@ to the edge of the water, 'sit' in it, and then type 'sail <direction>'.
 ~
 cfghlnu 3 3 0 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #921
 caravan brightly-painted painted wooden~
@@ -148,7 +148,7 @@ You can 'drag' the raft to the edge of the water, 'sit' on it, then type 'sail
 ~
 cfhlnu 3 3 0 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #952
 caravel lateen-rigged~
@@ -162,7 +162,7 @@ chijktu 20 32 150 0
 D
 5501 2 o
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -182,7 +182,7 @@ cijtu 20 32 450 0
 D
 5501 1 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -192,7 +192,7 @@ S
 #954
 longship fearsome~
 the longship~
-A fearsome longship floats ominiously on the water.~
+A fearsome longship floats ominously on the water.~
    The longship has a single tall mast, its single sail embroidered with the
 fierce emblem of its master. This longship is armed with cannon, and used to
 raid up and down the coast. You can "board" it from here.
@@ -204,7 +204,7 @@ C
 D
 5501 2 o
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -226,7 +226,7 @@ C
 D
 5501 4 op
 R
-16 2 1 0
+16 2 1 1048576
 R
 19 2 1 0
 R
@@ -245,7 +245,7 @@ ciktu 20 96 400 0
 D
 5522 8 opq
 R
-16 2 1 0
+16 2 1 1048576
 R
 19 2 1 0
 R
@@ -264,7 +264,7 @@ cijkpqtu 20 64 1000 0
 D
 5501 4 op
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R

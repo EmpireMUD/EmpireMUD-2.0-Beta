@@ -34,7 +34,7 @@ $exclude_files = array(
 	'.*',	// files starting with .
 	'*.o',	// compiled object files
 	'bin/*',	// compiled binaries
-	'lib/core.*',	// core dumps
+	'lib/core*',	// core dumps
 );
 
 

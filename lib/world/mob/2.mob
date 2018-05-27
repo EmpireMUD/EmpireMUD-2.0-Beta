@@ -43,7 +43,7 @@ S
 #n the bodyguard~
 #n the bodyguard is standing here.
 ~
-0 0 bdpquv cm
+0 125 bdpqvG cm
 1 0 0 1
 S
 #206
@@ -502,6 +502,8 @@ I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
 I 4 2315 10.00 1  # LOOT: a kite shield
+T 251
+T 250
 S
 #252
 guard outguard #e~
@@ -538,6 +540,8 @@ I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
 I 4 2315 10.00 1  # LOOT: a kite shield
+T 250
+T 251
 S
 #255
 sailor~
@@ -671,7 +675,7 @@ S
 #271
 #n apprentice exarch~
 apprentice exarch #n~
-Apprentice Exarch #n is working on a nexus crystal.
+Apprentice exarch #n is working on a nexus crystal.
 ~
 20 50 bdqv 0
 1 0 0 16
@@ -715,5 +719,29 @@ S
 ~
 20 50 bdqv 0
 1 0 0 6
+S
+#277
+#n supervisor~
+supervisor #n~
+Supervisor #n is surveying the area.
+~
+20 50 bdqv 0
+0 0 0 15
+S
+#278
+#n grand forgemaster~
+Grand Forgemaster #n~
+Grand Forgemaster #n is overseeing the magma crucible.
+~
+20 50 bdqv 0
+0 0 0 15
+S
+#279
+#n fisherman~
+fisherman #n~
+#n is working the nets.
+~
+20 50 bdqv 0
+1 0 0 7
 S
 $

@@ -174,6 +174,8 @@ powerful occupants, and a winding staircase leads back to the ground floor.
 M
 237 20.00 ce
 T 5511
+U
+1 5164
 S
 #5512
 Aftercastle~
@@ -240,7 +242,7 @@ M
 S
 #5516
 Captain's Cabin~
-The Bunk Room~
+The Captain's Cabin~
 ~
 0 0 aH q
 0 0 0 -1
@@ -349,5 +351,15 @@ You're standing on deck, looking out over this side of the ship.
 ~
 M
 255 20.00 c
+S
+#5523
+Extraction Pit~
+The Extraction Pit~
+&0[  ]~
+1 0 aejO 0
+0 0 0 -1
+D
+This is the pit where lost souls go before being freed from memory.
+~
 S
 $

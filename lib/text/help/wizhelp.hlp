@@ -1,3 +1,20 @@
+"ACCESS LEVEL"
+
+Access levels determine what commands a player can use. This is mainly used for
+immortals. Here is a breakdown of the access levels:
+
+ 1 - Mortal: players
+ 2 - God: an unused system for advanced players
+ 3 - Immortal: the base admin level
+ 4 - Assistant
+ 5 - Co-Implementor: can use virtually all commands and privileges
+ 6 - Implementor: the top access level
+
+Immortals and Assistants don't have access to most of the admin commands.
+Instead, they can be given specific commands with the grant system.
+
+See also: GOD SYSTEM, GRANT
+#d
 ADVANCE
 
 Usage:  advance <victim> <access level>
@@ -44,6 +61,41 @@ Examples:
   > at (0,0) bark  -- There must be no spaces in the coordinates
 
 See also: GOTO
+#d
+AUTOMESSAGE AUTOMSG
+
+Usage: automessage list
+       automessage add <type> [interval] <msg>
+       automessage change <id> <property> <new val>
+       automessage delete <id>
+
+The automessage system allows you to set messages that will display to all
+players at a set time. When you add a one-time or repeating message, there is
+a short "grace period" before the message starts displaying. This gives you
+time to edit typoes or change your mind and delete the message.
+
+Available types are:
+  one-time - Displayed once to each player.
+  login - Displayed every time a player logs in.
+  repeating - Displayed to each player every <interval> minutes. Players do not
+     necessarily all see repeating messages at the same time.
+
+The message will begin with your mud's name in brackets. You can configure the
+color of this header with the 'automessage_color' game config.
+
+This command is grantable.
+
+See also: CONFIGURE, GRANT, MESSAGES
+#d
+AUTOSTORE
+
+Usage:  autostore [target object or vehicle]
+
+This immortal command triggers an immediate autostore on the object or vehicle
+target, or on the entire room if you give no argument. This overrides the
+normal waiting period before auto-storing.
+
+For more information on the regular autostore system, try HELP AUTO STORE.
 #d
 AUTOWIZ
 
@@ -148,18 +200,20 @@ The mortal version of this is 'mark'.
 
 See also: MARK
 #d
-ECHO GECHO SEND
+ECHO GECHO SEND /ECHO
 
 Usage:  echo <message>
         gecho <message>
         send <victim> <message>
+        /echo <channel> <message>
 
 ECHO displays a string to everyone in your room.
 GECHO displays the string to everyone in the game.
 SEND displays the string to a particular person.
+/ECHO displays the string to people on a slash channel.
 
-Regular ECHO supports @target and #item just like emote. All three of these
-commands are grantable.
+Regular ECHO supports @target and #item just like emote. All of these commands
+are grantable (/echo uses the gecho grant).
 
 Examples:
 
@@ -167,7 +221,7 @@ Examples:
   > gecho Hi, everyone in the game, isn't this annoying?
   > send rasmussen You are being watched.
 
-See also: EMOTE, GRANT
+See also: EMOTE, GRANT, SLASH CHANNEL
 #d
 EDELETE
 
@@ -196,6 +250,34 @@ accounts as they log into the game. It shows up immediately after the syslog
 for entering the game, only if there are any notes to show.
 
 See also: GRANT
+#d
+ENDWAR "END WAR"
+
+Usage:  endwar [empire] [second empire]
+
+This command is used by immortals to cancel active wars. This command is part
+of the 'empires' grant. It has 3 modes:
+
+> endwar
+With no arguments, this just lists active wars.
+
+> endwar <empire>
+With one empire, it ends all wars for that empire.
+
+> endwar <empire> <second empire>
+With two arguments, it ends the war between those two empires.
+
+See also: GRANT
+#d
+EVOLVE EVOLVER EVOLUTIONS
+
+The 'evolve' utility is a separate program the EmpireMUD runs once per game
+day to update the map. This is normally silent, but will result in logs if
+you run it manually ('util evolve') or if the evolver fails to run.
+
+If not all of the evolver's suggested changes could be made, the most likely
+reason is that the tile already changed on the mud (e.g. due to chopping) so
+the mud ignores the evolver's suggestion on that tile.
 #d
 FILE
 
@@ -269,6 +351,22 @@ This is the history command for the immortal and god channels.
 
 See also: WIZNET, GODNET
 #d
+GOD GODS "GOD SYSTEM"
+
+The god system (access level 2) was originally a group of players who could
+teleport around the map and create items. Gods were empowered by items that
+mortals sacrificed to them, and could only create items using raw materials
+from the sacrifices.
+
+There have been no changes, maintenance, or improvements to the god system in
+EmpireMUD 2.0 and it is not considered operational. Concerns that would have
+to be addressed include:
+ - It's currently possible to get infinite resources by creating items that can
+   be broken down or crafted into multiple other items, then sacrificing those
+   items again.
+ - Gods can't be hurt by anyone other than gods, so adventures would be far too
+   easy.
+#
 GODNET
 
 The gods' communication channel.
@@ -300,11 +398,14 @@ Examples:
 
 See also: GRANT, POOFIN, POOFOUT, WIZAT
 #d
-GRANTS
+GRANT GRANTS
+
+Usage:  set <name> grants [add | remove] <grants>
 
 Grants allow a player to use commands that are above his or her privilege
 level. Grants can be added or removed using the "set" command. Mortals can also
 be granted access to some immortal commands, but this isn't always a good idea.
+You can see a person's grants by using 'stat' on them.
 
 Most of the grant names correspond to actual commands, but some are special:
  empires - Allows eedit, edelete, moveeinv, and more.
@@ -312,7 +413,8 @@ Most of the grant names correspond to actual commands, but some are special:
  olc-controls - Allows .setflags, .setminvnum, and .setmaxvnum.
  transfer - Allows moving mortals with commands like transfer and portal.
 
-Try 'helpsearch grantable' to find grantable commands.
+Try 'helpsearch grantable' to find grantable commands. You can also type
+'set <name> grants' with no other arguments to see a list of grants.
 
 See also: OLC-CONTROLS
 #d
@@ -322,19 +424,22 @@ Usage:  handbook
 
 Guidelines for having an Immortal character -- you should read it.
 #d
-HASSLE NOHASSLE "NO HASSLE"
+HASSLE NOHASSLE "NO HASSLE" "TOGGLE HASSLE"
 
-Usage:  toggle hassle
+Usage:  toggle hassle [on/off]
 
-Prevents you from activating command triggers and stops mobs from fighting you.
-This toggle is also used by some other triggers to check if you're an immortal
-who doesn't want to be interfered with.
+Prevents you from activating command triggers and stops aggro mobs from
+attacking you. This toggle is also used by some other triggers to check if
+you're an immortal who doesn't want to be interfered with.
+
+Note: An immortal can always 'toggle hassle off' even if a command trigger
+tries to prevent it. This keeps immortals from being trapped by triggers.
 
 See also: TOGGLE
 #d
 HOLYLIGHT "TOGGLE HOLYLIGHT"
 
-Usage:  toggle holylight
+Usage:  toggle holylight [on/off]
 
 A toggle which allows you to see:
    Invisible people and objects, even if you don't have 'detect invisibility'
@@ -362,7 +467,7 @@ See also: FORGIVE, GRANT, STAT, THIEF
 #d
 IDLE-OUT IDLEOUT "IDLE OUT"
 
-Usage:  toggle idle-out
+Usage:  toggle idle-out [on/off]
 
 This immortal toggle prevents you from being disconnected due to long periods
 of inactivity. You can still idle out if you lose your link.
@@ -390,7 +495,7 @@ See also: INVIS, TOGGLE, WIZHIDE
 #d
 INSTANCE INSTANCES
 
-Usage:  instance <list | add | delete | deleteall | nearby | reset | test> [argument]
+Usage:  instance <list | add | delete | deleteall | nearby | reset | spawn | test> [argument]
 
 This command allows immortals to list and manage adventure zone instances.
 The 'list' command can be used to see all instances, or all instances for one
@@ -400,10 +505,14 @@ and, optionally, provide a distance. The instance command is grantable.
 The 'delete' command deletes by number in the list.
 
 The 'deleteall' command removes all instances for a given adventure zone
-(by vnum).
+(by vnum). You can delete ALL instances in the game with 'inst deleteall all'.
 
 The 'reset' command will force a zone reset on the instance you're in or the
 instance number you target.
+
+The 'spawn' command runs 1 (or more) instance spawn cycles, attempting to
+generate an instance of the next adventure in the queue that isn't already at
+its limit. You can specify the number of cycles to run.
 
 The 'test' command will link an instance to the room you're in, using a generic
 portal, even if that instance cannot be linked.
@@ -415,15 +524,15 @@ INVIS INVISIBLE
 Usage:  invis [level]
 
 INVIS sets your invisibility level. With no argument, invis toggles between
-making you fully visible and fully invisible. If you specify a level, only
-people at and above the level you specify will be able to see you.
+making you fully visible and fully invisible. If you specify an access level,
+only people at and above the level you specify will be able to see you.
 
 Examples:
 
   > invis
   > invis 3
 
-See also: INCOGNITO, INVSTART, VISIBLE, WIZHIDE
+See also: ACCESS LEVEL, INCOGNITO, INVSTART, VISIBLE, WIZHIDE
 #d
 INVSTART INVISSTART "INVIS START" "INV START" "START INVISIBLE"
 
@@ -437,10 +546,11 @@ prompted to press any key to enter the game.
 
 See also: INVIS, VISIBLE, SET
 #d
-ISLAND "ISLAND COMMAND"
+ISLAND "ISLAND COMMAND" CONTINENT
 
 Usage:  island list [keywords]
         island rename <id> <name>
+        island description <id>
         island flags <id> [add | remove] <flags>
 
 This immortal command allows the game's staff to name islands and apply
@@ -449,8 +559,10 @@ properties to them. This command is grantable.
 Island flags:
  NEWBIE - Wipes claims periodically
  !AGGRO - Prevents aggro mobs, and guard towers won't fire
+ !CUSTOMIZE - Cannot be renamed by players
+ CONTINENT - Is a whole continent (affects adventure spawns)
 
-See also: GRANT
+See also: CHART, GRANT
 #d
 LAST
 
@@ -536,7 +648,7 @@ See also: TITLE
 #d
 NOWIZNET "NO WIZNET"
 
-Usage:  toggle wiznet
+Usage:  toggle wiznet [on/off]
 
 Allows you to hear or ignore messages coming over the wiznet.
 
@@ -578,7 +690,17 @@ Do not abuse this command.
 
 See also: GRANT
 #d
-PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER"
+PEACE
+
+Usage:  peace
+
+The peace command ends all combat in the room (but does not keep people from
+re-attacking). Input queues are also cleared, to avoid players accidentally
+restarting combat from queued attacks. This command is grantable.
+
+See also: GRANT
+#d
+PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER" DELETEPLAYER PLRDELETE
 
 Usage:  playerdelete <name> CONFIRM
 
@@ -613,6 +735,74 @@ Example:
  There is a blinding flash of light, and Bob appears!
 
 See also: GOTO
+#e
+"PREMIUM COMMANDS" "IMMORTAL COMMANDS" "MORTAL COMMANDS WITH IMMORTAL FEATURES"
+
+Some mortal commands have additional features when used by immortals.
+
+any immortal:
+- alternate: no cooldown when alternating to an immortal
+- blood upkeep: immortals never pay blood upkeep
+- /check: lists all channels (not just common ones)
+- consider: do not trigger automatic scaling
+- drop: can drop quest items
+- empires: can look up with 'empires -v <vnum>'
+- empires: can see vnum and creation time on empire details
+- estats: can see admin flags
+- fill: fills drink containers with water from no source
+- forge: doesn't require a forge building
+- gear: no level requirements
+- get: does not trigger item binding
+- get: immortals have few restrictions on stealing, and don't trigger distrust
+- give: can be given bound items
+- instances: can always enter an instance despite player limits; does not count
+             toward the limit
+- learn: can specify a vnum to learn a LEARNED-flagged craft without a recipe
+- look at: can see items through conceal
+- look out: works from all rooms
+- look: can see people's real identity while disguised/morphed
+- mail: can mail anywhere
+- mount: can ride ANY npc (results may be unexpected on named mobs)
+- moving: can still move while overburdened or exhausted
+- prompt/display: additional options available
+- pursuit: mobs won't pursue imms
+- quit: not restricted by pvp timer
+- refashion: doesn't require a tailor
+- reply: still works after the target alternates
+- score: can target others
+- shops, quests, crafts, socials, morphs: Can use things with IN-DEV on them
+- skill buy: doesn't need points to buy abilities
+- skill reset: all resets are free
+- skill sell: immortals can sell individual abilities
+- skill swap: instantaneous rather than delayed
+- solo: imms don't count against the solo role for players
+- toggle informative: can see chameleon buildings on informative and scan
+- trade: can use the trading post anywhere
+- /who: works on channels you're not on
+
+Commands with features for Co-Implementors:
+- /echo: can echo to slash-channels (or lower level, with the gecho grant)
+- create: does not require resources (load grant)
+- portal: can be used anywhere (transfer grant)
+- The ability to edit all vnums in OLC
+
+Empire commands that work differently for Co-Implementors, or for any immortal
+with the 'empire' grant:
+- empire: full detailed empire view
+- city: optional first arg to edit cities for any empire
+- eedit: optional first arg to specify which empire
+- einv: optional first arg to specify which empire
+- elog: optional first arg to specify which empire
+- findmaint: optional first arg to specify which empire
+- islands: optional first arg to specify which empire
+- import/export: optional first arg to specify which empire
+- offenses: optional first arg to specify which empire
+- progress: optional first arg to specify which empire
+- roster: optional first arg to specify which empire
+- territory: optional first arg to specify which empire
+- warehouse: optional first arg to specify which empire
+
+See also: GRANT
 #e
 PURGE
 
@@ -724,7 +914,7 @@ See also: SWITCH
 #d
 ROOMFLAGS "TOGGLE ROOMFLAGS" "ROOM FLAGS"
 
-Usage:  toggle roomflags
+Usage:  toggle roomflags [on/off]
 
 This immortal toggle allows you to see flags and vnums on the "look" command.
 
@@ -752,15 +942,17 @@ The following are valid fields:
 Field          Who     Value Type   Description
 ----------------------------------------------------------------
 account        PC      NAME         Sets account to match another character
-age            BOTH    NUMBER       Player age
+age            BOTH    NUMBER       Player age (and creation time)
 bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
+currency       PC      MISC         Sets amounts of adventure currencies
 faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
-level          PC      NUMBER       Player's immortal level
+learned        PC      MISC         Turns learned recipes on/off
+access         PC      NUMBER       Player's immortal access level
 loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
 password       PC      STRING       Change password
@@ -801,7 +993,15 @@ wizhide        PC      BINARY       Turns on/off wizhide
 
 scale          NPC     NUMBER       Rescales a mob to a given level
 
-See also: GRANT, STAT
+See also: ACCESS LEVEL, GRANT, STAT
+#d
+"SET CURRENCY" "SET CURRENCIES"
+
+Usage:  set [file] <player> currency <vnum> <amount>
+
+This allows you to change the amount of an adventure currency the player has.
+
+See also: COINS, SHOW CURRENCY
 #d
 "SET FACTION"
 
@@ -815,6 +1015,15 @@ You can delete a reputation entirely by setting it to 'none'.
 
 See also: FACTION, SHOW FACTIONS
 #d
+"SET LEARNED"
+
+Usage:  set [file] <player> learned <craft vnum> <on | off>
+
+This lets you give (or revoke) learned crafts. The craft must have the
+LEARNED flag.
+
+See also: LEARN, LEARNED, SHOW LEARNED
+#d
 SHOW
 
 Usage:  show <mode> [argument]
@@ -826,22 +1035,30 @@ the options below. Valid Modes:
 Mode       Level    Description
 ------     ------   -------------
 stats      God      Shows game stats including prototypes.
-arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
+ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
 components Immort   Shows all items matching a component type (and flags).
+crops      Immort   Shows counts for all the crops in the world.
+currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+learned    Immort   Shows you learned recipes.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
+progress   Immort   Shows how many empires have completed a progress goal.
+progression Immrt   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
+shops      Immort   Shows any shops available in your current location.
 skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
+technology Immort   Shows ability techs a player has.
 terrain    Immort   Shows total counts for all terrain types.
+unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
 variables  Immort   Shows script variables on a player character.
@@ -849,6 +1066,7 @@ commons    Asst     Shows players currently connected from duplicate sites.
 site       Asst     Shows all players with a specific site segment.
 account    Co-Impl  Shows all the alts associated with a given player.
 data       Co-Impl  Shows data stored in the global data system
+piles      Co-Impl  Shows rooms with too many items piled up.
 
 Each of these commands has its own help file (for example, HELP SHOW STATS)
 
@@ -861,11 +1079,11 @@ Usage:  show stats
 Shows some game statistics, similar to the ones you see when quitting, and
 including both instances in the world and prototypes.
 #e
-"SHOW ARROWTYPES"
+"SHOW AMMOTYPES" "SHOW ARROWTYPES"
 
-Usage:  show arrowtypes
+Usage:  show ammotypes
 
-Lists all bows and arrows by arrowtype. Useful for figuring out what arrowtype
+Lists all bows and ammo by ammotype. Useful for figuring out what ammotype
 to use for a new weapon/ammo.
 #e
 "SHOW COMPONENTS"
@@ -877,6 +1095,14 @@ If you specify any flags, all those flags must match the output.
 
 For a list of component types, see: HELP COMPONENT TYPES
 For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW CURRENCY" "SHOW CURRENCIES"
+
+Usage:  show currency <player>
+
+This shows all the coins and adventure currencies owned by the player.
+
+See also: SET CURRENCY
 #e
 "SHOW DAILYCYCLE" "SHOW DAILY CYCLE"
 
@@ -912,11 +1138,27 @@ an empire's leaderboard rank in place of its name, but not vnum.
 
 See also: ISLANDS, MOVEEINV
 #e
+"SHOW LEARNED"
+
+Usage:  show learned <player | empire> [search phrase]
+
+Shows you the recipes learned by a player or empire. For multi-word empire
+names, use "quotation marks".
+
+See also: SET LEARNED
+#e
 "SHOW NOTES"
 
 Usage:  show notes <player name>
 
 Shows immortal notes for the target player's account.
+#e
+"SHOW PILES"
+
+Usage:  show piles [max size]
+
+This shows rooms which have more than 100 items in them (or whatever pile size
+you specify).
 #e
 "SHOW PLAYER"
 
@@ -934,12 +1176,35 @@ players. Not to be confused with SHOW PLAYER.
 
 See also: USERS
 #e
+"SHOW PROGRESS"
+
+Usage:  show progress <goal>
+
+This shows how many empires have completed a given progression goal.
+
+See also: SHOW PROGRESSION
+#e
+"SHOW PROGRESSION"
+
+Usage:  show progression
+
+This shows stats on the number and value of goals in each progression tree.
+
+See also: SHOW PROGRESS
+#e
 "SHOW RENT"
 
 Usage:  show rent <player name>
 
 Shows the target player's inventory and equipment. Used to show the binary file
 path to their inventory data, hence the name.
+#e
+"SHOW SHOPS"
+
+Usage:  show shops
+
+Lists any shops available to you right now. Shops can come from mobs, objects,
+buildings, and room templates.
 #e
 "SHOW SKILLS"
 
@@ -968,12 +1233,29 @@ Usage:  show storage [building name]
 Lists objects which store in the named building, or the current building if none
 is specified. Takes a name, not a virtual number.
 #e
-"SHOW TERRAIN"
+"SHOW TECHNOLOGY"
+
+Usage:  show technology <player>
+
+Lists all the ability techs the player has.
+#e
+"SHOW TERRAIN" "SHOW CROPS"
 
 Usage:  show terrain
+        show crops
 
 Lists the total count of each sector and crop type in the world. Buildings are
 all listed together under 'Building'.
+#e
+"SHOW UNLEARNABLE"
+
+Usage:  show unlearnable
+
+This command lists craft recipes with LEARNED flags but where there's no recipe
+or progression goal that grants them.
+
+Warning: If a craft recipe is given by a script, this command will still show
+it as unlearnable.
 #e
 "SHOW USES"
 
@@ -1017,10 +1299,10 @@ occur in the middle or at the end, not just at the beginning).
 #e
 "SHOW ACCOUNT"
 
-Usage:  show account <player name>
+Usage:  show account <player name | account id>
 
 Shows all characters associated with the target character's account (the target
-player's alternates).
+player's alternates). You can look this up by player or by id.
 #e
 "SHOW QUESTS"
 
@@ -1099,10 +1381,13 @@ Examples:
   > stat mobile wolf
   > stat file niandra
   > stat object shawl
+  > stat empire 1
 
 See also: VSTAT
 #d
 SWITCH
+
+(Disambiguation: See also HELP SWITCH STATEMENT for the scripting command.)
 
 Usage:  switch <monster>
 
@@ -1153,6 +1438,16 @@ command is grantable.
 
 See also: BINDING, GRANT
 #d
+UNPROGRESS
+
+Usage:  unprogress <empire | all> <goal vnum>
+
+This command removes a progression goal from all empires' trackers and
+completion lists. However, they will immediately receive the goal again if they
+still qualify for it. This command is grantable.
+
+See also: GRANT, PROGRESS
+#d
 UNQUEST
 
 Usage:  unquest <player> <quest vnum>
@@ -1197,9 +1492,10 @@ They generally have no game effect, but can help with testing.
 
 Available utilities:
  &cb318buildings&0 - Finds buildings using flags that were deprecated in 2.0b3.18.
- &cclearroles&0 - Clears the class roles and class abilities of all players.
+ &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
+ &cevolve&0 - Triggers map evolutions (just like a normal day), see EVOLVER.
  &cislandsize&0 - Counts and displays tile counts for all islands.
  &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
@@ -1211,6 +1507,7 @@ Available utilities:
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.
+ &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
  &cyearly&0 - Runs a full annual update on the world.
 #d
 VNUM
@@ -1222,8 +1519,9 @@ specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, faction, global, mob, morph, obj, quest,
-                 roomtemplate, sector, skill, social, trigger, vehicle
+                 class, crop, faction, global, generic, mob, morph, obj, 
+                 progress, quest, roomtemplate, sector, shop, skill, social,
+                 trigger, vehicle
 
 Examples:
 
@@ -1244,13 +1542,14 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, faction, global, mob, morph, obj, quest,
-                 roomtemplate, sector, skill, social, trigger, vehicle
+                class, crop, empire, faction, global, generic, mob, morph, obj, 
+                progress, quest, roomtemplate, sector, shop, skill, social,
+                trigger, vehicle
 
 Examples:
 
-  > vstat obj 3000
-  > vstat mob 3001
+  > vstat obj 125
+  > vstat mob 247
 
 See also: LOAD, STAT, VNUM
 #d
@@ -1264,11 +1563,11 @@ WIZHIDE
 
 Usage: toggle wizhide
 
-This command prevents you from appearing in the room to players with lower
-access levels and players without holylight. They cannot target you in the
-room, and your poofin, poofout and movement will be invisible, along with most
-other room messages you cause. Mortals will still see any messages sent
-directly to them, such as if you look at them.
+This command prevents you from appearing in the room to players (and to
+immortals who have holylight off). They cannot target you in the room, and your
+poofin, poofout and movement will be invisible, along with most other room
+messages you cause. Mortals will still see any messages sent directly to them,
+such as if you look at them.
 
 You'll still show up in the "who" list, and players can still send you tells.
 

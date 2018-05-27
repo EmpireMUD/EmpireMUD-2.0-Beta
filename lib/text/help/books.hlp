@@ -10,6 +10,7 @@ The following help files have more information on books:
   BOOKEDIT - An introduction to the editor.
   BOOK TIPS - Additional notes on creating books.
   LIBRARY - The command to shelve books and check them out.
+  READ - How to read a book.
 #
 BOOKEDIT "BOOK EDIT" "BOOK EDITOR"
 
@@ -269,16 +270,18 @@ See also: BOOKEDIT, LIBRARY
 #
 LIBRARY
 
-Building:  [^^]  Library  (Grand Monuments)
+Building:  [^^]  Library  (Renown goal)
+Fame:  10
 Command:  library browse  -- see books shelved here
           library checkout <book>  -- grab a copy of a book
           library shelve <item>  -- put a book away on the shelves
           library burn <book>  -- remove all copies of a book from this library
 
-You can collect books and put them into your own library, which is a Grand
-Monument in the Empire skill tree. Once you shelve a book in your library, you
-can take as many copies of it as you want. The only way to permanently remove
-it from your collection is to use the 'library burn' command.
+You can collect books and put them into your own library, which is a grand
+monument unlocked by empire progression. Once you shelve a book in your
+library, you can take as many copies of it as you want. The only way to
+permanently remove it from your collection is to use the 'library burn'
+command.
 
 The 'checkout' and 'burn' commands target books in the library's collection,
 not items in your inventory. You can pick these books by name or by number.

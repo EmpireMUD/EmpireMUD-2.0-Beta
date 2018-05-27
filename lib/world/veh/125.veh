@@ -1,0 +1,28 @@
+#12501
+brace ankle colossal leg~
+a colossal ankle brace~
+A colossal ankle brace encircles the base of the leg.~
+   This ankle brace could just be enough to cripple the colossus and send it
+back to its scaffolding for repairs.
+~
+~
+uv 19 1000 0 0
+T 12524
+S
+#12513
+boot clockwork giant~
+a giant clockwork boot~
+A giant clockwork boot stands at attention.~
+   The boot is made from shining brass, with a large key on the back that must
+be used to wind it. You aren't entirely sure how it walks, but it appears to be
+made for walking nonetheless. This boot is large enough to hold a single
+person, with room for cargo in the... boot.
+~
+~
+befgiu 15 24 200 0
+C
+0 200
+R
+20 2 1 0
+S
+$

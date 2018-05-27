@@ -4,10 +4,10 @@ A Precarious Ledge~
 immediately struck by the furnace-like heat rising from the magma below, and
 your ears are constantly assaulted by a deafening roar. If you drop anything
 here, it will probably be lost forever. Light shines from an opening in the
-wall at the other end of the ledge.  
+wall at the other end of the ledge.
    A stone plate lying nearby has words carved into it.
 ~
-c 0
+c 0 0
 D14
 ~
 0 18076
@@ -26,6 +26,7 @@ T 18075
 T 18082
 T 18084
 T 18085
+T 18086
 S
 #18076
 The Fiend's Lair~
@@ -33,7 +34,7 @@ The Fiend's Lair~
 huge, boiling lake of magma. Ahead of you, a narrow rock bridge slopes downward
 to a central pillar, barely elevated above the magma.
 ~
-c 0
+c 0 0
 D14
 ~
 0 18075

@@ -4,9 +4,15 @@ a corpse~
 A corpse is lying on the ground.~
 You can skin or butcher most corpses.
 ~
-10 ekp a 2
+10 egkp a 4
 0 0 0
 7 36
+M
+0
+You bury $p.~
+M
+1
+$n buries $p.~
 S
 #1002
 fire~
@@ -23,7 +29,7 @@ chest gilded~
 a gilded chest~
 A gilded chest sits at the foot of the bed.~
    You can store your bound items safely in here. Items not bound to you may
-still be autostored.  
+still be autostored.
 ~
 4 0 0 2
 200 1 0

@@ -593,7 +593,7 @@ ACMD(do_mregionecho) {
 		mob_log(ch, "mregionecho called with invalid target");
 	}
 	else {
-		center = get_map_location_for(center);
+		center = GET_MAP_LOC(center) ? real_room(GET_MAP_LOC(center)->vnum) : NULL;
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
@@ -1020,9 +1020,11 @@ ACMD(do_mgoto) {
 
 /* lets the mobile do a command at another location. Very useful */
 ACMD(do_mat) {
+	char_data *was_fighting = FIGHTING(ch);
 	char arg[MAX_INPUT_LENGTH];
 	room_data *location = NULL, *original;
 	struct instance_data *inst;
+	int fmode = FIGHT_MODE(ch);
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -1065,6 +1067,10 @@ ACMD(do_mat) {
 	if (IN_ROOM(ch) == location) {
 		char_from_room(ch);
 		char_to_room(ch, original);
+	}
+	
+	if (was_fighting && IN_ROOM(was_fighting) == IN_ROOM(ch) && !IS_DEAD(ch) && !EXTRACTED(ch)) {
+		set_fighting(ch, was_fighting, fmode);
 	}
 }
 
@@ -1221,7 +1227,7 @@ ACMD(do_mrestore) {
 			free_resource_list(GET_BUILDING_RESOURCES(room));
 			GET_BUILDING_RESOURCES(room) = NULL;
 			COMPLEX_DATA(room)->damage = 0;
-			COMPLEX_DATA(room)->burning = 0;
+			COMPLEX_DATA(room)->burn_down_time = 0;
 		}
 	}
 }
@@ -1452,7 +1458,7 @@ ACMD(do_mterraform) {
 
 
 ACMD(do_mdamage) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *vict;
 	int type;
@@ -1477,6 +1483,14 @@ ACMD(do_mdamage) {
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
 	}
+	
+	// send negatives to %heal% instead
+	if (modifier < 0) {
+		sprintf(buf, "%s health %.2f", name, -atof(modarg));
+		script_heal(ch, MOB_TRIGGER, buf);
+		return;
+	}
+	
 	modifier = scale_modifier_by_mob(ch, modifier);
 
 	if (*name == UID_CHAR) {
@@ -1541,18 +1555,25 @@ ACMD(do_maoe) {
 	modifier = scale_modifier_by_mob(ch, modifier);
 	
 	level = get_approximate_level(ch);
-	for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_vict) {
-		next_vict = vict->next_in_room;
-		
-		if (ch != vict && is_fight_enemy(ch, vict)) {
-			script_damage(vict, ch, level, type, modifier);
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_vict, next_in_room) {
+		if (ch == vict) {
+			continue;
 		}
+		if (FIGHTING(ch) && !is_fight_enemy(ch, vict)) {
+			continue;	// in combat, only hit enemies
+		}
+		if (!FIGHTING(ch) && !IS_NPC(vict)) {
+			continue;	// out of combat, only hit players
+		}
+		
+		script_damage(vict, ch, level, type, modifier);
 	}
 }
 
 
 ACMD(do_mdot) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
+	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *vict;
 	int type, max_stacks;
@@ -1564,8 +1585,16 @@ ACMD(do_mdot) {
 
 	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
-
+	
 	argument = one_argument(argument, name);
+	// sometimes name is an affect vnum
+	if (*name == '#') {
+		atype = atoi(name+1);
+		argument = one_argument(argument, name);
+		if (!find_generic(atype, GENERIC_AFFECT)) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
 	argument = one_argument(argument, typearg);	// optional, default physical
@@ -1604,7 +1633,7 @@ ACMD(do_mdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(vict, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks, ch);
+	script_damage_over_time(vict, atype, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks, ch);
 }
 
 
@@ -1669,6 +1698,16 @@ ACMD(do_mforce) {
 			command_interpreter(victim, argument);
 	}
 }
+
+
+ACMD(do_mheal) {
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED) || (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	script_heal(ch, MOB_TRIGGER, argument);
+}
+
 
 /* hunt for someone */
 ACMD(do_mhunt) {
@@ -1834,8 +1873,8 @@ ACMD(do_mforget) {
 
 
 ACMD(do_msiege) {
-	void besiege_room(room_data *to_room, int damage);
-	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage);
+	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
 	
@@ -1883,11 +1922,11 @@ ACMD(do_msiege) {
 	
 	if (room_targ) {
 		if (validate_siege_target_room(ch, NULL, room_targ)) {
-			besiege_room(room_targ, dam);
+			besiege_room(NULL, room_targ, dam);
 		}
 	}
 	else if (veh_targ) {
-		besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL);
 	}
 	else {
 		mob_log(ch, "osiege: invalid target");
@@ -2403,8 +2442,7 @@ ACMD(do_mscale) {
 			scale_item_to_level(obj, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
-			scale_item_to_level(fresh, level);
+			fresh = fresh_copy_obj(obj, level);
 			swap_obj_for_obj(obj, fresh);
 			extract_obj(obj);
 		}

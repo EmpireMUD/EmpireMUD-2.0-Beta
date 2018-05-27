@@ -23,6 +23,7 @@
 #include "handler.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -38,7 +39,7 @@
 extern struct generic_name_data *generic_names;
 
 // external funcs
-extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
+extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
@@ -162,8 +163,7 @@ int mob_coins(char_data *mob) {
 		
 		if ((emp = GET_LOYALTY(mob))) {
 			amt = MIN(amt, EMPIRE_COINS(emp));
-			EMPIRE_COINS(emp) -= amt;
-			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			increase_empire_coins(emp, emp, -amt);
 		}
 	}
 	
@@ -439,7 +439,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}
-	else if (move_type == MOB_MOVE_FLY || AFF_FLAGGED(mob, AFF_FLY)) {
+	else if (AFF_FLAGGED(mob, AFF_FLY)) {
 		ok = TRUE;
 	}
 	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)) {
@@ -465,8 +465,8 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	
 	// overrides: things that cancel previous oks
 	
-	// non-humans won't enter buildings
-	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE)) {
+	// non-humans won't enter buildings (open buildings only count if finished)
+	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE) && (!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) || IS_COMPLETE(to_room))) {
 		ok = FALSE;
 	}
 	
@@ -505,7 +505,6 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 		if (MOB_FLAGGED(ch, MOB_AGGRESSIVE | MOB_CITYGUARD)) {
 			// only locks blocks aggressive/cityguard
 			if (EMPIRE_HAS_TECH(room_emp, TECH_LOCKS)) {
-				empire_skillup(room_emp, ABIL_LOCKS, 10);
 				valid = FALSE;
 			}
 		}
@@ -541,12 +540,12 @@ bool try_mobile_movement(char_data *ch) {
 				to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
 				
 				if (to_room && mob_can_move_to_sect(ch, to_room) && ROOM_PRIVATE_OWNER(to_room) == NOBODY) {
-					// this IF comes from act.movement and really needs to be generalized
-					if (!IS_COMPLETE(to_room) || (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))) {
+					// check building and entrances
+					if ((!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) && !IS_COMPLETE(to_room)) || (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))) {
 						// can't go that way
 					}
 					else if (validate_mobile_move(ch, dir, to_room)) {
-						perform_move(ch, dir, 1, 0);
+						perform_move(ch, dir, MOVE_WANDER);
 					}
 				}
 			}
@@ -555,7 +554,7 @@ bool try_mobile_movement(char_data *ch) {
 				to_room = ex->room_ptr;
 				
 				if (to_room && validate_mobile_move(ch, dir, to_room)) {
-					perform_move(ch, dir, 1, 0);
+					perform_move(ch, dir, MOVE_WANDER);
 				}
 			}
 		}
@@ -595,7 +594,7 @@ void mobile_activity(void) {
 		next_ch = ch->next;
 		moved = FALSE;
 
-		if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED))
+		if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED))
 			continue;
 		if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED) || IS_INJURED(ch, INJ_TIED) || GET_LED_BY(ch))
 			continue;
@@ -632,6 +631,7 @@ void mobile_activity(void) {
 
 					// track to next room
 					for (track = ROOM_TRACKS(IN_ROOM(ch)); !found && track; track = track->next) {
+						// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
 						if (track->player_id == purs->idnum) {
 							found = TRUE;
 							dir = track->dir;
@@ -641,7 +641,7 @@ void mobile_activity(void) {
 			}
 			
 			if (dir != NO_DIR && found == TRUE && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED)) {
-				perform_move(ch, dir, 1, 0);
+				perform_move(ch, dir, MOVE_WANDER);
 				moved = TRUE;
 			}
 			
@@ -696,9 +696,6 @@ void mobile_activity(void) {
 				}
 				
 				// ok good to go
-				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE) && can_gain_exp_from(vict, ch)) {
-					gain_ability_exp(vict, ABIL_MAJESTY, 10);
-				}
 				if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 					found = TRUE;
@@ -754,10 +751,6 @@ void mobile_activity(void) {
 								// check friendly first -- so we don't attack someone who's friendly
 								if (!empire_is_friendly(chemp, victemp) && can_fight(ch, vict)) {
 									if (IS_HOSTILE(vict) || (!IS_DISGUISED(vict) && empire_is_hostile(chemp, victemp, IN_ROOM(ch)))) {
-										if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE) && can_gain_exp_from(vict, ch)) {
-											gain_ability_exp(vict, ABIL_MAJESTY, 10);
-										}
-									
 										if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 											hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 											found = TRUE;
@@ -847,7 +840,7 @@ void run_mob_echoes(void) {
 		// now find a mob with a valid message
 		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 			// things that disqualify the mob
-			if (mob->desc || !IS_NPC(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
+			if (mob->desc || !IS_NPC(mob) || IS_DEAD(mob) || EXTRACTED(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
 				continue;
 			}
 			
@@ -895,6 +888,10 @@ void run_mob_echoes(void) {
 void despawn_mob(char_data *ch) {
 	obj_data *obj, *next_obj;
 	int iter;
+	
+	if (!IS_NPC(ch)) {
+		return;	// safety check
+	}
 	
 	// empty inventory and equipment
 	for (obj = ch->carrying; obj != NULL; obj = next_obj) {
@@ -1082,7 +1079,7 @@ void spawn_mobs_from_center(room_data *center) {
 	int mob_spawn_radius = config_get_int("mob_spawn_radius");
 	
 	// always start on the map
-	center = get_map_location_for(center);
+	center = (GET_MAP_LOC(center) ? real_room(GET_MAP_LOC(center)->vnum) : NULL);
 	
 	// skip if we didn't find a map location
 	if (!center || GET_ROOM_VNUM(center) >= MAP_SIZE) {
@@ -1286,9 +1283,19 @@ void scale_mob_to_level(char_data *mob, int level) {
 
 	// health
 	value = (1.5 * low_level) + (3.25 * mid_level) + (5.0 * high_level) + (12 * over_level);
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 2.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 4.5 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 5.5 : 1.0;
+	target = 45.0;	// max multiplier of health flags
+	if (MOB_FLAGGED(mob, MOB_GROUP) && MOB_FLAGGED(mob, MOB_HARD)) {	// boss
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (1.0 * target) : (0.75 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_GROUP)) {
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (0.65 * target) : (0.5 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_HARD)) {
+		value *= MOB_FLAGGED(mob, MOB_TANK) ? (0.25 * target) : (0.1 * target);
+	}
+	else if (MOB_FLAGGED(mob, MOB_TANK)) {
+		value *= (0.05 * target);
+	}
 	mob->points.max_pools[HEALTH] = MAX(1, (int) ceil(value));
 	
 	// move
@@ -1357,6 +1364,9 @@ void scale_mob_to_level(char_data *mob, int level) {
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.5 : 1.0;
 	if (!attack_hit_info[MOB_ATTACK_TYPE(mob)].disarmable) {
 		value *= 0.7;	// disarm would cut damage in half; this brings it closer together
+	}
+	if (MOB_FLAGGED(mob, MOB_HARD | MOB_GROUP)) {
+		value *= 1.15;	// 15% more damage from non-Normal mobs
 	}
 	mob->mob_specials.damage = MAX(1, (int) ceil(value));
 	

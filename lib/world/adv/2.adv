@@ -7,7 +7,7 @@ dangerous creatures within. It will take a valiant party to survive these
 realms. The spoils gained by those who do, however, are worth the trial!
 ~
 11100 11129 75-100
-10 1440 b 4
+10 1440 bk 4
 L
 0 a
 5107 -1 -1
@@ -31,7 +31,7 @@ past, yet tales still circle of how valuable those lands would be again, if
 only the curse were reversed.
 ~
 11130 11159 100-150
-5 0 c 4
+5 0 ck 4
 L
 5 0
 4320 -1 -1
@@ -49,12 +49,12 @@ S
 Mountain Valley: Molten Fiend~
 Owen Morris~
    A powerful demon, buried beneath the earth in ages past, is trying to break
-free, and its struggles have opened this molten crevice in the mountains! 
+free, and its struggles have opened this molten crevice in the mountains!
 Bring a capable party with you, for the demon's lengthy imprisonment has only
-fueled the fires of its rage!  
+fueled the fires of its rage!
 ~
 18075 18099 200-250
-5 0 0 4
+5 0 k 4
 L
 6 0
 50 -1 -1
@@ -75,7 +75,7 @@ Owen Morris~
 of war machine here! Judging by the smell, only two kinds of pest could have
 been responsible: goblins, or urchins. Judging by the warg bone tent poles,
 it's probably not urchins. Burning their camp to the ground or killing them
-should drive them from the region.  
+should drive them from the region.
 ~
 18100 18124 10-50
 10 0 d 0

@@ -19,6 +19,10 @@ negative modifier causes healing instead.
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
 
+When used by a mob's script, %aoe% only hits characters who are 'enemies',
+if the mob is in combat. Otherwise, it will hit all player characters. Non-mob
+versions of %aoe% hit ALL characters.
+
 Examples:
   %aoe% 100  - group damage
   %aoe% -20    - group healing
@@ -149,8 +153,10 @@ See also: REMOTE
 
 Cause amount points of damage to victim. Damage is automatically scaled based
 on the mob or adventure level. Modifier is a percent of the scaled damage,
-where 100 is the normal level. If modifier is negative, the player will be
-healed.
+where 100 is the normal level.
+
+If modifier is negative, the player will be healed, but you should use %heal%
+instead.
 
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
@@ -183,30 +189,43 @@ See also: TATTACH, TDETACH, TRIG-ATTACH
 #d
 DG_AFFECT DG_AFFECTS
 
-Usage:  dg_affect <target> <property> <value> <duration>
+Usage:  dg_affect [#affect vnum] <target> <property> <value | off> <duration>
+        dg_affect <#affect vnum> <target> off
 
 Puts an affection or apply on the target. Durations must be non-zero. You can
 use -1 for infinite duration ONLY if the target is an NPC.
+
+The affect vnum arg is optional, and requires a # if you're going to use it.
+For example, #3001 uses the "fly" generic affect.
+
+Using "off" with no property results in removing all affects of a given type.
 
 Examples:
   dg_affect %actor% HASTE on 20  -- Sets haste on actor for 20 seconds.
   dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
   dg_affect %actor% STRENGTH off  -- Removes any STRENGTH affects
+  dg_affect #3024 %actor% off  -- Removes all affects of vnum 134
 
-See also: APPLIES, AFFECTS
+See also: APPLIES, AFFECTS, GENERIC AFFECTS
 #d
 DG_AFFECT_ROOM
 
-Usage:  dg_affect_room <room> <affect> <on|off> <duration>
+Usage:  dg_affect_room [#affect vnum] <room> <affect> <on|off> <duration>
+        dg_affect_room [#affect vnum] <room> off
 
 Puts a room affect onto the target room. Durations must be non-zero, and you
 can use -1 for infinite duration if you're not on the map. Infinite affects
 can't be added to map locations.
 
+The affect vnum arg is optional, and requires a # if you're going to use it.
+For example, #3001 uses the "fly" generic affect.
+
+Using "off" with no property results in removing all affects of a given type.
+
 Examples:
   dg_affect_room %room% !WEATHER on
 
-See also: REDIT AFFECTS
+See also: REDIT AFFECTS, GENERIC AFFECTS
 #d
 DG_CAST
 
@@ -235,9 +254,12 @@ property of the door is being changed. Valid fields are:
 #d
 %DOT% MDOT ODOT VDOT WDOT
 
-%dot% <victim> <modifier> <duration> [damage type] [max stacks]
+%dot% [#affect vnum] <victim> <modifier> <duration> [damage type] [max stacks]
 
 Adds a scaled DoT -- Damage-Over-Time -- effect to the target.
+
+The affect vnum arg is optional, and requires a # if you're going to use it.
+For example, #3001 uses the "fly" generic affect.
 
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
@@ -250,7 +272,7 @@ not stack (max 1).
 
 NOTE: If you want to use max stacks, you must also provide the damage type.
 
-See also: %DAMAGE%, %AOE%, %SIEGE%
+See also: %DAMAGE%, %AOE%, %SIEGE%, GENERIC AFFECTS
 #d
 EVAL
 
@@ -261,12 +283,9 @@ the result of the immediate evaluation of the provided expression. There also
 exists a "set" command, with the same syntax. Set differs in that the expression
 is not evaluated until each time the variable is accessed.
 
-Example:
-* this example immediately evaluates the expression below and stores the result
-* in %result%:
-eval result %self.health% * 100 / %self.maxhealth% 
-say My hitpoint percentage is %result%.
-* this result will not change after the evaluation even if %self.health% changes.
+Use 'eval' instead of 'set' when:
+ - There is math in the text:  eval var %input% + 3
+ - There are nested variables:  eval to_room %%from_room.%direction%(room)%%
 
 See also: TRIG-SET
 #d
@@ -332,6 +351,20 @@ if %actor.level% < 20
 end
 %echo% %self.name% yells a Battlecry and throws himself at you.
 mkill %actor%
+#d
+%HEAL% OHEAL MHEAL WHEAL VHEAL
+
+%heal% <person> <type> [modifier]
+
+Heals a person's health, mana, moves, DoTs, or debuffs (these are the types).
+Modifier is a percent of the scaled amount, where 100 is the normal level.
+
+Examples:
+  %heal% %actor% health  - cause scaled healing
+  %heal% %actor% mana 50  - restores a smaller amount of mana
+  %heal% %self% debuffs  - remove all debuffs from self
+
+See also: %DAMAGE%
 #d
 IF ELSEIF END "ELSE IF" ELSIF
 
@@ -440,11 +473,6 @@ legally on lines that do not need to process the result.
 Examples:
   * this will award the actor with 10 coins
   nop %actor.give_coins(10)%
-
-Here is a workaround to use a variable:
-  *nop workaround
-  eval making %%self.give_coins(%coins%)%%
-  nop %making%
 #d
 %MORPH% MMORPH OMORPH VMORPH WMORPH
 
@@ -477,16 +505,17 @@ See also: EMPIRE VARS
 %PURGE% MPURGE OPURGE VPURGE WPURGE
 
 Usage:  %purge% <victim | obj | vehicle> [message]
-        %purge% instance mob <vnum> [message]
+        %purge% instance <mob | obj> <vnum> [message]
 
 Purge removes objects, mobs, or vehicles from the game. If no argument is
 given, then all objects and mobs (but not vehicles) in the room will be
 removed. If there is an argument, only that thing will be  purged. Players
 cannot be purged.
 
-The "purge instance" feature lets you purge ALL mobs by vnum in an instance.
-In the future, other types may be supported for this. Request one if you need
-it for your scripts.
+The "purge instance" feature lets you purge ALL mobs by vnum from the instance.
+It can also purge objects inside the instance by vnum, but this will ONLY work
+on objects that are on the ground inside. In the future, other types may be
+supported for this. Request one if you need it for your scripts.
 
 The optional [message] argument echoes a message for each thing extracted.
 If using "purge instance", you must use "dollar sign codes" rather than script
@@ -498,8 +527,9 @@ command is executed).
 
 Examples: 
   %purge% %self%
-  %purge% %actor.inventory(1300)%   
+  %purge% %actor.inventory(1300)%
   %purge% %actor.eq(hold)%
+  %purge% instance obj 2104
 
 See also: POSITIONS
 #d
@@ -628,13 +658,16 @@ the provided expression, which will be evaluated when the variable is accessed.
 There also exists an "eval" command, with the same syntax. Eval differs in that 
 the expression is evaluated immediately.
 
-Example:
-* this example sets the value of result to '%self.health% * 100 / %self.maxhealth%'
-set result %self.health% * 100 / %self.maxhealth% 
-* The %result% var now works as a 'function' every time it's accessed.
-say My hitpoint percentage is %result%.
-%damage% %self% 30
-say My hitpoint percentage is %result%.
+Note: Variables in %percents% will still be evaluated BEFORE the 'set' happens,
+so "set health %self.health%" will set the %health% variable to a number,
+which won't change no matter how many times you call %health%. Stock DG Scripts
+contained an example about using 'set' to calculate hitpoints before and after
+a %damage% effect; this example was incorrect and will not work.
+
+Use 'set' instead of 'eval' when:
+ - There is no math in the value:  set to_room %self.room%
+ - The value is a multi-word phrase:  set objname the wand of enchantment
+ - The value contains a '-' that isn't a minus:  set objname the gob-smacker
 
 See also: EVAL
 #d
@@ -865,6 +898,9 @@ use the wait command.
 
 Note: A trigger won't fire again while it's still in a 'wait', so be careful
 using this on Greet triggers.
+Note: Triggers attached to adventures or quests must not use 'wait', because
+those triggers only exist long enough to run, and will cancel themselves when
+they hit a 'wait'.
 
 Examples:
   say GET OUT! NOW!

@@ -5,7 +5,7 @@ Tavern Hideout Completion~
 if !%room.down(room)%
   * Add Secret Hidout
   %door% %room% down add 5510
-  eval hideout %room.down(room)%
+  set hideout %room.down(room)%
   if %hideout%
     * Close doors
     %door% %room% down flags ab
@@ -54,23 +54,23 @@ if !%study%
   %door% %firsthall% %room.enter_dir% add 5608
 end
 * Add basement tunnel
-eval basement %%firsthall.down(room)%%
+set basement %firsthall.down(room)%
 if !%basement%
   %door% %firsthall% down add 5612
 end
-eval basement %%firsthall.down(room)%%
+set basement %firsthall.down(room)%
 if !%basement%
   * Failed to add
   halt
 end
 * Add bedroom
-eval edir %room.bld_dir(east)%
+set edir %room.bld_dir(east)%
 eval bedroom %%basement.%edir%(room)%%
 if !%bedroom%
   %door% %basement% %edir% add 5601
 end
 * Add crypt
-eval sdir %room.bld_dir(south)%
+set sdir %room.bld_dir(south)%
 eval crypt %%basement.%sdir%(room)%%
 if !%crypt%
   %door% %basement% %sdir% add 5620
@@ -97,23 +97,23 @@ if !%study%
   %door% %firsthall% %room.enter_dir% add 5608
 end
 * Add basement tunnel
-eval basement %%firsthall.down(room)%%
+set basement %firsthall.down(room)%
 if !%basement%
   %door% %firsthall% down add 5612
 end
-eval basement %%firsthall.down(room)%%
+set basement %firsthall.down(room)%
 if !%basement%
   * Failed to add
   halt
 end
 * Add bedroom
-eval edir %room.bld_dir(east)%
+set edir %room.bld_dir(east)%
 eval bedroom %%basement.%edir%(room)%%
 if !%bedroom%
   %door% %basement% %edir% add 5601
 end
 * Add crypt
-eval sdir %room.bld_dir(south)%
+set sdir %room.bld_dir(south)%
 eval crypt %%basement.%sdir%(room)%%
 if !%crypt%
   %door% %basement% %sdir% add 5620
@@ -127,5 +127,55 @@ Oasis Drainage~
 %echo% The drainage is complete and the area is now a desert.
 %terraform% %room% 20
 return 0
+~
+#5195
+Equipment Cruncher: shatter~
+2 c 0
+shatter~
+eval target %%actor.obj_target(%arg%)%%
+if !%target%
+  %send% %actor% Convert what into shards?
+  halt
+end
+if !%target.carried_by%
+  %send% %actor% Pick %target.shortdesc% up first.
+  halt
+end
+if !%target.wearable%
+  %send% %actor% %target.shortdesc% is not an equipment item.
+  halt
+end
+* 26 ~ 200
+eval level_modified %target.level% + 25
+eval level_in_range (%level_modified% // 100)
+if %level_in_range% == 0
+  set level_in_range 100
+end
+eval shard_value %level_in_range% + 25
+if %target.is_flagged(HARD-DROP)%
+  eval shard_value %shard_value% + 25
+end
+if %target.is_flagged(GROUP-DROP)%
+  eval shard_value %shard_value% + 50
+end
+* 0~75: 5100
+* 76~175: 5101
+* 176~275: 5102
+* 276~375: 5103
+eval shard_type 5100 + ((%level_modified%-1) / 100)
+eval currency_name %%currency.%shard_type%%%
+if !%currency_name% || %currency_name% == UNKNOWN
+  %send% %actor% %target.shortdesc% is too high level to convert into any current type of shards!
+  halt
+end
+if %shard_value% < 1 || %target.quest% || %target.level% < 25
+  %send% %actor% %target.shortdesc% can't be converted into shards.
+  halt
+end
+%send% %actor% You shatter %target.shortdesc% into %shard_value% %currency_name%.
+%echoaround% %actor% %actor.name% shatters %target.shortdesc% into %currency_name%.
+eval money %%actor.give_currency(%shard_type%, %shard_value%)%%
+nop %money%
+%purge% %target%
 ~
 $

@@ -21,16 +21,19 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 #include "vnums.h"
 
 /**
 * Contents:
 *   Adventure Lib
+*   Automessages Lib
 *   Building Lib
 *   Craft Lib
 *   Crop Lib
 *   Empire Lib
 *   Empire NPC Lib
+*   Empire Offense Lib
 *   Exit Lib
 *   Extra Description Lib
 *   Globals Lib
@@ -42,6 +45,7 @@
 *   Room Lib
 *   Room Template Lib
 *   Sector Lib
+*   Stored Event Lib
 *   Trigger Lib
 *   Core Lib Functions
 *   Index Saving
@@ -52,8 +56,12 @@
 */
 
 // external variables
+extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
+extern struct empire_territory_data *global_next_territory_entry;
+extern int max_automessage_id;
+extern struct offense_info_type offense_info[NUM_OFFENSES];
 extern bool world_is_sorted;
 
 // external funcs
@@ -68,20 +76,25 @@ void sort_world_table();
 // locals
 int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
+void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 empire_vnum find_free_empire_vnum(void);
 void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
+PLAYER_UPDATE_FUNC(send_all_players_to_nowhere);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
 void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
 void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
+void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
 
@@ -175,8 +188,7 @@ void init_adventure(adv_data *adv) {
 */
 void parse_adventure(FILE *fl, adv_vnum vnum) {
 	int int_in[4];
-	char line[256], str_in[256], str_in2[256];
-	struct adventure_link_rule *link, *last_link = NULL;
+	char line[256], str_in[256];
 	adv_data *adv, *find;
 
 	CREATE(adv, adv_data, 1);
@@ -228,44 +240,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 		}
 		switch (*line) {
 			case 'L': {	// linking rule
-				CREATE(link, struct adventure_link_rule, 1);
-				link->next = NULL;
-				if (last_link) {
-					last_link->next = link;
-				}
-				else {
-					GET_ADV_LINKING(adv) = link;
-				}
-				last_link = link;
-				
-				// line 1: type flags
-				if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
-					log("SYSERR: Format error in L line 1 of %s", buf2);
-					exit(1);
-				}
-				
-				link->type = int_in[0];
-				link->flags = asciiflag_conv(str_in);
-				
-				// line 2: value portal_in portal_out
-				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
-					log("SYSERR: Format error in L line 2 of %s", buf2);
-					exit(1);
-				}
-				
-				link->value = int_in[0];
-				link->portal_in = int_in[1];
-				link->portal_out = int_in[2];
-				
-				// line 3: dir bld_on bld_facing
-				if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
-					log("SYSERR: Format error in L line 3 of %s", buf2);
-					exit(1);
-				}
-				
-				link->dir = int_in[0];
-				link->bld_on = asciiflag_conv(str_in);
-				link->bld_facing = asciiflag_conv(str_in2);
+				parse_link_rule(fl, &GET_ADV_LINKING(adv), buf2);
 				break;
 			}
 
@@ -296,8 +271,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 * @param adv_data *adv The thing to save.
 */
 void write_adventure_to_file(FILE *fl, adv_data *adv) {
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
-	struct adventure_link_rule *link;
+	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !adv) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_adventure_to_file called without %s", !fl ? "file" : "adventure");
@@ -317,21 +291,258 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	fprintf(fl, "%d %d %s %d\n", GET_ADV_MAX_INSTANCES(adv), GET_ADV_RESET_TIME(adv), bitv_to_alpha(GET_ADV_FLAGS(adv)), GET_ADV_PLAYER_LIMIT(adv));
 
 	// L: linking rules
-	for (link = GET_ADV_LINKING(adv); link; link = link->next) {
-		fprintf(fl, "L\n");
-		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
-		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
-		
-		strcpy(temp, bitv_to_alpha(link->bld_on));
-		strcpy(temp2, bitv_to_alpha(link->bld_facing));
-		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
-	}
+	write_linking_rules_to_file(fl, 'L', GET_ADV_LINKING(adv));
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_ADV_SCRIPTS(adv));
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUTOMESSAGES LIB ////////////////////////////////////////////////////////
+
+/**
+* Formats and sends an auto-message.
+*/
+void show_automessage_to_char(char_data *ch, struct automessage *msg) {
+	if (msg->msg && *msg->msg) {
+		msg_to_char(ch, "[%s%s&0] %s\r\n", config_get_string("automessage_color"), config_get_string("mud_name"), msg->msg);
+	}
+}
+
+
+// quick-sorter by id
+int sort_automessage_by_id(struct automessage *a, struct automessage *b) {
+	return a->id - b->id;
+}
+
+
+// quick-sorter by type/time
+int sort_automessage_by_data(struct automessage *a, struct automessage *b) {
+	// sort one-time to the top
+	if (a->timing != b->timing) {
+		if (a->timing == AUTOMSG_ONE_TIME) {
+			return -1;
+		}
+		if (b->timing == AUTOMSG_ONE_TIME) {
+			return 1;
+		}
+	}
+	
+	// otherwise sort by timestamp
+	return a->timestamp - b->timestamp;
+}
+
+
+/**
+* Checks if anybody needs an automessage, and sends it.
+*/
+void display_automessages(void) {
+	struct automessage *msg, *next_msg;
+	struct player_automessage *pam;
+	descriptor_data *desc;
+	time_t now = time(0);
+	char_data *ch;
+	int id;
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		id = msg->id;
+		
+		if (msg->timing == AUTOMSG_ON_LOGIN) {
+			continue;	// we don't show these now
+		}
+		if (msg->timestamp > now - (2 * SECS_PER_REAL_MIN)) {
+			continue;	// don't show messages newer than 2 minutes (grace period)
+		}
+		
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || IS_NPC(ch)) {
+				continue;	// not playing
+			}
+			
+			// have/should they see/n it
+			HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
+			if (pam && msg->timing == AUTOMSG_ONE_TIME) {
+				continue;	// seen
+			}
+			else if (pam && msg->timing == AUTOMSG_REPEATING && (now - pam->timestamp) < (msg->interval * SECS_PER_REAL_MIN)) {
+				continue;	// too soon
+			}
+			
+			// validated!
+			show_automessage_to_char(ch, msg);
+			
+			// update or add player data
+			if (!pam) {
+				CREATE(pam, struct player_automessage, 1);
+				pam->id = id;
+				HASH_ADD_INT(GET_AUTOMESSAGES(ch), id, pam);
+			}
+			pam->timestamp = now;
+		}
+	}
+}
+
+
+/**
+* Looks for login messages to send to a player who just logged in.
+*
+* @param char_data *ch The player.
+*/
+void display_automessages_on_login(char_data *ch) {
+	struct automessage *msg, *next_msg;
+	bool any = FALSE;
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		if (msg->timing != AUTOMSG_ON_LOGIN) {
+			continue;	// only showing 1 type
+		}
+		
+		show_automessage_to_char(ch, msg);
+		any = TRUE;
+	}
+		
+	// trailing crlf
+	if (any) {
+		msg_to_char(ch, "\r\n");
+	}
+}
+
+
+/**
+* Frees up an automessage.
+*
+* @param struct automessage *msg The message to free.
+*/
+void free_automessage(struct automessage *msg) {
+	if (msg->msg) {
+		free(msg->msg);
+	}
+	free(msg);
+}
+
+
+void load_automessages(void) {
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH];
+	int id, author, timing, interval, version;
+	struct automessage *msg, *find;
+	bool end = FALSE;
+	char *tmp;
+	FILE *fl;
+	long ts;
+	
+	version = 1;	// default (makes for easier alternate parsing to have version numbers)
+	if (version < 0) {
+		// nothing to do here, but it prevents a compiler warning until version is used
+	}
+	
+	if (!(fl = fopen(AUTOMESSAGE_FILE, "r"))) {
+		return;	// there are no messages
+	}
+	
+	snprintf(error, sizeof(error), "automessage file");
+	
+	while (!end) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Unexpected end of automessage file");
+			break;
+		}
+		
+		if (*line == '$') {
+			end = TRUE;
+		}
+		else if (!strn_cmp(line, "Automessage:", 12)) {
+			version = atoi(line+13);
+		}
+		else if (!strn_cmp(line, "Index:", 6)) {
+			max_automessage_id = atoi(line+7);
+		}
+		else if (!strn_cmp(line, "Message:", 8)) {
+			if (sscanf(line + 8, " %d %d %ld %d %d", &id, &author, &ts, &timing, &interval) != 5) {
+				log("SYSERR: Bad format in automessage file. Skipping message.");
+				tmp = fread_string(fl, error);
+				if (tmp) {	// skip a line
+					free(tmp);
+				}
+				continue;
+			}
+			
+			CREATE(msg, struct automessage, 1);
+			msg->id = id;
+			msg->author = author;
+			msg->timestamp = ts;
+			msg->timing = timing;
+			msg->interval = interval;
+			msg->msg = fread_string(fl, error);
+			
+			HASH_FIND_INT(automessages, &id, find);
+			if (find) {
+				log("SYSERR: Duplicate automessage id %d found in file", id);
+				HASH_DEL(automessages, find);
+				free_automessage(find);
+			}
+			
+			HASH_ADD_INT(automessages, id, msg);
+		}
+	}
+	
+	fclose(fl);
+}
+
+
+int new_automessage_id(void) {
+	struct automessage *msg, *next_msg;
+	int last = 0, found = 0;
+	
+	if (max_automessage_id < MAX_INT) {
+		return ++max_automessage_id;
+	}
+	else {
+		// whaaaa? find the first free id
+		HASH_SORT(automessages, sort_automessage_by_id);
+		HASH_ITER(hh, automessages, msg, next_msg) {
+			if (msg->id > last + 1) {
+				found = last + 1;
+			}
+			last = msg->id;
+		}
+		
+		// sort back
+		HASH_SORT(automessages, sort_automessage_by_data);
+		if (found) {
+			return found;
+		}
+	}
+	
+	// did we get here?
+	log("SYSERR: No free automessage id (somehow)");
+	return 1;
+}
+
+
+void save_automessages(void) {
+	struct automessage *msg, *next_msg;
+	FILE *fl;
+	
+	if (!(fl = fopen(AUTOMESSAGE_FILE TEMP_SUFFIX, "w"))) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write %s", AUTOMESSAGE_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// header
+	fprintf(fl, "Automessage: 1\n");	// version tag
+	fprintf(fl, "Index: %d\n", max_automessage_id);
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		fprintf(fl, "Message: %d %d %ld %d %d\n%s~\n", msg->id, msg->author, msg->timestamp, msg->timing, msg->interval, NULLSAFE(msg->msg));
+	}
+	
+	fprintf(fl, "$~\n");
+	fclose(fl);
+	rename(AUTOMESSAGE_FILE TEMP_SUFFIX, AUTOMESSAGE_FILE);	
 }
 
 
@@ -376,6 +587,8 @@ void remove_building_from_table(bld_data *bld) {
 * @param bld_data *building The building to free.
 */
 void free_building(bld_data *bdg) {
+	void free_bld_relations(struct bld_relation *list);
+	
 	bld_data *proto = building_proto(GET_BLD_VNUM(bdg));
 	struct interaction_item *interact;
 	
@@ -414,6 +627,10 @@ void free_building(bld_data *bdg) {
 		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(bdg));
 	}
 	
+	if (GET_BLD_RELATIONS(bdg) && (!proto || GET_BLD_RELATIONS(bdg) != GET_BLD_RELATIONS(proto))) {
+		free_bld_relations(GET_BLD_RELATIONS(bdg));
+	}
+	
 	free(bdg);
 }
 
@@ -440,6 +657,7 @@ void init_building(bld_data *building) {
 void parse_building(FILE *fl, bld_vnum vnum) {
 	char line[256], str_in[256], str_in2[256];
 	struct spawn_info *spawn, *stemp;
+	struct bld_relation *relat;
 	bld_data *bld, *find;
 	int int_in[4];
 	double dbl_in;
@@ -572,14 +790,27 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
-			// upgrades to
-			case 'U': {
-				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
-					log("SYSERR: Format error in U line of %s", buf2);
+			case 'U': {	// relation (formerly 'upgrades to')
+				if (!get_line(fl, line)) {
+					log("SYSERR: Missing U line of %s", buf2);
 					exit(1);
 				}
+				if (sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+					if (sscanf(line, "%d", &int_in[1]) == 1) {
+						// backwards-compatible to when U was only upgrades-to
+						int_in[0] = BLD_REL_UPGRADES_TO;
+					}
+					else {	// error
+						log("SYSERR: Format error in U line of %s", buf2);
+						exit(1);
+					}
+				}
 				
-				GET_BLD_UPGRADES_TO(bld) = int_in[0];
+				CREATE(relat, struct bld_relation, 1);
+				relat->type = int_in[0];
+				relat->vnum = int_in[1];
+				
+				LL_APPEND(GET_BLD_RELATIONS(bld), relat);
 				break;
 			}
 
@@ -606,6 +837,7 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 */
 void write_building_to_file(FILE *fl, bld_data *bld) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	struct bld_relation *relat;
 	struct spawn_info *spawn;
 	
 	if (!fl || !bld) {
@@ -668,10 +900,9 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_BLD_SCRIPTS(bld));
 	
-	// U: upgrades_to
-	if (GET_BLD_UPGRADES_TO(bld) != NOTHING && building_proto(GET_BLD_UPGRADES_TO(bld))) {
-		fprintf(fl, "U\n");
-		fprintf(fl, "%d\n", GET_BLD_UPGRADES_TO(bld));
+	// U: relations (formerly upgrades_to)
+	LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
+		fprintf(fl, "U\n%d %d\n", relat->type, relat->vnum);
 	}
 	
 	// end
@@ -1176,6 +1407,197 @@ void remove_empire_from_table(empire_data *emp) {
 
 
 /**
+* This function detects when the mud boots up on a new map, and moves all
+* empire territory to "no island" (to be moved back later). It also cleans up
+* empire data and ensures players don't log in mid-ocean.
+*/
+void check_for_new_map(void) {
+	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
+	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
+	
+	struct empire_storage_data *store, *next_store;
+	struct empire_territory_data *ter, *next_ter;
+	struct empire_trade_data *trade, *next_trade;
+	struct empire_city_data *city, *next_city;
+	struct shipping_data *shipd, *next_shipd;
+	struct empire_island *isle, *next_isle;
+	struct instance_data *inst, *next_inst;
+	struct empire_unique_storage *eus;
+	empire_data *emp, *next_emp;
+	room_data *room;
+	FILE *fl;
+	
+	if (!(fl = fopen(NEW_WORLD_HINT_FILE, "r"))) {
+		return;	// no new world
+	}
+	fclose(fl);
+	
+	log("DETECT NEW WORLD MAP -- Clearing empire islands and player locations...");
+	
+	// ensure no instances in the instance list-- their locations SHOULD be all gone anyway
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (inst->room) {
+			free(inst->room);
+		}
+		if (inst->mob_counts) {
+			free(inst->mob_counts);
+		}
+		LL_DELETE(instance_list, inst);
+		free(inst);
+	}
+	
+	// update all empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// move unique storage
+		LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			eus->island = NO_ISLAND;	// simple move, for now
+		}
+		
+		// free shipping (and put the items back)
+		LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+			add_to_empire_storage(emp, NO_ISLAND, shipd->vnum, shipd->amount);
+			free(shipd);	// no need to remove from list
+		}
+		EMPIRE_SHIPPING_LIST(emp) = NULL;	// all entries freed
+		
+		// free trade (no longer relevant)
+		LL_FOREACH_SAFE(EMPIRE_TRADE(emp), trade, next_trade) {
+			free(trade);
+		}
+		EMPIRE_TRADE(emp) = NULL;
+		
+		// free cities
+		LL_FOREACH_SAFE(EMPIRE_CITY_LIST(emp), city, next_city) {
+			if (city->name) {
+				free(city->name);
+			}
+			room = city->location;
+			if (room) {
+				if (IS_CITY_CENTER(room)) {
+					disassociate_building(room);
+				}
+				if (ROOM_OWNER(room)) {
+					abandon_room(room);
+				}
+			}
+			free(city);	// no need to remove from list
+		}
+		EMPIRE_CITY_LIST(emp) = NULL;	// all entries freed
+		
+		// free territory lists and clear numbers
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+			if (ter == global_next_territory_entry) {
+				global_next_territory_entry = ter->hh.next;
+			}
+			
+			// free npcs
+			while (ter->npcs) {
+				delete_territory_npc(ter, ter->npcs);
+			}
+			
+			HASH_DEL(EMPIRE_TERRITORY_LIST(emp), ter);
+			free(ter);
+		}
+		EMPIRE_TERRITORY_LIST(emp) = NULL;	// all entires freed
+		
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			if (isle->island == NO_ISLAND) {
+				continue;	// we ONLY keep no-island data
+			}
+			
+			// move all inventories to nowhere
+			HASH_ITER(hh, isle->store, store, next_store) {
+				add_to_empire_storage(emp, NO_ISLAND, store->vnum, store->amount);
+				HASH_DEL(isle->store, store);
+				free(store);
+			}
+			
+			// remove island data
+			if (isle->name) {
+				free(isle->name);
+			}
+			HASH_DEL(EMPIRE_ISLANDS(emp), isle);
+			free(isle);
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+	
+	// do this last in case of error
+	save_all_empires();
+	unlink(NEW_WORLD_HINT_FILE);
+	
+	// now move all player login locations to NOWHERE
+	update_all_players(NULL, send_all_players_to_nowhere);
+	
+	// rescan all empires
+	reread_empire_tech(NULL);
+}
+
+
+/**
+* This function looks for any empire inventory that's in a "no island" location
+* and moves it to the specified island. This includes unique storage.
+*
+* @param empire_data *emp The empire to move.
+* @param int new_island The ID of the island to move to.
+*/
+void check_nowhere_einv(empire_data *emp, int new_island) {
+	struct empire_storage_data *store, *next_store;
+	struct empire_unique_storage *eus;
+	struct empire_island *no_isle;
+	bool any = FALSE;
+	
+	if (!emp || new_island == NO_ISLAND) {
+		return;	// can't do
+	}
+	
+	// move basic storage
+	if ((no_isle = get_empire_island(emp, NO_ISLAND))) {
+		HASH_ITER(hh, no_isle->store, store, next_store) {
+			add_to_empire_storage(emp, new_island, store->vnum, store->amount);
+			HASH_DEL(no_isle->store, store);
+			free(store);
+			any = TRUE;
+		}
+		no_isle->store = NULL;
+	}
+	
+	// move unique storage
+	LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+		if (eus->island == NO_ISLAND) {
+			eus->island = new_island;	// simple move, for now
+			any = TRUE;
+		}
+	}
+	
+	if (any) {	// reporting
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+		log_to_empire(emp, ELOG_TERRITORY, "Empire inventory delivered to the new island");
+	}
+}
+
+
+/**
+* Checks all empires to ensure they have no "missing" einv in the no-island
+* state. This is meant to be run at startup but can be re-run as needed.
+*/
+void check_nowhere_einv_all(void) {
+	extern int get_main_island(empire_data *emp);
+	
+	empire_data *emp, *next_emp;
+	int island;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if ((island = get_main_island(emp)) != NO_ISLAND) {
+			check_nowhere_einv(emp, island);
+		}
+	}
+}
+
+
+/**
 * Creates a new empire with default ranks and ch as leader. The default empire
 * name is the player's name so that new players will see "This area is claimed
 * by <your name>", which fits the concept that small empires are just land
@@ -1187,6 +1609,7 @@ void remove_empire_from_table(empire_data *emp) {
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
 	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
+	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void resort_empires(bool force);
 
 	archetype_data *arch;
@@ -1253,8 +1676,9 @@ empire_data *create_empire(char_data *ch) {
 		EMPIRE_PRIV(emp, iter) = 2;
 	}
 	
-	// this is necessary to save einv at all
+	// this is necessary to save some parts at all
 	emp->storage_loaded = TRUE;
+	emp->logs_loaded = TRUE;
 
 	// set the player up
 	remove_lore(ch, LORE_PROMOTED);
@@ -1263,11 +1687,12 @@ empire_data *create_empire(char_data *ch) {
 	GET_RANK(ch) = 2;
 	SAVE_CHAR(ch);
 
-	save_empire(emp);
+	save_empire(emp, TRUE);
 	save_index(DB_BOOT_EMP);
 	
 	// this will set up all the data
 	reread_empire_tech(emp);
+	refresh_empire_goals(emp, NOTHING);
 
 	// this is a good time to sort and rank
 	resort_empires(FALSE);
@@ -1283,7 +1708,6 @@ empire_data *create_empire(char_data *ch) {
 * @param empire_data *emp The empire to delete.
 */
 void delete_empire(empire_data *emp) {
-	void eliminate_linkdead_players();
 	void remove_empire_from_table(empire_data *emp);
 
 	struct empire_political_data *emp_pol, *next_pol, *temp;
@@ -1295,14 +1719,12 @@ void delete_empire(empire_data *emp) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
-	bool file = FALSE, save;
+	bool file = FALSE;
 	empire_vnum vnum;
 
 	if (!emp) {
 		return;
 	}
-	
-	eliminate_linkdead_players();
 	
 	// prepare
 	log_to_empire(emp, ELOG_NONE, "This empire has been deleted");
@@ -1315,20 +1737,15 @@ void delete_empire(empire_data *emp) {
 
 	// things to unset on other empires
 	HASH_ITER(hh, empire_table, emp_iter, next_emp) {
-		save = FALSE;
-		
 		for (emp_pol = EMPIRE_DIPLOMACY(emp_iter); emp_pol; emp_pol = next_pol) {
 			next_pol = emp_pol->next;
 			if (emp_pol->id == vnum) {
 				REMOVE_FROM_LIST(emp_pol, EMPIRE_DIPLOMACY(emp_iter), next);
 				free(emp_pol);
-				save = TRUE;
+				
+				et_change_diplomacy(emp_iter);
+				EMPIRE_NEEDS_SAVE(emp_iter) = TRUE;
 			}
-		}
-		
-		// save at the end in case more than 1 thing changed
-		if (save) {
-			save_empire(emp_iter);
 		}
 	}
 	
@@ -1483,33 +1900,40 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
-	extern struct empire_territory_data *global_next_territory_entry;
+	void free_empire_goals(struct empire_goal *hash);
+	void free_empire_completed_goals(struct empire_completed_goal *hash);
 	
+	struct workforce_delay_chore *wdc, *next_wdc;
+	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
+	struct player_craft_data *pcd, *next_pcd;
+	struct empire_needs *needs, *next_needs;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
 	struct empire_log_data *elog;
+	struct workforce_log *wf_log;
 	struct shipping_data *shipd;
 	room_data *room;
 	int iter;
 	
-	// free island techs
+	// free islands
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		HASH_ITER(hh, isle->needs, needs, next_needs) {
+			HASH_DEL(isle->needs, needs);
+			free(needs);
+		}
+		HASH_ITER(hh, isle->store, store, next_store) {
+			HASH_DEL(isle->store, store);
+			free(store);
+		}
+		HASH_DEL(EMPIRE_ISLANDS(emp), isle);
 		free(isle);
 	}
 	EMPIRE_ISLANDS(emp) = NULL;
-			
-	// free storage
-	while ((store = emp->store)) {
-		emp->store = store->next;
-		store->next = NULL;
-		free(store);
-	}
-	emp->store = NULL;
 	
 	// free unique storage
 	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
@@ -1541,6 +1965,12 @@ void free_empire(empire_data *emp) {
 		free(city);
 	}
 	
+	// free learned crafts
+	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
+		HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
+		free(pcd);
+	}
+	
 	// free trades
 	while ((trade = emp->trade)) {
 		emp->trade = trade->next;
@@ -1557,9 +1987,9 @@ void free_empire(empire_data *emp) {
 	}
 	
 	// free territory
-	while ((ter = emp->territory_list)) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (ter == global_next_territory_entry) {
-			global_next_territory_entry = ter->next;
+			global_next_territory_entry = ter->hh.next;
 		}
 		
 		// free npcs
@@ -1567,7 +1997,7 @@ void free_empire(empire_data *emp) {
 			delete_territory_npc(ter, ter->npcs);
 		}
 		
-		emp->territory_list = ter->next;
+		HASH_DEL(EMPIRE_TERRITORY_LIST(emp), ter);
 		free(ter);
 	}
 	
@@ -1577,6 +2007,31 @@ void free_empire(empire_data *emp) {
 		free(pol);
 	}
 	
+	// free offenses
+	while (EMPIRE_OFFENSES(emp)) {
+		remove_offense(emp, EMPIRE_OFFENSES(emp));
+	}
+	
+	// free delays
+	HASH_ITER(hh, EMPIRE_DELAYS(emp), delay, next_delay) {
+		LL_FOREACH_SAFE(delay->chores, wdc, next_wdc) {
+			free(wdc);
+		}
+		HASH_DEL(EMPIRE_DELAYS(emp), delay);
+		free(delay);
+	}
+	
+	// free workforce log
+	while ((wf_log = EMPIRE_WORKFORCE_LOG(emp))) {
+		EMPIRE_WORKFORCE_LOG(emp) = wf_log->next;
+		free(wf_log);
+	}
+	
+	// free goals
+	free_empire_goals(EMPIRE_GOALS(emp));
+	free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
+	
+	// free strings
 	if (emp->name) {
 		free(emp->name);
 	}
@@ -1601,6 +2056,91 @@ void free_empire(empire_data *emp) {
 
 
 /**
+* Delayed-load of logs for an empire.
+*
+* @param FILE *fl The open read file.
+* @param empire_data *emp The empire to assign the logs to.
+*/
+void load_empire_logs_one(FILE *fl, empire_data *emp) {	
+	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
+	struct empire_log_data *elog, *last_log = NULL;
+	struct offense_data *off, *last_off = NULL;
+	long long_in;
+	int t[10];
+	
+	if (!fl || !emp) {
+		return;
+	}
+	
+	// error for later
+	sprintf(buf,"SYSERR: Format error in empire logs for #%d (expecting letter, got %s)", EMPIRE_VNUM(emp), line);
+
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("%s", buf);
+			exit(1);
+		}
+		switch (*line) {
+			case 'L': {	// logs
+				if (!get_line(fl, line) || sscanf(line, "%d %d", &t[0], &t[1]) != 2) {
+					log("SYSERR: Format error in L line of log file for empire %d", EMPIRE_VNUM(emp));
+					exit(1);
+				}
+				
+				CREATE(elog, struct empire_log_data, 1);
+				elog->type = t[0];
+				elog->timestamp = (time_t) t[1];
+				elog->string = fread_string(fl, buf2);
+				elog->next = NULL;
+				
+				// append to end to preserve original order
+				if (last_log) {
+					last_log->next = elog;
+				}
+				else {
+					emp->logs = elog;
+				}
+				last_log = elog;
+				break;
+			}
+			case 'W': {	// offenses
+				if (sscanf(line, "W %d %d %d %ld %d %d %s", &t[0], &t[1], &t[2], &long_in, &t[4], &t[5], str_in) != 7) {
+					log("SYSERR: W line of empire %d does not scan (ignoring).\r\n", emp->vnum);
+				}
+				
+				CREATE(off, struct offense_data, 1);
+				off->type = t[0];
+				off->empire = t[1];
+				off->player_id = t[2];
+				off->timestamp = long_in;
+				off->x = t[4];
+				off->y = t[5];
+				off->flags = asciiflag_conv(str_in);
+				
+				if (last_off) {
+					last_off->next = off;
+				}
+				else {
+					EMPIRE_OFFENSES(emp) = off;
+				}
+				
+				last_off = off;
+				break;
+			}
+
+			case 'S': {	// fin
+				return;
+			}
+			default: {
+				log("%s", buf);
+				exit(1);
+			}
+		}
+	}
+}
+
+
+/**
 * Delayed-load of storage for an empire.
 *
 * @param FILE *fl The open read file.
@@ -1610,9 +2150,9 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	int t[10], junk;
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
-	struct empire_storage_data *store, *last_store = NULL;
 	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct shipping_data *shipd, *last_shipd = NULL;
+	struct empire_storage_data *store;
 	obj_data *obj, *proto;
 	
 	if (!fl || !emp) {
@@ -1624,32 +2164,32 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(buf);
+			log("%s", buf);
 			exit(1);
 		}
 		switch (*line) {
 			case 'O': {	// storage
-				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
+				if (!get_line(fl, line)) {
 					log("SYSERR: Storage data for empire %d was incomplete", EMPIRE_VNUM(emp));
 					exit(1);
+				}
+				if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+					t[3] = 0;	// !keep
+					if (sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
+						log("SYSERR: Bad storage data for empire %d", EMPIRE_VNUM(emp));
+						exit(1);
+					}
 				}
 				
 				// validate vnum
 				proto = obj_proto(t[0]);
 				if (proto && proto->storage) {
-					CREATE(store, struct empire_storage_data, 1);
-					store->vnum = t[0];
-					store->amount = t[1];
-					store->island = t[2];
-
-					// at end
-					if (last_store) {
-						last_store->next = store;
+					add_to_empire_storage(emp, t[2], t[0], t[1]);
+					
+					// check keep
+					if (t[3] && (store = find_stored_resource(emp, t[2], t[0]))) {
+						store->keep = TRUE;
 					}
-					else {
-						emp->store = store;
-					}
-					last_store = store;
 				}
 				else if (proto && !proto->storage) {
 					log("- removing %dx #%d from empire storage for %s: not storable", t[1], t[0], EMPIRE_NAME(emp));
@@ -1699,27 +2239,30 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					exit(0);
 				}
 				
-				CREATE(shipd, struct shipping_data, 1);
-				shipd->vnum = t[0];
-				shipd->amount = t[1];
-				shipd->from_island = t[2];
-				shipd->to_island = t[3];
-				shipd->status = t[4];
-				shipd->status_time = l_in;
-				shipd->shipping_id = t[5];
-				shipd->ship_origin = t[6];
-				shipd->next = NULL;
+				if (obj_proto(t[0])) {
+					CREATE(shipd, struct shipping_data, 1);
+					shipd->vnum = t[0];
+					shipd->amount = t[1];
+					shipd->from_island = t[2];
+					shipd->to_island = t[3];
+					shipd->status = t[4];
+					shipd->status_time = l_in;
+					shipd->shipping_id = t[5];
+					shipd->ship_origin = t[6];
+					shipd->next = NULL;
 				
-				EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
+					EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
 
-				// append to end
-				if (last_shipd) {
-					last_shipd->next = shipd;
+					// append to end
+					if (last_shipd) {
+						last_shipd->next = shipd;
+					}
+					else {
+						EMPIRE_SHIPPING_LIST(emp) = shipd;
+					}
+					last_shipd = shipd;
 				}
-				else {
-					EMPIRE_SHIPPING_LIST(emp) = shipd;
-				}
-				last_shipd = shipd;
+				// else: don't bother warning, just drop it if the obj doesn't exist
 				break;
 			}
 
@@ -1727,7 +2270,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				return;
 			}
 			default: {
-				log(buf);
+				log("%s", buf);
 				exit(1);
 			}
 		}
@@ -1736,7 +2279,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 
 
 /**
-* Load the storage files for all empires (called at startup).
+* Load the storage and log files for all empires (called at startup).
 */
 void load_empire_storage(void) {
 	char fname[MAX_STRING_LENGTH];
@@ -1745,18 +2288,25 @@ void load_empire_storage(void) {
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		emp->storage_loaded = TRUE;	// safe to save now (whether or not it loads one)
+		emp->logs_loaded = TRUE;
 		
-		// open file
+		// storage file
 		sprintf(fname, "%s%d%s", STORAGE_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
 		if (!(fl = fopen(fname, "r"))) {
 			// it's not considered critical to lack this file
 			log("Unable to open einv file for empire %d %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
 			continue;
 		}
-		
 		load_empire_storage_one(fl, emp);
-		
 		fclose(fl);
+		
+		// logs file
+		sprintf(fname, "%s%d%s", ELOG_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
+		if ((fl = fopen(fname, "r"))) {
+			// it's not considered critical to lack this file
+			load_empire_logs_one(fl, emp);
+			fclose(fl);
+		}
 	}
 }
 
@@ -1779,15 +2329,24 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade, *last_trade = NULL;
-	struct empire_log_data *elog, *last_log = NULL;
+	struct empire_goal *egoal, *last_egoal = NULL;
+	struct empire_completed_goal *ecg;
+	struct player_craft_data *pcd;
+	struct empire_log_data *elog;
+	struct empire_needs *need;
+	struct offense_data *off;
 	struct empire_city_data *city;
 	struct empire_island *isle;
+	struct req_data *task;
+	bitvector_t bit_in;
 	room_data *room;
 	double dbl_in;
 	long long_in;
+	char *tmp, c_in;
 	
 	sprintf(buf2, "empire #%d", vnum);
 	
+	// init
 	CREATE(emp, empire_data, 1);
 	emp->vnum = vnum;
 
@@ -1798,7 +2357,8 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	}
 	add_empire_to_table(emp);
 	
-	emp->storage_loaded = FALSE;	// block accidental storage saves
+	emp->storage_loaded = FALSE;	// block accidental saves
+	emp->logs_loaded = FALSE;
 	
 	emp->name = fread_string(fl, buf2);
 	emp->adjective = fread_string(fl, buf2);
@@ -1819,8 +2379,6 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	emp->create_time = long_in;
 	emp->num_ranks = t[1];
 	
-	emp->city_terr = 0;
-	emp->outside_terr = 0;
 	emp->members = 0;
 	emp->greatness = 0;
 	for (iter = 0; iter < NUM_TECHS; ++iter) {
@@ -1841,13 +2399,32 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(buf);
+			log("%s", buf);
 			exit(1);
 		}
 
 		switch (*line) {
 			case 'A': {	// description
 				EMPIRE_DESCRIPTION(emp) = fread_string(fl, buf2);
+				break;
+			}
+			case 'B': {	// misc data
+				if (sscanf(line, "B %d %ld", &t[0], &long_in) != 2) {
+					log("SYSERR: Bad format in B tag of empire %d!", vnum);
+					exit(1);
+				}
+				
+				switch (t[0]) {
+					case 1: {
+						EMPIRE_CITY_OVERAGE_WARNING_TIME(emp) = long_in;
+						break;
+					}
+					default: {
+						log("SYSERR: Bad data type %d in B tag of empire %d!", t[0], vnum);
+						exit(1);
+					}
+				}
+				
 				break;
 			}
 			case 'C': { // chore
@@ -1877,8 +2454,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				emp_pol->type = t[1];
 				emp_pol->offer = t[2];
 				emp_pol->start_time = t[3];
-				emp_pol->next = emp->diplomacy;
-				emp->diplomacy = emp_pol;
+				LL_APPEND(emp->diplomacy, emp_pol);
 				break;
 			}
 			case 'E': {	// extra data
@@ -1896,13 +2472,143 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				emp->coins = dbl_in;
 				break;
 			}
+			case 'F': {	// base tech
+				if (sscanf(line, "F %d %d", &t[0], &t[1]) != 2) {
+					log("SYSERR: Bad format in F tag of empire %d!", vnum);
+					exit(1);
+				}
+				
+				if (t[0] >= 0 && t[0] < NUM_TECHS) {
+					EMPIRE_BASE_TECH(emp, t[0]) = t[1];
+				}
+				break;
+			}
+			case 'G': {	// goals (sub-divided by a 2nd letter)
+				switch (*(line + 1)) {
+					case 'C': {	// GC: completed
+						if (sscanf(line, "GC %d %ld", &t[0], &long_in) != 2) {
+							log("SYSERR: Format error in GC line of empire %d", vnum);
+							// non-fatal
+							break;
+						}
+						
+						HASH_FIND_INT(EMPIRE_COMPLETED_GOALS(emp), &t[0], ecg);
+						if (!ecg) {
+							CREATE(ecg, struct empire_completed_goal, 1);
+							ecg->vnum = t[0];
+							HASH_ADD_INT(EMPIRE_COMPLETED_GOALS(emp), vnum, ecg);
+						}
+						ecg->when = long_in;
+						break;
+					}
+					case 'G': {	// GG: goal in progress
+						if (sscanf(line, "GG %d %d %ld", &t[0], &t[1], &long_in) != 3) {
+							long_in = time(0);	// backwards-compatible
+							if (sscanf(line, "GG %d %d", &t[0], &t[1]) != 2) {
+								log("SYSERR: Format error in GG line of empire %d", vnum);
+								// fatal because it could mess up trackers
+								exit(1);
+							}
+						}
+						
+						HASH_FIND_INT(EMPIRE_GOALS(emp), &t[0], egoal);
+						if (!egoal) {
+							CREATE(egoal, struct empire_goal, 1);
+							egoal->vnum = t[0];
+							HASH_ADD_INT(EMPIRE_GOALS(emp), vnum, egoal);
+						}
+						egoal->version = t[1];
+						egoal->timestamp = long_in;
+						
+						last_egoal = egoal;
+						break;
+					}
+					case 'L': {	// GL: learned crafts
+						if (sscanf(line, "GL %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GL line of empire %d", vnum);
+							// not fatal
+							break;
+						}
+						
+						if (t[1] > 0) {
+							HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &t[0], pcd);
+							if (!pcd) {
+								CREATE(pcd, struct player_craft_data, 1);
+								pcd->vnum = t[0];
+								pcd->count = t[1];
+								HASH_ADD_INT(EMPIRE_LEARNED_CRAFTS(emp), vnum, pcd);
+							}
+						}
+						break;
+					}
+					case 'P': {	// GP: goal points (progress points)
+						if (sscanf(line, "GP %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Format error in GP line of empire %d", vnum);
+							// non-fatal
+							break;
+						}
+						
+						if (t[0] >= 0 && t[0] < NUM_PROGRESS_TYPES) {
+							EMPIRE_PROGRESS_POINTS(emp, t[0]) = t[1];
+						}
+						break;
+					}
+					case 'T': {	// GT: tracker for last goal
+						if (last_egoal && sscanf(line, "GT %d %d %lld %d %d %c", &t[0], &t[1], &bit_in, &t[2], &t[3], &c_in) == 6) {
+							// found group
+						}
+						else if (last_egoal && sscanf(line, "GT %d %d %lld %d %d", &t[0], &t[1], &bit_in, &t[2], &t[3]) == 5) {
+							c_in = 0;	// no group given
+						}
+						else {
+							log("SYSERR: Format error in GT line of empire %d", vnum);
+							// bad format but not fatal
+							if (last_egoal) {
+								--last_egoal->version;	// forces a refresh by putting the version out of date
+							}
+							break;
+						}
+					
+						CREATE(task, struct req_data, 1);
+						task->type = t[0];
+						task->vnum = t[1];
+						task->misc = bit_in;
+						task->needed = t[2];
+						task->current = t[3];
+						task->group = c_in;
+					
+						LL_APPEND(last_egoal->tracker, task);
+						break;
+					}
+					default: {
+						log("SYSERR: Unknown G line in empire %d: %s", vnum, line);
+						// safe to continue though
+						break;
+					}
+				}
+				break;
+			}
 			case 'I': {	// island name
 				if ((isle = get_empire_island(emp, atoi(line+1)))) {
 					isle->name = fread_string(fl, buf2);
 				}
 				break;
 			}
-			case 'L': {	// logs
+			case 'J': {	// island data
+				if (sscanf(line, "J %d %d %d %s", &t[0], &t[1], &t[2], str_in) != 4) {
+					log("SYSERR: Expected 4 args in J line of empire %d", vnum);
+					exit(0);
+				}
+				
+				// find or add
+				need = get_empire_needs(emp, t[0], t[1]);
+				
+				need->needed = t[2];
+				need->status = asciiflag_conv(str_in);
+				
+				break;
+			}
+			case 'L': {	// NOTE: logs are here for backwards-compatibility -- they are now loaded by load_empire_logs_one
 				if (!get_line(fl, line) || sscanf(line, "%d %d", &t[0], &t[1]) != 2) {
 					log("SYSERR: Format error in L line of empire %d", vnum);
 					exit(1);
@@ -1912,16 +2618,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				elog->type = t[0];
 				elog->timestamp = (time_t) t[1];
 				elog->string = fread_string(fl, buf2);
-				elog->next = NULL;
-				
-				// append to end to preserve original order
-				if (last_log) {
-					last_log->next = elog;
-				}
-				else {
-					emp->logs = elog;
-				}
-				last_log = elog;
+				LL_APPEND(emp->logs, elog);
 				break;
 			}
 			case 'M': {	// motd
@@ -1978,6 +2675,22 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				}
 				break;
 			}
+			case 'W': {	// NOTE: offenses are here for backwards-compatibility -- they are now loaded by load_empire_logs_one
+				if (sscanf(line, "W %d %d %d %ld %d %d %s", &t[0], &t[1], &t[2], &long_in, &t[4], &t[5], str_in) != 7) {
+					log("SYSERR: W line of empire %d does not scan (ignoring).\r\n", emp->vnum);
+				}
+				
+				CREATE(off, struct offense_data, 1);
+				off->type = t[0];
+				off->empire = t[1];
+				off->player_id = t[2];
+				off->timestamp = long_in;
+				off->x = t[4];
+				off->y = t[5];
+				off->flags = asciiflag_conv(str_in);
+				LL_APPEND(EMPIRE_OFFENSES(emp), off);
+				break;
+			}
 			case 'X': { // trade
 				if (sscanf(line, "X %d %d %d %lf", &t[0], &t[1], &t[2], &dbl_in) == 4) {
 					CREATE(trade, struct empire_trade_data, 1);
@@ -2003,8 +2716,18 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 			}
 			case 'Y': { // city				
 				if (sscanf(line, "Y %d %d %s", &t[0], &t[1], str_in) == 3) {
-					city = create_city_entry(emp, fread_string(fl, buf2), real_room(t[0]), t[1]);
-					city->traits = asciiflag_conv(str_in);
+					tmp = fread_string(fl, buf2);
+					
+					if ((room = real_room(t[0])) && IS_CITY_CENTER(room)) {
+						city = create_city_entry(emp, tmp, room, t[1]);
+						city->traits = asciiflag_conv(str_in);
+					}
+					else if (room) {
+						// no city center -- just lose the city
+						log_to_empire(emp, ELOG_TERRITORY, "%s was lost", tmp);
+					}
+					
+					free(tmp);	// was duplicated
 				}
 				else {
 					log("SYSERR: Format error in city line of empire %d", emp->vnum);
@@ -2012,15 +2735,43 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				
 				break;
 			}
+			case 'Z': { // attribute
+				if (sscanf(line, "Z%d %d", &t[0], &t[1]) != 2) {
+					log("SYSERR: Format error in Z line of empire %d.\r\n", emp->vnum);
+					exit(1);
+				}
+				
+				if (t[0] >= 0 && t[0] < NUM_EMPIRE_ATTRIBUTES) {
+					EMPIRE_ATTRIBUTE(emp, t[0]) = t[1];
+				}
+				break;
+			}
 
 			case 'S':			/* end of empire */
 				return;
 			default: {
-				log(buf);
+				log("%s", buf);
 				exit(1);
 			}
 		}
 	}
+}
+
+
+// for check_for_new_map
+PLAYER_UPDATE_FUNC(send_all_players_to_nowhere) {
+	// clear these rooms
+	GET_LAST_ROOM(ch) = NOWHERE;
+	GET_LOADROOM(ch) = NOWHERE;
+	GET_LOAD_ROOM_CHECK(ch) = NOWHERE;
+	GET_MARK_LOCATION(ch) = NOWHERE;
+	GET_TOMB_ROOM(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOTHING;
+	
+	// remove loadroom flag (their loadroom is gone)
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_LOADROOM);
 }
 
 
@@ -2033,11 +2784,15 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
+	struct empire_completed_goal *ecg, *next_ecg;
+	struct player_craft_data *pcd, *next_pcd;
+	struct empire_goal *egoal, *next_egoal;
+	struct empire_needs *need, *next_need;
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
-	struct empire_log_data *elog;
 	struct empire_npc_data *npc;
+	struct req_data *task;
 	int iter;
 
 	if (!emp) {
@@ -2058,6 +2813,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		strip_crlf(temp);
 		fprintf(fl, "A\n%s~\n", temp);
 	}
+	
+	// B: misc data
+	if (EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)) {
+		fprintf(fl, "B 1 %ld\n", EMPIRE_CITY_OVERAGE_WARNING_TIME(emp));
+	}
 
 	// C: chores
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -2076,10 +2836,47 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// E: extra data
 	fprintf(fl, "E\n%s %.1f\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), EMPIRE_COINS(emp));
 	
-	// I: island names
+	// F: base techs
+	for (iter = 0; iter < NUM_TECHS; ++iter) {
+		if (EMPIRE_BASE_TECH(emp, iter) > 0) {
+			fprintf(fl, "F %d %d\n", iter, EMPIRE_BASE_TECH(emp, iter));
+		}
+	}
+	
+	// G: progression goals, tasks, and completed
+	HASH_ITER(hh, EMPIRE_GOALS(emp), egoal, next_egoal) {
+		// GG goal in progress
+		fprintf(fl, "GG %d %d %ld\n", egoal->vnum, egoal->version, egoal->timestamp);
+		
+		// GT goal tracker
+		LL_FOREACH(egoal->tracker, task) {
+			fprintf(fl, "GT %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
+		}
+	}
+	HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), ecg, next_ecg) {
+		// GC completed goal
+		fprintf(fl, "GC %d %ld\n", ecg->vnum, ecg->when);
+	}
+	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
+		// GL learned crafts
+		fprintf(fl, "GL %d %d\n", pcd->vnum, pcd->count);
+	}
+	for (iter = 0; iter < NUM_PROGRESS_TYPES; ++iter) {
+		// GP goal points (progress points)
+		if (EMPIRE_PROGRESS_POINTS(emp, iter)) {
+			fprintf(fl, "GP %d %d\n", iter, EMPIRE_PROGRESS_POINTS(emp, iter));
+		}
+	}
+	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		// I: island names
 		if (isle->name) {
 			fprintf(fl, "I%d\n%s~\n", isle->island, isle->name);
+		}
+		
+		// J: island data
+		HASH_ITER(hh, isle->needs, need, next_need) {
+			fprintf(fl, "J %d %d %d %s\n", isle->island, need->type, need->needed, bitv_to_alpha(need->status));
 		}
 	}
 	
@@ -2092,26 +2889,20 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		fprintf(fl, "M\n%s~\n", temp);
 	}
 	
-	// L: logs
-	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
-		fprintf(fl, "L\n");
-		fprintf(fl, "%d %d\n", elog->type, (int) elog->timestamp);
-		fprintf(fl, "%s~\n", elog->string);
-	}
-
+	// avoid L (used by empire logs)
 	// avoid O (used by empire storage)
 
 	// P: privs
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter)
 		fprintf(fl, "P%d\n%d\n", iter, EMPIRE_PRIV(emp, iter));
-
+	
 	// R: ranks
 	for (iter = 0; iter < emp->num_ranks; ++iter)
 		fprintf(fl, "R%d\n%s~\n", iter, EMPIRE_RANK(emp, iter));
-
+	
 	// T: territory buildings
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
-		fprintf(fl, "T %d %d\n", GET_ROOM_VNUM(ter->room), ter->population_timer);
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		fprintf(fl, "T %d %d\n", ter->vnum, ter->population_timer);
 	
 		// npcs who live there
 		for (npc = ter->npcs; npc; npc = npc->next) {
@@ -2121,6 +2912,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	// avoid U (used by empire storage)
 	// avoid V (used by empire storage)
+	// avoid W (used by empire logs)
 	
 	// X: trade
 	for (trade = EMPIRE_TRADE(emp); trade; trade = trade->next) {
@@ -2131,7 +2923,45 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 		fprintf(fl, "Y %d %d %s\n%s~\n", GET_ROOM_VNUM(city->location), city->type, bitv_to_alpha(city->traits), city->name);
 	}
+	
+	// Z: attributes
+	for (iter = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
+		fprintf(fl, "Z%d %d\n", iter, EMPIRE_ATTRIBUTE(emp, iter));
+	}
 
+	fprintf(fl, "S\n");
+}
+
+
+/**
+* Writes one empire's log info to file. This is separate to speed up saving.
+* This file includes:
+* - elogs
+* - offenses
+*
+* @param FILE *fl The open write file.
+* @param empire_data *emp The empire whose logs to save.
+*/
+void write_empire_logs_to_file(FILE *fl, empire_data *emp) {
+	struct empire_log_data *elog;
+	struct offense_data *off;
+	
+	if (!emp) {
+		return;
+	}
+	
+	// L: logs
+	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+		fprintf(fl, "L\n");
+		fprintf(fl, "%d %d\n", elog->type, (int) elog->timestamp);
+		fprintf(fl, "%s~\n", elog->string);
+	}
+	
+	// W: offenses
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		fprintf(fl, "W %d %d %d %ld %d %d %s\n", off->type, off->empire, off->player_id, off->timestamp, off->x, off->y, bitv_to_alpha(off->flags));
+	}
+	
 	fprintf(fl, "S\n");
 }
 
@@ -2144,17 +2974,21 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 * @param empire_data *emp The empire whose storage to save.
 */
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
 
 	if (!emp) {
 		return;
 	}
-
-	// O: storage
-	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-		fprintf(fl, "O\n%d %d %d\n", store->vnum, store->amount, store->island);
+	
+	// islands
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		// O: storage
+		HASH_ITER(hh, isle->store, store, next_store) {
+			fprintf(fl, "O\n%d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep ? 1 : 0);
+		}
 	}
 
 	// U: unique storage
@@ -2177,11 +3011,72 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 
 
 /**
-* Saves an empire to files: main empire file, empire storage file.
+* Writes the logs file for the empire.
 *
 * @param empire_data *emp The empire to save.
 */
-void save_empire(empire_data *emp) {
+void save_empire_logs(empire_data *emp) {
+	char fname[30], tempname[64];
+	FILE *fl;
+
+	// empire logs: only if it's already been loaded (saves may trigger sooner)
+	if (!emp || !emp->logs_loaded) {
+		return;
+	}
+	
+	sprintf(fname, "%s%d%s", ELOG_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
+	strcpy(tempname, fname);
+	strcat(tempname, TEMP_SUFFIX);
+	if (!(fl = fopen(tempname, "w"))) {
+		log("SYSERR: Unable to write %s", tempname);
+		return;
+	}
+	write_empire_logs_to_file(fl, emp);
+	fprintf(fl, "$~\n");
+	fclose(fl);
+	rename(tempname, fname);
+	
+	EMPIRE_NEEDS_LOGS_SAVE(emp) = FALSE;
+}
+
+
+/**
+* Writes the storage file for the empire.
+*
+* @param empire_data *emp The empire to save.
+*/
+void save_empire_storage(empire_data *emp) {
+	FILE *fl;
+	char fname[30], tempname[64];
+
+	// empire storage: only if it's already been loaded (saves may trigger sooner)
+	if (!emp || !emp->storage_loaded) {
+		return;
+	}
+	
+	sprintf(fname, "%s%d%s", STORAGE_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
+	strcpy(tempname, fname);
+	strcat(tempname, TEMP_SUFFIX);
+	if (!(fl = fopen(tempname, "w"))) {
+		log("SYSERR: Unable to write %s", tempname);
+		return;
+	}
+	write_empire_storage_to_file(fl, emp);
+	fprintf(fl, "$~\n");
+	fclose(fl);
+	rename(tempname, fname);
+	
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = FALSE;
+}
+
+
+/**
+* Saves an empire to file.
+*
+* @param empire_data *emp The empire to save.
+* @param bool save_all_parts If TRUE, also saves storage file, etc.
+*/
+void save_empire(empire_data *emp, bool save_all_parts) {
 	FILE *fl;
 	char fname[30], tempname[64];
 
@@ -2201,23 +3096,13 @@ void save_empire(empire_data *emp) {
 	fprintf(fl, "$~\n");
 	fclose(fl);
 	rename(tempname, fname);
-
-	// empire storage: only if it's already been loaded (saves may trigger sooner)
-	if (emp->storage_loaded) {
-		sprintf(fname, "%s%d%s", STORAGE_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
-		strcpy(tempname, fname);
-		strcat(tempname, TEMP_SUFFIX);
-		if (!(fl = fopen(tempname, "w"))) {
-			log("SYSERR: Unable to write %s", tempname);
-			return;
-		}
-		write_empire_storage_to_file(fl, emp);
-		fprintf(fl, "$~\n");
-		fclose(fl);
-		rename(tempname, fname);
-	}
 	
 	EMPIRE_NEEDS_SAVE(emp) = FALSE;	// done
+	
+	if (save_all_parts) {
+		save_empire_storage(emp);
+		save_empire_logs(emp);
+	}
 }
 
 
@@ -2228,20 +3113,26 @@ void save_all_empires(void) {
 	empire_data *iter, *next_iter;
 
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		save_empire(iter);
+		save_empire(iter, TRUE);
 	}
 }
 
 
 /**
-* Delayed empire saves -- things marked EMPIRE_NEEDS_SAVE.
+* Delayed empire saves -- things marked as needing saves.
 */
 void save_marked_empires(void) {
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (EMPIRE_NEEDS_SAVE(emp)) {
-			save_empire(emp);
+			save_empire(emp, FALSE);
+		}
+		if (EMPIRE_NEEDS_STORAGE_SAVE(emp)) {
+			save_empire_storage(emp);
+		}
+		if (EMPIRE_NEEDS_LOGS_SAVE(emp)) {
+			save_empire_logs(emp);
 		}
 	}
 }
@@ -2332,7 +3223,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 	char_data *proto;
 	mob_vnum artisan;
 	
-	if (!room || !(emp = ROOM_OWNER(room)) || (!ter && !(ter = find_territory_entry(emp, room)))) {
+	if (!room || !(emp = ROOM_OWNER(room)) || !EMPIRE_HAS_TECH(emp, TECH_CITIZENS) || (!ter && !(ter = find_territory_entry(emp, room)))) {
 		return;	// no work
 	}
 	if (!IS_COMPLETE(room) || ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
@@ -2413,9 +3304,7 @@ void update_empire_npc_data(void) {
 		}
 		
 		// each territory spot
-		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = next_ter) {
-			next_ter = ter->next;
-			
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 			if (--ter->population_timer <= 0) {
 				populate_npc(ter->room, ter);
 			}
@@ -2481,9 +3370,7 @@ void kill_empire_npc(char_data *ch) {
 	}
 	
 	// find and remove the entry
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter && !found; ter = ter_next) {
-		ter_next = ter->next;
-		
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, ter_next) {
 		for (npc = ter->npcs; npc && !found; npc = npc_next) {
 			npc_next = npc->next;
 			
@@ -2492,14 +3379,330 @@ void kill_empire_npc(char_data *ch) {
 				
 				// reset the population timer
 				ter->population_timer = building_population_timer;
-				
 				found = TRUE;
 			}
+		}
+		
+		if (found) {
+			break;
 		}
 	}
 	
 	GET_EMPIRE_NPC_DATA(ch) = NULL;
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE OFFENSE LIB //////////////////////////////////////////////////////
+
+/**
+* Adds a new offense against an empire. Note: the OFF_WAR flag is added auto-
+* matically.
+*
+* @param empire_data *emp The empire being offended.
+* @param int type Any OFFENSE_ type.
+* @param char_data *offender The person committing the offense (will use any player master of an npc).
+* @param room_data *loc Where it happened.
+* @param bitvector_t flags Any OFF_ flags that apply.
+*/
+void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags) {
+	void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender);
+	
+	struct offense_data *off;
+	
+	// try to find a player
+	while (IS_NPC(offender) && offender->master) {
+		offender = offender->master;
+	}
+	if (IS_NPC(offender) || GET_LOYALTY(offender) == emp) {
+		return;	// no offense
+	}
+	
+	CREATE(off, struct offense_data, 1);
+	off->type = type;
+	off->empire = GET_LOYALTY(offender) ? EMPIRE_VNUM(GET_LOYALTY(offender)) : NOTHING;
+	off->player_id = GET_IDNUM(offender);
+	off->timestamp = time(0);
+	off->x = X_COORD(IN_ROOM(offender));
+	off->y = Y_COORD(IN_ROOM(offender));
+	off->flags = flags;
+	
+	// check for war
+	if (!IS_SET(flags, OFF_WAR) && GET_LOYALTY(offender) && has_relationship(emp, GET_LOYALTY(offender), DIPL_WAR)) {
+		off->flags |= OFF_WAR;
+	}
+	
+	LL_PREPEND(EMPIRE_OFFENSES(emp), off);
+	EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
+	
+	log_offense_to_empire(emp, off, offender);
+}
+
+
+/**
+* Marks all offenses from an empire 'avenged'.
+*
+* @param empire_data *emp The empire to mark (the Avenger).
+* @param empire_data *foe The empire whose offenses have been avenged.
+* @return int The number of offenses avenged by this.
+*/
+int avenge_offenses_from_empire(empire_data *emp, empire_data *foe) {
+	struct offense_data *off;
+	int count = 0;
+	
+	if (!emp || !foe) {
+		return 0;	// no work
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (off->empire == EMPIRE_VNUM(foe)) {
+			SET_BIT(off->flags, OFF_AVENGED);
+			++count;
+		}
+	}
+	
+	if (count) {
+		EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
+	}
+	
+	return count;
+}
+
+
+/**
+* Marks all non-empire offenses from a player 'avenged'. These are ONLY solo
+* offenses, not ones committed while in an empire.
+*
+* @param empire_data *emp The empire to mark (the Avenger).
+* @param char_data *foe The person whose offenses were avenged.
+* @return int The number of offenses avenged by this.
+*/
+int avenge_solo_offenses_from_player(empire_data *emp, char_data *foe) {
+	struct offense_data *off;
+	int count = 0;
+	
+	if (!emp || !foe || IS_NPC(foe)) {
+		return 0;	// no work
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (off->empire == NOTHING && off->player_id == GET_IDNUM(foe)) {
+			SET_BIT(off->flags, OFF_AVENGED);
+			++count;
+		}
+	}
+	
+	if (count) {
+		EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
+	}
+	
+	return count;
+}
+
+
+/**
+* Clears out old offenses for all empires.
+*/
+void clean_empire_offenses(void) {
+	time_t clear_older = time(0) - SECS_PER_REAL_WEEK, clear_faster = time(0) - SECS_PER_REAL_DAY;
+	struct offense_data *off, *next_off;
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
+			if (off->timestamp < clear_older) {
+				remove_offense(emp, off);
+			}
+			else if (!OFFENSE_HAS_WEIGHT(off) && off->timestamp < clear_faster) {
+				remove_offense(emp, off);
+			}
+		}
+		
+		// don't really need to trigger a save. They'll either save on their
+		// own or this will get re-pruned next reboot
+	}
+}
+
+
+/**
+* Gets the total 'weight' value of all current offenses by an empire.
+*
+* @param empire_data *emp The empire to check (who was offended).
+* @param empire_data *foe Which enemy did the offending.
+* @return int The total weight of all offenses.
+*/
+int get_total_offenses_from_empire(empire_data *emp, empire_data *foe) {
+	struct offense_data *off;
+	int total = 0;
+	
+	if (!emp || !foe) {
+		return 0;	// shortcut
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (!OFFENSE_HAS_WEIGHT(off)) {
+			continue;	// some don't count
+		}
+		if (off->empire != EMPIRE_VNUM(foe)) {
+			continue;	// wrong empire
+		}
+		
+		// ok
+		total += offense_info[off->type].weight;
+	}
+	
+	return total;
+}
+
+
+/**
+* Gets the total 'weight' value of all current offenses by a player.
+*
+* @param empire_data *emp The empire to check (who was offended).
+* @param char_data *ch The player who did the offending.
+* @return int The total weight of all offenses.
+*/
+int get_total_offenses_from_char(empire_data *emp, char_data *ch) {
+	struct offense_data *off;
+	int total = 0;
+	
+	if (!emp || !ch || IS_NPC(ch)) {
+		return 0;	// shortcut
+	}
+	
+	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+		if (!OFFENSE_HAS_WEIGHT(off)) {
+			continue;	// some don't count
+		}
+		if (off->player_id != GET_IDNUM(ch)) {
+			continue;	// wrong person
+		}
+		
+		// ok
+		total += offense_info[off->type].weight;
+	}
+	
+	return total;
+}
+
+
+/**
+* If offenses should elog, this function builds and logs that.
+*
+* @param empire_data *emp The empire that was offended.
+* @param struct offense_data *off The offense to log.
+* @param char_data *offender The person who committed the offense.
+*/
+void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender) {
+	char buf[MAX_STRING_LENGTH];
+	*buf = '\0';
+	
+	// OFFENSE_x: offenses that must be logged
+	switch (off->type) {
+		// TODO
+	}
+	
+	if (*buf) {
+		log_to_empire(emp, ELOG_HOSTILITY, "%s", buf);
+	}
+}
+
+
+/**
+* Determines if someone 'saw' an offense take place. Call this after the
+* offense takes place.
+*
+* @param char_data *ch The offender.
+* @param empire_data *emp The empire being offended.
+* @param room_data *from_room Optional: If the character started out in another spot (infiltrate).
+*/
+bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room) {
+	descriptor_data *desc;
+	char_data *iter;
+	
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
+			return TRUE;	// someone here saw it
+		}
+	}
+	
+	if (from_room) {
+		LL_FOREACH2(ROOM_PEOPLE(from_room), iter, next_in_room) {
+			if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
+				return TRUE;	// someone here saw it
+			}
+		}
+	}
+	
+	// check nearby players
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !desc->character || desc->character == ch) {
+			continue;	// not a player
+		}
+		if (IS_IMMORTAL(desc->character) || !AWAKE(desc->character) || !CAN_SEE(desc->character, ch)) {
+			continue;	// can't even see them
+		}
+		if (GET_LOYALTY(desc->character) != emp && (!GET_LOYALTY(desc->character) || !has_relationship(GET_LOYALTY(desc->character), emp, DIPL_ALLIED))) {
+			continue;	// must be a member of the empire, or an ally
+		}
+		if (compute_distance(IN_ROOM(ch), IN_ROOM(desc->character)) > 7) {
+			continue;	// too far away
+		}
+		
+		return TRUE;	// player saw it
+	}
+	
+	return FALSE;	// nobody saw it
+}
+
+
+/**
+* Removes and frees an offense.
+*
+* @param empire_data *emp The empire to remove from.
+* @param struct offense_data *off The offense to remove.
+*/
+void remove_offense(empire_data *emp, struct offense_data *off) {
+	LL_DELETE(EMPIRE_OFFENSES(emp), off);
+	free(off);
+}
+
+
+/**
+* Sometimes one offense overrides another. This removes any recent offense
+* for a character/type combo.
+*
+* @param empire_data *emp The empire that was offended.
+* @param int type The OFFENSE_ type.
+* @param char_data *offender The person who offended.
+*/
+void remove_recent_offenses(empire_data *emp, int type, char_data *offender) {
+	struct offense_data *off, *next_off;
+	long cutoff = time(0) - (10 * SECS_PER_REAL_MIN);
+	
+	while (offender && IS_NPC(offender) && offender->master) {
+		offender = offender->master;	// climb the food chain
+	}
+	
+	if (!emp || !offender || IS_NPC(offender)) {
+		return;	// sanitation check
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
+		if (off->timestamp < cutoff) {
+			break;	// offenses are sorted reverse-chronologically and we have gone too far this time
+		}
+		if (off->type != type) {
+			continue;	// wrong type
+		}
+		if (off->player_id != GET_IDNUM(offender)) {
+			continue;	// wrong player;
+		}
+		
+		// ok:
+		remove_offense(emp, off);
+	}
 }
 
 
@@ -3073,7 +4276,14 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 		CREATE(isle, struct island_info, 1);
 		// ensure good data
 		isle->id = island_id;
-		sprintf(buf, "Unexplored Island %d", island_id);
+		
+		if (island_id != NO_ISLAND) {
+			sprintf(buf, "Unexplored Island %d", island_id);
+		}
+		else {
+			strcpy(buf, "The Ocean");
+		}
+		
 		isle->name = str_dup(buf);
 		isle->flags = NOBITS;
 		isle->tile_size = 0;
@@ -3118,12 +4328,7 @@ struct island_info *get_island_by_coords(char *coords) {
 		return NULL;
 	}
 	
-	if (GET_ISLAND_ID(room) == NO_ISLAND) {
-		return NULL;
-	}
-	else {
-		return get_island(GET_ISLAND_ID(room), TRUE);
-	}
+	return GET_ISLAND(room);
 }
 
 
@@ -3147,7 +4352,7 @@ struct island_info *get_island_by_name(char_data *ch, char *name) {
 			if (eisle->name && !str_cmp(name, eisle->name)) {
 				return get_island(eisle->island, TRUE);
 			}
-			else if (eisle->name && !e_abbrev && is_abbrev(name, eisle->name)) {
+			else if (eisle->name && !e_abbrev && is_multiword_abbrev(name, eisle->name)) {
 				e_abbrev = eisle;
 			}
 		}
@@ -3162,7 +4367,7 @@ struct island_info *get_island_by_name(char_data *ch, char *name) {
 		if (!str_cmp(name, isle->name)) {
 			return isle;
 		}
-		else if (!abbrev && is_abbrev(name, isle->name)) {
+		else if (!abbrev && is_multiword_abbrev(name, isle->name)) {
 			abbrev = isle;
 		}
 	}
@@ -3247,6 +4452,10 @@ static struct island_info *load_one_island(FILE *fl, int id) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': {	// description
+				isle->desc = fread_string(fl, errstr);
+				break;
+			}
 			case 'S': {
 				// done
 				return isle;
@@ -3293,6 +4502,7 @@ void load_islands(void) {
 */
 void save_island_table(void) {
 	struct island_info *isle, *next_isle;
+	char temp[MAX_STRING_LENGTH];
 	FILE *fl;
 	
 	if (!(fl = fopen(ISLAND_FILE TEMP_SUFFIX, "w"))) {
@@ -3303,7 +4513,14 @@ void save_island_table(void) {
 	HASH_ITER(hh, island_table, isle, next_isle) {
 		fprintf(fl, "#%d\n", isle->id);
 		fprintf(fl, "%s~\n", NULLSAFE(isle->name));
-		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));		
+		fprintf(fl, "%s\n", bitv_to_alpha(isle->flags));
+		
+		if (isle->desc && *isle->desc) {
+			strcpy(temp, isle->desc);
+			strip_crlf(temp);
+			fprintf(fl, "D\n%s~\n", temp);
+		}
+		
 		fprintf(fl, "S\n");
 	}
 
@@ -3744,7 +4961,7 @@ void parse_object(FILE *obj_f, int nr) {
 		switch (*line) {
 			case 'A':
 				if (!get_line(obj_f, line)) {
-					log("SYSERR: Format error in 'A' field, %s\n...expecting 2 numeric constants but file ended!", buf2);
+					log("SYSERR: Format error in 'A' field, %s\n...expecting 3 numeric constants but file ended!", buf2);
 					exit(1);
 				}
 				
@@ -4112,9 +5329,12 @@ void parse_room(FILE *fl, room_vnum vnum) {
 
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
 	double dbl_in;
+	long l_in;
 	int t[10];
 	struct depletion_data *dep;
 	struct reset_com *reset, *last_reset = NULL;
+	struct affected_type *af;
+	struct track_data *track;
 	room_data *room, *find;
 	bool error = FALSE;
 	char *ptr;
@@ -4125,6 +5345,15 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	
 	// basic setup: things that don't default to 0/NULL
 	room->vnum = vnum;
+	
+	// attach/create shared data
+	if (vnum < MAP_SIZE) {
+		GET_MAP_LOC(room) = &(world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)]);
+		SHARED_DATA(room) = GET_MAP_LOC(room)->shared;
+	}
+	else {
+		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+	}
 	
 	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {
@@ -4146,11 +5375,26 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		exit(1);
 	}
 	
-	if (t[0] != NOTHING) {
-		SET_ISLAND_ID(room, t[0]);
+	// need to unlink shared data, if present, if this is not an ocean
+	if (t[1] != BASIC_OCEAN && SHARED_DATA(room) == &ocean_shared_data) {
+		// converting from ocean to non-ocean
+		SHARED_DATA(room) = NULL;	// unlink ocean share
+		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+		
+		if (GET_MAP_LOC(room)) {	// and pass this shared data back up to the world
+			GET_MAP_LOC(room)->shared = SHARED_DATA(room);
+		}
 	}
+	
+	GET_ISLAND_ID(room) = t[0];
+	SHARED_DATA(room)->island_ptr = (t[0] == NO_ISLAND ? NULL : get_island(t[0], TRUE));
 	room->sector_type = sector_proto(t[1]);
 	room->base_sector = sector_proto(t[2]);
+	
+	if (GET_MAP_LOC(room)) {
+		GET_MAP_LOC(room)->sector_type = room->sector_type;
+		GET_MAP_LOC(room)->base_sector = room->base_sector;
+	}
 
 	// set up building data?
 	if (IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) {
@@ -4162,12 +5406,29 @@ void parse_room(FILE *fl, room_vnum vnum) {
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log(error_log);
+			log("%s", error_log);
 			exit(1);
 		}
 		switch (*line) {
+			case 'A': {	// affects
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d %d %s", &t[0], &t[1], &l_in, &t[3], &t[4], str1) != 6) {
+					log("SYSERR: Format error in A line of room #%d", vnum);
+					exit(1);
+				}
+				
+				CREATE(af, struct affected_type, 1);
+				af->type = t[0];
+				af->cast_by = t[1];
+				af->duration = l_in;
+				af->modifier = t[3];
+				af->location = t[4];
+				af->bitvector = asciiflag_conv(str1);
+				
+				LL_PREPEND(ROOM_AFFECTS(room), af);
+				break;
+			}
 			case 'B': {	// building data
-				if (!get_line(fl, line2) || sscanf(line2, "%d %d %d %d %d %lf %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &dbl_in, &t[6], &t[7]) != 8) {
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %d %d %ld %lf %d %d", &t[0], &t[1], &t[2], &t[3], &l_in, &dbl_in, &t[6], &t[7]) != 8) {
 					log("SYSERR: Format error in B line of room #%d", vnum);
 					exit(1);
 				}
@@ -4186,10 +5447,10 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				
 				COMPLEX_DATA(room)->entrance = t[2];
 				COMPLEX_DATA(room)->patron = t[3];
-				COMPLEX_DATA(room)->burning = t[4];
+				COMPLEX_DATA(room)->burn_down_time = l_in;
 				COMPLEX_DATA(room)->damage = dbl_in;	// formerly t[5], which is now unused
 				COMPLEX_DATA(room)->private_owner = t[6];
-				COMPLEX_DATA(room)->disrepair = t[7];	// not currently used (initialized to 0 after b4.15)
+				COMPLEX_DATA(room)->paint_color = t[7];
 				
 				break;
 			}
@@ -4276,8 +5537,8 @@ void parse_room(FILE *fl, room_vnum vnum) {
 					break;
 				}
 
-				room->base_affects = asciiflag_conv(line2);
-				room->affects = room->base_affects;
+				ROOM_BASE_FLAGS(room) = asciiflag_conv(line2);
+				ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
 				break;
 			}
 			case 'H': {	// home_room
@@ -4291,18 +5552,24 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			case 'I': {	// icon
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->icon = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_ICON(room)) {
+					free(ROOM_CUSTOM_ICON(room));
+				}
+				ROOM_CUSTOM_ICON(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'M': {	// description
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->description = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_DESCRIPTION(room)) {
+					free(ROOM_CUSTOM_DESCRIPTION(room));
+				}
+				ROOM_CUSTOM_DESCRIPTION(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'N': {	// name
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->name = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_NAME(room)) {
+					free(ROOM_CUSTOM_NAME(room));
+				}
+				ROOM_CUSTOM_NAME(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'O': {	// owner (empire_vnum)
@@ -4359,6 +5626,22 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			
+			case 'Y': {	// tracks
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d", &t[0], &t[1], &l_in, &t[2]) != 4) {
+					log("SYSERR: Bad formatting in Y section of room #%d", vnum);
+					exit(1);
+				}
+				
+				CREATE(track, struct track_data, 1);
+				track->player_id = t[0];
+				track->mob_num = t[1];
+				track->timestamp = l_in;
+				track->dir = t[2];
+				
+				LL_PREPEND(ROOM_TRACKS(room), track);
+				break;
+			}
+			
 			case 'Z': {	// extra data
 				if (!get_line(fl, line2) || sscanf(line2, "%d %d", &t[0], &t[1]) != 2) {
 					log("SYSERR: Bad formatting in Z section of room #%d", vnum);
@@ -4373,7 +5656,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				return;
 			}
 			default: {
-				log(error_log);
+				log("%s", error_log);
 				exit(1);
 			}
 		}
@@ -4391,11 +5674,9 @@ void parse_room(FILE *fl, room_vnum vnum) {
 void write_room_to_file(FILE *fl, room_data *room) {
 	extern bool objpack_save_room(room_data *room);
 	
-	char temp[MAX_STRING_LENGTH];
-	struct room_extra_data *red, *next_red;
-	struct depletion_data *dep;
 	struct cooldown_data *cool;
 	struct trig_var_data *tvd;
+	struct affected_type *af;
 	trig_data *trig;
 	char_data *mob;
 	
@@ -4408,13 +5689,16 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	fprintf(fl, "#%d\n", GET_ROOM_VNUM(room));
 	
 	// both sector and original-sector must save vnums
-	// NOTE: does not need an island id if it's not on the map
-	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(room) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
+	fprintf(fl, "%d %d %d\n", GET_ISLAND_ID(room), GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
+	
+	// A affects
+	LL_FOREACH(ROOM_AFFECTS(room), af) {
+		fprintf(fl, "A\n%d %d %ld %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+	}
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
-		// NOTE: disrepair is not used and is always 0 after b4.15
-		fprintf(fl, "B\n%d %d %d %d %d %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burning, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->disrepair);
+		fprintf(fl, "B\n%d %d %d %d %ld %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burn_down_time, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->paint_color);
 	}
 	
 	// C: load commands
@@ -4433,7 +5717,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			
 			// triggers: C V
 			LL_FOREACH(SCRIPT(room)->global_vars, tvd) {
-				if (*tvd->name == '-') { // don't save if it begins with -
+				if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 					continue;
 				}
 				
@@ -4471,7 +5755,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 						// triggers: C V type context name~
 						//           value~
 						LL_FOREACH(SCRIPT(mob)->global_vars, tvd) {
-							if (*tvd->name == '-') { // don't save if it begins with -
+							if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
 								continue;
 							}
 							
@@ -4483,32 +5767,10 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			}
 		}
 	}
-
-	// E affects
-	if (ROOM_BASE_FLAGS(room)) {
-		fprintf(fl, "E\n%d\n", ROOM_BASE_FLAGS(room));
-	}
 	
 	// H home room
 	if (HOME_ROOM(room) != room) {
 		fprintf(fl, "H%d\n", GET_ROOM_VNUM(HOME_ROOM(room)));
-	}
-	
-	// I icon
-	if (ROOM_CUSTOM_ICON(room)) {
-		fprintf(fl, "I\n%s~\n", ROOM_CUSTOM_ICON(room));
-	}
-	
-	// M description
-	if (ROOM_CUSTOM_DESCRIPTION(room)) {
-		strcpy(temp, ROOM_CUSTOM_DESCRIPTION(room));
-		strip_crlf(temp);
-		fprintf(fl, "M\n%s~\n", temp);
-	}
-	
-	// N name
-	if (ROOM_CUSTOM_NAME(room)) {
-		fprintf(fl, "N\n%s~\n", ROOM_CUSTOM_NAME(room));
 	}
 	
 	// O owner
@@ -4524,11 +5786,6 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// R resource
 	if (COMPLEX_DATA(room) && BUILDING_RESOURCES(room)) {
 		write_resources_to_file(fl, 'R', BUILDING_RESOURCES(room));
-	}
-	
-	// X depletion
-	for (dep = ROOM_DEPLETION(room); dep; dep = dep->next) {
-		fprintf(fl, "X\n%d %d\n", dep->type, dep->count);
 	}
 
 	// D door
@@ -4555,9 +5812,9 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		write_resources_to_file(fl, 'W', GET_BUILT_WITH(room));
 	}
 	
-	// Z: extra data
-	HASH_ITER(hh, room->extra_data, red, next_red) {
-		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
+	// Things that we prefer to save to the base map
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		write_shared_room_data(fl, SHARED_DATA(room));
 	}
 	
 	// end
@@ -4925,13 +6182,6 @@ void add_sector_to_table(sector_data *sect) {
 * @param sector_data *sect The sect to remove from the table.
 */
 void remove_sector_from_table(sector_data *sect) {
-	extern sector_data *last_evo_sect;
-	
-	// if we left off on this sect, remove it entirely
-	if (last_evo_sect == sect) {
-		last_evo_sect = NULL;
-	}
-	
 	HASH_DEL(sector_table, sect);
 }
 
@@ -5190,6 +6440,118 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// STORED EVENT LIB ////////////////////////////////////////////////////////
+
+// cancel func externs
+EVENT_CANCEL_FUNC(cancel_burn_event);
+EVENT_CANCEL_FUNC(cancel_map_event);
+EVENT_CANCEL_FUNC(cancel_room_event);
+
+
+// SEV_x: list of cancel functions
+struct stored_event_info_t stored_event_info[] = {
+	{ cancel_map_event },	// SEV_TRENCH_FILL
+		{ NULL },	// unused
+	{ cancel_burn_event },	// SEV_BURN_DOWN
+	{ cancel_map_event },	// SEV_GROW_CROP
+	{ cancel_room_event },	// SEV_TAVERN
+	{ cancel_room_event },	// SEV_RESET_TRIGGER
+};
+
+
+/**
+* Adds a stored event to a list. If there's already one of the same type in
+* the list, it will be replaced.
+*
+* @param struct stored_event **list The list to add to.
+* @param int type The SEV_ type to add the event as.
+* @param struct event *event The event to store.
+*/
+void add_stored_event(struct stored_event **list, int type, struct event *event) {
+	struct stored_event *sev;
+	
+	if (!event) {
+		return;
+	}
+	
+	// ensure no duplicate entries
+	sev = find_stored_event(*list, type);
+	if (!sev) {
+		CREATE(sev, struct stored_event, 1);
+		sev->type = type;
+		HASH_ADD_INT(*list, type, sev);
+	}
+	
+	sev->ev = event;
+}
+
+
+/**
+* Cancels an event that was stored, and deletes the entry.
+*
+* @param struct stored_event **list The list to cancel out of.
+* @param int type The SEV_ type to cancel.
+*/
+void cancel_stored_event(struct stored_event **list, int type) {
+	struct stored_event *sev = find_stored_event(*list, type);
+	
+	if (sev && sev->ev) {
+		event_cancel(sev->ev, stored_event_info[type].cancel);
+		sev->ev = NULL;
+	}
+	
+	if (sev) {
+		HASH_DEL(*list, sev);
+		free(sev);
+	}
+}
+
+
+/**
+* Deletes a stored event without canceling it.
+*
+* @param struct stored_event **list The list to delete from.
+* @param int type The SEV_ type to cancel.
+*/
+void delete_stored_event(struct stored_event **list, int type) {
+	struct stored_event *sev = find_stored_event(*list, type);
+	if (sev) {
+		HASH_DEL(*list, sev);
+		free(sev);
+	}
+}
+
+
+/**
+* Finds a stored event in a list of them.
+*
+* @param struct stored_event *list The list to search in.
+* @param int type Any SEV_ const.
+* @return struct stored_event* The found event if any, or NULL.
+*/
+struct stored_event *find_stored_event(struct stored_event *list, int type) {
+	struct stored_event *find;
+	
+	HASH_FIND_INT(list, &type, find);
+	return find;
+}
+
+
+// frees memory when a map event is canceled
+EVENT_CANCEL_FUNC(cancel_map_event) {
+	struct map_event_data *data = (struct map_event_data *)event_obj;
+	free(data);
+}
+
+
+// generic canceller for room events) {
+EVENT_CANCEL_FUNC(cancel_room_event) {
+	struct room_event_data *data = (struct room_event_data *)event_obj;
+	free(data);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER LIB /////////////////////////////////////////////////////////////
 
 /**
@@ -5297,6 +6659,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_book(FILE *fl, int book_id);
 	void parse_class(FILE *fl, any_vnum vnum);
 	void parse_morph(FILE *fl, any_vnum vnum);
+	void parse_progress(FILE *fl, any_vnum vnum);
 	void parse_quest(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
 	void parse_social(FILE *fl, any_vnum vnum);
@@ -5306,7 +6669,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop", "progress" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5370,6 +6733,11 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_faction(fl, nr);
 					break;
 				}
+				case DB_BOOT_GEN: {
+					void parse_generic(FILE *fl, int nr);
+					parse_generic(fl, nr);
+					break;
+				}
 				case DB_BOOT_GLB: {
 					parse_global(fl, nr);
 					break;
@@ -5382,6 +6750,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					break;
 				case DB_BOOT_MORPH: {
 					parse_morph(fl, nr);
+					break;
+				}
+				case DB_BOOT_PRG: {
+					parse_progress(fl, nr);
 					break;
 				}
 				case DB_BOOT_EMP:
@@ -5404,6 +6776,11 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				}
 				case DB_BOOT_SECTOR: {
 					parse_sector(fl, nr);
+					break;
+				}
+				case DB_BOOT_SHOP: {
+					void parse_shop(FILE *fl, int nr);
+					parse_shop(fl, nr);
 					break;
 				}
 				case DB_BOOT_SKILL: {
@@ -5484,8 +6861,7 @@ void index_boot(int mode) {
 	}
 
 	if (!rec_count) {
-		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST || mode == DB_BOOT_SOC || mode == DB_BOOT_FCT) {
+		if (db_boot_info[mode].allow_zero) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5498,10 +6874,7 @@ void index_boot(int mode) {
 			exit(1);
 		}
 	}
-
-	/* Any idea why you put this here Jeremy? */
-	rec_count++;
-
+	
 	/*
 	 * DB_BOOT_x:
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
@@ -5565,6 +6938,11 @@ void index_boot(int mode) {
 			log("   %d factions, %d bytes in factions table.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_GEN: {
+			size[0] = sizeof(generic_data) * rec_count;
+			log("   %d generics, %d bytes in generics table.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_GLB: {
 			size[0] = sizeof(struct global_data) * rec_count;
 			log("   %d globals, %d bytes in globals table.", rec_count, size[0]);
@@ -5577,6 +6955,11 @@ void index_boot(int mode) {
 		}
 		case DB_BOOT_NAMES: {
 			log("   %d name lists.", rec_count);
+			break;
+		}
+		case DB_BOOT_PRG: {
+   			size[0] = sizeof(progress_data) * rec_count;
+			log("   %d progression goals, %d bytes in prototypes.", rec_count, size[0]);
 			break;
 		}
 		case DB_BOOT_OBJ:
@@ -5601,6 +6984,11 @@ void index_boot(int mode) {
 		case DB_BOOT_SECTOR: {
 			size[0] = sizeof(sector_data) * rec_count;
 			log("   %d sectors, %d bytes in sector.", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			size[0] = sizeof(shop_data) * rec_count;
+			log("   %d shops, %d bytes in shops table.", rec_count, size[0]);
 			break;
 		}
 		case DB_BOOT_SKILL: {
@@ -5644,15 +7032,18 @@ void index_boot(int mode) {
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
 			case DB_BOOT_FCT:
+			case DB_BOOT_GEN:
 			case DB_BOOT_GLB:
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
 			case DB_BOOT_MORPH:
+			case DB_BOOT_PRG:
 			case DB_BOOT_EMP:
 			case DB_BOOT_BOOKS:
 			case DB_BOOT_QST:
 			case DB_BOOT_RMT:
 			case DB_BOOT_SECTOR:
+			case DB_BOOT_SHOP:
 			case DB_BOOT_SKILL:
 			case DB_BOOT_SOC:
 			case DB_BOOT_TRG:
@@ -5807,6 +7198,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			}
 			break;
 		}
+		case DB_BOOT_GEN: {
+			void write_generic_to_file(FILE *fl, generic_data *gen);
+			generic_data *gen, *next_gen;
+			HASH_ITER(hh, generic_table, gen, next_gen) {
+				if (GEN_VNUM(gen) >= (zone * 100) && GEN_VNUM(gen) <= (zone * 100 + 99)) {
+					write_generic_to_file(fl, gen);
+				}
+			}
+			break;
+		}
 		case DB_BOOT_GLB: {
 			struct global_data *glb, *next_glb;
 			HASH_ITER(hh, globals_table, glb, next_glb) {
@@ -5844,6 +7245,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			}
 			break;
 		}
+		case DB_BOOT_PRG: {
+			void write_progress_to_file(FILE *fl, progress_data *prg);
+			progress_data *prg, *next_prg;
+			HASH_ITER(hh, progress_table, prg, next_prg) {
+				if (PRG_VNUM(prg) >= (zone * 100) && PRG_VNUM(prg) <= (zone * 100 + 99)) {
+					write_progress_to_file(fl, prg);
+				}
+			}
+			break;
+		}
 		case DB_BOOT_QST: {
 			void write_quest_to_file(FILE *fl, quest_data *quest);
 			quest_data *qst, *next_qst;
@@ -5868,6 +7279,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, sector_table, sect, next_sect) {
 				if (GET_SECT_VNUM(sect) >= (zone * 100) && GET_SECT_VNUM(sect) <= (zone * 100 + 99)) {
 					write_sector_to_file(fl, sect);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			void write_shop_to_file(FILE *fl, shop_data *shop);
+			shop_data *shop, *next_shop;
+			HASH_ITER(hh, shop_table, shop, next_shop) {
+				if (SHOP_VNUM(shop) >= (zone * 100) && SHOP_VNUM(shop) <= (zone * 100 + 99)) {
+					write_shop_to_file(fl, shop);
 				}
 			}
 			break;
@@ -6187,6 +7608,11 @@ void save_index(int type) {
 			write_faction_index(fl);
 			break;
 		}
+		case DB_BOOT_GEN: {
+			void write_generic_index(FILE *fl);
+			write_generic_index(fl);
+			break;
+		}
 		case DB_BOOT_GLB: {
 			write_globals_index(fl);
 			break;
@@ -6204,6 +7630,11 @@ void save_index(int type) {
 			write_object_index(fl);
 			break;
 		}
+		case DB_BOOT_PRG: {
+			void write_progress_index(FILE *fl);
+			write_progress_index(fl);
+			break;
+		}
 		case DB_BOOT_QST: {
 			void write_quest_index(FILE *fl);
 			write_quest_index(fl);
@@ -6215,6 +7646,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_SECTOR: {
 			write_sector_index(fl);
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			void write_shop_index(FILE *fl);
+			write_shop_index(fl);
 			break;
 		}
 		case DB_BOOT_SKILL: {
@@ -6533,12 +7969,10 @@ void clean_empire_logs(void) {
 	struct empire_log_data *elog, *next_elog, *temp;
 	empire_data *iter, *next_iter;
 	time_t now = time(0);
-	bool save;
 	
 	log("Cleaning stale empire logs...");
 
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		save = FALSE;
 		for (elog = EMPIRE_LOGS(iter); elog; elog = next_elog) {
 			next_elog = elog->next;
 			
@@ -6549,12 +7983,8 @@ void clean_empire_logs(void) {
 					free(elog->string);
 				}
 				free(elog);
-				save = TRUE;
+				EMPIRE_NEEDS_LOGS_SAVE(iter) = TRUE;
 			}
-		}
-		
-		if (save) {
-			EMPIRE_NEEDS_SAVE(iter) = TRUE;
 		}
 	}
 }
@@ -7011,85 +8441,6 @@ int sort_sectors(void *a, void *b) {
 }
 
 
-// for sort_storage: quick-switch of linked list positions
-static struct empire_storage_data *switch_storage_pos(struct empire_storage_data *l1, struct empire_storage_data *l2) {
-    l1->next = l2->next;
-    l2->next = l1;
-    return l2;
-}
-
-
-/**
-* This alpha-sorts an empire's storage.
-*
-* @param empire_data *emp The empire to sort.
-*/
-void sort_storage(empire_data *emp) {
-	struct empire_storage_data *start, *p, *q, *top;
-	char *a_name = NULL, *b_name = NULL;
-	obj_data *obj_a, *obj_b;
-	int a_store, b_store;
-    bool changed = TRUE;
-    
-    // [hopefully] quick macro to skip past a/an/the before comparing names
-    #define FIND_NAME_START(str)  (!strn_cmp((str), "the ", 4) ? ((str)+4) : (!strn_cmp((str), "an ", 3) ? ((str) + 3) : (!strn_cmp((str), "a ", 2) ? ((str) + 2) : (str))))
-    
-    // safety first
-    if (!emp) {
-    	return;
-    }
-    
-    start = EMPIRE_STORAGE(emp);
-
-	CREATE(top, struct empire_storage_data, 1);
-
-    top->next = start;
-    if (start && start->next) {
-    	// q is always one item behind p
-
-        while (changed) {
-            changed = FALSE;
-            q = top;
-            p = top->next;
-            while (p->next != NULL) {
-            	// determine items
-            	obj_a = obj_proto(p->vnum);
-            	obj_b = obj_proto(p->next->vnum);
-            	
-            	// only bother if the item is real (this accommodates deleted items)
-            	if (obj_a && obj_b) {
-					a_store = find_lowest_storage_loc(obj_a);
-					b_store = find_lowest_storage_loc(obj_b);
-				
-					// prepare for alpha-sorting ...
-					if (a_store == b_store) {
-						a_name = GET_OBJ_SHORT_DESC(obj_a);
-						b_name = GET_OBJ_SHORT_DESC(obj_b);
-				
-						// skip a/an/the
-						a_name = FIND_NAME_START(a_name);
-						b_name = FIND_NAME_START(b_name);
-					}
-				
-					if (a_store > b_store || (a_store == b_store && str_cmp(a_name, b_name) > 0)) {
-						q->next = switch_storage_pos(p, p->next);
-						changed = TRUE;
-					}
-				}
-				
-                q = p;
-                if (p->next) {
-                    p = p->next;
-                }
-            }
-        }
-    }
-    
-    EMPIRE_STORAGE(emp) = top->next;
-    free(top);
-}
-
-
 /**
 * This sorts trade data by type and cost, for easier visual analysis in both
 * the editor and the db file. It should not change the relative order of any
@@ -7275,7 +8626,7 @@ struct complex_room_data *init_complex_data() {
 	data->home_room = NULL;
 	data->private_owner = NOBODY;
 	
-	data->burning = 0;	// not-burning
+	data->burn_down_time = 0;	// not-burning
 	data->damage = 0;	// no damage
 	
 	return data;
@@ -7301,6 +8652,48 @@ void free_complex_data(struct complex_room_data *data) {
 	
 	free_resource_list(data->to_build);
 	free_resource_list(data->built_with);
+	
+	free(data);
+}
+
+
+/**
+* Frees the memory for shared room data.
+*
+* @param struct shared_room_data *data The data to free.
+*/
+void free_shared_room_data(struct shared_room_data *data) {
+	struct room_extra_data *room_ex, *next_room_ex;
+	struct stored_event *ev, *next_ev;
+	struct depletion_data *dep;
+	struct track_data *track;
+	
+	if (data->name) {
+		free(data->name);
+	}
+	if (data->icon) {
+		free(data->icon);
+	}
+	if (data->description) {
+		free(data->description);
+	}
+	
+	while ((dep = data->depletion)) {
+		data->depletion = dep->next;
+		free(dep);
+	}
+	HASH_ITER(hh, data->extra_data, room_ex, next_room_ex) {
+		HASH_DEL(data->extra_data, room_ex);
+		free(room_ex);
+	}
+	while ((track = data->tracks)) {
+		data->tracks = track->next;
+		free(track);
+	}
+	
+	HASH_ITER(hh, data->events, ev, next_ev) {
+		cancel_stored_event(&data->events, ev->type);
+	}
 	
 	free(data);
 }
@@ -7418,6 +8811,53 @@ void parse_generic_name_file(FILE *fl, char *err_str) {
 
 
 /**
+* Parse one linking rule and assign it to the end of the given list.
+* This function will trigger an exit(1) if it errors.
+*
+* @param FILE *fl The file, open for reading, right after the letter tag (usually L).
+* @param struct adventure_link_rule **list A reference to the start of the list to assign to.
+* @param char *error_part A string containing e.g. "mob #1234", describing where the error occurred, if one happens.
+*/
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part) {
+	char line[MAX_INPUT_LENGTH], str_in[MAX_INPUT_LENGTH], str_in2[MAX_INPUT_LENGTH];
+	struct adventure_link_rule *link;
+	int int_in[3];
+	
+	CREATE(link, struct adventure_link_rule, 1);
+	LL_APPEND(*list, link);
+	
+	// line 1: type flags
+	if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
+		log("SYSERR: Format error in link rule line 1 of %s", buf2);
+		exit(1);
+	}
+	
+	link->type = int_in[0];
+	link->flags = asciiflag_conv(str_in);
+	
+	// line 2: value portal_in portal_out
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+		log("SYSERR: Format error in link rule line 2 of %s", buf2);
+		exit(1);
+	}
+	
+	link->value = int_in[0];
+	link->portal_in = int_in[1];
+	link->portal_out = int_in[2];
+	
+	// line 3: dir bld_on bld_facing
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
+		log("SYSERR: Format error in link rule line 3 of %s", buf2);
+		exit(1);
+	}
+	
+	link->dir = int_in[0];
+	link->bld_on = asciiflag_conv(str_in);
+	link->bld_facing = asciiflag_conv(str_in2);
+}
+
+
+/**
 * Writes the A tag for any apply_data list.
 *
 * @param FILE *fl The file to write to.
@@ -7492,6 +8932,29 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 
 
 /**
+* Saves linking rule data (usually 'L' tag) to a db file.
+*
+* @param FILE *fl The open file to write to.
+* @param char letter The letter to tag in the file.
+* @param struct adventure_link_rule *list The list to write.
+*/
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list) {
+	struct adventure_link_rule *link;
+	char temp[256], temp2[256];
+	
+	LL_FOREACH(list, link) {
+		fprintf(fl, "%c\n", letter);
+		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
+		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
+		
+		strcpy(temp, bitv_to_alpha(link->bld_on));
+		strcpy(temp2, bitv_to_alpha(link->bld_facing));
+		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
+	}
+}
+
+
+/**
 * Writes a list of 'req_data' to a data file.
 *
 * @param FILE *fl The file, open for writing.
@@ -7508,5 +8971,63 @@ void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
 		else {
 			fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
 		}
+	}
+}
+
+
+/**
+* Saves the 'shared' portion of a room or map tile to file.
+*
+* @param FILE *fl The file already open for writing.
+* @param struct shared_room_data *dat The shared data to write.
+*/
+void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
+	struct room_extra_data *red, *next_red;
+	char temp[MAX_STRING_LENGTH];
+	struct depletion_data *dep;
+	struct track_data *track, *next_track;
+	time_t now = time(0);
+	
+	// E affects
+	if (dat->base_affects) {
+		fprintf(fl, "E\n%llu\n", dat->base_affects);
+	}
+
+	// I icon
+	if (dat->icon) {
+		fprintf(fl, "I\n%s~\n", dat->icon);
+	}
+
+	// M description
+	if (dat->description) {
+		strcpy(temp, dat->description);
+		strip_crlf(temp);
+		fprintf(fl, "M\n%s~\n", temp);
+	}
+
+	// N name
+	if (dat->name) {
+		fprintf(fl, "N\n%s~\n", dat->name);
+	}
+	
+	// X depletion
+	LL_FOREACH(dat->depletion, dep) {
+		fprintf(fl, "X\n%d %d\n", dep->type, dep->count);
+	}
+	
+	// Y tracks
+	LL_FOREACH_SAFE(dat->tracks, track, next_track) {
+		if (now - track->timestamp > SECS_PER_REAL_HOUR) {
+			LL_DELETE(dat->tracks, track);
+			free(track);
+		}
+		else {
+			fprintf(fl, "Y\n%d %d %ld %d\n", track->player_id, track->mob_num, track->timestamp, track->dir);
+		}
+	}
+
+	// Z: extra data
+	HASH_ITER(hh, dat->extra_data, red, next_red) {
+		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
 }

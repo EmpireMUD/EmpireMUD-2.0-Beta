@@ -5,11 +5,11 @@ only complete this quest if your Empire skill is under 15. If you still have
 the quest after that, type 'quest drop See Hugo' to get rid of it.
    Note: Make sure you don't have Empire noskilled. You can only turn in this
 quest if your Empire skill is still below 15. If you pass that level, you can
-drop this quest by typing 'quest drop The Perfect Rock'.
+drop this quest by typing 'quest drop See Hugo For Advice'.
 ~
 Hugo gives you some empire advice.
 ~
-12 0 0 25 0
+14 a 0 25 0
 P
 10 1 0 14
 R
@@ -31,7 +31,7 @@ reward Empire skill levels and bonus experience.
 ~
 You have found Ranger Clara!
 ~
-11 0 0 25 -1
+13 ah 0 25 -1
 A
 1 10800
 P
@@ -70,7 +70,7 @@ Note: Make sure you don't have Empire noskilled.
 want them for herself, though, so you can keep them for the next part of the
 tutorial.
 ~
-17 0 0 25 -1
+18 a 0 25 -1
 A
 1 10801
 P
@@ -100,7 +100,7 @@ done, take them to Rosemary in the planning office.
 ~
 Rosemary examines the logs you've scraped off, and gives you a nod of approval.
 ~
-14 0 0 25 -1
+15 a 0 25 -1
 A
 1 10801
 P
@@ -140,7 +140,7 @@ Rosemary wants you to take those logs and build a cabin.
 ~
 Rosemary seems pleased with your cabin.
 ~
-17 0 0 25 -1
+18 a 0 25 -1
 A
 1 10802
 P
@@ -173,7 +173,7 @@ forest, or get them by scraping trees.
 wonders aloud whether you'll be able to carry enough of them for the next part
 of the tutorial.
 ~
-17 0 0 25 -1
+18 a 0 25 -1
 A
 1 10802
 P
@@ -210,7 +210,7 @@ Return to the City Planner's office when you're done.
 ~
 Rosemary is proud of you for finishing so many buildings.
 ~
-18 0 0 25 -1
+19 a 0 25 -1
 A
 1 10802
 P
@@ -252,7 +252,7 @@ done.
 ~
 Rosemary is pleased with your progress.
 ~
-18 0 0 25 -1
+19 a 0 25 -1
 A
 1 10802
 P
@@ -290,7 +290,7 @@ some iron and smelt it into ingots, and then return to Rosemary.
 ~
 Rosemary is impressed that you got the iron so fast.
 ~
-20 0 0 25 -1
+21 a 0 25 -1
 A
 1 10802
 P
@@ -325,7 +325,7 @@ to build the whole forge.
 ~
 Rosemary inspects your building materials, and approves.
 ~
-23 0 0 25 -1
+24 a 0 25 -1
 A
 1 10802
 P
@@ -362,7 +362,7 @@ to Rosemary in the City Planning office when it's built.
    Rosemary congratulates you on building your forge. This is the end of the
 Empire tutorial. Now go forth, and rule the world!
 ~
-20 0 0 25 -1
+21 a 0 25 -1
 A
 1 10802
 P
@@ -442,7 +442,7 @@ reward Trade skill levels and bonus experience.
 ~
 You've found Horation and the Museum of Early Man!
 ~
-13 0 0 25 -1
+14 h 0 25 -1
 A
 1 10825
 P
@@ -906,7 +906,7 @@ into the Soulstream! Look around to see who else has quests for you in here --
 different tutorials might be available based on which skills you started with.
 Don't worry, you can always learn new skills, too.
 ~
-2 0 0 25 -1
+3 h 0 25 -1
 A
 2 10850
 R
@@ -937,7 +937,7 @@ need to learn the Ritual of Burdens.
 ~
 You have performed a ritual and satisfied the Spirit of Order!
 ~
-7 0 0 25 -1
+8 0 0 25 -1
 A
 1 10851
 P
@@ -951,7 +951,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 W
@@ -972,7 +972,7 @@ can find. When you have a rock and a flint, return to the Spirit of the Wild.
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
 Navigation' to improve your map.
 ~
-7 d 0 25 -1
+8 d 0 25 -1
 A
 1 10852
 P
@@ -986,7 +986,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 W
@@ -1012,7 +1012,7 @@ how to use it.
 ~
 You have satisfied the Spirit of the Hunt!
 ~
-6 d 0 25 -1
+7 d 0 25 -1
 A
 1 10853
 P
@@ -1026,7 +1026,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 T 10853
@@ -1050,7 +1050,7 @@ Heal.
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.
 ~
-14 0 0 25 -1
+15 0 0 25 -1
 A
 1 10854
 P
@@ -1064,7 +1064,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 W
@@ -1092,7 +1092,7 @@ worry, you'll get better at it as you level up.
 ~
 You have satisfied the Spirit of Darkness with your stealth.
 ~
-11 0 0 25 -1
+12 0 0 25 -1
 A
 1 10855
 P
@@ -1106,7 +1106,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 W
@@ -1131,7 +1131,7 @@ stone scythe for this quest, but most sharp weapons can be used to harvest.
 ~
 You have satisfied the Spirit of Progress.
 ~
-11 0 0 25 -1
+13 a 0 25 -1
 A
 1 10856
 P
@@ -1145,7 +1145,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 R
@@ -1165,12 +1165,14 @@ blood. Leave the Soulstream and find something with a beating heart to feast
 from. Knock out your victim in combat ('toggle autokill' will make you stop
 combat before killing your victim), then 'bite' them and drain some blood.
 When you have done this, return to the Spirit of Blood.
+Note: This quest will now show as 'complete' until you re-enter the
+Soulstream.
 ~
    You have satisfied the Spirit of Blood! Drinking the blood of live creatures
 is enough to gain Vampire skill up to level 15. After that, buy and use Vampire
 abilities to become a sanguine master.
 ~
-10 0 0 25 -1
+12 0 0 25 -1
 A
 1 10857
 P
@@ -1184,7 +1186,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 T 10857
@@ -1210,7 +1212,7 @@ you, because you never know when you'll want to cook food or brew a potion.
 make a torch by typing 'light stick', or to make a cooking fire with 'light
 tree'.
 ~
-9 0 0 25 -1
+10 0 0 25 -1
 A
 1 10858
 P
@@ -1224,7 +1226,7 @@ R
 R
 0 0 1
 R
-2 10852 1
+8 10852 1
 R
 6 10859 1
 R
@@ -1240,20 +1242,24 @@ S
 Complete More Tutorials~
    Complete more of the tutorials in the Soulstream in order to earn enough
 spirit tokens for a special reward. Once you have four of the tokens, you can
-finish this quest anywhere. You can find tutorials for each skill tree, so long
-as you're between levels 1 and 49 in that tree.
+finish this quest at the Soulstream portal, or at any city center. Type 'coins'
+to see how many of the spirit tokens you have.
 ~
    Congratulations! You've completed enough Soulstream tutorials to earn a
 special companion! Take this spirit bell, and use it any time you want to
 summon your non-combat minipet.
 ~
-5 0 0 25 -1
+6 0 0 25 -1
 R
 2 10859 1
 W
-2 10852 0 4
+20 10852 0 4
 Z
-2 10852
+2 10850
+Z
+2 10851
+Z
+0 5009
 S
 #10860
 Empire: Find The Pageboy~
@@ -1263,7 +1269,7 @@ and he will get you started. Try using 'where pageboy' to find him.
 ~
 You've found the pageboy...
 ~
-3 0 0 25 -1
+4 a 0 25 -1
 A
 1 10856
 P
@@ -1314,5 +1320,57 @@ W
 10 6 0 49
 Z
 1 10825
+S
+#10863
+High Sorcery: Study Sorcery~
+This quest has no description.
+~
+You have completed the Spirit of Order's task and become a sorcerer.
+~
+2 a 1 25 -1
+A
+1 10851
+P
+0 10850 0 1
+P
+10 2 0 0
+P
+6 10851 0 1
+P
+5 10851 0 1
+R
+0 0 1
+W
+12 5511 0 1
+W
+9 2 0 1
+Z
+1 10851
+S
+#10864
+Natural Magic: Druidic Chant~
+This quest has no description.
+~
+You have completed the quest.
+~
+1 a 1 25 -1
+A
+1 10854
+P
+0 10850 0 1
+P
+10 3 0 0
+P
+6 10854 0 1
+P
+5 10854 0 1
+R
+0 0 1
+W
+12 5142 0 1
+W
+9 3 0 1
+Z
+1 10854
 S
 $

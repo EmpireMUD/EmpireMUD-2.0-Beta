@@ -38,7 +38,6 @@
 */
 
 // external vars
-extern const char *affect_wear_off_msgs[];
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const struct material_data materials[NUM_MATERIALS];
@@ -165,11 +164,9 @@ void check_death_respawn(void) {
 * only runs on players who are connected. Nobody else, including mobs, needs
 * to know.
 */
-void check_expired_cooldowns(void) {
-	extern const char *cooldown_types[];
-	
+void check_expired_cooldowns(void) {	
 	struct cooldown_data *cool, *next_cool;
-	char lbuf[MAX_STRING_LENGTH];
+	generic_data *gen;
 	char_data *ch;
 	descriptor_data *d;
 	
@@ -179,8 +176,9 @@ void check_expired_cooldowns(void) {
 				next_cool = cool->next;
 				
 				if ((cool->expire_time - time(0)) <= 0) {
-					sprinttype(cool->type, cooldown_types, lbuf);
-					msg_to_char(ch, "&%cYour %s cooldown has ended.&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', lbuf);
+					if ((gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
+						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_COOLDOWN_WEAR_OFF(gen));
+					}
 					remove_cooldown(ch, cool);
 				}
 			}
@@ -294,7 +292,7 @@ void check_should_dismount(char_data *ch) {
 	else if (IS_MORPHED(ch)) {
 		ok = FALSE;
 	}
-	else if (IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
+	else if ((IS_COMPLETE(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_CLOSED)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
 		ok = FALSE;
 	}
 	else if (GET_SITTING_ON(ch)) {
@@ -306,36 +304,13 @@ void check_should_dismount(char_data *ch) {
 	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
 		ok = FALSE;
 	}
-	else if (!has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
 		ok = FALSE;
 	}
 	
 	if (!ok) {
 		do_dismount(ch, "", 0, 0);
 	}
-}
-
-
-/**
-* This clears the linkdead players out, and should be called before you run
-* anything that updates offline players, as players in this state can cause
-* actual problems if they reconnect.
-*/
-void eliminate_linkdead_players(void) {
-	void extract_pending_chars();
-	
-	char_data *ch, *next_ch;
-	
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
-		if (!IS_NPC(ch) && !ch->desc) {
-			perform_idle_out(ch);
-		}
-	}
-	
-	// they may be in the "pending" state
-	extract_pending_chars();
 }
 
 
@@ -384,17 +359,31 @@ void point_update_char(char_data *ch) {
 	struct cooldown_data *cool, *next_cool;
 	struct instance_data *inst;
 	obj_data *obj, *next_obj;
-	empire_data *emp;
-	char_data *c;
+	char_data *c, *chiter;
 	bool found;
+	int count;
 	
 	if (IS_NPC(ch) && FIGHTING(ch)) {
 		check_pointless_fight(ch);
 	}
 	
-	if (!IS_NPC(ch)) {
-		emp = GET_LOYALTY(ch);
+	// check mob crowding (for npcs in stables)
+	if (IS_NPC(ch) && !ch->desc && HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
+		count = 1;	// me
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+			if (ch != chiter && !EXTRACTED(chiter) && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
+				++count;
+			}
+		}
 		
+		if (count > config_get_int("num_duplicates_in_stable")) {
+			act("$n is feeling overcrowded, and leaves.", TRUE, ch, NULL, NULL, TO_ROOM);
+			extract_char(ch);
+			return;
+		}
+	}
+	
+	if (!IS_NPC(ch)) {
 		// check bad quest items
 		remove_quest_items(ch);
 		
@@ -417,37 +406,20 @@ void point_update_char(char_data *ch) {
 		if (IS_BLOOD_STARVED(ch)) {
 			msg_to_char(ch, "You are starving!\r\n");
 		}
-	
-		// in an empire with Prominence?
-		if (emp) {
-			gain_ability_exp(ch, ABIL_PROMINENCE, 2);
-			gain_ability_exp(ch, ABIL_LOCKS, 1);
-		}
-		// city lights after dark
-		if (weather_info.sunlight == SUN_DARK) {
-			gain_ability_exp(ch, ABIL_CITY_LIGHTS, 2);
-		}
-		else if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
+		
+		// light-based gains
+		if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
 			gain_ability_exp(ch, ABIL_DAYWALKING, 2);
 		}
-		
-		gain_ability_exp(ch, ABIL_COMMERCE, 2);
-		gain_ability_exp(ch, ABIL_SATED_THIRST, 2);
 		
 		if (GET_MOUNT_LIST(ch)) {
 			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
 		}
 		
-		if (IS_VAMPIRE(ch)) {
-			gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
-		}
-		
-		if (affected_by_spell(ch, ATYPE_RADIANCE)) {
-			gain_ability_exp(ch, ABIL_RADIANCE, 2);
-		}
-		
 		gain_ability_exp(ch, ABIL_GIFT_OF_NATURE, 2);
 		gain_ability_exp(ch, ABIL_ARCANE_POWER, 2);
+		
+		run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
 		
 		// death count decrease after 3 minutes without a death
 		if (GET_RECENT_DEATH_COUNT(ch) > 0 && GET_LAST_DEATH_TIME(ch) + (3 * SECS_PER_REAL_MIN) < time(0)) {
@@ -523,7 +495,17 @@ void point_update_char(char_data *ch) {
 			}
 		}
 	}
-
+	
+	// warn about burning
+	if (IS_BURNING(IN_ROOM(ch))) {
+		if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
+			act("The walls crackle and crisp as they burn!", FALSE, ch, NULL, NULL, TO_CHAR);
+		}
+		else {
+			act("The fire rages as the building burns!", FALSE, ch, NULL, NULL, TO_CHAR);
+		}
+	}
+	
 	// check all cooldowns -- ignore chars with descriptors, as they'll want
 	// the OTHER function to remove this (it sends messages; this one includes
 	// NPCs and doesn't)
@@ -567,9 +549,11 @@ void real_update_char(char_data *ch) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
 	char_data *room_ch, *next_ch, *caster;
+	char buf[MAX_STRING_LENGTH];
+	struct instance_data *inst;
 	int result, iter, type;
 	int fol_count, gain;
-	bool found, took_dot;
+	bool found, took_dot, msg;
 	
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
@@ -577,7 +561,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// first check location: this may move the player
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !find_instance_by_room(IN_ROOM(ch), FALSE)) {
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE)) || inst->id != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
 		adventure_unsummon(ch);
 	}
 	
@@ -723,9 +707,6 @@ void real_update_char(char_data *ch) {
 			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
 		}
 		GET_DAILY_QUESTS(ch) = 0;
-		for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
-			GET_REWARDED_TODAY(ch, iter) = -1;
-		}
 		
 		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
 		
@@ -738,7 +719,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	/* Update conditions */
-	if (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST)) {			
+	if (has_player_tech(ch, PTECH_NO_HUNGER)) {			
 		gain_condition(ch, FULL, -1);
 	}
 	else {
@@ -746,17 +727,11 @@ void real_update_char(char_data *ch) {
 			gain_condition(ch, FULL, 1);
 		}
 	}
-		
-	if (IS_DARK(IN_ROOM(ch))) {
-		if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
-			gain_ability_exp(ch, ABIL_NIGHTSIGHT, 0.5);
-		}
-		gain_ability_exp(ch, ABIL_PREDATOR_VISION, 0.5);
-		gain_ability_exp(ch, ABIL_BY_MOONLIGHT, 0.5);
-	}
+	
+	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_FREQUENT);
 	
 	// more thirsty?
-	if (has_ability(ch, ABIL_SATED_THIRST) || (IS_VAMPIRE(ch) && has_ability(ch, ABIL_UNNATURAL_THIRST))) {
+	if (has_player_tech(ch, PTECH_NO_THIRST)) {
 		gain_condition(ch, THIRST, -1);
 	}
 	else {
@@ -830,10 +805,13 @@ void real_update_char(char_data *ch) {
 
 	if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
 		sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
+		msg = !CHAR_MORPH_FLAGGED(ch, MORPHF_NO_MORPH_MESSAGE);
 
 		perform_morph(ch, NULL);
-
-		act(buf, TRUE, ch, 0, 0, TO_ROOM);
+		
+		if (msg) {
+			act(buf, TRUE, ch, 0, 0, TO_ROOM);
+		}
 		msg_to_char(ch, "You revert to normal!\r\n");
 	}
 
@@ -932,14 +910,19 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 void check_ruined_cities(void) {
 	struct empire_city_data *city, *next_city;
 	empire_data *emp, *next_emp;
+	bool any = FALSE;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!EMPIRE_IMM_ONLY(emp)) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
 				next_city = city->next;
-				check_one_city_for_ruin(emp, city);
+				any |= check_one_city_for_ruin(emp, city);
 			}
 		}
+	}
+	
+	if (any) {
+		read_empire_territory(NULL, FALSE);
 	}
 }
 
@@ -1017,7 +1000,7 @@ static void reduce_city_overage_one(empire_data *emp) {
 		perform_abandon_city(emp, city, FALSE);
 	}
 	
-	save_empire(emp);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -1033,17 +1016,33 @@ void reduce_city_overages(void) {
 	extern int count_city_points_used(empire_data *emp);
 	
 	empire_data *iter, *next_iter;
-	int used, points;
+	int points;
+	
+	time_t overage_timeout = time(0) - (config_get_int("city_overage_timeout") * SECS_PER_REAL_HOUR);
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		// only bother on !imm empires that have MORE than one city (they can always keep the last one)
 		if (!EMPIRE_IMM_ONLY(iter) && count_cities(iter) > 1) {
-			used = count_city_points_used(iter);
 			points = city_points_available(iter);
 			
-			// cutoff for keeping cities is being at 2x currently-earned points
-			if (used > (2 * (points + used))) {
-				reduce_city_overage_one(iter);
+			if (points >= 0) {	// no overage
+				// remove warning time, if any
+				EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) = 0;
+			}
+			else {	// over on points
+				
+				if (EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) == 0) {
+					EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) = time(0);
+					log_to_empire(iter, ELOG_TERRITORY, "Your empire is using more city points than it has available and will abandon one soon");
+				}
+				else if (EMPIRE_CITY_OVERAGE_WARNING_TIME(iter) <= overage_timeout) {
+					// time's up
+					reduce_city_overage_one(iter);
+				}
+				else {
+					// still over -- log again
+					log_to_empire(iter, ELOG_TERRITORY, "Your empire is using more city points than it has available and will abandon one soon");
+				}
 			}
 		}
 	}
@@ -1060,16 +1059,25 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	
 	struct empire_city_data *city;
 	room_data *iter, *next_iter, *loc, *farthest;
-	int dist, this_far, far_dist;
-	bool junk;
+	int dist, this_far, far_dist, far_type, ter_type;
+	bool junk, outskirts_over, frontier_over, total_over;
 	
 	// sanity
-	if (!emp || EMPIRE_IMM_ONLY(emp) || EMPIRE_OUTSIDE_TERRITORY(emp) <= land_can_claim(emp, TRUE)) {
+	if (!emp || EMPIRE_IMM_ONLY(emp)) {
 		return;
+	}
+	
+	// see which is over
+	outskirts_over = EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > OUTSKIRTS_CLAIMS_AVAILABLE(emp);
+	frontier_over = EMPIRE_TERRITORY(emp, TER_FRONTIER) > land_can_claim(emp, TER_FRONTIER);
+	total_over = EMPIRE_TERRITORY(emp, TER_TOTAL) > land_can_claim(emp, TER_TOTAL);
+	if (!outskirts_over && !frontier_over && !total_over) {
+		return;	// no work
 	}
 	
 	farthest = NULL;
 	far_dist = -1;	// always less
+	far_type = TER_FRONTIER;
 	
 	// check the whole map to determine the farthest outside claim
 	HASH_ITER(hh, world_table, iter, next_iter) {
@@ -1080,7 +1088,17 @@ static void reduce_outside_territory_one(empire_data *emp) {
 		loc = HOME_ROOM(iter);
 		
 		// if owner matches AND it's not in a city
-		if (ROOM_OWNER(loc) == emp && !is_in_city_for_empire(loc, emp, FALSE, &junk)) {
+		if (ROOM_OWNER(loc) == emp && (ter_type = get_territory_type_for_empire(loc, emp, FALSE, &junk)) != TER_CITY) {
+			if (ter_type == TER_CITY) {
+				continue;	// NEVER do a city, even if total is over
+			}
+			if (ter_type == TER_FRONTIER && !frontier_over && !total_over) {
+				continue;
+			}
+			else if (ter_type == TER_OUTSKIRTS && !outskirts_over && !total_over) {
+				continue;
+			}
+			
 			// check its distance from each city, find the city it's closest to
 			this_far = MAP_SIZE;
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
@@ -1094,12 +1112,13 @@ static void reduce_outside_territory_one(empire_data *emp) {
 			if (this_far > far_dist) {
 				far_dist = this_far;
 				farthest = loc;
+				far_type = ter_type;
 			}
 		}
 	}
 	
 	if (farthest) {
-		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much outside territory has been claimed", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest));
+		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much %s territory has been claimed", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest), (far_type == TER_FRONTIER) ? "frontier" : "outskirts");
 		abandon_room(farthest);
 	}
 }
@@ -1117,7 +1136,11 @@ void reduce_outside_territory(void) {
 	empire_data *iter, *next_iter;
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (!EMPIRE_IMM_ONLY(iter) && EMPIRE_OUTSIDE_TERRITORY(iter) > land_can_claim(iter, TRUE)) {
+		if (EMPIRE_IMM_ONLY(iter)) {
+			continue;	// ignore imms
+		}
+		
+		if (EMPIRE_TERRITORY(iter, TER_OUTSKIRTS) > OUTSKIRTS_CLAIMS_AVAILABLE(iter) || EMPIRE_TERRITORY(iter, TER_FRONTIER) > land_can_claim(iter, TER_FRONTIER)) {
 			reduce_outside_territory_one(iter);
 		}
 	}
@@ -1132,7 +1155,7 @@ void reduce_outside_territory(void) {
 * @param empire_data *emp The empire to reduce.
 */
 static void reduce_stale_empires_one(empire_data *emp) {
-	bool outside_only = (EMPIRE_OUTSIDE_TERRITORY(emp) > 0);
+	bool outside_only = (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > 0 || EMPIRE_TERRITORY(emp, TER_FRONTIER) > 0);
 	room_data *iter, *next_iter, *found_room = NULL;
 	bool junk;
 	
@@ -1197,8 +1220,17 @@ static void reduce_stale_empires_one(empire_data *emp) {
 void reduce_stale_empires(void) {
 	empire_data *iter, *next_iter;
 	
+	// syslog(SYS_INFO, 0, TRUE, "Debug: Starting reduce_stale_empires");
+	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (!EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && (EMPIRE_OUTSIDE_TERRITORY(iter) > 0 || EMPIRE_CITY_TERRITORY(iter) > 0)) {
+		// check if we need to rescan
+		if (EMPIRE_MEMBERS(iter) > 0 && EMPIRE_NEXT_TIMEOUT(iter) != 0 && EMPIRE_NEXT_TIMEOUT(iter) <= time(0)) {
+			// syslog(SYS_INFO, 0, TRUE, "Debug: Rescanning empire %s based on timeout", EMPIRE_NAME(iter));
+			reread_empire_tech(iter);
+		}
+		
+		// check overages
+		if (!EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
 			// when members hit 0, we consider the empire timed out
 			reduce_stale_empires_one(iter);
 		}
@@ -1226,6 +1258,97 @@ bool should_delete_empire(empire_data *emp) {
 }
 
 
+/**
+* Processes needs for a given empire/island/need. This generally involves
+* taking resources, and will set the UNSUPPLIED flag if there aren't enough.
+*
+* @param empire_data *emp Which empire.
+* @param struct empire_island *eisle The island being processed for needs.
+* @param struct empire_needs *needs The current 'needs' to process.
+*/
+void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs) {
+	void deactivate_workforce_island(empire_data *emp, int island_id);
+	void read_vault(empire_data *emp);
+	
+	struct empire_storage_data *store, *next_store;
+	struct island_info *island = get_island(eisle->island, TRUE);
+	bool any = TRUE, vault = FALSE;
+	int amount, max;
+	obj_data *obj;
+	
+	while (needs->needed > 0 && any) {
+		any = FALSE;	// ensure we charged any item this cycle
+		HASH_ITER(hh, eisle->store, store, next_store) {
+			if (needs->needed < 1) {
+				break;	// done early
+			}
+			if (store->keep || store->amount < 1 || !(obj = store->proto)) {
+				continue;
+			}
+			
+			amount = 0;
+			
+			// ENEED_x: processing the item
+			switch (needs->type) {
+				case ENEED_WORKFORCE: {
+					if (IS_FOOD(obj)) {
+						if (GET_FOOD_HOURS_OF_FULLNESS(obj) > needs->needed) {
+							amount = 1;
+							needs->needed = 0;
+						}
+						else {	// need more than 1
+							amount = ceil((double) needs->needed / GET_FOOD_HOURS_OF_FULLNESS(obj));
+							max = MAX(100, store->amount / 4);
+							amount = MIN(amount, store->amount);
+							amount = MIN(amount, max);	// don't take more than this of any 1 thing per cycle
+							SAFE_ADD(needs->needed, -(amount * GET_FOOD_HOURS_OF_FULLNESS(obj)), 0, INT_MAX, FALSE);
+						}
+					}
+					break;
+				}
+				default: {
+					// type not implemented
+					
+					// Note for implementation:
+					// if (IS_WEALTH(obj)) { vault = TRUE; }
+					break;
+				}
+			}
+			
+			// amount we could take
+			if (amount > 0) {
+				any = TRUE;
+				add_to_empire_storage(emp, eisle->island, store->vnum, -amount);
+				log_to_empire(emp, ELOG_WORKFORCE, "Consumed %s (x%d) on %s", GET_OBJ_SHORT_DESC(obj), amount, eisle->name ? eisle->name : island->name);
+			}
+		}
+	}
+	
+	if (needs->needed > 0) {
+		if (!IS_SET(needs->status, ENEED_STATUS_UNSUPPLIED)) {
+			// ENEED_x: logging the problem
+			switch (needs->type) {
+				case ENEED_WORKFORCE: {
+					// this logs to TRADE because otherwise members won't see it
+					log_to_empire(emp, ELOG_TRADE, "Your workforce on %s is starving!", eisle->name ? eisle->name : island->name);
+					deactivate_workforce_island(emp, eisle->island);
+					break;
+				}
+			}
+			
+			SET_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
+		}
+	}
+	else {
+		REMOVE_BIT(needs->status, ENEED_STATUS_UNSUPPLIED);
+	}
+	
+	if (vault) {
+		read_vault(emp);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT LIMITS ///////////////////////////////////////////////////////////
 
@@ -1243,7 +1366,7 @@ bool check_autostore(obj_data *obj, bool force) {
 	vehicle_data *in_veh;
 	room_data *real_loc;
 	obj_data *top_obj;
-	bool store, unique, full;
+	bool store, unique, full, is_home;
 	int islid;
 	
 	// easy exclusions
@@ -1260,13 +1383,11 @@ bool check_autostore(obj_data *obj, bool force) {
 	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
-	if (in_veh && !real_loc) {
-		real_loc = IN_ROOM(in_veh);
-	}
+	is_home = (real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) != NOBODY) || (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh)) != NOBODY);
 	
 	// detect owner here
 	if (!emp && in_veh) {
-		emp = VEH_OWNER(in_veh);
+		emp = VEH_OWNER(in_veh) ? VEH_OWNER(in_veh) : ROOM_OWNER(IN_ROOM(in_veh));
 	}
 	if (!emp && real_loc) {
 		emp = ROOM_OWNER(HOME_ROOM(real_loc));
@@ -1304,12 +1425,12 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (UNIQUE_OBJ_CAN_STORE(obj) && real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) == NOBODY) {
+	else if (UNIQUE_OBJ_CAN_STORE(obj) && !is_home) {
 		// store unique items but not in private homes
 		store = TRUE;
 		unique = TRUE;
 	}
-	else if (OBJ_BOUND_TO(obj) && real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) == NOBODY && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
+	else if (OBJ_BOUND_TO(obj) && !is_home && (GET_AUTOSTORE_TIMER(obj) + config_get_int("bound_item_junk_time") * SECS_PER_REAL_MIN) < time(0)) {
 		// room owned, item is bound, not a private home, but not storable? junk it
 		store = TRUE;
 		// DON'T mark unique -- we are just junking it
@@ -1344,7 +1465,9 @@ bool check_autostore(obj_data *obj, bool force) {
 				islid = get_main_island(emp);
 			}
 			
-			add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
+			if (islid != NO_ISLAND) {	// MUST be not-nowhere to autostore
+				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
+			}
 		}
 	}
 	
@@ -1360,6 +1483,7 @@ bool check_autostore(obj_data *obj, bool force) {
 * @param obj_data *obj The object to update.
 */
 void point_update_obj(obj_data *obj) {
+	char buf[MAX_STRING_LENGTH];
 	room_data *to_room, *obj_r;
 	obj_data *top;
 	char_data *c;
@@ -1564,14 +1688,17 @@ void point_update_obj(obj_data *obj) {
 * @param obj_data *obj The object to update.
 */
 void real_update_obj(obj_data *obj) {
+	void start_burning(room_data *room);
+	
 	struct empire_political_data *pol;
 	empire_data *emp, *enemy;
 	room_data *home;
+	char_data *pyro;
 	
 	// burny
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
 		home = HOME_ROOM(IN_ROOM(obj));
-		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !BUILDING_BURNING(home)) {
+		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
 			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
 			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
 				// check that the empire is at war
@@ -1580,14 +1707,13 @@ void real_update_obj(obj_data *obj) {
 				
 				// check for war
 				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
-					// TODO magic number -- this should be a config
-					COMPLEX_DATA(home)->burning = number(4, 12);
-					if (ROOM_PEOPLE(home)) {
-						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(home), obj, 0, TO_CHAR | TO_ROOM);
-
-						// ensure no building or dismantling
-						stop_room_action(home, ACT_BUILDING, CHORE_BUILDING);
-						stop_room_action(home, ACT_DISMANTLING, CHORE_BUILDING);
+					if (ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
+					}
+					start_burning(home);
+					
+					if (emp && obj->last_owner_id > 0 && (pyro = is_playing(obj->last_owner_id))) {
+						add_offense(emp, OFFENSE_BURNED_BUILDING, pyro, IN_ROOM(pyro), offense_was_seen(pyro, emp, IN_ROOM(obj)) ? OFF_SEEN : NOBITS);
 					}
 				}
 			}
@@ -1598,181 +1724,6 @@ void real_update_obj(obj_data *obj) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM LIMITS /////////////////////////////////////////////////////////////
-
-/**
-* Point update (per mud hour / 75 seconds) for each room.
-*
-* @param room_data *room The room to update.
-*/
-void point_update_room(room_data *room) {
-	void death_log(char_data *ch, char_data *killer, int type);
-	void fill_trench(room_data *room);
-
-	char_data *ch, *next_ch, *sub_ch, *next_sub;
-	obj_data *o, *next_o;
-	struct track_data *track, *next_track, *temp;
-	struct affected_type *af, *next_af;
-	empire_data *emp;
-	time_t now = time(0);
-	bool junk;
-	int count;
-	
-	int allowed_animals = config_get_int("num_duplicates_in_stable");
-
-	// map-only portion
-	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-		if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
-			if (weather_info.sky >= SKY_RAINING) {
-				add_to_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_gain_from_rain"));
-				if (get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS) >= config_get_int("trench_full_value")) {
-					fill_trench(room);
-				}
-			}
-			
-			// still a trench? (may have been filled by rain)
-			if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH)) {
-				if (find_flagged_sect_within_distance_from_room(room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER, NOBITS, 1)) {
-					fill_trench(room);
-				}
-			}
-		}
-
-		if (room_affected_by_spell(room, ATYPE_DARKNESS) && weather_info.sunlight != SUN_DARK && !number(0, 1)) {
-			affect_from_room(room, ATYPE_DARKNESS);
-			if (ROOM_PEOPLE(room))
-				act("The darkness dissipates.", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-		}
-
-		if (COMPLEX_DATA(room) && HOME_ROOM(room) == room && BUILDING_BURNING(room)) {
-			/* Reduce by one tick */
-			--COMPLEX_DATA(room)->burning;
-		
-			emp = ROOM_OWNER(room);
-			if (emp) {
-				log_to_empire(emp, ELOG_HOSTILITY, "Building on fire at (%d, %d) -- douse it quickly", X_COORD(room), Y_COORD(room));
-			}
-
-			/* Time's up! */
-			if (BUILDING_BURNING(room) == 0) {
-				if (ROOM_IS_CLOSED(room)) {
-					if (ROOM_PEOPLE(room)) {
-						act("The building collapses in flames around you!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-					for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-						next_ch = ch->next_in_room;
-						
-						if (!IS_NPC(ch)) {
-							death_log(ch, ch, TYPE_SUFFERING);
-						}
-						die(ch, ch);
-					}
-				}
-				else {
-					// not closed
-					if (ROOM_PEOPLE(room)) {
-						act("The building burns to the ground!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-				}
-			
-				disassociate_building(room);
-				
-				// auto-abandon if not in city
-				if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
-					// does check the city time limit for abandon protection
-					abandon_room(room);
-				}
-
-				/* Destroy 50% of the objects */
-				for (o = ROOM_CONTENTS(room); o; o = next_o) {
-					next_o = o->next_content;
-					if (!number(0, 1)) {
-						extract_obj(o);
-					}
-				}
-
-				return;
-			}
-
-			/* Otherwise, just send a message */
-			if (ROOM_PEOPLE(room)) {
-				if (ROOM_IS_CLOSED(room)) {
-					act("The walls crackle and crisp as they burn!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-				}
-				else {
-					act("The fire rages as the building burns!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-				}
-			}
-		}
-	}
-
-	// For remaining interior rooms, make sure everyone knows the place is crispy
-	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		if (HOME_ROOM(room) != room && BUILDING_BURNING(room) && ROOM_PEOPLE(room)) {
-			act("The walls crackle and crisp as they burn!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-		}
-	}
-
-	// WHOLE WORLD:
-	
-	// check tracks
-	for (track = ROOM_TRACKS(room); track; track = next_track) {
-		next_track = track->next;
-		
-		if (now - track->timestamp > config_get_int("tracks_lifespan") * SECS_PER_REAL_MIN) {
-			REMOVE_FROM_LIST(track, ROOM_TRACKS(room), next);
-			free(track);
-		}
-	}
-	
-	// check mob crowding
-	if (HAS_FUNCTION(room, FNC_STABLE)) {
-		for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-			next_ch = ch->next_in_room;
-			
-			// skip non-npcs and familiars
-			if (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_FAMILIAR)) {
-				continue;
-			}
-			
-			// look for more here than allowed
-			count = 1;
-			for (sub_ch = ch->next_in_room; sub_ch; sub_ch = next_sub) {
-				next_sub = sub_ch->next_in_room;
-				
-				// only looking for dupes
-				if (!IS_NPC(sub_ch) || sub_ch->desc || GET_MOB_VNUM(sub_ch) != GET_MOB_VNUM(ch)) {
-					continue;
-				}
-				
-				if (count++ >= allowed_animals) {
-					act("$n is feeling overcrowded, and leaves.", TRUE, sub_ch, NULL, NULL, TO_ROOM);
-					extract_char(sub_ch);
-				}
-			}
-		}
-	}
-
-	// update room ffects
-	for (af = ROOM_AFFECTS(room); af; af = next_af) {
-		next_af = af->next;
-		if (af->duration >= 1) {
-			af->duration--;
-		}
-		else if (af->duration != UNLIMITED) {
-			if ((af->type > 0)) {
-				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if (*affect_wear_off_msgs[af->type] && ROOM_PEOPLE(room)) {
-						act(affect_wear_off_msgs[af->type], FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-				}
-			}
-			affect_remove_room(room, af);
-		}
-	}
-	
-	// ensure these are up to date
-	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
-}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1820,7 +1771,7 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to update.
 */
 void point_update_vehicle(vehicle_data *veh) {
-	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	
 	// autostore
 	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {
@@ -1832,7 +1783,7 @@ void point_update_vehicle(vehicle_data *veh) {
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
-		if (!besiege_vehicle(veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING)) {
+		if (!besiege_vehicle(NULL, veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING)) {
 			// extracted
 			return;
 		}
@@ -1983,7 +1934,7 @@ void update_trading_post(void) {
 * @param int value The amount to gain or lose
 */
 void gain_condition(char_data *ch, int condition, int value) {
-	extern bool gain_cond_messsage;
+	extern bool gain_cond_message;
 	bool intoxicated;
 
 	// no change?
@@ -1992,12 +1943,12 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 	
 	// things that prevent thirst
-	if (value > 0 && condition == THIRST && (has_ability(ch, ABIL_SATED_THIRST) || has_ability(ch, ABIL_UNNATURAL_THIRST))) {
+	if (value > 0 && condition == THIRST && has_player_tech(ch, PTECH_NO_THIRST)) {
 		return;
 	}
 	
 	// things that prevent hunger
-	if (value > 0 && condition == FULL && has_ability(ch, ABIL_UNNATURAL_THIRST)) {
+	if (value > 0 && condition == FULL && has_player_tech(ch, PTECH_NO_HUNGER)) {
 		return;
 	}
 
@@ -2013,7 +1964,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
 
-	if (!gain_cond_messsage) {
+	if (!gain_cond_message) {
 		return;
 	}
 
@@ -2205,7 +2156,6 @@ void point_update(bool run_real) {
 	void update_players_online_stats();
 	
 	vehicle_data *veh, *next_veh;
-	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
 	
@@ -2259,11 +2209,6 @@ void point_update(bool run_real) {
 		
 		real_update_obj(obj);
 		point_update_obj(obj);
-	}
-	
-	// rooms
-	HASH_ITER(hh, world_table, room, next_room) {
-		point_update_room(room);
 	}
 }
 

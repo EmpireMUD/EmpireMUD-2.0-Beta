@@ -1,0 +1,426 @@
+#12400
+The Mouth of the Cave~
+   A narrow path follows the sea water into the mouth of the cave, which is
+much larger than it appeared from the outside. In fact, this seems like the
+perfect place to hide a small ship. It looks like the cave goes much deeper,
+if you are willing to explore it.
+~
+cd 0 0
+M 1 12405 100.00 1
+M 0 12400 100.00 1
+T 12400
+S
+#12401
+Beneath a Small Ship~
+   As you wend deeper into the cave, you come upon a ship which, though small,
+is blocking passage further into the cave. It looks as if it has run aground
+here, as the water is too shallow to sail further.
+~
+c 0 0
+D2
+~
+0 12400
+D8
+~
+0 12402
+E
+ship golden goblin~
+   This little wooden sailing ship appears to have a nude goblin for its
+figurehead, plated in what is almost certainly brass.
+~
+M 0 12401 100.00 1
+T 12445
+S
+#12402
+On the Deck of the Golden Goblin~
+   The ship, though dirty, seems to be in good repair compared to most of the
+goblin habitats you have witnessed. The masts are folded down, which is no
+small feat of engineering for a goblin, because the cave ceiling here is low.
+You have to hunch to avoid hitting your head.
+~
+c 0 0
+D9
+~
+0 12401
+D13
+~
+0 12403
+M 0 12402 100.00 1
+S
+#12403
+The Mizzenmast of the Golden Goblin~
+   The rear half of the ship is blocked by the mizzenmast, which has been
+folded down to give enough clearance to enter this cave. From here, you can see
+that the Golden Goblin is well and truly stuck in this cave. The goblins seemed
+to be working on a way to remove it, but they have made no progress.
+~
+c 0 0
+D10
+~
+0 12402
+D9
+~
+0 12404
+M 0 12403 100.00 1
+S
+#12404
+Floating Behind the Ship~
+   You lose your grip on the Golden Goblin and fall into the water. It looks
+shallow, but you can't seem to find sure footing. You could swim back to the
+mouth of the cave from here, but as you start to move, the water begins to
+ripple...
+~
+0 0 0
+D3
+~
+0 12400
+E
+ship golden goblin~
+   This little wooden sailing ship appears to have a nude goblin for its
+figurehead, plated in what is almost certainly brass.
+~
+T 12415
+S
+#12405
+A Whirling Maelstrom~
+   Water and air swirl around you as you are sucked deeper and deeper into an
+underwater cavern. You struggle to catch your breath but cough up more salt and
+water than air. For a moment, you struggle to hold onto the wall, but the
+seaweed is slippery and you lose your grip.
+~
+cg 0 0
+T 12416
+S
+#12406
+An Underwater Cavern~
+   You seem to have fallen through the maelstrom and into a pocket of air in an
+otherwise fully-submerged cavern. The walls are thick with seaweed and odd
+creatures, and the cavern smells of old fish. In the center, a small fire burns
+to warm the air, and its smoke billows up into the water above.
+~
+cd 0 G
+D0
+~
+0 12410
+E
+fire cauldron~
+It looks like Fathma is cooking up some kind of spell.
+~
+M 0 12406 100.00 1
+M 1 12406 100.00 1
+T 12414
+S
+#12407
+Backtracking Toward the Start~
+   You follow the disturbed sand in an attempt to retrace your path back to the
+air bubble before your breath runs out. It looks like you found the right way
+as you can hear the goblin sea witch chanting in the distance.
+~
+cdg 0 0
+D2
+~
+0 12406
+T 12413
+S
+#12408
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12410
+D14
+~
+0 12409
+D14
+~
+0 12409
+M 1 12408 100.00 8
+T 12413
+T 12410
+T 12407
+S
+#12409
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12410
+D14
+~
+0 12408
+D14
+~
+0 12408
+M 1 12443 100.00 3
+T 12413
+T 12410
+T 12407
+S
+#12410
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12412
+D14
+~
+0 12408
+D14
+~
+0 12409
+M 1 12408 100.00 8
+T 12413
+T 12410
+T 12407
+S
+#12411
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12412
+D14
+~
+0 12408
+D14
+~
+0 12409
+M 1 12408 100.00 8
+T 12413
+T 12410
+T 12407
+S
+#12412
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12410
+D14
+~
+0 12411
+D14
+~
+0 12414
+M 1 12408 100.00 8
+T 12413
+T 12410
+T 12407
+S
+#12413
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12414
+D14
+~
+0 12412
+D14
+~
+0 12411
+M 1 12408 100.00 8
+T 12413
+T 12410
+T 12407
+S
+#12414
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12416
+D14
+~
+0 12412
+D14
+~
+0 12413
+T 12413
+T 12410
+T 12407
+S
+#12415
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12416
+D14
+~
+0 12413
+D1
+~
+0 12419
+M 1 12408 100.00 8
+T 12413
+T 12410
+T 12407
+S
+#12416
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12418
+D14
+~
+0 12414
+D14
+~
+0 12415
+M 1 12408 100.00 8
+T 12413
+T 12410
+T 12407
+S
+#12417
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D14
+~
+0 12418
+D14
+~
+0 12415
+D14
+~
+0 12414
+T 12413
+T 12410
+T 12407
+S
+#12418
+A Flooded Cavern~
+   In the dark, with your air supply running out, every twist and turn of the
+cavern looks the same. You might be able to backtrack to the sea hag's air
+bubble, if you can hold your breath that long.
+~
+bg 0 0
+D2
+~
+0 12407
+D0
+~
+0 12420
+D14
+~
+0 12417
+D14
+~
+0 12416
+M 1 12408 100.00 8
+T 12413
+T 12410
+T 12407
+S
+#12419
+A Grand Cavern~
+   The cavern opens up into a much larger chamber. Though the whole thing is
+underwater, there still appears to be a pool in the center of the cavern. As
+you enter, the walls tremble around you and bits of sand and debris fall from
+the ceiling.
+~
+cg 0 0
+D3
+~
+0 12415
+E
+pool center~
+The pool looks briny and dark.
+~
+M 0 12419 100.00 1
+T 12413
+T 12407
+S
+#12420
+A Grand Cavern~
+   The cavern opens up into a much larger chamber. The floor is littered with
+gold and bones, both from humans and from animals. There appears to be no exit
+from this room except the way you came.
+~
+cg 0 0
+D2
+~
+0 12418
+E
+floor bones gold~
+   The golden treasures that line the floor seem to vanish as you approach
+them, leaving only the bones of those who tried to take the treasure before
+you.
+~
+M 0 12420 100.00 1
+T 12413
+T 12407
+S
+$

@@ -250,6 +250,11 @@ OCMD(do_oforce) {
 }
 
 
+OCMD(do_oheal) {
+	script_heal(obj, OBJ_TRIGGER, argument);
+}
+
+
 OCMD(do_obuildingecho) {
 	room_data *froom, *home_room, *iter;
 	room_data *orm = obj_room(obj);
@@ -261,7 +266,7 @@ OCMD(do_obuildingecho) {
 	if (!*room_number || !*msg) {
 		obj_log(obj, "obuildingecho called with too few args");
 	}
-	else if (!(froom = get_room(orm, arg))) {
+	else if (!(froom = get_room(orm, room_number))) {
 		obj_log(obj, "obuildingecho called with invalid target");
 	}
 	else {
@@ -301,7 +306,7 @@ OCMD(do_oregionecho) {
 		obj_log(obj, "oregionecho called with invalid target");
 	}
 	else {
-		center = get_map_location_for(center);
+		center = GET_MAP_LOC(center) ? real_room(GET_MAP_LOC(center)->vnum) : NULL;
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
@@ -481,7 +486,7 @@ OCMD(do_orestore) {
 			free_resource_list(GET_BUILDING_RESOURCES(room));
 			GET_BUILDING_RESOURCES(room) = NULL;
 			COMPLEX_DATA(room)->damage = 0;
-			COMPLEX_DATA(room)->burning = 0;
+			COMPLEX_DATA(room)->burn_down_time = 0;
 		}
 	}
 }
@@ -852,8 +857,8 @@ OCMD(do_oquest) {
 
 
 OCMD(do_osiege) {
-	void besiege_room(room_data *to_room, int damage);
-	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage);
+	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -901,11 +906,11 @@ OCMD(do_osiege) {
 	
 	if (room_targ) {
 		if (validate_siege_target_room(NULL, NULL, room_targ)) {
-			besiege_room(room_targ, dam);
+			besiege_room(NULL, room_targ, dam);
 		}
 	}
 	else if (veh_targ) {
-		besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL);
 	}
 	else {
 		obj_log(obj, "osiege: invalid target");
@@ -1111,6 +1116,7 @@ OCMD(do_oterraform) {
 
 
 OCMD(do_dgoload) {
+	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1180,6 +1186,11 @@ OCMD(do_dgoload) {
 		
 			// must scale now if possible
 			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			
+			// copy existing bindings
+			if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP) && OBJ_BOUND_TO(obj)) {
+				OBJ_BOUND_TO(object) = copy_obj_bindings(OBJ_BOUND_TO(obj));
+			}
 
 			load_otrigger(object);
 			return;
@@ -1209,6 +1220,11 @@ OCMD(do_dgoload) {
 		else {
 			// default
 			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		}
+		
+		// copy existing bindings
+		if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP) && OBJ_BOUND_TO(obj)) {
+			OBJ_BOUND_TO(object) = copy_obj_bindings(OBJ_BOUND_TO(obj));
 		}
 		
 		if (in_room) {	// load in the room
@@ -1269,7 +1285,7 @@ OCMD(do_dgoload) {
 
 
 OCMD(do_odamage) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
 	int type;
@@ -1285,6 +1301,13 @@ OCMD(do_odamage) {
 
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
+	}
+	
+	// send negatives to %heal% instead
+	if (modifier < 0) {
+		sprintf(buf, "%s health %.2f", name, -atof(modarg));
+		script_heal(obj, OBJ_TRIGGER, buf);
+		return;
 	}
 
 	ch = get_char_by_obj(obj, name);
@@ -1351,11 +1374,20 @@ OCMD(do_oaoe) {
 
 OCMD(do_odot) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
+	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
 	int type, max_stacks;
 
 	argument = one_argument(argument, name);
+	// sometimes name is an affect vnum
+	if (*name == '#') {
+		atype = atoi(name+1);
+		argument = one_argument(argument, name);
+		if (!find_generic(atype, GENERIC_AFFECT)) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
 	argument = one_argument(argument, typearg);	// optional, default: physical
@@ -1390,7 +1422,7 @@ OCMD(do_odot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 
@@ -1625,8 +1657,7 @@ OCMD(do_oscale) {
 			scale_item_to_level(otarg, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
-			scale_item_to_level(fresh, level);
+			fresh = fresh_copy_obj(otarg, level);
 			swap_obj_for_obj(otarg, fresh);
 			if (otarg == obj) {
 				dg_owner_purged = 1;
@@ -1658,6 +1689,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oechoaround", do_osend, SCMD_OECHOAROUND },
 	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
+	{ "oheal", do_oheal, NO_SCMD },
 	{ "oload", do_dgoload, NO_SCMD },
 	{ "omorph", do_omorph, NO_SCMD },
 	{ "oown", do_oown, NO_SCMD },

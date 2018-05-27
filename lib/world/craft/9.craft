@@ -81,7 +81,7 @@ R
 19 1 1 0
 S
 #908
-arrows~
+wooden arrows~
 908 1
 2 101 g 4 -1
 R
@@ -198,6 +198,75 @@ R
 R
 25 4 1 0
 S
+#923
+flint arrows~
+923 1
+2 298 g 6 -1
+R
+16 1 1 0
+R
+102 1 0 0
+S
+#924
+iron arrows~
+924 1
+2 298 g 8 -1
+R
+16 2 1 0
+R
+175 1 0 0
+S
+#925
+imperium bodkin arrows~
+925 1
+2 298 g 8 -1
+R
+16 6 1 0
+R
+177 1 0 0
+S
+#926
+nocturnium channeling arrows~
+926 1
+2 298 g 8 -1
+R
+16 6 1 0
+R
+176 1 0 0
+S
+#927
+flowing arrows~
+927 1
+2 298 g 8 -1
+R
+16 4 1 0
+R
+175 1 0 0
+R
+1300 1 0 0
+S
+#928
+thunderclap arrows~
+928 1
+2 298 g 8 -1
+R
+16 4 1 0
+R
+175 1 0 0
+R
+103 1 0 0
+S
+#929
+bloodletter arrows~
+929 1
+2 298 g 8 -1
+R
+16 4 1 0
+R
+175 1 0 0
+R
+104 1 0 0
+S
 #952
 caravel~
 952 1
@@ -254,7 +323,7 @@ S
 #955
 brigantine~
 955 1
-11 50 kno 1 -1
+11 61 knoq 1 -1
 R
 16 60 1 0
 R
@@ -273,7 +342,7 @@ S
 #956
 carrack~
 956 1
-11 50 kno 1 -1
+11 61 knoq 1 -1
 R
 16 50 1 0
 R
@@ -290,7 +359,7 @@ S
 #957
 hulk~
 957 1
-11 50 kno 1 -1
+11 61 knoq 1 -1
 R
 16 50 1 0
 R

@@ -414,7 +414,7 @@ LIBRARY_SCMD(library_browse) {
 		HASH_ITER(hh, book_table, book, next_book) {
 			for (libr = book->in_libraries; libr; libr = libr->next) {
 				if (libr->location == GET_ROOM_VNUM(IN_ROOM(ch))) {
-					sprintf(buf + strlen(buf), "%d. %s (%s)\r\n", ++count, book->title, book->byline);
+					sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, book->title, book->byline);
 				}
 			}
 		}
@@ -761,7 +761,7 @@ void read_book(char_data *ch, obj_data *obj) {
 	else if (!(book = book_proto(GET_BOOK_ID(obj)))) {
 		msg_to_char(ch, "The book is old and badly damaged; you can't read it.\r\n");
 	}
-	else if (!consume_otrigger(obj, ch, OCMD_READ)) {
+	else if (!consume_otrigger(obj, ch, OCMD_READ, NULL)) {
 		return;
 	}
 	else {

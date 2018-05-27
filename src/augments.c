@@ -43,6 +43,9 @@ extern const char *wear_bits[];
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 
+// locals
+const char *default_aug_name = "unnamed augment";
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -158,7 +161,7 @@ bool audit_augment(augment_data *aug, char_data *ch) {
 		olc_audit_msg(ch, GET_AUG_VNUM(aug), "Type not set");
 		problem = TRUE;
 	}
-	if (!GET_AUG_NAME(aug) || !*GET_AUG_NAME(aug) || !str_cmp(GET_AUG_NAME(aug), "unnamed augment")) {
+	if (!GET_AUG_NAME(aug) || !*GET_AUG_NAME(aug) || !str_cmp(GET_AUG_NAME(aug), default_aug_name)) {
 		olc_audit_msg(ch, GET_AUG_VNUM(aug), "No name set");
 		problem = TRUE;
 	}
@@ -555,7 +558,7 @@ augment_data *create_augment_table_entry(any_vnum vnum) {
 	CREATE(aug, augment_data, 1);
 	clear_augment(aug);
 	GET_AUG_VNUM(aug) = vnum;
-	GET_AUG_NAME(aug) = str_dup("unnamed augment");
+	GET_AUG_NAME(aug) = str_dup(default_aug_name);
 	add_augment_to_table(aug);
 
 	// save index and augment file now
@@ -621,7 +624,7 @@ void save_olc_augment(descriptor_data *desc) {
 		if (GET_AUG_NAME(aug)) {
 			free(GET_AUG_NAME(aug));
 		}
-		GET_AUG_NAME(aug) = str_dup("unnamed augment");
+		GET_AUG_NAME(aug) = str_dup(default_aug_name);
 	}
 
 	// save data back over the proto-type
@@ -667,7 +670,7 @@ augment_data *setup_olc_augment(augment_data *input) {
 	}
 	else {
 		// brand new: some defaults
-		GET_AUG_NAME(new) = str_dup("unnamed augment");
+		GET_AUG_NAME(new) = str_dup(default_aug_name);
 		GET_AUG_FLAGS(new) = AUG_IN_DEVELOPMENT;
 	}
 	
@@ -752,16 +755,16 @@ void olc_show_augment(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !augment_proto(GET_AUG_VNUM(aug)) ? "new augment" : GET_AUG_NAME(augment_proto(GET_AUG_VNUM(aug))));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GET_AUG_NAME(aug)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !augment_proto(GET_AUG_VNUM(aug)) ? "new augment" : GET_AUG_NAME(augment_proto(GET_AUG_VNUM(aug))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_AUG_NAME(aug), default_aug_name), NULLSAFE(GET_AUG_NAME(aug)));
 	
-	sprintf(buf + strlen(buf), "<\tytype\t0> %s\r\n", augment_types[GET_AUG_TYPE(aug)]);
+	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_TYPE(aug), 0), augment_types[GET_AUG_TYPE(aug)]);
 
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT), lbuf);
 	
 	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tywear\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%swear\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_WEAR_FLAGS(aug), NOBITS), lbuf);
 	
 	// ability required
 	if (GET_AUG_ABILITY(aug) == NO_ABIL || !(abil = find_ability_by_vnum(GET_AUG_ABILITY(aug)))) {
@@ -773,18 +776,18 @@ void olc_show_augment(char_data *ch) {
 			sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 	}
-	sprintf(buf + strlen(buf), "<\tyrequiresability\t0> %s\r\n", buf1);
+	sprintf(buf + strlen(buf), "<%srequiresability\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_ABILITY(aug), NO_ABIL), buf1);
 
-	sprintf(buf + strlen(buf), "<\tyrequiresobject\t0> %d - %s\r\n", GET_AUG_REQUIRES_OBJ(aug), GET_AUG_REQUIRES_OBJ(aug) == NOTHING ? "none" : get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
+	sprintf(buf + strlen(buf), "<%srequiresobject\t0> %d - %s\r\n", OLC_LABEL_VAL(GET_AUG_REQUIRES_OBJ(aug), NOTHING), GET_AUG_REQUIRES_OBJ(aug), GET_AUG_REQUIRES_OBJ(aug) == NOTHING ? "none" : get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
 	
 	// applies
-	sprintf(buf + strlen(buf), "Attribute applies: <\tyapply\t0>\r\n");
+	sprintf(buf + strlen(buf), "Attribute applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(GET_AUG_APPLIES(aug)));
 	for (app = GET_AUG_APPLIES(aug), num = 1; app; app = app->next, ++num) {
 		sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", num, app->weight, apply_types[app->location]);
 	}
 	
 	// resources
-	sprintf(buf + strlen(buf), "Resources required: <\tyresource\t0>\r\n");
+	sprintf(buf + strlen(buf), "Resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_AUG_RESOURCES(aug)));
 	if (GET_AUG_RESOURCES(aug)) {
 		get_resource_display(GET_AUG_RESOURCES(aug), lbuf);
 		strcat(buf, lbuf);

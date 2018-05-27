@@ -1,7 +1,7 @@
 #0
 Plains~
 The Open Plains~
-'.' 10 1 2 l b
+'.' 10 1 2 l bp
 C
 dig, pick~
 D1
@@ -21,11 +21,23 @@ E
 E
 2 604 0.04 602
 E
+2 55 0.80 27
+E
+2 54 0.80 1
+E
+2 45 0.80 1
+E
 2 28 0.80 27
 E
 2 29 0.80 27
 E
 2 4 0.80 1
+E
+2 53 5.00 56
+E
+2 57 10.00 50
+E
+2 5 10.00 40
 E
 3 29 0.80 29
 E
@@ -44,7 +56,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3013 100.00 1  # FORAGE: a handful of nuts
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 M
 237 5.00 ce
 M
@@ -161,11 +173,13 @@ M
 9039 5.00 g
 M
 9064 0.90 ad
+M
+9200 5.00 d
 S
 #1
 Light Forest~
 A Light Forest~
-'.' 14 1 2 dl n
+'.' 14 1 2 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -178,10 +192,16 @@ D3
 &g.&?^&g..~
 &y~
 D4
-.Y..~
+.&W^&?..~
 &0~
 E
 0 1 100.00 0
+E
+2 53 5.00 56
+E
+2 57 10.00 50
+E
+2 5 10.00 44
 E
 3 29 0.80 29
 E
@@ -192,7 +212,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -305,11 +325,15 @@ M
 9034 5.00 c
 M
 9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
 S
 #2
 Forest~
 A Forest~
-'^' 14 1 3 dl n
+'^' 14 1 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -322,10 +346,16 @@ D3
 ^&g.&?^&g.~
 &y~
 D4
-Y.Y.~
-&0~
+^&0.&?^&0.~
+&W~
 E
 0 1 100.00 1
+E
+2 53 5.00 56
+E
+2 57 10.00 50
+E
+2 5 10.00 45
 E
 3 29 0.80 29
 E
@@ -336,7 +366,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -421,11 +451,17 @@ M
 9034 5.00 c
 M
 9064 0.90 ad
+M
+9135 5.00 dh
+M
+9200 5.00 d
+M
+9202 5.00 dh
 S
 #3
 Shady Forest~
 A Shady Forest~
-'^' 14 1 4 dl n
+'^' 14 1 4 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -438,10 +474,16 @@ D3
 ^^&g.&?^~
 &y~
 D4
-YY.Y~
-&0~
+^^&0.&?^~
+&W~
 E
 0 1 100.00 2
+E
+2 53 5.00 56
+E
+2 57 10.00 50
+E
+2 5 10.00 45
 E
 3 29 0.20 29
 E
@@ -452,7 +494,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -525,11 +567,19 @@ M
 9034 5.00 c
 M
 9064 0.90 ad
+M
+9135 5.00 dh
+M
+9201 5.00 dh
+M
+9200 5.00 d
+M
+9202 5.00 dh
 S
 #4
 Overgrown Forest~
 An Overgrown Forest~
-'^' 14 1 5 dl dn
+'^' 14 1 5 dl dnp
 C
 chop, dig, gather, pick~
 D1
@@ -566,12 +616,18 @@ D3
 ^^&r^&R^~
 &y~
 D4
-YYYY~
-&0~
+^^^^~
+&W~
 E
 0 1 100.00 3
 E
 2 10565 0.01 10565
+E
+2 53 5.00 56
+E
+2 57 10.00 50
+E
+2 5 10.00 45
 E
 3 10565 0.04 10565
 E
@@ -580,7 +636,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 100.00 1  # CHOP: a large tree
 M
@@ -657,6 +713,14 @@ M
 9034 5.00 c
 M
 9064 0.90 ad
+M
+9135 5.00 dh
+M
+9201 5.00 dh
+M
+9200 5.00 d
+M
+9202 5.00 dh
 S
 #5
 River~
@@ -674,6 +738,8 @@ D3
 D4
 ~~~~~
 &c~
+E
+7 57 1.00 53
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
 I 21 256 0.25 1 f  # FISH: a hestian trinket
@@ -806,21 +872,21 @@ S
 #7
 Crop~
 A Crop~
-'.' 10 1 3 djk k
+'.' 10 1 3 djk kp
 C
 dig, harvest~
 D1
 ????~
-&y~
+&g~
 D2
 ????~
-&y~
+&g~
 D3
 ????~
-&y~
+&g~
 D4
 ????~
-&y~
+&0~
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
@@ -879,6 +945,10 @@ D3
 D4
 /\/\~
 &y~
+E
+2 32 10.00 58
+E
+2 57 10.00 52
 I 5 104 8.00 1 X  # DIG: a red bloodstone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -908,7 +978,7 @@ S
 #9
 Road~
 On a Road~
-'-' 26 0 1 mr o
+'-' 26 0 1 mr op
 D1
 ----~
 &0~
@@ -1019,18 +1089,18 @@ S
 #12
 Desert Crop~
 A Desert Crop~
-'.' 21 2 3 djk k
+'.' 21 2 3 djk kp
 C
 dig, harvest~
 D1
 ????~
-&y~
+&Y~
 D2
 ????~
 &y~
 D3
 ????~
-&y~
+&Y~
 D4
 ????~
 &y~
@@ -1125,7 +1195,7 @@ S
 #13
 Seeded Field~
 A Seeded Field~
-',' 10 1 3 j k
+',' 10 1 3 j kp
 C
 dig~
 D0
@@ -1138,7 +1208,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3003 100.00 1  # FORAGE: a handful of grain
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 M
 9037 5.00 dh
 M
@@ -1187,7 +1257,7 @@ S
 #14
 Sandy Field~
 A Sandy Field~
-',' 21 2 3 j k
+',' 21 2 3 j kp
 C
 dig~
 D0
@@ -1290,7 +1360,7 @@ S
 #15
 Jungle Field~
 A Jungle Field~
-',' 12 3 3 j k
+',' 12 3 3 j kp
 C
 gather~
 D0
@@ -1372,21 +1442,21 @@ S
 #16
 Jungle Crop~
 A Jungle Crop~
-'.' 12 3 3 djk k
+'.' 12 3 3 djk kp
 C
 harvest~
 D1
 ????~
-&y~
+&g~
 D2
 ????~
-&y~
+&g~
 D3
 ????~
-&y~
+&g~
 D4
 ????~
-&y~
+&g~
 M
 9061 0.01 d
 M
@@ -1457,7 +1527,7 @@ S
 #17
 Trench~
 A Trench~
-'_' 24 1 4 t 0
+'.' 24 1 4 t 0
 C
 dig, excavate, fillin, pour~
 D1
@@ -1473,7 +1543,7 @@ D4
 \__/~
 &0~
 E
-6 0 100.00 5
+6 0 100.00 19
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1497,10 +1567,18 @@ D4
 */\*~
 &y~
 S
+#19
+Canal~
+A Canal~
+'~' 17 0 8 gi af
+D0
+@w&?~~@e~
+&c~
+S
 #20
 Desert~
 An Arid Desert~
-'.' 21 2 2 l e
+'.' 21 2 2 l ep
 C
 dig~
 D1
@@ -1518,13 +1596,15 @@ D4
 E
 2 21 2.00 26
 E
+2 57 10.00 51
+E
 3 20 0.28 26
 E
 3 20 0.28 12
 E
 5 0 100.00 22
 E
-7 5 4.00 70
+7 19 4.00 70
 E
 8 0 100.00 14
 E
@@ -1622,7 +1702,7 @@ S
 #21
 Oasis~
 A Sparkling Oasis~
-'~' 18 2 6 iw jo
+'~' 18 2 6 iw jop
 C
 dig, drink, fill, gather, pick~
 D1
@@ -1638,9 +1718,15 @@ D4
 .&c~~&?.~
 &y~
 E
-2 6 4.00 5
+2 57 4.00 19
 E
-2 5 4.00 5
+2 53 4.00 19
+E
+2 6 4.00 19
+E
+2 5 4.00 19
+E
+2 19 4.00 19
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1736,7 +1822,7 @@ S
 #22
 Sandy Trench~
 A Sandy Trench~
-'_' 24 2 4 t 0
+'.' 24 2 4 t 0
 C
 dig, excavate, fillin, pour~
 D1
@@ -1760,7 +1846,7 @@ S
 #26
 Grove~
 A Shady Desert Grove~
-'^' 10 2 6 adl l
+'^' 10 2 6 adl lp
 C
 chop, dig, gather, pick~
 D0
@@ -1775,7 +1861,9 @@ D0
 E
 0 1 100.00 20
 E
-7 5 0.80 71
+2 57 10.00 51
+E
+7 19 0.80 71
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1880,6 +1968,10 @@ E
 E
 0 1 100.00 27
 E
+2 32 2.00 35
+E
+2 57 10.00 50
+E
 4 0 0.80 28
 E
 7 5 2.00 29
@@ -1887,6 +1979,8 @@ E
 8 0 100.00 15
 E
 9 0 50.00 28
+E
+15 0 1.00 34
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 I 20 128 100.00 1  # CHOP: a massive jungle tree
@@ -1982,7 +2076,13 @@ E
 E
 0 1 100.00 28
 E
+2 32 2.00 35
+E
+2 57 10.00 50
+E
 7 5 2.00 29
+E
+15 0 1.00 34
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 I 20 128 100.00 1  # CHOP: a massive jungle tree
@@ -2060,21 +2160,23 @@ Swamp~
 A Murky Swamp~
 '~' 13 3 10 aw m
 D0
-~~~&g^~
+~~~&G^~
 &c~
 D0
-~~&g^&?~~
+~~&G^&?~~
 &c~
 D0
-~&g^&?~~~
+~&G^&?~~~
 &c~
 D0
-&g^&?~~~~
+&G^&?~~~~
 &c~
 E
 9 0 25.00 27
 E
 11 5 4.00 27
+E
+15 0 5.00 34
 I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
@@ -2186,10 +2288,12 @@ S
 #32
 Lake~
 A Lake~
-'~' 17 0 10 gi a
+'~' 17 0 10 gi au
 D0
 ~~~~~
 &c~
+E
+15 0 25.00 33
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
 I 21 256 0.25 1 f  # FISH: a hestian trinket
@@ -2201,10 +2305,1783 @@ I 21 1312 100.00 1 f  # FISH: a speckled trout
 M
 9025 5.00 d
 S
+#33
+Frozen Lake~
+A Frozen Lake~
+'~' 2 0 10 0 a
+D0
+~~~~~
+&W~
+E
+12 0 20.00 32
+E
+13 0 100.00 32
+E
+14 0 100.00 32
+S
+#34
+Damaged Jungle~
+A Frost-Damaged Jungle~
+'^' 12 3 6 d 0
+C
+chop, gather~
+D0
+^.^.~
+&0~
+D0
+^.^.~
+&0~
+E
+0 1 100.00 0
+E
+4 0 1.20 2
+E
+9 0 50.00 27
+I 9 121 100.00 1  # GATHER: a stick
+I 20 128 100.00 1  # CHOP: a massive jungle tree
+S
+#35
+Marsh~
+A Marshy Lakeshore~
+'~' 13 3 10 aw m
+D0
+~~~&G^~
+&c~
+D0
+~~&G^&?~~
+&c~
+D0
+~&G^&?~~~
+&c~
+D0
+&G^&?~~~~
+&c~
+E
+9 0 25.00 27
+E
+10 32 4.00 27
+I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
+I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1316 25.00 1 f  # FISH: a small gator
+I 21 1314 100.00 1 f  # FISH: a fat catfish
+M
+9061 0.01 d
+M
+9162 0.50 d
+M
+9161 0.50 d
+M
+9160 0.50 ad
+M
+9017 5.00 dh
+M
+9156 15.00 dh
+M
+9151 10.00 dh
+M
+9109 15.00 dh
+M
+9106 15.00 dh
+M
+9105 15.00 bdh
+M
+9104 15.00 bdh
+M
+9006 5.00 dg
+M
+9155 15.00 dg
+M
+9107 15.00 dg
+M
+9109 15.00 dg
+M
+9114 10.00 bdg
+M
+9108 15.00 bdg
+M
+9115 10.00 adg
+M
+9159 15.00 d
+M
+9158 10.00 d
+M
+9157 10.00 d
+M
+264 10.00 ace
+M
+252 10.00 c
+M
+253 10.00 cf
+M
+9153 10.00 bc
+S
+#40
+Plains~
+On the Plains, Above the Riverbank~
+'.' 10 1 1 l bps
+C
+dig, pick~
+D1
+@w&t..@e~
+&t~
+D2
+@w&t..@e~
+&t~
+D3
+@w&t..@e~
+&t~
+D4
+@w&?..@e~
+&0~
+E
+2 604 0.04 602
+E
+2 54 0.80 44
+E
+2 45 0.80 44
+E
+2 28 0.80 27
+E
+2 29 0.80 27
+E
+2 4 1.00 44
+E
+3 29 0.80 29
+E
+3 28 2.00 27
+E
+3 4 3.00 44
+E
+5 0 100.00 17
+E
+8 0 100.00 13
+E
+9 0 50.00 44
+E
+10 5 10.00 0
+E
+12 0 25.00 41
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+M
+237 5.00 ce
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+240 6.00 bc
+M
+9153 10.00 bc
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+246 0.30 ad
+M
+247 0.10 d
+M
+248 1.00 bd
+M
+250 0.10 ad
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9200 5.00 d
+S
+#41
+Floodplains~
+A Flooded Plain~
+'~' 17 1 8 gi ps
+C
+fish, pick~
+D0
+@w&?~~@e~
+&c~
+E
+8 0 100.00 13
+E
+9 0 50.00 42
+E
+13 0 20.00 40
+E
+14 0 20.00 40
+E
+15 0 20.00 40
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+I 22 174 5.00 1  # PAN: a small flake of gold
+M
+9025 5.00 d
+S
+#42
+Flooded Woods~
+Some Flooded Woods~
+'~' 17 1 3 dgi ps
+C
+chop, fish, pick~
+D0
+@w&g^&?~@e~
+&c~
+D0
+@w&?~&g^@e~
+&c~
+E
+0 0 100.00 41
+E
+4 0 1.00 43
+E
+9 0 50.00 43
+E
+13 0 20.00 44
+E
+14 0 20.00 44
+E
+15 0 20.00 44
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+I 20 120 100.00 1  # CHOP: a large tree
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+I 22 174 5.00 1  # PAN: a small flake of gold
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+S
+#43
+Flooded Forest~
+A Flooded Forest~
+'~' 17 1 6 dgi ps
+C
+chop, fish, pick~
+D0
+@w&g^&?~@e~
+&c~
+D0
+@w&?~&g^@e~
+&c~
+E
+0 0 100.00 42
+E
+13 0 20.00 45
+E
+14 0 20.00 45
+E
+15 0 20.00 45
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+I 20 120 100.00 1  # CHOP: a large tree
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+I 22 174 5.00 1  # PAN: a small flake of gold
+M
+9202 5.00 dh
+S
+#44
+Light Forest~
+Some Trees on the Riverbank~
+'.' 14 1 2 dl nps
+C
+chop, dig, gather, pick~
+D1
+@w&g^&?.@e~
+&t~
+D1
+@w&?.&g^@e~
+&t~
+D2
+@w&g^&?.@e~
+&t~
+D2
+@w&?.&g^@e~
+&t~
+D3
+@w&y^&?.@e~
+&t~
+D3
+@w&?.&y^@e~
+&t~
+D4
+@w&W^&?.@e~
+&0~
+D4
+@w&?.&W^@e~
+&0~
+E
+0 0 100.00 40
+E
+3 29 0.80 29
+E
+4 0 1.00 45
+E
+9 0 50.00 45
+E
+10 5 10.00 1
+E
+12 0 25.00 42
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+S
+#45
+Forest~
+A Forest, Above the Riverbank~
+'^' 14 1 3 dl nps
+C
+chop, dig, gather, pick~
+D1
+@w&?^&t.@e~
+&g~
+D1
+@w&t.&?^@e~
+&g~
+D2
+@w&?^&t.@e~
+&g~
+D2
+@w&t.&?^@e~
+&g~
+D3
+@w&?^&t.@e~
+&y~
+D3
+@w&t.&?^@e~
+&y~
+D4
+@w&?^&0.@e~
+&W~
+D4
+@w&0.&?^@e~
+&W~
+E
+0 0 100.00 44
+E
+3 29 0.80 29
+E
+10 5 10.00 2
+E
+12 0 25.00 43
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+S
+#50
+Shore~
+Along the Shore~
+'.' 10 1 2 l bpr
+C
+dig, pick~
+D1
+....~
+&g~
+D2
+....~
+&g~
+D3
+....~
+&g~
+D4
+....~
+&0~
+E
+2 55 0.80 55
+E
+2 54 0.80 54
+E
+2 28 0.80 55
+E
+2 4 0.80 54
+E
+3 29 0.80 29
+E
+5 0 100.00 17
+E
+8 0 100.00 13
+E
+10 57 5.00 0
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+240 6.00 bc
+M
+9153 10.00 bc
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+246 0.30 ad
+M
+247 0.10 d
+M
+248 1.00 bd
+M
+250 0.10 ad
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9203 10.00 g
+M
+9204 10.00 0
+M
+9211 10.00 h
+M
+9210 0.03 0
+S
+#51
+Beach~
+A Sandy Beach~
+'.' 21 2 2 l epr
+C
+dig, pick~
+D1
+....~
+&Y~
+D2
+....~
+&y~
+D3
+....~
+&Y~
+D4
+....~
+&y~
+E
+5 0 100.00 22
+E
+7 19 4.00 70
+E
+8 0 100.00 14
+E
+10 57 5.00 20
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+9064 0.90 ad
+M
+9205 10.00 0
+M
+9206 10.00 0
+M
+9210 0.03 0
+S
+#52
+Cliffs~
+Along the Cliffs~
+'^' 25 0 50 nv c
+C
+dig, pick~
+D1
+/\/\~
+&y~
+D2
+/\/\~
+&y~
+D3
+/\/\~
+&y~
+D4
+/\/\~
+&y~
+E
+10 57 5.00 8
+I 5 104 8.00 1 X  # DIG: a red bloodstone
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 7 1202 100.00 1  # FIND-HERB: a twig of redthorn
+M
+9060 0.01 d
+M
+9057 0.03 d
+M
+9143 10.00 dh
+M
+9142 10.00 dh
+M
+9017 5.00 dg
+M
+9118 10.00 adg
+M
+9008 10.00 bd
+M
+9025 10.00 d
+M
+9005 10.00 bd
+M
+9018 10.00 d
+S
+#53
+Estuary~
+An Estuary~
+'~' 18 0 10 g afit
+D0
+~~~~~
+&a~
+E
+11 57 5.00 5
+I 21 3052 8.00 1 f  # FISH: a clam
+I 21 3051 8.00 1 f  # FISH: a sea urchin
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+I 22 174 5.00 1  # PAN: a small flake of gold
+M
+9025 5.00 d
+M
+9164 1.00 h
+M
+9163 1.00 g
+M
+9208 10.00 0
+M
+9209 10.00 0
+M
+9207 10.00 0
+S
+#54
+Light Forest~
+A Tree by the Shore~
+'.' 14 1 2 dl npr
+C
+chop, dig, gather, pick~
+D1
+.^..~
+&g~
+D1
+..^.~
+&g~
+D2
+.^..~
+&g~
+D2
+..^.~
+&g~
+D3
+.&y^&?..~
+&g~
+D3
+..&y^&?.~
+&g~
+D4
+.&W^&?..~
+&0~
+D4
+..&W^&?.~
+&0~
+E
+0 1 100.00 50
+E
+10 57 5.00 1
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+M
+9203 10.00 g
+M
+9204 10.00 0
+M
+9211 10.00 h
+M
+9210 0.03 0
+S
+#55
+Partial Jungle~
+The Edge of the Jungle, Overlooking the Sea~
+'^' 12 3 5 d g
+C
+chop, gather, pick~
+D0
+^.^.~
+&G~
+D0
+.^.^~
+&G~
+E
+0 1 100.00 50
+E
+7 5 2.00 29
+E
+8 0 100.00 15
+E
+10 57 5.00 27
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+I 9 121 100.00 1  # GATHER: a stick
+I 20 128 100.00 1  # CHOP: a massive jungle tree
+M
+9061 0.01 d
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9109 10.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9203 10.00 a
+M
+9204 10.00 0
+M
+9211 10.00 h
+M
+9210 0.03 0
+S
+#56
+Shore~
+The Shore of the Estuary~
+'.' 37 1 2 l bprs
+C
+dig, pick~
+D1
+@w&t..@e~
+&t~
+D2
+@w&t..@e~
+&t~
+D3
+@w&t..@e~
+&t~
+D4
+@w&?..@e~
+&0~
+E
+5 0 100.00 17
+E
+8 0 100.00 13
+E
+10 53 5.00 0
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+240 6.00 bc
+M
+9153 10.00 bc
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+246 0.30 ad
+M
+247 0.10 d
+M
+248 1.00 bd
+M
+250 0.10 ad
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9203 10.00 g
+M
+9204 10.00 0
+M
+9211 10.00 h
+M
+9210 0.03 0
+S
+#57
+Shallow Sea~
+The Shallow Sea, Near the Coast~
+'~' 18 0 10 h aiq
+D0
+~~~~~
+&a~
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1302 25.00 1 f  # FISH: a giant linefish
+I 21 1303 25.00 1 f  # FISH: a magenta arrowfish
+I 21 1301 100.00 1 f  # FISH: a striped barbfish
+M
+9171 1.00 d
+S
+#58
+Foothills~
+In the Foothills, By a Lake~
+'.' 10 1 4 l bp
+C
+dig, pick~
+D1
+....~
+&g~
+D2
+....~
+&g~
+D3
+....~
+&g~
+D4
+....~
+&0~
+E
+8 0 100.00 13
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a pile of clay
+I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+M
+237 5.00 ce
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+240 6.00 bc
+M
+9153 10.00 bc
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+246 0.30 ad
+M
+247 0.10 d
+M
+248 1.00 bd
+M
+250 0.10 ad
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9200 5.00 d
+S
 #70
 Irrigated Plains~
 An Irrigated Plain~
-'.' 10 1 2 l b
+'.' 10 1 2 l bp
 C
 dig, pick~
 D1
@@ -2236,13 +4113,13 @@ E
 E
 9 0 50.00 71
 E
-11 5 4.00 20
+11 19 4.00 20
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
-I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
 M
 9040 0.01 d
@@ -2332,7 +4209,7 @@ S
 #71
 Irrigated Forest~
 A Marshy Forest~
-'^' 14 1 3 dl n
+'^' 14 1 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -2354,21 +4231,21 @@ D3
 &g.&?^&g.&?^~
 &y~
 D4
-Y.Y.~
-&0~
+^&0.&?^&0.~
+&W~
 D4
-.Y.Y~
-&0~
+&0.&?^&0.&?^~
+&W~
 E
 0 1 100.00 70
 E
-11 5 4.00 26
+11 19 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
-I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
 I 9 121 100.00 1  # GATHER: a stick
 I 20 120 50.00 2 c  # CHOP: a large tree
@@ -2461,7 +4338,7 @@ S
 #72
 Irrigated Jungle~
 A Marshy Jungle~
-'^' 14 3 3 d n
+'^' 14 3 3 d g
 C
 chop, dig, gather, pick~
 D0
@@ -2471,19 +4348,19 @@ D0
 &g.&?^&g.&?^~
 &G~
 E
-0 2 50.00 70
-E
 0 1 100.00 70
 E
-11 5 4.00 26
+11 19 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
-I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
 I 9 121 100.00 1  # GATHER: a stick
+I 20 128 50.00 1 c  # CHOP: a massive jungle tree
+I 20 128 50.00 2 c  # CHOP: a massive jungle tree
 M
 9040 0.01 d
 M

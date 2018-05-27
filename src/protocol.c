@@ -52,7 +52,7 @@ static void Write(descriptor_t *apDescriptor, const char *apData) {
 }
 
 static void ReportBug(const char *apText) {
-	log(apText);
+	log("%s", apText);
 }
 
 static void InfoMessage(descriptor_t *apDescriptor, const char *apData) {
@@ -118,7 +118,7 @@ static const char s_Gauge5[] = "\005\002Opponent\002darkred\002OPPONENT_HEALTH\0
 #define NUMBER_IN_THE_RANGE(x,y)   false, true,  false, false,  x,  y,  0, NULL
 #define BOOLEAN_SET_TO(x)          false, true,  false, false,  0,  1,  x, NULL
 #define STRING_WITH_LENGTH_OF(x,y) true,  true,  false, false,  x,  y,  0, NULL
-#define STRING_WRITE_ONCE(x,y)     true,  true,  true,  false, -1, -1,  0, NULL
+#define STRING_WRITE_ONCE(x,y)     true,  true,  true,  false,  x,  y,  0, NULL
 #define STRING_GUI(x)              true,  false, false, true,  -1, -1,  0, x
 
 static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
@@ -129,6 +129,7 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_SNIPPET_VERSION, "SNIPPET_VERSION", NUMBER_READ_ONLY_SET_TO(SNIPPET_VERSION) },
 	
 	/* Character */
+	{ eMSDP_GENDER, "GENDER", STRING_READ_ONLY },
 	{ eMSDP_HEALTH, "HEALTH", NUMBER_READ_ONLY },
 	{ eMSDP_HEALTH_MAX, "HEALTH_MAX", NUMBER_READ_ONLY },
 	{ eMSDP_HEALTH_REGEN, "HEALTH_REGEN", NUMBER_READ_ONLY },
@@ -187,6 +188,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_EMPIRE_TERRITORY_MAX, "EMPIRE_TERRITORY_MAX", NUMBER_READ_ONLY },
 	{ eMSDP_EMPIRE_TERRITORY_OUTSIDE, "EMPIRE_TERRITORY_OUTSIDE", NUMBER_READ_ONLY },
 	{ eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, "EMPIRE_TERRITORY_OUTSIDE_MAX", NUMBER_READ_ONLY },
+	{ eMSDP_EMPIRE_TERRITORY_FRONTIER, "EMPIRE_TERRITORY_FRONTIER", NUMBER_READ_ONLY },
+	{ eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, "EMPIRE_TERRITORY_FRONTIER_MAX", NUMBER_READ_ONLY },
 	{ eMSDP_EMPIRE_WEALTH, "EMPIRE_WEALTH", NUMBER_READ_ONLY },
 	{ eMSDP_EMPIRE_SCORE, "EMPIRE_SCORE", NUMBER_READ_ONLY },
 	
@@ -2559,7 +2562,7 @@ static const char *GetMSSP_Areas() {
 
 static const char *GetMSSP_Classes() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", NUM_CLASSES);
+	strcpy(buf, "1");
 	return buf;
 }
 

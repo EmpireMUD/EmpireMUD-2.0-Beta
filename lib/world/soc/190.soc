@@ -1,0 +1,24 @@
+#19034
+dance~
+dance~
+b 8 8
+L
+18 19034 0 1
+M0
+You dance around like a hag.~
+M1
+$n dances around like a hag.~
+M2
+You lead $M to the dancefloor.~
+M3
+$n sends $N across the dancefloor.~
+M4
+$n sends you across the dancefloor.~
+M5
+Eh, WHOM?~
+M6
+You dance with yourself like a lonely old hag.~
+M7
+$n dances with $mself like a lonely old hag.~
+S
+$

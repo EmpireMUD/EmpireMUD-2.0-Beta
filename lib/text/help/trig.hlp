@@ -45,6 +45,29 @@ Mob and object triggers also provide:
 
 See also: MTRIG CHARMED
 #d
+"BUY TRIGGER" "MTRIG BUY" "OTRIG BUY" "RTRIG BUY" "VTRIG BUY" TRIGEDIT-MOB-BUY TRIGEDIT-OBJ-BUY TRIGEDIT-ROOM-BUY TRIGEDIT-VEH-BUY
+
+Buy (trigger type)
+
+Argument type:  location of the item to trigger (obj triggers only)
+Return value:  return 1 (default) to proceed with the purchase
+               return 0 to block the purchase
+
+Buy triggers let you intercept a player attempting to buy from a shop. All
+buy triggers in the room will run, regardless of whether the shop is attached
+to a mob, obj, or room.
+
+Variables:
+  &c%actor%&0 - The person who is trying to buy.
+  &c%shopkeeper%&0 - The mob who runs the shop, if any (may be empty).
+  &c%obj%&0 - The object the player is buying.
+  &c%cost%&0 - The numeric value of the purchase.
+  &c%currency%&0 - The currency vnum of the purchase, or "coins" if it's coins.
+
+Note: The %obj% is already in the player's inventory when the script runs. You
+   can change its properties in your script but you should NEVER purge it in
+   the script. Returning 0 will block the purchase and purge the object. 
+#d
 "COMMAND TRIGGER" "MTRIG COMMAND" "OTRIG COMMAND" "RTRIG COMMAND" "VTRIG COMMAND" TRIGEDIT-MOB-COMMAND TRIGEDIT-OBJ-COMMAND TRIGEDIT-ROOM-COMMAND TRIGEDIT-VEH-COMMAND
 
 Command (trigger type)
@@ -62,7 +85,8 @@ command that triggered it, return 0 and the player will see the normal result
 of their command.
 
 Note: High level Immortals can only use command triggers when the "hassle"
-   toggle is on.
+   toggle is on. You can always "toggle hassle" as an immortal, even if a
+   command trigger tries to prevent it.
 Note: Command triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 Note: If you trigger on a real game command, you should use the entire word
@@ -108,13 +132,14 @@ Return value:  return 0 to prevent the drop
 
 As an object trigger, this is activated any time a character attempts to drop
 the object. As a room trigger, it happens when an object is dropped in the
-room.
+room. This trigger also fires on put, junk, and sacrifice.
 
 The object trigger includes putting the object into a container or vehicle.
 
 Variables:
   &c%actor%&0 - The character attempting to drop the object.
-  &c%object%&0 - The object the character is attempting to drop (room trigger).
+  &c%object%&0 - The object the character is attempting to drop (room trigger).\
+  &c%command%&0 - drop, junk, put, sacrifice.
   &c%self%&0 - The item being dropped (object trigger).
 #d
 "EMPIRE VARS" "EMPIRE VARIABLES" EMP-VARS EMPIRE-VARS TRIGEDIT-EMP-VAR TRIGEDIT-VARIABLES-EMPIRES
@@ -123,15 +148,18 @@ Empire variables are accessed via %char.empire% (or obj, room, vehicle). If
 the thing belongs to no empire, this will be empty.
 
 When using field - The variable returns:
+&cadd_progress(vnum)&0 - Grants a progression goal (preferably set SCRIPT-ONLY).
 &cadj&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
 &ccoins&0 - How many coins the empire has in its vaults.
 &cdescription&0 - The empire's full description.
 &cfame&0 - The empire's total fame value.
 &cgreatness&0 - The empire's total greatness value.
+&chas_progress(vnum)&0 - Checks if the empire has earned/purchased a goal.
 &chas_tech(name)&0 - True if the empire has that technology (globally).
    This will not work for island-based techs.
 &cid&0 - The scripting ID for the empire.
+&cis_on_progress(vnum)&0 - True if the empire is currently working on this goal.
 &cleader_id&0 - The player id of the empire's leader.
 &cmax_territory&0 - The amount of land the empire can claim, total.
 &cmembers&0 - Number of players in the empire.
@@ -139,8 +167,15 @@ When using field - The variable returns:
 &cname&0 - Empire's full name.
 &cpopulation&0 - Total NPC population.
 &cpriv(name)&0 - Returns the rank required for a given privilege.
+&cqualifies_for_progress(vnum)&0 - True if the empire meets the prerequisites.
 &crank(num)&0 - Returns the name of a given rank.
 &cranks&0 - The number of ranks in the empire.
+&cremove_progress(vnum)&0 - Takes away a progression goal. Warning: If the empire
+   still qualifies for the goal, they may instantly re-earn it. This works best
+   if you only remove SCRIPT-ONLY goals.
+&cstart_progress(vnum)&0 - Begins a SCRIPT-ONLY progression goal, which will
+   also immediately auto-complete if tasks are already complete. Otherwise, it
+   will behave like a normal goal.
 &cterritory&0 - The amount of land claimed.
 &cvnum&0 - The empire's vnum.
 &cwealth&0 - The empire's total wealth (coins + treasure).
@@ -203,7 +238,8 @@ Finish Quest triggers in the room. It will also run Finish Quest triggers
 attached to the quest itself.
 
 The quest's triggers always run LAST, allowing them to be sure that no other
-trigger already prevented the quest turn-in.
+trigger already prevented the quest turn-in. Do not use the 'wait' command in
+triggers attached to quests -- see HELP WAIT.
 
 Variables:
   &c%actor%&0 - The character finishing the quest.
@@ -418,11 +454,21 @@ Special Variables When using field - The variable returns:
  
 &cself&0 - The mob, item, or room running the script. Normal fields may be 
                 used with this.
+&ccooldown.<vnum>&0 - Get the name of a cooldown, by vnum.
+&ccurrency.<vnum>(amt)&0 - Gets the currency name. The amt is used to determine
+   whether to use the singular or plural name.
 &cinstance.id&0 - Unique id of the adventure instance, if any.
+&cinstance.level&0 - Get the locked level of the instance (if it has one of the
+   LOCK-LEVEL-* flags).
+&cinstance.level(lvl)&0 - Lock the instance at a given level, if it isn't
+   already locked.
+&cinstance.loaded&0 - Checks if the instance has been fully loaded or not.
+&cinstance.load&0 - Forces loading an instance with the CAN-DELAY-LOAD. However,
+   this happens automatically when a player arrives.
 &cinstance.location&0 - The map/linked location of the instance, if any.
 &cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.
 &cinstance.name&0 - Name of the adventure instance, if any.
-&cinstance.nearest(rmt vnum)&0 - Finds a given room in the nearest instance
+&cinstance.nearest_rmt(vnum)&0 - Finds a given room in the nearest instance
    that has one (only works if you aren't in a !LOCATION spot).
 &cinstance.start&0 - The entry room of the instance, if any.
 &cpeople.<vnum>&0 - This variable returns the number of people in the room 
@@ -482,14 +528,15 @@ triggers in the room. It will also run Start Quest triggers attached to the
 quest itself.
 
 The quest's triggers always run LAST, allowing them to be sure that no other
-trigger already prevented the quest start.
+trigger already prevented the quest start. Do not use the 'wait' command in
+triggers attached to quests -- see HELP WAIT.
 
 Variables:
   &c%actor%&0 - The character trying to get the quest.
   &c%questvnum%&0 - The vnum of the quest to start.
   &c%questname%&0 - The name of the quest to start.
 
-See also: FINISH QUEST TRIGGER
+See also: FINISH QUEST TRIGGER, WAIT
 #d
 "TEXT VARIABLES" "TEXT VARS" TRIGEDIT-VARIABLES-TEXTS TEXT-VAR TRIGEDIT-TEXT-VAR
 

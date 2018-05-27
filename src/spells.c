@@ -119,14 +119,7 @@ const struct damage_spell_type damage_spell[] = {
 		NO_DOT_AFFECT,
 		COOLDOWN_ABLATE, 9
 	},
-	
-	// SCOUR
-	{ ABIL_SCOUR, 1.1, ATTACK_SCOUR, 0.4, AFF_IMMUNE_HIGH_SORCERY,
-		NO_SPELL_AFFECT,
-		ATYPE_SCOUR, 2, DAM_MAGICAL, 1.5, 5,
-		COOLDOWN_SCOUR, 6
-	},
-	
+		
 	// ARCLIGHT
 	{ ABIL_ARCLIGHT, 1, ATTACK_ARCLIGHT, 1.4, NOBITS,
 		NO_SPELL_AFFECT,
@@ -168,14 +161,7 @@ const struct damage_spell_type damage_spell[] = {
 		ATYPE_ASTRALCLAW, 3, DAM_PHYSICAL, 1.0, 3,
 		COOLDOWN_ASTRALCLAW, 9
 	},
-	
-	// ERODE
-	{ ABIL_ERODE, 1, ATTACK_ERODE, 0.9, AFF_IMMUNE_NATURAL_MAGIC,
-		NO_SPELL_AFFECT,
-		ATYPE_ERODE, 3, DAM_MAGICAL, 0.75, 3,
-		COOLDOWN_ERODE, 9
-	},
-	
+		
 	// DISPIRIT
 	{ ABIL_DISPIRIT, 1.1, ATTACK_DISPIRIT, 0.9, AFF_IMMUNE_NATURAL_MAGIC,
 		ATYPE_DISPIRIT, 2, APPLY_WITS, -4, NOBITS,
@@ -290,6 +276,11 @@ ACMD(do_damage_spell) {
 		return;
 	}
 	
+	if (NOT_MELEE_RANGE(ch, vict)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+		return;
+	}
+	
 	if (ABILITY_TRIGGERS(ch, vict, NULL, damage_spell[type].ability)) {
 		return;
 	}
@@ -311,6 +302,7 @@ ACMD(do_damage_spell) {
 	
 	// check counterspell and then damage
 	if (!trigger_counterspell(vict)) {
+		//msg_to_char(ch, "Damage: %d\r\n", dmg);
 		result = damage(ch, vict, dmg, damage_spell[type].attack_type, DAM_MAGICAL);
 		
 		// damage returns -1 on death
@@ -447,6 +439,9 @@ ACMD(do_ready) {
 	}
 	else {
 		scale_level = MIN(ch_level, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+	}
+	if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {	// ensure they'll be able to use the final item
+		scale_level = MIN(scale_level, GET_SKILL_LEVEL(ch));
 	}
 	scale_item_to_level(obj, scale_level);
 	

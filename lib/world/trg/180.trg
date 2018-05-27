@@ -13,15 +13,15 @@ Fiend Battle~
 0 k 25
 ~
 eval test 100*%self.health%/%self.maxhealth%
-eval phase 1
+set phase 1
 if %test%<67
-  eval phase 2
+  set phase 2
 end
 if %test%<34
-  eval phase 3
+  set phase 3
 end
 if !%lastphase%
-  eval lastphase phase
+  set lastphase phase
   remote lastphase %self.id%
 end
 if %lastphase%!=%phase%
@@ -35,7 +35,7 @@ if %lastphase%!=%phase%
       %echo% %self.name%'s second chain shatters, freeing it!
     end
   end
-  eval lastphase %phase%
+  set lastphase %phase%
   remote lastphase %self.id%
   halt
 end
@@ -67,7 +67,7 @@ end
 if %phase%==2
   switch %random.3%
     case 1
-      eval room %self.room%
+      set room %self.room%
       %echo% %self.name% whistles with a sound like escaping steam...
       %echo% A pair of fire elementals appear!
       %load% mob 18077 ally %self.level%
@@ -130,7 +130,7 @@ if %phase%==3
         %echoaround% %actor% The earth shakes as %self.name% punches %actor.name%, stunning %actor.himher%!
         %damage% %actor% 100 physical
         %damage% %actor% 50 fire
-        dg_affect %actor% STUNNED on 10
+        dg_affect %actor% HARD-STUNNED on 10
       else
         %send% %actor% You leap out of the way of %self.name%'s fist at the last second!
         %echoaround% %actor% %actor.name% leaps out of the way of %self.name%'s fist at the last second!
@@ -139,7 +139,7 @@ if %phase%==3
       end
     break
     case 2
-      eval target %random.enemy%
+      set target %random.enemy%
       * Unable to find a target = return self
       if !%target% || target == %self%
         halt
@@ -152,10 +152,10 @@ if %phase%==3
           %send% %target% A tornado of harmless smoke briefly surrounds you!
           %echoaround %target% A tornado of harmless smoke briefly surrounds %target%!
         else
-          %send% %target% &rYour body bursts into unquenchable flames!&0
-          %echoaround% %target% %target.name%'s body bursts into unquenchable flames!
+          %send% %target% &rYour body bursts into infernal flames!&0
+          %echoaround% %target% %target.name%'s body bursts into infernal flames!
           %damage% %target% 25 fire
-          %dot% %target% 100 300 fire
+          %dot% %target% 300 30 fire
         end
       end
     break
@@ -169,13 +169,13 @@ if %phase%==3
       %echo% &RThe platform starts shaking beneath your feet!&0
       wait 5 sec
       %echo% &rWaves of fire flood the room!&0
-      %aoe% 150 fire
+      %aoe% 100 fire
       wait 5 sec
       %echo% &rA barrage of sharp rocks falls from the ceiling!&0
-      %aoe% 150 physical
+      %aoe% 100 physical
       wait 5 sec
       %echo% &rThe floating motes of mana in the air transform into ethereal blades!&0
-      %aoe% 100 magical
+      %aoe% 50 magical
       %aoe% 50 physical
       wait 5 sec
       %echo% %self.name% sinks back into the lava...
@@ -264,13 +264,12 @@ return 0
 Molten essence identify~
 1 c 6
 identify~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+if !%self.is_name(%arg%)%
   halt
 end
 return 0
 wait 1
-eval level 250
+set level 250
 %send% %actor% This essence is from an item of level: %level%.
 ~
 #18084
@@ -282,7 +281,7 @@ if !%actor.has_resources(18097,1)%
   return 0
   halt
 end
-%send% %actor% &0All items cost 10 essence each and will be the same level as the lowest level
+%send% %actor% &0All items cost 10 essence each and will be the average level of the
 %send% %actor% &0essence spent to make them. All items are created exactly the same as if the
 %send% %actor% &0fiend dropped that item, but bound to you alone.
 %send% %actor% You can create (with 'buy <item>') any of the following items:
@@ -329,8 +328,8 @@ if !%actor.has_resources(18097,10)%
   halt
 end
 * What are we buying?
-eval check %arg%
-eval vnum 0
+set check %arg%
+set vnum 0
 set name nothing
 if firecloth /= %check%
   %send% %actor% Did you mean firecloth skirt or firecloth pauldrons?
@@ -346,64 +345,64 @@ elseif fiend /= %check%
   halt
 elseif firecloth skirt /= %check%
   set name a firecloth skirt
-  eval vnum 18075
+  set vnum 18075
 elseif firecloth pauldrons /= %check%
   set name firecloth pauldrons
-  eval vnum 18076
+  set vnum 18076
 elseif hearthflame skirt /= %check%
   set name a hearthflame skirt
-  eval vnum 18077
+  set vnum 18077
 elseif hearthflame sleeves /= %check%
   set name hearthflame sleeves
-  eval vnum 18078
+  set vnum 18078
 elseif magma-forged pauldrons /= %check%
   set name magma-forged pauldrons
-  eval vnum 18079
+  set vnum 18079
 elseif core-forged plate armor /= %check%
   set name core-forged plate armor
-  eval vnum 18080
+  set vnum 18080
 elseif huge spiked pauldrons /= %check%
   set name huge spiked pauldrons
-  eval vnum 18081
+  set vnum 18081
 elseif fiendskin jerkin /= %check%
   set name a fiendskin jerkin
-  eval vnum 18082
+  set vnum 18082
 elseif bottomless pouch /= %check%
   set name a bottomless pouch
-  eval vnum 18083
+  set vnum 18083
 elseif igneous shield /= %check%
   set name an igneous shield
-  eval vnum 18084
+  set vnum 18084
 elseif cold lava ring /= %check%
   set name a cold lava ring
-  eval vnum 18085
+  set vnum 18085
 elseif mantle of flames /= %check%
   set name a mantle of flames
-  eval vnum 18086
+  set vnum 18086
 elseif frozen flame earrings /= %check%
   set name frozen flame earrings
-  eval vnum 18087
+  set vnum 18087
 elseif emberweave gloves /= %check%
   set name emberweave gloves
-  eval vnum 18088
+  set vnum 18088
 elseif molten gauntlets /= %check%
   set name molten gauntlets
-  eval vnum 18089
+  set vnum 18089
 elseif molten fiend earrings /= %check%
   set name the molten fiend's earrings
-  eval vnum 18090
+  set vnum 18090
 elseif Flametalon /= %check%
   set name Flametalon
-  eval vnum 18091
+  set vnum 18091
 elseif obsidian earring /= %check%
   set name an obsidian earring
-  eval vnum 18092
+  set vnum 18092
 elseif crown of abyssal flames /= %check%
   set name a crown of abyssal flames
-  eval vnum 18093
+  set vnum 18093
 elseif fiendhorn bladed bow /= %check%
   set name a fiendhorn bladed bow
-  eval vnum 18094
+  set vnum 18094
 end
 if !%vnum%
   %send% %actor% You can't create that from essence.
@@ -413,34 +412,44 @@ end
 %send% %actor% You bring the ten motes of demonic essence together with a fiery explosion!
 %echoaround% %actor% %actor.name% brings ten motes of fiery light together, causing an explosion!
 * Charge essence cost and check level to scale to
-eval lowest_level 250
-eval essence_count 0
+set total_level 0
+set essence_count 0
 while %essence_count%<10
-  eval next_essence %actor.inventory(18097)%
+  set next_essence %actor.inventory(18097)%
   if !%next_essence%
+    * We accidentally ran out of essence in the middle of taking them away... oops
     %send% %actor% Something has gone horribly wrong while creating your item! Please submit a bug report containing this message.
+    eval total_level %total_level% + 250
+  else
+    eval total_level %total_level% + %next_essence.level%
+    %purge% %next_essence%
   end
-  if %next_essence.level%<%lowest_level%
-    eval lowest_level %next_essence.level%
-  end
-  %purge% %next_essence%
   eval essence_count %essence_count% + 1
 done
 * If unscaled essence was used, the level may be 0
-if %lowest_level% < 1
-  eval lowest_level 1
+eval avg_level %total_level% / 10
+if %avg_level% < 1
+  set avg_level 1
 end
 * Create the item
 %send% %actor% You create %name%!
 %echoaround% %actor% %actor.name% creates %name%!
 %load% obj %vnum% %actor% inv
-eval made %%actor.inventory(%vnum%)%%
+set made %actor.inventory(%vnum%)%
 if %made%
   nop %made.flag(HARD-DROP)%
   nop %made.flag(GROUP-DROP)%
-  %scale% %made% %lowest_level%
+  %scale% %made% %avg_level%
 else
   %send% %actor% Error setting flags and scaling.
+end
+~
+#18086
+Fiend Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(18075)%
 end
 ~
 $

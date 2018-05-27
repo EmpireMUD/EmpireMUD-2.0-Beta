@@ -12,7 +12,7 @@ Instructions for EmpireMUD administrators:
     temperate newbie islands on your mud.
 ~
 10800 10824 0-50
-1 0 h 0
+1 0 ahl 0
 L
 1 0
 10800 -1 -1
@@ -40,7 +40,7 @@ Instructions for EmpireMUD Administrators:
     newbie islands with mountains on them.
 ~
 10825 10849 0-50
-1 0 h 0
+1 0 hl 0
 L
 6 0
 100 -1 -1
@@ -69,7 +69,7 @@ Instructions for EmpireMUD administrators:
 locations) in your game.
 ~
 10850 10899 0-50
-1 0 0 0
+1 0 l 0
 L
 5 0
 43200 -1 -1

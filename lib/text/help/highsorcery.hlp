@@ -1,4 +1,4 @@
-"HIGH SORCERY"
+"HIGH SORCERY" SOR
 
 High Sorcery (skill)
 
@@ -8,17 +8,16 @@ harnessing the powerful mana that flows through the world.
 To begin the path of High Sorcery, seek out one of its lofty towers and use
 the STUDY command on the top floor.
 
-See also: STUDY, SORCERY TOWER, RITUAL, STAFFMAKING, FORESIGHT, MANASHIELD,
-    SUMMON SWIFT, DISENCHANT, COLORBURST, RITUAL OF BURDENS, PHOENIX RITE,
-    VIGOR, RITUAL OF TELEPORTATION, CITY TELEPORTATION, RITUAL OF DEFENSE,
-    PORTAL MAGIC, PORTAL MASTER, RITUAL OF SENSE LIFE, RITUAL OF DETECTION,
-    DEVASTATION RITUAL, ENCHANT, ENERVATE, SIPHON, SLOW, SUNSHOCK, MIRRORIMAGE,
-    ARCANE POWER, DISPEL, COLLAPSE
+You get additional High Sorcery abilities when you reach level 100, depending
+on which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
+See also: ROLE, SKILL, SKILL SYNERGY, STUDY
 #
 ABLATE ABLATION
 
 Ablate
-Class ability:  Battlemage
+High Sorcery Synergy Ability: 100 Battle
 
 Usage:  ablate [victim]
 Cooldown:  9 seconds
@@ -27,8 +26,6 @@ Debuff type:  High Sorcery
 
 Ablate deals damage to your victim and will cause bits of his armor to burn
 off, leaving him less resistant to physical damage.
-
-See also: BATTLEMAGE CLASS
 #
 "ARCANE POWER"
 
@@ -43,7 +40,7 @@ Gains experience passively over time.
 ARCLIGHT "ARC LIGHT"
 
 Arclight
-Class ability:  Archmage
+Natural Magic Synergy Ability: 100 High Sorcery
 
 Usage:  arclight [victim]
 Cooldown:  9 seconds
@@ -51,13 +48,11 @@ Cost:  based on damage
 
 Arclight is the Archmage's best magical attack. It deals direct damage to the
 target.
-
-See also: ARCHMAGE CLASS
 #
 CHRONOBLAST
 
 Chronoblast
-Class ability:  Artificer
+High Sorcery Synergy Ability: 100 Trade
 
 Usage:  chronoblast [victim]
 Cooldown:  6 seconds
@@ -66,8 +61,6 @@ Debuff type:  High Sorcery
 
 Chronoblast uses the artificer's knowledge of clocks to slow down the enemy,
 and the transition into a slower time frame deals serious magical damage.
-
-See also: ARTIFICER CLASS
 #
 "CITY TELEPORTATION"
 
@@ -184,10 +177,11 @@ Enchant Weapons:
   fury (offhand) - bonus magical, mana regen (5 lightning stone)
   venom (offhand) - bonus physical, move regen (5 bloodstone)
 
-Enchant Armor:
+Enchant Armor (armor, about, arms, waist, legs):
   health - health  (5 bloodstones)
   mana - mana  (5 blue irises)
   stamina - move  (5 lightning stones)
+  bloodwell - blood  (5 bloodstones)
   regeneration - health regen  (5 blue irises)
   longrunning - move regen  (5 lightning stones)
   energy - mana regen  (5 blue irises)
@@ -198,7 +192,7 @@ Enchant Armor:
   spellwarding - resist-magical (5 blue irises)
   focus - to-hit (5 bloodstones)
   acrobatics - dexterity (5 lightning stones)
-  blocking (shield) - block  (5 lightning stones)
+  blocking (shield slot) - block  (5 lightning stones)
 
 Enchant Tools:
   embiggening (pack) - capacity  (1 of each of the 4 gems)
@@ -233,9 +227,9 @@ Foresight (High Sorcery ability)
 Usage:  foresight [person]
 Cost:  30 mana
 
-When granted the gift of foresight, a person gains +5, +10, or +15 Dodge
-(based on skill, modified by Intelligence) as she begins to see the arc of an
-opponent's weapon before it strikes.
+When granted the gift of foresight, a person gains extra Dodge (based on skill,
+modified by Intelligence) as she begins to see the arc of an opponent's weapon
+before it strikes.
 
 If your target is in combat, you will join the combat upon using this ability.
 
@@ -332,8 +326,8 @@ Portal Master (High Sorcery ability)
 Command:  collapse <portal>
 Cost:  15 mana
 
-Becoming a Portal Master removes the range limit on your empire's portals.
-It also allows you to collapse portals yourself.
+Becoming a Portal Master removes the same-island-only limit on your empire's
+portals. It also allows you to collapse portals yourself.
 
 You can gain Portal Master skill whenever someone in your empire opens a
 portal, and whenever you collapse a portal.
@@ -424,25 +418,10 @@ Teleportation).
 
 See also: CITY TELEPORTATION, RITUAL
 #
-SCOUR
-
-Scour
-Class ability:  Exarch
-
-Usage:  scour [victim]
-Cooldown:  6 seconds
-Cost:  based on damage
-Debuff type:  High Sorcery
-
-Scour will scrub away at your opponent, damaging them magically over time (in
-addition to damage with the initial hit). This DoT stacks up to 5 times.
-
-See also: DOT, EXARCH CLASS
-#
 SHADOWLASH "SHADOW LASH"
 
 Shadowlash
-Class ability:  Occultist
+High Sorcery Synergy Ability: 100 Stealth
 
 Usage:  shadowlash [victim]
 Cooldown:  9 seconds
@@ -453,7 +432,7 @@ Shadowlash calls forth a tentacle of pure shadow, which wraps itself around
 your victim's head for both instantaneous and lasting damage. It also blinds
 your victim briefly. The DoT effect stacks up to 3 times.
 
-See also: DOT, OCCULTIST CLASS
+See also: DOT
 #
 "SIEGE RITUAL"
 
@@ -503,7 +482,7 @@ Debuff type:  High Sorcery
 
 This ability hexes your victim with lethargy, causing them to attack more
 slowly in combat. If you're already fighting and do not specify a victim, it
-will target the person you are fighting. As a class ability, this spell's
+will target the person you are fighting. At High Sorcery 100, this spell's
 duration increases.
 
 Gain experience by casting this spell.
@@ -511,7 +490,7 @@ Gain experience by casting this spell.
 SOULCHAIN "SOUL CHAIN"
 
 Soulchain
-Class ability:  Lich
+High Sorcery Synergy Ability: 100 Vampire
 
 Usage:  soulchain [victim]
 Cooldown:  9 seconds
@@ -520,8 +499,6 @@ Debuff type:  High Sorcery
 
 Soulchain wraps the victim in a painful spiritual binding, sapping his
 intelligence as well as dealing magical damage.
-
-See also: LICH CLASS
 #
 STAFFMAKING "STAFF MAKING" STAFF STAVES "POWERFUL STAVES"
 
@@ -632,7 +609,7 @@ See also: BLIND
 THORNLASH "THORN LASH"
 
 Thornlash
-Class ability:  Theurge
+High Sorcery Synergy Ability: 100 Survival
 
 Usage:  thornlash [victim]
 Cooldown:  9 seconds
@@ -643,7 +620,7 @@ Thornlash wraps a coil of thorny vines around your victim. The vines cause
 immediate pain, while the thorns dig in and deal poison damage over time. This
 DoT effect stacks up to 3 times.
 
-See also: DOT, THEURGE CLASS
+See also: DOT
 #
 VIGOR
 

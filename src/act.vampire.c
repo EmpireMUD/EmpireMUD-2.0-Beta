@@ -51,8 +51,6 @@ ACMD(do_bite);
 * @param char_data *ch The vampire paying upkeeps.
 */
 void cancel_blood_upkeeps(char_data *ch) {
-	extern const char *affect_types[];
-	
 	char buf[MAX_STRING_LENGTH];
 	struct affected_type *aff;
 	struct obj_apply *app;
@@ -76,8 +74,8 @@ void cancel_blood_upkeeps(char_data *ch) {
 					break;
 				}
 				
-				msg_to_char(ch, "Your %s effect fades.\r\n", affect_types[aff->type]);
-				snprintf(buf, sizeof(buf), "$n's %s effect fades.", affect_types[aff->type]);
+				msg_to_char(ch, "Your %s effect fades.\r\n", get_generic_name_by_vnum(aff->type));
+				snprintf(buf, sizeof(buf), "$n's %s effect fades.", get_generic_name_by_vnum(aff->type));
 				act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 				
 				affect_from_char(ch, aff->type, FALSE);
@@ -164,18 +162,6 @@ bool check_vampire_sun(char_data *ch, bool message) {
 }
 
 
-// for do_alacrity
-void end_alacrity(char_data *ch) {
-	if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-		affect_from_char(ch, ATYPE_ALACRITY, FALSE);
-		msg_to_char(ch, "Your supernatural alacrity fades.\r\n");
-		if (!AFF_FLAGGED(ch, AFF_HASTE)) {
-			act("$n seems to slow down.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-	}
-}
-
-
 /**
 * Ends all boost affects on a character.
 *
@@ -185,18 +171,6 @@ void end_boost(char_data *ch) {
 	if (affected_by_spell(ch, ATYPE_BOOST)) {
 		msg_to_char(ch, "Your boost fades.\r\n");
 		affect_from_char(ch, ATYPE_BOOST, FALSE);
-	}
-}
-
-
-// for do_majesty: shuts off majesty
-void end_majesty(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_MAJESTY)) {
-		affects_from_char_by_aff_flag(ch, AFF_MAJESTY, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_MAJESTY)) {
-			msg_to_char(ch, "You reduce your supernatural majesty.\r\n");
-			act("$n seems less majestic now.", TRUE, ch, 0, 0, TO_ROOM);
-		}
 	}
 }
 
@@ -224,6 +198,10 @@ int GET_MAX_BLOOD(char_data *ch) {
 			if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 				base *= 2;
 			}
+			
+			if (HAS_BONUS_TRAIT(ch, BONUS_BLOOD)) {
+				base += config_get_int("pool_bonus_amount") * (1 + (get_approximate_level(ch) / 25));
+			}
 		}
 	}
 
@@ -244,7 +222,7 @@ void make_vampire(char_data *ch, bool lore) {
 	
 	if (!IS_NPC(ch)) {
 		/* set BEFORE set as a vampire! */
-		GET_APPARENT_AGE(ch) = GET_AGE(ch);
+		GET_APPARENT_AGE(ch) = GET_REAL_AGE(ch);
 		
 		if (get_skill_level(ch, SKILL_VAMPIRE) < 1) {
 			gain_skill(ch, find_skill_by_vnum(SKILL_VAMPIRE), 1);
@@ -509,25 +487,18 @@ void update_biting_char(char_data *ch) {
 	}
 	
 	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
-	gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
+	run_ability_gain_hooks(ch, victim, AGH_VAMPIRE_FEEDING);
 	gain_ability_exp(ch, ABIL_BITE, 5);
 }
 
 
 void update_vampire_sun(char_data *ch) {
-	bool found = FALSE;
+	bool repeat, found = FALSE;
+	struct affected_type *af;
 	
 	// only applies if vampire and not an NPC
 	if (IS_NPC(ch) || !IS_VAMPIRE(ch) || check_vampire_sun(ch, FALSE)) {
 		return;
-	}
-	
-	if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-		if (!found) {
-			sun_message(ch);
-		}
-		found = TRUE;
-		end_alacrity(ch);
 	}
 	
 	if (affected_by_spell(ch, ATYPE_CLAWS)) {
@@ -538,18 +509,28 @@ void update_vampire_sun(char_data *ch) {
 		retract_claws(ch);
 	}
 	
-	if (affected_by_spell(ch, ATYPE_MAJESTY)) {
-		if (!found) {
-			sun_message(ch);
+	// look for things that cause blood upkeep and remove them
+	do {
+		repeat = FALSE;
+		
+		LL_FOREACH(ch->affected, af) {
+			if (af->cast_by == CAST_BY_ID(ch) && af->location == APPLY_BLOOD_UPKEEP && af->modifier > 0) {
+				if (!found) {
+					sun_message(ch);
+					found = TRUE;
+				}
+				repeat = TRUE;	// gotta try again
+				affect_from_char(ch, af->type, TRUE);
+				break;	// this removes multiple affs so it's not safe to continue on the list
+			}
 		}
-		found = TRUE;
-		end_majesty(ch);
-	}
+	} while (repeat);
 	
 	// revert vampire morphs
 	if (IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_VAMPIRE_ONLY)) {
 		if (!found) {
 			sun_message(ch);
+			found = TRUE;
 		}
 		
 		// store morph name
@@ -578,45 +559,6 @@ void update_vampire_sun(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
-
-ACMD(do_alacrity) {
-	struct affected_type *af;
-	int cost = 10;
-	
-	if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-		end_alacrity(ch);
-		command_lag(ch, WAIT_OTHER);
-		return;
-	}
-	
-	if (!check_vampire_ability(ch, ABIL_ALACRITY, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_ALACRITY)) {
-		return;
-	}
-
-	msg_to_char(ch, "You focus your blood into your lithe muscles...\r\n");
-	if (!AFF_FLAGGED(ch, AFF_HASTE)) {
-		msg_to_char(ch, "You speed up immensely!\r\n");
-		act("$n seems to speed up!", TRUE, ch, 0, 0, TO_ROOM);
-	}
-	
-	af = create_flag_aff(ATYPE_ALACRITY, UNLIMITED, AFF_HASTE, ch);
-	affect_join(ch, af, 0);
-	
-	af = create_mod_aff(ATYPE_ALACRITY, UNLIMITED, APPLY_BLOOD_UPKEEP, 3, ch);
-	affect_to_char(ch, af);
-	free(af);
-
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-	gain_ability_exp(ch, ABIL_ALACRITY, 20);
-}
-
 
 ACMD(do_bite) {
 	extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
@@ -660,6 +602,9 @@ ACMD(do_bite) {
 	}
 	else if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && !can_fight(ch, victim))
 		act("You can't attack $N!", FALSE, ch, 0, victim, TO_CHAR);
+	else if (NOT_MELEE_RANGE(ch, victim)) {
+		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+	}
 	else if (check_scaling(victim, ch) && !PRF_FLAGGED(victim, PRF_BOTHERABLE) && AWAKE(victim) && GET_HEALTH(victim) > MAX(5, GET_MAX_HEALTH(victim)/20)) {
 		// must scale before checking health ^
 		msg_to_char(ch, "You can only bite people who are vulnerable or low on health.\r\n");
@@ -924,7 +869,7 @@ ACMD(do_command) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use Command.\r\n");
 	}
-	else if (!check_vampire_ability(ch, ABIL_COMMAND, NOTHING, 0, NOTHING)) {
+	else if (!check_vampire_ability(ch, ABIL_VAMP_COMMAND, NOTHING, 0, NOTHING)) {
 		return;
 	}
 	else if (!check_vampire_sun(ch, TRUE)) {
@@ -955,7 +900,7 @@ ACMD(do_command) {
 		msg_to_char(ch, "If you wish to include your orders in a sentence, you must include the word in that sentence.\r\nFormat: command <target> <command> [sentence including command]\r\n");
 	else if (!CAN_SEE(victim, ch))
 		act("How do you intend to command $M if $E can't even see you?", FALSE, ch, 0, victim, TO_CHAR);
-	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_COMMAND)) {
+	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_VAMP_COMMAND)) {
 		return;
 	}
 	else {
@@ -968,10 +913,10 @@ ACMD(do_command) {
 		do_say(ch, argument, 0, 0);
 		
 		if (can_gain_exp_from(ch, victim)) {
-			gain_ability_exp(ch, ABIL_COMMAND, 33.4);
+			gain_ability_exp(ch, ABIL_VAMP_COMMAND, 33.4);
 		}
 
-		if (skill_check(ch, ABIL_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
+		if (skill_check(ch, ABIL_VAMP_COMMAND, DIFF_MEDIUM) && !AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
 			un_charm = AFF_FLAGGED(victim, AFF_CHARM) ? FALSE : TRUE;
 			SET_BIT(AFF_FLAGS(victim), AFF_CHARM);
 			
@@ -1070,37 +1015,6 @@ ACMD(do_feed) {
 		GET_BLOOD(ch) -= amt;
 		GET_BLOOD(victim) = MIN(GET_MAX_BLOOD(victim), GET_BLOOD(victim) + amt);
 	}
-}
-
-
-ACMD(do_majesty) {
-	struct affected_type *af;
-	
-	if (affected_by_spell(ch, ATYPE_MAJESTY)) {
-		end_majesty(ch);
-	}
-	else if (!check_vampire_ability(ch, ABIL_MAJESTY, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_MAJESTY)) {
-		return;
-	}
-	else {
-		msg_to_char(ch, "You create a sense of supernatural majesty about yourself.\r\n");
-		act("$n glows majestically.", TRUE, ch, 0, 0, TO_ROOM);
-
-		af = create_flag_aff(ATYPE_MAJESTY, UNLIMITED, AFF_MAJESTY, ch);
-		affect_join(ch, af, 0);
-			
-		af = create_mod_aff(ATYPE_MAJESTY, UNLIMITED, APPLY_BLOOD_UPKEEP, 3, ch);
-		affect_to_char(ch, af);
-		free(af);
-	}
-	
-	command_lag(ch, WAIT_ABILITY);
 }
 
 
@@ -1286,7 +1200,7 @@ ACMD(do_regenerate) {
 			}
 			case REGEN_MOVE: {
 				msg_to_char(ch, "You focus your blood into your sore muscles.\r\n");
-				act("$n seems envigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
+				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
 				GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + amount);
 				break;
 			}
@@ -1331,37 +1245,6 @@ ACMD(do_sire) {
 		if (GET_FEEDING_FROM(ch)) {
 			start_action(ch, ACT_SIRING, -1);
 		}
-	}
-}
-
-
-ACMD(do_soulmask) {
-	struct affected_type *af;
-
-	if (affected_by_spell(ch, ATYPE_SOULMASK)) {
-		msg_to_char(ch, "You turn off your soulmask.\r\n");
-		affect_from_char(ch, ATYPE_SOULMASK, FALSE);
-		command_lag(ch, WAIT_OTHER);
-		return;
-	}
-	else if (!check_vampire_ability(ch, ABIL_SOULMASK, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_SOULMASK)) {
-		return;
-	}
-	else {
-		if (skill_check(ch, ABIL_SOULMASK, DIFF_EASY)) {
-			af = create_flag_aff(ATYPE_SOULMASK, UNLIMITED, AFF_SOULMASK, ch);
-			affect_join(ch, af, 0);
-		}
-		msg_to_char(ch, "You conceal your magical aura!\r\n");
-		
-		gain_ability_exp(ch, ABIL_SOULMASK, 33.4);
-		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1411,64 +1294,8 @@ ACMD(do_veintap) {
 		charge_ability_cost(ch, BLOOD, amt, NOTHING, 0, WAIT_ABILITY);
 		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_CONTENTS) += amt;
 		GET_OBJ_VAL(container, VAL_DRINK_CONTAINER_TYPE) = LIQ_BLOOD;
+		GET_OBJ_TIMER(container) = UNLIMITED;
 		
 		gain_ability_exp(ch, ABIL_VEINTAP, 33.4);
-	}
-}
-
-
-ACMD(do_weaken) {
-	struct affected_type *af;
-	char_data *victim;
-	int cost = 50;
-
-	one_argument(argument, arg);
-
-	if (!check_vampire_ability(ch, ABIL_WEAKEN, BLOOD, cost, COOLDOWN_WEAKEN)) {
-		return;
-	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	else if (!*arg && !FIGHTING(ch))
-		msg_to_char(ch, "Inflict weakness upon whom?\r\n");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)) && !(victim = FIGHTING(ch)))
-		send_config_msg(ch, "no_person");
-	else if (ch == victim)
-		msg_to_char(ch, "You wouldn't want to do that to yourself...\r\n");
-	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
-		msg_to_char(ch, "You cannot use this power on so godly a target!\r\n");
-	else if (affected_by_spell(victim, ATYPE_WEAKEN) || (GET_STRENGTH(victim) <= 1 && GET_INTELLIGENCE(victim) <= 1))
-		act("$E is already weak!", FALSE, ch, 0, victim, TO_CHAR);
-	else if (!can_fight(ch, victim))
-		act("You can't attack $M!", FALSE, ch, 0, victim, TO_CHAR);
-	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_WEAKEN)) {
-		return;
-	}
-	else {
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-
-		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_WEAKEN, SECS_PER_MUD_HOUR, WAIT_COMBAT_ABILITY);
-
-		act("You spread your dead blood on $N...", FALSE, ch, 0, victim, TO_CHAR);
-		act("$n spreads $s cold, dead blood on you...", FALSE, ch, 0, victim, TO_VICT);
-		act("$n spreads some of $s blood on $N...", TRUE, ch, 0, victim, TO_NOTVICT);
-
-		if (!AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
-			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_STRENGTH, -1 * MIN(2, GET_STRENGTH(victim)-1), ch);
-			affect_join(victim, af, 0);
-			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_INTELLIGENCE, -1 * MIN(2, GET_INTELLIGENCE(victim)-1), ch);
-			affect_join(victim, af, 0);
-			msg_to_char(victim, "You feel weak!\r\n");
-			act("$n hunches over in pain!", TRUE, victim, 0, 0, TO_ROOM);
-		}
-		
-		engage_combat(ch, victim, TRUE);
-		
-		if (can_gain_exp_from(ch, victim)) {
-			gain_ability_exp(ch, ABIL_WEAKEN, 15);
-		}
 	}
 }

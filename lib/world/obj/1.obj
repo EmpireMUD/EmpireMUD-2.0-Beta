@@ -16,12 +16,12 @@ R
 5117 0
 S
 #101
-clay pile lump~
-a pile of clay~
+clay lump~
+a lump of clay~
 Some clay is lumped here.~
-You can mold clay into pottery.
+You can craft clay into pottery.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 6 0
 O
@@ -49,15 +49,13 @@ a yellow lightning stone~
 A translucent yellow lightning stone is lying here.~
 The lightning stone can be used for certain crafts and enchantments.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 1 0
 O
 11 gu
 R
 5164 0
-R
-5511 0
 S
 #104
 stone bloodstone red~
@@ -65,15 +63,13 @@ a red bloodstone~
 A red bloodstone is sitting on the ground.~
 The bloodstone can be used for certain crafts and enchantments.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 1 0
 O
 11 gu
 R
 5164 0
-R
-5511 0
 S
 #105
 block stone huge~
@@ -437,11 +433,9 @@ a silver nugget~
 A silver nugget has fallen to the ground.~
 Silver can be melted down for money.
 ~
-15 l a 4
+15 l a 5
 2 0 0
 3 0
-R
-5184 a
 R
 5611 a
 S
@@ -451,11 +445,9 @@ a pile of gold dust~
 Some sparkling gold dust is scattered across the ground.~
 Gold can be melted down for money.
 ~
-15 l a 4
+15 l a 6
 3 0 0
 4 0
-R
-5184 a
 R
 5611 a
 S
@@ -502,13 +494,11 @@ A silver ingot is stacked here.~
    Ingots are used in crafting, but aren't as valuable as the larger silver
 bars. They can be stored in your vault to add to your wealth.
 ~
-15 l a 6
+15 l a 7
 4 0 0
 3 0
 O
 18 dk
-R
-5184 a
 R
 5611 a
 S
@@ -519,13 +509,11 @@ A gold ingot is stacked here.~
    Ingots are usually used in crafting, and aren't as valuable as larger bars
 of gold. They can be stored in the vault to add to your wealth.
 ~
-15 l a 7
+15 l a 8
 6 0 0
 4 0
 O
 18 dk
-R
-5184 a
 R
 5611 a
 S
@@ -536,14 +524,12 @@ A bar of silver has been left on the ground.~
    Store the silver bar in your vault to gain wealth. You can also separate the
 bar back into ingots for crafting.
 ~
-15 l a 5
+15 l a 6
 10 1 0
 3 0
 I 15 170 100.00 2 s  # SEPARATE: a silver ingot
 O
 18 dm
-R
-5184 a
 R
 5611 a
 S
@@ -554,14 +540,12 @@ A bar of gold is lying on the ground.~
    Store the gold bar in your vault to gain wealth. You can also separate the
 bar back into ingots for crafting.
 ~
-15 l a 5
+15 l a 6
 16 1 0
 4 0
 I 15 171 100.00 2 s  # SEPARATE: a gold ingot
 O
 18 dm
-R
-5184 a
 R
 5611 a
 S
@@ -571,11 +555,9 @@ a small flake of gold~
 A small golden flake is lying here.~
 You can melt down gold flakes to make discs.
 ~
-15 l a 1
+15 l a 2
 0 0 0
 4 0
-R
-5184 a
 R
 5611 a
 S
@@ -653,7 +635,7 @@ a copper bar~
 A bar of copper has been left here.~
 Store the copper bar in your vault to gain wealth.
 ~
-15 l a 5
+15 l a 6
 1 1 0
 13 0
 I 15 178 100.00 2 s  # SEPARATE: a copper ingot
@@ -661,8 +643,6 @@ O
 18 m
 R
 5115 a
-R
-5184 a
 R
 5611 a
 S

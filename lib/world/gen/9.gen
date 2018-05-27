@@ -1,0 +1,53 @@
+#925
+bodkin arrow~
+4 0
+0 0 0 0
+T0
+Your armor is no longer pierced by that bodkin arrow.~
+T1
+$n's armor is no longer pierced by that bodkin arrow.~
+T2
+The bodkin arrow pierces your armor!~
+T3
+The bodkin arrow pierces $n's armor!~
+S
+#926
+channeling arrow~
+4 0
+0 0 0 0
+T0
+That arrow stops channeling magic into you.~
+T1
+$n is no longer affected by the channeling arrow.~
+T2
+The channeling arrow starts conducting magic into you!~
+T3
+The channeling arrow starts conducting magic into $n!~
+S
+#927
+flowing arrow~
+4 0
+0 0 0 0
+T0
+You are no longer affected by that flowing arrow.~
+T1
+$n is no longer affected by that flowing arrow.~
+T2
+The flowing arrow starts guiding attacks to you!~
+T3
+The flowing arrow starts guiding attacks to $n!~
+S
+#928
+thunderclap arrow~
+4 0
+0 0 0 0
+T0
+You are no longer dazed by the thunderclap arrow.~
+T1
+$n is no longer dazed by the thunderclap arrow.~
+T2
+The thunderclap arrow dazes you, weakening your offense!~
+T3
+The thunderclap arrow dazes $n, weakening $s offense!~
+S
+$

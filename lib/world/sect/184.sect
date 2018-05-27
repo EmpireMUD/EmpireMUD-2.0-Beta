@@ -13,7 +13,7 @@ S
 #18451
 Flooded Plains~
 The Flooded Plains~
-'~' 17 0 10 w 0
+'~' 17 0 10 w p
 D1
 ~~~&g.~
 &c~
@@ -70,7 +70,7 @@ S
 #18452
 Flooded Woods~
 The Flooded Woods~
-'~' 17 0 10 w 0
+'~' 17 0 10 w p
 D1
 ~&g^&c~&g^~
 &c~
@@ -90,10 +90,10 @@ D3
 &y^&c~&y^&c~~
 &c~
 D4
-~&0Y&c~&0Y~
+~&W^&c~&W^~
 &c~
 D4
-&0Y&c~&0Y&c~~
+&W^&c~&W^&c~~
 &c~
 E
 4 0 0.20 2
@@ -103,7 +103,7 @@ S
 #18453
 Flooded Desert~
 The Flooded Desert~
-'~' 17 0 10 w 0
+'~' 17 0 10 w p
 D0
 ~~~&Y.~
 &c~

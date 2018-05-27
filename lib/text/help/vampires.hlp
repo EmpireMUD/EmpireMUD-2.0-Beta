@@ -1,4 +1,4 @@
-VAMPIRE VAMPIRES "VAMPIRE SKILL"
+VAMPIRE VAMPIRES "VAMPIRE SKILL" VAM VAMP
 
 Vampire (skill)
 
@@ -13,15 +13,16 @@ way to gain Vampire skill is to use the Bite ability to drink the blood of
 others. Higher level vampires have an hourly upkeep based only on which powers
 are active. See the help file on BITE for more information on drinking blood.
 
-To become a vampire, seek out another of their kind -- if you dare.
+To become a vampire, seek out another of their kind -- if you dare. If you no
+longer want to be a vampire, find a player who can Purify you.
 
 Check out &yHELP VAMPIRE GUIDE&0 for a getting-started.
 
-See also: BITE, SIRE, FEED, BOOST, ALACRITY, BLOOD FORTITUDE, MUMMIFY,
-    TASTE BLOOD, ANCIENT BLOOD, READY BLOOD WEAPONS, COMMAND, MAJESTY, SUMMON,
-    SOULMASK, DEATHSHROUD, WOLF FORM, HORRID FORM, MIST FORM, CLAWS,
-    PREADTOR VISION, REGENERATE, BUILD HAVEN, DAYWALKING, VEINTAP, WEAKEN,
-    BAT FORM, UNNATURAL THIRST, SANGUINE RESTORATION
+You can get additional Vampire abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
+See also: BITE, SIRE, FEED, ROLE, SKILL, SKILL SYNERGY, PURIFY
 #
 ALACRITY
 
@@ -91,7 +92,7 @@ See also: ANCIENT BLOOD, SANGUINE RESTORATION, TOGGLE, UNNATURAL THIRST
 "BLOOD FORTITUDE" FORTITUDE
 
 Blood Fortitude
-Class ability:  Reaper
+Vampire Synergy Ability: 100 Battle
 Type:  passive
 
 The vampire's blood-fueled form is more resilient against physical damage.
@@ -99,7 +100,7 @@ The vampire's blood-fueled form is more resilient against physical damage.
 BLOODSWEAT "BLOOD SWEAT"
 
 Bloodsweat
-Class ability:  Reaper
+Vampire Synergy Ability: 100 Battle
 Usage:  bloodsweat
 Cost:  50 blood
 Cooldown:  30 seconds
@@ -209,7 +210,7 @@ Gains experience when activated.
 "DREAD BLOOD FORM"
 
 Dread Blood Form
-Class ability: Lich, Necromancer
+Vampire Synergy Ability: 100 High Sorcery OR 100 Natural Magic
 
 Usage:  morph dread blood
 Cost:  30 blood (90 in combat)
@@ -231,8 +232,8 @@ See also: TOGGLE
 #
 "HORRID FORM"
 
-Horrid Form 
-Class ability: Reaper, Shade, Wight
+Horrid Form
+Vampire Synergy Ability: 100 Battle OR 100 Stealth OR 100 Survival
 
 Usage:  morph horrid
 Cost:  30 blood (90 in combat)
@@ -241,6 +242,33 @@ The vampire takes on the horrid form, a twisted bestial monstrosity. This form
 is particularly effective in melee combat.
 
 See also: MORPH
+#
+INSPIRE
+
+Inspire (Vampire ability)
+
+Usage:  inspire <target | all> <type>
+Cost:  30 move points per person or 60 for 'all'
+Duration:  30 minutes (in same empire) or 5 minutes (if not)
+
+A powerful leader can inspire his friends and allies with a rousing speech.
+It will only be half as effective when used on himself. The 'all' option
+targets all players in the room except himself.
+
+This ability scales with the user's Greatness. If Greatness is too low, people
+may not feel inspired at all.
+
+Gain experience when you inspire someone, including yourself.
+
+Here are the ways you can inspire:
+  Accuracy: to-hit
+  Evasion: dodge
+  Mana: max mana and mana regeneration
+  Might: strength and bonus physical damage
+  Prowess: dexterity and wits
+  Sorcery: intelligence and bonus magical damage
+  Stamina: max moves and move regeneration
+  Toughness: max health
 #
 MAJESTY
 
@@ -258,19 +286,19 @@ sharks. Aggressive NPCs may still attack, but will be delayed.
 This power offers more protection to characters with higher Charisma. NPCs
 that are immune to Vampire debuffs are also immune to Majesty.
 
-Gains experience when a NPC would attack you, but not when initially activated.
+Gains experience when activated, and passively while active.
 #
 "MIST FORM"
 
 Mist Form (Vampire ability)
 
 Usage:  morph mist
-Cost: 20 blood (60 in combat)
+Cost: 20 blood
 Upkeep:  1 blood/hr
 
 The vampire dissolves into mist, unable to be harmed. Many spells and abilities
-cannot be used while in this state, but you can use it in combat, and you can
-move around while transformed.
+cannot be used while in this state, and you cannot use it in combat. However,
+you can move around while transformed.
 
 Gains experience when you finish transforming into mist.
 
@@ -296,9 +324,8 @@ Mummify gains experience when you activate it.
 
 Predator Vision (Vampire ability)
 
-This ability allows you to see live creatures in the dark. However, it doesn't
-enable you to see items on the ground. You will gain experience with this
-ability whenever you're in an unlit area.
+This ability allows you to see live creatures in the dark and raises your
+light radius. However, it doesn't enable you to see items on the ground.
 
 Gains experience passively when you're standing in a dark room.
 #

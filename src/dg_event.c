@@ -53,7 +53,7 @@ struct event *event_create(EVENTFUNC(*func), void *event_obj, long when) {
 
 
 /* removes the event from the system */
-void event_cancel(struct event *event) {
+void event_cancel(struct event *event, EVENT_CANCEL_FUNC(*func)) {
 	if (!event) {
 		log("SYSERR:  Attempted to cancel a NULL event");
 		return;
@@ -65,8 +65,16 @@ void event_cancel(struct event *event) {
 	else
 		queue_deq(event_q, event->q_el);
 
-	if (event->event_obj)
-		free(event->event_obj);
+	if (event->event_obj) {
+		if (func) {
+			// special freeing func
+			(func)(event->event_obj);
+		}
+		else {
+			// attempt to free the void*
+			free(event->event_obj);
+		}
+	}
 	free(event);
 }
 
@@ -88,6 +96,11 @@ void event_process(void) {
 		** event function.
 		*/
 		the_event->q_el = NULL;
+		
+		if (!the_event->func) {
+			log("SYSERR: Attempt to call an event with a null function.");
+			free(the_event);
+		}
 
 		/* call event func, reenqueue event if retval > 0 */
 		if ((new_time = (the_event->func)(the_event->event_obj)) > 0)

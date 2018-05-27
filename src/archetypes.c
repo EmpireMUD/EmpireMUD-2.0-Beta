@@ -98,9 +98,7 @@ void add_archetype_lore(char_data *ch) {
 			free(str);
 		}
 		
-		CAP(temp);
-		
-		add_lore(ch, LORE_CREATED, temp);
+		add_lore(ch, LORE_CREATED, "%s", CAP(temp));
 	}
 }
 
@@ -681,8 +679,12 @@ int sort_archetypes(archetype_data *a, archetype_data *b) {
 
 // typealphabetic sorter for sorted_archetypes
 int sort_archetypes_by_data(archetype_data *a, archetype_data *b) {
-	// TODO what to sort by other than name?
-	return strcmp(NULLSAFE(GET_ARCH_NAME(a)), NULLSAFE(GET_ARCH_NAME(b)));
+	if (GET_ARCH_TYPE(a) != GET_ARCH_TYPE(b)) {
+		return GET_ARCH_TYPE(a) - GET_ARCH_TYPE(b);
+	}
+	else {
+		return strcmp(NULLSAFE(GET_ARCH_NAME(a)), NULLSAFE(GET_ARCH_NAME(b)));
+	}
 }
 
 
@@ -1174,7 +1176,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	archetype_data *arch, *next_arch;
 	bool basic = FALSE, all = FALSE;
 	struct archetype_skill *sk;
-	bool skill_match;
+	bool skill_match, any;
 	size_t size;
 	
 	if (!*argument) {
@@ -1190,8 +1192,12 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	
 	size = 0;
 	*buf = '\0';
+	any = FALSE;
 	
 	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
+		if (ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+			continue;	// don't show in-dev
+		}
 		if (GET_ARCH_TYPE(arch) != type) {
 			continue;
 		}
@@ -1210,6 +1216,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		// match strings
 		if (all || basic || skill_match || multi_isname(argument, GET_ARCH_NAME(arch)) || multi_isname(argument, GET_ARCH_DESC(arch))) {
 			snprintf(line, sizeof(line), " %s%s\t0 - %s", ARCHETYPE_FLAGGED(arch, ARCH_BASIC) ? "\tc" : "\ty", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+			any = TRUE;
 			
 			if (size + strlen(line) + 40 < sizeof(buf)) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
@@ -1219,6 +1226,10 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 				break;
 			}
 		}
+	}
+	
+	if (!any) {
+		size += snprintf(buf + size, sizeof(buf) - size, " There are no archetypes %s.\r\n", (all || basic) ? "available to list" : "with those keywords");
 	}
 	
 	if (*buf) {
@@ -1599,28 +1610,28 @@ void olc_show_archetype(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
-	sprintf(buf + strlen(buf), "<\tytype\t0> %s\r\n", archetype_types[GET_ARCH_TYPE(arch)]);
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GET_ARCH_NAME(arch)));
-	sprintf(buf + strlen(buf), "<\tydescription\t0> %s\r\n", NULLSAFE(GET_ARCH_DESC(arch)));
-	sprintf(buf + strlen(buf), "<\tylore\t0> %s [on Month Day, Year.]\r\n", (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
+	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GET_ARCH_TYPE(arch), 0), archetype_types[GET_ARCH_TYPE(arch)]);
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_ARCH_NAME(arch), default_archetype_name), NULLSAFE(GET_ARCH_NAME(arch)));
+	sprintf(buf + strlen(buf), "<%sdescription\t0> %s\r\n", OLC_LABEL_STR(GET_ARCH_DESC(arch), default_archetype_desc), NULLSAFE(GET_ARCH_DESC(arch)));
+	sprintf(buf + strlen(buf), "<%slore\t0> %s [on Month Day, Year.]\r\n", OLC_LABEL_STR(GET_ARCH_LORE(arch), ""), (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tymalerank\t0> %s\r\n", NULLSAFE(GET_ARCH_MALE_RANK(arch)));
-	sprintf(buf + strlen(buf), "<\tyfemalerank\t0> %s\r\n", NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
+	sprintf(buf + strlen(buf), "<%smalerank\t0> %s\r\n", OLC_LABEL_STR(GET_ARCH_MALE_RANK(arch), default_archetype_rank), NULLSAFE(GET_ARCH_MALE_RANK(arch)));
+	sprintf(buf + strlen(buf), "<%sfemalerank\t0> %s\r\n", OLC_LABEL_STR(GET_ARCH_FEMALE_RANK(arch), default_archetype_rank), NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
 	
 	// attributes
 	total = 0;
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		total += GET_ARCH_ATTRIBUTE(arch, iter);
 	}
-	sprintf(buf + strlen(buf), "Attributes: <\tyattribute\t0> (%d total attributes)\r\n", total);
+	sprintf(buf + strlen(buf), "Attributes: <%sattribute\t0> (%d total attributes)\r\n", OLC_LABEL_UNCHANGED, total);
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
-		sprintf(lbuf, "%s  [%2d]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
-		sprintf(buf + strlen(buf), "  %-23.23s%s", lbuf, !((iter + 1) % 3) ? "\r\n" : "");
+		sprintf(lbuf, "%s%s\t0  [%2d]", OLC_LABEL_VAL(GET_ARCH_ATTRIBUTE(arch, pos), 0), attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
+		sprintf(buf + strlen(buf), "  %-27.27s%s", lbuf, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	if (iter % 3) {
 		strcat(buf, "\r\n");
@@ -1631,13 +1642,13 @@ void olc_show_archetype(char_data *ch) {
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		total += sk->level;
 	}
-	sprintf(buf + strlen(buf), "Starting skills: <\tystartingskill\t0> (%d total skill points)\r\n", total);
+	sprintf(buf + strlen(buf), "Starting skills: <%sstartingskill\t0> (%d total skill points)\r\n", OLC_LABEL_PTR(GET_ARCH_SKILLS(arch)), total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		sprintf(buf + strlen(buf), "  %s: %d\r\n", get_skill_name_by_vnum(sk->skill), sk->level);
 	}
 	
 	// gear
-	sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n");
+	sprintf(buf + strlen(buf), "Gear: <%sgear\t0>\r\n", OLC_LABEL_PTR(GET_ARCH_GEAR(arch)));
 	if (GET_ARCH_GEAR(arch)) {
 		get_archetype_gear_display(GET_ARCH_GEAR(arch), lbuf);
 		strcat(buf, lbuf);

@@ -48,9 +48,34 @@ OLC_MODULE(olc_set_max_vnum);
 OLC_MODULE(olc_set_min_vnum);
 
 // ability modules
+OLC_MODULE(abiledit_affects);
+OLC_MODULE(abiledit_affectvnum);
+OLC_MODULE(abiledit_apply);
+OLC_MODULE(abiledit_attacktype);
+OLC_MODULE(abiledit_cdtime);
+OLC_MODULE(abiledit_command);
+OLC_MODULE(abiledit_cooldown);
+OLC_MODULE(abiledit_cost);
+OLC_MODULE(abiledit_costperscalepoint);
+OLC_MODULE(abiledit_costtype);
+OLC_MODULE(abiledit_custom);
+OLC_MODULE(abiledit_damagetype);
+OLC_MODULE(abiledit_data);
+OLC_MODULE(abiledit_difficulty);
 OLC_MODULE(abiledit_flags);
+OLC_MODULE(abiledit_gainhooks);
+OLC_MODULE(abiledit_immunities);
+OLC_MODULE(abiledit_linkedtrait);
+OLC_MODULE(abiledit_longduration);
 OLC_MODULE(abiledit_masteryability);
+OLC_MODULE(abiledit_maxstacks);
+OLC_MODULE(abiledit_minposition);
 OLC_MODULE(abiledit_name);
+OLC_MODULE(abiledit_scale);
+OLC_MODULE(abiledit_shortduration);
+OLC_MODULE(abiledit_targets);
+OLC_MODULE(abiledit_types);
+OLC_MODULE(abiledit_waittype);
 
 // adventure zone modules
 OLC_MODULE(advedit_author);
@@ -117,11 +142,11 @@ OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
 OLC_MODULE(bedit_military);
 OLC_MODULE(bedit_name);
+OLC_MODULE(bedit_relations);
 OLC_MODULE(bedit_resource);
 OLC_MODULE(bedit_script);
 OLC_MODULE(bedit_spawns);
 OLC_MODULE(bedit_title);
-OLC_MODULE(bedit_upgradesto);
 
 // class modules
 OLC_MODULE(classedit_abbrev);
@@ -174,6 +199,30 @@ OLC_MODULE(fedit_name);
 OLC_MODULE(fedit_relation);
 OLC_MODULE(fedit_startingreputation);
 
+// generic modules
+OLC_MODULE(genedit_flags);
+OLC_MODULE(genedit_name);
+OLC_MODULE(genedit_type);
+OLC_MODULE(genedit_color);
+OLC_MODULE(genedit_drunk);
+OLC_MODULE(genedit_hunger);
+OLC_MODULE(genedit_liquid);
+OLC_MODULE(genedit_thirst);
+OLC_MODULE(genedit_apply2char);
+OLC_MODULE(genedit_apply2room);
+OLC_MODULE(genedit_build2char);
+OLC_MODULE(genedit_build2room);
+OLC_MODULE(genedit_craft2char);
+OLC_MODULE(genedit_craft2room);
+OLC_MODULE(genedit_repair2char);
+OLC_MODULE(genedit_repair2room);
+OLC_MODULE(genedit_quick_cooldown);
+OLC_MODULE(genedit_standardwearoff);
+OLC_MODULE(genedit_wearoff);
+OLC_MODULE(genedit_wearoff2room);
+OLC_MODULE(genedit_plural);
+OLC_MODULE(genedit_singular);
+
 // global modules
 OLC_MODULE(gedit_ability);
 OLC_MODULE(gedit_capacity);
@@ -215,6 +264,7 @@ OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
 OLC_MODULE(mapedit_delete_room);
 OLC_MODULE(mapedit_exits);
+OLC_MODULE(mapedit_grow);
 OLC_MODULE(mapedit_icon);
 OLC_MODULE(mapedit_maintain);
 OLC_MODULE(mapedit_naturalize);
@@ -246,18 +296,22 @@ OLC_MODULE(morphedit_shortdesc);
 // object modules
 OLC_MODULE(oedit_action_desc);
 OLC_MODULE(oedit_affects);
+OLC_MODULE(oedit_affecttype);
 OLC_MODULE(oedit_apply);
 OLC_MODULE(oedit_armortype);
-OLC_MODULE(oedit_arrowtype);
+OLC_MODULE(oedit_ammotype);
 OLC_MODULE(oedit_automint);
 OLC_MODULE(oedit_capacity);
+OLC_MODULE(oedit_cdtime);
 OLC_MODULE(oedit_charges);
 OLC_MODULE(oedit_coinamount);
 OLC_MODULE(oedit_compflags);
 OLC_MODULE(oedit_component);
 OLC_MODULE(oedit_containerflags);
 OLC_MODULE(oedit_contents);
+OLC_MODULE(oedit_cooldown);
 OLC_MODULE(oedit_corpseof);
+OLC_MODULE(oedit_currency);
 OLC_MODULE(oedit_custom);
 OLC_MODULE(oedit_damage);
 OLC_MODULE(oedit_extra_desc);
@@ -270,12 +324,11 @@ OLC_MODULE(oedit_long_desc);
 OLC_MODULE(oedit_material);
 OLC_MODULE(oedit_maxlevel);
 OLC_MODULE(oedit_minlevel);
-OLC_MODULE(oedit_missilespeed);
+OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
-OLC_MODULE(oedit_poison);
-OLC_MODULE(oedit_potion);
-OLC_MODULE(oedit_potionscale);
 OLC_MODULE(oedit_quantity);
+OLC_MODULE(oedit_quick_recipe);
+OLC_MODULE(oedit_recipe);
 OLC_MODULE(oedit_requiresquest);
 OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
@@ -290,6 +343,17 @@ OLC_MODULE(oedit_value2);
 OLC_MODULE(oedit_wealth);
 OLC_MODULE(oedit_weapontype);
 OLC_MODULE(oedit_wear);
+
+// progression modules
+OLC_MODULE(progedit_cost);
+OLC_MODULE(progedit_description);
+OLC_MODULE(progedit_flags);
+OLC_MODULE(progedit_name);
+OLC_MODULE(progedit_perks);
+OLC_MODULE(progedit_prereqs);
+OLC_MODULE(progedit_tasks);
+OLC_MODULE(progedit_type);
+OLC_MODULE(progedit_value);
 
 // quests
 OLC_MODULE(qedit_completemessage);
@@ -335,6 +399,15 @@ OLC_MODULE(sectedit_roadsideicon);
 OLC_MODULE(sectedit_spawns);
 OLC_MODULE(sectedit_title);
 
+// shops
+OLC_MODULE(shopedit_allegiance);
+OLC_MODULE(shopedit_closes);
+OLC_MODULE(shopedit_flags);
+OLC_MODULE(shopedit_items);
+OLC_MODULE(shopedit_locations);
+OLC_MODULE(shopedit_name);
+OLC_MODULE(shopedit_opens);
+
 // skill modules
 OLC_MODULE(skilledit_abbrev);
 OLC_MODULE(skilledit_description);
@@ -342,6 +415,9 @@ OLC_MODULE(skilledit_flags);
 OLC_MODULE(skilledit_maxlevel);
 OLC_MODULE(skilledit_mindrop);
 OLC_MODULE(skilledit_name);
+OLC_MODULE(skilledit_showsynergies);
+OLC_MODULE(skilledit_showtree);
+OLC_MODULE(skilledit_synergy);
 OLC_MODULE(skilledit_tree);
 
 // social modules
@@ -394,8 +470,6 @@ OLC_MODULE(vedit_shortdescription);
 // externs
 extern const char *component_flags[];
 extern const char *component_types[];
-extern const char *drinks[];
-extern const char *drinknames[];
 extern const char *interact_types[];
 extern const int interact_attach_types[NUM_INTERACTS];
 extern const byte interact_vnum_types[NUM_INTERACTS];
@@ -405,7 +479,6 @@ extern const char *pool_types[];
 extern const bool requirement_amt_type[];
 extern const char *requirement_types[];
 extern const char *resource_types[];
-extern const char *res_action_type[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -417,6 +490,7 @@ extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
 
 // locals
+bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 void smart_copy_requirements(struct req_data **to_list, struct req_data *from_list);
 
 // prototypes
@@ -430,13 +504,16 @@ void olc_show_class(char_data *ch);
 void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
 void olc_show_faction(char_data *ch);
+void olc_show_generic(char_data *ch);
 void olc_show_global(char_data *ch);
 void olc_show_mobile(char_data *ch);
 void olc_show_morph(char_data *ch);
 void olc_show_object(char_data *ch);
+void olc_show_progress(char_data *ch);
 void olc_show_quest(char_data *ch);
 void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
+void olc_show_shop(char_data *ch);
 void olc_show_skill(char_data *ch);
 void olc_show_social(char_data *ch);
 void olc_show_trigger(char_data *ch);
@@ -451,13 +528,16 @@ extern class_data *setup_olc_class(class_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
 extern faction_data *setup_olc_faction(faction_data *input);
+extern generic_data *setup_olc_generic(generic_data *input);
 extern struct global_data *setup_olc_global(struct global_data *input);
 extern char_data *setup_olc_mobile(char_data *input);
 extern morph_data *setup_olc_morph(morph_data *input);
 extern obj_data *setup_olc_object(obj_data *input);
+extern progress_data *setup_olc_progress(progress_data *input);
 extern quest_data *setup_olc_quest(quest_data *input);
 extern room_template *setup_olc_room_template(room_template *input);
 extern sector_data *setup_olc_sector(sector_data *input);
+extern shop_data *setup_olc_shop(shop_data *input);
 extern skill_data *setup_olc_skill(skill_data *input);
 extern social_data *setup_olc_social(social_data *input);
 extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
@@ -468,16 +548,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -486,8 +566,34 @@ const struct olc_command_data olc_data[] = {
 	{ "setmaxvnum", olc_set_max_vnum, NOBITS, NOBITS },
 	
 	// ability commands
+	{ "affects", abiledit_affects, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "affectvnum", abiledit_affectvnum, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "apply", abiledit_apply, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "attacktype", abiledit_attacktype, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "cdtime", abiledit_cdtime, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "command", abiledit_command, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "cooldown", abiledit_cooldown, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "cost", abiledit_cost, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "costperscalepoint", abiledit_costperscalepoint, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "costtype", abiledit_costtype, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "custom", abiledit_custom, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "damagetype", abiledit_damagetype, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "data", abiledit_data, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "difficulty", abiledit_difficulty, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "gainhooks", abiledit_gainhooks, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "immunities", abiledit_immunities, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "linkedtrait", abiledit_linkedtrait, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "longduration", abiledit_longduration, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "maxstacks", abiledit_maxstacks, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "minposition", abiledit_minposition, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "scale", abiledit_scale, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "shortduration", abiledit_shortduration, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "targets", abiledit_targets, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "types", abiledit_types, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "waittype", abiledit_waittype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
 	
 	// adventure zones
@@ -557,12 +663,12 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "military", bedit_military, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "name", bedit_name, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "relations", bedit_relations, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "resources", bedit_resource, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "rooms", bedit_extrarooms, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "script", bedit_script, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "spawns", bedit_spawns, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "title", bedit_title, OLC_BUILDING, OLC_CF_EDITOR },
-	{ "upgradesto", bedit_upgradesto, OLC_BUILDING, OLC_CF_EDITOR },
 	
 	// class commands
 	{ "abbrev", classedit_abbrev, OLC_CLASS, OLC_CF_EDITOR },
@@ -615,6 +721,34 @@ const struct olc_command_data olc_data[] = {
 	{ "relationship", fedit_relation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "startingreputation", fedit_startingreputation, OLC_FACTION, OLC_CF_EDITOR },
 	
+	// generic commands
+	{ "flags", genedit_flags, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "name", genedit_name, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "type", genedit_type, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: actions
+	{ "build2char", genedit_build2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "build2room", genedit_build2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "craft2char", genedit_craft2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "craft2room", genedit_craft2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "repair2char", genedit_repair2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "repair2room", genedit_repair2room, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: cooldowns
+	{ "apply2char", genedit_apply2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "apply2room", genedit_apply2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },
+	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "wearoff2room", genedit_wearoff2room, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: liquids
+	{ "color", genedit_color, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "drunk", genedit_drunk, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "hunger", genedit_hunger, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "liquid", genedit_liquid, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "thirst", genedit_thirst, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: currency
+	{ "plural", genedit_plural, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "singular", genedit_singular, OLC_GENERIC, OLC_CF_EDITOR },
+	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -657,6 +791,7 @@ const struct olc_command_data olc_data[] = {
 	{ "deleteroom", mapedit_delete_room, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "description", mapedit_room_description, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "exit", mapedit_exits, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "grow", mapedit_grow, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "icon", mapedit_icon, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "maintain", mapedit_maintain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -686,18 +821,22 @@ const struct olc_command_data olc_data[] = {
 	
 	// object commands
 	{ "affects", oedit_affects, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "affecttype", oedit_affecttype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "apply", oedit_apply, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "armortype", oedit_armortype, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "arrowtype", oedit_arrowtype, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "ammotype", oedit_ammotype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "automint", oedit_automint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "cdtime", oedit_cdtime, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "coinamount", oedit_coinamount, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "component", oedit_component, OLC_OBJECT, OLC_CF_EDITOR },	// deliberately before "compflags"
 	{ "compflags", oedit_compflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "containerflags", oedit_containerflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "contents", oedit_contents, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "cooldown", oedit_cooldown, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "corpseof", oedit_corpseof, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "currency", oedit_currency, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "custom", oedit_custom, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "damage", oedit_damage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "extra", oedit_extra_desc, OLC_OBJECT, OLC_CF_EDITOR },
@@ -711,12 +850,10 @@ const struct olc_command_data olc_data[] = {
 	{ "material", oedit_material, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "maxlevel", oedit_maxlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "missilespeed", oedit_missilespeed, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "poison", oedit_poison, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "potion", oedit_potion, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "potionscale", oedit_potionscale, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "recipe", oedit_recipe, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "requiresquest", oedit_requiresquest, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "roomvnum", oedit_roomvnum, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "script", oedit_script, OLC_OBJECT, OLC_CF_EDITOR },
@@ -732,6 +869,19 @@ const struct olc_command_data olc_data[] = {
 	{ "wealth", oedit_wealth, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "weapontype", oedit_weapontype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wear", oedit_wear, OLC_OBJECT, OLC_CF_EDITOR },
+	// oedit: special
+	{ "quickrecipe", oedit_quick_recipe, OLC_OBJECT, NOBITS },
+	
+	// progression commands
+	{ "cost", progedit_cost, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "description", progedit_description, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "flags", progedit_flags, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "name", progedit_name, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "perks", progedit_perks, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "prereqs", progedit_prereqs, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "tasks", progedit_tasks, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "type", progedit_type, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "value", progedit_value, OLC_PROGRESS, OLC_CF_EDITOR },
 	
 	// quest commands
 	{ "completemessage", qedit_completemessage, OLC_QUEST, OLC_CF_EDITOR },
@@ -777,6 +927,15 @@ const struct olc_command_data olc_data[] = {
 	{ "spawns", sectedit_spawns, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "title", sectedit_title, OLC_SECTOR, OLC_CF_EDITOR },
 	
+	// shop commands
+	{ "allegiance", shopedit_allegiance, OLC_SHOP, OLC_CF_EDITOR },
+	{ "closes", shopedit_closes, OLC_SHOP, OLC_CF_EDITOR },
+	{ "flags", shopedit_flags, OLC_SHOP, OLC_CF_EDITOR },
+	{ "items", shopedit_items, OLC_SHOP, OLC_CF_EDITOR },
+	{ "locations", shopedit_locations, OLC_SHOP, OLC_CF_EDITOR },
+	{ "name", shopedit_name, OLC_SHOP, OLC_CF_EDITOR },
+	{ "opens", shopedit_opens, OLC_SHOP, OLC_CF_EDITOR },
+	
 	// skill commands
 	{ "abbrev", skilledit_abbrev, OLC_SKILL, OLC_CF_EDITOR },
 	{ "description", skilledit_description, OLC_SKILL, OLC_CF_EDITOR },
@@ -784,7 +943,10 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", skilledit_maxlevel, OLC_SKILL, OLC_CF_EDITOR },
 	{ "mindrop", skilledit_mindrop, OLC_SKILL, OLC_CF_EDITOR },
 	{ "name", skilledit_name, OLC_SKILL, OLC_CF_EDITOR },
+	{ "synergy", skilledit_synergy, OLC_SKILL, OLC_CF_EDITOR },
 	{ "tree", skilledit_tree, OLC_SKILL, OLC_CF_EDITOR },
+	{ "showtree", skilledit_showtree, OLC_SKILL, OLC_CF_EDITOR },
+	{ "showsynergies", skilledit_showsynergies, OLC_SKILL, OLC_CF_EDITOR },
 	
 	// social commands
 	{ "charposition", socedit_charposition, OLC_SOCIAL, OLC_CF_EDITOR },
@@ -834,7 +996,7 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_OBJECT | OLC_TRIGGER, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_OBJECT | OLC_TRIGGER, NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -996,6 +1158,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_FACTION(ch->desc) = NULL;
 				break;
 			}
+			case OLC_GENERIC: {
+				free_generic(GET_OLC_GENERIC(ch->desc));
+				GET_OLC_GENERIC(ch->desc) = NULL;
+				break;
+			}
 			case OLC_GLOBAL: {
 				free_global(GET_OLC_GLOBAL(ch->desc));
 				GET_OLC_GLOBAL(ch->desc) = NULL;
@@ -1016,6 +1183,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_OBJECT(ch->desc) = NULL;
 				break;
 			}
+			case OLC_PROGRESS: {
+				free_progress(GET_OLC_PROGRESS(ch->desc));
+				GET_OLC_PROGRESS(ch->desc) = NULL;
+				break;
+			}
 			case OLC_QUEST: {
 				free_quest(GET_OLC_QUEST(ch->desc));
 				GET_OLC_QUEST(ch->desc) = NULL;
@@ -1029,6 +1201,11 @@ OLC_MODULE(olc_abort) {
 			case OLC_SECTOR: {
 				free_sector(GET_OLC_SECTOR(ch->desc));
 				GET_OLC_SECTOR(ch->desc) = NULL;
+				break;
+			}
+			case OLC_SHOP: {
+				free_shop(GET_OLC_SHOP(ch->desc));
+				GET_OLC_SHOP(ch->desc) = NULL;
 				break;
 			}
 			case OLC_SKILL: {
@@ -1186,6 +1363,16 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
+			case OLC_GENERIC: {
+				extern bool audit_generic(generic_data *gen, char_data *ch);
+				generic_data *gen, *next_gen;
+				HASH_ITER(hh, generic_table, gen, next_gen) {
+					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
+						found |= audit_generic(gen, ch);
+					}
+				}
+				break;
+			}
 			case OLC_GLOBAL: {
 				extern bool audit_global(struct global_data *global, char_data *ch);
 				struct global_data *glb, *next_glb;
@@ -1226,6 +1413,16 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
+			case OLC_PROGRESS: {
+				extern bool audit_progress(progress_data *prg, char_data *ch);
+				progress_data *prg, *next_prg;
+				HASH_ITER(hh, progress_table, prg, next_prg) {
+					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
+						found |= audit_progress(prg, ch);
+					}
+				}
+				break;
+			}
 			case OLC_QUEST: {
 				extern bool audit_quest(quest_data *quest, char_data *ch);
 				quest_data *quest, *next_quest;
@@ -1261,6 +1458,16 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			*/
+			case OLC_SHOP: {
+				extern bool audit_shop(shop_data *shop, char_data *ch);
+				shop_data *shop, *next_shop;
+				HASH_ITER(hh, shop_table, shop, next_shop) {
+					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
+						found |= audit_shop(shop, ch);
+					}
+				}
+				break;
+			}
 			case OLC_SKILL: {
 				extern bool audit_skill(skill_data *skill, char_data *ch);
 				skill_data *skill, *next_skill;
@@ -1403,6 +1610,11 @@ OLC_MODULE(olc_copy) {
 			exists = (find_faction_by_vnum(from_vnum) != NULL);
 			break;
 		}
+		case OLC_GENERIC: {
+			found = (real_generic(vnum) != NULL);
+			exists = (real_generic(from_vnum) != NULL);
+			break;
+		}
 		case OLC_GLOBAL: {
 			found = (global_proto(vnum) != NULL);
 			exists = (global_proto(from_vnum) != NULL);
@@ -1423,6 +1635,11 @@ OLC_MODULE(olc_copy) {
 			exists = (obj_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_PROGRESS: {
+			found = (real_progress(vnum) != NULL);
+			exists = (real_progress(from_vnum) != NULL);
+			break;
+		}
 		case OLC_QUEST: {
 			found = (quest_proto(vnum) != NULL);
 			exists = (quest_proto(from_vnum) != NULL);
@@ -1436,6 +1653,11 @@ OLC_MODULE(olc_copy) {
 		case OLC_SECTOR: {
 			found = (sector_proto(vnum) != NULL);
 			exists = (sector_proto(from_vnum) != NULL);
+			break;
+		}
+		case OLC_SHOP: {
+			found = (real_shop(vnum) != NULL);
+			exists = (real_shop(from_vnum) != NULL);
 			break;
 		}
 		case OLC_SKILL: {
@@ -1569,6 +1791,12 @@ OLC_MODULE(olc_copy) {
 			olc_show_faction(ch);
 			break;
 		}
+		case OLC_GENERIC: {
+			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(real_generic(from_vnum));
+			GET_OLC_GENERIC(ch->desc)->vnum = vnum;
+			olc_show_generic(ch);
+			break;
+		}
 		case OLC_GLOBAL: {
 			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(from_vnum));
 			GET_OLC_GLOBAL(ch->desc)->vnum = vnum;
@@ -1597,6 +1825,13 @@ OLC_MODULE(olc_copy) {
 			olc_show_object(ch);
 			break;
 		}
+		case OLC_PROGRESS: {
+			GET_OLC_PROGRESS(ch->desc) = setup_olc_progress(real_progress(from_vnum));
+			GET_OLC_PROGRESS(ch->desc)->vnum = vnum;
+			SET_BIT(PRG_FLAGS(GET_OLC_PROGRESS(ch->desc)), PRG_IN_DEVELOPMENT);	// ensure flag
+			olc_show_progress(ch);
+			break;
+		}
 		case OLC_QUEST: {
 			GET_OLC_QUEST(ch->desc) = setup_olc_quest(quest_proto(from_vnum));
 			GET_OLC_QUEST(ch->desc)->vnum = vnum;
@@ -1614,6 +1849,13 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_SECTOR(ch->desc) = setup_olc_sector(sector_proto(from_vnum));
 			GET_OLC_SECTOR(ch->desc)->vnum = vnum;
 			olc_show_sector(ch);
+			break;
+		}
+		case OLC_SHOP: {
+			GET_OLC_SHOP(ch->desc) = setup_olc_shop(real_shop(from_vnum));
+			GET_OLC_SHOP(ch->desc)->vnum = vnum;
+			SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(ch->desc)), SHOP_IN_DEVELOPMENT);	// ensure flag
+			olc_show_shop(ch);
 			break;
 		}
 		case OLC_SKILL: {
@@ -1754,6 +1996,11 @@ OLC_MODULE(olc_delete) {
 			olc_delete_faction(ch, vnum);
 			break;
 		}
+		case OLC_GENERIC: {
+			void olc_delete_generic(char_data *ch, any_vnum vnum);
+			olc_delete_generic(ch, vnum);
+			break;
+		}
 		case OLC_GLOBAL: {
 			olc_delete_global(ch, vnum);
 			break;
@@ -1770,6 +2017,11 @@ OLC_MODULE(olc_delete) {
 			olc_delete_object(ch, vnum);
 			break;
 		}
+		case OLC_PROGRESS: {
+			void olc_delete_progress(char_data *ch, any_vnum vnum);
+			olc_delete_progress(ch, vnum);
+			break;
+		}
 		case OLC_QUEST: {
 			void olc_delete_quest(char_data *ch, any_vnum vnum);
 			olc_delete_quest(ch, vnum);
@@ -1781,6 +2033,11 @@ OLC_MODULE(olc_delete) {
 		}
 		case OLC_SECTOR: {
 			olc_delete_sector(ch, vnum);
+			break;
+		}
+		case OLC_SHOP: {
+			void olc_delete_shop(char_data *ch, any_vnum vnum);
+			olc_delete_shop(ch, vnum);
 			break;
 		}
 		case OLC_SKILL: {
@@ -1850,6 +2107,10 @@ OLC_MODULE(olc_display) {
 			olc_show_faction(ch);
 			break;
 		}
+		case OLC_GENERIC: {
+			olc_show_generic(ch);
+			break;
+		}
 		case OLC_GLOBAL: {
 			olc_show_global(ch);
 			break;
@@ -1866,6 +2127,10 @@ OLC_MODULE(olc_display) {
 			olc_show_object(ch);
 			break;
 		}
+		case OLC_PROGRESS: {
+			olc_show_progress(ch);
+			break;
+		}
 		case OLC_QUEST: {
 			olc_show_quest(ch);
 			break;
@@ -1876,6 +2141,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_SECTOR: {
 			olc_show_sector(ch);
+			break;
+		}
+		case OLC_SHOP: {
+			olc_show_shop(ch);
 			break;
 		}
 		case OLC_SKILL: {
@@ -1903,23 +2172,11 @@ OLC_MODULE(olc_display) {
 
 
 OLC_MODULE(olc_edit) {	
-	descriptor_data *desc;
 	char typename[42];
-	bool found, ok = TRUE;
+	bool ok = TRUE;
 	any_vnum vnum;
 	
 	sprintbit(GET_OLC_TYPE(ch->desc) != 0 ? GET_OLC_TYPE(ch->desc) : type, olc_type_bits, typename, FALSE);
-		
-	// check that they're not already editing something
-	if (GET_OLC_VNUM(ch->desc) != NOTHING) {
-		if (*argument) {
-			msg_to_char(ch, "You are already editing a %s.\r\n", typename);
-		}
-		else {
-			msg_to_char(ch, "You are currently editing %s %d.\r\n", typename, GET_OLC_VNUM(ch->desc));
-		}
-		return;
-	}
 	
 	if (!*argument) {
 		msg_to_char(ch, "Edit which %s (vnum)?\r\n", typename);
@@ -1929,28 +2186,8 @@ OLC_MODULE(olc_edit) {
 		msg_to_char(ch, "You must pick a valid %s vnum between 0 and %d.\r\n", typename, MAX_VNUM);
 		return;
 	}
-	
-	if (!player_can_olc_edit(ch, type, vnum)) {
-		msg_to_char(ch, "You don't have permission to edit that vnum.\r\n");
-		return;
-	}
-	
-	if (type == OLC_ROOM_TEMPLATE && !valid_room_template_vnum(vnum)) {
-		msg_to_char(ch, "Invalid room template: may be outside any adventure zone.\r\n");
-		return;
-	}
-	
-	// make sure nobody else is already editing it
-	found = FALSE;
-	for (desc = descriptor_list; desc && !found; desc = desc->next) {
-		if (GET_OLC_TYPE(desc) == type && GET_OLC_VNUM(desc) == vnum) {
-			found = TRUE;
-		}
-	}
-	
-	if (found) {
-		msg_to_char(ch, "Someone else is already editing that %s.\r\n", typename);
-		return;
+	if (!can_start_olc_edit(ch, type, vnum)) {
+		return;	// sends own message
 	}
 	
 	// SUCCESS
@@ -2030,6 +2267,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_faction(ch);
 			break;
 		}
+		case OLC_GENERIC: {
+			// this will set up from existing OR new automatically based on real_generic
+			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(real_generic(vnum));
+			GET_OLC_GENERIC(ch->desc)->vnum = vnum;			
+			olc_show_generic(ch);
+			break;
+		}
 		case OLC_GLOBAL: {
 			// this will set up from existing OR new automatically based on global_proto
 			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(vnum));
@@ -2058,6 +2302,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_object(ch);
 			break;
 		}
+		case OLC_PROGRESS: {
+			// this will set up from existing OR new automatically
+			GET_OLC_PROGRESS(ch->desc) = setup_olc_progress(real_progress(vnum));
+			GET_OLC_PROGRESS(ch->desc)->vnum = vnum;			
+			olc_show_progress(ch);
+			break;
+		}
 		case OLC_QUEST: {
 			// this will set up from existing OR new automatically
 			GET_OLC_QUEST(ch->desc) = setup_olc_quest(quest_proto(vnum));
@@ -2077,6 +2328,13 @@ OLC_MODULE(olc_edit) {
 			GET_OLC_SECTOR(ch->desc) = setup_olc_sector(sector_proto(vnum));
 			GET_OLC_SECTOR(ch->desc)->vnum = vnum;
 			olc_show_sector(ch);
+			break;
+		}
+		case OLC_SHOP: {
+			// this will set up from existing OR new automatically based on real_shop
+			GET_OLC_SHOP(ch->desc) = setup_olc_shop(real_shop(vnum));
+			GET_OLC_SHOP(ch->desc)->vnum = vnum;			
+			olc_show_shop(ch);
 			break;
 		}
 		case OLC_SKILL: {
@@ -2191,6 +2449,10 @@ OLC_MODULE(olc_free) {
 					free = (find_faction_by_vnum(iter) == NULL);
 					break;
 				}
+				case OLC_GENERIC: {
+					free = (real_generic(iter) == NULL);
+					break;
+				}
 				case OLC_GLOBAL: {
 					free = (global_proto(iter) == NULL);
 					break;
@@ -2207,6 +2469,10 @@ OLC_MODULE(olc_free) {
 					free = (obj_proto(iter) == NULL);
 					break;
 				}
+				case OLC_PROGRESS: {
+					free = (real_progress(iter) == NULL);
+					break;
+				}
 				case OLC_QUEST: {
 					free = (quest_proto(iter) == NULL);
 					break;
@@ -2217,6 +2483,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_SECTOR: {
 					free = (sector_proto(iter) == NULL);
+					break;
+				}
+				case OLC_SHOP: {
+					free = (real_shop(iter) == NULL);
 					break;
 				}
 				case OLC_SKILL: {
@@ -2260,6 +2530,11 @@ OLC_MODULE(olc_fullsearch) {
 	
 	// OLC_x:
 	switch (type) {
+		case OLC_ABILITY: {
+			void olc_fullsearch_abil(char_data *ch, char *argument);
+			olc_fullsearch_abil(ch, argument);
+			break;
+		}
 		case OLC_OBJECT: {
 			void olc_fullsearch_obj(char_data *ch, char *argument);
 			olc_fullsearch_obj(ch, argument);
@@ -2488,6 +2763,20 @@ OLC_MODULE(olc_list) {
 				}
 				break;
 			}
+			case OLC_GENERIC: {
+				extern char *list_one_generic(generic_data *gen, bool detail);
+				generic_data *gen, *next_gen;
+				HASH_ITER(hh, generic_table, gen, next_gen) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_generic(gen, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_GLOBAL: {
 				extern char *list_one_global(struct global_data *glb, bool detail);
 				struct global_data *glb, *next_glb;
@@ -2544,6 +2833,20 @@ OLC_MODULE(olc_list) {
 				}
 				break;
 			}
+			case OLC_PROGRESS: {
+				extern char *list_one_progress(progress_data *prg, bool detail);
+				progress_data *prg, *next_prg;
+				HASH_ITER(hh, progress_table, prg, next_prg) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_progress(prg, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_QUEST: {
 				extern char *list_one_quest(quest_data *quest, bool detail);
 				quest_data *quest, *next_quest;
@@ -2582,6 +2885,20 @@ OLC_MODULE(olc_list) {
 					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_sector(sect, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_SHOP: {
+				extern char *list_one_shop(shop_data *shop, bool detail);
+				shop_data *shop, *next_shop;
+				HASH_ITER(hh, shop_table, shop, next_shop) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_shop(shop, show_details));
 					}
 				}
 				break;
@@ -2669,6 +2986,7 @@ OLC_MODULE(olc_removeindev) {
 	faction_data *fct, *next_fct;
 	social_data *soc, *next_soc;
 	augment_data *aug, *next_aug;
+	shop_data *shop, *next_shop;
 	class_data *cls, *next_cls;
 	adv_data *adv = NULL;
 	descriptor_data *desc;
@@ -2856,6 +3174,23 @@ OLC_MODULE(olc_removeindev) {
 			REMOVE_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 			msg_to_char(ch, "Removed IN-DEV flag from quest [%d] %s.\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			any = TRUE;
+		}
+		
+		HASH_ITER(hh, shop_table, shop, next_shop) {
+			if (SHOP_VNUM(shop) < from || SHOP_VNUM(shop) > to) {
+				continue;
+			}
+			if (!IS_SET(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_SHOP, SHOP_VNUM(shop))) {
+				continue;
+			}
+			
+			REMOVE_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+			msg_to_char(ch, "Removed IN-DEV flag from shop [%d] %s.\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 			any = TRUE;
 		}
 		
@@ -3049,6 +3384,13 @@ OLC_MODULE(olc_save) {
 				GET_OLC_FACTION(ch->desc) = NULL;
 				break;
 			}
+			case OLC_GENERIC: {
+				void save_olc_generic(descriptor_data *desc);
+				save_olc_generic(ch->desc);
+				free_generic(GET_OLC_GENERIC(ch->desc));
+				GET_OLC_GENERIC(ch->desc) = NULL;
+				break;
+			}
 			case OLC_GLOBAL: {
 				save_olc_global(ch->desc);
 				free_global(GET_OLC_GLOBAL(ch->desc));
@@ -3073,6 +3415,13 @@ OLC_MODULE(olc_save) {
 				GET_OLC_OBJECT(ch->desc) = NULL;
 				break;
 			}
+			case OLC_PROGRESS: {
+				void save_olc_progress(descriptor_data *desc);
+				save_olc_progress(ch->desc);
+				free_progress(GET_OLC_PROGRESS(ch->desc));
+				GET_OLC_PROGRESS(ch->desc) = NULL;
+				break;
+			}
 			case OLC_QUEST: {
 				void save_olc_quest(descriptor_data *desc);
 				save_olc_quest(ch->desc);
@@ -3090,6 +3439,13 @@ OLC_MODULE(olc_save) {
 				save_olc_sector(ch->desc);
 				free_sector(GET_OLC_SECTOR(ch->desc));
 				GET_OLC_SECTOR(ch->desc) = NULL;
+				break;
+			}
+			case OLC_SHOP: {
+				void save_olc_shop(descriptor_data *desc);
+				save_olc_shop(ch->desc);
+				free_shop(GET_OLC_SHOP(ch->desc));
+				GET_OLC_SHOP(ch->desc) = NULL;
 				break;
 			}
 			case OLC_SKILL: {
@@ -3201,6 +3557,11 @@ OLC_MODULE(olc_search) {
 				olc_search_faction(ch, vnum);
 				break;
 			}
+			case OLC_GENERIC: {
+				void olc_search_generic(char_data *ch, any_vnum vnum);
+				olc_search_generic(ch, vnum);
+				break;
+			}
 			case OLC_GLOBAL: {
 				olc_search_global(ch, vnum);
 				break;
@@ -3217,6 +3578,11 @@ OLC_MODULE(olc_search) {
 				olc_search_obj(ch, vnum);
 				break;
 			}
+			case OLC_PROGRESS: {
+				void olc_search_progress(char_data *ch, any_vnum vnum);
+				olc_search_progress(ch, vnum);
+				break;
+			}
 			case OLC_QUEST: {
 				void olc_search_quest(char_data *ch, any_vnum vnum);
 				olc_search_quest(ch, vnum);
@@ -3228,6 +3594,11 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_SECTOR: {
 				olc_search_sector(ch, vnum);
+				break;
+			}
+			case OLC_SHOP: {
+				void olc_search_shop(char_data *ch, any_vnum vnum);
+				olc_search_shop(ch, vnum);
 				break;
 			}
 			case OLC_SKILL: {
@@ -3464,7 +3835,7 @@ void get_icons_display(struct icon_data *list, char *save_buffer) {
 		sprintf(line, " %2d. %s: %s%s&0  %s%s&0 %s", ++count, icon_types[icon->type], icon->color, ibuf, icon->color, show_color_codes(icon->color), lbuf);
 		
 		// format column despite variable width of color codes
-		size = 30 + color_code_length(line);
+		size = 34 + color_code_length(line);
 		sprintf(lbuf, "%%-%d.%ds%%s", size, size);
 		sprintf(save_buffer + strlen(save_buffer), lbuf, line, !(count % 2) ? "\r\n" : "");
 	}
@@ -3558,8 +3929,8 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_LIQUID: {
-				sprintf(line, "%d units %s", res->amount, drinks[res->vnum]);
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				sprintf(line, "%d units %s", res->amount, get_generic_name_by_vnum(res->vnum));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
 				break;
 			}
 			case RES_COINS: {
@@ -3572,8 +3943,13 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_ACTION: {
-				sprintf(line, "%dx [%s]", res->amount, res_action_type[res->vnum]);
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				sprintf(line, "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				break;
+			}
+			case RES_CURRENCY: {
+				sprintf(line, "%dx %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
 				break;
 			}
 			default: {
@@ -3718,8 +4094,10 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 				olc_audit_msg(ch, vnum, "Interaction %s exclusion set '%c' totals %.2f%%", interact_types[as->type], (char)at->code, at->percent);
 				problem = TRUE;
 			}
+			HASH_DEL(as->set, at);
 			free(at);
 		}
+		HASH_DEL(set, as);
 		free(as);
 	}
 	
@@ -3772,6 +4150,57 @@ bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Pre-checks several requirements for opening a new OLC editor.
+*
+* @param char_data *ch The person trying to edit.
+* @param int type Any OLC_ type.
+* @param any_vnum vnum The vnum the player wants to edit.
+*/
+bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum) {
+	descriptor_data *desc;
+	char typename[42];
+	bool found;
+	
+	if (IS_NPC(ch) || !ch->desc) {
+		return FALSE;
+	}
+	
+	sprintbit(GET_OLC_TYPE(ch->desc) != 0 ? GET_OLC_TYPE(ch->desc) : type, olc_type_bits, typename, FALSE);
+		
+	// check that they're not already editing something
+	if (GET_OLC_VNUM(ch->desc) != NOTHING) {
+		msg_to_char(ch, "You are currently editing %s %d.\r\n", typename, GET_OLC_VNUM(ch->desc));
+		return FALSE;
+	}
+	
+	if (!player_can_olc_edit(ch, type, vnum)) {
+		msg_to_char(ch, "You don't have permission to edit that vnum.\r\n");
+		return FALSE;
+	}
+	
+	if (type == OLC_ROOM_TEMPLATE && !valid_room_template_vnum(vnum)) {
+		msg_to_char(ch, "Invalid room template: may not be outside any adventure zone.\r\n");
+		return FALSE;
+	}
+	
+	// make sure nobody else is already editing it
+	found = FALSE;
+	for (desc = descriptor_list; desc && !found; desc = desc->next) {
+		if (GET_OLC_TYPE(desc) == type && GET_OLC_VNUM(desc) == vnum) {
+			found = TRUE;
+		}
+	}
+	
+	if (found) {
+		msg_to_char(ch, "Someone else is already editing that %s.\r\n", typename);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
 
 /**
 * Creates a copy of a set of icons.
@@ -3964,6 +4393,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_FACTION) && !OLC_FLAGGED(ch, OLC_FLAG_NO_FACTIONS)) {
 			return TRUE;
 		}
+		else if (IS_SET(type, OLC_GENERIC) && !OLC_FLAGGED(ch, OLC_FLAG_NO_GENERICS)) {
+			return TRUE;
+		}
 		else if (IS_SET(type, OLC_GLOBAL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_GLOBAL)) {
 			return TRUE;
 		}
@@ -3976,10 +4408,16 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_OBJECT) && !OLC_FLAGGED(ch, OLC_FLAG_NO_OBJECT)) {
 			return TRUE;
 		}
+		else if (IS_SET(type, OLC_PROGRESS) && OLC_FLAGGED(ch, OLC_FLAG_ALLOW_PROGRESS)) {
+			return TRUE;
+		}
 		else if (IS_SET(type, OLC_QUEST) && !OLC_FLAGGED(ch, OLC_FLAG_NO_QUESTS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_ROOM_TEMPLATE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ROOM_TEMPLATE)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_SHOP) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SHOPS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_SOCIAL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SOCIALS)) {
@@ -3994,13 +4432,13 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_SECTOR) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SECTORS)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_ABILITY) && OLC_FLAGGED(ch, OLC_FLAG_ABILITIES)) {
+		else if (IS_SET(type, OLC_ABILITY) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ABILITIES)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_CLASS) && OLC_FLAGGED(ch, OLC_FLAG_CLASSES)) {
+		else if (IS_SET(type, OLC_CLASS) && !OLC_FLAGGED(ch, OLC_FLAG_NO_CLASSES)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_SKILL) && OLC_FLAGGED(ch, OLC_FLAG_SKILLS)) {
+		else if (IS_SET(type, OLC_SKILL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SKILLS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_BOOK)) {
@@ -4266,14 +4704,19 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 */
 bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group) {
 	extern const char *action_bits[];
+	extern const char *diplomacy_flags[];
 	extern const char *component_flags[];
 	extern const char *component_types[];
+	extern const char *function_flags[];
+	extern const char *vehicle_flags[];
 	
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
+	bool need_currency = FALSE, need_func_flags = FALSE, need_veh_flags = FALSE;
+	bool need_dip_flags = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -4305,18 +4748,26 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		case REQ_KILL_MOB_FLAGGED: {
 			need_mob_flags = TRUE;
 			break;
-		} {
 		}
 		case REQ_OWN_BUILDING: {
 			need_bld = TRUE;
+			break;
+		}
+		case REQ_OWN_BUILDING_FUNCTION: {
+			need_func_flags = TRUE;
 			break;
 		}
 		case REQ_OWN_VEHICLE: {
 			need_veh = TRUE;
 			break;
 		}
+		case REQ_OWN_VEHICLE_FLAGGED: {
+			need_veh_flags = TRUE;
+			break;
+		}
 		case REQ_SKILL_LEVEL_OVER:
-		case REQ_SKILL_LEVEL_UNDER: {
+		case REQ_SKILL_LEVEL_UNDER:
+		case REQ_CAN_GAIN_SKILL: {
 			need_skill = TRUE;
 			break;
 		}
@@ -4345,6 +4796,28 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		case REQ_REP_UNDER: {
 			need_faction = TRUE;
+			break;
+		}
+		case REQ_GET_CURRENCY: {
+			need_currency = TRUE;
+			break;
+		}
+		case REQ_OWN_SECTOR: {
+			need_sect = TRUE;
+			break;
+		}
+		case REQ_DIPLOMACY: {
+			need_dip_flags = TRUE;
+			break;
+		}
+		case REQ_OWN_HOMES:
+		case REQ_CROP_VARIETY:
+		case REQ_EMPIRE_WEALTH:
+		case REQ_EMPIRE_FAME:
+		case REQ_EMPIRE_MILITARY:
+		case REQ_EMPIRE_GREATNESS:
+		case REQ_GET_COINS: {
+			// need nothing?
 			break;
 		}
 	}
@@ -4404,6 +4877,27 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			*misc = olc_process_flag(ch, arg, "component", "", component_flags, NOBITS);
 		}
 	}
+	if (need_currency) {
+		generic_data *gen;
+		argument = any_one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a generic currency vnum.\r\n");
+			return FALSE;
+		}
+		if (!(gen = find_generic(atoi(arg), GENERIC_CURRENCY))) {
+			msg_to_char(ch, "Invalid generic currency '%s'.\r\n", arg);
+			return FALSE;
+		}
+		*vnum = GEN_VNUM(gen);
+	}
+	if (need_dip_flags) {
+		argument = any_one_word(argument, arg);
+		*misc = olc_process_flag(ch, arg, "diplomacy", "", diplomacy_flags, NOBITS);
+		if (!*misc) {
+			msg_to_char(ch, "You must provide diplomacy flags.\r\n");
+			return FALSE;
+		}
+	}
 	if (need_faction) {
 		faction_data *fct;
 		argument = any_one_word(argument, arg);
@@ -4417,6 +4911,14 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		*vnum = FCT_VNUM(fct);
 	}
+	if (need_func_flags) {
+		argument = any_one_word(argument, arg);
+		*misc = olc_process_flag(ch, arg, "function", "", function_flags, NOBITS);
+		if (!*misc) {
+			msg_to_char(ch, "You must provide function flags.\r\n");
+			return FALSE;
+		}
+	}
 	if (need_mob) {
 		argument = any_one_arg(argument, arg);
 		if (!*arg) {
@@ -4429,7 +4931,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 	}
 	if (need_mob_flags) {
-		*misc = olc_process_flag(ch, argument, "mob", "", action_bits, NOBITS);
+		argument = any_one_word(argument, arg);
+		*misc = olc_process_flag(ch, arg, "mob", "", action_bits, NOBITS);
 		if (!*misc) {
 			msg_to_char(ch, "You must provide mob flags.\r\n");
 			return FALSE;
@@ -4501,6 +5004,14 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			return FALSE;
 		}
 	}
+	if (need_veh_flags) {
+		argument = any_one_word(argument, arg);
+		*misc = olc_process_flag(ch, arg, "vehicle", "", vehicle_flags, NOBITS);
+		if (!*misc) {
+			msg_to_char(ch, "You must provide vehicle flags.\r\n");
+			return FALSE;
+		}
+	}
 	
 	// anything left for a group letter?
 	skip_spaces(&argument);
@@ -4551,7 +5062,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		argument = any_one_arg(argument, field_arg);	// tasks/prereqs field to copy
 		
 		if (!*type_arg || !*vnum_arg) {
-			msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks | prereqs]\r\n", command);
+			msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks | prereqs (quests only)]\r\n", command);
 		}
 		else if ((findtype = find_olc_type(type_arg)) == 0) {
 			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
@@ -4568,6 +5079,13 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			copyfrom = NULL;
 			
 			switch (findtype) {
+				case OLC_PROGRESS: {
+					progress_data *from_prg = real_progress(vnum);
+					if (from_prg) {
+						copyfrom = PRG_TASKS(from_prg);
+					}
+					break;
+				}
 				case OLC_QUEST: {
 					// requires tasks/preqeqs
 					if (!*field_arg || (!is_abbrev(field_arg, "tasks") && !is_abbrev(field_arg, "prereqs"))) {
@@ -4689,7 +5207,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		if (!change) {
 			msg_to_char(ch, "Invalid %s number.\r\n", command);
 		}
-		else if (is_abbrev(field_arg, "amount")) {
+		else if (is_abbrev(field_arg, "amount") || is_abbrev(field_arg, "value") || is_abbrev(field_arg, "quantity")) {
 			if (requirement_amt_type[change->type] == REQ_AMT_REPUTATION && (num = get_reputation_by_name(argument)) == NOTHING) {
 				msg_to_char(ch, "Invalid reputation '%s'.\r\n", argument);
 				return;
@@ -5031,7 +5549,7 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 		if (!change) {
 			msg_to_char(ch, "Invalid apply number.\r\n");
 		}
-		else if (is_abbrev(type_arg, "value")) {
+		else if (is_abbrev(type_arg, "value") || is_abbrev(type_arg, "amount") || is_abbrev(type_arg, "quantity")) {
 			num = atoi(val_arg);
 			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
 				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
@@ -5065,6 +5583,136 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 		}
 		if ((iter % 2) != 0) {
 			msg_to_char(ch, "\r\n");
+		}
+	}
+}
+
+
+/**
+* Processes adding/changing custom messages for various olc types.
+*
+* @param char_data *ch The person editing.
+* @param char *argument Text typed by the player.
+* @param struct custom_message **list Pointer to the list of custom messages.
+* @param const char **type_names List of names of valid types.
+*/
+void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct custom_message *custm, *change;
+	int num, iter, msgtype;
+	bool found;
+	
+	// arg1 arg2
+	half_chop(argument, arg1, arg2);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which custom message (number)?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			while ((custm = *list)) {
+				*list = custm->next;
+				if (custm->msg) {
+					free(custm->msg);
+				}
+				free(custm);
+			}
+			msg_to_char(ch, "You remove all the custom messages.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(*list, custm) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove custom message #%d.\r\n", atoi(arg2));
+					LL_DELETE(*list, custm);
+					free(custm);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid custom message number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		msgstr = any_one_word(arg2, arg);
+		skip_spaces(&msgstr);
+		
+		if (!*arg || !*msgstr) {
+			msg_to_char(ch, "Usage: custom add <type> <string>\r\n");
+		}
+		else if ((msgtype = search_block(arg, type_names, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
+		}
+		else {
+			delete_doubledollar(msgstr);
+			
+			CREATE(custm, struct custom_message, 1);
+
+			custm->type = msgtype;
+			custm->msg = str_dup(msgstr);
+			
+			LL_APPEND(*list, custm);
+			msg_to_char(ch, "You add a custom '%s' message:\r\n%s\r\n", type_names[custm->type], custm->msg);			
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		LL_FOREACH(*list, custm) {
+			if (--num == 0) {
+				change = custm;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((msgtype = search_block(val_arg, type_names, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+			}
+			else {
+				change->type = msgtype;
+				msg_to_char(ch, "Custom message %d changed to type %s.\r\n", atoi(num_arg), type_names[msgtype]);
+			}
+		}
+		else if (is_abbrev(type_arg, "message")) {
+			if (change->msg) {
+				free(change->msg);
+			}
+			delete_doubledollar(val_arg);
+			change->msg = str_dup(val_arg);
+			msg_to_char(ch, "Custom message %d changed to: %s\r\n", atoi(num_arg), val_arg);
+		}
+		else {
+			msg_to_char(ch, "You can only change the type or message.\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
+		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
+		msg_to_char(ch, "Available types:\r\n");
+		for (iter = 0; *type_names[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %s\r\n", type_names[iter]);
 		}
 	}
 }
@@ -5709,7 +6357,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				msg_to_char(ch, "Interaction %d type changed to %s.\r\n", atoi(arg2), interact_types[loc]);
 			}
 		}
-		else if (is_abbrev(arg3, "quantity")) {
+		else if (is_abbrev(arg3, "quantity") || is_abbrev(arg3, "amount")) {
 			if ((num = atoi(arg4)) < 1 || num >= 1000) {
 				msg_to_char(ch, "You must choose a quantity between 1 and 1000.\r\n");
 			}
@@ -5889,17 +6537,12 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					break;
 				}
 				case RES_LIQUID: {
-					if (*arg5) {
-						// reattach the rest of the arg, for two-word liquids (arg5 isn't used)
-						sprintf(arg4 + strlen(arg4), " %s", arg5);
-					}
-					
 					if (!*arg4) {
-						msg_to_char(ch, "Usage: resource add liquid <units> <name>\r\n");
+						msg_to_char(ch, "Usage: resource add liquid <units> <vnum>\r\n");
 						return;
 					}
-					if ((vnum = search_block(arg4, drinks, FALSE)) == NOTHING && (vnum = search_block(arg4, drinknames, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
+					if (!find_generic(vnum, GENERIC_LIQUID)) {
+						msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
 						return;
 					}
 					break;
@@ -5920,20 +6563,26 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					break;
 				}
 				case RES_ACTION: {
-					// need to re-integrate arg4 and arg5
-					if (*arg5) {
-						strcat(arg4, " ");
-						strcat(arg4, arg5);
-					}
-					
-					if (!*arg4) {
-						msg_to_char(ch, "Usage: resource add action <amount> <type>\r\n");
+					if (!*arg4 || !isdigit(*arg4)) {
+						msg_to_char(ch, "Usage: resource add action <amount> <generic action vnum>\r\n");
 						return;
 					}
-					if ((vnum = search_block(arg4, res_action_type, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown action type '%s' (see HELP RESOURCE ACTIONS).\r\n", arg4);
+					if (!find_generic(vnum, GENERIC_ACTION)) {
+						msg_to_char(ch, "Invalid generic action vnum '%s'.\r\n", arg4);
 						return;
 					}
+					break;
+				}
+				case RES_CURRENCY: {
+					if (!*arg4 || !isdigit(*arg4)) {
+						msg_to_char(ch, "Usage: resource add currency <quantity> <vnum>\r\n");
+						return;
+					}
+					if (!find_generic(vnum, GENERIC_CURRENCY)) {
+						msg_to_char(ch, "There is no such generic currency vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
 				}
 			}
 			
@@ -6039,7 +6688,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 		if (!change) {
 			msg_to_char(ch, "Invalid resource number.\r\n");
 		}
-		else if (is_abbrev(arg3, "quantity")) {
+		else if (is_abbrev(arg3, "quantity") || is_abbrev(arg3, "amount")) {
 			if (vnum < 1 || vnum > 10000) {
 				msg_to_char(ch, "You must specify a quantity between 1 and 10000.\r\n");
 			}
@@ -6049,18 +6698,47 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			}
 		}
 		else if (is_abbrev(arg3, "vnum")) {
-			if (change->type != RES_OBJECT) {
-				msg_to_char(ch, "You can't change the vnum on a resource that isn't an object.\r\n");
+			// RES_x: ones that support change vnum
+			switch (change->type) {
+				case RES_OBJECT: {
+					if (!obj_proto(vnum)) {
+						msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
+				case RES_LIQUID: {
+					if (!find_generic(vnum, GENERIC_LIQUID)) {
+						msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
+				case RES_ACTION: {
+					if (!find_generic(vnum, GENERIC_ACTION)) {
+						msg_to_char(ch, "Invalid generic action vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
+				case RES_CURRENCY: {
+					if (!find_generic(vnum, GENERIC_CURRENCY)) {
+						msg_to_char(ch, "Invalid generic currency vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't change the vnum on a resource of that type.\r\n");
+					return;
+				}
 			}
-			else if (!obj_proto(vnum)) {
-				msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
-			}
-			else {
-				change->vnum = vnum;
-				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_obj_name_by_proto(vnum));
-			}
+			
+			// ok
+			change->vnum = vnum;
+			msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_resource_name(change));
 		}
-		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "liquid") || is_abbrev(arg3, "pool")) {
+		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool")) {
 			// RES_x: some resource types support "change name"
 			switch (change->type) {
 				case RES_COMPONENT: {
@@ -6074,16 +6752,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(vnum, change->misc));
 					break;
 				}
-				case RES_LIQUID: {
-					if ((vnum = search_block(arg4, drinks, FALSE)) == NOTHING && (vnum = search_block(arg4, drinknames, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
-						return;
-					}
-					
-					change->vnum = vnum;
-					msg_to_char(ch, "You change resource %d's liquid to %s.\r\n", atoi(arg2), drinks[vnum]);
-					break;
-				}
 				case RES_POOL: {
 					if ((vnum = search_block(arg4, pool_types, FALSE)) == NOTHING) {
 						msg_to_char(ch, "Unknown pool type '%s'.\r\n", arg4);
@@ -6092,15 +6760,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					
 					change->vnum = vnum;
 					msg_to_char(ch, "You change resource %d's pool to %s.\r\n", atoi(arg2), pool_types[vnum]);
-					break;
-				}
-				case RES_ACTION: {
-					if ((vnum = search_block(arg4, res_action_type, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown action type '%s' (see HELP RESOURCE ACTIONS).\r\n", arg4);
-						return;
-					}
-					change->vnum = vnum;
-					msg_to_char(ch, "You change resource %d's action to %s.\r\n", atoi(arg2), res_action_type[vnum]);
 					break;
 				}
 				default: {
@@ -6619,6 +7278,8 @@ void smart_copy_icons(struct icon_data **addto, struct icon_data *input) {
 		
 		CREATE(new_icon, struct icon_data, 1);
 		*new_icon = *icon;
+		new_icon->icon = str_dup(NULLSAFE(icon->icon));
+		new_icon->color = str_dup(NULLSAFE(icon->color));
 		new_icon->next = NULL;
 		
 		LL_APPEND(*addto, new_icon);

@@ -1,4 +1,6 @@
-TRADE "TRADE SKILL"
+TRADE "TRADE SKILL" TRD
+
+(Disambiguation: did you mean HELP TRADE COMMAND ?)
 
 Trade (skill)
 
@@ -12,37 +14,12 @@ into leather.
 Many craftable items are scalable, meaning their stats depend on the level of
 the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
 
+You get additional Trade abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
-  REFORGE
-#
-"ADVANCED SHIPS" "ADVANCED SHIPYARDS" "UPGRADED SHIPYARD" "ADVANCED SHIP LIST"
-
-Advanced Ships (Trade ability)
-
-Building:  &b~&0[]&b~&0  Upgraded Shipyard (Seafaring ability)
-Fame:  4
-Commands:  manufacture <ship>
-           manufacture info <ship>
-
-The upgraded shipyard allows you to manufacture bigger, more powerful ships.
-
-With Advanced Ships you can manufacture:
-  Carrack
-    Type: Exploration ship (house boat)
-    Capacity: 400
-    Health: 96
-    Rooms: 8
-  Brigantine
-    Type: Warship (siege weapons)
-    Health: 128
-    Rooms: 4
-  Hulk
-    Type: Cargo ship (shipping)
-    Capacity: 1000
-    Health: 64
-    Rooms: 4
-
-See also: SHIPBUILDING, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
+  REFORGE, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
 #
 "ADVANCED WOODWORKING"
 
@@ -60,16 +37,32 @@ See also: CRAFT, LAND VEHICLES
 "ALCHEMIST CRAFTS"
 
 Alchemist Crafts
-Class ability: Alchemist
+Trade Synergy Ability: 100 Natural Magic
 
-This ability will contain any crafts for the Alchemist class.
+This ability will contain any crafts for the Alchemist synergy.
 #
 "ANTIQUARIAN CRAFTS"
 
 Antiquarian Crafts
-Class ability: Antiquarian
+Trade Synergy Ability: 100 Vampire
 
-This ability will contain any crafts for the Antiquarian class.
+This ability lets you make:
+  guild-patterned cloth (weave; makes a crafter item)
+#
+ARCHITECT "ARCHITECT ABILITY"
+
+Architect (Trade ability)
+
+This ability allows you to build more advanced buildings. It is required by
+most of the new building schematics you can learn throughout the game.
+
+It also lets you build:
+  [&b~~&0]  baths  (in-city only)
+  [CC]  cabinetofcuriosities
+  ....  courtyard  (in-city only)
+  {&c~~&0}  fountain  (in-city only)
+
+See also: BUILD, LEARN
 #
 ARMORSMITHING ARMORCRAFTING
 
@@ -92,7 +85,7 @@ See also: FORGE, WEAPONCRAFTING, STURDY ARMORS, IMPERIAL ARMORS
 "ARTIFICER CRAFTS"
 
 Artificer Crafts
-Class ability: Artificer
+Trade Synergy Ability: 100 High Sorcery
 
 Craft items:
   clockwork lens array  (crafter item)
@@ -122,7 +115,11 @@ Basic Crafts:
   violet dye  (glassblowing)
   orange dye  (glassblowing)
 
-See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP,
+This ability also allows you to:
+  mint
+  tan
+
+See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
 PRIMITIVE CRAFTS
 #
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
@@ -133,7 +130,8 @@ resources quickly from one place to another. They can also be ridden on and
 driven to move around without spending moves.
 
 You can board caravans and carriages, and ride around inside them. Caravans can
-even have a few different rooms redesignated inside.
+even have a few different rooms redesignated inside. You can also usually sit
+on/in a vehicle from the outside.
 
 Storage capacities (large items count twice):
 Cart: 200 items
@@ -141,7 +139,26 @@ Carriage: 200 items, 1 room inside
 Wagon: 400 items
 Caravan: 100 items: 2 rooms inside
 
-See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE
+See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE, SIT
+#
+CHORES CHORE
+
+Doing simple chores will help you raise your Trade or Survival skill at low
+levels.
+
+Chores include:
+  chop                      press *
+  harvest                   quarry
+  mill *                    saw
+  mine *                    scrape
+  mint                      smelt *
+  plant
+
+* Most common recipes/types give Trade experience, but some recipes may not.
+  (try 'smelt info iron ingot', for example, to see what ability it uses)
+
+See also: ACTIONS, CHOP, HARVEST, MILL, MINE, MINT, PLANT, PRESS, QUARRY, SAW,
+SCRAPE, SMELT
 #
 CLOTHING CLOTHES
 
@@ -224,6 +241,27 @@ For recipes from patterns, this also shows the level range of the recipe.
 
 See also; RESOURCES, SCALABLE CRAFTS, PATTERNS
 #
+"CUSTOMIZE BUILDING"
+
+Customize Building (Trade ability)
+
+Usage:  customize building name <name | none>
+        customize building description <set | none>
+
+Customize Building lets you change the names and descriptions of your build-
+ings. You must own the building you're trying to customize, and have permission
+from your empire.
+
+When editing a custom description, you can use /fi to add linebreaks and indent
+the first line. Generally descriptions look best in the 3-9 line range. You can
+use /h to get more information on editor commands, and /s to save and exit.
+
+This ability also allows you to put up roadsigns.
+
+Gain experience by customizing buildings.
+
+See also: STRING EDITOR, ROADSIGN
+#
 "DANGEROUS LEATHERS"
 
 Dangerous Leathers (Trade ability)
@@ -264,6 +302,7 @@ Deadly Weapons:
   horsemans pick
   kris
   maul
+  claymore (two-handed)
 
 Ship Weapons:
   cannon
@@ -317,11 +356,29 @@ With this ability, you can make the following fine pottery items:
 
 See also: POTTERY, MASTER CRAFTSMAN
 #
+FLETCHING
+
+Fletching (Trade ability)
+
+Mastery ability:  Master Craftsman
+Command:  craft [number] <type of arrows>
+
+This ability allows you to craft better arrows. You can make:
+  flint arrows
+  iron arrows
+  imperium bodkin arrows
+  nocturnium channeling arrows
+  flowing arrows
+  thunderclap arrows
+  bloodletter arrows
+
+See also: CRAFT
+#
 FORGE
 
 Forge (Trade ability)
 
-Building:  (FF)  Forge  (Basic Buildings)
+Building:  (FF)  Forge  (Build ability)
 Tool:  hammer
 Commands:  forge [number] <item>
            forge info <item>
@@ -373,19 +430,9 @@ You can make the following gourmet recipes:
 
 See also: BUFF FOOD, COOKING FIRE
 #
-"GUILDSMAN CRAFTS"
-
-Guildsman Crafts
-Class ability: Guildsman
-
-Weave items:
-  guild patterned cloth  (crafter item)
-
-See also: WEAVE
-#
 "HERBCLOTH WEAVING" "SPARKFIBER CLOTH" "MANASILK CLOTH"
 
-Herbcloth Weaving (Trade ability)
+Herbcloth Weaving (goal)
 Command:  weave <sparkfiber | manasilk> cloth
 
 Skilled tradesmen can weave enchanted herbs into their textiles in order to
@@ -638,7 +685,7 @@ See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
 #
 "MOONSTONE SMELTING" "MOONSTONE ORE" MOONSTONE "ARGENTINE INGOT" "EVENTIDE INGOT"
 
-Moonstone Smelting (Trade ability)
+Moonstone Smelting (goal)
 Command:  smelt <argentine | eventide> ingot
 
 The super-rare moonstone ore is highly prized by metallurgists, and can be
@@ -659,14 +706,16 @@ plated onto powerful magical objects.
 
 See also: FORGE, METALS, MINE, SEW, SMELT
 #
-PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS"
+PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS" SCHEMATICS DESIGNS
 
-Some items can be found in adventures which allow you to use crafting recipes as
-long as you own them. These are usually called 'patterns'. Crafts from patterns
-are not limited by the levels of your skills or the ability used to make them.
+Some items can be found in adventures which teach you new crafting recipes.
+These are usually called 'patterns', 'designs', 'schematics', or 'recipes'.
+Crafts from patterns are not limited by the levels of your skills or the
+ability used to make them.
 
-The level of the crafted item is based on your crafting level, but many patterns
-have their own upper limit. Usually the pattern will mention if there's a limit.
+The level of the crafted item is based on your crafting level, but many
+patterns have their own upper limit. Usually the pattern will mention if
+there's a limit.
   
 You can see the level range of the item a pattern makes on its info display.
 
@@ -710,12 +759,17 @@ Primitive crafts:
 With Archery, you can craft:
   arrows
 
+This ability also allows you to:
+  saw
+  chip
+  scrape
+
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, RECIPES,
-BASIC CRAFTS
+BASIC CRAFTS, SAW, CHIP, SCRAPE
 #
 "PRISMATIC CRYSTALS" "PRISMATIC CRYSTAL"
 
-Prismatic Crystals (Trade ability)
+Prismatic Crystals (goal)
 Command:  craft prismatic crystal
 Cost:  100 mana
 
@@ -726,6 +780,26 @@ enchantments.
 These gems are generally used in crafts in the 200-300 level range.
 
 See also: CRAFT
+#
+QUARRY
+
+Quarry (Primitive Crafts ability)
+
+Command:  quarry
+Building:  |__|  Quarry  (Build ability)
+Speed boosts:  Faster Chores bonus, haste
+
+A quarry must be built on plains or desert, facing a mountain. Quarries are a
+good place to dig up rocks. You can also quarry stone here using the "quarry"
+command. You will find more rocks before a quarry depletes, compared to digging
+anywhere else.
+
+If you have the "dig" workforce enabled, your citizens will only dig if you
+have a quarry.
+
+Quarries count as in-city territory when built in the outskirts (4x radius).
+
+See also: DEPLETION, DIG
 #
 "RAWHIDE STITCHING"
 
@@ -759,6 +833,10 @@ Usage:  recipes <item>
 This command allows you to see which recipes (forge, craft, cook, etc) you
 know that require a given item. It also shows which augments (enchant, hone)
 you know that require the item.
+
+'Recipe' is also a term used for some items that teach you new crafts or foods.
+
+See also: LEARN
 #
 REFORGE REFASHION
 
@@ -791,7 +869,7 @@ An item must be in your inventory to reforge it. However, if another player
 
 See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #
-"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES" "ITEM SCALING" OBJECT SCALING"
+"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES" "ITEM SCALING" "OBJECT SCALING"
 
 Many craftable items (including things made with brew, craft, forge, and sew)
 are scalable, which means they change in power and attributes based on the
@@ -818,8 +896,8 @@ Command:  sew [number] <item>
           sew info <item>
 
 The art of sewing is one of the oldest and simplest trade skills, but it also
-makes some of the finest clothing and the lightest armor. The only resource
-required for sewing is skin.
+makes some of the finest clothing and the lightest armor. The only resources
+required for sewing are skins or cloth.
 
 For a list of clothing items you can sew, see HELP CLOTHING.
 
@@ -852,19 +930,20 @@ command.
 
 See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING, DISPATCH
 #
-SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "SHIP LIST"
+SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "SHIP LIST" "UPGRADED SHIPYARD"
 
 Shipbuilding (Trade ability)
 
-Building:  &b~&0()&b~&0  Shipyard (Seafaring ability)
+Building:  &b~&0()&b~&0  Shipyard (Seafarers goal)
+           &b~&0[]&b~&0  Upgraded Shipyard (Great Shipyard goal)
 Commands:  manufacture <ship>
            manufacture info <ship>
 
-Great ships can be created via the manufacture skill. This can only be done in
-a shipyard, and the vessel can be sailed to a dock when finished.
+Ships can be constructed via the manufacture command. This can only be done at
+a shipyard, and the vessel can be sailed to a dock when finished. You can also
+upgrade the shipyard, if your empire has this knowledge.
 
-You gain experience for the appropriate ability every time you add resources to
-a ship being manufactured.
+You gain experience every time you add resources to a ship being manufactured.
 
 With basic Shipbuilding you can manufacture:
   Caravel
@@ -903,7 +982,8 @@ Usage:  skin <corpse>
 
 You can skin a fresh corpse to get usable material, which can later be turned
 into good equipment. Some corpses cannot be skinned, especially severely
-damaged and putrid ones.
+damaged and putrid ones. This command succeeds about 60% of the time unskilled,
+or 100% of the time with the Huntsman ability.
 
 Possible results from skinning and example animals:
   small skin: rabbit, squirrel
@@ -913,19 +993,19 @@ Possible results from skinning and example animals:
   fox fur: fox
   big cat pelt: tiger, jaguar, leopard
 
-See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
+See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, HUNTSMAN
 #
 "SMUGGLER CRAFTS"
 
 Smuggler Crafts
-Class ability: Smuggler
+Trade Synergy Ability: 100 Stealth
 
-This ability will contain any crafts for the Smuggler class.
+This ability will contain any crafts for the Stealth/Trade synergies.
 #
 "STEELSMITH CRAFTS"
 
 Steelsmith Crafts
-Class ability: Steelsmith
+Trade Synergy Ability: 100 Battle
 
 Forge items:
   delicate tools  (crafter item)
@@ -954,6 +1034,8 @@ See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, IMPERIAL ARMORS
 #
 TAN TANNING
 
+Tan (Basic Crafts ability)
+
 Usage:  tan <skin>
 Speed boosts:  Faster Chores bonus
 Stored in:  Tannery
@@ -966,7 +1048,7 @@ See also: SKIN, LEATHER
 "TINKER CRAFTS"
 
 Tinker Crafts
-Class ability: Tinker
+Trade Synergy Ability: 100 Survival
 
 Forge items:
   clips and buckles  (crafter item)
@@ -975,7 +1057,7 @@ See also: FORGE
 #
 "VERDANT LEATHERS" "BRIAR HIDE" "ABSINTHIAN LEATHER"
 
-Verdant Leathers (Trade ability)
+Verdant Leathers (goal)
 Command:  craft <briar hide | absinthian leather>
 
 Certain tradesmen learn to treat fine leather with a bath of herbs, creating

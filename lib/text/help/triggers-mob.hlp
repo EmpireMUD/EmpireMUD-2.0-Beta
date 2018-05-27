@@ -39,6 +39,7 @@ See also: MTRIG CHARMED
 Bribe (mob trigger)
 
 Argument type:  minimum number of misc coins given to the mobile
+Return value:  return 0 to prevent giving the coins
 
 Bribe is triggered when a person gives coins to the mob. The type of coin is
 not considered, because all coinage is made by players and has different
@@ -203,7 +204,7 @@ Examples:
   mgoto Rumble
   mgoto fountain
 #d
-MHUNT %HUNT% HUNT 
+MHUNT %HUNT%
 
 Usage:  mhunt <victim>
 
@@ -270,6 +271,7 @@ are player-only), in addition to some special commands:
 &c%echoaround%&0 - Sends a message to all but one target.
 &c%echoneither%&0 - Sends a message to all but two targets.
 &c%force%&0 - Forces a person to perform a command.
+&c%heal%&0 - Restores health/move/etc.
 &c%load%&0 - Loads a mob, object, etc.
 &c%morph%&0 - Causes a person to morph.
 &c%own%&0 - Changes ownership on something.
@@ -299,7 +301,7 @@ See the help files on those commands for more info.
 
 Mobs can trigger on the following events:
 
-&cGlobal&0 - Can happen even without players present (combine with Random).
+&cGlobal&0 - Modifier: Random trigger can happen even without players present.
 &cRandom&0 - Triggers randomly when players are around.
 &cCommand&0 - Responds to a player command.
 &cSpeech&0 - Responds to player speech.
@@ -318,11 +320,12 @@ Mobs can trigger on the following events:
 &cLeave&0 - Triggers when a visible person tries to leave.
 &cLeave-All&0 - Triggers when ANY person tries to leave.
 &cDoor&0 - Triggers when a player interacts with a door in the room.
-&cFight-Charmed&0 - Triggers during combat rounds even when charmed.
+&cCharmed&0 - Modifier: random/fight triggers work even when charmed.
 &cStart-Quest&0 - Triggers when a player tries to start a quest.
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 &cPlayer-in-Room&0 - Modifier: trigger requires a player present.
 &cReboot&0 - Triggers when the mud starts up.
+&cBuy&0 - Triggers when someone tries to buy in the room.
 
 For each type, there is a help file named &yMTRIG <type>&0.
 #d
@@ -332,11 +335,12 @@ All mob scripts provide the &c%self%&0 variable.
 
 When using field  - The variable returns:
 &cability(name)&0 - Returns whether or not the player knows the ability.
+&cadd_learned(vnum)&0 - Adds a learnable recipe to the actor.
 &cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
 &cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
 &caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
-&caffect(name)&0 - Checks the actor for the affect (by name) in the subfield.
-   This is the name that shows on your affects/score command when using active.
+&caffect(vnum/name)&0 - Checks the actor for the affect (by name or generic 
+   affect vnum) in the subfield.
 &calias&0 - The list of aliases (keywords) of the mob or the player name.
 &callegiance(faction)&0 - Returns a mob's faction vnum, or changes the faction
    to a different one (or 'none').
@@ -367,16 +371,22 @@ When using field  - The variable returns:
 &ccha&0 - The actor's Charisma.
 &cchar_target(name)&0 - Finds a visible target character in the room, by name.
 &ccharge_coins(amt)&0 - Charges the actor a number of coins.
+&ccharge_currency(vnum, amt)&0 - Takes away an amount of adventure currency.
 &cclass&0 - The actor's class, as a string.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
+&ccompleted_quest_instance(vnum)&0 - Has completed it in the current instance.
+&ccooldown(vnum)&0 - Gets the character's current cooldown time (seconds).
 &ccrafting_level&0 - The actor's crafting level.
+&ccurrency(vnum)&0 - The amount of an adventure currency that a player has.
 &cdex&0 - The actor's Dexterity.
 &cdir(name)&0 - Gives the name of the character's perceived direction
    ('name' is the real direction), which is useful for people without
    navigation.
 &cdisabled&0 - Returns TRUE if the actor is stunned or otherwise disabled.
 &cdodge&0 - The character's dodge rating.
+&cdrunk&0 or &cdrunk(hours)&0 - Get a character's drunk level, or add/subtract
+   hours of drunkenness. A character behaves drunk if this passes 24 hours.
 &cempire&0 - The character's empire, if any.
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
@@ -388,6 +398,7 @@ When using field  - The variable returns:
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
 &cgain_reputation(faction,amt)&0 - Gives the player faction rep (or takes).
 &cgive_coins(amt)&0 - Gives the actor a number of coins.
+&cgive_currency(vnum, amt)&0 - Gives an amount of adventure currency.
 &cgive_skill_reset(sk)&0 - Grants the player a free skill reset in that skill.
 &cgrt&0 - The actor's Greatness.
 &chas_item()&0 - Checks if the actor has a object (inventory, equipped and
@@ -396,20 +407,20 @@ When using field  - The variable returns:
    much reputation with the given faction.
 &chas_resources(vnum,amt)&0 - Whether or not the player has <amt> of object <vnum>
    available in the inventory/room.
+&chas_tech(ptech)&0 - Character has a given tech (see &yHELP PTECH&0)
 &chealth&0 - The current hit points of the actor.
 &cheshe&0 - Returns the correct pronoun (he/she/it).
 &chimher&0 - Returns the correct pronoun (him/her/it).
 &chisher&0 - Returns the correct pronoun (his/her/its).
 &chome&0 - Room id of the player's home, if any.
+&chunger&0 or &chunger(hours)&0 - Returns how hungry the player is, or makes
+   them more or less hungry (0 is not hungry).
 &cid&0 - The unique id of the actor.
 &cint&0 - The actor's intelligence.
 &cinventory()&0 - Returns the id of the first item in the actors inventory or 
    the id of the first object with vnum in the subfield. If the character
    doesn't have the item, an empty string is returned. * checks for any inv. 
-&cis_ally(char)&0 - Returns true if the other character is a combat ally. Run
-   this in two steps:
-      eval test %%actor.is_ally(%char%)%%
-      if %test% ...
+&cis_ally(char)&0 - Returns true if the other character is a combat ally.
 &cis_enemy(char)&0 - Returns true if the other character is a combat enemy.
 &cis_god&0 - Returns true if the actor is a god-level player.
 &cis_hostile(on/off)&0 - If the ()'s are omitted, return value is whether or
@@ -420,6 +431,7 @@ When using field  - The variable returns:
 &cis_pc&0 - Checks if the actor is a player. Useful when you want a trigger
    to fire on players and not mobs.
 &clastname&0 - The actor's last name (empty for mobs).
+&clearned(vnum)&0 - Whether the actor has learned a recipe vnum.
 &clevel&0 - The actor's computed level (or scaled level, for mobs).
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.
@@ -452,16 +464,21 @@ When using field  - The variable returns:
    tasks completed.
 &cquest_triggered(vnum)&0 - TRUE if the player is on the quest and that quest
    has a 'triggered' task that has already been completed.
+&cremove_learned(vnum)&0 - Removes a learnable recipe from the actor.
 &cremove_mob_flag(FLG)&0 - Removes a mob flag from the mob. Also, add_mob_flag().
 &cresist_magical&0 - Returns the amount of magic resistance the player has.
 &cresist_physical&0 - Returns the amount of physical resistance the player has.
 &cresist_poison&0 - Returns TRUE if the player has Resist Poison.
 &criding&0 - TRUE if the character is currently mounted.
-&croom&0 - The room the actor is in as a room variable. 
+&croom&0 - The room the actor is in as a room variable.
+&cset_cooldown(vnum, seconds)&0 - Sets the character's cooldown time.
+&cset_reputation(faction,rep)&0 - Sets reputation to a given level ("Liked").
 &cset_skill(name,level)&0 - Change a player's skill level, also gain_skill()
 &csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cskill(name)&0 - The player's level in the given skill.
 &cstr&0 - The actor's Strength.
+&cthirst&0 or &cthirst(hours)&0 - Returns how thirsty the player is, or makes
+   them more or less thirsty (0 is not thirsty).
 &ctitle()&0 - The actor's title. Subfield sets. Not used for mobs.
 &ctohit&0 - The player's to-hit rating.
 &ctrigger_counterspell&0 - Fires the character's counterspell and returns 1 if

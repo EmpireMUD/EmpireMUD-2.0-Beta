@@ -1,4 +1,4 @@
-BATTLE "BATTLE SKILL"
+BATTLE BAT "BATTLE SKILL"
 
 Battle (skill)
 
@@ -11,8 +11,11 @@ Sparring branch: Learn to hit faster and harder, and finish the fight.
 Big Game Hunter branch: Take on the world's monsters with no fear.
 Archery branch: Strike from afar.
 
-See also: EVASION, REFLEXES, SPARRING, BIG GAME HUNTER, ARCHERY, FIRSTAID,
-FLEET, WEAPONS PROFICIENCY
+You also get additional Battle abilities when you reach level 100, depending on
+which other skills you have at high levels. Use the 'role' command to choose
+which set of skills to use.
+
+See also: EVASION, WEAPON PROFICIENCY, ROLE, SKILL, SKILL SYNERGY
 #
 AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
 
@@ -21,15 +24,51 @@ general, these abilities only target NPCs.
 
 Examples: OUTRAGE
 #
+ABATE
+
+Usage:  abate [victim]
+Battle Synergy Ability:  75 Natural Magic
+Linked traits:  Caster role, Intelligence
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  32+ mana (varies with level)
+
+Abate reduces the magical damage dealt by your victim.
+#
+ADAPT
+
+Usage:  adapt
+Battle Synergy Ability:  75 Vampire
+Linked traits:  Melee or Caster role, Wits
+Cooldown:  6 seconds
+Duration:  6 seconds
+Cost:  5 blood
+
+Adapt boosts your physical and magical damage.
+#
+AMPLIFY
+
+Usage:  amplify
+Battle Synergy Ability:  75 High Sorcery
+Linked trait:  Caster role
+Cooldown:  6 seconds
+Duration:  6 seconds
+Cost:  32+ mana (varies with level)
+
+Amplify increases your magical damage for a short time.
+#
 ARCHERY
 
 Archery (Battle ability)
 
-Learn to use bows to start combat while you're still at a safe distance.
+Learn to use bows (and other ranged weapons) to start combat while you're still
+at a safe distance. This ability also allows you to craft basic arrows. You can
+craft better arrows with the Fletching ability.
 
-Gain experience when you successfully hit with an arrow.
+Gain experience when you successfully hit with a ranged weapon.
 
-See also: QUICK DRAW, SHOOT
+See also: FLETCHING, QUICK DRAW, SHOOT
 #
 ARMOR "LIGHT ARMOR" "MEDIUM ARMOR" "HEAVY ARMOR" "MAGE ARMOR"
 
@@ -66,12 +105,24 @@ Debuff type:  Battle, Stun
 
 Bash your target with your weapon and send him flying to the ground. When you
 successfully bash, your target is briefly stunned. As a specialty ability, bash
-cannot miss. As a class ability, bash does double damage.
+cannot miss. At Battle 100, bash does double damage.
 
 Only one person in the room may be bash-stunned at a time. Using the ability on
 a second person will release the first one.
 
 Gain experience when you try to bash something.
+#
+BEGUILE
+
+Usage:  beguile [victim]
+Battle Synergy Ability:  75 High Sorcery
+Linked traits:  Caster role, Intelligence
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  22+ mana (varies with level)
+
+Beguile lowers your victim's resistance to magical damage.
 #
 "BIG GAME HUNTER" BGH
 
@@ -81,7 +132,7 @@ The Big Game Hunter branch of the Battle skill is for people who aren't
 satisfied with puny elephants. It's for people who want to take down the most
 dangerous game: vampires, werewolves, and mages.
 
-Big Game Hunter gives you a chance to inflict 5% (10% as a class ability) extra
+Big Game Hunter gives you a chance to inflict 5% (10% at Battle 100) extra
 damage against each of these supernaturals. It also opens up special abilities
 to help you take them down.
 
@@ -94,9 +145,32 @@ See also: NULL MANA, HEARTSTOP
 Block Arrows (Battle ability)
 
 With training, you can learn to use shields to block incoming arrows, and
-take less damage before you've even gotten to your opponent.
+take less damage before you've even gotten to your opponent. This also works
+on other types of ranged weapons.
 
-Gains experience when you fail to dodge arrows.
+Gains experience when you fail to dodge ranged weapons.
+#
+BOWMASTER "BOW MASTER"
+
+Bowmaster (Battle ability)
+
+This ability increases your damage with ranged weapons by 50%. Gain experience
+when fighting with one.
+#
+CHARGE
+
+Charge (Battle ability)
+
+Cost:  50 move
+Cooldown:  3 minutes
+Usage:  charge [target]
+
+This ability allows you to charge directly into melee range. It can only be
+used if you're in ranged combat (or running into melee) or aren't in combat
+at all.
+
+You receive a brief boost to your to-hit and damage when you charge. The amount
+of the damage boost is based on your strength and intelligence.
 #
 "CUT DEEP" "DEEP CUTS"
 
@@ -110,6 +184,22 @@ cuts that bleed for additional damage. Higher Battle skill level results in
 longer durations, and this ability may stack up to 5 times.
 
 Gain experience when you inflict deep cuts.
+#
+DEFEND
+
+Defend (Battle ability)
+
+Usage:  defend
+Cooldown:  60 seconds
+Duration: 30 seconds / unlimited at class level
+Cost:  30 move
+
+The defend ability temporarily raises your dodge rating at the cost of your
+to-hit rating. Use it to survive in battle.
+
+At class level, this ability becomes a toggle and you can turn it off at will.
+
+Gain experience when you activate Defend.
 #
 DISARM DISARMED
 
@@ -140,7 +230,7 @@ Gain experience when you try to disarm someone, even if it fails.
 "DUAL-WIELD" "DUAL WIELD"
 
 Dual-Wield
-Class ability: Assassin, Bandit, Smuggler
+Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade
 
 With this ability, you can attack with weapons in both hands (the wield and
 hold slots). Without it, you can still hold a weapon in your off-hand, but
@@ -171,13 +261,25 @@ Evasion (Battle ability)
 This ability is part of basic combat training and improves your ability to
 fight. It gains experience whenever someone is trying to hit you in combat.
 #
+EXHAUST
+
+Usage:  exhaust [victim]
+Battle Synergy Ability:  75 Stealth
+Linked traits:  Melee role, Charisma
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  22+ move (varies with level)
+
+Exhaust reduces the physical damage dealt by your victim.
+#
 FINESSE
 
 Finesse (Battle ability)
 
 With finesse, your close-combat (non-Archery) automatic attacks happen faster,
 leading to more damage overall. As a basic ability, attacks are 10% faster. As a
-specialty ability, they are 15% faster. As a class ability, they are 20% faster.
+specialty ability, they are 15% faster. At Battle 100, they are 20% faster.
 
 The ranged (Archery) version of this ability is Quick Draw.
 
@@ -229,6 +331,34 @@ Gain experience when you successfully flee from combat.
 
 See also: FLEE
 #
+FRENZY
+
+Frenzy (Battle ability)
+
+Usage:  frenzy
+Cooldown:  60 seconds
+Duration: 30 seconds / unlimited at class level
+Cost:  30 move
+
+The frenzy ability temporarily raises your to-hit rating at the cost of your
+dodge rating. Use it to defeat your enemies with ease.
+
+At class level, this ability becomes a toggle and you can turn it off at will.
+
+Gain experience when you activate Frenzy.
+#
+GLEAM
+
+Usage:  gleam
+Battle Synergy Ability:  75 Trade
+Linked traits:  Tank role
+Cooldown:  30 seconds
+Duration:  30 seconds
+Cost:  21+ move (varies with level)
+
+Your polished, gleaming armor boosts your resistance to physical and magical
+damage.
+#
 HEARTSTOP "HEART STOP"
 
 Heartstop (Battle ability)
@@ -245,6 +375,68 @@ Chance of success rises based on your Battle level.
 
 Gain experience when you successfully Heartstop a vampire.
 #
+HINDER
+
+Usage:  hinder [victim]
+Battle Synergy Ability:  75 Survival
+Linked traits:  Tank role, Strength
+Debuff type:  Battle
+Cooldown:  6 seconds
+Duration:  6 seconds
+Cost:  22+ move (varies with level)
+
+Hinder reduces the physical damage done by your victim.
+#
+HOBBLE
+
+Usage:  hobble [victim]
+Battle Synergy Ability:  75 Survival
+Linked traits:  Tank role, Strength
+Debuff type:  Battle
+Cooldown:  6 seconds
+Duration:  6 seconds
+Cost:  8+ move (varies with level)
+
+Hobble reduces the magical damage done by your victim.
+#
+"IMPROVED REFLEXES"
+
+Improved Reflexes (Battle ability)
+
+This ability raises your dodge cap 20% higher than normal. For example, if your
+dodge cap is normally 55%, you can now go as high as 75% chance to dodge.
+
+This ability does not improve your actual chance to dodge, only allows you
+to stack more dodge bonuses from equipment and abilities.
+
+Gain experience when you dodge an attack.
+
+See also: DODGE CAP, REFLEXES
+#
+INFECT
+
+Usage:  infect [victim]
+Battle Synergy Ability:  75 Survival
+Linked traits:  Caster role, Wits
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  3 blood
+
+Infect reduces your victim's magical resistance by infecting them with your
+blood.
+#
+INTENSIFY
+
+Usage:  intensify
+Battle Synergy Ability:  75 Natural Magic
+Linked trait:  Caster role
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  21+ mana (varies with level)
+
+Intensify increases your magical damage for a short time.
+#
 KICK
 
 Kick (Battle ability)
@@ -254,19 +446,48 @@ Cooldown:  6 seconds
 Cost:  10 move
 
 Kick is a special attack that does bonus damage (based on your Strength) outside
-of the combat round. As a specialty ability, it cannot miss. As a class ability,
+of the combat round. As a specialty ability, it cannot miss. At Battle 100,
 it does increased damage.
 
 Gain experience when you try to kick something.
 
 See also: SHADOW KICK
 #
+KITE
+
+Kite (Battle ability)
+
+Usage:  kite
+Cooldown:  30 seconds
+Cost:  50 move
+
+You can kite opponents to keep them at range while you shoot them. However,
+your opponents must be stunned, entangled, or attacking someone else. If you
+use this ability while already at range, it will increase the time it takes
+for your opponent to run to you. Otherwise, it will move you back to ranged
+distance and start the run-in timer.
+
+Gain experience when you kite someone.
+#
+LACERATE
+
+Usage:  lacerate [victim]
+Battle Synergy Ability:  75 Survival
+Linked traits:  Melee role, Wits
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  3 blood
+
+Lacerate reduces your victim's physical resistance by opening up lots of
+tiny cuts.
+#
 "NOBLE BEARING"
 
-Noble Bearing
-Class ability: Duke
+Noble Bearing (Battle ability)
 
-Damage to your character is reduced by your Greatness rating.
+Damage to your character is reduced by your Greatness rating. Gain experience
+when you take damage.
 #
 "NULL MANA"
 
@@ -316,13 +537,38 @@ Quick Draw (Battle ability)
 
 Shoot more arrows before your enemies reach you by learning to draw more
 quickly, leading to more damage per second. This improves your ranged combat
-speed by 25% (or 35% as a class ability).
+speed by 25% (or 35% at Battle 100).
 
-The close-combat version of this ability is Finesse.
+The close-combat version of this ability is Finesse. It works on all ranged
+weapons, not just arrows.
 
-Gain experience when you successfully hit with an arrow.
+Gain experience when you successfully hit with a ranged weapon.
 
 See also: ARCHERY, SHOOT
+#
+PREPARED
+
+Usage:  prepared
+Battle Synergy Ability:  75 Trade
+Linked traits:  Melee role
+Cooldown:  12 seconds
+Duration:  12 seconds
+Cost:  13+ move (varies with level)
+
+Being prepared for battle boosts your physical damage.
+#
+SUNDER
+
+Usage:  sunder [victim]
+Battle Synergy Ability:  75 Trade
+Linked traits:  Tank role
+Debuff type:  Battle
+Cooldown:  9 seconds
+Duration:  9 seconds
+Cost:  11+ move (varies with level)
+
+Sunder opens up holes in your opponent's armor, making them more vulnerable
+to physical damage.
 #
 REFLEXES
 
@@ -332,14 +578,13 @@ With training, your reflexes become good enough that you dodge more often.
 This ability gives at least +10 dodge automatically.
 
 As a specialty ability, it adds 5% of your total level to your dodge.
-As a class ability, it adds 10% of your total level to your dodge.
+At Battle 100, it adds 10% of your total level to your dodge.
 
 This dodge bonus is reflected on your 'score'.
 
 Gain experience when someone tries to hit you.
 
-See also: SHIELD BLOCK, QUICK BLOCK, BLOCK ARROWS, MEDIUM ARMOR, OUTRAGE,
-    HEAVY ARMOR, RESCUE, DISARM
+See also: IMPROVED REFLEXES
 #
 RESCUE
 
@@ -396,13 +641,13 @@ By sparring, you can learn to hit more accurately. This ability gives at least
 +10 to-hit automatically.
 
 As a specialty ability, it adds 5% of your total level to your to-hit.
-As a class ability, it adds 10% of your total level to your to-hit.
+At Battle 100, it adds 10% of your total level to your to-hit.
 
 This to-hit bonus is reflected on your 'score'.
 
 Gain experience when you attack something.
 
-See also: LIGHT ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE
+See also: LIGHT ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE, FRENZY
 #
 SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
 
@@ -438,22 +683,72 @@ Usage:  summary
 
 This command shows a summary of you, your allies, and your enemies in combat.
 #
+"SUMMON BODYGUARD"
+
+Summon Bodyguard (Battle ability)
+
+Usage:  summon bodyguard
+Cooldown:  3 minutes
+Cost:  25 move
+
+This powerful ability allows you to summon a bodyguard. The bodyguard is strong
+enough to protect against many dangerous situations. He (or she) will take
+simple orders and will rescue you in battle.
+
+The bodyguard counts as a familiar, and can be removed with the "dismiss"
+command.
+
+Gains experience when you summon your bodyguard.
+
+See also: DISMISS, ORDER
+#
+"TRICK SHOTS"
+
+Trick Shots (Battle ability)
+
+Debuff type:  Battle
+
+Your ranged attacks get new effects based on attack type. Your chance to apply
+the effect on each shot is based on your Battle skill.
+
+Available affects:
+  bow (shoot) - Slows the victim.
+  crossbow (shoot) - Causes a stackable physical DoT.
+  pistol (shoot) - The victim loses dodge based on your Dexterity.
+  musket (shoot) - Causes a stackable physical DoT.
+
+Gain experience when fighting at range.
+
+See also: DODGE, DOT
+#
 "TWO-HANDED WEAPONS" "TWO HANDED WEAPONS" "TWOHANDED WEAPONS" "2HANDED WEAPONS" "2H"
 
 Two-Handed Weapons
-Class ability: Barbarian, Duke, Steelsmith
+Battle Synergy Ability: 100 Survival OR 100 Empire OR 100 Trade
 
 This ability allows you to use two-handed weapons. These weapons require that
 you don't have an item in your off-hand (hold) slot. Only certain powerful
-melee classes receive this ability.
+melee synergies receive this ability.
 
 Two-handed weapons are more powerful than ordinary weapons and are marked with
 the (2h) tag.
 #
+UNDERMINE
+
+Usage:  undermine [victim]
+Battle Synergy Ability:  75 Stealth
+Linked traits:  Melee role, Charisma
+Debuff type:  Battle
+Cooldown:  30 seconds
+Duration:  30 seconds
+Cost:  42+ move (varies with level)
+
+Undermine decreases your opponent's resistance to physical damage.
+#
 "WARD AGAINST MAGIC" "MAGIC WARD"
 
 Ward Against Magic
-Class ability: Barbarian, Reaper
+Battle Synergy Ability: 100 Survival OR 100 Vampire
 
 This ability allows characters to block magical attacks with their shields,
 albeit at a reduced rate. Your normal block chance is halved against magical
@@ -467,5 +762,16 @@ Weapon Proficiency (Battle ability)
 
 This ability allows you to use weapons. You can gain experience with it by
 fighting with any weapon.
+#
+WITHSTAND
+
+Usage:  withstand
+Battle Synergy Ability:  75 Survival
+Linked trait:  Tank role
+Cooldown:  12 seconds
+Duration:  12 seconds
+Cost:  5+ move (varies with level)
+
+Withstand increases your physical resistance.
 #
 $

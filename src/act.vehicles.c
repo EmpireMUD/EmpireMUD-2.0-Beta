@@ -33,6 +33,7 @@
 // local protos
 
 // external consts
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const bool is_flat_dir[NUM_OF_DIRS];
@@ -43,10 +44,13 @@ extern const int rev_dir[];
 extern int count_harnessed_animals(vehicle_data *veh);
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
+extern int get_north_for_char(char_data *ch);
 extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
-extern int perform_move(char_data *ch, int dir, int need_specials_check, byte mode);
+extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
+extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 void scale_item_to_level(obj_data *obj, int level);
+void skip_run_filler(char **string);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -81,8 +85,7 @@ void cancel_driving(char_data *ch) {
 	}
 	
 	snprintf(buf, sizeof(buf), "%s stops moving.\r\n", VEH_SHORT_DESC(veh));
-	CAP(buf);
-	msg_to_vehicle(veh, FALSE, buf);
+	msg_to_vehicle(veh, FALSE, "%s", CAP(buf));
 	
 	GET_DRIVING(ch) = NULL;
 	VEH_DRIVER(veh) = NULL;
@@ -316,7 +319,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	
 	// message driver
 	if (VEH_DRIVER(veh)) {
-		if (has_ability(VEH_DRIVER(veh), ABIL_NAVIGATION)) {
+		if (HAS_NAVIGATION(VEH_DRIVER(veh))) {
 			snprintf(buf, sizeof(buf), "You %s $V %s (%d, %d).", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 		}
 		else {
@@ -335,7 +338,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		}
 		
 		if (VEH_SITTING_ON(veh) != VEH_DRIVER(veh)) {
-			if (has_ability(VEH_SITTING_ON(veh), ABIL_NAVIGATION)) {
+			if (HAS_NAVIGATION(VEH_SITTING_ON(veh))) {
 				snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 			}
 			else {
@@ -352,7 +355,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
 			if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING)) {
 				act("You follow $N.\r\n", FALSE, fol->follower, NULL, VEH_SITTING_ON(veh), TO_CHAR);
-				perform_move(fol->follower, dir, TRUE, MOVE_FOLLOW);
+				perform_move(fol->follower, dir, MOVE_FOLLOW);
 			}
 		}
 	}
@@ -362,7 +365,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 			LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 				if (ch_iter->desc && ch_iter != VEH_DRIVER(veh)) {
-					if (has_ability(ch_iter, ABIL_NAVIGATION)) {
+					if (HAS_NAVIGATION(ch_iter)) {
 						snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 					}
 					else {
@@ -389,8 +392,13 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 * @return bool TRUE if successful, FALSE on fail.
 */
 bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, int mode) {
+	extern bool can_steal(char_data *ch, empire_data *emp);
 	extern bool can_take_obj(char_data *ch, obj_data *obj);
-	void get_check_money(char_data *ch, obj_data *obj);
+	extern bool get_check_money(char_data *ch, obj_data *obj);
+	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
+	
+	bool stealing = FALSE;
+	empire_data *emp;
 
 	if (!bind_ok(obj, ch)) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -399,6 +407,20 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, NULL, TO_CHAR);
 		return FALSE;
+	}
+	
+	if ((emp = VEH_OWNER(veh)) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && !can_use_vehicle(ch, veh, GUESTS_ALLOWED)) {
+		stealing = TRUE;
+		
+		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
+			// sends own message
+			return FALSE;
+		}
+		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+			// can_steal() technically checks this, but it isn't always called
+			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
+			return FALSE;
+		}
 	}
 	
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
@@ -411,6 +433,28 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 			obj_to_char(obj, ch);
 			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR);
 			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM);
+			
+			if (stealing) {
+				if (emp && IS_IMMORTAL(ch)) {
+					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+				}
+				else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+				}
+				
+				if (!IS_IMMORTAL(ch)) {
+					GET_STOLEN_TIMER(obj) = time(0);
+					GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
+					trigger_distrust_from_stealth(ch, emp);
+					gain_ability_exp(ch, ABIL_STEAL, 50);
+					add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
+				}
+			}
+			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+				// un-steal if this was the original owner
+				GET_STOLEN_TIMER(obj) = 0;
+			}
+			
 			get_check_money(ch, obj);
 			return TRUE;
 		}
@@ -430,7 +474,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh) {
 	char_data *mort;
 	
-	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
+	if (!drop_otrigger(obj, ch, DROP_TRIG_PUT)) {	// also takes care of obj purging self
 		return FALSE;
 	}
 	
@@ -566,11 +610,11 @@ void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont
 * @param char_data *ch The character doing the driving.
 */
 void process_driving(char_data *ch) {
-	extern int get_north_for_char(char_data *ch);
-	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-	
-	int dir = GET_ACTION_VNUM(ch, 0), subcmd = GET_ACTION_VNUM(ch, 2);
+	int dir = GET_ACTION_VNUM(ch, 0), new_dir, dist, subcmd = GET_ACTION_VNUM(ch, 2);
+	struct vehicle_room_list *vrl;
+	char_data *ch_iter;
 	vehicle_data *veh;
+	bool done = FALSE;
 	
 	// translate 'dir' from the way the character THINKS he's going, to the actual way
 	dir = confused_dirs[get_north_for_char(ch)][0][dir];
@@ -611,13 +655,45 @@ void process_driving(char_data *ch) {
 	if (GET_ACTION_VNUM(ch, 1) > 0) {
 		GET_ACTION_VNUM(ch, 1) -= 1;
 		
-		// arrived!
+		// finished this part of the drive!
 		if (GET_ACTION_VNUM(ch, 1) <= 0) {
-			look_at_room(ch);	// show them where they stopped
-			msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
-			cancel_action(ch);
-			return;
+			if (GET_MOVEMENT_STRING(ch)) {
+				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &new_dir, &dist, FALSE) && new_dir != -1 && new_dir != DIR_RANDOM && (subcmd == SCMD_PILOT || is_flat_dir[new_dir])) {
+					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, new_dir);
+					GET_ACTION_VNUM(ch, 1) = dist;
+					
+					// alert whole vehicle
+					if (new_dir != dir && VEH_ROOM_LIST(veh)) {
+						LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+							LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
+								if (ch_iter != ch && ch_iter->desc) {
+									snprintf(buf, sizeof(buf), "$V %s %s.", "turns to the", dirs[get_direction_for_char(ch_iter, new_dir)]);
+									act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR);
+								}
+							}
+						}
+					}
+				}
+				else {	// count not get next dir/dist
+					done = TRUE;
+				}
+			}
+			else {	// no movement string
+				done = TRUE;
+			}
 		}
+	}
+	
+	if (done) {
+		look_at_room(ch);	// show them where they stopped
+		msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
+		cancel_action(ch);
+		return;
+	}
+	
+	// not stopped by anything? auto-look each move
+	if (PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
+		look_at_room(ch);
 	}
 }
 
@@ -908,6 +984,10 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
 		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (flint ? "strikes $p and lights" : "lights"));
 		act(buf, FALSE, ch, flint, veh, TO_ROOM);
 		start_vehicle_burning(veh);
+		
+		if (VEH_OWNER(veh)) {
+			add_offense(VEH_OWNER(veh), OFFENSE_BURNED_VEHICLE, ch, IN_ROOM(ch), offense_was_seen(ch, VEH_OWNER(veh), IN_ROOM(veh)) ? OFF_SEEN : NOBITS);
+		}
 	}
 }
 
@@ -1393,7 +1473,7 @@ ACMD(do_dispatch) {
 	}
 	
 	// destination validation
-	else if (GET_ISLAND_ID(IN_ROOM(veh)) == NO_ISLAND) {
+	else if (!GET_ISLAND(IN_ROOM(veh))) {
 		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
 	}
 	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {
@@ -1566,7 +1646,7 @@ ACMD(do_drag) {
 	else {
 		// seems okay enough -- try movement
 		was_in = IN_ROOM(ch);
-		if (!perform_move(ch, dir, FALSE, 0) || IN_ROOM(ch) == was_in) {
+		if (!perform_move(ch, dir, NOBITS) || IN_ROOM(ch) == was_in) {
 			// failure here would have sent its own message
 			return;
 		}
@@ -1661,23 +1741,32 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	struct vehicle_room_list *vrl;
-	bool was_driving, same_dir;
+	bool was_driving, same_dir, dir_only;
 	char_data *ch_iter;
 	vehicle_data *veh;
 	obj_data *portal;
 	int dir, dist = -1;
-
-	// 2nd arg (dist) is optional
-	two_arguments(argument, dir_arg, dist_arg);
+	
+	skip_run_filler(&argument);
+	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word
 	
 	// basics
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (!*dir_arg && GET_ACTION(ch) == drive_data[subcmd].action) {
-		cancel_action(ch);
+	else if (!*argument && GET_ACTION(ch) == drive_data[subcmd].action) {
+		if (GET_ACTION_VNUM(ch, 1) == -1) {
+			msg_to_char(ch, "You are currently %s %s.\r\n", drive_data[subcmd].verb, dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+		}
+		else {
+			msg_to_char(ch, "You are currently %s %d tile%s %s.\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+		}
+		
+		if (GET_MOVEMENT_STRING(ch)) {
+			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_MOVEMENT_STRING(ch));
+		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != drive_data[subcmd].action) {
 		msg_to_char(ch, "You're too busy doing something else.\r\n");
@@ -1717,28 +1806,27 @@ ACMD(do_drive) {
 	}
 	
 	// target arg
-	else if (!*dir_arg) {
-		msg_to_char(ch, "Which direction would you like to %s?\r\n", drive_data[subcmd].command);
+	else if (!*argument) {
+		msg_to_char(ch, "You must specify a path to %s using a combination of directions and distances.\r\n", drive_data[subcmd].command);
 	}
-	else if ((dir = parse_direction(ch, dir_arg)) == NO_DIR) {
-		if ((portal = get_obj_in_list_vis(ch, dir_arg, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+	else if (dir_only && (dir = parse_direction(ch, argument)) == NO_DIR) {
+		if ((portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 			do_drive_through_portal(ch, veh, portal, subcmd);
 		}
 		else {
-			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", dir_arg, drive_data[subcmd].command);
+			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
 		}
+	}
+	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
+		// sends own error
+	}
+	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
+		msg_to_char(ch, "Invalid path string.\r\n");
 	}
 	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir, FALSE) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
 		msg_to_char(ch, "You can't %s that direction.\r\n", drive_data[subcmd].command);
 	}
-	else if (GET_ACTION(ch) == drive_data[subcmd].action && GET_ACTION_VNUM(ch, 0) == dir && !*dist_arg) {
-		msg_to_char(ch, "You are already %s that way.\r\n", drive_data[subcmd].verb);
-	}
-	else if (*dist_arg && (!isdigit(*dist_arg) || (dist = atoi(dist_arg)) < 1)) {
-		snprintf(buf, sizeof(buf), "%s how far!?\r\n", drive_data[subcmd].command);
-		CAP(buf);
-		send_to_char(buf, ch);
-	}
+	
 	else {
 		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
 		
@@ -1750,13 +1838,15 @@ ACMD(do_drive) {
 		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
 		GET_ACTION_VNUM(ch, 2) = subcmd;
 		
+		if (GET_MOVEMENT_STRING(ch)) {
+			free(GET_MOVEMENT_STRING(ch));
+		}
+		GET_MOVEMENT_STRING(ch) = dir_only ? NULL : str_dup(argument);
+		
 		GET_DRIVING(ch) = veh;
 		VEH_DRIVER(veh) = ch;
 		
-		if (same_dir) {
-			msg_to_char(ch, "You will now stop after %d tiles.\r\n", dist);
-		}
-		else if (was_driving) {
+		if (was_driving && !same_dir) {
 			msg_to_char(ch, "You turn %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
 		}
 		else {
@@ -1779,8 +1869,8 @@ ACMD(do_drive) {
 
 
 ACMD(do_fire) {
-	void besiege_room(room_data *to_room, int damage);
-	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage);
+	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	
 	char veh_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *veh_targ;
@@ -1866,7 +1956,7 @@ ACMD(do_fire) {
 			}
 			
 			secttype = SECT(room_targ);
-			besiege_room(room_targ, dam);
+			besiege_room(ch, room_targ, dam);
 			
 			if (SECT(room_targ) != secttype) {
 				msg_to_char(ch, "It is destroyed!\r\n");
@@ -1885,7 +1975,7 @@ ACMD(do_fire) {
 				trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
 			}
 			
-			besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+			besiege_vehicle(ch, veh_targ, dam, SIEGE_PHYSICAL);
 		}
 		
 		// delays
@@ -1965,7 +2055,7 @@ ACMD(do_lead) {
 		GET_LEADING_VEHICLE(ch) = NULL;
 	}
 	else if (IS_NPC(ch)) {
-		msg_to_char(ch, "Npcs can't lead anything.\r\n");
+		msg_to_char(ch, "NPCs can't lead anything.\r\n");
 	}
 	else if (GET_SITTING_ON(ch)) {
 		msg_to_char(ch, "You can't lead anything while you're sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));
@@ -2055,7 +2145,7 @@ ACMD(do_load_vehicle) {
 		msg_to_char(ch, "Usage: load <mob | vehicle | all> <onto vehicle>\r\n");
 	}
 	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
-		msg_to_char(ch, "You don't see %s %s here.\r\n", arg2, AN(arg2));
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
 	}
 	else if (!VEH_IS_COMPLETE(cont)) {
 		msg_to_char(ch, "You must finish constructing it before anything can be loaded %sto it.\r\n", IN_OR_ON(cont));

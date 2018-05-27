@@ -4,7 +4,8 @@ New here? There's a few things you should read as you go:
 
 - The INFO command shows a really good newbie guide.
 - Typing HELP by itself lists a bunch of suggested commands and topics.
-- Use the QUEST command and try the tutorial quests in the newbie area.
+- Use the QUEST command and try the tutorial quests in the newbie area. You
+  can also get tutorial quests from many common items.
 - HELP EMPIRE GUIDE for help starting an empire.
 - HELP HOUSING GUIDE will help you build your first house.
 - HELP IRON GUIDE will guide you through mining and forging.
@@ -15,7 +16,7 @@ Are you a vampire? Try HELP VAMPIRE GUIDE.
 Are you using a screen reader? There's more info on HELP SCREEN READERS.
 Having trouble finding help on a topic? Try HELPSEARCH.
 
-See also: DEPLETION, LEVELS, SKILL CAPS, DAILY BONUS EXPERIENCE
+See also: DEPLETION, LEVELS, SKILL CAPS, DAILY BONUS EXPERIENCE, TUTORIAL
 #
 "EMPIRE GUIDE"
 
@@ -96,13 +97,13 @@ entrance to face. If you want to place your building in the woods, you can
 clear out the necessary space during the next phase.
 
 Once you've picked a nice spot, you will need your building materials. Typing
-HELP CABIN reveals that you will need a total of 6 logs for construction. That
-means you will need to find some trees, which are hopefully not too far away.
-You will want to make sure to WIELD your trusty axe and proceed to CHOP while
-in a forest tile. A fully grown forest tile will provide 4 trees, so you will
-have to clear out 2 map tiles of dense forest for all of the material. If you
-are building your CABIN in the woods, these two tiles can be for placement of
-the building.
+BUILD INFO CABIN reveals that you will need a total of 6 logs for construction.
+That means you will need to find some trees, which are hopefully not too far
+away. You will want to make sure to WIELD your trusty axe and proceed to CHOP
+while in a forest tile. A fully grown forest tile will provide 4 trees, so you
+will have to clear out 2 map tiles of dense forest for all of the material. If
+you are building your CABIN in the woods, these two tiles can be for placement
+of the building.
 
 After chopping down 6 trees, you will want to SCRAPE TREE to convert the trees
 into logs and sticks. After all the scraping, you will end up with six logs
@@ -188,6 +189,21 @@ making. FORGE PICK to help you MINE, FORGE SHOVEL to help when you DIG, and you
 can even FORGE AXE to replace that stone age one you've been using.
 
 Type INFO for other getting-started tips.
+#
+TUTORIAL TUTORIALS
+
+EmpireMUD offers tutorial quests to help you learn the game. Most of these
+quests reward you with some bonus experience.
+
+If you aren't interested in tutorials, you can turn them off by typing
+'toggle tutorials'.
+
+You can also find tutorial zones at the following locations:
+ - The Soulstream (general) at any Tower of Souls.
+ - The Royal Planning Office (empire progress) -- currently disabled.
+ - The Museum of Early Man (Trade skill) on the newbie island.
+
+See also: NEARBY, QUEST, TOGGLE
 #
 "VAMPIRE GUIDE"
 

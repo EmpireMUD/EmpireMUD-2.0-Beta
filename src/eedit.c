@@ -32,10 +32,10 @@
 #define EEDIT(name)		void (name)(char_data *ch, char *argument, empire_data *emp)
 
 // externs
-void eliminate_linkdead_players();
 
 // locals
 EEDIT(eedit_adjective);
+EEDIT(eedit_admin_flags);
 EEDIT(eedit_banner);
 EEDIT(eedit_change_leader);
 EEDIT(eedit_description);
@@ -126,8 +126,7 @@ bool valid_empire_name(char *newname) {
 	extern char *invalid_list[MAX_INVALID_NAMES];
 	extern int num_invalid;
 
-	char *ptr, buf[MAX_STRING_LENGTH];
-	char tempname[MAX_INPUT_LENGTH];
+	char *ptr, tempname[MAX_INPUT_LENGTH];
 	bool ok = TRUE;
 	int iter;
 	
@@ -137,8 +136,8 @@ bool valid_empire_name(char *newname) {
 	}
 	
 	// check fill/reserved
-	strcpy(buf, newname);
-	if (fill_word(buf) || reserved_word(buf)) {
+	strcpy(tempname, newname);
+	if (fill_word(tempname) || reserved_word(tempname)) {
 		ok = FALSE;
 	}
 	
@@ -151,10 +150,18 @@ bool valid_empire_name(char *newname) {
 		
 		// compare to banned names
 		for (iter = 0; iter < num_invalid && ok; ++iter) {
-			if (strstr(tempname, invalid_list[iter])) {
-				ok = FALSE;
+			if (*invalid_list[iter] == '%') {	// leading % means substr
+				if (strstr(tempname, invalid_list[iter] + 1)) {
+					ok = FALSE;
+				}
+			}
+			else {	// otherwise exact-match
+				if (!str_cmp(tempname, invalid_list[iter])) {
+					ok = FALSE;
+				}
 			}
 		}
+
 	}
 	
 	return ok;
@@ -204,12 +211,16 @@ bool valid_rank_name(char_data *ch, char *newname) {
  //////////////////////////////////////////////////////////////////////////////
 //// CONTROL STRUCTURE ///////////////////////////////////////////////////////
 
+#define EEDIT_FLAG_IMM_ONLY  BIT(0)	// only a cimpl or granted imm can do this
+
+
 const struct {
 	char *command;
 	EEDIT(*func);
 	bitvector_t flags;
 } eedit_cmd[] = {
 	{ "adjective", eedit_adjective, NOBITS },
+	{ "adminflags", eedit_admin_flags, EEDIT_FLAG_IMM_ONLY },
 	{ "banner", eedit_banner, NOBITS },
 	{ "changeleader", eedit_change_leader, NOBITS },
 	{ "description", eedit_description, NOBITS },
@@ -244,6 +255,10 @@ ACMD(do_eedit) {
 	
 	// find type?
 	for (iter = 0; *eedit_cmd[iter].command != '\n' && type == NOTHING; ++iter) {
+		if (!imm_access && IS_SET(eedit_cmd[iter].flags, EEDIT_FLAG_IMM_ONLY)) {
+			continue;
+		}
+		
 		if (is_abbrev(arg, eedit_cmd[iter].command)) {
 			type = iter;
 		}
@@ -262,17 +277,22 @@ ACMD(do_eedit) {
 		msg_to_char(ch, "Available eedit commands: ");
 		found = FALSE;
 		for (iter = 0; *eedit_cmd[iter].command != '\n'; ++iter) {
+			if (!imm_access && IS_SET(eedit_cmd[iter].flags, EEDIT_FLAG_IMM_ONLY)) {
+				continue;
+			}
+			
 			msg_to_char(ch, "%s%s", (found ? ", " : ""), eedit_cmd[iter].command);
 			found = TRUE;
 		}
 		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
 	}
+	else if (!imm_access && IS_SET(eedit_cmd[type].flags, EEDIT_FLAG_IMM_ONLY)) {
+		msg_to_char(ch, "You don't have permission to do that.\r\n");
+	}
 	else {
 		// pass to child function
 		(eedit_cmd[type].func)(ch, argptr, emp);
-		
-		// always save
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
@@ -321,6 +341,23 @@ EEDIT(eedit_adjective) {
 		
 		if (emp != GET_LOYALTY(ch)) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's adjective form to %s", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_ADJECTIVE(emp));
+		}
+	}
+}
+
+
+EEDIT(eedit_admin_flags) {
+	extern const char *empire_admin_flags[];
+	
+	bitvector_t old_flags = EMPIRE_ADMIN_FLAGS(emp);
+	char buf[MAX_STRING_LENGTH];
+	
+	EMPIRE_ADMIN_FLAGS(emp) = olc_process_flag(ch, argument, "admin flags", NULL, empire_admin_flags, EMPIRE_ADMIN_FLAGS(emp));
+	
+	if (EMPIRE_ADMIN_FLAGS(emp) != old_flags) {
+		if (emp != GET_LOYALTY(ch)) {
+			prettier_sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, buf);
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's admin flags to: %s", GET_NAME(ch), EMPIRE_NAME(emp), buf);
 		}
 	}
 }
@@ -689,8 +726,6 @@ EEDIT(eedit_num_ranks) {
 		msg_to_char(ch, "You must choose a number of ranks between 2 and %d.\r\n", MAX_RANKS);
 	}
 	else {
-		eliminate_linkdead_players();
-		
 		// update all players
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 			if (index->loyalty != emp) {

@@ -87,19 +87,19 @@ You can eat pears, or plant them.
 6 bl a 4
 24 11102 0
 7 168
-I 15 11107 100.00 4 x  # SEPARATE: a juicy pear
+I 15 11107 100.00 4 x  # SEPARATE: a ripe pear
 O
 9 bq
 R
 5114 0
 S
 #11107
-pear juicy~
-a juicy pear~
-Someone has dropped a juicy pear nearby.~
+pear ripe~
+a ripe pear~
+Someone has dropped a ripe pear nearby.~
 This is just one pear, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 4
+6 0 a 5
 6 0 0
 7 48
 I 14 11106 100.00 4 x  # COMBINE: some juicy pears
@@ -154,9 +154,14 @@ a pouch of viper venom~
 A pouch of viper venom rests nearby.~
 This small pouch of viper venom could come in handy.
 ~
-26 0 a 2
-11 30 0
+26 m a 4
+0 15 -1
 7 0
+C
+125 125
+R
+5193 0
+T 1273
 S
 #11112
 pouch skink saliva~
@@ -164,9 +169,15 @@ a pouch of skink saliva~
 A pouch of skink saliva rests nearby.~
 This small pouch of skink saliva could come in handy.
 ~
-26 0 a 2
-1 30 0
+26 m a 3
+0 15 -1
 7 0
+A
+15 -1 0
+C
+125 125
+R
+5193 0
 S
 #11113
 stone glowing green serpent~
@@ -416,11 +427,9 @@ A hunk of jeweled slag cools nearby.~
 was intricately beautiful, is nonetheless worth its weight in .. Well, gold and
 jewels!
 ~
-15 0 a 1
+15 0 a 2
 16 0 0
 4 0
-R
-5184 a
 R
 5611 a
 S

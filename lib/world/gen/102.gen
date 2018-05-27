@@ -1,0 +1,91 @@
+#10200
+Goblin Challenge boss attack~
+3 0
+0 0 0 0
+T0
+Your Goblin Challenge boss attack cooldown has ended.~
+S
+#10201
+off-balance~
+4 0
+0 0 0 0
+T0
+You regain your balance.~
+S
+#10202
+powerful blow~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by the powerful blow.~
+S
+#10203
+bleeding wounds~
+4 0
+0 0 0 0
+T0
+Your wounds stop bleeding.~
+S
+#10204
+flanking~
+4 0
+0 0 0 0
+T0
+Your flanking wears off.~
+T1
+$n is no longer flanking.~
+S
+#10205
+goblinfire~
+4 0
+0 0 0 0
+T0
+You are no longer surrounded in goblinfire.~
+S
+#10206
+knockout punch~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by Zelkab's punch.~
+S
+#10207
+regeneration~
+4 0
+0 0 0 0
+T0
+Your regeneration wears off.~
+T1
+$n stops regenerating.~
+S
+#10208
+poison arrow~
+4 0
+0 0 0 0
+T0
+You are no longer poisoned by the poisoned arrow.~
+S
+#10209
+explosion~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by the explosion.~
+S
+#10210
+shield block~
+4 0
+0 0 0 0
+T0
+Your shield block wears off.~
+T1
+$n lowers $s shield.~
+S
+#10211
+spellstorm~
+4 0
+0 0 0 0
+T0
+The spellstorm fades.~
+S
+$

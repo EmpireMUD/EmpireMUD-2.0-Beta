@@ -15,6 +15,21 @@ You can reset your ability purchases with "skill reset <skill>".
 
 See also: SKILLS, SKILL CAPS, DAILY BONUS EXPERIENCE
 #
+BARDE BARDING "ARMORED HORSE"
+
+Usage:  barde <mount>
+Location:  stable
+Cost:  10x (common metal)
+
+Barding allows you to put armor on your noble steeds. This makes them less
+vulnerable to attack, and more impressive to look upon. Many mounts can be
+barded. You can only barde mounts in a stable. You cannot remove barding from
+mounts.
+
+Barded mounts will not de-spawn like normal animals.
+
+See also: RIDE, STABLE
+#
 BATHE 
 
 Usage:  bathe 
@@ -24,6 +39,8 @@ You must bathe regularly to keep clean. If you bathe in a bath house you will
 get cleaner faster than if you were to bathe in a river.
 #
 CHIP
+
+Chip (Primitive Crafts ability)
 
 Usage:  chip <item>
 Speed boosts:  Faster Chores bonus
@@ -38,7 +55,7 @@ See also: CRAFT
 #
 CHOP
 
-Chop (Chores ability)
+Chop (Primitive Crafts ability)
 
 Usage:  chop
 Speed boosts:  Faster Chores bonus, haste, higher axe damage, higher Strength
@@ -47,7 +64,7 @@ This command allows you to chop trees in the forest. Beware, trees are a
 limited resource. Different types of forest give different qualities and
 quantities of trees. Some trees can be scraped, sawed, or lit on fire.
 
-See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT, CHORES
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT
 #
 "DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
@@ -111,9 +128,6 @@ Speed boosts:  Faster Chores bonus, Finder ability, haste, shovel
 This lets you claw at the ground until you find something useful. Among
 things that may be found, rocks, flint, and clay are the most common.
 
-Using a shovel or having the Finder ability will each cut your dig time in
-half.
-
 See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL, SCAVENGING
 #
 DISMANTLE
@@ -176,7 +190,7 @@ See also: DRAG, LEAD
 #
 HARVEST HARVESTING
 
-Harvest (Chores ability)
+Harvest (Primitive Crafts ability)
 
 Usage:  harvest
 Speed boosts:  Faster Chores bonus, haste
@@ -185,39 +199,45 @@ Allows you to harvest a crop. Be careful that you also replant some,
 otherwise you'll run out of that crop quickly. You must be wielding a slashing
 or slicing weapon (sword or axe) to harvest crops.
 
-See also: PLANT, CHORES
+See also: PLANT
 #
 HERD HERDING
 
 Usage:  herd <animal> <direction>
 
-This command is useful in herding animals into stables and fenced-in areas.
+This command is useful in herding animals into stables or out of the way. For
+mountable creatures or ones that are pulling carts, try 'lead' instead.
+
+See also: LEAD
 #
 LEAD 
 
-Usage:  lead [vehicle]
+Usage:  lead [mount | vehicle]
 
 The lead command is used to move vehicles around. Once you are leading a
 vehicle, it will move with you until type "lead" again to stop. Some vehicles
-need you to harness animals to them before they can move.
+need you to harness animals to them before they can move. You can also lead
+any animal which is mountable.
 
 Some vehicles can't be led.
 
 Example:  
   > lead horse 
 
-See also: BOARD, DRAG, HARNESS
+See also: BOARD, DRAG, HARNESS, HERD
 #
 LIGHT TORCH
 
 Usage:  light <item | vehicle>
 
 To light something, you must have a flint set. You may light sticks to create
-torches. You can also light trees or logs to make camp fires.
+torches. You can also light trees or logs to make camp fires. Dropping a torch
+(or lighting a fire) may burn down the building it's in, if it's unowned or you
+are at war with the owner.
 
-You can also burn down some vehicles with this command.
+You can also burn down some vehicles with the 'light' command.
 
-See also: COOKING FIRE, DOUSE
+See also: COOKING FIRE, DOUSE, THROW
 #
 MILK
 
@@ -228,9 +248,9 @@ container to hold the milk. Cows can be milked once or twice per day.
 #
 MILL MILLING
 
-Mill (Chores ability)
+Mill (Basic Crafts ability)
 
-Building:  (MM)  Mill  (Basic Buildings)
+Building:  (MM)  Mill  (must be by a river; Build ability)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>
@@ -238,16 +258,17 @@ Command:  mill [number] <item>
 You can mill:
   wheat into flour
   corn into cornmeal
+  oats into oatmeal
 
 You must do this at a Mill building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, CHORES, RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES
 #
 MINE MINES
 
-Mine (Chores ability)
+Mine (Primitive Crafts ability)
 
-Building:  &y/&0[]&y\&0  Mine  (Basic Buildings)
+Building:  &y/&0[]&y\&0  Mine  (Build ability)
 Speed boosts:  Faster Chores bonus, haste, higher pick damage, higher Strength
 Command:  mine
 
@@ -262,7 +283,7 @@ dismantle a mine, its mountain will reset when the MUD celebrates a new year
 tile will involve digging a new mine shaft and the mineral found there could be
 completely different.
 
-Mines count as in-city territory as far away as 3x a city's normal radius.
+Mines count as in-city territory as far away as 4x a city's normal radius.
 
 See HELP IRON GUIDE for help getting started on mining and using iron.
 
@@ -275,13 +296,13 @@ Types of mines:
   imperium - only found with Rare Metals
   moonstone - only found with Rare Metals
 
-See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS, CHORES
+See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 #
 MINT
 
-Mint (Chores ability)
+Mint (Basic Crafts ability)
 
-Building:  [MM]  Mint  (Commerce ability)
+Building:  [MM]  Mint  (Trade Routes goal)
 Fame:  5
 Speed boosts:  Faster Chores bonus
 Command:  mint <object>
@@ -290,7 +311,7 @@ The mint building allows you to mint valuable metals into coins. Each building
 can only mint coins for the empire it belongs to. The mint command will auto-
 repeat; stopping the action will give you back the item you were minting.
 
-See also: COINS, COMMERCE, STOP, CHORES
+See also: COINS, STOP
 #
 MORPH MORPHING SHAPESHIFTING FASTMORPH
 
@@ -320,7 +341,7 @@ See also: SKILLS
 #
 PLANT
 
-Plant (Chores ability)
+Plant (Primitive Crafts ability)
 
 Usage:  plant <seed/food>
 Speed boosts:  Faster Chores bonus, haste
@@ -341,11 +362,11 @@ Jungle: light jungle
 Light jungle is jungle which has been partially chopped, but not reduced to
 plains.
 
-See also: CROPS, HARVEST, PICK, CHORES
+See also: CROPS, HARVEST, PICK
 #
 PRESS PRESSING OILMAKING "OIL MAKING"
 
-Press (Chores ability)
+Press (Basic Crafts ability)
 
 Command:  press [number] <item>
           press info <item>
@@ -355,8 +376,7 @@ You can press:
 
 You must do this at an Oilmaker building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CHORES, CRAFT INFO,
-  RECIPES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES
 #
 READY
 
@@ -388,7 +408,7 @@ Example:
 #
 SAW
 
-Saw (Chores ability)
+Saw (Primitive Crafts ability)
 
 Usage:  saw <item>
 Speed boosts:  Faster Chores bonus, haste
@@ -398,11 +418,11 @@ will go faster if you have the Woodworking ability.
 
 Not all types of trees can be sawed.
 
-See also: TREES, LOGS, LUMBER, CHORES
+See also: TREES, LOGS, LUMBER
 #
 SCRAPE
 
-Scrape (Chores ability)
+Scrape (Primitive Crafts ability)
 
 Usage:  scrape <item>
 Speed boosts:  Faster Chores bonus, haste
@@ -411,7 +431,7 @@ This skill is used to process some types of trees into logs.
 
 The Woodworking ability increases how fast you can scrape.
 
-See also: TREES, SAW, WOODWORKING, PILLAR, CHORES
+See also: TREES, SAW, WOODWORKING, PILLAR
 #
 SHEAR SHEARING
 
@@ -431,9 +451,17 @@ have matching arrows in your inventory. You will attack with your arrows
 one at a time, while the target runs at you. Once the target reaches you,
 you will draw your weapon and begin melee battle. 
 
+If you shoot someone who also has a ranged weapon, or if they're fighting
+someone else, you can stay at range indefinitely. You can manually cancel
+ranged combat by typing 'approach'.
+
+Use the 'use' command to set a default arrow (or other ammo) type.
+
 Example:  
 
   > shoot deer 
+
+See also: APPROACH, USE
 #
 SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
@@ -442,6 +470,7 @@ Usage:  skills -- list all skills
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
+        skill synergy <skill 1> <skill 2> -- see list of synergy abilities
         skill swap
 
 This multi-purpose command helps you understand your skills. It shows your
@@ -461,6 +490,10 @@ Resetting a skill only resets your current set (see SKILL SWAP).
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
+When you use an ability, its level is limited to your level in its parent skill
+unless you have 100 in that skill, in which case it scales all the way up to
+your full level.
+
 See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
    ABILITY POINTS, SKILL SWAP, LETHEIAN ICON
 #
@@ -469,8 +502,8 @@ See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
 Skills are capped at certain levels to limit the number of abilities any one
 character can have. When you reach 50 or 75 in a skill, you will stop gaining
 points in that skill. To choose that skill for further advancement as one of
-your specialty or class skills, use the "specialize" command. This will get you
-a free level in the skill.
+your specialty or synergy skills, use the "specialize" command. This will get
+you a free level in the skill.
 
 * You can have two skills at 100. These are your class skills.
   These skills will get 16 abilities each.
@@ -479,10 +512,10 @@ a free level in the skill.
 * The rest of the skills are limited to 50. These are basic skills.
   These skills will get 9 abilities each.
 
-You can get a second specialty skill (75) if you keep two of your skills at
-zero (0). Once you have fewer than two skills at zero, you can no longer choose
-to specialize an extra skill. The opposite is also true: if you specialize an
-extra skill, you'll no longer be able to gain in your last two zeroes.
+You can get a second specialty skill (75) if you keep one of your basic skills
+at zero (0). Once you have no basic skills left at zero, you can no longer
+choose to specialize an extra skill. The opposite is also true: if you
+specialize an extra skill, you'll no longer be able to gain in your last zero.
 
 You can use 'skill drop' if you want to lower one of your skills so that you
 can then start raising a different one.
@@ -523,6 +556,26 @@ Swapping skill sets takes 15 seconds and cannot be done in combat.
 
 See also: SKILLS, SLEEP
 #
+SYNERGY SYNERGIES "SYNERGY ABILITY" "SKILL SYNERGY"
+
+Usage:  skill synergy <skill 1> <skill 2>
+
+Some skills have 'synergy abilities', which are abilities you get automatically
+when you also have another skill. The required level of each skill varies for
+some synergy abilities, but they often both have to be at 100. Synergy
+abilities do not cost you an ability point. Some abilities require you to be
+in the right role.
+
+For example, with Natural Magic 100 and Battle 100, you receive Resurrect.
+
+Typing the 'skill synergy' command will let you see synergy abilities between
+any two skills.
+
+You can type 'role' to see your current synergy abilities. Check the help files
+for the various skills for a list of synergy abilities.
+
+See also: ROLE, SKILLS
+#
 "TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
 You can gain skill experience and levels by using any of the "yellow" abilities
@@ -542,7 +595,7 @@ See also: SKILL CAPS, SPECIALIZE, SKILLS
 #
 SMELT MELT
 
-Smelt (Chores ability)
+Smelt (Basic Crafts ability)
 
 Usage:  smelt [number] <type of ingot/bar>
 Speed boosts:  Faster Chores bonus
@@ -557,7 +610,7 @@ than their raw form. To return bars to their ingot form, use 'separate'.
 Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory.
 
-See also: CRAFT INFO, METAL, SEPARATE, WEALTH, CHORES, RECIPES
+See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES
 #
 SPECIALIZE SPECIALTY
 
@@ -565,7 +618,7 @@ Usage:  specialize <skill>
 
 This command allows you to choose which skills become your class skills and
 specialties. You can only specialize a skill that's at 50 (the basic skill cap)
-or 75 (the specialty skill cap). Doing this will gain you a free point in the
+or 75 (the specialty skill cap). Doing this will gain you a free level in the
 skill and allow you to continue leveling it.
 
 NOTE: This is a temporary command. In the future, we intend to use quests and
@@ -597,9 +650,9 @@ creatures, items, or bodyguards. Each may serve a different purpose, so you
 should consult the help file for the specific summon ability you're using.
 
 See also:
-SUMMON BODYGUARD  (Empire ability)
+SUMMON BODYGUARD  (Battle ability)
 SUMMON ANIMALS  (Natural Magic ability)
-SUMMON GUARDS  (Empire ability)
+SUMMON GUARDS  (unskilled)
 SUMMON HUMANS  (Vampire ability)
 SUMMON MATERIAlS  (High Sorcery ability)
 SUMMON PLAYER  (at an Astral Nexus)
@@ -627,11 +680,14 @@ See also: BUILD, DISMANTLE, SEW, CLAIM, ABANDON
 #
 UPGRADE
 
-Usage:  upgrade
+Usage:  upgrade [type]
 
 This is used to upgrade your guard towers into more powerful towers. They can
 still shoot while you upgrade them, but people will also be able to walk
 inside and sabotage them. You can also upgrade shipyards to make bigger ships.
+
+Some buildings can upgrade into more than one different building. In this case,
+you must type the name of the building you want to upgrade to (or part of it).
 
 See also: BUILD, SHIPYARD, GUARDTOWER
 #

@@ -1,0 +1,21 @@
+#18800
+Halloween Candy Quests~
+Paul Clarke and Owen Morris~
+   This adventure contains mobs, items, and quests for the Halloween season. 
+It does not have instances. Instead, players find the content in the form of
+candies dropped by all mobs in the game.
+
+To activate Halloween content:
+ .global edit 18802
+ .flag remove in-dev
+ .save
+
+To deactivate Halloween content:
+ .global edit 18802
+ .flag add in-dev
+ .save
+~
+18800 18899 0-0
+1 30 a 0
+S
+$

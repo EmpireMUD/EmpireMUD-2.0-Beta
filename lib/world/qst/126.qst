@@ -1,0 +1,105 @@
+#12601
+Earth Elemental Essence~
+   An earth elemental has escaped! Find it, defeat it, and bring its essence
+back to the apprentice so he can re-summon the elemental before his master
+notices it escaped. You can use 'where earth' to find the elemental if it is
+nearby, and 'where apprentice' to find the apprentice again afterwards.
+~
+   The sorcerer's apprentice looks relieved that you have retrieved the essence
+of the earth elemental. You have earned favor with the apprentice. Use 'list'
+and 'buy' to spend this favor. You can also type 'coins' to see how much favor
+you have.
+~
+4 d 0 25 60
+A
+1 12600
+A
+2 12601
+R
+8 12600 1
+R
+0 0 1
+W
+2 12601 0 1
+Z
+1 12600
+S
+#12602
+Fire Elemental Essence~
+   A fire elemental has escaped! Find it, defeat it, and bring its essence back
+to the apprentice so he can re-summon the elemental before his master notices
+it escaped. You can use 'where fire' to find the elemental if it is nearby, and
+'where apprentice' to find the apprentice again afterwards.
+~
+   The sorcerer's apprentice looks relieved that you have retrieved the essence
+of the fire elemental. You have earned favor with the apprentice. Use 'list'
+and 'buy' to spend this favor. You can also type 'coins' to see how much favor
+you have.
+~
+5 d 0 25 60
+A
+1 12600
+A
+2 12602
+R
+8 12600 1
+R
+0 0 1
+W
+2 12602 0 1
+Z
+1 12600
+S
+#12603
+Wind Elemental Essence~
+   A wind elemental has escaped! Find it, defeat it, and bring its essence back
+to the apprentice so he can re-summon the elemental before his master notices
+it escaped. You can use 'where wind' to find the elemental if it is nearby, and
+'where apprentice' to find the apprentice again afterwards.
+~
+   The sorcerer's apprentice looks relieved that you have retrieved the essence
+of the wind elemental. You have earned favor with the apprentice. Use 'list'
+and 'buy' to spend this favor. You can also type 'coins' to see how much favor
+you have.
+~
+6 d 0 25 60
+A
+1 12600
+A
+2 12603
+R
+8 12600 1
+R
+0 0 1
+W
+2 12603 0 1
+Z
+1 12600
+S
+#12604
+Water Elemental Essence~
+   A water elemental has escaped! Find it, defeat it, and bring its essence
+back to the apprentice so he can re-summon the elemental before his master
+notices it escaped. You can use 'where water' to find the elemental if it is
+nearby, and 'where apprentice' to find the apprentice again afterwards.
+~
+   The sorcerer's apprentice looks relieved that you have retrieved the essence
+of the water elemental. You have earned favor with the apprentice. Use 'list'
+and 'buy' to spend this favor. You can also type 'coins' to see how much favor
+you have.
+~
+7 d 0 25 60
+A
+1 12600
+A
+2 12604
+R
+8 12600 1
+R
+0 0 1
+W
+2 12604 0 1
+Z
+1 12600
+S
+$

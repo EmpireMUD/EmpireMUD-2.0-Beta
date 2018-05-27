@@ -73,11 +73,12 @@ S
 #258
 pipe peace~
 a peace pipe~
-A piece pipe is lying on the ground.~
+A peace pipe is lying on the ground.~
    This pipe is a symbol of peace, and smoking it is considered sacred. It
 looks like you could type 'smoke' to use it.
+Usage:  smoke <herb>
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 6 0
 R

@@ -9,6 +9,21 @@ nails. There are currently no objects which fill this type.
 
 See also: COMPONENT
 #
+ARROW ARROWS AMMUNITION AMMO
+
+In ranged combat, you will automatically use the best ammunition (e.g. arrows)
+in your inventory. But you can also give a preference with the 'use' command,
+which will cause you to use that type of arrow first.
+
+See also: USE
+#
+BEEHIVE "BEE HIVE" HIVE
+
+Beehives are used to build the Apiary building, and can also be stored there.
+You require Advanced Woodworking to craft a beehive.
+
+See also: ADVANCED WOODWORKING, APIARY
+#
 BONES "BONE COMPONENT"
 
 Bone (component)
@@ -29,7 +44,7 @@ The Block component is the building block of most buildings, and consists of
 stone blocks and clay bricks. Any recipes that call for (block) allow the use
 of either, while some buildings require a specific one:
 
-bunch:  clay bricks
+bunch of:  clay bricks
 single:  stone block
 
 You can quarry stone blocks from the ground at a quarry. They are used in
@@ -65,15 +80,21 @@ If you become hungry, you'll lose your well-fed effect early.
 
 See also: EAT, FAMILY RECIPES
 #
-CANOE
+CANOE RAFT
 
 Canoe (vehicle)
+Raft (vehicle)
 
 Required ability:  Basic Crafts
 
-A good canoe will allow you to cross rivers as well as oceans. And unlike
-swimming, you won't be bothered by sharks. To use a canoe, drag it to the shore
-and then sit in it. After that, use "sail" to move it.
+A good canoe or raft will allow you to cross rivers as well as oceans. And
+unlike swimming, you won't be bothered by sharks. To use a one of these
+vehicles, drag it to the shore and then sit in/on it. After that, use "sail"
+to move it.
+
+The difference between the canoe and raft is the material used to make it.
+Rafts are made from rough desert wood, while canoes are hollowed out of
+temperate trees.
 
 See also: SAIL, SWIMMING, SHIPBUILDING
 #
@@ -147,12 +168,28 @@ the components from other players.
 
 The first tier of crafter items comes at level 100:
   Head: clockwork goggles (requires a clockwork lens array from an Artificer)
-  Clothes: guildmaster tunic (requires guild-patterned cloth from a Guildsman)
+  Clothes: guildmaster tunic (requires guild-patterned cloth from an
+           Antiquarian)
   Waist: utility belt (requires some clips and buckles from a Tinker)
   Off-hand: steel multitool (needs a set of delicate tools from a Steelsmith)
 
-See also: ARTIFICER, CRAFT, ENCHANT, FORGE, GUILDSMAN, SCORE, SEW, STEELSMITH,
-   TINKER
+See also: CRAFT, ENCHANT, FORGE, SCORE, SEW
+#
+"DISTILLED HERBS" "ADVANCED HERBS" "HERB JARS" "JAR HERBS"
+
+Distilled herbs are herbs that have been processed to make them more potent, so
+that you can make more powerful potions. You must have the 'Healing Elixirs'
+ability to 'brew' these from herbs.
+
+The distilled herbs are:
+ distilled whitegrass
+ fiveleaf resin
+ redthorn extract
+ magewhisper essence
+ concentrated daggerbite
+ bileberry juice
+
+See also: FIND HERBS, HEALING ELIXIRS
 #
 "DROP FLAGS" "LOOT QUALITY FLAGS" "HARD DROP" "GROUP DROP" "GENERIC DROP" HARD-DROP GROUP-DROP GENERIC-DROP 
 
@@ -311,9 +348,16 @@ Herb (component)
 Used for:  potions, poisons, crafting
 
 The herb component type covers all the herbs which can be found using the Find
-Herbs ability. Most recipes call for a specific herb, though.
+Herbs ability. Most recipes call for a specific herb, though. The basic herbs
+are:
+ whitegrass
+ fiveleaf
+ redthorn
+ magewhisper
+ daggerbite
+ bileberries
 
-See also: COMPONENT, FIND HERBS, MIX, BREW
+See also: COMPONENT, DISTILLED HERBS, FIND HERBS, MIX, BREW
 #
 "IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
 
@@ -523,6 +567,12 @@ SEEDS "SEED COMPONENT" "SEEDS COMPONENT"
 Seeds (component)
 
 Used for:  nothing
+
+While there are not currently any generic uses for the 'seeds' component type,
+some crops use seeds for planting. However, most crops are planted using the
+harvested item (e.g. a bunch of apples).
+
+See also: PLANT
 #
 SKIN SKINS "SKIN COMPONENT"
 
@@ -622,7 +672,6 @@ Masterwork abilities:
   Forge - Master Blacksmith
   Pottery - Master Craftsman
   Woodworking - Master Craftsman
-  Healing Elixirs and Wrath of Nature Potions are masterworks if you have both
 
 See also: SCALABLE CRAFTS
 #
@@ -800,7 +849,7 @@ See also: COMPONENT, COOK, FRUIT
 #
 WAREHOUSE
 
-Building:  {WW}  Warehouse  (Artisans skill)
+Building:  {WW}  Warehouse  (Foundations goal)
 
 Command:  warehouse inventory [item keywords]
           warehouse identify <item keywords>
@@ -830,6 +879,6 @@ You retrieve a short sword (x4).
 Note: Immortals can see the warehouse lists for other empires using the syntax
 "warehouse inv <empire> [keywords]".
 
-See also: ARTISANS, KEEP, RETRIEVE, STORE, VAULT
+See also: KEEP, RETRIEVE, STORE, VAULT
 #
 $

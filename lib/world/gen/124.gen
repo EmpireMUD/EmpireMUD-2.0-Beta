@@ -1,0 +1,145 @@
+#12400
+goblin pirate cave enemy ability~
+3 0
+0 0 0 0
+S
+#12402
+golden goblin grog~
+1 0
+4 2 2 0
+T0
+golden goblin grog~
+T1
+seasick green~
+S
+#12403
+goblin coins~
+5 0
+0 0 0 0
+T0
+golden goblin~
+T1
+golden goblins~
+S
+#12417
+parrot whistle~
+3 0
+0 0 0 0
+T0
+Your parrot whistle cooldown has ended.~
+S
+#12418
+hydra conch~
+3 0
+0 0 0 0
+T0
+Your hydra conch cooldown has ended.~
+S
+#12419
+ankle stab~
+4 0
+0 0 0 0
+T0
+You are no longer suffering from being stabbed in the ankle.~
+S
+#12420
+goblin grog~
+4 0
+0 0 0 0
+T0
+Your goblin grog wears off.~
+S
+#12421
+pocket sand~
+4 0
+0 0 0 0
+T0
+You are no longer blinded by pocket sand.~
+S
+#12422
+parrot attack~
+4 0
+0 0 0 0
+T0
+You stop covering your eyes as the parrot flies away.~
+T1
+$n stops covering $s eyes as the parrot flies away.~
+S
+#12423
+parrot attack~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding from the parrot attack.~
+S
+#12424
+hydra venom~
+4 0
+0 0 0 0
+T0
+You are no longer affected by hydra venom.~
+S
+#12425
+regeneration~
+4 0
+0 0 0 0
+T0
+Your regeneration wears off.~
+S
+#12427
+hydrokinesis~
+4 0
+0 0 0 0
+T0
+Your hydrokinesis wears off.~
+S
+#12428
+crushing grip~
+4 0
+0 0 0 0
+S
+#12429
+pressure wave~
+4 0
+0 0 0 0
+T0
+You are no longer affected by Scylla's pressure wave.~
+S
+#12430
+crushing grip~
+4 0
+0 0 0 0
+T0
+You are no longer held in a crushing grip.~
+T1
+$n is no longer held in a crushing grip.~
+S
+#12431
+struggle~
+3 0
+0 0 0 0
+T0
+Your struggle cooldown has ended.~
+S
+#12433
+frostbrand~
+4 0
+0 0 0 0
+T0
+You are no longer affected by the magic of Scylla's sword.~
+S
+#12435
+drowning curse~
+4 0
+0 0 0 0
+T0
+Fathma's drowning curse finally wears off.~
+S
+#12438
+ice bolt~
+4 0
+0 0 0 0
+T0
+You are no longer affected by that ice bolt.~
+S
+$

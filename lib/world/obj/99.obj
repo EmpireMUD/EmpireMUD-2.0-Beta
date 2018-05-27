@@ -310,4 +310,16 @@ Type 'use whistle' to summon it.
 2 0
 T 9900
 S
+#9926
+whistle heisenbug~
+a heisenbug whistle~
+A heisenbug whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 8
+9926 0 0
+2 0
+T 9900
+S
 $

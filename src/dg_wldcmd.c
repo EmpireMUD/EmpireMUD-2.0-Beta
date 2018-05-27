@@ -337,7 +337,7 @@ WCMD(do_wregionecho) {
 		wld_log(room, "wregionecho called with invalid target");
 	}
 	else {
-		center = get_map_location_for(center);
+		center = GET_MAP_LOC(center) ? real_room(GET_MAP_LOC(center)->vnum) : NULL;
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
@@ -501,8 +501,8 @@ WCMD(do_wdoor) {
 
 
 WCMD(do_wsiege) {
-	void besiege_room(room_data *to_room, int damage);
-	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage);
+	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -550,11 +550,11 @@ WCMD(do_wsiege) {
 	
 	if (room_targ) {
 		if (validate_siege_target_room(NULL, NULL, room_targ)) {
-			besiege_room(room_targ, dam);
+			besiege_room(NULL, room_targ, dam);
 		}
 	}
 	else if (veh_targ) {
-		besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL);
 	}
 	else {
 		wld_log(room, "wsiege: invalid target");
@@ -791,6 +791,11 @@ WCMD(do_wforce) {
 		else
 			wld_log(room, "wforce: no target found");
 	}
+}
+
+
+WCMD(do_wheal) {
+	script_heal(room, WLD_TRIGGER, argument);
 }
 
 
@@ -1187,7 +1192,7 @@ WCMD(do_wmorph) {
 
 
 WCMD(do_wdamage) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
 	int type;
@@ -1202,6 +1207,13 @@ WCMD(do_wdamage) {
 
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
+	}
+	
+	// send negatives to %heal% instead
+	if (modifier < 0) {
+		sprintf(buf, "%s health %.2f", name, -atof(modarg));
+		script_heal(room, WLD_TRIGGER, buf);
+		return;
 	}
 	
 	ch = get_char_by_room(room, name);
@@ -1262,11 +1274,20 @@ WCMD(do_waoe) {
 
 WCMD(do_wdot) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
+	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
 	int type, max_stacks;
 
 	argument = one_argument(argument, name);
+	// sometimes name is an affect vnum
+	if (*name == '#') {
+		atype = atoi(name+1);
+		argument = one_argument(argument, name);
+		if (!find_generic(atype, GENERIC_AFFECT)) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
 	argument = one_argument(argument, typearg);	// optional, defualt: physical
@@ -1300,7 +1321,7 @@ WCMD(do_wdot) {
 	}
 
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, get_room_scale_level(room, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_room_scale_level(room, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 
@@ -1425,7 +1446,7 @@ WCMD(do_wrestore) {
 			free_resource_list(GET_BUILDING_RESOURCES(rtarg));
 			GET_BUILDING_RESOURCES(rtarg) = NULL;
 			COMPLEX_DATA(rtarg)->damage = 0;
-			COMPLEX_DATA(rtarg)->burning = 0;
+			COMPLEX_DATA(rtarg)->burn_down_time = 0;
 		}
 	}
 }
@@ -1492,8 +1513,7 @@ WCMD(do_wscale) {
 			scale_item_to_level(obj, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = read_object(GET_OBJ_VNUM(obj), TRUE);
-			scale_item_to_level(fresh, level);
+			fresh = fresh_copy_obj(obj, level);
 			swap_obj_for_obj(obj, fresh);
 			extract_obj(obj);
 		}
@@ -1519,6 +1539,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wechoaround", do_wsend, SCMD_WECHOAROUND },
 	{ "wechoneither", do_wechoneither, NO_SCMD },
 	{ "wforce", do_wforce, NO_SCMD },
+	{ "wheal", do_wheal, NO_SCMD },
 	{ "wload", do_wload, NO_SCMD },
 	{ "wmorph", do_wmorph, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },

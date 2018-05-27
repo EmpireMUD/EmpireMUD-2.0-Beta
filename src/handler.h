@@ -18,6 +18,7 @@
 #define AVG_DURATION	BIT(1)
 #define ADD_MODIFIER	BIT(2)
 #define AVG_MODIFIER	BIT(3)
+#define SILENT_AFF		BIT(4)	// prevents messaging
 
 
 // for find_all_dots
@@ -51,33 +52,36 @@
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
-#define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
+#define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME))))
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// handler.c protos ////////////////////////////////////////////////////////
 
 // affect handlers
-void affect_from_char(char_data *ch, int type, bool show_msg);
-void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg);
-void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bool show_msg);
-void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool show_msg);
+void affect_from_char(char_data *ch, any_vnum type, bool show_msg);
+void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg);
+void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg);
+void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster, bool show_msg);
 void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg);
-void affect_from_room(room_data *room, int type);
-void affect_from_room_by_bitvector(room_data *room, int type, bitvector_t bits, bool show_msg);
+void affect_from_room(room_data *room, any_vnum type);
+void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t bits, bool show_msg);
 void affect_join(char_data *ch, struct affected_type *af, int flags);
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add);
 void affect_remove(char_data *ch, struct affected_type *af);
 void affect_remove_room(room_data *room, struct affected_type *af);
+void affect_to_char_silent(char_data *ch, struct affected_type *af);
 void affect_to_char(char_data *ch, struct affected_type *af);
 void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
-extern bool affected_by_spell(char_data *ch, int type);
-extern bool affected_by_spell_and_apply(char_data *ch, int type, int apply);
-extern struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
+void affect_total_room(room_data *room);
+extern bool affected_by_spell(char_data *ch, any_vnum type);
+extern bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply);
+bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster);
+extern struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
+void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
-extern bool room_affected_by_spell(room_data *room, int type);
+extern bool room_affected_by_spell(room_data *room, any_vnum type);
 void show_wear_off_msg(char_data *ch, int atype);
 
 // affect shortcut macros
@@ -110,6 +114,7 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 void cleanup_all_coins();
 void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);
+extern int count_total_coins_as(char_data *ch, empire_data *type);
 extern obj_data *create_money(empire_data *type, int amount);
 #define decrease_coins(ch, emp, amount)  increase_coins(ch, emp, -1 * amount)
 extern double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to);
@@ -122,10 +127,14 @@ extern const char *money_desc(empire_data *type, int amount);
 extern int total_coins(char_data *ch);
 
 // cooldown handlers
-void add_cooldown(char_data *ch, int type, int seconds_duration);
-extern int get_cooldown_time(char_data *ch, int type);
+void add_cooldown(char_data *ch, any_vnum type, int seconds_duration);
+extern int get_cooldown_time(char_data *ch, any_vnum type);
 void remove_cooldown(char_data *ch, struct cooldown_data *cool);
-void remove_cooldown_by_type(char_data *ch, int type);
+void remove_cooldown_by_type(char_data *ch, any_vnum type);
+
+// currency handlers
+extern int add_currency(char_data *ch, any_vnum vnum, int amount);
+extern int get_currency(char_data *ch, any_vnum vnum);
 
 // empire handlers
 void abandon_room(room_data *room);
@@ -139,6 +148,11 @@ extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_emp
 #define decrease_empire_coins(emp_gaining, coin_empire, amount)  increase_empire_coins((emp_gaining), (coin_empire), -1 * (amount))
 void perform_abandon_room(room_data *room);
 void perform_claim_room(room_data *room, empire_data *emp);
+
+// empire needs handlers
+void add_empire_needs(empire_data *emp, int island, int type, int amount);
+extern struct empire_needs *get_empire_needs(empire_data *emp, int island, int type);
+extern bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t status);
 
 // empire targeting handlers
 extern struct empire_city_data *find_city(empire_data *emp, room_data *loc);
@@ -225,8 +239,14 @@ extern obj_data *unequip_char_to_room(char_data *ch, int pos);
 // custom message handlers
 extern struct custom_message *copy_custom_messages(struct custom_message *from);
 void free_custom_messages(struct custom_message *mes);
-extern char *get_custom_message(obj_data *obj, int type);
-extern bool has_custom_message(obj_data *obj, int type);
+extern char *get_custom_message(struct custom_message *list, int type);
+extern bool has_custom_message(struct custom_message *list, int type);
+
+// custom message helpers
+#define obj_get_custom_message(obj, type)  get_custom_message(obj->custom_msgs, type)
+#define obj_has_custom_message(obj, type)  has_custom_message(obj->custom_msgs, type)
+#define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)
+#define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 
 // object targeting handlers
 extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);
@@ -244,12 +264,19 @@ extern obj_data *get_obj_world(char *name);
 extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
 void remove_offers_by_type(char_data *ch, int type);
 
+// player tech handlers
+void add_player_tech(char_data *ch, any_vnum abil, int tech);
+extern bool has_player_tech(char_data *ch, int tech);
+void remove_player_tech(char_data *ch, any_vnum abil);
+extern bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
+
 // requirement handlers
 void free_requirements(struct req_data *list);
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);
+void remove_depletion_from_list(struct depletion_data **list, int type);
 void remove_depletion(room_data *room, int type);
 void set_depletion(room_data *room, int type, int value);
 
@@ -259,12 +286,20 @@ void attach_template_to_room(room_template *rmt, room_data *room);
 void detach_building_from_room(room_data *room);
 
 // room extra data handlers
-void add_to_room_extra_data(room_data *room, int type, int add_value);
-extern struct room_extra_data *find_room_extra_data(room_data *room, int type);
-extern int get_room_extra_data(room_data *room, int type);
-void multiply_room_extra_data(room_data *room, int type, double multiplier);
-void remove_room_extra_data(room_data *room, int type);
-void set_room_extra_data(room_data *room, int type, int value);
+void add_to_extra_data(struct room_extra_data **list, int type, int add_value);
+extern struct room_extra_data *find_extra_data(struct room_extra_data *list, int type);
+extern int get_extra_data(struct room_extra_data *list, int type);
+void multiply_extra_data(struct room_extra_data **list, int type, double multiplier);
+void remove_extra_data(struct room_extra_data **list, int type);
+void set_extra_data(struct room_extra_data **list, int type, int value);
+
+// room extra data helpers (backwards-compatibility and shortcuts)
+#define add_to_room_extra_data(room, type, add_value)  add_to_extra_data(&ROOM_EXTRA_DATA(room), type, add_value)
+#define find_room_extra_data(room, type)  find_extra_data(ROOM_EXTRA_DATA(room), type)
+#define get_room_extra_data(room, type)  get_extra_data(ROOM_EXTRA_DATA(room), type)
+#define multiply_room_extra_data(room, type, multiplier)  multiply_extra_data(&ROOM_EXTRA_DATA(room), type, multiplier);
+#define remove_room_extra_data(room, type)  remove_extra_data(&ROOM_EXTRA_DATA(room), type)
+#define set_room_extra_data(room, type, value)  set_extra_data(&ROOM_EXTRA_DATA(room), type, value)
 
 // room targeting handlers
 extern room_data *find_target_room(char_data *ch, char *rawroomstr);
@@ -277,12 +312,11 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 
 // storage handlers
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
-extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list);
+extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool use_kept, struct resource_data **build_used_list);
 extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
-extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount);
+extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool include_kept);
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
-extern int find_lowest_storage_loc(obj_data *obj);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
 extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);
 extern bool obj_can_be_stored(obj_data *obj, room_data *loc);
@@ -349,6 +383,7 @@ extern int get_reputation_by_name(char *name);
 extern int get_reputation_value(char_data *ch, any_vnum vnum);
 extern bool has_reputation(char_data *ch, any_vnum faction, int rep);
 extern int rep_const_to_index(int rep_const);
+void set_reputation(char_data *ch, any_vnum vnum, int rep);
 
 // fight.c
 void appear(char_data *ch);
@@ -374,6 +409,13 @@ extern int limit_crowd_control(char_data *victim, int atype);
 void perform_morph(char_data *ch, morph_data *morph);
 
 // objsave.c
+
+// progress.c
+void cancel_empire_goal(empire_data *emp, struct empire_goal *goal);
+extern struct empire_goal *get_current_goal(empire_data *emp, any_vnum vnum);
+extern bool empire_has_completed_goal(empire_data *emp, any_vnum vnum);
+extern time_t when_empire_completed_goal(empire_data *emp, any_vnum vnum);
+
 
 /**
 * This crash-saves all players in the game.

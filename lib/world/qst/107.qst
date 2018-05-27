@@ -23,6 +23,8 @@ S
 Hey Diddle Diddle~
    Hey diddle diddle, it seems the cat has lost its fiddle. Find the fiddle and
 return it to the musical cat in exchange for a starry cloak.
+   You can 'use' the fiddle to teleport back to the nearest Mother Goose
+adventure. From there, try 'where musical' to find the cat.
 ~
    You give the cat his fiddle. He seems so grateful that he immediately plays
 you a little tune:
@@ -33,11 +35,9 @@ you a little tune:
  To see such sport,
  And the dish ran away with the spoon.
 ~
-4 d 0 25 0
+6 d 0 25 0
 A
 2 10730
-A
-1 10730
 R
 2 10731 1
 W
@@ -50,6 +50,8 @@ To Fetch a Pail of Water~
    Jack and his sister are trying to fetch a pail of water, but it seems they
 lost their pail. Return the pail to Jack and receive a fetching pair of
 trousers.
+   You can 'use' the pail to teleport back to the nearest Mother Goose
+adventure. From there, try 'where jack' or 'where jill' to find them.
 ~
 You give Jack the pail. In exchange, he sings you a little rhyme:
 Jack and Jill went up the hill
@@ -57,13 +59,12 @@ To fetch a pail of water.
 Jack fell down and broke his crown,
 And Jill came tumbling after.
 ~
-2 d 1 25 0
-A
-1 10732
+5 d 1 25 0
 A
 2 10732
 R
 2 10733 1
+T 10740
 W
 2 10732 0 1
 Z
@@ -73,20 +74,21 @@ S
 Jill Came Tumbling After~
    Jill and her brother are trying to fetch a pail of water, but it seems they
 lost their pail. Return the pail to Jill and receive a fetching skirt.
+   You can 'use' the pail to teleport back to the nearest Mother Goose
+adventure. From there, try 'where jack' or 'where jill' to find them.
 ~
-You give Jack the pail. In exchange, she sings you a little rhyme:
+You give Jill the pail. In exchange, she sings you a little rhyme:
 Jack and Jill went up the hill
 To fetch a pail of water.
 Jack fell down and broke his crown,
 And Jill came tumbling after.
 ~
-3 d 1 25 0
-A
-1 10733
+7 d 1 25 0
 A
 2 10732
 R
 2 10745 1
+T 10740
 W
 2 10732 0 1
 Z
@@ -97,6 +99,8 @@ Jack Be Nimble (unlit candlestick)~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
 jumping shoes.
+   You can 'use' the candlestick to teleport back to the nearest Mother Goose
+adventure. From there, try 'where nimble' to find the right Jack.
 ~
    You hand Jack his candlestick, which he lights and proceeds to jump over.
 He looks no worse for the wear, other than his singed shoes. He chants a little
@@ -106,11 +110,9 @@ Jack be quick,
 Jack jump over
 The candlestick.
 ~
-4 d 0 25 0
+8 d 0 25 0
 A
 2 10734
-A
-1 10734
 R
 2 10736 1
 W
@@ -123,6 +125,8 @@ Jack Be Nimble (lit candlestick)~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
 jumping shoes.
+   You can 'use' the candlestick to teleport back to the nearest Mother Goose
+adventure. From there, try 'where nimble' to find the right Jack.
 ~
    You hand Jack his candlestick, which he immediately jumps over. He
 looks no worse for the wear, other than his singed shoes. He chants a little
@@ -132,7 +136,7 @@ Jack be quick,
 Jack jump over
 The candlestick.
 ~
-7 d 0 25 0
+8 d 0 25 0
 A
 2 10735
 R
@@ -148,18 +152,18 @@ Jack Sprat Could Eat No Fat~
    Jack Sprat is looking for the fatty ham which he was to share with his wife.
 Jack is all skin and bones, and looks like he needs the ham more than you do.
 Perhaps if you return it to him, he'll give you his old belt.
+   You can 'use' the ham to teleport back to the nearest Mother Goose
+adventure. From there, try 'where sprat' to find the right Jack.
 ~
 You give Jack the fatty ham, and he sings you a little tune:
-Jack Spart could eat no fat.
+Jack Sprat could eat no fat.
 His wife could eat no lean.
 And so between them both, you see,
 They licked the platter clean.
 ~
-6 d 0 25 0
+9 d 0 25 0
 A
 2 10737
-A
-1 10737
 R
 2 10738 1
 W
@@ -171,6 +175,8 @@ S
 Little Jack Horner Sat In The Corner~
    Little Jack Horner is looking for his Christmas pie. If you find it and
 return it, Jack might give you his old gloves.
+   You can 'use' the pie to teleport back to the nearest Mother Goose
+adventure. From there, try 'where horner' to find the right Jack.
 ~
 You hand Jack his pie, which he takes eagerly and sings:
 Little Jack Horner
@@ -180,11 +186,9 @@ He put in his thumb,
 And pulled out a plum,
 And said 'What a good boy am I!'
 ~
-6 d 0 25 0
+8 d 0 25 0
 A
 2 10739
-A
-1 10739
 R
 2 10740 1
 W
@@ -196,6 +200,8 @@ S
 Eating Her Curds And Whey~
    Little Miss Muffet has lost her curds and whey. If you could find her lunch,
 she would happily give you a nice earring in exchange.
+   You can 'use' the curds to teleport back to the nearest Mother Goose
+adventure. From there, try 'where muffet' to find her.
 ~
    Miss Muffet quickly snatches the meal and sits down to eat, while a voice
 nearby sings:
@@ -206,11 +212,9 @@ Along came a spider
 Who sat down beside her
 And frightened Miss Muffet away.
 ~
-7 d 0 25 0
+9 d 0 25 0
 A
 2 10741
-A
-1 10741
 R
 2 10742 1
 W
@@ -222,6 +226,8 @@ S
 Its Fleece Was White As Snow~
    Mary has lost her little lamb. Or, more importantly, the bell that calls the
 lamb. Return it to her in exchange for a warm reward.
+   You can 'use' the bell to teleport back to the nearest Mother Goose
+adventure. From there, try 'where mary' to find her.
 ~
 Mary takes the bell and gives it a jingle while singing:
 Mary had a little lamb,
@@ -229,11 +235,9 @@ His fleece was white as snow,
 And everwhere that Mary went,
 The lamb was sure to go.
 ~
-8 d 0 25 0
+10 d 0 25 0
 A
 2 10744
-A
-1 10743
 R
 2 10743 1
 W
@@ -246,6 +250,8 @@ Some Broth Without Any Bread~
    The old woman in the giant shoe has lost the only thing she had to feed her
 children: her broth. If you could find it and return it to her, she might be
 able to spare a shoelace as reward.
+   You can 'use' the broth to teleport back to the nearest Mother Goose
+adventure, where you can turn in this quest.
 ~
 You give the soup to the old woman, who sings as she ladles:
 There was an old woman who lived in a shoe.
@@ -253,11 +259,9 @@ She had so many children, she didn't know what to do;
 So she gave them some broth without any bread;
 And she whipped them all soundly and sent them to bed.
 ~
-8 d 0 25 0
+10 d 0 25 0
 A
 2 10746
-A
-1 10746
 R
 2 10747 1
 W

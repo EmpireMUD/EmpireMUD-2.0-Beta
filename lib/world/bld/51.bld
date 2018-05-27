@@ -12,7 +12,7 @@ moment's notice and moved to another location. It also doesn't seem to offer
 much protection against the elements.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 25 2 1 0
 S
@@ -29,7 +29,7 @@ elsewhere. The cabin is also more permanent than the huts, it can't be taken
 down. It is, however, still susceptible to fire.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 25 2 1 0
 S
@@ -48,7 +48,7 @@ is planked with wood to trap in heat.
 R
 19 1 1 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #5103
 Mud Hut~
@@ -62,7 +62,7 @@ of mud and rocks and designed to withstand heavy desert heat. It can't be
 burned down, but provides little defense against invaders.
 ~
 R
-0 1 5 0
+1000 1 5 0
 R
 25 2 1 0
 S
@@ -79,7 +79,7 @@ difficult to destroy. It is the favored home of the desert-dwellers as
 pueblos can be very large.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 21 1 1 0
 S
@@ -98,7 +98,7 @@ of god.
 R
 19 1 1 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #5106
 Well~
@@ -141,7 +141,7 @@ M
 M
 237 5.00 ce
 R
-0 2 5 0
+1000 2 5 0
 S
 #5107
 Mine~
@@ -164,7 +164,7 @@ I 5 100 100.00 1 X  # DIG: a rock
 M
 232 5.00 c
 R
-0 2 5 0
+1000 2 5 0
 S
 #5108
 Forge~
@@ -185,9 +185,9 @@ hv
 M
 241 15.00 ce
 R
-16 1 1 0
+1009 1 5 0
 R
-19 1 1 0
+16 1 1 1048576
 S
 #5109
 Mill~
@@ -207,7 +207,7 @@ n
 M
 234 10.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -230,7 +230,7 @@ rG
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -241,7 +241,7 @@ A Noisy Stable~
 10 0 bgpR 0
 0 0 0 213
 C
-harness, herd, inventory, milk, mount, retrieve, shear, store~
+harness, herd, milk, mount, shear~
 D
    The air is thick here in the livery. It smells strongly of animal manure
 and feed, almost enough to make you flee out through the door. There are many
@@ -257,7 +257,7 @@ M
 M
 233 10.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -268,7 +268,7 @@ A Wooden Fence~
 4 0 dijmp 0
 0 0 0 -1
 R
-3 1 5 0
+1003 1 5 0
 R
 25 2 1 0
 S
@@ -279,7 +279,7 @@ A Wooden Gate~
 4 0 dijp 0
 0 0 0 -1
 R
-3 1 5 0
+1003 1 5 0
 R
 25 2 1 0
 S
@@ -298,7 +298,7 @@ shelves lining the walls of this building for storing jars and cans of
 assorted fruit. Some empty jars have been left on one of the tables.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 25 1 1 0
 S
@@ -318,7 +318,7 @@ the storage. The foundry helps empires to clean up their untidy land.
 F
 v
 R
-2 1 5 0
+1009 1 5 0
 R
 25 1 1 0
 S
@@ -339,7 +339,7 @@ to the grains that are stored here. A large rat is munching on some stray
 corn kernels.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 25 1 1 0
 S
@@ -360,7 +360,7 @@ are scattered all around the place. A pick that's so worn it looks more like
 a mace is lying at your feet.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 25 1 1 0
 S
@@ -382,7 +382,7 @@ scattered around your feet.
 F
 t
 R
-2 1 5 0
+1002 1 5 0
 R
 25 1 1 0
 S
@@ -404,7 +404,7 @@ ready to cook with them.
 F
 G
 R
-2 1 5 0
+1002 1 5 0
 R
 25 1 1 0
 S
@@ -426,7 +426,7 @@ z
 M
 241 15.00 ce
 R
-2 1 5 0
+1002 1 5 0
 R
 25 1 1 0
 S
@@ -445,7 +445,7 @@ hold anything from a scythe for harvesting to a hammer for building! The
 hooks are even labelled with a small picture to tell you which goes where.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 25 1 1 0
 S
@@ -463,7 +463,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 23 105 100.00 1  # QUARRY: a huge stone block
 R
-0 1 5 0
+1000 1 5 0
 S
 #5123
 Clay Pit~
@@ -476,9 +476,9 @@ dig~
 F
 f
 I 5 100 9.00 1 X  # DIG: a rock
-I 5 101 100.00 1 X  # DIG: a pile of clay
+I 5 101 100.00 1 X  # DIG: a lump of clay
 R
-0 1 5 0
+1000 1 5 0
 S
 #5124
 Stone House~
@@ -493,7 +493,7 @@ protection from fire, a feature which lesser buildings could never produce.
 The house seems somehow colder, though. Nevertheless, it is very inviting.
 ~
 R
-3 1 5 0
+1003 1 5 0
 R
 19 1 1 0
 S
@@ -510,7 +510,7 @@ robust, capable of supporting an entire family or more. It is ideal for the
 head of a plantation or as the seat of a small empire.
 ~
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -531,7 +531,7 @@ look for.
 R
 19 1 1 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #5127
 Tree Complex~
@@ -548,7 +548,7 @@ of wood and easily burnt, but it has the advantage of being very difficult to
 spot from afar.
 ~
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -607,7 +607,7 @@ aG
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -627,7 +627,7 @@ b
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -650,7 +650,7 @@ G
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -663,7 +663,7 @@ A Bridge Over the River~
 R
 21 1 1 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -684,7 +684,7 @@ furniture, as well as other things.
 F
 e
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -707,14 +707,14 @@ i
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
 #5136
 Pigeon Post~
 The Pigeon Post~
-&0[PP]~
+&0|PP|~
 10 0 pR 0
 0 0 0 263
 C
@@ -732,7 +732,7 @@ M
 M
 9024 20.00 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -755,7 +755,7 @@ y
 M
 241 15.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -799,7 +799,7 @@ M
 M
 232 1.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5138
@@ -822,7 +822,7 @@ many different and curious items.
 F
 E
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -833,7 +833,7 @@ On The Steps~
 4 0 dio 0
 0 0 0 -1
 R
-2 1 5 0
+1002 1 5 0
 S
 #5141
 Statue~
@@ -844,7 +844,7 @@ A Statue~
 C
 dedicate~
 R
-1 1 5 0
+1001 1 5 0
 R
 3 1 1 0
 S
@@ -861,7 +861,7 @@ k
 M
 243 30.00 c
 R
-1 1 5 0
+1001 1 5 0
 R
 3 1 1 0
 S
@@ -872,7 +872,7 @@ A Gigantic Megalith~
 48 1 d 0
 0 0 0 -1
 R
-1 1 5 0
+1001 1 5 0
 R
 3 1 1 0
 S
@@ -897,7 +897,7 @@ M
 M
 9199 2.00 0
 R
-2 1 5 0
+1002 1 5 0
 S
 #5145
 Park~
@@ -906,7 +906,7 @@ A Park~
 10 0 di 0
 0 0 0 -1
 R
-2 1 5 0
+1002 1 5 0
 S
 #5146
 Tomb~
@@ -935,7 +935,7 @@ M
 M
 9199 2.00 0
 R
-2 1 5 0
+1002 1 5 0
 S
 #5147
 Shrine~
@@ -952,7 +952,7 @@ sacrifices. That same activity leaves a horrid stench in the air, but that
 stench is what attracts patron gods.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 19 1 1 0
 S
@@ -973,7 +973,7 @@ down into the earth below.
 M
 244 20.00 c
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -997,7 +997,7 @@ l
 M
 9198 2.00 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1018,7 +1018,7 @@ state mandated by any god worthy of a temple of such stature.
 M
 244 20.00 c
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1050,7 +1050,7 @@ M
 M
 9197 2.00 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1072,7 +1072,7 @@ of larger pieces of equipment into the ship's hold.
 F
 g
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1093,11 +1093,11 @@ animals. Ships may also not be brought back in once they leave.
 F
 u
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 U
-5154
+0 5154
 S
 #5154
 Great Shipyard~
@@ -1116,7 +1116,7 @@ animals. Ships may also not be brought back in once they leave.
 F
 u
 R
-16 1 1 0
+16 1 1 1048576
 R
 21 1 1 0
 R
@@ -1129,7 +1129,7 @@ A Rickety Swamp Walk~
 10 0 dmp 0
 0 0 0 -1
 R
-5 1 5 0
+1005 1 5 0
 S
 #5156
 Platform~
@@ -1138,7 +1138,7 @@ A Platform in the Swamp~
 4 0 dp 0
 0 0 0 -1
 R
-5 1 5 0
+1005 1 5 0
 R
 25 1 1 0
 T 5156
@@ -1157,7 +1157,7 @@ hut is actually warm and inviting -- if you're the type that likes to live in
 a swamp.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
 25 2 1 0
 S
@@ -1174,7 +1174,7 @@ city. The roof is made of sticks and pitch, but the manor has been fireproofed
 and built to last.
 ~
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1192,7 +1192,7 @@ rotting trees and guarded by crocodiles. Inside, you find it well-constructed,
 safe, and delightfully far from civilization.
 ~
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1203,7 +1203,7 @@ The Courtyard~
 10 0 di 0
 0 0 0 -1
 R
-2 1 5 0
+1002 1 5 0
 S
 #5161
 Trapper~
@@ -1223,7 +1223,7 @@ M
 M
 9195 5.00 c
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1248,7 +1248,7 @@ M
 M
 236 10.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1314,7 +1314,7 @@ is supporting the stairs.
 M
 237 20.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1338,7 +1338,7 @@ portcullis gate~
 The portcullis is massive. It must take 5 men to close it.
 ~
 R
-16 2 1 0
+16 2 1 1048576
 R
 19 2 1 0
 S
@@ -1355,7 +1355,7 @@ most important parts of the castle as it shows the wealth of the king. It
 also leads to the throne room.
 ~
 R
-16 2 1 0
+16 2 1 1048576
 R
 19 2 1 0
 S
@@ -1379,11 +1379,11 @@ j
 M
 251 5.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 U
-5168
+0 5168
 S
 #5168
 Advanced Guard Tower~
@@ -1405,11 +1405,11 @@ j
 M
 251 5.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 U
-5169
+0 5169
 S
 #5169
 Superior Guard Tower~
@@ -1428,7 +1428,7 @@ j
 M
 251 5.00 ce
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1497,18 +1497,18 @@ M
 R
 3 1 1 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #5174
 Wall~
 A Stone Wall~
 @U&#VV@V~
-32 0 djk 0
+32 0 djkn 0
 0 0 0 -1
 R
 3 1 1 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #5175
 Intentionally Left Blank~
@@ -1535,7 +1535,7 @@ turn cranks to open and close the doors.
 R
 3 1 1 0
 R
-3 1 5 0
+1003 1 5 0
 S
 #5177
 Terraced Garden~
@@ -1547,7 +1547,7 @@ C
 pick~
 I 7 1202 100.00 1  # FIND-HERB: a twig of redthorn
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1561,7 +1561,7 @@ C
 pick~
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1576,7 +1576,7 @@ pick~
 I 7 1204 50.00 1 X  # FIND-HERB: a daggerbite frond
 I 7 1203 100.00 1 X  # FIND-HERB: some magewhisper sepals
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1590,7 +1590,7 @@ C
 pick~
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1602,9 +1602,9 @@ A Shady Garden~
 0 0 0 -1
 C
 pick~
-I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1629,7 +1629,7 @@ M
 M
 254 100.00 e
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
@@ -1653,7 +1653,7 @@ reads 'No Bartering'.
 F
 C
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1678,11 +1678,13 @@ D
 M
 254 33.00 c
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 R
 3 1 1 0
+U
+1 5611
 S
 #5185
 Portal~
@@ -1703,7 +1705,7 @@ q
 R
 3 1 1 0
 R
-7 1 5 0
+1007 1 5 0
 S
 #5186
 Rickety House~
@@ -1720,9 +1722,9 @@ the house, though it looks very dark and uninviting.
 M
 235 10.00 c
 R
-4 1 5 0
+1004 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5186
@@ -1744,9 +1746,9 @@ hollow echo follows you through the passage.
 M
 235 10.00 c
 R
-4 1 5 0
+1004 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5187
@@ -1767,9 +1769,9 @@ uncomfortable.
 M
 235 10.00 c
 R
-4 1 5 0
+1004 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5186
@@ -1791,9 +1793,9 @@ breeze flows from inside, sending the hair on your neck to full attention.
 M
 235 10.00 c
 R
-4 1 5 0
+1004 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 T 5187
@@ -1811,7 +1813,7 @@ x
 R
 3 1 1 0
 R
-7 1 5 0
+1007 1 5 0
 S
 #5191
 Draining Oasis~
@@ -1820,7 +1822,7 @@ A Draining Oasis~
 4 0 dp 0
 0 0 0 -1
 R
-5 1 5 0
+1005 1 5 0
 R
 25 1 1 0
 T 5191
@@ -1841,7 +1843,7 @@ heavy stone press in the other corner extracts the precious oil.
 F
 s
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1861,9 +1863,9 @@ collection of the spoils of many an adventure, though you can barely see it as
 the dusty air blocks what little light sneaks in between the relics.
 ~
 R
-2 1 5 0
+1002 1 5 0
 R
-16 1 1 0
+16 1 1 1048576
 R
 19 1 1 0
 S
@@ -1888,6 +1890,88 @@ M
 M
 9199 2.00 0
 R
-2 1 5 0
+1002 1 5 0
+S
+#5195
+Celestial Forge~
+The Celestial Forge~
+&W[FF]~
+48 5 0 0
+0 0 0 -1
+C
+shatter <item to destroy>~
+D
+   The towering stone walls of the celestial forge are offset just enough that
+light comes cascading through thousands of crevices, forming stars that dance
+around the room as the sun crosses the sky. The forge is so hot that you begin
+sweating instantly, unable to escape the powerful furnace.
+~
+F
+hv
+R
+3 2 1 0
+R
+1007 1 5 0
+T 5195
+S
+#5196
+Ocean Fishery~
+A Fishery on the Coast~
+&0(&a~~&0)~
+8 0 dpDL 0
+0 0 0 -1
+C
+fish~
+F
+I
+I 21 1302 33.00 1 f  # FISH: a giant linefish
+I 21 1303 33.00 1 f  # FISH: a magenta arrowfish
+I 21 1301 100.00 1 f  # FISH: a striped barbfish
+R
+1002 1 5 0
+R
+25 1 1 0
+S
+#5197
+Stilt House~
+A House on Stilts~
+&0|==|~
+10 0 pR em
+3 2 0 -1
+D
+   The calm sounds of rippling water fill the air as you look out the window of
+this raised wooden house. Despite its high perch, the house feels stable and
+seems well-built. It makes the perfect home for a fisherman.
+~
+R
+16 1 1 0
+R
+19 1 1 0
+S
+#5198
+Coastal Shrine~
+A Coastal Shrine~
+@w&0{}@e~
+16 2 dh 0
+0 0 0 -1
+C
+dedicate~
+R
+1002 1 5 0
+R
+19 1 1 0
+S
+#5199
+Mountain Well~
+A Deep Well on the Mountain~
+&y{&c~~&y}~
+4 0 d 0
+0 0 0 -1
+C
+drink, fill~
+F
+F
+R
+1000 2 5 0
 S
 $

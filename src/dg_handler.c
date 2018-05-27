@@ -23,6 +23,12 @@
 #include "handler.h"
 #include "dg_event.h"
 
+// external funcs
+EVENT_CANCEL_FUNC(cancel_wait_event);
+
+// locals
+void actually_free_trigger(trig_data *trig);
+
 
 /**
 * Ensures the "attach_to" thing (also called "go" in some scripting code)
@@ -86,44 +92,79 @@ struct script_data *create_script_data(void *attach_to, int type) {
 }
 
 
+/**
+* Triggers are temporarily stored in a list and then freed after everything has
+* finished running, so that their data is still available if they e.g. detach
+* themselves from something -- they can't free mid-execution. This fixes a bug
+* from stock DG Scripts where a trigger could free itself mid-execution and
+* still try to reference freed memory. -pc 5/29/2017
+*/
+void free_freeable_triggers(void) {
+	trig_data *trig, *next_trig;
+	
+	LL_FOREACH_SAFE2(free_trigger_list, trig, next_trig, next_to_free) {
+		actually_free_trigger(trig);
+	}
+	free_trigger_list = NULL;
+}
+
+
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
-	struct trig_var_data *i, *j;
-
-	for (i = vd; i;) {
-		j = i;
-		i = i->next;
-		if (j->name)
-			free(j->name);
-		if (j->value)
-			free(j->value);
-		free(j);
+	void free_var_el(struct trig_var_data *var);
+	struct trig_var_data *var, *next_var;
+	LL_FOREACH_SAFE(vd, var, next_var) {
+		free_var_el(var);
 	}
 }
 
 
-/* 
-* Return memory used by a trigger
-* The command list is free'd when changed and when
-* shutting down.
+/**
+* Prepares to free a trigger. The actual freeing is done on a short delay to
+* ensure no script is running at the time.
+*
+* @param trig_data *trig The trigger to free.
 */
 void free_trigger(trig_data *trig) {
-	if (trig->name) {
+	if (GET_TRIG_WAIT(trig)) {
+		event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
+		GET_TRIG_WAIT(trig) = NULL;
+	}
+	
+	LL_PREPEND2(free_trigger_list, trig, next_to_free);
+}
+
+
+/* 
+* Performs the actual freeing of a trigger, which is always done on a delay so
+* that they can't be extracted while their own script is running. -pc 5/29/2017
+*/
+void actually_free_trigger(trig_data *trig) {
+	trig_data *proto = real_trigger(GET_TRIG_VNUM(trig));
+	struct cmdlist_element *cmd, *next_cmd;
+	
+	if (GET_TRIG_WAIT(trig)) {
+		event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
+	}
+	
+	if (trig->name && (!proto || trig->name != proto->name)) {
 		free(trig->name);
-		trig->name = NULL;
 	}
-
-	if (trig->arglist) {
+	if (trig->arglist && (!proto || trig->arglist != proto->arglist)) {
 		free(trig->arglist);
-		trig->arglist = NULL;
 	}
-	if (trig->var_list) {
+	if (trig->var_list && (!proto || trig->var_list != proto->var_list)) {
 		free_varlist(trig->var_list);
-		trig->var_list = NULL;
 	}
-	if (GET_TRIG_WAIT(trig))
-		event_cancel(GET_TRIG_WAIT(trig));
-
+	if (trig->cmdlist && (!proto || trig->cmdlist != proto->cmdlist)) {
+		LL_FOREACH_SAFE(trig->cmdlist, cmd, next_cmd) {
+			if (cmd->cmd) {
+				free(cmd->cmd);
+			}
+			free(cmd);
+		}
+	}
+	
 	free(trig);
 }
 
@@ -131,7 +172,7 @@ void free_trigger(trig_data *trig) {
 /* remove a single trigger from a mob/obj/room */
 void extract_trigger(trig_data *trig) {
 	if (GET_TRIG_WAIT(trig)) {
-		event_cancel(GET_TRIG_WAIT(trig));
+		event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
 		GET_TRIG_WAIT(trig) = NULL;
 	}
 

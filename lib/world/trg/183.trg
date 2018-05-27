@@ -2,29 +2,29 @@
 Pharaoh combat~
 0 k 100
 ~
-eval heroic_mode %self.mob_flagged(GROUP)%
+set heroic_mode %self.mob_flagged(GROUP)%
 * Count combat script cycles until enrage
 * 1 cycle should be 30 seconds?
 if %heroic_mode%
   * Start scaling up after 5 minutes, game over at 15 minutes
-  eval soft_enrage_cycles 10
-  eval hard_enrage_cycles 30
+  set soft_enrage_cycles 10
+  set hard_enrage_cycles 30
 else
   * Start scaling up after 5 minutes, game over at 15 minutes
-  eval soft_enrage_cycles 10
-  eval hard_enrage_cycles 30
+  set soft_enrage_cycles 10
+  set hard_enrage_cycles 30
 end
-eval enrage_counter 0
-eval enraged 0
+set enrage_counter 0
+set enraged 0
 if %self.varexists(enrage_counter)%
-  eval enrage_counter %self.enrage_counter%
+  set enrage_counter %self.enrage_counter%
 end
 eval enrage_counter %enrage_counter%+1
 if %enrage_counter% >= %soft_enrage_cycles%
   * Start increasing damage
-  eval enraged 1
+  set enraged 1
   if %enrage_counter% > %hard_enrage_cycles%
-    eval enraged 2
+    set enraged 2
   end
   * Enrage messages
   if %enrage_counter% == %soft_enrage_cycles%
@@ -56,11 +56,11 @@ switch %random.4%
   * Summon
   case 1
     %echo% %self.name% makes a mystical gesture!
-    eval room %self.room%
+    set room %self.room%
     if %heroic_mode%
       * Scarab swarm
       %load% mob 18302 ally
-      eval summon %room.people%
+      set summon %room.people%
       if %summon.vnum% == 18302
         %echo% %self.name% summons %summon.name%, and directs them to attack %actor.name%!
         %force% %summon% %aggro% %actor%
@@ -68,7 +68,7 @@ switch %random.4%
     else
       * Jackal
       %load% mob 18301 ally
-      eval summon %room.people%
+      set summon %room.people%
       if %summon.vnum% == 18301
         %echo% %self.name% summons %summon.name%, and directs it to attack %actor.name%!
         %force% %summon% %aggro% %actor%
@@ -81,14 +81,14 @@ switch %random.4%
     %echo% %self.name% raises %self.hisher% hands!
     %echo% &AWater starts to flood the chamber! Swim for your life!&0
     * Give the group time to type 'swim' (if they're going to)
-    eval running 1
+    set running 1
     remote running %self.id%
     wait 10 sec
-    eval running 0
+    set running 0
     remote running %self.id%
     %echo% &AWater floods the chamber!
-    eval room %self.room%
-    eval person %room.people%
+    set room %self.room%
+    set person %room.people%
     while %person%
       if %person.is_pc%
         if %person.health% <= 0
@@ -96,7 +96,7 @@ switch %random.4%
           %send% %person% You are pummeled by raging waters...
           %damage% %person% 100 physical
         end
-        eval test %%self.varexists(swimming_%person.id%)%%
+        set test %self.varexists(swimming_%person.id%)%
         if %test%
           eval test %%self.swimming_%person.id%%%
         end
@@ -104,9 +104,9 @@ switch %random.4%
           %send% %person% &rYou are drowned by the rising waters!
           %echoaround% %person% %person.name% sinks beneath the rising waters!
           if %heroic_mode%
-            %damage% %person% 750 direct
-          else
             %damage% %person% 500 direct
+          else
+            %damage% %person% 250 direct
           end
         else
           %send% %person% You barely keep your head above the water!
@@ -114,13 +114,13 @@ switch %random.4%
           unset swimming_%person.id%
         end
       end
-      eval person %person.next_in_room%
+      set person %person.next_in_room%
     done
     %echo% %self.name% looks rejuvenated by the water!
     if %heroic_mode%
-      %damage% %self% -2000
+      %damage% %self% -1000
     else
-      %damage% %self% -300
+      %damage% %self% -150
     end
     wait 3 sec
     %echo% The water level starts to lower...
@@ -133,15 +133,14 @@ switch %random.4%
     %echo% &rA howling tornado of sand fills the chamber, blinding and slashing at everyone!
     set cycle 1
     while %cycle% <= 4
-      eval room %self.room%
-      eval person %room.people%
+      set room %self.room%
+      set person %room.people%
       while %person%
-        eval check %%self.is_enemy(%person%)%%
-        if %check%
+        if %self.is_enemy(%person%)%
           if %cycle% == 1
             dg_affect %person% BLIND on 20
           end
-          %damage% %person% 50 physical
+          %damage% %person% 40 physical
         end
         eval person %person.next_in_room%
       done
@@ -164,13 +163,13 @@ switch %random.4%
       set max_cycles 2
     end
     eval duration %max_cycles%*5
-    dg_affect %actor% STUNNED on %duration%
+    dg_affect %actor% HARD-STUNNED on %duration%
     set cycle 1
     while %cycle% <= %max_cycles%
       if %actor.health% > -10
         %send% %actor% &r%self.name%'s bandages tighten around you, trying to squeeze the life out of you!
         %echoaround% %actor% %self.name%'s bandages tighten around %actor.name%!
-        %damage% %actor% 200 physical
+        %damage% %actor% 150 physical
         wait 5 sec
       end
       eval cycle %cycle% + 1
@@ -225,7 +224,7 @@ if !%self.running%
 end
 %send% %actor% You start swimming.
 %echoaround% %actor% %actor.name% starts swimming.
-dg_affect %actor% STUNNED on 10
+dg_affect %actor% HARD-STUNNED on 10
 set swimming_%actor.id% 1
 remote swimming_%actor.id% %self.id%
 ~
@@ -241,22 +240,22 @@ end
 * TODO: Check nobody's in the adventure before changing difficulty
 if hard /= %arg%
   %echo% Setting difficulty to Hard...
-  eval difficulty 2
+  set difficulty 2
 elseif group /= %arg%
   %echo% Setting difficulty to Group...
-  eval difficulty 3
+  set difficulty 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  eval difficulty 4
+  set difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
   return 1
 end
 * Clear existing difficulty flags and set new ones.
-eval vnum 18300
+set vnum 18300
 while %vnum% <= 18300
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -278,19 +277,19 @@ while %vnum% <= 18300
 done
 %send% %actor% You touch one of the symbols on the wall, and a section of the wall slowly slides into the floor...
 %echoaround% %actor% %actor.name% touches one of the symbols on the wall, and a section of the wall slowly slides into the floor...
-eval newroom i18302
-eval exitroom i18300
+set newroom i18302
+set exitroom i18300
 if %exitroom%
   %door% %exitroom% down room %newroom%
 end
-eval room %self.room%
-eval person %room.people%
+set person %self.room.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   %teleport% %person% %newroom%
-  eval person %next_person%
+  set person %next_person%
 done
 otimer 24
+%at% i18300 %load% mob 18309
 ~
 #18305
 Pyramid delayed despawn~
@@ -309,57 +308,57 @@ return 1
 Pyramid bonus loot replacer~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if %actor%
   if %actor.mob_flagged(GROUP)% && %actor.mob_flagged(HARD)%
     * Roll for mount
-    eval percent_roll %random.100%
+    set percent_roll %random.100%
     if %percent_roll% <= 10
       * Sobek
-      eval vnum 18300
+      set vnum 18300
     else
       eval percent_roll %percent_roll% - 10
       if %percent_roll% <= 10
         * Bastet
-        eval vnum 18301
+        set vnum 18301
       else
         eval percent_roll %percent_roll% - 10
         if %percent_roll% <= 10
           * Anubis
-          eval vnum 18302
+          set vnum 18302
         else
           eval percent_roll %percent_roll% - 10
           if %percent_roll% <= 10
             * Horus
-            eval vnum 18303
+            set vnum 18303
           else
             eval percent_roll %percent_roll% - 10
             if %percent_roll% <= 5
               * Morpher
-              eval vnum 18325
+              set vnum 18325
             else
               eval percent_roll %percent_roll% - 5
               if %percent_roll% <= 20
                 * Pet
-                eval vnum 18326
+                set vnum 18326
               else
                 eval percent_roll %percent_roll% - 20
                 if %percent_roll% <= 15
                   * Croc mount
-                  eval vnum 18327
+                  set vnum 18327
                 else
                   eval percent_roll %percent_roll% - 15
                   if %percent_roll% <= 5
                     * Falcon mount
-                    eval vnum 18328
+                    set vnum 18328
                   else
                     eval percent_roll %percent_roll% - 5
                     if %percent_roll% <= 5
                       * disk
-                      eval vnum 18329
+                      set vnum 18329
                     else
                       * flax seeds
-                      eval vnum 18322
+                      set vnum 18322
                     end
                   end
                 end
@@ -370,9 +369,9 @@ if %actor%
       end
     end
     if %self.level%
-      eval level %self.level%
+      set level %self.level%
     else
-      eval level 100
+      set level 100
     end
     %load% obj %vnum% %actor% inv %level%
     if %vnum% == 18322
@@ -381,15 +380,14 @@ if %actor%
       %load% obj %vnum% %actor% inv
       %load% obj %vnum% %actor% inv
     end
-    eval item %%actor.inventory(%vnum%)%%
+    set item %actor.inventory(%vnum%)%
     if !%item.is_flagged(GROUP-DROP)% && %vnum% >= 18300 && %vnum% <= 18303
       * flag clothes with group-drop
       nop %item.flag(GROUP-DROP)%
       %scale% %item% %level%
     end
     if %item.is_flagged(BOP)%
-      eval bind %%item.bind(%self%)%%
-      nop %bind%
+      nop %item.bind(%self%)%
     end
   end
 end
@@ -400,7 +398,7 @@ Scarab special attack~
 0 k 100
 ~
 %echo% &rEveryone is bitten and stung by %self.name%!
-%aoe% 100 physical
+%aoe% 75 physical
 ~
 #18309
 Wander Mummy~
@@ -422,6 +420,14 @@ if %random.100% == 1
   end
 end
 ~
+#18311
+Neferkare Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(18300)%
+end
+~
 #18353
 Load: Link random temple~
 2 n 100
@@ -430,7 +436,7 @@ Load: Link random temple~
 eval room_vnum 18353 + %random.4%
 makeuid active_temple room i%room_vnum%
 makeuid corridor room i18353
-eval tofind 18354
+set tofind 18354
 * Link it
 set direction east
 %door% %corridor% %direction% room %active_temple%
@@ -449,7 +455,7 @@ if !%arg%
   return 1
   halt
 end
-eval item %%actor.obj_target(%arg%)%%
+set item %actor.obj_target(%arg%)%
 if %item.worn_by% || !%item.carried_by%
   %send% %actor% You can only offer an item from your inventory.
   return 1
@@ -480,12 +486,12 @@ eval temple_num %room.template% - 18353
 if %solution% == %temple_num%
   * Bonus reward
   %echo% The gods are pleased!
-  eval person %room.people%
+  set person %room.people%
   while %person%
     if %person.is_pc%
       * random reward
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 else
   %echo% The gods accept the offering.
@@ -500,7 +506,7 @@ makeuid next_room room i18358
 Drop Random Canopic Jars~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 set number 1
 if %actor.mob_flagged(HARD)%
   eval number %number% + 1
@@ -524,10 +530,9 @@ while %number% > 0
     eval iterator %iterator% + 1
   done
   %load% obj %vnum% %actor% inv
-  eval item %%actor.inventory(%vnum%)%%
+  set item %actor.inventory(%vnum%)%
   * Bind item
-  eval bind %%item.bind(%self%)%%
-  nop %bind%
+  nop %item.bind(%self%)%
   eval items_left %items_left% - 1
   eval number %number% - 1
 done
@@ -537,8 +542,7 @@ done
 Combine canopic jars~
 1 c 2
 combine~
-eval targ %%actor.obj_target(%arg%)%%
-if %targ% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -546,7 +550,7 @@ return 1
 * got all 4?
 if %actor.inventory(18359)% && %actor.inventory(18360) && %actor.inventory(18361)% && %actor.inventory(18362)%
   %load% obj 18350 %actor% inv
-  eval item %actor.inventory(18350)%
+  set item %actor.inventory(18350)%
   %send% %actor% You combine your four canopic jars into %item.shortdesc%!
   if %self.vnum% != 18359
     nop %actor.add_resources(18359, -1)%
@@ -575,9 +579,8 @@ if %actor.is_npc%
 end
 context %instance.id%
 * One quick trick to get the target room
-eval room_var %self%
+set room_var %self%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   return 1
@@ -585,22 +588,22 @@ if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
 end
 return 0
 * Trap triggered
-eval trap_running 1
+set trap_running 1
 global trap_running
-eval last_trap_command 0
+set last_trap_command 0
 remote last_trap_command %actor.id%
 %echoaround% %actor% %actor.name% starts walking %direction%...
 %send% %actor% There is a loud groaning sound from the ceiling!
 %echoaround% %actor% There is a loud groaning sound from the ceiling above %actor.name%!
 wait 8 sec
-eval trap_running 0
+set trap_running 0
 global trap_running
 if %actor.last_trap_command% == run && %actor.position% == Standing
   %send% %actor% You dash forward as a huge stone block crashes to the floor right behind you!
   %echoaround% %actor% %actor.name% dashes forward, barely avoiding a huge stone block which falls from the ceiling!
   %send% %actor% You dive through an archway into the next room.
   %echoaround% %actor% %actor.name% dives through an archway into the next room.
-  %teleport% %actor% %to_room%
+  %teleport% %actor% %tricky%
   %echoaround% %actor% %actor.name% dives through the doorway from the previous room.
   %force% %actor% look
 else
@@ -611,22 +614,22 @@ else
   if %actor.health% > 0 && %actor.position% == Standing
     %send% %actor% You stagger forward to the next room.
     %echoaround% %actor% %actor.name% staggers through to the next room, looking dazed.
-    %teleport% %actor% %to_room%
+    %teleport% %actor% %tricky%
     %echoaround% %actor% %actor.name% staggers through the doorway from the previous room, looking dazed.
     %force% %actor% look
   end
 end
 * Send NPC followers after player
-eval person %room_var.people%
+set person %room_var.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
     %echoaround% %person% %person.name% follows %actor.name%.
     %teleport% %person% %actor.room%
     %send% %actor% %person.name% follows you.
     %echoaround% %actor% %person.name% follows %actor.name%.
   end
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #18364
@@ -701,22 +704,22 @@ end
 * TODO: Check nobody's in the adventure before changing difficulty
 if hard /= %arg%
   %echo% Setting difficulty to Hard...
-  eval difficulty 2
+  set difficulty 2
 elseif group /= %arg%
   %echo% Setting difficulty to Group...
-  eval difficulty 3
+  set difficulty 3
 elseif boss /= %arg%
   %echo% Setting difficulty to Boss...
-  eval difficulty 4
+  set difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
   halt
   return 1
 end
 * Clear existing difficulty flags and set new ones.
-eval vnum 18350
+set vnum 18350
 while %vnum% <= 18350
-  eval mob %%instance.mob(%vnum%)%%
+  set mob %instance.mob(%vnum%)%
   if !%mob%
     * This was for debugging. We could do something about this.
     * Maybe just ignore it and keep on setting?
@@ -738,17 +741,17 @@ while %vnum% <= 18350
 done
 %send% %actor% You touch one of the symbols on the wall, and a section of the wall slowly slides into the floor...
 %echoaround% %actor% %actor.name% touches one of the symbols on the wall, and a section of the wall slowly slides into the floor...
-eval newroom i18352
-eval exitroom i18350
+set newroom i18352
+set exitroom i18350
 if %exitroom%
   %door% %exitroom% down room %newroom%
 end
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   %teleport% %person% %newroom%
-  eval person %next_person%
+  set person %next_person%
 done
 otimer 24
 ~

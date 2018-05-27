@@ -244,6 +244,11 @@ VCMD(do_vforce) {
 }
 
 
+VCMD(do_vheal) {	// mmmm, veal
+	script_heal(veh, VEH_TRIGGER, argument);
+}
+
+
 VCMD(do_vbuildingecho) {
 	char room_number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
 	room_data *froom, *home_room, *iter;
@@ -255,7 +260,7 @@ VCMD(do_vbuildingecho) {
 	if (!*room_number || !*msg) {
 		veh_log(veh, "vbuildingecho called with too few args");
 	}
-	else if (!(froom = get_room(orm, arg))) {
+	else if (!(froom = get_room(orm, room_number))) {
 		veh_log(veh, "vbuildingecho called with invalid target");
 	}
 	else {
@@ -295,7 +300,7 @@ VCMD(do_vregionecho) {
 		veh_log(veh, "vregionecho called with invalid target");
 	}
 	else {
-		center = get_map_location_for(center);
+		center = GET_MAP_LOC(center) ? real_room(GET_MAP_LOC(center)->vnum) : NULL;
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
@@ -663,8 +668,8 @@ VCMD(do_vquest) {
 
 
 VCMD(do_vsiege) {
-	void besiege_room(room_data *to_room, int damage);
-	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage);
+	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
 	extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -713,12 +718,12 @@ VCMD(do_vsiege) {
 	
 	if (room_targ) {
 		if (validate_siege_target_room(NULL, NULL, room_targ)) {
-			besiege_room(room_targ, dam);
+			besiege_room(NULL, room_targ, dam);
 		}
 	}
 	else if (veh_targ) {
 		self = (veh_targ == veh);
-		res = besiege_vehicle(veh_targ, dam, SIEGE_PHYSICAL);
+		res = besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL);
 		if (self && !res) {
 			dg_owner_purged = TRUE;
 		}
@@ -1084,7 +1089,7 @@ VCMD(do_dgvload) {
 
 
 VCMD(do_vdamage) {
-	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
+	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
 	int type;
@@ -1100,6 +1105,13 @@ VCMD(do_vdamage) {
 
 	if (*modarg) {
 		modifier = atof(modarg) / 100.0;
+	}
+	
+	// send negatives to %heal% instead
+	if (modifier < 0) {
+		sprintf(buf, "%s health %.2f", name, -atof(modarg));
+		script_heal(veh, VEH_TRIGGER, buf);
+		return;
 	}
 
 	ch = get_char_by_vehicle(veh, name);
@@ -1166,11 +1178,20 @@ VCMD(do_vaoe) {
 
 VCMD(do_vdot) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
+	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
 	int type, max_stacks;
 
 	argument = one_argument(argument, name);
+	// sometimes name is an affect vnum
+	if (*name == '#') {
+		atype = atoi(name+1);
+		argument = one_argument(argument, name);
+		if (!find_generic(atype, GENERIC_AFFECT)) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
 	argument = one_argument(argument, typearg);	// optional, default: physical
@@ -1205,7 +1226,7 @@ VCMD(do_vdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, get_vehicle_scale_level(veh, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_vehicle_scale_level(veh, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 
@@ -1467,7 +1488,7 @@ VCMD(do_vrestore) {
 			free_resource_list(GET_BUILDING_RESOURCES(room));
 			GET_BUILDING_RESOURCES(room) = NULL;
 			COMPLEX_DATA(room)->damage = 0;
-			COMPLEX_DATA(room)->burning = 0;
+			COMPLEX_DATA(room)->burn_down_time = 0;
 		}
 	}
 }
@@ -1528,8 +1549,7 @@ VCMD(do_vscale) {
 			scale_item_to_level(otarg, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = read_object(GET_OBJ_VNUM(otarg), TRUE);
-			scale_item_to_level(fresh, level);
+			fresh = fresh_copy_obj(otarg, level);
 			swap_obj_for_obj(otarg, fresh);
 			extract_obj(otarg);
 		}
@@ -1579,6 +1599,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vechoaround", do_vsend, SCMD_VECHOAROUND },
 	{ "vechoneither", do_vechoneither, NO_SCMD },
 	{ "vforce", do_vforce, NO_SCMD },
+	{ "vheal", do_vheal, NO_SCMD },
 	{ "vload", do_dgvload, NO_SCMD },
 	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },

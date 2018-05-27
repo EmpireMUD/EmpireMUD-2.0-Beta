@@ -1,0 +1,62 @@
+#12500
+colossal cog~
+5 0
+0 0 0 0
+T0
+colossal cog~
+T1
+colossal cogs~
+S
+#12501
+immaculate condition~
+4 0
+0 0 0 0
+S
+#12502
+colossus boss cooldown~
+3 0
+0 0 0 0
+S
+#12505
+lightning punch~
+4 0
+0 0 0 0
+T0
+You are no longer affected by the colossus's lightning punch.~
+S
+#12506
+rending strike~
+4 0
+0 0 0 0
+T0
+You are no longer affected by the colossus's rending strike.~
+S
+#12508
+repair drones~
+4 0
+0 0 0 0
+T1
+$n's clockwork spiders retreat back into their hidden compartments.~
+S
+#12509
+mighty boot~
+4 0
+0 0 0 0
+T0
+You recover from the colossus's mighty boot.~
+S
+#12510
+clockwork magpie whistle~
+3 0
+0 0 0 0
+T0
+Your clockwork magpie cooldown has ended.~
+S
+#12511
+colossal beam~
+4 0
+0 0 0 0
+T0
+You recover from the effects of the colossal beam.~
+S
+$

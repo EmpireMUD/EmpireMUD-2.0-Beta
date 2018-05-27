@@ -1,0 +1,44 @@
+#12424
+hulk cargo smuggler's smugglers goblin~
+a goblin smuggler's hulk~
+A goblin smuggler's cargo hulk is floating here.~
+   This ship is smaller than most hulks, at least on the surface. The bottom of
+the ship is designed to hide its true capacity beneath the water, away from the
+watchful eyes of tax collectors and pirates.
+~
+&j<&u44&0&j>~
+cijkpqtu 20 64 1600 0
+C
+0 175
+D
+12424 4 op
+R
+16 1 1 1048576
+R
+19 1 1 0
+R
+26 1 1 0
+T 957
+S
+#12425
+ship pirate goblin~
+the goblin pirate ship~
+A goblin pirate ship looms in the water.~
+   This pirate ship isn't large, but it makes up for its size in sheer
+ferocity. A ship like this could take on a brigantine twice its size!
+~
+&0<&u44&0>~
+ckpqrtu 20 128 0 0
+C
+0 175
+D
+12425 4 op
+R
+16 2 1 1048576
+R
+19 2 1 0
+R
+26 2 1 0
+T 955
+S
+$

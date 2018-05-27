@@ -1,0 +1,175 @@
+#5200
+Volcanic Forge~
+A Volcanic Forge in the Mountainside~
+&y(FF)~
+64 0 e 0
+0 0 0 278
+C
+forge, smelt~
+D
+   Though this smithy is little more than a facade built over a cave in the
+mountain, the magma chamber below makes this the perfect place to smelt the
+hardest metals, and forge the strongest armors. Thick sulfuric smoke spews from
+holes in the floor and vents through specially-made chimneys.
+~
+F
+hv
+M
+241 15.00 ce
+R
+1009 1 5 0
+R
+16 1 1 1048576
+S
+#5201
+Burial Cavern~
+A Hidden Burial Cavern~
+&y/&0()&y\~
+64 0 e 0
+0 0 0 -1
+A
+d
+C
+tomb~
+D
+   The entrance to this cavern is so small you could miss it, and the cavern
+itself is barely large enough to hold two men. Chalk art on the walls suggest
+this must be the burial place of a great hero.
+~
+E
+chalk art walls~
+It looks like someone drew the story of a hero's epic birth, rise, and fall.
+~
+F
+B
+R
+1002 1 5 0
+R
+1000 1 5 0
+S
+#5202
+Mountain Crypt~
+A Crypt on a Mountaintop~
+&y[oo]~
+48 2 e 0
+0 0 0 -1
+C
+tomb~
+D
+   The crypt is dry and frigid, and nestled just below the clouds. This stone
+crypt sits so high on the mountaintop that it can be seen for miles in every
+direction. Surely whoever is buried here has brought glory to the empire.
+~
+F
+B
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+R
+1002 1 5 0
+S
+#5203
+Mountain Hall~
+Inside the Mountain Hall~
+&y[**]~
+128 0 ef abdeghijkm
+30 0 0 -1
+D
+   Carved from the mountain itself, this greathall is adorned with all the
+splendor of a mountain king. You cannot tell how deep the hall delves into the
+mountainside, but the shafts of light that cut through the ceiling hint that
+this place is astonishingly large.
+~
+R
+16 2 1 0
+R
+19 2 1 0
+S
+#5204
+Mountain Garrison~
+A Garrison on the Mountainside~
+&y[BB]~
+128 0 ef dehm
+10 0 20 -1
+D
+   This garrison is spartan, carved into the mountainside with little more than
+stone alcoves to house its soldiers. Still, for a mountain empire that must
+always be at the ready, it provides a warm home for the soldiers.
+~
+R
+3 2 1 0
+S
+#5205
+Mountain Lodge~
+A Lodge on the Mountainside~
+&y(==)&0~
+24 0 pR em
+3 2 0 -1
+D
+   This cozy lodge is built into the mountainside, like a wooden facade
+extending from the stone. It's cold up here, but the lodge traps warm air
+enough that as you look out the window, the only chill you feel is from gazing
+at the snowy mountaintops.
+~
+R
+19 1 1 0
+R
+1003 1 5 0
+S
+#5206
+Boardwalk~
+A Boardwalk Over the Shallows~
+&a~&0--&a~~
+16 0 dm 0
+0 0 0 -1
+R
+21 1 1 0
+R
+16 1 1 1048576
+R
+19 1 1 0
+S
+#5207
+River Fishery~
+A Fishery on the River~
+&0(&c~~&0)~
+8 0 dpDL 0
+0 0 0 -1
+C
+fish~
+F
+I
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+R
+1002 1 5 0
+R
+25 1 1 0
+S
+#5208
+Lake Fishery~
+A Fishery on the Lake~
+&0(&c~~&0)~
+8 0 dpDL 0
+0 0 0 -1
+C
+fish~
+F
+I
+I 21 1314 25.00 1 f  # FISH: a fat catfish
+I 21 1315 25.00 1 f  # FISH: a yellow perch
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+R
+1002 1 5 0
+R
+25 1 1 0
+S
+$

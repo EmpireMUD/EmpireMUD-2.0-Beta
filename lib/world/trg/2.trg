@@ -1,40 +1,81 @@
 #221
-Stealth GM Bribe coins~
-0 m 100
+Stealth GM Bribe coins: Prevent~
+0 m 0
 ~
-%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to each other.
-if (%actor.skill(Stealth)% > 0)
-  %send% %actor% %self.name% whispers, 'It looks like you're already a member of the Guild.'
-elseif (!%actor.can_gain_new_skills%)
-  %send% %actor% %self.name% whispers, 'It doesn't look like you can learn any new skills.'
-else
-  %actor.set_skill(Stealth, 1)%
-  %send% %actor% %self.name% whispers, 'I suppose I could let you into the Guild, provisionally.'
-end
+%send% %actor% %self.name% doesn't take bribes like that any more. Complete %self.hisher% quest instead.
+return 0
 ~
 #222
-Stealth GM Bribe item~
+Stealth GM Bribe item: Prevent~
 0 j 100
 ~
-%echoaround% %actor% %self.name% and %actor.name% seem to be whispering to each other.
-if (%object.material% != GOLD)
-  %send% %actor% %self.name% whispers, 'Thanks, mate!'
-elseif (%actor.skill(Stealth)% > 0)
-  %send% %actor% %self.name% whispers, 'It looks like you're already a member of the Guild.'
-elseif (!%actor.can_gain_new_skills%)
-  %send% %actor% %self.name% whispers, 'It doesn't look like you can learn any new skills.'
-else
-  %actor.set_skill(Stealth, 1)%
-  %send% %actor% %self.name% whispers, 'I suppose I could let you into the Guild, provisionally.'
+%send% %actor% %self.name% doesn't take bribes like that any more. Complete %self.hisher% quest instead.
+return 0
+~
+#250
+City Guard: Distract~
+0 k 50
+~
+if %self.cooldown(250)%
+  halt
 end
-%purge% %object%
+nop %self.set_cooldown(250, 30)%
+%send% %actor% %self.name%'s attacks leave you distracted.
+%echoaround% %actor% %actor.name% looks distracted by %self.name%'s attacks.
+dg_affect #251 %actor% DISTRACTED on 30
+~
+#251
+City Guard: Reinforcements~
+0 k 100
+~
+if %self.cooldown(250)%
+  halt
+end
+set room %self.room%
+set person %room.people%
+set ally_guards_present 0
+while %person%
+  if %person.is_enemy(%self%)% && %person.is_pc% && %person.empire% != %self.empire%
+    set found_hostile_player 1
+  elseif %person.vnum% == %self.vnum%
+    eval ally_guards_present %ally_guards_present% + 1
+  end
+  set person %person.next_in_room%
+done
+if !%found_hostile_player%
+  halt
+end
+if %ally_guards_present% >= 3
+  halt
+end
+nop %self.set_cooldown(250, 30)%
+%echo% %self.name% calls for reinforcements!
+wait 10 sec
+if !%self.fighting%
+  halt
+end
+set count %random.3%
+set num 1
+while %num% <= %count%
+  %load% mob %self.vnum%
+  set summon %room.people%
+  if %summon.vnum% != %self.vnum%
+    %echo% %self.name% looks confused.
+    halt
+  end
+  if %self.empire%
+    %own% %summon% %self.empire%
+  end
+  %echo% %summon.name% arrives!
+  %force% %summon% mkill %actor%
+  eval num %num% + 1
+done
 ~
 #256
 Hestian Trinket~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -46,38 +87,28 @@ if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   %send% %actor% You can't teleport out of here.
   halt
 end
-eval home %actor.home%
+set home %actor.home%
 if !%home%
   %send% %actor% You have no home to teleport back to with this trinket.
   halt
 end
-eval veh %home.in_vehicle%
+set veh %home.in_vehicle%
 if %veh%
-  eval outside_room %veh.room%
-  eval test %%actor.canuseroom_guest(%outside_room%)%%
-  eval test2 eval test %%actor.can_teleport_room(%outside_room%)%%
-  if !%test%
+  set outside_room %veh.room%
+  if !%actor.canuseroom_guest(%outside_room%)%
     %send% %actor% You can't teleport home to a vehicle that's parked on foreign territory you don't have permission to use!
     halt
-  elseif !%test2%
+  elseif !%actor.can_teleport_room(%outside_room%)%
     %send% %actor% You can't teleport to your home's current location.
     halt
   end
 end
 * once per 60 minutes
-if %actor.varexists(last_hestian_time)%
-  if (%timestamp% - %actor.last_hestian_time%) < 3600
-    eval diff (%actor.last_hestian_time% - %timestamp%) + 3600
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
-    halt
-  end
+if %actor.cooldown(256)%
+  %send% %actor% Your %cooldown.256% is on cooldown!
+  halt
 end
-eval room_var %actor.room%
+set room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
 %echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
 wait 5 sec
@@ -94,8 +125,7 @@ end
 %teleport% %actor% %actor.home%
 %force% %actor% look
 %echoaround% %actor% %actor.name% appears in a flash of light!
-eval last_hestian_time %timestamp%
-remote last_hestian_time %actor.id%
+nop %actor.set_cooldown(256, 3600)%
 nop %actor.cancel_adventure_summon%
 ~
 #258
@@ -106,9 +136,8 @@ if !%arg%
   %send% %actor% Smoke what?
   halt
 end
-eval item %actor.inventory()%
-eval found 0
-eval found %%actor.obj_target(%arg%)%%
+set item %actor.inventory()%
+set found %actor.obj_target(%arg%)%
 if !%found%
   %send% %actor% You don't seem to have that.
   halt
@@ -128,8 +157,7 @@ end
 Trinket of Conveyance~
 1 c 2
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -142,19 +170,11 @@ if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   halt
 end
 * once per 30 minutes
-if %actor.varexists(last_conveyance_time)%
-  if (%timestamp% - %actor.last_conveyance_time%) < 1800
-    eval diff (%actor.last_conveyance_time% - %timestamp%) + 1800
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc%.
-    halt
-  end
+if %actor.cooldown(262)%
+  %send% %actor% Your %cooldown.262% is still on cooldown!
+  halt
 end
-eval room_var %actor.room%
+set room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
 %echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
 wait 5 sec
@@ -171,8 +191,7 @@ end
 %teleport% %actor% %startloc%
 %force% %actor% look
 %echoaround% %actor% %actor.name% appears in a flourish of yellow light!
-eval last_conveyance_time %timestamp%
-remote last_conveyance_time %actor.id%
+nop %actor.set_cooldown(262, 1800)%
 nop %actor.cancel_adventure_summon%
 %purge% %self%
 ~
@@ -180,10 +199,9 @@ nop %actor.cancel_adventure_summon%
 Letheian Icon use~
 1 c 2
 use~
-eval item %arg.car%
-eval sk %arg.cdr%
-eval test %%actor.obj_target(%item%)%%
-if (%test% != %self%) && (use /= %cmd%)
+set item %arg.car%
+set sk %arg.cdr%
+if (%actor.obj_target(%item%)% != %self%) && (use /= %cmd%)
   return 0
   halt
 end
@@ -195,16 +213,13 @@ if (%actor.position% != Standing)
   %send% %actor% You can't do that right now.
   halt
 end
-eval test %%skill.validate(%sk%)%%
-if !%test%
+if !%skill.validate(%sk%)%
   %send% %actor% No such skill '%sk%'.
   halt
 end
-eval name %%skill.name(%sk%)%%
-%send% %actor% You use %self.shortdesc% and gain a skill reset in %name%!
+%send% %actor% You use %self.shortdesc% and gain a skill reset in %skill.name(%sk%)%!
 %echoaround% %actor% %actor.name% uses %self.shortdesc%.
-eval grant %%actor.give_skill_reset(%sk%)%%
-nop %grant%
+nop %actor.give_skill_reset(%sk%)%
 %purge% %self%
 ~
 $

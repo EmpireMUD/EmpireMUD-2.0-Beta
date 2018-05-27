@@ -1,0 +1,222 @@
+#12000
+anat goddess virgin war-goddess~
+the goddess Anat~
+Anat, virgin war-goddess of old, stands fierce and bloody (difficulty).
+~
+225 325 aduyB ciE
+2 0 35 1
+I 4 12004 16.67 1 a  # LOOT: the golden chain of the old god Anat
+I 4 12006 16.67 1 a  # LOOT: a vial of the blood of the old god Anat
+I 4 12008 16.67 1 a  # LOOT: an idol of the old god Anat
+I 4 12010 16.67 1 a  # LOOT: the hawk pendant of the old god Anat
+I 4 12012 16.66 1 a  # LOOT: the stone of wrath of the old god Anat
+I 4 12014 16.66 1 a  # LOOT: a vial of the winnowed grain of the old god Anat
+M
+1
+Our time will come again!~
+M
+1
+The old gods will come for you, your children, your people, even for your dead!~
+M
+1
+No one escapes my vengeance!~
+M
+1
+No one escapes my wrath!~
+M
+0
+Blood drips from Anat's dress.~
+M
+1
+I will winnow you like grain!~
+M
+1
+You will be as dust cast before me!~
+M
+1
+How dare you challenge the old gods!?~
+M
+0
+Anat shines radiantly in a dress of saffron and murex, drenched in blood.~
+M
+1
+I have killed god and man alike. What chance have the likes of you?~
+T 12003
+T 12006
+T 12001
+T 12007
+T 12008
+T 12009
+T 12010
+T 12012
+T 12015
+S
+#12001
+Yatpan hawk~
+the hawk Yatpan~
+The hawk Yatpan swoops in to attack!
+~
+225 325 abdhozD q
+1 0 2 27
+T 12011
+T 12013
+S
+#12016
+hawk trained~
+a trained hawk~
+A trained hawk circles overhead.
+~
+1 1 bdoD mn
+0 0 0 10
+M
+0
+$n circles overhead.~
+M
+0
+$n is watching you like a hawk.~
+M
+0
+$n bares $s talons as $e glides through the air.~
+M
+0
+$n circles overhead.~
+M
+0
+$n circles overhead.~
+T 9901
+T 9902
+S
+#12017
+anat memory~
+the memory of Anat~
+The memory of Anat, warrior-goddess of old, barely lingers in the air.
+~
+225 325 do dn
+0 0 27 15
+M
+0
+A hawk soars high overhead.~
+M
+0
+You hear the distant clanging of swords.~
+M
+0
+You can hear someone chanting a soft prayer, but you can't make out the words.~
+M
+0
+The screech of a distant hawk pierces the air.~
+S
+#12018
+hawk yatpan giant~
+the hawk Yatpan~
+The giant hawk Yatpan alights on the ground.
+~
+100 125 de m
+0 0 2 10
+S
+#12030
+hadad ba'al baal god~
+the god Ba'al Hadad~
+The storm god Ba'al Hadad towers over you, lightning in his eyes (difficulty).
+~
+225 325 aduyB ciE
+1 0 26 1
+I 4 12034 16.67 1 a  # LOOT: the bronze bull ring of Ba'al Hadad
+I 4 12036 16.67 1 a  # LOOT: the clouded ring of Ba'al Hadad
+I 4 12038 16.67 1 a  # LOOT: the lightning ring of Ba'al Hadad
+I 4 12040 16.67 1 a  # LOOT: the thunderbolt ring of Ba'al Hadad
+I 4 12042 16.66 1 a  # LOOT: the hurricane ring of Ba'al Hadad
+I 4 12044 16.66 1 a  # LOOT: the stormwashed ring of Ba'al Hadad
+M
+1
+Our time will come again!~
+M
+1
+The old gods will come for you, your crops, your stores, for your empire itself!~
+M
+1
+No one escapes my lightning!~
+M
+1
+No one escapes my thunderbolts!~
+M
+1
+How dare you challenge the old gods!?~
+M
+1
+You will drown in the deluge of my storms, as your ancestors did!~
+M
+0
+Stormclouds gather around Ba'al Hadad.~
+M
+0
+Lightning strikes the ground near you, sending a shiver up your spine.~
+M
+0
+Plants grow up around the feet of Ba'al Hadad as spring rains fall around him.~
+T 12001
+T 12003
+T 12006
+T 12030
+T 12031
+T 12032
+T 12035
+T 12036
+T 12037
+T 12038
+T 12041
+T 12042
+S
+#12031
+storm coming stormcloud massive baalhadadstormcloud~
+the Coming Storm~
+A massive stormcloud envelops and suffocates you!
+~
+225 325 bdnyA ci
+0 0 2 21
+T 12033
+T 12039
+T 12041
+S
+#12047
+bull bronze little~
+the little bronze bull~
+A little bronze bull stands with its horns held high.
+~
+1 1 bdoD dn
+0 0 0 27
+M
+0
+Smoke puffs from $n's nostrils.~
+T 9901
+T 9902
+S
+#12048
+lightning horse bolt~
+the lightning~
+A bolt of lightning in the shape of a horse appears before you.
+~
+100 125 de m
+0 0 2 21
+S
+#12052
+worshipper~
+a worshipper of the storm god~
+A worshipper of the storm god bows low, begging for rain.
+~
+40 60 dov 0
+1 0 0 21
+M
+1
+Praise be to the Stormlord!~
+M
+1
+Tut tut, looks like rain.~
+M
+1
+My Lord, bring rain to the crops!~
+M
+1
+The storm will drown this world.~
+S
+$

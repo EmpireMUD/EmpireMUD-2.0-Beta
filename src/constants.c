@@ -23,6 +23,7 @@
 /**
 * Contents:
 *   EmpireMUD Constants
+*   Ability Constants
 *   Adventure Constants
 *   Archetype Constants
 *   Augment Constants
@@ -33,11 +34,14 @@
 *   Craft Recipe Constants
 *   Empire Constants
 *   Faction Constants
+*   Generic Constants
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
+*   Progress Constants
 *   Quest Constants
 *   Room/World Constants
+*   Shop Constants
 *   Skill Constants
 *   Social Constants
 *   Trigger Constants
@@ -103,29 +107,155 @@ const char *reboot_type[] = { "reboot", "shutdown" };
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ABILITY CONSTANTS ///////////////////////////////////////////////////////
+
+// ABILF_x: ability flags
+const char *ability_flags[] = {
+	"VIOLENT",	// 0
+	"COUNTERSPELLABLE",
+	"TOGGLE",
+	"INVISIBLE",
+	"!ENGAGE",
+	"RANGED",	// 5
+	"!ANIMAL",
+	"!INVULNERABLE",
+	"CASTER-ROLE",
+	"HEALER-ROLE",
+	"MELEE-ROLE",	// 10
+	"TANK-ROLE",
+	"RANGED-ONLY",
+	"IGNORE-SUN",
+	"\n"
+};
+
+
+// ABILT_x: ability type flags
+const char *ability_type_flags[] = {
+	"CRAFT",	// 0
+	"BUFF",
+	"DAMAGE",
+	"DOT",
+	"PLAYER-TECH",
+/*
+	"UNAFFECTS",
+	"POINTS",
+	"ALTER-OBJS",
+	"GROUPS",
+	"MASSES",
+	"AREAS",
+	"SUMMONS",
+	"CREATIONS",
+	"MANUAL",
+	"ROOMS",
+	"CRAFT",
+*/
+	"\n"
+};
+
+
+// ATAR_x: ability targeting flags
+const char *ability_target_flags[] = {
+	"IGNORE",	// 0
+	"CHAR-ROOM",
+	"CHAR-WORLD",
+	"CHAR-CLOSEST",
+	"FIGHT-SELF",
+	"FIGHT-VICTIM",	// 5
+	"SELF-ONLY",
+	"NOT-SELF",
+	"OBJ-INV",
+	"OBJ-ROOM",
+	"OBJ-WORLD",	// 10
+	"OBJ-EQUIP",
+	"VEH-ROOM",
+	"VEH-WORLD",
+	"\n"
+};
+
+
+// ABIL_CUSTOM_x
+const char *ability_custom_types[] = {
+	"self-to-char",	// 0
+	"self-to-room",
+	"targ-to-char",
+	"targ-to-vict",
+	"targ-to-room",
+	"counterspell-to-char",	// 5
+	"counterspell-to-vict",
+	"counterspell-to-room",
+	"fail-self-to-char",
+	"fail-self-to-room",
+	"fail-targ-to-char",	// 10
+	"fail-targ-to-vict",
+	"fail-targ-to-room",
+	"\n"
+};
+
+
+// ADL_x: for adding to ability_data_list
+const char *ability_data_types[] = {
+	"PTECH",
+	"EFFECT",
+	"\n"
+};
+
+
+// ABIL_EFFECT_x: things that happen when an ability is used
+const char *ability_effects[] = {
+	"dismount",	// 0
+	"\n"
+};
+
+
+// AGH_x: ability gain hooks
+const char *ability_gain_hooks[] = {
+	"ONLY-WHEN-AFFECTED",	// 0
+	"MELEE",
+	"RANGED",
+	"DODGE",
+	"BLOCK",
+	"TAKE-DAMAGE",	// 5
+	"PASSIVE-FREQUENT",
+	"PASSIVE-HOURLY",
+	"ONLY-DARK",
+	"ONLY-LIGHT",
+	"ONLY-VS-ANIMAL",	// 10
+	"VAMPIRE-FEEDING",
+	"MOVING",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// ADVENTURE CONSTANTS /////////////////////////////////////////////////////
 
 // ADV_x
 const char *adventure_flags[] = {
-	"IN-DEVELOPMENT",
+	"IN-DEVELOPMENT",	// 0
 	"LOCK-LEVEL-ON-ENTER",
 	"LOCK-LEVEL-ON-COMBAT",
 	"!NEARBY",
 	"ROTATABLE",
-	"CONFUSING-RANDOMS",
+	"CONFUSING-RANDOMS",	// 5
 	"!NEWBIE",
 	"NEWBIE-ONLY",
 	"NO-MOB-CLEANUP",
 	"EMPTY-RESET-ONLY",
+	"CAN-DELAY-LOAD",	// 10
+	"IGNORE-WORLD-SIZE",
+	"IGNORE-ISLAND-LEVELS",
 	"\n"
 };
 
 
 // ADV_LINKF_x
 const char *adventure_link_flags[] = {
-	"CLAIMED-OK",
+	"CLAIMED-OK",	// 0
 	"CITY-ONLY",
 	"!CITY",
+	"CLAIMED-ONLY",
+	"CONTINENT-ONLY",
+	"!CONTINENT",	// 5
 	"\n"
 };
 
@@ -139,6 +269,7 @@ const char *adventure_link_types[] = {
 	"PORTAL-BDG-NEW",
 	"TIME-LIMIT",
 	"NOT-NEAR-SELF",
+	"PORTAL-CROP",
 	"\n"
 };
 
@@ -155,6 +286,7 @@ const char *adventure_spawn_types[] = {
 // INST_x
 const char *instance_flags[] = {
 	"COMPLETED",
+	"NEEDS-LOAD",
 	"\n"
 };
 
@@ -226,18 +358,18 @@ const char *augment_types[] = {
 
 // AUGMENT_x (1/2): augment type data
 const struct augment_type_data augment_info[] = {
-	// noun, verb, apply-type, default-flags, greater-ability, use-obj-flag
-	{ "augment", "augment", APPLY_TYPE_NATURAL, NOBITS, NO_ABIL, NOBITS },
-	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, NOBITS, ABIL_GREATER_ENCHANTMENTS, OBJ_ENCHANTED },
-	{ "hone", "hone", APPLY_TYPE_HONED, AUG_SELF_ONLY, NO_ABIL, NOBITS },
+	// noun, verb, apply-type, default-flags, use-obj-flag
+	{ "augment", "augment", APPLY_TYPE_NATURAL, NOBITS, NOBITS },
+	{ "enchantment", "enchant", APPLY_TYPE_ENCHANTMENT, NOBITS, OBJ_ENCHANTED },
+	{ "hone", "hone", APPLY_TYPE_HONED, AUG_SELF_ONLY, NOBITS },
 	
-	{ "\n", "\n", 0, 0, 0 }	// last
+	{ "\n", "\n", 0, 0 }	// last
 };
 
 
 // AUG_x: augment flags
 const char *augment_flags[] = {
-	"IN-DEV",
+	"IN-DEVELOPMENT",
 	"SELF-ONLY",
 	"ARMOR",
 	"SHIELD",
@@ -290,6 +422,7 @@ const char *bonus_bits[] = {
 	"EXTRA-DAILY-SKILLS",
 	"INVENTORY",
 	"FASTER",
+	"BLOOD",
 	"\n"
 };
 
@@ -312,6 +445,7 @@ const char *bonus_bit_descriptions[] = {
 	"Extra daily bonus experience",
 	"Larger inventory",
 	"Faster walking",
+	"Extra blood (for vampires)",
 	"\n"
 };
 
@@ -354,6 +488,7 @@ const char *extra_attribute_types[] = {
 	"Resist-Magical",	// 10
 	"Crafting-Bonus",
 	"Blood-Upkeep",
+	"Age",
 	"\n"
 };
 
@@ -420,6 +555,9 @@ const char *grant_bits[] = {
 	"oset",
 	"playerdelete",
 	"unquest",
+	"automessage",
+	"peace",	// 40
+	"unprogress",
 	"\n"
 };
 
@@ -494,6 +632,12 @@ const char *preference_bits[] = {
 	"AUTODISMOUNT",
 	"!EMPIRE",
 	"CLEARMETERS",
+	"!TUTORIALS",
+	"!PAINT",
+	"EXTRA-SPACING",
+	"TRAVEL-LOOK",
+	"AUTOCLIMB",
+	"AUTOSWIM",
 	"\n"
 };
 
@@ -526,38 +670,47 @@ const char *class_role_color[] = {
 
 // PRF_x: for do_toggle, this controls the "toggle" command and these are displayed in rows of 3	
 const struct toggle_data_type toggle_data[] = {
-	// name, type, prf, level, func
-	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, NULL },
-	{ "mortlog", TOG_ONOFF, PRF_MORTLOG, 0, NULL },
-	{ "autokill", TOG_ONOFF, PRF_AUTOKILL, 0, NULL },
-	
 	// these are shown in rows of 3
-	{ "tell", TOG_OFFON, PRF_NOTELL, 0, NULL },
+	// name, type, prf, level, func
+	
+	{ "autoclimb", TOG_ONOFF, PRF_AUTOCLIMB, 0, NULL },
+	{ "screen-reader", TOG_ONOFF, PRF_SCREEN_READER, 0, NULL },
+	{ "afk", TOG_ONOFF, PRF_AFK, 0, afk_notify },
+	
+	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
 	{ "scrolling", TOG_ONOFF, PRF_SCROLLING, 0, NULL },
 	{ "bother", TOG_ONOFF, PRF_BOTHERABLE, 0, NULL },
 	
-	{ "shout", TOG_OFFON, PRF_DEAF, 0, NULL },
-	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
-	{ "political", TOG_ONOFF, PRF_POLITICAL, 0, tog_political },
+	{ "autokill", TOG_ONOFF, PRF_AUTOKILL, 0, NULL },
+	{ "action-spam", TOG_OFFON, PRF_NOSPAM, 0, NULL },
+	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
 	
 	{ "autorecall", TOG_ONOFF, PRF_AUTORECALL, 0, NULL },
-	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
-	{ "informative", TOG_ONOFF, PRF_INFORMATIVE, 0, tog_informative },
-	
-	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, tog_mapcolor },
-	{ "no-repeat", TOG_ONOFF, PRF_NOREPEAT, 0, NULL },
-	{ "screen-reader", TOG_ONOFF, PRF_SCREEN_READER, 0, NULL },
-	
-	{ "action-spam", TOG_OFFON, PRF_NOSPAM, 0, NULL },
+	{ "brief", TOG_ONOFF, PRF_BRIEF, 0, NULL },
 	{ "rp", TOG_ONOFF, PRF_RP, 0, NULL },
-	{ "afk", TOG_ONOFF, PRF_AFK, 0, afk_notify },
 	
-	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
-	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
-	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
+	{ "autoswim", TOG_ONOFF, PRF_AUTOSWIM, 0, NULL },
+	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
+	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, NULL },
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
-	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
+	{ "travel-look", TOG_ONOFF, PRF_TRAVEL_LOOK, 0, NULL },
+	{ "mortlog", TOG_ONOFF, PRF_MORTLOG, 0, NULL },
+	
+	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
+	{ "extra-spacing",	TOG_ONOFF, PRF_EXTRA_SPACING, 0, NULL },
+	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
+	
+	{ "informative", TOG_ONOFF, PRF_INFORMATIVE, 0, tog_informative },
+	{ "no-repeat", TOG_ONOFF, PRF_NOREPEAT, 0, NULL },
+	{ "tell", TOG_OFFON, PRF_NOTELL, 0, NULL },
+	
+	{ "political", TOG_ONOFF, PRF_POLITICAL, 0, tog_political },
+	{ "no-paint", TOG_ONOFF, PRF_NO_PAINT, 0, NULL },
+	{ "shout", TOG_OFFON, PRF_DEAF, 0, NULL },
+	
+	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, tog_mapcolor },
+	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -605,6 +758,66 @@ const char *connected_types[] = {
 	"Add bonus",
 	"Promo code?",	// 25
 	"Confirm promo",
+	"\n"
+};
+
+
+// PTECH_x: player techs
+const char *player_tech_types[] = {
+	"RESERVED",	// 0
+	"Armor-Heavy",
+	"Armor-Light",
+	"Armor-Mage",
+	"Armor-Medium",
+	"Block",	// 5
+	"Block-Ranged",
+	"Block-Magical",
+	"Bonus-vs-Animals",
+	"Butcher-Upgrade",
+	"Customize-Building",	// 10
+	"Deep-Mines",
+	"Dual-Wield",
+	"Fast-Wood-Processing",
+	"Fastcasting",
+	"Fast-Find",	// 15
+	"Fish",
+	"Forage",
+	"Harvest-Upgrade",
+	"Healing-Boost",
+	"Hide-Upgrade",	// 20
+	"Infiltrate",
+	"Infiltrate-Upgrade",
+	"Larger-Light-Radius",
+	"Light-Fire",
+	"Map-Invis",	// 25
+	"Mill-Upgrade",
+	"Navigation",
+	"!Hunger",
+	"!Poison",
+	"!Thirst",	// 30
+	"!Track-City",
+	"!Track-Wild",
+	"Pickpocket",
+	"Poison",
+	"Poison-Upgrade",	// 35
+	"Portal",
+	"Portal-Upgrade",
+	"Ranged-Combat",
+	"Riding",
+	"Riding-Flying",	// 40
+	"Riding-Upgrade",
+	"Rough-Terrain",
+	"See-Chars-In-Dark",
+	"See-Objs-In-Dark",
+	"See-Inventory",	// 45
+	"Shear-Upgrade",
+	"Steal-Upgrade",
+	"Swimming",
+	"Teleport-City",
+	"Two-Handed-Weapons",	// 50
+	"Where-Upgrade",
+	"Dodge-Cap",
+	"Skinning-Upgrade",
 	"\n"
 };
 
@@ -821,7 +1034,7 @@ const int rev_dir[NUM_OF_DIRS] = {
 };
 
 
-// for ABIL_NAVIGATION: confused_dir[which dir is north][reverse][which dir to translate]
+// for PTECH_NAVIGATION: confused_dir[which dir is north][reverse][which dir to translate]
 // reverse=0 is for moving
 // reverse=1 is for which way directions are displayed (this was very confusing to figure out)
 const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS] = {
@@ -861,7 +1074,7 @@ const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS] = {
 };
 
 
-// for ABIL_NAVIGATION: how_to_show_map[dir which is north for char][x=0,y=1]
+// for PTECH_NAVIGATION: how_to_show_map[dir which is north for char][x=0,y=1]
 // for each direction, whether the x/y coord goes from positive to negative (1) or negative to positive (-1)
 int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
 	{ -1, 1 },	// north
@@ -871,7 +1084,7 @@ int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
 };
 
 
-// for ABIL_NAVIGATION: show_map_y_first[dir which is north for char]
+// for PTECH_NAVIGATION: show_map_y_first[dir which is north for char]
 // 1 = show y coordinate vertically, 0 = show x coord vertically
 int show_map_y_first[NUM_SIMPLE_DIRS] = {
 	1,	// N
@@ -920,6 +1133,9 @@ const char *affected_bits[] = {
 	"*ORDERED",
 	"!DRINK-BLOOD",
 	"DISTRACTED",
+	"HARD-STUNNED",
+	"IMMUNE-DAMAGE",	// 35
+	"!WHERE",
 	"\n"
 };
 
@@ -959,6 +1175,9 @@ const char *affected_bits_consider[] = {
 	"",	// ordred
 	"",	// !drink-blood
 	"",	// distracted
+	"",	// hard-stunned
+	"",	// 35 - immune-damage
+	"",	// !where
 	"\n"
 };
 
@@ -997,7 +1216,10 @@ const bool aff_is_bad[] = {
 	FALSE,	// 30
 	FALSE,
 	FALSE,
-	TRUE
+	TRUE,
+	FALSE,	// hard-stunned (not 'bad' because it's uncleansable)
+	FALSE,	// 35 - immune-damage
+	FALSE,
 };
 
 
@@ -1264,7 +1486,7 @@ struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits", "not agile enough" },
 	{ "Charisma", "Charisma improves your success with Stealth abilities", "not charming enough" },
 	{ "Greatness", "Greatness determines how much territory your empire can claim", "not great enough" },
-	{ "Intelligence", "Intelligence improves your magical damage and healing", "not clever" },
+	{ "Intelligence", "Intelligence improves your magical damage and healing", "not clever enough" },
 	{ "Wits", "Wits improves your speed and effectiveness in combat", "too slow" }
 };
 
@@ -1316,6 +1538,8 @@ const char *craft_flags[] = {
 	"VEHICLE",
 	"SHIPYARD",
 	"BLD-UPGRADED",
+	"LEARNED",
+	"BY-RIVER",
 	"\n"
 };
 
@@ -1338,6 +1562,8 @@ const char *craft_flag_for_info[] = {
 	"",	// vehicle
 	"requires shipyard",
 	"requires upgrade",
+	"",	// learned
+	"must be by a river",
 	"\n"
 };
 
@@ -1365,19 +1591,51 @@ const char *craft_types[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE CONSTANTS ////////////////////////////////////////////////////////
 
-// name, icon, radius, max population
+// name, icon, radius, show-to-others, is-capital
 struct city_metadata_type city_type[] = {
-	{ "outpost", "&0-&?C1&0-", 5, 10 },
-	{ "village", "&0-&?C2&0-", 10, 30 },
-	{ "city", "&0-&?C3&0-", 15, 50 },
-	{ "capital", "&0-&?C4&0-", 25, 150 },
+	{ "outpost", "&0-&?C1&0-", 5, FALSE, FALSE },
+	{ "village", "&0-&?C2&0-", 10, TRUE, FALSE },
+	{ "city", "&0-&?C3&0-", 15, TRUE, FALSE },
+	{ "capital", "&0-&?C4&0-", 25, TRUE, TRUE },
 
-	// this must go last	
-	{ "\n", "\n", 0, 0 }
+	// this must go last
+	{ "\n", "\n", 0, FALSE, FALSE }
 };
 
 
-// ELOG_x
+// DIPL_x: Diplomacy types
+const char *diplomacy_flags[] = {
+	"peace",	// 0
+	"war",
+	"unknown",
+	"allied",
+	"nonaggression",
+	"trade",	// 5
+	"distrust",
+	"truce",
+	"\n"
+};
+
+
+// OFFENSE_x: offense definitions
+// note: weights are in relation to the offense_min_to_war and offenses_for_free_war
+struct offense_info_type offense_info[NUM_OFFENSES] = {
+	// name, weight
+	{ "stealing", 15 },	// 0
+	{ "attacked player", 5 },
+	{ "guard tower", 1 },
+	{ "killed player", 15 },
+	{ "infiltrated", 2 },
+	{ "attacked npc", 1 },	// 5
+	{ "sieged building", 15 },
+	{ "sieged vehicle", 15 },
+	{ "burned building", 5 },
+	{ "burned vehicle", 5 },
+	{ "pickpocketed", 5 },	// 10
+};
+
+
+// ELOG_x (1/3)
 const char *empire_log_types[] = {
 	"None",
 	"Admin",
@@ -1388,11 +1646,13 @@ const char *empire_log_types[] = {
 	"Trade",
 	"Logins",
 	"Shipping",
+	"Workforce",
+	"Progress",
 	"\n"
 };
 
 
-// ELOG_x: Whether or not logs are shown to players online
+// ELOG_x (2/3): Whether or not logs are shown to players online
 const bool show_empire_log_type[] = {
 	TRUE,	// none
 	TRUE,	// admin
@@ -1402,7 +1662,61 @@ const bool show_empire_log_type[] = {
 	TRUE,	// territory
 	FALSE,	// trade
 	TRUE,	// logins
-	FALSE	// shipments
+	FALSE,	// shipments
+	FALSE,	// workforce
+	TRUE,	// progress
+};
+
+
+// ELOG_x (3/3): Whether or not logs are shown on the base 'elog' command
+const bool empire_log_request_only[] = {
+	FALSE,	// none
+	FALSE,	// admin
+	FALSE,	// diplo
+	FALSE,	// hostility
+	FALSE,	// members
+	FALSE,	// territory
+	FALSE,	// trade
+	TRUE,	// logins
+	FALSE,	// shipments
+	TRUE,	// workforce
+	FALSE,	// progress
+};
+
+
+// EADM_x: empire admin flags
+const char *empire_admin_flags[] = {
+	"!WAR",
+	"!STEAL",
+	"CITY-CLAIMS-ONLY",
+	"\n"
+};
+
+
+// EATT_x: empire attributes
+const char *empire_attributes[] = {
+	"Progress Pool",
+	"Bonus City Points",
+	"Max City Size",
+	"Tty per 100 Wealth",
+	"Tty per Greatness",
+	"Workforce Cap",
+	"Bonus Territory",
+	"\n"
+};
+
+
+// ENEED_x: empire need types
+const char *empire_needs_types[] = {
+	"food for workforce",
+	"\n"
+};
+
+
+// ENEED_STATUS_x: empire statuses
+const char *empire_needs_status[] = {
+	"UNSUPPLIED",
+	"\n"
 };
 
 
@@ -1413,21 +1727,36 @@ const char *unique_storage_flags[] = {
 };
 
 
+// OFF_x: offense flags
+const char *offense_flags[] = {
+	"SEEN",
+	"WAR",
+	"AVENGED",
+	"\n"
+};
+
+
 // TECH_x
 const char *techs[] = {
 	"Glassblowing",
-	"Lights",
+	"City Lights",
 	"Locks",
 	"Apiaries",
 	"Seaport",
 	"Workforce",
 	"Prominence",
-	"Commerce",
+	"Citizens",
 	"Portals",
 	"Master Portals",
 	"Skilled Labor",
 	"Trade Routes",
 	"Exarch Crafts",
+	"Deep Mines",
+	"Rare Metals",
+	"Bonus Experience",
+	"Tunnels",
+	"Fast Prospect",
+	"Fast Excavate",
 	"\n"
 };
 
@@ -1460,22 +1789,23 @@ const char *priv[] = {
 	"homes",
 	"storage",
 	"warehouse",
+	"progress",
 	"\n"
 };
 
 
 // SCORE_x -- score types
 const char *score_type[] = {
-	"Wealth",
-	"Territory",
-	"Members",
-	"Techs",
-	"Inventory",
+	"Community",
+	"Defense",
 	"Greatness",
-	"Diplomacy",
-	"Fame",
-	"Military",
+	"Industry",
+	"Inventory",
+	"Members",
 	"Playtime",
+	"Prestige",
+	"Territory",
+	"Wealth",
 	"\n"
 };
 
@@ -1498,6 +1828,19 @@ const char *trade_mostleast[] = {
 const char *trade_overunder[] = {
 	"over",	// export
 	"under",	// import
+	"\n"
+};
+
+
+// WF_PROB_x: Workforce problem logging
+const char *wf_problem_types[] = {
+	"no workers",
+	"over limit",
+	"depleted",
+	"no resources",
+	"already sheared",
+	"delayed",
+	"out of city",
 	"\n"
 };
 
@@ -1550,6 +1893,28 @@ struct faction_reputation_type reputation_levels[] = {
 	{ REP_REVERED, "Revered", "\tg", 100 },
 	
 	{ -1, "\n", "\t0", 0 },	// last
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GENERIC CONSTANTS ///////////////////////////////////////////////////////
+
+// GENERIC_x: generic types
+const char *generic_types[] = {
+	"UNKNOWN",
+	"LIQUID",
+	"ACTION",
+	"COOLDOWN",
+	"AFFECT",
+	"CURRENCY",
+	"\n"
+};
+
+
+// GEN_x: generic flags
+const char *generic_flags[] = {
+	// none yet defined
+	"\n"
 };
 
 
@@ -1726,21 +2091,21 @@ const char *item_types[] = {
 	"CONTAINER",
 	"DRINKCON",
 	"FOOD",
-	"*",
+	"RECIPE",
 	"PORTAL",
 	"*BOARD",
 	"CORPSE",
 	"COINS",
-	"*",
-	"*",
+	"CURRENCY",
+	"PAINT",
 	"*MAIL",
 	"WEALTH",
 	"*CART",
 	"*SHIP",
 	"*",
 	"*",
-	"MISSILE_WEAPON",
-	"ARROW",
+	"MISSILE-WEAPON",
+	"AMMO",
 	"INSTRUMENT",
 	"SHIELD",
 	"PACK",
@@ -1752,7 +2117,7 @@ const char *item_types[] = {
 };
 
 
-// ITEM_WEAR_ (wear bitvector) -- also see wear_significance
+// ITEM_WEAR_x (wear bitvector) -- also see wear_significance
 const char *wear_bits[] = {
 	"TAKE",
 	"FINGER",
@@ -1852,6 +2217,7 @@ const char *extra_bits[] = {
 	"HARD-DROP",
 	"GROUP-DROP",
 	"GENERIC-DROP",
+	"!STORE",
 	"\n"
 };
 
@@ -1883,6 +2249,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// hard-drop
 	"",	// group-drop
 	"",	// generic-drop
+	"",	// no-store
 	"\n"
 };
 
@@ -1892,7 +2259,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.1,	// OBJ_UNIQUE
 	1.0,	// OBJ_PLANTABLE
 	1.0,	// OBJ_LIGHT
-	1.3333,	// OBJ_SUPERIOR
+	1.6,	// OBJ_SUPERIOR
 	1.0,	// OBJ_LARGE
 	1.0,	// OBJ_CREATED
 	1.0,	// OBJ_SINGLE_USE
@@ -1913,7 +2280,8 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_NO_AUTOSTORE
 	1.2,	// OBJ_HARD_DROP
 	1.4,	// OBJ_GROUP_DROP
-	1.0	// OBJ_GENERIC_DROP
+	1.0,	// OBJ_GENERIC_DROP
+	1.0	// OBJ_NO_STORE
 };
 
 
@@ -1965,94 +2333,6 @@ const char *container_bits[] = {
 };
 
 
-/* LIQ_x */
-const char *drinks[] = {
-	"water",
-	"lager",
-	"wheat beer",
-	"ale",
-	"cider",
-	"milk",
-	"blood",
-	"honey",
-	"bean soup",
-	"coffee",
-	"green tea",
-	"red wine",
-	"white wine",
-	"grog",
-	"mead",
-	"stout",
-	"\n"
-};
-
-
-/* LIQ_x one-word alias for each drink */
-const char *drinknames[] = {
-	"water",
-	"lager",
-	"wheatbeer",
-	"ale",
-	"cider",
-	"milk",
-	"blood",
-	"honey",
-	"soup",
-	"coffee",
-	"tea",
-	"wine",
-	"wine",
-	"grog",
-	"mead",
-	"stout",
-	"\n"
-};
-
-
-// LIQ_x: this table is amount per "drink", in mud hours of thirst cured, etc
-// effect on DRUNK, FULL, THIRST
-int drink_aff[][3] = {
-	{ 0, 0, 3 },	/* water	*/
-	{ 2, 1, 1 },	/* larger	*/
-	{ 3, 1, 1 },	/* wheatbeer	*/
-	{ 2, 1, 1 },	/* ale		*/
-	{ 3, 1, 1 },	/* cider	*/
-	{ 0, 2, 2 },	/* milk		*/
-	{ 0, 0, -1 },	/* blood	*/
-	{ 0, 0, 1 },	/* honey	*/
-	{ 0, 4, 0 },	// bean soup
-	{ 0, 0, 1 },	// coffee
-	{ 0, 0, 1 },	// green tea
-	{ 4, 0, 1 },	// red wine
-	{ 3, 0, 1 },	// white wine
-	{ 2, 1, 1 },	// grog
-	{ 1, 1, 1 },	// mead
-	{ 3, 2, 1 },	// stout
-};
-
-
-// LIQ_x: color of the various drinks
-const char *color_liquid[] = {
-	"clear",
-	"brown",
-	"golden white",
-	"golden",
-	"golden",
-	"white",
-	"red",
-	"golden",
-	"soupy",
-	"brown",
-	"green",
-	"red",
-	"clear",
-	"amber",
-	"golden",
-	"black",
-	"\n"
-};
-
-
 // CMP_x: component types
 const char *component_types[] = {
 	"none",
@@ -2084,6 +2364,7 @@ const char *component_types[] = {
 	"textile",
 	"vegetable",
 	"rope",
+	"paint",
 	"\n"
 };
 
@@ -2091,7 +2372,7 @@ const char *component_types[] = {
 // CMPF_x: component flags
 const char *component_flags[] = {
 	"animal",
-	"bunch",
+	"bunch of",
 	"desert",
 	"fine",
 	"hard",
@@ -2124,6 +2405,48 @@ const char *fullness[] = {
 };
 
 
+// house painting (1/2)
+const char *paint_colors[] = {
+	"&0",	// none/normal
+	"&b",	// blue
+	"&r",	// red
+	"&y",	// yellow
+	"&g",	// green
+	"&o",	// orange
+	"&v",	// violet
+	"&a",	// azure
+	"&c",	// Cyan
+	"&j",	// Jade
+	"&l",	// Lime
+	"&m",	// Magenta
+	"&p",	// Pink
+	"&t",	// Tan
+	"&w",	// White
+	"\n"
+};
+
+
+// house painting (2/2)
+const char *paint_names[] = {
+	"none",
+	"Blue",
+	"Red",
+	"Yellow",
+	"Green",
+	"Orange",
+	"Violet",
+	"Azure",
+	"Cyan",
+	"Jade",
+	"Lime",
+	"Magenta",
+	"Pink",
+	"Tan",
+	"White",
+	"\n"
+};
+
+
 // RES_x: resource requirement types
 const char *resource_types[] = {
 	"object",
@@ -2132,74 +2455,8 @@ const char *resource_types[] = {
 	"coins",
 	"pool",
 	"action",
+	"currency",
 	"\n"
-};
-
-
-// NOTE: these match up with 'res_action_messages', and you must add entries to both
-const char *res_action_type[] = {
-	"dig",
-	"clear terrain",
-	"tidy up",
-	"repair",	// 3: used in vnums.h
-	"scout area",
-	"block water",
-	"engrave",
-	"magic words",
-	"organize",
-	"\n"
-};
-
-
-// these match up with 'res_action_type'; all message pairs are to-char, to-room; vehicles use $V
-const char *res_action_messages[][NUM_APPLY_RES_TYPES][2] = {
-	#define RES_ACTION_MESSAGE(build_to_char, build_to_room, veh_to_char, veh_to_room, repair_to_char, repair_to_room)  {{"",""},{build_to_char,build_to_room},{veh_to_char,veh_to_room},{repair_to_char,repair_to_room}}
-	
-	RES_ACTION_MESSAGE(	// dig
-		"You dig at the ground.", "$n digs at the ground.",	// building/maintaining
-		"You dig underneath $V.", "$n digs underneath $V.",	// craft vehicle
-		"You dig underneath $V.", "$n digs underneath $V."	// repair vehicle
-	),
-	RES_ACTION_MESSAGE(	// clear terrain
-		"You clear the area of debris.", "$n clears the area of debris.",
-		"You clear the area around $V.", "$n clears the area around $V.",
-		"You clear the area around $V.", "$n clears the area around $V."
-	),
-	RES_ACTION_MESSAGE(	// tidy up
-		"You tidy up the area.", "$n tidies up the area.",
-		"You tidy up around $V.", "$n tidies up around $V.",
-		"You tidy up $V.", "$n tidies up $V."
-	),
-	RES_ACTION_MESSAGE(	// repair
-		"You repair the building.", "$n repairs the building.",
-		"You repair $V.", "$n repairs $V.",
-		"You repair $V.", "$n repairs $V."
-	),
-	RES_ACTION_MESSAGE(	// scout area
-		"You scout the area.", "$n scouts the area.",
-		"You scout the area.", "$n scouts the area.",
-		"You scout the area around $V.", "$n scouts the area around $V."
-	),
-	RES_ACTION_MESSAGE(	// block water
-		"You block off the water.", "$n blocks off the water.",
-		"You block off the water around $V.", "$n blocks off the water around $V.",
-		"You block off the water around $V.", "$n blocks off the water around $V."
-	),
-	RES_ACTION_MESSAGE(	// engrave
-		"You engrave the building.", "$n engraves the building.",
-		"You engrave $V.", "$n engraves $V.",
-		"You engrave $V.", "$n engraves $V."
-	),
-	RES_ACTION_MESSAGE(	// magic words
-		"You speak some magic words.", "$n speaks some magic words.",
-		"You speak some magic words.", "$n speaks some magic words.",
-		"You speak some magic words.", "$n speaks some magic words."
-	),
-	RES_ACTION_MESSAGE(	// organize
-		"You organize the building.", "$n organizes the building.",
-		"You organize $V.", "$n organizes $V.",
-		"You organize $V.", "$n organizes $V."
-	),
 };
 
 
@@ -2234,53 +2491,46 @@ const char *obj_custom_types[] = {
 // Weapon attack texts -- TYPE_x
 struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	// * lower numbers are better for speeds (seconds between attacks)
-	// name, singular, plural, { fast spd, normal spd, slow spd }, WEAPON_, DAM_, disarmable
-	{ "RESERVED", "hit", "hits", { 1.8, 2.0, 2.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "slash", "slash", "slashes", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "slice", "slice", "slices", { 3.0, 3.2, 3.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "jab", "jab", "jabs", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "stab", "stab", "stabs", { 2.0, 2.2, 2.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "pound", "pound", "pounds", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "hammer", "hammer", "hammers", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "whip", "whip", "whips", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "pick", "jab", "jabs", { 3.4, 3.6, 3.8 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "bite", "bite", "bites", { 2.2, 2.4, 2.6 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "claw", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "kick", "kick", "kicks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "fire", "burn", "burns", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_FIRE, TRUE },
-	{ "vampire claws", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "crush", "crush", "crushes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "hit", "hit", "hits", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "magic fire", "blast", "blasts", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "lightning staff", "zap", "zaps", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "burn staff", "burn", "burns", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "agony staff", "agonize", "agonizes", { 3.3, 3.6, 3.9 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic frost", "chill", "chills", { 4.1, 4.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic shock", "shock", "shocks", { 2.6, 2.8, 3.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic light", "flash", "flashes", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "sting", "sting", "stings", { 3.6, 3.8, 4.0 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "swipe", "swipe", "swipes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "tail swipe", "swipe", "swipes", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "peck", "peck", "pecks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "mana blast", "blast", "blasts", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE }
+	// name, first-pers, 2nd-pers, noun, { fast spd, normal spd, slow spd }, WEAPON_, DAM_, disarmable
+	{ "RESERVED", "hit", "hits", "hit", { 1.8, 2.0, 2.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "slash", "slash", "slashes", "slash", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "slice", "slice", "slices", "swing", { 3.0, 3.2, 3.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "jab", "jab", "jabs", "jab", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "stab", "stab", "stabs", "stab", { 2.0, 2.2, 2.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "pound", "pound", "pounds", "swing", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "hammer", "hammer", "hammers", "hammer", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "whip", "whip", "whips", "whip", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "pick", "jab", "jabs", "pick", { 3.4, 3.6, 3.8 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "bite", "bite", "bites", "bite", { 2.2, 2.4, 2.6 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "claw", "claw", "claws", "claw", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "kick", "kick", "kicks", "kick", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "fire", "burn", "burns", "fire", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_FIRE, TRUE },
+	{ "vampire claws", "claw", "claws", "claw", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "crush", "crush", "crushes", "blow", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "hit", "hit", "hits", "hit", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "magic fire", "blast", "blasts", "blast", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "lightning staff", "zap", "zaps", "staff", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "burn staff", "burn", "burns", "staff", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "agony staff", "agonize", "agonizes", "staff", { 3.3, 3.6, 3.9 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic frost", "chill", "chills", "frost", { 4.1, 4.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic shock", "shock", "shocks", "shock", { 2.6, 2.8, 3.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic light", "flash", "flashes", "light", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "sting", "sting", "stings", "sting", { 3.6, 3.8, 4.0 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "swipe", "swipe", "swipes", "swipe", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "tail swipe", "swipe", "swipes", "tail swipe", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "peck", "peck", "pecks", "peck", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "gore", "gore", "gores", "gore", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "mana blast", "blast", "blasts", "blast", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
+	{ "bow", "shoot", "shoots", "shot", { 2.2, 2.6, 3.2 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "crossbow", "shoot", "shoots", "shot", { 3.7, 3.9, 4.3 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "pistol", "shoot", "shoots", "shot", { 2.0, 2.4, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "musket", "shoot", "shoots", "shot", { 3.6, 3.8, 4.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE }
 };
 
 
 // basic speed is the theoretical average weapon speed without wits/haste,
 // and is used to apply bonus-physical/magical evenly by adjusting for speed
 const double basic_speed = 4.0;	// seconds between attacks
-
-
-// missile speeds
-const double missile_weapon_speed[] = {
-	3.0,
-	2.4,
-	2.0,
-	
-	// terminate the list
-	-1
-};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2303,14 +2553,17 @@ const char *olc_flag_bits[] = {
 	"!GLOBAL",
 	"!AUGMENT",
 	"!ARCHETYPE",
-	"ABILITIES",
-	"CLASSES",
-	"SKILLS",
+	"!ABILITIES",
+	"!CLASSES",
+	"!SKILLS",
 	"!VEHICLES",
 	"!MORPHS",
 	"!QUESTS",
 	"!SOCIALS",
 	"!FACTIONS",
+	"!GENERICS",
+	"!SHOPS",
+	"ALLOW-PROGRESS",
 	"\n"
 };
 
@@ -2339,6 +2592,47 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"quest",
 	"social",
 	"faction",
+	"generic",
+	"shop",
+	"progression",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PROGRESS CONSTANTS //////////////////////////////////////////////////////
+
+// PROGRESS_x: progress types
+const char *progress_types[] = {
+	"UNDEFINED",
+	"Community",
+	"Industry",
+	"Defense",
+	"Prestige",
+	"\n"
+};
+
+
+// PRG_x: progress flags
+const char *progress_flags[] = {
+	"IN-DEVELOPMENT",
+	"PURCHASABLE",
+	"SCRIPT-ONLY",
+	"HIDDEN",
+	"\n"
+};
+
+
+// PRG_PERK_x: progress perk types (should be all 1 word)
+const char *progress_perk_types[] = {
+	"Technology",
+	"City-points",
+	"Craft",
+	"Max-city-size",
+	"Wealth-territory-per-100",
+	"Greatness-territory",
+	"Workforce-cap",
+	"Territory",
 	"\n"
 };
 
@@ -2355,6 +2649,7 @@ const char *quest_flags[] = {
 	"DAILY",
 	"EMPIRE-ONLY",
 	"NO-GUESTS",
+	"TUTORIAL",
 	"\n"
 };
 
@@ -2381,6 +2676,7 @@ const char *quest_reward_types[] = {
 	"SKILL-LEVELS",	// 5
 	"QUEST-CHAIN",
 	"REPUTATION",
+	"CURRENCY",
 	"\n",
 };
 
@@ -2390,21 +2686,27 @@ const char *quest_reward_types[] = {
 
 // BLD_ON_x
 const char *bld_on_flags[] = {
-	"water",
+	"water",	// 0
 	"plains",
 	"mountain",
-	"full forest",
+	"full-forest",
 	"desert",
-	"river",
+	"river",	// 5
 	"jungle",
-	"not player made",
+	"not-player-made",
 	"ocean",
 	"oasis",
-	"crops",
+	"crops",	// 10
 	"grove",
 	"swamp",
-	"any forest",
-	"open building",
+	"any-forest",
+	"open-building",
+	"flat-terrain",	// 15
+	"shallow-sea",
+	"coast",
+	"riverbank",
+	"estuary",
+	"lake",	// 20
 	"\n"
 };
 
@@ -2424,7 +2726,7 @@ const char *bld_flags[] = {
 	"BARRIER",	// 10
 	"IN-CITY-ONLY",
 	"LARGE-CITY-RADIUS",
-	"*MINE-DEPRECATED",
+	"!PAINT",
 	"ATTACH-ROAD",
 	"BURNABLE",	// 15
 	"*FORGE-DEPRECATED",
@@ -2459,6 +2761,14 @@ const char *bld_flags[] = {
 	"*SHIPYARD-DEPRECATED",	// 45
 	"UPGRADED",
 	"*PRESS-DEPRECATED",
+	"\n"
+};
+
+
+// BLD_REL_x: relationships with other buildings
+const char *bld_relationship_types[] = {
+	"UPGRADES-TO",
+	"STORES-LIKE",
 	"\n"
 };
 
@@ -2524,18 +2834,22 @@ const char *designate_flags[] = {
 
 // EVO_x 1/3: world evolution names
 const char *evo_types[] = {
-	"CHOPPED-DOWN",
+	"CHOPPED-DOWN",	// 0
 	"CROP-GROWS",
 	"ADJACENT-ONE",
 	"ADJACENT-MANY",
 	"RANDOM",
-	"TRENCH-START",
+	"TRENCH-START",	// 5
 	"TRENCH-FULL",
 	"NEAR-SECTOR",
 	"PLANTS-TO",
 	"MAGIC-GROWTH",
-	"NOT-ADJACENT",
+	"NOT-ADJACENT",	// 10
 	"NOT-NEAR-SECTOR",
+	"SPRING",
+	"SUMMER",
+	"AUTUMN",
+	"WINTER",	// 15
 	"\n"
 };
 
@@ -2554,6 +2868,10 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// magic-growth
 	EVO_VAL_SECTOR,	// not-adjacent
 	EVO_VAL_SECTOR,	// not-near-sector
+	EVO_VAL_NONE,	// spring
+	EVO_VAL_NONE,	// summer
+	EVO_VAL_NONE,	// autumn
+	EVO_VAL_NONE,	// winter
 };
 
 
@@ -2571,6 +2889,10 @@ bool evo_is_over_time[] = {
 	FALSE,	// magic-growth
 	TRUE,	// not-adjacent
 	TRUE,	// not-near-sector
+	TRUE,	// spring
+	TRUE,	// summer
+	TRUE,	// autumn
+	TRUE,	// winter
 };
 
 
@@ -2609,6 +2931,8 @@ const char *function_flags[] = {
 	"WAREHOUSE",	// 30
 	"DRINK-WATER",
 	"COOKING-FIRE",
+	"LARGER-NEARBY",
+	"FISHING",
 	"\n"
 };
 
@@ -2618,6 +2942,7 @@ const char *island_bits[] = {
 	"NEWBIE",
 	"!AGGRO",
 	"!CUSTOMIZE",
+	"CONTINENT",
 	"\n"
 };
 
@@ -2786,6 +3111,7 @@ const char *room_aff_bits[] = {
 	"*!DISMANTLE",
 	"*INCOMPLETE",	// 15
 	"!TELEPORT",
+	"BRIGHT-PAINT",
 	"\n"
 };
 
@@ -2794,7 +3120,7 @@ const char *room_aff_bits[] = {
 const char *room_extra_types[] = {
 	"prospect empire",
 	"mine amount",
-		"unused",
+	"fire remaining",
 	"seed time",
 	"tavern type",
 	"tavern brewing time",
@@ -2810,6 +3136,8 @@ const char *room_extra_types[] = {
 	"redesignate time",
 	"ceded",
 	"mine global vnum",
+	"trench fill time",
+	"trench original sector",
 	"\n"
 };
 
@@ -2932,258 +3260,17 @@ const char *weather_types[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// SHOP CONSTANTS //////////////////////////////////////////////////////////
+
+// SHOP_x: shop flags
+const char *shop_flags[] = {
+	"IN-DEVELOPMENT",	// 0
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// SKILL CONSTANTS /////////////////////////////////////////////////////////
-
-// ABILF_x: ability flags
-const char *ability_flags[] = {
-	"*",
-	"\n"
-};
-
-
-/* ATYPE_x */
-const char *affect_types[] = {
-	"!RESERVED!",	// 0
-	"fly",
-	"entrancement",
-	"darkness",
-	"poisoned",
-	"boost",	// 5
-	"cut deep",
-	"sap",
-	"mana shield",
-	"foresight",
-	"earthmeld",	// 10
-	"mummify",
-	"earth armor",
-	"bestow vigor",
-	"weakness",
-	"colorburst",	// 15
-	"heartstop",
-	"phoenix rite",
-	"disarm",
-	"shocked",
-	"skybrand",  // 20
-	"counterspell",
-	"hasten",
-	"rejuvenate",
-	"entangle",
-	"radiance",	// 25
-	"inspire",
-	"jabbed",
-	"blind",
-	"healing potion",
-	"nature potion",	// 30
-	"vigor",
-	"enervate",
-	"enervate",
-	"siphon",
-	"slow",	// 35
-	"sunshock",
-	"tripping",
-	"siphoned",
-	"affect",	// 39 -- DG Scripts affect
-	"claws",	// 40
-	"deathshroud",
-	"soulmask",
-	"majesty",
-	"alacrity",
-	"nightsight", // 45
-	"death penalty",
-	"bash",
-	"terrify",
-	"stunning blow",
-	"stun immunity",	// 50
-	"war delay",
-	"unburdened",
-	"shadow kick",
-	"stagger jab",
-	"shadowcage",	// 55
-	"howl",
-	"crucial jab",
-	"diversion",
-	"shadow jab",
-	"confer",	// 60
-	"conferred",
-	"morph",
-	"whisperstride",
-	"well-fed",
-	"ablate",	// 65
-	"acidblast",
-	"astralclaw",
-	"chronoblast",
-	"dispirit",
-	"erode",	// 70
-	"scour",
-	"shadowlash",	// blind
-	"shadowlash",	// dot
-	"soulchain",
-	"thornlash",	// 75
-	"arrow to the knee",
-	"hostile delay",
-	"nature burn",
-	"\n"
-	};
-
-
-// ATYPE_x -- empty string will send no message at all
-const char *affect_wear_off_msgs[] = {
-	"!RESERVED!",	// 0
-	"You land quickly as your magical flight wears off.",
-	"You no longer feel entranced.",
-	"The blanket of darkness dissipates.",
-	"Poison fades from your system.",
-	"You suddenly feel weaker.",	// 5
-	"You're no longer bleeding from your deep cuts.",
-	"You are no longer stunned.",
-	"Your mana shield fades.",
-	"Your foresight ends.",
-	"You rise from the ground!",	// 10
-	"Your flesh returns to normal.",
-	"Your plating of earth armor fades.",
-	"Your heightened Fortitude fades.",
-	"Your weakness fades.",
-	"You are no longer distracted by colorburst.",	// 15
-	"Your vitae is no longer hindered.",
-	"Your phoenix rite expires.",
-	"You recover and are no longer disarmed.",
-	"The lightning shock wears off.",
-	"The skybrand fades.",  // 20
-	"Your counterspell expires.",
-	"Your haste fades.",
-	"The rejuvenation effect ends.",
-	"You are no longer entangled in vines.",
-	"Your radiant aura fades.",	// 25
-	"Your inspiration fades.",
-	"Your jab wound stops bleeding.",
-	"You are no longer blinded by sand.",
-	"Your healing potion effect ends.",
-	"Your nature potion effect ends.",	// 30
-	"Your vigor penalty ends.",
-	"Your stamina begins to return.",
-	"You are no longer gaining stamina from enervate.",
-	"You are no longer receiving mana from the siphon.",
-	"You no longer feel lethargic.",	// 35
-	"You are no longer blinded by the light.",
-	"Stuff isn't doing that thing anymore.",
-	"Your mana is no longer siphoned.",
-	"",	// 39 -- DG Scripts affect
-	"Your claws retract.",	// 40
-	"Your deathshroud fades.",
-	"Your soulmask fades.",
-	"You are no longer so majestic.",
-	"Your alacrity fades.",
-	"Your nightsight fades.",	// 45
-	"Your death penalty ends.",
-	"You are no longer stunned by that bash.",
-	"You are no longer terrified.",
-	"You are no longer dazed by that stunning blow.",
-	"Your stun immunity expires.",	// 50
-	"Your war delay ends and you are free to act.",
-	"You feel the weight of the world return.",
-	"You are no longer weakened by the shadow kick.",
-	"You are no longer weakened by the stagger jab.",
-	"The shadowcage fades and your focus returns.",	// 55
-	"The terrifying howl fades from your mind.",
-	"You are no longer weakened by the crucial jab.",
-	"You are no longer distracted by the diversion.",
-	"You are no longer weakened by the shadow jab.",
-	"The power you were conferred has faded.",	// 60
-	"Your conferred strength returns.",
-	"",	// morph stats -- no wear-off message
-	"Your whisperstride fades.",
-	"You no longer feel well-fed.",
-	"The ablation fades.",	// 65
-	"The acid blast wears off.",
-	"",	// astral claw
-	"Time speeds back up to normal.",
-	"Your wits return.",
-	"",	// 70, erode
-	"",	// scour
-	"Your vision returns.",
-	"",	// shadowlash-dot
-	"Your soul is unchained.",
-	"",	// 75, thornlast
-	"Your knee feels better.",
-	"Your hostile login delay ends and you are free to act.",
-	"Your nature burn eases.",
-	"\n"
-};
-
-
-// COOLDOWN_x
-const char *cooldown_types[] = {
-	"!RESERVED!",	// 0
-	"respawn",
-	"left empire",
-	"hostile flag",
-	"pvp flag",
-	"pvp quit timer",	// 5
-	"milk",
-	"shear",
-	"disarm",
-	"outrage",
-	"rescue",	// 10
-	"kick",
-	"bash",
-	"colorburst",
-	"enervate",
-	"slow",	// 15
-	"siphon",
-	"mirrorimage",
-	"sunshock",
-	"teleport home",
-	"city teleportation",	// 20
-	"rejuvenate",
-	"cleanse",
-	"lightningbolt",
-	"skybrand",
-	"entangle",	// 25
-	"heartstop",
-	"summon humans",
-	"summon animals",
-	"summon guards",
-	"summon bodyguard",	// 30
-	"summon thug",
-	"summon swift",
-	"reward",
-	"search",
-	"terrify",	// 35
-	"darkness",
-	"shadowstep",
-	"backstab",
-	"jab",
-	"blind",	// 40
-	"sap",
-	"prick",
-	"weaken",
-	"moonrise",
-	"alternate",	// 45
-	"dispel",
-	"bloodsweat",
-	"earthmeld",
-	"shadowcage",
-	"howl",	// 50
-	"diversion",
-	"rogue flag",
-	"portal sickness",
-	"whisperstride",
-	"ablate",	// 55
-	"acidblast",
-	"arclight",
-	"astralclaw",
-	"chronoblast",
-	"deathtouch",	// 60
-	"dispirit",
-	"erode",
-	"scour",
-	"shadowlash",
-	"soulchain",	// 65
-	"starstrike",
-	"thornlash",	// 67
-	"\n"
-};
-
 
 // DAM_x damage types
 const char *damage_types[] = {
@@ -3196,8 +3283,20 @@ const char *damage_types[] = {
 };
 
 
-// DIFF_x: modifiers to your skill level before a skill check
+// DIFF_x (1/2): OLC labels for how difficult a roll is
+const char *skill_check_difficulty[] = {
+	"trivial (always passes)",
+	"easy (always passes after 50 skill)",
+	"medium (always passes at 100 skill)",
+	"hard (can still fail at 100)",
+	"rare (passes 10% of the time at 100)",
+	"\n"
+};
+
+
+// DIFF_x (2/2): modifiers to your skill level before a skill check
 double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
+	100,	// trivial (always passes)
 	1.5,  // easy
 	1,  // medium
 	0.66,  // hard
@@ -3208,6 +3307,7 @@ double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 // SKILLF_x: skill flags
 const char *skill_flags[] = {
 	"IN-DEVELOPMENT",
+	"BASIC",
 	"\n"
 };
 
@@ -3264,7 +3364,8 @@ const char *trig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3294,6 +3395,7 @@ const bitvector_t mtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
@@ -3322,7 +3424,8 @@ const char *otrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3330,7 +3433,7 @@ const char *otrig_types[] = {
 const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// global
 	TRIG_ARG_PERCENT,	// random
-	TRIG_ARG_OBJ_WHERE,	// command
+	TRIG_ARG_COMMAND | TRIG_ARG_OBJ_WHERE,	// command
 	NOBITS,	//
 	NOBITS,	//
 	NOBITS,	// timer
@@ -3352,6 +3455,7 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	TRIG_ARG_OBJ_WHERE,	// buy
 };
 
 
@@ -3380,7 +3484,8 @@ const char *vtrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3411,6 +3516,7 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
@@ -3439,7 +3545,8 @@ const char *wtrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3469,6 +3576,7 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
@@ -3512,6 +3620,15 @@ const bitvector_t *trig_argument_type_list[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// MISC CONSTANTS //////////////////////////////////////////////////////////
 
+// AUTOMSG_x: automessage types
+const char *automessage_types[] = {
+	"one-time",
+	"login",
+	"repeating",
+	"\n"
+};
+
+
 // for command-interpreting
 const char *fill_words[] = {
 	"in",
@@ -3541,6 +3658,7 @@ const char *global_flags[] = {
 	"ADVENTURE-ONLY",
 	"CUMULATIVE-PRC",
 	"CHOOSE-LAST",
+	"RARE",
 	"\n"
 };
 
@@ -3647,6 +3765,7 @@ const char *morph_flags[] = {
 	"GENDER-NEUTRAL",
 	"CONSUME-OBJ",	// 10
 	"!FASTMORPH",
+	"!MORPH-MESSAGE",
 	"\n"
 };
 
@@ -3673,6 +3792,20 @@ const char *requirement_types[] = {
 	"REP-UNDER",
 	"WEARING",
 	"WEARING-OR-HAS",
+	"GET-CURRENCY",	// 20
+	"GET-COINS",
+	"CAN-GAIN-SKILL",
+	"CROP-VARIETY",
+	"OWN-HOMES",
+	"OWN-SECTOR",	// 25
+	"OWN-BUILDING-FUNCTION",
+	"OWN-VEHICLE-FLAGGED",
+	"EMPIRE-WEALTH",
+	"EMPIRE-FAME",
+	"EMPIRE-GREATNESS",	// 30
+	"DIPLOMACY",
+	"HAVE-CITY",
+	"EMPIRE-MILITARY",
 	"\n",
 };
 
@@ -3699,6 +3832,20 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_REPUTATION,	// faction-under
 	REQ_AMT_NONE,	// wearing
 	REQ_AMT_NONE,	// wearing-or-has
+	REQ_AMT_NUMBER,	// get currency
+	REQ_AMT_NUMBER,	// get coins
+	REQ_AMT_NONE,	// can gain skill
+	REQ_AMT_NUMBER,	// crop variety
+	REQ_AMT_NUMBER,	// own homes
+	REQ_AMT_NUMBER,	// own sector
+	REQ_AMT_NUMBER,	// own building function
+	REQ_AMT_NUMBER,	// own vehicle flagged
+	REQ_AMT_NUMBER,	// empire wealth
+	REQ_AMT_NUMBER,	// empire fame
+	REQ_AMT_NUMBER,	// empire greatness
+	REQ_AMT_NUMBER,	// diplomacy
+	REQ_AMT_NUMBER,	// have city
+	REQ_AMT_NUMBER,	// empire military
 };
 
 
@@ -3724,6 +3871,20 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// faction-under
 	FALSE,	// wearing
 	FALSE,	// wearing-or-has
+	FALSE,	// get currency
+	FALSE,	// get coins
+	FALSE,	// can gain skill
+	FALSE,	// crop variety
+	FALSE,	// own homes
+	FALSE,	// own sector
+	FALSE,	// own building function
+	FALSE,	// own vehicle flagged
+	FALSE,	// empire wealth
+	FALSE,	// empire fame
+	FALSE,	// empire greatness
+	FALSE,	// diplomacy
+	FALSE,	// have city
+	FALSE,	// empire military
 };
 
 
@@ -3809,5 +3970,19 @@ const char *vehicle_flags[] = {
 	"ON-FIRE",
 	"!LOAD-ONTO-VEHICLE",
 	"VISIBLE-IN-DARK",	// 20
+	"!CLAIM",
+	"\n"
+};
+
+
+// WAIT_x: Wait types for the command_lag() function.
+const char *wait_types[] = {
+	"NONE",	// 0
+	"ABILITY",
+	"COMBAT-ABILITY",
+	"COMBAT-SPELL",
+	"MOVEMENT",
+	"SPELL",	// 5
+	"OTHER",
 	"\n"
 };

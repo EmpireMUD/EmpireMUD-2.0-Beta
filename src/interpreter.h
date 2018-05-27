@@ -174,6 +174,14 @@ struct alias_data {
 #define SCMD_POOFIN		0
 #define SCMD_POOFOUT	1
 
+// do_history
+#define SCMD_HISTORY  0
+#define SCMD_GOD_HISTORY  1
+#define SCMD_TELL_HISTORY  2
+#define SCMD_SAY_HISTORY  3
+#define SCMD_EMPIRE_HISTORY  4
+#define SCMD_ROLL_HISTORY  5
+
 /* do_hit */
 #define SCMD_HIT		0
 #define SCMD_MURDER		1
@@ -203,6 +211,17 @@ struct alias_data {
 // do_morph
 #define SCMD_MORPH  0
 #define SCMD_FASTMORPH  1
+
+// do_no_cmd
+#define NOCMD_CAST  1
+#define NOCMD_GOSSIP  2
+#define NOCMD_LEVELS  3
+#define NOCMD_PRACTICE  4
+#define NOCMD_RENT  5
+#define NOCMD_REPORT  6
+#define NOCMD_UNGROUP  7
+#define NOCMD_WIMPY  8
+#define NOCMD_TOGGLE  9
 
 // do_prompt
 #define SCMD_PROMPT  0
@@ -234,13 +253,19 @@ struct alias_data {
 #define NUM_TOG_TYPES  2
 
 
-// movement types
-#define MOVE_NORMAL  0	// Normal move message
-#define MOVE_LEAD  1	// Leading message
-#define MOVE_FOLLOW  2	// Follower message
-#define MOVE_CIRCLE  3	// circling
-#define MOVE_EARTHMELD  4
-#define MOVE_SWIM  5	// swim skill
+// movement flags
+#define MOVE_LEAD  BIT(0)	// leading something
+#define MOVE_FOLLOW  BIT(1)	// following someone
+#define MOVE_CIRCLE  BIT(2)	// is circling a building
+#define MOVE_EARTHMELD  BIT(3)	// is earthmelded (can't be seen)
+#define MOVE_SWIM  BIT(4)	// player is swimming
+#define MOVE_CLIMB  BIT(5)	// player is climbing
+#define MOVE_HERD  BIT(6)	// mob being herded
+#define MOVE_WANDER  BIT(7)	// normal mob move
+#define MOVE_RUN  BIT(8)	// running
+
+// flags that ignore some move checks
+#define MOVE_IGNORE  (MOVE_LEAD | MOVE_FOLLOW | MOVE_HERD | MOVE_WANDER)
 
 
 // obj desc flags

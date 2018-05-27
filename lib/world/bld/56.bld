@@ -77,6 +77,8 @@ F
 hv
 M
 241 20.00 ce
+U
+1 5115
 S
 #5604
 Great Hall~
@@ -257,7 +259,7 @@ S
 Tunnel~
 A Winding Tunnel~
 ~
-0 0 ab d
+0 0 abg d
 0 0 0 -1
 D
    The tunnel is earthen with tall logs supporting it, though not very well.
@@ -285,7 +287,7 @@ D
    A rope bridge is all that supports you as you pass from tree to tree.
 Despite your best efforts not to, you look down and are suddenly frightened by
 the great drop below. Fortunately, the superior construction prevails and
-you're saved the fall by the strong bridge.
+you're saved from the fall by the strong bridge.
 ~
 M
 9196 2.00 0
@@ -384,6 +386,8 @@ F
 aG
 M
 241 20.00 ce
+U
+1 5130
 S
 #5619
 Larder~
@@ -455,5 +459,7 @@ M
 9190 2.00 0
 M
 9198 2.00 0
+U
+1 5193
 S
 $

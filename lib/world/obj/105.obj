@@ -40,9 +40,11 @@ A jar of pickled glowkra is shining away.~
    This jar contains freshly pickled glowkra pods. It's bright enough to light
 the way at night.
 ~
-6 c a 4
-48 0 0
+6 c a 5
+12 0 0
 8 336
+B
+c
 C
 0 10
 M
@@ -53,7 +55,6 @@ M
 $n pops a glowing pod into $s mouth from $p.~
 R
 5114 0
-T 10500
 S
 #10503
 gumbo glowkra seafood plate~
@@ -82,13 +83,11 @@ to summon skeletal guards for your empire.
 
 Craft (Jewelry): dragonstooth sceptre
 ~
-3 b a 8
+3 b a 9
 0 10502 0
 14 0
 R
 5164 0
-R
-5511 0
 S
 #10505
 sceptre dragonstooth~
@@ -300,11 +299,14 @@ a magic mushroom potion~
 A magic mushroom potion is sitting here.~
 This foul-smelling mana potion is made from magic mushrooms.
 ~
-25 m a 4
-4 1 0
+25 m a 6
+-1 0 -1
 8 0
 C
-0 200
+150 150
+R
+5130 0
+T 1254
 S
 #10518
 fig unripe~
@@ -483,11 +485,11 @@ A quiver of bladegrass arrows is lying here.~
 magi-netically engineered bladegrass, while the shaft is made from a piece of
 stalk. They look rather vicious.
 ~
-21 m a 2
-10 2 0
+21 mo a 3
+20 1 0
 2 0
 C
-0 50
+50 125
 S
 #10531
 fruit pickthorn red~
@@ -589,14 +591,14 @@ R
 5118 0
 S
 #10550
-portal frosty~
+portal frosty arch ice~
 a frosty portal~
 A frosty portal spews flurries of snow from beneath an arch of ice!~
    An arch of ice rises above the frozen river, forming the border of a strange
 portal. Snow blasts through the portal and, as the snow lands on your skin, you
 feel the electric mana of the Magiterranean -- the realm of nature mages.
 ~
-8 0 0 1
+8 0 0 2
 -1 0 0
 10 0
 S
@@ -675,18 +677,6 @@ meltwater is pouring from them.
 9 48
 T 10555
 S
-#10556
-tokens permafrost pouch~
-a pouch of permafrost tokens~
-A pouch of permafrost tokens is lying here.~
-   This pouch holds tokens redeemable for rewards at the Permafrost adventure's
-shop. Use 'count tokens' to count them.
-~
-3 p a 7
-0 0 0
-7 0
-T 10556
-S
 #10557
 token permafrost~
 a permafrost token~
@@ -694,10 +684,9 @@ A permafrost token is lying here.~
    This token, redeemable for rewards at the Permafrost adventure's shop, will
 be automatically stored in your pouch when taken.
 ~
-3 p a 6
-0 0 0
+12 p a 7
+1 10550 0
 7 0
-T 10557
 S
 #10558
 tree spruce fallen~
@@ -924,11 +913,11 @@ S
 pattern winds whipping north~
 the whipping winds of the North pattern~
 The whipping winds of the North pattern is lying here.~
-This looks complicated to do...
-Sew (Dangerous Leathers): whipping winds of the North
+   This looks complicated to do... This pattern teaches you to sew the whipping
+winds of the North.
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10571 0 0
 0 0
 S
 #10573
@@ -953,11 +942,11 @@ S
 pattern frozen pykrete sword~
 the frozen pykrete sword pattern~
 The frozen pykrete sword is lying here.~
-Forging is easy. Forging ice without shattering it is a lot harder.
-Forge (Deadly Weapons): frozen pykrete sword
+   Forging is easy. Forging ice without shattering it is a lot harder. This
+pattern teaches you to forge a frozen pykrete sword.
 ~
-3 0 a 1
-0 0 0
+7 0 a 2
+10573 0 0
 0 0
 S
 #10575
@@ -985,11 +974,10 @@ pattern icy star winter~
 the icy star of winter pattern~
 The icy star of winter pattern is lying here.~
    Cutting ice is basically like cutting gems. The tricky bit is trapping a
-star inside it.
-Craft (Master Craftsman): icy star of winter
+star inside it. This pattern teaches you to craft the icy star of winter.
 ~
-3 0 a 1
-0 0 0
+7 0 a 2
+10575 0 0
 0 0
 S
 #10577
@@ -1019,11 +1007,10 @@ the glacial staff of the Maelstrom pattern~
 The glacial staff of the Maelstrom pattern is lying here.~
    The methods used in crafting and enchanting this staff are natural magic,
 anathema to high sorcerers, so normal staffmaking skill isn't required to craft
-it.
-Craft (Master Craftsman): glacial staff of the Maelstrom
+it. This pattern teaches you to craft a glacial staff of the Maelstrom.
 ~
-3 0 a 1
-0 0 0
+7 0 a 2
+10577 0 0
 0 0
 S
 #10579

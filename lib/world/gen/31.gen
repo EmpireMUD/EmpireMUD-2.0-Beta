@@ -1,0 +1,24 @@
+#3100
+sundered~
+4 0
+0 0 0 0
+T0
+Your armor is no longer sundered.~
+S
+#3101
+unstuck~
+4 0
+0 0 0 0
+T0
+Your temporary flight ends.~
+T2
+The gods grant you temporary flying as you seem to be stuck.~
+S
+#3102
+potion~
+4 0
+0 0 0 0
+T0
+Your potion effect ends.~
+S
+$

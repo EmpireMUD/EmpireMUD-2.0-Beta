@@ -26,6 +26,7 @@
 #include "dg_event.h"
 #include "db.h"
 #include "skills.h"
+#include "vnums.h"
 
 // external funcs
 void combat_meter_damage_dealt(char_data *ch, int amt);
@@ -54,19 +55,18 @@ extern const char *affected_bits[];
 room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
-	extern room_data *create_room();
+	extern room_data *create_room(room_data *home);
 	void sort_world_table();
 	
 	room_data *home = HOME_ROOM(from), *new;
 	
 	// create the new room
-	new = create_room();
+	new = create_room(home);
 	create_exit(from, new, dir, TRUE);
 	if (bld) {
 		attach_building_to_room(bld, new, TRUE);
 	}
 
-	COMPLEX_DATA(new)->home_room = home;
 	COMPLEX_DATA(home)->inside_rooms++;
 	
 	if (GET_ROOM_VEHICLE(from)) {
@@ -101,46 +101,68 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
 	char charname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
+	any_vnum atype = ATYPE_DG_AFFECT;
 	bitvector_t i = 0, type = 0;
 	struct affected_type af;
+	bool all_off = FALSE;
 
 	half_chop(cmd, junk, cmd);
 	half_chop(cmd, charname, cmd);
+	// sometimes charname is an affect vnum
+	if (*charname == '#') {
+		atype = atoi(charname+1);
+		half_chop(cmd, charname, cmd);
+		if (!find_generic(atype, GENERIC_AFFECT)) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
+	
 	half_chop(cmd, property, cmd);
 	half_chop(cmd, value_p, duration_p);
 
 	/* make sure all parameters are present */
-	if (!*charname || !*property || !*value_p) {
-		script_log("Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+	if (!*charname || !*property) {
+		script_log("Trigger: %s, VNum %d. dg_affect usage: [#affect vnum] <target> <property> <value> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
-	if (str_cmp(value_p, "off") && !*duration_p) {
-		script_log("Trigger: %s, VNum %d. dg_affect missing duration", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-		return;
+	
+	if (!str_cmp(property, "off")) {
+		all_off = TRUE;
+		// this is good -- no mor args
 	}
-
-	value = atoi(value_p);
-	duration = atoi(duration_p);
-	if (duration == 0 || duration < -1) {
-		script_log("Trigger: %s, VNum %d. dg_affect: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-		script_log("Line was: dg_affect %s %s %s %s (%d)", charname, property, value_p, duration_p, duration);
-		return;
-	}
-
-	/* find the property -- first search apply_types */
-	if ((i = search_block(property, apply_types, TRUE)) != NOTHING) {
-		type = APPLY_TYPE;
-	}
-
-	if (!type) { /* search affect_types now */
-		if ((i = search_block(property, affected_bits, TRUE)) != NOTHING) {
-			type = AFFECT_TYPE;
+	else {
+		if (!*value_p) {
+			script_log("Trigger: %s, VNum %d. dg_affect usage: [#affect vnum] <target> <property> <value> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			return;
 		}
-	}
+		else if (str_cmp(value_p, "off") && !*duration_p) {
+			script_log("Trigger: %s, VNum %d. dg_affect missing duration", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			return;
+		}
 
-	if (!type) { /* property not found */
-		script_log("Trigger: %s, VNum %d. dg_affect: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
-		return;
+		value = atoi(value_p);
+		duration = atoi(duration_p);
+		if ((duration == 0 || duration < -1) && str_cmp(value_p, "off")) {
+			script_log("Trigger: %s, VNum %d. dg_affect: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			script_log("Line was: dg_affect %s %s %s %s (%d)", charname, property, value_p, duration_p, duration);
+			return;
+		}
+
+		/* find the property -- first search apply_types */
+		if ((i = search_block(property, apply_types, TRUE)) != NOTHING) {
+			type = APPLY_TYPE;
+		}
+
+		if (!type) { /* search affect_bits now */
+			if ((i = search_block(property, affected_bits, TRUE)) != NOTHING) {
+				type = AFFECT_TYPE;
+			}
+		}
+
+		if (!type) { /* property not found */
+			script_log("Trigger: %s, VNum %d. dg_affect: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
+			return;
+		}
 	}
 
 	/* locate the target */
@@ -154,23 +176,30 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		return;
 	}
 	
-	if (duration == -1 && !IS_NPC(ch)) {
+	if (duration == -1 && !IS_NPC(ch) && str_cmp(value_p, "off")) {
 		script_log("Trigger: %s, VNum %d. dg_affect: cannot use infinite duration on player target", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
-
+	
+	// are we just removing the whole thing?
+	if (all_off) {
+		affect_from_char(ch, atype, TRUE);
+		return;
+	}
+	
+	// removing one type?
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
-			affect_from_char_by_apply(ch, ATYPE_DG_AFFECT, i, FALSE);
+			affect_from_char_by_apply(ch, atype, i, TRUE);
 		}
 		else {
-			affect_from_char_by_bitvector(ch, ATYPE_DG_AFFECT, BIT(i), FALSE);
+			affect_from_char_by_bitvector(ch, atype, BIT(i), TRUE);
 		}
 		return;
 	}
 
 	/* add the affect */
-	af.type = ATYPE_DG_AFFECT;
+	af.type = atype;
 	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
 	af.duration = (duration == -1 ? UNLIMITED : ceil((double)duration / SECS_PER_REAL_UPDATE));
 	af.modifier = value;
@@ -198,36 +227,57 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	char roomname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
 	bitvector_t i = 0, type = 0;
+	int atype = ATYPE_DG_AFFECT;
 	struct affected_type af;
 	room_data *room = NULL;
+	bool all_off = FALSE;
 	int duration = 0;
 
 	half_chop(cmd, junk, cmd);
 	half_chop(cmd, roomname, cmd);
+	// sometimes roomname is an affect vnum
+	if (*roomname == '#') {
+		atype = atoi(roomname+1);
+		half_chop(cmd, roomname, cmd);
+		if (!find_generic(atype, GENERIC_AFFECT)) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	half_chop(cmd, property, cmd);
 	half_chop(cmd, value_p, duration_p);
 
 	/* make sure all parameters are present */
-	if (!*roomname || !*property || !*value_p || !*duration_p) {
-		script_log("Trigger: %s, VNum %d. dg_affect_room usage: <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+	if (!*roomname || !*property) {
+		script_log("Trigger: %s, VNum %d. dg_affect_room usage: [#affect vnum] <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
 	
-	duration = atoi(duration_p);
-	if (duration == 0 || duration < -1) {
-		script_log("Trigger: %s, VNum %d. dg_affect_room: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-		script_log("Line was: dg_affect_room %s %s %s %s (%d)", roomname, property, value_p, duration_p, duration);
-		return;
+	if (!str_cmp(property, "off")) {
+		all_off = TRUE;
+		// simple mode
 	}
+	else {
+		if (!*value_p || !*duration_p) {
+			script_log("Trigger: %s, VNum %d. dg_affect_room usage: [#affect vnum] <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			return;
+		}
+	
+		duration = atoi(duration_p);
+		if (duration == 0 || duration < -1) {
+			script_log("Trigger: %s, VNum %d. dg_affect_room: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			script_log("Line was: dg_affect_room %s %s %s %s (%d)", roomname, property, value_p, duration_p, duration);
+			return;
+		}
 
-	// find the property -- search room_aff_bits
-	if ((i = search_block(property, room_aff_bits, TRUE)) != NOTHING) {
-		type = AFFECT_TYPE;
-	}
+		// find the property -- search room_aff_bits
+		if ((i = search_block(property, room_aff_bits, TRUE)) != NOTHING) {
+			type = AFFECT_TYPE;
+		}
 
-	if (!type) { // property not found
-		script_log("Trigger: %s, VNum %d. dg_affect_room: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
-		return;
+		if (!type) { // property not found
+			script_log("Trigger: %s, VNum %d. dg_affect_room: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
+			return;
+		}
 	}
 
 	/* locate the target */
@@ -241,16 +291,21 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 		script_log("Trigger: %s, VNum %d. dg_affect_room: cannot use infinite duration on map tile target", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
+	
+	if (all_off) {	// removing all matching types
+		affect_from_room(room, atype);
+		return;
+	}
 
-	if (!str_cmp(value_p, "off")) {
-		affect_from_room_by_bitvector(room, ATYPE_DG_AFFECT, BIT(i), FALSE);
+	if (!str_cmp(value_p, "off")) {	// remove by bit
+		affect_from_room_by_bitvector(room, atype, BIT(i), FALSE);
 		return;
 	}
 
 	/* add the affect */
-	af.type = ATYPE_DG_AFFECT;
+	af.type = atype;
 	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
-	af.duration = (duration == -1 ? UNLIMITED : ceil((double)duration / SECS_PER_MUD_HOUR));
+	af.duration = time(0) + duration;	// duration is actually expire time on room affs (TODO: change the name)
 	af.modifier = 0;
 	af.location = APPLY_NONE;
 	af.bitvector = BIT(i);
@@ -407,7 +462,9 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char_data *mob, *next_mob;
+	obj_data *obj, *next_obj;
 	any_vnum vnum;
+	int iter;
 	
 	if (!inst) {
 		return;
@@ -423,7 +480,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 	}
 	else if (is_abbrev(arg1, "mobile")) {
 		LL_FOREACH_SAFE(character_list, mob, next_mob) {
-			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob)) {
+			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob) || MOB_INSTANCE_ID(mob) != inst->id) {
 				continue;
 			}
 			
@@ -436,6 +493,29 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 				dg_owner_purged = 1;
 			}
 			extract_char(mob);
+		}
+	}
+	else if (is_abbrev(arg1, "object")) {
+		for (iter = 0; iter < inst->size; ++iter) {
+			if (!inst->room[iter]) {
+				continue;
+			}
+			
+			LL_FOREACH_SAFE2(ROOM_CONTENTS(inst->room[iter]), obj, next_obj, next_content) {
+				if (GET_OBJ_VNUM(obj) != vnum) {
+					continue;
+				}
+				
+				// found!
+				if (*argument && ROOM_PEOPLE(inst->room[iter])) {
+					act(argument, FALSE, ROOM_PEOPLE(inst->room[iter]), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+			
+				if (obj == owner) {
+					dg_owner_purged = 1;
+				}
+				extract_obj(obj);
+			}
 		}
 	}
 	else {
@@ -625,6 +705,8 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 * @param sector_data *sect The sector to change it to.
 */
 void do_dg_terraform(room_data *target, sector_data *sect) {
+	void finish_trench(room_data *room);
+	
 	sector_data *old_sect;
 	
 	if (!target || !sect) {
@@ -653,6 +735,10 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	if (ROOM_OWNER(target)) {
 		void deactivate_workforce_room(empire_data *emp, room_data *room);
 		deactivate_workforce_room(ROOM_OWNER(target), target);
+	}
+	
+	if (SECT_FLAGGED(sect, SECTF_IS_TRENCH)) {
+		finish_trench(target);
 	}
 }
 
@@ -782,7 +868,15 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	}
 	
 	dam = level / 7.0;
+	if (level > 100) {
+		dam *= 1.0 + ((level - 100) / 40.0);
+	}
 	dam *= modifier;
+	
+	// full immunity
+	if (AFF_FLAGGED(vict, AFF_IMMUNE_DAMAGE)) {
+		dam = 0;
+	}
 	
 	// guarantee at least 1
 	if (modifier > 0) {
@@ -829,6 +923,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 * victim.
 *
 * @param char_data *vict The person receiving the DoT.
+* @param any_vnum atype The ATYPE_ const or vnum for the affect.
 * @param int level The level to scale damage to.
 * @param int dam_type A DAM_x type.
 * @param double modifier An amount to modify the damage by (1.0 = full damage).
@@ -836,7 +931,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 * @param int max_stacks Number of times this DoT can stack (minimum/default 1).
 * @param char_data *cast_by The caster, if any, for tracking on the effect (may be NULL).
 */
-void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by) {
+void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by) {
 	double dam;
 	
 	if (modifier <= 0 || dur_seconds <= 0) {
@@ -857,5 +952,155 @@ void script_damage_over_time(char_data *vict, int level, int dam_type, double mo
 	}
 
 	// add the affect
-	apply_dot_effect(vict, ATYPE_DG_AFFECT, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks), cast_by);
+	apply_dot_effect(vict, atype, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks), cast_by);
+}
+
+
+/**
+* Central processor for %heal% -- this is used to restore scaled health/move/
+* mana, and (optionally) to remove debuffs and dots.
+*
+* Expected parameters in the string: <target> <what to heal> [scale modifier]
+* Example: %self% mana 100
+*
+* @param void *thing The thing calling the script (mob, room, obj, veh)
+* @param int type What type "thing" is (MOB_TRIGGER, etc)
+* @param char *argument The text passed to the command.
+*/
+void script_heal(void *thing, int type, char *argument) {
+	extern char_data *get_char_by_room(room_data *room, char *name);
+	extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
+	extern int get_room_scale_level(room_data *room, char_data *targ);
+	extern const double apply_values[];
+	extern const bool aff_is_bad[];
+	
+	char targ_arg[MAX_INPUT_LENGTH], what_arg[MAX_INPUT_LENGTH], *scale_arg, log_root[MAX_STRING_LENGTH];
+	struct affected_type *aff, *next_aff;
+	int pos, amount, level = -1;
+	char_data *victim = NULL;
+	double scale = 100.0;
+	bool done_aff;
+	bitvector_t bitv;
+	
+	// 3 args: target, what, scale
+	scale_arg = any_one_arg(argument, targ_arg);
+	scale_arg = any_one_arg(scale_arg, what_arg);
+	skip_spaces(&scale_arg);
+	if (*targ_arg == UID_CHAR) {
+		victim = get_char(targ_arg);
+	}	// otherwise we'll determine victim later
+	
+	// determine how to log errors
+	switch (type) {
+		case MOB_TRIGGER: {
+			level = get_approximate_level((char_data*)thing);
+			if (!victim) {
+				victim = get_char_room_vis((char_data*)thing, targ_arg);
+			}
+			
+			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT((char_data*)thing), GET_MOB_VNUM((char_data*)thing));
+			break;
+		}
+		case OBJ_TRIGGER: {
+			level = GET_OBJ_CURRENT_SCALE_LEVEL((obj_data*)thing);
+			if (!victim) {
+				victim = get_char_by_obj((obj_data*)thing, targ_arg);
+			}
+			
+			snprintf(log_root, sizeof(log_root), "Obj (%s, VNum %d)::", GET_OBJ_SHORT_DESC((obj_data*)thing), GET_OBJ_VNUM((obj_data*)thing));
+			break;
+		}
+		case VEH_TRIGGER: {
+			level = VEH_SCALE_LEVEL((vehicle_data*)thing);
+			if (!victim) {
+				victim = get_char_by_vehicle((vehicle_data*)thing, targ_arg);
+			}
+			
+			snprintf(log_root, sizeof(log_root), "Veh (%s, VNum %d)::", VEH_SHORT_DESC((vehicle_data*)thing), VEH_VNUM((vehicle_data*)thing));
+			break;
+		}
+		case WLD_TRIGGER:
+		default: {
+			level = get_room_scale_level((room_data*)thing, NULL);
+			if (!victim) {
+				victim = get_char_by_room((room_data*)thing, targ_arg);
+			}
+			
+			snprintf(log_root, sizeof(log_root), "Room %d ::", GET_ROOM_VNUM((room_data*)thing));
+			break;
+		}
+	}
+	
+	if (!*targ_arg || !*what_arg) {
+		script_log("%s script_heal: Invalid arguments: %s", log_root, argument);
+		return;
+	}
+	if (level < 0) {
+		script_log("%s script_heal: Unable to detect level", log_root);
+		return;
+	}
+	if (!victim) {
+		script_log("%s script_heal: Unable to find target: %s", log_root, targ_arg);
+		return;
+	}
+	
+	// process scale arg (optional)
+	if (*scale_arg && (scale = atof(scale_arg)) < 1) {
+		script_log("%s script_heal: Invalid scale argument: %s", log_root, scale_arg);
+		return;
+	}
+	scale /= 100.0;	// convert to percent
+	
+	// now the real work
+	if (is_abbrev(what_arg, "health") || is_abbrev(what_arg, "hitpoints")) {
+		amount = (394 * level / 55.0 - 5580 / 11.0) * scale;
+		amount = MAX(30, amount);
+		GET_HEALTH(victim) = MIN(GET_MAX_HEALTH(victim), GET_HEALTH(victim) + amount);
+		
+		if (GET_POS(victim) < POS_SLEEPING) {
+			GET_POS(victim) = POS_STANDING;
+		}
+	}
+	else if (is_abbrev(what_arg, "mana")) {
+		amount = (292 * level / 55.0 - 3940 / 11.0) * scale;
+		amount = MAX(40, amount);
+		GET_MANA(victim) = MIN(GET_MAX_MANA(victim), GET_MANA(victim) + amount);
+	}
+	else if (is_abbrev(what_arg, "moves")) {
+		amount = (37 * level / 11.0 - 1950 / 11.0) * scale;
+		amount = MAX(75, amount);
+		GET_MOVE(victim) = MIN(GET_MAX_MOVE(victim), GET_MOVE(victim) + amount);
+	}
+	else if (is_abbrev(what_arg, "dots")) {
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+	}
+	else if (is_abbrev(what_arg, "debuffs")) {
+	
+		LL_FOREACH_SAFE(victim->affected, aff, next_aff) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(victim)) {
+				continue;
+			}
+			
+			done_aff = FALSE;
+			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+				affect_remove(victim, aff);
+				done_aff = TRUE;
+			}
+			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
+				// check each bit
+				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+						affect_remove(victim, aff);
+						done_aff = TRUE;
+					}
+				}
+			}
+		}
+	}
+	else {
+		script_log("%s script_heal: Invalid thing to heal: %s", log_root, what_arg);
+	}
 }

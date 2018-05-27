@@ -49,7 +49,6 @@
 */
 
 // external vars
-extern const char *drinks[];
 extern const char *pool_types[];
 
 // external funcs
@@ -59,6 +58,7 @@ void send_char_pos(char_data *ch, int dam);
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
+bool empire_can_claim(empire_data *emp);
 bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
@@ -381,6 +381,58 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1) {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE UTILS ////////////////////////////////////////////////////////////
 
+/**
+* Checks all empires for delayed-refresh commands.
+*/
+void run_delayed_refresh(void) {
+	void complete_goal(empire_data *emp, struct empire_goal *goal);
+	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
+	void count_quest_tasks(struct req_data *list, int *complete, int *total);
+	
+	if (check_delayed_refresh) {
+		struct empire_goal *goal, *next_goal;
+		int complete, total, crop_var;
+		empire_data *emp, *next_emp;
+		struct req_data *task;
+		
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			crop_var = -1;
+			
+			// DELAY_REFRESH_x: effects of various rereshes
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_CROP_VARIETY)) {
+				HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+					LL_FOREACH(goal->tracker, task) {
+						if (task->type == REQ_CROP_VARIETY) {
+							if (crop_var == -1) {
+								// only look up once per empire
+								crop_var = count_empire_crop_variety(emp, task->needed, NO_ISLAND);
+							}
+							task->current = crop_var;
+							TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+						}
+					}
+				}
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_GOAL_COMPLETE)) {
+				HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+					count_quest_tasks(goal->tracker, &complete, &total);
+					if (complete == total) {
+						complete_goal(emp, goal);
+					}
+				}
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MEMBERS)) {
+				read_empire_members(emp, FALSE);
+			}
+			
+			// clear this
+			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
+		}
+		
+		check_delayed_refresh = FALSE;
+	}
+}
+
 
 /**
 * @param empire_data *emp
@@ -462,6 +514,33 @@ void resort_empires(bool force) {
 }
 
 
+// score_empires helper type
+struct scemp_type {
+	int value;
+	struct scemp_type *next;	// LL
+};
+
+
+// score_empires sorter
+int compare_scemp(struct scemp_type *a, struct scemp_type *b) {
+	return a->value - b->value;
+}
+
+
+/**
+* score_empires helper adder: inserts a value in order
+*
+* @param struct scemp_type **list A pointer to the list to add to.
+* @param int value The number to add to the list.
+*/
+static inline void add_scemp(struct scemp_type **list, int value) {
+	struct scemp_type *scemp;
+	CREATE(scemp, struct scemp_type, 1);
+	scemp->value = value;
+	LL_INSERT_INORDER(*list, scemp, compare_scemp);
+}
+
+
 /**
 * This function assigns scores to all empires so they can be ranked on the
 * empire list.
@@ -470,9 +549,10 @@ void score_empires(void) {
 	extern double empire_score_average[NUM_SCORES];
 	extern const double score_levels[];
 	
-	int iter, pos, total[NUM_SCORES], max[NUM_SCORES], num_emps = 0;
-	struct empire_political_data *pol;
-	struct empire_storage_data *store;
+	struct scemp_type *scemp, *next_scemp, *lists[NUM_SCORES];
+	int iter, pos, median, num_emps = 0;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
 	empire_data *emp, *next_emp;
 	long long num;
 	
@@ -480,9 +560,8 @@ void score_empires(void) {
 
 	// clear data	
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
-		total[iter] = 0;
+		lists[iter] = NULL;
 		empire_score_average[iter] = 0;
-		max[iter] = 0;
 	}
 	
 	// clear scores first
@@ -493,7 +572,7 @@ void score_empires(void) {
 		EMPIRE_SORT_VALUE(emp) = 0;
 	}
 	
-	#define SCORE_SKIP_EMPIRE(ee)  (EMPIRE_IMM_ONLY(ee) || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
+	#define SCORE_SKIP_EMPIRE(ee)  (EMPIRE_IMM_ONLY(ee) || EMPIRE_MEMBERS(ee) == 0 || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
 
 	// build data
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -505,61 +584,55 @@ void score_empires(void) {
 		++num_emps;
 		
 		// detect scores -- and store later for easy comparison
-		total[SCORE_WEALTH] += GET_TOTAL_WEALTH(emp);
-		max[SCORE_WEALTH] = MAX(GET_TOTAL_WEALTH(emp), max[SCORE_WEALTH]);
+		add_scemp(&lists[SCORE_WEALTH], GET_TOTAL_WEALTH(emp));
 		EMPIRE_SCORE(emp, SCORE_WEALTH) = GET_TOTAL_WEALTH(emp);
 		
-		total[SCORE_TERRITORY] += (num = land_can_claim(emp, FALSE));
-		max[SCORE_TERRITORY] = MAX(num, max[SCORE_TERRITORY]);
+		add_scemp(&lists[SCORE_TERRITORY], (num = land_can_claim(emp, TER_TOTAL)));
 		EMPIRE_SCORE(emp, SCORE_TERRITORY) = num;
 		
-		total[SCORE_MEMBERS] += EMPIRE_MEMBERS(emp);
-		max[SCORE_MEMBERS] = MAX(EMPIRE_MEMBERS(emp), max[SCORE_MEMBERS]);
+		add_scemp(&lists[SCORE_MEMBERS], EMPIRE_MEMBERS(emp));
 		EMPIRE_SCORE(emp, SCORE_MEMBERS) = EMPIRE_MEMBERS(emp);
 		
-		total[SCORE_TECHS] += (num = count_tech(emp));
-		max[SCORE_TECHS] = MAX(num, max[SCORE_TECHS]);
-		EMPIRE_SCORE(emp, SCORE_TECHS) = num;
+		add_scemp(&lists[SCORE_COMMUNITY], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_COMMUNITY)));
+		EMPIRE_SCORE(emp, SCORE_COMMUNITY) = num;
 		
 		num = 0;
-		for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
-			num += store->amount;
-		}
-		num /= 1000;	// for sanity of number size
-		total[SCORE_EINV] += num;
-		max[SCORE_EINV] = MAX(num, max[SCORE_EINV]);
-		EMPIRE_SCORE(emp, SCORE_EINV) = num;
-		
-		total[SCORE_GREATNESS] += EMPIRE_GREATNESS(emp);
-		max[SCORE_GREATNESS] = MAX(EMPIRE_GREATNESS(emp), max[SCORE_GREATNESS]);
-		EMPIRE_SCORE(emp, SCORE_GREATNESS) = EMPIRE_GREATNESS(emp);
-		
-		num = 0;
-		for (pol = EMPIRE_DIPLOMACY(emp); pol; pol = pol->next) {
-			if (IS_SET(pol->type, DIPL_TRADE)) {
-				++num;
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			HASH_ITER(hh, isle->store, store, next_store) {
+				SAFE_ADD(num, store->amount, 0, MAX_INT, FALSE);
 			}
 		}
-		total[SCORE_DIPLOMACY] += num;
-		max[SCORE_DIPLOMACY] = MAX(num, max[SCORE_DIPLOMACY]);
-		EMPIRE_SCORE(emp, SCORE_DIPLOMACY) = num;
+		num /= 1000;	// for sanity of number size
+		add_scemp(&lists[SCORE_INVENTORY], num);
+		EMPIRE_SCORE(emp, SCORE_INVENTORY) = num;
 		
-		total[SCORE_FAME] += EMPIRE_FAME(emp);
-		max[SCORE_FAME] = MAX(EMPIRE_FAME(emp), max[SCORE_FAME]);
-		EMPIRE_SCORE(emp, SCORE_FAME) = EMPIRE_FAME(emp);
+		add_scemp(&lists[SCORE_GREATNESS], EMPIRE_GREATNESS(emp));
+		EMPIRE_SCORE(emp, SCORE_GREATNESS) = EMPIRE_GREATNESS(emp);
 		
-		total[SCORE_MILITARY] += EMPIRE_MILITARY(emp);
-		max[SCORE_MILITARY] = MAX(EMPIRE_MILITARY(emp), max[SCORE_MILITARY]);
-		EMPIRE_SCORE(emp, SCORE_MILITARY) = EMPIRE_MILITARY(emp);
+		add_scemp(&lists[SCORE_INDUSTRY], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_INDUSTRY)));
+		EMPIRE_SCORE(emp, SCORE_INDUSTRY) = num;
 		
-		total[SCORE_PLAYTIME] += EMPIRE_TOTAL_PLAYTIME(emp);
-		max[SCORE_PLAYTIME] = MAX(EMPIRE_TOTAL_PLAYTIME(emp), max[SCORE_PLAYTIME]);
+		add_scemp(&lists[SCORE_PRESTIGE], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_PRESTIGE)));
+		EMPIRE_SCORE(emp, SCORE_PRESTIGE) = num;
+		
+		add_scemp(&lists[SCORE_DEFENSE], (num = EMPIRE_PROGRESS_POINTS(emp, PROGRESS_DEFENSE)));
+		EMPIRE_SCORE(emp, SCORE_DEFENSE) = num;
+		
+		add_scemp(&lists[SCORE_PLAYTIME], EMPIRE_TOTAL_PLAYTIME(emp));
 		EMPIRE_SCORE(emp, SCORE_PLAYTIME) = EMPIRE_TOTAL_PLAYTIME(emp);
 	}
 	
-	// determine avgs
+	// determine medians and free lists
+	median = num_emps / 2 + 1;
+	median = MIN(num_emps, median);
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
-		empire_score_average[iter] = ((double) total[iter]) / MAX(1, num_emps);
+		pos = 0;
+		LL_FOREACH_SAFE(lists[iter], scemp, next_scemp) {
+			if (pos++ == median) {
+				empire_score_average[iter] = scemp->value;
+			}
+			free(scemp);
+		}
 	}
 	
 	// apply scores to empires based on how they fared
@@ -572,9 +645,11 @@ void score_empires(void) {
 			num = 0;
 			
 			// score_levels[] terminates with a -1 but I don't trust doubles enough to do anything other than >= 0 here
-			for (pos = 0; score_levels[pos] >= 0; ++pos) {
-				if (EMPIRE_SCORE(emp, iter) >= (empire_score_average[iter] * score_levels[pos])) {
-					++num;
+			if (EMPIRE_SCORE(emp, iter) > 0) {
+				for (pos = 0; score_levels[pos] >= 0; ++pos) {
+					if (EMPIRE_SCORE(emp, iter) >= (empire_score_average[iter] * score_levels[pos])) {
+						++num;
+					}
 				}
 			}
 			
@@ -844,7 +919,7 @@ bool can_build_or_claim_at_war(char_data *ch, room_data *loc) {
 *
 * @param char_data *ch_a One character.
 * @param char_data *ch_b Another character.
-* @param bitvector_t dipl_bits Any DIPL_x flags.
+* @param bitvector_t dipl_bits Any DIPL_ flags.
 * @return bool TRUE if the characters have the requested diplomacy.
 */
 bool char_has_relationship(char_data *ch_a, char_data *ch_b, bitvector_t dipl_bits) {
@@ -928,6 +1003,40 @@ bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc) {
 
 
 /**
+* Clears out old diplomacy to keep things clean and simple.
+*/
+void expire_old_politics(void) {
+	empire_data *emp, *next_emp, *other;
+	struct empire_political_data *pol, *next_pol, *find_pol;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (!EMPIRE_IS_TIMED_OUT(emp) || EMPIRE_MEMBERS(emp) > 0 || EMPIRE_TERRITORY(emp, TER_TOTAL) > 0) {
+			continue;
+		}
+		
+		LL_FOREACH_SAFE(EMPIRE_DIPLOMACY(emp), pol, next_pol) {
+			if ((other = real_empire(pol->id)) && other != emp) {
+				if (pol->type != NOBITS) {
+					log_to_empire(emp, ELOG_DIPLOMACY, "Diplomatic relations with %s have ended because your empire is in ruins", EMPIRE_NAME(other));
+					log_to_empire(other, ELOG_DIPLOMACY, "Diplomatic relations with %s have ended because that empire is in ruins", EMPIRE_NAME(emp));
+				}
+				if ((find_pol = find_relation(other, emp))) {
+					LL_DELETE(EMPIRE_DIPLOMACY(other), find_pol);
+					free(find_pol);
+				}
+				EMPIRE_NEEDS_SAVE(other) = TRUE;
+			}
+			
+			LL_DELETE(EMPIRE_DIPLOMACY(emp), pol);
+			free(pol);
+			
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+/**
 * Determines if an empire has a trait set at a certain location. It auto-
 * matically detects if the location is covered by a city's traits or the
 * empire's frontier traits.
@@ -938,21 +1047,29 @@ bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc) {
 * @return bool TRUE if the empire has that (those) trait(s) at loc.
 */
 bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
+	extern struct city_metadata_type city_type[];
+	
 	struct empire_city_data *city;
 	bitvector_t set = NOBITS;
+	bool near_city = FALSE;
+	
+	double outskirts_mod = config_get_double("outskirts_modifier");
 	
 	// short-circuit
 	if (!emp) {
 		return FALSE;
 	}
 	
-	// determine which location to use
-	if (loc && ((city = find_closest_city(emp, loc)) && compute_distance(loc, city->location) < config_get_int("city_trait_radius"))) {
-		set = city->traits;
+	if (loc) {	// see if it's near enough to any cities
+		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+			if (compute_distance(loc, city->location) <= city_type[city->type].radius * outskirts_mod) {
+				near_city = TRUE;
+				break;	// only need 1
+			}
+		}
 	}
-	else {
-		set = EMPIRE_FRONTIER_TRAITS(emp);
-	}
+	
+	set = near_city ? city->traits : EMPIRE_FRONTIER_TRAITS(emp);
 	
 	return (IS_SET(set, trait) ? TRUE : FALSE);
 }
@@ -961,7 +1078,7 @@ bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
 /**
 * @param empire_data *emp one empire
 * @param empire_data *fremp other empire
-* @param bitvector_t diplomacy DIPL_x
+* @param bitvector_t diplomacy DIPL_
 * @return TRUE if emp and fremp have the given diplomacy with each other
 */
 bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t diplomacy) {
@@ -1047,17 +1164,15 @@ bool is_trading_with(empire_data *emp, empire_data *partner) {
 * @return bool TRUE if the player is allowed to claim.
 */
 bool can_claim(char_data *ch) {
-	empire_data *e;
-
-	if (IS_NPC(ch))
-		return FALSE;
-	if (!(e = GET_LOYALTY(ch)))
-		return TRUE;
-	if (EMPIRE_CITY_TERRITORY(e) + EMPIRE_OUTSIDE_TERRITORY(e) >= land_can_claim(e, FALSE))
-		return FALSE;
-	if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CLAIM))
-		return FALSE;
-	return TRUE;
+	if (IS_NPC(ch)) {
+		return FALSE;	// npcs never claim
+	}
+	if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {
+		return FALSE;	// rank too low
+	}
+	
+	// and check the empire itself
+	return empire_can_claim(GET_LOYALTY(ch));
 }
 
 
@@ -1166,10 +1281,29 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 
 
 /**
+* Determines if an empire can currently claim land.
+*
+* @param empire_data *emp The empire.
+* @return bool TRUE if the empire is allowed to claim.
+*/
+bool empire_can_claim(empire_data *emp) {
+	if (!emp) {	// theoretically, no empire == you can found one...
+		return TRUE;
+	}
+	if (EMPIRE_TERRITORY(emp, TER_TOTAL) >= land_can_claim(emp, TER_TOTAL)) {
+		return FALSE;	// too much territory
+	}
+	
+	// seems ok
+	return TRUE;
+}
+
+
+/**
 * Checks the room to see if ch has permission.
 *
 * @param char_data *ch
-* @param int type PRIV_x
+* @param int type PRIV_
 * @return bool TRUE if it's ok
 */
 bool has_permission(char_data *ch, int type) {
@@ -1196,7 +1330,7 @@ bool has_permission(char_data *ch, int type) {
 * It takes the location into account, not just the tech flags.
 *
 * @param char_data *ch acting character, although this is location-based
-* @param int tech TECH_x id
+* @param int tech TECH_ id
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available(char_data *ch, int tech) {
@@ -1264,33 +1398,78 @@ bool has_tech_available_room(room_data *room, int tech) {
 * Calculates the total claimable land for an empire.
 *
 * @param empire_data *emp An empire number.
-* @param bool outside_only If TRUE, only the amount of territory that can be outside cities.
+* @param int ter_type Any TER_ to determine how much territory an empire can claim of that type.
 * @return int The total claimable land.
 */
-int land_can_claim(empire_data *emp, bool outside_only) {
-	int from_wealth, total = 0;
+int land_can_claim(empire_data *emp, int ter_type) {
+	int cur, from_wealth, out_t = 0, fron_t = 0, total = 0, min_cap = 0;
+	double outskirts_mod = config_get_double("land_outside_city_modifier");
+	double frontier_mod = config_get_double("land_frontier_modifier");
 	
-	if (emp) {
-		total += EMPIRE_GREATNESS(emp) * config_get_int("land_per_greatness");
-		total += count_tech(emp) * config_get_int("land_per_tech");
+	if (!emp) {
+		return 0;
+	}
+	
+	
+	// so long as there's at least 1 active member, they get the min cap
+	if (EMPIRE_MEMBERS(emp) > 0) {
+		min_cap = config_get_int("land_min_cap");
+	}
+	
+	// basics
+	total += EMPIRE_GREATNESS(emp) * (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_GREATNESS)) + EMPIRE_ATTRIBUTE(emp, EATT_BONUS_TERRITORY);
+	
+	if (EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH) > 0) {
+		from_wealth = GET_TOTAL_WEALTH(emp) / 100.0 * EMPIRE_ATTRIBUTE(emp, EATT_TERRITORY_PER_100_WEALTH);
 		
-		if (EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-			// diminishes by an amount equal to non-wealth territory
-			from_wealth = diminishing_returns((int) (GET_TOTAL_WEALTH(emp) * config_get_double("land_per_wealth")), total);
+		// limited to 3x non-wealth territory
+		from_wealth = MIN(from_wealth, total * 3);
+		
+		// for a total of 4x
+		total += from_wealth;
+	}
+	
+	// determine specific caps and apply minimum
+	total = MAX(total, min_cap);
+	if (ter_type == TER_TOTAL || ter_type == TER_CITY) {
+		return total;	// shortcut -- no further work
+	}
+	
+	out_t = total * (outskirts_mod + frontier_mod);
+	out_t = MAX(out_t, min_cap);
+	fron_t = total * frontier_mod;
+	fron_t = MAX(fron_t, min_cap);
+	
+	// check cascading categories
+	if (EMPIRE_TERRITORY(emp, TER_CITY) > (total - out_t)) {
+		out_t -= (EMPIRE_TERRITORY(emp, TER_CITY) - (total - out_t));
+		out_t = MAX(0, out_t);
+	}
+	if (EMPIRE_TERRITORY(emp, TER_CITY) + EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > (total - fron_t)) {
+		fron_t -= (EMPIRE_TERRITORY(emp, TER_CITY) + EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - (total - fron_t));
+		fron_t = MAX(0, fron_t);
+	}
+	if (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) > out_t - fron_t) {
+		fron_t -= (EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) - (out_t - fron_t));
+		fron_t = MAX(0, fron_t);
+	}
+	
+	switch (ter_type) {
+		case TER_OUTSKIRTS: {
+			// subtract out currently-used frontier, as that territory is shared with outskirts
+			cur = MIN(fron_t, EMPIRE_TERRITORY(emp, TER_FRONTIER));
+			out_t -= cur;
 			
-			// limited to 3x non-wealth territory
-			from_wealth = MIN(from_wealth, total * 3);
-			
-			// for a total of 4x
-			total += from_wealth;
+			return out_t;
+		}
+		case TER_FRONTIER: {
+			return fron_t;
+		}
+		// default: no changes
+		default: {
+			return total;
 		}
 	}
-	
-	if (outside_only) {
-		total *= config_get_double("land_outside_city_modifier");
-	}
-	
-	return total;
 }
 
 
@@ -1454,7 +1633,7 @@ void basic_mud_log(const char *format, ...) {
 * ELOG_NONE/ELOG_LOGINS types, which are displayed but not stored.
 *
 * @param empire_data *emp Which empire to log to.
-* @param int type ELOG_x
+* @param int type ELOG_
 * @param const char *str The va-arg format ...
 */
 void log_to_empire(empire_data *emp, int type, const char *str, ...) {
@@ -1491,7 +1670,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 			EMPIRE_LOGS(emp) = elog;
 		}
 		
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
 	}
 	
 	// show to players
@@ -1570,7 +1749,7 @@ void syslog(bitvector_t type, int level, bool file, const char *str, ...) {
 	vsprintf(output, str, tArgList);
 
 	if (file) {
-		log(output);
+		log("%s", output);
 	}
 	
 	level = MAX(level, LVL_START_IMM);
@@ -2057,8 +2236,8 @@ double rate_item(obj_data *obj) {
 			score += get_base_dps(obj);
 			break;
 		}
-		case ITEM_ARROW: {
-			score += GET_ARROW_DAMAGE_BONUS(obj);
+		case ITEM_AMMO: {
+			score += GET_AMMO_DAMAGE_BONUS(obj);
 			break;
 		}
 		case ITEM_PACK: {
@@ -2078,7 +2257,7 @@ double rate_item(obj_data *obj) {
 * Gives a character the appropriate amount of command lag (wait time).
 *
 * @param char_data *ch The person to give command lag to.
-* @param int wait_type A WAIT_x const to help determine wait time.
+* @param int wait_type A WAIT_ const to help determine wait time.
 */
 void command_lag(char_data *ch, int wait_type) {
 	extern const int universal_wait;
@@ -2096,7 +2275,7 @@ void command_lag(char_data *ch, int wait_type) {
 	
 	switch (wait_type) {
 		case WAIT_SPELL: {	// spells (but not combat spells)
-			if (has_ability(ch, ABIL_FASTCASTING)) {
+			if (has_player_tech(ch, PTECH_FASTCASTING)) {
 				val = 0.3333 * GET_WITS(ch);
 				wait -= MAX(0, val) RL_SEC;
 				
@@ -2160,6 +2339,9 @@ void determine_gear_level(char_data *ch) {
 			
 			// bonuses
 			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_SUPERIOR)) {
+				total += 10 * wear_data[pos].gear_level_mod;
+			}
+			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_ENCHANTED)) {
 				total += 10 * wear_data[pos].gear_level_mod;
 			}
 			if (OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_HARD_DROP)) {
@@ -2316,8 +2498,6 @@ void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, 
 * @param struct resource_data **build_used_list Optional: If you need to track the actual resources used, pass a pointer to that list.
 */
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list) {
-	extern const char *res_action_messages[][NUM_APPLY_RES_TYPES][2];
-	
 	bool messaged_char = FALSE, messaged_room = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	int amt;
@@ -2326,27 +2506,27 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		return;	// nothing to do
 	}
 	
-	// APPLPY_RES_x: send custom messages (only) now
+	// APPLY_RES_x: send custom messages (only) now
 	if (use_obj) {
 		switch (msg_type) {
 			case APPLY_RES_BUILD: {
-				if (!messaged_char && has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR)) {
-					act(get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR), FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+				if (!messaged_char && obj_has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR)) {
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR), FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
 					messaged_char = TRUE;
 				}		
-				if (!messaged_room && has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM)) {
-					act(get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+				if (!messaged_room && obj_has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM)) {
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
 					messaged_room = TRUE;
 				}
 				break;
 			}
 			case APPLY_RES_CRAFT: {
-				if (!messaged_char && has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
-					act(get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+				if (!messaged_char && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
 					messaged_char = TRUE;
 				}
-				if (!messaged_room && has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
-					act(get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+				if (!messaged_room && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
 					messaged_room = TRUE;
 				}
 				break;
@@ -2397,6 +2577,7 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				if (build_used_list) {
 					add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(use_obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(use_obj));
 				}
+				empty_obj_before_extract(use_obj);
 				extract_obj(use_obj);
 			}
 			break;
@@ -2457,6 +2638,19 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			res->amount = 0;	// cost paid in full
 			break;
 		}
+		case RES_CURRENCY: {
+			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "You spend %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "$n spends %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			add_currency(ch, res->vnum, -(res->amount));
+			res->amount = 0;	// paid all at once
+			break;
+		}
 		case RES_POOL: {
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
 				snprintf(buf, sizeof(buf), "You spend %d %s point%s.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
@@ -2483,11 +2677,36 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			break;
 		}
 		case RES_ACTION: {
-			if (*res_action_messages[res->vnum][msg_type][0]) {
-				act(res_action_messages[res->vnum][msg_type][0], FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
-			}
-			if (*res_action_messages[res->vnum][msg_type][1]) {
-				act(res_action_messages[res->vnum][msg_type][1], FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+			generic_data *gen = find_generic(res->vnum, GENERIC_ACTION);
+			
+			switch (msg_type) {
+				case APPLY_RES_BUILD: {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)) {
+						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_CRAFT: {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_REPAIR: {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
 			}
 			
 			res->amount -= 1;	// only 1 at a time
@@ -2639,6 +2858,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
 					break;
 				}
+				case RES_CURRENCY: {
+					add_currency(ch, res->vnum, -(res->amount));
+					break;
+				}
 				case RES_POOL: {
 					if (build_used_list) {
 						add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
@@ -2745,6 +2968,12 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 				}
 				break;
 			}
+			case RES_CURRENCY: {
+				if (get_currency(ch, res->vnum) >= res->amount) {
+					return res;
+				}
+				break;
+			}
 			case RES_POOL: {
 				// special rule: require that blood or health costs not reduce player below 1
 				amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
@@ -2779,9 +3008,7 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 * @param sturct resource_data *res The resource to display.
 * @return char* A short string including quantity and type.
 */
-char *get_resource_name(struct resource_data *res) {
-	extern const char *res_action_type[];
-	
+char *get_resource_name(struct resource_data *res) {	
 	static char output[MAX_STRING_LENGTH];
 	
 	*output = '\0';
@@ -2797,11 +3024,15 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_LIQUID: {
-			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		}
 		case RES_COINS: {
-			snprintf(output, sizeof(output), money_amount(real_empire(res->vnum), res->amount));
+			snprintf(output, sizeof(output), "%s", money_amount(real_empire(res->vnum), res->amount));
+			break;
+		}
+		case RES_CURRENCY: {
+			snprintf(output, sizeof(output), "%d %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 			break;
 		}
 		case RES_POOL: {
@@ -2809,7 +3040,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_ACTION: {
-			snprintf(output, sizeof(output), "%dx [%s]", res->amount, res_action_type[res->vnum]);
+			snprintf(output, sizeof(output), "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
 			break;
 		}
 		default: {
@@ -2902,6 +3133,11 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 				last = FALSE;	// cause next obj to refund
 				break;
 			}
+			case RES_CURRENCY: {
+				add_currency(ch, res->vnum, res->amount);
+				last = FALSE;	// cause next obj to refund
+				break;
+			}
 			case RES_POOL: {
 				GET_CURRENT_POOL(ch, res->vnum) += res->amount / (split ? 2 : 1);
 				GET_CURRENT_POOL(ch, res->vnum) = MIN(GET_MAX_POOL(ch, res->vnum), GET_CURRENT_POOL(ch, res->vnum));
@@ -2960,7 +3196,8 @@ void halve_resource_list(struct resource_data **list, bool remove_nonrefundables
 * @param bool ground If TRUE, will also count resources on the ground.
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
 */
-bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {	
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {
+	char buf[MAX_STRING_LENGTH];
 	int total, amt, liter, cycle;
 	struct resource_data *res;
 	bool ok = TRUE;
@@ -3056,7 +3293,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_LIQUID: {
-									msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), drinks[res->vnum]);
+									msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 									break;
 								}
 							}
@@ -3071,6 +3308,13 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 						if (send_msgs) {
 							msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
 						}
+						ok = FALSE;
+					}
+					break;
+				}
+				case RES_CURRENCY: {
+					if (get_currency(ch, res->vnum) < res->amount) {
+						snprintf(buf, sizeof(buf), "You need %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 						ok = FALSE;
 					}
 					break;
@@ -3648,6 +3892,27 @@ char *reverse_strstr(char *haystack, char *needle) {
 
 
 /**
+* Looks for certain keywords in a set of custom messages. All given keywords
+* must appear in 1 of the custom messages to be valid.
+*
+* @param char *keywords The word(s) we are looking for.
+* @param struct custom_message *list The list of custom messages to search.
+* @return bool TRUE if the keywords were found, FALSE if not.
+*/
+bool search_custom_messages(char *keywords, struct custom_message *list) {
+	struct custom_message *iter;
+	
+	LL_FOREACH(list, iter) {
+		if (iter->msg && multi_isname(keywords, iter->msg)) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// not found
+}
+
+
+/**
 * Doubles the & in a string so that color codes are displayed to the user.
 *
 * @param char *string The input string.
@@ -4086,15 +4351,21 @@ char *trim(char *string) {
 * @return bld_data *The matching building entry (BUILDING_x const) or NULL.
 */
 bld_data *get_building_by_name(char *name, bool room_only) {
-	bld_data *iter, *next_iter;
+	bld_data *iter, *next_iter, *partial = NULL;
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
-		if ((!room_only || IS_SET(GET_BLD_FLAGS(iter), BLD_ROOM)) && is_abbrev(name, GET_BLD_NAME(iter))) {
-			return iter;
+		if (room_only && !IS_SET(GET_BLD_FLAGS(iter), BLD_ROOM)) {
+			continue;
+		}
+		if (!str_cmp(name, GET_BLD_NAME(iter))) {
+			return iter;	// exact match
+		}
+		else if (!partial && is_abbrev(name, GET_BLD_NAME(iter))) {
+			partial = iter;
 		}
 	}
 	
-	return NULL;
+	return partial;	// if any
 }
 
 
@@ -4358,16 +4629,20 @@ room_data *get_map_location_for(room_data *room) {
 room_data *find_load_room(char_data *ch) {
 	extern room_data *find_starting_location();
 	
-	struct empire_territory_data *ter;
-	room_data *rl, *rl_last_room, *found = NULL;
+	struct empire_territory_data *ter, *next_ter;
+	room_data *rl, *rl_last_room, *found, *map;
 	int num_found = 0;
 	sh_int island;
+	bool veh_ok;
 	
 	// preferred graveyard?
-	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
+	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
+		// check that we're not somewhere illegal (vehicle in enemy territory)
+		veh_ok = GET_MAP_LOC(rl) && (map = real_room(GET_MAP_LOC(rl)->vnum)) && can_use_room(ch, map, GUESTS_ALLOWED);
+		
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (room_has_function_and_city_ok(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED) && !BUILDING_BURNING(rl)) {
+		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room))) {
 			return rl;
 		}
 	}
@@ -4375,8 +4650,9 @@ room_data *find_load_room(char_data *ch) {
 	// first: look for graveyard
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
-		for (ter = EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)); ter; ter = ter->next) {
-			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !BUILDING_BURNING(ter->room)) {
+		found = NULL;
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
+			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
@@ -4425,10 +4701,10 @@ bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with
 */
 bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance) {
 	int x, y;
-	room_data *shift, *real = get_map_location_for(room);
+	room_data *shift, *real;
 	bool found = FALSE;
 	
-	if (!real) {	// no map location
+	if (!(real = (GET_MAP_LOC(room) ? real_room(GET_MAP_LOC(room)->vnum) : NULL))) {	// no map location
 		return FALSE;
 	}
 	
@@ -4475,13 +4751,13 @@ bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int di
 * @return bool TRUE if the sect is found
 */
 bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance) {
-	room_data *real = get_map_location_for(room);
+	room_data *real;
 	sector_data *find = sector_proto(sect);
 	bool found = FALSE;
 	room_data *shift;
 	int x, y;
 	
-	if (!real) {	// no map location
+	if (!(real = (GET_MAP_LOC(room) ? real_room(GET_MAP_LOC(room)->vnum) : NULL))) {	// no map location
 		return FALSE;
 	}
 	
@@ -4645,41 +4921,6 @@ int get_direction_to(room_data *from, room_data *to) {
 
 
 /**
-* Fetch the island id based on the map location of the room. This was a macro,
-* but get_map_location_for() can return a NULL.
-*
-* @param room_data *room The room to check.
-* @return int The island ID, or NO_ISLAND if none.
-*/
-int GET_ISLAND_ID(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	
-	if (map && GET_ROOM_VNUM(map) < MAP_SIZE) {
-		return world_map[FLAT_X_COORD(map)][FLAT_Y_COORD(map)].island;
-	}
-	else {
-		return NO_ISLAND;
-	}
-}
-
-
-/**
-* Changes the island id of a room.
-*
-* @param room_data *room The room to change the island on.
-* @param int island The island ID to set it to.
-*/
-void SET_ISLAND_ID(room_data *room, int island) {
-	extern bool world_map_needs_save;
-	
-	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].island = island;
-		world_map_needs_save = TRUE;
-	}
-}
-
-
-/**
 * @param room_data *room A room that has existing mine data
 * @return TRUE if the room has a deep mine set up
 */
@@ -4708,7 +4949,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 		return;
 	}
 
-	if (!(icon = use_icon)) {	
+	if (!(icon = use_icon)) {
 		season = pick_season(room);
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), season);
 	}
@@ -4735,7 +4976,7 @@ room_data *real_shift(room_data *origin, int x_shift, int y_shift) {
 		return NULL;
 	}
 	
-	map = get_map_location_for(origin);
+	map = (GET_MAP_LOC(origin) ? real_room(GET_MAP_LOC(origin)->vnum) : NULL);
 	
 	// are we somehow not on the map? if not, don't shift
 	if (!map || GET_ROOM_VNUM(map) >= MAP_SIZE) {
@@ -4854,9 +5095,8 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 * @return int The x-coordinate, or -1 if none.
 */
 int X_COORD(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	if (map) {
-		return FLAT_X_COORD(map);
+	if (GET_MAP_LOC(room)) {
+		return MAP_X_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
 		return -1;
@@ -4872,9 +5112,8 @@ int X_COORD(room_data *room) {
 * @return int The y-coordinate, or -1 if none.
 */
 int Y_COORD(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	if (map) {
-		return FLAT_Y_COORD(map);
+	if (GET_MAP_LOC(room)) {
+		return MAP_Y_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
 		return -1;
@@ -4902,6 +5141,56 @@ char *shared_by(obj_data *obj, char_data *ch) {
 	else {
 		return "";
 	}
+}
+
+
+/**
+* Simple, short display for number of days/hours/minutes/seconds since an
+* event. It only shows the largest 2 of those groups, so something 26 hours ago
+* is '1d2h' and something 100 seconds ago is '1m40s'.
+*
+* @param time_t when The timestamp.
+* @return char* The short string.
+*/
+char *simple_time_since(time_t when) {
+	static char output[80];
+	int diff, parts;
+	
+	parts = 0;
+	diff = time(0) - when;
+	*output = '\0';
+	
+	if (diff > SECS_PER_REAL_YEAR && parts < 2) {
+		sprintf(output + strlen(output), "%*dy", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_YEAR));
+		diff %= SECS_PER_REAL_YEAR;
+		++parts;
+	}
+	if (diff > SECS_PER_REAL_WEEK && parts < 2) {
+		sprintf(output + strlen(output), "%*dw", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_WEEK));
+		diff %= SECS_PER_REAL_WEEK;
+		++parts;
+	}
+	if (diff > SECS_PER_REAL_DAY && parts < 2) {
+		sprintf(output + strlen(output), "%*dd", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_DAY));
+		diff %= SECS_PER_REAL_DAY;
+		++parts;
+	}
+	if (diff > SECS_PER_REAL_HOUR && parts < 2) {
+		sprintf(output + strlen(output), "%*dh", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_HOUR));
+		diff %= SECS_PER_REAL_HOUR;
+		++parts;
+	}
+	if (diff > SECS_PER_REAL_MIN && parts < 2) {
+		sprintf(output + strlen(output), "%*dm", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_MIN));
+		diff %= SECS_PER_REAL_MIN;
+		++parts;
+	}
+	if (diff > 0 && parts < 2) {
+		sprintf(output + strlen(output), "%*ds", parts ? 1 : 2, diff);
+		++parts;
+	}
+	
+	return output;
 }
 
 
@@ -4950,6 +5239,7 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 * @param PLAYER_UPDATE_FUNC(*func)  A function pointer for the function to run on each player.
 */
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
+	char buf[MAX_STRING_LENGTH];
 	player_index_data *index, *next_index;
 	descriptor_data *desc;
 	char_data *ch;

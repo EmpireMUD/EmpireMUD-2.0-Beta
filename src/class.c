@@ -44,6 +44,7 @@ void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bo
 int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
 // external consts
+extern const int base_player_pools[NUM_POOLS];
 extern const char *class_flags[];
 extern const char *class_role[];
 extern const char *class_role_color[];
@@ -66,9 +67,21 @@ extern const char *pool_types[];
 void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	void check_skill_sell(char_data *ch, ability_data *abil);
 	
+	// helper type
+	struct assign_abil_t {
+		any_vnum vnum;	// which abil
+		ability_data *ptr;	// quick pointer
+		bool can_have;	// if the player can have it
+		UT_hash_handle hh;
+	};
+	
+	struct assign_abil_t *hash = NULL, *aat, *next_aat;
+	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil, *next_abil;
+	struct synergy_ability *syn;
 	struct class_ability *clab;
-	bool has;
+	skill_data *skill;
+	any_vnum vnum;
 
 	// simple sanity
 	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
@@ -83,14 +96,23 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		role = GET_CLASS_ROLE(ch);
 	}
 	
-	// check all abilities
+	// STEP 1: build the initial hash of all abilities AND check the class for them
 	HASH_ITER(hh, ability_table, abil, next_abil) {
-		if (ABIL_ASSIGNED_SKILL(abil)) {
-			continue;	// class abils only
+		if (ABIL_IS_PURCHASE(abil)) {
+			continue;	// skip skill-purchase abils entirely
 		}
 		
-		// determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
-		has = FALSE;
+		// STEAP 1a: find/add an 'aat' entry
+		vnum = ABIL_VNUM(abil);
+		HASH_FIND_INT(hash, &vnum, aat);
+		if (!aat) {
+			CREATE(aat, struct assign_abil_t, 1);
+			aat->vnum = vnum;
+			aat->ptr = abil;
+			HASH_ADD_INT(hash, vnum, aat);
+		}
+		
+		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
 		if (cls && GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
@@ -101,20 +123,53 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 				}
 				
 				// found it!
-				has = TRUE;
+				aat->can_have = TRUE;
 				break;
 			}
 		}
+	}
+	
+	// STEP 2: check which skill synergies the player qualifies for
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		skill = plsk->ptr;
 		
+		if (plsk->level < SKILL_MAX_LEVEL(skill)) {
+			continue;	// only skills at their max
+		}
+		
+		LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+			if (syn->role != NOTHING && syn->role != role) {
+				continue;	// wrong role
+			}
+			if (syn->level > get_skill_level(ch, syn->skill)) {
+				continue;	// level in other skill too low
+			}
+			
+			// found!
+			vnum = syn->ability;
+			HASH_FIND_INT(hash, &vnum, aat);
+			if (aat) {
+				// ONLY add it if we already had an entry
+				aat->can_have = TRUE;
+			}
+		}
+	}
+	
+	// STEP 3: assign/remove abilities
+	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
-		if (has_ability(ch, ABIL_VNUM(abil)) && !has) {
-			remove_ability(ch, abil, FALSE);
-			check_skill_sell(ch, abil);
+		if (has_ability(ch, aat->vnum) && !aat->can_have) {
+			remove_ability(ch, aat->ptr, FALSE);
+			check_skill_sell(ch, aat->ptr);
 		}
 		// add if needed
-		if (has) {
-			add_ability(ch, abil, FALSE);
+		if (aat->can_have) {
+			add_ability(ch, aat->ptr, FALSE);
 		}
+		
+		// clean up memory
+		HASH_DEL(hash, aat);
+		free(aat);
 	}
 }
 
@@ -177,7 +232,7 @@ bool check_solo_role(char_data *ch) {
 
 	char_data *iter;
 	
-	if (IS_NPC(ch) || GET_CLASS_ROLE(ch) != ROLE_SOLO) {
+	if (IS_NPC(ch) || GET_CLASS_ROLE(ch) != ROLE_SOLO || !IN_ROOM(ch)) {
 		return TRUE;
 	}
 	
@@ -289,13 +344,16 @@ void update_class(char_data *ch) {
 	over_basic = 0, over_specialty = 0;
 	at_zero = 0;
 	HASH_ITER(hh, skill_table, skill, next_skill) {
-		if (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
-			++at_zero;	// count total live skills
+		if (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT) && SKILL_FLAGGED(skill, SKILLF_BASIC)) {
+			++at_zero;	// count total live skills (ignoring non-basics)
 		}
 	}
 	
 	// find skill counts
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skdata) {
+		if (!SKILL_FLAGGED(skdata->ptr, SKILLF_BASIC)) {
+			continue;	// ignore non-basics
+		}
 		if (skdata->level > 0) {
 			--at_zero;
 		}
@@ -369,9 +427,6 @@ void update_class(char_data *ch) {
 	if (best_class != old_class) {
 		GET_CLASS_ROLE(ch) = ROLE_NONE;
 	}
-	
-	GET_CLASS(ch) = best_class;
-	assign_class_abilities(ch, NULL, NOTHING);
 			
 	// total up best X skills
 	best_total = 0;
@@ -390,6 +445,16 @@ void update_class(char_data *ch) {
 	}
 	else {
 		GET_CLASS_PROGRESSION(ch) = 0;
+	}
+	
+	// set class and assign abilities
+	GET_CLASS(ch) = best_class;
+	if (GET_LOYALTY(ch)) {
+		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
+	}
+	assign_class_abilities(ch, NULL, NOTHING);
+	if (GET_LOYALTY(ch)) {
+		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
 	}
 	
 	if (GET_CLASS(ch) != old_class || GET_SKILL_LEVEL(ch) != old_level) {
@@ -680,8 +745,6 @@ void remove_class_from_table(class_data *cls) {
 * @param class_data *cls The class to initialize.
 */
 void clear_class(class_data *cls) {
-	extern const int base_player_pools[NUM_POOLS];
-	
 	memset((char *) cls, 0, sizeof(class_data));
 	int iter;
 	
@@ -1028,6 +1091,7 @@ void save_olc_class(descriptor_data *desc) {
 	class_data *proto, *cls = GET_OLC_CLASS(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted;
+	char_data *ch_iter;
 
 	// have a place to save it?
 	if (!(proto = find_class_by_vnum(vnum))) {
@@ -1057,7 +1121,7 @@ void save_olc_class(descriptor_data *desc) {
 		}
 		CLASS_ABBREV(cls) = str_dup(default_class_abbrev);
 	}
-
+	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	sorted = proto->sorted_hh;
@@ -1071,6 +1135,13 @@ void save_olc_class(descriptor_data *desc) {
 
 	// ... and re-sort
 	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
+	
+	// update all players in-game
+	LL_FOREACH(character_list, ch_iter) {
+		if (!IS_NPC(ch_iter)) {
+			update_class(ch_iter);
+		}
+	}
 }
 
 
@@ -1222,22 +1293,22 @@ void olc_show_class(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_class_by_vnum(CLASS_VNUM(cls)) ? "new class" : CLASS_NAME(find_class_by_vnum(CLASS_VNUM(cls))));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(CLASS_NAME(cls)));
-	sprintf(buf + strlen(buf), "<\tyabbrev\t0> %s\r\n", NULLSAFE(CLASS_ABBREV(cls)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_class_by_vnum(CLASS_VNUM(cls)) ? "new class" : CLASS_NAME(find_class_by_vnum(CLASS_VNUM(cls))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(CLASS_NAME(cls), default_class_name), NULLSAFE(CLASS_NAME(cls)));
+	sprintf(buf + strlen(buf), "<%sabbrev\t0> %s\r\n", OLC_LABEL_STR(CLASS_ABBREV(cls), default_class_abbrev), NULLSAFE(CLASS_ABBREV(cls)));
 	
 	sprintbit(CLASS_FLAGS(cls), class_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT), lbuf);
 	
 	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, FALSE);
-	sprintf(buf + strlen(buf), "Skills required: <\tyrequires\t0>\r\n%s", CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
+	sprintf(buf + strlen(buf), "Skills required: <%srequires\t0>\r\n%s", OLC_LABEL_PTR(CLASS_SKILL_REQUIREMENTS(cls)), CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
 	
-	sprintf(buf + strlen(buf), "<\tymaxhealth\t0> %d\r\n", CLASS_POOL(cls, HEALTH));
-	sprintf(buf + strlen(buf), "<\tymaxmana\t0> %d\r\n", CLASS_POOL(cls, MANA));
-	sprintf(buf + strlen(buf), "<\tymaxmoves\t0> %d\r\n", CLASS_POOL(cls, MOVE));
+	sprintf(buf + strlen(buf), "<%smaxhealth\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, HEALTH), base_player_pools[HEALTH]), CLASS_POOL(cls, HEALTH));
+	sprintf(buf + strlen(buf), "<%smaxmana\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, MANA), base_player_pools[MANA]), CLASS_POOL(cls, MANA));
+	sprintf(buf + strlen(buf), "<%smaxmoves\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, MOVE), base_player_pools[MOVE]), CLASS_POOL(cls, MOVE));
 	
 	get_class_ability_display(CLASS_ABILITIES(cls), lbuf, NULL);
-	sprintf(buf + strlen(buf), "Class roles and abilities: <\tyrole\t0>\r\n%s%s", lbuf, *lbuf ? "\r\n" : "");
+	sprintf(buf + strlen(buf), "Class roles and abilities: <%srole\t0>\r\n%s%s", OLC_LABEL_PTR(CLASS_ABILITIES(cls)), lbuf, *lbuf ? "\r\n" : "");
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -1505,7 +1576,7 @@ OLC_MODULE(classedit_role) {
 //// COMMANDS ///////////////////////////////////////////////////////////////
 
 ACMD(do_class) {
-	void resort_empires();
+	void resort_empires(bool force);
 	
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
@@ -1520,10 +1591,10 @@ ACMD(do_class) {
 		// Handle role selection or display
 		
 		if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You can't set a class role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
+			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
 		}
 		else if (!*arg2) {
-			msg_to_char(ch, "Your class role is currently set to: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
+			msg_to_char(ch, "Your group role is currently set to: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
 		else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
 			msg_to_char(ch, "You can't do that while fighting!\r\n");
@@ -1547,10 +1618,10 @@ ACMD(do_class) {
 			assign_class_abilities(ch, NULL, NOTHING);
 			if (emp) {
 				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires();
+				resort_empires(FALSE);
 			}
 			
-			msg_to_char(ch, "Your class role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
+			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
 	}
 	else if (*arg) {
@@ -1566,7 +1637,111 @@ ACMD(do_class) {
 			msg_to_char(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], SHOW_CLASS_NAME(ch), class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
 			
 			get_class_ability_display(CLASS_ABILITIES(GET_CLASS(ch)), buf, ch);
-			msg_to_char(ch, " Available class roles:\r\n%s%s", buf, *buf ? "\r\n" : "  none\r\n");
+			msg_to_char(ch, " Available class abilities:\r\n%s%s", buf, *buf ? "\r\n" : "  none\r\n");
+		}
+	}
+}
+
+
+ACMD(do_role) {
+	void resort_empires(bool force);
+	
+	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct player_skill_data *plsk, *next_plsk;
+	empire_data *emp = GET_LOYALTY(ch);
+	struct synergy_ability *syn;
+	size_t sizes[NUM_ROLES+2];
+	int found, iter;
+	bool any;
+	
+	one_argument(argument, arg);
+
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You have no roles!\r\n");
+		return;
+	}
+	
+	if (*arg) {
+		// Handle role selection or display
+		
+		if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
+			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
+		}
+		else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
+			msg_to_char(ch, "You can't do that while fighting!\r\n");
+		}
+		else if (GET_POS(ch) < POS_STANDING) {
+			msg_to_char(ch, "You need to stand up first.\r\n");
+		}
+		else if ((found = search_block(arg, class_role, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Unknown role '%s'.\r\n", arg);
+		}
+		else {
+			// remove old abilities
+			if (emp) {
+				adjust_abilities_to_empire(ch, emp, FALSE);
+			}
+			
+			// change role
+			GET_CLASS_ROLE(ch) = found;
+			
+			// add new abilities
+			assign_class_abilities(ch, NULL, NOTHING);
+			if (emp) {
+				adjust_abilities_to_empire(ch, emp, TRUE);
+				resort_empires(FALSE);
+			}
+			
+			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
+		}
+	}
+	else {	// no arg
+		// Display role info
+		
+		msg_to_char(ch, "%s\r\nYou are level: %d/%d/%d, role: %s%s\t0\r\n", PERS(ch, ch, TRUE), GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch), class_role_color[GET_CLASS_ROLE(ch)], class_role[(int) GET_CLASS_ROLE(ch)]);
+		msg_to_char(ch, "Available synergy abilities:\r\n");
+		
+		// init
+		for (iter = 0; iter < NUM_ROLES+2; ++iter) {
+			*roles[iter] = '\0';
+			sizes[iter] = 0;
+		}
+		
+		// check player's skills
+		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+			if (plsk->level < SKILL_MAX_LEVEL(plsk->ptr)) {
+				continue;	// skip ones not at max
+			}
+			
+			LL_FOREACH(SKILL_SYNERGIES(plsk->ptr), syn) {
+				if (get_skill_level(ch, syn->skill) < syn->level) {
+					continue;	// too low
+				}
+				
+				// ok found, let's append -- for roles, +1 is to account for -1 == all
+				sprintf(part, "%s%s%s\t0", (*roles[syn->role+1] ? ", " : ""), (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
+				
+				if (sizes[syn->role+1] + strlen(part) + 1 < MAX_STRING_LENGTH) {
+					strcat(roles[syn->role+1], part);
+					sizes[syn->role+1] += strlen(part);
+				}
+			}
+		}
+		
+		// and show them
+		any = FALSE;
+		if (*roles[0]) {	// ALL
+			msg_to_char(ch, " All: %s\r\n", roles[0]);
+			any = TRUE;
+		}
+		for (iter = 1; iter < NUM_ROLES+2; ++iter) {
+			if (*roles[iter]) {
+				msg_to_char(ch, " %s%s\t0: %s\r\n", class_role_color[iter-1], class_role[iter-1], roles[iter]);
+				any = TRUE;
+			}
+		}
+		if (!any) {
+			msg_to_char(ch, " none\r\n");
 		}
 	}
 }

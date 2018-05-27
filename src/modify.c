@@ -44,8 +44,6 @@
 #define STRINGADD_ABORT		2	/* Abort edit, restore old text.		*/
 #define STRINGADD_ACTION	4	/* Editor action, don't append \r\n.	*/
 
-#define FORMAT_INDENT	BIT(0)
-
 
 extern char *show_color_codes(char *string);
 void show_string(descriptor_data *d, char *input);
@@ -126,6 +124,7 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 	d->straight_to_editor = TRUE;
 	d->mail_to = 0;
 	d->notes_id = 0;
+	d->island_desc_id = NOTHING;
 	d->save_empire = NOTHING;
 	d->file_storage = NULL;
 	d->allow_null = allow_null;
@@ -156,9 +155,11 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 /* Add user input to the 'current' string (as defined by d->str) */
 void string_add(descriptor_data *d, char *str) {
 	void check_delayed_load(char_data *ch);
+	void save_island_table();
 	extern char *stripcr(char *dest, const char *src);
 	extern int improved_editor_execute(descriptor_data *d, char *str);
 	
+	char buf1[MAX_STRING_LENGTH];
 	player_index_data *index;
 	struct mail_data *mail;
 	account_data *acct;
@@ -241,6 +242,8 @@ void string_add(descriptor_data *d, char *str) {
 	if (action) {
 		if (STATE(d) == CON_PLAYING && PLR_FLAGGED(d->character, PLR_MAILING)) {
 			if (action == STRINGADD_SAVE && *d->str) {
+				SEND_TO_Q("You tie your message to a pigeon and it flies away!\r\n", d);
+				
 				if ((index = find_player_index_by_idnum(d->mail_to)) && (recip = find_or_load_player(index->name, &is_file))) {
 					check_delayed_load(recip);	// need to delay-load them to save mail
 					
@@ -257,9 +260,10 @@ void string_add(descriptor_data *d, char *str) {
 					if (is_file) {
 						store_loaded_char(recip);
 					}
+					else {
+						msg_to_char(recip, "\trYou see a mail pigeon circling above you.\t0\r\n");
+					}
 				}
-				
-				SEND_TO_Q("You tie your message to a pigeon and it flies away!\r\n", d);
 			}
 			else {
 				SEND_TO_Q("Mail aborted.\r\n", d);
@@ -304,6 +308,17 @@ void string_add(descriptor_data *d, char *str) {
 			
 			act("$n stops editing notes.", TRUE, d->character, FALSE, FALSE, TO_ROOM);
 		}
+		else if (d->island_desc_id != NOTHING) {
+			if (action != STRINGADD_ABORT) {
+				struct island_info *isle = get_island(d->island_desc_id, TRUE);
+				syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s has edited the description for island [%d] %s", GET_NAME(d->character), isle->id, isle->name);
+				save_island_table();
+				SEND_TO_Q("Island description saved.\r\n", d);
+			}
+			else {
+				SEND_TO_Q("Edit aborted.\r\n", d);
+			}
+		}
 		else if (d->file_storage) {
 			if (action != STRINGADD_ABORT) {
 				if ((fl = fopen((char *)d->file_storage, "w"))){
@@ -337,6 +352,7 @@ void string_add(descriptor_data *d, char *str) {
 		d->str = NULL;
 		d->mail_to = 0;
 		d->notes_id = 0;
+		d->island_desc_id = NOTHING;
 		d->max_str = 0;
 		d->save_empire = NOTHING;
 		if (d->file_storage) {
@@ -491,7 +507,7 @@ void page_string(descriptor_data *d, char *str, int keep_internal) {
 
 /* The call that displays the next page. */
 void show_string(descriptor_data *d, char *input) {
-	char buffer[MAX_STRING_LENGTH];
+	char buffer[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	int diff;
 
 	any_one_arg(input, buf);
@@ -662,7 +678,7 @@ void parse_action(int command, char *string, descriptor_data *d) {
 	extern int format_script(descriptor_data *d);
 	extern int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
 	
-	char buf[MAX_STRING_LENGTH * 3];	// should be big enough
+	char buf[MAX_STRING_LENGTH * 3], buf2[MAX_STRING_LENGTH * 3];	// should be big enough
 	int indent = 0, rep_all = 0, flags = 0, replaced, i, line_low, line_high, j = 0;
 	unsigned int total_len;
 	char *s, *t, temp;
@@ -710,7 +726,11 @@ void parse_action(int command, char *string, descriptor_data *d) {
 			while (isalpha(string[j]) && j < 2)
 				if (string[j++] == 'a' && !indent)
 					rep_all = 1;
-			if ((s = strtok(string, "'")) == NULL) {
+			if (!*d->str) {
+				SEND_TO_Q("Nothing to replace.\r\n", d);
+				return;
+			}
+			else if ((s = strtok(string, "'")) == NULL) {
 				SEND_TO_Q("Invalid format.\r\n", d);
 				return;
 			}
@@ -1130,13 +1150,14 @@ int format_script(struct descriptor_data *d) {
 }
 
 
+// "d" is unused and appears to be optional, so I'm treating it as optional -paul
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen) {
 	int line_chars, startlen, len, cap_next = TRUE, cap_next_next = FALSE;
 	char *flow, *start = NULL, temp;
 	char formatted[MAX_STRING_LENGTH];
 
-	if (d->max_str > MAX_STRING_LENGTH) {
-		log("SYSERR: format_text: max_str is greater than buffer size.");
+	if (maxlen > MAX_STRING_LENGTH) {
+		log("SYSERR: format_text: maxlen is greater than buffer size.");
 		return;
 	}
 	

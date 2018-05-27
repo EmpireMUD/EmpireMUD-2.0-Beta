@@ -54,7 +54,7 @@ player who sent the offer logs off, you cannot accept the offer.
 #
 ACTION-SPAM ACTIONSPAM "ACTION SPAM"
 
-Usage:  toggle action-spam
+Usage:  toggle action-spam [on/off]
 
 This toggles disable the periodic messages of various continuous actions, like
 crafting and some chores. You will still see messages when these tasks are
@@ -75,7 +75,7 @@ See also: SCORE
 #
 AFK "AFK TOGGLE"
 
-Usage:  toggle afk
+Usage:  toggle afk [on/off]
 
 This toggle causes a small &r(AFK)&0 flag to appear after your title on the
 "who" list, indicating to other players that you are away-from-keyboard. You
@@ -202,6 +202,13 @@ Bright colors:
  
 See also: BANNER, INFORMATIVE, POLITICAL, RECOLOR, TOGGLE
 #
+APPROACH
+
+Usage:  approach
+
+When you're involved in ranged combat, you can manually end this phase and
+begin to approach your opponent.
+#
 ASSIST
 
 Usage:  assist <person in need>
@@ -215,9 +222,18 @@ you're assisting is fighting.
 
 See also: FLEE, KILL
 #
+AUTOCLIMB
+
+Usage:  toggle autoclimb [on/off]
+
+This toggle turns off the need to type 'climb' to enter mountains or other
+rough terrain.
+
+See also: CLIMB, TOGGLE
+#
 AUTOKILL
 
-Usage:  toggle autokill
+Usage:  toggle autokill [on/off]
 
 Use this toggle if you don't want to kill your opponent in combat, and you'll
 stop attacking when they drop into unconsciousness. They will still need help,
@@ -228,12 +244,32 @@ health, regardless of your autokill setting.
 
 See also: TOGGLE
 #
+AUTOSWIM
+
+Usage:  toggle autoswim [on/off]
+
+This toggle turns off the need to type 'swim' to enter water.
+
+See also:  SWIM, TOGGLE
+#
 AVOID
 
 Usage:  avoid <person>
 
 This command stops someone who is following you. They will be stunned for 4
 seconds, after which they can follow again.
+
+See also: FOLLOW
+#
+BECKON
+
+Usage:  beckon [name]
+
+This beckons people to follow you. Players who you beckon can just type
+'follow' without having to type your name, so long as they're still in the
+room with you.
+
+Inviting a player to a group automatically beckons them to follow.
 
 See also: FOLLOW
 #
@@ -258,7 +294,7 @@ See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
 BRIEF
 
-Usage:  toggle brief
+Usage:  toggle brief [on/off]
 
 This toggle turns off room descriptions and shrinks the map display from 15 by
 15 to 7 by 7. It reduces disconnects from buffer overflows for people moving
@@ -280,6 +316,14 @@ Examples:
   > idea more types of pottery
   > typo 'sence' should be spelled 'sense'
 #
+BUY LIST SHOP SHOPS
+
+Usage:  list [keywords]
+        buy <item>
+
+These commands let you list and buy items from shops. You can find shops in
+various places around the world.
+#
 CHANGEPASS CHANGEPASSWORD "CHANGE PASSWORD" PASSWORD
 
 Usage:  changepass <old pw> <new pw> <new again>
@@ -296,12 +340,24 @@ else.
 #
 CHANNEL-JOINS CHANNELJOINS "CHANNEL JOINS"
 
-Usage:  toggle channel-joins
+Usage:  toggle channel-joins [on/off]
 
 This toggles the messages which display when a player joins or leaves a
 slash-channel you are currently in.
 
 See also: SLASH-CHANNELS, TOGGLE
+#
+CHART CHARTS
+
+Usage:  chart <island>
+
+This command shows you information about any island.
+
+If any land is claimed, the three empires with the most claims are listed
+(in descending order). All empires with cities are listed below that, although
+only one city is listed per empire. Outposts are not listed.
+
+See also: ISLANDS, SURVEY
 #
 CIRCLE
 
@@ -322,6 +378,16 @@ This command clears your combat meters so you can get fresh data. Or, you can
 use the toggle to automatically clear meters whenever you start a new fight.
 
 See also: METERS, TOGGLE
+#
+CLIMB
+
+Usage:  climb <direction>
+
+This command allows you to enter a mountain tile (or other rough terrain). This
+keeps you from accidentally walking onto a mountain. You can 'toggle autoclimb'
+to remove the need for this command.
+
+See also: AUTOCLIMB, MOUNTAIN CLIMBING
 #
 CLS
 
@@ -350,7 +416,7 @@ See also: SOCIALS
 #
 COMPACT
 
-Usage:  toggle compact
+Usage:  toggle compact [on/off]
 
 This command toggles the extra blank line output to your screen after each
 command. Useful if you have a small display.
@@ -492,7 +558,7 @@ See also: SHIPPING
 #
 DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
 
-Usage:  douse [vehicle]
+Usage:  douse [vehicle | light]
 
 In the event of a fire, you may douse it with water from any portable source. 
 It may take a lot of water to douse the fire, and you may have to leave and 
@@ -502,6 +568,9 @@ and destroy your structure.
 If your empire has a workforce, the fire brigade can also put out fires for
 you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
+
+If you use this on a light such as a torch or cooking fire, it will extinguish
+the light (and destroy the object).
 
 See also: COOKING FIRE, LIGHT, WORKFORCE
 #
@@ -588,6 +657,8 @@ EQUIPMENT
 Usage:  equipment [-all]
 
 Gives you a list of all the equipment you're wearing, holding, and wielding.
+Items do not take up inventory space when equipped (except containers and their
+contents).
 
 If you also want to see empty slots, use the -a flag.
 
@@ -603,6 +674,38 @@ empire if you give no argument.
 
 See also: EMPIRE
 #
+EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
+
+Usage:  excavate
+        fillin
+
+Speed boosts:  Faster Chores bonus, haste
+
+Using a shovel, your own strength, and a lot of time, you can excavate a
+trench from a desert or plains. Once the trench is complete, it will begin
+to fill with water. Eventually, it becomes a canal.
+
+The "fillin" command is the opposite of excavate: it fills trenches in until
+they are ordinary plains or desert again. It will also work on a player-created
+oasis or canal. It takes 1 minute to begin a fillin on a completed trench; if
+you cancel the action or are interrupted, you must start the minute over.
+
+You can only excavate and fill in on claimed land. If you abandon your claim to
+a canal or trench, it will slowly fill in over time.
+
+When a desert trench fills with water, it will become an oasis instead of a
+canal. Oases convert into canals if they are adjacent to other canals or water
+sources.
+
+There are three ways to fill a finished trench with water:
+ - If there is more water adjacent, the trench will fill quickly.
+ - If you pour water out on the ground, you can fill the trench yourself.
+ - If you wait long enough, it will fill with rain water on its own.
+
+An unfinished trench will not fill with water.
+
+See also: CANAL, CLAIM, OASIS DRAINAGE
+#
 EXECUTE
 
 Usage:  execute <victim>
@@ -613,6 +716,13 @@ staked, or tied up.
 To automatically kill your victims in combat, "toggle autokill".
 
 See also: TOGGLE, STAKE, TIE
+#
+EXTRA-SPACING "EXTRA SPACING" "TOGGLE EXTRA-SPACING"
+
+Usage:  toggle extra-spacing [on/off]
+
+This toggle will insert an extra blank line after your prompt when you type
+any command. This is useful on MUD clients that don't have local echo.
 #
 EXITS
 
@@ -691,12 +801,14 @@ Usage:  follow <leader>
 Use FOLLOW to automatically follow someone else. You can use AVOID to shake
 someone loose.
 
-Examples:
+If someone has beckoned you to follow, you can just type 'follow' without
+their name.
 
+Examples:
   > follow ras
   > follow self
 
-See also: AVOID, GROUP, SNEAK
+See also: AVOID, BECKON, GROUP, SNEAK
 #
 GET TAKE
 
@@ -775,6 +887,9 @@ invite them to the group.
 There is a limit of 4 members in a group at a time. This is intended to help
 balance game encounters against the number of players in the group.
 
+Inviting a player to a group automatically beckons them to follow, if they
+aren't already following someone.
+
 See also: ADVENTURE SUMMON, GSAY
 #
 GSAY GTELL PSAY PTELL
@@ -825,7 +940,7 @@ See also: EIDENTIFY
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
-Usage:  toggle informative
+Usage:  toggle informative [on/off]
 
 Informative map mode shows you details about your buildings.
 
@@ -871,22 +986,24 @@ Usage:  inventory
         inventory -w <wear location> [keywords]
         inventory -t <type> [keywords]
 
-If you're uncertain about what you're carrying, or simply want to check that
-no thieves have got to your backpack. When in a storage building, this also
-checks the stored items there.
+Use this command if you're uncertain about what you're carrying, or simply want
+to check that no thieves have got to your backpack. When in a storage building,
+this also checks the stored items there.
 
 You can also search your inventory by keyword, or use the following flags:
-  &c-i&0 - Identify items (e.g. levels).
-  &c-k&0 - Only show items marked (keep).
-  &c-n&0 - Omit items marked (keep).
-  &c-c&0 - Show items of component type (e.g. 'lumber', 'large, single block').
-  &c-w&0 - Show items which can be worn in a given slot (e.g. 'finger').
-  &c-t&0 - Show items of a given type (e.g. 'weapon').
+  &c-i&0 Identify items (e.g. levels).
+  &c-k&0 Only show items marked (keep).
+  &c-n&0 Omit items marked (keep).
+  &c-c&0 Show items of component type (e.g. 'lumber', 'large, single block').
+  &c-w&0 Show items which can be worn in a given slot (e.g. 'finger').
+  &c-t&0 Show items of a given type (e.g. 'weapon').
 
 Items marked (large) take up two slots instead of one. If you equip an item
 to your "pack" slot, you can carry more items.
 
-If you're trying to see what you're wearing instead, type EQUIPMENT.
+If you're trying to see what you're wearing instead, type EQUIPMENT. Items do
+not take up inventory space when equipped (except containers and their
+contents).
 
 See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP
 #
@@ -909,10 +1026,11 @@ Examples:
 
 See also: COINS, DROP
 #
-KILL HIT
+KILL HIT MURDER
 
 Usage:  kill <victim>
         hit <victim>
+        murder <victim>
 
 A good way to start a fight.
 
@@ -930,29 +1048,38 @@ LAY ROAD ROADS
 
 Roads: ----  ..|.  ..+-  --+.  .--.
 
-Roads (Empire)
 Usage:  lay
 Cost:  20x (rock)
 
-You may use this ability to lay rocks into the ground to form a cobblestone 
-road. Roads eliminate the small movement lag that you normally get while
-walking. They can aid in tree and crop control -- nothing will grow over the
-roads, but they will eventually decay if left unclaimed.
+You can lay rocks into the ground to form a cobblestone road. Roads eliminate
+the small movement lag that you normally get while walking. Roads will
+eventually decay if left unclaimed.
 
 The lay command is also used to pull up a road and retrieve half its rocks.
 
-The Roads ability also allows you to put up road signs, if you specialize in
-the Empire skill.
-
 Roads count as their base terrain for most building functions, so you can
-build things facing roads, and can usually build right over a road -- but the
-road underneath will be lost. Roads count as in-city territory as far away as
-3x a city's normal radius.
-
-Gain experience when you lay a road (but not on mountains) or put down a
-road sign.
+build things facing roads. Roads count as in-city territory when built in the
+outskirts (4x radius).
 
 See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
+#
+LEARN LEARNED LEARNING
+
+Usage:  learn <recipe>
+        learned [search terms]
+
+You can learn a recipe (including patterns, schematics, and designs) from an
+item that teaches it. This gives you permanent access to that craft recipe
+(although you must still meet any skill and level requirements).
+
+Learning a recipe will consume the recipe item.
+
+You can see your learned recipes with the 'learned' command and, optionally,
+can filter the results. Empire recipes come from progression goals.
+
+Immortals can 'learn <vnum>' to instantly learn and craft recipe.
+
+See also: RECIPES, PROGRESS
 #
 LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
@@ -1044,6 +1171,13 @@ Workforce.
 
 See also: WORKFORCE
 #
+MESSAGES
+
+Usage:  messages
+
+This displays any system messages from the last 24 hours, plus any messages
+that are set to show on login or on auto-repeat.
+#
 METERS "COMBAT METERS"
 
 Usage:  meters
@@ -1056,7 +1190,7 @@ See also: CLEARMETERS
 #
 MORTLOG
 
-Usage:  toggle mortlog
+Usage:  toggle mortlog [on/off]
 
 This will give you periodic updates, such as when a player logs in, leaves, or
 dies. It's useful in keeping up on current events. Mortlog is colored cyan.
@@ -1083,7 +1217,7 @@ See also: TEXT EDITOR
 #
 NOREPEAT NO-REPEAT "NO REPEAT"
 
-Usage:  toggle no-repeat
+Usage:  toggle no-repeat [on/off]
 
 This command toggles whether or not you see your communication echoed back to
 you (i.e., from commands such as SAY, SHOUT, /OOC, etc). Useful if you have
@@ -1093,7 +1227,7 @@ See also: TOGGLE
 #
 NOTELL "NO TELL" "TOGGLE TELL"
 
-Usage:  toggle tell
+Usage:  toggle tell [on/off]
 
 Use this toggle if you wish to prevent other players from using "tell" to
 communicate with you. (notell) will appear after your name in the WHO list if
@@ -1125,6 +1259,33 @@ Examples:
   > order puppy eat bread
   > order cityguard sleep
 #
+PAINT PAINTING UNPAINT
+
+Usage:  paint <using paint item>
+        unpaint
+
+You can use the 'paint' command to color your buildings. This requires one
+paint item per building. You can learn painting recipes at the Painter's
+Workshop building, and from world drop recipes.
+
+Painting a building the same color twice will result in a brighter color. The
+'unpaint' command removes the paint.
+
+You need the 'customize' privilege in your empire to paint or unpaint.
+
+See also: COLORS, PAINTER'S WORKSHOP
+#
+PAN
+
+Usage:  pan [direction]
+Speed boosts:  Finder ability
+
+Using a simple metal pan, you can pan for gold flakes next to the river. It's
+rare to find anything, but it's something to do. You can pan an adjacent map
+tile, or the one you're standing in.
+
+See also: DEPLETION, FORGE
+#
 PLAY INSTRUMENTS MUSIC
 
 Speed boosts:  haste
@@ -1137,9 +1298,9 @@ Instruments will be played faster while hasted.
 
 See also: HOLD, TIMED ACTION
 #
-POLITICAL "POLITICAL VIEW"
+POLITICAL "POLITICAL VIEW" "TOGGLE POLITICAL"
 
-Usage:  toggle political
+Usage:  toggle political [on/off]
 
 This toggle changes your map colors from environmental to political. You will
 see each acre colored with the banner of the empire who owns it.
@@ -1221,6 +1382,33 @@ Examples:
 
 See also: FILL, TRENCH
 #
+PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
+
+Usage:  progress [category]
+        progress [info] [goal name]
+        progress buy [reward name]
+        progress <completed | purchased> [category]
+        progress summary
+        progress new
+
+This command shows your empire's current progress points, progression goals,
+and information about those goals. As your empire earns progress points, it can
+spend them to unlock new rewards.
+
+You can see what is required for your current goals by typing 'progress
+<goal name>'. This will also show you when you completed a goal, if it is
+finished.
+
+Progression goals are automatically unlocked when your empires meets all the
+requirements. Use 'elog progress' to see previous goal achievements.
+
+You can buy rewards with 'rpgress buy [reward name]'. View your completed goals
+or purchased rewards with 'progress completed' and 'progress purchased'. You
+can see if you have new goals with 'progress new'.
+
+See also: ELOG
+Immortals see also: UNPROGRESS
+#
 PROMPT FPROMPT "FIGHT PROMPT" "COMBAT PROMPT"
 
 Usage:  prompt <string | off | default>
@@ -1273,6 +1461,21 @@ Here are some suggested prompts:
  basic leveling with blood: |%hh %vv %mm %bb &&c%s&&0s %t [%c] %a>
 
 See also: PROMPT
+#
+PROSPECT
+
+Usage:  prospect
+
+A good prospector can determine what minerals are in the ground without
+exploratory mining. If your empire has Deep Mines or Rare Metals and are the
+first person to prospect a mountain tile (since the last mountain reset), that
+tile will benefit from your Deep Mines and/or Rare Metals until the next
+mountain reset. For more info on mountain resets, see HELP MINE.
+
+Prospecting happens instantly if your empire was the last one to prospect the
+tile.
+
+See also: MINE, DEEP MINES, RARE METALS
 #
 PUT
 
@@ -1379,26 +1582,52 @@ ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 Usage:  roadsign <message>
 Materials:  blank sign (stored in the Utility Shed)
 
-If you have the Roads ability and you have specialized in the Empire skill,
-you can use blank signs to put up signs on the side of the road. These signs
-are made by the Woodworking ability.
+If you have the Customize Building ability, you can use blank signs to put up
+signs on the side of the road. These signs are made by the Woodworking ability.
 
 The message on the sign can be no longer than 70 characters, and you can only
 set up a sign on a road, bridge, swamp walk, or mountain path. If the road is
 removed, the sign will be lost. Each road tile can only have one sign at a
 time, and using this ability again will replace the old sign.
 
-Gain Roads experience when you place a road sign.
+Gain Customize Building experience when you place a road sign.
 
-See also: ROADS, WOODWORKING
+See also: CUSTOMIZE BUILDING, WOODWORKING
 #
-ROLL
+ROLE "GROUP ROLE" "CLASS ROLE"
+
+Usage:  role [type]
+
+The role command shows your role, other available roles, and synergy abilities
+that go with those roles. You can also use this command to change roles. For
+example, "role tank". You must have a role in order to gain your synergy
+abilities, even if all of its roles share them.
+
+Group roles are the different tasks a person might be suited for. For example,
+if your character has both Natural Magic and Survival as its core skills, it
+might be suited to melee damage, caster damage, or healing. You can't perform
+all roles at the same time.
+
+&yTank&0: Takes all the damage in combat.
+&rMelee&0: Does physical damage.
+&aCaster&0: Does magical damage.
+&jHealer&0: Keeps the group alive.
+&mUtility&0: Doesn't fight; builds or crafts instead.
+&wSolo&0: For playing alone; some abilities won't work in groups.
+
+The colors shown above are used to display group roles on "who" and "roster".
+
+See also: TANK, HEALER, MELEE, CASTER, UTILITY, SOLO, SYNERGY ABILITY
+#
+ROLL ROLLHISTORY "ROLL HISTORY"
 
 Usage:  roll [number of dice] [size of dice]
+        rollhistory
 
 This command rolls dice for you, to determine random results. It can be used
 either in-character or out-of-character. The result will be shown to people in
-the room with you, as well as group members.
+the room with you, as well as group members. You can see recent rolls with the
+'rollhistory' command.
 
 Examples:
  > roll
@@ -1410,34 +1639,57 @@ Examples:
 #
 RP "RP TOGGLE"
 
-Usage:  toggle rp
+Usage:  toggle rp [on/off]
 
 This toggle indicates to others that you are currently roleplaying with a &m(RP)&0
 tag next to your name on the "who" list.
 
 See also: TOGGLE
 #
+RUN RUNNING SPEEDWALK SPEED-WALK "SPEED WALK"
+
+Usage:  run <direction>
+        run <path>
+
+This command allows you to set your character moving in a given direction, or
+along a path you specify. Paths must be pairs of directions and distances which
+your character will move in order.
+
+You will run faster if you took the 'faster walking' bonus trait during
+character creation.
+
+Examples:
+ > run east
+ > run 3e 4n 7nw
+ > run east 3, north 4, northwest 7
+#
 SAIL DRIVE PILOT SAILING DRIVING PILOTING
 
-Usage:  sail <direction | portal> [distance]
-        drive <direction | portal> [distance]
-        pilot <direction | portal> [distance]
+Usage:  sail <direction | path | portal>
+        drive <direction | path | portal>
+        pilot <direction | path | portal>
 
 These three commands are used to control ships, carriages, and other vehicles.
 Which command you use depends upon the type of vehicle. Travel in this manner
 is usually slow, but does not require movement points. You need to either be
 sitting on the vehicle, or inside of it and able to see out, to do this.
 
+You can use 'stop' to cancel travel at any time. If you don't like seeing the
+messages each time the ship moves, you can 'toggle action-spam' (unless you
+are the pilot).
+
+You can either specify a direction by itself, or a path. Paths must be pairs of
+directions and distances which your character will move in order.
+
+Examples:
+ > drive east
+ > sail 3e 4n 7nw
+ > pilot east 3, north 4, northwest 7
+
 Many vehicles cannot move through portals.
 
-If you specify a distance, you will only travel that many tiles. If not, you
-will continue to move until you hit an obstacle.
-
-You can use 'stop' to cancel travel at any time. If you don't like seeing the
-messages each time the ship moves, you can 'toggle action-spam'.
-
 See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
-STOP, TOGGLE
+STOP, TOGGLE, RUN
 #
 SAVE
 
@@ -1486,9 +1738,9 @@ Usage:  score
 The score command provides you all the important information about your
 character, including health and attributes.
 
-Your class is determined by your top two skills, and you first receive a class
-when both of these skills are past 75. The level shown on score is your total
-level, with your skill level shown in parentheses.
+Your top two skills are dsplayed, if both of these skills are past 75. The
+level shown on score is your total level, with your skill level shown in
+parentheses.
 
 Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/5s
 The first number (50) is your current health, the second (100) is your maximum
@@ -1546,7 +1798,7 @@ See also: DISPLAY, SCAN, TOGGLE, MAPSIZE
 #
 SCROLLING
 
-Usage:  toggle scrolling
+Usage:  toggle scrolling [on/off]
 
 This toggle turns off the page breaks sent when a character receives a long
 amount of information. The information is sent all at once, as preferred by
@@ -1663,7 +1915,7 @@ See also: EMOTE
 #
 STEALTHABLE
 
-Usage:  toggle stealthable
+Usage:  toggle stealthable [on/off]
 
 This toggle prevents you from accidentally performing stealth actions (for
 example picking up an item on another empire's territory). It must be enabled
@@ -1687,12 +1939,8 @@ to try again, so don't just spam the struggle command over and over.
 #
 "SUGGESTED ALIASES" "ALIAS SUGGESTIONS"
 
-Here are some suggested aliases. Some of them, like "loot", may involve an
-ability you don't have. You can either modify the alias to not have "butcher"
-at the end, or you can just ignore the warning message until you get Butcher.
-The rest of the loot alias will still work.
-
-Have a useful alias? Submit it with the "idea" command.
+Here are some suggested aliases. Have a useful alias? Submit it with the "idea"
+command.
 
 Feel free to copy and paste the alias commands below, or modify them as you
 like:
@@ -1714,6 +1962,16 @@ alias pol toggle political;look
 
 See also: ALIAS, IDEA
 #
+"SUMMON GUARDS"
+
+Usage:  summon guards
+Cooldown:  3 minutes
+Cost:  25 move
+
+This ability summons up to (Charisma / 2, rounded down) guards. They aren't
+very strong, but they count as city guards and will attack intruders and
+hostile mobs. You can only use this in your empire's own cities and outskirts.
+#
 "SUMMON PLAYERS"
 
 Command:  summon player <name>
@@ -1733,7 +1991,7 @@ Usage:  survey
 
 This command gets you basic information about the room you're currently in.
 
-See also: ADVENTURE
+See also: ADVENTURE, CHART
 #
 SWAP
 
@@ -1749,6 +2007,17 @@ trees to build more mines. You wield a pick and hold an axe, and "swap" them
 as you change back and forth between activities.
 
 See also: DRAW, SHEATH
+#
+SWIM
+
+Usage:  swim <direction>
+
+This command allows you to enter a water tile from land. You must still have
+the Swimming ability, or some other way to swim.
+
+You can turn off the need for this command with 'toggle autoswim'.
+
+See also: AUTOSWIM, SWIMMING
 #
 TELLHISTORY
 
@@ -1811,36 +2080,42 @@ See also: WHO
 #
 TOGGLE TOGGLES
 
-Usage:  toggle [type]
+Usage:  toggle [type] [on/off]
 
 This command is the master switchboard for various preference toggles. You can
 use it to see your current preferences, or to switch them on and off. Some
 toggles have their own help files under 'HELP TOGGLE <option>'.
 
 Toggles:
-  tell - the tell channel
-  shout - the local shout channel
-  political - shows empire colors instead of terrain colors
-  mortlog - see logs when people create characters and die
-  scrolling - scroll long text instead of paginating
-  brief - see smaller maps and no room descriptions
-  compact - no extra newlines
-  no-repeat - Some commands will say "ok" instead of typing out your message
-  autokill - don't end combat at incapacitation
-  bother - allows "bothersome" things like bite and purify
-  rp - Whether or not you are roleplaying
-  map-color - shut off color for just the map
-  pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
-  informative - informative map coloring -- HELP INFORMATIVE
   action-spam - if you turn this off, you won't see periodic action messages
-  screen-reader - see HELP SCREEN READER
   afk - Whether or not you are away-from-keyboard
-  channel-joins - blocks slash-channel join messages
-  autorecall - if you're logged out over an hour, automatically sends you home
-  stealthable - if off, you will be prevented from accidentally stealing
+  autoclimb - can enter mountains without typing 'climb'
   autodismount - will dismount you while moving, if necessary
-  no-empire - will not create a new empire when you try to claim or build
+  autokill - don't end combat at incapacitation
+  autorecall - if you're logged out over an hour, automatically sends you home
+  autoswim - can enter water without typing 'swim'
+  bother - allows "bothersome" things like bite and purify
+  brief - see smaller maps and no room descriptions
+  channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
+  compact - no extra newlines
+  extra-spacing - adds an extra blank line after you type a command
+  informative - informative map coloring -- HELP INFORMATIVE
+  map-color - shut off color for just the map
+  mortlog - see logs when people create characters and die
+  no-empire - will not create a new empire when you try to claim or build
+  no-paint - turns off custom paint colors on buildings
+  no-repeat - Some commands will say "ok" instead of typing out your message
+  political - shows empire colors instead of terrain colors
+  pvp - turns on/off free pvp; will remain on 5 minutes after toggled off
+  rp - Whether or not you are roleplaying
+  screen-reader - see HELP SCREEN READER
+  scrolling - scroll long text instead of paginating
+  shout - the local shout channel
+  stealthable - if off, you will be prevented from accidentally stealing
+  tell - the tell channel
+  travel-look - automatically 'looks' after each run or when your vehicle moves
+  tutorials - you won't see available tutorial quests if this is off
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
@@ -1856,11 +2131,19 @@ See also: FIGHT MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 
-Usage:  toggle no-empire
+Usage:  toggle no-empire [on/off]
 
 This toggle is for players who do not wish to be in any empire. The game will
 no longer create a new empire for you when you try to do things like claim
 or build.
+#
+TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
+
+Usage:  toggle travel-look [on/off]
+
+This toggle causes you to automatically 'look' after each time you move when
+running or when driving, piloting, or sailing a vehicle. With this toggle off,
+you only see a short message indicating you moved.
 #
 UNLOAD UNLOADVEHICLE BOATUNLOAD
 
@@ -1879,9 +2162,9 @@ USE
 Usage:  use <item>
 
 This command is used to interact with some items, such as the hestian trinket.
-It also sets your active poison.
+It also sets your active poison or your preferred ammunition.
 
-See also: HESTIAN TRINKET, POISON
+See also: HESTIAN TRINKET, POISON, AMMUNITION
 #
 VISIBLE
 
@@ -1945,7 +2228,7 @@ Lists the people currently in the game. Some people may be invisible. Command-
 line options can be used to limit the listing. The parameters can be specified
 on the command-line in any order.
 
-The color of the player's class name (if not white) indicates their role, if
+The color of the player's main skills (if not white) indicates their role, if
 any: &aCaster&0, &jHealer&0, &yTank&0, &rMelee&0, or &mUtility&0.
 
 min-max    Specify a level range, e.g. 100-200

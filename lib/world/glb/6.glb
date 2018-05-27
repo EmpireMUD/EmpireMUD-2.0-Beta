@@ -9,9 +9,9 @@ I 12 600 100.00 1  # PICKPOCKET: a strange crystal seed
 S
 #609
 moonstone mine~
-1 c v 0 0-0
+1 ce v 0 0-0
 E
-133 1.50
+-1 1.50
 10 0 0
 I 13 609 100.00 1  # MINE: some moonstone ore
 S

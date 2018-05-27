@@ -21,10 +21,12 @@ Available types are:
  .b - buildings                  .book - books
  .c - crafts                     .class - classes
  .crop - crops                   .f - factions
- .g - globals                    .m - mobiles
- .map - map tiles/interiors      .morph - morphs
- .o - objects                    .q - quests
- .r - room templates             .sect - map sectors
+ .g - globals                    .gen - generics
+ .m - mobiles                    .map - map tiles/interiors
+ .morph - morphs                 .o - objects
+ .prog - empire progression gaol
+ .q - quests                     .r - room templates
+ .sect - map sectors             .shop - shops
  .skill - skills                 .soc - socials
  .t - scripts/triggers           .v - vehicles
 
@@ -35,6 +37,9 @@ Basic commands:
  delete <vnum> - deletes a vnum from the database, with all copies of it
  edit <vnum> - loads that vnum into the editor
  list <from vnum> <to vnum> - lists everything in that vnum range
+ search <vnum> - see where a thing is used by other things
+ fullsearch <args> - a deeper search provided for some tyepes
+ audit <vnum/range> - find common errors automatically
  save - save your open editor and close it
 
 Examples:
@@ -42,14 +47,21 @@ Examples:
  > olc object edit 1500
  > .m list 50-60
 
+In the editor display, anything in angle brackets is also the name of the
+command to edit it. For example, <&yname&0> can be edited by typing .name and
+the name you want to set. This label changes from yellow to green if the item
+has been changed from its default. For blind players, an asterisk appears
+before the label name.
+
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
 See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
-   OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
+   OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC, OLC GENERICS,
+   OLC SHOPS
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
-"OLC ABBREVIATIONS" "OLC ABBREVS" ADV BLD BDG CFT CRP MOB OBJ QST RMT SCT SOC TRG
+"OLC ABBREVIATIONS" "OLC ABBREVS" ADV BLD BDG CFT CRP MOB OBJ PRG QST RMT SCT SOC TRG
 
 Sometimes abbreviations are used for core "thing" types, like mobs. Here are
 some common ones:
@@ -62,15 +74,18 @@ bld (or bdg) - building (these include designated rooms)
 cft - craft
 cls - class
 crp - crop
-fct - factions
+fct - faction
+gen - generic
 glb - global
 mob - mobile/npc
 mph - morph
 npc - non-player character (mob)
+prog/prg - empire progression goal
 obj - object
 qst - quest
 rmt - room template
 sct - sector/terrain
+shop - shop
 skl - skill
 soc - social
 trg - trigger
@@ -106,6 +121,10 @@ Abilities (ABILEDIT):
   (superior). Do not apply mastery abilities to abilities that don't need this.
 
 Adventures (ADVEDIT):
+- You should use the CAN-DELAY-LOAD flag whenever possible. This will reduce
+  work (and lag) from having many copies of the adventure by not loading the
+  interior until a player arrives. However, some types of adventures won't work
+  correctly if they don't load immediately (like the Magiterranean Whirlwind).
 - When you set a min/max level for the adventure, mobs and items that don't
   have their own level limits will inherit the limits from the adventure.
 - If you plan to use obj/room scripts that will do scaled damage, you should
@@ -152,9 +171,8 @@ Buildings (BEDIT):
   never run again.
 
 Classes (CLASSEDIT):
-- By convention, stock EmpireMUD has one class for every pair of level 100
-  skills. This leaves no room for adding more classes unless you are re-
-  designing that entire notion.
+- EmpireMUD is not currently using 'classes' at all, but they are still
+  included as features for muds that want to implement them.
 - A player will get assigned the class with the most matching skills, so adding
   a 100/100/75 class would give them a more specific version of the 100/100.
 - Abilities can be on more than one class and more than one role within a class
@@ -165,12 +183,11 @@ Crafts (CEDIT):
 - Soups are made using the COOK type and the SOUP flag. Instead of choosing an
   item to make, you choose a liquid, and the recipe will require a container
   of water to make the soup in.
-- To make a recipe item, build an item ("an old recipe") and set it in a
-  craft's requiresobject field. The player will only be able to see and use
-  the craft if they have the item in their inventory. You can still also choose
-  to require an Ability, for example an armor pattern that requires Armor-
-  smithing. You should mention the recipe by name in the item's look
-  description.
+- To make a recipe item, build an item ("an old recipe") of type RECIPE, and
+  set its recipe vnum to the craft. Your craft must have the LEARNED flag.
+  Players must still meet other requirements, such as requiresability, to make
+  the craft once they have learned it. If you want to constrain the level of
+  the item it makes, put min/max levels on the item.
 - To make an item that can be combined with another item, for example a spear-
   head that can be crafted into a spear, create a craft and set its requires-
   object to the spearhead (just like a recipe item, above). Then, also set the
@@ -210,6 +227,14 @@ Factions (FEDIT):
   Hated/Venerated. Despised/Revered don't have ranges, and players can 'bump
   out' of those ranges by gaining/losing even 1 reputation point.
 - See HELP FACTION SCRIPTING for tips on writing scripts.
+
+Generics (GENEDIT):
+- Core content appears in low-numbered vnums, but new generics should usually
+  be in the vnum block of the adventure that adds them.
+- Core liquids are in the 0-99 vnum range.
+- Core resource actions are in the 1000-1099 vnum range.
+- Core cooldowns are in the 2000-2999 vnum range.
+- Core affects are in the 3000-3999 range.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
@@ -252,7 +277,7 @@ Mobs (MEDIT):
   players working very hard, or perhaps 2 extremely good players.
 - A mob with HARD and GROUP is a major boss fight and may take a lot of work
   even for a full 4-player group.
-- ANIMAL mobs will take double damage from players with Hunt.
+- ANIMAL mobs will take double damage from players with Huntsman.
 - Consider using a must-fight script (like a Leave trigger with "return 0")
   rather than the AGGR flag.
 - If your mob spawns in a dark adventure, strongly consider giving it INFRA.
@@ -263,7 +288,7 @@ Morphs (MORPHEDIT):
   player morph lists.
 - If you use a required object and the CONSUME-OBJ flag, be sure not to use a
   scalable item. Scalable items will refund at the wrong level.
-- If the morph requires a class ability, you should also set the CHECK-SOLO
+- If the morph requires a synergy ability, you should also set the CHECK-SOLO
   flag. This is necessary to use it in the Solo role.
 
 Objects (OEDIT):
@@ -304,6 +329,14 @@ Objects (OEDIT):
 - The COMBINE interaction should always use 1 exclusion set, as it will extract
   the original item if the interaction succeeds, and it's usually not safe to
   run additional interactions.
+- Ammo items that cause debuffs will use an 'affect' generic with the same
+  vnum as the ammo, if one exists.
+- Potions should have a locked level (min equal to max) to be storable.
+
+Empire Progress Goals (PROGEDIT):
+- Goals that are PURCHASABLE should not have cost or tasks.
+- Do not use goal names starting with 'Buy', 'Completed', or any progress type.
+  Players may not be able to get info on them using the 'progress' command.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
@@ -363,6 +396,9 @@ Sectors (SECTEDIT):
 - Please provide a useful list of commands for any new sector. For example, if
   you add any DIG interaction, put "dig" on the commands list.
 
+Shops (SHOPEDIT):
+- no tips yet
+
 Skills (SKILLEDIT):
 - See HELP ABILITY POINTS for a breakdown of how many points a player gets in
   each skill tree. Use this to "gate" abilities and prevent players from having
@@ -407,6 +443,11 @@ Triggers and Scripts (TRIGEDIT):
 - Do not put a "%quest% finish" in a trigger that's attached to an object
   that requires that quest. The object will be extracted during the "finish"
   and it will interrupt the execution of your trigger.
+- Consume triggers on poisons or arrows MUST return 0 if they purge the %self%
+  items. You can also check "if %target%" to be sure you have someone to hit
+  in these triggers.
+- If a player uses 'douse' to put out a torch/fire with a timer, it will
+  immediately fire any Timer triggers on the object.
 
 Vehicles (VEDIT):
 - Keywords should always have the most significant word first (the noun). This
@@ -461,8 +502,9 @@ Usage:  .abil <command>
 The .olc ability editor allows you to configure the data for various abilities.
 The main properties set up here are names and mastery abilities.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP ABILEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP ABILEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -475,12 +517,348 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
+"ABILEDIT AFFECTS" "ABILEDIT AFFECT"
+
+Usage:  .affects [add | remove] <flag>
+
+For buff abilities, these are affect flags that are placed on the target of the
+ability.
+
+See also: AFFECT FLAGS, OLC ABILITIES, BUFF ABILITY
+#d
+"ABILEDIT AFFECTVNUM" "ABILEDIT AFFECT VNUM"
+
+Usage:  .affectvnum <vnum | none>
+
+For buff abilities, this determines which 'affect' (generic) to use. The affect
+determines what text is shown on the 'affects' command or when the ability
+wears off.
+
+If you don't specify an ability, it will just say 'buff' and will have no wear-
+off message.
+
+See also: OLC ABILITIES, BUFF ABILITY
+#d
+"ABILEDIT APPLY" "ABILEDIT APPLIES"
+
+Usage:  .apply add <value> <apply>
+        .apply change <number> <value | apply> <new value>
+        .apply remove <number | all>
+
+For buff abilities, these are the various traits that are changed by the buff.
+The values should be positive for buffs, and negative for debuffs.
+
+Unlike object applies, using a negative apply will NOT provide a bonus for the
+other positive applies.
+
+For a list of the applies, see: HELP OEDIT APPLY
+
+See also: OLC ABILITIES, BUFF ABILITY
+#d
+"ABILEDIT ATTACKTYPE" "ABILEDIT ATTACK TYPE"
+
+Usage:  .attacktype <number>
+
+This determines the attack message that a damage ability sends. These are
+numeric values matching the game's attack messages.
+
+In the future, attack messages will be moved to an in-game editor. Until then,
+if you need a new type, ask your game administrator to add one in the
+'messages' file.
+
+Current attack types:
+ 52. execute                         53. arrow
+ 54. kick                            55. bash
+ 60. lightningbolt                   62. backstab
+ 63. sunshock                        67. ablate
+ 68. acidblast                       69. arclight
+ 70. astralclaw                      71. chronoblast
+ 72. deathtouch                      73. dispirit
+ 74. erode (unused)                  75. scour (unused)
+ 76. shadowlash                      77. soulchain
+ 78. starstrike                      79. thornlash
+
+See also: OLC ABILITIES, DAMAGE ABILITY
+#d
+"ABILEDIT BUFF ABILITY" "BUFF ABILITY" "BUFF ABILITIES"
+
+The BUFF ability type means that the ability gives some affects to the target.
+This includes 'debuffs', which give negative abilities to enemies.
+
+You must always set the VIOLENT flag on a debuff.
+
+Buff abilities have the following properties:
+ <&yshortduration&0> How long it lasts (at low level).
+ <&ylongduration&0> How long it lasts (at class level).
+ <&yaffects&0> Affect flags to set.
+ <&yapply&0> Trait modifiers to give.
+ <&yaffectvnum&0> Which affect (generic) to use for the buff.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT CRAFT ABILITY" "CRAFT ABILITY" "CRAFTING ABILITY" "CRAFT ABILITIES"
+
+The CRAFT ability type indicates that an ability is only used to make crafts.
+This type of ability has no "command" or other special properties.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT COMMAND"
+
+Usage:  .command <word | none>
+
+Adding a command makes the ability usable. Its exact use depends on what
+type(s) you set on the ability. Commands must be a single word, and should
+NEVER share the name with a game command.
+
+Players can only use this command if they have this ability. You can use
+'skill buy <your skill name>' to buy and test the ability.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT COOLDOWN" "ABILEDIT CDTIME"
+
+Usage:  .cooldown <vnum | none>
+        .cdtime <seconds>
+
+These two properties determine what cooldown an ability has, if any. The vnum
+must be a cooldown generic.
+
+Cooldowns are used to balance how powerful an ability is, by limiting how often
+it can be used.
+
+See also: COOLDOWN GENERICS, OLC ABILITIES
+#d
+"ABILEDIT COST" "ABILEDIT COSTTYPE" "ABILEDIT COST TYPE" "ABILEDIT COSTPERSCALEPOINT" "ABILEDIT COST PER SCALE POINT"
+
+Usage:  .cost <amount>
+        .costperscalepoint <amount>
+        .costtype <health | move | mana | blood>
+
+These two commands determine how much it costs to use an ability. If the
+ability is free, just set the cost to 0.
+
+You can also set the cost to be based on the scale of the ability. There are
+approximately 4 scale points per 100 levels (before modifiers). This feature
+allows you to add cost to stronger abilities.
+
+Costs are part of balancing an ability. A more powerful ability should have a
+higher cost.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT CRAFT ABILITY" "CRAFT ABILITY"
+
+The CRAFT ability type indicates that it is used for crafting/building items.
+There are no special ability properties for this type. This ability can be
+assigned to a craft in the .craft editor's 'requiresability' field.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT CUSTOM" "ABILEDIT CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom remove <number | all>
+
+You can set custom messages on abilities. Different types of abilities may use
+different messages; see the help files for each ability type for more info.
+These messages may use the tokens $n/$e/$s/$m for name/he/his/him for the
+player using the ability, and capitalized letters for the target.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cself-to-char&0 - Shown to the actor when the ability targets himself (or
+   targets nobody).
+ &cself-to-room&0 - Shown to the room when the ability targets self/nobody.
+ &ctarg-to-char&0 - Shown to the actor when the ability targets a character.
+ &ctarg-to-vict&0 - Shown to the victim when the ability targets a character.
+ &ctarg-to-room&0 - Shown to the rest of the room when targeting a character.
+ &ccounterspell-to-char&0 - Shown to the actor when a counterspell cancels the
+   ability.
+ &ccounterspell-to-vict&0 - Shown to the ability's victim after the counterspell.
+ &ccounterspell-to-room&0 - Shown to the room after the counterspell.
+ &cfail-self-to-char&0 - Shown to the actor when the ability fails targeting
+   himself (or targets nobody).
+ &cfail-self-to-room&0 - To the room when the ability fails targeting self/nobody.
+ &cfail-targ-to-char&0 - To the actor when the ability fails targeting a character.
+ &cfail-targ-to-vict&0 - To the victim when the ability fails targeting a character.
+ &cfail-targ-to-room&0 - To the room when it fails targeting a character.
+
+See also: OLC ABILITIES, DOLLAR SIGN CODES
+#d
+"ABILEDIT DAMAGE ABILITY" "DAMAGE ABILITY" "DAMAGE ABILITIES"
+
+The DAMAGE ability type is an ability that deals damage directly to the target,
+without a hit/dodge roll or an attack.
+
+You must always set the VIOLENT flag on a damage ability.
+
+DAmage abilities have the following properties:
+ <&yattacktype&0> Determines the attack messages.
+ <&ydamagetype&0> What type of damage it does.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT DAMAGETYPE" "ABILEDIT DAMAGE TYPE"
+
+Usage:  .damagetype <type>
+
+This determines what type of damage the ability deals. Damage type affects
+the target's ability to block, and affects which resistances protect against
+it.
+
+See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
+#d
+"ABILEDIT DATA"
+
+Usage:  .data add <type> <name | vnum>
+        .data remove <number | all>
+
+The 'data' field is used by different types of abilities. Available types are:
+ &cPTECH&0 - Player technologies. Used by the PLAYER-TECH ability type.
+ &cEFFECT&0 - Something happens when the ability activates. See ABILITY EFFECTS
+
+See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
+#d
+"ABILEDIT DIFFICULTY"
+
+Usage:  .difficulty <type>
+
+Some abilities have a chance to fail. This setting determines how hard the
+ability is. If an ability can fail, you should set custom fail messages.
+
+See also: ABILEDIT CUSTOM, OLC ABILITIES
+#d
+"ABILEDIT DOT ABILITY" "DOT ABILITY" "DOT ABILITIES"
+
+The DOT ability type deals damage over time. If you set the maxstacks number
+very high, you should also lower the scale property.
+
+You must always set the VIOLENT flag on a DoT.
+
+DoT abilities have the following properties:
+ <&yshortduration&0> How long it lasts (at low level).
+ <&ylongduration&0> How long it lasts (at class level).
+ <&ymaxstacks&0> How many times this DoT can stack.
+ <&yaffectvnum&0> Which affect (generic) to use for the DoT.
+
+See also: OLC ABILITIES, ABILEDIT SCALE, ABILEDIT TYPES
+#d
 "ABILEDIT FLAGS" "ABILITY FLAGS"
 
 Usage:  .flags [add | remove] <flags>
 
 The following ability flags are available:
- * - There are noflags for abilities yet
+ &cVIOLENT&0 - Causes combat; can't be used on allies. You MUST set this flag
+   on offensive abilities or ones that harm the target.
+ &cCOUNTERSPELLABLE&0 - Can trigger an opponent's counterspell (used for magic).
+ &cTOGGLE&0 - Using this ability on twice  yourself will end its affect (for free).
+ &cINVISIBLE&0 - Shows no message if the actor can't be seen, instead of 'Someone'.
+ &c!ENGAGE&0 - Will not automatically add you to combat when used.
+ &cRANGED&0 - Can be used during ranged combat without giving a melee error.
+ &c!ANIMAL&0 - Cannot be used in animal form.
+ &c!INVULNERABLE&0 - Cannot be used while invulnerable (e.g. mistform).
+ &cCASTER-ROLE&0 - Bonus for caster role, weaker without it.
+ &cHEALER-ROLE&0 - Bonus for healer role, weaker without it.
+ &cMELEE-ROLE&0 - Bonus for melee role, weaker without it.
+ &cTANK-ROLE&0 - Bonus for tank role, weaker without it.
+ &cRANGED-ONLY&0 - Cannot be used in melee combat.
+ &cIGNORE-SUN&0 - For a vampire ability, won't check sunlight.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT FULLSEARCH"
+
+Usage:  .abil fullsearch -<field> <argument> <...>
+
+This command allows you to search for abilities matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the ability's keywords and other text.
+
+Fields:
+  &c-affects&0 - see HELP AFFECT FLAGS
+  &c-apply&0 - see HELP APPLIES
+  &c-attacktype&0 - see HELP ABILEDIT ATTACK TYPE
+  &c-costtype&0 - health, mana, move, or blood
+  &c-custom&0 - has a specific type, see HELP ABILEDIT CUSTOM
+  &c-damagetype&0 - see HELP ABILEDIT DAMAGE TYPE
+  &c-difficulty&0 - see HELP ABILEDIT DIFFICULTY
+  &c-flagged&0, &cunflagged&0 - see HELP ABILEDIT FLAGS
+  &c-gainhooks&0 - see HELP ABILEDIT GAIN HOOKS
+  &c-immunities&0 - see HELP AFFECT FLAGS
+  &c-linkedtrait&0 - see HELP APPLIES
+  &c-mincooldown&0, &c-maxcooldown&0 - cooldown time within these limits
+  &c-mincost&0, &c-maxcost&0 - base cost within these limits
+  &c-mincostperscalepoint&0, &c-maxcostperscalepoint&0 - scaled cost limits
+  &c-minduration&0, &c-maxduration&0 - short/long duration within these limits
+  &c-minposition&0, &c-maxposition&0 - required position within these limits
+  &c-ptech&0 - see HELP PTECH
+  &c-scale&0, &c-scaleunder&0, &c-scaleover&0 - scale percent within these limits
+  &c-targets&0 - see HELP ABILEDIT TARGETS
+  &c-type&0 - see HELP ABILEDIT TYPE
+  &c-waittype&0 - see HELP ABILEDIT WAIT TYPE
+
+Examples:
+ > .abil fullsearch -type PLAYER-TECH -ptech Swimming
+ > .abil fullsearch -flagged RANGED -flagged RANGED-ONLY
+ > .abil fullsearch -scaleover 50 -scaleunder 99
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all objects with the "Mini-pet Use"
+trigger, use ".t search 9900".
+#d
+"ABILEDIT GAINHOOKS" "ABILEDIT GAIN HOOKS" "GAIN HOOKS"
+
+Usage:  .gainhooks [add | remove] <flags>
+
+This tells the ability when to trigger skill gain:
+ &cONLY-WHEN-AFFECTED&0 - Below flags will only happen when the ability's affect
+   is on.
+ &cMELEE&0 - Gains when you hit in melee combat.
+ &cRANGED&0 - Gains when you hit in ranged combat.
+ &cDODGE&0 - Gains when you dodge an attack.
+ &cBLOCK&0 - Gains when you block an attack.
+ &cTAKE-DAMAGE&0 - Gains when you take damage.
+ &cPASSIVE-FREQUENT&0 - Gains every 5 seconds.
+ &cPASSIVE_HOURLY&0 - Gains every 75 seconds (game hour).
+ &cONLY-DARK&0 - Only gains if it's dark here.
+ &cONLY-LIGHT&0 - Only gains if it's NOT dark here.
+ &cONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
+ &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
+ &cMOVING&0 - Gains when the player moves.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT IMMUNITIES" "ABILEDIT IMMUNITY"
+
+Usage:  .immunities [add | remove] <flag>
+
+These are affect flags that make the target immune to this ability. For
+example, the !BATTLE immunity means mobs with that flag can't be targeted by
+this ability.
+
+Any affect flag can be used for this.
+
+See also: AFFECT FLAGS, OLC ABILITIES
+#d
+"ABILEDIT LINKEDTRAIT" "ABILEDIT LINKED TRAIT"
+
+Usage:  .linkedtrait <trait | none>
+
+Linking an ability to a trait makes the ability more powerful based on how
+close the actor is to his/her cap in that trait.
+
+This selector uses the same list of traits as applies, but only traits that
+have a cap will provide a bonus.
+
+The following traits cannot be used: &rHEALTH-REGEN, MOVE-REGEN, MANA-REGEN,
+AGE, MAX-MOVE, HEAL-OVER-TIME, MAX-HEALTH, MAX-MANA, INVENTORY, MAX-BLOOD,
+CRAFTING, BLOOD-UPKEEP&0
+
+See also: OLC ABILITIES, APPLIES
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
 
@@ -493,6 +871,28 @@ mastery abilities that result in the (superior) flag on crafts.
 Most abilities have no mastery ability.
 
 See also: OLC ABILITIES
+#d
+"ABILEDIT MAXSTACKS" "ABILEDIT MAX STACKS"
+
+Usage:  .maxstacks <number>
+
+This is the number of times a DoT can stack. Each time the DoT would be
+applied, it refreshes the duration. It also adds 1 to the stack count, if it's
+below the maximum number. Total damage is multiplied by the stack count.
+
+If maxstacks is higher, the 'scale' property should be lower. Conversely, if
+maxstacks is low, the scale could be higher.
+
+See also: OLC ABILITIES, DOT ABILITY, ABILEDIT SCALE
+#d
+"ABILEDIT MINPOSITION"
+
+Usage:  .minposition <position>
+
+This is the minimum position a character must be in to use the ability. For
+most abilities, this is "resting", "fighting", or "standing".
+
+See also: POSITIONS, OLC ABILITIES
 #d
 "ABILEDIT NAME"
 
@@ -510,6 +910,167 @@ each word typed by the user is matched sequentially. For example, "hor fo"
 matches "Horrid Form".
 
 See also: OLC ABILITIES
+#d
+"ABILEDIT PLAYER-TECH ABILITY" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
+
+Usage:  .data add ptech <type>
+
+The PLAYER-TECH ability type means that the ability gives a constant effect to
+the player. This effect is always on and has no cost. You can use more than one
+tech on the same ability. You can use these techs to build fun new abilities,
+or reconfigure existing abilities.
+
+Available techs are:
+ &cArmor-Heavy&0 * - Can wear heavy armor items (tank).
+ &cArmor-Light&0 * - Can wear light armor items (melee).
+ &cArmor-Mage&0 * - Can wear mage armor items (caster/healer).
+ &cArmor-Medium&0 * - Can wear medium armor items (solo/pvp).
+ &cBlock&0 * - Can use shields and block melee attacks with them.
+ &cBlock-Ranged&0 * - Can block ranged attacks with shields (requires Block).
+ &cBlock-Magical&0 * - Can block magical attacks with shields (requires Block).
+ &cBonus-vs-Animals&0 - Extra combat damage when the victim is an animal.
+ &cButcher-Upgrade&0 * - Butcher always succeeds.
+ &cCustomize-Building&0 * - Can customize buildings.
+ &cDeep-Mines&0 * - Mines are 50% larger.
+ &cDual-Wield&0 - Gets an offhand attack at a reduced accuracy.
+ &c*&0 - Unused tech.
+ &cFastcasting&0 - Wits reduces lag from non-combat abilities rather than
+    improving combat speed.
+ &cFast-Find&0 * - Dig, gather, and pick are faster.
+ &cFish&0 * - Can use the fish command/interaction.
+ &cForage&0 * - Can use the forage command/interaction.
+ &cHarvest-Upgrade&0 * - Increases the number of items received from harvest.
+ &cHealing-Boost&0 - Improves all healing abilities.
+ &cHide-Upgrade&0 * - Guarantees hide and protects from normal 'search'.
+ &cInfiltrate&0 * - Allows the player to enter claimed/restricted buildings.
+ &cInfiltrate-Upgrade&0 * - Raises the success of infiltrate.
+ &cLarger-Light-Radius&0 - Can see further in the dark.
+ &cLight-Fire&0 * - Can light torches/fires without any tools.
+ &cMap-Invis&0 * - Can't be seen at a distance on the map.
+ &cMill-Upgrade&0 * - Increases the number of items received from mill.
+ &cNavigation&0 * - Orients the map and directions correctly.
+ &c!Hunger&0 - Will not get hungry.
+ &c!Poison&0 * - Total immunity to poisons.
+ &c!Thirst&0 - Will not get thirsty.
+ &c!Track-City&0 * - Leaves no tracks in the city or indoors.
+ &c!Track-Wild&0 * - Leaves no tracks in the wild, outside of cities.
+ &cPickpocket&0 * - Can use the pickpocket command/interaction.
+ &cPoison&0 * - Can use poisons in combat.
+ &cPoison-Upgrade&0 * - Improves the effect of all poisons (requires Poison).
+ &cPortal&0 * - Can open normal portals at the correct buildings.
+ &cPortal-Upgrade&0 * - Can open longer-range portals (requires Portal).
+ &cRanged-Combat&0 * - Can use a ranged weapon.
+ &cRiding&0 * - Can ride/mount.
+ &cRiding-Flying&0 * - Can use flying mounts on all terrain (requires Riding).
+ &cRiding-Upgrade&0 * - Can travel on rough terrain and ocean (requires Riding).
+ &cRough-Terrain&0 * - Can travel between two rough tiles (like mountains).
+ &cSee-Chars-In-Dark&0 - Can see people in the room with no light.
+ &cSee-Objs-In-Dark&0 - Can see objects in the room with no light.
+ &cSee-Inventory&0 * - Can see other players' inventories.
+ &cShear-Upgrade&0 * - Increases the number of items received from shear.
+ &cSteal-Upgrade&0 * - Can steal from vaults too.
+ &cSwimming&0 * - Can move on water tiles with no boat.
+ &cTeleport-City&0 * - Teleport can target your cities (requires an ability).
+ &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
+ &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
+ &cDodge-Cap&0 - Improves the player's maximum dodge percent.
+ &cSkinning-Upgrade&0 - Skinning always succeeds.
+
+* Marked techs trigger ability gains on their own without gain hooks.
+
+See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT TYPES
+#d
+"ABILEDIT SCALE"
+
+Usage:  .scale <percent>
+
+This allows you to make an ability more or less powerful. Be warned: game
+balance relies on abilities being in balance with each other. If you increase
+the 'scale' on an ability, you should also increase its cost and/or cooldown.
+
+See also: ABILEDIT COOLDOWN, ABILEDIT COST, OLC ABILITIES
+#d
+"ABILEDIT SHORTDURATION" "ABILEDIT SHORT DURATION" "ABILEDIT LONGDURATION" "ABILEDIT LONG DURATION"
+
+Usage:  .shortduration <seconds | unlimited>
+        .longduration <seconds | unlimited>
+
+For buff/dot abilities, this is how long the effect lasts. Short duration
+applies when the actor has the skill at a low level. Long duration is for
+high-level users and class abilities.
+
+Be careful with unlimited duration buffs -- these should always be self-only
+toggles. DoTs cannot have unlimited duration.
+
+You can also choose to set both durations to the same amount of time.
+
+See also: OLC ABILITIES, BUFF ABILITIES, DOT ABILITIES
+#d
+"ABILEDIT TARGETS"
+
+Usage:  .targets [add | remove] <flag>
+
+This determines what targets an ability has. Many of these flags go together or
+modify each other. They are:
+ &cIGNORE&0 - Has no automatic targets.
+ &cCHAR-ROOM&0 - Targets a character in the room with the actor.
+ &cCHAR-WORLD&0 - Targets a character anywhere in the world.
+ &cCHAR-CLOSEST&0 - Targets the closest person with that name.
+ &yFIGHT-SELF&0 - Modifier: Targets self if no argument while fighting.
+ &yFIGHT-VICTIM&0 - Modifier: Targets victim if no argument while fighting.
+ &ySELF-ONLY&0 - Modifier: Can only target yourself.
+ &yNOT-SELF&0 - Modifier: Character target cannot be self.
+ &cOBJ-INV&0 - Targets an object in your inventory.
+ &cOBJ-ROOM&0 - Targets an object on the ground.
+ &cOBJ-WORLD&0 - Targets an object anywhere.
+ &cOBJ-EQUIP&0 - Targets an object you're wearing.
+ &cVEH-ROOM&0 - Targets a vehicle in the room.
+ &cVEH-WORLD&0 - Targets a vehicle anywhere.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT TYPES"
+
+Usage:  .types add <type> [weight]
+        .types change <type> <weight>
+        .types remove <type>
+
+Ability types determine how they behave, and open up additional editor options.
+The 'weight' of an ability type determines what percentage of scaling points it
+receives, similar to the applies on objects, morphs, etc.
+
+Weights can be 0, meaning they don't take any scaling points from other types.
+Any type with a weight of 0 should still get 1 point worth of effect.
+
+The following types are available (each has its own help file):
+ &cCRAFT&0 - Used for craft/building recipes.
+ &cBUFF&0 - Puts affects on characters.
+ &cDAMAGE&0 - Deals direct damage.
+ &cDOT&0 - Adds a damage-over-time effect.
+ &cPLAYER-TECH&0 - Various 'techs' that players get from abilities.
+
+See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
+   DOT ABILITY, PLAYER-TECH ABILITY
+#d
+"ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
+
+Usage:  .waittype <type>
+
+The wait type is how long the character has "command lag" after using this
+ability. These are standardized wait times, so you select them from a list
+based on what type of ability you're making.
+
+Choose the wait type that best fits your ability.
+
+See also: COMMAND LAG, OLC ABILITIES
+#d
+"ABILITY EFFECTS"
+
+Some abilities have 'effects' which happen when the ability is activated.
+Available effect types are:
+ &cdismount&0 - the player will be dismounted
+
+See also: ABILEDIT DATA
 #d
 "ADVEDIT AUTHOR"
 
@@ -576,6 +1137,10 @@ The following adventure flags are available:
  NEWBIE-ONLY - Only spawns on newbie islands.
  NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
  EMPTY-RESET-ONLY - Won't reset while players are inside.
+ CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
+    first time.
+ IGNORE-WORLD-SIZE - Won't adjust the number of instances based on the world.
+ IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -584,9 +1149,14 @@ See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 Usage:  .limit <number>
 
 This number controls how many copies of an adventure can exist in the world
-at a time.
+at a time. The number you set here is used on default EmpireMUDs with roughly
+a 300000-tile world. Your MUD automatically adjusts the instance limit if you
+have a larger or smaller world than that.
 
-See also: OLC ADVENTURES
+If you want a fixed number of instances with no adjusting, set the
+IGNORE-WORLD-SIZE flag on the adventure.
+
+See also: ADVEDIT FLAGS, OLC ADVENTURES
 #d
 "ADVEDIT BDG-EXISTING" "ADVEDIT LINK BDG-EXISTING" "ADVEDIT LINKING BDG-EXISTING"
 
@@ -636,6 +1206,20 @@ All distances are measured in map tiles. Setting a NOT-NEAR-SELF of 50 would
 mean no two copies of the adventure will link within 50 tiles of each other.
 
 See also: ADVEDIT LINKING
+#d
+"ADVEDIT PORTAL-CROP" "ADVEDIT LINK PORTAL-CROP" "ADVEDIT LINKING PORTAL-CROP"
+
+Usage:  .linking add PORTAL-CROP <crop vnum> <portal-in vnum> <portal-out vnum> [flags]
+
+This will spawn a portal somewhere in the world, matching the crop of your
+choice. You must provide portal object vnums for the in- and out-portals, but
+it is okay if both are the same.
+
+Remember that the portals don't have to be called portals. You could use "a
+strange door in the side of the tree", and the messages would look correct
+when players type "enter door" or "enter tree".
+
+See also: ADVEDIT LINKING, VNUM
 #d
 "ADVEDIT PORTAL-WORLD" "ADVEDIT LINK PORTAL-WORLD" "ADVEDIT LINKING PORTAL-WORLD"
 
@@ -719,19 +1303,23 @@ adventure. You can add as many linking rules as you like; it will spawn
 instances in any place that matches any rule.
 
 See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
- BDG-EXISTING: Link from an existing building or interior room.
- BDG-NEW: Builds the building on the map and links from it (no interior rooms).
- PORTAL-WORLD: Portal appears in a matching sector.
- PORTAL-BDG-EXISTING: Portal appears in an existing building or interior room.
- PORTAL-BDG-NEW: Builds the building on the map and puts a portal in it (no
+ &cBDG-EXISTING&0: Link from an existing building or interior room.
+ &cBDG-NEW&0: Builds the building on the map and links from it (no interior rooms).
+ &cPORTAL-WORLD&0: Portal appears in a matching sector.
+ &cPORTAL-BDG-EXISTING&0: Portal appears in an existing building or interior room.
+ &cPORTAL-BDG-NEW&0: Builds the building on the map and puts a portal in it (no
     interior rooms).
- TIME-LIMIT: Removes instances after a certain number of minutes expire.
- NOT-NEAR-SELF: Prevent the adventure from linking near other copies of itself.
+ &cPORTAL-CROP&0: Portal appears on a matching crop tile.
+ &cTIME-LIMIT&0: Removes instances after a certain number of minutes expire.
+ &cNOT-NEAR-SELF&0: Prevent the adventure from linking near other copies of itself.
 
 Available flags:
- CLAIMED-OK - Can link to claimed locations (default: unclaimed only).
- CITY-ONLY - Only links to claimed tiles in cities.
- !CITY - Will not link to claimed tiles in cities.
+ &cCLAIMED-OK&0 - Can link to claimed locations (default: unclaimed only).
+ &cCITY-ONLY&0 - Only links to claimed tiles in cities.
+ &c!CITY&0 - Will not link to claimed tiles in cities.
+ &cCLAIMED-ONLY&0 - Will only link to claimed tiles.
+ &cCONTINENT-ONLY&0 - Only spawns on islands with the CONTINENT flag.
+ &c!CONTINENT&0 - Will not spawn on continents.
 
 Portals require a portal object for both the entrance and exit (they may be
 the same object). Existing buildings may also be interior rooms, but new
@@ -753,6 +1341,8 @@ These are set in terms of players' composite level (the level number given by
 their skills and gear).
 
 Adventures whose minimum level is over 25 will not spawn on newbie islands.
+Islands will only spawn adventures that are within 50 levels of the players
+who live on/visit those islands (but continents spawn all levels).
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 
@@ -835,6 +1425,9 @@ The following affect flags are available:
  !STUN - Immune to stun effects.
  !DRINK-BLOOD - Can't be bitten/sired by vampires.
  DISTRACTED - Cannot perform timed actions.
+ HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
+ IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
+ !WHERE - Cannot be found using the 'where' command.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -845,8 +1438,8 @@ The .olc archetype editor is a powerful tool for creating and editing player
 archetypes (character creation options). It provides a simple in-game menu with
 contextual choices to design any archetype.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these by typing &yHELP ARCHEDIT <COMMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these by typing: &yHELP ARCHEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -998,8 +1591,8 @@ The .olc augment editor is a powerful tool for creating and editing augments
 (which are like item enchantments). It provides a simple in-game menu with
 contextual choices to design multiple types of augments.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -1307,7 +1900,8 @@ Available flags:
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
  IN-CITY-ONLY - can only be used if in an established city
- LARGE-CITY-RADIUS - counts as in-city much further away than normal
+ LARGE-CITY-RADIUS - counts as in-city even when built in the outskirts
+ !PAINT - cannot be painted
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
  SAIL - can enter this building with a boat
@@ -1367,6 +1961,8 @@ Available functions:
  WAREHOUSE - can use the warehouse command and store unique items
  DRINK-WATER - can get water here, like a well
  COOKING-FIRE - can cook, brew, and other tasks that require a fire
+ LARGER-NEARBY - extends the radius of 'nearby'
+ FISHING - workforce can fish here (also need fish interaction)
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -1442,6 +2038,22 @@ You should choose a name that's as short as possible. For example, if your
 room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
 
 See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
+#d
+"BEDIT RELATIONS" "BEDIT RELATIONSHIPS"
+
+Usage:  .relation add <type> <vnum>
+        .relation change <number> vnum <value>
+        .relation copy building <from vnum>
+        .relation remove <number | all>
+
+Relations link this building to other buildings in various ways:
+
+Available relationship types:
+ &cUPGRADES-TO&0 - This building can be upgraded to that type.
+ &cSTORES-LIKE&0 - Anything that can be stored there can be stored here.
+                      (this does not include warehouses; use function flags)
+
+See also: OLC BUILDINGS
 #d
 "BEDIT RESOURCES" "BEDIT YEARLY MAINTENANCE"
 
@@ -1542,25 +2154,9 @@ Examples:
 
 See also: OLC BUILDINGS
 #d
-"BEDIT UPGRADESTO" "BEDIT UPGRADES TO"
-
-Usage:  .upgradesto <building vnum>
-        .upgradesto none
-
-Some buildings can be upgraded into other buildings. You specify which building
-this one can upgrade to here. You must specify a valid building vnum.
-
-In order for the 'upgrade' command to actually work, you must also use the
-craft recipe editor to create a new building recipe for the upgraded building,
-and mark it as UPGRADE. This building will only need a regular craft recipe,
-and only if it's buildable.
-
-See also: OLC BUILDINGS, UPGRADE, VNUM
-#d
 "CEDIT BUILDFACING" "CEDIT BUILD FACING"
 
 Usage:  .buildfacing [add | remove] <flags>
-        .buildfacing generic
 
 This command sets the rules for the tile a building must face. If the building
 is an "open" building (one that doesn't take players off the map), it doesn't
@@ -1568,25 +2164,28 @@ require a buildfacing at all. However, if an "open" building has a buildfacing,
 the game engine will still require a facing direction when it is built. This
 allows you to require that quarries are built next to mountains, for example.
 
-You can also set ".buildfacing generic", which sets a pre-defined list of
-buildfacing flags that many buildings are allowed to face.
-
 The following flags are available:
- water - any ocean or river tile
- plains - a plains or a road that was built on plains
- mountain - a mountain or mountain path
- full forest - an overgrown forest (^^^^) or other full forest
- desert - a desert or a road that was built on desert
- river - a river tile
- jungle - any jungle tile
- not player made - can't be (e.g.) a river tile made by a player
- ocean - an ocean tile
- oasis - an oasis tile
- crops - any crop or seeded tile
- grove - a desert grove tile
- swamp - a swamp tile
- any forest - any level of forest tile, from light forest to overgrown
- open building - a building that doesn't block the map
+ &cwater&0 - any ocean or river tile
+ &cplains&0 - a plains or a road that was built on plains
+ &cmountain&0 - a mountain or mountain path
+ &cfull-forest&0 - an overgrown forest (^^^^) or other full forest
+ &cdesert&0 - a desert or a road that was built on desert
+ &criver&0 - a river tile
+ &cjungle&0 - any jungle tile
+ &cnot-player-made&0 - can't be (e.g.) a river tile made by a player
+ &cocean&0 - an ocean tile
+ &coasis&0 - an oasis tile
+ &ccrops&0 - any crop or seeded tile
+ &cgrove&0 - a desert grove tile
+ &cswamp&0 - a swamp/marsh tile
+ &cany-forest&0 - any level of forest tile, from light forest to overgrown
+ &copen-building&0 - a building that doesn't block the map
+ &cflat-terrain&0 - for buildings that can face most flat tiles
+ &cshallow-sea&0 - the area around islands
+ &ccoast&0 - the land on the ocean coastline
+ &criverbank&0 - the land on the edge of rivers
+ &cestuary&0 - where the river meets the sea
+ &clake&0 - a lake tile
 
 See also: OLC CRAFTS
 #d
@@ -1607,21 +2206,27 @@ This sets the types of terrain that a building craft may be built upon. You
 must set at least one flag.
 
 The following flags are available:
- water - any ocean or river tile
- plains - a plains or a road that was built on plains
- mountain - a mountain or mountain path
- full forest - an overgrown forest (^^^^) or other full forest
- desert - a desert or a road that was built on desert
- river - a river tile
- jungle - any jungle tile
- not player made - can't be (e.g.) a river tile made by a player
- ocean - an ocean tile
- oasis - an oasis tile
- crops - *** do not use for buildon
- grove - a desert grove tile
- swamp - a swamp tile
- any forest - *** do not use for buildon
- open building - *** do not use for buildon
+ &cwater&0 - any ocean or river tile
+ &cplains&0 - a plains or a road that was built on plains
+ &cmountain&0 - a mountain or mountain path
+ &cfull-forest&0 - an overgrown forest (^^^^) or other full forest
+ &cdesert&0 - a desert or a road that was built on desert
+ &criver&0 - a river tile
+ &cjungle&0 - any jungle tile
+ &cnot-player-made&0 - can't be (e.g.) a river tile made by a player
+ &cocean&0 - an ocean tile
+ &coasis&0 - an oasis tile
+ &rcrops&0 - *** do not use for buildon
+ &cgrove&0 - a desert grove tile
+ &cswamp&0 - a swamp/marsh tile
+ &rany-forest&0 - *** do not use for buildon
+ &ropen-building&0 - *** do not use for buildon
+ &rflat-terrain&0 - *** do not use for buildon (ONLY for facing)
+ &cshallow-sea&0 - the area around islands
+ &ccoast&0 - the land on the ocean coastline
+ &criverbank&0 - the land on the edge of rivers
+ &cestuary&0 - where the river meets the sea
+ &clake&0 - a lake tile
 
 See also: CEDIT BUILDFACING, OLC CRAFTS
 #d
@@ -1677,6 +2282,8 @@ Available flags:
  VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
  SHIPYARD - requires being at a shipyard
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
+ LEARNED - requires the player/empire 'learn' a recipe to use it
+ BY-RIVER - must be adjacent to a river
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -1831,8 +2438,9 @@ skills. Classes can have broadly overlapping requirements (but can't be
 identical to each other), allowing players with similar sets of skills to end
 up in different classes.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP CLASSEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP CLASSEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -2067,8 +2675,7 @@ because gaining/losing even 1 reputation point can bump a player out of the
 endcaps.
 
 Testing reputation against the mob's faction:
-eval test %%actor.has_reputation(%self.allegiance%,Liked)%%
-if %!test%
+if !%actor.has_reputation(%self.allegiance%,Liked)%
   %send% %actor% You must be Liked by %self.faction_name%!
   return 0
 end
@@ -2091,8 +2698,9 @@ are groups that NPCs can belong to. Players gain and lose reputation with
 factions, and these reputation levels can be used to control access to quests
 and adventure content.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP FEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP FEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -2204,6 +2812,215 @@ a faction but lose reputation over time.
 
 See also: OLC FACTIONS, OLC LEVELS, REPUTATIONS
 #d
+GENEDIT GENERICEDIT "OLC GENERICS "GENERIC OLC" "GENERIC EDIT"
+
+Usage:  .generic <comman>
+        .<command>
+
+The .olc generics editor allows you to add, edit, or delete generics from
+the system. It provides an in-game menu for controlling features like liquids
+and resource actions.
+
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP GENEDIT <COMMAND>&0
+
+Each type of generic provides a different function, and has its own help file.
+See: GENERIC LIQUID, GENERIC ACTION, GENERIC COOLDOWN, GENERIC AFFECT,
+  GENERIC CURRENCY
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .gen edit 123
+ > .name My Generic
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"GENERIC ACTIONS" "ACTION EDITOR" "ACTION GENERICS" "GENEDIT BUILD2CHAR" "GENEDIT BUILD2ROOM" "GENEDIT CRAFT2CHAR" "GENEDIT CRAFT2ROOM" "GENEDIT REPAIR2CHAR" "GENEDIT REAPIR2ROOM"
+
+Generic 'actions' are used in resource lists, and are free tasks that players
+perform while building or making a vehicle. Normal crafts don't support the
+action-type resources, nor do augments.
+
+Actions require 6 properties:
+  <&ybuild2char&0> Sent to the character when building a building
+    Example: You dig at the ground.
+  <&ybuild2room&0> Sent to the room when building a building
+    Example: $n digs at the ground.
+  <&ycraft2char&0> Sent to the character when crafting a vehicle
+    Example: You dig underneath $V.
+  <&ycraft2room&0> Sent to the room when crafting a vehicle
+    Example: $n digs underneath $V.
+  <&yrepair2char&0> Sent to the character when repairing a vehicle
+    Example: You dig underneath $V.
+  <&yrepair2room&0> Sent to the room when repairing a vehicle
+    Example: $n digs underneath $V.
+
+These messages support codes like $n for the actor and $V for a vehicle
+being crafted/repaired.
+
+Stock actions can be found in the 1000-1099 vnum block, but new actions should
+usually be added within an adventure zone's vnums.
+
+See also: OLC GENERICS, DOLLAR SIGN CODES
+#d
+"GENERIC AFFECTS" "AFFECTS EDITOR" "AFFECT EDITOR" "AFFECT GENERICS"
+
+Generic 'affects' are used by spells, abilities, and scripts to show names on
+the affect list, and to show messages when these effects wear off.
+
+Affects have 4 properties:
+  <&yapply2char&0> An optional message shown to the character when the affect
+    is applied.
+  <&yapply2room&0> An optional message shown to the room when the affect is
+    applied.
+  <&ywearoff&0> An optional message shown to the character when the affect ends.
+  <&ywearoff2room&0> An optional message shown to the rest of the room.
+
+You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
+adds a message for the character -- normal effects don't show anything to the
+room when they end.
+
+See also: AFFECTS, OLC GENERICS
+#d
+"GENEDIT APPLY2CHAR"
+
+Usage:  .apply2char <message | none>
+
+This message is sent to the character when he/she gains this affect. This
+message is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS
+#d
+"GENEDIT APPLY2ROOM"
+
+Usage:  .apply2room <message | none>
+
+This message is sent to the room when a person gains this affect. It will
+only be shown to players who can see that person. This message is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS
+#d
+"GENERIC COOLDOWN" "COOLDOWN EDITOR" "COOLDOWN GENERICS"
+
+Generic 'cooldowns' are used to track time limits on players' abilities, as
+well as in scripts.
+
+Cooldowns have 1 optional property:
+  <&ywearoff&0> An optional message shown when the cooldown ends.
+
+You can use <&ystandardwearoff&0> to add the normal wear-off message.
+
+You can also create quick cooldowns with: .gen quickcooldown <type> <vnum>
+
+See also: GENEDIT QUICKCOOLDOWN, OLC GENERICS
+#d
+"GENERIC CURRENCY" "CURRENCY GENERICS" "CURRENCY EDITOR" "GENEDIT SINGULAR" "GENEDIT PLURAL"
+
+The 'currency' generic type is used to create money for use in shops and in
+scripts. This is separate from player-minted coins. The most common type of
+currency included in stock content is adventure-specific tokens.
+
+You must set 2 properties on currency:
+  <&ysingular&0> the money's name (e.g. dragon token)
+  <&yplural&0> a name to show when there's more than one (e.g. dragon tokens)
+
+See also: OLC GENERICS
+#d
+"GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
+
+The 'liquid' generic type is used in drink containers and resource lists.
+
+You must set 5 properties on liquids:
+  <&yliquid&0> the name as it appears in descriptions (a bottle of 'water')
+  <&ycolor&0> the color of the liquid when the player looks in the bottle
+  <&yhunger&0> number of hours to satiate hunger per unit of liquid
+  <&ythirst&0> number of hours to satiate thirst per unit
+  <&ydrunk&0> number of hours to cause drunknness per unit
+
+Stock liquids can be found in the 0-99 vnum block, but new liquids should
+usually be added within an adventure zone's vnums.
+
+See also: OLC GENERICS
+#d
+"GENEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+This set of flags applies to the generic. There are currently no flags
+available.
+
+See also: OLC GENERICS
+#d
+"GENEDIT NAME"
+
+Usage:  .name <name>
+
+The name of a generic has various rules based on the generic type. On some
+types, like liquids, the name is never shown to players. However, other types
+such as actions do appear to the player.
+
+Action names should be lowercase unless they are proper nouns.
+
+See also: OLC GENERICS
+#d
+"GENEDIT QUICKCOOLDOWN"
+
+Usage:  .gen quickcooldown <type> <vnum>
+
+This creates a new generic cooldown based on the type/vnum you pick. For
+example, using it on an object named "a puppy whistle" results in a new
+cooldown named "puppy whistle" and with the standard wear-off message.
+
+See also: OLC GENERICS
+#d
+"GENEDIT STANDARDWEAROFF"
+
+Usage:  .standardwearoff
+
+This sets the 'wearoff' property to a standard message based on the name of
+the generic.
+
+See also: OLC GENERICS, GENERIC AFFECTS, GENERIC COOLDOWNS, GENEDIT WEAROFF
+#d
+"GENEDIT TYPE"
+
+Usage:  .type <type>
+
+Each generic type has its own requirements and features. See the help file
+for each type:
+ ACTION - Simple echoes performed during building (GENERIC ACTIONS)
+ LIQUID - Drinkables for use in items (GENERIC LIQUIDS)
+ COOLDOWN - For use in abilities and scripts (GENERIC COOLDOWNS)
+ AFFECT - Shown on the 'affects' list, and wear-off messages (GENERIC AFFECTS)
+ CURRENCY - Used in shops and scripts (GENERIC CURRENCY)
+
+See also: OLC GENERICS
+#d
+"GENEDIT WEAROFF"
+
+Usage:  .wearoff <message | none>
+
+The wearoff message is sent to the player when the cooldown/affect ends. This
+message is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS, GENERIC COOLDOWNS,
+GENEDIT STANDARDWEAROFF
+#d
+"GENEDIT WEAROFF2ROOM"
+
+Usage:  .wearoff2room <message | none>
+
+The wearoff message is sent to the rest of the room when a player's affect
+ends. It will only be shown to players who can see that person. This message
+is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS
+#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -2217,6 +3034,7 @@ Available flags:
  CHOOSE-LAST - The first choose-last global that passes the percent check will
     be saved for later, and only used if no other global succeeds. This can
     be used to create 100% "choose if nothing else passes" final cases.
+ RARE - Requires a special flag, e.g. Rare Metals for mine type.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d
@@ -2456,9 +3274,8 @@ Scaling based on item types:
  drink container - the "capacity" value
  coins - the "coinamount" value
  missile weapons - the "damage" value
- arrow - the "damage" value
+ ammo - the "damage" value
  pack - the "capacity" value
- potion - the "potionscale" value
 
 Applies and item values of 0 are ignored and do not get any points assigned.
 
@@ -2583,6 +3400,14 @@ building.
 
 See also: MAP OLC
 #d
+"MAPEDIT GROW"
+
+Usage:  .map grow
+
+Triggers immediate growth, similar to chant of nature.
+
+See also: MAP OLC
+#d
 "MAPEDIT ICON"
 
 Usage:  .map icon <icon>
@@ -2675,11 +3500,13 @@ This command will reduce a map building to ruins.
 #d
 "MAPEDIT TERRAIN"
 
-Usage:  .map terrain <type>
+Usage:  .map terrain <type/vnum>
 
 This command allows you to change the sector type (terrain) of a map tile.
 It can be used to clear space for building an immortal's home, or to remove
 a building on the map.
+
+This command accepts sector names, crop names, or sector vnums.
 
 Example:
  > .map terrain Tower of Souls
@@ -2712,14 +3539,18 @@ always active on the mob, as if a spell had been cast on them.
 
 See also: AFFECT FLAGS, OLC MOBILES
 #d
-"MEDIT ALLEGIANCE"
+"MEDIT ALLEGIANCE" "SHOPEDIT ALLEGIANCE"
 
 Usage:  .allegiance <none | vnum | name>
 
-This sets a mob to be a member of a faction. For some factions, this will cause
-reputation gain if a player kills the mob.
+This sets a mob or shop to be a member of a faction.
 
-See also: FACTION, OLC FACTIONS, OLC MOBILES
+For some factions, this will cause reputation gain if a player kills the mob.
+
+The faction allegiance of a shop only matters for items that have a reputation
+requirement to purchase.
+
+See also: FACTION, OLC FACTIONS, SHOPEDIT ITEM, OLC MOBILES, OLC SHOPS
 #d
 "MEDIT ATTACK" "ATTACK TYPES"
 
@@ -3000,9 +3831,10 @@ should get the updated script list right away.
 
 Note: Adventure scripts will only work if they are the Adventure Cleanup type.
 Note: Only room triggers can be added to quests.
+Note: Neither quest nor adventure scripts can use 'wait' statements.
 
 See also: OLC BUILDINGS, OLC MOBILES, OLC OBJECTS, OLC QUESTS, OLC TRIGGERS,
-   OLC VEHICLES, VNUM
+   OLC VEHICLES, VNUM, WAIT
 #d
 "MEDIT SEX"
 
@@ -3040,11 +3872,18 @@ shop.
 To create a pet whistle (or other summoner item), attach script 9900 (Mini-pet
 Use) to an object and set its <value0> to the mini-pet mob's vnum.
 
+You must also create a generic cooldown with the same vnum as the item, used
+to keep it from being resummoned.
+
 Mini-pet mobs should have the following traits:
  - Flags: SENTINEL SPAWNED !LOOT (and ISNPC)
  - Affects: !ATTACK
  - Scripts: 9901 (Dismissable), 9902 (Lonely Despawn)
+ - Value0: The vnum of the mob
+ - A cooldown generic with the same vnum as the mini-pet whistle
  - Adorable custom messages (optional)
+
+See also: GENERIC COOLDOWN
 #d
 MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
 
@@ -3054,8 +3893,9 @@ Usage:  .morph <command>
 The .olc morph editor allows you to configure the data for morphs, which are
 used by players (and NPCs) to change shape.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP MORPHEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP MORPHEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -3127,6 +3967,7 @@ The following morph flags are available:
  GENDER-NEUTRAL - Shows as "it" instead of he/she/him/her.
  CONSUME-OBJ - Will use up the requiresobj to morph.
  !FASTMORPH - This morph won't work with 'fastmorph'.
+ !MORPH-MESSAGE - Shows no message to the room when forced to un-morph.
 
 See also: OLC MORPHS
 #d
@@ -3240,6 +4081,90 @@ despawns.
 To create a mount whistle, attach script 10263 (Mount whistle use) to an
 object, and set the object's <value0> field to the vnum of the mount.
 #d
+"OBJECT VALUES" "OBJ VALUES" "OBJECT VALS" "OBJ VALS" OBJVALS "ITEM VALUES"
+
+The 'object values' are 3 multi-purpose numbers attached to each object. These
+values have a different meaning depending on the type of the object. Each of
+these values can be changed by scripts and by normal use (like poison charges
+going down). Not all item types use the values at all. Here are ones that do:
+
+Ammo:
+ 0 - remaining number of shots
+ 1 - damage bonus (scalable)
+ 2 - ammo type (must match type on the missile weapon)
+
+Armor:
+ 0 - armor type (0 mage, 1 light, 2 medium, 3 heavy)
+
+Book:
+ 0 - vnum for the book text (from the book editor)
+
+Coins:
+ 0 - amount (scalable)
+ 1 - empire vnum (or -1 for misc coins)
+
+Container:
+ 0 - max contents
+ 1 - container flags (1 = closable, 2 = closed, 3 = both)
+
+Corpse:
+ 0 - idnum/vnum of the corpse (players are negative; npc vnums are positive)
+ 1 - unused
+ 2 - corpse flags (1 = eaten, 2 = skinned, 4 = human)
+
+Currency:
+ 0 - amount
+ 1 - generic currency vnum
+
+Drink Container:
+ 0 - max capacity (scalable)
+ 1 - current amount
+ 2 - generic liquid vnum
+
+Food:
+ 0 - hours of fullness
+ 1 - crop vnum (if plantable)
+
+Missile Weapon:
+ 0 - attack type (see ATTACK TYPES)
+ 1 - bonus damage (if scalable, this is the weight to scale the damage)
+ 2 - ammo type (must match type on the ammo object)
+
+Other:
+ - does not use the values, but allows them to be used for scripting
+ - if the item is PLANTABLE, value 1 is the crop vnum
+
+Pack:
+ 0 - inventory bonus (scalable)
+
+Paint:
+ 0 - paint color (see PAINT ITEM)
+
+Poison:
+ 1 - poison charges remaining
+ 2 - generic affect vnum (optional, defaults to 3004 poisoned)
+
+Portal:
+ 0 - target room vnum (real vnum, not template)
+     Note: for adventure portals, this is the room template vnum instead UNTIL
+     the portal has been loaded into the world, when it becomes the real vnum
+
+Potions:
+ 0 - generic cooldown vnum (optional)
+ 1 - cooldown time in seconds (optional)
+ 2 - generic affect vnum (optional, defaults to 3102 potion)
+
+Recipe:
+ 0 - craft vnum to learn from this recipe
+
+Wealth:
+ 0 - treasure value
+ 1 - automint (if 0, workforce won't mint this)
+
+Weapon:
+ 1 - bonus damage (if scalable, this is the weight to scale the damage)
+ 2 - attack type (see ATTACK TYPES)
+#d
 "OEDIT AFFECTS"
 
 Usage:  .affects [add | remove] <flags>
@@ -3249,6 +4174,24 @@ are set on the character who equips this object, as if they had a spell cast
 on them.
 
 See also: AFFECT FLAGS, OLC OBJECTS
+#d
+"OEDIT AFFECTTYPE" "OEDIT AFFECT TYPE"
+
+Usage:  .affecttype <vnum>
+
+This lets you set a generic affect that will be used for the item's benefits.
+This is how you set a custom name to appear on a player's 'affects' list.
+
+Potions: If two potions have the same affect vnum (including -1/none), one
+potion will overwrite the other's effects when quaffed.
+
+Poisons: If two poisons have the same affect type AND came from the same
+poisoner, a new affect will overwrite an older one.
+
+NOTE: This affecttype only applies if the poison/potion has applies or aff
+flags. Any affects applied by a script will not inherit this type.
+
+See also: GENERIC AFFECT, OLC OBJECTS
 #d
 "OEDIT APPLY" "OEDIT APPLIES" APPLIES
 
@@ -3277,7 +4220,7 @@ Most applies are self-explanatory:
  MAX-MOVE - move pool
  RESIST-PHYSICAL - physical damage reduction
  BLOCK - block only matters if the player has a shield
- * - not used
+ HEAL-OVER-TIME - healing even during battle
  MAX-HEALTH - health pool
  MAX-MANA - mana pool
  TO-HIT - chance to hit (%)
@@ -3309,19 +4252,19 @@ heavy - Should include a -WITS or -STRENGTH penalty, and should include only
 
 See also: OLC OBJECTS, APPLIES
 #d
-"OEDIT ARROWTYPE" "OEDIT ARROW TYPE"
+"OEDIT AMMOTYPE" "OEDIT AMMO TYPE"
 
-Usage:  .arrowtype <letter>
+Usage:  .ammotype <letter>
 
-Arrow type is a property you set on missile weapons (e.g. bows) and arrow
-objects, to match the two up together. An arrow object any kind (whether it's
+Ammo type is a property you set on missile weapons (e.g. bows) and ammo
+objects, to match the two up together. An ammo object any kind (whether it's
 actually an arrow, or a bolt, or whatever) can only be used on a bow with the
-same arrow type.
+same ammo type.
 
-Arrow types are single letters, like 'A', 'B', and so on. You can find a list
-of existing items and their arrowtypes by typing "show arrowtypes".
+Ammo types are single letters, like 'A', 'B', and so on. You can find a list
+of existing items and their ammotypes by typing "show ammotypes".
 
-Common arrow types:
+Common ammo types:
  A - arrows
 
 See also: OLC OBJECTS, OEDIT TYPE, SHOW
@@ -3362,6 +4305,16 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT CONTENTS, OLC OBJECTS
 #d
+"OEDIT CDTIME"
+
+Usage:  .cdtime <seconds>
+
+This optional feature specifies how long the cooldown will be, in seconds. If
+you set this field and 'cooldown', quaffing the potion will trigger a cooldown
+that blocks you from using other potions that have the same cooldown.
+
+See also: COOLDOWN GENERIC, OEDIT COOLDOWN, OLC OBJECTS
+#d
 "OEDIT CHARGES"
 
 Usage:  .charges <number>
@@ -3375,11 +4328,12 @@ See also: OLC OBJECTS
 
 Usage:  .coinamount <number>
 
-This sets how many coins are in a COINS-type object. You can't set what empire
-the coins belong to; they will always be "other".
+Coins: This sets how many coins are in a COINS-type object. You can't set what
+empire the coins belong to; they will always be "other". For SCALABLE objects,
+thus number is a scalable value if it is set to a number other than 0.
 
-For SCALABLE objects, thus number is a scalable value if it is set to a number
-other than 0.
+Currency: This sets the amount of adventure currency the object gives. This is
+not scalable.
 
 See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
 #d
@@ -3424,6 +4378,7 @@ Available components (common flags listed in parentheses):
  &ctextile&0 - cloth or fabric for crafting
  &cvegetable&0 - for cooking
  &crope&0 - for construction and harnessing animals
+ &cpaint&0 - for painting buildings
 
 See also: COMPONENT FLAGS, SHOW COMPONENTS
 #d
@@ -3442,7 +4397,7 @@ magical and a recipe could require the non-magical version.
 
 Available flags:
  &canimal&0 - From an animal (like animal fibers)
- &cbunch&0 - A group of things
+ &cbunch of&0 - A group of things
  &cdesert&0 - Comes from the desert (especially foods)
  &cfine&0 - High-quality
  &chard&0 - As opposed to soft
@@ -3488,6 +4443,16 @@ want it to start out full, set it to the same amount as the capacity.
 
 See also: OEDIT CAPACITY, OLC OBJECTS
 #d
+"OEDIT COOLDOWN"
+
+Usage:  .cooldown <vnum>
+
+This optional feature specifies a cooldown generic for a potion. If you set
+this field and 'cdtime', quaffing the potion will trigger a cooldown that
+blocks you from using other potions that have the same cooldown.
+
+See also: COOLDOWN GENERIC, OEDIT CDTIME, OLC OBJECTS
+#d
 "OEDIT CORPSEOF" "OEDIT CORPSE OF"
 
 Usage:  .corpseof <mob vnum>
@@ -3499,6 +4464,14 @@ of your mobs.
 All corpse items must be the corpse of something (for skin/butcher data).
 
 See also: VNUM
+#d
+"OEDIT CURRENCY"
+
+Usage:  .currency <vnum>
+
+This sets the vnum of the adventure currency (a generic).
+
+See also: GENERIC CURRENCY
 #d
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
@@ -3537,7 +4510,7 @@ See also: OLC OBJECTS, DOLLAR SIGN CODES
 Usage:  .damage <amount>
 
 This lets you set the damage on various types of weapons. Usually this amount
-of damage is added to another number, like bow damage + arrow damage, or
+of damage is added to another number, like bow damage + ammo damage, or
 strength + weapon damage.
 
 When you set the damage, it will also give you the weapon's current DPS. This
@@ -3612,6 +4585,7 @@ Available flags:
  HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
  GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
+ !STORE - cannot be stored (this is usually toggled on by scripts)
 
 See also: BINDING, OLC OBJECTS
 #d
@@ -3648,7 +4622,7 @@ Fields:
   &c-cflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
   &c-component&0 - see HELP OEDIT COMPONENT
   &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
-  &c-flagged&0, &cnotflagged&0 - see HELP OEDIT FLAGS
+  &c-flagged&0, &cunflagged&0 - see HELP OEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
   &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
@@ -3800,19 +4774,6 @@ to any level under the maximum.
 
 See also: ITEM SCALING, OEDIT MAXLEVEL, OLC OBJECTS
 #d
-"OEDIT MISSILESPEED" "OEDIT MISSILE SPEED"
-
-Usage:  .missilespeed <number>
-
-This trait determines how fast a missile weapon (e.g. a bow) attacks in combat.
-You cannot choose your own speed; you must pick from a list. You should always
-specify the number in the list as your argument to this command.
-
-The 'speed' trait is the number of seconds between attacks in combat, so a
-lower number means a faster weapon. In that way, the name is backwards.
-
-See also: OLC OBJECTS
-#d
 "OEDIT REQUIRESQUEST" "OEDIT REQUIRES QUEST" "OEDIT REQUIRE QUEST" "OEDIT QUEST"
 
 Usage:  .requiresquest <vnum | none>
@@ -3853,49 +4814,52 @@ anything else).
 
 See also: PLANT, OEDIT TYPE, OLC OBJECTS, VNUM
 #d
-"OEDIT POISON"
+"OEDIT PAINTS" "OEDIT PAINT COLORS"
 
-Usage:  .poison <type>
+Usage:  .paint <color>
 
-This sets which type of poison the item contains. Poisons are used by the
-Stealth skill tree, and the poison item is lost when it runs out of charges.
+This sets what color a 'paint' item uses. Type '.paint' by itself to see the
+list of available colors.
 
-Never set a poison type marked with an * (asterisk).
-
-See also: POISON, OEDIT CHARGES, OLC OBJECTS
-#d
-"OEDIT POTION"
-
-Usage:  .potion <type>
-
-This sets which type of potion the item contains. Potion items are used up
-(removed) when quaffed. Each potion type has a pre-determined effect.
-
-Never set a potion type with an * (asterisk).
-
-See also: POTION, OLC OBJECTS
-#d
-"OEDIT POTIONSCALE"
-
-Usage:  .potionscale <number>
-
-This sets the "scale level" of a potion's effects, usually corresponding to a
-player level.
-
-For SCALABLE objects, thus number is a scalable value if it is set to a number
-other than 0.
-
-Never set a potion type with an * (asterisk).
-
-See also: ITEM SCALING, POTION, OLC OBJECTS
+See also: PAINT ITEM, OLC OBJECTS
 #d
 "OEDIT QUANTITY"
 
 Usage:  .quantity <number>
 
-This sets how many arrows are available from a given ARROW object.
+This sets how many arrows (or other ammo) are available from a given AMMO
+object.
 
 See also: OLC OBJECTS
+#d
+"OEDIT QUICKRECIPE" "OEDIT QUICK RECIPE" QUICKRECIPE "QUICK RECIPE"
+
+Usage:  .o quickrecipe <new obj vnum> <craft vnum> [pattern | design | etc]
+
+This command generates a quick 'recipe' item for a given craft. The craft
+must be set LEARNABLE. You can optionally give it a word like "pattern",
+"schematic", etc if you don't want the default name "recipe".
+
+It sets the following properties:
+keywords: recipe <craft name>
+shortdescription: the <craft name> recipe
+longdescription: The <craft name> recipe is on the ground.
+lookdescription: This recipe will teach you to <command>: <craft name>.
+type: RECIPE
+recipe vnum: <craft vnum>
+
+See also: OLC OBJECTS, LEARN, RECIPE ITEM
+#d
+"OEDIT RECIPE"
+
+Usage:  .recipe <craft vnum>
+
+This sets the craft recipe that a RECIPE item teaches. You must specify the
+vnum of a craft that has the LEARNED flag.
+
+You can make recipes even faster with the quickrecipe command.
+
+See also: OLC OBJECTS, OLC CRAFTS, CEDIT FLAGS, OEDIT QUICKRECIPE
 #d
 "OEDIT ROOMVNUM"
 
@@ -3985,19 +4949,21 @@ Available types:
  CONTAINER - a chest, holds items on the ground (never set wear TAKE)
  DRINKCON - a drink container, like a flask
  FOOD - edible
- * - unused
+ RECIPE - can be 'learned' to give a craft
  PORTAL - transports a player to another place (never set .wear TAKE)
  *BOARD - a message board
  CORPSE - a corpse
  COINS - a pile of coins
+ CURRENCY - a pile of adventure currency
+ PAINT - used for painting buildings
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored
  *CART - use vehicles instead
  *SHIP - use vehicles instead
  * - unused
  * - unused
- MISSILE_WEAPON - a bow, or similar (requires .wear RANGED)
- ARROW - ammunition for missile weapons
+ MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
+ AMMO - ammunition for missile weapons
  INSTRUMENT - a musical instrument -- must set custom messages
  SHIELD - for blocking attacks (requires .wear HOLD)
  PACK - expands the player's inventory (requires .wear PACK)
@@ -4044,7 +5010,8 @@ See also: OEDIT STORAGE, OLC OBJECTS
 Usage:  .weapontype <type>
 
 The weapon type determines which combat messages are sent, how fast the weapon
-attacks in combat, and whether or not it is sharp.
+attacks in combat, and whether or not it is sharp. Both regular weapons and
+missile weapons share the same set of types.
 
 The following weapon types are available:
  1. RESERVED - do not use
@@ -4076,6 +5043,10 @@ The following weapon types are available:
 27. peck - animals
 28. gore - animals
 29. mana blast - normal magical attack (e.g. disarmed mage)
+30. bow (shoot) - a normal bow
+31. crossbow (shoot) - a crossbow
+32. pistol (shoot) - a small firearm
+33. musket (shoot) - a large firearm
 
 See also: OLC OBJECTS
 #d
@@ -4145,8 +5116,9 @@ The .olc adventure zone editor allows you to configure the data for adventure
 zones. Each adventure zone contains a set of room templates. The .adv editor
 controls meta-data about the adventure zone, such as its name and level range.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP ADVEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP ADVEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4167,8 +5139,9 @@ Usage:  .b <command>
 The .olc building editor allows you to configure the data for buildings of all
 kinds. It provides a simple in-game menu with options for the building.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP BEDIT <COMMAND>.&0
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP BEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4213,13 +5186,16 @@ Available flags:
  - !GLOBAL -- Cannot edit globals
  - !AUGMENT -- Cannot edit augments
  - !ARCHETYPE -- Cannot edit archetypes
- - ABILITIES -- CAN edit abilities
- - CLASSES -- CAN edit classes
- - SKILLS -- CAN edit skills
+ - !ABILITIES -- Cannot edit abilities
+ - !CLASSES -- Cannot edit classes
+ - !SKILLS -- Cannot edit skills
  - !VEHICLES -- Cannot edit vehicles
  - !MORPHS -- Cannot edit morphs
  - !QUESTS -- Cannot edit quests
  - !SOCIALS -- Cannot edit socials
+ - !FACITONS -- Cannot edit factions
+ - !GENERICS - Cannot edit generics
+ - !SHOPS - Cannot edit shops
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -4232,8 +5208,9 @@ The .olc craft editor allows you to create and edit craft recipes for any of
 the main crafting systems in the game. It provides a simple in-game menu with
 contextual choices to set up the recipe.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP CEDIT <COMMMAND>.&0
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP CEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4259,9 +5236,9 @@ You should set the FORAGE and HARVEST interactions on a crop, usually with a
 1x quantity and 100% chance. Orchard-type crops should also usually have a
 GATHER interaction.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP CROPEDIT
-<COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP CROPEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4286,9 +5263,9 @@ loot tables.
 Any global data that doesn't have an IN-DEVELOPMENT flag will be used by the
 live game system.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP GEDIT
-<COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP GEDIT <COMMAND>&0
 
 Each type of global provides a different function, and has its own help file.
 See: GLOBAL MINE DATA, GLOBAL MOB INTERACTIONS
@@ -4378,8 +5355,9 @@ The .olc mob editor is a tool for creating and editing mobiles. It provides a
 simple in-game menu with contextual choices to allow you to easily create new
 NPCs for your game.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP MEDIT <COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP MEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4401,8 +5379,9 @@ The .olc object editor is a powerful tool for creating and editing items. It
 provides a simple in-game menu with contextual choices to design any type of
 object.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP OEDIT <COMMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP OEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4424,8 +5403,9 @@ Usage:  .q <command>
 The .olc quest editor lets you build quests, both simple and complex. It
 provides an in-game menu for controlling every detail of the quest.
 
-All of the .olc commands are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these by typing &yHELP QEDIT <COMMAND>&0.
+All of the .olc commands are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these by typing:
+  &yHELP QEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4448,7 +5428,11 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - augments
 - classes
 - crafts
+- factions
 - globals
+- morphs
+- quests
+- shops
 - skills
 - socials
 
@@ -4468,10 +5452,11 @@ other pools), coins, and liquids.
 Specific syntaxes for adding:
   .resource add object <quantity> <vnum>
   .resource add component <quantity> <component type> [component flags]
-  .resource add liquid <number of units> <liquid name>
+  .resource add liquid <number of units> <liquid vnum>
   .resource add coins <amount>
   .resource add pool <number of points> <pool type>
   .resource add action <amount> <type>
+  .resource add currency <amount> <currency vnum>
 
 Valid pools are: health, mana, move, blood.
 
@@ -4490,8 +5475,9 @@ its start and end numbers.
 This is NOT the editor for designatable rooms -- use .build for that (see
 HELP OLC BUILDINGS).
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP REDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP REDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4540,9 +5526,9 @@ every detail of a sector, including how it evolves over time.
 Sectors are also called terrain types, and essentially form the basis of the
 world map.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these commands by typing &yHELP SECTEDIT
-<COMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP SECTEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4568,8 +5554,9 @@ triggers on (e.g. greeting), and then its command list.
 When editing the trigger's command text, you can use * to put a comment on a
 line, to help people reading the trigger understand what it's meant to do.
 
-All of the .olc commands are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these by typing &yHELP TRIGEDIT <COMMAND>&0.
+All of the .olc commands are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these by typing:
+  &yHELP TRIGEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4587,8 +5574,9 @@ The .olc vehicle editor gives you the freedom to create a wide range of
 vehicles. It provides an in-game menu for controlling every detail of the
 vehicle (except how to make one; that's the craft editor).
 
-All of the .olc commands are highlighted in yellow and placed inside <angle
-braces>. You can get help on any of these by typing &yHELP VEDIT <COMMAND>&0.
+All of the .olc commands are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these by typing:
+  &yHELP VEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -4601,6 +5589,159 @@ Example vehicle settings:
  catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
+
+Usage:  .prog <command>
+        .command
+
+The .olc progression editor allows you to configure goals, which empires can
+complete in exchange for rewards. Some goals are unlocked by completing tasks,
+and others can be purchased for a cost.
+
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP SHOPEDIT <COMMAND>&0
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .prog edit 123
+> .name Test Goal
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"PROGEDIT COST"
+
+Usage:  .cost <points>
+
+This determines how many progress points it costs to buy this progression. You
+only set the cost on goals marked PURCHASABLE. A purchasable goal should not
+have any tasks (but can still have prerequisites).
+
+See also: OLC PROGRESS, PROGEDIT VALUE, PROGEDIT FLAGS
+#d
+"PROGEDIT DESCRIPTION"
+
+Usage:  .description
+
+This command will open the string editor. The progress goal's description
+should be short and concise. It should give the player a basic idea of how to
+achieve the goal. It does not need to mention the reward.
+
+See also: OLC PROGRESS, STRING EDITOR
+#d
+"PROGEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following progress goal flags are available:
+ IN-DEVELOPMENT - Empires cannot start or complete this goal.
+ PURCHASABLE - This goal is purchased, not unlocked by tasks.
+ SCRIPT-ONLY - For scripts; cannot be purchased and won't be earned unless a
+               script starts it first.
+ HIDDEN - Will not show up in lists until completed.
+
+See also: OLC PROGRESS
+#d
+"PROGEDIT NAME"
+
+Usage:  .name <name>
+
+A progress goal needs a unique name, but it should also be simple enough for
+a player to type.
+
+Tips:
+- Avoid starting with "A" or "The" if possible.
+- Write the name like a book title: Every Word Capitalized
+- No ending punctuation
+- Do not start the name with "Buy", "Completed", or one of the type names as
+  players may not be able to get info on those goals due to conflicts in the
+  'progress' command.
+
+See also: OLC PROGRESS, PROGEDIT TYPES
+#d
+"PROGEDIT PERKS"
+
+Usage: perks add <type> <name/value>
+       perks copy <from vnum>
+       perks remove <number | all>
+
+Perks are the rewards for unlocking a goal. Perks are permanent, and are never
+lost even if the empire no longer qualifies for the goal that gave them.
+
+Perk types:
+ Technology - Grants an empire technology.
+ City-points - Grants one or more city points.
+ Craft - Grants a LEARNED craft recipe to the entire empire.
+ Max-city-size - Increases how large the empire can upgrade its cities.
+ Wealth-territory-per-100 - Increases territory-per-100-wealth.
+ Greatness-territory - Increases territory per greatness point.
+ Workforce-cap - Raises the maximum workforce cap.
+ Territory - Directly adds to the total territory for an empire.
+
+Note: To grant progress points for a goal, set the 'value' field instead.
+
+See also: OLC PROGRESS, PROGEDIT VALUE
+#d
+"PROGEDIT PREREQS" "PROGEDIT PREREQUISITES"
+
+Usage:  .prereqs add <vnum>
+        .prereqs copy <from vnum>
+        .prereqs remove <number | all>
+
+This setting allows you to make some progression goals dependent upon others,
+forming a "tree" of unlockable goals. You can require as many preqreqs as you
+like, but if you require none, the goal will be open to all empires.
+
+See also: OLC PROGRESS
+#d
+"PROGEDIT TASKS" "PROGEDIT REQUIREMENTS"
+
+Usage:  .tasks add <type> <vnum> [group]
+        .tasks change <number> <amount | group | vnum> <value>
+        .tasks copy <from type> <from vnum> [tasks/prereqs (quests only)]
+        .tasks remove <number | all>
+
+These are the tasks that must be completed in order to unlock the progression
+goal's rewards. This uses the same system of requirements as quests and
+socials, but some of the tasks do not apply to progression gaols.
+
+See HELP REQUIREMENTS for more information about requirements. Just like with
+other requirements, if you don't group tasks, a goal can be completed by
+finishing any of them. Group names are always a single case-sensitive letter.
+
+Task types that do not apply to empire progression:
+ &rCOMPLETED-QUEST, NOT-COMPLETED-QUEST, NOT-ON-QUEST, SKILL-LEVEL-OVER,
+ SKILL-LEVEL-UNDER, TRIGGERED, VISIT-BUILDING, VISIT-ROOM-TEMPLATE,
+ VISIT-SECTOR, HAVE-ABILITY, REP-OVER, REP-UNDER, WEARING, WEARING-OR-HAS,
+ GET-CURRENCY, CAN-GAIN-SKILL&0
+
+See also: OLC PROGRESS, REQUIREMENTS
+#d
+"PROGEDIT TYPE"
+
+Usage:  .type <type>
+
+This sets the type (or tree) that this particular goal belongs to. The current
+types are:
+
+???
+
+See also: OLC PROGRESS
+#d
+"PROGEDIT VALUE"
+
+Usage:  .value <points>
+
+This sets how many progress points the goal is worth when it is finished.
+Only set this on progression goals that have tasks, not ones that are flagged
+PURCAHSABLE.
+
+See also: OLC PROGRESS, PROGEDIT COST, PROGEDIT FLAGS
 #d
 "QEDIT COMPLETEMESSAGE" "QEDIT COMPLETE MESSAGE"
 
@@ -4715,6 +5856,7 @@ Available reward types:
  QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
  REPUTATION - Gain/lose faction reputation.
+ CURRENCY - Gives generic currency (e.g. tokens).
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -4851,7 +5993,7 @@ REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIR
 
 Usage:  .<field> add <type> <vnum> [group]
         .<field> change <number> <amount | group | vnum> <value>
-        .<field> copy <from type> <from vnum> [tasks/prereqs]
+        .<field> copy <from type> <from vnum> [tasks/prereqs (quests only)]
         .<field> remove <number | all>
 
 Requirement lists are used to determine if a character is eligible for some-
@@ -4872,11 +6014,13 @@ Available tasks:
          .requirement add get-component 3 skin "" a
  &cGET-OBJECT&0 - Must have items.
  &cKILL-MOB &r*&0&0 - Must kill a certain mob.
- &cKILL-MOB-FLAGGED &r*&0&0 - Must kill mobs with certain flags.
+ &cKILL-MOB-FLAGGED &r*&0^ - Must kill mobs with certain flags.
  &cNOT-COMPLETED-QUEST&0 - Has not completed a certain quest.
  &cNOT-ON-QUEST&0 - Is not currently on a certain quest.
  &cOWN-BUILDING&0 - Empire has a certain building.
+ &cOWN-BUILDING-FUNCTION&0^ - Empire has a building with a given function flag.
  &cOWN-VEHICLE&0 - Empire has a certain vehicle.
+ &cOWN-VEHICLE-FLAGGED&0^ - Empire has a vehicle with specific flags.
  &cSKILL-LEVEL-OVER&0 - Player has a certain skill at least this high.
  &cSKILL-LEVEL-UNDER&0 - Player has a certain skill no higher than this.
  &cTRIGGERED &r*&0&0 - Activated by a %quest% command in a trigger.
@@ -4889,8 +6033,22 @@ Available tasks:
  &cWEARING&0 - Player has the item equipped
  &cWEARING-OR-HAS&0 - Player has the item either equipped or in inventory
     Note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on
+ &cGET-CURRENCY&0 - Player must have an amount of adventure currency.
+ &cGET-COINS&0 - Player must get some miscellaneous coins.
+ &cCAN-GAIN-SKILL&0 - Player is able to gain a point in a skill.
+ &cCROP-VARIETY&0 - Needs produce from a number of different crops.
+ &cOWN-HOMES&0 - Empire must have enough citizen homes.
+ &cOWN-SECTOR&0 - Empire must own enough tiles of this sector type.
+ &cEMPIRE-WEALTH&0 - Empire must have a certain amount of wealth.
+ &cEMPIRE-FAME&0 - Empire must have a certain amount of fame.
+ &cEMPIRE-GREATNESS&0 - Empire must have a certain amount of greatness.
+ &cDIPLOMACY&0 - Empire must have a number of matching diplomatic relations.
+ &cHAVE-CITY&0 - Empire must have a number of cities (of any size).
+ &cEMPIRE-MILITARY&0 - Empire must have a certain amount of military.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
+^ If a type requires flags and you use more than one flag, you MUST put the
+  flags in "quotation marks".
 
 See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%
 #d
@@ -4904,21 +6062,27 @@ to build. A building may be built on this sector if at least one flag from its
 'buildon' appears in the sector's 'buildflags'.
 
 Available flags:
- water - any type of water tile
- plains - a flat, temperate sector like plains
- mountain - a rough tile like a mountain
- full forest - a temperate forest of various types
- desert - a flat, arid sector
- river - a fresh-water sector
- jungle - any jungle tile
- not player made - DO NOT SET on .buildflags
- ocean - a salt-water tile
- oasis - an arid water source
- crops - any crop tile, should ONLY be used for 'buildfacing'
- grove - an arid forest tile like a desert grove
- swamp - a swamp-type tile
- any forest - a broader category of forests usually used for 'buildfacing'
- open building - does not apply to buildflags -- do not use
+ &cwater&0 - any type of water tile
+ &cplains&0 - a flat, temperate sector like plains
+ &cmountain&0 - a rough tile like a mountain
+ &cfull-forest&0 - a temperate forest of various types
+ &cdesert&0 - a flat, arid sector
+ &criver&0 - a fresh-water sector
+ &cjungle&0 - any jungle tile
+ &cnot-player-made&0 - DO NOT SET on .buildflags
+ &cocean&0 - a salt-water tile
+ &coasis&0 - an arid water source
+ &ccrops&0 - any crop tile, should ONLY be used for 'buildfacing'
+ &cgrove&0 - an arid forest tile like a desert grove
+ &cswamp&0 - a swamp-/marsh-type tile
+ &cany-forest&0 - a broader category of forests usually used for 'buildfacing'
+ &copen-building&0 - does not apply to buildflags -- do not use
+ &cflat-terrain&0 - for buildings that can face any flat terrain
+ &cshallow-sea&0 - the area around islands
+ &ccoast&0 - the land on the ocean coastline
+ &criverbank&0 - the land on the edge of rivers
+ &cestuary&0 - where the river meets the sea
+ &clake&0 - a lake tile
 
 Note: When adding these flags to adventure linking rules, they all have to
 be added in one line, so you can't type multiple words. Try abbreviating them
@@ -4955,6 +6119,8 @@ Usage:  .evolution add <type> [value] <percent> <becomes sector vnum>
 This command lets you add or remove an evolution from a sector. Evolutions are
 rules that describe how the sector changes over time. Some evolutions change
 the world periodically on their own; others are triggered by player action.
+
+Evolutions happen once per in-game day.
 
 No matter how small you set the percentages on evolutions, if they run on their
 own, they'll eventually succeed. Percentages may be set from 0.01 to 100.00.
@@ -5011,7 +6177,7 @@ Available sector flags:
  SHOW-ON-POLITICAL-MAPOUT - Still appears on the political version of the graphical map
  MAP-BUILDING - This sector represents a building on the map; shown using building data
  INSIDE-ROOM - This sector represents an interior (designated) ROOM building
- LARGE-CITY-RADIUS - This tile counts as in-city much further away than normal
+ LARGE-CITY-RADIUS - This tile counts as in-city even in the outskirts
  OBSCURE-VISION - Players can't be seen here; also blocks guard towers
  IS-TRENCH - Sector counts as a trench and fills with water
  * - unused
@@ -5104,6 +6270,110 @@ sector.
 
 See also: OLC SECTORS
 #d
+SHOPEDIT "OLC SHOPS" "SHOP OLC"
+
+Usage:  .shop <command>
+        .command
+
+The .olc shop editor allows you to configure shops, which can be attached to
+mobs, objects, room templates, and buildings. Shops can sell items for coins
+or for various adventure currencies (generics). However, shops are not
+currently able to buy items.
+
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP SHOPEDIT <COMMAND>&0
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .shop edit 123
+> .name Test Shop
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"SHOPEDIT CLOSES" "SHOPEDIT OPENS"
+
+Usage:  .opens <hour>
+        .closes <hour>
+
+These commands allow you to set when the shop opens or closes. You can use
+either 12- or 24-hour time ('4pm' or '16'). If a shop has the same time for
+both opening and closing, it will be open all the time.
+
+If the opening time is later than the closing time, the shop will be open
+overnight: e.g. if it opens at 6pm and closes at 4am.
+
+See also: OLC SHOPS
+#d
+"SHOPEDIT FLAGS" "SHOP FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Shop flags set various properties on shops.
+
+Available flags:
+ IN-DEVELOPMENT - Players can't use the shop.
+
+See also: OLC SHOPS, OLC REMOVEINDEV
+#d
+"SHOPEDIT ITEMS"
+Usage: .item add <vnum> <cost> <currency vnum | coins> [min reputation]
+       .item change <number> vnum <value>
+       .item move <number> <up | down>
+       .item copy <from type> <from vnum>
+       .item remove <number | all>
+
+The shop's item list determines what it sells. Shops have an infinite number
+of each item, and do not run out. Shopkeepers do not receive the coins or
+currency that are paid to them; this is always lost.
+
+The parameters for add/copy are:
+- vnum: The object vnum to sell.
+- cost: The number of coins/currency.
+- currency: Either the word 'coins' or the vnum of a generic currency. Coins
+  will always be miscellaneous coins unless the shop's mob/room belong to an
+  empire, in which case it will be empire coins.
+- min reputation: If the shop has allegiance to a faction, this is the lowest
+  reputation that can buy the item (optional).
+
+See also: SHOPEDIT ALLEGIANCE, OLC SHOPS, GENERIC CURRENCY, VNUM
+#d
+"SHOPEDIT LOCATIONS"
+
+Usage:  .location add <type> <vnum>
+        .location change <number> vnum <value>
+        .location copy <from type> <from vnum>
+        .location remove <number | all>
+
+Locations are places where the shop appears. The same shop can have multiple
+shopkeepers.
+
+Available location types:
+ BUILDING - Any copy of this building (or designated room) has the shop.
+ MOBILE - A mob has the shop, wherever that mob is.
+ OBJECT - An object has the shop. Be careful; this will work even if the object
+   is in the player's inventory.
+ ROOM-TEMPLATE - The shop is in a room template in an adventure.
+
+Shop locations use the same system as the start/end locations of a quest, and
+you can copy from those fields (and vice versa) with this syntax:
+> .location copy quest <vnum> starts
+
+See also: OLC QUESTS, OLC SHOPS
+#d
+"SHOPEDIT NAME"
+
+Usage:  .name <name>
+
+A shop's name is only used for internal purposes, such as 'vnum' or '.list'.
+Players do not see the name. You should use something descriptive.
+
+See also: OLC SHOPS
+#d
 SKILLEDIT "OLC SKILLS" "SKILL OLC"
 
 Usage:  .skill <command>
@@ -5114,8 +6384,9 @@ this is to choose which abilities that skill unlocks, and at what level. This
 does not control what class a player becomes (see HELP CLASSEDIT), only which
 powers they have access to and in which order.
 
-All commands in the editor arg highlighted in yellow and placed inside <angle
-braces>. You can get help on these commands by typing &yHELP SKILLEDIT <COMMAND>&0.
+All commands in the editor arg highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP SKILLEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5157,6 +6428,7 @@ Skill flags set various properties on skills.
 
 Available flags:
  IN-DEVELOPMENT - Players can't see or gain the skill.
+ BASIC - Always shows in the list for players, even at 0.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d
@@ -5192,11 +6464,46 @@ very unique. Players will want to abbreviate them easily.
 
 See also: OLC SKILLS
 #d
+"SKILLEDIT SHOWSYNERGIES" "SKILLEDIT SHOW SYNERGIES" "SKILLEDIT SHOWSYNERGY" "SKILLEDIT SHOW SYNERGY"
+
+Usage:  .showsynergies
+
+This command will hide/show the list of synergy abilities in the skill editor.
+This toggle resets each time you log in.
+
+See also: SKILLEDIT SYNERGY, OLC SKILLS
+#d
+"SKILLEDIT SHOWTREE" "SKILLEDIT SHOW TREE"
+
+Usage:  .showtree
+
+This command will hide/show the ability tree in the skill editor. This toggle
+resets each time you log in.
+
+See also: SKILLEDIT TREE, OLC SKILLS
+#d
+"SKILLEDIT SYNERGY" "SKILLEDIT SYNERGIES"
+
+Usage:  .synergy <role | all> add <paired skill> <skill level> <ability>
+        .synergy <role | all> change <ability> <skill | level> <value>
+        .synergy <roll | all> remove <ability | all>
+        .showsynergies  (shows/hides the list of synergies)
+
+Synergy abilities are ones you get when this skill is at max level, and another
+skill is at the given skill level. The "paired skill" parameter is the name
+(or vnum) of the other required skill.
+
+You cannot use normal skill tree abilities as synergy abilities. However, an
+ability may appear in any number of synergy lists.
+
+See also: SKILLEDIT SHOWSYNERGIES, OLC SKILLS
+#d
 "SKILLEDIT TREE"
 
 Usage:  .tree add <ability> <level> [requires ability]
         .tree remove <ability | all>
         .tree change <ability> <level | requires> <new value>
+        .showtree  (shows/hides the tree)
 
 This command allows you to set up the skill tree -- the abilities players can
 purchase. Each ability requires a level. You can also set a requirement that
@@ -5209,7 +6516,7 @@ Players always get a fixed number of ability points in a skill, and you can
 use the level and prerequisite abilities to help control how many of the
 abilities a player can access.
 
-See also: ABILITY POINTS, OLC SKILLS, VNUM
+See also: ABILITY POINTS, SKILLEDIT SHOWTREE, OLC SKILLS, VNUM
 #d
 "SPECIAL ICONS" "ICON CODES"
 
@@ -5235,8 +6542,8 @@ The .olc social editor is a tool for creating and editing social commands
 (which are like pre-set emotes). It provides a simple in-game menu with
 contextual choices to design all types of socials.
 
-All commands in the editor are highlighted in yellow and placed inside <angle
-braces>. You can get help on these by typing &yHELP SOCEDIT <COMMMAND>&0.
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these by typing: &yHELP SOCEDIT <COMMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5461,16 +6768,28 @@ Medium armor is for PVP or solo adventuring, and should give both DPS and
 
 Heavy armor should always include -WITS, -STRENGTH, or other melee penalties.
    It should only include tank traits otherwise.
-#d
-"ARROW ITEM" "ARROW OBJECT"
 
-The ARROW item type is used to create stacks of ammunition for the MISSILE
+Object values:
+ 0 - armor type (0 mage, 1 light, 2 medium, 3 heavy)
+#d
+"AMMO ITEM" "AMMO OBJECT" "ARROW ITEM" "ARROW OBJECT"
+
+The AMMO item type is used to create stacks of ammunition for the MISSILE
 WEAPON type. Its damage is added to the missile weapon's own damage. Arrows
 normally come in stacks of 10 and are named as "a quiver of arrows".
 
-If the arrow is scalable, its damage bonus will scale. Applies don't matter on
-arrow items because they are not equipped. Arrows only fire out of the player's
-inventory.
+If the ammo is scalable, its damage bonus will scale. Ammo only fires out of
+the player's inventory.
+
+If there are any applies, they will become debuffs on the enemy when hit by
+the ammo. For example, a -1 STR on the ammo becomes -1 STR on the victim.
+If there is an 'affect' generic with the same vnum as the ammo item, it will
+be used for the debuff.
+
+Object values:
+ 0 - remaining number of shots
+ 1 - damage bonus (scalable)
+ 2 - ammo type (must match type on the missile weapon)
 #d
 "BOARD ITEM" "BOARD OBJECT"
 
@@ -5484,8 +6803,11 @@ system. You can spawn books in adventures by writing them in the book editor,
 then assigning their book ID to a book object in your adventure zone. The
 data from the book editor will override your short description, long desc-
 ription, and look description.
+
+Object values:
+ 0 - vnum for the book text (from the book editor)
 #d
-"COINS ITEM" "COINS OBJECT"
+"COINS ITEM" "COINS OBJECT" "COIN ITEM" "COIN OBJECT"
 
 The COINS type represents a pile of coins and will be converted from an object
 to "real" coins when a player picks it up. Coins dropped by adventures should
@@ -5496,6 +6818,10 @@ If your coin item is scalable, the coin value will be set by the scaling system
 based on the player's level.
 
 This should not be confused with the WEALTH item type.
+
+Object values:
+ 0 - amount (scalable)
+ 1 - empire vnum (or -1 for misc coins)
 #d
 "CONTAINER ITEM" "CONTAINER OBJECT"
 
@@ -5504,6 +6830,10 @@ be used on the ground. If you want to raise inventory capacity, use the PACK
 item type instead.
 
 If you want to make a cart (or other movable container), use a vehicle instead.
+
+Object values:
+ 0 - max contents
+ 1 - container flags (1 = closable, 2 = closed, 3 = both)
 #d
 "CORPSE ITEM" "CORPSE OBJECT"
 
@@ -5511,7 +6841,24 @@ EmpireMUD does not currently allow content builders to add actual corpse
 objects. You can use the CONTAINER item type if you don't set it as take-able,
 or else you can use OTHER but won't be able to put items inside the corpse.
 
-This item type itself is reserved for code use.
+This item type itself is reserved for code use. Use an OTHER item to make fake
+corpses.
+
+Object values:
+ 0 - idnum/vnum of the corpse (players are negative; npc vnums are positive)
+ 1 - unused
+ 2 - corpse flags (1 = eaten, 2 = skinned, 4 = human)
+#d
+"CURRENCY ITEM" "CURRENCY OBJECT"
+
+Currency items represent a pile of adventure currency. The name of the currency
+is defined by a generic.
+
+Object values:
+ 0 - amount
+ 1 - generic currency vnum
+
+See also: GENERIC CURRENCY
 #d
 "DRINKCON ITEM" "DRINKCON OBJECT" "DRINK ITEM" "DRINK OBJECT" "DRINK CONTAINER ITEM" "DRINK CONTAINER OBJECT"
 
@@ -5524,6 +6871,15 @@ scalable in order to automatically determine how many drinks it will hold.
 Other drink containers are like fountains, as no-take objects in the room
 which can provide very large amounts of liquid to players. These shouldn't
 be scalable, and you can set the capacity as high as you like.
+
+Note: Unlike other items, if there is a 'timer' on a drink container, it will
+only cause the liquid inside to go bad and be poured out, rather than purging
+the whole container.
+
+Object values:
+ 0 - max capacity (scalable)
+ 1 - current amount
+ 2 - generic liquid vnum
 #d
 "FOOD ITEM" "FOOD OBJECT"
 
@@ -5533,6 +6889,10 @@ ness, only if it's harder to make or acquire. Simple foods received from the
 forage or pick command should be short-lived and low-fullness no matter what
 they represent. Something that takes several ingredients and a Trade ability
 could last much longer.
+
+Object values:
+ 0 - hours of fullness
+ 1 - crop vnum (if plantable)
 #d
 "INSTRUMENT ITEM" "INSTRUMENT OBJECT"
 
@@ -5555,10 +6915,17 @@ extra-description to get the same effect.
 
 The MISSILE WEAPON item type represents a bow, crossbow, or similar item. It
 should always have the RANGED wear slot only, never wield or hold. In order to
-use weapons of this type, players must also have matching ARROW items in their
+use weapons of this type, players must also have matching AMMO items in their
 inventory.
 
 If the missile weapon is scalable, it will scale its own damage bonus.
+
+Object values:
+ 0 - attack type (see ATTACK TYPES)
+ 1 - bonus damage (if scalable, this is the weight to scale the damage)
+ 2 - ammo type (must match type on the ammo object)
+
+See also: AMMO ITEM
 #d
 "OTHER ITEM" "OTHER OBJECT"
 
@@ -5566,6 +6933,10 @@ This is used for items that don't have another applicable type. It has no
 base requirements to use it, and can represent almost anything. This type also
 gives you access to edit the object's 3 generic values, which may be useful
 for scripting.
+
+Object values:
+ - does not use the values, but allows them to be used for scripting
+ - if the item is PLANTABLE, value 1 is the crop vnum
 #d
 "PACK ITEM" "PACK OBJECT"
 
@@ -5580,6 +6951,33 @@ each other.
 
 If you want items in other slots to add inventory capacity, use the INVENTORY
 apply instead.
+
+Object values:
+ 0 - inventory bonus (scalable)
+#d
+"PAINT ITEM" "PAINT OBJECT"
+
+The PAINT item type is used by players to color their buildings. One paint item
+is required per building, and the item is consumed when used by the 'paint'
+command.
+
+Object values:
+ 0 - paint color
+     0 none
+     1 Blue
+     2 Red
+     3 Yellow
+     4 Green
+     5 Orange
+     6 Violet
+     7 Azure
+     8 Cyan
+     9 Jade
+    10 Lime
+    11 Magenta
+    12 Pink
+    13 Tan
+    14 White
 #d
 "POISON ITEM" "POISON OBJECT"
 
@@ -5588,6 +6986,10 @@ have one active poison at a time.
 
 Each time a poison is applied to a target, the poison object loses 1 charge,
 until it is used up and discarded completely.
+
+Object values:
+ 1 - poison charges remaining
+ 2 - generic affect vnum (optional, defaults to 3004 poisoned)
 #d
 "PORTAL ITEM" "PORTAL OBJECT"
 
@@ -5603,19 +7005,47 @@ vnum.
 
 You could also spawn portals using scripts. In this case, you should usually
 set the portal's destination using the script that spawns it.
+
+Object values:
+ 0 - target room vnum (real vnum, not template)
+     Note: for adventure portals, this is the room template vnum instead UNTIL
+     the portal has been loaded into the world, when it becomes the real vnum
 #d
 "POTION ITEM" "POTION OBJECT"
 
-Potions choose their effect from a pre-existing list. Some potion types, but
-not all, can be scaled using the potionscale trait.
+Potions will put their applies and affects on a person when quaffed. Potions
+also fire 'consume' triggers, so you can give them custom effects with scripts.
 
-If you don't set your potion as scalable, you can manually set the potionscale
-to a level to get that level of healing/etc.
+When you drink a potion, it will clear any affects from other potions that
+share the same affect vnum. If you do not set a vnum, it will use the default
+'potion' affect.
 
-If you do set your potion as scalable, you only need to set the potionscale to
-1 and it will scale to the correct level.
+In order to make potions storable, you should set their min- and max-level to
+the same number, e.g. 100-100. This allows them to be both scalable and
+storable.
+
+Note: Prior to EmpireMUD 2.0 b5.23, potions had a pre-determined list of
+effects and used custom scaling.
 
 Potions can only be used once, and then are lost.
+
+Object values:
+ 0 - generic cooldown vnum (optional)
+ 1 - cooldown time in seconds (optional)
+ 2 - generic affect vnum (optional, defaults to 3102 potion)
+#d
+"RECIPE ITEM" "RECIPE OBJECT"
+
+Recipes are single-use items that permanently teach a player a new craft. You
+must also create the craft entry, which must have the LEARNED flag. Only
+players who learn the recipe from an item can make that craft.
+
+You can make recipes even faster with the quickrecipe command.
+
+Object values:
+ 0 - craft vnum to learn from this recipe
+
+See also: OEDIT QUICKRECIPE
 #d
 "RESOURCE ACTIONS" "RESOURCE ACTION TYPES"
 
@@ -5955,6 +7385,10 @@ like the COINS type is, but they can be minted into coins by players with a
 mint. Wealth items contribute to an empire's total wealth when they are stored.
 
 This item type has no effect unless the item is stored in normal storage.
+
+Object values:
+ 0 - treasure value
+ 1 - automint (if 0, workforce won't mint this)
 #d
 "WEAPON ITEM" "WEAPON OBJECT"
 
@@ -5975,6 +7409,10 @@ Notes:
   avoid pre-enchanted ones.
 - The SLOW and FAST flags affect the rate of attack, but neither is really a
   bonus or penalty. They just help create more weapon diversity.
+
+Object values:
+ 1 - bonus damage (if scalable, this is the weight to scale the damage)
+ 2 - attack type (see ATTACK TYPES)
 #d
 "WORN ITEM" "WORN OBJECT"
 

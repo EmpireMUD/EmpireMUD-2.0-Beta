@@ -2,8 +2,7 @@
 Seed enchantment~
 1 c 2
 enchant~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -13,8 +12,7 @@ set cost_item_count 1
 set ability_required Enchant Tools
 set mana_cost 100
 set result_vnum 601
-eval check %%actor.ability(%ability_required%)%%
-if !%check%
+if !%actor.ability(%ability_required%)%
   %send% %actor% You need %ability_required% to enchant %self.shortdesc%.
   return 1
   halt
@@ -24,20 +22,17 @@ if %actor.mana% < %mana_cost%
   return 1
   halt
 end
-eval check %%actor.has_resources(%cost_item_vnum%, %cost_item_count%)%%
-if !%check%
+if !%actor.has_resources(%cost_item_vnum%, %cost_item_count%)%
   %send% %actor% You need %cost_item_name% (x%cost_item_count%) to enchant %self.shortdesc%.
   return 1
   halt
 end
-eval charge %%actor.add_resources(%cost_item_vnum%,-%cost_item_count%)%%
-nop %charge%
-eval charge %%actor.mana(-%mana_cost%)%%
+nop %actor.add_resources(%cost_item_vnum%,-%cost_item_count%)%
 %send% %actor% You enchant %self.shortdesc%!
 %echoaround% %actor% %actor.name% enchants %self.shortdesc%!
-nop %charge%
+nop %actor.mana(-%mana_cost%)%
 %load% obj %result_vnum% %actor% inv
-eval obj %actor.inventory()%
+set obj %actor.inventory()%
 %send% %actor% It becomes %obj.shortdesc%!
 %echoaround% %actor% It becomes %obj.shortdesc%!
 %purge% %self%
@@ -46,12 +41,11 @@ eval obj %actor.inventory()%
 Enchanted seed plant~
 1 c 2
 plant~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-eval room %self.room%
+set room %self.room%
 if !%actor.canuseroom_member()%
   %send% %actor% You don't have permission to plant anything here.
   return 1
@@ -72,8 +66,8 @@ end
 Enchanted forest unclaimed chop~
 0 ab 100
 ~
-eval room %self.room%
-eval cycles_left 5
+set room %self.room%
+set cycles_left 5
 while %cycles_left% >= 0
   if (%self.room% != %room%) || %room.empire% || !(%room.sector% ~= Enchanted)
     * We've either moved or the room's no longer suitable for deforesting - despawn the mob
@@ -120,6 +114,7 @@ done
 Talking Horse script~
 0 bw 10
 ~
+* This script is no longer in use, and has been replaced with custom messages.
 if %self.disabled%
   halt
 end
@@ -178,9 +173,9 @@ switch %random.4%
   break
   case 3
     if %self.varexists(has_duped)%
-      eval has_duped %self.has_duped%
+      set has_duped %self.has_duped%
     else
-      eval has_duped 0
+      set has_duped 0
     end
     if %has_duped% > 0
       * has already duplicated
@@ -188,12 +183,12 @@ switch %random.4%
       %purge% %self%
       halt
     else
-      eval room %self.room%
+      set room %self.room%
       * only duplicate if not in a building
       if (!%room.building%)
         %echo% %self.name% does a little backflip and splits into two bunnies!
         %load% mob 612
-        eval has_duped 1
+        set has_duped 1
         remote has_duped %self.id%
       else
         say I'm late! I'm late!
@@ -209,6 +204,7 @@ done
 Singing Bear script~
 0 bw 10
 ~
+* This is deprecated, replaced by mob custom strings.
 if %self.disabled%
   halt
 end
@@ -275,11 +271,10 @@ switch %random.4%
   break
   case 3
     %echo% %self.name% sneezes pixy dust all over you!
-    eval room %self.room%
-    eval ch %room.people%
+    set ch %self.room.people%
     while %ch%
       dg_affect %ch% FLY on 60
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
   break
   case 4
@@ -305,11 +300,10 @@ switch %random.4%
   break
   case 3
     %echo% %self.name% sprinkles pixy dust all over you!
-    eval room %self.room%
-    eval ch %room.people%
+    set ch %self.room.people%
     while %ch%
       dg_affect %ch% FLY on 60
-      eval ch %ch.next_in_room%
+      set ch %ch.next_in_room%
     done
   break
   case 4

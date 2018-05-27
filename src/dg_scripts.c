@@ -25,6 +25,7 @@
 #include "db.h"
 #include "olc.h"
 #include "skills.h"
+#include "vnums.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define player_script_radius  25	// map tiles away that players may be for scripts to trigger
@@ -36,11 +37,9 @@ extern unsigned long pulse;
 /* other external vars */
 extern const char *action_bits[];
 extern const char *affected_bits[];
-extern const char *affect_types[];
 extern const char *alt_dirs[];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
-extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
@@ -53,11 +52,15 @@ extern const char *otrig_types[];
 extern struct instance_data *quest_instance_global;
 extern const char *trig_attach_types[];
 extern const char *trig_types[];
+extern const char *vtrig_types[];
 extern const char *wtrig_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
+void check_for_eligible_goals(empire_data *emp);	// progress.c
 extern int count_harnessed_animals(vehicle_data *veh);
+void count_quest_tasks(struct req_data *list, int *complete, int *total);
+extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
@@ -1047,7 +1050,7 @@ void script_trigger_check(void) {
 			case MOB_TRIGGER: {
 				mob = (char_data *)sc->attached_to;
 				in_room = IN_ROOM(mob);
-				if (GET_POS(mob) < POS_SLEEPING || IS_DEAD(mob) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
+				if (GET_POS(mob) < POS_SLEEPING || IS_DEAD(mob) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
 					fail = TRUE;
 				}
 				if (AFF_FLAGGED(mob, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
@@ -1110,6 +1113,13 @@ void script_trigger_check(void) {
 			}
 		}
 	}
+}
+
+
+// frees memory when a waited trigger is canceled
+EVENT_CANCEL_FUNC(cancel_wait_event) {
+	struct wait_event_data *wait_event_obj = (struct wait_event_data *)event_obj;
+	free(wait_event_obj);
 }
 
 
@@ -1189,18 +1199,32 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 	}
 
 	len += snprintf(sb, sizeof(sb), "Name: '&y%s&0',  VNum: [&g%5d&0]\r\n", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-
-	if (trig->attach_type==OBJ_TRIGGER) {
-		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Objects\r\n");
-		sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
-	}
-	else if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER || trig->attach_type == ADV_TRIGGER) {
-		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Rooms\r\n");
-		sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
-	}
-	else {
-		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Mobiles\r\n");
-		sprintbit(GET_TRIG_TYPE(trig), trig_types, buf, TRUE);
+	
+	// x_TRIGGER
+	switch (trig->attach_type) {
+		case OBJ_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Objects\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
+			break;
+		}
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case BLD_TRIGGER:
+		case ADV_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Rooms\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
+			break;
+		}
+		case MOB_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Mobiles\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), trig_types, buf, TRUE);
+			break;
+		}
+		case VEH_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Vehicles\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), vtrig_types, buf, TRUE);
+			break;
+		}
 	}
 
 	len += snprintf(sb + len, sizeof(sb)-len, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s\r\n", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
@@ -1335,6 +1359,8 @@ void do_sstat_character(char_data *ch, char_data *k) {
 * add to the end, loc = 0 means add before all other triggers.
 */
 void add_trigger(struct script_data *sc, trig_data *t, int loc) {
+	void check_reset_trigger_event(room_data *room, bool random_offset);
+	
 	trig_data *i;
 	int n;
 
@@ -1359,6 +1385,10 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 	if (TRIG_IS_RANDOM(t)) {
 		// add to end
 		DL_APPEND2(random_triggers, t, prev_in_random_triggers, next_in_random_triggers);
+	}
+	
+	if (sc->attached_type == WLD_TRIGGER && sc->attached_to) {
+		check_reset_trigger_event((room_data*)sc->attached_to, TRUE);
 	}
 }
 
@@ -1918,7 +1948,7 @@ void script_vlog(const char *format, va_list args) {
 
 	snprintf(temp, sizeof(temp), "SCRIPT ERR: %s", format);
 	vsnprintf(output, sizeof(output), temp, args);
-	log(output);
+	log("%s", output);
 
 	for (i = descriptor_list; i; i = i->next) {
 		if (STATE(i) != CON_PLAYING || IS_NPC(i->character)) /* switch */
@@ -2086,7 +2116,7 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 		return;
 	}
 
-	if ((ex = find_exit(room, dir))) {	// normal exit
+	if ((ex = find_exit(room, dir)) && (!subfield || str_cmp(subfield, "map"))) {	// normal exit
 		if (subfield && *subfield) {
 			if (!str_cmp(subfield, "vnum")) {
 				snprintf(str, slen, "%d", ex->to_room);
@@ -2107,13 +2137,13 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 			sprintbit(ex->exit_info ,exit_bits, str, TRUE);
 		}
 	}
-	else if (!ROOM_IS_CLOSED(room) && dir < NUM_2D_DIRS) {	// map dirs
+	else if (dir < NUM_2D_DIRS && (!ROOM_IS_CLOSED(room) || !str_cmp(NULLSAFE(subfield), "map"))) {	// map dirs
 		room_data *to_room = SHIFT_DIR(room, dir);
 		if (to_room && subfield && *subfield) {
 			if (!str_cmp(subfield, "vnum")) {
 				snprintf(str, slen, "%d", GET_ROOM_VNUM(to_room));
 			}
-			else if (!str_cmp(subfield, "room")) {
+			else if (!str_cmp(subfield, "room") || !str_cmp(subfield, "map")) {
 				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(to_room) + ROOM_ID_BASE);
 			}
 		}
@@ -2157,6 +2187,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		"echoaround",
 		"echoneither",
 		"force",
+		"heal",
 		"load",
 		"morph",
 		"own",
@@ -2420,6 +2451,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else if (!str_cmp(field, "id")) {
 					snprintf(str, slen, "%d", inst->id);
 				}
+				else if (!str_cmp(field, "load")) {
+					void check_instance_is_loaded(struct instance_data *inst);
+					check_instance_is_loaded(inst);
+					strcpy(str, "1");
+				}
+				else if (!str_cmp(field, "loaded")) {
+					snprintf(str, slen, "%d", IS_SET(inst->flags, INST_NEEDS_LOAD) ? 0 : 1);
+				}
+				else if (!str_cmp(field, "level")) {
+					extern int lock_instance_level(room_data *room, int level);
+					
+					if (subfield && *subfield && inst->start && atoi(subfield) > 0) {
+						lock_instance_level(inst->start, atoi(subfield));
+					}
+					snprintf(subfield, slen, "%d", inst->level);
+				}
 				else if (!str_cmp(field, "location")) {
 					if (inst->location) {
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
@@ -2468,6 +2515,37 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					script_log("Trigger: %s, VNum %d, unknown instance field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), field);
 				}
 				return;
+			}
+			else if (!str_cmp(var, "cooldown")) {
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen;
+					if ((gen = find_generic(atoi(field), GENERIC_COOLDOWN))) {
+						snprintf(str, slen, "%s", GEN_NAME(gen));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
+			}
+			else if (!str_cmp(var, "currency")) {
+				// %currency.<vnum>(<amt>)% gets the name for that currency
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen;
+					int amt = subfield ? atoi(subfield) : 1;
+					
+					if ((gen = find_generic(atoi(field), GENERIC_CURRENCY))) {
+						snprintf(str, slen, "%s", GEN_STRING(gen, WHICH_CURRENCY(amt)));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
 			}
 			else if (!str_cmp(var, "random")) {
 				if (!str_cmp(field, "char") || !str_cmp(field, "ally") || !str_cmp(field, "enemy")) {
@@ -2583,6 +2661,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
+					else if (!str_cmp(field, "add_learned")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void add_learned_craft(char_data *ch, any_vnum vnum);
+							craft_data *cft = craft_proto(atoi(subfield));
+							if (cft && CRAFT_FLAGGED(cft, CRAFT_LEARNED) && !CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
+								add_learned_craft(c, GET_CRAFT_VNUM(cft));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid learned craft: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
+					
 					else if (!str_cmp(field, "add_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
@@ -2670,15 +2763,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					*/
 					else if (!str_cmp(field, "affect")) {
 						if (subfield && *subfield) {
-							int spell = search_block(subfield, affect_types, FALSE);
-
-							if (affected_by_spell(c, spell))
-								snprintf(str, slen, "1");
-							else 
+							generic_data *gen;
+							
+							if (isdigit(*subfield) && (gen = find_generic(atoi(subfield), GENERIC_AFFECT))) {
+								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
+							}
+							else if ((gen = find_generic_by_name(GENERIC_AFFECT, subfield, TRUE))) {
+								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
+							}
+							else {
 								snprintf(str, slen, "0");
+							}
 						}
-						else
+						else {
 							snprintf(str, slen, "0");
+						}
 					}
 					break;
 				}
@@ -2812,6 +2911,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "charge_currency")) {
+						if (subfield && isdigit(*subfield)) {
+							char arg1[256], arg2[256];
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2) {
+								add_currency(c, atoi(arg1), -atoi(arg2));
+							}
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "canbeseen")) {
 						if ((type == MOB_TRIGGER) && !CAN_SEE(((char_data*)go), c))
 							snprintf(str, slen, "0");
@@ -2877,9 +2986,38 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
+					else if (!str_cmp(field, "completed_quest_instance")) {
+						struct instance_data *inst = get_instance_for_script(type, go);
+						
+						if (subfield && *subfield && isdigit(*subfield) && inst) {
+							any_vnum vnum = atoi(subfield);
+							if (!IS_NPC(c) && has_completed_quest(c, vnum, inst->id)) {
+								strcpy(str, "1");
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "cooldown")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", get_cooldown_time(c, atoi(subfield)));
+						}
+					}
 					else if (!str_cmp(field, "crafting_level")) {
 						extern int get_crafting_level(char_data *ch);
 						snprintf(str, slen, "%d", get_crafting_level(c));
+					}
+					else if (!str_cmp(field, "currency")) {
+						if (subfield && *subfield) {
+							snprintf(str, slen, "%d", get_currency(c, atoi(subfield)));
+						}
+						else {
+							strcpy(str, "0");
+						}
 					}
 
 					break;
@@ -2892,7 +3030,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							int dir;
 							if ((dir = search_block(subfield, dirs, FALSE)) != NOTHING || (dir = search_block(subfield, alt_dirs, FALSE)) != NOTHING) {
-								if (IS_NPC(c) || has_ability(c, ABIL_NAVIGATION)) {
+								if (IS_NPC(c) || HAS_NAVIGATION(c)) {
 									snprintf(str, slen, "%s", dirs[dir]);	// real dir
 								}
 								else {
@@ -2910,7 +3048,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "disabled")) {
 						// things which would keep a character from acting
-						if (EXTRACTED(c) || GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED)) {
+						if (EXTRACTED(c) || GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED | AFF_HARD_STUNNED)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -2920,6 +3058,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "dodge")) {
 						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_dodge_modifier(c, NULL, FALSE));
+					}
+					else if (!str_cmp(field, "drunk")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, DRUNK, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, DRUNK) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 					break;
 				}
@@ -3045,6 +3189,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "give_currency")) {
+						if (subfield && isdigit(*subfield)) {
+							char arg1[256], arg2[256];
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2) {
+								add_currency(c, atoi(arg1), atoi(arg2));
+							}
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "give_skill_reset")) {
 						skill_data *sk = find_skill(subfield);
 						struct player_skill_data *skdata;
@@ -3106,6 +3260,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "has_tech")) {
+						if (subfield && *subfield) {
+							extern const char *player_tech_types[];
+							int pos;
+							
+							if ((pos = search_block(subfield, player_tech_types, FALSE)) != NOTHING) {
+								snprintf(str, slen, "%d", has_player_tech(c, pos) ? 1 : 0);
+							}
+							else {
+								*str = '\0';
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					
 					else if (!str_cmp(field, "hisher"))
 						snprintf(str, slen, "%s", HSHR(c));
@@ -3129,6 +3299,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							*str = '\0';
 						}
+					}
+					else if (!str_cmp(field, "hunger")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, FULL, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 						
 					break;
@@ -3225,6 +3401,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'l': {	// char.l*
 					if (!str_cmp(field, "lastname")) {
 						snprintf(str, slen, "%s", IS_NPC(c) ? "" : GET_LASTNAME(c)); 
+					}
+					else if (!str_cmp(field, "learned")) {
+						extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+						
+						if (subfield && *subfield && isdigit(*subfield) && has_learned_craft(c, atoi(subfield))) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
 					}
 					else if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", get_approximate_level(c)); 
@@ -3397,7 +3583,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "poison_immunity")) {
-						if (has_ability(c, ABIL_POISON_IMMUNITY)) {
+						if (has_player_tech(c, PTECH_NO_POISON)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -3414,12 +3600,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'q': {	// char.q*
 					if (!str_cmp(field, "quest_finished")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
 							any_vnum vnum = atoi(subfield);
 							struct player_quest *pq;
 							int complete, total;
 							if (!IS_NPC(c) && (pq = is_on_quest(c, vnum))) {
-								count_quest_tasks(pq, &complete, &total);
+								count_quest_tasks(pq->tracker, &complete, &total);
 								if (complete >= total) {
 									strcpy(str, "1");
 								}
@@ -3434,7 +3619,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "quest_triggered")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
 							any_vnum vnum = atoi(subfield);
 							struct player_quest *pq;
 							struct req_data *task;
@@ -3461,7 +3645,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_mob_flag")) {
+					if (!str_cmp(field, "remove_learned")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void remove_learned_craft(char_data *ch, any_vnum vnum);
+							remove_learned_craft(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
 							if (pos != NOTHING) {
@@ -3500,7 +3692,47 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 's': {	// char.s*
-					if (!str_cmp(field, "sex"))
+					if (!str_cmp(field, "set_cooldown")) {
+						if (subfield && *subfield) {
+							char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+							generic_data *gen;
+							int val;
+							
+							comma_args(subfield, arg1, arg2);
+							
+							if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2) || !(gen = find_generic(atoi(arg1), GENERIC_COOLDOWN))) {
+								script_log("Trigger: %s, VNum %d. bad arguments to set_cooldown(%s, %s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg1, arg2);
+								strcpy(str, "0");
+							}
+							else {
+								val = atoi(arg2);
+								if (val > 0) {
+									add_cooldown(c, GEN_VNUM(gen), val);
+								}
+								else {
+									remove_cooldown_by_type(c, GEN_VNUM(gen));
+								}
+								
+								// success
+								strcpy(str, "1");
+							}
+						}
+					}
+					else if (!str_cmp(field, "set_reputation")) {
+						if (subfield && *subfield && !IS_NPC(c)) {
+							// %actor.has_reputation(vnum, level)%
+							char arg1[256], arg2[256];
+							faction_data *fct;
+							int rep;
+							
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING) {
+								set_reputation(c, FCT_VNUM(fct), rep);
+							}
+						}
+						strcpy(str, "1");
+					}
+					else if (!str_cmp(field, "sex"))
 						snprintf(str, slen, "%s", genders[(int)GET_SEX(c)]);
 
 					else if (!str_cmp(field, "str") || !str_cmp(field, "strength"))
@@ -3540,7 +3772,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 't': {	// char.t*
-					if (!str_cmp(field, "tohit")) {
+					if (!str_cmp(field, "thirst")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, THIRST, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR);
+					}
+					else if (!str_cmp(field, "tohit")) {
 						extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
@@ -3681,7 +3919,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'c': {	// obj.c*
-					if (!str_cmp(field, "carried_by")) {
+					if (!str_cmp(field, "can_wear")) {
+						extern const char *wear_bits[];
+						int pos;
+						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE))) {
+							snprintf(str, slen, "%d", CAN_WEAR(o, BIT(pos)) ? 1 : 0);
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "carried_by")) {
 						if (o->carried_by)
 							snprintf(str, slen,"%c%d",UID_CHAR, char_script_id(o->carried_by));
 						else
@@ -3832,6 +4080,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'q': {	// obj.q*
+					if (!str_cmp(field, "quest")) {
+						snprintf(str, slen, "%d", GET_OBJ_REQUIRES_QUEST(o) > 0 ? GET_OBJ_REQUIRES_QUEST(o) : 0);
+					}
+					break;
+				}
 				case 'r': {	// obj.r*
 					if (!str_cmp(field, "room")) {
 						if (obj_room(o))
@@ -3883,7 +4137,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'w': {	// obj.w*
-					if (!str_cmp(field, "worn_by")) {
+					if (!str_cmp(field, "wearable")) {
+						snprintf(str, slen, "%d", (GET_OBJ_WEAR(o) & ~ITEM_WEAR_TAKE) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "worn_by")) {
 						if (o->worn_by)
 							snprintf(str, slen,"%c%d",UID_CHAR, char_script_id(o->worn_by));
 						else
@@ -3981,6 +4238,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "building_vnum")) {
+						if (GET_BUILDING(r)) {
+							snprintf(str, slen, "%d", GET_BLD_VNUM(GET_BUILDING(r)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					break;
 				}
 				case 'c': {	// room.c*
@@ -4025,9 +4290,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "coords")) {
-						room_data *map = get_map_location_for(r);
-						if (map) {
-							snprintf(str, slen, "(%d, %d)", FLAT_X_COORD(map), FLAT_Y_COORD(map));
+						if (GET_MAP_LOC(r)) {
+							snprintf(str, slen, "(%d, %d)", MAP_X_COORD(GET_MAP_LOC(r)->vnum), MAP_Y_COORD(GET_MAP_LOC(r)->vnum));
 						}
 						else {
 							snprintf(str, slen, "(%s, %s)", "???", "???");
@@ -4037,6 +4301,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						crop_data *cp;
 						if ((cp = ROOM_CROP(r))) {
 							snprintf(str, slen, "%s", GET_CROP_NAME(cp));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "crop_vnum")) {
+						crop_data *cp;
+						if ((cp = ROOM_CROP(r))) {
+							snprintf(str, slen, "%d", GET_CROP_VNUM(cp));
 						}
 						else {
 							*str = '\0';
@@ -4128,6 +4401,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "fore")) {
 						direction_vars(r, FORE, subfield, str, slen);
 					}
+					else if (!str_cmp(field, "function")) {
+						extern const char *function_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, function_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", HAS_FUNCTION(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					break;
 				}
 				case 'i': {	// room.i*
@@ -4136,6 +4425,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%d", GET_ROOM_VNUM(r) + ROOM_ID_BASE);
 						else
 							*str = '\0';
+					}
+					else if (!str_cmp(field, "in_city")) {
+						bool junk;
+						if (ROOM_OWNER(r) && is_in_city_for_empire(r, ROOM_OWNER(r), (*subfield && (atoi(subfield) || !str_cmp(subfield, "true"))), &junk)) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
 					}
 					else if (!str_cmp(field, "in_vehicle")) {
 						if (GET_ROOM_VEHICLE(r)) {
@@ -4207,6 +4505,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 's': {	// room.s*
 					if (!str_cmp(field, "sector")) {
 						snprintf(str, slen, "%s", GET_SECT_NAME(SECT(r)));
+					}
+					else if (!str_cmp(field, "sector_vnum")) {
+						snprintf(str, slen, "%d", GET_SECT_VNUM(SECT(r)));
 					}
 					else if (!str_cmp(field, "south")) {
 						direction_vars(r, SOUTH, subfield, str, slen);
@@ -4614,7 +4915,29 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {	// emp.a*
-					if (!str_cmp(field, "adjective")) {
+					if (!str_cmp(field, "add_progress")) {
+						if (subfield && *subfield) {
+							progress_data *prg;
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
+								if (!empire_has_completed_goal(emp, vnum)) {
+									void script_reward_goal(empire_data *emp, progress_data *prg);
+									script_reward_goal(emp, prg);
+									check_for_eligible_goals(emp);
+								}
+								strcpy(str, "1");
+							}
+							else {
+								script_log("Trigger: %s, VNum %d. add_progress called with invalid vnum '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "adjective")) {
 						snprintf(str, slen, "%s", EMPIRE_ADJECTIVE(emp));
 					}
 					break;
@@ -4650,7 +4973,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// emp.h*
-					if (!str_cmp(field, "has_tech")) {
+					if (!str_cmp(field, "has_progress")) {
+						if (subfield && *subfield) {
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING) {
+								snprintf(str, slen, "%d", empire_has_completed_goal(emp, vnum) ? 1 : 0);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "has_tech")) {
 						if (subfield && *subfield) {
 							extern const char *techs[];
 							int pos;
@@ -4673,6 +5011,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						// this is scripting id
 						snprintf(str, slen, "%d", EMPIRE_VNUM(emp) + EMPIRE_ID_BASE);
 					}
+					else if (!str_cmp(field, "is_on_progress")) {
+						if (subfield && *subfield) {
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING) {
+								snprintf(str, slen, "%d", get_current_goal(emp, vnum) ? 1 : 0);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					break;
 				}
 				case 'l': {	// emp.l*
@@ -4683,7 +5036,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'm': {	// emp.m*
 					if (!str_cmp(field, "max_territory")) {
-						snprintf(str, slen, "%d", land_can_claim(emp, FALSE));
+						snprintf(str, slen, "%d", land_can_claim(emp, TER_TOTAL));
 					}
 					else if (!str_cmp(field, "members")) {
 						snprintf(str, slen, "%d", EMPIRE_MEMBERS(emp));
@@ -4716,6 +5069,25 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'q': {	// emp.q*
+					if (!str_cmp(field, "qualifies_for_progress")) {
+						if (subfield && *subfield) {
+							progress_data *prg;
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
+								snprintf(str, slen, "%d", (!empire_has_completed_goal(emp, vnum) && empire_meets_goal_prereqs(emp, prg)) ? 1 : 0);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					break;
+				}
 				case 'r': {	// emp.r*
 					if (!str_cmp(field, "rank")) {
 						if (subfield && *subfield) {
@@ -4731,14 +5103,77 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "remove_progress")) {
+						if (subfield && *subfield) {
+							struct empire_goal *goal;
+							progress_data *prg;
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
+								if (empire_has_completed_goal(emp, vnum)) {
+									void remove_completed_goal(empire_data *emp, any_vnum vnum);
+									remove_completed_goal(emp, vnum);
+								}
+								if ((goal = get_current_goal(emp, vnum))) {
+									cancel_empire_goal(emp, goal);
+								}
+								strcpy(str, "1");
+								check_for_eligible_goals(emp);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "ranks")) {
 						snprintf(str, slen, "%d", EMPIRE_NUM_RANKS(emp));
 					}
 					break;
 				}
+				case 's': {	// emp.s*
+					if (!str_cmp(field, "start_progress")) {
+						if (subfield && *subfield) {
+							progress_data *prg;
+							any_vnum vnum;
+							
+							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
+								if (!empire_has_completed_goal(emp, vnum) && !get_current_goal(emp, vnum) && empire_meets_goal_prereqs(emp, prg)) {
+									extern struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
+									
+									struct empire_goal *goal = start_empire_goal(emp, prg);
+									int complete, total;
+									
+									if (goal) {
+										void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
+										refresh_one_goal_tracker(emp, goal);
+									}
+									// check if complete
+									count_quest_tasks(goal->tracker, &complete, &total);
+									if (complete == total) {
+										void complete_goal(empire_data *emp, struct empire_goal *goal);
+										complete_goal(emp, goal);
+									}
+								}
+								strcpy(str, "1");
+							}
+							else {
+								script_log("Trigger: %s, VNum %d. start_progress called with invalid vnum '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+								strcpy(str, "0");
+							}
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					break;
+				}
+				
 				case 't': {	// emp.t*
 					if (!str_cmp(field, "territory")) {
-						snprintf(str, slen, "%d", EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp));
+						snprintf(str, slen, "%d", EMPIRE_TERRITORY(emp, TER_TOTAL));
 					}
 					break;
 				}
@@ -4840,6 +5275,10 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 					if (dots > 0) {
 						*subfield_p = '\0';
 						find_replacement(go, sc, trig, type, var, field, subfield, repl_str, sizeof(repl_str));
+						
+						// reset subfield -- this fixes a dg scripts error where subfields would continue concatenating
+						subfield_p = subfield;
+						
 						if (*repl_str) {   
 							snprintf(tmp2, sizeof(tmp2), "eval tmpvr %s", repl_str); //temp var
 							process_eval(go, sc, trig, type, tmp2);
@@ -4882,6 +5321,9 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 			len = strlen(repl_str);
 			buf += len;
 			left -= len;
+			
+			// reset subfield -- this fixes a dg scripts error where subfields would continue concatenating
+			subfield_p = subfield;
 		} /* else if *p .. */
 	} /* while *p .. */ 
 }
@@ -4916,7 +5358,6 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 	for (--p; isspace(*p) && (p > lhs); *p-- = '\0');
 	for (p = rhs; *p; p++);
 	for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
-
 
 	/* find the op, and figure out the value */
 	if (!strcmp("||", op)) {
@@ -5091,7 +5532,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 	
 	// symbols used in operators
 	const char *opsymbols = "!/*+-<>=~&|";
-
+	
 	p = strcpy(line, expr);
 
 	/*
@@ -5281,8 +5722,9 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 /* processes a script set command */
 void process_set(struct script_data *sc, trig_data *trig, char *cmd) {
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], *value;
-
-	value = two_arguments(cmd, arg, name);
+	
+	value = any_one_arg(cmd, arg);
+	value = any_one_arg(value, name);
 
 	skip_spaces(&value);
 
@@ -5300,8 +5742,8 @@ void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, c
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
 	char result[MAX_INPUT_LENGTH], *expr;
 
-	expr = one_argument(cmd, arg); /* cut off 'eval' */
-	expr = one_argument(expr, name); /* cut off name */
+	expr = any_one_arg(cmd, arg); /* cut off 'eval' */
+	expr = any_one_arg(expr, name); /* cut off name */
 
 	skip_spaces(&expr);
 
@@ -5504,9 +5946,14 @@ room_data *dg_room_of_obj(obj_data *obj) {
 
 /* create a UID variable from the id number */
 void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
+	
 	char junk[MAX_INPUT_LENGTH], varname[MAX_INPUT_LENGTH];
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
 	char uid[MAX_INPUT_LENGTH];
+	struct instance_data *inst;
+	char_data *mob;
 
 	*uid = '\0';
 	half_chop(cmd, junk, cmd);    /* makeuid */
@@ -5597,25 +6044,42 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				case BLD_TRIGGER:
 				case ADV_TRIGGER:
 					r = (room_data*)go;
-					if (*name) {
+					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE))) {
+						// instance lookup
+						r = find_room_template_in_instance(inst, atoi(name+1));
+					}
+					else if (*name) {
 						r = get_room(r, name);
 					}
 					break;
 				case OBJ_TRIGGER:
 					r = obj_room((obj_data*)go);
-					if (*name) {
+					if (*name == 'i' && isdigit(*(name+1)) && r && (inst = find_instance_by_room(r, FALSE))) {
+						// instance lookup
+						r = find_room_template_in_instance(inst, atoi(name+1));
+					}
+					else if (*name) {
 						r = get_room(r, name);
 					}
 					break;
 				case MOB_TRIGGER:
-					r = IN_ROOM((char_data*)go);
-					if (*name) {
+					mob = (char_data *)go;
+					r = IN_ROOM(mob);
+					if (*name == 'i' && isdigit(*(name+1)) && MOB_INSTANCE_ID(mob) != NOTHING && (inst = get_instance_by_id(MOB_INSTANCE_ID(mob)))) {
+						// instance lookup
+						r = find_room_template_in_instance(inst, atoi(name+1));
+					}
+					else if (*name) {
 						r = get_room(r, name);
 					}
 					break;
 				case VEH_TRIGGER: {
 					r = IN_ROOM((vehicle_data*)go);
-					if (*name) {
+					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE))) {
+						// instance lookup
+						r = find_room_template_in_instance(inst, atoi(name+1));
+					}
+					else if (*name) {
 						r = get_room(r, name);
 					}
 					break;
@@ -5715,7 +6179,8 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	obj_data *obj;
 
 	line = any_one_arg(cmd, arg);
-	two_arguments(line, buf, buf2);
+	line = any_one_arg(line, buf);
+	line = any_one_arg(line, buf2);
 	var = buf;
 	uid_p = buf2;
 	skip_spaces(&var);
@@ -5791,7 +6256,8 @@ ACMD(do_vdelete) {
 	char_data *mob;
 	obj_data *obj;
 
-	argument = two_arguments(argument, buf, buf2);
+	argument = any_one_arg(argument, buf);
+	argument = any_one_arg(argument, buf2);
 	var = buf;
 	uid_p = buf2;
 	skip_spaces(&var);
@@ -5879,7 +6345,8 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	obj_data *obj;
 
 	line = any_one_arg(cmd, arg);
-	two_arguments(line, buf, buf2);
+	line = any_one_arg(line, buf);
+	line = any_one_arg(line, buf2);
 	var = buf;
 	uid_p = buf2;
 	skip_spaces(&var);
@@ -6071,6 +6538,11 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			break;
 		}
 	}
+	
+	if (!sc) {
+		script_log("Attempting to run script without script data (trig: %d)", GET_TRIG_VNUM(trig));
+		return ret_val;
+	}
 
 	if (mode == TRIG_NEW) {
 		GET_TRIG_DEPTH(trig) = 1;
@@ -6140,11 +6612,13 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 					cl = cl->original;
 					loops++;   
 					GET_TRIG_LOOPS(trig)++;
+					/* This actually breaks multiple types of triggers -kh
 					if (loops == 30) {
 						process_wait(go, trig, type, "wait 1", cl);
 						depth--;
 						return ret_val;
 					}
+					*/
 					if (GET_TRIG_LOOPS(trig) >= 100) {
 						script_log("Trigger VNum %d has looped 100 times!!!",
 						GET_TRIG_VNUM(trig));
@@ -6269,6 +6743,8 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			break;
 		}
 	}
+	
+	// TODO why does this only free vars if there's still a script? Is there a possibility of getting here with vars unfreed? If not, isn't it safe to try to free them again?
 	if (sc)
 		free_varlist(GET_TRIG_VARS(trig));
 	GET_TRIG_VARS(trig) = NULL;

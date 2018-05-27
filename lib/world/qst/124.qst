@@ -1,0 +1,187 @@
+#12403
+Lumber for the Golden Goblin~
+   The pirate ship Golden Goblin has run aground in the cave and needs supplies
+to make repairs. Return with 12 lumber and you might curry favor with the
+pirates.
+~
+Quartermaster Smeegle takes the lumber from you with a grin.
+~
+4 bcd 50 150 -1
+A
+1 12403
+P
+16 12401 0 1 a
+R
+7 12401 5
+R
+6 12405 1
+T 12411
+W
+1 16 0 12 a
+W
+16 12401 0 1 a
+Z
+1 12403
+S
+#12404
+Nails for the Golden Goblin~
+   The pirate ship is practically falling apart. Quartermaster Smeegle asks you
+to donate some nails to help them get moving again, in exchange for vague
+promises of future gratitude.
+~
+Smeegle grins from ear to green ear when you hand him the nails.
+~
+4 bcd 50 150 -1
+A
+1 12403
+P
+16 12401 0 1 a
+R
+7 12401 5
+R
+6 12405 1
+T 12411
+W
+1 19 0 12 a
+W
+16 12401 0 1 a
+Z
+1 12403
+S
+#12405
+Find Fathma~
+   Smeegle puts his deckhand to work making repairs, but stops and looks
+around, puzzled. He shouts for someone named Fathma, but there is no response.
+The quartermaster scratches his head and asks you to go figure out where Fathma
+has gone.
+~
+You found Fathma! Now, how do you get out of here?
+~
+5 bc 50 150 -1
+A
+1 12403
+P
+16 12401 0 6 a
+P
+0 12403 0 1 a
+P
+0 12404 0 1 a
+T 12411
+W
+13 12406 0 1 a
+W
+16 12401 0 6 a
+Z
+1 12406
+S
+#12406
+Seaweed for the Sea Witch~
+   Fathma is working on a better water-breathing potion but needs the seaweed
+that grows in the caverns. Unfortunately, she can't leave the air bubble
+herself. Explore the caverns and 'pick' some seaweed. Fathma has promised to
+pay you for it.
+~
+You hand Fathma the seaweed.
+~
+5 bcd 50 150 -1
+A
+1 12406
+P
+16 12401 0 6 a
+R
+8 12403 2
+T 12411
+W
+2 12407 0 6 a
+W
+16 12401 0 6 a
+Z
+1 12406
+S
+#12407
+Song of the Deep~
+   Fathma needs some unusual ingredients that are rare in the open ocean, but
+might be easy to find in this underwater cavern. You'll need to hunt and kill
+an orca, a squid, and a mermaid. Return to Fathma with the correct pieces of
+each.
+~
+   Fathma whistles a raspy tune as she takes the reagents and dumps them into
+her cauldron.
+~
+6 bcd 50 150 -1
+A
+1 12406
+P
+16 12401 0 6 a
+R
+8 12403 2
+T 12411
+W
+2 12414 0 1 a
+W
+2 12415 0 1 a
+W
+2 12416 0 1 a
+W
+16 12401 0 6 a
+Z
+1 12406
+S
+#12408
+Fish Food~
+   Spellcasting in this cold, dank air bubble is hungry work. Worse, Fathma
+tells you it's practically torture to be so close to the stench of fish but
+unable to eat any of them. Fillet some fish and cook them into a 'crispy fish'
+for Fathma, to keep her going through this spell.
+~
+   Fathma swallows the crispy fish whole, which makes you question why she
+needed you to cook it first.
+~
+7 bcd 50 150 -1
+A
+1 12406
+P
+16 12401 0 6 a
+R
+8 12403 2
+T 12411
+W
+2 12410 0 1 a
+W
+16 12401 0 6 a
+Z
+1 12406
+S
+#12409
+A Deeper Evil~
+   Fathma confides that she came down here not just for seafood and rare
+reagents, but to gain the honor of killing a great sea creature. 
+Unfortunately, she has been stuck in this air bubble unable to stop casting for
+fear of running out of air. But if you kill one of the ocean's legendary
+denizens in her name, and she steals the credit, that will be close enough. 
+Hunt down one of the great creatures that dwells in these caverns, and slay it
+for her.
+~
+   Rather than thanking you, Fathma pays you and then begins plotting how she
+will tell the tale of her heroic conquest of the sea cavern.
+~
+8 bc 50 150 -1
+A
+1 12406
+P
+16 12401 0 6 a
+R
+8 12403 2
+T 12411
+W
+3 12419 0 1 a
+W
+16 12401 0 6 a
+W
+3 12420 0 1 b
+W
+16 12401 0 6 b
+Z
+1 12406
+S
+$

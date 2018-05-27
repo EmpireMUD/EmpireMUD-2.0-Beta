@@ -21,9 +21,12 @@ or change the room in some way, you should return 0 to stop triggers.
 
 Note: This trigger ONLY works when attached to an adventure directly.
 Note: You won't have access to %instance% variable information anymore.
+Note: Do not use the 'wait' command in triggers attached to adventures.
 
 Variables:
   &c%room%&0 - The room it was activated on.
+
+See also: WAIT
 #d
 "COMPLETE TRIGGER" "RTRIG COMPLETE" TRIGEDIT-ROOM-COMPLETE TRIGEDIT-COMPLETE TRIG-COMPLETE
 
@@ -71,6 +74,7 @@ help files for more info):
 &c%echoaround%&0 - Sends a message to all but one target.
 &c%echoneither%&0 - Sends a message to all but two people.
 &c%force%&0 - Forces a person to execute a command.
+&c%heal%&0 - Restores health/move/etc.
 &c%load%&0 - Loads a mob, object, etc.
 &c%morph%&0 - Causes a person to morph.
 &c%own%&0 - Changes ownership on something.
@@ -127,6 +131,7 @@ Rooms can trigger on the following events:
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 &cPlayer-in-Room&0 - Modifier: trigger requires a player present.
 &cReboot&0 - Triggers when the mud starts up.
+&cBuy&0 - Triggers when someone tries to buy in the room.
 
 For each type, there is a help file named &yRTRIG <type>&0.
 #d
@@ -140,11 +145,13 @@ When using field - The variable returns:
    is facing (compared to North). Returns the same dir if no building.
 &cbld_flagged(AFF)&0 - True if the room has a building flag on it.
 &cbuilding&0 - The name of the building on the room, if any.
+&cbuilding_vnum&0 - The vnum of the building on the room, if any.
 &ccan_build(FLAG)&0 - True if the room has the given build flags.
 &ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
 &ccoords&0 - The (x, y) location of the room on the map.
 &ccrop&0 - The name of the crop on the map room, if any.
+&ccrop_vnum&0 - The vnum of the crop on the map room, if any.
 &cdirection(target)&0 - The approximate direction to the target.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.
@@ -153,17 +160,23 @@ When using field - The variable returns:
 &cempire_name&0 - The owner empire's name, if any.
 &center_dir&0 - For map buildings, the direction you go to enter them.
 &cexit_dir&0 - For map buildings, the direction to exit them.
+&cfunction(FLAG)&0 - True if the room has a function flag on it.
 &c<dir>&0 - The list of flags affecting the exit in the specified direction: 
       north, south, up, down, fore, aft (etc). The result is either:
       %room.north(vnum)% - vnum of room in direction
       %room.north(FLG)% - CLOSED LOCKED, etc.
-      %room.north(room)% - room variable for room in direction
+      %room.north(room)% - room variable for room in direction (may be inside
+         or on the map, depending on available exits and location)
+      %room.north(map)% - room variable for the map location in the dir
 &cid&0 - The unique id of the room.
+&cin_city&0 - For claimed land, true if the tile is in a city for the owner.
+&cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
 &csector&0 - The sector type of the room.
+&csector_vnum&0 - The sector vnum of the room.
 &ctemplate&0 - The room template vnum, if any.
 &cvehicles&0 - The id of the first vehicle in the room, if any
    (then %veh.next_in_room%).
@@ -171,7 +184,7 @@ When using field - The variable returns:
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning
 
 See also: EMPIRE VARS, REDIT AFFECTS, REDIT FLAGS, BEDIT FLAGS,
-  SECTEDIT BUILDFLAGS
+  SECTEDIT BUILDFLAGS, FUNCTION FLAGS
 #d
 "ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
 

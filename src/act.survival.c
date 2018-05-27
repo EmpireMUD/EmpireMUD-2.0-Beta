@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -46,8 +47,8 @@ INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
 	int num;
 	
-	if (!skill_check(ch, ABIL_BUTCHER, DIFF_EASY)) {
-		return FALSE;
+	if (!has_player_tech(ch, PTECH_BUTCHER_UPGRADE) && number(1, 100) > 60) {
+		return FALSE;	// 60% chance of failure without the ability
 	}
 	
 	for (num = 0; num < interaction->quantity; ++num) {
@@ -85,9 +86,9 @@ INTERACTION_FUNC(do_one_forage) {
 	num = interaction->quantity;
 	
 	// more for skill wins
-	num += skill_check(ch, ABIL_FORAGE, DIFF_EASY) ? 1 : 0;
-	num += skill_check(ch, ABIL_FORAGE, DIFF_MEDIUM) ? 1 : 0;
-	num += skill_check(ch, ABIL_FORAGE, DIFF_HARD) ? 1 : 0;
+	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_EASY) ? 1 : 0;
+	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_MEDIUM) ? 1 : 0;
+	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_HARD) ? 1 : 0;
 	
 	for (iter = 0; iter < num; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
@@ -190,7 +191,7 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_RIDE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -342,7 +343,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_RIDE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL)) {
 		return;
 	}
 	else {
@@ -503,10 +504,6 @@ ACMD(do_butcher) {
 	obj_data *corpse;
 	
 	one_argument(argument, arg);
-
-	if (!can_use_ability(ch, ABIL_BUTCHER, NOTHING, 0, NOTHING)) {
-		return;
-	}
 	
 	if (!*arg) {
 		msg_to_char(ch, "What would you like to butcher?\r\n");
@@ -536,12 +533,13 @@ ACMD(do_butcher) {
 	else if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need a sharp tool to butcher with.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, corpse, ABIL_BUTCHER)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse)) {
 		return;
 	}
 	else {
 		if (run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, butcher_interact)) {
 			// success
+			gain_player_tech_exp(ch, PTECH_BUTCHER_UPGRADE, 15);
 		}
 		else {
 			act("You butcher $p but get no useful meat.", FALSE, ch, corpse, NULL, TO_CHAR);
@@ -550,8 +548,7 @@ ACMD(do_butcher) {
 		
 		empty_obj_before_extract(corpse);
 		extract_obj(corpse);
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_BUTCHER, 15);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
@@ -600,7 +597,10 @@ ACMD(do_fish) {
 	else if (FIGHTING(ch) && GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You can't do that now!\r\n");
 	}
-	else if (!can_use_ability(ch, ABIL_FISH, NOTHING, 0, NOTHING)) {
+	else if (!has_player_tech(ch, PTECH_FISH)) {
+		msg_to_char(ch, "You don't have the correct ability to fish for anything.\r\n");
+	}
+	else if (!can_use_ability(ch, NOTHING, NOTHING, 0, NOTHING)) {
 		// own messages
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_FISHING) {
@@ -624,7 +624,7 @@ ACMD(do_fish) {
 	else if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
 		msg_to_char(ch, "You'll need a spear to fish.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_FISH)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_FISH, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -638,7 +638,7 @@ ACMD(do_fish) {
 		msg_to_char(ch, "You begin looking for fish%s...\r\n", buf);
 		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }
@@ -649,8 +649,13 @@ ACMD(do_forage) {
 	
 	int short_depletion = config_get_int("short_depletion");
 	
-	if (!can_use_ability(ch, ABIL_FORAGE, MOVE, cost, NOTHING)) {
+	if (!has_player_tech(ch, PTECH_FORAGE)) {
+		msg_to_char(ch, "You don't have the correct ability to forage.\r\n");
 		return;
+	}
+	
+	if (!can_use_ability(ch, NOTHING, MOVE, cost, NOTHING)) {
+		return;	// just checking cost, not ability
 	}
 	
 	if (GET_ACTION(ch) != ACT_NONE) {
@@ -678,14 +683,14 @@ ACMD(do_forage) {
 		return;
 	}
 	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_FORAGE)) {
+	if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE, NULL, NULL)) {
 		return;
 	}
 
 	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage)) {
 		// success
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_FORAGE, 15);
+		gain_player_tech_exp(ch, PTECH_FORAGE, 15);
 	}
 	else {
 		msg_to_char(ch, "You don't seem to be able to find anything to forage for.\r\n");
@@ -702,8 +707,8 @@ ACMD(do_mount) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't ride anything!\r\n");
 	}
-	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
-		// sends own msgs
+	else if (!has_player_tech(ch, PTECH_RIDING)) {
+		msg_to_char(ch, "You don't have the ability to ride anything.\r\n");
 	}
 	
 	// list requires no position
@@ -732,31 +737,6 @@ ACMD(do_mount) {
 }
 
 
-ACMD(do_nightsight) {	
-	struct affected_type *af;
-	
-	if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
-		msg_to_char(ch, "You end your nightsight.\r\n");
-		act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_NIGHTSIGHT, FALSE);
-	}
-	else if (!can_use_ability(ch, ABIL_NIGHTSIGHT, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_NIGHTSIGHT)) {
-		return;
-	}
-	else {
-		msg_to_char(ch, "You activate nightsight.\r\n");
-		act("$n's eyes flash and take on a pale red glow.", TRUE, ch, NULL, NULL, TO_ROOM);
-		af = create_flag_aff(ATYPE_NIGHTSIGHT, UNLIMITED, AFF_INFRAVISION, ch);
-		affect_join(ch, af, 0);
-	}
-
-	command_lag(ch, WAIT_ABILITY);
-}
-
-
 ACMD(do_track) {
 	extern const char *dirs[];
 	
@@ -764,6 +744,8 @@ ACMD(do_track) {
 	struct track_data *track;
 	bool found = FALSE;
 	byte dir = NO_DIR;
+	
+	int tracks_lifespan = config_get_int("tracks_lifespan");
 	
 	one_argument(argument, arg);
 	
@@ -783,6 +765,11 @@ ACMD(do_track) {
 	}
 
 	for (track = ROOM_TRACKS(IN_ROOM(ch)); !found && track; track = track->next) {
+		// skip already-expired tracks
+		if (time(0) - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
+			continue;
+		}
+		
 		if (track->player_id != NOTHING && (vict = is_playing(track->player_id))) {
 			// TODO: this is pretty similar to the MATCH macro in handler.c and could be converted to use it
 			if (isname(arg, GET_PC_NAME(vict)) || isname(arg, PERS(vict, vict, 0)) || isname(arg, PERS(vict, vict, 1)) || (!IS_NPC(vict) && GET_LASTNAME(vict) && isname(arg, GET_LASTNAME(vict)))) {

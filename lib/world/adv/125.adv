@@ -1,0 +1,32 @@
+#12500
+Clockwork Colossus~
+Paul Clarke and Owen Morris~
+   A towering clockwork man stomps across the landscape, paying little
+attention to what he might step on -- if it is a he -- as he marches inexorably
+toward an unseen goal. Few have ever beheld such a marvel as this colossus, and
+fewer still have managed to fell one and see what makes it tick.
+   This adventure has 6 difficulty settings. To lower the difficulty of the
+colossus, you must '&cboard&0' it and sabotage its massive metal mechanisms. Each
+piece lowers the difficulty by one level, with the exception of the feet.
+Disabling the feet will return the colossus to its scaffolding, where you can
+summon fellow adventurers to aid in the fight.
+   You can '&cdisembark&0' from the colossus at any time, but be careful not to let
+it throw you off from great height. The colossus shoots powerful laser beams
+from its eyes, so be prepared to type '&rdodge&0'.
+~
+12500 12599 100-200
+5 0 bl 4
+L
+1 0
+12500 -1 -1
+9 beln 0
+L
+6 0
+150 -1 -1
+-1 0 0
+L
+5 0
+2880 -1 -1
+-1 0 0
+S
+$

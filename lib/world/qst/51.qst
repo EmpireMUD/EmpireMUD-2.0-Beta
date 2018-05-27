@@ -1,0 +1,27 @@
+#5107
+Mine Building Tutorial~
+   With a stack of logs or columns, you can build yourself a mine. This gives
+you access to all the riches that lie underground. The steps are:
+ 1. Get 4 logs or bound wooden columns.
+ 2. Find a suitable mountain tile.
+ 3. Type 'build mine'.
+ Tip: You can type 'build info mine' to learn more about the building.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+Now that you have a mine, maybe you can find something good.
+~
+3 h 0 15 -1
+A
+2 124
+A
+2 127
+R
+0 0 1
+R
+6 160 1
+W
+7 5107 0 1
+Z
+0 5107
+S
+$

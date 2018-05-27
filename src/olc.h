@@ -49,7 +49,10 @@
 #define OLC_QUEST  BIT(19)
 #define OLC_SOCIAL  BIT(20)
 #define OLC_FACTION  BIT(21)
-#define NUM_OLC_TYPES  22
+#define OLC_GENERIC  BIT(22)
+#define OLC_SHOP  BIT(23)
+#define OLC_PROGRESS  BIT(24)
+#define NUM_OLC_TYPES  25
 
 
 // olc command flags
@@ -74,14 +77,17 @@
 #define OLC_FLAG_NO_GLOBAL  BIT(12)	// cannot edit globals
 #define OLC_FLAG_NO_AUGMENT  BIT(13)	// cannot edit augs
 #define OLC_FLAG_NO_ARCHETYPE  BIT(14)	// cannot edit archetypes
-#define OLC_FLAG_ABILITIES  BIT(15)	// CAN edit abilities
-#define OLC_FLAG_CLASSES  BIT(16)	// CAN edit classes
-#define OLC_FLAG_SKILLS  BIT(17)	// CAN edit skills
+#define OLC_FLAG_NO_ABILITIES  BIT(15)	// CAN edit abilities
+#define OLC_FLAG_NO_CLASSES  BIT(16)	// CAN edit classes
+#define OLC_FLAG_NO_SKILLS  BIT(17)	// CAN edit skills
 #define OLC_FLAG_NO_VEHICLES  BIT(18)	// cannot edit vehicles
 #define OLC_FLAG_NO_MORPHS  BIT(19)	// cannot edit morphs
 #define OLC_FLAG_NO_QUESTS  BIT(19)	// cannot edit quests
 #define OLC_FLAG_NO_SOCIALS  BIT(20)	// cannot edit socials
-#define OLC_FLAG_NO_FACTIONS  BIT(21)	// cannot edit factionss
+#define OLC_FLAG_NO_FACTIONS  BIT(21)	// cannot edit factions
+#define OLC_FLAG_NO_GENERICS  BIT(21)	// cannot edit generics
+#define OLC_FLAG_NO_SHOPS  BIT(22)	// cannot edit shops
+#define OLC_FLAG_ALLOW_PROGRESS  BIT(23)	// CAN edit progress
 
 
 // for trigger editing
@@ -90,6 +96,14 @@
 #define TRIG_ARG_PHRASE_OR_WORDLIST  BIT(2)	// 0 = phrase, 1 = wordlist
 #define TRIG_ARG_COST  BIT(3)
 #define TRIG_ARG_OBJ_WHERE  BIT(4)
+
+
+// these cause the color change on olc labels
+#define OLC_LABEL_CHANGED  (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\tg*" : "\tg")
+#define OLC_LABEL_UNCHANGED  "\ty"
+#define OLC_LABEL_STR(cur, dflt)  ((cur && strcmp(cur, dflt)) ? OLC_LABEL_CHANGED : OLC_LABEL_UNCHANGED)
+#define OLC_LABEL_PTR(ptr)  (ptr ? OLC_LABEL_CHANGED : OLC_LABEL_UNCHANGED)
+#define OLC_LABEL_VAL(val, dflt)  (val != dflt ? OLC_LABEL_CHANGED : OLC_LABEL_UNCHANGED)
 
 
 // subcommands for olc

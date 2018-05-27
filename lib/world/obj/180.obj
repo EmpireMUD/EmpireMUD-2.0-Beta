@@ -363,7 +363,7 @@ A bladed bow made from a fiend's horns is lying here.~
 this demon's horns always neatly bow-shaped?
 ~
 20 mp ap 4
-0 3 0
+29 3 0
 14 0
 A
 15 3 0
@@ -397,10 +397,10 @@ some molten essence~
 Some molten essence is floating here.~
    This essence is released when the molten fiend's equipment is thrown into
 the fissure outside its lair. If you collect enough of it, maybe you can make
-something out of it?  
- 
+something out of it?
+
 While standing on the ledge, type 'list' to see the things you can make and
-'buy <item>' to buy one.  
+'buy <item>' to buy one.
 ~
 3 mp ao 7
 0 0 0

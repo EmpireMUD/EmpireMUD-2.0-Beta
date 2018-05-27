@@ -50,7 +50,7 @@ struct {
 	char *color;	// color code, e.g. \ty
 	int type;	// PUB_COMM_x
 	int min_level;	// absolute minimum
-	bitvector_t ignore_flag;	// PRF_x flag for ignoring this channel
+	bitvector_t ignore_flag;	// PRF_ flag for ignoring this channel
 	int history;
 } pub_comm[NUM_CHANNELS] = {
 	{ "shout", "\ty", PUB_COMM_SHORT_RANGE, 0, PRF_DEAF, CHANNEL_HISTORY_SAY },
@@ -309,7 +309,7 @@ void remove_ignore(char_data *ch, int idnum) {
 
 // uses subcmd as a position in the pub_comm array
 ACMD(do_pub_comm) {
-	char msgbuf[MAX_STRING_LENGTH], someonebuf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char msgbuf[MAX_STRING_LENGTH], someonebuf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], recog[MAX_STRING_LENGTH];
 	char level_string[10], invis_string[10];
 	descriptor_data *desc;
 	bool emote = FALSE;
@@ -409,17 +409,18 @@ ACMD(do_pub_comm) {
 			}
 		}
 		
-		// message to others:		
+		// message to others: (build msgbuf, recog, and someonebuf)
 		switch (pub_comm[subcmd].type) {
 			case PUB_COMM_GLOBAL:
 			case PUB_COMM_SHORT_RANGE: {
 				// leading color code is handled later
 				
+				sprintf(msgbuf, "$n%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 				if (IS_DISGUISED(ch) || IS_MORPHED(ch)) {
-					sprintf(msgbuf, "$n ($o)%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					sprintf(recog, "$n ($o)%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 				}
 				else {
-					sprintf(msgbuf, "$n%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					strcpy(recog, msgbuf);
 				}
 				
 				// invis version
@@ -430,10 +431,12 @@ ACMD(do_pub_comm) {
 			default: {
 				if (emote) {
 					sprintf(msgbuf, "[%s%s\tn%s%s] $o %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+					strcpy(recog, msgbuf);
 					sprintf(someonebuf, "[%s%s\tn%s] Someone %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
 				}
 				else {
 					sprintf(msgbuf, "[%s%s\tn $o%s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, invis_string, level_string, argument);
+					strcpy(recog, msgbuf);
 					sprintf(someonebuf, "[%s%s\tn Someone%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, argument);
 				}
 				break;
@@ -452,7 +455,8 @@ ACMD(do_pub_comm) {
 							// special color handling for non-ooc channels
 							if (pub_comm[subcmd].type != PUB_COMM_OOC) {
 								// use act() so that nobody gets the color code that wouldn't get the rest of the string
-								act(pub_comm[subcmd].color, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								//act(pub_comm[subcmd].color, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								send_to_char(pub_comm[subcmd].color, desc->character);
 							}
 							
 							// channel history
@@ -460,7 +464,12 @@ ACMD(do_pub_comm) {
 							
 							// send message
 							if (CAN_SEE_NO_DARK(desc->character, ch)) {
-								act(msgbuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && (IS_IMMORTAL(desc->character) || CAN_RECOGNIZE(desc->character, ch))) {
+									act(recog, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								}
+								else {
+									act(msgbuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
+								}
 							}
 							else {
 								act(someonebuf, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
@@ -477,6 +486,10 @@ ACMD(do_pub_comm) {
 								}
 								
 								add_to_channel_history(desc->character, pub_comm[subcmd].history, lbuf);
+							}
+							else {
+								// color terminator if they somehow missed the rest of the string
+								send_to_char("\t0", desc->character);
 							}
 						}
 					}
@@ -503,9 +516,10 @@ int top_slash_channel_id = 0;
 * !CHANNEL-JOINS preference (toggle channel-joins).
 *
 * @param struct slash_channel *chan The slash channel to announce to.
+* @param char_data *person The person being announced (for ignores).
 * @param const char *messg... String format of the messages
 */
-void announce_to_slash_channel(struct slash_channel *chan, const char *messg, ...) {
+void announce_to_slash_channel(struct slash_channel *chan, char_data *person, const char *messg, ...) {
 	struct player_slash_channel *slash;
 	char output[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	descriptor_data *d;
@@ -517,16 +531,56 @@ void announce_to_slash_channel(struct slash_channel *chan, const char *messg, ..
 		sprintf(lbuf, "[\t%c/%s\tn] %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
-			if (d->character && STATE(d) == CON_PLAYING && !PRF_FLAGGED(d->character, PRF_NO_CHANNEL_JOINS)) {
-				if ((slash = find_on_slash_channel(d->character, chan->id))) {
-					SEND_TO_Q(lbuf, d);
-					// no longer putting announcements on history
-					// process_add_to_channel_history(&(slash->history), lbuf);
-				}
+			if (!d->character || STATE(d) != CON_PLAYING) {
+				continue;
 			}
+			if (PRF_FLAGGED(d->character, PRF_NO_CHANNEL_JOINS) || is_ignoring(d->character, person)) {
+				continue;
+			}
+			if (!(slash = find_on_slash_channel(d->character, chan->id))) {
+				continue;
+			}
+			
+			SEND_TO_Q(lbuf, d);
+			// no longer putting announcements on history
+			// process_add_to_channel_history(&(slash->history), lbuf);
 		}
 
 		va_end(tArgList);
+	}
+}
+
+
+/**
+* Checks if a slash-channel is now empty, and deletes it.
+*
+* @param struct slash_channel *chan The channel to check/delete.
+*/
+void check_empty_slash_channel(struct slash_channel *chan) {
+	char_data *ch;
+	int count = 0;
+	
+	LL_FOREACH(character_list, ch) {
+		if (IS_NPC(ch)) {
+			continue;
+		}
+		if (!(find_on_slash_channel(ch, chan->id))) {
+			continue;
+		}
+		
+		++count;
+		break;	// only need 1
+	}
+	
+	if (!count) {	// delete the channel
+		LL_DELETE(slash_channel_list, chan);
+		if (chan->name) {
+			free(chan->name);
+		}
+		if (chan->lc_name) {
+			free(chan->lc_name);
+		}
+		free(chan);
 	}
 }
 
@@ -651,7 +705,15 @@ void skip_slash(char *string) {
 }
 
 
-void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *argument) {
+/**
+* Sends a message to the channel.
+*
+* @param char_data *ch The person speaking.
+* @param struct slash_channel *chan The channel to speak on.
+* @param char *argument What to say.
+* @param bool echo If TRUE, does not show the player's name.
+*/
+void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *argument, bool echo) {
 	struct player_slash_channel *slash;
 	char lbuf[MAX_STRING_LENGTH], invis_string[10];
 	descriptor_data *desc;
@@ -675,13 +737,13 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		return;
 	}
 
-	if (*argument == '*') {
+	if (*argument == '*' && !echo) {
 		emote = TRUE;
 		argument++;
 	}
 	skip_spaces(&argument);
 
-	if (GET_INVIS_LEV(ch) > 0) {
+	if (GET_INVIS_LEV(ch) > 0 && !echo) {
 		sprintf(invis_string, " (i%d)", GET_INVIS_LEV(ch));
 	}
 	else {
@@ -689,7 +751,7 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 	}
 
 	// msg to self
-	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT) && !echo) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {
@@ -700,7 +762,10 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		
 		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SLASH) : '0';
 
-		if (emote) {
+		if (echo) {
+			sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s\tn", color, chan->color, chan->name, color, invis_string, argument);
+		}
+		else if (emote) {
 			sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] $o %s\tn", color, chan->color, chan->name, color, invis_string, argument);
 		}
 		else {
@@ -720,7 +785,15 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 
 			color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH) : '0';
 
-			if (emote) {
+			if (echo) {
+				if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+					sprintf(lbuf, "\t%c[\t%c/%s\t%c (echo by %s%s)]: %s\tn", color, chan->color, chan->name, color, !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
+				}
+				else {	// can't see name
+					sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s\tn", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", argument);
+				}
+			}
+			else if (emote) {
 				sprintf(lbuf, "\t%c[\t%c/%s\t%c%s] %s %s\tn", color, chan->color, chan->name, color, CAN_SEE_NO_DARK(vict, ch) ? invis_string : "", !CAN_SEE_NO_DARK(vict, ch) ? "Someone" : "$o", argument);
 			}
 			else {
@@ -745,10 +818,10 @@ ACMD(do_slash_channel) {
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	descriptor_data *desc;
 	char_data *vict;
-	int iter;
+	int iter, count;
 	bool ok, found;
 	
-	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "\n" };
+	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "echo", "\n" };
 	
 	half_chop(argument, arg, arg2);
 	
@@ -808,6 +881,16 @@ ACMD(do_slash_channel) {
 		}
 	}
 	else if (!str_cmp(arg, "join")) {
+		// check safety limit
+		count = 0;
+		LL_FOREACH(GET_SLASH_CHANNELS(ch), slash) {
+			++count;
+		}
+		if (count > 30 && !IS_IMMORTAL(ch)) {
+			msg_to_char(ch, "You cannot be on more than 30 slash-channels at a time.\r\n");
+			return;
+		}
+		
 		// join channel: just first word
 		skip_slash(arg2);
 		any_one_arg(arg2, arg3);
@@ -862,7 +945,7 @@ ACMD(do_slash_channel) {
 			if (!global_mute_slash_channel_joins) {
 				// announce to channel members
 				if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
-					announce_to_slash_channel(chan, "%s has joined the channel", PERS(ch, ch, TRUE));
+					announce_to_slash_channel(chan, ch, "%s has joined the channel", PERS(ch, ch, TRUE));
 				}
 				// if player wouldn't see their own join announce
 				if (GET_INVIS_LEV(ch) > LVL_MORTAL || PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS) || PRF_FLAGGED(ch, PRF_INCOGNITO)) {
@@ -891,8 +974,10 @@ ACMD(do_slash_channel) {
 			}
 			
 			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
-				announce_to_slash_channel(chan, "%s has left the channel", PERS(ch, ch, TRUE));
+				announce_to_slash_channel(chan, ch, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
+			
+			check_empty_slash_channel(chan);
 		}
 	}
 	else if (!str_cmp(arg, "who")) {
@@ -935,18 +1020,60 @@ ACMD(do_slash_channel) {
 			HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
 			if (psh) {
 				LL_FOREACH(psh->history, hist) {
-					send_to_char(hist->message, ch);
-			
-					// check for newline
-					if (hist->message[strlen(hist->message) - 1] != '\n') {
-						send_to_char("\r\n", ch);
-					}
+					msg_to_char(ch, "%3s: %s%s", simple_time_since(hist->timestamp), hist->message, (hist->message[strlen(hist->message) - 1] != '\n') ? "\r\n" : "");
 				}
 			}
 		}
 	}
+	else if (!str_cmp(arg, "echo") && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_GECHO))) {
+		strcpy(buf, arg2);
+		half_chop(buf, arg2, arg3);
+		skip_slash(arg2);
+		skip_slash(arg3);
+		
+		// list players
+		if (!*arg2 || !*arg3) {
+			msg_to_char(ch, "Usage: /echo <channel> <text>\r\n");
+		}
+		else if (!(chan = find_slash_channel_by_name(arg2, TRUE))) {
+			msg_to_char(ch, "No such channel '%s'.\r\n", arg2);
+		}
+		else {
+			if (!find_on_slash_channel(ch, chan->id)) {
+				send_config_msg(ch, "ok_string");
+			}
+			speak_on_slash_channel(ch, chan, arg3, TRUE);
+		}
+	}
+	else if (!str_cmp(arg, "recase") && IS_IMMORTAL(ch)) {
+		strcpy(buf, arg2);
+		half_chop(buf, arg2, arg3);
+		skip_slash(arg2);
+		skip_slash(arg3);
+		
+		// list players
+		if (!*arg2 || !*arg3) {
+			msg_to_char(ch, "Usage: /recase <channel> <new capitalization>\r\n");
+		}
+		else if (!(chan = find_slash_channel_by_name(arg2, TRUE))) {
+			msg_to_char(ch, "No such channel '%s'.\r\n", arg2);
+		}
+		else if (str_cmp(chan->name, arg3)) {
+			msg_to_char(ch, "You cannot change the name or spelling, only the letter case.\r\n");
+		}
+		else if (!strcmp(chan->name, arg3)) {
+			msg_to_char(ch, "That doesn't seem to be a change in the current letter case.\r\n");
+		}
+		else {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has changed the case of /%s to /%s", GET_REAL_NAME(ch), chan->name, arg3);
+			free(chan->name);
+			chan->name = str_dup(arg3);
+			chan->color = compute_slash_channel_color(arg3);
+			send_config_msg(ch, "ok_string");
+		}
+	}
 	else if ((chan = find_slash_channel_for_char(ch, arg))) {
-		speak_on_slash_channel(ch, chan, arg2);
+		speak_on_slash_channel(ch, chan, arg2, FALSE);
 	}
 	else {
 		msg_to_char(ch, "You are not on a channel called '%s'.\r\n", arg);
@@ -1023,38 +1150,82 @@ ACMD(do_gsay) {
 
 
 /**
-* Uses subcmd as which channel history.
+* Uses subcmd for different histories.
 */
 ACMD(do_history) {
-	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats" };
+	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats", "rolls" };
 	struct channel_history_data *chd_iter;
 	bool found_crlf;
-	int pos;
+	int pos, type = NO_HISTORY;
 	
-	if (!REAL_NPC(ch)) {
-		msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[subcmd]);
+	if (REAL_NPC(ch)) {
+		return;	// nothing to show
+	}
 	
-		for (chd_iter = GET_HISTORY(REAL_CHAR(ch), subcmd); chd_iter; chd_iter = chd_iter->next) {
-			// verify has newline
-			pos = strlen(chd_iter->message) - 1;
-			found_crlf = FALSE;
-			while (pos > 0 && !found_crlf) {
-				if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n') {	
-					found_crlf = TRUE;
-				}
-				else if (chd_iter->message[pos] == '&' || chd_iter->message[pos-1] == '&') {
-					// probably color code
-					--pos;
-				}
-				else {
-					// found something not a crlf or a color code
-					break;
-				}
-			}
-			
-			// send message
-			msg_to_char(ch, "%s\tn%s", chd_iter->message, (found_crlf ? "" : "\r\n"));
+	skip_spaces(&argument);
+	
+	// determine type
+	if (subcmd == SCMD_GOD_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "godnet") || is_abbrev(argument, "wiznet") || is_abbrev(argument, "immortal")))) {
+		type = CHANNEL_HISTORY_GOD;
+	}
+	else if (subcmd == SCMD_TELL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(argument, "tells"))) {
+		type = CHANNEL_HISTORY_TELLS;
+	}
+	else if (subcmd == SCMD_SAY_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "says") || is_abbrev(argument, "group") || is_abbrev(argument, "gsays") || is_abbrev(argument, "emotes") || is_abbrev(argument, "socials")))) {
+		type = CHANNEL_HISTORY_SAY;
+	}
+	else if (subcmd == SCMD_EMPIRE_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "empire") || is_abbrev(argument, "esays") || is_abbrev(argument, "etalks")))) {
+		type = CHANNEL_HISTORY_EMPIRE;
+	}
+	else if (subcmd == SCMD_ROLL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(argument, "rolls"))) {
+		type = CHANNEL_HISTORY_ROLL;
+	}
+	else if (subcmd == SCMD_HISTORY && *argument == '/') {
+		// forward to /history
+		ACMD(do_slash_channel);
+		char buf[MAX_INPUT_LENGTH];
+		snprintf(buf, sizeof(buf), "history %s", argument);
+		do_slash_channel(ch, buf, 0, 0);
+		return;
+	}
+	else if (subcmd == SCMD_HISTORY) {
+		if (!*argument) {
+			msg_to_char(ch, "Usage: history <say | tell | /<channel> | empire | rolls%s>\r\n", IS_IMMORTAL(ch) ? " | immortal" : (IS_GOD(ch) ? " | god" : ""));
 		}
+		else {
+			msg_to_char(ch, "Invalid history channel.\r\n");
+		}
+		return;	// fail either way
+	}
+	
+	if (type == NO_HISTORY) {
+		msg_to_char(ch, "No history to show.\r\n");
+		return;
+	}
+	
+	// show a history
+	msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[type]);
+
+	for (chd_iter = GET_HISTORY(REAL_CHAR(ch), type); chd_iter; chd_iter = chd_iter->next) {
+		// verify has newline
+		pos = strlen(chd_iter->message) - 1;
+		found_crlf = FALSE;
+		while (pos > 0 && !found_crlf) {
+			if (chd_iter->message[pos] == '\r' || chd_iter->message[pos] == '\n') {	
+				found_crlf = TRUE;
+			}
+			else if (chd_iter->message[pos] == '&' || chd_iter->message[pos-1] == '&') {
+				// probably color code
+				--pos;
+			}
+			else {
+				// found something not a crlf or a color code
+				break;
+			}
+		}
+		
+		// send message
+		msg_to_char(ch, "%3s: %s\tn%s", simple_time_since(chd_iter->timestamp), chd_iter->message, (found_crlf ? "" : "\r\n"));
 	}
 }
 
@@ -1268,7 +1439,7 @@ ACMD(do_reply) {
 
 ACMD(do_say) {
 	char_data *c;
-	char lbuf[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH], recog[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	int ctype = (subcmd == SCMD_OOCSAY ? CUSTOM_COLOR_OOCSAY : CUSTOM_COLOR_SAY);
 	char color;
 	
@@ -1288,6 +1459,7 @@ ACMD(do_say) {
 		
 		// this leaves in a "%c" used for a color code
 		sprintf(string, "$n says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
+		sprintf(recog, "$n ($o) says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
 		
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
 			if (REAL_NPC(c) || ch == c || is_ignoring(c, ch))
@@ -1301,7 +1473,13 @@ ACMD(do_say) {
 			color = (!IS_NPC(c) && GET_CUSTOM_COLOR(c, ctype)) ? GET_CUSTOM_COLOR(c, ctype) : '0';
 			msg_to_char(c, "\t%c", color);
 			
-			sprintf(buf, string, color);
+			if ((IS_MORPHED(ch) || IS_DISGUISED(ch)) && (IS_IMMORTAL(c) || CAN_RECOGNIZE(c, ch))) {
+				sprintf(buf, recog, color);
+			}
+			else {
+				sprintf(buf, string, color);
+			}
+			
 			act(buf, FALSE, ch, 0, c, TO_VICT | DG_NO_TRIG);
 			
 			// channel history
@@ -1368,8 +1546,7 @@ ACMD(do_spec_comm) {
 		send_config_msg(ch, "need_approval_string");
 	}
 	else if (!*buf || !*buf2) {
-		sprintf(buf, "Whom do you want to %s... and what??\r\n", action_sing);
-		msg_to_char(ch, buf);
+		msg_to_char(ch, "Whom do you want to %s... and what??\r\n", action_sing);
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))
 		msg_to_char(ch, "You speak, but no words come out!\r\n");

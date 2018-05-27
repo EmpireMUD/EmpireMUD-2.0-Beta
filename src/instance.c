@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -33,6 +35,7 @@
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const int rev_dir[];
+extern int size_of_world;
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
@@ -53,10 +56,11 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
-static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
+void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
+void link_instance_entrance(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
-void unlink_instance_entrance(room_data *room, struct instance_data *inst);
+void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 
 // local globals
@@ -73,6 +77,7 @@ const bool is_location_rule[] = {
 	TRUE,	// ADV_LINK_PORTAL_BUILDING_NEW
 	FALSE,	// ADV_LINK_TIME_LIMIT
 	FALSE,	// ADV_LINK_NOT_NEAR_SELF
+	TRUE,	// ADV_LINK_PORTAL_CROP
 };
 
 
@@ -80,30 +85,25 @@ const bool is_location_rule[] = {
 //// INSTANCE-BUILDING ///////////////////////////////////////////////////////
 
 /**
-* Sets up the world entrance for an instanced adventure zone.
+* Sets up the map tile for an instance (without the interior). The instance
+* already has all the data it needs to do this.
 *
-* @param struct instance_data *inst The instance we're instantiating.
-* @param struct adventure_link_rule *rule The rule we're using to set it up.
-* @param room_data *loc The pre-validated world location.
-* @param int dir The chosen direction, IF required (may be DIR_RANDOM or NO_DIR, too).
-* @param int rotation The rotatable direction, if applicable (NO_DIR for none).
+* @param struct instance_data *inst The instance.
 */
-static void build_instance_entrance(struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
+void build_instance_exterior(struct instance_data *inst) {
 	void special_building_setup(char_data *ch, room_data *room);
 	void complete_building(room_data *room);
 	
 	char_data *mob, *next_mob;
-	obj_data *portal;
 	bld_data *bdg;
-	int my_dir;
 	
-	// nothing to link to!
-	if (!inst->start) {
+	// nerp
+	if (!inst->location) {
 		return;
 	}
 	
 	// purge mobs in the room
-	for (mob = ROOM_PEOPLE(loc); mob; mob = next_mob) {
+	for (mob = ROOM_PEOPLE(inst->location); mob; mob = next_mob) {
 		next_mob = mob->next_in_room;
 		
 		if (IS_NPC(mob)) {
@@ -111,81 +111,42 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 		}
 	}
 	
-	// ADV_LINK_x part 1: things that need buildings added
-	switch (rule->type) {
+	// ADV_LINK_x: things that need buildings added
+	switch (inst->rule->type) {
 		case ADV_LINK_BUILDING_NEW:
 		case ADV_LINK_PORTAL_BUILDING_NEW: {
-			if (!(bdg = building_proto(rule->value))) {
+			if (!(bdg = building_proto(inst->rule->value))) {
 				log("SYSERR: Error instantiating adventure #%d: invalid building in link rule", GET_ADV_VNUM(inst->adventure));
 				return;
 			}
 			
 			// make the building
-			disassociate_building(loc);
-			construct_building(loc, GET_BLD_VNUM(bdg));
-			special_building_setup(NULL, loc);
+			disassociate_building(inst->location);
+			construct_building(inst->location, GET_BLD_VNUM(bdg));
+			special_building_setup(NULL, inst->location);
 			
 			// exit?
-			if (dir != NO_DIR && ROOM_IS_CLOSED(loc)) {
-				create_exit(loc, SHIFT_DIR(loc, dir), dir, FALSE);
-
-				COMPLEX_DATA(loc)->entrance = rev_dir[dir];
+			if (inst->dir != NO_DIR && ROOM_IS_CLOSED(inst->location)) {
+				create_exit(inst->location, SHIFT_DIR(inst->location, inst->dir), inst->dir, FALSE);
+				COMPLEX_DATA(inst->location)->entrance = rev_dir[inst->dir];
 			}
 			
-			complete_building(loc);
+			complete_building(inst->location);
 			
 			// set these so it can be cleaned up later
-			SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_TEMPORARY);
-			SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_TEMPORARY);			
+			SET_BIT(ROOM_BASE_FLAGS(inst->location), ROOM_AFF_TEMPORARY);
+			SET_BIT(ROOM_AFF_FLAGS(inst->location), ROOM_AFF_TEMPORARY);			
 			break;
 		}
 	}
 	
 	// small tweaks to room
-	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_HAS_INSTANCE);
-	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_HAS_INSTANCE);
+	SET_BIT(ROOM_BASE_FLAGS(inst->location), ROOM_AFF_HAS_INSTANCE);
+	SET_BIT(ROOM_AFF_FLAGS(inst->location), ROOM_AFF_HAS_INSTANCE);
 	
 	// and the home room
-	SET_BIT(ROOM_BASE_FLAGS(HOME_ROOM(loc)), ROOM_AFF_HAS_INSTANCE);
-	SET_BIT(ROOM_AFF_FLAGS(HOME_ROOM(loc)), ROOM_AFF_HAS_INSTANCE);
-	
-	// ADV_LINK_x part 2: portal or direction
-	switch (rule->type) {
-		case ADV_LINK_BUILDING_EXISTING:
-		case ADV_LINK_BUILDING_NEW: {
-			my_dir = (rule->dir != DIR_RANDOM ? rule->dir : determine_random_exit(inst->adventure, loc, inst->start));
-			if (ADVENTURE_FLAGGED(inst->adventure, ADV_ROTATABLE) && rotation != NO_DIR && my_dir != NO_DIR) {
-				my_dir = confused_dirs[rotation][0][my_dir];
-			}
-			if (my_dir != NO_DIR) {
-				create_exit(loc, inst->start, my_dir, TRUE);
-			}
-			break;
-		}
-		case ADV_LINK_PORTAL_WORLD:
-		case ADV_LINK_PORTAL_BUILDING_EXISTING:
-		case ADV_LINK_PORTAL_BUILDING_NEW: {
-			if (obj_proto(rule->portal_in)) {
-				portal = read_object(rule->portal_in, TRUE);
-				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->start);
-				obj_to_room(portal, loc);
-				if (ROOM_PEOPLE(IN_ROOM(portal))) {
-					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
-				}
-				load_otrigger(portal);
-			}
-			if (obj_proto(rule->portal_out)) {
-				portal = read_object(rule->portal_out, TRUE);
-				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(loc);
-				obj_to_room(portal, inst->start);
-				if (ROOM_PEOPLE(IN_ROOM(portal))) {
-					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
-				}
-				load_otrigger(portal);
-			}
-			break;
-		}
-	}
+	SET_BIT(ROOM_BASE_FLAGS(HOME_ROOM(inst->location)), ROOM_AFF_HAS_INSTANCE);
+	SET_BIT(ROOM_AFF_FLAGS(HOME_ROOM(inst->location)), ROOM_AFF_HAS_INSTANCE);
 }
 
 
@@ -200,7 +161,9 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 */
 struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir) {
 	struct instance_data *inst, *temp;
+	char_data *ch;
 	int rotation;
+	bool present;
 	
 	// basic sanitation
 	if (!loc) {
@@ -249,11 +212,35 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	inst->start = NULL;
 	inst->size = 0;
 	
-	// make sure it is in the instance_list BEFORE adding rooms (for create_room updates)
-	instantiate_rooms(adv, inst, rule, loc, dir, rotation);
+	// store data on instantiation
+	inst->dir = dir;
+	inst->rotation = rotation;
+	CREATE(inst->rule, struct adventure_link_rule, 1);
+	*inst->rule = *rule;	// COPY the rule
+	inst->rule->next = NULL;
 	
-	// reset instance (spawns)
-	reset_instance(inst);
+	// check for players
+	present = FALSE;
+	LL_FOREACH2(ROOM_PEOPLE(loc), ch, next_in_room) {
+		if (!IS_NPC(ch)) {
+			present = TRUE;
+			break;
+		}
+	}
+	
+	// set up the outside
+	build_instance_exterior(inst);
+	
+	if (IS_SET(GET_ADV_FLAGS(adv), ADV_CAN_DELAY_LOAD) && !present) {
+		SET_BIT(inst->flags, INST_NEEDS_LOAD);
+	}
+	else {	// normal instantiation
+		// make sure it is in the instance_list BEFORE adding rooms (for create_room updates)
+		instantiate_rooms(adv, inst, rule, loc, dir, rotation);
+		
+		// reset instance (spawns)
+		reset_instance(inst);
+	}
 	
 	return inst;
 }
@@ -426,7 +413,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 * @return room_data* The new room.
 */
 static room_data *instantiate_one_room(struct instance_data *inst, room_template *rmt) {
-	extern room_data *create_room();
+	extern room_data *create_room(room_data *home);
 	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
 	
@@ -437,7 +424,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 		return NULL;
 	}
 	
-	room = create_room();
+	room = create_room(NULL);
 	attach_template_to_room(rmt, room);
 	sect = sector_proto(config_get_int("default_adventure_sect"));
 	perform_change_sect(room, NULL, sect);
@@ -468,7 +455,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 * @param int dir A direction, for rules that need it.
 * @param int rotation The direction the instance "faces", e.g. NORTH.
 */
-static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
+void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
 	void sort_exits(struct room_direction_data **list);
 	
 	room_data **room_list = NULL;
@@ -476,6 +463,12 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	room_template *rmt, *next_rmt;
 	struct exit_template *ex;
 	int iter, pos;
+	
+	REMOVE_BIT(inst->flags, INST_NEEDS_LOAD);
+	
+	if (!inst->location) {
+		return;
+	}
 	
 	// this is sometimes larger than it needs to be (and that's ok)
 	inst->size = (GET_ADV_END_VNUM(adv) - GET_ADV_START_VNUM(adv)) + 1;
@@ -500,9 +493,18 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 			if (room_list[pos]) {
 				if (!inst->start) {
 					inst->start = room_list[pos];
+					
+					if (inst->location) {
+						GET_ISLAND_ID(inst->start) = GET_ISLAND_ID(inst->location);
+						GET_ISLAND(inst->start) = GET_ISLAND(inst->location);
+						GET_MAP_LOC(inst->start) = GET_MAP_LOC(inst->location);
+					}
 				}
 				else {
 					COMPLEX_DATA(room_list[pos])->home_room = inst->start;
+					GET_ISLAND_ID(room_list[pos]) = GET_ISLAND_ID(inst->start);
+					GET_ISLAND(room_list[pos]) = GET_ISLAND(inst->start);
+					GET_MAP_LOC(room_list[pos]) = GET_MAP_LOC(inst->location);
 				}
 			}
 			
@@ -524,8 +526,8 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	
 	// attach the instance to the world (do this before adding dirs, because it may take up a random dir slot)
 	// do not rotate this dir; it was pre-validated for building
-	build_instance_entrance(inst, rule, loc, dir, rotation);
-
+	link_instance_entrance(inst);
+	
 	// exits: non-random first
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter] && template_list[iter]) {
@@ -559,6 +561,62 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter]) {
 			load_wtrigger(room_list[iter]);
+		}
+	}
+}
+
+
+/**
+* Links the instance entrance to the already-existing interior. The instance
+* already has all the data it needs to do this.
+*
+* @param struct instance_data *inst The instance.
+*/
+void link_instance_entrance(struct instance_data *inst) {
+	obj_data *portal;
+	int my_dir;
+	
+	// wut
+	if (!inst->location || !inst->start || !inst->rule) {
+		return;
+	}
+	
+	// ADV_LINK_x: link exits by type
+	switch (inst->rule->type) {
+		case ADV_LINK_BUILDING_EXISTING:
+		case ADV_LINK_BUILDING_NEW: {
+			my_dir = (inst->rule->dir != DIR_RANDOM ? inst->rule->dir : determine_random_exit(inst->adventure, inst->location, inst->start));
+			if (ADVENTURE_FLAGGED(inst->adventure, ADV_ROTATABLE) && inst->rotation != NO_DIR && my_dir != NO_DIR) {
+				my_dir = confused_dirs[inst->rotation][0][my_dir];
+			}
+			if (my_dir != NO_DIR) {
+				create_exit(inst->location, inst->start, my_dir, TRUE);
+			}
+			break;
+		}
+		case ADV_LINK_PORTAL_WORLD:
+		case ADV_LINK_PORTAL_BUILDING_EXISTING:
+		case ADV_LINK_PORTAL_BUILDING_NEW:
+		case ADV_LINK_PORTAL_CROP: {
+			if (obj_proto(inst->rule->portal_in)) {
+				portal = read_object(inst->rule->portal_in, TRUE);
+				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->start);
+				obj_to_room(portal, inst->location);
+				if (ROOM_PEOPLE(IN_ROOM(portal))) {
+					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
+				}
+				load_otrigger(portal);
+			}
+			if (obj_proto(inst->rule->portal_out)) {
+				portal = read_object(inst->rule->portal_out, TRUE);
+				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->location);
+				obj_to_room(portal, inst->start);
+				if (ROOM_PEOPLE(IN_ROOM(portal))) {
+					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
+				}
+				load_otrigger(portal);
+			}
+			break;
 		}
 	}
 }
@@ -632,10 +690,9 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	extern bool is_entrance(room_data *room);
 	
 	room_data *home;
-	struct island_info *isle;
+	struct island_info *isle = NULL;
 	empire_data *emp;
 	char_data *ch;
-	int island_id;
 	bool junk;
 	
 	const bitvector_t no_no_flags = ROOM_AFF_DISMANTLING | ROOM_AFF_HAS_INSTANCE;
@@ -662,12 +719,28 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	if (LINK_FLAGGED(rule, ADV_LINKF_CITY_ONLY) && (!home || !ROOM_OWNER(home))) {
 		return FALSE;
 	}
+		
+	// continental or incontinental?
+	if (LINK_FLAGGED(rule, ADV_LINKF_CONTINENT_ONLY | ADV_LINKF_NO_CONTINENT)) {
+		if (!isle) {
+			isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
+		}
+		if (isle && LINK_FLAGGED(rule, ADV_LINKF_CONTINENT_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT)) {
+			return FALSE;
+		}
+		else if (isle && LINK_FLAGGED(rule, ADV_LINKF_NO_CONTINENT) && IS_SET(isle->flags, ISLE_CONTINENT)) {
+			return FALSE;
+		}
+	}
 	
 	// things that only matter if we received/found loc
 	if (loc) {
 		// ownership check
-		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
+		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY | ADV_LINKF_CLAIMED_ONLY)) {
 			return FALSE;
+		}
+		if (!ROOM_OWNER(home) && LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_ONLY)) {
+			return FALSE;	// must be claimed
 		}
 		if (ROOM_OWNER(home) && (EMPIRE_LAST_LOGON(ROOM_OWNER(home)) + (config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK)) < time(0)) {
 			return FALSE;	// owner is timed out -- don't spawn here
@@ -698,9 +771,20 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	}
 	
 	// newbie island checks
-	island_id = map ? map->island : GET_ISLAND_ID(loc);
-	if (island_id != NO_ISLAND) {
-		isle = get_island(island_id, TRUE);
+	if (!isle) {
+		isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
+	}
+	if (isle && isle->id != NO_ISLAND) {
+		if (!ADVENTURE_FLAGGED(adv, ADV_IGNORE_ISLAND_LEVELS | ADV_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT)) {	// not continent: check levels
+			if (GET_ADV_MIN_LEVEL(adv) > 0 && (!isle->max_level || isle->max_level + 50 < GET_ADV_MIN_LEVEL(adv))) {
+				// island's max level is more than 50 below the adventure's minimum
+				return FALSE;
+			}
+			if (GET_ADV_MAX_LEVEL(adv) > 0 && isle->min_level > GET_ADV_MAX_LEVEL(adv) + 50) {
+				// island's min level is more than 50 above the adventure's maximum level
+				return FALSE;
+			}
+		}
 		if (IS_SET(isle->flags, ISLE_NEWBIE)) {	// is newbie island
 			if (GET_ADV_MIN_LEVEL(adv) > config_get_int("newbie_adventure_cap") && !ADVENTURE_FLAGGED(adv, ADV_NEWBIE_ONLY)) {
 				return FALSE;
@@ -752,6 +836,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	room_data *room, *next_room, *loc, *shift, *found = NULL;
 	int dir, iter, sub, num_found, pos;
 	sector_data *findsect = NULL;
+	crop_data *findcrop = NULL;
 	bool match_buildon = FALSE;
 	bld_data *findbdg = NULL, *bdg = NULL;
 	struct map_data *map;
@@ -787,6 +872,10 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 			match_buildon = TRUE;
 			break;
 		}
+		case ADV_LINK_PORTAL_CROP: {
+			findcrop = crop_proto(rule->value);
+			break;
+		}
 		default: {
 			// type not implemented or cannot be used to generate a link
 			return NULL;
@@ -794,11 +883,14 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	}
 	
 	// two ways of doing this:
-	if (findsect) {	// scan the whole map
+	if (findsect || findcrop) {	// scan the whole map
 		num_found = 0;
 		for (map = land_map; map; map = map->next) {
 			// looking for sect: fail
 			if (findsect && map->sector_type != findsect) {
+				continue;
+			}
+			if (findcrop && map->crop_type != findcrop) {
 				continue;
 			}
 			
@@ -839,8 +931,8 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 			pos = number(0, MAP_SIZE-1);
 			map = &(world_map[MAP_X_COORD(pos)][MAP_Y_COORD(pos)]);
 			
-			// shortcut: skip BASIC_OCEAN
-			if (GET_SECT_VNUM(map->sector_type) == BASIC_OCEAN) {
+			// shortcut: skip !SECT_IS_LAND_MAP
+			if (!SECT_IS_LAND_MAP(map->sector_type)) {
 				continue;
 			}
 			
@@ -968,21 +1060,25 @@ void generate_adventure_instances(void) {
 * This deletes an instance but does NOT save the instance file.
 *
 * @param struct instance_data *inst The instance to delete.
+* @param bool run_cleanup If TRUE, runs cleanup scripts. If FALSE, skips this.
 */
-void delete_instance(struct instance_data *inst) {
+void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	void expire_instance_quests(struct instance_data *inst);
-	void extract_pending_chars();
+	extern room_data *get_extraction_room(void);
 	void relocate_players(room_data *room, room_data *to_room);
 	
 	struct instance_mob *im, *next_im;
+	struct adventure_link_rule *rule;
 	vehicle_data *veh, *next_veh;
 	struct instance_data *temp;
 	char_data *mob, *next_mob;
-	room_data *room;
+	room_data *room, *extraction_room;
 	int iter;
 	
 	// disable instance saving
 	instance_save_wait = TRUE;
+	
+	extraction_room = get_extraction_room();
 	
 	expire_instance_quests(inst);
 	
@@ -1000,7 +1096,7 @@ void delete_instance(struct instance_data *inst) {
 		}
 	
 		// unlink from location:
-		unlink_instance_entrance(inst->location, inst);
+		unlink_instance_entrance(inst->location, inst, run_cleanup);
 	}
 	
 	// any portal in will be cleaned up by delete_room
@@ -1015,13 +1111,17 @@ void delete_instance(struct instance_data *inst) {
 				MOB_INSTANCE_ID(mob) = NOTHING;
 				// shouldn't need this: subtract_instance_mob(inst, GET_MOB_VNUM(mob));
 			}
+			else if ((FIGHTING(mob) || GET_POS(mob) == POS_FIGHTING) && (!ROOM_INSTANCE(IN_ROOM(mob)) || ROOM_INSTANCE(IN_ROOM(mob)) == inst)) {
+				// delayed-despawn if fighting -- we don't want to interrupt a fight
+				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+			}
 			else {
 				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+				char_to_room(mob, extraction_room);
 				extract_char(mob);
 			}
 		}
 	}
-	extract_pending_chars();
 	
 	// remove rooms
 	for (iter = 0; iter < inst->size; ++iter) {
@@ -1041,7 +1141,13 @@ void delete_instance(struct instance_data *inst) {
 	
 	// other stuff to free
 	HASH_ITER(hh, inst->mob_counts, im, next_im) {
+		HASH_DEL(inst->mob_counts, im);
 		free(im);
+	}
+	
+	while ((rule = inst->rule)) {
+		inst->rule = rule->next;
+		free(rule);
 	}
 	
 	free(inst);
@@ -1065,7 +1171,7 @@ int delete_all_instances(adv_data *adv) {
 		next_inst = inst->next;
 		
 		if (inst->adventure == adv) {
-			delete_instance(inst);
+			delete_instance(inst, TRUE);
 			++count;
 		}
 	}
@@ -1222,7 +1328,7 @@ void reset_instances(void) {
 void prune_instances(void) {
 	struct instance_data *inst, *next_inst;
 	struct adventure_link_rule *rule;
-	bool save = FALSE;
+	bool delayed, save = FALSE;
 	room_data *room, *next_room;
 	
 	// look for dead instances
@@ -1230,12 +1336,13 @@ void prune_instances(void) {
 		next_inst = inst->next;
 		
 		rule = get_link_rule_by_type(inst->adventure, ADV_LINK_TIME_LIMIT);
+		delayed = IS_SET(inst->flags, INST_NEEDS_LOAD) ? TRUE : FALSE;
 		
 		// look for completed or orphaned instances
-		if (INSTANCE_FLAGGED(inst, INST_COMPLETED) || !inst->start || !inst->location || inst->size == 0 || (rule && (inst->created + 60 * rule->value) < time(0))) {
+		if (!inst->adventure || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!inst->start && !delayed) || !inst->location || (inst->size == 0 && !delayed) || (rule && (inst->created + 60 * rule->value) < time(0))) {
 			// well, only if empty
 			if (count_players_in_instance(inst, TRUE, NULL) == 0) {
-				delete_instance(inst);
+				delete_instance(inst, TRUE);
 				save = TRUE;
 			}
 		}
@@ -1249,7 +1356,7 @@ void prune_instances(void) {
 		
 		// scan only non-map rooms for orphaned instance rooms
 		if (IS_ADVENTURE_ROOM(room) && (!COMPLEX_DATA(room) || !COMPLEX_DATA(room)->instance)) {
-			log("Deleting room %d due to missing instance.", GET_ROOM_VNUM(room));
+			log("Deleting room %d (template %d) due to missing instance.", GET_ROOM_VNUM(room), GET_ROOM_TEMPLATE(room) ? GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)) : NOTHING);
 			delete_room(room, FALSE);	// must call check_all_exits
 			save = TRUE;
 		}
@@ -1270,11 +1377,12 @@ void prune_instances(void) {
 *
 * @param room_data *room The map (or interior) location that was the anchor for an instance.
 * @param struct instance_data *inst The instance being cleaned up.
+* @param bool run_cleanup If TRUE, runs cleanup scripts. If FALSE, skips this.
 */
-void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
+void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup) {
 	extern bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 	
-	adv_data *adv = inst->adventure;
+	adv_data *adv = inst ? inst->adventure : NULL;
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;
 	
@@ -1286,7 +1394,7 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 	REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
 	
 	// check for scripts
-	if (adv && GET_ADV_SCRIPTS(adv)) {
+	if (run_cleanup && adv && GET_ADV_SCRIPTS(adv)) {
 		// add scripts
 		LL_FOREACH(GET_ADV_SCRIPTS(adv), tpl) {
 			if (!(proto = real_trigger(tpl->vnum))) {
@@ -1365,6 +1473,30 @@ void add_instance_mob(struct instance_data *inst, mob_vnum vnum) {
 
 
 /**
+* This function adjusts the instance limits based on the size of the game
+* world, so smaller worlds get fewer instances and larger ones get more.
+* It uses the magic number "330000" because that size was used in developing
+* the game.
+*
+* You can shut this off with the "adjust_instance_limits" config.
+*
+* @param adv_data *adv Which adventure.
+* @return int The adjusted maximum number of instances.
+*/
+int adjusted_instance_limit(adv_data *adv) {
+	int val;
+	
+	if (ADVENTURE_FLAGGED(adv, ADV_IGNORE_WORLD_SIZE) || !config_get_bool("adjust_instance_limits")) {
+		return GET_ADV_MAX_INSTANCES(adv);
+	}
+	else {
+		val = round((double)GET_ADV_MAX_INSTANCES(adv) * size_of_world / 330000);
+		return MAX(1, val);	// guarantee 1
+	}
+}
+
+
+/**
 * Determines if a player is eligible to enter an instance in any way.
 *
 * @param char_data *ch The person trying to enter.
@@ -1405,13 +1537,29 @@ bool can_instance(adv_data *adv) {
 		// the start vnum MUST be a room template
 		return FALSE;
 	}
-	if (count_instances(adv) >= GET_ADV_MAX_INSTANCES(adv)) {
+	if (count_instances(adv) >= adjusted_instance_limit(adv)) {
 		// never more
 		return FALSE;
 	}
 	
 	// yay!
 	return TRUE;
+}
+
+
+/**
+* Checks if the instance needs a delayed-load and, if so, does it.
+*
+* @param struct instance_data *inst The instance to check/load.
+*/
+void check_instance_is_loaded(struct instance_data *inst) {
+	void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
+	void reset_instance(struct instance_data *inst);
+	
+	if (IS_SET(inst->flags, INST_NEEDS_LOAD) && inst->location) {
+		instantiate_rooms(inst->adventure, inst, inst->rule, inst->location, inst->dir, inst->rotation);
+		reset_instance(inst);
+	}
 }
 
 
@@ -1546,7 +1694,7 @@ room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
 	if (!adv) {
 		return NULL;	// no such adventure
 	}
-	if (!(map = get_map_location_for(from))) {
+	if (!(map = (GET_MAP_LOC(from) ? real_room(GET_MAP_LOC(from)->vnum) : NULL))) {
 		return NULL;	// does not work if no map loc
 	}
 	
@@ -1567,6 +1715,7 @@ room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
 	}
 	
 	if (closest) {
+		check_instance_is_loaded(closest);
 		return find_room_template_in_instance(closest, vnum);
 	}
 	else {
@@ -1778,6 +1927,30 @@ void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum) {
 }
 
 
+/**
+* This function updates the numbers that are used to adjust the number of
+* instances based on the size of the world (land tiles only).
+*/
+void update_instance_world_size(void) {
+	extern int stats_get_sector_count(sector_data *sect);
+	void update_world_count();
+	
+	sector_data *sect, *next_sect;
+	int total;
+	
+	// fresh numbers
+	update_world_count();
+	
+	// determine total land area
+	total = 0;
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		total += stats_get_sector_count(sect);
+	}
+	
+	size_of_world = MAX(1, total);	// don't allow 0
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// INSTANCE FILE UTILS /////////////////////////////////////////////////////
 
@@ -1813,7 +1986,7 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 
 /**
 * @param adv_data *adv The adventure to search.
-* @param int type Any ADV_LINK_x const.
+* @param int type Any ADV_LINK_ const.
 * @return struct adventure_link_rule* The found rule, or NULL.
 */
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type) {
@@ -1870,7 +2043,9 @@ void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, in
 * @param any_vnum idnum The instance id.
 * @return struct instance_data* The instance.
 */
-static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {	
+static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
+	void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
+	
 	struct instance_data *inst;
 	char line[256], str_in[256];
 	int i_in[3];
@@ -1910,9 +2085,24 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': {	// direction data
+				if (sscanf(line, "D %d %d", &i_in[0], &i_in[1]) != 2) {
+					log("SYSERR: Format error in D line of instance, got %s", line);
+					exit(1);
+				}
+				
+				inst->dir = i_in[0];
+				inst->rotation = i_in[1];
+				
+				break;
+			}
+			case 'L': {	// the linking rule that was used
+				parse_link_rule(fl, &inst->rule, "instance");
+				break;
+			}
 			case 'R': {
 				if (sscanf(line, "R %d", &i_in[0]) != 1) {
-					log("SYSERR: Format error in R line of instance, gotL %s", line);
+					log("SYSERR: Format error in R line of instance, got %s", line);
 					exit(1);
 				}
 				
@@ -1988,12 +2178,18 @@ static void renum_instances(void) {
 			// set up instance data
 			if (inst->room[iter] && COMPLEX_DATA(inst->room[iter])) {
 				COMPLEX_DATA(inst->room[iter])->instance = inst;
+				
+				if (inst->location) {
+					GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(inst->location);
+					GET_ISLAND(inst->room[iter]) = GET_ISLAND(inst->location);
+					GET_MAP_LOC(inst->room[iter]) = GET_MAP_LOC(inst->location);
+				}
 			}
 		}
 		
 		// check bad instance
-		if (!inst->location || !inst->start) {
-			delete_instance(inst);
+		if (!inst->adventure || !inst->location || (!inst->start && !IS_SET(inst->flags, INST_NEEDS_LOAD))) {
+			delete_instance(inst, FALSE);
 		}
 	}
 }
@@ -2043,6 +2239,8 @@ void load_instances(void) {
 * Writes all instances to the instance file.
 */
 void save_instances(void) {
+	void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
+	
 	struct instance_data *inst;
 	FILE *fl;
 	int iter;
@@ -2061,6 +2259,16 @@ void save_instances(void) {
 		fprintf(fl, "#%d\n", inst->id);
 		fprintf(fl, "%d %d %d %s\n", GET_ADV_VNUM(inst->adventure), inst->location ? GET_ROOM_VNUM(inst->location) : NOWHERE, inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE, bitv_to_alpha(inst->flags));
 		fprintf(fl, "%d %ld %ld\n", inst->level, inst->created, inst->last_reset);
+		
+		// 'D' direction data
+		if (inst->dir || inst->rotation) {
+			fprintf(fl, "D %d %d\n", inst->dir, inst->rotation);
+		}
+		
+		// 'L' the linking rule that built the instance (a copy of the one from the adv)
+		write_linking_rules_to_file(fl, 'L', inst->rule);
+		
+		// 'R' rooms
 		for (iter = 0; iter < inst->size; ++iter) {
 			if (inst->room[iter]) {
 				fprintf(fl, "R %d\n", GET_ROOM_VNUM(inst->room[iter]));

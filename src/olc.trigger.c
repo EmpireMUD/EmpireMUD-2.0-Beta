@@ -57,6 +57,8 @@ const char *trig_arg_phrase_type[] = {
 	"\n"
 };
 
+const char *default_trig_name = "new trigger";
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -106,7 +108,7 @@ trig_data *create_trigger_table_entry(trig_vnum vnum) {
 	add_trigger_to_table(trig);
 	
 	// simple default data (triggers cannot be nameless)
-	trig->name = str_dup("New Trigger");
+	trig->name = str_dup(default_trig_name);
 		
 	// save index and crop file now
 	save_index(DB_BOOT_TRG);
@@ -278,6 +280,7 @@ bool delete_from_proto_list_by_vnum(struct trig_proto_list **list, trig_vnum vnu
 */
 void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
+	void free_freeable_triggers();
 	void remove_trigger_from_table(trig_data *trig);
 	
 	trig_data *trig;
@@ -286,6 +289,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	char_data *mob, *next_mob;
+	shop_data *shop, *next_shop;
 	descriptor_data *dsc;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
@@ -302,13 +306,13 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		return;
 	}
 	
-	// remove from hash table
-	remove_trigger_from_table(trig);
-	
 	// look for live mobs with this script and remove
 	for (mob = character_list; mob; mob = mob->next) {
 		if (IS_NPC(mob) && SCRIPT(mob)) {
 			remove_live_script_by_vnum(SCRIPT(mob), vnum);
+			if (!TRIGGERS(SCRIPT(mob))) {
+				extract_script(mob, MOB_TRIGGER);
+			}
 		}
 	}
 	
@@ -316,6 +320,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	for (obj = object_list; obj; obj = obj->next) {
 		if (SCRIPT(obj)) {
 			remove_live_script_by_vnum(SCRIPT(obj), vnum);
+			if (!TRIGGERS(SCRIPT(obj))) {
+				extract_script(obj, OBJ_TRIGGER);
+			}
 		}
 	}
 	
@@ -323,6 +330,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	LL_FOREACH(vehicle_list, veh) {
 		if (SCRIPT(veh)) {
 			remove_live_script_by_vnum(SCRIPT(veh), vnum);
+			if (!TRIGGERS(SCRIPT(veh))) {
+				extract_script(veh, VEH_TRIGGER);
+			}
 		}
 	}
 	
@@ -330,9 +340,18 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (SCRIPT(room)) {
 			remove_live_script_by_vnum(SCRIPT(room), vnum);
+			if (!TRIGGERS(SCRIPT(room))) {
+				extract_script(room, WLD_TRIGGER);
+			}
 		}
 		delete_from_proto_list_by_vnum(&(room->proto_script), vnum);
 	}
+	
+	// free them before continuing (or risk memory error doom)
+	free_freeable_triggers();
+	
+	// remove from hash table (AFTER deleting live copies)
+	remove_trigger_from_table(trig);
 	
 	// remove from adventures
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
@@ -381,6 +400,16 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_TRIGGER, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// update vehicle protos
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (delete_from_proto_list_by_vnum(&veh->proto_script, vnum)) {
@@ -410,6 +439,14 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(dsc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(dsc, "A trigger used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(dsc)) {
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(dsc)), QG_TRIGGER, vnum);
+			
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(dsc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(dsc, "A trigger used by the shop you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_ROOM_TEMPLATE(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_ROOM_TEMPLATE(dsc)->proto_script, vnum)) {
@@ -457,7 +494,10 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
 		
-		if (is_abbrev(type_arg, "-attaches")) {
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		else if (is_abbrev(type_arg, "-attaches")) {
 			argument = any_one_word(argument, val_arg);
 			if ((only_attaches = search_block(val_arg, trig_attach_types, FALSE)) == NOTHING) {
 				msg_to_char(ch, "Invalid attach type '%s'.\r\n", val_arg);
@@ -586,6 +626,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	struct trig_proto_list *trig;
 	room_template *rmt, *next_rmt;
 	vehicle_data *veh, *next_veh;
+	shop_data *shop, *next_shop;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
@@ -683,6 +724,19 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_TRIGGER, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+		}
+	}
+	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
@@ -712,12 +766,13 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_trigger(descriptor_data *desc, char *script_text) {
+	EVENT_CANCEL_FUNC(cancel_wait_event);
 	extern struct cmdlist_element *compile_command_list(char *input);
 	void free_varlist(struct trig_var_data *vd);
 	
 	trig_data *proto, *live_trig, *next_trig, *find, *trig = GET_OLC_TRIGGER(desc);
 	trig_vnum vnum = GET_OLC_VNUM(desc);
-	struct cmdlist_element *cmd, *next_cmd;
+	struct cmdlist_element *cmd, *next_cmd, *cmdlist;
 	struct script_data *sc;
 	bool free_text = FALSE;
 	UT_hash_handle hh;
@@ -726,6 +781,36 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	// have a place to save it?
 	if (!(proto = real_trigger(vnum))) {
 		proto = create_trigger_table_entry(vnum);
+	}
+	
+	// build new cmdlist
+	cmdlist = compile_command_list(script_text);
+	
+	// update live triggers
+	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
+		if (GET_TRIG_VNUM(live_trig) != vnum) {
+			continue;	// wrong trigger
+		}
+		
+		// find any 'waiting' copies and kill them
+		if (GET_TRIG_WAIT(live_trig)) {
+			event_cancel(GET_TRIG_WAIT(live_trig), cancel_wait_event);
+			GET_TRIG_WAIT(live_trig) = NULL;
+			GET_TRIG_DEPTH(live_trig) = 0;
+			free_varlist(GET_TRIG_VARS(live_trig));
+			GET_TRIG_VARS(live_trig) = NULL;
+		}
+		
+		// check pointers
+		if (live_trig->name == proto->name) {
+			live_trig->name = trig->name;
+		}
+		if (live_trig->arglist == proto->arglist) {
+			live_trig->arglist = trig->arglist;
+		}
+		if (live_trig->cmdlist == proto->cmdlist) {
+			live_trig->cmdlist = cmdlist;
+		}
 	}
 	
 	// free existing commands
@@ -743,6 +828,9 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	if (proto->name) {
 		free(proto->name);
 	}
+	if (proto->var_list) {
+		free_varlist(proto->var_list);
+	}
 	
 	if (!*script_text) {
 		// do not free old script text
@@ -751,7 +839,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	}
 	
 	// Recompile the command list from the new script
-	trig->cmdlist = compile_command_list(script_text);
+	trig->cmdlist = cmdlist;
 	
 	if (free_text) {
 		free(script_text);
@@ -760,9 +848,9 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 
 	// make the prorotype look like what we have
 	hh = proto->hh;	// preserve hash handle
-	trig_data_copy(proto, trig);
+	*proto = *trig;
 	proto->hh = hh;
-	proto->vnum = vnum;	// ensure correct vnu,
+	proto->vnum = vnum;	// ensure correct vnum
 	
 	// remove and reattach existing copies of this trigger
 	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
@@ -844,7 +932,7 @@ struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_stor
 		new->vnum = NOTHING;
 
 		// Set up some defaults
-		new->name = strdup("new trigger");
+		new->name = strdup(default_trig_name);
 		new->attach_type = MOB_TRIGGER;
 		new->trigger_type = NOBITS;
 
@@ -880,31 +968,31 @@ void olc_show_trigger(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !real_trigger(GET_OLC_VNUM(ch->desc)) ? "new trigger" : GET_TRIG_NAME(real_trigger(GET_OLC_VNUM(ch->desc))));
-	sprintf(buf + strlen(buf), "<&yname&0> %s\r\n", NULLSAFE(GET_TRIG_NAME(trig)));
-	sprintf(buf + strlen(buf), "<&yattaches&0> %s\r\n", trig_attach_types[trig->attach_type]);
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_trigger(GET_OLC_VNUM(ch->desc)) ? "new trigger" : GET_TRIG_NAME(real_trigger(GET_OLC_VNUM(ch->desc))));
+	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_TRIG_NAME(trig), default_trig_name), NULLSAFE(GET_TRIG_NAME(trig)));
+	sprintf(buf + strlen(buf), "<%sattaches\t0> %s\r\n", OLC_LABEL_VAL(trig->attach_type, 0), trig_attach_types[trig->attach_type]);
 	
 	sprintbit(GET_TRIG_TYPE(trig), trig_attach_type_list[trig->attach_type], trgtypes, TRUE);
-	sprintf(buf + strlen(buf), "<&ytypes&0> %s\r\n", trgtypes);
+	sprintf(buf + strlen(buf), "<%stypes\t0> %s\r\n", OLC_LABEL_VAL(GET_TRIG_TYPE(trig), NOBITS), trgtypes);
 	
 	if (IS_SET(trig_arg_types, TRIG_ARG_PERCENT)) {
-		sprintf(buf + strlen(buf), "<&ypercent&0> %d%%\r\n", trig->narg);
+		sprintf(buf + strlen(buf), "<%spercent\t0> %d%%\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_PHRASE_OR_WORDLIST)) {
-		sprintf(buf + strlen(buf), "<&yargtype&0> %s\r\n", trig_arg_phrase_type[trig->narg]);
+		sprintf(buf + strlen(buf), "<%sargtype\t0> %s\r\n", OLC_LABEL_VAL(trig->narg, 0), trig_arg_phrase_type[trig->narg]);
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_OBJ_WHERE)) {
 		sprintbit(trig->narg, trig_arg_obj_where, buf1, TRUE);
-		sprintf(buf + strlen(buf), "<&ylocation&0> %s\r\n", trig->narg ? buf1 : "none");
+		sprintf(buf + strlen(buf), "<%slocation\t0> %s\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg ? buf1 : "none");
 	}
-	if (IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST | TRIG_ARG_OBJ_WHERE)) {
-		sprintf(buf + strlen(buf), "<&ystring&0> %s\r\n", NULLSAFE(trig->arglist));
+	if (IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST)) {
+		sprintf(buf + strlen(buf), "<%sstring\t0> %s\r\n", OLC_LABEL_STR(trig->arglist, ""), NULLSAFE(trig->arglist));
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COST)) {
-		sprintf(buf + strlen(buf), "<&ycosts&0> %d other coins\r\n", trig->narg);
+		sprintf(buf + strlen(buf), "<%scosts\t0> %d other coins\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	
-	sprintf(buf + strlen(buf), "<&ycommands&0>\r\n%s", show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
+	sprintf(buf + strlen(buf), "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -1003,7 +1091,7 @@ OLC_MODULE(tedit_string) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
 	bitvector_t trig_arg_types = compile_argument_types_for_trigger(trig);
 	
-	if (!IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST | TRIG_ARG_OBJ_WHERE)) {
+	if (!IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST)) {
 		msg_to_char(ch, "You can't set that property on this trigger.\r\n");
 	}
 	else {

@@ -79,6 +79,7 @@ void display_statistics_to_char(char_data *ch) {
 
 	char populous_str[MAX_STRING_LENGTH], wealthiest_str[MAX_STRING_LENGTH], famous_str[MAX_STRING_LENGTH], greatest_str[MAX_STRING_LENGTH];
 	int populous_empire = NOTHING, wealthiest_empire = NOTHING, famous_empire = NOTHING, greatest_empire = NOTHING;
+	int num_populous = 0, num_wealthy = 0, num_famous = 0, num_great = 0;
 	vehicle_data *veh;
 	char_data *vict;
 	obj_data *obj;
@@ -114,15 +115,31 @@ void display_statistics_to_char(char_data *ch) {
 		
 		if (EMPIRE_MEMBERS(emp) > populous_empire) {
 			populous_empire = EMPIRE_MEMBERS(emp);
+			num_populous = 1;
+		}
+		else if (EMPIRE_MEMBERS(emp) == populous_empire) {
+			++num_populous;
 		}
 		if (GET_TOTAL_WEALTH(emp) > wealthiest_empire) {
 			wealthiest_empire = GET_TOTAL_WEALTH(emp);
+			num_wealthy = 1;
+		}
+		else if (GET_TOTAL_WEALTH(emp) == wealthiest_empire) {
+			++num_wealthy;
 		}
 		if (EMPIRE_FAME(emp) > famous_empire) {
 			famous_empire = EMPIRE_FAME(emp);
+			num_famous = 1;
+		}
+		else if (EMPIRE_FAME(emp) == famous_empire) {
+			++num_famous;
 		}
 		if (EMPIRE_GREATNESS(emp) > greatest_empire) {
 			greatest_empire = EMPIRE_GREATNESS(emp);
+			num_great = 1;
+		}
+		else if (EMPIRE_GREATNESS(emp) == greatest_empire) {
+			++num_great;
 		}
 	}
 	
@@ -138,37 +155,37 @@ void display_statistics_to_char(char_data *ch) {
 			continue;
 		}
 		
-		if (populous_empire != NOTHING && EMPIRE_MEMBERS(emp) >= populous_empire) {
+		if (populous_empire != NOTHING && num_populous < 5 && EMPIRE_MEMBERS(emp) >= populous_empire) {
 			snprintf(populous_str + strlen(populous_str), sizeof(populous_str) - strlen(populous_str), "%s%s%s&0", (*populous_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
-		if (wealthiest_empire != NOTHING && GET_TOTAL_WEALTH(emp) >= wealthiest_empire) {
+		if (wealthiest_empire != NOTHING && num_wealthy < 5 && GET_TOTAL_WEALTH(emp) >= wealthiest_empire) {
 			snprintf(wealthiest_str + strlen(wealthiest_str), sizeof(wealthiest_str) - strlen(wealthiest_str), "%s%s%s&0", (*wealthiest_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
-		if (famous_empire != NOTHING && EMPIRE_FAME(emp) >= famous_empire) {
+		if (famous_empire != NOTHING && num_famous < 5 && EMPIRE_FAME(emp) >= famous_empire) {
 			snprintf(famous_str + strlen(famous_str), sizeof(famous_str) - strlen(famous_str), "%s%s%s&0", (*famous_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
-		if (greatest_empire != NOTHING && EMPIRE_GREATNESS(emp) >= greatest_empire) {
+		if (greatest_empire != NOTHING && num_great < 5 && EMPIRE_GREATNESS(emp) >= greatest_empire) {
 			snprintf(greatest_str + strlen(greatest_str), sizeof(greatest_str) - strlen(greatest_str), "%s%s%s&0", (*greatest_str ? ", " : ""), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 	}
 	
 	if (*greatest_str) {
-		msg_to_char(ch, "Greatest empire: %s\r\n", greatest_str);
+		msg_to_char(ch, "Greatest empire%s: %s\r\n", PLURAL(num_great), greatest_str);
 	}
 	if (*populous_str) {
-		msg_to_char(ch, "Most populous empire: %s\r\n", populous_str);
+		msg_to_char(ch, "Most populous empire%s: %s\r\n", PLURAL(num_populous), populous_str);
 	}
 	if (*wealthiest_str) {
-		msg_to_char(ch, "Most wealthy empire: %s\r\n", wealthiest_str);
+		msg_to_char(ch, "Most wealthy empire%s: %s\r\n", PLURAL(num_wealthy), wealthiest_str);
 	}
 	if (*famous_str) {
-		msg_to_char(ch, "Most famous empire: %s\r\n", famous_str);
+		msg_to_char(ch, "Most famous empire%s: %s\r\n", PLURAL(num_famous), famous_str);
 	}
 
 	// empire stats
 	territory = members = citizens = military = 0;
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		territory += EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp);
+		territory += EMPIRE_TERRITORY(emp, TER_TOTAL);
 		members += EMPIRE_MEMBERS(emp);
 		citizens += EMPIRE_POPULATION(emp);
 		military += EMPIRE_MILITARY(emp);
@@ -185,15 +202,15 @@ void display_statistics_to_char(char_data *ch) {
 			++count;
 		}
 	}
-	msg_to_char(ch, "Unique Creatures:   %3d     Total Mobs:         %d\r\n", HASH_COUNT(mobile_table), count);
+	msg_to_char(ch, "Unique Creatures: %5d     Total Mobs:         %d\r\n", HASH_COUNT(mobile_table), count);
 
 	// objs
 	LL_COUNT(object_list, obj, count);
-	msg_to_char(ch, "Unique Objects:     %3d     Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
+	msg_to_char(ch, "Unique Objects:   %5d     Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
 	
 	// vehicles
 	LL_COUNT(vehicle_list, veh, count);
-	msg_to_char(ch, "Unique Vehicles:    %3d     Total Vehicles:     %d\r\n", HASH_COUNT(vehicle_table), count);
+	msg_to_char(ch, "Unique Vehicles:  %5d     Total Vehicles:     %d\r\n", HASH_COUNT(vehicle_table), count);
 }
 
 
@@ -209,10 +226,10 @@ void mudstats_empires(char_data *ch, char *argument) {
 	
 	int iter;
 	
-	msg_to_char(ch, "Empire score averages:\r\n");
+	msg_to_char(ch, "Empire score medians:\r\n");
 	
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
-		msg_to_char(ch, " %s: %.3f\r\n", score_type[iter], empire_score_average[iter]);
+		msg_to_char(ch, " %s: %d\r\n", score_type[iter], (int) empire_score_average[iter]);
 	}
 }
 

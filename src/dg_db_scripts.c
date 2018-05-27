@@ -32,11 +32,11 @@ extern int max_vehicle_id;
 extern struct reboot_control_data reboot_control;
 
 // external fucs
+void free_trigger(trig_data *trig);
 extern void half_chop(char *string, char *arg1, char *arg2);
 
 // locals
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
-void free_trigger(trig_data *trig);
 
 
 /**

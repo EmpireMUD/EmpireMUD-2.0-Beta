@@ -6,7 +6,7 @@ if (!%instance.location%)
   halt
 end
 mgoto %instance.location%
-eval room %self.room%
+set room %self.room%
 if %room.exit_dir%
   %room.exit_dir%
 end
@@ -34,7 +34,7 @@ if (!%instance.location%)
   halt
 end
 mgoto %instance.location%
-eval room %self.room%
+set room %self.room%
 if %room.exit_dir%
   %room.exit_dir%
 end
@@ -80,8 +80,8 @@ Cave Phase 2 Linker~
 if !%instance.id%
   halt
 end
-eval entr %instance.location%
-eval dir %entr.exit_dir%
+set entr %instance.location%
+set dir %entr.exit_dir%
 eval outside %%entr.%dir%(vnum)%%
 %door% %room% %dir% room %outside%
 detach 10829 %room.id%
@@ -94,7 +94,7 @@ if (%actor.is_pc% && %actor.completed_quest(10835)%)
   %teleport% %actor% i10826
   halt
 end
-eval boss %actor.master%
+set boss %actor.master%
 if (%actor.is_npc% && %boss%)
   %teleport% %actor% %boss.room%
 end
@@ -106,7 +106,7 @@ Detect Ritual of Burdens~
 if (%ability% != 163 || !%actor.on_quest(10851)%)
   halt
 end
-eval invsize %actor.maxcarrying%
+set invsize %actor.maxcarrying%
 wait 5 s
 * Attempt to detect that they cast the ritual
 if %actor.maxcarrying% > %invsize% || %invsize% > 25
@@ -130,9 +130,7 @@ Give Skinning Knife~
 Detect Heal~
 0 c 0
 heal~
-eval test %%self.is_name(%arg%)%%
-eval test2 %%actor.char_target(%arg%)%%
-if ((!%test% && %test2% != %self%) || !%actor.ability(Heal)% || !%actor.on_quest(10854)%)
+if ((!%self.is_name(%arg%)% && %actor.char_target(%arg%)% != %self%) || !%actor.ability(Heal)% || !%actor.on_quest(10854)%)
   return 0
   halt
 end
@@ -160,8 +158,7 @@ end
 Detect Harvest~
 1 c 3
 harvest~
-eval room %actor.room%
-if %room.crop%
+if %actor.room.crop%
   %quest% %actor% trigger 10856
 end
 return 0
@@ -174,7 +171,7 @@ if (%actor.blood% >= (%actor.maxblood% - 5))
   * Ensure not at full blood by taking a little
   nop %actor.blood(-5)%
 end
-eval bloodamt %actor.blood%
+set bloodamt %actor.blood%
 remote bloodamt %actor.id%
 ~
 #10858
@@ -198,8 +195,19 @@ if %room.template% == 10850
   if (!%actor.on_quest(10850)% && !%actor.completed_quest(10850)%)
     %send% %actor% You must start the quest 'Enter the Soulstream' before entering.
     %send% %actor% Use 'quest start Enter' to begin the quest.
+    %send% %actor% (If you can't see the quest, try 'toggle tutorials'.)
+    %echoaround% %actor% %actor.name% is pushed back through the portal.
     return 0
   end
 end
+~
+#10859
+Convert Spirit Token~
+1 gh 100
+~
+%send% %actor% Your spirit token vanishes and can now be found on the 'coins' command.
+%actor.give_currency(10852,1)%
+%purge% %self%
+return 0
 ~
 $
