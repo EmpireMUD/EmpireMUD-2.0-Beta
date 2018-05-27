@@ -1200,7 +1200,7 @@ ACMD(do_regenerate) {
 			}
 			case REGEN_MOVE: {
 				msg_to_char(ch, "You focus your blood into your sore muscles.\r\n");
-				act("$n seems envigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
+				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
 				GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + amount);
 				break;
 			}
