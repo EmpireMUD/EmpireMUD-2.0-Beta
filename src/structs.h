@@ -3439,6 +3439,14 @@ struct player_index_data {
 };
 
 
+// for stack_msg_to_desc(); descriptor_data
+struct stack_msg {
+	char *string;	// text
+	int count;	// (x2)
+	struct stack_msg *next;
+};
+
+
 // for descriptor_data
 struct txt_block {
 	char *text;
@@ -3484,6 +3492,7 @@ struct descriptor_data {
 	char **showstr_vector;	// for paging through texts
 	int showstr_count;	// number of pages to page through
 	int showstr_page;	// which page are we currently showing?
+	struct stack_msg *stack_msg_list;	// queued stackable messages
 	
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;

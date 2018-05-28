@@ -1557,7 +1557,13 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			free(to->desc->last_act_message);
 		}
 		to->desc->last_act_message = strdup(lbuf);
-		SEND_TO_Q(lbuf, to->desc);
+		
+		if (IS_SET(act_flags, TO_QUEUE)) {
+			stack_simple_msg_to_desc(to->desc, lbuf);
+		}
+		else {	// send normally
+			SEND_TO_Q(lbuf, to->desc);
+		}
 	}
 
 	if ((IS_NPC(to) && dg_act_check) && (to != ch)) {
@@ -1648,6 +1654,102 @@ void send_to_room(const char *messg, room_data *room) {
 	for (i = ROOM_PEOPLE(room); i; i = i->next_in_room)
 		if (i->desc)
 			SEND_TO_Q(messg, i->desc);
+}
+
+
+/**
+* Flushes a descriptor's stacked messages, adding (x2) where needed.
+*
+* @param descriptor_data *desc The descriptor to send the messages to.
+*/
+void send_stacked_msgs(descriptor_data *desc) {
+	struct stack_msg *iter, *next_iter;
+	int len, rem;
+	
+	if (!desc) {
+		return;
+	}
+	
+	LL_FOREACH_SAFE(desc->stack_msg_list, iter, next_iter) {
+		if (iter->count > 1) {
+			// deconstruct to add the (x2)
+			len = strlen(iter->string);
+			rem = (len > 1 && ISNEWL(iter->string[len-1])) ? 1 : 0;
+			rem += (len > 2 && ISNEWL(iter->string[len-2])) ? 1 : 0;
+			// rebuild
+			msg_to_desc(desc, "%*.*s (x%d)%s", (len-rem), (len-rem), iter->string, iter->count, (rem > 0 ? "\r\n" : ""));
+		}
+		else {
+			SEND_TO_Q(NULLSAFE(iter->string), desc);
+		}
+		
+		// free it up
+		LL_DELETE(desc->stack_msg_list, iter);
+		if (iter->string) {
+			free(iter->string);
+		}
+		free(iter);
+	}
+	
+	desc->stack_msg_list = NULL;
+}
+
+
+/**
+* Similar to msg_to_desc, but the message is put in a queue for stacking and
+* then sent on a very short delay. If more than one identical message is sent
+* in this time, it stacks with (x2).
+*
+* @param descriptor_data *desc The player.
+* @param const char *messg... va_arg format.
+*/
+void stack_msg_to_desc(descriptor_data *desc, const char *messg, ...) {
+	char output[MAX_STRING_LENGTH];
+	va_list tArgList;
+	
+	if (!messg || !desc) {
+		return;
+	}
+	
+	va_start(tArgList, messg);
+	vsprintf(output, messg, tArgList);
+	va_end(tArgList);
+	stack_simple_msg_to_desc(desc, output);
+}
+
+
+/**
+* Similar to msg_to_desc, but the message is put in a queue for stacking and
+* then sent on a very short delay. If more than one identical message is sent
+* in this time, it stacks with (x2).
+*
+* @param descriptor_data *desc The player.
+* @param const char *messg A string to send.
+*/
+void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg) {
+	struct stack_msg *iter, *stm;
+	bool found = FALSE;
+	
+	if (!messg || !desc) {
+		return;
+	}
+	
+	// look in queue
+	LL_FOREACH(desc->stack_msg_list, iter) {
+		if (!strcmp(iter->string, messg)) {
+			++iter->count;
+			found = TRUE;
+			break;
+		}
+	}
+	
+	// add
+	if (!found) {
+		CREATE(stm, struct stack_msg, 1);
+		stm->string = str_dup(messg);
+		stm->count = 1;
+		LL_APPEND(desc->stack_msg_list, stm);
+	}
 }
 
 
@@ -2654,6 +2756,7 @@ static int process_output(descriptor_data *t) {
 		char prompt[MAX_STRING_LENGTH];
 		int wantsize;
 		
+		send_stacked_msgs(t);
 		strcpy(prompt, make_prompt(t));
 		wantsize = strlen(prompt);
 		strncpy(prompt, ProtocolOutput(t, prompt, &wantsize), MAX_STRING_LENGTH);
@@ -3691,7 +3794,8 @@ void game_loop(socket_t mother_desc) {
 			if (!d->has_prompt) {
 				char prompt[MAX_STRING_LENGTH];
 				int wantsize;
-		
+				
+				send_stacked_msgs(d);
 				strcpy(prompt, make_prompt(d));
 				wantsize = strlen(prompt);
 				strncpy(prompt, ProtocolOutput(d, prompt, &wantsize), MAX_STRING_LENGTH);

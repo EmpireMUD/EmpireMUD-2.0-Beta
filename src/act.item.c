@@ -724,9 +724,9 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 	else {
 		obj_to_obj(obj, cont);
 
-		act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM);
+		act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE);
 
-		act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR);
+		act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE);
 
 		if (IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a container in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
@@ -1040,9 +1040,9 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	}
 
 	sprintf(buf, "You %s $p.%s", sname, VANISH(mode));
-	act(buf, FALSE, ch, obj, 0, TO_CHAR);
+	act(buf, FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	sprintf(buf, "$n %ss $p.%s", sname, VANISH(mode));
-	act(buf, TRUE, ch, obj, 0, TO_ROOM);
+	act(buf, TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 
 	switch (mode) {
 		case SCMD_DROP:
@@ -1194,8 +1194,8 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			}
 			
 			obj_to_char(obj, ch);
-			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR);
-			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM);
+			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE);
+			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE);
 			
 			if (stealing) {
 				if (emp && IS_IMMORTAL(ch)) {
@@ -1329,8 +1329,8 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		}
 		
 		obj_to_char(obj, ch);
-		act("You get $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM);
+		act("You get $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
+		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 					
 		if (stealing) {
 			if (emp && IS_IMMORTAL(ch)) {

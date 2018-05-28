@@ -7759,7 +7759,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	}
 
 	if (!CAN_CARRY_OBJ(ch, proto)) {
-		msg_to_char(ch, "Your arms are full.\r\n");
+		stack_msg_to_desc(ch->desc, "Your arms are full.\r\n");
 		return FALSE;
 	}
 
@@ -7769,8 +7769,8 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	scale_item_to_level(obj, 1);	// scale to its minimum
 
 	obj_to_char(obj, ch);
-	act("You retrieve $p.", FALSE, ch, obj, 0, TO_CHAR);
-	act("$n retrieves $p.", TRUE, ch, obj, 0, TO_ROOM);
+	act("You retrieve $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
+	act("$n retrieves $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 	load_otrigger(obj);
 	
 	if (stolen) {
@@ -7796,8 +7796,8 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 * @return int 1 -- it always returns 1
 */
 int store_resource(char_data *ch, empire_data *emp, obj_data *obj) {
-	act("You store $p.", FALSE, ch, obj, 0, TO_CHAR);
-	act("$n stores $p.", TRUE, ch, obj, 0, TO_ROOM);
+	act("You store $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
+	act("$n stores $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 
 	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1);
 	extract_obj(obj);
@@ -8014,8 +8014,8 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	}
 	
 	if (ch) {
-		act("You store $p.", FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n stores $p.", FALSE, ch, obj, NULL, TO_ROOM);
+		act("You store $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		act("$n stores $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
 	}
 	
 	if (extract) {
