@@ -1663,6 +1663,7 @@ void send_to_room(const char *messg, room_data *room) {
 * @param descriptor_data *desc The descriptor to send the messages to.
 */
 void send_stacked_msgs(descriptor_data *desc) {
+	char output[MAX_STRING_LENGTH+24];
 	struct stack_msg *iter, *next_iter;
 	int len, rem;
 	
@@ -1677,10 +1678,11 @@ void send_stacked_msgs(descriptor_data *desc) {
 			rem = (len > 1 && ISNEWL(iter->string[len-1])) ? 1 : 0;
 			rem += (len > 2 && ISNEWL(iter->string[len-2])) ? 1 : 0;
 			// rebuild
-			msg_to_desc(desc, "%*.*s (x%d)%s", (len-rem), (len-rem), iter->string, iter->count, (rem > 0 ? "\r\n" : ""));
+			snprintf(output, sizeof(output), "%*.*s (x%d)%s", (len-rem), (len-rem), iter->string, iter->count, (rem > 0 ? "\r\n" : ""));
+			write_to_descriptor(desc->descriptor, output);
 		}
 		else {
-			SEND_TO_Q(NULLSAFE(iter->string), desc);
+			write_to_descriptor(desc->descriptor, NULLSAFE(iter->string));
 		}
 		
 		// free it up
