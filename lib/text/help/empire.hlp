@@ -28,6 +28,19 @@ It can also be used to abandon vehicles.
 
 See also: CEDE, CLAIM, PRIVILEGE, PUBLICIZE
 #
+"ALMOST FAMOUS" "ALMOST FAMOUS GOAL"
+
+Almost Famous (Prestige goal)
+
+Rewards the following buildings:
+  .i.i  cemetery
+  &g.&0||&g.&0  megalith
+  .}{.  statue
+  [[]]  temple
+  [oo]  tomb
+
+See also: PROGRESS
+#
 BANNER
 
 The empire banner can be changed with the eedit command.
@@ -155,6 +168,15 @@ Some monuments can be dedicated to a particularly powerful person or god. Once
 dedicated, they can never be re-dedicated, so choose carefully.
 
 To find buildings that can be dedicated, try 'helpsearch dedicate'.
+#
+"DEFENDING THE CITY GOAL"
+
+Defending the City (Defense goal)
+
+Rewards the following building:
+  'TT'  Advanced Tower  (upgrades from Guard Tower)
+
+See also: PROGRESS, UPGRADE
 #
 "DEEP MINES"
 
@@ -519,6 +541,34 @@ for that empire.
 
 See also: MAINTAIN, WORKFORCE
 #
+FORTIFICATIONS "FORTIFICATIONS GOAL"
+
+Fortifications (Defense goal)
+
+Rewards the following buildings:
+  [BB]  barracks
+  [  ]  trainingyard
+
+See also: PROGRESS
+#
+FOUNDATIONS "FOUNDATIONS GOAL"
+
+Foundations (Industry goal)
+
+Rewards the following buildings:
+  (AA)  alchemist
+  {BB}  apiary
+  (BB)  bakery
+  (CC)  carpenter
+  (GG)  glassblower
+  (OO)  oilmaker
+  [PP]  painter
+  |PP|  pigeonpost
+  (TT)  tailor
+  {WW}  warehouse
+
+See also: PROGRESS
+#
 FRONTIER OUTSKIRTS
 
 An empire's 'frontier' is the area that's far from cities. Specifically, it's
@@ -529,6 +579,34 @@ For example, an outpost with radius 5 has outskirts out to 20 tiles, and the
 rest is frontier.
 
 See also: FRONTIER TRAITS
+#
+"GREAT WALLS GOAL"
+
+Great Walls (Defense goal)
+
+Rewards the following buildings:
+  &y^&0VV&y^&0  greatwall
+  V&c||&0V  rivergate
+
+See also: PROGRESS
+#
+"GREAT SHIPYARD" "GREAT SHIPYARD GOAL"
+
+Great Shipyard (Industry goal)
+
+Rewards the following building:
+  &b~&0[]&b~&0  Upgraded Shipyard (upgrades from Shipyard)
+
+See also: PROGRESS
+#
+"GUARD TOWERS GOAL"
+
+Guard Towers (Defense goal)
+
+Rewards the following building:
+  .TT.  guardtower
+
+See also: PROGRESS
 #
 HOME "HESTIAN TRINKET"
 
@@ -554,6 +632,20 @@ itself doesn't house citizens.
 
 See also: CITIZENS, FINE POTTERY
 #
+HOMESTEAD "HOMESTEAD GOAL"
+
+Homestead (Community goal)
+
+Rewards the following buildings:
+  [==]  largehouse
+  &y/&0[]&y\&0  minecomplex
+  [--]  stonehouse
+  &g^[]^&0  treecomplex
+  &g^()^&0  treehouse
+  &g.&0()&g.&0  undergroundcomplex
+
+See also: PROGRESS
+#
 ISLANDS
 
 Usage:  islands
@@ -569,6 +661,31 @@ all empires on the island share the same custom name for it.
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
 See also: CHART, CUSTOMIZE ISLAND, SURVEY
+#
+LUXURIES "LUXURIES GOAL"
+
+Luxuries (Community goal)
+
+Rewards the following buildings:
+  [**]  greathall
+  V[]V  portcullis
+  .==.  steps
+
+See also: LUXURY RESOURCES GOAL, PROGRESS
+#
+"LUXURY RESOURCES" "LUXURY RESOURCES GOAL"
+
+Luxury Resources (Industry goal)
+
+Rewards the following buildings:
+  &b~&0##&b~&0  estuarygarden
+  &G^&C##&G^&0  oasisgarden
+  &c~&b##&c~&0  raftgarden
+  &g|&y##&g|&0  shadygarden
+  &y/&r##&y\&0  terracedgarden
+  &g^/\^&0  trappersPost
+
+See also: LUXURIES GOAL, PROGRESS
 #
 MAINTAIN MAINTENANCE DISREPAIR
 
@@ -615,6 +732,22 @@ Note: Players with extremely low average playtime may never count as active
 empire members.
 
 See also: ENROLL, PLEDGE, ROSTER, TERRITORY
+#
+"MOUNTAIN ENGINEERING" "MOUNTAIN ENGINEERING GOAL"
+
+Mountain Engineering (Community goal)
+
+Rewards the following buildings:
+  &y/&0()&y\&0  burialcavern
+  &y[oo]&0  mountaincrypt
+  &y[**]&0  mountainhall
+  &y(==)&0  mountainlodge
+  &y.&0/\&y.&0  mountainoutpost
+  &y(&c~~&y)&0  mountainwell
+  &y/&0OO&y\&0  Tunnel  (tunnel command)
+  &y(FF)&0  volcanicforge
+
+See also: PROGRESS, TUNNEL
 #
 OFFENSES
 
@@ -730,6 +863,18 @@ This command can be used to take ownership of a tile during war. You must be
 standing on the tile, and must already own 4 or more adjacent tiles. Reclaiming
 will take a little while, and can be interrupted by combat.
 #
+RENOWN "RENOWN GOAL"
+
+Renown (Prestige goal)
+
+Rewards the following buildings:
+  [FF]  celestialforge
+  [||]  hightemple
+  [^^]  library
+  &y/^^\&0  pyramid
+
+See also: PROGRESS
+#
 ROSTER
 
 Usage:  roster [all]
@@ -744,6 +889,16 @@ High-level immortals can also target other empires with this command.
 
 See also: CLASS, WHO
 #
+SEAFARERS
+
+Seafarers (Industry goal)
+
+Rewards the following buildings:
+  &b~&0==&g.&0  docks
+  &b~&0()&b~&0  shipyard
+
+See also: PROGRESS
+#
 SILVER GOLD COPPER
 
 Copper, silver, and gold are found in mines, although more rarely than iron
@@ -751,6 +906,42 @@ ore. They are used as currency in many empires for trade and exchange. Some
 empires, however, prefer to use material goods instead.
 
 See also: RARE METALS, SMELT, SEPARATE
+#
+"STILT BUILDINGS" "STILT BUILDINGS GOAL"
+
+Stilt Buildings (Community goal)
+
+Rewards the following buildings:
+  &a~&0--&a~&0  boardwalk
+  &a~&0{}&a~&0  coastalshrine
+  &y.&c__&y.&0  drainage
+  &0(&a~~&0)  oceanfishery
+  &0(&c~~&0)  riverfishery
+  &0(&c~~&0)  lakefishery
+  &c~&0__&c~&0  swampplatform
+
+See also: PROGRESS
+#
+"SUPERIOR GUARD TOWERS GOAL"
+
+Superior Guard Towers (Defense goal)
+
+Rewards the following building:
+  "TT"  Superior Tower (upgrade from Advanced Tower)
+
+See also: PROGRESS, UPGRADE
+#
+"SWAMP ENGINEERING" "SWAMP ENGINEERING GOAL"
+
+Swamp Engineering (Community goal)
+
+Rewards the following buildings:
+  &c~&0--&c~&0  swampwalk
+  &c~&0/\&c~&0  swamphut
+  &c~&0[]&c~&0  swampmanor
+  &c~&0()&c~&0  swampcomplex
+
+See also: PROGRESS
 #
 TERRITORY
 
@@ -802,6 +993,19 @@ You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
 
 See also: CITIES, NAVIGATION, TERRITORY
+#
+"TRADE ROUTES" "TRADE ROUTES GOAL"
+
+Trade Routes (Industry goal)
+
+This goal unlocks the ability to establish trade agreements, to import, and
+to export.
+
+It also rewards the following buildings:
+  [MM]  mint
+  [$$]  tradingpost
+
+See also: DIPLOMACY, EXPORT, IMPORT, PROGRESS
 #
 TREE TREES LOGS
 
@@ -887,6 +1091,28 @@ Unpublicize removes the public status of ALL buildings owned by your empire
 instantly.
 
 See also: PUBLICIZE
+#
+"VAMPIRE HAVENS" HAVENS "VAMPIRE HAVENS GOAL"
+
+Vampire Havens (Community goal)
+
+Rewards the following buildings:
+  &g^[]^&0  burrowhaven
+  &y/&0()&y\&0  cavehaven
+  .[].  househaven
+  &y.&0[]&y.&0  pueblohaven
+
+See also: PROGRESS
+#
+"WALLED TOWN" "WALLED TOWN GOAL"
+
+Walled Town (Defense goal)
+
+Rewards the following buildings:
+  V||V  gatehouse
+  VVVV  wall
+
+See also: GREAT WALLS GOAL, PROGRESS
 #
 WEALTH
 
