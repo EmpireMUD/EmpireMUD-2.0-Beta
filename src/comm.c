@@ -1679,10 +1679,10 @@ void send_stacked_msgs(descriptor_data *desc) {
 			rem += (len > 2 && ISNEWL(iter->string[len-2])) ? 1 : 0;
 			// rebuild
 			snprintf(output, sizeof(output), "%*.*s (x%d)%s", (len-rem), (len-rem), iter->string, iter->count, (rem > 0 ? "\r\n" : ""));
-			write_to_descriptor(desc->descriptor, output);
+			SEND_TO_Q(output, desc);
 		}
 		else {
-			write_to_descriptor(desc->descriptor, NULLSAFE(iter->string));
+			SEND_TO_Q(NULLSAFE(iter->string), desc);
 		}
 		
 		// free it up
@@ -2758,7 +2758,6 @@ static int process_output(descriptor_data *t) {
 		char prompt[MAX_STRING_LENGTH];
 		int wantsize;
 		
-		send_stacked_msgs(t);
 		strcpy(prompt, make_prompt(t));
 		wantsize = strlen(prompt);
 		strncpy(prompt, ProtocolOutput(t, prompt, &wantsize), MAX_STRING_LENGTH);
@@ -3777,6 +3776,9 @@ void game_loop(socket_t mother_desc) {
 		/* Send queued output out to the operating system (ultimately to user). */
 		for (d = descriptor_list; d; d = next_d) {
 			next_d = d->next;
+			
+			send_stacked_msgs(d);
+			
 			if (*(d->output) && FD_ISSET(d->descriptor, &output_set)) {
 				/* Output for this player is ready */
 				if (process_output(d) < 0) {
@@ -3797,7 +3799,6 @@ void game_loop(socket_t mother_desc) {
 				char prompt[MAX_STRING_LENGTH];
 				int wantsize;
 				
-				send_stacked_msgs(d);
 				strcpy(prompt, make_prompt(d));
 				wantsize = strlen(prompt);
 				strncpy(prompt, ProtocolOutput(d, prompt, &wantsize), MAX_STRING_LENGTH);
