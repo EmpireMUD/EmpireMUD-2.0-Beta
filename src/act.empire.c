@@ -2971,8 +2971,11 @@ void sort_territory_node_list_by_distance(room_data *from, struct find_territory
 *
 * @param char_data *ch The player trying to abandon.
 * @param room_data *room The room to abandon.
+* @param bool confirm If TRUE, the player typed "confirm" as the last arg.
 */
-void do_abandon_room(char_data *ch, room_data *room) {
+void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
+	crop_data *cp;
+	
 	if (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You don't even own the area.\r\n");
 	}
@@ -2981,6 +2984,12 @@ void do_abandon_room(char_data *ch, room_data *room) {
 	}
 	else if (HOME_ROOM(room) != room) {
 		msg_to_char(ch, "Just abandon the main room.\r\n");
+	}
+	else if (IS_ANY_BUILDING(room) && room != IN_ROOM(ch) && !confirm) {
+		msg_to_char(ch, "%s might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", get_room_name(room, FALSE));
+	}
+	else if ((cp = ROOM_CROP(room)) && CROP_FLAGGED(cp, CROPF_NOT_WILD)) {
+		msg_to_char(ch, "That %s crop might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", GET_CROP_NAME(cp));
 	}
 	else {
 		if (room != IN_ROOM(ch)) {
@@ -3009,8 +3018,9 @@ void do_abandon_room(char_data *ch, room_data *room) {
 *
 * @param char_data *ch The player trying to abandon.
 * @param vehicle_data *veh The vehicle to abandon.
+* @param bool confirm If TRUE, the player typed "confirm" as the last arg.
 */
-void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
+void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 	empire_data *emp = VEH_OWNER(veh);
 	
 	if (!emp || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
@@ -3037,12 +3047,15 @@ ACMD(do_abandon) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	room_data *room = IN_ROOM(ch);
+	bool confirm;
 
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
-	one_word(argument, arg);
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	confirm = !str_cmp(arg, "confirm") || !str_cmp(argument, "confirm");	// TRUE if they have the confirm arg
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -3058,7 +3071,7 @@ ACMD(do_abandon) {
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
-		do_abandon_vehicle(ch, veh);
+		do_abandon_vehicle(ch, veh, confirm);
 	}
 	else if (*arg && !(room = find_target_room(ch, arg))) {
 		// sends own error
@@ -3067,10 +3080,10 @@ ACMD(do_abandon) {
 		msg_to_char(ch, "You can't abandon that!\r\n");
 	}
 	else if (GET_ROOM_VEHICLE(room)) {
-		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(room));
+		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(room), confirm);
 	}
 	else {
-		do_abandon_room(ch, room);
+		do_abandon_room(ch, room, confirm);
 	}
 }
 

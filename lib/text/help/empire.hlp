@@ -19,10 +19,11 @@ See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, CITY COMMAND,
 #
 ABANDON
 
-Usage:  abandon [target/coordinates]
+Usage:  abandon [target/coordinates] [confirm]
 
 This command allows you to abandon a building or acre of land which your 
-empire no longer wants. This falls under the cede privilege.
+empire no longer wants. This falls under the cede privilege. Buildings and rare
+crops require you to type 'confirm' when you try to abandon them remotely.
 
 It can also be used to abandon vehicles.
 
