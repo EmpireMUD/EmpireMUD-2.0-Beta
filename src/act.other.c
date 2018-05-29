@@ -737,6 +737,12 @@ OFFER_FINISH(ofin_summon) {
 	look_at_room(ch);
 	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	entry_memory_mtrigger(ch);
+	greet_mtrigger(ch, NO_DIR);
+	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR);
+	
 	return TRUE;
 }
 
