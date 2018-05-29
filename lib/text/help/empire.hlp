@@ -1157,8 +1157,9 @@ workforce chores consume food from your empire's inventory. Food is collected
 at 8pm each day.
 
 Typing "workforce" without a "type" after it will show you which workforce
-chores are currently enabled. Empire leaders can set the minimum rank to change
-the workforce settings.
+chores are currently enabled for the island you're currently on. Chores with
+asterisks have different settings on other islands. Empire leaders can set the
+minimum rank to change the workforce settings.
 
 The workforce is made up of the empire's citizens (NPCs). These citizens will
 only work within 20 map tiles of their own homes, and must be on the same 

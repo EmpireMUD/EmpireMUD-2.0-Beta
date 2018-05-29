@@ -1295,15 +1295,17 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 * @param char_data *ch The person to show it to.
 */
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
-	struct empire_island *isle, *next_isle;
+	struct empire_island *isle, *next_isle, *this_isle;
 	char part[MAX_STRING_LENGTH];
 	int iter, on, off, size;
+	bool here;
 	
 	if (!emp) {
 		msg_to_char(ch, "No workforce is set up.\r\n");
 	}
 	
 	msg_to_char(ch, "Workforce setup for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	this_isle = (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND ? get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))) : NULL);
 	
 	for (iter = 0; iter < NUM_CHORES; ++iter) {
 		if (chore_data[iter].hidden) {
@@ -1325,9 +1327,10 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 				++on;
 			}
 		}
+		here = (this_isle ? (this_isle->workforce_limit[iter] != 0) : FALSE);
 		
-		snprintf(part, sizeof(part), "%s: %s", chore_data[iter].name, (on == 0) ? "&yoff&0" : ((off == 0) ? "&con&0" : "&mpart&0"));
-		size = 24 + color_code_length(part);
+		snprintf(part, sizeof(part), "%s: %s%s", chore_data[iter].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
+		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
 		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !((iter+1)%3)) ? "\r\n" : " ");
 	}
 	if (iter % 3 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
