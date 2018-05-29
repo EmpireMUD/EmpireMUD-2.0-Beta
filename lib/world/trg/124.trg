@@ -357,6 +357,9 @@ if %breath% < 0
 end
 remote breath %actor.id%
 %load% obj 12409 %actor% inv
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12400)%
+end
 ~
 #12414
 Air Supply~
