@@ -2988,7 +2988,7 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 	else if (IS_ANY_BUILDING(room) && room != IN_ROOM(ch) && !confirm) {
 		msg_to_char(ch, "%s might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", get_room_name(room, FALSE));
 	}
-	else if ((cp = ROOM_CROP(room)) && CROP_FLAGGED(cp, CROPF_NOT_WILD)) {
+	else if ((cp = ROOM_CROP(room)) && CROP_FLAGGED(cp, CROPF_NOT_WILD) && !confirm) {
 		msg_to_char(ch, "That %s crop might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", GET_CROP_NAME(cp));
 	}
 	else {
