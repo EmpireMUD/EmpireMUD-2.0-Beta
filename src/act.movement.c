@@ -2064,8 +2064,16 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open portals here.\r\n");
 		return;
 	}
-	if (!all_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PORTAL) || !HAS_FUNCTION(target, FNC_PORTAL) || !IS_COMPLETE(target) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!all_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PORTAL) || !HAS_FUNCTION(target, FNC_PORTAL))) {
 		msg_to_char(ch, "You can only open portals between portal buildings.\r\n");
+		return;
+	}
+	if (!all_access && !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Complete the building first.\r\n");
+		return;
+	}
+	if (!all_access && !IS_COMPLETE(target)) {
+		msg_to_char(ch, "The target portal is not complete.\r\n");
 		return;
 	}
 	if (!all_access && (!check_in_city_requirement(IN_ROOM(ch), TRUE) || !check_in_city_requirement(target, TRUE))) {

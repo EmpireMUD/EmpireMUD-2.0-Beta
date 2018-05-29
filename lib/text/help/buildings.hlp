@@ -81,9 +81,11 @@ For a road over a river, use a bridge instead.
 
 See also: BRIDGE, ROAD
 #
-BRIDGE
+BRIDGE "BRIDGES GOAL"
 
-&c~~&0|&c~&0  Bridge  (Bridges goal)
+Bridges (Industry goal)
+
+Building:  &c~~&0|&c~&0  bridge
 
 Once completed, a bridge allows you to cross river tiles without a boat. You
 can also sail ships under the bridges. Nobody knows how.
@@ -92,7 +94,7 @@ Bridges count as in-city territory even if built in the outskirts (4x radius).
 
 To build a road over other terrains, see boardwalk and swampwalk.
 
-See also: BOARDWALK, SWAMPWALK
+See also: BOARDWALK, SWAMPWALK, PROGRESS
 #
 BUILD BUILDING "BASIC BUILDINGS"
 
@@ -448,7 +450,7 @@ See also: FENCE
 #
 GATEHOUSE "GATE HOUSE"
 
--==-  V||V  V\\V  Gatehouse  (Walled Town goal)
+V||V  Gatehouse
 
 The gatehouse creates a secure way through your walls. Only players who can
 infiltrate will make it through the gatehouse, and many of those will be
@@ -527,10 +529,11 @@ circle command.
 
 See also: CIRCLE
 #
-HENGE "STONE HENGE"
+HENGE "STONE HENGE" "HENGE CONSTRUCTION GOAL"
 
-<<>>  Henge (Henge Construction goal)
+Henge Construction (Community goal)
 
+Building:  <<>>  henge
 Fame:  4
 
 The henge is a great, circular monument made of massive stones. It is used in
@@ -538,7 +541,7 @@ some druidic practices. In fact, it is said that by chanting at a henge, you
 can align yourself the natural flow of mana through the world, and gain an
 understanding of Natural Magic.
 
-See also: CHANT OF DRUIDS
+See also: CHANT OF DRUIDS, PROGRESS
 #
 HIGHTEMPLE "HIGH TEMPLE"
 
@@ -1145,10 +1148,11 @@ tomb available.
 
 See also: CEMETERY, STARTING LOCATION
 #
-"TOWER OF SORCERY" TOWEROFSORCERY SORCERYTOWER "SORCERY TOWER"
+"TOWER OF SORCERY" TOWEROFSORCERY SORCERYTOWER "SORCERY TOWER" "SORCERY TOWER CONSTRUCTION GOAL"
 
-&g.&b||&g.&0  Tower of Sorcery  (Sorcery Tower Construction goal)
+Sorcery Tower Construction (Community goal)
 
+Building:  &g.&b||&g.&0  sorcerytower
 Extra rooms:  1
 Special rooms: sorcery tower, skybridge
 Citizens:  1

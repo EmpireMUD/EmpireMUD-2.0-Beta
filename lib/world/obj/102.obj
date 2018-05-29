@@ -505,9 +505,10 @@ A gnarled wooden token is lying here.~
 Magiterranean. Simply perform the chant of gardens ('chant gardens') inside the
 Hidden Garden adventure area.
 ~
-3 jp a 1
+3 jp a 2
 0 0 0
 0 0
+T 10236
 S
 #10237
 list first druid's~

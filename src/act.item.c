@@ -724,9 +724,9 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 	else {
 		obj_to_obj(obj, cont);
 
-		act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM);
+		act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE);
 
-		act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR);
+		act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE);
 
 		if (IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a container in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
@@ -1040,9 +1040,9 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	}
 
 	sprintf(buf, "You %s $p.%s", sname, VANISH(mode));
-	act(buf, FALSE, ch, obj, 0, TO_CHAR);
+	act(buf, FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	sprintf(buf, "$n %ss $p.%s", sname, VANISH(mode));
-	act(buf, TRUE, ch, obj, 0, TO_ROOM);
+	act(buf, TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 
 	switch (mode) {
 		case SCMD_DROP:
@@ -1194,8 +1194,8 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			}
 			
 			obj_to_char(obj, ch);
-			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR);
-			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM);
+			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE);
+			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE);
 			
 			if (stealing) {
 				if (emp && IS_IMMORTAL(ch)) {
@@ -1329,8 +1329,8 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		}
 		
 		obj_to_char(obj, ch);
-		act("You get $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM);
+		act("You get $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
+		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 					
 		if (stealing) {
 			if (emp && IS_IMMORTAL(ch)) {
@@ -3279,8 +3279,12 @@ void warehouse_identify(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 		msg_to_char(ch, "You can't do that here.\r\n");
+		return;
+	}
+	if (!imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Complete the building first.\r\n");
 		return;
 	}
 	if (!imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && GET_LOYALTY(ch) != room_emp && !has_relationship(GET_LOYALTY(ch), room_emp, DIPL_TRADE)))) {
@@ -3349,8 +3353,12 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 		msg_to_char(ch, "You can't do that here.\r\n");
+		return;
+	}
+	if (!imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Complete the building first.\r\n");
 		return;
 	}
 	if (!imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && GET_LOYALTY(ch) != room_emp && !has_relationship(GET_LOYALTY(ch), room_emp, DIPL_TRADE)))) {
@@ -3494,8 +3502,12 @@ void warehouse_store(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 		msg_to_char(ch, "You can't do that here.\r\n");
+		return;
+	}
+	if (!imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Complete the building first.\r\n");
 		return;
 	}
 	if (!imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && GET_LOYALTY(ch) != room_emp && !has_relationship(GET_LOYALTY(ch), room_emp, DIPL_TRADE)))) {
@@ -5937,8 +5949,11 @@ ACMD(do_trade) {
 	else if (is_abbrev(command, "check")) {
 		trade_check(ch, argument);
 	}
-	else if ((!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TRADING_POST) || !IS_COMPLETE(IN_ROOM(ch))) && !IS_IMMORTAL(ch)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TRADING_POST) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't trade here.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "Complete the building first.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You don't have permission to trade here.\r\n");

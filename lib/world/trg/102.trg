@@ -582,23 +582,24 @@ end
 ~
 #10236
 Hidden Garden teleport chant~
-2 c 0
+1 c 2
 chant~
+set room %self.room%
 * Only know the 'gardens' chant if the have the token.
-if (!(gardens /= %arg%) || !(%actor.has_item(10236)%) || %actor.position% != Standing)
+if (!(gardens /= %arg%) || !(%self.carried_by% == %actor%) || %actor.position% != Standing || (%room.template% != 10225)
   return 0
   halt
 end
 %send% %actor% You begin the chant of gardens...
 %echoaround% %actor% %actor.name% begins the chant of gardens...
 wait 4 sec
-if !(%actor.has_item(10236)%)
+if !(%self.carried_by% == %actor%) || %room% != %self.room%
   halt
 end
 %send% %actor% You rhythmically speak the words to the chant of gardens...
 %echoaround% %actor% %actor.name% rhythmically speaks the words to the chant of gardens...
 wait 4 sec
-if !(%actor.has_item(10236)%)
+if !(%self.carried_by% == %actor%) || %room% != %self.room%
   halt
 end
 %echoaround% %actor% %actor.name% vanishes in a swirl of dust!

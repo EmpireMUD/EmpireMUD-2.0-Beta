@@ -1651,8 +1651,9 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else if (can_do) {
-		worker = place_chore_worker(emp, CHORE_DISMANTLE_MINES, room);
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// ensure he's always set to despawn
+		if ((worker = place_chore_worker(emp, CHORE_DISMANTLE_MINES, room))) {
+			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// ensure he's always set to despawn
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);

@@ -37,6 +37,14 @@ Full multiplaying rules are found by typing POLICY.
 
 See also: ALTERNATE
 #
+ACHIEVEMENT ACHIEVEMENTS ACHIEVE ACHIEVED
+
+When your empire receives a notification that it has "Achieved" something, it
+means the empire has completed a progress goal. You can see completed goals
+on your elog, and can see current goals with the progress command.
+
+See also: ELOG, PROGRESS
+#
 ACTION ACTIONS "TIMED ACTIONS"
 
 EmpireMUD uses timed actions for most chores. These are things that happen

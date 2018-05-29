@@ -1317,7 +1317,9 @@ typedef struct vehicle_data vehicle_data;
 
 // misc game configs
 #define ACTION_CYCLE_TIME  5	// seconds per action tick (before haste) -- TODO should this be a config?
-#define ACTION_CYCLE_MULTIPLIER  2	// make action cycles longer so things can make them go faster
+#define ACTION_CYCLE_MULTIPLIER  10	// make action cycles longer so things can make them go faster
+#define ACTION_CYCLE_SECOND  2	// how many action cycles is 1 second
+#define ACTION_CYCLE_HALF_SEC  1	// how many action cycles is half a second
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 
 
@@ -3437,6 +3439,14 @@ struct player_index_data {
 };
 
 
+// for stack_msg_to_desc(); descriptor_data
+struct stack_msg {
+	char *string;	// text
+	int count;	// (x2)
+	struct stack_msg *next;
+};
+
+
 // for descriptor_data
 struct txt_block {
 	char *text;
@@ -3482,6 +3492,7 @@ struct descriptor_data {
 	char **showstr_vector;	// for paging through texts
 	int showstr_count;	// number of pages to page through
 	int showstr_page;	// which page are we currently showing?
+	struct stack_msg *stack_msg_list;	// queued stackable messages
 	
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;
@@ -3739,7 +3750,7 @@ struct player_special_data {
 
 	// action info
 	int action;	// ACT_
-	int action_cycle;	// time left before an action tick
+	double action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
