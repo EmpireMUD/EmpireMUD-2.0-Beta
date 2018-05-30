@@ -1215,9 +1215,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					account_id = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Action:", length)) {
-					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+					if (sscanf(line + length + 1, "%d %lf %d %d", &i_in[0], &dbl_in, &i_in[2], &i_in[3]) == 4) {
 						GET_ACTION(ch) = i_in[0];
-						GET_ACTION_CYCLE(ch) = i_in[1];
+						GET_ACTION_CYCLE(ch) = dbl_in;
 						GET_ACTION_TIMER(ch) = i_in[2];
 						GET_ACTION_ROOM(ch) = i_in[3];
 					}
@@ -2312,7 +2312,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	fprintf(fl, "Access Level: %d\n", GET_ACCESS_LEVEL(ch));
 	if (GET_ACTION(ch) != ACT_NONE) {
-		fprintf(fl, "Action: %d %d %d %d\n", GET_ACTION(ch), GET_ACTION_CYCLE(ch), GET_ACTION_TIMER(ch), GET_ACTION_ROOM(ch));
+		fprintf(fl, "Action: %d %.1f %d %d\n", GET_ACTION(ch), GET_ACTION_CYCLE(ch), GET_ACTION_TIMER(ch), GET_ACTION_ROOM(ch));
 		for (iter = 0; iter < NUM_ACTION_VNUMS; ++iter) {
 			fprintf(fl, "Action-vnum: %d %d\n", iter, GET_ACTION_VNUM(ch, iter));
 		}

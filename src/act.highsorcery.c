@@ -902,7 +902,7 @@ ACMD(do_enervate) {
 		// succeed
 	
 		act("$N starts to glow red as you shout the enervate hex at $M! You feel your own stamina grow as you drain $S.", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n shouts somthing at you... The world takes on a reddish hue and you feel your stamina drain.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n shouts something at you... The world takes on a reddish hue and you feel your stamina drain.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n shouts some kind of hex at $N, who starts to glow red and seems weakened!", FALSE, ch, NULL, vict, TO_NOTVICT);
 	
 		af = create_mod_aff(ATYPE_ENERVATE, 1 MUD_HOURS, APPLY_MOVE_REGEN, -1 * GET_INTELLIGENCE(ch) / 2, ch);
@@ -1389,8 +1389,8 @@ ACMD(do_vigor) {
 		}
 		else {
 			act("You focus your thoughts and say the word 'maktso', and $N suddenly seems refreshed.", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n closes $s eyes and says the word 'matkso', and you feel a sudden burst of vigor!", FALSE, ch, NULL, vict, TO_VICT);
-			act("$n closes $s eyes and says the word 'matkso', and $N suddenly seems refreshed.", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("$n closes $s eyes and says the word 'maktso', and you feel a sudden burst of vigor!", FALSE, ch, NULL, vict, TO_VICT);
+			act("$n closes $s eyes and says the word 'maktso', and $N suddenly seems refreshed.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		}
 		
 		// check if vict is in combat
@@ -1464,8 +1464,12 @@ RITUAL_SETUP_FUNC(start_chant_of_illusions) {
 		add_to_resource_list(&illusion_res, RES_OBJECT, o_IRIDESCENT_IRIS, 1, 0);
 	}
 	
-	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!IS_ROAD(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't perform the chant of illusions here.\r\n");
+		return FALSE;
+	}
+	if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Complete the building first.\r\n");
 		return FALSE;
 	}
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {

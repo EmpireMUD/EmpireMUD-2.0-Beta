@@ -2055,7 +2055,7 @@ ACMD(do_lead) {
 		GET_LEADING_VEHICLE(ch) = NULL;
 	}
 	else if (IS_NPC(ch)) {
-		msg_to_char(ch, "Npcs can't lead anything.\r\n");
+		msg_to_char(ch, "NPCs can't lead anything.\r\n");
 	}
 	else if (GET_SITTING_ON(ch)) {
 		msg_to_char(ch, "You can't lead anything while you're sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));

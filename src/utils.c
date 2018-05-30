@@ -1681,7 +1681,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 			if (GET_LOYALTY(i->character) != emp)
 				continue;
 
-			msg_to_char(i->character, "%s[ %s ]&0\r\n", EMPIRE_BANNER(emp), output);
+			stack_msg_to_desc(i, "%s[ %s ]&0\r\n", EMPIRE_BANNER(emp), output);
 		}
 	}
 	
@@ -1703,7 +1703,7 @@ void mortlog(const char *str, ...) {
 
 	for (i = descriptor_list; i; i = i->next) {
 		if (STATE(i) == CON_PLAYING && i->character && PRF_FLAGGED(i->character, PRF_MORTLOG)) {
-			msg_to_char(i->character, "&c[ %s ]&0\r\n", output);
+			stack_msg_to_desc(i, "&c[ %s ]&0\r\n", output);
 		}
 	}
 	va_end(tArgList);
@@ -1758,10 +1758,10 @@ void syslog(bitvector_t type, int level, bool file, const char *str, ...) {
 		if (STATE(i) == CON_PLAYING && i->character && !IS_NPC(i->character) && GET_ACCESS_LEVEL(i->character) >= level) {
 			if (IS_SET(SYSLOG_FLAGS(REAL_CHAR(i->character)), type)) {
 				if (level > LVL_START_IMM) {
-					msg_to_char(i->character, "&g[ (i%d) %s ]&0\r\n", level, output);
+					stack_msg_to_desc(i, "&g[ (i%d) %s ]&0\r\n", level, output);
 				}
 				else {
-					msg_to_char(i->character, "&g[ %s ]&0\r\n", output);
+					stack_msg_to_desc(i, "&g[ %s ]&0\r\n", output);
 				}
 			}
 		}

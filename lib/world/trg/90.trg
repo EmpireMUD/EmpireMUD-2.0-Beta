@@ -368,11 +368,6 @@ if !%target%
   return 0
   halt
 end
-if !%actor.ability(butcher)%
-  * Player does not have butcher
-  return 0
-  halt
-end
 * Debug...
 if %test% != *CORPSE && %test%
   return 0

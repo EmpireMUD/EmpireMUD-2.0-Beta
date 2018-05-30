@@ -1433,7 +1433,7 @@ Here are the prompt codes and what they do:
   %H  Maximum health      %V  Maximum moves      %M  Maximum mana
   %i  Health text         %u  Move text          %n  Mana text
   
-  %b  Current blood       %t  Time
+  %b  Current blood       %t  Time               %I  Inventory size
   %B  Maximum blood       %a  Current action
   %d  Blood text          %_  Line break
   

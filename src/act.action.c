@@ -241,7 +241,7 @@ void update_actions(void) {
 	bitvector_t act_flags;
 	craft_data *craft;
 	char_data *ch;
-	int speed;
+	double speed;
 	bool junk;
 
 	// only players with active connections can process actions
@@ -288,44 +288,44 @@ void update_actions(void) {
 		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
-		speed = ACTION_CYCLE_MULTIPLIER;	// makes it a full second
+		speed = ACTION_CYCLE_SECOND;	// makes it a full second
 		
 		// things that modify speed...
 		if (IS_SET(act_flags, ACTF_ALWAYS_FAST)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_HALF_SEC;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_HALF_SEC;
 		}
 		if (IS_SET(act_flags, ACTF_FASTER_BONUS) && HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_HALF_SEC;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_PROSPECT) && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_FAST_PROSPECT)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_EXCAVATE) && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_FAST_EXCAVATE) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &junk)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FINDER) && has_player_tech(ch, PTECH_FAST_FIND)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_HALF_SEC;
 			gain_player_tech_exp(ch, PTECH_FAST_FIND, 0.1);
 		}
 		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
-			speed += ACTION_CYCLE_MULTIPLIER;
+			speed += ACTION_CYCLE_HALF_SEC;
 		}
 		
 		// things that slow you down
 		if (AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
-			speed /= 2;
-			speed = MAX(1, speed);	// don't stall them completely
+			speed /= 2.0;
+			speed = MAX(1.0, speed);	// don't stall them completely
 		}
 		
 		GET_ACTION_CYCLE(ch) -= speed;
 		
-		if (GET_ACTION_CYCLE(ch) <= 0) {
+		if (GET_ACTION_CYCLE(ch) <= 0.0) {
 			// reset cycle timer
 			GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME * ACTION_CYCLE_MULTIPLIER;
 			
@@ -1151,7 +1151,7 @@ void process_chop(char_data *ch) {
 		return;
 	}
 
-	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 2 * get_base_dps(GET_EQ(ch, WEAR_WIELD))));
+	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 3 * get_base_dps(GET_EQ(ch, WEAR_WIELD))));
 	act("You swing $p hard!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR | TO_SPAMMY);
 	act("$n swings $p hard!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_ROOM | TO_SPAMMY);
 	
@@ -1669,13 +1669,18 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-		if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE) || get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+		if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
 			msg_to_char(ch, "You can't mine here.\r\n");
 			cancel_action(ch);
 			break;
 		}
+		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+			msg_to_char(ch, "You don't see even a hint of anything worthwhile in this depleted mine.\r\n");
+			cancel_action(ch);
+			break;
+		}
 
-		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + 2.0 * get_base_dps(GET_EQ(ch, WEAR_WIELD));
+		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + 3 * get_base_dps(GET_EQ(ch, WEAR_WIELD));
 
 		act("You pick at the walls with $p, looking for ore.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_CHAR | TO_SPAMMY);
 		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_ROOM | TO_SPAMMY);
@@ -3085,8 +3090,11 @@ ACMD(do_saw) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW) || !IS_COMPLETE(IN_ROOM(ch))) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW)) {
 		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Complete the building first.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");

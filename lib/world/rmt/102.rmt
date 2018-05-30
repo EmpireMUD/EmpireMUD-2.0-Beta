@@ -22,7 +22,6 @@ growing in them, the fertile soil is sure to produce something delicious.
 ~
 ac 0 0
 M 0 10225 100.00 1
-T 10236
 T 10227
 S
 #10226
@@ -287,6 +286,7 @@ through its dooming shadow.
 ~
 M 1 10264 100.00 1
 T 10274
+T 10255
 S
 #10256
 The Primeval Forest~

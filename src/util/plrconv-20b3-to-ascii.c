@@ -930,7 +930,7 @@ int scan_mail_file(void) {
 
 
 /*
- * Retrieves one messsage for a player. The mail is then discarded from
+ * Retrieves one message for a player. The mail is then discarded from
  * the file and the mail index.
  */
 char *read_delete(long recipient, int *from, time_t *timestamp) {

@@ -2353,7 +2353,7 @@ OLC_MODULE(oedit_text) {
 	book_data *book;
 	
 	if (!IS_BOOK(obj)) {
-		msg_to_char(ch, "You can only set etxt id on a book.\r\n");
+		msg_to_char(ch, "You can only set text id on a book.\r\n");
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "text id", "text", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));

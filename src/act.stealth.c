@@ -1092,7 +1092,7 @@ ACMD(do_pickpocket) {
 		send_to_char("Come on now, that's rather stupid!\r\n", ch);
 	}
 	else if (!IS_NPC(vict)) {
-		msg_to_char(ch, "You may only pickpocket npcs.\r\n");
+		msg_to_char(ch, "You may only pickpocket NPCs.\r\n");
 	}
 	else if ((ch_emp = GET_LOYALTY(ch)) && (vict_emp = GET_LOYALTY(vict)) && has_relationship(ch_emp, vict_emp, DIPL_ALLIED | DIPL_NONAGGR)) {
 		msg_to_char(ch, "You can't pickpocket mobs you are allied or have a non-aggression pact with.\r\n");

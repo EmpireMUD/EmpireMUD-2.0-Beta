@@ -237,7 +237,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	empire_data *old_emp;
 	
 	if (!old || !new || !old->desc || new->desc) {
-		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
+		log("SYSERR: Attempting invalid perform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
 		return;
 	}
 
@@ -737,6 +737,12 @@ OFFER_FINISH(ofin_summon) {
 	look_at_room(ch);
 	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	entry_memory_mtrigger(ch);
+	greet_mtrigger(ch, NO_DIR);
+	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR);
+	
 	return TRUE;
 }
 
@@ -1034,7 +1040,7 @@ void do_alt_import(char_data *ch, char *argument) {
 		alt_import_slash_channels(ch, alt);
 	}
 	else {
-		msg_to_char(ch, "Uknown field '%s'.\r\n%s", arg2, valid_fields);
+		msg_to_char(ch, "Unknown field '%s'.\r\n%s", arg2, valid_fields);
 	}
 
 	// cleanup	
@@ -2305,7 +2311,7 @@ ACMD(do_order) {
 		send_to_char("You obviously suffer from schizophrenia.\r\n", ch);
 	else {
 		if (AFF_FLAGGED(ch, AFF_CHARM)) {
-			send_to_char("Your superior would not aprove of you giving orders.\r\n", ch);
+			send_to_char("Your superior would not approve of you giving orders.\r\n", ch);
 			return;
 		}
 		if (vict) {
@@ -2555,8 +2561,11 @@ ACMD(do_shear) {
 	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch))) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You need to be in a stable to shear anything.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Complete the building first.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
@@ -2722,7 +2731,7 @@ ACMD(do_summon) {
 	}
 	
 	if (count > config_get_int("summon_npc_limit")) {
-		msg_to_char(ch, "There are too many npcs here to summon more.\r\n");
+		msg_to_char(ch, "There are too many NPCs here to summon more.\r\n");
 		return;
 	}
 

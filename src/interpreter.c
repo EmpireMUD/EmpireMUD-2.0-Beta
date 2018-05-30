@@ -613,7 +613,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "cities", POS_DEAD, do_city, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "city", POS_DEAD, do_city, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "claim", POS_RESTING, do_claim, NO_MIN, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "class", POS_DEAD, do_class, NO_MIN, CTYPE_UTIL ),
+	// uncomment this if you use the old class system
+	// SIMPLE_CMD( "class", POS_DEAD, do_class, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "claws", POS_RESTING, do_claws, NO_MIN, CTYPE_SKILL, ABIL_CLAWS ),
 	ABILITY_CMD( "cleanse", POS_FIGHTING, do_cleanse, NO_MIN, CTYPE_SKILL, ABIL_CLEANSE ),
 	SCMD_CMD( "clear", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_CLEAR ),

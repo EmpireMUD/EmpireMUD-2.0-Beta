@@ -1934,7 +1934,7 @@ void update_trading_post(void) {
 * @param int value The amount to gain or lose
 */
 void gain_condition(char_data *ch, int condition, int value) {
-	extern bool gain_cond_messsage;
+	extern bool gain_cond_message;
 	bool intoxicated;
 
 	// no change?
@@ -1964,7 +1964,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
 
-	if (!gain_cond_messsage) {
+	if (!gain_cond_message) {
 		return;
 	}
 

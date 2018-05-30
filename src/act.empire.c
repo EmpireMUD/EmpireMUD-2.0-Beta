@@ -1295,15 +1295,17 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 * @param char_data *ch The person to show it to.
 */
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
-	struct empire_island *isle, *next_isle;
+	struct empire_island *isle, *next_isle, *this_isle;
 	char part[MAX_STRING_LENGTH];
 	int iter, on, off, size;
+	bool here;
 	
 	if (!emp) {
 		msg_to_char(ch, "No workforce is set up.\r\n");
 	}
 	
 	msg_to_char(ch, "Workforce setup for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	this_isle = (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND ? get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))) : NULL);
 	
 	for (iter = 0; iter < NUM_CHORES; ++iter) {
 		if (chore_data[iter].hidden) {
@@ -1325,9 +1327,10 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 				++on;
 			}
 		}
+		here = (this_isle ? (this_isle->workforce_limit[iter] != 0) : FALSE);
 		
-		snprintf(part, sizeof(part), "%s: %s", chore_data[iter].name, (on == 0) ? "&yoff&0" : ((off == 0) ? "&con&0" : "&mpart&0"));
-		size = 24 + color_code_length(part);
+		snprintf(part, sizeof(part), "%s: %s%s", chore_data[iter].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
+		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
 		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !((iter+1)%3)) ? "\r\n" : " ");
 	}
 	if (iter % 3 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
@@ -2971,8 +2974,11 @@ void sort_territory_node_list_by_distance(room_data *from, struct find_territory
 *
 * @param char_data *ch The player trying to abandon.
 * @param room_data *room The room to abandon.
+* @param bool confirm If TRUE, the player typed "confirm" as the last arg.
 */
-void do_abandon_room(char_data *ch, room_data *room) {
+void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
+	crop_data *cp;
+	
 	if (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You don't even own the area.\r\n");
 	}
@@ -2981,6 +2987,12 @@ void do_abandon_room(char_data *ch, room_data *room) {
 	}
 	else if (HOME_ROOM(room) != room) {
 		msg_to_char(ch, "Just abandon the main room.\r\n");
+	}
+	else if (IS_ANY_BUILDING(room) && room != IN_ROOM(ch) && !confirm) {
+		msg_to_char(ch, "%s might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", get_room_name(room, FALSE));
+	}
+	else if ((cp = ROOM_CROP(room)) && CROP_FLAGGED(cp, CROPF_NOT_WILD) && room != IN_ROOM(ch) && !confirm) {
+		msg_to_char(ch, "That %s crop might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", GET_CROP_NAME(cp));
 	}
 	else {
 		if (room != IN_ROOM(ch)) {
@@ -3009,8 +3021,9 @@ void do_abandon_room(char_data *ch, room_data *room) {
 *
 * @param char_data *ch The player trying to abandon.
 * @param vehicle_data *veh The vehicle to abandon.
+* @param bool confirm If TRUE, the player typed "confirm" as the last arg.
 */
-void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
+void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 	empire_data *emp = VEH_OWNER(veh);
 	
 	if (!emp || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
@@ -3037,12 +3050,15 @@ ACMD(do_abandon) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	room_data *room = IN_ROOM(ch);
+	bool confirm;
 
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
-	one_word(argument, arg);
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	confirm = !str_cmp(arg, "confirm") || !str_cmp(argument, "confirm");	// TRUE if they have the confirm arg
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -3058,7 +3074,7 @@ ACMD(do_abandon) {
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
-		do_abandon_vehicle(ch, veh);
+		do_abandon_vehicle(ch, veh, confirm);
 	}
 	else if (*arg && !(room = find_target_room(ch, arg))) {
 		// sends own error
@@ -3067,10 +3083,10 @@ ACMD(do_abandon) {
 		msg_to_char(ch, "You can't abandon that!\r\n");
 	}
 	else if (GET_ROOM_VEHICLE(room)) {
-		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(room));
+		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(room), confirm);
 	}
 	else {
-		do_abandon_room(ch, room);
+		do_abandon_room(ch, room, confirm);
 	}
 }
 
@@ -3092,8 +3108,12 @@ ACMD(do_barde) {
 	
 	one_argument(argument, arg);
 
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Complete the building first.\r\n");
+	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
@@ -3323,7 +3343,7 @@ void do_claim_room(char_data *ch, room_data *room) {
 	bool junk;
 	
 	if (!emp) {
-		msg_to_char(ch, "You don't belong to any empre.\r\n");
+		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (ROOM_OWNER(room) == emp) {
 		msg_to_char(ch, "Your empire already owns this area.\r\n");
@@ -3381,7 +3401,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 		msg_to_char(ch, "That cannot be claimed.\r\n");
 	}
 	else if (!emp) {
-		msg_to_char(ch, "You don't belong to any empre.\r\n");
+		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (VEH_OWNER(veh) == emp) {
 		msg_to_char(ch, "Your empire already owns that.\r\n");
@@ -4970,8 +4990,11 @@ ACMD(do_home) {
 		else if (!has_permission(ch, PRIV_HOMES)) {	// after the has-owner check because otherwise the error is misleading
 			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
 		}
-		else if (!IS_COMPLETE(real) || !GET_BUILDING(real) || GET_BLD_CITIZENS(GET_BUILDING(real)) <= 0) {
+		else if (!GET_BUILDING(real) || GET_BLD_CITIZENS(GET_BUILDING(real)) <= 0) {
 			msg_to_char(ch, "You can't make this your home.\r\n");
+		}
+		else if (!IS_COMPLETE(real)) {
+			msg_to_char(ch, "Complete the building first.\r\n");
 		}
 		else if (ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
 			msg_to_char(ch, "You can't make this your home right now.\r\n");
@@ -5161,9 +5184,13 @@ ACMD(do_tavern) {
 		}
 	}
 	
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN) || !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		show_tavern_status(ch);
+		msg_to_char(ch, "Complete the building to change what it's brewing.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
@@ -5247,8 +5274,11 @@ ACMD(do_tomb) {
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}
-		else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB) || !IS_COMPLETE(IN_ROOM(ch))) {
+		else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "You can't make this place your tomb!\r\n");
+		}
+		else if (!IS_COMPLETE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Complete the building first.\r\n");
 		}
 		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE) || ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
 			msg_to_char(ch, "You can't make this your tomb right now.\r\n");
@@ -5644,6 +5674,11 @@ ACMD(do_progress) {
 		}
 	}
 	skip_spaces(&argument);
+	
+	if (!emp) {
+		msg_to_char(ch, "You must be in an empire to view progress.\r\n");
+		return;
+	}
 	
 	// optional split into arg/arg2 (argument preserves the whole thing)
 	arg2 = any_one_word(argument, arg);
