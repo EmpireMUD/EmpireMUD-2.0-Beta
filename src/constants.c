@@ -2933,6 +2933,7 @@ const char *function_flags[] = {
 	"COOKING-FIRE",
 	"LARGER-NEARBY",
 	"FISHING",
+	"STORE-ALL", // 35
 	"\n"
 };
 
