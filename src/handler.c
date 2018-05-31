@@ -7692,7 +7692,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 		return FALSE;	// quest items don't store
 	}
 	
-	if (obj->storage && HAS_FUNCTION(loc, FNC_STORE_ALL)) {
+	if (obj->storage && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
