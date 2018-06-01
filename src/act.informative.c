@@ -1351,7 +1351,7 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 	
 	HASH_ITER(hh, eisle->store, store, next_store) {
 		if ((proto = store->proto)) {
-			if (obj_can_be_stored(proto, room)) {
+			if (obj_can_be_retrieved(proto, room)) {
 				if (!found) {
 					msg_to_char(ch, "\r\n%s inventory available here:\r\n", EMPIRE_ADJECTIVE(emp));
 				}
