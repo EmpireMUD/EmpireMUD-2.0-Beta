@@ -7678,9 +7678,10 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 /**
 * @param obj_data *obj The item to check
 * @param room_data *loc The world location you want to store it in
+* @param retrieval_mode bool TRUE if we're retrieving, FALSE if we're storing
 * @return bool TRUE if the object can be stored here; otherwise FALSE
 */
-bool obj_can_be_stored(obj_data *obj, room_data *loc) {
+bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	struct obj_storage_type *store;
 	bld_data *bld = GET_BUILDING(loc);
 	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE) > 0) : FALSE);
@@ -7692,7 +7693,8 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 		return FALSE;	// quest items don't store
 	}
 	
-	if (obj->storage && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
+	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
+	if (!retrieval_mode && obj->storage && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
@@ -7706,6 +7708,15 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 	}
 	
 	return FALSE;
+}
+
+/**
+ * @param obj_data *obj The item to check
+ * @param room_data *loc The world location you want to retrieve it from
+ * @return bool TRUE if the object can be retrieved from here; otherwise FALSE
+ */
+bool obj_can_be_retrieved(obj_data *obj, room_data *loc) {
+	return obj_can_be_stored(obj, loc, TRUE);
 }
 
 

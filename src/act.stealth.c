@@ -1629,7 +1629,7 @@ ACMD(do_steal) {
 			
 			proto = store->proto;
 			
-			if (proto && obj_can_be_stored(proto, IN_ROOM(ch)) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
+			if (proto && obj_can_be_retrieved(proto, IN_ROOM(ch)) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
 				found = TRUE;
 				
 				if (stored_item_requires_withdraw(proto) && !has_player_tech(ch, PTECH_STEAL_UPGRADE)) {
