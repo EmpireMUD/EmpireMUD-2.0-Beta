@@ -5843,7 +5843,7 @@ ACMD(do_store) {
 		for (obj = ch->carrying; obj; obj = next_obj) {
 			next_obj = obj->next_content;
 			
-			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
+			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;
@@ -5875,7 +5875,7 @@ ACMD(do_store) {
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
 			
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch))) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;
