@@ -320,6 +320,7 @@ extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
 extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);
 extern bool obj_can_be_stored(obj_data *obj, room_data *loc);
+extern bool obj_can_be_retrieved(obj_data *obj, room_data *loc);
 extern bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
 extern int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
 extern bool stored_item_requires_withdraw(obj_data *obj);

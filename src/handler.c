@@ -7708,6 +7708,15 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 	return FALSE;
 }
 
+/**
+ * @param obj_data *obj The item to check
+ * @param room_data *loc The world location you want to retrieve it from
+ * @return bool TRUE if the object can be retrieved from here; otherwise FALSE
+ */
+bool obj_can_be_retrieved(obj_data *obj, room_data *loc) {
+	return !room_has_function_and_city_ok(loc, FNC_STORE_ALL) && obj_can_be_stored(obj, loc);
+}
+
 
 /**
 * re-read the vault of an empire

@@ -5380,7 +5380,7 @@ ACMD(do_retrieve) {
 	/* they hit "ret all" */
 	if (!str_cmp(objname, "all")) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if ((objn = store->proto) && obj_can_be_stored(objn, IN_ROOM(ch))) {
+			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch))) {
 				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW)) {
 					msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 					return;
@@ -5404,7 +5404,7 @@ ACMD(do_retrieve) {
 				break;
 			}
 			
-			if ((objn = store->proto) && obj_can_be_stored(objn, IN_ROOM(ch))) {
+			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch))) {
 				if (multi_isname(objname, GET_OBJ_KEYWORDS(objn)) && (++pos == number)) {
 					found = 1;
 					
