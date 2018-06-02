@@ -4805,7 +4805,7 @@ room_data *find_other_starting_location(room_data *current_room) {
 		return NULL;
 	}
 	
-	// Select a random start_loc_index. If it's the user's current one, increment by one and wrap around.
+	// Select a random start_loc_index.
 	start_loc_index = number(0, highest_start_loc_index);
 	
 	// If the selected index is the user's current room's index:
