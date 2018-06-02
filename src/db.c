@@ -138,7 +138,7 @@ int top_of_helpt = 0;	// top of help index table
 
 // map
 room_vnum *start_locs = NULL;	// array of start locations
-int num_of_start_locs = -1;	// maximum start locations
+int highest_start_loc_index = -1;	// maximum start locations
 int top_island_num = -1;	// for number of islands
 
 // mobs
@@ -3633,7 +3633,7 @@ void setup_start_locations(void) {
 	}
 
 	start_locs = new_start_locs;
-	num_of_start_locs = count;
+	highest_start_loc_index = count;
 }
 
 

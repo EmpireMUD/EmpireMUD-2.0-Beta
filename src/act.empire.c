@@ -1588,7 +1588,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 void found_city(char_data *ch, empire_data *emp, char *argument) {
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	void stop_room_action(room_data *room, int action, int chore);
-	extern int num_of_start_locs;
+	extern int highest_start_loc_index;
 	extern int *start_locs;
 	
 	empire_data *emp_iter, *next_emp;
@@ -1637,7 +1637,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 
 	// check starting locations
-	for (iter = 0; iter <= num_of_start_locs; ++iter) {
+	for (iter = 0; iter <= highest_start_loc_index; ++iter) {
 		if (compute_distance(IN_ROOM(ch), real_room(start_locs[iter])) < min_distance_from_city_to_starting_location) {
 			msg_to_char(ch, "You can't found a city within %d tiles of a starting location.\r\n", min_distance_from_city_to_starting_location);
 			return;
