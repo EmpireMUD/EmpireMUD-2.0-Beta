@@ -4792,6 +4792,32 @@ room_data *find_starting_location() {
 
 
 /**
+ * Attempt to find a random starting location, other than the one you're currently in
+ *
+ * @return room_data* A random starting location that's less likely to be your current one
+ */
+room_data *find_other_starting_location(room_data *current_room) {
+	extern int num_of_start_locs;
+	extern int *start_locs;
+	int start_loc_index;
+	
+	if (num_of_start_locs < 0) {
+		return NULL;
+	}
+	
+	// Try multiple times to randomly select a start_loc that is not your current one.
+	for (int max_tries = 50; max_tries >= 0; max_tries--) {
+		start_loc_index = number(0, num_of_start_locs);
+		if (start_locs[start_loc_index] != GET_ROOM_VNUM(current_room))
+			break;
+	}
+	
+	// We return a room no matter what, even if it's the one they're in already.
+	return (real_room(start_locs[start_loc_index]));
+}
+
+
+/**
 * This function takes a set of coordinates and finds another location in
 * relation to them. It checks the wrapping boundaries of the map in the
 * process.

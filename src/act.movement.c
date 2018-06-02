@@ -2378,7 +2378,7 @@ ACMD(do_swim) {
 
 
 ACMD(do_transport) {
-	extern room_data *find_starting_location();
+	extern room_data *find_other_starting_location(room_data *current_room);
 	
 	char arg[MAX_INPUT_LENGTH];
 	room_data *target = NULL;
@@ -2405,7 +2405,7 @@ ACMD(do_transport) {
 		msg_to_char(ch, "You don't have permission to transport there.\r\n");
 	}
 	else {
-		perform_transport(ch, target ? target : find_starting_location());
+		perform_transport(ch, target ? target : find_other_starting_location(IN_ROOM(ch)));
 	}
 }
 
