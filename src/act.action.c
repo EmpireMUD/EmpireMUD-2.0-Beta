@@ -323,7 +323,7 @@ void update_actions(void) {
 		
 		// Vehicles set a flat speed based on their number of speed bonuses.
 		if (IS_SET(act_flags, ACTF_VEHICLE_SPEEDS)) {
-			int half_secs_to_add_to_base_speed = 0;
+			int half_secs_to_add_to_base_speed = VSPEED_NORMAL;
 			vehicle_data *veh = get_current_piloted_vehicle(ch);
 			
 			if (veh) {
@@ -339,7 +339,9 @@ void update_actions(void) {
 				// Apply our vehicle movement modifier to speed, overriding any prior speed changes.
 				speed = ACTION_CYCLE_SECOND + (ACTION_CYCLE_HALF_SEC * half_secs_to_add_to_base_speed);
 			} else {
-				// Do nothing. This matches the previous logic of also doing nothing when the vehicle was invalid.
+				// If we have no vehicle tp read from, mimic the behavior of the previous code (it didn't check for vehicles).
+				// Previous code's behavior was to give all driving/piloting characters a flat +2 speed boost.
+				speed += half_secs_to_add_to_base_speed;
 			}
 		}
 		
