@@ -563,6 +563,9 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 			load_wtrigger(room_list[iter]);
 		}
 	}
+	
+	// clean up template_list
+	free(template_list);
 }
 
 
