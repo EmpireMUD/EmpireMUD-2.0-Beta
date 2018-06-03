@@ -48,6 +48,7 @@ extern room_data *create_room(room_data *home);
 extern const char *designate_flags[];
 extern const char *mob_move_types[];
 extern const char *vehicle_flags[];
+extern const char *vehicle_speed_types[];
 
 // external funcs
 extern struct resource_data *copy_resource_list(struct resource_data *input);
@@ -1427,6 +1428,9 @@ void clear_vehicle(vehicle_data *veh) {
 	
 	// attributes init
 	VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
+	
+	// Since we've wiped out the attributes above, we need to set the speed to the default of VSPEED_NORMAL (two bonuses).
+	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
 }
 
 
@@ -1573,6 +1577,16 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				parse_trig_proto(line, &(veh->proto_script), error);
 				break;
 			}
+				
+			case 'P': { // speed bonuses (default is VSPEED_NORMAL, set above in clear_vehicle(veh)
+				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
+					log("SYSERR: Format error in P line of %s", error);
+					exit(1);
+				}
+				
+				VEH_SPEED_BONUSES(veh) = int_in[0];
+				break;
+			}
 			
 			// end
 			case 'S': {
@@ -1656,6 +1670,9 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', veh->proto_script);
+	
+	// P: speed bonuses
+	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -2269,7 +2286,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s\t0 %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0], Speed: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)], vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -2412,6 +2429,7 @@ void olc_show_vehicle(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
+	sprintf(buf + strlen(buf), "<%sspeed\t0> %s\r\n", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
 	sprintf(buf + strlen(buf), "<%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
 	
@@ -2484,6 +2502,11 @@ OLC_MODULE(vedit_animalsrequired) {
 OLC_MODULE(vedit_capacity) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_CAPACITY(veh) = olc_process_number(ch, argument, "capacity", "capacity", 0, 10000, VEH_CAPACITY(veh));
+}
+
+OLC_MODULE(vedit_speed) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_SPEED_BONUSES(veh) = olc_process_type(ch, argument, "speed", "speed", vehicle_speed_types, VEH_SPEED_BONUSES(veh));
 }
 
 

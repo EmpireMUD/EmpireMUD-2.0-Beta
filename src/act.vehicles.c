@@ -603,6 +603,44 @@ void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont
 	}
 }
 
+/**
+ * Helper function to get a reference to the vehicle the character is currently driving.
+ *
+ * @param char_data *ch The character doing the driving.
+ * @return vehicle_data *veh The vehicle they're driving, or NULL if no acceptable vehicle was found.
+ */
+vehicle_data *get_current_piloted_vehicle(char_data *ch) {
+	int subcmd = GET_ACTION_VNUM(ch, 2);
+	vehicle_data *veh = NULL;
+	
+	// Select the vehicle they're sitting in; if that doesn't exist, the one in the room. If neither exists, bail out.
+	if (!(veh = GET_SITTING_ON(ch)) && !(veh = GET_ROOM_VEHICLE(IN_ROOM(ch)))) {
+		return NULL;
+	}
+	
+	// Check if the vehicle is driveable. If it isn't, bail out.
+	if (!VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
+		return NULL;
+	}
+	
+	// If they're not actually driving it, bail out.
+	if (veh != GET_DRIVING(ch)) {
+		return NULL;
+	}
+	
+	// If it doesn't have enough horsepower to be moving, bail out.
+	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
+		return NULL;
+	}
+	
+	// They're probably more concerned with putting themselves out.
+	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		return NULL;
+	}
+	
+	return veh;
+}
+
 
 /**
 * Tick update for driving action.
@@ -619,23 +657,8 @@ void process_driving(char_data *ch) {
 	// translate 'dir' from the way the character THINKS he's going, to the actual way
 	dir = confused_dirs[get_north_for_char(ch)][0][dir];
 	
-	// not got a vehicle?
-	if ((!(veh = GET_SITTING_ON(ch)) && !(veh = GET_ROOM_VEHICLE(IN_ROOM(ch)))) || !VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
-		cancel_action(ch);
-		return;
-	}
-	// on wrong vehicle?
-	if (veh != GET_DRIVING(ch)) {
-		cancel_action(ch);
-		return;
-	}
-	
-	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
-		cancel_action(ch);
-		return;
-	}
-	
-	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+	// Find the vehicle they're actually driving, if any.
+	if (!(veh = get_current_piloted_vehicle(ch))){
 		cancel_action(ch);
 		return;
 	}
