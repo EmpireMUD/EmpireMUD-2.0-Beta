@@ -341,7 +341,7 @@ void update_actions(void) {
 			} else {
 				// If we have no vehicle tp read from, mimic the behavior of the previous code (it didn't check for vehicles).
 				// Previous code's behavior was to give all driving/piloting characters a flat +2 speed boost.
-				speed += half_secs_to_add_to_base_speed;
+				speed += ACTION_CYCLE_SECOND;
 			}
 		}
 		
