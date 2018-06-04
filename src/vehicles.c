@@ -871,6 +871,11 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 
 	CREATE(veh, vehicle_data, 1);
 	clear_vehicle(veh);
+	
+	// fix memory leak because attributes was allocated by clear_vehicle then overwritten by the next line
+	if (veh->attributes) {
+		free(veh->attributes);
+	}
 
 	*veh = *proto;
 	LL_PREPEND2(vehicle_list, veh, next);
