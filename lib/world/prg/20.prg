@@ -350,10 +350,10 @@ W
 S
 #2051
 Shipping Magnate~
-   Build or buy ten total cargo ships to show the world the force of your
+   Build or buy five total cargo ships to show the world the force of your
 empire's economy. This goal unlocks the hulk, an advanced cargo ship.
 ~
-5 2 0 25 0
+6 2 0 25 0
 K 2 957
 P 2050
 W

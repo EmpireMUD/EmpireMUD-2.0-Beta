@@ -3,9 +3,10 @@ Almost Famous~
    An empire is defined by its people and its laws, but it is remembered for
 its monuments. Build your first monument -- any building that gives Fame -- to
 complete this goal. Make sure you claim the monument. Completing this goal will
-unlock new monuments for your empire.
+unlock new monuments for your empire. Building a shrine is an easy way to
+increase your fame.
 ~
-4 4 0 5 0
+5 4 0 5 0
 K 2 5141
 K 2 5143
 K 2 5144
