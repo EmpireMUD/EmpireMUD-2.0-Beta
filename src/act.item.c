@@ -3368,11 +3368,11 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
-	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
+	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
@@ -3517,7 +3517,7 @@ void warehouse_store(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to store items here.\r\n");
 		return;
 	}
@@ -5384,7 +5384,7 @@ ACMD(do_retrieve) {
 	if (!str_cmp(objname, "all")) {
 		HASH_ITER(hh, isle->store, store, next_store) {
 			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch))) {
-				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW)) {
+				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 					msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 					return;
 				}
@@ -5411,7 +5411,7 @@ ACMD(do_retrieve) {
 				if (multi_isname(objname, GET_OBJ_KEYWORDS(objn)) && (++pos == number)) {
 					found = 1;
 					
-					if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW)) {
+					if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 						msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 						return;
 					}

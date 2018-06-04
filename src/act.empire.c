@@ -219,7 +219,7 @@ void do_customize_island(char_data *ch, char *argument) {
 	else if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You must be part of an empire to customize an island.\r\n");;
 	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to customize anything.\r\n");
 	}
 	else if (!(island = GET_ISLAND(IN_ROOM(ch))) || !(eisle = get_empire_island(GET_LOYALTY(ch), island->id))) {
@@ -3070,7 +3070,7 @@ ACMD(do_abandon) {
 		msg_to_char(ch, "You're not part of an empire.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
-		// this doesn't use has_permission because that would check if the land is owned already
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
@@ -3227,7 +3227,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't cede the inside of a vehicle.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CEDE)) {
-		// don't use has_permission here because it would check permits on the room you're in
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to cede.\r\n");
 	}
 	else if (ROOM_OWNER(room) != e)
@@ -3450,7 +3450,7 @@ ACMD(do_claim) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {
-		// this doesn't use has_permission because that would check if the land is owned already
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to claim for the empire.\r\n");
 	}
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
@@ -3525,7 +3525,7 @@ ACMD(do_demote) {
 		return;
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_PROMOTE)) {
-		// don't use has_permission, it would check the ownership of the room
+		// could probably now use has_permission
 		msg_to_char(ch, "You can't demote anybody!\r\n");
 		return;
 	}
@@ -3677,7 +3677,7 @@ ACMD(do_diplomacy) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_DIPLOMACY)) {
-		// don't use has_permission, it would check the ownership of the room
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have the authority to make diplomatic relations.\r\n");
 	}
 	
@@ -4314,7 +4314,7 @@ ACMD(do_enroll) {
 	if (!e)
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_ENROLL)) {
-		// don't use has_permission; it would check ownership of the room
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have the authority to enroll followers.\r\n");
 	}
 	else if (!*arg)
@@ -4987,7 +4987,7 @@ ACMD(do_home) {
 		else if (ROOM_PRIVATE_OWNER(real) != NOBODY && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
 			msg_to_char(ch, "Someone already owns this home.\r\n");
 		}
-		else if (!has_permission(ch, PRIV_HOMES)) {	// after the has-owner check because otherwise the error is misleading
+		else if (!has_permission(ch, PRIV_HOMES, IN_ROOM(ch))) {	// after the has-owner check because otherwise the error is misleading
 			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
 		}
 		else if (!GET_BUILDING(real) || GET_BLD_CITIZENS(GET_BUILDING(real)) <= 0) {
@@ -5198,7 +5198,7 @@ ACMD(do_tavern) {
 	else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "Your empire doesn't own this tavern.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_WORKFORCE)) {
+	else if (!has_permission(ch, PRIV_WORKFORCE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You need the workforce privilege to change what this tavern is brewing.\r\n");
 	}
 	else if (!*arg || type == NOTHING) {
@@ -6071,7 +6071,7 @@ ACMD(do_promote) {
 		return;
 	}
 	if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_PROMOTE)) {
-		// don't use has_permission, it would check the ownership of the room
+		// could probably now use has_permission
 		msg_to_char(ch, "You can't promote anybody!\r\n");
 		return;
 	}
@@ -6143,7 +6143,7 @@ ACMD(do_publicize) {
 	else if (GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "Your empire doesn't own this area.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_CLAIM)) {
+	else if (!has_permission(ch, PRIV_CLAIM, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to do that.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_PUBLIC)) {
@@ -6228,7 +6228,7 @@ ACMD(do_reclaim) {
 		msg_to_char(ch, "Your empire already owns this acre.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CLAIM)) {
-		// this doesn't use has_permission because that would check if the land is owned already
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to claim land for the empire.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
@@ -6578,7 +6578,7 @@ ACMD(do_workforce) {
 	}
 	// everything below requires privileges
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
-		// this doesn't use has_permission because that would check if the current room is owned
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to set up the workforce.\r\n");
 	}
 	else if (is_abbrev(arg, "keep")) {
@@ -6754,7 +6754,7 @@ ACMD(do_withdraw) {
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "No empire stores coins here.\r\n");
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !has_permission(ch, PRIV_WITHDRAW)) {
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 		// real members only
 		msg_to_char(ch, "You don't have permission to withdraw coins here.\r\n");
 	}

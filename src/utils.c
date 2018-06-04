@@ -1304,20 +1304,25 @@ bool empire_can_claim(empire_data *emp) {
 *
 * @param char_data *ch
 * @param int type PRIV_
+* @param room_data *loc Optional: For permission checks that only matter on claimed tiles. (Pass NULL if location doesn't matter.)
 * @return bool TRUE if it's ok
 */
-bool has_permission(char_data *ch, int type) {
-	empire_data *emp = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+bool has_permission(char_data *ch, int type, room_data *loc) {
+	empire_data *loc_emp = loc ? ROOM_OWNER(HOME_ROOM(loc)) : NULL;
 	
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		return FALSE;
 	}
-	else if (emp && GET_LOYALTY(ch) == emp && GET_RANK(ch) < EMPIRE_PRIV(emp, type)) {
+	else if (loc_emp && GET_LOYALTY(ch) == loc_emp && GET_RANK(ch) < EMPIRE_PRIV(loc_emp, type)) {
 		// for empire members only
 		return FALSE;
 	}
-	else if (emp && GET_LOYALTY(ch) != emp && EMPIRE_PRIV(emp, type) > 1) {
+	else if (loc_emp && GET_LOYALTY(ch) != loc_emp && EMPIRE_PRIV(loc_emp, type) > 1) {
 		// allies can't use things that are above rank 1 in the owner's empire
+		return FALSE;
+	}
+	else if (!loc && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), type)) {
+		// privileges too low on global check
 		return FALSE;
 	}
 	

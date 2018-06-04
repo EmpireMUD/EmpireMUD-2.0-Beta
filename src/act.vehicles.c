@@ -750,7 +750,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	else if (!VEH_FLAGGED(veh, VEH_CUSTOMIZABLE)) {
 		msg_to_char(ch, "You can't customize that!\r\n");
 	}
-	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY) || !has_permission(ch, PRIV_CUSTOMIZE)) {
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to customize that.\r\n");
 	}
 	
