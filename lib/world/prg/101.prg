@@ -20,7 +20,7 @@ Chiv to keep them from bringing ruin to your empire, and to expand your
 territory. (Both mobs are listed twice because there are two variants of Sly
 and you only need one or the other.)
 ~
-1 4 0 5 c
+2 4 0 5 c
 K 7 5
 W
 3 10110 0 1 a
@@ -29,6 +29,6 @@ W
 W
 3 10114 0 1 b
 W
-3 10111 0 11 b
+3 10111 0 1 b
 S
 $

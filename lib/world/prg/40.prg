@@ -123,10 +123,12 @@ Full Coffers~
 the resources needed to found another city. This goal also grants more
 territory per wealth point.
 ~
-2 4 0 25 0
+3 4 0 25 0
 K 4 1
 K 1 1
 P 4021
+W
+28 0 0 4000
 S
 #4023
 Rich Beyond Imagining~

@@ -399,15 +399,42 @@ switch %random.3%
     wait 3 sec
     %echo% A torrent of water pours through %self.name%'s portal, flash-freezing into a huge icy comet!
     wait 2 sec
-    %send% %actor% &rThe comet crashes into you, smashing you to the ground, and explodes!
-    %echoaround% %actor% The comet crashes into %actor.name%, smashing %actor.himher% to the ground, and explodes!
+    set actor %self.fighting%
+    if !%self.fighting%
+      %echo% The comet crashes to the ground, hitting nobody.
+      halt
+    end
+    if %actor.trigger_counterspell%
+      set counterspell 1
+    end
     if %heroic_mode%
-      %aoe% 100 physical
-      %damage% %actor% 400 physical
-      dg_affect #10553 %actor% HARD-STUNNED on 10
+      if %counterspell%
+        %send% %actor% &rThe comet triggers your counterspell and briefly slows, before crashing into you and exploding!
+        %echoaround% %actor% The comet briefly slows before crashing into %actor.name% and exploding!
+        %damage% %actor% 200 physical
+        %echo% &rFragments fly in all directions!
+        %aoe% 100 physical
+      else
+        %send% %actor% &rThe comet crashes into you, smashing you to the ground, and explodes!
+        %echoaround% %actor% The comet crashes into %actor.name%, smashing %actor.himher% to the ground, and explodes!
+        %damage% %actor% 400 physical
+        dg_affect #10553 %actor% HARD-STUNNED on 10
+        %echo% &rFragments fly in all directions!
+        %aoe% 100 physical
+      end
     else
-      %aoe% 50 physical
-      %damage% %actor% 200 physical
+      if %counterspell%
+        %send% %actor% The comet crashes into your counterspell and explodes!
+        %echoaround% %actor% The comet explodes against an invisible shield in front of %actor.name%!
+        %echo% &rFragments fly in all directions!
+        %aoe% 50 physical
+      else
+        %send% %actor% &rThe comet crashes into you, knocking you back, and explodes!
+        %echoaround% %actor% The comet crashes into %actor.name%, knocking %actor.himher% back, and explodes!
+        %damage% %actor% 200 physical
+        %echo% &rFragments fly in all directions!
+        %aoe% 50 physical
+      end
     end
   break
   case 3

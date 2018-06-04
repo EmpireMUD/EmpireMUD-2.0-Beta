@@ -56,10 +56,10 @@ Foundations~
    Your empire is well underway, but if you're planning to rise to greatness,
 you'll need some basic resources first. Collect small stockpiles each of any
 type of rock, lumber, block, pillar, stick, and metal ingots. You will need to
-have all these things stored at once in order to complete this goal. 
+have all these things stored at once in order to complete this goal.
 Completing this goal will allow your empire to build new artisan buildings.
 ~
-8 2 0 5 0
+9 2 0 5 0
 K 2 5130
 K 2 5131
 K 2 5132
@@ -71,6 +71,7 @@ K 2 5138
 K 2 5139
 K 2 5192
 K 2 1401
+K 2 5209
 P 2010
 W
 1 18 0 50 a
