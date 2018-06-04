@@ -744,4 +744,13 @@ fisherman #n~
 20 50 bdqv 0
 1 0 0 7
 S
+#280
+#n~
+organizer #n~
+#n is organizing the depository and sending items off for proper storage.
+~
+10 15 bdqv 0
+1 0 0 15
+T 9802
+S
 $
