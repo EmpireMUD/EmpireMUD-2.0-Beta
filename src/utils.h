@@ -1476,6 +1476,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_MIN_SCALE_LEVEL(veh)  ((veh)->attributes->min_scale_level)
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
 #define VEH_YEARLY_MAINTENANCE(veh)  ((veh)->attributes->yearly_maintenance)
+#define VEH_SPEED_BONUSES(veh)  ((veh)->attributes->veh_move_speed)
 
 // helpers
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")

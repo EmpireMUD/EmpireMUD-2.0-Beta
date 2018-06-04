@@ -2922,7 +2922,7 @@ ACMD(do_mudstats) {
 
 ACMD(do_nearby) {
 	extern const char *alt_dirs[];
-	extern int num_of_start_locs;
+	extern int highest_start_loc_index;
 	extern int *start_locs;
 	
 	int max_dist = room_has_function_and_city_ok(IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
@@ -2970,7 +2970,7 @@ ACMD(do_nearby) {
 
 	// check starting locations
 	if (starts) {
-		for (iter = 0; iter <= num_of_start_locs; ++iter) {
+		for (iter = 0; iter <= highest_start_loc_index; ++iter) {
 			loc = real_room(start_locs[iter]);
 			dist = compute_distance(IN_ROOM(ch), loc);
 		
