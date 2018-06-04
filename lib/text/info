@@ -16,7 +16,7 @@ the help files for MAP and CROPS.
 You can type SCORE to see a sheet of information about your character, with
 your name, play time, and skills. It also shows your health, moves, and mana in
 the form of &gcurrent&0/&gmax&0/+&gregen&0/5s (amount per 5 seconds). You can
-also see get this information in your PROMPT or over MDSP.
+also get this information in your PROMPT or over MDSP.
 
 Here are some starting commands you will want to know from the get go:
    EQUIPMENT (eq)   INVENTORY (i)   SKILLS         QUEST (q)
