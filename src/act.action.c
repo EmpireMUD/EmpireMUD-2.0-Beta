@@ -328,7 +328,7 @@ void update_actions(void) {
 			
 			if (veh) {
 				// Bounds check the value for sanity.
-				if (VEH_SPEED_BONUSES(veh) >= 0 && VEH_SPEED_BONUSES(veh) <= 5) {
+				if (VEH_SPEED_BONUSES(veh) >= VSPEED_VERY_SLOW && VEH_SPEED_BONUSES(veh) <= VSPEED_VERY_FAST) {
 					// Since we have a valid speed, set this as the multiplier for our half-second addition.
 					half_secs_to_add_to_base_speed = VEH_SPEED_BONUSES(veh);
 				} else {
