@@ -1185,7 +1185,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		}
 	}
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
-		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
@@ -1321,7 +1321,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		return TRUE;
 	}
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
-		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
+		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	if (can_take_obj(ch, obj) && get_otrigger(obj, ch)) {

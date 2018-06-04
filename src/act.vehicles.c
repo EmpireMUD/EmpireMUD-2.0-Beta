@@ -405,7 +405,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 		return TRUE;	// don't break loop
 	}
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
-		act("$p: you can't hold any more items.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't hold any more items.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	
@@ -431,8 +431,8 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 			}
 			
 			obj_to_char(obj, ch);
-			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR);
-			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM);
+			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE);
+			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM | TO_QUEUE);
 			
 			if (stealing) {
 				if (emp && IS_IMMORTAL(ch)) {
