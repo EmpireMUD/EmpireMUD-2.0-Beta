@@ -4504,7 +4504,7 @@ char *coord_display(char_data *ch, int x, int y, bool fixed_width) {
 			snprintf(output, sizeof(output), " (%*d, %*d)", X_PRECISION, x, Y_PRECISION, y);
 		}
 		else {
-			snprintf(output, sizeof(output), " (%-*.*s)", X_PRECISION, + Y_PRECISION + 2, "unknown");
+			snprintf(output, sizeof(output), " (%-*.*s)", X_PRECISION + Y_PRECISION + 2, X_PRECISION + Y_PRECISION + 2, "unknown");
 		}
 	}
 	else if (CHECK_MAP_BOUNDS(x, y)) {
