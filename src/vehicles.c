@@ -1567,16 +1567,6 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				VEH_DESIGNATE_FLAGS(veh) = asciiflag_conv(str_in);
 				break;
 			}
-			
-			case 'R': {	// resources/yearly maintenance
-				parse_resource(fl, &VEH_YEARLY_MAINTENANCE(veh), error);
-				break;
-			}
-			
-			case 'T': {	// trigger
-				parse_trig_proto(line, &(veh->proto_script), error);
-				break;
-			}
 				
 			case 'P': { // speed bonuses (default is VSPEED_NORMAL, set above in clear_vehicle(veh)
 				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
@@ -1585,6 +1575,16 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				}
 				
 				VEH_SPEED_BONUSES(veh) = int_in[0];
+				break;
+			}
+			
+			case 'R': {	// resources/yearly maintenance
+				parse_resource(fl, &VEH_YEARLY_MAINTENANCE(veh), error);
+				break;
+			}
+			
+			case 'T': {	// trigger
+				parse_trig_proto(line, &(veh->proto_script), error);
 				break;
 			}
 			
