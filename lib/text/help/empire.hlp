@@ -522,6 +522,8 @@ Empires gain Fame by building great monuments. This trait is required to
 complete some progression goals, and for the "Most Famous Empire" leaderboard
 (shown when you quit).
 
+Basic monuments that give fame are: statue, megalith, temple
+
 See also: EMPIRE SCORE, PROGRESS
 #
 FINDMAINTENANCE "FIND MAINTENANCE"
