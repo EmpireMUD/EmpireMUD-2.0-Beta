@@ -485,7 +485,10 @@ For more information, see the help page for each skill or ability.
 When you hit a skill cap level (50, 75, 100) you get to reset your abilities
 in that skill. To do that, you can type "skill reset <skill>". If you type it
 without the skill name, you can see which skills have free resets available.
-Resetting a skill only resets your current set (see SKILL SWAP).
+You can reset in order to buy a different set of abilities, because you bought
+the wrong ability, or because you were using a certain set of abilities to
+level up and are ready for a longterm set. Resetting a skill only resets your
+current set (see SKILL SWAP).
 
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
