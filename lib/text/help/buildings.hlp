@@ -315,6 +315,15 @@ paving stones. It is well-maintained and forests will not grow upon it.
 
 This building can only be built in a city.
 #
+DEPOSITORY DEPOSITARY
+
+{DD}  Depository  (Foundations goal)
+
+You can store all normal storable items (but not warehouse items) at the
+depository. You must still retrieve the items from their normal locations.
+
+Depositories only work inside cities.
+#
 DOCK DOCKS
 
 &b~&0==&g.&0  Docks  (Seafarers goal)

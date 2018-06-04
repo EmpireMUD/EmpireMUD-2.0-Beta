@@ -233,7 +233,7 @@ You can deposit coins in your empire's vault. Foreign coins are always
 exchanged for local currency at the current exchange rate, and stored as local
 currency.
 
-See also: EXCHANGE, MINT, VAULT, WITHDRAW
+See also: DEPOSITORY, EXCHANGE, MINT, VAULT, WITHDRAW
 #
 DIPLOMACY PEACE WAR ALLIANCE TRUCE DISTRUST
 
@@ -562,6 +562,7 @@ Rewards the following buildings:
   {BB}  apiary
   (BB)  bakery
   (CC)  carpenter
+  {DD}  depository
   (GG)  glassblower
   (OO)  oilmaker
   [PP]  painter
