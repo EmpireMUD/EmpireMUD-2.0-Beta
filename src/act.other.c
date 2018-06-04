@@ -2252,9 +2252,16 @@ ACMD(do_morph) {
 			command_lag(ch, WAIT_ABILITY);
 		}
 		
-		// take the obj
-		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {
-			extract_obj(obj);
+		// required obj?
+		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {
+			if (!IS_IMMORTAL(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {	// bind when used
+				bind_obj_to_player(obj, ch);
+				reduce_obj_binding(obj, ch);
+			}
+			
+			if (MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ)) {	// take the obj
+				extract_obj(obj);
+			}
 		}
 		
 		if (IS_NPC(ch) || fast) {

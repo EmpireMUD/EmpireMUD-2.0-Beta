@@ -459,6 +459,11 @@ void cancel_morphing(char_data *ch) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
 		load_otrigger(obj);
+		
+		if (!IS_IMMORTAL(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {	// bind when used (or gotten)
+			bind_obj_to_player(obj, ch);
+			reduce_obj_binding(obj, ch);
+		}
 	}
 }
 
