@@ -2020,7 +2020,7 @@ ACMD(do_chart) {
 			send_to_char(isle->desc, ch);
 		}
 		
-		if (has_player_tech(ch, PTECH_NAVIGATION) && isle->center != NOWHERE) {
+		if (HAS_NAVIGATION(ch) && isle->center != NOWHERE) {
 			msg_to_char(ch, "Approximate center: (%d, %d)\r\n", MAP_X_COORD(isle->center), MAP_Y_COORD(isle->center));
 			msg_to_char(ch, "Edges: ");
 			any = FALSE;

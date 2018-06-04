@@ -1809,7 +1809,7 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 	any_one_word(argument, arg);
 	
 	if (*arg) {
-		if (!has_player_tech(ch, PTECH_NAVIGATION) && !imm_access) {
+		if (!HAS_NAVIGATION(ch) && !imm_access) {
 			msg_to_char(ch, "You can't list cities for other empires without Navigation.\r\n");
 			return;
 		}

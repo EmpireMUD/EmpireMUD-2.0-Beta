@@ -2173,7 +2173,7 @@ ACMD(do_mapscan) {
 	
 	skip_spaces(&argument);
 	
-	if (IS_NPC(ch) || !has_player_tech(ch, PTECH_NAVIGATION)) {
+	if (IS_NPC(ch) || !HAS_NAVIGATION(ch)) {
 		msg_to_char(ch, "You need Navigation to use mapscan.\r\n");
 	}
 	else if (!*argument) {

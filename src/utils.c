@@ -4496,7 +4496,7 @@ int compute_map_distance(int x1, int y1, int x2, int y2) {
 char *coord_display(char_data *ch, int x, int y, bool fixed_width) {
 	static char output[80];
 	
-	if (!ch || IS_NPC(ch) || !has_player_tech(ch, PTECH_NAVIGATION)) {
+	if (!ch || IS_NPC(ch) || !HAS_NAVIGATION(ch)) {
 		*output = '\0';
 	}
 	else if (fixed_width) {
