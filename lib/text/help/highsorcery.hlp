@@ -109,6 +109,10 @@ ritual magic. It will bring down forests and crops within 3 tiles of the
 caster, one resource at a time, repeating until it completes (or until you run
 out of mana). These resources are transferred to the caster.
 
+On claimed land, you can only devastate forest tiles if you have chop
+permission and can only devastate crop tiles if you have harvest permission.
+These locations will be skipped if you don't have the right privileges.
+
 Gains experience each time you complete the ritual, devastating a tile.
 
 See also: RITUAL
