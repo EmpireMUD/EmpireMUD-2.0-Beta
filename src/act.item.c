@@ -678,8 +678,8 @@ static bool perform_exchange(char_data *ch, obj_data *obj, empire_data *emp) {
 	}
 	else {
 		sprintf(buf, "You exchange $p for %s.", money_amount(emp, amt));
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n exchanges $p for some coins.", TRUE, ch, obj, NULL, TO_ROOM);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		act("$n exchanges $p for some coins.", TRUE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
 		
 		increase_coins(ch, emp, amt);
 		decrease_empire_coins(emp, emp, amt);
@@ -1117,8 +1117,8 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			}
 
 			obj_to_room(obj, IN_ROOM(ch));
-			act("You drop $p.", FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n drops $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			act("You drop $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+			act("$n drops $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
 			
 			// log dropping items in front of mortals
 			if (IS_IMMORTAL(ch)) {
@@ -1132,9 +1132,9 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n drops %s which disappear%s in a puff of smoke!", money_desc(type, amount), (amount == 1 ? "s" : ""));
-			act(buf, FALSE, ch, 0, 0, TO_ROOM);
+			act(buf, FALSE, ch, 0, 0, TO_ROOM | TO_QUEUE);
 
-			msg_to_char(ch, "You drop %s which disappear%s in a puff of smoke!\r\n", (amount != 1 ? "some coins" : "a coin"), (amount == 1 ? "s" : ""));
+			stack_msg_to_desc(ch->desc, "You drop %s which disappear%s in a puff of smoke!\r\n", (amount != 1 ? "some coins" : "a coin"), (amount == 1 ? "s" : ""));
 		}
 	}
 }
@@ -1469,9 +1469,9 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s gives %s to %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), PERS(vict, vict, TRUE));
 	}
 	
-	act("You give $p to $N.", FALSE, ch, obj, vict, TO_CHAR);
-	act("$n gives you $p.", FALSE, ch, obj, vict, TO_VICT);
-	act("$n gives $p to $N.", TRUE, ch, obj, vict, TO_NOTVICT);
+	act("You give $p to $N.", FALSE, ch, obj, vict, TO_CHAR | TO_QUEUE);
+	act("$n gives you $p.", FALSE, ch, obj, vict, TO_VICT | TO_QUEUE);
+	act("$n gives $p to $N.", TRUE, ch, obj, vict, TO_NOTVICT | TO_QUEUE);
 	
 	if (IS_STOLEN(obj) && !IS_NPC(vict) && GET_LOYALTY(vict) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(vict))) {
 		// un-steal if this was the original owner
@@ -1531,7 +1531,7 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 		}
 
 		snprintf(buf, sizeof(buf), "$n gives you %d in various coin%s.", amount, amount == 1 ? "" : "s");
-		act(buf, FALSE, ch, NULL, vict, TO_VICT);
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_QUEUE);
 		// to-room/char messages below
 	}
 	else {
@@ -1549,7 +1549,7 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 		increase_coins(vict, type, amount);
 		
 		snprintf(buf, sizeof(buf), "$n gives you %s.", money_amount(type, amount));
-		act(buf, FALSE, ch, NULL, vict, TO_VICT);
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_QUEUE);
 		// to-room/char messages below
 	}
 	
@@ -1559,11 +1559,11 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 	
 	// msg to char
 	snprintf(buf, sizeof(buf), "You give %s to $N.", money_desc(type, amount));
-	act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+	act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_QUEUE);
 
 	// msg to room
 	snprintf(buf, sizeof(buf), "$n gives %s to $N.", money_desc(type, amount));
-	act(buf, TRUE, ch, NULL, vict, TO_NOTVICT);
+	act(buf, TRUE, ch, NULL, vict, TO_NOTVICT | TO_QUEUE);
 }
 
 
@@ -2431,12 +2431,12 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
 	vehicle_to_room(boat, to_room);
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
 	
 	VEH_SHIPPING_ID(boat) = -1;
@@ -2569,12 +2569,12 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
 	vehicle_to_room(boat, get_ship_pen());
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
 }
 
@@ -3457,8 +3457,8 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 				iter->amount -= 1;
 				any = TRUE;
 				obj_to_char(obj, ch);	// inventory size pre-checked
-				act("You retrieve $p.", FALSE, ch, obj, NULL, TO_CHAR);
-				act("$n retrieves $p.", FALSE, ch, obj, NULL, TO_ROOM);
+				act("You retrieve $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+				act("$n retrieves $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
 				load_otrigger(obj);
 			}
 		}
@@ -4748,7 +4748,7 @@ ACMD(do_keep) {
 				qt_keep_obj(ch, obj, FALSE);
 			}
 			sprintf(buf, "You %s $p.", sname);
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 			obj = next_obj;
 		}
 	}
