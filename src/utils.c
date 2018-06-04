@@ -4780,14 +4780,44 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 * @return room_data* A random starting location.
 */
 room_data *find_starting_location() {
-	extern int num_of_start_locs;
+	extern int highest_start_loc_index;
 	extern int *start_locs;
 	
-	if (num_of_start_locs < 0) {
+	if (highest_start_loc_index < 0) {
 		return NULL;
 	}
 
-	return (real_room(start_locs[number(0, num_of_start_locs)]));
+	return (real_room(start_locs[number(0, highest_start_loc_index)]));
+}
+
+
+/**
+ * Attempt to find a random starting location, other than the one you're currently in
+ *
+ * @return room_data* A random starting location that's less likely to be your current one
+ */
+room_data *find_other_starting_location(room_data *current_room) {
+	extern int highest_start_loc_index;
+	extern int *start_locs;
+	int start_loc_index;
+	
+	if (highest_start_loc_index < 0) {
+		return NULL;
+	}
+	
+	// Select a random start_loc_index.
+	start_loc_index = number(0, highest_start_loc_index);
+	
+	// If the selected index is the user's current room's index:
+	if (start_locs[start_loc_index] == GET_ROOM_VNUM(current_room)) {
+		// Increment by one, and if it's out of bounds, wrap back to 0.
+		if (++start_loc_index > highest_start_loc_index) {
+			start_loc_index = 0;
+		}
+	}
+	
+	// We return a room no matter what, even if it's the one they're in already.
+	return (real_room(start_locs[start_loc_index]));
 }
 
 
