@@ -1239,7 +1239,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				continue;	// wrong chore
 			}
 		
-			snprintf(line, sizeof(line), " (%*d, %*d) %s: %s%s\r\n", X_PRECISION, MAP_X_COORD(wf_log->loc), Y_PRECISION, MAP_Y_COORD(wf_log->loc), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
+			snprintf(line, sizeof(line), "%s %s: %s%s\r\n", coord_display(ch, MAP_X_COORD(wf_log->loc), MAP_Y_COORD(wf_log->loc), TRUE), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
 		
 			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow

@@ -4483,6 +4483,42 @@ int compute_map_distance(int x1, int y1, int x2, int y2) {
 
 
 /**
+* Gets coordinates IF the player has Navigation, and an empty string if not.
+* The coordinates will include a leading space, like " (x, y)" if present. It
+* may also return " (unknown)" if (x,y) are not on the map.
+*
+* @param char_data *ch The person to check for Navigation.
+* @param int x The X-coordinate to show.
+* @param int y The Y-coordinate to show.
+* @param bool fixed_width If TRUE, spaces the coordinates for display in a vertical column.
+* @return char* The string containing " (x, y)" or "", depending on the Navigation ability.
+*/
+char *coord_display(char_data *ch, int x, int y, bool fixed_width) {
+	static char output[80];
+	
+	if (!ch || IS_NPC(ch) || !has_player_tech(ch, PTECH_NAVIGATION)) {
+		*output = '\0';
+	}
+	else if (fixed_width) {
+		if (CHECK_MAP_BOUNDS(x, y)) {
+			snprintf(output, sizeof(output), " (%*d, %*d)", X_PRECISION, x, Y_PRECISION, y);
+		}
+		else {
+			snprintf(output, sizeof(output), " (%-*.*s)", X_PRECISION, + Y_PRECISION + 2, "unknown");
+		}
+	}
+	else if (CHECK_MAP_BOUNDS(x, y)) {
+		snprintf(output, sizeof(output), " (%d, %d)", x, y);
+	}
+	else {
+		strcpy(output, " (unknown)");	// strcpy ok: known width
+	}
+	
+	return output;
+}
+
+
+/**
 * Counts how many adjacent tiles have the given sector type...
 *
 * @param room_data *room The location to check.
