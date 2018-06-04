@@ -3267,9 +3267,10 @@ void b5_37_progress_update(void) {
 	void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
 	
 	struct empire_completed_goal *goal, *next_goal;
+	struct instance_data *inst, *next_inst;
 	empire_data *emp, *next_emp;
 	
-	log("Applying b5.37 progression update...");
+	log("Applying b5.37 update...");
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), goal, next_goal) {
@@ -3283,6 +3284,13 @@ void b5_37_progress_update(void) {
 		}
 		
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+	
+	// remove all instances of adventure 12600 (force respawn to attach trigger)
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (inst->adventure && GET_ADV_VNUM(inst->adventure) == 12600) {
+			delete_instance(inst, TRUE);
+		}
 	}
 }
 
