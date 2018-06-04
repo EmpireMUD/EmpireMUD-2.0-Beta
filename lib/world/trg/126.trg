@@ -229,4 +229,11 @@ else
   halt
 end
 ~
+#12612
+Give rejection~
+0 j 100
+~
+%send% %actor% Don't give the item to %self.name%, use 'quest finish <quest name>' instead (or 'quest finish all').
+return 0
+~
 $
