@@ -219,7 +219,9 @@ bool get_check_money(char_data *ch, obj_data *obj) {
 		case ITEM_COINS: {
 			value = GET_COINS_AMOUNT(obj);
 			increase_coins(ch, emp, value);
-			msg_to_char(ch, "There %s %s.\r\n", (value == 1 ? "was" : "were"), money_amount(emp, value));
+			if (ch->desc) {	// these usually appear with stacked messages
+				stack_msg_to_desc(ch->desc, "There %s %s.\r\n", (value == 1 ? "was" : "were"), money_amount(emp, value));
+			}
 			break;
 		}
 		case ITEM_CURRENCY: {
