@@ -1670,14 +1670,14 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 		fprintf(fl, "D\n%d %d %s\n", VEH_INTERIOR_ROOM_VNUM(veh), VEH_MAX_ROOMS(veh), temp);
 	}
 	
+	// P: speed bonuses
+	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
+	
 	// 'R': resources
 	write_resources_to_file(fl, 'R', VEH_YEARLY_MAINTENANCE(veh));
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', veh->proto_script);
-	
-	// P: speed bonuses
-	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
 	
 	// end
 	fprintf(fl, "S\n");
