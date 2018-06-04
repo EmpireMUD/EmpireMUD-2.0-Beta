@@ -1801,6 +1801,25 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
 	} while (0)
 
 
+// bounds-safe adding: doubles
+#define SAFE_ADD_DOUBLE(field, amount, min, max, warn)  do { \
+		long double _safe_add_old_val = (field);	\
+		field += (amount);	\
+		if ((amount) > 0.0 && (field) < _safe_add_old_val) {	\
+			(field) = (max);	\
+			if (warn) {	\
+				log("SYSERR: SAFE_ADD_DOUBLE out of bounds at %s:%d.", __FILE__, __LINE__);	\
+			}	\
+		}	\
+		else if ((amount) < 0.0 && (field) > _safe_add_old_val) {	\
+			(field) = (min);	\
+			if (warn) {	\
+				log("SYSERR: SAFE_ADD_DOUBLE out of bounds at %s:%d.", __FILE__, __LINE__);	\
+			}	\
+		}	\
+	} while (0)
+
+
 // shortcudt for messaging
 #define send_config_msg(ch, conf)  msg_to_char((ch), "%s\r\n", config_get_string(conf))
 
