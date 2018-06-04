@@ -1893,7 +1893,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	extern bool valid_no_trace(room_data *room);
 	extern bool valid_unseen_passing(room_data *room);
 	
-	int check_x, check_y, closest, dir, dist, max_distance;
+	int closest, dir, dist, max_distance;
 	struct instance_data *ch_inst, *i_inst;
 	descriptor_data *d;
 	char_data *i, *found = NULL;
@@ -1942,20 +1942,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(i)));
 			// dist already set for us
 		
-			if (HAS_NAVIGATION(ch)) {
-				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
-				check_y = Y_COORD(IN_ROOM(i));
-				
-				if (CHECK_MAP_BOUNDS(check_x, check_y) && !RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
-					msg_to_char(ch, "%-20s - (%*d, %*d) %s, %d tile%s %s\r\n", PERS(i, ch, 0), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
-				}
-				else {
-					msg_to_char(ch, "%-20s - (unknown) %s, %d tile%s %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
-				}
-			}
-			else {
-				msg_to_char(ch, "%-20s - %s, %d tile%s %s\r\n", PERS(i, ch, 0), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
-			}
+			msg_to_char(ch, "%-20s -%s %s, %d tile%s %s\r\n", PERS(i, ch, 0), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (dir != NO_DIR ? dirs[dir] : "away"));
 			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
 	}
@@ -2002,20 +1989,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		if (found) {
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), IN_ROOM(found)));
 			// distance is already set for us as 'closest'
-			
-			if (HAS_NAVIGATION(ch)) {
-				check_x = X_COORD(IN_ROOM(found));	// not all locations are on the map
-				check_y = Y_COORD(IN_ROOM(found));
-				if (CHECK_MAP_BOUNDS(check_x, check_y) && !RMT_FLAGGED(IN_ROOM(found), RMT_NO_LOCATION)) {
-					msg_to_char(ch, "%-25s - (%*d, %*d) %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
-				}
-				else {
-					msg_to_char(ch, "%-25s - (unknown) %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
-				}
-			}
-			else {
-				msg_to_char(ch, "%-25s - %s, %d tile%s %s\r\n", PERS(found, ch, 0), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
-			}
+			msg_to_char(ch, "%-25s -%s %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), coord_display_room(ch, IN_ROOM(found), TRUE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (dir != NO_DIR ? dirs[dir] : "away"));
 			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
 		else {
@@ -2026,8 +2000,6 @@ void perform_mortal_where(char_data *ch, char *arg) {
 
 
 void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
-	int check_x, check_y;
-	
 	if (num > 0) {
 		sprintf(buf, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 	}
@@ -2040,20 +2012,7 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 	}
 
 	if (IN_ROOM(obj)) {
-		if (HAS_NAVIGATION(ch)) {
-			check_x = X_COORD(IN_ROOM(obj));	// not all locations are on the map
-			check_y = Y_COORD(IN_ROOM(obj));
-			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-				sprintf(buf + strlen(buf), "[%d] (%d, %d) %s\r\n",  GET_ROOM_VNUM(IN_ROOM(obj)), check_x, check_y, get_room_name(IN_ROOM(obj), FALSE));
-			}
-			else {
-				sprintf(buf + strlen(buf), "[%d] (unknown) %s\r\n", GET_ROOM_VNUM(IN_ROOM(obj)), get_room_name(IN_ROOM(obj), FALSE));
-			}
-		}
-		else {
-			sprintf(buf + strlen(buf), "[%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(obj)), get_room_name(IN_ROOM(obj), FALSE));
-		}
-		
+		sprintf(buf + strlen(buf), "[%d]%s %s\r\n",  GET_ROOM_VNUM(IN_ROOM(obj)), coord_display_room(ch, IN_ROOM(obj), TRUE), get_room_name(IN_ROOM(obj), FALSE));
 		send_to_char(buf, ch);
 	}
 	else if (obj->carried_by) {
@@ -2063,14 +2022,7 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 	else if (obj->in_vehicle) {
 		sprintf(buf + strlen(buf), "inside %s%s\r\n", get_vehicle_short_desc(obj->in_vehicle, ch), recur ? ", which is" : " ");
 		if (recur) {
-			check_x = X_COORD(IN_ROOM(obj->in_vehicle));	// not all locations are on the map
-			check_y = Y_COORD(IN_ROOM(obj->in_vehicle));
-			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-				sprintf(buf + strlen(buf), "%35s[%d] (%d, %d) %s\r\n", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), check_x, check_y, get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
-			}
-			else {
-				sprintf(buf + strlen(buf), "%35s[%d] (unknown) %s\r\n", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
-			}
+			sprintf(buf + strlen(buf), "%35s[%d]%s %s\r\n", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), coord_display_room(ch, IN_ROOM(obj->in_vehicle), TRUE), get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
 		}
 		send_to_char(buf, ch);
 	}
@@ -2093,7 +2045,7 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 
 
 void perform_immort_where(char_data *ch, char *arg) {
-	int check_x, check_y, num = 0, found = 0;
+	int num = 0, found = 0;
 	descriptor_data *d;
 	vehicle_data *veh;
 	char_data *i;
@@ -2106,24 +2058,10 @@ void perform_immort_where(char_data *ch, char *arg) {
 				i = (d->original ? d->original : d->character);
 				if (i && CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i)) {
 					if (d->original) {
-						check_x = X_COORD(IN_ROOM(d->character));	// not all locations are on the map
-						check_y = Y_COORD(IN_ROOM(d->character));
-						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-							msg_to_char(ch, "%-20s - [%d] (%d, %d) %s (in %s)\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), check_x, check_y, get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
-						}
-						else {
-							msg_to_char(ch, "%-20s - [%d] (unknown) %s (in %s)\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
-						}
+						msg_to_char(ch, "%-20s - [%d]%s %s (in %s)\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(d->character), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 					}
 					else {
-						check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
-						check_y = Y_COORD(IN_ROOM(i));
-						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-							msg_to_char(ch, "%-20s - [%d] (%d, %d) %s\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), check_x, check_y, get_room_name(IN_ROOM(i), FALSE));
-						}
-						else {
-							msg_to_char(ch, "%-20s - [%d] (unknown) %s\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
-						}
+						msg_to_char(ch, "%-20s - [%d]%s %s\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
 					}
 				}
 			}
@@ -2133,28 +2071,14 @@ void perform_immort_where(char_data *ch, char *arg) {
 		for (i = character_list; i; i = i->next) {
 			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && multi_isname(arg, GET_PC_NAME(i))) {
 				found = 1;
-				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
-				check_y = Y_COORD(IN_ROOM(i));
-				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-					msg_to_char(ch, "M%3d. %-25s - %s[%d] (%d, %d) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), check_x, check_y, get_room_name(IN_ROOM(i), FALSE));
-				}
-				else {
-					msg_to_char(ch, "M%3d. %-25s - %s[%d] (unknown) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
-				}
+				msg_to_char(ch, "M%3d. %-25s - %s[%d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}
 		}
 		num = 0;
 		LL_FOREACH2(vehicle_list, veh, next) {
 			if (CAN_SEE_VEHICLE(ch, veh) && multi_isname(arg, VEH_KEYWORDS(veh))) {
 				found = 1;
-				check_x = X_COORD(IN_ROOM(veh));	// not all locations are on the map
-				check_y = Y_COORD(IN_ROOM(veh));
-				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-					msg_to_char(ch, "V%3d. %-25s - %s[%d] (%d, %d) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), check_x, check_y, get_room_name(IN_ROOM(veh), FALSE));
-				}
-				else {
-					msg_to_char(ch, "V%3d. %-25s - %s[%d] (unknown) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), get_room_name(IN_ROOM(veh), FALSE));
-				}
+				msg_to_char(ch, "V%3d. %-25s - %s[%d]%s %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), coord_display_room(ch, IN_ROOM(veh), TRUE), get_room_name(IN_ROOM(veh), FALSE));
 			}
 		}
 		for (num = 0, k = object_list; k; k = k->next) {

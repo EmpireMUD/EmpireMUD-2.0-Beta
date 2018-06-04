@@ -2631,7 +2631,7 @@ void show_tavern_status(char_data *ch) {
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (room_has_function_and_city_ok(ter->room, FNC_TAVERN)) {
 			found = TRUE;
-			msg_to_char(ch, "%s %s : %s\r\n", coord_display_room(ch, ter->room, FALSE), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
+			msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, ter->room, FALSE), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
 		}
 	}
 	
@@ -2858,12 +2858,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 				dist = compute_distance(IN_ROOM(ch), node->loc);
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
 			
-				if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_NAVIGATION(ch)) {
-					lsize = snprintf(line, sizeof(line), "%2d %s: %s (%d, %d)", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE), check_x, check_y);
-				}
-				else {
-					lsize = snprintf(line, sizeof(line), "%2d %s: %s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE));
-				}
+				lsize = snprintf(line, sizeof(line), "%2d %s: %s%s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE), coord_display(ch, check_x, check_y, FALSE));
 				
 				if ((PRF_FLAGGED(ch, PRF_POLITICAL) || claimed || foreign) && ROOM_OWNER(node->loc)) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(node->loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(node->loc)));
@@ -2990,12 +2985,7 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 	}
 	else {
 		if (room != IN_ROOM(ch)) {
-			if (HAS_NAVIGATION(ch)) {
-				msg_to_char(ch, "(%d, %d) %s abandoned.\r\n", X_COORD(room), Y_COORD(room), get_room_name(room, FALSE));
-			}
-			else {
-				msg_to_char(ch, "%s abandoned.\r\n", get_room_name(room, FALSE));
-			}
+			msg_to_char(ch, "%s%s abandoned.\r\n", get_room_name(room, FALSE), coord_display_room(ch, room, FALSE));
 			if (ROOM_PEOPLE(room)) {
 				act("$N abandons $S claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
 			}
@@ -3846,7 +3836,7 @@ ACMD(do_efind) {
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
-	int check_x, check_y, total;
+	int total;
 	bool all = FALSE;
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
@@ -3914,23 +3904,7 @@ ACMD(do_efind) {
 				
 				// first item at this location?
 				if (eg->location != last_rm) {
-					if (HAS_NAVIGATION(ch)) {
-						// count have no coordinates
-						check_x = X_COORD(eg->location);
-						check_y = Y_COORD(eg->location);
-						
-						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, check_x, Y_PRECISION, check_y);
-						}
-						else {
-							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(unknown) ");
-						}
-					}
-					else {
-						size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-					}
-					size += snprintf(buf + size, sizeof(buf) - size, "%s: ", get_room_name(eg->location, FALSE));
-					
+					size += snprintf(buf + size, sizeof(buf) - size, "\r\n%s%s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
 					last_rm = eg->location;
 				}
 				else {
@@ -4853,6 +4827,7 @@ ACMD(do_findmaintenance) {
 	// player is only checking one room (pre-validated)
 	if (find_room) {
 		show_resource_list(BUILDING_RESOURCES(find_room), partial);
+		// note: shows coords regardless of navigation
 		msg_to_char(ch, "Maintenance needed for %s (%d, %d): %s\r\n", get_room_name(find_room, FALSE), X_COORD(find_room), Y_COORD(find_room), partial);
 		return;
 	}
@@ -4901,6 +4876,7 @@ ACMD(do_findmaintenance) {
 		// display and free the nodes
 		for (node = node_list; node; node = next_node) {
 			next_node = node->next;
+			// note: shows coords regardless of naviation
 			sprintf(buf + strlen(buf), "%2d building%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, X_COORD(node->loc), Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
 			free(node);
 		}
@@ -4956,11 +4932,8 @@ ACMD(do_home) {
 		if (!home) {
 			msg_to_char(ch, "You have no home set.\r\n");
 		}
-		else if (HAS_NAVIGATION(ch)) {
-			msg_to_char(ch, "Your home is at: %s (%d, %d)\r\n", get_room_name(home, FALSE), X_COORD(home), Y_COORD(home));
-		}
 		else {
-			msg_to_char(ch, "Your home is at: %s\r\n", get_room_name(home, FALSE));
+			msg_to_char(ch, "Your home is at: %s%s\r\n", get_room_name(home, FALSE), coord_display_room(ch, home, FALSE));
 		}
 		
 		msg_to_char(ch, "Use 'home set' to claim this room.\r\n");
@@ -5135,7 +5108,7 @@ ACMD(do_islands) {
 		
 		isle = get_island(item->id, TRUE);
 		room = real_room(isle->center);
-		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", get_island_name_for(isle->id, ch), X_COORD(room), Y_COORD(room));
+		lsize = snprintf(line, sizeof(line), " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 		if (item->territory > 0) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
@@ -5243,11 +5216,8 @@ ACMD(do_tomb) {
 		if (!tomb) {
 			msg_to_char(ch, "You have no tomb set.\r\n");
 		}
-		else if (HAS_NAVIGATION(ch)) {
-			msg_to_char(ch, "Your tomb is at: %s (%d, %d)\r\n", get_room_name(tomb, FALSE), X_COORD(tomb), Y_COORD(tomb));
-		}
 		else {
-			msg_to_char(ch, "Your tomb is at: %s\r\n", get_room_name(tomb, FALSE));
+			msg_to_char(ch, "Your tomb is at: %s%s\r\n", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
 		}
 		
 		// additional info
@@ -5515,7 +5485,7 @@ ACMD(do_offenses) {
 			strcpy(epart, "(unseen)");
 		}
 		
-		// build location part
+		// build location part; note: this shows coords regardless of navigation
 		if (off->x != -1 && off->y != -1) {
 			sprintf(lpart, " (%d, %d)", off->x, off->y);
 		}
@@ -6380,7 +6350,7 @@ ACMD(do_territory) {
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
 	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
-	int total, check_x, check_y;
+	int total;
 	crop_data *crop = NULL;
 	char *remain;
 	
@@ -6486,16 +6456,7 @@ ACMD(do_territory) {
 			next_node = node->next;
 			total += node->count;
 			
-			// territory can be off the map (e.g. ships) and get a -1 here
-			check_x = X_COORD(node->loc);
-			check_y = Y_COORD(node->loc);
-			
-			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-				sprintf(buf + strlen(buf), "%2d tile%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(node->loc, FALSE));
-			}
-			else {
-				sprintf(buf + strlen(buf), "%2d tile%s near%s (unknown) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), get_room_name(node->loc, FALSE));
-			}
+			sprintf(buf + strlen(buf), "%2d tile%s near%s%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
 			free(node);
 		}
 		

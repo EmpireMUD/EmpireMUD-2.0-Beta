@@ -1865,7 +1865,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 			if (STATE(d) == CON_PLAYING && (targ = d->character) && targ != ch && !IS_NPC(targ) && !IS_IMMORTAL(targ)) {
 				if (find_city(GET_LOYALTY(ch), IN_ROOM(targ)) == city) {
 					found = TRUE;
-					msg_to_char(ch, "You sense %s at (%d, %d) %s\r\n", PERS(targ, targ, FALSE), X_COORD(IN_ROOM(targ)), Y_COORD(IN_ROOM(targ)), get_room_name(IN_ROOM(targ), FALSE));
+					msg_to_char(ch, "You sense %s at %s%s\r\n", PERS(targ, targ, FALSE), get_room_name(IN_ROOM(targ), FALSE), coord_display_room(ch, IN_ROOM(targ), FALSE));
 				}
 			}
 		}

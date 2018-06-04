@@ -1362,12 +1362,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	// auto-look
 	if (ch->desc != NULL) {
 		if (IS_SET(flags, MOVE_RUN) && !PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
-			if (has_player_tech(ch, PTECH_NAVIGATION)) {
-				msg_to_char(ch, "You run %s to %s (%d, %d).\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-			}
-			else {
-				msg_to_char(ch, "You run %s to %s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE));
-			}
+			msg_to_char(ch, "You run %s to %s%s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
 		}
 		else {	// normal look
 			look_at_room(ch);
@@ -2012,12 +2007,7 @@ ACMD(do_portal) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%2d. ", count);
 				}
 				
-				// coords: navigation only
-				if (HAS_NAVIGATION(ch)) {
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, "(%*d, %*d) ", X_PRECISION, X_COORD(room), Y_PRECISION, Y_COORD(room));
-				}
-				
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s (%s%s&0)", get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s%s (%s%s&0)", coord_display_room(ch, room, TRUE), get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 				
 				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(room))) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");

@@ -1934,13 +1934,7 @@ ACMD(do_interlink) {
 		// success!
 		create_exit(IN_ROOM(ch), to_room, dir, TRUE);
 		
-		if (HAS_NAVIGATION(ch)) {
-			msg_to_char(ch, "You interlink %s to %s (%d, %d).\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(to_room, FALSE), X_COORD(to_room), Y_COORD(to_room));
-		}
-		else {
-			msg_to_char(ch, "You interlink %s to %s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(to_room, FALSE));
-		}
-		
+		msg_to_char(ch, "You interlink %s to %s%s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(to_room, FALSE), coord_display_room(ch, to_room, FALSE));
 		act("$n interlinks the room with another building.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (ROOM_PEOPLE(to_room)) {

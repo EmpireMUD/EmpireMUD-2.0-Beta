@@ -2084,12 +2084,7 @@ ACMD(do_chart) {
 				city_prompt = TRUE;
 			}
 			
-			if (has_player_tech(ch, PTECH_NAVIGATION)) {
-				msg_to_char(ch, " The %s%s\t0 %s of %s (%d, %d)\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name, X_COORD(citer->largest_city->location), Y_COORD(citer->largest_city->location));
-			}
-			else {
-				msg_to_char(ch, " The %s%s\t0 %s of %s\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name);
-			}
+			msg_to_char(ch, " The %s%s\t0 %s of %s%s\r\n", EMPIRE_BANNER(citer->emp), EMPIRE_ADJECTIVE(citer->emp), city_type[citer->largest_city->type].name, citer->largest_city->name, coord_display_room(ch, citer->largest_city->location, FALSE));
 		}
 		
 		free_chart_hash(hash);
@@ -2978,13 +2973,7 @@ ACMD(do_nearby) {
 				found = TRUE;
 
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-			
-				if (HAS_NAVIGATION(ch)) {
-					snprintf(line, sizeof(line), " %2d %s: %s (%d, %d)\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
-				}
-				else {
-					snprintf(line, sizeof(line), " %2d %s: %s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE));
-				}
+				snprintf(line, sizeof(line), " %2d %s: %s%s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
 				
 				if (size + strlen(line) < sizeof(buf)) {
 					strcat(buf, line);
@@ -3005,13 +2994,7 @@ ACMD(do_nearby) {
 					found = TRUE;
 				
 					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-
-					if (HAS_NAVIGATION(ch)) {
-						snprintf(line, sizeof(line), " %d %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-					}
-					else {
-						snprintf(line, sizeof(line), " %d %s: the %s of %s / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-					}
+					snprintf(line, sizeof(line), " %d %s: the %s of %s%s / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 					
 					if (size + strlen(line) < sizeof(buf)) {
 						strcat(buf, line);
@@ -3049,12 +3032,7 @@ ACMD(do_nearby) {
 			// show instance
 			found = TRUE;
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
-			if (HAS_NAVIGATION(ch)) {
-				snprintf(line, sizeof(line), " %d %s: %s (%d, %d) / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst), part);
-			}
-			else {
-				snprintf(line, sizeof(line), " %d %s: %s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), instance_level_string(inst), part);
-			}
+			snprintf(line, sizeof(line), " %d %s: %s%s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
@@ -3264,13 +3242,8 @@ ACMD(do_weather) {
 }
 
 
-ACMD(do_whereami) {	
-	if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
-		msg_to_char(ch, "You are at: %s (%d, %d)\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-	}
-	else {
-		msg_to_char(ch, "You are at: %s\r\n", get_room_name(IN_ROOM(ch), FALSE));
-	}
+ACMD(do_whereami) {
+	msg_to_char(ch, "You are at: %s%s\r\n", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
 }
 
 
