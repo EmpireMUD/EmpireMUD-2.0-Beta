@@ -1780,6 +1780,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_FASTER_BONUS  BIT(7)	// speed boost from starting bonus
 #define ACTF_FAST_PROSPECT  BIT(8)	// empire tech boosts speed
 #define ACTF_FAST_EXCAVATE  BIT(9)	// empire tech boosts speed, when in-city
+#define ACTF_VEHICLE_SPEEDS BIT(10)  // signals that this action accelerates based on vehicle speeds
 
 
 // BONUS_x: bonus traits
@@ -2274,6 +2275,13 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
 #define VEH_VISIBLE_IN_DARK  BIT(20)	// u. can be seen at night
 #define VEH_NO_CLAIM  BIT(21)	// v. cannot be claimed
+
+// VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
+#define VSPEED_VERY_SLOW  0 // No speed bonuses.
+#define VSPEED_SLOW       1 // One speed bonus.
+#define VSPEED_NORMAL     2 // Two speed bonuses.
+#define VSPEED_FAST       3 // Three speed bonuses.
+#define VSPEED_VERY_FAST  4 // Four speed bonuses.
 
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
@@ -5004,6 +5012,7 @@ struct vehicle_attribute_data {
 	int max_rooms;	// 1 = can enter; >1 allows designate
 	bitvector_t designate_flags;	// DES_ flags
 	struct resource_data *yearly_maintenance;
+	int veh_move_speed;  // VSPEED_ for driving action speed
 };
 
 

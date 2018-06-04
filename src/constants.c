@@ -3975,6 +3975,16 @@ const char *vehicle_flags[] = {
 	"\n"
 };
 
+// VSPEED_x: Vehicle speed classes
+const char *vehicle_speed_types[] = {
+	"Very Slow",
+	"Slow",
+	"Normal",
+	"Fast",
+	"Very Fast",
+	"\n"
+};
+
 
 // WAIT_x: Wait types for the command_lag() function.
 const char *wait_types[] = {

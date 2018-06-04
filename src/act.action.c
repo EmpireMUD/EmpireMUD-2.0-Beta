@@ -137,13 +137,13 @@ const struct action_data_struct action_data[] = {
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
-	{ "driving", "is driving.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
+	{ "driving", "is driving.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
 	{ "reading", "is reading a book.", ACTF_SITTING, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
-	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
-	{ "piloting", "is piloting the vessel.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
+	{ "sailing", "is sailing the ship.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
+	{ "piloting", "is piloting the vessel.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
 	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	
@@ -228,6 +228,10 @@ void stop_room_action(room_data *room, int action, int chore) {
 * This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
+	// Extern functions.
+	extern vehicle_data *get_current_piloted_vehicle(char_data *ch);
+	
+	// Extern vars.
 	extern struct gen_craft_data_t gen_craft_data[];
 	extern bool catch_up_actions;
 	
@@ -315,6 +319,30 @@ void update_actions(void) {
 		}
 		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
 			speed += ACTION_CYCLE_HALF_SEC;
+		}
+		
+		// Vehicles set a flat speed based on their number of speed bonuses.
+		if (IS_SET(act_flags, ACTF_VEHICLE_SPEEDS)) {
+			int half_secs_to_add_to_base_speed = VSPEED_NORMAL;
+			vehicle_data *veh = get_current_piloted_vehicle(ch);
+			
+			if (veh) {
+				// Bounds check the value for sanity.
+				if (VEH_SPEED_BONUSES(veh) >= VSPEED_VERY_SLOW && VEH_SPEED_BONUSES(veh) <= VSPEED_VERY_FAST) {
+					// Since we have a valid speed, set this as the multiplier for our half-second addition.
+					half_secs_to_add_to_base_speed = VEH_SPEED_BONUSES(veh);
+				} else {
+					// In the case of no valid VSPEED_ flag being detected, move at VSPEED_VERY_SLOW and log.
+					log("SYSERR: Unrecognized vehicle speed flag %d for vehicle #%d (%s).", VEH_SPEED_BONUSES(veh), VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				}
+				
+				// Apply our vehicle movement modifier to speed, overriding any prior speed changes.
+				speed = ACTION_CYCLE_SECOND + (ACTION_CYCLE_HALF_SEC * half_secs_to_add_to_base_speed);
+			} else {
+				// If we have no vehicle tp read from, mimic the behavior of the previous code (it didn't check for vehicles).
+				// Previous code's behavior was to give all driving/piloting characters a flat +2 speed boost.
+				speed += ACTION_CYCLE_SECOND;
+			}
 		}
 		
 		// things that slow you down
