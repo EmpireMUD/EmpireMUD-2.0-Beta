@@ -5917,7 +5917,7 @@ ACMD(do_progress) {
 					*vstr = '\0';
 				}
 				
-				snprintf(line, sizeof(line), "+ %s%s (%d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+				snprintf(line, sizeof(line), "+ %s\tc%s\t0 (%d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 				any = TRUE;
 			
 				if (size + strlen(line) + 18 < sizeof(buf)) {
