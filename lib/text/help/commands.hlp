@@ -469,7 +469,7 @@ customize its things.
 Valid types:
 - building (requires the Customize Building ability)
 - island
-- vehicle
+- vehicle (not all vehicles can be customized)
 
 Valid fields:
 - name
