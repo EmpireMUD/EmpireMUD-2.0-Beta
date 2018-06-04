@@ -152,6 +152,7 @@ ACMD(do_consider) {
 	bitvector_t bits;
 	int diff, pos, hitch;
 	char_data *vict;
+	bool any = FALSE;
 	
 	one_argument(argument, arg);
 	
@@ -178,34 +179,46 @@ ACMD(do_consider) {
 		if (diff != 0) {
 			snprintf(buf, sizeof(buf), "$E is %d level%s %s you.", ABSOLUTE(diff), PLURAL(ABSOLUTE(diff)), diff > 0 ? "below" : "above");
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+			any = TRUE;
 		}
 		
 		// difficulty
 		if (MOB_FLAGGED(vict, MOB_HARD) && MOB_FLAGGED(vict, MOB_GROUP)) {
 			act("$E is a boss fight (requires 4 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+			any = TRUE;
 		}
 		else if (MOB_FLAGGED(vict, MOB_GROUP)) {
 			act("$E is a group fight (requires 3 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+			any = TRUE;
 		}
 		else if (MOB_FLAGGED(vict, MOB_HARD)) {
 			act("$E is a hard fight (may require 2 players of proper level).", FALSE, ch, NULL, vict, TO_CHAR);
+			any = TRUE;
 		}
 
 		// hit/dodge
 		hitch = get_to_hit(ch, vict, FALSE, FALSE) - get_dodge_modifier(vict, ch, FALSE);
 		if (hitch < 50) {
 			act("You would have trouble hitting $M.", FALSE, ch, NULL, vict, TO_CHAR);
+			any = TRUE;
 		}
 		hitch = get_to_hit(vict, ch, FALSE, FALSE) - get_dodge_modifier(ch, vict, FALSE);
 		if (hitch > 50) {
 			act("You would have trouble dodging $S attacks.", FALSE, ch, NULL, vict, TO_CHAR);
+			any = TRUE;
 		}
 
 		// flags (with overflow protection on affected_bits_consider[])
 		for (bits = AFF_FLAGS(vict), pos = 0; bits && *affected_bits_consider[pos] != '\n'; bits >>= 1, ++pos) {
 			if (IS_SET(bits, BIT(0)) && *affected_bits_consider[pos]) {
 				act(affected_bits_consider[pos], FALSE, ch, NULL, vict, TO_CHAR);
+				any = TRUE;
 			}
+		}
+		
+		// no message sent?
+		if (!any) {
+			msg_to_char(ch, "You seem to be an even match.\r\n");
 		}
 	}
 }
