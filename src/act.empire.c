@@ -1859,10 +1859,10 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));
 			dist = compute_distance(IN_ROOM(ch), city->location);
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), city->location));
-			msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d%s), %d %s%s\r\n", count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, traits, dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), pending ? " &r(new)&0" : "");
+			msg_to_char(ch, "%d.%s %s, on %s (%s/%d%s), %d %s%s\r\n", count, coord_display_room(ch, rl, TRUE), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, traits, dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), pending ? " &r(new)&0" : "");
 		}
 		else {
-			msg_to_char(ch, "(%*d, %*d) %s, on %s (traits: %s)\r\n", X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), *buf ? buf : "none");
+			msg_to_char(ch, "%s%s, on %s (traits: %s)\r\n", coord_display_room(ch, rl, TRUE), city->name, get_island_name_for(isle->id, ch), *buf ? buf : "none");
 		}
 	}
 	
@@ -2631,13 +2631,7 @@ void show_tavern_status(char_data *ch) {
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (room_has_function_and_city_ok(ter->room, FNC_TAVERN)) {
 			found = TRUE;
-			
-			if (HAS_NAVIGATION(ch)) {
-				msg_to_char(ch, "(%*d, %*d) %s : %s\r\n", X_PRECISION, X_COORD(ter->room), Y_PRECISION, Y_COORD(ter->room), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
-			}
-			else {
-				msg_to_char(ch, " %s: %s\r\n", get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
-			}
+			msg_to_char(ch, "%s %s : %s\r\n", coord_display_room(ch, ter->room, FALSE), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
 		}
 	}
 	

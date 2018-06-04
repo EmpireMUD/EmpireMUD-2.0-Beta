@@ -1624,7 +1624,7 @@ extern char *trim(char *string);
 // world functions in utils.c
 extern bool check_sunny(room_data *room);
 extern char *coord_display(char_data *ch, int x, int y, bool fixed_width);
-#define room_coord_display(ch, room, fixed_width)  coord_display((ch), X_COORD(room), Y_COORD(room), (fixed_width))
+#define coord_display_room(ch, room, fixed_width)  coord_display((ch), X_COORD(room), Y_COORD(room), (fixed_width))
 extern bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
