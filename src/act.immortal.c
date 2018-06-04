@@ -4665,6 +4665,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_WEALTH: {
 			msg_to_char(ch, "Wealth value: %d\r\n", GET_WEALTH_VALUE(j));
+			msg_to_char(ch, "Automatically minted by workforce: %s\r\n", GET_WEALTH_AUTOMINT(j) ? "yes" : "no");
 			break;
 		}
 		default:
