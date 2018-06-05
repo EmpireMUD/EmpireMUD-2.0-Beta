@@ -7390,6 +7390,36 @@ Object values:
  0 - treasure value
  1 - automint (if 0, workforce won't mint this)
 #d
+"VEDIT SPEED"
+
+Usage:  .speed
+        .speed <number>
+1234567890123456789012345678901234567890123456789012345678901234567890123456789
+The SPEED trait indicates how many speed bonuses are granted to the player 
+while sailing, piloting, or driving the selected vehicle. Acceptable values may
+be listed by using '.speed' on its own.
+
+Values:
+ 0 - Very Slow
+ 1 - Slow
+ 2 - Normal
+ 3 - Fast
+ 4 - Very Fast
+
+See also: OLC VEHICLES, SPEED
+#d
+"WEALTH ITEM" "WEALTH OBJECT"
+
+The WEALTH type represents an object of value. These are not converted to money
+like the COINS type is, but they can be minted into coins by players with a
+mint. Wealth items contribute to an empire's total wealth when they are stored.
+
+This item type has no effect unless the item is stored in normal storage.
+
+Object values:
+ 0 - treasure value
+ 1 - automint (if 0, workforce won't mint this)
+#d
 "WEAPON ITEM" "WEAPON OBJECT"
 
 The WEAPON item type covers melee/caster weapons.
