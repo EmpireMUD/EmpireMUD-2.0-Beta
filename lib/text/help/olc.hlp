@@ -7394,7 +7394,7 @@ Object values:
 
 Usage:  .speed
         .speed <number>
-1234567890123456789012345678901234567890123456789012345678901234567890123456789
+
 The SPEED trait indicates how many speed bonuses are granted to the player 
 while sailing, piloting, or driving the selected vehicle. Acceptable values may
 be listed by using '.speed' on its own.
