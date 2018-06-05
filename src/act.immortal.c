@@ -7863,6 +7863,9 @@ ACMD(do_set) {
 			}
 			return;
 		}
+		
+		// some sets need the delay file
+		check_delayed_load(vict);
 	}
 
 	/* find the command in the list */
