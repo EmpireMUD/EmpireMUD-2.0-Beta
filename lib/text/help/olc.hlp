@@ -7378,6 +7378,16 @@ Examples:
 
 See also: VEDIT KEYWORDS, VEDIT LONG DESCRIPTION, OLC VEHICLES
 #d
+"VEDIT SPEED"
+
+Usage:  .speed
+        .speed <number>
+
+The SPEED trait indicates how many speed bonuses are granted to the player 
+while sailing, piloting, or driving the selected vehicle.
+
+See also: OLC VEHICLES
+#d
 "WEALTH ITEM" "WEALTH OBJECT"
 
 The WEALTH type represents an object of value. These are not converted to money
