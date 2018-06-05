@@ -1963,6 +1963,7 @@ Available functions:
  COOKING-FIRE - can cook, brew, and other tasks that require a fire
  LARGER-NEARBY - extends the radius of 'nearby'
  FISHING - workforce can fish here (also need fish interaction)
+ STORE-ALL - any regular storable item can be stored (but not retrieved)
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d

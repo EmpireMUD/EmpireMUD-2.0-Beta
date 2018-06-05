@@ -240,7 +240,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 					load_otrigger(obj);
 				}
 				
-				if (reward->amount > 0) {
+				if (reward->amount > 1) {
 					snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
 				}
 				else {

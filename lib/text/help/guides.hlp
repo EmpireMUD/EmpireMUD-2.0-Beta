@@ -40,7 +40,7 @@ a distance.
 You don't need to found a city yet, but you will be limited on how much land
 you can claim that isn't in a city. To find out what your claim limits are,
 type "empire <name>" (using the name of your character or empire). There is a
-line on that display that says "Territory: XXX in cities, YYY/ZZZ outside".
+line on that display that says "Territory: XXX/YYY" (with breakdowns by type).
 If you reach your claim limit, you won't be able to claim more land. The
 TERRITORY help file has more information on gaining territory. It can also be
 used to find places you claimed that you might not want any more.

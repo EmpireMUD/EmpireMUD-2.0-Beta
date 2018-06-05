@@ -8,6 +8,8 @@ back to its scaffolding for repairs.
 ~
 uv 19 1000 0 0
 T 12524
+P
+2
 S
 #12513
 boot clockwork giant~
@@ -24,5 +26,7 @@ C
 0 200
 R
 20 2 1 0
+P
+1
 S
 $

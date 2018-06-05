@@ -3,9 +3,10 @@ Almost Famous~
    An empire is defined by its people and its laws, but it is remembered for
 its monuments. Build your first monument -- any building that gives Fame -- to
 complete this goal. Make sure you claim the monument. Completing this goal will
-unlock new monuments for your empire.
+unlock new monuments for your empire. Building a shrine is an easy way to
+increase your fame.
 ~
-4 4 0 5 0
+5 4 0 5 0
 K 2 5141
 K 2 5143
 K 2 5144
@@ -123,10 +124,12 @@ Full Coffers~
 the resources needed to found another city. This goal also grants more
 territory per wealth point.
 ~
-2 4 0 25 0
+3 4 0 25 0
 K 4 1
 K 1 1
 P 4021
+W
+28 0 0 4000
 S
 #4023
 Rich Beyond Imagining~

@@ -407,8 +407,8 @@ static void print_group(char_data *ch) {
 			
 			// show location if different
 			if (IN_ROOM(k) != IN_ROOM(ch)) {
-				if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(IN_ROOM(k), RMT_NO_LOCATION) && (IS_NPC(k) || HAS_NAVIGATION(k)) && X_COORD(IN_ROOM(k)) >= 0) {
-					snprintf(loc, sizeof(loc), " - %s (%d, %d)", get_room_name(IN_ROOM(k), FALSE), X_COORD(IN_ROOM(k)), Y_COORD(IN_ROOM(k)));
+				if (HAS_NAVIGATION(ch) && (IS_NPC(k) || HAS_NAVIGATION(k))) {
+					snprintf(loc, sizeof(loc), " - %s%s", get_room_name(IN_ROOM(k), FALSE), coord_display_room(ch, IN_ROOM(k), FALSE));
 				}
 				else {
 					snprintf(loc, sizeof(loc), " - %s", get_room_name(IN_ROOM(k), FALSE));
@@ -563,12 +563,7 @@ void summon_player(char_data *ch, char *argument) {
 		}
 		
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		if (HAS_NAVIGATION(vict)) {
-			snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%d, %d) -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-		}
-		else {
-			snprintf(buf, sizeof(buf), "$o is trying to summon you to %s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE));
-		}
+		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s%s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
 		command_lag(ch, WAIT_OTHER);
@@ -2252,9 +2247,16 @@ ACMD(do_morph) {
 			command_lag(ch, WAIT_ABILITY);
 		}
 		
-		// take the obj
-		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {
-			extract_obj(obj);
+		// required obj?
+		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {
+			if (!IS_IMMORTAL(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {	// bind when used
+				bind_obj_to_player(obj, ch);
+				reduce_obj_binding(obj, ch);
+			}
+			
+			if (MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ)) {	// take the obj
+				extract_obj(obj);
+			}
 		}
 		
 		if (IS_NPC(ch) || fast) {

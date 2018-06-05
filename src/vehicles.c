@@ -872,6 +872,11 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 
 	CREATE(veh, vehicle_data, 1);
 	clear_vehicle(veh);
+	
+	// fix memory leak because attributes was allocated by clear_vehicle then overwritten by the next line
+	if (veh->attributes) {
+		free(veh->attributes);
+	}
 
 	*veh = *proto;
 	LL_PREPEND2(vehicle_list, veh, next);
@@ -1665,14 +1670,14 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 		fprintf(fl, "D\n%d %d %s\n", VEH_INTERIOR_ROOM_VNUM(veh), VEH_MAX_ROOMS(veh), temp);
 	}
 	
+	// P: speed bonuses
+	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
+	
 	// 'R': resources
 	write_resources_to_file(fl, 'R', VEH_YEARLY_MAINTENANCE(veh));
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', veh->proto_script);
-	
-	// P: speed bonuses
-	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
 	
 	// end
 	fprintf(fl, "S\n");

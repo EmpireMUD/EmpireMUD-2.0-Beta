@@ -1760,6 +1760,7 @@ void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg) {
 
 
 void close_socket(descriptor_data *d) {
+	struct stack_msg *stacked;
 	descriptor_data *temp;
 
 	REMOVE_FROM_LIST(d, descriptor_list, next);
@@ -1837,6 +1838,16 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->file_storage) {
 		free(d->file_storage);
+	}
+	
+	// leftover stacked messages
+	while ((stacked = d->stack_msg_list)) {
+		d->stack_msg_list = stacked->next;
+		
+		if (stacked->string) {
+			free(stacked->string);
+		}
+		free(stacked);
 	}
 	
 	ProtocolDestroy(d->pProtocol);

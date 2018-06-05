@@ -640,7 +640,8 @@ OLC_MODULE(mapedit_naturalize) {
 		// no longer need this
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 		
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+		// probably no need to log 1-tile naturalizes
+		// syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have naturalized the sector for this tile.\r\n");
 		act("$n has naturalized the area!", FALSE, ch, NULL, NULL, TO_ROOM);
 		world_map_needs_save = TRUE;

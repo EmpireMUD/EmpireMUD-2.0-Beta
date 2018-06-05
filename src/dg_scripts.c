@@ -4290,7 +4290,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "coords")) {
-						if (GET_MAP_LOC(r)) {
+						if (GET_MAP_LOC(r) && !RMT_FLAGGED(r, RMT_NO_LOCATION)) {
 							snprintf(str, slen, "(%d, %d)", MAP_X_COORD(GET_MAP_LOC(r)->vnum), MAP_Y_COORD(GET_MAP_LOC(r)->vnum));
 						}
 						else {

@@ -2748,12 +2748,12 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 	}
 	
 	if (amount < 0) {
-		SAFE_ADD(EMPIRE_COINS(emp_gaining), amount, 0, MAX_COIN, FALSE);
+		SAFE_ADD_DOUBLE(EMPIRE_COINS(emp_gaining), amount, 0, MAX_COIN, FALSE);
 		et_change_coins(emp_gaining, amount);
 	}
 	else {
 		if ((local = exchange_coin_value(amount, coin_empire, emp_gaining)) > 0) {
-			SAFE_ADD(EMPIRE_COINS(emp_gaining), local, 0, MAX_COIN, FALSE);
+			SAFE_ADD_DOUBLE(EMPIRE_COINS(emp_gaining), local, 0, MAX_COIN, FALSE);
 			et_change_coins(emp_gaining, local);
 		}
 	}

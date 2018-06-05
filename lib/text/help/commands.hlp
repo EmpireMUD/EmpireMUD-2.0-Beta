@@ -286,9 +286,13 @@ BOTHER NOBOTHER
 
 Usage: toggle bother
 
-When enabled, this toggle protects you from having your character affected by
-various other commands - you cannot be sired, you cannot be purified of
-vampirism, and vampires can't bite you unless you're restrained or unconscious.
+When bother is off, this toggle protects you from having your character
+affected by various other commands - you cannot be sired, you cannot be
+purified of vampirism, and vampires can't bite you unless you're restrained or
+unconscious. It also prevents players from ceding you land
+
+Turn bother on to allow yourself to be bitten or to have land ceded to you,
+but don't forget to turn it off again!
 
 See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
@@ -469,7 +473,7 @@ customize its things.
 Valid types:
 - building (requires the Customize Building ability)
 - island
-- vehicle
+- vehicle (not all vehicles can be customized)
 
 Valid fields:
 - name
@@ -1399,12 +1403,12 @@ You can see what is required for your current goals by typing 'progress
 <goal name>'. This will also show you when you completed a goal, if it is
 finished.
 
-Progression goals are automatically unlocked when your empires meets all the
+Progression goals are automatically unlocked when your empire meets all the
 requirements. Use 'elog progress' to see previous goal achievements.
 
-You can buy rewards with 'rpgress buy [reward name]'. View your completed goals
-or purchased rewards with 'progress completed' and 'progress purchased'. You
-can see if you have new goals with 'progress new'.
+You can buy rewards with 'progress buy [reward name]'. View your completed
+goals or purchased rewards with 'progress completed' and 'progress purchased'.
+You can see if you have new goals with 'progress new'.
 
 See also: ELOG
 Immortals see also: UNPROGRESS

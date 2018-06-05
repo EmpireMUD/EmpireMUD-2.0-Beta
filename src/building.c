@@ -1332,7 +1332,7 @@ ACMD(do_build) {
 	else if (!(e = get_or_create_empire(ch)) && FALSE) {
 		msg_to_char(ch, "You will never see this line, it's only here to set up an empire!\r\n");
 	}
-	else if (!has_permission(ch, PRIV_BUILD)) {
+	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to build anything.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
@@ -1524,7 +1524,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (!has_permission(ch, PRIV_BUILD) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+	if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to dismantle this building.\r\n");
 		return;
 	}
@@ -1579,7 +1579,7 @@ void do_customize_room(char_data *ch, char *argument) {
 	else if (!IS_ANY_BUILDING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't customize here.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You are not allowed to customize.\r\n");
 	}
 	else if (is_abbrev(arg, "name")) {
@@ -1663,7 +1663,7 @@ ACMD(do_dedicate) {
 	else if (GET_LOYALTY(ch) != ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can only dedicate it if you own it.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_BUILD) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to dedicate buildings.\r\n");
 	}
 	else if (!*arg) {
@@ -1755,7 +1755,7 @@ ACMD(do_designate) {
 		msg_to_char(ch, "Invalid direction.\r\n");
 		msg_to_char(ch, "Usage: %s <room>\r\n", subcmd == SCMD_REDESIGNATE ? "redesignate" : "designate <direction>");
 	}
-	else if (!has_permission(ch, PRIV_BUILD) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to designate rooms here.\r\n");
 	}
 	else if (subcmd == SCMD_DESIGNATE && IS_MAP_BUILDING(IN_ROOM(ch)) && dir != BUILDING_ENTRANCE(IN_ROOM(ch))) {
@@ -1891,7 +1891,7 @@ ACMD(do_interlink) {
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building the room before you can interlink it.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_BUILD) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to interlink rooms here.\r\n");
 	}
 	else if ((dir = parse_direction(ch, arg)) == NO_DIR || !can_designate_dir[dir]) {
@@ -1934,13 +1934,7 @@ ACMD(do_interlink) {
 		// success!
 		create_exit(IN_ROOM(ch), to_room, dir, TRUE);
 		
-		if (HAS_NAVIGATION(ch)) {
-			msg_to_char(ch, "You interlink %s to %s (%d, %d).\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(to_room, FALSE), X_COORD(to_room), Y_COORD(to_room));
-		}
-		else {
-			msg_to_char(ch, "You interlink %s to %s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(to_room, FALSE));
-		}
-		
+		msg_to_char(ch, "You interlink %s to %s%s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(to_room, FALSE), coord_display_room(ch, to_room, FALSE));
 		act("$n interlinks the room with another building.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (ROOM_PEOPLE(to_room)) {
@@ -1977,7 +1971,7 @@ ACMD(do_lay) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))
 		msg_to_char(ch, "You can't lay road in someone else's territory!\r\n");
-	else if (!has_permission(ch, PRIV_BUILD))
+	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)))
 		msg_to_char(ch, "You don't have permission to lay road.\r\n");
 	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_PATHFINDING)) {
 		// rough requires Pathfinding
@@ -2083,7 +2077,7 @@ ACMD(do_nodismantle) {
 	else if (!IS_ANY_BUILDING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only toggle nodismantle in buildings.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_BUILD)) {
+	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to do that.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_NO_DISMANTLE)) {
@@ -2110,7 +2104,7 @@ ACMD(do_paint) {
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		msg_to_char(ch, "You don't have permission to paint here.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to paint anything (customize).\r\n");
 	}
 	else if (!COMPLEX_DATA(IN_ROOM(ch)) || !IS_ANY_BUILDING(IN_ROOM(ch))) {
@@ -2181,7 +2175,7 @@ ACMD(do_tunnel) {
 	
 	one_argument(argument, arg);
 	
-	if (!has_permission(ch, PRIV_BUILD)) {
+	if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch))) {
 		msg_to_char(ch, "You do not have permission to build anything.\r\n");
 	}
 	else if (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_TUNNELS)) {
@@ -2273,7 +2267,7 @@ ACMD(do_unpaint) {
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to remove the paint here.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to unpaint anything (customize).\r\n");
 	}
 	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
@@ -2323,7 +2317,7 @@ ACMD(do_upgrade) {
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to upgrade this building.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_BUILD)) {
+	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch))) {
 		msg_to_char(ch, "You do not have permission to upgrade buildings.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {

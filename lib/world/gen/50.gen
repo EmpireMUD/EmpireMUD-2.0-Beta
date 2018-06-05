@@ -1,0 +1,86 @@
+#5001
+set up tent~
+2 0
+0 0 0 0
+T0
+You set up the tent...~
+T1
+$n sets up the tent...~
+T2
+You set up the tent...~
+T3
+$n sets up the tent...~
+T4
+You set up the tent...~
+T5
+$n sets up the tent...~
+S
+#5002
+build rock shelter~
+2 0
+0 0 0 0
+T0
+You drag large rocks to build a shelter...~
+T1
+$n drags large rocks to build a shelter...~
+T2
+You drag large rocks to build a shelter...~
+T3
+$n drags large rocks to build a shelter...~
+T4
+You drag large rocks to build a shelter...~
+T5
+$n drags large rocks to build a shelter...~
+S
+#5003
+build tree shelter~
+2 0
+0 0 0 0
+T0
+You weave a shelter from the tree branches...~
+T1
+$n weaves a shelter from the tree branches...~
+T2
+You weave a shelter from the tree branches...~
+T3
+$n weaves a shelter from the tree branches...~
+T4
+You weave a shelter from the tree branches...~
+T5
+$n weaves a shelter from the tree branches...~
+S
+#5004
+build cave shelter~
+2 0
+0 0 0 0
+T0
+You clean out the cave to make a safe shelter...~
+T1
+$n cleans out the cave to make a safe shelter...~
+T2
+You clean out the cave to make a safe shelter...~
+T3
+$n cleans out the cave to make a safe shelter...~
+T4
+You clean out the cave to make a safe shelter...~
+T5
+$n cleans out the cave to make a safe shelter...~
+S
+#5005
+build jungle shelter~
+2 0
+0 0 0 0
+T0
+You scrape together a shelter from vines and leaves...~
+T1
+$n scrapes together a shelter from vines and leaves...~
+T2
+You scrape together a shelter from vines and leaves...~
+T3
+$n scrapes together a shelter from vines and leaves...~
+T4
+You scrape together a shelter from vines and leaves...~
+T5
+$n scrapes together a shelter from vines and leaves...~
+S
+$

@@ -319,12 +319,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	
 	// message driver
 	if (VEH_DRIVER(veh)) {
-		if (HAS_NAVIGATION(VEH_DRIVER(veh))) {
-			snprintf(buf, sizeof(buf), "You %s $V %s (%d, %d).", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
-		}
-		else {
-			snprintf(buf, sizeof(buf), "You %s $V %s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)]);
-		}
+		snprintf(buf, sizeof(buf), "You %s $V %s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE));
 		act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR);
 		msdp_update_room(VEH_DRIVER(veh));
 	}
@@ -338,12 +333,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		}
 		
 		if (VEH_SITTING_ON(veh) != VEH_DRIVER(veh)) {
-			if (HAS_NAVIGATION(VEH_SITTING_ON(veh))) {
-				snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
-			}
-			else {
-				snprintf(buf, sizeof(buf), "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
-			}
+			snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(VEH_SITTING_ON(veh), IN_ROOM(veh), FALSE));
 			act(buf, FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
 		}
 		
@@ -365,12 +355,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 			LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 				if (ch_iter->desc && ch_iter != VEH_DRIVER(veh)) {
-					if (HAS_NAVIGATION(ch_iter)) {
-						snprintf(buf, sizeof(buf), "$V %s %s (%d, %d).", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
-					}
-					else {
-						snprintf(buf, sizeof(buf), "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
-					}
+					snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(ch_iter, IN_ROOM(veh), FALSE));
 					act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY);
 					msdp_update_room(ch_iter);
 				}
@@ -405,7 +390,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 		return TRUE;	// don't break loop
 	}
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
-		act("$p: you can't hold any more items.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't hold any more items.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	
@@ -431,8 +416,8 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 			}
 			
 			obj_to_char(obj, ch);
-			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR);
-			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM);
+			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE);
+			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM | TO_QUEUE);
 			
 			if (stealing) {
 				if (emp && IS_IMMORTAL(ch)) {
@@ -750,7 +735,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	else if (!VEH_FLAGGED(veh, VEH_CUSTOMIZABLE)) {
 		msg_to_char(ch, "You can't customize that!\r\n");
 	}
-	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY) || !has_permission(ch, PRIV_CUSTOMIZE)) {
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to customize that.\r\n");
 	}
 	

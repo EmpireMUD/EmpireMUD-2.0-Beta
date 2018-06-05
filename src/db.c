@@ -1916,6 +1916,7 @@ const char *versions_list[] = {
 	"b5.30",
 	"b5.34",
 	"b5.35",
+	"b5.37",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3261,6 +3262,39 @@ void b5_35_progress_update(void) {
 }
 
 
+// fixes some progression goals
+void b5_37_progress_update(void) {
+	void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
+	
+	struct empire_completed_goal *goal, *next_goal;
+	struct instance_data *inst, *next_inst;
+	empire_data *emp, *next_emp;
+	
+	log("Applying b5.37 update...");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), goal, next_goal) {
+			// Some goals were changed in this patch. Need to update anybody who completed them.
+			switch (goal->vnum) {
+				case 2011: {	// Foundations: +craft
+					add_learned_craft_empire(emp, 5209);	// depository
+					break;
+				}
+			}
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+	
+	// remove all instances of adventure 12600 (force respawn to attach trigger)
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (inst->adventure && GET_ADV_VNUM(inst->adventure) == 12600) {
+			delete_instance(inst, TRUE);
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3512,6 +3546,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.35")) {
 			b5_35_progress_update();
+		}
+		if (MATCH_VERSION("b5.37")) {
+			b5_37_progress_update();
 		}
 	}
 	

@@ -1544,7 +1544,7 @@ extern bool can_use_room(char_data *ch, room_data *room, int mode);
 extern bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
 extern bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode);
 #define can_use_vehicle(ch, veh, mode)  (IS_IMMORTAL(ch) || (emp_can_use_vehicle(GET_LOYALTY(ch), (veh), (mode)) && (!VEH_INTERIOR_HOME_ROOM(veh) || can_use_room((ch), VEH_INTERIOR_HOME_ROOM(veh), (mode)))))
-extern bool has_permission(char_data *ch, int type);
+extern bool has_permission(char_data *ch, int type, room_data *loc);
 extern bool has_tech_available(char_data *ch, int tech);
 extern bool has_tech_available_room(room_data *room, int tech);
 extern bool is_at_war(empire_data *emp);
@@ -1623,6 +1623,8 @@ extern char *trim(char *string);
 
 // world functions in utils.c
 extern bool check_sunny(room_data *room);
+extern char *coord_display(char_data *ch, int x, int y, bool fixed_width);
+#define coord_display_room(ch, room, fixed_width)  coord_display((ch), (room && !RMT_FLAGGED(room, RMT_NO_LOCATION)) ? X_COORD(room) : NOWHERE, (room && !RMT_FLAGGED(room, RMT_NO_LOCATION)) ? Y_COORD(room) : NOWHERE, (fixed_width))
 extern bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
@@ -1797,6 +1799,25 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
 			(field) = (min);	\
 			if (warn) {	\
 				log("SYSERR: SAFE_ADD out of bounds at %s:%d.", __FILE__, __LINE__);	\
+			}	\
+		}	\
+	} while (0)
+
+
+// bounds-safe adding: doubles
+#define SAFE_ADD_DOUBLE(field, amount, min, max, warn)  do { \
+		long double _safe_add_old_val = (field);	\
+		field += (amount);	\
+		if ((amount) > 0.0 && (field) < _safe_add_old_val) {	\
+			(field) = (max);	\
+			if (warn) {	\
+				log("SYSERR: SAFE_ADD_DOUBLE out of bounds at %s:%d.", __FILE__, __LINE__);	\
+			}	\
+		}	\
+		else if ((amount) < 0.0 && (field) > _safe_add_old_val) {	\
+			(field) = (min);	\
+			if (warn) {	\
+				log("SYSERR: SAFE_ADD_DOUBLE out of bounds at %s:%d.", __FILE__, __LINE__);	\
 			}	\
 		}	\
 	} while (0)

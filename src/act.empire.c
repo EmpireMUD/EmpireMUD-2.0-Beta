@@ -219,7 +219,7 @@ void do_customize_island(char_data *ch, char *argument) {
 	else if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You must be part of an empire to customize an island.\r\n");;
 	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to customize anything.\r\n");
 	}
 	else if (!(island = GET_ISLAND(IN_ROOM(ch))) || !(eisle = get_empire_island(GET_LOYALTY(ch), island->id))) {
@@ -1239,7 +1239,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				continue;	// wrong chore
 			}
 		
-			snprintf(line, sizeof(line), " (%*d, %*d) %s: %s%s\r\n", X_PRECISION, MAP_X_COORD(wf_log->loc), Y_PRECISION, MAP_Y_COORD(wf_log->loc), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
+			snprintf(line, sizeof(line), "%s %s: %s%s\r\n", coord_display(ch, MAP_X_COORD(wf_log->loc), MAP_Y_COORD(wf_log->loc), TRUE), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
 		
 			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
@@ -1809,7 +1809,7 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 	any_one_word(argument, arg);
 	
 	if (*arg) {
-		if (!has_player_tech(ch, PTECH_NAVIGATION) && !imm_access) {
+		if (!HAS_NAVIGATION(ch) && !imm_access) {
 			msg_to_char(ch, "You can't list cities for other empires without Navigation.\r\n");
 			return;
 		}
@@ -1859,10 +1859,10 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));
 			dist = compute_distance(IN_ROOM(ch), city->location);
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), city->location));
-			msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d%s), %d %s%s\r\n", count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, traits, dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), pending ? " &r(new)&0" : "");
+			msg_to_char(ch, "%d.%s %s, on %s (%s/%d%s), %d %s%s\r\n", count, coord_display_room(ch, rl, TRUE), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, traits, dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), pending ? " &r(new)&0" : "");
 		}
 		else {
-			msg_to_char(ch, "(%*d, %*d) %s, on %s (traits: %s)\r\n", X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), *buf ? buf : "none");
+			msg_to_char(ch, "%s%s, on %s (traits: %s)\r\n", coord_display_room(ch, rl, TRUE), city->name, get_island_name_for(isle->id, ch), *buf ? buf : "none");
 		}
 	}
 	
@@ -2631,13 +2631,7 @@ void show_tavern_status(char_data *ch) {
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (room_has_function_and_city_ok(ter->room, FNC_TAVERN)) {
 			found = TRUE;
-			
-			if (HAS_NAVIGATION(ch)) {
-				msg_to_char(ch, "(%*d, %*d) %s : %s\r\n", X_PRECISION, X_COORD(ter->room), Y_PRECISION, Y_COORD(ter->room), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
-			}
-			else {
-				msg_to_char(ch, " %s: %s\r\n", get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
-			}
+			msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, ter->room, FALSE), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
 		}
 	}
 	
@@ -2864,12 +2858,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 				dist = compute_distance(IN_ROOM(ch), node->loc);
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
 			
-				if (CHECK_MAP_BOUNDS(check_x, check_y) && HAS_NAVIGATION(ch)) {
-					lsize = snprintf(line, sizeof(line), "%2d %s: %s (%d, %d)", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE), check_x, check_y);
-				}
-				else {
-					lsize = snprintf(line, sizeof(line), "%2d %s: %s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE));
-				}
+				lsize = snprintf(line, sizeof(line), "%2d %s: %s%s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE), coord_display(ch, check_x, check_y, FALSE));
 				
 				if ((PRF_FLAGGED(ch, PRF_POLITICAL) || claimed || foreign) && ROOM_OWNER(node->loc)) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(node->loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(node->loc)));
@@ -2996,12 +2985,7 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 	}
 	else {
 		if (room != IN_ROOM(ch)) {
-			if (HAS_NAVIGATION(ch)) {
-				msg_to_char(ch, "(%d, %d) %s abandoned.\r\n", X_COORD(room), Y_COORD(room), get_room_name(room, FALSE));
-			}
-			else {
-				msg_to_char(ch, "%s abandoned.\r\n", get_room_name(room, FALSE));
-			}
+			msg_to_char(ch, "%s%s abandoned.\r\n", get_room_name(room, FALSE), coord_display_room(ch, room, FALSE));
 			if (ROOM_PEOPLE(room)) {
 				act("$N abandons $S claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
 			}
@@ -3070,7 +3054,7 @@ ACMD(do_abandon) {
 		msg_to_char(ch, "You're not part of an empire.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
-		// this doesn't use has_permission because that would check if the land is owned already
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
@@ -3227,7 +3211,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't cede the inside of a vehicle.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CEDE)) {
-		// don't use has_permission here because it would check permits on the room you're in
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to cede.\r\n");
 	}
 	else if (ROOM_OWNER(room) != e)
@@ -3450,7 +3434,7 @@ ACMD(do_claim) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {
-		// this doesn't use has_permission because that would check if the land is owned already
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to claim for the empire.\r\n");
 	}
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
@@ -3525,7 +3509,7 @@ ACMD(do_demote) {
 		return;
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_PROMOTE)) {
-		// don't use has_permission, it would check the ownership of the room
+		// could probably now use has_permission
 		msg_to_char(ch, "You can't demote anybody!\r\n");
 		return;
 	}
@@ -3677,7 +3661,7 @@ ACMD(do_diplomacy) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_DIPLOMACY)) {
-		// don't use has_permission, it would check the ownership of the room
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have the authority to make diplomatic relations.\r\n");
 	}
 	
@@ -3852,7 +3836,7 @@ ACMD(do_efind) {
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
-	int check_x, check_y, total;
+	int total;
 	bool all = FALSE;
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
@@ -3920,23 +3904,7 @@ ACMD(do_efind) {
 				
 				// first item at this location?
 				if (eg->location != last_rm) {
-					if (HAS_NAVIGATION(ch)) {
-						// count have no coordinates
-						check_x = X_COORD(eg->location);
-						check_y = Y_COORD(eg->location);
-						
-						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(%*d, %*d) ", X_PRECISION, check_x, Y_PRECISION, check_y);
-						}
-						else {
-							size += snprintf(buf + size, sizeof(buf) - size, "\r\n(unknown) ");
-						}
-					}
-					else {
-						size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-					}
-					size += snprintf(buf + size, sizeof(buf) - size, "%s: ", get_room_name(eg->location, FALSE));
-					
+					size += snprintf(buf + size, sizeof(buf) - size, "\r\n%s%s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
 					last_rm = eg->location;
 				}
 				else {
@@ -4314,7 +4282,7 @@ ACMD(do_enroll) {
 	if (!e)
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_ENROLL)) {
-		// don't use has_permission; it would check ownership of the room
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have the authority to enroll followers.\r\n");
 	}
 	else if (!*arg)
@@ -4859,6 +4827,7 @@ ACMD(do_findmaintenance) {
 	// player is only checking one room (pre-validated)
 	if (find_room) {
 		show_resource_list(BUILDING_RESOURCES(find_room), partial);
+		// note: shows coords regardless of navigation
 		msg_to_char(ch, "Maintenance needed for %s (%d, %d): %s\r\n", get_room_name(find_room, FALSE), X_COORD(find_room), Y_COORD(find_room), partial);
 		return;
 	}
@@ -4907,6 +4876,7 @@ ACMD(do_findmaintenance) {
 		// display and free the nodes
 		for (node = node_list; node; node = next_node) {
 			next_node = node->next;
+			// note: shows coords regardless of naviation
 			sprintf(buf + strlen(buf), "%2d building%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, X_COORD(node->loc), Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
 			free(node);
 		}
@@ -4962,11 +4932,8 @@ ACMD(do_home) {
 		if (!home) {
 			msg_to_char(ch, "You have no home set.\r\n");
 		}
-		else if (HAS_NAVIGATION(ch)) {
-			msg_to_char(ch, "Your home is at: %s (%d, %d)\r\n", get_room_name(home, FALSE), X_COORD(home), Y_COORD(home));
-		}
 		else {
-			msg_to_char(ch, "Your home is at: %s\r\n", get_room_name(home, FALSE));
+			msg_to_char(ch, "Your home is at: %s%s\r\n", get_room_name(home, FALSE), coord_display_room(ch, home, FALSE));
 		}
 		
 		msg_to_char(ch, "Use 'home set' to claim this room.\r\n");
@@ -4987,7 +4954,7 @@ ACMD(do_home) {
 		else if (ROOM_PRIVATE_OWNER(real) != NOBODY && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
 			msg_to_char(ch, "Someone already owns this home.\r\n");
 		}
-		else if (!has_permission(ch, PRIV_HOMES)) {	// after the has-owner check because otherwise the error is misleading
+		else if (!has_permission(ch, PRIV_HOMES, IN_ROOM(ch))) {	// after the has-owner check because otherwise the error is misleading
 			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
 		}
 		else if (!GET_BUILDING(real) || GET_BLD_CITIZENS(GET_BUILDING(real)) <= 0) {
@@ -5141,7 +5108,7 @@ ACMD(do_islands) {
 		
 		isle = get_island(item->id, TRUE);
 		room = real_room(isle->center);
-		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", get_island_name_for(isle->id, ch), X_COORD(room), Y_COORD(room));
+		lsize = snprintf(line, sizeof(line), " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 		if (item->territory > 0) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
@@ -5198,7 +5165,7 @@ ACMD(do_tavern) {
 	else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "Your empire doesn't own this tavern.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_WORKFORCE)) {
+	else if (!has_permission(ch, PRIV_WORKFORCE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You need the workforce privilege to change what this tavern is brewing.\r\n");
 	}
 	else if (!*arg || type == NOTHING) {
@@ -5249,11 +5216,8 @@ ACMD(do_tomb) {
 		if (!tomb) {
 			msg_to_char(ch, "You have no tomb set.\r\n");
 		}
-		else if (HAS_NAVIGATION(ch)) {
-			msg_to_char(ch, "Your tomb is at: %s (%d, %d)\r\n", get_room_name(tomb, FALSE), X_COORD(tomb), Y_COORD(tomb));
-		}
 		else {
-			msg_to_char(ch, "Your tomb is at: %s\r\n", get_room_name(tomb, FALSE));
+			msg_to_char(ch, "Your tomb is at: %s%s\r\n", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
 		}
 		
 		// additional info
@@ -5521,7 +5485,7 @@ ACMD(do_offenses) {
 			strcpy(epart, "(unseen)");
 		}
 		
-		// build location part
+		// build location part; note: this shows coords regardless of navigation
 		if (off->x != -1 && off->y != -1) {
 			sprintf(lpart, " (%d, %d)", off->x, off->y);
 		}
@@ -5917,7 +5881,7 @@ ACMD(do_progress) {
 					*vstr = '\0';
 				}
 				
-				snprintf(line, sizeof(line), "+ %s%s (%d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+				snprintf(line, sizeof(line), "+ %s\tc%s\t0 (%d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 				any = TRUE;
 			
 				if (size + strlen(line) + 18 < sizeof(buf)) {
@@ -6071,7 +6035,7 @@ ACMD(do_promote) {
 		return;
 	}
 	if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_PROMOTE)) {
-		// don't use has_permission, it would check the ownership of the room
+		// could probably now use has_permission
 		msg_to_char(ch, "You can't promote anybody!\r\n");
 		return;
 	}
@@ -6143,7 +6107,7 @@ ACMD(do_publicize) {
 	else if (GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "Your empire doesn't own this area.\r\n");
 	}
-	else if (!has_permission(ch, PRIV_CLAIM)) {
+	else if (!has_permission(ch, PRIV_CLAIM, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to do that.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_PUBLIC)) {
@@ -6228,7 +6192,7 @@ ACMD(do_reclaim) {
 		msg_to_char(ch, "Your empire already owns this acre.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_CLAIM)) {
-		// this doesn't use has_permission because that would check if the land is owned already
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to claim land for the empire.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
@@ -6386,7 +6350,7 @@ ACMD(do_territory) {
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
 	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
-	int total, check_x, check_y;
+	int total;
 	crop_data *crop = NULL;
 	char *remain;
 	
@@ -6492,16 +6456,7 @@ ACMD(do_territory) {
 			next_node = node->next;
 			total += node->count;
 			
-			// territory can be off the map (e.g. ships) and get a -1 here
-			check_x = X_COORD(node->loc);
-			check_y = Y_COORD(node->loc);
-			
-			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-				sprintf(buf + strlen(buf), "%2d tile%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(node->loc, FALSE));
-			}
-			else {
-				sprintf(buf + strlen(buf), "%2d tile%s near%s (unknown) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), get_room_name(node->loc, FALSE));
-			}
+			sprintf(buf + strlen(buf), "%2d tile%s near%s%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
 			free(node);
 		}
 		
@@ -6578,7 +6533,7 @@ ACMD(do_workforce) {
 	}
 	// everything below requires privileges
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
-		// this doesn't use has_permission because that would check if the current room is owned
+		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to set up the workforce.\r\n");
 	}
 	else if (is_abbrev(arg, "keep")) {
@@ -6754,7 +6709,7 @@ ACMD(do_withdraw) {
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "No empire stores coins here.\r\n");
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !has_permission(ch, PRIV_WITHDRAW)) {
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 		// real members only
 		msg_to_char(ch, "You don't have permission to withdraw coins here.\r\n");
 	}

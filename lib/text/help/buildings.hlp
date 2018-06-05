@@ -101,15 +101,13 @@ BUILD BUILDING "BASIC BUILDINGS"
 Build (Trade ability)
 
 Usage:  build <building> [direction]
-        build <monument> <god>
         build info <building>
 
 Speed boosts:  Faster Chores bonus, haste
 
-This command is used to create buildings using raw materials. If you build a
-shrine or temple, you must specify a god to dedicate it to. Most other
-buildings require a direction that they'll face. Resources are added from left
-to right in the requirements list (you can't add nails before lumber).
+This command is used to create buildings using raw materials. Most buildings
+require a direction that they'll face. Resources are added from left to right
+in the requirements list (you can't add nails before lumber).
 
 You can just get information on a building, like what it costs to build, by
 typing "build info <building>".
@@ -314,6 +312,15 @@ The courtyard is a well-appointed open space, well-planted and with fine
 paving stones. It is well-maintained and forests will not grow upon it.
 
 This building can only be built in a city.
+#
+DEPOSITORY DEPOSITARY
+
+{DD}  Depository  (Foundations goal)
+
+You can store all normal storable items (but not warehouse items) at the
+depository. You must still retrieve the items from their normal locations.
+
+Depositories only work inside cities.
 #
 DOCK DOCKS
 

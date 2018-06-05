@@ -1304,20 +1304,25 @@ bool empire_can_claim(empire_data *emp) {
 *
 * @param char_data *ch
 * @param int type PRIV_
+* @param room_data *loc Optional: For permission checks that only matter on claimed tiles. (Pass NULL if location doesn't matter.)
 * @return bool TRUE if it's ok
 */
-bool has_permission(char_data *ch, int type) {
-	empire_data *emp = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+bool has_permission(char_data *ch, int type, room_data *loc) {
+	empire_data *loc_emp = loc ? ROOM_OWNER(HOME_ROOM(loc)) : NULL;
 	
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		return FALSE;
 	}
-	else if (emp && GET_LOYALTY(ch) == emp && GET_RANK(ch) < EMPIRE_PRIV(emp, type)) {
+	else if (loc_emp && GET_LOYALTY(ch) == loc_emp && GET_RANK(ch) < EMPIRE_PRIV(loc_emp, type)) {
 		// for empire members only
 		return FALSE;
 	}
-	else if (emp && GET_LOYALTY(ch) != emp && EMPIRE_PRIV(emp, type) > 1) {
+	else if (loc_emp && GET_LOYALTY(ch) != loc_emp && EMPIRE_PRIV(loc_emp, type) > 1) {
 		// allies can't use things that are above rank 1 in the owner's empire
+		return FALSE;
+	}
+	else if (!loc && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), type)) {
+		// privileges too low on global check
 		return FALSE;
 	}
 	
@@ -4474,6 +4479,42 @@ int compute_map_distance(int x1, int y1, int x2, int y2) {
 	dist = (int) sqrt(dist);
 	
 	return dist;
+}
+
+
+/**
+* Gets coordinates IF the player has Navigation, and an empty string if not.
+* The coordinates will include a leading space, like " (x, y)" if present. It
+* may also return " (unknown)" if (x,y) are not on the map.
+*
+* @param char_data *ch The person to check for Navigation.
+* @param int x The X-coordinate to show.
+* @param int y The Y-coordinate to show.
+* @param bool fixed_width If TRUE, spaces the coordinates for display in a vertical column.
+* @return char* The string containing " (x, y)" or "", depending on the Navigation ability.
+*/
+char *coord_display(char_data *ch, int x, int y, bool fixed_width) {
+	static char output[80];
+	
+	if (!ch || IS_NPC(ch) || !HAS_NAVIGATION(ch)) {
+		*output = '\0';
+	}
+	else if (fixed_width) {
+		if (CHECK_MAP_BOUNDS(x, y)) {
+			snprintf(output, sizeof(output), " (%*d, %*d)", X_PRECISION, x, Y_PRECISION, y);
+		}
+		else {
+			snprintf(output, sizeof(output), " (%*.*s)", X_PRECISION + Y_PRECISION + 2, X_PRECISION + Y_PRECISION + 2, "unknown");
+		}
+	}
+	else if (CHECK_MAP_BOUNDS(x, y)) {
+		snprintf(output, sizeof(output), " (%d, %d)", x, y);
+	}
+	else {
+		strcpy(output, " (unknown)");	// strcpy ok: known width
+	}
+	
+	return output;
 }
 
 

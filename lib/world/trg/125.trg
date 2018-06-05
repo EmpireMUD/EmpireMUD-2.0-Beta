@@ -568,6 +568,8 @@ if %tokens% > 0
   done
 end
 %load% mob 12505
+set dealer %self.room.people%
+%echo% %dealer.name% arrives!
 ~
 #12522
 free cannonballs~
