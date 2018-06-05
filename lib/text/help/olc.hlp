@@ -7378,18 +7378,6 @@ Examples:
 
 See also: VEDIT KEYWORDS, VEDIT LONG DESCRIPTION, OLC VEHICLES
 #d
-"WEALTH ITEM" "WEALTH OBJECT"
-
-The WEALTH type represents an object of value. These are not converted to money
-like the COINS type is, but they can be minted into coins by players with a
-mint. Wealth items contribute to an empire's total wealth when they are stored.
-
-This item type has no effect unless the item is stored in normal storage.
-
-Object values:
- 0 - treasure value
- 1 - automint (if 0, workforce won't mint this)
-#d
 "VEDIT SPEED"
 
 Usage:  .speed
