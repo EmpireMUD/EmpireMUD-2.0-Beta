@@ -7384,15 +7384,7 @@ Usage:  .speed
         .speed <number>
 
 The SPEED trait indicates how many speed bonuses are granted to the player 
-while sailing, piloting, or driving the selected vehicle. Acceptable values may
-be listed by using '.speed' on its own.
-
-Values:
- 0 - Very Slow
- 1 - Slow
- 2 - Normal
- 3 - Fast
- 4 - Very Fast
+while sailing, piloting, or driving the selected vehicle.
 
 See also: OLC VEHICLES, SPEED
 #d
