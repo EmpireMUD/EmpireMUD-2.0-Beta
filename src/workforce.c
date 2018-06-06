@@ -106,7 +106,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "brickmaking", BRICKMAKER, FALSE },
 	{ "abandon-dismantled", NOTHING, FALSE },
 	{ "herb-gardening", GARDENER, FALSE },
-	{ "fire brigade", FIRE_BRIGADE, FALSE },
+	{ "fire-brigade", FIRE_BRIGADE, FALSE },
 	{ "trapping", TRAPPER, FALSE },
 	{ "tanning", TANNER, FALSE },
 	{ "shearing", SHEARER, FALSE },

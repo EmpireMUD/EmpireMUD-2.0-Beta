@@ -560,7 +560,7 @@ destination island must have docks to receive the ship.
 
 See also: SHIPPING
 #
-DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
+DOUSE BURNING "PUT OUT FIRE" FIRE-BRIGADE "FIRE BRIGADE"
 
 Usage:  douse [vehicle | light]
 
@@ -569,7 +569,7 @@ It may take a lot of water to douse the fire, and you may have to leave and
 come back. If you don't fully douse it, the flames will slowly rise again, 
 and destroy your structure.
 
-If your empire has a workforce, the fire brigade can also put out fires for
+If your empire has a workforce, the fire-brigade can also put out fires for
 you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
