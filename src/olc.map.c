@@ -402,6 +402,7 @@ OLC_MODULE(mapedit_delete_room) {
 				msg_to_char(c, "Room deleted.\r\n");
 			}
 			look_at_room(c);
+			msdp_update_room(c);
 		}
 		
 		delete_room(in_room, TRUE);

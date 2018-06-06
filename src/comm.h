@@ -17,6 +17,7 @@
 /* comm.c */
 void send_to_all(const char *messg, ...) __attribute__((format(printf, 1, 2)));
 void send_to_char(const char *messg, char_data *ch);
+void msdp_update_room(char_data *ch);
 void msg_to_char(char_data *ch, const char *messg, ...) __attribute__((format(printf, 2, 3)));
 void msg_to_desc(descriptor_data *d, const char *messg, ...) __attribute__((format(printf, 2, 3)));
 void msg_to_vehicle(vehicle_data *veh, bool awake_only, const char *messg, ...) __attribute__((format(printf, 3, 4)));

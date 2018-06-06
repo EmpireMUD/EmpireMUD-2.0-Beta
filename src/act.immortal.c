@@ -205,6 +205,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	qt_visit_room(ch, IN_ROOM(ch));
 	look_at_room(ch);
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	msdp_update_room(ch);	// once we're sure we're staying
 }
 
 
@@ -5604,6 +5605,8 @@ ACMD(do_at) {
 		char_from_room(ch);
 		char_to_room(ch, original_loc);
 	}
+	
+	msdp_update_room(ch);	// in case it changed
 }
 
 
@@ -8375,6 +8378,7 @@ ACMD(do_trans) {
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
+				msdp_update_room(victim);	// once we're sure we're staying
 			}
 		}
 		
@@ -8404,6 +8408,7 @@ ACMD(do_trans) {
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
+			msdp_update_room(victim);	// once we're sure we're staying
 			send_config_msg(ch, "ok_string");
 		}
 	}

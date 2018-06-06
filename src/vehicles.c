@@ -148,6 +148,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 					qt_visit_room(ch, IN_ROOM(ch));
 					look_at_room(ch);
 					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
+					msdp_update_room(ch);
 				}
 				else {
 					extract_char(ch);

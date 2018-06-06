@@ -602,6 +602,7 @@ WCMD(do_wteleport) {
 			char_to_room(ch, target);
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 			qt_visit_room(ch, IN_ROOM(ch));
+			msdp_update_room(ch);	// once we're sure we're staying
 		}
 	}
 	else if (!str_cmp(arg1, "adventure")) {
@@ -630,6 +631,7 @@ WCMD(do_wteleport) {
 						}
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 						qt_visit_room(ch, IN_ROOM(ch));
+						msdp_update_room(ch);	// once we're sure we're staying
 					}
 				}
 			}
@@ -645,6 +647,7 @@ WCMD(do_wteleport) {
 				char_to_room(ch, target);
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 				qt_visit_room(ch, IN_ROOM(ch));
+				msdp_update_room(ch);	// once we're sure we're staying
 			}
 		}
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_room(room, arg1))) {

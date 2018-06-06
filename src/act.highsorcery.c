@@ -1703,6 +1703,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR);
+		msdp_update_room(ch);	// once we're sure we're staying
 	
 		gain_ability_exp(ch, ABIL_RITUAL_OF_TELEPORTATION, 50);
 	

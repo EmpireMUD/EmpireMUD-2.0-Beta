@@ -3379,7 +3379,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
 	void give_level_zero_abilities(char_data *ch);
-	void msdp_update_room(char_data *ch);
 	void refresh_all_quests(char_data *ch);
 	void reset_combat_meters(char_data *ch);
 	

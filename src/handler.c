@@ -1460,7 +1460,6 @@ void char_to_room(char_data *ch, room_data *room) {
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern int lock_instance_level(room_data *room, int level);
-	void msdp_update_room(char_data *ch);
 	void spawn_mobs_from_center(room_data *center);
 	
 	int pos;
@@ -1517,9 +1516,6 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch)) {
 			GET_LAST_ROOM(ch) = GET_ROOM_VNUM(room);
 		}
-		
-		// update location
-		msdp_update_room(ch);
 	}
 }
 

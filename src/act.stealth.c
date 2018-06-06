@@ -244,6 +244,7 @@ void perform_escape(char_data *ch) {
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR);
+		msdp_update_room(ch);
 		
 		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
@@ -968,6 +969,7 @@ ACMD(do_infiltrate) {
 			greet_mtrigger(ch, NO_DIR);
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR);
+			msdp_update_room(ch);	// once we're sure we're staying
 		}
 
 		// chance to log
@@ -1500,6 +1502,7 @@ ACMD(do_shadowstep) {
 			greet_mtrigger(ch, NO_DIR);
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR);
+			msdp_update_room(ch);	// once we're sure we're staying
 		}
 
 		// chance to log

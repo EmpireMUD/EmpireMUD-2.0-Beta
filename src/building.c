@@ -322,6 +322,7 @@ void disassociate_building(room_data *room) {
 	struct instance_data *inst;
 	bool deleted = FALSE;
 	int was_ter, is_ter;
+	char_data *temp_ch;
 	
 	// for updating territory counts
 	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS);
@@ -417,11 +418,12 @@ void disassociate_building(room_data *room) {
 			remove_designate_objects(iter);
 			
 			// move people and contents
-			while (ROOM_PEOPLE(iter)) {
-				if (!IS_NPC(ROOM_PEOPLE(iter))) {
-					GET_LAST_DIR(ROOM_PEOPLE(iter)) = NO_DIR;
+			while ((temp_ch = ROOM_PEOPLE(iter))) {
+				if (!IS_NPC(temp_ch)) {
+					GET_LAST_DIR(temp_ch) = NO_DIR;
 				}
-				char_to_room(ROOM_PEOPLE(iter), room);
+				char_to_room(temp_ch, room);
+				msdp_update_room(temp_ch);
 			}
 			while (ROOM_CONTENTS(iter)) {
 				obj_to_room(ROOM_CONTENTS(iter), room);
@@ -1039,6 +1041,7 @@ void start_dismantle_building(room_data *loc) {
 				}
 				char_from_room(targ);
 				char_to_room(targ, loc);
+				msdp_update_room(targ);
 			}
 		
 			delete_room(room, FALSE);	// must check_all_exits

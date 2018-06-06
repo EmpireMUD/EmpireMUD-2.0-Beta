@@ -656,6 +656,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	greet_mtrigger(ch, NO_DIR);
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR);
+	msdp_update_room(ch);	// once we're sure we're staying
 
 	for (k = ch->followers; k; k = k->next) {
 		if ((IN_ROOM(k->follower) == was_in) && (GET_POS(k->follower) >= POS_STANDING)) {
@@ -1086,6 +1087,8 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	else {
 		greet_memory_mtrigger(ch);
 	}
+	
+	msdp_update_room(ch);	// once we're sure we're staying
 }
 
 
@@ -1389,6 +1392,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		greet_memory_mtrigger(ch);
 	}
 	
+	msdp_update_room(ch);	// once we're sure we're staying
 	return TRUE;
 }
 
@@ -1708,6 +1712,7 @@ ACMD(do_circle) {
 	}
 	entry_memory_mtrigger(ch);
 	greet_memory_mtrigger(ch);
+	msdp_update_room(ch);	// once we're sure we're staying
 	
 	gain_ability_exp_from_moves(ch, was_in, MOVE_CIRCLE);
 	

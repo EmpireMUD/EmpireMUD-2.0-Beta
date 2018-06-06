@@ -304,6 +304,8 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetNumber(desc, eMSDP_ROOM_VNUM, IS_IMMORTAL(ch) ? GET_ROOM_VNUM(IN_ROOM(ch)) : 0);
 	MSDPSetString(desc, eMSDP_ROOM_NAME, get_room_name(IN_ROOM(ch), FALSE));
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
+	
+	MSDPUpdate(desc);
 }
 
 
