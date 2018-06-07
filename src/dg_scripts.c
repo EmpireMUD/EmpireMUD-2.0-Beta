@@ -2431,7 +2431,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				struct instance_data *inst = get_instance_for_script(type, go);
 				
 				// does not require an instance
-				if (!str_cmp(field, "nearest_rmt")) {
+				if (!str_cmp(field, "nearest_adventure")) {
+					extern room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum);
+					room_data *find;
+					any_vnum vnum;
+					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_adventure(get_room_by_script(type, go), vnum))) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(find) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
+				else if (!str_cmp(field, "nearest_rmt")) {
 					extern room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
 					room_data *find;
 					any_vnum vnum;

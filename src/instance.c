@@ -1680,6 +1680,52 @@ int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum) {
 
 
 /**
+* Finds the closest instance with a given vnum, and returns the instance's
+* base location. This function does not pre-load instances if the adventure
+* allows delay-loads.
+*
+* @param room_data *from Our "closest to" starting point.
+* @param any_vnum vnum Which adventure vnum we're looking for.
+*/
+room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum) {
+	adv_data *adv = adventure_proto(vnum);
+	struct instance_data *inst, *closest = NULL;
+	int this, dist = 0;
+	room_data *map;
+	
+	if (!adv) {
+		return NULL;	// no such adventure
+	}
+	if (!(map = (GET_MAP_LOC(from) ? real_room(GET_MAP_LOC(from)->vnum) : NULL))) {
+		return NULL;	// does not work if no map loc
+	}
+	
+	LL_FOREACH(instance_list, inst) {
+		if (inst->adventure != adv) {
+			continue;	// wrong adv
+		}
+		if (IS_SET(inst->flags, INST_COMPLETED)) {
+			continue;	// do not pick a completed adventure
+		}
+		
+		// this could work
+		this = compute_distance(map, inst->location);
+		if (!closest || this < dist) {
+			closest = inst;	// save for later
+			dist = this;
+		}
+	}
+	
+	if (closest) {
+		return closest->location;
+	}
+	else {
+		return NULL;
+	}
+}
+
+
+/**
 * Finds the closest instance with a given room template, and returns the
 * instantiated room location.
 *
