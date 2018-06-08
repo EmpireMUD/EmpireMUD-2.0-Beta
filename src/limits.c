@@ -47,7 +47,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 // external funcs
 extern obj_data *die(char_data *ch, char_data *killer);
 void death_log(char_data *ch, char_data *killer, int type);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
@@ -477,7 +477,7 @@ void point_update_char(char_data *ch) {
 				if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
 					inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
 					if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-						inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+						inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE);
 					}
 					// if no instance or not level-locked
 					if (!inst || inst->level <= 0) {
@@ -561,7 +561,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// first check location: this may move the player
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE)) || inst->id != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE)) || inst->id != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
 		adventure_unsummon(ch);
 	}
 	
@@ -1823,9 +1823,9 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 	}
 	
 	// player limit, maybe
-	if (IS_ADVENTURE_ROOM(loc) && (inst = find_instance_by_room(loc, FALSE))) {
+	if (IS_ADVENTURE_ROOM(loc) && (inst = find_instance_by_room(loc, FALSE, FALSE))) {
 		// only if not already in there
-		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch), FALSE) != inst) {
+		if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) != inst) {
 			if (!can_enter_instance(ch, inst)) {
 				return FALSE;
 			}

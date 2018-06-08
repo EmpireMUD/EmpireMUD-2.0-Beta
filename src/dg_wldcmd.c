@@ -35,7 +35,7 @@ extern struct instance_data *quest_instance_global;
 void send_char_pos(char_data *ch, int dam);
 void die(char_data *ch, char_data *killer);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 char_data *get_char_by_room(room_data *room, char *name);
 room_data *get_room(room_data *ref, char *name);
 obj_data *get_obj_by_room(room_data *room, char *name);
@@ -133,7 +133,7 @@ WCMD(do_wadventurecomplete) {
 	
 	inst = quest_instance_global;
 	if (!inst) {
-		inst = find_instance_by_room(room, FALSE);
+		inst = find_instance_by_room(room, FALSE, TRUE);
 	}
 	
 	if (inst) {
@@ -1019,7 +1019,7 @@ WCMD(do_wload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	struct instance_data *inst = find_instance_by_room(room, FALSE);
+	struct instance_data *inst = find_instance_by_room(room, FALSE, TRUE);
 	int number = 0;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
@@ -1110,7 +1110,7 @@ WCMD(do_wload) {
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
 		}
-		else if ((inst = find_instance_by_room(room, FALSE)) && inst->level > 0) {
+		else if ((inst = find_instance_by_room(room, FALSE, TRUE)) && inst->level > 0) {
 			// scaling by locked adventure
 			scale_item_to_level(object, inst->level);
 		}
@@ -1477,7 +1477,7 @@ WCMD(do_wscale) {
 	else if (*lvl_arg) {
 		level = atoi(lvl_arg);
 	}
-	else if ((inst = find_instance_by_room(room, FALSE))) {
+	else if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
 		level = inst->level;
 	}
 	else {
@@ -1492,7 +1492,7 @@ WCMD(do_wscale) {
 	// scale adventure
 	if (!str_cmp(arg, "instance")) {
 		void scale_instance_to_level(struct instance_data *inst, int level);
-		if (inst || (inst = find_instance_by_room(room, FALSE))) {
+		if (inst || (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			scale_instance_to_level(inst, level);
 		}
 	}

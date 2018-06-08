@@ -43,7 +43,7 @@ extern const struct toggle_data_type toggle_data[];	// constants.c
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 extern char *get_room_name(room_data *room, bool color);
@@ -73,7 +73,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	if (GET_POS(ch) < POS_STANDING) {
 		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
-	else if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+	else if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
 		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -716,7 +716,7 @@ OFFER_FINISH(ofin_summon) {
 	if (type == SUMMON_ADVENTURE) {
 		SET_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
-		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = (inst = find_instance_by_room(loc, FALSE)) ? inst->id : NOTHING;
+		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = (inst = find_instance_by_room(loc, FALSE, FALSE)) ? inst->id : NOTHING;
 		map = GET_MAP_LOC(IN_ROOM(ch));
 		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? map->vnum : NOWHERE;
 	}

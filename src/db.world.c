@@ -440,7 +440,7 @@ room_data *create_room(room_data *home) {
 */
 void delete_room(room_data *room, bool check_exits) {
 	EVENT_CANCEL_FUNC(cancel_room_expire_event);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
 	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
@@ -497,7 +497,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// delete any open instance here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
@@ -643,6 +643,10 @@ void delete_room(room_data *room, bool check_exits) {
 			if (inst->location == room) {
 				SET_BIT(inst->flags, INST_COMPLETED);
 				inst->location = NULL;
+			}
+			if (inst->fake_loc == room) {
+				SET_BIT(inst->flags, INST_COMPLETED);
+				inst->fake_loc = inst->location;	// reset to main loc (may be NULL)
 			}
 			if (inst->start == room) {
 				SET_BIT(inst->flags, INST_COMPLETED);
