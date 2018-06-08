@@ -1631,7 +1631,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		return;
 	}
 	
-	if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
+	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER)) {
 		if (!IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't fill your water until it's finished being built.\r\n");
 			return;
@@ -1639,7 +1639,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		act("You gently fill $p with water.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n gently fills $p with water.", TRUE, ch, obj, 0, TO_ROOM);
 	}
-	else if (HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
+	else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAVERN)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE) == 0 || !IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "This tavern has nothing on tap.\r\n");
 			return;

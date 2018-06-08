@@ -3092,7 +3092,7 @@ ACMD(do_barde) {
 	
 	one_argument(argument, arg);
 
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -3585,6 +3585,9 @@ ACMD(do_deposit) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only deposit coins in a vault.\r\n");
+	}
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
+		msg_to_char(ch, "You can only deposit coins in this vault if it's in a city.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building it first.\r\n");
@@ -5155,6 +5158,10 @@ ACMD(do_tavern) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAVERN)) {
+		show_tavern_status(ch);
+		msg_to_char(ch, "This tavern only works in a city.\r\n");
+	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "Complete the building to change what it's brewing.\r\n");
@@ -6699,6 +6706,9 @@ ACMD(do_withdraw) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only withdraw coins in a vault.\r\n");
+	}
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
+		msg_to_char(ch, "This vault only works if it's in a city.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building it first.\r\n");

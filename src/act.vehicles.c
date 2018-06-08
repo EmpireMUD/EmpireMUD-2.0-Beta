@@ -1492,7 +1492,7 @@ ACMD(do_dispatch) {
 	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {
 		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
 	}
-	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && HAS_FUNCTION(IN_ROOM(veh), FNC_DOCKS)) {
+	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(IN_ROOM(veh), FNC_DOCKS)) {
 		msg_to_char(ch, "It is already docked on that island.\r\n");
 	}
 	else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {

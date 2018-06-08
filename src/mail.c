@@ -208,6 +208,9 @@ ACMD(do_mail) {
 		if (!IS_IMMORTAL(ch) && !HAS_FUNCTION(IN_ROOM(ch), FNC_MAIL)) {
 			msg_to_char(ch, "You can only send mail from a pigeon post.\r\n");
 		}
+		else if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MAIL)) {
+			msg_to_char(ch, "This pigeon post only works if it's in a city.\r\n");
+		}
 		else if (!IS_IMMORTAL(ch) && !IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "Complete the building first.\r\n");
 		}

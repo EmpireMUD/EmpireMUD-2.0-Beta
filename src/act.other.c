@@ -2569,6 +2569,9 @@ ACMD(do_shear) {
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You need to be in a stable to shear anything.\r\n");
 	}
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
+		msg_to_char(ch, "This stable must be in a city for you to shear anything.\r\n");
+	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "Complete the building first.\r\n");
 	}

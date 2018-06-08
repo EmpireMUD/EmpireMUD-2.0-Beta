@@ -2109,19 +2109,19 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	
 	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
-	if (HAS_FUNCTION(room, FNC_APIARY)) {
+	if (room_has_function_and_city_ok(room, FNC_APIARY)) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_APIARIES] += amt;
 		}
 	}
-	if (HAS_FUNCTION(room, FNC_GLASSBLOWER)) {
+	if (room_has_function_and_city_ok(room, FNC_GLASSBLOWER)) {
 		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_GLASSBLOWING] += amt;
 		}
 	}
-	if (HAS_FUNCTION(room, FNC_DOCKS)) {
+	if (room_has_function_and_city_ok(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_SEAPORT] += amt;
