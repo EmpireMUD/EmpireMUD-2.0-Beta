@@ -1756,7 +1756,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 		dist = compute_distance(loc, city->location);
 		
 		// check radii
-		if (dist <= city_type[city->type].radius) {
+		if (dist <= city_type[city->type].radius && GET_ISLAND(loc) == GET_ISLAND(city->location)) {
 			// check wait?
 			type = TER_CITY;
 		}
