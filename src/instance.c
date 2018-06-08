@@ -2050,7 +2050,7 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 	}
 	
 	// check if it's the location for one
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
+	if (allow_fake_loc || ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
 		for (inst = instance_list; inst; inst = inst->next) {
 			if (inst->location == room || (check_homeroom && HOME_ROOM(inst->location) == room)) {
 				return inst;	// real loc
