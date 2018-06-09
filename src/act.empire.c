@@ -1456,7 +1456,7 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_city_data *city;
 	int x, y, radius;
 	room_data *iter, *next_iter, *to_room, *center, *home;
-	bool found = FALSE, all = FALSE;
+	bool found = FALSE, all = FALSE, junk;
 	int len;
 	
 	// look for the "all" at the end
@@ -1517,6 +1517,9 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 			}
 			if (ROOM_SECT_FLAGGED(to_room, SECTF_NO_CLAIM)) {
 				continue;
+			}
+			if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
+				continue;	// wouldn't be in-city (checks corners and islands)
 			}
 			
 			// ok...
