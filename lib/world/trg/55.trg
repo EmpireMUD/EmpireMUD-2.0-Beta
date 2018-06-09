@@ -34,6 +34,7 @@ set item %actor.inventory(5511)%
 High Sorcery skillbook~
 1 t 100
 ~
+set room %actor.room%
 if !%self.is_flagged(ENCHANTED)%
   halt
 end
@@ -45,6 +46,7 @@ end
 if %room.bld_flagged(IN-CITY-ONLY)% && !%room.in_city(true)%
   %send% %actor% %self.shortdesc% suddenly snaps shut before you can finish reading!
   %send% %actor% (This Tower of Sorcery doesn't work correctly when it's not in a city.)
+  halt
 end
 if %actor.can_gain_new_skills% && %actor.skill(High Sorcery)% == 0 && !%actor.noskill(High Sorcery)%
   %send% %actor% &mYour mind begins to open to the ways of High Sorcery, and you are now an apprentice to this school.&0
