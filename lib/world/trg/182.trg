@@ -31,10 +31,11 @@ end
 %send% %actor% &0an inn on its back. (Type 'board tortoise' to climb onto the tortoise.)
 ~
 #18202
-City tortoise entry~
+Atlasian Tortoise location updater~
 0 i 100
 ~
 set room %self.room%
+nop %instance.set_location(%room%)%
 %regionecho% %room% -7 The footfalls of %self.name% shake the earth as %self.heshe% moves to %room.coords%.
 wait 5
 %echo% %self.name% looms large over the scenery. It's so large that it carries
@@ -45,7 +46,7 @@ City turtle load~
 0 n 100
 ~
 context %instance.id%
-if !%instance.location%
+if !%instance.real_location%
   %purge% %self%
 end
 if %self.room.template%==18200
@@ -56,7 +57,7 @@ if %self.room.template%==18200
     set already_loaded_tortoise 1
     global already_loaded_tortoise
   end
-  mgoto %instance.location%
+  mgoto %instance.real_location%
 end
 ~
 #18204

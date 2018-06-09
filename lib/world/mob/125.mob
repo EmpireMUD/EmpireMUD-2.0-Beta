@@ -8,7 +8,6 @@ An enormous clockwork colossus towers over you (adventure).
 I 4 12551 100.00 1  # LOOT: the clockwork loot controller
 T 12516
 T 12500
-T 12518
 T 12517
 T 12520
 T 12521
@@ -36,6 +35,7 @@ T 12507
 T 12508
 T 12509
 T 12510
+T 12517
 S
 #12502
 spider clockwork~

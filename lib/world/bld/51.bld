@@ -1201,7 +1201,7 @@ S
 Courtyard~
 The Courtyard~
 ....~
-10 0 di 0
+10 0 dil 0
 0 0 0 -1
 R
 1002 1 5 0
@@ -1232,7 +1232,7 @@ S
 Baths~
 The Baths~
 &0[&b~~&0]~
-16 0 R 0
+16 0 lR 0
 0 0 0 -1
 C
 bathe~
@@ -1257,7 +1257,7 @@ S
 Fountain~
 A Flowing Fountain~
 &0{&c~~&0}~
-10 0 do 0
+10 0 dlo 0
 0 0 0 -1
 C
 drink, fill~
@@ -1300,7 +1300,7 @@ S
 Tower of Sorcery~
 The Tower of Sorcery~
 .&b||&?.~
-128 1 R eflm
+128 1 lR eflm
 2 1 0 -1
 C
 inventory, retrieve, store~
@@ -1326,7 +1326,7 @@ S
 Portcullis~
 A Great Portcullis~
 @U&0[]@V~
-64 0 foR abeghijkm
+64 0 floR abeghijkm
 30 0 0 -1
 D
    You are standing beneath a great portcullis. This is the entrance to a
@@ -1347,7 +1347,7 @@ S
 Great Hall~
 The Great Hall~
 &0[**]~
-64 0 fR abeghijkm
+64 0 flR abeghijkm
 30 0 0 -1
 D
    This is the Great Hall, a room lined with magnificent suits of armor and

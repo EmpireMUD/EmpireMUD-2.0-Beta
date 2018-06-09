@@ -449,7 +449,7 @@ Colossus load~
 0 n 100
 ~
 if %self.room.template% == 12500
-  mgoto %instance.location%
+  mgoto %instance.real_location%
   %echo% %self.name% appears.
   set first_chant %random.4%
   set second_chant %random.3%
@@ -465,25 +465,28 @@ if !%self.affect(12501)%
 end
 ~
 #12517
-Colossus move announcement~
+Colossus location updater + leash~
 0 i 100
 ~
 eval room %self.room%
-if %room.distance(%instance.location%)% > 20
+if %room.distance(%instance.real_location%)% > 20
   %echo% %self.name% hastily backtracks.
   return 0
   wait 1
   %echo% %self.name% hastily backtracks.
   halt
 end
-%regionecho% %room% -7 The footfalls of %self.name% shake the earth as %self.heshe% moves to %room.coords%.
+nop %instance.set_location(%room%)%
+if %self.vnum% == 12500
+  %regionecho% %room% -7 The footfalls of %self.name% shake the earth as %self.heshe% moves to %room.coords%.
+end
 ~
 #12518
 wandering mob adventure command~
 0 c 0
 adventure~
 if !(summon /= %arg.car%)
-  %teleport% %actor% %instance.location%
+  %teleport% %actor% %instance.real_location%
   %force% %actor% adventure
   %teleport% %actor% %self%
   return 1
@@ -605,7 +608,7 @@ Delayed Completer~
 ankle brace completion~
 5 n 100
 ~
-if !%instance.location%
+if !%instance.real_location%
   %echo% %self.name% vanishes uselessly.
   %purge% %self%
 end
@@ -613,8 +616,9 @@ eval colossus %instance.mob(12500)%
 %echo% %colossus.name% slowly staggers back to its scaffold.
 if %colossus%
   %echoaround% %colossus% %colossus.name% staggers slowly back to its scaffold.
-  %teleport% %colossus% %instance.location%
+  %teleport% %colossus% %instance.real_location%
   nop %colossus.add_mob_flag(SENTINEL)%
+  nop %colossus.set_location(%instance.real_location%)%
   %echoaround% %colossus% %colossus.name% staggers slowly up.
 end
 %purge% %self%
