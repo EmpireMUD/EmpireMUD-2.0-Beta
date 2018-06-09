@@ -3294,6 +3294,10 @@ void warehouse_identify(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
+	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it for that.\r\n");
+		return;
+	}
 	
 	// list position
 	number = get_number(&argument);
@@ -3374,6 +3378,10 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
+		return;
+	}
+	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it for that.\r\n");
 		return;
 	}
 	
@@ -3519,6 +3527,10 @@ void warehouse_store(char_data *ch, char *argument) {
 	}
 	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to store items here.\r\n");
+		return;
+	}
+	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it for that.\r\n");
 		return;
 	}
 	
@@ -5341,6 +5353,10 @@ ACMD(do_retrieve) {
 		msg_to_char(ch, "You can't retrieve anything here.\r\n");
 		return;
 	}
+	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This storage building must be in a city to use it.\r\n");
+		return;
+	}
 
 	half_chop(argument, arg, buf);
 
@@ -5812,6 +5828,10 @@ ACMD(do_store) {
 	}
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
 		msg_to_char(ch, "You need to establish a trade pact to store your things here.\r\n");
+		return;
+	}
+	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This storage building must be in a city to use it.\r\n");
 		return;
 	}
 
