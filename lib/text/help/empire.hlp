@@ -672,8 +672,8 @@ LUXURIES "LUXURIES GOAL"
 Luxuries (Community goal)
 
 Rewards the following buildings:
-  [**]  greathall
-  V[]V  portcullis
+  [**]  greathall  (in-city only)
+  V[]V  portcullis  (in-city only)
   .==.  steps
 
 See also: LUXURY RESOURCES GOAL, PROGRESS

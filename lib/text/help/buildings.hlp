@@ -63,7 +63,7 @@ The most opulent empires construct bath houses for their citizens. These
 luxuries serve as meeting places and relaxation houses for persons of dist-
 inction throughout the empire, and are a good way to entertain guests.
 
-This building can only be built in a city.
+You can only have this building in a city.
 
 See also:  BATHE
 #
@@ -311,7 +311,7 @@ COURTYARD "COURT YARD"
 The courtyard is a well-appointed open space, well-planted and with fine
 paving stones. It is well-maintained and forests will not grow upon it.
 
-This building can only be built in a city.
+You can only have this building in a city.
 #
 DEPOSITORY DEPOSITARY
 
@@ -390,7 +390,7 @@ buildings, or it can serve as the entrance for those. You can designate a
 huge number of rooms from the great hall, and can interlink it with other
 buildings.
 
-This building can only be built in a city.
+You can only have this building in a city.
 
 See also: DESIGNATE, PORTCULLIS, INTERLINK
 #
@@ -442,7 +442,7 @@ FOUNTAIN
 
 Fountains provide water, like a well.
 
-This building can only be built in a city.
+You can only have this building in a city.
 
 See also: DRINK, FILL
 #
@@ -704,7 +704,7 @@ This great hall is carved into the side of the mountain, the most defensible
 type of terrain. Build your mountain empire by interlinking mountain halls and
 surrounding them with great walls.
 
-This building can only be built in a city.
+You can only have this building in a city.
 
 See also: DESIGNATE, INTERLINK
 #
@@ -822,7 +822,7 @@ Special rooms:  greathall, crypt, throne, vault, baths, laboratory
 The portcullis serves as the entrance to a castle. You can designate a huge
 number of rooms from the portcullis, and can interlink it with other buildings.
 
-This building can only be built in a city.
+You can only have this building in a city.
 
 See also: DESIGNATE, GREAT HALL, INTERLINK
 #
@@ -1173,7 +1173,7 @@ the ways of city magic.
 If you accidentally redesignate your "Top of the Tower" room, you can get it
 back by designating a room as "sorcery tower".
 
-This building can only be built in a city.
+You can only have this building in a city.
 
 See also: DESIGNATE, HIGH SORCERY, REDESIGNATE, STUDY
 #
