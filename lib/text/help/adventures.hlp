@@ -4,7 +4,6 @@ adventures without helps:
 [   50] Tutorial: Royal Planning Office
 [   51] Tutorial: Museum of Early Man
 [   52] Tutorial Quests
-[  100] Magiterranean: The Grove
 [  101] Magiterranean: The Hidden Garden
 [  102] Magiterranean: Interdimensional Whirlwind
 [  103] Magiterranean: Monsoon Rift
@@ -233,6 +232,34 @@ The shops here sell:
   goblin sea-shaman pantaloons pattern - caster pants
   pirate boarding pantaloons pattern - melee pants
   goblin dress pantaloons pattern - pvp/solo pants
+#
+"GROVE OF THE MAGITERRANEAN" "MAGITERRANEAN: THE GROVE" "MAGITERRANEAN THE GROVE" "MAGITERRANEAN GROVE"
+
+Magiterranean: The Grove (level 1-75 adventure)
+
+description here
+
+Grandmother Poplar's Poplar Goods sells for wooden nickels:
+  Grove seeker stone - find more groves easier
+  tiny wildling trap - minipet
+  animal totem of the Grove - more morphs for the Animal Forms ability
+  wild fire - just like the ones you find in the Grove
+  robes of the Grove druids - the local fashion
+  wildling whistle - wildling mount
+  wood henge stone - a henge building for your city
+  oil of the snake druid - use once each to improve the following items:
+  bark gauntlets - dodge gauntlets
+  leaf gloves - to-hit/wits gloves
+  petal gloves - mana/move regen gloves
+  ring of the turtle - dexterity/health ring
+  ring of the badger - to-hit/bonus-physical ring
+  ring of the crow - to-hit/bonus-magical ring
+  belt of the Grove - dexterity/dodge belt
+  girdle of the Forest - strength/to-hit belt
+  sash of the Magiterranean - intelligence/to-hit belt
+
+The belts, rings, and gloves can be upgraded (once each) using the oil of the
+snake druid by typing 'oil <item>'.
 #
 "GUILD OF ADVENTURERS" "ADVENTURERS GUILD" "THE GUILD OF ADVENTURERS"
 
