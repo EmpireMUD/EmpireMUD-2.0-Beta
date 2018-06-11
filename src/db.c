@@ -1917,6 +1917,7 @@ const char *versions_list[] = {
 	"b5.34",
 	"b5.35",
 	"b5.37",
+	"b5.38",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3295,6 +3296,21 @@ void b5_37_progress_update(void) {
 }
 
 
+// remove old Groves
+void b5_38_grove_update(void) {
+	struct instance_data *inst, *next_inst;
+	
+	log("Applying b5.38 update...");
+	
+	// remove all instances of adventure 100 (it's now in-dev)
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (inst->adventure && GET_ADV_VNUM(inst->adventure) == 100) {
+			delete_instance(inst, TRUE);
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3549,6 +3565,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.37")) {
 			b5_37_progress_update();
+		}
+		if (MATCH_VERSION("b5.38")) {
+			b5_38_grove_update();
 		}
 	}
 	
