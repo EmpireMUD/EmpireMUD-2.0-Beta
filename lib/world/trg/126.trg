@@ -271,8 +271,14 @@ Grove 2.0: Druid death~
 0 f 100
 ~
 if %actor.on_quest(12650)%
-  %quest% %actor% drop 12650%
-  %send% %actor% You fail the quest QUESTNAME for killing a druid.
+  %quest% %actor% drop 12650
+  %send% %actor% You fail the quest Tranquility of the Grove for killing a druid.
+  set fox %instance.mob(12676)%
+  if %fox%
+    %at% %fox% %load% mob 12677
+    set new_mob %fox.room.people%
+    %purge% %fox% $n vanishes, replaced with %new_mob.name%.
+  end
 end
 if %self.vnum% <= 12654 || %self.vnum% >= 12657
   * Trash
@@ -358,6 +364,9 @@ if !%result%
 end
 %door% %self.room% %result% room %newroom%
 %load% obj 12653
+%load% mob 12661
+%load% mob 12661
+%load% mob 12661
 %purge% %self%
 ~
 #12653
@@ -609,6 +618,9 @@ Escaped wildling load~
 0 n 100
 ~
 mgoto %instance.location%
+mmove
+mmove
+mmove
 ~
 #12662
 Squirrel Druid: Morph/Nibble~
@@ -849,6 +861,14 @@ dg_affect #12669 %self% off
 nop %self.remove_mob_flag(NO-ATTACK)%
 dg_affect #12671 %self% HARD-STUNNED on 5
 ~
+#12672
+Grove Start Progression~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12650)%
+end
+~
 #12673
 Grove 2.0: Tranquility Chant~
 1 c 2
@@ -898,7 +918,7 @@ while %cycles_left% >= 0
       %send% %actor% Your totem of tranquility takes on a soft white glow, and the air around it seems to cool...
     break
     case 2
-%echoaround% %actor% A peaceful feeling fills the air...
+      %echoaround% %actor% A peaceful feeling fills the air...
       %send% %actor% A peaceful feeling fills the air...
     break
     case 1
@@ -942,6 +962,7 @@ while %cycles_left% >= 0
           if %give_token%
             %send% %person% You receive a %currency.12650(1)%.
           end
+          nop %person.give_currency(12650, 1)%
           if %done%
             %send% %person% You have tranquilized all four of the druid leaders.
             %quest% %person% trigger 12650

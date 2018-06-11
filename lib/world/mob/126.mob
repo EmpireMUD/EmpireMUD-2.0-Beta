@@ -209,6 +209,7 @@ A hooded figure is standing amongst the trees.
 ~
 5 0 dvx c
 1 0 0 15
+I 4 12654 5.00 1  # LOOT: wild fire
 T 12651
 T 12650
 T 12662
@@ -220,6 +221,7 @@ A hooded figure is standing amongst the trees.
 ~
 5 0 bdvx c
 0 0 0 15
+I 4 12654 5.00 1  # LOOT: wild fire
 T 12650
 T 12660
 T 12651
@@ -231,6 +233,7 @@ A tall, antlered druid stands beneath the canopy of trees.
 ~
 5 0 bdvx c
 2 0 0 11
+I 4 12654 5.00 1  # LOOT: wild fire
 T 12650
 T 12651
 T 12659
@@ -242,6 +245,7 @@ A druid of the gopher is crouched in the dirt.
 ~
 5 0 bdvx c
 1 0 0 5
+I 4 12654 5.00 1  # LOOT: wild fire
 T 12650
 T 12651
 T 12660
@@ -253,6 +257,16 @@ A huge creature - half man, half badger - looms over you!
 ~
 5 0 bdvx c
 1 0 0 10
+I 4 12654 5.00 1  # LOOT: wild fire
+M
+0
+$n digs around at the soil.~
+M
+0
+$n scratches behind $s ear.~
+M
+0
+$n growls under $s breath.~
 T 12650
 T 12663
 T 12664
@@ -265,6 +279,16 @@ Archdruid #n seems to glow with the energy of the Grove!
 ~
 5 0 bdvx c
 2 3 0 5
+I 4 12654 5.00 1  # LOOT: wild fire
+M
+1
+Our ambitions cannot be contained by these trees!~
+M
+1
+For too long, the druids have been under the heel of weaker sorcerers.~
+M
+1
+What do you think you're doing here?~
 T 12650
 T 12665
 T 12666
@@ -277,6 +301,16 @@ A tall druid in a black feathered cloak is perched above you.
 ~
 5 0 bdvx c
 2 0 0 10
+I 4 12654 5.00 1  # LOOT: wild fire
+M
+0
+$n caws at you.~
+M
+0
+$n is distracted by something shiny.~
+M
+0
+$n leaps from branch to branch.~
 T 12650
 T 12651
 T 12667
@@ -289,6 +323,16 @@ A rotund druid wallows peacefully in the water.
 ~
 5 0 bdvx c
 1 0 0 9
+I 4 12654 5.00 1  # LOOT: wild fire
+M
+0
+$n lets out a few bubbles.~
+M
+0
+$n looks ready to snap at you.~
+M
+1
+Blub, blub, blub, blub, blub.~
 T 12650
 T 12669
 T 12670
@@ -358,6 +402,7 @@ A hooded druid is floating in the water.
 ~
 0 0 bdvx c
 0 0 0 15
+I 4 12654 5.00 1  # LOOT: wild fire
 T 12650
 T 12651
 T 12683
@@ -395,7 +440,7 @@ A tame wildling is curled up on the ground.
 0 75 dej 0
 0 0 0 10
 I 3 12670 100.00 1  # BARDE: an armored wildling
-I 4 10001 25.00 1  # LOOT: wild fire
+I 4 12654 25.00 1  # LOOT: wild fire
 I 4 12669 100.00 1  # LOOT: a wildling whistle
 S
 #12670
@@ -405,7 +450,7 @@ An armored wildling crouches low, completely covered in plate armor.
 ~
 125 125 dej 0
 0 0 0 10
-I 4 10001 25.00 1  # LOOT: wild fire
+I 4 12654 25.00 1  # LOOT: wild fire
 S
 #12671
 druid wildling~
@@ -464,6 +509,23 @@ I can close the portal, but not while the archdruid is in control.~
 M
 1
 I used to appear as a hippo avatar, but it wasn't foxy enough for today's adventurers.~
+S
+#12677
+spirit strange grove~
+the Spirit of the Grove~
+A strange spirit lingers in the air.
+~
+0 0 bd cn
+0 0 0 15
+M
+1
+I've never seen the druids revolt like this.~
+M
+1
+The Grove is in trouble, and soon your world will be, too!~
+M
+1
+I can close the portal, but not while the archdruid is in control.~
 S
 #12682
 squirrel angry summoned~

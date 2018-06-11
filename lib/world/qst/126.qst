@@ -146,9 +146,11 @@ leader, the Archdruid.
 ~
 The fox looks down, sad, but accepts that you did what you had to do.
 ~
-4 bc 1 75 -1
+5 bc 1 75 -1
 A
 1 12676
+A
+1 12677
 P
 6 12650 0 1 a
 P
@@ -167,6 +169,8 @@ W
 3 12655 0 1 a
 Z
 1 12676
+Z
+1 12677
 S
 #12652
 Invasion of the Grove~
@@ -181,9 +185,11 @@ the Crow, the Druid of the Turtle, and their leader, the Archdruid.
    The fox thanks you for doing what must be done, but it looks despondent at
 what you were forced to do to save your world.
 ~
-4 bc 1 75 -1
+5 bc 1 75 -1
 A
 1 12676
+A
+1 12677
 P
 6 12650 0 1 a
 P
@@ -202,5 +208,7 @@ W
 3 12655 0 1 a
 Z
 1 12676
+Z
+1 12677
 S
 $
