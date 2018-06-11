@@ -85,4 +85,111 @@ tiny broom whistle~
 T0
 Your tiny broom whistle cooldown has ended.~
 S
+#12650
+Grove Token~
+5 0
+0 0 0 0
+T0
+wooden nickel~
+T1
+wooden nickels~
+S
+#12657
+Grove attack cooldown~
+3 0
+0 0 0 0
+T0
+Your Grove attack cooldown cooldown has ended.~
+S
+#12658
+nasty bite~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding from that bite.~
+S
+#12659
+regeneration~
+4 0
+0 0 0 0
+T0
+Your regeneration wears off.~
+T1
+$n's magical regeneration fades.~
+S
+#12660
+searing firebolt~
+4 0
+0 0 0 0
+T0
+You are no longer ignited by that firebolt.~
+S
+#12661
+squirrel bites~
+4 0
+0 0 0 0
+T0
+Your squirrel bites stop bleeding.~
+S
+#12664
+earthen claws~
+4 0
+0 0 0 0
+T0
+Your armor is no longer damaged by earthen claws.~
+S
+#12666
+firebrand~
+4 0
+0 0 0 0
+T0
+Your firebrand wears off.~
+T1
+The flames wreathing $n's weapon flicker and die.~
+T2
+Your weapon bursts into flames!~
+T3
+$n's weapon bursts into flames!~
+S
+#12667
+swoop~
+4 0
+0 0 0 0
+T0
+You recover your weapon.~
+S
+#12668
+off-balance~
+4 0
+0 0 0 0
+T0
+You regain your balance.~
+S
+#12669
+turtle shell~
+4 0
+0 0 0 0
+S
+#12670
+spellcasting~
+4 0
+0 0 0 0
+S
+#12671
+stomped~
+4 0
+0 0 0 0
+S
+#12673
+tranquil~
+4 0
+0 0 0 0
+S
+#12678
+Grove seeker stone~
+3 0
+0 0 0 0
+T0
+Your Grove seeker stone cooldown has ended.~
+S
 $
