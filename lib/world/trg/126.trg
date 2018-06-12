@@ -1237,52 +1237,6 @@ else
 end
 %send% %actor% You find a trail to the %result%!
 ~
-#12681
-Faun Druid: Morph~
-0 k 50
-~
-if %self.cooldown(12657)%
-  halt
-end
-nop %self.set_cooldown(12657, 30)%
-if !%self.morph%
-  set current %self.name%
-  %morph% %self% 12661
-  %echo% %current% rapidly morphs into %self.name%!
-  wait 1 sec
-end
-if %self.health% < %self.maxhealth%
-  %echo% %self.name% looks slightly healthier.
-  %heal% %self% health 15
-end
-~
-#12682
-Faun Druid: Squirrel Swarm~
-0 k 100
-~
-if %self.cooldown(12657)%
-  halt
-end
-nop %self.set_cooldown(12657, 30)%
-if %self.morph%
-  set current %self.name%
-  %morph% %self% normal
-  %echo% %current% rapidly morphs into %self.name%!
-  wait 1 sec
-end
-%echo% %self.name% sends up a jet of sparkling blue mana...
-wait 3 sec
-%send% %actor% &rA swarm of squirrels dive-bombs you from the surrounding trees!
-%echoaround% %actor% A swarm of squirrels dive-bombs %actor.name% from the surrounding trees!
-%damage% %actor% 10 physical
-set room %self.room%
-%load% mob 12657 ally
-set summon1 %room.people%
-%load% mob 12657 ally
-set summon2 %room.people%
-%force% %summon1% %aggro% %actor%
-%force% %summon2% %aggro% %actor%
-~
 #12683
 Grove Druid 2.0 Underwater: Water Blast~
 0 k 100
@@ -1366,6 +1320,7 @@ end
 Grove rage spirit time limit~
 0 bnw 100
 ~
+%scale% %self% %instance.level%
 wait 6 sec
 %echo% A voice in your head urges, 'Say it out loud!'
 wait 8 sec
