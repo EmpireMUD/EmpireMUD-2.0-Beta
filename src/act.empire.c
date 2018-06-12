@@ -431,7 +431,7 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 
 
 /**
-* Displays all gaols completed by the empire.
+* Displays all goals completed by the empire.
 *
 * @param char_data *ch The player to show them to.
 * @parma empire_data *emp The empire whose goals to show.
