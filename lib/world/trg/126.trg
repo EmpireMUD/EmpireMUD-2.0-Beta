@@ -275,12 +275,12 @@ if %actor.on_quest(12650)%
   %send% %actor% You fail the quest Tranquility of the Grove for killing a druid.
   set fox %instance.mob(12676)%
   if %fox%
-    %at% %fox% %load% mob 12677
+    %at% %fox.room% %load% mob 12677
     set new_mob %fox.room.people%
     %purge% %fox% $n vanishes, replaced with %new_mob.name%.
   end
 end
-if %self.vnum% <= 12654 || %self.vnum% >= 12657
+if %self.vnum% < 12654 || %self.vnum% > 12657
   * Trash
   halt
 end
@@ -289,12 +289,14 @@ set person %self.room.people%
 while %person%
   if %person.is_pc%
     * You get a token, and you get a token, and YOU get a token!
-    %send% %person% As %self.name% dies, a wooden nickel falls to the ground!
-    %send% %person% You take the newly created token.
     if %self.mob_flagged(HARD)%
       nop %person.give_currency(12650, 2)%
+      %send% %person% As %self.name% dies, 2 %currency.12650(2)% fall to the ground!
+      %send% %person% You take them.
     else
       nop %person.give_currency(12650, 1)%
+      %send% %person% As %self.name% dies, a %currency.12650(1)% falls to the ground!
+      %send% %person% You take the newly created token.
     end
   end
   set person %person.next_in_room%
@@ -505,7 +507,7 @@ if %target.on_quest(12650)% || %target.ability(Hide)% || %clothes_valid%
       %echoaround% %target% You spot %self.name% in the branches of a tree nearby...
     break
   done
-  %echo% %self.name% does not react to your presence.
+  * %echo% %self.name% does not react to your presence.
   halt
 end
 visible
@@ -683,7 +685,7 @@ else
   %send% %actor% &r%self.name% gestures, and earthen claws burst from the soil, tearing into you!
   %echoaround% %actor% &r%self.name% gestures, and earthen claws burst from the soil, tearing into %actor.name%!
   %damage% %actor% 50 physical
-  set scale %self.level%/15 + 1
+  eval scale %self.level%/15 + 1
   dg_affect #12664 %actor% RESIST-PHYSICAL -%scale% 15
 end
 ~
@@ -910,16 +912,16 @@ while %cycles_left% >= 0
       %send% %actor% You clutch the totem of tranquility and begin to chant...
     break
     case 4
-      %echoaround% %actor% %actor.name% sways as %actor.heshe% whispers strange words into the air...
+      %echoaround% %actor% %actor.name% sways as %actor.heshe% whispers strange words...
       %send% %actor% You sway as you whisper the words of the tranquil chant...
     break
     case 3
-      %echoaround% %actor% %actor.name%'s totem of tranquility takes on a soft white glow, and the air around it seems to cool...
-      %send% %actor% Your totem of tranquility takes on a soft white glow, and the air around it seems to cool...
+      %echoaround% %actor% %actor.name%'s totem of tranquility takes on a soft white glow, and the area around it seems to cool...
+      %send% %actor% Your totem of tranquility takes on a soft white glow, and the area around it seems to cool...
     break
     case 2
-      %echoaround% %actor% A peaceful feeling fills the air...
-      %send% %actor% A peaceful feeling fills the air...
+      %echoaround% %actor% A peaceful feeling fills the area...
+      %send% %actor% A peaceful feeling fills the area...
     break
     case 1
       %echoaround% %actor% %actor.name% whispers into the air, and the feeling of tranquility spreads...
@@ -961,8 +963,8 @@ while %cycles_left% >= 0
         if %person.is_pc%
           if %give_token%
             %send% %person% You receive a %currency.12650(1)%.
+            nop %person.give_currency(12650, 1)%
           end
-          nop %person.give_currency(12650, 1)%
           if %done%
             %send% %person% You have tranquilized all four of the druid leaders.
             %quest% %person% trigger 12650

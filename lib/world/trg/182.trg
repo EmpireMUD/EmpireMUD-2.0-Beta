@@ -355,9 +355,13 @@ if %actor.is_pc% && %actor.empire%
 end
 ~
 #18216
-Adventurer's Guildhall~
+Adventurer's Guildhall Complete~
 2 o 100
 ~
+if !%self.in_city%
+  %terraform% %self% %self.sector_vnum%
+  halt
+end
 * Add basement
 if !%room.down(room)%
   %door% %room% down add 18218
