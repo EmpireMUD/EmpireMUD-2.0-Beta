@@ -60,28 +60,48 @@ blocks that are currently in use.
 
 
 Included Adventure Zones
-[   50] Tutorial: Royal Planning Office [10800-10824] (1-50) 4 mobs, 1 obj, 4 rooms
+[   50] Tutorial: Royal Planning Office [10800-10824] DEPRECATED
 [   51] Tutorial: Museum of Early Man [10825-10849] (1-50) 3 mobs, 1 obj, 3 rooms
 [   52] Tutorial Quests [10850-10899] (1-50) 9 mobs, 6 objs, 5 rooms
-[  100] Magiterranean: The Grove [10000-10005] (1-75) 6 mobs, 6 objs, 6 rooms
+[  100] Magiterranean: The Grove [10000-10005] DEPRECATED (replaced by 12650)
 [  101] Magiterranean: The Hidden Garden [10225-10249] (15+) 3 mobs, 21 objs, 6 rooms
 [  102] Magiterranean: Interdimensional Whirlwind [10500-10549] (5+) 17 mobs, 38 objs, 1 room
-[  120] Mountain Cave: Red Dragon [10006-10010] (300) 2 mobs, 5 objs, 1 room
-[  121] The Swamp Hag [10100-10104] (75-150) 2 mobs, 5 objs, 1 room
+[  103] Magiterranean: Monsoon Rift [10140-10189] (75-100) 20 mobs, 39 objs, 7 rooms
+[  104] Magiterranean: Permafrost [10550-10599] (75-125) 18 mobs, 49 objs, 12 rooms
+[  120] Mountain Cave: Red Dragon [10006-10010] DEPRECATED (replaced by 128)
+[  121] The Swamp Hag [10100-10104] DEPRECATED (replaced by 19000)
 [  122] Ruins: Three Banditos [10105-10109] (100-200) 4 mobs, 5 objs, 1 room
 [  123] Ruins: Thieves [10110-10129] (25-75) 5 mobs, 17 objs, 1 room
-[  125] Ruins: The Goblin Challenge [10200-10224] (50-150) 8 mobs, 22 objs, 1 room
+[  125] Ruins: The Goblin Challenge [10200-10224] (50-150) 10 mobs, 24 objs, 1 room
 [  126] Mountain Cave: Flame Dragon [10300-10329] (100-150) 8 mobs, 17 objs, 1 room
 [  127] Abandoned Dragon Nest [10330-10359] (125-175) 8 mobs, 23 objs, 1 room
+[  128] Colossal Red Dragon [10900-10949] (250-300) 7 mobs, 47 objs, 3 rooms
+[  129] A Gigantic Nest [11000-11074] (100-125) 12 mobs, 57 objs, 1 room
+[  130] Volcano [10190-10199] (0) 1 mob, 3 objs, 1 room
 [  140] The Sewer: Ratskins [10011-10027] (1-50) 11 mobs, 17 objs, 17 rooms
 [  141] The Sewer: Goblin Outpost [10450-10499] (50-100) 6 mobs, 33 objs, 5 rooms
-[  160] The Tower Skycleave [10030-10099] (30-200) 25 mobs, 49 objs, 29 rooms
+[  160] The Tower Skycleave [10030-10099] (30-200) 25 mobs, 50 objs, 29 rooms
 [  161] Portal to the Primeval [10250-10299] (75-100) 17 mobs, 36 objs, 9 rooms
 [  170] Hamlet of the Undead [10400-10449] (175-225) 22 mobs, 36 objs, 19 rooms
 [  180] Misplaced Mother Goose [10730-10749] (1-25) 10 mobs, 18 objs, 1 room
-[  181] Goblin Mines [10750-10774] (1-25) 7 mobs, 20 objs, 6 rooms
-[  190] Winter Wonderland [10700-10729] (1-300) 7 mobs, 19 objs, 6 rooms
+[  181] Goblin Mines [10750-10774] (1-25) 9 mobs, 23 objs, 6 rooms
+[  190] Winter Wonderland [10700-10729] (1-300) 12 mobs, 28 objs, 6 rooms
 [  200] Burrow Canyons [11100-11129] (75-100) 14 mobs, 24 objs, 24 rooms
 [  201] The Cursed Chalice of Mill Manor [11130-11159] (100-150) 10 mobs, 20 objs, 19 rooms
-[  281] Mountain Valley: Molten Fiend [18075-18099] (200-250) 5 mobs, 22 objs, 2 rooms
+[  281] Mountain Valley: Molten Fiend [18075-18099] (200-250) 5 mobs, 23 objs, 2 rooms
 [  282] Goblin Logging Camp [18100-18124] (10-50) 1 mob, 7 objs, 1 room
+[12000] Binding Circle: Anat [12000-12029] (225-325) 5 mobs, 22 objs, 1 room
+[12030] Binding Circle: Ba'al Hadad [12030-12059] (225-325) 5 mobs, 25 objs, 2 rooms
+[12400] The Golden Goblin [12400-12499] (50-150) 24 mobs, 62 objs, 21 rooms
+[12500] Clockwork Colossus [12500-12599] (100-200) 13 mobs, 62 objs, 8 rooms
+[12600] Elemental Escape [12600-12624] (1-25) 11 mobs, 18 objs, 1 room
+[12650] Magiterranean: The Grove [12650-12699] (1-75) 21 mobs, 26 objs, 22 rooms
+[18200] The Guild of Adventurers [18200-18299] (0) 38 mobs, 48 objs, 11 rooms
+[18300] Pyramid: Hidden Chamber of Neferkare [18300-18349] (250-300) 7 mobs, 30 objs, 4 rooms
+[18350] Pyramid 2 [18350-18399] (150-200) 0 mobs, 0 objs, 10 rooms
+[18450] That Dammed River [18450-18459] (25-75) 3 mobs, 3 objs, 1 room
+[18460] Unstable Portal [18460-18499] (0) 27 mobs, 24 objs, 19 rooms
+[18500] The Lost Temple [18500-18599] (125-175) 15 mobs, 42 objs, 16 rooms
+[18800] Halloween Candy Quests [18800-18899] (0) 16 mobs, 51 objs, 0 rooms
+[19000] The Swamp Hag [19000-19059] (100-150) 7 mobs, 46 objs, 3 rooms
+[19060] Goblin Challenge Additional Items [19060-19099] (50-150) 0 mobs, 19 objs, 0 rooms
