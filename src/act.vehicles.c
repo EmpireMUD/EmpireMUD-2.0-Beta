@@ -463,13 +463,13 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 	}
 	
 	if (VEH_CARRYING_N(veh) + obj_carry_size(obj) > VEH_CAPACITY(veh)) {
-		act("$p won't fit in $V.", FALSE, ch, obj, veh, TO_CHAR);
+		act("$p won't fit in $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	
 	obj_to_vehicle(obj, veh);
-	act("$n puts $p in $V.", TRUE, ch, obj, veh, TO_ROOM);
-	act("You put $p in $V.", FALSE, ch, obj, veh, TO_CHAR);
+	act("$n puts $p in $V.", TRUE, ch, obj, veh, TO_ROOM | TO_QUEUE);
+	act("You put $p in $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE);
 	
 	if (IS_IMMORTAL(ch)) {
 		if (VEH_OWNER(veh) && !EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
