@@ -9,4 +9,680 @@ M 0 12602 100.00 1
 M 0 12603 100.00 1
 M 0 12604 100.00 1
 S
+#12650
+A Portal in the Fog~
+   You find yourself in a thick bank of fog which has nestled itself into an
+eerie grove. The trees are not dense, but their thick canopy drowns out the
+sun, except for a few stray rays. The fog keeps you from seeing more than fifty
+feet in any direction, and the call of animals tells you that you are not
+alone. You can only make out the faintest of trails here, if only because you
+can proceed in no other direction.
+~
+acd 0 0
+D14
+~
+0 12651
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12676 100.00 1
+T 12654
+T 12680
+T 12672
+S
+#12651
+A Strange Grove~
+   The trees grow thick here and though there is no underbrush or grass, it is
+sometimes hard to move. In the corner of your eye, shadows dart between trees.
+Behind the fog, you can hear the cackle of wildlings and the chants of their
+druid masters.
+Commands: &clist, buy&0
+~
+ad 0 0
+D14
+~
+0 12650
+D14
+~
+0 12652
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 1 12652 100.00 1
+M 0 12675 100.00 1
+T 12654
+T 12680
+T 12672
+S
+#12652
+A Strange Grove~
+   The fog gives way to a winding path through the grove. The canopy overhead
+is deathly silent, but the fog all around you echoes with the barks and howls
+and screeches of uncountable wild animals. You can see no eyes through the fog,
+but you have the ever-present sense that they can see you.
+~
+ad 0 0
+D14
+~
+0 12651
+D14
+~
+0 12657
+D14
+~
+0 12653
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+T 12654
+T 12680
+S
+#12653
+A Strange Grove~
+   You seem to be lost in the fog. It twists and tangles through the dense
+trees, and you can't tell which way is forward or backward in the grove. The
+leaves rustle in the canopy, but when you look up, all you see there is fog.
+~
+a 0 0
+D14
+~
+0 12652
+D14
+~
+0 12654
+E
+fog dense canopy trees path~
+Nope, it's just fog. All fog.
+~
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+M 1 12679 75.00 2
+T 12654
+T 12680
+S
+#12654
+A Strange Grove~
+   The trees grow too close together for you to do anything more than squeeze
+through, and then you can't even do that. You try to move between the trees,
+but the fog smothers you and you gasp for breath. You can only go back from
+here, not forward.
+~
+a 0 0
+D14
+~
+0 12653
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 100.00 25
+T 12654
+T 12680
+S
+#12657
+A Strange Grove~
+   The path twists and turns, sometimes barely visible in the undergrowth. The
+fog keeps you from straying too far from the path, but you notice an odd burrow
+beneath the roots of a great oak. The wildlings seem to be coming from the
+trees, so perhaps the burrow will be safe.
+~
+a 0 0
+D14
+~
+0 12662
+D14
+~
+0 12652
+D14
+~
+0 12658
+E
+undergrowth burrow roots~
+   Hidden in the undergrowth around the roots of an old oak tree is a rather
+large burrow.
+~
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+M 1 12679 75.00 2
+T 12654
+T 12680
+S
+#12658
+A Strange Burrow~
+   The entrance to the burrow looks as if it's barely large enough for a
+person, but once you climb inside, you discover a tunnel large enough to march
+a parade through. The walls of the tunnel are carved with long scratches, as if
+this entire burrow were dug by wild beasts.
+~
+bd 0 0
+D14
+~
+0 12657
+D9
+~
+0 12659
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+M 0 12658 50.00 3
+T 12657
+S
+#12659
+A Strange Burrow~
+   The burrow twists and winds in the dark, with alcoves, crevices, and dead
+ends at every turn. The call of the wildlings outside the burrow is only a
+faint echo from here. The tunnels seem to be safe.
+~
+bd 0 0
+D8
+~
+0 12658
+D14
+~
+0 12660
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+M 0 12658 50.00 3
+M 0 12653 75.00 1
+T 12657
+S
+#12660
+A Strange Burrow~
+   The burrow ends abruptly in this spacious chamber where an altar has been
+carved from the earth. Candles atop the altar burn an eerie green flame which
+does little to illuminate the chamber. Exposed roots in the walls are scratched
+with strange symbols that glow faintly in the dark.
+~
+bd 0 0
+D14
+~
+0 12659
+E
+altar candles green flame~
+   The altar is formed from the earth at the end of the burrow. Half-spoiled
+berries and dry twigs adorn the top of the altar, dimly lit by the green-flamed
+candles on the corners.
+~
+E
+walls roots exposed strange symbols glow~
+Odd runes have been scratched into the roots by some three-clawed creature.
+~
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+M 0 12654 100.00 1
+M 0 12658 25.00 3
+T 12657
+S
+#12662
+A Strange Grove~
+   The grove is darker here, as its canopy chokes out the sun. Even moss dares
+not grow here. There are no squirrels or rabbits. In the distance, you can hear
+the call of wildlings. Above you, something rustles in the trees.
+~
+a 0 0
+D14
+~
+0 12667
+D14
+~
+0 12657
+D14
+~
+0 12663
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+T 12654
+T 12676
+T 12680
+S
+#12663
+A Strange Grove~
+   As you press through the fog, it suddenly turns to water! The entire grove
+is flooded, with water as high up as the canopy. As you try to swim up for air,
+roots grasp at your leg and drag you back down. Strangely, the roots don't seem
+to stop you from walking along the forest floor.
+~
+ad 0 0
+D14
+~
+0 12662
+D14
+~
+0 12664
+M 0 12659 50.00 3
+T 12674
+S
+#12664
+A Flooded Grove~
+   You move along the floor of the flooded grove, half-swimming and
+half-walking, unable to swim to the surface to take a breath. The path is hard
+to see now, but each time you deviate from it, a tree root rises from the
+ground like a tentacle and pulls you back toward the path.
+~
+ad 0 0
+D14
+~
+0 12663
+D14
+~
+0 12665
+M 1 12655 50.00 1
+M 0 12659 50.00 3
+M 0 12663 75.00 2
+T 12674
+S
+#12665
+A Flooded Grove~
+   The trees in this submerged grove have opened up and you are now six feet
+underwater in what might be a clearing or a pond. The water around you is
+magical, held up by the strange forces of the Magiterranean. And try as you
+might, you can't get to the surface to breathe.
+~
+ad 0 0
+D14
+~
+0 12664
+M 0 12657 100.00 1
+M 0 12659 25.00 3
+T 12674
+S
+#12667
+A Strange Grove~
+   The trees begin to sway in the wind, with dead lower branches hitting you in
+the face at every turn. The druids of the Grove seem unaffected, and they sway
+as if in tune with the primal movements of the plants around them. The fog in
+the distance seems to glow redder and redder as you press deeper into the
+Grove.
+~
+a 0 0
+D14
+~
+0 12662
+D14
+~
+0 12668
+D14
+~
+0 12674
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+T 12654
+T 12680
+S
+#12668
+A Strange Grove~
+   You seem to have strayed from the main path -- no easy task in this dense
+fog. As soon as you leave the path, you can no longer see where it was. All of
+a sudden you realize: you're lost!
+~
+ad 0 0
+D14
+~
+0 12669
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+T 12654
+T 12680
+S
+#12669
+A Tree With a Staircase~
+   As you plod through the trees, you barely notice your trail disappearing
+behind you. But when you turn, it's completely gone, and you can't see the path
+through the trees or the fog. As you wander, lost beyond hope, you come across
+a peculiar tree with a wooden staircase wound around its trunk. Perhaps this
+leads somewhere interesting?
+~
+a 0 0
+D8
+~
+0 12670
+E
+stairs staircase wooden trunk tree~
+   The staircase appears to be made from bent saplings and upturned roots. It
+leads up into the canopy, but you can't see through the fog.
+~
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+M 0 12650 75.00 1
+T 12654
+S
+#12670
+The Branches Above the Grove~
+   The staircase brings you up to the lower canopy, where the branches are as
+large around as a cow, easily strong enough to support your weight. The leaves
+around you rustle constantly, and you're certain you are not alone, but you can
+only trek forward from here. Or backward -- you're completely turned around.
+~
+a 0 0
+D9
+~
+0 12669
+D14
+~
+0 12671
+D14
+~
+0 12672
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+T 12654
+S
+#12671
+The Branches Above the Grove~
+   You balance carefully along the branch as far as you can go, but it ends
+abruptly. There is only fog below you, and it's too hard to gauge the distance.
+It seems you can only go backward afterall.
+~
+a 0 0
+D14
+~
+0 12670
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 100.00 25
+T 12654
+S
+#12672
+The Branches Above the Grove~
+   The long, powerful branch brings you to a well-lit spot looking down on a
+huge bonfire below. The forest canopy is thick here, and you have no trouble
+balancing along the branch as you cling to smaller branches along the way. You
+measure the distance to the ground with your eyes. It looks like you could get
+down from here and investigate that bonfire.
+~
+acd 0 0
+D14
+~
+0 12670
+D9
+~
+0 12675
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12656 100.00 1
+M 0 12660 25.00 25
+T 12654
+S
+#12674
+A Strange Grove~
+   Dozens of trees line the path here, their branches intertwined to make this
+feel more like a corridor than a forest. The fog makes it difficult to see
+behind you, but the path ahead is well-lit by a bonfire in the distance.
+~
+a 0 0
+D14
+~
+0 12667
+D14
+~
+0 12675
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12660 25.00 25
+T 12654
+T 12680
+S
+#12675
+A Bonfire in the Grove~
+   The grove grows more dangerous here, forming a thicket that seems to conceal
+a hidden path. The glowing fog gives way to a smoky bonfire, piled high with
+the bones of animals. That is, you hope those are animal bones. The ways of the
+druids of the Grove are mysterious, and you can't tell if this bonfire is part
+of a festival or instead if these are merely the remains of the last
+adventurers who trespassed in the Grove of the Magiterranean.
+~
+acd 0 0
+D14
+thicket hidden path~
+ab 12676
+D14
+~
+0 12674
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12655 100.00 1
+M 0 12660 25.00 25
+T 12654
+T 12680
+S
+#12676
+A Hidden Thicket~
+   The thicket opens into a small, hidden clearing in the trees. It looks like
+you have stumbled upon a wildling nest. Bits of spiky black fur are stuck
+against the brambles of plants in a location that was carefully selected to
+keep interlopers out. It is unwise to stay long, as the wildlings who made the
+nest are likely to return.
+~
+ad 0 0
+D14
+thicket hidden path~
+ab 12675
+I 5 104 3.00 1 X  # DIG: a red bloodstone
+I 5 103 3.00 1 X  # DIG: a yellow lightning stone
+I 5 102 8.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 1254 1.00 1 X  # FORAGE: a mana potion
+I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 1 X  # FORAGE: an orange
+I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
+I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
+I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
+I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
+I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 9 121 100.00 1 X  # GATHER: a stick
+M 0 12669 5.00 1
+M 0 12660 50.00 25
+M 0 12660 50.00 25
+T 12654
+T 12680
+S
 $

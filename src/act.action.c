@@ -2782,6 +2782,9 @@ ACMD(do_mine) {
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This mine only works in a city.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't mine here because it's not in a city.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -3125,6 +3128,9 @@ ACMD(do_saw) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW)) {
 		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "You can only saw in this building if it's in a city.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "Complete the building first.\r\n");

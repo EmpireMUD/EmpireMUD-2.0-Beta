@@ -286,7 +286,7 @@ guildmage mage #n~
 Guildmage #n~
 Guildmage #n stands at the window.
 ~
-100 150 bdqv 0
+100 150 bdqv e
 0 2 0 19
 M
 0
@@ -318,13 +318,14 @@ All these magic words... even just the sound of them is really quite atrocious!~
 M
 1
 Avada... No! I meant, Abracadabra!~
+T 18218
 S
 #18218
 #n librarian~
 #n the librarian~
 #n is reshelving the disheveled books.
 ~
-100 150 bdqv 0
+100 150 bdqv e
 0 0 0 5
 M
 1
@@ -338,13 +339,14 @@ Shh!~
 M
 1
 Too much noise there!~
+T 18218
 S
 #18219
 superintendant #n~
 Superintendant #n~
 The superintendant is sitting at his desk.
 ~
-100 150 bdqv 0
+100 150 bdqv e
 1 0 0 1
 M
 0
@@ -371,14 +373,16 @@ M
 1
 I'm afraid we've run out of cold cuts again.~
 T 18219
+T 18218
 S
 #18220
 #n treasurer~
 #n the treasurer~
 #n is locking up a new treasure.
 ~
-100 150 bdqv 0
+100 150 bdqv e
 0 1 0 4
+T 18218
 S
 #18225
 tortoise baby~

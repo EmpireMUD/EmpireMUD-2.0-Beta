@@ -71,6 +71,7 @@ void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.item.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
@@ -205,6 +206,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	qt_visit_room(ch, IN_ROOM(ch));
 	look_at_room(ch);
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	msdp_update_room(ch);	// once we're sure we're staying
 }
 
 
@@ -1028,7 +1030,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 		for (inst = instance_list; inst; inst = inst->next) {
 			++num;
 		
-			inst_loc = inst->location;
+			inst_loc = inst->fake_loc;
 			if (inst_loc && !INSTANCE_FLAGGED(inst, INST_COMPLETED) && compute_distance(loc, inst_loc) <= distance) {
 				++count;
 				instance_list_row(inst, num, line, sizeof(line));
@@ -1046,7 +1048,6 @@ void do_instance_nearby(char_data *ch, char *argument) {
 
 
 void do_instance_reset(char_data *ch, char *argument) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void reset_instance(struct instance_data *inst);
 
 	struct instance_data *inst;
@@ -1061,7 +1062,7 @@ void do_instance_reset(char_data *ch, char *argument) {
 	
 		for (inst = instance_list; inst; inst = inst->next) {
 			if (--num == 0) {
-				loc = inst->location;
+				loc = inst->fake_loc;
 				reset_instance(inst);
 				break;
 			}
@@ -1074,12 +1075,12 @@ void do_instance_reset(char_data *ch, char *argument) {
 	}
 	else {
 		// no argument
-		if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+		if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE))) {
 			msg_to_char(ch, "You are not in or near an adventure zone instance.\r\n");
 			return;
 		}
 
-		loc = inst->location;
+		loc = inst->fake_loc;
 		reset_instance(inst);
 	}
 	
@@ -1114,15 +1115,15 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 		*info = '\0';
 	}
 	
-	if (inst->location && ROOM_OWNER(inst->location)) {
-		snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(inst->location)), EMPIRE_NAME(ROOM_OWNER(inst->location)));
+	if (inst->fake_loc && ROOM_OWNER(inst->fake_loc)) {
+		snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(inst->fake_loc)), EMPIRE_NAME(ROOM_OWNER(inst->fake_loc)));
 	}
 	else {
 		*owner = '\0';
 	}
 
 	sprintbit(inst->flags, instance_flags, flg, TRUE);
-	snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), inst->location ? GET_ROOM_VNUM(inst->location) : NOWHERE, inst->location ? X_COORD(inst->location) : NOWHERE, inst->location ? Y_COORD(inst->location) : NOWHERE, info, inst->flags != NOBITS ? flg : "", owner);
+	snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), inst->fake_loc ? GET_ROOM_VNUM(inst->fake_loc) : NOWHERE, inst->fake_loc ? X_COORD(inst->fake_loc) : NOWHERE, inst->fake_loc ? Y_COORD(inst->fake_loc) : NOWHERE, info, inst->flags != NOBITS ? flg : "", owner);
 }
 
 
@@ -4754,7 +4755,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
@@ -4849,7 +4849,7 @@ void do_stat_room(char_data *ch) {
 		}
 	}
 	
-	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE))) {
 		num = 0;
 		LL_FOREACH(instance_list, inst_iter) {
 			++num;
@@ -5604,6 +5604,8 @@ ACMD(do_at) {
 		char_from_room(ch);
 		char_to_room(ch, original_loc);
 	}
+	
+	msdp_update_room(ch);	// in case it changed
 }
 
 
@@ -7863,6 +7865,9 @@ ACMD(do_set) {
 			}
 			return;
 		}
+		
+		// some sets need the delay file
+		check_delayed_load(vict);
 	}
 
 	/* find the command in the list */
@@ -8372,6 +8377,7 @@ ACMD(do_trans) {
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
+				msdp_update_room(victim);	// once we're sure we're staying
 			}
 		}
 		
@@ -8401,6 +8407,7 @@ ACMD(do_trans) {
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
+			msdp_update_room(victim);	// once we're sure we're staying
 			send_config_msg(ch, "ok_string");
 		}
 	}

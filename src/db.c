@@ -688,7 +688,7 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 * startup and should also be called any time a building is deleted.
 */
 void check_for_bad_buildings(void) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void unlink_instance_entrance(room_data *room, bool run_cleanup);
 	extern const char *bld_relationship_types[];
 
@@ -725,7 +725,7 @@ void check_for_bad_buildings(void) {
 			delete_room(room, FALSE);	// must check_all_exits
 			deleted = TRUE;
 		}
-		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room, TRUE)) {
+		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room, TRUE, FALSE)) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
 			unlink_instance_entrance(room, FALSE);
@@ -1917,6 +1917,7 @@ const char *versions_list[] = {
 	"b5.34",
 	"b5.35",
 	"b5.37",
+	"b5.38",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3295,6 +3296,21 @@ void b5_37_progress_update(void) {
 }
 
 
+// remove old Groves
+void b5_38_grove_update(void) {
+	struct instance_data *inst, *next_inst;
+	
+	log("Applying b5.38 update...");
+	
+	// remove all instances of adventure 100 (it's now in-dev)
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (inst->adventure && GET_ADV_VNUM(inst->adventure) == 100) {
+			delete_instance(inst, TRUE);
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3549,6 +3565,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.37")) {
 			b5_37_progress_update();
+		}
+		if (MATCH_VERSION("b5.38")) {
+			b5_38_grove_update();
 		}
 	}
 	

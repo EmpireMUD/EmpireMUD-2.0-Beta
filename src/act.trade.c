@@ -92,6 +92,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
 		msg_to_char(ch, "You can only make that in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");
 	}
+	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER | CRAFT_SHIPYARD | CRAFT_GLASSBLOWER)) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
+	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHARP) && !has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need to be using a sharp tool to %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
@@ -122,7 +125,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !HAS_FUNCTION(IN_ROOM(ch), FNC_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
 		// sends its own messages -- needs glassblowing unless in alchemist room
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FLAGS_REQUIRING_BUILDINGS) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -156,6 +159,9 @@ bool can_forge(char_data *ch) {
 	
 	if (!IS_IMMORTAL(ch) && !HAS_FUNCTION(IN_ROOM(ch), FNC_FORGE)) {
 		msg_to_char(ch, "You need to be in a forge to do that.\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_FORGE)) {
+		msg_to_char(ch, "This forge only works if it's in a city.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must complete the building first.\r\n");
@@ -1088,6 +1094,9 @@ bool can_refashion(char_data *ch) {
 	
 	if (!IS_IMMORTAL(ch) && !HAS_FUNCTION(IN_ROOM(ch), FNC_TAILOR)) {
 		msg_to_char(ch, "You need to be at the tailor to do that.\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This tailor only works if it's in a city.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");

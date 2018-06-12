@@ -578,7 +578,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern const char *color_by_difficulty(char_data *ch, int level);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
@@ -668,7 +668,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// coloring for adventures
 	*advcolbuf = '\0';
-	if ((GET_ROOM_TEMPLATE(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) && (inst = find_instance_by_room(room, FALSE))) {
+	if ((GET_ROOM_TEMPLATE(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) && (inst = find_instance_by_room(room, FALSE, FALSE))) {
 		level = (inst->level > 0 ? inst->level : get_approximate_level(ch));
 		strcpy(advcolbuf, color_by_difficulty((ch), pick_level_from_range(level, GET_ADV_MIN_LEVEL(inst->adventure), GET_ADV_MAX_LEVEL(inst->adventure))));
 	}
@@ -1889,7 +1889,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 //// WHERE FUNCTIONS /////////////////////////////////////////////////////////
 
 void perform_mortal_where(char_data *ch, char *arg) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern bool valid_no_trace(room_data *room);
 	extern bool valid_unseen_passing(room_data *room);
 	
@@ -1917,8 +1917,8 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
 			
-			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE);
-			i_inst = find_instance_by_room(IN_ROOM(i), FALSE);
+			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE);
+			i_inst = find_instance_by_room(IN_ROOM(i), FALSE, FALSE);
 			if (ch_inst != i_inst || IS_ADVENTURE_ROOM(IN_ROOM(i)) != !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
 				// not in same adventure...
 				if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
@@ -1957,9 +1957,9 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
 				
-			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE);
-			i_inst = find_instance_by_room(IN_ROOM(i), FALSE);
-			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch), FALSE) != find_instance_by_room(IN_ROOM(i), FALSE)) {
+			ch_inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE);
+			i_inst = find_instance_by_room(IN_ROOM(i), FALSE, FALSE);
+			if (i_inst != ch_inst || find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) != find_instance_by_room(IN_ROOM(i), FALSE, FALSE)) {
 				// not in same adventure...
 				if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) || RMT_FLAGGED(IN_ROOM(i), RMT_NO_LOCATION)) {
 					// one or the other is set no-location

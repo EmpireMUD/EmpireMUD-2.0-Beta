@@ -39,7 +39,7 @@ extern struct instance_data *quest_instance_global;
 
 // external functions
 void die(char_data *ch, char_data *killer);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
 extern obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
 extern room_data *get_room(room_data *ref, char *name);
@@ -139,7 +139,7 @@ VCMD(do_vadventurecomplete) {
 	
 	inst = quest_instance_global;
 	if (!inst) {
-		inst = room ? find_instance_by_room(room, FALSE) : NULL;
+		inst = room ? find_instance_by_room(room, FALSE, TRUE) : NULL;
 	}
 	
 	if (inst) {
@@ -619,7 +619,7 @@ VCMD(do_vpurge) {
 		room_data *room = IN_ROOM(veh);
 		struct instance_data *inst = quest_instance_global;
 		if (!inst) {
-			inst = room ? find_instance_by_room(room, FALSE) : NULL;
+			inst = room ? find_instance_by_room(room, FALSE, TRUE) : NULL;
 		}
 		if (!inst) {
 			veh_log(veh, "vpurge: vehicle using purge instance outside of an instance");
@@ -773,11 +773,12 @@ VCMD(do_vteleport) {
 			}
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 			qt_visit_room(ch, IN_ROOM(ch));
+			msdp_update_room(ch);	// once we're sure we're staying
 		}
 	}
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
-		if (!orm || !(inst = find_instance_by_room(orm, FALSE))) {
+		if (!orm || !(inst = find_instance_by_room(orm, FALSE, TRUE))) {
 			veh_log(veh, "vteleport: 'adventure' mode called outside any adventure");
 			return;
 		}
@@ -801,6 +802,7 @@ VCMD(do_vteleport) {
 						}
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 						qt_visit_room(ch, IN_ROOM(ch));
+						msdp_update_room(ch);	// once we're sure we're staying
 					}
 				}
 			}
@@ -816,6 +818,7 @@ VCMD(do_vteleport) {
 				}
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 				qt_visit_room(ch, IN_ROOM(ch));
+				msdp_update_room(ch);	// once we're sure we're staying
 			}
 		}
 		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
@@ -959,7 +962,7 @@ VCMD(do_dgvload) {
 		return;
 	}
 	
-	inst = find_instance_by_room(room, FALSE);
+	inst = find_instance_by_room(room, FALSE, TRUE);
 	
 	if (is_abbrev(arg1, "mobile")) {
 		if (!mob_proto(number)) {
@@ -1528,7 +1531,7 @@ VCMD(do_vscale) {
 	if (!str_cmp(arg, "instance")) {
 		void scale_instance_to_level(struct instance_data *inst, int level);
 		struct instance_data *inst;
-		if ((inst = find_instance_by_room(IN_ROOM(veh), FALSE))) {
+		if ((inst = find_instance_by_room(IN_ROOM(veh), FALSE, TRUE))) {
 			scale_instance_to_level(inst, level);
 		}
 	}

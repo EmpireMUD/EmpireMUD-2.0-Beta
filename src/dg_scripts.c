@@ -523,7 +523,7 @@ obj_data *get_obj(char *name)  {
 * @return room_data* The found room, or NULL if none.
 */
 room_data *get_room(room_data *ref, char *name) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	struct instance_data *inst;
@@ -531,7 +531,7 @@ room_data *get_room(room_data *ref, char *name) {
 
 	if (*name == UID_CHAR)
 		return find_room(atoi(name + 1));
-	else if (*name == 'i' && isdigit(*(name+1)) && ref && (inst = find_instance_by_room(ref, FALSE))) {
+	else if (*name == 'i' && isdigit(*(name+1)) && ref && (inst = find_instance_by_room(ref, FALSE, TRUE))) {
 		// instance lookup
 		nr = find_room_template_in_instance(inst, atoi(name+1));
 		if (nr) {
@@ -2431,7 +2431,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				struct instance_data *inst = get_instance_for_script(type, go);
 				
 				// does not require an instance
-				if (!str_cmp(field, "nearest_rmt")) {
+				if (!str_cmp(field, "nearest_adventure")) {
+					extern room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum);
+					room_data *find;
+					any_vnum vnum;
+					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_adventure(get_room_by_script(type, go), vnum))) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(find) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
+				else if (!str_cmp(field, "nearest_rmt")) {
 					extern room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
 					room_data *find;
 					any_vnum vnum;
@@ -2468,8 +2479,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(subfield, slen, "%d", inst->level);
 				}
 				else if (!str_cmp(field, "location")) {
-					if (inst->location) {
-						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
+					if (inst->fake_loc) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->fake_loc) + ROOM_ID_BASE);
 					}
 					else {
 						snprintf(str, slen, "0");
@@ -2501,6 +2512,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				else if (!str_cmp(field, "name")) {
 					snprintf(str, slen, "%s", GET_ADV_NAME(inst->adventure));
+				}
+				else if (!str_cmp(field, "real_location")) {
+					if (inst->location) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
+				else if (!str_cmp(field, "set_location")) {
+					void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
+					room_data *targ_room;
+					
+					if (subfield && *subfield && (targ_room = get_room(get_room_by_script(type, go), subfield))) {
+						set_instance_fake_loc(inst, targ_room);
+					}
+					else {
+						script_log("Trigger: %s, VNum %d, bad instance.set_location: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
+					}
+					
+					strcpy(str, "0");
 				}
 				else if (!str_cmp(field, "start")) {
 					if (inst->start) {
@@ -2941,13 +2973,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "can_enter_instance")) {
 						extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-						extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+						extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						struct instance_data *inst;
 						
-						if (troom && IS_ADVENTURE_ROOM(troom) && (inst = find_instance_by_room(troom, FALSE))) {
+						if (troom && IS_ADVENTURE_ROOM(troom) && (inst = find_instance_by_room(troom, FALSE, FALSE))) {
 							// only if not already in there
-							if (!IS_ADVENTURE_ROOM(IN_ROOM(c)) || find_instance_by_room(IN_ROOM(c), FALSE) != inst) {
+							if (!IS_ADVENTURE_ROOM(IN_ROOM(c)) || find_instance_by_room(IN_ROOM(c), FALSE, FALSE) != inst) {
 								if (!can_enter_instance(c, inst)) {
 									snprintf(str, slen, "0");
 								}
@@ -4407,7 +4439,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, function_flags, FALSE);
 							if (pos != NOTHING) {
-								snprintf(str, slen, "%d", HAS_FUNCTION(r, BIT(pos)) ? 1 : 0);
+								snprintf(str, slen, "%d", room_has_function_and_city_ok(r, BIT(pos)) ? 1 : 0);
 							}
 							else {
 								snprintf(str, slen, "0");
@@ -5946,7 +5978,7 @@ room_data *dg_room_of_obj(obj_data *obj) {
 
 /* create a UID variable from the id number */
 void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	char junk[MAX_INPUT_LENGTH], varname[MAX_INPUT_LENGTH];
@@ -6044,7 +6076,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				case BLD_TRIGGER:
 				case ADV_TRIGGER:
 					r = (room_data*)go;
-					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE))) {
+					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE, TRUE))) {
 						// instance lookup
 						r = find_room_template_in_instance(inst, atoi(name+1));
 					}
@@ -6054,7 +6086,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					break;
 				case OBJ_TRIGGER:
 					r = obj_room((obj_data*)go);
-					if (*name == 'i' && isdigit(*(name+1)) && r && (inst = find_instance_by_room(r, FALSE))) {
+					if (*name == 'i' && isdigit(*(name+1)) && r && (inst = find_instance_by_room(r, FALSE, TRUE))) {
 						// instance lookup
 						r = find_room_template_in_instance(inst, atoi(name+1));
 					}
@@ -6075,7 +6107,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					break;
 				case VEH_TRIGGER: {
 					r = IN_ROOM((vehicle_data*)go);
-					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE))) {
+					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE, TRUE))) {
 						// instance lookup
 						r = find_room_template_in_instance(inst, atoi(name+1));
 					}

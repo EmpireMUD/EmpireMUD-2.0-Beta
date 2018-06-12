@@ -34,7 +34,7 @@ extern struct instance_data *quest_instance_global;
 // external functions
 void obj_command_interpreter(obj_data *obj, char *argument);
 void send_char_pos(char_data *ch, int dam);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 char_data *get_char_by_obj(obj_data *obj, char *name);
 obj_data *get_obj_by_obj(obj_data *obj, char *name);
 room_data *get_room(room_data *ref, char *name);
@@ -147,7 +147,7 @@ OCMD(do_oadventurecomplete) {
 	
 	inst = quest_instance_global;
 	if (!inst) {
-		inst = room ? find_instance_by_room(room, FALSE) : NULL;
+		inst = room ? find_instance_by_room(room, FALSE, TRUE) : NULL;
 	}
 	
 	if (inst) {
@@ -804,7 +804,7 @@ OCMD(do_opurge) {
 		room_data *room = obj_room(obj);
 		struct instance_data *inst = quest_instance_global;
 		if (!inst) {
-			inst = room ? find_instance_by_room(room, FALSE) : NULL;
+			inst = room ? find_instance_by_room(room, FALSE, TRUE) : NULL;
 		}
 		
 		if (!inst) {
@@ -955,11 +955,12 @@ OCMD(do_oteleport) {
 			}
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 			qt_visit_room(ch, IN_ROOM(ch));
+			msdp_update_room(ch);
 		}
 	}
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
-		if (!orm || !(inst = find_instance_by_room(orm, FALSE))) {
+		if (!orm || !(inst = find_instance_by_room(orm, FALSE, TRUE))) {
 			obj_log(obj, "oteleport: 'adventure' mode called outside any adventure");
 			return;
 		}
@@ -983,6 +984,7 @@ OCMD(do_oteleport) {
 						}
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 						qt_visit_room(ch, IN_ROOM(ch));
+						msdp_update_room(ch);
 					}
 				}
 			}
@@ -998,6 +1000,7 @@ OCMD(do_oteleport) {
 				}
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 				qt_visit_room(ch, IN_ROOM(ch));
+				msdp_update_room(ch);
 			}
 		}
 		else if ((veh = get_vehicle_near_obj(obj, arg1))) {
@@ -1143,7 +1146,7 @@ OCMD(do_dgoload) {
 	}
 	
 	if (obj_room(obj)) {
-		inst = find_instance_by_room(obj_room(obj), FALSE);
+		inst = find_instance_by_room(obj_room(obj), FALSE, TRUE);
 	}
 
 	if (is_abbrev(arg1, "mobile")) {
@@ -1633,7 +1636,7 @@ OCMD(do_oscale) {
 		void scale_instance_to_level(struct instance_data *inst, int level);
 		room_data *orm = obj_room(obj);
 		struct instance_data *inst;
-		if ((inst = find_instance_by_room(orm, FALSE))) {
+		if ((inst = find_instance_by_room(orm, FALSE, TRUE))) {
 			scale_instance_to_level(inst, level);
 		}
 	}

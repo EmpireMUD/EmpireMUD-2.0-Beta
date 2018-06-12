@@ -92,7 +92,7 @@ void load_base_map();
 int map_distance(struct map_t *start, struct map_t *end);
 int number(int from, int to);
 int season(struct map_t *tile);
-bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance);
+bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance, bool count_original_sect);
 struct map_t *shift_tile(struct map_t *origin, int x_shift, int y_shift);
 
 // this allows the inclusion of utils.h
@@ -168,14 +168,14 @@ void evolve_one(struct map_t *tile) {
 	
 	// near sector
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NEAR_SECTOR))) {
-		if (sect_within_distance(tile, evo->value, nearby_distance)) {
+		if (sect_within_distance(tile, evo->value, nearby_distance, TRUE)) {
 			become = evo->becomes;
 		}
 	}
 	
 	// not near sector
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR))) {
-		if (!sect_within_distance(tile, evo->value, nearby_distance)) {
+		if (!sect_within_distance(tile, evo->value, nearby_distance, TRUE)) {
 			become = evo->becomes;
 		}
 	}
@@ -936,9 +936,10 @@ int season(struct map_t *tile) {
 * @param struct map_t *tile
 * @param sector_vnum sect Sector vnum
 * @param int distance how far away to check
+* @param bool count_original_sect If TRUE, also checks BASE_SECT
 * @return bool TRUE if the sect is found
 */
-bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance) {
+bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance, bool count_original_sect) {
 	bool found = FALSE;
 	struct map_t *shift;
 	int x, y;
@@ -946,7 +947,7 @@ bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance) {
 	for (x = -1 * distance; x <= distance && !found; ++x) {
 		for (y = -1 * distance; y <= distance && !found; ++y) {
 			shift = shift_tile(tile, x, y);
-			if (shift && shift->sector_type == sect && map_distance(tile, shift) <= distance) {
+			if (shift && (shift->sector_type == sect || (count_original_sect && shift->base_sector == sect)) && map_distance(tile, shift) <= distance) {
 				found = TRUE;
 			}
 		}

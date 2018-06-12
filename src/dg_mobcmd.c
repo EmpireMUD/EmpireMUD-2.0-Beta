@@ -1015,6 +1015,7 @@ ACMD(do_mgoto) {
 	char_from_room(ch);
 	char_to_room(ch, location);
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	msdp_update_room(ch);
 }
 
 
@@ -1072,6 +1073,8 @@ ACMD(do_mat) {
 	if (was_fighting && IN_ROOM(was_fighting) == IN_ROOM(ch) && !IS_DEAD(ch) && !EXTRACTED(ch)) {
 		set_fighting(ch, was_fighting, fmode);
 	}
+	
+	msdp_update_room(ch);	// once we're sure we're staying
 }
 
 
@@ -1238,8 +1241,6 @@ ACMD(do_mrestore) {
 * everyone in the current room to the specified location
 */
 ACMD(do_mteleport) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	room_data *target;
 	char_data *vict, *next_ch;
@@ -1287,6 +1288,7 @@ ACMD(do_mteleport) {
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
 				qt_visit_room(vict, IN_ROOM(vict));
+				msdp_update_room(vict);
 			}
 		}
 	}
@@ -1316,6 +1318,7 @@ ACMD(do_mteleport) {
 						}
 						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR);
 						qt_visit_room(vict, IN_ROOM(vict));
+						msdp_update_room(vict);
 					}
 				}
 			}
@@ -1331,6 +1334,7 @@ ACMD(do_mteleport) {
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
 				qt_visit_room(vict, IN_ROOM(vict));
+				msdp_update_room(vict);
 			}
 		}
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1))) {

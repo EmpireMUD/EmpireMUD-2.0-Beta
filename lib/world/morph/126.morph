@@ -1,0 +1,129 @@
+#12662
+squirrels horde~
+a horde of squirrels~
+A horde of squirrels is milling about in confusion.~
+bj 9 0 0 G
+0 0 -1 -1
+A
+21 -2
+A
+2 1
+S
+#12663
+badger giant~
+the giant badger~
+A giant badger glowers at you, human intelligence shining in its beady little eyes.~
+bj 10 0 0 0
+0 0 -1 -1
+A
+1 1
+S
+#12666
+turtle snapping large~
+the snapping turtle~
+A large snapping turtle wallows peacefully in the water.~
+bj 9 6 0 0
+0 0 -1 -1
+A
+12 1
+S
+#12667
+crow huge black-feathered feathered~
+the huge crow~
+A huge black-feathered crow is perched above you.~
+bj 26 2 0 m
+0 0 -1 -1
+A
+18 1
+S
+#12668
+elk~
+an elk~
+An elk is grazing here.~
+cej 11 0 100 0
+2 25 215 12670
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#12669
+boar~
+a boar~
+A boar snuffles the ground nearby.~
+cj 27 0 100 0
+2 25 215 12670
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#12670
+jackrabbit rabbit~
+a jackrabbit~
+A jackrabbit sits with its ears raised.~
+cfj 9 15 100 0
+2 25 215 12670
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#12671
+tortoise desert~
+a desert tortoise~
+A desert tortoise slowly wanders by.~
+cefj 9 0 100 0
+2 25 215 12670
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#12672
+anaconda giant~
+a giant anaconda~
+A giant anaconda is draping from the tree!~
+cgj 5 5 100 0
+2 25 215 12670
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#12673
+baboon~
+a baboon~
+A baboon is sitting here and staring at you.~
+cgj 9 0 100 0
+2 25 215 12670
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+$

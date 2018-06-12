@@ -49,7 +49,7 @@ extern const char *wear_bits[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external functions
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char *get_room_name(room_data *room, bool color);
 extern char *list_harnessed_mobs(vehicle_data *veh);
 void look_at_vehicle(vehicle_data *veh, char_data *ch);
@@ -1925,7 +1925,7 @@ ACMD(do_adventure) {
 		// otherwise fall through to the rest of the command
 	}
 	
-	if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+	if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE))) {
 		msg_to_char(ch, "You are not in or near an adventure zone.\r\n");
 		return;
 	}
@@ -3008,7 +3008,7 @@ ACMD(do_nearby) {
 	// check instances
 	if (adventures) {
 		for (inst = instance_list; inst; inst = inst->next) {
-			if (!inst->location || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
+			if (!inst->fake_loc || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
 				continue;
 			}
 		
@@ -3016,7 +3016,7 @@ ACMD(do_nearby) {
 				continue;
 			}
 		
-			loc = inst->location;
+			loc = inst->fake_loc;
 			if (!loc || (dist = compute_distance(IN_ROOM(ch), loc)) > max_dist) {
 				continue;
 			}
@@ -3031,7 +3031,7 @@ ACMD(do_nearby) {
 		
 			// show instance
 			found = TRUE;
-			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			snprintf(line, sizeof(line), " %d %s: %s%s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (size + strlen(line) < sizeof(buf)) {
@@ -3166,7 +3166,7 @@ ACMD(do_survey) {
 	}
 	
 	// adventure info
-	if (find_instance_by_room(IN_ROOM(ch), FALSE)) {
+	if (find_instance_by_room(IN_ROOM(ch), FALSE, TRUE)) {
 		do_adventure(ch, "", 0, 0);
 	}
 }

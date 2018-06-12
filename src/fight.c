@@ -1597,6 +1597,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	// move character
 	char_to_room(ch, loc);
 	qt_visit_room(ch, IN_ROOM(ch));
+	msdp_update_room(ch);
 	
 	// take care of the corpse
 	if ((corpse = find_obj(GET_LAST_CORPSE_ID(ch), FALSE)) && IS_CORPSE(corpse)) {

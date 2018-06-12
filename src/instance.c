@@ -52,7 +52,7 @@ int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms, char_data *ignore_ch);
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
-struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
@@ -206,6 +206,7 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	
 	// basic data
 	inst->location = loc;
+	inst->fake_loc = loc;	// by default
 	inst->level = 0;	// unscaled
 	inst->created = time(0);
 	inst->last_reset = 0;	// will update this on 1st reset
@@ -1680,6 +1681,52 @@ int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum) {
 
 
 /**
+* Finds the closest instance with a given vnum, and returns the instance's
+* base location. This function does not pre-load instances if the adventure
+* allows delay-loads.
+*
+* @param room_data *from Our "closest to" starting point.
+* @param any_vnum vnum Which adventure vnum we're looking for.
+*/
+room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum) {
+	adv_data *adv = adventure_proto(vnum);
+	struct instance_data *inst, *closest = NULL;
+	int this, dist = 0;
+	room_data *map;
+	
+	if (!adv) {
+		return NULL;	// no such adventure
+	}
+	if (!(map = (GET_MAP_LOC(from) ? real_room(GET_MAP_LOC(from)->vnum) : NULL))) {
+		return NULL;	// does not work if no map loc
+	}
+	
+	LL_FOREACH(instance_list, inst) {
+		if (inst->adventure != adv) {
+			continue;	// wrong adv
+		}
+		if (IS_SET(inst->flags, INST_COMPLETED)) {
+			continue;	// do not pick a completed adventure
+		}
+		
+		// this could work
+		this = compute_distance(map, inst->fake_loc);
+		if (!closest || this < dist) {
+			closest = inst;	// save for later
+			dist = this;
+		}
+	}
+	
+	if (closest) {
+		return closest->location;
+	}
+	else {
+		return NULL;
+	}
+}
+
+
+/**
 * Finds the closest instance with a given room template, and returns the
 * instantiated room location.
 *
@@ -1710,7 +1757,7 @@ room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
 		}
 		
 		// this could work
-		this = compute_distance(map, inst->location);
+		this = compute_distance(map, inst->fake_loc);
 		if (!closest || this < dist) {
 			closest = inst;	// save for later
 			dist = this;
@@ -1819,13 +1866,13 @@ struct instance_data *get_instance_for_script(int go_type, void *go) {
 					inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
 				}
 				if (!inst) {
-					inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
+					inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE, TRUE);
 				}
 				break;
 			}
 			case OBJ_TRIGGER: {
 				if ((orm = obj_room((obj_data*)go))) {
-					inst = find_instance_by_room(orm, FALSE);
+					inst = find_instance_by_room(orm, FALSE, TRUE);
 				}
 				break;
 			}
@@ -1833,11 +1880,11 @@ struct instance_data *get_instance_for_script(int go_type, void *go) {
 			case RMT_TRIGGER:
 			case BLD_TRIGGER:
 			case ADV_TRIGGER: {
-				inst = find_instance_by_room((room_data*)go, FALSE);
+				inst = find_instance_by_room((room_data*)go, FALSE, TRUE);
 				break;
 			}
 			case VEH_TRIGGER: {
-				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
+				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE, TRUE);
 				break;
 			}
 		}
@@ -1906,6 +1953,33 @@ struct instance_data *real_instance(any_vnum instance_id) {
 
 
 /**
+* Used for 'roaming instances', where the player is presented with a new
+* location as the instance moves.
+*
+* @param struct instance_data *inst The instance.
+* @param room_data *loc The location where it now "is".
+*/
+void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
+	int iter;
+	
+	if (!inst || !loc) {
+		return;	// no work / error?
+	}
+	
+	inst->fake_loc = loc;
+	
+	// update interior
+	for (iter = 0; iter < inst->size; ++iter) {
+		if (inst->room[iter] && COMPLEX_DATA(inst->room[iter])) {
+			GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(inst->fake_loc);
+			GET_ISLAND(inst->room[iter]) = GET_ISLAND(inst->fake_loc);
+			GET_MAP_LOC(inst->room[iter]) = GET_MAP_LOC(inst->fake_loc);
+		}
+	}
+}
+
+
+/**
 * Removes a mob from the instance's count (e.g. when it dies).
 *
 * @param struct instance_data *inst The instance.
@@ -1960,10 +2034,11 @@ void update_instance_world_size(void) {
 /**
 * @param room_data *room Any world location.
 * @param bool check_homeroom If TRUE, also checks for extended instance (the homeroom is marked ROOM_AFF_HAS_INSTANCE too, to prevent claiming, etc)
+* @param bool allow_fake_loc If TRUE, will return an instance from its fake_loc (script-set location; will still prefer a real-loc instance if two are here); FALSE only returns an instance really at that loc.
 * @return struct instance_data* An instance associated with that room (maybe one it's the map location for), or NULL if none.
 */
-struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom) {
-	struct instance_data *inst;
+struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc) {
+	struct instance_data *inst, *fake = NULL;
 	
 	if (!room) {
 		return NULL;
@@ -1975,15 +2050,18 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 	}
 	
 	// check if it's the location for one
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
+	if (allow_fake_loc || ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
 		for (inst = instance_list; inst; inst = inst->next) {
 			if (inst->location == room || (check_homeroom && HOME_ROOM(inst->location) == room)) {
-				return inst;
+				return inst;	// real loc
+			}
+			else if (allow_fake_loc && !fake && (inst->fake_loc == room || (check_homeroom && HOME_ROOM(inst->fake_loc) == room))) {
+				fake = inst;	// save for later, in case no real is found
 			}
 		}
 	}
 	
-	return NULL;
+	return fake;	// if any
 }
 
 
@@ -2051,26 +2129,36 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 	
 	struct instance_data *inst;
 	char line[256], str_in[256];
-	int i_in[3];
+	int i_in[4];
 	long l_in[2];
 
 	CREATE(inst, struct instance_data, 1);
 	inst->id = idnum;
 	
-	// line 1: adventure-vnum, location, start, flags
-	if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &i_in[0], &i_in[1], &i_in[2], str_in) != 4) {
-		log("SYSERR: Format error in line 1 of instance");
+	// line 1: adventure-vnum, location, start, flags, fake_loc
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 1 of instance %d", idnum);
 		exit(1);
+	}
+	if (sscanf(line, "%d %d %d %s %d", &i_in[0], &i_in[1], &i_in[2], str_in, &i_in[3]) != 5) {
+		i_in[3] = i_in[1];	// missing fake_loc? set to real location
+		
+		// backwards-compatible for missing fake_loc:
+		if (sscanf(line, "%d %d %d %s", &i_in[0], &i_in[1], &i_in[2], str_in) != 4) {
+			log("SYSERR: Format error in line 1 of instance %d", idnum);
+			exit(1);
+		}
 	}
 	
 	inst->adventure = adventure_proto(i_in[0]);
 	inst->location = real_room(i_in[1]);
 	inst->start = real_room(i_in[2]);
 	inst->flags = asciiflag_conv(str_in);
+	inst->fake_loc = real_room(i_in[3]);
 
 	// line 2: level, created, last-reset
 	if (!get_line(fl, line) || sscanf(line, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]) != 3) {
-		log("SYSERR: Format error in line 2 of instance");
+		log("SYSERR: Format error in line 2 of instance %d", idnum);
 		exit(1);
 	}
 	
@@ -2176,16 +2264,21 @@ static void renum_instances(void) {
 	int iter;
 	
 	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		// ensure fake_loc is set
+		if (!inst->fake_loc) {
+			inst->fake_loc = inst->location;
+		}
+		
 		// attach pointers
 		for (iter = 0; iter < inst->size; ++iter) {			
 			// set up instance data
 			if (inst->room[iter] && COMPLEX_DATA(inst->room[iter])) {
 				COMPLEX_DATA(inst->room[iter])->instance = inst;
 				
-				if (inst->location) {
-					GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(inst->location);
-					GET_ISLAND(inst->room[iter]) = GET_ISLAND(inst->location);
-					GET_MAP_LOC(inst->room[iter]) = GET_MAP_LOC(inst->location);
+				if (inst->fake_loc) {
+					GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(inst->fake_loc);
+					GET_ISLAND(inst->room[iter]) = GET_ISLAND(inst->fake_loc);
+					GET_MAP_LOC(inst->room[iter]) = GET_MAP_LOC(inst->fake_loc);
 				}
 			}
 		}
@@ -2260,7 +2353,7 @@ void save_instances(void) {
 
 	for (inst = instance_list; inst; inst = inst->next) {
 		fprintf(fl, "#%d\n", inst->id);
-		fprintf(fl, "%d %d %d %s\n", GET_ADV_VNUM(inst->adventure), inst->location ? GET_ROOM_VNUM(inst->location) : NOWHERE, inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE, bitv_to_alpha(inst->flags));
+		fprintf(fl, "%d %d %d %s %d\n", GET_ADV_VNUM(inst->adventure), inst->location ? GET_ROOM_VNUM(inst->location) : NOWHERE, inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE, bitv_to_alpha(inst->flags), inst->fake_loc ? GET_ROOM_VNUM(inst->fake_loc) : NOWHERE);
 		fprintf(fl, "%d %ld %ld\n", inst->level, inst->created, inst->last_reset);
 		
 		// 'D' direction data

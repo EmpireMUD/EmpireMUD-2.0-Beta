@@ -235,4 +235,477 @@ A
 C
 25 25
 S
+#12650
+portal strange green~
+a strange green portal~
+A strange green portal has opened in one of the trees! (adventure)~
+   The portal crackles and hisses with a strange energy that is at once natural
+and unnatural. You can tell by the way the portal has formed in a tree that
+there are powerful natural forces at work here.
+~
+8 0 0 4
+0 0 0
+10 0
+S
+#12651
+portal strange green fog~
+a strange green portal~
+The fog swirls into a portal back into the forests of your own world!~
+   The portal crackles and hisses with a strange energy that is at once natural
+and unnatural. This is surely your only escape from this dark Magiterranean
+realm.
+~
+8 0 0 5
+0 0 0
+10 0
+S
+#12652
+fog bank dense~
+the fog bank~
+The dense fog bank seems to part along the path as you approach... (difficulty <normal | hard>)~
+The fog bank seems to part as you approach. Select a difficulty to continue.
+Usage: difficulty <normal | hard>
+~
+3 0 0 3
+0 0 0
+10 0
+T 12655
+T 12652
+S
+#12653
+fog bank dense~
+the fog bank~
+The fog has parted, revealing a path.~
+~
+3 0 0 3
+0 0 0
+10 48
+T 12653
+S
+#12654
+fire wild~
+wild fire~
+A little fire is burning on the ground.~
+   You gaze into the sparkling wild fire, burning bright but entirely harmless.
+These little fires are safe enough to put in your pocket, and they'll burn even
+in the depths of the ocean, but only for a little while.
+~
+3 cmy ao 4
+0 0 0
+10 168
+A
+7 2 0
+A
+8 1 0
+C
+0 75
+S
+#12655
+corpse drowned interloper~
+the corpse of a drowned interloper~
+A drowned corpse floats in front of you, held in place by a long root.~
+It looks like this interloper messed with the wrong druids.
+~
+3 0 0 1
+0 0 0
+7 0
+S
+#12657
+gauntlets bark pair~
+bark gauntlets~
+A pair of bark gauntlets is lying here.~
+   These gauntlets are woven from thin, pliable bark, but they're surprisingly
+sturdy.
+~
+2 mp ah 7
+-1 -1 -1
+7 0
+A
+18 1 0
+C
+0 75
+S
+#12658
+gloves leaf pair~
+leaf gloves~
+A pair of leaf gloves is lying here.~
+These gloves are woven from fine, green leaves.
+~
+2 mp ah 7
+-1 -1 -1
+7 0
+A
+9 1 0
+A
+17 1 0
+C
+0 75
+S
+#12659
+gloves petal pair~
+petal gloves~
+A pair of petal gloves is lying here.~
+These gloves are woven from delicate white flower petals.
+~
+2 mp ah 8
+-1 -1 -1
+7 0
+A
+7 1 0
+A
+6 1 0
+C
+0 75
+S
+#12660
+ring scaly turtle~
+the ring of the turtle~
+A scaly ring is lying on the ground.~
+The ring is made from scales and covered in scutes.
+~
+2 mp ab 5
+-1 -1 -1
+7 0
+A
+2 1 0
+A
+15 1 0
+C
+0 75
+S
+#12661
+ring badger furry~
+the ring of the badger~
+A furry ring is lying here.~
+The ring is covered in coarse fur, half black and half white.
+~
+2 mp ab 4
+-1 -1 -1
+7 0
+A
+21 1 0
+A
+17 1 0
+C
+0 75
+S
+#12662
+ring crow feathered~
+the ring of the crow~
+A feathered ring is lying here.~
+   The ring is made from woven feathers, with a few long black feathers
+sticking out.
+~
+2 mp ab 5
+-1 -1 -1
+7 0
+A
+22 1 0
+A
+17 1 0
+C
+0 75
+S
+#12663
+belt grove~
+the belt of the Grove~
+The belt of the Grove is lying on the ground.~
+This fur-lined belt is marked with the sigil of the Grove of the Magiterranean!
+~
+2 mp al 4
+-1 -1 -1
+7 0
+A
+2 1 0
+A
+18 2 0
+A
+5 1 3
+C
+0 75
+S
+#12664
+girdle forest~
+the girdle of the Forest~
+The girdle of the Forest is lying on the ground.~
+   This girdle is made from oak bark and branded with the sigil of the Forest
+of the Magiterranean!
+~
+2 mp al 5
+-1 -1 -1
+7 0
+A
+1 1 0
+A
+17 2 0
+A
+5 1 3
+C
+0 75
+S
+#12665
+sash magiterranean~
+the sash of the Magiterranean~
+The sash of the Magiterranean is lying here.~
+   This sash appears to be made from black fur, into which someone has shaved
+the sigil of the Grove of the Magiterranean!
+~
+2 mp al 6
+-1 -1 -1
+7 0
+A
+8 1 0
+A
+17 2 0
+A
+5 1 3
+C
+0 75
+S
+#12667
+robes grove druids~
+robes of the Grove druids~
+The robes of the Grove druids are lying here.~
+   These layered brown robes are the sort worn by the druids of the Grove of
+the Magiterranean.
+~
+2 p ad 4
+0 0 0
+11 0
+C
+75 75
+M
+12
+The druid $n stands before you in heavy brown robes.~
+S
+#12668
+trap wildling tiny~
+a tiny wildling trap~
+A tiny wildling trap is sitting on the ground.~
+This trap can summon a noncombat pet!
+Type 'use trap' to summon it.
+~
+3 p a 4
+12668 0 0
+2 0
+T 9900
+S
+#12669
+whistle wildling~
+a wildling whistle~
+A wildling whistle is dangling here.~
+This whistle can be used to summon a wildling mount.
+~
+3 p a 5
+12669 0 0
+14 0
+T 10263
+S
+#12670
+totem grove animal~
+the animal totem of the Grove~
+The animal totem of the Grove is lying here.~
+This totem enhances the Animal Forms ability, allowing 6 new morphs:
+Temperate: elk, boar
+Desert: jackrabbit, desert tortoise
+Tropical: giant anaconda, baboon
+~
+3 p a 3
+0 0 0
+0 0
+S
+#12671
+stone henge wood~
+the wood henge stone~
+The wood henge stone is sitting on the ground.~
+This massive sacred stone can imbue its power to a wood henge. Use it to build
+yours in one of your cities.
+Usage: build woodhenge
+~
+3 e a 1
+0 0 0
+1 0
+S
+#12673
+totem grove~
+the totem of tranquility~
+The totem of tranquility is on the ground.~
+   The totem is carved from hardwood, in the shape of a baby fox. Inscribed in
+a spiral around the totem are the words to the chant of tranqulity. Use 'chant
+tranquility' to tranquilize the Grove.
+~
+3 0 a 2
+0 0 0
+0 0
+Q 12650
+T 12673
+S
+#12674
+tranquility aura~
+an aura of tranquility~
+An aura of tranquility permeates the fog.~
+~
+3 0 0 4
+0 0 0
+10 0
+S
+#12675
+breath~
+your breath~
+Your breath is here, and it is breathtaking.~
+~
+3 p a 3
+0 0 0
+10 2
+T 12675
+S
+#12677
+oil jar snake druid~
+oil of the snake druid~
+A jar of oil of the snake druid is lying here.~
+   This tiny jar of oil is just enough to polish one item. When used on any of
+the rings, belts, or gloves from the Grove of the Magiterranean, this oil
+permanently enhances the item.
+Usage: oil <item>
+~
+3 p a 2
+0 0 0
+10 0
+C
+1 1
+T 12677
+S
+#12678
+stone seeker grove~
+a Grove seeker stone~
+A Grove seeker stone lies here.~
+Use 'seek grove' to find the nearest Magiterranean: The Grove adventure.
+~
+3 p a 10
+0 0 0
+12 0
+T 12678
+S
+#12679
+spawner druid~
+a druid~
+A druid spawner is here.~
+~
+3 0 0 3
+0 0 0
+0 0
+T 12679
+S
+#12681
+mix grove pocketful~
+a pocketful of grove mix~
+Some grove mix is scattered on the ground.~
+   You have filled your pocket with this strange mix of grains, fruits, and
+nuts. The whole mixture has a strange, blue sparkle that seems to indicate mana
+flowing through it. It tastes good, though.
+~
+6 p a 3
+24 0 0
+0 1152
+B
+c
+C
+1 1
+M
+4
+You munch away at the grove mix, wistfully remembering how you saved the druids of the Grove.~
+S
+#12682
+mix grove pocketful~
+a pocketful of grove mix~
+Some grove mix is scattered on the ground.~
+   You have filled your pocket with this strange mix of grains, fruits, and
+nuts. The whole mixture has a strange, blue sparkle that seems to indicate mana
+flowing through it. It tastes good, though.
+~
+6 p a 4
+24 0 0
+0 1152
+B
+c
+C
+1 1
+M
+4
+You weep as you eat the grove mix, remembering all those druids you killed.~
+S
+#12684
+seedling golden~
+a golden seedling~
+A golden seedling is sitting here.~
+   It looks like a tiny plant, but made from solid gold. Still, you swear it
+blows in the wind when you put it down.
+~
+15 0 a 1
+1 0 0
+4 0
+C
+1 1
+R
+5611 0
+S
+#12685
+lint pocket magiterranean~
+the pocket lint of the Magiterranean~
+Some pocket lint is lying here.~
+   This seems like ordinary brown robe lint until you look at it long enough,
+and notice it sparkle with the magic of the Magiterranean.
+~
+3 k a 3
+0 0 0
+0 0
+S
+#12686
+cubs sugar~
+some sugar cubes~
+Some sugar cubes are scattered on the ground.~
+   These strange sugar cubes are glimmering with sparks of Magiterranean magic.
+Perhaps you could plant them...
+~
+6 b a 10
+1 12687 0
+10 168
+S
+#12687
+candy cotton basket~
+a basket of cotton candy~
+A basket of cotton candy is sitting here.~
+   This cotton candy is impossibly light and fluffy, like the pixies have spun
+floss from sugar.
+~
+6 b a 9
+6 12687 0
+10 168
+R
+5621 0
+R
+5193 0
+S
+#12689
+bolt cloth candy~
+a bolt of candy cloth~
+A bolt of candy cloth is sitting out.~
+This strange, sweet cloth is woven from sugar and yet surprisingly durable.
+~
+6 l a 8
+2 0 0
+11 0
+M
+6
+You hang some candy cloth on $V.~
+M
+7
+$n hangs some candy cloth on $V.~
+O
+26 h
+R
+5193 0
+R
+5621 0
+S
 $

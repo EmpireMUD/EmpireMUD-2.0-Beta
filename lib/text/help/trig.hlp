@@ -465,11 +465,17 @@ Special Variables When using field - The variable returns:
 &cinstance.loaded&0 - Checks if the instance has been fully loaded or not.
 &cinstance.load&0 - Forces loading an instance with the CAN-DELAY-LOAD. However,
    this happens automatically when a player arrives.
-&cinstance.location&0 - The map/linked location of the instance, if any.
+&cinstance.location&0 - The map/linked location of the instance, which can be
+   changed by set_location.
 &cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.
 &cinstance.name&0 - Name of the adventure instance, if any.
+&cinstance.nearest_adventure(vnum)&0 - Finds the location of the nearest
+   instance of a given adventure (only works if not in a !LOCATION spot).
 &cinstance.nearest_rmt(vnum)&0 - Finds a given room in the nearest instance
    that has one (only works if you aren't in a !LOCATION spot).
+&cinstance.real_location&0 - The instance's original location (if any).
+&cinstance.set_location(room)&0 - Changes the map location of the instance, for
+   example if the adventure appears to move.
 &cinstance.start&0 - The entry room of the instance, if any.
 &cpeople.<vnum>&0 - This variable returns the number of people in the room 
    specified via vnum.

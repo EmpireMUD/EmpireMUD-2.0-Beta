@@ -238,8 +238,6 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 * @return bool TRUE if it moved, FALSE if it was blocked.
 */
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
-	void msdp_update_room(char_data *ch);
-	
 	room_data *to_room = NULL, *was_in;
 	struct follow_type *fol, *next_fol;
 	struct vehicle_room_list *vrl;
@@ -341,6 +339,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		greet_mtrigger(VEH_SITTING_ON(veh), dir);
 		greet_memory_mtrigger(VEH_SITTING_ON(veh));
 		greet_vtrigger(VEH_SITTING_ON(veh), NO_DIR);
+		msdp_update_room(VEH_SITTING_ON(veh));
 		
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
 			if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING)) {
@@ -464,13 +463,13 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 	}
 	
 	if (VEH_CARRYING_N(veh) + obj_carry_size(obj) > VEH_CAPACITY(veh)) {
-		act("$p won't fit in $V.", FALSE, ch, obj, veh, TO_CHAR);
+		act("$p won't fit in $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	
 	obj_to_vehicle(obj, veh);
-	act("$n puts $p in $V.", TRUE, ch, obj, veh, TO_ROOM);
-	act("You put $p in $V.", FALSE, ch, obj, veh, TO_CHAR);
+	act("$n puts $p in $V.", TRUE, ch, obj, veh, TO_ROOM | TO_QUEUE);
+	act("You put $p in $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE);
 	
 	if (IS_IMMORTAL(ch)) {
 		if (VEH_OWNER(veh) && !EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
@@ -517,6 +516,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	greet_mtrigger(mob, NO_DIR);
 	greet_memory_mtrigger(mob);
 	greet_vtrigger(mob, NO_DIR);
+	msdp_update_room(mob);	// is this possibly a person?
 }
 
 
@@ -567,6 +567,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	greet_mtrigger(mob, NO_DIR);
 	greet_memory_mtrigger(mob);
 	greet_vtrigger(mob, NO_DIR);
+	msdp_update_room(mob);	// is this possibly a person?
 }
 
 
@@ -1246,6 +1247,7 @@ ACMD(do_board) {
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR);
+		msdp_update_room(ch);
 		
 		// leading-mob
 		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
@@ -1312,6 +1314,7 @@ ACMD(do_board) {
 			greet_mtrigger(k->follower, NO_DIR);
 			greet_memory_mtrigger(k->follower);
 			greet_vtrigger(k->follower, NO_DIR);
+			msdp_update_room(k->follower);	// once we're sure we're staying
 		}
 		
 		command_lag(ch, WAIT_OTHER);
@@ -1358,6 +1361,7 @@ ACMD(do_disembark) {
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR);
+		msdp_update_room(ch);
 		
 		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
 			act("$n is led off.", TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
@@ -1418,6 +1422,7 @@ ACMD(do_disembark) {
 			greet_mtrigger(k->follower, NO_DIR);
 			greet_memory_mtrigger(k->follower);
 			greet_vtrigger(k->follower, NO_DIR);
+			msdp_update_room(k->follower);
 		}
 		
 		command_lag(ch, WAIT_OTHER);
@@ -1487,7 +1492,7 @@ ACMD(do_dispatch) {
 	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {
 		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
 	}
-	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && HAS_FUNCTION(IN_ROOM(veh), FNC_DOCKS)) {
+	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(IN_ROOM(veh), FNC_DOCKS)) {
 		msg_to_char(ch, "It is already docked on that island.\r\n");
 	}
 	else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
@@ -1723,6 +1728,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 		if (VEH_SITTING_ON(veh)) {
 			char_to_room(VEH_SITTING_ON(veh), to_room);
 			look_at_room(VEH_SITTING_ON(veh));
+			msdp_update_room(VEH_SITTING_ON(veh));
 		}
 		
 		// stop driving after

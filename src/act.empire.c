@@ -431,7 +431,7 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 
 
 /**
-* Displays all gaols completed by the empire.
+* Displays all goals completed by the empire.
 *
 * @param char_data *ch The player to show them to.
 * @parma empire_data *emp The empire whose goals to show.
@@ -1456,7 +1456,7 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_city_data *city;
 	int x, y, radius;
 	room_data *iter, *next_iter, *to_room, *center, *home;
-	bool found = FALSE, all = FALSE;
+	bool found = FALSE, all = FALSE, junk;
 	int len;
 	
 	// look for the "all" at the end
@@ -1517,6 +1517,9 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 			}
 			if (ROOM_SECT_FLAGGED(to_room, SECTF_NO_CLAIM)) {
 				continue;
+			}
+			if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
+				continue;	// wouldn't be in-city (checks corners and islands)
 			}
 			
 			// ok...
@@ -1756,7 +1759,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 		dist = compute_distance(loc, city->location);
 		
 		// check radii
-		if (dist <= city_type[city->type].radius) {
+		if (dist <= city_type[city->type].radius && GET_ISLAND(loc) == GET_ISLAND(city->location)) {
 			// check wait?
 			type = TER_CITY;
 		}
@@ -3092,7 +3095,7 @@ ACMD(do_barde) {
 	
 	one_argument(argument, arg);
 
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -3585,6 +3588,9 @@ ACMD(do_deposit) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only deposit coins in a vault.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "You can only deposit coins in this vault if it's in a city.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building it first.\r\n");
@@ -5155,6 +5161,10 @@ ACMD(do_tavern) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		show_tavern_status(ch);
+		msg_to_char(ch, "This tavern only works in a city.\r\n");
+	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "Complete the building to change what it's brewing.\r\n");
@@ -6699,6 +6709,9 @@ ACMD(do_withdraw) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only withdraw coins in a vault.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This vault only works if it's in a city.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building it first.\r\n");

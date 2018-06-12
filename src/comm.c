@@ -238,7 +238,7 @@ inline void empire_sleep(struct timeval *timeout) {
 * @param char_data *ch The player to update (no effect if no descriptor).
 */
 void msdp_update_room(char_data *ch) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern char *get_room_name(room_data *room, bool color);
 	extern const char *alt_dirs[];
 	
@@ -255,7 +255,7 @@ void msdp_update_room(char_data *ch) {
 	}
 
 	// determine area name: we'll use it twice
-	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
 		snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(inst->adventure));
 	}
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
@@ -304,6 +304,8 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetNumber(desc, eMSDP_ROOM_VNUM, IS_IMMORTAL(ch) ? GET_ROOM_VNUM(IN_ROOM(ch)) : 0);
 	MSDPSetString(desc, eMSDP_ROOM_NAME, get_room_name(IN_ROOM(ch), FALSE));
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
+	
+	MSDPUpdate(desc);
 }
 
 

@@ -24,7 +24,7 @@ Available types are:
  .g - globals                    .gen - generics
  .m - mobiles                    .map - map tiles/interiors
  .morph - morphs                 .o - objects
- .prog - empire progression gaol
+ .prog - empire progression goal
  .q - quests                     .r - room templates
  .sect - map sectors             .shop - shops
  .skill - skills                 .soc - socials
@@ -5709,7 +5709,7 @@ Usage:  .tasks add <type> <vnum> [group]
 
 These are the tasks that must be completed in order to unlock the progression
 goal's rewards. This uses the same system of requirements as quests and
-socials, but some of the tasks do not apply to progression gaols.
+socials, but some of the tasks do not apply to progression goals.
 
 See HELP REQUIREMENTS for more information about requirements. Just like with
 other requirements, if you don't group tasks, a goal can be completed by

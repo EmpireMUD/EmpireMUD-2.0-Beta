@@ -58,7 +58,7 @@ extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 extern struct req_data *copy_requirements(struct req_data *from);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_requirement_display(struct req_data *list, char *save_buffer);
@@ -1497,7 +1497,7 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 		}
 		
 		// success
-		inst = (room ? find_instance_by_room(room, FALSE) : NULL);
+		inst = (room ? find_instance_by_room(room, FALSE, TRUE) : NULL);
 		
 		// pre-reqs?
 		if (char_meets_prereqs(ch, ql->quest, inst)) {
@@ -1570,7 +1570,7 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 			}
 			
 			// success
-			inst = (room ? find_instance_by_room(room, FALSE) : NULL);
+			inst = (room ? find_instance_by_room(room, FALSE, TRUE) : NULL);
 			
 			// pre-reqs?
 			if (char_meets_prereqs(ch, ql->quest, inst)) {

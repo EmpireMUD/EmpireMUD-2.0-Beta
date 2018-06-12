@@ -3044,6 +3044,7 @@ struct instance_data {
 	
 	bitvector_t flags;	// INST_ flags
 	room_data *location;	// map room linked from
+	room_data *fake_loc;	// for "roaming instances", a location set by script
 	room_data *start;	// starting interior room (first room of zone)
 	int level;	// locked, scaled level
 	time_t created;	// when instantiated
