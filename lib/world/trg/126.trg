@@ -245,6 +245,9 @@ eval room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
 eval to_room %tricky%
 * Compare template ids to figure out if they're going forward or back
+if %actor.is_npc%
+  halt
+end
 if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
   halt
 end
@@ -785,7 +788,7 @@ end
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
-    dg_affect #12668 %actor% TO-HIT -10 15
+    dg_affect #12663 %actor% TO-HIT -10 15
   end
   set person %person.next_in_room%
 done
@@ -1142,7 +1145,11 @@ else
   else
     set plural tiles
   end
-  %send% %actor% There is a Magiterranean Grove %distance% %plural% to the %direction%.
+  if %actor.ability(Navigation)%
+    %send% %actor% There is a Magiterranean Grove at %room.coords%, %distance% %plural% to the %direction%.
+  else
+    %send% %actor% There is a Magiterranean Grove %distance% %plural% to the %direction%.
+  end
   %echoaround% %actor% %actor.name% holds %self.shortdesc% aloft...
 end
 ~
@@ -1281,29 +1288,5 @@ Give Grove 2.0 chant item~
 if %questvnum% == 12650
   %load% obj 12673 %actor% inv
 end
-~
-#12688
-Grove bosses stagger~
-0 l 66
-~
-if %self.cooldown(12669)%
-  halt
-end
-nop %self.set_cooldown(12669, 45)%
-%echo% %self.name% staggers under your assault!
-%echo% &YYou can try to 'trip' %self.himher%.
-dg_affect #12671 %self% DODGE -5 10
-~
-#12689
-Grove bosses: trip~
-0 c 0
-trip~
-if !%self.affect(12671)%
-  %send% %actor% %self.name% isn't currently vulnerable to being tripped.
-  halt
-end
-%send% %actor% &yYou trip %self.name%, who falls to the ground, stunned.
-dg_affect #12671 %self% off
-dg_affect #12672 %self% HARD-STUNNED on 10
 ~
 $

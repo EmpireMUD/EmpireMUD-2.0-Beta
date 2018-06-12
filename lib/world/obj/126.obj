@@ -543,9 +543,9 @@ S
 #12674
 tranquility aura~
 an aura of tranquility~
-An aura of tranquility fills the air.~
+An aura of tranquility permeates the fog.~
 ~
-3 0 0 3
+3 0 0 4
 0 0 0
 10 0
 S
@@ -579,9 +579,9 @@ S
 stone seeker grove~
 a Grove seeker stone~
 A Grove seeker stone lies here.~
-Use 'seek grove' to find the nearest Magiterannean: The Grove adventure.
+Use 'seek grove' to find the nearest Magiterranean: The Grove adventure.
 ~
-3 p a 9
+3 p a 10
 0 0 0
 12 0
 T 12678
@@ -595,5 +595,79 @@ A druid spawner is here.~
 0 0 0
 0 0
 T 12679
+S
+#12684
+seedling golden~
+a golden seedling~
+A golden seedling is sitting here.~
+   It looks like a tiny plant, but made from solid gold. Still, you swear it
+blows in the wind when you put it down.
+~
+15 0 a 1
+1 0 0
+4 0
+C
+1 1
+R
+5611 0
+S
+#12685
+link pocket magiterranean~
+the pocket lint of the Magiterranean~
+Some pocket lint is lying here.~
+   This seems like ordinary brown robe lint until you look at it long enough,
+and notice it sparkle with the magic of the Magiterranean.
+~
+3 k a 2
+0 0 0
+0 0
+S
+#12686
+cubs sugar~
+some sugar cubes~
+Some sugar cubes are scattered on the ground.~
+   These strange sugar cubes are glimmering with sparks of Magiterranean magic.
+Perhaps you could plant them...
+~
+6 b a 10
+1 12687 0
+10 168
+S
+#12687
+candy cotton basket~
+a basket of cotton candy~
+A basket of cotton candy is sitting here.~
+   This cotton candy is impossibly light and fluffy, like the pixies have spun
+floss from sugar.
+~
+6 b a 9
+6 12687 0
+10 168
+R
+5621 0
+R
+5193 0
+S
+#12689
+bolt cloth candy~
+a bolt of candy cloth~
+A bolt of candy cloth is sitting out.~
+This strange, sweet cloth is woven from sugar and yet surprisingly durable.
+~
+6 l a 8
+2 0 0
+11 0
+M
+6
+You hang some candy cloth on $V.~
+M
+7
+$n hangs some candy cloth on $V.~
+O
+26 h
+R
+5193 0
+R
+5621 0
 S
 $

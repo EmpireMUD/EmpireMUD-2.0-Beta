@@ -1,0 +1,101 @@
+#12687
+cotton candy~
+A Cotton Candy Bush~
+36 1 c
+0 100 0 100
+D1
+&g.&?%%&g.~
+&P~
+D2
+&g.&?%%&g.~
+&P~
+D3
+&g.&?%%&g.~
+&P~
+D4
+&0.&?%%&0.~
+&P~
+I 6 12686 100.00 1  # FORAGE: some sugar cubes
+I 8 12687 20.00 2 H  # HARVEST: a basket of cotton candy
+I 8 12687 20.00 3 H  # HARVEST: a basket of cotton candy
+I 8 12687 20.00 4 H  # HARVEST: a basket of cotton candy
+I 8 12687 20.00 5 H  # HARVEST: a basket of cotton candy
+I 8 12687 20.00 6 H  # HARVEST: a basket of cotton candy
+M
+9145 5.00 adh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9141 5.00 dg
+M
+9144 5.00 adg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9153 10.00 d
+M
+9021 10.00 d
+M
+9024 5.00 d
+M
+9034 5.00 d
+M
+9011 10.00 d
+M
+9010 10.00 d
+M
+9154 5.00 bd
+M
+9152 5.00 bd
+M
+9009 10.00 d
+M
+9004 10.00 d
+M
+9012 10.00 d
+M
+9150 5.00 d
+M
+9149 5.00 d
+M
+9148 5.00 d
+M
+9023 5.00 d
+M
+9008 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 5.00 bd
+M
+9031 5.00 bd
+M
+9030 5.00 bd
+M
+9029 5.00 bd
+M
+9025 5.00 bd
+M
+9020 5.00 bd
+S
+$

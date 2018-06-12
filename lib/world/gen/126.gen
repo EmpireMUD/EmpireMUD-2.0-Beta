@@ -131,6 +131,13 @@ squirrel bites~
 T0
 Your squirrel bites stop bleeding.~
 S
+#12663
+off-balance~
+4 0
+0 0 0 0
+T0
+You regain your balance.~
+S
 #12664
 earthen claws~
 4 0
@@ -159,11 +166,11 @@ T0
 You recover your weapon.~
 S
 #12668
-off-balance~
-4 0
+tiny wildling pet~
+3 0
 0 0 0 0
 T0
-You regain your balance.~
+Your tiny wildling pet cooldown has ended.~
 S
 #12669
 turtle shell~
