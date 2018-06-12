@@ -2476,7 +2476,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (subfield && *subfield && inst->start && atoi(subfield) > 0) {
 						lock_instance_level(inst->start, atoi(subfield));
 					}
-					snprintf(subfield, slen, "%d", inst->level);
+					snprintf(str, slen, "%d", inst->level);
 				}
 				else if (!str_cmp(field, "location")) {
 					if (inst->fake_loc) {
