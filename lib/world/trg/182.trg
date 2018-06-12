@@ -395,7 +395,7 @@ Guildhall mob out of city despawn~
 0 n 100
 ~
 if !%self.room.in_city(true)%
-  %purge% %self%
+  %purge% %self% $n leaves because this guildhall isn't in an active city.
 else
   visible
 end
