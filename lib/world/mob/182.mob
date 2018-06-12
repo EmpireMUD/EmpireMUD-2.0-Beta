@@ -286,7 +286,7 @@ guildmage mage #n~
 Guildmage #n~
 Guildmage #n stands at the window.
 ~
-100 150 bdqv 0
+100 150 bdqv e
 0 2 0 19
 M
 0
@@ -325,7 +325,7 @@ S
 #n the librarian~
 #n is reshelving the disheveled books.
 ~
-100 150 bdqv 0
+100 150 bdqv e
 0 0 0 5
 M
 1
@@ -346,7 +346,7 @@ superintendant #n~
 Superintendant #n~
 The superintendant is sitting at his desk.
 ~
-100 150 bdqv 0
+100 150 bdqv e
 1 0 0 1
 M
 0
@@ -380,7 +380,7 @@ S
 #n the treasurer~
 #n is locking up a new treasure.
 ~
-100 150 bdqv 0
+100 150 bdqv e
 0 1 0 4
 T 18218
 S

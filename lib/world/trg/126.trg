@@ -1315,7 +1315,7 @@ end
 #12686
 Grove rage spirit speech~
 0 d 1
-calm relax pacify slumber~
+*~
 if !%self.varexists(correct_word)%
   set success 1
 else
@@ -1358,7 +1358,7 @@ if %success%
 else
   %send% %actor% &r%self.name% attacks you with a painful bolt of crimson light, and flies off into the trees!
   %echoaround% %actor% %self.name% attacks %actor.name% with a bolt of crimson light, and flies off into the trees!
-  %damage% %actor% 100 magical
+  %damage% %actor% 200 magical
   %purge% %self%
 end
 ~
@@ -1369,7 +1369,8 @@ Grove rage spirit time limit~
 wait 6 sec
 %echo% A voice in your head urges, 'Say it out loud!'
 wait 8 sec
-%echo% %self.name% flies off into the trees, looking furious!
+%echo% &r%self.name% releases a painful surge of crimson energy and flies off into the trees, looking furious!
+%aoe% 150 magical
 %purge% %self%
 ~
 $
