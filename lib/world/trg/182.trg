@@ -358,10 +358,6 @@ end
 Adventurer's Guildhall Complete~
 2 o 100
 ~
-if !%self.in_city%
-  %terraform% %self% %self.sector_vnum%
-  halt
-end
 * Add basement
 if !%room.down(room)%
   %door% %room% down add 18218
@@ -393,6 +389,14 @@ Give Adventurer Guild Charter~
 2 u 100
 ~
 %load% obj 18216 %actor%
+~
+#18218
+Guildhall mob out of city despawn~
+0 n 100
+~
+if !%self.room.in_city(true)%
+  %purge% %self% $n leaves because this guildhall isn't in an active city.
+end
 ~
 #18219
 Adventuring guild block vault~

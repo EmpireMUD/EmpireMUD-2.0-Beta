@@ -596,6 +596,50 @@ A druid spawner is here.~
 0 0
 T 12679
 S
+#12681
+mix grove pocketful~
+a pocketful of grove mix~
+Some grove mix is scattered on the ground.~
+   You have filled your pocket with this strange mix of grains, fruits, and
+nuts. The whole mixture has a strange, blue sparkle that seems to indicate mana
+flowing through it. It tastes good, though You have filled your pocket with
+this strange mix of grains, fruits, and nuts. The whole mixture has a strange,
+blue sparkle that seems to indicate mana flowing through it. It tastes good,
+though.
+~
+6 p a 1
+24 0 0
+0 1152
+B
+c
+C
+1 1
+M
+4
+You munch away at the grove mix, wistfully remembering how you saved the druids of the Grove.~
+S
+#12682
+mix grove pocketful~
+a pocketful of grove mix~
+Some grove mix is scattered on the ground.~
+   You have filled your pocket with this strange mix of grains, fruits, and
+nuts. The whole mixture has a strange, blue sparkle that seems to indicate mana
+flowing through it. It tastes good, though You have filled your pocket with
+this strange mix of grains, fruits, and nuts. The whole mixture has a strange,
+blue sparkle that seems to indicate mana flowing through it. It tastes good,
+though.
+~
+6 p a 2
+24 0 0
+0 1152
+B
+c
+C
+1 1
+M
+4
+You weep as you eat the grove mix, remembering all those druids you killed.~
+S
 #12684
 seedling golden~
 a golden seedling~
@@ -612,13 +656,13 @@ R
 5611 0
 S
 #12685
-link pocket magiterranean~
+lint pocket magiterranean~
 the pocket lint of the Magiterranean~
 Some pocket lint is lying here.~
    This seems like ordinary brown robe lint until you look at it long enough,
 and notice it sparkle with the magic of the Magiterranean.
 ~
-3 k a 2
+3 k a 3
 0 0 0
 0 0
 S

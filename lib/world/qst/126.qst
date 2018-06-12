@@ -115,9 +115,10 @@ Badger, the Druid of the Crow, the Druid of the Turtle, and their leader, the
 Archdruid.
 ~
    You have tranquilized the Grove and saved the druids! Hopefully they don't
-get into this kind of trouble again...
+get into this kind of trouble again... You receive some magical food, in
+addition to the wooden nickels you already earned.
 ~
-5 bc 1 75 -1
+8 bc 1 75 -1
 A
 1 12676
 P
@@ -126,6 +127,10 @@ P
 6 12652 0 1 a
 P
 9 3 0 1 a
+R
+2 12681 1
+R
+0 0 1
 T 12685
 W
 11 0 0 1
@@ -144,9 +149,11 @@ your world might be saved without too much bloodshed. Track down and kill the
 Druid of the Badger, the Druid of the Crow, the Druid of the Turtle, and their
 leader, the Archdruid.
 ~
-The fox looks down, sad, but accepts that you did what you had to do.
+   The fox looks down, sad, but accepts that you did what you had to do. You
+receive some magical food, in addition to the wooden nickels you already
+earned.
 ~
-5 bc 1 75 -1
+8 bc 1 75 -1
 A
 1 12676
 A
@@ -159,6 +166,10 @@ P
 9 4 0 1 a
 P
 6 12652 0 1 a
+R
+2 12682 1
+R
+0 0 1
 W
 3 12654 0 1 a
 W
@@ -183,9 +194,10 @@ and defeat the four leaders of the Grove: the Druid of the Badger, the Druid of
 the Crow, the Druid of the Turtle, and their leader, the Archdruid.
 ~
    The fox thanks you for doing what must be done, but it looks despondent at
-what you were forced to do to save your world.
+what you were forced to do to save your world. You receive some magical food,
+in addition to the wooden nickels you already earned.
 ~
-5 bc 1 75 -1
+8 bc 1 75 -1
 A
 1 12676
 A
@@ -198,6 +210,10 @@ P
 10 3 0 1 a
 P
 10 4 0 1 a
+R
+2 12682 1
+R
+0 0 1
 W
 3 12654 0 1 a
 W

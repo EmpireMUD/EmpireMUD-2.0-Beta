@@ -635,6 +635,7 @@ if %self.cooldown(12657)%
   halt
 end
 nop %self.set_cooldown(12657, 30)%
+wait 1
 set old_name %self.name%
 if !%self.morph%
   %morph% %self% 12662
@@ -746,7 +747,6 @@ if %self.cooldown(12657)%
 end
 nop %self.set_cooldown(12657, 30)%
 wait 1 sec
-dg_affect #12670 %self% HARD-STUNNED on 5
 %echo% %self.name% thrusts %self.hisher% staff skyward!
 dg_affect #12666 %self% SLOW on 15
 ~
@@ -886,6 +886,13 @@ set room %actor.room%
 set cycles_left 5
 while %cycles_left% >= 0
   eval sector_valid (%room.template% >= 12650 && %room.template% <= 12699)
+  set mob %room.people%
+  while %mob%
+    if %mob.vnum% == 12686
+      set rage_spirit_here 1
+    end
+    set mob %mob.next_in_room%
+  done
   set object %room.contents%
   while %object% && !%already_done%
     if %object.vnum% == 12674
@@ -893,11 +900,13 @@ while %cycles_left% >= 0
     end
     set object %object.next_in_list%
   done
-  if (%actor.room% != %room%) || !%sector_valid% || %already_done% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%sector_valid% || %already_done% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing) || %rage_spirit_here%
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 5
       %echoaround% %actor% %actor.name%'s chant is interrupted.
       %send% %actor% Your chant is interrupted.
+    elseif %rage_spirit_here%
+      %send% %actor% You can't perform the chant while the spirit of rage is here!
     elseif !%sector_valid%
       %send% %actor% You must perform the chant inside the Magiterranean Grove.
     elseif %already_done%
@@ -931,6 +940,20 @@ while %cycles_left% >= 0
       %send% %actor% You whisper into the air, and the feeling of tranquility spreads...
     break
     case 0
+      if %random.2% == 2
+        %echoaround% %actor% %actor.name%'s chant is interrupted as a spirit of rage materializes in front of %actor.himher%!
+        %send% %actor% Your chant is interrupted as a spirit of rage materializes in front of you!
+        %load% mob 12686
+        set spirit %self.room.people%
+        set word_1 calm
+        set word_2 relax
+        set word_3 pacify
+        set word_4 slumber
+        eval correct_word %%word_%random.4%%%
+        remote correct_word %spirit.id%
+        %echo% A voice in your head whispers, 'Tell it to %correct_word%!'
+        halt
+      end
       %echoaround% %actor% %actor.name% completes %actor.hisher% chant, and the area is tranquilized!
       %send% %actor% You complete your chant, and the area is tranquilized!
       %load% obj 12674 %room%
@@ -1288,5 +1311,65 @@ Give Grove 2.0 chant item~
 if %questvnum% == 12650
   %load% obj 12673 %actor% inv
 end
+~
+#12686
+Grove rage spirit speech~
+0 d 1
+calm relax pacify slumber~
+if !%self.varexists(correct_word)%
+  set success 1
+else
+  eval success %speech% ~= %self.correct_word%
+end
+if %success%
+  %echo% %self.name% begins to calm, and fades from view.
+  %echo% The area is tranquilized!
+  set room %self.room%
+  %load% obj 12674 %room%
+  set person %room.people%
+  while %person%
+    set next_person %person.next_in_room%
+    if %person.vnum% == 12660 || %person.vnum% == 12659 || %person.vnum% == 12658 || %person.vnum% == 12661
+      %purge% %person% $n slinks away.
+    elseif %person.vnum% >= 12650 && %person.vnum% <= 12657 || %person.vnum% == 12663
+      dg_affect #12673 %person% !ATTACK on -1
+      %echo% %person.name% looks pacified.
+      if %person.vnum% >= 12654 && %person.vnum% <= 12657
+        set give_token 1
+      end
+    end
+    set person %next_person%
+  done
+  set person %self.room.people%
+  while %person%
+    if %person.is_pc%
+      if %give_token%
+        %send% %person% You receive a %currency.12650(1)%.
+        nop %person.give_currency(12650, 1)%
+      end
+      if %done%
+        %send% %person% You have tranquilized all four of the druid leaders.
+        %quest% %person% trigger 12650
+      end
+    end
+    set person %person.next_in_room%
+  done
+  %purge% %self%
+else
+  %send% %actor% &r%self.name% attacks you with a painful bolt of crimson light, and flies off into the trees!
+  %echoaround% %actor% %self.name% attacks %actor.name% with a bolt of crimson light, and flies off into the trees!
+  %damage% %actor% 100 magical
+  %purge% %self%
+end
+~
+#12687
+Grove rage spirit time limit~
+0 bnw 100
+~
+wait 6 sec
+%echo% A voice in your head urges, 'Say it out loud!'
+wait 8 sec
+%echo% %self.name% flies off into the trees, looking furious!
+%purge% %self%
 ~
 $

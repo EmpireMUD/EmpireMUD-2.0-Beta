@@ -207,7 +207,7 @@ druid grove hooded figure #n~
 a druid of the Grove~
 A hooded figure is standing amongst the trees.
 ~
-5 0 dvx c
+5 0 dx c
 1 0 0 15
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -237,7 +237,7 @@ faun druid hooded antlered tall~
 a hooded faun~
 A tall, antlered druid stands beneath the canopy of trees.
 ~
-5 0 bdvx c
+5 0 bdx c
 2 0 0 11
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -252,7 +252,7 @@ druid gopher~
 a druid of the gopher~
 A druid of the gopher is crouched in the dirt.
 ~
-5 0 bdvx c
+5 0 bdx c
 1 0 0 5
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -267,7 +267,7 @@ druid badger creature huge man~
 the badger druid~
 A huge creature - half man, half badger - looms over you!
 ~
-5 0 bdvx c
+5 0 bdx c
 1 0 0 10
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -342,7 +342,7 @@ druid rotund turtle~
 the turtle druid~
 A rotund druid wallows peacefully in the water.
 ~
-5 0 bdvx c
+5 0 bdx c
 1 0 0 9
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -553,5 +553,15 @@ The Grove is in trouble, and soon your world will be, too!~
 M
 1
 I can close the portal, but not while the archdruid is in control.~
+S
+#12686
+spirit rage~
+the spirit of rage~
+The spirit of rage is floating here, screaming with primal fury!
+~
+0 0 bd n
+0 0 2 16
+T 12686
+T 12687
 S
 $
