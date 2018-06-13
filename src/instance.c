@@ -58,6 +58,7 @@ static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type
 any_vnum get_new_instance_id(void);
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 void link_instance_entrance(struct instance_data *inst);
+void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
@@ -1082,6 +1083,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	instance_save_wait = TRUE;
 	
 	extraction_room = get_extraction_room();
+	remove_instance_fake_loc(inst);	// if any
 	
 	expire_instance_quests(inst);
 	
@@ -1949,6 +1951,48 @@ struct instance_data *real_instance(any_vnum instance_id) {
 
 
 /**
+* Un-sets the location for 'roaming instances' and removes any leftover data.
+*
+* @param struct instance_data *inst The instance to remove the fake_loc for.
+*/
+void remove_instance_fake_loc(struct instance_data *inst) {
+	struct instance_data *i_iter;
+	int iter;
+	
+	if (!inst) {
+		return;	// no work
+	}
+	
+	// remove fake-instance flag (if needed)
+	if (INST_FAKE_LOC(inst) && ROOM_AFF_FLAGGED(INST_FAKE_LOC(inst), ROOM_AFF_FAKE_INSTANCE)) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
+		REMOVE_BIT(ROOM_AFF_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
+		
+		// see if the flag needs to be re-added (check all instances to see if one is still here)
+		LL_FOREACH(instance_list, i_iter) {
+			if (i_iter != inst && INST_FAKE_LOC(i_iter) == INST_FAKE_LOC(inst)) {
+				SET_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(i_iter)), ROOM_AFF_FAKE_INSTANCE);
+				SET_BIT(ROOM_AFF_FLAGS(INST_FAKE_LOC(i_iter)), ROOM_AFF_FAKE_INSTANCE);
+				break;	// any 1 will do
+			}
+		}
+	}
+	
+	// reset fake loc to real loc
+	INST_FAKE_LOC(inst) = INST_LOCATION(inst);
+	
+	// update interior
+	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
+		if (INST_ROOM(inst, iter) && COMPLEX_DATA(INST_ROOM(inst, iter))) {
+			GET_ISLAND_ID(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND_ID(INST_FAKE_LOC(inst)) : NO_ISLAND;
+			GET_ISLAND(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_ISLAND(INST_FAKE_LOC(inst)) : NULL;
+			GET_MAP_LOC(INST_ROOM(inst, iter)) = INST_FAKE_LOC(inst) ? GET_MAP_LOC(INST_FAKE_LOC(inst)) : NULL;
+		}
+	}
+}
+
+
+/**
 * Used for 'roaming instances', where the player is presented with a new
 * location as the instance moves.
 *
@@ -1962,7 +2006,19 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
 		return;	// no work / error?
 	}
 	
+	if (INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
+		// undo old one first
+		remove_instance_fake_loc(inst);
+	}
+	
+	// actually change it
 	INST_FAKE_LOC(inst) = loc ? loc : INST_LOCATION(inst);	// may be NULL anyway, but try to avoid that
+	
+	if (INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
+		// add fake-instance flag if needed
+		SET_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
+		SET_BIT(ROOM_AFF_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
+	}
 	
 	// update interior
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
@@ -2046,7 +2102,7 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 	}
 	
 	// check if it's the location for one
-	if (allow_fake_loc || ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_FAKE_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
 		LL_FOREACH(instance_list, inst) {
 			if (INST_LOCATION(inst) == room || (check_homeroom && HOME_ROOM(INST_LOCATION(inst)) == room)) {
 				return inst;	// real loc
@@ -2257,12 +2313,25 @@ void mark_instance_completed(struct instance_data *inst) {
 */
 static void renum_instances(void) {
 	struct instance_data *inst, *next_inst;
+	room_data *room, *next_room;
 	int iter;
+	
+	// remove all fake-loc flags first (avoids stray flags lingering forever)
+	HASH_ITER(hh, world_table, room, next_room) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_FAKE_INSTANCE);
+		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_FAKE_INSTANCE);
+	}
 	
 	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		// ensure fake_loc is set
 		if (!INST_FAKE_LOC(inst)) {
 			INST_FAKE_LOC(inst) = INST_LOCATION(inst);
+		}
+		
+		// ensure fake-loc flag is set
+		if (INST_FAKE_LOC(inst) && INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
+			SET_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
+			SET_BIT(ROOM_AFF_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
 		}
 		
 		// attach pointers
