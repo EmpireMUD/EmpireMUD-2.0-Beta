@@ -1965,6 +1965,10 @@ const char *action_bits[] = {
 const char *mob_custom_types[] = {
 	"echo",
 	"say",
+	"say-day",
+	"say-night",
+	"echo-day",
+	"echo-night",
 	"\n"
 };
 

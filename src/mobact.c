@@ -847,7 +847,17 @@ void run_mob_echoes(void) {
 			// ok now find a random message to show?
 			LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
 				// MOB_CUSTOM_x: types we use here
-				if (mcm->type != MOB_CUSTOM_ECHO && mcm->type != MOB_CUSTOM_SAY) {
+				if (mcm->type == MOB_CUSTOM_ECHO || mcm->type == MOB_CUSTOM_SAY) {
+					// ok = true
+				}
+				else if ((mcm->type == MOB_CUSTOM_SAY_DAY || mcm->type == MOB_CUSTOM_ECHO_DAY) && (weather_info.sunlight == SUN_LIGHT || weather_info.sunlight == SUN_RISE)) {
+					// day ok
+				}
+				else if ((mcm->type == MOB_CUSTOM_SAY_NIGHT || mcm->type == MOB_CUSTOM_ECHO_NIGHT) && (weather_info.sunlight == SUN_DARK || weather_info.sunlight == SUN_SET)) {
+					// night ok
+				}
+				else {
+					// NOT ok
 					continue;
 				}
 				

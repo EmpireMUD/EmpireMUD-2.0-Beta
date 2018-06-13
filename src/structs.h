@@ -1412,6 +1412,10 @@ typedef struct vehicle_data vehicle_data;
 // MOB_CUSTOM_x: custom message types
 #define MOB_CUSTOM_ECHO  0
 #define MOB_CUSTOM_SAY  1
+#define MOB_CUSTOM_SAY_DAY  2
+#define MOB_CUSTOM_SAY_NIGHT  3
+#define MOB_CUSTOM_ECHO_DAY  4
+#define MOB_CUSTOM_ECHO_NIGHT  5
 
 
 // MOB_MOVE_x: mob/vehicle movement types
