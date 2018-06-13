@@ -873,11 +873,15 @@ void run_mob_echoes(void) {
 		if (found_mcm) {
 			// MOB_CUSTOM_x
 			switch (found_mcm->type) {
-				case MOB_CUSTOM_ECHO: {
+				case MOB_CUSTOM_ECHO:
+				case MOB_CUSTOM_ECHO_DAY:
+				case MOB_CUSTOM_ECHO_NIGHT: {
 					act(found_mcm->msg, FALSE, found_mob, NULL, NULL, TO_ROOM);
 					break;
 				}
-				case MOB_CUSTOM_SAY: {
+				case MOB_CUSTOM_SAY:
+				case MOB_CUSTOM_SAY_DAY:
+				case MOB_CUSTOM_SAY_NIGHT: {
 					do_say(found_mob, found_mcm->msg, 0, 0);
 					break;
 				}
