@@ -1962,7 +1962,7 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
 		return;	// no work / error?
 	}
 	
-	INST_FAKE_LOC(inst) = loc;
+	INST_FAKE_LOC(inst) = loc ? loc : INST_LOCATION(inst);	// may be NULL anyway, but try to avoid that
 	
 	// update interior
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
