@@ -385,7 +385,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 	empire_data *emp;
 
 	if (!bind_ok(obj, ch)) {
-		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return TRUE;	// don't break loop
 	}
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
