@@ -869,15 +869,15 @@ void do_instance_delete(char_data *ch, char *argument) {
 		return;
 	}
 	
-	for (inst = instance_list; inst; inst = inst->next) {
+	LL_FOREACH(instance_list, inst) {
 		if (--num == 0) {
-			if ((loc = inst->location)) {
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted an instance of %s at %s", GET_REAL_NAME(ch), GET_ADV_NAME(inst->adventure), room_log_identifier(loc));
+			if ((loc = INST_LOCATION(inst))) {
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted an instance of %s at %s", GET_REAL_NAME(ch), GET_ADV_NAME(INST_ADVENTURE(inst)), room_log_identifier(loc));
 			}
 			else {
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted an instance of %s at unknown location", GET_REAL_NAME(ch), GET_ADV_NAME(inst->adventure));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted an instance of %s at unknown location", GET_REAL_NAME(ch), GET_ADV_NAME(INST_ADVENTURE(inst)));
 			}
-			msg_to_char(ch, "Instance of %s deleted.\r\n", GET_ADV_NAME(inst->adventure));
+			msg_to_char(ch, "Instance of %s deleted.\r\n", GET_ADV_NAME(INST_ADVENTURE(inst)));
 			delete_instance(inst, TRUE);
 			break;
 		}
@@ -916,10 +916,8 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 		}
 	}
 	
-	for (inst = instance_list; inst; inst = next_inst) {
-		next_inst = inst->next;
-		
-		if (all || inst->adventure == adv) {
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (all || INST_ADVENTURE(inst) == adv) {
 			++count;
 			delete_instance(inst, TRUE);
 		}
@@ -992,11 +990,11 @@ void do_instance_list(char_data *ch, char *argument) {
 	
 	*buf = '\0';
 	
-	for (inst = instance_list; inst; inst = inst->next) {
+	LL_FOREACH(instance_list, inst) {
 		// num is out of the total instances, not just ones shown
 		++num;
 		
-		if (!adv || adv == inst->adventure) {
+		if (!adv || adv == INST_ADVENTURE(inst)) {
 			++count;
 			instance_list_row(inst, num, line, sizeof(line));
 			
@@ -1027,10 +1025,10 @@ void do_instance_nearby(char_data *ch, char *argument) {
 	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
 	
 	if (loc) {	// skip work if no map location found
-		for (inst = instance_list; inst; inst = inst->next) {
+		LL_FOREACH(instance_list, inst) {
 			++num;
 		
-			inst_loc = inst->fake_loc;
+			inst_loc = INST_FAKE_LOC(inst);
 			if (inst_loc && !INSTANCE_FLAGGED(inst, INST_COMPLETED) && compute_distance(loc, inst_loc) <= distance) {
 				++count;
 				instance_list_row(inst, num, line, sizeof(line));
@@ -1060,9 +1058,9 @@ void do_instance_reset(char_data *ch, char *argument) {
 			return;
 		}
 	
-		for (inst = instance_list; inst; inst = inst->next) {
+		LL_FOREACH(instance_list, inst) {
 			if (--num == 0) {
-				loc = inst->fake_loc;
+				loc = INST_FAKE_LOC(inst);
 				reset_instance(inst);
 				break;
 			}
@@ -1080,15 +1078,15 @@ void do_instance_reset(char_data *ch, char *argument) {
 			return;
 		}
 
-		loc = inst->fake_loc;
+		loc = INST_FAKE_LOC(inst);
 		reset_instance(inst);
 	}
 	
 	if (loc) {
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s forced a reset of an instance of %s at %s", GET_REAL_NAME(ch), GET_ADV_NAME(inst->adventure), room_log_identifier(loc));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s forced a reset of an instance of %s at %s", GET_REAL_NAME(ch), GET_ADV_NAME(INST_ADVENTURE(inst)), room_log_identifier(loc));
 	}
 	else {
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s forced a reset of an instance of %s at unknown location", GET_REAL_NAME(ch), GET_ADV_NAME(inst->adventure));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s forced a reset of an instance of %s at unknown location", GET_REAL_NAME(ch), GET_ADV_NAME(INST_ADVENTURE(inst)));
 	}
 	send_config_msg(ch, "ok_string");
 }
@@ -1108,22 +1106,22 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 	
 	char flg[256], info[256], owner[MAX_STRING_LENGTH];
 
-	if (inst->level > 0) {
-		sprintf(info, " L%d", inst->level);
+	if (INST_LEVEL(inst) > 0) {
+		sprintf(info, " L%d", INST_LEVEL(inst));
 	}
 	else {
 		*info = '\0';
 	}
 	
-	if (inst->fake_loc && ROOM_OWNER(inst->fake_loc)) {
-		snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(inst->fake_loc)), EMPIRE_NAME(ROOM_OWNER(inst->fake_loc)));
+	if (INST_FAKE_LOC(inst) && ROOM_OWNER(INST_FAKE_LOC(inst))) {
+		snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
 	}
 	else {
 		*owner = '\0';
 	}
 
-	sprintbit(inst->flags, instance_flags, flg, TRUE);
-	snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), inst->fake_loc ? GET_ROOM_VNUM(inst->fake_loc) : NOWHERE, inst->fake_loc ? X_COORD(inst->fake_loc) : NOWHERE, inst->fake_loc ? Y_COORD(inst->fake_loc) : NOWHERE, info, inst->flags != NOBITS ? flg : "", owner);
+	sprintbit(INST_FLAGS(inst), instance_flags, flg, TRUE);
+	snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? X_COORD(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? Y_COORD(INST_FAKE_LOC(inst)) : NOWHERE, info, INST_FLAGS(inst) != NOBITS ? flg : "", owner);
 }
 
 
@@ -4857,8 +4855,8 @@ void do_stat_room(char_data *ch) {
 				break;
 			}
 		}
-		sprintbit(inst->flags, instance_flags, buf2, TRUE);
-		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", num, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), (inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE), buf2);
+		sprintbit(INST_FLAGS(inst), instance_flags, buf2, TRUE);
+		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", num, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), (INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE), buf2);
 	}
 
 	sprintf(buf, "Chars present:&y");
@@ -6730,7 +6728,7 @@ ACMD(do_instance) {
 	
 	if (!*arg) {
 		count = 0;
-		for (inst = instance_list; inst; inst = inst->next) {
+		LL_FOREACH(instance_list, inst) {
 			++count;
 		}
 		
@@ -8094,7 +8092,7 @@ ACMD(do_stat) {
 	}
 	else if (!strn_cmp(buf1, "adventure", 3) && is_abbrev(buf1, "adventure")) {
 		if (COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance) {
-			do_stat_adventure(ch, COMPLEX_DATA(IN_ROOM(ch))->instance->adventure);
+			do_stat_adventure(ch, INST_ADVENTURE(COMPLEX_DATA(IN_ROOM(ch))->instance));
 		}
 		else {
 			msg_to_char(ch, "You are not in an adventure zone.\r\n");

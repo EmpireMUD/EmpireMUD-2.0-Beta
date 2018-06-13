@@ -161,25 +161,25 @@ char *instance_level_string(struct instance_data *inst) {
 		return output;
 	}
 	
-	if (inst->level) {
-		snprintf(output, sizeof(output), "level %d", inst->level);
+	if (INST_LEVEL(inst)) {
+		snprintf(output, sizeof(output), "level %d", INST_LEVEL(inst));
 	}
-	else if (GET_ADV_MIN_LEVEL(inst->adventure) > 0 && GET_ADV_MAX_LEVEL(inst->adventure) == 0) {
-		snprintf(output, sizeof(output), "levels %d+", GET_ADV_MIN_LEVEL(inst->adventure));
+	else if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) > 0 && GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)) == 0) {
+		snprintf(output, sizeof(output), "levels %d+", GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)));
 	}
-	else if (GET_ADV_MIN_LEVEL(inst->adventure) == 0 && GET_ADV_MAX_LEVEL(inst->adventure) > 0) {
-		snprintf(output, sizeof(output), "levels 1-%d", GET_ADV_MAX_LEVEL(inst->adventure));
+	else if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) == 0 && GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)) > 0) {
+		snprintf(output, sizeof(output), "levels 1-%d", GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
 	}
-	else if (GET_ADV_MIN_LEVEL(inst->adventure) == GET_ADV_MAX_LEVEL(inst->adventure)) {
-		if (GET_ADV_MIN_LEVEL(inst->adventure) == 0) {
+	else if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) == GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst))) {
+		if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) == 0) {
 			snprintf(output, sizeof(output), "any level");
 		}
 		else {
-			snprintf(output, sizeof(output), "level %d", GET_ADV_MAX_LEVEL(inst->adventure));
+			snprintf(output, sizeof(output), "level %d", GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
 		}
 	}
 	else {
-		snprintf(output, sizeof(output), "levels %d-%d", GET_ADV_MIN_LEVEL(inst->adventure), GET_ADV_MAX_LEVEL(inst->adventure));
+		snprintf(output, sizeof(output), "levels %d-%d", GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
 	}
 	
 	return output;
@@ -1930,14 +1930,14 @@ ACMD(do_adventure) {
 		return;
 	}
 
-	msg_to_char(ch, "%s (%s)\r\n", NULLSAFE(GET_ADV_NAME(inst->adventure)), instance_level_string(inst));
+	msg_to_char(ch, "%s (%s)\r\n", NULLSAFE(GET_ADV_NAME(INST_ADVENTURE(inst))), instance_level_string(inst));
 	
-	if (GET_ADV_AUTHOR(inst->adventure) && *(GET_ADV_AUTHOR(inst->adventure))) {
-		msg_to_char(ch, "by %s\r\n", GET_ADV_AUTHOR(inst->adventure));
+	if (GET_ADV_AUTHOR(INST_ADVENTURE(inst)) && *(GET_ADV_AUTHOR(INST_ADVENTURE(inst)))) {
+		msg_to_char(ch, "by %s\r\n", GET_ADV_AUTHOR(INST_ADVENTURE(inst)));
 	}
-	msg_to_char(ch, "%s", NULLSAFE(GET_ADV_DESCRIPTION(inst->adventure)));
-	if (GET_ADV_PLAYER_LIMIT(inst->adventure) > 0) {
-		msg_to_char(ch, "Player limit: %d\r\n", GET_ADV_PLAYER_LIMIT(inst->adventure));
+	msg_to_char(ch, "%s", NULLSAFE(GET_ADV_DESCRIPTION(INST_ADVENTURE(inst))));
+	if (GET_ADV_PLAYER_LIMIT(INST_ADVENTURE(inst)) > 0) {
+		msg_to_char(ch, "Player limit: %d\r\n", GET_ADV_PLAYER_LIMIT(INST_ADVENTURE(inst)));
 	}
 }
 
@@ -3007,16 +3007,16 @@ ACMD(do_nearby) {
 	
 	// check instances
 	if (adventures) {
-		for (inst = instance_list; inst; inst = inst->next) {
-			if (!inst->fake_loc || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
+		LL_FOREACH(instance_list, inst) {
+			if (!INST_FAKE_LOC(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
 				continue;
 			}
 		
-			if (ADVENTURE_FLAGGED(inst->adventure, ADV_NO_NEARBY)) {
+			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_NO_NEARBY)) {
 				continue;
 			}
 		
-			loc = inst->fake_loc;
+			loc = INST_FAKE_LOC(inst);
 			if (!loc || (dist = compute_distance(IN_ROOM(ch), loc)) > max_dist) {
 				continue;
 			}
@@ -3032,7 +3032,7 @@ ACMD(do_nearby) {
 			// show instance
 			found = TRUE;
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
-			snprintf(line, sizeof(line), " %d %s: %s%s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
+			snprintf(line, sizeof(line), " %d %s: %s%s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);

@@ -480,7 +480,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 	}
 	else if (is_abbrev(arg1, "mobile")) {
 		LL_FOREACH_SAFE(character_list, mob, next_mob) {
-			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob) || MOB_INSTANCE_ID(mob) != inst->id) {
+			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob) || MOB_INSTANCE_ID(mob) != INST_ID(inst)) {
 				continue;
 			}
 			
@@ -496,19 +496,19 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 		}
 	}
 	else if (is_abbrev(arg1, "object")) {
-		for (iter = 0; iter < inst->size; ++iter) {
-			if (!inst->room[iter]) {
+		for (iter = 0; iter < INST_SIZE(inst); ++iter) {
+			if (!INST_ROOM(inst, iter)) {
 				continue;
 			}
 			
-			LL_FOREACH_SAFE2(ROOM_CONTENTS(inst->room[iter]), obj, next_obj, next_content) {
+			LL_FOREACH_SAFE2(ROOM_CONTENTS(INST_ROOM(inst, iter)), obj, next_obj, next_content) {
 				if (GET_OBJ_VNUM(obj) != vnum) {
 					continue;
 				}
 				
 				// found!
-				if (*argument && ROOM_PEOPLE(inst->room[iter])) {
-					act(argument, FALSE, ROOM_PEOPLE(inst->room[iter]), NULL, NULL, TO_CHAR | TO_ROOM);
+				if (*argument && ROOM_PEOPLE(INST_ROOM(inst, iter))) {
+					act(argument, FALSE, ROOM_PEOPLE(INST_ROOM(inst, iter)), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
 			
 				if (obj == owner) {

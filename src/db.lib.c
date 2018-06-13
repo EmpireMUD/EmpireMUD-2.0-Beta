@@ -1439,8 +1439,8 @@ void check_for_new_map(void) {
 		if (inst->room) {
 			free(inst->room);
 		}
-		if (inst->mob_counts) {
-			free(inst->mob_counts);
+		if (INST_MOB_COUNTS(inst)) {
+			free(INST_MOB_COUNTS(inst));
 		}
 		LL_DELETE(instance_list, inst);
 		free(inst);

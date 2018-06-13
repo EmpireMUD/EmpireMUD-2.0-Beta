@@ -2876,7 +2876,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	
 	// look for an instance to lock (before running triggers)
 	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
-		if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
+		if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
 			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
 		}
 	}
@@ -3250,7 +3250,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	
 	// look for an instance to lock (before running triggers)
 	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
-		if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
+		if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
 			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
 		}
 	}

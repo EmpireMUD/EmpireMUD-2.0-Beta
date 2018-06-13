@@ -160,8 +160,25 @@
 
 // utils
 #define ADVENTURE_FLAGGED(adv, flg)  (IS_SET(GET_ADV_FLAGS(adv), (flg)) ? TRUE : FALSE)
-#define INSTANCE_FLAGGED(i, flg)  (IS_SET((i)->flags, (flg)))
 #define LINK_FLAGGED(lnkptr, flg)  (IS_SET((lnkptr)->flags, (flg)) ? TRUE : FALSE)
+
+// instance utils
+#define INSTANCE_FLAGGED(i, flg)  (IS_SET(INST_FLAGS(i), (flg)))
+#define INST_ADVENTURE(inst)  ((inst)->adventure)
+#define INST_CREATED(inst)  ((inst)->created)
+#define INST_DIR(inst)  ((inst)->dir)
+#define INST_FAKE_LOC(inst)  ((inst)->fake_loc)
+#define INST_FLAGS(inst)  ((inst)->flags)
+#define INST_ID(inst)  ((inst)->id)
+#define INST_LAST_RESET(inst)  ((inst)->last_reset)
+#define INST_LEVEL(inst)  ((inst)->level)
+#define INST_LOCATION(inst)  ((inst)->location)
+#define INST_MOB_COUNTS(inst)  ((inst)->mob_counts)
+#define INST_ROOM(inst, num)  ((inst)->room[(num)])
+#define INST_ROTATION(inst)  ((inst)->rotation)
+#define INST_RULE(inst)  ((inst)->rule)
+#define INST_SIZE(inst)  ((inst)->size)
+#define INST_START(inst)  ((inst)->start)
 
 
  //////////////////////////////////////////////////////////////////////////////

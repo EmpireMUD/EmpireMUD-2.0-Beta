@@ -480,7 +480,7 @@ void point_update_char(char_data *ch) {
 						inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE);
 					}
 					// if no instance or not level-locked
-					if (!inst || inst->level <= 0) {
+					if (!inst || INST_LEVEL(inst) <= 0) {
 						GET_CURRENT_SCALE_LEVEL(ch) = 0;
 					}
 				}
@@ -561,7 +561,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// first check location: this may move the player
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE)) || inst->id != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE)) || INST_ID(inst) != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
 		adventure_unsummon(ch);
 	}
 	

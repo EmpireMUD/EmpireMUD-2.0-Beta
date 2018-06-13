@@ -669,8 +669,8 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// coloring for adventures
 	*advcolbuf = '\0';
 	if ((GET_ROOM_TEMPLATE(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) && (inst = find_instance_by_room(room, FALSE, FALSE))) {
-		level = (inst->level > 0 ? inst->level : get_approximate_level(ch));
-		strcpy(advcolbuf, color_by_difficulty((ch), pick_level_from_range(level, GET_ADV_MIN_LEVEL(inst->adventure), GET_ADV_MAX_LEVEL(inst->adventure))));
+		level = (INST_LEVEL(inst) > 0 ? INST_LEVEL(inst) : get_approximate_level(ch));
+		strcpy(advcolbuf, color_by_difficulty((ch), pick_level_from_range(level, GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)))));
 	}
 
 	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
@@ -1925,7 +1925,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					// one or the other is set no-location
 					continue;
 				}
-				if (i_inst && ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
+				if (i_inst && ADVENTURE_FLAGGED(INST_ADVENTURE(i_inst), ADV_NO_NEARBY)) {
 					// target's adventure is !nearby
 					continue;
 				}
@@ -1965,7 +1965,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					// one or the other is set no-location
 					continue;
 				}
-				if (i_inst && ADVENTURE_FLAGGED(i_inst->adventure, ADV_NO_NEARBY)) {
+				if (i_inst && ADVENTURE_FLAGGED(INST_ADVENTURE(i_inst), ADV_NO_NEARBY)) {
 					// target's adventure is !nearby
 					continue;
 				}

@@ -1507,7 +1507,7 @@ void char_to_room(char_data *ch, room_data *room) {
 		
 		// look for an instance to lock
 		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst || (inst = find_instance_by_room(room, FALSE, TRUE)))) {
-			if (ADVENTURE_FLAGGED(inst->adventure, ADV_LOCK_LEVEL_ON_ENTER) && !IS_IMMORTAL(ch)) {
+			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_LOCK_LEVEL_ON_ENTER) && !IS_IMMORTAL(ch)) {
 				lock_instance_level(room, determine_best_scale_level(ch, TRUE));
 			}
 		}
@@ -3564,7 +3564,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	}
 	
 	inst = real_instance(MOB_INSTANCE_ID(mob));
-	adv = inst ? inst->adventure : NULL;
+	adv = inst ? INST_ADVENTURE(inst) : NULL;
 	cumulative_prc = number(1, 10000);
 	choose_last = NULL;
 
@@ -6301,7 +6301,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 		// REQ_x: only requirements that can be prereqs (don't require a tracker)
 		switch(req->type) {
 			case REQ_COMPLETED_QUEST: {
-				if (!has_completed_quest(ch, req->vnum, instance ? instance->id : NOTHING)) {
+				if (!has_completed_quest(ch, req->vnum, instance ? INST_ID(instance) : NOTHING)) {
 					ok = FALSE;
 				}
 				break;
@@ -6337,7 +6337,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				break;
 			}
 			case REQ_NOT_COMPLETED_QUEST: {
-				if (has_completed_quest(ch, req->vnum, instance ? instance->id : NOTHING)) {
+				if (has_completed_quest(ch, req->vnum, instance ? INST_ID(instance) : NOTHING)) {
 					ok = FALSE;
 				}
 				break;

@@ -623,8 +623,8 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	pq->vnum = QUEST_VNUM(qst);
 	pq->version = QUEST_VERSION(qst);
 	pq->start_time = time(0);
-	pq->instance_id = inst ? inst->id : NOTHING;
-	pq->adventure = inst ? GET_ADV_VNUM(inst->adventure) : NOTHING;
+	pq->instance_id = inst ? INST_ID(inst) : NOTHING;
+	pq->adventure = inst ? GET_ADV_VNUM(INST_ADVENTURE(inst)) : NOTHING;
 	pq->tracker = copy_requirements(QUEST_TASKS(qst));
 	
 	LL_PREPEND(GET_QUESTS(ch), pq);
@@ -968,7 +968,7 @@ QCMD(qcmd_share) {
 	// look up instance (re-use the 'inst' var, which was junk above)
 	// we need the same instance for the other players here
 	inst = get_instance_by_id(pq->instance_id);
-	if (inst && GET_ADV_VNUM(inst->adventure) != pq->adventure) {
+	if (inst && GET_ADV_VNUM(INST_ADVENTURE(inst)) != pq->adventure) {
 		inst = NULL;
 	}
 	

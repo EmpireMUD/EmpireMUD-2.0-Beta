@@ -412,19 +412,19 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 	// detect level if we weren't given a strong level
 	if (!level) {
 		if (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh)))) {
-			if (inst->level > 0) {
-				level = inst->level;
+			if (INST_LEVEL(inst) > 0) {
+				level = INST_LEVEL(inst);
 			}
 		}
 	}
 	
 	// outside constraints
 	if (inst || (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh))))) {
-		if (GET_ADV_MIN_LEVEL(inst->adventure) > 0) {
-			level = MAX(level, GET_ADV_MIN_LEVEL(inst->adventure));
+		if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) > 0) {
+			level = MAX(level, GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)));
 		}
-		if (GET_ADV_MAX_LEVEL(inst->adventure) > 0) {
-			level = MIN(level, GET_ADV_MAX_LEVEL(inst->adventure));
+		if (GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)) > 0) {
+			level = MIN(level, GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
 		}
 	}
 	

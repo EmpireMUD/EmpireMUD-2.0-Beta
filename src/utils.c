@@ -4631,8 +4631,8 @@ room_data *get_map_location_for(room_data *room) {
 		// instance resolution: find instance home
 		do {
 			last = working;
-			if (COMPLEX_DATA(working) && COMPLEX_DATA(working)->instance && COMPLEX_DATA(working)->instance->location) {
-				working = COMPLEX_DATA(working)->instance->location;
+			if (COMPLEX_DATA(working) && COMPLEX_DATA(working)->instance && INST_FAKE_LOC(COMPLEX_DATA(working)->instance)) {
+				working = INST_FAKE_LOC(COMPLEX_DATA(working)->instance);
 			}
 		} while (last != working);
 		

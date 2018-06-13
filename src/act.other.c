@@ -121,7 +121,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n starts summoning $N...", FALSE, ch, NULL, vict, TO_ROOM);
-		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", PERS(ch, ch, TRUE), GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
+		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", PERS(ch, ch, TRUE), GET_ADV_NAME(INST_ADVENTURE(inst)), get_room_name(IN_ROOM(ch), FALSE));
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);
 	}
@@ -716,7 +716,7 @@ OFFER_FINISH(ofin_summon) {
 	if (type == SUMMON_ADVENTURE) {
 		SET_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
-		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = (inst = find_instance_by_room(loc, FALSE, FALSE)) ? inst->id : NOTHING;
+		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = (inst = find_instance_by_room(loc, FALSE, FALSE)) ? INST_ID(inst) : NOTHING;
 		map = GET_MAP_LOC(IN_ROOM(ch));
 		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? map->vnum : NOWHERE;
 	}

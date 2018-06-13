@@ -182,7 +182,7 @@ INTERACTION_FUNC(run_one_encounter) {
 		aggr = read_mobile(interaction->vnum, TRUE);
 		setup_generic_npc(aggr, NULL, NOTHING, NOTHING);
 		if (COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance) {
-			MOB_INSTANCE_ID(aggr) = COMPLEX_DATA(IN_ROOM(ch))->instance->id;
+			MOB_INSTANCE_ID(aggr) = INST_ID(COMPLEX_DATA(IN_ROOM(ch))->instance);
 			if (MOB_INSTANCE_ID(aggr) != NOTHING) {
 				add_instance_mob(real_instance(MOB_INSTANCE_ID(aggr)), GET_MOB_VNUM(aggr));
 			}
