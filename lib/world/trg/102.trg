@@ -586,8 +586,16 @@ Hidden Garden teleport chant~
 chant~
 set room %self.room%
 * Only know the 'gardens' chant if the have the token.
-if (!(gardens /= %arg%) || !(%self.carried_by% == %actor%) || %actor.position% != Standing || (%room.template% != 10225)
+if !(gardens /= %arg%)
   return 0
+  halt
+end
+if %actor.position% != Standing
+  return 0
+  halt
+end
+if (%room.template% != 10225)
+  %send% %actor% You can only use that chant in the entrance room of the Hidden Garden adventure.
   halt
 end
 %send% %actor% You begin the chant of gardens...

@@ -464,7 +464,7 @@ Wildling Ambusher reveal~
 ~
 if %actor%
   * Actor entered room - valid target?
-  if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)%) || (%actor.is_pc% && !%actor.nohassle%)
+  if (%actor.is_pc% && !%actor.nohassle%)
     set target %actor%
   end
 else
@@ -472,7 +472,7 @@ else
   set person %room.people%
   while %person%
     * validate
-    if (%person.is_npc% && %person.mob_flagged(HUMAN)% && !%person.aff_flagged(!ATTACK)%) || (%person.is_pc% && !%person.nohassle%)
+    if (%person.is_pc% && !%person.nohassle%)
       set target_clothes %person.eq(clothes)%
       if %target_clothes%
         eval clothes_valid (%target_clothes.vnum% == 12667)
@@ -885,7 +885,7 @@ end
 set room %actor.room%
 set cycles_left 5
 while %cycles_left% >= 0
-  eval sector_valid (%room.template% >= 12650 && %room.template% <= 12699)
+  eval sector_valid (%room.template% >= 12652 && %room.template% <= 12699)
   set mob %room.people%
   while %mob%
     if %mob.vnum% == 12686
@@ -908,7 +908,11 @@ while %cycles_left% >= 0
     elseif %rage_spirit_here%
       %send% %actor% You can't perform the chant while the spirit of rage is here!
     elseif !%sector_valid%
-      %send% %actor% You must perform the chant inside the Magiterranean Grove.
+      if %room.template% == 12650 || %room.template% == 12651
+        %send% %actor% You must venture deeper into the Grove before performing the chant.
+      else
+        %send% %actor% You must perform the chant inside the Magiterranean Grove.
+      end
     elseif %already_done%
       %send% %actor% The tranquility chant has already been performed here.
     else
@@ -943,7 +947,7 @@ while %cycles_left% >= 0
       if %random.2% == 2
         %echoaround% %actor% %actor.name%'s chant is interrupted as a spirit of rage materializes in front of %actor.himher%!
         %send% %actor% Your chant is interrupted as a spirit of rage materializes in front of you!
-        %load% mob 12686
+        %load% mob 12686 %instance.level%
         set spirit %self.room.people%
         set word_1 calm
         set word_2 relax
@@ -986,7 +990,7 @@ while %cycles_left% >= 0
       done
       set person %self.room.people%
       while %person%
-        if %person.is_pc%
+        if %person.is_pc% && %person.on_quest(12650)%
           if %give_token%
             %send% %person% You receive a %currency.12650(1)%.
             nop %person.give_currency(12650, 1)%
@@ -1270,12 +1274,21 @@ end
 Grove rage spirit speech~
 0 d 1
 *~
-if !%self.varexists(correct_word)%
-  set success 1
-else
-  eval success %speech% ~= %self.correct_word%
-end
-if %success%
+set word_1 calm
+set word_2 relax
+set word_3 pacify
+set word_4 slumber
+set iterator 1
+while %iterator% <= 4
+  eval current_word %%word_%iterator%%%
+  if %current_word% == %correct_word%
+    eval success %speech% ~= %self.current_word%
+  elseif %speech% ~= %self.current_word%
+    set failure 1
+  end
+  eval iterator %iterator% + 1
+done
+if %success% && !%failure%
   %echo% %self.name% begins to calm, and fades from view.
   %echo% The area is tranquilized!
   set room %self.room%
@@ -1296,7 +1309,7 @@ if %success%
   done
   set person %self.room.people%
   while %person%
-    if %person.is_pc%
+    if %person.is_pc% && %person.on_quest(12650)%
       if %give_token%
         %send% %person% You receive a %currency.12650(1)%.
         nop %person.give_currency(12650, 1)%
@@ -1320,7 +1333,6 @@ end
 Grove rage spirit time limit~
 0 bnw 100
 ~
-%scale% %self% %instance.level%
 wait 6 sec
 %echo% A voice in your head urges, 'Say it out loud!'
 wait 8 sec

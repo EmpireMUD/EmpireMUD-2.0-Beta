@@ -1965,6 +1965,10 @@ const char *action_bits[] = {
 const char *mob_custom_types[] = {
 	"echo",
 	"say",
+	"say-day",
+	"say-night",
+	"echo-day",
+	"echo-night",
 	"\n"
 };
 
@@ -3113,6 +3117,7 @@ const char *room_aff_bits[] = {
 	"*INCOMPLETE",	// 15
 	"!TELEPORT",
 	"BRIGHT-PAINT",
+	"FAKE-INSTANCE",
 	"\n"
 };
 

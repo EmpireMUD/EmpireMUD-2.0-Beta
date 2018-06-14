@@ -2255,7 +2255,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if (!str_cmp(var, "instance")) {
 				// %instance% with no field
 				struct instance_data *inst = get_instance_for_script(type, go);
-				snprintf(str, slen, "%d", inst ? inst->id : 0);
+				snprintf(str, slen, "%d", inst ? INST_ID(inst) : 0);
 			}
 			else if (!str_cmp(var, "timestamp")) {
 				snprintf(str, slen, "%ld", time(0));
@@ -2460,7 +2460,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "0");
 				}
 				else if (!str_cmp(field, "id")) {
-					snprintf(str, slen, "%d", inst->id);
+					snprintf(str, slen, "%d", INST_ID(inst));
 				}
 				else if (!str_cmp(field, "load")) {
 					void check_instance_is_loaded(struct instance_data *inst);
@@ -2468,19 +2468,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					strcpy(str, "1");
 				}
 				else if (!str_cmp(field, "loaded")) {
-					snprintf(str, slen, "%d", IS_SET(inst->flags, INST_NEEDS_LOAD) ? 0 : 1);
+					snprintf(str, slen, "%d", IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) ? 0 : 1);
 				}
 				else if (!str_cmp(field, "level")) {
 					extern int lock_instance_level(room_data *room, int level);
 					
-					if (subfield && *subfield && inst->start && atoi(subfield) > 0) {
-						lock_instance_level(inst->start, atoi(subfield));
+					if (subfield && *subfield && INST_START(inst) && atoi(subfield) > 0) {
+						lock_instance_level(INST_START(inst), atoi(subfield));
 					}
-					snprintf(subfield, slen, "%d", inst->level);
+					snprintf(str, slen, "%d", INST_LEVEL(inst));
 				}
 				else if (!str_cmp(field, "location")) {
-					if (inst->fake_loc) {
-						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->fake_loc) + ROOM_ID_BASE);
+					if (INST_FAKE_LOC(inst)) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(INST_FAKE_LOC(inst)) + ROOM_ID_BASE);
 					}
 					else {
 						snprintf(str, slen, "0");
@@ -2492,7 +2492,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						mob_vnum vnum = atoi(subfield);
 						for (miter = character_list; miter && !found_mob; miter = miter->next) {
 							if (!EXTRACTED(miter) && GET_MOB_VNUM(miter) == vnum) {
-								if (MOB_INSTANCE_ID(miter) == inst->id || ROOM_INSTANCE(IN_ROOM(miter)) == inst) {
+								if (MOB_INSTANCE_ID(miter) == INST_ID(inst) || ROOM_INSTANCE(IN_ROOM(miter)) == inst) {
 									found_mob = miter;
 									break;
 								}
@@ -2511,11 +2511,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 				}
 				else if (!str_cmp(field, "name")) {
-					snprintf(str, slen, "%s", GET_ADV_NAME(inst->adventure));
+					snprintf(str, slen, "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
 				}
 				else if (!str_cmp(field, "real_location")) {
-					if (inst->location) {
-						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
+					if (INST_LOCATION(inst)) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(INST_LOCATION(inst)) + ROOM_ID_BASE);
 					}
 					else {
 						snprintf(str, slen, "0");
@@ -2535,8 +2535,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					strcpy(str, "0");
 				}
 				else if (!str_cmp(field, "start")) {
-					if (inst->start) {
-						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->start) + ROOM_ID_BASE);
+					if (INST_START(inst)) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(INST_START(inst)) + ROOM_ID_BASE);
 					}
 					else {
 						snprintf(str, slen, "0");
@@ -3023,7 +3023,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						
 						if (subfield && *subfield && isdigit(*subfield) && inst) {
 							any_vnum vnum = atoi(subfield);
-							if (!IS_NPC(c) && has_completed_quest(c, vnum, inst->id)) {
+							if (!IS_NPC(c) && has_completed_quest(c, vnum, INST_ID(inst))) {
 								strcpy(str, "1");
 							}
 							else {

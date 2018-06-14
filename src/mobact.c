@@ -182,7 +182,7 @@ INTERACTION_FUNC(run_one_encounter) {
 		aggr = read_mobile(interaction->vnum, TRUE);
 		setup_generic_npc(aggr, NULL, NOTHING, NOTHING);
 		if (COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance) {
-			MOB_INSTANCE_ID(aggr) = COMPLEX_DATA(IN_ROOM(ch))->instance->id;
+			MOB_INSTANCE_ID(aggr) = INST_ID(COMPLEX_DATA(IN_ROOM(ch))->instance);
 			if (MOB_INSTANCE_ID(aggr) != NOTHING) {
 				add_instance_mob(real_instance(MOB_INSTANCE_ID(aggr)), GET_MOB_VNUM(aggr));
 			}
@@ -847,7 +847,17 @@ void run_mob_echoes(void) {
 			// ok now find a random message to show?
 			LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
 				// MOB_CUSTOM_x: types we use here
-				if (mcm->type != MOB_CUSTOM_ECHO && mcm->type != MOB_CUSTOM_SAY) {
+				if (mcm->type == MOB_CUSTOM_ECHO || mcm->type == MOB_CUSTOM_SAY) {
+					// ok = true
+				}
+				else if ((mcm->type == MOB_CUSTOM_SAY_DAY || mcm->type == MOB_CUSTOM_ECHO_DAY) && (weather_info.sunlight == SUN_LIGHT || weather_info.sunlight == SUN_RISE)) {
+					// day ok
+				}
+				else if ((mcm->type == MOB_CUSTOM_SAY_NIGHT || mcm->type == MOB_CUSTOM_ECHO_NIGHT) && (weather_info.sunlight == SUN_DARK || weather_info.sunlight == SUN_SET)) {
+					// night ok
+				}
+				else {
+					// NOT ok
 					continue;
 				}
 				
@@ -863,11 +873,15 @@ void run_mob_echoes(void) {
 		if (found_mcm) {
 			// MOB_CUSTOM_x
 			switch (found_mcm->type) {
-				case MOB_CUSTOM_ECHO: {
+				case MOB_CUSTOM_ECHO:
+				case MOB_CUSTOM_ECHO_DAY:
+				case MOB_CUSTOM_ECHO_NIGHT: {
 					act(found_mcm->msg, FALSE, found_mob, NULL, NULL, TO_ROOM);
 					break;
 				}
-				case MOB_CUSTOM_SAY: {
+				case MOB_CUSTOM_SAY:
+				case MOB_CUSTOM_SAY_DAY:
+				case MOB_CUSTOM_SAY_NIGHT: {
 					do_say(found_mob, found_mcm->msg, 0, 0);
 					break;
 				}

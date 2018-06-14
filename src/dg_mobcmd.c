@@ -1043,9 +1043,9 @@ ACMD(do_mat) {
 	}
 
 	// special case for use of i### room-template targeting when mob is outside its instance
-	if (arg[0] == 'i' && isdigit(arg[1]) && MOB_INSTANCE_ID(ch) != NOTHING && (inst = real_instance(MOB_INSTANCE_ID(ch))) && inst->start) {
+	if (arg[0] == 'i' && isdigit(arg[1]) && MOB_INSTANCE_ID(ch) != NOTHING && (inst = real_instance(MOB_INSTANCE_ID(ch))) && INST_START(inst)) {
 		// I know that's a lot to check but we want i###-targeting to work when a mob wanders out -pc 4/13/2015
-		location = get_room(inst->start, arg);
+		location = get_room(INST_START(inst), arg);
 	}
 	else {
 		location = get_room(IN_ROOM(ch), arg);
@@ -1299,10 +1299,10 @@ ACMD(do_mteleport) {
 			return;
 		}
 		
-		for (iter = 0; iter < inst->size; ++iter) {
+		for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 			// only if it's not the target room, or we'd be here all day
-			if (inst->room[iter] && inst->room[iter] != target) {
-				for (vict = ROOM_PEOPLE(inst->room[iter]); vict; vict = next_ch) {
+			if (INST_ROOM(inst, iter) && INST_ROOM(inst, iter) != target) {
+				for (vict = ROOM_PEOPLE(INST_ROOM(inst, iter)); vict; vict = next_ch) {
 					next_ch = vict->next_in_room;
 					
 					if (!valid_dg_target(vict, DG_ALLOW_GODS)) {

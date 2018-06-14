@@ -132,7 +132,7 @@
 	GET_EXITS_HERE(room) == 0 && \
 	SECT(room) == world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type && \
 	!ROOM_SECT_FLAGGED(room, TILE_KEEP_FLAGS) && \
-	!ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && \
+	!ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_FAKE_INSTANCE) && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
 	!ROOM_VEHICLES(room) && \
 	!ROOM_AFFECTS(room) && \
@@ -1412,6 +1412,10 @@ typedef struct vehicle_data vehicle_data;
 // MOB_CUSTOM_x: custom message types
 #define MOB_CUSTOM_ECHO  0
 #define MOB_CUSTOM_SAY  1
+#define MOB_CUSTOM_SAY_DAY  2
+#define MOB_CUSTOM_SAY_NIGHT  3
+#define MOB_CUSTOM_ECHO_DAY  4
+#define MOB_CUSTOM_ECHO_NIGHT  5
 
 
 // MOB_MOVE_x: mob/vehicle movement types
@@ -2422,6 +2426,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_INCOMPLETE  BIT(15)	// p. building is incomplete
 #define ROOM_AFF_NO_TELEPORT  BIT(16)	// q. cannot teleport
 #define ROOM_AFF_BRIGHT_PAINT  BIT(17)	// r. paint is bright color
+#define ROOM_AFF_FAKE_INSTANCE  BIT(18)	// s. room is a fake_loc for an instance
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 

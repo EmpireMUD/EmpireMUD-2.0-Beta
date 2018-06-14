@@ -1018,18 +1018,18 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	
 	// can't junk stolen items
 	if (mode == SCMD_JUNK && IS_STOLEN(obj)) {
-		act("$p: You can't junk stolen items!", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: You can't junk stolen items!", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return -1;
 	}
 	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
-		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return 0;	// don't break a drop-all
 	}
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return 0;
 	}
 	
@@ -1165,11 +1165,11 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		return FALSE;
 	}
 	if (!bind_ok(obj, ch)) {
-		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return TRUE;	// don't break loop
 	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
-		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return TRUE;
 	}
 	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(cont)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -1300,7 +1300,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 	int idnum = IS_NPC(ch) ? NOBODY : GET_IDNUM(ch);
 
 	if (!bind_ok(obj, ch)) {
-		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return TRUE;	// don't break loop
 	}
 	// check for stealing -- we check not-bound-to because you can always get an item bound to you
@@ -1318,7 +1318,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		}
 	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
-		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return TRUE;
 	}
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
@@ -1449,18 +1449,18 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	}
 	
 	if (!bind_ok(obj, vict)) {
-		act("$p: item is bound.", FALSE, ch, obj, vict, TO_CHAR);
+		act("$p: item is bound.", FALSE, ch, obj, vict, TO_CHAR | TO_QUEUE);
 		return;
 	}
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !IS_IMMORTAL(vict)) {
-		act("$p: you can't give this item away.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't give this item away.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return;
 	}
 	
 	// NPCs usually have no carry limit, but 'give' is an exception because otherwise crazy ensues
 	if (!CAN_CARRY_OBJ(vict, obj)) {
-		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR);
+		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR | TO_QUEUE);
 		return;
 	}
 
@@ -3446,7 +3446,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		// load the actual objs
 		while (!done && iter->amount > 0 && (all || amt-- > 0)) {
 			if (iter->obj && !CAN_CARRY_OBJ(ch, iter->obj)) {
-				msg_to_char(ch, "Your arms are full.\r\n");
+				act("Your arms are full.", FALSE, ch, NULL, NULL, TO_CHAR | TO_QUEUE);
 				done = TRUE;
 				break;
 			}

@@ -443,7 +443,9 @@ void delete_room(room_data *room, bool check_exits) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
+	void remove_instance_fake_loc(struct instance_data *inst);
 	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
+	void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct empire_territory_data *ter;
@@ -498,7 +500,7 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// delete any open instance here
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE, FALSE))) {
-		SET_BIT(inst->flags, INST_COMPLETED);
+		SET_BIT(INST_FLAGS(inst), INST_COMPLETED);
 	}
 	
 	if (check_exits) {
@@ -638,23 +640,23 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// update instances (if it wasn't deleted already earlier)
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance)) {
-		for (inst = instance_list; inst; inst = inst->next) {
-			if (inst->location == room) {
-				SET_BIT(inst->flags, INST_COMPLETED);
-				inst->location = NULL;
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_FAKE_INSTANCE) || (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance)) {
+		LL_FOREACH(instance_list, inst) {
+			if (INST_LOCATION(inst) == room) {
+				SET_BIT(INST_FLAGS(inst), INST_COMPLETED);
+				INST_LOCATION(inst) = NULL;
 			}
-			if (inst->fake_loc == room) {
-				SET_BIT(inst->flags, INST_COMPLETED);
-				inst->fake_loc = inst->location;	// reset to main loc (may be NULL)
+			if (INST_FAKE_LOC(inst) == room) {
+				SET_BIT(INST_FLAGS(inst), INST_COMPLETED);
+				remove_instance_fake_loc(inst);
 			}
-			if (inst->start == room) {
-				SET_BIT(inst->flags, INST_COMPLETED);
-				inst->start = NULL;
+			if (INST_START(inst) == room) {
+				SET_BIT(INST_FLAGS(inst), INST_COMPLETED);
+				INST_START(inst) = NULL;
 			}
-			for (iter = 0; iter < inst->size; ++iter) {
-				if (inst->room[iter] == room) {
-					inst->room[iter] = NULL;
+			for (iter = 0; iter < INST_SIZE(inst); ++iter) {
+				if (INST_ROOM(inst, iter) == room) {
+					INST_ROOM(inst, iter) = NULL;
 				}
 			}
 		}

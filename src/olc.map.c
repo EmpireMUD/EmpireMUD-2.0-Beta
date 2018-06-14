@@ -584,7 +584,13 @@ OLC_MODULE(mapedit_naturalize) {
 				continue;
 			}
 			if (map->sector_type == map->natural_sector) {
-				continue;	// already same
+				// already same -- but refresh crop type if applicable
+				if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA)) {
+					if (room || (room = real_room(map->vnum))) {
+						set_crop_type(room, get_potential_crop_for_location(room));
+					}
+				}
+				continue;	// no need to change terrain
 			}
 			
 			// looks good: naturalize it
@@ -640,6 +646,11 @@ OLC_MODULE(mapedit_naturalize) {
 		
 		// no longer need this
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
+		
+		// reset crop?
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA)) {
+			set_crop_type(IN_ROOM(ch), get_potential_crop_for_location(IN_ROOM(ch)));
+		}
 		
 		// probably no need to log 1-tile naturalizes
 		// syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
