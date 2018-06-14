@@ -379,7 +379,7 @@ an end to the infestation.
 ~
 The Guild thanks you for helping to control the wildling population.
 ~
-8 e 0 0 -1
+11 e 0 0 -1
 A
 1 18211
 A
@@ -394,7 +394,13 @@ R
 R
 1 -1 50
 W
-3 10000 0 4
+3 12658 0 1
+W
+3 12659 0 1
+W
+3 12660 0 1
+W
+3 12661 0 1
 Z
 1 18211
 Z

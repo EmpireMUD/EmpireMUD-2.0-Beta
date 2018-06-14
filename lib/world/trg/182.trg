@@ -628,7 +628,7 @@ if !%target%
   return 1
   halt
 end
-if %target.is_npc% && %target.vnum% == 10000
+if %target.is_npc% && (%target.vnum% >= 12658 && %target.vnum% <= 12661)
   if %actor.inventory(18257)%
     %send% %actor% You don't need to catch any more wildlings.
     return 1
@@ -641,7 +641,7 @@ if %target.is_npc% && %target.vnum% == 10000
   return 1
   %purge% %self%
   halt
-elseif %target.is_npc% && %target.vnum% == 10005
+elseif %target.is_npc% && ((%target.vnum% >= 12668 && %target.vnum% <= 12670) || %target.vnum% == 10005)
   %send% %actor% That wildling is tame. Catching it in a net would be pointless and wasteful.
   return 1
   halt

@@ -573,6 +573,11 @@ end
 %load% mob 12505
 set dealer %self.room.people%
 %echo% %dealer.name% arrives!
+* Set adventure location back to scaffold
+nop %instance.set_location(%instance.real_location%)%
+* Load despawn timer
+eval room2 i12500
+%at% %room2% %load% obj 12504
 ~
 #12522
 free cannonballs~
@@ -618,7 +623,7 @@ if %colossus%
   %echoaround% %colossus% %colossus.name% staggers slowly back to its scaffold.
   %teleport% %colossus% %instance.real_location%
   nop %colossus.add_mob_flag(SENTINEL)%
-  nop %colossus.set_location(%instance.real_location%)%
+  nop %instance.set_location(%instance.real_location%)%
   %echoaround% %colossus% %colossus.name% staggers slowly up.
 end
 %purge% %self%
