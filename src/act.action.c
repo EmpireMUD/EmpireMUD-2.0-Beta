@@ -3071,15 +3071,12 @@ ACMD(do_play) {
 
 ACMD(do_prospect) {
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot prospect.\r\n");
+		msg_to_char(ch, "You can't prospect.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_PROSPECTING) {
 		send_to_char("You stop prospecting.\r\n", ch);
 		act("$n stops prospecting.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
-	}
-	else if (IS_NPC(ch)) {
-		msg_to_char(ch, "You can't prospect.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
