@@ -1918,6 +1918,7 @@ const char *versions_list[] = {
 	"b5.35",
 	"b5.37",
 	"b5.38",
+	"b5.40",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3311,6 +3312,32 @@ void b5_38_grove_update(void) {
 }
 
 
+// add new channels
+PLAYER_UPDATE_FUNC(b5_40_update_players) {
+	extern struct slash_channel *create_slash_channel(char *name);
+	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
+	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
+	
+	struct player_slash_channel *slash;
+	struct slash_channel *chan;
+	int iter;
+	
+	char *to_join[] = { "grats", "death", "progress", "\n" };
+	
+	for (iter = 0; *to_join[iter] != '\n'; ++iter) {
+		if (!(chan = find_slash_channel_by_name(to_join[iter], TRUE))) {
+			chan = create_slash_channel(to_join[iter]);
+		}
+		if (!find_on_slash_channel(ch, chan->id)) {
+			CREATE(slash, struct player_slash_channel, 1);
+			slash->next = GET_SLASH_CHANNELS(ch);
+			GET_SLASH_CHANNELS(ch) = slash;
+			slash->id = chan->id;
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3568,6 +3595,10 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.38")) {
 			b5_38_grove_update();
+		}
+		if (MATCH_VERSION("b5.40")) {
+			log("Applying b5.40 channel update to players...");
+			update_all_players(NULL, b5_40_update_players);
 		}
 	}
 	
