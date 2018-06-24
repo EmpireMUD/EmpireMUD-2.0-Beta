@@ -618,7 +618,7 @@ struct slash_channel *create_slash_channel(const char *name) {
 	lc = str_dup(buf);
 	strtolower(lc);
 	chan->lc_name = lc;
-	chan->color = compute_slash_channel_color(lc);
+	chan->color = compute_slash_channel_color(name);
 	
 	LL_APPEND(slash_channel_list, chan);
 	return chan;
