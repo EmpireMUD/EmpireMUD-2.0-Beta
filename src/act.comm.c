@@ -604,10 +604,10 @@ char compute_slash_channel_color(char *name) {
 /**
 * Creates a slash channel.
 *
-* @param const char *name The name of the channel to create.
+* @param char *name The name of the channel to create.
 * @return struct slash_channel* The new channel.
 */
-struct slash_channel *create_slash_channel(const char *name) {
+struct slash_channel *create_slash_channel(char *name) {
 	struct slash_channel *chan;
 	char *lc;
 	
