@@ -8008,7 +8008,7 @@ ACMD(do_slay) {
 		else {
 			if (!IS_NPC(vict) && !affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
 				syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %s at %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), room_log_identifier(IN_ROOM(vict)));
-				mortlog("%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
 			
 			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, 0, vict, TO_CHAR);

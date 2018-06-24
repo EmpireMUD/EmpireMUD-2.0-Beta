@@ -602,6 +602,30 @@ char compute_slash_channel_color(char *name) {
 
 
 /**
+* Creates a slash channel.
+*
+* @param const char *name The name of the channel to create.
+* @return struct slash_channel* The new channel.
+*/
+struct slash_channel *create_slash_channel(const char *name) {
+	struct slash_channel *chan;
+	char *lc;
+	
+	CREATE(chan, struct slash_channel, 1);
+	
+	chan->id = ++top_slash_channel_id;
+	chan->name = str_dup(name);
+	lc = str_dup(buf);
+	strtolower(lc);
+	chan->lc_name = lc;
+	chan->color = compute_slash_channel_color(lc);
+	
+	LL_APPEND(slash_channel_list, chan);
+	return chan;
+}
+
+
+/**
 * Matches a slash channel name. It will take abbreviations but prefers exact
 * matches.
 *
@@ -682,6 +706,52 @@ struct player_slash_channel *find_on_slash_channel(char_data *ch, int id) {
 	}
 	
 	return found;
+}
+
+
+/**
+* Sends game data logs to slash channels.
+*
+* @param char *chan_name The name of the slash channel to announce to.
+* @param char_data *ignorable_person The person being announced (for ignores, may be NULL).
+* @param const char *messg... String format of the messages
+*/
+void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, const char *messg, ...) {
+	struct player_slash_channel *slash;
+	char output[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct slash_channel *chan;
+	descriptor_data *d;
+	va_list tArgList;
+	
+	if (*chan_name == '/') {
+		++chan_name;	// skip leading /
+	}
+	if (!(chan = find_slash_channel_by_name(chan_name, TRUE))) {
+		chan = create_slash_channel(chan_name);
+	}
+	
+	if (messg) {
+		va_start(tArgList, messg);
+		vsprintf(output, messg, tArgList);
+		sprintf(lbuf, "[\t%c/%s\tn %s \tn]\r\n", chan->color, chan->name, output);
+
+		for (d = descriptor_list; d; d = d->next) {
+			if (!d->character || STATE(d) != CON_PLAYING) {
+				continue;
+			}
+			if (ignorable_person && is_ignoring(d->character, ignorable_person)) {
+				continue;
+			}
+			if (!(slash = find_on_slash_channel(d->character, chan->id))) {
+				continue;
+			}
+			
+			SEND_TO_Q(lbuf, d);
+			add_to_slash_channel_history(d->character, chan, lbuf);
+		}
+
+		va_end(tArgList);
+	}
 }
 
 
@@ -921,15 +991,7 @@ ACMD(do_slash_channel) {
 		}
 		
 		if (!(chan = find_slash_channel_by_name(arg3, TRUE))) {
-			// create a channel
-			CREATE(chan, struct slash_channel, 1);
-			chan->next = slash_channel_list;
-			slash_channel_list = chan;
-			chan->id = ++top_slash_channel_id;
-			chan->name = str_dup(arg3);
-			strcpy(buf, arg3);
-			chan->lc_name = str_dup(strtolower(buf));
-			chan->color = compute_slash_channel_color(arg3);
+			chan = create_slash_channel(arg3);
 		}
 		
 		if (find_on_slash_channel(ch, chan->id)) {

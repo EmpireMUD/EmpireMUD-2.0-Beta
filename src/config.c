@@ -69,7 +69,7 @@ void save_config_system();
 //// EMPIREMUD CONFIGS ///////////////////////////////////////////////////////
 
 // slash-channels a player joins automatically upon creation (\n-terminated list)
-const char *default_channels[] = { "newbie", "ooc", "recruit", "trade", "\n" };
+const char *default_channels[] = { "newbie", "ooc", "recruit", "trade", "grats", "deaths", "progress", "\n" };
 
 
 // list of promo funcs

@@ -1818,6 +1818,12 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_CHANNEL_HISTORY_TYPES  5
 
 
+// channels for announcements
+#define DEATH_LOG_CHANNEL  "deaths"
+#define PROGRESS_LOG_CHANNEL  "progress"
+#define PLAYER_LOG_CHANNEL  "grats"
+
+
 // Modes of connectedness
 #define CON_PLAYING  0	// Playing - Nominal state
 #define CON_CLOSE  1	// Disconnecting
