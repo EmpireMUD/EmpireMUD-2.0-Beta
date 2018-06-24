@@ -1757,6 +1757,7 @@ const char *techs[] = {
 	"Tunnels",
 	"Fast Prospect",
 	"Fast Excavate",
+	"Hidden Progress",
 	"\n"
 };
 
