@@ -733,7 +733,7 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 	if (messg) {
 		va_start(tArgList, messg);
 		vsprintf(output, messg, tArgList);
-		sprintf(lbuf, "[\t%c/%s\tn] [ %s \tn]\r\n", chan->color, chan->name, output);
+		sprintf(lbuf, "[\t%c/%s\tn]: %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
 			if (!d->character || STATE(d) != CON_PLAYING) {
