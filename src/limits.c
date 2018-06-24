@@ -681,6 +681,11 @@ void real_update_char(char_data *ch) {
 	
 	// update recent level data if level has gone up or it's been too long since we've seen a higher level
 	if (GET_COMPUTED_LEVEL(ch) > GET_HIGHEST_KNOWN_LEVEL(ch)) {
+		if ((int) (GET_COMPUTED_LEVEL(ch) / 100) > (int) (GET_HIGHEST_KNOWN_LEVEL(ch) / 100)) {
+			// first time over a new 100?
+			log_to_slash_channel_by_name(PLAYER_LOG_CHANNEL, ch, "%s has reached level %d!", PERS(ch, ch, TRUE), (int)(GET_COMPUTED_LEVEL(ch) / 100) * 100);
+		}
+		
 		GET_HIGHEST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 	}
 	// update the last-known-level

@@ -1819,7 +1819,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // channels for announcements
-#define DEATH_LOG_CHANNEL  "deaths"
+#define DEATH_LOG_CHANNEL  "death"
 #define PROGRESS_LOG_CHANNEL  "progress"
 #define PLAYER_LOG_CHANNEL  "grats"
 

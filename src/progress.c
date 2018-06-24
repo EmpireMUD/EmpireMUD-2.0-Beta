@@ -664,6 +664,7 @@ void complete_goal(empire_data *emp, struct empire_goal *goal) {
 		return;	// no data
 	}
 	
+	log_to_slash_channel_by_name(PROGRESS_LOG_CHANNEL, NULL, "%s%s\t0 achieved %s", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), PRG_NAME(prg));
 	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
 	
 	add_completed_goal(emp, goal->vnum);
@@ -1013,6 +1014,7 @@ void script_reward_goal(empire_data *emp, progress_data *prg) {
 		return;	// nothing to do
 	}
 	
+	log_to_slash_channel_by_name(PROGRESS_LOG_CHANNEL, NULL, "%s%s\t0 achieved %s", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), PRG_NAME(prg));
 	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
 	
 	add_completed_goal(emp, PRG_VNUM(prg));
