@@ -5602,7 +5602,7 @@ ACMD(do_ship) {
 	struct island_info *from_isle, *to_isle;
 	struct empire_storage_data *store;
 	struct shipping_data *sd, *temp;
-	bool done, gave_number = FALSE;
+	bool done, wrong_isle, gave_number = FALSE;
 	vehicle_data *veh;
 	obj_data *proto;
 	int number = 1;
@@ -5699,13 +5699,10 @@ ACMD(do_ship) {
 		}
 		
 		// find a matching entry
-		done = FALSE;
+		done = wrong_isle = FALSE;
 		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
 			if ((sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) || sd->shipping_id != -1) {
 				continue;	// never cancel one in progress
-			}
-			if (sd->from_island != GET_ISLAND_ID(IN_ROOM(ch))) {
-				continue;
 			}
 			if (gave_number && number != sd->amount) {
 				continue;
@@ -5714,6 +5711,10 @@ ACMD(do_ship) {
 				continue;
 			}
 			if (!multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {
+				continue;
+			}
+			if (sd->from_island != GET_ISLAND_ID(IN_ROOM(ch))) {
+				wrong_isle = TRUE;
 				continue;
 			}
 			
@@ -5730,7 +5731,7 @@ ACMD(do_ship) {
 		}
 		
 		if (!done) {
-			msg_to_char(ch, "No shipments like that found to cancel.\r\n");
+			msg_to_char(ch, "No shipments like that found to cancel%s.\r\n", wrong_isle ? " on this island" : "");
 		}
 	}
 	else {

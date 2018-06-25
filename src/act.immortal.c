@@ -4379,7 +4379,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	
 	// attributes
 	for (iter = 0, len = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
-		sprintf(line, "%s: [\tc%d\t0]", empire_attributes[iter], EMPIRE_ATTRIBUTE(emp, iter));
+		sprintf(line, "%s: [\tc%+d\t0]", empire_attributes[iter], EMPIRE_ATTRIBUTE(emp, iter));
 		
 		if (len > 0 && len + strlen(line) + 2 >= 80) {	// start new line
 			msg_to_char(ch, "\r\n%s", line);
