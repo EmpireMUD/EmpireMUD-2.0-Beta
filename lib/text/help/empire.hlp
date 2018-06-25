@@ -1237,7 +1237,7 @@ Workforce types:
   &ymilling:&0 Will mill grains into flour.
   &yrepair-vehicles&0: Will keep vehicles maintained.
   &yoilmaking:&0 Will press oil.
-  &yfishing:&0 Will catch fish at the fishery.
+  &yfishing:&0 Will catch fish at the fishery. Costs no food.
   
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.

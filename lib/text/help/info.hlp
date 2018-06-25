@@ -774,7 +774,7 @@ Intelligence is used for:
 
 See also: ATTRIBUTES, CASTER, HEALER
 #
-LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL"
+LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL" "COMPOSITE LEVEL" "TOTAL LEVEL"
 
 Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.
@@ -792,7 +792,7 @@ Gear level: Your gear level raises your total level to 50 more than the average
    which make the item more powerful, such as superior and drop flags, raise
    the effective levels of items for this purpose.
 
-Composite level: This is the sum of your skill and gear levels. It is the
+Composite/total level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
