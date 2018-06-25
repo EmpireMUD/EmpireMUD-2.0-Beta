@@ -630,6 +630,8 @@ The owl shadow familiar will use the following abilities in combat:
 - Invigorating Darkness: +(level/5) Move points on party (instant)
 - Brilliant Darkness: +(1+level/100) Wits on party (30 sec)
 
+When you hide, this familiar will hide too.
+
 See also: BUFF, FAMILIAR
 #
 "PHOENIX FAMILIAR"
@@ -786,6 +788,8 @@ The scorpion shadow familiar will use the following abilities in combat:
 - Shadow Venom: -(level/20) bonus physical/magical damage on enemy (30 sec)
 - Numbing Venom: -(2+level/100) Wits on enemy (30 sec)
 - Agonizing Venom: Poison DoT on enemy (30 sec)
+
+When you hide, this familiar will hide too.
 
 See also: DEBUFF, FAMILIAR
 #
