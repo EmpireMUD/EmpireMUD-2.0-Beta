@@ -68,6 +68,7 @@ The following things will speed up various chores:
 - Weapon damage: chop, mine
 - Superior tool: craft, forge
 - Progression goals: excavate, prospect
+- Certain buildings: sew (tailor), craft (clay at potter)
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
 #
@@ -328,9 +329,11 @@ The "chameleon" trait is the property of some buildings to be invisible at a
 distance. Instead of seeing the building and its owner's banner, you see only
 normal terrain.
 #
-CHANNEL CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE
+CHANNEL CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE /DEATH /GRATS /PROGRESS
 
-Usage:  shout <message>
+Usage:  say <message>
+        shout <message>
+        /ooc <message>
 
 See also HELP SLASH-CHANNELS for global channels like /ooc and /newbie.
 
@@ -345,6 +348,9 @@ Global channels:
 &j/newbie&0 - Newbie channel
 &R/recruit&0 - Empire recruitment channel
 &o/trade&0 - Global trade channel
+&V/grats&0 - Player accomplishments
+&T/death&0 - Player death announcements
+&g/progress&0 - Empire progress announcements
 &yshout&0 - an in-character channel limited to 50 map tiles distance
 &rtell&0 - this is a private channel that is generally considered OOC
 
@@ -768,7 +774,7 @@ Intelligence is used for:
 
 See also: ATTRIBUTES, CASTER, HEALER
 #
-LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL"
+LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL" "COMPOSITE LEVEL" "TOTAL LEVEL"
 
 Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.
@@ -786,7 +792,7 @@ Gear level: Your gear level raises your total level to 50 more than the average
    which make the item more powerful, such as superior and drop flags, raise
    the effective levels of items for this purpose.
 
-Composite level: This is the sum of your skill and gear levels. It is the
+Composite/total level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 

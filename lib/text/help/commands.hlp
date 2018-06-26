@@ -317,8 +317,8 @@ For making useful suggestions and reporting problems to the Powers that Be.
 Examples:
 
   > bug the entire game crashes when I type 'put bag in bag'
-  > idea more types of pottery
-  > typo 'sence' should be spelled 'sense'
+  > idea more types of pottery: wedding vase, corded pot, terrible helmet
+  > typo 'sence' should be spelled 'cense'
 #
 BUY LIST SHOP SHOPS
 
@@ -683,7 +683,7 @@ EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
 Usage:  excavate
         fillin
 
-Speed boosts:  Faster Chores bonus, haste
+Speed boosts:  Faster Chores bonus, haste, Faster Excavations goal
 
 Using a shovel, your own strength, and a lot of time, you can excavate a
 trench from a desert or plains. Once the trench is complete, it will begin
@@ -708,7 +708,7 @@ There are three ways to fill a finished trench with water:
 
 An unfinished trench will not fill with water.
 
-See also: CANAL, CLAIM, OASIS DRAINAGE
+See also: CLAIM, OASIS DRAINAGE
 #
 EXECUTE
 
@@ -1083,7 +1083,7 @@ can filter the results. Empire recipes come from progression goals.
 
 Immortals can 'learn <vnum>' to instantly learn and craft recipe.
 
-See also: RECIPES, PROGRESS
+See also: RECIPES, PATTERNS, PROGRESS
 #
 LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
@@ -1469,6 +1469,7 @@ See also: PROMPT
 PROSPECT
 
 Usage:  prospect
+Speed boost:  Faster Prospecting Goal
 
 A good prospector can determine what minerals are in the ground without
 exploratory mining. If your empire has Deep Mines or Rare Metals and are the
@@ -2140,6 +2141,14 @@ Usage:  toggle no-empire [on/off]
 This toggle is for players who do not wish to be in any empire. The game will
 no longer create a new empire for you when you try to do things like claim
 or build.
+#
+"TOGGLE NO-PAINT" "TOGGLE NOPAINT" NOPAINT NO-PAINT
+
+Usage:  toggle no-paint [on/off]
+
+This toggle turns off paint colors on the map. This can make it clearer what
+you're looking at since paint colors can make buildings look deceptively
+different.
 #
 TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
 

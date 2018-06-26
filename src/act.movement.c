@@ -2009,10 +2009,10 @@ ACMD(do_portal) {
 				
 				// sequential numbering: only numbers them if it's not a -all
 				if (!all) {
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%2d. ", count);
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%2d.", count);
 				}
 				
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s%s (%s%s&0)", coord_display_room(ch, room, TRUE), get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s %s (%s%s&0)", coord_display_room(ch, room, TRUE), get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 				
 				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(room))) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");

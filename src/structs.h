@@ -1173,7 +1173,8 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_TUNNELS  16
 #define TECH_FAST_PROSPECT  17
 #define TECH_FAST_EXCAVATE  18
-#define NUM_TECHS  19
+#define TECH_HIDDEN_PROGRESS  19
+#define NUM_TECHS  20
 
 
 // TER_x: territory types for empire arrays
@@ -1816,6 +1817,12 @@ typedef struct vehicle_data vehicle_data;
 #define CHANNEL_HISTORY_EMPIRE  3
 #define CHANNEL_HISTORY_ROLL  4
 #define NUM_CHANNEL_HISTORY_TYPES  5
+
+
+// channels for announcements
+#define DEATH_LOG_CHANNEL  "death"
+#define PROGRESS_LOG_CHANNEL  "progress"
+#define PLAYER_LOG_CHANNEL  "grats"
 
 
 // Modes of connectedness

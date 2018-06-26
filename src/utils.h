@@ -1670,6 +1670,9 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 void cancel_action(char_data *ch);
 void start_action(char_data *ch, int type, int timer);
 
+// utils from act.comm.c
+void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, const char *messg, ...);
+
 // utils from act.empire.c
 extern bool check_in_city_requirement(room_data *room, bool check_wait);
 extern int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);

@@ -591,6 +591,7 @@ else
   %load% obj 12508
   %load% obj 12508
 end
+if %actor%
   if %actor.mob_flagged(HARD)% && !%self.is_flagged(HARD-DROP)%
     nop %self.flag(HARD-DROP)%
   end

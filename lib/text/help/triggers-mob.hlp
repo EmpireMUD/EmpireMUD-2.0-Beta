@@ -422,6 +422,7 @@ When using field  - The variable returns:
    doesn't have the item, an empty string is returned. * checks for any inv. 
 &cis_ally(char)&0 - Returns true if the other character is a combat ally.
 &cis_enemy(char)&0 - Returns true if the other character is a combat enemy.
+&cis_flying&0 - True if the character has any form of flying.
 &cis_god&0 - Returns true if the actor is a god-level player.
 &cis_hostile(on/off)&0 - If the ()'s are omitted, return value is whether or
    not the actor is marked as a Hostile player.

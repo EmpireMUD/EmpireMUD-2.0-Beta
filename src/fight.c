@@ -2601,7 +2601,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage) {
 		else {
 			msg_to_char(c, "You are hit and killed!\r\n");
 			if (!IS_NPC(c)) {
-				mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(c, c, 1), X_COORD(IN_ROOM(c)), Y_COORD(IN_ROOM(c)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, c, "%s has been killed by siege damage at (%d, %d)!", PERS(c, c, 1), X_COORD(IN_ROOM(c)), Y_COORD(IN_ROOM(c)));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(c), room_log_identifier(IN_ROOM(c)));
 			}
 			die(c, c);
@@ -2703,7 +2703,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 				LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
 					if (!IS_NPC(ch)) {
-						mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+						log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 						syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 					}
 					die(ch, ch);
@@ -2713,7 +2713,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		if (VEH_SITTING_ON(veh)) {
 			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
 			if (!IS_NPC(VEH_SITTING_ON(veh))) {
-				mortlog("%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, VEH_SITTING_ON(veh), "%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
 			}
 			die(ch, ch);
@@ -3122,7 +3122,7 @@ void death_log(char_data *ch, char_data *killer, int type) {
 	else
 		sprintf(output, msg, PERS(ch, ch, 1));
 
-	mortlog("%s (%d, %d)", output, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+	log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s (%d, %d)", output, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	syslog(SYS_DEATH, 0, TRUE, "DEATH: %s %s", output, room_log_identifier(IN_ROOM(ch)));
 }
 

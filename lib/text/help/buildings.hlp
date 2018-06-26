@@ -134,7 +134,7 @@ Basic buildings:
   (MM) mill  (must be by a river)
   (PP) potter
   (SS) stable
-  .&g^&?.&co&0 park
+  &g.^.&co&0 park
   .{}. shrine
   vvvv fence
   vxvv gate
@@ -788,6 +788,7 @@ PAINTER PAINTSHOP "PAINT SHOP" "PAINTER'S WORKSHOP" "PAINTERS WORKSHOP"
 [PP]  Painter's Workshop  (Foundations goal)
 
 Command:  build painter <direction>
+Requires:  Architect ability, Foundations goal
 Stored here:  paints
 
 This building is used to make and store paints (although you also require

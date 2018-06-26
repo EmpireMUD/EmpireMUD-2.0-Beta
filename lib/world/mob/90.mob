@@ -618,6 +618,9 @@ I 1 1351 100.00 1  # SKIN: a large skin
 I 1 1351 100.00 1  # SKIN: a large skin
 I 1 1351 100.00 1  # SKIN: a large skin
 I 1 1351 75.00 1  # SKIN: a large skin
+I 2 1358 100.00 4  # SHEAR: a bag of wool
+I 2 1358 50.00 4  # SHEAR: a bag of wool
+I 2 1358 5.00 4  # SHEAR: a bag of wool
 I 3 304 100.00 1 X  # BARDE: an armored warmammoth
 S
 #9059

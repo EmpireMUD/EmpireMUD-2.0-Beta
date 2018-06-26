@@ -784,7 +784,7 @@ set cycles 3
 set scale 50
 if %self.varexists(phase)%
   if %self.phase% == 3
-    set scale 100
+    set scale 50
     set cycles 5
   end
 end

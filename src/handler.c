@@ -6716,6 +6716,9 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_DIPLOMACY: {
 			sprintbit(req->misc, diplomacy_flags, lbuf, TRUE);
+			if (lbuf[strlen(lbuf)-1] == ' ') {
+				lbuf[strlen(lbuf)-1] = '\0';	// strip training space
+			}
 			snprintf(output, sizeof(output), "Have diplomatic relations: %dx %s", req->needed, lbuf);
 			break;
 		}

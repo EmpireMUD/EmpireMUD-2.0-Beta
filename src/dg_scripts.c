@@ -3402,6 +3402,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
+					else if (!str_cmp(field, "is_flying")) {
+						snprintf(str, slen, EFFECTIVELY_FLYING(c) ? "0" : "1");
+					}
+					
 					else if (!str_cmp(field, "is_god")) {
 						snprintf(str, slen, "%d", IS_GOD(c) ? 1 : 0);
 					}

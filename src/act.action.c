@@ -2453,7 +2453,10 @@ ACMD(do_chip) {
 
 	one_argument(argument, arg);
 
-	if (GET_ACTION(ch) == ACT_CHIPPING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot chip.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_CHIPPING) {
 		msg_to_char(ch, "You stop chipping it.\r\n");
 		act("$n stops chipping.", TRUE, ch, NULL, NULL, TO_ROOM);
 		cancel_action(ch);
@@ -2495,7 +2498,10 @@ ACMD(do_chip) {
 
 
 ACMD(do_chop) {
-	if (GET_ACTION(ch) == ACT_CHOPPING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot chop.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_CHOPPING) {
 		send_to_char("You stop chopping.\r\n", ch);
 		act("$n stops chopping.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
@@ -2563,7 +2569,10 @@ ACMD(do_excavate) {
 	struct evolution_data *evo;
 	sector_data *orig;
 	
-	if (GET_ACTION(ch) == ACT_EXCAVATING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot excavate.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_EXCAVATING) {
 		msg_to_char(ch, "You stop the excavation.\r\n");
 		act("$n stops excavating the trench.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
@@ -2625,7 +2634,10 @@ ACMD(do_excavate) {
 ACMD(do_fillin) {
 	sector_data *old_sect;
 	
-	if (GET_ACTION(ch) == ACT_START_FILLIN) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot fillin.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_START_FILLIN) {
 		msg_to_char(ch, "You stop preparing to fill in the trench.\r\n");
 		act("$n stops preparing to fill in the trench.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
@@ -2686,7 +2698,10 @@ ACMD(do_fillin) {
 ACMD(do_gather) {
 	int gather_base_timer = config_get_int("gather_base_timer");
 	
-	if (GET_ACTION(ch) == ACT_GATHERING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot gather.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_GATHERING) {
 		send_to_char("You stop searching for sticks.\r\n", ch);
 		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
@@ -3028,7 +3043,10 @@ ACMD(do_plant) {
 ACMD(do_play) {
 	obj_data *obj;
 
-	if (GET_ACTION(ch) == ACT_MUSIC) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot do that.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_MUSIC) {
 		msg_to_char(ch, "You stop playing music.\r\n");
 		act("$n stops playing music.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
@@ -3052,13 +3070,13 @@ ACMD(do_play) {
 
 
 ACMD(do_prospect) {
-	if (GET_ACTION(ch) == ACT_PROSPECTING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't prospect.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_PROSPECTING) {
 		send_to_char("You stop prospecting.\r\n", ch);
 		act("$n stops prospecting.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
-	}
-	else if (IS_NPC(ch)) {
-		msg_to_char(ch, "You can't prospect.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
@@ -3085,7 +3103,10 @@ ACMD(do_prospect) {
 
 
 ACMD(do_quarry) {
-	if (GET_ACTION(ch) == ACT_QUARRYING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot quarry.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_QUARRYING) {
 		send_to_char("You stop quarrying.\r\n", ch);
 		act("$n stops quarrying.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
@@ -3119,7 +3140,10 @@ ACMD(do_saw) {
 
 	one_argument(argument, arg);
 
-	if (GET_ACTION(ch) == ACT_SAWING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot saw.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_SAWING) {
 		act("You stop sawing.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
 	}
@@ -3176,7 +3200,10 @@ ACMD(do_scrape) {
 	
 	one_argument(argument, arg);
 	
-	if (GET_ACTION(ch) == ACT_SCRAPING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot scrape.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_SCRAPING) {
 		act("You stop scraping.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
 	}

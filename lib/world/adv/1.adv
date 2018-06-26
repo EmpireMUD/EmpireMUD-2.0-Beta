@@ -1,5 +1,5 @@
 #100
-Magiterranean: The Grove~
+OLD Magiterranean: The Grove~
 Paul Clarke~
    A small grove deep in the Magiterranean, the plane of nature magic. This is
 a place where the forces of nature run deep, and interlopers are unwelcome.
@@ -7,6 +7,8 @@ The grove is but a small part of the greater realm, and can be found in deep
 forests.
    Enter the portal, but be prepared for both unfriendly druids and hidden
 predators as you explore the otherworldly forest of the Magiterranean.
+
+This adventure is deprecated and replaced with 12650.
 ~
 10000 10005 1-75
 50 0 ak 0
@@ -121,7 +123,7 @@ L
 -1 0 0
 S
 #120
-Mountain Cave: Red Dragon~
+OLD Mountain Cave: Red Dragon~
 Paul Clarke~
    Enter a cavernous mountain cave and find yourself face-to-claw with a giant
 red dragon! Bring a healer and a tank, and see how you fare against the most
@@ -141,7 +143,7 @@ L
 14 c c
 S
 #121
-The Swamp Hag~
+OLD The Swamp Hag~
 Paul Clarke~
    You have stumbled upon a strange, raised house in the swamp. It's old,
 dilapidated, and surrounded by unfriendly swamp creatures. What sort of person
@@ -255,7 +257,7 @@ L
 14 c bdegkln
 S
 #127
-Abandoned Dragon Nest~
+Wandering Dragon~
 Paul Clarke~
    The dragon nest appears abandoned, which means a dragon is on the loose
 nearby. Can you find and defeat it? Be careful, it might take a pair of stout

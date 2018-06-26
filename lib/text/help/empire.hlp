@@ -530,15 +530,14 @@ FINDMAINTENANCE "FIND MAINTENANCE"
 
 Usage:  findmaintenance [coordinates | island]
 
-This command finds all the buildings in your empire that are damaged or need
-at least 2 years of maintenance. If you give it target coordinates or an island
-name, it will instead list the resources needed to repair that location or all
-buildings you own on the island.
+This command finds all the buildings in your empire that are at least 20%
+damaged or need at least 2 years of maintenance.
+
+If you give it target coordinates or an island name, it will list the resources
+needed to repair that location or all buildings you own on the island.
 
 If you are using Workforce to maintain your buildings, this generally means
 that only buildings not serviced by your workforce will show up on the list.
-Only buildings that have taken at least 20% of their maximum damage or require
-any maintenance show up on the list.
 
 Immortals can give an empire name as the first argument to see maintenance
 for that empire.
@@ -1064,6 +1063,7 @@ Available technologies are:
  - Tunnels: The empire can use the 'tunnel' command.
  - Fast Prospect: Members of the empire can prospect much faster.
  - Fast Excavate: Members of the empire excavate much faster when in-city.
+ - Hidden Progress: The empire's progress won't show on the /progress channel.
 
 * some technologies only function on the same island as the building that
   provides them
@@ -1236,7 +1236,7 @@ Workforce types:
   &ymilling:&0 Will mill grains into flour.
   &yrepair-vehicles&0: Will keep vehicles maintained.
   &yoilmaking:&0 Will press oil.
-  &yfishing:&0 Will catch fish at the fishery.
+  &yfishing:&0 Will catch fish at the fishery. Costs no food.
   
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
