@@ -582,7 +582,7 @@ void mobile_activity(void) {
 	empire_data *chemp, *victemp;
 	bool moved;
 
-	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && !IS_GOD(vict) && CAN_SEE(mob, vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK))
+	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && CAN_SEE(mob, vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK))
 	
 	// prevent running multiple mob moves during a catch-up cycle
 	if (!catch_up_mobs) {
