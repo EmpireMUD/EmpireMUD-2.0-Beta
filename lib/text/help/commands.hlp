@@ -2142,6 +2142,14 @@ This toggle is for players who do not wish to be in any empire. The game will
 no longer create a new empire for you when you try to do things like claim
 or build.
 #
+"TOGGLE NO-PAINT" "TOGGLE NOPAINT" NOPAINT NO-PAINT
+
+Usage:  toggle no-paint [on/off]
+
+This toggle turns off paint colors on the map. This can make it clearer what
+you're looking at since paint colors can make buildings look deceptively
+different.
+#
 TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
 
 Usage:  toggle travel-look [on/off]
