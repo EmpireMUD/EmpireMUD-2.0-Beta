@@ -6018,6 +6018,7 @@ ACMD(do_progress) {
 		msg_to_char(ch, "       progress buy [goal name]\r\n");
 		msg_to_char(ch, "       progress <completed | purchased> [category]\r\n");
 		msg_to_char(ch, "       progress new\r\n");
+		msg_to_char(ch, "       progress summary\r\n");
 	}
 }
 
