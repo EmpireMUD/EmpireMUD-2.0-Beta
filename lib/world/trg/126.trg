@@ -1241,6 +1241,12 @@ else
 end
 %send% %actor% You find a trail to the %result%!
 ~
+#12681
+Grove 2.0 Quest Finish completes adventure~
+2 v 0
+~
+%adventurecomplete%
+~
 #12683
 Grove Druid 2.0 Underwater: Water Blast~
 0 k 100
@@ -1282,8 +1288,8 @@ set iterator 1
 while %iterator% <= 4
   eval current_word %%word_%iterator%%%
   if %current_word% == %correct_word%
-    eval success %speech% ~= %self.current_word%
-  elseif %speech% ~= %self.current_word%
+    eval success %speech% ~= %current_word%
+  elseif %speech% ~= %current_word%
     set failure 1
   end
   eval iterator %iterator% + 1
@@ -1306,6 +1312,19 @@ if %success% && !%failure%
       end
     end
     set person %next_person%
+  done
+  set done 1
+  set vnum 12654
+  while %vnum% <= 12657
+    set druid %instance.mob(%vnum%)%
+    if !%druid%
+      set done 0
+    else
+      if !%druid.affect(12673)%
+        set done 0
+      end
+    end
+    eval vnum %vnum%+1
   done
   set person %self.room.people%
   while %person%

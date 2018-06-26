@@ -1224,7 +1224,7 @@ if (!%arg%)
   %send% %actor% %self.name% sells %named% for %cost% greater skystones.
   %send% %actor% Type 'buy backpack' to purchase one.
   halt
-elseif !(backpack /= %arg% || form-fitting /= %arg%)
+elseif !(backpack /= %arg% || armored /= %arg%)
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end
@@ -1317,9 +1317,9 @@ set named a portable hole
 set keyw portable
 if (!%arg%)
   %send% %actor% %self.name% sells %named% for %cost% greater skystones.
-  %send% %actor% Type 'buy backpack' to purchase one.
+  %send% %actor% Type 'buy hole' to purchase one.
   halt
-elseif !(backpack /= %arg% || form-fitting /= %arg%)
+elseif !(hole /= %arg% || portable /= %arg%)
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end

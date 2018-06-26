@@ -1900,7 +1900,7 @@ The Celestial Forge~
 48 5 0 0
 0 0 0 -1
 C
-shatter <item to destroy>~
+forge, smelt, shatter <item to destroy>~
 D
    The towering stone walls of the celestial forge are offset just enough that
 light comes cascading through thousands of crevices, forming stars that dance

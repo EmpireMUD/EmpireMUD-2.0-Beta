@@ -114,10 +114,13 @@ if (%self.fighting% || %self.disabled%)
   halt
 end
 set room %self.room%
-if (%instance.location% && %room% != %instance.location% && (%room.template% == 10330 || %room.sector% == Ocean))
+if (%instance.real_location% && %room% != %instance.real_location% && (%room.template% == 10330 || %room.sector% == Ocean))
   %echo% %self.name% flies away!
-  mgoto %instance.location%
+  mgoto %instance.real_location%
+  nop %instance.set_location(%instance.real_location%)%
   %echo% %self.name% flies into the nest!
+else
+  nop %instance.set_location(%room%)%
 end
 ~
 #10331
