@@ -1141,6 +1141,8 @@ The following adventure flags are available:
     first time.
  IGNORE-WORLD-SIZE - Won't adjust the number of instances based on the world.
  IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
+ CHECK-OUTSIDE-FIGHTS - Makes sure nobody is fighting a mob from the instance
+    outside the adventure, before despawning.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d

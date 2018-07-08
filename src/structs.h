@@ -542,19 +542,20 @@ typedef struct vehicle_data vehicle_data;
 //// ADVENTURE DEFINES ///////////////////////////////////////////////////////
 
 // ADV_x: adventure flags
-#define ADV_IN_DEVELOPMENT  BIT(0)	// will not generate instances
-#define ADV_LOCK_LEVEL_ON_ENTER  BIT(1)	// lock levels on entry
-#define ADV_LOCK_LEVEL_ON_COMBAT  BIT(2)	// lock levels when combat starts
-#define ADV_NO_NEARBY  BIT(3)	// hide from mortal nearby command
-#define ADV_ROTATABLE  BIT(4)	// random rotation on instantiate
-#define ADV_CONFUSING_RANDOMS  BIT(5)	// random exits do not need to match
-#define ADV_NO_NEWBIE  BIT(6)	// prevents spawning on newbie islands
-#define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
-#define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
-#define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
-#define ADV_CAN_DELAY_LOAD  BIT(10)	// can save memory by not instantiating till a player appears
-#define ADV_IGNORE_WORLD_SIZE  BIT(11)	// does not adjust the instance limit
-#define ADV_IGNORE_ISLAND_LEVELS  BIT(12)	// does not skip islands with no players in the level range
+#define ADV_IN_DEVELOPMENT  BIT(0)	// a. will not generate instances
+#define ADV_LOCK_LEVEL_ON_ENTER  BIT(1)	// b. lock levels on entry
+#define ADV_LOCK_LEVEL_ON_COMBAT  BIT(2)	// c. lock levels when combat starts
+#define ADV_NO_NEARBY  BIT(3)	// d. hide from mortal nearby command
+#define ADV_ROTATABLE  BIT(4)	// e. random rotation on instantiate
+#define ADV_CONFUSING_RANDOMS  BIT(5)	// f. random exits do not need to match
+#define ADV_NO_NEWBIE  BIT(6)	// g. prevents spawning on newbie islands
+#define ADV_NEWBIE_ONLY  BIT(7)	// h. only spawns on newbie islands
+#define ADV_NO_MOB_CLEANUP  BIT(8)	// i. won't despawn mobs that escaped the instance
+#define ADV_EMPTY_RESET_ONLY  BIT(9)	// j. won't reset while players are inside
+#define ADV_CAN_DELAY_LOAD  BIT(10)	// k. can save memory by not instantiating till a player appears
+#define ADV_IGNORE_WORLD_SIZE  BIT(11)	// l. does not adjust the instance limit
+#define ADV_IGNORE_ISLAND_LEVELS  BIT(12)	// m. does not skip islands with no players in the level range
+#define ADV_CHECK_OUTSIDE_FIGHTS  BIT(13)	// n. looks for mobs in combat before despawning
 
 
 // ADV_LINK_x: adventure link rule types
