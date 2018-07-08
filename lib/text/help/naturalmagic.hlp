@@ -151,7 +151,8 @@ Chants have no beginning or end, but you can stop chanting by typing the
 command again.
 
 Unlike most timed actions, chants are not running on a timer. Their effect,
-if any, happens at random as you chant.
+if any, happens at random as you chant. Some chants have a higher random chance
+than others.
 
 See also: help for individual chants, like HELP CHANT OF NATURE
 #
@@ -287,7 +288,7 @@ Natural Magic Synergy Ability: 100 Vampire
 
 Usage:  deathtouch [victim]
 Cooldown:  6 seconds
-Cost:  based on damage
+Cost:  mana, based on damage
 
 This fast spell deals instant damage to your victim, as the very essence of
 death seeps into him.
@@ -324,9 +325,8 @@ Linked trait: Intelligence
 Cost:  10+ mana, based on level
 
 This spell allows a nature mage to coat his or her allies in a powerful
-coating of earth, protecting them from some damage. It adds an amount of
-physical damage resistance equal to the caster's Natural Magic level divided by
-14, with a bonus based on Intelligence.
+coating of earth, protecting them from some damage. It adds damage resistances
+based on the caster's level and Intelligence.
 
 Gains experience when you cast this spell or when you take damage while using
 it.

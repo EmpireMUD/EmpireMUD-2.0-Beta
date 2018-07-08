@@ -68,7 +68,7 @@ The following things will speed up various chores:
 - Weapon damage: chop, mine
 - Superior tool: craft, forge
 - Progression goals: excavate, prospect
-- Certain buildings: sew (tailor), craft (clay at potter)
+- Certain buildings: sew (tailor), weaving (tailor), craft (clay at potter)
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
 #
@@ -678,7 +678,7 @@ health, and you can enchant your gear to get even more.
 
 If you're knocked out with 0 health, you will die without assistance.
 
-See also: CLASS, DEATH, ENDURANCE
+See also: DEATH, ENDURANCE
 #
 HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
 
@@ -820,7 +820,7 @@ The mana pool is the amount of magical energy you can channel before you must
 stop to recover some. All players begin with 50 mana points. Some abilities and
 gear give you a larger mana pool, and you can enchant gear to get even more.
 
-See also: ARCANE POWER, CLASS, GIFT OF NATURE, SOLAR POWER
+See also: ARCANE POWER, GIFT OF NATURE, SOLAR POWER
 #
 MAPSCAN "MAP SCAN"
 
