@@ -2797,7 +2797,7 @@ void nanny(descriptor_data *d, char *arg) {
 				send_to_char(START_MESSG, d->character);
 			}
 			
-			if (!IS_APPROVED(d->character) && has_anonymous_host(d)) {
+			if (!IS_APPROVED(d->character) && !IS_IMMORTAL(d->character) && has_anonymous_host(d)) {
 				msg_to_char(d->character, "\r\n&rWarning: You are playing from an anonymous public host, which does not provide\r\n");
 				msg_to_char(d->character, "your IP address to this game. Characters from this host are not automatically\r\n");
 				msg_to_char(d->character, "'approved' and only un-approved characters can play from this host. If you wish\r\n");

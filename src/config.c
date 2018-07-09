@@ -208,6 +208,7 @@ const char *slow_nameserver_ips[] = {
 */
 const char *anonymous_public_hosts[] = {
 	"mudconnector.com",
+	"ec2-34-228-95-236.compute-1.amazonaws.com",	// mudportal.com
 	"\n"
 };
 
