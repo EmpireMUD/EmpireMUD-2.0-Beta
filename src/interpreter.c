@@ -2798,11 +2798,11 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			
 			if (!IS_APPROVED(d->character) && !IS_IMMORTAL(d->character) && has_anonymous_host(d)) {
-				msg_to_char(d->character, "\r\n&rWarning: You are playing from an anonymous public host, which does not provide\r\n");
+				msg_to_char(d->character, "\r\n\trWarning:\t0 You are playing from an anonymous public host, which does not provide\r\n");
 				msg_to_char(d->character, "your IP address to this game. Characters from this host are not automatically\r\n");
 				msg_to_char(d->character, "'approved' and only un-approved characters can play from this host. If you wish\r\n");
 				msg_to_char(d->character, "to become a permanent player on this game, you should speak to an immortal who\r\n");
-				msg_to_char(d->character, "can approve your character and explain how to connect from a real MUD client.\r\n");
+				msg_to_char(d->character, "can approve your character and explain how to connect from a real MUD client.\r\n\r\n");
 			}
 			
 			d->has_prompt = 0;
