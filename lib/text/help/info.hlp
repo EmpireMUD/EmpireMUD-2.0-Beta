@@ -108,6 +108,19 @@ the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, GROUP, NEARBY
 #
+APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL MORTAPPROVE
+
+Some MUDs require that characters are 'approved' before they are allowed to
+play the full game. Different EmpireMUDs configure this differently. In
+general, approval is required 
+
+By default, EmpireMUDs auto-approve all characters except ones that log in from
+anonymous public hosts. These are hosts that don't provide the game with your
+actual IP address. Characters that are created from anonymous hosts will not
+auto-approve, and approved characters cannot play from those hosts.
+
+If you require approval, contact any member of the immortal staff.
+#
 ATTRIBUTES STATS
 
 Current stat implementations are as follows:

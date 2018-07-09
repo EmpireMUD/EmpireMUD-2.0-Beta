@@ -41,6 +41,8 @@ This command is grantable.
 
 The command "config approval -v" will show the current configuration.
 
+To see the mortal version of this help file, see: MORTAPPROVE
+
 See also: CONFIG, GRANT
 #d
 AT WIZAT

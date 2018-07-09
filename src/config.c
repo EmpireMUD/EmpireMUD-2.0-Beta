@@ -199,6 +199,19 @@ const char *slow_nameserver_ips[] = {
 };
 
 
+/**
+* This is a list of known hosts that won't pass through a user's real IP. Some
+* players use this to violate the game's multiplayer rules. If you have the
+* 'restrict_anonymous_hosts' config turned on (default), characters from these
+* hosts won't auto-approve and characters who are approved cannot play from
+* these hosts.
+*/
+const char *anonymous_public_hosts[] = {
+	"mudconnector.com",
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER CONFIGS //////////////////////////////////////////////////////////
 
@@ -1656,6 +1669,7 @@ void init_config_system(void) {
 	init_config(CONFIG_APPROVAL, "join_empire_approval", CONFTYPE_BOOL, "pledge, enroll");
 	init_config(CONFIG_APPROVAL, "manage_empire_approval", CONFTYPE_BOOL, "commands related to having an empire");
 	init_config(CONFIG_APPROVAL, "quest_approval", CONFTYPE_BOOL, "quest command");
+	init_config(CONFIG_APPROVAL, "restrict_anonymous_hosts", CONFTYPE_BOOL, "restricts approval of players from hosts like mudconnector.com");
 	init_config(CONFIG_APPROVAL, "skill_gain_approval", CONFTYPE_BOOL, "gain any skill points");
 	init_config(CONFIG_APPROVAL, "tell_approval", CONFTYPE_BOOL, "sending tells (except to immortals)");
 	init_config(CONFIG_APPROVAL, "terraform_approval", CONFTYPE_BOOL, "excavate, fillin, chant of nature");

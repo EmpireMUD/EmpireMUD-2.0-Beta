@@ -155,6 +155,34 @@ char_data *find_player_in_room_by_id(room_data *room, int id) {
 
 
 /**
+* Checks if a user is in the anonymous host list -- the list of sites that
+* are public and hide a player's real IP address. This is used to prevent
+* cheating via unlinked alts or multiplaying.
+*
+* You can disable this by turning off the 'restrict_anonymous_hosts' config.
+*
+* @param descriptor_data *desc The user.
+* @return bool TRUE if the player is from an anonymous public host, FALSE if not.
+*/
+bool has_anonymous_host(descriptor_data *desc) {
+	extern const char *anonymous_public_hosts[];
+	int iter;
+	
+	if (!config_get_bool("restrict_anonymous_hosts")) {
+		return FALSE;	// don't bother
+	}
+	
+	for (iter = 0; *anonymous_public_hosts[iter] != '\n'; ++iter) {
+		if (!str_cmp(desc->host, anonymous_public_hosts[iter])) {
+			return TRUE;	// FOUND!
+		}
+	}
+	
+	return FALSE;	// not found
+}
+
+
+/**
 * Finds a character who is sitting at a menu, for various functions that update
 * all players and check which are in-game vs not. If a person is at a menu,
 * then to safely update them you should change both their live data and saved
@@ -3975,7 +4003,7 @@ void start_new_character(char_data *ch) {
 		GET_ACCESS_LEVEL(ch) = LVL_MORTAL;
 	}
 	// auto-authorization
-	if (!IS_APPROVED(ch) && config_get_bool("auto_approve")) {
+	if (!IS_APPROVED(ch) && config_get_bool("auto_approve") && ch->desc && !has_anonymous_host(ch->desc)) {
 		// only approve the character automatically
 		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
 	}

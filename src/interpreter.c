@@ -2270,6 +2270,7 @@ void nanny(descriptor_data *d, char *arg) {
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
+	extern bool has_anonymous_host(descriptor_data *desc);
 	extern int num_earned_bonus_traits(char_data *ch);
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
@@ -2736,6 +2737,17 @@ void nanny(descriptor_data *d, char *arg) {
 				STATE(d) = CON_GOODBYE;
 				return;
 			}
+			else if (IS_APPROVED(d->character) && has_anonymous_host(d)) {
+				SEND_TO_Q("\r\n\033[31mAccess Denied: Anonymous public host detected\033[0m\r\n", d);
+				SEND_TO_Q("This game does not allow existing 'approved' characters to log in from public\r\n", d);
+				SEND_TO_Q("hosts (such as Mudconnector) that do not provide your IP address. You can only\r\n", d);
+				SEND_TO_Q("log in from this host using a character that is not 'approved', or a new\r\n", d);
+				SEND_TO_Q("character (which will not be approved.\r\n", d);
+				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Approved character %s connecting from anonymous host [%s]", GET_NAME(d->character), d->host);
+				
+				STATE(d) = CON_GOODBYE;
+				return;
+			}
 			
 			if (LOWER(*arg) == 'i' && (IS_GOD(d->character) || IS_IMMORTAL(d->character))) {
 				GET_INVIS_LEV(d->character) = GET_ACCESS_LEVEL(d->character);
@@ -2783,6 +2795,14 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			if (show_start) {
 				send_to_char(START_MESSG, d->character);
+			}
+			
+			if (!IS_APPROVED(d->character) && has_anonymous_host(d)) {
+				msg_to_char(d->character, "\r\n&rWarning: You are playing from an anonymous public host, which does not provide\r\n");
+				msg_to_char(d->character, "your IP address to this game. Characters from this host are not automatically\r\n");
+				msg_to_char(d->character, "'approved' and only un-approved characters can play from this host. If you wish\r\n");
+				msg_to_char(d->character, "to become a permanent player on this game, you should speak to an immortal who\r\n");
+				msg_to_char(d->character, "can approve your character and explain how to connect from a real MUD client.\r\n");
 			}
 			
 			d->has_prompt = 0;
