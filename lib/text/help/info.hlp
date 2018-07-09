@@ -108,7 +108,7 @@ the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, GROUP, NEARBY
 #
-APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL MORTAPPROVE
+APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL "ANONYMOUS HOST" "PUBLIC HOST" "ANONYMOUS PUBLIC HOST" MORTAPPROVE
 
 Some MUDs require that characters are 'approved' before they are allowed to
 play the full game. Different EmpireMUDs configure this differently. In
