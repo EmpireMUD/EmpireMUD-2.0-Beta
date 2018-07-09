@@ -79,10 +79,18 @@ can reduce the chances of being attacked by aggro mobs.
 
 See also: MAJESTY
 #
-APPROVAL AUTHORIZATION AUTHORIZED APPROVED
+APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL APPROVED "ANONYMOUS HOST" "PUBLIC HOST" "ANONYMOUS PUBLIC HOST" MORTAPPROVE
 
-If this MUD is configured to require player approval, you need to contact the
-game's staff to find out how to become approved. Or, check the MOTD or website.
+Some MUDs require that characters are 'approved' before they are allowed to
+play the full game. Different EmpireMUDs configure this differently. In
+general, approval is required 
+
+By default, EmpireMUDs auto-approve all characters except ones that log in from
+anonymous public hosts. These are hosts that don't provide the game with your
+actual IP address. Characters that are created from anonymous hosts will not
+auto-approve, and approved characters cannot play from those hosts.
+
+If you require approval, contact any member of the immortal staff.
 
 Implementors: update this help file in: lib/text/help/info.hlp
 #
@@ -107,19 +115,6 @@ will not be eligible for resurrection. You can still be summoned back.
 the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, GROUP, NEARBY
-#
-APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL "ANONYMOUS HOST" "PUBLIC HOST" "ANONYMOUS PUBLIC HOST" MORTAPPROVE
-
-Some MUDs require that characters are 'approved' before they are allowed to
-play the full game. Different EmpireMUDs configure this differently. In
-general, approval is required 
-
-By default, EmpireMUDs auto-approve all characters except ones that log in from
-anonymous public hosts. These are hosts that don't provide the game with your
-actual IP address. Characters that are created from anonymous hosts will not
-auto-approve, and approved characters cannot play from those hosts.
-
-If you require approval, contact any member of the immortal staff.
 #
 ATTRIBUTES STATS
 
