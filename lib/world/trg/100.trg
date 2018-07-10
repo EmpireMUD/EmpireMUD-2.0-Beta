@@ -1273,6 +1273,10 @@ switch %random.4%
   case 1
     %echo% %self.name% seems to spark with electricity...
     wait 1 sec
+    set actor %self.fighting%
+    if !%actor%
+      halt
+    end
     %send% %actor% %self.name% unleashes a powerful torrent of lightning bolts at you!
     %echoaround% %actor% %self.name% unleashes a torrent of lightning bolts at %actor.name%!
     %damage% %actor% 150 magical

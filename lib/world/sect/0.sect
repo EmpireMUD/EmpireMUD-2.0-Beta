@@ -53,7 +53,7 @@ E
 E
 9 0 50.00 1
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3013 100.00 1  # FORAGE: a handful of nuts
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
@@ -209,7 +209,7 @@ E
 E
 9 0 50.00 2
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
@@ -363,7 +363,7 @@ E
 E
 9 0 50.00 3
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
@@ -491,7 +491,7 @@ E
 E
 9 0 50.00 4
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
@@ -633,7 +633,7 @@ E
 E
 3 29 0.80 29
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
@@ -888,7 +888,7 @@ D4
 ????~
 &0~
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 M
 9039 5.00 cg
@@ -1204,7 +1204,7 @@ D0
 E
 1 0 100.00 7
 E
-9 0 50.00 7
+9 0 20.00 7
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3003 100.00 1  # FORAGE: a handful of grain
@@ -1266,7 +1266,7 @@ D0
 E
 1 0 100.00 12
 E
-9 0 50.00 12
+9 0 20.00 12
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
@@ -1369,7 +1369,7 @@ D0
 E
 1 0 100.00 16
 E
-9 0 50.00 16
+9 0 20.00 16
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 M
@@ -1545,7 +1545,7 @@ D4
 E
 6 0 100.00 19
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 S
 #18
@@ -2469,7 +2469,7 @@ E
 12 0 25.00 41
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
-I 5 101 100.00 1 x  # DIG: a pile of clay
+I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3013 100.00 1  # FORAGE: a handful of nuts
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 M
@@ -2853,7 +2853,7 @@ E
 12 0 25.00 42
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
-I 5 101 100.00 1 x  # DIG: a pile of clay
+I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 9 121 100.00 1  # GATHER: a stick
@@ -3013,7 +3013,7 @@ E
 12 0 25.00 43
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
-I 5 101 100.00 1 x  # DIG: a pile of clay
+I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 I 9 121 100.00 1  # GATHER: a stick
@@ -3169,7 +3169,7 @@ E
 10 57 5.00 0
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
-I 5 101 100.00 1 x  # DIG: a pile of clay
+I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3051 50.00 1 x  # FORAGE: a sea urchin
 I 6 3052 50.00 1 x  # FORAGE: a clam
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
@@ -3324,7 +3324,7 @@ E
 10 57 5.00 20
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
-I 5 101 100.00 1 x  # DIG: a pile of clay
+I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3051 50.00 1 x  # FORAGE: a sea urchin
 I 6 3052 50.00 1 x  # FORAGE: a clam
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
@@ -3532,7 +3532,7 @@ E
 10 57 5.00 1
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
-I 5 101 100.00 1 x  # DIG: a pile of clay
+I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3051 50.00 1 x  # FORAGE: a sea urchin
 I 6 3052 50.00 1 x  # FORAGE: a clam
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
@@ -3789,7 +3789,7 @@ E
 10 53 5.00 0
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
-I 5 101 100.00 1 x  # DIG: a pile of clay
+I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3051 50.00 1 x  # FORAGE: a sea urchin
 I 6 3052 50.00 1 x  # FORAGE: a clam
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
@@ -3956,7 +3956,7 @@ E
 8 0 100.00 13
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
-I 5 101 100.00 1 x  # DIG: a pile of clay
+I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3013 100.00 1  # FORAGE: a handful of nuts
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
 M
@@ -4116,7 +4116,7 @@ E
 11 19 4.00 20
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
 I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
@@ -4241,7 +4241,7 @@ E
 E
 11 19 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
@@ -4352,7 +4352,7 @@ E
 E
 11 19 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans

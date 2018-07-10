@@ -39,4 +39,12 @@ K 2 5175
 K 2 5176
 P 3001
 S
+#3904
+Hidden Progress~
+   Your empire dwells in the shadows of society. Other empires will no longer
+see announcements of your progress on the /progress channel.
+~
+1 3 30 0 b
+K 0 19
+S
 $

@@ -432,6 +432,12 @@ end
 %send% %target% %self.name% draws a flintlock pistol and takes aim at you!
 %echoaround% %target% %self.name% draws a flintlock pistol and takes aim at %target.name%!
 wait 3 sec
+if !%target%
+  halt
+end
+if !%self.is_enemy(%target%)%
+  halt
+end
 %send% %target% &r%self.name% shoots you with %self.hisher% pistol!
 %echoaround% %target% %self.name% shoots %target.name% with %self.hisher% pistol!
 %damage% %target% 200 physical
