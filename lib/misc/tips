@@ -29,7 +29,7 @@ Lots of useful preferences are found on the 'toggle' command.
 You can knock enemies out instead of killing them using 'toggle autokill'.
 You can reduce the spam from chores like chopping by typing 'toggle action-spam'.
 If you're not riding or on a road, there's a small delay each time you move.
-You can only get two skills all the way to 100; these determine your class.
+You can only get two skills all the way to 100.
 It's possible to gain skill levels even when you're out of daily skill points. The rate is just lower.
 With the Workforce ability, you can give your citizens chores.
 Your Workforce will only work a chore if you don't already have too much of the resource it produces.
@@ -89,7 +89,6 @@ Type 'elog' to see a list of recent empire events.
 You can use the 'eedit' command to configure your empire.
 Type 'cooldowns' to see how long until your abilities are available.
 Players with less than 24 hours of playtime can't be attacked by other players, unless they are hostile.
-You get a class when two skills hit level 76, but won't get class abilities until you hit skill level 100.
 You can identify items to see how good they are, or which is better.
 To identify an item in your inventory when you're wearing something with the same name, try 'id 1.item'.
 You can create new slash-channels with /join.
