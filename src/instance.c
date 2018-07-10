@@ -46,6 +46,7 @@ extern int stats_get_sector_count(sector_data *sect);
 
 // locals
 bool can_instance(adv_data *adv);
+bool check_outside_fights(struct instance_data *inst);
 int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
@@ -1342,7 +1343,7 @@ void prune_instances(void) {
 		// look for completed or orphaned instances
 		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_CREATED(inst) + 60 * rule->value) < time(0))) {
 			// well, only if empty
-			if (count_players_in_instance(inst, TRUE, NULL) == 0) {
+			if (count_players_in_instance(inst, TRUE, NULL) == 0 && (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_CHECK_OUTSIDE_FIGHTS) || check_outside_fights(inst))) {
 				delete_instance(inst, TRUE);
 				save = TRUE;
 			}
@@ -1561,6 +1562,31 @@ void check_instance_is_loaded(struct instance_data *inst) {
 		instantiate_rooms(INST_ADVENTURE(inst), inst, INST_RULE(inst), INST_LOCATION(inst), INST_DIR(inst), INST_ROTATION(inst));
 		reset_instance(inst);
 	}
+}
+
+
+/**
+* Determines if it's safe to despawn an instance because there are no outside
+* fights going on.
+*
+* @param struct instance_data *inst The instance to check.
+* @return bool TRUE if it's okay to despawn; FALSE if instance mobs are fighting.
+*/
+bool check_outside_fights(struct instance_data *inst) {
+	char_data *mob;
+	
+	LL_FOREACH(character_list, mob) {
+		if (!FIGHTING(mob) || !IS_NPC(mob)) {
+			continue;	// not a mob / not fighting
+		}
+		if (MOB_INSTANCE_ID(mob) != INST_ID(inst)) {
+			continue;	// not from this instance
+		}
+		
+		return FALSE;	// oops: we found a mob from the instance, fighting
+	}
+	
+	return TRUE;	// safe
 }
 
 

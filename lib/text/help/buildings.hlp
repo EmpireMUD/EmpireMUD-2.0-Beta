@@ -110,7 +110,8 @@ require a direction that they'll face. Resources are added from left to right
 in the requirements list (you can't add nails before lumber).
 
 You can just get information on a building, like what it costs to build, by
-typing "build info <building>".
+typing 'build info <building>'. Typing 'build' by itself will resume work if
+you're in an incomplete building, or will list what you can build if not.
 
 You can't build on land that's inside another empire's city radius while at war
 with that empire.

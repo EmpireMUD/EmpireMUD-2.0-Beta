@@ -244,6 +244,7 @@ const char *adventure_flags[] = {
 	"CAN-DELAY-LOAD",	// 10
 	"IGNORE-WORLD-SIZE",
 	"IGNORE-ISLAND-LEVELS",
+	"CHECK-OUTSIDE-FIGHTS",
 	"\n"
 };
 

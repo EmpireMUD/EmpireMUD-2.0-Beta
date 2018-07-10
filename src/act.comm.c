@@ -615,9 +615,8 @@ struct slash_channel *create_slash_channel(char *name) {
 	
 	chan->id = ++top_slash_channel_id;
 	chan->name = str_dup(name);
-	lc = str_dup(buf);
-	strtolower(lc);
-	chan->lc_name = lc;
+	lc = str_dup(name);
+	chan->lc_name = strtolower(lc);
 	chan->color = compute_slash_channel_color(name);
 	
 	LL_APPEND(slash_channel_list, chan);

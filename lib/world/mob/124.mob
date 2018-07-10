@@ -332,6 +332,7 @@ A banded sea snake coils around your legs.
 0 0 bdj c
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1355 100.00 1  # SKIN: some snakeskin
 M
 0
 $n is a little too close for comfort.~

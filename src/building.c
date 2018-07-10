@@ -2132,7 +2132,7 @@ ACMD(do_paint) {
 		msg_to_char(ch, "Paint the building with what?\r\n");
 	}
 	else if (!(paint = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have that paint.\r\n");
+		msg_to_char(ch, "You don't seem to have that paint with.\r\n");
 	}
 	else if (!IS_PAINT(paint)) {
 		act("$p isn't paint!", FALSE, ch, paint, NULL, TO_CHAR);

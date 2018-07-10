@@ -98,7 +98,7 @@ The banshee familiar will use the following abilities in combat:
 - Heart-wrenching wail: -(level/30) Bonus-Physical/Magical on enemies (30 sec)
 - Blood-curdling wail: Magical DoT on enemies (30 sec)
 
-See also: DEBUFF, FAMILIAR
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS
 #
 "ASTRAL WEREWOLF FORM"
 
@@ -124,7 +124,7 @@ The basilisk familiar will use the following abilities in combat:
 - Basalt gaze: -(2+level/100) Wits on enemy (30 sec)
 - Granite gaze: -(15+level/25) To-Hit on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS
 #
 BREW
 
@@ -151,7 +151,8 @@ Chants have no beginning or end, but you can stop chanting by typing the
 command again.
 
 Unlike most timed actions, chants are not running on a timer. Their effect,
-if any, happens at random as you chant.
+if any, happens at random as you chant. Some chants have a higher random chance
+than others.
 
 See also: help for individual chants, like HELP CHANT OF NATURE
 #
@@ -221,7 +222,7 @@ Vampire synergy:
   Banshee (healer) - Debuffs the enemy.
 
 See also: HELP <NAME> FAMILIAR
-See also: SYNERGIES, FAMILIAR, MIRROR IMAGE
+See also: SYNERGIES, FAMILIAR, MIRROR IMAGE, SUPPORT FAMILIARS
 #
 CLEANSE
 
@@ -287,7 +288,7 @@ Natural Magic Synergy Ability: 100 Vampire
 
 Usage:  deathtouch [victim]
 Cooldown:  6 seconds
-Cost:  based on damage
+Cost:  mana, based on damage
 
 This fast spell deals instant damage to your victim, as the very essence of
 death seeps into him.
@@ -324,9 +325,8 @@ Linked trait: Intelligence
 Cost:  10+ mana, based on level
 
 This spell allows a nature mage to coat his or her allies in a powerful
-coating of earth, protecting them from some damage. It adds an amount of
-physical damage resistance equal to the caster's Natural Magic level divided by
-14, with a bonus based on Intelligence.
+coating of earth, protecting them from some damage. It adds damage resistances
+based on the caster's level and Intelligence.
 
 Gains experience when you cast this spell or when you take damage while using
 it.
@@ -580,7 +580,7 @@ The moon rabbit familiar will use the following abilities in combat:
 - Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
 - Moon's protection: +(level/5) Resist-Physical/Magical on the tank (30 sec)
 
-See also: BUFF, FAMILIAR
+See also: BUFF, FAMILIAR, BUFF FAMILIARS
 #
 MOONRISE
 
@@ -632,7 +632,7 @@ The owl shadow familiar will use the following abilities in combat:
 
 When you hide, this familiar will hide too.
 
-See also: BUFF, FAMILIAR
+See also: BUFF, FAMILIAR, BUFF FAMILIARS
 #
 "PHOENIX FAMILIAR"
 
@@ -646,7 +646,7 @@ The phoenix familiar will use the following abilities in combat:
 - Healing Fire: smaller heal for the whole party (instant)
 - Burning Passion: +(level/30) bonus physical/magical damage to party (30 sec)
 
-See also: BUFF, FAMILIAR
+See also: BUFF, FAMILIAR, BUFF FAMILIARS
 #
 PURIFY
 
@@ -763,7 +763,7 @@ The salamander familiar will use the following abilities in combat:
 - Guardian flames: +(15+level/25) Dodge on tank (10 sec)
 - Ember surge: +(level/30) Bonus-Physical/Magical on party (30 sec)
 
-See also: BUFF, FAMILIAR
+See also: BUFF, FAMILIAR, BUFF FAMILIARS
 #
 "SAVAGE WEREWOLF FORM"
 
@@ -791,7 +791,7 @@ The scorpion shadow familiar will use the following abilities in combat:
 
 When you hide, this familiar will hide too.
 
-See also: DEBUFF, FAMILIAR
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS
 #
 "SKELETAL HULK FAMILIAR"
 
@@ -868,7 +868,7 @@ The spirit wolf familiar will use the following abilities in combat:
 - Bark/Blurred Vision: -(15+level/25) To-Hit on enemy (30 sec)
 - Bite/Ghost Energy: Magical DoT on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS
 #
 "SUMMON ANIMALS"
 
@@ -885,6 +885,25 @@ take simple orders.
 Summon Animals gains experience when you use it, even if no animals appear.
 
 See also: ORDER
+#
+"SUPPORT FAMILIARS" "BUFF FAMILIARS" "DEBUFF FAMILIARS" "CASTER FAMILIARS"
+
+Usage: order <familiar> [status | random]
+       order <familiar> <ability>
+
+Some high-level familiars, instead of directly attacking the enemy or defending
+your party, have a set of support spells on a shared cooldown, which they cast
+to support the party or impede the enemy. By default, these familiars will
+select a random ability to use each time the cooldown ends, but they can be
+ordered (with the 'order' command) to use only a specific ability. This will
+only tell the familiar to use this ability at every future opportunity; it will
+not use the ability immediately.
+
+You can also order a support familiar to show you its currently selected
+ability, and a short list of its abilities, by ordering it to 'status', or
+reset it to using abilities at random by ordering it to 'random'.
+
+Support familiars will not remember your ability selection between summons.
 #
 STARSTRIKE "STAR STRIKE"
 

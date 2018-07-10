@@ -1297,6 +1297,7 @@ ACMD(do_accept) {
 
 ACMD(do_alternate) {
 	extern int isbanned(char *hostname);
+	extern bool has_anonymous_host(descriptor_data *desc);
 	extern bool member_is_timed_out_ch(char_data *ch);
 	extern const char *class_role[];
 	extern const char *class_role_color[];
@@ -1415,6 +1416,10 @@ ACMD(do_alternate) {
 		}
 		if (newch->desc || !IN_ROOM(newch)) {
 			msg_to_char(ch, "You can't switch to that character because someone is already playing it.\r\n");
+			return;
+		}
+		if (IS_APPROVED(newch) && has_anonymous_host(ch->desc)) {
+			msg_to_char(ch, "You can't switch to an approved character from an anonymous public host.\r\n");
 			return;
 		}
 		

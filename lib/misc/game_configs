@@ -223,6 +223,7 @@ join_empire_approval 1
 manage_empire_approval 1
 need_approval_string You must be approved before you can do that.
 quest_approval 1
+restrict_anonymous_hosts 1
 skill_gain_approval 1
 tell_approval 1
 terraform_approval 1

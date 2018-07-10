@@ -68,7 +68,7 @@ The following things will speed up various chores:
 - Weapon damage: chop, mine
 - Superior tool: craft, forge
 - Progression goals: excavate, prospect
-- Certain buildings: sew (tailor), craft (clay at potter)
+- Certain buildings: sew (tailor), weaving (tailor), craft (clay at potter)
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
 #
@@ -79,10 +79,18 @@ can reduce the chances of being attacked by aggro mobs.
 
 See also: MAJESTY
 #
-APPROVAL AUTHORIZATION AUTHORIZED APPROVED
+APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL APPROVED "ANONYMOUS HOST" "PUBLIC HOST" "ANONYMOUS PUBLIC HOST" MORTAPPROVE
 
-If this MUD is configured to require player approval, you need to contact the
-game's staff to find out how to become approved. Or, check the MOTD or website.
+Some MUDs require that characters are 'approved' before they are allowed to
+play the full game. Different EmpireMUDs configure this differently. In
+general, approval is required 
+
+By default, EmpireMUDs auto-approve all characters except ones that log in from
+anonymous public hosts. These are hosts that don't provide the game with your
+actual IP address. Characters that are created from anonymous hosts will not
+auto-approve, and approved characters cannot play from those hosts.
+
+If you require approval, contact any member of the immortal staff.
 
 Implementors: update this help file in: lib/text/help/info.hlp
 #
@@ -678,7 +686,7 @@ health, and you can enchant your gear to get even more.
 
 If you're knocked out with 0 health, you will die without assistance.
 
-See also: CLASS, DEATH, ENDURANCE
+See also: DEATH, ENDURANCE
 #
 HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
 
@@ -820,7 +828,7 @@ The mana pool is the amount of magical energy you can channel before you must
 stop to recover some. All players begin with 50 mana points. Some abilities and
 gear give you a larger mana pool, and you can enchant gear to get even more.
 
-See also: ARCANE POWER, CLASS, GIFT OF NATURE, SOLAR POWER
+See also: ARCANE POWER, GIFT OF NATURE, SOLAR POWER
 #
 MAPSCAN "MAP SCAN"
 

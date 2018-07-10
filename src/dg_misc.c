@@ -1043,6 +1043,9 @@ void script_heal(void *thing, int type, char *argument) {
 		script_log("%s script_heal: Unable to find target: %s", log_root, targ_arg);
 		return;
 	}
+	if (IS_DEAD(victim)) {
+		return;	// fail silently on dead people
+	}
 	
 	// process scale arg (optional)
 	if (*scale_arg && (scale = atof(scale_arg)) < 1) {

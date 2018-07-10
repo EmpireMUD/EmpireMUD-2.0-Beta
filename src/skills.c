@@ -1009,7 +1009,7 @@ bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount) {
 
 	// this allows bonus skillups...
 	if (GET_DAILY_BONUS_EXPERIENCE(ch) <= 0) {
-		amount /= 50.0;
+		amount /= 25.0;
 	}
 	
 	// gain the exp
