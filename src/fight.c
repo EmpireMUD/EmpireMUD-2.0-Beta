@@ -3390,7 +3390,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_CLAWS, 2);
 			}
-			if (!IS_NPC(ch) && GET_EQ(ch, WEAR_WIELD) && IS_BLOOD_WEAPON(GET_EQ(ch, WEAR_WIELD)) && w_type == TYPE_SLASH && can_gain_exp_from(ch, victim)) {
+			if (!IS_NPC(ch) && GET_EQ(ch, WEAR_WIELD) && IS_BLOOD_WEAPON(GET_EQ(ch, WEAR_WIELD)) && w_type == GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) && can_gain_exp_from(ch, victim)) {
+				// this verifies w_type to make sure it's a normal weapon attack
 				gain_ability_exp(ch, ABIL_READY_BLOOD_WEAPONS, 2);
 			}
 			
