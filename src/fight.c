@@ -1458,7 +1458,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 	
 	// coins?
-	if (killer && !IS_NPC(killer) && (!GET_LOYALTY(mob) || GET_LOYALTY(mob) == GET_LOYALTY(killer) || char_has_relationship(killer, mob, DIPL_WAR))) {
+	if (killer && !IS_NPC(killer) && (!GET_LOYALTY(mob) || GET_LOYALTY(mob) == GET_LOYALTY(killer) || char_has_relationship(killer, mob, DIPL_WAR | DIPL_THIEVERY))) {
 		coins = mob_coins(mob);
 		coin_emp = GET_LOYALTY(mob);
 		if (coins > 0) {
@@ -2289,6 +2289,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 	extern bitvector_t pk_ok;
 	
 	empire_data *ch_emp, *victim_emp;
+	obj_data *obj;
 
 	if (!ch || !victim) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: can_fight() called without ch or victim");
@@ -2374,6 +2375,14 @@ bool can_fight(char_data *ch, char_data *victim) {
 	if (IS_PVP_FLAGGED(ch) && IS_PVP_FLAGGED(victim)) {
 		return TRUE;
 	}
+	// is stealing from you
+	if (GET_LOYALTY(ch)) {
+		LL_FOREACH2(victim->carrying, obj, next_content) {
+			if (IS_STOLEN(obj) && obj->last_empire_id == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+				return TRUE;	// has at least 1 stolen obj in inventory
+			}
+		}
+	}
 
 	// playtime
 	if (!has_one_day_playtime(ch) || !has_one_day_playtime(victim)) {
@@ -2386,7 +2395,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return TRUE;
 
 	if (IS_SET(pk_ok, PK_WAR)) {
-		if (has_relationship(ch_emp, victim_emp, DIPL_WAR)) {
+		if (has_relationship(ch_emp, victim_emp, DIPL_WAR) || has_relationship(victim_emp, ch_emp, DIPL_THIEVERY)) {
 			return TRUE;
 		}
 

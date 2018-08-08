@@ -1926,7 +1926,10 @@ This toggle prevents you from accidentally performing stealth actions (for
 example picking up an item on another empire's territory). It must be enabled
 in order to use most PvP stealth commands.
 
-See also: GET, INFILTRATE, PICKPOCKET, STEAL, TOGGLE
+You must still have thievery permission (from diplomacy) and stealth privilege
+(from your empire) to steal.
+
+See also: GET, INFILTRATE, PICKPOCKET, STEAL, TOGGLE, DIPLOMACY, PRIVILEGE
 #
 STOP
 

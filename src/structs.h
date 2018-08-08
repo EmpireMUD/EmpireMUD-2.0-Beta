@@ -1056,7 +1056,7 @@ typedef struct vehicle_data vehicle_data;
 // DIPL_x: Diplomacy types
 #define DIPL_PEACE  BIT(0)	// At peace
 #define DIPL_WAR  BIT(1)	// At war
-	// 2 is unused
+#define DIPL_THIEVERY  BIT(2)	// Can steal/thieve
 #define DIPL_ALLIED  BIT(3)	// In an alliance
 #define DIPL_NONAGGR  BIT(4)	// In a non-aggression pact
 #define DIPL_TRADE  BIT(5)	// Open trading
@@ -1064,7 +1064,7 @@ typedef struct vehicle_data vehicle_data;
 #define DIPL_TRUCE  BIT(7)	// end of war but not peace
 
 // combo of all of them
-#define ALL_DIPLS  (DIPL_PEACE | DIPL_WAR | DIPL_ALLIED | DIPL_NONAGGR | DIPL_TRADE | DIPL_DISTRUST | DIPL_TRUCE)
+#define ALL_DIPLS  (DIPL_PEACE | DIPL_WAR | DIPL_THIEVERY | DIPL_ALLIED | DIPL_NONAGGR | DIPL_TRADE | DIPL_DISTRUST | DIPL_TRUCE)
 #define ALL_DIPLS_EXCEPT(flag)  (ALL_DIPLS & ~(flag))
 #define CORE_DIPLS  ALL_DIPLS_EXCEPT(DIPL_TRADE)
 

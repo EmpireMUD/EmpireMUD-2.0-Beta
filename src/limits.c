@@ -964,6 +964,17 @@ void check_wars(void) {
 					log_to_empire(enemy, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(emp));
 				}
 			}
+			// check for a theivery permit that's over a day
+			if (IS_SET(pol->type, DIPL_THIEVERY) && pol->start_time < (time(0) - SECS_PER_REAL_DAY)) {
+				enemy = real_empire(pol->id);
+				
+				// remove war, set distrust
+				REMOVE_BIT(pol->type, DIPL_THIEVERY);
+				pol->start_time = time(0);
+								
+				syslog(SYS_INFO, 0, TRUE, "DIPL: %s's thievery permit against %s has timed out", EMPIRE_NAME(emp), EMPIRE_NAME(enemy));
+				log_to_empire(emp, ELOG_DIPLOMACY, "The thievery permit against %s has timed out", EMPIRE_NAME(enemy));
+			}
 		}
 	}
 }
