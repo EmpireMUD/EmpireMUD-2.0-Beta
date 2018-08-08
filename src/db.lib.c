@@ -2370,14 +2370,19 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 		exit(1);
 	}
 
-	if (sscanf(line, "%d %ld %d", &t[0], &long_in, &t[1]) != 3) {
-		log("SYSERR: Format error in numeric line of empire #%d", vnum);
-		exit(1);
+	if (sscanf(line, "%d %ld %d %s", &t[0], &long_in, &t[1], str_in) != 4) {
+		// backwards-compatibility if no flags
+		strcpy(str_in, "0");
+		if (sscanf(line, "%d %ld %d", &t[0], &long_in, &t[1]) != 3) {
+			log("SYSERR: Format error in data line of empire #%d", vnum);
+			exit(1);
+		}
 	}
 
 	emp->leader = t[0];
 	emp->create_time = long_in;
 	emp->num_ranks = t[1];
+	emp->admin_flags = asciiflag_conv(str_in);
 	
 	emp->members = 0;
 	emp->greatness = 0;
@@ -2803,7 +2808,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	fprintf(fl, "%s~\n", NULLSAFE(EMPIRE_NAME(emp)));
 	fprintf(fl, "%s~\n", NULLSAFE(EMPIRE_ADJECTIVE(emp)));
 	fprintf(fl, "%s~\n", NULLSAFE(EMPIRE_BANNER(emp)));
-	fprintf(fl, "%d %ld %d\n", EMPIRE_LEADER(emp), EMPIRE_CREATE_TIME(emp), EMPIRE_NUM_RANKS(emp));
+	fprintf(fl, "%d %ld %d %s\n", EMPIRE_LEADER(emp), EMPIRE_CREATE_TIME(emp), EMPIRE_NUM_RANKS(emp), bitv_to_alpha(EMPIRE_ADMIN_FLAGS(emp)));
 	
 	// A: description
 	if (EMPIRE_DESCRIPTION(emp) && *EMPIRE_DESCRIPTION(emp)) {
