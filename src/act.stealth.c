@@ -166,7 +166,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
-	if (count_members_online(emp) == 0) {
+	if (count_members_online(emp) == 0 && !has_relationship(chemp, emp, DIPL_WAR | DIPL_THIEVERY)) {
 		msg_to_char(ch, "There are no members of %s online.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
 	}
