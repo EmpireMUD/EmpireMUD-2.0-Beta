@@ -4373,6 +4373,17 @@ struct offense_info_type {
 };
 
 
+// records recent thefts in the empire
+struct theft_log {
+	obj_vnum vnum;
+	int amount;
+	long time_minutes;	// timestamp to the nearest minute
+						// NOTE: Theft logs are always stored in descending time
+	
+	struct theft_log *next;	// linked list
+};
+
+
 // temporarily logs any errors that come up during workforce
 struct workforce_log {
 	any_vnum loc;	// don't store room itself -- may not be in memory later
@@ -4419,6 +4430,7 @@ struct empire_data {
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
+	struct theft_log *theft_logs;	// recently stolen items
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

@@ -379,6 +379,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 	extern bool can_steal(char_data *ch, empire_data *emp);
 	extern bool can_take_obj(char_data *ch, obj_data *obj);
 	extern bool get_check_money(char_data *ch, obj_data *obj);
+	void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
 	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 	
 	bool stealing = FALSE;
@@ -419,6 +420,8 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM | TO_QUEUE);
 			
 			if (stealing) {
+				record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
+				
 				if (emp && IS_IMMORTAL(ch)) {
 					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
 				}
