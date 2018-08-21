@@ -588,7 +588,7 @@ dg_affect #12430 %actor% HARD-STUNNED on 20
 if !%keep_attacking%
   dg_affect #12428 %self% HARD-STUNNED on 20
 end
-while %actor.affect(12430)% do
+while %actor.affect(12430)%
   %send% %actor% &r%self.name% constricts and crushes you!
   %damage% %actor% 50 physical
   wait 5 sec
