@@ -1,0 +1,283 @@
+#16000
+goblin necromancer necrogoblin~
+the necrogoblin~
+The goblin necromancer is chanting here.
+~
+125 200 adxB cd
+1 0 0 20
+I 4 16004 5.00 1 i  # LOOT: a rib bone dagger
+I 4 16008 5.00 1 i  # LOOT: a stapes earring
+I 4 16009 5.00 1 i  # LOOT: an ear bone ring
+I 4 16010 5.00 1 i  # LOOT: a sternum shield
+I 4 16012 5.00 1 i  # LOOT: a spinal whip
+I 4 16013 5.00 1 i  # LOOT: a necklace of human teeth
+I 4 16014 5.00 1 i  # LOOT: a radius bow
+I 4 16015 5.00 1 i  # LOOT: waste band
+I 4 16002 5.00 1 r  # LOOT: an astrakhan cloak
+I 4 16003 75.00 1 r  # LOOT: a silver skull
+I 4 16007 10.00 1 r  # LOOT: a bag of bone dust
+I 4 16006 10.00 2 r  # LOOT: a long bone
+I 4 10504 1.00 1 t  # LOOT: a dragon's tooth
+I 4 16011 40.00 1 t  # LOOT: a corrupted dragon's tooth
+I 4 16011 4.00 2 t  # LOOT: a corrupted dragon's tooth
+M
+1
+My love will never be complete with you bothering me. Be gone, or contribute to my understanding of death!~
+M
+3
+The sun has gone down, time to continue my work.~
+M
+2
+Dragon's teeth wake the dead, but how? How?!~
+M
+4
+$n turns a dragon's tooth over and over in $s hands.~
+M
+5
+$n spins a skull round and round on $s hand.~
+T 16001
+T 16002
+T 16003
+T 16004
+S
+#16001
+skeleton warrior skeletal~
+a skeletal warrior~
+A skeletal warrior rattles here.
+~
+125 200 acdhop cG
+0 0 22 15
+I 4 16005 100.00 1  # LOOT: a crushed skeleton
+I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
+I 4 16008 4.00 1 i  # LOOT: a stapes earring
+I 4 16009 4.00 1 i  # LOOT: an ear bone ring
+I 4 16010 4.00 1 i  # LOOT: a sternum shield
+I 4 16012 4.00 1 i  # LOOT: a spinal whip
+I 4 16013 4.00 1 i  # LOOT: a necklace of human teeth
+I 4 16014 4.00 1 i  # LOOT: a radius bow
+I 4 16015 4.00 1 i  # LOOT: waste band
+T 16007
+S
+#16002
+skeleton soldier skeletal~
+a skeletal soldier~
+A skeletal soldier rattles here.
+~
+125 200 acdhopz cqG
+0 0 22 1
+I 4 16005 100.00 1  # LOOT: a crushed skeleton
+I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
+I 4 16008 4.00 1 i  # LOOT: a stapes earring
+I 4 16009 4.00 1 i  # LOOT: an ear bone ring
+I 4 16010 4.00 1 i  # LOOT: a sternum shield
+I 4 16012 4.00 1 i  # LOOT: a spinal whip
+I 4 16013 4.00 1 i  # LOOT: a necklace of human teeth
+I 4 16014 4.00 1 i  # LOOT: a radius bow
+I 4 16015 4.00 1 i  # LOOT: waste band
+T 16007
+S
+#16003
+rawhead~
+the rawhead~
+The rawhead looms here.
+~
+125 200 acdghopyA ciwEG
+0 0 26 15
+I 4 16005 100.00 1  # LOOT: a crushed skeleton
+I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
+I 4 16008 4.00 1 i  # LOOT: a stapes earring
+I 4 16009 4.00 1 i  # LOOT: an ear bone ring
+I 4 16010 4.00 1 i  # LOOT: a sternum shield
+I 4 16012 4.00 1 i  # LOOT: a spinal whip
+I 4 16013 4.00 1 i  # LOOT: a necklace of human teeth
+I 4 16014 4.00 1 i  # LOOT: a radius bow
+I 4 16015 4.00 1 i  # LOOT: waste band
+T 16007
+S
+#16004
+mess bone natural materials~
+a mess~
+A mess of bone and natural materials stands here.
+~
+125 200 dh cG
+0 0 13 15
+I 4 16005 18.00 1 d  # LOOT: a crushed skeleton
+I 4 16008 1.00 1 d  # LOOT: a stapes earring
+I 4 16009 1.00 1 d  # LOOT: an ear bone ring
+I 4 16010 1.00 1 d  # LOOT: a sternum shield
+I 4 16012 1.00 1 d  # LOOT: a spinal whip
+I 4 16013 1.00 1 d  # LOOT: a necklace of human teeth
+I 4 16014 1.00 1 d  # LOOT: a radius bow
+I 4 16015 1.00 1 d  # LOOT: waste band
+I 4 16006 30.00 1 d  # LOOT: a long bone
+I 4 16006 20.00 2 d  # LOOT: a long bone
+I 4 16006 15.00 3 d  # LOOT: a long bone
+T 16006
+S
+#16005
+plant skeletal skeleton~
+the skeletal plant~
+A skeleton with leaves for flesh and vines for veins sways here.
+~
+125 200 bdhxzA cwABG
+2 0 0 15
+I 4 16011 5.00 1 i  # LOOT: a corrupted dragon's tooth
+I 4 16002 25.00 1 i  # LOOT: an astrakhan cloak
+I 4 16008 12.00 1 i  # LOOT: a stapes earring
+I 4 16009 12.00 1 i  # LOOT: an ear bone ring
+I 4 16013 12.00 1 i  # LOOT: a necklace of human teeth
+I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
+I 4 16005 35.00 1 k  # LOOT: a crushed skeleton
+I 4 16006 20.00 2 k  # LOOT: a long bone
+I 4 16006 40.00 1 k  # LOOT: a long bone
+I 4 16007 5.00 1 k  # LOOT: a bag of bone dust
+M
+1
+My husband hasn't finished his work on me yet, but soon.~
+M
+1
+You'll never make it past the guards to my husband's chambers.~
+M
+2
+The daylight is hard on my newly undead eyes, not that you can see it from here.~
+T 16006
+T 16008
+S
+#16006
+guard skeleton skeletal~
+a skeletal guard~
+A skeleton in what is clearly a guard's uniform stands here.
+~
+125 200 abdhz cqG
+0 0 0 4
+I 4 16005 100.00 1  # LOOT: a crushed skeleton
+I 4 16014 15.00 1 w  # LOOT: a radius bow
+I 4 16012 15.00 1 w  # LOOT: a spinal whip
+I 4 16004 15.00 1 w  # LOOT: a rib bone dagger
+I 4 16010 15.00 1 w  # LOOT: a sternum shield
+M
+0
+$n brings $s weapon to guard and seems to be grinning.~
+M
+1
+You won't make it to the master. Well, not alive anyway.~
+M
+1
+You're going to die here.~
+T 16006
+T 16007
+S
+#16007
+guard skeleton skeletal~
+a skeletal guard~
+A skeleton in what is clearly a guard's uniform stands here.
+~
+125 200 adhz cqG
+0 0 0 4
+I 4 16005 100.00 1  # LOOT: a crushed skeleton
+I 4 16008 3.00 1 a  # LOOT: a stapes earring
+I 4 16009 3.00 1 a  # LOOT: an ear bone ring
+I 4 16015 3.00 1 a  # LOOT: waste band
+I 4 16010 7.00 1 a  # LOOT: a sternum shield
+M
+0
+$n brings $s weapon to guard and seems to be grinning.~
+M
+1
+You won't make it to the master. Well, not alive anyway.~
+M
+1
+You're going to die here.~
+T 16006
+T 16007
+S
+#16008
+horse fragmented bone~
+a horse made of fragmented bone~
+A horse made up of fragmented bone stands here.
+~
+125 200 deh G
+0 0 22 11
+T 16010
+S
+#16009
+horse vine~
+a viney horse~
+A horse made up of more vine than anything else sways here.
+~
+125 200 deh G
+0 0 14 15
+T 16010
+S
+#16010
+construct skeleton skeletal~
+a skeletal construct~
+A skeletal construct, made of many different creatures stands here.
+~
+125 200 deh G
+0 0 22 9
+T 16010
+S
+#16011
+construct plants~
+a plant construct~
+A construct made up of various plants sways here.
+~
+125 200 deh G
+0 0 13 7
+T 16010
+S
+#16012
+skeleton beastial plant~
+a beastial plant skeleton~
+A beastial plant skeleton thing rages here.
+~
+14 0 cdkoyzB ciG
+0 0 0 15
+S
+#16013
+dracolich skeletal~
+a skeletal dracolich~
+A skeletal dracolich stands here with flames in its eyes.
+~
+125 200 deh mG
+0 0 25 12
+T 16010
+S
+#16014
+dragon viney~
+a viney dragon~
+A viney dragon looks to have grown up out of the ground.
+~
+125 200 deh mG
+0 0 25 15
+T 16010
+S
+#16015
+shark viney plant~
+a viney shark~
+A shark made up entirely of vines and other plant life swims here.
+~
+125 200 dehl 0
+0 0 6 9
+T 16010
+S
+#16016
+hawk skeletal giant~
+a giant skeletal hawk~
+A giant skeletal hawk hovers here.
+~
+125 200 deh m
+0 0 2 26
+T 16010
+S
+#16017
+bird leafy leaves~
+a leafy bird~
+A bird with leaves for feathers hovers here.
+~
+125 200 deh m
+0 0 2 26
+T 16010
+S
+$

@@ -1,0 +1,241 @@
+#16000
+An Earthen Tunnel~
+   With a rounded roof, walls, and even a slightly rounded floor, this is
+clearly not a finished tunnel. Scratches and roughly pressed dirt give an
+impression of utility and not beauty, while strange tracks seem to indicate
+something uncommon has taken up residence.
+~
+cd 0 0
+D9
+~
+0 16001
+I 5 101 1.00 1 g  # DIG: a lump of clay
+I 5 103 3.00 1 g  # DIG: a yellow lightning stone
+I 5 104 3.00 1 g  # DIG: a red bloodstone
+I 5 102 10.00 1 g  # DIG: a flint stone
+I 5 100 83.00 1 g  # DIG: a rock
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+T 16000
+S
+#16001
+A Hollowed Out Cavern~
+   Here the tunnel opens up into a cavern. While still not large, there is a
+clear feel of empty space that was absent before. All around, those same tracks
+from before can be seen, moving back and forth across the floor.
+~
+bg 0 0
+D8
+~
+0 16000
+D14
+~
+0 16002
+D14
+~
+0 16003
+I 5 101 1.00 1 g  # DIG: a lump of clay
+I 5 103 3.00 1 g  # DIG: a yellow lightning stone
+I 5 104 3.00 1 g  # DIG: a red bloodstone
+I 5 102 10.00 1 g  # DIG: a flint stone
+I 5 100 83.00 1 g  # DIG: a rock
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+M 0 16004 60.00 4
+S
+#16002
+Experimentation Chamber~
+   All throughout this chamber you see signs of horrific experiments going on:
+here a dragon's tooth embedded in the skull of some animal, there vines growing
+through a skeleton in mimicry of a circulatory system. It seems someone has
+been trying to use nature magic to resurrect the long since dead.
+~
+bg 0 0
+D14
+~
+0 16001
+I 5 101 1.00 1 g  # DIG: a lump of clay
+I 5 103 3.00 1 g  # DIG: a yellow lightning stone
+I 5 104 3.00 1 g  # DIG: a red bloodstone
+I 5 102 10.00 1 g  # DIG: a flint stone
+I 5 100 83.00 1 g  # DIG: a rock
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+M 0 16004 60.00 4
+M 0 16005 100.00 1
+S
+#16003
+A Small Tunnel~
+   This tunnel leads off of the central meeting area, as shown by the tracks,
+and leads further down into the ground. Far less tracks can be found here, and
+only half of them are the strange looking ones from before. Other noticeable
+tracks are clearly from goblin feet.
+~
+bg 0 0
+D14
+~
+0 16001
+D1
+~
+0 16004
+I 5 101 1.00 1 g  # DIG: a lump of clay
+I 5 103 3.00 1 g  # DIG: a yellow lightning stone
+I 5 104 3.00 1 g  # DIG: a red bloodstone
+I 5 102 10.00 1 g  # DIG: a flint stone
+I 5 100 83.00 1 g  # DIG: a rock
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+M 0 16004 60.00 4
+M 0 16004 100.00 4
+S
+#16004
+A Structurally Sound Tunnel~
+   The further down you go, the more solid the walls and ceiling seem to
+become. It almost seems as though someone worked from underground up. The
+abnormal tracks are almost completely gone from the floor now, and just the
+goblin footsteps show up as signs of constant passage.
+~
+bg 0 0
+D3
+~
+0 16003
+D1
+~
+0 16005
+I 5 101 1.00 1 g  # DIG: a lump of clay
+I 5 103 3.00 1 g  # DIG: a yellow lightning stone
+I 5 104 3.00 1 g  # DIG: a red bloodstone
+I 5 102 10.00 1 g  # DIG: a flint stone
+I 5 100 83.00 1 g  # DIG: a rock
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+M 0 16004 60.00 4
+M 0 16007 100.00 2
+S
+#16005
+The Guard Room~
+   Coming to the end of the tunnel, you're in yet another chamber. This time,
+however, the chamber is almost modern in its construction. There's no chance of
+finding tracks on the floor, because it is made of some sort of smoothed stone.
+The walls are striped by supports and even the ceiling shows signs of some
+solid workmanship.
+~
+bdg 0 0
+D3
+~
+0 16004
+D9
+~
+0 16007
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+M 0 16006 100.00 2
+M 0 16006 100.00 2
+S
+#16006
+The Goblin's Altar~
+   Darkness cloaks this altar, more than just the dark of being underground.
+An almost tangible cloud of wrongness blankets the room. The scent of blood is
+strong, and probably could be felt too, if you were willing to place a hand on
+the ritual stones.
+~
+bg a 0
+D2
+~
+0 16007
+D7
+~
+0 16008
+D1
+~
+0 16009
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+M 0 16000 100.00 1
+S
+#16007
+The Goblin's Chambers~
+   The walls here are made of lovingly crafted stone and covered in what seems
+to be several runic languages. Years of work are clearly displayed in the
+writing alone, but also in the tomes littering the floor.
+~
+bg 0 0
+D0
+~
+0 16006
+D8
+~
+0 16005
+D1
+~
+0 16008
+D5
+~
+0 16009
+I 5 101 1.00 1 g  # DIG: a lump of clay
+I 5 103 3.00 1 g  # DIG: a yellow lightning stone
+I 5 104 3.00 1 g  # DIG: a red bloodstone
+I 5 102 10.00 1 g  # DIG: a flint stone
+I 5 100 83.00 1 g  # DIG: a rock
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+S
+#16008
+The Goblin's Chambers~
+   The walls here are made of lovingly crafted stone and covered in what seems
+to be several runic languages. Years of work are clearly displayed in the
+writing alone, but also in the tomes littering the floor.
+~
+bg 0 0
+D3
+~
+0 16007
+D0
+~
+0 16009
+D4
+~
+0 16006
+I 5 101 1.00 1 g  # DIG: a lump of clay
+I 5 103 3.00 1 g  # DIG: a yellow lightning stone
+I 5 104 3.00 1 g  # DIG: a red bloodstone
+I 5 102 10.00 1 g  # DIG: a flint stone
+I 5 100 83.00 1 g  # DIG: a rock
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+S
+#16009
+The Goblin's Chambers~
+   The walls here are made of lovingly crafted stone and covered in what seems
+to be several runic languages. Years of work are clearly displayed in the
+writing alone, but also in the tomes littering the floor.
+~
+bg 0 0
+D3
+~
+0 16006
+D6
+~
+0 16007
+D2
+~
+0 16008
+I 5 101 1.00 1 g  # DIG: a lump of clay
+I 5 103 3.00 1 g  # DIG: a yellow lightning stone
+I 5 104 3.00 1 g  # DIG: a red bloodstone
+I 5 102 10.00 1 g  # DIG: a flint stone
+I 5 100 83.00 1 g  # DIG: a rock
+I 6 16001 10.00 3 r  # FORAGE: an oversized earthworm
+I 6 16001 35.00 2 r  # FORAGE: an oversized earthworm
+I 6 16001 55.00 1 r  # FORAGE: an oversized earthworm
+S
+$
