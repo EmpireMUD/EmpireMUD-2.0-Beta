@@ -996,6 +996,11 @@ bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc) {
 				return TRUE;
 			}
 		}
+		if ((pol = find_relation(enemy, emp))) {	// the reverse
+			if (IS_SET(pol->type, DIPL_THIEVERY) && (distrustful && !empire_is_friendly(enemy, emp))) {
+				return TRUE;
+			}
+		}
 	}
 
 	return (distrustful && !empire_is_friendly(emp, enemy));

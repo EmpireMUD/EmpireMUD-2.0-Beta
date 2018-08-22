@@ -1056,7 +1056,7 @@ typedef struct vehicle_data vehicle_data;
 // DIPL_x: Diplomacy types
 #define DIPL_PEACE  BIT(0)	// At peace
 #define DIPL_WAR  BIT(1)	// At war
-	// 2 is unused
+#define DIPL_THIEVERY  BIT(2)	// Can steal/thieve
 #define DIPL_ALLIED  BIT(3)	// In an alliance
 #define DIPL_NONAGGR  BIT(4)	// In a non-aggression pact
 #define DIPL_TRADE  BIT(5)	// Open trading
@@ -1064,7 +1064,7 @@ typedef struct vehicle_data vehicle_data;
 #define DIPL_TRUCE  BIT(7)	// end of war but not peace
 
 // combo of all of them
-#define ALL_DIPLS  (DIPL_PEACE | DIPL_WAR | DIPL_ALLIED | DIPL_NONAGGR | DIPL_TRADE | DIPL_DISTRUST | DIPL_TRUCE)
+#define ALL_DIPLS  (DIPL_PEACE | DIPL_WAR | DIPL_THIEVERY | DIPL_ALLIED | DIPL_NONAGGR | DIPL_TRADE | DIPL_DISTRUST | DIPL_TRUCE)
 #define ALL_DIPLS_EXCEPT(flag)  (ALL_DIPLS & ~(flag))
 #define CORE_DIPLS  ALL_DIPLS_EXCEPT(DIPL_TRADE)
 
@@ -4373,6 +4373,17 @@ struct offense_info_type {
 };
 
 
+// records recent thefts in the empire
+struct theft_log {
+	obj_vnum vnum;
+	int amount;
+	long time_minutes;	// timestamp to the nearest minute
+						// NOTE: Theft logs are always stored in descending time
+	
+	struct theft_log *next;	// linked list
+};
+
+
 // temporarily logs any errors that come up during workforce
 struct workforce_log {
 	any_vnum loc;	// don't store room itself -- may not be in memory later
@@ -4419,6 +4430,7 @@ struct empire_data {
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
+	struct theft_log *theft_logs;	// recently stolen items
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

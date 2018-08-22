@@ -97,7 +97,7 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
-	if (GET_RANK(ch) < EMPIRE_PRIV(chemp, PRIV_STEALTH) && (!pol || !IS_SET(pol->type, DIPL_WAR))) {
+	if (GET_RANK(ch) < EMPIRE_PRIV(chemp, PRIV_STEALTH) && (!pol || !IS_SET(pol->type, DIPL_WAR | DIPL_THIEVERY))) {
 		msg_to_char(ch, "You don't have permission from your empire to infiltrate others. Are you trying to start a war?\r\n");
 		return FALSE;
 	}
@@ -145,6 +145,11 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
+	if (!chemp || !has_relationship(chemp, emp, DIPL_WAR | DIPL_THIEVERY)) {
+		msg_to_char(ch, "You need a thievery permit (using the diplomacy command) to steal from that empire.\r\n");
+		return FALSE;
+	}
+	
 	if (EMPIRE_IMM_ONLY(emp)) {
 		msg_to_char(ch, "You can't steal from immortal empires.\r\n");
 		return FALSE;
@@ -161,7 +166,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
-	if (count_members_online(emp) == 0) {
+	if (count_members_online(emp) == 0 && !has_relationship(chemp, emp, DIPL_WAR | DIPL_THIEVERY)) {
 		msg_to_char(ch, "There are no members of %s online.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
 	}
@@ -178,7 +183,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
-	if (GET_RANK(ch) < EMPIRE_PRIV(chemp, PRIV_STEALTH) && (!pol || !IS_SET(pol->type, DIPL_WAR))) {
+	if (GET_RANK(ch) < EMPIRE_PRIV(chemp, PRIV_STEALTH) && (!pol || !IS_SET(pol->type, DIPL_WAR | DIPL_THIEVERY))) {
 		msg_to_char(ch, "You don't have permission from your empire to steal from others. Are you trying to start a war?\r\n");
 		return FALSE;
 	}
@@ -1099,10 +1104,10 @@ ACMD(do_pickpocket) {
 	else if ((ch_emp = GET_LOYALTY(ch)) && (vict_emp = GET_LOYALTY(vict)) && has_relationship(ch_emp, vict_emp, DIPL_ALLIED | DIPL_NONAGGR)) {
 		msg_to_char(ch, "You can't pickpocket mobs you are allied or have a non-aggression pact with.\r\n");
 	}
-	else if (ch_emp && vict_emp && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_STEALTH) && !has_relationship(ch_emp, vict_emp, DIPL_WAR)) {
+	else if (ch_emp && vict_emp && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_STEALTH) && !has_relationship(ch_emp, vict_emp, DIPL_WAR | DIPL_THIEVERY)) {
 		msg_to_char(ch, "You don't have permission to steal that -- you could start a war!\r\n");
 	}
-	else if (ch_emp && vict_emp && !PRF_FLAGGED(ch, PRF_STEALTHABLE) && !has_relationship(ch_emp, vict_emp, DIPL_WAR)) {
+	else if (ch_emp && vict_emp && !PRF_FLAGGED(ch, PRF_STEALTHABLE) && !has_relationship(ch_emp, vict_emp, DIPL_WAR | DIPL_THIEVERY)) {
 		msg_to_char(ch, "You cannot pickpocket that target because your 'stealthable' toggle is off.\r\n");
 	}
 	else if (FIGHTING(vict)) {
@@ -1118,7 +1123,7 @@ ACMD(do_pickpocket) {
 		check_scaling(vict, ch);
 
 		// some random coins (negative coins are not given)
-		if (MOB_FLAGGED(vict, MOB_HUMAN) && (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR))) {
+		if (MOB_FLAGGED(vict, MOB_HUMAN) && (!GET_LOYALTY(vict) || GET_LOYALTY(vict) == GET_LOYALTY(ch) || char_has_relationship(ch, vict, DIPL_WAR | DIPL_THIEVERY))) {
 			coins = mob_coins(vict);
 		}
 		else {
@@ -1470,7 +1475,7 @@ ACMD(do_shadowstep) {
 		was_in = IN_ROOM(ch);
 		infil = !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED);
 		
-		if (infil && emp && GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_WAR)) {
+		if (infil && emp && GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_WAR | DIPL_THIEVERY)) {
 			if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
 				msg_to_char(ch, "You cannot shadowstep there while your 'stealthable' toggle is off.\r\n");
 				return;

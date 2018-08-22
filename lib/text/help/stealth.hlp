@@ -475,9 +475,11 @@ You can also steal stored resources. If you type "steal" in a storage room or
 building, it will list what you can steal there. Type "steal <item>" to take
 one.
 
+You need a thievery permit to steal from an empire.
+
 Gains experience when you steal something.
 
-See also: VAULTCRACKING
+See also: VAULTCRACKING, THIEVERY PERMIT
 #
 "SUMMON THUG"
 

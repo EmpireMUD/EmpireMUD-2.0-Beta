@@ -146,8 +146,8 @@ if !%actor.is_pc% || %actor.nohassle%
   halt
 end
 if %self.varexists(gave_gifts)%
-wait 4
-%echo% %self.name% seems to be out of gifts!
+  wait 4
+  %echo% %self.name% seems to be out of gifts!
   halt
 end
 wait 1 sec

@@ -46,6 +46,7 @@
 *   Room Template Lib
 *   Sector Lib
 *   Stored Event Lib
+*   Theft Lib
 *   Trigger Lib
 *   Core Lib Functions
 *   Index Saving
@@ -78,6 +79,7 @@ int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 empire_vnum find_free_empire_vnum(void);
+void free_theft_logs(struct theft_log *list);
 void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 void parse_generic_name_file(FILE *fl, char *err_str);
@@ -85,6 +87,7 @@ void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part)
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
+struct theft_log *reduce_theft_logs_and_get_recent(empire_data *emp);
 PLAYER_UPDATE_FUNC(send_all_players_to_nowhere);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
@@ -2027,6 +2030,8 @@ void free_empire(empire_data *emp) {
 		free(wf_log);
 	}
 	
+	free_theft_logs(EMPIRE_THEFT_LOGS(emp));
+	
 	// free goals
 	free_empire_goals(EMPIRE_GOALS(emp));
 	free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
@@ -2153,6 +2158,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct shipping_data *shipd, *last_shipd = NULL;
 	struct empire_storage_data *store;
+	struct theft_log *tft;
 	obj_data *obj, *proto;
 	
 	if (!fl || !emp) {
@@ -2197,6 +2203,19 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				else {
 					log("- removing %dx #%d from empire storage for %s: no such object", t[1], t[0], EMPIRE_NAME(emp));
 				}
+				break;
+			}
+			case 'T': {	// theft logs
+				if (sscanf(line, "T %d %d %ld", &t[0], &t[1], &l_in) != 3) {
+					log("SYSERR: Invalid T line of empire %d: %s", EMPIRE_VNUM(emp), line);
+					exit(0);
+				}
+				
+				CREATE(tft, struct theft_log, 1);
+				tft->vnum = t[0];
+				tft->amount = t[1];
+				tft->time_minutes = l_in;
+				LL_APPEND(EMPIRE_THEFT_LOGS(emp), tft);
 				break;
 			}
 			case 'U': {	// unique storage
@@ -2370,14 +2389,19 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 		exit(1);
 	}
 
-	if (sscanf(line, "%d %ld %d", &t[0], &long_in, &t[1]) != 3) {
-		log("SYSERR: Format error in numeric line of empire #%d", vnum);
-		exit(1);
+	if (sscanf(line, "%d %ld %d %s", &t[0], &long_in, &t[1], str_in) != 4) {
+		// backwards-compatibility if no flags
+		strcpy(str_in, "0");
+		if (sscanf(line, "%d %ld %d", &t[0], &long_in, &t[1]) != 3) {
+			log("SYSERR: Format error in data line of empire #%d", vnum);
+			exit(1);
+		}
 	}
 
 	emp->leader = t[0];
 	emp->create_time = long_in;
 	emp->num_ranks = t[1];
+	emp->admin_flags = asciiflag_conv(str_in);
 	
 	emp->members = 0;
 	emp->greatness = 0;
@@ -2803,7 +2827,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	fprintf(fl, "%s~\n", NULLSAFE(EMPIRE_NAME(emp)));
 	fprintf(fl, "%s~\n", NULLSAFE(EMPIRE_ADJECTIVE(emp)));
 	fprintf(fl, "%s~\n", NULLSAFE(EMPIRE_BANNER(emp)));
-	fprintf(fl, "%d %ld %d\n", EMPIRE_LEADER(emp), EMPIRE_CREATE_TIME(emp), EMPIRE_NUM_RANKS(emp));
+	fprintf(fl, "%d %ld %d %s\n", EMPIRE_LEADER(emp), EMPIRE_CREATE_TIME(emp), EMPIRE_NUM_RANKS(emp), bitv_to_alpha(EMPIRE_ADMIN_FLAGS(emp)));
 	
 	// A: description
 	if (EMPIRE_DESCRIPTION(emp) && *EMPIRE_DESCRIPTION(emp)) {
@@ -2978,6 +3002,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
+	struct theft_log *tft;
 
 	if (!emp) {
 		return;
@@ -2989,6 +3014,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 		HASH_ITER(hh, isle->store, store, next_store) {
 			fprintf(fl, "O\n%d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep ? 1 : 0);
 		}
+	}
+	
+	// T: theft logs
+	LL_FOREACH(EMPIRE_THEFT_LOGS(emp), tft) {
+		fprintf(fl, "T %d %d %ld\n", tft->vnum, tft->amount, tft->time_minutes);
 	}
 
 	// U: unique storage
@@ -6548,6 +6578,144 @@ EVENT_CANCEL_FUNC(cancel_map_event) {
 EVENT_CANCEL_FUNC(cancel_room_event) {
 	struct room_event_data *data = (struct room_event_data *)event_obj;
 	free(data);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// THEFT LIB ///////////////////////////////////////////////////////////////
+
+/**
+* Frees up a list of theft logs.
+*
+* struct theft_log *list The list to free.
+*/
+void free_theft_logs(struct theft_log *list) {
+	struct theft_log *iter;
+	
+	while ((iter = list)) {
+		list = list->next;
+		free(iter);
+	}
+}
+
+
+/**
+* Turns theft logs into consolidated empire theft reports.
+*/
+void process_theft_logs(void) {
+	char buf[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
+	struct theft_log *list, *iter;
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (!EMPIRE_THEFT_LOGS(emp)) {
+			continue;	// short-circuit
+		}
+		
+		list = reduce_theft_logs_and_get_recent(emp);
+		*buf = '\0';
+		LL_FOREACH(list, iter) {	// build the buffer to report
+			if (iter->vnum == NOTHING) {
+				sprintf(temp, "coin%s x%d", PLURAL(iter->amount), iter->amount);
+			}
+			else {
+				sprintf(temp, "%s x%d", skip_filler(get_obj_name_by_proto(iter->vnum)), iter->amount);
+			}
+			
+			if (!*buf || strlen(buf) + strlen(temp) + 2 < 150) {
+				// just add to buffer
+				sprintf(buf + strlen(buf), "%s%s", (*buf ? ", " : "Recently stolen: "), temp);
+			}
+			else {
+				// overflow: report current then start new buffer
+				log_to_empire(emp, ELOG_HOSTILITY, "%s", buf);
+				sprintf(buf, "Recently stolen: %s", temp);
+			}
+		}
+		
+		// anything left to report?
+		if (*buf) {
+			log_to_empire(emp, ELOG_HOSTILITY, "%s", buf);
+		}
+		
+		free_theft_logs(list);
+	}
+}
+
+
+/**
+* Records a theft to an empire for delayed logging.
+*
+* @param empire_data *emp Which empire.
+* @param obj_vnum vnum What item was stolen (use NOTHING for coins).
+* @param int amount How much/many was/were taken.
+*/
+void record_theft_log(empire_data *emp, obj_vnum vnum, int amount) {
+	long time_minutes = time(0) / 60;
+	struct theft_log *tft, *iter;
+	bool found = FALSE;
+	
+	if (!emp || amount < 1) {
+		return;	// wut?
+	}
+	
+	LL_FOREACH(EMPIRE_THEFT_LOGS(emp), iter) {
+		if (iter->time_minutes < time_minutes) {
+			// always stored in descending order of time for fast adds
+			break;
+		}
+		if (iter->vnum == vnum) {
+			iter->amount += amount;
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			found = TRUE;
+			break;
+		}
+	}
+	
+	if (!found) {
+		CREATE(tft, struct theft_log, 1);
+		tft->vnum = vnum;
+		tft->amount = amount;
+		tft->time_minutes = time_minutes;
+		LL_PREPEND(EMPIRE_THEFT_LOGS(emp), tft);
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+}
+
+
+/**
+* Filters recent thefts from an empire's theft log, EXCLUDING the last ~5
+* minutes, which are not reported to give some anonymity. This generates a NEW
+* list (which must be freed with free_theft_logs) that is consolidated so that
+* each vnum only appears once, with the total stolen.
+*
+* @param empire_data *emp Which empire to get theft logs for.
+* @return struct theft_log* The new list of recent thefts to report.
+*/
+struct theft_log *reduce_theft_logs_and_get_recent(empire_data *emp) {
+	struct theft_log *iter, *next_iter, *tft, *recent = NULL;
+	long threshold = (time(0) / 60) - 4;	// more than 4 minutes ago
+	
+	LL_FOREACH_SAFE(EMPIRE_THEFT_LOGS(emp), iter, next_iter) {
+		if (iter->time_minutes > threshold) {
+			continue;	// skip recent
+		}
+		
+		// ok, found, so we're gonna use this one
+		LL_DELETE(EMPIRE_THEFT_LOGS(emp), iter);
+		LL_SEARCH_SCALAR(EMPIRE_THEFT_LOGS(emp), tft, vnum, iter->vnum);
+		if (!tft) {
+			CREATE(tft, struct theft_log, 1);
+			tft->vnum = iter->vnum;
+			// prepend will essentially flip the order so older thefts are earlier
+			LL_PREPEND(recent, tft);
+		}
+		tft->amount += iter->amount;
+		free(iter);
+	}
+	
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	return recent;
 }
 
 

@@ -1458,7 +1458,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 	
 	// coins?
-	if (killer && !IS_NPC(killer) && (!GET_LOYALTY(mob) || GET_LOYALTY(mob) == GET_LOYALTY(killer) || char_has_relationship(killer, mob, DIPL_WAR))) {
+	if (killer && !IS_NPC(killer) && (!GET_LOYALTY(mob) || GET_LOYALTY(mob) == GET_LOYALTY(killer) || char_has_relationship(killer, mob, DIPL_WAR | DIPL_THIEVERY))) {
 		coins = mob_coins(mob);
 		coin_emp = GET_LOYALTY(mob);
 		if (coins > 0) {
@@ -2289,6 +2289,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 	extern bitvector_t pk_ok;
 	
 	empire_data *ch_emp, *victim_emp;
+	obj_data *obj;
 
 	if (!ch || !victim) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: can_fight() called without ch or victim");
@@ -2374,6 +2375,14 @@ bool can_fight(char_data *ch, char_data *victim) {
 	if (IS_PVP_FLAGGED(ch) && IS_PVP_FLAGGED(victim)) {
 		return TRUE;
 	}
+	// is stealing from you
+	if (GET_LOYALTY(ch)) {
+		LL_FOREACH2(victim->carrying, obj, next_content) {
+			if (IS_STOLEN(obj) && obj->last_empire_id == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+				return TRUE;	// has at least 1 stolen obj in inventory
+			}
+		}
+	}
 
 	// playtime
 	if (!has_one_day_playtime(ch) || !has_one_day_playtime(victim)) {
@@ -2386,7 +2395,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return TRUE;
 
 	if (IS_SET(pk_ok, PK_WAR)) {
-		if (has_relationship(ch_emp, victim_emp, DIPL_WAR)) {
+		if (has_relationship(ch_emp, victim_emp, DIPL_WAR) || has_relationship(victim_emp, ch_emp, DIPL_THIEVERY)) {
 			return TRUE;
 		}
 
@@ -3390,7 +3399,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_CLAWS, 2);
 			}
-			if (!IS_NPC(ch) && GET_EQ(ch, WEAR_WIELD) && IS_BLOOD_WEAPON(GET_EQ(ch, WEAR_WIELD)) && w_type == TYPE_SLASH && can_gain_exp_from(ch, victim)) {
+			if (!IS_NPC(ch) && GET_EQ(ch, WEAR_WIELD) && IS_BLOOD_WEAPON(GET_EQ(ch, WEAR_WIELD)) && w_type == GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) && can_gain_exp_from(ch, victim)) {
+				// this verifies w_type to make sure it's a normal weapon attack
 				gain_ability_exp(ch, ABIL_READY_BLOOD_WEAPONS, 2);
 			}
 			

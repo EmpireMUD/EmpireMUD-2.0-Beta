@@ -255,15 +255,18 @@ Options:
   &ynonaggression&0 - propose or accept a pact of non-aggression
   &ytrade&0 - propose or accept a trade agreement
   &ydistrust&0 - declare that your empire distrusts but is not at war with another
-  &ywar&0 - declare war on an empire!
+  &ywar&0 - declare war on an empire! (requires war cost)
   &ybattle&0 - suggest a friendly war
+  &ythievery&0 - purchase permission to steal from an empire (requires war cost)
 
 * To declare war, an empire must immediately spend an amount of money based
 on the difference between the two empires' composite scores. You can see the
 cost to declare war on the empire detail page for any empire you're not in
-a non-aggression pact (or better) with.
+a non-aggression pact (or better) with. This also applies to thievery permits.
 
-See also: EMPIRE SCORE
+You do not need a thievery permit if you're already at war.
+
+See also: EMPIRE SCORE, THIEVERY
 #
 DISMANTLE-MINES "DISMANTLE MINES"
 
@@ -997,6 +1000,23 @@ You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
 
 See also: CITIES, NAVIGATION, TERRITORY
+#
+THIEVERY "THIEVERY PERMIT" "STEALING PERMIT"
+
+Usage:  diplomacy thievery <empire>
+
+Thievery permits allow your empire to steal from the other empire. This permit
+costs the same number of coins as a declaration of war (that is, the cost is
+based on the disparity between the empires and is cheaper if the other empire
+has offended you). This permit lasts 24 hours.
+
+You don't need a thievery permit to steal if you're already at war.
+
+The other empire will not be notified that you can steal from them. However,
+they gain the ability to attack members of your empire until the permit
+expires.
+
+See also: DIPLOMACY, OFFENSE, STEAL
 #
 "TRADE ROUTES" "TRADE ROUTES GOAL"
 

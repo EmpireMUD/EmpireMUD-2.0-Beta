@@ -531,14 +531,16 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		char *name; // "Offering XXX to empire"
 		char *text;	// "XXX empire, empire, empire"
 		bool offers_only;	// only shows separately if it's an offer
+		bool self_only;	// does not show to others
 	} diplomacy_display[] = {
-		{ DIPL_ALLIED, "an alliance", "Allied with", FALSE },
-		{ DIPL_NONAGGR, "a non-aggression pact", "In a non-aggression pact with", FALSE },
-		{ DIPL_PEACE, "peace", "At peace with", FALSE },
-		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE },
-		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE },
-		{ DIPL_WAR, "battle", "At war with", FALSE },
-		{ DIPL_TRADE, "trade", "Trade relations with", TRUE },
+		{ DIPL_ALLIED, "an alliance", "Allied with", FALSE, FALSE },
+		{ DIPL_NONAGGR, "a non-aggression pact", "In a non-aggression pact with", FALSE, FALSE },
+		{ DIPL_PEACE, "peace", "At peace with", FALSE, FALSE },
+		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE, FALSE },
+		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE, FALSE },
+		{ DIPL_WAR, "battle", "At war with", FALSE, FALSE },
+		{ DIPL_TRADE, "trade", "Trade relations with", TRUE, FALSE },
+		{ DIPL_THIEVERY, "thievery", "Thievery permitted against", FALSE, TRUE },
 		
 		// goes last
 		{ NOTHING, "\n" }
@@ -646,7 +648,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != e && !EMPIRE_IMM_ONLY(e) && !EMPIRE_IMM_ONLY(GET_LOYALTY(ch)) && !has_relationship(GET_LOYALTY(ch), e, DIPL_NONAGGR | DIPL_ALLIED)) {
 		int war_cost = get_war_cost(GET_LOYALTY(ch), e);
 		if (war_cost > 0) {
-			msg_to_char(ch, "Cost to declare war on this empire: %d coin%s\r\n", war_cost, PLURAL(war_cost));
+			msg_to_char(ch, "Cost to declare war or thievery on this empire: %d coin%s\r\n", war_cost, PLURAL(war_cost));
 		}
 	}
 
@@ -658,6 +660,9 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	if (is_own_empire || !EMPIRE_IS_TIMED_OUT(e)) {
 		// display political information by diplomacy type
 		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+			if (diplomacy_display[iter].self_only && !is_own_empire) {
+				continue;
+			}
 			if (!diplomacy_display[iter].offers_only) {
 				found = FALSE;
 				for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
@@ -2027,6 +2032,8 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 #define DIPF_ALLOW_FROM_NEUTRAL  BIT(4)	// Can be used if no relations at all
 #define DIPF_REQUIRES_OFFENSE  BIT(5)	// only allowed if an offense threshold is reached ('offense_min_to_war')
 #define DIPF_REQUIRES_TRADE_ROUTES  BIT(6)	// requires the trade-routes tech on both sides
+#define DIPF_HIDDEN  BIT(7)	// does not alert the other side
+#define DIPF_ONLY_FLAG_SELF  BIT(8)	// does not apply the flag to both sides of the pol entry
 
 struct diplomacy_type {
 	char *keywords;	// keyword list (first word is displayed to players, any word matches)
@@ -2046,6 +2053,8 @@ struct diplomacy_type {
 	
 	{ "war", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_UNILATERAL | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE | DIPF_NOT_MUTUAL_WAR | DIPF_REQUIRES_OFFENSE, "declare war on an empire!" },
 	{ "battle", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_REQUIRE_PRESENCE | DIPF_ALLOW_FROM_NEUTRAL, "suggest a friendly war" },
+	
+	{ "thievery", DIPL_THIEVERY, NOBITS, DIPL_DISTRUST, DIPF_UNILATERAL | DIPF_ONLY_FLAG_SELF | DIPF_HIDDEN | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE | DIPF_NOT_MUTUAL_WAR, "buy permission to steal from an empire!" },
 	
 	{ "\n", NOBITS, NOBITS, NOBITS, NOBITS }	// this goes last
 };
@@ -3715,7 +3724,9 @@ ACMD(do_diplomacy) {
 		else {
 			REMOVE_BIT(ch_pol->offer, diplo_option[type].add_bits);
 			log_to_empire(ch_emp, ELOG_DIPLOMACY, "The offer of %s to %s has been canceled", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
-			log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s has withdrawn the offer of %s", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			if (!IS_SET(diplo_option[type].flags, DIPF_HIDDEN)) {
+				log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s has withdrawn the offer of %s", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			}
 			msg_to_char(ch, "You have withdrawn the offer of %s to %s.\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			EMPIRE_NEEDS_SAVE(ch_emp) = TRUE;
 		}
@@ -3763,14 +3774,18 @@ ACMD(do_diplomacy) {
 		
 		if (IS_SET(diplo_option[type].flags, DIPF_UNILATERAL)) {
 			// demand
-			ch_pol->start_time = vict_pol->start_time = time(0);
+			ch_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
 			REMOVE_BIT(ch_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
-			
 			SET_BIT(ch_pol->type, diplo_option[type].add_bits);
-			SET_BIT(vict_pol->type, diplo_option[type].add_bits);
+			
+			// and back
+			if (!IS_SET(diplo_option[type].flags, DIPF_ONLY_FLAG_SELF)) {
+				vict_pol->start_time = time(0);
+				REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
+				REMOVE_BIT(vict_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
+				SET_BIT(vict_pol->type, diplo_option[type].add_bits);
+			}
 			
 			snprintf(ch_log, sizeof(ch_log), "%s has been declared with %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			snprintf(vict_log, sizeof(vict_log), "%s has declared %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
@@ -3782,14 +3797,18 @@ ACMD(do_diplomacy) {
 		}
 		else if (POL_OFFERED(vict_pol, diplo_option[type].add_bits)) {
 			// accept
-			ch_pol->start_time = vict_pol->start_time = time(0);
+			ch_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
 			REMOVE_BIT(ch_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
-			
 			SET_BIT(ch_pol->type, diplo_option[type].add_bits);
-			SET_BIT(vict_pol->type, diplo_option[type].add_bits);
+			
+			// and back
+			if (!IS_SET(diplo_option[type].flags, DIPF_ONLY_FLAG_SELF)) {
+				vict_pol->start_time = time(0);
+				REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
+				REMOVE_BIT(vict_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
+				SET_BIT(vict_pol->type, diplo_option[type].add_bits);
+			}
 			
 			snprintf(ch_log, sizeof(ch_log), "%s has been accepted with %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			snprintf(vict_log, sizeof(vict_log), "%s has accepted %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
@@ -3803,9 +3822,12 @@ ACMD(do_diplomacy) {
 			// offer
 			// don't set start time
 			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
-			
 			SET_BIT(ch_pol->offer, diplo_option[type].add_bits);
+			
+			// and back
+			if (!IS_SET(diplo_option[type].flags, DIPF_ONLY_FLAG_SELF)) {
+				REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
+			}
 			
 			snprintf(ch_log, sizeof(ch_log), "The empire has offered %s to %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			snprintf(vict_log, sizeof(vict_log), "%s offers %s to the empire", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
@@ -3821,7 +3843,7 @@ ACMD(do_diplomacy) {
 				log_to_empire(ch_emp, ELOG_DIPLOMACY, "%s!", CAP(ch_log));
 			}
 		}
-		if (*vict_log) {
+		if (*vict_log && !IS_SET(diplo_option[type].flags, DIPF_HIDDEN)) {
 			log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s", CAP(vict_log));
 		}
 		

@@ -1608,7 +1608,7 @@ struct city_metadata_type city_type[] = {
 const char *diplomacy_flags[] = {
 	"peace",	// 0
 	"war",
-	"unknown",
+	"thievery",
 	"allied",
 	"nonaggression",
 	"trade",	// 5

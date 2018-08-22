@@ -7760,6 +7760,7 @@ void read_vault(empire_data *emp) {
 * @return bool TRUE if something was retrieved and there are more left, FALSE in any other case
 */
 bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen) {
+	void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
 	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 	
 	obj_data *obj, *proto;
@@ -7788,6 +7789,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	load_otrigger(obj);
 	
 	if (stolen) {
+		record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
 		GET_STOLEN_TIMER(obj) = time(0);
 		GET_STOLEN_FROM(obj) = EMPIRE_VNUM(emp);
 		trigger_distrust_from_stealth(ch, emp);

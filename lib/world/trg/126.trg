@@ -1173,7 +1173,7 @@ else
     set plural tiles
   end
   if %actor.ability(Navigation)%
-    %send% %actor% There is a Magiterranean Grove at %room.coords%, %distance% %plural% to the %direction%.
+    %send% %actor% There is a Magiterranean Grove at %adv.coords%, %distance% %plural% to the %direction%.
   else
     %send% %actor% There is a Magiterranean Grove %distance% %plural% to the %direction%.
   end

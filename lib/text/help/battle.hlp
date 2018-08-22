@@ -416,7 +416,7 @@ See also: DODGE CAP, REFLEXES
 INFECT
 
 Usage:  infect [victim]
-Battle Synergy Ability:  75 Survival
+Battle Synergy Ability:  75 Vampire
 Linked traits:  Caster role, Wits
 Debuff type:  Battle
 Cooldown:  9 seconds
@@ -472,7 +472,7 @@ Gain experience when you kite someone.
 LACERATE
 
 Usage:  lacerate [victim]
-Battle Synergy Ability:  75 Survival
+Battle Synergy Ability:  75 Vampire
 Linked traits:  Melee role, Wits
 Debuff type:  Battle
 Cooldown:  9 seconds

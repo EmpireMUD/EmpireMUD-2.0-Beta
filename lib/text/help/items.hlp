@@ -472,6 +472,7 @@ rare:           silver, gold, imperium and nocturnium ingots
 rare, fine:     silver and gold ingots
 refined:        copper, silver and gold bars
 refined, fine:  silver and gold bars
+hard, rare:     argentine and eventide ingots
 
 See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #

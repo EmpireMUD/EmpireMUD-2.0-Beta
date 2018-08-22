@@ -55,6 +55,7 @@ void free_shop_temp_list(struct shop_temp_list *list);
 extern char *get_room_name(room_data *room, bool color);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 void read_vault(empire_data *emp);
+void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
 void save_trading_post();
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
@@ -1201,6 +1202,8 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE);
 			
 			if (stealing) {
+				record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
+				
 				if (emp && IS_IMMORTAL(ch)) {
 					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
 				}
@@ -1336,6 +1339,8 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 					
 		if (stealing) {
+			record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
+			
 			if (emp && IS_IMMORTAL(ch)) {
 				syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
 			}
