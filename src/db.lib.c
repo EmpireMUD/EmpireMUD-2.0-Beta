@@ -6619,7 +6619,7 @@ void process_theft_logs(void) {
 				sprintf(temp, "coin%s x%d", PLURAL(iter->amount), iter->amount);
 			}
 			else {
-				sprintf(temp, "%s x%d", get_obj_name_by_proto(iter->vnum), iter->amount);
+				sprintf(temp, "%s x%d", skip_filler(get_obj_name_by_proto(iter->vnum)), iter->amount);
 			}
 			
 			if (!*buf || strlen(buf) + strlen(temp) + 2 < 150) {
