@@ -86,6 +86,10 @@ end
 bone dust usage~
 1 c 2
 use~
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
 if !%actor.aff_flagged(blind)%
   %echoaround% %actor% %actor.name% upends an entire bag of bone dust over %actor.hisher% head.
   %send% %actor% You dump a full bag of bone dust over your head and even as you lose your sight, you feel the protective spell take hold.
@@ -135,14 +139,24 @@ end
 transformative tooth~
 1 c 2
 implant~
+if !%arg%
+  %send% %actor% What would you like to implant with the tooth?
+  return 1
+  halt
+end
 set target %actor.char_target(%arg%)%
+if !%target%
+  %send% %actor% Seems you were too slow. Better luck next time.
+  return 1
+  halt
+end
 if !%target.mob_flagged(mountable)%
   %send% %actor% You are unable to implant %self.shortdesc% into %target.name%.
   unset target
   halt
 else
   %send% %actor% You stab %self.shortdesc% into %target.name%'s neck and watch the mutation begin.
-  %echoaround% %actor% As %actor% stabs %self.shortdesc% into %target.name%'s neck, a horrific transformation takes place.
+  %echoaround% %actor% As %actor.name% stabs %self.shortdesc% into %target.name%'s neck, a horrific transformation takes place.
   set beast_chance %random.100%
   if %beast_chance% == (6)
     eval monster_level %actor.level% + 13
