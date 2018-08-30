@@ -74,9 +74,9 @@ detach 16003 %self.id%
 nature combat~
 0 k 30
 ~
-if !%self.affect(eartharmor)%
+if !%self.affect(3012)%
   eartharmor
-elseif !%actor.affect(entangle)%
+elseif !%actor.aff_flagged(entangle)%
   entangle
 else
   skybrand
@@ -111,11 +111,9 @@ return 0
 ~
 #16007
 skeletal combat~
-0 k 75
+0 k 30
 ~
-if !%actor.affect(disarm)%
-  disarm
-elseif !%actor.affect(terrify)%
+if !%actor.affect(3048)%
   terrify
 else
   kick
@@ -123,14 +121,12 @@ end
 ~
 #16008
 nature buff up~
-0 k 75
+0 k 25
 ~
-if !%self.affect(rejuvenat)%
-  rejuvenate
-elseif !%self.affect(counterspell)%
+if !%self.affect(3021)%
   counterspell
-elseif !%self.affect(hasten)%
-  hasten
+elseif !%self.affect(3023)%
+  rejuvenate
 else
   heal
 end
