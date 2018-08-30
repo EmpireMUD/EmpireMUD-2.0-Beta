@@ -1,0 +1,308 @@
+#16000
+hole covered~
+a covered hole~
+A mostly covered hole is here. (adventure)~
+   A covering of woven grass sits on the ground over this hole, likely to hide
+it from casual observation. Looking closer you find markings along the edges of
+the hole that are common with goblin construction.
+~
+8 0 0 6
+-1 0 0
+6 0
+S
+#16001
+earthworm oversized worm~
+an oversized earthworm~
+An oversized earthworm wriggles here.~
+You can eat the oversized earthworm.
+~
+6 0 a 4
+6 0 0
+7 48
+S
+#16002
+cloak astrakhan~
+an astrakhan cloak~
+A cloak made from unborn lamb wool lays here.~
+   As unsettling as it might be to wear unborn lamb wool, no one can claim the
+cloak isn't soft.
+~
+2 mp ak 9
+0 0 0
+11 0
+A
+5 1 0
+A
+19 1 0
+A
+15 1 0
+A
+11 1 0
+C
+125 200
+S
+#16003
+skull silver~
+a silver skull~
+A skull forged from silver sits here.~
+   A skull crafted in great detail out of silver. However, a variety of points
+indicate this could be jointed to other things. Perhaps something to keep in
+mind going forward.
+~
+15 0 a 4
+6 0 0
+3 0
+S
+#16004
+dagger blade rib bone~
+a rib bone dagger~
+A rib sharpened into a blade lays here.~
+   This was once a rib bone. After being ripped out of a skeleton, the end was
+sharpened into an unusual stabbing weapon.
+~
+1 imp ano 13
+0 5 4
+14 0
+A
+1 1 0
+A
+4 2 0
+A
+9 2 4
+A
+2 1 5
+C
+125 200
+S
+#16005
+skeleton crushed~
+a crushed skeleton~
+A skeleton, crushed from however it died, is laying here.~
+   This crushed skeleton is to damaged to be used as a building material, but
+it looks like you can use the various tools in a lumber yard to render it down
+into useable pieces. Perhaps you should try to scrape or saw it and see what
+happens? And of course, you could always light it on fire.
+~
+3 0 a 3
+0 0 0
+0 0
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 16 16003 0.01 1  # SCRAPE: a silver skull
+I 16 16007 90.00 1 s  # SCRAPE: a bag of bone dust
+I 16 16007 10.00 2 s  # SCRAPE: a bag of bone dust
+I 17 16006 100.00 2  # SAW: a long bone
+I 17 16006 40.00 2  # SAW: a long bone
+I 17 16006 5.00 2  # SAW: a long bone
+I 17 16006 0.10 2  # SAW: a long bone
+R
+5118 0
+S
+#16006
+bone long~
+a long bone~
+A single long bone rests here.~
+   This bone has saw marks at either end. It must be one of the bones sawed
+from the crushed skeleton someone left in the lumberyard. Seems it could make a
+reasonable replacement for a stick, if just a bit creepy.
+~
+1 0 ano 5
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: a torch
+O
+25 nu
+R
+5118 0
+S
+#16007
+bag bone dust~
+a bag of bone dust~
+A bag full of bone dust sits here.~
+This black bag of ground up bone glows with a light green shimmer. Just imagine
+the sort of affects it could have if you were to use the bone dust.
+~
+3 p a 5
+0 0 0
+14 0
+C
+1 1
+T 16005
+S
+#16008
+earring stapes-earring~
+a stapes earring~
+A stapes earring rests here.~
+This earring is crafted from a collection of stapes bones. The sensativity this
+causes makes it an excellent protective piece of gear.
+~
+2 mp am 18
+0 0 0
+14 0
+A
+18 5 0
+A
+13 4 0
+A
+17 4 4
+A
+2 4 4
+C
+125 200
+S
+#16009
+ring bone ear~
+an ear bone ring~
+An ear bone ring is sitting here.~
+   A perfectly round ring sits here; crafted from what looks like compacted ear
+bones and flakes of gold.
+~
+2 mp ab 6
+0 0 0
+14 0
+A
+22 3 0
+A
+23 -1 0
+A
+8 3 0
+A
+7 2 0
+A
+19 1 4
+A
+17 2 5
+C
+125 200
+S
+#16010
+shield sternum~
+a sternum shield~
+A sternum shaped into a shield lays here.~
+   A massive sternum has been carefully removed from a hopefully dead person,
+and shaped into a disturbing shield of bone.
+~
+23 mp ao 6
+0 0 0
+14 0
+A
+13 3 0
+A
+24 1 0
+A
+12 1 0
+A
+18 3 4
+A
+15 1 5
+C
+125 200
+S
+#16011
+tooth dragon's dragons corrupted~
+a corrupted dragon's tooth~
+A corrupted dragon's tooth is lying here.~
+   This dragon's tooth is blackened with the necromantic energies that have
+been worked through it. Chipped, burned, darkened, and generally in terrible
+shape, it still may have a use.
+Implant this into mountable creatures to activate the tooth's magic.
+~
+3 0 a 13
+0 0 0
+14 0
+C
+1 1
+R
+5164 0
+T 16009
+S
+#16012
+whip spinal spine~
+a spinal whip~
+A whip made of some poor soul's spine lays here.~
+~
+1 mp an 4
+0 6 7
+14 0
+A
+9 1 0
+A
+11 1 0
+A
+18 1 4
+A
+6 1 4
+C
+125 200
+S
+#16013
+necklace teeth human~
+a necklace of human teeth~
+A necklace made of human teeth lays here.~
+   At least seventy-two teeth are linked together in this ghastly chain of
+necromantic power. Each of which seems to hold just a little of the magical
+ability of its donor.
+~
+2 mp ac 3
+0 0 0
+14 0
+A
+16 2 0
+A
+17 1 0
+A
+7 2 4
+A
+18 1 4
+A
+8 2 5
+C
+125 200
+S
+#16014
+bow radius~
+a radius bow~
+A bow crafted from someone's radius rests here.~
+   Some unfortunate soul has given up their radius for the creation of this
+shortbow. Strung with what looks like human leather, this is clearly not the
+weapon of anyone friendly.
+~
+20 mp ap 5
+29 1 0
+14 0
+A
+17 2 0
+A
+1 1 4
+A
+6 2 5
+C
+125 200
+S
+#16015
+band waste waist~
+waste band~
+A waste band lays here.~
+   This band, intended to be worn as a belt, is made from all the parts no one
+would want to eat, or could find another good use for.
+~
+27 mp al 2
+3 0 0
+7 0
+A
+24 4 0
+A
+12 4 0
+A
+2 3 4
+A
+13 2 4
+A
+18 2 5
+C
+125 200
+S
+$
