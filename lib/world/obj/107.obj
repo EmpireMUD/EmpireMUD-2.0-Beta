@@ -971,4 +971,55 @@ This is supposed to purge itself and spawn a goblin raft. Evidently it didn't.
 0 1
 T 10773
 S
+#10777
+fruit knowledge~
+the fruit of knowledge~
+The fruit of knowledge is lying on the ground.~
+   The fruit of knowledge resembles an apple on the outside, with the thick
+peel of an orange, and the arils of a pomegranate. Eat it to unlock its power.
+~
+6 p a 3
+24 0 0
+0 0
+A
+8 2 0
+C
+1 1
+T 10777
+S
+#10780
+knowledge seed~
+the seed of knowledge~
+The seed of knowledge has been planted here.~
+This tiny seed grants great knowledge to those who know where to look.
+~
+3 k a 2
+0 0 0
+0 2
+T 10780
+S
+#10781
+leash buffalo~
+a buffalo leash~
+A buffalo leash is lying here.~
+This leash will summon a noncombat pet!
+Type 'use leash' to summon it.
+~
+3 p a 4
+10781 0 0
+2 0
+T 9900
+S
+#10782
+leash zebra~
+a zebra leash~
+A zebra leash is lying here.~
+This leash will summon a noncombat pet!
+Type 'use leash' to summon it.
+~
+3 p a 5
+10782 0 0
+2 0
+T 9900
+S
 $

@@ -411,4 +411,100 @@ M
 $n ties some sticks together with an old piece of twine.~
 T 10756
 S
+#10776
+buffalo great~
+a great buffalo~
+A great buffalo grazes below the green boughs.
+~
+100 125 dejo 0
+0 0 0 27
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 4  # SKIN: a large skin
+I 3 10777 100.00 1  # BARDE: an armored war buffalo
+I 4 10781 100.00 1  # LOOT: a buffalo leash
+S
+#10777
+buffalo war armored~
+an armored war buffalo~
+An armored war buffalo is grazing under heavy armor.
+~
+200 225 bdejo 0
+0 0 0 27
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 4  # SKIN: a large skin
+I 4 10781 100.00 1  # LOOT: a buffalo leash
+S
+#10778
+zebra great~
+a great zebra~
+A great zebra stands in the shadows, hidden.
+~
+100 125 dejo 0
+0 0 0 27
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 2  # SKIN: a large skin
+I 3 10779 100.00 1  # BARDE: an armored war zebra
+I 4 10782 100.00 1  # LOOT: a zebra leash
+S
+#10779
+zebra war armored~
+an armored war zebra~
+An armored war zebra stands valliantly before you.
+~
+200 225 bdejo 0
+0 0 0 27
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 2  # SKIN: a large skin
+I 4 10782 100.00 1  # LOOT: a zebra leash
+S
+#10781
+buffalo calf~
+a buffalo calf~
+A buffalo calf prances around you.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+$n prances around you.~
+M
+0
+$n makes the most adorable moo you've ever heard.~
+M
+0
+$n moos at you.~
+M
+0
+$n grunts and charges around.~
+M
+0
+$n tries to graze.~
+T 9901
+T 9902
+S
+#10782
+zebra foal~
+a zebra foal~
+A zebra foal prances around you.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+$n prances around you.~
+M
+0
+$n tries to graze.~
+M
+0
+$n whinnies at you.~
+M
+0
+$n runs at full speed until it's out of sight, and then back again.~
+M
+0
+$n prances around, dazzling you with its stripes.~
+T 9901
+T 9902
+S
 $

@@ -84,4 +84,27 @@ goblin coffin~
 T0
 You can build another goblin coffin now.~
 S
+#10778
+tend the tree~
+2 0
+0 0 0 0
+T0
+You tend to the tree, ensuring it grows strong.~
+T1
+$n tends to the tree, ensuring it grows strong.~
+S
+#10781
+buffalo leash~
+3 0
+0 0 0 0
+T0
+Your buffalo leash cooldown has ended.~
+S
+#10782
+zebra leash~
+3 0
+0 0 0 0
+T0
+Your zebra leash cooldown has ended.~
+S
 $

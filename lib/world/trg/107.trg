@@ -1122,4 +1122,102 @@ Goblin raft replacer~
 %load% veh 10771
 %purge% %self%
 ~
+#10775
+Fog Bank Environment~
+2 bw 10
+~
+switch %random.4%
+  case 1
+    %echo% The fog rolls around you, making it hard to see.
+  break
+  case 2
+    %echo% The fog around you is thick, almost suffocating.
+  break
+  case 3
+    %echo% You wonder where this fog might have come from, as it isn't foggy anywhere else in the area.
+  break
+  case 4
+    %echo% You nearly lose your way in the fog.
+  break
+done
+~
+#10776
+Dust Storm Environment~
+2 bw 10
+~
+switch %random.4%
+  case 1
+    %echo% The dust storm nearly knocks you off your feet!
+  break
+  case 2
+    %echo% The dust storm makes it hard to see.
+  break
+  case 3
+    %echo% The dust storm must have come out of nowhere. The rest of the desert is clear.
+  break
+  case 4
+    %echo% This is the worst dust storm you've seen in a long time.
+  break
+done
+~
+#10777
+Fruit of Knowledge consume~
+1 s 100
+~
+%load% obj 10780 %actor% inv
+~
+#10778
+Tree of Knowledge spawner~
+2 e 100
+~
+if %room.building_vnum% == 10775
+  %build% %room% 10778
+elseif %room.building_vnum% == 10776
+  %build% %room% 10779
+end
+~
+#10779
+Pick fruit of knowledge~
+2 c 0
+pick~
+%load% obj 10777 %actor% inv
+%send% %actor% You pick the fruit of knowledge from the tree, which withers and dies!
+%echoaround% %actor% %actor.name% picks the fruit of knowledge from the tree, which withers and dies!
+if %room.building_vnum% == 10779
+  %terraform% %room% 10776
+else
+  %terraform% %room% 10775
+end
+~
+#10780
+Tree of Knowledge skill gain~
+1 n 100
+~
+* Script is called by a temporary item on a VERY short delay
+wait 1
+set actor %self.carried_by%
+if !%actor%
+  %purge% %self%
+  %halt%
+end
+set try 10
+set done 0
+while %try% > 0 && !%done%
+  * Determine which skill
+  set vnum %random.7%
+  if %vnum% == 1
+    * Skip 1 (Empire) and give 0 (Battle) instead
+    set vnum 0
+  end
+  * Attempt to gain the skill
+  if !%actor.noskill(%vnum%)
+    if (%actor.skill(%vnum%)% > 0 && %actor.skill(%vnum%)% < 50) || (%actor.skill(%vnum%)% > 50 && %actor.skill(%vnum%)% < 75) || (%actor.skill(%vnum%)% > 75 && %actor.skill(%vnum%)% < 100)
+      nop %actor.gain_skill(%vnum%, 1)%
+      set done 1
+    end
+  end
+  eval try %try% - 1
+done
+%purge% %self%
+~
 $
