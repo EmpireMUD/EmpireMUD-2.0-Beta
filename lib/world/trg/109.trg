@@ -544,6 +544,7 @@ nop %instance.set_location(%room%)%
 Muck Dragon death~
 0 f 100
 ~
+nop %instance.set_location(%instance.real_location%)%
 set char %self.room.people%
 while %char%
   if %char.is_pc% && %char.empire%
