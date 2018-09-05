@@ -778,4 +778,164 @@ wrist item that brings Greatness to your empire! You require Fabled Hides
 10946 0 0
 0 0
 S
+#10950
+skin dragon molted moulted mountainous pile~
+the molted dragon skin~
+A mountainous pile of molted dragon skin rests in the muck.~
+   This appears to be the outer layer of the skin of a great lizard. It could
+only belong to a dragon which, like all serpents, sheds its outer skin en
+masse. Perhaps the dragon hasn't gone far.
+~
+3 0 0 3
+0 0 0
+7 1152
+C
+225 325
+T 10950
+S
+#10951
+hoard dragon's dragons muck~
+a muck dragon's hoard~
+The hoard of a muck dragon is piled high and gleaming.~
+   This dragon's hoard is mostly gold, piled high, comprised of everything from
+coins to cups and crowns.
+~
+15 0 a 2
+32 0 0
+4 0
+R
+5611 a
+S
+#10952
+book draconomicon ancient~
+the Draconomicon~
+An ancient book, the Draconomicon, hovers before you!~
+   This ancient book is bound in dragon scales and written in dragon's blood.
+Unfortunately, it's also written in a dead draconic language, and you can't
+make out its words. But it's also worth its weight in gold.
+~
+15 0 a 2
+48 0 0
+7 0
+R
+5611 a
+S
+#10953
+princess golden petrified~
+a golden princess~
+A princess stands petrified, turned completely to gold!~
+   This life-sized statue is frozen in a moment of horror. The detail is
+exquisite, as if an actual princess was turned into solid gold! But you know
+what they say: A good princess is worth her weight in gold.
+~
+15 0 a 3
+64 0 0
+4 0
+R
+5611 a
+S
+#10954
+seeds bag red tiny~
+a bag of tiny red seeds~
+There are tiny red seeds scattered all across the ground.~
+   These seeds are curiously small and you'd have to plant them in a jungle
+next to the river to see what they grow into.
+~
+3 b a 3
+0 10956 0
+0 0
+S
+#10955
+stone muck elemental~
+a muck elemental stone~
+A muck elemental stone is lying here.~
+This magical stone can summon a noncombat pet -- the muck elemental.
+Type 'use stone' to summon it.
+~
+3 p a 4
+10955 0 0
+2 0
+T 9900
+S
+#10956
+sack bog cranberries~
+a sack of bog cranberries~
+A sack of bog cranberries is sitting on the ground.~
+   These deep red cranberries have the earthy aroma of the bog they grew in. 
+They're tart, but they should cook up into something delicious.
+You can cook:
+- cranberry jelly
+- cranbread
+~
+3 b a 7
+0 10956 0
+7 168
+O
+9 br
+R
+5114 0
+S
+#10957
+jelly jar cranberry~
+a jar of cranberry jelly~
+A jar of cranberry jelly has been left here.~
+   This little old jar has been filled with a tart cranberry jelly. It would go
+perfectly with turkey.
+~
+6 m a 7
+24 0 0
+7 336
+A
+7 1 0
+C
+50 50
+R
+5606 0
+R
+5619 0
+S
+#10958
+cranbread bread loaf~
+a loaf of cranbread~
+A loaf of cranbread is molding on the ground.~
+It looks like an ordinary loaf of bread, with tart cranberry inclusions.
+~
+6 m a 4
+24 0 0
+7 336
+A
+21 1 0
+C
+50 50
+R
+5606 0
+S
+#10959
+skin dragon molted moulted mountainous~
+the molted dragon skin~
+A mountainous pile of molted dragon skin rests in the muck.~
+   This appears to be the outer layer of the skin of a great lizard. It could
+only belong to a dragon which, like all serpents, sheds its outer skin en
+masse. Perhaps the dragon hasn't gone far.
+~
+3 0 0 3
+0 0 0
+7 48
+C
+225 325
+T 10950
+S
+#10960
+carcass muck dragon monstrous corpse body~
+the monstrous carcass of a muck dragon~
+The monstrous carcass of a muck dragon is floating on the water.~
+   The corpse is so enormous that you can't imagine picking it up. The muck
+dragon is still slimy, even in death, as if its scales exude mucus of their own
+accord. It look as if the dragon has dropped the treasure it was clutching in
+its talons.
+~
+10 0 0 1
+10950 0 0
+7 48
+S
 $

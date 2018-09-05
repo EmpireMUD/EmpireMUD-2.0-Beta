@@ -1,0 +1,200 @@
+#10775
+Withered Tree~
+A Withered Tree~
+'^' 14 1 5 d np
+C
+chop, dig, gather~
+D0
+^||^~
+&w~
+E
+0 0 100.00 0
+E
+4 0 10.00 1
+E
+9 0 100.00 1
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
+M
+9040 0.01 d
+M
+9056 0.01 d
+M
+9109 10.00 dh
+M
+9145 5.00 adh
+M
+9147 5.00 bdh
+M
+9007 5.00 dg
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9146 5.00 adg
+M
+9144 5.00 adg
+M
+9002 5.00 adg
+M
+9001 10.00 dg
+M
+9136 5.00 bdg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9017 5.00 d
+M
+9150 5.00 d
+M
+9149 5.00 d
+M
+9148 5.00 d
+M
+9008 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9025 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9135 5.00 dh
+M
+9201 5.00 dh
+M
+9200 5.00 d
+M
+9202 5.00 dh
+S
+#10776
+Withered Tree~
+A Withered Tree~
+'^' 14 2 5 d p
+C
+chop, dig, gather~
+D0
+^||^~
+&w~
+E
+0 0 100.00 20
+E
+4 0 10.00 26
+E
+9 0 100.00 26
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3016 100.00 1  # FORAGE: a handful of dates
+I 9 121 100.00 1  # GATHER: a stick
+I 20 122 5.00 4 c  # CHOP: some rough wood
+I 20 122 10.00 3 c  # CHOP: some rough wood
+I 20 122 50.00 2 c  # CHOP: some rough wood
+I 20 122 35.00 1 c  # CHOP: some rough wood
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9117 15.00 bd
+M
+9126 5.00 bd
+M
+9122 5.00 bd
+M
+9125 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9153 10.00 bc
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+S
+$

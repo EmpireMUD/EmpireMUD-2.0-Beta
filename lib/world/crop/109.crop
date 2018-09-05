@@ -1,0 +1,95 @@
+#10956
+bog cranberries~
+A Row of Bog Cranberry Bushes~
+30 3 ac
+0 100 0 100
+D0
+****~
+&g~
+D0
+&po&?***~
+&g~
+D0
+*&po&?**~
+&g~
+D0
+**&po&?*~
+&g~
+D0
+***&po~
+&g~
+D0
+****~
+&g~
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 8 10956 60.00 4 H  # HARVEST: a sack of bog cranberries
+I 8 10956 30.00 3 H  # HARVEST: a sack of bog cranberries
+I 8 10956 10.00 2 H  # HARVEST: a sack of bog cranberries
+M
+9061 0.01 d
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+S
+$

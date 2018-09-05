@@ -512,4 +512,146 @@ Crimson dragon despawn timer~
 ~
 %adventurecomplete%
 ~
+#10950
+Muck Dragon delayed despawn~
+1 f 0
+~
+%adventurecomplete%
+~
+#10951
+Muck Dragon load~
+0 n 100
+~
+if %instance.location%
+  mgoto %instance.location%
+end
+%load% obj 10950
+~
+#10952
+Muck Dragon updater + leash~
+0 i 100
+~
+eval room %self.room%
+if (%room.sector% != Swamp && %room.sector% != Marsh && %room.sector% != River && %room.sector% != Lake)
+  return 0
+  wait 1
+  %echo% %self.name% hastily backtracks.
+  halt
+end
+nop %instance.set_location(%room%)%
+~
+#10953
+Muck Dragon death~
+0 f 100
+~
+nop %instance.set_location(%instance.real_location%)%
+set char %self.room.people%
+while %char%
+  if %char.is_pc% && %char.empire%
+    nop %char.empire.start_progress(10950)%
+  end
+  set char %char.next_in_room%
+done
+if %instance.real_location%
+  set obj %instance.real_location.contents%
+  while %obj%
+    if %obj.vnum% == 10950
+      %purge% %obj%
+      %at% %instance.real_location% %load% obj 10959
+      halt
+    end
+    set obj %obj.next_in_list%
+  done
+end
+~
+#10956
+Muck Dragon: Muck Rake~
+0 k 33
+~
+if %self.cooldown(10950)%
+  halt
+end
+nop %self.set_cooldown(10950, 30)%
+%echo% %self.name% shakes its body violently, spraying clumps of sticky mud flying in all directions!
+set person %self.room.people%
+while %person%
+  if %person.is_enemy(%self%)%
+    dg_affect #10956 %person% SLOW on 60
+  end
+  set person %person.next_in_room%
+done
+~
+#10957
+Muck Dragon: Burrow Charge~
+0 k 50
+~
+if %self.cooldown(10950)%
+  halt
+end
+nop %self.set_cooldown(10950, 30)%
+wait 1 sec
+dg_affect #10959 %self% HARD-STUNNED on 20
+dg_affect #10959 %self% IMMUNE-DAMAGE on 20
+%echo% %self.name% dives into the marshy water and vanishes from view!
+wait 3 sec
+%send% %actor% The swampy ground shifts beneath your feet!
+%send% %actor% ('leap' out of the way!)
+%echoaround% %actor% The ground shifts beneath %actor.name%'s feet!
+set target %actor.id%
+remote target %self.id%
+wait 9 sec
+if %self.varexists(success)%
+  set success %self.success%
+end
+rdelete target %self.id%
+rdelete success %self.id%
+if %success%
+  %send% %actor% %self.name% bursts from the swampy ground, narrowly missing you!
+  %echoaround% %actor% %self.name% bursts from the swampy ground, narrowly missing %actor.name%!
+else
+  %send% %actor% &r%self.name% bursts from the swampy ground beneath your feet, sending you flying!
+  %send% %actor% %self.name% bursts from the swampy ground beneath %actor.name%'s feet, sending %actor.himher% flying!
+  %damage% %actor% 200 physical
+  dg_affect #12957 %actor% HARD-STUNNED on 10
+end
+dg_affect #10959 %self% off
+~
+#10958
+Muck Dragon: Swamp Breath~
+0 k 100
+~
+if %self.cooldown(10950)%
+  halt
+end
+nop %self.set_cooldown(10950, 30)%
+%echo% &r%self.name% opens %self.hisher% mouth wide and exhales a cloud of noxious vapor!
+set person %self.room.people%
+while %person%
+  if %person.is_enemy(%self%)%
+    %dot% #10958 %person% 100 30 poison
+    %damage% %person% 25 poison
+  end
+  set person %person.next_in_room%
+done
+~
+#10959
+Muck dragon burrow charge leap command~
+0 c 0
+leap~
+if %self.varexists(target)%
+  set target %self.target%
+end
+if %actor.id% != %target%
+  %send% %actor% You don't need to.
+  halt
+end
+if %self.varexists(success)%
+  %send% %actor% You already did.
+  halt
+end
+set success 1
+remote success %self.id%
+%send% %actor% You desperately leap to one side!
+%echoaround% %actor% %actor.name% desperately leaps to one side!
+~
 $
