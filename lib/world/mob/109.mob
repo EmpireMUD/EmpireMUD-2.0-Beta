@@ -157,4 +157,73 @@ A crimson sea dragon splashes around.
 0 0 6 9
 I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
 S
+#10950
+dragon muck viscous vicious~
+a viscous muck dragon~
+A viscous muck dragon coils through the water.
+~
+225 325 dghuB chmoBCD
+0 0 5 27
+I 0 10907 100.00 4  # BUTCHER: a raw dragon steak
+I 1 1357 100.00 8  # SKIN: a large piece of leather
+I 1 10006 60.00 1 a  # SKIN: a dragon scale
+I 1 10006 30.00 2 a  # SKIN: a dragon scale
+I 1 10006 10.00 3 a  # SKIN: a dragon scale
+I 4 10960 100.00 1  # LOOT: the monstrous carcass of a muck dragon
+I 4 10951 60.00 1 a  # LOOT: a muck dragon's hoard
+I 4 10952 30.00 1 a  # LOOT: the Draconomicon
+I 4 10953 10.00 1 a  # LOOT: a golden princess
+I 4 10954 12.50 3 b  # LOOT: a bag of tiny red seeds
+I 4 10955 12.50 1 b  # LOOT: a muck elemental stone
+M
+0
+$n circles you in the water.~
+M
+0
+$n burbles a roar beneath the surface.~
+M
+0
+You hear a rattling sound from the water.~
+M
+0
+The massive muck dragon rolls around in the water.~
+M
+0
+Fish scatter before $n.~
+T 10951
+T 10952
+T 10953
+T 10956
+T 10957
+T 10958
+T 10959
+S
+#10955
+elemental muck little~
+a muck elemental~
+A little elemental is rolling around in a puddle of muck.
+~
+1 1 bdoD mn
+0 0 2 5
+M
+0
+$n splashes around in its own puddle of muck.~
+M
+0
+$n flings a ball of muck at you, but misses.~
+M
+0
+$n flings a ball of muck at you, but misses.~
+M
+0
+$n hits you in the eye with a ball of muck.~
+M
+0
+$n rolls around on the ground.~
+M
+0
+$n rolls around on the ground.~
+T 9901
+T 9902
+S
 $

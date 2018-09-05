@@ -1,0 +1,19 @@
+#10950
+Viscous Muck Dragon~
+Paul Clarke and Owen Morris~
+   A muck dragon is roamings the swamps. These dragons are large, slimy, and
+particularly vicious. Fortunately, they never leave the water. Perhaps if you
+slay the dragon, you can take its riches for yourself.
+~
+10950 10964 225-325
+1 0 ln 0
+L
+1 0
+10950 -1 -1
+9 m 0
+L
+5 0
+1500 -1 -1
+-1 0 0
+S
+$

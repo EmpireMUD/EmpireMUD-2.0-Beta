@@ -1180,6 +1180,11 @@ end
 Pick fruit of knowledge~
 2 c 0
 pick~
+if !%actor.canuseroom_member()%
+  %send% %actor% You don't have permission to pick anything here.
+  return 1
+  halt
+end
 %load% obj 10777 %actor% inv
 %send% %actor% You pick the fruit of knowledge from the tree, which withers and dies!
 %echoaround% %actor% %actor.name% picks the fruit of knowledge from the tree, which withers and dies!
@@ -1188,6 +1193,7 @@ if %room.building_vnum% == 10779
 else
   %terraform% %room% 10775
 end
+return 1
 ~
 #10780
 Tree of Knowledge skill gain~
@@ -1210,7 +1216,7 @@ while %try% > 0 && !%done%
     set vnum 0
   end
   * Attempt to gain the skill
-  if !%actor.noskill(%vnum%)
+  if !%actor.noskill(%vnum%)%
     if (%actor.skill(%vnum%)% > 0 && %actor.skill(%vnum%)% < 50) || (%actor.skill(%vnum%)% > 50 && %actor.skill(%vnum%)% < 75) || (%actor.skill(%vnum%)% > 75 && %actor.skill(%vnum%)% < 100)
       nop %actor.gain_skill(%vnum%, 1)%
       set done 1

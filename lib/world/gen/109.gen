@@ -7,4 +7,45 @@ dragon token~
 T1
 dragon tokens~
 S
+#10950
+swamp dragon attack~
+3 0
+0 0 0 0
+S
+#10956
+unclean~
+4 0
+0 0 0 0
+T0
+You are no longer covered in mud.~
+T1
+$n is no longer covered in mud.~
+T2
+You are covered in mud.~
+T3
+$n is covered in mud.~
+S
+#10957
+stunned~
+4 0
+0 0 0 0
+T0
+You are no longer stunned.~
+S
+#10958
+swamp breath~
+4 0
+0 0 0 0
+T0
+You are no longer poisoned by the muck dragon's swamp breath.~
+T2
+You are poisoned by the swamp breath!~
+T3
+$n looks nauseous.~
+S
+#10959
+burrowed~
+4 0
+0 0 0 0
+S
 $

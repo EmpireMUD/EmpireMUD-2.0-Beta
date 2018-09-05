@@ -43,4 +43,13 @@ D14
 0 10900
 M 0 10901 100.00 1
 S
+#10950
+A Hole in the Muck~
+   When it's time to shed their skin, muck dragons pupate underground in the
+swamp for several days. This hole is rather large, indicating that it wasn't a
+small dragon resting here. This one has already emerged. Perhaps it is nearby?
+~
+g 0 0
+M 0 10950 100.00 1
+S
 $
