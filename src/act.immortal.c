@@ -2747,6 +2747,10 @@ SHOW(show_buildings) {
 		total = count = 0;
 	
 		HASH_ITER(hh, building_table, bld, next_bld) {
+			if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+				continue;
+			}
+			
 			this = stats_get_building_count(bld);
 			strcpy(buf, GET_BLD_NAME(bld));
 			msg_to_char(ch, " %6d %-20.20s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
@@ -2761,6 +2765,9 @@ SHOW(show_buildings) {
 	// argument usage: show building <vnum | name>
 	else if (!(isdigit(*argument) && (bld = building_proto(atoi(argument)))) && !(bld = get_building_by_name(argument, FALSE))) {
 		msg_to_char(ch, "Unknown building '%s'.\r\n", argument);
+	}
+	else if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+		msg_to_char(ch, "This function only works on map buildings, not interior rooms.\r\n");
 	}
 	else if (!(sect = sector_proto(config_get_int("default_building_sect"))) || !(idx = find_sector_index(GET_SECT_VNUM(sect)))) {
 		msg_to_char(ch, "Error looking up buildings: default sector not configured.\r\n");
@@ -2859,7 +2866,8 @@ SHOW(show_crops) {
 		msg_to_char(ch, "Unknown crop '%s'.\r\n", argument);
 	}
 	else {
-		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), stats_get_crop_count(crop));
+		strcpy(part, GET_CROP_NAME(crop));
+		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_CROP_VNUM(crop), CAP(part), stats_get_crop_count(crop));
 		
 		any = FALSE;
 		LL_FOREACH(land_map, map) {
