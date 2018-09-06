@@ -447,7 +447,8 @@ void look_in_obj(char_data *ch, char *arg) {
 			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else {
-			act("$V (here):", FALSE, ch, NULL, veh, TO_CHAR);
+			sprintf(buf, "$V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
 		}
 	}
