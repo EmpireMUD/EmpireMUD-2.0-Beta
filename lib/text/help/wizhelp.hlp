@@ -1040,7 +1040,7 @@ stats      God      Shows game stats including prototypes.
 ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
 buildings  Immort   Shows occurrences of buildings (vnum/name optional).
 components Immort   Shows all items matching a component type (and flags).
-crops      Immort   Shows counts for all the crops in the world.
+crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
@@ -1060,7 +1060,7 @@ spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 technology Immort   Shows ability techs a player has.
-terrain    Immort   Shows total counts for all terrain types.
+terrain    Immort   Shows tile counts for all sector types (vnum/name optional).
 unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
