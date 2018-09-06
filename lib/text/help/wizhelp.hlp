@@ -1038,6 +1038,7 @@ Mode       Level    Description
 ------     ------   -------------
 stats      God      Shows game stats including prototypes.
 ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
+buildings  Immort   Shows occurrences of buildings (vnum/name optional).
 components Immort   Shows all items matching a component type (and flags).
 crops      Immort   Shows counts for all the crops in the world.
 currency   Immort   Shows coins and adventure currencies for a player.
@@ -1241,13 +1242,15 @@ Usage:  show technology <player>
 
 Lists all the ability techs the player has.
 #e
-"SHOW TERRAIN" "SHOW CROPS"
+"SHOW TERRAIN" "SHOW CROPS" "SHOW BUILDINGS"
 
 Usage:  show terrain
         show crops
+        show buildings [name/vnum]
 
-Lists the total count of each sector and crop type in the world. Buildings are
-all listed together under 'Building'.
+Lists the total count of each sector, crop, or building type in the world. You
+can also specify one to see a list of matching tiles in the world, with their
+owners.
 #e
 "SHOW UNLEARNABLE"
 
