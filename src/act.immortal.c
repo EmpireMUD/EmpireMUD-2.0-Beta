@@ -3054,26 +3054,79 @@ SHOW(show_technology) {
 
 
 SHOW(show_terrain) {
+	extern sector_data *get_sect_by_name(char *name);
+	
+	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
 	sector_data *sect, *next_sect;
 	int count, total, this;
+	struct map_data *map;
+	size_t size, l_size;
+	room_data *room;
+	bool any;
 	
 	// fresh numbers
 	update_world_count();
 	
-	// output
-	total = count = 0;
+	if (!*argument) {	// no-arg: show summary
+		// output
+		total = count = 0;
 	
-	HASH_ITER(hh, sector_table, sect, next_sect) {
-		this = stats_get_sector_count(sect);
-		msg_to_char(ch, " %6d %-20.20s %s", this, GET_SECT_NAME(sect), !((++count)%2) ? "\r\n" : " ");
-		total += this;
+		HASH_ITER(hh, sector_table, sect, next_sect) {
+			this = stats_get_sector_count(sect);
+			msg_to_char(ch, " %6d %-20.20s %s", this, GET_SECT_NAME(sect), !((++count)%2) ? "\r\n" : " ");
+			total += this;
+		}
+	
+		if (count % 2) {
+			msg_to_char(ch, "\r\n");
+		}
+	
+		msg_to_char(ch, " Total: %d\r\n", total);
 	}
-	
-	if (count % 2) {
-		msg_to_char(ch, "\r\n");
+	// argument usage: show building <vnum | name>
+	else if (!(isdigit(*argument) && (sect = sector_proto(atoi(argument)))) && !(sect = get_sect_by_name(argument))) {
+		msg_to_char(ch, "Unknown sector '%s'.\r\n", argument);
 	}
-	
-	msg_to_char(ch, " Total: %d\r\n", total);
+	else {
+		strcpy(part, GET_SECT_NAME(sect));
+		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_SECT_VNUM(sect), CAP(part), stats_get_sector_count(sect));
+		
+		any = FALSE;
+		LL_FOREACH(land_map, map) {
+			if (map->sector_type != sect) {
+				continue;
+			}
+			
+			// load room if possible (but not if it's not in RAM)
+			room = real_real_room(map->vnum);
+			
+			// found
+			if (room && ROOM_OWNER(room)) {
+				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			}
+			else {
+				*part = '\0';
+			}
+			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), room ? get_room_name(room, FALSE) : GET_SECT_TITLE(sect), part);
+			any = TRUE;
+			
+			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
+				strcat(buf, line);
+				size += l_size;
+			}
+			else {
+				// hit the end, but we reserved space
+				snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!any) {
+			snprintf(buf + size, sizeof(buf) - size, " no matching tiles\r\n");
+		}
+		
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 

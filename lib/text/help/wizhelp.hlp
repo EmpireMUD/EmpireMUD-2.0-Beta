@@ -1244,13 +1244,14 @@ Lists all the ability techs the player has.
 #e
 "SHOW TERRAIN" "SHOW CROPS" "SHOW BUILDINGS"
 
-Usage:  show terrain
-        show crops
+Usage:  show terrain [name/vnum]
+        show crops [name/vnum]
         show buildings [name/vnum]
 
 Lists the total count of each sector, crop, or building type in the world. You
 can also specify one to see a list of matching tiles in the world, with their
-owners.
+owners. However, if there is a large number of tiles, you'll only be able to
+see as many as fit in the text buffer.
 #e
 "SHOW UNLEARNABLE"
 
