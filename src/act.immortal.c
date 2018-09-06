@@ -2739,10 +2739,10 @@ SHOW(show_buildings) {
 	room_data *room;
 	bool any;
 	
+	// fresh numbers
+	update_world_count();
+	
 	if (!*argument) {	// no-arg: show summary
-		// fresh numbers
-		update_world_count();
-		
 		// output
 		total = count = 0;
 	
@@ -2766,7 +2766,7 @@ SHOW(show_buildings) {
 		msg_to_char(ch, "Error looking up buildings: default sector not configured.\r\n");
 	}
 	else {
-		size = snprintf(buf, sizeof(buf), "[%d] %s (%d current, %d base):\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), idx->sect_count, idx->base_count);
+		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), stats_get_building_count(bld));
 		
 		any = FALSE;
 		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
@@ -2784,6 +2784,7 @@ SHOW(show_buildings) {
 				*part = '\0';
 			}
 			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), get_room_name(room, FALSE), part);
+			any = TRUE;
 			
 			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
 				strcat(buf, line);
