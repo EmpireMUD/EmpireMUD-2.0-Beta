@@ -1289,7 +1289,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	struct empire_storage_data *store, *next_store;
 	struct island_info *island = get_island(eisle->island, TRUE);
 	bool any = TRUE, vault = FALSE;
-	int amount, max;
+	int amount, max, can_take;
 	obj_data *obj;
 	
 	while (needs->needed > 0 && any) {
@@ -1298,10 +1298,11 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			if (needs->needed < 1) {
 				break;	// done early
 			}
-			if (store->keep || store->amount < 1 || !(obj = store->proto)) {
+			if ((store->keep == UNLIMITED || store->keep <= store->amount) || store->amount < 1 || !(obj = store->proto)) {
 				continue;
 			}
 			
+			can_take = store->amount - store->keep;	// already checked for keep=UNLIMITED
 			amount = 0;
 			
 			// ENEED_x: processing the item
@@ -1314,8 +1315,8 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 						}
 						else {	// need more than 1
 							amount = ceil((double) needs->needed / GET_FOOD_HOURS_OF_FULLNESS(obj));
-							max = MAX(100, store->amount / 4);
-							amount = MIN(amount, store->amount);
+							max = MAX(100, can_take / 4);
+							amount = MIN(amount, can_take);
 							amount = MIN(amount, max);	// don't take more than this of any 1 thing per cycle
 							SAFE_ADD(needs->needed, -(amount * GET_FOOD_HOURS_OF_FULLNESS(obj)), 0, INT_MAX, FALSE);
 						}

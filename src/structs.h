@@ -4276,7 +4276,7 @@ struct empire_storage_data {
 	obj_vnum vnum;	// what's stored
 	obj_data *proto;	// pointer to the obj proto
 	int amount;	// how much
-	bool keep;	// if TRUE, workforce will ignore it
+	int keep;	// how much workforce should ignore/keep (UNLIMITED/-1 or >0)
 	UT_hash_handle hh;	// empire_island->store hash (by vnum)
 };
 

@@ -82,7 +82,7 @@ struct einv_type {
 	obj_vnum vnum;
 	int local;
 	int total;
-	bool keep;
+	int keep;
 	UT_hash_handle hh;
 };
 
@@ -838,7 +838,7 @@ int sort_einv_list(struct einv_type *a, struct einv_type *b) {
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256];
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_storage_data *store, *next_store;
@@ -931,11 +931,21 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				*vstr = '\0';
 			}
 			
-			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "", einv->total);
+			if (einv->keep == UNLIMITED) {
+				strcpy(keepstr, " (keep)");
+			}
+			else if (einv->keep > 0) {
+				snprintf(keepstr, sizeof(keepstr), " (keep %d)", einv->keep);
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), einv->keep ? " (keep)" : "");
+				*keepstr = '\0';
+			}
+			
+			if (einv->total > einv->local) {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, einv->total);
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr);
 			}
 			
 			// append if room
@@ -6572,12 +6582,27 @@ ACMD(do_workforce) {
 	else if (is_abbrev(arg, "keep")) {
 		skip_spaces(&argument);
 		
-		if (!*argument) {
-			msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
-			return;
-		}
 		if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(eisle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 			msg_to_char(ch, "You can't tell workforce to keep items if you're not on any island.\r\n");
+			return;
+		}
+		
+		if (!strn_cmp(argument, "all ", 4)) {
+			limit = UNLIMITED;
+			half_chop(argument, lim_arg, argument);	// strip off the "all"
+		}
+		else if (isdigit(*argument)) {
+			half_chop(argument, lim_arg, argument);	// find a number
+			limit = atoi(lim_arg);
+			if (limit < 0) {
+				msg_to_char(ch, "Invalid number to keep.\r\n");
+				return;
+			}
+		}
+		
+		// now ensure there's (still) an argument
+		if (!*argument) {
+			msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
 			return;
 		}
 		
@@ -6591,8 +6616,14 @@ ACMD(do_workforce) {
 			}
 			
 			found = TRUE;
-			msg_to_char(ch, "Your workforce will %s keep all its '%s' on this island.\r\n", store->keep ? "no longer" : "now", skip_filler(GET_OBJ_SHORT_DESC(proto)));
-			store->keep = store->keep ? FALSE : TRUE;
+			if (limit == UNLIMITED || limit > 0) {
+				store->keep = limit;
+			}
+			else {	// toggle off/all
+				store->keep = store->keep ? 0 : UNLIMITED;
+			}
+			msg_to_char(ch, "Your workforce will %s keep %s its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any of"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
+			
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			break;
 		}
