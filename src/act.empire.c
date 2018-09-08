@@ -6622,7 +6622,7 @@ ACMD(do_workforce) {
 			else {	// toggle off/all
 				store->keep = store->keep ? 0 : UNLIMITED;
 			}
-			msg_to_char(ch, "Your workforce will %s keep %s its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any of"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
+			msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
 			
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			break;
