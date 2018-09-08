@@ -186,6 +186,88 @@ void cancel_adventure_summon(char_data *ch) {
 
 
 /**
+* called by do_customize
+*
+* @param char_data *ch The player.
+* @param char *argument Usage: name <new name | none>
+*/
+void do_customize_road(char_data *ch, char *argument) {
+	char arg2[MAX_STRING_LENGTH], *ptr;
+	empire_data *emp = GET_LOYALTY(ch);
+	bool found;
+	int iter;
+	
+	char *required_words[] = { "road", "avenue", "street", "way", "drive",
+		"grove", "lane", "gardens", "place", "circus", "crescent", "close",
+		"square", "hill", "mews", "vale", "rise", "row", "mead", "wharf",
+		"alley", "bend", "boulevard", "circle", "court", "course", "crossing",
+		"crossroad", "crossroads", "freeway", "lane", "loop", "pass",
+		"parkway", "plaza", "trail", "route", "skyway", "terrace", "track",
+		"trace", "tunnel", "turnpike", "bluff", "rd", "av", "ave", "st", "wy",
+		"dr", "blf", "blvd", "cir", "pkwy",
+		"\n"
+	};
+	
+	half_chop(argument, arg, arg2);
+	
+	if (!emp || ROOM_OWNER(IN_ROOM(ch)) != emp) {
+		msg_to_char(ch, "You must own the tile to do this.\r\n");
+	}
+	else if (!IS_ROAD(IN_ROOM(ch))) {
+		msg_to_char(ch, "This isn't a road (try customize building).\r\n");
+	}
+	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
+		msg_to_char(ch, "You are not allowed to customize.\r\n");
+	}
+	else if (is_abbrev(arg, "name")) {
+		if (!*arg2) {
+			msg_to_char(ch, "What would you like to name this road (or \"none\")?\r\n");
+		}
+		else if (!str_cmp(arg2, "none")) {
+			if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
+				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
+				ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
+			}
+			
+			msg_to_char(ch, "This road no longer has a custom name.\r\n");
+			command_lag(ch, WAIT_ABILITY);
+		}
+		else if (color_code_length(arg2) > 0) {
+			msg_to_char(ch, "You cannot use color codes in custom road names.\r\n");
+		}
+		else if (strlen(arg2) > 60) {
+			msg_to_char(ch, "That name is too long. Road names may not be over 60 characters.\r\n");
+		}
+		else {
+			// looks good, but check that it has a required word
+			found = FALSE;
+			for (iter = 0; *required_words[iter] != '\n' && !found; ++iter) {
+				if ((ptr = str_str(arg2, required_words[iter])) && ptr > arg2 && *(ptr-1) == ' ') {
+					// found it at the start of a word
+					found = TRUE;
+				}
+			}
+			if (!found) {
+				msg_to_char(ch, "The name must include a road name word like 'road' or 'drive'.\r\n");
+				return;
+			}
+			
+			if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
+				free(ROOM_CUSTOM_NAME(IN_ROOM(ch)));
+			}
+			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
+			
+			msg_to_char(ch, "This road tile is now called \"%s\".\r\n", arg2);
+			command_lag(ch, WAIT_ABILITY);
+		}
+	}
+	else {
+		msg_to_char(ch, "You can only customize the road's name.\r\n");
+	}
+}
+
+
+/**
 * Performs a douse on a torch/fire, if possible.
 *
 * @param char_data *ch The douser.
@@ -1609,6 +1691,9 @@ ACMD(do_customize) {
 	}
 	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "ship")) {
 		do_customize_vehicle(ch, arg2);
+	}
+	else if (is_abbrev(arg, "road")) {
+		do_customize_road(ch, arg2);
 	}
 	else {
 		msg_to_char(ch, "What do you want to customize? (See HELP CUSTOMIZE)\r\n");
