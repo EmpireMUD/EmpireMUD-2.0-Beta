@@ -1919,6 +1919,7 @@ const char *versions_list[] = {
 	"b5.37",
 	"b5.38",
 	"b5.40",
+	"b5.45",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3338,6 +3339,30 @@ PLAYER_UPDATE_FUNC(b5_40_update_players) {
 }
 
 
+// keep now has a variable number and old data must be converted
+void b5_45_keep_update(void) {
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
+	empire_data *emp, *next_emp;
+	
+	log("Applying b5.45 'keep' update to empires...");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			HASH_ITER(hh, isle->store, store, next_store) {
+				if (store->keep == 1) {
+					// convert old 0/1 to 0/UNLIMITED
+					store->keep = UNLIMITED;
+					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				}
+			}
+		}
+	}
+	
+	save_all_empires();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3599,6 +3624,9 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.40")) {
 			log("Applying b5.40 channel update to players...");
 			update_all_players(NULL, b5_40_update_players);
+		}
+		if (MATCH_VERSION("b5.45")) {
+			b5_45_keep_update();
 		}
 	}
 	

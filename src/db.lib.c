@@ -2194,7 +2194,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					
 					// check keep
 					if (t[3] && (store = find_stored_resource(emp, t[2], t[0]))) {
-						store->keep = TRUE;
+						store->keep = t[3];
 					}
 				}
 				else if (proto && !proto->storage) {
@@ -3012,7 +3012,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		// O: storage
 		HASH_ITER(hh, isle->store, store, next_store) {
-			fprintf(fl, "O\n%d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep ? 1 : 0);
+			fprintf(fl, "O\n%d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep);
 		}
 	}
 	

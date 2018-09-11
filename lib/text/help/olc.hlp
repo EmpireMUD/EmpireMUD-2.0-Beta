@@ -3669,6 +3669,38 @@ Available mob flags:
 
 See also: OLC MOBILES
 #d
+"MEDIT FULLSEARCH"
+
+Usage:  .m fullsearch -<field> <argument> <...>
+
+This command allows you to search for mobs matching certain criteria. You can
+specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the mob's keywords and text fields.
+
+Fields:
+  &c-affects&0 - see HELP AFFECT FLAGS
+  &c-attack&0 - see HELP MEDIT ATTACK
+  &c-custom&0 - has a specific type, see HELP MEDIT CUSTOM
+  &c-faction&0 - is a member of a specific faction
+  &c-flagged&0, &cunflagged&0 - see HELP MEDIT FLAGS
+  &c-interaction&0 - has a specific type, see HELP MEDIT INTERACTION
+  &c-level&0 - matches anything where this level is within the range
+     (note: will not account for mobs whose levels are inherited from
+      adventures, see ADVEDIT CASCADE for help)
+  &c-movetype&0 - see HELP MEDIT MOVETYPE
+  &c-nameset&0 - see HELP MEDIT NAMESET
+  &c-sex&0 - male, female, neutral
+  &c-attack&0 - see HELP MEDIT ATTACK
+
+Examples:
+ > .m fullsearch -sex male -attack slash
+ > .m fullsearch -flagged SENTINEL -flagged PURSUE
+ > .m fullsearch -level 100 guard
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all mobs with the "Dismissable"
+trigger, use ".t search 9901".
+#d
 "MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" INTERACTIONS
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]

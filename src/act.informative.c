@@ -447,7 +447,8 @@ void look_in_obj(char_data *ch, char *arg) {
 			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else {
-			act("$V (here):", FALSE, ch, NULL, veh, TO_CHAR);
+			sprintf(buf, "$V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
 		}
 	}
@@ -1547,7 +1548,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 */
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero) {
 	int total = get_total_stored_count(emp, store->vnum, TRUE);
-	char lbuf[MAX_INPUT_LENGTH];
+	char lbuf[MAX_INPUT_LENGTH], keepstr[256];
 	
 	if (total > store->amount || show_zero) {
 		sprintf(lbuf, " (%d total)", total);
@@ -1556,7 +1557,17 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 		*lbuf = '\0';
 	}
 	
-	msg_to_char(ch, "(%4d) %s%s%s\r\n", (show_zero ? 0 : store->amount), get_obj_name_by_proto(store->vnum), store->keep ? " (keep)" : "", lbuf);
+	if (store->keep == UNLIMITED) {
+		strcpy(keepstr, " (keep)");
+	}
+	else if (store->keep > 0) {
+		snprintf(keepstr, sizeof(keepstr), " (keep %d)", store->keep);
+	}
+	else {
+		*keepstr = '\0';
+	}
+	
+	msg_to_char(ch, "(%4d) %s%s%s\r\n", (show_zero ? 0 : store->amount), get_obj_name_by_proto(store->vnum), keepstr, lbuf);
 }
 
 

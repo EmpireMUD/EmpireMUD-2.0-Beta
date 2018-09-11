@@ -462,7 +462,7 @@ tailor.
 
 See also: TAILOR, WEAVE
 #
-CUSTOMIZE "CUSTOMIZE VEHICLE"
+CUSTOMIZE "CUSTOMIZE VEHICLE" "CUSTOMIZE ROAD"
 
 Usage:  customize <type> [target] <field> <value | none>
 
@@ -473,6 +473,7 @@ customize its things.
 Valid types:
 - building (requires the Customize Building ability)
 - island
+- road (must include a street name word like 'road' or 'drive')
 - vehicle (not all vehicles can be customized)
 
 Valid fields:

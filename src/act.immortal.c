@@ -2725,6 +2725,94 @@ SHOW(show_skills) {
 }
 
 
+SHOW(show_buildings) {
+	extern bld_data *get_building_by_name(char *name, bool room_only);
+	extern int stats_get_building_count(bld_data *bdg);
+	
+	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
+	struct sector_index_type *idx;
+	bld_data *bld, *next_bld;
+	int count, total, this;
+	struct map_data *map;
+	size_t size, l_size;
+	sector_data *sect;
+	room_data *room;
+	bool any;
+	
+	// fresh numbers
+	update_world_count();
+	
+	if (!*argument) {	// no-arg: show summary
+		// output
+		total = count = 0;
+	
+		HASH_ITER(hh, building_table, bld, next_bld) {
+			if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+				continue;
+			}
+			
+			this = stats_get_building_count(bld);
+			strcpy(buf, GET_BLD_NAME(bld));
+			msg_to_char(ch, " %6d %-20.20s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
+			total += this;
+		}
+		if (count % 2) {
+			msg_to_char(ch, "\r\n");
+		}
+	
+		msg_to_char(ch, " Total: %d\r\n", total);
+	}
+	// argument usage: show building <vnum | name>
+	else if (!(isdigit(*argument) && (bld = building_proto(atoi(argument)))) && !(bld = get_building_by_name(argument, FALSE))) {
+		msg_to_char(ch, "Unknown building '%s'.\r\n", argument);
+	}
+	else if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+		msg_to_char(ch, "This function only works on map buildings, not interior rooms.\r\n");
+	}
+	else if (!(sect = sector_proto(config_get_int("default_building_sect"))) || !(idx = find_sector_index(GET_SECT_VNUM(sect)))) {
+		msg_to_char(ch, "Error looking up buildings: default sector not configured.\r\n");
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), stats_get_building_count(bld));
+		
+		any = FALSE;
+		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+			// building rooms are always instantiated so it's safe to do a real_room without wasting RAM
+			room = real_room(map->vnum);
+			if (BUILDING_VNUM(room) != GET_BLD_VNUM(bld)) {
+				continue;
+			}
+			
+			// found
+			if (ROOM_OWNER(room)) {
+				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			}
+			else {
+				*part = '\0';
+			}
+			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), get_room_name(room, FALSE), part);
+			any = TRUE;
+			
+			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
+				strcat(buf, line);
+				size += l_size;
+			}
+			else {
+				// hit the end, but we reserved space
+				snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!any) {
+			snprintf(buf + size, sizeof(buf) - size, " no matching tiles\r\n");
+		}
+		
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 SHOW(show_commons) {
 	descriptor_data *d, *nd;
 	
@@ -2744,27 +2832,79 @@ SHOW(show_commons) {
 
 
 SHOW(show_crops) {
+	extern crop_data *get_crop_by_name(char *name);
+	
+	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
 	crop_data *crop, *next_crop;
 	int count, total, this;
+	struct map_data *map;
+	size_t size, l_size;
+	room_data *room;
+	bool any;
 	
 	// fresh numbers
 	update_world_count();
 	
-	// output
-	total = count = 0;
+	if (!*argument) {	// no-arg: show summary
+		// output
+		total = count = 0;
 	
-	HASH_ITER(hh, crop_table, crop, next_crop) {
-		this = stats_get_crop_count(crop);
-		strcpy(buf, GET_CROP_NAME(crop));
-		msg_to_char(ch, " %6d %-20.20s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
-		total += this;
-	}
-	if (count % 2) {
-		msg_to_char(ch, "\r\n");
-	}
+		HASH_ITER(hh, crop_table, crop, next_crop) {
+			this = stats_get_crop_count(crop);
+			strcpy(buf, GET_CROP_NAME(crop));
+			msg_to_char(ch, " %6d %-20.20s %s", this, CAP(buf), !((++count)%2) ? "\r\n" : " ");
+			total += this;
+		}
+		if (count % 2) {
+			msg_to_char(ch, "\r\n");
+		}
 	
-	msg_to_char(ch, " Total: %d\r\n", total);
-
+		msg_to_char(ch, " Total: %d\r\n", total);
+	}
+	// argument usage: show building <vnum | name>
+	else if (!(isdigit(*argument) && (crop = crop_proto(atoi(argument)))) && !(crop = get_crop_by_name(argument))) {
+		msg_to_char(ch, "Unknown crop '%s'.\r\n", argument);
+	}
+	else {
+		strcpy(part, GET_CROP_NAME(crop));
+		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_CROP_VNUM(crop), CAP(part), stats_get_crop_count(crop));
+		
+		any = FALSE;
+		LL_FOREACH(land_map, map) {
+			if (map->crop_type != crop) {
+				continue;
+			}
+			
+			// load room if possible (but not if it's not in RAM)
+			room = real_real_room(map->vnum);
+			
+			// found
+			if (room && ROOM_OWNER(room)) {
+				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			}
+			else {
+				*part = '\0';
+			}
+			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), room ? get_room_name(room, FALSE) : GET_CROP_TITLE(crop), part);
+			any = TRUE;
+			
+			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
+				strcat(buf, line);
+				size += l_size;
+			}
+			else {
+				// hit the end, but we reserved space
+				snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!any) {
+			snprintf(buf + size, sizeof(buf) - size, " no matching tiles\r\n");
+		}
+		
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 
@@ -2914,26 +3054,79 @@ SHOW(show_technology) {
 
 
 SHOW(show_terrain) {
+	extern sector_data *get_sect_by_name(char *name);
+	
+	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
 	sector_data *sect, *next_sect;
 	int count, total, this;
+	struct map_data *map;
+	size_t size, l_size;
+	room_data *room;
+	bool any;
 	
 	// fresh numbers
 	update_world_count();
 	
-	// output
-	total = count = 0;
+	if (!*argument) {	// no-arg: show summary
+		// output
+		total = count = 0;
 	
-	HASH_ITER(hh, sector_table, sect, next_sect) {
-		this = stats_get_sector_count(sect);
-		msg_to_char(ch, " %6d %-20.20s %s", this, GET_SECT_NAME(sect), !((++count)%2) ? "\r\n" : " ");
-		total += this;
+		HASH_ITER(hh, sector_table, sect, next_sect) {
+			this = stats_get_sector_count(sect);
+			msg_to_char(ch, " %6d %-20.20s %s", this, GET_SECT_NAME(sect), !((++count)%2) ? "\r\n" : " ");
+			total += this;
+		}
+	
+		if (count % 2) {
+			msg_to_char(ch, "\r\n");
+		}
+	
+		msg_to_char(ch, " Total: %d\r\n", total);
 	}
-	
-	if (count % 2) {
-		msg_to_char(ch, "\r\n");
+	// argument usage: show building <vnum | name>
+	else if (!(isdigit(*argument) && (sect = sector_proto(atoi(argument)))) && !(sect = get_sect_by_name(argument))) {
+		msg_to_char(ch, "Unknown sector '%s'.\r\n", argument);
 	}
-	
-	msg_to_char(ch, " Total: %d\r\n", total);
+	else {
+		strcpy(part, GET_SECT_NAME(sect));
+		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_SECT_VNUM(sect), CAP(part), stats_get_sector_count(sect));
+		
+		any = FALSE;
+		LL_FOREACH(land_map, map) {
+			if (map->sector_type != sect) {
+				continue;
+			}
+			
+			// load room if possible (but not if it's not in RAM)
+			room = real_real_room(map->vnum);
+			
+			// found
+			if (room && ROOM_OWNER(room)) {
+				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			}
+			else {
+				*part = '\0';
+			}
+			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), room ? get_room_name(room, FALSE) : GET_SECT_TITLE(sect), part);
+			any = TRUE;
+			
+			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
+				strcat(buf, line);
+				size += l_size;
+			}
+			else {
+				// hit the end, but we reserved space
+				snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!any) {
+			snprintf(buf + size, sizeof(buf) - size, " no matching tiles\r\n");
+		}
+		
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 
@@ -7908,6 +8101,7 @@ ACMD(do_show) {
 		{ "rent", LVL_START_IMM, show_rent },
 		{ "stats", LVL_GOD, show_stats },
 		{ "site", LVL_ASST, show_site },
+		{ "buildings", LVL_START_IMM, show_buildings },
 		{ "commons", LVL_ASST, show_commons },
 		{ "crops", LVL_START_IMM, show_crops },
 		{ "players", LVL_START_IMM, show_players },

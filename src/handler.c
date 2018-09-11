@@ -7422,7 +7422,7 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool use_kept, struct resource_data **build_used_list) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
-	int this, found = 0;
+	int this, can_take, found = 0;
 	obj_data *proto;
 	
 	if (amount < 0) {
@@ -7438,7 +7438,7 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (store->keep && !use_kept) {
+			if ((store->keep == UNLIMITED || store->amount <= store->keep) && !use_kept) {
 				continue;
 			}
 			
@@ -7453,7 +7453,8 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 			}
 		
 			// ok make it so
-			this = MIN(amount, store->amount);
+			can_take = (store->keep > 0 ? store->amount - store->keep : store->amount);	// because we already know either keep is not unlimited, or we can ignore keep if it is
+			this = MIN(amount, can_take);
 			found += this;
 			
 			if (build_used_list) {
@@ -7559,14 +7560,14 @@ bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle;
 	obj_data *proto;
-	int found = 0;
+	int amt, found = 0;
 	
 	if (island == NO_ISLAND || !(isle = get_empire_island(emp, island))) {
 		return FALSE;	// shortcut out
 	}
 	
 	HASH_ITER(hh, isle->store, store, next_store) {
-		if (store->keep && !include_kept) {
+		if ((store->keep == UNLIMITED || store->amount <= store->keep) && !include_kept) {
 			continue;
 		}
 		
@@ -7576,7 +7577,8 @@ bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int
 		
 		// is it a match, though?
 		if (GET_OBJ_CMP_TYPE(proto) == cmp_type && (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) == cmp_flags) {
-			SAFE_ADD(found, store->amount, 0, MAX_INT, FALSE);
+			amt = (store->keep > 0 ? store->amount - store->keep : store->amount);
+			SAFE_ADD(found, amt, 0, MAX_INT, FALSE);
 			if (found >= amount) {
 				break;
 			}

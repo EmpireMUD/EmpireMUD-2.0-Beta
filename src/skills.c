@@ -961,7 +961,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 				msg_to_char(ch, "\tyYou have earned a free skill reset in %s. Type 'skill reset %s' to use it.\t0\r\n", SKILL_NAME(skill), SKILL_NAME(skill));
 			}
 			
-			if (skdata->level == SKILL_MAX_LEVEL(skill)) {
+			if (!IS_IMMORTAL(ch) && skdata->level == SKILL_MAX_LEVEL(skill)) {
 				log_to_slash_channel_by_name(PLAYER_LOG_CHANNEL, ch, "%s has reached %s %d!", PERS(ch, ch, TRUE), SKILL_NAME(skill), SKILL_MAX_LEVEL(skill));
 			}
 		}

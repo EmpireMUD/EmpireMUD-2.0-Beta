@@ -1239,7 +1239,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 				// can ONLY do crafts that use objects/components
 				has_res = FALSE;
 			}
-			else if (res->type == RES_OBJECT && (!(store = find_stored_resource(emp, islid, res->vnum)) || store->keep || store->amount < res->amount)) {
+			else if (res->type == RES_OBJECT && (!(store = find_stored_resource(emp, islid, res->vnum)) || store->keep == UNLIMITED || store->amount <= store->keep || (store->amount - store->keep) < res->amount)) {
 				has_res = FALSE;
 			}
 			else if (res->type == RES_COMPONENT && !empire_can_afford_component(emp, islid, res->vnum, res->misc, res->amount, FALSE)) {
@@ -1371,7 +1371,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	}
 	else if ((res = BUILDING_RESOURCES(room))) {
 		// RES_x: can only process some types in this way
-		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && !store->keep && store->amount > 0) {
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
@@ -1697,7 +1697,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 	// look for something to process
 	eisle = get_empire_island(emp, islid);
 	HASH_ITER(hh, eisle->store, store, next_store) {
-		if (store->amount < 1 || store->keep) {
+		if (store->amount < 1 || store->keep == UNLIMITED || store->amount <= store->keep) {
 			continue;
 		}
 		if (!(proto = store->proto)) {
@@ -2115,7 +2115,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 		highest = NULL;
 		high_amt = 0;
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			if (store->keep) {
+			if (store->keep == UNLIMITED || store->amount <= store->keep) {
 				continue;
 			}
 			
@@ -2418,7 +2418,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	
 	if ((res = VEH_NEEDS_RESOURCES(veh))) {
 		// RES_x: can ONLY do it if it requires an object, component, or action
-		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && !store->keep && store->amount > 0) {
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
