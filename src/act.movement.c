@@ -2062,7 +2062,7 @@ ACMD(do_portal) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%2d.", count);
 			}
 			
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s %s (%s%s&0) - %d tile%s", coord_display_room(ch, port->room, TRUE), get_room_name(port->room, FALSE), EMPIRE_BANNER(ROOM_OWNER(port->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(port->room)), port->distance, PLURAL(port->distance));
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s %s (%s%s&0) - %d tile%s", coord_display_room(ch, port->room, TRUE), get_room_name(port->room, FALSE), ROOM_OWNER(port->room) ? EMPIRE_BANNER(ROOM_OWNER(port->room)) : "\t0", ROOM_OWNER(port->room) ? EMPIRE_ADJECTIVE(ROOM_OWNER(port->room)) : "not claimed", port->distance, PLURAL(port->distance));
 			
 			if ((port->distance > max_out_of_city_portal && (!ch_in_city || !port->in_city)) || (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(port->room))) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
