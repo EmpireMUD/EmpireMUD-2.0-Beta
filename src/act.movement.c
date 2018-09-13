@@ -933,10 +933,10 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 // simple sorter for portal data
 int sort_temp_portal_data(struct temp_portal_data *a, struct temp_portal_data *b) {
 	if (a->is_own != b->is_own) {
-		return a->is_own ? 1 : -1;
+		return a->is_own ? -1 : 1;
 	}
 	else if (a->is_ally != b->is_ally) {
-		return a->is_ally ? 1 : -1;
+		return a->is_ally ? -1 : 1;
 	}
 	else {
 		return a->distance - b->distance;
@@ -2017,6 +2017,9 @@ ACMD(do_portal) {
 		ch_in_city = (is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || (!ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait_here)));
 		
 		HASH_ITER(hh, world_table, room, next_room) {
+			if (!all && !ROOM_OWNER(room)) {
+				continue;	// only show unowned on all
+			}
 			if (!IS_COMPLETE(room) || !room_has_function_and_city_ok(room, FNC_PORTAL)) {
 				continue;	// not a portal
 			}
