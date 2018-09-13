@@ -568,6 +568,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
+	extern const char *bonus_bit_descriptions[];
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const int base_hit_chance;
 	extern const double hit_per_dex;
@@ -608,6 +609,11 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	else {
 		msg_to_char(to, "\r\n");
+	}
+	
+	if (GET_BONUS_TRAITS(ch)) {
+		prettier_sprintbit(GET_BONUS_TRAITS(ch), bonus_bit_descriptions, lbuf);
+		msg_to_char(ch, "Bonus traits: %s\r\n", lbuf);
 	}
 
 	msg_to_char(to, " +-------------------------------- Condition --------------------------------+\r\n");
