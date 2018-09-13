@@ -2041,7 +2041,8 @@ ACMD(do_portal) {
 			port->distance = dist;
 			port->in_city = there_in_city;
 			port->is_own = (ROOM_OWNER(room) && ROOM_OWNER(room) == GET_LOYALTY(ch));
-			port->is_ally = !port->is_own && can_use_room(ch, room, MEMBERS_AND_ALLIES);
+			// ally is not recorded on 'all' so it will sort with others
+			port->is_ally = !all && !port->is_own && can_use_room(ch, room, MEMBERS_AND_ALLIES);
 			
 			LL_INSERT_INORDER(portal_list, port, sort_temp_portal_data);
 		}
