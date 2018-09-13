@@ -73,7 +73,6 @@ struct temp_portal_data {
 	int distance;
 	int in_city;
 	bool is_own;
-	bool is_ally;
 	struct temp_portal_data *next;
 };
 
@@ -934,9 +933,6 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 int sort_temp_portal_data(struct temp_portal_data *a, struct temp_portal_data *b) {
 	if (a->is_own != b->is_own) {
 		return a->is_own ? -1 : 1;
-	}
-	else if (a->is_ally != b->is_ally) {
-		return a->is_ally ? -1 : 1;
 	}
 	else {
 		return a->distance - b->distance;
@@ -2041,8 +2037,6 @@ ACMD(do_portal) {
 			port->distance = dist;
 			port->in_city = there_in_city;
 			port->is_own = (ROOM_OWNER(room) && ROOM_OWNER(room) == GET_LOYALTY(ch));
-			// ally is not recorded on 'all' so it will sort with others
-			port->is_ally = !all && !port->is_own && can_use_room(ch, room, MEMBERS_AND_ALLIES);
 			
 			LL_INSERT_INORDER(portal_list, port, sort_temp_portal_data);
 		}
@@ -2073,6 +2067,9 @@ ACMD(do_portal) {
 			}
 			
 			bsize += snprintf(buf + bsize, sizeof(buf) - bsize, "%s\r\n", line);
+			
+			// RAM!
+			free(port);
 		}
 		
 		// page it in case it's long
