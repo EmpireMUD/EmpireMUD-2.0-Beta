@@ -2044,6 +2044,7 @@ ACMD(do_portal) {
 	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
 	
 	ch_in_city = (is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || (!ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait_here)));
+	skip_spaces(&argument);
 	
 	// grab the first word off the argument
 	if (*argument == '(' || *argument == '"') {	// if it starts with a ( or ", strip them
