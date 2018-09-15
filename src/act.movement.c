@@ -2059,7 +2059,7 @@ ACMD(do_portal) {
 	if (!str_cmp(arg, "-a") || !str_cmp(arg, "-all")) {
 		all = TRUE;
 	}
-	else if (!str_cmp(arg, "-n") || !str_cmp(arg, "-near") || !str_cmp(arg, "near")) {
+	else if (!str_cmp(arg, "-n") || !str_cmp(arg, "-near")) {
 		// portal near <coords>
 		argument = any_one_arg(argument, arg);	// strip off the 'near'
 		argument = any_one_word(argument, arg);	// grab coords into 'arg'
