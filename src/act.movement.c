@@ -2044,28 +2044,39 @@ ACMD(do_portal) {
 	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
 	
 	ch_in_city = (is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || (!ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait_here)));
-	argument = any_one_word(argument, arg);
+	
+	// grab the first word off the argument
+	if (*argument == '(' || *argument == '"') {	// if it starts with a ( or ", strip them
+		argument = any_one_word(argument, arg);
+		strcpy(argument, arg);
+	}
+	else {	// grab the first word but don't remove it
+		skip_spaces(&argument);
+		any_one_word(argument, arg);
+	}
 	
 	if (!str_cmp(arg, "-a") || !str_cmp(arg, "-all")) {
 		all = TRUE;
 	}
 	else if (!str_cmp(arg, "-n") || !str_cmp(arg, "-near") || !str_cmp(arg, "near")) {
 		// portal near <coords>
-		skip_spaces(&argument);
+		argument = any_one_arg(argument, arg);	// strip off the 'near'
+		argument = any_one_word(argument, arg);	// grab coords into 'arg'
+		
 		if (!HAS_NAVIGATION(ch)) {
 			msg_to_char(ch, "You can't do that without the Navigation ability.\r\n");
 			return;
 		}
-		if (!*argument) {
+		if (!*arg) {
 			msg_to_char(ch, "See portals near which coordinates?\r\n");
 			return;
 		}
-		if (*argument != '(' || !strchr(argument, ',')) {
+		if (!strchr(arg, ',')) {
 			msg_to_char(ch, "You can only use 'portal near' with coordinates.\r\n");
 			return;
 		}
 		
-		near = find_target_room(ch, argument);
+		near = find_target_room(ch, arg);
 		if (!near) {
 			msg_to_char(ch, "Invalid location.\r\n");
 			return;
@@ -2073,7 +2084,7 @@ ACMD(do_portal) {
 	}
 	
 	// just show portals
-	if (all || near || !*arg) {
+	if (all || near || !*argument) {
 		if (IS_NPC(ch) || !ch->desc) {
 			msg_to_char(ch, "You can't list portals right now.\r\n");
 			return;
@@ -2128,7 +2139,7 @@ ACMD(do_portal) {
 	}
 	
 	// targeting: by list number (only targets member/ally portals)
-	if (!target && is_number(arg) && (num = atoi(arg)) >= 1 && GET_LOYALTY(ch)) {
+	if (!target && is_number(argument) && (num = atoi(argument)) >= 1 && GET_LOYALTY(ch)) {
 		portal_list = build_portal_list_near(ch, IN_ROOM(ch), ch_in_city, FALSE);
 		LL_FOREACH_SAFE(portal_list, port, next_port) {
 			if (!target && --num <= 0) {
@@ -2139,10 +2150,10 @@ ACMD(do_portal) {
 	}
 	
 	// targeting: by keywords? (only targets member/ally portals; only if not coords)
-	if (!target && *arg && *arg != '(' && !strchr(arg, ',')) {
+	if (!target && *argument && *argument != '(' && !strchr(argument, ',')) {
 		portal_list = build_portal_list_near(ch, IN_ROOM(ch), ch_in_city, FALSE);
 		LL_FOREACH_SAFE(portal_list, port, next_port) {
-			if (!target && multi_isname(arg, get_room_name(port->room, FALSE))) {
+			if (!target && multi_isname(argument, get_room_name(port->room, FALSE))) {
 				target = port->room;
 			}
 			free(port);	// free RAM!
@@ -2150,7 +2161,7 @@ ACMD(do_portal) {
 	}
 	
 	// targeting: if we didn't get a result yet, try standard targeting
-	if (!target && !(target = find_target_room(ch, arg))) {
+	if (!target && !(target = find_target_room(ch, argument))) {
 		// sends own message
 		return;
 	}
