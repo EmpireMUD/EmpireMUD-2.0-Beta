@@ -1317,8 +1317,9 @@ PORTAL PORTALS ENTER
 Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystal  (High Sorcery ability)
 Built on:  plains, desert
 Fame:  1
-Commands:  portal [destination]
+Commands:  portal [coordinates | number | keywords]
            portal -all
+           portal -near <coordinates>
            enter <portal>
 
 You can open a portal between two portal buildings, so long as you have per-
@@ -1330,7 +1331,7 @@ Portals have a maximum distance of 50 tiles unless both ends are in a city.
 
 You can portal to specific coordinates by using parentheses (123, 456) or by
 typing the coordinates with no space -- 123,456 -- but you can target your
-own and allied portals by number.
+own and allied portals by number or keywords.
 
 Typing "portal" with no argument will list portals belonging to your empire
 and its allies. Typing "portal -all" will list all public portals belonging
