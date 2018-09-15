@@ -2139,7 +2139,7 @@ ACMD(do_portal) {
 	}
 	
 	// targeting: by list number (only targets member/ally portals)
-	if (!target && is_number(argument) && (num = atoi(argument)) >= 1 && GET_LOYALTY(ch)) {
+	if (!target && !strchr(argument, ',') && is_number(argument) && (num = atoi(argument)) >= 1 && GET_LOYALTY(ch)) {
 		portal_list = build_portal_list_near(ch, IN_ROOM(ch), ch_in_city, FALSE);
 		LL_FOREACH_SAFE(portal_list, port, next_port) {
 			if (!target && --num <= 0) {
@@ -2150,7 +2150,7 @@ ACMD(do_portal) {
 	}
 	
 	// targeting: by keywords? (only targets member/ally portals; only if not coords)
-	if (!target && *argument && *argument != '(' && !strchr(argument, ',')) {
+	if (!target && *argument && !strchr(argument, ',')) {
 		portal_list = build_portal_list_near(ch, IN_ROOM(ch), ch_in_city, FALSE);
 		LL_FOREACH_SAFE(portal_list, port, next_port) {
 			if (!target && multi_isname(argument, get_room_name(port->room, FALSE))) {
