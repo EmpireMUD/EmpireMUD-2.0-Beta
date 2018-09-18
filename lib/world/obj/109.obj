@@ -861,7 +861,7 @@ S
 sack bog cranberries~
 a sack of bog cranberries~
 A sack of bog cranberries is sitting on the ground.~
-   These deep red cranberries have the earthy aroma of the bog they grew in. 
+   These deep red cranberries have the earthy aroma of the bog they grew in.
 They're tart, but they should cook up into something delicious.
 You can cook:
 - cranberry jelly
@@ -937,5 +937,146 @@ its talons.
 10 0 0 1
 10950 0 0
 7 48
+S
+#10965
+ruins giant hovel~
+the ruins of the giant hovel~
+The ruins of a giant hovel are strewn about the area.~
+   This hovel, though easily the largest you have ever seen, is in ruins. The
+roof lies on the ground, upturned. The doorway, already crude, is distended and
+destroyed. Perhaps the hovel's owner outgrew it? Look nearby to find them.
+~
+3 0 0 2
+0 0 0
+0 1152
+T 10965
+S
+#10966
+ruins giant hovel~
+the ruins of the giant hovel~
+The ruins of a giant hovel are strewn about the area.~
+   This hovel, though easily the largest you have ever seen, is in ruins. The
+roof lies on the ground, upturned. The doorway, already crude, is distended and
+destroyed. Perhaps the hovel's owner outgrew it? Look nearby to find them.
+~
+3 0 0 5
+0 0 0
+0 24
+T 10965
+S
+#10967
+corpse body hill giant enormous~
+the enormous corpse of a hill giant~
+The enormous corpse of a hill giant is draped across the landscape.~
+   The hill giant corpse is far too large to pick up, and has already begun to
+smell. In truth, you suspect, it probably smelled foul before it died.
+~
+10 0 0 2
+10965 0 0
+7 48
+S
+#10968
+coin gold giant~
+a giant gold coin~
+A giant gold coin has been dropped here from some height.~
+This single giant coin is almost as big as your head!
+~
+15 0 a 3
+8 0 0
+4 0
+R
+5611 a
+S
+#10969
+goose golden~
+a golden goose~
+A golden goose is sitting on the ground.~
+   This golden goose is so well cast that you begin to suspect it was a living
+goose that was turned to gold. Either way, it's worth its weight in gold now.
+~
+15 0 a 4
+16 0 0
+4 0
+R
+5611 a
+S
+#10970
+harp golden~
+a golden harp~
+A golden harp seems to play itself!~
+   This golden harp almost seems to play itself, as music fills the air around
+it. The harp is made from solid gold, too yellow to be mixed but too strong to
+be pure. The harp is also quite large. Perhaps it was made by giants?
+~
+15 e a 5
+24 0 0
+4 0
+R
+5611 a
+T 10970
+S
+#10971
+whistle ant giant~
+a giant ant whistle~
+A giant ant whistle is lying here.~
+   The whistle is actually surprisingly small. It's the summoned ant that's
+giant. Type 'use whistle' to summon this noncombat pet.
+~
+3 p a 4
+10971 0 0
+2 0
+T 9900
+S
+#10972
+schematic giant's giants causeway~
+the giant's causeway schematic~
+The giant's causeway schematic is on the ground.~
+   This schematic teaches you to build a special bridge: the giant's causeway.
+This schematic requires the Architect ability.
+~
+7 0 a 2
+10972 0 0
+0 0
+S
+#10973
+club giant wooden~
+a giant wooden club~
+A truly giant wooden club is lying across your path.~
+   This club is really just a shaved tree. Whoever wielded it must have been
+much bigger than you, as you can barely pick it up. But it looks like it could
+hold up the roof of a mine or be sawn into lumber.
+~
+3 e a 2
+0 0 0
+0 0
+C
+100 100
+I 17 125 100.00 8  # SAW: a stack of lumber
+O
+21 0
+R
+5193 0
+S
+#10974
+schematic giant hovel~
+the giant hovel schematic~
+The giant hovel schematic is on the ground.~
+   This schematic will teach you to build a new single-room large home, the
+giant hovel. This schematic requires the Architect ability.
+~
+7 0 a 1
+10974 0 0
+0 0
+S
+#10975
+schematic giant stone head~
+the giant stone head schematic~
+The giant stone head schematic is on the ground.~
+   This schematic will teach you to build a unique monument, the giant stone
+head. It requires the Architect ability.
+~
+7 0 a 1
+10975 0 0
+0 0
 S
 $

@@ -226,4 +226,98 @@ $n rolls around on the ground.~
 T 9901
 T 9902
 S
+#10965
+giant hill~
+the hill giant~
+A hill giant towers over you, swinging a club the size of a tree!
+~
+100 175 dhkuvA cEG
+0 0 26 5
+I 4 10967 100.00 1  # LOOT: the enormous corpse of a hill giant
+I 4 10973 100.00 1  # LOOT: a giant wooden club
+I 4 10968 60.00 1 a  # LOOT: a giant gold coin
+I 4 10970 10.00 1 a  # LOOT: a golden harp
+I 4 10969 30.00 1 a  # LOOT: a golden goose
+I 4 10974 12.50 1 b  # LOOT: the giant hovel schematic
+I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+T 10967
+T 10968
+T 10971
+T 10972
+T 10973
+T 10974
+S
+#10966
+giant river~
+the river giant~
+A river giant towers over you, barely missing you on its path across the countryside!
+~
+100 175 dhkuvA cEG
+0 0 26 5
+I 4 10967 100.00 1  # LOOT: the enormous corpse of a hill giant
+I 4 10973 100.00 1  # LOOT: a giant wooden club
+I 4 10968 60.00 1 a  # LOOT: a giant gold coin
+I 4 10970 10.00 1 a  # LOOT: a golden harp
+I 4 10972 30.00 1 a  # LOOT: the giant's causeway schematic
+I 4 10974 12.50 1 b  # LOOT: the giant hovel schematic
+I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+T 10967
+T 10968
+T 10971
+T 10972
+T 10973
+T 10974
+S
+#10967
+giant dune~
+the dune giant~
+A dune giant towers above you, with a tree over its shoulder!
+~
+100 175 dhkuvA cEG
+0 0 26 5
+I 4 10967 100.00 1  # LOOT: the enormous corpse of a hill giant
+I 4 10973 100.00 1  # LOOT: a giant wooden club
+I 4 10968 60.00 1 a  # LOOT: a giant gold coin
+I 4 10970 10.00 1 a  # LOOT: a golden harp
+I 4 10972 30.00 1 a  # LOOT: the giant's causeway schematic
+I 4 10975 12.50 1 b  # LOOT: the giant stone head schematic
+I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+T 10967
+T 10968
+T 10971
+T 10972
+T 10973
+T 10974
+S
+#10968
+portents giant~
+portents of the giant~
+Portents of the giant linger in the air.
+~
+100 175 bd kln
+0 0 0 15
+T 10966
+S
+#10971
+ant giant~
+a giant ant~
+A giant ant scurries past you.
+~
+1 1 bdoD n
+0 0 7 9
+M
+0
+$n pokes at you with its antennae.~
+M
+0
+$n chitters through its mandibles.~
+M
+0
+$n prances around like a puppy.~
+M
+0
+$n looks at you with huge puppydog eyes, longing for some crumbs.~
+T 9901
+T 9902
+S
 $

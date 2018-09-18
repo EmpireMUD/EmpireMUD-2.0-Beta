@@ -18,7 +18,7 @@ Mucking Around~
 Draconomicon and a golden princess, plus as much treasure as you can. For the
 glory of the empire!
 ~
-3 4 0 5 ac
+4 4 0 5 c
 K 7 5
 W
 2 10951 0 1 a
@@ -26,5 +26,21 @@ W
 2 10952 0 1 a
 W
 2 10953 0 1 a
+S
+#10965
+Kingdom of Giants~
+   Clearing giants from our territory isn't enough. If our empire could learn
+the secrets of their massive architecture, it would bring us gigantic fame. 
+Acquire each of the three giant buildings: the causeway, the hovel, and the
+stone head.
+~
+5 4 0 5 c
+K 7 5
+W
+7 10972 0 1 a
+W
+7 10974 0 1 a
+W
+7 10975 0 1 a
 S
 $

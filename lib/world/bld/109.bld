@@ -90,4 +90,67 @@ A Hole in the Muck~
 C
 adventure~
 S
+#10965
+Giant Hovel~
+The Remnants of a Giant Hovel~
+&t(--)~
+124 0 d 0
+0 0 0 -1
+C
+adventure~
+S
+#10966
+Giant Hovel~
+The Remnants of a Giant Hovel~
+&t(--)~
+124 0 d 0
+0 0 0 -1
+C
+adventure~
+S
+#10967
+Giant Hovel~
+The Remnants of a Giant Hovel~
+&t(--)~
+124 0 d 0
+0 0 0 -1
+C
+adventure~
+S
+#10972
+Giant's Causeway~
+A Giant's Causeway~
+&wnnnn~
+124 0 dD 0
+0 0 0 -1
+R
+10973 1 5 0
+S
+#10974
+Giant Hovel~
+A Giant Hovel~
+.&0()&?.~
+124 0 R 0
+0 8 0 -1
+D
+   This hovel, like most of the huts you've seen, is crudely made. 
+Nevertheless, This crudely-made hovel looks as if it has been patched and
+re-patched to keep the weather at bay. It's not dissimilar from other hovels
+you've seen, save for the size, which is enormous. A hovel made for a single
+giant can easily sleep a family of eight.
+~
+R
+21 1 1 0
+R
+25 2 1 0
+S
+#10975
+Giant Stone Head~
+A Giant Stone Head~
+&w(oo)~
+124 1 d 0
+0 0 0 -1
+R
+10975 1 5 0
+S
 $
