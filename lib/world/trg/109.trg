@@ -654,4 +654,228 @@ remote success %self.id%
 %send% %actor% You desperately leap to one side!
 %echoaround% %actor% %actor.name% desperately leaps to one side!
 ~
+#10965
+Hill Giant delayed despawn~
+1 f 0
+~
+%adventurecomplete%
+~
+#10966
+Hill Giant load~
+0 n 100
+~
+if %instance.location%
+  mgoto %instance.location%
+end
+%load% obj 10965
+%load% mob %self.room.building_vnum%
+%purge% %self%
+~
+#10967
+Hill Giant updater~
+0 i 100
+~
+nop %instance.set_location(%self.room%)%
+~
+#10968
+Hill Giant death~
+0 f 100
+~
+nop %instance.set_location(%instance.real_location%)%
+set char %self.room.people%
+while %char%
+  if %char.is_pc% && %char.empire%
+    nop %char.empire.start_progress(10965)%
+  end
+  set char %char.next_in_room%
+done
+if %instance.real_location%
+  set obj %instance.real_location.contents%
+  while %obj%
+    if %obj.vnum% == 10965
+      %purge% %obj%
+      %at% %instance.real_location% %load% obj 10966
+      halt
+    end
+    set obj %obj.next_in_list%
+  done
+end
+~
+#10970
+Golden Harp plays self~
+1 bw 12
+~
+if %self.carried_by%
+  halt
+end
+switch %random.3%
+  case 1
+    %echo% Sweet music floats off of %self.shortdesc% as it seemingly plays itself!
+  break
+  case 2
+    %echo% The strings of %self.shortdesc% vibrate almost imperceptibly as soft music fills the air!
+  break
+  case 3
+    %echo% A disembodied voice sings softly behind the ethereal music of %self.shortdesc%.
+  break
+done
+~
+#10971
+Hill Giant fight: Throw Boulder (duck)~
+0 k 33
+~
+if %self.cooldown(10966)%
+  halt
+end
+nop %self.set_cooldown(10966, 30)%
+%echo% %self.name% grabs a small boulder from the ground nearby and hefts it!
+%echo% &YYou'd better duck!&0
+set running 1
+remote running %self.id%
+wait 10 sec
+set running 0
+remote running %self.id%
+%echo% %self.name% hurls the boulder forward and lets it fly!
+set room %self.room%
+set person %room.people%
+while %person%
+  if %person.is_pc%
+    if %person.health% <= 0
+      * Lying down is basically ducking right?
+      set command 1
+    else
+      set command %self.varexists(command_%person.id%)%
+      if %command%
+        eval command %%self.command_%person.id%%%
+        rdelete command_%person.id% %self.id%
+      end
+    end
+    if %command% != duck
+      %send% %person% &rYou are knocked to the ground by the flying boulder!
+      %echoaround% %person% %person.name% is knocked to the ground by the flying boulder!
+      %damage% %person% 150 physical
+      dg_affect #10967 %person% STUNNED on 5
+    else
+      %send% %person% You throw yourself to the ground, and the boulder flies over your head!
+      %echoaround% %person% %person.name% throws %person.himher%self to the ground!
+    end
+  end
+  set person %person.next_in_room%
+done
+~
+#10972
+Hill Giant fight: Club Smash (dive)~
+0 k 50
+~
+if %self.cooldown(10966)%
+  halt
+end
+nop %self.set_cooldown(10966, 30)%
+%echo% %self.name% raises %self.hisher% club for an overhead smash!
+%echo% &YYou'd better dive out of the way!&0
+set running 1
+remote running %self.id%
+wait 10 sec
+set running 0
+remote running %self.id%
+%echo% %self.name% slams %self.hisher% club down!
+set room %self.room%
+set person %room.people%
+while %person%
+  if %person.is_pc%
+    if %person.health% <= 0
+      * Can't dodge if incapacitated
+    else
+      set command %self.varexists(command_%person.id%)%
+      if %command%
+        eval command %%self.command_%person.id%%%
+        rdelete command_%person.id% %self.id%
+      end
+    end
+    if %command% != dive
+      %send% %person% &rYou are smashed to the ground by the force of the blow!
+      %echoaround% %person% %person.name% is smashed to the ground by the force of the blow!
+      %damage% %person% 150 physical
+      dg_affect #10967 %person% STUNNED on 5
+    else
+      %send% %person% You dive to the side, and the club slams into the ground where you were standing!
+      %echoaround% %person% %person.name% dives out of the way!
+    end
+  end
+  set person %person.next_in_room%
+done
+~
+#10973
+Hill Giant fight: Quake Stomp (jump)~
+0 k 100
+~
+if %self.cooldown(10966)%
+  halt
+end
+nop %self.set_cooldown(10966, 30)%
+%echo% %self.name% lifts %self.hisher% foot high, preparing for a powerful stomp...
+%echo% &YYou'd better jump!&0
+set running 1
+remote running %self.id%
+wait 10 sec
+set running 0
+remote running %self.id%
+%echo% %self.name% stomps %self.hisher% foot down, sending a powerful tremor through the ground!
+set room %self.room%
+set person %room.people%
+while %person%
+  if %person.is_pc%
+    if %person.health% <= 0
+      * Can't dodge if incapacitated
+    else
+      set command %self.varexists(command_%person.id%)%
+      if %command%
+        eval command %%self.command_%person.id%%%
+        rdelete command_%person.id% %self.id%
+      end
+    end
+    if %command% != jump
+      %send% %person% &rYou are knocked off your feet by the ground tremor!&0
+      %echoaround% %person% %person.name% is knocked to the ground!
+      dg_affect #10967 %person% HARD-STUNNED on 5
+      dg_affect #10968 %person% DODGE -20 15
+    else
+      %send% %person% You leap into the air as the ground shakes below you, avoiding the tremor!
+      %echoaround% %person% %person.name% leaps into the air, avoiding the tremor!
+    end
+  end
+  set person %person.next_in_room%
+done
+~
+#10974
+Hill Giant fight commands~
+0 c 0
+duck dive jump~
+if !%self.running%
+  %send% %actor% You don't need to do that right now.
+  return 1
+  halt
+end
+if %self.varexists(command_%actor.id%)%
+  eval current_command %%self.command_%actor.id%%%
+  if %current_command% /= %cmd%
+    %send% %actor% You already did.
+    halt
+  end
+end
+if duck /= %cmd%
+  set command_%actor.id% duck
+  %send% %actor% You stand your ground and prepare to duck...
+  %echoaround% %actor% %actor.name% stands %actor.hisher% ground and prepares to duck...
+elseif dive /= %cmd%
+  %send% %actor% You tense and prepare to dive to one side...
+  %echoaround% %actor% %actor.name% tenses, preparing to dive out of the way...
+  set command_%actor.id% dive
+elseif jump /= %cmd%
+  %send% %actor% You crouch and prepare to jump into the air...
+  %echoaroud% %actor% %actor.name% crouches and prepares to jump into the air...
+  set command_%actor.id% jump
+end
+remote command_%actor.id% %self.id%
+~
 $

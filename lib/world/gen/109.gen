@@ -48,4 +48,52 @@ burrowed~
 4 0
 0 0 0 0
 S
+#10966
+giant attack~
+3 0
+0 0 0 0
+S
+#10967
+stunned~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by the giant's attack.~
+S
+#10968
+dazed~
+4 0
+0 0 0 0
+T0
+You are no longer dazed by the ground tremor.~
+T2
+You are dazed by the ground tremor!~
+S
+#10972
+carve stone~
+2 0
+0 0 0 0
+T0
+You chisel away at the giant stone head...~
+T1
+$n chisels away at the giant stone head...~
+S
+#10973
+repair causeway~
+2 0
+0 0 0 0
+T0
+You make some basic repairs on the causeway, but it was built to last and doesn't need much.~
+T1
+$n makes some basic repairs to the causeway.~
+S
+#10975
+polish head~
+2 0
+0 0 0 0
+T0
+You polish the giant stone head.~
+T1
+$n polishes the giant stone head.~
+S
 $

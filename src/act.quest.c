@@ -283,6 +283,10 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				quest_data *start = quest_proto(reward->vnum);
 				struct instance_data *inst = get_instance_by_id(pcq->last_instance_id);
 				
+				if (start && QUEST_FLAGGED(start, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+					break;	// player does not want tutorials to auto-chain
+				}
+				
 				// shows nothing if the player doesn't qualify
 				if (start && !is_on_quest(ch, reward->vnum) && char_meets_prereqs(ch, start, inst)) {
 					if (!PRF_FLAGGED(ch, PRF_COMPACT)) {

@@ -67,6 +67,27 @@ const int flags_door[] = {
 };
 
 
+// helper data type for listing portals
+struct temp_portal_data {
+	room_data *room;
+	int distance;
+	int in_city;
+	bool is_own;
+	struct temp_portal_data *next;
+};
+
+
+// simple sorter for portal data
+int sort_temp_portal_data(struct temp_portal_data *a, struct temp_portal_data *b) {
+	if (a->is_own != b->is_own) {
+		return a->is_own ? -1 : 1;
+	}
+	else {
+		return a->distance - b->distance;
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
@@ -107,6 +128,57 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 			ROOM_TRACKS(room) = track;
 		}
 	}
+}
+
+
+/**
+* Builds a temporary list of portals available to the character, based on a
+* location. You MUST free this list after you're done with it.
+*
+* @param char_data *ch The person we're building the list for (their loyalty matters).
+* @param room_data *origin The location to look for portals near.
+* @param bool from_city If TRUE, the character is in a city.
+* @param bool all_portals If TRUE, looking for all public portals, not just allies.
+* @return struct temp_portal_data* The temporary list of portals.
+*/
+struct temp_portal_data *build_portal_list_near(char_data *ch, room_data *origin, bool from_city, bool all_portals) {
+	struct temp_portal_data *port, *portal_list = NULL;
+	bool there_in_city, wait_there;
+	room_data *room, *next_room;
+	int dist;
+	
+	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!all_portals && !ROOM_OWNER(room)) {
+			continue;	// only show unowned on all
+		}
+		if (!IS_COMPLETE(room) || !room_has_function_and_city_ok(room, FNC_PORTAL)) {
+			continue;	// not a portal
+		}
+		if (!can_use_room(ch, room, all_portals ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES)) {
+			continue;	// not usable
+		}
+		
+		// compute some distances
+		dist = compute_distance(origin, room);
+		there_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_there) : FALSE;
+		
+		if (all_portals && dist > max_out_of_city_portal && (!from_city || !there_in_city)) {
+			continue;	// need city to reach it (all only)
+		}
+		
+		// should be ok?
+		CREATE(port, struct temp_portal_data, 1);
+		port->room = room;
+		port->distance = dist;
+		port->in_city = there_in_city;
+		port->is_own = (ROOM_OWNER(room) && ROOM_OWNER(room) == GET_LOYALTY(ch));
+		
+		LL_INSERT_INORDER(portal_list, port, sort_temp_portal_data);
+	}
+	
+	return portal_list;
 }
 
 
@@ -1963,22 +2035,57 @@ ACMD(do_portal) {
 	
 	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
-	room_data *room, *next_room, *target = NULL;
+	struct temp_portal_data *port, *next_port, *portal_list = NULL;
+	room_data *near = NULL, *target = NULL;
 	obj_data *portal, *end, *obj;
 	int bsize, lsize, count, num, dist;
 	bool all = FALSE, wait_here = FALSE, wait_there = FALSE, ch_in_city;
-	bool there_in_city;
 	
 	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
 	
-	argument = any_one_word(argument, arg);
+	ch_in_city = (is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || (!ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait_here)));
+	skip_spaces(&argument);
+	
+	// grab the first word off the argument
+	if (*argument == '(' || *argument == '"') {	// if it starts with a ( or ", strip them
+		argument = any_one_word(argument, arg);
+		strcpy(argument, arg);
+	}
+	else {	// grab the first word but don't remove it
+		skip_spaces(&argument);
+		any_one_word(argument, arg);
+	}
 	
 	if (!str_cmp(arg, "-a") || !str_cmp(arg, "-all")) {
 		all = TRUE;
 	}
+	else if (!str_cmp(arg, "-n") || !str_cmp(arg, "-near")) {
+		// portal near <coords>
+		argument = any_one_arg(argument, arg);	// strip off the 'near'
+		argument = any_one_word(argument, arg);	// grab coords into 'arg'
+		
+		if (!HAS_NAVIGATION(ch)) {
+			msg_to_char(ch, "You can't do that without the Navigation ability.\r\n");
+			return;
+		}
+		if (!*arg) {
+			msg_to_char(ch, "See portals near which coordinates?\r\n");
+			return;
+		}
+		if (!strchr(arg, ',')) {
+			msg_to_char(ch, "You can only use 'portal near' with coordinates.\r\n");
+			return;
+		}
+		
+		near = find_target_room(ch, arg);
+		if (!near) {
+			msg_to_char(ch, "Invalid location.\r\n");
+			return;
+		}
+	}
 	
 	// just show portals
-	if (all || !*arg) {
+	if (all || near || !*argument) {
 		if (IS_NPC(ch) || !ch->desc) {
 			msg_to_char(ch, "You can't list portals right now.\r\n");
 			return;
@@ -1988,38 +2095,42 @@ ACMD(do_portal) {
 			return;
 		}
 		
-		bsize = snprintf(buf, sizeof(buf), "Known portals:\r\n");
+		portal_list = build_portal_list_near(ch, near ? near : IN_ROOM(ch), ch_in_city, all);
+		
+		// ready to show it
+		if (near) {
+			bsize = snprintf(buf, sizeof(buf), "Known portals near (%d, %d):\r\n", X_COORD(near), Y_COORD(near));
+		}
+		else {
+			bsize = snprintf(buf, sizeof(buf), "Known portals:\r\n");
+		}
 		
 		count = 0;
-		ch_in_city = (is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &wait_here) || (!ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait_here)));
-		HASH_ITER(hh, world_table, room, next_room) {
+		LL_FOREACH_SAFE(portal_list, port, next_port) {
 			// early exit
 			if (bsize >= sizeof(buf) - 1) {
 				break;
 			}
 			
-			dist = compute_distance(IN_ROOM(ch), room);
-			there_in_city = is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_there);
+			++count;
+			*line = '\0';
+			lsize = 0;
 			
-			if (ROOM_OWNER(room) && room_has_function_and_city_ok(room, FNC_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (dist <= max_out_of_city_portal || (ch_in_city && there_in_city)))) {
-				// only shows owned portals the character can use
-				++count;
-				*line = '\0';
-				lsize = 0;
-				
-				// sequential numbering: only numbers them if it's not a -all
-				if (!all) {
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%2d.", count);
-				}
-				
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s %s (%s%s&0)", coord_display_room(ch, room, TRUE), get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
-				
-				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(room))) {
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
-				}
-				
-				bsize += snprintf(buf + bsize, sizeof(buf) - bsize, "%s\r\n", line);
+			// sequential numbering: only numbers them if it's not a -all
+			if (!all) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%2d.", count);
 			}
+			
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s %s (%s%s&0) - %d tile%s", coord_display_room(ch, port->room, TRUE), get_room_name(port->room, FALSE), ROOM_OWNER(port->room) ? EMPIRE_BANNER(ROOM_OWNER(port->room)) : "\t0", ROOM_OWNER(port->room) ? EMPIRE_ADJECTIVE(ROOM_OWNER(port->room)) : "not claimed", port->distance, PLURAL(port->distance));
+			
+			if ((port->distance > max_out_of_city_portal && (!ch_in_city || !port->in_city)) || (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(port->room))) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
+			}
+			
+			bsize += snprintf(buf + bsize, sizeof(buf) - bsize, "%s\r\n", line);
+			
+			// free RAM!
+			free(port);
 		}
 		
 		// page it in case it's long
@@ -2028,20 +2139,30 @@ ACMD(do_portal) {
 		return;
 	}
 	
-	// targeting: by list number (only targets member/ally portals
-	if (is_number(arg) && (num = atoi(arg)) >= 1 && GET_LOYALTY(ch)) {
-		HASH_ITER(hh, world_table, room, next_room) {
-			if (ROOM_OWNER(room) && room_has_function_and_city_ok(room, FNC_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
-				if (--num <= 0) {
-					target = room;
-					break;
-				}
+	// targeting: by list number (only targets member/ally portals)
+	if (!target && !strchr(argument, ',') && is_number(argument) && (num = atoi(argument)) >= 1 && GET_LOYALTY(ch)) {
+		portal_list = build_portal_list_near(ch, IN_ROOM(ch), ch_in_city, FALSE);
+		LL_FOREACH_SAFE(portal_list, port, next_port) {
+			if (!target && --num <= 0) {
+				target = port->room;
 			}
+			free(port);	// free RAM!
+		}
+	}
+	
+	// targeting: by keywords? (only targets member/ally portals; only if not coords)
+	if (!target && *argument && !strchr(argument, ',')) {
+		portal_list = build_portal_list_near(ch, IN_ROOM(ch), ch_in_city, FALSE);
+		LL_FOREACH_SAFE(portal_list, port, next_port) {
+			if (!target && multi_isname(argument, get_room_name(port->room, FALSE))) {
+				target = port->room;
+			}
+			free(port);	// free RAM!
 		}
 	}
 	
 	// targeting: if we didn't get a result yet, try standard targeting
-	if (!target && !(target = find_target_room(ch, arg))) {
+	if (!target && !(target = find_target_room(ch, argument))) {
 		// sends own message
 		return;
 	}

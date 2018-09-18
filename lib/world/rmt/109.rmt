@@ -52,4 +52,11 @@ small dragon resting here. This one has already emerged. Perhaps it is nearby?
 g 0 0
 M 0 10950 100.00 1
 S
+#10965
+Inside the Hovel~
+This is a holding room not seen by players.
+~
+g 0 0
+M 0 10968 100.00 1
+S
 $

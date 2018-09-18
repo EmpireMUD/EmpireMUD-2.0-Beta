@@ -41,6 +41,7 @@
 extern struct archetype_menu_type archetype_menu[];
 
 // external funcs
+extern bool has_anonymous_host(descriptor_data *desc);
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
@@ -2028,7 +2029,10 @@ bool check_multiplaying(descriptor_data *d) {
 		}
 		else if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !ACCOUNT_FLAGGED(c->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !PLR_FLAGGED(d->character, PLR_IPMASK) && !strcmp(c->host, d->host)) {
 			// IP is already logged in: just decline the connection
-			ok = FALSE;
+			// anonymous players are allowed through because the IP is not expected to be unique (unless same acct)
+			if (GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character) || !has_anonymous_host(d)) {
+				ok = FALSE;
+			}
 		}
 	}
 	
@@ -2270,7 +2274,6 @@ void nanny(descriptor_data *d, char *arg) {
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
-	extern bool has_anonymous_host(descriptor_data *desc);
 	extern int num_earned_bonus_traits(char_data *ch);
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
