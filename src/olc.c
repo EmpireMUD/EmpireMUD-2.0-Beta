@@ -254,6 +254,7 @@ OLC_MODULE(medit_movetype);
 OLC_MODULE(medit_nameset);
 OLC_MODULE(medit_script);
 OLC_MODULE(medit_sex);
+OLC_MODULE(medit_size);
 OLC_MODULE(medit_short_description);
 
 // map modules
@@ -782,6 +783,7 @@ const struct olc_command_data olc_data[] = {
 	{ "script", medit_script, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "sex", medit_sex, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "shortdescription", medit_short_description, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "size", medit_size, OLC_MOBILE, OLC_CF_EDITOR },
 	
 	// map commands
 	{ "build", mapedit_build, OLC_MAP, OLC_CF_MAP_EDIT },

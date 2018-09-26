@@ -892,6 +892,17 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_GENDERS  3	// total
 
 
+// SIZE_x: character size (determines blood pool, corpse size, etc) -- note: these must go in order but you'll need to write an auto-updater if you want to add one in the middle
+#define SIZE_NEGLIGIBLE  0	// has no size
+#define SIZE_TINY  1	// mouse
+#define SIZE_SMALL  2	// dog
+#define SIZE_NORMAL  3	// human
+#define SIZE_LARGE  4	// horse
+#define SIZE_HUGE  5	// elephant
+#define SIZE_ENORMOUS  6	// dragon
+#define NUM_SIZES  7	// total
+
+
 // positions
 #define POS_DEAD  0	/* dead				*/
 #define POS_MORTALLYW  1	/* mortally wounded	*/
@@ -3903,6 +3914,7 @@ struct char_special_data {
 	// add new items to write_player_to_file() and read_player_primary_data()
 	
 	int idnum;	// player's idnum; -1 for mobiles
+	sbyte size;	// character's SIZE_ const
 	bitvector_t act;	// mob flag for NPCs; player flag for PCs
 	bitvector_t injuries;	// Bitvectors including damage to the player
 	bitvector_t affected_by;	// Bitvector for spells/skills affected by
@@ -5263,4 +5275,13 @@ struct map_data {
 	struct map_data *next_in_sect;	// LL of all map locations of a given sect
 	struct map_data *next_in_base_sect;	// LL for base sect
 	struct map_data *next;	// linked list of non-ocean tiles, for iterating
+};
+
+
+// for character size, search SIZE_x
+struct character_size_data {
+	int max_blood;	// how much blood the mob has
+	bitvector_t corpse_flags;	// large or not
+	bool can_take_corpse;	// corpse is no-take if false
+	bool show_on_map;	// show (oo)/name on map at range
 };

@@ -1682,6 +1682,7 @@ void clear_char(char_data *ch) {
 
 	ch->vnum = NOBODY;
 	GET_POS(ch) = POS_STANDING;
+	GET_SIZE(ch) = SIZE_NORMAL;
 	MOB_INSTANCE_ID(ch) = NOTHING;
 	MOB_DYNAMIC_SEX(ch) = NOTHING;
 	MOB_DYNAMIC_NAME(ch) = NOTHING;

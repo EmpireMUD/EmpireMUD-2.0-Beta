@@ -1518,6 +1518,32 @@ const char *pool_abbrevs[] = {
 };
 
 
+// SIZE_x (1/2): character size, strings
+const char *size_types[] = {
+	"negligible",
+	"tiny",
+	"small",
+	"normal",
+	"large",
+	"huge",	// 5
+	"enormous",
+	"\n"
+};
+
+
+// SIZE_x (1/2): character size, data
+struct character_size_data size_data[] = {
+	// max_blood, corpse_flags, can_take_corpse, show_on_map
+	{ 100, NOBITS, TRUE, FALSE },	// negligible size
+	{ 10, NOBITS, TRUE, FALSE },	// tiny
+	{ 25, NOBITS, TRUE, FALSE },	// small
+	{ 100, OBJ_LARGE, TRUE, FALSE },	// normal/human size
+	{ 150, OBJ_LARGE, TRUE, FALSE },	// large
+	{ 200, OBJ_LARGE, FALSE, FALSE },	// huge
+	{ 300, OBJ_LARGE, FALSE, TRUE },	// enormous
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CRAFT RECIPE CONSTANTS //////////////////////////////////////////////////
 

@@ -3898,6 +3898,24 @@ Examples:
 
 See also: MEDIT LONG DESCRIPTION
 #d
+"MEDIT SIZE" "MOB SIZE"
+
+Usage:  .size [size]
+
+A mob's size determines several of its attributes:
+- corpse size (large/normal) and whether or not players can take the corpse
+- total amount of blood the mob has (also modified by animal/vampire flags)
+- whether or not you can see the mob on the world map
+
+Available sizes are:
+ &cnegligible&0 - no size / immaterial
+ &ctiny&0 - mouse, insect; low blood
+ &csmall&0 - dog, goblin
+ &cnormal&0 - human; large corpse
+ &clarge&0 - horse; large corpse
+ &chuge&0 - elephant; cannot take corpse
+ &cenormous&0 - dragon; can be seen on the map
+#d
 MINIPET MINI-PET "MINI PET" "PET WHISTLE"
 
 Mini-pets are a common cosmetic reward from adventure zones. They are summoned

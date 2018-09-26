@@ -58,6 +58,7 @@ extern const char *progress_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
+extern const char *size_types[];
 extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
@@ -4227,7 +4228,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)]);
+		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s, Size: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[(int) GET_SIZE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2);

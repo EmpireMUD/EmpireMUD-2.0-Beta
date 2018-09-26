@@ -37,6 +37,7 @@
 
 // external vars
 extern struct generic_name_data *generic_names;
+extern struct character_size_data size_data[];
 
 // external funcs
 extern int perform_move(char_data *ch, int dir, bitvector_t flags);
@@ -1327,10 +1328,9 @@ void scale_mob_to_level(char_data *mob, int level) {
 	mob->points.max_pools[MANA] = MAX(0, (int) ceil(value));
 	
 	// blood*
-	value = base_player_pools[BLOOD];
+	value = size_data[(int)GET_SIZE(mob)].max_blood;
 	value += MOB_FLAGGED(mob, MOB_VAMPIRE) ? ((10 * high_level) + (20 * over_level)) : 0;
 	value *= MOB_FLAGGED(mob, MOB_ANIMAL) ? 0.5 : 1.0;
-	value *= (level <= 10) ? 0.1 : 1.0;
 	mob->points.max_pools[BLOOD] = MAX(1, (int) ceil(value));
 	
 	// strength

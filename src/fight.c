@@ -43,6 +43,7 @@
 // external vars
 extern struct message_list fight_messages[MAX_MESSAGES];
 extern const double hit_per_dex;
+extern struct character_size_data size_data[];
 
 // external funcs
 ACMD(do_flee);
@@ -1488,6 +1489,12 @@ obj_data *make_corpse(char_data *ch) {
 	// store as person's last corpse id
 	if (!IS_NPC(ch)) {
 		GET_LAST_CORPSE_ID(ch) = obj_script_id(corpse);
+	}
+	else {	// mob corpse setup
+		if (!size_data[(int)GET_SIZE(ch)].can_take_corpse) {
+			REMOVE_BIT(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
+		}
+		SET_BIT(GET_OBJ_EXTRA(corpse), size_data[(int)GET_SIZE(ch)].corpse_flags);
 	}
 	
 	// binding

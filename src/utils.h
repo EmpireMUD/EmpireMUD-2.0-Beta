@@ -382,6 +382,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_MOVE_REGEN(ch)  ((ch)->char_specials.move_regen)
 #define GET_SITTING_ON(ch)  ((ch)->char_specials.sitting_on)
 #define GET_POS(ch)  ((ch)->char_specials.position)
+#define GET_SIZE(ch)  ((ch)->char_specials.size)
 #define HUNTING(ch)  ((ch)->char_specials.hunting)
 #define IS_CARRYING_N(ch)  ((ch)->char_specials.carry_items)
 
