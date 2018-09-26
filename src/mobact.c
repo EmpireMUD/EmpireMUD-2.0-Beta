@@ -1241,7 +1241,6 @@ void scale_mob_for_character(char_data *mob, char_data *ch) {
 * @param int level The level to scale it to.
 */
 void scale_mob_to_level(char_data *mob, int level) {
-	extern const int base_player_pools[NUM_POOLS];
 	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 	
 	double value, target;
