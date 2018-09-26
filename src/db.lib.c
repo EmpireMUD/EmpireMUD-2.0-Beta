@@ -4651,7 +4651,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 	if (!get_line(mob_f, line) || sscanf(line, "%d %d %s %s %d", &t[0], &t[1], f1, f2, &t[2]) != 5) {
 		t[2] = SIZE_NORMAL;	// backwards-compatible
 		
-		if (!get_line(mob_f, line) || sscanf(line, "%d %d %s %s", &t[0], &t[1], f1, f2) != 4) {
+		if (sscanf(line, "%d %d %s %s", &t[0], &t[1], f1, f2) != 4) {
 			log("SYSERR: Format error in first numeric section of mob #%d\n...expecting line of form '# # # # #'", nr);
 			exit(1);
 		}
