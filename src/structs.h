@@ -5284,4 +5284,7 @@ struct character_size_data {
 	bitvector_t corpse_flags;	// large or not
 	bool can_take_corpse;	// corpse is no-take if false
 	bool show_on_map;	// show (oo)/name on map at range
+	char *corpse_keywords;	// additional keywords on the corpse
+	char *corpse_long_desc;	// custom long desc with %s for the "corpse of"
+	char *body_long_desc;	// custom long desc with %s for "the body of"
 };
