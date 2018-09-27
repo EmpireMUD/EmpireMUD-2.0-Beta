@@ -3,7 +3,7 @@ lumberjack goblin~
 a goblin lumberjack~
 A goblin lumberjack is attacking trees with a greataxe here!
 ~
-10 50 dy c
+10 50 dy c 2
 0 0 0 2
 I 4 18100 10.00 1 a  # LOOT: a logging axe
 I 4 18101 10.00 3 a  # LOOT: a goblin lumberjack brew

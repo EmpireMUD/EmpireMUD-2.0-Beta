@@ -3,7 +3,7 @@ hag swamp old~
 the swamp hag~
 An old hag is rocking slowly in her chair.
 ~
-0 0 bdgvxAB c
+0 0 bdgvxAB c 3
 2 0 0 15
 I 4 19003 100.00 1  # LOOT: the Swamp Hag loot replacer
 I 4 19011 9.00 1 L  # LOOT: a repulsive stench
@@ -48,7 +48,7 @@ rat swamp grizzled~
 a swamp rat~
 A grizzled swamp rat is sitting in the corner.
 ~
-0 0 abdhoz c
+0 0 abdhoz c 2
 0 0 0 9
 T 19013
 T 19014
@@ -58,7 +58,7 @@ rat swamp huge~
 a huge swamp rat~
 A huge swamp rat decked out in bone jewelry stares malevolently at you.
 ~
-0 0 abdhoz c
+0 0 abdhoz c 3
 0 0 0 9
 T 19013
 S
@@ -67,7 +67,7 @@ rat swamp~
 a swamp rat~
 A swamp rat is trying to climb your leg.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
 M
 0
@@ -86,7 +86,7 @@ rodent size unusual~
 a rodent of unusual size~
 A rodent of unusual size is cleaning its whiskers.
 ~
-100 125 dej 0
+100 125 dej 0 4
 0 0 8 9
 S
 #19009
@@ -94,7 +94,7 @@ manatee~
 a manatee~
 A manatee rolls over playfully.
 ~
-100 125 del 0
+100 125 del 0 4
 0 0 6 9
 S
 #19010
@@ -102,7 +102,7 @@ broom enchanted~
 an enchanted broom~
 An enchanted broom is hovering here.
 ~
-100 125 bde m
+100 125 bde m 3
 0 0 2 28
 S
 $

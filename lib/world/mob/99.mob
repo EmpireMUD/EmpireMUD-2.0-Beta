@@ -3,7 +3,7 @@ puppy adorable~
 an adorable puppy~
 An adorable puppy is whining at you.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
 M
 0
@@ -25,7 +25,7 @@ kitten cute~
 a cute kitten~
 A cute kitten is winding its way between your legs.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
 M
 0
@@ -53,7 +53,7 @@ pixie tiny~
 a tiny pixie~
 A tiny pixie is flitting around.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 18 22
 M
 0
@@ -72,7 +72,7 @@ fawn tiny~
 a tiny fawn~
 A tiny fawn is staggering around.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 14 11
 M
 0
@@ -94,7 +94,7 @@ cub bear~
 a bear cub~
 A bear cub is rearing up playfully.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
 M
 0
@@ -113,7 +113,7 @@ pup wolf~
 a wolf pup~
 A wolf pup is panting and wagging its tail.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
 M
 0
@@ -135,7 +135,7 @@ hummingbird tame~
 a tame hummingbird~
 A tame hummingbird flits around you.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 26
 M
 0
@@ -154,7 +154,7 @@ butterfly colorful~
 a colorful butterfly~
 A colorful butterfly is fluttering around here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 18 22
 M
 0
@@ -179,7 +179,7 @@ cobra cuddly~
 a cuddly cobra~
 A cuddly cobra is winding itself around your leg.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 5 9
 M
 0
@@ -195,7 +195,7 @@ bat bitsy~
 a bitsy bat~
 A bitsy bat is flapping around here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 9
 M
 0
@@ -217,7 +217,7 @@ fish flying~
 a flying fish~
 A flying fish swims happily past you.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 6 9
 M
 0
@@ -236,7 +236,7 @@ firefly friendly~
 a friendly firefly~
 A friendly firefly is flying happily around here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 6 22
 M
 0
@@ -267,7 +267,7 @@ spirit fire tame~
 a fire spirit~
 A tame fire spirit is blazing away here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 0
 0 0 2 16
 M
 0
@@ -295,7 +295,7 @@ spirit ice tame~
 an ice spirit~
 A tame ice spirit is freezing the air here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 20
 M
 0
@@ -323,7 +323,7 @@ spirit storm tame~
 a storm spirit~
 A tame storm spirit is sparking and crackling here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 0
 0 0 2 21
 M
 0
@@ -354,7 +354,7 @@ spirit earth tame~
 an earth spirit~
 A tame earth spirit is levitating pebbles here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 5
 M
 0
@@ -379,7 +379,7 @@ spirit lost~
 a lost spirit~
 A lost spirit is wandering aimlessly here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 0
 0 0 2 21
 M
 0
@@ -416,7 +416,7 @@ lizard little~
 a little lizard~
 A little lizard is scuttling around here.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 7 9
 M
 0
@@ -441,7 +441,7 @@ dwarf-kobold kobold~
 a dwarf-kobold~
 A dwarf-kobold brandishes its tiny scimitar at you!
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 11 1
 M
 1
@@ -469,7 +469,7 @@ bug cute~
 a cute bug~
 You have found a cute bug.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 8 9
 M
 0
@@ -488,7 +488,7 @@ rock pet~
 a pet rock~
 A pet rock is sitting here.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 15 5
 M
 0
@@ -522,7 +522,7 @@ shrub animated cute little~
 an animated shrub~
 A cute little shrub is growing here.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 9 7
 M
 0
@@ -550,7 +550,7 @@ eye floating~
 a floating eye~
 A floating eye without a body is staring at you.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 27 20
 M
 0
@@ -575,7 +575,7 @@ bug prehistoric~
 a prehistoric bug~
 A prehistoric bug has been unearthed.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 15
 M
 0
@@ -600,7 +600,7 @@ beagle bald~
 a bald beagle~
 A bald beagle hops along the ground, trying to take flight.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 15 9
 M
 0
@@ -616,7 +616,7 @@ snark great white~
 a great white snark~
 A great white snark drags itself slowly along the ground.
 ~
-1 1 bdoD n
+1 1 bdoD n 4
 0 0 17 9
 M
 1
@@ -641,7 +641,7 @@ Heisenbug notorious~
 the notorious Heisenbug~
 You have discovered the notorious Heisenbug!
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 8 9
 T 9901
 T 9902

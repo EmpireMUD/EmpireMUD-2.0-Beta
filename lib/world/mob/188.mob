@@ -3,7 +3,7 @@ spirit restless~
 a restless spirit~
 A restless spirit haunts this place (list).
 ~
-0 0 bdho cnG
+0 0 bdho cnG 0
 2 0 0 15
 M
 0
@@ -26,7 +26,7 @@ centaur headless horseman man~
 the headless centaur~
 A headless horse man rears back and brandishes his sword!
 ~
-25 275 bdoy c
+25 275 bdoy c 4
 1 0 12 1
 I 4 18830 12.50 1 a  # LOOT: a glowing bone shield
 I 4 18831 12.50 1 a  # LOOT: a leather batwing shield
@@ -61,7 +61,7 @@ lantern attack-o-lantern~
 the attack-o-lantern~
 An attack-o-lantern is floating here.
 ~
-25 275 abdhozD c
+25 275 abdhozD c 3
 0 0 27 28
 T 18807
 S
@@ -70,7 +70,7 @@ S
 the ghost of #n~
 The ghost of #n is haunting this place.
 ~
-0 0 do cmn
+0 0 do cmn 0
 0 0 27 15
 S
 #18824
@@ -78,7 +78,7 @@ S
 guard #n~
 #n the guard is standing here.
 ~
-5 125 bdouv 0
+5 125 bdouv 0 3
 1 0 0 1
 S
 #18826
@@ -86,7 +86,7 @@ companion starry-eyed eyed~
 a starry-eyed companion~
 A companion stands, starry-eyed, looking around in wonder.
 ~
-1 1 bdoD n
+1 1 bdoD n 3
 0 0 0 15
 M
 1
@@ -114,7 +114,7 @@ ghost knocking~
 a knocking ghost~
 A ghost lingers in the air.
 ~
-25 75 dov de
+25 75 dov de 0
 0 0 27 28
 M
 0
@@ -131,7 +131,7 @@ ghost rattling~
 a rattling ghost~
 A ghost lingers in the air.
 ~
-25 75 dov de
+25 75 dov de 0
 0 0 27 28
 M
 0
@@ -148,7 +148,7 @@ hand skittering disembodied~
 a skittering hand~
 A disembodied hand skitters across the floor.
 ~
-25 75 dov 0
+25 75 dov 0 1
 0 0 8 15
 S
 #18839
@@ -156,7 +156,7 @@ horse headless~
 a headless horse~
 A headless horse neighs silently in the breeze.
 ~
-10 100 dej 0
+10 100 dej 0 4
 0 0 14 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -169,7 +169,7 @@ nightmare pitch-black black~
 a nightmare~
 A pitch-black nightmare gallops across the sky.
 ~
-100 150 bdej m
+100 150 bdej m 4
 0 0 12 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -179,7 +179,7 @@ ghoul little~
 a little ghoul~
 A little ghoul scampers around, spreading mischief.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
 M
 0
@@ -207,7 +207,7 @@ goblin mischievous~
 a mischievous goblin~
 A mischievous goblin is lurking around.
 ~
-25 75 dovz 0
+25 75 dovz 0 2
 0 0 9 9
 S
 #18843
@@ -215,7 +215,7 @@ vampire skulking~
 a skulking vampire~
 A vampire is skulking in the shadows.
 ~
-25 75 dovwz 0
+25 75 dovwz 0 3
 0 0 7 9
 T 9064
 S
@@ -224,7 +224,7 @@ ghost~
 a ghost~
 A ghost hangs in the air like a sheet.
 ~
-25 75 dhozD v
+25 75 dhozD v 0
 0 0 27 16
 S
 #18845
@@ -232,7 +232,7 @@ half-spider spider man half-man strange creature~
 a half-spider~
 A strange creature, half-spider, half-man, stands here.
 ~
-25 75 dovz v
+25 75 dovz v 3
 0 0 9 9
 S
 $

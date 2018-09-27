@@ -3,7 +3,7 @@ apprentice sorcerer's sorcerers~
 the sorcerer's apprentice~
 A sorcerer's apprentice stands in front of the rift (adventure).
 ~
-0 25 bdv cn
+0 25 bdv cn 3
 1 0 0 15
 I 12 12600 100.00 4  # PICKPOCKET: an elemental binding trap
 I 12 12616 10.00 1  # PICKPOCKET: a tiny broom whistle
@@ -40,7 +40,7 @@ elemental rocky earth~
 a rocky elemental~
 A rocky earth elemental rises from the soil.
 ~
-0 25 dh cG
+0 25 dh cG 2
 0 0 21 14
 I 4 12601 100.00 1  # LOOT: the essence of earth
 I 4 12612 10.00 1  # LOOT: a rolling rock whistle
@@ -66,7 +66,7 @@ elemental fire burning~
 a burning elemental~
 A fire elemental burns brightly!
 ~
-0 25 dh cG
+0 25 dh cG 2
 0 0 18 16
 I 4 12602 100.00 1  # LOOT: the essence of fire
 I 4 12613 10.00 1  # LOOT: a ball of fire whistle
@@ -91,7 +91,7 @@ elemental wind tornado~
 a wind elemental~
 A wind elemental rips across the land like a tornado!
 ~
-0 25 dh cG
+0 25 dh cG 2
 0 0 27 21
 I 4 12603 100.00 1  # LOOT: the essence of wind
 I 4 12614 10.00 1  # LOOT: a light breeze whistle
@@ -113,7 +113,7 @@ elemental water~
 a water elemental~
 A water elemental splashes about.
 ~
-0 25 dh cG
+0 25 dh cG 2
 0 0 10 20
 I 4 12604 100.00 1  # LOOT: the essence of water
 I 4 12615 10.00 1  # LOOT: a little puddle whistle
@@ -133,7 +133,7 @@ ember floating~
 a floating ember~
 An ember is floating here.
 ~
-1 1 abdhnoD G
+1 1 abdhnoD G 0
 0 0 27 16
 T 12608
 S
@@ -142,7 +142,7 @@ rock rolling little~
 a rolling rock~
 A little rock rolls around on the ground.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 21 15
 M
 0
@@ -155,7 +155,7 @@ fire ball little~
 a ball of fire~
 A little ball of fire rolls around in the air.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 21 15
 M
 0
@@ -168,7 +168,7 @@ breeze light~
 a light breeze~
 A light breeze whistles through your hair.
 ~
-1 1 bdoD n
+1 1 bdoD n 0
 0 0 29 15
 M
 0
@@ -181,7 +181,7 @@ puddle little~
 a little puddle~
 A little puddle splashes around on the ground.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 10 15
 M
 0
@@ -194,7 +194,7 @@ broom tiny~
 a tiny broom~
 A tiny broom marches in circles.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 35 15
 M
 0
@@ -207,7 +207,7 @@ druid grove hooded figure #n~
 a druid of the Grove~
 A hooded figure is standing amongst the trees.
 ~
-5 0 dx c
+5 0 dx c 3
 1 0 0 15
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -222,7 +222,7 @@ druid grove hooded figure #n~
 a druid of the Grove~
 A hooded figure is standing amongst the trees.
 ~
-5 0 bdvx c
+5 0 bdvx c 3
 0 0 0 15
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -237,7 +237,7 @@ faun druid hooded antlered tall~
 a hooded faun~
 A tall, antlered druid stands beneath the canopy of trees.
 ~
-5 0 bdx c
+5 0 bdx c 3
 2 0 0 11
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -252,7 +252,7 @@ druid gopher~
 a druid of the gopher~
 A druid of the gopher is crouched in the dirt.
 ~
-5 0 bdx c
+5 0 bdx c 3
 1 0 0 5
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -267,7 +267,7 @@ druid badger creature huge man~
 the badger druid~
 A huge creature - half man, half badger - looms over you!
 ~
-5 0 bdx c
+5 0 bdx c 3
 1 0 0 10
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -292,7 +292,7 @@ druid archdruid #n~
 Archdruid #n~
 Archdruid #n seems to glow with the energy of the Grove!
 ~
-5 0 bdvx c
+5 0 bdvx c 3
 2 3 0 5
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -317,7 +317,7 @@ druid tall crow~
 the crow druid~
 A tall druid in a black feathered cloak is perched above you.
 ~
-5 0 bdvx c
+5 0 bdvx c 3
 2 0 0 10
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -342,7 +342,7 @@ druid rotund turtle~
 the turtle druid~
 A rotund druid wallows peacefully in the water.
 ~
-5 0 bdx c
+5 0 bdx c 3
 1 0 0 9
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -368,7 +368,7 @@ wildling red eyes~
 a wildling~
 A bright red pair of eyes stare at you from the darkness.
 ~
-5 75 bdj ce
+5 75 bdj ce 2
 0 0 17 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -382,7 +382,7 @@ wotterling waterling wildling~
 a wotterling~
 A wotterling twists and curls through the trees.
 ~
-5 75 bdj ce
+5 75 bdj ce 2
 0 0 6 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -396,7 +396,7 @@ wildling black spiny~
 a wildling~
 A spiny black wildling is crawling down the tree.
 ~
-5 75 bdj ce
+5 75 bdj ce 2
 0 0 1 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -410,7 +410,7 @@ wildling black spiny escaped~
 an escaped wildling~
 A spiny black wildling is crawling down the tree.
 ~
-5 75 dj cde
+5 75 dj cde 2
 0 0 1 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -424,7 +424,7 @@ druid grove hooded figure #n~
 a druid of the Grove~
 A hooded druid is floating in the water.
 ~
-0 0 bdvx c
+0 0 bdvx c 3
 0 0 0 15
 I 4 12654 5.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: a golden seedling
@@ -439,7 +439,7 @@ wilding tiny~
 a tiny wildling~
 A tiny wildling stalks behind you.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 14 9
 M
 0
@@ -464,7 +464,7 @@ wildling tame~
 a wildling~
 A tame wildling is curled up on the ground.
 ~
-0 75 dej 0
+0 75 dej 0 4
 0 0 0 10
 I 3 12670 100.00 1  # BARDE: an armored wildling
 I 4 12654 25.00 1  # LOOT: wild fire
@@ -475,7 +475,7 @@ wildling armored~
 an armored wildling~
 An armored wildling crouches low, completely covered in plate armor.
 ~
-125 125 dej 0
+125 125 dej 0 4
 0 0 0 10
 I 4 12654 25.00 1  # LOOT: wild fire
 S
@@ -484,7 +484,7 @@ druid wildling~
 the wildling druid~
 A druid clings to the henge, half-morphed into a spiky black wildling.
 ~
-50 75 bdovx c
+50 75 bdovx c 2
 1 0 0 10
 I 4 1107 10.00 1  # LOOT: a wooden staff
 M
@@ -502,7 +502,7 @@ tree gnarled old grandmother poplar's poplars goods~
 Grandmother Poplar's Poplar Goods~
 A gnarled old tree with the face of a woman is selling some goods.
 ~
-0 0 bdAB cn
+0 0 bdAB cn 5
 2 0 0 15
 M
 0
@@ -522,7 +522,7 @@ fox orange talking~
 the talking fox~
 An orange talking fox stands here, wary.
 ~
-0 0 bd cn
+0 0 bd cn 2
 0 0 0 15
 M
 1
@@ -542,7 +542,7 @@ spirit strange grove~
 the Spirit of the Grove~
 A strange spirit lingers in the air.
 ~
-0 0 bd cn
+0 0 bd cn 0
 0 0 0 15
 M
 1
@@ -559,7 +559,7 @@ spirit rage~
 the spirit of rage~
 The spirit of rage is floating here, screaming with primal fury!
 ~
-0 0 bd n
+0 0 bd n 0
 0 0 2 16
 T 12686
 T 12687

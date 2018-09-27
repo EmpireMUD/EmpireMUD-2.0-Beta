@@ -3,7 +3,7 @@ boar~
 a boar~
 A boar snuffles the ground nearby.
 ~
-10 20 djo 0
+10 20 djo 0 3
 0 0 0 27
 I 0 3201 100.00 1  # BUTCHER: a slab of pork
 I 0 3201 100.00 1  # BUTCHER: a slab of pork
@@ -15,7 +15,7 @@ tapir forest~
 a forest tapir~
 A forest tapir is rooting around a bush.
 ~
-20 30 djo 0
+20 30 djo 0 3
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -26,7 +26,7 @@ capybara~
 a capybara~
 A capybara sits here, staring sideways at you.
 ~
-20 30 djo 0
+20 30 djo 0 2
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -36,7 +36,7 @@ seal harbor~
 a harbor seal~
 A harbor seal is rolling around playfully.
 ~
-20 30 bdjo 0
+20 30 bdjo 0 3
 0 0 16 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -52,7 +52,7 @@ crab horseshoe~
 a horseshoe crab~
 A horseshoe crab sits at the water's edge.
 ~
-10 15 bdjoz G
+10 15 bdjoz G 1
 0 0 8 3
 M
 0
@@ -66,7 +66,7 @@ iguana marine~
 a marine iguana~
 A marine iguana basks on a rock.
 ~
-10 20 bdjo 0
+10 20 bdjo 0 2
 0 0 16 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -76,7 +76,7 @@ flamingo pink~
 a pink flamingo~
 A pink flamingo is standing on one leg.
 ~
-10 20 djo m
+10 20 djo m 2
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 M
@@ -91,7 +91,7 @@ otter river playful~
 a river otter~
 A playful river otter rolls around in the water.
 ~
-15 25 djlo 0
+15 25 djlo 0 2
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -110,7 +110,7 @@ heron tall~
 a heron~
 A tall heron pokes its beak around for food.
 ~
-10 20 djo m
+10 20 djo m 2
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -119,7 +119,7 @@ crab mud~
 a mud crab~
 A mud crab pokes its head up.
 ~
-10 15 djloz G
+10 15 djloz G 1
 0 0 6 3
 S
 #9210
@@ -127,7 +127,7 @@ pirate salty~
 a salty pirate~
 A salty pirate stands atop a half-buried chest.
 ~
-75 100 bdvyz c
+75 100 bdvyz c 3
 1 0 0 1
 I 4 9210 100.00 1  # LOOT: a pirate's chest
 M
@@ -145,7 +145,7 @@ penguin little~
 a little penguin~
 A little penguin waddles along.
 ~
-10 15 djo 0
+10 15 djo 0 1
 0 0 16 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 M

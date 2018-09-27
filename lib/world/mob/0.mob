@@ -3,7 +3,7 @@ bug small flittering~
 a bug~
 A small, flittering bug zooms around -- you should report it!
 ~
-1 1 bdjo 0
+1 1 bdjo 0 0
 0 0 0 10
 S
 #33
@@ -11,7 +11,7 @@ lion time regal~
 a time lion~
 A regal time lion is basking before you.
 ~
-200 200 dhuA c
+200 200 dhuA c 3
 0 0 0 10
 T 33
 S
@@ -20,7 +20,7 @@ mobile new~
 a new mobile~
 A new mobile is standing here.
 ~
-75 75 d 0
+75 75 d 0 3
 0 0 0 15
 S
 $

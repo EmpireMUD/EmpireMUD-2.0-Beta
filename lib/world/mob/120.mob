@@ -3,7 +3,7 @@ anat goddess virgin war-goddess~
 the goddess Anat~
 Anat, virgin war-goddess of old, stands fierce and bloody (difficulty).
 ~
-225 325 aduyB ciE
+225 325 aduyB ciE 5
 2 0 35 1
 I 4 12004 16.67 1 a  # LOOT: the golden chain of the old god Anat
 I 4 12006 16.67 1 a  # LOOT: a vial of the blood of the old god Anat
@@ -56,7 +56,7 @@ Yatpan hawk~
 the hawk Yatpan~
 The hawk Yatpan swoops in to attack!
 ~
-225 325 abdhozD q
+225 325 abdhozD q 3
 1 0 2 27
 T 12011
 T 12013
@@ -66,7 +66,7 @@ hawk trained~
 a trained hawk~
 A trained hawk circles overhead.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 2
 0 0 0 10
 M
 0
@@ -91,7 +91,7 @@ anat memory~
 the memory of Anat~
 The memory of Anat, warrior-goddess of old, barely lingers in the air.
 ~
-225 325 do dn
+225 325 do dn 0
 0 0 27 15
 M
 0
@@ -111,7 +111,7 @@ hawk yatpan giant~
 the hawk Yatpan~
 The giant hawk Yatpan alights on the ground.
 ~
-100 125 de m
+100 125 de m 3
 0 0 2 10
 S
 #12030
@@ -119,7 +119,7 @@ hadad ba'al baal god~
 the god Ba'al Hadad~
 The storm god Ba'al Hadad towers over you, lightning in his eyes (difficulty).
 ~
-225 325 aduyB ciE
+225 325 aduyB ciE 5
 1 0 26 1
 I 4 12034 16.67 1 a  # LOOT: the bronze bull ring of Ba'al Hadad
 I 4 12036 16.67 1 a  # LOOT: the clouded ring of Ba'al Hadad
@@ -172,7 +172,7 @@ storm coming stormcloud massive baalhadadstormcloud~
 the Coming Storm~
 A massive stormcloud envelops and suffocates you!
 ~
-225 325 bdnyA ci
+225 325 bdnyA ci 5
 0 0 2 21
 T 12033
 T 12039
@@ -183,7 +183,7 @@ bull bronze little~
 the little bronze bull~
 A little bronze bull stands with its horns held high.
 ~
-1 1 bdoD dn
+1 1 bdoD dn 2
 0 0 0 27
 M
 0
@@ -196,7 +196,7 @@ lightning horse bolt~
 the lightning~
 A bolt of lightning in the shape of a horse appears before you.
 ~
-100 125 de m
+100 125 de m 0
 0 0 2 21
 S
 #12052
@@ -204,7 +204,7 @@ worshipper~
 a worshipper of the storm god~
 A worshipper of the storm god bows low, begging for rain.
 ~
-40 60 dov 0
+40 60 dov 0 3
 1 0 0 21
 M
 1

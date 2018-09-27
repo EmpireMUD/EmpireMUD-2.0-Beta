@@ -3,7 +3,7 @@ warhorse horse armored~
 an armored warhorse~
 An armored warhorse stands valiantly here.
 ~
-40 80 bdej 0
+40 80 bdej 0 4
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -26,7 +26,7 @@ warunicorn unicorn armored~
 an armored warunicorn~
 An armored warunicorn stands majestically here!
 ~
-100 150 bdejx 0
+100 150 bdejx 0 4
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -40,7 +40,7 @@ warelephant elephant huge armored~
 an armored warelephant~
 A huge, armored warelephant stands proudly here.
 ~
-90 110 bdejy 0
+90 110 bdejy 0 5
 0 0 0 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -61,7 +61,7 @@ warcamel camel armored~
 an armored warcamel~
 An armored warcamel stands firmly here.
 ~
-40 80 bdefj 0
+40 80 bdefj 0 4
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -75,7 +75,7 @@ warmammoth mammoth wooly armored~
 an armored warmammoth~
 An armored wooly warmammoth dominates the view!
 ~
-100 150 bdefjy 0
+100 150 bdefjy 0 5
 0 0 0 5
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -100,7 +100,7 @@ donkey wardonkey mule armored~
 a wardonkey~
 An armored wardonkey is circling you.
 ~
-40 80 dejo 0
+40 80 dejo 0 4
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -117,7 +117,7 @@ warox war ox armored~
 a war ox~
 An armored war ox is standing valiantly.
 ~
-40 70 dejo 0
+40 70 dejo 0 4
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat

@@ -3,7 +3,7 @@ goblin necromancer necrogoblin~
 the necrogoblin~
 The goblin necromancer is chanting here.
 ~
-125 200 adxB cd
+125 200 adxB cd 2
 1 0 0 20
 I 4 16004 5.00 1 i  # LOOT: a rib bone dagger
 I 4 16008 5.00 1 i  # LOOT: a stapes earring
@@ -45,7 +45,7 @@ skeleton warrior skeletal~
 a skeletal warrior~
 A skeletal warrior rattles here.
 ~
-125 200 acdhop cG
+125 200 acdhop cG 3
 0 0 22 15
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
@@ -63,7 +63,7 @@ skeleton soldier skeletal~
 a skeletal soldier~
 A skeletal soldier rattles here.
 ~
-125 200 acdhopz cqG
+125 200 acdhopz cqG 3
 0 0 22 1
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
@@ -81,7 +81,7 @@ rawhead~
 the rawhead~
 The rawhead looms here.
 ~
-125 200 dghopyA ciwEG
+125 200 dghopyA ciwEG 2
 0 0 26 15
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
@@ -99,7 +99,7 @@ mess bone natural materials~
 a mess~
 A mess of bone and natural materials stands here.
 ~
-125 200 dh cG
+125 200 dh cG 2
 0 0 13 15
 I 4 16005 18.00 1 d  # LOOT: a crushed skeleton
 I 4 16008 1.00 1 d  # LOOT: a stapes earring
@@ -119,7 +119,7 @@ plant skeletal skeleton~
 the skeletal plant~
 A skeleton with leaves for flesh and vines for veins sways here.
 ~
-125 200 bdhxzA cwABG
+125 200 bdhxzA cwABG 2
 2 0 0 15
 I 4 16011 5.00 1 i  # LOOT: a corrupted dragon's tooth
 I 4 16002 25.00 1 i  # LOOT: an astrakhan cloak
@@ -148,7 +148,7 @@ guard skeleton skeletal~
 a skeletal guard~
 A skeleton in what is clearly a guard's uniform stands here.
 ~
-125 200 abdhz cqG
+125 200 abdhz cqG 3
 0 0 0 2
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16014 15.00 1 w  # LOOT: a radius bow
@@ -172,7 +172,7 @@ guard skeleton skeletal~
 a skeletal guard~
 A skeleton in what is clearly a guard's uniform stands here.
 ~
-125 200 adhz cqG
+125 200 adhz cqG 3
 0 0 0 4
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16008 3.00 1 a  # LOOT: a stapes earring
@@ -196,7 +196,7 @@ horse fragmented bone~
 a horse made of fragmented bone~
 A horse made up of fragmented bone stands here.
 ~
-125 200 deh G
+125 200 deh G 4
 0 0 22 11
 T 16010
 S
@@ -205,7 +205,7 @@ horse vine~
 a viney horse~
 A horse made up of more vine than anything else sways here.
 ~
-125 200 deh G
+125 200 deh G 4
 0 0 14 15
 T 16010
 S
@@ -214,7 +214,7 @@ construct skeleton skeletal~
 a skeletal construct~
 A skeletal construct, made of many different creatures stands here.
 ~
-125 200 deh G
+125 200 deh G 4
 0 0 22 9
 T 16010
 S
@@ -223,7 +223,7 @@ construct plants~
 a plant construct~
 A construct made up of various plants sways here.
 ~
-125 200 deh G
+125 200 deh G 4
 0 0 13 7
 T 16010
 S
@@ -232,7 +232,7 @@ skeleton beastial plant~
 a beastial plant skeleton~
 A beastial plant skeleton thing rages here.
 ~
-14 0 cdkoyzB ciG
+14 0 cdkoyzB ciG 3
 0 0 0 15
 S
 #16013
@@ -240,7 +240,7 @@ dracolich skeletal~
 a skeletal dracolich~
 A skeletal dracolich stands here with flames in its eyes.
 ~
-125 200 deh mG
+125 200 deh mG 5
 0 0 25 12
 T 16010
 S
@@ -249,7 +249,7 @@ dragon viney~
 a viney dragon~
 A viney dragon looks to have grown up out of the ground.
 ~
-125 200 deh mG
+125 200 deh mG 5
 0 0 25 15
 T 16010
 S
@@ -258,7 +258,7 @@ shark viney plant~
 a viney shark~
 A shark made up entirely of vines and other plant life swims here.
 ~
-125 200 dehl 0
+125 200 dehl 0 5
 0 0 6 9
 T 16010
 S
@@ -267,7 +267,7 @@ hawk skeletal giant~
 a giant skeletal hawk~
 A giant skeletal hawk hovers here.
 ~
-125 200 deh m
+125 200 deh m 4
 0 0 2 26
 T 16010
 S
@@ -276,7 +276,7 @@ bird leafy leaves~
 a leafy bird~
 A bird with leaves for feathers hovers here.
 ~
-125 200 deh m
+125 200 deh m 4
 0 0 2 26
 T 16010
 S

@@ -3,7 +3,7 @@ king god-king sun ancient~
 the Sun King~
 An ancient god-king arises from his deathly slumber!
 ~
-0 0 bdxyzAB 0
+0 0 bdxyzAB 0 3
 1 0 0 18
 I 4 18544 100.00 1  # LOOT: a chance of boss loot
 I 4 18545 20.00 1  # LOOT: the solar raiment
@@ -40,7 +40,7 @@ manasa serpent lord~
 Manasa the serpent lord~
 A serpent lord stands here, wielding a sword with each of her four arms!
 ~
-0 0 abdxzAB 0
+0 0 abdxzAB 0 3
 2 2 5 1
 I 4 18544 100.00 1  # LOOT: a chance of boss loot
 I 4 18527 6.66 1 e  # LOOT: a jaguar claw ring
@@ -78,7 +78,7 @@ Quetzalcoatl feathered serpent~
 the feathered serpent Quetzalcoatl~
 The feathered serpent Quetzalcoatl hovers here, defending its domain!
 ~
-0 0 bdxy m
+0 0 bdxy m 3
 0 0 2 22
 I 4 18544 100.00 1  # LOOT: a chance of boss loot
 I 4 18527 6.66 1 e  # LOOT: a jaguar claw ring
@@ -114,7 +114,7 @@ gorilla giant~
 a giant gorilla~
 A gorilla the size of a carthorse looms menacingly over you!
 ~
-0 0 bdy c
+0 0 bdy c 4
 0 0 0 15
 T 18513
 T 18503
@@ -124,7 +124,7 @@ jaguar feral~
 a feral jaguar~
 A feral jaguar snarls at you and bares its fangs!
 ~
-0 0 bdjz c
+0 0 bdjz c 3
 0 0 0 10
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
@@ -136,7 +136,7 @@ cobra king~
 a king cobra~
 A king cobra rears up and flares its hood, hissing loudly!
 ~
-0 0 bdjz c
+0 0 bdjz c 3
 0 0 5 9
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 2  # SKIN: some snakeskin
@@ -148,7 +148,7 @@ snake grass large~
 a grass snake~
 A large grass snake is slithering away.
 ~
-0 0 bdho 0
+0 0 bdho 0 2
 0 0 5 9
 T 18520
 S
@@ -157,7 +157,7 @@ serpent lord mirage~
 a serpent lord mirage~
 A mirage of the serpent lord is fading away.
 ~
-0 0 bdhox 0
+0 0 bdhox 0 3
 2 2 5 1
 T 18520
 S
@@ -166,7 +166,7 @@ battle-jaguar jaguar armored~
 an armored battle-jaguar~
 An armored battle-jaguar is stalking around here.
 ~
-125 175 bdej 0
+125 175 bdej 0 4
 0 0 11 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
@@ -180,7 +180,7 @@ jaguar riding~
 a riding jaguar~
 A riding jaguar is saddled up and prowling around.
 ~
-75 100 bdej 0
+75 100 bdej 0 4
 0 0 11 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
@@ -191,7 +191,7 @@ serpent sea huge~
 a sea serpent~
 A huge sea serpent is swimming around here.
 ~
-125 175 bdejl 0
+125 175 bdejl 0 5
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
@@ -201,7 +201,7 @@ serpent feathered~
 a feathered serpent~
 A feathered serpent is riding the winds nearby.
 ~
-125 175 bdej m
+125 175 bdej m 5
 0 0 2 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
@@ -211,7 +211,7 @@ jaguar cub tiny~
 a tiny jaguar cub~
 A tiny jaguar cub runs around your ankles.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
 T 9901
 T 9902
@@ -221,7 +221,7 @@ snakes knot~
 a knot of snakes~
 A knot of snakes slithers towards you, hissing.
 ~
-0 0 cdoz c
+0 0 cdoz c 3
 0 0 5 9
 T 18516
 S
@@ -230,7 +230,7 @@ S
 Professor #n~
 The renowned archaeologist, Professor #n, is setting up shop here...
 ~
-0 0 bd cn
+0 0 bd cn 3
 0 1 0 15
 S
 $

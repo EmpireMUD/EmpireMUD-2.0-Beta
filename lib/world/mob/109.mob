@@ -3,7 +3,7 @@ dragon red colossal collosal collossal colosal~
 a colossal red dragon~
 A colossal red dragon looms over you!
 ~
-250 300 bdgxyzAB cmE
+250 300 bdgxyzAB cmE 6
 2 0 2 10
 I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
 I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
@@ -60,7 +60,7 @@ Sir Vivor~
 Sir Vivor~
 Sir Vivor is glancing around nervously.
 ~
-250 300 bdkvxyzAB cE
+250 300 bdkvxyzAB cE 3
 1 0 0 1
 I 4 10907 75.00 2  # LOOT: a raw dragon steak
 I 4 10907 75.00 2  # LOOT: a raw dragon steak
@@ -115,7 +115,7 @@ Bangles thief nervous~
 Bangles the thief~
 A nervous thief is hiding in the shadows.
 ~
-250 300 dkv nD
+250 300 dkv nD 3
 1 0 0 15
 T 10902
 T 10903
@@ -126,7 +126,7 @@ vendor token~
 the token vendor~
 The token vendor is peddling his wares (list).
 ~
-250 300 bdov nD
+250 300 bdov nD 3
 1 0 0 15
 T 10914
 S
@@ -135,7 +135,7 @@ serpent crimson coiled~
 a crimson serpent~
 A crimson serpent is coiled here.
 ~
-100 125 dej 0
+100 125 dej 0 2
 0 0 5 10
 I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
 S
@@ -144,7 +144,7 @@ dragon crimson small~
 the crimson dragon~
 A small crimson dragon is circling.
 ~
-100 125 de m
+100 125 de m 2
 0 0 2 10
 I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
 S
@@ -153,7 +153,7 @@ dragon sea crimson~
 a crimson sea dragon~
 A crimson sea dragon splashes around.
 ~
-100 125 del 0
+100 125 del 0 2
 0 0 6 9
 I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
 S
@@ -162,7 +162,7 @@ dragon muck viscous vicious~
 a viscous muck dragon~
 A viscous muck dragon coils through the water.
 ~
-225 325 dghuB chmoBCD
+225 325 dghuB chmoBCD 6
 0 0 5 27
 I 0 10907 100.00 4  # BUTCHER: a raw dragon steak
 I 1 1357 100.00 8  # SKIN: a large piece of leather
@@ -203,7 +203,7 @@ elemental muck little~
 a muck elemental~
 A little elemental is rolling around in a puddle of muck.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 5
 M
 0
@@ -231,15 +231,32 @@ giant hill~
 the hill giant~
 A hill giant towers over you, swinging a club the size of a tree!
 ~
-100 175 dhkuvA cEG
+100 175 dkuvA cEG 6
 0 0 26 5
-I 4 10967 100.00 1  # LOOT: the enormous corpse of a hill giant
 I 4 10973 100.00 1  # LOOT: a giant wooden club
 I 4 10968 60.00 1 a  # LOOT: a giant gold coin
 I 4 10970 10.00 1 a  # LOOT: a golden harp
 I 4 10969 30.00 1 a  # LOOT: a golden goose
 I 4 10974 12.50 1 b  # LOOT: the giant hovel schematic
 I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+M
+0
+$n casually swings $s tree, barely missing you as $e passes.~
+M
+1
+Fee-fi-fo-fum...~
+M
+1
+Someone been standing on my shoulders...~
+M
+1
+You awakened the sleeping giant!~
+M
+1
+I'll grind your bones to make my bread.~
+M
+0
+The earth shakes as $n walks past.~
 T 10967
 T 10968
 T 10971
@@ -252,15 +269,32 @@ giant river~
 the river giant~
 A river giant towers over you, barely missing you on its path across the countryside!
 ~
-100 175 dhkuvA cEG
+100 175 dhkuvA cEG 6
 0 0 26 5
-I 4 10967 100.00 1  # LOOT: the enormous corpse of a hill giant
 I 4 10973 100.00 1  # LOOT: a giant wooden club
 I 4 10968 60.00 1 a  # LOOT: a giant gold coin
 I 4 10970 10.00 1 a  # LOOT: a golden harp
 I 4 10972 30.00 1 a  # LOOT: the giant's causeway schematic
 I 4 10974 12.50 1 b  # LOOT: the giant hovel schematic
 I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+M
+0
+$n casually swings $s tree, barely missing you as $e passes.~
+M
+1
+Fee-fi-fo-fum...~
+M
+1
+Someone been standing on my shoulders...~
+M
+1
+You awakened the sleeping giant!~
+M
+1
+I'll grind your bones to make my bread.~
+M
+0
+The earth shakes as $n walks past.~
 T 10967
 T 10968
 T 10971
@@ -273,15 +307,32 @@ giant dune~
 the dune giant~
 A dune giant towers above you, with a tree over its shoulder!
 ~
-100 175 dhkuvA cEG
+100 175 dkuvA cEG 6
 0 0 26 5
-I 4 10967 100.00 1  # LOOT: the enormous corpse of a hill giant
 I 4 10973 100.00 1  # LOOT: a giant wooden club
 I 4 10968 60.00 1 a  # LOOT: a giant gold coin
 I 4 10970 10.00 1 a  # LOOT: a golden harp
 I 4 10972 30.00 1 a  # LOOT: the giant's causeway schematic
 I 4 10975 12.50 1 b  # LOOT: the giant stone head schematic
 I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
+M
+0
+$n casually swings $s tree, barely missing you as $e passes.~
+M
+1
+Fee-fi-fo-fum...~
+M
+1
+Someone been standing on my shoulders...~
+M
+1
+You awakened the sleeping giant!~
+M
+1
+I'll grind your bones to make my bread.~
+M
+0
+The earth shakes as $n walks past.~
 T 10967
 T 10968
 T 10971
@@ -294,7 +345,7 @@ portents giant~
 portents of the giant~
 Portents of the giant linger in the air.
 ~
-100 175 bd kln
+100 175 bd kln 3
 0 0 0 15
 T 10966
 S
@@ -303,7 +354,7 @@ ant giant~
 a giant ant~
 A giant ant scurries past you.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 7 9
 M
 0
