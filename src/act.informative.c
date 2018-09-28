@@ -1110,6 +1110,8 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 * @param bool show_eq If TRUE, can also show inventory (if skilled).
 */
 void look_at_char(char_data *i, char_data *ch, bool show_eq) {
+	extern struct character_size_data size_data[];
+	
 	char buf[MAX_STRING_LENGTH];
 	bool disguise;
 	int j, found;
@@ -1125,9 +1127,21 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 
 	if (ch != i) {
-		act("You look at $N.", FALSE, ch, FALSE, i, TO_CHAR);
+		act("You look at $N:", FALSE, ch, FALSE, i, TO_CHAR);
 	}
 	
+	// look decs
+	if (IS_MORPHED(i)) {
+		msg_to_char(ch, "%s&0", NULLSAFE(MORPH_LOOK_DESC(GET_MORPH(i))));
+	}
+	else if (GET_LOOK_DESC(i)) {
+		msg_to_char(ch, "%s&0", GET_LOOK_DESC(i));
+	}
+	
+	// diagnose at the end
+	diag_char_to_char(i, ch);
+	
+	// membership info
 	if (GET_LOYALTY(i) && !disguise) {
 		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(GET_LOYALTY(i)), EMPIRE_NAME(GET_LOYALTY(i)));
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
@@ -1143,28 +1157,24 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
+	if (size_data[(int)GET_SIZE(i)].show_on_look) {
+		act(size_data[(int)GET_SIZE(i)].show_on_look, FALSE, ch, NULL, i, TO_CHAR);
+	}
+	
+	// non-npc, non-disguised info (disguise 'counts' as NPC)
 	if (!IS_NPC(i) && !disguise) {
-		// basic description -- don't show if morphed
-		if (GET_LONG_DESC(i) && !IS_MORPHED(i)) {
-			msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
-		}
-
 		if (HAS_INFRA(i)) {
-			act("   You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
+			act("You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
 		}
 		if (AFF_FLAGGED(i, AFF_CLAWS)) {
-			act("   $N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
+			act("$N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
 		}
 		if (AFF_FLAGGED(i, AFF_MAJESTY)) {
-			act("   $N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
+			act("$N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
 		}
 		if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
-			act("   $E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
+			act("$E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
 		}
-		diag_char_to_char(i, ch);
-	}
-	else {	// npc or disguised
-		diag_char_to_char(i, ch);
 	}
 
 	if (show_eq && !disguise) {

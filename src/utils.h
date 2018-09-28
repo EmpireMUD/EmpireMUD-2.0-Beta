@@ -323,6 +323,7 @@
 // ch->player: char_player_data
 #define GET_ACCESS_LEVEL(ch)  ((ch)->player.access_level)
 #define GET_LONG_DESC(ch)  ((ch)->player.long_descr)
+#define GET_LOOK_DESC(ch)  ((ch)->player.look_descr)
 #define GET_LORE(ch)  ((ch)->player.lore)
 #define GET_PASSWD(ch)  ((ch)->player.passwd)
 #define GET_PC_NAME(ch)  ((ch)->player.name)
@@ -809,6 +810,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MORPH_FLAGS(mph)  ((mph)->flags)
 #define MORPH_KEYWORDS(mph)  ((mph)->keywords)
 #define MORPH_LONG_DESC(mph)  ((mph)->long_desc)
+#define MORPH_LOOK_DESC(mph)  ((mph)->look_desc)
 #define MORPH_MAX_SCALE(mph)  ((mph)->max_scale)
 #define MORPH_MOVE_TYPE(mph)  ((mph)->move_type)
 #define MORPH_REQUIRES_OBJ(mph)  ((mph)->requires_obj)

@@ -2373,14 +2373,14 @@ ACMD(do_mydescription) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*argument) {
-		msg_to_char(ch, "Your current description (type 'mydescription set' to change):\r\n%s", GET_LONG_DESC(ch) ? GET_LONG_DESC(ch) : " not set\r\n");
+		msg_to_char(ch, "Your current description (type 'mydescription set' to change):\r\n%s", GET_LOOK_DESC(ch) ? GET_LOOK_DESC(ch) : " not set\r\n");
 	}
 	else if (!str_cmp(argument, "set")) {
 		if (ch->desc->str) {
 			msg_to_char(ch, "You are already editing text.\r\n");
 		}
 		else {
-			start_string_editor(ch->desc, "your description", &(GET_LONG_DESC(ch)), MAX_PLAYER_DESCRIPTION, TRUE);
+			start_string_editor(ch->desc, "your description", &(GET_LOOK_DESC(ch)), MAX_PLAYER_DESCRIPTION, TRUE);
 		}
 	}
 	else {

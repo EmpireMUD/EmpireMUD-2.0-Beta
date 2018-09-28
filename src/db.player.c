@@ -1019,6 +1019,9 @@ void free_char(char_data *ch) {
 	if (ch->player.long_descr && (!proto || ch->player.long_descr != proto->player.long_descr)) {
 		free(ch->player.long_descr);
 	}
+	if (ch->player.look_descr && (!proto || ch->player.look_descr != proto->player.look_descr)) {
+		free(ch->player.look_descr);
+	}
 	if (ch->proto_script && (!proto || ch->proto_script != proto->proto_script)) {
 		free_proto_scripts(&ch->proto_script);
 	}
@@ -1463,10 +1466,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "Description:", length)) {
-					if (GET_LONG_DESC(ch)) {
-						free(GET_LONG_DESC(ch));
+					if (GET_LOOK_DESC(ch)) {
+						free(GET_LOOK_DESC(ch));
 					}
-					GET_LONG_DESC(ch) = fread_string(fl, error);
+					GET_LOOK_DESC(ch) = fread_string(fl, error);
 				}
 				else if (PFILE_TAG(line, "Disguised Name:", length)) {
 					if (GET_DISGUISED_NAME(ch)) {
@@ -2412,8 +2415,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// 'D'
 	fprintf(fl, "Daily Cycle: %d\n", GET_DAILY_CYCLE(ch));
 	fprintf(fl, "Daily Quests: %d\n", GET_DAILY_QUESTS(ch));
-	if (GET_LONG_DESC(ch)) {
-		strcpy(temp, NULLSAFE(GET_LONG_DESC(ch)));
+	if (GET_LOOK_DESC(ch)) {
+		strcpy(temp, NULLSAFE(GET_LOOK_DESC(ch)));
 		strip_crlf(temp);
 		fprintf(fl, "Description:\n%s~\n", temp);
 	}
@@ -3810,6 +3813,7 @@ void init_player(char_data *ch) {
 	set_title(ch, NULL);
 	ch->player.short_descr = NULL;
 	ch->player.long_descr = NULL;
+	ch->player.look_descr = NULL;
 	GET_PROMPT(ch) = NULL;
 	GET_FIGHT_PROMPT(ch) = NULL;
 	POOFIN(ch) = NULL;

@@ -4701,6 +4701,10 @@ void parse_mobile(FILE *mob_f, int nr) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': { // look desc
+				mob->player.look_descr = fread_string(mob_f, buf2);
+				break;
+			}
 			case 'F': {	// faction
 				if (strlen(line) > 2) {
 					MOB_FACTION(mob) = find_faction_by_vnum(atoi(line + 2));
@@ -4766,6 +4770,13 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	fprintf(fl, "%d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob));
 
 	// optionals:
+	
+	// D: look desc
+	if (GET_LOOK_DESC(mob) && *GET_LOOK_DESC(mob)) {
+		strcpy(temp, GET_LOOK_DESC(mob));
+		strip_crlf(temp);
+		fprintf(fl, "D\n%s", temp);
+	}
 	
 	// F: faction
 	if (MOB_FACTION(mob)) {

@@ -3850,6 +3850,16 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
+"MEDIT LOOKDESCRIPTION" "MEDIT LOOK DESCRIPTION"
+
+Usage:  .lookdescription
+
+The look description is shown when a player looks at the mob. This can be short
+or long, but you should avoid passing 3 lines of text, after the /fi formatter.
+You can also use the /f formatter if it's shorter than 80 characters.
+
+See also: OLC MOBILES, STRING EDITOR
+#d
 "ADVEDIT SCRIPTS" "BEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "QEDIT SCRIPTS" "REDIT SCRIPTS" "VEDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
@@ -4055,6 +4065,19 @@ A fiery dragon circles overhead.
 You're standing at the foot of a huge giant!
 
 See also: OLC MORPHS
+#d
+"MORPHEDIT LOOKDESCRIPTION" "MORPHEDIT LOOK DESCRIPTION"
+
+Usage:  .lookdescription
+
+The look description is shown when a player looks at the morphed person. This
+can be short or long, but you should avoid passing 3 lines of text, after the
+/fi formatter. You can also use the /f formatter if it's shorter than 80
+characters.
+
+A morph's look description will override the regular one on a player or mob.
+
+See also: OLC MORPHS, STRING EDITOR
 #d
 "MORPHEDIT MAXLEVEL" "MORPHEDIT MAX LEVEL"
 
@@ -4776,7 +4799,8 @@ characters long, it will fit on one line and should not be indented. If it
 goes any longer than that, you should use /fi to format it with indent inside
 the string editor.
 
-See also: OLC OBJECTS, STRING EDITOR
+See also: OLC OBJECTS, STRING EDITOR, MEDIT LOOKDESCRIPTION,
+MORPHEDIT LOOKDSECRIPTION
 #d
 "OEDIT MATERIAL"
 

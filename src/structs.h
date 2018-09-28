@@ -2734,6 +2734,7 @@ struct morph_data {
 	char *keywords;
 	char *short_desc;	// short description (a bat)
 	char *long_desc;	// long description (seen in room)
+	char *look_desc;	// desc shown on look-at
 	
 	bitvector_t flags;	// MORPHF_ flags
 	bitvector_t affects;	// AFF_ flags added
@@ -3876,7 +3877,8 @@ struct char_player_data {
 	char *passwd;	// character's password
 	char *name;	// PC name / NPC keyword (kill ... )
 	char *short_descr;	// for NPC string-building
-	char *long_descr;	// for 'look' on mobs or 'look at' on players
+	char *long_descr;	// for 'look' on mobs
+	char *look_descr;	// look-at text
 	byte sex;	// PC / NPC sex
 	byte access_level;	// PC access level -- LVL_x -- not to be confused with GET_COMPUTED_LEVEL() or get_approximate_level()
 	struct time_data time;	// PC's age
@@ -5287,4 +5289,5 @@ struct character_size_data {
 	char *corpse_keywords;	// additional keywords on the corpse
 	char *corpse_long_desc;	// custom long desc with %s for the "corpse of"
 	char *body_long_desc;	// custom long desc with %s for "the body of"
+	char *show_on_look;	// if not null, shows when you look at a person of this size
 };

@@ -120,6 +120,12 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not capitalized");
 		problem = TRUE;
 	}
+	
+	if (!GET_LOOK_DESC(mob) || !*GET_LOOK_DESC(mob)) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "No look description");
+		problem = TRUE;
+	}
+	
 	if (!is_adventure && GET_MAX_SCALE_LEVEL(mob) == 0) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "No maximum scale level on non-adventure mob");
 		problem = TRUE;
@@ -734,7 +740,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && !multi_isname(find_keywords, GET_LOOK_DESC(mob)) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
 			continue;
 		}
 		
@@ -1002,6 +1008,9 @@ void save_olc_mobile(descriptor_data *desc) {
 			if (GET_LONG_DESC(mob_iter) == GET_LONG_DESC(proto)) {
 				GET_LONG_DESC(mob_iter) = GET_LONG_DESC(mob);
 			}
+			if (GET_LOOK_DESC(mob_iter) == GET_LOOK_DESC(proto)) {
+				GET_LOOK_DESC(mob_iter) = GET_LOOK_DESC(mob);
+			}
 
 			// update pointers
 			if (mob_iter->interactions == proto->interactions) {
@@ -1049,6 +1058,9 @@ void save_olc_mobile(descriptor_data *desc) {
 	}
 	if (GET_LONG_DESC(proto)) {
 		free(GET_LONG_DESC(proto));
+	}
+	if (GET_LOOK_DESC(proto)) {
+		free(GET_LOOK_DESC(proto));
 	}
 
 	while ((interact = proto->interactions)) {
@@ -1098,6 +1110,7 @@ char_data *setup_olc_mobile(char_data *input) {
 		GET_PC_NAME(new) = GET_PC_NAME(input) ? str_dup(GET_PC_NAME(input)) : NULL;
 		GET_SHORT_DESC(new) = GET_SHORT_DESC(input) ? str_dup(GET_SHORT_DESC(input)) : NULL;
 		GET_LONG_DESC(new) = GET_LONG_DESC(input) ? str_dup(GET_LONG_DESC(input)) : NULL;
+		GET_LOOK_DESC(new) = GET_LOOK_DESC(input) ? str_dup(GET_LOOK_DESC(input)) : NULL;
 
 		// copy scripts
 		SCRIPT(new) = NULL;
@@ -1152,6 +1165,7 @@ void olc_show_mobile(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_PC_NAME(mob), default_mob_keywords), GET_PC_NAME(mob));
 	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_SHORT_DESC(mob), default_mob_short), GET_SHORT_DESC(mob));
 	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_LONG_DESC(mob), default_mob_long), GET_LONG_DESC(mob));
+	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_PTR(GET_LOOK_DESC(mob)), NULLSAFE(GET_LOOK_DESC(mob)));
 	
 	sprintf(buf + strlen(buf), "<%ssex\t0> %s\r\n", OLC_LABEL_VAL(GET_SEX(mob), 0), genders[GET_SEX(mob)]);
 	
@@ -1277,6 +1291,19 @@ OLC_MODULE(medit_longdescription) {
 		sprintf(buf, "%s\r\n", GET_LONG_DESC(mob));
 		free(GET_LONG_DESC(mob));
 		GET_LONG_DESC(mob) = str_dup(buf);
+	}
+}
+
+
+OLC_MODULE(medit_lookdescription) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "description for %s", GET_LOOK_DESC(mob));
+		start_string_editor(ch->desc, buf, &GET_LOOK_DESC(mob), MAX_PLAYER_DESCRIPTION, TRUE);
 	}
 }
 

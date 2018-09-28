@@ -387,6 +387,11 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!MORPH_LOOK_DESC(morph) || !*MORPH_LOOK_DESC(morph)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "No look description");
+		problem = TRUE;
+	}
+	
 	for (app = MORPH_APPLIES(morph); app; app = app->next) {
 		if (app->location == APPLY_NONE || app->weight == 0) {
 			olc_audit_msg(ch, MORPH_VNUM(morph), "Invalid apply: %d to %s", app->weight, apply_types[app->location]);
@@ -610,6 +615,9 @@ void free_morph(morph_data *morph) {
 	if (MORPH_LONG_DESC(morph) && (!proto || MORPH_LONG_DESC(morph) != MORPH_LONG_DESC(proto))) {
 		free(MORPH_LONG_DESC(morph));
 	}
+	if (MORPH_LOOK_DESC(morph) && (!proto || MORPH_LOOK_DESC(morph) != MORPH_LOOK_DESC(proto))) {
+		free(MORPH_LOOK_DESC(morph));
+	}
 	
 	if (MORPH_APPLIES(morph) && (!proto || MORPH_APPLIES(morph) != MORPH_APPLIES(proto))) {
 		free_apply_list(MORPH_APPLIES(morph));
@@ -686,6 +694,10 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 				parse_apply(fl, &MORPH_APPLIES(morph), error);
 				break;
 			}
+			case 'D': { // look desc
+				MORPH_LOOK_DESC(morph) = fread_string(fl, error);
+				break;
+			}
 						
 			// end
 			case 'S': {
@@ -753,6 +765,13 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 	
 	// 'A': applies
 	write_applies_to_file(fl, MORPH_APPLIES(morph));
+	
+	// D: look desc
+	if (MORPH_LOOK_DESC(morph) && *MORPH_LOOK_DESC(morph)) {
+		strcpy(temp, MORPH_LOOK_DESC(morph));
+		strip_crlf(temp);
+		fprintf(fl, "D\n%s", temp);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -855,6 +874,9 @@ void save_olc_morph(descriptor_data *desc) {
 	if (MORPH_LONG_DESC(proto)) {
 		free(MORPH_LONG_DESC(proto));
 	}
+	if (MORPH_LOOK_DESC(proto)) {
+		free(MORPH_LOOK_DESC(proto));
+	}
 	free_apply_list(MORPH_APPLIES(proto));
 	
 	// sanity
@@ -875,6 +897,10 @@ void save_olc_morph(descriptor_data *desc) {
 			free(MORPH_LONG_DESC(morph));
 		}
 		MORPH_LONG_DESC(morph) = str_dup(default_morph_long_desc);
+	}
+	if (MORPH_LOOK_DESC(morph) && !*MORPH_LOOK_DESC(morph)) {
+		free(MORPH_LOOK_DESC(morph));
+		MORPH_LOOK_DESC(morph) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -915,6 +941,7 @@ morph_data *setup_olc_morph(morph_data *input) {
 		MORPH_KEYWORDS(new) = MORPH_KEYWORDS(input) ? str_dup(MORPH_KEYWORDS(input)) : NULL;
 		MORPH_SHORT_DESC(new) = MORPH_SHORT_DESC(input) ? str_dup(MORPH_SHORT_DESC(input)) : NULL;
 		MORPH_LONG_DESC(new) = MORPH_LONG_DESC(input) ? str_dup(MORPH_LONG_DESC(input)) : NULL;
+		MORPH_LOOK_DESC(new) = MORPH_LOOK_DESC(input) ? str_dup(MORPH_LOOK_DESC(input)) : NULL;
 		
 		// copy lists
 		MORPH_APPLIES(new) = copy_apply_list(MORPH_APPLIES(input));
@@ -954,7 +981,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Keywords: \tc%s\t0, Short desc: \ty%s\t0\r\n", MORPH_VNUM(morph), MORPH_KEYWORDS(morph), MORPH_SHORT_DESC(morph));
-	size += snprintf(buf + size, sizeof(buf) - size, "L-Desc: \ty%s\t0\r\n", MORPH_LONG_DESC(morph));
+	size += snprintf(buf + size, sizeof(buf) - size, "L-Desc: \ty%s\t0\r\n%s", MORPH_LONG_DESC(morph), NULLSAFE(MORPH_LOOK_DESC(morph)));
 	
 	snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
 	if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
@@ -1011,6 +1038,7 @@ void olc_show_morph(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(MORPH_KEYWORDS(morph), default_morph_keywords), NULLSAFE(MORPH_KEYWORDS(morph)));
 	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(MORPH_SHORT_DESC(morph), default_morph_short_desc), NULLSAFE(MORPH_SHORT_DESC(morph)));
 	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s\r\n", OLC_LABEL_STR(MORPH_LONG_DESC(morph), default_morph_long_desc), NULLSAFE(MORPH_LONG_DESC(morph)));
+	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_PTR(MORPH_LOOK_DESC(morph)), NULLSAFE(MORPH_LOOK_DESC(morph)));
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT), lbuf);
@@ -1167,6 +1195,19 @@ OLC_MODULE(morphedit_keywords) {
 OLC_MODULE(morphedit_longdesc) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	olc_process_string(ch, argument, "long description", &MORPH_LONG_DESC(morph));
+}
+
+
+OLC_MODULE(morphedit_lookdescription) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "description for %s", MORPH_LOOK_DESC(morph));
+		start_string_editor(ch->desc, buf, &MORPH_LOOK_DESC(morph), MAX_PLAYER_DESCRIPTION, TRUE);
+	}
 }
 
 

@@ -4141,7 +4141,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 	if (IS_MOB(k)) {
 		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
-		msg_to_char(ch, "L-Des: &y%s&0", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"));
+		msg_to_char(ch, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), GET_LOOK_DESC(k));
 	}
 
 	if (IS_NPC(k)) {
