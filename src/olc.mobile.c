@@ -1302,7 +1302,7 @@ OLC_MODULE(medit_lookdescription) {
 		msg_to_char(ch, "You are already editing a string.\r\n");
 	}
 	else {
-		sprintf(buf, "description for %s", GET_LOOK_DESC(mob));
+		sprintf(buf, "description for %s", GET_SHORT_DESC(mob));
 		start_string_editor(ch->desc, buf, &GET_LOOK_DESC(mob), MAX_PLAYER_DESCRIPTION, TRUE);
 	}
 }

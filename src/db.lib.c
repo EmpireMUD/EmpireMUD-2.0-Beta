@@ -4775,7 +4775,7 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	if (GET_LOOK_DESC(mob) && *GET_LOOK_DESC(mob)) {
 		strcpy(temp, GET_LOOK_DESC(mob));
 		strip_crlf(temp);
-		fprintf(fl, "D\n%s", temp);
+		fprintf(fl, "D\n%s~\n", temp);
 	}
 	
 	// F: faction

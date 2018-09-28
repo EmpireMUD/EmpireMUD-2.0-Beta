@@ -770,7 +770,7 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 	if (MORPH_LOOK_DESC(morph) && *MORPH_LOOK_DESC(morph)) {
 		strcpy(temp, MORPH_LOOK_DESC(morph));
 		strip_crlf(temp);
-		fprintf(fl, "D\n%s", temp);
+		fprintf(fl, "D\n%s~\n", temp);
 	}
 	
 	// end
@@ -1205,7 +1205,7 @@ OLC_MODULE(morphedit_lookdescription) {
 		msg_to_char(ch, "You are already editing a string.\r\n");
 	}
 	else {
-		sprintf(buf, "description for %s", MORPH_LOOK_DESC(morph));
+		sprintf(buf, "description for %s", MORPH_SHORT_DESC(morph));
 		start_string_editor(ch->desc, buf, &MORPH_LOOK_DESC(morph), MAX_PLAYER_DESCRIPTION, TRUE);
 	}
 }
