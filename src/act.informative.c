@@ -1129,6 +1129,9 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	if (ch != i) {
 		act("You look at $N:", FALSE, ch, FALSE, i, TO_CHAR);
 	}
+	else {
+		msg_to_char(ch, "You take a look at yourself:\r\n");
+	}
 	
 	// look decs
 	if (IS_MORPHED(i)) {
