@@ -409,7 +409,9 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	GET_PC_NAME(mob) = str_dup(replace_npc_names(GET_PC_NAME(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
 	GET_SHORT_DESC(mob) = str_dup(replace_npc_names(GET_SHORT_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
 	GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	GET_LOOK_DESC(mob) = str_dup(replace_npc_names(GET_LOOK_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+	if (GET_LOOK_DESC(mob)) {
+		GET_LOOK_DESC(mob) = str_dup(replace_npc_names(GET_LOOK_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+	}
 	
 	// and free that memory if necessary
 	if (free_name) {
