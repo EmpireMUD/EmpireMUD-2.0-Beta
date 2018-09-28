@@ -40,7 +40,7 @@ manasa serpent lord~
 Manasa the serpent lord~
 A serpent lord stands here, wielding a sword with each of her four arms!
 ~
-0 0 abdxzAB 0 3
+0 0 abdxzAB 0 4
 2 2 5 1
 I 4 18544 100.00 1  # LOOT: a chance of boss loot
 I 4 18527 6.66 1 e  # LOOT: a jaguar claw ring
@@ -78,7 +78,7 @@ Quetzalcoatl feathered serpent~
 the feathered serpent Quetzalcoatl~
 The feathered serpent Quetzalcoatl hovers here, defending its domain!
 ~
-0 0 bdxy m 3
+0 0 bdxy m 5
 0 0 2 22
 I 4 18544 100.00 1  # LOOT: a chance of boss loot
 I 4 18527 6.66 1 e  # LOOT: a jaguar claw ring
@@ -157,7 +157,7 @@ serpent lord mirage~
 a serpent lord mirage~
 A mirage of the serpent lord is fading away.
 ~
-0 0 bdhox 0 3
+0 0 bdhox 0 4
 2 2 5 1
 T 18520
 S
@@ -221,7 +221,7 @@ snakes knot~
 a knot of snakes~
 A knot of snakes slithers towards you, hissing.
 ~
-0 0 cdoz c 3
+0 0 cdhoz c 4
 0 0 5 9
 T 18516
 S
