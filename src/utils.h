@@ -882,6 +882,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
  //////////////////////////////////////////////////////////////////////////////
 //// OBJVAL UTILS ////////////////////////////////////////////////////////////
 
+// ITEM_x: getters based on object type
+
 // ITEM_POTION
 #define IS_POTION(obj)  (GET_OBJ_TYPE(obj) == ITEM_POTION)
 #define VAL_POTION_COOLDOWN_TYPE  0
@@ -1025,6 +1027,11 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_PAINT(obj)  (GET_OBJ_TYPE(obj) == ITEM_PAINT)
 #define VAL_PAINT_COLOR  0
 #define GET_PAINT_COLOR(obj)  (IS_PAINT(obj) ? GET_OBJ_VAL((obj), VAL_PAINT_COLOR) : 0)
+
+// ITEM_LIGHTER
+#define IS_LIGHTER(obj)  (GET_OBJ_TYPE(obj) == ITEM_LIGHTER)
+#define VAL_LIGHTER_USES  0
+#define GET_LIGHTER_USES(obj)  (IS_LIGHTER(obj) ? GET_OBJ_VAL((obj), VAL_LIGHTER_USES) : 0)
 
 
  //////////////////////////////////////////////////////////////////////////////

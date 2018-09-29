@@ -77,7 +77,6 @@
 #define o_HOPS  143
 #define o_BARLEY  145
 #define o_HANDAXE  181	// TODO: this is special-cased for mining
-#define o_FLINT_SET  183	// TODO: this is special-cased for lighting fires
 
 // brewing items
 #define o_APPLES  3002

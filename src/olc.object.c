@@ -296,6 +296,13 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
+		case ITEM_LIGHTER: {
+			if (GET_LIGHTER_USES(obj) == 0) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Number of uses not set");
+				problem = TRUE;
+			}
+			break;
+		}
 		case ITEM_UNDEFINED: {
 			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Type is UNDEFINED");
 			problem = TRUE;
@@ -1918,6 +1925,15 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			sprintf(storage + strlen(storage), "<%sautomint\t0> %s\r\n", OLC_LABEL_VAL(GET_WEALTH_AUTOMINT(obj), 0), offon_types[GET_WEALTH_AUTOMINT(obj)]);
 			break;
 		}
+		case ITEM_LIGHTER: {
+			if (GET_LIGHTER_USES(obj) == UNLIMITED) {
+				sprintf(storage + strlen(storage), "<%suses\t0> unlimited\r\n", OLC_LABEL_VAL(GET_LIGHTER_USES(obj), 0));
+			}
+			else {
+				sprintf(storage + strlen(storage), "<%suses\t0> %d\r\n", OLC_LABEL_VAL(GET_LIGHTER_USES(obj), 0), GET_LIGHTER_USES(obj));
+			}
+			break;
+		}
 		
 		// types with no vals
 		case ITEM_BOARD:
@@ -3071,6 +3087,28 @@ OLC_MODULE(oedit_type) {
 				break;
 			}
 		}
+	}
+}
+
+
+OLC_MODULE(oedit_uses) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (GET_OBJ_TYPE(obj) != ITEM_LIGHTER) {
+		msg_to_char(ch, "You can only set uses on a LIGHTER object.\r\n");
+	}
+	else if (is_abbrev(argument, "unlimited")) {
+		GET_OBJ_VAL(obj, VAL_LIGHTER_USES) = UNLIMITED;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It now has unlimited uses.\r\n");
+		}
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_LIGHTER_USES) = olc_process_number(ch, argument, "lighter uses", "uses", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_LIGHTER_USES));
 	}
 }
 

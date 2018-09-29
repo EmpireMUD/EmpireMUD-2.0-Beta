@@ -200,6 +200,45 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 
 
 /**
+* Finds a lighter. Limited-use lighters that are marked (keep) will NOT be
+* used, but will result in the 'had_keep' argument being set to TRUE.
+*
+* This will return the BEST lighter in the inventory -- either an unlimited
+* lighter, or the one with the fewest charges remaining.
+*
+* @param obj_data *list The list to check (usually ch->carrying).
+* @param bool *had_keep If there's a keep'd lighter that can't be used, this will be set to TRUE (so you can inform the player).
+* @return obj_data* The lighter, if it found one.
+*/
+obj_data *find_lighter_in_list(obj_data *list, bool *had_keep) {
+	obj_data *obj, *best = NULL;
+	
+	*had_keep = FALSE;	// presumably
+	
+	LL_FOREACH2(list, obj, next_content) {
+		if (!IS_LIGHTER(obj)) {
+			continue;	// not a lighter
+		}
+		if (GET_LIGHTER_USES(obj) == UNLIMITED) {
+			if (!best || GET_LIGHTER_USES(best) != UNLIMITED || !OBJ_FLAGGED(best, OBJ_KEEP)) {
+				best = obj;	// new best
+			}
+		}
+		else if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {	// not unlmited; don't use kept items if not unlimited
+			if (!best || (GET_LIGHTER_USES(best) != UNLIMITED && GET_LIGHTER_USES(best) > GET_LIGHTER_USES(obj))) {
+				best = obj;	// new best
+			}
+		}
+		else {
+			*had_keep = TRUE;
+		}
+	}
+	
+	return best;
+}
+
+
+/**
 * Converts a "gotten" object into money, if it's coins. This will extract the
 * object if so.
 *
@@ -507,6 +546,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		case ITEM_WEALTH: {
 			msg_to_char(ch, "Adds %d wealth when stored.\r\n", GET_WEALTH_VALUE(obj));
 			msg_to_char(ch, "Automatically minted by workforce: %s\r\n", GET_WEALTH_AUTOMINT(obj) ? "yes" : "no");
+			break;
+		}
+		case ITEM_LIGHTER: {
+			msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(obj));
 			break;
 		}
 	}
@@ -986,6 +1029,34 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 	else {
 		act(wear_data[where].wear_msg_to_room, TRUE, ch, obj, NULL, TO_ROOM);
 	}
+}
+
+
+/**
+* Uses up a charge on a lighter (if not unlimited) and sends a message to the
+* player if it runs out and is lost.
+*
+* @param char_data *ch Optional: The person using the lighter (who gets the message when it's used up; may be NULL).
+* @param obj_data *obj The lighter being used (may be purged if the last charge is used).
+* @return bool TRUE if the item was used up and purged; FALSE if the item was not purged.
+*/
+bool used_lighter(char_data *ch, obj_data *obj) {
+	if (!IS_LIGHTER(obj) || GET_LIGHTER_USES(obj) == UNLIMITED) {
+		return FALSE;	// did not use up the lighter
+	}
+	
+	// decrement now
+	GET_OBJ_VAL(obj, VAL_LIGHTER_USES) -= 1;
+	
+	if (GET_LIGHTER_USES(obj) <= 0) {
+		if (ch) {
+			act("$p is used up, and you throw it away.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		}
+		extract_obj(obj);
+		return TRUE;	// did use it up
+	}
+	
+	return FALSE;	// did not use it up
 }
 
 
@@ -4794,23 +4865,32 @@ ACMD(do_light) {
 	void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint);
 	
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
-	obj_data *obj, *flint = NULL;
+	obj_data *obj, *lighter = NULL;
 	vehicle_data *veh;
+	bool kept = FALSE;
 
 	one_argument(argument, arg);
 
 	if (!objless) {
-		flint = get_obj_in_list_num(o_FLINT_SET, ch->carrying);
+		lighter = find_lighter_in_list(ch->carrying, &kept);
 	}
 
-	if (!*arg)
+	if (!*arg) {
 		msg_to_char(ch, "Light what?\r\n");
-	else if (!IS_NPC(ch) && !objless && !flint)
-		msg_to_char(ch, "You don't have a flint set to light that with.\r\n");
+	}
+	else if (!IS_NPC(ch) && !objless && !lighter) {
+		// nothing to light it with
+		if (kept) {
+			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't have anything to light that with.\r\n");
+		}
+	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		// try burning a vehicle
 		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
-			do_light_vehicle(ch, veh, flint);
+			do_light_vehicle(ch, veh, lighter);
 		}
 		else {
 			msg_to_char(ch, "You don't have a %s.\r\n", arg);
@@ -4825,11 +4905,11 @@ ACMD(do_light) {
 			act("$n lights $p on fire!", FALSE, ch, obj, NULL, TO_ROOM);
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
 		}
-		else if (flint) {
-			act("You strike $p and light $P.", FALSE, ch, flint, obj, TO_CHAR);
-			act("$n strikes $p and lights $P.", FALSE, ch, flint, obj, TO_ROOM);
+		else if (lighter) {
+			act("You use $p to light $P.", FALSE, ch, lighter, obj, TO_CHAR);
+			act("$n uses $p to lights $P.", FALSE, ch, lighter, obj, TO_ROOM);
 		}
-		else {
+		else { // somehow?
 			act("You light $P.", FALSE, ch, NULL, obj, TO_CHAR);
 			act("$n lights $P.", FALSE, ch, NULL, obj, TO_ROOM);
 		}
@@ -4838,6 +4918,7 @@ ACMD(do_light) {
 		empty_obj_before_extract(obj);
 		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
 		extract_obj(obj);
+		used_lighter(ch, lighter);
 		command_lag(ch, WAIT_OTHER);
 	}
 }

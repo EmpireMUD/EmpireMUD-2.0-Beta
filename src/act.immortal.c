@@ -4861,6 +4861,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Automatically minted by workforce: %s\r\n", GET_WEALTH_AUTOMINT(j) ? "yes" : "no");
 			break;
 		}
+		case ITEM_LIGHTER: {
+			msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(j));
+			break;
+		}
 		default:
 			msg_to_char(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]\r\n", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
 			break;

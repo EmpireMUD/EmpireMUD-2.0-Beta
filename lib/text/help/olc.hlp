@@ -4205,6 +4205,9 @@ Food:
  0 - hours of fullness
  1 - crop vnum (if plantable)
 
+Lighter:
+ 0 - number of uses (-1 is unlimited)
+
 Missile Weapon:
  0 - attack type (see ATTACK TYPES)
  1 - bonus damage (if scalable, this is the weight to scale the damage)
@@ -5041,7 +5044,7 @@ Available types:
  WEALTH - adds to empire wealth when stored
  *CART - use vehicles instead
  *SHIP - use vehicles instead
- * - unused
+ LIGHTER - can light fires
  * - unused
  MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
  AMMO - ammunition for missile weapons
@@ -5056,6 +5059,16 @@ Available types:
 You can get specific help on each of these via HELP <type> ITEM
 
 See also: OEDIT WEAR, OLC OBJECTS
+#d
+"OEDIT USES"
+
+Usage:  .uses <number | unlimited>
+
+This sets the number of times a LIGHTER object can be used. When it runs out
+of uses, the player automatically junks the item. You can also create unlimited
+lighters.
+
+See also: LIGHTER OBJECT
 #d
 "OEDIT VALUE0" "OEDIT VALUE1" "OEDIT VALUE2"
 
@@ -6985,6 +6998,17 @@ custom message for the item. You can set more if you like, and each one will
 be displayed randomly every few action ticks.
 
 See also: OEDIT CUSTOM
+#d
+"LIGHTER ITEM" "LIGHTER OBJECT"
+
+The LIGHTER item type can be used to light fires and torches. It can either
+be unlimited (like firesteel) or have a specific number of uses (like a tinder
+box).
+
+Object values:
+ 0 - number of uses
+
+See also: OEDIT USES
 #d
 "MAIL ITEM" "MAIL OBJECT"
 

@@ -1576,7 +1576,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_WEALTH  15	// item provides wealth
 #define ITEM_CART  16	// This type is mostly DEPRECATED; use vehicles instead
 #define ITEM_SHIP  17	// This type is mostly DEPRECATED; use vehicles instead
-	#define ITEM_UNUSED4  18
+#define ITEM_LIGHTER  18	// can be used to light fires
 	#define ITEM_UNUSED5  19
 #define ITEM_MISSILE_WEAPON  20	// bow/crossbow/etc
 #define ITEM_AMMO  21	// for missile weapons
