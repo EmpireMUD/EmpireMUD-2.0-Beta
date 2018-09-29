@@ -3690,6 +3690,7 @@ Fields:
   &c-movetype&0 - see HELP MEDIT MOVETYPE
   &c-nameset&0 - see HELP MEDIT NAMESET
   &c-sex&0 - male, female, neutral
+  &c-size&0 - see HELP MOB SIZE
   &c-attack&0 - see HELP MEDIT ATTACK
 
 Examples:

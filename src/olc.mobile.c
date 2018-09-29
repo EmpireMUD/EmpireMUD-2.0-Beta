@@ -562,7 +562,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
 	int only_attack = NOTHING, only_move = NOTHING, only_nameset = NOTHING;
-	int count, lookup, only_level = NOTHING, only_sex = NOTHING;
+	int count, lookup, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING;
 	faction_data *only_fct = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
@@ -665,6 +665,13 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 				return;
 			}
 		}
+		else if (is_abbrev(type_arg, "-size")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_size = search_block(val_arg, size_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid size '%s'.\r\n", val_arg);
+				return;
+			}
+		}
 		else if (is_abbrev(type_arg, "-unflagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, action_bits, FALSE)) != NOTHING) {
@@ -713,6 +720,9 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_move != NOTHING && MOB_MOVE_TYPE(mob) != only_move) {
+			continue;
+		}
+		if (only_size != NOTHING && SET_SIZE(mob) != only_size) {
 			continue;
 		}
 		if (only_nameset != NOTHING && MOB_NAME_SET(mob) != only_nameset) {
