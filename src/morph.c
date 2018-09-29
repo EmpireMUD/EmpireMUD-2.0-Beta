@@ -1000,7 +1000,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%s\t0, Move type: \ty%s\t0\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name, mob_move_types[MORPH_MOVE_TYPE(morph)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%s\t0, Move type: \ty%s\t0, Size: \ty%s\t0\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name, mob_move_types[MORPH_MOVE_TYPE(morph)], size_types[MORPH_SIZE(morph)]);
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
