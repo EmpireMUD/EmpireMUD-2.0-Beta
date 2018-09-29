@@ -3157,6 +3157,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else 
 							*str = '\0';
 					}
+					else if (!str_cmp(field, "find_lighter")) {
+						extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
+						
+						bool junk;
+						obj_data *lighter = find_lighter_in_list(c->carrying, &junk);
+						if (lighter) {
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(lighter));
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "firstname")) {
 						if (IS_NPC(c)) {
 							char temp[MAX_STRING_LENGTH];
@@ -4147,6 +4159,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					else if (!str_cmp(field, "timer"))
 						snprintf(str, slen, "%d", GET_OBJ_TIMER(o));
+					break;
+				}
+				case 'u': {	// obj.u*
+					if (!str_cmp(field, "used_lighter")) {
+						extern bool used_lighter(char_data *ch, obj_data *obj);
+						char_data *person = NULL;
+						
+						if (subfield && *subfield) {	// optional person
+							person = get_char_by_obj(o, subfield);
+						}
+						
+						// returns 1 if obj is purged
+						snprintf(str, slen, "%d", used_lighter(person, o) ? 1 : 0);
+					}
 					break;
 				}
 				case 'v': {	// obj.v*

@@ -971,10 +971,11 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 *
 * @param char_data *ch The person trying to burn a vehicle.
 * @param vehicle_data *veh The vehicle to burn.
-* @param obj_data *flint The flint.
+* @param obj_data *lighter Optional: The lighter item, if any.
 */
-void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
+void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 	void start_vehicle_burning(vehicle_data *veh);
+	extern bool used_lighter(char_data *ch, obj_data *obj);
 	
 	char buf[MAX_STRING_LENGTH];
 	
@@ -991,11 +992,12 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
 		msg_to_char(ch, "You can't burn %s vehicles unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
 	else {
-		snprintf(buf, sizeof(buf), "You %s $V on fire!", (flint ? "strike $p and light" : "light"));
-		act(buf, FALSE, ch, flint, veh, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (flint ? "strikes $p and lights" : "lights"));
-		act(buf, FALSE, ch, flint, veh, TO_ROOM);
+		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
+		act(buf, FALSE, ch, lighter, veh, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (lighter ? "uses $p to light" : "lights"));
+		act(buf, FALSE, ch, lighter, veh, TO_ROOM);
 		start_vehicle_burning(veh);
+		used_lighter(ch, lighter);
 		
 		if (VEH_OWNER(veh)) {
 			add_offense(VEH_OWNER(veh), OFFENSE_BURNED_VEHICLE, ch, IN_ROOM(ch), offense_was_seen(ch, VEH_OWNER(veh), IN_ROOM(veh)) ? OFF_SEEN : NOBITS);

@@ -184,7 +184,10 @@ When using field  - The variable returns:
 &cshortdesc&0 - The name of the object that players see.
 &csize&0 - Inventory size of the object.
 &ctimer&0 - The timer of the object.
-&ctype&0 - The type of object, such as WAND, ARMOR, or KEY.
+&ctype&0 - The type of object, such as WEAPON, ARMOR, or PACK.
+&cused_lighter(PERSON)&0 - Uses up a charge on a LIGHTER item, if applicable.
+   The person using it is an optional argument; they receive a message if the
+   last charge is used. Returns 1 if the last charge is used (obj is purged).
 &cval0&0 - Returns the current value 0 of the object, defined here.
 &cval0(num)&0 - Changes the value 0 of the object.
 &cval1&0 - Returns the current value 1 of the object, defined here.
