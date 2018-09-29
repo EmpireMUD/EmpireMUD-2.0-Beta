@@ -747,15 +747,15 @@ specific adventures where you find them.
 You can see information about any faction by using its name with this command.
 
 Reputation levels and values:
-  &RDespised&0  -100
-  &rHated&0  -99 to -75
-  &oLoathed&0  -74 to -30
-  &yDisliked&0  -29 to -10
-  &tNeutral&0  -9 to 9
-  &cLiked&0  10 to 29
-  &aEsteemed&0  30 to 74
-  &gVenerated&0  75 to 99
-  &gRevered&0  100
+  &RDespised&0  -1000
+  &rHated&0  -999 to -750
+  &oLoathed&0  -749 to -300
+  &yDisliked&0  -299 to -100
+  &tNeutral&0  -99 to 99
+  &cLiked&0  100 to 290
+  &aEsteemed&0  300 to 749
+  &gVenerated&0  750 to 999
+  &gRevered&0  1000
 #
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 

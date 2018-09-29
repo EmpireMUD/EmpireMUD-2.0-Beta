@@ -1908,17 +1908,17 @@ const char *relationship_descs[] = {
 struct faction_reputation_type reputation_levels[] = {
 	// { type const, name, points to achieve this level } -> ASCENDING ORDER
 	// note: you achieve the level when you reach the absolute value of its
-	// points (-9 < x < 9 is neutral, +/-10 are the cutoffs for the first rank)
+	// points (-99 < x < 99 is neutral, +/-100 are the cutoffs for the first rank)
 	
-	{ REP_DESPISED, "Despised", "\tr", -100 },
-	{ REP_HATED, "Hated", "\tr", -75 },
-	{ REP_LOATHED, "Loathed", "\to", -30 },
-	{ REP_DISLIKED, "Disliked", "\ty", -10 },
+	{ REP_DESPISED, "Despised", "\tr", -1000 },
+	{ REP_HATED, "Hated", "\tr", -750 },
+	{ REP_LOATHED, "Loathed", "\to", -300 },
+	{ REP_DISLIKED, "Disliked", "\ty", -100 },
 	{ REP_NEUTRAL, "Neutral", "\tt", 0 },
-	{ REP_LIKED, "Liked", "\tc", 10 },
-	{ REP_ESTEEMED, "Esteemed", "\ta", 30 },
-	{ REP_VENERATED, "Venerated", "\tg", 75 },
-	{ REP_REVERED, "Revered", "\tg", 100 },
+	{ REP_LIKED, "Liked", "\tc", 100 },
+	{ REP_ESTEEMED, "Esteemed", "\ta", 300 },
+	{ REP_VENERATED, "Venerated", "\tg", 750 },
+	{ REP_REVERED, "Revered", "\tg", 1000 },
 	
 	{ -1, "\n", "\t0", 0 },	// last
 };
