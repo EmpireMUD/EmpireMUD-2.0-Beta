@@ -394,6 +394,7 @@ When using field  - The variable returns:
 &cfaction_name&0 - The name of the mob's 'allegiance' faction, if any.
 &cfighting&0 - The unique id of the mob fighting the actor.
 &cfind_lighter&0 - Finds an available LIGHTER in the inventory, if one exists.
+   Note: Players may also light things with %actor.has_tech(Light-Fires)%.
 &cfirstname&0 - The actor's first name (or first keyword, for mobs).
 &cfollower(name)&0 - The follower of the actor (as an id) with name supplied.
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
