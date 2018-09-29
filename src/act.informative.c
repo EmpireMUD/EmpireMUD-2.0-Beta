@@ -1160,8 +1160,8 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
-	if (size_data[(int)GET_SIZE(i)].show_on_look) {
-		act(size_data[(int)GET_SIZE(i)].show_on_look, FALSE, ch, NULL, i, TO_CHAR);
+	if (size_data[GET_SIZE(i)].show_on_look) {
+		act(size_data[GET_SIZE(i)].show_on_look, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
 	// non-npc, non-disguised info (disguise 'counts' as NPC)

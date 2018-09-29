@@ -295,6 +295,7 @@ OLC_MODULE(morphedit_maxlevel);
 OLC_MODULE(morphedit_movetype);
 OLC_MODULE(morphedit_requiresobject);
 OLC_MODULE(morphedit_shortdesc);
+OLC_MODULE(morphedit_size);
 
 // object modules
 OLC_MODULE(oedit_action_desc);
@@ -825,6 +826,7 @@ const struct olc_command_data olc_data[] = {
 	{ "requiresability", morphedit_ability, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresobject", morphedit_requiresobject, OLC_MORPH, OLC_CF_EDITOR },
 	{ "shortdescription", morphedit_shortdesc, OLC_MORPH, OLC_CF_EDITOR },
+	{ "size", morphedit_size, OLC_MORPH, OLC_CF_EDITOR },
 	
 	// object commands
 	{ "affects", oedit_affects, OLC_OBJECT, OLC_CF_EDITOR },

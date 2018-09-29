@@ -511,7 +511,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 	
 			++count;
 		}
-		else if (IS_NPC(c) && size_data[(int)GET_SIZE(c)].show_on_map) {
+		else if (IS_NPC(c) && size_data[GET_SIZE(c)].show_on_map) {
 			show_mob = TRUE;
 		}
 	}
@@ -1801,7 +1801,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 					if (can_see_player_in_other_room(ch, vict)) {
 						sprintf(plrbuf + strlen(plrbuf), "%s%s", *plrbuf ? ", " : "", PERS(vict, ch, FALSE));
 					}
-					else if (IS_NPC(vict) && size_data[(int)GET_SIZE(vict)].show_on_map) {
+					else if (IS_NPC(vict) && size_data[GET_SIZE(vict)].show_on_map) {
 						sprintf(plrbuf + strlen(plrbuf), "%s%s", *plrbuf ? ", " : "", skip_filler(PERS(vict, ch, FALSE)));
 					}
 				}

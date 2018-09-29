@@ -3908,7 +3908,7 @@ Examples:
 
 See also: MEDIT LONG DESCRIPTION
 #d
-"MEDIT SIZE" "MOB SIZE"
+"MEDIT SIZE" "MORPHEDIT SIZE" "MOB SIZE"
 
 Usage:  .size [size]
 
@@ -3925,6 +3925,8 @@ Available sizes are:
  &clarge&0 - horse; large corpse
  &chuge&0 - elephant; cannot take corpse
  &cenormous&0 - dragon; can be seen on the map
+
+Morphs also have a 'size' trait with the same meaning.
 #d
 MINIPET MINI-PET "MINI PET" "PET WHISTLE"
 

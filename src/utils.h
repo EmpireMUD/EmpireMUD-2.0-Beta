@@ -383,7 +383,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_MOVE_REGEN(ch)  ((ch)->char_specials.move_regen)
 #define GET_SITTING_ON(ch)  ((ch)->char_specials.sitting_on)
 #define GET_POS(ch)  ((ch)->char_specials.position)
-#define GET_SIZE(ch)  ((ch)->char_specials.size)
+#define SET_SIZE(ch)  ((ch)->char_specials.size)	// notice "SET_SIZE" -- the simple version of the macro
+#define GET_SIZE(ch)  (IS_MORPHED(ch) ? MORPH_SIZE(GET_MORPH(ch)) : SET_SIZE(ch))
 #define HUNTING(ch)  ((ch)->char_specials.hunting)
 #define IS_CARRYING_N(ch)  ((ch)->char_specials.carry_items)
 
@@ -815,6 +816,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MORPH_MOVE_TYPE(mph)  ((mph)->move_type)
 #define MORPH_REQUIRES_OBJ(mph)  ((mph)->requires_obj)
 #define MORPH_SHORT_DESC(mph)  ((mph)->short_desc)
+#define MORPH_SIZE(mph)  ((mph)->size)
 #define MORPH_VNUM(mph)  ((mph)->vnum)
 
 // helpers

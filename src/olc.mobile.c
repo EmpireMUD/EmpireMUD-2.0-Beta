@@ -1191,7 +1191,7 @@ void olc_show_mobile(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), TYPE_HIT), attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
-	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(GET_SIZE(mob), SIZE_NORMAL), size_types[(int) GET_SIZE(mob)]);
+	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
 	sprintf(buf + strlen(buf), "<%snameset\t0> %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)]);
 	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
@@ -1352,5 +1352,5 @@ OLC_MODULE(medit_short_description) {
 
 OLC_MODULE(medit_size) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	GET_SIZE(mob) = olc_process_type(ch, argument, "size", "size", size_types, GET_SIZE(mob));
+	SET_SIZE(mob) = olc_process_type(ch, argument, "size", "size", size_types, SET_SIZE(mob));
 }

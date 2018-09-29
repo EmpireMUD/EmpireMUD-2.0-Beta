@@ -48,6 +48,7 @@ extern const char *apply_types[];
 extern const char *mob_move_types[];
 extern const char *morph_flags[];
 extern const char *pool_types[];
+extern const char *size_types[];
 
 // external funcs
 extern struct resource_data *copy_resource_list(struct resource_data *input);
@@ -593,6 +594,7 @@ void clear_morph(morph_data *morph) {
 	MORPH_ABILITY(morph) = NO_ABIL;
 	MORPH_REQUIRES_OBJ(morph) = NOTHING;
 	MORPH_ATTACK_TYPE(morph) = TYPE_HIT;
+	MORPH_SIZE(morph) = SIZE_NORMAL;
 }
 
 
@@ -660,10 +662,14 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 	MORPH_SHORT_DESC(morph) = fread_string(fl, error);
 	MORPH_LONG_DESC(morph) = fread_string(fl, error);
 	
-	// 4. flags attack-type move-type max-level affects
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], str_in2) != 5) {
-		log("SYSERR: Format error in line 4 of %s", error);
-		exit(1);
+	// 4. flags attack-type move-type max-level affects [size]
+	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %s %d", str_in, &int_in[0], &int_in[1], &int_in[2], str_in2, &int_in[3]) != 6) {
+		int_in[3] = SIZE_NORMAL;	// backward-compatible
+		
+		if (sscanf(line, "%s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], str_in2) != 5) {
+			log("SYSERR: Format error in line 4 of %s", error);
+			exit(1);
+		}
 	}
 	
 	MORPH_FLAGS(morph) = asciiflag_conv(str_in);
@@ -671,6 +677,7 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 	MORPH_MOVE_TYPE(morph) = int_in[1];
 	MORPH_MAX_SCALE(morph) = int_in[2];
 	MORPH_AFFECTS(morph) = asciiflag_conv(str_in2);
+	MORPH_SIZE(morph) = int_in[3];
 	
 	// 5. cost-type cost-amount ability requires-obj
 	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
@@ -755,10 +762,10 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_LONG_DESC(morph)));
 	
-	// 4. flags attack-type move-type max-level affs
+	// 4. flags attack-type move-type max-level affs size
 	strcpy(temp, bitv_to_alpha(MORPH_FLAGS(morph)));
 	strcpy(temp2, bitv_to_alpha(MORPH_AFFECTS(morph)));
-	fprintf(fl, "%s %d %d %d %s\n", temp, MORPH_ATTACK_TYPE(morph), MORPH_MOVE_TYPE(morph), MORPH_MAX_SCALE(morph), temp2);
+	fprintf(fl, "%s %d %d %d %s %d\n", temp, MORPH_ATTACK_TYPE(morph), MORPH_MOVE_TYPE(morph), MORPH_MAX_SCALE(morph), temp2, MORPH_SIZE(morph));
 	
 	// 5. cost-type cost-amount ability requires-obj
 	fprintf(fl, "%d %d %d %d\n", MORPH_COST_TYPE(morph), MORPH_COST(morph), MORPH_ABILITY(morph), MORPH_REQUIRES_OBJ(morph));
@@ -1045,6 +1052,7 @@ void olc_show_morph(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MORPH_ATTACK_TYPE(morph), 0), attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MORPH_MOVE_TYPE(morph), 0), mob_move_types[MORPH_MOVE_TYPE(morph)]);
+	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(MORPH_SIZE(morph), SIZE_NORMAL), size_types[MORPH_SIZE(morph)]);
 
 	sprintbit(MORPH_AFFECTS(morph), affected_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(MORPH_AFFECTS(morph), NOBITS), lbuf);
@@ -1252,4 +1260,10 @@ OLC_MODULE(morphedit_requiresobject) {
 OLC_MODULE(morphedit_shortdesc) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	olc_process_string(ch, argument, "short description", &MORPH_SHORT_DESC(morph));
+}
+
+
+OLC_MODULE(morphedit_size) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	MORPH_SIZE(morph) = olc_process_type(ch, argument, "size", "size", size_types, MORPH_SIZE(morph));
 }
