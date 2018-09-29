@@ -3926,7 +3926,8 @@ Available sizes are:
  &chuge&0 - elephant; cannot take corpse
  &cenormous&0 - dragon; can be seen on the map
 
-Morphs also have a 'size' trait with the same meaning.
+Morphs also have a 'size' trait with the same meaning. However, morph size will
+not affect the blood pool of the morphed person/mob at all.
 #d
 MINIPET MINI-PET "MINI PET" "PET WHISTLE"
 
