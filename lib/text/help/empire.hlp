@@ -379,7 +379,7 @@ EMPIREIDENTIFY EIDENTIFY EID
 Usage:  empireidentify <item>
         eidentify <item>
        
-The eidentify command identifies an item stored by your empire, showing you
+The EIdentify command identifies an item stored by your empire, showing you
 the same information that identify would as well as a listing of quantities
 of this item across the empire's islands.
 
@@ -394,14 +394,14 @@ EMPIREINVENTORY EINVENTORY EINV
 Usage:  empireinventory [item | all]
         einventory [item | all]
        
-The einventory command shows the contents of all storage buildings and rooms
+The EInventory command shows the contents of all storage buildings and rooms
 for the island you're currently on. It won't work out in the ocean. You can
 use the ship command to move resources between multiple islands.
 
 You can specify an item name to see only matching items. If you specify a name,
 it'll show them whether or not the item is stored on your current island. If
 you don't specify a name, you can see all items regardless of where they are
-stored using "einv all".
+stored using "EInv all".
 
 You can use "warehouse inventory" to see items in warehouse (unique) storage.
 
@@ -657,7 +657,7 @@ ISLANDS
 
 Usage:  islands
 
-This command lists the islands your empire has territory or einventory on
+This command lists the islands your empire has territory or EInventory on
 (including warehouse storage). You must have the Navigation ability. The
 coordinates for each island are the approximate center of the island.
 
