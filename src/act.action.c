@@ -119,7 +119,7 @@ const struct action_data_struct action_data[] = {
 	{ "fishing", "is fishing.", ACTF_SITTING, process_fishing, NULL },	// ACT_FISHING
 	{ "preparing", "is preparing to fill in the trench.", NOBITS, process_start_fillin, NULL },	// ACT_START_FILLIN
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
-	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
+	{ "chipping", "is chipping flints.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_excavating, NULL },	// ACT_EXCAVATING
@@ -1122,7 +1122,7 @@ void process_chipping(char_data *ch) {
 	bool success;
 	
 	if (!find_chip_weapon(ch)) {
-		msg_to_char(ch, "You need to be using some kind of hammer to chip it.\r\n");
+		msg_to_char(ch, "You need to be wielding some kind of hammer or rock to chip it.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1155,7 +1155,7 @@ void process_chipping(char_data *ch) {
 		if (success) {
 			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 25);
 			
-			// repeat! (no -paul) note: keyword-targeting is hard because "chipped rock" also has "rock" as an alias
+			// repeat! (no -paul) note: keyword-targeting is hard because "chipped flint" also has "flint" as an alias
 			// do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
@@ -2480,7 +2480,7 @@ ACMD(do_chip) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
 	else if (!find_chip_weapon(ch)) {
-		msg_to_char(ch, "You need to be using some kind of hammer to chip it.\r\n");
+		msg_to_char(ch, "You need to be wielding some kind of hammer or rock to chip it.\r\n");
 	}
 	else {
 		start_action(ch, ACT_CHIPPING, chip_timer);
