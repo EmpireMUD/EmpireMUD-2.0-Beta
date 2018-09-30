@@ -626,7 +626,7 @@ Temperate crops (plains):
  &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
  &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
  &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
- &Y;;;;&0  Wheat               &G@@@@&0  Lettuce
+ &Y;;;;&0  Wheat
 
 Arid crops (desert):
  &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
@@ -637,7 +637,10 @@ Tropical crops (partially cleared jungle):
  &Gwwow&0  Watermelons
 
 River crops (plains near river):
- &yoooo&0  Gourds              &g,,,,&0  Rice
+ &yoooo&0  Squash              &g,,,,&0  Rice
+
+Newbie island crops:
+ &G@@@@&0  Lettuce             &goooo&0  Calabash gourds
 
 Most crops are used to make food and drink. Some, like cotton, have other uses.
 
