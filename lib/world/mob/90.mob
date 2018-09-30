@@ -431,6 +431,10 @@ A brown horse is standing here.
 ~
 10 20 dejo 0 4
 0 0 14 11
+D
+   The horse stands with its head high, ears alert for danger. Nevertheless, it
+looks tame, and you might be able to ride it.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse

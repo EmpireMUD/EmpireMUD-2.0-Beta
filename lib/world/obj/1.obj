@@ -680,8 +680,8 @@ a flint set~
 A flint set is lying here.~
 You can use the flint set to light sticks and make torches.
 ~
-3 0 a 2
-0 0 0
+18 0 a 3
+-1 0 0
 5 0
 C
 1 1

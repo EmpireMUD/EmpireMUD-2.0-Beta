@@ -2,7 +2,7 @@
 deer reindeer~
 a reindeer~
 A reindeer raises its head from grazing.~
-cej 9 0 100 0
+cej 9 0 100 0 4
 2 25 215 10719
 A
 6 2
@@ -17,7 +17,7 @@ S
 snowman large~
 a large snowman~
 A large snowman stands nearby.~
-cijl 15 9 100 nrG
+cijl 15 9 100 nrG 3
 1 0 -1 10719
 A
 11 -5
@@ -26,7 +26,7 @@ S
 elf christmas~
 a Christmas elf~
 A Christmas elf is dancing about.~
-0 15 0 0 0
+0 15 0 0 0 2
 1 0 -1 10719
 S
 $

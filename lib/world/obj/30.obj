@@ -295,17 +295,17 @@ It's a single, delicious squash.
 6 0 a 4
 6 0 0
 7 48
-I 14 3023 100.00 4 x  # COMBINE: a basket of gourds
+I 14 3023 100.00 4 x  # COMBINE: a basket of squash
 O
 27 nq
 S
 #3023
-gourds basket~
-a basket of gourds~
-A basket full of gourds is sitting on the ground.~
-You can eat gourds, or plant them.
+squash basket~
+a basket of squash~
+A basket full of squash is sitting on the ground.~
+The yellow squash are fresh. You could eat them or plant them.
 ~
-6 bl a 4
+6 bl a 6
 24 12 0
 7 168
 I 15 3022 100.00 4 x  # SEPARATE: a yellow squash
@@ -705,5 +705,64 @@ You could eat the clam.
 6 0 a 3
 6 0 0
 7 48
+S
+#3053
+calabash green~
+a green calabash~
+A green calabash is lying here.~
+   The calabash, also called a bottle gourd, has a mild flavor. This one isn't
+ripe enough to dry into a bottle, but it might satisfy your hunger.
+~
+6 0 a 5
+6 0 0
+7 48
+O
+27 nq
+S
+#3054
+sack calabash fresh gourds~
+a sack of fresh calabash gourds~
+A sack of fresh calabash gourds is hanging here.~
+   These calabash gourds are fresh off the vine, and still deep green. The
+calabash is cultivated worldwide for its use as a bottle gourd. If you leave
+this sack out to dry, you could craft it into a bottle.
+~
+6 el a 7
+24 0 0
+7 132
+O
+27 bq
+R
+5606 0
+R
+5610 0
+T 3054
+S
+#3055
+sack calabash dried gourds~
+a sack of dried calabash gourds~
+A sack of dried calabash gourds is hanging here.~
+   The dried calabash gourds, also called bottle gourds, are used to make
+tools. You can 'craft gourd bottle' to make a drink container, which you can
+then fill from any river or lake.
+~
+3 0 a 7
+0 0 0
+7 1152
+R
+5610 0
+S
+#3056
+seeds calabash~
+some calabash seeds~
+Some calabash seeds are scattered on the ground.~
+   The calabash seeds are small, round, and yellow. These seeds can be planted
+near the river to grow bottle gourds.
+~
+3 b a 7
+0 3018 0
+7 1152
+R
+5116 0
 S
 $
