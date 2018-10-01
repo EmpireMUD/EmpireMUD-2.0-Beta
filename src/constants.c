@@ -2882,6 +2882,7 @@ const char *evo_types[] = {
 	"SUMMER",
 	"AUTUMN",
 	"WINTER",	// 15
+	"BURNS-TO",
 	"\n"
 };
 
@@ -2904,6 +2905,7 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// summer
 	EVO_VAL_NONE,	// autumn
 	EVO_VAL_NONE,	// winter
+	EVO_VAL_NONE,	// burns-to
 };
 
 
@@ -2925,6 +2927,7 @@ bool evo_is_over_time[] = {
 	TRUE,	// summer
 	TRUE,	// autumn
 	TRUE,	// winter
+	FALSE,	// burns-to
 };
 
 

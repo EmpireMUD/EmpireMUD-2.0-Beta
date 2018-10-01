@@ -2402,7 +2402,8 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_SUMMER  13	// triggers if it's summer
 #define EVO_AUTUMN  14	// triggers if it's autumn
 #define EVO_WINTER  15	// triggers if it's winter
-#define NUM_EVOS  16	// total
+#define EVO_BURNS_TO  16	// caused by a player burning it
+#define NUM_EVOS  17	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0

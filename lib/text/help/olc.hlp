@@ -6239,7 +6239,8 @@ Available types ([value] isn't used unless specified):
  NOT-ADJACENT - No matching sector within 1 tile (value is the sector vnum).
  NOT-NEAR-SECTOR - No matching sector within 2 tiles (value is the sector
     vnum).
- 
+ SPRING, SUMMER, AUTUMN, WINTER - Triggers during this season.
+ BURNS-TO - Sector this tile becomes when burned down by a player.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
