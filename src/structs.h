@@ -1516,7 +1516,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_ROCK  22
 #define CMP_SEEDS  23
 #define CMP_SKIN  24
-#define CMP_STICK  25
+#define CMP_SAPLING  25
 #define CMP_TEXTILE  26
 #define CMP_VEGETABLE  27
 #define CMP_ROPE  28

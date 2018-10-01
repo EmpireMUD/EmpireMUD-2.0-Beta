@@ -2392,7 +2392,7 @@ const char *component_types[] = {
 	"rock",
 	"seeds",
 	"skin",
-	"stick",	// 25
+	"sapling",	// 25
 	"textile",
 	"vegetable",
 	"rope",

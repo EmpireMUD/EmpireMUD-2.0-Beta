@@ -408,6 +408,7 @@ With the basic Forge skill, you can create:
   mirror
   coin mill
   anchor -- used on ships
+  firesteel tinderbox -- for lighting fires
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
@@ -756,9 +757,9 @@ All crafting abilities train when you complete recipes that require them.
 Primitive crafts:
   handle
   stone axe
-  flint set
   stone hammer
   spear
+  fire sticks (for lighting torches and fires)
 
 With Archery, you can craft:
   arrows
@@ -1122,6 +1123,7 @@ With Woodworking you can craft:
   walking stick
   lantern*  (glassblowing)
   wooden sword
+  fire drill (lights fires)
   blank sign*
   stool*
   bench*
