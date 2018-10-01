@@ -1045,6 +1045,10 @@ bool used_lighter(char_data *ch, obj_data *obj) {
 		return FALSE;	// not even a lighter
 	}
 	
+	if (ch && !consume_otrigger(obj, ch, OCMD_LIGHT, NULL)) {
+		return TRUE;	// trigger kicked us out (return TRUE because possibly used up)
+	}
+	
 	// check binding
 	if (ch && !IS_IMMORTAL(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
 		bind_obj_to_player(obj, ch);
