@@ -225,16 +225,19 @@ Feathers are a component type.
 
 See also: COMPONENT
 #
-FIBERS "FIBERS COMPONENT" "FIBER COMPONENT"
+FIBERS "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER"
 
 Fibers (component)
 
-Used for:  weaving, adventure crafts
+Used for:  building, crafting
 
-Fibers are a component type usually used to make cloth. Typical examples are
-cotton and wool.
+Fibers are a component type usually used to make various crafts. Common types
+of fibers are:
 
-See also: COMPONENT
+animal fiber: wool
+plant fiber: cotton, sticks and leaves, branches, vines
+
+See also: COMPONENT, GATHER
 #
 FLOUR "FLOUR COMPONENT"
 
@@ -605,18 +608,16 @@ Example:
 
 See also: COINS
 #
-STICKS "STICK COMPONENT"
-
-Stick (component)
+"STICKS AND LEAVES" "THORNY BRANCHES" "TANGLED VINES" VINES
 
 Stored at:  Lumber Yard
 Used for:  crafting, basic buildings
 
-Sticks are gathered in the forest, or scraped off some types of tree. They can
-be used for weapons, torches, and some buildings. Most recipes that need sticks
-will accept any kind of stick.
+You can gather these items in a forest, grove, or jungle. They can be used for
+torches, crafts, and some buildings. These are all types of plant fiber, and
+can be used in any recipe that says (fiber) or (plant fiber).
 
-See also: COMPONENT, GATHER, BUILD, CRAFT, SCRAPE
+See also: FIBER COMPONENT, GATHER, BUILD, CRAFT, SCRAPE
 #
 ROPE ROPES "ROPE COMPONENT"
 
@@ -629,7 +630,7 @@ Ropes are used to tie mounts to land vehicles to pull them, and to control the
 sails of ships. They will be consumed when you manufacture the vehicles - no
 more ropes are needed afterwards.
 
-You can craft basic ropes from small pieces of leather.
+You can craft basic ropes from plant fiber or small pieces of leather.
 
 See also: COMPONENT, CRAFT, MANUFACTURE
 #

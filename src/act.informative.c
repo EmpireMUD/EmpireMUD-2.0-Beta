@@ -1179,7 +1179,11 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 			act("$E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
 		}
 	}
-
+	
+	if (IS_NPC(i) && !disguise && MOB_FLAGGED(i, MOB_MOUNTABLE) && has_player_tech(ch, PTECH_RIDING) && (!AFF_FLAGGED(i, AFF_FLY) || CAN_RIDE_FLYING_MOUNT(ch))) {
+		act("You can ride on $M.", FALSE, ch, NULL, i, TO_CHAR);
+	}
+	
 	if (show_eq && !disguise) {
 		// check if there's eq to see
 		found = FALSE;
