@@ -234,8 +234,11 @@ Used for:  building, crafting
 Fibers are a component type usually used to make various crafts. Common types
 of fibers are:
 
-animal fiber: wool
-plant fiber: cotton, sticks and leaves, branches, vines
+ sticks and leaves (hard, plant, temperate, basic)
+ thorny branches (desert, hard, plant, basic)
+ tangle of vines (plant, soft, tropical, basic)
+ basket of cotton (plant, soft)
+ bag of wool (animal, soft)
 
 See also: COMPONENT, GATHER
 #
