@@ -1041,19 +1041,27 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 * @return bool TRUE if the item was used up and purged; FALSE if the item was not purged.
 */
 bool used_lighter(char_data *ch, obj_data *obj) {
-	if (!IS_LIGHTER(obj) || GET_LIGHTER_USES(obj) == UNLIMITED) {
-		return FALSE;	// did not use up the lighter
+	if (!IS_LIGHTER(obj)) {
+		return FALSE;	// not even a lighter
 	}
 	
-	// decrement now
-	GET_OBJ_VAL(obj, VAL_LIGHTER_USES) -= 1;
+	// check binding
+	if (ch && !IS_IMMORTAL(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+		bind_obj_to_player(obj, ch);
+		reduce_obj_binding(obj, ch);
+	}
 	
-	if (GET_LIGHTER_USES(obj) <= 0) {
-		if (ch) {
-			act("$p is used up, and you throw it away.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+	if (GET_LIGHTER_USES(obj) != UNLIMITED) {
+		GET_OBJ_VAL(obj, VAL_LIGHTER_USES) -= 1;	// use 1 charge
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);	// no longer storable
+		
+		if (GET_LIGHTER_USES(obj) <= 0) {
+			if (ch) {
+				act("$p is used up, and you throw it away.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+			}
+			extract_obj(obj);
+			return TRUE;	// did use it up
 		}
-		extract_obj(obj);
-		return TRUE;	// did use it up
 	}
 	
 	return FALSE;	// did not use it up
