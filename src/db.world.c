@@ -852,13 +852,18 @@ void init_mine(room_data *room, char_data *ch) {
 * @param room_data *room The outdoor room with a BURNS-TO evolution.
 */
 void perform_burn_room(room_data *room) {
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], from[256], to[256];
 	struct evolution_data *evo;
 	sector_data *sect;
 	
 	if ((evo = get_evolution_by_type(SECT(room), EVO_BURNS_TO)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
 		if (ROOM_PEOPLE(room)) {
-			sprintf(buf, "The %s burns down and becomes %s %s.", GET_SECT_NAME(SECT(room)), AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
+			strcpy(from, GET_SECT_NAME(SECT(room)));
+			strtolower(from);
+			strcpy(to, GET_SECT_NAME(sect));
+			strtolower(to);
+			
+			sprintf(buf, "The %s burn%s down and becomes %s%s.", from, (from[strlen(from)-1] == 's' ? "" : "s"), (from[strlen(to)-1] == 's' ? "" : AN(to)), to);
 			act(buf, FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 		
