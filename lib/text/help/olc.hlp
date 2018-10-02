@@ -5290,6 +5290,7 @@ Available flags:
  - !FACITONS -- Cannot edit factions
  - !GENERICS - Cannot edit generics
  - !SHOPS - Cannot edit shops
+ - ALLOW-PROGRESS - Is allowed to edit progressions
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
