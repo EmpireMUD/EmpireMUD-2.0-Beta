@@ -110,7 +110,7 @@ void process_tanning(char_data *ch);
 const struct action_data_struct action_data[] = {
 	{ "", "", NOBITS, NULL, NULL },	// ACT_NONE
 	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_digging, NULL },	// ACT_DIGGING
-	{ "gathering", "is gathering sticks.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
+	{ "gathering", "is gathering plant material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
 	{ "chopping", "is chopping down trees.", ACTF_HASTE | ACTF_FAST_CHORES, process_chop, NULL },	// ACT_CHOPPING
 	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	// ACT_BUILDING
 	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
@@ -1646,7 +1646,7 @@ void process_gathering(char_data *ch) {
 	int gather_depletion = config_get_int("gather_depletion");
 	
 	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		send_to_char("You search the ground for sticks...\r\n", ch);
+		send_to_char("You search the ground for useful material...\r\n", ch);
 	}
 	act("$n searches around on the ground...", TRUE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 	GET_ACTION_TIMER(ch) -= 1;
@@ -1654,7 +1654,7 @@ void process_gathering(char_data *ch) {
 	// done ?
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
-			msg_to_char(ch, "There aren't any good sticks left to gather here.\r\n");
+			msg_to_char(ch, "The's nothing good left to gather here.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
 		}
 		else {
@@ -2833,7 +2833,7 @@ ACMD(do_gather) {
 		msg_to_char(ch, "NPCs cannot gather.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_GATHERING) {
-		send_to_char("You stop searching for sticks.\r\n", ch);
+		send_to_char("You stop gathering.\r\n", ch);
 		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
@@ -2852,7 +2852,7 @@ ACMD(do_gather) {
 	else {
 		start_action(ch, ACT_GATHERING, gather_base_timer);
 		
-		send_to_char("You begin looking around for sticks.\r\n", ch);
+		send_to_char("You begin looking around for plant material.\r\n", ch);
 	}
 }
 
