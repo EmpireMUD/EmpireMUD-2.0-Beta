@@ -4425,7 +4425,7 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_OBJECT) && !OLC_FLAGGED(ch, OLC_FLAG_NO_OBJECT)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_PROGRESS) && OLC_FLAGGED(ch, OLC_FLAG_ALLOW_PROGRESS)) {
+		else if (IS_SET(type, OLC_PROGRESS) && !OLC_FLAGGED(ch, OLC_FLAG_NO_PROGRESS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_QUEST) && !OLC_FLAGGED(ch, OLC_FLAG_NO_QUESTS)) {

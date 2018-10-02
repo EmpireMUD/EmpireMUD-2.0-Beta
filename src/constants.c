@@ -2595,7 +2595,7 @@ const char *olc_flag_bits[] = {
 	"!FACTIONS",
 	"!GENERICS",
 	"!SHOPS",
-	"ALLOW-PROGRESS",
+	"!PROGRESS",
 	"\n"
 };
 
