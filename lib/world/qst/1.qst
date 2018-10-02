@@ -1,19 +1,19 @@
 #100
-Rock Tutorial~
-   You found a rock! You can dig up rocks like this all over, and their main
-use is laying roads. But there's another use for rocks like this: you can make
-tools from them. Instructions:
- 1. Dig up a second rock.
- 2. Wield one of the rocks (wield rock).
- 3. Chip the other rock (chip rock).
+Flint Tutorial~
+   You found a flint stone! You can dig up rocks and flints all over. Both
+types can be used to lay roads, but you can also make tools from flints.
+Instructions:
+ 1. You need a rock and a flint stone.
+ 2. Wield the rock.
+ 3. Chip the flint.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
-   Chipped rocks aren't very useful on their own, but you can make them into
+   Chipped flints aren't very useful on their own, but you can make them into
 other tools.
 ~
-4 h 0 15 -1
+5 h 0 15 -1
 A
-2 100
+2 102
 R
 0 0 1
 R
@@ -24,32 +24,32 @@ Z
 2 180
 S
 #102
-Flint Tutorial~
-   You have found a piece of flint! These are useful for starting fires, but
-first you'll need to make it into a flint set:
- 1. Dig up a regular rock too (dig).
- 2. Put them together (craft flint set).
- Tip: Type 'craft info flint set' to see more information about the craft.
+Fire Sticks Tutorial~
+   You have found some sticks. You can select the best ones to make a
+fire-starting tool. Here are the steps:
+ 1. Gather a couple sticks (gather).
+ 2. Check what you need to make the fire sticks (craft info fire sticks).
+ 3. Make the fire sticks (craft fire sticks).
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
    Congratulations! You can now light sticks, trees, and other items. Now get
 out there and set the world on fire!
 ~
-3 h 0 15 -1
+6 h 0 15 -1
 A
-2 102
+2 121
 R
 0 0 1
 R
 6 183 1
 W
-2 183 0 1
+2 940 0 1
 Z
-2 183
+2 940
 S
 #121
 Handle Tutorial~
-   You can turn this stick into a handle that could be made into a tool or
+   You can turn this sapling into a handle that could be made into a tool or
 weapon. Here are the instructions:
  1. Wield a sharp weapon like a sword or dagger.
  2. Type 'craft handle'.
@@ -58,9 +58,9 @@ weapon. Here are the instructions:
 ~
 This handle can be used for lots of other crafts.
 ~
-2 h 0 15 -1
+3 h 0 15 -1
 A
-2 121
+2 131
 R
 0 0 1
 R
@@ -139,18 +139,20 @@ Z
 S
 #127
 Bound Wooden Column Tutorial~
-   In order to make pillars out of rough wood, you'll need to craft bound
+   In order to make pillars out of desert resources, you'll need to craft bound
 wooden columns. Here's how:
- 1. Gather 6 sticks.
- 2. Type 'craft bound wooden column'.
+ 1. Gather 3 saplings (of any kind).
+ 2. Gather 5 items made of plant fiber, such as thorny branches.
+ 3. Make a rope (craft rope).
+ 4. Make a bound wooden column (craft bound wooden column).
  Tip: Type 'craft info bound wooden column' to see more information about it.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
 You can use the column to build all kinds of things.
 ~
-2 h 0 15 -1
+4 h 0 15 -1
 A
-2 126
+2 134
 R
 0 0 1
 R
@@ -232,14 +234,14 @@ Z
 2 179
 S
 #180
-Chipped Rock Tutorial~
-   You've chipped a rock! Chip the rock again to turn it into a better tool.
-Don't forget to wield a rock to chip it with.
+Chipped Flint Tutorial~
+   You've chipped some pieces off the flint! Chip the flint again to turn it
+into a better tool. Don't forget to wield a rock to chip it with.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
-Chipping rocks is a good way to make primitive tools.
+Chipping flints is a good way to make primitive tools.
 ~
-3 h 0 15 -1
+4 h 0 15 -1
 A
 2 180
 R
@@ -251,18 +253,18 @@ Z
 S
 #183
 Torch Tutorial~
-   Now that you have a flint set, it's time to use it. Here's how to make a
-torch:
+   Now that you have some fire sticks, it's time to use them. Here's how to
+make a torch:
  1. Find a stick (gather).
  2. Light it on fire (light stick).
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
    Now that you have a torch, you'll be able to find your way around in the
-dark! Torches don't last long though, so keep your flint set handy.
+dark! Torches don't last long, though, so keep some fire sticks handy.
 ~
-4 h 0 15 -1
+7 h 0 15 -1
 A
-2 183
+2 940
 P
 5 184 0 1 a
 P
@@ -276,18 +278,19 @@ Z
 S
 #184
 Torch Tutorial~
-   You've found a stick! These could be used to light up the night, but only if
-you get a flint set. Here's how to make your torch:
- 1. Get a flint set ('dig' until you get a flint, and follow its quest).
- 2. Use the flint set (light stick).
+   You've found a good, strong sapling. This would make a perfect torch!
+Here's how to make it into one:
+ 1. Gather some sticks and leaves (gather).
+ 2. Put together some fire sticks (craft fire sticks).
+ 3. Light the sapling with the fire sticks (light sapling).
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
    Now that you have a torch, you'll be able to find your way around in the
-dark! Torches don't last long though, so keep your flint set handy.
+dark! Keep some sticks or saplings handy for when it burns out, though.
 ~
-4 h 0 15 -1
+5 h 0 15 -1
 A
-2 121
+2 131
 P
 5 183 0 1 a
 P

@@ -110,12 +110,12 @@ takes to the skies at the slightest hint of wind. If you want to plant more of
 them, mill the cattails into seeds. Or, you can burn them to get a powerful
 reagent that can be milled into a burnt zephyr salve.
 ~
-3 0 a 6
+3 0 a 7
 0 0 0
 0 0
 I 11 11015 100.00 1  # LIGHT: a burnt zephyr cattail
 O
-7 i
+7 ip
 S
 #11010
 seeds handful purple~
@@ -166,11 +166,11 @@ A gigantic roc feather is blowing around.~
 bird aloft. The feather is rust-colored and despite its size, it weighs next to
 nothing.
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 7 0
 O
-7 af
+7 afp
 R
 5193 0
 R

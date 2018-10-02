@@ -3,9 +3,9 @@ bound wooden column~
 127 1
 2 198 0 3 -1
 R
-16 1 1 0
+25 3 1 0
 R
-25 6 1 0
+28 1 1 0
 S
 #170
 silver ingot~
@@ -78,12 +78,14 @@ R
 178 2 0 0
 S
 #183
-flint set~
+firesteel tinderbox~
 183 1
-2 288 0 1 -1
+1 51 0 4 -1
 R
 102 1 0 0
 R
-100 1 0 0
+175 1 0 0
+R
+7 4 1 0
 S
 $

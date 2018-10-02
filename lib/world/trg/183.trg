@@ -1,5 +1,5 @@
 #18300
-Pharaoh combat~
+Pharaoh Neferkare Combat~
 0 k 100
 ~
 set heroic_mode %self.mob_flagged(GROUP)%
@@ -118,7 +118,7 @@ switch %random.4%
     done
     %echo% %self.name% looks rejuvenated by the water!
     if %heroic_mode%
-      %damage% %self% -1000
+      %damage% %self% -300
     else
       %damage% %self% -150
     end
@@ -166,11 +166,13 @@ switch %random.4%
     dg_affect %actor% HARD-STUNNED on %duration%
     set cycle 1
     while %cycle% <= %max_cycles%
-      if %actor.health% > -10
-        %send% %actor% &r%self.name%'s bandages tighten around you, trying to squeeze the life out of you!
-        %echoaround% %actor% %self.name%'s bandages tighten around %actor.name%!
-        %damage% %actor% 150 physical
-        wait 5 sec
+      if %actor%
+        if %actor.health% > -10
+          %send% %actor% &r%self.name%'s bandages tighten around you, trying to squeeze the life out of you!
+          %echoaround% %actor% %self.name%'s bandages tighten around %actor.name%!
+          %damage% %actor% 150 physical
+          wait 5 sec
+        end
       end
       eval cycle %cycle% + 1
     done

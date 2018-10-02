@@ -5,6 +5,11 @@ A dire beaver is building a huge dam here.
 ~
 25 75 djy cm 3
 0 0 0 9
+D
+   Beavers are large, furry, semi-aquatic rodents, best known for chewing
+through trees and building dams across rivers. This one is the size of a large
+dog!
+~
 I 4 18452 5.00 1  # LOOT: a beaver whistle
 I 4 18453 100.00 1 x  # LOOT: a gnawed walking stick
 T 18451
@@ -28,6 +33,9 @@ A beaver kit is gnawing on a twig.
 ~
 1 1 bdoD n 1
 0 0 0 9
+D
+The kit hides behind its tail as you bend down to examine it.
+~
 T 9901
 T 9902
 S

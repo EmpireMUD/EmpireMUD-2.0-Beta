@@ -14,7 +14,7 @@ much protection against the elements.
 R
 1002 1 5 0
 R
-25 2 1 0
+7 2 1 1048848
 S
 #5101
 Cabin~
@@ -31,7 +31,7 @@ down. It is, however, still susceptible to fire.
 R
 1002 1 5 0
 R
-25 2 1 0
+7 2 1 1048848
 S
 #5102
 Small House~
@@ -64,7 +64,7 @@ burned down, but provides little defense against invaders.
 R
 1000 1 5 0
 R
-25 2 1 0
+7 2 1 1048848
 S
 #5104
 Pueblo~
@@ -271,7 +271,7 @@ A Wooden Fence~
 R
 1003 1 5 0
 R
-25 2 1 0
+25 1 1 1048576
 S
 #5113
 Gate~
@@ -282,7 +282,7 @@ A Wooden Gate~
 R
 1003 1 5 0
 R
-25 2 1 0
+25 2 1 1048576
 S
 #5114
 Cannery~
@@ -301,7 +301,7 @@ assorted fruit. Some empty jars have been left on one of the tables.
 R
 1002 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5115
 Foundry~
@@ -321,7 +321,7 @@ v
 R
 1009 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5116
 Granary~
@@ -342,7 +342,7 @@ corn kernels.
 R
 1002 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5117
 Gravel Pit~
@@ -363,7 +363,7 @@ a mace is lying at your feet.
 R
 1002 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5118
 Lumber Yard~
@@ -385,7 +385,7 @@ t
 R
 1002 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5119
 Smokehouse~
@@ -407,7 +407,7 @@ G
 R
 1002 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5120
 Tannery~
@@ -429,7 +429,7 @@ M
 R
 1002 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5121
 Utility Shed~
@@ -448,7 +448,7 @@ hooks are even labelled with a small picture to tell you which goes where.
 R
 1002 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5122
 Quarry~
@@ -1141,7 +1141,7 @@ A Platform in the Swamp~
 R
 1005 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 T 5156
 S
 #5157
@@ -1160,7 +1160,7 @@ a swamp.
 R
 1002 1 5 0
 R
-25 2 1 0
+7 2 1 1048848
 S
 #5158
 Swamp Manor~
@@ -1825,7 +1825,7 @@ A Draining Oasis~
 R
 1005 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 T 5191
 S
 #5192
@@ -1931,7 +1931,7 @@ I 21 1301 100.00 1 f  # FISH: a striped barbfish
 R
 1002 1 5 0
 R
-25 1 1 0
+7 1 1 1048848
 S
 #5197
 Stilt House~

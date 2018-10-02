@@ -133,7 +133,7 @@ A Giant Hovel~
 124 0 R 0
 0 8 0 -1
 D
-   This hovel, like most of the huts you've seen, is crudely made. 
+   This hovel, like most of the huts you've seen, is crudely made.
 Nevertheless, This crudely-made hovel looks as if it has been patched and
 re-patched to keep the weather at bay. It's not dissimilar from other hovels
 you've seen, save for the size, which is enormous. A hovel made for a single
@@ -142,7 +142,7 @@ giant can easily sleep a family of eight.
 R
 21 1 1 0
 R
-25 2 1 0
+7 2 1 1048848
 S
 #10975
 Giant Stone Head~

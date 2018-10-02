@@ -5,6 +5,12 @@ The goblin necromancer is chanting here.
 ~
 125 200 adxB cd 2
 1 0 0 20
+D
+   The translucent flesh of this goblin is stretched over a skeleton with
+little to no musculature or fat protection. A black cloud of magic seems to
+drift up from him, and glints of silver shine out as he spins a skull in his
+hand.
+~
 I 4 16004 5.00 1 i  # LOOT: a rib bone dagger
 I 4 16008 5.00 1 i  # LOOT: a stapes earring
 I 4 16009 5.00 1 i  # LOOT: an ear bone ring
@@ -47,6 +53,11 @@ A skeletal warrior rattles here.
 ~
 125 200 acdhop cG 3
 0 0 22 15
+D
+   This skeleton stands with no weapon in hand, but clearly ready to fight for
+it's master. The various marks on it's bones indicate that it is no stranger to
+war.
+~
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
 I 4 16008 4.00 1 i  # LOOT: a stapes earring
@@ -65,6 +76,11 @@ A skeletal soldier rattles here.
 ~
 125 200 acdhopz cqG 3
 0 0 22 1
+D
+   This skeleton stands with a simple but effective blade in hand, clearly
+ready to fight for it's master. The various marks on it's bones indicate that
+it is no stranger to war.
+~
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
 I 4 16008 4.00 1 i  # LOOT: a stapes earring
@@ -81,8 +97,14 @@ rawhead~
 the rawhead~
 The rawhead looms here.
 ~
-125 200 dghopyA ciwEG 2
+125 200 dghopyA ciwEG 4
 0 0 26 15
+D
+   A monster made up of a mixture of bones looms over you with it's arms
+outstretched. The head is clearly from some large beast, perhaps a rhino,
+perhaps a small dragon, or one of any number of other such creatures. And the
+rest of the body is well proportioned to said skull.
+~
 I 4 16005 100.00 1  # LOOT: a crushed skeleton
 I 4 16004 4.00 1 i  # LOOT: a rib bone dagger
 I 4 16008 4.00 1 i  # LOOT: a stapes earring
@@ -101,6 +123,12 @@ A mess of bone and natural materials stands here.
 ~
 125 200 dh cG 2
 0 0 13 15
+D
+   A collection of dirt, bones, moss, and other organic materials are all
+formed here into some semblence of a creature. Standing about as high as a
+goblin, but absolutely not humanoid this... Mess, for nothing else fits, is
+blocking your path forward or back.
+~
 I 4 16005 18.00 1 d  # LOOT: a crushed skeleton
 I 4 16008 1.00 1 d  # LOOT: a stapes earring
 I 4 16009 1.00 1 d  # LOOT: an ear bone ring
@@ -121,6 +149,13 @@ A skeleton with leaves for flesh and vines for veins sways here.
 ~
 125 200 bdhxzA cwABG 2
 2 0 0 15
+D
+   This clearly female goblin skeleton stands dressed in an astrakhan cloak and
+little else. Under the folds there's a skeleton frame, dressed in a variety of
+plant matter. With vines taking the place of her circulatory system, almost
+unnoticeable fruits growing in where her organs belong, and different types of
+moss replacing skin and hair.
+~
 I 4 16011 5.00 1 i  # LOOT: a corrupted dragon's tooth
 I 4 16002 25.00 1 i  # LOOT: an astrakhan cloak
 I 4 16008 12.00 1 i  # LOOT: a stapes earring

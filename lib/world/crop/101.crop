@@ -157,7 +157,7 @@ D4
 I 6 3014 100.00 1  # FORAGE: some dry beans
 I 8 10152 50.00 2 H  # HARVEST: a handful of mesquite pods
 I 8 10152 50.00 3 H  # HARVEST: a handful of mesquite pods
-I 9 121 100.00 1  # GATHER: a stick
+I 9 132 100.00 1  # GATHER: some thorny branches
 I 20 10151 50.00 2 c  # CHOP: a mesquite tree
 I 20 10151 50.00 1 c  # CHOP: a mesquite tree
 M
