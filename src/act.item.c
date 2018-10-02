@@ -4873,10 +4873,15 @@ ACMD(do_keep) {
 }
 
 
+// also do_burn
 ACMD(do_light) {
+	void do_burn_area(char_data *ch, int subcmd);
 	void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint);
 	
+	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
+	
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
+	char buf[MAX_STRING_LENGTH];
 	obj_data *obj, *lighter = NULL;
 	vehicle_data *veh;
 	bool kept = FALSE;
@@ -4888,7 +4893,8 @@ ACMD(do_light) {
 	}
 
 	if (!*arg) {
-		msg_to_char(ch, "Light what?\r\n");
+		sprintf(buf, "%s what?\r\n", cmdname[subcmd]);
+		send_to_char(CAP(buf), ch);
 	}
 	else if (!IS_NPC(ch) && !objless && !lighter) {
 		// nothing to light it with
@@ -4896,7 +4902,7 @@ ACMD(do_light) {
 			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You don't have anything to light that with.\r\n");
+			msg_to_char(ch, "You don't have anything to %s that with.\r\n", cmdname[subcmd]);
 		}
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
@@ -4904,12 +4910,15 @@ ACMD(do_light) {
 		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
 			do_light_vehicle(ch, veh, lighter);
 		}
+		else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+			do_burn_area(ch, subcmd);
+		}
 		else {
 			msg_to_char(ch, "You don't have a %s.\r\n", arg);
 		}
 	}
 	else if (!has_interaction(obj->interactions, INTERACT_LIGHT)) {
-		msg_to_char(ch, "You can't light that!\r\n");
+		msg_to_char(ch, "You can't %s that!\r\n", cmdname[subcmd]);
 	}
 	else {
 		if (objless) {
@@ -4919,7 +4928,7 @@ ACMD(do_light) {
 		}
 		else if (lighter) {
 			act("You use $p to light $P.", FALSE, ch, lighter, obj, TO_CHAR);
-			act("$n uses $p to lights $P.", FALSE, ch, lighter, obj, TO_ROOM);
+			act("$n uses $p to light $P.", FALSE, ch, lighter, obj, TO_ROOM);
 		}
 		else { // somehow?
 			act("You light $P.", FALSE, ch, NULL, obj, TO_CHAR);

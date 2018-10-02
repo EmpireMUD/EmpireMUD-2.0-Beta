@@ -846,6 +846,35 @@ void init_mine(room_data *room, char_data *ch) {
 
 
 /**
+* Changes the sector when an outdoor tile is 'burned down', if there's an
+* evolution for it. (No effect on rooms without the evolution.)
+*
+* @param room_data *room The outdoor room with a BURNS-TO evolution.
+*/
+void perform_burn_room(room_data *room) {
+	char buf[MAX_STRING_LENGTH];
+	struct evolution_data *evo;
+	sector_data *sect;
+	
+	if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
+		if (ROOM_PEOPLE(room)) {
+			sprintf(buf, "The %s burns down and becomes %s %s.", GET_SECT_NAME(SECT(room)), AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
+			act(buf, FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+		
+		change_terrain(room, evo->becomes);
+		
+		stop_room_action(room, ACT_BURN_AREA, NOTHING);
+		stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
+		stop_room_action(room, ACT_PICKING, CHORE_FARMING);
+		stop_room_action(room, ACT_GATHERING, NOTHING);
+		stop_room_action(room, ACT_HARVESTING, NOTHING);
+		stop_room_action(room, ACT_PLANTING, NOTHING);
+	}
+}
+
+
+/**
 * Converts a trench back into its base sect.
 *
 * @param room_data *room The trench to convert back.

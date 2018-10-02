@@ -42,6 +42,7 @@ extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
+extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 extern char *get_mine_type_name(room_data *room);
 extern obj_data *has_sharp_tool(char_data *ch);
 extern bool is_deep_mine(room_data *room);
@@ -69,6 +70,7 @@ void perform_saw(char_data *ch);
 void perform_study(char_data *ch);
 void process_bathing(char_data *ch);
 void process_build_action(char_data *ch);
+void process_burn_area(char_data *ch);
 void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
 void process_digging(char_data *ch);
@@ -146,6 +148,7 @@ const struct action_data_struct action_data[] = {
 	{ "piloting", "is piloting the vessel.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
 	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
+	{ "burning", "is preparing to burn the area.", NOBITS, process_burn_area, NULL },	// ACT_BURN_AREA
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -414,6 +417,48 @@ void show_prospect_result(char_data *ch, room_data *room) {
 			msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(room)), get_mine_type_name(room));
 		}
 	}
+}
+
+
+/**
+* Makes sure a person can [still] burn the room they are in.
+*
+* @param char_data *ch The player.
+* @param int subcmd SCMD_LIGHT or SCMD_BURN.
+* @return bool TRUE if safe, FALSE if they cannot burn it.
+*/
+bool validate_burn_area(char_data *ch, int subcmd) {
+	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
+	
+	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
+	obj_data *lighter = NULL;
+	bool kept = FALSE;
+	
+	if (!objless) {	// find lighter if needed
+		lighter = find_lighter_in_list(ch->carrying, &kept);
+	}
+	
+	if (!objless && !lighter) {
+		// nothing to light it with
+		if (kept) {
+			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't have a lighter to %s the area with.\r\n", cmdname[subcmd]);
+		}
+	}
+	else if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
+		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
+	}
+	else if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(ch)), DIPL_WAR)) {
+		msg_to_char(ch, "You must be at war to burn someone else's territory!\r\n");
+	}
+	else { // safe!
+		return TRUE;
+	}
+	
+	// if we got here:
+	return FALSE;
 }
 
 
@@ -1108,6 +1153,59 @@ void process_build_action(char_data *ch) {
 	total = 1;	// number of materials to attach in one go (add things that speed up building)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_BUILDING; ++count) {
 		process_build(ch, IN_ROOM(ch), ACT_BUILDING);
+	}
+}
+
+
+/**
+* Tick update for burn area / do_burn_area.
+*
+* @param char_data *ch The person burning the area.
+*/
+void process_burn_area(char_data *ch) {
+	void perform_burn_room(room_data *room);
+	extern bool used_lighter(char_data *ch, obj_data *obj);
+	
+	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
+		// sends own message
+		cancel_action(ch);
+		return;
+	}
+	
+	GET_ACTION_TIMER(ch) -= 1;
+	
+	if (GET_ACTION_TIMER(ch) > 0) {
+		act("You prepare to burn the area...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+	}
+	else {	// done!
+		bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
+		obj_data *lighter = NULL;
+		bool kept = FALSE;
+	
+		if (!objless) {	// find lighter if needed
+			lighter = find_lighter_in_list(ch->carrying, &kept);
+		}
+		
+		// messaging
+		if (lighter) {
+			act("You use $p to light some fires!", FALSE, ch, lighter, NULL, TO_CHAR);
+			act("$n uses $p to light some fires!.", FALSE, ch, lighter, NULL, TO_ROOM);
+		}
+		else {
+			act("You light some fires!", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n lights some fires!", FALSE, ch, NULL, NULL, TO_ROOM);
+			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+		}
+		
+		// finished burning
+		cancel_action(ch);
+		perform_burn_room(IN_ROOM(ch));
+		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA, NOTHING);
+		
+		if (lighter) {
+			used_lighter(ch, lighter);
+		}
 	}
 }
 
@@ -2559,6 +2657,39 @@ ACMD(do_dig) {
 	}
 	else {
 		start_digging(ch);
+	}
+}
+
+
+/**
+* do_light passes control here after finding that the target is the room.
+*
+* This is a timed action that triggers a room evolution.
+*
+* @param char_data *ch The character doing the action.
+* @param int subcmd The subcmd that was passed to do_light (SCMD_LIGHT, SCMD_BURN).
+*/
+void do_burn_area(char_data *ch, int subcmd) {
+	const char *cmdname[] = { "light", "burn" };	// also in do_light
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You cannot %s the area.\r\n", cmdname[subcmd]);
+	}
+	else if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're a little bit busy right now.\r\n");
+	}
+	else if (GET_POS(ch) != POS_STANDING) {
+		send_low_pos_msg(ch);
+	}
+	else if (!validate_burn_area(ch, subcmd)) {
+		// sends its own message
+	}
+	else {
+		start_action(ch, ACT_BURN_AREA, 5);
+		GET_ACTION_VNUM(ch, 0) = subcmd;
+		
+		msg_to_char(ch, "You prepare to burn the area...\r\n");
+		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 

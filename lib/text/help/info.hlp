@@ -1241,6 +1241,17 @@ Strength is used for:
 
 See also: ATTRIBUTES, MELEE DPS, CHOP, MINE
 #
+STUMPS COPSE COPPICE COPPICING
+
+When you chop down a forest, you are usually left with a field of stumps. If
+left alone, they will regrow into a copse, and can be chopped down for
+saplings. Given time, they will regrow into full-size trees again.
+
+You can build without removing stumps, but most other uses will require that
+you burn them. Try 'burn stumps' to remove them.
+
+See also: BURN, LIGHTER
+#
 STUN STUNNED "STUN IMMUNITY"
 
 A character who is stunned, for instance by the Bash ability, cannot type
