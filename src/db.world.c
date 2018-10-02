@@ -856,7 +856,7 @@ void perform_burn_room(room_data *room) {
 	struct evolution_data *evo;
 	sector_data *sect;
 	
-	if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
+	if ((evo = get_evolution_by_type(SECT(room), EVO_BURNS_TO)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
 		if (ROOM_PEOPLE(room)) {
 			sprintf(buf, "The %s burns down and becomes %s %s.", GET_SECT_NAME(SECT(room)), AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
 			act(buf, FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);

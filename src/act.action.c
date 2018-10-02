@@ -438,7 +438,10 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 		lighter = find_lighter_in_list(ch->carrying, &kept);
 	}
 	
-	if (!objless && !lighter) {
+	if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
+		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
+	}
+	else if (!objless && !lighter) {
 		// nothing to light it with
 		if (kept) {
 			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
@@ -446,9 +449,6 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 		else {
 			msg_to_char(ch, "You don't have a lighter to %s the area with.\r\n", cmdname[subcmd]);
 		}
-	}
-	else if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
-		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
 	}
 	else if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(ch)), DIPL_WAR)) {
 		msg_to_char(ch, "You must be at war to burn someone else's territory!\r\n");
@@ -1199,8 +1199,8 @@ void process_burn_area(char_data *ch) {
 		}
 		
 		// finished burning
-		cancel_action(ch);
 		perform_burn_room(IN_ROOM(ch));
+		cancel_action(ch);
 		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA, NOTHING);
 		
 		if (lighter) {
