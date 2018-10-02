@@ -863,7 +863,7 @@ void perform_burn_room(room_data *room) {
 			strcpy(to, GET_SECT_NAME(sect));
 			strtolower(to);
 			
-			sprintf(buf, "The %s burn%s down and become%s %s%s.", from, (from[strlen(from)-1] == 's' ? "" : "s"), (from[strlen(to)-1] == 's' ? "" : "s "), (from[strlen(to)-1] == 's' ? "" : AN(to)), to);
+			sprintf(buf, "The %s burn%s down and become%s %s%s%s.", from, (from[strlen(from)-1] == 's' ? "" : "s"), (from[strlen(from)-1] == 's' ? "" : "s "), (to[strlen(to)-1] == 's' ? "" : AN(to)), (to[strlen(to)-1] == 's' ? "" : " "), to);
 			act(buf, FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 		
