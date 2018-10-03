@@ -124,14 +124,8 @@ void change_chop_territory(room_data *room) {
 	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = ROOM_CROP(room))) {
 		// TODO: This is a special case for orchards
 		
-		// check if original sect was stored to the crop
-		if (BASE_SECT(room) != SECT(room)) {
-			change_terrain(room, GET_SECT_VNUM(BASE_SECT(room)));
-		}
-		else {
-			// default
-			change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
-		}
+		// change to default sect
+		change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
 		// normal case

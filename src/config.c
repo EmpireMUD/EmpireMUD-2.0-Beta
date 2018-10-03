@@ -283,7 +283,7 @@ const sector_vnum climate_default_sector[NUM_CLIMATES] = {
 	0,	// plains (no climate)
 	0,	// plains (temperate)
 	20,	// desert
-	28	// jungle
+	27	// jungle
 };
 
 

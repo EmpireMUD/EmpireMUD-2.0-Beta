@@ -1826,14 +1826,8 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 						}
 					}
 					else {
-						// do we have a stored original sect?
-						if (BASE_SECT(room) != SECT(room)) {
-							change_terrain(room, GET_SECT_VNUM(BASE_SECT(room)));
-						}
-						else {
-							// fallback
-							change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(room))]);
-						}
+						// change to base sect
+						change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(room))]);
 						
 						if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED)) {
 							abandon_room(room);

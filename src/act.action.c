@@ -1740,21 +1740,14 @@ void process_harvesting(char_data *ch) {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
 		}
 		
-		// change the sector
-		if (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) {
-			// use original terrain (appears to have been stored)
-			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))));
+		// change the sector: attempt to detect
+		crop_data *cp = ROOM_CROP(IN_ROOM(ch));
+		sector_data *sect = cp ? sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]) : NULL;
+		if (!sect) {
+			sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
 		}
-		else {
-			// attempt to detect
-			crop_data *cp = ROOM_CROP(IN_ROOM(ch));
-			sector_data *sect = cp ? sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]) : NULL;
-			if (!sect) {
-				sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
-			}
-			if (sect) {
-				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
-			}
+		if (sect) {
+			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 		}
 	}
 }
