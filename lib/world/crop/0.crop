@@ -16,6 +16,7 @@ D0
 ;;;;~
 &Y~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 141 20.00 2 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 3 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 4 H  # HARVEST: a bundle of wheat
@@ -97,6 +98,7 @@ D0
 iiii~
 &g~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 3005 20.00 2 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 3 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 4 H  # HARVEST: a bushel of corn
@@ -309,6 +311,7 @@ D0
 ::::~
 &Y~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 145 20.00 2 H  # HARVEST: a sack of barley
 I 8 145 20.00 3 H  # HARVEST: a sack of barley
 I 8 145 20.00 4 H  # HARVEST: a sack of barley
@@ -681,6 +684,7 @@ D0
 ,,,,~
 &g~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 3011 20.00 2 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 3 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 4 H  # HARVEST: a sack of dried rice

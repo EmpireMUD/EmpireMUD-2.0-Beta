@@ -367,13 +367,13 @@ R
 5134 0
 S
 #131
-sapling fallen~
-a fallen sapling~
-A sapling has fallen here.~
+sapling green~
+a green sapling~
+A green sapling has fallen here.~
    This sapling is young, straight, and taller than you are. It could be used
 to build a simple hut, or carved into a handle, or fashioned into an arrow.
 ~
-1 l an 2
+1 l an 3
 0 2 5
 0 0
 C
@@ -613,6 +613,48 @@ Copper ore can be smelted into ingots and bars.
 R
 5115 0
 S
+#166
+tinore ore tin pile~
+some tin ore~
+Some tin ore is piled on the ground.~
+Tin ore can be smelted into ingots, which are then used to make bronze.
+~
+3 l a 3
+0 0 0
+2 0
+R
+5115 0
+S
+#167
+tiningot tin ingot~
+a tin ingot~
+A tin ingot is stacked here.~
+   The tin has a bright white color. Tin ingots are primarily smelted with
+copper to make bronze.
+~
+3 l a 6
+0 0 0
+2 0
+O
+18 ju
+R
+5115 0
+S
+#168
+bronzeingot bronze ingot~
+a bronze ingot~
+A bronze ingot is stacked here.~
+   The bronze has a rich, brown color and a fine finish. Bronze is used to make
+many different tools and armors.
+~
+3 l a 6
+0 0 0
+13 0
+O
+18 su
+R
+5115 0
+S
 #170
 ingot silver~
 a silver ingot~
@@ -745,13 +787,14 @@ S
 copperingot copper ingot~
 a copper ingot~
 A copper ingot is sitting here.~
-Copper ingots can be forged into useful things.
+   Copper ingots can be made into bars (to be stored in the vault, for wealth),
+or smelted with tin to make bronze ingots.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 13 0
 O
-18 su
+18 ju
 R
 5115 0
 S

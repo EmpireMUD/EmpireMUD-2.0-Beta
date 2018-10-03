@@ -772,6 +772,24 @@ R
 R
 5606 0
 S
+#3342
+straw bale~
+a bale of straw~
+A bale of straw sits on the ground.~
+   Straw is the byproduct of growing grains like barley, oats, rice, rye, and
+wheat. It has been used since ancient times in crafting and construction.
+~
+3 l a 1
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+O
+7 eiu
+R
+5118 0
+R
+5116 0
+S
 #3343
 oatmeal sack~
 a sack of oatmeal~

@@ -7,6 +7,22 @@ R
 R
 28 1 1 0
 S
+#167
+tin ingot~
+167 1
+12 198 0 4 166
+R
+166 2 0 0
+S
+#168
+bronze ingot~
+168 2
+12 51 0 4 167
+R
+178 2 0 0
+R
+167 1 0 0
+S
 #170
 silver ingot~
 170 1
@@ -55,6 +71,8 @@ nocturnium ingot~
 12 198 0 4 163
 R
 163 2 0 0
+R
+175 2 0 0
 S
 #177
 imperium ingot~
@@ -62,6 +80,8 @@ imperium ingot~
 12 198 0 4 164
 R
 164 2 0 0
+R
+167 1 0 0
 S
 #178
 copper ingot~
