@@ -473,7 +473,9 @@ Metal is a category of component that covers all refined metal ores. It is used
 for a huge variety of crafts, most of which call for either a specific metal or
 one of the following metal categories:
 
-common:         copper and iron ingots
+poor:           copper and tin ingots
+common:         bronze and iron ingots
+basic:          copper, tin, bronze, and iron ingots
 rare:           silver, gold, imperium and nocturnium ingots
 rare, fine:     silver and gold ingots
 refined:        copper, silver and gold bars

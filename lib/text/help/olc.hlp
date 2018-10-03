@@ -4822,7 +4822,7 @@ Choose the material that best fits your object. If there isn't one that fits
 at all, contact the programmer to discuss adding a new one. But remember, the
 material doesn't need to be exact. It just needs to be close enough.
 
-Available mat
+Available materials:
   WOOD     ROCK      IRON
   SILVER   GOLD      FLINT
   CLAY     FLESH     GLASS

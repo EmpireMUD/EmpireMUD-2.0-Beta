@@ -72,10 +72,10 @@ Command:  forge [number] <item>
 Tool:  hammer
 
 A forgemaster with the Armorsmithing specialization can create many armors:
-  copper breastplate (armor)
-  copper mask (head)
-  copper vambraces (arms)
-  copper buckler (shield)
+  bronze breastplate (armor)
+  bronze mask (head)
+  bronze vambraces (arms)
+  bronze buckler (shield)
   
 These armor pieces are all classified as Medium Armor.
 
@@ -126,6 +126,16 @@ This ability also allows you to:
 
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
 PRIMITIVE CRAFTS, MILL
+#
+BRONZE "BRONZE INGOT"
+
+Used for:  forge
+Stored in:  Foundry
+
+Bronze is a metal that was once so common that there is an entire Age named
+after it. Bronze is made by smelting copper and tin ingots together.
+
+See also: FORGE, METALS, MINE, SMELT
 #
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
 
@@ -411,6 +421,8 @@ With the basic Forge skill, you can create:
   anchor -- used on ships
   firesteel tinderbox -- for lighting fires
 
+It also allows you to smelt bronze ignots from tin and copper.
+
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
   DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES
@@ -473,13 +485,14 @@ You can hone the following item slots:
 
 See also: RECIPES
 #
-IRON "IRON ORE"
+IRON "IRON INGOT" "IRON ORE"
 
 Used for:  forge, build, manufacture
 Stored in:  Foundry
 
 Iron ore is found by mining in the mountains. It is useful in building and
-forging equipment, as well as manufacturing ships.
+forging equipment, as well as manufacturing ships. It is also smelted with
+nocturnium ore to make nocturnium ingots.
 
 You can learn about getting iron via HELP IRON GUIDE.
 
@@ -516,7 +529,8 @@ Used for:  forge
 Stored in:  Foundry
 
 Imperium is a rare, strong metal with a bright white color. It is used to make
-powerful weapons and armor.
+powerful weapons and armor. Smelting imperium ingots requires mixing it with
+tin.
 
 See also: FORGE, METALS, MINE, SMELT
 #
@@ -707,8 +721,9 @@ NOCTURNIUM "NOCTURNIUM ORE"
 Used for:  forge, sew
 Stored in:  Foundry
 
-Nocturnium is a pure black metal, its surface swirling with mana. It is often
-plated onto powerful magical objects.
+Nocturnium is a deep black metal, its surface swirling with mana. It is often
+plated onto powerful magical objects. Smelting stable nocturnium requires that
+you mix it with iron.
 
 See also: FORGE, METALS, MINE, SEW, SMELT
 #
@@ -1052,6 +1067,16 @@ skins and leathers are used in sewing and crafting.
 
 See also: SKIN, LEATHER
 #
+TIN "TIN INGOT" "TIN ORE"
+
+Used for:  smelting bronze
+Stored in:  Foundry
+
+Tin is an uncommon white metal used since ancient times to create bronze. It
+can also be smelted with imperium ore to make imperium ingots.
+
+See also: FORGE, METALS, MINE, SMELT
+#
 "TINKER CRAFTS"
 
 Tinker Crafts
@@ -1085,10 +1110,10 @@ Weaponcrafting is a forge specialization, and allows you to create additional
 items.
 
 Weaponcrafting:
-  copper knife
-  copper spear
-  copper axe
-  copper mace
+  bronze knife
+  bronze spear
+  bronze axe
+  bronze mace
 
 Weaponcrafting -> Iron Blades -> Deadly Weapons
 
