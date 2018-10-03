@@ -1522,15 +1522,9 @@ RITUAL_FINISH_FUNC(perform_chant_of_nature) {
 		new_sect = sector_proto(evo->becomes);
 		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
 		
-		// messaging based on whether or not it's choppable
-		if (new_sect && has_evolution_type(new_sect, EVO_CHOPPED_DOWN)) {
-			msg_to_char(ch, "As you chant, a mighty tree springs from the ground!\r\n");
-			act("As $n chants, a mighty tree springs from the ground!", FALSE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {
-			msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
-			act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
-		}
+		// messaging
+		msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
+		act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		change_terrain(IN_ROOM(ch), evo->becomes);
 		if (preserve) {
