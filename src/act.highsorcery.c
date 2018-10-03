@@ -1514,12 +1514,11 @@ RITUAL_SETUP_FUNC(start_chant_of_nature) {
 }
 
 RITUAL_FINISH_FUNC(perform_chant_of_nature) {
-	sector_data *new_sect, *preserve;
+	sector_data *preserve;
 	struct evolution_data *evo;
 	
 	// percentage is checked in the evolution data
 	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
-		new_sect = sector_proto(evo->becomes);
 		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
 		
 		// messaging
