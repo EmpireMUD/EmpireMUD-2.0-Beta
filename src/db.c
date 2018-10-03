@@ -1921,6 +1921,7 @@ const char *versions_list[] = {
 	"b5.38",
 	"b5.40",
 	"b5.45",
+	"b5.47",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3364,6 +3365,23 @@ void b5_45_keep_update(void) {
 }
 
 
+// resets mountain tiles off-cycle because of the addition of tin
+void b5_47_mine_update(void) {
+	struct map_data *tile;
+	room_data *room;
+	
+	log("Applying b5.47 update to clear mine data...");
+	
+	LL_FOREACH(land_map, tile) {
+		if (!(room = real_real_room(tile->vnum)) || !HAS_FUNCTION(room, FNC_MINE)) {
+			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
+			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
+			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3628,6 +3646,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.45")) {
 			b5_45_keep_update();
+		}
+		if (MATCH_VERSION("b5.47")) {
+			b5_47_mine_update();
 		}
 	}
 	
