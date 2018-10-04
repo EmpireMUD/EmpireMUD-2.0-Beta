@@ -794,6 +794,7 @@ void free_char(char_data *ch) {
 	struct player_slash_history *slash_hist, *next_slash_hist;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct minipet_data *mini, *next_mini;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
 	struct player_tech *ptech;
@@ -982,6 +983,10 @@ void free_char(char_data *ch) {
 			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
 			free(pcd);
 		}
+		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
+			HASH_DEL(GET_MINIPETS(ch), mini);
+			free(mini);
+		}
 		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
 			HASH_DEL(GET_MOUNT_LIST(ch), mount);
 			free(mount);
@@ -1117,6 +1122,7 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
+	void add_minipet(char_data *ch, any_vnum vnum);
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
@@ -1697,6 +1703,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						GET_MAX_POOL(ch, num) = i_in[0];
 					}
 				}
+				else if (PFILE_TAG(line, "Mini-pet:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						add_minipet(ch, i_in[0]);
+					}
+				}
 				else if (PFILE_TAG(line, "Morph:", length)) {
 					GET_MORPH(ch) = morph_proto(atoi(line + length + 1));
 				}
@@ -2235,6 +2246,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct minipet_data *mini, *next_mini;
 	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
@@ -2503,6 +2515,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_MAPSIZE(ch)) {
 		fprintf(fl, "Mapsize: %d\n", GET_MAPSIZE(ch));
+	}
+	HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
+		fprintf(fl, "Mini-pet: %d\n", mini->vnum);
 	}
 	if (IS_MORPHED(ch)) {
 		fprintf(fl, "Morph: %d\n", MORPH_VNUM(GET_MORPH(ch)));
@@ -3412,6 +3427,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void apply_all_ability_techs(char_data *ch);
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
+	void check_minipets(char_data *ch);
 	void clean_lore(char_data *ch);
 	void clean_player_kills(char_data *ch);
 	extern room_data *find_home(char_data *ch);
@@ -3688,6 +3704,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	refresh_all_quests(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);
+	check_minipets(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {

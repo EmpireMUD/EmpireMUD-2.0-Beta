@@ -552,6 +552,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(obj));
 			break;
 		}
+		case ITEM_MINIPET: {
+			msg_to_char(ch, "Grants mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
+			break;
+		}
 	}
 	
 	// data that isn't type-based:
@@ -1028,6 +1032,37 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 	}
 	else {
 		act(wear_data[where].wear_msg_to_room, TRUE, ch, obj, NULL, TO_ROOM);
+	}
+}
+
+
+/**
+* Attempt to learn a mini-pet. Caution: this may extract the obj.
+*
+* @param char_data *ch The player trying to learn it.
+* @param obj_data *obj The MINIPET item.
+*/
+void use_minipet_obj(char_data *ch, obj_data *obj) {
+	void add_minipet(char_data *ch, any_vnum vnum);
+	extern bool has_minipet(char_data *ch, any_vnum vnum);
+	
+	char_data *mob;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	else if (!obj || !IS_MINIPET(obj)) {
+		msg_to_char(ch, "You can't use that like that.\r\n");
+	}
+	else if (!(mob = mob_proto(GET_MINIPET_VNUM(obj)))) {
+		msg_to_char(ch, "It doesn't seem to do anything when used.\r\n");
+	}
+	else if (has_minipet(ch, GET_MINIPET_VNUM(obj))) {
+		msg_to_char(ch, "You already have that mini-pet.\r\n");
+	}
+	else {
+		add_minipet(ch, GET_MINIPET_VNUM(obj));
+		msg_to_char(ch, "You gain '%s' as a mini-pet. Use the minipets command to summon it.\r\n", GET_SHORT_DESC(mob));
 	}
 }
 
@@ -6151,6 +6186,10 @@ ACMD(do_use) {
 		}
 		if (IS_AMMO(obj)) {
 			use_ammo(ch, obj);
+			return;
+		}
+		if (IS_MINIPET(obj)) {
+			use_minipet_obj(ch, obj);
 			return;
 		}
 	

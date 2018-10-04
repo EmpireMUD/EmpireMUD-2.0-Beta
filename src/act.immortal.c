@@ -4941,6 +4941,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(j));
 			break;
 		}
+		case ITEM_MINIPET: {
+			msg_to_char(ch, "Mini-pet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j)));
+			break;
+		}
 		default:
 			msg_to_char(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]\r\n", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
 			break;

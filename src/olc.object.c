@@ -303,6 +303,13 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
+		case ITEM_MINIPET: {
+			if (GET_MINIPET_VNUM(obj) == NOTHING || !mob_proto(GET_MINIPET_VNUM(obj))) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Mini-pet not set");
+				problem = TRUE;
+			}
+			break;
+		}
 		case ITEM_UNDEFINED: {
 			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Type is UNDEFINED");
 			problem = TRUE;
@@ -1941,6 +1948,10 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			}
 			break;
 		}
+		case ITEM_MINIPET: {
+			sprintf(storage + strlen(storage), "<%sminipet\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MINIPET_VNUM(obj), NOTHING), GET_MINIPET_VNUM(obj), get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
+			break;
+		}
 		
 		// types with no vals
 		case ITEM_BOARD:
@@ -2552,6 +2563,9 @@ OLC_MODULE(oedit_corpseof) {
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
 		}
+		else {
+			send_config_msg(ch, "ok_string");
+		}
 	}
 }
 
@@ -2690,6 +2704,29 @@ OLC_MODULE(oedit_maxlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
 	GET_OBJ_MAX_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
+}
+
+
+OLC_MODULE(oedit_minipet) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	mob_vnum old = GET_MINIPET_VNUM(obj);
+	
+	if (!IS_MINIPET(obj)) {
+		msg_to_char(ch, "You can only set this on a MINIPET item.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = olc_process_number(ch, argument, "mini-pet", "minipet", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_MINIPET_VNUM));
+		if (!mob_proto(GET_MINIPET_VNUM(obj))) {
+			GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = old;
+			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+		}
+		else {
+			send_config_msg(ch, "ok_string");
+		}
+	}
 }
 
 
@@ -3088,6 +3125,10 @@ OLC_MODULE(oedit_type) {
 			}
 			case ITEM_POISON: {
 				GET_OBJ_VAL(obj, VAL_POISON_AFFECT) = NOTHING;
+				break;
+			}
+			case ITEM_MINIPET: {
+				GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = NOTHING;
 				break;
 			}
 			default: {

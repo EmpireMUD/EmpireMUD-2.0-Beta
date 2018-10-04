@@ -1577,7 +1577,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_CART  16	// This type is mostly DEPRECATED; use vehicles instead
 #define ITEM_SHIP  17	// This type is mostly DEPRECATED; use vehicles instead
 #define ITEM_LIGHTER  18	// can be used to light fires
-	#define ITEM_UNUSED5  19
+#define ITEM_MINIPET  19	// grants a minipet when 'use'd
 #define ITEM_MISSILE_WEAPON  20	// bow/crossbow/etc
 #define ITEM_AMMO  21	// for missile weapons
 #define ITEM_INSTRUMENT  22	// item is a musical instrument
@@ -3634,6 +3634,13 @@ struct mail_data {
 };
 
 
+// for permanently learning minipets
+struct minipet_data {
+	any_vnum vnum;	// vnum of the mob
+	UT_hash_handle hh;	// player's minipets hash
+};
+
+
 // for player mount collections
 struct mount_data {
 	mob_vnum vnum;	// mob that's mounted, for name
@@ -3829,6 +3836,7 @@ struct player_special_data {
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
+	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
 	

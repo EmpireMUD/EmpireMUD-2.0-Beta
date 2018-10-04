@@ -1193,6 +1193,20 @@ also type "clearmeters" to clear them at any time.
 
 See also: CLEARMETERS
 #
+MINIPET MINIPETS MINI-PET MINI-PETS "MINI PET" "MINI PETS"
+
+Usage:  minipets
+        minipet <name>
+        minipet dismiss
+
+This command lists, summons, and dismisses your mini-pets. A mini-pet is a
+non-combat NPC that follows you around. They are strictly cosmetic, and are
+often awarded as trophies in certain adventures.
+
+You can only have one mini-pet out at a time.
+
+There is no limit to how many mini-pets you can collect. Gotta collect 'em all!
+#
 MORTLOG
 
 Usage:  toggle mortlog [on/off]

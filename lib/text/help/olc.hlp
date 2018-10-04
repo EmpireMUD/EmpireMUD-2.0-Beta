@@ -3930,28 +3930,6 @@ Available sizes are:
 Morphs also have a 'size' trait with the same meaning. However, morph size will
 not affect the blood pool of the morphed person/mob at all.
 #d
-MINIPET MINI-PET "MINI PET" "PET WHISTLE"
-
-Mini-pets are a common cosmetic reward from adventure zones. They are summoned
-from a reusable item, and the player may get that item from a loot drop or a
-shop.
-
-To create a pet whistle (or other summoner item), attach script 9900 (Mini-pet
-Use) to an object and set its <value0> to the mini-pet mob's vnum.
-
-You must also create a generic cooldown with the same vnum as the item, used
-to keep it from being resummoned.
-
-Mini-pet mobs should have the following traits:
- - Flags: SENTINEL SPAWNED !LOOT (and ISNPC)
- - Affects: !ATTACK
- - Scripts: 9901 (Dismissable), 9902 (Lonely Despawn)
- - Value0: The vnum of the mob
- - A cooldown generic with the same vnum as the mini-pet whistle
- - Adorable custom messages (optional)
-
-See also: GENERIC COOLDOWN
-#d
 MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
 
 Usage:  .morph <command>
@@ -4844,6 +4822,15 @@ If you set the maxlevel to 0, there will be no maximum and the obj can scale
 to any level over the minimum.
 
 See also: ITEM SCALING, OEDIT MINLEVEL, OLC OBJECTS
+#d
+"OEDIT MINIPET"
+
+Usage:  .minipet <mob vnum>
+
+This command assigns which mob is taught by a MINIPET item, when used with the
+'use' command.
+
+See also: MINIPETS
 #d
 "OEDIT MINLEVEL" "OEDIT MIN LEVEL"
 
@@ -7017,6 +7004,23 @@ See also: OEDIT USES
 The MAIL item type is used internally and can't be set in builder-created items
 or adventures. However, you can use the OTHER type with a look-description or
 extra-description to get the same effect.
+#d
+"MINIPET ITEM" "MINIPET OBJECT" "MINI-PET ITEM" "MINI-PET OBJECT" "MINI PET OBJECT" "MINI PET ITEM" "PET WHISTLE"
+
+Mini-pets are a common cosmetic reward from adventure zones. They are taught
+by a MINIPET item, and the player may get that item from a loot drop or a
+shop.
+
+Object values on a MINIPET item:
+ 0 - mob vnum to teach
+
+Mini-pet mobs should have the following traits:
+ - Flags: SENTINEL SPAWNED !LOOT !EXPERIENCE (and ISNPC)
+ - Affects: !ATTACK
+ - Scripts: 9901 (Dismissable; optional), 9902 (Lonely Despawn)
+ - Adorable custom messages (optional)
+
+See also: OLC OBJECTS, MINIPET, GENERIC COOLDOWN
 #d
 "MISSILE WEAPON ITEM" "MISSILE WEAPON OBJECT"
 

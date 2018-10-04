@@ -36,6 +36,11 @@
 *   Commands
 */
 
+// configs for mini-pets
+bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
+bitvector_t default_minipet_affs = AFF_NO_ATTACK;
+
+
 // external vars
 extern const struct toggle_data_type toggle_data[];	// constants.c
 
@@ -52,6 +57,9 @@ extern bool is_ignoring(char_data *ch, char_data *victim);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_as_familiar(char_data *mob, char_data *master);
 extern char *show_color_codes(char *string);
+
+// locals
+char_data *find_minipet(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -186,6 +194,21 @@ void cancel_adventure_summon(char_data *ch) {
 
 
 /**
+* Dismisses all mini-pets controlled by the character, if any.
+*
+* @param char_data *ch The player whose pet(s) to purge.
+*/
+void dismiss_any_minipet(char_data *ch) {
+	char_data *mob;
+	
+	while ((mob = find_minipet(ch))) {	// ensures there aren't more than 1
+		act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+		extract_char(mob);
+	}
+}
+
+
+/**
 * called by do_customize
 *
 * @param char_data *ch The player.
@@ -295,6 +318,37 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 			extract_obj(obj);	// unless prevented by the trigger
 		}
 	}
+}
+
+
+/**
+* Finds a mini-pet belonging to the character, if any.
+*
+* @param char_data *ch The player whose pet to look for.
+* @return char_data* The found mini-pet, if any.
+*/
+char_data *find_minipet(char_data *ch) {
+	char_data *chiter, *found = NULL;
+	
+	#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !MOB_FLAGGED((mob), MOB_FAMILIAR) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
+	
+	// try the room first
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+		if (IS_MINIPET_OF(chiter, ch)) {
+			found = chiter;
+			break;
+		}
+	}
+	if (!found) {
+		LL_FOREACH(character_list, chiter) {
+			if (IS_MINIPET_OF(chiter, ch)) {
+				found = chiter;
+				break;
+			}
+		}
+	}
+	
+	return found;	// if any
 }
 
 
@@ -2248,6 +2302,116 @@ ACMD(do_milk) {
 		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) += amount;
 		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_TYPE) = LIQ_MILK;
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
+	}
+}
+
+
+ACMD(do_minipets) {
+	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	struct minipet_data *mini, *next_mini;
+	char_data *mob, *to_summon;
+	size_t size, count;
+	bool overflow;
+	
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "Mobs don't get mini-pets.\r\n");
+		return;
+	}
+	if (!ch->desc) {
+		return;	// no point, nothing to show
+	}
+	
+	if (!*argument) {	// just list minipets
+		size = snprintf(output, sizeof(output), "Mini-pets in your collection:\r\n");
+		overflow = FALSE;
+		count = 0;
+	
+		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
+			if (!(mob = mob_proto(mini->vnum))) {
+				continue;	// no mob
+			}
+		
+			// ok:
+			++count;
+		
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				snprintf(line, sizeof(line), "%s\r\n", skip_filler(GET_SHORT_DESC(mob)));
+			}
+			else {	// non-screenreader
+				snprintf(line, sizeof(line), " %-25.25s%s", skip_filler(GET_SHORT_DESC(mob)), !(count % 3) ? "\r\n" : "");
+			}
+		
+			if (size + strlen(line) + 14 < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
+			else {
+				overflow = TRUE;
+				strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
+				break;
+			}
+		}
+	
+		if (count == 0) {
+			strcat(output, " none\r\n");	// space always reserved for this
+		}
+		else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 3)) {
+			strcat(output, "\r\n");	// space always reserved for this
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}	// end no-arg
+	else if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);	// must be standing to do the rest
+	}
+	else if (is_abbrev(argument, "dismiss")) {
+		if (!(mob = find_minipet(ch))) {
+			msg_to_char(ch, "You don't seem to have a mini-pet to dismiss.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You dimiss your mini-pet.\r\n");
+			dismiss_any_minipet(ch);
+		}
+	}
+	else {
+		to_summon = NULL;	// to find
+		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
+			if (!(mob = mob_proto(mini->vnum))) {
+				continue;	// no mob
+			}
+			else if (!multi_isname(argument, GET_PC_NAME(mob))) {
+				continue;	// no match
+			}
+			else {
+				to_summon = mob;
+				break;	// FOUND!
+			}
+		}
+		
+		if (!to_summon) {
+			msg_to_char(ch, "You don't have a mini-pet called '%s'.\r\n", argument);
+		}
+		else {
+			dismiss_any_minipet(ch);	// out with the old...
+			
+			mob = read_mobile(GET_MOB_VNUM(to_summon), TRUE);
+			SET_BIT(MOB_FLAGS(mob), default_minipet_flags);
+			SET_BIT(AFF_FLAGS(mob), default_minipet_affs);	// will this work?
+			
+			// try to scale mob to the summoner (most minipets have level caps of 1 tho)
+			scale_mob_as_familiar(mob, ch);
+			
+			char_to_room(mob, IN_ROOM(ch));
+			act("You whistle and $N appears!", FALSE, ch, NULL, mob, TO_CHAR);
+			act("$n whistles and $N appears!", FALSE, ch, NULL, mob, TO_NOTVICT);
+			
+			add_follower(mob, ch, TRUE);
+			load_mtrigger(mob);
+		}
 	}
 }
 
