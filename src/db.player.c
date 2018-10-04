@@ -1618,6 +1618,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Last Tip:", length)) {
 					GET_LAST_TIP(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Last Vehicle:", length)) {
+					GET_LAST_VEHICLE(ch) = atoi(line + length + 1);
+				}
 				else if (PFILE_TAG(line, "Last Room:", length)) {
 					GET_LAST_ROOM(ch) = atoi(line + length + 1);
 				}
@@ -2481,6 +2484,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_LAST_TIP(ch)) {
 		fprintf(fl, "Last Tip: %d\n", GET_LAST_TIP(ch));
 	}
+	if ((IN_ROOM(ch) && GET_SITTING_ON(ch)) || (!IN_ROOM(ch) && GET_LAST_VEHICLE(ch) != NOTHING)) {
+		fprintf(fl, "Last Vehicle: %d\n", IN_ROOM(ch) ? VEH_VNUM(GET_SITTING_ON(ch)) : GET_LAST_VEHICLE(ch));
+	}
 	fprintf(fl, "Last Offense: %ld\n", GET_LAST_OFFENSE_SEEN(ch));
 	if (GET_LASTNAME(ch)) {
 		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
@@ -3290,6 +3296,7 @@ void clear_player(char_data *ch) {
 	GET_LAST_TELL(ch) = NOBODY;
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
+	GET_LAST_VEHICLE(ch) = NOTHING;
 }
 
 
@@ -3412,6 +3419,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void give_level_zero_abilities(char_data *ch);
 	void refresh_all_quests(char_data *ch);
 	void reset_combat_meters(char_data *ch);
+	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -3422,6 +3430,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
 	player_index_data *index;
+	vehicle_data *veh;
 	empire_data *emp;
 	int iter, duration;
 	
@@ -3651,6 +3660,17 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
 			affect_join(ch, af, ADD_DURATION);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
+		}
+	}
+	
+	// attempt to put them back in a vehicle
+	if (GET_LAST_VEHICLE(ch) != NOTHING) {
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && validate_sit_on_vehicle(ch, veh, FALSE)) {
+				sit_on_vehicle(ch, veh);
+				GET_POS(ch) = POS_SITTING;
+				break;	// only need 1
+			}
 		}
 	}
 

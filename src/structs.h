@@ -3808,6 +3808,7 @@ struct player_special_data {
 	room_vnum adventure_summon_return_location;	// where to send a player back to if they're outside an adventure
 	room_vnum adventure_summon_return_map;	// map check location for the return loc
 	room_vnum marked_location;	// for map marking
+	any_vnum last_vehicle;	// if the player quit in a vehicle
 	
 	// olc data
 	any_vnum olc_min_vnum;	// low range of olc permissions
