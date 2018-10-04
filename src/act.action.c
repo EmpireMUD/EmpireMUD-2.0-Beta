@@ -2628,8 +2628,13 @@ ACMD(do_chop) {
 
 
 ACMD(do_dig) {
+	skip_spaces(&argument);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't dig.\r\n");
+	}
+	else if (*argument) {
+		msg_to_char(ch, "You can't dig for specific items. Just type 'dig' and see what you get.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_DIGGING) {
 		send_to_char("You stop digging.\r\n", ch);

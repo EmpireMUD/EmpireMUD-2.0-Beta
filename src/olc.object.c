@@ -1364,6 +1364,13 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
+		for (gear = GET_GLOBAL_GEAR(glb); gear && !any; gear = gear->next) {
+			if (gear->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			}
+		}
 	}
 	
 	// mob interactions
