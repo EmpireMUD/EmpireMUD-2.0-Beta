@@ -4186,6 +4186,9 @@ Food:
 Lighter:
  0 - number of uses (-1 is unlimited)
 
+Minipet:
+ 0 - vnum of mob to teach
+
 Missile Weapon:
  0 - attack type (see ATTACK TYPES)
  1 - bonus damage (if scalable, this is the weight to scale the damage)
@@ -5032,7 +5035,7 @@ Available types:
  *CART - use vehicles instead
  *SHIP - use vehicles instead
  LIGHTER - can light fires
- * - unused
+ MINIPET - teaches a mini-pet to the player on 'use'
  MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
  AMMO - ammunition for missile weapons
  INSTRUMENT - a musical instrument -- must set custom messages
