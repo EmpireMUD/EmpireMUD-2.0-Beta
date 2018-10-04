@@ -948,7 +948,7 @@ void do_instance_info(char_data *ch, char *argument) {
 	
 	LL_FOREACH(instance_list, inst) {
 		if (--num == 0) {
-			msg_to_char(ch, "Instance %d: [%d] %s\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
+			msg_to_char(ch, "\tcInstance %d: [%d] %s\t0\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
 			
 			if (INST_LOCATION(inst)) {
 				if (ROOM_OWNER(INST_LOCATION(inst))) {
