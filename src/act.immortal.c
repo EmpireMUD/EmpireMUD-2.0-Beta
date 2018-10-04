@@ -983,15 +983,15 @@ void do_instance_info(char_data *ch, char *argument) {
 			sprintbit(INST_FLAGS(inst), instance_flags, buf, TRUE);
 			msg_to_char(ch, "Flags: %s\r\n", buf);
 			
-			msg_to_char(ch, "Created: %s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
-			if (INST_LAST_RESET(inst)) {
-				msg_to_char(ch, "Last reset: %s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
+			msg_to_char(ch, "Created: %-12.12s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
+			if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
+				msg_to_char(ch, "Last reset: %-12.12s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
 			}
 			
 			if (INST_DIR(inst) != NO_DIR) {
 				msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
 			}
-			if (INST_ROTATION(inst) != NO_DIR) {
+			if (INST_ROTATION(inst) != NO_DIR && IS_SET(GET_ADV_FLAGS(INST_ADVENTURE(inst)), ADV_ROTATABLE)) {
 				msg_to_char(ch, "Rotation: %s\r\n", dirs[INST_ROTATION(inst)]);
 			}
 			
