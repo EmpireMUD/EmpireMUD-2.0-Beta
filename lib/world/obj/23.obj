@@ -394,12 +394,12 @@ A
 12 -1 0
 S
 #2324
-breastplate copper~
-a copper breastplate~
-A copper breastplate is lying here.~
-The copper breastplate has molded abs!
+breastplate bronze~
+a bronze breastplate~
+A bronze breastplate is lying here.~
+The bronze breastplate has molded abs!
 ~
-27 emo aq 1
+27 emo aq 2
 2 0 0
 13 0
 A
@@ -408,12 +408,12 @@ A
 17 1 0
 S
 #2325
-mask copper~
-a copper mask~
-A copper mask has been left here.~
+mask bronze~
+a bronze mask~
+A bronze mask has been left here.~
 The mask looks like it would protect the face from blows.
 ~
-27 mo ae 1
+27 mo ae 2
 2 0 0
 13 0
 A
@@ -422,13 +422,13 @@ A
 18 1 0
 S
 #2326
-vambraces pair copper~
-copper vambraces~
-A pair of copper vambraces is lying here.~
+vambraces pair bronze~
+bronze vambraces~
+A pair of bronze vambraces is lying here.~
    These strong vambraces are heavy, but they do an amazing job of protecting
 your forearms from enemy weaponry.
 ~
-27 mo ai 1
+27 mo ai 2
 2 0 0
 13 0
 A
@@ -437,12 +437,12 @@ A
 17 1 0
 S
 #2327
-buckler copper~
-a copper buckler~
-A copper buckler is lying here.~
-The copper buckler is quite common around here.
+buckler bronze~
+a bronze buckler~
+A bronze buckler is lying here.~
+The bronze buckler is quite common around here.
 ~
-23 emo ao 1
+23 emo ao 2
 0 0 0
 13 0
 A

@@ -185,17 +185,17 @@ else
     wait 1
     %echo% As the changes are completed, a monster is born.
     %load% mob 16015 %actor.level%
-elseif %target.is_name(horse)%
-wait 1
-%echo% As the changes are completed, a monster is born.
-switch %random.2%
-case 1
-%load% mob 16008 %actor.level%
-break
-case 2
-%load% mob 16009 %actor.level%
-break
-done
+  elseif %target.is_name(horse)%
+    wait 1
+    %echo% As the changes are completed, a monster is born.
+    switch %random.2%
+      case 1
+        %load% mob 16008 %actor.level%
+      break
+      case 2
+        %load% mob 16009 %actor.level%
+      break
+    done
   else
     wait 1
     %echo% As the changes are completed, a monster is born.
