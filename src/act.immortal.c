@@ -4468,10 +4468,10 @@ void do_stat_character(char_data *ch, char_data *k) {
 				}
 				else {
 					if (mem->cmd) {
-						msg_to_char(ch, "  %-20.20s%s\r\n", GET_NAME(mc), mem->cmd);
+						msg_to_char(ch, "  %-20.20s%s\r\n", PERS(mc, mc, TRUE), mem->cmd);
 					}
 					else {
-						msg_to_char(ch, "  %-20.20s <default>\r\n", GET_NAME(mc));
+						msg_to_char(ch, "  %-20.20s <default>\r\n", PERS(mc, mc, TRUE));
 					}
 				}
 				

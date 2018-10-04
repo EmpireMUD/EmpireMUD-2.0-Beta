@@ -1250,13 +1250,17 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 
 /* find the name of what the uid points to */
 void find_uid_name(char *uid, char *name, size_t nlen) {
+	vehicle_data *veh;
 	char_data *ch;
 	obj_data *obj;
 
 	if ((ch = get_char(uid)))
-		snprintf(name, nlen, "%s", ch->player.name);
+		snprintf(name, nlen, "%s", PERS(ch, ch, TRUE));
 	else if ((obj = get_obj(uid)))
 		snprintf(name, nlen, "%s", obj->name);
+	else if ((veh = get_vehicle(uid))) {
+		snprintf(name, nlen, "%s", VEH_SHORT_DESC(veh));
+	}
 	else
 		snprintf(name, nlen, "uid = %s, (not found)", uid + 1);
 }
