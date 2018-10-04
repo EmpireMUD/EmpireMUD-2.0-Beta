@@ -269,6 +269,7 @@ OLC_MODULE(mapedit_maintain) {
 OLC_MODULE(mapedit_unclaimable) {
 	int hor, ver, radius;
 	bool set = !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE);
+	bool any_land = FALSE;
 	room_data *to;
 	
 	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
@@ -287,7 +288,8 @@ OLC_MODULE(mapedit_unclaimable) {
 		for (ver = -1 * radius; ver <= radius; ++ver) {
 			to = real_shift(IN_ROOM(ch), hor, ver);
 			
-			if (to) {
+			if (to && GET_ISLAND_ID(to) != NO_ISLAND) {
+				any_land = TRUE;
 				if (set) {
 					SET_BIT(ROOM_AFF_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
 					SET_BIT(ROOM_BASE_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
@@ -301,7 +303,10 @@ OLC_MODULE(mapedit_unclaimable) {
 		}
 	}
 	
-	if (radius == 0) {
+	if (!any_land) {
+		msg_to_char(ch, "Only ocean found -- ocean cannot be set unclaimable.\r\n");
+	}
+	else if (radius == 0) {
 		msg_to_char(ch, "You set this tile %s.\r\n", (set ? "unclaimable" : "no longer unclaimable"));
 	}
 	else {
