@@ -983,9 +983,9 @@ void do_instance_info(char_data *ch, char *argument) {
 			sprintbit(INST_FLAGS(inst), instance_flags, buf, TRUE);
 			msg_to_char(ch, "Flags: %s\r\n", buf);
 			
-			msg_to_char(ch, "Created: %-12.12s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
+			msg_to_char(ch, "Created: %-24.24s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
 			if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
-				msg_to_char(ch, "Last reset: %-12.12s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
+				msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
 			}
 			
 			if (INST_DIR(inst) != NO_DIR) {
@@ -998,7 +998,7 @@ void do_instance_info(char_data *ch, char *argument) {
 			if (INST_MOB_COUNTS(inst)) {
 				msg_to_char(ch, "Mob counts:\r\n");
 				HASH_ITER(hh, INST_MOB_COUNTS(inst), mc, next_mc) {
-					msg_to_char(ch, "%3d %s\r\n", mc->count, get_mob_name_by_proto(mc->vnum));
+					msg_to_char(ch, "%3d %s\r\n", mc->count, skip_filler(get_mob_name_by_proto(mc->vnum)));
 				}
 			}
 			
