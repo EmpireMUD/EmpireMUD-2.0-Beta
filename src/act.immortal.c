@@ -52,6 +52,7 @@ extern const char *extra_bits[];
 extern const char *function_flags[];
 extern const char *genders[];
 extern const char *grant_bits[];
+extern const char *instance_flags[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
 extern const char *progress_types[];
@@ -934,6 +935,83 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 }
 
 
+void do_instance_info(char_data *ch, char *argument) {
+	struct instance_mob *mc, *next_mc;
+	char buf[MAX_STRING_LENGTH];
+	struct instance_data *inst;
+	int num;
+	
+	if (!*argument || !isdigit(*argument) || (num = atoi(argument)) < 1) {
+		msg_to_char(ch, "Invalid instance number '%s'.\r\n", *argument ? argument : "<blank>");
+		return;
+	}
+	
+	LL_FOREACH(instance_list, inst) {
+		if (--num == 0) {
+			msg_to_char(ch, "Instance %d: [%d] %s\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
+			
+			if (INST_LOCATION(inst)) {
+				if (ROOM_OWNER(INST_LOCATION(inst))) {
+					sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_LOCATION(inst))), EMPIRE_NAME(ROOM_OWNER(INST_LOCATION(inst))));
+				}
+				else {
+					*buf = '\0';
+				}
+				msg_to_char(ch, "Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_LOCATION(inst)), get_room_name(INST_LOCATION(inst), FALSE), coord_display_room(ch, INST_LOCATION(inst), FALSE), buf);
+			}
+			if (INST_FAKE_LOC(inst) && INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
+				if (ROOM_OWNER(INST_FAKE_LOC(inst))) {
+					sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
+				}
+				else {
+					*buf = '\0';
+				}
+				msg_to_char(ch, "Fake Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_FAKE_LOC(inst)), get_room_name(INST_FAKE_LOC(inst), FALSE), coord_display_room(ch, INST_FAKE_LOC(inst), FALSE), buf);
+			}
+			
+			if (INST_START(inst)) {
+				msg_to_char(ch, "First room: [%d] %s\r\n", GET_ROOM_VNUM(INST_START(inst)), get_room_name(INST_START(inst), FALSE));
+			}
+			
+			if (INST_LEVEL(inst) > 0) {
+				msg_to_char(ch, "Level: %d\r\n", INST_LEVEL(inst));
+			}
+			else {
+				msg_to_char(ch, "Level: unscaled\r\n");
+			}
+			
+			sprintbit(INST_FLAGS(inst), instance_flags, buf, TRUE);
+			msg_to_char(ch, "Flags: %s\r\n", buf);
+			
+			msg_to_char(ch, "Created: %s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
+			if (INST_LAST_RESET(inst)) {
+				msg_to_char(ch, "Last reset: %s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
+			}
+			
+			if (INST_DIR(inst) != NO_DIR) {
+				msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
+			}
+			if (INST_ROTATION(inst) != NO_DIR) {
+				msg_to_char(ch, "Rotation: %s\r\n", dirs[INST_ROTATION(inst)]);
+			}
+			
+			if (INST_MOB_COUNTS(inst)) {
+				msg_to_char(ch, "Mob counts:\r\n");
+				HASH_ITER(hh, INST_MOB_COUNTS(inst), mc, next_mc) {
+					msg_to_char(ch, "%3d %s\r\n", mc->count, get_mob_name_by_proto(mc->vnum));
+				}
+			}
+			
+			break;	// only show 1
+		}
+	}
+	
+	if (num > 0) {
+		msg_to_char(ch, "Invalid instance number %d.\r\n", atoi(argument));
+	}
+}
+
+
 // shows by adventure
 void do_instance_list_all(char_data *ch) {
 	extern int count_instances(adv_data *adv);
@@ -1103,8 +1181,6 @@ void do_instance_reset(char_data *ch, char *argument) {
 * @param size_t size Size of the buffer.
 */
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size) {
-	extern const char *instance_flags[];
-	
 	char flg[256], info[256], owner[MAX_STRING_LENGTH];
 
 	if (INST_LEVEL(inst) > 0) {
@@ -6930,7 +7006,7 @@ ACMD(do_instance) {
 			++count;
 		}
 		
-		msg_to_char(ch, "Usage: instance <list | add | delete | deleteall | nearby | reset | spawn | test> [argument]\r\n");
+		msg_to_char(ch, "Usage: instance <list | add | delete | deleteall | info | nearby | reset | spawn | test> [argument]\r\n");
 		msg_to_char(ch, "There are %d live instances.\r\n", count);
 	}
 	else if (is_abbrev(arg, "list")) {
@@ -6944,6 +7020,9 @@ ACMD(do_instance) {
 	}
 	else if (is_abbrev(arg, "deleteall")) {
 		do_instance_delete_all(ch, argument);
+	}
+	else if (is_abbrev(arg, "information")) {
+		do_instance_info(ch, argument);
 	}
 	else if (is_abbrev(arg, "nearby")) {
 		do_instance_nearby(ch, argument);
