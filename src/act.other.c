@@ -2311,7 +2311,6 @@ ACMD(do_minipets) {
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *to_summon;
 	size_t size, count;
-	bool overflow;
 	
 	skip_spaces(&argument);
 	
@@ -2325,7 +2324,6 @@ ACMD(do_minipets) {
 	
 	if (!*argument) {	// just list minipets
 		size = snprintf(output, sizeof(output), "Mini-pets in your collection:\r\n");
-		overflow = FALSE;
 		count = 0;
 	
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
@@ -2348,7 +2346,6 @@ ACMD(do_minipets) {
 				size += strlen(line);
 			}
 			else {
-				overflow = TRUE;
 				strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
 				break;
 			}
