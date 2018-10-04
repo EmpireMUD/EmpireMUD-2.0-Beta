@@ -94,6 +94,23 @@ O
 R
 5117 0
 S
+#106
+obsidian rough black piece~
+a rough piece of obsidian~
+A black piece of obsidian is on the ground.~
+   Although it's rough and dirty, the gleaming black center of this piece of
+obsidian shows through. Obsidian forms a cutting edge like no other stone. Use
+'chip' to give it a sharp edge.
+~
+1 hl ano 7
+0 2 5
+8 0
+I 19 182 100.00 1  # CHIP: a sharpened piece of obsidian
+O
+22 u
+R
+5117 0
+S
 #120
 tree large~
 a large tree~
@@ -847,6 +864,21 @@ R
 5121 0
 R
 5610 0
+S
+#182
+obsidian piece sharpened~
+a sharpened piece of obsidian~
+A sharpened piece of obsidian has been left here.~
+   This gleaming black piece of obsidian has been sharpened through knapping to
+form a razor-sharp edge, sharper than any steel. It's far too sharp to use
+bare-handed, but you could craft it into an obsidian knife, obsidian spear, or
+obsidian sword (requires Basic Crafts).
+~
+3 l a 7
+0 0 0
+8 0
+R
+5121 0
 S
 #183
 tinderbox tinder firesteel steel~
