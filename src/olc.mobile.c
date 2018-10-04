@@ -750,7 +750,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && !multi_isname(find_keywords, GET_LOOK_DESC(mob)) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && (!GET_LOOK_DESC(mob) || !multi_isname(find_keywords, GET_LOOK_DESC(mob))) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
 			continue;
 		}
 		
