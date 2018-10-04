@@ -1063,6 +1063,7 @@ void use_minipet_obj(char_data *ch, obj_data *obj) {
 	else {
 		add_minipet(ch, GET_MINIPET_VNUM(obj));
 		msg_to_char(ch, "You gain '%s' as a mini-pet. Use the minipets command to summon it.\r\n", GET_SHORT_DESC(mob));
+		extract_obj(obj);
 	}
 }
 

@@ -2721,7 +2721,7 @@ OLC_MODULE(oedit_minipet) {
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
 		}
 		else {
 			send_config_msg(ch, "ok_string");
