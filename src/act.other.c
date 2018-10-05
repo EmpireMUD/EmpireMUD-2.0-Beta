@@ -2352,7 +2352,7 @@ ACMD(do_minipets) {
 				snprintf(line, sizeof(line), "%s\r\n", skip_filler(GET_SHORT_DESC(mob)));
 			}
 			else {	// non-screenreader
-				snprintf(line, sizeof(line), " %-25.25s%s", skip_filler(GET_SHORT_DESC(mob)), !(count % 3) ? "\r\n" : "");
+				snprintf(line, sizeof(line), " %-36.36s%s", skip_filler(GET_SHORT_DESC(mob)), !(count % 2) ? "\r\n" : "");
 			}
 		
 			if (size + strlen(line) + 14 < sizeof(output)) {
@@ -2368,7 +2368,7 @@ ACMD(do_minipets) {
 		if (count == 0) {
 			strcat(output, " none\r\n");	// space always reserved for this
 		}
-		else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 3)) {
+		else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2)) {
 			strcat(output, "\r\n");	// space always reserved for this
 		}
 	
