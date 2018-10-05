@@ -2712,6 +2712,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						strcpy(str, "0");
 					}
 					
+					else if (!str_cmp(field, "add_minipet")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void add_minipet(char_data *ch, any_vnum vnum);
+							char_data *pet = mob_proto(atoi(subfield));
+							if (pet) {
+								add_minipet(c, GET_MOB_VNUM(pet));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid minipet: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
+					
 					else if (!str_cmp(field, "add_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
@@ -3265,7 +3280,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							snprintf(str, slen, "%d", char_has_item(subfield, c));
 					}
-					
+					else if (!str_cmp(field, "has_minipet")) {
+						extern bool has_minipet(char_data *ch, any_vnum vnum);
+						
+						if (subfield && *subfield && isdigit(*subfield) && has_minipet(c, atoi(subfield))) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "has_reputation")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_reputation(vnum, level)%
@@ -3701,6 +3725,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && isdigit(*subfield)) {
 							void remove_learned_craft(char_data *ch, any_vnum vnum);
 							remove_learned_craft(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_minipet")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void remove_minipet(char_data *ch, any_vnum vnum);
+							remove_minipet(c, atoi(subfield));
 						}
 						
 						strcpy(str, "0");

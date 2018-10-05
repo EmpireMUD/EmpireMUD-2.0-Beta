@@ -336,6 +336,7 @@ All mob scripts provide the &c%self%&0 variable.
 When using field  - The variable returns:
 &cability(name)&0 - Returns whether or not the player knows the ability.
 &cadd_learned(vnum)&0 - Adds a learnable recipe to the actor.
+&cadd_minipet(vnum)&0 - Grants a mob as a mini-pet (see MINIPET ITEM).
 &cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
 &cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
 &caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
@@ -405,6 +406,7 @@ When using field  - The variable returns:
 &cgrt&0 - The actor's Greatness.
 &chas_item()&0 - Checks if the actor has a object (inventory, equipped and
    in containers) by subfield name/var/vnum.
+&chas_minipet(vnum)&0 - Character has a given mini-pet.
 &chas_reputation(faction,rep)&0 - Whether or not the player has at least that
    much reputation with the given faction.
 &chas_resources(vnum,amt)&0 - Whether or not the player has <amt> of object <vnum>
@@ -468,6 +470,7 @@ When using field  - The variable returns:
 &cquest_triggered(vnum)&0 - TRUE if the player is on the quest and that quest
    has a 'triggered' task that has already been completed.
 &cremove_learned(vnum)&0 - Removes a learnable recipe from the actor.
+&cremove_minipet(vnum)&0 - Takes away a mini-pet mob.
 &cremove_mob_flag(FLG)&0 - Removes a mob flag from the mob. Also, add_mob_flag().
 &cresist_magical&0 - Returns the amount of magic resistance the player has.
 &cresist_physical&0 - Returns the amount of physical resistance the player has.
