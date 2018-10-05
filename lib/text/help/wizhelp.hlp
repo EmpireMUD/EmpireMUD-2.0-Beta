@@ -1049,6 +1049,7 @@ factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 learned    Immort   Shows you learned recipes.
+minipets   Immort   Shows you mini-pets collected by a player.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
@@ -1151,6 +1152,14 @@ Shows you the recipes learned by a player or empire. For multi-word empire
 names, use "quotation marks".
 
 See also: SET LEARNED
+#e
+"SHOW MINIPETS" "SHOW MINI-PETS"
+
+Usage:  show minipets <player> [search phrase]
+
+Shows you mini-pets collected by a player.
+
+See also: SET MINIPET
 #e
 "SHOW NOTES"
 
