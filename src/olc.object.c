@@ -30,6 +30,7 @@
 */
 
 // externs
+extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *apply_type_names[];
 extern const char *apply_types[];
@@ -2708,23 +2709,37 @@ OLC_MODULE(oedit_maxlevel) {
 
 
 OLC_MODULE(oedit_minipet) {
+	extern bitvector_t default_minipet_flags, default_minipet_affs;
+	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	mob_vnum old = GET_MINIPET_VNUM(obj);
+	char buf[MAX_STRING_LENGTH];
+	char_data *mob;
 	
 	if (!IS_MINIPET(obj)) {
 		msg_to_char(ch, "You can only set this on a MINIPET item.\r\n");
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = olc_process_number(ch, argument, "mini-pet", "minipet", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_MINIPET_VNUM));
-		if (!mob_proto(GET_MINIPET_VNUM(obj))) {
+		if (!(mob = mob_proto(GET_MINIPET_VNUM(obj)))) {
 			GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = old;
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
+			return;
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
 		}
 		else {
 			send_config_msg(ch, "ok_string");
+		}
+		
+		if (!MOB_FLAGGED(mob, default_minipet_flags)) {
+			sprintbit(default_minipet_flags, action_bits, buf, TRUE);
+			msg_to_char(ch, "Warning: mob should have these flags: buf\r\n");
+		}
+		if (!AFF_FLAGGED(mob, default_minipet_affs)) {
+			sprintbit(default_minipet_affs, affected_bits, buf, TRUE);
+			msg_to_char(ch, "Warning: mob should have these affects: buf\r\n");
 		}
 	}
 }
