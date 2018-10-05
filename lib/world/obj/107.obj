@@ -119,10 +119,9 @@ A holiday bell is lying here.~
 This bell can summon a cheerful elf (a noncombat pet)!
 Type 'use bell' to summon him.
 ~
-3 p a 4
+19 p a 5
 10709 0 0
 2 0
-T 9900
 S
 #10710
 snowglobe globe~
@@ -309,10 +308,9 @@ Someone has left their Christmas tree whistle here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 2
+19 p a 3
 10723 0 0
 2 0
-T 9900
 S
 #10724
 whistle reindeer fawn~
@@ -321,10 +319,9 @@ Someone has left their reindeer fawn whistle here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 3
+19 p a 4
 10724 0 0
 2 0
-T 9900
 S
 #10725
 whistle snowman small animated~
@@ -333,10 +330,9 @@ Someone has left their animated snowman whistle here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 4
+19 p a 5
 10725 0 0
 2 0
-T 9900
 S
 #10726
 whistle toy soldier~
@@ -345,10 +341,9 @@ Someone has left their toy soldier whistle here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 5
+19 p a 6
 10726 0 0
 2 0
-T 9900
 S
 #10727
 whistle mini-pet pet random~
@@ -747,10 +742,9 @@ a spider egg~
 A spider egg is lying here.~
 This egg will summon a spiderling minipet if you use it.
 ~
-3 p a 5
+19 p a 6
 10753 0 0
 7 0
-T 9900
 S
 #10754
 potion bug~
@@ -1005,10 +999,9 @@ A buffalo leash is lying here.~
 This leash will summon a noncombat pet!
 Type 'use leash' to summon it.
 ~
-3 o a 5
+19 o a 6
 10781 0 0
 2 0
-T 9900
 S
 #10782
 leash zebra~
@@ -1017,9 +1010,8 @@ A zebra leash is lying here.~
 This leash will summon a noncombat pet!
 Type 'use leash' to summon it.
 ~
-3 o a 6
+19 o a 7
 10782 0 0
 2 0
-T 9900
 S
 $

@@ -208,10 +208,9 @@ A parrot whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 4
+19 p a 5
 12417 0 0
 0 0
-T 9900
 S
 #12418
 conch hydra~
@@ -220,10 +219,9 @@ A hydra conch is lying here.~
 This conch can summon a noncombat pet!
 Type 'use conch' to summon it.
 ~
-3 p a 5
+19 p a 6
 12418 0 0
 0 0
-T 9900
 S
 #12419
 feast deep-sea deepsea sea delights~

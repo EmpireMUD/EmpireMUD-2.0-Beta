@@ -1853,7 +1853,7 @@ Desert Stumps~
 A Group of Stumps in the Desert~
 '.' 21 2 2 l ep
 C
-burn, dig, pick~
+burn stumps, dig, pick~
 D1
 .&t.&?..~
 &Y~
@@ -2773,7 +2773,7 @@ Stumps~
 A Field of Stumps~
 '.' 10 1 2 dl bp
 C
-burn, dig~
+burn stumps, dig~
 D1
 .&t.&?..~
 &g~
@@ -4116,7 +4116,7 @@ Stumped Riverbank~
 Some Stumps on the Riverbank~
 '.' 10 1 1 dl bps
 C
-burn, dig, pick~
+burn stumps, dig, pick~
 D1
 @w&t..@e~
 &t~
@@ -5381,7 +5381,7 @@ Seaside Stumps~
 Some Stumps Along the Shore~
 '.' 10 1 2 dl bpr
 C
-burn, dig, pick~
+burn stumps, dig, pick~
 D1
 .&t.&?..~
 &g~
@@ -5720,7 +5720,7 @@ Jungle Stumps~
 A Densely Vined Field of Stumps~
 '.' 10 3 3 dl p
 C
-burn~
+burn stumps~
 D1
 .&t.&?..~
 &g~
@@ -5943,7 +5943,7 @@ Seaside Jungle Stumps~
 Amidst Tropical Stumps on the Seaside~
 '.' 10 3 3 dl pr
 C
-burn, pick~
+burn stumps, pick~
 D0
 .&t.&?..~
 &g~
@@ -6860,7 +6860,7 @@ Irrigated Stumps~
 Some Stumps on the Irrigated Plain~
 '.' 10 1 2 dl bp
 C
-burn, dig, pick~
+burn stumps, dig, pick~
 D1
 .&t.&?..~
 &g~

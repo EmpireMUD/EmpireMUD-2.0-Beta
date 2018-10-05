@@ -852,10 +852,9 @@ A muck elemental stone is lying here.~
 This magical stone can summon a noncombat pet -- the muck elemental.
 Type 'use stone' to summon it.
 ~
-3 p a 4
+19 p a 5
 10955 0 0
 2 0
-T 9900
 S
 #10956
 sack bog cranberries~
@@ -1022,10 +1021,9 @@ A giant ant whistle is lying here.~
    The whistle is actually surprisingly small. It's the summoned ant that's
 giant. Type 'use whistle' to summon this noncombat pet.
 ~
-3 p a 4
+19 p a 5
 10971 0 0
 2 0
-T 9900
 S
 #10972
 schematic giant's giants causeway~

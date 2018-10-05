@@ -17,10 +17,9 @@ A dragon egg is sitting here.~
 This dragon egg looks ready to hatch and summon you a noncombat pet!
 Type 'use egg' to summon it.
 ~
-3 p a 3
+19 p a 4
 10301 0 0
 14 0
-T 9900
 S
 #10302
 seeds firefruit fruit~
@@ -258,10 +257,9 @@ A wyvern whistle is lying here.~
 The wyvern whistle can be used to summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 4
+19 p a 5
 10334 0 0
 14 0
-T 9900
 S
 #10335
 whistle emerald~
