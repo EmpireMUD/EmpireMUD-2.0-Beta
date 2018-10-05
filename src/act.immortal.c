@@ -1887,11 +1887,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		
 		if (!str_cmp(onoff_arg, "on")) {
-			add_minipet(ch, GET_MOB_VNUM(pet));
+			add_minipet(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: gained mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 		}
 		else if (!str_cmp(onoff_arg, "off")) {
-			remove_minipet(ch, GET_MOB_VNUM(pet));
+			remove_minipet(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: removed mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 		}
 		else {

@@ -2384,7 +2384,7 @@ ACMD(do_minipets) {
 			msg_to_char(ch, "You don't seem to have a mini-pet to dismiss.\r\n");
 		}
 		else {
-			msg_to_char(ch, "You dimiss your mini-pet.\r\n");
+			msg_to_char(ch, "You dismiss your mini-pet.\r\n");
 			dismiss_any_minipet(ch);
 		}
 	}
