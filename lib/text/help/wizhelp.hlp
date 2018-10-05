@@ -956,6 +956,7 @@ grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
 learned        PC      MISC         Turns learned recipes on/off
+minipet        PC      MISC         Turns minipets on/off
 access         PC      NUMBER       Player's immortal access level
 loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
@@ -1027,6 +1028,16 @@ This lets you give (or revoke) learned crafts. The craft must have the
 LEARNED flag.
 
 See also: LEARN, LEARNED, SHOW LEARNED
+#d
+"SET MINIPET" "SET MINI-PET"
+
+Usage:  set [file] <player> minipet <mob vnum> <on | off>
+
+This lets you give (or revoke) collectable mini-pets.
+
+WARNING: This works on ANY mob vnum.
+
+See also: MINIPET
 #d
 SHOW
 
