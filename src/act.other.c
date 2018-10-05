@@ -37,6 +37,7 @@
 */
 
 // configs for mini-pets
+#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !MOB_FLAGGED((mob), MOB_FAMILIAR) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
 bitvector_t default_minipet_affs = AFF_NO_ATTACK;
 
@@ -197,14 +198,19 @@ void cancel_adventure_summon(char_data *ch) {
 * Dismisses all mini-pets controlled by the character, if any.
 *
 * @param char_data *ch The player whose pet(s) to purge.
+* @return bool TRUE if it dismissed a minipet, FALSE if not.
 */
-void dismiss_any_minipet(char_data *ch) {
+bool dismiss_any_minipet(char_data *ch) {
+	bool any = FALSE;
 	char_data *mob;
 	
 	while ((mob = find_minipet(ch))) {	// ensures there aren't more than 1
 		act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
 		extract_char(mob);
+		any = TRUE;
 	}
+	
+	return any;
 }
 
 
@@ -329,8 +335,6 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 */
 char_data *find_minipet(char_data *ch) {
 	char_data *chiter, *found = NULL;
-	
-	#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !MOB_FLAGGED((mob), MOB_FAMILIAR) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 	
 	// try the room first
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
@@ -1774,11 +1778,20 @@ ACMD(do_dismiss) {
 			send_config_msg(ch, "ok_string");
 		}
 	}
+	else if (!strn_cmp(arg, "mini", 4) && (is_abbrev(arg, "minipet") || is_abbrev(arg, "mini-pet"))) {
+		// requires abbrev of at least "famil"
+		if (!dismiss_any_minipet(ch)) {
+			msg_to_char(ch, "You do not have a mini-pet to dismiss.\r\n");
+		}
+		else {
+			send_config_msg(ch, "ok_string");
+		}
+	}
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict) || vict->master != ch || !MOB_FLAGGED(vict, MOB_FAMILIAR)) {
-		msg_to_char(ch, "You can only dismiss a familiar.\r\n");
+	else if (!IS_NPC(vict) || vict->master != ch || (!MOB_FLAGGED(vict, MOB_FAMILIAR) && !IS_MINIPET_OF(vict, ch))) {
+		msg_to_char(ch, "You can only dismiss a familiar or mini-pet.\r\n");
 	}
 	else if (FIGHTING(vict) || GET_POS(vict) < POS_SLEEPING) {
 		act("You can't dismiss $M right now.", FALSE, ch, NULL, vict, TO_CHAR);
