@@ -414,6 +414,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	// save old char...
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
 	SAVE_CHAR(old);
+	dismiss_any_minipet(old);
 	
 	// save this to switch over replies
 	last_tell = GET_LAST_TELL(old);
@@ -2735,6 +2736,7 @@ ACMD(do_quit) {
 			}
 		}
 		send_to_char("Goodbye, friend... Come back soon!\r\n", ch);
+		dismiss_any_minipet(ch);
 
 		/*
 		 * kill off all sockets connected to the same player as the one who is

@@ -1361,6 +1361,7 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 * @param char_data *ch The player to idle out.
 */
 void perform_idle_out(char_data *ch) {
+	extern bool dismiss_any_minipet(char_data *ch);
 	extern obj_data *player_death(char_data *ch);
 	
 	empire_data *emp = NULL;
@@ -1394,6 +1395,7 @@ void perform_idle_out(char_data *ch) {
 	}
 	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
+	dismiss_any_minipet(ch);
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
 	
