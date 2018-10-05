@@ -39,7 +39,7 @@
 // configs for mini-pets
 #define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !MOB_FLAGGED((mob), MOB_FAMILIAR) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
-bitvector_t default_minipet_affs = AFF_NO_ATTACK;
+bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
 
 
 // external vars
