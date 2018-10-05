@@ -188,7 +188,8 @@
 #define DATA_LAST_NEW_YEAR  1	// timestamp of last annual world update
 #define DATA_WORLD_START  2	// timestamp of when the mud first started up
 #define DATA_MAX_PLAYERS_TODAY  3	// players logged in today
-#define NUM_DATAS  4
+#define DATA_LAST_ISLAND_DESCS  4	// last time island descs regenerated
+#define NUM_DATAS  5
 
 
 // DATYPE_x: types of stored data

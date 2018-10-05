@@ -2609,13 +2609,15 @@ void generate_island_descriptions(void) {
 	int temp, count;
 	double prc;
 	
+	bool override = (data_get_long(DATA_LAST_ISLAND_DESCS) + SECS_PER_REAL_DAY < time(0));
+	
 	// first determine which islands need descs
 	HASH_ITER(hh, island_table, isliter, next_isliter) {
 		if (isliter->tile_size < 1) {
 			continue;	// don't bother?
 		}
 		
-		if (!isliter->desc || !*isliter->desc) {
+		if (!isliter->desc || !*isliter->desc || (override && !IS_SET(isliter->flags, ISLE_HAS_CUSTOM_DESC))) {
 			CREATE(isle, struct genisdesc_isle, 1);
 			isle->id = isliter->id;
 			HASH_ADD_INT(isle_hash, id, isle);
@@ -2697,6 +2699,7 @@ void generate_island_descriptions(void) {
 	if (any) {
 		save_island_table();
 	}
+	data_set_long(DATA_LAST_ISLAND_DESCS, time(0));
 }
 
 

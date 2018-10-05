@@ -407,7 +407,7 @@ void boot_db(void) {
 	log("Building shop lookup hints.");
 	build_all_shop_lookups();
 	
-	log("Ensuring all islands have descriptions.");
+	log("Updating island descriptions.");
 	generate_island_descriptions();
 	
 	// final things...
@@ -3367,17 +3367,37 @@ void b5_45_keep_update(void) {
 
 // resets mountain tiles off-cycle because of the addition of tin
 void b5_47_mine_update(void) {
+	void save_island_table();
+	
+	struct island_info *isle, *next_isle;
 	struct map_data *tile;
+	bool any = FALSE;
 	room_data *room;
 	
-	log("Applying b5.47 update to clear mine data...");
+	const char *detect_desc = "   The island has ";
+	int len = strlen(detect_desc);
 	
+	log("Applying b5.47 update to clear mine data and update island flags...");
+	
+	// clear mines
 	LL_FOREACH(land_map, tile) {
 		if (!(room = real_real_room(tile->vnum)) || !HAS_FUNCTION(room, FNC_MINE)) {
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
 		}
+	}
+	save_whole_world();
+	
+	// island desc flags
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		if (isle->desc && strncmp(isle->desc, detect_desc, len)) {
+			SET_BIT(isle->flags, ISLE_HAS_CUSTOM_DESC);
+			any = TRUE;
+		}
+	}
+	if (any) {
+		save_island_table();
 	}
 }
 

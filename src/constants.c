@@ -2979,6 +2979,7 @@ const char *island_bits[] = {
 	"!AGGRO",
 	"!CUSTOMIZE",
 	"CONTINENT",
+	"*",	// has-custom-desc (internal use only)
 	"\n"
 };
 
