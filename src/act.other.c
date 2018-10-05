@@ -2405,6 +2405,9 @@ ACMD(do_minipets) {
 		if (!to_summon) {
 			msg_to_char(ch, "You don't have a mini-pet called '%s'.\r\n", argument);
 		}
+		else if ((mob = find_minipet(ch)) && GET_MOB_VNUM(mob) == GET_MOB_VNUM(to_summon)) {
+			msg_to_char(ch, "You already have that mini-pet out.\r\n");
+		}
 		else {
 			dismiss_any_minipet(ch);	// out with the old...
 			
@@ -2421,6 +2424,8 @@ ACMD(do_minipets) {
 			
 			add_follower(mob, ch, TRUE);
 			load_mtrigger(mob);
+			
+			command_lag(ch, WAIT_OTHER);
 		}
 	}
 }
