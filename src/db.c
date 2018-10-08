@@ -3365,6 +3365,24 @@ void b5_45_keep_update(void) {
 }
 
 
+// fix reputation
+PLAYER_UPDATE_FUNC(b5_47_update_players) {
+	void update_reputations(char_data *ch);
+	
+	struct player_faction_data *fct, *next;
+	bool any = FALSE;
+	
+	HASH_ITER(hh, GET_FACTIONS(ch), fct, next) {
+		fct->value *= 10;	// this update raised the scale of faction rep by 10x
+		any = TRUE;
+	}
+	
+	if (any) {
+		update_reputations(ch);
+	}
+}
+
+
 // resets mountain tiles off-cycle because of the addition of tin
 void b5_47_mine_update(void) {
 	void save_island_table();
@@ -3377,7 +3395,7 @@ void b5_47_mine_update(void) {
 	const char *detect_desc = "   The island has ";
 	int len = strlen(detect_desc);
 	
-	log("Applying b5.47 update to clear mine data and update island flags...");
+	log("Applying b5.47 update to clear mine data, update island flags, and fix player reputation...");
 	
 	// clear mines
 	LL_FOREACH(land_map, tile) {
@@ -3399,6 +3417,8 @@ void b5_47_mine_update(void) {
 	if (any) {
 		save_island_table();
 	}
+	
+	update_all_players(NULL, b5_47_update_players);
 }
 
 
