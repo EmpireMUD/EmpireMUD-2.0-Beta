@@ -48,6 +48,7 @@
 extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 
 // external functions
+void check_delayed_load(char_data *ch);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void discrete_load(FILE *fl, int mode, char *filename);
@@ -1982,8 +1983,6 @@ PLAYER_UPDATE_FUNC(b2_8_update_players) {
 
 // 2.11 loads inventories and attaches triggers
 PLAYER_UPDATE_FUNC(b2_11_update_players) {
-	void check_delayed_load(char_data *ch);
-
 	obj_data *obj, *proto;
 	int iter;
 	
@@ -2055,7 +2054,6 @@ void b3_1_mine_update(void) {
 
 
 PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
-	void check_delayed_load(char_data *ch);
 	obj_data *obj, *next_obj, *new;
 	int iter;
 	
@@ -2218,8 +2216,6 @@ void b3_11_ship_fix(void) {
 
 // removes AFF_SENSE_HIDE
 PLAYER_UPDATE_FUNC(b3_12_update_players) {
-	void check_delayed_load(char_data *ch);
-	
 	// only care if they have a permanent sense-hide
 	if (!AFF_FLAGGED(ch, AFF_SENSE_HIDE)) {
 		return;
@@ -2337,8 +2333,6 @@ PLAYER_UPDATE_FUNC(b4_1_approve_players) {
 
 // adds current mount to mounts list
 PLAYER_UPDATE_FUNC(b4_2_mount_update) {
-	void check_delayed_load(char_data *ch);
-	
 	check_delayed_load(ch);
 	
 	if (GET_MOUNT_VNUM(ch)) {
@@ -2509,7 +2503,6 @@ void b4_39_data_conversion(void) {
 
 // b5.1 changes the values of ATYPE_x consts and this updates existing affects
 PLAYER_UPDATE_FUNC(b5_1_update_players) {
-	void check_delayed_load(char_data *ch);
 	void free_var_el(struct trig_var_data *var);
 	
 	struct trig_var_data *var, *next_var;
@@ -2705,7 +2698,6 @@ void b5_3_missile_update(void) {
 
 // b5.14 refreshes superior items
 PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
-	void check_delayed_load(char_data *ch);
 	obj_data *obj, *next_obj, *new;
 	int iter;
 	
@@ -2867,7 +2859,6 @@ void b5_20_canal_fix(void) {
 
 // updates potions in player inventory
 PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
-	void check_delayed_load(char_data *ch);
 	obj_data *obj, *next_obj, *new;
 	int iter;
 	
@@ -2951,7 +2942,6 @@ void b5_23_potion_update(void) {
 
 // updates poisons in player inventory
 PLAYER_UPDATE_FUNC(b5_24_player_poison_update) {
-	void check_delayed_load(char_data *ch);
 	obj_data *obj, *next_obj, *new;
 	int iter;
 	
@@ -3085,7 +3075,6 @@ void b5_30_empire_update(void) {
 
 
 PLAYER_UPDATE_FUNC(b5_34_player_update) {
-	void check_delayed_load(char_data *ch);
 	void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 	
 	struct player_skill_data *skill, *next_skill;
