@@ -3372,6 +3372,8 @@ PLAYER_UPDATE_FUNC(b5_47_update_players) {
 	struct player_faction_data *fct, *next;
 	bool any = FALSE;
 	
+	check_delayed_load(ch);
+	
 	HASH_ITER(hh, GET_FACTIONS(ch), fct, next) {
 		fct->value *= 10;	// this update raised the scale of faction rep by 10x
 		any = TRUE;
