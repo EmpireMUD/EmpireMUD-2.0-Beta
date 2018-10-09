@@ -164,6 +164,12 @@ A viscous muck dragon coils through the water.
 ~
 225 325 dghuB chmoBCD 6
 0 0 5 27
+D
+   You can only see the fins and head of the dragon as it moves through the
+water, but it is enormous! The muck dragon's turqoise scales drip mud as its
+back arches out of the water, coiling in circles around you. What sort of prize
+might this dragon hold?
+~
 I 0 10907 100.00 4  # BUTCHER: a raw dragon steak
 I 1 1357 100.00 8  # SKIN: a large piece of leather
 I 1 10006 60.00 1 a  # SKIN: a dragon scale
@@ -205,6 +211,9 @@ A little elemental is rolling around in a puddle of muck.
 ~
 1 1 bdoD mn 1
 0 0 2 5
+D
+This little ball of muck is playing in its own mess.
+~
 M
 0
 $n splashes around in its own puddle of muck.~
@@ -233,6 +242,11 @@ A hill giant towers over you, swinging a club the size of a tree!
 ~
 100 175 dkuvA cEG 6
 0 0 26 5
+D
+   The hill giant towers over you with an entire tree slung over its shoulder
+as a club. Luckily, the giant seems to be focused on problems its own size, and
+isn't even looking down at you.
+~
 I 4 10973 100.00 1  # LOOT: a giant wooden club
 I 4 10968 60.00 1 a  # LOOT: a giant gold coin
 I 4 10970 10.00 1 a  # LOOT: a golden harp
@@ -271,6 +285,11 @@ A river giant towers over you, barely missing you on its path across the country
 ~
 100 175 dhkuvA cEG 6
 0 0 26 5
+D
+   This giant is dressed mainly in gigantic nets, which appear to double as
+fishing tools. Its height dominates the landscape, taller than most trees. In
+fact, it has a tree slung over its shoulder like a club.
+~
 I 4 10973 100.00 1  # LOOT: a giant wooden club
 I 4 10968 60.00 1 a  # LOOT: a giant gold coin
 I 4 10970 10.00 1 a  # LOOT: a golden harp
@@ -309,6 +328,11 @@ A dune giant towers above you, with a tree over its shoulder!
 ~
 100 175 dkuvA cEG 6
 0 0 26 5
+D
+   This gigantic desert nomad has a massive tree slung over its shoulder like a
+club. The giant is so large that it doesn't even appear to notice you down
+here.
+~
 I 4 10973 100.00 1  # LOOT: a giant wooden club
 I 4 10968 60.00 1 a  # LOOT: a giant gold coin
 I 4 10970 10.00 1 a  # LOOT: a golden harp
@@ -356,6 +380,9 @@ A giant ant scurries past you.
 ~
 1 1 bdoD n 2
 0 0 7 9
+D
+It's an ant the size of a large dog.
+~
 M
 0
 $n pokes at you with its antennae.~
@@ -369,6 +396,282 @@ M
 0
 $n looks at you with huge puppydog eyes, longing for some crumbs.~
 T 9901
+T 9902
+S
+#10980
+portents doom~
+portents of doom~
+Portents of doom linger in the air.
+~
+100 175 bd kln 3
+0 0 0 15
+T 10980
+S
+#10981
+#n rogue wizard~
+the rogue wizard #n~
+A rogue wizard is skulking here.
+~
+100 175 dvxA c 3
+1 0 0 20
+D
+   The black and gray robes immediately signify -- to those who are familiar
+with High Sorcery -- that this wizard is no friend. Indeed, only outcasts in
+search of power would don such colors. He notices you looking at him and begins
+spinning a powerful spell. Hopefully you aren't too late with the counterspell.
+~
+I 4 10982 60.00 10 a  # LOOT: a fiery brimstone
+I 4 10983 30.00 1 a  # LOOT: a pure crystal orb
+I 4 10984 10.00 1 a  # LOOT: a crystal skull
+I 4 10986 12.50 1 b  # LOOT: an ember of the eternal flame
+I 4 10987 12.50 1 b  # LOOT: a talking skull
+I 4 10990 12.50 1 b  # LOOT: a fractured sorcerer's stone
+M
+1
+I shouldn't've left Llewdor.~
+M
+1
+I spent a century as a cat. Compared to that, killing you will be easy.~
+M
+1
+I'll feed you to the chickens.~
+M
+1
+You remind me of my sister, Hagatha.~
+M
+0
+$n prepares a spell...~
+M
+0
+$n prepares a spell...~
+M
+0
+$n prepares a spell...~
+M
+0
+$n prepares a spell...~
+M
+0
+$n prepares a spell...~
+T 10984
+T 10985
+T 10986
+T 10987
+T 10988
+T 10983
+S
+#10982
+#n druid rogue magiterranean~
+the druid #n~
+A rogue Magiterranean druid is creeping through the shadows.
+~
+100 175 dvxA c 3
+1 3 9 21
+D
+   #n peers around nervously from beneath a brown hood, as if he
+fears something is following him. He catches your eye and a look of
+fury crosses his face. He doesn't look happy to see you.
+~
+I 4 10982 60.00 10 a  # LOOT: a fiery brimstone
+I 4 10983 30.00 1 a  # LOOT: a pure crystal orb
+I 4 10984 10.00 1 a  # LOOT: a crystal skull
+I 4 10986 12.50 1 b  # LOOT: an ember of the eternal flame
+I 4 10988 12.50 1 b  # LOOT: Mother's grimoire
+I 4 10991 12.50 1 b  # LOOT: a strange spore
+M
+0
+$n draws mana from you.~
+M
+0
+$n draws mana from the ground.~
+M
+0
+$n draws mana from the sky.~
+M
+0
+$n draws mana from the air.~
+M
+0
+$n draws mana from your weapon.~
+M
+0
+$n draws mana from you.~
+T 10984
+T 10989
+T 10990
+T 10991
+T 10983
+S
+#10983
+#n witch teenage~
+#n the teenage witch~
+A teenage witch stands with her hands on her hips.
+~
+100 175 advxyD cD 3
+2 0 0 16
+D
+   #n stands with her hands on her hips, frowning. Her black hair and pale
+white skin look almost unnatural. Then, just as that thought passes through
+your mind, her eyes dart toward you. Can she read your thoughts? She looks
+angry.
+~
+I 4 10982 60.00 10 a  # LOOT: a fiery brimstone
+I 4 10983 30.00 1 a  # LOOT: a pure crystal orb
+I 4 10984 10.00 1 a  # LOOT: a crystal skull
+I 4 10986 12.50 1 b  # LOOT: an ember of the eternal flame
+I 4 10989 12.50 1 b  # LOOT: a cat's collar
+I 4 10993 12.50 1 b  # LOOT: the keys to the magicycle
+M
+1
+I'm team Angel.~
+M
+1
+Woo-hoo! I'm normal. Gotta go tell the cat.~
+M
+1
+I want a world where you can escape your problems and not learn anything.~
+M
+1
+Oh, my cheeks are killing me, from smiling... pretending to be polite is so exhausting.~
+M
+1
+Nowadays every girl with a henna tatto and a spice rack thinks she's a sister to the dark ones.~
+T 10984
+T 10992
+T 10993
+T 10994
+T 10995
+T 10983
+S
+#10984
+#n witch teenage~
+#n the teenage witch~
+A teenage witch is playing with fire.
+~
+100 175 abdvxyD cD 3
+2 0 0 16
+D
+   As she runs a brush through her long red hair, #n's gaze appears
+to drift elsewhere, lost in thought if only momentarily. Suddenly she
+looks down toward you and her face turns bright red. You can't read her
+thoughts, but it looks as if she can read yours.
+~
+I 4 10982 60.00 10 a  # LOOT: a fiery brimstone
+I 4 10983 30.00 1 a  # LOOT: a pure crystal orb
+I 4 10984 10.00 1 a  # LOOT: a crystal skull
+I 4 10986 12.50 1 b  # LOOT: an ember of the eternal flame
+I 4 10989 12.50 1 b  # LOOT: a cat's collar
+I 4 10993 12.50 1 b  # LOOT: the keys to the magicycle
+M
+1
+I'm team Damon.~
+M
+1
+You know, tomorrow looked a lot better yesterday.~
+M
+1
+Why are you suddenly so worried about acting like an idiot? That came out wrong.~
+M
+1
+Let's go to the tavern, sneak in our own tea bags, and ask for hot water.~
+M
+1
+We still need to be watched! Personally, I can't get through the day without a little hairy eyeball.~
+T 10984
+T 10992
+T 10993
+T 10994
+T 10995
+T 10983
+S
+#10987
+skull floating~
+a floating skull~
+A skull floats in the air.
+~
+1 1 bdoDF n 1
+0 0 27 9
+D
+   This skull is bleached white and completely devoid of everything except
+personality.
+~
+M
+1
+We have now left Reason and Sanity Junction. Next stop, Looneyville.~
+M
+1
+I have nightmares about hell, where all I do is add up numbers and try to have conversations with people like you.~
+M
+1
+All right. Tell me what I'm looking at.~
+M
+1
+Alas, poor Hamlet...~
+M
+1
+Life is a journey, time is a river, and the door is ajar.~
+M
+1
+I could just die. Again.~
+M
+1
+My gast was pretty well flabbered.~
+T 9902
+S
+#10988
+grimoire mother's mothers~
+Mother's grimoire~
+Mother's grimoire is floating in the air.
+~
+1 1 bdoDF n 1
+0 0 2 16
+D
+This old tome flaps its bindings to stay afloat in the air.
+~
+T 9902
+T 10998
+S
+#10989
+cat black~
+a black cat~
+A black cat is cleaning itself.
+~
+1 1 bdoD n 1
+0 0 0 9
+D
+   The black cat stares at you intently. It's wearing a collar that says
+'Danvers'.
+~
+M
+1
+I'm more of a hip cat than a lap cat.~
+M
+1
+One day we'll both look back on this day and get revenge.~
+M
+1
+Dogs guard. Cats watch... and judge.~
+M
+1
+Meow.~
+M
+1
+Meow?~
+M
+1
+Leave the sarcasm to the professionals.~
+M
+1
+When that witch offered me the choice of any form, I picked the one that's easiest to control humans with.~
+M
+1
+Did you know Sabrina?~
+M
+1
+If you're going to write a book, try not to humiliate the tree.~
+M
+1
+I'm curious. So kill me.~
 T 9902
 S
 $

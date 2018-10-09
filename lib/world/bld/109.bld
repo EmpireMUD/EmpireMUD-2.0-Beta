@@ -153,4 +153,92 @@ A Giant Stone Head~
 R
 10975 1 5 0
 S
+#10981
+Portal Scar~
+A Portal Scar~
+&?@.&b()&?@.~
+100 0 d 0
+0 0 0 -1
+C
+adventure~
+E
+portal scar~
+   The ground is scorched in the characteristic size and shape of a portal,
+though the portal itself is gone without a trace. The ground around the portal
+is stained bright blue, as if someone overloaded a city portal to open the
+other end here rather than at an established node. The portal must have been
+opened someone with extensive sorcery training.
+~
+S
+#10982
+Portal Scar~
+A Portal Scar~
+&?@.&w()&?@.~
+100 0 d 0
+0 0 0 -1
+C
+adventure~
+E
+portal scar~
+   The ground is scorched in the characteristic size and shape of a portal,
+though the portal itself is gone without a trace. All around the scar, thick,
+brambly, wild weeds are growing. The portal must have come from some place with
+intense natural magic.
+~
+S
+#10983
+Portal Scar~
+A Portal Scar~
+&?@.&o()&?@.~
+100 0 d 0
+0 0 0 -1
+C
+adventure~
+E
+portal scar~
+   The ground is scorched in the characteristic size and shape of a portal,
+though the portal itself is gone without a trace. The ground is torn up around
+the portal, as if the portal was unstable, and the place seems drained of
+magic. This portal must have been opened by overconfident amateurs.
+~
+S
+#10990
+Fractured Tower~
+A Fractured Sorcery Tower~
+.&A||&?.~
+128 2 R efm
+4 1 0 -1
+C
+inventory, retrieve, store, study~
+D
+   This small sorcery tower is bent in the middle, broken down the center, and
+held together by little more than mana and willpower. Everything form the
+shelves to the books are half-sundered. But on the bright side, the massive
+crack in the wall lets in a lot of light.
+~
+R
+16 1 1 1048576
+R
+19 1 1 0
+R
+3 1 1 0
+T 5511
+U
+1 5164
+S
+#10991
+Mushroom House~
+A Mushroom House~
+&?.&0&uOO&0&?.~
+64 1 R em
+5 1 0 -1
+D
+   You've found your way into an enormous mushroom. So large is it, in fact,
+that it has been hollowed out to form a beautiful home. The walls and floor are
+spongy white, and the ceiling is red with white spots. The windows let in a
+surprising amount of light.
+~
+R
+1007 1 5 0
+S
 $

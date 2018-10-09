@@ -1077,4 +1077,160 @@ head. It requires the Architect ability.
 10975 0 0
 0 0
 S
+#10980
+tombstone stone~
+the tombstone~
+There is a tombstone here.~
+It looks like someone must have died here.
+~
+3 0 0 1
+0 0 0
+1 48
+T 10982
+S
+#10982
+brimstone stone fiery~
+a fiery brimstone~
+A fiery brimstone is piled here.~
+   This little black stone is actually on fire, though the fire does not burn
+you. It has the faint smell of rotten eggs.
+~
+3 0 a 5
+0 0 0
+1 0
+O
+11 gu
+R
+5164 0
+S
+#10983
+orb crystal pure~
+a pure crystal orb~
+A pure crystal orb is lying here.~
+   This orb is almost as large as your head, but is optically pure and
+beautifully shaped. Orbs like this are rare, and are sought after by powerful
+spellcasters for their clarity.
+~
+15 0 a 5
+16 0 0
+8 0
+R
+5611 a
+S
+#10984
+skull crystal~
+a crystal skull~
+A crystal skull is lying here.~
+   You can't tell whether this skull is cut from a rare gem, or it's truly the
+skull of some crystalline demon. Either way, these skulls are supremely rare
+and are sought out by powerful spellcasters the world over.
+~
+15 e a 6
+24 0 0
+8 0
+R
+5611 a
+S
+#10986
+ember eternal flame~
+an ember of the eternal flame~
+An ember of the eternal flame is floating on the breeze.~
+   This little ember dances around on the air, never touching anything unless
+you force it to do so. As a piece of the eternal flame, this ember never goes
+out.
+~
+18 p a 1
+-1 0 0
+0 0
+S
+#10987
+skull talking~
+a talking skull~
+A talking skull is lying here.~
+This skull can become a mini-pet. Type 'use skull' to receive it.
+~
+19 p a 5
+10987 0 0
+14 0
+S
+#10988
+grimoire mother's mothers~
+Mother's grimoire~
+Mother's grimoire is floating here.~
+This grimoire can become a mini-pet. Type 'use grimoire' to receive it.
+~
+19 p a 6
+10988 0 0
+14 0
+S
+#10989
+collar cat's cats~
+a cat's collar~
+A cat's collar is lying here.~
+This collar can become a mini-pet. Type 'use collar' to receive it.
+~
+19 p a 7
+10989 0 0
+14 0
+S
+#10990
+stone fractured sorcerer's sorcerers~
+a fractured sorcerer's stone~
+A fractured sorcerer's stone is lying here.~
+   This powerful magical stone has been fractured, but its magic seems to be
+mostly intact. You could use this to build a tower of sorcery:
+Build (requires Architect): fracturedtower
+~
+3 e a 1
+0 0 0
+1 0
+S
+#10991
+spore strange~
+a strange spore~
+A strange spore floats on the breeze.~
+This little spore can be used to grow a great mushroom house.
+Build: mushroomhouse
+~
+3 g a 1
+0 0 0
+7 0
+S
+#10992
+keys magicycle~
+the keys to the magicycle~
+The keys to the magicycle are here.~
+   These keys operate a magicycle -- a small flying vehicle animated by magic.
+Of course, you'll have to build one first. Luckily, the magic is in the keys.
+Manufacture: magicycle
+~
+3 0 a 1
+0 0 0
+2 0
+S
+#10993
+keys magicycle~
+the keys to the magicycle~
+The keys to the magicycle are here.~
+   These keys operate a magicycle -- a small flying vehicle animated by magic.
+Of course, you'll have to build one first. Luckily, the magic is in the keys.
+Manufacture: magicycle
+~
+3 0 a 2
+0 0 0
+2 0
+S
+#10998
+frog chocolate~
+a chocolate frog~
+A chocolate from is melting on the ground.~
+   This little piece of candy is made in the shape of the frog. Just don't look
+too closely, because it still seems to be moving.
+~
+6 p a 1
+2 0 0
+7 4
+C
+1 1
+S
 $
