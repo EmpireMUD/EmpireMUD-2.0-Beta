@@ -936,6 +936,13 @@ if %self.vnum% == 10983 || %self.vnum% == 10984
 end
 nop %instance.set_location(%instance.real_location%)%
 %at% %instance.real_location% %load% obj 10980 room
+set char %self.room.people%
+while %char%
+  if %char.is_pc% && %char.empire%
+    nop %char.empire.start_progress(10980)%
+  end
+  set char %char.next_in_room%
+done
 ~
 #10984
 Hostile Spellcaster Reaction~
