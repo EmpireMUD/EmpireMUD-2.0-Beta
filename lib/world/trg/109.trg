@@ -905,34 +905,45 @@ Spellcaster delayed despawn~
 %adventurecomplete%
 ~
 #10983
-Teen Witch death~
+Renegade Spellcaster death~
 0 f 100
 ~
-set other_witch %instance.mob(10983)%
-if !%other_witch%
-  set other_witch %instance.mob(10984)%
-end
-if %other_witch%
-  nop %other_witch.remove_mob_flag(!LOOT)%
-end
-set victim %self.room.people%
-set spell_broken 0
-if %victim.morph% == 10992
-  if !%spell_broken%
-    %echo% As %self.name% dies, her spell is broken!
+* Teen Witch stuff
+if %self.vnum% == 10983 || %self.vnum% == 10984
+  set other_witch %instance.mob(10983)%
+  if !%other_witch%
+    set other_witch %instance.mob(10984)%
   end
-  set spell_broken 1
-  set prev_name %victim.name%
-  morph %victim% normal
-  %echoaround% %victim% %prev_name% suddenly turns into %victim.name%!
-  %send% %victim% You suddenly return to your normal form!
-  dg_affect #10992 %victim% off
+  if %other_witch%
+    nop %other_witch.remove_mob_flag(!LOOT)%
+  end
+  set victim %self.room.people%
+  while %victim%
+    set spell_broken 0
+    if %victim.morph% == 10992
+      if !%spell_broken%
+        %echo% As %self.name% dies, %self.hisher% spell is broken!
+      end
+      set spell_broken 1
+      set prev_name %victim.name%
+      morph %victim% normal
+      %echoaround% %victim% %prev_name% suddenly turns into %victim.name%!
+      %send% %victim% You suddenly return to your normal form!
+      dg_affect #10992 %victim% off
+    end
+    set victim %victim.next_in_room%
+  done
 end
+nop %instance.set_location(%instance.real_location%)%
+%at% %instance.real_location% %load% obj 10980 room
 ~
 #10984
 Hostile Spellcaster Reaction~
 0 e 1
 you~
+if %actor.is_npc%
+  halt
+end
 wait 1
 switch %self.vnum%
   case 10981
@@ -951,6 +962,13 @@ done
 wait 2 sec
 nop %self.add_mob_flag(AGGR)%
 detach 10984 %self.id%
+set other_witch %instance.mob(10983)%
+if !%other_witch%
+  set other_witch %instance.mob(10984)%
+end
+if %other_witch%
+  nop %other_witch.add_mob_flag(AGGR)%
+end
 ~
 #10985
 Rogue Wizard: Portal Attack~
@@ -1306,7 +1324,7 @@ end
 ~
 #10998
 Mother's grimoire emotes~
-0 bw 10
+0 btw 10
 ~
 if !%self.master%
   halt
