@@ -549,7 +549,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_LIGHTER: {
-			msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(obj));
+			if (GET_LIGHTER_USES(obj) == UNLIMITED) {
+				msg_to_char(ch, "Lighter uses: unlimited\r\n");
+			}
+			else {
+				msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(obj));
+			}
 			break;
 		}
 		case ITEM_MINIPET: {

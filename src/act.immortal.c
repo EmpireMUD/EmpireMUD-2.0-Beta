@@ -5032,7 +5032,12 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_LIGHTER: {
-			msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(j));
+			if (GET_LIGHTER_USES(j) == UNLIMITED) {
+				msg_to_char(ch, "Lighter uses: unlimited\r\n");
+			}
+			else {
+				msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(j));
+			}
 			break;
 		}
 		case ITEM_MINIPET: {
