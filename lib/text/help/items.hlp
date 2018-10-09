@@ -639,6 +639,29 @@ You can craft basic ropes from plant fiber or small pieces of leather.
 
 See also: COMPONENT, CRAFT, MANUFACTURE
 #
+SAPLING SAPLINGS "SAPLING COMPONENT"
+
+Sapling (component)
+
+Used for:  building, crafting
+
+Saplings are young, straight trees with very few branches. This makes them
+perfect for making handles, shafts, and arrows. They are also used to make
+many simple buildings.
+
+The best ways to get saplings are:
+ chopping a copse
+ scraping or sawing trees (rare result)
+ gathering in a forest (rare result)
+
+Common types of sapling are:
+ large shoot (basic)
+ green sapling (temperate, basic)
+ thorny sapling (desert, basic)
+ reaching sapling (tropical, basic)
+
+See also: COMPONENT, GATHER, SCRAPE, SAW, COPSE
+#
 STORE STORAGE
 
 Usage:  store <item>
