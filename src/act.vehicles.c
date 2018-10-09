@@ -1054,7 +1054,10 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (lighter ? "uses $p to light" : "lights"));
 		act(buf, FALSE, ch, lighter, veh, TO_ROOM);
 		start_vehicle_burning(veh);
-		used_lighter(ch, lighter);
+		
+		if (lighter) {
+			used_lighter(ch, lighter);
+		}
 		
 		if (VEH_OWNER(veh)) {
 			add_offense(VEH_OWNER(veh), OFFENSE_BURNED_VEHICLE, ch, IN_ROOM(ch), offense_was_seen(ch, VEH_OWNER(veh), IN_ROOM(veh)) ? OFF_SEEN : NOBITS);

@@ -1078,7 +1078,7 @@ void use_minipet_obj(char_data *ch, obj_data *obj) {
 * @return bool TRUE if the item was used up and purged; FALSE if the item was not purged.
 */
 bool used_lighter(char_data *ch, obj_data *obj) {
-	if (!IS_LIGHTER(obj)) {
+	if (!obj || !IS_LIGHTER(obj)) {
 		return FALSE;	// not even a lighter
 	}
 	
@@ -4976,8 +4976,11 @@ ACMD(do_light) {
 		empty_obj_before_extract(obj);
 		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
 		extract_obj(obj);
-		used_lighter(ch, lighter);
 		command_lag(ch, WAIT_OTHER);
+		
+		if (lighter) {
+			used_lighter(ch, lighter);
+		}
 	}
 }
 
