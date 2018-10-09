@@ -1151,13 +1151,13 @@ else
   %send% %actor% &rA swirling dust devil abruptly envelops you and hurls you into the air!
   %echoaround% %actor% A swirling dust devil abruptly envelops %actor.name% and hurls %actor.himher% into the air!
   %damage% %actor% 50 magical
-  dg_affect #10990 %actor.name% HARD-STUNNED on 10
+  dg_affect #10990 %actor% HARD-STUNNED on 10
   wait 5 sec
   if %actor.affect(10990)%
     %echo% %self.name% slams %self.hisher% fist into the earth!
     %send% %actor% &rA gust of wind suddenly hurls you downward!
     %echoaround% %actor% %actor.name% is abruptly hurled downward!
-    dg_affect #10990 %actor.name% off
+    dg_affect #10990 %actor% off
     %damage% %actor% 100 physical
   end
   dg_affect #10982 %self% off
