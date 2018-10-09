@@ -794,6 +794,7 @@ void free_char(char_data *ch) {
 	struct player_slash_history *slash_hist, *next_slash_hist;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct minipet_data *mini, *next_mini;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
 	struct player_tech *ptech;
@@ -982,6 +983,10 @@ void free_char(char_data *ch) {
 			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
 			free(pcd);
 		}
+		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
+			HASH_DEL(GET_MINIPETS(ch), mini);
+			free(mini);
+		}
 		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
 			HASH_DEL(GET_MOUNT_LIST(ch), mount);
 			free(mount);
@@ -1018,6 +1023,9 @@ void free_char(char_data *ch) {
 	}
 	if (ch->player.long_descr && (!proto || ch->player.long_descr != proto->player.long_descr)) {
 		free(ch->player.long_descr);
+	}
+	if (ch->player.look_descr && (!proto || ch->player.look_descr != proto->player.look_descr)) {
+		free(ch->player.look_descr);
 	}
 	if (ch->proto_script && (!proto || ch->proto_script != proto->proto_script)) {
 		free_proto_scripts(&ch->proto_script);
@@ -1114,6 +1122,7 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
+	void add_minipet(char_data *ch, any_vnum vnum);
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
@@ -1463,10 +1472,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "Description:", length)) {
-					if (GET_LONG_DESC(ch)) {
-						free(GET_LONG_DESC(ch));
+					if (GET_LOOK_DESC(ch)) {
+						free(GET_LOOK_DESC(ch));
 					}
-					GET_LONG_DESC(ch) = fread_string(fl, error);
+					GET_LOOK_DESC(ch) = fread_string(fl, error);
 				}
 				else if (PFILE_TAG(line, "Disguised Name:", length)) {
 					if (GET_DISGUISED_NAME(ch)) {
@@ -1615,6 +1624,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Last Tip:", length)) {
 					GET_LAST_TIP(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Last Vehicle:", length)) {
+					GET_LAST_VEHICLE(ch) = atoi(line + length + 1);
+				}
 				else if (PFILE_TAG(line, "Last Room:", length)) {
 					GET_LAST_ROOM(ch) = atoi(line + length + 1);
 				}
@@ -1689,6 +1701,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
 						GET_MAX_POOL(ch, num) = i_in[0];
+					}
+				}
+				else if (PFILE_TAG(line, "Mini-pet:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						add_minipet(ch, i_in[0]);
 					}
 				}
 				else if (PFILE_TAG(line, "Morph:", length)) {
@@ -2229,6 +2246,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
+	struct minipet_data *mini, *next_mini;
 	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
@@ -2412,8 +2430,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// 'D'
 	fprintf(fl, "Daily Cycle: %d\n", GET_DAILY_CYCLE(ch));
 	fprintf(fl, "Daily Quests: %d\n", GET_DAILY_QUESTS(ch));
-	if (GET_LONG_DESC(ch)) {
-		strcpy(temp, NULLSAFE(GET_LONG_DESC(ch)));
+	if (GET_LOOK_DESC(ch)) {
+		strcpy(temp, NULLSAFE(GET_LOOK_DESC(ch)));
 		strip_crlf(temp);
 		fprintf(fl, "Description:\n%s~\n", temp);
 	}
@@ -2478,6 +2496,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_LAST_TIP(ch)) {
 		fprintf(fl, "Last Tip: %d\n", GET_LAST_TIP(ch));
 	}
+	if ((IN_ROOM(ch) && GET_SITTING_ON(ch)) || (!IN_ROOM(ch) && GET_LAST_VEHICLE(ch) != NOTHING)) {
+		fprintf(fl, "Last Vehicle: %d\n", IN_ROOM(ch) ? VEH_VNUM(GET_SITTING_ON(ch)) : GET_LAST_VEHICLE(ch));
+	}
 	fprintf(fl, "Last Offense: %ld\n", GET_LAST_OFFENSE_SEEN(ch));
 	if (GET_LASTNAME(ch)) {
 		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
@@ -2494,6 +2515,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_MAPSIZE(ch)) {
 		fprintf(fl, "Mapsize: %d\n", GET_MAPSIZE(ch));
+	}
+	HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
+		fprintf(fl, "Mini-pet: %d\n", mini->vnum);
 	}
 	if (IS_MORPHED(ch)) {
 		fprintf(fl, "Morph: %d\n", MORPH_VNUM(GET_MORPH(ch)));
@@ -3287,6 +3311,7 @@ void clear_player(char_data *ch) {
 	GET_LAST_TELL(ch) = NOBODY;
 	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
+	GET_LAST_VEHICLE(ch) = NOTHING;
 }
 
 
@@ -3402,6 +3427,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void apply_all_ability_techs(char_data *ch);
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
+	void check_minipets(char_data *ch);
 	void clean_lore(char_data *ch);
 	void clean_player_kills(char_data *ch);
 	extern room_data *find_home(char_data *ch);
@@ -3409,6 +3435,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void give_level_zero_abilities(char_data *ch);
 	void refresh_all_quests(char_data *ch);
 	void reset_combat_meters(char_data *ch);
+	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -3419,6 +3446,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
 	player_index_data *index;
+	vehicle_data *veh;
 	empire_data *emp;
 	int iter, duration;
 	
@@ -3650,6 +3678,17 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
 		}
 	}
+	
+	// attempt to put them back in a vehicle
+	if (GET_LAST_VEHICLE(ch) != NOTHING) {
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && validate_sit_on_vehicle(ch, veh, FALSE)) {
+				sit_on_vehicle(ch, veh);
+				GET_POS(ch) = POS_SITTING;
+				break;	// only need 1
+			}
+		}
+	}
 
 	// script/trigger stuff
 	greet_mtrigger(ch, NO_DIR);
@@ -3665,6 +3704,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	refresh_all_quests(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);
+	check_minipets(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
@@ -3810,6 +3850,7 @@ void init_player(char_data *ch) {
 	set_title(ch, NULL);
 	ch->player.short_descr = NULL;
 	ch->player.long_descr = NULL;
+	ch->player.look_descr = NULL;
 	GET_PROMPT(ch) = NULL;
 	GET_FIGHT_PROMPT(ch) = NULL;
 	POOFIN(ch) = NULL;

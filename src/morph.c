@@ -48,6 +48,7 @@ extern const char *apply_types[];
 extern const char *mob_move_types[];
 extern const char *morph_flags[];
 extern const char *pool_types[];
+extern const char *size_types[];
 
 // external funcs
 extern struct resource_data *copy_resource_list(struct resource_data *input);
@@ -387,6 +388,11 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!MORPH_LOOK_DESC(morph) || !*MORPH_LOOK_DESC(morph)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "No look description");
+		problem = TRUE;
+	}
+	
 	for (app = MORPH_APPLIES(morph); app; app = app->next) {
 		if (app->location == APPLY_NONE || app->weight == 0) {
 			olc_audit_msg(ch, MORPH_VNUM(morph), "Invalid apply: %d to %s", app->weight, apply_types[app->location]);
@@ -588,6 +594,7 @@ void clear_morph(morph_data *morph) {
 	MORPH_ABILITY(morph) = NO_ABIL;
 	MORPH_REQUIRES_OBJ(morph) = NOTHING;
 	MORPH_ATTACK_TYPE(morph) = TYPE_HIT;
+	MORPH_SIZE(morph) = SIZE_NORMAL;
 }
 
 
@@ -609,6 +616,9 @@ void free_morph(morph_data *morph) {
 	}
 	if (MORPH_LONG_DESC(morph) && (!proto || MORPH_LONG_DESC(morph) != MORPH_LONG_DESC(proto))) {
 		free(MORPH_LONG_DESC(morph));
+	}
+	if (MORPH_LOOK_DESC(morph) && (!proto || MORPH_LOOK_DESC(morph) != MORPH_LOOK_DESC(proto))) {
+		free(MORPH_LOOK_DESC(morph));
 	}
 	
 	if (MORPH_APPLIES(morph) && (!proto || MORPH_APPLIES(morph) != MORPH_APPLIES(proto))) {
@@ -652,10 +662,14 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 	MORPH_SHORT_DESC(morph) = fread_string(fl, error);
 	MORPH_LONG_DESC(morph) = fread_string(fl, error);
 	
-	// 4. flags attack-type move-type max-level affects
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], str_in2) != 5) {
-		log("SYSERR: Format error in line 4 of %s", error);
-		exit(1);
+	// 4. flags attack-type move-type max-level affects [size]
+	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %s %d", str_in, &int_in[0], &int_in[1], &int_in[2], str_in2, &int_in[3]) != 6) {
+		int_in[3] = SIZE_NORMAL;	// backward-compatible
+		
+		if (sscanf(line, "%s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], str_in2) != 5) {
+			log("SYSERR: Format error in line 4 of %s", error);
+			exit(1);
+		}
 	}
 	
 	MORPH_FLAGS(morph) = asciiflag_conv(str_in);
@@ -663,6 +677,7 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 	MORPH_MOVE_TYPE(morph) = int_in[1];
 	MORPH_MAX_SCALE(morph) = int_in[2];
 	MORPH_AFFECTS(morph) = asciiflag_conv(str_in2);
+	MORPH_SIZE(morph) = int_in[3];
 	
 	// 5. cost-type cost-amount ability requires-obj
 	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
@@ -684,6 +699,10 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 		switch (*line) {
 			case 'A': {	// applies
 				parse_apply(fl, &MORPH_APPLIES(morph), error);
+				break;
+			}
+			case 'D': { // look desc
+				MORPH_LOOK_DESC(morph) = fread_string(fl, error);
 				break;
 			}
 						
@@ -743,16 +762,23 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_LONG_DESC(morph)));
 	
-	// 4. flags attack-type move-type max-level affs
+	// 4. flags attack-type move-type max-level affs size
 	strcpy(temp, bitv_to_alpha(MORPH_FLAGS(morph)));
 	strcpy(temp2, bitv_to_alpha(MORPH_AFFECTS(morph)));
-	fprintf(fl, "%s %d %d %d %s\n", temp, MORPH_ATTACK_TYPE(morph), MORPH_MOVE_TYPE(morph), MORPH_MAX_SCALE(morph), temp2);
+	fprintf(fl, "%s %d %d %d %s %d\n", temp, MORPH_ATTACK_TYPE(morph), MORPH_MOVE_TYPE(morph), MORPH_MAX_SCALE(morph), temp2, MORPH_SIZE(morph));
 	
 	// 5. cost-type cost-amount ability requires-obj
 	fprintf(fl, "%d %d %d %d\n", MORPH_COST_TYPE(morph), MORPH_COST(morph), MORPH_ABILITY(morph), MORPH_REQUIRES_OBJ(morph));
 	
 	// 'A': applies
 	write_applies_to_file(fl, MORPH_APPLIES(morph));
+	
+	// D: look desc
+	if (MORPH_LOOK_DESC(morph) && *MORPH_LOOK_DESC(morph)) {
+		strcpy(temp, MORPH_LOOK_DESC(morph));
+		strip_crlf(temp);
+		fprintf(fl, "D\n%s~\n", temp);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -855,6 +881,9 @@ void save_olc_morph(descriptor_data *desc) {
 	if (MORPH_LONG_DESC(proto)) {
 		free(MORPH_LONG_DESC(proto));
 	}
+	if (MORPH_LOOK_DESC(proto)) {
+		free(MORPH_LOOK_DESC(proto));
+	}
 	free_apply_list(MORPH_APPLIES(proto));
 	
 	// sanity
@@ -875,6 +904,10 @@ void save_olc_morph(descriptor_data *desc) {
 			free(MORPH_LONG_DESC(morph));
 		}
 		MORPH_LONG_DESC(morph) = str_dup(default_morph_long_desc);
+	}
+	if (MORPH_LOOK_DESC(morph) && !*MORPH_LOOK_DESC(morph)) {
+		free(MORPH_LOOK_DESC(morph));
+		MORPH_LOOK_DESC(morph) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -915,6 +948,7 @@ morph_data *setup_olc_morph(morph_data *input) {
 		MORPH_KEYWORDS(new) = MORPH_KEYWORDS(input) ? str_dup(MORPH_KEYWORDS(input)) : NULL;
 		MORPH_SHORT_DESC(new) = MORPH_SHORT_DESC(input) ? str_dup(MORPH_SHORT_DESC(input)) : NULL;
 		MORPH_LONG_DESC(new) = MORPH_LONG_DESC(input) ? str_dup(MORPH_LONG_DESC(input)) : NULL;
+		MORPH_LOOK_DESC(new) = MORPH_LOOK_DESC(input) ? str_dup(MORPH_LOOK_DESC(input)) : NULL;
 		
 		// copy lists
 		MORPH_APPLIES(new) = copy_apply_list(MORPH_APPLIES(input));
@@ -954,7 +988,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Keywords: \tc%s\t0, Short desc: \ty%s\t0\r\n", MORPH_VNUM(morph), MORPH_KEYWORDS(morph), MORPH_SHORT_DESC(morph));
-	size += snprintf(buf + size, sizeof(buf) - size, "L-Desc: \ty%s\t0\r\n", MORPH_LONG_DESC(morph));
+	size += snprintf(buf + size, sizeof(buf) - size, "L-Desc: \ty%s\t0\r\n%s", MORPH_LONG_DESC(morph), NULLSAFE(MORPH_LOOK_DESC(morph)));
 	
 	snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
 	if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
@@ -966,7 +1000,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%s\t0, Move type: \ty%s\t0\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name, mob_move_types[MORPH_MOVE_TYPE(morph)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%s\t0, Move type: \ty%s\t0, Size: \ty%s\t0\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name, mob_move_types[MORPH_MOVE_TYPE(morph)], size_types[MORPH_SIZE(morph)]);
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
@@ -1011,12 +1045,14 @@ void olc_show_morph(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(MORPH_KEYWORDS(morph), default_morph_keywords), NULLSAFE(MORPH_KEYWORDS(morph)));
 	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(MORPH_SHORT_DESC(morph), default_morph_short_desc), NULLSAFE(MORPH_SHORT_DESC(morph)));
 	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s\r\n", OLC_LABEL_STR(MORPH_LONG_DESC(morph), default_morph_long_desc), NULLSAFE(MORPH_LONG_DESC(morph)));
+	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_PTR(MORPH_LOOK_DESC(morph)), NULLSAFE(MORPH_LOOK_DESC(morph)));
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MORPH_ATTACK_TYPE(morph), 0), attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MORPH_MOVE_TYPE(morph), 0), mob_move_types[MORPH_MOVE_TYPE(morph)]);
+	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(MORPH_SIZE(morph), SIZE_NORMAL), size_types[MORPH_SIZE(morph)]);
 
 	sprintbit(MORPH_AFFECTS(morph), affected_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(MORPH_AFFECTS(morph), NOBITS), lbuf);
@@ -1170,6 +1206,19 @@ OLC_MODULE(morphedit_longdesc) {
 }
 
 
+OLC_MODULE(morphedit_lookdescription) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "description for %s", MORPH_SHORT_DESC(morph));
+		start_string_editor(ch->desc, buf, &MORPH_LOOK_DESC(morph), MAX_PLAYER_DESCRIPTION, TRUE);
+	}
+}
+
+
 OLC_MODULE(morphedit_maxlevel) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	MORPH_MAX_SCALE(morph) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, MORPH_MAX_SCALE(morph));
@@ -1211,4 +1260,10 @@ OLC_MODULE(morphedit_requiresobject) {
 OLC_MODULE(morphedit_shortdesc) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	olc_process_string(ch, argument, "short description", &MORPH_SHORT_DESC(morph));
+}
+
+
+OLC_MODULE(morphedit_size) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	MORPH_SIZE(morph) = olc_process_type(ch, argument, "size", "size", size_types, MORPH_SIZE(morph));
 }

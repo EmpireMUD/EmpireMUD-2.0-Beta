@@ -38,6 +38,7 @@ extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *mob_custom_types[];
 extern const char *mob_move_types[];
 extern const char *name_sets[];
+extern const char *size_types[];
 
 // external funcs
 extern char **get_weapon_types_string();
@@ -119,6 +120,12 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not capitalized");
 		problem = TRUE;
 	}
+	
+	if (!GET_LOOK_DESC(mob) || !*GET_LOOK_DESC(mob)) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "No look description");
+		problem = TRUE;
+	}
+	
 	if (!is_adventure && GET_MAX_SCALE_LEVEL(mob) == 0) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "No maximum scale level on non-adventure mob");
 		problem = TRUE;
@@ -555,7 +562,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
 	int only_attack = NOTHING, only_move = NOTHING, only_nameset = NOTHING;
-	int count, lookup, only_level = NOTHING, only_sex = NOTHING;
+	int count, lookup, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING;
 	faction_data *only_fct = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
@@ -658,6 +665,13 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 				return;
 			}
 		}
+		else if (is_abbrev(type_arg, "-size")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_size = search_block(val_arg, size_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid size '%s'.\r\n", val_arg);
+				return;
+			}
+		}
 		else if (is_abbrev(type_arg, "-unflagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, action_bits, FALSE)) != NOTHING) {
@@ -708,6 +722,9 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		if (only_move != NOTHING && MOB_MOVE_TYPE(mob) != only_move) {
 			continue;
 		}
+		if (only_size != NOTHING && SET_SIZE(mob) != only_size) {
+			continue;
+		}
 		if (only_nameset != NOTHING && MOB_NAME_SET(mob) != only_nameset) {
 			continue;
 		}
@@ -733,7 +750,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && (!GET_LOOK_DESC(mob) || !multi_isname(find_keywords, GET_LOOK_DESC(mob))) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
 			continue;
 		}
 		
@@ -1001,6 +1018,9 @@ void save_olc_mobile(descriptor_data *desc) {
 			if (GET_LONG_DESC(mob_iter) == GET_LONG_DESC(proto)) {
 				GET_LONG_DESC(mob_iter) = GET_LONG_DESC(mob);
 			}
+			if (GET_LOOK_DESC(mob_iter) == GET_LOOK_DESC(proto)) {
+				GET_LOOK_DESC(mob_iter) = GET_LOOK_DESC(mob);
+			}
 
 			// update pointers
 			if (mob_iter->interactions == proto->interactions) {
@@ -1048,6 +1068,9 @@ void save_olc_mobile(descriptor_data *desc) {
 	}
 	if (GET_LONG_DESC(proto)) {
 		free(GET_LONG_DESC(proto));
+	}
+	if (GET_LOOK_DESC(proto)) {
+		free(GET_LOOK_DESC(proto));
 	}
 
 	while ((interact = proto->interactions)) {
@@ -1097,6 +1120,7 @@ char_data *setup_olc_mobile(char_data *input) {
 		GET_PC_NAME(new) = GET_PC_NAME(input) ? str_dup(GET_PC_NAME(input)) : NULL;
 		GET_SHORT_DESC(new) = GET_SHORT_DESC(input) ? str_dup(GET_SHORT_DESC(input)) : NULL;
 		GET_LONG_DESC(new) = GET_LONG_DESC(input) ? str_dup(GET_LONG_DESC(input)) : NULL;
+		GET_LOOK_DESC(new) = GET_LOOK_DESC(input) ? str_dup(GET_LOOK_DESC(input)) : NULL;
 
 		// copy scripts
 		SCRIPT(new) = NULL;
@@ -1151,6 +1175,7 @@ void olc_show_mobile(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_PC_NAME(mob), default_mob_keywords), GET_PC_NAME(mob));
 	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_SHORT_DESC(mob), default_mob_short), GET_SHORT_DESC(mob));
 	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_LONG_DESC(mob), default_mob_long), GET_LONG_DESC(mob));
+	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_PTR(GET_LOOK_DESC(mob)), NULLSAFE(GET_LOOK_DESC(mob)));
 	
 	sprintf(buf + strlen(buf), "<%ssex\t0> %s\r\n", OLC_LABEL_VAL(GET_SEX(mob), 0), genders[GET_SEX(mob)]);
 	
@@ -1176,6 +1201,7 @@ void olc_show_mobile(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), TYPE_HIT), attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
+	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
 	sprintf(buf + strlen(buf), "<%snameset\t0> %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)]);
 	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
@@ -1279,6 +1305,19 @@ OLC_MODULE(medit_longdescription) {
 }
 
 
+OLC_MODULE(medit_lookdescription) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "description for %s", GET_SHORT_DESC(mob));
+		start_string_editor(ch->desc, buf, &GET_LOOK_DESC(mob), MAX_PLAYER_DESCRIPTION, TRUE);
+	}
+}
+
+
 OLC_MODULE(medit_maxlevel) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);	
 	GET_MAX_SCALE_LEVEL(mob) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_MAX_SCALE_LEVEL(mob));
@@ -1318,4 +1357,10 @@ OLC_MODULE(medit_sex) {
 OLC_MODULE(medit_short_description) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	olc_process_string(ch, argument, "short description", &GET_SHORT_DESC(mob));
+}
+
+
+OLC_MODULE(medit_size) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+	SET_SIZE(mob) = olc_process_type(ch, argument, "size", "size", size_types, SET_SIZE(mob));
 }

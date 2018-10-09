@@ -45,7 +45,7 @@ Chip (Primitive Crafts ability)
 Usage:  chip <item>
 Speed boosts:  Faster Chores bonus
 
-This lets you chip a rock down to a sharper, more refined tool. You need to be
+This lets you chip a flint down to a sharper, more refined tool. You need to be
 wielding a rock or other hammer to do this.
 
 If you keep chipping, you can make a handaxe. You can chip this again to make
@@ -145,15 +145,21 @@ building.
 
 See also: BUILD, NODISMANTLE
 #
-FLINT "FLINT SET"
+"FIRE STICKS" FIRESTICKS "FIRE DRILL" "FIRESTEEL TINDERBOX" TINDERBOX "FLINT SET" LIGHTERS
 
-Flint can be combined with rocks (using CRAFT) to create a flint set, which
-can then be used to light torches.
+Items that light fires:
+  fire sticks (Primitive Crafts ability)
+  fire drill (Woodworking ability)
+  flintsteel tinderbox (Forge ability)
 
-Flint can be found by digging almost anywhere you could find rocks. It is
-somewhat less common than generic rocks, and counts as a rock component.
+Usage:  light <object>
 
-See also: DIG, LIGHT, ROCK COMPONENT
+You can craft fire sticks from simple plant material in order to create a quick
+fire lighter. These sticks are dry and can be rubbed together to generate heat.
+More advanced techniques can make a type of pump drill for lighting fires. A
+good blacksmith can also make a firesteel set that uses a flint to start fires.
+
+See also: GATHER, LIGHT
 #
 GATHER
 
@@ -226,18 +232,27 @@ Example:
 
 See also: BOARD, DRAG, HARNESS, HERD
 #
-LIGHT TORCH
+LIGHT BURN TORCH
 
-Usage:  light <item | vehicle>
+Usage:  light <item | vehicle | area>
+        burn <item | vehicle | area>
 
-To light something, you must have a flint set. You may light sticks to create
-torches. You can also light trees or logs to make camp fires. Dropping a torch
-(or lighting a fire) may burn down the building it's in, if it's unowned or you
-are at war with the owner.
+To light something, you must have fire sticks or some other lighter. You may
+light sticks to create torches. You can also light trees or logs to make camp
+fires. Dropping a torch (or lighting a fire) may burn down the building it's
+in, if it's unowned or you are at war with the owner.
+
+You can also burn the area (either with the word 'area' or with any keyword
+from the room title) to remove stumps and other features. This only works on
+certain terrain.
+
+Some lighters have a limited number of uses and will be thrown away afterwards.
+If you have marked a lighter 'keep', it won't be used (unless it has unlimited
+uses).
 
 You can also burn down some vehicles with the 'light' command.
 
-See also: COOKING FIRE, DOUSE, THROW
+See also: COOKING FIRE, DOUSE, THROW, LIGHTERS
 #
 MILK
 
@@ -290,6 +305,7 @@ See HELP IRON GUIDE for help getting started on mining and using iron.
 Types of mines:
   iron - very common
   copper - common
+  tin - uncommon
   silver - very uncommon
   gold - only found with Rare Metals
   nocturnium - only found with Rare Metals

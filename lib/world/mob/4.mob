@@ -3,7 +3,7 @@ deinonychus swift ferocious~
 a swift deinonychus~
 A ferocious deinonychus is stalking around!
 ~
-40 50 dejo 0
+40 50 dejo 0 3
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -13,7 +13,7 @@ liger swift gigantic~
 a swift liger~
 A gigantic liger is prowling around!
 ~
-40 50 dejo 0
+40 50 dejo 0 4
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -25,7 +25,7 @@ serpent giant swift~
 a swift giant serpent~
 A swift, giant serpent is coiled and ready to strike!
 ~
-40 50 dejo 0
+40 50 dejo 0 4
 0 0 5 7
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -35,7 +35,7 @@ stag swift majestic white~
 a swift white stag~
 A majestic white stag is standing before you!
 ~
-40 50 dejo 0
+40 50 dejo 0 4
 0 0 0 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -45,7 +45,7 @@ bear swift golden~
 a swift golden bear~
 A swift golden bear stands up and towers over you!
 ~
-40 50 dejo 0
+40 50 dejo 0 4
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -57,7 +57,7 @@ mirror image~
 a mirror image~
 A mirror image is standing here.
 ~
-0 0 bdhnqxDF cmG
+0 0 bdhnqxDF cmG 3
 0 0 0 7
 T 450
 T 9901

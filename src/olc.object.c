@@ -30,6 +30,7 @@
 */
 
 // externs
+extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *apply_type_names[];
 extern const char *apply_types[];
@@ -292,6 +293,20 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		case ITEM_WEALTH: {
 			if (GET_WEALTH_VALUE(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Wealth value not set");
+				problem = TRUE;
+			}
+			break;
+		}
+		case ITEM_LIGHTER: {
+			if (GET_LIGHTER_USES(obj) == 0) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Number of uses not set");
+				problem = TRUE;
+			}
+			break;
+		}
+		case ITEM_MINIPET: {
+			if (GET_MINIPET_VNUM(obj) == NOTHING || !mob_proto(GET_MINIPET_VNUM(obj))) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Mini-pet not set");
 				problem = TRUE;
 			}
 			break;
@@ -1357,6 +1372,13 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
+		for (gear = GET_GLOBAL_GEAR(glb); gear && !any; gear = gear->next) {
+			if (gear->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			}
+		}
 	}
 	
 	// mob interactions
@@ -1916,6 +1938,19 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_WEALTH: {
 			sprintf(storage + strlen(storage), "<%swealth\t0> %d\r\n", OLC_LABEL_VAL(GET_WEALTH_VALUE(obj), 0), GET_WEALTH_VALUE(obj));
 			sprintf(storage + strlen(storage), "<%sautomint\t0> %s\r\n", OLC_LABEL_VAL(GET_WEALTH_AUTOMINT(obj), 0), offon_types[GET_WEALTH_AUTOMINT(obj)]);
+			break;
+		}
+		case ITEM_LIGHTER: {
+			if (GET_LIGHTER_USES(obj) == UNLIMITED) {
+				sprintf(storage + strlen(storage), "<%suses\t0> unlimited\r\n", OLC_LABEL_VAL(GET_LIGHTER_USES(obj), 0));
+			}
+			else {
+				sprintf(storage + strlen(storage), "<%suses\t0> %d\r\n", OLC_LABEL_VAL(GET_LIGHTER_USES(obj), 0), GET_LIGHTER_USES(obj));
+			}
+			break;
+		}
+		case ITEM_MINIPET: {
+			sprintf(storage + strlen(storage), "<%sminipet\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MINIPET_VNUM(obj), NOTHING), GET_MINIPET_VNUM(obj), get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
 			break;
 		}
 		
@@ -2529,6 +2564,9 @@ OLC_MODULE(oedit_corpseof) {
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
 		}
+		else {
+			send_config_msg(ch, "ok_string");
+		}
 	}
 }
 
@@ -2667,6 +2705,43 @@ OLC_MODULE(oedit_maxlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
 	GET_OBJ_MAX_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
+}
+
+
+OLC_MODULE(oedit_minipet) {
+	extern bitvector_t default_minipet_flags, default_minipet_affs;
+	
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	mob_vnum old = GET_MINIPET_VNUM(obj);
+	char buf[MAX_STRING_LENGTH];
+	char_data *mob;
+	
+	if (!IS_MINIPET(obj)) {
+		msg_to_char(ch, "You can only set this on a MINIPET item.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = olc_process_number(ch, argument, "mini-pet", "minipet", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_MINIPET_VNUM));
+		if (!(mob = mob_proto(GET_MINIPET_VNUM(obj)))) {
+			GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = old;
+			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
+			return;
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
+		}
+		else {
+			send_config_msg(ch, "ok_string");
+		}
+		
+		if (!MOB_FLAGGED(mob, default_minipet_flags)) {
+			sprintbit(default_minipet_flags, action_bits, buf, TRUE);
+			msg_to_char(ch, "Warning: mob should have these flags: buf\r\n");
+		}
+		if (!AFF_FLAGGED(mob, default_minipet_affs)) {
+			sprintbit(default_minipet_affs, affected_bits, buf, TRUE);
+			msg_to_char(ch, "Warning: mob should have these affects: buf\r\n");
+		}
+	}
 }
 
 
@@ -3067,10 +3142,36 @@ OLC_MODULE(oedit_type) {
 				GET_OBJ_VAL(obj, VAL_POISON_AFFECT) = NOTHING;
 				break;
 			}
+			case ITEM_MINIPET: {
+				GET_OBJ_VAL(obj, VAL_MINIPET_VNUM) = NOTHING;
+				break;
+			}
 			default: {
 				break;
 			}
 		}
+	}
+}
+
+
+OLC_MODULE(oedit_uses) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (GET_OBJ_TYPE(obj) != ITEM_LIGHTER) {
+		msg_to_char(ch, "You can only set uses on a LIGHTER object.\r\n");
+	}
+	else if (is_abbrev(argument, "unlimited")) {
+		GET_OBJ_VAL(obj, VAL_LIGHTER_USES) = UNLIMITED;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It now has unlimited uses.\r\n");
+		}
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_LIGHTER_USES) = olc_process_number(ch, argument, "lighter uses", "uses", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_LIGHTER_USES));
 	}
 }
 

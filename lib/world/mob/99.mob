@@ -3,8 +3,11 @@ puppy adorable~
 an adorable puppy~
 An adorable puppy is whining at you.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
+D
+The puppy is bouncing around, clearly delighted by your attention.
+~
 M
 0
 $n wags $s tail and yips.~
@@ -25,8 +28,11 @@ kitten cute~
 a cute kitten~
 A cute kitten is winding its way between your legs.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
+D
+The kitten's tail switches gently to and fro as it returns your gaze.
+~
 M
 0
 $n mews plaintively.~
@@ -53,8 +59,11 @@ pixie tiny~
 a tiny pixie~
 A tiny pixie is flitting around.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 18 22
+D
+The pixie is wearing a tiny, colorfully embroidered gown!
+~
 M
 0
 $n twirls in the air like a ballerina.~
@@ -72,8 +81,11 @@ fawn tiny~
 a tiny fawn~
 A tiny fawn is staggering around.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 14 11
+D
+The fawn's spindly legs look way too long for its tiny body.
+~
 M
 0
 $n staggers around on its tiny little legs.~
@@ -94,8 +106,11 @@ cub bear~
 a bear cub~
 A bear cub is rearing up playfully.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
+D
+It looks just like a full-grown bear, but tiny and fluffy!
+~
 M
 0
 $n licks your hand.~
@@ -113,8 +128,11 @@ pup wolf~
 a wolf pup~
 A wolf pup is panting and wagging its tail.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
+D
+The wolf cub sits on its haunches, tail wagging, and stares back.
+~
 M
 0
 $n tries to howl, but it comes out as a squeak.~
@@ -135,8 +153,11 @@ hummingbird tame~
 a tame hummingbird~
 A tame hummingbird flits around you.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 26
+D
+Its wings are moving so fast you can't even see them!
+~
 M
 0
 $n hovers in front of your face for a moment, wings flapping furiously.~
@@ -154,8 +175,11 @@ butterfly colorful~
 a colorful butterfly~
 A colorful butterfly is fluttering around here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 18 22
+D
+Its tiny wings are spread wide, displaying beautiful patterns of vibrant color.
+~
 M
 0
 $n flaps its wings, and you wonder if $e's causing a storm on the other side of the world.~
@@ -179,8 +203,11 @@ cobra cuddly~
 a cuddly cobra~
 A cuddly cobra is winding itself around your leg.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 5 9
+D
+Don't worry. It's probably not poisonous.
+~
 M
 0
 $n hisses.~
@@ -195,8 +222,11 @@ bat bitsy~
 a bitsy bat~
 A bitsy bat is flapping around here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 9
+D
+This bat isn't much bigger than the insects it hunts!
+~
 M
 0
 $n makes an adorable squeaking noise.~
@@ -217,8 +247,11 @@ fish flying~
 a flying fish~
 A flying fish swims happily past you.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 6 9
+D
+Even upon closer inspection, you have no idea how the fish stays airborne.
+~
 M
 0
 $n blows a stream of bubbles.~
@@ -236,8 +269,11 @@ firefly friendly~
 a friendly firefly~
 A friendly firefly is flying happily around here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 6 22
+D
+The firefly keeps flashing at you. Maybe it's trying to communicate?
+~
 M
 0
 $n emits four short flashes, then a brief pause, then two more short flashes.~
@@ -267,8 +303,11 @@ spirit fire tame~
 a fire spirit~
 A tame fire spirit is blazing away here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 0
 0 0 2 16
+D
+The spirit is shaped like a tiny humanoid, with crackling flames for hair.
+~
 M
 0
 $n crackles and sparks.~
@@ -295,8 +334,11 @@ spirit ice tame~
 an ice spirit~
 A tame ice spirit is freezing the air here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 20
+D
+The spirit is shaped like a tiny humanoid, with spiky icicles for hair.
+~
 M
 0
 $n stares at you frostily.~
@@ -323,8 +365,11 @@ spirit storm tame~
 a storm spirit~
 A tame storm spirit is sparking and crackling here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 0
 0 0 2 21
+D
+The spirit is shaped like a tiny humanoid, with crackling lightning for hair.
+~
 M
 0
 $n crackles and sparks.~
@@ -354,8 +399,11 @@ spirit earth tame~
 an earth spirit~
 A tame earth spirit is levitating pebbles here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 5
+D
+The spirit is shaped like a tiny humanoid, with little stalactites for hair.
+~
 M
 0
 $n sits in silent concentration.~
@@ -379,8 +427,11 @@ spirit lost~
 a lost spirit~
 A lost spirit is wandering aimlessly here.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 0
 0 0 2 21
+D
+It just looks like a faintly glowing white blob with a long, trailing tail.
+~
 M
 0
 You wonder if $n would feel like a pillow if you could touch it.~
@@ -416,8 +467,11 @@ lizard little~
 a little lizard~
 A little lizard is scuttling around here.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 7 9
+D
+The little lizard's tiny scales are brightly colored.
+~
 M
 0
 $n stands still for a moment and starts doing push-ups.~
@@ -441,8 +495,11 @@ dwarf-kobold kobold~
 a dwarf-kobold~
 A dwarf-kobold brandishes its tiny scimitar at you!
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 11 1
+D
+It appears to be waylaying you and demanding your money.
+~
 M
 1
 Stand and deliver!~
@@ -469,8 +526,11 @@ bug cute~
 a cute bug~
 You have found a cute bug.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 8 9
+D
+You should probably report this adorable specimen.
+~
 M
 0
 $n starts flying around, then suddenly crashes.~
@@ -488,8 +548,12 @@ rock pet~
 a pet rock~
 A pet rock is sitting here.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 15 5
+D
+   It's an ordinary, common rock of the sort you find everywhere in the ground.
+You think.
+~
 M
 0
 You stare hard at $n, trying to figure out if it's moving.~
@@ -522,8 +586,11 @@ shrub animated cute little~
 an animated shrub~
 A cute little shrub is growing here.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 9 7
+D
+Is this shrub moving, or it just the wind?
+~
 M
 0
 $n waves happily at you.~
@@ -550,8 +617,11 @@ eye floating~
 a floating eye~
 A floating eye without a body is staring at you.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 27 20
+D
+The eye looks back at you.
+~
 M
 0
 $n blinks.~
@@ -575,8 +645,11 @@ bug prehistoric~
 a prehistoric bug~
 A prehistoric bug has been unearthed.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 15
+D
+It was fossilized in amber, but some recent change brought it to the surface!
+~
 M
 0
 $n starts flying around...~
@@ -600,8 +673,11 @@ beagle bald~
 a bald beagle~
 A bald beagle hops along the ground, trying to take flight.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 15 9
+D
+What made wizard created this adorable monstrosity?
+~
 M
 0
 $n tries to screech like an eagle, but it comes out as a high wine.~
@@ -616,8 +692,11 @@ snark great white~
 a great white snark~
 A great white snark drags itself slowly along the ground.
 ~
-1 1 bdoD n
+1 1 bdoD n 4
 0 0 17 9
+D
+Land sharks were a lot moor intimidating in your imagination.
+~
 M
 1
 Land sharks, the wizard said... What a grate idea, he said...~
@@ -641,8 +720,11 @@ Heisenbug notorious~
 the notorious Heisenbug~
 You have discovered the notorious Heisenbug!
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 8 9
+D
+You do not see that here.
+~
 T 9901
 T 9902
 T 9926

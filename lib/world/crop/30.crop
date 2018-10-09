@@ -1006,6 +1006,7 @@ D0
 iiii~
 &T~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 3046 20.00 2 H  # HARVEST: a sack of oats
 I 8 3046 20.00 3 H  # HARVEST: a sack of oats
 I 8 3046 20.00 4 H  # HARVEST: a sack of oats
@@ -1287,5 +1288,78 @@ M
 9025 5.00 bd
 M
 9020 5.00 bd
+S
+#3018
+calabash gourds~
+A Field of Calabash Gourds~
+13 1 ad
+0 100 0 100
+D0
+oooo~
+&g~
+I 6 3053 100.00 1  # FORAGE: a green calabash
+I 8 3054 100.00 2  # HARVEST: a sack of fresh calabash gourds
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9120 15.00 adg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+9153 10.00 d
+M
+9024 5.00 d
+M
+9023 10.00 d
+M
+9034 5.00 d
+M
+9133 10.00 ad
+M
+9116 5.00 ad
+M
+9022 20.00 ad
+M
+9032 10.00 bd
+M
+9031 10.00 bd
+M
+9030 10.00 bd
+M
+9029 10.00 bd
+M
+9025 5.00 bd
+M
+9011 10.00 bd
+M
+9021 10.00 bd
+M
+9020 5.00 bd
+M
+9154 5.00 bd
+M
+9152 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 10.00 bd
+M
+9004 10.00 bd
 S
 $

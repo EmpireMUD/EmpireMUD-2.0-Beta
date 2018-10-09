@@ -45,6 +45,7 @@
 *   Interaction Handlers
 *   Learned Craft Handlers
 *   Lore Handlers
+*   Mini-pet Handlers
 *   Mob Tagging Handlers
 *   Mount Handlers
 *   Object Handlers
@@ -1360,6 +1361,7 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 * @param char_data *ch The player to idle out.
 */
 void perform_idle_out(char_data *ch) {
+	extern bool dismiss_any_minipet(char_data *ch);
 	extern obj_data *player_death(char_data *ch);
 	
 	empire_data *emp = NULL;
@@ -1393,6 +1395,7 @@ void perform_idle_out(char_data *ch) {
 	}
 	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
+	dismiss_any_minipet(ch);
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
 	
@@ -4017,6 +4020,109 @@ void remove_lore_record(char_data *ch, struct lore_data *lore) {
 		free(lore->text);
 	}
 	free(lore);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MINI-PET HANDLERS ///////////////////////////////////////////////////////
+
+// for minipets/show minipets
+int sort_minipets(struct minipet_data *a, struct minipet_data *b) {
+	char_data *acr = mob_proto(a->vnum), *bcr = mob_proto(b->vnum);
+	
+	if (!acr || !bcr) {
+		return 0;
+	}
+	else {	// sort by 1st keyword
+		return strcmp(GET_PC_NAME(acr), GET_PC_NAME(bcr));
+	}
+}
+
+
+/**
+* Adds a minipet vnum to a player's list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The minipet vnum to learn.
+*/
+void add_minipet(char_data *ch, any_vnum vnum) {
+	struct minipet_data *mini;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_MINIPETS(ch), &vnum, mini);
+	if (!mini) {
+		CREATE(mini, struct minipet_data, 1);
+		mini->vnum = vnum;
+		HASH_ADD_INT(GET_MINIPETS(ch), vnum, mini);
+		HASH_SORT(GET_MINIPETS(ch), sort_minipets);
+	}
+}
+
+
+/**
+* Checks that all a player's minipets are valid.
+*
+* @param char_data *ch The player to check.
+*/
+void check_minipets(char_data *ch) {
+	void remove_minipet(char_data *ch, any_vnum vnum);
+	
+	struct minipet_data *mini, *next_mini;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+
+	HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
+		if (!mob_proto(mini->vnum)) {
+			remove_minipet(ch, mini->vnum);
+		}
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param any_vnum vnum The minipet vnum to check.
+* @return bool TRUE if the player has it.
+*/
+bool has_minipet(char_data *ch, any_vnum vnum) {
+	struct minipet_data *mini;
+	
+	if (IS_NPC(ch)) {
+		return TRUE;
+	}
+	
+	HASH_FIND_INT(GET_MINIPETS(ch), &vnum, mini);
+	
+	if (mini) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+
+/**
+* Removes a minipet vnum from a player's list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The minipet vnum to forget.
+*/
+void remove_minipet(char_data *ch, any_vnum vnum) {
+	struct minipet_data *mini;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_MINIPETS(ch), &vnum, mini);
+	if (mini) {
+		HASH_DEL(GET_MINIPETS(ch), mini);
+		free(mini);
+	}
 }
 
 

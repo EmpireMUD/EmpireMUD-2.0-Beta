@@ -2,7 +2,7 @@
 copper mine~
 1 c v 0 0-0
 E
-289 20.00
+289 30.00
 40 0 0
 I 13 165 100.00 1  # MINE: some copper ore
 S
@@ -37,6 +37,14 @@ E
 -1 1.50
 20 0 0
 I 13 164 100.00 1  # MINE: some imperium ore
+S
+#166
+tin mine~
+1 c v 0 0-0
+E
+289 15.00
+30 0 0
+I 13 166 100.00 1  # MINE: some tin ore
 S
 #199
 iron mine~

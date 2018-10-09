@@ -535,16 +535,16 @@ A scraggly mesquite tree is lying on the ground.~
    This rough, twisted wood has long spines on its branches. The wood has a
 fresh desert scent, and would be good for cooking meat.
 ~
-3 e a 8
+3 e a 9
 0 0 0
 0 0
 I 11 10145 100.00 1  # LIGHT: a mesquite fire
 I 17 10150 100.00 1  # SAW: some mesquite lumber
-I 17 121 20.00 1 s  # SAW: a stick
-I 17 121 20.00 2 s  # SAW: a stick
-I 17 121 20.00 3 s  # SAW: a stick
-I 17 121 20.00 4 s  # SAW: a stick
-I 17 121 20.00 5 s  # SAW: a stick
+I 17 132 20.00 1 s  # SAW: some thorny branches
+I 17 132 20.00 2 s  # SAW: some thorny branches
+I 17 132 20.00 3 s  # SAW: some thorny branches
+I 17 132 20.00 4 s  # SAW: some thorny branches
+I 17 132 20.00 5 s  # SAW: some thorny branches
 R
 5118 0
 S
@@ -688,10 +688,9 @@ entire cactus looks fluffy like a bear, and they're known to leave you with a
 bleed-over-time effect. Type 'use branch' to summon your teddybear cactus
 noncombat pet.
 ~
-3 p a 4
+19 p a 5
 10159 0 0
 2 0
-T 9900
 S
 #10160
 totem armadillo giant~

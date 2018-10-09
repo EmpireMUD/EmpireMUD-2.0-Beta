@@ -30,7 +30,7 @@ S
 #10965
 Kingdom of Giants~
    Clearing giants from our territory isn't enough. If our empire could learn
-the secrets of their massive architecture, it would bring us gigantic fame. 
+the secrets of their massive architecture, it would bring us gigantic fame.
 Acquire each of the three giant buildings: the causeway, the hovel, and the
 stone head.
 ~
@@ -42,5 +42,20 @@ W
 7 10974 0 1 a
 W
 7 10975 0 1 a
+S
+#10980
+Warlock Patrol~
+   Renegade spellcasters are on the loose. The empire has defeated one of them,
+but remain vigilant! They could return. Defeat the spellcasters and construct
+their unique buildings and vehicle, for the glory of the empire!
+~
+3 4 0 5 c
+K 7 5
+W
+8 10993 0 1 a
+W
+7 10991 0 1 a
+W
+7 10990 0 1 a
 S
 $

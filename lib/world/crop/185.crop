@@ -11,7 +11,7 @@ D0
 &G~
 I 6 18501 100.00 1  # FORAGE: a single papaya
 I 8 18500 100.00 1  # HARVEST: a basket of papayas
-I 9 121 100.00 1  # GATHER: a stick
+I 9 133 100.00 1  # GATHER: a tangle of vines
 I 20 128 100.00 1  # CHOP: a massive jungle tree
 M
 9061 0.01 d

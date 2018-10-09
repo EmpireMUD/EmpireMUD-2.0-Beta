@@ -3,7 +3,7 @@ tortoise atlasian giant inn turtle~
 an atlasian tortoise~
 A giant atlasian tortoise plods past, carrying an inn on its back.
 ~
-300 300 dky n
+300 300 dky n 6
 0 0 16 9
 T 18200
 T 18201
@@ -15,7 +15,7 @@ S
 #n~
 The tavern patron #n is carousing enthusiastically here.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 0 0 0 15
 M
 0
@@ -26,7 +26,7 @@ man waiting~
 a man waiting to fight~
 A man is waiting for his turn in the fight.
 ~
-200 250 bd n
+200 250 bd n 3
 1 0 0 15
 S
 #18204
@@ -34,7 +34,7 @@ leon~
 Leon~
 Leon is dusting off his fists.
 ~
-0 0 bdhyA G
+0 0 bdhyA G 3
 1 0 0 1
 M
 0
@@ -55,7 +55,7 @@ raffee~
 Raffee~
 Raffee is ignoring you as he prepares for his fight.
 ~
-0 0 bdhyA G
+0 0 bdhyA G 3
 1 0 0 3
 M
 0
@@ -76,7 +76,7 @@ donnet~
 Donnet~
 Donnet is whittling a large stick.
 ~
-0 0 bdhyA G
+0 0 bdhyA G 3
 1 0 0 5
 M
 0
@@ -97,7 +97,7 @@ meek langolo~
 Meek Langolo~
 Meek Langolo is showing off on the mat.
 ~
-0 0 bdhyA G
+0 0 bdhyA G 3
 1 0 0 11
 M
 0
@@ -118,7 +118,7 @@ S
 #n of Clan Helius~
 #n pours a thick, red vial into his cauldron.
 ~
-0 0 bd nD
+0 0 bd nD 3
 1 2 0 15
 F 18200
 M
@@ -145,7 +145,7 @@ S
 #n the Umbramancer~
 The shadows curl around #n, guild umbramancer.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 0 2 0 15
 F 18200
 M
@@ -169,7 +169,7 @@ S
 #n, guild Tinker~
 #n is working furiously at the tinker bench.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 0 1 0 15
 F 18200
 M
@@ -208,7 +208,7 @@ Nostrazak incautious dragon avatar~
 Nostrazak the Incautious~
 An avatar of Nostrazak looms over you, more dragon than man.
 ~
-0 0 bd nD
+0 0 bd nD 4
 1 0 0 15
 F 18200
 M
@@ -244,7 +244,7 @@ dwarf giant~
 the giant dwarf~
 A giant dwarf stands, arms crossed, in front of the door.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 15
 F 18200
 T 18212
@@ -254,7 +254,7 @@ S
 Fancy #n~
 Fancy #n stands here in a vest, hawking wares.
 ~
-100 150 bdv nD
+100 150 bdv nD 3
 0 0 0 19
 F 18200
 S
@@ -263,7 +263,7 @@ S
 #n the adventurer~
 #n walks along, wearing a heavy pack.
 ~
-100 150 dqv 0
+100 150 dqv 0 3
 0 0 0 1
 M
 1
@@ -286,7 +286,7 @@ guildmage mage #n~
 Guildmage #n~
 Guildmage #n stands at the window.
 ~
-100 150 bdqv e
+100 150 bdqv e 3
 0 2 0 19
 M
 0
@@ -325,7 +325,7 @@ S
 #n the librarian~
 #n is reshelving the disheveled books.
 ~
-100 150 bdqv e
+100 150 bdqv e 3
 0 0 0 5
 M
 1
@@ -346,7 +346,7 @@ superintendant #n~
 Superintendant #n~
 The superintendant is sitting at his desk.
 ~
-100 150 bdqv e
+100 150 bdqv e 3
 1 0 0 1
 M
 0
@@ -380,7 +380,7 @@ S
 #n the treasurer~
 #n is locking up a new treasure.
 ~
-100 150 bdqv e
+100 150 bdqv e 3
 0 1 0 4
 T 18218
 S
@@ -389,7 +389,7 @@ tortoise baby~
 a baby tortoise~
 A baby tortoise is munching around on the ground.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
 M
 0
@@ -411,7 +411,7 @@ tortoise ninja tiny~
 a tiny ninja tortoise~
 A tiny ninja tortoise is lurking nearby.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
 M
 0
@@ -436,7 +436,7 @@ dragon turtle~
 a dragon turtle~
 A dragon turtle clacks its beak and puffs smoke from its nostrils.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
 M
 0
@@ -458,7 +458,7 @@ monstrosity sanguine~
 a sanguine monstrosity~
 A sanguine monstrosity is dripping along the ground.
 ~
-100 125 de 0
+100 125 de 0 4
 0 0 10 27
 T 18240
 S
@@ -467,7 +467,7 @@ warg umbral~
 an umbral warg~
 An umbral warg stalks from shadow to shadow.
 ~
-100 125 de 0
+100 125 de 0 4
 0 0 9 9
 T 18240
 S
@@ -476,7 +476,7 @@ steed clockwork~
 a clockwork steed~
 A clockwork steed is munching on some rocks.
 ~
-100 125 de 0
+100 125 de 0 4
 0 0 12 9
 T 18240
 S
@@ -485,7 +485,7 @@ bear imperium-clad clad~
 an imperium-clad bear~
 An imperium-clad bear rears up on its hind legs!
 ~
-100 125 de 0
+100 125 de 0 4
 0 0 26 10
 T 18240
 S
@@ -494,7 +494,7 @@ patrons group~
 a group of patrons~
 A group of patrons is huddled over a table with dice and strange documents.
 ~
-0 0 bd nD
+0 0 bd nD 4
 0 0 0 15
 M
 0
@@ -526,7 +526,7 @@ Death patron tavern bony~
 Death~
 A bony tavern patron with a hooded cloak and scythe is sitting here.
 ~
-0 0 bd nD
+0 0 bd nD 3
 1 0 0 15
 M
 1
@@ -553,7 +553,7 @@ rat-man ratman~
 the rat-man~
 A rat-man in a robe is drowning his sorrows at the bar.
 ~
-0 0 bd nD
+0 0 bd nD 3
 1 0 0 15
 M
 0
@@ -579,7 +579,7 @@ stranger mysterious patron~
 a mysterious patron~
 A mysterious stranger in a hooded cloak is lurking in a dark corner.
 ~
-0 0 bd nD
+0 0 bd nD 3
 0 0 0 15
 M
 1
@@ -596,7 +596,7 @@ archsorcerer malfernes~
 Archsorcerer Malfernes~
 Archsorcerer Malfernes removes his cloak and hangs it in the air.
 ~
-0 0 bdvxzBE cnCE
+0 0 bdvxzBE cnCE 3
 1 0 0 22
 T 18296
 S
@@ -605,7 +605,7 @@ dragon fearsome~
 a fearsome dragon~
 A fearsome dragon coils through the halls and archways of the tower!
 ~
-0 200 dghnxA choBCDEG
+0 200 dghnxA choBCDEG 5
 0 0 5 16
 I 4 18284 33.34 1 a  # LOOT: an imaginary whistle
 I 4 18285 33.33 1 a  # LOOT: an imaginary egg
@@ -632,7 +632,7 @@ dragon imaginary~
 an imaginary dragon~
 An imaginary dragon is (or isn't) flitting about.
 ~
-100 125 de m
+100 125 de m 5
 0 0 2 10
 S
 #18285
@@ -640,7 +640,7 @@ dragonling imaginary~
 an imaginary dragonling~
 An imaginary dragonling might be flying around above your head.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
 M
 0
@@ -671,7 +671,7 @@ planter~
 the dragon tree planter~
 The dragon tree planter is supposed to be invisible.
 ~
-0 0 d dkln
+0 0 d dkln 3
 0 0 0 15
 T 18291
 S
@@ -680,7 +680,7 @@ tree spirit~
 the spirit of the tree~
 The spirit of the tree floats nearby.
 ~
-25 50 bdo n
+25 50 bdo n 0
 0 0 0 15
 T 18287
 S
@@ -689,7 +689,7 @@ dragon pen~
 a pen dragon~
 A pen dragon flies around, trailing a stream of black ink.
 ~
-100 200 djoxA cm
+100 200 djoxA cm 5
 0 0 2 27
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 I 1 10006 50.00 1  # SKIN: a dragon scale
@@ -700,7 +700,7 @@ dragon dungeon~
 a dungeon dragon~
 A dungeon dragon has gotten free!
 ~
-100 200 djoxA cm
+100 200 djoxA cm 5
 0 0 2 27
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 I 1 10006 50.00 1  # SKIN: a dragon scale
@@ -711,7 +711,7 @@ dragon luck little~
 a little luck dragon~
 A little luck dragon twists and turns through the air.
 ~
-100 200 djoxA cm
+100 200 djoxA cm 2
 0 0 2 27
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 I 1 10006 50.00 1  # SKIN: a dragon scale

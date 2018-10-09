@@ -43,6 +43,7 @@
 // external vars
 extern struct message_list fight_messages[MAX_MESSAGES];
 extern const double hit_per_dex;
+extern struct character_size_data size_data[];
 
 // external funcs
 ACMD(do_flee);
@@ -1480,14 +1481,21 @@ void drop_loot(char_data *mob, char_data *killer) {
 obj_data *make_corpse(char_data *ch) {	
 	char shortdesc[MAX_INPUT_LENGTH], longdesc[MAX_INPUT_LENGTH], kws[MAX_INPUT_LENGTH];
 	obj_data *corpse, *o, *next_o;
-	int i;
+	int i, size;
 	bool human = (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_HUMAN));
 
 	corpse = read_object(o_CORPSE, TRUE);
+	size = GET_SIZE(ch);
 	
 	// store as person's last corpse id
 	if (!IS_NPC(ch)) {
 		GET_LAST_CORPSE_ID(ch) = obj_script_id(corpse);
+	}
+	else {	// mob corpse setup
+		if (!size_data[size].can_take_corpse) {
+			REMOVE_BIT(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
+		}
+		SET_BIT(GET_OBJ_EXTRA(corpse), size_data[size].corpse_flags);
 	}
 	
 	// binding
@@ -1499,15 +1507,15 @@ obj_data *make_corpse(char_data *ch) {
 	}
 	
 	if (human) {
-		sprintf(kws, "corpse body %s", skip_filler(PERS(ch, ch, FALSE)));
+		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
 		sprintf(shortdesc, "%s's body", PERS(ch, ch, FALSE));
-		snprintf(longdesc, sizeof(longdesc), "%s's body is lying here.", PERS(ch, ch, FALSE));
+		snprintf(longdesc, sizeof(longdesc), size_data[size].body_long_desc, PERS(ch, ch, FALSE));
 		CAP(longdesc);
 	}
 	else {
-		sprintf(kws, "corpse body %s", skip_filler(PERS(ch, ch, FALSE)));
+		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
 		sprintf(shortdesc, "the corpse of %s", PERS(ch, ch, FALSE));
-		snprintf(longdesc, sizeof(longdesc), "%s's corpse is festering on the ground.", PERS(ch, ch, FALSE));
+		snprintf(longdesc, sizeof(longdesc), size_data[size].corpse_long_desc, PERS(ch, ch, FALSE));
 		CAP(longdesc);
 	}
 	

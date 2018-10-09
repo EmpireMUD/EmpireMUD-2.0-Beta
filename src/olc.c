@@ -248,12 +248,14 @@ OLC_MODULE(medit_flags);
 OLC_MODULE(medit_interaction);
 OLC_MODULE(medit_keywords);
 OLC_MODULE(medit_longdescription);
+OLC_MODULE(medit_lookdescription);
 OLC_MODULE(medit_maxlevel);
 OLC_MODULE(medit_minlevel);
 OLC_MODULE(medit_movetype);
 OLC_MODULE(medit_nameset);
 OLC_MODULE(medit_script);
 OLC_MODULE(medit_sex);
+OLC_MODULE(medit_size);
 OLC_MODULE(medit_short_description);
 
 // map modules
@@ -288,10 +290,12 @@ OLC_MODULE(morphedit_costtype);
 OLC_MODULE(morphedit_flags);
 OLC_MODULE(morphedit_keywords);
 OLC_MODULE(morphedit_longdesc);
+OLC_MODULE(morphedit_lookdescription);
 OLC_MODULE(morphedit_maxlevel);
 OLC_MODULE(morphedit_movetype);
 OLC_MODULE(morphedit_requiresobject);
 OLC_MODULE(morphedit_shortdesc);
+OLC_MODULE(morphedit_size);
 
 // object modules
 OLC_MODULE(oedit_action_desc);
@@ -323,6 +327,7 @@ OLC_MODULE(oedit_liquid);
 OLC_MODULE(oedit_long_desc);
 OLC_MODULE(oedit_material);
 OLC_MODULE(oedit_maxlevel);
+OLC_MODULE(oedit_minipet);
 OLC_MODULE(oedit_minlevel);
 OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
@@ -337,6 +342,7 @@ OLC_MODULE(oedit_storage);
 OLC_MODULE(oedit_text);
 OLC_MODULE(oedit_timer);
 OLC_MODULE(oedit_type);
+OLC_MODULE(oedit_uses);
 OLC_MODULE(oedit_value0);
 OLC_MODULE(oedit_value1);
 OLC_MODULE(oedit_value2);
@@ -775,6 +781,7 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", medit_interaction, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "keywords", medit_keywords, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "longdescription", medit_longdescription, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "lookdescription", medit_lookdescription, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "maxlevel", medit_maxlevel, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "minlevel", medit_minlevel, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "movetype", medit_movetype, OLC_MOBILE, OLC_CF_EDITOR },
@@ -782,6 +789,7 @@ const struct olc_command_data olc_data[] = {
 	{ "script", medit_script, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "sex", medit_sex, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "shortdescription", medit_short_description, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "size", medit_size, OLC_MOBILE, OLC_CF_EDITOR },
 	
 	// map commands
 	{ "build", mapedit_build, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -814,11 +822,13 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", morphedit_flags, OLC_MORPH, OLC_CF_EDITOR },
 	{ "keywords", morphedit_keywords, OLC_MORPH, OLC_CF_EDITOR },
 	{ "longdescription", morphedit_longdesc, OLC_MORPH, OLC_CF_EDITOR },
+	{ "lookdescription", morphedit_lookdescription, OLC_MORPH, OLC_CF_EDITOR },
 	{ "maxlevel", morphedit_maxlevel, OLC_MORPH, OLC_CF_EDITOR },
 	{ "movetype", morphedit_movetype, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresability", morphedit_ability, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresobject", morphedit_requiresobject, OLC_MORPH, OLC_CF_EDITOR },
 	{ "shortdescription", morphedit_shortdesc, OLC_MORPH, OLC_CF_EDITOR },
+	{ "size", morphedit_size, OLC_MORPH, OLC_CF_EDITOR },
 	
 	// object commands
 	{ "affects", oedit_affects, OLC_OBJECT, OLC_CF_EDITOR },
@@ -851,6 +861,7 @@ const struct olc_command_data olc_data[] = {
 	{ "material", oedit_material, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "maxlevel", oedit_maxlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "minipet", oedit_minipet, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
@@ -864,6 +875,7 @@ const struct olc_command_data olc_data[] = {
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "text", oedit_text, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "type", oedit_type, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "uses", oedit_uses, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value0", oedit_value0, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value1", oedit_value1, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value2", oedit_value2, OLC_OBJECT, OLC_CF_EDITOR },
@@ -4415,7 +4427,7 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_OBJECT) && !OLC_FLAGGED(ch, OLC_FLAG_NO_OBJECT)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_PROGRESS) && OLC_FLAGGED(ch, OLC_FLAG_ALLOW_PROGRESS)) {
+		else if (IS_SET(type, OLC_PROGRESS) && !OLC_FLAGGED(ch, OLC_FLAG_NO_PROGRESS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_QUEST) && !OLC_FLAGGED(ch, OLC_FLAG_NO_QUESTS)) {

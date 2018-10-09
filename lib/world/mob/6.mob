@@ -3,7 +3,7 @@ necrovandal vandal cultist~
 the necrovandal~
 A necrovandal cultist skulks about beneath a midnight-blue, hooded robe.
 ~
-50 75 bdovx c
+50 75 bdovx c 3
 1 0 0 19
 T 602
 S
@@ -12,7 +12,7 @@ horse talking~
 a talking horse~
 A horse looks up from the grass and greets you by name.
 ~
-10 20 dejo 0
+10 20 dejo 0 4
 0 0 14 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -36,7 +36,7 @@ warhorse horse armored talking~
 a talking warhorse~
 An armored warhorse shouts its battle cry.
 ~
-40 80 bdej 0
+40 80 bdej 0 4
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -52,7 +52,7 @@ bunny talking~
 a talking bunny~
 A bunny thumps its foot and asks you for the time.
 ~
-1 5 djo 0
+1 5 djo 0 1
 0 0 15 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 607 100.00 1  # SKIN: a shimmering hide
@@ -63,7 +63,7 @@ bear singing~
 a singing bear~
 A bear is dancing around and singing a tune.
 ~
-20 40 dgjkoy c
+20 40 dgjkoy c 4
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -87,7 +87,7 @@ tree walking~
 a walking tree~
 A tree has uprooted itself and is walking around.
 ~
-20 30 dho G
+20 30 dho G 4
 0 0 33 15
 I 4 120 100.00 1  # LOOT: a large tree
 T 614
@@ -97,7 +97,7 @@ pixy pixie feral~
 a feral pixy~
 A feral pixy swoops down at you from the trees.
 ~
-30 50 doxz 0
+30 50 doxz 0 1
 0 0 2 9
 I 4 103 20.00 1 g  # LOOT: a yellow lightning stone
 I 4 104 20.00 1 g  # LOOT: a red bloodstone
@@ -110,7 +110,7 @@ pixy pixie queen~
 a pixy queen~
 A pixy queen is buzzing around your head.
 ~
-30 50 dxzA 0
+30 50 dxzA 0 1
 2 0 2 9
 I 4 103 20.00 1 g  # LOOT: a yellow lightning stone
 I 4 104 20.00 1 g  # LOOT: a red bloodstone

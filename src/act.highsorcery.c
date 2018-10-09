@@ -1514,23 +1514,16 @@ RITUAL_SETUP_FUNC(start_chant_of_nature) {
 }
 
 RITUAL_FINISH_FUNC(perform_chant_of_nature) {
-	sector_data *new_sect, *preserve;
+	sector_data *preserve;
 	struct evolution_data *evo;
 	
 	// percentage is checked in the evolution data
 	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
-		new_sect = sector_proto(evo->becomes);
 		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
 		
-		// messaging based on whether or not it's choppable
-		if (new_sect && has_evolution_type(new_sect, EVO_CHOPPED_DOWN)) {
-			msg_to_char(ch, "As you chant, a mighty tree springs from the ground!\r\n");
-			act("As $n chants, a mighty tree springs from the ground!", FALSE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {
-			msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
-			act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
-		}
+		// messaging
+		msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
+		act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		change_terrain(IN_ROOM(ch), evo->becomes);
 		if (preserve) {
@@ -2042,14 +2035,8 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
 			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
 			
-			// check for original sect, which may have been stored
-			if (BASE_SECT(to_room) != SECT(to_room)) {
-				change_terrain(to_room, GET_SECT_VNUM(BASE_SECT(to_room)));
-			}
-			else {
-				// fallback sect
-				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
-			}
+			// change to default sect
+			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 		}
 		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
 			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
@@ -2059,14 +2046,8 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
-			// check for original sect, which may have been stored
-			if (BASE_SECT(to_room) != SECT(to_room)) {
-				change_terrain(to_room, GET_SECT_VNUM(BASE_SECT(to_room)));
-			}
-			else {
-				// fallback sect
-				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
-			}
+			// check to default sect
+			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 		}
 		else {
 			msg_to_char(ch, "The Devastation Ritual has failed.\r\n");

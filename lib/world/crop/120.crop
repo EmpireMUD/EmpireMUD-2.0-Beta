@@ -23,7 +23,7 @@ D0
 &y~
 I 6 3016 100.00 1  # FORAGE: a handful of dates
 I 8 12052 100.00 1  # HARVEST: a bag of fresh dates
-I 9 121 100.00 1  # GATHER: a stick
+I 9 132 100.00 1  # GATHER: some thorny branches
 I 20 122 50.00 1 c  # CHOP: some rough wood
 I 20 122 50.00 2 c  # CHOP: some rough wood
 M

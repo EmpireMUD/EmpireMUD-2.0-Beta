@@ -3,7 +3,7 @@ pageboy boy adviser's~
 the pageboy~
 The adviser's pageboy is standing here.
 ~
-0 25 dv nD
+0 25 dv nD 3
 1 0 0 15
 T 10800
 T 10802
@@ -13,7 +13,7 @@ Clara forest ranger~
 Ranger Clara~
 Clara, the Forest Ranger, is adjusting her boot.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 2 0 0 15
 T 10801
 S
@@ -22,7 +22,7 @@ Rosemary planner city~
 Rosemary the City Planner~
 Rosemary, the City Planner, is reviewing a scroll.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 2 0 0 15
 T 10801
 S
@@ -31,7 +31,7 @@ Hugo adviser royal~
 Royal Adviser Hugo~
 Hugo, the Royal Adviser, sits behind his desk.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 15
 T 10801
 S
@@ -40,7 +40,7 @@ crier museum~
 the museum crier~
 The museum crier is standing here.
 ~
-0 25 dv nD
+0 25 dv nD 3
 1 0 0 15
 T 10825
 T 10827
@@ -50,7 +50,7 @@ Horation curator~
 Curator Horation~
 The curator is dusting the shelves.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 15
 M
 1
@@ -71,7 +71,7 @@ Horation curator~
 Curator Horation~
 Curator Horation stands proudly next to the exhibit.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 15
 M
 1
@@ -92,7 +92,7 @@ spirit order~
 the Spirit of Order~
 The Spirit of Order picks and knits at the clouds.
 ~
-0 0 dF n
+0 0 dF n 0
 0 0 27 15
 S
 #10852
@@ -100,7 +100,7 @@ spirit wild~
 the Spirit of the Wild~
 The Spirit of the Wild comes screaming through the veil of clouds.
 ~
-0 0 dF n
+0 0 dF n 0
 0 0 27 15
 S
 #10853
@@ -108,7 +108,7 @@ spirit hunt~
 the Spirit of the Hunt~
 The Spirit of the Hunt is perched high above you.
 ~
-0 0 dF n
+0 0 dF n 0
 0 0 27 15
 S
 #10854
@@ -116,7 +116,7 @@ spirit mana~
 the Spirit of Mana~
 The Spirit of Mana takes the form of the clouds themselves.
 ~
-0 0 dF n
+0 0 dF n 0
 0 0 27 15
 T 10854
 S
@@ -125,7 +125,7 @@ spirit darkness~
 the Spirit of Darkness~
 The Spirit of Darkness looms beyond the clouds.
 ~
-0 0 dF n
+0 0 dF n 0
 0 0 27 15
 T 10855
 S
@@ -134,7 +134,7 @@ spirit progress~
 the Spirit of Progress~
 The Spirit of Progress marches through the stream.
 ~
-0 0 dF n
+0 0 dF n 0
 0 0 27 15
 S
 #10857
@@ -142,7 +142,7 @@ spirit blood~
 the Spirit of Blood~
 The Spirit of Blood pools beneath you.
 ~
-0 0 dF n
+0 0 dF n 0
 0 0 27 15
 S
 #10858
@@ -150,7 +150,7 @@ spirit innovation~
 the Spirit of Innovation~
 The Spirit of Innovation flows forth from the Soulstream.
 ~
-0 0 dF n
+0 0 dF n 0
 0 0 27 15
 S
 #10859
@@ -158,7 +158,7 @@ spirit companion friendly~
 a companion spirit~
 A friendly spirit is floating nearby.
 ~
-1 1 bdoD n
+1 1 bdoD n 0
 0 0 27 9
 T 9901
 T 9902

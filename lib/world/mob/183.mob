@@ -3,7 +3,7 @@ Neferkare pharaoh pharoah linen-wrapped wrapped~
 Pharaoh Neferkare~
 A linen-wrapped pharaoh climbs out of his sarcophagus.
 ~
-0 0 bdxyzAB c
+0 0 bdxyzAB c 3
 1 0 13 7
 I 0 18324 100.00 8  # BUTCHER: a bolt of linen
 I 0 3306 25.00 2 b  # BUTCHER: a pouch of jerky
@@ -54,7 +54,7 @@ jackal fierce~
 a fierce jackal~
 A fierce jackal is leaving.
 ~
-0 0 bdhjo c
+0 0 bdhjo c 3
 0 0 14 9
 T 18301
 S
@@ -63,7 +63,7 @@ scarabs swarm~
 a swarm of scarabs~
 A swarm of scarabs is leaving.
 ~
-0 0 bdhoyz cm
+0 0 bdhoyz cm 3
 0 0 2 23
 T 18308
 T 18301
@@ -73,7 +73,7 @@ mummy reanimated~
 what's left of the mummy~
 Most of a reanimated mummy shambles past you.
 ~
-250 300 adgh G
+250 300 adgh G 3
 1 0 13 5
 I 4 18324 100.00 4  # LOOT: a bolt of linen
 I 4 18322 100.00 1  # LOOT: a sack of flaxseed
@@ -97,7 +97,7 @@ cat sacred~
 a sacred cat~
 A sacred cat is cleaning its paw.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 10
 M
 0
@@ -119,7 +119,7 @@ crocodile enormous~
 an enormous crocodile~
 An enormous crocodile practically surrounds you!
 ~
-100 125 dej 0
+100 125 dej 0 5
 0 0 9 9
 S
 #18328
@@ -127,7 +127,7 @@ falcon great~
 a great falcon~
 A great falcon stands ready to fly.
 ~
-100 125 de m
+100 125 de m 4
 0 0 2 27
 S
 $

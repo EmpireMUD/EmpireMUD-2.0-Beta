@@ -3,7 +3,7 @@ crab seaweed-covered covered~
 a crab~
 A seaweed-covered crab is picking at bits of food with its claws.
 ~
-0 50 bdj G
+0 50 bdj G 1
 0 0 0 10
 S
 #12401
@@ -11,7 +11,7 @@ goblin pirate~
 a goblin pirate~
 A goblin pirate is washing the side of the ship.
 ~
-0 0 bd 0
+0 0 bd 0 2
 1 0 0 1
 F 12401
 M
@@ -36,7 +36,7 @@ deckhand hand human~
 the deckhand~
 A human deckhand is chained to the side of the ship.
 ~
-0 0 bdv 0
+0 0 bdv 0 3
 1 0 0 15
 M
 0
@@ -66,7 +66,7 @@ Smeegle goblin quartermaster master~
 Quartermaster Smeegle~
 Smeegle, the goblin quartermaster, is walking around with a list.
 ~
-0 0 bd c
+0 0 bd c 2
 1 0 0 4
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
@@ -113,7 +113,7 @@ Hornswaggle first mate~
 First Mate Hornswaggle~
 Hornswaggle, the Golden Goblin's first mate, stands ready to fight!
 ~
-0 0 bdy c
+0 0 bdy c 2
 1 0 0 7
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
@@ -157,7 +157,7 @@ Greenbeard captain~
 Captain Greenbeard~
 Captain Greenbeard stands on the aftercastle, sword held high!
 ~
-0 0 bdyz c
+0 0 bdyz c 2
 1 0 0 1
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
@@ -201,7 +201,7 @@ Fathma goblin sorceress~
 Fathma~
 Fathma, goblin sorceress of the deep, holds her wand high!
 ~
-0 0 bdxyz c
+0 0 bdxyz c 2
 2 0 0 21
 F 12401
 I 4 12411 1.50 1 x  # LOOT: dread pirate garb
@@ -255,7 +255,7 @@ S
 deckhand #n~
 #n has been freed from his shackles (list).
 ~
-0 0 bdv 0
+0 0 bdv 0 3
 1 0 0 15
 M
 1
@@ -275,7 +275,7 @@ octopus blue-ringed ringed~
 a blue-ringed octopus~
 A blue-ringed octopus clings to the wall and flashes warning colors.
 ~
-0 0 bdj c
+0 0 bdj c 2
 0 0 6 7
 I 0 12404 100.00 1  # BUTCHER: a fillet of fish
 M
@@ -294,7 +294,7 @@ anglerfish fish toothy ball light~
 a toothy anglerfish~
 A ball of light dances in the shadows.
 ~
-0 0 bdj c
+0 0 bdj c 2
 0 0 6 9
 I 0 12404 100.00 1  # BUTCHER: a fillet of fish
 M
@@ -310,7 +310,7 @@ eel wolf~
 a wolf eel~
 A wolf eel pokes its head out from a crevice.
 ~
-0 0 bdj c
+0 0 bdj c 2
 0 0 6 9
 I 0 12404 100.00 1  # BUTCHER: a fillet of fish
 M
@@ -329,7 +329,7 @@ snake sea banded~
 a banded sea snake~
 A banded sea snake coils around your legs.
 ~
-0 0 bdj c
+0 0 bdj c 2
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
@@ -343,7 +343,7 @@ orca war armored~
 a war orca~
 An armored war orca blocks your way!
 ~
-0 0 bdjy c
+0 0 bdjy c 5
 0 0 6 9
 I 0 3012 100.00 8  # BUTCHER: a fillet of raw meat
 I 4 12414 100.00 2  # LOOT: fat of orca
@@ -372,7 +372,7 @@ squid giant~
 a giant squid~
 A giant squid fills the cavern!
 ~
-0 0 bdjy c
+0 0 bdjy c 5
 0 0 6 7
 I 0 12404 100.00 3  # BUTCHER: a fillet of fish
 I 4 12415 100.00 2  # LOOT: tentacle of squid
@@ -403,7 +403,7 @@ mermidon myrmidon warrior~
 a mermidon warrior~
 A mermidon warrior aims her trident at you!
 ~
-0 0 bdvy c
+0 0 bdvy c 3
 2 0 6 3
 I 4 12416 100.00 2  # LOOT: eye of mermaid
 I 4 12428 2.00 1 x  # LOOT: a deep coral ring
@@ -436,7 +436,7 @@ parrot~
 the parrot~
 A parrot with an eyepatch is watching you with its good eye.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 9
 T 9901
 T 9902
@@ -447,7 +447,7 @@ hydra tiny~
 a tiny hydra~
 A tiny hydra is rolling around on the ground.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
 M
 0
@@ -472,7 +472,7 @@ hydra serpent massive nine-headed~
 the Hydra~
 A massive nine-headed serpent slithers out of the pool.
 ~
-0 0 bdjyA c
+0 0 bdjyA c 5
 0 0 6 9
 I 4 12411 1.00 1 x  # LOOT: dread pirate garb
 I 4 12422 1.00 1 x  # LOOT: a raging kraken shell
@@ -527,7 +527,7 @@ scylla silla sylla~
 Scylla~
 Scylla floats in the center of the chamber as water swirls around her!
 ~
-0 0 bdzA c
+0 0 bdzA c 4
 2 0 6 7
 I 4 12411 1.00 1 x  # LOOT: dread pirate garb
 I 4 12422 1.00 1 x  # LOOT: a raging kraken shell
@@ -590,7 +590,7 @@ orca green-tinged tinged~
 a green-tinged orca~
 A green-tinged orca is stalking you.
 ~
-100 125 del 0
+100 125 del 0 5
 0 0 6 9
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 S
@@ -599,7 +599,7 @@ kraken raging rages~
 a raging kraken~
 A kraken rages violently in the water!
 ~
-100 125 del 0
+100 125 del 0 5
 0 0 6 7
 I 0 12404 100.00 3  # BUTCHER: a fillet of fish
 S
@@ -608,7 +608,7 @@ albatross giant~
 a giant albatross~
 A giant albatross with a saddle circles overhead!
 ~
-100 125 dej m
+100 125 dej m 4
 0 0 2 9
 I 0 3200 100.00 3  # BUTCHER: a cut of poultry
 S
@@ -617,7 +617,7 @@ dockmaster master goblin~
 the goblin dockmaster~
 A goblin dockmaster is pacing with a clipboard.
 ~
-30 60 bdqv 0
+30 60 bdqv 0 2
 1 0 0 15
 M
 1
@@ -628,7 +628,7 @@ deckhand hand goblin~
 a goblin deckhand~
 A goblin deckhand is standing here.
 ~
-20 50 dqv 0
+20 50 dqv 0 2
 1 0 0 15
 M
 1

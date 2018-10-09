@@ -384,11 +384,11 @@ a bag of wool~
 Some wool is scattered on the ground.~
 You can weave the wool into cloth.
 ~
-3 l a 4
+3 l a 5
 0 0 0
 7 0
 O
-7 a
+7 ap
 R
 5137 0
 S
@@ -443,11 +443,11 @@ Some soft llama wool is scattered on the ground.~
    Llama wool is softer than sheep wool, and comes in a variety of colors. It
 can be woven into llama fiber cloth.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 7 0
 O
-7 a
+7 ap
 R
 5137 0
 S

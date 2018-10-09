@@ -3,8 +3,13 @@ fiend molten massive chained~
 the molten fiend~
 A massive molten fiend is chained to the wall here, half-submerged in magma!
 ~
-0 0 bdxyAB cG
+0 0 bdxyAB cG 5
 0 0 0 16
+D
+   This towering, red-skinned demon has goat-like horns wreathed in flames atop
+its snarling visage. Its bare, muscular arms, thick as tree-trunks, strain
+against the dark iron shackles binding its wrists to the rock behind it.
+~
 I 4 18075 10.00 1 a  # LOOT: a firecloth skirt
 I 4 18076 10.00 1 a  # LOOT: firecloth pauldrons
 I 4 18077 10.00 1 a  # LOOT: a hearthflame skirt
@@ -38,8 +43,11 @@ elemental fire~
 a fire elemental~
 A fire elemental blazes brightly here!
 ~
-0 0 bdhox cmG
+0 0 bdhox cmG 3
 0 0 2 12
+D
+The elemental looks unstable. It probably won't last long.
+~
 T 18077
 T 18078
 S
@@ -48,8 +56,12 @@ hellsteed pitch-black black steed~
 a pitch-black hellsteed~
 A pitch-black hellsteed is rearing here, mane and tail ablaze!
 ~
-100 150 dej c
+100 150 dej c 4
 0 0 12 11
+D
+   This obsidian-skinned demonic steed has a mane and tail of flames, and
+hooves of molten iron that leave smoking craters in their wake!
+~
 I 3 18080 100.00 1  # BARDE: a fearsome hellcharger
 S
 #18079
@@ -57,8 +69,12 @@ phoenix magnificent~
 a magnificent phoenix~
 A magnificent phoenix soars overhead, beating its massive wings of flame!
 ~
-100 125 deh m
+100 125 deh m 4
 0 0 2 12
+D
+   Greater phoenixes such as this one are drawn to the sides of those who fight
+evil. They have the power to return from their ashes if slain.
+~
 I 4 18096 100.00 1  # LOOT: a pile of phoenix ash
 S
 #18080
@@ -66,7 +82,13 @@ hellcharger fearsome charger~
 a fearsome hellcharger~
 A fearsome hellcharger clad in molten mail is trampling the charred ground!
 ~
-100 150 dejy c
+100 150 dejy c 4
 0 0 12 11
+D
+   This obsidian-skinned demonic steed has a mane and tail of flames, and
+hooves of molten iron that leave smoking craters in their wake! Someone has
+fashioned metal barding armor for it, and the hellcharger's own heat causes the
+armor to emit a dull red glow.
+~
 S
 $

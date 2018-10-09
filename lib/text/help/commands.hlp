@@ -541,11 +541,11 @@ See also: BOARD, SAIL, UNLOAD, SHIPS
 #
 DISMISS
 
-Usage:  dismiss <familiar>
+Usage:  dismiss <familiar | minipet>
 
-This command causes your familiar to leave. You can target the familiar by
-name if it's in the room with you, or else can type 'dismiss familiar' to
-dismiss it anywhere in the world.
+This command causes your familiar or mini-pet to leave. You can target it by
+name if it's in the room with you, or else can type 'dismiss familiar' or
+'dismiss minipet' to dismiss it anywhere in the world.
 #
 DISPATCH
 
@@ -747,15 +747,15 @@ specific adventures where you find them.
 You can see information about any faction by using its name with this command.
 
 Reputation levels and values:
-  &RDespised&0  -100
-  &rHated&0  -99 to -75
-  &oLoathed&0  -74 to -30
-  &yDisliked&0  -29 to -10
-  &tNeutral&0  -9 to 9
-  &cLiked&0  10 to 29
-  &aEsteemed&0  30 to 74
-  &gVenerated&0  75 to 99
-  &gRevered&0  100
+  &RDespised&0  -1000
+  &rHated&0  -999 to -750
+  &oLoathed&0  -749 to -300
+  &yDisliked&0  -299 to -100
+  &tNeutral&0  -99 to 99
+  &cLiked&0  100 to 290
+  &aEsteemed&0  300 to 749
+  &gVenerated&0  750 to 999
+  &gRevered&0  1000
 #
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 
@@ -1192,6 +1192,20 @@ This shows your combat meters from your recent fights. If you turn on the
 also type "clearmeters" to clear them at any time.
 
 See also: CLEARMETERS
+#
+MINIPET MINIPETS MINI-PET MINI-PETS "MINI PET" "MINI PETS"
+
+Usage:  minipets
+        minipet <name>
+        minipet dismiss
+
+This command lists, summons, and dismisses your mini-pets. A mini-pet is a
+non-combat NPC that follows you around. They are strictly cosmetic, and are
+often awarded as trophies in certain adventures.
+
+You can only have one mini-pet out at a time.
+
+There is no limit to how many mini-pets you can collect. Gotta collect 'em all!
 #
 MORTLOG
 

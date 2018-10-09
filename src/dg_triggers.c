@@ -1363,6 +1363,10 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target
 					add_var(&GET_TRIG_VARS(t), "command", "paint", 0);
 					break;
 				}
+				case OCMD_LIGHT: {
+					add_var(&GET_TRIG_VARS(t), "command", "light", 0);
+					break;
+				}
 			}
 			sdd.o = obj;
 			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);

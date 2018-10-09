@@ -258,6 +258,45 @@ C
 75 100
 T 929
 S
+#940
+sticks fire handful~
+a handful of fire sticks~
+Some fire sticks are lying here.~
+   These are some dry sticks and bits of plant material that have been
+carefully selected for being dry and ready to burn. You could light something
+on fire by rubbing these sticks together (just type 'light <object>' to light
+something with them). Fire sticks are single-use items.
+~
+18 0 a 4
+1 0 0
+0 0
+C
+1 1
+R
+5121 0
+R
+5610 0
+S
+#941
+drill fire~
+a fire drill~
+A fire drill is lying on the ground.~
+   The fire drill is an ancient way to quickly start a fire. It works like an
+ordinary pump drill, twirling and untwirling a short rope to spin the drill. 
+But instead of a hard drill bit, it spins bare wood against a plank to build
+friction and start a fire with very little effort. Unfortunately, it doesn't
+last very long before too much of the wood has burned away.
+~
+18 0 a 1
+10 0 0
+0 0
+C
+50 50
+R
+5121 0
+R
+5610 0
+S
 #952
 pinnace ship small~
 the Pinnace~

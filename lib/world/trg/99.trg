@@ -2,6 +2,9 @@
 Mini-pet Use~
 1 c 3
 use~
+* DEPRECATED: This controlled mini-pets before b5.47 when they got a code-based collection
+return 0
+halt
 if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_by%)
   return 0
   halt

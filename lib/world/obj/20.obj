@@ -447,12 +447,12 @@ R
 5610 0
 S
 #2035
-rope length~
-a length of rope~
-A rope is coiled on the ground.~
+rope leather~
+a leather rope~
+A leather rope is coiled on the ground.~
 Rope can be used to lead, tie, or harness an animal.
 ~
-3 l a 5
+3 0 a 6
 0 0 0
 7 0
 M
@@ -500,6 +500,33 @@ You run a sail up the mast of $V.~
 M
 7
 $n runs a sail up the mast of $V.~
+R
+5153 0
+R
+5154 0
+S
+#2038
+rope length~
+a length of rope~
+A rope is coiled on the ground.~
+   This rope is made from twisted plant fibers. It may be thin, but it is far
+stronger than it looks. Rope can be used to lead, tie, or harness an animal.
+~
+3 l a 6
+0 0 0
+0 0
+M
+6
+You attach a rope to $V.~
+M
+7
+$n attaches a rope to $V.~
+O
+28 u
+R
+5121 0
+R
+5610 0
 R
 5153 0
 R

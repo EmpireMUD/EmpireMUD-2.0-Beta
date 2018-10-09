@@ -3,8 +3,13 @@ beaver dire~
 a dire beaver~
 A dire beaver is building a huge dam here.
 ~
-25 75 djy cm
+25 75 djy cm 3
 0 0 0 9
+D
+   Beavers are large, furry, semi-aquatic rodents, best known for chewing
+through trees and building dams across rivers. This one is the size of a large
+dog!
+~
 I 4 18452 5.00 1  # LOOT: a beaver whistle
 I 4 18453 100.00 1 x  # LOOT: a gnawed walking stick
 T 18451
@@ -16,7 +21,7 @@ water rising~
 the rising water~
 The water is rising here.
 ~
-0 0 dh dklmn
+0 0 dh dklmn 0
 0 0 0 15
 T 18450
 T 18451
@@ -26,8 +31,11 @@ kit beaver~
 a beaver kit~
 A beaver kit is gnawing on a twig.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
+D
+The kit hides behind its tail as you bend down to examine it.
+~
 T 9901
 T 9902
 S
@@ -36,7 +44,7 @@ owl snowy small~
 a snowy owl~
 A small snowy owl is drifting overhead.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 0 9
 M
 0
@@ -64,7 +72,7 @@ fido beastly~
 the beastly fido~
 A beastly fido is mucking through the garbage looking for food here.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 1 0 0 9
 M
 0
@@ -86,7 +94,7 @@ scarecrow brainless tiny little~
 a brainless little scarecrow~
 A tiny, brainless scarecrow is dancing and singing around your feet.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 2
 1 0 0 9
 M
 1
@@ -108,7 +116,7 @@ bird little cheerful~
 a cheerful little bird~
 A cheerful little bird is sitting here singing.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 1
 0 0 2 26
 T 9901
 T 9902
@@ -118,7 +126,7 @@ yarn ball vorpal~
 a ball of vorpal yarn~
 A ball of vorpal yarn in the shape of a sheep is frolicking here.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 14 9
 T 9901
 T 9902
@@ -128,7 +136,7 @@ hobbit timid~
 a timid hobbit~
 A hobbit stands nearby, looking timidly around.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 1 0 0 15
 T 18490
 T 9901
@@ -139,7 +147,7 @@ werewolf pint-sized pintsized~
 the pint-sized werewolf~
 A pint-sized werewolf is running in circles.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 28 9
 M
 0
@@ -167,7 +175,7 @@ guest blue~
 Blue Guest~
 Blue Guest (out on his feet) is here.
 ~
-1 1 bdoD n
+1 1 bdoD n 3
 1 0 0 9
 T 9901
 T 9902
@@ -177,7 +185,7 @@ radroach roach huge~
 a radroach~
 A huge radroach probes the ground with its antennae.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
 T 9901
 T 9902
@@ -187,7 +195,7 @@ poodle teacup~
 a teacup poodle~
 A teacup poodle sits happily in its owner's handbag.
 ~
-1 1 bdoD dn
+1 1 bdoD dn 1
 0 0 0 9
 M
 0
@@ -206,7 +214,7 @@ dysentery cloud~
 a cloud of dysentery~
 A cloud of dysentery hangs in the air.
 ~
-1 1 bdoD mn
+1 1 bdoD mn 0
 0 0 0 9
 M
 0
@@ -225,7 +233,7 @@ keeper peacekeeper~
 the Peacekeeper~
 A Peacekeeper is standing here, ready to jump in at the first sign of trouble.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 1
 M
 0
@@ -240,7 +248,7 @@ green gelatinous blob oozing~
 the green gelatinous blob~
 An oozing green gelatinous blob is here, sucking in bits of debris.
 ~
-0 0 bd nD
+0 0 bd nD 2
 0 0 32 9
 M
 0
@@ -261,7 +269,7 @@ janitor~
 the janitor~
 A janitor is walking around, cleaning up.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 1
 M
 0
@@ -282,7 +290,7 @@ scarecrow raggedy~
 the scarecrow~
 A raggedy scarecrow is draped on an old wooden frame.
 ~
-0 0 bd nD
+0 0 bd nD 3
 1 0 0 1
 M
 0
@@ -311,7 +319,7 @@ cow sheepish wooly woolly~
 a sheepish cow~
 A woolly cow stares at you sheepishly.
 ~
-10 20 dfjoy 0
+10 20 dfjoy 0 3
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -337,7 +345,7 @@ something horse~
 something that definitely isn't a horse~
 Something is standing here, and you're pretty sure it's not a horse.
 ~
-100 125 bdej 0
+100 125 bdej 0 4
 0 0 14 11
 I 3 18488 100.00 1  # BARDE: an armored whatsit
 S
@@ -346,7 +354,7 @@ whatsit armored~
 an armored whatsit~
 An armored whatsit is here. It's definitely not a horse.
 ~
-150 175 bdejy 0
+150 175 bdejy 0 4
 0 0 14 11
 S
 #18489
@@ -354,7 +362,7 @@ S
 #n~
 A ravenous vampire is standing here.
 ~
-0 0 bdvw nD
+0 0 bdvw nD 3
 0 0 0 9
 T 18489
 S
@@ -363,7 +371,7 @@ crowd shoppers~
 the crowd of shoppers~
 A crowd of busy shoppers moves back and forth, oblivious to your presence.
 ~
-0 0 bdv nD
+0 0 bdv nD 4
 0 0 0 1
 M
 0
@@ -413,7 +421,7 @@ man crazy~
 the crazy man~
 A crazy man with wild, white hair stands here in a matching jacket.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 1
 M
 1
@@ -436,7 +444,7 @@ doctor strange mad man~
 the strange doctor~
 A mad man is standing next to his box.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 1
 M
 1
@@ -476,7 +484,7 @@ canine clockwork~
 a clockwork canine~
 A clockwork canine is parked at your feet.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
 M
 1
@@ -498,7 +506,7 @@ woman blue strange~
 the woman in blue~
 A woman in a strange blue and yellow suit stands before you.
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 2 0 0 1
 M
 1
@@ -521,7 +529,7 @@ lion time~
 a time lion~
 A time lion is stalking you from the shadows.
 ~
-100 125 dej 0
+100 125 dej 0 4
 0 0 9 10
 S
 #18498
@@ -529,7 +537,7 @@ nautilus huge~
 a huge nautilus~
 A huge nautilus is curled up here.
 ~
-100 125 del 0
+100 125 del 0 4
 0 0 6 28
 S
 #18499
@@ -537,7 +545,7 @@ hippogriff hippogryph majestic~
 a majestic hippogriff~
 A majestic hippogriff is prancing overhead.
 ~
-100 125 de m
+100 125 de m 4
 0 0 2 26
 S
 $

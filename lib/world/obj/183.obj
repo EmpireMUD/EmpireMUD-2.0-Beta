@@ -428,11 +428,11 @@ A bundle of flax fibers lies on the ground.~
    The golden flax fibers have been bundled together, and could be woven into
 fine linen cloth.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 O
-7 i
+7 ei
 R
 5137 0
 S
@@ -513,10 +513,9 @@ A sacred bell is lying here.~
 This bell can summon a noncombat pet!
 Type 'use bell' to summon it.
 ~
-3 p a 4
+19 p a 5
 18326 0 0
 2 0
-T 9900
 S
 #18327
 whistle crocodile~

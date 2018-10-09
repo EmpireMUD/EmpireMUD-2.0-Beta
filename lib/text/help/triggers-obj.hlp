@@ -13,7 +13,7 @@ See also:
 Consume (object trigger)
 
 Supported commands:  &cdrink, eat, quaff, read, shoot, poison, build/craft/etc,
-                     paint&0
+                     paint, light&0
 Argument type:  percent chance to execute
 Return value:  return 0 to prevent the consumption
 
@@ -22,6 +22,12 @@ Activated any time a character attempts to consume or use the object.
 The 'shoot' (arrows) and 'poison' consume triggers cannot prevent consumption
 by returning 0. These types also have a target. They only fire when the actor
 successfully attacks with a poison or arrow.
+
+Any use of a lighter object will run a consume trigger with 'light' as the
+%command%, even if the player typed 'burn'. This happens AFTER the lighting
+happens, but BEFORE a charge is subtracted from the lighter's uses, thus if it
+has val0 == 1, it is on its last charge. Returning 0 won't prevent using the
+lighter, but you MUST return 0 if you purge the lighter itself.
 
 Note: If you purge a poison or arrow object in its consume trigger, you must
 return 0 to prevent trying to extract the item afterwards.
@@ -184,7 +190,10 @@ When using field  - The variable returns:
 &cshortdesc&0 - The name of the object that players see.
 &csize&0 - Inventory size of the object.
 &ctimer&0 - The timer of the object.
-&ctype&0 - The type of object, such as WAND, ARMOR, or KEY.
+&ctype&0 - The type of object, such as WEAPON, ARMOR, or PACK.
+&cused_lighter(PERSON)&0 - Uses up a charge on a LIGHTER item, if applicable.
+   The person using it is an optional argument; they receive a message if the
+   last charge is used. Returns 1 if the last charge is used (obj is purged).
 &cval0&0 - Returns the current value 0 of the object, defined here.
 &cval0(num)&0 - Changes the value 0 of the object.
 &cval1&0 - Returns the current value 1 of the object, defined here.

@@ -7,6 +7,7 @@ These are the common map icons:
 
  &g....&0  Plains              &g^^^^&0  Forest              &y/\/\&0  Mountain
  ....  Plains              &W^^^^&0  Forest              &y^^&r^&R^&0  Forest
+ &g.w..&0  Copse               &g.ww.&0  Copse               &g..&t.&g.&0  Stump
  &Y....&0  Desert              &Y.&G^^&Y.&0  Desert Grove        &Y.&C~~&Y.&0  Oasis
  &y....&0  Desert              &y.&g^^&y.&0  Desert Grove        &y.&c~~&y.&0  Oasis
  &c~~~~&0  River               &b~~~~&0  Ocean               &a~~~~&0  Estuary/Shallows
@@ -323,7 +324,7 @@ See also: SCORE
 #
 "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
-You can create a cooking fire by lighting a tree or log, using a flint set.
+You can create a cooking fire by lighting a tree or log, using fire sticks.
 This will let you cook food, brew potions, or craft pottery.
 
 You can also cook in a Kitchen, Alchemist, Potter, or Laboratory. If you have
@@ -626,7 +627,7 @@ Temperate crops (plains):
  &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
  &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
  &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
- &Y;;;;&0  Wheat               &G@@@@&0  Lettuce
+ &Y;;;;&0  Wheat
 
 Arid crops (desert):
  &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
@@ -637,7 +638,10 @@ Tropical crops (partially cleared jungle):
  &Gwwow&0  Watermelons
 
 River crops (plains near river):
- &yoooo&0  Gourds              &g,,,,&0  Rice
+ &yoooo&0  Squash              &g,,,,&0  Rice
+
+Newbie island crops:
+ &G@@@@&0  Lettuce             &goooo&0  Calabash gourds
 
 Most crops are used to make food and drink. Some, like cotton, have other uses.
 
@@ -1216,7 +1220,7 @@ See also: CHANNELS
 SPEAR
 
 A spear is the basic tool for fishing. You can make a spear by crafting a
-handle, chipping a rock until it is a handaxe, then again until it is a spear-
+handle, chipping a flint until it is a handaxe, then again until it is a spear-
 head, and then crafting the spear from the spearhead and the handle.
 
 See also: CRAFT, CHIP, FISH
@@ -1237,6 +1241,17 @@ Strength is used for:
  - Wearing heavy armor (tank armor sometimes has -STRENGTH).
 
 See also: ATTRIBUTES, MELEE DPS, CHOP, MINE
+#
+STUMPS COPSE COPPICE COPPICING
+
+When you chop down a forest, you are usually left with a field of stumps. If
+left alone, they will regrow into a copse, and can be chopped down for
+saplings. Given time, they will regrow into full-size trees again.
+
+You can build without removing stumps, but most other uses will require that
+you burn them. Try 'burn stumps' to remove them.
+
+See also: BURN, LIGHTER
 #
 STUN STUNNED "STUN IMMUNITY"
 

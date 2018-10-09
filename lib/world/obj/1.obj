@@ -2,14 +2,14 @@
 rock~
 a rock~
 A rock is lying on the ground.~
-   Rocks can be used as a primitive weapon, used to chip other rocks, used as a
-crafting component, or as catapult shot. They are also used to lay roads and
-build some buildings.
+   It's an ordinary, common rock of the sort you find everywhere in the ground.
+Rocks can be used as a primitive weapon, used as a hammer to chip pieces of
+flint, as a crafting component, or as catapult shot. They are also used to lay
+roads and build some buildings.
 ~
-1 il ano 5
+1 il ano 6
 0 2 5
 1 0
-I 19 180 100.00 1  # CHIP: a chipped rock
 O
 22 u
 R
@@ -33,11 +33,14 @@ S
 flint stone~
 a flint stone~
 A piece of flint is lying on the ground.~
-You can craft a flint set and use that to light torches.
+   This piece of flint is rough and unworked but, like all flint, holds the
+potential to be shaped into a powerful primitive weapon. Wield a rock and
+'chip' this flint to work it into a more useful shape.
 ~
-1 il ano 3
+1 il ano 5
 0 1 5
 5 0
+I 19 180 100.00 1  # CHIP: a chipped flint
 O
 22 u
 R
@@ -91,6 +94,23 @@ O
 R
 5117 0
 S
+#106
+obsidian rough black piece~
+a rough piece of obsidian~
+A black piece of obsidian is on the ground.~
+   Although it's rough and dirty, the gleaming black center of this piece of
+obsidian shows through. Obsidian forms a cutting edge like no other stone. Use
+'chip' to give it a sharp edge.
+~
+1 hl ano 7
+0 2 5
+8 0
+I 19 182 100.00 1  # CHIP: a sharpened piece of obsidian
+O
+22 u
+R
+5117 0
+S
 #120
 tree large~
 a large tree~
@@ -98,16 +118,21 @@ A large tree has fallen here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
 into a canoe.
 ~
-3 el a 3
+3 el a 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
 I 16 124 100.00 1  # SCRAPE: a heavy log
-I 16 121 25.00 2 s  # SCRAPE: a stick
-I 16 121 25.00 3 s  # SCRAPE: a stick
-I 16 121 25.00 4 s  # SCRAPE: a stick
-I 16 121 25.00 5 s  # SCRAPE: a stick
+I 16 136 5.00 1  # SCRAPE: a large shoot
+I 16 121 25.00 2 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 3 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 4 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 5 s  # SCRAPE: some sticks and leaves
 I 17 125 100.00 2  # SAW: a stack of lumber
+I 17 136 5.00 1  # SAW: a large shoot
+I 17 121 50.00 1 s  # SAW: some sticks and leaves
+I 17 121 40.00 2 s  # SAW: some sticks and leaves
+I 17 121 10.00 3 s  # SAW: some sticks and leaves
 M
 7
 $n carves out a tree for $V.~
@@ -118,17 +143,20 @@ R
 5118 0
 S
 #121
-stick~
-a stick~
-A stick has fallen on the ground.~
-You can craft a handle from a stick, or use it for building.
+sticks leaves leaf~
+some sticks and leaves~
+Some sticks and leaves are piled here.~
+   It's a small pile of plant debris. It might be useful for crafting or
+building.
 ~
-1 l ano 3
-0 2 5
+3 l a 5
+0 0 0
 0 0
+C
+1 1
 I 11 184 100.00 1  # LIGHT: a torch
 O
-25 nu
+7 eiqu
 R
 5118 0
 S
@@ -140,16 +168,17 @@ Some rough wood is stacked here.~
 tree. You can saw it into boards, and might even be able to salvage some
 sticks.
 ~
-3 e a 5
+3 e a 7
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
 I 17 126 100.00 1  # SAW: some rough boards
-I 17 121 20.00 1 s  # SAW: a stick
-I 17 121 20.00 2 s  # SAW: a stick
-I 17 121 20.00 3 s  # SAW: a stick
-I 17 121 20.00 4 s  # SAW: a stick
-I 17 121 20.00 5 s  # SAW: a stick
+I 17 136 5.00 1  # SAW: a large shoot
+I 17 132 20.00 1 s  # SAW: some thorny branches
+I 17 132 20.00 2 s  # SAW: some thorny branches
+I 17 132 20.00 3 s  # SAW: some thorny branches
+I 17 132 20.00 4 s  # SAW: some thorny branches
+I 17 132 20.00 5 s  # SAW: some thorny branches
 R
 5118 0
 S
@@ -169,11 +198,12 @@ a heavy log~
 A heavy log has been left here.~
 Logs are used in construction.
 ~
-3 el a 5
+3 el a 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
-I 17 125 100.00 1  # SAW: a stack of lumber
+I 17 125 75.00 1 s  # SAW: a stack of lumber
+I 17 125 25.00 2 s  # SAW: a stack of lumber
 M
 7
 $n hoists a log onto $V.~
@@ -247,10 +277,10 @@ S
 column wooden bound~
 a bound wooden column~
 A bound column of wood is lying on the ground.~
-   It looks as though someone has bound some lumber and sticks to make a
-structural support. This could be used in place of logs for building.
+   This sturdy column is made by several thin saplings bound with rope. It
+could be used in place of logs for building.
 ~
-3 e a 7
+3 e a 8
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -278,13 +308,17 @@ A massive tree is lying on its side.~
    You can use a sharp tool to shape this exotic tree into a pillar, or you can
 saw it into lumber.
 ~
-3 e a 5
+3 e a 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
 I 16 129 100.00 1  # SCRAPE: a fine wooden pillar
+I 16 133 50.00 1 s  # SCRAPE: a tangle of vines
+I 16 133 25.00 2 s  # SCRAPE: a tangle of vines
 I 17 130 50.00 1 c  # SAW: some fine tropical lumber
 I 17 130 50.00 2 c  # SAW: some fine tropical lumber
+I 17 133 50.00 1 s  # SAW: a tangle of vines
+I 17 133 25.00 2 s  # SAW: a tangle of vines
 R
 5118 0
 S
@@ -349,6 +383,115 @@ R
 R
 5134 0
 S
+#131
+sapling green~
+a green sapling~
+A green sapling has fallen here.~
+   This sapling is young, straight, and taller than you are. It could be used
+to build a simple hut, or carved into a handle, or fashioned into an arrow.
+~
+1 l an 3
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: a torch
+O
+25 qu
+R
+5118 0
+S
+#132
+branches thorny~
+some thorny branches~
+Some thorny branches are piled here.~
+   It's a small pile of plant debris. It might be useful for crafting or
+building.
+~
+3 l a 6
+0 0 0
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: a torch
+O
+7 ceiu
+R
+5118 0
+S
+#133
+vines tangle~
+a tangle of vines~
+A tangle of vines is piled on the ground.~
+   This tangle of vines must have come from an incredible jungle. It's a small
+pile of plant debris. It might be useful for crafting or building.
+~
+3 l a 7
+0 0 0
+0 0
+C
+1 1
+O
+7 ipru
+R
+5118 0
+S
+#134
+sapling thorny~
+a thorny sapling~
+A thorny sapling has fallen here.~
+   This small sapling is covered in thorns or spines -- the difference hardly
+matters when they're buried in your flesh. Still, it could be used for building
+or carved into a handle.
+~
+1 i an 4
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: a torch
+O
+25 cu
+R
+5118 0
+S
+#135
+sapling reaching~
+a reaching sapling~
+A reaching sapling has fallen here.~
+   This sapling is thin, but very strong. In its short life, it grew tall,
+perhaps reaching for the high canopy of the jungle. It could be used for
+building, or carved into a handle.
+~
+1 0 an 3
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: a torch
+O
+25 ru
+R
+5118 0
+S
+#136
+shoot large~
+a large shoot~
+A large shoot is lying here.~
+   This shoot once grew out of a mighty tree. It is long and straight, and
+would be just as useful as a young sapling for building or crafting.
+~
+1 0 an 3
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: a torch
+O
+25 u
+R
+5118 0
+S
 #141
 wheat bundle~
 a bundle of wheat~
@@ -387,11 +530,11 @@ a basket of cotton~
 A basket of cotton has been left here.~
 Weave cotton into cloth.
 ~
-3 bl a 2
+3 bl a 3
 0 4 0
 7 0
 O
-7 i
+7 ip
 R
 5137 0
 S
@@ -484,6 +627,48 @@ Copper ore can be smelted into ingots and bars.
 3 l a 2
 0 0 0
 13 0
+R
+5115 0
+S
+#166
+tinore ore tin pile~
+some tin ore~
+Some tin ore is piled on the ground.~
+Tin ore can be smelted into ingots, which are then used to make bronze.
+~
+3 l a 3
+0 0 0
+2 0
+R
+5115 0
+S
+#167
+tiningot tin ingot~
+a tin ingot~
+A tin ingot is stacked here.~
+   The tin has a bright white color. Tin ingots are primarily smelted with
+copper to make bronze.
+~
+3 l a 6
+0 0 0
+2 0
+O
+18 ju
+R
+5115 0
+S
+#168
+bronzeingot bronze ingot~
+a bronze ingot~
+A bronze ingot is stacked here.~
+   The bronze has a rich, brown color and a fine finish. Bronze is used to make
+many different tools and armors.
+~
+3 l a 6
+0 0 0
+13 0
+O
+18 su
 R
 5115 0
 S
@@ -619,13 +804,14 @@ S
 copperingot copper ingot~
 a copper ingot~
 A copper ingot is sitting here.~
-Copper ingots can be forged into useful things.
+   Copper ingots can be made into bars (to be stored in the vault, for wealth),
+or smelted with tin to make bronze ingots.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 13 0
 O
-18 su
+18 ju
 R
 5115 0
 S
@@ -647,12 +833,14 @@ R
 5611 a
 S
 #180
-rock chipped~
-a chipped rock~
-A chipped rock is lying on the ground.~
-Keep chipping the rock.
+flint chipped~
+a chipped flint~
+A chipped flint is lying on the ground.~
+   Flint knapping -- the process of chipping flakes off a piece of flint to
+make a tool -- is one of mankind's oldest techniques. Keep chipping the flint
+until it becomes a useful tool.
 ~
-1 ikl ano 4
+1 ikl ano 5
 0 2 5
 1 0
 I 19 181 100.00 1  # CHIP: a handaxe
@@ -663,10 +851,13 @@ S
 handaxe axe~
 a handaxe~
 A handaxe has been left here.~
-A handaxe is a great multi-purpose tool, but you can also chip it down further.
+   This flint handaxe has been chipped and knapped into a rough shape that can
+be used to cut, slice, and scrape. It's still large, and not very sharp, and
+can't be used to chop until it has a handle. From here, you can wield the
+handaxe, use it to mine ore, or craft it into a stone axe.
 ~
-1 hl ano 2
-0 2 1
+1 hl ano 3
+0 2 5
 1 0
 I 19 186 100.00 1  # CHIP: a stone spear head
 R
@@ -674,17 +865,36 @@ R
 R
 5610 0
 S
-#183
-set flint~
-a flint set~
-A flint set is lying here.~
-You can use the flint set to light sticks and make torches.
+#182
+obsidian piece sharpened~
+a sharpened piece of obsidian~
+A sharpened piece of obsidian has been left here.~
+   This gleaming black piece of obsidian has been sharpened through knapping to
+form a razor-sharp edge, sharper than any steel. It's far too sharp to use
+bare-handed, but you could craft it into an obsidian knife, obsidian spear, or
+obsidian sword (requires Basic Crafts).
 ~
-3 0 a 2
+3 l a 7
 0 0 0
+8 0
+R
+5121 0
+S
+#183
+tinderbox tinder firesteel steel~
+a firesteel and tinder~
+A tinderbox is sitting on the ground.~
+   This tinderbox can be used to light small fires such as torches. The
+firesteel wears down over time, and must be replaced periodically. It works by
+striking good steel against a piece of flint to produce sparks, which light the
+tinder and can be used to light a larger fire. Type 'light <object>' to light
+something using this tinderbox.
+~
+18 0 a 6
+10 0 0
 5 0
 C
-1 1
+50 50
 R
 5121 0
 R
@@ -704,9 +914,11 @@ S
 spear head stone spearhead~
 a stone spear head~
 A spear head is jabbed into the ground.~
-You can attach this spear head to a handle.
+   This piece of flint has been chipped and chipped, until it's thin and sharp.
+You can wield this spearhead alone, like a knife, or attach it to a shaft to
+make a full spear.
 ~
-1 il ano 1
+1 il ano 2
 0 1 4
 1 0
 R

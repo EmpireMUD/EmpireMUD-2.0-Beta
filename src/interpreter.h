@@ -160,6 +160,10 @@ struct alias_data {
 #define SCMD_TYPO		1
 #define SCMD_IDEA		2
 
+// do_light
+#define SCMD_LIGHT  0
+#define SCMD_BURN  1
+
 /* do_look */
 #define SCMD_LOOK		0
 

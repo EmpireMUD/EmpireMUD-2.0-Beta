@@ -52,12 +52,14 @@ extern const char *extra_bits[];
 extern const char *function_flags[];
 extern const char *genders[];
 extern const char *grant_bits[];
+extern const char *instance_flags[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
 extern const char *progress_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
+extern const char *size_types[];
 extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
@@ -933,6 +935,83 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 }
 
 
+void do_instance_info(char_data *ch, char *argument) {
+	struct instance_mob *mc, *next_mc;
+	char buf[MAX_STRING_LENGTH];
+	struct instance_data *inst;
+	int num;
+	
+	if (!*argument || !isdigit(*argument) || (num = atoi(argument)) < 1) {
+		msg_to_char(ch, "Invalid instance number '%s'.\r\n", *argument ? argument : "<blank>");
+		return;
+	}
+	
+	LL_FOREACH(instance_list, inst) {
+		if (--num == 0) {
+			msg_to_char(ch, "\tcInstance %d: [%d] %s\t0\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
+			
+			if (INST_LOCATION(inst)) {
+				if (ROOM_OWNER(INST_LOCATION(inst))) {
+					sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_LOCATION(inst))), EMPIRE_NAME(ROOM_OWNER(INST_LOCATION(inst))));
+				}
+				else {
+					*buf = '\0';
+				}
+				msg_to_char(ch, "Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_LOCATION(inst)), get_room_name(INST_LOCATION(inst), FALSE), coord_display_room(ch, INST_LOCATION(inst), FALSE), buf);
+			}
+			if (INST_FAKE_LOC(inst) && INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
+				if (ROOM_OWNER(INST_FAKE_LOC(inst))) {
+					sprintf(buf, " / %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
+				}
+				else {
+					*buf = '\0';
+				}
+				msg_to_char(ch, "Fake Location: [%d] %s%s%s\r\n", GET_ROOM_VNUM(INST_FAKE_LOC(inst)), get_room_name(INST_FAKE_LOC(inst), FALSE), coord_display_room(ch, INST_FAKE_LOC(inst), FALSE), buf);
+			}
+			
+			if (INST_START(inst)) {
+				msg_to_char(ch, "First room: [%d] %s\r\n", GET_ROOM_VNUM(INST_START(inst)), get_room_name(INST_START(inst), FALSE));
+			}
+			
+			if (INST_LEVEL(inst) > 0) {
+				msg_to_char(ch, "Level: %d\r\n", INST_LEVEL(inst));
+			}
+			else {
+				msg_to_char(ch, "Level: unscaled\r\n");
+			}
+			
+			sprintbit(INST_FLAGS(inst), instance_flags, buf, TRUE);
+			msg_to_char(ch, "Flags: %s\r\n", buf);
+			
+			msg_to_char(ch, "Created: %-24.24s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
+			if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
+				msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
+			}
+			
+			if (INST_DIR(inst) != NO_DIR) {
+				msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
+			}
+			if (INST_ROTATION(inst) != NO_DIR && IS_SET(GET_ADV_FLAGS(INST_ADVENTURE(inst)), ADV_ROTATABLE)) {
+				msg_to_char(ch, "Rotation: %s\r\n", dirs[INST_ROTATION(inst)]);
+			}
+			
+			if (INST_MOB_COUNTS(inst)) {
+				msg_to_char(ch, "Mob counts:\r\n");
+				HASH_ITER(hh, INST_MOB_COUNTS(inst), mc, next_mc) {
+					msg_to_char(ch, "%3d %s\r\n", mc->count, skip_filler(get_mob_name_by_proto(mc->vnum)));
+				}
+			}
+			
+			break;	// only show 1
+		}
+	}
+	
+	if (num > 0) {
+		msg_to_char(ch, "Invalid instance number %d.\r\n", atoi(argument));
+	}
+}
+
+
 // shows by adventure
 void do_instance_list_all(char_data *ch) {
 	extern int count_instances(adv_data *adv);
@@ -1102,8 +1181,6 @@ void do_instance_reset(char_data *ch, char *argument) {
 * @param size_t size Size of the buffer.
 */
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size) {
-	extern const char *instance_flags[];
-	
 	char flg[256], info[256], owner[MAX_STRING_LENGTH];
 
 	if (INST_LEVEL(inst) > 0) {
@@ -1252,6 +1329,7 @@ struct set_struct {
 		{ "skill", LVL_START_IMM, PC, MISC },
 		{ "faction", LVL_START_IMM, PC, MISC },
 		{ "learned", LVL_START_IMM, PC, MISC },
+		{ "minipet", LVL_START_IMM, PC, MISC },
 		{ "currency", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1785,6 +1863,36 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_learned_craft(ch, GET_CRAFT_VNUM(cft));
 			sprintf(output, "%s un-learned craft %d %s.", GET_NAME(vict), GET_CRAFT_VNUM(cft), GET_CRAFT_NAME(cft));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
+		}
+	}
+	else if SET_CASE("minipet") {
+		void add_minipet(char_data *ch, any_vnum vnum);
+		void remove_minipet(char_data *ch, any_vnum vnum);
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		char_data *pet;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> minipet <mob vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(pet = mob_proto(atoi(vnum_arg)))) {
+			msg_to_char(ch, "Invalid mob vnum.\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			add_minipet(vict, GET_MOB_VNUM(pet));
+			sprintf(output, "%s: gained mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			remove_minipet(vict, GET_MOB_VNUM(pet));
+			sprintf(output, "%s: removed mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 		}
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
@@ -3648,6 +3756,69 @@ SHOW(show_learned) {
 }
 
 
+SHOW(show_minipets) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct minipet_data *mini, *next_mini;
+	char_data *mob, *plr = NULL;
+	size_t size, count;
+	bool file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show minipets <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Mini-pets matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Mini-pets for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_MINIPETS(plr), mini, next_mini) {
+			if (!(mob = mob_proto(mini->vnum))) {
+				continue;	// no mob?
+			}
+			if (*argument && !multi_isname(argument, GET_PC_NAME(mob))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_workforce) {
 	void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 	
@@ -4140,7 +4311,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 	if (IS_MOB(k)) {
 		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
-		msg_to_char(ch, "L-Des: &y%s&0", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"));
+		msg_to_char(ch, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), NULLSAFE(GET_LOOK_DESC(k)));
 	}
 
 	if (IS_NPC(k)) {
@@ -4227,7 +4398,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)]);
+		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s, Size: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2);
@@ -4391,10 +4562,10 @@ void do_stat_character(char_data *ch, char_data *k) {
 				}
 				else {
 					if (mem->cmd) {
-						msg_to_char(ch, "  %-20.20s%s\r\n", GET_NAME(mc), mem->cmd);
+						msg_to_char(ch, "  %-20.20s%s\r\n", PERS(mc, mc, TRUE), mem->cmd);
 					}
 					else {
-						msg_to_char(ch, "  %-20.20s <default>\r\n", GET_NAME(mc));
+						msg_to_char(ch, "  %-20.20s <default>\r\n", PERS(mc, mc, TRUE));
 					}
 				}
 				
@@ -4858,6 +5029,19 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		case ITEM_WEALTH: {
 			msg_to_char(ch, "Wealth value: %d\r\n", GET_WEALTH_VALUE(j));
 			msg_to_char(ch, "Automatically minted by workforce: %s\r\n", GET_WEALTH_AUTOMINT(j) ? "yes" : "no");
+			break;
+		}
+		case ITEM_LIGHTER: {
+			if (GET_LIGHTER_USES(j) == UNLIMITED) {
+				msg_to_char(ch, "Lighter uses: unlimited\r\n");
+			}
+			else {
+				msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(j));
+			}
+			break;
+		}
+		case ITEM_MINIPET: {
+			msg_to_char(ch, "Mini-pet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j)));
 			break;
 		}
 		default:
@@ -6925,7 +7109,7 @@ ACMD(do_instance) {
 			++count;
 		}
 		
-		msg_to_char(ch, "Usage: instance <list | add | delete | deleteall | nearby | reset | spawn | test> [argument]\r\n");
+		msg_to_char(ch, "Usage: instance <list | add | delete | deleteall | info | nearby | reset | spawn | test> [argument]\r\n");
 		msg_to_char(ch, "There are %d live instances.\r\n", count);
 	}
 	else if (is_abbrev(arg, "list")) {
@@ -6939,6 +7123,9 @@ ACMD(do_instance) {
 	}
 	else if (is_abbrev(arg, "deleteall")) {
 		do_instance_delete_all(ch, argument);
+	}
+	else if (is_abbrev(arg, "information")) {
+		do_instance_info(ch, argument);
 	}
 	else if (is_abbrev(arg, "nearby")) {
 		do_instance_nearby(ch, argument);
@@ -8124,6 +8311,7 @@ ACMD(do_show) {
 		{ "factions", LVL_START_IMM, show_factions },
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 		{ "data", LVL_CIMPL, show_data },
+		{ "minipets", LVL_START_IMM, show_minipets },
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },

@@ -2,70 +2,70 @@
 demi-griffin griffin heroic~
 a heroic demi-griffin~
 A heroic demi-griffin is standing here, half human, half bird, and half lion.~
-b 10 0 0 0
+b 10 0 0 0 4
 0 0 -1 -1
 S
 #2901
 centaurnicorn unicorn heroic~
 a heroic centaurnicorn~
 A heroic centaurnicorn stands here, half person, half unicorn.~
-b 11 14 0 0
+b 11 14 0 0 4
 0 0 -1 -1
 S
 #2902
 half-naga naga heroic~
 a heroic half-naga~
 A heroic half-naga coils around you.~
-b 9 5 0 0
+b 9 5 0 0 4
 0 0 -1 -1
 S
 #2903
 pegacentaur pegasus centaur pegasentaur~
 a heroic pegacentaur~
 A heroic pegacentaur stretches its wings.~
-b 11 14 0 0
+b 11 14 0 0 4
 0 0 -1 -1
 S
 #2904
 were-cerberus cerberus heroic~
 a heroic were-cerberus~
 A heroic were-cerberus stalks past you, watching you with six eyes.~
-b 9 0 0 0
+b 9 0 0 0 4
 0 0 -1 -1
 S
 #2910
 griffin heroic little~
 a heroic little griffin~
 A heroic little griffin is flapping around.~
-bj 10 2 0 0
+bj 10 2 0 0 1
 0 0 -1 -1
 S
 #2911
 unicorn heroic little~
 a heroic little unicorn~
 A heroic little unicorn is prancing about.~
-bj 11 14 0 0
+bj 11 14 0 0 1
 0 0 -1 -1
 S
 #2912
 naga heroic little~
 a heroic little naga~
 A heroic little naga is slithering around you.~
-bj 9 5 0 0
+bj 9 5 0 0 1
 0 0 -1 -1
 S
 #2913
 pegasus heroic little~
 a heroic little pegasus~
 A heroic little pegasus is flapping around you.~
-bj 11 2 0 0
+bj 11 2 0 0 1
 0 0 -1 -1
 S
 #2914
 cerberus heroic little~
 a heroic little cerberus~
 A heroic little cerberus is running around trying to bite both your ankles.~
-bj 9 0 0 0
+bj 9 0 0 0 1
 0 0 -1 -1
 S
 $

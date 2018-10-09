@@ -37,6 +37,7 @@
 
 // external vars
 extern struct generic_name_data *generic_names;
+extern struct character_size_data size_data[];
 
 // external funcs
 extern int perform_move(char_data *ch, int dir, bitvector_t flags);
@@ -347,7 +348,7 @@ char *replace_npc_names(const char *str, const char *name, const char *empire_na
 * @param int sex Which sex it should be -- NOTHING for auto-pick
 */
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
-	char *free_name = NULL, *free_short = NULL, *free_long = NULL;
+	char *free_name = NULL, *free_short = NULL, *free_long = NULL, *free_look = NULL;
 	struct generic_name_data *name_set;
 	char_data *proto;
 	
@@ -400,11 +401,17 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	if (GET_LONG_DESC(mob) && (!proto || GET_LONG_DESC(mob) != GET_LONG_DESC(proto))) {
 		free_long = GET_LONG_DESC(mob);
 	}
+	if (GET_LOOK_DESC(mob) && (!proto || GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto))) {
+		free_look = GET_LOOK_DESC(mob);
+	}
 	
 	// restrings: uses "afar"/"lost" if there is no empire
 	GET_PC_NAME(mob) = str_dup(replace_npc_names(GET_PC_NAME(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
 	GET_SHORT_DESC(mob) = str_dup(replace_npc_names(GET_SHORT_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
 	GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+	if (GET_LOOK_DESC(mob)) {
+		GET_LOOK_DESC(mob) = str_dup(replace_npc_names(GET_LOOK_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+	}
 	
 	// and free that memory if necessary
 	if (free_name) {
@@ -415,6 +422,9 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	}
 	if (free_long) {
 		free(free_long);
+	}
+	if (free_look) {
+		free(free_look);
 	}
 }
 
@@ -1240,7 +1250,6 @@ void scale_mob_for_character(char_data *mob, char_data *ch) {
 * @param int level The level to scale it to.
 */
 void scale_mob_to_level(char_data *mob, int level) {
-	extern const int base_player_pools[NUM_POOLS];
 	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 	
 	double value, target;
@@ -1327,10 +1336,9 @@ void scale_mob_to_level(char_data *mob, int level) {
 	mob->points.max_pools[MANA] = MAX(0, (int) ceil(value));
 	
 	// blood*
-	value = base_player_pools[BLOOD];
+	value = size_data[GET_SIZE(mob)].max_blood;
 	value += MOB_FLAGGED(mob, MOB_VAMPIRE) ? ((10 * high_level) + (20 * over_level)) : 0;
 	value *= MOB_FLAGGED(mob, MOB_ANIMAL) ? 0.5 : 1.0;
-	value *= (level <= 10) ? 0.1 : 1.0;
 	mob->points.max_pools[BLOOD] = MAX(1, (int) ceil(value));
 	
 	// strength

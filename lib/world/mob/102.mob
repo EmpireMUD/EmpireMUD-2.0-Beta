@@ -3,7 +3,7 @@ Zelkab goblin bruiser~
 Zelkab, goblin bruiser~
 A goblin bruiser is guarding the nest.
 ~
-50 150 bd 0
+50 150 bd 0 2
 1 0 0 5
 T 10201
 T 10205
@@ -16,7 +16,7 @@ Garlgarl goblin shaman~
 Garlgarl, goblin shaman~
 A goblin shaman is drawing symbols in the blood on the floor.
 ~
-50 150 bdxyA 0
+50 150 bdxyA 0 2
 2 0 0 16
 T 10200
 T 10201
@@ -30,7 +30,7 @@ Filks goblin archer~
 Filks, goblin archer~
 A goblin archer is trying to fix her bow.
 ~
-50 150 abdzA 0
+50 150 abdzA 0 2
 2 0 0 1
 T 10200
 T 10201
@@ -44,7 +44,7 @@ Walts goblin sapper~
 Walts, goblin sapper~
 A goblin sapper is trying to light something on fire.
 ~
-50 150 abdyA s
+50 150 abdyA s 2
 1 0 0 4
 T 10200
 T 10201
@@ -58,7 +58,7 @@ Nilbog goblin champion~
 Nilbog, goblin champion~
 The goblin champion is unpolishing her armor.
 ~
-50 150 bdB 0
+50 150 bdB 0 2
 2 0 0 2
 T 10200
 T 10201
@@ -72,7 +72,7 @@ Furl goblin war shaman~
 Furl, war shaman~
 The goblin war shaman is raising his staff!
 ~
-50 150 bdxyAB 0
+50 150 bdxyAB 0 2
 1 0 0 18
 T 10200
 T 10201
@@ -85,7 +85,7 @@ warg goblin hairy big~
 a goblin warg~
 A big, hairy goblin warg is snarling at you!
 ~
-50 50 dej 0
+50 50 dej 0 3
 0 0 0 10
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -97,7 +97,7 @@ warg goblin armored~
 an armored goblin warg~
 An armored goblin warg is here!
 ~
-100 100 bdej 0
+100 100 bdej 0 3
 0 0 0 10
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -108,7 +108,7 @@ warg goblin hairy big~
 a goblin warg~
 A big, hairy goblin warg is snarling at you!
 ~
-50 50 dej 0
+50 50 dej 0 3
 0 0 0 10
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -120,7 +120,7 @@ wolf winged~
 a winged wolf~
 A winged wolf flaps around near the ground.
 ~
-100 125 dej m
+100 125 dej m 3
 0 0 2 9
 S
 #10225
@@ -128,7 +128,7 @@ druid #n~
 the druid #n~
 #n is tending the gardens.
 ~
-50 50 bdv nD
+50 50 bdv nD 3
 0 2 0 15
 T 10233
 T 10225
@@ -139,7 +139,7 @@ S
 the gardener~
 #n is tending the gardens.
 ~
-50 50 bdv nD
+50 50 bdv nD 3
 0 0 0 15
 T 10233
 S
@@ -148,7 +148,7 @@ tumbleweed enchanted~
 an enchanted tumbleweed~
 An enchanted tumbleweed is blowing through.
 ~
-0 50 de G
+0 50 de G 2
 0 0 4 16
 S
 #10250
@@ -156,7 +156,7 @@ chronomancer #n~
 Chronomancer #n~
 A chronomancer is holding the portal open.
 ~
-0 0 bdv cnD
+0 0 bdv cnD 3
 0 2 0 16
 T 10250
 S
@@ -165,7 +165,7 @@ salesman~
 the salesman~
 A salesman is running a booth that says 'list'.
 ~
-0 0 bdv cnD
+0 0 bdv cnD 3
 1 0 0 15
 S
 #10252
@@ -173,7 +173,7 @@ dracosaur king~
 the King of the Dracosaurs~
 The King of the Dracosaurs crushes trees as he approaches!
 ~
-0 0 bdjyzBE cCE
+0 0 bdjyzBE cCE 5
 1 0 0 9
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 I 0 10267 100.00 1  # BUTCHER: a serrated dracosaur tooth
@@ -201,7 +201,7 @@ terrosaur terrorsaur pterosaur fearsome~
 the Terrosaur~
 A fearsome Terrosaur swoops down from the sky!
 ~
-0 0 bdjyzBE cmCE
+0 0 bdjyzBE cmCE 4
 0 0 0 27
 I 0 3200 100.00 4  # BUTCHER: a cut of poultry
 I 0 10267 100.00 2  # BUTCHER: a serrated dracosaur tooth
@@ -229,7 +229,7 @@ archsorcerer malfernes~
 Archsorcerer Malfernes~
 Archsorcerer Malfernes is here, and he looks like he's gone mad!
 ~
-0 0 bdvxzBE cCE
+0 0 bdvxzBE cCE 3
 1 0 0 22
 I 4 10254 100.00 1  # LOOT: a stunning violet gem
 I 4 10265 75.00 1  # LOOT: a thick dracosaur hide
@@ -252,7 +252,7 @@ dracosaur three-horned horned frilled~
 the three-horned dracosaur~
 A frilled, three-horned dracosaur is charging at you like a bull!
 ~
-0 0 bdjyAE ch
+0 0 bdjyAE ch 5
 0 0 0 27
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
@@ -274,7 +274,7 @@ dracosaur feathered brightly~
 a feathered dracosaur~
 A brightly feathered dracosaur raises its wings to ward you off.
 ~
-0 0 abdjzE c
+0 0 abdjzE c 4
 0 0 0 10
 I 0 3200 100.00 2  # BUTCHER: a cut of poultry
 I 0 10267 100.00 1  # BUTCHER: a serrated dracosaur tooth
@@ -292,7 +292,7 @@ dracosaur feathered small~
 a small, feathered dracosaur~
 A small, feathered dracosaur begins to circle around you.
 ~
-0 0 abdjzE c
+0 0 abdjzE c 3
 0 0 0 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 10267 50.00 1  # BUTCHER: a serrated dracosaur tooth
@@ -306,7 +306,7 @@ druid #n~
 the druid #n~
 A druid is magically growing the foliage over the path.
 ~
-0 0 bdvxzAE c
+0 0 bdvxzAE c 3
 1 3 0 16
 I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
 I 4 10265 50.00 1  # LOOT: a thick dracosaur hide
@@ -324,7 +324,7 @@ bird terror lead fierce~
 the lead terror bird~
 A fierce terror bird is pacing toward you!
 ~
-0 0 abdjE c
+0 0 abdjE c 3
 0 0 0 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -338,7 +338,7 @@ bird terror~
 a terror bird~
 A terror bird is eyeing you from the foliage.
 ~
-0 0 abdjE c
+0 0 abdjE c 3
 0 0 0 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 1 1351 75.00 1  # SKIN: a large skin
@@ -350,7 +350,7 @@ ants swarm~
 a swarm of ants~
 A swarm of ants is coming toward you!
 ~
-0 0 bdjyE cG
+0 0 bdjyE cG 2
 0 0 0 9
 I 4 10259 10.00 1 X  # LOOT: a primitive satchel
 I 4 10261 10.00 1 X  # LOOT: an unlit branch
@@ -362,7 +362,7 @@ hunter trophy~
 the trophy hunter~
 A trophy hunter is crouching in the underbrush.
 ~
-0 0 bdvzE c
+0 0 bdvzE c 3
 1 3 0 2
 I 4 10259 10.00 1 X  # LOOT: a primitive satchel
 I 4 10261 10.00 1 X  # LOOT: an unlit branch
@@ -374,7 +374,7 @@ dracosaur~
 a dracosaur~
 A dracosaur is sniffing around for food.
 ~
-75 100 dej 0
+75 100 dej 0 5
 0 0 0 10
 I 3 10264 100.00 1 X  # BARDE: an armored dracosaur
 S
@@ -383,7 +383,7 @@ dracosaur armored~
 an armored dracosaur~
 An armored dracosaur stands guard valiantly.
 ~
-75 100 bdej 0
+75 100 bdej 0 5
 0 0 0 10
 S
 #10285
@@ -391,7 +391,7 @@ terrosaur flying armored~
 a flying, armored terrosaur~
 An armored, flying terrosaur has perched here.
 ~
-75 100 bdej m
+75 100 bdej m 4
 0 0 0 27
 S
 #10286
@@ -399,7 +399,7 @@ terrosaur flying~
 a flying terrosaur~
 A flying terrosaur swoops low and lands.
 ~
-75 100 dej m
+75 100 dej m 4
 0 0 0 27
 I 3 10285 100.00 1 X  # BARDE: a flying, armored terrosaur
 S

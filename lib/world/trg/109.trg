@@ -878,4 +878,486 @@ elseif jump /= %cmd%
 end
 remote command_%actor.id% %self.id%
 ~
+#10980
+Renegade Caster spawner~
+0 n 100
+~
+if %instance.location%
+  mgoto %instance.location%
+end
+%load% mob %self.room.building_vnum%
+if %self.room.building_vnum% == 10983
+  %load% mob 10984
+  %force% %self.room.people% mfollow %self.room.people.next_in_room%
+end
+%purge% %self%
+~
+#10981
+Renegade Spellcaster movement~
+0 i 100
+~
+nop %instance.set_location(%self.room%)%
+~
+#10982
+Spellcaster delayed despawn~
+1 f 0
+~
+%adventurecomplete%
+~
+#10983
+Renegade Spellcaster death~
+0 f 100
+~
+* Teen Witch stuff
+if %self.vnum% == 10983 || %self.vnum% == 10984
+  set other_witch %instance.mob(10983)%
+  if !%other_witch%
+    set other_witch %instance.mob(10984)%
+  end
+  if %other_witch%
+    nop %other_witch.remove_mob_flag(!LOOT)%
+  end
+  set victim %self.room.people%
+  while %victim%
+    set spell_broken 0
+    if %victim.morph% == 10992
+      if !%spell_broken%
+        %echo% As %self.name% dies, %self.hisher% spell is broken!
+      end
+      set spell_broken 1
+      set prev_name %victim.name%
+      morph %victim% normal
+      %echoaround% %victim% %prev_name% suddenly turns into %victim.name%!
+      %send% %victim% You suddenly return to your normal form!
+      dg_affect #10992 %victim% off
+    end
+    set victim %victim.next_in_room%
+  done
+end
+nop %instance.set_location(%instance.real_location%)%
+%at% %instance.real_location% %load% obj 10980 room
+set char %self.room.people%
+while %char%
+  if %char.is_pc% && %char.empire%
+    nop %char.empire.start_progress(10980)%
+  end
+  set char %char.next_in_room%
+done
+~
+#10984
+Hostile Spellcaster Reaction~
+0 e 1
+you~
+if %actor.is_npc%
+  halt
+end
+wait 1
+switch %self.vnum%
+  case 10981
+    say You have crossed the wrong wizard!
+  break
+  case 10982
+    say It seems the spirits want you dead...
+  break
+  case 10983
+    say As if!
+  break
+  case 10984
+    say Whatever!
+  break
+done
+wait 2 sec
+nop %self.add_mob_flag(AGGR)%
+detach 10984 %self.id%
+set other_witch %instance.mob(10983)%
+if !%other_witch%
+  set other_witch %instance.mob(10984)%
+end
+if %other_witch%
+  nop %other_witch.add_mob_flag(AGGR)%
+end
+~
+#10985
+Rogue Wizard: Portal Attack~
+0 k 33
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+%echo% %self.name% opens a tiny portal and reaches inside...
+if !%self.varexists(rare_summon_done)%
+  if %random.10% == 10
+    set rare_summon_done 1
+    remote rare_summon_done %self.id%
+    %send% %actor% %self.name% withdraws a silver ingot and hurls it at you!
+    %send% %actor% The silver ingot falls to the ground at your feet.
+    %echoaround% %actor% %self.name% withdraws a silver ingot and hurls it at %actor.name%!
+    %echoaround% %actor% The silver ingot falls to the ground at %actor.hisher% feet.
+    %echo% %self.name% mutters a series of increasingly profane curses.
+    %load% obj 170 room
+    halt
+  end
+end
+switch %random.2%
+  case 1
+    %send% %actor% %self.name% withdraws a rock and hurls it at you!
+    %send% %actor% &rThe rock bounces off your head, stunning you!
+    %echoaround% %actor% %self.name% withdraws a rock and hurls it at %actor.name%!
+    %echoaround% %actor% The rock bounces off %actor.hisher% head, and %actor.heshe% staggers!
+    %damage% %actor% 50 physical
+    dg_affect #10984 %actor% STUNNED on 5
+  break
+  case 2
+    %send% %actor% %self.name% withdraws a throwing dagger and hurls it at you!
+    %send% %actor% &rThe dagger hits you in the shoulder, opening a bleeding wound!
+    %echoaround% %actor% %self.name% withdraws a small dagger and hurls it at %actor.name%!
+    %echoaround% %actor% The dagger hits %actor.himher% in the shoulder, drawing blood!
+    %damage% %actor% 50 physical
+    %dot% #10985 %actor% 100 15
+  break
+done
+~
+#10986
+Rogue Wizard: Energy Drain~
+0 k 50
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+if %actor.trigger_counterspell%
+  %send% %actor% %self.name% shouts some kind of hex at you, but your counterspell dispels it!
+  %echoaround% %actor% %self.name% shouts some kind of hex at %actor.name%, but nothing seems to happen!
+else
+  %echoaround% %actor% %self.name% shouts some kind of hex at %actor.name%, who seems weakened!
+  %send% %actor% %self.name% shouts something at you, and you feel your energy drain away!
+  %damage% %actor% 25 magical
+  dg_affect #10986 %actor% SLOW on 15
+  %echo% %self.name% suddenly fights with renewed strength!
+  dg_affect #10986 %self% HASTE on 15
+end
+~
+#10987
+Rogue Wizard: Fire Ritual~
+0 k 100
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+%echo% %self.name% begins drawing mana to %self.himher%self...
+%echo% (You should 'interrupt' %self.hisher% ritual.)
+set ritual_active 1
+remote ritual_active %self.id%
+wait 5 sec
+if !%self.ritual_active%
+  halt
+end
+%echo% %self.name% concentrates %self.hisher% power into a whip of crackling flames!
+wait 5 sec
+if !%self.ritual_active%
+  halt
+end
+%send% %actor% &r%self.name% cracks the blazing whip at you, blowing you off your feet!
+%echoaround% %actor% %self.name% cracks the blazing whip at %actor.name%, blowing %actor.himher% off %actor.hisher% feet!
+if %actor.trigger_counterspell%
+  %send% %actor% The fiery whip crashes through your counterspell unimpeded, breaking it!
+end
+%damage% %actor% 200 magical
+dg_affect #10984 %actor% HARD-STUNNED on 5
+~
+#10988
+Rogue Wizard: Interrupt Ritual~
+0 c 0
+interrupt~
+if !%self.varexists(ritual_active)%
+  %send% %actor% You don't need to do that right now.
+end
+if !%self.ritual_active%
+  %send% %actor% You don't need to do that right now.
+end
+%send% %actor% You trip %self.name%, interrupting %self.hisher% ritual.
+%echoaround% %actor% %actor.name% trips %self.name%, interrupting %self.hisher% ritual.
+set ritual_active 0
+remote ritual_active %self.id%
+~
+#10989
+Rogue Druid: Morph Attack~
+0 k 33
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+if !%self.morph%
+  set current %self.name%
+  %morph% %self% 10988
+  %echo% %current% rapidly morphs into %self.name%!
+  wait 1 sec
+end
+%echo% &r%self.name% goes berserk, claws flailing in all directions!
+%damage% %actor% 75 physical
+%aoe% 25 physical
+~
+#10990
+Rogue Druid: Dust Devil~
+0 k 50
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+if %self.morph%
+  set current %self.name%
+  %morph% %self% normal
+  %echo% %current% rapidly morphs into %self.name%!
+  wait 1 sec
+end
+%echo% %self.name% makes a sweeping skyward gesture with both arms!
+if %actor.trigger_counterspell%
+  %send% %actor% The dust around your feet swirls gently in a circle, then your counterspell stops it.
+  %echoaround% %actor% The dust around %actor.name%'s feet swirls gently in a circle, then stops.
+else
+  dg_affect #10982 %self% HARD-STUNNED on 10
+  %send% %actor% &rA swirling dust devil abruptly envelops you and hurls you into the air!
+  %echoaround% %actor% A swirling dust devil abruptly envelops %actor.name% and hurls %actor.himher% into the air!
+  %damage% %actor% 50 magical
+  dg_affect #10990 %actor% HARD-STUNNED on 10
+  wait 5 sec
+  if %actor.affect(10990)%
+    %echo% %self.name% slams %self.hisher% fist into the earth!
+    %send% %actor% &rA gust of wind suddenly hurls you downward!
+    %echoaround% %actor% %actor.name% is abruptly hurled downward!
+    dg_affect #10990 %actor% off
+    %damage% %actor% 100 physical
+  end
+  dg_affect #10982 %self% off
+end
+~
+#10991
+Rogue Druid: Dust Cloud~
+0 k 100
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+if %self.morph%
+  set current %self.name%
+  %morph% %self% normal
+  %echo% %current% rapidly morphs into %self.name%!
+  wait 1 sec
+end
+%echo% %self.name% slams %self.hisher% hands to the earth, fingers spread!
+%echo% A thick cloud of dust explodes outward, filling the area and obscuring your vision!
+set person %self.room.people%
+while %person%
+  if %person% != %self%
+    dg_affect #10991 %person% BLIND on 20
+  end
+  set person %person.next_in_room%
+done
+wait 15 sec
+%echo% The dust cloud settles.
+set person %self.room.people%
+while %person%
+  if %person% != %self%
+    dg_affect #10991 %person% off
+  end
+  set person %person.next_in_room%
+done
+~
+#10992
+Teen Witch: Baleful Polymorph~
+0 k 33
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+say Don't think of this as ruining your chances for a date. Think of it as your only chance to kiss a princess!
+wait 2 sec
+%echo% %self.name% snaps %self.hisher% fingers!
+set actor %self.fighting%
+if !%actor% || %actor.morph% == 10992
+  %echo% %self.name% looks confused.
+  halt
+end
+if %actor.trigger_counterspell%
+  %echo% Nothing seems to happen.
+  halt
+end
+set prev_name %actor.name%
+%morph% %actor% 10992
+%send% %actor% You are abruptly transformed into %actor.name%!
+%echoaround% %actor% %prev_name% is abruptly transformed into %actor.name%!
+dg_affect #10992 %actor% HARD-STUNNED on 20
+wait 15 sec
+if %actor.morph% == 10992
+  set prev_name %actor.name%
+  %morph% %actor% normal
+  %echoaround% %actor% %prev_name% slowly shifts back into %actor.name%.
+  %send% %actor% Your form returns to normal.
+  dg_affect #10992 %actor% off
+end
+~
+#10993
+Teen Witch: Ugly Stick~
+0 k 50
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+%send% %actor% &r%self.name% pulls out a gnarled wooden staff and smacks you over the head with it!
+%echoaround% %actor% %self.name% pulls out a gnarled wooden staff and smacks %actor.name% over the head with it!
+%damage% %actor% 25 physical
+if %actor.trigger_counterspell%
+  %send% %actor% Your counterspell protects you from the staff's enchantment.
+  halt
+end
+dg_affect #10993 %actor% STRENGTH -3 15
+dg_affect #10994 %actor% INTELLIGENCE -3 15
+dg_affect #10994 %actor% CHARISMA -3 15
+~
+#10994
+Teen Witch: Expelliarmus~
+0 k 100
+~
+if %self.cooldown(10981)%
+  halt
+end
+nop %self.set_cooldown(10981, 30)%
+if %self.affect(3021)%
+  dg_affect #3021 %self% off
+else
+  %echo% %self.name% flickers momentarily with a blue-white aura.
+end
+dg_affect #3021 %self% RESIST-MAGICAL 1 35
+wait 1 sec
+if !%actor.is_pc%
+  set person %self.room.people%
+  while %person%
+    if %person.is_pc% && %person.is_enemy(%self%)%
+      set actor %person%
+    end
+    set person %person.next_in_room%
+  done
+end
+%send% %actor% %self.name% pulls out a small wand and points it at you.
+%echoaround% %actor% %self.name% pulls out a small wand and points it at %actor.name%.
+say Expelliarmus!
+if %actor.trigger_counterspell%
+  %send% %actor% Your weapon twitches in your hand, then stops.
+else
+  %send% %actor% Your weapon flies out of your hand!
+  %echoaround% %actor% %actor.name%'s weapon flies out of %actor.hisher% hand!
+  dg_affect #10995 %actor% DISARM on 20
+end
+~
+#10995
+Teen Witch: Kiss Frog~
+0 e 0
+kisses~
+if %victim.morph% != 10992
+  halt
+end
+wait 4
+if %victim.morph% == 10992
+  set prev_name %victim.name%
+  morph %victim% normal
+  %send% %actor% As you kiss %prev_name%, it suddenly turns into %victim.name%!
+  %send% %victim% As %actor.name% kisses you, you suddenly return to your normal form!
+  %echoneither% %actor% %victim% As %actor.name% kisses %prev_name%, it suddenly transforms into %victim.name%!
+  dg_affect #10992 %victim% off
+end
+~
+#10998
+Mother's grimoire emotes~
+0 btw 10
+~
+if !%self.master%
+  halt
+end
+switch %random.4%
+  case 1
+    %echo% %self.name% flips to a page marked 'Grooming' and begins to glow...
+    %send% %self.master% A blue light flies toward you, straightening your hair!
+    %echoaround% %self.master% A blue light flies toward %self.master.name% and suddenly %self.master.hisher% hair straightens itself!
+  break
+  case 2
+    %echo% %self.name% flips to a page marked 'Hygiene' and begins to glow...
+    %send% %self.master% A white light flies into your mouth, polishing your teeth!
+    %echoaround% %self.master% A white light flies toward %self.master.name%, into %self.master.hisher% mouth, and polishing %self.master.hisher% teeth!
+  break
+  case 3
+    %echo% %self.name% flips to a page marked 'Food' and begins to glow...
+    %send% %self.master% A yellow light flies into your hand, revealing a chocolate frog!
+    %echoaround% %self.master% A yellow light flies into %self.master.name%'s hand, revealing a chocolate frog!
+    %load% obj 10998 %self.master% inv
+  break
+  case 4
+    %echo% %self.name% flips to a page marked 'Smudges' and begins to glow...
+    %send% %self.master% A green light flies toward you, removing a smudge of dirt from your face!
+    %echoaround% %self.master% A green light flies toward %self.master.name%, removing a smudge of dirt from %self.master.hisher% face!
+  break
+done
+~
 $

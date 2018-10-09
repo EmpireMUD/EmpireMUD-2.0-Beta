@@ -3,7 +3,7 @@ gardener hooded magiterranean~
 the Magiterranean gardener~
 A hooded gardener is poking at the ground.
 ~
-5 80 dv cnoB
+5 80 dv cnoB 3
 0 2 0 22
 T 10501
 S
@@ -12,7 +12,7 @@ terrier foxglove~
 the foxglove terrier~
 A foxglove terrier runs circles around you.
 ~
-1 1 bdoD nG
+1 1 bdoD nG 2
 0 0 0 9
 T 9901
 T 9902
@@ -23,7 +23,7 @@ retriever verdant grass-green green~
 the verdant retriever~
 A grass-green verdant retriever is holding a stick in its mouth.
 ~
-1 1 bdoD nG
+1 1 bdoD nG 2
 0 0 0 9
 T 9901
 T 9902
@@ -34,7 +34,7 @@ poodle petal pink~
 the petal poodle~
 A pink petal poodle wags her tail.
 ~
-1 1 bdoD nG
+1 1 bdoD nG 2
 2 0 0 9
 T 9901
 T 9902
@@ -45,7 +45,7 @@ spaniel sunflower~
 the sunflower spaniel~
 A sunflower spaniel barks up at the sky.
 ~
-1 1 bdoD nG
+1 1 bdoD nG 2
 0 0 0 9
 T 9901
 T 9902
@@ -56,7 +56,7 @@ guard skeletal~
 a skeletal guard~
 A skeletal guard marches silently past.
 ~
-100 125 dhqtuD cG
+100 125 dhqtuD cG 3
 0 0 0 1
 S
 #10506
@@ -64,7 +64,7 @@ sheep skeletal skeleton empty~
 a skeletal sheep~
 The empty skeleton of a sheep is frolicking around.
 ~
-5 10 djoy G
+5 10 djoy G 2
 0 0 0 9
 S
 #10507
@@ -72,7 +72,7 @@ chicken undead~
 an undead chicken~
 An undead chicken is pecking mindlessly at the ground.
 ~
-1 3 djo G
+1 3 djo G 1
 2 0 0 10
 S
 #10508
@@ -80,7 +80,7 @@ hound skeletal~
 a skeletal hound~
 A skeletal hound is lying here as if basking in the sun.
 ~
-20 40 djoz cG
+20 40 djoz cG 2
 0 0 14 9
 S
 #10509
@@ -88,7 +88,7 @@ horse zombie~
 a zombie horse~
 A zombie horse is standing here, skin still falling off it.
 ~
-30 60 dejo G
+30 60 dejo G 4
 0 0 14 11
 I 3 10510 100.00 1 X  # BARDE: a zombie charger
 S
@@ -97,7 +97,7 @@ charger zombie armored~
 a zombie charger~
 An armored zombie charger is decomposing valiantly here.
 ~
-40 80 bdej G
+40 80 bdej G 4
 0 0 0 11
 I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
@@ -109,7 +109,7 @@ cat skeletal~
 a skeletal cat~
 A skeletal cat is cleaning its bones.
 ~
-10 30 djoz cG
+10 30 djoz cG 1
 0 0 0 10
 S
 #10512
@@ -117,7 +117,7 @@ skeleton cow skeletal~
 a skeletal cow~
 The skeleton of a cow is trying to graze here.
 ~
-5 10 djoy G
+5 10 djoy G 4
 0 0 0 11
 S
 #10513
@@ -125,7 +125,7 @@ bird decaying zombie~
 a zombie bird~
 A decaying bird flies overhead on tattered wings.
 ~
-5 15 djo mG
+5 15 djo mG 1
 0 0 2 10
 S
 #10514
@@ -133,7 +133,7 @@ rabbit skeletal~
 a skeletal rabbit~
 A skeletal rabbit hops around.
 ~
-1 3 djo G
+1 3 djo G 1
 0 0 15 9
 S
 #10515
@@ -141,7 +141,7 @@ vegetable vigilant~
 a vigilant vegetable~
 A vigilant vegetable stalks the fields.
 ~
-125 150 doqtuA cG
+125 150 doqtuA cG 3
 0 0 13 7
 S
 #10516
@@ -149,7 +149,7 @@ vegetable vigilante masked~
 a vigilante vegetable~
 A masked vigilante vegetable is lurking in the shadows.
 ~
-50 75 cdo cG
+50 75 cdo cG 3
 0 0 13 7
 S
 #10550
@@ -157,7 +157,7 @@ Aquilo polar baron~
 Aquilo, the Polar Baron~
 Aquilo, the Polar Baron, hovers above the snow on a frosty updraft.
 ~
-0 0 bdvxyzABE cm
+0 0 bdvxyzABE cm 3
 1 0 2 20
 I 4 10570 100.00 1  # LOOT: a chance of boss loot
 I 4 10579 14.28 1 L  # LOOT: cold echoes of the future
@@ -192,7 +192,7 @@ S
 Cryomancer #n~
 Cryomancer #n, apprentice to the Polar Baron, glares at you from atop a frozen column.
 ~
-0 0 bdvxyE c
+0 0 bdvxyE c 3
 0 3 0 20
 I 4 10570 100.00 1  # LOOT: a chance of boss loot
 I 4 10579 7.15 1 L  # LOOT: cold echoes of the future
@@ -225,7 +225,7 @@ mage rime #n apprentice~
 Rime Mage #n~
 Rime Mage #n glowers at you from behind a cold violet fire.
 ~
-0 0 bdvxyE c
+0 0 bdvxyE c 3
 0 3 0 20
 I 4 10570 100.00 1  # LOOT: a chance of boss loot
 I 4 10579 7.15 1 L  # LOOT: cold echoes of the future
@@ -258,7 +258,7 @@ caribou rabid~
 a rabid caribou~
 A rabid caribou charges at you, spraying frozen foam from its mouth!
 ~
-0 0 bdj 0
+0 0 bdj 0 4
 0 0 0 27
 I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
 T 10558
@@ -269,7 +269,7 @@ orca flying enchanted~
 a flying orca~
 An enchanted orca surprises you from above!
 ~
-0 0 bdj m
+0 0 bdj m 5
 0 0 2 9
 I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
 T 10558
@@ -280,7 +280,7 @@ ermines pack vicious~
 a pack of vicious ermines~
 A pack of vicious ermines surprises you from tunnels in the snow!
 ~
-0 0 bdj 0
+0 0 bdj 0 2
 0 0 0 9
 I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
 T 10558
@@ -291,7 +291,7 @@ hare snowshoe~
 a snowshoe hare~
 A snowshoe hare darts away from you.
 ~
-1 5 djo 0
+1 5 djo 0 1
 0 0 15 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -307,7 +307,7 @@ wolf arctic white~
 an arctic wolf~
 A white arctic wolf hunches low and bares its fangs.
 ~
-20 40 djo c
+20 40 djo c 3
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -324,7 +324,7 @@ tern arctic~
 an arctic tern~
 An arctic tern swoops low in the sky.
 ~
-5 15 djoz m
+5 15 djoz m 1
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -333,7 +333,7 @@ freezer river~
 the river freezer~
 The river freezer is here.
 ~
-0 0 dh dklmn
+0 0 dh dklmn 3
 0 0 0 15
 T 10559
 T 10560
@@ -343,7 +343,7 @@ sword enchanted ice~
 the enchanted ice sword~
 A sword of ice animated by Aquilo's power is flying around.
 ~
-0 0 abdhzDF m
+0 0 abdhzDF m 2
 0 0 2 1
 T 10564
 S
@@ -352,7 +352,7 @@ sprite ice~
 an ice sprite~
 An ice sprite is flitting around here.
 ~
-75 125 abdhoxDF cm
+75 125 abdhoxDF cm 1
 0 0 2 28
 T 10564
 S
@@ -361,7 +361,7 @@ elemental ice~
 an ice elemental~
 A summoned ice elemental soars overhead on wings of rime.
 ~
-75 125 abdhoxzDF cm
+75 125 abdhoxzDF cm 1
 0 0 2 20
 T 10564
 S
@@ -370,7 +370,7 @@ bear polar~
 a polar bear~
 A polar bear is resting here.
 ~
-100 125 bdej 0
+100 125 bdej 0 4
 0 0 26 9
 S
 #10565
@@ -378,7 +378,7 @@ penguin emperor~
 an emperor penguin~
 An emperor penguin stands placidly before you.
 ~
-100 125 del 0
+100 125 del 0 2
 0 0 6 9
 S
 #10566
@@ -386,7 +386,7 @@ wyvern frost~
 a frost wyvern~
 A frost wyvern is perched nearby.
 ~
-100 125 de m
+100 125 de m 5
 0 0 2 10
 S
 #10567
@@ -394,7 +394,7 @@ cub bear polar~
 a polar bear cub~
 A polar bear cub is rolling around on the ground.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
 T 9901
 T 9902
@@ -404,7 +404,7 @@ walrus vested~
 a vested walrus~
 A walrus wearing a vest and tophat has set up a shop on the ice (list).
 ~
-75 125 bdH enD
+75 125 bdH enD 4
 1 0 0 15
 M
 1

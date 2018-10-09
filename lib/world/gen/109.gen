@@ -96,4 +96,83 @@ You polish the giant stone head.~
 T1
 $n polishes the giant stone head.~
 S
+#10981
+rogue spellcaster attack~
+3 0
+0 0 0 0
+S
+#10982
+spellcasting~
+4 0
+0 0 0 0
+S
+#10984
+stunned~
+4 0
+0 0 0 0
+T0
+You are no longer stunned.~
+S
+#10985
+bleeding~
+4 0
+0 0 0 0
+T0
+You are no longer bleeding.~
+S
+#10986
+energy drain~
+4 0
+0 0 0 0
+T0
+You recover from the energy draining spell.~
+S
+#10990
+airborne~
+4 0
+0 0 0 0
+T0
+You hit the ground.~
+T1
+$n hits the ground.~
+S
+#10991
+dust cloud~
+4 0
+0 0 0 0
+S
+#10992
+baleful polymorph~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by your sudden transformation.~
+S
+#10993
+ugly stick~
+4 0
+0 0 0 0
+T0
+Your features return to normal.~
+T1
+$n's appearance returns to normal.~
+T2
+You feel your features shift, weakening you!~
+T3
+$n's features suddenly shift, becoming hideous!~
+S
+#10994
+ugly stick~
+4 0
+0 0 0 0
+S
+#10995
+disarmed~
+4 0
+0 0 0 0
+T0
+You retrieve your weapon.~
+T1
+$n retrieves $s weapon.~
+S
 $

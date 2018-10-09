@@ -3,7 +3,7 @@ guard panicked~
 the panicked guard~
 A panicked guard is fleeing the hamlet!
 ~
-0 0 bdv nD
+0 0 bdv nD 3
 1 0 0 15
 T 10400
 T 10401
@@ -13,7 +13,7 @@ ghoul crouching~
 a crouching ghoul~
 A ghoul is crouched here, looking up at you.
 ~
-0 0 abd s
+0 0 abd s 3
 0 0 0 10
 I 4 10408 3.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 3.00 1 X  # LOOT: a steel chain
@@ -30,7 +30,7 @@ panther huge familiar~
 a huge panther~
 A huge panther, surely a mage's familiar, is prowling the street.
 ~
-0 0 bdz 0
+0 0 bdz 0 4
 0 0 0 9
 I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 6.00 1 X  # LOOT: a steel chain
@@ -47,7 +47,7 @@ cobra giant familiar~
 a giant cobra~
 There is a giant cobra familiar coiled in the street.
 ~
-0 0 bdz 0
+0 0 bdz 0 4
 0 0 0 9
 I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 6.00 1 X  # LOOT: a steel chain
@@ -64,7 +64,7 @@ skeleton giant animated~
 the giant skeleton~
 The animated skeleton of a giant looms tall over the street!
 ~
-0 0 bdA G
+0 0 bdA G 4
 0 0 0 5
 I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
 I 4 10416 20.00 1 X  # LOOT: a giant bone mace
@@ -78,7 +78,7 @@ mammoth skeletal~
 the skeletal mammoth~
 A skeletal mammoth blocks the entire street!
 ~
-0 0 bdyA G
+0 0 bdyA G 5
 0 0 0 27
 I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
 I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
@@ -94,7 +94,7 @@ armor animated suit~
 the animated armor~
 An animated suit of armor swings its sword at you!
 ~
-0 0 bdzA G
+0 0 bdzA G 3
 0 0 0 1
 I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 6.00 1 X  # LOOT: a steel chain
@@ -111,7 +111,7 @@ imp green~
 a green imp~
 A green imp scampers down the shopfront!
 ~
-0 0 bdzA G
+0 0 bdzA G 2
 0 0 0 16
 I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 6.00 1 X  # LOOT: a steel chain
@@ -128,7 +128,7 @@ demon ruddy big~
 a ruddy demon~
 A big, ruddy demon blocks your path!
 ~
-0 0 bdyA G
+0 0 bdyA G 4
 0 0 0 24
 I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 6.00 1 X  # LOOT: a steel chain
@@ -145,7 +145,7 @@ necrofiend fiend nine-legged~
 the necrofiend~
 A nine-legged necrofiend crawls over the blockade!
 ~
-0 0 bdB G
+0 0 bdB G 4
 0 0 0 20
 I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
 I 4 10424 20.00 1 X  # LOOT: a disjointed necrofiend leg
@@ -159,7 +159,7 @@ S
 Infernomancer #n~
 Infernomancer #n drags waves of fire over the square!
 ~
-0 0 bdxzB 0
+0 0 bdxzB 0 3
 0 2 0 16
 I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
 I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
@@ -175,7 +175,7 @@ watchman risen~
 a risen watchman~
 A risen watchman shambles down the street.
 ~
-0 0 abdzA G
+0 0 abdzA G 3
 1 0 0 2
 I 4 10408 3.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 3.00 1 X  # LOOT: a steel chain
@@ -192,7 +192,7 @@ monk risen~
 a risen monk~
 A risen monk is gnawing on his own arm.
 ~
-0 0 bdB G
+0 0 bdB G 3
 1 0 0 9
 I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 6.00 1 X  # LOOT: a steel chain
@@ -209,7 +209,7 @@ guard temple risen~
 a risen temple guard~
 A risen temple guard lurches toward you!
 ~
-0 0 bdB G
+0 0 bdB G 3
 1 0 0 5
 I 4 10408 6.00 1 X  # LOOT: tarnished silver earrings
 I 4 10409 6.00 1 X  # LOOT: a steel chain
@@ -226,7 +226,7 @@ S
 Necromancer #n~
 A necromancer is preparing a dark spell over one of the corpses.
 ~
-0 0 bdxAB 0
+0 0 bdxAB 0 3
 2 2 0 19
 I 4 10418 2.00 1 X  # LOOT: a skeletal horse whip
 I 4 10430 20.00 1 X  # LOOT: the necromancer's staff
@@ -240,7 +240,7 @@ S
 Necromaster #n~
 Necromaster #n is shouting orders to the cultists!
 ~
-0 0 bdxAB 0
+0 0 bdxAB 0 3
 0 2 0 21
 I 4 10420 2.00 1 X  # LOOT: a skeletal mammoth crop
 I 4 10418 4.00 1 X  # LOOT: a skeletal horse whip
@@ -256,7 +256,7 @@ citizen fleeing~
 a fleeing citizen~
 A fleeing citizen looks absolutely panicked!
 ~
-40 80 dv 0
+40 80 dv 0 3
 2 0 0 15
 T 10416
 S
@@ -265,7 +265,7 @@ zombie shambling citizen~
 a shambling zombie~
 The shambling zombie of a citizen stumbles toward you.
 ~
-40 80 dv G
+40 80 dv G 3
 0 0 0 9
 T 10417
 S
@@ -274,7 +274,7 @@ horse skeletal~
 a skeletal horse~
 A skeletal horse munches fruitlessly at the turf.
 ~
-30 60 dej G
+30 60 dej G 4
 0 0 14 11
 I 3 10419 100.00 1 X  # BARDE: a skeletal warhorse
 S
@@ -283,7 +283,7 @@ warhorse horse skeletal~
 a skeletal warhorse~
 A skeletal warhorse rears and kicks at the air.
 ~
-40 80 bdej G
+40 80 bdej G 4
 0 0 0 11
 S
 #10420
@@ -291,7 +291,7 @@ mammoth skeletal bony huge~
 a skeletal mammoth~
 A huge, bony skeletal mammoth stands over you.
 ~
-100 120 dejy G
+100 120 dejy G 5
 0 0 0 5
 I 3 10421 100.00 1 X  # BARDE: a skeletal warmammoth
 S
@@ -300,7 +300,7 @@ mammoth skeletal warmammoth huge~
 a skeletal warmammoth~
 A huge skeletal warmammoth looms down on you.
 ~
-100 120 dejy G
+100 120 dejy G 5
 0 0 0 5
 S
 #10450
@@ -308,7 +308,7 @@ rat sewer trained~
 a trained sewer rat~
 A trained rat scurries alongside you.
 ~
-0 75 adj c
+0 75 adj c 1
 0 0 7 9
 I 0 10016 50.00 1  # BUTCHER: a hunk of rat meat
 I 1 10013 100.00 1  # SKIN: a rat skin
@@ -319,7 +319,7 @@ dryleef vanguard leader goblin~
 Dryleef, vanguard leader~
 Dryleef, leader of the goblin vanguard, is sitting on the throne.
 ~
-0 0 bdy 0
+0 0 bdy 0 2
 1 0 0 5
 I 4 10452 5.00 1 a  # LOOT: Pimmin's ring
 I 4 10453 5.00 1 a  # LOOT: a bone charm necklace
@@ -340,7 +340,7 @@ pimmin shaman goblin~
 Pimmin, goblin shaman~
 A goblin shaman is swirling a vial with a rat tail.
 ~
-0 0 bdxy 0
+0 0 bdxy 0 2
 2 0 0 16
 I 4 10452 15.00 1 a  # LOOT: Pimmin's ring
 I 4 10453 15.00 1 a  # LOOT: a bone charm necklace
@@ -353,7 +353,7 @@ shivsper goblin assassin~
 Shivsper, goblin assassin~
 Shivsper throws a dagger at a crude drawing of a human on the wall.
 ~
-0 0 bdyz 0
+0 0 bdyz 0 2
 1 0 0 4
 I 4 10458 15.00 1 a  # LOOT: Shivsper's poison ring
 I 4 10459 15.00 1 a  # LOOT: a gaudy copper chain
@@ -366,7 +366,7 @@ wargreyn goblin smith blacksmith~
 Wargreyn, goblin blacksmith~
 Wargreyn, the goblin smith, is resting by the forge.
 ~
-0 0 bdy 0
+0 0 bdy 0 2
 2 0 0 6
 I 4 10464 15.00 1 a  # LOOT: Wargreyn's ring
 I 4 10465 15.00 1 a  # LOOT: the blacksmith's charm
@@ -379,7 +379,7 @@ rat war armored giant~
 a giant war rat~
 An giant, armored war rat bares its teeth at you!
 ~
-0 0 adjA c
+0 0 adjA c 2
 0 0 7 9
 I 0 10016 50.00 1  # BUTCHER: a hunk of rat meat
 I 1 10013 100.00 1  # SKIN: a rat skin

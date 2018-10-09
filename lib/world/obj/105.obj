@@ -700,10 +700,10 @@ of winter about it.
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
 I 16 10560 100.00 1  # SCRAPE: a spruce post
-I 16 121 25.00 7 s  # SCRAPE: a stick
-I 16 121 25.00 6 s  # SCRAPE: a stick
-I 16 121 25.00 8 s  # SCRAPE: a stick
-I 16 121 25.00 5 s  # SCRAPE: a stick
+I 16 121 25.00 7 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 6 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 8 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 5 s  # SCRAPE: some sticks and leaves
 I 17 10559 50.00 2 L  # SAW: some fresh spruce lumber
 I 17 10559 50.00 3 L  # SAW: some fresh spruce lumber
 M
@@ -849,10 +849,9 @@ A polar cub whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 4
+19 p a 5
 10567 0 0
 2 0
-T 9900
 S
 #10568
 charm yeti~

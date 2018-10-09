@@ -1250,13 +1250,17 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 
 /* find the name of what the uid points to */
 void find_uid_name(char *uid, char *name, size_t nlen) {
+	vehicle_data *veh;
 	char_data *ch;
 	obj_data *obj;
 
 	if ((ch = get_char(uid)))
-		snprintf(name, nlen, "%s", ch->player.name);
+		snprintf(name, nlen, "%s", PERS(ch, ch, TRUE));
 	else if ((obj = get_obj(uid)))
 		snprintf(name, nlen, "%s", obj->name);
+	else if ((veh = get_vehicle(uid))) {
+		snprintf(name, nlen, "%s", VEH_SHORT_DESC(veh));
+	}
 	else
 		snprintf(name, nlen, "uid = %s, (not found)", uid + 1);
 }
@@ -2708,6 +2712,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						strcpy(str, "0");
 					}
 					
+					else if (!str_cmp(field, "add_minipet")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void add_minipet(char_data *ch, any_vnum vnum);
+							char_data *pet = mob_proto(atoi(subfield));
+							if (pet) {
+								add_minipet(c, GET_MOB_VNUM(pet));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid minipet: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
+					
 					else if (!str_cmp(field, "add_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
@@ -3157,6 +3176,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else 
 							*str = '\0';
 					}
+					else if (!str_cmp(field, "find_lighter")) {
+						extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
+						
+						bool junk;
+						obj_data *lighter = find_lighter_in_list(c->carrying, &junk);
+						if (lighter) {
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(lighter));
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "firstname")) {
 						if (IS_NPC(c)) {
 							char temp[MAX_STRING_LENGTH];
@@ -3249,7 +3280,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							snprintf(str, slen, "%d", char_has_item(subfield, c));
 					}
-					
+					else if (!str_cmp(field, "has_minipet")) {
+						extern bool has_minipet(char_data *ch, any_vnum vnum);
+						
+						if (subfield && *subfield && isdigit(*subfield) && has_minipet(c, atoi(subfield))) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "has_reputation")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_reputation(vnum, level)%
@@ -3685,6 +3725,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && isdigit(*subfield)) {
 							void remove_learned_craft(char_data *ch, any_vnum vnum);
 							remove_learned_craft(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_minipet")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void remove_minipet(char_data *ch, any_vnum vnum);
+							remove_minipet(c, atoi(subfield));
 						}
 						
 						strcpy(str, "0");
@@ -4147,6 +4195,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					else if (!str_cmp(field, "timer"))
 						snprintf(str, slen, "%d", GET_OBJ_TIMER(o));
+					break;
+				}
+				case 'u': {	// obj.u*
+					if (!str_cmp(field, "used_lighter")) {
+						extern bool used_lighter(char_data *ch, obj_data *obj);
+						char_data *person = NULL;
+						
+						if (subfield && *subfield) {	// optional person
+							person = get_char_by_obj(o, subfield);
+						}
+						
+						// returns 1 if obj is purged
+						snprintf(str, slen, "%d", used_lighter(person, o) ? 1 : 0);
+					}
 					break;
 				}
 				case 'v': {	// obj.v*

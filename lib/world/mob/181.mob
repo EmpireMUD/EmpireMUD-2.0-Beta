@@ -3,8 +3,13 @@ lumberjack goblin~
 a goblin lumberjack~
 A goblin lumberjack is attacking trees with a greataxe here!
 ~
-10 50 dy c
+10 50 dy c 2
 0 0 0 2
+D
+   What goblin lumberjacks lack up in skill, they make up for in enthusiasm,
+resulting in lots of self-inflicted injuries. Nonetheless, this one will
+probably devastate the surrounding forests if you don't do something about it.
+~
 I 4 18100 10.00 1 a  # LOOT: a logging axe
 I 4 18101 10.00 3 a  # LOOT: a goblin lumberjack brew
 I 4 18102 10.00 1 a  # LOOT: goblin sandals

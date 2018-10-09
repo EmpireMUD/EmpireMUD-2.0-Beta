@@ -221,10 +221,9 @@ A baby tortoise is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 4
+19 p a 5
 18225 0 0
 2 0
-T 9900
 S
 #18226
 whistle ninja tortoise~
@@ -233,10 +232,9 @@ A ninja tortoise whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 5
+19 p a 6
 18226 0 0
 2 0
-T 9900
 S
 #18227
 whistle dragon turtle~
@@ -245,10 +243,9 @@ A dragon turtle whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 6
+19 p a 7
 18227 0 0
 2 0
-T 9900
 S
 #18228
 whistle sanguine~
@@ -567,10 +564,9 @@ an imaginary egg~
 An imaginary egg might be here.~
 This egg lets you imagine having a pet dragon. Type 'use egg' to summon it.
 ~
-3 o a 5
+19 o a 6
 18285 0 0
 10 0
-T 9900
 S
 #18286
 net ratcatcher's ratcatchers~
@@ -689,9 +685,9 @@ castle. Now it might provide enough lumber for an entire house.
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
 I 16 124 100.00 12  # SCRAPE: a heavy log
-I 16 121 100.00 60  # SCRAPE: a stick
+I 16 121 100.00 60  # SCRAPE: some sticks and leaves
 I 17 125 100.00 24  # SAW: a stack of lumber
-I 17 121 100.00 60  # SAW: a stick
+I 17 121 100.00 60  # SAW: some sticks and leaves
 R
 5118 0
 S

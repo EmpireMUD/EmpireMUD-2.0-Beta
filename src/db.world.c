@@ -124,14 +124,8 @@ void change_chop_territory(room_data *room) {
 	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = ROOM_CROP(room))) {
 		// TODO: This is a special case for orchards
 		
-		// check if original sect was stored to the crop
-		if (BASE_SECT(room) != SECT(room)) {
-			change_terrain(room, GET_SECT_VNUM(BASE_SECT(room)));
-		}
-		else {
-			// default
-			change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
-		}
+		// change to default sect
+		change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
 		// normal case
@@ -841,6 +835,40 @@ void init_mine(room_data *room, char_data *ch) {
 		if (ch && GET_GLOBAL_ABILITY(found) != NO_ABIL) {
 			gain_ability_exp(ch, GET_GLOBAL_ABILITY(found), 75);
 		}
+	}
+}
+
+
+/**
+* Changes the sector when an outdoor tile is 'burned down', if there's an
+* evolution for it. (No effect on rooms without the evolution.)
+*
+* @param room_data *room The outdoor room with a BURNS-TO evolution.
+*/
+void perform_burn_room(room_data *room) {
+	char buf[MAX_STRING_LENGTH], from[256], to[256];
+	struct evolution_data *evo;
+	sector_data *sect;
+	
+	if ((evo = get_evolution_by_type(SECT(room), EVO_BURNS_TO)) && (sect = sector_proto(evo->becomes)) && SECT(room) != sect) {
+		if (ROOM_PEOPLE(room)) {
+			strcpy(from, GET_SECT_NAME(SECT(room)));
+			strtolower(from);
+			strcpy(to, GET_SECT_NAME(sect));
+			strtolower(to);
+			
+			sprintf(buf, "The %s burn%s down and become%s %s%s%s.", from, (from[strlen(from)-1] == 's' ? "" : "s"), (from[strlen(from)-1] == 's' ? "" : "s"), (to[strlen(to)-1] == 's' ? "" : AN(to)), (to[strlen(to)-1] == 's' ? "" : " "), to);
+			act(buf, FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+		
+		change_terrain(room, evo->becomes);
+		
+		stop_room_action(room, ACT_BURN_AREA, NOTHING);
+		stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
+		stop_room_action(room, ACT_PICKING, CHORE_FARMING);
+		stop_room_action(room, ACT_GATHERING, NOTHING);
+		stop_room_action(room, ACT_HARVESTING, NOTHING);
+		stop_room_action(room, ACT_PLANTING, NOTHING);
 	}
 }
 
@@ -2581,13 +2609,15 @@ void generate_island_descriptions(void) {
 	int temp, count;
 	double prc;
 	
+	bool override = (data_get_long(DATA_LAST_ISLAND_DESCS) + SECS_PER_REAL_DAY < time(0));
+	
 	// first determine which islands need descs
 	HASH_ITER(hh, island_table, isliter, next_isliter) {
 		if (isliter->tile_size < 1) {
 			continue;	// don't bother?
 		}
 		
-		if (!isliter->desc || !*isliter->desc) {
+		if (!isliter->desc || !*isliter->desc || (override && !IS_SET(isliter->flags, ISLE_HAS_CUSTOM_DESC))) {
 			CREATE(isle, struct genisdesc_isle, 1);
 			isle->id = isliter->id;
 			HASH_ADD_INT(isle_hash, id, isle);
@@ -2669,6 +2699,7 @@ void generate_island_descriptions(void) {
 	if (any) {
 		save_island_table();
 	}
+	data_set_long(DATA_LAST_ISLAND_DESCS, time(0));
 }
 
 

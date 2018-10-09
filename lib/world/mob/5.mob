@@ -3,48 +3,86 @@ cat black familiar~
 a black cat~
 A black cat curls around its master's ankles.
 ~
-10 50 doG cfmG
+10 50 doG cfmG 2
 0 0 0 10
+D
+   This appears on first glance to be an ordinary black housecat, but upon
+closer inspection, you detect a magical glint in its eye...
+~
 S
 #501
 saber-toothed sabertoothed toothed cat familiar~
 a saber-toothed cat~
 A saber-toothed cat is eyeing you from its master's side.
 ~
-50 100 doG cfmG
+50 100 doG cfmG 4
 0 0 0 10
+D
+   This is a large feline, about the size of a lion or tiger. It can be
+identified by the large, pronounced upper canine teeth that extend from its
+mouth even when closed, and give it its name. Judging by the magical glint in
+its eye, this one is probably a mage's familiar.
+~
 S
 #502
 sphinx familiar~
 a sphinx~
 A deadly sphinx paces back and forth beside its master.
 ~
-75 100 dopG cfmG
+75 100 dopG cfmG 4
 0 0 0 10
+D
+   The sphinx is a strange beast with the head of a human, and the body of a
+lion. While they're best known as guardians of tombs, temples and crossroads,
+forcing travellers to answer riddles, this one seems to have chosen to become
+the guardian of a mage instead. In combat, it will attempt to rescue its master
+from attackers by forcing them to attack it instead.
+~
 S
 #503
 griffin familiar~
 a griffin~
 A griffin sits beside its master, sharpening its talons on its beak.
 ~
-100 0 dopyG cfmG
+100 0 dopyG cfmG 4
 0 0 0 10
+D
+   The griffin is a powerful and majestic magical beast with the body of a
+lion, and the head and wings of an eagle. While traditionally known for
+guarding treasure, this one has instead decided to guard the mage it serves. 
+In combat, it will attempt to rescue its master from attackers by forcing them
+to attack it instead.
+~
 S
 #504
 wolf dire familiar~
 a dire wolf~
 A dire wolf hunches low and bares its fangs.
 ~
-100 0 dozG cfmG
+100 0 dozG cfmG 4
 0 0 0 9
+D
+   This bulky, muscular wolf is a powerful fighter and a loyal companion. 
+Judging by the magical glint in its eye, serves as a mage's familiar, perhaps
+seeing in them something of itself. In combat, it simply attacks with great
+ferocity.
+~
 S
 #505
 rabbit moon familiar~
 a moon rabbit~
 A little moon rabbit glows as it hops around its master's feet.
 ~
-100 0 dnoG cfmG
+100 0 dnoG cfmG 1
 0 0 15 10
+D
+   This curious little creature, said to have once lived upon the moon, looks
+exactly like a normal rabbit, but bright white, and possessing a permanent,
+unearthly pale glow to its fur. It is highly intelligent and can channel the
+power of the moon into protective enchantments, often forming a bond with mages
+who do the same. In combat, it uses its innate magical abilities to support its
+master.
+~
 T 505
 T 506
 S
@@ -53,16 +91,29 @@ tortoise giant familiar~
 a giant tortoise~
 A giant tortoise eyes you placidly.
 ~
-100 0 dnopyG cfmG
+100 0 dnopyG cfmG 3
 0 0 16 10
+D
+   This man-sized, hard-shelled testudon makes up for what it lacks in ferocity
+with sheer implacable persistence. The glint of magic in its eye suggests that
+it may be a mage's familiar. In combat, it does not attack at all, but will
+attempt to rescue its master from attackers by forcing them to attack it
+instead.
+~
 S
 #507
 wolf spirit familiar~
 a spirit wolf~
 A spirit wolf flitters in and out of sight as it leaps about.
 ~
-100 0 dnoG cfmG
+100 0 dnoG cfmG 3
 0 0 0 10
+D
+   Those who become greatly accomplished in spirit magic become capable of
+calling forth their own spirit animals. This pale blue spectral wolf is one
+such animal, given its own intelligence and physical form by its master's
+power. In combat, it uses its innate magical abilities to support its master.
+~
 T 507
 T 508
 S
@@ -71,16 +122,28 @@ manticore huge familiar~
 a huge manticore~
 A huge manticore is waving its dangerously spined tail.
 ~
-100 0 dozG cfmG
+100 0 dozG cfmG 4
 0 0 0 27
+D
+   The manticore is a magical beast, and a more fearsome, predatory cousin of
+the sphinx. It has the head of a human, the body of a lion, and a tail bearing
+dozens of venomous spines. This manticore's lack of aggression clearly marks it
+as a mage's familiar. In combat, it simply attacks with great ferocity.
+~
 S
 #509
 phoenix familiar~
 a phoenix~
 A small phoenix alights on its master's shoulder.
 ~
-100 0 dnoG cfmG
+100 0 dnoG cfmG 1
 0 0 2 10
+D
+   A bird made entirely from flames, and associated with life, rebirth, and
+High Sorcery, phoenixes are intelligent, loyal, and powerful allies. This one
+is only the size of an ordinary bird, but it still commands powerful magic of
+its own. In combat, it uses its innate magical abilities to support its master.
+~
 T 509
 T 516
 S
@@ -89,8 +152,15 @@ shadow scorpion familiar~
 the scorpion shadow~
 Something is casting the shadow of a scorpion on the ground!
 ~
-100 0 dnoG cfmG
+100 0 dnoG cfmG 0
 0 0 9 10
+D
+   These strange shadow beings are created when a mage's command over shadows
+becomes so great that their shadow can move independently of their body, and no
+longer resembles their physical form. This one has taken the form of a venomous
+scorpion. In combat, it uses its innate magical abilities to support its
+master.
+~
 T 510
 T 514
 T 517
@@ -100,8 +170,14 @@ shadow owl familiar~
 the owl shadow~
 Something is casting the shadow of an owl on the ground!
 ~
-100 0 dnoG cfmG
+100 0 dnoG cfmG 0
 0 0 9 10
+D
+   These strange shadow beings are created when a mage's command over shadows
+becomes so great that their shadow can move independently of their body, and no
+longer resembles their physical form. This one has taken the form of a huge
+owl. In combat, it uses its innate magical abilities to support its master.
+~
 T 511
 T 514
 T 518
@@ -111,8 +187,15 @@ basilisk familiar~
 a basilisk~
 A basilisk curls around its master and hisses.
 ~
-100 0 dnoG cfmG
+100 0 dnoG cfmG 2
 0 0 0 10
+D
+   The basilisk is a cat-sized, grey-brown lizard with a crown-shaped crest. 
+Its most famous and dangerous feature is not its venomous bite, but its bright
+yellow, serpentine eyes, capable of turning anyone or anything who meets its
+gaze into stone. This one has formed a bond with a mage. In combat, it uses its
+innate magical abilities to support its master.
+~
 T 512
 T 519
 S
@@ -121,8 +204,15 @@ salamander familiar~
 a salamander~
 A large salamander is smoldering at its master's feet.
 ~
-100 0 dnoG cfmG
+100 0 dnoG cfmG 1
 0 0 0 10
+D
+   Tiny red lizards which store immense heat within their bodies and can
+transmute it into short-lived but powerful bursts of magical energy,
+salamanders normally live in deserts and volcanos. This one appears to be a
+mage's familiar. In combat, it uses its innate magical abilities to support its
+master.
+~
 T 513
 T 520
 S
@@ -131,16 +221,30 @@ hulk skeletal familiar~
 a skeletal hulk~
 A skeletal hulk looms over you.
 ~
-100 0 dozG cfmG
+100 0 dozG cfmG 4
 0 0 0 10
+D
+   This skeletal monstrosity, clearly been assembled using bones from more than
+one corpse by a particularly creative and vicious necromancer, towers
+head-and-shoulders over you. Being a jumbled pastiche of human and animal bones
+does not diminish its strength, and merely adds to its terrifying appearance.
+In combat, it simply attacks with great ferocity.
+~
 S
 #515
 banshee familiar~
 a banshee~
 A banshee hovers at her master's side.
 ~
-100 0 dnoG cfmG
+100 0 dnoG cfmG 3
 2 0 2 10
+D
+   Dark spirits whose cries are said to announce (or perhaps cause) the deaths
+of those who hear them, banshees resemble ethereal human women formed from
+white mist. This banshee has found someone to follow around who sees a lot of
+death... In combat, she uses her innate magical abilities to support her
+master.
+~
 T 515
 T 521
 S

@@ -710,6 +710,63 @@ void process_driving(char_data *ch) {
 }
 
 
+/**
+* Determines if a person can sit in/on a vehicle.
+*
+* @param char_data *ch The player.
+* @param vehicle_data *veh The vehicle to sit in/on.
+* @param bool message if TRUE, sends its own error message; FALSE is silent.
+* @return bool TRUE if ok to sit, FALSE if not.
+*/
+bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
+	if (!VEH_FLAGGED(veh, VEH_SIT)) {
+		if (message) {
+			msg_to_char(ch, "You can't sit on that!\r\n");
+		}
+	}
+	else if (!VEH_IS_COMPLETE(veh)) {
+		if (message) {
+			msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", IN_OR_ON(veh));
+		}
+	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		if (message) {
+			msg_to_char(ch, "You can't sit on it while it's on fire!\r\n");
+		}
+	}
+	else if (VEH_SITTING_ON(veh)) {
+		if (message) {
+			msg_to_char(ch, "%s already sitting %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), IN_OR_ON(veh));
+		}
+	}
+	else if (VEH_LED_BY(veh)) {
+		if (message) {
+			msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", IN_OR_ON(veh), (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
+		}
+	}
+	else if (VEH_DRIVER(veh)) {
+		if (message) {
+			msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
+		}
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
+		if (message) {
+			msg_to_char(ch, "You don't have permission to sit %s that.\r\n", IN_OR_ON(veh));
+		}
+	}
+	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
+		if (message) {
+			msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
+		}
+	}
+	else {
+		return TRUE; // made it!
+	}
+	
+	return FALSE;	// failed
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// SUB-COMMANDS ////////////////////////////////////////////////////////////
 
@@ -971,10 +1028,11 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 *
 * @param char_data *ch The person trying to burn a vehicle.
 * @param vehicle_data *veh The vehicle to burn.
-* @param obj_data *flint The flint.
+* @param obj_data *lighter Optional: The lighter item, if any.
 */
-void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
+void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 	void start_vehicle_burning(vehicle_data *veh);
+	extern bool used_lighter(char_data *ch, obj_data *obj);
 	
 	char buf[MAX_STRING_LENGTH];
 	
@@ -991,11 +1049,15 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint) {
 		msg_to_char(ch, "You can't burn %s vehicles unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
 	else {
-		snprintf(buf, sizeof(buf), "You %s $V on fire!", (flint ? "strike $p and light" : "light"));
-		act(buf, FALSE, ch, flint, veh, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (flint ? "strikes $p and lights" : "lights"));
-		act(buf, FALSE, ch, flint, veh, TO_ROOM);
+		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
+		act(buf, FALSE, ch, lighter, veh, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (lighter ? "uses $p to light" : "lights"));
+		act(buf, FALSE, ch, lighter, veh, TO_ROOM);
 		start_vehicle_burning(veh);
+		
+		if (lighter) {
+			used_lighter(ch, lighter);
+		}
 		
 		if (VEH_OWNER(veh)) {
 			add_offense(VEH_OWNER(veh), OFFENSE_BURNED_VEHICLE, ch, IN_ROOM(ch), offense_was_seen(ch, VEH_OWNER(veh), IN_ROOM(veh)) ? OFF_SEEN : NOBITS);
@@ -1031,29 +1093,8 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	else if (!(veh = get_vehicle_in_room_vis(ch, argument))) {
 		msg_to_char(ch, "You don't see anything like that here.\r\n");
 	}
-	else if (!VEH_FLAGGED(veh, VEH_SIT)) {
-		msg_to_char(ch, "You can't sit on that!\r\n");
-	}
-	else if (!VEH_IS_COMPLETE(veh)) {
-		msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", IN_OR_ON(veh));
-	}
-	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
-		msg_to_char(ch, "You can't sit on it while it's on fire!\r\n");
-	}
-	else if (VEH_SITTING_ON(veh)) {
-		msg_to_char(ch, "%s already sitting %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), IN_OR_ON(veh));
-	}
-	else if (VEH_LED_BY(veh)) {
-		msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", IN_OR_ON(veh), (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
-	}
-	else if (VEH_DRIVER(veh)) {
-		msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
-	}
-	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
-		msg_to_char(ch, "You don't have permission to sit %s that.\r\n", IN_OR_ON(veh));
-	}
-	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
-		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
+	else if (!validate_sit_on_vehicle(ch, veh, TRUE)) {
+		// sends own message
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You sit %s $V.", IN_OR_ON(veh));

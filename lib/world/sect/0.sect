@@ -21,17 +21,17 @@ E
 E
 2 604 0.04 602
 E
-2 55 0.80 27
+2 55 0.60 65
 E
-2 54 0.80 1
+2 54 0.60 39
 E
-2 45 0.80 1
+2 45 0.60 39
 E
-2 28 0.80 27
+2 28 0.60 65
 E
-2 29 0.80 27
+2 29 0.60 65
 E
-2 4 0.80 1
+2 4 0.60 39
 E
 2 53 5.00 56
 E
@@ -43,15 +43,15 @@ E
 E
 3 10565 2.00 10562
 E
-3 28 2.00 27
+3 28 2.00 65
 E
-3 4 2.00 1
+3 4 2.00 39
 E
 5 0 100.00 17
 E
 8 0 100.00 13
 E
-9 0 50.00 1
+9 0 33.33 39
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
@@ -195,7 +195,7 @@ D4
 .&W^&?..~
 &0~
 E
-0 1 100.00 0
+0 1 100.00 36
 E
 2 53 5.00 56
 E
@@ -213,7 +213,8 @@ I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 88.00 1 g  # GATHER: some sticks and leaves
+I 9 131 12.00 1 g  # GATHER: a green sapling
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9140 1.00 dh
@@ -367,7 +368,8 @@ I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 88.00 1 g  # GATHER: some sticks and leaves
+I 9 131 12.00 1 g  # GATHER: a green sapling
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9109 10.00 dh
@@ -495,7 +497,8 @@ I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 88.00 1 g  # GATHER: some sticks and leaves
+I 9 131 12.00 1 g  # GATHER: a green sapling
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9109 10.00 dh
@@ -637,7 +640,8 @@ I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 88.00 1 g  # GATHER: some sticks and leaves
+I 9 131 12.00 1 g  # GATHER: a green sapling
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9040 0.01 d
@@ -949,6 +953,7 @@ E
 2 32 10.00 58
 E
 2 57 10.00 52
+I 5 106 4.00 1 X  # DIG: a rough piece of obsidian
 I 5 104 8.00 1 X  # DIG: a red bloodstone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1371,7 +1376,7 @@ E
 E
 9 0 20.00 16
 I 6 3017 100.00 1  # FORAGE: a plump fig
-I 9 121 100.00 1  # GATHER: a stick
+I 9 133 100.00 1  # GATHER: a tangle of vines
 M
 9061 0.01 d
 M
@@ -1594,11 +1599,11 @@ D4
 ....~
 &y~
 E
-2 21 2.00 26
+2 21 2.00 25
 E
 2 57 10.00 51
 E
-3 20 0.28 26
+3 20 0.28 25
 E
 3 20 0.28 12
 E
@@ -1608,7 +1613,7 @@ E
 E
 8 0 100.00 14
 E
-9 0 50.00 26
+9 0 50.00 25
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1843,6 +1848,347 @@ I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 S
+#23
+Desert Stumps~
+A Group of Stumps in the Desert~
+'.' 21 2 2 l ep
+C
+burn stumps, dig, pick~
+D1
+.&t.&?..~
+&Y~
+D1
+..&t.&?.~
+&Y~
+D2
+.&t.&?..~
+&y~
+D2
+..&t.&?.~
+&y~
+D3
+.&t.&?..~
+&Y~
+D3
+..&t.&?.~
+&Y~
+D4
+.&t.&?..~
+&y~
+D4
+..&t.&?.~
+&y~
+E
+2 57 10.00 51
+E
+4 0 2.50 24
+E
+7 19 4.00 73
+E
+9 0 50.00 24
+E
+16 0 100.00 20
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3014 100.00 1  # FORAGE: some dry beans
+I 7 1204 100.00 1  # FIND-HERB: a daggerbite frond
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9064 0.90 ad
+S
+#24
+Desert Copse~
+A Gnarled Desert Copse~
+'w' 11 2 6 ad p
+C
+chop, dig, pick~
+D0
+&y..&?ww~
+&g~
+D0
+&y.&?ww&y.~
+&g~
+D0
+ww&y..~
+&g~
+E
+0 0 33.33 23
+E
+0 0 100.00 24
+E
+2 57 10.00 51
+E
+4 0 0.40 26
+E
+7 19 0.80 74
+E
+9 0 50.00 26
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3016 100.00 1  # FORAGE: a handful of dates
+I 7 1204 100.00 1  # FIND-HERB: a daggerbite frond
+I 20 134 100.00 1  # CHOP: a thorny sapling
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9117 15.00 bd
+M
+9126 5.00 bd
+M
+9122 5.00 bd
+M
+9125 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9153 10.00 bc
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+S
+#25
+Desert Shrub~
+A Large Shrub in the Desert~
+'w' 11 2 5 ad p
+C
+chop, dig, pick~
+D0
+w&y...~
+&g~
+D0
+&y.&?w&y..~
+&g~
+D0
+&y..&?w&y.~
+&g~
+D0
+&y...&?w~
+&g~
+E
+0 0 75.00 23
+E
+0 0 100.00 25
+E
+2 57 10.00 51
+E
+4 0 0.40 26
+E
+7 19 0.80 74
+E
+9 0 50.00 26
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3016 100.00 1  # FORAGE: a handful of dates
+I 7 1204 100.00 1  # FIND-HERB: a daggerbite frond
+I 20 134 100.00 1  # CHOP: a thorny sapling
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9117 15.00 bd
+M
+9126 5.00 bd
+M
+9122 5.00 bd
+M
+9125 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9153 10.00 bc
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+S
 #26
 Grove~
 A Shady Desert Grove~
@@ -1859,7 +2205,7 @@ D0
 &g^^&?..~
 &y~
 E
-0 1 100.00 20
+0 1 100.00 23
 E
 2 57 10.00 51
 E
@@ -1869,7 +2215,8 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3016 100.00 1  # FORAGE: a handful of dates
 I 7 1204 100.00 1  # FIND-HERB: a daggerbite frond
-I 9 121 100.00 1  # GATHER: a stick
+I 9 132 88.00 1 g  # GATHER: some thorny branches
+I 9 134 12.00 1 g  # GATHER: a thorny sapling
 I 20 122 5.00 4 c  # CHOP: some rough wood
 I 20 122 10.00 3 c  # CHOP: some rough wood
 I 20 122 50.00 2 c  # CHOP: some rough wood
@@ -1964,7 +2311,7 @@ D4
 ^&g.&?^&g.~
 &G~
 E
-0 1 50.00 0
+0 1 50.00 61
 E
 0 1 100.00 27
 E
@@ -1982,7 +2329,7 @@ E
 E
 15 0 1.00 34
 I 6 3017 100.00 1  # FORAGE: a plump fig
-I 9 121 100.00 1  # GATHER: a stick
+I 9 133 100.00 1  # GATHER: a tangle of vines
 I 20 128 100.00 1  # CHOP: a massive jungle tree
 M
 9061 0.01 d
@@ -2084,7 +2431,7 @@ E
 E
 15 0 1.00 34
 I 6 3017 100.00 1  # FORAGE: a plump fig
-I 9 121 100.00 1  # GATHER: a stick
+I 9 133 100.00 1  # GATHER: a tangle of vines
 I 20 128 100.00 1  # CHOP: a massive jungle tree
 M
 9061 0.01 d
@@ -2332,12 +2679,12 @@ D0
 ^.^.~
 &0~
 E
-0 1 100.00 0
+0 1 100.00 36
 E
 4 0 1.20 2
 E
 9 0 50.00 27
-I 9 121 100.00 1  # GATHER: a stick
+I 9 133 100.00 1  # GATHER: a tangle of vines
 I 20 128 100.00 1  # CHOP: a massive jungle tree
 S
 #35
@@ -2421,8 +2768,637 @@ M
 M
 9153 10.00 bc
 S
+#36
+Stumps~
+A Field of Stumps~
+'.' 10 1 2 dl bp
+C
+burn stumps, dig~
+D1
+.&t.&?..~
+&g~
+D1
+..&t.&?.~
+&g~
+D2
+.&t.&?..~
+&g~
+D2
+..&t.&?.~
+&g~
+D3
+.&t.&?..~
+&g~
+D3
+..&t.&?.~
+&g~
+D4
+.&t.&?..~
+&0~
+D4
+..&t.&?.~
+&0~
+E
+2 29 0.80 61
+E
+2 53 5.00 56
+E
+2 5 10.00 46
+E
+2 57 10.00 59
+E
+4 0 2.50 37
+E
+9 0 50.00 37
+E
+16 0 100.00 0
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3013 100.00 1  # FORAGE: a handful of nuts
+M
+237 5.00 ce
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+240 6.00 bc
+M
+9153 10.00 bc
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+246 0.30 ad
+M
+247 0.10 d
+M
+248 1.00 bd
+M
+250 0.10 ad
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9200 5.00 d
+S
+#37
+Small Copse~
+A Small Copse~
+'w' 13 1 2 d p
+C
+chop, dig~
+D1
+.w..~
+&g~
+D2
+.w..~
+&g~
+D3
+&g.&?w&g..~
+&y~
+D4
+.w..~
+&W~
+E
+0 1 50.00 36
+E
+0 0 100.00 37
+E
+2 53 5.00 56
+E
+2 57 10.00 60
+E
+2 5 10.00 47
+E
+3 29 0.80 29
+E
+4 0 0.80 38
+E
+9 0 50.00 38
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 20 131 100.00 1  # CHOP: a green sapling
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+S
+#38
+Copse~
+A Copse of Young Trees~
+'w' 13 1 3 dl p
+C
+chop, dig~
+D1
+w.w.~
+&g~
+D2
+w.w.~
+&g~
+D3
+w&g.&?w&g.~
+&y~
+D4
+w.w.~
+&W~
+E
+0 1 33.33 37
+E
+0 0 100.00 38
+E
+2 53 5.00 56
+E
+2 57 10.00 60
+E
+2 5 10.00 47
+E
+3 29 0.80 29
+E
+4 0 0.40 2
+E
+9 0 50.00 2
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 20 131 100.00 1  # CHOP: a green sapling
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+S
+#39
+Forest Edge~
+The Edge of the Forest~
+'w' 13 1 2 d np
+C
+chop, dig~
+D1
+.w..~
+&g~
+D2
+.w..~
+&g~
+D3
+&g.&?w&g..~
+&y~
+D4
+.w..~
+&W~
+E
+0 1 75.00 36
+E
+0 0 100.00 39
+E
+2 53 5.00 56
+E
+2 57 10.00 60
+E
+2 5 10.00 47
+E
+3 29 0.80 29
+E
+4 0 0.80 1
+E
+9 0 50.00 1
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 20 131 100.00 1  # CHOP: a green sapling
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+S
 #40
-Plains~
+Riverbank~
 On the Plains, Above the Riverbank~
 '.' 10 1 1 l bps
 C
@@ -2446,15 +3422,15 @@ E
 E
 2 45 0.80 44
 E
-2 28 0.80 27
+2 28 0.80 65
 E
-2 29 0.80 27
+2 29 0.80 65
 E
 2 4 1.00 44
 E
 3 29 0.80 29
 E
-3 28 2.00 27
+3 28 2.00 65
 E
 3 4 3.00 44
 E
@@ -2810,7 +3786,7 @@ M
 9202 5.00 dh
 S
 #44
-Light Forest~
+Light Riverbank Forest~
 Some Trees on the Riverbank~
 '.' 14 1 2 dl nps
 C
@@ -2840,7 +3816,7 @@ D4
 @w&?.&W^@e~
 &0~
 E
-0 0 100.00 40
+0 0 100.00 46
 E
 3 29 0.80 29
 E
@@ -2856,7 +3832,8 @@ I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 88.00 1 g  # GATHER: some sticks and leaves
+I 9 131 12.00 1 g  # GATHER: a green sapling
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9140 1.00 dh
@@ -2974,7 +3951,7 @@ M
 9202 5.00 dh
 S
 #45
-Forest~
+Forested Riverbank~
 A Forest, Above the Riverbank~
 '^' 14 1 3 dl nps
 C
@@ -3016,8 +3993,326 @@ I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 88.00 1 g  # GATHER: some sticks and leaves
+I 9 131 12.00 1 g  # GATHER: a green sapling
 I 20 120 100.00 1  # CHOP: a large tree
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+S
+#46
+Stumped Riverbank~
+Some Stumps on the Riverbank~
+'.' 10 1 1 dl bps
+C
+burn stumps, dig, pick~
+D1
+@w&t..@e~
+&t~
+D2
+@w&t..@e~
+&t~
+D3
+@w&t..@e~
+&t~
+D4
+@w&?..@e~
+&0~
+E
+4 0 2.50 47
+E
+9 0 50.00 47
+E
+10 5 10.00 36
+E
+12 0 25.00 41
+E
+16 0 100.00 40
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 9.00 1 X  # DIG: a rock
+I 5 101 100.00 1 X  # DIG: a lump of clay
+I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+M
+237 5.00 ce
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+240 6.00 bc
+M
+9153 10.00 bc
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+246 0.30 ad
+M
+247 0.10 d
+M
+248 1.00 bd
+M
+250 0.10 ad
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9200 5.00 d
+S
+#47
+Riverside Copse~
+A Copse on the Riverbank~
+'w' 13 1 3 d p
+C
+chop, dig, pick~
+D1
+@w&?w&t.@e~
+&g~
+D1
+@w&t.&?w@e~
+&g~
+D2
+@w&?w&t.@e~
+&g~
+D2
+@w&t.&?w@e~
+&g~
+D3
+@w&?w&t.@e~
+&y~
+D3
+@w&t.&?w@e~
+&y~
+D4
+@w&?w&0.@e~
+&W~
+D4
+@w&0.&?w@e~
+&W~
+E
+0 1 50.00 46
+E
+0 0 100.00 47
+E
+3 29 0.80 29
+E
+4 0 0.40 44
+E
+9 0 50.00 44
+E
+10 5 10.00 37
+E
+12 0 25.00 42
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 9.00 1 X  # DIG: a rock
+I 5 101 100.00 1 X  # DIG: a lump of clay
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 7 1205 100.00 1  # FIND-HERB: some bileberries
+I 20 131 100.00 1  # CHOP: a green sapling
 M
 9140 1.00 dh
 M
@@ -3437,6 +4732,7 @@ D4
 &y~
 E
 10 57 5.00 8
+I 5 106 4.00 1 X  # DIG: a rough piece of obsidian
 I 5 104 8.00 1 X  # DIG: a red bloodstone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -3497,7 +4793,7 @@ M
 9207 10.00 0
 S
 #54
-Light Forest~
+Shoreside Tree~
 A Tree by the Shore~
 '.' 14 1 2 dl npr
 C
@@ -3527,7 +4823,7 @@ D4
 ..&W^&?.~
 &0~
 E
-0 1 100.00 50
+0 1 100.00 59
 E
 10 57 5.00 1
 I 5 102 9.00 1 x  # DIG: a flint stone
@@ -3536,7 +4832,8 @@ I 5 101 100.00 1 x  # DIG: a lump of clay
 I 6 3051 50.00 1 x  # FORAGE: a sea urchin
 I 6 3052 50.00 1 x  # FORAGE: a clam
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 88.00 1 g  # GATHER: some sticks and leaves
+I 9 131 12.00 1 g  # GATHER: a green sapling
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9140 1.00 dh
@@ -3662,7 +4959,7 @@ M
 9210 0.03 0
 S
 #55
-Partial Jungle~
+Seaside Jungle~
 The Edge of the Jungle, Overlooking the Sea~
 '^' 12 3 5 d g
 C
@@ -3684,7 +4981,8 @@ E
 I 6 3051 50.00 1 x  # FORAGE: a sea urchin
 I 6 3052 50.00 1 x  # FORAGE: a clam
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
-I 9 121 100.00 1  # GATHER: a stick
+I 9 133 88.00 1 g  # GATHER: a tangle of vines
+I 9 135 12.00 1 g  # GATHER: a reaching sapling
 I 20 128 100.00 1  # CHOP: a massive jungle tree
 M
 9061 0.01 d
@@ -3764,7 +5062,7 @@ M
 9210 0.03 0
 S
 #56
-Shore~
+Estuary Shore~
 The Shore of the Estuary~
 '.' 37 1 2 l bprs
 C
@@ -4078,6 +5376,1077 @@ M
 M
 9200 5.00 d
 S
+#59
+Seaside Stumps~
+Some Stumps Along the Shore~
+'.' 10 1 2 dl bpr
+C
+burn stumps, dig, pick~
+D1
+.&t.&?..~
+&g~
+D1
+..&t.&?.~
+&g~
+D2
+.&t.&?..~
+&g~
+D2
+..&t.&?.~
+&g~
+D3
+.&t.&?..~
+&g~
+D3
+..&t.&?.~
+&g~
+D4
+.&t.&?..~
+&0~
+D4
+..&t.&?.~
+&0~
+E
+3 29 0.80 29
+E
+4 0 2.50 60
+E
+9 0 50.00 60
+E
+10 57 5.00 36
+E
+16 0 100.00 50
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a lump of clay
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+240 6.00 bc
+M
+9153 10.00 bc
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+246 0.30 ad
+M
+247 0.10 d
+M
+248 1.00 bd
+M
+250 0.10 ad
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9203 10.00 g
+M
+9204 10.00 0
+M
+9211 10.00 h
+M
+9210 0.03 0
+S
+#60
+Seaside Copse~
+A Small Copse by the Sea~
+'w' 13 1 2 dl pr
+C
+chop, dig, pick~
+D1
+.w..~
+&g~
+D1
+..w.~
+&g~
+D2
+.w..~
+&g~
+D2
+..w.~
+&g~
+D3
+&g.&?w&g..~
+&y~
+D3
+&g..&?w&g.~
+&y~
+D4
+.w..~
+&0~
+D4
+..w.~
+&W~
+E
+0 0 50.00 59
+E
+0 0 100.00 60
+E
+4 0 0.40 54
+E
+9 0 50.00 54
+E
+10 57 5.00 37
+I 5 102 9.00 1 x  # DIG: a flint stone
+I 5 100 9.00 1 x  # DIG: a rock
+I 5 101 100.00 1 x  # DIG: a lump of clay
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+I 20 131 100.00 1  # CHOP: a green sapling
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9200 5.00 d
+M
+9202 5.00 dh
+M
+9203 10.00 g
+M
+9204 10.00 0
+M
+9211 10.00 h
+M
+9210 0.03 0
+S
+#61
+Jungle Stumps~
+A Densely Vined Field of Stumps~
+'.' 10 3 3 dl p
+C
+burn stumps~
+D1
+.&t.&?..~
+&g~
+D1
+..&t.&?.~
+&g~
+D2
+.&t.&?..~
+&g~
+D2
+..&t.&?.~
+&g~
+D3
+.&t.&?..~
+&g~
+D3
+..&t.&?.~
+&g~
+D4
+.&t.&?..~
+&0~
+D4
+..&t.&?.~
+&0~
+E
+2 32 2.00 35
+E
+2 57 10.00 63
+E
+4 0 2.50 62
+E
+7 5 2.00 29
+E
+8 0 100.00 15
+E
+9 0 50.00 62
+E
+15 0 1.00 0
+E
+16 0 100.00 0
+I 6 3017 100.00 1  # FORAGE: a plump fig
+M
+9061 0.01 d
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9109 10.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+S
+#62
+Jungle Copse~
+A Copse of Young Jungle Trees~
+'w' 13 3 6 d 0
+C
+chop~
+D1
+w&g.&?w&g.~
+&G~
+D2
+w&g.&?w&g.~
+&G~
+D3
+w&g.&?w&g.~
+&G~
+D4
+w&g.&?w&g.~
+&G~
+E
+0 1 50.00 61
+E
+0 0 100.00 62
+E
+2 32 2.00 35
+E
+2 57 10.00 64
+E
+4 0 0.80 27
+E
+7 5 2.00 29
+E
+8 0 100.00 15
+E
+9 0 50.00 27
+E
+15 0 1.00 34
+I 6 3017 100.00 1  # FORAGE: a plump fig
+I 20 135 100.00 1  # CHOP: a reaching sapling
+M
+9061 0.01 d
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9109 10.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+S
+#63
+Seaside Jungle Stumps~
+Amidst Tropical Stumps on the Seaside~
+'.' 10 3 3 dl pr
+C
+burn stumps, pick~
+D0
+.&t.&?..~
+&g~
+D0
+..&t.&?.~
+&g~
+E
+4 0 2.50 64
+E
+7 5 2.00 29
+E
+9 0 50.00 64
+E
+10 57 5.00 61
+E
+16 0 100.00 50
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+M
+9061 0.01 d
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9109 10.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9203 10.00 g
+M
+9204 10.00 0
+M
+9211 10.00 h
+M
+9210 0.03 0
+S
+#64
+Seaside Jungle Copse~
+A Copse in the Jungle by the Sea~
+'w' 13 3 6 d pr
+C
+chop, pick~
+D0
+&g.&?w&g..~
+&G~
+D0
+&g..&?w&g.~
+&G~
+E
+0 0 50.00 63
+E
+0 0 100.00 64
+E
+4 0 0.40 55
+E
+7 5 2.00 29
+E
+9 0 50.00 55
+E
+10 57 5.00 62
+I 6 3051 50.00 1 x  # FORAGE: a sea urchin
+I 6 3052 50.00 1 x  # FORAGE: a clam
+I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+I 20 135 100.00 1  # CHOP: a reaching sapling
+M
+9061 0.01 d
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9109 10.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+201 5.00 bce
+M
+200 5.00 bce
+M
+222 5.00 bce
+M
+223 5.00 bce
+M
+251 15.00 ce
+M
+252 10.00 cf
+M
+9154 10.00 bc
+M
+9004 5.00 bd
+M
+9010 5.00 bd
+M
+9012 10.00 bd
+M
+9009 10.00 bd
+M
+9152 5.00 bd
+M
+9154 5.00 bd
+M
+9020 5.00 bd
+M
+9021 5.00 bd
+M
+9011 5.00 bd
+M
+9025 5.00 bd
+M
+9029 1.00 bd
+M
+9030 1.00 bd
+M
+9031 1.00 bd
+M
+9032 1.00 bd
+M
+9022 5.00 ad
+M
+9116 5.00 ad
+M
+9133 5.00 ad
+M
+9023 5.00 d
+M
+9024 5.00 d
+M
+9013 5.00 bdg
+M
+9002 5.00 adg
+M
+9120 15.00 adg
+M
+9007 5.00 dg
+M
+9132 5.00 dg
+M
+9121 5.00 dg
+M
+9128 5.00 dg
+M
+9137 5.00 dg
+M
+9141 5.00 dg
+M
+9006 5.00 dg
+M
+9134 5.00 bdh
+M
+9135 5.00 adh
+M
+9138 5.00 dh
+M
+9139 5.00 dh
+M
+9140 1.00 dh
+M
+9058 0.01 d
+M
+9040 0.01 d
+M
+9034 5.00 0
+M
+9036 5.00 h
+M
+9037 5.00 h
+M
+9038 5.00 h
+M
+9033 5.00 g
+M
+9035 5.00 g
+M
+9039 5.00 g
+M
+9064 0.90 ad
+M
+9203 10.00 g
+M
+9204 10.00 0
+M
+9211 10.00 h
+M
+9210 0.03 0
+S
+#65
+Jungle Edge~
+The Edge of the Jungle~
+'w' 13 3 5 d 0
+C
+chop~
+D0
+&g.&?w&g..~
+&G~
+E
+0 1 75.00 61
+E
+0 0 100.00 65
+E
+2 32 2.00 35
+E
+2 57 10.00 64
+E
+4 0 0.80 27
+E
+7 5 2.00 29
+E
+8 0 100.00 15
+E
+9 0 50.00 27
+E
+15 0 1.00 34
+I 6 3017 100.00 1  # FORAGE: a plump fig
+I 20 135 100.00 1  # CHOP: a reaching sapling
+M
+9061 0.01 d
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9109 10.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+S
 #70
 Irrigated Plains~
 An Irrigated Plain~
@@ -4237,7 +6606,7 @@ D4
 &0.&?^&0.&?^~
 &W~
 E
-0 1 100.00 70
+0 1 100.00 73
 E
 11 19 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
@@ -4247,7 +6616,8 @@ I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
 I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 88.00 1 g  # GATHER: some sticks and leaves
+I 9 131 12.00 1 g  # GATHER: a green sapling
 I 20 120 50.00 2 c  # CHOP: a large tree
 I 20 120 50.00 1 c  # CHOP: a large tree
 M
@@ -4348,7 +6718,7 @@ D0
 &g.&?^&g.&?^~
 &G~
 E
-0 1 100.00 70
+0 1 100.00 75
 E
 11 19 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
@@ -4358,9 +6728,570 @@ I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
 I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
-I 9 121 100.00 1  # GATHER: a stick
+I 9 123 88.00 1 g  # GATHER: a small flower
+I 9 135 12.00 1 g  # GATHER: a reaching sapling
 I 20 128 50.00 1 c  # CHOP: a massive jungle tree
 I 20 128 50.00 2 c  # CHOP: a massive jungle tree
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9061 0.01 d
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+S
+#73
+Irrigated Stumps~
+Some Stumps on the Irrigated Plain~
+'.' 10 1 2 dl bp
+C
+burn stumps, dig, pick~
+D1
+.&t.&?..~
+&g~
+D1
+..&t.&?.~
+&g~
+D2
+.&t.&?..~
+&g~
+D2
+..&t.&?.~
+&g~
+D3
+.&t.&?..~
+&g~
+D3
+..&t.&?.~
+&g~
+D4
+.&t.&?..~
+&0~
+D4
+..&t.&?.~
+&0~
+E
+4 0 2.50 74
+E
+9 0 50.00 74
+E
+11 19 4.00 23
+E
+16 0 100.00 70
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3014 100.00 1  # FORAGE: some dry beans
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
+I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9064 0.90 ad
+S
+#74
+Irrigated Copse~
+An Irrigated Copse~
+'w' 13 1 3 d p
+C
+chop, dig, pick~
+D1
+w.w.~
+&g~
+D2
+w.w.~
+&g~
+D3
+w&g.&?w&g.~
+&y~
+D3
+&g.&?w&g.&?w~
+&y~
+D4
+w&0.&?w&0.~
+&W~
+D4
+&0.&?w&0.&?w~
+&W~
+E
+0 0 50.00 73
+E
+0 0 100.00 74
+E
+4 0 0.40 71
+E
+9 0 50.00 71
+E
+11 19 4.00 24
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3014 100.00 1  # FORAGE: some dry beans
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
+I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
+I 20 131 100.00 1  # CHOP: a green sapling
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9064 0.90 ad
+S
+#75
+Irrigated Jungle Stumps~
+A Marshy Field of Stumps~
+'.' 10 3 3 dl p
+C
+chop, dig, pick~
+D0
+.&t.&?..~
+&g~
+D0
+..&t.&?.~
+&g~
+E
+4 0 2.50 76
+E
+9 0 50.00 76
+E
+11 19 4.00 23
+E
+16 0 100.00 70
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3014 100.00 1  # FORAGE: some dry beans
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
+I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9061 0.01 d
+M
+9151 10.00 dh
+M
+9109 10.00 dh
+M
+9106 10.00 dh
+M
+9111 10.00 bdh
+M
+9105 5.00 bdh
+M
+9104 5.00 bdh
+M
+9103 5.00 adh
+M
+9113 5.00 adh
+M
+9102 5.00 adh
+M
+9107 10.00 dg
+M
+9101 1.00 dg
+M
+9112 5.00 bdg
+M
+9110 5.00 bdg
+M
+9114 5.00 bdg
+M
+9108 5.00 bdg
+M
+9115 10.00 adg
+M
+9100 5.00 adg
+M
+9016 5.00 adg
+M
+253 10.00 cf
+S
+#76
+Irrigated Jungle Copse~
+Irrigated Jungle Copse~
+'w' 13 3 6 d p
+C
+chop, dig, pick~
+D0
+w&g.&?w&g.~
+&G~
+D0
+&g.&?w&g.&?w~
+&G~
+E
+0 0 50.00 75
+E
+0 0 100.00 76
+E
+4 0 0.40 72
+E
+9 0 50.00 72
+E
+11 19 4.00 24
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a lump of clay
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 3014 100.00 1  # FORAGE: some dry beans
+I 7 1201 50.00 1 a  # FIND-HERB: a sack of fiveleaf
+I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
+I 20 135 100.00 1  # CHOP: a reaching sapling
 M
 9040 0.01 d
 M

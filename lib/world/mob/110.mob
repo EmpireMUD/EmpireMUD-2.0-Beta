@@ -3,7 +3,7 @@ roc giant~
 a giant roc~
 A giant roc raises her wings in a threatening pose.
 ~
-100 125 bcdjyA cmE
+100 125 bcdjyA cmE 5
 2 0 2 26
 I 0 3200 100.00 8  # BUTCHER: a cut of poultry
 I 0 11002 25.00 1 b  # BUTCHER: a giant lobster
@@ -16,7 +16,7 @@ adventurer late~
 the late adventurer~
 A late adventurer is standing here (list).
 ~
-100 125 bdov nD
+100 125 bdov nD 3
 1 0 0 15
 T 11025
 S
@@ -25,7 +25,7 @@ roc giant~
 a giant roc~
 A giant roc swoops low toward you!
 ~
-100 125 cdjuyA cmE
+100 125 cdjuyA cmE 5
 2 0 2 26
 I 0 3200 100.00 8  # BUTCHER: a cut of poultry
 I 0 11002 25.00 1 b  # BUTCHER: a giant lobster
@@ -38,7 +38,7 @@ thief shady~
 a shady thief~
 A shady thief is hiding in the shadows (list).
 ~
-100 125 bdov nD
+100 125 bdov nD 3
 1 0 0 15
 T 11026
 S
@@ -47,7 +47,7 @@ roc giant~
 a giant roc~
 A giant roc is perched on the nest (list).
 ~
-100 125 bdjyA cmnE
+100 125 bdjyA cmnE 5
 2 0 2 26
 S
 #11005
@@ -55,7 +55,7 @@ roc giant hatchling~
 a giant roc hatchling~
 The hatchling roc is pecking around at the trees.
 ~
-100 125 bdj cnE
+100 125 bdj cnE 2
 2 0 0 26
 T 11012
 S
@@ -64,7 +64,7 @@ poacher~
 a poacher~
 A poacher is creeping through the brush.
 ~
-100 125 bdov c
+100 125 bdov c 3
 1 0 9 2
 T 11007
 S
@@ -73,7 +73,7 @@ spawner~
 the invisible carcass spawner~
 The invisible carcass spawner exists here.
 ~
-0 0 dhk cdln
+0 0 dhk cdln 3
 0 0 29 15
 T 11010
 T 11011
@@ -83,7 +83,7 @@ ostrich baby~
 a baby ostrich~
 A baby ostrich is running in circles.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
 T 9901
 T 9902
@@ -94,7 +94,7 @@ roc tawny~
 a tawny roc~
 A tawny roc is perched over you.
 ~
-100 125 de m
+100 125 de m 5
 0 0 2 26
 S
 #11019
@@ -102,7 +102,7 @@ ostrich lithe~
 a lithe ostrich~
 A lithe ostrich prances circles around you.
 ~
-100 125 dej 0
+100 125 dej 0 3
 0 0 11 11
 S
 #11020
@@ -110,7 +110,7 @@ swan huge trumpeter~
 a huge trumpeter swan~
 A huge trumpeter swan glides past you with grace.
 ~
-100 125 del 0
+100 125 del 0 3
 0 0 6 9
 S
 $

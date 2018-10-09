@@ -892,6 +892,17 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_GENDERS  3	// total
 
 
+// SIZE_x: character size (determines blood pool, corpse size, etc) -- note: these must go in order but you'll need to write an auto-updater if you want to add one in the middle
+#define SIZE_NEGLIGIBLE  0	// has no size
+#define SIZE_TINY  1	// mouse
+#define SIZE_SMALL  2	// dog
+#define SIZE_NORMAL  3	// human
+#define SIZE_LARGE  4	// horse
+#define SIZE_HUGE  5	// elephant
+#define SIZE_ENORMOUS  6	// dragon
+#define NUM_SIZES  7	// total
+
+
 // positions
 #define POS_DEAD  0	/* dead				*/
 #define POS_MORTALLYW  1	/* mortally wounded	*/
@@ -1505,7 +1516,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_ROCK  22
 #define CMP_SEEDS  23
 #define CMP_SKIN  24
-#define CMP_STICK  25
+#define CMP_SAPLING  25
 #define CMP_TEXTILE  26
 #define CMP_VEGETABLE  27
 #define CMP_ROPE  28
@@ -1565,8 +1576,8 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_WEALTH  15	// item provides wealth
 #define ITEM_CART  16	// This type is mostly DEPRECATED; use vehicles instead
 #define ITEM_SHIP  17	// This type is mostly DEPRECATED; use vehicles instead
-	#define ITEM_UNUSED4  18
-	#define ITEM_UNUSED5  19
+#define ITEM_LIGHTER  18	// can be used to light fires
+#define ITEM_MINIPET  19	// grants a minipet when 'use'd
 #define ITEM_MISSILE_WEAPON  20	// bow/crossbow/etc
 #define ITEM_AMMO  21	// for missile weapons
 #define ITEM_INSTRUMENT  22	// item is a musical instrument
@@ -1774,6 +1785,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_PILOTING		37
 #define ACT_SWAP_SKILL_SETS	38
 #define ACT_MAINTENANCE		39
+#define ACT_BURN_AREA		40
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -2391,7 +2403,8 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_SUMMER  13	// triggers if it's summer
 #define EVO_AUTUMN  14	// triggers if it's autumn
 #define EVO_WINTER  15	// triggers if it's winter
-#define NUM_EVOS  16	// total
+#define EVO_BURNS_TO  16	// caused by a player burning it
+#define NUM_EVOS  17	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0
@@ -2409,6 +2422,7 @@ typedef struct vehicle_data vehicle_data;
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
 #define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 #define ISLE_CONTINENT  BIT(3)	// d. island is a continent (usually large, affects spawns)
+#define ISLE_HAS_CUSTOM_DESC  BIT(4)	// e. ** island has a custom desc -- internal use only (not having this flag will get the desc replaced)
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
@@ -2723,11 +2737,13 @@ struct morph_data {
 	char *keywords;
 	char *short_desc;	// short description (a bat)
 	char *long_desc;	// long description (seen in room)
+	char *look_desc;	// desc shown on look-at
 	
 	bitvector_t flags;	// MORPHF_ flags
 	bitvector_t affects;	// AFF_ flags added
 	int attack_type;	// TYPE_ const
 	int move_type;	// MOVE_TYPE_ const
+	int size;	// SIZE_ const for this form
 	struct apply_data *applies;	// how it modifies players
 	
 	int cost_type;	// any pool (NUM_POOLS)
@@ -3619,6 +3635,13 @@ struct mail_data {
 };
 
 
+// for permanently learning minipets
+struct minipet_data {
+	any_vnum vnum;	// vnum of the mob
+	UT_hash_handle hh;	// player's minipets hash
+};
+
+
 // for player mount collections
 struct mount_data {
 	mob_vnum vnum;	// mob that's mounted, for name
@@ -3793,6 +3816,7 @@ struct player_special_data {
 	room_vnum adventure_summon_return_location;	// where to send a player back to if they're outside an adventure
 	room_vnum adventure_summon_return_map;	// map check location for the return loc
 	room_vnum marked_location;	// for map marking
+	any_vnum last_vehicle;	// if the player quit in a vehicle
 	
 	// olc data
 	any_vnum olc_min_vnum;	// low range of olc permissions
@@ -3813,6 +3837,7 @@ struct player_special_data {
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
+	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
 	
@@ -3865,7 +3890,8 @@ struct char_player_data {
 	char *passwd;	// character's password
 	char *name;	// PC name / NPC keyword (kill ... )
 	char *short_descr;	// for NPC string-building
-	char *long_descr;	// for 'look' on mobs or 'look at' on players
+	char *long_descr;	// for 'look' on mobs
+	char *look_descr;	// look-at text
 	byte sex;	// PC / NPC sex
 	byte access_level;	// PC access level -- LVL_x -- not to be confused with GET_COMPUTED_LEVEL() or get_approximate_level()
 	struct time_data time;	// PC's age
@@ -3903,6 +3929,7 @@ struct char_special_data {
 	// add new items to write_player_to_file() and read_player_primary_data()
 	
 	int idnum;	// player's idnum; -1 for mobiles
+	sbyte size;	// character's SIZE_ const
 	bitvector_t act;	// mob flag for NPCs; player flag for PCs
 	bitvector_t injuries;	// Bitvectors including damage to the player
 	bitvector_t affected_by;	// Bitvector for spells/skills affected by
@@ -5263,4 +5290,17 @@ struct map_data {
 	struct map_data *next_in_sect;	// LL of all map locations of a given sect
 	struct map_data *next_in_base_sect;	// LL for base sect
 	struct map_data *next;	// linked list of non-ocean tiles, for iterating
+};
+
+
+// for character size, search SIZE_x
+struct character_size_data {
+	int max_blood;	// how much blood the mob has
+	bitvector_t corpse_flags;	// large or not
+	bool can_take_corpse;	// corpse is no-take if false
+	bool show_on_map;	// show (oo)/name on map at range
+	char *corpse_keywords;	// additional keywords on the corpse
+	char *corpse_long_desc;	// custom long desc with %s for the "corpse of"
+	char *body_long_desc;	// custom long desc with %s for "the body of"
+	char *show_on_look;	// if not null, shows when you look at a person of this size
 };

@@ -3,8 +3,14 @@ king god-king sun ancient~
 the Sun King~
 An ancient god-king arises from his deathly slumber!
 ~
-0 0 bdxyzAB 0
+0 0 bdxyzAB 0 3
 1 0 0 18
+D
+   The mummified husk of this ancient ruler offers little clue to his
+appearance in life. His jewelled golden raiment, however, attests to the great
+wealth he must once have possessed, and the emerald flames burning in his empty
+eyesockets hints at his great magical strength.
+~
 I 4 18544 100.00 1  # LOOT: a chance of boss loot
 I 4 18545 20.00 1  # LOOT: the solar raiment
 I 4 18532 10.00 1 e  # LOOT: plated jaguar gauntlets
@@ -40,8 +46,15 @@ manasa serpent lord~
 Manasa the serpent lord~
 A serpent lord stands here, wielding a sword with each of her four arms!
 ~
-0 0 abdxzAB 0
+0 0 abdxzAB 0 4
 2 2 5 1
+D
+   This serpent lord has the lower body of a giant serpent, melding into the
+upper body of a four-armed human woman. All four of her arms grip exotic,
+curved swords in the stance of a trained warrior. She stands head-and-shoulders
+above even the tallest human, and her forked tongue flicks out to taste the air
+as she examines you...
+~
 I 4 18544 100.00 1  # LOOT: a chance of boss loot
 I 4 18527 6.66 1 e  # LOOT: a jaguar claw ring
 I 4 18528 6.66 1 e  # LOOT: an obsidian coyote ring
@@ -78,8 +91,15 @@ Quetzalcoatl feathered serpent~
 the feathered serpent Quetzalcoatl~
 The feathered serpent Quetzalcoatl hovers here, defending its domain!
 ~
-0 0 bdxy m
+0 0 bdxy m 5
 0 0 2 22
+D
+   This elephant-sized serpent has massive feathered wings with beautiful,
+many-colored plumage that shines softly in the dim light of the hidden valley.
+It floats effortlessly in the air in complete defiance of its massive weight,
+and a gentle breeze swirls in a circle around it, lightly ruffling its colorful
+feathers.
+~
 I 4 18544 100.00 1  # LOOT: a chance of boss loot
 I 4 18527 6.66 1 e  # LOOT: a jaguar claw ring
 I 4 18528 6.66 1 e  # LOOT: an obsidian coyote ring
@@ -114,8 +134,12 @@ gorilla giant~
 a giant gorilla~
 A gorilla the size of a carthorse looms menacingly over you!
 ~
-0 0 bdy c
+0 0 bdy c 4
 0 0 0 15
+D
+   A faint emerald light shines in the eyes of this huge ape, suggesting its
+size and aggression may be unnatural...
+~
 T 18513
 T 18503
 S
@@ -124,8 +148,12 @@ jaguar feral~
 a feral jaguar~
 A feral jaguar snarls at you and bares its fangs!
 ~
-0 0 bdjz c
+0 0 bdjz c 3
 0 0 0 10
+D
+   As this large, fearsome feline prepares to defend its territory, you notice
+a faint flicker of green light in its eyes...
+~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
 T 18513
@@ -136,8 +164,12 @@ cobra king~
 a king cobra~
 A king cobra rears up and flares its hood, hissing loudly!
 ~
-0 0 bdjz c
+0 0 bdjz c 3
 0 0 5 9
+D
+   Are the slitted green eyes of this unusually large and fierce serpent
+glowing, or is it just your imagination...?
+~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 2  # SKIN: some snakeskin
 T 18513
@@ -148,8 +180,12 @@ snake grass large~
 a grass snake~
 A large grass snake is slithering away.
 ~
-0 0 bdho 0
+0 0 bdho 0 2
 0 0 5 9
+D
+   It appears as though Quetzalcoatl has command over normal snakes. It will
+probably leave soon if you don't kill it. Or if you kill Quetzalcoatl.
+~
 T 18520
 S
 #18507
@@ -157,8 +193,13 @@ serpent lord mirage~
 a serpent lord mirage~
 A mirage of the serpent lord is fading away.
 ~
-0 0 bdhox 0
+0 0 bdhox 0 4
 2 2 5 1
+D
+   These illusory doubles of the serpent lord look and feel real, but their
+strikes don't quite hurt as much... The mirage will probably fade away
+eventually, and vanish if the original is slain.
+~
 T 18520
 S
 #18511
@@ -166,8 +207,11 @@ battle-jaguar jaguar armored~
 an armored battle-jaguar~
 An armored battle-jaguar is stalking around here.
 ~
-125 175 bdej 0
+125 175 bdej 0 4
 0 0 11 10
+D
+Someone has given this already fearsome feline a suit of chain armor!
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
 I 4 175 100.00 4  # LOOT: an iron ingot
@@ -180,8 +224,11 @@ jaguar riding~
 a riding jaguar~
 A riding jaguar is saddled up and prowling around.
 ~
-75 100 bdej 0
+75 100 bdej 0 4
 0 0 11 10
+D
+A glint of intelligence flickers in the fearsome feline's emerald green eyes...
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
 I 3 18511 100.00 1  # BARDE: an armored battle-jaguar
@@ -191,8 +238,12 @@ serpent sea huge~
 a sea serpent~
 A huge sea serpent is swimming around here.
 ~
-125 175 bdejl 0
+125 175 bdejl 0 5
 0 0 6 9
+D
+   Someone has very thoughtfully put a bridle on it. It would be pretty hard to
+hold onto it otherwise.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
 S
@@ -201,8 +252,12 @@ serpent feathered~
 a feathered serpent~
 A feathered serpent is riding the winds nearby.
 ~
-125 175 bdej m
+125 175 bdej m 5
 0 0 2 9
+D
+   This feathered serpent, while not as large or majestic as its progenitor,
+Quetzalcoatl, is still easily strong enough to carry someone on its back.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
 S
@@ -211,8 +266,23 @@ jaguar cub tiny~
 a tiny jaguar cub~
 A tiny jaguar cub runs around your ankles.
 ~
-1 1 bdoD n
+1 1 bdoD n 1
 0 0 0 9
+D
+It's the size of a housecat!
+~
+M
+0
+$n pounces on your foot.~
+M
+0
+$n nudges your leg.~
+M
+0
+$n is stalking you!~
+M
+0
+$n mews plaintively.~
 T 9901
 T 9902
 S
@@ -221,8 +291,11 @@ snakes knot~
 a knot of snakes~
 A knot of snakes slithers towards you, hissing.
 ~
-0 0 cdoz c
+0 0 cdhoz c 4
 0 0 5 9
+D
+The snakes are all around you! They're coming out of the walls!
+~
 T 18516
 S
 #18517
@@ -230,7 +303,23 @@ S
 Professor #n~
 The renowned archaeologist, Professor #n, is setting up shop here...
 ~
-0 0 bd cn
+0 0 bd cn 3
 0 1 0 15
+D
+   Professor of Archaeology, expert on the occult, and how does one say it...
+Obtainer of rare antiquities.
+~
+M
+1
+Snakes. Why did it have to be snakes?~
+M
+1
+Fortune and glory, kid. Fortune and glory.~
+M
+1
+Asps. Very dangerous. ...You go first.~
+M
+1
+I'm like a bad penny, I always turn up.~
 S
 $

@@ -497,7 +497,7 @@ See also: INVIS, TOGGLE, WIZHIDE
 #d
 INSTANCE INSTANCES
 
-Usage:  instance <list | add | delete | deleteall | nearby | reset | spawn | test> [argument]
+Usage:  instance <list | add | delete | deleteall | info | nearby | reset | spawn | test> [argument]
 
 This command allows immortals to list and manage adventure zone instances.
 The 'list' command can be used to see all instances, or all instances for one
@@ -508,6 +508,8 @@ The 'delete' command deletes by number in the list.
 
 The 'deleteall' command removes all instances for a given adventure zone
 (by vnum). You can delete ALL instances in the game with 'inst deleteall all'.
+
+The 'info' command gets full details on a single instance.
 
 The 'reset' command will force a zone reset on the instance you're in or the
 instance number you target.
@@ -954,6 +956,7 @@ grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
 learned        PC      MISC         Turns learned recipes on/off
+minipet        PC      MISC         Turns minipets on/off
 access         PC      NUMBER       Player's immortal access level
 loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
@@ -1026,6 +1029,16 @@ LEARNED flag.
 
 See also: LEARN, LEARNED, SHOW LEARNED
 #d
+"SET MINIPET" "SET MINI-PET"
+
+Usage:  set [file] <player> minipet <mob vnum> <on | off>
+
+This lets you give (or revoke) collectable mini-pets.
+
+WARNING: This works on ANY mob vnum.
+
+See also: MINIPET
+#d
 SHOW
 
 Usage:  show <mode> [argument]
@@ -1047,6 +1060,7 @@ factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 learned    Immort   Shows you learned recipes.
+minipets   Immort   Shows you mini-pets collected by a player.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
@@ -1149,6 +1163,14 @@ Shows you the recipes learned by a player or empire. For multi-word empire
 names, use "quotation marks".
 
 See also: SET LEARNED
+#e
+"SHOW MINIPETS" "SHOW MINI-PETS"
+
+Usage:  show minipets <player> [search phrase]
+
+Shows you mini-pets collected by a player.
+
+See also: SET MINIPET
 #e
 "SHOW NOTES"
 

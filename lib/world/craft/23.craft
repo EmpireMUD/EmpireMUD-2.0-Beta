@@ -205,7 +205,7 @@ clay shield~
 R
 4 6 1 0
 R
-25 6 1 0
+7 6 1 272
 R
 15 1 1 16384
 S
@@ -249,22 +249,22 @@ R
 176 6 0 0
 S
 #2324
-copper breastplate~
+bronze breastplate~
 2324 1
 1 53 0 24 -1
 R
-178 10 0 0
+168 10 0 0
 R
 15 2 1 16384
 S
 #2325
-copper mask~
+bronze mask~
 2325 1
 1 53 0 24 -1
 R
 26 1 1 0
 R
-178 4 0 0
+168 4 0 0
 S
 #2326
 copper vambraces~

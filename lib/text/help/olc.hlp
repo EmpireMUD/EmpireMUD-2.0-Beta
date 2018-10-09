@@ -3690,6 +3690,7 @@ Fields:
   &c-movetype&0 - see HELP MEDIT MOVETYPE
   &c-nameset&0 - see HELP MEDIT NAMESET
   &c-sex&0 - male, female, neutral
+  &c-size&0 - see HELP MOB SIZE
   &c-attack&0 - see HELP MEDIT ATTACK
 
 Examples:
@@ -3850,6 +3851,16 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
+"MEDIT LOOKDESCRIPTION" "MEDIT LOOK DESCRIPTION"
+
+Usage:  .lookdescription
+
+The look description is shown when a player looks at the mob. This can be short
+or long, but you should avoid passing 3 lines of text, after the /fi formatter.
+You can also use the /f formatter if it's shorter than 80 characters.
+
+See also: OLC MOBILES, STRING EDITOR
+#d
 "ADVEDIT SCRIPTS" "BEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "QEDIT SCRIPTS" "REDIT SCRIPTS" "VEDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
@@ -3898,27 +3909,26 @@ Examples:
 
 See also: MEDIT LONG DESCRIPTION
 #d
-MINIPET MINI-PET "MINI PET" "PET WHISTLE"
+"MEDIT SIZE" "MORPHEDIT SIZE" "MOB SIZE"
 
-Mini-pets are a common cosmetic reward from adventure zones. They are summoned
-from a reusable item, and the player may get that item from a loot drop or a
-shop.
+Usage:  .size [size]
 
-To create a pet whistle (or other summoner item), attach script 9900 (Mini-pet
-Use) to an object and set its <value0> to the mini-pet mob's vnum.
+A mob's size determines several of its attributes:
+- corpse size (large/normal) and whether or not players can take the corpse
+- total amount of blood the mob has (also modified by animal/vampire flags)
+- whether or not you can see the mob on the world map
 
-You must also create a generic cooldown with the same vnum as the item, used
-to keep it from being resummoned.
+Available sizes are:
+ &cnegligible&0 - no size / immaterial
+ &ctiny&0 - mouse, insect; low blood
+ &csmall&0 - dog, goblin
+ &cnormal&0 - human; large corpse
+ &clarge&0 - horse; large corpse
+ &chuge&0 - elephant; cannot take corpse
+ &cenormous&0 - dragon; can be seen on the map
 
-Mini-pet mobs should have the following traits:
- - Flags: SENTINEL SPAWNED !LOOT (and ISNPC)
- - Affects: !ATTACK
- - Scripts: 9901 (Dismissable), 9902 (Lonely Despawn)
- - Value0: The vnum of the mob
- - A cooldown generic with the same vnum as the mini-pet whistle
- - Adorable custom messages (optional)
-
-See also: GENERIC COOLDOWN
+Morphs also have a 'size' trait with the same meaning. However, morph size will
+not affect the blood pool of the morphed person/mob at all.
 #d
 MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
 
@@ -4037,6 +4047,19 @@ A fiery dragon circles overhead.
 You're standing at the foot of a huge giant!
 
 See also: OLC MORPHS
+#d
+"MORPHEDIT LOOKDESCRIPTION" "MORPHEDIT LOOK DESCRIPTION"
+
+Usage:  .lookdescription
+
+The look description is shown when a player looks at the morphed person. This
+can be short or long, but you should avoid passing 3 lines of text, after the
+/fi formatter. You can also use the /f formatter if it's shorter than 80
+characters.
+
+A morph's look description will override the regular one on a player or mob.
+
+See also: OLC MORPHS, STRING EDITOR
 #d
 "MORPHEDIT MAXLEVEL" "MORPHEDIT MAX LEVEL"
 
@@ -4159,6 +4182,12 @@ Drink Container:
 Food:
  0 - hours of fullness
  1 - crop vnum (if plantable)
+
+Lighter:
+ 0 - number of uses (-1 is unlimited)
+
+Minipet:
+ 0 - vnum of mob to teach
 
 Missile Weapon:
  0 - attack type (see ATTACK TYPES)
@@ -4758,7 +4787,8 @@ characters long, it will fit on one line and should not be indented. If it
 goes any longer than that, you should use /fi to format it with indent inside
 the string editor.
 
-See also: OLC OBJECTS, STRING EDITOR
+See also: OLC OBJECTS, STRING EDITOR, MEDIT LOOKDESCRIPTION,
+MORPHEDIT LOOKDSECRIPTION
 #d
 "OEDIT MATERIAL"
 
@@ -4773,7 +4803,7 @@ Choose the material that best fits your object. If there isn't one that fits
 at all, contact the programmer to discuss adding a new one. But remember, the
 material doesn't need to be exact. It just needs to be close enough.
 
-Available mat
+Available materials:
   WOOD     ROCK      IRON
   SILVER   GOLD      FLINT
   CLAY     FLESH     GLASS
@@ -4795,6 +4825,15 @@ If you set the maxlevel to 0, there will be no maximum and the obj can scale
 to any level over the minimum.
 
 See also: ITEM SCALING, OEDIT MINLEVEL, OLC OBJECTS
+#d
+"OEDIT MINIPET"
+
+Usage:  .minipet <mob vnum>
+
+This command assigns which mob is taught by a MINIPET item, when used with the
+'use' command.
+
+See also: MINIPETS
 #d
 "OEDIT MINLEVEL" "OEDIT MIN LEVEL"
 
@@ -4995,8 +5034,8 @@ Available types:
  WEALTH - adds to empire wealth when stored
  *CART - use vehicles instead
  *SHIP - use vehicles instead
- * - unused
- * - unused
+ LIGHTER - can light fires
+ MINIPET - teaches a mini-pet to the player on 'use'
  MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
  AMMO - ammunition for missile weapons
  INSTRUMENT - a musical instrument -- must set custom messages
@@ -5010,6 +5049,16 @@ Available types:
 You can get specific help on each of these via HELP <type> ITEM
 
 See also: OEDIT WEAR, OLC OBJECTS
+#d
+"OEDIT USES"
+
+Usage:  .uses <number | unlimited>
+
+This sets the number of times a LIGHTER object can be used. When it runs out
+of uses, the player automatically junks the item. You can also create unlimited
+lighters.
+
+See also: LIGHTER OBJECT
 #d
 "OEDIT VALUE0" "OEDIT VALUE1" "OEDIT VALUE2"
 
@@ -5231,6 +5280,7 @@ Available flags:
  - !FACITONS -- Cannot edit factions
  - !GENERICS - Cannot edit generics
  - !SHOPS - Cannot edit shops
+ - ALLOW-PROGRESS - Is allowed to edit progressions
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -6180,7 +6230,8 @@ Available types ([value] isn't used unless specified):
  NOT-ADJACENT - No matching sector within 1 tile (value is the sector vnum).
  NOT-NEAR-SECTOR - No matching sector within 2 tiles (value is the sector
     vnum).
- 
+ SPRING, SUMMER, AUTUMN, WINTER - Triggers during this season.
+ BURNS-TO - Sector this tile becomes when burned down by a player.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
@@ -6940,11 +6991,39 @@ be displayed randomly every few action ticks.
 
 See also: OEDIT CUSTOM
 #d
+"LIGHTER ITEM" "LIGHTER OBJECT"
+
+The LIGHTER item type can be used to light fires and torches. It can either
+be unlimited (like firesteel) or have a specific number of uses (like a tinder
+box).
+
+Object values:
+ 0 - number of uses
+
+See also: OEDIT USES
+#d
 "MAIL ITEM" "MAIL OBJECT"
 
 The MAIL item type is used internally and can't be set in builder-created items
 or adventures. However, you can use the OTHER type with a look-description or
 extra-description to get the same effect.
+#d
+"MINIPET ITEM" "MINIPET OBJECT" "MINI-PET ITEM" "MINI-PET OBJECT" "MINI PET OBJECT" "MINI PET ITEM" "PET WHISTLE"
+
+Mini-pets are a common cosmetic reward from adventure zones. They are taught
+by a MINIPET item, and the player may get that item from a loot drop or a
+shop.
+
+Object values on a MINIPET item:
+ 0 - mob vnum to teach
+
+Mini-pet mobs should have the following traits:
+ - Flags: SENTINEL SPAWNED !LOOT !EXPERIENCE (and ISNPC)
+ - Affects: !ATTACK
+ - Scripts: 9901 (Dismissable; optional), 9902 (Lonely Despawn)
+ - Adorable custom messages (optional)
+
+See also: OLC OBJECTS, MINIPET, GENERIC COOLDOWN
 #d
 "MISSILE WEAPON ITEM" "MISSILE WEAPON OBJECT"
 

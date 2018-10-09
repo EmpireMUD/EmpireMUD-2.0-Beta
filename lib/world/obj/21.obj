@@ -142,15 +142,15 @@ A
 7 1 0
 S
 #2112
-bottle clay~
-a clay bottle~
-A clay bottle rolls around on the ground.~
-   The bottle looks like it would be good for holding water. Type 'fill bottle'
-near the river or at an oasis to refill it.
+bottle gourd~
+a gourd bottle~
+A gourd bottle rolls around on the ground.~
+   This bottle gourd has been dried and hollowed out to make it perfect to hold
+water. Type 'fill bottle' near the river or at an oasis to refill it.
 ~
-5 0 a 2
+5 0 a 3
 12 12 0
-6 0
+7 0
 S
 #2113
 saddle~
@@ -469,5 +469,65 @@ C
 1 1
 R
 5121 0
+S
+#2136
+bottle gourd~
+a gourd bottle~
+A gourd bottle rolls around on the ground.~
+   This bottle gourd has been dried and hollowed out to make it perfect to hold
+water. Type 'fill bottle' near the river or at an oasis to refill it.
+~
+5 0 a 5
+12 0 0
+7 0
+C
+1 1
+R
+5121 0
+R
+5610 0
+S
+#2137
+knife obsidian~
+an obsidian knife~
+An obsidian knife is sticking out of the ground.~
+   This glassy black knife is made from sharpened obsidian, with a simple piece
+of hide wrapped around the base for a handle. It's incredible sharp for such a
+simple stone tool.
+~
+1 imo ano 3
+0 1 4
+8 0
+C
+50 50
+S
+#2138
+spear obsidian~
+an obsidian spear~
+An obsidian spear is stuck in the ground.~
+   This strong, light spear is tipped with pitch-black obsidian, sharp enough
+to penetrate even a mammoth hide.
+~
+1 eho an 4
+0 2 3
+8 0
+A
+21 1 0
+C
+50 50
+S
+#2139
+sword obsidian~
+an obsidian sword~
+An obsidian sword is sticking up out of the ground.~
+   This strange sword is made from a long wooden shaft with many pieces of
+sharpened obsidian embedded in the side of it to form a burtally sharp stone
+tool -- one that strikes as much fear as it does damage.
+~
+1 hmo an 2
+0 1 1
+8 0
+C
+50 50
 S
 $

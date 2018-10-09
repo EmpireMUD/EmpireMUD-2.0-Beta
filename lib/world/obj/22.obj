@@ -172,48 +172,48 @@ A
 2 1 0
 S
 #2214
-spear copper~
-a copper spear~
-A copper spear is planted in the ground.~
-This copper spear is somewhat crude, but effective.
+spear bronze~
+a bronze spear~
+A bronze spear is planted in the ground.~
+This bronze spear is somewhat crude, but effective.
 ~
-1 ehmo an 1
+1 ehmo an 2
 0 5 3
 13 0
 A
 2 1 0
 S
 #2215
-knife copper~
-a copper knife~
-A copper knife is jabbed into the ground.~
-This small copper knife is quite sharp.
+knife bronze~
+a bronze knife~
+A bronze knife is jabbed into the ground.~
+This small bronze knife is quite sharp.
 ~
-1 mo ano 1
+1 mo ano 2
 0 5 4
 13 0
 A
 17 1 0
 S
 #2216
-mace copper~
-a copper mace~
-A copper mace is lying here.~
+mace bronze~
+a bronze mace~
+A bronze mace is lying here.~
 The mace is a powerful weapon of war, capable of crushing armor.
 ~
-1 ehmo an 1
+1 ehmo an 2
 0 1 5
 13 0
 A
 21 1 0
 S
 #2217
-axe copper~
-a copper axe~
-A copper axe is stuck into the ground.~
-This copper axe looks well-worn.
+axe bronze~
+a bronze axe~
+A bronze axe is stuck into the ground.~
+This bronze axe looks well-worn.
 ~
-1 ehmo an 1
+1 ehmo an 2
 0 6 2
 13 0
 S

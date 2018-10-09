@@ -16,6 +16,7 @@ D0
 ;;;;~
 &Y~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 141 20.00 2 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 3 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 4 H  # HARVEST: a bundle of wheat
@@ -97,6 +98,7 @@ D0
 iiii~
 &g~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 3005 20.00 2 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 3 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 4 H  # HARVEST: a bushel of corn
@@ -309,6 +311,7 @@ D0
 ::::~
 &Y~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 145 20.00 2 H  # HARVEST: a sack of barley
 I 8 145 20.00 3 H  # HARVEST: a sack of barley
 I 8 145 20.00 4 H  # HARVEST: a sack of barley
@@ -418,7 +421,7 @@ o^^^~
 &Y~
 I 6 3006 100.00 1  # FORAGE: a plump peach
 I 8 3004 100.00 1  # HARVEST: a basket of peaches
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
@@ -534,7 +537,7 @@ D0
 &Y~
 I 6 3007 100.00 1  # FORAGE: a couple red cherries
 I 8 3008 100.00 1  # HARVEST: a bag of cherries
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
@@ -632,7 +635,7 @@ D0
 &y~
 I 6 3009 100.00 1  # FORAGE: an orange
 I 8 3010 100.00 1  # HARVEST: a sack of oranges
-I 9 121 100.00 1  # GATHER: a stick
+I 9 132 100.00 1  # GATHER: some thorny branches
 I 20 122 50.00 1 c  # CHOP: some rough wood
 I 20 122 50.00 2 c  # CHOP: some rough wood
 M
@@ -681,6 +684,7 @@ D0
 ,,,,~
 &g~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 3011 20.00 2 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 3 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 4 H  # HARVEST: a sack of dried rice
@@ -772,7 +776,7 @@ D0
 &y~
 I 6 3018 100.00 1  # FORAGE: a couple of olives
 I 8 3019 100.00 1  # HARVEST: a basket of olives
-I 9 121 100.00 1  # GATHER: a stick
+I 9 132 100.00 1  # GATHER: some thorny branches
 I 20 122 50.00 1 c  # CHOP: some rough wood
 I 20 122 50.00 2 c  # CHOP: some rough wood
 M
@@ -894,15 +898,15 @@ M
 9004 10.00 bd
 S
 #12
-gourds~
-A Field of Gourds~
+squash~
+A Field of Squash Vines~
 23 1 a
 0 50 63 36
 D0
 oooo~
 &y~
 I 6 3022 100.00 1  # FORAGE: a yellow squash
-I 8 3023 100.00 2  # HARVEST: a basket of gourds
+I 8 3023 100.00 2  # HARVEST: a basket of squash
 M
 9134 5.00 bdh
 M
@@ -1007,7 +1011,7 @@ D0
 &Y~
 I 6 3001 100.00 1  # FORAGE: a green apple
 I 8 3002 100.00 1  # HARVEST: a bunch of apples
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh

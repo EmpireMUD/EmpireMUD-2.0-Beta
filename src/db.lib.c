@@ -4647,16 +4647,21 @@ void parse_mobile(FILE *mob_f, int nr) {
 			*tmpptr = LOWER(*tmpptr);
 	mob->player.long_descr = fread_string(mob_f, buf2);
 	
-	// 1. min_scale_level max_scale_level mobflags affs
-	if (!get_line(mob_f, line) || sscanf(line, "%d %d %s %s", &t[0], &t[1], f1, f2) != 4) {
-		log("SYSERR: Format error in first numeric section of mob #%d\n...expecting line of form '# # # #'", nr);
-		exit(1);
+	// 1. min_scale_level max_scale_level mobflags affs [size]
+	if (!get_line(mob_f, line) || sscanf(line, "%d %d %s %s %d", &t[0], &t[1], f1, f2, &t[2]) != 5) {
+		t[2] = SIZE_NORMAL;	// backwards-compatible
+		
+		if (sscanf(line, "%d %d %s %s", &t[0], &t[1], f1, f2) != 4) {
+			log("SYSERR: Format error in first numeric section of mob #%d\n...expecting line of form '# # # # #'", nr);
+			exit(1);
+		}
 	}
 	
 	GET_MIN_SCALE_LEVEL(mob) = t[0];
 	GET_MAX_SCALE_LEVEL(mob) = t[1];
 	MOB_FLAGS(mob) = asciiflag_conv(f1);
 	AFF_FLAGS(mob) = asciiflag_conv(f2);
+	SET_SIZE(mob) = t[2];
 
 	SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);	// sanity
 	REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);	// sanity
@@ -4696,6 +4701,10 @@ void parse_mobile(FILE *mob_f, int nr) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': { // look desc
+				mob->player.look_descr = fread_string(mob_f, buf2);
+				break;
+			}
 			case 'F': {	// faction
 				if (strlen(line) > 2) {
 					MOB_FACTION(mob) = find_faction_by_vnum(atoi(line + 2));
@@ -4752,15 +4761,22 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
 
-	// min_scale_level max_scale_level mobflags affs
+	// min_scale_level max_scale_level mobflags affs size
 	strcpy(temp, bitv_to_alpha(MOB_FLAGS(mob)));
 	strcpy(temp2, bitv_to_alpha(AFF_FLAGS(mob)));
-	fprintf(fl, "%d %d %s %s\n", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), temp, temp2);
+	fprintf(fl, "%d %d %s %s %d\n", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), temp, temp2, SET_SIZE(mob));
 	
 	// sex name-list move-type attack-type
 	fprintf(fl, "%d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob));
 
 	// optionals:
+	
+	// D: look desc
+	if (GET_LOOK_DESC(mob) && *GET_LOOK_DESC(mob)) {
+		strcpy(temp, GET_LOOK_DESC(mob));
+		strip_crlf(temp);
+		fprintf(fl, "D\n%s~\n", temp);
+	}
 	
 	// F: faction
 	if (MOB_FACTION(mob)) {

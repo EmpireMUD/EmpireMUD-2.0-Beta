@@ -48,6 +48,7 @@
 extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 
 // external functions
+void check_delayed_load(char_data *ch);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void discrete_load(FILE *fl, int mode, char *filename);
@@ -407,7 +408,7 @@ void boot_db(void) {
 	log("Building shop lookup hints.");
 	build_all_shop_lookups();
 	
-	log("Ensuring all islands have descriptions.");
+	log("Updating island descriptions.");
 	generate_island_descriptions();
 	
 	// final things...
@@ -1682,6 +1683,7 @@ void clear_char(char_data *ch) {
 
 	ch->vnum = NOBODY;
 	GET_POS(ch) = POS_STANDING;
+	SET_SIZE(ch) = SIZE_NORMAL;
 	MOB_INSTANCE_ID(ch) = NOTHING;
 	MOB_DYNAMIC_SEX(ch) = NOTHING;
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
@@ -1920,6 +1922,7 @@ const char *versions_list[] = {
 	"b5.38",
 	"b5.40",
 	"b5.45",
+	"b5.47",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1980,8 +1983,6 @@ PLAYER_UPDATE_FUNC(b2_8_update_players) {
 
 // 2.11 loads inventories and attaches triggers
 PLAYER_UPDATE_FUNC(b2_11_update_players) {
-	void check_delayed_load(char_data *ch);
-
 	obj_data *obj, *proto;
 	int iter;
 	
@@ -2053,7 +2054,6 @@ void b3_1_mine_update(void) {
 
 
 PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
-	void check_delayed_load(char_data *ch);
 	obj_data *obj, *next_obj, *new;
 	int iter;
 	
@@ -2216,8 +2216,6 @@ void b3_11_ship_fix(void) {
 
 // removes AFF_SENSE_HIDE
 PLAYER_UPDATE_FUNC(b3_12_update_players) {
-	void check_delayed_load(char_data *ch);
-	
 	// only care if they have a permanent sense-hide
 	if (!AFF_FLAGGED(ch, AFF_SENSE_HIDE)) {
 		return;
@@ -2335,8 +2333,6 @@ PLAYER_UPDATE_FUNC(b4_1_approve_players) {
 
 // adds current mount to mounts list
 PLAYER_UPDATE_FUNC(b4_2_mount_update) {
-	void check_delayed_load(char_data *ch);
-	
 	check_delayed_load(ch);
 	
 	if (GET_MOUNT_VNUM(ch)) {
@@ -2507,7 +2503,6 @@ void b4_39_data_conversion(void) {
 
 // b5.1 changes the values of ATYPE_x consts and this updates existing affects
 PLAYER_UPDATE_FUNC(b5_1_update_players) {
-	void check_delayed_load(char_data *ch);
 	void free_var_el(struct trig_var_data *var);
 	
 	struct trig_var_data *var, *next_var;
@@ -2703,7 +2698,6 @@ void b5_3_missile_update(void) {
 
 // b5.14 refreshes superior items
 PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
-	void check_delayed_load(char_data *ch);
 	obj_data *obj, *next_obj, *new;
 	int iter;
 	
@@ -2865,7 +2859,6 @@ void b5_20_canal_fix(void) {
 
 // updates potions in player inventory
 PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
-	void check_delayed_load(char_data *ch);
 	obj_data *obj, *next_obj, *new;
 	int iter;
 	
@@ -2949,7 +2942,6 @@ void b5_23_potion_update(void) {
 
 // updates poisons in player inventory
 PLAYER_UPDATE_FUNC(b5_24_player_poison_update) {
-	void check_delayed_load(char_data *ch);
 	obj_data *obj, *next_obj, *new;
 	int iter;
 	
@@ -3083,7 +3075,6 @@ void b5_30_empire_update(void) {
 
 
 PLAYER_UPDATE_FUNC(b5_34_player_update) {
-	void check_delayed_load(char_data *ch);
 	void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 	
 	struct player_skill_data *skill, *next_skill;
@@ -3363,6 +3354,65 @@ void b5_45_keep_update(void) {
 }
 
 
+// fix reputation
+PLAYER_UPDATE_FUNC(b5_47_update_players) {
+	void update_reputations(char_data *ch);
+	
+	struct player_faction_data *fct, *next;
+	bool any = FALSE;
+	
+	check_delayed_load(ch);
+	
+	HASH_ITER(hh, GET_FACTIONS(ch), fct, next) {
+		fct->value *= 10;	// this update raised the scale of faction rep by 10x
+		any = TRUE;
+	}
+	
+	if (any) {
+		update_reputations(ch);
+	}
+}
+
+
+// resets mountain tiles off-cycle because of the addition of tin
+void b5_47_mine_update(void) {
+	void save_island_table();
+	
+	struct island_info *isle, *next_isle;
+	struct map_data *tile;
+	bool any = FALSE;
+	room_data *room;
+	
+	const char *detect_desc = "   The island has ";
+	int len = strlen(detect_desc);
+	
+	log("Applying b5.47 update to clear mine data, update island flags, and fix player reputation...");
+	
+	// clear mines
+	LL_FOREACH(land_map, tile) {
+		if (!(room = real_real_room(tile->vnum)) || !HAS_FUNCTION(room, FNC_MINE)) {
+			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
+			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
+			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
+		}
+	}
+	save_whole_world();
+	
+	// island desc flags
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		if (isle->desc && strncmp(isle->desc, detect_desc, len)) {
+			SET_BIT(isle->flags, ISLE_HAS_CUSTOM_DESC);
+			any = TRUE;
+		}
+	}
+	if (any) {
+		save_island_table();
+	}
+	
+	update_all_players(NULL, b5_47_update_players);
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3627,6 +3677,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.45")) {
 			b5_45_keep_update();
+		}
+		if (MATCH_VERSION("b5.47")) {
+			b5_47_mine_update();
 		}
 	}
 	

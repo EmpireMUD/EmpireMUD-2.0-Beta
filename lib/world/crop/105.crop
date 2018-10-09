@@ -98,7 +98,7 @@ I 8 10507 20.00 5 H  # HARVEST: a bundle of spadebrush
 I 8 10507 20.00 6 H  # HARVEST: a bundle of spadebrush
 I 8 10506 75.00 1 S  # HARVEST: a handful of spadebrush seeds
 I 8 10506 25.00 2 S  # HARVEST: a handful of spadebrush seeds
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 100.00 1  # GATHER: some sticks and leaves
 M
 9145 5.00 adh
 M
@@ -519,7 +519,7 @@ D0
 I 6 10521 1.00 1 a  # FORAGE: a fig leaf
 I 6 10518 100.00 1 a  # FORAGE: an unripe fig
 I 8 10519 100.00 1  # HARVEST: a basket of pudding figs
-I 9 121 100.00 1  # GATHER: a stick
+I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
@@ -860,7 +860,7 @@ I 8 10532 20.00 5 H  # HARVEST: a pickthorn stalk
 I 8 10532 20.00 6 H  # HARVEST: a pickthorn stalk
 I 8 10531 75.00 1 S  # HARVEST: a red pickthorn fruit
 I 8 10531 25.00 2 S  # HARVEST: a red pickthorn fruit
-I 9 121 100.00 1  # GATHER: a stick
+I 9 132 100.00 1  # GATHER: some thorny branches
 M
 9145 5.00 adh
 M

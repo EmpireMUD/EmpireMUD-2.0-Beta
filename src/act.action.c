@@ -42,6 +42,7 @@ extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
+extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 extern char *get_mine_type_name(room_data *room);
 extern obj_data *has_sharp_tool(char_data *ch);
 extern bool is_deep_mine(room_data *room);
@@ -69,6 +70,7 @@ void perform_saw(char_data *ch);
 void perform_study(char_data *ch);
 void process_bathing(char_data *ch);
 void process_build_action(char_data *ch);
+void process_burn_area(char_data *ch);
 void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
 void process_digging(char_data *ch);
@@ -108,7 +110,7 @@ void process_tanning(char_data *ch);
 const struct action_data_struct action_data[] = {
 	{ "", "", NOBITS, NULL, NULL },	// ACT_NONE
 	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_digging, NULL },	// ACT_DIGGING
-	{ "gathering", "is gathering sticks.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
+	{ "gathering", "is gathering plant material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
 	{ "chopping", "is chopping down trees.", ACTF_HASTE | ACTF_FAST_CHORES, process_chop, NULL },	// ACT_CHOPPING
 	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	// ACT_BUILDING
 	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
@@ -119,7 +121,7 @@ const struct action_data_struct action_data[] = {
 	{ "fishing", "is fishing.", ACTF_SITTING, process_fishing, NULL },	// ACT_FISHING
 	{ "preparing", "is preparing to fill in the trench.", NOBITS, process_start_fillin, NULL },	// ACT_START_FILLIN
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
-	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
+	{ "chipping", "is chipping flints.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_excavating, NULL },	// ACT_EXCAVATING
@@ -146,6 +148,7 @@ const struct action_data_struct action_data[] = {
 	{ "piloting", "is piloting the vessel.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
 	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
+	{ "burning", "is preparing to burn the area.", NOBITS, process_burn_area, NULL },	// ACT_BURN_AREA
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -414,6 +417,48 @@ void show_prospect_result(char_data *ch, room_data *room) {
 			msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(room)), get_mine_type_name(room));
 		}
 	}
+}
+
+
+/**
+* Makes sure a person can [still] burn the room they are in.
+*
+* @param char_data *ch The player.
+* @param int subcmd SCMD_LIGHT or SCMD_BURN.
+* @return bool TRUE if safe, FALSE if they cannot burn it.
+*/
+bool validate_burn_area(char_data *ch, int subcmd) {
+	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
+	
+	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
+	obj_data *lighter = NULL;
+	bool kept = FALSE;
+	
+	if (!objless) {	// find lighter if needed
+		lighter = find_lighter_in_list(ch->carrying, &kept);
+	}
+	
+	if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
+		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
+	}
+	else if (!objless && !lighter) {
+		// nothing to light it with
+		if (kept) {
+			msg_to_char(ch, "You need a lighter that isn't marked 'keep'.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't have a lighter to %s the area with.\r\n", cmdname[subcmd]);
+		}
+	}
+	else if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(ch)), DIPL_WAR)) {
+		msg_to_char(ch, "You must be at war to burn someone else's territory!\r\n");
+	}
+	else { // safe!
+		return TRUE;
+	}
+	
+	// if we got here:
+	return FALSE;
 }
 
 
@@ -1113,6 +1158,59 @@ void process_build_action(char_data *ch) {
 
 
 /**
+* Tick update for burn area / do_burn_area.
+*
+* @param char_data *ch The person burning the area.
+*/
+void process_burn_area(char_data *ch) {
+	void perform_burn_room(room_data *room);
+	extern bool used_lighter(char_data *ch, obj_data *obj);
+	
+	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
+		// sends own message
+		cancel_action(ch);
+		return;
+	}
+	
+	GET_ACTION_TIMER(ch) -= 1;
+	
+	if (GET_ACTION_TIMER(ch) > 0) {
+		act("You prepare to burn the area...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+	}
+	else {	// done!
+		bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
+		obj_data *lighter = NULL;
+		bool kept = FALSE;
+	
+		if (!objless) {	// find lighter if needed
+			lighter = find_lighter_in_list(ch->carrying, &kept);
+		}
+		
+		// messaging
+		if (lighter) {
+			act("You use $p to light some fires!", FALSE, ch, lighter, NULL, TO_CHAR);
+			act("$n uses $p to light some fires!.", FALSE, ch, lighter, NULL, TO_ROOM);
+		}
+		else {
+			act("You light some fires!", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n lights some fires!", FALSE, ch, NULL, NULL, TO_ROOM);
+			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+		}
+		
+		// finished burning
+		perform_burn_room(IN_ROOM(ch));
+		cancel_action(ch);
+		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA, NOTHING);
+		
+		if (lighter) {
+			used_lighter(ch, lighter);
+		}
+	}
+}
+
+
+/**
 * Tick update for chip action.
 *
 * @param char_data *ch The chipper one.
@@ -1122,7 +1220,7 @@ void process_chipping(char_data *ch) {
 	bool success;
 	
 	if (!find_chip_weapon(ch)) {
-		msg_to_char(ch, "You need to be using some kind of hammer to chip it.\r\n");
+		msg_to_char(ch, "You need to be wielding some kind of hammer or rock to chip it.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1155,7 +1253,7 @@ void process_chipping(char_data *ch) {
 		if (success) {
 			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 25);
 			
-			// repeat! (no -paul) note: keyword-targeting is hard because "chipped rock" also has "rock" as an alias
+			// repeat! (no -paul) note: keyword-targeting is hard because "chipped flint" also has "flint" as an alias
 			// do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
@@ -1548,7 +1646,7 @@ void process_gathering(char_data *ch) {
 	int gather_depletion = config_get_int("gather_depletion");
 	
 	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		send_to_char("You search the ground for sticks...\r\n", ch);
+		send_to_char("You search the ground for useful material...\r\n", ch);
 	}
 	act("$n searches around on the ground...", TRUE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
 	GET_ACTION_TIMER(ch) -= 1;
@@ -1556,7 +1654,7 @@ void process_gathering(char_data *ch) {
 	// done ?
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
-			msg_to_char(ch, "There aren't any good sticks left to gather here.\r\n");
+			msg_to_char(ch, "The's nothing good left to gather here.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
 		}
 		else {
@@ -1642,21 +1740,14 @@ void process_harvesting(char_data *ch) {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
 		}
 		
-		// change the sector
-		if (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) {
-			// use original terrain (appears to have been stored)
-			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))));
+		// change the sector: attempt to detect
+		crop_data *cp = ROOM_CROP(IN_ROOM(ch));
+		sector_data *sect = cp ? sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]) : NULL;
+		if (!sect) {
+			sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
 		}
-		else {
-			// attempt to detect
-			crop_data *cp = ROOM_CROP(IN_ROOM(ch));
-			sector_data *sect = cp ? sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]) : NULL;
-			if (!sect) {
-				sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
-			}
-			if (sect) {
-				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
-			}
+		if (sect) {
+			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 		}
 	}
 }
@@ -2480,7 +2571,7 @@ ACMD(do_chip) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
 	else if (!find_chip_weapon(ch)) {
-		msg_to_char(ch, "You need to be using some kind of hammer to chip it.\r\n");
+		msg_to_char(ch, "You need to be wielding some kind of hammer or rock to chip it.\r\n");
 	}
 	else {
 		start_action(ch, ACT_CHIPPING, chip_timer);
@@ -2537,8 +2628,13 @@ ACMD(do_chop) {
 
 
 ACMD(do_dig) {
+	skip_spaces(&argument);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't dig.\r\n");
+	}
+	else if (*argument) {
+		msg_to_char(ch, "You can't dig for specific items. Just type 'dig' and see what you get.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_DIGGING) {
 		send_to_char("You stop digging.\r\n", ch);
@@ -2559,6 +2655,39 @@ ACMD(do_dig) {
 	}
 	else {
 		start_digging(ch);
+	}
+}
+
+
+/**
+* do_light passes control here after finding that the target is the room.
+*
+* This is a timed action that triggers a room evolution.
+*
+* @param char_data *ch The character doing the action.
+* @param int subcmd The subcmd that was passed to do_light (SCMD_LIGHT, SCMD_BURN).
+*/
+void do_burn_area(char_data *ch, int subcmd) {
+	const char *cmdname[] = { "light", "burn" };	// also in do_light
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You cannot %s the area.\r\n", cmdname[subcmd]);
+	}
+	else if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're a little bit busy right now.\r\n");
+	}
+	else if (GET_POS(ch) != POS_STANDING) {
+		send_low_pos_msg(ch);
+	}
+	else if (!validate_burn_area(ch, subcmd)) {
+		// sends its own message
+	}
+	else {
+		start_action(ch, ACT_BURN_AREA, 5);
+		GET_ACTION_VNUM(ch, 0) = subcmd;
+		
+		msg_to_char(ch, "You prepare to burn the area...\r\n");
+		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -2702,7 +2831,7 @@ ACMD(do_gather) {
 		msg_to_char(ch, "NPCs cannot gather.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_GATHERING) {
-		send_to_char("You stop searching for sticks.\r\n", ch);
+		send_to_char("You stop gathering.\r\n", ch);
 		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
@@ -2721,7 +2850,7 @@ ACMD(do_gather) {
 	else {
 		start_action(ch, ACT_GATHERING, gather_base_timer);
 		
-		send_to_char("You begin looking around for sticks.\r\n", ch);
+		send_to_char("You begin looking around for plant material.\r\n", ch);
 	}
 }
 

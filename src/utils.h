@@ -323,6 +323,7 @@
 // ch->player: char_player_data
 #define GET_ACCESS_LEVEL(ch)  ((ch)->player.access_level)
 #define GET_LONG_DESC(ch)  ((ch)->player.long_descr)
+#define GET_LOOK_DESC(ch)  ((ch)->player.look_descr)
 #define GET_LORE(ch)  ((ch)->player.lore)
 #define GET_PASSWD(ch)  ((ch)->player.passwd)
 #define GET_PC_NAME(ch)  ((ch)->player.name)
@@ -382,6 +383,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_MOVE_REGEN(ch)  ((ch)->char_specials.move_regen)
 #define GET_SITTING_ON(ch)  ((ch)->char_specials.sitting_on)
 #define GET_POS(ch)  ((ch)->char_specials.position)
+#define SET_SIZE(ch)  ((ch)->char_specials.size)	// notice "SET_SIZE" -- the simple version of the macro
+#define GET_SIZE(ch)  (IS_MORPHED(ch) ? MORPH_SIZE(GET_MORPH(ch)) : SET_SIZE(ch))
 #define HUNTING(ch)  ((ch)->char_specials.hunting)
 #define IS_CARRYING_N(ch)  ((ch)->char_specials.carry_items)
 
@@ -808,10 +811,12 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MORPH_FLAGS(mph)  ((mph)->flags)
 #define MORPH_KEYWORDS(mph)  ((mph)->keywords)
 #define MORPH_LONG_DESC(mph)  ((mph)->long_desc)
+#define MORPH_LOOK_DESC(mph)  ((mph)->look_desc)
 #define MORPH_MAX_SCALE(mph)  ((mph)->max_scale)
 #define MORPH_MOVE_TYPE(mph)  ((mph)->move_type)
 #define MORPH_REQUIRES_OBJ(mph)  ((mph)->requires_obj)
 #define MORPH_SHORT_DESC(mph)  ((mph)->short_desc)
+#define MORPH_SIZE(mph)  ((mph)->size)
 #define MORPH_VNUM(mph)  ((mph)->vnum)
 
 // helpers
@@ -876,6 +881,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
  //////////////////////////////////////////////////////////////////////////////
 //// OBJVAL UTILS ////////////////////////////////////////////////////////////
+
+// ITEM_x: getters based on object type
 
 // ITEM_POTION
 #define IS_POTION(obj)  (GET_OBJ_TYPE(obj) == ITEM_POTION)
@@ -1021,6 +1028,16 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VAL_PAINT_COLOR  0
 #define GET_PAINT_COLOR(obj)  (IS_PAINT(obj) ? GET_OBJ_VAL((obj), VAL_PAINT_COLOR) : 0)
 
+// ITEM_LIGHTER
+#define IS_LIGHTER(obj)  (GET_OBJ_TYPE(obj) == ITEM_LIGHTER)
+#define VAL_LIGHTER_USES  0
+#define GET_LIGHTER_USES(obj)  (IS_LIGHTER(obj) ? GET_OBJ_VAL((obj), VAL_LIGHTER_USES) : 0)
+
+// ITEM_MINIPET
+#define IS_MINIPET(obj)  (GET_OBJ_TYPE(obj) == ITEM_MINIPET)
+#define VAL_MINIPET_VNUM  0
+#define GET_MINIPET_VNUM(obj)  (IS_MINIPET(obj) ? GET_OBJ_VAL((obj), VAL_MINIPET_VNUM) : NOTHING)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
@@ -1096,12 +1113,14 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
 #define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
 #define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tip))
+#define GET_LAST_VEHICLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_vehicle))
 #define GET_LEARNED_CRAFTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->learned_crafts))
 #define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room))
 #define GET_LOAD_ROOM_CHECK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room_check))
 #define GET_MAIL_PENDING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mail_pending))
 #define GET_MAPSIZE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mapsize))
 #define GET_MARK_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->marked_location))
+#define GET_MINIPETS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->minipets))
 #define GET_MOUNT_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_flags))
 #define GET_MOUNT_LIST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_list))
 #define GET_MOUNT_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_vnum))

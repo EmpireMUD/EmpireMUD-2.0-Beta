@@ -3,8 +3,13 @@ spirit restless~
 a restless spirit~
 A restless spirit haunts this place (list).
 ~
-0 0 bdho cnG
+0 0 bdho cnG 0
 2 0 0 15
+D
+   She is dressed in tattered rags, bound in chains, wandering to and fro
+through the tomb. When she passes through you -- and she does -- you feel an
+unearthly chill that you cannot shake.
+~
 M
 0
 $n wails mournfully into the wind.~
@@ -26,8 +31,13 @@ centaur headless horseman man~
 the headless centaur~
 A headless horse man rears back and brandishes his sword!
 ~
-25 275 bdoy c
+25 275 bdoy c 4
 1 0 12 1
+D
+   This mighty centaur stands head and shoulders above you. Well, shoulders,
+anyway. He is dressed in black armor and armed with a black steel sword, and he
+looks angry.
+~
 I 4 18830 12.50 1 a  # LOOT: a glowing bone shield
 I 4 18831 12.50 1 a  # LOOT: a leather batwing shield
 I 4 18832 12.50 1 a  # LOOT: the black cat's talon
@@ -61,8 +71,11 @@ lantern attack-o-lantern~
 the attack-o-lantern~
 An attack-o-lantern is floating here.
 ~
-25 275 abdhozD c
+25 275 abdhozD c 3
 0 0 27 28
+D
+It's a carved pumpkin, but it looks like it might be enchanted.
+~
 T 18807
 S
 #18822
@@ -70,24 +83,33 @@ S
 the ghost of #n~
 The ghost of #n is haunting this place.
 ~
-0 0 do cmn
+0 0 do cmn 0
 0 0 27 15
+D
+You can see straight through the ghost. That can't be normal.
+~
 S
 #18824
 #n guard~
 guard #n~
 #n the guard is standing here.
 ~
-5 125 bdouv 0
+5 125 bdouv 0 3
 1 0 0 1
+D
+The guard doesn't look happy at what you've been doing.
+~
 S
 #18826
 companion starry-eyed eyed~
 a starry-eyed companion~
 A companion stands, starry-eyed, looking around in wonder.
 ~
-1 1 bdoD n
-0 0 0 15
+1 1 bdoD n 3
+2 0 0 15
+D
+She looks like she's come from a different time.
+~
 M
 1
 This whole kingdom seems bigger from the inside.~
@@ -114,8 +136,11 @@ ghost knocking~
 a knocking ghost~
 A ghost lingers in the air.
 ~
-25 75 dov de
+25 75 dov de 0
 0 0 27 28
+D
+It's knocking on the walls, the doors, and anything else it comes across.
+~
 M
 0
 You hear a strange knocking sound.~
@@ -131,8 +156,11 @@ ghost rattling~
 a rattling ghost~
 A ghost lingers in the air.
 ~
-25 75 dov de
+25 75 dov de 0
 0 0 27 28
+D
+The ghost is wrapped in chains, and rattles them loudly as it floats along.
+~
 M
 0
 You hear a strange rattle from behind.~
@@ -148,16 +176,22 @@ hand skittering disembodied~
 a skittering hand~
 A disembodied hand skitters across the floor.
 ~
-25 75 dov 0
+25 75 dov 0 1
 0 0 8 15
+D
+You're not sure where this Thing came from.
+~
 S
 #18839
 horse headless~
 a headless horse~
 A headless horse neighs silently in the breeze.
 ~
-10 100 dej 0
+10 100 dej 0 4
 0 0 14 11
+D
+It navigates surprisingly well for a horse with no eyes.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 M
@@ -169,8 +203,11 @@ nightmare pitch-black black~
 a nightmare~
 A pitch-black nightmare gallops across the sky.
 ~
-100 150 bdej m
+100 150 bdej m 4
 0 0 12 11
+D
+Legend says this black horse flies across the night sky.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -179,8 +216,11 @@ ghoul little~
 a little ghoul~
 A little ghoul scampers around, spreading mischief.
 ~
-1 1 bdoD n
+1 1 bdoD n 2
 0 0 0 9
+D
+The ghoul is collecting bits of candy from the ground.
+~
 M
 0
 $n gasps and vanishes!~
@@ -207,16 +247,22 @@ goblin mischievous~
 a mischievous goblin~
 A mischievous goblin is lurking around.
 ~
-25 75 dovz 0
+25 75 dovz 0 2
 0 0 9 9
+D
+This little goblin runs away when it realizes you're looking at it.
+~
 S
 #18843
 vampire skulking~
 a skulking vampire~
 A vampire is skulking in the shadows.
 ~
-25 75 dovwz 0
+25 75 dovwz 0 3
 0 0 7 9
+D
+It's a vampire. Try not to get too close.
+~
 T 9064
 S
 #18844
@@ -224,15 +270,22 @@ ghost~
 a ghost~
 A ghost hangs in the air like a sheet.
 ~
-25 75 dhozD v
+25 75 dhozD v 0
 0 0 27 16
+D
+On second look, this might just be a floating sheet.
+~
 S
 #18845
 half-spider spider man half-man strange creature~
 a half-spider~
 A strange creature, half-spider, half-man, stands here.
 ~
-25 75 dovz v
+25 75 dovz v 3
 0 0 9 9
+D
+   You're not sure what happened to this poor spider, but someone has turned
+half of it into a human!
+~
 S
 $

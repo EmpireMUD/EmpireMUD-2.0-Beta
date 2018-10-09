@@ -46,4 +46,33 @@ L
 10967 -1 -1
 9 el 0
 S
+#10980
+Renegade Spellcaster!~
+Paul Clarke and Owen Morris~
+   A renegade spellcaster is on the loose. Track them down before they cause
+trouble for your empire.
+~
+10980 10999 100-175
+2 0 ln 0
+L
+1 0
+10981 -1 -1
+9 bel 0
+L
+1 0
+10982 -1 -1
+9 bel 0
+L
+1 0
+10983 -1 -1
+9 bel 0
+L
+6 0
+250 -1 -1
+-1 0 0
+L
+5 0
+1440 -1 -1
+-1 0 0
+S
 $
