@@ -731,6 +731,7 @@ ACMD(do_tie) {
 			obj_to_char(rope, ch);
 			scale_item_to_level(rope, 1);	// minimum
 			load_otrigger(rope);
+			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;
 	}

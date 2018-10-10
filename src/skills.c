@@ -2520,6 +2520,7 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 			obj_to_char(rope, ch);
 			scale_item_to_level(rope, 1);	// minimum scale
 			load_otrigger(rope);
+			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;
 	}
