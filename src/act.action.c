@@ -1654,7 +1654,7 @@ void process_gathering(char_data *ch) {
 	// done ?
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
-			msg_to_char(ch, "The's nothing good left to gather here.\r\n");
+			msg_to_char(ch, "There's nothing good left to gather here.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
 		}
 		else {
