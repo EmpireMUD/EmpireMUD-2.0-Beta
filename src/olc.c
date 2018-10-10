@@ -3402,7 +3402,6 @@ OLC_MODULE(olc_save) {
 				void save_olc_faction(descriptor_data *desc);
 				save_olc_faction(ch->desc);
 				audit_faction(GET_OLC_FACTION(ch->desc), ch);
-				// TODO
 				free_faction(GET_OLC_FACTION(ch->desc));
 				GET_OLC_FACTION(ch->desc) = NULL;
 				break;
@@ -3410,6 +3409,7 @@ OLC_MODULE(olc_save) {
 			case OLC_GENERIC: {
 				void save_olc_generic(descriptor_data *desc);
 				save_olc_generic(ch->desc);
+				audit_generic(GET_OLC_GENERIC(ch->desc), ch);
 				free_generic(GET_OLC_GENERIC(ch->desc));
 				GET_OLC_GENERIC(ch->desc) = NULL;
 				break;
@@ -3417,6 +3417,7 @@ OLC_MODULE(olc_save) {
 			case OLC_GLOBAL: {
 				void save_olc_global(descriptor_data *desc);
 				save_olc_global(ch->desc);
+				audit_global(GET_OLC_GLOBAL(ch->desc), ch);
 				free_global(GET_OLC_GLOBAL(ch->desc));
 				GET_OLC_GLOBAL(ch->desc) = NULL;
 				break;
@@ -3424,6 +3425,7 @@ OLC_MODULE(olc_save) {
 			case OLC_MOBILE: {
 				void save_olc_mobile(descriptor_data *desc);
 				save_olc_mobile(ch->desc);
+				audit_mobile(GET_OLC_MOBILE(ch->desc), ch);
 				free_char(GET_OLC_MOBILE(ch->desc));
 				GET_OLC_MOBILE(ch->desc) = NULL;
 				break;
@@ -3431,6 +3433,7 @@ OLC_MODULE(olc_save) {
 			case OLC_MORPH: {
 				void save_olc_morph(descriptor_data *desc);
 				save_olc_morph(ch->desc);
+				audit_morph(GET_OLC_MORPH(ch->desc), ch);
 				free_morph(GET_OLC_MORPH(ch->desc));
 				GET_OLC_MORPH(ch->desc) = NULL;
 				break;
@@ -3438,6 +3441,7 @@ OLC_MODULE(olc_save) {
 			case OLC_OBJECT: {
 				void save_olc_object(descriptor_data *desc);
 				save_olc_object(ch->desc);
+				audit_object(GET_OLC_OBJECT(ch->desc), ch);
 				free_obj(GET_OLC_OBJECT(ch->desc));
 				GET_OLC_OBJECT(ch->desc) = NULL;
 				break;
@@ -3445,6 +3449,7 @@ OLC_MODULE(olc_save) {
 			case OLC_PROGRESS: {
 				void save_olc_progress(descriptor_data *desc);
 				save_olc_progress(ch->desc);
+				audit_progress(GET_OLC_PROGRESS(ch->desc), ch);
 				free_progress(GET_OLC_PROGRESS(ch->desc));
 				GET_OLC_PROGRESS(ch->desc) = NULL;
 				break;
@@ -3452,6 +3457,7 @@ OLC_MODULE(olc_save) {
 			case OLC_QUEST: {
 				void save_olc_quest(descriptor_data *desc);
 				save_olc_quest(ch->desc);
+				audit_quest(GET_OLC_QUEST(ch->desc), ch);
 				free_quest(GET_OLC_QUEST(ch->desc));
 				GET_OLC_QUEST(ch->desc) = NULL;
 				break;
@@ -3459,6 +3465,7 @@ OLC_MODULE(olc_save) {
 			case OLC_ROOM_TEMPLATE: {
 				void save_olc_room_template(descriptor_data *desc);
 				save_olc_room_template(ch->desc);
+				audit_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc), ch);
 				free_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc));
 				GET_OLC_ROOM_TEMPLATE(ch->desc) = NULL;
 				break;
@@ -3466,6 +3473,7 @@ OLC_MODULE(olc_save) {
 			case OLC_SECTOR: {
 				void save_olc_sector(descriptor_data *desc);
 				save_olc_sector(ch->desc);
+				audit_sector(GET_OLC_SECTOR(ch->desc), ch);
 				free_sector(GET_OLC_SECTOR(ch->desc));
 				GET_OLC_SECTOR(ch->desc) = NULL;
 				break;
@@ -3473,6 +3481,7 @@ OLC_MODULE(olc_save) {
 			case OLC_SHOP: {
 				void save_olc_shop(descriptor_data *desc);
 				save_olc_shop(ch->desc);
+				audit_shop(GET_OLC_SHOP(ch->desc), ch);
 				free_shop(GET_OLC_SHOP(ch->desc));
 				GET_OLC_SHOP(ch->desc) = NULL;
 				break;
@@ -3480,6 +3489,7 @@ OLC_MODULE(olc_save) {
 			case OLC_SKILL: {
 				void save_olc_skill(descriptor_data *desc);
 				save_olc_skill(ch->desc);
+				audit_skill(GET_OLC_SKILL(ch->desc), ch);
 				free_skill(GET_OLC_SKILL(ch->desc));
 				GET_OLC_SKILL(ch->desc) = NULL;
 				break;
@@ -3487,6 +3497,7 @@ OLC_MODULE(olc_save) {
 			case OLC_SOCIAL: {
 				void save_olc_social(descriptor_data *desc);
 				save_olc_social(ch->desc);
+				audit_social(GET_OLC_SOCIAL(ch->desc), ch);
 				free_social(GET_OLC_SOCIAL(ch->desc));
 				GET_OLC_SOCIAL(ch->desc) = NULL;
 				break;
@@ -3494,6 +3505,7 @@ OLC_MODULE(olc_save) {
 			case OLC_TRIGGER: {
 				void save_olc_trigger(descriptor_data *desc, char *script_text);
 				save_olc_trigger(ch->desc, GET_OLC_STORAGE(ch->desc));
+				// audit_trigger(GET_OLC_TRIGGER(ch->desc), ch);
 				free_trigger(GET_OLC_TRIGGER(ch->desc));
 				GET_OLC_TRIGGER(ch->desc) = NULL;
 				if (GET_OLC_STORAGE(ch->desc)) {
