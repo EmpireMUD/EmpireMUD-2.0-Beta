@@ -51,6 +51,7 @@ bool check_scaling(char_data *mob, char_data *based_on);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 extern int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
+void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
@@ -1389,8 +1390,6 @@ obj_data *die(char_data *ch, char_data *killer) {
 
 // this drops the loot to the inventory of the 'ch' who is interacting -- so run it on the mob itself, usually
 INTERACTION_FUNC(loot_interact) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	obj_data *obj;
 	int iter, scale_level = 0;
 	
@@ -1480,7 +1479,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 */
 obj_data *make_corpse(char_data *ch) {	
 	char shortdesc[MAX_INPUT_LENGTH], longdesc[MAX_INPUT_LENGTH], kws[MAX_INPUT_LENGTH];
-	obj_data *corpse, *o, *next_o;
+	obj_data *corpse, *rope, *o, *next_o;
 	int i, size;
 	bool human = (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_HUMAN));
 
@@ -1549,9 +1548,12 @@ obj_data *make_corpse(char_data *ch) {
 		}
 		
 		// rope if it was tied
-		if (MOB_FLAGGED(ch, MOB_TIED)) {
-			obj_to_obj(read_object(o_ROPE, TRUE), corpse);
+		if (MOB_FLAGGED(ch, MOB_TIED) && GET_ROPE_VNUM(ch) != NOTHING && (rope = read_object(GET_ROPE_VNUM(ch), TRUE))) {
+			scale_item_to_level(rope, 1);
+			obj_to_obj(rope, corpse);
+			load_otrigger(rope);
 		}
+		GET_ROPE_VNUM(ch) = NOTHING;
 
 		IS_CARRYING_N(ch) = 0;
 		ch->carrying = NULL;

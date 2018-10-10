@@ -53,6 +53,7 @@ extern const char *class_role_color[];
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
+void scale_item_to_level(obj_data *obj, int level);
 void update_class(char_data *ch);
 
 // local protos
@@ -2502,6 +2503,7 @@ obj_data *has_sharp_tool(char_data *ch) {
 
 /* tie/untie an npc */
 void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
+	bool kept = FALSE;
 	obj_data *rope;
 
 	if (!subcmd && MOB_FLAGGED(victim, MOB_TIED))
@@ -2513,14 +2515,20 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 		act("$n unties you!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 		act("$n unties $N.", FALSE, ch, 0, victim, TO_NOTVICT);
 		REMOVE_BIT(MOB_FLAGS(victim), MOB_TIED);
-		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
-		load_otrigger(rope);
+		
+		if (GET_ROPE_VNUM(victim) != NOTHING && (rope = read_object(GET_ROPE_VNUM(victim), TRUE))) {
+			obj_to_char(rope, ch);
+			scale_item_to_level(rope, 1);	// minimum scale
+			load_otrigger(rope);
+		}
+		GET_ROPE_VNUM(victim) = NOTHING;
 	}
 	else if (!MOB_FLAGGED(victim, MOB_ANIMAL)) {
 		msg_to_char(ch, "You can only tie animals.\r\n");
 	}
-	else if (!(rope = get_obj_in_list_num(o_ROPE, ch->carrying)))
-		msg_to_char(ch, "You don't have any rope.\r\n");
+	else if (!(rope = get_component_in_list(CMP_ROPE, NOBITS, ch->carrying, &kept))) {
+		msg_to_char(ch, "You don't seem to have any rope%s.\r\n", kept ? " that isn't marked 'keep'" : "");
+	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN))
 		msg_to_char(ch, "You can't tie it here.\r\n");
 	else {
@@ -2528,6 +2536,7 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 		act("$n ties you up.", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 		act("$n ties $N up.", FALSE, ch, 0, victim, TO_NOTVICT);
 		SET_BIT(MOB_FLAGS(victim), MOB_TIED);
+		GET_ROPE_VNUM(victim) = GET_OBJ_VNUM(rope);
 		extract_obj(rope);
 	}
 }

@@ -5690,6 +5690,41 @@ bool has_custom_message(struct custom_message *list, int type) {
 //// OBJECT TARGETING HANDLERS ///////////////////////////////////////////////
 
 /**
+* Search a given list for a matching component and return it (will not return
+* kept items).
+*
+* @param int cmp_type The CMP_ type to find.
+* @param bitvector_t cmp_flags Any required flags (all must match).
+* @param obj_data *list The start of any object list.
+* @param bool *kept A variable to bind to if there was a match but it was marked 'keep' (which won't be returned).
+* @return obj_data *The first matching object in the list, if any.
+*/
+obj_data *get_component_in_list(int cmp_type, bitvector_t cmp_flags, obj_data *list, bool *kept) {
+	bool found_keep = FALSE;
+	obj_data *obj;
+	
+	*kept = FALSE;
+	
+	LL_FOREACH2(list, obj, next_content) {
+		if (GET_OBJ_CMP_TYPE(obj) == cmp_type && (GET_OBJ_CMP_FLAGS(obj) & cmp_flags) == cmp_flags) {
+			// valid match?
+			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				found_keep = TRUE;
+			}
+			else {
+				// found!
+				return obj;
+			}
+		}
+	}
+	
+	// failed
+	*kept = found_keep;
+	return NULL;
+}
+
+
+/**
 * Find an object in another person's share slot, by character name.
 *
 * @param char_data *ch The person looking for a shared obj.

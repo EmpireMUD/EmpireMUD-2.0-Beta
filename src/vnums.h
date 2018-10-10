@@ -86,9 +86,6 @@
 // clay
 #define o_BRICKS  257	// TODO: create a workforce brickmaking ability/craft
 
-// Sewn items
-#define o_ROPE  2035
-
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
