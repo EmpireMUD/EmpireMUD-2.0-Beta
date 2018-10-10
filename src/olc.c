@@ -500,7 +500,31 @@ extern bool valid_room_template_vnum(rmt_vnum vnum);
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 void smart_copy_requirements(struct req_data **to_list, struct req_data *from_list);
 
-// prototypes
+// prototypes: auditors
+extern bool audit_ability(ability_data *abil, char_data *ch);
+extern bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
+extern bool audit_archetype(archetype_data *arch, char_data *ch);
+extern bool audit_augment(augment_data *aug, char_data *ch);
+extern bool audit_building(bld_data *bld, char_data *ch);
+extern bool audit_class(class_data *cls, char_data *ch);
+extern bool audit_craft(craft_data *craft, char_data *ch);
+extern bool audit_crop(crop_data *cp, char_data *ch);
+extern bool audit_faction(faction_data *fct, char_data *ch);
+extern bool audit_generic(generic_data *gen, char_data *ch);
+extern bool audit_global(struct global_data *global, char_data *ch);
+extern bool audit_mobile(char_data *mob, char_data *ch);
+extern bool audit_morph(morph_data *morph, char_data *ch);
+extern bool audit_object(obj_data *obj, char_data *ch);
+extern bool audit_progress(progress_data *prg, char_data *ch);
+extern bool audit_quest(quest_data *quest, char_data *ch);
+extern bool audit_room_template(room_template *rmt, char_data *ch);
+extern bool audit_sector(sector_data *sect, char_data *ch);
+extern bool audit_shop(shop_data *shop, char_data *ch);
+extern bool audit_skill(skill_data *skill, char_data *ch);
+extern bool audit_social(social_data *soc, char_data *ch);
+extern bool audit_vehicle(vehicle_data *veh, char_data *ch);
+
+// prototypes: show
 void olc_show_ability(char_data *ch);
 void olc_show_adventure(char_data *ch);
 void olc_show_archetype(char_data *ch);
@@ -525,6 +549,8 @@ void olc_show_skill(char_data *ch);
 void olc_show_social(char_data *ch);
 void olc_show_trigger(char_data *ch);
 void olc_show_vehicle(char_data *ch);
+
+// prototypes: setup
 extern ability_data *setup_olc_ability(ability_data *input);
 extern adv_data *setup_olc_adventure(adv_data *input);
 extern archetype_data *setup_olc_archetype(archetype_data *input);
@@ -549,6 +575,8 @@ extern skill_data *setup_olc_skill(skill_data *input);
 extern social_data *setup_olc_social(social_data *input);
 extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
 extern vehicle_data *setup_olc_vehicle(vehicle_data *input);
+
+// prototypes: other
 extern bool validate_icon(char *icon);
 
 
@@ -1288,7 +1316,6 @@ OLC_MODULE(olc_audit) {
 		// OLC_x: auditors
 		switch (type) {
 			case OLC_ABILITY: {
-				extern bool audit_ability(ability_data *abil, char_data *ch);
 				ability_data *abil, *next_abil;
 				HASH_ITER(hh, ability_table, abil, next_abil) {
 					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
@@ -1298,7 +1325,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_ADVENTURE: {
-				extern bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
 				adv_data *adv, *next_adv;
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
@@ -1308,7 +1334,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_ARCHETYPE: {
-				extern bool audit_archetype(archetype_data *arch, char_data *ch);
 				archetype_data *arch, *next_arch;
 				HASH_ITER(hh, archetype_table, arch, next_arch) {
 					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
@@ -1318,7 +1343,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_AUGMENT: {
-				extern bool audit_augment(augment_data *aug, char_data *ch);
 				augment_data *aug, *next_aug;
 				HASH_ITER(hh, augment_table, aug, next_aug) {
 					if (GET_AUG_VNUM(aug) >= from_vnum && GET_AUG_VNUM(aug) <= to_vnum) {
@@ -1328,7 +1352,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_BUILDING: {
-				extern bool audit_building(bld_data *bld, char_data *ch);
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
@@ -1338,7 +1361,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_CLASS: {
-				extern bool audit_class(class_data *cls, char_data *ch);
 				class_data *cls, *next_cls;
 				HASH_ITER(hh, class_table, cls, next_cls) {
 					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
@@ -1348,7 +1370,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_CRAFT: {
-				extern bool audit_craft(craft_data *craft, char_data *ch);
 				craft_data *craft, *next_craft;
 				HASH_ITER(hh, craft_table, craft, next_craft) {
 					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
@@ -1358,7 +1379,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_CROP: {
-				extern bool audit_crop(crop_data *cp, char_data *ch);
 				crop_data *cp, *next_cp;
 				HASH_ITER(hh, crop_table, cp, next_cp) {
 					if (GET_CROP_VNUM(cp) >= from_vnum && GET_CROP_VNUM(cp) <= to_vnum) {
@@ -1368,7 +1388,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_FACTION: {
-				extern bool audit_faction(faction_data *fct, char_data *ch);
 				faction_data *fct, *next_fct;
 				HASH_ITER(hh, faction_table, fct, next_fct) {
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
@@ -1378,7 +1397,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_GENERIC: {
-				extern bool audit_generic(generic_data *gen, char_data *ch);
 				generic_data *gen, *next_gen;
 				HASH_ITER(hh, generic_table, gen, next_gen) {
 					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
@@ -1388,7 +1406,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_GLOBAL: {
-				extern bool audit_global(struct global_data *global, char_data *ch);
 				struct global_data *glb, *next_glb;
 				HASH_ITER(hh, globals_table, glb, next_glb) {
 					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
@@ -1398,7 +1415,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_MOBILE: {
-				extern bool audit_mobile(char_data *mob, char_data *ch);
 				char_data *mob, *next_mob;
 				HASH_ITER(hh, mobile_table, mob, next_mob) {
 					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
@@ -1408,7 +1424,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_MORPH: {
-				extern bool audit_morph(morph_data *morph, char_data *ch);
 				morph_data *morph, *next_morph;
 				HASH_ITER(hh, morph_table, morph, next_morph) {
 					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
@@ -1418,7 +1433,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_OBJECT: {
-				extern bool audit_object(obj_data *obj, char_data *ch);
 				obj_data *obj, *next_obj;
 				HASH_ITER(hh, object_table, obj, next_obj) {
 					if (GET_OBJ_VNUM(obj) >= from_vnum && GET_OBJ_VNUM(obj) <= to_vnum) {
@@ -1428,7 +1442,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_PROGRESS: {
-				extern bool audit_progress(progress_data *prg, char_data *ch);
 				progress_data *prg, *next_prg;
 				HASH_ITER(hh, progress_table, prg, next_prg) {
 					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
@@ -1438,7 +1451,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_QUEST: {
-				extern bool audit_quest(quest_data *quest, char_data *ch);
 				quest_data *quest, *next_quest;
 				HASH_ITER(hh, quest_table, quest, next_quest) {
 					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
@@ -1448,7 +1460,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_ROOM_TEMPLATE: {
-				extern bool audit_room_template(room_template *rmt, char_data *ch);
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
@@ -1457,23 +1468,16 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
-			/*
 			case OLC_SECTOR: {
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
-						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+						found |= audit_sector(sect, ch);
 					}
 				}
 				break;
 			}
-			*/
 			case OLC_SHOP: {
-				extern bool audit_shop(shop_data *shop, char_data *ch);
 				shop_data *shop, *next_shop;
 				HASH_ITER(hh, shop_table, shop, next_shop) {
 					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
@@ -1483,7 +1487,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_SKILL: {
-				extern bool audit_skill(skill_data *skill, char_data *ch);
 				skill_data *skill, *next_skill;
 				HASH_ITER(hh, skill_table, skill, next_skill) {
 					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
@@ -1493,7 +1496,6 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			case OLC_SOCIAL: {
-				extern bool audit_social(social_data *soc, char_data *ch);
 				social_data *soc, *next_soc;
 				HASH_ITER(hh, social_table, soc, next_soc) {
 					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
@@ -1518,7 +1520,6 @@ OLC_MODULE(olc_audit) {
 			}
 			*/
 			case OLC_VEHICLE: {
-				extern bool audit_vehicle(vehicle_data *veh, char_data *ch);
 				vehicle_data *veh, *next_veh;
 				HASH_ITER(hh, vehicle_table, veh, next_veh) {
 					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
@@ -3344,54 +3345,63 @@ OLC_MODULE(olc_save) {
 		switch (GET_OLC_TYPE(ch->desc)) {
 			case OLC_ABILITY: {
 				save_olc_ability(ch->desc);
+				audit_ability(GET_OLC_ABILITY(ch->desc), ch);
 				free_ability(GET_OLC_ABILITY(ch->desc));
 				GET_OLC_ABILITY(ch->desc) = NULL;
 				break;
 			}
 			case OLC_ADVENTURE: {
 				save_olc_adventure(ch->desc);
+				audit_adventure(GET_OLC_ADVENTURE(ch->desc), ch, FALSE);
 				free_adventure(GET_OLC_ADVENTURE(ch->desc));
 				GET_OLC_ADVENTURE(ch->desc) = NULL;
 				break;
 			}
 			case OLC_ARCHETYPE: {
 				save_olc_archetype(ch->desc);
+				audit_archetype(GET_OLC_ARCHETYPE(ch->desc), ch);
 				free_archetype(GET_OLC_ARCHETYPE(ch->desc));
 				GET_OLC_ARCHETYPE(ch->desc) = NULL;
 				break;
 			}
 			case OLC_AUGMENT: {
 				save_olc_augment(ch->desc);
+				audit_augment(GET_OLC_AUGMENT(ch->desc), ch);
 				free_augment(GET_OLC_AUGMENT(ch->desc));
 				GET_OLC_AUGMENT(ch->desc) = NULL;
 				break;
 			}
 			case OLC_BOOK: {
 				save_olc_book(ch->desc);
+				// audit_book(GET_OLC_BOOK(ch->desc), ch);
 				free_book(GET_OLC_BOOK(ch->desc));
 				GET_OLC_BOOK(ch->desc) = NULL;
 				break;
 			}
 			case OLC_BUILDING: {
 				save_olc_building(ch->desc);
+				audit_building(GET_OLC_BUILDING(ch->desc), ch);
 				free_building(GET_OLC_BUILDING(ch->desc));
 				GET_OLC_BUILDING(ch->desc) = NULL;
 				break;
 			}
 			case OLC_CLASS: {
 				save_olc_class(ch->desc);
+				audit_class(GET_OLC_CLASS(ch->desc), ch);
 				free_class(GET_OLC_CLASS(ch->desc));
 				GET_OLC_CLASS(ch->desc) = NULL;
 				break;
 			}
 			case OLC_CRAFT: {
 				save_olc_craft(ch->desc);
+				audit_craft(GET_OLC_CRAFT(ch->desc), ch);
 				free_craft(GET_OLC_CRAFT(ch->desc));
 				GET_OLC_CRAFT(ch->desc) = NULL;
 				break;
 			}
 			case OLC_CROP: {
 				save_olc_crop(ch->desc);
+				audit_crop(GET_OLC_CROP(ch->desc), ch);
 				free_crop(GET_OLC_CROP(ch->desc));
 				GET_OLC_CROP(ch->desc) = NULL;
 				break;
@@ -3399,6 +3409,8 @@ OLC_MODULE(olc_save) {
 			case OLC_FACTION: {
 				void save_olc_faction(descriptor_data *desc);
 				save_olc_faction(ch->desc);
+				audit_faction(GET_OLC_FACTION(ch->desc), ch);
+				// TODO
 				free_faction(GET_OLC_FACTION(ch->desc));
 				GET_OLC_FACTION(ch->desc) = NULL;
 				break;

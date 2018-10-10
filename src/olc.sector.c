@@ -54,6 +54,85 @@ const char default_roadside_icon = '.';
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Checks for common sector problems and reports them to ch.
+*
+* @param sector_data *sect The item to audit.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_sector(sector_data *sect, char_data *ch) {
+	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
+	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
+	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
+	extern const char *icon_types[];
+	
+	char temp[MAX_STRING_LENGTH];
+	bool problem = FALSE;
+	int iter;
+	
+	// flags to audit for
+	const bitvector_t odd_flags = SECTF_ADVENTURE | SECTF_NON_ISLAND | SECTF_START_LOCATION | SECTF_MAP_BUILDING | SECTF_INSIDE;
+	
+	if (!GET_SECT_NAME(sect) || !*GET_SECT_NAME(sect) || !str_cmp(GET_SECT_NAME(sect), default_sect_name)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "No name set");
+		problem = TRUE;
+	}
+	if (GET_SECT_NAME(sect) && islower(*GET_SECT_NAME(sect))) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Missing capital in sector name");
+		problem = TRUE;
+	}
+	
+	if (!GET_SECT_TITLE(sect) || !*GET_SECT_TITLE(sect) || !str_cmp(GET_SECT_TITLE(sect), default_sect_title)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "No title set");
+		problem = TRUE;
+	}
+	
+	for (iter = 0; iter < NUM_TILESETS; ++iter) {
+		if (!get_icon_from_set(GET_SECT_ICONS(sect), iter)) {
+			olc_audit_msg(ch, GET_SECT_VNUM(sect), "No icon for '%s' tileset", icon_types[iter]);
+			problem = TRUE;
+		}
+	}
+	if (GET_SECT_CLIMATE(sect) == CLIMATE_NONE) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Climate not set");
+		problem = TRUE;
+	}
+	if (!GET_SECT_SPAWNS(sect)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "No spawns set");
+		problem = TRUE;
+	}
+	if (GET_SECT_MAPOUT(sect) == 0) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Mapout color not set (or set to starting location)");
+		problem = TRUE;
+	}
+	if (!GET_SECT_MOVE_LOSS(sect)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "No movement cost");
+		problem = TRUE;
+	}
+	
+	if (SECT_FLAGGED(sect, odd_flags)) {
+		sprintbit(GET_SECT_FLAGS(sect) & odd_flags, sector_flags, temp, TRUE);
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Unusual flag(s): %s", temp);
+		problem = TRUE;
+	}
+	if (SECT_FLAGGED(sect, SECTF_OCEAN | SECTF_FRESH_WATER) && !has_interaction(GET_SECT_INTERACTIONS(sect), INTERACT_FISH)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Water sect with no fish interaction");
+		problem = TRUE;
+	}
+	
+	if (has_evolution_type(sect, EVO_CHOPPED_DOWN) && !has_interaction(GET_SECT_INTERACTIONS(sect), INTERACT_CHOP)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Choppable sect with no chop interaction");
+		problem = TRUE;
+	}
+	
+	problem |= audit_interactions(GET_SECT_VNUM(sect), GET_SECT_INTERACTIONS(sect), TYPE_ROOM, ch);
+	problem |= audit_spawns(GET_SECT_VNUM(sect), GET_SECT_SPAWNS(sect), ch);
+	
+	return problem;
+}
+
+
+/**
 * Creates a new sector entry.
 * 
 * @param sector_vnum vnum The number to create.
