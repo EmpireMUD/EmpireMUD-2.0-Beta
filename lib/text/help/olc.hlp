@@ -332,6 +332,8 @@ Objects (OEDIT):
 - Ammo items that cause debuffs will use an 'affect' generic with the same
   vnum as the ammo, if one exists.
 - Potions should have a locked level (min equal to max) to be storable.
+- Rope components can be used to tie up players and animals. They should always
+  be locked to just 1 level, because they'll be downscaled when returned.
 
 Empire Progress Goals (PROGEDIT):
 - Goals that are PURCHASABLE should not have cost or tasks.
