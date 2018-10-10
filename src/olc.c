@@ -3308,25 +3308,6 @@ OLC_MODULE(olc_removeindev) {
 
 
 OLC_MODULE(olc_save) {
-	void save_olc_ability(descriptor_data *desc);
-	void save_olc_adventure(descriptor_data *desc);
-	void save_olc_archetype(descriptor_data *desc);
-	void save_olc_augment(descriptor_data *desc);
-	void save_olc_book(descriptor_data *desc);
-	void save_olc_building(descriptor_data *desc);
-	void save_olc_class(descriptor_data *desc);
-	void save_olc_craft(descriptor_data *desc);
-	void save_olc_crop(descriptor_data *desc);
-	void save_olc_global(descriptor_data *desc);
-	void save_olc_mobile(descriptor_data *desc);
-	void save_olc_morph(descriptor_data *desc);
-	void save_olc_object(descriptor_data *desc);
-	void save_olc_room_template(descriptor_data *desc);
-	void save_olc_sector(descriptor_data *desc);	
-	void save_olc_skill(descriptor_data *desc);
-	void save_olc_social(descriptor_data *desc);
-	void save_olc_trigger(descriptor_data *desc, char *script_text);
-	
 	char typename[42];
 	
 	sprintbit(GET_OLC_TYPE(ch->desc), olc_type_bits, typename, FALSE);
@@ -3341,9 +3322,12 @@ OLC_MODULE(olc_save) {
 		msg_to_char(ch, "Close your text editor (&y,/h&0) before saving an olc editor.\r\n");
 	}
 	else {
+		msg_to_char(ch, "Saving %s %d...\r\n", typename, GET_OLC_VNUM(ch->desc));
+		
 		// OLC_x:
 		switch (GET_OLC_TYPE(ch->desc)) {
 			case OLC_ABILITY: {
+				void save_olc_ability(descriptor_data *desc);
 				save_olc_ability(ch->desc);
 				audit_ability(GET_OLC_ABILITY(ch->desc), ch);
 				free_ability(GET_OLC_ABILITY(ch->desc));
@@ -3351,6 +3335,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_ADVENTURE: {
+				void save_olc_adventure(descriptor_data *desc);
 				save_olc_adventure(ch->desc);
 				audit_adventure(GET_OLC_ADVENTURE(ch->desc), ch, FALSE);
 				free_adventure(GET_OLC_ADVENTURE(ch->desc));
@@ -3358,6 +3343,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_ARCHETYPE: {
+				void save_olc_archetype(descriptor_data *desc);
 				save_olc_archetype(ch->desc);
 				audit_archetype(GET_OLC_ARCHETYPE(ch->desc), ch);
 				free_archetype(GET_OLC_ARCHETYPE(ch->desc));
@@ -3365,6 +3351,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_AUGMENT: {
+				void save_olc_augment(descriptor_data *desc);
 				save_olc_augment(ch->desc);
 				audit_augment(GET_OLC_AUGMENT(ch->desc), ch);
 				free_augment(GET_OLC_AUGMENT(ch->desc));
@@ -3372,6 +3359,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_BOOK: {
+				void save_olc_book(descriptor_data *desc);
 				save_olc_book(ch->desc);
 				// audit_book(GET_OLC_BOOK(ch->desc), ch);
 				free_book(GET_OLC_BOOK(ch->desc));
@@ -3379,6 +3367,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_BUILDING: {
+				void save_olc_building(descriptor_data *desc);
 				save_olc_building(ch->desc);
 				audit_building(GET_OLC_BUILDING(ch->desc), ch);
 				free_building(GET_OLC_BUILDING(ch->desc));
@@ -3386,6 +3375,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_CLASS: {
+				void save_olc_class(descriptor_data *desc);
 				save_olc_class(ch->desc);
 				audit_class(GET_OLC_CLASS(ch->desc), ch);
 				free_class(GET_OLC_CLASS(ch->desc));
@@ -3393,6 +3383,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_CRAFT: {
+				void save_olc_craft(descriptor_data *desc);
 				save_olc_craft(ch->desc);
 				audit_craft(GET_OLC_CRAFT(ch->desc), ch);
 				free_craft(GET_OLC_CRAFT(ch->desc));
@@ -3400,6 +3391,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_CROP: {
+				void save_olc_crop(descriptor_data *desc);
 				save_olc_crop(ch->desc);
 				audit_crop(GET_OLC_CROP(ch->desc), ch);
 				free_crop(GET_OLC_CROP(ch->desc));
@@ -3423,24 +3415,28 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_GLOBAL: {
+				void save_olc_global(descriptor_data *desc);
 				save_olc_global(ch->desc);
 				free_global(GET_OLC_GLOBAL(ch->desc));
 				GET_OLC_GLOBAL(ch->desc) = NULL;
 				break;
 			}
 			case OLC_MOBILE: {
+				void save_olc_mobile(descriptor_data *desc);
 				save_olc_mobile(ch->desc);
 				free_char(GET_OLC_MOBILE(ch->desc));
 				GET_OLC_MOBILE(ch->desc) = NULL;
 				break;
 			}
 			case OLC_MORPH: {
+				void save_olc_morph(descriptor_data *desc);
 				save_olc_morph(ch->desc);
 				free_morph(GET_OLC_MORPH(ch->desc));
 				GET_OLC_MORPH(ch->desc) = NULL;
 				break;
 			}
 			case OLC_OBJECT: {
+				void save_olc_object(descriptor_data *desc);
 				save_olc_object(ch->desc);
 				free_obj(GET_OLC_OBJECT(ch->desc));
 				GET_OLC_OBJECT(ch->desc) = NULL;
@@ -3461,12 +3457,14 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_ROOM_TEMPLATE: {
+				void save_olc_room_template(descriptor_data *desc);
 				save_olc_room_template(ch->desc);
 				free_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc));
 				GET_OLC_ROOM_TEMPLATE(ch->desc) = NULL;
 				break;
 			}
 			case OLC_SECTOR: {
+				void save_olc_sector(descriptor_data *desc);
 				save_olc_sector(ch->desc);
 				free_sector(GET_OLC_SECTOR(ch->desc));
 				GET_OLC_SECTOR(ch->desc) = NULL;
@@ -3480,18 +3478,21 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_SKILL: {
+				void save_olc_skill(descriptor_data *desc);
 				save_olc_skill(ch->desc);
 				free_skill(GET_OLC_SKILL(ch->desc));
 				GET_OLC_SKILL(ch->desc) = NULL;
 				break;
 			}
 			case OLC_SOCIAL: {
+				void save_olc_social(descriptor_data *desc);
 				save_olc_social(ch->desc);
 				free_social(GET_OLC_SOCIAL(ch->desc));
 				GET_OLC_SOCIAL(ch->desc) = NULL;
 				break;
 			}
 			case OLC_TRIGGER: {
+				void save_olc_trigger(descriptor_data *desc, char *script_text);
 				save_olc_trigger(ch->desc, GET_OLC_STORAGE(ch->desc));
 				free_trigger(GET_OLC_TRIGGER(ch->desc));
 				GET_OLC_TRIGGER(ch->desc) = NULL;
@@ -3516,7 +3517,6 @@ OLC_MODULE(olc_save) {
 		
 		// log and cleanup
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has edited %s %d", GET_NAME(ch), typename, GET_OLC_VNUM(ch->desc));
-		send_config_msg(ch, "ok_string");
 		GET_OLC_TYPE(ch->desc) = 0;
 		GET_OLC_VNUM(ch->desc) = NOTHING;
 	}
