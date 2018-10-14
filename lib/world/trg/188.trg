@@ -335,13 +335,13 @@ end
 if %target.is_pc%
   %send% %actor% You can't costume players with %self.shortdesc%.
   halt
-elseif %target.vnum% < 200 || %target.vnum% > 299 || !%target.mob_flagged(HUMAN)%
+elseif !%target.mob_flagged(HUMAN)%
   %send% %actor% You can't put a costume on %target.name%.
   halt
 elseif %target.mob_flagged(AGGR)% || %target.mob_flagged(CITYGUARD)%
   %send% %actor% You don't think %target.name% would be very pleased if you did that.
   halt
-elseif %target.mob_flagged(!EXP)%
+elseif !%target.mob_flagged(EMPIRE)%
   %send% %actor% %target.name% declines.
   halt
 elseif %target.morph% >= 18812 && %target.morph% <= 18817
@@ -704,9 +704,31 @@ detach 18828 %self.id%
 make offering to the spirits~
 1 c 2
 offer~
-* Values:
-* Sacrifices remaining; Sacrifice item vnum; ?
-set sacrifice_amount %self.val2%
+* Value0 tracks sacrifices remaining
+switch %self.vnum%
+  case 18850
+    set component_base metal
+    set component_flags common
+    set sacrifice_amount 10
+    set display_str 10x common metal
+  break
+  case 18851
+    set component_base block
+    set sacrifice_amount 10
+    set display_str 10x block
+  break
+  case 18852
+    set component_base rock
+    set sacrifice_amount 10
+    set display_str 10x rock
+  break
+  case 18853
+    set component_base fibers
+    set component_flags plant
+    set sacrifice_amount 10
+    set display_str 10x plant fibers
+  break
+done
 set found_grave 0
 set room %self.room%
 if !%room.function(TOMB)% || !%room.complete%
@@ -730,16 +752,13 @@ if %sacrifices_left% < 1
   halt
 end
 * actual sacrifice
-set sacrifice_vnum %self.val1%
-if !%actor.has_resources(%sacrifice_vnum%, %sacrifice_amount%)%
-  %send% %actor% You don't have the items required for this sacrifice...
+if !%actor.has_components(%component_base%, %sacrifice_amount%, %component_flags%)%
+  %send% %actor% You don't have the %display_str% required for this sacrifice...
   halt
 end
-set item %actor.inventory(%sacrifice_vnum%)%
-set item_name %item.shortdesc%
-%send% %actor% You offer up %item_name% (x%sacrifice_amount%) to appease the spirits of the dead...
-%echoaround% %actor% %actor.name% offers up %item_name% (x%sacrifice_amount%) to appease the spirits of the dead...
-nop %actor.add_resources(%sacrifice_vnum%, -%sacrifice_amount%)%
+%send% %actor% You offer up %display_str% to appease the spirits of the dead...
+%echoaround% %actor% %actor.name% offers up %display_str% to appease the spirits of the dead...
+nop %actor.charge_components(%component_base%, %sacrifice_amount%, %component_flags%)%
 eval sacrifices_left %sacrifices_left% - 1
 nop %self.val0(%sacrifices_left%)%
 if %sacrifices_left% == 0

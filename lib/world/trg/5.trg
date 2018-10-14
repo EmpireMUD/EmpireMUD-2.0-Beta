@@ -929,10 +929,10 @@ if %actor% != %self.master%
   halt
 end
 set ability_0 random
-set ability_1 marble
-set ability_2 quartzite
-set ability_3 basalt
-set ability_4 granite
+set ability_1 quartzite
+set ability_2 basalt
+set ability_3 granite
+set ability_4 marble
 if %ability_1% /= %arg2%
   set selected_ability 1
 elseif %ability_2% /= %arg2%

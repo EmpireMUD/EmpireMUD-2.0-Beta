@@ -741,10 +741,10 @@ S
 instructions offering iron~
 the iron offering instructions~
 The iron offering instructions are lying here.~
-Take 10x iron ingots to 'offer' at 5 different tombs to complete this quest.
+Take 10x common metal to 'offer' at 5 different tombs to complete this quest.
 ~
-3 0 a 4
-5 175 10
+3 0 a 5
+5 0 0
 0 0
 Q 18829
 T 18848
@@ -756,8 +756,8 @@ The brick offering instructions are lying here.~
    Take 10x piles of bricks to 'offer' at 5 different tombs to complete this
 quest.
 ~
-3 0 a 6
-5 257 10
+3 0 a 7
+5 0 0
 0 0
 Q 18830
 T 18848
@@ -768,20 +768,20 @@ the rock offering instructions~
 The rock offering instructions are lying here.~
 Take 10x rocks to 'offer' at 5 different tombs to complete this quest.
 ~
-3 0 a 8
-5 100 10
+3 0 a 9
+5 0 0
 0 0
 Q 18831
 T 18848
 S
 #18853
-instructions offering stick~
-the stick offering instructions~
-The stick offering instructions are lying here.~
-Take 10x sticks to 'offer' at 5 different tombs to complete this quest.
+instructions offering straw~
+the straw offering instructions~
+The straw offering instructions are lying here.~
+Take 10x plant fibers to 'offer' at 5 different tombs to complete this quest.
 ~
-3 0 a 7
-5 121 10
+3 0 a 8
+5 0 0
 0 0
 Q 18832
 T 18848
