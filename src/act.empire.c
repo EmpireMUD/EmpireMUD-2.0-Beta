@@ -3955,7 +3955,7 @@ ACMD(do_efind) {
 				
 				// first item at this location?
 				if (eg->location != last_rm) {
-					size += snprintf(buf + size, sizeof(buf) - size, "\r\n%s%s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
+					size += snprintf(buf + size, sizeof(buf) - size, "\r\n%s %s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
 					last_rm = eg->location;
 				}
 				else {

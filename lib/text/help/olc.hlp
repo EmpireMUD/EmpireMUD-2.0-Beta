@@ -3652,7 +3652,7 @@ Available mob flags:
  FAMILIAR - Will not be saved through reboots; players may only have one familiar follower at a time.
  *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
  CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
- PURSUE - Will purse players who flee in combat.
+ PURSUE - Will pursue players who flee in combat.
  HUMAN - Counts as a human for various commands.
  VAMPIRE - Counts as a vampire for various commands.
  CASTER - Has a mana pool; counts as a caster.
