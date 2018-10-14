@@ -263,6 +263,9 @@ while %person%
       %quest% %person% finish 18801
       set loot 1
     end
+    if %person.empire%
+      nop %person.empire.start_progress(18800)%
+    end
   elseif %person.vnum% == 18805
     %purge% %person% $n vanishes in a flash of blue fire!
   end
@@ -752,13 +755,13 @@ if %sacrifices_left% < 1
   halt
 end
 * actual sacrifice
-if !%actor.has_components(%component_base%, %sacrifice_amount%, %component_flags%)%
-  %send% %actor% You don't have the %display_str% required for this sacrifice...
+if !%actor.has_component(%component_base%, %sacrifice_amount%, %component_flags%)%
+  %send% %actor% You don't have the (%display_str%) required for this sacrifice...
   halt
 end
-%send% %actor% You offer up %display_str% to appease the spirits of the dead...
-%echoaround% %actor% %actor.name% offers up %display_str% to appease the spirits of the dead...
-nop %actor.charge_components(%component_base%, %sacrifice_amount%, %component_flags%)%
+%send% %actor% You offer up (%display_str%) to appease the spirits of the dead...
+%echoaround% %actor% %actor.name% offers up (%display_str%) to appease the spirits of the dead...
+nop %actor.charge_component(%component_base%, %sacrifice_amount%, %component_flags%)%
 eval sacrifices_left %sacrifices_left% - 1
 nop %self.val0(%sacrifices_left%)%
 if %sacrifices_left% == 0
