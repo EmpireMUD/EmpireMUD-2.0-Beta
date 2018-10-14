@@ -101,7 +101,7 @@ See also: SAIL, SWIMMING, SHIPBUILDING
 CLAY "CLAY COMPONENT"
 
 Clay (component)
-Pile of clay (resource)
+Lump of clay (resource)
 
 Clay is a component used in pottery and brickmaking. Clay is found by digging
 in plains, forests, and well-irrigated areas. You can also build a clay pit to
@@ -207,13 +207,11 @@ DYES "DYE COMPONENT"
 
 Dye (component)
 
-Used for:  sewing, vehicles
+Used for:  none
 
-Dyes are a component type used primarily for clothing. Some recipes require a
-specific color of dye while others will accept any dye. The Glassblowing
-technology is required to make the vials used to store dyes.
+Dyes are not currently used.
 
-See also: BASIC CRAFTS, COMPONENT
+See also: COMPONENT
 #
 FEATHERS "FEATHERS COMPONENT" "FEATHER COMPONENT"
 
@@ -290,8 +288,8 @@ Used for:  sewing
 
 Fur is a component type primarily used for clothing and mage armor.
 
-small:  fox fur
-large:  big cat pelt
+small:  fox fur, wolverine fur
+large:  big cat pelt, polar bear fur
 
 See also: COMPONENT, SEW, SKIN COMMAND
 #
@@ -341,7 +339,7 @@ Stored in:  Utility Shed, Storage room
 Create a handle using the craft command.
 
 Handles are used in forging and crafting to provide a grasping surface to a
-tool or weapon. The most basic handles are made from sticks.
+tool or weapon. The most basic handles are made from saplings.
 
 The more advanced elegant handle can be made from magic wood.
 
@@ -412,7 +410,8 @@ LEATHER "LEATHER COMPONENT"
 
 Leather (component)
 
-Leather is a component type used in many sewing recipes.
+Leather is a component type used in many sewing recipes. You can make leather
+by tanning skins.
 
 See also: COMPONENT, TAN, SKIN, VERDANT LEATHERS
 #
@@ -535,7 +534,7 @@ Pillar (component)
 Used for:  building
 
 The most commonly used pillars are simple wooden logs. You can also craft bound
-wooden columns from sticks and lumber if you have Basic Crafts. This may be
+wooden columns from saplings and rope if you have Basic Crafts. This may be
 useful if you're unable to get logs (for example, rough wood cannot be scraped).
 
 See also: BASIC CRAFTS, COMPONENT, LOGS
