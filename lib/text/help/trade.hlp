@@ -982,6 +982,11 @@ With basic Shipbuilding you can manufacture:
     Health: 32
     Rooms: 1
 
+Unlock more advanced ships through empire progression:
+  Carrack (exploration, 8 rooms)
+  Brigantine (siege, 128 health)
+  Hulk (shipping, 1000 capacity)
+
 See also: CRAFT INFO, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE,
    RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES
 #
