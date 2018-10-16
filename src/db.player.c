@@ -1904,6 +1904,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Rewarded:", length)) {
 					// old data; ignore
 				}
+				else if (PFILE_TAG(line, "Rope vnum:", length)) {
+					GET_ROPE_VNUM(ch) = atoi(line + length + 1);
+				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
@@ -2572,6 +2575,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		if (GET_RESOURCE(ch, iter) != 0) {
 			fprintf(fl, "Resource: %d %s\n", GET_RESOURCE(ch, iter), materials[iter].name);
 		}
+	}
+	if (GET_ROPE_VNUM(ch) != NOTHING) {
+		fprintf(fl, "Rope vnum: %d\n", GET_ROPE_VNUM(ch));
 	}
 	
 	// 'S'

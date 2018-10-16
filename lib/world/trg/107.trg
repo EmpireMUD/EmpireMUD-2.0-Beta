@@ -608,51 +608,12 @@ if %actor.obj_target(%arg%)% != %self% && !(%self.is_name(%arg%)% && %self.worn_
   return 0
   halt
 end
-if (%actor.position% != Standing)
-  %send% %actor% You can't do that right now.
-  halt
-end
-set varname minipet%self.val0%
-* once per 30 minutes
-if %actor.cooldown(%self.val0%)%
-  %send% %actor% %self.shortdesc% is on cooldown.
-  halt
-end
-* check too many mobs
-set mobs 0
-set found 0
-set found_pet 0
-set ch %self.room.people%
-while %ch% && !%found%
-  if (%ch.is_npc% && %ch.vnum% == %self.val0% && %ch.master% && %ch.master% == %actor%)
-    set found 1
-  elseif (%ch.is_npc% && %ch.master% && %ch.master% == %actor% && !%ch.mob_flagged(FAMILIAR)%)
-    set found_pet 1
-  elseif %ch.is_npc%
-    eval mobs %mobs% + 1
-  end
-  set ch %ch.next_in_room%
-done
-if %found%
-  %send% %actor% You already have this mini-pet.
-elseif %found_pet% then
-  %send% %actor% You already have another non-familiar follower.
-elseif %mobs% > 4
-  %send% %actor% There are too many mobs here already.
+if %actor.has_minipet(%self.val0%)%
+  %send% %actor% You already have the lamb mini-pet.
 else
-  %send% %actor% You ring %self.shortdesc%...
-  %echoaround% %actor% %actor.name% rings %self.shortdesc%...
-  nop %self.bind(%actor%)%
-  %load% m %self.val0%
-  set pet %self.room.people%
-  if (%pet% && %pet.vnum% == %self.val0%)
-    %force% %pet% mfollow %actor%
-    %echo% %pet.name% appears!
-    nop %actor.set_cooldown(%self.val0%, 1800)%
-    dg_affect %pet% *CHARM on -1
-    nop %pet.add_mob_flag(!EXP)%
-    nop %pet.unlink_instance%
-  end
+  nop %actor.add_minipet(%self.val0%)%
+  %send% %actor% You ring %self.shortdesc% and gain a little lamb mini-pet! (see HELP MINIPET)
+  %echoaround% %actor% %actor.name% rings %self.shortdesc%.
 end
 ~
 #10746

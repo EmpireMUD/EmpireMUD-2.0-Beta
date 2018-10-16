@@ -70,6 +70,7 @@ extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest.c
 extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
+extern bool parse_script_component_args(char *argument, int *cmp_type, int *number, bitvector_t *cmp_flags);
 trig_data *read_trigger(trig_vnum vnum);
 obj_data *get_object_in_equip(char_data *ch, char *name);
 void extract_trigger(trig_data *trig);
@@ -2962,6 +2963,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "charge_component")) {
+						struct resource_data *resources = NULL;
+						bitvector_t cmp_flags = NOBITS;
+						int cmp_type = 0, number = 0;
+						
+						if (!subfield || !parse_script_component_args(subfield, &cmp_type, &number, &cmp_flags)) {
+							script_log("Trigger: %s, VNum %d, bad args to charge_component(%s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
+							*str = '\0';
+						}
+						else {
+							add_to_resource_list(&resources, RES_COMPONENT, cmp_type, number, cmp_flags);
+							extract_resources(c, resources, FALSE, NULL);
+							free_resource_list(resources);
+							strcpy(str, "1");
+						}
+					}
 					else if (!str_cmp(field, "charge_currency")) {
 						if (subfield && isdigit(*subfield)) {
 							char arg1[256], arg2[256];
@@ -3274,7 +3291,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// char.h*
-					if (!str_cmp(field, "has_item")) {
+					if (!str_cmp(field, "has_component")) {
+						struct resource_data *resources = NULL;
+						bitvector_t cmp_flags = NOBITS;
+						int cmp_type = 0, number = 0;
+						
+						if (!subfield || !parse_script_component_args(subfield, &cmp_type, &number, &cmp_flags)) {
+							script_log("Trigger: %s, VNum %d, bad args to has_component(%s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
+							*str = '\0';
+						}
+						else {
+							add_to_resource_list(&resources, RES_COMPONENT, cmp_type, number, cmp_flags);
+							snprintf(str, slen, "%d", has_resources(c, resources, FALSE, FALSE) ? 1 : 0);
+							free_resource_list(resources);
+						}
+					}
+					else if (!str_cmp(field, "has_item")) {
 						if (!(subfield && *subfield))
 							*str = '\0';
 						else

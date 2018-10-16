@@ -56,6 +56,8 @@ const char *default_crop_title = "An Unnamed Crop";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_crop(crop_data *cp, char_data *ch) {
+	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
+	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
 	extern const char *icon_types[];
@@ -130,6 +132,9 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No FORAGE");
 		problem = TRUE;
 	}
+	
+	problem |= audit_interactions(GET_CROP_VNUM(cp), GET_CROP_INTERACTIONS(cp), TYPE_ROOM, ch);
+	problem |= audit_spawns(GET_CROP_VNUM(cp), GET_CROP_SPAWNS(cp), ch);
 	
 	return problem;
 }

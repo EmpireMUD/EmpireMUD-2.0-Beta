@@ -75,6 +75,7 @@ char **olc_material_list = NULL;	// used for olc
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_object(obj_data *obj, char_data *ch) {
+	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
@@ -183,6 +184,8 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Object has !STORE - this flag is meaningless on a prototype");
 		problem = TRUE;
 	}
+	
+	problem |= audit_interactions(GET_OBJ_VNUM(obj), obj->interactions, TYPE_OBJ, ch);
 	
 	// ITEM_X: auditors
 	switch (GET_OBJ_TYPE(obj)) {

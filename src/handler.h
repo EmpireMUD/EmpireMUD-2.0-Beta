@@ -249,6 +249,7 @@ extern bool has_custom_message(struct custom_message *list, int type);
 #define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 
 // object targeting handlers
+extern obj_data *get_component_in_list(int cmp_type, bitvector_t cmp_flags, obj_data *list, bool *kept);
 extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);
 extern obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
 extern obj_data *get_obj_in_list_num(int num, obj_data *list);

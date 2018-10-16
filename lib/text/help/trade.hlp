@@ -421,7 +421,7 @@ With the basic Forge skill, you can create:
   anchor -- used on ships
   firesteel tinderbox -- for lighting fires
 
-It also allows you to smelt bronze ignots from tin and copper.
+It also allows you to smelt bronze ingots from tin and copper.
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
@@ -981,6 +981,11 @@ With basic Shipbuilding you can manufacture:
     Capacity: 450
     Health: 32
     Rooms: 1
+
+Unlock more advanced ships through empire progression:
+  Carrack (exploration, 8 rooms)
+  Brigantine (siege, 128 health)
+  Hulk (shipping, 1000 capacity)
 
 See also: CRAFT INFO, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE,
    RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES

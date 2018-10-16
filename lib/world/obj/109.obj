@@ -569,10 +569,9 @@ schematic warhammer dragonsteel~
 the dragonsteel warhammer schematic~
 The dragonsteel warhammer schematic is lying here.~
    This schematic makes a dragonsteel warhammer, a powerful 1-handed melee
-weapon. You require Mythic Forge (Steelsmith or Guildsman) to forge this
-weapon.
+weapon. You require Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 4
+7 0 a 5
 10910 0 0
 0 0
 S
@@ -581,10 +580,9 @@ schematic dragonsteel claymore~
 the dragonsteel claymore schematic~
 The dragonsteel claymore schematic is lying here.~
    This schematic makes a dragonsteel claymore, a powerful 2-handed melee
-weapon. You require Mythic Forge (Steelsmith or Guildsman) to forge this
-weapon.
+weapon. You require Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 5
+7 0 a 6
 10911 0 0
 0 0
 S
@@ -593,9 +591,9 @@ schematic dragonbone mace~
 the dragonbone mace schematic~
 The dragonbone mace schematic is lying here.~
    This schematic makes a dragonbone mace, a strong tank weapon. You require
-Mythic Forge (Steelsmith or Guildsman) to forge this weapon.
+Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 6
+7 0 a 7
 10912 0 0
 0 0
 S
@@ -603,10 +601,10 @@ S
 schematic wand draconic~
 the draconic wand schematic~
 The draconic wand schematic is lying here.~
-   This schematic makes a flaming draconic wand, a powerful healer's weapon.
-You need Lore Crafts (Artificer or Tinker) to craft this weapon.
+   This schematic makes a flaming draconic wand, a powerful healer's weapon. 
+You need Lore Crafts (Trade/High Sorcery) to craft this weapon.
 ~
-7 0 a 7
+7 0 a 8
 10913 0 0
 0 0
 S
@@ -615,9 +613,9 @@ schematic dragonbone staff~
 the dragonbone staff schematic~
 The dragonbone staff schematic is lying here.~
    This schematic makes a flaming dragonbone staff, a powerful caster weapon.
-You need Lore Crafts (Artificer or Tinker) to craft this weapon.
+You need Lore Crafts (Trade/High Sorcery) to craft this weapon.
 ~
-7 0 a 8
+7 0 a 9
 10914 0 0
 0 0
 S
@@ -626,10 +624,10 @@ design wristblade dragonbone~
 the dragonbone wristblade design~
 The dragonbone wristblade design is lying here.~
    This design is for a dragonbone wristblade, a strong off-hand weapon for
-melee warriors. You require Mythic Forge (Steelsmith or Guildsman) to forge
-this off-hand weapon.
+melee warriors. You require Mythic Forge (Trade/Battle) to forge this off-hand
+weapon.
 ~
-7 0 a 9
+7 0 a 10
 10915 0 0
 0 0
 S
@@ -637,10 +635,10 @@ S
 design dragonbone tower shield~
 the dragonbone tower shield design~
 The dragonbone tower shield design is lying here.~
-   This design is for a dragonbone tower shield, a strong shield for tanks.
-You require Mythic Forge (Steelsmith or Guildsman) to forge this shield.
+   This design is for a dragonbone tower shield, a strong shield for tanks. 
+You require Mythic Forge (Trade/Battle) to forge this shield.
 ~
-7 0 a 10
+7 0 a 11
 10916 0 0
 0 0
 S
@@ -649,10 +647,9 @@ design red dragon charm~
 the red dragon charm design~
 The red dragon charm design is lying here.~
    This design is for a flaming red dragon charm, a powerful healer off-hand
-item. You need Lore Crafts (Artificer or Tinker) to craft this off-hand
-trinket.
+item. You need Lore Crafts (Trade/High Sorcery) to craft this off-hand trinket.
 ~
-7 0 a 11
+7 0 a 12
 10917 0 0
 0 0
 S
@@ -661,9 +658,9 @@ design tome dragonkind~
 the dragonkind tome design~
 The dragonkind tome design is lying here.~
    This design creates the tome of dragonkind, a powerful caster off-hand item.
-You need Lore Crafts (Artificer or Tinker) to craft this off-hand tome.
+You need Lore Crafts (Trade/High Sorcery) to craft this off-hand tome.
 ~
-7 0 a 12
+7 0 a 13
 10918 0 0
 0 0
 S
@@ -672,10 +669,10 @@ pattern dragon girdle crimson~
 the crimson dragon girdle pattern~
 The crimson dragon girdle pattern is lying here.~
    This pattern creates a crimson dragon girdle, a powerful light armor
-waistband for melee warriors. You need Fabled Hides (Antiquarian or Alchemist)
-to sew this belt.
+waistband for melee warriors. You need Fabled Hides (Trade/Natural Magic) to
+sew this belt.
 ~
-7 0 a 13
+7 0 a 14
 10919 0 0
 0 0
 S
@@ -684,10 +681,9 @@ pattern burning dragonsteel waistband~
 the burning dragonsteel waistband pattern~
 The burning dragonsteel waistband pattern is lying here.~
    This pattern creates a burning dragonsteel waistband, a heavy armored
-tanking belt. You need Fabled Hides (Antiquarian or Alchemist) to sew this
-belt.
+tanking belt. You need Fabled Hides (Trade/Natural Magic) to sew this belt.
 ~
-7 0 a 14
+7 0 a 15
 10920 0 0
 0 0
 S
@@ -696,10 +692,9 @@ pattern draconic flaming cincture~
 the flaming draconic cincture pattern~
 The flaming draconic cincture pattern is lying here.~
    This pattern creates a flaming draconic cincture, a powerful mage armor belt
-for healers. You need Legendary Stitching (Artificer or Smuggler) to sew this
-belt.
+for healers. You need Legendary Stitching (Trade/Stealth) to sew this belt.
 ~
-7 0 a 16
+7 0 a 17
 10921 0 0
 0 0
 S
@@ -708,10 +703,9 @@ pattern burning dragoncloth sash~
 the burning dragoncloth sash pattern~
 The burning dragoncloth sash pattern is lying here.~
    This pattern creates a burning dragoncloth sash, a powerful mage armor belt
-for casters. You need Legendary Stitching (Artificer or Smuggler) to sew this
-belt.
+for casters. You need Legendary Stitching (Trade/Stealth) to sew this belt.
 ~
-7 0 a 16
+7 0 a 17
 10922 0 0
 0 0
 S
@@ -772,9 +766,9 @@ the magnificent dragon bracelet schematic~
 The magnificent dragon bracelet schematic is lying here.~
    This schematic makes a pair of magnificent dragon bracelets, a powerful
 wrist item that brings Greatness to your empire! You require Fabled Hides
-(Antiquarian or Alchemist) to sew this item.
+(Trade/Natural Magic) to sew this item.
 ~
-7 0 a 6
+7 0 a 7
 10946 0 0
 0 0
 S

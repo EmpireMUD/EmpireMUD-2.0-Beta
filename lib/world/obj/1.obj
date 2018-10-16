@@ -786,7 +786,7 @@ an imperium ingot~
 An imperium ingot is sitting on the ground.~
 Imperium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 2 0
 M
@@ -794,7 +794,7 @@ M
 You install imperium locks on the doors.~
 M
 1
-$n install imperium locks on the doors.~
+$n installs imperium locks on the doors.~
 O
 18 k
 R

@@ -393,9 +393,10 @@ to remove the need for this command.
 
 See also: AUTOCLIMB, MOUNTAIN CLIMBING
 #
-CLS
+CLS CLAER
 
 Usage:  cls
+        clear
 
 CLS is short for "clear screen" and sends an instruction to your telnet client
 to clear the screen.
@@ -918,7 +919,7 @@ most common commands in the game.
 Examples:
 
   > help hide
-    will find the help text for the hide skill.
+    will find the help text for the hide ability.
 
 See also: COMMANDS, HELPSEARCH, SOCIALS
 #

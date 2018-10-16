@@ -332,6 +332,8 @@ Objects (OEDIT):
 - Ammo items that cause debuffs will use an 'affect' generic with the same
   vnum as the ammo, if one exists.
 - Potions should have a locked level (min equal to max) to be storable.
+- Rope components can be used to tie up players and animals. They should always
+  be locked to just 1 level, because they'll be downscaled when returned.
 
 Empire Progress Goals (PROGEDIT):
 - Goals that are PURCHASABLE should not have cost or tasks.
@@ -3650,7 +3652,7 @@ Available mob flags:
  FAMILIAR - Will not be saved through reboots; players may only have one familiar follower at a time.
  *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
  CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
- PURSUE - Will purse players who flee in combat.
+ PURSUE - Will pursue players who flee in combat.
  HUMAN - Counts as a human for various commands.
  VAMPIRE - Counts as a vampire for various commands.
  CASTER - Has a mana pool; counts as a caster.
@@ -4436,9 +4438,9 @@ Available components (common flags listed in parentheses):
  &coil&0 - for cooking or maintaining machinery
  &cpillar&0 - for construction, like a log
  &crock&0 - common stones dug up from the ground
+ &csapling&0 - a common building and crafting material
  &cseeds&0 - for planting or cooking
  &cskin&0 - unprocessed animal skin or rawhide
- &cstick&0 - a common building and crafting material
  &ctextile&0 - cloth or fabric for crafting
  &cvegetable&0 - for cooking
  &crope&0 - for construction and harnessing animals

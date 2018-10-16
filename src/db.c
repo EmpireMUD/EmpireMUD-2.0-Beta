@@ -1688,6 +1688,7 @@ void clear_char(char_data *ch) {
 	MOB_DYNAMIC_SEX(ch) = NOTHING;
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
 	MOB_PURSUIT_LEASH_LOC(ch) = NOWHERE;
+	GET_ROPE_VNUM(ch) = NOTHING;
 }
 
 
@@ -1923,6 +1924,7 @@ const char *versions_list[] = {
 	"b5.40",
 	"b5.45",
 	"b5.47",
+	"b5.48",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3412,6 +3414,26 @@ void b5_47_mine_update(void) {
 	update_all_players(NULL, b5_47_update_players);
 }
 
+// adds a rope vnum to mobs that are tied
+void b5_48_rope_update(void) {
+	bool any = FALSE;
+	char_data *mob;
+	
+	obj_vnum OLD_ROPE = 2035;	// leather rope
+	
+	log("Applying b5.48 update to add ropes to tied mobs...");
+	LL_FOREACH(character_list, mob) {
+		if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_TIED)) {
+			GET_ROPE_VNUM(mob) = OLD_ROPE;
+			any = TRUE;
+		}
+	}
+	
+	if (any) {
+		save_whole_world();
+	}
+}
+
 
 /**
 * Performs some auto-updates when the mud detects a new version.
@@ -3680,6 +3702,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.47")) {
 			b5_47_mine_update();
+		}
+		if (MATCH_VERSION("b5.48")) {
+			b5_48_rope_update();
 		}
 	}
 	

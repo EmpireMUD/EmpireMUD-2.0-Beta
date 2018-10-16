@@ -38,6 +38,7 @@ extern obj_data *die(char_data *ch, char_data *killer);
 extern int determine_best_scale_level(char_data *ch, bool check_group);	// mobact.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
+void scale_item_to_level(obj_data *obj, int level);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
 
@@ -543,8 +544,6 @@ ACMD(do_shoot) {
 
 
 ACMD(do_stake) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	char_data *victim;
 	obj_data *stake;
 
@@ -696,7 +695,8 @@ ACMD(do_summary) {
 // do_untie -- search hint
 ACMD(do_tie) {
 	void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
-
+	
+	bool kept = FALSE;
 	char_data *victim;
 	obj_data *rope;
 
@@ -726,13 +726,20 @@ ACMD(do_tie) {
 		GET_HEALTH(victim) = MAX(1, GET_HEALTH(victim));
 		GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_TIED);
-		obj_to_char((rope = read_object(o_ROPE, TRUE)), ch);
-		load_otrigger(rope);
+		
+		if (GET_ROPE_VNUM(victim) != NOTHING && (rope = read_object(GET_ROPE_VNUM(victim), TRUE))) {
+			obj_to_char(rope, ch);
+			scale_item_to_level(rope, 1);	// minimum
+			load_otrigger(rope);
+			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
+		}
+		GET_ROPE_VNUM(victim) = NOTHING;
 	}
 	else if (GET_POS(victim) >= POS_SLEEPING)
 		act("You need to knock $M out first.", FALSE, ch, 0, victim, TO_CHAR);
-	else if (!(rope = get_obj_in_list_num(o_ROPE, ch->carrying)))
-		msg_to_char(ch, "You don't have any rope.\r\n");
+	else if (!(rope = get_component_in_list(CMP_ROPE, NOBITS, ch->carrying, &kept))) {
+		msg_to_char(ch, "You don't seem to have any rope%s.\r\n", kept ? " that isn't marked 'keep'" : "");
+	}
 	else {
 		act("You bind and gag $N!", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n binds and gags you!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
@@ -742,6 +749,7 @@ ACMD(do_tie) {
 			GET_HEALTH(victim) = 1;
 			GET_POS(victim) = POS_RESTING;
 		}
+		GET_ROPE_VNUM(victim) = GET_OBJ_VNUM(rope);
 		extract_obj(rope);
 	}
 }

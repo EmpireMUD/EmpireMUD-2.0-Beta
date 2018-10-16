@@ -61,6 +61,7 @@ const char *default_mob_long = "A new mobile is standing here.\r\n";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_mobile(char_data *mob, char_data *ch) {
+	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_MOB_VNUM(mob)) != NULL);
@@ -142,6 +143,8 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal can't be butchered");
 		problem = TRUE;
 	}
+	
+	problem |= audit_interactions(GET_MOB_VNUM(mob), mob->interactions, TYPE_MOB, ch);
 	
 	return problem;
 }

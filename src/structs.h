@@ -3933,7 +3933,8 @@ struct char_special_data {
 	bitvector_t act;	// mob flag for NPCs; player flag for PCs
 	bitvector_t injuries;	// Bitvectors including damage to the player
 	bitvector_t affected_by;	// Bitvector for spells/skills affected by
-	morph_data *morph;	// for morphed players
+	morph_data *morph;	// for morphed people
+	obj_vnum rope_vnum;	// for tied-up people
 
 	// UNSAVED SECTION //
 	

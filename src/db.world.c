@@ -1709,11 +1709,9 @@ void reset_one_room(room_data *room) {
 				SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);
 				REMOVE_BIT(MOB_FLAGS(mob), MOB_EXTRACTED);
 				
-				// has old pulling data? attempt to convert
-				if (reset->arg2 > 0) {
-					add_convert_vehicle_data(mob, reset->arg2);
-				}
+				GET_ROPE_VNUM(mob) = reset->arg2;
 				
+				// TODO: should we really be running a load trigger? (it shouldn't matter since it's loaded with no scripts, but this is not really a new load) -paul oct 10, 2018
 				load_mtrigger(mob);
 				tmob = mob;
 				break;

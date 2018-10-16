@@ -3955,7 +3955,7 @@ ACMD(do_efind) {
 				
 				// first item at this location?
 				if (eg->location != last_rm) {
-					size += snprintf(buf + size, sizeof(buf) - size, "\r\n%s%s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
+					size += snprintf(buf + size, sizeof(buf) - size, "\r\n%s %s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
 					last_rm = eg->location;
 				}
 				else {
@@ -4987,7 +4987,9 @@ ACMD(do_home) {
 			msg_to_char(ch, "Your home is at: %s%s\r\n", get_room_name(home, FALSE), coord_display_room(ch, home, FALSE));
 		}
 		
-		msg_to_char(ch, "Use 'home set' to claim this room.\r\n");
+		if (GET_BUILDING(real) && GET_BLD_CITIZENS(GET_BUILDING(real)) > 0) {
+			msg_to_char(ch, "Use 'home set' to claim this room.\r\n");
+		}
 	}
 	else if (!str_cmp(argument, "set")) {
 		if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
