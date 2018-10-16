@@ -413,6 +413,13 @@ Leather (component)
 Leather is a component type used in many sewing recipes. You can make leather
 by tanning skins.
 
+Common types of leather are:
+ small leather (small, basic)
+ large leather (large, basic)
+ shimmering leather (large)
+ briar hide (magic)
+ absinthian leather (magic)
+
 See also: COMPONENT, TAN, SKIN, VERDANT LEATHERS
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
