@@ -5067,6 +5067,7 @@ struct vehicle_attribute_data {
 	bitvector_t designate_flags;	// DES_ flags
 	struct resource_data *yearly_maintenance;
 	int veh_move_speed;  // VSPEED_ for driving action speed
+	struct extra_descr_data *ex_description;	// extra descriptions
 };
 
 

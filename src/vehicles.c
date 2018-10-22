@@ -540,6 +540,8 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_vehicle(vehicle_data *veh, char_data *ch) {
+	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
+	
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh));
 	bool problem = FALSE;
@@ -662,6 +664,8 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "ON-FIRE flag");
 		problem = TRUE;
 	}
+	
+	problem |= audit_extra_descs(VEH_VNUM(veh), VEH_EX_DESCS(veh), ch);
 	
 	return problem;
 }
@@ -1506,6 +1510,7 @@ void free_vehicle(vehicle_data *veh) {
 * @param any_vnum vnum The vehicle vnum
 */
 void parse_vehicle(FILE *fl, any_vnum vnum) {
+	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
 	char line[256], error[256], str_in[256];
@@ -1573,6 +1578,10 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				VEH_DESIGNATE_FLAGS(veh) = asciiflag_conv(str_in);
 				break;
 			}
+			case 'E': {	// extra descs
+				parse_extra_desc(fl, &VEH_EX_DESCS(veh), error);
+				break;
+			}
 				
 			case 'P': { // speed bonuses (default is VSPEED_NORMAL, set above in clear_vehicle(veh)
 				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
@@ -1634,6 +1643,7 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
+	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
@@ -1670,6 +1680,9 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 		strcpy(temp, bitv_to_alpha(VEH_DESIGNATE_FLAGS(veh)));
 		fprintf(fl, "D\n%d %d %s\n", VEH_INTERIOR_ROOM_VNUM(veh), VEH_MAX_ROOMS(veh), temp);
 	}
+	
+	// 'E': extra descs
+	write_extra_descs_to_file(fl, VEH_EX_DESCS(veh));
 	
 	// P: speed bonuses
 	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
@@ -2086,7 +2099,9 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 *
 * @param descriptor_data *desc The descriptor who is saving.
 */
-void save_olc_vehicle(descriptor_data *desc) {	
+void save_olc_vehicle(descriptor_data *desc) {
+	void prune_extra_descs(struct extra_descr_data **list);
+	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	bitvector_t old_flags;
@@ -2121,6 +2136,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 		VEH_ICON(veh) = NULL;
 	}
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+	prune_extra_descs(&VEH_EX_DESCS(veh));
 	
 	// update live vehicles
 	LL_FOREACH(vehicle_list, iter) {
@@ -2189,6 +2205,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_YEARLY_MAINTENANCE(proto)) {
 		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
 	}
+	free_extra_descs(&VEH_EX_DESCS(proto));
 	free(proto->attributes);
 	
 	// free old script?
@@ -2214,6 +2231,8 @@ void save_olc_vehicle(descriptor_data *desc) {
 * @return vehicle_data* The copied vehicle.
 */
 vehicle_data *setup_olc_vehicle(vehicle_data *input) {
+	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
+	
 	vehicle_data *new;
 	
 	CREATE(new, vehicle_data, 1);
@@ -2236,6 +2255,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		
 		// copy lists
 		VEH_YEARLY_MAINTENANCE(new) = copy_resource_list(VEH_YEARLY_MAINTENANCE(input));
+		VEH_EX_DESCS(new) = copy_extra_descs(VEH_EX_DESCS(input));
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
@@ -2414,6 +2434,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 * @param char_data *ch The person who is editing a vehicle and will see its display.
 */
 void olc_show_vehicle(char_data *ch) {
+	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
@@ -2459,6 +2480,13 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh));
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
+	
+	// exdesc
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
+	if (VEH_EX_DESCS(veh)) {
+		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(VEH_YEARLY_MAINTENANCE(veh)));
@@ -2522,6 +2550,12 @@ OLC_MODULE(vedit_speed) {
 OLC_MODULE(vedit_designate) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_DESIGNATE_FLAGS(veh) = olc_process_flag(ch, argument, "designate", "designate", designate_flags, VEH_DESIGNATE_FLAGS(veh));
+}
+
+
+OLC_MODULE(vedit_extra_desc) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_extra_desc(ch, argument, &VEH_EX_DESCS(veh));
 }
 
 

@@ -327,7 +327,7 @@ void look_at_target(char_data *ch, char *arg) {
 	int bits, found = FALSE, j, fnum, i = 0;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
-	vehicle_data *found_veh = NULL;
+	vehicle_data *veh, *found_veh = NULL;
 	char *desc;
 
 	if (!ch->desc)
@@ -392,6 +392,18 @@ void look_at_target(char_data *ch, char *arg) {
 				act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 				found = TRUE;
 			}
+
+	// does it match an extra desc of a vehicle here?
+	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && ++i == fnum) {
+				send_to_char(desc, ch);
+				act("$n looks at $V.", TRUE, ch, NULL, veh, TO_ROOM);
+				found = TRUE;
+				break;	// only 1
+			}
+		}
+	}
 
 	// does it match an extra desc of the room template?
 	if (!found && GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
