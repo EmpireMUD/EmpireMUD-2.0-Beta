@@ -2180,7 +2180,7 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open portals here.\r\n");
 		return;
 	}
-	if (!all_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PORTAL) || !HAS_FUNCTION(target, FNC_PORTAL))) {
+	if (!all_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_PORTAL) || !room_has_function_and_city_ok(target, FNC_PORTAL))) {
 		msg_to_char(ch, "You can only open portals between portal buildings.\r\n");
 		return;
 	}

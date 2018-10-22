@@ -5292,6 +5292,19 @@ unsigned long long microtime(void) {
 * @return bool TRUE if the room has the function and passed the city check, FALSE if not.
 */
 bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
+	vehicle_data *veh;
+	bool junk;
+	
+	// check vehicles first
+	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
+			if (!IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) || (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk) == TER_CITY)) {
+				return TRUE;	// vehicle allows it
+			}
+		}
+	}
+	
+	// otherwise check the room itself
 	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {
 		return FALSE;
 	}

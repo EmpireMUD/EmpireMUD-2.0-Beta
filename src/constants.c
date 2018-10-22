@@ -2969,6 +2969,7 @@ const char *function_flags[] = {
 	"LARGER-NEARBY",
 	"FISHING",
 	"STORE-ALL", // 35
+	"IN-CITY-ONLY",
 	"\n"
 };
 

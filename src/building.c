@@ -76,6 +76,7 @@ void special_building_setup(char_data *ch, room_data *room) {
 		
 	// mine data
 	if (HAS_FUNCTION(room, FNC_MINE)) {
+		// NOTE: vehicle functions don't support mining, so we don't use room_has_function_and_city_ok
 		init_mine(room, ch);
 	}
 }

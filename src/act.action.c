@@ -2923,6 +2923,7 @@ ACMD(do_mine) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
+		// NOTE: vehicle functions don't support mining, so we don't use room_has_function_and_city_ok
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -3279,7 +3280,7 @@ ACMD(do_saw) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW)) {
 		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {

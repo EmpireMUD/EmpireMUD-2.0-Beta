@@ -1431,7 +1431,7 @@ bool check_in_city_requirement(room_data *room, bool check_wait) {
 	room_data *home = HOME_ROOM(room);
 	bool junk;
 	
-	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY)) {
+	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !HAS_FUNCTION(room, FNC_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY) && !HAS_FUNCTION(home, FNC_IN_CITY_ONLY)) {
 		return TRUE;
 	}
 	if (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), check_wait, &junk) == TER_CITY) {
@@ -3618,7 +3618,7 @@ ACMD(do_deposit) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't deposit anything.\r\n");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only deposit coins in a vault.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -5205,6 +5205,7 @@ ACMD(do_tavern) {
 	}
 	
 	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
+		// NOTE: vehicle functions don't support taverns, so we don't use room_has_function_and_city_ok
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
@@ -5296,6 +5297,7 @@ ACMD(do_tomb) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}
 		else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB)) {
+			// NOTE: vehicle functions don't support tomb (because vehicle tombs could move), so we don't use room_has_function_and_city_ok
 			msg_to_char(ch, "You can't make this place your tomb!\r\n");
 		}
 		else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -6776,7 +6778,7 @@ ACMD(do_withdraw) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't withdraw anything.\r\n");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only withdraw coins in a vault.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {

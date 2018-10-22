@@ -1427,7 +1427,7 @@ ACMD(do_vigor) {
 //// CHANTS ///////////////////////////////////////////////////////////////////
 
 RITUAL_SETUP_FUNC(start_chant_of_druids) {
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_HENGE)) {
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_HENGE)) {
 		msg_to_char(ch, "You can't perform the chant of druids unless you are at a henge.\r\n");
 		return FALSE;
 	}

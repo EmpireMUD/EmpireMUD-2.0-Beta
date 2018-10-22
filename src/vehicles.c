@@ -46,6 +46,7 @@ extern room_data *create_room(room_data *home);
 
 // external consts
 extern const char *designate_flags[];
+extern const char *function_flags[];
 extern const char *mob_move_types[];
 extern const char *vehicle_flags[];
 extern const char *vehicle_speed_types[];
@@ -1513,7 +1514,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
-	char line[256], error[256], str_in[256];
+	char line[256], error[256], str_in[256], str_in2[256];
 	vehicle_data *veh, *find;
 	int int_in[4];
 	
@@ -1538,10 +1539,18 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_LOOK_DESC(veh) = fread_string(fl, error);
 	VEH_ICON(veh) = fread_string(fl, error);
 	
-	// line 6: flags move_type maxhealth capacity animals_required
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
-		log("SYSERR: Format error in line 6 of %s", error);
+	// line 6: flags move_type maxhealth capacity animals_required [functions]
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
+	}
+	if (sscanf(line, "%s %d %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2) != 6) {
+		strcpy(str_in2, "0");	// backwards-compatible
+		
+		if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
+			log("SYSERR: Format error in line 6 of %s", error);
+			exit(1);
+		}
 	}
 	
 	VEH_FLAGS(veh) = asciiflag_conv(str_in);
@@ -1549,6 +1558,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh) = int_in[1];
 	VEH_CAPACITY(veh) = int_in[2];
 	VEH_ANIMALS_REQUIRED(veh) = int_in[3];
+	VEH_FUNCTIONS(veh) = asciiflag_conv(str_in2);
 	
 	// optionals
 	for (;;) {
@@ -1647,7 +1657,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
-	char temp[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
 	
 	if (!fl || !veh) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_vehicle_to_file called without %s", !fl ? "file" : "vehicle");
@@ -1665,9 +1675,10 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s~\n", temp);
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 6. flags move_type maxhealth capacity animals_required
+	// 6. flags move_type maxhealth capacity animals_required functions
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
-	fprintf(fl, "%s %d %d %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh));
+	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
+	fprintf(fl, "%s %d %d %d %d %s\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2);
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -2481,6 +2492,9 @@ void olc_show_vehicle(char_data *ch) {
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
 	
+	sprintbit(VEH_FUNCTIONS(veh), function_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
+	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
 	if (VEH_EX_DESCS(veh)) {
@@ -2568,6 +2582,12 @@ OLC_MODULE(vedit_extrarooms) {
 OLC_MODULE(vedit_flags) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_FLAGS(veh) = olc_process_flag(ch, argument, "vehicle", "flags", vehicle_flags, VEH_FLAGS(veh));
+}
+
+
+OLC_MODULE(vedit_functions) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_FUNCTIONS(veh) = olc_process_flag(ch, argument, "function", "functions", function_flags, VEH_FUNCTIONS(veh));
 }
 
 

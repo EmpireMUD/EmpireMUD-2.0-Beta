@@ -428,7 +428,7 @@ void do_mount_swap(char_data *ch, char *argument) {
 	char_data *proto;
 	int number;
 	
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
+	if (!has_ability(ch, ABIL_STABLEMASTER) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You can only swap mounts in a stable unless you have the Stablemaster ability.\r\n");
 		return;
 	}

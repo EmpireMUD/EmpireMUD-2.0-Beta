@@ -1924,12 +1924,13 @@ Available flags:
 
 See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
 #d
-"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "FUNCTION FLAGS"
+"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "VEDIT FUNCTIONS" "FUNCTION FLAGS"
 
 Usage:  .flags [add | remove] <flags>
 
 The function flags determine what chores, actions, and other tasks happen at
-that building or room template.
+that building or room template. For vehicles, it applies to people in the same
+room as the vehicle.
 
 Available functions:
  ALCHEMIST - can brew and mix here
@@ -1968,8 +1969,9 @@ Available functions:
  LARGER-NEARBY - extends the radius of 'nearby'
  FISHING - workforce can fish here (also need fish interaction)
  STORE-ALL - any regular storable item can be stored (but not retrieved)
+ &yIN-CITY-ONLY&0 - all function flags only work when in a city
 
-See also: OLC BUILDINGS, OLC ROOM TEMPLATES
+See also: OLC BUILDINGS, OLC ROOM TEMPLATES, OLC VEHICLES
 #d
 "BEDIT HITPOINTS" "BEDIT HEALTH"
 

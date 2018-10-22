@@ -798,6 +798,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_LARGER_NEARBY  BIT(33)	// extends the radius of 'nearby'
 #define FNC_FISHING  BIT(34)	// workforce can fish here
 #define FNC_STORE_ALL BIT(35) // anything can be stored here (does not allow retrieval)
+#define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -5068,6 +5069,7 @@ struct vehicle_attribute_data {
 	struct resource_data *yearly_maintenance;
 	int veh_move_speed;  // VSPEED_ for driving action speed
 	struct extra_descr_data *ex_description;	// extra descriptions
+	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
 };
 
 
