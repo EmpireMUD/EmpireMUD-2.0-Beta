@@ -472,12 +472,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		found = delete_mob_from_spawn_list(&VEH_SPAWNS(veh), vnum);
 		// found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_MOB, vnum);
-		/*
-		if (GET_BLD_ARTISAN(bld) == vnum) {
-			GET_BLD_ARTISAN(bld) = NOTHING;
+		if (VEH_ARTISAN_VNUM(veh) == vnum) {
+			VEH_ARTISAN_VNUM(veh) = NOTHING;
 			found |= TRUE;
 		}
-		*/
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -562,12 +560,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			/*
-			if (VEH_ARTISAN(GET_OLC_VEHICLE(desc)) == vnum) {
-				VEH_ARTISAN(GET_OLC_VEHICLE(desc)) = NOTHING;
+			if (VEH_ARTISAN_VNUM(GET_OLC_VEHICLE(desc)) == vnum) {
+				VEH_ARTISAN_VNUM(GET_OLC_VEHICLE(desc)) = NOTHING;
 				msg_to_char(desc->character, "The artisan mob for the vehicle you're editing was deleted.\r\n");
 			}
-			*/
 			if (delete_mob_from_spawn_list(&VEH_SPAWNS(GET_OLC_VEHICLE(desc)), vnum)) {
 				msg_to_char(desc->character, "One of the mobs that spawns in the vehicle you're editing was deleted.\r\n");
 			}
@@ -1007,12 +1003,10 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
-		/*
-		if (VEH_ARTISAN(bld) == vnum) {
+		if (VEH_ARTISAN_VNUM(veh) == vnum) {
 			any = TRUE;
 			++found;
 		}
-		*/
 		for (spawn = VEH_SPAWNS(veh); spawn && !any; spawn = spawn->next) {
 			if (spawn->vnum == vnum) {
 				any = TRUE;

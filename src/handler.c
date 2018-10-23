@@ -8341,6 +8341,7 @@ int get_number(char **name) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle(vehicle_data *veh) {
+	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void empty_vehicle(vehicle_data *veh);
 	void relocate_players(room_data *room, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
@@ -8351,6 +8352,10 @@ void extract_vehicle(vehicle_data *veh) {
 	if (veh == dg_owner_veh) {
 		dg_owner_purged = 1;
 		dg_owner_veh = NULL;
+	}
+	
+	if (VEH_OWNER(veh) && IN_ROOM(veh)) {
+		adjust_vehicle_tech(veh, FALSE);
 	}
 	
 	// delete interior

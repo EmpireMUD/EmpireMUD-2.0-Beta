@@ -936,6 +936,8 @@ void finish_gen_craft(char_data *ch) {
 * @param craft_data *type The craft recipe.
 */
 void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
+	void adjust_vehicle_tech(vehicle_data *veh, bool add);
+	
 	bool found = FALSE, any = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
@@ -984,6 +986,9 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 			}
 		}
 		
+		if (VEH_OWNER(veh)) {
+			adjust_vehicle_tech(veh, TRUE);
+		}
 		load_vtrigger(veh);
 	}
 	else if (!found) {

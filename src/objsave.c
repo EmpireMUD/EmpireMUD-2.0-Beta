@@ -829,6 +829,7 @@ bool objpack_save_room(room_data *room) {
 * @param room_data *room The room.
 */
 void objpack_load_room(room_data *room) {
+	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	extern vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
 
 	obj_data *obj, *obj2, *cont_row[MAX_BAG_ROWS];
@@ -950,6 +951,7 @@ void objpack_load_room(room_data *room) {
 			
 			if ((veh = unstore_vehicle_from_file(fl, vnum))) {
 				vehicle_to_room(veh, room);
+				adjust_vehicle_tech(veh, TRUE);
 			}
 		}
 		else if (!strn_cmp(line, "Rent-time:", 10)) {

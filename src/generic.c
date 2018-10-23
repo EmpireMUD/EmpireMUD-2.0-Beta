@@ -738,6 +738,7 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_generic(char_data *ch, any_vnum vnum) {
+	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void complete_building(room_data *room);
 	
 	struct trading_post_data *tpd, *next_tpd;
@@ -860,6 +861,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				// removing the resource finished the vehicle
 				if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
 					REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+					adjust_vehicle_tech(veh, TRUE);
 					load_vtrigger(veh);
 				}
 			}

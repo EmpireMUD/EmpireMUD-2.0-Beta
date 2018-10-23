@@ -26,8 +26,6 @@
 // NOTE: many of these are used just for spawn data and if we could do that in
 // file instead of code, these would not be needed
 
-// TODO: guard towers could use a flag plus a damage config of some kind
-
 #define BUILDING_RUINS_OPEN  5006	// custom icons and db.world.c
 #define BUILDING_RUINS_CLOSED  5007	// custom icons and db.world.c
 #define BUILDING_TUNNEL  5008  // building.c

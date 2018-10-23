@@ -42,6 +42,7 @@ extern const char *from_dir[];
 extern const char *mob_move_types[];
 
 // external funcs
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_unseat_from_vehicle(char_data *ch);
 extern char *get_room_name(room_data *room, bool color);
 
@@ -1123,7 +1124,11 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 			snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 			act(buf, FALSE, ROOM_PEOPLE(was_in), portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM);
 		}
+		
+		adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
+		adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
+		
 		snprintf(buf, sizeof(buf), "$V %s in through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, use_portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM);
 	}
@@ -1526,7 +1531,11 @@ int perform_move(char_data *ch, int dir, bitvector_t flags) {
 			snprintf(buf, sizeof(buf), "$v %s behind $N.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 			act(buf, FALSE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
 		}
+		
+		adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
+		adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
+		
 		snprintf(buf, sizeof(buf), "$V %s in behind you.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
 		snprintf(buf, sizeof(buf), "$V %s in behind $n.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);

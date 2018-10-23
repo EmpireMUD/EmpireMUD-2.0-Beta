@@ -65,6 +65,7 @@ extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
 
 // external functions
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int adjusted_instance_limit(adv_data *adv);
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
@@ -8820,8 +8821,12 @@ ACMD(do_trans) {
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
+		
+		adjust_vehicle_tech(veh, FALSE);
 		vehicle_from_room(veh);
 		vehicle_to_room(veh, to_room);
+		adjust_vehicle_tech(veh, TRUE);
+		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}

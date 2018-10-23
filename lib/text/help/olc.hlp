@@ -1757,7 +1757,7 @@ Some affects are managed by live data and commands (do not set affects with *):
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
-"BEDIT ARTISAN"
+"BEDIT ARTISAN" "VEDIT ARTISAN"
 
 Usage:  .artisan <mob vnum>
         .artisan none
@@ -1765,6 +1765,9 @@ Usage:  .artisan <mob vnum>
 Some buildings may have artisan mobs set. These mobs will always spawn in the
 building if the building is owned by an empire and has been populated. Only
 one artisan will ever spawn per building.
+
+For vehicles, the artisan spawns on the outside of the vehicle and, after it
+spawns, does not move with the vehicle.
 
 This artisan is marked as an EMPIRE mob and you may use the following name
 tokens on the mob itself, if it is only loaded as an artisan:
@@ -1774,7 +1777,7 @@ tokens on the mob itself, if it is only loaded as an artisan:
 
 You can use the "none" argument to this command in order to remove the artisan.
 
-See also: OLC BUILDINGS, MEDIT NAMESET, VNUM
+See also: OLC BUILDINGS, OLC VEHICLES, MEDIT NAMESET, VNUM
 #d
 "BEDIT CITIZENS"
 
@@ -1862,16 +1865,16 @@ Available designate flags:
 
 See also: OLC BUILDINGS
 #d
-"BEDIT FAME"
+"BEDIT FAME" "VEDIT FAME"
 
 Usage:  .fame <amount>
 
-This number is added to an empire's fame for each instance of this building
-they own.
+This number is added to an empire's fame for each instance of this building or
+vehicle they own.
 
 You can set negative fame to penalize empires for certain buildings.
 
-Most buildings should have 0 fame, unless they are monuments.
+Most buildings and vehicles should have 0 fame, unless they are monuments.
 
 See also: OLC BUILDINGS
 #d
@@ -2027,14 +2030,14 @@ Examples:
 
 See also: COLOR, OLC BUILDINGS
 #d
-"BEDIT MILITARY"
+"BEDIT MILITARY" "VEDIT MILITARY"
 
 Usage:  .military <number>
 
 This property adds to the military total of the empire that owns it. However,
 the military value of an empire is not used for anything at the moment.
 
-See also:  OLC BUILDINGS
+See also: OLC BUILDINGS, OLC VEHICLES
 #d
 "BEDIT NAME"
 

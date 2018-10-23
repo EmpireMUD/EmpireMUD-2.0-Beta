@@ -408,6 +408,7 @@ void do_dg_build(room_data *target, char *argument) {
 * @param vehicle_data *veh Optional: A vehicle whose ownership to change.
 */
 void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
+	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void kill_empire_npc(char_data *ch);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -423,16 +424,18 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
 	}
 	if (veh) {
-		if (VEH_OWNER(veh) && emp != VEH_OWNER(veh) ) {
+		if (VEH_OWNER(veh) && emp != VEH_OWNER(veh)) {
 			VEH_SHIPPING_ID(veh) = -1;
 			if (VEH_INTERIOR_HOME_ROOM(veh)) {
 				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 			}
+			adjust_vehicle_tech(veh, FALSE);
 		}
 		VEH_OWNER(veh) = emp;
 		if (emp && VEH_INTERIOR_HOME_ROOM(veh)) {
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
 		}
+		adjust_vehicle_tech(veh, TRUE);
 	}
 	if (room) {
 		if (ROOM_OWNER(room) && emp != ROOM_OWNER(room)) {

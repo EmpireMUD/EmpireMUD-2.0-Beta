@@ -1441,6 +1441,7 @@ void clear_vehicle(vehicle_data *veh) {
 	
 	// attributes init
 	VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
+	VEH_ARTISAN_VNUM(veh) = NOTHING;
 	
 	// Since we've wiped out the attributes above, we need to set the speed to the default of VSPEED_NORMAL (two bonuses).
 	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
@@ -1530,7 +1531,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
 	double dbl_in;
-	int int_in[4];
+	int int_in[7];
 	
 	CREATE(veh, vehicle_data, 1);
 	clear_vehicle(veh);
@@ -1553,13 +1554,16 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_LOOK_DESC(veh) = fread_string(fl, error);
 	VEH_ICON(veh) = fread_string(fl, error);
 	
-	// line 6: flags move_type maxhealth capacity animals_required [functions]
+	// line 6: flags move_type maxhealth capacity animals_required functions fame artisan_vnum military
 	if (!get_line(fl, line)) {
 		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2) != 6) {
-		strcpy(str_in2, "0");	// backwards-compatible
+	if (sscanf(line, "%s %d %d %d %d %s %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6]) != 9) {
+		strcpy(str_in2, "0");	// backwards-compatible: functions
+		int_in[4] = 0;	// fame
+		int_in[5] = NOTHING;	// artisan
+		int_in[6] = 0;	// military
 		
 		if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
 			log("SYSERR: Format error in line 6 of %s", error);
@@ -1573,6 +1577,9 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_CAPACITY(veh) = int_in[2];
 	VEH_ANIMALS_REQUIRED(veh) = int_in[3];
 	VEH_FUNCTIONS(veh) = asciiflag_conv(str_in2);
+	VEH_FAME(veh) = int_in[4];
+	VEH_ARTISAN_VNUM(veh) = int_in[5];
+	VEH_MILITARY(veh) = int_in[6];
 	
 	// optionals
 	for (;;) {
@@ -1705,10 +1712,10 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s~\n", temp);
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 6. flags move_type maxhealth capacity animals_required functions
+	// 6. flags move_type maxhealth capacity animals_required functions fame artisan_vnum military
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
-	fprintf(fl, "%s %d %d %d %d %s\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2);
+	fprintf(fl, "%s %d %d %d %d %s %d %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_ARTISAN_VNUM(veh), VEH_MILITARY(veh));
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -2534,6 +2541,9 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh));
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh));
+	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
+	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(VEH_ARTISAN_VNUM(veh), NOTHING), VEH_ARTISAN_VNUM(veh), VEH_ARTISAN_VNUM(veh) == NOTHING ? "none" : get_mob_name_by_proto(VEH_ARTISAN_VNUM(veh)));
 	
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
@@ -2603,6 +2613,32 @@ OLC_MODULE(vedit_animalsrequired) {
 }
 
 
+OLC_MODULE(vedit_artisan) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	mob_vnum old = VEH_ARTISAN_VNUM(veh);
+	
+	if (!str_cmp(argument, "none")) {
+		VEH_ARTISAN_VNUM(veh) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer has an artisan.\r\n");
+		}
+	}
+	else {
+		VEH_ARTISAN_VNUM(veh) = olc_process_number(ch, argument, "artisan vnum", "artisanvnum", 0, MAX_VNUM, VEH_ARTISAN_VNUM(veh));
+		if (!mob_proto(VEH_ARTISAN_VNUM(veh))) {
+			VEH_ARTISAN_VNUM(veh) = old;
+			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now has artisan: %s\r\n", get_mob_name_by_proto(VEH_ARTISAN_VNUM(veh)));
+		}
+	}
+}
+
+
 OLC_MODULE(vedit_capacity) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_CAPACITY(veh) = olc_process_number(ch, argument, "capacity", "capacity", 0, 10000, VEH_CAPACITY(veh));
@@ -2630,6 +2666,12 @@ OLC_MODULE(vedit_extra_desc) {
 OLC_MODULE(vedit_extrarooms) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MAX_ROOMS(veh) = olc_process_number(ch, argument, "max rooms", "maxrooms", 0, 1000, VEH_MAX_ROOMS(veh));
+}
+
+
+OLC_MODULE(vedit_fame) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_FAME(veh) = olc_process_number(ch, argument, "fame", "fame", -1000, 1000, VEH_FAME(veh));
 }
 
 
@@ -2729,6 +2771,12 @@ OLC_MODULE(vedit_lookdescription) {
 OLC_MODULE(vedit_maxlevel) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MAX_SCALE_LEVEL(veh) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, VEH_MAX_SCALE_LEVEL(veh));
+}
+
+
+OLC_MODULE(vedit_military) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_MILITARY(veh) = olc_process_number(ch, argument, "military", "military", 0, 1000, VEH_MILITARY(veh));
 }
 
 

@@ -2646,6 +2646,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage) {
 * @return bool TRUE if the target survives, FALSE if it's extracted
 */
 bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type) {
+	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void fully_empty_vehicle(vehicle_data *veh);
 
 	static struct resource_data *default_res = NULL;
@@ -2736,6 +2737,11 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
 			}
 			die(ch, ch);
+		}
+		
+		if (VEH_OWNER(veh)) {
+			// do this before removing it from room
+			adjust_vehicle_tech(veh, FALSE);
 		}
 		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside

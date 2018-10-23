@@ -54,6 +54,7 @@ extern const char *trade_mostleast[];
 extern const char *trade_overunder[];
 
 // external funcs
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern bool can_claim(char_data *ch);
 void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
@@ -3060,6 +3061,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
 			et_lose_vehicle(emp, VEH_VNUM(veh));
+			adjust_vehicle_tech(veh, FALSE);
 		}
 	}
 }
@@ -3444,6 +3446,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
 			et_gain_vehicle(emp, VEH_VNUM(veh));
+			adjust_vehicle_tech(veh, TRUE);
 		}
 	}
 }

@@ -2137,19 +2137,19 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	
 	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
-	if (room_has_function_and_city_ok(room, FNC_APIARY)) {
+	if (HAS_FUNCTION(room, FNC_APIARY)) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_APIARIES] += amt;
 		}
 	}
-	if (room_has_function_and_city_ok(room, FNC_GLASSBLOWER)) {
+	if (HAS_FUNCTION(room, FNC_GLASSBLOWER)) {
 		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_GLASSBLOWING] += amt;
 		}
 	}
-	if (room_has_function_and_city_ok(room, FNC_DOCKS)) {
+	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_SEAPORT] += amt;
@@ -2159,6 +2159,61 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room)) * amt;
 	EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
+}
+
+
+/**
+* Tech/fame marker for vehicles. Call this after you finish a vehicle or
+* destroy it.
+*
+* Note: Vehicles inside of moving vehicles do not contribute tech or fame.
+*
+* @param vehicle_data *veh The vehicle to update.
+* @param bool add Adds the techs if TRUE, or removes them if FALSE.
+*/
+void adjust_vehicle_tech(vehicle_data *veh, bool add) {
+	int amt = add ? 1 : -1;	// adding or removing 1
+	struct empire_island *isle = NULL;
+	empire_data *emp = NULL;
+	room_data *room = NULL;
+	int island = NO_ISLAND;
+	
+	if (veh) {
+		emp = VEH_OWNER(veh);
+		room = IN_ROOM(veh);
+		island = GET_ISLAND_ID(room);
+	}
+	
+	// only care about
+	if (!emp || !veh || !VEH_IS_COMPLETE(veh) || !room) {
+		return;
+	}
+	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_DRIVING | VEH_SAILING | VEH_FLYING)) {
+		return;	// do NOT adjust tech if inside a moving vehicle
+	}
+	
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_APIARY)) {
+		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
+		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
+			isle->tech[TECH_APIARIES] += amt;
+		}
+	}
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_GLASSBLOWER)) {
+		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
+		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
+			isle->tech[TECH_GLASSBLOWING] += amt;
+		}
+	}
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
+		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
+		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
+			isle->tech[TECH_SEAPORT] += amt;
+		}
+	}
+	
+	// other traits from buildings?
+	EMPIRE_MILITARY(emp) += VEH_MILITARY(veh) * amt;
+	EMPIRE_FAME(emp) += VEH_FAME(veh) * amt;
 }
 
 
@@ -2362,6 +2417,7 @@ void reread_empire_tech(empire_data *emp) {
 	
 	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
+	vehicle_data *veh;
 	int sub;
 	
 	// nowork
@@ -2376,6 +2432,18 @@ void reread_empire_tech(empire_data *emp) {
 	// re-read both things
 	read_empire_members(emp, TRUE);
 	read_empire_territory(emp, TRUE);
+	
+	// also read vehicles for tech/etc
+	LL_FOREACH(vehicle_list, veh) {
+		if (emp && VEH_OWNER(veh) != emp) {
+			continue;	// only checking one
+		}
+		if (!VEH_OWNER(veh) || !VEH_IS_COMPLETE(veh)) {
+			continue;	// skip unowned/unfinished
+		}
+		
+		adjust_vehicle_tech(veh, TRUE);
+	}
 	
 	// special-handling for imm-only empires: give them all techs
 	HASH_ITER(hh, empire_table, iter, next_iter) {
