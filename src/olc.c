@@ -473,6 +473,7 @@ OLC_MODULE(vedit_movetype);
 OLC_MODULE(vedit_resource);
 OLC_MODULE(vedit_script);
 OLC_MODULE(vedit_shortdescription);
+OLC_MODULE(vedit_spawns);
 OLC_MODULE(vedit_speed);
 
 
@@ -1038,6 +1039,7 @@ const struct olc_command_data olc_data[] = {
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "spawns", vedit_spawns, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "speed", vedit_speed, OLC_VEHICLE, OLC_CF_EDITOR },
 	
 	
@@ -6857,6 +6859,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 	char *flagarg, *tmp;
 	int loc, num, iter, count, findtype;
 	struct spawn_info *spawn, *change, *temp, *copyfrom = NULL;
+	vehicle_data *veh;
 	sector_data *sect;
 	any_vnum vnum;
 	double prc;
@@ -6903,6 +6906,12 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 				case OLC_SECTOR: {
 					if ((sect = sector_proto(vnum))) {
 						copyfrom = GET_SECT_SPAWNS(sect);
+					}
+					break;
+				}
+				case OLC_VEHICLE: {
+					if ((veh = vehicle_proto(vnum))) {
+						copyfrom = VEH_SPAWNS(veh);
 					}
 					break;
 				}

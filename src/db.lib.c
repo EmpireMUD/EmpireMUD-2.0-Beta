@@ -594,6 +594,7 @@ void free_building(bld_data *bdg) {
 	
 	bld_data *proto = building_proto(GET_BLD_VNUM(bdg));
 	struct interaction_item *interact;
+	struct spawn_info *spawn;
 	
 	if (GET_BLD_NAME(bdg) && (!proto || GET_BLD_NAME(bdg) != GET_BLD_NAME(proto))) {
 		free(GET_BLD_NAME(bdg));
@@ -619,6 +620,12 @@ void free_building(bld_data *bdg) {
 		while ((interact = GET_BLD_INTERACTIONS(bdg))) {
 			GET_BLD_INTERACTIONS(bdg) = interact->next;
 			free(interact);
+		}
+	}
+	if (GET_BLD_SPAWNS(bdg) && (!proto || GET_BLD_SPAWNS(bdg) != GET_BLD_SPAWNS(proto))) {
+		while ((spawn = GET_BLD_SPAWNS(bdg))) {
+			GET_BLD_SPAWNS(bdg) = spawn->next;
+			free(spawn);
 		}
 	}
 	

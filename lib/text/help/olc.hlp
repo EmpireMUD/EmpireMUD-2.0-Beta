@@ -2106,7 +2106,7 @@ NOTE: If players add bedrooms to a building, it will spawn additional citizens.
 
 See also: BEDIT DESIGNATE, OLC BUILDINGS
 #d
-"BEDIT SPAWNS" "CROPEDIT SPAWNS" "SECTEDIT SPAWNS"
+"BEDIT SPAWNS" "CROPEDIT SPAWNS" "SECTEDIT SPAWNS" "VEDIT SPAWNS"
 
 Usage:  .spawns add <mob vnum> <percent> [flags]
         .spawns copy <from type> <from vnum>
@@ -2116,7 +2116,8 @@ Usage:  .spawns add <mob vnum> <percent> [flags]
 
 This lets you control how mobs spawn in a given location. Mobs only spawn if
 there aren't too many other mobs present, and only if they meet the percent
-and flag requirements of their spawn info.
+and flag requirements of their spawn info. Vehicles spawn mobs in the room that
+contains the vehicle (not the interior of the vehicle).
 
 You can set any percent between .01 and 100. This is the chance the mob will
 be loaded each time the room is checked for spawns, which is usually every few

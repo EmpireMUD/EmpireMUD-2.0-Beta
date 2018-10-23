@@ -313,6 +313,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
 	shop_data *shop, *next_shop;
@@ -467,6 +468,21 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
+	// update vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		found = delete_mob_from_spawn_list(&VEH_SPAWNS(veh), vnum);
+		// found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_MOB, vnum);
+		/*
+		if (GET_BLD_ARTISAN(bld) == vnum) {
+			GET_BLD_ARTISAN(bld) = NOTHING;
+			found |= TRUE;
+		}
+		*/
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
 	// remove spawn locations and interactions from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_BUILDING(desc)) {
@@ -544,6 +560,22 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A mobile required by the social you are editing was deleted.\r\n");
 			}
+		}
+		if (GET_OLC_VEHICLE(desc)) {
+			/*
+			if (VEH_ARTISAN(GET_OLC_VEHICLE(desc)) == vnum) {
+				VEH_ARTISAN(GET_OLC_VEHICLE(desc)) = NOTHING;
+				msg_to_char(desc->character, "The artisan mob for the vehicle you're editing was deleted.\r\n");
+			}
+			*/
+			if (delete_mob_from_spawn_list(&VEH_SPAWNS(GET_OLC_VEHICLE(desc)), vnum)) {
+				msg_to_char(desc->character, "One of the mobs that spawns in the vehicle you're editing was deleted.\r\n");
+			}
+			/*
+			if (delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_MOB, vnum)) {
+				msg_to_char(desc->character, "One of the mobs in an interaction for the vehicle you're editing was deleted.\r\n");
+			}
+			*/
 		}
 	}
 	
@@ -802,6 +834,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
 	shop_data *shop, *next_shop;
@@ -968,6 +1001,35 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum)) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		/*
+		if (VEH_ARTISAN(bld) == vnum) {
+			any = TRUE;
+			++found;
+		}
+		*/
+		for (spawn = VEH_SPAWNS(veh); spawn && !any; spawn = spawn->next) {
+			if (spawn->vnum == vnum) {
+				any = TRUE;
+				++found;
+			}
+		}
+		/*
+		for (inter = VEH_INTERACTIONS(veh); inter && !any; inter = inter->next) {
+			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+				any = TRUE;
+				++found;
+			}
+		}
+		*/
+		
+		if (any) {
+			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	

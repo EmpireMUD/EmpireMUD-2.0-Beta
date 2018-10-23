@@ -542,6 +542,7 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 */
 bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
+	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh));
@@ -667,6 +668,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	problem |= audit_extra_descs(VEH_VNUM(veh), VEH_EX_DESCS(veh), ch);
+	problem |= audit_spawns(VEH_VNUM(veh), VEH_SPAWNS(veh), ch);
 	
 	return problem;
 }
@@ -1455,6 +1457,7 @@ void clear_vehicle(vehicle_data *veh) {
 void free_vehicle(vehicle_data *veh) {
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	struct vehicle_attached_mob *vam;
+	struct spawn_info *spawn;
 	
 	// strings
 	if (VEH_KEYWORDS(veh) && (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto))) {
@@ -1471,6 +1474,15 @@ void free_vehicle(vehicle_data *veh) {
 	}
 	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 		free(VEH_ICON(veh));
+	}
+	if (VEH_EX_DESCS(veh) && (!proto || VEH_EX_DESCS(veh) != VEH_EX_DESCS(proto))) {
+		free_extra_descs(&VEH_EX_DESCS(veh));
+	}
+	if (VEH_SPAWNS(veh) && (!proto || VEH_SPAWNS(veh) != VEH_SPAWNS(proto))) {
+		while ((spawn = VEH_SPAWNS(veh))) {
+			VEH_SPAWNS(veh) = spawn->next;
+			free(spawn);
+		}
 	}
 	
 	// pointers
@@ -1515,7 +1527,9 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
 	char line[256], error[256], str_in[256], str_in2[256];
+	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
+	double dbl_in;
 	int int_in[4];
 	
 	CREATE(veh, vehicle_data, 1);
@@ -1592,7 +1606,22 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				parse_extra_desc(fl, &VEH_EX_DESCS(veh), error);
 				break;
 			}
+			
+			case 'M': {	// mob spawn
+				if (!get_line(fl, line) || sscanf(line, "%d %lf %s", &int_in[0], &dbl_in, str_in) != 3) {
+					log("SYSERR: Format error in M line of %s", error);
+					exit(1);
+				}
 				
+				CREATE(spawn, struct spawn_info, 1);
+				spawn->vnum = int_in[0];
+				spawn->percent = dbl_in;
+				spawn->flags = asciiflag_conv(str_in);
+				
+				LL_APPEND(VEH_SPAWNS(veh), spawn);
+				break;
+			}
+			
 			case 'P': { // speed bonuses (default is VSPEED_NORMAL, set above in clear_vehicle(veh)
 				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
 					log("SYSERR: Format error in P line of %s", error);
@@ -1658,6 +1687,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	struct spawn_info *spawn;
 	
 	if (!fl || !veh) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_vehicle_to_file called without %s", !fl ? "file" : "vehicle");
@@ -1695,7 +1725,12 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	// 'E': extra descs
 	write_extra_descs_to_file(fl, VEH_EX_DESCS(veh));
 	
-	// P: speed bonuses
+	// 'M': mob spawns
+	LL_FOREACH(VEH_SPAWNS(veh), spawn) {
+		fprintf(fl, "M\n%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
+	}
+	
+	// 'P': speed bonuses
 	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
 	
 	// 'R': resources
@@ -2115,6 +2150,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	struct spawn_info *spawn;
 	bitvector_t old_flags;
 	UT_hash_handle hh;
 
@@ -2216,6 +2252,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_YEARLY_MAINTENANCE(proto)) {
 		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
 	}
+	while ((spawn = VEH_SPAWNS(proto))) {
+		VEH_SPAWNS(proto) = spawn->next;
+		free(spawn);
+	}
 	free_extra_descs(&VEH_EX_DESCS(proto));
 	free(proto->attributes);
 	
@@ -2267,6 +2307,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		// copy lists
 		VEH_YEARLY_MAINTENANCE(new) = copy_resource_list(VEH_YEARLY_MAINTENANCE(input));
 		VEH_EX_DESCS(new) = copy_extra_descs(VEH_EX_DESCS(input));
+		VEH_SPAWNS(new) = copy_spawn_list(VEH_SPAWNS(input));
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
@@ -2450,6 +2491,8 @@ void olc_show_vehicle(char_data *ch) {
 	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct spawn_info *spawn;
+	int count;
 	
 	if (!veh) {
 		return;
@@ -2516,6 +2559,16 @@ void olc_show_vehicle(char_data *ch) {
 		strcat(buf, lbuf);
 	}
 	
+	// spawns
+	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(VEH_SPAWNS(veh)));
+	if (VEH_SPAWNS(veh)) {
+		count = 0;
+		LL_FOREACH(VEH_SPAWNS(veh), spawn) {
+			++count;
+		}
+		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
+	}
+	
 	page_string(ch->desc, buf, TRUE);
 }
 
@@ -2556,6 +2609,7 @@ OLC_MODULE(vedit_capacity) {
 }
 
 OLC_MODULE(vedit_speed) {
+	// TODO: move this into alphabetic order on some future major version
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_SPEED_BONUSES(veh) = olc_process_type(ch, argument, "speed", "speed", vehicle_speed_types, VEH_SPEED_BONUSES(veh));
 }
@@ -2706,4 +2760,10 @@ OLC_MODULE(vedit_script) {
 OLC_MODULE(vedit_shortdescription) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_string(ch, argument, "short description", &VEH_SHORT_DESC(veh));
+}
+
+
+OLC_MODULE(vedit_spawns) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_spawns(ch, argument, &VEH_SPAWNS(veh));
 }

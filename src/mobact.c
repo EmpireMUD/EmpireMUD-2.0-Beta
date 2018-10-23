@@ -935,6 +935,101 @@ void despawn_mob(char_data *ch) {
 
 
 /**
+* Runs a single spawn list on a room. The room is assumed to be pre-validated
+* and ready to receive spawns.
+*
+* @param room_data *room The room to spawn in.
+* @param struct spawn_info *list The spawn list to run (spawns based on flags and percentages).
+* @return int The number of mobs spawned, if any.
+*/
+static int spawn_one_list(room_data *room, struct spawn_info *list) {
+	extern char *replace_npc_names(const char *str, const char *name, const char *empire_name, const char *empire_adjective);
+	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
+	
+	int count, x_coord, y_coord;
+	struct spawn_info *spawn;
+	bool in_city, junk;
+	room_data *home;
+	char_data *mob;
+	
+	if (!room || !list) {
+		return 0;	// safety first
+	}
+	
+	home = HOME_ROOM(room);
+	
+	// set up data for faster checking
+	x_coord = X_COORD(room);
+	y_coord = Y_COORD(room);
+	count = 0;
+	in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
+	
+	LL_FOREACH(list, spawn) {
+		// validate flags
+		if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home)) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home)) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_NORTHERN) && (y_coord == -1 || y_coord < (MAP_HEIGHT / 2))) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && (y_coord == -1 || y_coord >= (MAP_HEIGHT / 2))) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_EASTERN) && (x_coord == -1 || x_coord < (MAP_WIDTH / 2))) {
+			continue;
+		}
+		if (IS_SET(spawn->flags, SPAWN_WESTERN) && (x_coord == -1 || x_coord >= (MAP_WIDTH / 2))) {
+			continue;
+		}
+		
+		// check percent
+		if (number(1, 10000) > (int)(100 * spawn->percent)) {
+			continue;
+		}
+		
+		// passed! let's spawn
+		mob = read_mobile(spawn->vnum, TRUE);
+		if (!mob) {
+			continue;	// in case of problem
+		}
+		
+		// ensure loyalty
+		if (ROOM_OWNER(home) && MOB_FLAGGED(mob, MOB_HUMAN | MOB_EMPIRE | MOB_CITYGUARD)) {
+			GET_LOYALTY(mob) = ROOM_OWNER(home);
+		}
+		
+		// in case of generic names
+		setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
+		
+		// enforce spawn data
+		SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+		
+		// put in the room
+		char_to_room(mob, room);
+		load_mtrigger(mob);
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
 * This code processes the spawn data for one room and spawns accordingly.
 * Notably, it won't spawn if more NPCs are in the room than the config const
 * 'spawn_limit_per_room', and it won't spawn claimed tiles if the empire is
@@ -951,13 +1046,12 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 	
 	room_data *iter, *next_iter, *home;
 	struct empire_territory_data *ter;
-	int count, x_coord, y_coord;
-	struct spawn_info *list, *spawn;
+	vehicle_data *veh, *next_veh;
 	struct empire_npc_data *npc;
-	char_data *mob, *ch_iter;
+	char_data *ch_iter;
 	time_t now = time(0);
-	bool in_city, junk;
 	crop_data *cp;
+	int count;
 	mob_vnum artisan = NOTHING;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
@@ -1005,73 +1099,26 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 	
 	// normal spawn list
 	if (!only_artisans && count < config_get_int("spawn_limit_per_room")) {
-		// find a spawn list
-		list = NULL;
-		if (GET_BUILDING(room)) {
-			// only find a spawn list here if the building is complete; otherwise no list = no spawn
-			if (IS_COMPLETE(room)) {
-				list = GET_BLD_SPAWNS(GET_BUILDING(room));
+		// spawn based on vehicles?
+		LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+			if (VEH_SPAWNS(veh)) {
+				count += spawn_one_list(room, VEH_SPAWNS(veh));
 			}
 		}
-		else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
-			list = GET_CROP_SPAWNS(cp);
-		}
-		else {
-			list = GET_SECT_SPAWNS(SECT(room));
-		}
-	
-		// anything to spawn?
-		if (list) {
-			// set up data for faster checking
-			x_coord = X_COORD(room);
-			y_coord = Y_COORD(room);
-			in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
-	
-			for (spawn = list; spawn; spawn = spawn->next) {
-				// validate flags
-				if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET)
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE)
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home))
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home))
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city)
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city)
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_NORTHERN) && y_coord < (MAP_HEIGHT / 2))
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && y_coord >= (MAP_HEIGHT / 2))
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_EASTERN) && x_coord < (MAP_WIDTH / 2))
-					continue;
-				if (IS_SET(spawn->flags, SPAWN_WESTERN) && x_coord >= (MAP_WIDTH / 2))
-					continue;
-
-				// check percent
-				if (number(1, 10000) > (int)(100 * spawn->percent)) {
-					continue;
+		
+		// spawn based on tile type -- if we're not now over the count
+		if (count < config_get_int("spawn_limit_per_room")) {
+			if (GET_BUILDING(room)) {
+				// only find a spawn list here if the building is complete; otherwise no list = no spawn
+				if (IS_COMPLETE(room)) {
+					count += spawn_one_list(room, GET_BLD_SPAWNS(GET_BUILDING(room)));
 				}
-		
-				// passed! let's spawn
-				mob = read_mobile(spawn->vnum, TRUE);
-		
-				// ensure loyalty
-				if (ROOM_OWNER(home) && MOB_FLAGGED(mob, MOB_HUMAN | MOB_EMPIRE | MOB_CITYGUARD)) {
-					GET_LOYALTY(mob) = ROOM_OWNER(home);
-				}
-
-				// in case of generic names
-				setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
-		
-				// enforce spawn data
-				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
-				
-				// put in the room
-				char_to_room(mob, room);
-				load_mtrigger(mob);
+			}
+			else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
+				count += spawn_one_list(room, GET_CROP_SPAWNS(cp));
+			}
+			else {
+				count += spawn_one_list(room, GET_SECT_SPAWNS(SECT(room)));
 			}
 		}
 	}

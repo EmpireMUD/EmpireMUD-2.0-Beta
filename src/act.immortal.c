@@ -3902,6 +3902,7 @@ SHOW(show_startlocs) {
 SHOW(show_spawns) {
 	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *sp;
+	vehicle_data *veh, *next_veh;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
 	bld_data *bld, *next_bld;
@@ -3948,6 +3949,19 @@ SHOW(show_spawns) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
 				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
+				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
+					strcat(buf, buf1);
+				}
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		LL_FOREACH(VEH_SPAWNS(veh), sp) {
+			if (sp->vnum == vnum) {
+				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
+				sprintf(buf1, "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
