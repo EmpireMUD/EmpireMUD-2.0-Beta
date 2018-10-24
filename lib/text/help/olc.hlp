@@ -1757,7 +1757,7 @@ Some affects are managed by live data and commands (do not set affects with *):
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
-"BEDIT ARTISAN" "VEDIT ARTISAN"
+"BEDIT ARTISAN"
 
 Usage:  .artisan <mob vnum>
         .artisan none
@@ -1765,9 +1765,6 @@ Usage:  .artisan <mob vnum>
 Some buildings may have artisan mobs set. These mobs will always spawn in the
 building if the building is owned by an empire and has been populated. Only
 one artisan will ever spawn per building.
-
-For vehicles, the artisan spawns on the outside of the vehicle and, after it
-spawns, does not move with the vehicle.
 
 This artisan is marked as an EMPIRE mob and you may use the following name
 tokens on the mob itself, if it is only loaded as an artisan:

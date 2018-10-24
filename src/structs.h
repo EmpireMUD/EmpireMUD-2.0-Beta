@@ -5073,7 +5073,6 @@ struct vehicle_attribute_data {
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
 	int fame;	// how much fame it adds to the empire
 	int military;	// how much it adds to the military pool
-	mob_vnum artisan_vnum;	// vnum of an artisan to load outside
 };
 
 

@@ -1507,7 +1507,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // attribute (non-instanced) data
 #define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
-#define VEH_ARTISAN_VNUM(veh)  ((veh)->attributes->artisan_vnum)
 #define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
 #define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)
 #define VEH_EX_DESCS(veh)  ((veh)->attributes->ex_description)
