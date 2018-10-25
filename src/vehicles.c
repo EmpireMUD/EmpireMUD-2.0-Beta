@@ -542,6 +542,7 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 */
 bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
+	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
 	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	
 	char temp[MAX_STRING_LENGTH], *ptr;
@@ -668,6 +669,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	problem |= audit_extra_descs(VEH_VNUM(veh), VEH_EX_DESCS(veh), ch);
+	problem |= audit_interactions(VEH_VNUM(veh), VEH_INTERACTIONS(veh), TYPE_ROOM, ch);
 	problem |= audit_spawns(VEH_VNUM(veh), VEH_SPAWNS(veh), ch);
 	
 	return problem;
@@ -1457,6 +1459,7 @@ void clear_vehicle(vehicle_data *veh) {
 void free_vehicle(vehicle_data *veh) {
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	struct vehicle_attached_mob *vam;
+	struct interaction_item *interact;
 	struct spawn_info *spawn;
 	
 	// strings
@@ -1477,6 +1480,12 @@ void free_vehicle(vehicle_data *veh) {
 	}
 	if (VEH_EX_DESCS(veh) && (!proto || VEH_EX_DESCS(veh) != VEH_EX_DESCS(proto))) {
 		free_extra_descs(&VEH_EX_DESCS(veh));
+	}
+	if (VEH_INTERACTIONS(veh) && (!proto || VEH_INTERACTIONS(veh) != VEH_INTERACTIONS(proto))) {
+		while ((interact = VEH_INTERACTIONS(veh))) {
+			VEH_INTERACTIONS(veh) = interact->next;
+			free(interact);
+		}
 	}
 	if (VEH_SPAWNS(veh) && (!proto || VEH_SPAWNS(veh) != VEH_SPAWNS(proto))) {
 		while ((spawn = VEH_SPAWNS(veh))) {
@@ -1524,6 +1533,7 @@ void free_vehicle(vehicle_data *veh) {
 */
 void parse_vehicle(FILE *fl, any_vnum vnum) {
 	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
+	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
 	char line[256], error[256], str_in[256], str_in2[256];
@@ -1610,6 +1620,10 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				parse_extra_desc(fl, &VEH_EX_DESCS(veh), error);
 				break;
 			}
+			case 'I': {	// interaction item
+				parse_interaction(line, &VEH_INTERACTIONS(veh), error);
+				break;
+			}
 			
 			case 'M': {	// mob spawn
 				if (!get_line(fl, line) || sscanf(line, "%d %lf %s", &int_in[0], &dbl_in, str_in) != 3) {
@@ -1687,6 +1701,7 @@ void write_vehicle_index(FILE *fl) {
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
+	void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
@@ -1728,6 +1743,9 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// 'E': extra descs
 	write_extra_descs_to_file(fl, VEH_EX_DESCS(veh));
+	
+	// I: interactions
+	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));
 	
 	// 'M': mob spawns
 	LL_FOREACH(VEH_SPAWNS(veh), spawn) {
@@ -2154,6 +2172,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	struct interaction_item *interact;
 	struct spawn_info *spawn;
 	bitvector_t old_flags;
 	UT_hash_handle hh;
@@ -2256,6 +2275,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_YEARLY_MAINTENANCE(proto)) {
 		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
 	}
+	while ((interact = VEH_INTERACTIONS(proto))) {
+		VEH_INTERACTIONS(proto) = interact->next;
+		free(interact);
+	}
 	while ((spawn = VEH_SPAWNS(proto))) {
 		VEH_SPAWNS(proto) = spawn->next;
 		free(spawn);
@@ -2311,6 +2334,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		// copy lists
 		VEH_YEARLY_MAINTENANCE(new) = copy_resource_list(VEH_YEARLY_MAINTENANCE(input));
 		VEH_EX_DESCS(new) = copy_extra_descs(VEH_EX_DESCS(input));
+		VEH_INTERACTIONS(new) = copy_interaction_list(VEH_INTERACTIONS(input));
 		VEH_SPAWNS(new) = copy_spawn_list(VEH_SPAWNS(input));
 		
 		// copy scripts
@@ -2491,6 +2515,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void olc_show_vehicle(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
+	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
@@ -2548,6 +2573,12 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
 	if (VEH_EX_DESCS(veh)) {
 		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf);
+		strcat(buf, lbuf);
+	}
+
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(VEH_INTERACTIONS(veh)));
+	if (VEH_INTERACTIONS(veh)) {
+		get_interaction_display(VEH_INTERACTIONS(veh), lbuf);
 		strcat(buf, lbuf);
 	}
 	
@@ -2682,6 +2713,12 @@ OLC_MODULE(vedit_icon) {
 		olc_process_string(ch, argument, "icon", &VEH_ICON(veh));
 		msg_to_char(ch, "\t0");	// in case color is unterminated
 	}
+}
+
+
+OLC_MODULE(vedit_interaction) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_interactions(ch, argument, &VEH_INTERACTIONS(veh), TYPE_ROOM);
 }
 
 

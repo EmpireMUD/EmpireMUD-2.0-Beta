@@ -1302,7 +1302,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // definitions
 #define BLD_ALLOWS_MOUNTS(room)  (ROOM_IS_CLOSED(room) ? (ROOM_BLD_FLAGGED((room), BLD_ALLOW_MOUNTS | BLD_OPEN) || RMT_FLAGGED((room), RMT_OUTDOOR)) : TRUE)
-#define CAN_CHOP_ROOM(room)  (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM((room), INTERACT_CHOP) || (ROOM_SECT_FLAGGED((room), SECTF_CROP) && ROOM_CROP_FLAGGED((room), CROPF_IS_ORCHARD)))
+#define CAN_CHOP_ROOM(room)  (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || can_interact_room((room), INTERACT_CHOP) || (ROOM_SECT_FLAGGED((room), SECTF_CROP) && ROOM_CROP_FLAGGED((room), CROPF_IS_ORCHARD)))
 #define DEPLETION_LIMIT(room)  (ROOM_BLD_FLAGGED((room), BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))
 #define HAS_MINOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_minor") / 100)))
 #define HAS_MAJOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_major") / 100)))
@@ -1318,12 +1318,14 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 #define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (RMT_FLAGGED((room), RMT_LIGHT) || IS_ANY_BUILDING(room) || !IS_DARK(room) || adjacent_room_is_light(room))
 
-// interaction checks (leading up to CAN_INTERACT_ROOM)
+// interaction checks (by type)
 #define BLD_CAN_INTERACT_ROOM(room, type)  (GET_BUILDING(room) && has_interaction(GET_BLD_INTERACTIONS(GET_BUILDING(room)), (type)))
 #define CROP_CAN_INTERACT_ROOM(room, type)  (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room) && has_interaction(GET_CROP_INTERACTIONS(ROOM_CROP(room)), (type)))
 #define RMT_CAN_INTERACT_ROOM(room, type)  (GET_ROOM_TEMPLATE(room) && has_interaction(GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), (type)))
 #define SECT_CAN_INTERACT_ROOM(room, type)  has_interaction(GET_SECT_INTERACTIONS(SECT(room)), (type))
-#define CAN_INTERACT_ROOM(room, type)  (SECT_CAN_INTERACT_ROOM((room), (type)) || BLD_CAN_INTERACT_ROOM((room), (type)) || RMT_CAN_INTERACT_ROOM((room), (type)) || CROP_CAN_INTERACT_ROOM((room), (type)))
+// room interactions including vehicles: bool can_interact_room(room, type)
+// if you don't want to check vehicles, you can use this macro:
+#define CAN_INTERACT_ROOM_NO_VEH(room, type)  (SECT_CAN_INTERACT_ROOM((room), (type)) || BLD_CAN_INTERACT_ROOM((room), (type)) || RMT_CAN_INTERACT_ROOM((room), (type)) || CROP_CAN_INTERACT_ROOM((room), (type)))
 
 // fundamental types
 #define BUILDING_VNUM(room)  (GET_BUILDING(room) ? GET_BLD_VNUM(GET_BUILDING(room)) : NOTHING)
@@ -1512,6 +1514,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_EX_DESCS(veh)  ((veh)->attributes->ex_description)
 #define VEH_FAME(veh)  ((veh)->attributes->fame)
 #define VEH_FUNCTIONS(veh)  ((veh)->attributes->functions)
+#define VEH_INTERACTIONS(veh)  ((veh)->attributes->interactions)
 #define VEH_INTERIOR_ROOM_VNUM(veh)  ((veh)->attributes->interior_room_vnum)
 #define VEH_MAX_HEALTH(veh)  ((veh)->attributes->maxhealth)
 #define VEH_MAX_ROOMS(veh)  ((veh)->attributes->max_rooms)

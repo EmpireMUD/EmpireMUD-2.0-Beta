@@ -464,6 +464,7 @@ OLC_MODULE(vedit_flags);
 OLC_MODULE(vedit_functions);
 OLC_MODULE(vedit_hitpoints);
 OLC_MODULE(vedit_icon);
+OLC_MODULE(vedit_interaction);
 OLC_MODULE(vedit_interiorroom);
 OLC_MODULE(vedit_keywords);
 OLC_MODULE(vedit_longdescription);
@@ -1032,6 +1033,7 @@ const struct olc_command_data olc_data[] = {
 	{ "functions", vedit_functions, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "interaction", vedit_interaction, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "interiorroom", vedit_interiorroom, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "keywords", vedit_keywords, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "longdescription", vedit_longdescription, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -6197,6 +6199,13 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					sector_data *sect;
 					if ((sect = sector_proto(vnum))) {
 						copyfrom = GET_SECT_INTERACTIONS(sect);
+					}
+					break;
+				}
+				case OLC_VEHICLE: {
+					vehicle_data *veh;
+					if ((veh = vehicle_proto(vnum))) {
+						copyfrom = VEH_INTERACTIONS(veh);
 					}
 					break;
 				}

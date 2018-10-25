@@ -174,6 +174,7 @@ void join_group(char_data *ch, struct group_data *group);
 void leave_group(char_data *ch);
 
 // interaction handlers
+extern bool can_interact_room(room_data *room, int type);
 extern bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent);
 extern struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
 void free_exclusion_data(struct interact_exclusion_data *list);

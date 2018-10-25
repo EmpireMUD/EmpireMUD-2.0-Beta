@@ -623,7 +623,7 @@ ACMD(do_fish) {
 	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't fish in that direction.\r\n");
 	}
-	else if (!CAN_INTERACT_ROOM(room, INTERACT_FISH)) {
+	else if (!can_interact_room(room, INTERACT_FISH)) {
 		msg_to_char(ch, "You can't fish for anything %s!\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
 	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
@@ -676,7 +676,7 @@ ACMD(do_forage) {
 		return;
 	}
 	
-	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_FORAGE)) {
+	if (!can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
 		msg_to_char(ch, "There's nothing you can forage for here.\r\n");
 		return;
 	}

@@ -5069,6 +5069,7 @@ struct vehicle_attribute_data {
 	struct resource_data *yearly_maintenance;
 	int veh_move_speed;  // VSPEED_ for driving action speed
 	struct extra_descr_data *ex_description;	// extra descriptions
+	struct interaction_item *interactions;	// interaction items
 	struct spawn_info *spawns;	// linked list of spawn data
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
 	int fame;	// how much fame it adds to the empire
