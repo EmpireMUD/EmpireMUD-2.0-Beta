@@ -2367,10 +2367,12 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 * @param vehicle_data *veh The vehicle to display.
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
+	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	extern char *get_room_name(room_data *room, bool color);
 	void script_stat (char_data *ch, struct script_data *sc);
+	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 	
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	obj_data *obj;
 	size_t size;
 	int found;
@@ -2388,14 +2390,22 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s", VEH_LOOK_DESC(veh));
 	}
 	
+	if (VEH_EX_DESCS(veh)) {
+		struct extra_descr_data *desc;
+		size += snprintf(buf + size, sizeof(buf) - size, "Extra descs:\tc");
+		LL_FOREACH(VEH_EX_DESCS(veh), desc) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %s", desc->keyword);
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "\t0\r\n");
+	}
+	
 	if (VEH_ICON(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s\t0 %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
 	}
 	
+	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	
-	// speed info
-	size += snprintf(buf + size, sizeof(buf) - size, "Speed: [\ty%s\t0]\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Speed: [\ty%s\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -2404,6 +2414,16 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	sprintbit(VEH_FUNCTIONS(veh), function_flags, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Functions: \tc%s\t0\r\n", part);
+	
+	if (VEH_INTERACTIONS(veh)) {
+		send_to_char("Interactions:\r\n", ch);
+		get_interaction_display(VEH_INTERACTIONS(veh), part);
+		strcat(buf, part);
+		size += strlen(part);
+	}
 	
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
 		get_resource_display(VEH_YEARLY_MAINTENANCE(veh), part);
@@ -2450,6 +2470,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	send_to_char(buf, ch);
+	show_spawn_summary_to_char(ch, VEH_SPAWNS(veh));
 	
 	// script info
 	msg_to_char(ch, "Script information:\r\n");
