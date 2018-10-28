@@ -491,8 +491,7 @@ Used for:  forge, build, manufacture
 Stored in:  Foundry
 
 Iron ore is found by mining in the mountains. It is useful in building and
-forging equipment, as well as manufacturing ships. It is also smelted with
-nocturnium ore to make nocturnium ingots.
+forging equipment, as well as manufacturing ships.
 
 You can learn about getting iron via HELP IRON GUIDE.
 
@@ -723,7 +722,7 @@ Stored in:  Foundry
 
 Nocturnium is a deep black metal, its surface swirling with mana. It is often
 plated onto powerful magical objects. Smelting stable nocturnium requires that
-you mix it with iron.
+you mix it with copper.
 
 See also: FORGE, METALS, MINE, SEW, SMELT
 #
