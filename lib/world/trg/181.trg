@@ -22,7 +22,7 @@ if %room.sector_vnum% >= 1 && %room.sector_vnum% <= 4
   nop %self.add_mob_flag(SENTINEL)%
   eval new_sector %room.sector_vnum% - 1
   if %new_sector% == 0
-    set new_sector 18100
+    set new_sector 36
   end
   %terraform% %room% %new_sector%
   eval logs %logs% + 1
@@ -34,7 +34,7 @@ if %room.sector_vnum% >= 1 && %room.sector_vnum% <= 4
 elseif %room.sector_vnum% == 26
   nop %self.add_mob_flag(SENTINEL)%
   %echo% %self.name% fells two trees!
-  %terraform% %room% 20
+  %terraform% %room% 23
   eval logs %logs% + 2
   wait 1 sec
   %echo% The trees fall into each other with a single mighty crash!
@@ -43,7 +43,7 @@ elseif %room.sector_vnum% >= 42 && %room.sector_vnum% <= 45
   nop %self.add_mob_flag(SENTINEL)%
   eval new_sector %room.sector_vnum% - 1
   if %room.sector_vnum% == 44
-    set new_sector 40
+    set new_sector 46
   end
   %terraform% %room% %new_sector%
   eval logs %logs% + 1

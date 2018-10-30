@@ -83,7 +83,7 @@ S
 the ghost of #n~
 The ghost of #n is haunting this place.
 ~
-0 0 do cmn 0
+0 0 do cmnG 0
 0 0 27 15
 D
 You can see straight through the ghost. That can't be normal.
@@ -136,7 +136,7 @@ ghost knocking~
 a knocking ghost~
 A ghost lingers in the air.
 ~
-25 75 dov de 0
+25 75 dov deG 0
 0 0 27 28
 D
 It's knocking on the walls, the doors, and anything else it comes across.
@@ -156,7 +156,7 @@ ghost rattling~
 a rattling ghost~
 A ghost lingers in the air.
 ~
-25 75 dov de 0
+25 75 dov deG 0
 0 0 27 28
 D
 The ghost is wrapped in chains, and rattles them loudly as it floats along.
@@ -270,7 +270,7 @@ ghost~
 a ghost~
 A ghost hangs in the air like a sheet.
 ~
-25 75 dhozD v 0
+25 75 dhozD G 0
 0 0 27 16
 D
 On second look, this might just be a floating sheet.
