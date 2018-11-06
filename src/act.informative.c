@@ -613,7 +613,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	if (GET_BONUS_TRAITS(ch)) {
 		prettier_sprintbit(GET_BONUS_TRAITS(ch), bonus_bit_descriptions, lbuf);
-		msg_to_char(ch, "  Bonus traits: %s\r\n", lbuf);
+		msg_to_char(to, "  Bonus traits: %s\r\n", lbuf);
 	}
 
 	msg_to_char(to, " +-------------------------------- Condition --------------------------------+\r\n");
