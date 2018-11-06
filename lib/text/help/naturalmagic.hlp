@@ -575,7 +575,7 @@ Natural Magic Synergy Ability: 100 Battle
 Familiar type:  buff
 
 The moon rabbit familiar will use the following abilities in combat:
-- Replenish: +(level*2/3) Mana to master (instant)
+- Replenish: +(scaled amount) Mana to master (instant)
 - Re-energize: +(level/10) Mana-Regen to master (30 sec)
 - Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
 - Moon's protection: +(level/5) Resist-Physical/Magical on the tank (30 sec)
@@ -626,7 +626,7 @@ Familiar type:  buff
 
 The owl shadow familiar will use the following abilities in combat:
 - Dark Wings: +(15+level/25) Dodge on tank (30 sec)
-- Healing Darkness: +(level/20) Heal-Over-Time on party (30 sec)
+- Healing Darkness: +(scaled amount) Heal-Over-Time on party (30 sec)
 - Invigorating Darkness: +(level/5) Move points on party (instant)
 - Brilliant Darkness: +(1+level/100) Wits on party (30 sec)
 
