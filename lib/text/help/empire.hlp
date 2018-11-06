@@ -533,8 +533,7 @@ FINDMAINTENANCE "FIND MAINTENANCE"
 
 Usage:  findmaintenance [coordinates | island]
 
-This command finds all the buildings in your empire that are at least 20%
-damaged or need at least 2 years of maintenance.
+This command finds all the buildings in your empire that require maintenance.
 
 If you give it target coordinates or an island name, it will list the resources
 needed to repair that location or all buildings you own on the island.
@@ -729,8 +728,9 @@ nologies, or Greatness to the empire. The timeout period is based on each
 character's play time, and may be as short as a week or as long as 4 months.
 
 As members become timed out the empire may no longer qualify for as many
-cities or as much territory as before. If it has more than double its allowed
-cities, they will begin to auto-abandon. Outside-of-city territory will also
+cities or as much territory as before. If the empire is using more city points
+than it has available, the elog will warn and then the empire will
+automatically abandon some of its cities. Outside-of-city territory will also
 start to automatically reduce itself. If the empire times out completely, it
 may lose all its territory. Finally, if no members log on for a very long time,
 the empire itself may crumble to dust.
@@ -856,11 +856,17 @@ of the mountain. Mines you build or prospect have a chance to find rare metals.
 If you were not the first person to mine or prospect a mountain tile (since the
 last mountain reset), your rare metals ability does not apply.
 
+The following mines can only be found if you have Rare Metals:
+- gold mine (0.5% chance)
+- nocturnium mine (1.5% chance)
+- imperium mine (1.5% chance)
+- moonstone mine (1.5% chance)
+
 Once you have started a mine (or prospected) a given mountain tile, it will
 keep its current metal type unless the mountain is reset at the end of the
 year. For more information on mountain resets, see HELP MINE.
 
-See also: MINE, DEEP MINES, PROSPECT
+See also: MINE, DEEP MINES, PROSPECT, METALS
 #
 RECLAIM
 
@@ -966,7 +972,7 @@ see this broken down on the empire details.
       vault. The amount of territory from wealth is not linear. Max territory
       from wealth is equal to 3x normal territory.
 
-Most territory must be location within an empire's cities. 35% of your total
+Most territory must be located within an empire's cities. 35% of your total
 territory can be on the outskirts of cities (up to 4x city radius), and another
 5% of the territory can be either outskirts or on the frontier (beyond the
 outskirts). The 'estats' command shows how much territory of each type you can
@@ -1188,8 +1194,9 @@ minimum rank to change the workforce settings.
 
 The workforce is made up of the empire's citizens (NPCs). These citizens will
 only work within 20 map tiles of their own homes, and must be on the same 
-island. Citizens will only work on claimed land. Only one citizen will work
-a given location at a time.
+island. Citizens will only work on claimed land. Only one citizen will perform
+a particular chore at each chore location at one time (build more chore
+buildings to increase chore speed).
 
 If you set your own limit on a chore, the empire won't produce more than that
 limit on each island. Not all chores use the numeric limit (for example, the
