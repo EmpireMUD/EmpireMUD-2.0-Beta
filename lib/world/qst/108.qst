@@ -1162,13 +1162,12 @@ from. Knock out your victim in combat ('toggle autokill' will make you stop
 combat before killing your victim), then 'bite' them and drain some blood.
 When you have done this, return to the Spirit of Blood.
 Note: This quest will not show as 'complete' until you re-enter the
-Soulstream.
+Soulstream. Use 'skill buy bite' if you don't already have the Bite ability.
 ~
-   You have satisfied the Spirit of Blood! Drinking the blood of live creatures
-is enough to gain Vampire skill up to level 15. After that, buy and use Vampire
-abilities to become a sanguine master.
+   You have satisfied the Spirit of Blood! Buy and use more abilities from the
+Vampire skill tree to become a sanguine master!
 ~
-13 0 0 25 -1
+14 0 0 25 -1
 A
 1 10857
 P

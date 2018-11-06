@@ -929,7 +929,7 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if !(%actor.on_quest(18280)% || %actor.on_quest(18281)% || %actor.on_quest(18282)% || %actor.on_quest(18383)%)
+if !(%actor.on_quest(18280)% || %actor.on_quest(18281)% || %actor.on_quest(18282)% || %actor.on_quest(18283)%)
   %send% %actor% You have no need to contact Malfernes right now.
   %send% %actor% %self.shortdesc% crumbles to dust.
   %purge% %self%
