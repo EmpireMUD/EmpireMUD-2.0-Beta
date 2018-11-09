@@ -5297,6 +5297,9 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 	
 	// check vehicles first
 	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (!VEH_IS_COMPLETE(veh)) {
+			continue;
+		}
 		if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {
 			continue;	// exclude certain functions on movable vehicles (functions that require room data)
 		}
