@@ -471,7 +471,7 @@ static void ewt_mark_for_interactions(empire_data *emp, room_data *room, int int
 */
 static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
-	int island_id, max;
+	int island_id, max, glob_max;
 	struct empire_workforce_tracker *tt;
 	struct empire_island *emp_isle;
 	obj_data *proto;
@@ -491,6 +491,8 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	max = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(emp);
 	max += EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP);
 	
+	glob_max = max;	// does not change
+	
 	// check empire's own limit
 	if ((emp_isle = get_empire_island(emp, island_id))) {
 		if (emp_isle->workforce_limit[chore] > 0 && emp_isle->workforce_limit[chore] < max) {
@@ -499,7 +501,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	}
 
 	// do we have too much?
-	if (tt->total_amount + tt->total_workers >= max) {
+	if (tt->total_amount + tt->total_workers >= glob_max) {
 		if (isle->amount + isle->workers < config_get_int("max_chore_resource_over_total")) {
 			return TRUE;
 		}
