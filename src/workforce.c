@@ -502,7 +502,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 
 	// do we have too much?
 	if (tt->total_amount + tt->total_workers >= glob_max) {
-		if (isle->amount + isle->workers < config_get_int("max_chore_resource_over_total")) {
+		if (isle->amount + isle->workers < config_get_int("max_chore_resource_over_total") && isle->amount + isle->workers < max) {
 			return TRUE;
 		}
 	}
