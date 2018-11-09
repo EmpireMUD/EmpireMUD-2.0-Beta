@@ -759,7 +759,7 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp) {
 		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
 			continue;
 		}
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!emp || EMPIRE_HAS_TECH(emp, TECH_RARE_METALS)) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!emp || EMPIRE_HAS_TECH(emp, TECH_RARE_METALS)) && (!ch || !GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
 			continue;	// missing rare metals
 		}
 		
