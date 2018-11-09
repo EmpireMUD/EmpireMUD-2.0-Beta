@@ -729,9 +729,10 @@ void finish_trench(room_data *room) {
 * requirements.
 *
 * @param room_data *room The room to choose a mine type for.
-* @param char_data *ch The character setting up mine data (for abilities).
+* @param char_data *ch Optional: The character setting up mine data (for abilities).
+* @param empire_data *emp Optional: The empire/owner (for techs).
 */
-void init_mine(room_data *room, char_data *ch) {
+void init_mine(room_data *room, char_data *ch, empire_data *emp) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	struct global_data *glb, *next_glb, *choose_last, *found;
@@ -758,7 +759,7 @@ void init_mine(room_data *room, char_data *ch) {
 		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
 			continue;
 		}
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!emp || EMPIRE_HAS_TECH(emp, TECH_RARE_METALS)) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
 			continue;	// missing rare metals
 		}
 		
@@ -827,7 +828,7 @@ void init_mine(room_data *room, char_data *ch) {
 		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(found));
 		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE)));
 		
-		if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
+		if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (emp && EMPIRE_HAS_TECH(emp, TECH_DEEP_MINES)) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
 			multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
 		}

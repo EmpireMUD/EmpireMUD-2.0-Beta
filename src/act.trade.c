@@ -937,6 +937,7 @@ void finish_gen_craft(char_data *ch) {
 */
 void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
+	void finish_vehicle_setup(vehicle_data *veh);
 	
 	bool found = FALSE, any = FALSE;
 	char buf[MAX_STRING_LENGTH];
@@ -989,6 +990,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		if (VEH_OWNER(veh)) {
 			adjust_vehicle_tech(veh, TRUE);
 		}
+		finish_vehicle_setup(veh);
 		load_vtrigger(veh);
 	}
 	else if (!found) {

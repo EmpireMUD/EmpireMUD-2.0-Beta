@@ -72,12 +72,12 @@ const char *interlink_codes[11] = { "AX", "RB",	"UN", "DD", "WZ", "FG", "VI", "Q
 * @param room_data *room The location to set up.
 */
 void special_building_setup(char_data *ch, room_data *room) {
-	void init_mine(room_data *room, char_data *ch);
+	void init_mine(room_data *room, char_data *ch, empire_data *emp);
 		
 	// mine data
 	if (HAS_FUNCTION(room, FNC_MINE)) {
 		// NOTE: vehicle functions don't support mining, so we don't use room_has_function_and_city_ok
-		init_mine(room, ch);
+		init_mine(room, ch, ROOM_OWNER(room) ? ROOM_OWNER(room) : (ch ? GET_LOYALTY(ch) : NULL));
 	}
 }
 

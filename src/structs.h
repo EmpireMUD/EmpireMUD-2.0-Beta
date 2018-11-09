@@ -800,6 +800,9 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_STORE_ALL BIT(35) // anything can be stored here (does not allow retrieval)
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
 
+// These function flags don't work on movable vehicles (they require room data)
+#define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER DEFINES ///////////////////////////////////////////////////////
@@ -2312,6 +2315,9 @@ typedef struct vehicle_data vehicle_data;
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
 #define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE)
+
+// The following vehicle flags indicate a vehicle can move
+#define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)
 
 
  //////////////////////////////////////////////////////////////////////////////

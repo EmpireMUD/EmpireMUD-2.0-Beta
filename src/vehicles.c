@@ -128,6 +128,25 @@ void empty_vehicle(vehicle_data *veh) {
 
 
 /**
+* This runs after the vehicle is finished (or, in some cases, if it moves).
+*
+* @param vehicle_data *veh The vehicle being finished.
+*/
+void finish_vehicle_setup(vehicle_data *veh) {
+	void init_mine(room_data *room, char_data *ch, empire_data *emp);
+	
+	if (!veh || !VEH_IS_COMPLETE(veh)) {
+		return;	// no work
+	}
+	
+	// mine setup
+	if (room_has_function_and_city_ok(IN_ROOM(veh), FNC_MINE)) {
+		init_mine(IN_ROOM(veh), NULL, VEH_OWNER(veh));
+	}
+}
+
+
+/**
 * Removes everyone/everything from inside a vehicle, and puts it on the outside
 * if possible.
 *

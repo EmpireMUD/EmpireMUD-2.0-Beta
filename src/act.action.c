@@ -2121,7 +2121,7 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	void init_mine(room_data *room, char_data *ch);
+	void init_mine(room_data *room, char_data *ch, empire_data *emp);
 		
 	// simple decrement
 	GET_ACTION_TIMER(ch) -= 1;
@@ -2147,7 +2147,7 @@ void process_prospecting(char_data *ch) {
 		}
 		case 0: {
 			GET_ACTION(ch) = ACT_NONE;
-			init_mine(IN_ROOM(ch), ch);
+			init_mine(IN_ROOM(ch), ch, GET_LOYALTY(ch));
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE, GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING);
 			
 			show_prospect_result(ch, IN_ROOM(ch));
