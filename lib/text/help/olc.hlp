@@ -1971,8 +1971,8 @@ Available functions:
  STORE-ALL - any regular storable item can be stored (but not retrieved)
  &yIN-CITY-ONLY&0 - all function flags only work when in a city
  
-&r* Note:&0 Functions marked with &r*&0 cannot be used on vehicles, only
-building interiors.
+&r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
+buildings and stationary vehicles.
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES, OLC VEHICLES
 #d
