@@ -1159,7 +1159,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	}
 	
 	// clean mine data from anything that's not currently a mine
-	if (!room || !HAS_FUNCTION(room, FNC_MINE)) {
+	if (!room || !room_has_function_and_city_ok(room, FNC_MINE)) {
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
