@@ -1184,7 +1184,7 @@ ACMD(do_rejuvenate) {
 	// amount determines cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
 	amount += round(GET_INTELLIGENCE(ch) * int_mod);
-	if ((GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO || has_player_tech(ch, PTECH_HEALING_BOOST)) && check_solo_role(ch)) {
+	if (!IS_NPC(ch) && (GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO || has_player_tech(ch, PTECH_HEALING_BOOST)) && check_solo_role(ch)) {
 		amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
 		cost = round(amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_mod, ch, ABIL_REJUVENATE));
 	}
