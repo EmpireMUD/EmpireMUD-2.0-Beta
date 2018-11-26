@@ -5207,8 +5207,7 @@ ACMD(do_tavern) {
 		}
 	}
 	
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
-		// NOTE: vehicle functions don't support taverns, so we don't use room_has_function_and_city_ok
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAVERN)) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
@@ -5299,8 +5298,7 @@ ACMD(do_tomb) {
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}
-		else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB)) {
-			// NOTE: vehicle functions don't support tomb (because vehicle tombs could move), so we don't use room_has_function_and_city_ok
+		else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "You can't make this place your tomb!\r\n");
 		}
 		else if (!IS_COMPLETE(IN_ROOM(ch))) {
