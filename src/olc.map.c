@@ -96,8 +96,8 @@ OLC_MODULE(mapedit_build) {
 			herd_animals_out(IN_ROOM(ch));
 		}
 		
-		special_building_setup(ch, IN_ROOM(ch));
 		complete_building(IN_ROOM(ch));
+		special_building_setup(ch, IN_ROOM(ch));
 
 		msg_to_char(ch, "You create %s %s!\r\n", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		sprintf(buf, "$n creates %s %s!", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));

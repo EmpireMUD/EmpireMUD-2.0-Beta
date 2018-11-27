@@ -384,8 +384,8 @@ void do_dg_build(room_data *target, char *argument) {
 		disassociate_building(target);
 	
 		construct_building(target, GET_BLD_VNUM(bld));
-		special_building_setup(NULL, target);
 		complete_building(target);
+		special_building_setup(NULL, target);
 	
 		if (dir != NO_DIR) {
 			create_exit(target, SHIFT_DIR(target, dir), dir, FALSE);

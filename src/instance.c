@@ -125,7 +125,6 @@ void build_instance_exterior(struct instance_data *inst) {
 			// make the building
 			disassociate_building(INST_LOCATION(inst));
 			construct_building(INST_LOCATION(inst), GET_BLD_VNUM(bdg));
-			special_building_setup(NULL, INST_LOCATION(inst));
 			
 			// exit?
 			if (INST_DIR(inst) != NO_DIR && ROOM_IS_CLOSED(INST_LOCATION(inst))) {
@@ -134,6 +133,7 @@ void build_instance_exterior(struct instance_data *inst) {
 			}
 			
 			complete_building(INST_LOCATION(inst));
+			special_building_setup(NULL, INST_LOCATION(inst));
 			
 			// set these so it can be cleaned up later
 			SET_BIT(ROOM_BASE_FLAGS(INST_LOCATION(inst)), ROOM_AFF_TEMPORARY);
