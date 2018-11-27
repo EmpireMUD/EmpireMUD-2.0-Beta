@@ -65,6 +65,7 @@ extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
 
 // external functions
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int adjusted_instance_limit(adv_data *adv);
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
@@ -3902,6 +3903,7 @@ SHOW(show_startlocs) {
 SHOW(show_spawns) {
 	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *sp;
+	vehicle_data *veh, *next_veh;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
 	bld_data *bld, *next_bld;
@@ -3948,6 +3950,19 @@ SHOW(show_spawns) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
 				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
+				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
+					strcat(buf, buf1);
+				}
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		LL_FOREACH(VEH_SPAWNS(veh), sp) {
+			if (sp->vnum == vnum) {
+				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
+				sprintf(buf1, "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -8806,8 +8821,12 @@ ACMD(do_trans) {
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
+		
+		adjust_vehicle_tech(veh, FALSE);
 		vehicle_from_room(veh);
 		vehicle_to_room(veh, to_room);
+		adjust_vehicle_tech(veh, TRUE);
+		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}

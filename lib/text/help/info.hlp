@@ -488,6 +488,41 @@ That is, things you can't use yet because the timer hasn't expired. Some
 abilities can only be used every so often, usually for reasons relating to
 game balance.
 #
+DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" MAUL MASSACRE DECIMATE OBLITERATE ANNIHILATE MUTILATE SLAUGHTER ERADICATE **ERADICATE** LIQUIDATE **LIQUIDATE**
+
+Use the 'hit' command (or any attack ability) to initiate combat and deal
+damage to other creatures. Getting better gear will increase the a mount of
+damage you can deal. If you want to see more information about your hit rate
+and your total damage, check the 'meters'.
+
+When you deal damage with a weapon, you will see generated text based on the
+type of weapon and the amount of damage you dealt.
+
+Damage text:
+      0 damage: miss
+      1 damage: tickle
+    2-3 damage: barely
+   4-10 damage: [normal]
+  11-14 damage: hard
+  15-16 damage: very hard
+  17-20 damage: extremely hard
+  21-24 damage: maul
+  25-28 damage: massacre
+  29-32 damage: decimate
+  33-45 damage: OBLITERATE
+  46-60 damage: ANNIHILATE
+  61-75 damage: MUTILATE
+ 76-100 damage: SLAUGHTER
+101-125 damage: **ERADICATE**
+   126+ damage: **LIQUIDATE**
+
+Examples:
+  You slash the ship very hard!
+  You SLAUGHTER the pig with your chop!
+  You **LIQUIDATE** the ice scupture with your fire!
+
+See also: CASTER DPS, DOT, HIT, MELEE DPS, METERS
+#
 DEATH DYING
 
 When you die in EmpireMUD, you will lie on the ground for a short time, until

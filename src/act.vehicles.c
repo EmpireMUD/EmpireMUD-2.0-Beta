@@ -41,6 +41,7 @@ extern const char *mob_move_types[];
 extern const int rev_dir[];
 
 // external funcs
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int count_harnessed_animals(vehicle_data *veh);
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
@@ -294,10 +295,14 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 	
 	was_in = IN_ROOM(veh);
+	adjust_vehicle_tech(veh, FALSE);
 	vehicle_to_room(veh, to_room);
+	adjust_vehicle_tech(veh, TRUE);
 	
 	if (!entry_vtrigger(veh)) {
+		adjust_vehicle_tech(veh, FALSE);
 		vehicle_to_room(veh, was_in);
+		adjust_vehicle_tech(veh, TRUE);
 		return FALSE;
 	}
 	
@@ -537,6 +542,7 @@ void perform_load_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont, 
 	snprintf(buf, sizeof(buf), "$n loads $V %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, veh, TO_ROOM | ACT_VEHICLE_OBJ);
 	
+	// probably do not need to adjust-tech -- this can't change islands, can it?
 	vehicle_to_room(veh, to_room);
 	
 	snprintf(buf, sizeof(buf), "$V is loaded %sto $v.", IN_OR_ON(cont));
@@ -585,6 +591,7 @@ void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont
 	act("You unload $V from $v.", FALSE, ch, cont, veh, TO_CHAR | ACT_VEHICLE_OBJ);
 	act("$n unloads $V from $v.", FALSE, ch, cont, veh, TO_ROOM | ACT_VEHICLE_OBJ);
 	
+	// probably do not need to adjust-tech -- this can't change islands, can it?
 	vehicle_to_room(veh, IN_ROOM(cont));
 	
 	if (ROOM_PEOPLE(IN_ROOM(cont))) {
@@ -1323,7 +1330,10 @@ ACMD(do_board) {
 				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
 			}
 			
+			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
 			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
+			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
+			
 			act("$V is led in.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
 		}
 		
@@ -1430,7 +1440,11 @@ ACMD(do_disembark) {
 			if (ROOM_PEOPLE(was_in)) {
 				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
 			}
+			
+			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
 			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
+			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
+			
 			act("$V is led off.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
 		}
 
@@ -1631,7 +1645,10 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 			act("$V is dragged into $p.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), portal, veh, TO_CHAR | TO_ROOM);
 		}
 		
+		adjust_vehicle_tech(veh, FALSE);
 		vehicle_to_room(veh, IN_ROOM(ch));
+		adjust_vehicle_tech(veh, TRUE);
+		
 		act("$V is dragged in with you.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$V is dragged in with $m.", FALSE, ch, NULL, veh, TO_ROOM);
 	}
@@ -1712,7 +1729,10 @@ ACMD(do_drag) {
 			act("$V is dragged along.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
 		
+		adjust_vehicle_tech(veh, FALSE);
 		vehicle_to_room(veh, IN_ROOM(ch));
+		adjust_vehicle_tech(veh, TRUE);
+		
 		act("$V is dragged along with you.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$V is dragged along with $m.", FALSE, ch, NULL, veh, TO_ROOM);
 	}
@@ -1762,7 +1782,9 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 			act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), portal, veh, TO_CHAR | TO_ROOM);
 		}
 		
+		adjust_vehicle_tech(veh, FALSE);
 		vehicle_to_room(veh, to_room);
+		adjust_vehicle_tech(veh, TRUE);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			snprintf(buf, sizeof(buf), "$V %s out of $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);

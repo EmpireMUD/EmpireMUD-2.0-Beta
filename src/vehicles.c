@@ -46,6 +46,7 @@ extern room_data *create_room(room_data *home);
 
 // external consts
 extern const char *designate_flags[];
+extern const char *function_flags[];
 extern const char *mob_move_types[];
 extern const char *vehicle_flags[];
 extern const char *vehicle_speed_types[];
@@ -122,6 +123,25 @@ void empty_vehicle(vehicle_data *veh) {
 		else {
 			extract_obj(obj);
 		}
+	}
+}
+
+
+/**
+* This runs after the vehicle is finished (or, in some cases, if it moves).
+*
+* @param vehicle_data *veh The vehicle being finished.
+*/
+void finish_vehicle_setup(vehicle_data *veh) {
+	void init_mine(room_data *room, char_data *ch, empire_data *emp);
+	
+	if (!veh || !VEH_IS_COMPLETE(veh)) {
+		return;	// no work
+	}
+	
+	// mine setup
+	if (room_has_function_and_city_ok(IN_ROOM(veh), FNC_MINE)) {
+		init_mine(IN_ROOM(veh), NULL, VEH_OWNER(veh));
 	}
 }
 
@@ -540,6 +560,10 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_vehicle(vehicle_data *veh, char_data *ch) {
+	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
+	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
+	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
+	
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh));
 	bool problem = FALSE;
@@ -662,6 +686,10 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "ON-FIRE flag");
 		problem = TRUE;
 	}
+	
+	problem |= audit_extra_descs(VEH_VNUM(veh), VEH_EX_DESCS(veh), ch);
+	problem |= audit_interactions(VEH_VNUM(veh), VEH_INTERACTIONS(veh), TYPE_ROOM, ch);
+	problem |= audit_spawns(VEH_VNUM(veh), VEH_SPAWNS(veh), ch);
 	
 	return problem;
 }
@@ -1450,6 +1478,8 @@ void clear_vehicle(vehicle_data *veh) {
 void free_vehicle(vehicle_data *veh) {
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	struct vehicle_attached_mob *vam;
+	struct interaction_item *interact;
+	struct spawn_info *spawn;
 	
 	// strings
 	if (VEH_KEYWORDS(veh) && (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto))) {
@@ -1466,6 +1496,21 @@ void free_vehicle(vehicle_data *veh) {
 	}
 	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 		free(VEH_ICON(veh));
+	}
+	if (VEH_EX_DESCS(veh) && (!proto || VEH_EX_DESCS(veh) != VEH_EX_DESCS(proto))) {
+		free_extra_descs(&VEH_EX_DESCS(veh));
+	}
+	if (VEH_INTERACTIONS(veh) && (!proto || VEH_INTERACTIONS(veh) != VEH_INTERACTIONS(proto))) {
+		while ((interact = VEH_INTERACTIONS(veh))) {
+			VEH_INTERACTIONS(veh) = interact->next;
+			free(interact);
+		}
+	}
+	if (VEH_SPAWNS(veh) && (!proto || VEH_SPAWNS(veh) != VEH_SPAWNS(proto))) {
+		while ((spawn = VEH_SPAWNS(veh))) {
+			VEH_SPAWNS(veh) = spawn->next;
+			free(spawn);
+		}
 	}
 	
 	// pointers
@@ -1506,11 +1551,15 @@ void free_vehicle(vehicle_data *veh) {
 * @param any_vnum vnum The vehicle vnum
 */
 void parse_vehicle(FILE *fl, any_vnum vnum) {
+	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
+	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
-	char line[256], error[256], str_in[256];
+	char line[256], error[256], str_in[256], str_in2[256];
+	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
-	int int_in[4];
+	double dbl_in;
+	int int_in[7];
 	
 	CREATE(veh, vehicle_data, 1);
 	clear_vehicle(veh);
@@ -1533,10 +1582,20 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_LOOK_DESC(veh) = fread_string(fl, error);
 	VEH_ICON(veh) = fread_string(fl, error);
 	
-	// line 6: flags move_type maxhealth capacity animals_required
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
-		log("SYSERR: Format error in line 6 of %s", error);
+	// line 6: flags move_type maxhealth capacity animals_required functions fame military
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
+	}
+	if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
+		strcpy(str_in2, "0");	// backwards-compatible: functions
+		int_in[4] = 0;	// fame
+		int_in[5] = 0;	// military
+		
+		if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
+			log("SYSERR: Format error in line 6 of %s", error);
+			exit(1);
+		}
 	}
 	
 	VEH_FLAGS(veh) = asciiflag_conv(str_in);
@@ -1544,6 +1603,9 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh) = int_in[1];
 	VEH_CAPACITY(veh) = int_in[2];
 	VEH_ANIMALS_REQUIRED(veh) = int_in[3];
+	VEH_FUNCTIONS(veh) = asciiflag_conv(str_in2);
+	VEH_FAME(veh) = int_in[4];
+	VEH_MILITARY(veh) = int_in[5];
 	
 	// optionals
 	for (;;) {
@@ -1573,7 +1635,30 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				VEH_DESIGNATE_FLAGS(veh) = asciiflag_conv(str_in);
 				break;
 			}
+			case 'E': {	// extra descs
+				parse_extra_desc(fl, &VEH_EX_DESCS(veh), error);
+				break;
+			}
+			case 'I': {	// interaction item
+				parse_interaction(line, &VEH_INTERACTIONS(veh), error);
+				break;
+			}
+			
+			case 'M': {	// mob spawn
+				if (!get_line(fl, line) || sscanf(line, "%d %lf %s", &int_in[0], &dbl_in, str_in) != 3) {
+					log("SYSERR: Format error in M line of %s", error);
+					exit(1);
+				}
 				
+				CREATE(spawn, struct spawn_info, 1);
+				spawn->vnum = int_in[0];
+				spawn->percent = dbl_in;
+				spawn->flags = asciiflag_conv(str_in);
+				
+				LL_APPEND(VEH_SPAWNS(veh), spawn);
+				break;
+			}
+			
 			case 'P': { // speed bonuses (default is VSPEED_NORMAL, set above in clear_vehicle(veh)
 				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
 					log("SYSERR: Format error in P line of %s", error);
@@ -1634,10 +1719,13 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
+	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
+	void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
-	char temp[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	struct spawn_info *spawn;
 	
 	if (!fl || !veh) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_vehicle_to_file called without %s", !fl ? "file" : "vehicle");
@@ -1655,9 +1743,10 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s~\n", temp);
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 6. flags move_type maxhealth capacity animals_required
+	// 6. flags move_type maxhealth capacity animals_required functions fame military
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
-	fprintf(fl, "%s %d %d %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh));
+	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
+	fprintf(fl, "%s %d %d %d %d %s %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh));
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -1671,7 +1760,18 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 		fprintf(fl, "D\n%d %d %s\n", VEH_INTERIOR_ROOM_VNUM(veh), VEH_MAX_ROOMS(veh), temp);
 	}
 	
-	// P: speed bonuses
+	// 'E': extra descs
+	write_extra_descs_to_file(fl, VEH_EX_DESCS(veh));
+	
+	// I: interactions
+	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));
+	
+	// 'M': mob spawns
+	LL_FOREACH(VEH_SPAWNS(veh), spawn) {
+		fprintf(fl, "M\n%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
+	}
+	
+	// 'P': speed bonuses
 	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
 	
 	// 'R': resources
@@ -2086,9 +2186,13 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 *
 * @param descriptor_data *desc The descriptor who is saving.
 */
-void save_olc_vehicle(descriptor_data *desc) {	
+void save_olc_vehicle(descriptor_data *desc) {
+	void prune_extra_descs(struct extra_descr_data **list);
+	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	struct interaction_item *interact;
+	struct spawn_info *spawn;
 	bitvector_t old_flags;
 	UT_hash_handle hh;
 
@@ -2121,6 +2225,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 		VEH_ICON(veh) = NULL;
 	}
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+	prune_extra_descs(&VEH_EX_DESCS(veh));
 	
 	// update live vehicles
 	LL_FOREACH(vehicle_list, iter) {
@@ -2189,6 +2294,15 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_YEARLY_MAINTENANCE(proto)) {
 		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
 	}
+	while ((interact = VEH_INTERACTIONS(proto))) {
+		VEH_INTERACTIONS(proto) = interact->next;
+		free(interact);
+	}
+	while ((spawn = VEH_SPAWNS(proto))) {
+		VEH_SPAWNS(proto) = spawn->next;
+		free(spawn);
+	}
+	free_extra_descs(&VEH_EX_DESCS(proto));
 	free(proto->attributes);
 	
 	// free old script?
@@ -2214,6 +2328,8 @@ void save_olc_vehicle(descriptor_data *desc) {
 * @return vehicle_data* The copied vehicle.
 */
 vehicle_data *setup_olc_vehicle(vehicle_data *input) {
+	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
+	
 	vehicle_data *new;
 	
 	CREATE(new, vehicle_data, 1);
@@ -2236,6 +2352,9 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		
 		// copy lists
 		VEH_YEARLY_MAINTENANCE(new) = copy_resource_list(VEH_YEARLY_MAINTENANCE(input));
+		VEH_EX_DESCS(new) = copy_extra_descs(VEH_EX_DESCS(input));
+		VEH_INTERACTIONS(new) = copy_interaction_list(VEH_INTERACTIONS(input));
+		VEH_SPAWNS(new) = copy_spawn_list(VEH_SPAWNS(input));
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
@@ -2267,10 +2386,12 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 * @param vehicle_data *veh The vehicle to display.
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
+	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	extern char *get_room_name(room_data *room, bool color);
 	void script_stat (char_data *ch, struct script_data *sc);
+	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 	
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	obj_data *obj;
 	size_t size;
 	int found;
@@ -2288,14 +2409,22 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s", VEH_LOOK_DESC(veh));
 	}
 	
+	if (VEH_EX_DESCS(veh)) {
+		struct extra_descr_data *desc;
+		size += snprintf(buf + size, sizeof(buf) - size, "Extra descs:\tc");
+		LL_FOREACH(VEH_EX_DESCS(veh), desc) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %s", desc->keyword);
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "\t0\r\n");
+	}
+	
 	if (VEH_ICON(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s\t0 %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
 	}
 	
+	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	
-	// speed info
-	size += snprintf(buf + size, sizeof(buf) - size, "Speed: [\ty%s\t0]\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Speed: [\ty%s\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -2304,6 +2433,16 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	sprintbit(VEH_FUNCTIONS(veh), function_flags, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Functions: \tc%s\t0\r\n", part);
+	
+	if (VEH_INTERACTIONS(veh)) {
+		send_to_char("Interactions:\r\n", ch);
+		get_interaction_display(VEH_INTERACTIONS(veh), part);
+		strcat(buf, part);
+		size += strlen(part);
+	}
 	
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
 		get_resource_display(VEH_YEARLY_MAINTENANCE(veh), part);
@@ -2350,6 +2489,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	send_to_char(buf, ch);
+	show_spawn_summary_to_char(ch, VEH_SPAWNS(veh));
 	
 	// script info
 	msg_to_char(ch, "Script information:\r\n");
@@ -2414,10 +2554,14 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 * @param char_data *ch The person who is editing a vehicle and will see its display.
 */
 void olc_show_vehicle(char_data *ch) {
+	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
+	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct spawn_info *spawn;
+	int count;
 	
 	if (!veh) {
 		return;
@@ -2459,6 +2603,24 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh));
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh));
+	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
+	
+	sprintbit(VEH_FUNCTIONS(veh), function_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
+	
+	// exdesc
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
+	if (VEH_EX_DESCS(veh)) {
+		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf);
+		strcat(buf, lbuf);
+	}
+
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(VEH_INTERACTIONS(veh)));
+	if (VEH_INTERACTIONS(veh)) {
+		get_interaction_display(VEH_INTERACTIONS(veh), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(VEH_YEARLY_MAINTENANCE(veh)));
@@ -2472,6 +2634,16 @@ void olc_show_vehicle(char_data *ch) {
 	if (veh->proto_script) {
 		get_script_display(veh->proto_script, lbuf);
 		strcat(buf, lbuf);
+	}
+	
+	// spawns
+	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(VEH_SPAWNS(veh)));
+	if (VEH_SPAWNS(veh)) {
+		count = 0;
+		LL_FOREACH(VEH_SPAWNS(veh), spawn) {
+			++count;
+		}
+		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
 	}
 	
 	page_string(ch->desc, buf, TRUE);
@@ -2514,6 +2686,7 @@ OLC_MODULE(vedit_capacity) {
 }
 
 OLC_MODULE(vedit_speed) {
+	// TODO: move this into alphabetic order on some future major version
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_SPEED_BONUSES(veh) = olc_process_type(ch, argument, "speed", "speed", vehicle_speed_types, VEH_SPEED_BONUSES(veh));
 }
@@ -2525,15 +2698,33 @@ OLC_MODULE(vedit_designate) {
 }
 
 
+OLC_MODULE(vedit_extra_desc) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_extra_desc(ch, argument, &VEH_EX_DESCS(veh));
+}
+
+
 OLC_MODULE(vedit_extrarooms) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MAX_ROOMS(veh) = olc_process_number(ch, argument, "max rooms", "maxrooms", 0, 1000, VEH_MAX_ROOMS(veh));
 }
 
 
+OLC_MODULE(vedit_fame) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_FAME(veh) = olc_process_number(ch, argument, "fame", "fame", -1000, 1000, VEH_FAME(veh));
+}
+
+
 OLC_MODULE(vedit_flags) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_FLAGS(veh) = olc_process_flag(ch, argument, "vehicle", "flags", vehicle_flags, VEH_FLAGS(veh));
+}
+
+
+OLC_MODULE(vedit_functions) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_FUNCTIONS(veh) = olc_process_flag(ch, argument, "function", "functions", function_flags, VEH_FUNCTIONS(veh));
 }
 
 
@@ -2562,6 +2753,12 @@ OLC_MODULE(vedit_icon) {
 		olc_process_string(ch, argument, "icon", &VEH_ICON(veh));
 		msg_to_char(ch, "\t0");	// in case color is unterminated
 	}
+}
+
+
+OLC_MODULE(vedit_interaction) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_interactions(ch, argument, &VEH_INTERACTIONS(veh), TYPE_ROOM);
 }
 
 
@@ -2624,6 +2821,12 @@ OLC_MODULE(vedit_maxlevel) {
 }
 
 
+OLC_MODULE(vedit_military) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_MILITARY(veh) = olc_process_number(ch, argument, "military", "military", 0, 1000, VEH_MILITARY(veh));
+}
+
+
 OLC_MODULE(vedit_minlevel) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MIN_SCALE_LEVEL(veh) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, VEH_MIN_SCALE_LEVEL(veh));
@@ -2652,4 +2855,10 @@ OLC_MODULE(vedit_script) {
 OLC_MODULE(vedit_shortdescription) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_string(ch, argument, "short description", &VEH_SHORT_DESC(veh));
+}
+
+
+OLC_MODULE(vedit_spawns) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_spawns(ch, argument, &VEH_SPAWNS(veh));
 }

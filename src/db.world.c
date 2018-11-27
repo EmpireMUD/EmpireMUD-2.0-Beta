@@ -729,9 +729,10 @@ void finish_trench(room_data *room) {
 * requirements.
 *
 * @param room_data *room The room to choose a mine type for.
-* @param char_data *ch The character setting up mine data (for abilities).
+* @param char_data *ch Optional: The character setting up mine data (for abilities).
+* @param empire_data *emp Optional: The empire/owner (for techs).
 */
-void init_mine(room_data *room, char_data *ch) {
+void init_mine(room_data *room, char_data *ch, empire_data *emp) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	struct global_data *glb, *next_glb, *choose_last, *found;
@@ -758,7 +759,7 @@ void init_mine(room_data *room, char_data *ch) {
 		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
 			continue;
 		}
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!emp || EMPIRE_HAS_TECH(emp, TECH_RARE_METALS)) && (!ch || !GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
 			continue;	// missing rare metals
 		}
 		
@@ -827,7 +828,7 @@ void init_mine(room_data *room, char_data *ch) {
 		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(found));
 		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE)));
 		
-		if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
+		if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (emp && EMPIRE_HAS_TECH(emp, TECH_DEEP_MINES)) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
 			multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
 		}
@@ -1158,7 +1159,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	}
 	
 	// clean mine data from anything that's not currently a mine
-	if (!room || !HAS_FUNCTION(room, FNC_MINE)) {
+	if (!room || !room_has_function_and_city_ok(room, FNC_MINE)) {
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
@@ -2137,19 +2138,19 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	
 	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
-	if (room_has_function_and_city_ok(room, FNC_APIARY)) {
+	if (HAS_FUNCTION(room, FNC_APIARY)) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_APIARIES] += amt;
 		}
 	}
-	if (room_has_function_and_city_ok(room, FNC_GLASSBLOWER)) {
+	if (HAS_FUNCTION(room, FNC_GLASSBLOWER)) {
 		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_GLASSBLOWING] += amt;
 		}
 	}
-	if (room_has_function_and_city_ok(room, FNC_DOCKS)) {
+	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_SEAPORT] += amt;
@@ -2159,6 +2160,61 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room)) * amt;
 	EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
+}
+
+
+/**
+* Tech/fame marker for vehicles. Call this after you finish a vehicle or
+* destroy it.
+*
+* Note: Vehicles inside of moving vehicles do not contribute tech or fame.
+*
+* @param vehicle_data *veh The vehicle to update.
+* @param bool add Adds the techs if TRUE, or removes them if FALSE.
+*/
+void adjust_vehicle_tech(vehicle_data *veh, bool add) {
+	int amt = add ? 1 : -1;	// adding or removing 1
+	struct empire_island *isle = NULL;
+	empire_data *emp = NULL;
+	room_data *room = NULL;
+	int island = NO_ISLAND;
+	
+	if (veh) {
+		emp = VEH_OWNER(veh);
+		room = IN_ROOM(veh);
+		island = GET_ISLAND_ID(room);
+	}
+	
+	// only care about
+	if (!emp || !veh || !VEH_IS_COMPLETE(veh) || !room) {
+		return;
+	}
+	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_DRIVING | VEH_SAILING | VEH_FLYING)) {
+		return;	// do NOT adjust tech if inside a moving vehicle
+	}
+	
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_APIARY)) {
+		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
+		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
+			isle->tech[TECH_APIARIES] += amt;
+		}
+	}
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_GLASSBLOWER)) {
+		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
+		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
+			isle->tech[TECH_GLASSBLOWING] += amt;
+		}
+	}
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
+		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
+		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
+			isle->tech[TECH_SEAPORT] += amt;
+		}
+	}
+	
+	// other traits from buildings?
+	EMPIRE_MILITARY(emp) += VEH_MILITARY(veh) * amt;
+	EMPIRE_FAME(emp) += VEH_FAME(veh) * amt;
 }
 
 
@@ -2362,6 +2418,7 @@ void reread_empire_tech(empire_data *emp) {
 	
 	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
+	vehicle_data *veh;
 	int sub;
 	
 	// nowork
@@ -2376,6 +2433,18 @@ void reread_empire_tech(empire_data *emp) {
 	// re-read both things
 	read_empire_members(emp, TRUE);
 	read_empire_territory(emp, TRUE);
+	
+	// also read vehicles for tech/etc
+	LL_FOREACH(vehicle_list, veh) {
+		if (emp && VEH_OWNER(veh) != emp) {
+			continue;	// only checking one
+		}
+		if (!VEH_OWNER(veh) || !VEH_IS_COMPLETE(veh)) {
+			continue;	// skip unowned/unfinished
+		}
+		
+		adjust_vehicle_tech(veh, TRUE);
+	}
 	
 	// special-handling for imm-only empires: give them all techs
 	HASH_ITER(hh, empire_table, iter, next_iter) {

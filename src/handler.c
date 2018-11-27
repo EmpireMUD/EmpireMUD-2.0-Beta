@@ -3439,6 +3439,31 @@ struct help_index_element *find_help_entry(int level, const char *word) {
 //// INTERACTION HANDLERS ////////////////////////////////////////////////////
 
 /**
+* Determines if an interaction is available in the room, from any source.
+*
+* @param room_data *room The location.
+* @param int type Any INTERACT_ const.
+* @return bool TRUE if you can, FALSE if not.
+*/ 
+bool can_interact_room(room_data *room, int type) {
+	vehicle_data *veh;
+	
+	if (SECT_CAN_INTERACT_ROOM(room, type) || BLD_CAN_INTERACT_ROOM(room, type) || RMT_CAN_INTERACT_ROOM(room, type) || CROP_CAN_INTERACT_ROOM(room, type)) {
+		return TRUE;	// simple
+	}
+	
+	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
+			return TRUE;
+		}
+	}
+	
+	// reached end
+	return FALSE;
+}
+
+
+/**
 * Compares an interaction's chances against an exclusion set. Interactions are
 * exclusive with other interactions that share an exclusion code, and the
 * chance rolls on exclusion sets are cumulative.
@@ -3688,10 +3713,43 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
 bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func)) {
-	bool success;
+	vehicle_data *veh;
 	crop_data *crop;
+	bool success;
+	int num;
+	
+	struct temp_veh_helper {
+		vehicle_data *veh;
+		struct temp_veh_helper *next;
+	} *list = NULL, *tvh, *next_tvh;
 	
 	success = FALSE;
+	
+	// first, build a list of vehicles that match this interaction type in the room
+	num = 0;
+	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
+			CREATE(tvh, struct temp_veh_helper, 1);
+			tvh->veh = veh;
+			
+			// attempt a semi-random order (randomly goes first or else last)
+			if (!number(0, num++) || !list) {
+				LL_PREPEND(list, tvh);
+			}
+			else {
+				LL_APPEND(list, tvh);
+			}
+		}
+	}
+	
+	// now, try vehicles in random order...
+	LL_FOREACH_SAFE(list, tvh, next_tvh) {
+		if (!success) {
+			success |= run_interactions(ch, VEH_INTERACTIONS(tvh->veh), type, room, NULL, NULL, func);
+		}
+		free(tvh);	// clean up
+	}
+	list = NULL;	// already empty
 	
 	// building first
 	if (!success && GET_BUILDING(room)) {
@@ -8341,6 +8399,7 @@ int get_number(char **name) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle(vehicle_data *veh) {
+	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void empty_vehicle(vehicle_data *veh);
 	void relocate_players(room_data *room, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
@@ -8351,6 +8410,10 @@ void extract_vehicle(vehicle_data *veh) {
 	if (veh == dg_owner_veh) {
 		dg_owner_purged = 1;
 		dg_owner_veh = NULL;
+	}
+	
+	if (VEH_OWNER(veh) && IN_ROOM(veh)) {
+		adjust_vehicle_tech(veh, FALSE);
 	}
 	
 	// delete interior

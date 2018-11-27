@@ -574,7 +574,7 @@ void start_chopping(char_data *ch) {
 static void start_digging(char_data *ch) {
 	int dig_base_timer = config_get_int("dig_base_timer");
 	
-	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
+	if (can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
 		start_action(ch, ACT_DIGGING, dig_base_timer);
 
 		send_to_char("You begin to dig into the ground.\r\n", ch);
@@ -646,7 +646,7 @@ void start_picking(char_data *ch) {
 * @param char_data *ch The player who is to quarry.
 */
 void start_quarrying(char_data *ch) {	
-	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) && IS_COMPLETE(IN_ROOM(ch))) {
+	if (can_interact_room(IN_ROOM(ch), INTERACT_QUARRY) && IS_COMPLETE(IN_ROOM(ch))) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
 			msg_to_char(ch, "There's not enough left to quarry here.\r\n");
 		}
@@ -1576,7 +1576,7 @@ void process_fishing(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!room || !CAN_INTERACT_ROOM(room, INTERACT_FISH) || !can_use_room(ch, room, MEMBERS_ONLY)) {
+	if (!room || !can_interact_room(room, INTERACT_FISH) || !can_use_room(ch, room, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You can no longer fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 		cancel_action(ch);
 		return;
@@ -1660,7 +1660,7 @@ void process_gathering(char_data *ch) {
 		else {
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, finish_gathering)) {
 				// check repeatability
-				if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_GATHER)) {
+				if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
 					GET_ACTION_TIMER(ch) = gather_base_timer;
 				}
 				else {
@@ -1964,7 +1964,7 @@ void process_panning(char_data *ch) {
 		msg_to_char(ch, "It's too dark to pan here.\r\n");
 		cancel_action(ch);
 	}
-	else if (!room || !CAN_INTERACT_ROOM(room, INTERACT_PAN) || !can_use_room(ch, room, MEMBERS_ONLY)) {
+	else if (!room || !can_interact_room(room, INTERACT_PAN) || !can_use_room(ch, room, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You can no longer pan %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 		cancel_action(ch);
 	}
@@ -2037,7 +2037,7 @@ void process_picking(char_data *ch) {
 				gain_ability_exp(ch, ABIL_SCAVENGING, 10);
 				found = TRUE;
 			}
-			else if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
+			else if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
 				// only orchards allow pick -- and only run this if we hit no herbs at all
 				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking_crop)) {
 					gain_ability_exp(ch, ABIL_SCAVENGING, 10);
@@ -2121,7 +2121,7 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	void init_mine(room_data *room, char_data *ch);
+	void init_mine(room_data *room, char_data *ch, empire_data *emp);
 		
 	// simple decrement
 	GET_ACTION_TIMER(ch) -= 1;
@@ -2147,7 +2147,7 @@ void process_prospecting(char_data *ch) {
 		}
 		case 0: {
 			GET_ACTION(ch) = ACT_NONE;
-			init_mine(IN_ROOM(ch), ch);
+			init_mine(IN_ROOM(ch), ch, GET_LOYALTY(ch));
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE, GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING);
 			
 			show_prospect_result(ch, IN_ROOM(ch));
@@ -2166,7 +2166,7 @@ void process_prospecting(char_data *ch) {
 void process_quarrying(char_data *ch) {
 	room_data *in_room;
 	
-	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) || !IS_COMPLETE(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
+	if (!can_interact_room(IN_ROOM(ch), INTERACT_QUARRY) || !IS_COMPLETE(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
 		msg_to_char(ch, "You can't quarry anything here.\r\n");
 		cancel_action(ch);
 		return;
@@ -2647,7 +2647,7 @@ ACMD(do_dig) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
+	else if (!can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
 		send_to_char("You can't dig here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -2841,7 +2841,7 @@ ACMD(do_gather) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_GATHER)) {
+	else if (!can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
 		send_to_char("You can't really gather anything useful here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -2922,7 +2922,7 @@ ACMD(do_mine) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -3036,7 +3036,7 @@ ACMD(do_pan) {
 	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't pan in that direction.\r\n");
 	}
-	else if (!CAN_INTERACT_ROOM(room, INTERACT_PAN)) {
+	else if (!can_interact_room(room, INTERACT_PAN)) {
 		msg_to_char(ch, "You can't pan for anything %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
 	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
@@ -3246,7 +3246,7 @@ ACMD(do_quarry) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
+	else if (!can_interact_room(IN_ROOM(ch), INTERACT_QUARRY)) {
 		send_to_char("You can't quarry here.\r\n", ch);
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -3279,7 +3279,7 @@ ACMD(do_saw) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW)) {
 		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {

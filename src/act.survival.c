@@ -428,7 +428,7 @@ void do_mount_swap(char_data *ch, char *argument) {
 	char_data *proto;
 	int number;
 	
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
+	if (!has_ability(ch, ABIL_STABLEMASTER) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You can only swap mounts in a stable unless you have the Stablemaster ability.\r\n");
 		return;
 	}
@@ -623,7 +623,7 @@ ACMD(do_fish) {
 	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't fish in that direction.\r\n");
 	}
-	else if (!CAN_INTERACT_ROOM(room, INTERACT_FISH)) {
+	else if (!can_interact_room(room, INTERACT_FISH)) {
 		msg_to_char(ch, "You can't fish for anything %s!\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
 	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
@@ -676,7 +676,7 @@ ACMD(do_forage) {
 		return;
 	}
 	
-	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_FORAGE)) {
+	if (!can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
 		msg_to_char(ch, "There's nothing you can forage for here.\r\n");
 		return;
 	}

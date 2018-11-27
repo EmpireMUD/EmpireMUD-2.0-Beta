@@ -72,11 +72,11 @@ const char *interlink_codes[11] = { "AX", "RB",	"UN", "DD", "WZ", "FG", "VI", "Q
 * @param room_data *room The location to set up.
 */
 void special_building_setup(char_data *ch, room_data *room) {
-	void init_mine(room_data *room, char_data *ch);
+	void init_mine(room_data *room, char_data *ch, empire_data *emp);
 		
 	// mine data
-	if (HAS_FUNCTION(room, FNC_MINE)) {
-		init_mine(room, ch);
+	if (room_has_function_and_city_ok(room, FNC_MINE)) {
+		init_mine(room, ch, ROOM_OWNER(room) ? ROOM_OWNER(room) : (ch ? GET_LOYALTY(ch) : NULL));
 	}
 }
 
@@ -1409,10 +1409,10 @@ ACMD(do_build) {
 	construct_building(IN_ROOM(ch), GET_CRAFT_BUILD_TYPE(type));
 	set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 	
+	special_building_setup(ch, IN_ROOM(ch));
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
 	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
 	GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
-	special_building_setup(ch, IN_ROOM(ch));
 	
 	// can_claim checks total available land, but the outside is check done within this block
 	if (!ROOM_OWNER(IN_ROOM(ch)) && can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {

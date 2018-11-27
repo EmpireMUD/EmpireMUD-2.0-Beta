@@ -457,20 +457,26 @@ OLC_MODULE(tedit_types);
 OLC_MODULE(vedit_animalsrequired);
 OLC_MODULE(vedit_capacity);
 OLC_MODULE(vedit_designate);
+OLC_MODULE(vedit_extra_desc);
 OLC_MODULE(vedit_extrarooms);
+OLC_MODULE(vedit_fame);
 OLC_MODULE(vedit_flags);
+OLC_MODULE(vedit_functions);
 OLC_MODULE(vedit_hitpoints);
 OLC_MODULE(vedit_icon);
+OLC_MODULE(vedit_interaction);
 OLC_MODULE(vedit_interiorroom);
 OLC_MODULE(vedit_keywords);
 OLC_MODULE(vedit_longdescription);
 OLC_MODULE(vedit_lookdescription);
 OLC_MODULE(vedit_maxlevel);
+OLC_MODULE(vedit_military);
 OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
 OLC_MODULE(vedit_resource);
 OLC_MODULE(vedit_script);
 OLC_MODULE(vedit_shortdescription);
+OLC_MODULE(vedit_spawns);
 OLC_MODULE(vedit_speed);
 
 
@@ -1020,20 +1026,26 @@ const struct olc_command_data olc_data[] = {
 	{ "animalsrequired", vedit_animalsrequired, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "capacity", vedit_capacity, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "designate", vedit_designate, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "extra", vedit_extra_desc, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "extrarooms", vedit_extrarooms, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "fame", vedit_fame, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "flags", vedit_flags, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "functions", vedit_functions, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "interaction", vedit_interaction, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "interiorroom", vedit_interiorroom, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "keywords", vedit_keywords, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "longdescription", vedit_longdescription, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "lookdescription", vedit_lookdescription, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "maxlevel", vedit_maxlevel, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "military", vedit_military, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "minlevel", vedit_minlevel, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "spawns", vedit_spawns, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "speed", vedit_speed, OLC_VEHICLE, OLC_CF_EDITOR },
 	
 	
@@ -6190,6 +6202,13 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					}
 					break;
 				}
+				case OLC_VEHICLE: {
+					vehicle_data *veh;
+					if ((veh = vehicle_proto(vnum))) {
+						copyfrom = VEH_INTERACTIONS(veh);
+					}
+					break;
+				}
 				default: {
 					msg_to_char(ch, "You can't copy interactions from %ss.\r\n", buf);
 					return;
@@ -6853,6 +6872,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 	char *flagarg, *tmp;
 	int loc, num, iter, count, findtype;
 	struct spawn_info *spawn, *change, *temp, *copyfrom = NULL;
+	vehicle_data *veh;
 	sector_data *sect;
 	any_vnum vnum;
 	double prc;
@@ -6899,6 +6919,12 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 				case OLC_SECTOR: {
 					if ((sect = sector_proto(vnum))) {
 						copyfrom = GET_SECT_SPAWNS(sect);
+					}
+					break;
+				}
+				case OLC_VEHICLE: {
+					if ((veh = vehicle_proto(vnum))) {
+						copyfrom = VEH_SPAWNS(veh);
 					}
 					break;
 				}

@@ -798,6 +798,10 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_LARGER_NEARBY  BIT(33)	// extends the radius of 'nearby'
 #define FNC_FISHING  BIT(34)	// workforce can fish here
 #define FNC_STORE_ALL BIT(35) // anything can be stored here (does not allow retrieval)
+#define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
+
+// These function flags don't work on movable vehicles (they require room data)
+#define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2311,6 +2315,9 @@ typedef struct vehicle_data vehicle_data;
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
 #define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE)
+
+// The following vehicle flags indicate a vehicle can move
+#define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -5067,6 +5074,12 @@ struct vehicle_attribute_data {
 	bitvector_t designate_flags;	// DES_ flags
 	struct resource_data *yearly_maintenance;
 	int veh_move_speed;  // VSPEED_ for driving action speed
+	struct extra_descr_data *ex_description;	// extra descriptions
+	struct interaction_item *interactions;	// interaction items
+	struct spawn_info *spawns;	// linked list of spawn data
+	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
+	int fame;	// how much fame it adds to the empire
+	int military;	// how much it adds to the military pool
 };
 
 

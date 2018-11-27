@@ -1774,7 +1774,7 @@ tokens on the mob itself, if it is only loaded as an artisan:
 
 You can use the "none" argument to this command in order to remove the artisan.
 
-See also: OLC BUILDINGS, MEDIT NAMESET, VNUM
+See also: OLC BUILDINGS, OLC VEHICLES, MEDIT NAMESET, VNUM
 #d
 "BEDIT CITIZENS"
 
@@ -1862,16 +1862,16 @@ Available designate flags:
 
 See also: OLC BUILDINGS
 #d
-"BEDIT FAME"
+"BEDIT FAME" "VEDIT FAME"
 
 Usage:  .fame <amount>
 
-This number is added to an empire's fame for each instance of this building
-they own.
+This number is added to an empire's fame for each instance of this building or
+vehicle they own.
 
 You can set negative fame to penalize empires for certain buildings.
 
-Most buildings should have 0 fame, unless they are monuments.
+Most buildings and vehicles should have 0 fame, unless they are monuments.
 
 See also: OLC BUILDINGS
 #d
@@ -1924,12 +1924,13 @@ Available flags:
 
 See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
 #d
-"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "FUNCTION FLAGS"
+"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "VEDIT FUNCTIONS" "FUNCTION FLAGS"
 
 Usage:  .flags [add | remove] <flags>
 
 The function flags determine what chores, actions, and other tasks happen at
-that building or room template.
+that building or room template. For vehicles, it applies to people in the same
+room as the vehicle.
 
 Available functions:
  ALCHEMIST - can brew and mix here
@@ -1943,10 +1944,10 @@ Available functions:
  GLASSBLOWER - grants the Glassblowing tech to the empire
  GUARD-TOWER - hostile toward enemy players, at range
  HENGE - allows Chant of Druids
- LIBRARY - can write and store books here
+ &rLIBRARY*&0 - can write and store books here
  MAIL - players can send mail here
  MILL - can use the mill command here
- MINE - can be mined for ore resources
+ &rMINE*&0 - can be mined for ore resources
  MINT - functions as a mint
  PORTAL - functions as a portal building
  POTTER - pottery craft time is reduced here
@@ -1958,8 +1959,8 @@ Available functions:
  SUMMON-PLAYER - allows the summon player command
  TAILOR - counts as tailor; can use refashion here
  TANNERY - allows tanning here
- TAVERN - functions as a tavern (don't set this on the same building as DRINK)
- TOMB - players can re-spawn here after dying
+ &rTAVERN*&0 - functions as a tavern (don't set this on the same building as DRINK)
+ &rTOMB*&0 - players can re-spawn here after dying
  TRADING-POST - access to global trade, e.g. a trading post
  VAULT - stores coins, can use the warehouse command for privileged storage
  WAREHOUSE - can use the warehouse command and store unique items
@@ -1968,8 +1969,12 @@ Available functions:
  LARGER-NEARBY - extends the radius of 'nearby'
  FISHING - workforce can fish here (also need fish interaction)
  STORE-ALL - any regular storable item can be stored (but not retrieved)
+ &yIN-CITY-ONLY&0 - all function flags only work when in a city
+ 
+&r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
+buildings and stationary vehicles.
 
-See also: OLC BUILDINGS, OLC ROOM TEMPLATES
+See also: OLC BUILDINGS, OLC ROOM TEMPLATES, OLC VEHICLES
 #d
 "BEDIT HITPOINTS" "BEDIT HEALTH"
 
@@ -2022,14 +2027,14 @@ Examples:
 
 See also: COLOR, OLC BUILDINGS
 #d
-"BEDIT MILITARY"
+"BEDIT MILITARY" "VEDIT MILITARY"
 
 Usage:  .military <number>
 
 This property adds to the military total of the empire that owns it. However,
 the military value of an empire is not used for anything at the moment.
 
-See also:  OLC BUILDINGS
+See also: OLC BUILDINGS, OLC VEHICLES
 #d
 "BEDIT NAME"
 
@@ -2101,7 +2106,7 @@ NOTE: If players add bedrooms to a building, it will spawn additional citizens.
 
 See also: BEDIT DESIGNATE, OLC BUILDINGS
 #d
-"BEDIT SPAWNS" "CROPEDIT SPAWNS" "SECTEDIT SPAWNS"
+"BEDIT SPAWNS" "CROPEDIT SPAWNS" "SECTEDIT SPAWNS" "VEDIT SPAWNS"
 
 Usage:  .spawns add <mob vnum> <percent> [flags]
         .spawns copy <from type> <from vnum>
@@ -2111,7 +2116,8 @@ Usage:  .spawns add <mob vnum> <percent> [flags]
 
 This lets you control how mobs spawn in a given location. Mobs only spawn if
 there aren't too many other mobs present, and only if they meet the percent
-and flag requirements of their spawn info.
+and flag requirements of their spawn info. Vehicles spawn mobs in the room that
+contains the vehicle (not the interior of the vehicle).
 
 You can set any percent between .01 and 100. This is the chance the mob will
 be loaded each time the room is checked for spawns, which is usually every few
@@ -3704,7 +3710,7 @@ To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all mobs with the "Dismissable"
 trigger, use ".t search 9901".
 #d
-"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" INTERACTIONS
+"MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" "VEDIT INTERACTION" INTERACTIONS
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
         .interaction change <number> <field> <value>
@@ -3715,7 +3721,8 @@ Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
 This command adds or removes an interaction. These are objects or mobs that are
 generated by certain commands. Some are only used on mobs, while others are
 only used on rooms. You can copy interactions from other mobs, buildings,
-rooms, sectors, and crops -- this may save you time if many are the same.
+rooms, sectors, crops, and vehicles -- this may save you time if many are the
+same.
 
 Mob interaction types:
  BUTCHER - Items received when the Butcher ability is used.
@@ -3737,7 +3744,7 @@ Object interaction types:
  TAN - Items you get when tanning this item (skin -> leather).
  CHIP - What you get for chipping at the item.
 
-Room interaction types:
+Room/vehicle interaction types:
  DIG - Items received when using the dig action.
  FORAGE - Items received when using the Forage ability.
  FIND-HERB - Items found when picking, if the user has Find Herbs.
@@ -3773,7 +3780,7 @@ Example of possible multiple results from shear:
  2. SHEAR: 1x some wool 50.00%
  3. SHEAR: 1x some wool 5.00%
 
-See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS
+See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES
 #d
 "MEDIT KEYWORDS"
 
@@ -4592,7 +4599,7 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT MISSILESPEED, OEDIT WEAPONTYPE, OLC OBJECTS
 #d
-"OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS"
+"OEDIT EXTRA" "OEDIT EXTRA DESCRIPTIONS" "BEDIT EXTRA" "BEDIT EXTRA DESCRIPTIONS" "REDIT EXTRA" "REDIT EXTRA DESCRIPTIONS" "VEDIT EXTRA" "VEDIT EXTRA DESCRIPTIONS"
 
 Usage:  .extra add <keywords>
         .extra change <number> <description | keywords> [value]

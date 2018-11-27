@@ -54,6 +54,7 @@ extern const char *trade_mostleast[];
 extern const char *trade_overunder[];
 
 // external funcs
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern bool can_claim(char_data *ch);
 void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
@@ -1431,7 +1432,7 @@ bool check_in_city_requirement(room_data *room, bool check_wait) {
 	room_data *home = HOME_ROOM(room);
 	bool junk;
 	
-	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY)) {
+	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !HAS_FUNCTION(room, FNC_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY) && !HAS_FUNCTION(home, FNC_IN_CITY_ONLY)) {
 		return TRUE;
 	}
 	if (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), check_wait, &junk) == TER_CITY) {
@@ -3060,6 +3061,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
 			et_lose_vehicle(emp, VEH_VNUM(veh));
+			adjust_vehicle_tech(veh, FALSE);
 		}
 	}
 }
@@ -3444,6 +3446,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
 			et_gain_vehicle(emp, VEH_VNUM(veh));
+			adjust_vehicle_tech(veh, TRUE);
 		}
 	}
 }
@@ -3618,7 +3621,7 @@ ACMD(do_deposit) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't deposit anything.\r\n");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only deposit coins in a vault.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -5204,7 +5207,7 @@ ACMD(do_tavern) {
 		}
 	}
 	
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAVERN)) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
@@ -5295,7 +5298,7 @@ ACMD(do_tomb) {
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}
-		else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB)) {
+		else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "You can't make this place your tomb!\r\n");
 		}
 		else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -6776,7 +6779,7 @@ ACMD(do_withdraw) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't withdraw anything.\r\n");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only withdraw coins in a vault.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {

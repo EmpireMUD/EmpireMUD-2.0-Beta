@@ -3392,7 +3392,7 @@ void b5_47_mine_update(void) {
 	
 	// clear mines
 	LL_FOREACH(land_map, tile) {
-		if (!(room = real_real_room(tile->vnum)) || !HAS_FUNCTION(room, FNC_MINE)) {
+		if (!(room = real_real_room(tile->vnum)) || !room_has_function_and_city_ok(room, FNC_MINE)) {
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);

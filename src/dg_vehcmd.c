@@ -38,6 +38,7 @@ extern const char *dirs[];
 extern struct instance_data *quest_instance_global;
 
 // external functions
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void die(char_data *ch, char_data *killer);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
@@ -822,8 +823,10 @@ VCMD(do_vteleport) {
 			}
 		}
 		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
+			adjust_vehicle_tech(v, FALSE);
 			vehicle_from_room(v);
 			vehicle_to_room(v, target);
+			adjust_vehicle_tech(v, FALSE);
 			entry_vtrigger(v);
 		}
 		else {

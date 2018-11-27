@@ -977,15 +977,12 @@ void olc_show_building(char_data *ch) {
 
 	if (!is_room) {
 		sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MAX_DAMAGE(bdg), 1), GET_BLD_MAX_DAMAGE(bdg));
-		sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_FAME(bdg), 0), GET_BLD_FAME(bdg));
 		sprintf(buf + strlen(buf), "<%srooms\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_EXTRA_ROOMS(bdg), 0), GET_BLD_EXTRA_ROOMS(bdg));
 	}
-	
+
+	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_FAME(bdg), 0), GET_BLD_FAME(bdg));	
 	sprintf(buf + strlen(buf), "<%scitizens\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_CITIZENS(bdg), 0), GET_BLD_CITIZENS(bdg));
-	
-	if (!is_room) {
-		sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
-	}
+	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
 	
 	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg)));
 	
@@ -1048,9 +1045,9 @@ void olc_show_building(char_data *ch) {
 
 
 /**
-* Displays the interactions data from a given list.
+* Displays the relationship data from a given list.
 *
-* @param struct interaction_item *list Pointer to the start of a list of interactions.
+* @param struct bld_relation *list Pointer to the start of a list of relations.
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer) {
@@ -1169,13 +1166,7 @@ OLC_MODULE(bedit_extrarooms) {
 
 OLC_MODULE(bedit_fame) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	
-	if (IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM)) {
-		msg_to_char(ch, "You can't set that on a ROOM.\r\n");
-	}
-	else {
-		GET_BLD_FAME(bdg) = olc_process_number(ch, argument, "fame", "fame", -1000, 1000, GET_BLD_FAME(bdg));
-	}
+	GET_BLD_FAME(bdg) = olc_process_number(ch, argument, "fame", "fame", -1000, 1000, GET_BLD_FAME(bdg));
 }
 
 
@@ -1230,13 +1221,7 @@ OLC_MODULE(bedit_interaction) {
 
 OLC_MODULE(bedit_military) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	
-	if (IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM)) {
-		msg_to_char(ch, "You can't set that on a ROOM.\r\n");
-	}
-	else {
-		GET_BLD_MILITARY(bdg) = olc_process_number(ch, argument, "military", "military", 0, 1000, GET_BLD_MILITARY(bdg));
-	}
+	GET_BLD_MILITARY(bdg) = olc_process_number(ch, argument, "military", "military", 0, 1000, GET_BLD_MILITARY(bdg));
 }
 
 
