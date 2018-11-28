@@ -201,7 +201,7 @@ INTERACTION_FUNC(pickpocket_interact) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, get_approximate_level(inter_mob));
 		obj_to_char(obj, ch);
-		act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR);
+		act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		load_otrigger(obj);
 	}
 		
@@ -1148,10 +1148,14 @@ ACMD(do_pickpocket) {
 			
 			// messaging
 			if (coins > 0) {
-				msg_to_char(ch, "You find %s!\r\n", money_amount(vict_emp, coins));
+				if (ch->desc) {
+					stack_msg_to_desc(ch->desc, "You find %s!\r\n", money_amount(vict_emp, coins));
+				}
 			}
 			else if (!any) {
-				msg_to_char(ch, "You find nothing of any use.\r\n");
+				if (ch->desc) {
+					stack_msg_to_desc(ch->desc, "You find nothing of any use.\r\n");
+				}
 			}
 		}
 		else {
