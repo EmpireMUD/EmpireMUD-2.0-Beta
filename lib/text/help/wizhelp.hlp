@@ -956,7 +956,8 @@ grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
 learned        PC      MISC         Turns learned recipes on/off
-minipet        PC      MISC         Turns minipets on/off
+minipet        PC      MISC         Adds/removes minipets
+mount          PC      MISC         Adds/removes mounts
 access         PC      NUMBER       Player's immortal access level
 loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
@@ -1038,6 +1039,16 @@ This lets you give (or revoke) collectable mini-pets.
 WARNING: This works on ANY mob vnum.
 
 See also: MINIPET
+#d
+"SET MOUNT"
+
+Usage:  set [file] <player> mount <mob vnum> <on | off>
+
+This lets you give (or revoke) a mount.
+
+WARNING: This works on ANY mob vnum.
+
+See also: SHOW MOUNTS
 #d
 SHOW
 

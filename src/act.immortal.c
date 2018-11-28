@@ -1331,6 +1331,7 @@ struct set_struct {
 		{ "faction", LVL_START_IMM, PC, MISC },
 		{ "learned", LVL_START_IMM, PC, MISC },
 		{ "minipet", LVL_START_IMM, PC, MISC },
+		{ "mount", LVL_START_IMM, PC, MISC },
 		{ "currency", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1894,6 +1895,46 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_minipet(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: removed mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
+		}
+	}
+	else if SET_CASE("mount") {
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		struct mount_data *mentry;
+		char_data *mount;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> mount <mob vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(mount = mob_proto(atoi(vnum_arg)))) {
+			msg_to_char(ch, "Invalid mob vnum.\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			if (find_mount_data(vict, GET_MOB_VNUM(mount))) {
+				msg_to_char(ch, "%s already has that mount.\r\n", GET_NAME(vict));
+				return 0;
+			}
+			add_mount(vict, GET_MOB_VNUM(mount), get_mount_flags_by_mob(mount));
+			sprintf(output, "%s: gained mount %d %s.", GET_NAME(vict), GET_MOB_VNUM(mount), GET_SHORT_DESC(mount));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			if ((mentry = find_mount_data(vict, GET_MOB_VNUM(mount)))) {
+				HASH_DEL(GET_MOUNT_LIST(vict), mentry);
+				free(mentry);
+				sprintf(output, "%s: removed mount %d %s.", GET_NAME(vict), GET_MOB_VNUM(mount), GET_SHORT_DESC(mount));
+			}
+			else {
+				msg_to_char(ch, "%s does not have that mount.\r\n", GET_NAME(vict));
+				return 0;
+			}
 		}
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
