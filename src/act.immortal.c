@@ -2620,11 +2620,12 @@ SHOW(show_rent) {
 
 SHOW(show_stats) {
 	void update_account_stats();
-	extern int buf_switches, buf_largecount, buf_overflows;
+	extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
 	extern int total_accounts, active_accounts, active_accounts_week;
+	extern struct help_index_element *help_table;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
-	int num_trigs = 0, num_goals = 0, num_rewards = 0;
+	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0;
 	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
@@ -2632,6 +2633,7 @@ SHOW(show_stats) {
 	char_data *vict;
 	trig_data *trig;
 	obj_data *obj;
+	int iter;
 	
 	// count descriptors at menus
 	for (desc = descriptor_list; desc; desc = desc->next) {
@@ -2679,6 +2681,20 @@ SHOW(show_stats) {
 		}
 	}
 	
+	// count helps
+	for (iter = 0; iter <= top_of_helpt; ++iter) {
+		if (help_table[iter].duplicate) {
+			continue;
+		}
+		
+		if (help_table[iter].level > LVL_MORTAL) {
+			++num_imm_helps;
+		}
+		else {
+			++num_mort_helps;
+		}
+	}
+	
 	update_account_stats();
 
 	msg_to_char(ch, "Current stats:\r\n");
@@ -2702,6 +2718,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
 	msg_to_char(ch, "  %6d progress goals   %6d progress rewards\r\n", num_goals, num_rewards);
 	msg_to_char(ch, "  %6d shops\r\n", HASH_COUNT(shop_table));
+	msg_to_char(ch, "  %6d mortal helpfiles %6d immortal helpfiles\r\n", num_mort_helps, num_imm_helps);
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
 }
