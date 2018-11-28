@@ -3837,6 +3837,69 @@ SHOW(show_minipets) {
 }
 
 
+SHOW(show_mounts) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct mount_data *mount, *next_mount;
+	char_data *mob, *plr = NULL;
+	size_t size, count;
+	bool file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show mounts <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Mounts matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Mounts for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_MOUNT_LIST(plr), mount, next_mount) {
+			if (!(mob = mob_proto(mount->vnum))) {
+				continue;	// no mob?
+			}
+			if (*argument && !multi_isname(argument, GET_PC_NAME(mob))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_workforce) {
 	void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 	
@@ -8344,6 +8407,7 @@ ACMD(do_show) {
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 		{ "data", LVL_CIMPL, show_data },
 		{ "minipets", LVL_START_IMM, show_minipets },
+		{ "mounts", LVL_START_IMM, show_mounts },
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },
