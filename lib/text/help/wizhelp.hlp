@@ -190,18 +190,6 @@ DC is also useful for disconnecting people who are stuck in character creation.
 
 See also: GRANT, USERS
 #d
-DISTANCE
-
-Usage:  distance <location>
-
-This computes the map distance between your current location and any target.
-You can target players, coordinates, or anything else you could target with
-commands like 'goto'.
-
-The mortal version of this is 'mark'.
-
-See also: MARK
-#d
 ECHO GECHO SEND /ECHO
 
 Usage:  echo <message>

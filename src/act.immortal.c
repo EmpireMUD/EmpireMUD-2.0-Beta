@@ -6536,6 +6536,12 @@ ACMD(do_distance) {
 	if (!*arg) {
 		msg_to_char(ch, "Measure distance to where?\r\n");
 	}
+	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
+		msg_to_char(ch, "You don't know how to navigate.\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && (!isdigit(*arg) || !strchr(arg, ','))) {
+		msg_to_char(ch, "You can only find distances to coordinates.\r\n");
+	}
 	else if (!(target = find_target_room(ch, arg))) {
 		msg_to_char(ch, "Unknown target.\r\n");
 	}
