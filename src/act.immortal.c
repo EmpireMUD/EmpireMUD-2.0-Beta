@@ -6526,6 +6526,7 @@ ACMD(do_dc) {
 }
 
 
+// do_directions
 ACMD(do_distance) {
 	char arg[MAX_INPUT_LENGTH];
 	room_data *target;
@@ -6533,11 +6534,11 @@ ACMD(do_distance) {
 	
 	one_word(argument, arg);
 	
-	if (!*arg) {
-		msg_to_char(ch, "Measure distance to where?\r\n");
-	}
-	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
 		msg_to_char(ch, "You don't know how to navigate.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Get the direction and distance to where?\r\n");
 	}
 	else if (!IS_IMMORTAL(ch) && (!isdigit(*arg) || !strchr(arg, ','))) {
 		msg_to_char(ch, "You can only find distances to coordinates.\r\n");
@@ -6548,7 +6549,7 @@ ACMD(do_distance) {
 	else {	
 		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), target));
 		dist = compute_distance(IN_ROOM(ch), target);
-		msg_to_char(ch, "Distance to (%d, %d): %d tile%s %s.\r\n", X_COORD(target), Y_COORD(target), dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]));
+		msg_to_char(ch, "(%d, %d) is %d tile%s %s.\r\n", X_COORD(target), Y_COORD(target), dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]));
 	}
 }
 
