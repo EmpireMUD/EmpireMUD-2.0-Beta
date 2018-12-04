@@ -562,6 +562,19 @@ destination island must have docks to receive the ship.
 
 See also: SHIPPING
 #
+DISTANCE DIRECTIONS
+
+Usage:  distance <location>
+        directions <location>
+
+This computes the map distance between your current location and any target
+as well as the direction to go to get there (in a straight line).
+
+Immortals can target players, vehicles, coordinates, or anything else. Mortals
+can only get the distance to a pair of coordinates.
+
+See also: MARK
+#
 DOUSE BURNING "PUT OUT FIRE" FIRE-BRIGADE "FIRE BRIGADE"
 
 Usage:  douse [vehicle | light]

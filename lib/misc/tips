@@ -114,6 +114,7 @@ The 'meters' command will show you how much damage you're dealing/taking.
 You can find out where to store an item by identifying it. Items without regular storage may go in the warehouse.
 Some recipes use generic components, which look like (lumber). Many different types of lumber can be used for this.
 You can morph faster, at an additional cost, by typing 'fastmorph'.
+The 'distance' command tells you the distance to any coordinates.
 Forests will regrow faster if they have more forest tiles around them.
 Type 'estats' to get quick info about your empire, or another.
 If you don't maintain your buildings, they will fall into ruin.
@@ -147,4 +148,5 @@ Type 'climb' to move onto mountains, or 'toggle autoclimb' to remove the need to
 Type 'swim' to move into water, or 'toggle autoswim' to remove the need to do this.
 Use 'mapscan' to locate islands across the sea.
 Use 'run' to set a path and move quickly. You can 'toggle travel-look' to stop seeing rooms while running.
+Try the 'directions' command to figure out how to get to a set of coordinates.
 $~

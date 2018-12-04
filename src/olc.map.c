@@ -107,6 +107,7 @@ OLC_MODULE(mapedit_build) {
 
 
 OLC_MODULE(mapedit_decay) {
+	void annual_update_depletions(struct depletion_data **list);	// db.world.c
 	void annual_update_map_tile(struct map_data *tile);	// db.world.c
 	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
@@ -117,6 +118,7 @@ OLC_MODULE(mapedit_decay) {
 	else {
 		msg_to_char(ch, "Ok.\r\n");
 		annual_update_map_tile(&(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]));
+		annual_update_depletions(&(SHARED_DATA(room)->depletion));
 	}
 }
 

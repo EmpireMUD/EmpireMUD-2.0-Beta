@@ -190,18 +190,6 @@ DC is also useful for disconnecting people who are stuck in character creation.
 
 See also: GRANT, USERS
 #d
-DISTANCE
-
-Usage:  distance <location>
-
-This computes the map distance between your current location and any target.
-You can target players, coordinates, or anything else you could target with
-commands like 'goto'.
-
-The mortal version of this is 'mark'.
-
-See also: MARK
-#d
 ECHO GECHO SEND /ECHO
 
 Usage:  echo <message>
@@ -956,7 +944,8 @@ grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
 learned        PC      MISC         Turns learned recipes on/off
-minipet        PC      MISC         Turns minipets on/off
+minipet        PC      MISC         Adds/removes minipets
+mount          PC      MISC         Adds/removes mounts
 access         PC      NUMBER       Player's immortal access level
 loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
@@ -1039,6 +1028,16 @@ WARNING: This works on ANY mob vnum.
 
 See also: MINIPET
 #d
+"SET MOUNT"
+
+Usage:  set [file] <player> mount <mob vnum> <on | off>
+
+This lets you give (or revoke) a mount.
+
+WARNING: This works on ANY mob vnum.
+
+See also: SHOW MOUNTS
+#d
 SHOW
 
 Usage:  show <mode> [argument]
@@ -1061,6 +1060,7 @@ ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 learned    Immort   Shows you learned recipes.
 minipets   Immort   Shows you mini-pets collected by a player.
+mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
@@ -1171,6 +1171,14 @@ Usage:  show minipets <player> [search phrase]
 Shows you mini-pets collected by a player.
 
 See also: SET MINIPET
+#e
+"SHOW MOUNTS"
+
+Usage:  show mounts <player> [search phrase]
+
+Shows you mounts owned by a player.
+
+See also: SET MOUNT
 #e
 "SHOW NOTES"
 

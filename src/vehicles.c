@@ -1497,21 +1497,6 @@ void free_vehicle(vehicle_data *veh) {
 	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 		free(VEH_ICON(veh));
 	}
-	if (VEH_EX_DESCS(veh) && (!proto || VEH_EX_DESCS(veh) != VEH_EX_DESCS(proto))) {
-		free_extra_descs(&VEH_EX_DESCS(veh));
-	}
-	if (VEH_INTERACTIONS(veh) && (!proto || VEH_INTERACTIONS(veh) != VEH_INTERACTIONS(proto))) {
-		while ((interact = VEH_INTERACTIONS(veh))) {
-			VEH_INTERACTIONS(veh) = interact->next;
-			free(interact);
-		}
-	}
-	if (VEH_SPAWNS(veh) && (!proto || VEH_SPAWNS(veh) != VEH_SPAWNS(proto))) {
-		while ((spawn = VEH_SPAWNS(veh))) {
-			VEH_SPAWNS(veh) = spawn->next;
-			free(spawn);
-		}
-	}
 	
 	// pointers
 	if (VEH_NEEDS_RESOURCES(veh)) {
@@ -1535,6 +1520,21 @@ void free_vehicle(vehicle_data *veh) {
 	if (veh->attributes && (!proto || veh->attributes != proto->attributes)) {
 		if (VEH_YEARLY_MAINTENANCE(veh)) {
 			free_resource_list(VEH_YEARLY_MAINTENANCE(veh));
+		}
+		if (VEH_EX_DESCS(veh)) {
+			free_extra_descs(&VEH_EX_DESCS(veh));
+		}
+		if (VEH_INTERACTIONS(veh)) {
+			while ((interact = VEH_INTERACTIONS(veh))) {
+				VEH_INTERACTIONS(veh) = interact->next;
+				free(interact);
+			}
+		}
+		if (VEH_SPAWNS(veh)) {
+			while ((spawn = VEH_SPAWNS(veh))) {
+				VEH_SPAWNS(veh) = spawn->next;
+				free(spawn);
+			}
 		}
 		
 		free(veh->attributes);

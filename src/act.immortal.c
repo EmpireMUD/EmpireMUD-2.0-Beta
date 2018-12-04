@@ -1331,6 +1331,7 @@ struct set_struct {
 		{ "faction", LVL_START_IMM, PC, MISC },
 		{ "learned", LVL_START_IMM, PC, MISC },
 		{ "minipet", LVL_START_IMM, PC, MISC },
+		{ "mount", LVL_START_IMM, PC, MISC },
 		{ "currency", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1894,6 +1895,46 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_minipet(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: removed mini-pet %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
+		}
+	}
+	else if SET_CASE("mount") {
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		struct mount_data *mentry;
+		char_data *mount;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> mount <mob vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(mount = mob_proto(atoi(vnum_arg)))) {
+			msg_to_char(ch, "Invalid mob vnum.\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			if (find_mount_data(vict, GET_MOB_VNUM(mount))) {
+				msg_to_char(ch, "%s already has that mount.\r\n", GET_NAME(vict));
+				return 0;
+			}
+			add_mount(vict, GET_MOB_VNUM(mount), get_mount_flags_by_mob(mount));
+			sprintf(output, "%s: gained mount %d %s.", GET_NAME(vict), GET_MOB_VNUM(mount), GET_SHORT_DESC(mount));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			if ((mentry = find_mount_data(vict, GET_MOB_VNUM(mount)))) {
+				HASH_DEL(GET_MOUNT_LIST(vict), mentry);
+				free(mentry);
+				sprintf(output, "%s: removed mount %d %s.", GET_NAME(vict), GET_MOB_VNUM(mount), GET_SHORT_DESC(mount));
+			}
+			else {
+				msg_to_char(ch, "%s does not have that mount.\r\n", GET_NAME(vict));
+				return 0;
+			}
 		}
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
@@ -2620,11 +2661,12 @@ SHOW(show_rent) {
 
 SHOW(show_stats) {
 	void update_account_stats();
-	extern int buf_switches, buf_largecount, buf_overflows;
+	extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
 	extern int total_accounts, active_accounts, active_accounts_week;
+	extern struct help_index_element *help_table;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
-	int num_trigs = 0, num_goals = 0, num_rewards = 0;
+	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0;
 	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
@@ -2632,6 +2674,7 @@ SHOW(show_stats) {
 	char_data *vict;
 	trig_data *trig;
 	obj_data *obj;
+	int iter;
 	
 	// count descriptors at menus
 	for (desc = descriptor_list; desc; desc = desc->next) {
@@ -2679,6 +2722,20 @@ SHOW(show_stats) {
 		}
 	}
 	
+	// count helps
+	for (iter = 0; iter <= top_of_helpt; ++iter) {
+		if (help_table[iter].duplicate) {
+			continue;
+		}
+		
+		if (help_table[iter].level > LVL_MORTAL) {
+			++num_imm_helps;
+		}
+		else {
+			++num_mort_helps;
+		}
+	}
+	
 	update_account_stats();
 
 	msg_to_char(ch, "Current stats:\r\n");
@@ -2702,6 +2759,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
 	msg_to_char(ch, "  %6d progress goals   %6d progress rewards\r\n", num_goals, num_rewards);
 	msg_to_char(ch, "  %6d shops\r\n", HASH_COUNT(shop_table));
+	msg_to_char(ch, "  %6d mortal helpfiles %6d immortal helpfiles\r\n", num_mort_helps, num_imm_helps);
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
 }
@@ -3784,6 +3842,69 @@ SHOW(show_minipets) {
 		count = 0;
 		HASH_ITER(hh, GET_MINIPETS(plr), mini, next_mini) {
 			if (!(mob = mob_proto(mini->vnum))) {
+				continue;	// no mob?
+			}
+			if (*argument && !multi_isname(argument, GET_PC_NAME(mob))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
+SHOW(show_mounts) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct mount_data *mount, *next_mount;
+	char_data *mob, *plr = NULL;
+	size_t size, count;
+	bool file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show mounts <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Mounts matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Mounts for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_MOUNT_LIST(plr), mount, next_mount) {
+			if (!(mob = mob_proto(mount->vnum))) {
 				continue;	// no mob?
 			}
 			if (*argument && !multi_isname(argument, GET_PC_NAME(mob))) {
@@ -6405,6 +6526,7 @@ ACMD(do_dc) {
 }
 
 
+// do_directions
 ACMD(do_distance) {
 	char arg[MAX_INPUT_LENGTH];
 	room_data *target;
@@ -6412,8 +6534,14 @@ ACMD(do_distance) {
 	
 	one_word(argument, arg);
 	
-	if (!*arg) {
-		msg_to_char(ch, "Measure distance to where?\r\n");
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
+		msg_to_char(ch, "You don't know how to navigate.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Get the direction and distance to where?\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && (!isdigit(*arg) || !strchr(arg, ','))) {
+		msg_to_char(ch, "You can only find distances to coordinates.\r\n");
 	}
 	else if (!(target = find_target_room(ch, arg))) {
 		msg_to_char(ch, "Unknown target.\r\n");
@@ -6421,7 +6549,7 @@ ACMD(do_distance) {
 	else {	
 		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), target));
 		dist = compute_distance(IN_ROOM(ch), target);
-		msg_to_char(ch, "Distance to (%d, %d): %d tile%s %s.\r\n", X_COORD(target), Y_COORD(target), dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]));
+		msg_to_char(ch, "(%d, %d) is %d tile%s %s.\r\n", X_COORD(target), Y_COORD(target), dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]));
 	}
 }
 
@@ -8327,6 +8455,7 @@ ACMD(do_show) {
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 		{ "data", LVL_CIMPL, show_data },
 		{ "minipets", LVL_START_IMM, show_minipets },
+		{ "mounts", LVL_START_IMM, show_mounts },
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },

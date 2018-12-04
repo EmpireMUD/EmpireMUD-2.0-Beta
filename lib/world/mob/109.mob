@@ -293,8 +293,8 @@ fact, it has a tree slung over its shoulder like a club.
 I 4 10973 100.00 1  # LOOT: a giant wooden club
 I 4 10968 60.00 1 a  # LOOT: a giant gold coin
 I 4 10970 10.00 1 a  # LOOT: a golden harp
-I 4 10972 30.00 1 a  # LOOT: the giant's causeway schematic
-I 4 10974 12.50 1 b  # LOOT: the giant hovel schematic
+I 4 10969 30.00 1 a  # LOOT: a golden goose
+I 4 10972 12.50 1 b  # LOOT: the giant's causeway schematic
 I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
 M
 0
@@ -336,7 +336,7 @@ here.
 I 4 10973 100.00 1  # LOOT: a giant wooden club
 I 4 10968 60.00 1 a  # LOOT: a giant gold coin
 I 4 10970 10.00 1 a  # LOOT: a golden harp
-I 4 10972 30.00 1 a  # LOOT: the giant's causeway schematic
+I 4 10969 30.00 1 a  # LOOT: a golden goose
 I 4 10975 12.50 1 b  # LOOT: the giant stone head schematic
 I 4 10971 12.50 1 b  # LOOT: a giant ant whistle
 M
