@@ -471,7 +471,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		found = delete_mob_from_spawn_list(&VEH_SPAWNS(veh), vnum);
-		// found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_MOB, vnum);
+		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_MOB, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -559,11 +559,9 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			if (delete_mob_from_spawn_list(&VEH_SPAWNS(GET_OLC_VEHICLE(desc)), vnum)) {
 				msg_to_char(desc->character, "One of the mobs that spawns in the vehicle you're editing was deleted.\r\n");
 			}
-			/*
 			if (delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_MOB, vnum)) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the vehicle you're editing was deleted.\r\n");
 			}
-			*/
 		}
 	}
 	
@@ -1001,14 +999,12 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 				++found;
 			}
 		}
-		/*
 		for (inter = VEH_INTERACTIONS(veh); inter && !any; inter = inter->next) {
 			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 			}
 		}
-		*/
 		
 		if (any) {
 			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
