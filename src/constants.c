@@ -3678,6 +3678,7 @@ const char *fill_words[] = {
 	"at",
 	"to",
 	"into",
+	"of",
 	"\n"
 };
 
