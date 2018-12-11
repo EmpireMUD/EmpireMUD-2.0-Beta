@@ -1964,7 +1964,9 @@ bool is_multiword_abbrev(const char *arg, const char *phrase) {
 		strcpy(phrasecpy, phrase);
 		strcpy(argcpy, arg);
 		
-		argptr = any_one_arg(argcpy, argword);
+		do {		// skip fill words like "of" so "bunch of apples" also matches "bunch apples"
+			argptr = any_one_arg(argcpy, argword);
+		} while (fill_word(argword));
 		phraseptr = any_one_arg(phrasecpy, phraseword);
 		
 		ok = TRUE;
@@ -1972,7 +1974,9 @@ bool is_multiword_abbrev(const char *arg, const char *phrase) {
 			if (!is_abbrev(argword, phraseword)) {
 				ok = FALSE;
 			}
-			argptr = any_one_arg(argptr, argword);
+			do {	// skip fill words
+				argptr = any_one_arg(argptr, argword);
+			} while (fill_word(argword));
 			phraseptr = any_one_arg(phraseptr, phraseword);
 		}
 		
@@ -3791,15 +3795,19 @@ bool multi_isname(const char *arg, const char *namelist) {
 	}
 	
 	strcpy(argcpy, arg);
-	ptr = any_one_arg(argcpy, argword);
+	ptr = argcpy;
+	do {
+		ptr = any_one_arg(ptr, argword);
+	} while (fill_word(argword));
 	
 	ok = TRUE;
 	while (*argword && ok) {
 		if (!isname(argword, namelist)) {
 			ok = FALSE;
 		}
-		
-		ptr = any_one_arg(ptr, argword);
+		do {	// skip fill words like "of" so "bunch of apples" also matches "bunch apples"	
+			ptr = any_one_arg(ptr, argword);
+		} while (fill_word(argword));
 	}
 	
 	return ok;
