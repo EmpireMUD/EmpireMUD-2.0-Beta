@@ -477,7 +477,6 @@ C
 dig~
 F
 f
-I 5 100 9.00 1 X  # DIG: a rock
 I 5 101 100.00 1 X  # DIG: a lump of clay
 R
 1000 1 5 0

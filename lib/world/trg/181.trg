@@ -136,7 +136,7 @@ Goblin camp cleanup~
 2 e 100
 ~
 * Replace the camp with plains
-%terraform% %room% 0
+%terraform% %room% 36
 ~
 #18106
 Goblin camp despawn timer~
