@@ -1718,7 +1718,7 @@ int sort_progress_by_data(progress_data *a, progress_data *b) {
 		return PRG_FLAGGED(a, PRG_SCRIPT_ONLY) ? 1 : -1;
 	}
 	else {
-		return str_cmp(PRG_NAME(a), PRG_NAME(b));
+		return str_cmp(NULLSAFE(PRG_NAME(a)), NULLSAFE(PRG_NAME(b)));
 	}
 }
 
