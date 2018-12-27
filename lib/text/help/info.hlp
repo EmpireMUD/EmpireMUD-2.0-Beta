@@ -877,6 +877,9 @@ This command allows you to find out which oceans and islands lie in a given
 direction from your current location. Use this ability if you are lost at sea
 (or on land).
 
+When used on land, mapscan will also show you the first vision-blocking terrain
+in that direction. Usually this is a mountain range.
+
 Mapscan only checks every 5 tiles up to 70, then every 10 tiles up to its
 maximum distance, which is based on the size of the world map.
 
