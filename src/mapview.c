@@ -2217,7 +2217,7 @@ ACMD(do_mapscan) {
 			if (show_obscured && ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION)) {
 				// we will show the first obscuring tile on the same island
 				
-				msg_to_char(ch, " %d %s: %s\r\n", dist, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]), last_isle == NO_ISLAND ? "The Ocean" : get_room_name(to_room, FALSE));
+				msg_to_char(ch, " %d %s: %s\r\n", dist, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]), last_isle == NO_ISLAND ? "The Ocean" : GET_SECT_NAME(SECT(to_room)));
 				any = TRUE;
 				show_obscured = FALSE;
 				// don't continue -- fall through (but will likely hit the next continue for: same isle)
