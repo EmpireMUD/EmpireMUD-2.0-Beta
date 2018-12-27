@@ -2214,7 +2214,7 @@ ACMD(do_mapscan) {
 			if (!(to_room = real_shift(use_room, shift_dir[dir][0] * dist, shift_dir[dir][1] * dist))) {
 				break;
 			}
-			if (!show_obscured && ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION)) {
+			if (show_obscured && ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION)) {
 				// we will show the first obscuring tile on the same island
 				
 				msg_to_char(ch, " %d %s: %s\r\n", dist, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]), last_isle == NO_ISLAND ? "The Ocean" : get_room_name(to_room, FALSE));
