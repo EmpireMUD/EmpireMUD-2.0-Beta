@@ -2178,7 +2178,7 @@ ACMD(do_mapscan) {
 	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
 	int dir, dist, last_isle;
 	room_data *to_room;
-	bool any;
+	bool any, show_obscured;
 	
 	int max_dist = MIN(MAP_WIDTH, MAP_HEIGHT) / 2;
 	
@@ -2207,10 +2207,19 @@ ACMD(do_mapscan) {
 		
 		last_isle = GET_ISLAND_ID(use_room);
 		any = FALSE;
+		show_obscured = (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND) ? TRUE : FALSE;	// if they're on an island, we will look for a vision-obscuring tile
 		
-		for (dist = 1; dist <= max_dist; dist += (dist < 10 ? 1 : (dist < 70 ? 5 : 10))) {
+		for (dist = 1; dist <= max_dist; dist += ((show_obscured || dist < 10) ? 1 : (dist < 70 ? 5 : 10))) {
 			if (!(to_room = real_shift(use_room, shift_dir[dir][0] * dist, shift_dir[dir][1] * dist))) {
 				break;
+			}
+			if (show_obscured && ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION)) {
+				// we will show the first obscuring tile on the same island
+				
+				msg_to_char(ch, " %d %s: %s\r\n", dist, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]), last_isle == NO_ISLAND ? "The Ocean" : GET_SECT_NAME(SECT(to_room)));
+				any = TRUE;
+				show_obscured = FALSE;
+				// don't continue -- fall through (but will likely hit the next continue for: same isle)
 			}
 			if (GET_ISLAND_ID(to_room) == last_isle) {
 				continue;	// only look for changes
@@ -2218,6 +2227,7 @@ ACMD(do_mapscan) {
 			
 			// got this far?
 			last_isle = GET_ISLAND_ID(to_room);
+			show_obscured = FALSE;	// don't show an obscuring tile if we switched islands
 			msg_to_char(ch, " %d %s: %s\r\n", dist, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]), last_isle == NO_ISLAND ? "The Ocean" : get_island_name_for(last_isle, ch));
 			any = TRUE;
 		}
