@@ -4021,7 +4021,7 @@ ACMD(do_drink) {
 		send_to_char("You can't drink from that!\r\n", ch);
 		return;
 	}
-	if (!bind_ok(obj, ch)) {
+	if (obj && !bind_ok(obj, ch)) {
 		msg_to_char(ch, "You can't drink from an item that's bound to someone else.\r\n");
 		return;
 	}
