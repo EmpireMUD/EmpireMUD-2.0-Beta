@@ -1830,7 +1830,7 @@ ACMD(do_drive) {
 	int dir, dist = -1;
 	
 	skip_run_filler(&argument);
-	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word
+	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
 	
 	// basics
 	if (IS_NPC(ch)) {
@@ -1889,7 +1889,7 @@ ACMD(do_drive) {
 	else if (!*argument) {
 		msg_to_char(ch, "You must specify a path to %s using a combination of directions and distances.\r\n", drive_data[subcmd].command);
 	}
-	else if (dir_only && (dir = parse_direction(ch, argument)) == NO_DIR) {
+	else if (!strchr(argument, ' ') && (dir = parse_direction(ch, argument)) == NO_DIR) {
 		if ((portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 			do_drive_through_portal(ch, veh, portal, subcmd);
 		}
