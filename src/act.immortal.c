@@ -342,6 +342,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 
 #define ADMIN_UTIL(name)  void name(char_data *ch, char *argument)
 
+ADMIN_UTIL(util_approval);
 ADMIN_UTIL(util_b318_buildings);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
@@ -363,6 +364,7 @@ struct {
 	int level;
 	void (*func)(char_data *ch, char *argument);
 } admin_utils[] = {
+	{ "approval", LVL_CIMPL, util_approval },
 	{ "b318buildings", LVL_CIMPL, util_b318_buildings },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
@@ -395,6 +397,80 @@ ADMIN_UTIL(util_tool) {
 			}
 		}
 	}
+}
+
+
+/**
+* This utility converts player approval to/from "by account" or "by character".
+*/
+ADMIN_UTIL(util_approval) {
+	bool to_acc = FALSE, to_char = FALSE, save_acct = FALSE, loaded = FALSE;
+	account_data *acct, *next_acct;
+	struct account_player *plr;
+	char_data *pers;
+	
+	skip_spaces(&argument);
+	
+	// optional "by " account/character
+	if (!strn_cmp(argument, "by ", 3)) {
+		argument += 3;
+		skip_spaces(&argument);
+	}
+	if (is_abbrev(argument, "account")) {
+		to_acc = TRUE;
+	}
+	else if (is_abbrev(argument, "character")) {
+		to_char = TRUE;
+	}
+	else {
+		msg_to_char(ch, "Usage: util approval by <character | account>\r\n");
+		msg_to_char(ch, "This utility will change all existing approvals to be either by-whole-account or by-character.\r\n");
+		return;
+	}
+	
+	// check all accounts
+	HASH_ITER(hh, account_table, acct, next_acct) {
+		save_acct = FALSE;
+		
+		// check players on the account
+		for (plr = acct->players; plr; plr = plr->next) {
+			if (plr->player) {
+				if (to_acc && IS_SET(plr->player->plr_flags, PLR_APPROVED) && !IS_SET(acct->flags, ACCT_APPROVED)) {
+					// upgrade approval to account
+					SET_BIT(acct->flags, ACCT_APPROVED);
+					save_acct = TRUE;
+					break;	// converting to account: only requires 1 approved alt
+				}
+				else if (to_char && IS_SET(acct->flags, ACCT_APPROVED) && !IS_SET(plr->player->plr_flags, PLR_APPROVED)) {
+					// distribute account approval to characters
+					if ((pers = find_or_load_player(plr->name, &loaded))) {
+						REMOVE_BIT(PLR_FLAGS(pers), PLR_APPROVED);
+						if (loaded) {
+							store_loaded_char(pers);
+						}
+						else {
+							SAVE_CHAR(pers);
+						}
+					}
+					// no break in this one -- need to do all alts
+				}
+			}
+		}
+		
+		// shut off account-wide approval now?
+		if (to_char && IS_SET(acct->flags, ACCT_APPROVED)) {
+			REMOVE_BIT(acct->flags, ACCT_APPROVED);
+			save_acct = TRUE;
+		}
+		
+		// and save
+		if (save_acct) {
+			save_library_file_for_vnum(DB_BOOT_ACCT, acct->id);
+		}
+	}
+	
+	syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s changed existing approvals to be %s", GET_NAME(ch), to_acc ? "account-wide" : "by character, not account");
+	msg_to_char(ch, "All approvals are now %s.\r\n", to_acc ? "account-wide" : "by character, not account");
 }
 
 
