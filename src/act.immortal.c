@@ -444,7 +444,7 @@ ADMIN_UTIL(util_approval) {
 				else if (to_char && IS_SET(acct->flags, ACCT_APPROVED) && !IS_SET(plr->player->plr_flags, PLR_APPROVED)) {
 					// distribute account approval to characters
 					if ((pers = find_or_load_player(plr->name, &loaded))) {
-						REMOVE_BIT(PLR_FLAGS(pers), PLR_APPROVED);
+						SET_BIT(PLR_FLAGS(pers), PLR_APPROVED);
 						if (loaded) {
 							store_loaded_char(pers);
 						}
