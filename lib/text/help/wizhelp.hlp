@@ -41,6 +41,9 @@ This command is grantable.
 
 The command "config approval -v" will show the current configuration.
 
+You can also use 'util approval' to convert existing player approvals to/from
+"by account" or "by character".
+
 To see the mortal version of this help file, see: MORTAPPROVE
 
 See also: CONFIG, GRANT
