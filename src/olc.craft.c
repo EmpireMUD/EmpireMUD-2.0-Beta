@@ -231,7 +231,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	
 	// find players who are crafting it and stop them (BEFORE removing from table)
 	for (iter = character_list; iter; iter = iter->next) {
-		if (IS_NPC(ch)) {
+		if (IS_NPC(iter)) {
 			continue;
 		}
 		

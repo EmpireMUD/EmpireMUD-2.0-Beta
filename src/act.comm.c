@@ -158,6 +158,7 @@ int is_tell_ok(char_data *ch, char_data *vict) {
 	else if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && !IS_IMMORTAL(vict) && config_get_bool("tell_approval")) {
 		// can always tell immortals
 		send_config_msg(ch, "need_approval_string");
+		msg_to_char(ch, "You can only send tells to immortals.\r\n");
 	}
 	else if (PRF_FLAGGED(ch, PRF_NOTELL))
 		msg_to_char(ch, "You can't tell other people while you have notell on.\r\n");
