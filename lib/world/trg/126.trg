@@ -304,6 +304,40 @@ while %person%
   end
   set person %person.next_in_room%
 done
+* Ensure instance is scaled
+if %instance.level% < 1
+  set level 1
+  set person %self.room.people%
+  while %person%
+    if %person.is_pc%
+      if %person.level% > %level%
+        set level %person.level%
+      end
+    end
+    set person %person.next_in_room%
+  done
+  %scale% instance %level%
+end
+* Check if difficulty was not selected and select it now
+set oldroom %self.room%
+mgoto i12651
+set selector %self.room.contents(12652)%
+set result %selector.result%
+if %selector%
+  %echo% %selector.shortdesc% parts before you.
+  set newroom i12652
+  if !%result%
+    * global var not found
+    set result up
+  end
+  %door% %self.room% %result% room %newroom%
+  %load% obj 12653
+  %load% mob 12661
+  %load% mob 12661
+  %load% mob 12661
+  %purge% %selector%
+end
+mgoto %oldroom%
 ~
 #12652
 Grove difficulty selector~

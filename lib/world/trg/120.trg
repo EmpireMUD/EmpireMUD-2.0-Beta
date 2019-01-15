@@ -259,7 +259,7 @@ wait 2 sec
 %echo% %self.name% raises her axe over one shoulder in a two-handed grip...
 wait 3 sec
 if %self.aff_flagged(ENTANGLE)%
-  %echoaround% %actor% &r%self.name% hacks at you between attempts to free %self.himher%self from the entanglement!
+  %send% %actor% &r%self.name% hacks at you between attempts to free %self.himher%self from the entanglement!
   %echoaround% %actor% %self.name% hacks at %actor.name% between attempts to free %self.himher%self from the entanglement.
   %damage% %actor% 250 physical
   %dot% #12008 %actor% 150 30 physical
