@@ -620,8 +620,25 @@ ACMD(do_outrage) {
 		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim && (!found || GET_MOVE(ch) >= add_cost); victim = next_vict) {
 			next_vict = victim->next_in_room;
 			
-			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && skill_check(ch, ABIL_OUTRAGE, DIFF_MEDIUM) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
-				if (found) {
+			if (victim == ch) {
+				continue;	// self
+			}
+			if (!IS_NPC(ch) && !IS_NPC(victim)) {
+				continue;	// If used by a player, does not hit players
+			}
+			if (!CAN_SEE(ch, victim)) {
+				continue;	// can't see
+			}
+			if (is_fight_ally(ch, victim) || in_same_group(ch, victim)) {
+				continue;	// skip ally or grouped
+			}
+			if (!can_fight(ch, victim)) {
+				continue;	// illegal hit
+			}
+			
+			// ok seems valid...
+			if (skill_check(ch, ABIL_OUTRAGE, DIFF_MEDIUM)) {
+				if (found) {	// add cost if more than 1 victim (already found)
 					GET_MOVE(ch) -= add_cost;
 				}
 				
