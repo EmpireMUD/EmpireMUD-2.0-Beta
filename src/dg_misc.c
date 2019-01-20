@@ -747,6 +747,30 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 
 
 /**
+* Just checks if a trigger is attached to a given SCRIPT(*).
+*
+* @param struct script_data *sc The SCRIPT() from a char/obj/etc.
+* @param any_vnum vnum Which trigger to check for.
+* @return bool TRUE if the trigger is attached, FALSE if not.
+*/
+bool has_trigger(struct script_data *sc, any_vnum vnum) {
+	trig_data *trig;
+	
+	if (!sc) {	// no script data?
+		return FALSE;
+	}
+	LL_FOREACH(TRIGGERS(sc), trig) {
+		if (GET_TRIG_VNUM(trig) == vnum) {
+			return TRUE;	// found any 1 copy of it
+		}
+	}
+	
+	// not found
+	return FALSE;
+}
+
+
+/**
 * For the has_component and charge_component script functions. Both are
 * expected to look like:
 *   %actor.has_component(type, amount, <optional comma-separated flags>)%

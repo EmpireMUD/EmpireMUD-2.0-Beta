@@ -98,6 +98,7 @@ When using field  - The variable returns:
 &charness(mob)&0 - Harnesses a mob to the vehicle (or loads and harnesses one if
    you give a vnum instead of a mob).
 &chas_in(str)&0 - True if an object with a given name/vnum is inside.
+&chas_trigger(vnum)&0 - Has the specified trigger attached.
 &chealth&0 - Current health of the vehicle.
 &cid&0 - The id number of the vehicle.
 &cin_on&0 - "in" or "on" depending on how characters sit in/on the vehicle.
