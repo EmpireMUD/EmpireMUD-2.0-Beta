@@ -1241,10 +1241,10 @@ finish this quest at the Soulstream portal, or at any city center. Type 'coins'
 to see how many of the spirit tokens you have.
 ~
    Congratulations! You've completed enough Soulstream tutorials to earn a
-special companion! Take this spirit bell, and use it any time you want to
-summon your non-combat minipet.
+special companion! Use this spirit bell to add the 'companion spirit' to your
+minipet collection. Then you can type 'minipet companion spirit' to summon it.
 ~
-6 0 0 25 -1
+7 0 0 25 -1
 R
 2 10859 1
 W
