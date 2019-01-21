@@ -149,6 +149,7 @@ When using field - The variable returns:
 &ccan_build(FLAG)&0 - True if the room has the given build flags.
 &ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
+&ccontents(vnum)&0 - The id of the first obj in the room that has that vnum.
 &ccoords&0 - The (x, y) location of the room on the map.
 &ccrop&0 - The name of the crop on the map room, if any.
 &ccrop_vnum&0 - The vnum of the crop on the map room, if any.

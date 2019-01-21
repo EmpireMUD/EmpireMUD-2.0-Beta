@@ -266,7 +266,7 @@ wait 2 sec
 wait 2 sec
 %send% %actor% The shadows rip at your very soul!
 wait 2 sec
-%send% %actor% Feelings of terror was over you!
+%send% %actor% Feelings of terror wash over you!
 wait 2 sec
 %send% %actor% Your own shadow reaches up to strangle you!
 ~

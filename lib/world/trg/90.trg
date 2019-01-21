@@ -248,7 +248,7 @@ switch (%random.8%)
   break
   case 7
     if (%weather% != clear)
-      %echo% %self.name% shakes vigorously showering you with doggy scented drops of water.
+      %echo% %self.name% shakes vigorously showering you with doggy-scented drops of water.
     end
   break
   default
