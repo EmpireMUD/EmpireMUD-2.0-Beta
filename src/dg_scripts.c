@@ -3380,6 +3380,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "has_trigger")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", has_trigger(SCRIPT(c), atoi(subfield)));
+						}
+						else {
+							snprintf(str, slen, "0");	// no vnum provided
+						}
+					}
 					
 					else if (!str_cmp(field, "hisher"))
 						snprintf(str, slen, "%s", HSHR(c));
@@ -4133,6 +4141,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							snprintf(str, slen, "0");
 					}
+					else if (!str_cmp(field, "has_trigger")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", has_trigger(SCRIPT(o), atoi(subfield)));
+						}
+						else {
+							snprintf(str, slen, "0");	// no vnum provided
+						}
+					}
 					break;
 				}
 				case 'i': {	// obj.i*
@@ -4549,6 +4565,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'h': {	// room.h*
+					if (!str_cmp(field, "has_trigger")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", has_trigger(SCRIPT(r), atoi(subfield)));
+						}
+						else {
+							snprintf(str, slen, "0");	// no vnum provided
+						}
+					}
+					break;
+				}
 				case 'i': {	// room.i*
 					if (!str_cmp(field, "id")) {
 						if (r)
@@ -4882,6 +4909,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						
 						snprintf(str, slen, "%d", found ? 1 : 0);
+					}
+					else if (!str_cmp(field, "has_trigger")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", has_trigger(SCRIPT(v), atoi(subfield)));
+						}
+						else {
+							snprintf(str, slen, "0");	// no vnum provided
+						}
 					}
 					else if (!str_cmp(field, "health") || !str_cmp(field, "hitp")) {
 						snprintf(str, slen, "%d", (int) VEH_HEALTH(v));

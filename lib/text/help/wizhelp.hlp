@@ -373,7 +373,7 @@ GOTO TRANSFER
 Usage:  goto <location>
         transfer <victim|vehicle> [location]
 
-These commands are used to transports yourself and others to different rooms.
+These commands are used to transport yourself and others to different rooms.
 GOTO allows you to go to other rooms; TRANS transports a person (or vehicle)
 from wherever they are to the room you're in, or another location. The transfer
 command is grantable.

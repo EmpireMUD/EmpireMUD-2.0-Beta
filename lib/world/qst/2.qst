@@ -31,8 +31,8 @@ with clay, but the first one you should learn is the brick. To make a pile of
 bricks:
  1. You need the Basic Crafts ability (skill buy Basic Crafts).
     (If you don't have Trade 1, do some other tutorials first.)
- 2. You need a fire to harden the clay. If you already have a flint set and an
- axe, chop down a tree and light it on fire.
+ 2. You need a fire to harden the clay. If you already have some fire sticks and
+    an axe, chop down a tree and light it on fire.
  3. Type 'craft bricks'.
  Tip: You can make clay items faster by building a potter.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
@@ -40,7 +40,7 @@ bricks:
    Bricks are a common building material. Try typing 'recipe bricks' to see
 what you can make.
 ~
-1 h 0 15 -1
+2 h 0 15 -1
 A
 2 101
 R

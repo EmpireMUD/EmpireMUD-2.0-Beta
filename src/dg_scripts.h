@@ -345,6 +345,7 @@ extern struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
 
+extern bool has_trigger(struct script_data *sc, any_vnum vnum);
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
 room_data *dg_room_of_obj(obj_data *obj);

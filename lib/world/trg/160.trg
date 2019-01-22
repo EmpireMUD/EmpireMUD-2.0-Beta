@@ -221,6 +221,23 @@ mutant mounts die~
 ~
 %echo% As %self.name% dies, it crumbles and returned to the earth.
 ~
+#16011
+necrogoblin trigger reattach~
+0 h 100
+~
+if %self.fighting%
+  halt
+end
+if !%self.has_trigger(16001)%
+  attach 16001 %self.id%
+end
+if !%self.has_trigger(16002)%
+  attach 16002 %self.id%
+end
+if !%self.has_trigger(16003)%
+  attach 16003 %self.id%
+end
+~
 #16020
 no drop me~
 1 h 100
