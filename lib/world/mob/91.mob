@@ -79,6 +79,7 @@ A brightly colored macaw flies past you.
 10 20 djo m 1
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 T 9106
 T 9107
 S
@@ -254,6 +255,7 @@ A roadrunner dashes past you!
 1 5 dgjo c 1
 0 0 0 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
 #9124
 ostrich~
@@ -263,6 +265,7 @@ An ostrich ruffles its feathers and backs away from you.
 10 20 djo c 3
 0 0 0 11
 I 0 3200 100.00 2  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9125
@@ -353,6 +356,7 @@ A great-horned owl is surveying the ground.
 5 15 djo m 2
 0 0 2 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n hoots loudly.~
@@ -530,6 +534,7 @@ A bluebird is pecking at the ground.
 1 5 djo m 1
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n sings sweetly from a nearby tree.~
@@ -542,6 +547,7 @@ A small finch is perched here.
 1 5 djo m 1
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n sings sweetly from a nearby tree.~
@@ -554,6 +560,7 @@ A woodpecker is hammering away at a tree.
 1 5 djo m 1
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n hammers loudly at a nearby tree.~
@@ -572,6 +579,7 @@ A bird of paradise is displaying its feathers.
 10 20 djo m 1
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
 #9152
 bull~
@@ -661,6 +669,7 @@ A great heron is poking around for food.
 40 60 djo m 2
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
 #9160
 will wisp glowing~
@@ -767,12 +776,7 @@ A huge, spotted whale shark swims just below the surface.
 ~
 30 50 djloy 0 5
 0 0 6 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 9019 100.00 2  # BUTCHER: a slab of shark meat
 I 1 1354 50.00 1  # SKIN: a shark skin
 I 1 1354 50.00 1  # SKIN: a shark skin
 I 1 1354 50.00 1  # SKIN: a shark skin
@@ -791,12 +795,8 @@ A basking shark swims slowly, with its mouth wide open.
 ~
 30 50 djloy 0 5
 0 0 6 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 9019 50.00 1 s  # BUTCHER: a slab of shark meat
+I 0 9019 50.00 2 s  # BUTCHER: a slab of shark meat
 I 1 1354 50.00 1  # SKIN: a shark skin
 I 1 1354 50.00 1  # SKIN: a shark skin
 I 1 1354 50.00 1  # SKIN: a shark skin
@@ -816,6 +816,7 @@ A gannet dives out of the air and into the water.
 1 5 djo m 2
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
 #9171
 albatross bird~
@@ -825,6 +826,7 @@ An albatross is floating peacefully in the water.
 1 5 djo m 2
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
 #9172
 fox arctic~

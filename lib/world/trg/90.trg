@@ -16,40 +16,14 @@ else
 end
 ~
 #9001
-Wolf Animation~
-0 bw 3
+Wolf Pack~
+0 n 100
 ~
-* This script is no longer used. It was replaced by custom strings.
-* Wolf Animation (9001-9003)
-* Time of day is important, can't have wolves howling at the sun...
-if ((%time.hour% < 7) && (%time.hour% > 19))
-  * Can't have wolves howling at the rain clouds either...
-  if (%weather% == clear)
-    %echo% self.name points %self.hisher% muzzle toward the sky and howls.
-  end
-else
-  if (%self.name% == a snarling wolf)
-    %echo% %self.name% looks directly at you, opens %self.hisher% mouth to show %self.hisher% fangs, and growls deep in %self.hisher% chest as %self.hisher% hackles stand on end...
-  else
-    switch (%random.4%)
-      case 1
-        * scratch
-        %echo% %self.name% scratches %self.hisher% ear with a hind foot.
-      break
-      case 2
-        * roll
-        %echo% %self.name% rolls around, all four paws in the air, making odd snorting sounds.
-      break
-      case 3
-        * Yawn
-        %echo% %self.name% yawns, showing off an impressive set of gleaming white fangs.
-      break
-      default
-        %echo% %self.name% pants, with %self.hisher% tongue hanging out and tail gently wagging.
-      break
-    done
-  end
-end
+set num %random.2%
+while %num% > 0
+  eval num %num% - 1
+  %load% mob 9003 ally
+done
 ~
 #9002
 Herd Cats~

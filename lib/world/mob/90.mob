@@ -3,27 +3,40 @@ wolf snarling brown~
 a snarling wolf~
 A brown wolf snarls at you.
 ~
-20 40 djo c 3
+20 40 adjo c 3
 0 0 0 10
+D
+   The wolf lowers its head, pulls back its ears, and bares its teeth and gums
+as it snarls at you. Its eyes follow you as you circle around it, but it holds
+its ground.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 1 9001 75.00 1 s  # SKIN: a wolf fur
+I 1 1351 25.00 1 s  # SKIN: a large skin
 M
 0
 $n looks directly at you, opens $s mouth to show $s fangs, and growls deep in $s chest as $s hackles stand on end...~
 M
 0
 $n points $s muzzle toward the sky and howls.~
+T 9001
 S
 #9002
 wolf brown~
 a brown wolf~
 A brown wolf is sitting here.
 ~
-10 20 djo c 3
+10 20 adjo c 3
 0 0 0 10
+D
+   The wolf has a brown coat, though you recognize that it's actually a grey
+wolf. It keeps both eyes on you as it sniffs along the ground, looking for the
+scent of food.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 1 9001 50.00 1 s  # SKIN: a wolf fur
+I 1 1351 50.00 1 s  # SKIN: a large skin
 M
 0
 $n pants, with $s tongue hanging out and tail gently wagging.~
@@ -39,16 +52,23 @@ $n scratches $s ear with a hind foot.~
 M
 0
 $n points $s muzzle toward the sky and howls.~
+T 9001
 S
 #9003
 wolf small brown~
 a small wolf~
 A small, brown wolf is resting here.
 ~
-5 15 djo c 2
+5 15 abdjo c 2
 0 0 0 10
+D
+   The wolf looks younger, probably an adolescent learning to hunt with its
+parents. It seems timid until you approach, and then it pulls its ears back and
+bares its teeth.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 1 9001 25.00 1 s  # SKIN: a wolf fur
+I 1 1351 75.00 1 s  # SKIN: a large skin
 M
 0
 $n pants, with $s tongue hanging out and tail gently wagging.~
@@ -72,8 +92,11 @@ A fluffy sheep is frolicking around.
 ~
 5 15 djoy 0 3
 0 0 0 9
+D
+   The sheep nibbles at the ground, then springs its head upwards and frolicks
+in a circle around you.
+~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
 I 2 1358 100.00 1  # SHEAR: a bag of wool
 I 2 1358 50.00 1  # SHEAR: a bag of wool
 I 2 1358 5.00 1  # SHEAR: a bag of wool
@@ -94,6 +117,10 @@ A mountain goat is prancing about.
 ~
 10 20 djko 0 3
 0 0 0 11
+D
+   The mountain goat is large, with strong muscles and white fur. Its small
+hooves are perfect for climbing the steep, craggy mountainsides.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
@@ -104,8 +131,13 @@ A white-tailed deer is grazing here.
 ~
 10 20 djo 0 4
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The flecked brown deer strolls warily through the grass, keeping one eye on
+you as it slowly grazes.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9007 5.00 2 x  # BUTCHER: a fine deer antler
+I 0 9007 10.00 1 x  # BUTCHER: a fine deer antler
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9007
@@ -115,8 +147,12 @@ A large buck is standing here.
 ~
 10 20 djo 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+This proud deer holds its antlers high as it watches you walk past.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9007 50.00 2 x  # BUTCHER: a fine deer antler
+I 0 9007 25.00 1 x  # BUTCHER: a fine deer antler
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9008
@@ -126,6 +162,9 @@ A small squirrel sits on his haunches and stares at you.
 ~
 1 5 djko c 1
 0 0 0 9
+D
+This little red squirrel holds an acorn between its paws as it watches you.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 M
@@ -142,9 +181,10 @@ A hefty cow is grazing here.
 ~
 10 20 dfjoy 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+The cow doesn't seem interested in you.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 M
 0
 $n moos contentedly.~
@@ -162,7 +202,11 @@ A chicken is pecking at the ground.
 ~
 1 5 djo 0 1
 2 0 0 10
+D
+The chicken is pecking at the ground, ignoring you.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n clucks with contentment as $e preens $mself.~
@@ -183,7 +227,11 @@ A rooster is crowing at you.
 ~
 1 5 djo 0 1
 1 0 0 10
+D
+The rooster struts proudly around the yard.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n clucks with contentment as $e preens $mself.~
@@ -204,6 +252,9 @@ A large dog is lying in the sun.
 ~
 5 15 djoz c 2
 0 0 14 9
+D
+This old mutt seems happy just lying around.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 M
 0
@@ -237,6 +288,11 @@ A small prairie dog pokes its head out of the ground.
 ~
 1 5 djo 0 1
 0 0 0 9
+D
+   The fat little prairie dog stands up on its hind legs and looks at you
+warily. Its nose twitches as it catches your scent, but it doesn't move from
+its post.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 M
@@ -246,6 +302,48 @@ M
 0
 $n peeks out of $s hole.~
 S
+#9014
+sheep wild~
+a wild sheep~
+A wild sheep chews slowly as it looks at you.
+~
+10 20 djoy 0 3
+0 0 0 9
+D
+This wild sheep has short, course hair, totally unlike its domestic cousin.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+M
+0
+$n eats some grass.~
+M
+0
+$n baas contentedly.~
+M
+0
+$n chews $s cud.~
+S
+#9015
+wildcat cat~
+a wildcat~
+A wildcat is stalking through the grass.
+~
+5 15 djoz c 1
+0 0 0 10
+D
+Though it doesn't look so different from a tabby, this is clearly no housecat.
+~
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+M
+0
+$n crouches low and lowers its ears.~
+M
+0
+$n hisses at you.~
+T 9002
+S
 #9016
 tiger hungry~
 a tiger~
@@ -253,9 +351,13 @@ A hungry tiger is crouched low to the ground!
 ~
 75 100 cdjoz c 3
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1353 100.00 1  # SKIN: a big cat pelt
+D
+   The huge tiger is crouched low, perhaps hoping its bright orange fur and
+black stripes camouflage it against the green vegetation. Be careful! It looks
+hungry.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 9016 100.00 1  # SKIN: a fine tiger pelt
 S
 #9017
 bear large~
@@ -264,9 +366,11 @@ A large bear is pawing at the ground.
 ~
 20 40 dgjkoy c 4
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The bear sees you and stands up on its hind legs. You quickly realize the
+bear has more than a foot on you, and at least 100 pounds.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9018
@@ -276,7 +380,11 @@ A hideous vulture circles over your head.
 ~
 5 15 djo m 2
 0 0 2 9
+D
+The vulture circles above you, eternally patient, waiting for you to pass on.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n circles high overhead, patiently waiting...~
@@ -288,9 +396,11 @@ A huge shark circles below you!
 ~
 75 100 cdjlo 0 5
 0 0 6 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The shark circles just below the surface, barely visible as its dark back
+disappears against the abyss.
+~
+I 0 9019 100.00 1  # BUTCHER: a slab of shark meat
 I 1 1354 100.00 1  # SKIN: a shark skin
 S
 #9020
@@ -300,7 +410,12 @@ A stout quail dashes past you.
 ~
 1 5 djo 0 1
 0 0 0 9
+D
+   The little quail dashes from bush to bush, perhaps looking for a mate or for
+food.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n calls, 'Bob, Bob, White'.~
@@ -312,14 +427,17 @@ M
 $n runs around on the ground looking for food.~
 S
 #9021
-donkey mule grey~
+donkey grey gray~
 a donkey~
 A grey donkey is standing here.
 ~
 10 20 dejo 0 4
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The old grey donkey looks like it's seen better days as it slowly walks in a
+circle around you. Still, it looks strong enough for farm work.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 305 100.00 1 X  # BARDE: a wardonkey
 M
 0
@@ -332,6 +450,10 @@ A black cat is cleaning itself.
 ~
 5 15 djoz c 1
 0 0 0 10
+D
+   The little cat is more shadow than beast and you're careful to avoid it as
+it chases every butterfly, beetle, and bug.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 M
 0
@@ -351,6 +473,11 @@ A white rabbit hops around.
 ~
 1 5 djo 0 1
 0 0 15 9
+D
+   The rabbit is pure white, of the kind you rarely see in nature, so it has
+surely come from domestic ancestors. But rabbits are quick to breed, and will
+establish a colony if even two escape.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -361,7 +488,11 @@ A grey pigeon is pecking near your feet.
 ~
 1 5 djo m 1
 0 0 2 9
+D
+   The pigeon is fat from eating every crumb dropped by the villagers.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
 #9025
 eagle majestic~
@@ -370,7 +501,13 @@ A majestic eagle is soaring overhead.
 ~
 5 15 djoz m 2
 0 0 2 10
+D
+   The eagle soars overhead, giving you a striking look at its brown and white
+wings. Occasionally it flaps once or twice, almost gripping the air with the
+long, slender feathers of its wingtips.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n suddenly dives, then takes off again, a rabbit in $s talons.~
@@ -388,41 +525,104 @@ A camel is lumbering around.
 ~
 10 20 defjo 0 4
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The camel is large, slow, and ponderous. These single-humped camels are well
+known for their use as mounts and pack animals in the desert.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 303 100.00 1 X  # BARDE: an armored warcamel
 S
+#9027
+camel wild~
+a wild camel~
+A wild camel is grazing on the bushes.
+~
+10 20 djo 0 4
+0 0 0 9
+D
+   The camel is shaggy and untamed. Perhaps if you could tame it, it would be a
+good beast of burden.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+I 24 9026 100.00 1  # TAME: a camel
+S
+#9028
+horse wild~
+a wild horse~
+A wild horse dashes past you!
+~
+10 20 djo 0 4
+0 0 14 11
+D
+   This wild horse is as fast as the wind, and just as free. Its mane blows in
+the breeze as it gallops past you. You might be able to tame the horse, if you
+can catch it.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+I 24 9033 50.00 1 x  # TAME: a brown horse
+I 24 9035 15.00 1 x  # TAME: a roan horse
+I 24 9039 10.00 1 x  # TAME: a bay horse
+I 24 9034 25.00 1 x  # TAME: a paint horse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
+M
+0
+$n can't be broken.~
+S
 #9029
-human man dirty~
+man dirty~
 a dirty man~
 A man is digging through the dirt.
 ~
 20 30 douv 0 3
 1 0 0 15
+D
+   The man is barely clothed, with ragged hair and deep creases in his face.
+He must live just beyond the edges of society.
+~
 S
 #9030
-human man~
+man~
 a man~
 A man is walking around.
 ~
 20 30 douv 0 3
 1 0 0 15
+D
+   The man doesn't wear the colors of any empire. Perhaps he belongs to a free
+village?
+~
 S
 #9031
-human woman young~
+woman young~
 a young woman~
 A young woman walks past you.
 ~
 20 30 douv 0 3
 2 0 0 15
+D
+The young woman doesn't bear the colors of any empire.
+~
 S
 #9032
-human woman~
+woman~
 a woman~
 A woman is standing here.
 ~
 20 30 douv 0 3
 2 0 0 15
+D
+The woman doesn't bear the colors of any empire.
+~
 S
 #9033
 horse brown~
@@ -435,8 +635,7 @@ D
    The horse stands with its head high, ears alert for danger. Nevertheless, it
 looks tame, and you might be able to ride it.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
 M
 0
@@ -455,8 +654,12 @@ A brown and white paint horse is standing here.
 ~
 10 20 dejo 0 4
 0 0 14 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The horse wanders over to you, perhaps curious if you have a carrot for it.
+Its coat is blotched like a great canvas, and it's clear someone has cared for
+it. The horse looks tame enough to ride.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
 M
 0
@@ -475,8 +678,11 @@ A blue roan horse is standing here.
 ~
 10 20 dejo 0 4
 0 0 14 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The horse's roan coat glimmers in the light. It wanders over to you as you
+admire it, and looks tame enough to ride.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
 M
 0
@@ -495,8 +701,11 @@ A spotted appaloosa horse is standing here.
 ~
 10 20 dejo 0 4
 0 0 14 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The speckled horse stands still, cautiously watching you. But as you
+approach, it seems friendly enough to ride.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
 M
 0
@@ -515,8 +724,10 @@ A golden palomino horse is standing here.
 ~
 10 20 dejo 0 4
 0 0 14 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+This tall horse has a gorgeous palomino coat and luxurious blonde mane.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
 M
 0
@@ -535,8 +746,11 @@ A stunning chestnut horse is standing here.
 ~
 10 20 dejo 0 4
 0 0 14 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The horse has a beautiful chestnut coat and it seems friendly. You might be
+able to ride it.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
 M
 0
@@ -555,8 +769,11 @@ A tall bay horse is standing here.
 ~
 10 20 dejo 0 4
 0 0 14 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The horse has a brown body, with black legs and hair. It looks friendly
+enough to ride.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
 M
 0
@@ -575,9 +792,47 @@ A majestic white unicorn is standing here!
 ~
 100 125 dejox 0 4
 0 0 14 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The unicorn glistens in the light, like something out of a fairy tale. Its
+coat is as white as the driven snow, with mane and tail to match. But the
+feature which is most mesmerizing is the single conical horn in the middle of
+the unicorn's head. Those horns are said to fetch a serious price.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9040 100.00 1  # BUTCHER: a unicorn horn
+I 1 1351 100.00 1  # SKIN: a large skin
 I 3 301 100.00 1 X  # BARDE: an armored warunicorn
+S
+#9041
+horse wild~
+a wild horse~
+A wild horse dashes past you!
+~
+10 20 djo 0 4
+0 0 14 11
+D
+   This wild horse is as fast as the wind, and just as free. Its mane blows in
+the breeze as it gallops past you. You might be able to tame the horse, if you
+can catch it.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+I 24 9038 50.00 1 x  # TAME: a chestnut horse
+I 24 9036 10.00 1 x  # TAME: an appaloosa horse
+I 24 9037 15.00 1 x  # TAME: a golden palomino horse
+I 24 9034 25.00 1 x  # TAME: a paint horse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
+M
+0
+$n can't be broken.~
 S
 #9055
 jackalope horned~
@@ -585,8 +840,13 @@ the jackalope~
 A horned jackalope is prancing about.
 ~
 50 75 djko 0 2
-0 0 0 15
+0 0 0 27
+D
+   The strange and previously-mythical jackalope sits on its haunches and looks
+at you warily, occasionally scratching one of its antlers with its paw.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 9055 100.00 1  # BUTCHER: a pair of jackalope antlers
 I 1 1350 100.00 1  # SKIN: a small skin
 S
 #9056
@@ -596,6 +856,12 @@ A hairy sasquatch is trying to escape.
 ~
 100 125 djkox 0 3
 0 0 0 15
+D
+   The sasquatch is over eight feet tall, with unusually long arms and legs.
+It is covered in thick brown hair from head to foot, except its goatee, which
+is graying. It sees you and immediately tries to hide!
+~
+I 1 9056 100.00 1  # SKIN: a sasquatch hide
 S
 #9057
 yeti~
@@ -604,6 +870,12 @@ The yeti is watching you carefully.
 ~
 100 125 djkox 0 4
 0 0 0 15
+D
+   You can't believe your eyes! Like the son of a lumberjack and a mountain,
+the yeti is huge, broad, and covered in hair. You've never seen anything quite
+like it.
+~
+I 1 9057 100.00 1  # SKIN: a luxurious yeti fur
 S
 #9058
 mammoth wooly huge~
@@ -612,15 +884,15 @@ A huge wooly mammoth is standing over you!
 ~
 20 40 defjoy 0 5
 0 0 0 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The mammoth is enormous -- bigger than any elephant you've ever seen. It has
+long, shaggy brown hair and tusks the size of trees, and its every step rattles
+the earth beneath you. Hey, maybe you could ride it...
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 0 9058 100.00 1  # BUTCHER: an enormous mammoth tusk
+I 0 9058 50.00 1  # BUTCHER: an enormous mammoth tusk
+I 1 1351 100.00 3  # SKIN: a large skin
 I 1 1351 75.00 1  # SKIN: a large skin
 I 2 1358 100.00 4  # SHEAR: a bag of wool
 I 2 1358 50.00 4  # SHEAR: a bag of wool
@@ -632,8 +904,14 @@ chupacabras~
 el chupacabras~
 Watch out! It's el chupacabras!
 ~
-100 125 dgjoz c 2
+100 125 dgjowz c 2
 0 0 0 10
+D
+   El chupacabras is a strange, toothy demon that drinks blood from goats.
+It's known to stalk the southern deserts, where it sometimes mistakes children
+for its favorite prey.
+~
+T 9064
 S
 #9060
 dragon massive green~
