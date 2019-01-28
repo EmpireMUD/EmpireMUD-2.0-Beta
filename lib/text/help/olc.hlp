@@ -977,6 +977,11 @@ Available techs are:
  &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
  &cDodge-Cap&0 - Improves the player's maximum dodge percent.
  &cSkinning-Upgrade&0 - Skinning always succeeds.
+ &cBarde&0 - Can barde animals.
+ &cHerd&0 - Can herd animals.
+ &cMilk&0 - Can milk animals (in a stable).
+ &cShear&0 - Can shear animals (in a stable).
+ &cTame&0 - Can tame animals.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -3731,6 +3736,7 @@ Mob interaction types:
  BARDE - Mob loaded when the Barde ability is used in a stable.
  LOOT - Items dropped into the corpse when the mob is killed.
  PICKPOCKET - Items gained from the pickpocket skill.
+ TAME - Becomes another mob when it is 'tamed'.
  
 Object interaction types:
  LIGHT - Item something is converted into when lit on fire.

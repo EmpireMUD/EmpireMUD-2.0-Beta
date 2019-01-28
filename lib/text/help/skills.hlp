@@ -28,7 +28,9 @@ mounts.
 
 Barded mounts will not de-spawn like normal animals.
 
-See also: RIDE, STABLE
+Barde requires the Animal Husbandry ability.
+
+See also: ANIMAL HUSBANDRY, RIDE, STABLE
 #
 BATHE 
 
@@ -214,7 +216,9 @@ Usage:  herd <animal> <direction>
 This command is useful in herding animals into stables or out of the way. For
 mountable creatures or ones that are pulling carts, try 'lead' instead.
 
-See also: LEAD
+Herd requires the Animal Husbandry ability.
+
+See also: ANIMAL HUSBANDRY, LEAD
 #
 LEAD 
 
@@ -260,6 +264,10 @@ Usage:  milk <animal> <container>
 
 You can milk cows and some other animals in a stable, if you have a drink
 container to hold the milk. Cows can be milked once or twice per day.
+
+Milking requires the Animal Husbandry ability.
+
+See also: ANIMAL HUSBANDRY
 #
 MILL MILLING
 
@@ -456,7 +464,9 @@ Usage:  shear <animal>
 You can shear sheep in a stable, giving you wool to weave into cloth. Sheep
 can be shorn every 6 hours (of real time).
 
-See also: WEAVE
+Sheaing requires the Animal Husbandry ability.
+
+See also: ANIMAL HUSBANDRY, WEAVE
 #
 SHOOT
 
@@ -677,6 +687,17 @@ SUMMON MATERIAlS  (High Sorcery ability)
 SUMMON PLAYER  (at an Astral Nexus)
 SUMMON THUG  (Stealth ability)
 ADVENTURE SUMMON  (inside an adventure)
+#
+TAME
+
+Usage:  tame <animal>
+
+Some animals can be tamed. For example, you can tame a wild horse in order to
+get a new mount.
+
+Taming animals requires the Animal Husbandry ability.
+
+See also: ANIMAL HUSBANDRY
 #
 TENT TENTS
 

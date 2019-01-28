@@ -3129,7 +3129,10 @@ ACMD(do_barde) {
 	
 	one_argument(argument, arg);
 
-	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
+	if (!has_player_tech(ch, PTECH_BARDE)) {
+		msg_to_char(ch, "You don't have the correct ability to barde animals.\r\n");
+	}
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -3199,6 +3202,7 @@ ACMD(do_barde) {
 		}
 
 		if (found) {
+			gain_player_tech_exp(ch, PTECH_BARDE, 50);
 			if (!IS_NPC(ch)) {
 				extract_resources(ch, res, TRUE, NULL);
 			}
