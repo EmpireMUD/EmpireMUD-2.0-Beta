@@ -736,6 +736,52 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 }
 
 
+// for do_tame
+INTERACTION_FUNC(tame_interact) {
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	char buf[MAX_STRING_LENGTH];
+	char_data *newmob;
+	bool any = FALSE;
+	double prc;
+	int iter;
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		newmob = read_mobile(interaction->vnum, TRUE);
+		if (!newmob) {
+			continue;
+		}
+		
+		setup_generic_npc(newmob, GET_LOYALTY(inter_mob), MOB_DYNAMIC_NAME(inter_mob), MOB_DYNAMIC_SEX(inter_mob));
+		char_to_room(newmob, IN_ROOM(ch));
+		MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(inter_mob);
+		if (MOB_INSTANCE_ID(newmob) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(newmob)), GET_MOB_VNUM(newmob));
+		}
+
+		prc = (double)GET_HEALTH(inter_mob) / MAX(1, GET_MAX_HEALTH(inter_mob));
+		GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
+		
+		// message before triggering
+		if (!any) {
+			if (interaction->quantity > 1) {
+				sprintf(buf, "$n is now $N (x%d)!", interaction->quantity);
+				act(buf, FALSE, inter_mob, NULL, newmob, TO_ROOM);
+			}
+			else {
+				act("$n is now $N!", FALSE, inter_mob, NULL, newmob, TO_ROOM);
+			}
+			
+			any = TRUE;
+		}
+		
+		load_mtrigger(newmob);
+	}
+	
+	return any;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// GENERIC CRAFT (craft, forge, sew, cook) /////////////////////////////////
 
@@ -2191,5 +2237,55 @@ ACMD(do_reforge) {
 	// no leaks
 	if (res) {
 		free_resource_list(res);
+	}
+}
+
+
+ACMD(do_tame) {
+	char_data *mob;
+	bool any;
+	
+	one_argument(argument, arg);
+
+	if (!has_player_tech(ch, PTECH_TAME)) {
+		msg_to_char(ch, "You don't have the correct ability to tame animals.\r\n");
+	}
+	else if (get_cooldown_time(ch, COOLDOWN_TAME) > 0) {
+		msg_to_char(ch, "You can't tame again yet.\r\n");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to tame animals here.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Which animal would you like to tame?\r\n");
+	}
+	else if (!(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (!IS_NPC(mob) || !has_interaction(mob->interactions, INTERACT_TAME)) {
+		act("You can't tame $N!", FALSE, ch, 0, mob, TO_CHAR);
+	}
+	else if (GET_LED_BY(mob)) {
+		act("You can't tame $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
+	}
+	else {
+		act("You try to tame $N...", FALSE, ch, NULL, mob, TO_CHAR);
+		act("$n tries to tame you...", FALSE, ch, NULL, mob, TO_VICT);
+		act("$n tries to tame $N...", FALSE, ch, NULL, mob, TO_NOTVICT);
+		
+		any = run_interactions(ch, mob->interactions, INTERACT_TAME, IN_ROOM(ch), mob, NULL, tame_interact);
+		
+		if (any) {
+			gain_player_tech_exp(ch, PTECH_TAME, 50);
+			add_cooldown(ch, COOLDOWN_TAME, 3 * SECS_PER_REAL_MIN);
+			
+			// remove the original
+			extract_char(mob);
+		}
+		else {
+			act("You can't seem to tame $M!", FALSE, ch, NULL, mob, TO_CHAR);
+		}
+		
+		command_lag(ch, WAIT_OTHER);
 	}
 }

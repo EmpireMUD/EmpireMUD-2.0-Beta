@@ -28,8 +28,9 @@ An armored warunicorn stands majestically here!
 ~
 100 150 bdejx 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9040 100.00 1  # BUTCHER: a unicorn horn
+I 1 1351 100.00 1  # SKIN: a large skin
 I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot

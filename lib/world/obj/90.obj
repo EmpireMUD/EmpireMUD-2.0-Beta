@@ -1,3 +1,33 @@
+#9001
+fur wolf's wolfs~
+a wolf fur~
+A wolf's fur is hanging here.~
+   This wolf fur is in fine condition and could be used as-is or tanned into
+leather.
+~
+3 e a 5
+0 0 0
+7 0
+I 18 1357 100.00 1  # TAN: a large piece of leather
+O
+10 f
+R
+5120 0
+S
+#9007
+antler deer fine~
+a fine deer antler~
+A fine deer antler is lying on the ground.~
+The antler has 5 points and must have come from a good-sized buck.
+~
+3 e a 1
+0 0 0
+14 0
+O
+2 0
+R
+5120 0
+S
 #9009
 horseshoe shoe~
 a horseshoe~
@@ -20,6 +50,53 @@ as long as you're on his quest.
 0 0 0
 2 0
 Q 9009
+S
+#9016
+pelt tiger fine~
+a fine tiger pelt~
+A fine tiger pelt is lying here.~
+   This brilliant orange and black pelt can only have come from the largest
+jungle predator -- the tiger!
+~
+3 0 a 5
+0 0 0
+7 0
+O
+10 fu
+R
+5120 0
+S
+#9019
+meat slab shark~
+a slab of shark meat~
+A slab of shark meat is rotting on the ground.~
+   The shark meat has begun to ferment. You could cook it into dried shark
+meat.
+~
+3 0 a 4
+0 0 0
+7 24
+O
+17 lt
+R
+5119 0
+S
+#9025
+feathers bird~
+some bird feathers~
+Some bird feathers are scattered here.~
+   These bird feathers aren't in very good condition, but they could be used as
+stuffing or for other crafts.
+~
+3 l a 6
+0 0 0
+7 0
+C
+1 1
+O
+7 apu
+R
+5137 0
 S
 #9030
 head mighty beast severed~
@@ -83,6 +160,19 @@ The High Sorcerer wants them disenchanted so they can be reused.
 Q 9036
 T 9036
 S
+#9040
+horn unicorn~
+a unicorn horn~
+A unicorn horn is sticking out of the ground.~
+   This thin, spiralled horn is the stuff of legends. If it's real, it could
+fetch a lot of money.
+~
+15 0 a 2
+16 0 0
+14 0
+R
+5193 a
+S
 #9042
 letter smith undelivered~
 a letter for the smith~
@@ -121,5 +211,62 @@ maybe you could take a peek.
 0 0
 Q 9042
 T 9043
+S
+#9055
+antlers jackalope pair~
+a pair of jackalope antlers~
+A pair of jackalope antlers are lying here.~
+   These antlers may resemble tiny deer antlers, but they are clearly from a
+legendary jackalope.
+~
+15 0 a 3
+16 0 0
+14 0
+R
+5193 a
+S
+#9056
+hide sasquatch~
+a sasquatch hide~
+A sasquatch hide is draped here.~
+This huge hide could be from none other than the sasquatch!
+~
+15 0 a 5
+16 0 0
+7 0
+O
+10 fk
+R
+5193 a
+S
+#9057
+fur yeti luxurious~
+a luxurious yeti fur~
+A luxurious yeti fur is draping here.~
+   This huge, white fur could only have come from the elusive yeti. It must be
+worth its weight in gold!
+~
+15 0 a 6
+16 0 0
+7 0
+O
+10 fk
+R
+5193 a
+S
+#9058
+tusk mammoth enormous~
+an enormous mammoth tusk~
+An enormous mammoth tusk is standing here.~
+   The tusk is larger, longer, and curvier than any elephant's tusk. It can
+only have come from a mammoth, the rarest of the giant beasts.
+~
+15 e a 7
+16 0 0
+14 0
+O
+2 fk
+R
+5193 a
 S
 $

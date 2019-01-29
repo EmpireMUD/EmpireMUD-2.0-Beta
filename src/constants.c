@@ -819,6 +819,11 @@ const char *player_tech_types[] = {
 	"Where-Upgrade",
 	"Dodge-Cap",
 	"Skinning-Upgrade",
+	"Barde",
+	"Herd",	// 55
+	"Milk",
+	"Shear",
+	"Tame",
 	"\n"
 };
 
@@ -3729,6 +3734,7 @@ const char *interact_types[] = {
 	"FISH",
 	"PAN",
 	"QUARRY",
+	"TAME",
 	"\n"
 };
 
@@ -3759,6 +3765,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// fish
 	TYPE_ROOM,	// pan
 	TYPE_ROOM,	// quarry
+	TYPE_MOB,	// tame
 };
 
 
@@ -3788,6 +3795,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// fish
 	TYPE_OBJ,	// pan
 	TYPE_OBJ,	// quarry
+	TYPE_MOB,	// tame
 };
 
 

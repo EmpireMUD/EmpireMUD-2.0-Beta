@@ -2220,6 +2220,9 @@ ACMD(do_herd) {
 
 	if (IS_NPC(ch))
 		return;
+	else if (!has_player_tech(ch, PTECH_HERD)) {
+		msg_to_char(ch, "You don't have the correct ability to herd animals.\r\n");
+	}
 	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't herd anything in an adventure.\r\n");
 	}
@@ -2269,6 +2272,7 @@ ACMD(do_herd) {
 			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, NOBITS)) {
 				char_to_room(victim, IN_ROOM(ch));
 			}
+			gain_player_tech_exp(ch, PTECH_HERD, 5);
 		}
 		else {
 			act("You try to herd $N, but $E refuses to move!", FALSE, ch, 0, victim, TO_CHAR);
@@ -2285,7 +2289,10 @@ ACMD(do_milk) {
 
 	two_arguments(argument, arg, buf);
 
-	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE))
+	if (!has_player_tech(ch, PTECH_MILK)) {
+		msg_to_char(ch, "You don't have the correct ability to milk animals.\r\n");
+	}
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE))
 		msg_to_char(ch, "You can't milk animals here!\r\n");
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish building the stable before you can milk anything.\r\n");
@@ -2316,6 +2323,7 @@ ACMD(do_milk) {
 		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_CONTENTS) += amount;
 		GET_OBJ_VAL(cont, VAL_DRINK_CONTAINER_TYPE) = LIQ_MILK;
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
+		gain_player_tech_exp(ch, PTECH_MILK, 33);
 	}
 }
 
@@ -2837,6 +2845,9 @@ ACMD(do_shear) {
 	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
+	else if (!has_player_tech(ch, PTECH_SHEAR)) {
+		msg_to_char(ch, "You don't have the correct ability to shear animals.\r\n");
+	}
 	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You need to be in a stable to shear anything.\r\n");
 	}
@@ -2871,7 +2882,8 @@ ACMD(do_shear) {
 		any |= run_global_mob_interactions(ch, mob, INTERACT_SHEAR, shear_interact);
 		
 		if (any) {
-			gain_player_tech_exp(ch, PTECH_SHEAR_UPGRADE, 5);
+			gain_player_tech_exp(ch, PTECH_SHEAR, 33);
+			gain_player_tech_exp(ch, PTECH_SHEAR_UPGRADE, 33);
 		}
 		else {
 			act("You can't shear $N!", FALSE, ch, NULL, mob, TO_CHAR);

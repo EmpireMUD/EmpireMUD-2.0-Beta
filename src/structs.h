@@ -350,7 +350,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_FISH  21
 #define INTERACT_PAN  22
 #define INTERACT_QUARRY  23
-#define NUM_INTERACTS  24
+#define INTERACT_TAME  24
+#define NUM_INTERACTS  25
 
 
 // for object saving
@@ -2120,6 +2121,11 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
 #define PTECH_DODGE_CAP  52	// improves your dodge cap
 #define PTECH_SKINNING_UPGRADE  53	// skinning always succeeds
+#define PTECH_BARDE  54	// can barde animals
+#define PTECH_HERD  55	// can herd animals
+#define PTECH_MILK  56	// can milk animals (at a stable)
+#define PTECH_SHEAR  57	// can shear animals (at a stable)
+#define PTECH_TAME  58	// can tame animals
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

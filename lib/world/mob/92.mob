@@ -79,6 +79,7 @@ A pink flamingo is standing on one leg.
 10 20 djo m 2
 0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
 $n spreads $s wings and stretches.~
@@ -113,6 +114,7 @@ A tall heron pokes its beak around for food.
 10 20 djo m 2
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
 #9209
 crab mud~
