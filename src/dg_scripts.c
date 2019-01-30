@@ -38,6 +38,8 @@ extern unsigned long pulse;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *alt_dirs[];
+extern const char *component_flags[];
+extern const char *component_types[];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *extra_bits[];
@@ -4167,6 +4169,50 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							snprintf(str, slen, "0");
+						}
+					}
+					
+					else if (!str_cmp(field, "is_component")) {
+						// format: %obj.is_component(type, flags...)%
+						char arg1[256], arg2[256], tmp[256];
+						bitvector_t cmp_flags = NOBITS;
+						int cmp_type, pos;
+						
+						if (subfield && *subfield) {
+							comma_args(subfield, arg1, arg2);
+							
+							// arg1 is a component type
+							if ((cmp_type = search_block(arg1, component_types, FALSE)) != NOTHING && cmp_type != CMP_NONE) {
+								// arg2 is optional and could be any number of component flags
+								while (*arg2) {
+									strcpy(tmp, arg2);
+									if (strchr(tmp, ',')) {
+										comma_args(tmp, arg1, arg2);
+									}
+									else {	// no comma -- just split by words
+										half_chop(tmp, arg1, arg2);
+									}
+									
+									// arg1 is now the first word of the flags section
+									if (*arg1 && (pos = search_block(arg1, component_flags, FALSE)) != NOTHING) {
+										cmp_flags |= BIT(pos);
+									}
+								}	// end flag processing loop
+								
+								if (GET_OBJ_CMP_TYPE(o) == cmp_type && (GET_OBJ_CMP_FLAGS(o) & cmp_flags) == cmp_flags) {
+									// full type/flags match
+									snprintf(str, slen, "1");
+								}
+								else {
+									snprintf(str, slen, "0");
+								}
+							}
+							else {	// invalid component type
+								snprintf(str, slen, "0");
+							}
+						}
+						else {	// no subfield: is a component at all?
+							snprintf(str, slen, "%d", GET_OBJ_CMP_TYPE(o) != CMP_NONE ? 1 : 0);
 						}
 					}
 
