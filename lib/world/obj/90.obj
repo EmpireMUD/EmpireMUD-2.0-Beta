@@ -269,4 +269,32 @@ O
 R
 5193 a
 S
+#9060
+hoard dragon's dragons gold~
+a dragon's hoard~
+A hoard of gold has spilled onto the floor.~
+   The odd golden trinkets in the pile appear to have come from far and wide
+across the land. Each piece has long claw marks or signs of fire, both
+resulting from its time in a dragon's hoard.
+~
+15 0 a 3
+16 0 0
+4 0
+R
+5193 a
+S
+#9062
+purse mermaid's mermaids~
+a mermaid's purse~
+A mermaid's purse has been dropped here.~
+   This cold, slimy purse has horn-shaped protrusions on all four corners. 
+There doesn't seem to be a way to open it, but it feels like there are pearls
+inside. These purses are known to come from mermaids who swim in deep waters.
+~
+15 0 a 4
+16 0 0
+7 0
+R
+5193 a
+S
 $
