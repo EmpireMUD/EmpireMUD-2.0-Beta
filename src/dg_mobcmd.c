@@ -381,7 +381,7 @@ ACMD(do_mjunk) {
 
 /* prints the message to everyone in the room other than the mob and victim */
 ACMD(do_mechoaround) {
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char_data *victim;
 	char *p;
 
@@ -392,8 +392,9 @@ ACMD(do_mechoaround) {
 
 	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
-
-	p = one_argument(argument, arg);
+	
+	strcpy(temp, argument);	// preserve a copy
+	p = one_argument(temp, arg);
 	skip_spaces(&p);
 
 	if (!*arg) {
@@ -470,7 +471,7 @@ ACMD(do_mechoneither) {
 
 /* sends the message to only the victim */
 ACMD(do_msend) {
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char_data *victim;
 	char *p;
 
@@ -481,8 +482,9 @@ ACMD(do_msend) {
 
 	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
-
-	p = one_argument(argument, arg);
+	
+	strcpy(temp, argument);	// preserve this
+	p = one_argument(temp, arg);
 	skip_spaces(&p);
 
 	if (!*arg) {
