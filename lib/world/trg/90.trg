@@ -384,8 +384,16 @@ Tameness Required to Tame~
 tame~
 * Amount of tameness required
 set target 5
+* Check target and tech
+if (!%actor.has_tech(Tame)% || %actor.char_target(%arg%)% != %self%)
+  return 0
+  halt
+end
+* Skill checks / load tameness
 if %actor.ability(Summon Animals)%
   set tameness %target%
+  %send% %actor% You whistle at %self.name%...
+  %echoaround% %actor% %actor.name% whistles at %self.name%...
 elseif %self.varexists(tameness)%
   set tameness %self.tameness%
 else
@@ -393,10 +401,12 @@ else
 end
 if %tameness% < %target%
   %send% %actor% You can't seem to get close enough to %self.name% to tame %self.himher%. Try feeding %self.himher% some fruit.
+  return 1
   halt
 else
   * Ok to tame
   return 0
+  halt
 end
 ~
 #9030
