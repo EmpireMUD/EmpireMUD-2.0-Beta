@@ -1140,7 +1140,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	extern bool check_ability(char_data *ch, char *string, bool exact);
 	extern bool check_social(char_data *ch, char *string, bool exact);
 	int cmd, length, iter;
-	char *line;
+	char arg[MAX_INPUT_LENGTH], *line;
 
 	/* just drop to next line for hitting CR */
 	skip_spaces(&argument);
