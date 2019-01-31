@@ -1242,7 +1242,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	}
 	
 	// Command trigger (3/3): exact match on abbreviated command
-	else if (check_command_trigger(ch, (char*)cmd_info[cmd].command, line, CMDTRG_EXACT)) {
+	else if (strlen(arg) < strlen(cmd_info[cmd].command) && check_command_trigger(ch, (char*)cmd_info[cmd].command, line, CMDTRG_EXACT)) {
 		return;
 	}
 	
