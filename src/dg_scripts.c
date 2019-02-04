@@ -4656,10 +4656,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "north")) {
 						direction_vars(r, NORTH, subfield, str, slen);
 					}
-					else if (!str_cmp(field, "northeast")) {
+					else if (!str_cmp(field, "northeast") || !str_cmp(field, "ne")) {
 						direction_vars(r, NORTHEAST, subfield, str, slen);
 					}
-					else if (!str_cmp(field, "northwest")) {
+					else if (!str_cmp(field, "northwest") || !str_cmp(field, "nw")) {
 						direction_vars(r, NORTHWEST, subfield, str, slen);
 					}
 					break;
@@ -4715,10 +4715,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "south")) {
 						direction_vars(r, SOUTH, subfield, str, slen);
 					}
-					else if (!str_cmp(field, "southeast")) {
+					else if (!str_cmp(field, "southeast") || !str_cmp(field, "se")) {
 						direction_vars(r, SOUTHEAST, subfield, str, slen);
 					}
-					else if (!str_cmp(field, "southwest")) {
+					else if (!str_cmp(field, "southwest") || !str_cmp(field, "sw")) {
 						direction_vars(r, SOUTHWEST, subfield, str, slen);
 					}
 					else if (!str_cmp(field, "starboard")) {
