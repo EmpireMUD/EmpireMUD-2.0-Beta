@@ -117,4 +117,38 @@ else
   dg_affect %self% SNEAK on -1
 end
 ~
+#9999
+Iterative mini-pet reward~
+1 c 2
+use~
+set pet_found 0
+set vnum 9900
+while !%pet_found%
+  if %vnum% >= 9923
+    %send% %actor% You already have all the mini-pets %self.shortdesc% can provide!
+    %send% %actor% Keep it for now, and pester Yvain to add more.
+    halt
+  elseif %vnum% == 9919 || %actor.has_minipet(%vnum%)%
+    eval vnum %vnum%+1
+  else
+    set pet_found %vnum%
+  end
+done
+if %pet_found%
+  %load% mob %pet_found%
+  set mob %self.room.people%
+  if %mob.vnum% != %pet_found%
+    * Uh-oh.
+    %echo% Something went horribly wrong while granting a mini-pet. Please bug-report this error.
+    halt
+  end
+  set mob_string %mob.name%
+  %purge% %mob%
+  %send% %actor% You open %self.shortdesc% and find a whistle inside!
+  %send% %actor% You gain '%mob_string%' as a mini-pet. Use the minipets command to summon it.
+  %echoaround% %actor% %actor.name% opens %self.shortdesc% and takes %mob_string% whistle out.
+  nop %actor.add_minipet(%vnum%)%
+  %purge% %self%
+end
+~
 $

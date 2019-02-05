@@ -333,7 +333,7 @@ switch (%random.3)
 done
 ~
 #9027
-Feed to Tame: Fruit/Veg~
+Feed to Tame: Fruit/Veg/Grain~
 0 j 100
 ~
 * Amount of tameness required
@@ -345,7 +345,7 @@ if %actor.cooldown(9027)%
 end
 nop %actor.set_cooldown(9027, 5)%
 wait 3
-if !%object.is_component(fruit)% && !%object.is_component(vegetable)%
+if !%object.is_component(fruit)% && !%object.is_component(vegetable)% && !%object.is_component(grain)%
   %echo% %self.name% does not seem interested.
   drop all
   halt
