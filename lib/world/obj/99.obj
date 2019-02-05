@@ -295,4 +295,16 @@ Type 'use whistle' to summon it.
 9926 0 0
 2 0
 S
+#9999
+box amazing reward~
+an amazing reward box~
+Someone has dropped an amazing reward box here!~
+   You can 'use reward' to get the ability to summon an exclusive mini-pet!
+This gives you pets in a specific order and will never give you duplicates.
+~
+3 0 a 2
+0 0 0
+0 0
+T 9999
+S
 $

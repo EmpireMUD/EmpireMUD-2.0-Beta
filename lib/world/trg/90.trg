@@ -332,6 +332,83 @@ switch (%random.3)
   break
 done
 ~
+#9027
+Feed to Tame: Fruit/Veg/Grain~
+0 j 100
+~
+* Amount of tameness required
+set target 5
+if %actor.cooldown(9027)%
+  %send% %actor% You can't feed wild animals again yet...
+  return 0
+  halt
+end
+nop %actor.set_cooldown(9027, 5)%
+wait 3
+if !%object.is_component(fruit)% && !%object.is_component(vegetable)% && !%object.is_component(grain)%
+  %echo% %self.name% does not seem interested.
+  drop all
+  halt
+end
+* Block NPCs
+if %actor.is_npc%
+  halt
+end
+* Load tameness
+if %self.varexists(tameness)%
+  set tameness %self.tameness%
+else
+  set tameness 0
+end
+eval tameness %tameness% + 1
+if %actor.charisma% > %random.10%
+  eval tameness %tameness% + 1
+end
+remote tameness %self.id%
+* Messaging
+if %self.name% ~= horse
+  set emotion and nickers
+else
+  set emotion and chews contentedly
+end
+%echo% %self.name% eats %object.shortdesc% %emotion%.
+if %tameness% >= %target%
+  %send% %actor% %self.heshe% really seems to like you.
+  %echoaround% %actor% %self.heshe% really seems to like %actor.name%.
+end
+mjunk all
+~
+#9028
+Tameness Required to Tame~
+0 c 0
+tame~
+* Amount of tameness required
+set target 5
+* Check target and tech
+if (!%actor.has_tech(Tame)% || %actor.char_target(%arg%)% != %self%)
+  return 0
+  halt
+end
+* Skill checks / load tameness
+if %actor.ability(Summon Animals)%
+  set tameness %target%
+  %send% %actor% You whistle at %self.name%...
+  %echoaround% %actor% %actor.name% whistles at %self.name%...
+elseif %self.varexists(tameness)%
+  set tameness %self.tameness%
+else
+  set tameness 0
+end
+if %tameness% < %target%
+  %send% %actor% You can't seem to get close enough to %self.name% to tame %self.himher%. Try feeding %self.himher% some fruit.
+  return 1
+  halt
+else
+  * Ok to tame
+  return 0
+  halt
+end
+~
 #9030
 Butcher detect~
 1 c 3
@@ -518,6 +595,17 @@ else
   return 0
   halt
 end
+~
+#9061
+Hypnotoad fight~
+0 k 75
+~
+wait 1
+dg_affect #9061 %actor% STUNNED on 15
+%send% %actor% You lock eyes with %self.name% and black out for a moment...
+%echoaround% %actor% %actor.name% locks eyes with %self.name% and appears dazed...
+wait 1
+flee
 ~
 #9064
 Wandering Vampire combat~

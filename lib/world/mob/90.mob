@@ -546,6 +546,8 @@ good beast of burden.
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 I 24 9026 100.00 1  # TAME: a camel
+T 9028
+T 9027
 S
 #9028
 horse wild~
@@ -577,6 +579,8 @@ $n's ears prick forward as though listening for danger...~
 M
 0
 $n can't be broken.~
+T 9028
+T 9027
 S
 #9029
 man dirty~
@@ -833,6 +837,32 @@ $n's ears prick forward as though listening for danger...~
 M
 0
 $n can't be broken.~
+T 9028
+T 9027
+S
+#9042
+ass wild~
+a wild ass~
+A wild ass brays loudly as it darts away from you.
+~
+10 20 djo 0 4
+0 0 11 9
+D
+   Although it's similar to domestic donkeys you've seen, the wild ass nowhere
+near as friendly. It also has striped legs that almost resemble a zebra, and a
+black fringe at the end of its short mane.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+I 24 9021 100.00 1  # TAME: a donkey
+M
+0
+$n brays loudly.~
+M
+0
+$n keeps $s distance from you.~
+T 9027
+T 9028
 S
 #9055
 jackalope horned~
@@ -920,13 +950,16 @@ A massive green dragon is here!
 ~
 200 200 cdjouxB c 6
 0 0 0 9
+D
+   The enormous dragon is the size of a large keep or a small castle. Its
+forest green scales dance in the light, and you think you see the glimmer of
+gold tucked beneath its wing.
+~
 I 0 3012 100.00 10  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 4  # SKIN: a large skin
-I 4 171 50.00 1  # LOOT: a gold ingot
-I 4 171 50.00 1  # LOOT: a gold ingot
-I 4 171 50.00 1  # LOOT: a gold ingot
-I 4 171 50.00 1  # LOOT: a gold ingot
-I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 9060 100.00 1  # LOOT: a dragon's hoard
+I 4 9060 50.00 1  # LOOT: a dragon's hoard
+I 4 9060 50.00 1  # LOOT: a dragon's hoard
 S
 #9061
 toad hypnotoad~
@@ -935,20 +968,26 @@ You seem to be staring at a hypnotoad!
 ~
 50 75 djo 0 1
 0 0 0 16
+D
+   The hypnotoad drones a constant, peaceful sound as its eyes swirl and
+wobble. You're unable to break your gaze.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+T 9061
 S
 #9062
 mermaid~
 the mermaid~
 A mermaid swims along beside you!
 ~
-75 100 djlox 0 3
-0 0 6 16
-I 4 171 50.00 1  # LOOT: a gold ingot
-I 4 171 50.00 1  # LOOT: a gold ingot
-I 4 171 50.00 1  # LOOT: a gold ingot
-I 4 171 50.00 1  # LOOT: a gold ingot
-I 4 171 50.00 1  # LOOT: a gold ingot
+75 100 dlovx 0 3
+2 0 6 16
+D
+   The mermaid is ethereal, graceful, and fleeting as she dives beneath the
+surface and reemerges in the distance. Her top half is almost human, but the
+bottom half strongly resembles a fish.
+~
+I 4 9062 100.00 1  # LOOT: a mermaid's purse
 S
 #9063
 sea turtle green~

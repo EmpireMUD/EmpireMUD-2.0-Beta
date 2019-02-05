@@ -765,11 +765,11 @@ INTERACTION_FUNC(tame_interact) {
 		// message before triggering
 		if (!any) {
 			if (interaction->quantity > 1) {
-				sprintf(buf, "$n is now $N (x%d)!", interaction->quantity);
+				sprintf(buf, "$e is now $N (x%d)!", interaction->quantity);
 				act(buf, FALSE, inter_mob, NULL, newmob, TO_ROOM);
 			}
 			else {
-				act("$n is now $N!", FALSE, inter_mob, NULL, newmob, TO_ROOM);
+				act("$e is now $N!", FALSE, inter_mob, NULL, newmob, TO_ROOM);
 			}
 			
 			any = TRUE;

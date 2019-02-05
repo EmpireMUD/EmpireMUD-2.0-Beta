@@ -1140,7 +1140,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	extern bool check_ability(char_data *ch, char *string, bool exact);
 	extern bool check_social(char_data *ch, char *string, bool exact);
 	int cmd, length, iter;
-	char *line;
+	char arg[MAX_INPUT_LENGTH], *line;
 
 	/* just drop to next line for hitting CR */
 	skip_spaces(&argument);
@@ -1242,7 +1242,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	}
 	
 	// Command trigger (3/3): exact match on abbreviated command
-	else if (check_command_trigger(ch, (char*)cmd_info[cmd].command, line, CMDTRG_EXACT)) {
+	else if (strlen(arg) < strlen(cmd_info[cmd].command) && check_command_trigger(ch, (char*)cmd_info[cmd].command, line, CMDTRG_EXACT)) {
 		return;
 	}
 	
