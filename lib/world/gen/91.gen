@@ -1,0 +1,17 @@
+#9103
+constrict~
+3 0
+0 0 0 0
+T0
+Your constrict cooldown has ended.~
+S
+#9104
+constricted~
+4 0
+0 0 0 0
+T0
+You're no longer being constricted.~
+T1
+$n is no longer constricted.~
+S
+$

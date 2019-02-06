@@ -368,6 +368,8 @@ remote tameness %self.id%
 * Messaging
 if %self.name% ~= horse
   set emotion and nickers
+elseif %self.name% ~= elephant
+  set emotion and trumpets happily
 else
   set emotion and chews contentedly
 end

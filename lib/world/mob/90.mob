@@ -864,6 +864,23 @@ $n keeps $s distance from you.~
 T 9027
 T 9028
 S
+#9043
+elephant wild jungle~
+a wild jungle elephant~
+A wild jungle elephant is rummaging around.
+~
+20 40 djoy 0 5
+0 0 0 27
+D
+   The elephant is most brown, with some fine pink or orange spots. It stands
+over you, easily twice your height, but doesn't seem very interested in you.
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 3  # SKIN: a large skin
+I 24 9101 100.00 1  # TAME: a jungle elephant
+T 9027
+T 9028
+S
 #9055
 jackalope horned~
 the jackalope~
@@ -996,6 +1013,10 @@ A green sea turtle swims up for a breath of air.
 ~
 10 20 dejlo 0 2
 0 0 6 9
+D
+The sea turtle is decorated with bits of decorative coral and pearls,
+apparently placed there by whoever tamed it. It looks friendly enough to ride.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #9064
@@ -1005,6 +1026,10 @@ S
 ~
 30 50 dovw c 3
 0 0 0 15
+D
+The wanderer looks a bit pale, almost sickly.
+~
+I 4 9064 33.33 1  # LOOT: a seeping wineskin
 T 9064
 S
 #9065
@@ -1014,6 +1039,10 @@ A starving, feral vampire stalks through the shadows nearby.
 ~
 75 100 cduvw c 3
 1 0 0 10
+D
+   The vampire looks emaciated, perhaps near death -- again. It sees you and
+crouches low, preparing to strike.
+~
 S
 #9066
 bat nerf~
@@ -1022,6 +1051,11 @@ A nerf bat hovers menacingly overhead.
 ~
 1 5 djo m 1
 0 0 2 9
+D
+   The little bat is black, almost blue in color. You know little of its
+original homeland of Nerf, but these bats are said to curse anyone whose path
+they cross.
+~
 T 9066
 S
 $

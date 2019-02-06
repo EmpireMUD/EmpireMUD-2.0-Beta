@@ -5,6 +5,10 @@ A leopard is waiting to strike!
 ~
 75 100 cdgjoz c 3
 0 0 0 10
+D
+   The leopard is a beautiful golden color with rosette spots all over its
+coat. The rest of the animal, on the other hand, is a well-honed murder weapon.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
@@ -16,15 +20,12 @@ A towering jungle elephant is rummaging around.
 ~
 20 40 dejoy 0 5
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The great elephant has a blanket over its back, belted on to form a sort of
+saddle, or a place to attach a proper saddle.
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 3  # SKIN: a large skin
 I 3 302 100.00 1 X  # BARDE: an armored warelephant
 S
 #9102
@@ -34,8 +35,11 @@ A spotted jaguar is stalking you!
 ~
 75 100 cdgjoz c 3
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+The jaguar is barely visible as it stalks through heavy leaves, but its
+characteristic spots give away its location.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
 S
 #9103
@@ -45,8 +49,11 @@ A tapir is rooting around a bush.
 ~
 75 100 djo 0 3
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The tapir is tapered on the front end. It's the strangest animal you've ever
+seen, like a horse and a pig had a baby and it was raised by an elephant.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9104
@@ -56,10 +63,15 @@ A giant anaconda is draping from the tree!
 ~
 75 100 cdjo c 4
 0 0 5 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The snake is as long as a boat, and as big around as a dog. It's capable of
+strangling an ox with its powerful muscles, and can unhinge its jaw to swallow
+one, too.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
+T 9103
+T 9104
 S
 #9105
 snake green treesnake~

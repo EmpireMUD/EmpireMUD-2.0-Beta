@@ -1,3 +1,68 @@
+#9103
+Snake Constrict: Struggle~
+0 c 0
+struggle~
+set break_free_at 1
+if !%actor.affect(9104)%
+  return 0
+  halt
+end
+if !%actor.varexists(struggle_counter)%
+  set struggle_counter 0
+  remote struggle_counter %actor.id%
+else
+  set struggle_counter %actor.struggle_counter%
+end
+eval struggle_counter %struggle_counter% + 1
+if %struggle_counter% >= %break_free_at%
+  %send% %actor% You break free!
+  %echoaround% %actor% %actor.name% breaks free!
+  dg_affect #9104 %actor% off
+  rdelete struggle_counter %actor.id%
+  halt
+else
+  %send% %actor% You struggle, but fail to break free.
+  %echoaround% %actor% %actor.name% struggles to break free!
+  remote struggle_counter %actor.id%
+  halt
+end
+~
+#9104
+Snake: Constrict~
+0 k 100
+~
+if %self.cooldown(9103)%
+  halt
+end
+* Find a non-bound target
+set target %actor%
+set person %self.room.people%
+set target_found 0
+set no_targets 0
+while %target.affect(9104)% && %person%
+  if %person.is_pc% && %person.is_enemy(%self%)%
+    set target %person%
+  end
+  set person %person.next_in_room%
+done
+if !%target%
+  * Sanity check
+  halt
+end
+if %target.affect(9104)%
+  * No valid targets
+  halt
+end
+nop %self.cooldown(9103, 20)%
+* Valid target found, start attack
+%send% %target% %self.name% starts to wrap around you...
+%echoaround% %target% %self.name% starts to wrap around %target.name%...
+wait 3 sec
+%send% %target% %self.name% squeezes around you, constricting until you cannot move!
+%echoaround% %target% %self.name% constricts around %target.name%!
+%send% %target% Type 'struggle' to break free!
+dg_affect #9104 %actor% STUNNED on 20
+~
 #9106
 Jungle Bird Animation~
 0 bw 3
