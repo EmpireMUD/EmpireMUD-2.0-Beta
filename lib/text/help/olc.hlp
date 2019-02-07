@@ -1888,9 +1888,6 @@ When set on a building, these flags affect all interior rooms, too. When set
 on a designate-able room (a building where the ROOM flag is set), they only
 affect players in that room.
 
-(Some former building flags were moved to the 'functions' list, and their
-former building flags still show up in the editor as DEPRECATED.)
-
 Available flags:
  ROOM - this is a room that can be added with the designate command if it has
     matching designate flags with a building
@@ -5040,15 +5037,13 @@ Available types:
  FOOD - edible
  RECIPE - can be 'learned' to give a craft
  PORTAL - transports a player to another place (never set .wear TAKE)
- *BOARD - a message board
+ *BOARD - a message board (internal use only)
  CORPSE - a corpse
  COINS - a pile of coins
  CURRENCY - a pile of adventure currency
  PAINT - used for painting buildings
- *MAIL - a letter
+ *MAIL - a letter (internal use only)
  WEALTH - adds to empire wealth when stored
- *CART - use vehicles instead
- *SHIP - use vehicles instead
  LIGHTER - can light fires
  MINIPET - teaches a mini-pet to the player on 'use'
  MISSILE-WEAPON - a bow, or similar (requires .wear RANGED)
