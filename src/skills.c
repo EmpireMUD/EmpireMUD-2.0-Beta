@@ -2610,7 +2610,7 @@ bool audit_skill(skill_data *skill, char_data *ch) {
 	
 	// other skills
 	HASH_ITER(hh, skill_table, iter, next_iter) {
-		if (iter == skill) {
+		if (iter == skill || SKILL_VNUM(iter) == SKILL_VNUM(skill)) {
 			continue;
 		}
 		
