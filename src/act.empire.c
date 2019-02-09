@@ -5671,7 +5671,7 @@ ACMD(do_progress) {
 	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 	extern progress_data *find_progress_goal_by_name(char *name);
 	extern progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
-	void get_progress_perks_display(struct progress_perk *list, char *save_buffer);
+	void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
 	void get_tracker_display(struct req_data *tracker, char *save_buffer);
 	void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
 	
@@ -6056,7 +6056,7 @@ ACMD(do_progress) {
 		}
 		
 		if (PRG_PERKS(prg)) {
-			get_progress_perks_display(PRG_PERKS(prg), buf);
+			get_progress_perks_display(PRG_PERKS(prg), buf, FALSE);
 			msg_to_char(ch, "Rewards:\r\n%s", buf);
 		}
 		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
