@@ -3135,7 +3135,8 @@ OLC_MODULE(oedit_type) {
 				break;
 			}
 			case ITEM_WEAPON: {
-				GET_OBJ_VAL(obj, VAL_WEAPON_TYPE) = TYPE_SLASH;
+				// do not set a default, or it shows as 'changed' in the editor/auditor even if it was missed
+				// GET_OBJ_VAL(obj, VAL_WEAPON_TYPE) = TYPE_SLASH;
 				break;
 			}
 			case ITEM_POTION: {
