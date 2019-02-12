@@ -780,7 +780,7 @@ Command:  craft [number] <item>
 All crafting abilities train when you complete recipes that require them.
 
 Primitive crafts:
-  handle
+  handle, bone handle
   stone axe
   stone hammer
   spear
