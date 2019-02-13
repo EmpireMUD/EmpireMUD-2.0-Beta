@@ -160,11 +160,11 @@ int is_tell_ok(char_data *ch, char_data *vict) {
 		send_config_msg(ch, "need_approval_string");
 		msg_to_char(ch, "You can only send tells to immortals.\r\n");
 	}
-	else if (PRF_FLAGGED(ch, PRF_NOTELL))
+	else if (PRF_FLAGGED(ch, PRF_NOTELL) && !IS_IMMORTAL(vict))
 		msg_to_char(ch, "You can't tell other people while you have notell on.\r\n");
 	else if (!REAL_NPC(vict) && !vict->desc)        /* linkless */
 		act("$E's linkless at the moment.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
-	else if (PRF_FLAGGED(vict, PRF_NOTELL))
+	else if (PRF_FLAGGED(vict, PRF_NOTELL) && !IS_IMMORTAL(ch))
 		act("$E can't hear you.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
 	else if (is_ignoring(ch, vict)) {
 		msg_to_char(ch, "You cannot send a tell to someone you're ignoring.\r\n");
@@ -225,8 +225,11 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_TELLS, ch->desc->last_act_message);
 		}
 	}
-
-	if (IS_AFK(vict)) {
+	
+	if (PRF_FLAGGED(vict, PRF_NOTELL)) {	// immortals can hit this point
+		act("Note: $E has tells toggled off.", FALSE, ch, 0, vict, TO_CHAR);
+	}
+	else if (IS_AFK(vict)) {
 		act("$E is AFK and may not receive your message.", FALSE, ch, 0, vict, TO_CHAR);
 	}
 

@@ -365,14 +365,24 @@ void get_progress_list_display(struct progress_list *list, char *save_buffer) {
 * The display for a single perk.
 *
 * @param struct progress_perk *perk The perk to get display text for.
+* @param bool show_vnums If true, adds [ 1234] before the name.
 */
-char *get_one_perk_display(struct progress_perk *perk) {
+char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
 	extern const char *craft_types[];
 	
 	static char save_buffer[MAX_STRING_LENGTH];
 	craft_data *craft;
+	char numstr[256];
 	
 	*save_buffer = '\0';
+	
+	// only some types will use this
+	if (show_vnums) {
+		sprintf(numstr, "[%5d] ", perk->value);
+	}
+	else {
+		*numstr = '\0';
+	}
 	
 	// PRG_PERK_x: displays for each type
 	switch (perk->type) {
@@ -386,7 +396,7 @@ char *get_one_perk_display(struct progress_perk *perk) {
 		}
 		case PRG_PERK_CRAFT: {
 			if ((craft = craft_proto(perk->value))) {
-				sprintf(save_buffer, "%s: %s", craft_types[GET_CRAFT_TYPE(craft)], GET_CRAFT_NAME(craft));
+				sprintf(save_buffer, "%s: %s%s", craft_types[GET_CRAFT_TYPE(craft)], numstr, GET_CRAFT_NAME(craft));
 			}
 			else {
 				strcpy(save_buffer, "UNKNOWN");
@@ -428,14 +438,15 @@ char *get_one_perk_display(struct progress_perk *perk) {
 *
 * @param struct progress_perk *list Pointer to the start of a list of perks.
 * @param char *save_buffer A buffer to store the result to.
+* @param bool show_vnums If true, adds [ 1234] before the name.
 */
-void get_progress_perks_display(struct progress_perk *list, char *save_buffer) {
+void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums) {
 	struct progress_perk *item;
 	int count = 0;
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, item) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, get_one_perk_display(item));
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, get_one_perk_display(item, show_vnums));
 	}
 	
 	// empty list not shown
@@ -2311,7 +2322,7 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	get_requirement_display(PRG_TASKS(prg), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
 	
-	get_progress_perks_display(PRG_PERKS(prg), part);
+	get_progress_perks_display(PRG_PERKS(prg), part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Perks:\r\n%s", *part ? part : " none\r\n");
 	
 	page_string(ch->desc, buf, TRUE);
@@ -2358,7 +2369,7 @@ void olc_show_progress(char_data *ch) {
 		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
 	}
 	
-	get_progress_perks_display(PRG_PERKS(prg), lbuf);
+	get_progress_perks_display(PRG_PERKS(prg), lbuf, TRUE);
 	sprintf(buf + strlen(buf), "Perks: <%sperks\t0>\r\n%s", OLC_LABEL_PTR(PRG_PERKS(prg)), lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
@@ -2583,7 +2594,7 @@ OLC_MODULE(progedit_perks) {
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the perk: %s\r\n", get_one_perk_display(iter));
+					msg_to_char(ch, "You remove the perk: %s\r\n", get_one_perk_display(iter, TRUE));
 					LL_DELETE(PRG_PERKS(prg), iter);
 					free(iter);
 					break;
@@ -2685,7 +2696,7 @@ OLC_MODULE(progedit_perks) {
 			item->value = vnum;
 			LL_APPEND(PRG_PERKS(prg), item);
 			
-			msg_to_char(ch, "You add the perk: %s\r\n", get_one_perk_display(item));
+			msg_to_char(ch, "You add the perk: %s\r\n", get_one_perk_display(item, TRUE));
 		}
 	}	// end 'add'
 	else {

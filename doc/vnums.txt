@@ -46,7 +46,7 @@ blocks that are currently in use.
 5500  System rooms (ships, etc)
 5600  Designate rooms
 
-9000  Map Animals
+9000  Map Animals (and related objects and triggers)
 9100      |
 9200      |
 9200      |

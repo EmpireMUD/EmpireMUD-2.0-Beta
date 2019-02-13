@@ -1,0 +1,35 @@
+#9103
+constrict~
+3 0
+0 0 0 0
+T0
+Your constrict cooldown has ended.~
+S
+#9104
+constricted~
+4 0
+0 0 0 0
+T0
+You're no longer being constricted.~
+T1
+$n is no longer constricted.~
+S
+#9105
+snake venom~
+4 0
+0 0 0 0
+T0
+Your snake venom wears off.~
+T2
+You don't feel so good...~
+S
+#9131
+scorpion venom~
+4 0
+0 0 0 0
+T0
+Your scorpion venom wears off.~
+T2
+You don't feel so good...~
+S
+$

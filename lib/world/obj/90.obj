@@ -20,11 +20,11 @@ a fine deer antler~
 A fine deer antler is lying on the ground.~
 The antler has 5 points and must have come from a good-sized buck.
 ~
-3 e a 1
+3 e a 2
 0 0 0
 14 0
 O
-2 0
+2 u
 R
 5120 0
 S
@@ -287,7 +287,7 @@ S
 purse mermaid's mermaids~
 a mermaid's purse~
 A mermaid's purse has been dropped here.~
-   This cold, slimy purse has horn-shaped protrusions on all four corners. 
+   This cold, slimy purse has horn-shaped protrusions on all four corners.
 There doesn't seem to be a way to open it, but it feels like there are pearls
 inside. These purses are known to come from mermaids who swim in deep waters.
 ~
@@ -296,5 +296,16 @@ inside. These purses are known to come from mermaids who swim in deep waters.
 7 0
 R
 5193 a
+S
+#9064
+wineskin skin seeping~
+a seeping wineskin~
+A seepling wineskin is lying on the ground.~
+   The wineskin is poorly made, and badly damage from decades -- or more -- of
+heavy use.
+~
+5 p a 1
+72 0 6
+7 96
 S
 $

@@ -5,6 +5,10 @@ A leopard is waiting to strike!
 ~
 75 100 cdgjoz c 3
 0 0 0 10
+D
+   The leopard is a beautiful golden color with rosette spots all over its
+coat. The rest of the animal, on the other hand, is a well-honed murder weapon.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
@@ -16,15 +20,14 @@ A towering jungle elephant is rummaging around.
 ~
 20 40 dejoy 0 5
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The great elephant has a blanket over its back, belted on to form a sort of
+saddle, or a place to attach a proper saddle.
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 0 9140 50.00 2 t  # BUTCHER: a huge ivory tusk
+I 0 9140 25.00 1 t  # BUTCHER: a huge ivory tusk
+I 1 1351 100.00 3  # SKIN: a large skin
 I 3 302 100.00 1 X  # BARDE: an armored warelephant
 S
 #9102
@@ -34,9 +37,13 @@ A spotted jaguar is stalking you!
 ~
 75 100 cdgjoz c 3
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+The jaguar is barely visible as it stalks through heavy leaves, but its
+characteristic spots give away its location.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1353 100.00 1  # SKIN: a big cat pelt
+T 9117
 S
 #9103
 tapir~
@@ -45,8 +52,11 @@ A tapir is rooting around a bush.
 ~
 75 100 djo 0 3
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The tapir is tapered on the front end. It's the strangest animal you've ever
+seen, like a horse and a pig had a baby and it was raised by an elephant.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9104
@@ -54,12 +64,17 @@ anaconda giant~
 a giant anaconda~
 A giant anaconda is draping from the tree!
 ~
-75 100 cdjo c 4
+75 100 cdjo cs 4
 0 0 5 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The snake is as long as a boat, and as big around as a dog. It's capable of
+strangling an ox with its powerful muscles, and can unhinge its jaw to swallow
+one, too.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
+T 9103
+T 9104
 S
 #9105
 snake green treesnake~
@@ -68,8 +83,14 @@ A green treesnake is dangling toward you.
 ~
 40 60 cdjo c 1
 0 0 5 9
+D
+   The little treesnake is no bigger around than your smallest finger, but its
+mouth gapes wide and its fangs look sharp!
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
+T 9105
+T 9117
 S
 #9106
 macaw brightly colored bird~
@@ -78,6 +99,9 @@ A brightly colored macaw flies past you.
 ~
 10 20 djo m 1
 0 0 2 9
+D
+The exotic macaw has plumage in bright red, yellow and blue.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 T 9106
@@ -90,6 +114,10 @@ A grey parrot is pecking at some fruit.
 ~
 10 20 djo m 1
 0 0 2 9
+D
+   The small parrot is a beautiful palette of greys. Its yellow eye follows you
+as the bird crushes a seed in its beak.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 T 9106
 T 9107
@@ -99,10 +127,18 @@ mamba black snake~
 a black mamba~
 A black mamba is coiled up on the ground.
 ~
-40 60 cdjo c 1
+40 60 cdjo c 2
 0 0 5 9
+D
+   Despite its name, the snake is a pale shade of grey. It looks small until it
+moves, and then you realize this is one of the largest snakes you've seen!
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
+M
+0
+$n opens its inky-black mouth and hisses at you.~
+T 9105
 S
 #9109
 monkey brown little~
@@ -111,6 +147,10 @@ A little brown monkey is walking along a low branch.
 ~
 40 60 djo c 2
 0 0 0 9
+D
+   The little monkey is balanced carefully on a low branch, clinging to the
+branch with its nimble toes as it reaches for dangling branches with its hands.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -121,6 +161,11 @@ A hairy chimpanzee eyes you cautiously.
 ~
 75 100 doA 0 3
 1 0 0 15
+D
+   The chimpanzee scratches its gray chin as it ponders you. It reminds you of
+a little old man, hunched over and contemplative.
+~
+T 9121
 S
 #9111
 gorilla huge~
@@ -129,6 +174,12 @@ A huge gorilla pounds its chest at you.
 ~
 75 100 doA 0 3
 1 0 0 15
+D
+   The gorilla is twice your size. It's mostly black, but its back is pure
+silver. It doesn't look happy that you've invaded its territory, and it beats
+its chest and howls at you as you pass.
+~
+T 9118
 S
 #9112
 baboon~
@@ -137,6 +188,10 @@ A baboon is sitting here and staring at you.
 ~
 75 100 djoA 0 3
 1 0 0 9
+D
+   The brown baboon chews a handful of leaves, watching you cautiously as if
+it's unsure of your intentions.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -147,8 +202,13 @@ An ocelot is cleaning its paws.
 ~
 40 60 djo c 2
 0 0 0 10
+D
+   The ocelot's fur is a beautiful mix of lines, spots, and rosettes that make
+it a prized catch for hunters.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 1 9113 100.00 1  # SKIN: a spotted fur
+T 9117
 S
 #9114
 crocodile massive~
@@ -157,10 +217,14 @@ A massive crocodile is lurking here.
 ~
 75 100 cdgjo c 5
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The enormous, flat reptile is barely moving -- more a murder-log than an
+animal. When it opens its maw, you can see dozens of spike-shaped teeth lining
+its pale pink mouth.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 2  # SKIN: a large skin
+T 9117
 S
 #9115
 bat flying fox~
@@ -169,6 +233,9 @@ A flying fox is flapping around above you.
 ~
 10 20 djo m 1
 0 0 2 9
+D
+This gigantic bat is nearly the size of a fox!
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -180,7 +247,8 @@ A black bat is flying here.
 1 5 djo m 1
 0 0 2 9
 D
-The tiny bat is fluttering to and fro, chasing bugs.
+The tiny bat is fluttering to and fro, chasing bugs. You can barely see the
+tiny black bat against the darkness.
 ~
 S
 #9117
@@ -190,8 +258,14 @@ A jackrabbit sits with its ears raised.
 ~
 1 5 djo 0 1
 0 0 15 9
+D
+   The oversized jackrabbit -- actually a hare -- sits perfectly still and
+slowly moves its enormous, plate-shaped ears to scan for danger.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
+T 9117
+T 9121
 S
 #9118
 cougar puma~
@@ -200,9 +274,15 @@ A cougar is crouched low and watching you.
 ~
 20 40 dgjko c 3
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The cougar has a flecked brown coat, rounded ears, and an unusually long
+tail with a black tip. It crouches low to the ground, almost vanishing against
+the plants.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
+T 9117
+T 9118
 S
 #9119
 bobcat cat curious~
@@ -211,9 +291,16 @@ A curious bobcat is sitting here, waiting.
 ~
 10 20 djo c 2
 0 0 0 10
+D
+   Though larger than a housecat, this spotted bobcat isn't very large. It
+lowers its ears behind its ruffled face as it sees you, and waits for you to
+pass.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1350 100.00 1  # SKIN: a small skin
+I 1 9113 50.00 1 a  # SKIN: a spotted fur
+I 1 1350 50.00 1 a  # SKIN: a small skin
 T 9002
+T 9117
 S
 #9120
 coyote lanky~
@@ -222,6 +309,10 @@ A lanky coyote dashes past you.
 ~
 10 20 dgjo c 2
 0 0 0 10
+D
+   The scrawny coyote looks like it hasn't eaten all season. It keeps its
+distance from you, but its eyes never stop following you.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
@@ -232,10 +323,13 @@ A mule deer is alerted.
 ~
 10 20 djo 0 4
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The pale brown deer almost disappears against the brush, but its enormous
+ears give it away. It stands perfectly still, watching you, unsure what to do.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
+T 9121
 S
 #9122
 squirrel ground small~
@@ -244,8 +338,14 @@ A small ground squirrel dashes behind a shrub.
 ~
 1 5 djo c 1
 0 0 0 9
+D
+   The ground squirrel looks almost comical. Its body is skinny to the point of
+looking emaciated, but its cheeks are puffed out to preposterous proportions as
+the little squirrel continues to shovel more and more food into them.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
+T 9117
 S
 #9123
 roadrunner runner bird~
@@ -254,8 +354,14 @@ A roadrunner dashes past you!
 ~
 1 5 dgjo c 1
 0 0 0 9
+D
+   This striking bird has a bright red patch behind its eye, and its brown
+feathers come to a crest on the top of its head. It has an unusually long tail
+to counterbalance its powerful beak and fast forward lunges.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
+T 9121
 S
 #9124
 ostrich~
@@ -264,8 +370,16 @@ An ostrich ruffles its feathers and backs away from you.
 ~
 10 20 djo c 3
 0 0 0 11
+D
+   This awkward creature looks like a baby bird that forgot to moult as it
+grew. It is taller than you are, with a long, bare neck and huge, downy
+feathers.
+~
 I 0 3200 100.00 2  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
+I 0 9124 33.33 3 b  # BUTCHER: a large ostrich feather
+I 0 9124 33.33 2 b  # BUTCHER: a large ostrich feather
+I 0 9124 33.34 1 b  # BUTCHER: a large ostrich feather
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9125
@@ -275,6 +389,9 @@ A meerkat is standing on its hind legs, watching you.
 ~
 1 5 djo 0 1
 0 0 0 9
+D
+The banded little meerkat stands on its hind legs and scouts for danger.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -285,6 +402,10 @@ A horned lizard is digging at the ground.
 ~
 1 5 djo 0 1
 0 0 0 10
+D
+   This flat little lizard would be invisible against the ground if you hadn't
+just seen it move.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #9127
@@ -294,6 +415,12 @@ A desert tortoise slowly wanders by.
 ~
 5 15 djoy 0 1
 0 0 0 9
+D
+   The tortoise has a hard, rounded shell as well as powerful armored legs. 
+Its beak is made for eating fruits and leaves, but it looks as if it might take
+off a finger, given the chance.
+~
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #9128
 pronghorn musky~
@@ -302,20 +429,33 @@ A musky pronghorn stops to watch you.
 ~
 10 20 djo 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This odd animal resembles a deer or antelope, but its horns reveal a
+different lineage. Despite its appearance, it's actually more closely related
+to the giraffe.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 0 9128 100.00 1  # BUTCHER: a set of pronged horns
 I 1 1351 100.00 1  # SKIN: a large skin
+T 9121
 S
 #9129
 hyena spotted~
 a hyena~
-A spotted hyena is laughing at you.
+A spotted hyena saunters along.
 ~
 20 40 dgjo c 3
 0 0 14 10
+D
+   The hyena walks along with little concern for you. Its short mane and
+spotted coat flutter in the wind. The hyena is an ancient symbol of treachery,
+and you would be wise to keep your distance.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
+M
+0
+$n laughs at you.~
 S
 #9130
 rattlesnake snake sidewinder~
@@ -324,8 +464,15 @@ A sidewinder rattlesnake is coiled and rattling.
 ~
 5 15 djo 0 1
 0 0 5 9
+D
+   The sidewinder moves in a characteristic sideways motion, waving across the
+sand almost as if it's water. The rattle on the end of its tail lets you know
+you probably shouldn't get any closer.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
+T 9117
+T 9105
 S
 #9131
 scorpion giant~
@@ -334,6 +481,10 @@ A giant scorpion skitters toward cover.
 ~
 5 15 djoz 0 1
 0 0 8 3
+D
+Though giant for a scorpion, it's still quite small.
+~
+T 9131
 S
 #9132
 bison heavy buffalo~
@@ -342,10 +493,10 @@ A heavy bison is roaming around.
 ~
 10 20 dfjoy 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+The bison, the greatest predator of the endless grass, towers over the plains.
+~
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9133
@@ -355,6 +506,9 @@ A great-horned owl is surveying the ground.
 ~
 5 15 djo m 2
 0 0 2 10
+D
+You can barely see the owl as it swoops silently across the night sky.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
@@ -371,6 +525,10 @@ A collared peccary stands perfectly still, watching you.
 ~
 5 15 dgjo c 2
 0 0 0 9
+D
+   This foul-smelling musk hog only superficially resembles a pig. It's
+thinner, hairier, and significantly meaner.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
@@ -381,8 +539,13 @@ A giant anteater is lumbering about.
 ~
 10 20 djo c 3
 0 0 0 15
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This odd, lumbering creature almost appears to be walking backwards as its
+narrow face is shaped like a tail and its bushy tale is thick like a head. 
+Adding to the confusion, its front legs have eye spots and appear to be grazing
+on the ground.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9136
@@ -392,10 +555,14 @@ A moose is standing here.
 ~
 20 40 djo 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The moose is bigger than any deer you've ever seen, and taller than some of
+your favorite trees. It seems wary of you, but it's large enough to hold its
+ground.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 0 9136 50.00 2  # BUTCHER: a huge antler
+I 1 1351 100.00 2  # SKIN: a large skin
 S
 #9137
 elk~
@@ -404,10 +571,13 @@ An elk is grazing here.
 ~
 20 40 djo 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The elk resembles a deer, but it is at least twice as bulky as any deer
+you've seen.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 0 9136 50.00 2  # BUTCHER: a huge antler
+I 1 1351 100.00 2  # SKIN: a large skin
 S
 #9138
 giraffe tall~
@@ -416,10 +586,13 @@ A tall giraffe is grazing here.
 ~
 10 20 djo 0 5
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The giraffe towers above you, surveying the landscape from its lofty vantage
+point. Its huge, reticulated spots form a mesmerizing pattern and you can
+hardly break your gaze.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 3  # SKIN: a large skin
 S
 #9139
 rhinoceros white~
@@ -428,12 +601,16 @@ A white rhinoceros stomps around.
 ~
 20 40 djoA 0 4
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The massive rhinoceros is large, even by its own standards. It has a great
+horn on its nose, and a smaller horn behind it. Its armored skin and heavy
+build make for an intimidating sight.
+~
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 0 9139 100.00 1  # BUTCHER: a rhinoceros horn
+I 1 1351 100.00 2  # SKIN: a large skin
+T 9118
+T 9503
 S
 #9140
 elephant massive~
@@ -442,15 +619,13 @@ A massive elephant lumbers past you.
 ~
 20 40 dejoy 0 5
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+The gray elephant is truly huge, with ears like bedsheets and legs like trees.
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 0 9140 50.00 2 t  # BUTCHER: a huge ivory tusk
+I 0 9140 25.00 1 t  # BUTCHER: a huge ivory tusk
+I 1 1351 100.00 3  # SKIN: a large skin
 I 3 302 100.00 1 X  # BARDE: an armored warelephant
 S
 #9141
@@ -460,6 +635,10 @@ A red fox is playing here.
 ~
 5 15 djo c 2
 0 0 0 9
+D
+   The little fox has a bright orange coat, with a white tip on its tail. It
+moves low to the ground, stalking its prey behind tall plants.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1352 100.00 1  # SKIN: a luxurious fox fur
 S
@@ -470,8 +649,10 @@ A llama is looking at you.
 ~
 10 20 dfjko 0 4
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+The shaggy llama munches a mouthful of grass as it contemplates you.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 I 2 1361 100.00 1  # SHEAR: a bag of soft llama wool
 I 2 1361 50.00 1  # SHEAR: a bag of soft llama wool
@@ -484,8 +665,16 @@ A snow leopard is waiting to strike!
 ~
 20 40 dgjko c 2
 0 0 0 10
+D
+   This large, bulky leopard is covered in shaggy fur, decorated with large
+rosettes, and armed with dozens of sharp claws and teeth. It stalks prey in
+snowy mountains, and has the strength to drag that prey uphill to its lair.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
+I 1 9113 50.00 1 x  # SKIN: a spotted fur
+I 1 1351 50.00 1 x  # SKIN: a large skin
+T 9118
+T 9117
 S
 #9144
 raccoon~
@@ -494,6 +683,9 @@ A raccoon is cleaning its paws.
 ~
 5 15 djo c 2
 0 0 0 9
+D
+The sly little bandit sits on its rear feet, rubbing its paws together.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -504,6 +696,9 @@ There is an opossum on the ground, but it looks dead.
 ~
 5 15 djo c 2
 0 0 0 9
+D
+You're pretty sure the opossum is dead.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -514,8 +709,13 @@ A badger is digging furiously at the ground.
 ~
 20 40 djoz c 2
 0 0 0 10
+D
+   The badger -- nature's plow -- digs furiously at the ground, stopping only
+briefly to listen for its quarry scurrying through tunnels below.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
+T 9118
 S
 #9147
 turtle forest~
@@ -524,6 +724,10 @@ A forest turtle is munching on something.
 ~
 1 5 djo 0 1
 0 0 0 9
+D
+   This flat little brown turtle plods along through the underbrush, stopping
+occasionally to grab a berry or leaf in its beak.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #9148
@@ -533,11 +737,14 @@ A bluebird is pecking at the ground.
 ~
 1 5 djo m 1
 0 0 2 26
+D
+This tiny bird has a gorgeous blue back, with a reddish brown belly.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
 0
-$n sings sweetly from a nearby tree.~
+$n chirps from a nearby tree.~
 S
 #9149
 finch bird small~
@@ -546,6 +753,11 @@ A small finch is perched here.
 ~
 1 5 djo m 1
 0 0 2 26
+D
+   This little round bird has a gray back, a striped wing, and a bright pink
+chest. Its tiny black beak is perfect for cracking open seeds, which is seems
+to do constantly.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
@@ -559,6 +771,10 @@ A woodpecker is hammering away at a tree.
 ~
 1 5 djo m 1
 0 0 2 26
+D
+   The woodpecker is mostly black and white, with a bright red crest on its
+head. It clings to the side of a tree, hammering away as it drills for food.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
@@ -578,6 +794,11 @@ A bird of paradise is displaying its feathers.
 ~
 10 20 djo m 1
 0 0 2 26
+D
+   The exotic bird is larger than a pigeon, but smaller than a goose. Its long,
+vibrant feathers come in every color, but they pale in comparison to the bird's
+risque dance.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
@@ -588,9 +809,11 @@ A bull is grazing here.
 ~
 20 40 djo 0 4
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The bull is grazing peacefully, as if it doesn't know its head is crowned
+with a pair of murderhorns.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 M
 0
@@ -601,6 +824,7 @@ $n eats some grass.~
 M
 0
 $n chews $s cud.~
+T 9503
 S
 #9153
 ox~
@@ -609,9 +833,10 @@ An ox is standing here.
 ~
 10 20 dejo 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+The ox meanders about, munching grass and minding its own business.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 3 306 100.00 1 X  # BARDE: a war ox
 S
 #9154
@@ -621,6 +846,10 @@ A pig is rooting around.
 ~
 5 15 djo 0 3
 0 0 0 9
+D
+   The pig is big and round, almost ready for market. It roots around at the
+ground before rolling over to cover itself in fresh dirt.
+~
 I 0 3201 100.00 2  # BUTCHER: a slab of pork
 S
 #9155
@@ -630,6 +859,9 @@ A muskrat is digging around.
 ~
 40 60 djo 0 2
 0 0 0 9
+D
+The muskrat is big, for a rodent. It's more like a beaver than a rat.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
@@ -640,8 +872,11 @@ A beaver rests back on its hind legs and looks at you.
 ~
 40 60 djo 0 2
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The beaver is large, with a distinctive flat tail and massive teeth, which
+it uses to build its dam home.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9157
@@ -651,6 +886,10 @@ A giant swamp crab pokes its claw up out of the water.
 ~
 40 60 cdjo c 2
 0 0 0 10
+D
+   The crab is nearly the size of a hunting dog! It has one massive claw and
+another, smaller, claw. Neither claw makes you want to move closer.
+~
 S
 #9158
 turtle snapping~
@@ -659,6 +898,11 @@ A snapping turtle pokes its head up.
 ~
 40 60 cdjo c 1
 0 0 0 9
+D
+   This large freshwater turtle isn't much to look at, until it opens its
+powerful beak and snaps down on a stray tree branch, snapping the branch in
+half.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #9159
@@ -668,6 +912,11 @@ A great heron is poking around for food.
 ~
 40 60 djo m 2
 0 0 2 9
+D
+   This tall, slender, graceful bird is a heron. Its long beak is perfect for
+stabbing into the water to grab an unsuspecting fish. When it flaps its wings,
+its underside looks almost blue.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
@@ -676,9 +925,12 @@ will wisp glowing~
 Will o' the Wisp~
 A glowing wisp floats along the swamp.
 ~
-100 125 cdjoux c 0
+100 125 cdoux c 0
 1 0 0 16
-I 4 2104 50.00 1  # LOOT: a torch
+D
+   It just looks like a ball of light hovering over the swamp.
+~
+I 4 9160 100.00 1  # LOOT: a ball of fool's fire
 S
 #9161
 witch swamp~
@@ -687,10 +939,16 @@ The swamp witch lurches about.
 ~
 75 100 cdovx c 3
 2 0 0 19
-I 4 1206 20.00 1  # LOOT: an iridescent blue iris
-I 4 103 20.00 1  # LOOT: a yellow lightning stone
-I 4 104 20.00 1  # LOOT: a red bloodstone
-I 4 1300 20.00 1  # LOOT: a glowing green seashell
+D
+   The old witch is clothed in bits of swamp. Her hair is indistinguishable
+from the moss that hangs from the trees. Her skin is pale and slimy, like
+frogskin. She is a part of the swamp, and she doesn't look happy you've entered
+it.
+~
+I 4 1300 25.00 6 g  # LOOT: a glowing green seashell
+I 4 104 25.00 6 g  # LOOT: a red bloodstone
+I 4 103 25.00 6 g  # LOOT: a yellow lightning stone
+I 4 1206 25.00 6 g  # LOOT: an iridescent blue iris
 S
 #9162
 bandit swamp someone~
@@ -699,7 +957,13 @@ Someone is lurking behind a tree!
 ~
 75 100 cdov c 3
 1 0 0 4
-I 4 170 20.00 1  # LOOT: a silver ingot
+D
+   The bandit is dressed in gray and green to match the swamp, with a mask over
+his mouth to disguise his face.
+~
+I 4 178 50.00 1 x  # LOOT: a copper ingot
+I 4 170 40.00 1 x  # LOOT: a silver ingot
+I 4 171 10.00 1 x  # LOOT: a gold ingot
 S
 #9163
 manatee~
@@ -708,13 +972,12 @@ A manatee is bobbing near the surface.
 ~
 30 50 djlo 0 4
 0 0 6 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 50.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 50.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The manatee takes a breath at the surface and then drifts down to chew the
+plants that grow at the bottom. It's a massive creature, like a sea cow.
+~
+I 0 3012 100.00 5  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 2  # SKIN: a large skin
 S
 #9164
 dolphin common~
@@ -723,9 +986,13 @@ A common dolphin is swimming along side you.
 ~
 30 50 djlo 0 3
 0 0 6 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 50.00 1  # BUTCHER: a fillet of raw meat
+D
+   The dolphin jumps out of the water over and over, either trying to perform
+for you or trying to get a look at you. Its back is dark and its belly is
+white, but the side has a large hourglass that is golden in the front and dusty
+gray in the back.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9165
@@ -735,9 +1002,14 @@ A sea otter glides past you.
 ~
 30 50 djlo 0 2
 0 0 6 9
+D
+   The large, brown otter swims past you and then rolls over to float on its
+back through the tranquil water. It places a rock on its chest and then slams a
+crab on it to crack open the crab.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
-I 1 1350 100.00 1  # SKIN: a small skin
+I 4 100 100.00 1  # LOOT: a rock
 S
 #9166
 whale right huge~
@@ -746,6 +1018,11 @@ A huge right whale surfaces nearby!
 ~
 30 50 djloy 0 6
 0 0 6 5
+D
+   This type of whale is known as a the right whale to hunt. The whale slowly
+skims the surface, gulping in water and spewing it back out. You can barely see
+the whale from here, as most of its dark form is too deep in the water.
+~
 I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 6  # SKIN: a large skin
 S

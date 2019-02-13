@@ -337,7 +337,8 @@ Handle (component)
 Used for:  forge, craft
 Stored in:  Utility Shed, Storage room
 
-Create a handle using the craft command.
+Create a handle (from a sapling, or a bone handle from bone) using the craft
+command.
 
 Handles are used in forging and crafting to provide a grasping surface to a
 tool or weapon. The most basic handles are made from saplings.
