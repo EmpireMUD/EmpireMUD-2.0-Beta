@@ -10,8 +10,7 @@ D
 as it snarls at you. Its eyes follow you as you circle around it, but it holds
 its ground.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 9001 75.00 1 s  # SKIN: a wolf fur
 I 1 1351 25.00 1 s  # SKIN: a large skin
 M
@@ -21,6 +20,7 @@ M
 0
 $n points $s muzzle toward the sky and howls.~
 T 9001
+T 9118
 S
 #9002
 wolf brown~
@@ -139,6 +139,7 @@ I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 9007 5.00 2 x  # BUTCHER: a fine deer antler
 I 0 9007 10.00 1 x  # BUTCHER: a fine deer antler
 I 1 1351 100.00 1  # SKIN: a large skin
+T 9121
 S
 #9007
 buck large~
@@ -219,6 +220,7 @@ $n deftly catches a bug in its beak and gobbles it down.~
 M
 0
 $n searches around on the ground, looking for bugs.~
+T 9121
 S
 #9011
 rooster~
@@ -358,6 +360,7 @@ hungry.
 ~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 9016 100.00 1  # SKIN: a fine tiger pelt
+T 9117
 S
 #9017
 bear large~
@@ -372,6 +375,7 @@ bear has more than a foot on you, and at least 100 pounds.
 ~
 I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
+T 9118
 S
 #9018
 vulture hideous~
@@ -480,6 +484,8 @@ establish a colony if even two escape.
 ~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
+T 9117
+T 9121
 S
 #9024
 pigeon grey~
@@ -581,9 +587,10 @@ M
 $n can't be broken.~
 T 9028
 T 9027
+T 9121
 S
 #9029
-man dirty~
+man dirty human~
 a dirty man~
 A man is digging through the dirt.
 ~
@@ -595,7 +602,7 @@ He must live just beyond the edges of society.
 ~
 S
 #9030
-man~
+man human~
 a man~
 A man is walking around.
 ~
@@ -607,7 +614,7 @@ village?
 ~
 S
 #9031
-woman young~
+woman young human~
 a young woman~
 A young woman walks past you.
 ~
@@ -618,7 +625,7 @@ The young woman doesn't bear the colors of any empire.
 ~
 S
 #9032
-woman~
+woman human~
 a woman~
 A woman is standing here.
 ~
@@ -650,6 +657,7 @@ $n stomps $s hoof.~
 M
 0
 $n's ears prick forward as though listening for danger...~
+T 9121
 S
 #9034
 horse paint pinto brown white~
@@ -674,6 +682,7 @@ $n stomps $s hoof.~
 M
 0
 $n's ears prick forward as though listening for danger...~
+T 9121
 S
 #9035
 horse blue roan~
@@ -697,6 +706,7 @@ $n stomps $s hoof.~
 M
 0
 $n's ears prick forward as though listening for danger...~
+T 9121
 S
 #9036
 horse appaloosa apaloosa spotted~
@@ -720,6 +730,7 @@ $n stomps $s hoof.~
 M
 0
 $n's ears prick forward as though listening for danger...~
+T 9121
 S
 #9037
 horse palomino golden~
@@ -742,6 +753,7 @@ $n stomps $s hoof.~
 M
 0
 $n's ears prick forward as though listening for danger...~
+T 9121
 S
 #9038
 horse chestnut stunning~
@@ -765,6 +777,7 @@ $n stomps $s hoof.~
 M
 0
 $n's ears prick forward as though listening for danger...~
+T 9121
 S
 #9039
 horse bay tall~
@@ -788,6 +801,7 @@ $n stomps $s hoof.~
 M
 0
 $n's ears prick forward as though listening for danger...~
+T 9121
 S
 #9040
 unicorn majestic white~
@@ -839,6 +853,7 @@ M
 $n can't be broken.~
 T 9028
 T 9027
+T 9121
 S
 #9042
 ass wild~
@@ -876,8 +891,47 @@ D
 over you, easily twice your height, but doesn't seem very interested in you.
 ~
 I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 0 9140 50.00 2 t  # BUTCHER: a huge ivory tusk
+I 0 9140 25.00 1 t  # BUTCHER: a huge ivory tusk
 I 1 1351 100.00 3  # SKIN: a large skin
 I 24 9101 100.00 1  # TAME: a jungle elephant
+T 9027
+T 9028
+S
+#9044
+elephant wild~
+a wild elephant~
+A wild elephant lumbers along slowly.
+~
+20 40 djoy 0 5
+0 0 0 27
+D
+   The elephant is enormous, powerful, and terrifying. Luckily, it doesn't seem
+very interested in something as small as you.
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 0 9140 50.00 2 t  # BUTCHER: a huge ivory tusk
+I 0 9140 25.00 1 t  # BUTCHER: a huge ivory tusk
+I 1 1351 100.00 3  # SKIN: a large skin
+I 24 9140 100.00 1  # TAME: a massive elephant
+T 9027
+T 9028
+S
+#9045
+llama wild~
+a wild llama~
+A wild llama darts away from you.
+~
+10 20 djko 0 4
+0 0 0 9
+D
+   Also called the wanaku or guanaco, the wild llama has short brown fur and is
+set atop lithe, nimble legs. You've heard of people domesticating these
+animals.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+I 24 9142 100.00 1  # TAME: a llama
 T 9027
 T 9028
 S
@@ -959,6 +1013,7 @@ It's known to stalk the southern deserts, where it sometimes mistakes children
 for its favorite prey.
 ~
 T 9064
+T 9118
 S
 #9060
 dragon massive green~
@@ -1031,6 +1086,7 @@ The wanderer looks a bit pale, almost sickly.
 ~
 I 4 9064 33.33 1  # LOOT: a seeping wineskin
 T 9064
+T 9118
 S
 #9065
 vampire feral starving~

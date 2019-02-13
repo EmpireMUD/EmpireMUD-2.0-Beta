@@ -1,3 +1,102 @@
+#9113
+fur spotted~
+a spotted fur~
+A spotted fur is draped here.~
+This spotted fur looks like it must have come from some exotic cat.
+~
+3 0 a 4
+0 0 0
+7 0
+O
+10 ou
+R
+5120 0
+S
+#9124
+feather large ostrich~
+a large ostrich feather~
+A large ostrich feather is lying here.~
+This feather is so large you could almost stuff a pillow with it alone.
+~
+3 0 a 7
+0 0 0
+7 0
+C
+1 1
+O
+7 apu
+R
+5137 0
+S
+#9128
+horns pronged set~
+a set of pronged horns~
+A set of pronged horns are lying here.~
+   These odd bifurcated horns can only have come from the pronghorn. Perhaps
+they could be used for crafts.
+~
+3 0 a 4
+0 0 0
+14 0
+O
+2 u
+R
+5120 0
+S
+#9136
+antler huge~
+a huge antler~
+A huge antler is lying here.~
+This antler must have come from a truly enormous animal!
+~
+3 e a 3
+0 0 0
+14 0
+O
+2 u
+R
+5120 0
+S
+#9139
+horn rhinoceros~
+a rhinoceros horn~
+A rhinoceros horn is lying here.~
+   This exotic conical horn comes from a rhinoceros. Due to their rarity, the
+horns are quite expensive.
+~
+15 0 a 8
+8 0 0
+14 0
+O
+2 k
+R
+5193 a
+S
+#9140
+tusk ivory huge~
+a huge ivory tusk~
+A huge ivory tusk is lying here.~
+The long, elegantly curved ivory tusk must have come from a great elephant.
+~
+15 e a 8
+4 0 0
+14 0
+O
+2 fk
+R
+5193 a
+S
+#9160
+fire fool's fools ball~
+a ball of fool's fire~
+A ball of fool's fire is floating here.~
+   The ball of fire almost looks alive as it dances back and forth without
+burning you.
+~
+3 cp ao 2
+0 0 0
+10 8064
+S
 #9173
 cabin tent collapsed folded~
 a collapsed cabin tent~
@@ -20,11 +119,11 @@ warts before branching smoothly into a half-dozen, widely-spaced prongs.
 
 Forge (Deadly Weapons): reindeer antler dagger
 ~
-3 e a 3
+3 e a 4
 0 0 0
 14 0
 O
-2 0
+2 u
 R
 5120 0
 S

@@ -63,6 +63,15 @@ wait 3 sec
 %send% %target% Type 'struggle' to break free!
 dg_affect #9104 %actor% STUNNED on 20
 ~
+#9105
+Snake: Venom~
+0 k 100
+~
+if %actor.has_tech(!Poison)%
+  halt
+end
+%dot% #9105 %actor% 100 15 poison 5
+~
 #9106
 Jungle Bird Animation~
 0 bw 3
@@ -92,6 +101,50 @@ Jungle Bird Speech~
 *~
 set last_phrase %speech%
 remote last_phrase %self.id%
+~
+#9117
+Animal Becomes Hidden Over Time~
+0 ab 20
+~
+if %self.fighting% || %self.disabled%
+  halt
+end
+* Prevent duplicates
+dg_affect %self% HIDE off
+* Add infinite hide
+dg_affect %self% HIDE on -1
+~
+#9118
+Mob Becomes Hostile on Interaction~
+0 e 1
+you~
+* Mob becomes hostile after a player pays attention to it.
+if %actor.is_npc%
+  halt
+end
+wait 2 sec
+nop %self.add_mob_flag(AGGR)%
+detach 9118 %self.id%
+~
+#9121
+Wimpy Flee~
+0 l 20
+~
+if %self.disabled% || %self.aff_flagged(ENTANGLED)%
+  halt
+end
+if %random.3% == 3
+  fleet
+end
+~
+#9131
+Scorpion: Venom~
+0 k 100
+~
+if %actor.has_tech(!Poison)%
+  halt
+end
+%dot% #9131 %actor% 100 15 poison 5
 ~
 #9133
 Great Horned Owl Animation~
