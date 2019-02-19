@@ -416,7 +416,7 @@ A desert tortoise slowly wanders by.
 5 15 djoy 0 1
 0 0 0 9
 D
-   The tortoise has a hard, rounded shell as well as powerful armored legs. 
+   The tortoise has a hard, rounded shell as well as powerful armored legs.
 Its beak is made for eating fruits and leaves, but it looks as if it might take
 off a finger, given the chance.
 ~
@@ -541,7 +541,7 @@ A giant anteater is lumbering about.
 0 0 0 15
 D
    This odd, lumbering creature almost appears to be walking backwards as its
-narrow face is shaped like a tail and its bushy tale is thick like a head. 
+narrow face is shaped like a tail and its bushy tale is thick like a head.
 Adding to the confusion, its front legs have eye spots and appear to be grazing
 on the ground.
 ~
@@ -1033,18 +1033,14 @@ A gigantic fin whale swims up alongside you!
 ~
 30 50 djloy 0 6
 0 0 6 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   Cruising just below the surface, the fin whale is barely visible as it pulls
+up alongside you. Then, its enormous back crests through the waves and it
+shoots up a spout of foul water and breath that reaches higher than your
+tallest tower!
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 6  # SKIN: a large skin
 S
 #9168
 shark whale huge spotted~
@@ -1053,6 +1049,11 @@ A huge, spotted whale shark swims just below the surface.
 ~
 30 50 djloy 0 5
 0 0 6 5
+D
+   The whale shark is unmistakably a fish, and yet it is the size of a whale!
+Its skin is inky black, almost invisible against the water, but it's covered in
+uncountable white spots, arranged like stars.
+~
 I 0 9019 100.00 2  # BUTCHER: a slab of shark meat
 I 1 1354 50.00 1  # SKIN: a shark skin
 I 1 1354 50.00 1  # SKIN: a shark skin
@@ -1072,6 +1073,11 @@ A basking shark swims slowly, with its mouth wide open.
 ~
 30 50 djloy 0 5
 0 0 6 5
+D
+   Though large, the basking shark isn't exceptionally big, for a shark. It
+trawls along just below the surface with its gaping maw hung open like a net,
+eating anything trapped inside.
+~
 I 0 9019 50.00 1 s  # BUTCHER: a slab of shark meat
 I 0 9019 50.00 2 s  # BUTCHER: a slab of shark meat
 I 1 1354 50.00 1  # SKIN: a shark skin
@@ -1092,16 +1098,26 @@ A gannet dives out of the air and into the water.
 ~
 1 5 djo m 2
 0 0 2 9
+D
+   As you watch the gannet circle overhead, it tucks back its wings and drops
+into a high-speed dive, piercing the water like an arrow. It vanishes beneath
+the waves, only to surface a minute later with a fish in its beak.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
 #9171
 albatross bird~
 an albatross~
-An albatross is floating peacefully in the water.
+An albatross soars effortlessly on the wing.
 ~
 1 5 djo m 2
 0 0 2 9
+D
+   This great white and grey bird, the albatross, soars almost without
+flapping. It is said they even sleep on the wing. The albatross is the ancient
+symbol of the lost sailor, and killing them is said to bring bad luck.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
@@ -1112,6 +1128,10 @@ An arctic fox is playing here.
 ~
 30 50 djo c 2
 0 0 14 9
+D
+   The arctic fox is plush, with pure white fur. When it turns its head away
+from you, you can barely make out its outline against the snow.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1352 100.00 1  # SKIN: a luxurious fox fur
 S
@@ -1122,6 +1142,11 @@ A dire arctic fox rolls nearby.
 ~
 75 100 djo c 2
 0 0 14 9
+D
+   This fearsome white fox is larger than most wolves, though it has all the
+sleek and slender features of its small namesake. It rolls playfully, perhaps
+unconcerned at how close you are to it.
+~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 I 1 1352 100.00 1  # SKIN: a luxurious fox fur
