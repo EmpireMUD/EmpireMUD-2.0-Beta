@@ -2096,34 +2096,32 @@ int reserved_word(char *argument) {
 * it to be returned.  Returns NOTHING if not found; 0..n otherwise.  Array
 * must be terminated with a '\n' so it knows to stop searching.
 *
+* As of b5.57, This function will prefer exact matches over partial matches,
+* even without 'exact'.
+*
 * @param char *arg The input.
 * @param const char **list A "\n"-terminated name list.
 * @param int exact 0 = abbrevs, 1 = full match
 */
 int search_block(char *arg, const char **list, int exact) {
-	register int i, l;
+	register int i, l, part = NOTHING;
+
+	if (!*arg) {
+		return NOTHING;	// shortcut
+	}
 
 	l = strlen(arg);
 
-	if (exact) {
-		for (i = 0; **(list + i) != '\n'; i++) {
-			if (!str_cmp(arg, *(list + i))) {
-				return (i);
-			}
+	for (i = 0; **(list + i) != '\n'; i++) {
+		if (!str_cmp(arg, *(list + i))) {
+			return i;	// exact or otherwise
 		}
-	}
-	else {
-		if (!l) {
-			l = 1;			/* Avoid "" to match the first available string */
-		}
-		for (i = 0; **(list + i) != '\n'; i++) {
-			if (!strn_cmp(arg, *(list + i), l)) {
-				return (i);
-			}
+		else if (!exact && part == NOTHING && !strn_cmp(arg, *(list + i), l)) {
+			part = i;	// found partial but keep searching
 		}
 	}
 
-	return (NOTHING);
+	return part;	// if any
 }
 
 
