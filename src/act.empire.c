@@ -4453,6 +4453,10 @@ ACMD(do_enroll) {
 				// storage
 				HASH_ITER(hh, from_isle->store, store, next_store) {
 					add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
+					
+					// counts as imported items
+					add_gathered_total(e, store->vnum, store->amount);
+					mark_gathered_trade(e, store->vnum, store->amount, 0);
 				}
 				
 				// needs

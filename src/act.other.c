@@ -590,6 +590,11 @@ INTERACTION_FUNC(shear_interact) {
 		load_otrigger(obj);
 	}
 	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, amt);
+	}
+	
 	// only show loot to the skinner
 	if (amt == 1) {
 		act("You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
@@ -623,6 +628,11 @@ INTERACTION_FUNC(skin_interact) {
 		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char(obj, ch);
 		load_otrigger(obj);
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	// only show loot to the skinner

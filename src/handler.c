@@ -37,6 +37,7 @@
 *   Cooldown Handlers
 *   Currency Handlers
 *   Empire Handlers
+*   Empire Gather Total Handlers
 *   Empire Needs Handlers
 *   Empire Targeting Handlers
 *   Follow Handlers
@@ -2878,6 +2879,157 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 		event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
 		ROOM_UNLOAD_EVENT(room) = NULL;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE GATHER TOTAL HANDLERS ////////////////////////////////////////////
+
+/**
+* Marks that the empire has gathered (or produced, or traded for) an item.
+* If you are adding as the result of an import, you should call
+* mark_gathered_trade too.
+*
+* @param empire_data *emp Which empire.
+* @param obj_vnum vnum The item gained.
+* @param int amount How many were gained.
+*/
+void add_gathered_total(empire_data *emp, obj_vnum vnum, int amount) {
+	struct empire_gathered_total *egt;
+	
+	if (!emp || vnum == NOTHING) {
+		return;	// no work
+	}
+	
+	HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &vnum, egt);
+	if (!egt) {
+		CREATE(egt, struct empire_gathered_total, 1);
+		egt->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_GATHERED_TOTALS(emp), vnum, egt);
+	}
+	
+	SAFE_ADD(egt->amount, amount, 0, INT_MAX, FALSE);
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+}
+
+
+/**
+* Marks an item as gathered for everyone on a mob's tag list, ignoring anybody
+* whose empire has already been done (adds at most 1 per empire).
+*
+* @param struct mob_tag *list The list of mob tags.
+* @param obj_vnum vnum The item gained.
+* @param int amount How many were gained.
+*/
+void add_gathered_total_for_tag_list(struct mob_tag *list, obj_vnum vnum, int amount) {
+	struct mob_tag *tag;
+	char_data *plr;
+	bool done;
+	
+	// mini data type for preventing duplicates
+	struct agtftl_data {
+		any_vnum eid;
+		struct agtftl_data *next;
+	} *dat, *next_dat, *dat_list = NULL;
+	
+	if (vnum == NOTHING || !list) {
+		return;	// sanity
+	}
+	
+	for (tag = list; tag; tag = tag->next) {
+		if (!(plr = is_playing(tag->idnum))) {
+			continue;	// ignore missing players
+		}
+		if (!GET_LOYALTY(plr)) {
+			continue;	// not in an empire
+		}
+		
+		// check if already done this empire
+		done = FALSE;
+		LL_FOREACH(dat_list, dat) {
+			if (dat->eid == EMPIRE_VNUM(GET_LOYALTY(plr))) {
+				done = TRUE;
+				break;
+			}
+		}
+		if (done) {
+			continue;	// we only do each empire once
+		}
+		
+		// OK: add it
+		add_gathered_total(GET_LOYALTY(plr), vnum, amount);
+		
+		// and mark the empire
+		CREATE(dat, struct agtftl_data, 1);
+		dat->eid = EMPIRE_VNUM(GET_LOYALTY(plr));
+		LL_PREPEND(dat_list, dat);
+	}
+	
+	// free the data list
+	LL_FOREACH_SAFE(dat_list, dat, next_dat) {
+		free(dat);
+	}
+}
+
+
+/**
+* Gets the total count produced (or traded for) by an empire.
+*
+* @param empire_data *emp Which empire.
+* @param obj_vnum vnum The item to check
+* @return int How many the empire has every gained.
+*/
+int get_gathered_total(empire_data *emp, obj_vnum vnum) {
+	struct empire_gathered_total *egt;
+	
+	if (!emp || vnum == NOTHING) {
+		return 0;	// no work
+	}
+	
+	HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &vnum, egt);
+	if (egt) {
+		// ignores any that may have been exported then imported, to prevent
+		// abuse where 2 empires could constantly import/export from each other
+		return egt->amount - MAX(0, egt->imported - egt->exported);
+	}
+	else {
+		return 0;
+	}
+}
+
+
+/**
+* Marks that an empire has imported/exported a resource, which will affect how
+* totals are determined. Note that this only marks an amount as imported or
+* exported; it does not add to the gathered amount (imports should do this
+* separately).
+*
+* @param empire_data *emp Which empire.
+* @param obj_vnum vnum The item gained.
+* @param int imported The amount that were imported (0 or more).
+* @param int exported The amount that were exported (0 or more).
+*/
+void mark_gathered_trade(empire_data *emp, obj_vnum vnum, int imported, int exported) {
+	struct empire_gathered_total *egt;
+	
+	if (!emp || vnum == NOTHING) {
+		return;	// no work
+	}
+	
+	HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &vnum, egt);
+	if (!egt) {
+		CREATE(egt, struct empire_gathered_total, 1);
+		egt->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_GATHERED_TOTALS(emp), vnum, egt);
+	}
+	
+	if (imported) {
+		SAFE_ADD(egt->imported, imported, 0, INT_MAX, FALSE);
+	}
+	if (exported) {
+		SAFE_ADD(egt->exported, exported, 0, INT_MAX, FALSE);
+	}
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 

@@ -4238,6 +4238,16 @@ struct empire_completed_goal {
 };
 
 
+// permanent counts of totals of items accumulated by the empire, for use in progress goals/quests
+struct empire_gathered_total {
+	obj_vnum vnum;	// which item
+	int amount;	// how much
+	int imported;	// how many have been imported (used to prevent abuse)
+	int exported;	// how many have been exported
+	UT_hash_handle hh;	// empire->gathered_totals hash (by vnum)
+};
+
+
 // current progress goals
 struct empire_goal {
 	any_vnum vnum;	// which progress goal
@@ -4472,6 +4482,7 @@ struct empire_data {
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
+	struct empire_gathered_total *gathered_totals;	// totals of items gathered by the empire (hash by vnum)
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

@@ -204,6 +204,11 @@ INTERACTION_FUNC(pickpocket_interact) {
 		act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		load_otrigger(obj);
 	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
 		
 	return TRUE;
 }

@@ -323,6 +323,11 @@ INTERACTION_FUNC(devastate_crop) {
 	sprintf(buf, "$n's powerful ritual devastates the %s crops!", GET_CROP_NAME(cp));
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, num);
+	}
+	
 	while (num-- > 0) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
@@ -357,6 +362,11 @@ INTERACTION_FUNC(devastate_trees) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	return TRUE;

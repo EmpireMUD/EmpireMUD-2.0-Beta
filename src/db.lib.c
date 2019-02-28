@@ -1913,6 +1913,7 @@ void free_empire(empire_data *emp) {
 	void free_empire_goals(struct empire_goal *hash);
 	void free_empire_completed_goals(struct empire_completed_goal *hash);
 	
+	struct empire_gathered_total *egt, *next_egt;
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
@@ -2039,6 +2040,12 @@ void free_empire(empire_data *emp) {
 	
 	free_theft_logs(EMPIRE_THEFT_LOGS(emp));
 	
+	// free gathered totals
+	HASH_ITER(hh, EMPIRE_GATHERED_TOTALS(emp), egt, next_egt) {
+		HASH_DEL(EMPIRE_GATHERED_TOTALS(emp), egt);
+		free(egt);
+	}
+	
 	// free goals
 	free_empire_goals(EMPIRE_GOALS(emp));
 	free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
@@ -2164,6 +2171,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
 	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct shipping_data *shipd, *last_shipd = NULL;
+	struct empire_gathered_total *egt;
 	struct empire_storage_data *store;
 	struct theft_log *tft;
 	obj_data *obj, *proto;
@@ -2181,6 +2189,24 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'G': {	// gathered totals
+				if (sscanf(line, "G %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+					log("SYSERR: Invalid G line of empire %d: %s", EMPIRE_VNUM(emp), line);
+					exit(0);
+				}
+				
+				HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &t[0], egt);
+				if (!egt) {
+					CREATE(egt, struct empire_gathered_total, 1);
+					egt->vnum = t[0];
+					HASH_ADD_INT(EMPIRE_GATHERED_TOTALS(emp), vnum, egt);
+				}
+				
+				egt->amount = t[1];
+				egt->imported = t[2];
+				egt->exported = t[3];
+				break;
+			}
 			case 'O': {	// storage
 				if (!get_line(fl, line)) {
 					log("SYSERR: Storage data for empire %d was incomplete", EMPIRE_VNUM(emp));
@@ -3006,6 +3032,7 @@ void write_empire_logs_to_file(FILE *fl, empire_data *emp) {
 */
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
 	struct empire_storage_data *store, *next_store;
+	struct empire_gathered_total *egt, *next_egt;
 	struct empire_island *isle, *next_isle;
 	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
@@ -3013,6 +3040,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 
 	if (!emp) {
 		return;
+	}
+	
+	// G: gathered totals
+	HASH_ITER(hh, EMPIRE_GATHERED_TOTALS(emp), egt, next_egt) {
+		fprintf(fl, "G %d %d %d %d\n", egt->vnum, egt->amount, egt->imported, egt->exported);
 	}
 	
 	// islands

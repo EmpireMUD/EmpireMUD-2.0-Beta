@@ -123,10 +123,17 @@ INTERACTION_FUNC(combine_obj_interact) {
 	new_obj = read_object(interaction->vnum, TRUE);
 	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 	
+	// Note: does not currently affect an empire's gather totals
+	
 	if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
 		GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
 	}
 	
+	if (GET_LOYALTY(ch)) {
+		// subtract old item and add the new one
+		add_gathered_total(GET_LOYALTY(ch), GET_OBJ_VNUM(inter_item), -1 * interaction->quantity);
+		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, 1);
+	}
 	extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), NULL);
 	
 	// ownership
@@ -661,6 +668,11 @@ INTERACTION_FUNC(light_obj_interact) {
 		}
 		load_otrigger(new);
 	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_gathered_total(GET_LOYALTY(ch), vnum, interaction->quantity);
+	}
 
 	if (interaction->quantity > 1) {
 		sprintf(buf1, "It is now $p (x%d).", interaction->quantity);
@@ -990,6 +1002,11 @@ INTERACTION_FUNC(separate_obj_interact) {
 	snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
 	
+	if (GET_LOYALTY(ch)) {
+		// add the gained items (the original item is subtracted in do_separate)
+		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		new_obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
@@ -1011,6 +1028,8 @@ INTERACTION_FUNC(separate_obj_interact) {
 		}
 		load_otrigger(new_obj);
 	}
+	
+	// note: does not currently add to an empire's gathered amount
 	
 	return TRUE;
 }
@@ -5697,6 +5716,12 @@ ACMD(do_separate) {
 	}
 	else {		
 		if (run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+			if (GET_LOYALTY(ch)) {
+				// subtract old item from empire counts
+				add_gathered_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);
+			}
+			
+			// and extract it
 			extract_obj(obj);
 		}
 		else {
