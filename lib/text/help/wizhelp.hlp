@@ -1059,6 +1059,7 @@ crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
+gathered   Immort   Shows total gathered items for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 learned    Immort   Shows you learned recipes.
@@ -1140,6 +1141,15 @@ This command shows you all of a player's faction reputation levels. It can
 be filtered by name.
 
 See also: FACTION, SET FACTION
+#e
+"SHOW GATHERED"
+
+Usage:  show gathered "<empire>" [search phrase]
+
+This command shows the total gathered items for an empire. Put the empire name
+in quotes if it's longer than 1 word.
+
+The total gathered item counts are used for some progress goals and quests.
 #e
 "SHOW IGNORING"
 

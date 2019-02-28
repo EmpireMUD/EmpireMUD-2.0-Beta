@@ -3823,6 +3823,71 @@ SHOW(show_currency) {
 }
 
 
+SHOW(show_gathered) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct empire_gathered_total *egt, *next_egt;
+	empire_data *emp = NULL;
+	size_t size, count;
+	obj_data *obj;
+	
+	argument = any_one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show gathered <empire>\r\n");
+	}
+	else if (!(emp = get_empire_by_name(arg))) {
+		send_to_char("There is no such empire.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Gathered items for matching '%s' for %s%s\t0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Gatheres items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, EMPIRE_GATHERED_TOTALS(emp), egt, next_egt) {
+			if (!(obj = obj_proto(egt->vnum))) {
+				continue;	// no obj?
+			}
+			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+				continue;	// searched
+			}
+		
+			// show it
+			if (egt->imported || egt->exported) {
+				snprintf(line, sizeof(line), " [%5d] %s: %d (%d/%d)\r\n", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount, egt->imported, egt->exported);
+			}
+			else {
+				snprintf(line, sizeof(line), " [%5d] %s: %d\r\n", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount);
+			}
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_learned) {
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
@@ -8539,6 +8604,7 @@ ACMD(do_show) {
 		{ "piles", LVL_CIMPL, show_piles },
 		{ "progress", LVL_START_IMM, show_progress },
 		{ "progression", LVL_START_IMM, show_progression },
+		{ "gathered", LVL_START_IMM, show_gathered },
 
 		// last
 		{ "\n", 0, NULL }
