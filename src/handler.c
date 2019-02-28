@@ -3033,6 +3033,12 @@ void mark_gathered_trade(empire_data *emp, obj_vnum vnum, int imported, int expo
 }
 
 
+// Simple amount-sorter for gathered item totals
+int sort_empire_gathered_totals(struct empire_gathered_total *a, struct empire_gathered_total *b) {
+	return b->amount - a->amount;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE NEEDS HANDLERS ///////////////////////////////////////////////////
 

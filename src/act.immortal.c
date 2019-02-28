@@ -3824,6 +3824,8 @@ SHOW(show_currency) {
 
 
 SHOW(show_gathered) {
+	extern int sort_empire_gathered_totals(struct empire_gathered_total *a, struct empire_gathered_total *b);
+	
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct empire_gathered_total *egt, *next_egt;
 	empire_data *emp = NULL;
@@ -3844,10 +3846,11 @@ SHOW(show_gathered) {
 			size = snprintf(output, sizeof(output), "Gathered items for matching '%s' for %s%s\t0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Gatheres items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			size = snprintf(output, sizeof(output), "Gathered items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		
 		count = 0;
+		HASH_SORT(EMPIRE_GATHERED_TOTALS(emp), sort_empire_gathered_totals);
 		HASH_ITER(hh, EMPIRE_GATHERED_TOTALS(emp), egt, next_egt) {
 			if (!(obj = obj_proto(egt->vnum))) {
 				continue;	// no obj?
