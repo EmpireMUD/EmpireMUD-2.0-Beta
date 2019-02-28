@@ -457,6 +457,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	struct archetype_gear *gear, *next_gear;
 	obj_data *proto, *obj_iter, *next_obj;
 	struct global_data *glb, *next_glb;
+	struct empire_gathered_total *egt;
 	archetype_data *arch, *next_arch;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
@@ -566,6 +567,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				free(trade);	// certified
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
+		}
+		
+		// delete gather totals
+		HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &vnum, egt);
+		if (egt) {
+			HASH_DEL(EMPIRE_GATHERED_TOTALS(emp), egt);
+			free(egt);
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 		}
 	}
 	
