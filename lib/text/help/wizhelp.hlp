@@ -1144,7 +1144,7 @@ See also: FACTION, SET FACTION
 #e
 "SHOW GATHERED"
 
-Usage:  show gathered "<empire>" [search phrase]
+Usage:  show gathered "<empire>" [search phrase | vnum]
 
 This command shows the total gathered items for an empire. Put the empire name
 in quotes if it's longer than 1 word.
