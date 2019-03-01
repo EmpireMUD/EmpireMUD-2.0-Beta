@@ -36,9 +36,9 @@ will immediately fail any remaining daily quests in your quest list.
 
 See also: CITY DAILIES
 #
-"EMPIRE PRODUCED TOTALS" "EMPIRE PRODUCTION TOTALS" "EMPIRE HAS PRODUCED OVER" EMPIRE-PRODUCED-TOTAL-OBJECT EMPIRE-PRODUCED-TOTAL-COMPONENT
+"EMPIRE PRODUCED TOTALS" "EMPIRE PRODUCTION TOTALS" "EMPIRE HAS PRODUCED" EMPIRE-PRODUCED-OBJECT EMPIRE-PRODUCED-COMPONENT
 
-Quests and progress goals that require "Empire has produced over: x# item"
+Quests and progress goals that require "Empire has produced: x# item"
 count the total number the empire has ever gathered/produced rather than the
 amount you currently have in the empire inventory.
 

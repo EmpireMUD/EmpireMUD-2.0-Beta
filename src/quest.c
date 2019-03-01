@@ -941,11 +941,11 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 				break;
 			}
-			case REQ_EMPIRE_PRODUCED_TOTAL_OBJECT: {
+			case REQ_EMPIRE_PRODUCED_OBJECT: {
 				task->current = GET_LOYALTY(ch) ? get_production_total(GET_LOYALTY(ch), task->vnum) : 0;
 				break;
 			}
-			case REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT: {
+			case REQ_EMPIRE_PRODUCED_COMPONENT: {
 				task->current = GET_LOYALTY(ch) ? get_production_total_component(GET_LOYALTY(ch), task->vnum, task->misc) : 0;
 				break;
 			}
@@ -2189,10 +2189,10 @@ void qt_change_production_total(char_data *ch, any_vnum vnum, int amount) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_EMPIRE_PRODUCED_TOTAL_OBJECT && task->vnum == vnum) {
+			if (task->type == REQ_EMPIRE_PRODUCED_OBJECT && task->vnum == vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 			}
-			else if (task->type == REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
+			else if (task->type == REQ_EMPIRE_PRODUCED_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 			}
 		}

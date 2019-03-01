@@ -4787,14 +4787,14 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			break;
 		}
 		case REQ_GET_COMPONENT:
-		case REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT: {
+		case REQ_EMPIRE_PRODUCED_COMPONENT: {
 			need_component = TRUE;
 			break;
 		}
 		case REQ_GET_OBJECT:
 		case REQ_WEARING:
 		case REQ_WEARING_OR_HAS:
-		case REQ_EMPIRE_PRODUCED_TOTAL_OBJECT: {
+		case REQ_EMPIRE_PRODUCED_OBJECT: {
 			need_obj = TRUE;
 			break;
 		}

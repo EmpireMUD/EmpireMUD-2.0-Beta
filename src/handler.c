@@ -6918,13 +6918,13 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
-			case REQ_EMPIRE_PRODUCED_TOTAL_OBJECT: {
+			case REQ_EMPIRE_PRODUCED_OBJECT: {
 				if (!GET_LOYALTY(ch) || get_production_total(GET_LOYALTY(ch), req->vnum) < req->needed) {
 					ok = FALSE;
 				}
 				break;
 			}
-			case REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT: {
+			case REQ_EMPIRE_PRODUCED_COMPONENT: {
 				if (!GET_LOYALTY(ch) || get_production_total_component(GET_LOYALTY(ch), req->vnum, req->misc) < req->needed) {
 					ok = FALSE;
 				}
@@ -7150,11 +7150,11 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			snprintf(output, sizeof(output), "Have %d cit%s", req->needed, req->needed == 1 ? "y" : "ies");
 			break;
 		}
-		case REQ_EMPIRE_PRODUCED_TOTAL_OBJECT: {
+		case REQ_EMPIRE_PRODUCED_OBJECT: {
 			snprintf(output, sizeof(output), "Empire has produced: %dx %s%s", req->needed, vnum, get_obj_name_by_proto(req->vnum));
 			break;
 		}
-		case REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT: {
+		case REQ_EMPIRE_PRODUCED_COMPONENT: {
 			snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, component_string(req->vnum, req->misc));
 			break;
 		}
