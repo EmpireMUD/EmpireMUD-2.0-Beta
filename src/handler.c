@@ -7155,7 +7155,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_EMPIRE_GATHER_TOTAL_COMPONENT: {
-			snprintf(output, sizeof(output), "Empire has gathered over: %dx %s%s", req->needed, vnum, component_string(req->vnum, req->misc));
+			snprintf(output, sizeof(output), "Empire has gathered over: %dx (%s)", req->needed, component_string(req->vnum, req->misc));
 			break;
 		}
 		default: {
