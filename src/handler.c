@@ -87,6 +87,7 @@ void scale_item_to_level(obj_data *obj, int level);
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
 void die_follower(char_data *ch);
+struct empire_gathered_total *get_gathered_total_entry(empire_data *emp, any_vnum vnum);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
@@ -2901,18 +2902,13 @@ void add_gathered_total(empire_data *emp, obj_vnum vnum, int amount) {
 		return;	// no work
 	}
 	
-	HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &vnum, egt);
-	if (!egt) {
-		CREATE(egt, struct empire_gathered_total, 1);
-		egt->vnum = vnum;
-		HASH_ADD_INT(EMPIRE_GATHERED_TOTALS(emp), vnum, egt);
+	if ((egt = get_gathered_total_entry(emp, vnum))) {
+		SAFE_ADD(egt->amount, amount, 0, INT_MAX, FALSE);
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	
+		// update trackers
+		et_change_gather_total(emp, vnum, amount);
 	}
-	
-	SAFE_ADD(egt->amount, amount, 0, INT_MAX, FALSE);
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-	
-	// update trackers
-	et_change_gather_total(emp, vnum, amount);
 }
 
 
@@ -3002,6 +2998,37 @@ int get_gathered_total(empire_data *emp, obj_vnum vnum) {
 
 
 /**
+* Finds (or creates) an empire_gathered_total entry, if possible.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum Which object vnum (must correspond to an object).
+* @return struct empire_gathered_total* The entry for that object, or NULL if not possible.
+*/
+struct empire_gathered_total *get_gathered_total_entry(empire_data *emp, any_vnum vnum) {
+	struct empire_gathered_total *egt;
+	obj_data *proto;
+	
+	if (!emp || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &vnum, egt);
+	if (!egt) {
+		// ensure real obj now
+		if (!(proto = obj_proto(vnum))) {
+			return NULL;
+		}
+		
+		CREATE(egt, struct empire_gathered_total, 1);
+		egt->vnum = vnum;
+		egt->proto = proto;
+		HASH_ADD_INT(EMPIRE_GATHERED_TOTALS(emp), vnum, egt);
+	}
+	return egt;
+}
+
+
+/**
 * Marks that an empire has imported/exported a resource, which will affect how
 * totals are determined. Note that this only marks an amount as imported or
 * exported; it does not add to the gathered amount (imports should do this
@@ -3019,20 +3046,15 @@ void mark_gathered_trade(empire_data *emp, obj_vnum vnum, int imported, int expo
 		return;	// no work
 	}
 	
-	HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &vnum, egt);
-	if (!egt) {
-		CREATE(egt, struct empire_gathered_total, 1);
-		egt->vnum = vnum;
-		HASH_ADD_INT(EMPIRE_GATHERED_TOTALS(emp), vnum, egt);
+	if ((egt = get_gathered_total_entry(emp, vnum))) {
+		if (imported) {
+			SAFE_ADD(egt->imported, imported, 0, INT_MAX, FALSE);
+		}
+		if (exported) {
+			SAFE_ADD(egt->exported, exported, 0, INT_MAX, FALSE);
+		}
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
-	
-	if (imported) {
-		SAFE_ADD(egt->imported, imported, 0, INT_MAX, FALSE);
-	}
-	if (exported) {
-		SAFE_ADD(egt->exported, exported, 0, INT_MAX, FALSE);
-	}
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 

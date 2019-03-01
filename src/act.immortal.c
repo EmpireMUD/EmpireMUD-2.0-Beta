@@ -3858,7 +3858,7 @@ SHOW(show_gathered) {
 		count = 0;
 		HASH_SORT(EMPIRE_GATHERED_TOTALS(emp), sort_empire_gathered_totals);
 		HASH_ITER(hh, EMPIRE_GATHERED_TOTALS(emp), egt, next_egt) {
-			if (!(obj = obj_proto(egt->vnum))) {
+			if (!(obj = egt->proto)) {
 				continue;	// no obj?
 			}
 			if (*argument && vnum != egt->vnum && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {

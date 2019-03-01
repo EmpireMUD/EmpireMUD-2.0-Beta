@@ -2166,6 +2166,8 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 * @param empire_data *emp The empire to assign the storage to.
 */
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
+	extern struct empire_gathered_total *get_gathered_total_entry(empire_data *emp, any_vnum vnum);
+	
 	int t[10], junk;
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
@@ -2195,16 +2197,11 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					exit(0);
 				}
 				
-				HASH_FIND_INT(EMPIRE_GATHERED_TOTALS(emp), &t[0], egt);
-				if (!egt) {
-					CREATE(egt, struct empire_gathered_total, 1);
-					egt->vnum = t[0];
-					HASH_ADD_INT(EMPIRE_GATHERED_TOTALS(emp), vnum, egt);
+				if ((egt = get_gathered_total_entry(emp, t[0]))) {
+					egt->amount = t[1];
+					egt->imported = t[2];
+					egt->exported = t[3];
 				}
-				
-				egt->amount = t[1];
-				egt->imported = t[2];
-				egt->exported = t[3];
 				break;
 			}
 			case 'O': {	// storage

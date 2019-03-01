@@ -4242,9 +4242,12 @@ struct empire_completed_goal {
 // permanent counts of totals of items accumulated by the empire, for use in progress goals/quests
 struct empire_gathered_total {
 	obj_vnum vnum;	// which item
+	obj_data *proto;	// pointer to the obj proto
+	
 	int amount;	// how much
 	int imported;	// how many have been imported (used to prevent abuse)
 	int exported;	// how many have been exported
+	
 	UT_hash_handle hh;	// empire->gathered_totals hash (by vnum)
 };
 
