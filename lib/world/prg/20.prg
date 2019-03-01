@@ -141,25 +141,25 @@ S
 Cache of Resources~
    In order to weather the worst shortages and droughts, you must build up a
 cache of critical resources for your empire. Collect a sizeable cache each of
-the basic component types: lumber, rock, block, pillar, sapling, and metal. 
+the basic component types: lumber, rock, block, pillar, sapling, and metal.
 You can mix and match different types of each component, such as tin and
 copper. Completing this goal earns you another city point.
 ~
-9 2 0 15 0
+10 2 0 15 0
 K 1 1
 P 2011
 W
-1 18 0 200 a
+35 18 0 250 a
 W
-1 21 0 200 a
+35 21 0 250 a
 W
-1 3 0 200 a
+35 3 0 250 a
 W
-1 22 0 200 a
+35 22 0 250 a
 W
-1 25 0 200 a
+35 25 0 250 a
 W
-1 16 0 200 a
+35 16 0 250 a
 S
 #2016
 Rare Surplus~
