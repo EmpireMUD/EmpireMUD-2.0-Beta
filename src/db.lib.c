@@ -2191,19 +2191,6 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			exit(1);
 		}
 		switch (*line) {
-			case 'G': {	// gathered totals
-				if (sscanf(line, "G %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
-					log("SYSERR: Invalid G line of empire %d: %s", EMPIRE_VNUM(emp), line);
-					exit(0);
-				}
-				
-				if ((egt = get_production_total_entry(emp, t[0]))) {
-					egt->amount = t[1];
-					egt->imported = t[2];
-					egt->exported = t[3];
-				}
-				break;
-			}
 			case 'O': {	// storage
 				if (!get_line(fl, line)) {
 					log("SYSERR: Storage data for empire %d was incomplete", EMPIRE_VNUM(emp));
@@ -2232,6 +2219,19 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				}
 				else {
 					log("- removing %dx #%d from empire storage for %s: no such object", t[1], t[0], EMPIRE_NAME(emp));
+				}
+				break;
+			}
+			case 'P': {	// production totals
+				if (sscanf(line, "P %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+					log("SYSERR: Invalid P line of empire %d: %s", EMPIRE_VNUM(emp), line);
+					exit(0);
+				}
+				
+				if ((egt = get_production_total_entry(emp, t[0]))) {
+					egt->amount = t[1];
+					egt->imported = t[2];
+					egt->exported = t[3];
 				}
 				break;
 			}
@@ -3039,17 +3039,17 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 		return;
 	}
 	
-	// G: gathered totals
-	HASH_ITER(hh, EMPIRE_PRODUCTION_TOTALS(emp), egt, next_egt) {
-		fprintf(fl, "G %d %d %d %d\n", egt->vnum, egt->amount, egt->imported, egt->exported);
-	}
-	
 	// islands
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		// O: storage
 		HASH_ITER(hh, isle->store, store, next_store) {
 			fprintf(fl, "O\n%d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep);
 		}
+	}
+	
+	// P: production totals
+	HASH_ITER(hh, EMPIRE_PRODUCTION_TOTALS(emp), egt, next_egt) {
+		fprintf(fl, "P %d %d %d %d\n", egt->vnum, egt->amount, egt->imported, egt->exported);
 	}
 	
 	// T: theft logs
