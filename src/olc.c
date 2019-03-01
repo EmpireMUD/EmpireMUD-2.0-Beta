@@ -4792,7 +4792,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		case REQ_GET_OBJECT:
 		case REQ_WEARING:
-		case REQ_WEARING_OR_HAS: {
+		case REQ_WEARING_OR_HAS:
+		case REQ_EMPIRE_GATHER_TOTAL: {
 			need_obj = TRUE;
 			break;
 		}

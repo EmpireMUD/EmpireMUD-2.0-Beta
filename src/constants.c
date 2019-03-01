@@ -3854,6 +3854,7 @@ const char *requirement_types[] = {
 	"DIPLOMACY",
 	"HAVE-CITY",
 	"EMPIRE-MILITARY",
+	"EMPIRE-GATHER-TOTAL",
 	"\n",
 };
 
@@ -3894,6 +3895,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// diplomacy
 	REQ_AMT_NUMBER,	// have city
 	REQ_AMT_NUMBER,	// empire military
+	REQ_AMT_NUMBER,	// empire gather total
 };
 
 
@@ -3933,6 +3935,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// diplomacy
 	FALSE,	// have city
 	FALSE,	// empire military
+	FALSE,	// empire gather total
 };
 
 

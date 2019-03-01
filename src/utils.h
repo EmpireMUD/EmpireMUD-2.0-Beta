@@ -1737,6 +1737,7 @@ extern char *get_bld_name_by_proto(bld_vnum vnum);
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);
 void qt_change_ability(char_data *ch, any_vnum abil);
+void qt_change_gather_total(char_data *ch, any_vnum vnum, int amount);
 void qt_change_reputation(char_data *ch, any_vnum faction);
 void qt_change_skill_level(char_data *ch, any_vnum skl);
 void qt_drop_obj(char_data *ch, obj_data *obj);
@@ -1773,6 +1774,7 @@ void et_change_greatness(empire_data *emp);
 void et_gain_building(empire_data *emp, any_vnum vnum);
 void et_gain_tile_sector(empire_data *emp, sector_vnum vnum);
 void et_gain_vehicle(empire_data *emp, any_vnum vnum);
+void et_change_gather_total(empire_data *emp, obj_vnum vnum, int amount);
 void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total);
 void et_lose_building(empire_data *emp, any_vnum vnum);
 void et_lose_tile_sector(empire_data *emp, sector_vnum vnum);

@@ -2910,6 +2910,9 @@ void add_gathered_total(empire_data *emp, obj_vnum vnum, int amount) {
 	
 	SAFE_ADD(egt->amount, amount, 0, INT_MAX, FALSE);
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	
+	// update trackers
+	et_change_gather_total(emp, vnum, amount);
 }
 
 
@@ -6863,6 +6866,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_EMPIRE_GATHER_TOTAL: {
+				if (!GET_LOYALTY(ch) || get_gathered_total(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -7081,6 +7090,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_HAVE_CITY: {
 			snprintf(output, sizeof(output), "Have %d cit%s", req->needed, req->needed == 1 ? "y" : "ies");
+			break;
+		}
+		case REQ_EMPIRE_GATHER_TOTAL: {
+			snprintf(output, sizeof(output), "Empire has gathered over: %dx %s%s", req->needed, vnum, get_obj_name_by_proto(req->vnum));
 			break;
 		}
 		default: {

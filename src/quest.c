@@ -941,6 +941,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 				break;
 			}
+			case REQ_EMPIRE_GATHER_TOTAL: {
+				task->current = GET_LOYALTY(ch) ? get_gathered_total(GET_LOYALTY(ch), task->vnum) : 0;
+				break;
+			}
 		}
 	}
 }
@@ -2157,6 +2161,31 @@ void qt_change_currency(char_data *ch, any_vnum vnum, int total) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_GET_CURRENCY && task->vnum == vnum) {
 				task->current = total;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire changes gathered-total
+*
+* @param char_data *ch The player.
+* @param obj_vnum vnum Which object vnum.
+* @param int amount How much was gained (or lost).
+*/
+void qt_change_gather_total(char_data *ch, any_vnum vnum, int amount) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_EMPIRE_GATHER_TOTAL && task->vnum == vnum) {
+				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 			}
 		}
 	}
