@@ -941,12 +941,12 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 				break;
 			}
-			case REQ_EMPIRE_GATHER_TOTAL_OBJECT: {
-				task->current = GET_LOYALTY(ch) ? get_gathered_total(GET_LOYALTY(ch), task->vnum) : 0;
+			case REQ_EMPIRE_PRODUCED_TOTAL_OBJECT: {
+				task->current = GET_LOYALTY(ch) ? get_production_total(GET_LOYALTY(ch), task->vnum) : 0;
 				break;
 			}
-			case REQ_EMPIRE_GATHER_TOTAL_COMPONENT: {
-				task->current = GET_LOYALTY(ch) ? get_gathered_total_component(GET_LOYALTY(ch), task->vnum, task->misc) : 0;
+			case REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT: {
+				task->current = GET_LOYALTY(ch) ? get_production_total_component(GET_LOYALTY(ch), task->vnum, task->misc) : 0;
 				break;
 			}
 		}
@@ -2172,13 +2172,13 @@ void qt_change_currency(char_data *ch, any_vnum vnum, int total) {
 
 
 /**
-* Quest Tracker: empire changes gathered-total
+* Quest Tracker: empire changes production-total
 *
 * @param char_data *ch The player.
 * @param obj_vnum vnum Which object vnum.
 * @param int amount How much was gained (or lost).
 */
-void qt_change_gather_total(char_data *ch, any_vnum vnum, int amount) {
+void qt_change_production_total(char_data *ch, any_vnum vnum, int amount) {
 	obj_data *proto = obj_proto(vnum);
 	struct player_quest *pq;
 	struct req_data *task;
@@ -2189,10 +2189,10 @@ void qt_change_gather_total(char_data *ch, any_vnum vnum, int amount) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_EMPIRE_GATHER_TOTAL_OBJECT && task->vnum == vnum) {
+			if (task->type == REQ_EMPIRE_PRODUCED_TOTAL_OBJECT && task->vnum == vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 			}
-			else if (task->type == REQ_EMPIRE_GATHER_TOTAL_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
+			else if (task->type == REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 			}
 		}

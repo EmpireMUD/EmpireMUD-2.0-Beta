@@ -3452,7 +3452,7 @@ void b5_58_gather_totals(void) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			// storage
 			HASH_ITER(hh, isle->store, store, next_store) {
-				add_gathered_total(emp, store->vnum, store->amount);
+				add_production_total(emp, store->vnum, store->amount);
 			}
 		}
 		

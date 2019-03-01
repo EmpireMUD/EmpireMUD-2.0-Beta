@@ -1370,7 +1370,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 		while (ch->carrying) {
 			if (IS_NPC(ch) && MOB_TAGGED_BY(ch)) {
 				// mark as gathered
-				add_gathered_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(ch->carrying), 1);
+				add_production_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(ch->carrying), 1);
 			}
 			obj_to_room(ch->carrying, IN_ROOM(ch));
 		}
@@ -1564,7 +1564,7 @@ obj_data *make_corpse(char_data *ch) {
 		
 		if (MOB_TAGGED_BY(ch)) {
 			LL_FOREACH2(corpse->contains, o, next_content) {
-				add_gathered_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(o), 1);
+				add_production_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(o), 1);
 			}
 		}
 	}

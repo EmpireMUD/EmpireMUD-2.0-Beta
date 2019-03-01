@@ -978,12 +978,12 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_cities(emp);
 				break;
 			}
-			case REQ_EMPIRE_GATHER_TOTAL_OBJECT: {
-				task->current = get_gathered_total(emp, task->vnum);
+			case REQ_EMPIRE_PRODUCED_TOTAL_OBJECT: {
+				task->current = get_production_total(emp, task->vnum);
 				break;
 			}
-			case REQ_EMPIRE_GATHER_TOTAL_COMPONENT: {
-				task->current = get_gathered_total_component(emp, task->vnum, task->misc);
+			case REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT: {
+				task->current = get_production_total_component(emp, task->vnum, task->misc);
 				break;
 			}
 			
@@ -1310,13 +1310,13 @@ void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
 
 
 /**
-* Empire Tracker: empire changes gathered-total
+* Empire Tracker: empire changes produced-total
 *
 * @param empire_data *emp The empire.
 * @param obj_vnum vnum Which object vnum.
 * @param int amount How much was gained (or lost).
 */
-void et_change_gather_total(empire_data *emp, obj_vnum vnum, int amount) {
+void et_change_production_total(empire_data *emp, obj_vnum vnum, int amount) {
 	struct empire_goal *goal, *next_goal;
 	obj_data *proto = obj_proto(vnum);
 	struct req_data *task;
@@ -1329,11 +1329,11 @@ void et_change_gather_total(empire_data *emp, obj_vnum vnum, int amount) {
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_EMPIRE_GATHER_TOTAL_OBJECT && task->vnum == vnum) {
+			if (task->type == REQ_EMPIRE_PRODUCED_TOTAL_OBJECT && task->vnum == vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_EMPIRE_GATHER_TOTAL_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
+			else if (task->type == REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 			}
 		}
@@ -1348,7 +1348,7 @@ void et_change_gather_total(empire_data *emp, obj_vnum vnum, int amount) {
 			continue;
 		}
 		
-		qt_change_gather_total(ch, vnum, amount);
+		qt_change_production_total(ch, vnum, amount);
 	}
 }
 

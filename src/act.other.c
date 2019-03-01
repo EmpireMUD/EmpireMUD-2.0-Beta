@@ -592,7 +592,7 @@ INTERACTION_FUNC(shear_interact) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, amt);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, amt);
 	}
 	
 	// only show loot to the skinner
@@ -632,7 +632,7 @@ INTERACTION_FUNC(skin_interact) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	// only show loot to the skinner

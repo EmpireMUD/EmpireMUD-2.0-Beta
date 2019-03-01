@@ -131,8 +131,8 @@ INTERACTION_FUNC(combine_obj_interact) {
 	
 	if (GET_LOYALTY(ch)) {
 		// subtract old item and add the new one
-		add_gathered_total(GET_LOYALTY(ch), GET_OBJ_VNUM(inter_item), -1 * interaction->quantity);
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, 1);
+		add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(inter_item), -1 * interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, 1);
 	}
 	extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), NULL);
 	
@@ -671,7 +671,7 @@ INTERACTION_FUNC(light_obj_interact) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), vnum, interaction->quantity);
 	}
 
 	if (interaction->quantity > 1) {
@@ -1004,7 +1004,7 @@ INTERACTION_FUNC(separate_obj_interact) {
 	
 	if (GET_LOYALTY(ch)) {
 		// add the gained items (the original item is subtracted in do_separate)
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
@@ -5718,7 +5718,7 @@ ACMD(do_separate) {
 		if (run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
 			if (GET_LOYALTY(ch)) {
 				// subtract old item from empire counts
-				add_gathered_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);
+				add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);
 			}
 			
 			// and extract it

@@ -676,7 +676,7 @@ INTERACTION_FUNC(finish_chopping) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	// messaging
@@ -719,7 +719,7 @@ INTERACTION_FUNC(finish_digging) {
 		
 		// mark gained
 		if (GET_LOYALTY(ch)) {
-			add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+			add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 		}
 		
 		if (interaction->quantity > 1) {
@@ -753,7 +753,7 @@ INTERACTION_FUNC(finish_fishing) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	// messaging
@@ -787,7 +787,7 @@ INTERACTION_FUNC(finish_gathering) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	if (obj) {
@@ -831,7 +831,7 @@ INTERACTION_FUNC(finish_harvesting) {
 		
 		// mark gained
 		if (GET_LOYALTY(ch)) {
-			add_gathered_total(GET_LOYALTY(ch), interaction->vnum, num);
+			add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
 		}
 		
 		// info messaging
@@ -868,7 +868,7 @@ INTERACTION_FUNC(finish_mining) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	return any;
@@ -889,7 +889,7 @@ INTERACTION_FUNC(finish_panning) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	// messaging
@@ -942,7 +942,7 @@ INTERACTION_FUNC(finish_picking_herb) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), vnum, num);
+		add_production_total(GET_LOYALTY(ch), vnum, num);
 	}
 	
 	if (obj) {
@@ -984,7 +984,7 @@ INTERACTION_FUNC(finish_picking_crop) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	if (obj) {
@@ -1024,7 +1024,7 @@ INTERACTION_FUNC(finish_quarrying) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	if (interaction->quantity > 1) {
@@ -1071,7 +1071,7 @@ INTERACTION_FUNC(finish_scraping) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 
 	if (interaction->quantity > 1) {

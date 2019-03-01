@@ -394,8 +394,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_DIPLOMACY  31
 #define REQ_HAVE_CITY  32
 #define REQ_EMPIRE_MILITARY  33
-#define REQ_EMPIRE_GATHER_TOTAL_OBJECT  34
-#define REQ_EMPIRE_GATHER_TOTAL_COMPONENT  35
+#define REQ_EMPIRE_PRODUCED_TOTAL_OBJECT  34
+#define REQ_EMPIRE_PRODUCED_TOTAL_COMPONENT  35
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -4241,7 +4241,7 @@ struct empire_completed_goal {
 
 
 // permanent counts of totals of items accumulated by the empire, for use in progress goals/quests
-struct empire_gathered_total {
+struct empire_production_total {
 	obj_vnum vnum;	// which item
 	obj_data *proto;	// pointer to the obj proto
 	
@@ -4487,7 +4487,7 @@ struct empire_data {
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
-	struct empire_gathered_total *gathered_totals;	// totals of items gathered by the empire (hash by vnum)
+	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

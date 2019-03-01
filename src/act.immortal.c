@@ -3823,11 +3823,11 @@ SHOW(show_currency) {
 }
 
 
-SHOW(show_gathered) {
-	extern int sort_empire_gathered_totals(struct empire_gathered_total *a, struct empire_gathered_total *b);
+SHOW(show_produced) {
+	extern int sort_empire_production_totals(struct empire_production_total *a, struct empire_production_total *b);
 	
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	struct empire_gathered_total *egt, *next_egt;
+	struct empire_production_total *egt, *next_egt;
 	empire_data *emp = NULL;
 	obj_vnum vnum = NOTHING;
 	size_t size, count;
@@ -3837,17 +3837,17 @@ SHOW(show_gathered) {
 	skip_spaces(&argument);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Usage: show gathered <empire>\r\n");
+		msg_to_char(ch, "Usage: show produced <empire>\r\n");
 	}
 	else if (!(emp = get_empire_by_name(arg))) {
 		send_to_char("There is no such empire.\r\n", ch);
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Gathered items for matching '%s' for %s%s\t0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			size = snprintf(output, sizeof(output), "Produced items for matching '%s' for %s%s\t0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Gathered items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			size = snprintf(output, sizeof(output), "Produced items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		
 		// check if argument is a vnum
@@ -3856,8 +3856,8 @@ SHOW(show_gathered) {
 		}
 		
 		count = 0;
-		HASH_SORT(EMPIRE_GATHERED_TOTALS(emp), sort_empire_gathered_totals);
-		HASH_ITER(hh, EMPIRE_GATHERED_TOTALS(emp), egt, next_egt) {
+		HASH_SORT(EMPIRE_PRODUCTION_TOTALS(emp), sort_empire_production_totals);
+		HASH_ITER(hh, EMPIRE_PRODUCTION_TOTALS(emp), egt, next_egt) {
 			if (!(obj = egt->proto)) {
 				continue;	// no obj?
 			}
@@ -8613,7 +8613,7 @@ ACMD(do_show) {
 		{ "piles", LVL_CIMPL, show_piles },
 		{ "progress", LVL_START_IMM, show_progress },
 		{ "progression", LVL_START_IMM, show_progression },
-		{ "gathered", LVL_START_IMM, show_gathered },
+		{ "produced", LVL_START_IMM, show_produced },
 
 		// last
 		{ "\n", 0, NULL }

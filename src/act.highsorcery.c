@@ -325,7 +325,7 @@ INTERACTION_FUNC(devastate_crop) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, num);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
 	}
 	
 	while (num-- > 0) {
@@ -366,7 +366,7 @@ INTERACTION_FUNC(devastate_trees) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	return TRUE;

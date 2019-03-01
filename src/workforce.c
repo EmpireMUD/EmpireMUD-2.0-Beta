@@ -1276,7 +1276,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 		}
 		
 		add_to_empire_storage(emp, islid, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
-		add_gathered_total(emp, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
+		add_production_total(emp, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
@@ -1326,7 +1326,7 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 		
 		charge_stored_component(emp, islid, CMP_CLAY, NOBITS, 2, FALSE, NULL);
 		add_to_empire_storage(emp, islid, o_BRICKS, 1);
-		add_gathered_total(emp, o_BRICKS, 1);
+		add_production_total(emp, o_BRICKS, 1);
 		
 		act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM);
 	}
@@ -1449,7 +1449,7 @@ INTERACTION_FUNC(one_chop_chore) {
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_CHOPPING, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		add_gathered_total(emp, interaction->vnum, interaction->quantity);
+		add_production_total(emp, interaction->vnum, interaction->quantity);
 		return TRUE;
 	}
 	
@@ -1526,7 +1526,7 @@ INTERACTION_FUNC(one_dig_chore) {
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_DIGGING, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		add_gathered_total(emp, interaction->vnum, interaction->quantity);
+		add_production_total(emp, interaction->vnum, interaction->quantity);
 		add_depletion(inter_room, DPLTN_DIG, TRUE);
 		return TRUE;
 	}
@@ -1609,7 +1609,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 				found = TRUE;
 				res->amount -= 1;
 				add_to_empire_storage(emp, GET_ISLAND_ID(room), res->vnum, 1);
-				add_gathered_total(emp, res->vnum, 1);
+				add_production_total(emp, res->vnum, 1);
 			}
 			
 			// remove res?
@@ -1677,7 +1677,7 @@ INTERACTION_FUNC(one_einv_interaction_chore) {
 	if (emp && can_gain_chore_resource(emp, inter_room, einv_interaction_chore_type, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		add_gathered_total(emp, interaction->vnum, interaction->quantity);
+		add_production_total(emp, interaction->vnum, interaction->quantity);
 		return TRUE;
 	}
 	
@@ -1776,7 +1776,7 @@ INTERACTION_FUNC(one_farming_chore) {
 		
 		amt = interaction->quantity;
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
-		add_gathered_total(emp, interaction->vnum, amt);
+		add_production_total(emp, interaction->vnum, amt);
 		
 		// add depletion only if orchard
 		if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
@@ -1879,7 +1879,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_FISHING, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		add_gathered_total(emp, interaction->vnum, interaction->quantity);
+		add_production_total(emp, interaction->vnum, interaction->quantity);
 		add_depletion(inter_room, DPLTN_FISH, TRUE);
 		return TRUE;
 	}
@@ -1965,7 +1965,7 @@ INTERACTION_FUNC(one_gardening_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
 		
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		add_gathered_total(emp, interaction->vnum, interaction->quantity);
+		add_production_total(emp, interaction->vnum, interaction->quantity);
 		add_depletion(inter_room, DPLTN_PICK, TRUE);
 
 		act("$n picks an herb and carefully hangs it to dry.", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -2040,7 +2040,7 @@ INTERACTION_FUNC(one_mining_chore) {
 		if (interaction->quantity > 0) {
 			add_to_room_extra_data(inter_room, ROOM_EXTRA_MINE_AMOUNT, -1 * interaction->quantity);
 			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-			add_gathered_total(emp, interaction->vnum, interaction->quantity);
+			add_production_total(emp, interaction->vnum, interaction->quantity);
 			
 			sprintf(buf, "$n strikes the wall and %s falls loose!", get_obj_name_by_proto(interaction->vnum));
 			act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
@@ -2184,7 +2184,7 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 		
 		charge_stored_component(emp, islid, CMP_METAL, CMPF_COMMON, 1, FALSE, NULL);
 		add_to_empire_storage(emp, islid, o_NAILS, 4);
-		add_gathered_total(emp, o_NAILS, 4);
+		add_production_total(emp, o_NAILS, 4);
 		
 		act("$n finishes a pouch of nails.", FALSE, worker, NULL, NULL, TO_ROOM);
 	}
@@ -2216,7 +2216,7 @@ INTERACTION_FUNC(one_quarry_chore) {
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_QUARRYING, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		add_gathered_total(emp, interaction->vnum, interaction->quantity);
+		add_production_total(emp, interaction->vnum, interaction->quantity);
 		return TRUE;
 	}
 	
@@ -2326,7 +2326,7 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 				}
 				
 				add_to_empire_storage(emp, GET_ISLAND_ID(room), interact->vnum, interact->quantity);
-				add_gathered_total(emp, interact->vnum, interact->quantity);
+				add_production_total(emp, interact->vnum, interact->quantity);
 				add_cooldown(shearable, COOLDOWN_SHEAR, shear_growth_time * SECS_PER_REAL_HOUR);
 				done_any = TRUE;
 			}
@@ -2372,7 +2372,7 @@ void do_chore_trapping(empire_data *emp, room_data *room) {
 		// roughly 1 skin per game day
 		if (!number(0, 23)) {
 			add_to_empire_storage(emp, GET_ISLAND_ID(room), vnum, 1);
-			add_gathered_total(emp, vnum, 1);
+			add_production_total(emp, vnum, 1);
 			add_depletion(room, DPLTN_TRAPPING, TRUE);
 		}
 	}

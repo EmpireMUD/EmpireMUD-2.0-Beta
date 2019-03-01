@@ -242,7 +242,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				
 				// mark gained
 				if (GET_LOYALTY(ch)) {
-					add_gathered_total(GET_LOYALTY(ch), reward->vnum, reward->amount);
+					add_production_total(GET_LOYALTY(ch), reward->vnum, reward->amount);
 				}
 				
 				if (reward->amount > 1) {

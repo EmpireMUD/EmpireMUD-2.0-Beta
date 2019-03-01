@@ -207,7 +207,7 @@ INTERACTION_FUNC(pickpocket_interact) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 		
 	return TRUE;

@@ -60,7 +60,7 @@ INTERACTION_FUNC(butcher_interact) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	if (fillet) {
@@ -105,7 +105,7 @@ INTERACTION_FUNC(do_one_forage) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_gathered_total(GET_LOYALTY(ch), interaction->vnum, num);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
 	}
 	
 	sprintf(lbuf, "You forage around and find $p (x%d)!", num);

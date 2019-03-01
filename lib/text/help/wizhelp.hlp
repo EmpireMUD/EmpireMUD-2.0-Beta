@@ -1059,7 +1059,6 @@ crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
-gathered   Immort   Shows total gathered items for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 learned    Immort   Shows you learned recipes.
@@ -1068,6 +1067,7 @@ mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
+produced   Immort   Shows total produced items for an empire.
 progress   Immort   Shows how many empires have completed a progress goal.
 progression Immrt   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
@@ -1142,15 +1142,6 @@ be filtered by name.
 
 See also: FACTION, SET FACTION
 #e
-"SHOW GATHERED"
-
-Usage:  show gathered "<empire>" [search phrase | vnum]
-
-This command shows the total gathered items for an empire. Put the empire name
-in quotes if it's longer than 1 word.
-
-The total gathered item counts are used for some progress goals and quests.
-#e
 "SHOW IGNORING"
 
 Usage:  show ignoring <player name>
@@ -1221,6 +1212,15 @@ Shows the names and current and max health, moves, mana and blood of all online
 players. Not to be confused with SHOW PLAYER.
 
 See also: USERS
+#e
+"SHOW PRODUCED"
+
+Usage:  show produced "<empire>" [search phrase | vnum]
+
+This command shows the total produced items for an empire. Put the empire name
+in quotes if it's longer than 1 word.
+
+The total produced item counts are used for some progress goals and quests.
 #e
 "SHOW PROGRESS"
 

@@ -3854,8 +3854,8 @@ const char *requirement_types[] = {
 	"DIPLOMACY",
 	"HAVE-CITY",
 	"EMPIRE-MILITARY",
-	"EMPIRE-GATHER-TOTAL-OBJECT",
-	"EMPIRE-GATHER-TOTAL-COMPONENT",
+	"EMPIRE-PRODUCED-TOTAL-OBJECT",
+	"EMPIRE-PRODUCED-TOTAL-COMPONENT",
 	"\n",
 };
 
@@ -3896,8 +3896,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// diplomacy
 	REQ_AMT_NUMBER,	// have city
 	REQ_AMT_NUMBER,	// empire military
-	REQ_AMT_NUMBER,	// empire gather total
-	REQ_AMT_NUMBER,	// empire gather total component
+	REQ_AMT_NUMBER,	// empire produced total object
+	REQ_AMT_NUMBER,	// empire produced total component
 };
 
 
@@ -3937,8 +3937,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// diplomacy
 	FALSE,	// have city
 	FALSE,	// empire military
-	FALSE,	// empire gather total
-	FALSE,	// empire gather total component
+	FALSE,	// empire produced total object
+	FALSE,	// empire produced total component
 };
 
 
