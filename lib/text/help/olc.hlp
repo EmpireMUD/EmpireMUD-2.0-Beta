@@ -6140,7 +6140,9 @@ Available tasks:
  &cDIPLOMACY&0 - Empire must have a number of matching diplomatic relations.
  &cHAVE-CITY&0 - Empire must have a number of cities (of any size).
  &cEMPIRE-MILITARY&0 - Empire must have a certain amount of military.
- &cEMPIRE-GATHER-TOTAL&0 - Empire has gathered a certain total of an item.
+ &cEMPIRE-GATHER-TOTAL-OBJECT&0 - Empire has gathered an amount of an item.
+ &cEMPIRE-GATHER-TOTAL-COMPONENT&0 - Empire has gathered a total amount of
+    components.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

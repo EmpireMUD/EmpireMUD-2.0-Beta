@@ -36,7 +36,7 @@ will immediately fail any remaining daily quests in your quest list.
 
 See also: CITY DAILIES
 #
-"EMPIRE GATHER TOTALS" "EMPIRE GATHERED TOTALS" "EMPIRE HAS GATHERED OVER" EMPIRE-GATHER-TOTAL
+"EMPIRE GATHER TOTALS" "EMPIRE GATHERED TOTALS" "EMPIRE HAS GATHERED OVER" EMPIRE-GATHER-TOTAL-OBJECT EMPIRE-GATHER-TOTAL-COMPONENT
 
 Quests and progress goals that require "Empire has gathered over: x# item"
 count the total number the empire has ever gathered (or produced) rather than

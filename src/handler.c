@@ -2976,7 +2976,7 @@ void add_gathered_total_for_tag_list(struct mob_tag *list, obj_vnum vnum, int am
 *
 * @param empire_data *emp Which empire.
 * @param obj_vnum vnum The item to check
-* @return int How many the empire has every gained.
+* @return int How many the empire has ever gained.
 */
 int get_gathered_total(empire_data *emp, obj_vnum vnum) {
 	struct empire_gathered_total *egt;
@@ -2994,6 +2994,36 @@ int get_gathered_total(empire_data *emp, obj_vnum vnum) {
 	else {
 		return 0;
 	}
+}
+
+
+/**
+* Gets the total count produced (or traded for) by an empire, for a component.
+*
+* @param empire_data *emp Which empire.
+* @param int cmp_type Which component type.
+* @param bitvector_t cmp_flags Any required component flags.
+* @return int How many matching items the empire has ever gained.
+*/
+int get_gathered_total_component(empire_data *emp, int cmp_type, bitvector_t cmp_flags) {
+	struct empire_gathered_total *egt, *next_egt;
+	int count = 0;
+	
+	if (!emp || cmp_type == CMP_NONE) {
+		return count;	// no work
+	}
+	
+	HASH_ITER(hh, EMPIRE_GATHERED_TOTALS(emp), egt, next_egt) {
+		if (!egt->proto) {
+			continue;
+		}
+		
+		if (GET_OBJ_CMP_TYPE(egt->proto) == cmp_type && (GET_OBJ_CMP_FLAGS(egt->proto) & cmp_flags) == cmp_flags) {
+			count += (egt->amount - MAX(0, egt->imported - egt->exported));
+		}
+	}
+	
+	return count;
 }
 
 
@@ -6888,8 +6918,14 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
-			case REQ_EMPIRE_GATHER_TOTAL: {
+			case REQ_EMPIRE_GATHER_TOTAL_OBJECT: {
 				if (!GET_LOYALTY(ch) || get_gathered_total(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_EMPIRE_GATHER_TOTAL_COMPONENT: {
+				if (!GET_LOYALTY(ch) || get_gathered_total_component(GET_LOYALTY(ch), req->vnum, req->misc) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -7114,8 +7150,12 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			snprintf(output, sizeof(output), "Have %d cit%s", req->needed, req->needed == 1 ? "y" : "ies");
 			break;
 		}
-		case REQ_EMPIRE_GATHER_TOTAL: {
+		case REQ_EMPIRE_GATHER_TOTAL_OBJECT: {
 			snprintf(output, sizeof(output), "Empire has gathered over: %dx %s%s", req->needed, vnum, get_obj_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EMPIRE_GATHER_TOTAL_COMPONENT: {
+			snprintf(output, sizeof(output), "Empire has gathered over: %dx %s%s", req->needed, vnum, component_string(req->vnum, req->misc));
 			break;
 		}
 		default: {

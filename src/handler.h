@@ -153,6 +153,7 @@ void perform_claim_room(room_data *room, empire_data *emp);
 void add_gathered_total(empire_data *emp, obj_vnum vnum, int amount);
 void add_gathered_total_for_tag_list(struct mob_tag *list, obj_vnum vnum, int amount);
 extern int get_gathered_total(empire_data *emp, obj_vnum vnum);
+extern int get_gathered_total_component(empire_data *emp, int cmp_type, bitvector_t cmp_flags);
 void mark_gathered_trade(empire_data *emp, obj_vnum vnum, int imported, int exported);
 
 // empire needs handlers
