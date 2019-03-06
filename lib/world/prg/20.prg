@@ -14,15 +14,14 @@ S
 Clayworks~
    You can build a great empire from brick and mortar. First you'll need to
 build a Potter, where you can craft clay items faster and easier. Then make 50
-piles of clay bricks, and store them. You need to own the Potter and have all
-50 bricks in storage to complete this goal.
+piles of clay bricks. You need to claim the Potter to complete this goal.
 ~
-3 2 0 15 0
+4 2 0 15 0
 K 7 5
 W
 7 5110 0 1 a
 W
-2 257 0 50 a
+34 257 0 50 a
 S
 #2010
 Storage~
@@ -54,12 +53,11 @@ S
 #2011
 Foundations~
    Your empire is well underway, but if you're planning to rise to greatness,
-you'll need some basic resources first. Collect small stockpiles each of any
-type of rock, lumber, block, pillar, stick, and metal ingots. You will need to
-have all these things stored at once in order to complete this goal.
-Completing this goal will allow your empire to build new artisan buildings.
+you'll need some basic resources first. Produce small stockpiles each of any
+type of rock, lumber, block, pillar, stick, and metal ingots. Completing this
+goal will allow your empire to build new artisan buildings.
 ~
-9 2 0 5 0
+10 2 0 5 0
 K 2 5130
 K 2 5131
 K 2 5132
@@ -74,17 +72,17 @@ K 2 1401
 K 2 5209
 P 2010
 W
-1 18 0 50 a
+35 18 0 50 a
 W
-1 22 0 50 a
+35 22 0 50 a
 W
-1 3 0 50 a
+35 3 0 50 a
 W
-1 21 0 50 a
+35 21 0 50 a
 W
-1 25 0 100 a
+35 25 0 50 a
 W
-1 16 0 100 a
+35 16 0 50 a
 S
 #2012
 Artisans~
@@ -127,15 +125,15 @@ W
 7 5130 0 1 a
 S
 #2014
-Stockpile Iron~
-   Build up a stockpile of iron ingots to ensure the success of your empire.
+Ironclad Future~
+   It will take a lot of iron ingots to ensure the success of your empire. 
 Your reward for all this mining is the ability to dig deeper mines.
 ~
-3 2 0 15 0
+5 2 0 15 0
 K 0 13
 P 2011
 W
-2 175 0 250
+34 175 0 250
 S
 #2015
 Cache of Resources~
@@ -163,95 +161,96 @@ W
 S
 #2016
 Rare Surplus~
-Build up small surplus of the rarer resources: leather, gems, and rare metals.
+   If your empire is going to be successful, you'll need to produce a surplus
+of the rarer resources: leather, gems, and rare metals.
 ~
-5 2 0 25 0
+7 2 0 25 0
 K 6 100
 P 2011
 W
-2 1206 0 25 a
+34 1206 0 25 a
 W
-2 1300 0 25 a
+34 1300 0 25 a
 W
-2 103 0 25 a
+34 103 0 25 a
 W
-2 104 0 25 a
+34 104 0 25 a
 W
-2 177 0 25 a
+34 177 0 25 a
 W
-2 176 0 25 a
+34 176 0 25 a
 W
-2 1356 0 50 a
+35 15 16384 50 a
 W
-2 1357 0 50 a
+35 15 32 50 a
 S
 #2017
 Rare Stockpiles~
-   Become a powerful trade empire by building huge stockpiles of the rare
+   Become a powerful trade empire by producing huge stockpiles of the rare
 resources: leather, gems, and rare metals. Completing this goal earns you a
 higher workforce cap, if you have a workforce.
 ~
-6 2 0 50 0
+7 2 0 50 0
 K 6 100
 P 2016
 W
-2 1206 0 150 a
+34 1206 0 150 a
 W
-2 1300 0 150 a
+34 1300 0 150 a
 W
-2 103 0 150 a
+34 103 0 150 a
 W
-2 104 0 150 a
+34 104 0 150 a
 W
-2 177 0 75 a
+34 177 0 75 a
 W
-2 176 0 75 a
+34 176 0 75 a
 W
-2 1356 0 250 a
+35 15 16384 250 a
 W
-2 1357 0 250 a
+35 15 32 250 a
 S
 #2018
 Collecting Herbs~
    A good stockpile of herbs is necessary for the health and development of an
-empire. Have 50 of each basic herb in your storage to complete this goal.
+empire. Produce 50 of each basic herb to complete this goal.
 ~
-3 1 0 25 0
+4 1 0 25 0
 K 7 5
 P 2011
 W
-2 1200 0 50 a
+34 1200 0 50 a
 W
-2 1201 0 50 a
+34 1201 0 50 a
 W
-2 1202 0 50 a
+34 1202 0 50 a
 W
-2 1203 0 50 a
+34 1203 0 50 a
 W
-2 1204 0 50 a
+34 1204 0 50 a
 W
-2 1205 0 50 a
+34 1205 0 50 a
 S
 #2019
 Herbal Empire~
    Ensure your empire never runs out of herbs by building up a stockpile of 500
-each in your empire's storage.
+of each herb.
 ~
-4 1 0 50 0
+5 1 0 50 0
 K 7 5
 P 2018
 W
-2 1200 0 500 a
+34 1200 0 500 a
 W
-2 1201 0 500 a
+34 1201 0 500 a
 W
-2 1202 0 500 a
+34 1202 0 500 a
 W
-2 1203 0 500 a
+34 1203 0 500 a
 W
-2 1204 0 500 a
+34 1204 0 500 a
 W
-2 1205 0 500 a
+34 1205 0 500 a
 S
 #2030
 Early Harvest~
