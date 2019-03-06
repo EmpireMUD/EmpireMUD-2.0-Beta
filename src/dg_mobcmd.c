@@ -784,6 +784,11 @@ ACMD(do_mload) {
 		
 		tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1);
 		if (tch) {	// load on char
+			// mark as "gathered" like a resource
+			if (!IS_NPC(tch) && GET_LOYALTY(tch)) {
+				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
+			}
+			
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);

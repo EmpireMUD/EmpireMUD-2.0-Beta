@@ -58,6 +58,11 @@ INTERACTION_FUNC(butcher_interact) {
 		load_otrigger(fillet);
 	}
 	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
 	if (fillet) {
 		if (interaction->quantity != 1) {
 			sprintf(buf, "You skillfully butcher $p (x%d) from the corpse!", interaction->quantity);
@@ -96,6 +101,11 @@ INTERACTION_FUNC(do_one_forage) {
 		obj_to_char_or_room(obj, ch);
 		add_depletion(inter_room, DPLTN_FORAGE, TRUE);
 		load_otrigger(obj);
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
 	}
 	
 	sprintf(lbuf, "You forage around and find $p (x%d)!", num);

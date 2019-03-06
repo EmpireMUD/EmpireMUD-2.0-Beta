@@ -938,6 +938,11 @@ void finish_gen_craft(char_data *ch) {
 				
 				load_otrigger(obj);
 			}
+			
+			// mark for the empire
+			if (GET_LOYALTY(ch)) {
+				add_production_total(GET_LOYALTY(ch), GET_CRAFT_OBJECT(type), amt);
+			}
 		}
 	}
 

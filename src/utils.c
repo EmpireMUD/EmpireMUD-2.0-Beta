@@ -805,6 +805,11 @@ bool process_import_one(empire_data *emp) {
 				add_to_empire_storage(emp, found_island, trade->vnum, trade_amt);
 				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt);
 				
+				// mark gather trackers
+				add_production_total(emp, trade->vnum, trade_amt);
+				mark_production_trade(emp, trade->vnum, trade_amt, 0);
+				mark_production_trade(pair->emp, trade->vnum, 0, trade_amt);
+				
 				// money
 				decrease_empire_coins(emp, emp, cost);
 				increase_empire_coins(pair->emp, pair->emp, cost * pair->rate);

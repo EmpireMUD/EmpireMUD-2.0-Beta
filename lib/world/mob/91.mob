@@ -607,7 +607,8 @@ horn on its nose, and a smaller horn behind it. Its armored skin and heavy
 build make for an intimidating sight.
 ~
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
-I 0 9139 100.00 1  # BUTCHER: a rhinoceros horn
+I 0 9139 5.00 1 a  # BUTCHER: a rare rhinoceros horn
+I 0 9141 95.00 1 a  # BUTCHER: a rhinoceros horn
 I 1 1351 100.00 2  # SKIN: a large skin
 T 9118
 T 9503

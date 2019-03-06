@@ -163,15 +163,15 @@ S
 #1031
 Forging the Future~
    Your empire will need many smithed tools and resources to build and develop.
-Build a forge and make 50 nails. Store the nails (identify them to see where
-they store) and be sure to claim the forge to complete this goal.
+Build a forge and make 50 nails. Be sure to claim the forge to complete this
+goal.
 ~
-2 1 0 15 0
+3 1 0 15 0
 P 1030
 W
 26 0 128 1 a
 W
-1 19 0 50 a
+35 19 0 50 a
 S
 #1040
 Luxuries~

@@ -840,12 +840,10 @@ A chipped flint is lying on the ground.~
 make a tool -- is one of mankind's oldest techniques. Keep chipping the flint
 until it becomes a useful tool.
 ~
-1 ikl ano 5
+1 ikl ano 6
 0 2 5
 1 0
 I 19 181 100.00 1  # CHIP: a handaxe
-O
-22 u
 S
 #181
 handaxe axe~

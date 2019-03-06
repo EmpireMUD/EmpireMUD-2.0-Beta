@@ -3823,6 +3823,80 @@ SHOW(show_currency) {
 }
 
 
+SHOW(show_produced) {
+	extern int sort_empire_production_totals(struct empire_production_total *a, struct empire_production_total *b);
+	
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct empire_production_total *egt, *next_egt;
+	empire_data *emp = NULL;
+	obj_vnum vnum = NOTHING;
+	size_t size, count;
+	obj_data *obj;
+	
+	argument = any_one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show produced <empire>\r\n");
+	}
+	else if (!(emp = get_empire_by_name(arg))) {
+		send_to_char("There is no such empire.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Produced items for matching '%s' for %s%s\t0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Produced items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
+		
+		// check if argument is a vnum
+		if (isdigit(*argument)) {
+			vnum = atoi(argument);
+		}
+		
+		count = 0;
+		HASH_SORT(EMPIRE_PRODUCTION_TOTALS(emp), sort_empire_production_totals);
+		HASH_ITER(hh, EMPIRE_PRODUCTION_TOTALS(emp), egt, next_egt) {
+			if (!(obj = egt->proto)) {
+				continue;	// no obj?
+			}
+			if (*argument && vnum != egt->vnum && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+				continue;	// searched
+			}
+		
+			// show it
+			if (egt->imported || egt->exported) {
+				snprintf(line, sizeof(line), " [%5d] %s: %d (%d/%d)\r\n", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount, egt->imported, egt->exported);
+			}
+			else {
+				snprintf(line, sizeof(line), " [%5d] %s: %d\r\n", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount);
+			}
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_learned) {
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
@@ -8539,6 +8613,7 @@ ACMD(do_show) {
 		{ "piles", LVL_CIMPL, show_piles },
 		{ "progress", LVL_START_IMM, show_progress },
 		{ "progression", LVL_START_IMM, show_progression },
+		{ "produced", LVL_START_IMM, show_produced },
 
 		// last
 		{ "\n", 0, NULL }

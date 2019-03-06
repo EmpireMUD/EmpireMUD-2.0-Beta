@@ -240,6 +240,11 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 					load_otrigger(obj);
 				}
 				
+				// mark gained
+				if (GET_LOYALTY(ch)) {
+					add_production_total(GET_LOYALTY(ch), reward->vnum, reward->amount);
+				}
+				
 				if (reward->amount > 1) {
 					snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
 				}

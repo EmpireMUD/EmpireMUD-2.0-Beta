@@ -36,6 +36,19 @@ will immediately fail any remaining daily quests in your quest list.
 
 See also: CITY DAILIES
 #
+"EMPIRE PRODUCED TOTALS" "EMPIRE PRODUCTION TOTALS" "EMPIRE HAS PRODUCED" EMPIRE-PRODUCED-OBJECT EMPIRE-PRODUCED-COMPONENT
+
+Quests and progress goals that require "Empire has produced: x# item"
+count the total number the empire has ever gathered/produced rather than the
+amount you currently have in the empire inventory.
+
+This number goes up when you gather or produce the item, for example when you
+chop a tree down or when your workforce saws a tree into lumber. Importing an
+item also counts, but exporting it again will count against the total.
+
+However, it does not count toward this requirement if you pick up an item you
+didn't produce yourself, or if another player gives you an item.
+#
 "QUEST DROP"
 
 Usage:  quest drop <name>

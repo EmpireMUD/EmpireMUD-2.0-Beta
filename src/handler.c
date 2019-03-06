@@ -37,6 +37,7 @@
 *   Cooldown Handlers
 *   Currency Handlers
 *   Empire Handlers
+*   Empire Production Total Handlers
 *   Empire Needs Handlers
 *   Empire Targeting Handlers
 *   Follow Handlers
@@ -86,6 +87,7 @@ void scale_item_to_level(obj_data *obj, int level);
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
 void die_follower(char_data *ch);
+struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
@@ -2878,6 +2880,217 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 		event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
 		ROOM_UNLOAD_EVENT(room) = NULL;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE PRODUCTION TOTAL HANDLERS ////////////////////////////////////////
+
+/**
+* Marks that the empire has gathered (or produced, or traded for) an item.
+* If you are adding as the result of an import, you should call
+* mark_production_trade too.
+*
+* @param empire_data *emp Which empire.
+* @param obj_vnum vnum The item gained.
+* @param int amount How many were gained.
+*/
+void add_production_total(empire_data *emp, obj_vnum vnum, int amount) {
+	struct empire_production_total *egt;
+	
+	if (!emp || vnum == NOTHING) {
+		return;	// no work
+	}
+	
+	if ((egt = get_production_total_entry(emp, vnum))) {
+		SAFE_ADD(egt->amount, amount, 0, INT_MAX, FALSE);
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	
+		// update trackers
+		et_change_production_total(emp, vnum, amount);
+	}
+}
+
+
+/**
+* Marks an item as produced for everyone on a mob's tag list, ignoring anybody
+* whose empire has already been done (adds at most 1 per empire).
+*
+* @param struct mob_tag *list The list of mob tags.
+* @param obj_vnum vnum The item gained.
+* @param int amount How many were gained.
+*/
+void add_production_total_for_tag_list(struct mob_tag *list, obj_vnum vnum, int amount) {
+	struct mob_tag *tag;
+	char_data *plr;
+	bool done;
+	
+	// mini data type for preventing duplicates
+	struct agtftl_data {
+		any_vnum eid;
+		struct agtftl_data *next;
+	} *dat, *next_dat, *dat_list = NULL;
+	
+	if (vnum == NOTHING || !list) {
+		return;	// sanity
+	}
+	
+	for (tag = list; tag; tag = tag->next) {
+		if (!(plr = is_playing(tag->idnum))) {
+			continue;	// ignore missing players
+		}
+		if (!GET_LOYALTY(plr)) {
+			continue;	// not in an empire
+		}
+		
+		// check if already done this empire
+		done = FALSE;
+		LL_FOREACH(dat_list, dat) {
+			if (dat->eid == EMPIRE_VNUM(GET_LOYALTY(plr))) {
+				done = TRUE;
+				break;
+			}
+		}
+		if (done) {
+			continue;	// we only do each empire once
+		}
+		
+		// OK: add it
+		add_production_total(GET_LOYALTY(plr), vnum, amount);
+		
+		// and mark the empire
+		CREATE(dat, struct agtftl_data, 1);
+		dat->eid = EMPIRE_VNUM(GET_LOYALTY(plr));
+		LL_PREPEND(dat_list, dat);
+	}
+	
+	// free the data list
+	LL_FOREACH_SAFE(dat_list, dat, next_dat) {
+		free(dat);
+	}
+}
+
+
+/**
+* Gets the total count produced (or traded for) by an empire.
+*
+* @param empire_data *emp Which empire.
+* @param obj_vnum vnum The item to check
+* @return int How many the empire has ever gained.
+*/
+int get_production_total(empire_data *emp, obj_vnum vnum) {
+	struct empire_production_total *egt;
+	
+	if (!emp || vnum == NOTHING) {
+		return 0;	// no work
+	}
+	
+	HASH_FIND_INT(EMPIRE_PRODUCTION_TOTALS(emp), &vnum, egt);
+	if (egt) {
+		// ignores any that may have been exported then imported, to prevent
+		// abuse where 2 empires could constantly import/export from each other
+		return egt->amount - MAX(0, egt->imported - egt->exported);
+	}
+	else {
+		return 0;
+	}
+}
+
+
+/**
+* Gets the total count produced (or traded for) by an empire, for a component.
+*
+* @param empire_data *emp Which empire.
+* @param int cmp_type Which component type.
+* @param bitvector_t cmp_flags Any required component flags.
+* @return int How many matching items the empire has ever gained.
+*/
+int get_production_total_component(empire_data *emp, int cmp_type, bitvector_t cmp_flags) {
+	struct empire_production_total *egt, *next_egt;
+	int count = 0;
+	
+	if (!emp || cmp_type == CMP_NONE) {
+		return count;	// no work
+	}
+	
+	HASH_ITER(hh, EMPIRE_PRODUCTION_TOTALS(emp), egt, next_egt) {
+		if (!egt->proto) {
+			continue;
+		}
+		
+		if (GET_OBJ_CMP_TYPE(egt->proto) == cmp_type && (GET_OBJ_CMP_FLAGS(egt->proto) & cmp_flags) == cmp_flags) {
+			count += (egt->amount - MAX(0, egt->imported - egt->exported));
+		}
+	}
+	
+	return count;
+}
+
+
+/**
+* Finds (or creates) an empire_production_total entry, if possible.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum Which object vnum (must correspond to an object).
+* @return struct empire_production_total* The entry for that object, or NULL if not possible.
+*/
+struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum) {
+	struct empire_production_total *egt;
+	obj_data *proto;
+	
+	if (!emp || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(EMPIRE_PRODUCTION_TOTALS(emp), &vnum, egt);
+	if (!egt) {
+		// ensure real obj now
+		if (!(proto = obj_proto(vnum))) {
+			return NULL;
+		}
+		
+		CREATE(egt, struct empire_production_total, 1);
+		egt->vnum = vnum;
+		egt->proto = proto;
+		HASH_ADD_INT(EMPIRE_PRODUCTION_TOTALS(emp), vnum, egt);
+	}
+	return egt;
+}
+
+
+/**
+* Marks that an empire has imported/exported a resource, which will affect how
+* totals are determined. Note that this only marks an amount as imported or
+* exported; it does not add to the production amount (imports should do this
+* separately).
+*
+* @param empire_data *emp Which empire.
+* @param obj_vnum vnum The item gained.
+* @param int imported The amount that were imported (0 or more).
+* @param int exported The amount that were exported (0 or more).
+*/
+void mark_production_trade(empire_data *emp, obj_vnum vnum, int imported, int exported) {
+	struct empire_production_total *egt;
+	
+	if (!emp || vnum == NOTHING) {
+		return;	// no work
+	}
+	
+	if ((egt = get_production_total_entry(emp, vnum))) {
+		if (imported) {
+			SAFE_ADD(egt->imported, imported, 0, INT_MAX, FALSE);
+		}
+		if (exported) {
+			SAFE_ADD(egt->exported, exported, 0, INT_MAX, FALSE);
+		}
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+}
+
+
+// Simple amount-sorter for production item totals
+int sort_empire_production_totals(struct empire_production_total *a, struct empire_production_total *b) {
+	return b->amount - a->amount;
 }
 
 
@@ -6705,6 +6918,18 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_EMPIRE_PRODUCED_OBJECT: {
+				if (!GET_LOYALTY(ch) || get_production_total(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_EMPIRE_PRODUCED_COMPONENT: {
+				if (!GET_LOYALTY(ch) || get_production_total_component(GET_LOYALTY(ch), req->vnum, req->misc) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -6779,7 +7004,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_GET_COMPONENT: {
-			snprintf(output, sizeof(output), "Get component%s: %dx %s%s", PLURAL(req->needed), req->needed, vnum, component_string(req->vnum, req->misc));
+			snprintf(output, sizeof(output), "Get component%s: %dx (%s)", PLURAL(req->needed), req->needed, component_string(req->vnum, req->misc));
 			break;
 		}
 		case REQ_GET_OBJECT: {
@@ -6923,6 +7148,14 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_HAVE_CITY: {
 			snprintf(output, sizeof(output), "Have %d cit%s", req->needed, req->needed == 1 ? "y" : "ies");
+			break;
+		}
+		case REQ_EMPIRE_PRODUCED_OBJECT: {
+			snprintf(output, sizeof(output), "Empire has produced: %dx %s%s", req->needed, vnum, get_obj_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EMPIRE_PRODUCED_COMPONENT: {
+			snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, component_string(req->vnum, req->misc));
 			break;
 		}
 		default: {

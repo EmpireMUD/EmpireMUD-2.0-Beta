@@ -1925,6 +1925,7 @@ const char *versions_list[] = {
 	"b5.45",
 	"b5.47",
 	"b5.48",
+	"b5.58",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3435,6 +3436,33 @@ void b5_48_rope_update(void) {
 }
 
 
+// tracks current empire einv as "gathered items" to retroactively set gather totals
+void b5_58_gather_totals(void) {
+	void save_marked_empires();
+	
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	empire_data *emp, *next_emp;
+	
+	log("Applying b5.58 update to empire gather totals...");
+	
+	// each empire
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// each island
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			// storage
+			HASH_ITER(hh, isle->store, store, next_store) {
+				add_production_total(emp, store->vnum, store->amount);
+			}
+		}
+		
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	}
+	
+	save_marked_empires();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3705,6 +3733,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.48")) {
 			b5_48_rope_update();
+		}
+		if (MATCH_VERSION("b5.58")) {
+			b5_58_gather_totals();
 		}
 	}
 	

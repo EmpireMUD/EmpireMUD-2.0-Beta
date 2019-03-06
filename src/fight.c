@@ -1368,6 +1368,10 @@ obj_data *die(char_data *ch, char_data *killer) {
 			recursive_loot_set(ch->carrying, GET_IDNUM(killmaster), GET_LOYALTY(killmaster));
 		}
 		while (ch->carrying) {
+			if (IS_NPC(ch) && MOB_TAGGED_BY(ch)) {
+				// mark as gathered
+				add_production_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(ch->carrying), 1);
+			}
 			obj_to_room(ch->carrying, IN_ROOM(ch));
 		}
 	}
@@ -1557,6 +1561,12 @@ obj_data *make_corpse(char_data *ch) {
 
 		IS_CARRYING_N(ch) = 0;
 		ch->carrying = NULL;
+		
+		if (MOB_TAGGED_BY(ch)) {
+			LL_FOREACH2(corpse->contains, o, next_content) {
+				add_production_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(o), 1);
+			}
+		}
 	}
 	else {
 		// not an npc, but check for stolen

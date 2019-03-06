@@ -674,6 +674,11 @@ INTERACTION_FUNC(finish_chopping) {
 		load_otrigger(obj);
 	}
 	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
 	// messaging
 	if (obj) {
 		if (interaction->quantity > 1) {
@@ -711,7 +716,12 @@ INTERACTION_FUNC(finish_digging) {
 			// add to depletion and 1/4 chance of adding a second one, to mix up the depletion values
 			add_depletion(inter_room, DPLTN_DIG, TRUE);
 		}
-
+		
+		// mark gained
+		if (GET_LOYALTY(ch)) {
+			add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		}
+		
 		if (interaction->quantity > 1) {
 			sprintf(buf1, "You pull $p from the ground (x%d)!", interaction->quantity);
 		}
@@ -741,6 +751,11 @@ INTERACTION_FUNC(finish_fishing) {
 		load_otrigger(obj);
 	}
 	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
 	// messaging
 	if (obj) {
 		if (interaction->quantity > 1) {
@@ -768,6 +783,11 @@ INTERACTION_FUNC(finish_gathering) {
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
 		add_depletion(IN_ROOM(ch), DPLTN_GATHER, TRUE);
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	if (obj) {
@@ -808,7 +828,12 @@ INTERACTION_FUNC(finish_harvesting) {
 			obj_to_char_or_room(obj, ch);
 			load_otrigger(obj);
 		}
-
+		
+		// mark gained
+		if (GET_LOYALTY(ch)) {
+			add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
+		}
+		
 		// info messaging
 		if (obj) {
 			sprintf(buf, "You got $p (x%d)!", num);
@@ -841,6 +866,11 @@ INTERACTION_FUNC(finish_mining) {
 		any = TRUE;
 	}
 	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
 	return any;
 }
 
@@ -855,6 +885,11 @@ INTERACTION_FUNC(finish_panning) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
 		load_otrigger(obj);
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	// messaging
@@ -905,6 +940,11 @@ INTERACTION_FUNC(finish_picking_herb) {
 		load_otrigger(obj);
 	}
 	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), vnum, num);
+	}
+	
 	if (obj) {
 		if (num > 1) {
 			sprintf(buf, "You find $p (x%d)!", num);
@@ -942,6 +982,11 @@ INTERACTION_FUNC(finish_picking_crop) {
 		load_otrigger(obj);
 	}
 	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
 	if (obj) {
 		if (interaction->quantity > 1) {
 			sprintf(buf, "You find $p (x%d)!", interaction->quantity);
@@ -975,6 +1020,11 @@ INTERACTION_FUNC(finish_quarrying) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	if (interaction->quantity > 1) {
@@ -1017,6 +1067,11 @@ INTERACTION_FUNC(finish_scraping) {
 			obj_to_room(load, IN_ROOM(ch));
 		}
 		load_otrigger(load);
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 
 	if (interaction->quantity > 1) {

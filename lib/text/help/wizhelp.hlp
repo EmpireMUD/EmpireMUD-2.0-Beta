@@ -1067,6 +1067,7 @@ mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
+produced   Immort   Shows total produced items for an empire.
 progress   Immort   Shows how many empires have completed a progress goal.
 progression Immrt   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
@@ -1211,6 +1212,15 @@ Shows the names and current and max health, moves, mana and blood of all online
 players. Not to be confused with SHOW PLAYER.
 
 See also: USERS
+#e
+"SHOW PRODUCED"
+
+Usage:  show produced "<empire>" [search phrase | vnum]
+
+This command shows the total produced items for an empire. Put the empire name
+in quotes if it's longer than 1 word.
+
+The total produced item counts are used for some progress goals and quests.
 #e
 "SHOW PROGRESS"
 
