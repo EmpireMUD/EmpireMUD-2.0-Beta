@@ -287,6 +287,28 @@ Variables:
   
 See also: MTRIG CHARMED
 #d
+"KILL TRIGGER" "MTRIG KILL" "OTRIG KILL" "VTRIG KILL" TRIGEDIT-MOB-KILL TRIGEDIT-OBJ-KILL TRIGEDIT-VEH-KILL
+
+Kill (trigger)
+
+Argument type:  percent chance to trigger
+Return value:  return 0 to silence death cries (except in vehicle triggers)
+
+This trigger fires when a person is killed by a mob, killed by a vehicle, or
+killed by someone who has an item with a kill trigger. Allies of the killer
+will also fire a kill trigger, for example if your pet makes a kill, or a
+member of your group does.
+
+A person who kills themselves, or who dies as a result of something other than
+combat/siege damage, generally does not fire this trigger. Charmed mobs will
+not fire this trigger unless the trigger also has the Charmed flag.
+
+Variables:
+  &c%actor%&0 - The person who was killed.
+  &c%killer%&0 - The person or vehicle who killed them.
+  
+See also: MTRIG CHARMED
+#d
 "LEAVE TRIGGER" "LEAVE-ALL TRIGGER" "MTRIG LEAVE" "OTRIG LEAVE" "RTRIG LEAVE" "VTRIG LEAVE" "MTRIG LEAVE ALL" TRIGEDIT-MOB-LEAVE TRIGEDIT-OBJ-LEAVE TRIGEDIT-ROOM-LEAVE TRIGEDIT-VEH-LEAVE TRIGEDIT-MOB-LEAVE-ALL
 
 Leave (trigger)

@@ -43,6 +43,7 @@ extern struct instance_data *quest_instance_global;
 
 // locals
 int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
+int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
 
 
 /*
@@ -2876,4 +2877,187 @@ void check_reset_trigger_event(room_data *room, bool random_offset) {
 	else {
 		cancel_stored_event_room(room, SEV_RESET_TRIGGER);
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// KILL TRIGGER FUNCS //////////////////////////////////////////////////////
+
+/**
+* Runs kill triggers for everyone involved in the kill -- the killer, their
+* allies, and all items possessed by those people. Additionally, vehicles also
+* fire kill triggers if they cause the kill, even if they are not in the same
+* room.
+*
+* Kill triggers will not fire if a person kills himself.
+*
+* @param char_data *dying The person who has died.
+* @param char_data *killer Optional: Person who killed them.
+* @param vehicle_data *veh_killer Optional: Vehicle who killed them.
+* @return int The return value of a script (1 is normal, 0 suppresses the death cry).
+*/
+int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer) {
+	extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
+	
+	union script_driver_data_u sdd;
+	char_data *ch_iter, *next_ch;
+	trig_data *trig, *next_trig;
+	char buf[MAX_INPUT_LENGTH];
+	room_data *room;
+	int pos;
+	
+	int val = 1;	// default return value
+	
+	if (!dying) {
+		return val;	// somehow
+	}
+	
+	// store this, in case it changes during any script
+	room = IN_ROOM(dying);
+	
+	if (killer && killer != dying) {
+		// check characters first:
+		LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch_iter, next_ch, next_in_room) {
+			if (EXTRACTED(ch_iter) || IS_DEAD(ch_iter) || !SCRIPT_CHECK(ch_iter, MTRIG_KILL)) {
+				continue;
+			}
+			if (ch_iter == dying) {
+				continue;	// cannot fire if killing self
+			}
+			if (ch_iter != killer && !is_fight_ally(ch_iter, killer)) {
+				continue;	// is not on the killing team
+			}
+			LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch_iter)), trig, next_trig) {
+				if (AFF_FLAGGED(ch_iter, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
+					continue;	// cannot do while charmed
+				}
+				if (!TRIGGER_CHECK(trig, MTRIG_KILL) || (number(1, 100) > GET_TRIG_NARG(trig))) {
+					continue;	// wrong trig or failed random percent
+				}
+			
+				// ok:
+				memset((char *) &sdd, 0, sizeof(union script_driver_data_u));
+				ADD_UID_VAR(buf, trig, char_script_id(dying), "actor", 0);
+				if (killer) {
+					ADD_UID_VAR(buf, trig, char_script_id(killer), "killer", 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(trig), "killer", "", 0);
+				}
+				sdd.c = ch_iter;
+			
+				// run it -- any script returning 0 guarantees we will return 0
+				val &= script_driver(&sdd, trig, MOB_TRIGGER, TRIG_NEW);
+			}
+		}
+		
+		// check gear on characters present, IF they are on the killing team:
+		LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch_iter, next_ch, next_in_room) {
+			if (EXTRACTED(ch_iter) || IS_DEAD(ch_iter)) {
+				continue;	// cannot benefit if dead
+			}
+			if (ch_iter != killer && !is_fight_ally(ch_iter, killer)) {
+				continue;	// is not on the killing team
+			}
+			
+			// equipped
+			for (pos = 0; pos < NUM_WEARS; ++pos) {
+				if (!GET_EQ(ch_iter, pos)) {
+					continue;	// no item
+				}
+				
+				// ok:
+				val &= kill_otrigger(GET_EQ(ch_iter, pos), dying, killer);
+			}
+			
+			// inventory:
+			val &= kill_otrigger(ch_iter->carrying, dying, killer);
+		}
+	}
+	
+	// and the vehicle
+	if (veh_killer && SCRIPT_CHECK(veh_killer, VTRIG_KILL)) {
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh_killer)), trig, next_trig) {
+			if (!TRIGGER_CHECK(trig, VTRIG_KILL) || (number(1, 100) > GET_TRIG_NARG(trig))) {
+				continue;	// wrong trig or failed random percent
+			}
+			
+			// ok:
+			memset((char *) &sdd, 0, sizeof(union script_driver_data_u));
+			ADD_UID_VAR(buf, trig, char_script_id(dying), "actor", 0);
+			ADD_UID_VAR(buf, trig, veh_script_id(veh_killer), "killer", 0);
+			sdd.v = veh_killer;
+		
+			// run it -- any script returning 0 guarantees we will return 0
+			val &= script_driver(&sdd, trig, VEH_TRIGGER, TRIG_NEW);
+		}
+	}
+	
+	return val;
+}
+
+
+/**
+* Runs kill triggers on a single object, then on its next contents
+* (recursively). This function is called by run_kill_triggers, which has
+* already validated that the owner of the object qualifies as either the killer
+* or an ally of the killer.
+*
+* @param obj_data *obj The object possibly running triggers.
+* @param char_data *dying The person who has died.
+* @param char_data *killer Optional: Person who killed them.
+* @return int The return value of a script (1 is normal, 0 suppresses the death cry).
+*/
+int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer) {
+	obj_data *next_contains, *next_inside;
+	union script_driver_data_u sdd;
+	trig_data *trig, *next_trig;
+	int val = 1;	// default value
+	
+	if (!obj) {
+		return val;	// often called with no obj
+	}
+	
+	// save for later
+	next_contains = obj->contains;
+	next_inside = obj->next_content;
+	
+	// run script if possible...
+	if (SCRIPT_CHECK(obj, OTRIG_KILL)) {
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), trig, next_trig) {
+			if (!TRIGGER_CHECK(trig, OTRIG_KILL) || (number(1, 100) > GET_TRIG_NARG(trig))) {
+				continue;	// wrong trig or failed random percent
+			}
+			
+			// ok:
+			memset((char *) &sdd, 0, sizeof(union script_driver_data_u));
+			ADD_UID_VAR(buf, trig, char_script_id(dying), "actor", 0);
+			if (killer) {
+				ADD_UID_VAR(buf, trig, char_script_id(killer), "killer", 0);
+			}
+			else {
+				add_var(&GET_TRIG_VARS(trig), "killer", "", 0);
+			}
+			sdd.o = obj;
+			
+			// run it -- any script returning 0 guarantees we will return 0
+			val &= script_driver(&sdd, trig, OBJ_TRIGGER, TRIG_NEW);
+			
+			// ensure obj is safe
+			obj = sdd.o;
+			if (!obj) {
+				break;	// cannot run more triggers -- obj is gone
+			}
+		}
+	}
+	
+	// run recursively
+	if (next_contains) {
+		val &= kill_otrigger(next_contains, dying, killer);
+	}
+	if (next_inside) {
+		val &= kill_otrigger(next_inside, dying, killer);
+	}
+	
+	return val;
 }

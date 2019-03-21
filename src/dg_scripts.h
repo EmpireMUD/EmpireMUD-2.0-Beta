@@ -61,6 +61,7 @@
 #define MTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 #define MTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define MTRIG_BUY              BIT(24)	// attempting a purchase
+#define MTRIG_KILL             BIT(25)	// mob has killed something
 
 
 // OTRIG_x: obj trigger types
@@ -87,6 +88,7 @@
 #define OTRIG_PLAYER_IN_ROOM   BIT(22)	// NOT actually used, currently
 #define OTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define OTRIG_BUY              BIT(24)	// attempting a purchase
+#define OTRIG_KILL             BIT(25)	// obj's owner has killed something
 
 
 // VTRIG_x: vehicle trigger types
@@ -109,6 +111,7 @@
 #define VTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 #define VTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define VTRIG_BUY              BIT(24)	// attempting a purchase in the room
+#define VTRIG_KILL             BIT(25)	// vehicle killed someone
 
 
 // WTRIG_x: wld trigger types
@@ -133,6 +136,7 @@
 #define WTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 #define WTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define WTRIG_BUY              BIT(24)	// attempting a purchase
+// unused 25: rooms cannot kill
 
 
 // list of global trigger types (for random_triggers linked list)
@@ -303,6 +307,8 @@ int door_wtrigger(char_data *actor, int subcmd, int dir);
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target);
 
 int finish_otrigger(obj_data *obj, char_data *actor);
+
+extern int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
 int destroy_vtrigger(vehicle_data *veh);
