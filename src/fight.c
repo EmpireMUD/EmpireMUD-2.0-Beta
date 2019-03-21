@@ -1319,6 +1319,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
 		GET_HEALTH(ch) = MIN(GET_HEALTH(ch), -10);	// ensure negative health
 		GET_POS(ch) = POS_DEAD;	// ensure pos
+		run_kill_triggers(ch, killer, NULL);
 		return NULL;
 	}
 	
