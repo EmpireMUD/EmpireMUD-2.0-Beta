@@ -5824,7 +5824,13 @@ Usage:  .type <type>
 This sets the type (or tree) that this particular goal belongs to. The current
 types are:
 
-???
+&cCommunity&0 - Goals related to city-building (stock goals are in the 1000 vnums)
+&cIndustry&0 - Goals related to production (stock goals are in the 2000 vnums)
+&cDefense&0 - Goals related to war and foritication (3000 vnum range)
+&cPrestige&0 - Goals related to accomplishments (4000 vnum range)
+
+Vnum ranges are given for reference. Adventure goals still belong in the
+adventure's vnum block.
 
 See also: OLC PROGRESS
 #d
