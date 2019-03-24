@@ -258,7 +258,7 @@ struct show_res_t {
 
 // show resources median sorter
 int compare_show_res(struct show_res_t *a, struct show_res_t *b) {
-	return b->amount - a->amount;
+	return a->amount - b->amount;
 }
 
 
