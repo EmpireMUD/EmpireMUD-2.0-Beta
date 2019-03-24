@@ -1335,6 +1335,7 @@ void et_change_production_total(empire_data *emp, obj_vnum vnum, int amount) {
 			}
 			else if (task->type == REQ_EMPIRE_PRODUCED_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
 	}
