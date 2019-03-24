@@ -2794,19 +2794,19 @@ SHOW(show_resource) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
 			HASH_FIND_INT(eisle->store, &vnum, store);
 			if (store) {
-				SAFE_ADD(amt, store->amount, 0, LONG_LONG_MAX, FALSE);
+				SAFE_ADD(amt, store->amount, 0, LLONG_MAX, FALSE);
 			}
 		}
 		// scan shipping
 		LL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 			if (shipd->vnum == vnum) {
-				SAFE_ADD(amt, shipd->amount, 0, LONG_LONG_MAX, FALSE);
+				SAFE_ADD(amt, shipd->amount, 0, LLONG_MAX, FALSE);
 			}
 		}
 		
 		// count it
 		++total_emps;
-		SAFE_ADD(total, amt, 0, LONG_LONG_MAX, FALSE);
+		SAFE_ADD(total, amt, 0, LLONG_MAX, FALSE);
 		
 		if (amt > 0) {
 			++emps_storing;
@@ -2815,7 +2815,7 @@ SHOW(show_resource) {
 		// active-only
 		if (!EMPIRE_IS_TIMED_OUT(emp)) {
 			++active_emps;
-			SAFE_ADD(active_total, amt, 0, LONG_LONG_MAX, FALSE);
+			SAFE_ADD(active_total, amt, 0, LLONG_MAX, FALSE);
 			
 			CREATE(el, struct show_res_t, 1);
 			el->amount = amt;
