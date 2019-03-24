@@ -3980,6 +3980,10 @@ ACMD(do_draw) {
 	if (removed && !GET_EQ(ch, loc)) {
 		perform_wear(ch, removed, loc);
 	}
+	
+	if (FIGHTING(ch)) {
+		command_lag(ch, WAIT_COMBAT_ABILITY);
+	}
 }
 
 
@@ -4810,6 +4814,10 @@ ACMD(do_grab) {
 				perform_remove(ch, WEAR_HOLD);
 			}
 			perform_wear(ch, obj, WEAR_HOLD);
+			
+			if (FIGHTING(ch)) {
+				command_lag(ch, WAIT_COMBAT_ABILITY);
+			}
 		}
 	}
 	else {
@@ -6147,6 +6155,10 @@ ACMD(do_swap) {
 		obj_to_char(unequip_char(ch, WEAR_HOLD), ch);
 		perform_wear(ch, hold, WEAR_WIELD);
 		perform_wear(ch, wield, WEAR_HOLD);
+		
+		if (FIGHTING(ch)) {
+			command_lag(ch, WAIT_COMBAT_ABILITY);
+		}
 	}
 }
 
@@ -6335,6 +6347,9 @@ ACMD(do_wear) {
 		if (!items_worn) {
 			send_to_char("You don't seem to have anything else you can wear.\r\n", ch);
 		}
+		else if (FIGHTING(ch)) {
+			command_lag(ch, WAIT_COMBAT_ABILITY);
+		}
 	}
 	else if (dotmode == FIND_ALLDOT) {
 		if (!*arg1) {
@@ -6350,11 +6365,16 @@ ACMD(do_wear) {
 				next_obj = get_obj_in_list_vis(ch, arg1, obj->next_content);
 				if ((where = find_eq_pos(ch, obj, 0)) != NO_WEAR && where < NUM_WEARS && !GET_EQ(ch, where) && can_wear_item(ch, obj, FALSE)) {
 					perform_wear(ch, obj, where);
+					++items_worn;
 				}
 				else if (!GET_EQ(ch, where)) {
 					act("You can't wear $p.", FALSE, ch, obj, 0, TO_CHAR);
 				}
 				obj = next_obj;
+			}
+			
+			if (items_worn && FIGHTING(ch)) {
+				command_lag(ch, WAIT_COMBAT_ABILITY);
 			}
 		}
 	}
@@ -6368,6 +6388,10 @@ ACMD(do_wear) {
 				if (can_wear_item(ch, obj, TRUE)) {
 					// sends its own error message if it fails
 					perform_wear(ch, obj, where);
+					
+					if (FIGHTING(ch)) {
+						command_lag(ch, WAIT_COMBAT_ABILITY);
+					}
 				}
 			}
 			else if (!*arg2) {
@@ -6411,5 +6435,9 @@ ACMD(do_wield) {
 			perform_remove(ch, WEAR_WIELD);
 		}
 		perform_wear(ch, obj, WEAR_WIELD);
+		
+		if (FIGHTING(ch)) {
+			command_lag(ch, WAIT_COMBAT_ABILITY);
+		}
 	}
 }
