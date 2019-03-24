@@ -2747,7 +2747,7 @@ SHOW(show_resource) {
 	
 	// tracker data: uses long longs because empires can store max-int per island
 	int total_emps = 0, active_emps = 0, emps_storing = 0, active_storing = 0;
-	long long amt, total, active_total;	// track both total-total and active empires
+	long long amt, total = 0, active_total = 0;	// track both total-total and active empires
 	empire_data *highest_emp = NULL;	// empire with the most
 	long long highest_amt = 0;	// how much they have
 	
