@@ -1021,12 +1021,29 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		return FALSE;
 	}
 	
-	// closed building?
-	if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh)) && !IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
-		if (ch) {
-			act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+	// closed building checks
+	if (!IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
+		// prevent entering from outside if mounts are not allowed
+		if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh))) {
+			if (ch) {
+				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+			}
+			return FALSE;
 		}
-		return FALSE;
+		// prevent moving from an allowed building to a disallowed building (usually due to interlink)
+		if (HOME_ROOM(to_room) != to_room && HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(veh)) && !BLD_ALLOWS_MOUNTS(to_room) && !BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room))) {
+			if (ch) {
+				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+			}
+			return FALSE;
+		}
+		// prevent moving deeper into a building if part of it does not allow vehicles and you're in the entrance room
+		if (IS_MAP_BUILDING(IN_ROOM(veh)) && (VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room))) {
+			if (ch) {
+				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+			}
+			return FALSE;
+		}
 	}
 	
 	// barrier?
