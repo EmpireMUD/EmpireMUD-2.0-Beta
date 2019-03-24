@@ -2845,11 +2845,11 @@ SHOW(show_resource) {
 	
 	// and output
 	msg_to_char(ch, "Resource storage analysis for [%d] %s:\r\n", GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto));
-	msg_to_char(ch, "Active empires: %lld stored, %lld mean, %lld median, %d empires have any\r\n", active_total, (active_total / MAX(1, active_emps)), med_amt, active_storing);
-	msg_to_char(ch, "All empires: %lld stored, %lld mean, %d empires have any\r\n", total, (total / MAX(1, total_emps)), emps_storing);
+	msg_to_char(ch, "%d active empire%s: %lld stored, %lld mean, %lld median, %d empires have any\r\n", active_emps, PLURAL(active_emps), active_total, (active_total / MAX(1, active_emps)), med_amt, active_storing);
 	if (highest_emp) {
 		msg_to_char(ch, "Highest active empire: %s (%lld stored)\r\n", EMPIRE_NAME(highest_emp), highest_amt);
 	}
+	msg_to_char(ch, "%d total empire%s: %lld stored, %lld mean, %d empires have any\r\n", total_emps, PLURAL(total_emps), total, (total / MAX(1, total_emps)), emps_storing);
 }
 
 
