@@ -258,7 +258,7 @@ struct show_res_t {
 
 // show resources median sorter
 int compare_show_res(struct show_res_t *a, struct show_res_t *b) {
-	return a->amount - b->amount;
+	return b->amount - a->amount;
 }
 
 
@@ -2798,6 +2798,10 @@ SHOW(show_resource) {
 	
 	// ok now build the data
 	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_IMM_ONLY(emp)) {
+			continue;	// skip imms
+		}
+		
 		amt = 0;
 		
 		// scan islands
