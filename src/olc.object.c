@@ -46,6 +46,7 @@ extern const char *obj_custom_types[];
 extern const char *offon_types[];
 extern const char *paint_colors[];
 extern const char *paint_names[];
+extern const char *size_types[];
 extern const char *storage_bits[];
 extern const char *wear_bits[];
 
@@ -1882,6 +1883,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_CORPSE: {
 			sprintf(storage + strlen(storage), "<%scorpseof\t0> %d %s\r\n", OLC_LABEL_VAL(GET_CORPSE_NPC_VNUM(obj), 0), GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(GET_CORPSE_SIZE(obj), 0), size_types[GET_CORPSE_SIZE(obj)]);
 			break;
 		}
 		case ITEM_WEAPON: {
@@ -2982,6 +2984,18 @@ OLC_MODULE(oedit_script) {
 OLC_MODULE(oedit_short_description) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	olc_process_string(ch, argument, "short description", &GET_OBJ_SHORT_DESC(obj));
+}
+
+
+OLC_MODULE(oedit_size) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (!IS_CORPSE(obj)) {
+		msg_to_char(ch, "You can only set the size on a corpse.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_CORPSE_SIZE) = olc_process_type(ch, argument, "size", "size", size_types, GET_CORPSE_SIZE(obj));
+	}
 }
 
 

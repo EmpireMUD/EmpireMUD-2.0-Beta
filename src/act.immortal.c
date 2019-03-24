@@ -5386,6 +5386,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			else {
 				msg_to_char(ch, "unknown\r\n");
 			}
+			
+			msg_to_char(ch, "Corpse size: %s\r\n", size_types[GET_CORPSE_SIZE(j)]);
 			break;
 		case ITEM_COINS: {
 			msg_to_char(ch, "Amount: %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));

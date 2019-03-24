@@ -786,7 +786,7 @@ void mobile_activity(void) {
 
 		if (MOB_FLAGGED(ch, MOB_SCAVENGER) && !FIGHTING(ch)) {
 			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
-				if (GET_OBJ_TYPE(obj) == ITEM_CORPSE && !number(0, 10)) {
+				if (GET_OBJ_TYPE(obj) == ITEM_CORPSE && GET_CORPSE_SIZE(obj) <= GET_SIZE(ch) && !number(0, 10)) {
 					act("$n eats $p.", FALSE, ch, obj, NULL, TO_ROOM);
 					empty_obj_before_extract(obj);
 					extract_obj(obj);

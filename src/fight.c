@@ -1531,6 +1531,7 @@ obj_data *make_corpse(char_data *ch) {
 	GET_OBJ_LONG_DESC(corpse) = str_dup(longdesc);
 
 	GET_OBJ_VAL(corpse, VAL_CORPSE_IDNUM) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch));
+	GET_OBJ_VAL(corpse, VAL_CORPSE_SIZE) = size;
 	GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS) = 0;
 		
 	if (human) {

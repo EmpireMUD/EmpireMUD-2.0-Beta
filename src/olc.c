@@ -338,6 +338,7 @@ OLC_MODULE(oedit_requiresquest);
 OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
 OLC_MODULE(oedit_short_description);
+OLC_MODULE(oedit_size);
 OLC_MODULE(oedit_storage);
 OLC_MODULE(oedit_text);
 OLC_MODULE(oedit_timer);
@@ -904,6 +905,7 @@ const struct olc_command_data olc_data[] = {
 	{ "roomvnum", oedit_roomvnum, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "script", oedit_script, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "shortdescription", oedit_short_description, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "size", oedit_size, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "storage", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "store", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },

@@ -324,6 +324,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
+	extern const char *size_types[];
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
@@ -506,6 +507,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 					free(temp);
 				}
 				msg_to_char(ch, "%s\r\n", lbuf);
+				
+				msg_to_char(ch, "Corpse size: %s\r\n", size_types[GET_CORPSE_SIZE(obj)]);
 			}
 			else if (IS_NPC_CORPSE(obj))
 				msg_to_char(ch, "nothing.\r\n");
