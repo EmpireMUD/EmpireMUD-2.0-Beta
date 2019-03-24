@@ -249,6 +249,19 @@ void perform_immort_vis(char_data *ch) {
 }
 
 
+// for show resources
+struct show_res_t {
+	long long amount;
+	struct show_res_t *next;
+};
+
+
+// show resources median sorter
+int compare_show_res(struct show_res_t *a, struct show_res_t *b) {
+	return a->amount - b->amount;
+}
+
+
 /* Stop a person from snooping (cannot be used on the government) */
 void stop_snooping(char_data *ch) {
 	if (!ch->desc->snooping)
@@ -2752,10 +2765,7 @@ SHOW(show_resource) {
 	long long highest_amt = 0;	// how much they have
 	
 	// data storage for medians
-	struct show_res_t {
-		long long amount;
-		struct show_res_t *next;
-	} *el, *next_el, *list = NULL;
+	struct show_res_t *el, *next_el, *list = NULL;
 	
 	// attempt to figure out which resource
 	if (!*argument) {
@@ -2819,7 +2829,7 @@ SHOW(show_resource) {
 			
 			CREATE(el, struct show_res_t, 1);
 			el->amount = amt;
-			LL_PREPEND(list, el);
+			LL_INSERT_INORDER(list, el, compare_show_res);
 			
 			if (amt > highest_amt) {
 				highest_emp = emp;
