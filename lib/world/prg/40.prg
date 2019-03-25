@@ -71,30 +71,55 @@ W
 25 604 0 10
 S
 #4012
-The Magic Grows~
+Witchwood~
    Though your empire has no need for a larger enchanted forest, you feel
 strangely compelled to let the forest grow ever larger. Remember to keep the
 tiles around your enchanted forest clear and claimed, and don't over-chop the
 enchanted forest. To complete this goal, you must have 50 fully-grown enchanted
 forest tiles all at once.
 ~
-4 4 0 25 0
+5 4 0 25 0
 K 7 5
 P 4011
 W
 25 604 0 50
 S
 #4013
-Magic to Make the Sanest Man Go Mad~
+The Magic Grows~
    Only the most powerful empires achieve truly large enchanted forests. Keep
 growing your forest until it reaches a staggering 100 map tiles. All 100 tiles
 must be fully-grown enchanted forests to complete this goal.
 ~
-3 4 0 50 0
+4 4 0 50 0
 K 7 50
 P 4012
 W
 25 604 0 100
+S
+#4014
+Rowling in the Forest~
+   Grow, claim, and control 500 tiles of enchanted forests to achieve this
+monumental goal. This task will take time, care, patience, and a lot of
+territory. But if you achieve it, your empire will see a level of greatness to
+which most people dare not aspire.
+~
+6 4 0 50 0
+K 7 50
+P 4013
+W
+25 604 0 500
+S
+#4015
+Magic to Make the Sanest Man Go Mad~
+   Few empires ever stand in the shadow of the prestige required to grow an
+enchanted forest to 1000 tiles. Grow, claim, and tend the forest to this
+immense size and achieve renown to last a thousand years.
+~
+7 4 0 50 0
+K 7 50
+P 4014
+W
+25 604 0 1000
 S
 #4020
 Savings~
@@ -132,18 +157,57 @@ W
 28 0 0 4000
 S
 #4023
-Rich Beyond Imagining~
-   An empire can become rich through hard work and dedication. But to become
-ludicrously rich -- rich beyond imagining -- will take considerably more. Mine
-every mountain, sell to every empire, adventure until your vault is
-overflowing. Reach 100000 wealth and be rewarded with another city point and
-additional territory.
+Mint Condition~
+   With enough mines, enough mints, and enough prudence, your empire can rank
+among the wealthiest to ever grace the world. Put every citizen to work in the
+mines. Sell every stack of lumber. Polish every rock you see and turn enough
+profit to reach 100000 wealth. This goal will earn you another city point.
 ~
-4 4 0 50 0
+6 4 0 50 0
 K 4 2
 K 1 1
 P 4022
 W
 28 0 0 100000
+S
+#4024
+The Only Thing Better Than Gold~
+   Your empire has reached an historic level of wealth, and yet you yearn for
+more. After all, the only thing better than gold is more gold. Reach 500000
+wealth to complete this herculean task.
+~
+6 4 0 50 0
+K 7 25
+P 4023
+W
+28 0 0 500000
+S
+#4025
+Draconic Hoard~
+   Those who say wealth is relative have clearly never had true wealth. Your
+empire is practically swimming in gold, but that's not enough. Amass enough
+wealth that a dragon could swim in your vault, and rival the hoards of the
+greatest dragons that ever lived. You'll need 1000000 wealth to achieve this.
+Good luck.
+~
+8 4 0 50 0
+K 7 25
+P 4024
+W
+28 0 0 1000000
+S
+#4026
+Rich Beyond Imagining~
+   An empire can become rich through hard work and dedication. You already did
+that. But to become ludicrously rich -- rich beyond imagining -- will take
+considerably more. Mine every mountain, sell to every empire, slay every
+dragon, adventure until your vault is overflowing, and don't spend a penny of
+it. Reach 5000000 wealth and prove yours is the wealthiest empire of all time!
+~
+9 4 0 50 0
+K 7 25
+P 4025
+W
+28 0 0 5000000
 S
 $

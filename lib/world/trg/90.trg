@@ -603,6 +603,9 @@ Hypnotoad fight~
 0 k 75
 ~
 wait 1
+if (!%actor% || %actor.room% != %self.room%)
+  halt
+end
 dg_affect #9061 %actor% STUNNED on 15
 %send% %actor% You lock eyes with %self.name% and black out for a moment...
 %echoaround% %actor% %actor.name% locks eyes with %self.name% and appears dazed...
