@@ -159,6 +159,7 @@ Objects can trigger on the following events:
 &cPlayer-in-Room&0 - Modifier: trigger requires a player present.
 &cReboot&0 - Triggers when the mud starts up.
 &cBuy&0 - Triggers when someone tries to buy in the room.
+&cKill&0 - Triggers when the object's owner, or their ally, kills someone here.
 
 For each type, there is a help file named &yOTRIG <type>&0.
 #d

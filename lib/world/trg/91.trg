@@ -58,6 +58,9 @@ nop %self.cooldown(9103, 20)%
 %send% %target% %self.name% starts to wrap around you...
 %echoaround% %target% %self.name% starts to wrap around %target.name%...
 wait 3 sec
+if (!%target% || %target.room% != %self.room%)
+  halt
+end
 %send% %target% %self.name% squeezes around you, constricting until you cannot move!
 %echoaround% %target% %self.name% constricts around %target.name%!
 %send% %target% Type 'struggle' to break free!

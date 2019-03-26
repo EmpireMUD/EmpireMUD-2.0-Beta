@@ -58,13 +58,13 @@ R
 5120 0
 S
 #9139
-horn rhinoceros~
-a rhinoceros horn~
-A rhinoceros horn is lying here.~
+horn rare rhinoceros~
+a rare rhinoceros horn~
+A rare rhinoceros horn is lying here.~
    This exotic conical horn comes from a rhinoceros. Due to their rarity, the
 horns are quite expensive.
 ~
-15 0 a 8
+15 0 a 9
 8 0 0
 14 0
 O
@@ -83,6 +83,20 @@ The long, elegantly curved ivory tusk must have come from a great elephant.
 14 0
 O
 2 fk
+R
+5193 a
+S
+#9141
+horn rhinoceros~
+a rhinoceros horn~
+A rhinoceros horn is lying here.~
+The horn is cracked, but should still fetch a decent price.
+~
+15 0 a 10
+1 0 0
+14 0
+O
+2 k
 R
 5193 a
 S

@@ -1241,7 +1241,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	char_data *ch_iter, *player, *killmaster;
 	obj_data *corpse = NULL;
 	struct mob_tag *tag;
-	int iter;
+	int iter, trig_val;
 	
 	// no need to repeat
 	if (EXTRACTED(ch)) {
@@ -1319,6 +1319,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
 		GET_HEALTH(ch) = MIN(GET_HEALTH(ch), -10);	// ensure negative health
 		GET_POS(ch) = POS_DEAD;	// ensure pos
+		run_kill_triggers(ch, killer, NULL);
 		return NULL;
 	}
 	
@@ -1326,7 +1327,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 
 	/* To make ordinary commands work in scripts.  welcor*/  
 	GET_POS(ch) = POS_STANDING;
-	if (death_mtrigger(ch, killmaster)) {
+	trig_val = death_mtrigger(ch, killmaster);
+	trig_val &= run_kill_triggers(ch, killer, NULL);
+	if (trig_val) {
 		death_cry(ch);
 	}
 	GET_POS(ch) = POS_DEAD;
@@ -1528,6 +1531,7 @@ obj_data *make_corpse(char_data *ch) {
 	GET_OBJ_LONG_DESC(corpse) = str_dup(longdesc);
 
 	GET_OBJ_VAL(corpse, VAL_CORPSE_IDNUM) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch));
+	GET_OBJ_VAL(corpse, VAL_CORPSE_SIZE) = size;
 	GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS) = 0;
 		
 	if (human) {
@@ -2539,8 +2543,9 @@ void appear(char_data *ch) {
 * @param char_data *ch Optional: The attacker (may be NULL, used for offenses)
 * @param room_data *to_room The target room
 * @param int damage How much damage to deal to the room
+* @param vehicle_data *by_vehicle Optional: Which vehicle gets credit for the damage, if any.
 */
-void besiege_room(char_data *attacker, room_data *to_room, int damage) {
+void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle) {
 	static struct resource_data *default_res = NULL;
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
@@ -2633,6 +2638,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage) {
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, c, "%s has been killed by siege damage at (%d, %d)!", PERS(c, c, 1), X_COORD(IN_ROOM(c)), Y_COORD(IN_ROOM(c)));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(c), room_log_identifier(IN_ROOM(c)));
 			}
+			run_kill_triggers(c, attacker, by_vehicle);
 			die(c, c);
 		}
 	}
@@ -2653,9 +2659,10 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage) {
 * @param vehicle_data *veh The vehicle to damage.
 * @param int damage How much siege damage to deal.
 * @param int siege_type What SIEGE_ damage type.
+* @param vehicle_data *by_vehicle Optional: Which vehicle gets credit for the damage, if any.
 * @return bool TRUE if the target survives, FALSE if it's extracted
 */
-bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type) {
+bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void fully_empty_vehicle(vehicle_data *veh);
 
@@ -2736,6 +2743,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 						log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 						syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 					}
+					run_kill_triggers(ch, attacker, by_vehicle);
 					die(ch, ch);
 				}
 			}
@@ -2746,7 +2754,8 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, VEH_SITTING_ON(veh), "%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
 			}
-			die(ch, ch);
+			run_kill_triggers(VEH_SITTING_ON(veh), attacker, by_vehicle);
+			die(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh));
 		}
 		
 		if (VEH_OWNER(veh)) {

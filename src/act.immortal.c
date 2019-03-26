@@ -249,6 +249,19 @@ void perform_immort_vis(char_data *ch) {
 }
 
 
+// for show resources
+struct show_res_t {
+	long long amount;
+	struct show_res_t *next;
+};
+
+
+// show resources median sorter
+int compare_show_res(struct show_res_t *a, struct show_res_t *b) {
+	return a->amount - b->amount;
+}
+
+
 /* Stop a person from snooping (cannot be used on the government) */
 void stop_snooping(char_data *ch) {
 	if (!ch->desc->snooping)
@@ -2732,6 +2745,125 @@ SHOW(show_rent) {
 	}
 
 	Crash_listrent(ch, argument);
+}
+
+
+SHOW(show_resource) {
+	obj_data *obj_iter, *next_obj, *proto = NULL;
+	struct empire_island *eisle, *next_eisle;
+	struct empire_storage_data *store;
+	struct shipping_data *shipd;
+	empire_data *emp, *next_emp;
+	long long med_amt = 0;
+	int median, pos;
+	any_vnum vnum;
+	
+	// tracker data: uses long longs because empires can store max-int per island
+	int total_emps = 0, active_emps = 0, emps_storing = 0, active_storing = 0;
+	long long amt, total = 0, active_total = 0;	// track both total-total and active empires
+	empire_data *highest_emp = NULL;	// empire with the most
+	long long highest_amt = 0;	// how much they have
+	
+	// data storage for medians
+	struct show_res_t *el, *next_el, *list = NULL;
+	
+	// attempt to figure out which resource
+	if (!*argument) {
+		msg_to_char(ch, "Usage: show resource <vnum | name>\r\n");
+		return;
+	}
+	else if (isdigit(*argument)) {
+		proto = obj_proto(atoi(argument));
+		// checked later
+	}
+	else {	// look up by name
+		HASH_ITER(hh, object_table, obj_iter, next_obj) {
+			if (obj_iter->storage && multi_isname(argument, GET_OBJ_KEYWORDS(obj_iter))) {
+				proto = obj_iter;
+				break;
+			}
+		}
+	}
+	
+	// verify
+	if (!proto) {
+		msg_to_char(ch, "Unknown storable object '%s'.\r\n", argument);
+		return;
+	}
+	if (!proto->storage) {
+		msg_to_char(ch, "You can only use 'show resource' on storable objects.\r\n");
+		return;
+	}
+	vnum = GET_OBJ_VNUM(proto);
+	
+	// ok now build the data
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_IMM_ONLY(emp)) {
+			continue;	// skip imms
+		}
+		
+		amt = 0;
+		
+		// scan islands
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
+			HASH_FIND_INT(eisle->store, &vnum, store);
+			if (store) {
+				SAFE_ADD(amt, store->amount, 0, LLONG_MAX, FALSE);
+			}
+		}
+		// scan shipping
+		LL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
+			if (shipd->vnum == vnum) {
+				SAFE_ADD(amt, shipd->amount, 0, LLONG_MAX, FALSE);
+			}
+		}
+		
+		// count it
+		++total_emps;
+		SAFE_ADD(total, amt, 0, LLONG_MAX, FALSE);
+		
+		if (amt > 0) {
+			++emps_storing;
+		}
+		
+		// active-only
+		if (!EMPIRE_IS_TIMED_OUT(emp)) {
+			++active_emps;
+			SAFE_ADD(active_total, amt, 0, LLONG_MAX, FALSE);
+			
+			CREATE(el, struct show_res_t, 1);
+			el->amount = amt;
+			LL_INSERT_INORDER(list, el, compare_show_res);
+			
+			if (amt > highest_amt) {
+				highest_emp = emp;
+				highest_amt = amt;
+			}
+			
+			if (amt > 0) {
+				++active_storing;
+			}
+		}
+	}
+	
+	// determine medians and free list
+	median = active_emps / 2 + 1;
+	median = MIN(active_emps, median);
+	pos = 0;
+	LL_FOREACH_SAFE(list, el, next_el) {
+		if (pos++ == median) {
+			med_amt = el->amount;
+		}
+		free(el);
+	}
+	
+	// and output
+	msg_to_char(ch, "Resource storage analysis for [%d] %s:\r\n", GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto));
+	msg_to_char(ch, "%d active empire%s: %lld stored, %lld mean, %lld median, %d empires have any\r\n", active_emps, PLURAL(active_emps), active_total, (active_total / MAX(1, active_emps)), med_amt, active_storing);
+	if (highest_emp) {
+		msg_to_char(ch, "Highest active empire: %s (%lld stored)\r\n", EMPIRE_NAME(highest_emp), highest_amt);
+	}
+	msg_to_char(ch, "%d total empire%s: %lld stored, %lld mean, %d empires have any\r\n", total_emps, PLURAL(total_emps), total, (total / MAX(1, total_emps)), emps_storing);
 }
 
 
@@ -5254,6 +5386,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			else {
 				msg_to_char(ch, "unknown\r\n");
 			}
+			
+			msg_to_char(ch, "Corpse size: %s\r\n", size_types[GET_CORPSE_SIZE(j)]);
 			break;
 		case ITEM_COINS: {
 			msg_to_char(ch, "Amount: %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
@@ -8614,6 +8748,7 @@ ACMD(do_show) {
 		{ "progress", LVL_START_IMM, show_progress },
 		{ "progression", LVL_START_IMM, show_progression },
 		{ "produced", LVL_START_IMM, show_produced },
+		{ "resource", LVL_START_IMM, show_resource },
 
 		// last
 		{ "\n", 0, NULL }

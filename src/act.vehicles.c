@@ -1949,8 +1949,8 @@ ACMD(do_drive) {
 
 
 ACMD(do_fire) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage);
-	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type);
+	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
+	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
 	
 	char veh_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *veh_targ;
@@ -2036,7 +2036,7 @@ ACMD(do_fire) {
 			}
 			
 			secttype = SECT(room_targ);
-			besiege_room(ch, room_targ, dam);
+			besiege_room(ch, room_targ, dam, veh);
 			
 			if (SECT(room_targ) != secttype) {
 				msg_to_char(ch, "It is destroyed!\r\n");
@@ -2055,7 +2055,7 @@ ACMD(do_fire) {
 				trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
 			}
 			
-			besiege_vehicle(ch, veh_targ, dam, SIEGE_PHYSICAL);
+			besiege_vehicle(ch, veh_targ, dam, SIEGE_PHYSICAL, veh);
 		}
 		
 		// delays

@@ -728,7 +728,7 @@ void olc_show_social(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "Messages:\r\n");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
-		sprintf(buf + strlen(buf), "%s <%s%s\t0>: %s\r\n", OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][0], social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
+		sprintf(buf + strlen(buf), "%s <%s%s\t0>: %s\r\n", social_message_types[iter][0], OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
 	page_string(ch->desc, buf, TRUE);

@@ -3646,7 +3646,7 @@ Available mob flags:
  ISNPC - Is an NPC (this is always set).
  MOUNTABLE - Can be ridden by players.
  MILKABLE - Can be milked in a stable.
- SCAVENGER - Eats corpses off the ground.
+ SCAVENGER - Eats corpses off the ground (not larger than the mob).
  UNDEAD - Leaves no corpse when it dies.
  TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
  ANIMAL - Counts as an animal for herding, tying, etc.
@@ -3921,7 +3921,7 @@ Examples:
 
 See also: MEDIT LONG DESCRIPTION
 #d
-"MEDIT SIZE" "MORPHEDIT SIZE" "MOB SIZE"
+"MEDIT SIZE" "MORPHEDIT SIZE" "MOB SIZE" "OEDIT SIZE"
 
 Usage:  .size [size]
 
@@ -3929,6 +3929,7 @@ A mob's size determines several of its attributes:
 - corpse size (large/normal) and whether or not players can take the corpse
 - total amount of blood the mob has (also modified by animal/vampire flags)
 - whether or not you can see the mob on the world map
+- SCAVENGER mobs will not eat corpses larger than themselves
 
 Available sizes are:
  &cnegligible&0 - no size / immaterial
@@ -3941,6 +3942,8 @@ Available sizes are:
 
 Morphs also have a 'size' trait with the same meaning. However, morph size will
 not affect the blood pool of the morphed person/mob at all.
+
+Corpse objects also have a 'size' trait, based on the animal that died.
 #d
 MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
 
@@ -4179,7 +4182,7 @@ Container:
 
 Corpse:
  0 - idnum/vnum of the corpse (players are negative; npc vnums are positive)
- 1 - unused
+ 1 - size
  2 - corpse flags (1 = eaten, 2 = skinned, 4 = human)
 
 Currency:
@@ -5824,7 +5827,13 @@ Usage:  .type <type>
 This sets the type (or tree) that this particular goal belongs to. The current
 types are:
 
-???
+&cCommunity&0 - Goals related to city-building (stock goals are in the 1000 vnums)
+&cIndustry&0 - Goals related to production (stock goals are in the 2000 vnums)
+&cDefense&0 - Goals related to war and foritication (3000 vnum range)
+&cPrestige&0 - Goals related to accomplishments (4000 vnum range)
+
+Vnum ranges are given for reference. Adventure goals still belong in the
+adventure's vnum block.
 
 See also: OLC PROGRESS
 #d
@@ -6944,7 +6953,7 @@ corpses.
 
 Object values:
  0 - idnum/vnum of the corpse (players are negative; npc vnums are positive)
- 1 - unused
+ 1 - corpse size
  2 - corpse flags (1 = eaten, 2 = skinned, 4 = human)
 #d
 "CURRENCY ITEM" "CURRENCY OBJECT"

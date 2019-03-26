@@ -1072,6 +1072,7 @@ progress   Immort   Shows how many empires have completed a progress goal.
 progression Immrt   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
+resource   Immort   Shows stats on an item based on global empire storage.
 shops      Immort   Shows any shops available in your current location.
 skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
@@ -1244,6 +1245,13 @@ Usage:  show rent <player name>
 
 Shows the target player's inventory and equipment. Used to show the binary file
 path to their inventory data, hence the name.
+#e
+"SHOW RESOURCE"
+
+Usage:  show resource <vnum | name>
+
+Shows stats on how many empires are storing an item, and how many they have,
+on average.
 #e
 "SHOW SHOPS"
 

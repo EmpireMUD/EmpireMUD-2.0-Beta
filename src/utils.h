@@ -955,6 +955,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // ITEM_CORPSE
 #define IS_CORPSE(obj)  (GET_OBJ_TYPE(obj) == ITEM_CORPSE)
 #define VAL_CORPSE_IDNUM  0
+#define VAL_CORPSE_SIZE  1
 #define VAL_CORPSE_FLAGS  2
 #define IS_NPC_CORPSE(obj)  (IS_CORPSE(obj) && GET_OBJ_VAL((obj), VAL_CORPSE_IDNUM) >= 0)
 #define IS_PC_CORPSE(obj)  (IS_CORPSE(obj) && GET_OBJ_VAL((obj), VAL_CORPSE_IDNUM) < 0)
@@ -962,6 +963,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_CORPSE_PC_ID(obj)  (IS_PC_CORPSE(obj) ? (-1 * GET_OBJ_VAL((obj), VAL_CORPSE_IDNUM)) : NOBODY)
 #define GET_CORPSE_FLAGS(obj)  (IS_CORPSE(obj) ? GET_OBJ_VAL((obj), VAL_CORPSE_FLAGS) : 0)
 #define IS_CORPSE_FLAG_SET(obj, flag)  (GET_CORPSE_FLAGS(obj) & (flag))
+#define GET_CORPSE_SIZE(obj)  (IS_CORPSE(obj) ? GET_OBJ_VAL((obj), VAL_CORPSE_SIZE) : SIZE_NORMAL)
 
 // ITEM_COINS
 #define IS_COINS(obj)  (GET_OBJ_TYPE(obj) == ITEM_COINS)

@@ -57,12 +57,15 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 * @return bool TRUE if ch is allowed to infiltrate emp
 */
 bool can_infiltrate(char_data *ch, empire_data *emp) {
-	struct empire_political_data *pol;
+	struct empire_political_data *pol = NULL;
 	empire_data *chemp = GET_LOYALTY(ch);
 	
 	// no empire = no problem
 	if (!emp) {
 		return TRUE;
+	}
+	if (chemp) {	// look this up for later
+		pol = find_relation(chemp, emp);
 	}
 	
 	if (emp == chemp) {
@@ -75,7 +78,7 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
-	if (count_members_online(emp) == 0) {
+	if (count_members_online(emp) == 0 && (!chemp || !pol || !IS_SET(pol->type, DIPL_WAR | DIPL_THIEVERY))) {
 		msg_to_char(ch, "There are no members of %s online.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
 	}
@@ -89,8 +92,6 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 	if (!chemp) {
 		return TRUE;
 	}
-	
-	pol = find_relation(chemp, emp);
 	
 	if (pol && IS_SET(pol->type, DIPL_ALLIED | DIPL_NONAGGR)) {
 		msg_to_char(ch, "You can't infiltrate -- you have a non-aggression pact with %s.\r\n", EMPIRE_NAME(emp));

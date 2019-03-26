@@ -607,7 +607,7 @@ EEDIT(eedit_name) {
 			}
 			
 			if ((mem = find_or_load_player(index->name, &file))) {
-				remove_recent_lore(ch, LORE_JOIN_EMPIRE);
+				remove_recent_lore(mem, LORE_JOIN_EMPIRE);
 				add_lore(mem, LORE_JOIN_EMPIRE, "Empire became %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 				
 				if (file) {
