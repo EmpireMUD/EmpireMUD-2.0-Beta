@@ -2116,7 +2116,7 @@ Do not abuse this command; if you do, it will be taken from you.
 
 See also: WHO
 #
-TOGGLE TOGGLES
+TOGGLE TOGGLES PREFERENCES PREFS SETTINGS
 
 Usage:  toggle [type] [on/off]
 
