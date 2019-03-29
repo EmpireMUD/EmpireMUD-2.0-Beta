@@ -358,7 +358,7 @@ void free_extra_descs(struct extra_descr_data **list);
 // events
 extern event_data *event_table;
 extern int top_event_id;
-extern event_data *event_proto(any_vnum vnum);
+extern event_data *find_event_by_vnum(any_vnum vnum);
 void free_event(event_data *event);
 
 // factions

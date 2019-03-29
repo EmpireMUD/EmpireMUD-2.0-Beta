@@ -61,7 +61,7 @@ extern const char *event_rewards[];
 * @return char* A name for the vnum, or "UNKNOWN".
 */
 char *get_event_name_by_proto(any_vnum vnum) {
-	event_data *proto = event_proto(vnum);
+	event_data *proto = find_event_by_vnum(vnum);
 	return proto ? EVT_NAME(proto) : "UNKNOWN";
 }
 
@@ -257,7 +257,7 @@ char *list_one_event(event_data *event, bool detail) {
 */
 void olc_search_event(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
-	event_data *event = event_proto(vnum);
+	event_data *event = find_event_by_vnum(vnum);
 	// quest_data *quest, *next_quest;
 	int size, found;
 	// bool any;
@@ -364,7 +364,7 @@ int sort_events(event_data *a, event_data *b) {
 * @param any_vnum vnum Any event vnum
 * @return event_data* The event, or NULL if it doesn't exist
 */
-event_data *event_proto(any_vnum vnum) {
+event_data *find_event_by_vnum(any_vnum vnum) {
 	event_data *event;
 	
 	if (vnum < 0 || vnum == NOTHING) {
@@ -464,7 +464,7 @@ void free_event_rewards(struct event_reward *list) {
 * @param event_data *event The event data to free.
 */
 void free_event(event_data *event) {
-	event_data *proto = event_proto(EVT_VNUM(event));
+	event_data *proto = find_event_by_vnum(EVT_VNUM(event));
 	
 	// strings
 	if (EVT_NAME(event) && (!proto || EVT_NAME(event) != EVT_NAME(proto))) {
@@ -701,9 +701,9 @@ event_data *create_event_table_entry(any_vnum vnum) {
 	event_data *event;
 	
 	// sanity
-	if (event_proto(vnum)) {
+	if (find_event_by_vnum(vnum)) {
 		log("SYSERR: Attempting to insert event at existing vnum %d", vnum);
-		return event_proto(vnum);
+		return find_event_by_vnum(vnum);
 	}
 	
 	CREATE(event, event_data, 1);
@@ -739,7 +739,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	// char_data *chiter;
 	// bool found;
 	
-	if (!(event = event_proto(vnum))) {
+	if (!(event = find_event_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such event %d.\r\n", vnum);
 		return;
 	}
@@ -894,7 +894,7 @@ void save_olc_event(descriptor_data *desc) {
 	UT_hash_handle hh;
 	
 	// have a place to save it?
-	if (!(proto = event_proto(vnum))) {
+	if (!(proto = find_event_by_vnum(vnum))) {
 		proto = create_event_table_entry(vnum);
 	}
 	
@@ -1093,7 +1093,7 @@ void olc_show_event(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !event_proto(EVT_VNUM(event)) ? "new event" : get_event_name_by_proto(EVT_VNUM(event)));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_event_by_vnum(EVT_VNUM(event)) ? "new event" : get_event_name_by_proto(EVT_VNUM(event)));
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(EVT_NAME(event), default_event_name), NULLSAFE(EVT_NAME(event)));
 	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(EVT_DESCRIPTION(event), default_event_description), NULLSAFE(EVT_DESCRIPTION(event)));
 	sprintf(buf + strlen(buf), "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(EVT_COMPLETE_MSG(event), default_event_complete_msg), NULLSAFE(EVT_COMPLETE_MSG(event)));

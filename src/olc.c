@@ -1674,8 +1674,8 @@ OLC_MODULE(olc_copy) {
 			break;
 		}
 		case OLC_EVENT: {
-			found = (event_proto(vnum) != NULL);
-			exists = (event_proto(from_vnum) != NULL);
+			found = (find_event_by_vnum(vnum) != NULL);
+			exists = (find_event_by_vnum(from_vnum) != NULL);
 			break;
 		}
 		case OLC_FACTION: {
@@ -1858,7 +1858,7 @@ OLC_MODULE(olc_copy) {
 			break;
 		}
 		case OLC_EVENT: {
-			GET_OLC_EVENT(ch->desc) = setup_olc_event(event_proto(from_vnum));
+			GET_OLC_EVENT(ch->desc) = setup_olc_event(find_event_by_vnum(from_vnum));
 			GET_OLC_EVENT(ch->desc)->vnum = vnum;
 			SET_BIT(EVT_FLAGS(GET_OLC_EVENT(ch->desc)), EVTF_IN_DEVELOPMENT);	// ensure flag
 			olc_show_event(ch);
@@ -2350,8 +2350,8 @@ OLC_MODULE(olc_edit) {
 			break;
 		}
 		case OLC_EVENT: {
-			// this will set up from existing OR new automatically based on event_proto
-			GET_OLC_EVENT(ch->desc) = setup_olc_event(event_proto(vnum));
+			// this will set up from existing OR new automatically based on find_event_by_vnum
+			GET_OLC_EVENT(ch->desc) = setup_olc_event(find_event_by_vnum(vnum));
 			GET_OLC_EVENT(ch->desc)->vnum = vnum;			
 			olc_show_event(ch);
 			break;
@@ -2542,7 +2542,7 @@ OLC_MODULE(olc_free) {
 					break;
 				}
 				case OLC_EVENT: {
-					free = (event_proto(iter) == NULL);
+					free = (find_event_by_vnum(iter) == NULL);
 					break;
 				}
 				case OLC_FACTION: {

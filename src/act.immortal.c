@@ -9568,6 +9568,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No crops by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "event")) {
+		extern int vnum_event(char *searchname, char_data *ch);
+		if (!vnum_event(buf2, ch)) {
+			msg_to_char(ch, "No events by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "faction")) {
 		extern int vnum_faction(char *searchname, char_data *ch);
 		if (!vnum_faction(buf2, ch)) {
@@ -9751,6 +9757,15 @@ ACMD(do_vstat) {
 		else {
 			msg_to_char(ch, "Unknown empire.\r\n");
 		}
+	}
+	else if (is_abbrev(buf, "event")) {
+		void do_stat_event(char_data *ch, event_data *event);
+		event_data *event = find_event_by_vnum(number);
+		if (!event) {
+			msg_to_char(ch, "There is no event with that number.\r\n");
+			return;
+		}
+		do_stat_event(ch, event);
 	}
 	else if (is_abbrev(buf, "faction")) {
 		void do_stat_faction(char_data *ch, faction_data *fct);
