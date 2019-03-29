@@ -1116,6 +1116,10 @@ void heartbeat(int heart_pulse) {
 			save_data_table(FALSE);
 			if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
 		}
+		if (events_need_save) {
+			write_running_events_file();
+			if (debug_log && HEARTBEAT(15)) { log("debug 26.5:\t%lld", microtime()); }
+		}
 		save_marked_empires();
 		if (debug_log && HEARTBEAT(15)) { log("debug 27:\t%lld", microtime()); }
 	}

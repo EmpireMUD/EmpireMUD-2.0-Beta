@@ -165,6 +165,7 @@
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
 #define NEW_WORLD_HINT_FILE  LIB_ETC"new_world"	// if present, moves einv on startup
+#define RUNNING_EVENTS_FILE  LIB_ETC"events"	// data for events that are running
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
 #define VERSION_FILE  LIB_ETC"version"	// for version tracking
 
@@ -358,6 +359,8 @@ void free_extra_descs(struct extra_descr_data **list);
 // events
 extern event_data *event_table;
 extern int top_event_id;
+extern struct event_running_data *running_events;
+extern bool events_need_save;
 extern event_data *find_event_by_vnum(any_vnum vnum);
 void free_event(event_data *event);
 

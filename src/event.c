@@ -29,6 +29,8 @@
 /**
 * Contents:
 *   Helpers
+*   Leaderboard Helpers
+*   Running Events
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -139,6 +141,310 @@ void smart_copy_event_rewards(struct event_reward **to_list, struct event_reward
 			LL_APPEND(*to_list, reward);
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LEADERBOARD HELPERS /////////////////////////////////////////////////////
+
+/**
+* Fetches (or creates) a leaderboard entry for the given id. This is used for
+* both the empire and player leaderboards.
+*
+* @param struct event_leaderboard **hash The has to search in.
+* @param int id The id of the empire/player.
+* @return struct event_leaderboard* The entry for that id.
+*/
+struct event_leaderboard *get_event_leaderboard_entry(struct event_leaderboard **hash, int id) {
+	struct event_leaderboard *el;
+	
+	HASH_FIND_INT(*hash, &id, el);
+	if (!el) {
+		CREATE(el, struct event_leaderboard, 1);
+		el->id = id;
+	}
+	
+	return el;
+}
+
+
+/**
+* Frees a whole leaderboard.
+*
+* @param struct event_leaderboard *hash The leaderboard hash to free.
+*/
+void free_event_leaderboard(struct event_leaderboard *hash) {
+	struct event_leaderboard *el, *next_el;
+	
+	HASH_ITER(hh, hash, el, next_el) {
+		HASH_DEL(hash, el);
+		free(el);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// RUNNING EVENTS //////////////////////////////////////////////////////////
+
+/**
+* Cancels an event without rewarding anybody.
+*
+* @param struct event_running_data *re The event to cancel.
+*/
+void cancel_running_event(struct event_running_data *re) {
+	if (!re) {
+		return;
+	}
+	
+	// TODO: remove data from all active players
+	// TODO: message to players
+	
+	// remove
+	LL_DELETE(running_events, re);
+	
+	// and free
+	free_event_leaderboard(re->empire_leaderboard);
+	free_event_leaderboard(re->player_leaderboard);
+	free(re);
+	
+	// mark file for save
+	events_need_save = TRUE;
+}
+
+
+/**
+* Audits all the currently-running events, on startup.
+*/
+void check_running_events(void) {
+	struct event_running_data *re, *next_re;
+	bool bad;
+	
+	LL_FOREACH_SAFE(running_events, re, next_re) {
+		bad = FALSE;
+		
+		if (!re->event) {
+			bad = TRUE;	// no event??
+		}
+		else if (EVT_FLAGGED(re->event, EVTF_IN_DEVELOPMENT)) {
+			bad = TRUE;	// event is in-dev
+		}
+		
+		// oops:
+		if (bad) {
+			log("check_running_events: Canceling event %d (%s)", re->id, re->event ? EVT_NAME(re->event) : "invalid event");
+			cancel_running_event(re);
+		}
+	}
+}
+
+
+/**
+* Pulls up the entry for a running event by id. This will find it regardless
+* of 'status'.
+*
+* @param int id The id of the event to look up.
+* @return struct event_running_data* The event_running_data entry or NULL if none found.
+*/
+struct event_running_data *find_running_event_by_id(int id) {
+	struct event_running_data *re;
+	LL_FOREACH(running_events, re) {
+		if (re->id == id) {
+			return re;
+		}
+	}
+	return NULL;
+}
+
+
+/**
+* Pulls up the entry for a running event by event vnum. Hopefully this only
+* ever finds one. This will only find events that are in the RUNNING status.
+*
+* @param any_vnum event_vnum Which event we're looking for.
+* @return struct event_running_data* The event_running_data entry or NULL if none found.
+*/
+struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum) {
+	struct event_running_data *re;
+	LL_FOREACH(running_events, re) {
+		if (re->event && EVT_VNUM(re->event) == event_vnum && re->status == EVTS_RUNNING) {
+			return re;
+		}
+	}
+	return NULL;
+}
+
+
+/**
+* Load one running event, from the running event file.
+*
+* @param FILE *fl The open read file.
+* @param int id The event id.
+* @return struct event_running_data* The event.
+*/
+struct event_running_data *load_one_running_event(FILE *fl, int id) {
+	char errstr[MAX_STRING_LENGTH], line[256];
+	struct event_leaderboard *lb;
+	struct event_running_data *re;
+	int int_in[4];
+	long long_in;
+	
+	snprintf(errstr, sizeof(errstr), "running event %d", id);
+	
+	// find or create/add
+	if ((re = find_running_event_by_id(id))) {
+		log("Found duplicate running event id: %d", id);
+		// but load it anyway
+	}
+	else {
+		CREATE(re, struct event_running_data, 1);
+		re->id = id;
+		LL_PREPEND(running_events, re);
+	}
+	
+	// line 1: vnum start-time status
+	if (!get_line(fl, line) || sscanf(line, "%d %ld %d", &int_in[0], &long_in, &int_in[1]) != 3) {
+		log("SYSERR: Format error in line 1 of %s", errstr);
+		exit(1);
+	}
+	
+	re->event = find_event_by_vnum(int_in[0]);	// warning: may be NULL / audit later
+	re->start_time = long_in;
+	re->status = int_in[1];
+	
+	// line 2: misc/unused
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+		log("SYSERR: Format error in line 2 of %s", errstr);
+		exit(1);
+	}
+	
+	// int_in[0-3] not currently used
+	
+	// optionals
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Format error in instance, expecting alphabetic flags, got: %s", line);
+			exit(1);
+		}
+		switch (*line) {
+			case 'E': {	// empire leaderboard
+				if (sscanf(line, "E %d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in E line of %s: %s", errstr, line);
+					// not fatal
+				}
+				else {
+					lb = get_event_leaderboard_entry(&re->empire_leaderboard, int_in[0]);
+					lb->points = int_in[1];
+				}
+				break;
+			}
+			case 'P': {	// player leaderboard
+				if (sscanf(line, "P %d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in E line of %s: %s", errstr, line);
+					// not fatal
+				}
+				else {
+					lb = get_event_leaderboard_entry(&re->player_leaderboard, int_in[0]);
+					lb->points = int_in[1];
+				}
+				break;
+			}
+			case 'S': {
+				// done
+				return re;
+			}
+		}
+	}
+	
+	return re;
+}
+
+
+/**
+* Loads the running events file, if there is any.
+*/
+void load_running_events_file(void) {
+	char line[256];
+	FILE *fl;
+	
+	if (!(fl = fopen(RUNNING_EVENTS_FILE, "r"))) {
+		// log("SYSERR: Unable to load running events from file.");
+		// there just isn't a file -- that's ok, we'll generate new data
+		return;
+	}
+	
+	// header info
+	if (!get_line(fl, line)) {
+		log("WARNING: Running events file is empty.");
+		fclose(fl);
+		return;
+	}
+	top_event_id = atoi(line);
+	
+	// load #-marked entries
+	while (get_line(fl, line)) {
+		if (*line == '#') {
+			load_one_running_event(fl, atoi(line+1));
+		}
+		else if (*line == '$') {
+			// done;
+			break;
+		}
+		else {
+			// junk data?
+		}
+	}
+	
+	fclose(fl);
+}
+
+
+/**
+* Writes the running_events table to file. This is called whenever
+* events_need_save is TRUE.
+*/
+void write_running_events_file(void) {
+	struct event_leaderboard *lb, *next_lb;
+	struct event_running_data *re;
+	FILE *fl;
+	
+	if (!(fl = fopen(RUNNING_EVENTS_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to write %s", RUNNING_EVENTS_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// header info
+	fprintf(fl, "%d\n", top_event_id);
+	
+	LL_FOREACH(running_events, re) {
+		if (!re->event) {
+			continue;	// can't save if no event data
+		}
+		
+		fprintf(fl, "#%d\n", re->id);
+		fprintf(fl, "%d %ld %d\n", EVT_VNUM(re->event), re->start_time, re->status);
+		fprintf(fl, "0 0 0 0\n");	// numeric line for future use
+		
+		// E: empire leaderboard
+		HASH_ITER(hh, re->empire_leaderboard, lb, next_lb) {
+			fprintf(fl, "E %d %d\n", lb->id, lb->points);
+		}
+		
+		// P: player leaderboard
+		HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
+			fprintf(fl, "P %d %d\n", lb->id, lb->points);
+		}
+		
+		fprintf(fl, "S\n");
+	}
+	
+	// end
+	fprintf(fl, "$\n");
+	fclose(fl);
+	
+	rename(RUNNING_EVENTS_FILE TEMP_SUFFIX, RUNNING_EVENTS_FILE);
+	
+	// and prevent re-saving
+	events_need_save = FALSE;
 }
 
 

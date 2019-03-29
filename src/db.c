@@ -111,6 +111,8 @@ bool check_delayed_refresh = FALSE;	// triggers multiple refreshes
 // events
 event_data *event_table = NULL;	// global hash table (hh)
 int top_event_id = 0;	// highest unique id used
+struct event_running_data *running_events = NULL;	// list of active events
+bool events_need_save = FALSE;	// triggers a save on running_events
 
 // factions
 faction_data *faction_table = NULL;	// main hash (hh)
@@ -462,6 +464,7 @@ void boot_world(void) {
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
 	void check_newbie_islands();
+	void check_running_events();
 	void check_triggers();
 	void clean_empire_logs();
 	void index_boot_world();
@@ -470,6 +473,7 @@ void boot_world(void) {
 	void load_empire_storage();
 	void load_instances();
 	void load_islands();
+	void load_running_events_file();
 	void load_world_map_from_file();
 	void number_and_count_islands(bool reset);
 	void read_ability_requirements();
@@ -597,6 +601,9 @@ void boot_world(void) {
 	log("Loading daily quest cycles.");
 	load_daily_quest_file();
 	
+	log("Loading active events.");
+	load_running_events_file();
+	
 	// check for bad data
 	log("Verifying data.");
 	check_abilities();
@@ -606,6 +613,7 @@ void boot_world(void) {
 	check_skills();
 	check_for_bad_buildings();
 	check_for_bad_sectors();
+	check_running_events();
 	read_ability_requirements();
 	check_triggers();
 	

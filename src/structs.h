@@ -1243,6 +1243,12 @@ typedef struct vehicle_data vehicle_data;
 #define EVTR_x
 
 
+// EVTS_x: event status
+#define EVTS_NOT_STARTED  0	// default status
+#define EVTS_RUNNING  1	// event is active
+#define EVTS_COMPLETE  2	// event has ended
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT DEFINES (TIMED EVENT SYSTEM) //////////////////////////////////////
 
@@ -4587,6 +4593,31 @@ struct event_reward {
 	int amount;	// how much/many to give
 	
 	struct event_reward *next;	// linked list
+};
+
+
+// for the 'running_events' linked list, saved to the events file
+struct event_running_data {
+	int id;	// permanent unique id (based on top_event_id)
+	event_data *event;	// pointer to the event proto
+	
+	time_t start_time;	// when it began
+	int status;	// EVTS_ state
+	
+	// leaderboards (these are summaries and, in general, the game relies on the player file for scores)
+	struct event_leaderboard *player_leaderboard;
+	struct event_leaderboard *empire_leaderboard;
+	
+	struct event_running_data *next;	// linked list: running_events
+};
+
+
+// summary of player/empire points (copied from any points the players gain)
+struct event_leaderboard {
+	int id;	// player or empire id
+	int points;	// last-recorded points
+	
+	UT_hash_handle hh;	// hash handle for running_event->player_leaderboard or running_event->empire_leaderboard
 };
 
 
