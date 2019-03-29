@@ -1118,7 +1118,7 @@ void olc_show_event(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sduration\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60));
 	
 	if (EVT_REPEATS_AFTER(event) == NOT_REPEATABLE || EVT_REPEATS_AFTER(event) == 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0));
+		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), NOT_REPEATABLE));
 	}
 	else if (EVT_REPEATS_AFTER(event) > 0) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
