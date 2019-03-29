@@ -1897,6 +1897,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_crop) {
 		free_crop(d->olc_crop);
 	}
+	if (d->olc_event) {
+		free_event(d->olc_event);
+	}
 	if (d->olc_faction) {
 		free_faction(d->olc_faction);
 	}

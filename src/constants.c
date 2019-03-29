@@ -33,6 +33,7 @@
 *   Character Constants
 *   Craft Recipe Constants
 *   Empire Constants
+*   Event Constants
 *   Faction Constants
 *   Generic Constants
 *   Mob Constants
@@ -1879,6 +1880,28 @@ const char *wf_problem_types[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// EVENT CONSTANTS /////////////////////////////////////////////////////////
+
+// EVT_x: event types
+const char *event_types[] = {
+};
+
+
+// EVTF_x: event flags
+const char *event_flags[] = {
+	"IN-DEVELOPMENT",	// 0
+	"CONTINUES",
+	"\n"
+};
+
+
+// EVTR_x: event rewards
+const char *event_rewards[] = {
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// FACTION CONSTANTS ///////////////////////////////////////////////////////
 
 // FCT_x: faction flags
@@ -2601,6 +2624,7 @@ const char *olc_flag_bits[] = {
 	"!GENERICS",
 	"!SHOPS",
 	"!PROGRESS",
+	"!EVENTS",
 	"\n"
 };
 
@@ -2632,6 +2656,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"generic",
 	"shop",
 	"progression",
+	"event",
 	"\n"
 };
 

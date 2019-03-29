@@ -108,6 +108,10 @@ double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
 bool check_delayed_refresh = FALSE;	// triggers multiple refreshes
 
+// events
+event_data *event_table = NULL;	// global hash table (hh)
+int top_event_id = 0;	// highest unique id used
+
 // factions
 faction_data *faction_table = NULL;	// main hash (hh)
 faction_data *sorted_factions = NULL;	// alpha hash (sorted_hh)
@@ -273,6 +277,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ GEN_PREFIX, GEN_SUFFIX, TRUE },	// DB_BOOT_GEN
 	{ SHOP_PREFIX, SHOP_SUFFIX, TRUE },	// DB_BOOT_SHOP
 	{ PRG_PREFIX, PRG_SUFFIX, TRUE },	// DB_BOOT_PRG
+	{ EVT_PREFIX, EVT_SUFFIX, TRUE },	// DB_BOOT_EVT
 };
 
 
@@ -575,6 +580,9 @@ void boot_world(void) {
 	
 	log("Loading empire progression.");
 	index_boot(DB_BOOT_PRG);
+	
+	log("Loading events.");
+	index_boot(DB_BOOT_EVT);
 	
 	log("Loading socials.");
 	index_boot(DB_BOOT_SOC);

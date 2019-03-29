@@ -29,6 +29,7 @@
 *     Crop Defines
 *     Empire Defines
 *     Event Defines
+*     Event Defines (Timed Event System)
 *     Faction Defines
 *     Game Defines
 *     Generic Defines
@@ -61,6 +62,7 @@
 *     Data Structs
 *     Empire Structs
 *     Event Structs
+*     Event Structs (Timed Event System)
 *     Faction Structs
 *     Fight Structs
 *     Game Structs
@@ -235,6 +237,7 @@ typedef struct craft_data craft_data;
 typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
+typedef struct event_data event_data;
 typedef struct faction_data faction_data;
 typedef struct generic_data generic_data;
 typedef struct index_data index_data;
@@ -1227,6 +1230,21 @@ typedef struct vehicle_data vehicle_data;
 
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT DEFINES ///////////////////////////////////////////////////////////
+
+// EVT_x: event types
+
+
+// EVTF_x: event flags
+#define EVTF_IN_DEVELOPMENT  BIT(0)	// a. quest is not live
+#define EVTF_CONTINUES  BIT(1)	// b. event points do not reset when it runs again (it runs on the same id as last time)
+
+
+// EVTR_x: event rewards
+#define EVTR_x
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENT DEFINES (TIMED EVENT SYSTEM) //////////////////////////////////////
 
 // function types
 #define EVENTFUNC(name) long (name)(void *event_obj)
@@ -3604,6 +3622,7 @@ struct descriptor_data {
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
+	event_data *olc_event;	// event being edited
 	faction_data *olc_faction;	// faction being edited
 	generic_data *olc_generic;	// generic being edited
 	struct global_data *olc_global;	// global being edited
@@ -4532,6 +4551,47 @@ struct empire_data {
 
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT STRUCTS ///////////////////////////////////////////////////////////
+
+// global events: main data
+struct event_data {
+	any_vnum vnum;
+	ush_int version;	// for auto-updating
+	
+	char *name;	// short name for strings
+	char *description;	// long desc shown to players
+	char *complete_msg;	// sent to participants when over
+	char *notes;	// admin notes
+	
+	int type;	// EVT_ type
+	bitvector_t flags;	// EVTF_ flags
+	struct event_reward *rank_rewards;	// rewards given for final position
+	struct event_reward *threshold_rewards;	// rewards given for points progress
+	
+	// constraints
+	int min_level;	// or 0 for no min
+	int max_level;	// or 0 for no max
+	int duration;	// minutes in length
+	int repeats_after;	// minutes to auto-repeat; 0/NOT_REPEATABLE for none
+	
+	UT_hash_handle hh;	// hash handle for event_table
+};
+
+
+// global events: rewards
+struct event_reward {
+	int min;	// minimum rank that gets this, OR minimum event points for threshold
+	int max;	// maximum rank that gets this (optional: if 0, all players over 'min' get it)
+	int type;	// EVTR_ type
+	
+	any_vnum vnum;	// thing to give
+	int amount;	// how much/many to give
+	
+	struct event_reward *next;	// linked list
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENT STRUCTS (TIMED EVENT SYSTEM) //////////////////////////////////////
 
 // for map events
 struct map_event_data {

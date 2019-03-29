@@ -27,6 +27,7 @@
 *   Crop Utils
 *   Descriptor Utils
 *   Empire Utils
+*   Event Utils
 *   Faction Utils
 *   Fight Utils
 *   Generic Utils
@@ -509,6 +510,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_CLASS(desc)  ((desc)->olc_class)
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
+#define GET_OLC_EVENT(desc)  ((desc)->olc_event)
 #define GET_OLC_FACTION(desc)  ((desc)->olc_faction)
 #define GET_OLC_GENERIC(desc)  ((desc)->olc_generic)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
@@ -610,6 +612,28 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // deprecated
 #define EMPIRE_CITY_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_CITY)
 #define EMPIRE_OUTSIDE_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_OUTSKIRTS)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENT UTILS /////////////////////////////////////////////////////////////
+
+#define EVT_VNUM(evt)  ((evt)->vnum)
+#define EVT_COMPLETE_MSG(evt)  ((evt)->complete_msg)
+#define EVT_DESCRIPTION(evt)  ((evt)->description)
+#define EVT_DURATION(evt)  ((evt)->duration)
+#define EVT_FLAGS(evt)  ((evt)->flags)
+#define EVT_MAX_LEVEL(evt)  ((evt)->max_level)
+#define EVT_MIN_LEVEL(evt)  ((evt)->min_level)
+#define EVT_NAME(evt)  ((evt)->name)
+#define EVT_NOTES(evt)  ((evt)->notes)
+#define EVT_RANK_REWARDS(evt)  ((evt)->rank_rewards)
+#define EVT_REPEATS_AFTER(evt)  ((evt)->repeats_after)
+#define EVT_THRESHOLD_REWARDS(evt)  ((evt)->threshold_rewards)
+#define EVT_TYPE(evt)  ((evt)->type)
+#define EVT_VERSION(evt)  ((evt)->version)
+
+// helpers
+#define EVT_FLAGGED(evt, fl)  IS_SET(EVT_FLAGS(evt), (fl))
 
 
  //////////////////////////////////////////////////////////////////////////////

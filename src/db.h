@@ -39,7 +39,8 @@
 #define DB_BOOT_GEN  25
 #define DB_BOOT_SHOP  26
 #define DB_BOOT_PRG  27
-#define NUM_DB_BOOT_TYPES  28	// total
+#define DB_BOOT_EVT  28
+#define NUM_DB_BOOT_TYPES  29	// total
 
 
 // library sub-dirs
@@ -81,6 +82,7 @@
 #define CLASS_PREFIX  LIB_WORLD"class/"	// player classes
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
+#define EVT_PREFIX  LIB_WORLD"evt/"	// events
 #define FCT_PREFIX  LIB_WORLD"fct/"	// factions
 #define GEN_PREFIX  LIB_WORLD"gen/"	// generics
 #define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
@@ -116,6 +118,7 @@
 #define CRAFT_SUFFIX  ".craft"	// craft file suffix
 #define CROP_SUFFIX  ".crop"	// crop file suffix
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
+#define EVT_SUFFIX  ".evt"	// events
 #define FCT_SUFFIX  ".fct"	// factions
 #define GEN_SUFFIX  ".gen"	// generics
 #define GLB_SUFFIX  ".glb"	// global suffix
@@ -351,6 +354,12 @@ void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
+
+// events
+extern event_data *event_table;
+extern int top_event_id;
+extern event_data *event_proto(any_vnum vnum);
+void free_event(event_data *event);
 
 // factions
 extern faction_data *faction_table;

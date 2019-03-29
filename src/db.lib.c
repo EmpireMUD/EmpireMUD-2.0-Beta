@@ -6889,7 +6889,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop", "progress" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop", "progress", "event" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -6946,6 +6946,11 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				}
 				case DB_BOOT_CROP: {
 					parse_crop(fl, nr);
+					break;
+				}
+				case DB_BOOT_EVT: {
+					void parse_event(FILE *fl, int nr);
+					parse_event(fl, nr);
 					break;
 				}
 				case DB_BOOT_FCT: {
@@ -7158,6 +7163,11 @@ void index_boot(int mode) {
 			log("   %d factions, %d bytes in factions table.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_EVT: {
+			size[0] = sizeof(event_data) * rec_count;
+			log("   %d events, %d bytes in event table.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_GEN: {
 			size[0] = sizeof(generic_data) * rec_count;
 			log("   %d generics, %d bytes in generics table.", rec_count, size[0]);
@@ -7251,6 +7261,7 @@ void index_boot(int mode) {
 			case DB_BOOT_CLASS:
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
+			case DB_BOOT_EVT:
 			case DB_BOOT_FCT:
 			case DB_BOOT_GEN:
 			case DB_BOOT_GLB:
@@ -7404,6 +7415,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, crop_table, crop, next_crop) {
 				if (GET_CROP_VNUM(crop) >= (zone * 100) && GET_CROP_VNUM(crop) <= (zone * 100 + 99)) {
 					write_crop_to_file(fl, crop);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_EVT: {
+			void write_event_to_file(FILE *fl, event_data *event);
+			event_data *event, *next_event;
+			HASH_ITER(hh, event_table, event, next_event) {
+				if (EVT_VNUM(event) >= (zone * 100) && EVT_VNUM(event) <= (zone * 100 + 99)) {
+					write_event_to_file(fl, event);
 				}
 			}
 			break;
@@ -7821,6 +7842,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_CROP: {
 			write_crop_index(fl);
+			break;
+		}
+		case DB_BOOT_EVT: {
+			void write_event_index(FILE *fl);
+			write_event_index(fl);
 			break;
 		}
 		case DB_BOOT_FCT: {
