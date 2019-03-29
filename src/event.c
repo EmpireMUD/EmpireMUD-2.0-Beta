@@ -417,6 +417,7 @@ void clear_event(event_data *event) {
 	
 	EVT_VNUM(event) = NOTHING;
 	EVT_REPEATS_AFTER(event) = NOT_REPEATABLE;
+	EVT_DURATION(event) = 1;
 }
 
 
