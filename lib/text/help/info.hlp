@@ -339,7 +339,7 @@ The "chameleon" trait is the property of some buildings to be invisible at a
 distance. Instead of seeing the building and its owner's banner, you see only
 normal terrain.
 #
-CHANNEL CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE /DEATH /GRATS /PROGRESS
+CHANNEL CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE /DEATH /GRATS /PROGRESS /EVENTS
 
 Usage:  say <message>
         shout <message>
@@ -361,6 +361,7 @@ Global channels:
 &V/grats&0 - Player accomplishments
 &T/death&0 - Player death announcements
 &g/progress&0 - Empire progress announcements
+&t/events&0 - Event announcements and discussion
 &yshout&0 - an in-character channel limited to 50 map tiles distance
 &rtell&0 - this is a private channel that is generally considered OOC
 
