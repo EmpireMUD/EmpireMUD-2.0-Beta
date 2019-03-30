@@ -986,6 +986,14 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = get_production_total_component(emp, task->vnum, task->misc);
 				break;
 			}
+			case REQ_EVENT_RUNNING: {
+				task->current = find_running_event_by_vnum(task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_EVENT_NOT_RUNNING: {
+				task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
+				break;
+			}
 			
 			/* otherwise... do nothing
 			default: {

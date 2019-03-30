@@ -306,6 +306,11 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				gain_reputation(ch, reward->vnum, reward->amount, FALSE, TRUE);
 				break;
 			}
+			case QR_EVENT_POINTS: {
+				extern int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
+				gain_event_points(ch, reward->vnum, reward->amount);
+				break;
+			}
 		}
 	}
 	

@@ -949,6 +949,7 @@ void heartbeat(int heart_pulse) {
 	void update_players_online_stats();
 	void update_trading_post();
 	void weather_and_time(int mode);
+	void write_running_events_file();
 
 	static int mins_since_crashsave = 0;
 	bool debug_log = FALSE;

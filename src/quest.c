@@ -755,6 +755,11 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			snprintf(output, sizeof(output), "%s%+d rep to %s", vnum, reward->amount, (fct ? FCT_NAME(fct) : "UNKNOWN"));
 			break;
 		}
+		case QR_EVENT_POINTS: {
+			event_data *event = find_event_by_vnum(reward->vnum);
+			snprintf(output, sizeof(output), "%+d event point%s to %s%s", reward->amount, PLURAL(reward->amount), vnum, (event ? EVT_NAME(event) : "UNKNOWN"));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "%s%dx UNKNOWN", vnum, reward->amount);
 			break;
@@ -947,6 +952,14 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_EMPIRE_PRODUCED_COMPONENT: {
 				task->current = GET_LOYALTY(ch) ? get_production_total_component(GET_LOYALTY(ch), task->vnum, task->misc) : 0;
+				break;
+			}
+			case REQ_EVENT_RUNNING: {
+				task->current = find_running_event_by_vnum(task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_EVENT_NOT_RUNNING: {
+				task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
 				break;
 			}
 		}
@@ -4646,6 +4659,7 @@ OLC_MODULE(qedit_rewards) {
 	struct quest_reward **list = &QUEST_REWARDS(quest);
 	int findtype, num, stype;
 	faction_data *fct;
+	event_data *event;
 	bool found, ok;
 	any_vnum vnum;
 	
@@ -4846,6 +4860,19 @@ OLC_MODULE(qedit_rewards) {
 					ok = TRUE;
 					break;
 				}
+				case QR_EVENT_POINTS: {
+					if (!*vnum_arg || !isdigit(*vnum_arg)) {
+						msg_to_char(ch, "Usage: rewards add event-points <amount> <event vnum>\r\n");
+						return;
+					}
+					if (!(event = find_event_by_vnum(atoi(vnum_arg)))) {
+						msg_to_char(ch, "Invalid event vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					vnum = EVT_VNUM(event);
+					ok = TRUE;
+					break;
+				}
 			}
 			
 			// did we find one?
@@ -4970,6 +4997,15 @@ OLC_MODULE(qedit_rewards) {
 						return;
 					}
 					vnum = FCT_VNUM(fct);
+					ok = TRUE;
+					break;
+				}
+				case QR_EVENT_POINTS: {
+					if (!*vnum_arg || !isdigit(*vnum_arg) || !(event = find_event_by_vnum(atoi(vnum_arg)))) {
+						msg_to_char(ch, "Invalid event vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					vnum = EVT_VNUM(event);
 					ok = TRUE;
 					break;
 				}

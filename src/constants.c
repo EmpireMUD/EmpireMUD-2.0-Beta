@@ -1906,6 +1906,7 @@ const char *event_status[] = {
 	"not started",
 	"running",
 	"complete",
+	"collected",
 	"\n"
 };
 
@@ -2748,6 +2749,7 @@ const char *quest_reward_types[] = {
 	"QUEST-CHAIN",
 	"REPUTATION",
 	"CURRENCY",
+	"EVENT-POINTS",
 	"\n",
 };
 
@@ -3895,7 +3897,9 @@ const char *requirement_types[] = {
 	"HAVE-CITY",
 	"EMPIRE-MILITARY",
 	"EMPIRE-PRODUCED-OBJECT",
-	"EMPIRE-PRODUCED-COMPONENT",
+	"EMPIRE-PRODUCED-COMPONENT",	// 35
+	"EVENT-RUNNING",
+	"EVENT-NOT-RUNNING",
 	"\n",
 };
 
@@ -3938,6 +3942,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// empire military
 	REQ_AMT_NUMBER,	// empire produced object
 	REQ_AMT_NUMBER,	// empire produced component
+	REQ_AMT_NONE,	// event running
+	REQ_AMT_NONE,	// event not running
 };
 
 
@@ -3979,6 +3985,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// empire military
 	FALSE,	// empire produced object
 	FALSE,	// empire produced component
+	FALSE,	// event running
+	FALSE,	// event not running
 };
 
 

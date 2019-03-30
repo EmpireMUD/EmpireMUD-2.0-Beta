@@ -30,6 +30,7 @@
 * Contents:
 *   Helpers
 *   Leaderboard Helpers
+*   Player Event Data
 *   Running Events
 *   Utilities
 *   Database
@@ -49,8 +50,13 @@ extern const char *event_flags[];
 extern const char *event_rewards[];
 
 // external funcs
+extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
+extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
+extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 
 // local protos
+void update_player_leaderboard(char_data *ch, struct event_running_data *re, struct player_event_data *ped);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -184,6 +190,229 @@ void free_event_leaderboard(struct event_leaderboard *hash) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// PLAYER EVENT DATA ///////////////////////////////////////////////////////
+
+/**
+* Called on login to make sure all of a player's event data is valid.
+*
+* @param char_data *ch The character to check.
+*/
+void check_player_events(char_data *ch) {
+	struct player_event_data *ped, *next_ped;
+	struct event_running_data *running;
+	// bool any_running = FALSE;
+	
+	if (!IS_NPC(ch)) {
+		return;	// safety first
+	}
+	
+	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
+		if (!ped->event) {	// event does not exist
+			HASH_DEL(GET_EVENT_DATA(ch), ped);
+			free(ped);
+			continue;
+		}
+		// TODO should this also have removed events that are in-dev?
+		
+		// check status
+		if ((running = find_running_event_by_id(ped->id))) {
+			if (running->status == EVTS_COMPLETE && ped->status == EVTS_RUNNING) {
+				// TODO should event completion be processed here?
+				ped->status = running->status;	// copy event status
+			}
+			else if (running->status == EVTS_RUNNING && ped->status == EVTS_NOT_STARTED) {
+				ped->status = running->status;	// just copy this status
+			}
+			else if (ped->status == EVTS_RUNNING) {
+				// any_running = TRUE;
+			}
+		}
+	}
+}
+
+
+/**
+* Creates a player_event_data entry and returns it. Or, if one already exists,
+* returns that. Either way, you're guaranteed an entry, if your input data is
+* good. If you're only trying to fetch existing data, use get_event_data()
+* instead.
+*
+* @param char_data *ch The player character to create (or get) data for.
+* @param int event_id The event's unique id.
+* @param any_vnum event_vnum Which event the entry is for.
+* @return struct player_event_data* The event entry, if possible.
+*/
+struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum) {
+	struct player_event_data *ped = NULL;
+	struct event_running_data *running;
+	
+	if (IS_NPC(ch)) {
+		return NULL;	// sanity
+	}
+	
+	HASH_FIND_INT(GET_EVENT_DATA(ch), &event_id, ped);
+	if (!ped) {
+		CREATE(ped, struct player_event_data, 1);
+		ped->id = event_id;
+		ped->event = find_event_by_vnum(event_vnum);
+		
+		if ((running = find_running_event_by_id(event_id))) {
+			ped->timestamp = running->start_time;
+			ped->status = running->status;
+		}
+		else {	// backup
+			ped->timestamp = time(0);
+			ped->status = EVTS_NOT_STARTED;
+		}
+		
+		HASH_ADD_INT(GET_EVENT_DATA(ch), id, ped);
+	}
+	return ped;
+}
+
+
+/**
+* Frees a set of player_event_data, e.g. when the player is being freed.
+*
+* @param struct player_event_data *hash The event data to free.
+*/
+void free_player_event_data(struct player_event_data *hash) {
+	struct player_event_data *el, *next_el;
+	
+	HASH_ITER(hh, hash, el, next_el) {
+		HASH_DEL(hash, el);
+		free(el);
+	}
+}
+
+
+/**
+* Gains (or loses) a number of points for a currently-running event, by vnum.
+* This function fails silently if there is no matching event running, as it's
+* possible for quests/scripts to try to grant points without it.
+*
+* Players receive a message when this happens.
+*
+* @param char_data *ch The person gaining points.
+* @param any_vnum event_vnum Which event.
+* @param int points How many points to gain/lose.
+* @return int The new point total.
+*/
+int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
+	struct event_running_data *running;
+	struct player_event_data *ped;
+	
+	if (!ch || !points) {
+		return 0;	// no work
+	}
+	
+	if (!(running = find_running_event_by_vnum(event_vnum))) {
+		return 0;	// no running event
+	}
+	if (!(ped = create_event_data(ch, running->id, event_vnum))) {
+		return 0;	// cannot get/create an event data entry
+	}
+	
+	SAFE_ADD(ped->points, points, 0, INT_MAX, FALSE);
+	update_player_leaderboard(ch, running, ped);
+	
+	if (points > 0) {
+		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d point%s.\t0\r\n", points, PLURAL(points), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, PLURAL(ped->points));
+	}
+	else if (points < 0) {
+		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, PLURAL(ped->points));
+	}
+	return ped->points;
+}
+
+
+/**
+* Gets the event data entry for a player, if it exists. Use create_event_data
+* if you need to guarantee it exists.
+*
+* @param char_data *ch The player character to get data for.
+* @param int event_id The event's unique id (not vnum).
+* @return struct player_event_data* The event entry, if it exists.
+*/
+struct player_event_data *get_event_data(char_data *ch, int event_id) {
+	struct player_event_data *ped = NULL;
+	
+	if (IS_NPC(ch)) {
+		return NULL;	// sanity
+	}
+	
+	HASH_FIND_INT(GET_EVENT_DATA(ch), &event_id, ped);
+	return ped;	// if any
+}
+
+
+/**
+* Sets the point total for a currently-running event, by vnum.
+* This function fails silently if there is no matching event running, as it's
+* possible for quests/scripts to try to grant points without it.
+*
+* Players do not receive a message for this.
+*
+* @param char_data *ch The person whose points are changing.
+* @param any_vnum event_vnum Which event.
+* @param int points How many points to have.
+*/
+void set_event_points(char_data *ch, any_vnum event_vnum, int points) {
+	struct event_running_data *running;
+	struct player_event_data *ped;
+	
+	if (!ch) {
+		return;	// no work
+	}
+	
+	if (!(running = find_running_event_by_vnum(event_vnum))) {
+		return;	// no running event
+	}
+	if (!(ped = create_event_data(ch, running->id, event_vnum))) {
+		return;	// cannot get/create an event data entry
+	}
+	
+	ped->points = points;
+	update_player_leaderboard(ch, running, ped);
+}
+
+
+// Simple vnum sorter for event leaderboards
+int sort_leaderboard(struct event_leaderboard *a, struct event_leaderboard *b) {
+	return b->points - a->points;
+}
+
+
+/**
+* Checks and updates the player leaderboard, when someone's score changes.
+* This only works on events that are still running, and is called by
+* set/gain_event_points().
+*
+* This does not update rank.
+*
+* @param char_data *ch The person whose points have changed.
+* @param struct event_running_data *re The data for the running-event.
+* @param struct player_event_data *ped The player's event data for it.
+*/
+void update_player_leaderboard(char_data *ch, struct event_running_data *re, struct player_event_data *ped) {
+	struct event_leaderboard *lb;
+	
+	if (!ch || !re || !ped) {
+		return;	// no work
+	}
+	if (re->status != EVTS_RUNNING) {
+		return;	// leaderboard cannot be updated after event ends
+	}
+	
+	if ((lb = get_event_leaderboard_entry(&re->player_leaderboard, GET_IDNUM(ch))) && lb->points != ped->points) {
+		lb->points = ped->points;
+		HASH_SORT(re->player_leaderboard, sort_leaderboard);
+		events_need_save = TRUE;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// RUNNING EVENTS //////////////////////////////////////////////////////////
 
 /**
@@ -203,7 +432,7 @@ void cancel_running_event(struct event_running_data *re) {
 	LL_DELETE(running_events, re);
 	
 	// and free
-	free_event_leaderboard(re->empire_leaderboard);
+	// free_event_leaderboard(re->empire_leaderboard);
 	free_event_leaderboard(re->player_leaderboard);
 	free(re);
 	
@@ -332,8 +561,9 @@ struct event_running_data *load_one_running_event(FILE *fl, int id) {
 					// not fatal
 				}
 				else {
-					lb = get_event_leaderboard_entry(&re->empire_leaderboard, int_in[0]);
-					lb->points = int_in[1];
+					// not currently used
+					// lb = get_event_leaderboard_entry(&re->empire_leaderboard, int_in[0]);
+					// lb->points = int_in[1];
 				}
 				break;
 			}
@@ -425,9 +655,11 @@ void write_running_events_file(void) {
 		fprintf(fl, "0 0 0 0\n");	// numeric line for future use
 		
 		// E: empire leaderboard
+		/* not currently used
 		HASH_ITER(hh, re->empire_leaderboard, lb, next_lb) {
 			fprintf(fl, "E %d %d\n", lb->id, lb->points);
 		}
+		*/
 		
 		// P: player leaderboard
 		HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
@@ -487,7 +719,23 @@ bool audit_event(event_data *event, char_data *ch) {
 		problem = TRUE;
 	}
 	
-	// TODO more audits...
+	if (EVT_DURATION(event) < 1) {
+		olc_audit_msg(ch, EVT_VNUM(event), "Invalid duration");
+		problem = TRUE;
+	}
+	if (EVT_DURATION(event) < 30) {
+		olc_audit_msg(ch, EVT_VNUM(event), "Duration is very low");
+		problem = TRUE;
+	}
+	
+	if (!EVT_RANK_REWARDS(event)) {
+		olc_audit_msg(ch, EVT_VNUM(event), "No rank rewards set");
+		problem = TRUE;
+	}
+	if (!EVT_THRESHOLD_REWARDS(event)) {
+		olc_audit_msg(ch, EVT_VNUM(event), "No threshold rewards set");
+		problem = TRUE;
+	}
 	
 	return problem;
 }
@@ -564,9 +812,11 @@ char *list_one_event(event_data *event, bool detail) {
 void olc_search_event(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	event_data *event = find_event_by_vnum(vnum);
-	// quest_data *quest, *next_quest;
+	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
+	social_data *soc, *next_soc;
 	int size, found;
-	// bool any;
+	bool any;
 	
 	if (!event) {
 		msg_to_char(ch, "There is no event %d.\r\n", vnum);
@@ -576,16 +826,14 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of event %d (%s):\r\n", vnum, EVT_NAME(event));
 	
-	/*
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
 		// REQ_x: requirement search
-		any = find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
-		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
-		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_EVENT_RUNNING, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_EVENT_NOT_RUNNING, vnum);
 		
 		if (any) {
 			++found;
@@ -593,39 +841,22 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	// on other quests
-	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
 		// QR_x, REQ_x: quest types
-		any = find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
-		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST, vnum);
-		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
-		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
-		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_NOT_ON_QUEST, vnum);
-		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_NOT_ON_QUEST, vnum);
-		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_QUEST_CHAIN, vnum);
-		any |= find_quest_giver_in_list(QUEST_STARTS_AT(qiter), QG_QUEST, vnum);
-		any |= find_quest_giver_in_list(QUEST_ENDS_AT(qiter), QG_QUEST, vnum);
+		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_EVENT_RUNNING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_EVENT_RUNNING, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_EVENT_NOT_RUNNING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_EVENT_NOT_RUNNING, vnum);
+		
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_EVENT_POINTS, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
-		}
-	}
-	
-	// on other shops
-	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
-		// QG_x: shop types
-		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_QUEST, vnum);
-		
-		if (any) {
-			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -635,16 +866,14 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 			break;
 		}
 		// REQ_x: quest types
-		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
-		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_COMPLETED_QUEST, vnum);
-		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_ON_QUEST, vnum);
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_EVENT_RUNNING, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_EVENT_NOT_RUNNING, vnum);
 		
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
-	*/
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
@@ -1037,46 +1266,61 @@ event_data *create_event_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_event(char_data *ch, any_vnum vnum) {
-	event_data *event;
-	// quest_data *quest, *next_quest;
-	// progress_data *prg, *next_prg;
-	// social_data *soc, *next_soc;
-	// shop_data *shop, *next_shop;
+	struct event_running_data *running, *next_running;
+	struct player_event_data *ped, *next_ped;
+	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
+	social_data *soc, *next_soc;
 	descriptor_data *desc;
-	// char_data *chiter;
-	// bool found;
+	char_data *chiter;
+	event_data *event;
+	bool found;
 	
 	if (!(event = find_event_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such event %d.\r\n", vnum);
 		return;
 	}
 	
-	// remove it from the hash table first
+	// end the event, if running -- BEFORE removing from the hash table
+	while ((running = find_running_event_by_vnum(vnum))) {
+		cancel_running_event(running);
+	}
+	
+	// remove it from the hash table now
 	remove_event_from_table(event);
 	
-	// look for people/empires on the event and force a refresh
-	/*
+	// look for people with event data and remove it
 	LL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter)) {
 			continue;
 		}
-		if (!is_on_quest(chiter, vnum)) {
-			continue;
+		
+		HASH_ITER(hh, GET_EVENT_DATA(chiter), ped, next_ped) {
+			if (!ped->event || EVT_VNUM(ped->event) == vnum) {
+				HASH_DEL(GET_EVENT_DATA(chiter), ped);
+				free(ped);
+			}
 		}
-		refresh_all_quests(chiter);
 	}
-	*/
+	
+	// delete all old running-events with this vnum
+	LL_FOREACH_SAFE(running_events, running, next_running) {
+		if (!running->event || EVT_VNUM(running->event) == vnum) {
+			LL_DELETE(running_events, running);
+			free_event_leaderboard(running->player_leaderboard);
+			free(running);
+		}
+	}
 	
 	// save index and event file now
 	save_index(DB_BOOT_EVT);
 	save_library_file_for_vnum(DB_BOOT_EVT, vnum);
 	
-	/*
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
-		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
-		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
+		// REQ_x:
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_EVENT_RUNNING, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_EVENT_NOT_RUNNING, vnum);
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
@@ -1085,101 +1329,70 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	// update other quests
-	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
 		// REQ_x, QR_x: quest types
-		found = delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
-		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST, vnum);
-		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
-		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
-		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_NOT_ON_QUEST, vnum);
-		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_NOT_ON_QUEST, vnum);
-		found |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_QUEST_CHAIN, vnum);
-		found |= delete_quest_giver_from_list(&QUEST_STARTS_AT(qiter), QG_QUEST, vnum);
-		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(qiter), QG_QUEST, vnum);
+		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_EVENT_RUNNING, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_EVENT_RUNNING, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_EVENT_NOT_RUNNING, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_EVENT_NOT_RUNNING, vnum);
+		
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_EVENT_POINTS, vnum);
 		
 		if (found) {
-			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
-			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
-		}
-	}
-	
-	// update shops
-	HASH_ITER(hh, shop_table, shop, next_shop) {
-		// QG_x: quest types
-		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_QUEST, vnum);
-		
-		if (found) {
-			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
-			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
 	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		// REQ_x: quest types
-		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
-		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_COMPLETED_QUEST, vnum);
-		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_ON_QUEST, vnum);
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_EVENT_RUNNING, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_EVENT_NOT_RUNNING, vnum);
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
-	*/
 	
 	// remove from from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
-	/*
 		if (GET_OLC_PROGRESS(desc)) {
-			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST, vnum);
-			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
-			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_ON_QUEST, vnum);
+			// REQ_x:
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_EVENT_RUNNING, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_EVENT_NOT_RUNNING, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A quest used by the progression goal you're editing has been deleted.\r\n");
+				msg_to_desc(desc, "An event used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
 			// REQ_x, QR_x: quest types
-			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);
-			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);
-			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
-			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
-			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_ON_QUEST, vnum);
-			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_NOT_ON_QUEST, vnum);
-			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_QUEST_CHAIN, vnum);
-			found |= delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_QUEST, vnum);
-			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_QUEST, vnum);
+			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_EVENT_RUNNING, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_EVENT_NOT_RUNNING, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_EVENT_RUNNING, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_EVENT_NOT_RUNNING, vnum);
+			
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_EVENT_POINTS, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
-				msg_to_desc(desc, "Another quest used by the quest you are editing was deleted.\r\n");
-			}
-		}
-		if (GET_OLC_SHOP(desc)) {
-			// QG_x: quest types
-			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_QUEST, vnum);
-		
-			if (found) {
-				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A quest used by the shop you are editing was deleted.\r\n");
+				msg_to_desc(desc, "An event used by the quest you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {
 			// REQ_x: quest types
-			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_COMPLETED_QUEST, vnum);
-			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
-			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_ON_QUEST, vnum);
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_EVENT_RUNNING, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_EVENT_NOT_RUNNING, vnum);
 			
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A quest required by the social you are editing was deleted.\r\n");
+				msg_to_desc(desc, "An event required by the social you are editing was deleted.\r\n");
 			}
 		}
-		*/
 	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted event %d", GET_NAME(ch), vnum);

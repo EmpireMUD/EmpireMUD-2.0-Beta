@@ -4895,7 +4895,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
 	bool need_currency = FALSE, need_func_flags = FALSE, need_veh_flags = FALSE;
-	bool need_dip_flags = FALSE;
+	bool need_dip_flags = FALSE, need_event = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -4991,6 +4991,11 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_dip_flags = TRUE;
 			break;
 		}
+		case REQ_EVENT_RUNNING:
+		case REQ_EVENT_NOT_RUNNING: {
+			need_event = TRUE;
+			break;
+		}
 		case REQ_OWN_HOMES:
 		case REQ_CROP_VARIETY:
 		case REQ_EMPIRE_WEALTH:
@@ -5078,6 +5083,19 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			msg_to_char(ch, "You must provide diplomacy flags.\r\n");
 			return FALSE;
 		}
+	}
+	if (need_event) {
+		event_data *event;
+		argument = any_one_word(argument, arg);
+		if (!*arg || !isdigit(*arg)) {
+			msg_to_char(ch, "You must provide an event vnum.\r\n");
+			return FALSE;
+		}
+		if (!(event = find_event_by_vnum(atoi(arg)))) {
+			msg_to_char(ch, "Invalid event '%s'.\r\n", arg);
+			return FALSE;
+		}
+		*vnum = EVT_VNUM(event);
 	}
 	if (need_faction) {
 		faction_data *fct;

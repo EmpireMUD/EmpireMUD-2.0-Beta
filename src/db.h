@@ -362,7 +362,10 @@ extern int top_event_id;
 extern struct event_running_data *running_events;
 extern bool events_need_save;
 extern event_data *find_event_by_vnum(any_vnum vnum);
+extern struct event_running_data *find_running_event_by_id(int id);
+extern struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum);
 void free_event(event_data *event);
+extern char *get_event_name_by_proto(any_vnum vnum);
 
 // factions
 extern faction_data *faction_table;

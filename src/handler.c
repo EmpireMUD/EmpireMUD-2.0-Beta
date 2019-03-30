@@ -6930,6 +6930,18 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_EVENT_RUNNING: {
+				if (!find_running_event_by_vnum(req->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_EVENT_NOT_RUNNING: {
+				if (find_running_event_by_vnum(req->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -7156,6 +7168,14 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_EMPIRE_PRODUCED_COMPONENT: {
 			snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, component_string(req->vnum, req->misc));
+			break;
+		}
+		case REQ_EVENT_RUNNING: {
+			snprintf(output, sizeof(output), "Event is running: %s%s", vnum, get_event_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EVENT_NOT_RUNNING: {
+			snprintf(output, sizeof(output), "Event is not running: %s%s", vnum, get_event_name_by_proto(req->vnum));
 			break;
 		}
 		default: {

@@ -780,6 +780,7 @@ void check_delayed_load(char_data *ch) {
 void free_char(char_data *ch) {
 	void die_follower(char_data *ch);
 	void free_alias(struct alias_data *a);
+	void free_player_event_data(struct player_event_data *hash);
 	void free_mail(struct mail_data *mail);
 	void free_player_completed_quests(struct player_completed_quest **hash);
 	void free_player_quests(struct player_quest *list);
@@ -991,6 +992,7 @@ void free_char(char_data *ch) {
 			HASH_DEL(GET_MOUNT_LIST(ch), mount);
 			free(mount);
 		}
+		free_player_event_data(GET_EVENT_DATA(ch));
 		
 		while ((ptech = GET_TECHS(ch))) {
 			GET_TECHS(ch) = ptech->next;
@@ -1123,6 +1125,7 @@ char_data *load_player(char *name, bool normal) {
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
 	void add_minipet(char_data *ch, any_vnum vnum);
+	extern struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum);
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
@@ -1143,6 +1146,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_automessage *automsg;
 	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num;
+	struct player_event_data *ped;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
 	struct req_data *task;
@@ -1521,6 +1525,17 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "End Primary Data", length)) {
 					// this tag is no longer used; ignore it
+				}
+				else if (PFILE_TAG(line, "Event:", length)) {
+					if (sscanf(line + length + 1, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3], &i_in[4], &i_in[5]) == 7) {
+						if ((ped = create_event_data(ch, i_in[0], i_in[1]))) {
+							ped->timestamp = l_in[0];
+							ped->points = i_in[2];
+							ped->collected_points = i_in[3];
+							ped->rank = i_in[4];
+							ped->status = i_in[5];
+						}
+					}
 				}
 				else if (PFILE_TAG(line, "Extra Attribute:", length)) {
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
@@ -2247,6 +2262,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct player_event_data *ped, *next_ped;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
 	struct minipet_data *mini, *next_mini;
@@ -2449,6 +2465,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'E'
+	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
+		if (ped->event) {
+			fprintf(fl, "Event: %d %d %ld %d %d %d %d\n", ped->id, EVT_VNUM(ped->event), ped->timestamp, ped->points, ped->collected_points, ped->rank, ped->status);
+		}
+	}
 	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
 		if (GET_EXTRA_ATT(ch, iter)) {
 			fprintf(fl, "Extra Attribute: %s %d\n", extra_attribute_types[iter], GET_EXTRA_ATT(ch, iter));
@@ -3434,6 +3455,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
 	void check_minipets(char_data *ch);
+	void check_player_events(char_data *ch);
 	void clean_lore(char_data *ch);
 	void clean_player_kills(char_data *ch);
 	extern room_data *find_home(char_data *ch);
@@ -3711,6 +3733,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_minipets(ch);
+	check_player_events(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {

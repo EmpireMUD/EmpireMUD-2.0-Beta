@@ -399,6 +399,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_EMPIRE_MILITARY  33
 #define REQ_EMPIRE_PRODUCED_OBJECT  34
 #define REQ_EMPIRE_PRODUCED_COMPONENT  35
+#define REQ_EVENT_RUNNING  36
+#define REQ_EVENT_NOT_RUNNING  37
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -1247,6 +1249,7 @@ typedef struct vehicle_data vehicle_data;
 #define EVTS_NOT_STARTED  0	// default status
 #define EVTS_RUNNING  1	// event is active
 #define EVTS_COMPLETE  2	// event has ended
+#define EVTS_COLLECTED  3	// rewards have been collected (used only on players)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2247,6 +2250,7 @@ typedef struct vehicle_data vehicle_data;
 #define QR_QUEST_CHAIN  6
 #define QR_REPUTATION  7
 #define QR_CURRENCY  8
+#define QR_EVENT_POINTS  9
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -3828,6 +3832,7 @@ struct player_special_data {
 	struct player_faction_data *factions;	// hash table of factions
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 	struct player_automessage *automessages;	// hash of seen messages
+	struct player_event_data *event_data;	// hash of event scores and results
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -4606,7 +4611,7 @@ struct event_running_data {
 	
 	// leaderboards (these are summaries and, in general, the game relies on the player file for scores)
 	struct event_leaderboard *player_leaderboard;
-	struct event_leaderboard *empire_leaderboard;
+	// struct event_leaderboard *empire_leaderboard;
 	
 	struct event_running_data *next;	// linked list: running_events
 };
@@ -4618,6 +4623,21 @@ struct event_leaderboard {
 	int points;	// last-recorded points
 	
 	UT_hash_handle hh;	// hash handle for running_event->player_leaderboard or running_event->empire_leaderboard
+};
+
+
+// for tracking players' points and status in the current event as well as past ones
+struct player_event_data {
+	int id;	// event id
+	event_data *event;	// which event it was
+	
+	time_t timestamp;	// when the event happened
+	int points;	// total accumulated points
+	int collected_points;	// the highest threshold reward collected by the player
+	int rank;	// last recorded rank
+	int status;	// what state the event is in
+	
+	UT_hash_handle hh;	// hash handle for GET_EVENT_DATA(ch)
 };
 
 
