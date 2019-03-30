@@ -3178,6 +3178,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							snprintf(str, slen, "%c%d",UID_CHAR, obj_script_id(GET_EQ(c, pos)));
 					}
+					else if (!str_cmp(field, "event_points")) {
+						extern struct player_event_data *get_event_data(char_data *ch, int event_id);
+						
+						if (subfield && *subfield && isdigit(*subfield)) {
+							struct event_running_data *running = find_running_event_by_vnum(atoi(subfield));
+							struct player_event_data *ped;
+							if (running && (ped = get_event_data(c, running->id))) {
+								snprintf(str, slen, "%d", ped->points);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					break;
 				}
 				case 'f': {	// char.f*
@@ -3228,6 +3245,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'g': {	// char.g*
 					if (!str_cmp(field, "grt") || !str_cmp(field, "greatness")) {
 						snprintf(str, slen, "%d", GET_GREATNESS(c));
+					}
+					else if (!str_cmp(field, "gain_event_points")) {
+						extern int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
+						// %actor.gain_event_points(vnum,amt)%
+						
+						if (subfield && *subfield && !IS_NPC(c)) {
+							char arg1[256], arg2[256];
+							comma_args(subfield, arg1, arg2);
+							
+							if (*arg1 && *arg2 && isdigit(*arg1)) {
+								int pts = gain_event_points(c, atoi(arg1), atoi(arg2));
+								snprintf(str, slen, "%d", pts);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							strcpy(str, "0");
+						}
 					}
 					else if (!str_cmp(field, "gain_reputation")) {
 						if (subfield && *subfield && !IS_NPC(c)) {

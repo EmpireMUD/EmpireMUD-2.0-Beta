@@ -395,6 +395,7 @@ When using field  - The variable returns:
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
    (0-18) or the name of the location * checks all positions. &yHELP %LOAD%&0
+&cevent_points(vnum)&0 - The character's score in the event, if it's running.
 &cfaction_name&0 - The name of the mob's 'allegiance' faction, if any.
 &cfighting&0 - The unique id of the mob fighting the actor.
 &cfind_lighter&0 - Finds an available LIGHTER in the inventory, if one exists.
@@ -402,6 +403,7 @@ When using field  - The variable returns:
 &cfirstname&0 - The actor's first name (or first keyword, for mobs).
 &cfollower(name)&0 - The follower of the actor (as an id) with name supplied.
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
+&cgain_event_points(vnum,amt)&0 - Give (or take) points for a current event.
 &cgain_reputation(faction,amt)&0 - Gives the player faction rep (or takes).
 &cgive_coins(amt)&0 - Gives the actor a number of coins.
 &cgive_currency(vnum, amt)&0 - Gives an amount of adventure currency.
