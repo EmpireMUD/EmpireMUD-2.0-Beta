@@ -36,7 +36,8 @@
 *   Database
 *   OLC Handlers
 *   Displays
-*   Edit Modules
+*   OLC Modules
+*   Events Command
 */
 
 // local data
@@ -57,6 +58,9 @@ extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum v
 
 // local protos
 void update_player_leaderboard(char_data *ch, struct event_running_data *re, struct player_event_data *ped);
+
+
+#define EVENT_CMD(name)		void (name)(char_data *ch, char *argument)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -116,6 +120,44 @@ char *event_reward_string(struct event_reward *reward, bool show_vnums) {
 
 
 /**
+* This function will return the 1 currently-running event, if there is only
+* one. It can optionally also get the total number of events currently-running.
+*
+* The reason this function returns NULL if there is more than 1 event running
+* is that many functions behave differently when only 1 is running, as a short-
+* cut.
+*
+* @param int *count Optional: A variable to pass back the count of running events.
+* @return struct event_running_data* If there is only 1 event running, this returns it. In all other cases, it returns NULL.
+*/
+struct event_running_data *only_one_running_event(int *count) {
+	struct event_running_data *running, *only = NULL;
+	int num;
+	
+	// count or find only event
+	num = 0;
+	LL_FOREACH(running_events, running) {
+		if (running->event && running->status == EVTS_RUNNING) {
+			++num;
+			only = running;
+		}
+	}
+	
+	// store count if requested
+	if (count) {
+		*count = num;
+	}
+	
+	if (num == 1) {
+		return only;	// ONLY if there's only 1
+	}
+	else {
+		return NULL;
+	}
+}
+
+
+/**
 * Copies entries from one list into another, only if they are not already in
 * the to_list.
 *
@@ -147,6 +189,41 @@ void smart_copy_event_rewards(struct event_reward **to_list, struct event_reward
 			LL_APPEND(*to_list, reward);
 		}
 	}
+}
+
+
+/**
+* Looks up an event by name or vnum, optionally requiring that the event be
+* active right now.
+*
+* @param char *name The string (name/vnum) to look for.
+* @param bool running_only If TRUE, skips events that aren't running.
+* @return event_data* The event prototype found, if any.
+*/
+event_data *smart_find_event(char *name, bool running_only) {
+	event_data *iter, *next_iter, *partial = NULL;
+	any_vnum find_vnum = (isdigit(*name) ? atoi(name) : NOTHING);
+	
+	HASH_ITER(hh, event_table, iter, next_iter) {
+		if (EVT_FLAGGED(iter, EVTF_IN_DEVELOPMENT)) {
+			continue;	// skip in-dev
+		}
+		if (running_only && !find_running_event_by_vnum(EVT_VNUM(iter))) {
+			continue;	// not running
+		}
+		
+		if (find_vnum != NOTHING && find_vnum == EVT_VNUM(iter)) {
+			return iter;	// vnum match
+		}
+		else if (!str_cmp(name, EVT_NAME(iter))) {
+			return iter;	// FOUND!
+		}
+		else if (!partial && is_multiword_abbrev(name, EVT_NAME(iter))) {
+			partial = iter;	// partial match
+		}
+	}
+	
+	return partial;	// if any
 }
 
 
@@ -406,6 +483,8 @@ void update_player_leaderboard(char_data *ch, struct event_running_data *re, str
 	
 	if ((lb = get_event_leaderboard_entry(&re->player_leaderboard, GET_IDNUM(ch))) && lb->points != ped->points) {
 		lb->points = ped->points;
+		lb->approved = IS_APPROVED(ch);
+		lb->ignore = IS_IMMORTAL(ch);	// reasons to ignore this result
 		HASH_SORT(re->player_leaderboard, sort_leaderboard);
 		events_need_save = TRUE;
 	}
@@ -464,6 +543,35 @@ void check_running_events(void) {
 			cancel_running_event(re);
 		}
 	}
+}
+
+
+/**
+* Finds either the current running version of the event (by vnum) or the last
+* time it was run.
+*
+* @param any_vnum event_vnum Which event we're looking for.
+* @return struct event_running_data* The event_running_data entry or NULL if none found.
+*/
+struct event_running_data *find_last_event_by_vnum(any_vnum event_vnum) {
+	struct event_running_data *re, *found = NULL;
+	time_t last_time = 0;
+	
+	LL_FOREACH(running_events, re) {
+		if (!re->event || EVT_VNUM(re->event) != event_vnum) {
+			continue;	// not what we're looking for
+		}
+		
+		// ok:
+		if (re->status == EVTS_RUNNING) {
+			return re;	// if we find one running, it's always the right one
+		}
+		else if (last_time == 0 || re->start_time > last_time) {
+			found = re;
+			last_time = re->start_time;
+		}
+	}
+	return found;	// if any
 }
 
 
@@ -556,7 +664,7 @@ struct event_running_data *load_one_running_event(FILE *fl, int id) {
 		}
 		switch (*line) {
 			case 'E': {	// empire leaderboard
-				if (sscanf(line, "E %d %d", &int_in[0], &int_in[1]) != 2) {
+				if (sscanf(line, "E %d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
 					log("SYSERR: Format error in E line of %s: %s", errstr, line);
 					// not fatal
 				}
@@ -564,17 +672,21 @@ struct event_running_data *load_one_running_event(FILE *fl, int id) {
 					// not currently used
 					// lb = get_event_leaderboard_entry(&re->empire_leaderboard, int_in[0]);
 					// lb->points = int_in[1];
+					// lb->approved = int_in[2] ? 1 : 0;
+					// lb->ignore = int_in[3] ? 1 : 0;
 				}
 				break;
 			}
 			case 'P': {	// player leaderboard
-				if (sscanf(line, "P %d %d", &int_in[0], &int_in[1]) != 2) {
+				if (sscanf(line, "P %d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
 					log("SYSERR: Format error in E line of %s: %s", errstr, line);
 					// not fatal
 				}
 				else {
 					lb = get_event_leaderboard_entry(&re->player_leaderboard, int_in[0]);
 					lb->points = int_in[1];
+					lb->approved = int_in[2] ? 1 : 0;
+					lb->ignore = int_in[3] ? 1 : 0;
 				}
 				break;
 			}
@@ -657,13 +769,13 @@ void write_running_events_file(void) {
 		// E: empire leaderboard
 		/* not currently used
 		HASH_ITER(hh, re->empire_leaderboard, lb, next_lb) {
-			fprintf(fl, "E %d %d\n", lb->id, lb->points);
+			fprintf(fl, "E %d %d %d %d\n", lb->id, lb->points, lb->approved, lb->ignore);
 		}
 		*/
 		
 		// P: player leaderboard
 		HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
-			fprintf(fl, "P %d %d\n", lb->id, lb->points);
+			fprintf(fl, "P %d %d %d %d\n", lb->id, lb->points, lb->approved, lb->ignore);
 		}
 		
 		fprintf(fl, "S\n");
@@ -1656,6 +1768,178 @@ void olc_show_event(char_data *ch) {
 
 
 /**
+* Basic event detail page for players. This includes the player's score/rank
+* if applicable.
+*
+* @param char_data *ch The person to show to (also includes some of their stats).
+* @param event_data *event The event prototype.
+*/
+void show_event_detail(char_data *ch, event_data *event) {
+	// bool full_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EVENTS));
+	struct event_running_data *running = find_last_event_by_vnum(EVT_VNUM(event));
+	char vnum[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	bool ended_recently = FALSE;
+	
+	// vnum portion
+	if (IS_IMMORTAL(ch)) {
+		snprintf(vnum, sizeof(vnum), "[%d] ", EVT_VNUM(event));
+	}
+	else {
+		*vnum = '\0';
+	}
+	
+	// level portion
+	if (EVT_MIN_LEVEL(event) == EVT_MAX_LEVEL(event) && EVT_MIN_LEVEL(event) == 0) {
+		snprintf(part, sizeof(part), " (all levels)");
+	}
+	else {
+		snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0));
+	}
+	
+	// header
+	msg_to_char(ch, "%s\tc%s\t0%s\r\n", vnum, EVT_NAME(event), part);
+	
+	// desc?
+	if (!running || running->status == EVTS_RUNNING || running->status == EVTS_NOT_STARTED) {
+		// show desc while running
+		msg_to_char(ch, "%s", EVT_DESCRIPTION(event));
+	}
+	else if ((running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) + SECS_PER_REAL_WEEK) > time(0)) {
+		// show complete message
+		ended_recently = TRUE;
+		msg_to_char(ch, "%s", EVT_COMPLETE_MSG(event));
+	}
+	else {
+		// show desc in all other cases
+		msg_to_char(ch, "%s", EVT_DESCRIPTION(event));
+	}
+	
+	switch (running->status) {
+		case EVTS_RUNNING: {	// show time remaining
+			msg_to_char(ch, "\tCStatus: Running (ends in %s)\t0\r\n", time_length_string(running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) - time(0)));
+			break;
+		}
+		case EVTS_COMPLETE: {	// show time since end
+			msg_to_char(ch, "\tcStatus: Ended (%s ago)\t0\r\n", time_length_string(running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) - time(0)));
+			break;
+		}
+		// no other status shown
+	}
+	
+	// TODO show current points/rank (or last points/rank if ended)
+	
+	// TODO show:
+	// EVT_RANK_REWARDS(event)	-> probably on another display
+	// EVT_THRESHOLD_REWARDS(evt)	-> probably on another display
+	// EVT_TYPE(evt)
+}
+
+
+/**
+* Displays the current leaderboard for any event that still has 'running' data.
+*
+* @param char_data *ch The person who's looking at the data.
+* @param struct event_running_data *re The event.
+*/
+void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[256];
+	struct event_leaderboard *lb, *next_lb;
+	player_index_data *index;
+	int rank = 0;
+	size_t size;
+	
+	bool need_approval = config_get_bool("event_approval");
+	
+	// basic sanitation
+	if (!re || !re->event || !ch->desc) {
+		msg_to_char(ch, "Unable to display leaderboard.\r\n");
+		return;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Leaderboard for %s:\r\n", EVT_NAME(re->event));
+	HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
+		if (lb->ignore || (need_approval && !lb->approved)) {
+			strcpy(part, " *");
+		}
+		else {
+			sprintf(part, "%2d", ++rank);
+		}
+		
+		index = find_player_index_by_idnum(lb->id);
+		snprintf(line, sizeof(line), "%s. %s (%d)\r\n", part, index ? index->fullname : "???", lb->points);
+		
+		if (size + strlen(line) < sizeof(buf)) {
+			strcat(buf, line);
+			size += strlen(line);
+		}
+		else {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (!re->player_leaderboard) {
+		// always room left in 'buf' in this case
+		snprintf(buf + size, sizeof(buf) - size, " no entries\r\n");
+	}
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* What to show if someone types 'events' with no argument. This shows:
+* - a list of events, if more than 1 are running
+* - the event detail if only 1 is running
+* - a status message if none are running
+*
+* @param char_data *ch The person who typed it.
+*/
+void show_events_no_arg(char_data *ch) {
+	struct event_running_data *running, *only;
+	char part[MAX_STRING_LENGTH];
+	int count;
+	
+	// fetch count and optional only-running-event
+	only = only_one_running_event(&count);
+	
+	if (count == 0) {
+		msg_to_char(ch, "No events are running right now (see HELP EVENTS for more options).\r\n");
+	}
+	else if (count == 1 && only) {
+		show_event_detail(ch, only->event);
+		msg_to_char(ch, "(See HELP EVENTS for more options)\r\n");
+	}
+	else {	// more than 1
+		msg_to_char(ch, "Current events (see HELP EVENTS for more options):\r\n");
+		LL_FOREACH(running_events, running) {
+			if (!running->event) {
+				continue;
+			}
+			if (running->status != EVTS_RUNNING) {
+				continue;
+			}
+			
+			// level portion
+			if (EVT_MIN_LEVEL(running->event) == EVT_MAX_LEVEL(running->event) && EVT_MIN_LEVEL(running->event) == 0) {
+				snprintf(part, sizeof(part), " (all levels)");
+			}
+			else {
+				snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
+			}
+			
+			if (IS_IMMORTAL(ch)) {	// imms see id prefix
+				msg_to_char(ch, "%d.", running->id);
+			}
+			
+			msg_to_char(ch, " %s%s\r\n", EVT_NAME(running->event), part);
+			// TODO show current rank, points, and time remaining
+		}
+	}
+}
+
+
+/**
 * Searches the event db for a match, and prints it to the character.
 *
 * @param char *searchname The search string.
@@ -2216,3 +2500,119 @@ OLC_MODULE(qedit_rewards) {
 }
 
 */
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENTS COMMAND //////////////////////////////////////////////////////////
+
+EVENT_CMD(evcmd_leaderboard);
+
+// subcommand struct for 'events'
+const struct {
+	char *command;
+	EVENT_CMD(*func);
+	int min_level;
+	bitvector_t grant_flag;
+} event_cmd[] = {
+	{ "leaderboard", evcmd_leaderboard, 0, NO_GRANTS },
+	{ "lb", evcmd_leaderboard, 0, NO_GRANTS },
+	
+	/*
+	-- need imm lookup that finds events by id OR most-recent-name
+		- show event id on the list and detail pages
+	
+	x lists current events by default
+	x if only 1 event is running, show event details on no-arg
+	x <name>: details on event
+	- leaderboard/lb <name>: current lb for an event or past event
+	- start
+	- cancel
+	- end (confirm)
+	- need to show stats on participants to imms
+	- announcements and logs go to the /events channel
+	- un-collect command that reset's a player's collection on an event, or else sets it to a certain level
+	- view/claim rewards
+	*/
+
+	// this goes last
+	{ "\n", NULL, 0, NOBITS }
+};
+
+
+ACMD(do_events) {
+	char *argptr, arg[MAX_INPUT_LENGTH];
+	int iter, type = NOTHING;
+	event_data *event;
+	
+	skip_spaces(&argument);
+	argptr = any_one_arg(argument, arg);
+	skip_spaces(&argptr);
+	
+	// find type?
+	for (iter = 0; *event_cmd[iter].command != '\n' && type == NOTHING; ++iter) {
+		if (GET_ACCESS_LEVEL(ch) < event_cmd[iter].min_level && (!event_cmd[iter].grant_flag || !IS_GRANTED(ch, event_cmd[iter].grant_flag))) {
+			continue;	// can't do
+		}
+		
+		// ok?
+		if (is_abbrev(arg, event_cmd[iter].command)) {
+			type = iter;
+		}
+	}
+	
+	// are they looking up an event instead?
+	if (*arg && type == NOTHING && (event = smart_find_event(argument, FALSE))) {
+		show_event_detail(ch, event);
+		return;
+	}
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs can't participate in events.\r\n");
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("event_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!*arg) {
+		show_events_no_arg(ch);
+	}
+	else {
+		// pass to child function
+		(event_cmd[type].func)(ch, argptr);
+	}
+}
+
+
+// displays a leaderboard for an event
+EVENT_CMD(evcmd_leaderboard) {
+	struct event_running_data *re, *only;
+	event_data *event;
+	
+	// if only 1 event is running, show it if no-args
+	only = only_one_running_event(NULL);
+	
+	if (!*argument && only) {
+		show_event_leaderboard(ch, only);
+		return;
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Show leaderboard for which event?\r\n");
+		return;
+	}
+	
+	// targeting: imms may target by event id
+	if (IS_IMMORTAL(ch) && isdigit(*argument) && (re = find_running_event_by_id(atoi(argument)))) {
+		event = re->event;
+		// this is a valid case; all other targeting below happens otherwise:
+	}
+	else if (!(event = smart_find_event(argument, FALSE))) {
+		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
+		return;
+	}
+	else if (!(re = find_last_event_by_vnum(EVT_VNUM(event)))) {
+		msg_to_char(ch, "There is no leaderboard for that event.\r\n");
+		return;
+	}
+	
+	// success
+	show_event_leaderboard(ch, re);
+}

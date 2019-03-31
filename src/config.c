@@ -1666,6 +1666,7 @@ void init_config_system(void) {
 	init_config(CONFIG_APPROVAL, "build_approval", CONFTYPE_BOOL, "build, upgrade, lay roads, roadsigns");
 	init_config(CONFIG_APPROVAL, "chat_approval", CONFTYPE_BOOL, "slash-channels and global channels");
 	init_config(CONFIG_APPROVAL, "craft_approval", CONFTYPE_BOOL, "all crafting commands");
+	init_config(CONFIG_APPROVAL, "event_approval", CONFTYPE_BOOL, "participate in events");
 	init_config(CONFIG_APPROVAL, "gather_approval", CONFTYPE_BOOL, "all resource gathering");
 	init_config(CONFIG_APPROVAL, "join_empire_approval", CONFTYPE_BOOL, "pledge, enroll");
 	init_config(CONFIG_APPROVAL, "manage_empire_approval", CONFTYPE_BOOL, "commands related to having an empire");

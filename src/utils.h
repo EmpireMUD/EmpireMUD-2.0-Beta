@@ -1695,6 +1695,7 @@ void prune_crlf(char *txt);
 extern const char *skip_filler(char *string);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
 void sprinttype(int type, const char *names[], char *result);
+extern char *time_length_string(int seconds);
 extern char *trim(char *string);
 
 // world functions in utils.c

@@ -4336,6 +4336,45 @@ char *str_str(char *cs, char *ct) {
 
 
 /**
+* Takes a number of seconds and returns a string like "5 days, 1 hour, 
+* 30 minutes, 27 seconds".
+*
+* @param int seconds Amount of time.
+* @return char* The string describing the time.
+*/
+char *time_length_string(int seconds) {
+	static char output[MAX_STRING_LENGTH];
+	bool any = FALSE;
+	int left, amt;
+	
+	*output = '\0';
+	left = ABSOLUTE(seconds);	// sometimes we get negative seconds for times in the future?
+	
+	if ((amt = (left / SECS_PER_REAL_DAY)) > 0) {
+		sprintf(output + strlen(output), "%s%d day%s", (any ? ", " : ""), amt, PLURAL(amt));
+		left -= (amt * SECS_PER_REAL_DAY);
+		any = TRUE;
+	}
+	if ((amt = (left / SECS_PER_REAL_HOUR)) > 0) {
+		sprintf(output + strlen(output), "%s%d hour%s", (any ? ", " : ""), amt, PLURAL(amt));
+		left -= (amt * SECS_PER_REAL_HOUR);
+		any = TRUE;
+	}
+	if ((amt = (left / SECS_PER_REAL_MIN)) > 0) {
+		sprintf(output + strlen(output), "%s%d minute%s", (any ? ", " : ""), amt, PLURAL(amt));
+		left -= (amt * SECS_PER_REAL_MIN);
+		any = TRUE;
+	}
+	if (left > 0) {
+		sprintf(output + strlen(output), "%s%d seconds%s", (any ? ", " : ""), left, PLURAL(left));
+		any = TRUE;
+	}
+	
+	return output;
+}
+
+
+/**
 * Removes spaces (' ') from the end of a string, and returns a pointer to the
 * first non-space character.
 *

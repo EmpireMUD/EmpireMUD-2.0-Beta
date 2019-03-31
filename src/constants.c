@@ -560,6 +560,7 @@ const char *grant_bits[] = {
 	"automessage",
 	"peace",	// 40
 	"unprogress",
+	"events",
 	"\n"
 };
 

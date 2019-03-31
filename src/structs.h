@@ -1984,6 +1984,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_AUTOMESSAGE  BIT(39)
 #define GRANT_PEACE  BIT(40)
 #define GRANT_UNPROGRESS  BIT(41)
+#define GRANT_EVENTS  BIT(42)
 
 
 // Lore types
@@ -4621,6 +4622,8 @@ struct event_running_data {
 struct event_leaderboard {
 	int id;	// player or empire id
 	int points;	// last-recorded points
+	bool approved;	// in case we can't count unapproved chars
+	bool ignore;	// for imms or people who are disqualified, won't count toward rank
 	
 	UT_hash_handle hh;	// hash handle for running_event->player_leaderboard or running_event->empire_leaderboard
 };

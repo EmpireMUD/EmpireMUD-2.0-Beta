@@ -405,6 +405,7 @@ Most of the grant names correspond to actual commands, but some are special:
  olc - Allows .olc, vnum, and vstat.
  olc-controls - Allows .setflags, .setminvnum, and .setmaxvnum.
  transfer - Allows moving mortals with commands like transfer and portal.
+ events - Allows more event commands and starting/stopping events.
 
 Try 'helpsearch grantable' to find grantable commands. You can also type
 'set <name> grants' with no other arguments to see a list of grants.
