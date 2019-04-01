@@ -2768,7 +2768,7 @@ EVENT_CMD(evcmd_cancel) {
 	else if (is_number(argument) && !(re = find_running_event_by_id(atoi(argument)))) {
 		msg_to_char(ch, "Unknown event id '%s'.\r\n", argument);
 	}
-	else if (!(event = smart_find_event(argument, TRUE))) {
+	else if (!re && !(event = smart_find_event(argument, TRUE))) {
 		msg_to_char(ch, "Unable to find a running event called '%s'.\r\n", argument);
 	}
 	else {
@@ -2804,7 +2804,7 @@ EVENT_CMD(evcmd_end) {
 	else if (is_number(argument) && !(re = find_running_event_by_id(atoi(argument)))) {
 		msg_to_char(ch, "Unknown event id '%s'.\r\n", argument);
 	}
-	else if (!(event = smart_find_event(argument, TRUE))) {
+	else if (!re && !(event = smart_find_event(argument, TRUE))) {
 		msg_to_char(ch, "Unable to find a running event called '%s'.\r\n", argument);
 	}
 	else {

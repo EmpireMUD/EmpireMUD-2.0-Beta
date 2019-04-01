@@ -4370,6 +4370,10 @@ char *time_length_string(int seconds) {
 		any = TRUE;
 	}
 	
+	if (!*output) {
+		strcpy(output, "0 seconds");
+	}
+	
 	return output;
 }
 
