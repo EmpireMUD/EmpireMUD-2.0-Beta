@@ -914,6 +914,7 @@ void update_reboot(void) {
 
 void heartbeat(int heart_pulse) {
 	void check_death_respawn();
+	void check_event_timers();
 	void check_expired_cooldowns();
 	void check_idle_passwords();
 	void check_newbie_islands();
@@ -1109,6 +1110,7 @@ void heartbeat(int heart_pulse) {
 			process_imports();
 			if (debug_log && HEARTBEAT(15)) { log("debug 25.5:\t%lld", microtime()); }
 		}
+		check_event_timers();
 		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
 	}
 	

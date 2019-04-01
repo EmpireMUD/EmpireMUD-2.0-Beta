@@ -57,6 +57,7 @@ extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_v
 extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 
 // local protos
+struct player_event_data *get_event_data(char_data *ch, int event_id);
 void update_player_leaderboard(char_data *ch, struct event_running_data *re, struct player_event_data *ped);
 
 
@@ -65,6 +66,72 @@ void update_player_leaderboard(char_data *ch, struct event_running_data *re, str
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Gets a character's rank in an event. It returns NOTHING if ch is unranked.
+*
+* @param char_data *ch the player.
+* @param struct event_running_data *re The event to check rank for.
+* @return int The rank, or NOTHING if not ranked in the event.
+*/
+int get_event_rank(char_data *ch, struct event_running_data *re) {
+	struct event_leaderboard *lb, *next_lb;
+	int rank = 0;
+	
+	if (!ch || !re) {
+		return NOTHING;
+	}
+	
+	HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
+		// compute rank
+		if (!lb->ignore && (lb->approved || !config_get_bool("event_approval"))) {
+			++rank;	// otherwise they don't count toward rank
+		}
+		
+		// it me?
+		if (lb->id == GET_IDNUM(ch)) {
+			return rank;
+		}
+	}
+	
+	// not found
+	return NOTHING;
+}
+
+
+/**
+* Ends an event that was running.
+*
+* @param event_data *event
+*/
+void end_event(struct event_running_data *re) {
+	struct player_event_data *ped;
+	event_data *event;
+	char_data *ch;
+	
+	// basic safety
+	if (!re || !(event = re->event)) {
+		return;
+	}
+	
+	// change status
+	re->status = EVTS_COMPLETE;
+	events_need_save = TRUE;
+	
+	// update all in-game players so they have their current rank
+	LL_FOREACH(character_list, ch) {
+		if (IS_NPC(ch) || !(ped = get_event_data(ch, re->id))) {
+			continue;	// no work
+		}
+		
+		ped->status = EVTS_COMPLETE;	// but not collected
+		ped->rank = get_event_rank(ch, re);
+	}
+	
+	// announce
+	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has ended!", EVT_NAME(event));
+}
+
 
 /**
 * Quick way to turn a vnum into a name, safely.
@@ -227,6 +294,43 @@ event_data *smart_find_event(char *name, bool running_only) {
 }
 
 
+/**
+* Starts an event running.
+*
+* @param event_data *event
+*/
+void start_event(event_data *event) {
+	struct event_running_data *re;
+	
+	// basic safety
+	if (!event) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: start_event called with no event");
+		return;
+	}
+	if (find_running_event_by_id(EVT_VNUM(event))) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: start_event called on event that's already running");
+		return;
+	}
+	if (EVT_FLAGGED(event, EVTF_IN_DEVELOPMENT)) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: start_event called with on IN-DEV event");
+		return;
+	}
+	
+	// let's a-go
+	CREATE(re, struct event_running_data, 1);
+	re->id = ++top_event_id;
+	re->event = event;
+	re->start_time = time(0);	// TODO add a way to delay-start?
+	re->status = EVTS_RUNNING;	// ^ would set it to EVTS_NOT_STARTED if so
+	
+	LL_PREPEND(running_events, re);	// newest always first (must sort if delay-start is added)
+	events_need_save = TRUE;
+	
+	// announce
+	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has been begun!", EVT_NAME(event));
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LEADERBOARD HELPERS /////////////////////////////////////////////////////
 
@@ -294,8 +398,8 @@ void check_player_events(char_data *ch) {
 		// check status
 		if ((running = find_running_event_by_id(ped->id))) {
 			if (running->status == EVTS_COMPLETE && ped->status == EVTS_RUNNING) {
-				// TODO should event completion be processed here?
 				ped->status = running->status;	// copy event status
+				ped->rank = get_event_rank(ch, running);
 			}
 			else if (running->status == EVTS_RUNNING && ped->status == EVTS_NOT_STARTED) {
 				ped->status = running->status;	// just copy this status
@@ -383,7 +487,7 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		return 0;	// no work
 	}
 	
-	if (!(running = find_running_event_by_vnum(event_vnum))) {
+	if (!(running = find_running_event_by_vnum(event_vnum)) || running->status != EVTS_RUNNING) {
 		return 0;	// no running event
 	}
 	if (!(ped = create_event_data(ch, running->id, event_vnum))) {
@@ -500,12 +604,32 @@ void update_player_leaderboard(char_data *ch, struct event_running_data *re, str
 * @param struct event_running_data *re The event to cancel.
 */
 void cancel_running_event(struct event_running_data *re) {
+	struct player_event_data *ped;
+	char_data *chiter;
+	int id;
+	
 	if (!re) {
 		return;
 	}
 	
-	// TODO: remove data from all active players
-	// TODO: message to players
+	// announce
+	if (re->event) {
+		log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has been canceled", EVT_NAME(re->event));
+	}
+	
+	// look for people with event data and remove it
+	id = re->id;
+	LL_FOREACH(character_list, chiter) {
+		if (IS_NPC(chiter)) {
+			continue;
+		}
+		
+		HASH_FIND_INT(GET_EVENT_DATA(chiter), &id, ped);
+		if (ped) {
+			HASH_DEL(GET_EVENT_DATA(chiter), ped);
+			free(ped);
+		}
+	}
 	
 	// remove
 	LL_DELETE(running_events, re);
@@ -521,9 +645,41 @@ void cancel_running_event(struct event_running_data *re) {
 
 
 /**
+* This function should be called roughly once per minute to check for events
+* ending.
+*/
+void check_event_timers(void) {
+	struct event_running_data *re, *next_re;
+	
+	LL_FOREACH_SAFE(running_events, re, next_re) {
+		if (!re->event) {
+			continue;	// cannot work without this -- should we remove it?
+		}
+		
+		// EVTS_x: what to do as time passes
+		switch (re->status) {
+			case EVTS_NOT_STARTED: {
+				// TODO add a delay-start system that compares start_time to now
+				break;
+			}
+			case EVTS_RUNNING: {
+				if (re->start_time + (EVT_DURATION(re->event) * SECS_PER_REAL_MIN) < time(0)) {
+					end_event(re);
+				}
+				break;
+			}
+			// no default: no work for other statuses
+		}
+		
+		// TODO: expire very old event data
+	}
+}
+
+
+/**
 * Audits all the currently-running events, on startup.
 */
-void check_running_events(void) {
+void verify_running_events(void) {
 	struct event_running_data *re, *next_re;
 	bool bad;
 	
@@ -539,7 +695,7 @@ void check_running_events(void) {
 		
 		// oops:
 		if (bad) {
-			log("check_running_events: Canceling event %d (%s)", re->id, re->event ? EVT_NAME(re->event) : "invalid event");
+			log("verify_running_events: Canceling event %d (%s)", re->id, re->event ? EVT_NAME(re->event) : "invalid event");
 			cancel_running_event(re);
 		}
 	}
@@ -635,7 +791,7 @@ struct event_running_data *load_one_running_event(FILE *fl, int id) {
 	else {
 		CREATE(re, struct event_running_data, 1);
 		re->id = id;
-		LL_PREPEND(running_events, re);
+		LL_APPEND(running_events, re);
 	}
 	
 	// line 1: vnum start-time status
@@ -1827,6 +1983,7 @@ void show_event_detail(char_data *ch, event_data *event) {
 	}
 	
 	// TODO show current points/rank (or last points/rank if ended)
+		// get_event_rank(ch, running);
 	
 	// TODO show:
 	// EVT_RANK_REWARDS(event)	-> probably on another display
@@ -1897,8 +2054,9 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 */
 void show_events_no_arg(char_data *ch) {
 	struct event_running_data *running, *only;
+	struct player_event_data *ped;
 	char part[MAX_STRING_LENGTH];
-	int count;
+	int count, rank;
 	
 	// fetch count and optional only-running-event
 	only = only_one_running_event(&count);
@@ -1932,8 +2090,21 @@ void show_events_no_arg(char_data *ch) {
 				msg_to_char(ch, "%d.", running->id);
 			}
 			
-			msg_to_char(ch, " %s%s\r\n", EVT_NAME(running->event), part);
-			// TODO show current rank, points, and time remaining
+			msg_to_char(ch, " %s%s", EVT_NAME(running->event), part);
+			
+			if ((ped = get_event_data(ch, running->id))) {
+				if ((rank = get_event_rank(ch, running)) > 0) {
+					sprintf(part, "rank %d", rank);
+				}
+				else {
+					strcpy(part, "unranked");
+				}
+				msg_to_char(ch, " (%d point%s, %s)", ped->points, PLURAL(ped->points), part);
+			}
+			
+			msg_to_char(ch, "\r\n");
+			
+			// TODO show time remaining?
 		}
 	}
 }
@@ -2505,7 +2676,9 @@ OLC_MODULE(qedit_rewards) {
  //////////////////////////////////////////////////////////////////////////////
 //// EVENTS COMMAND //////////////////////////////////////////////////////////
 
+EVENT_CMD(evcmd_cancel);
 EVENT_CMD(evcmd_leaderboard);
+EVENT_CMD(evcmd_start);
 
 // subcommand struct for 'events'
 const struct {
@@ -2517,19 +2690,16 @@ const struct {
 	{ "leaderboard", evcmd_leaderboard, 0, NO_GRANTS },
 	{ "lb", evcmd_leaderboard, 0, NO_GRANTS },
 	
+	// immortal commands
+	{ "cancel", evcmd_cancel, LVL_CIMPL, GRANT_EVENTS },
+	{ "start", evcmd_start, LVL_CIMPL, GRANT_EVENTS },
+	
 	/*
 	-- need imm lookup that finds events by id OR most-recent-name
 		- show event id on the list and detail pages
 	
-	x lists current events by default
-	x if only 1 event is running, show event details on no-arg
-	x <name>: details on event
-	- leaderboard/lb <name>: current lb for an event or past event
-	- start
-	- cancel
 	- end (confirm)
 	- need to show stats on participants to imms
-	- announcements and logs go to the /events channel
 	- un-collect command that reset's a player's collection on an event, or else sets it to a certain level
 	- view/claim rewards
 	*/
@@ -2582,6 +2752,42 @@ ACMD(do_events) {
 }
 
 
+// cancels a current event
+EVENT_CMD(evcmd_cancel) {
+	struct event_running_data *re = NULL;
+	event_data *event = NULL;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Cancel which event (id or name)?\r\n");
+	}
+	else if (is_number(argument) && !(re = find_running_event_by_id(atoi(argument)))) {
+		msg_to_char(ch, "Unknown event id '%s'.\r\n", argument);
+	}
+	else if (!(event = smart_find_event(argument, TRUE))) {
+		msg_to_char(ch, "Unable to find a running event called '%s'.\r\n", argument);
+	}
+	else {
+		// quick data check
+		if (event && !re) {
+			re = find_running_event_by_vnum(EVT_VNUM(event));
+		}
+		else if (re && !event) {
+			event = re->event;
+		}
+		
+		if (!re || !event) {
+			msg_to_char(ch, "Unable to find event to cancel.\r\n");
+			return;
+		}
+		
+		// ok cancel it
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has canceled event: %d %s", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event));
+		send_config_msg(ch, "ok_string");
+		cancel_running_event(re);
+	}
+}
+
+
 // displays a leaderboard for an event
 EVENT_CMD(evcmd_leaderboard) {
 	struct event_running_data *re, *only;
@@ -2615,4 +2821,28 @@ EVENT_CMD(evcmd_leaderboard) {
 	
 	// success
 	show_event_leaderboard(ch, re);
+}
+
+
+// starts an event
+EVENT_CMD(evcmd_start) {
+	event_data *event;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Start what event?\r\n");
+	}
+	else if (!(event = smart_find_event(argument, FALSE))) {
+		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
+	}
+	else if (find_running_event_by_id(EVT_VNUM(event))) {
+		msg_to_char(ch, "That event is already running.\r\n");
+	}
+	else if (EVT_FLAGGED(event, EVTF_IN_DEVELOPMENT)) {
+		msg_to_char(ch, "You cannot start that event because it's flagged as in-development.\r\n");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has started event: %d %s", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event));
+		send_config_msg(ch, "ok_string");
+		start_event(event);
+	}
 }

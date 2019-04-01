@@ -693,6 +693,24 @@ empire if you give no argument.
 
 See also: EMPIRE
 #
+EVENT EVENTS
+
+Usage:  events [command]
+
+From time to time, there are global events that all players may participate in.
+Prizes are awarded based on total points earned (threshold rewards) and on your
+rank amongst all participants (ranked rewards).
+
+Typing 'events' by itself lists any events that are currently running, or you
+can type 'event <name>' to see info on an event.
+
+You can also use the following event commands:
+ &clb <event>&0 - View the leaderboard for a current or past event.
+
+Immortal event commands:
+ &ccancel <id/event>&0 - Cancel a running event (with no rewards).
+ &cstart <event>&0 - Start an event.
+#
 EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
 
 Usage:  excavate

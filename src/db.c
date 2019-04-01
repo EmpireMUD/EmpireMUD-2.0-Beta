@@ -464,7 +464,6 @@ void boot_world(void) {
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
 	void check_newbie_islands();
-	void check_running_events();
 	void check_triggers();
 	void clean_empire_logs();
 	void index_boot_world();
@@ -479,6 +478,7 @@ void boot_world(void) {
 	void read_ability_requirements();
 	void renum_world();
 	void setup_start_locations();
+	void verify_running_events();
 	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
 	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
 	extern int sort_augments_by_data(augment_data *a, augment_data *b);
@@ -613,7 +613,7 @@ void boot_world(void) {
 	check_skills();
 	check_for_bad_buildings();
 	check_for_bad_sectors();
-	check_running_events();
+	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
 	
