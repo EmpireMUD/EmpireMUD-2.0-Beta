@@ -1970,16 +1970,18 @@ void show_event_detail(char_data *ch, event_data *event) {
 		msg_to_char(ch, "%s", EVT_DESCRIPTION(event));
 	}
 	
-	switch (running->status) {
-		case EVTS_RUNNING: {	// show time remaining
-			msg_to_char(ch, "\tCStatus: Running (ends in %s)\t0\r\n", time_length_string(running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) - time(0)));
-			break;
+	if (running) {
+		switch (running->status) {
+			case EVTS_RUNNING: {	// show time remaining
+				msg_to_char(ch, "\tCStatus: Running (ends in %s)\t0\r\n", time_length_string(running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) - time(0)));
+				break;
+			}
+			case EVTS_COMPLETE: {	// show time since end
+				msg_to_char(ch, "\tcStatus: Ended (%s ago)\t0\r\n", time_length_string(running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) - time(0)));
+				break;
+			}
+			// no other status shown
 		}
-		case EVTS_COMPLETE: {	// show time since end
-			msg_to_char(ch, "\tcStatus: Ended (%s ago)\t0\r\n", time_length_string(running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) - time(0)));
-			break;
-		}
-		// no other status shown
 	}
 	
 	// TODO show current points/rank (or last points/rank if ended)
