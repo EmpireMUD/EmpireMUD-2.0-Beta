@@ -349,6 +349,7 @@ struct event_leaderboard *get_event_leaderboard_entry(struct event_leaderboard *
 	if (!el) {
 		CREATE(el, struct event_leaderboard, 1);
 		el->id = id;
+		HASH_ADD_INT(*hash, id, el);
 	}
 	
 	return el;
