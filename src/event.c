@@ -2875,7 +2875,7 @@ EVENT_CMD(evcmd_start) {
 	else if (!(event = smart_find_event(argument, FALSE))) {
 		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
 	}
-	else if (find_running_event_by_id(EVT_VNUM(event))) {
+	else if (find_running_event_by_vnum(EVT_VNUM(event))) {
 		msg_to_char(ch, "That event is already running.\r\n");
 	}
 	else if (EVT_FLAGGED(event, EVTF_IN_DEVELOPMENT)) {
