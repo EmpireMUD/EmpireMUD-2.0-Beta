@@ -4366,7 +4366,7 @@ char *time_length_string(int seconds) {
 		any = TRUE;
 	}
 	if (left > 0) {
-		sprintf(output + strlen(output), "%s%d seconds%s", (any ? ", " : ""), left, PLURAL(left));
+		sprintf(output + strlen(output), "%s%d second%s", (any ? ", " : ""), left, PLURAL(left));
 		any = TRUE;
 	}
 	

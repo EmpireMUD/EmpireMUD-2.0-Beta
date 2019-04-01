@@ -2747,6 +2747,9 @@ ACMD(do_events) {
 	else if (!*arg) {
 		show_events_no_arg(ch);
 	}
+	else if (type == NOTHING || !event_cmd[type].func) {
+		msg_to_char(ch, "Invalid event command. See HELP EVENTS for more info.\r\n");
+	}
 	else {
 		// pass to child function
 		(event_cmd[type].func)(ch, argptr);
