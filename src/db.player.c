@@ -2262,7 +2262,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
-	struct player_event_data *ped, *next_ped;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
 	struct minipet_data *mini, *next_mini;
@@ -2465,11 +2464,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'E'
-	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
-		if (ped->event) {
-			fprintf(fl, "Event: %d %d %ld %d %d %d %d\n", ped->id, EVT_VNUM(ped->event), ped->timestamp, ped->points, ped->collected_points, ped->rank, ped->status);
-		}
-	}
 	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
 		if (GET_EXTRA_ATT(ch, iter)) {
 			fprintf(fl, "Extra Attribute: %s %d\n", extra_attribute_types[iter], GET_EXTRA_ATT(ch, iter));
@@ -2697,6 +2691,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct player_automessage *automsg, *next_automsg;
 	struct player_slash_history *psh, *next_psh;
 	struct player_faction_data *pfd, *next_pfd;
+	struct player_event_data *ped, *next_ped;
 	struct channel_history_data *hist;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
@@ -2729,6 +2724,13 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'C'
 	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
 		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
+	}
+	
+	// 'E'
+	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
+		if (ped->event) {
+			fprintf(fl, "Event: %d %d %ld %d %d %d %d\n", ped->id, EVT_VNUM(ped->event), ped->timestamp, ped->points, ped->collected_points, ped->rank, ped->status);
+		}
 	}
 	
 	// 'F'
