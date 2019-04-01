@@ -2677,6 +2677,7 @@ OLC_MODULE(qedit_rewards) {
 //// EVENTS COMMAND //////////////////////////////////////////////////////////
 
 EVENT_CMD(evcmd_cancel);
+EVENT_CMD(evcmd_end);
 EVENT_CMD(evcmd_leaderboard);
 EVENT_CMD(evcmd_start);
 
@@ -2692,6 +2693,7 @@ const struct {
 	
 	// immortal commands
 	{ "cancel", evcmd_cancel, LVL_CIMPL, GRANT_EVENTS },
+	{ "end", evcmd_end, LVL_CIMPL, GRANT_EVENTS },
 	{ "start", evcmd_start, LVL_CIMPL, GRANT_EVENTS },
 	
 	/*
@@ -2752,7 +2754,7 @@ ACMD(do_events) {
 }
 
 
-// cancels a current event
+// cancels a current event (no rewards)
 EVENT_CMD(evcmd_cancel) {
 	struct event_running_data *re = NULL;
 	event_data *event = NULL;
@@ -2784,6 +2786,42 @@ EVENT_CMD(evcmd_cancel) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has canceled event: %d %s", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event));
 		send_config_msg(ch, "ok_string");
 		cancel_running_event(re);
+	}
+}
+
+
+// ends a current event (with rewards)
+EVENT_CMD(evcmd_end) {
+	struct event_running_data *re = NULL;
+	event_data *event = NULL;
+	
+	if (!*argument) {
+		msg_to_char(ch, "End which event (id or name)?\r\n");
+	}
+	else if (is_number(argument) && !(re = find_running_event_by_id(atoi(argument)))) {
+		msg_to_char(ch, "Unknown event id '%s'.\r\n", argument);
+	}
+	else if (!(event = smart_find_event(argument, TRUE))) {
+		msg_to_char(ch, "Unable to find a running event called '%s'.\r\n", argument);
+	}
+	else {
+		// quick data check
+		if (event && !re) {
+			re = find_running_event_by_vnum(EVT_VNUM(event));
+		}
+		else if (re && !event) {
+			event = re->event;
+		}
+		
+		if (!re || !event) {
+			msg_to_char(ch, "Unable to find event to end.\r\n");
+			return;
+		}
+		
+		// ok end it
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has ended event: %d %s", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event));
+		send_config_msg(ch, "ok_string");
+		end_event(re);
 	}
 }
 

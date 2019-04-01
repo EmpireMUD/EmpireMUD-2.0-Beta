@@ -709,6 +709,7 @@ You can also use the following event commands:
 
 Immortal event commands:
  &ccancel <id/event>&0 - Cancel a running event (with no rewards).
+ &cend <id/event>&0 - End a running event early (with rewards).
  &cstart <event>&0 - Start an event.
 #
 EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
