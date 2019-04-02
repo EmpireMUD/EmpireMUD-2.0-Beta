@@ -2415,7 +2415,6 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 		}
 	}
 	if (!EVT_THRESHOLD_REWARDS(re->event)) {
-		// always room left in 'buf' in this case
 		snprintf(buf + size, sizeof(buf) - size, " no threshold rewards\r\n");
 	}
 	
@@ -2435,9 +2434,8 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 			break;
 		}
 	}
-	if (!EVT_THRESHOLD_REWARDS(re->event)) {
-		// always room left in 'buf' in this case
-		snprintf(buf + size, sizeof(buf) - size, " no threshold rewards\r\n");
+	if (!EVT_RANK_REWARDS(re->event)) {
+		snprintf(buf + size, sizeof(buf) - size, " no rank rewards\r\n");
 	}
 	
 	page_string(ch->desc, buf, TRUE);
