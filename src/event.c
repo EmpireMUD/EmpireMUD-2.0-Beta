@@ -148,7 +148,7 @@ char *get_event_name_by_proto(any_vnum vnum) {
 
 
 /**
-* Gets standard string display like "4x lumber" for an event reward.
+* Wraps quest_reward_string for use with event rewards.
 *
 * @param struct event_reward *reward The reward to show.
 * @param bool show_vnums If TRUE, adds [1234] at the start of the string.
@@ -156,28 +156,15 @@ char *get_event_name_by_proto(any_vnum vnum) {
 */
 char *event_reward_string(struct event_reward *reward, bool show_vnums) {
 	extern char *quest_reward_string(struct quest_reward *reward, bool show_vnums);
-	
-	static char output[256];
+
 	struct quest_reward qr;
-	
-	*output = '\0';
-	if (!reward) {
-		return output;
-	}
-	
+
 	// borrow data to use the other reward string func
 	qr.type = reward->type;
 	qr.vnum = reward->vnum;
 	qr.amount = reward->amount;
 	
-	if (reward->max) {
-		snprintf(output, sizeof(output), "%d-%d: %s", reward->min, reward->max, quest_reward_string(&qr, show_vnums));
-	}
-	else {
-		snprintf(output, sizeof(output), "%d: %s", reward->min, quest_reward_string(&qr, show_vnums));
-	}
-	
-	return output;
+	return quest_reward_string(&qr, show_vnums);
 }
 
 
@@ -1427,6 +1414,7 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 	int findtype, num = 1, stype, temp, min, max = 0;
 	any_vnum vnum;
 	bool found;
+	char *pos;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
 	
@@ -1517,7 +1505,14 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 		// usage: rewards add <min> [max] <type> <amount> <vnum/type>
 		argument = any_one_arg(argument, min_arg);
 		if (rank) {
-			argument = any_one_arg(argument, max_arg);
+			// check for optional "min-max" with a dash
+			if ((pos = strchr(min_arg, '-'))) {
+				*pos = '\0';
+				strcpy(max_arg, pos+1);
+			}
+			else {
+				argument = any_one_arg(argument, max_arg);
+			}
 		}
 		argument = any_one_arg(argument, type_arg);
 		argument = any_one_arg(argument, num_arg);
@@ -1559,7 +1554,15 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 			
 			LL_PREPEND(*list, reward);
 			LL_SORT(*list, sort_event_rewards);
-			msg_to_char(ch, "You add %s %s reward: %s\r\n", AN(quest_reward_types[stype]), quest_reward_types[stype], event_reward_string(reward, TRUE));
+			
+			if (rank) {
+				sprintf(buf, "ranks %d-%d", min, max);
+			}
+			else {
+				sprintf(buf, "%d points", min);
+			}
+			
+			msg_to_char(ch, "You add %s %s reward for %s: %s\r\n", AN(quest_reward_types[stype]), quest_reward_types[stype], buf, event_reward_string(reward, TRUE));
 		}
 	}	// end 'add'
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -2121,15 +2124,20 @@ event_data *setup_olc_event(event_data *input) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_event_reward_display(struct event_reward *list, char *save_buffer) {
+	char buf[MAX_STRING_LENGTH];
 	struct event_reward *reward;
 	int count = 0;
 	
 	*save_buffer = '\0';
-	LL_FOREACH(list, reward) {		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], event_reward_string(reward, TRUE));
+	LL_FOREACH(list, reward) {
+		if (reward->max > 0) {
+			sprintf(buf, "Ranks %d-%d", reward->min, reward->max);
+		}
+		else {
+			sprintf(buf, "%d points", reward->min);
+		}
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s: %s\r\n", ++count, buf, quest_reward_types[reward->type], event_reward_string(reward, TRUE));
 	}
-	
-	// TODO could borrow from quest reward types display
 	
 	// empty list not shown
 }
