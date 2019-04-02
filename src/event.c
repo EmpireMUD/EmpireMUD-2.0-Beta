@@ -2421,10 +2421,10 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 	
 	// RANK
 	size += snprintf(buf + size, sizeof(buf) - size, "Rank rewards for %s:\r\n", EVT_NAME(re->event));
-	LL_FOREACH(EVT_THRESHOLD_REWARDS(re->event), reward) {
+	LL_FOREACH(EVT_RANK_REWARDS(re->event), reward) {
 		collect = (ped->rank >= reward->min && ped->rank <= reward->max);
 		done = (ped->status == EVTS_COLLECTED);
-		snprintf(line, sizeof(line), "%sRank %d-%d: %s%s\t0\r\n", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : "");
+		snprintf(line, sizeof(line), "%s %d-%d: %s%s\t0\r\n", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : "");
 		
 		if (size + strlen(line) < sizeof(buf)) {
 			strcat(buf, line);
