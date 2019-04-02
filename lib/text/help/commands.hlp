@@ -705,6 +705,7 @@ Typing 'events' by itself lists any events that are currently running, or you
 can type 'event <name>' to see info on an event.
 
 You can also use the following event commands:
+ &ccollect&0 - Collect all your pending event rewards.
  &clb <event>&0 - View the leaderboard for a current or past event.
 
 Immortal event commands:

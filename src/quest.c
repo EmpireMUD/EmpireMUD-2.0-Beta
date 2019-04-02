@@ -628,6 +628,143 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 
 
 /**
+* Gives out the actual quest rewards. This is also used by the event system.
+*
+* @param char_data *ch The person receiving the reward.
+* @param struct quest_reward *list The list of 0 or more quest rewards.
+* @param int reward_level The scale level of any rewards (pass get_approximate_level(ch) if you're not sure what to pass).
+* @param empire_data *quest_giver_emp Optional: If applicable, the empire that gave the quest. (For events, this can be the player's own empire.)
+* @param int instance_id Optional: If the quest is associated with an instance, pass its id. Otherwise, 0 is fine.
+*/
+void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
+	void clear_char_abilities(char_data *ch, any_vnum skill);
+	void scale_item_to_level(obj_data *obj, int level);
+	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
+	
+	char buf[MAX_STRING_LENGTH];
+	struct quest_reward *reward;
+	
+	LL_FOREACH(list, reward) {
+		// QR_x: reward the rewards
+		switch (reward->type) {
+			case QR_BONUS_EXP: {
+				msg_to_char(ch, "\tyYou gain %d bonus experience point%s!\t0\r\n", reward->amount, PLURAL(reward->amount));
+				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), reward->amount, 0, UCHAR_MAX, FALSE);
+				break;
+			}
+			case QR_COINS: {
+				empire_data *coin_emp = (reward->vnum == OTHER_COIN ? NULL : quest_giver_emp);
+				msg_to_char(ch, "\tyYou receive %s!\t0\r\n", money_amount(coin_emp, reward->amount));
+				increase_coins(ch, coin_emp, reward->amount);
+				break;
+			}
+			case QR_CURRENCY: {
+				generic_data *gen;
+				if ((gen = find_generic(reward->vnum, GENERIC_CURRENCY))) {
+					msg_to_char(ch, "\tyYou receive %d %s!\t0\r\n", reward->amount, reward->amount != 1 ? GET_CURRENCY_PLURAL(gen) : GET_CURRENCY_SINGULAR(gen));
+					add_currency(ch, reward->vnum, reward->amount);
+				}
+				break;
+			}
+			case QR_OBJECT: {
+				obj_data *obj = NULL;
+				int iter;
+				for (iter = 0; iter < reward->amount; ++iter) {
+					obj = read_object(reward->vnum, TRUE);
+					scale_item_to_level(obj, reward_level);
+					if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+						obj_to_char(obj, ch);
+					}
+					else {
+						obj_to_room(obj, IN_ROOM(ch));
+					}
+					
+					// ensure binding
+					if (!IS_NPC(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+						bind_obj_to_player(obj, ch);
+						reduce_obj_binding(obj, ch);
+					}
+					
+					load_otrigger(obj);
+				}
+				
+				// mark gained
+				if (GET_LOYALTY(ch)) {
+					add_production_total(GET_LOYALTY(ch), reward->vnum, reward->amount);
+				}
+				
+				if (reward->amount > 1) {
+					snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
+				}
+				else {
+					snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
+				}
+				
+				if (obj) {
+					act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+				}
+				break;
+			}
+			case QR_SET_SKILL: {
+				int val = MAX(0, MIN(CLASS_SKILL_CAP, reward->amount));
+				bool loss;
+				
+				loss = (val < get_skill_level(ch, reward->vnum));
+				set_skill(ch, reward->vnum, val);
+				
+				msg_to_char(ch, "\tyYour %s is now level %d!\t0\r\n", get_skill_name_by_vnum(reward->vnum), val);
+				
+				if (loss) {
+					clear_char_abilities(ch, reward->vnum);
+				}
+				
+				break;
+			}
+			case QR_SKILL_EXP: {
+				msg_to_char(ch, "\tyYou gain %s skill experience!\t0\r\n", get_skill_name_by_vnum(reward->vnum));
+				gain_skill_exp(ch, reward->vnum, reward->amount);
+				break;
+			}
+			case QR_SKILL_LEVELS: {
+				if (gain_skill(ch, find_skill_by_vnum(reward->vnum), reward->amount)) {
+					// sends its own message
+					// msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), get_skill_level(ch, reward->vnum));
+				}
+				break;
+			}
+			case QR_QUEST_CHAIN: {
+				quest_data *start = quest_proto(reward->vnum);
+				struct instance_data *inst = get_instance_by_id(instance_id);
+				
+				if (start && QUEST_FLAGGED(start, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+					break;	// player does not want tutorials to auto-chain
+				}
+				
+				// shows nothing if the player doesn't qualify
+				if (start && !is_on_quest(ch, reward->vnum) && char_meets_prereqs(ch, start, inst)) {
+					if (!PRF_FLAGGED(ch, PRF_COMPACT)) {
+						msg_to_char(ch, "\r\n");	// add some spacing
+					}
+					start_quest(ch, start, inst);
+				}
+				
+				break;
+			}
+			case QR_REPUTATION: {
+				gain_reputation(ch, reward->vnum, reward->amount, FALSE, TRUE);
+				break;
+			}
+			case QR_EVENT_POINTS: {
+				extern int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
+				gain_event_points(ch, reward->vnum, reward->amount);
+				break;
+			}
+		}
+	}
+}
+
+
+/**
 * Gets standard string display like "4x lumber" for a quest giver (starts/ends
 * at).
 *

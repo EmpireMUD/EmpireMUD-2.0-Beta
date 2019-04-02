@@ -2584,6 +2584,7 @@ OLC_MODULE(evedit_thresholdrewards) {
 //// EVENTS COMMAND //////////////////////////////////////////////////////////
 
 EVENT_CMD(evcmd_cancel);
+EVENT_CMD(evcmd_collect);
 EVENT_CMD(evcmd_end);
 EVENT_CMD(evcmd_leaderboard);
 EVENT_CMD(evcmd_start);
@@ -2595,6 +2596,7 @@ const struct {
 	int min_level;
 	bitvector_t grant_flag;
 } event_cmd[] = {
+	{ "collect", evcmd_collect, 0, NO_GRANTS },
 	{ "leaderboard", evcmd_leaderboard, 0, NO_GRANTS },
 	{ "lb", evcmd_leaderboard, 0, NO_GRANTS },
 	
@@ -2696,6 +2698,104 @@ EVENT_CMD(evcmd_cancel) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has canceled event: %d %s", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event));
 		send_config_msg(ch, "ok_string");
 		cancel_running_event(re);
+	}
+}
+
+
+// collects all pending rewards
+EVENT_CMD(evcmd_collect) {
+	void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
+	
+	int level, base_level = get_approximate_level(ch);
+	struct player_event_data *ped, *next_ped;
+	struct event_reward *reward;
+	struct quest_reward qr;
+	bool any, header;
+	
+	// qr is used for sharing reward handling with quests
+	qr.next = NULL;
+	
+	// bad arg check
+	if (*argument) {
+		msg_to_char(ch, "You can't specify what to collect. Just use 'event collect' to collect all your rewards.\r\n");
+		return;
+	}
+	
+	// TODO check that player is allowed to play in events (approved, etc)
+	
+	any = FALSE;
+	
+	// check player's event data
+	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
+		if (!ped->event) {
+			continue;	// no work if no event
+		}
+		if (ped->status == EVTS_COLLECTED) {
+			continue;	// no work for fully-collected events
+		}
+		
+		// determine reward level
+		level = base_level;
+		if (EVT_MIN_LEVEL(ped->event) > 0) {
+			level = MAX(level, EVT_MIN_LEVEL(ped->event));
+		}
+		if (EVT_MAX_LEVEL(ped->event) > 0) {
+			level = MIN(level, EVT_MAX_LEVEL(ped->event));
+		}
+		
+		// threshold rewards: thresholds are ALWAYS lowest-to-highest in the list
+		// players can claim thresholds at any time, before the event ends
+		header = FALSE;
+		LL_FOREACH(EVT_THRESHOLD_REWARDS(ped->event), reward) {
+			if (ped->points > reward->min && reward->min < ped->collected_points) {
+				// show header
+				if (!header) {
+					header = TRUE,
+					msg_to_char(ch, "You collect threshold rewards for %s (%d point%s):\r\n", EVT_NAME(ped->event), ped->points, PLURAL(ped->points));
+				}
+				
+				ped->collected_points = reward->min;	// update highest collection
+				
+				// copy helper data to use quest rewards
+				qr.type = reward->type;
+				qr.vnum = reward->vnum;
+				qr.amount = reward->amount;
+				
+				give_quest_rewards(ch, &qr, level, GET_LOYALTY(ch), 0);
+				any = TRUE;
+			}
+		}
+		
+		// rank rewards: look for events in the 'complete' state
+		if (ped->status == EVTS_COMPLETE) {
+			ped->status = EVTS_COLLECTED;	// update status now
+			
+			header = FALSE;
+			LL_FOREACH(EVT_RANK_REWARDS(ped->event), reward) {
+				if (ped->rank >= reward->min && ped->rank <= reward->max) {
+					// show header
+					if (!header) {
+						header = TRUE,
+						msg_to_char(ch, "You collect rank rewards for %s (rank %d):\r\n", EVT_NAME(ped->event), ped->rank);
+					}
+					
+					// copy helper data to use quest rewards
+					qr.type = reward->type;
+					qr.vnum = reward->vnum;
+					qr.amount = reward->amount;
+				
+					give_quest_rewards(ch, &qr, level, GET_LOYALTY(ch), 0);
+					any = TRUE;
+				}
+			}
+		}
+	}
+	
+	if (any) {
+		SAVE_CHAR(ch);
+	}
+	else {
+		msg_to_char(ch, "You have no pending rewards to collect.\r\n");
 	}
 }
 
