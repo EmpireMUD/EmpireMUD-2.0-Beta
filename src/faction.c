@@ -257,6 +257,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct = find_faction_by_vnum(vnum);
 	faction_data *iter, *next_iter, *find;
 	quest_data *qiter, *next_qiter;
+	event_data *event, *next_event;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
@@ -271,6 +272,21 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of faction %d (%s):\r\n", vnum, FCT_NAME(fct));
+	
+	// events
+	HASH_ITER(hh, event_table, event, next_event) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x: event rewards
+		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_REPUTATION, vnum);
+		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_REPUTATION, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+		}
+	}
 	
 	// check other factions
 	HASH_ITER(hh, faction_table, iter, next_iter) {
@@ -1036,6 +1052,7 @@ faction_data *create_faction_table_entry(any_vnum vnum) {
 void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct, *iter, *next_iter, *find;
 	char_data *mob, *next_mob, *chiter;
+	event_data *event, *next_event;
 	quest_data *qiter, *next_qiter;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
@@ -1058,6 +1075,19 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		}
 		else if (!IS_NPC(chiter)) {
 			update_reputations(chiter);
+		}
+	}
+
+	
+	// update events
+	HASH_ITER(hh, event_table, event, next_event) {
+		// QR_x: event reward types
+		found = delete_event_reward_from_list(&EVT_RANK_REWARDS(event), QR_REPUTATION, vnum);
+		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(event), QR_REPUTATION, vnum);
+		
+		if (found) {
+			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(event));
 		}
 	}
 	
@@ -1129,6 +1159,16 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	
 	// remove from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_EVENT(desc)) {
+			// QR_x: event reward types
+			found = delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_REPUTATION, vnum);
+			found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(desc)), QR_REPUTATION, vnum);
+		
+			if (found) {
+				// SET_BIT(EVT_FLAGS(GET_OLC_EVENT(desc)), EVTF_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A faction used as a reward by the event you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_FACTION(desc)) {
 			HASH_FIND_INT(FCT_RELATIONS(GET_OLC_FACTION(desc)), &FCT_VNUM(fct), find);
 			if (find) {

@@ -137,3 +137,7 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 void smart_copy_scripts(struct trig_proto_list **addto, struct trig_proto_list *input);
 void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input);
 void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure_spawn *input);
+
+// helpers from other systems
+bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);
+bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);

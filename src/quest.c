@@ -3153,6 +3153,7 @@ char *list_one_quest(quest_data *quest, bool detail) {
 void olc_search_quest(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	quest_data *quest = quest_proto(vnum);
+	event_data *event, *next_event;
 	quest_data *qiter, *next_qiter;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
@@ -3167,6 +3168,21 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of quest %d (%s):\r\n", vnum, QUEST_NAME(quest));
+	
+	// events
+	HASH_ITER(hh, event_table, event, next_event) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x: event rewards
+		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_QUEST_CHAIN, vnum);
+		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_QUEST_CHAIN, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+		}
+	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
@@ -4304,6 +4320,7 @@ quest_data *create_quest_table_entry(any_vnum vnum) {
 */
 void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *qiter, *next_qiter;
+	event_data *event, *next_event;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
@@ -4336,6 +4353,18 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	
 	// delete from lookups
 	add_or_remove_all_quest_lookups_for(quest, FALSE);
+	
+	// update events
+	HASH_ITER(hh, event_table, event, next_event) {
+		// QR_x: event reward types
+		found = delete_event_reward_from_list(&EVT_RANK_REWARDS(event), QR_QUEST_CHAIN, vnum);
+		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(event), QR_QUEST_CHAIN, vnum);
+		
+		if (found) {
+			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(event));
+		}
+	}
 	
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
@@ -4395,6 +4424,16 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	
 	// remove from from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_EVENT(desc)) {
+			// QR_x: event reward types
+			found = delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_QUEST_CHAIN, vnum);
+			found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(desc)), QR_QUEST_CHAIN, vnum);
+		
+			if (found) {
+				// SET_BIT(EVT_FLAGS(GET_OLC_EVENT(desc)), EVTF_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A quest used as a reward by the event you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_PROGRESS(desc)) {
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
@@ -4927,9 +4966,7 @@ OLC_MODULE(qedit_rewards) {
 	struct quest_reward *reward, *iter, *change, *copyfrom;
 	struct quest_reward **list = &QUEST_REWARDS(quest);
 	int findtype, num, stype;
-	faction_data *fct;
-	event_data *event;
-	bool found, ok;
+	bool found;
 	any_vnum vnum;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
@@ -5032,125 +5069,10 @@ OLC_MODULE(qedit_rewards) {
 		else if ((num = atoi(num_arg)) < 1) {
 			msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
 		}
-		else {		
-			// QR_x: validate vnum
-			vnum = 0;
-			ok = FALSE;
-			switch (stype) {
-				case QR_BONUS_EXP: {
-					// vnum not required
-					ok = TRUE;
-					break;
-				}
-				case QR_COINS: {
-					if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
-						vnum = OTHER_COIN;
-						ok = TRUE;
-					}
-					else if (is_abbrev(vnum_arg, "empire")) {
-						vnum = REWARD_EMPIRE_COIN;
-						ok = TRUE;
-					}
-					else {
-						msg_to_char(ch, "You must choose misc or empire coins.\r\n");
-						return;
-					}
-					break;	
-				}
-				case QR_CURRENCY: {
-					if (!*vnum_arg) {
-						msg_to_char(ch, "Usage: rewards add currency <amount> <generic vnum>\r\n");
-						return;
-					}
-					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid generic vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (find_generic(vnum, GENERIC_CURRENCY)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_OBJECT: {
-					if (!*vnum_arg) {
-						msg_to_char(ch, "Usage: rewards add object <amount> <object vnum>\r\n");
-						return;
-					}
-					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (obj_proto(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_SET_SKILL:
-				case QR_SKILL_EXP:
-				case QR_SKILL_LEVELS: {
-					if (!*vnum_arg) {
-						msg_to_char(ch, "Usage: rewards add <set-skill | skill-exp | skill-levels> <level> <skill vnum>\r\n");
-						return;
-					}
-					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (find_skill_by_vnum(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_QUEST_CHAIN: {
-					if (!*vnum_arg) {
-						strcpy(vnum_arg, num_arg);	// they may have omitted amount
-					}
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (quest_proto(vnum)) {
-						ok = TRUE;
-					}
-					// amount is not used here
-					num = 1;
-					break;
-				}
-				case QR_REPUTATION: {
-					if (!*vnum_arg) {
-						msg_to_char(ch, "Usage: rewards add reputation <amount> <faction>\r\n");
-						return;
-					}
-					if (!(fct = find_faction(vnum_arg))) {
-						msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
-						return;
-					}
-					vnum = FCT_VNUM(fct);
-					ok = TRUE;
-					break;
-				}
-				case QR_EVENT_POINTS: {
-					if (!*vnum_arg || !isdigit(*vnum_arg)) {
-						msg_to_char(ch, "Usage: rewards add event-points <amount> <event vnum>\r\n");
-						return;
-					}
-					if (!(event = find_event_by_vnum(atoi(vnum_arg)))) {
-						msg_to_char(ch, "Invalid event vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					vnum = EVT_VNUM(event);
-					ok = TRUE;
-					break;
-				}
-			}
-			
-			// did we find one?
-			if (!ok) {
-				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_reward_types[stype], vnum);
-				return;
-			}
-			
-			// success
+		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == NOTHING) {
+			// sends own error
+		}
+		else {	// success
 			CREATE(reward, struct quest_reward, 1);
 			reward->type = stype;
 			reward->amount = num;
@@ -5195,99 +5117,13 @@ OLC_MODULE(qedit_rewards) {
 			}
 		}
 		else if (is_abbrev(field_arg, "vnum")) {
-			// QR_x: validate vnum
-			vnum = 0;
-			ok = FALSE;
-			switch (change->type) {
-				case QR_BONUS_EXP: {
-					msg_to_char(ch, "You can't change the vnum on that.\r\n");
-					break;
-				}
-				case QR_COINS: {
-					if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
-						vnum = OTHER_COIN;
-						ok = TRUE;
-					}
-					else if (is_abbrev(vnum_arg, "empire")) {
-						vnum = REWARD_EMPIRE_COIN;
-						ok = TRUE;
-					}
-					else {
-						msg_to_char(ch, "You must choose misc or empire coins.\r\n");
-						return;
-					}
-					break;	
-				}
-				case QR_CURRENCY: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid currency vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (find_generic(vnum, GENERIC_CURRENCY)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_OBJECT: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (obj_proto(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_SET_SKILL:
-				case QR_SKILL_EXP:
-				case QR_SKILL_LEVELS: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (find_skill_by_vnum(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_QUEST_CHAIN: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (quest_proto(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_REPUTATION: {
-					if (!*vnum_arg || !(fct = find_faction(vnum_arg))) {
-						msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
-						return;
-					}
-					vnum = FCT_VNUM(fct);
-					ok = TRUE;
-					break;
-				}
-				case QR_EVENT_POINTS: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || !(event = find_event_by_vnum(atoi(vnum_arg)))) {
-						msg_to_char(ch, "Invalid event vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					vnum = EVT_VNUM(event);
-					ok = TRUE;
-					break;
-				}
+			if ((vnum = parse_quest_reward_vnum(ch, change->type, vnum_arg, NULL)) == NOTHING) {
+				// sends own error
 			}
-			
-			// did we find one?
-			if (!ok) {
-				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_reward_types[change->type], vnum);
-				return;
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "Changed reward %d to: %s\r\n", atoi(num_arg), quest_reward_string(change, TRUE));
 			}
-			
-			change->vnum = vnum;
-			msg_to_char(ch, "Changed reward %d to: %s\r\n", atoi(num_arg), quest_reward_string(change, TRUE));
 		}
 		else {
 			msg_to_char(ch, "You can only change the amount or vnum.\r\n");

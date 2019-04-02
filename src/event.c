@@ -1070,6 +1070,7 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
+	event_data *ev, *next_ev;
 	int size, found;
 	bool any;
 	
@@ -1080,6 +1081,21 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of event %d (%s):\r\n", vnum, EVT_NAME(event));
+	
+	// other events
+	HASH_ITER(hh, event_table, ev, next_ev) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x: event rewards
+		any = find_event_reward_in_list(EVT_RANK_REWARDS(ev), QR_EVENT_POINTS, vnum);
+		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(ev), QR_EVENT_POINTS, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(ev), EVT_NAME(ev));
+		}
+	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
@@ -1540,7 +1556,7 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == NOTHING) {
 			// this should have sent its own message
 		}
-		else {	// ok!			
+		else {	// ok!
 			// slight sanity: ensure max > min
 			if (min > max && max != 0) {
 				temp = min;
@@ -1863,6 +1879,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
+	event_data *ev, *next_ev;
 	descriptor_data *desc;
 	char_data *chiter;
 	event_data *event;
@@ -1908,6 +1925,18 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_EVT);
 	save_library_file_for_vnum(DB_BOOT_EVT, vnum);
 	
+	// update other events
+	HASH_ITER(hh, event_table, ev, next_ev) {
+		// QR_x: event reward types
+		found = delete_event_reward_from_list(&EVT_RANK_REWARDS(ev), QR_EVENT_POINTS, vnum);
+		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(ev), QR_EVENT_POINTS, vnum);
+		
+		if (found) {
+			// SET_BIT(EVT_FLAGS(ev), EVTF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(ev));
+		}
+	}
+	
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		// REQ_x:
@@ -1951,6 +1980,16 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	
 	// remove from from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_EVENT(desc)) {
+			// QR_x: event reward types
+			found = delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_EVENT_POINTS, vnum);
+			found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(desc)), QR_EVENT_POINTS, vnum);
+		
+			if (found) {
+				// SET_BIT(EVT_FLAGS(GET_OLC_EVENT(desc)), EVTF_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An event used as a reward by the event you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_PROGRESS(desc)) {
 			// REQ_x:
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_EVENT_RUNNING, vnum);
