@@ -2366,7 +2366,7 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 	
 	if (!re->player_leaderboard) {
 		// always room left in 'buf' in this case
-		snprintf(buf + size, sizeof(buf) - size, " no entries\r\n");
+		size += snprintf(buf + size, sizeof(buf) - size, " no entries\r\n");
 	}
 	
 	page_string(ch->desc, buf, TRUE);
@@ -2415,7 +2415,7 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 		}
 	}
 	if (!EVT_THRESHOLD_REWARDS(re->event)) {
-		snprintf(buf + size, sizeof(buf) - size, " no threshold rewards\r\n");
+		size += snprintf(buf + size, sizeof(buf) - size, " no threshold rewards\r\n");
 	}
 	
 	// RANK
@@ -2435,7 +2435,7 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 		}
 	}
 	if (!EVT_RANK_REWARDS(re->event)) {
-		snprintf(buf + size, sizeof(buf) - size, " no rank rewards\r\n");
+		size += snprintf(buf + size, sizeof(buf) - size, " no rank rewards\r\n");
 	}
 	
 	page_string(ch->desc, buf, TRUE);
