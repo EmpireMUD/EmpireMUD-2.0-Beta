@@ -155,33 +155,26 @@ char *get_event_name_by_proto(any_vnum vnum) {
 * @return char* The string display.
 */
 char *event_reward_string(struct event_reward *reward, bool show_vnums) {
+	extern char *quest_reward_string(struct quest_reward *reward, bool show_vnums);
+	
 	static char output[256];
-	char vnum[256];
+	struct quest_reward qr;
 	
 	*output = '\0';
 	if (!reward) {
 		return output;
 	}
 	
-	if (show_vnums) {
-		snprintf(vnum, sizeof(vnum), "[%d] ", reward->vnum);
+	// borrow data to use the other reward string func
+	qr.type = reward->type;
+	qr.vnum = reward->vnum;
+	qr.amount = reward->amount;
+	
+	if (reward->max) {
+		snprintf(output, sizeof(output), "%d-%d: %s", reward->min, reward->max, quest_reward_string(&qr, show_vnums));
 	}
 	else {
-		*vnum = '\0';
-	}
-	
-	// QR_x
-	switch (reward->type) {
-	/*
-		case EVTR_CURRENCY: {
-			snprintf(output, sizeof(output), "%s%d %s", vnum, reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(reward->amount)));
-			break;
-		}
-	*/
-		default: {
-			snprintf(output, sizeof(output), "%s%dx UNKNOWN", vnum, reward->amount);
-			break;
-		}
+		snprintf(output, sizeof(output), "%d: %s", reward->min, quest_reward_string(&qr, show_vnums));
 	}
 	
 	return output;
