@@ -88,11 +88,15 @@ int get_event_rank(char_data *ch, struct event_running_data *re) {
 		// compute rank
 		if (!lb->ignore && (lb->approved || !config_get_bool("event_approval"))) {
 			++rank;	// otherwise they don't count toward rank
+			
+			// it me?
+			if (lb->id == GET_IDNUM(ch)) {
+				return rank;
+			}
 		}
-		
-		// it me?
-		if (lb->id == GET_IDNUM(ch)) {
-			return rank;
+		else if (lb->id == GET_IDNUM(ch)) {
+			// found me but I don't qualify for a rank
+			return NOTHING;
 		}
 	}
 	
