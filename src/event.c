@@ -2818,7 +2818,7 @@ EVENT_CMD(evcmd_collect) {
 		// players can claim thresholds at any time, before the event ends
 		header = FALSE;
 		LL_FOREACH(EVT_THRESHOLD_REWARDS(ped->event), reward) {
-			if (ped->points > reward->min && reward->min < ped->collected_points) {
+			if (ped->points >= reward->min && reward->min < ped->collected_points) {
 				// show header
 				if (!header) {
 					header = TRUE,
