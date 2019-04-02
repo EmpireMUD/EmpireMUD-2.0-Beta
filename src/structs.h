@@ -1241,10 +1241,6 @@ typedef struct vehicle_data vehicle_data;
 #define EVTF_CONTINUES  BIT(1)	// b. event points do not reset when it runs again (it runs on the same id as last time)
 
 
-// EVTR_x: event rewards
-#define EVTR_x
-
-
 // EVTS_x: event status
 #define EVTS_NOT_STARTED  0	// default status
 #define EVTS_RUNNING  1	// event is active
@@ -4594,7 +4590,7 @@ struct event_data {
 struct event_reward {
 	int min;	// minimum rank that gets this, OR minimum event points for threshold
 	int max;	// maximum rank that gets this (optional: if 0, all players over 'min' get it)
-	int type;	// EVTR_ type
+	int type;	// QR_ type
 	
 	any_vnum vnum;	// thing to give
 	int amount;	// how much/many to give

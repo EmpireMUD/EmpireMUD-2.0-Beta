@@ -170,7 +170,7 @@ char *event_reward_string(struct event_reward *reward, bool show_vnums) {
 		*vnum = '\0';
 	}
 	
-	// EVTR_x
+	// QR_x
 	switch (reward->type) {
 	/*
 		case EVTR_CURRENCY: {
