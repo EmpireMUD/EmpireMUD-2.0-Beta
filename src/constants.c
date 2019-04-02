@@ -1896,12 +1896,6 @@ const char *event_flags[] = {
 };
 
 
-// EVTR_x: event rewards
-const char *event_rewards[] = {
-	"\n"
-};
-
-
 // EVTS_x: event status
 const char *event_status[] = {
 	"not started",

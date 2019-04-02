@@ -48,7 +48,8 @@ const char *default_event_complete_msg = "The event has ended.\r\n";
 // external consts
 extern const char *event_types[];
 extern const char *event_flags[];
-extern const char *event_rewards[];
+extern const char *olc_type_bits[NUM_OLC_TYPES+1];
+extern const char *quest_reward_types[];
 
 // external funcs
 extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
@@ -58,6 +59,7 @@ extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum v
 
 // local protos
 struct player_event_data *get_event_data(char_data *ch, int event_id);
+int sort_event_rewards(struct event_reward *a, struct event_reward *b);
 void update_player_leaderboard(char_data *ch, struct event_running_data *re, struct player_event_data *ped);
 
 
@@ -589,7 +591,7 @@ void update_player_leaderboard(char_data *ch, struct event_running_data *re, str
 	if ((lb = get_event_leaderboard_entry(&re->player_leaderboard, GET_IDNUM(ch))) && lb->points != ped->points) {
 		lb->points = ped->points;
 		lb->approved = IS_APPROVED(ch);
-		lb->ignore = IS_IMMORTAL(ch);	// reasons to ignore this result
+		lb->ignore |= IS_IMMORTAL(ch);	// reasons to ignore this result
 		HASH_SORT(re->player_leaderboard, sort_leaderboard);
 		events_need_save = TRUE;
 	}
@@ -1410,6 +1412,327 @@ void parse_event(FILE *fl, any_vnum vnum) {
 }
 
 
+/**
+* Handler for the .rankrewards and .thresholdrewards editors. The only
+* difference between the two is that rank requires a min-max (rank range) while
+* threshold only has a min (number of points).
+*
+* @param char_data *ch The person editing.
+* @param char *argument Any args.
+* @param struct event_reward **list Pointer to which list of rewards to work with.
+* @param char *cmd Which command is shown in strings (what they typed to use this editor).
+* @bool rank If TRUE, requires min-max rank. FALSE is threshold mode and only needs min points.
+*/
+void process_evedit_rewards(char_data *ch, char *argument, struct event_reward **list, char *cmd, bool rank) {
+	extern any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg);
+	
+	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	char min_arg[MAX_INPUT_LENGTH], max_arg[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct event_reward *reward, *iter, *change, *copyfrom;
+	int findtype, num = 1, stype, temp, min, max = 0;
+	any_vnum vnum;
+	bool found;
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: rewards copy <from type> <from vnum>
+		argument = any_one_arg(argument, type_arg);	// just "event" for now
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: %s copy <from type> <from vnum>\r\n", cmd);
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy from which %s?\r\n", buf);
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			copyfrom = NULL;
+			
+			switch (findtype) {
+				case OLC_EVENT: {
+					event_data *from_event = find_event_by_vnum(vnum);
+					if (from_event) {
+						copyfrom = rank ? EVT_RANK_REWARDS(from_event) : EVT_THRESHOLD_REWARDS(from_event);
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy rewards from %ss.\r\n", buf);
+					return;
+				}
+			}
+			
+			if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				smart_copy_event_rewards(list, copyfrom);
+				msg_to_char(ch, "Copied rewards from %s %d.\r\n", buf, vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: rewards remove <number | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which %s (number)?\r\n", cmd);
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_event_rewards(*list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the %s.\r\n", cmd);
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid reward number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(*list, iter) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					if (iter->vnum > 0) {
+						msg_to_char(ch, "You remove the %s for %dx %s %d.\r\n", cmd, iter->amount, quest_reward_types[iter->type], iter->vnum);
+					}
+					else {
+						msg_to_char(ch, "You remove the %s for %dx %s.\r\n", cmd, iter->amount, quest_reward_types[iter->type]);
+					}
+					LL_DELETE(*list, iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid %s number.\r\n", cmd);
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: rewards add <min> [max] <type> <amount> <vnum/type>
+		argument = any_one_arg(argument, min_arg);
+		if (rank) {
+			argument = any_one_arg(argument, max_arg);
+		}
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_word(argument, vnum_arg);
+		
+		if (!*min_arg || (rank && !*max_arg) || !*type_arg || !*num_arg || !isdigit(*num_arg)) {
+			msg_to_char(ch, "Usage: %s add %s <type> <amount> <vnum/type>\r\n", cmd, rank ? "<min rank> <max rank>" : "<min threshold>");
+		}
+		else if (!isdigit(*min_arg) || (min = atoi(min_arg)) < 1) {
+			msg_to_char(ch, "Minimum %s must be a number greater than 0.\r\n", rank ? "rank" : "threshold");
+		}
+		else if (rank && (!isdigit(*max_arg) || (max = atoi(max_arg)) < 1)) {
+			msg_to_char(ch, "Maximum %s must be a number greater than 0.\r\n", rank ? "rank" : "threshold");
+		}
+		else if ((stype = search_block(type_arg, quest_reward_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
+		}
+		else if ((num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
+		}
+		else if ((vnum = parse_quest_reward_vnum(ch, stype, vnum_arg, num_arg)) == NOTHING) {
+			// this should have sent its own message
+		}
+		else {	// ok!			
+			// slight sanity: ensure max > min
+			if (min > max && max != 0) {
+				temp = min;
+				min = max;
+				max = temp;
+			}
+			
+			// success
+			CREATE(reward, struct event_reward, 1);
+			reward->min = min;
+			reward->max = max;
+			reward->type = stype;
+			reward->amount = num;
+			reward->vnum = vnum;
+			
+			LL_PREPEND(*list, reward);
+			LL_SORT(*list, sort_event_rewards);
+			msg_to_char(ch, "You add %s %s reward: %s\r\n", AN(quest_reward_types[stype]), quest_reward_types[stype], event_reward_string(reward, TRUE));
+		}
+	}	// end 'add'
+	else if (is_abbrev(cmd_arg, "change")) {
+		// usage: rewards change <number> <min | max | amount | vnum> <value>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		argument = any_one_word(argument, vnum_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*field_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: %s change <number> <min | max | amount | vnum> <value>\r\n", cmd);
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		LL_FOREACH(*list, iter) {
+			if (--num == 0) {
+				change = iter;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid reward number.\r\n");
+		}
+		else if (is_abbrev(field_arg, "minimum")) {
+			if (!isdigit(*vnum_arg) || (min = atoi(vnum_arg)) < 1) {
+				msg_to_char(ch, "Invalid minimum '%s'.\r\n", vnum_arg);
+				return;
+			}
+			else {
+				change->min = min;
+				LL_SORT(*list, sort_event_rewards);
+				msg_to_char(ch, "You change the minimum %s to: %d\r\n", rank ? "rank" : "threshold", min);
+			}
+		}
+		else if (is_abbrev(field_arg, "maximum")) {
+			if (!rank) {
+				msg_to_char(ch, "You can't set the maximum on this type of reward.\r\n");
+				return;
+			}
+			else if (!isdigit(*vnum_arg) || (max = atoi(vnum_arg)) < 1) {
+				msg_to_char(ch, "Invalid maximum '%s'.\r\n", vnum_arg);
+				return;
+			}
+			else {
+				change->max = max;
+				LL_SORT(*list, sort_event_rewards);
+				msg_to_char(ch, "You change the maximum %s to: %d\r\n", rank ? "rank" : "threshold", max);
+			}
+		}
+		else if (is_abbrev(field_arg, "amount") || is_abbrev(field_arg, "quantity")) {
+			if (!isdigit(*vnum_arg) || (num = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid amount '%s'.\r\n", vnum_arg);
+				return;
+			}
+			else {
+				change->amount = num;
+				msg_to_char(ch, "You change reward %d to: %s\r\n", atoi(num_arg), event_reward_string(change, TRUE));
+			}
+		}
+		else if (is_abbrev(field_arg, "vnum")) {
+			if ((vnum = parse_quest_reward_vnum(ch, change->type, vnum_arg, NULL)) == NOTHING) {
+				// sends own error
+			}
+			else {
+				change->vnum = vnum;
+				msg_to_char(ch, "Changed reward %d to: %s\r\n", atoi(num_arg), event_reward_string(change, TRUE));
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
+		}
+	}	// end 'change'
+	else if (is_abbrev(cmd_arg, "move")) {
+		struct event_reward *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		bool up;
+		
+		// usage: rewards move <number> <up | down>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		up = is_abbrev(field_arg, "up");
+		
+		if (!*num_arg || !*field_arg) {
+			msg_to_char(ch, "Usage: %s move <number> <up | down>\r\n", cmd);
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid reward number.\r\n");
+		}
+		else if (!is_abbrev(field_arg, "up") && !is_abbrev(field_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (reward = *list; reward && !to_move; reward = reward->next) {
+				if (--num == 0) {
+					to_move = reward;
+				}
+				else {
+					// store for next iteration
+					prev = reward;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid reward number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					a = prev;
+					b = to_move;
+				}
+				else {
+					a = to_move;
+					b = to_move->next;
+				}
+				
+				// store next pointers
+				a_next = a->next;
+				b_next = b->next;
+				
+				// swap data
+				iitem = *a;
+				*a = *b;
+				*b = iitem;
+				
+				// restore next pointers
+				a->next = a_next;
+				b->next = b_next;
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				LL_SORT(*list, sort_event_rewards);
+				msg_to_char(ch, "You move reward %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
+	else {
+		msg_to_char(ch, "Usage: %s add %s <type> <amount> <vnum/type>\r\n", cmd, rank ? "<min rank> <max rank>" : "<min threshold>");
+		msg_to_char(ch, "Usage: %s change <number> <min | max | vnum | amount> <value>\r\n", cmd);
+		msg_to_char(ch, "Usage: %s copy <from type> <from vnum>\r\n", cmd);
+		msg_to_char(ch, "Usage: %s remove <number | all>\r\n", cmd);
+		msg_to_char(ch, "Usage: %s move <number> <up | down>\r\n", cmd);
+	}
+}
+
+
+// simple sorter for event rewards
+int sort_event_rewards(struct event_reward *a, struct event_reward *b) {
+	if (a->min != b->min) {
+		return a->min - b->min;
+	}
+	else {
+		return a->max - b->max;
+	}
+}
+
+
 // writes entries in the event index
 void write_event_index(FILE *fl) {
 	event_data *event, *next_event;
@@ -1810,8 +2133,10 @@ void get_event_reward_display(struct event_reward *list, char *save_buffer) {
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, reward) {		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, event_rewards[reward->type], event_reward_string(reward, TRUE));
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], event_reward_string(reward, TRUE));
 	}
+	
+	// TODO could borrow from quest reward types display
 	
 	// empty list not shown
 }
@@ -2224,6 +2549,11 @@ OLC_MODULE(evedit_notes) {
 }
 
 
+OLC_MODULE(evedit_rankrewards) {
+	process_evedit_rewards(ch, argument, &EVT_RANK_REWARDS(GET_OLC_EVENT(ch->desc)), "rankrewards", TRUE);
+}
+
+
 OLC_MODULE(evedit_repeat) {
 	event_data *event = GET_OLC_EVENT(ch->desc);
 	
@@ -2243,437 +2573,10 @@ OLC_MODULE(evedit_repeat) {
 	}
 }
 
-/*
-OLC_MODULE(qedit_rewards) {
-	quest_data *quest = GET_OLC_QUEST(ch->desc);
-	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
-	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
-	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	struct quest_reward *reward, *iter, *change, *copyfrom;
-	struct quest_reward **list = &QUEST_REWARDS(quest);
-	int findtype, num, stype;
-	faction_data *fct;
-	bool found, ok;
-	any_vnum vnum;
-	
-	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
-	
-	if (is_abbrev(cmd_arg, "copy")) {
-		// usage: rewards copy <from type> <from vnum>
-		argument = any_one_arg(argument, type_arg);	// just "quest" for now
-		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
-		
-		if (!*type_arg || !*vnum_arg) {
-			msg_to_char(ch, "Usage: rewards copy <from type> <from vnum>\r\n");
-		}
-		else if ((findtype = find_olc_type(type_arg)) == 0) {
-			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
-		}
-		else if (!isdigit(*vnum_arg)) {
-			sprintbit(findtype, olc_type_bits, buf, FALSE);
-			msg_to_char(ch, "Copy from which %s?\r\n", buf);
-		}
-		else if ((vnum = atoi(vnum_arg)) < 0) {
-			msg_to_char(ch, "Invalid vnum.\r\n");
-		}
-		else {
-			sprintbit(findtype, olc_type_bits, buf, FALSE);
-			copyfrom = NULL;
-			
-			switch (findtype) {
-				case OLC_QUEST: {
-					quest_data *from_qst = quest_proto(vnum);
-					if (from_qst) {
-						copyfrom = QUEST_REWARDS(from_qst);
-					}
-					break;
-				}
-				default: {
-					msg_to_char(ch, "You can't copy rewards from %ss.\r\n", buf);
-					return;
-				}
-			}
-			
-			if (!copyfrom) {
-				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
-			}
-			else {
-				smart_copy_quest_rewards(list, copyfrom);
-				msg_to_char(ch, "Copied rewards from %s %d.\r\n", buf, vnum);
-			}
-		}
-	}	// end 'copy'
-	else if (is_abbrev(cmd_arg, "remove")) {
-		// usage: rewards remove <number | all>
-		skip_spaces(&argument);	// only arg is number
-		
-		if (!*argument) {
-			msg_to_char(ch, "Remove which reward (number)?\r\n");
-		}
-		else if (!str_cmp(argument, "all")) {
-			free_quest_rewards(*list);
-			*list = NULL;
-			msg_to_char(ch, "You remove all the rewards.\r\n");
-		}
-		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
-			msg_to_char(ch, "Invalid reward number.\r\n");
-		}
-		else {
-			found = FALSE;
-			LL_FOREACH(*list, iter) {
-				if (--num == 0) {
-					found = TRUE;
-					
-					if (iter->vnum > 0) {
-						msg_to_char(ch, "You remove the reward for %dx %s %d.\r\n", iter->amount, quest_reward_types[iter->type], iter->vnum);
-					}
-					else {
-						msg_to_char(ch, "You remove the reward for %dx %s.\r\n", iter->amount, quest_reward_types[iter->type]);
-					}
-					LL_DELETE(*list, iter);
-					free(iter);
-					break;
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid reward number.\r\n");
-			}
-		}
-	}	// end 'remove'
-	else if (is_abbrev(cmd_arg, "add")) {
-		// usage: rewards add <type> <amount> <vnum/type>
-		argument = any_one_arg(argument, type_arg);
-		argument = any_one_arg(argument, num_arg);
-		argument = any_one_word(argument, vnum_arg);
-		
-		if (!*type_arg || !*num_arg || !isdigit(*num_arg)) {
-			msg_to_char(ch, "Usage: rewards add <type> <amount> <vnum/type>\r\n");
-		}
-		else if ((stype = search_block(type_arg, quest_reward_types, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
-		}
-		else if ((num = atoi(num_arg)) < 1) {
-			msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
-		}
-		else {		
-			// QR_x: validate vnum
-			vnum = 0;
-			ok = FALSE;
-			switch (stype) {
-				case QR_BONUS_EXP: {
-					// vnum not required
-					ok = TRUE;
-					break;
-				}
-				case QR_COINS: {
-					if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
-						vnum = OTHER_COIN;
-						ok = TRUE;
-					}
-					else if (is_abbrev(vnum_arg, "empire")) {
-						vnum = REWARD_EMPIRE_COIN;
-						ok = TRUE;
-					}
-					else {
-						msg_to_char(ch, "You must choose misc or empire coins.\r\n");
-						return;
-					}
-					break;	
-				}
-				case QR_CURRENCY: {
-					if (!*vnum_arg) {
-						msg_to_char(ch, "Usage: rewards add currency <amount> <generic vnum>\r\n");
-						return;
-					}
-					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid generic vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (find_generic(vnum, GENERIC_CURRENCY)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_OBJECT: {
-					if (!*vnum_arg) {
-						msg_to_char(ch, "Usage: rewards add object <amount> <object vnum>\r\n");
-						return;
-					}
-					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (obj_proto(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_SET_SKILL:
-				case QR_SKILL_EXP:
-				case QR_SKILL_LEVELS: {
-					if (!*vnum_arg) {
-						msg_to_char(ch, "Usage: rewards add <set-skill | skill-exp | skill-levels> <level> <skill vnum>\r\n");
-						return;
-					}
-					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (find_skill_by_vnum(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_QUEST_CHAIN: {
-					if (!*vnum_arg) {
-						strcpy(vnum_arg, num_arg);	// they may have omitted amount
-					}
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (quest_proto(vnum)) {
-						ok = TRUE;
-					}
-					// amount is not used here
-					num = 1;
-					break;
-				}
-				case QR_REPUTATION: {
-					if (!*vnum_arg) {
-						msg_to_char(ch, "Usage: rewards add reputation <amount> <faction>\r\n");
-						return;
-					}
-					if (!(fct = find_faction(vnum_arg))) {
-						msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
-						return;
-					}
-					vnum = FCT_VNUM(fct);
-					ok = TRUE;
-					break;
-				}
-			}
-			
-			// did we find one?
-			if (!ok) {
-				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_reward_types[stype], vnum);
-				return;
-			}
-			
-			// success
-			CREATE(reward, struct quest_reward, 1);
-			reward->type = stype;
-			reward->amount = num;
-			reward->vnum = vnum;
-			
-			LL_APPEND(*list, reward);
-			msg_to_char(ch, "You add %s %s reward: %s\r\n", AN(quest_reward_types[stype]), quest_reward_types[stype], quest_reward_string(reward, TRUE));
-		}
-	}	// end 'add'
-	else if (is_abbrev(cmd_arg, "change")) {
-		// usage: rewards change <number> <amount | vnum> <value>
-		argument = any_one_arg(argument, num_arg);
-		argument = any_one_arg(argument, field_arg);
-		argument = any_one_word(argument, vnum_arg);
-		
-		if (!*num_arg || !isdigit(*num_arg) || !*field_arg || !*vnum_arg) {
-			msg_to_char(ch, "Usage: rewards change <number> <amount | vnum> <value>\r\n");
-			return;
-		}
-		
-		// find which one to change
-		num = atoi(num_arg);
-		change = NULL;
-		LL_FOREACH(*list, iter) {
-			if (--num == 0) {
-				change = iter;
-				break;
-			}
-		}
-		
-		if (!change) {
-			msg_to_char(ch, "Invalid reward number.\r\n");
-		}
-		else if (is_abbrev(field_arg, "amount") || is_abbrev(field_arg, "quantity")) {
-			if (!isdigit(*vnum_arg) || (num = atoi(vnum_arg)) < 0) {
-				msg_to_char(ch, "Invalid amount '%s'.\r\n", vnum_arg);
-				return;
-			}
-			else {
-				change->amount = num;
-				msg_to_char(ch, "You change reward %d to: %s\r\n", atoi(num_arg), quest_reward_string(change, TRUE));
-			}
-		}
-		else if (is_abbrev(field_arg, "vnum")) {
-			// QR_x: validate vnum
-			vnum = 0;
-			ok = FALSE;
-			switch (change->type) {
-				case QR_BONUS_EXP: {
-					msg_to_char(ch, "You can't change the vnum on that.\r\n");
-					break;
-				}
-				case QR_COINS: {
-					if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
-						vnum = OTHER_COIN;
-						ok = TRUE;
-					}
-					else if (is_abbrev(vnum_arg, "empire")) {
-						vnum = REWARD_EMPIRE_COIN;
-						ok = TRUE;
-					}
-					else {
-						msg_to_char(ch, "You must choose misc or empire coins.\r\n");
-						return;
-					}
-					break;	
-				}
-				case QR_CURRENCY: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid currency vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (find_generic(vnum, GENERIC_CURRENCY)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_OBJECT: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (obj_proto(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_SET_SKILL:
-				case QR_SKILL_EXP:
-				case QR_SKILL_LEVELS: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (find_skill_by_vnum(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_QUEST_CHAIN: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
-						return;
-					}
-					if (quest_proto(vnum)) {
-						ok = TRUE;
-					}
-					break;
-				}
-				case QR_REPUTATION: {
-					if (!*vnum_arg || !(fct = find_faction(vnum_arg))) {
-						msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
-						return;
-					}
-					vnum = FCT_VNUM(fct);
-					ok = TRUE;
-					break;
-				}
-			}
-			
-			// did we find one?
-			if (!ok) {
-				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[change->type], vnum);
-				return;
-			}
-			
-			change->vnum = vnum;
-			msg_to_char(ch, "Changed reward %d to: %s\r\n", atoi(num_arg), quest_reward_string(change, TRUE));
-		}
-		else {
-			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
-		}
-	}	// end 'change'
-	else if (is_abbrev(cmd_arg, "move")) {
-		struct quest_reward *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
-		bool up;
-		
-		// usage: rewards move <number> <up | down>
-		argument = any_one_arg(argument, num_arg);
-		argument = any_one_arg(argument, field_arg);
-		up = is_abbrev(field_arg, "up");
-		
-		if (!*num_arg || !*field_arg) {
-			msg_to_char(ch, "Usage: rewards move <number> <up | down>\r\n");
-		}
-		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
-			msg_to_char(ch, "Invalid reward number.\r\n");
-		}
-		else if (!is_abbrev(field_arg, "up") && !is_abbrev(field_arg, "down")) {
-			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
-		}
-		else if (up && num == 1) {
-			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
-		}
-		else {
-			// find the one to move
-			to_move = prev = NULL;
-			for (reward = *list; reward && !to_move; reward = reward->next) {
-				if (--num == 0) {
-					to_move = reward;
-				}
-				else {
-					// store for next iteration
-					prev = reward;
-				}
-			}
-			
-			if (!to_move) {
-				msg_to_char(ch, "Invalid reward number.\r\n");
-			}
-			else if (!up && !to_move->next) {
-				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
-			}
-			else {
-				// SUCCESS: "move" them by swapping data
-				if (up) {
-					a = prev;
-					b = to_move;
-				}
-				else {
-					a = to_move;
-					b = to_move->next;
-				}
-				
-				// store next pointers
-				a_next = a->next;
-				b_next = b->next;
-				
-				// swap data
-				iitem = *a;
-				*a = *b;
-				*b = iitem;
-				
-				// restore next pointers
-				a->next = a_next;
-				b->next = b_next;
-				
-				// message: re-atoi(num_arg) because we destroyed num finding our target
-				msg_to_char(ch, "You move reward %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));
-			}
-		}
-	}	// end 'move'
-	else {
-		msg_to_char(ch, "Usage: rewards add <type> <amount> <vnum/type>\r\n");
-		msg_to_char(ch, "Usage: rewards change <number> vnum <value>\r\n");
-		msg_to_char(ch, "Usage: rewards copy <from type> <from vnum>\r\n");
-		msg_to_char(ch, "Usage: rewards remove <number | all>\r\n");
-		msg_to_char(ch, "Usage: rewards move <number> <up | down>\r\n");
-	}
-}
 
-*/
+OLC_MODULE(evedit_thresholdrewards) {
+	process_evedit_rewards(ch, argument, &EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(ch->desc)), "thresholdrewards", FALSE);
+}
 
 
  //////////////////////////////////////////////////////////////////////////////

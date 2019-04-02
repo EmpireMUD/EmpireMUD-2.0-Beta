@@ -3111,6 +3111,138 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 
 
 /**
+* Parses the <vnum> arg for a quest/event reward add/change.
+*
+* @param char_data *ch The person editing.
+* @param int type The QR_ reward type.
+* @param char *vnum_arg The argument which the player supplied.
+* @param char *prev_arg The argument right BEFORE that one (if it's the quantity arg, because types that don't use quantity will want that instead).
+* @return any_vnum The 'vnum' field for the reward, or NOTHING if it failed.
+*/
+any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg) {
+	faction_data *fct;
+	event_data *event;
+	any_vnum vnum = 0;
+	bool ok = FALSE;
+	
+	// QR_x: validate vnum
+	switch (type) {
+		case QR_BONUS_EXP: {
+			// vnum not required
+			ok = TRUE;
+			break;
+		}
+		case QR_COINS: {
+			if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
+				vnum = OTHER_COIN;
+				ok = TRUE;
+			}
+			else if (is_abbrev(vnum_arg, "empire")) {
+				vnum = REWARD_EMPIRE_COIN;
+				ok = TRUE;
+			}
+			else {
+				msg_to_char(ch, "You must choose misc or empire coins.\r\n");
+				return NOTHING;
+			}
+			break;	
+		}
+		case QR_CURRENCY: {
+			if (!*vnum_arg) {
+				msg_to_char(ch, "You must specify a currency (generic) vnum.\r\n");
+				return NOTHING;
+			}
+			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid generic vnum '%s'.\r\n", vnum_arg);
+				return NOTHING;
+			}
+			if (find_generic(vnum, GENERIC_CURRENCY)) {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_OBJECT: {
+			if (!*vnum_arg) {
+				msg_to_char(ch, "You must specify an object vnum.\r\n");
+				return NOTHING;
+			}
+			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
+				return NOTHING;
+			}
+			if (obj_proto(vnum)) {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_SET_SKILL:
+		case QR_SKILL_EXP:
+		case QR_SKILL_LEVELS: {
+			if (!*vnum_arg) {
+				msg_to_char(ch, "You must specify a skill vnum.\r\n");
+				return NOTHING;
+			}
+			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
+				return NOTHING;
+			}
+			if (find_skill_by_vnum(vnum)) {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_QUEST_CHAIN: {
+			if (!*vnum_arg) {
+				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
+			}
+			if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
+				return NOTHING;
+			}
+			if (quest_proto(vnum)) {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_REPUTATION: {
+			if (!*vnum_arg) {
+				msg_to_char(ch, "You must specify a faction name or vnum.\r\n");
+				return NOTHING;
+			}
+			if (!(fct = find_faction(vnum_arg))) {
+				msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
+				return NOTHING;
+			}
+			vnum = FCT_VNUM(fct);
+			ok = TRUE;
+			break;
+		}
+		case QR_EVENT_POINTS: {
+			if (!*vnum_arg || !isdigit(*vnum_arg)) {
+				msg_to_char(ch, "You must specify an event vnum.\r\n");
+				return NOTHING;
+			}
+			if (!(event = find_event_by_vnum(atoi(vnum_arg)))) {
+				msg_to_char(ch, "Invalid event vnum '%s'.\r\n", vnum_arg);
+				return NOTHING;
+			}
+			vnum = EVT_VNUM(event);
+			ok = TRUE;
+			break;
+		}
+	}
+	
+	// did we find one?
+	if (!ok) {
+		msg_to_char(ch, "Unable to find %s %d.\r\n", quest_reward_types[type], vnum);
+		return NOTHING;
+	}
+	
+	return vnum;
+}
+
+
+/**
 * Processing for quest-givers (starts at, ends at).
 *
 * @param char_data *ch The player using OLC.
@@ -5013,7 +5145,7 @@ OLC_MODULE(qedit_rewards) {
 			
 			// did we find one?
 			if (!ok) {
-				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[change->type], vnum);
+				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_reward_types[change->type], vnum);
 				return;
 			}
 			
@@ -5095,7 +5227,7 @@ OLC_MODULE(qedit_rewards) {
 	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: rewards add <type> <amount> <vnum/type>\r\n");
-		msg_to_char(ch, "Usage: rewards change <number> vnum <value>\r\n");
+		msg_to_char(ch, "Usage: rewards change <number> <amount | vnum> <value>\r\n");
 		msg_to_char(ch, "Usage: rewards copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: rewards remove <number | all>\r\n");
 		msg_to_char(ch, "Usage: rewards move <number> <up | down>\r\n");

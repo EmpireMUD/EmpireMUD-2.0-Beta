@@ -198,7 +198,9 @@ OLC_MODULE(evedit_name);
 OLC_MODULE(evedit_maxlevel);
 OLC_MODULE(evedit_minlevel);
 OLC_MODULE(evedit_notes);
+OLC_MODULE(evedit_rankrewards);
 OLC_MODULE(evedit_repeat);
+OLC_MODULE(evedit_thresholdrewards);
 
 // faction modules
 OLC_MODULE(fedit_description);
@@ -776,7 +778,9 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", evedit_maxlevel, OLC_EVENT, OLC_CF_EDITOR },
 	{ "minlevel", evedit_minlevel, OLC_EVENT, OLC_CF_EDITOR },
 	{ "notes", evedit_notes, OLC_EVENT, OLC_CF_EDITOR },
+	{ "ranks", evedit_rankrewards, OLC_EVENT, OLC_CF_EDITOR },
 	{ "repeat", evedit_repeat, OLC_EVENT, OLC_CF_EDITOR },
+	{ "thresholds", evedit_thresholdrewards, OLC_EVENT, OLC_CF_EDITOR },
 	
 	// faction commands
 	{ "description", fedit_description, OLC_FACTION, OLC_CF_EDITOR },
