@@ -2403,7 +2403,7 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 	LL_FOREACH(EVT_THRESHOLD_REWARDS(re->event), reward) {
 		collect = (ped->points >= reward->min);
 		done = (ped->collected_points >= reward->min);
-		snprintf(line, sizeof(line), "%s%*d pt%s: %s%s\t0\r\n", done ? "\tc" : (collect ? "\tg" : ""), reward->min == 1 ? 4 : 3, reward->min, PLURAL(reward->min), event_reward_string(reward, IS_IMMORTAL(ch)), done ? " (collected)" : "");
+		snprintf(line, sizeof(line), "%s%*d pt%s: %s%s\t0\r\n", done ? "\tc" : (collect ? "\tg" : ""), reward->min == 1 ? 4 : 3, reward->min, PLURAL(reward->min), event_reward_string(reward, IS_IMMORTAL(ch)), done ? " (collected)" : (collect ? "pending" : ""));
 		
 		if (size + strlen(line) < sizeof(buf)) {
 			strcat(buf, line);
@@ -2424,7 +2424,7 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 	LL_FOREACH(EVT_RANK_REWARDS(re->event), reward) {
 		collect = (ped->rank >= reward->min && ped->rank <= reward->max);
 		done = (ped->status == EVTS_COLLECTED);
-		snprintf(line, sizeof(line), "%s %d-%d: %s%s\t0\r\n", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : "");
+		snprintf(line, sizeof(line), "%s %d-%d: %s%s\t0\r\n", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : (collect ? "pending" : ""));
 		
 		if (size + strlen(line) < sizeof(buf)) {
 			strcat(buf, line);
