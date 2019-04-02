@@ -2373,6 +2373,77 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 }
 
 
+
+/**
+* Displays the rewards for any event that still has 'running' data. This will
+* show ones the player has already collected as such.
+*
+* @param char_data *ch The person who's looking at the data.
+* @param struct event_running_data *re The event.
+*/
+void show_event_rewards(char_data *ch, struct event_running_data *re) {
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	struct player_event_data *ped;
+	struct event_reward *reward;
+	bool collect, done;
+	size_t size;
+	
+	// basic sanitation
+	if (!re || !re->event || !ch->desc) {
+		msg_to_char(ch, "Unable to view rewards.\r\n");
+		return;
+	}
+	
+	ped = get_event_data(ch, re->id);
+	size = 0;
+	*buf = '\0';
+	
+	// THRESHOLD
+	size += snprintf(buf + size, sizeof(buf) - size, "Threshold rewards for %s:\r\n", EVT_NAME(re->event));
+	LL_FOREACH(EVT_THRESHOLD_REWARDS(re->event), reward) {
+		collect = (ped->points >= reward->min);
+		done = (ped->collected_points >= reward->min);
+		snprintf(line, sizeof(line), "%s%*d pt%s: %s%s\t0\r\n", done ? "\tc" : (collect ? "\tg" : ""), reward->min == 1 ? 4 : 3, reward->min, PLURAL(reward->min), event_reward_string(reward, IS_IMMORTAL(ch)), done ? " (collected)" : "");
+		
+		if (size + strlen(line) < sizeof(buf)) {
+			strcat(buf, line);
+			size += strlen(line);
+		}
+		else {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	if (!EVT_THRESHOLD_REWARDS(re->event)) {
+		// always room left in 'buf' in this case
+		snprintf(buf + size, sizeof(buf) - size, " no threshold rewards\r\n");
+	}
+	
+	// RANK
+	size += snprintf(buf + size, sizeof(buf) - size, "Rank rewards for %s:\r\n", EVT_NAME(re->event));
+	LL_FOREACH(EVT_THRESHOLD_REWARDS(re->event), reward) {
+		collect = (ped->rank >= reward->min && ped->rank <= reward->max);
+		done = (ped->status == EVTS_COLLECTED);
+		snprintf(line, sizeof(line), "%sRank %d-%d: %s%s\t0\r\n", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : "");
+		
+		if (size + strlen(line) < sizeof(buf)) {
+			strcat(buf, line);
+			size += strlen(line);
+		}
+		else {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	if (!EVT_THRESHOLD_REWARDS(re->event)) {
+		// always room left in 'buf' in this case
+		snprintf(buf + size, sizeof(buf) - size, " no threshold rewards\r\n");
+	}
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
 /**
 * What to show if someone types 'events' with no argument. This shows:
 * - a list of events, if more than 1 are running
@@ -2587,6 +2658,7 @@ EVENT_CMD(evcmd_cancel);
 EVENT_CMD(evcmd_collect);
 EVENT_CMD(evcmd_end);
 EVENT_CMD(evcmd_leaderboard);
+EVENT_CMD(evcmd_rewards);
 EVENT_CMD(evcmd_start);
 
 // subcommand struct for 'events'
@@ -2599,6 +2671,7 @@ const struct {
 	{ "collect", evcmd_collect, 0, NO_GRANTS },
 	{ "leaderboard", evcmd_leaderboard, 0, NO_GRANTS },
 	{ "lb", evcmd_leaderboard, 0, NO_GRANTS },
+	{ "rewards", evcmd_rewards, 0, NO_GRANTS },
 	
 	// immortal commands
 	{ "cancel", evcmd_cancel, LVL_CIMPL, GRANT_EVENTS },
@@ -2869,6 +2942,42 @@ EVENT_CMD(evcmd_leaderboard) {
 	
 	// success
 	show_event_leaderboard(ch, re);
+}
+
+
+// shows all rewards for an event
+EVENT_CMD(evcmd_rewards) {
+	struct event_running_data *re, *only;
+	event_data *event;
+	
+	// if only 1 event is running, show it if no-args
+	only = only_one_running_event(NULL);
+	
+	if (!*argument && only) {
+		show_event_rewards(ch, only);
+		return;
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "View rewards for which event?\r\n");
+		return;
+	}
+	
+	// targeting: imms may target by event id
+	if (IS_IMMORTAL(ch) && isdigit(*argument) && (re = find_running_event_by_id(atoi(argument)))) {
+		event = re->event;
+		// this is a valid case; all other targeting below happens otherwise:
+	}
+	else if (!(event = smart_find_event(argument, FALSE))) {
+		msg_to_char(ch, "Unknown event '%s'.\r\n", argument);
+		return;
+	}
+	else if (!(re = find_last_event_by_vnum(EVT_VNUM(event)))) {
+		msg_to_char(ch, "Unable to view rewards for that event.\r\n");
+		return;
+	}
+	
+	// success
+	show_event_rewards(ch, re);
 }
 
 
