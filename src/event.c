@@ -1916,6 +1916,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 	LL_FOREACH_SAFE(running_events, running, next_running) {
 		if (!running->event || EVT_VNUM(running->event) == vnum) {
 			LL_DELETE(running_events, running);
+			// free_event_leaderboard(running->empire_leaderboard);
 			free_event_leaderboard(running->player_leaderboard);
 			free(running);
 		}
