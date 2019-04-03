@@ -136,6 +136,9 @@ void end_event(struct event_running_data *re) {
 	
 	// announce
 	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has ended!", EVT_NAME(event));
+	
+	qt_event_start_stop(EVT_VNUM(event));
+	et_event_start_stop(EVT_VNUM(event));
 }
 
 
@@ -314,6 +317,9 @@ void start_event(event_data *event) {
 	
 	// announce
 	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has been begun!", EVT_NAME(event));
+	
+	qt_event_start_stop(EVT_VNUM(event));
+	et_event_start_stop(EVT_VNUM(event));
 }
 
 
@@ -620,6 +626,11 @@ void cancel_running_event(struct event_running_data *re) {
 	
 	// remove
 	LL_DELETE(running_events, re);
+	
+	if (re->event) {
+		qt_event_start_stop(EVT_VNUM(re->event));
+		et_event_start_stop(EVT_VNUM(re->event));
+	}
 	
 	// and free
 	// free_event_leaderboard(re->empire_leaderboard);
@@ -2724,10 +2735,8 @@ const struct {
 	-- need imm lookup that finds events by id OR most-recent-name
 		- show event id on the list and detail pages
 	
-	- end (confirm)
 	- need to show stats on participants to imms
 	- un-collect command that reset's a player's collection on an event, or else sets it to a certain level
-	- view/claim rewards
 	*/
 
 	// this goes last

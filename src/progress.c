@@ -1229,6 +1229,33 @@ void et_change_greatness(empire_data *emp) {
 
 
 /**
+* Empire Tracker: event starts or stops (update all empires)
+*
+* @param any_vnum event_vnum Which event has started or stopped.
+*/
+void et_event_start_stop(any_vnum event_vnum) {
+	struct empire_goal *goal, *next_goal;
+	empire_data *emp, *next_emp;
+	struct req_data *task;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			LL_FOREACH(goal->tracker, task) {
+				if (task->type == REQ_EVENT_RUNNING && task->vnum == event_vnum) {
+					task->current = find_running_event_by_vnum(task->vnum) ? task->needed : 0;
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				}
+				else if (task->type == REQ_EVENT_NOT_RUNNING && task->vnum == event_vnum) {
+					task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				}
+			}
+		}
+	}
+}
+
+
+/**
 * Empire Tracker: empire gets a building
 *
 * @param empire_data *emp The empire.

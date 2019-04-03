@@ -2375,6 +2375,35 @@ void qt_empire_wealth(char_data *ch, any_vnum amount) {
 
 
 /**
+* Quest Tracker: an event starts or stops (updates all players in-game)
+*
+* @param any_vnum event_vnum Which event has started or stopped.
+*/
+void qt_event_start_stop(any_vnum event_vnum) {
+	struct player_quest *pq;
+	struct req_data *task;
+	char_data *ch;
+	
+	LL_FOREACH(character_list, ch) {
+		if (IS_NPC(ch)) {
+			continue;
+		}
+		
+		LL_FOREACH(GET_QUESTS(ch), pq) {
+			LL_FOREACH(pq->tracker, task) {
+				if (task->type == REQ_EVENT_RUNNING && task->vnum == event_vnum) {
+					task->current = find_running_event_by_vnum(task->vnum) ? task->needed : 0;
+				}
+				else if (task->type == REQ_EVENT_NOT_RUNNING && task->vnum == event_vnum) {
+					task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
+				}
+			}
+		}
+	}
+}
+
+
+/**
 * Quest Tracker: ch gets a building
 *
 * @param char_data *ch The player.
