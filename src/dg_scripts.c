@@ -2062,6 +2062,15 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", p);
 		return TRUE;
 	}
+	else if (!str_cmp(field, "char")) {
+		int pos = atoi(NULLSAFE(subfield));
+		if (subfield && strlen(vd->value) > pos) {
+			snprintf(str, slen, "%c", vd->value[pos]);
+		}
+		else {
+			snprintf(str, slen, "0");
+		}
+	}
 	else if (!str_cmp(field, "contains")) {            /* contains  */
 		if (str_str(vd->value, subfield))
 			snprintf(str, slen, "1");
@@ -2087,6 +2096,15 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 
 		snprintf(str, slen, "%s", cdr);
 		return TRUE;
+	}
+	else if (!str_cmp(field, "index_of")) {
+		char *find;
+		if (subfield && *subfield && (find = strchr(vd->value, *subfield))) {
+			snprintf(str, slen, "%d", (int)(find - vd->value));
+		}
+		else {
+			snprintf(str, slen, "-1");
+		}
 	}
 	else if (!str_cmp(field, "mudcommand")) {
 		/* find the mud command returned from this text */
