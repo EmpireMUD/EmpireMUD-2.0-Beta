@@ -2731,14 +2731,6 @@ const struct {
 	{ "end", evcmd_end, LVL_CIMPL, GRANT_EVENTS },
 	{ "start", evcmd_start, LVL_CIMPL, GRANT_EVENTS },
 	
-	/*
-	-- need imm lookup that finds events by id OR most-recent-name
-		- show event id on the list and detail pages
-	
-	- need to show stats on participants to imms
-	- un-collect command that reset's a player's collection on an event, or else sets it to a certain level
-	*/
-
 	// this goes last
 	{ "\n", NULL, 0, NOBITS }
 };
