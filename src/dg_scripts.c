@@ -2249,7 +2249,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		}
 	}
 
-	if (!*field) {
+	if (!field || !*field) {
 		if (vd) {
 			snprintf(str, slen, "%s", vd->value);
 		}
