@@ -1751,11 +1751,11 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 
 // simple sorter for event rewards
 int sort_event_rewards(struct event_reward *a, struct event_reward *b) {
-	if (a->min != b->min) {
-		return a->min - b->min;
+	if (a->max != b->max) {
+		return a->max - b->max;
 	}
 	else {
-		return a->max - b->max;
+		return a->min - b->min;
 	}
 }
 
