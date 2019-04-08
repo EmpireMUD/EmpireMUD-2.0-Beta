@@ -903,7 +903,7 @@ void load_running_events_file(void) {
 */
 void schedule_event_event(struct event_running_data *erd) {
 	struct event_event_data *data;
-	time_t left;
+	time_t end, left;
 	
 	if (!erd) {
 		return;
@@ -922,17 +922,18 @@ void schedule_event_event(struct event_running_data *erd) {
 	CREATE(data, struct event_event_data, 1);
 	data->running = erd;
 	
-	left = (erd->start_time + (EVT_DURATION(erd->event) * SECS_PER_REAL_MIN)) - time(0);
+	end = erd->start_time + (EVT_DURATION(erd->event) * SECS_PER_REAL_MIN);
+	left = end - time(0);
 	
 	// announce at...
-	if (left >= 5 * SECS_PER_REAL_MIN) {
+	if (left > 5 * SECS_PER_REAL_MIN) {
 		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, left - (5 * SECS_PER_REAL_MIN));
 	}
-	else if (left >= 1 * SECS_PER_REAL_MIN) {
+	else if (left > 1 * SECS_PER_REAL_MIN) {
 		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, left - (1 * SECS_PER_REAL_MIN));
 	}
-	if (left >= 30) {
-		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, 30);
+	if (left > 30) {
+		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, left - 30);
 	}
 	else {	// event almost over
 		erd->next_dg_event = dg_event_create(check_event_end, (void*)data, left);
