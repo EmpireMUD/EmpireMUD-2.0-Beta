@@ -926,6 +926,7 @@ void schedule_event_event(struct event_running_data *erd) {
 	left = end - time(0);
 	
 	// announce at...
+	/*
 	if (left > 5 * SECS_PER_REAL_MIN) {
 		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, left - (5 * SECS_PER_REAL_MIN));
 	}
@@ -936,8 +937,9 @@ void schedule_event_event(struct event_running_data *erd) {
 		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, left - 30);
 	}
 	else {	// event almost over
+	*/
 		erd->next_dg_event = dg_event_create(check_event_end, (void*)data, left);
-	}
+	//}
 }
 
 
