@@ -6547,9 +6547,9 @@ struct stored_event_info_t stored_event_info[] = {
 *
 * @param struct stored_event **list The list to add to.
 * @param int type The SEV_ type to add the event as.
-* @param struct event *event The event to store.
+* @param struct dg_event *event The event to store.
 */
-void add_stored_event(struct stored_event **list, int type, struct event *event) {
+void add_stored_event(struct stored_event **list, int type, struct dg_event *event) {
 	struct stored_event *sev;
 	
 	if (!event) {
@@ -6578,7 +6578,7 @@ void cancel_stored_event(struct stored_event **list, int type) {
 	struct stored_event *sev = find_stored_event(*list, type);
 	
 	if (sev && sev->ev) {
-		event_cancel(sev->ev, stored_event_info[type].cancel);
+		dg_event_cancel(sev->ev, stored_event_info[type].cancel);
 		sev->ev = NULL;
 	}
 	

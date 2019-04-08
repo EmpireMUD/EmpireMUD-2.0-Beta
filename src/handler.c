@@ -600,7 +600,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 	}
 	
 	if (af->expire_event) {
-		event_cancel(af->expire_event, cancel_room_expire_event);
+		dg_event_cancel(af->expire_event, cancel_room_expire_event);
 	}
 	
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
@@ -1024,7 +1024,7 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 		expire_data->room = room;
 		expire_data->affect = af;
 		
-		af->expire_event = event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
+		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
 	}
 }
 
@@ -2877,7 +2877,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	
 	// claimed rooms are never unloadable anyway
 	if (ROOM_UNLOAD_EVENT(room)) {
-		event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
+		dg_event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
 		ROOM_UNLOAD_EVENT(room) = NULL;
 	}
 }

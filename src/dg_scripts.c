@@ -1309,7 +1309,7 @@ void script_stat (char_data *ch, struct script_data *sc) {
 		msg_to_char(ch, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s\r\n",  buf1, GET_TRIG_NARG(t), ((GET_TRIG_ARG(t) && *GET_TRIG_ARG(t)) ? GET_TRIG_ARG(t) : "None"));
 
 		if (GET_TRIG_WAIT(t)) {
-			msg_to_char(ch, "    Wait: %ld, Current line: %s\r\n", event_time(GET_TRIG_WAIT(t)), t->curr_state ? t->curr_state->cmd : "End of Script");
+			msg_to_char(ch, "    Wait: %ld, Current line: %s\r\n", dg_event_time(GET_TRIG_WAIT(t)), t->curr_state ? t->curr_state->cmd : "End of Script");
 			msg_to_char(ch, "  Variables: %s\r\n", GET_TRIG_VARS(t) ? "" : "None");
 
 			for (tv = GET_TRIG_VARS(t); tv; tv = tv->next) {
@@ -5980,7 +5980,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 	wait_event_obj->go = go;
 	wait_event_obj->type = type;
 
-	GET_TRIG_WAIT(trig) = event_create(trig_wait_event, wait_event_obj, when);
+	GET_TRIG_WAIT(trig) = dg_event_create(trig_wait_event, wait_event_obj, when);
 	trig->curr_state = cl->next;
 }
 

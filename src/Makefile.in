@@ -253,7 +253,7 @@ eedit.o: eedit.c conf.h sysdep.h structs.h uthash.h utils.h interpreter.h \
   comm.h handler.h db.h olc.h
 	$(CC) -c $(CFLAGS) eedit.c
 event.o: event.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
-  skills.h handler.h interpreter.h dg_scripts.h vnums.h
+  skills.h handler.h interpreter.h dg_event.h dg_scripts.h vnums.h
 	$(CC) -c $(CFLAGS) event.c
 faction.o: faction.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
   interpreter.h handler.h db.h skills.h olc.h

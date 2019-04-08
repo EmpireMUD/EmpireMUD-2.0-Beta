@@ -23,7 +23,7 @@
 /*
 ** define event related structures
 */
-struct event {
+struct dg_event {
 	EVENTFUNC(*func);
 	void *event_obj;
 	struct q_element *q_el;
@@ -48,12 +48,12 @@ struct q_element {
 /****** End of Queue related info ********/
 
 /* - events - function protos need by other modules */
-void event_init(void);
-struct event *event_create(EVENTFUNC(*func), void *event_obj, long when);
-void event_cancel(struct event *event, EVENT_CANCEL_FUNC(*func));
-void event_process(void);
-long event_time(struct event *event);
-void event_free_all(void);
+void dg_event_init(void);
+struct dg_event *dg_event_create(EVENTFUNC(*func), void *event_obj, long when);
+void dg_event_cancel(struct dg_event *event, EVENT_CANCEL_FUNC(*func));
+void dg_event_process(void);
+long dg_event_time(struct dg_event *event);
+void dg_event_free_all(void);
 
 /* - queues - function protos need by other modules */
 struct queue *queue_init(void);
@@ -63,4 +63,4 @@ void *queue_head(struct queue *q);
 long queue_key(struct queue *q);
 long queue_elmt_key(struct q_element *qe);
 void queue_free(struct queue *q);
-int  event_is_queued(struct event *event);
+int  dg_event_is_queued(struct dg_event *event);

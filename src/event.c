@@ -23,6 +23,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "dg_event.h"
 #include "dg_scripts.h"
 #include "vnums.h"
 
@@ -58,7 +59,9 @@ extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_v
 extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 
 // local protos
+EVENT_CANCEL_FUNC(cancel_event_event);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
+void schedule_event_event(struct event_running_data *erd);
 int sort_event_rewards(struct event_reward *a, struct event_reward *b);
 void update_player_leaderboard(char_data *ch, struct event_running_data *re, struct player_event_data *ped);
 
@@ -139,6 +142,11 @@ void end_event(struct event_running_data *re) {
 	
 	qt_event_start_stop(EVT_VNUM(event));
 	et_event_start_stop(EVT_VNUM(event));
+	
+	// unschedule event?
+	if (re->next_dg_event) {
+		dg_event_cancel(re->next_dg_event, cancel_event_event);
+	}
 }
 
 
@@ -320,6 +328,8 @@ void start_event(event_data *event) {
 	
 	qt_event_start_stop(EVT_VNUM(event));
 	et_event_start_stop(EVT_VNUM(event));
+	
+	schedule_event_event(re);
 }
 
 
@@ -632,6 +642,11 @@ void cancel_running_event(struct event_running_data *re) {
 		et_event_start_stop(EVT_VNUM(re->event));
 	}
 	
+	// unschedule event?
+	if (re->next_dg_event) {
+		dg_event_cancel(re->next_dg_event, cancel_event_event);
+	}
+	
 	// and free
 	// free_event_leaderboard(re->empire_leaderboard);
 	free_event_leaderboard(re->player_leaderboard);
@@ -642,61 +657,48 @@ void cancel_running_event(struct event_running_data *re) {
 }
 
 
-/**
-* This function should be called roughly once per minute to check for events
-* ending.
-*/
-void check_event_timers(void) {
-	struct event_running_data *re, *next_re;
-	
-	LL_FOREACH_SAFE(running_events, re, next_re) {
-		if (!re->event) {
-			continue;	// cannot work without this -- should we remove it?
-		}
-		
-		// EVTS_x: what to do as time passes
-		switch (re->status) {
-			case EVTS_NOT_STARTED: {
-				// TODO add a delay-start system that compares start_time to now
-				break;
-			}
-			case EVTS_RUNNING: {
-				if (re->start_time + (EVT_DURATION(re->event) * SECS_PER_REAL_MIN) < time(0)) {
-					end_event(re);
-				}
-				break;
-			}
-			// no default: no work for other statuses
-		}
-		
-		// TODO: expire very old event data
-	}
+// frees memory when an event_data event is canceled
+EVENT_CANCEL_FUNC(cancel_event_event) {
+	struct event_event_data *data = (struct event_event_data *)event_obj;
+	free(data);
 }
 
 
-/**
-* Audits all the currently-running events, on startup.
-*/
-void verify_running_events(void) {
-	struct event_running_data *re, *next_re;
-	bool bad;
+// sends an alert that an event is ending soon
+EVENTFUNC(check_event_announce) {
+	struct event_event_data *data = (struct event_event_data *)event_obj;
+	struct event_running_data *erd = data->running;
 	
-	LL_FOREACH_SAFE(running_events, re, next_re) {
-		bad = FALSE;
-		
-		if (!re->event) {
-			bad = TRUE;	// no event??
-		}
-		else if (EVT_FLAGGED(re->event, EVTF_IN_DEVELOPMENT)) {
-			bad = TRUE;	// event is in-dev
-		}
-		
-		// oops:
-		if (bad) {
-			log("verify_running_events: Canceling event %d (%s)", re->id, re->event ? EVT_NAME(re->event) : "invalid event");
-			cancel_running_event(re);
-		}
+	if (!erd) {	// somehow
+		log("SYSERR: check_event_announce called with null event");
+		free(data);
+		return 0;
 	}
+	
+	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s will end in %s", EVT_NAME(erd->event), time_length_string(erd->start_time + (EVT_DURATION(erd->event) * SECS_PER_REAL_MIN) - time(0)));
+	
+	erd->next_dg_event = NULL;
+	schedule_event_event(erd);	// schedule the next one
+	
+	return 0;	// do not reenqueue this one
+}
+
+
+// checks if an event should have ended by now
+EVENTFUNC(check_event_end) {
+	struct event_event_data *data = (struct event_event_data *)event_obj;
+	struct event_running_data *erd = data->running;
+	
+	if (!erd) {	// somehow
+		log("SYSERR: check_event_end called with null event");
+		free(data);
+		return 0;
+	}
+	
+	free(data);
+	end_event(erd);
+	erd->next_dg_event = NULL;
+	return 0;	// do not reenqueue
 }
 
 
@@ -891,6 +893,80 @@ void load_running_events_file(void) {
 	}
 	
 	fclose(fl);
+}
+
+
+/**
+* Schedules the end of an event, or its next notification.
+*
+* @param struct event_running_data *erd The running event.
+*/
+void schedule_event_event(struct event_running_data *erd) {
+	struct event_event_data *data;
+	time_t left;
+	
+	if (!erd) {
+		return;
+	}
+	
+	// cancel any old event
+	if (erd->next_dg_event) {
+		dg_event_cancel(erd->next_dg_event, cancel_event_event);
+	}
+	
+	if (!erd->event) {
+		return;	// can't really function without an event
+	}
+	
+	// start the new one
+	CREATE(data, struct event_event_data, 1);
+	data->running = erd;
+	
+	left = (erd->start_time + (EVT_DURATION(erd->event) * SECS_PER_REAL_MIN)) - time(0);
+	
+	// announce at...
+	if (left >= 5 * SECS_PER_REAL_MIN) {
+		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, left - (5 * SECS_PER_REAL_MIN));
+	}
+	else if (left >= 1 * SECS_PER_REAL_MIN) {
+		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, left - (1 * SECS_PER_REAL_MIN));
+	}
+	if (left >= 30) {
+		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, 30);
+	}
+	else {	// event almost over
+		erd->next_dg_event = dg_event_create(check_event_end, (void*)data, left);
+	}
+}
+
+
+/**
+* Audits all the currently-running events, on startup.
+*/
+void verify_running_events(void) {
+	struct event_running_data *re, *next_re;
+	bool bad;
+	
+	LL_FOREACH_SAFE(running_events, re, next_re) {
+		bad = FALSE;
+		
+		if (!re->event) {
+			bad = TRUE;	// no event??
+		}
+		else if (EVT_FLAGGED(re->event, EVTF_IN_DEVELOPMENT)) {
+			bad = TRUE;	// event is in-dev
+		}
+		
+		// oops:
+		if (bad) {
+			log("verify_running_events: Canceling event %d (%s)", re->id, re->event ? EVT_NAME(re->event) : "invalid event");
+			cancel_running_event(re);
+		}
+		else {
+			// schedule its next event
+			schedule_event_event(re);
+		}
+	}
 }
 
 

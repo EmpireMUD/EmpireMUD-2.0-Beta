@@ -2612,7 +2612,7 @@ struct affected_type {
 	byte location;	// Tells which ability to change - APPLY_
 	bitvector_t bitvector;	// Tells which bits to set - AFF_
 	
-	struct event *expire_event;	// SOMETIMES these have scheduled events
+	struct dg_event *expire_event;	// SOMETIMES these have scheduled events
 	
 	struct affected_type *next;
 };
@@ -4586,6 +4586,12 @@ struct event_data {
 };
 
 
+// for 'event' start/end events
+struct event_event_data {
+	struct event_running_data *running;
+};
+
+
 // global events: rewards
 struct event_reward {
 	int min;	// minimum rank that gets this, OR minimum event points for threshold
@@ -4610,6 +4616,8 @@ struct event_running_data {
 	// leaderboards (these are summaries and, in general, the game relies on the player file for scores)
 	struct event_leaderboard *player_leaderboard;
 	// struct event_leaderboard *empire_leaderboard;
+	
+	struct dg_event *next_dg_event;	// handles timing for ending the event
 	
 	struct event_running_data *next;	// linked list: running_events
 };
@@ -4665,7 +4673,7 @@ struct room_expire_event_data {
 
 // for lists of stored events on things
 struct stored_event {
-	struct event *ev;
+	struct dg_event *ev;
 	int type;	// SEV_ type
 	
 	UT_hash_handle hh;	// hashed by type
@@ -5283,7 +5291,7 @@ struct room_data {
 	vehicle_data *vehicles;	// start of vehicle list (veh->next_in_room)
 	
 	struct reset_com *reset_commands;	// used only during startup
-	struct event *unload_event;	// used for un-loading of live rooms
+	struct dg_event *unload_event;	// used for un-loading of live rooms
 	
 	UT_hash_handle hh;	// hash handle for world_table
 	room_data *next_interior;	// linked list: interior_room_list
