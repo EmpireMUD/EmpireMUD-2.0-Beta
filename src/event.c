@@ -146,6 +146,7 @@ void end_event(struct event_running_data *re) {
 	// unschedule event?
 	if (re->next_dg_event) {
 		dg_event_cancel(re->next_dg_event, cancel_event_event);
+		re->next_dg_event = NULL;
 	}
 }
 
@@ -696,8 +697,8 @@ EVENTFUNC(check_event_end) {
 	}
 	
 	free(data);
-	end_event(erd);
 	erd->next_dg_event = NULL;
+	end_event(erd);
 	return 0;	// do not reenqueue
 }
 
@@ -936,8 +937,11 @@ void schedule_event_event(struct event_running_data *erd) {
 	if (left > 30) {
 		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, (left - 30) RL_SEC);
 	}
-	else {	// event almost over
+	else if (left > 0) {	// event almost over
 		erd->next_dg_event = dg_event_create(check_event_end, (void*)data, left RL_SEC);
+	}
+	else {	// event is already over
+		end_event(erd);
 	}
 }
 
