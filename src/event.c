@@ -2458,7 +2458,7 @@ void show_event_detail(char_data *ch, event_data *event) {
 		
 		if ((ped = get_event_data(ch, running->id))) {
 			rank = get_event_rank(ch, running);
-			if (rank) {
+			if (rank > 0) {
 				msg_to_char(ch, "Rank: %d (%d point%s)\r\n", rank, ped->points, PLURAL(ped->points));
 			}
 			else {
