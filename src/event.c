@@ -912,6 +912,7 @@ void schedule_event_event(struct event_running_data *erd) {
 	// cancel any old event
 	if (erd->next_dg_event) {
 		dg_event_cancel(erd->next_dg_event, cancel_event_event);
+		erd->next_dg_event = NULL;
 	}
 	
 	if (!erd->event) {
