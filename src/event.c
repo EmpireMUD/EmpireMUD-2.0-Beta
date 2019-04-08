@@ -119,7 +119,7 @@ void end_event(struct event_running_data *re) {
 	char_data *ch;
 	
 	// basic safety
-	if (!re || !(event = re->event)) {
+	if (!re || !(event = re->event) || re->status != EVTS_RUNNING) {
 		return;
 	}
 	
