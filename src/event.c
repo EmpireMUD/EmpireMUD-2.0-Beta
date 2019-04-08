@@ -646,6 +646,7 @@ void cancel_running_event(struct event_running_data *re) {
 	// unschedule event?
 	if (re->next_dg_event) {
 		dg_event_cancel(re->next_dg_event, cancel_event_event);
+		re->next_dg_event = NULL;
 	}
 	
 	// and free
@@ -676,9 +677,13 @@ EVENTFUNC(check_event_announce) {
 		return 0;
 	}
 	
-	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s will end in %s", EVT_NAME(erd->event), time_length_string(erd->start_time + (EVT_DURATION(erd->event) * SECS_PER_REAL_MIN) - time(0)));
-	
+	// clear this now
 	erd->next_dg_event = NULL;
+	
+	if (erd->event) {
+		log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s will end in %s", EVT_NAME(erd->event), time_length_string(erd->start_time + (EVT_DURATION(erd->event) * SECS_PER_REAL_MIN) - time(0)));
+	}
+	
 	schedule_event_event(erd);	// schedule the next one
 	
 	return 0;	// do not reenqueue this one
@@ -928,14 +933,14 @@ void schedule_event_event(struct event_running_data *erd) {
 	left = end - time(0);
 	
 	// announce at...
-	if (left > 5 * SECS_PER_REAL_MIN) {
-		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, (left - (5 * SECS_PER_REAL_MIN)) RL_SEC + 1);
+	if (left > 5 * SECS_PER_REAL_MIN + 1) {
+		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, (left - (5 * SECS_PER_REAL_MIN)) RL_SEC);
 	}
-	else if (left > 1 * SECS_PER_REAL_MIN) {
-		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, (left - (1 * SECS_PER_REAL_MIN)) RL_SEC + 1);
+	else if (left > 1 * SECS_PER_REAL_MIN + 1) {
+		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, (left - (1 * SECS_PER_REAL_MIN)) RL_SEC);
 	}
-	if (left > 30) {
-		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, (left - 30) RL_SEC + 1);
+	if (left > 30 + 1) {
+		erd->next_dg_event = dg_event_create(check_event_announce, (void*)data, (left - 30) RL_SEC);
 	}
 	else if (left > 0) {	// event almost over
 		erd->next_dg_event = dg_event_create(check_event_end, (void*)data, left RL_SEC);
