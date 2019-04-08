@@ -962,7 +962,7 @@ void verify_running_events(void) {
 			log("verify_running_events: Canceling event %d (%s)", re->id, re->event ? EVT_NAME(re->event) : "invalid event");
 			cancel_running_event(re);
 		}
-		else {
+		else if (re->status == EVTS_RUNNING) {
 			// schedule its next event
 			schedule_event_event(re);
 		}
