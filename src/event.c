@@ -941,6 +941,7 @@ void schedule_event_event(struct event_running_data *erd) {
 		erd->next_dg_event = dg_event_create(check_event_end, (void*)data, left RL_SEC);
 	}
 	else {	// event is already over
+		free(data);
 		end_event(erd);
 	}
 }
