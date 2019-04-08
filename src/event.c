@@ -2399,7 +2399,9 @@ void show_event_detail(char_data *ch, event_data *event) {
 	// bool full_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EVENTS));
 	struct event_running_data *running = find_last_event_by_vnum(EVT_VNUM(event));
 	char vnum[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct player_event_data *ped;
 	bool ended_recently = FALSE;
+	int diff, rank;
 	
 	// vnum portion
 	if (IS_IMMORTAL(ch)) {
@@ -2442,20 +2444,31 @@ void show_event_detail(char_data *ch, event_data *event) {
 				break;
 			}
 			case EVTS_COMPLETE: {	// show time since end
-				msg_to_char(ch, "\tcStatus: Ended (%s ago)\t0\r\n", time_length_string(running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) - time(0)));
+				diff = running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) - time(0);
+				if (diff < 0) {
+					msg_to_char(ch, "\tcStatus: Ended (%s ago)\t0\r\n", time_length_string(diff));
+				}
+				else {	// end is still in the future?
+					msg_to_char(ch, "\tcStatus: Ended recently\t0\r\n");
+				}
 				break;
 			}
 			// no other status shown
 		}
+		
+		if ((ped = get_event_data(ch, running->id))) {
+			rank = get_event_rank(ch, running);
+			if (rank) {
+				msg_to_char(ch, "Rank: %d (%d point%s)\r\n", rank, ped->points, PLURAL(ped->points));
+			}
+			else {
+				msg_to_char(ch, "Rank: unranked (%d point%s)\r\n", ped->points, PLURAL(ped->points));
+			}
+		}
+		else {
+			msg_to_char(ch, "Rank: unranked (0 points)\r\n");
+		}
 	}
-	
-	// TODO show current points/rank (or last points/rank if ended)
-		// get_event_rank(ch, running);
-	
-	// TODO show:
-	// EVT_RANK_REWARDS(event)	-> probably on another display
-	// EVT_THRESHOLD_REWARDS(evt)	-> probably on another display
-	// EVT_TYPE(evt)
 }
 
 
