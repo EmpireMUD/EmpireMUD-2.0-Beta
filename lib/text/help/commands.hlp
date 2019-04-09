@@ -709,10 +709,18 @@ You can also use the following event commands:
  &clb <event>&0 - View the leaderboard for a current or past event.
  &crewards <event>&0 - View the list of rewards for an event.
 
+Immortals see also: IMMORTAL EVENTS COMMAND
+#
+"IMMORTAL EVENTS COMMAND" "IMM EVENTS COMMAND"
+
+Usage:  events [command]
+
 Immortal event commands:
  &ccancel <id/event>&0 - Cancel a running event (with no rewards).
  &cend <id/event>&0 - End a running event early (with rewards).
  &cstart <event>&0 - Start an event.
+
+See also: EVENTS
 #
 EXCAVATE EXCAVATION TRENCH MOAT CANAL FILLIN
 
