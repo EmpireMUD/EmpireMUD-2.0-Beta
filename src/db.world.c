@@ -1226,7 +1226,7 @@ void annual_world_update(void) {
 	bool naturalize_newbie_islands = config_get_bool("naturalize_newbie_islands");
 	bool naturalize_unclaimable = config_get_bool("naturalize_unclaimable");
 	
-	snprintf(message, sizeof(message), "\r\n%s\r\n", config_get_string("newyear_message"));
+	snprintf(message, sizeof(message), "\r\n%s\r\n\r\n", config_get_string("newyear_message"));
 	
 	// MESSAGE TO ALL
 	for (d = descriptor_list; d; d = d->next) {
