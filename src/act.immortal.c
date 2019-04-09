@@ -2964,6 +2964,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d classes          %6d skills\r\n", HASH_COUNT(class_table), HASH_COUNT(skill_table));
 	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
 	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
+	msg_to_char(ch, "  %6d events           \r\n", HASH_COUNT(event_table));
 	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
 	msg_to_char(ch, "  %6d progress goals   %6d progress rewards\r\n", num_goals, num_rewards);
 	msg_to_char(ch, "  %6d shops\r\n", HASH_COUNT(shop_table));
@@ -9567,6 +9568,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No crops by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "event")) {
+		extern int vnum_event(char *searchname, char_data *ch);
+		if (!vnum_event(buf2, ch)) {
+			msg_to_char(ch, "No events by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "faction")) {
 		extern int vnum_faction(char *searchname, char_data *ch);
 		if (!vnum_faction(buf2, ch)) {
@@ -9750,6 +9757,15 @@ ACMD(do_vstat) {
 		else {
 			msg_to_char(ch, "Unknown empire.\r\n");
 		}
+	}
+	else if (is_abbrev(buf, "event")) {
+		void do_stat_event(char_data *ch, event_data *event);
+		event_data *event = find_event_by_vnum(number);
+		if (!event) {
+			msg_to_char(ch, "There is no event with that number.\r\n");
+			return;
+		}
+		do_stat_event(ch, event);
 	}
 	else if (is_abbrev(buf, "faction")) {
 		void do_stat_faction(char_data *ch, faction_data *fct);

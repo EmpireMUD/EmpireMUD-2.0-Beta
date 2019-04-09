@@ -29,6 +29,7 @@
 *     Crop Defines
 *     Empire Defines
 *     Event Defines
+*     Event Defines (Timed Event System)
 *     Faction Defines
 *     Game Defines
 *     Generic Defines
@@ -61,6 +62,7 @@
 *     Data Structs
 *     Empire Structs
 *     Event Structs
+*     Event Structs (Timed Event System)
 *     Faction Structs
 *     Fight Structs
 *     Game Structs
@@ -235,6 +237,7 @@ typedef struct craft_data craft_data;
 typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
+typedef struct event_data event_data;
 typedef struct faction_data faction_data;
 typedef struct generic_data generic_data;
 typedef struct index_data index_data;
@@ -396,6 +399,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_EMPIRE_MILITARY  33
 #define REQ_EMPIRE_PRODUCED_OBJECT  34
 #define REQ_EMPIRE_PRODUCED_COMPONENT  35
+#define REQ_EVENT_RUNNING  36
+#define REQ_EVENT_NOT_RUNNING  37
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -1228,6 +1233,24 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT DEFINES ///////////////////////////////////////////////////////////
 
+// EVT_x: event types
+
+
+// EVTF_x: event flags
+#define EVTF_IN_DEVELOPMENT  BIT(0)	// a. quest is not live
+#define EVTF_CONTINUES  BIT(1)	// b. event points do not reset when it runs again (it runs on the same id as last time)
+
+
+// EVTS_x: event status
+#define EVTS_NOT_STARTED  0	// default status
+#define EVTS_RUNNING  1	// event is active
+#define EVTS_COMPLETE  2	// event has ended
+#define EVTS_COLLECTED  3	// rewards have been collected (used only on players)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENT DEFINES (TIMED EVENT SYSTEM) //////////////////////////////////////
+
 // function types
 #define EVENTFUNC(name) long (name)(void *event_obj)
 #define EVENT_CANCEL_FUNC(name) void (name)(void *event_obj)
@@ -1841,6 +1864,7 @@ typedef struct vehicle_data vehicle_data;
 
 // channels for announcements
 #define DEATH_LOG_CHANNEL  "death"
+#define EVENT_LOG_CHANNEL  "events"
 #define PROGRESS_LOG_CHANNEL  "progress"
 #define PLAYER_LOG_CHANNEL  "grats"
 
@@ -1957,6 +1981,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_AUTOMESSAGE  BIT(39)
 #define GRANT_PEACE  BIT(40)
 #define GRANT_UNPROGRESS  BIT(41)
+#define GRANT_EVENTS  BIT(42)
 
 
 // Lore types
@@ -2223,6 +2248,7 @@ typedef struct vehicle_data vehicle_data;
 #define QR_QUEST_CHAIN  6
 #define QR_REPUTATION  7
 #define QR_CURRENCY  8
+#define QR_EVENT_POINTS  9
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -2586,7 +2612,7 @@ struct affected_type {
 	byte location;	// Tells which ability to change - APPLY_
 	bitvector_t bitvector;	// Tells which bits to set - AFF_
 	
-	struct event *expire_event;	// SOMETIMES these have scheduled events
+	struct dg_event *expire_event;	// SOMETIMES these have scheduled events
 	
 	struct affected_type *next;
 };
@@ -3604,6 +3630,7 @@ struct descriptor_data {
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
+	event_data *olc_event;	// event being edited
 	faction_data *olc_faction;	// faction being edited
 	generic_data *olc_generic;	// generic being edited
 	struct global_data *olc_global;	// global being edited
@@ -3803,6 +3830,7 @@ struct player_special_data {
 	struct player_faction_data *factions;	// hash table of factions
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 	struct player_automessage *automessages;	// hash of seen messages
+	struct player_event_data *event_data;	// hash of event scores and results
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -4533,6 +4561,97 @@ struct empire_data {
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT STRUCTS ///////////////////////////////////////////////////////////
 
+// global events: main data
+struct event_data {
+	any_vnum vnum;
+	ush_int version;	// for auto-updating
+	
+	char *name;	// short name for strings
+	char *description;	// long desc shown to players
+	char *complete_msg;	// sent to participants when over
+	char *notes;	// admin notes
+	
+	int type;	// EVT_ type
+	bitvector_t flags;	// EVTF_ flags
+	struct event_reward *rank_rewards;	// rewards given for final position
+	struct event_reward *threshold_rewards;	// rewards given for points progress
+	
+	// constraints
+	int min_level;	// or 0 for no min
+	int max_level;	// or 0 for no max
+	int duration;	// minutes in length
+	int repeats_after;	// minutes to auto-repeat; 0/NOT_REPEATABLE for none
+	
+	UT_hash_handle hh;	// hash handle for event_table
+};
+
+
+// for 'event' start/end events
+struct event_event_data {
+	struct event_running_data *running;
+};
+
+
+// global events: rewards
+struct event_reward {
+	int min;	// minimum rank that gets this, OR minimum event points for threshold
+	int max;	// maximum rank that gets this (optional: if 0, all players over 'min' get it)
+	int type;	// QR_ type
+	
+	any_vnum vnum;	// thing to give
+	int amount;	// how much/many to give
+	
+	struct event_reward *next;	// linked list
+};
+
+
+// for the 'running_events' linked list, saved to the events file
+struct event_running_data {
+	int id;	// permanent unique id (based on top_event_id)
+	event_data *event;	// pointer to the event proto
+	
+	time_t start_time;	// when it began
+	int status;	// EVTS_ state
+	
+	// leaderboards (these are summaries and, in general, the game relies on the player file for scores)
+	struct event_leaderboard *player_leaderboard;
+	// struct event_leaderboard *empire_leaderboard;
+	
+	struct dg_event *next_dg_event;	// handles timing for ending the event
+	
+	struct event_running_data *next;	// linked list: running_events
+};
+
+
+// summary of player/empire points (copied from any points the players gain)
+struct event_leaderboard {
+	int id;	// player or empire id
+	int points;	// last-recorded points
+	bool approved;	// in case we can't count unapproved chars
+	bool ignore;	// for imms or people who are disqualified, won't count toward rank
+	
+	UT_hash_handle hh;	// hash handle for running_event->player_leaderboard or running_event->empire_leaderboard
+};
+
+
+// for tracking players' points and status in the current event as well as past ones
+struct player_event_data {
+	int id;	// event id
+	event_data *event;	// which event it was
+	
+	time_t timestamp;	// when the event happened
+	int points;	// total accumulated points
+	int collected_points;	// the highest threshold reward collected by the player
+	int rank;	// last recorded rank
+	int status;	// what state the event is in
+	
+	UT_hash_handle hh;	// hash handle for GET_EVENT_DATA(ch)
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENT STRUCTS (TIMED EVENT SYSTEM) //////////////////////////////////////
+
 // for map events
 struct map_event_data {
 	struct map_data *map;
@@ -4554,7 +4673,7 @@ struct room_expire_event_data {
 
 // for lists of stored events on things
 struct stored_event {
-	struct event *ev;
+	struct dg_event *ev;
 	int type;	// SEV_ type
 	
 	UT_hash_handle hh;	// hashed by type
@@ -5172,7 +5291,7 @@ struct room_data {
 	vehicle_data *vehicles;	// start of vehicle list (veh->next_in_room)
 	
 	struct reset_com *reset_commands;	// used only during startup
-	struct event *unload_event;	// used for un-loading of live rooms
+	struct dg_event *unload_event;	// used for un-loading of live rooms
 	
 	UT_hash_handle hh;	// hash handle for world_table
 	room_data *next_interior;	// linked list: interior_room_list

@@ -8,6 +8,7 @@ bld - Buildings and designated rooms
 class - Player classes
 craft - Craft (forge, sew, etc) and build recipes
 crop - Crops
+evt - Events
 fct - Factions
 gen - Generics
 glb - Global data

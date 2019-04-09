@@ -39,7 +39,8 @@
 #define DB_BOOT_GEN  25
 #define DB_BOOT_SHOP  26
 #define DB_BOOT_PRG  27
-#define NUM_DB_BOOT_TYPES  28	// total
+#define DB_BOOT_EVT  28
+#define NUM_DB_BOOT_TYPES  29	// total
 
 
 // library sub-dirs
@@ -81,6 +82,7 @@
 #define CLASS_PREFIX  LIB_WORLD"class/"	// player classes
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
+#define EVT_PREFIX  LIB_WORLD"evt/"	// events
 #define FCT_PREFIX  LIB_WORLD"fct/"	// factions
 #define GEN_PREFIX  LIB_WORLD"gen/"	// generics
 #define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
@@ -116,6 +118,7 @@
 #define CRAFT_SUFFIX  ".craft"	// craft file suffix
 #define CROP_SUFFIX  ".crop"	// crop file suffix
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
+#define EVT_SUFFIX  ".evt"	// events
 #define FCT_SUFFIX  ".fct"	// factions
 #define GEN_SUFFIX  ".gen"	// generics
 #define GLB_SUFFIX  ".glb"	// global suffix
@@ -162,6 +165,7 @@
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
 #define NEW_WORLD_HINT_FILE  LIB_ETC"new_world"	// if present, moves einv on startup
+#define RUNNING_EVENTS_FILE  LIB_ETC"events"	// data for events that are running
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
 #define VERSION_FILE  LIB_ETC"version"	// for version tracking
 
@@ -352,6 +356,18 @@ void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
 
+// events
+extern event_data *event_table;
+extern int top_event_id;
+extern struct event_running_data *running_events;
+extern bool events_need_save;
+extern event_data *find_event_by_vnum(any_vnum vnum);
+extern struct event_running_data *find_last_event_run_by_vnum(any_vnum event_vnum);
+extern struct event_running_data *find_running_event_by_id(int id);
+extern struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum);
+void free_event(event_data *event);
+extern char *get_event_name_by_proto(any_vnum vnum);
+
 // factions
 extern faction_data *faction_table;
 extern int MAX_REPUTATION;
@@ -483,7 +499,7 @@ extern social_data *social_proto(any_vnum vnum);
 void free_social(social_data *soc);
 
 // stored event libs
-void add_stored_event(struct stored_event **list, int type, struct event *event);
+void add_stored_event(struct stored_event **list, int type, struct dg_event *event);
 void cancel_stored_event(struct stored_event **list, int type);
 void delete_stored_event(struct stored_event **list, int type);
 extern struct stored_event *find_stored_event(struct stored_event *list, int type);

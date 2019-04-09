@@ -245,6 +245,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	generic_data *gen = real_generic(vnum);
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
+	event_data *event, *next_event;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
@@ -314,6 +315,21 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			}
+		}
+	}
+	
+	// events
+	HASH_ITER(hh, event_table, event, next_event) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x: event rewards
+		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_CURRENCY, vnum);
+		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_CURRENCY, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	
@@ -746,6 +762,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	struct empire_unique_storage *eus;
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
+	event_data *event, *next_event;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
@@ -923,6 +940,18 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update events
+	HASH_ITER(hh, event_table, event, next_event) {
+		// QR_x: event reward types
+		found = delete_event_reward_from_list(&EVT_RANK_REWARDS(event), QR_CURRENCY, vnum);
+		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(event), QR_CURRENCY, vnum);
+		
+		if (found) {
+			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(event));
+		}
+	}
+	
 	// update objs
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		found = FALSE;
@@ -1031,6 +1060,16 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "One of the resources used in the craft you're editing was deleted.\r\n");
 			}	
+		}
+		if (GET_OLC_EVENT(desc)) {
+			// QR_x: event reward types
+			found = delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_CURRENCY, vnum);
+			found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(desc)), QR_CURRENCY, vnum);
+		
+			if (found) {
+				// SET_BIT(EVT_FLAGS(GET_OLC_EVENT(desc)), EVTF_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A generic currency used as a reward by the event you are editing was deleted.\r\n");
+			}
 		}
 		if (GET_OLC_OBJECT(desc)) {
 			found = FALSE;

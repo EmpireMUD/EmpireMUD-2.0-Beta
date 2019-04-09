@@ -1,0 +1,135 @@
+#11505
+Supplies for the Guild of Adventurers~
+   The Guild of Adventurers is stretched thin and needs supplies in order to
+maintain its constant assault on ancient tombs, sky-high towers, and wayward
+druids. Take this supply list and forge Guild swords, craft Guild cleansing
+smudges, and sew Guild decoy kits. Bring back one of each to get us started.
+(Look at the list of supplies to see how to make the items.)
+~
+It's going to take a lot more supplies than that to keep the guild running...
+~
+7 d 0 0 5760
+A
+1 18219
+A
+1 18211
+P
+36 11505 0 1 a
+P
+16 18200 0 6 a
+R
+9 11505 10
+R
+6 11506 11506
+R
+6 11507 11507
+R
+6 11508 11508
+T 11505
+W
+36 11505 0 1 a
+W
+2 11506 0 1 a
+W
+2 11507 0 1 a
+W
+2 11508 0 1 a
+Z
+1 18219
+Z
+1 18211
+S
+#11506
+Swords for the Guild~
+Forge another batch of Guild swords.
+~
+The Guild thanks you for another set of swords.
+~
+7 d 0 0 0
+A
+1 18219
+A
+1 18211
+P
+36 11505 0 1 a
+P
+16 18200 0 6 a
+P
+0 11505 0 1 a
+R
+9 11505 10
+R
+6 11506 11506
+T 11505
+W
+36 11505 0 1 a
+W
+2 11506 0 1 a
+Z
+1 18219
+Z
+1 18211
+S
+#11507
+Smudges for the Guild~
+Craft another batch of Guild cleansing smudges.
+~
+The Guild thanks you for another set of smudges.
+~
+8 d 0 0 0
+A
+1 18217
+A
+1 18209
+P
+36 11505 0 1 a
+P
+16 18200 0 6 a
+P
+0 11505 0 1 a
+R
+9 11505 10
+R
+6 11507 11507
+T 11505
+W
+36 11505 0 1 a
+W
+2 11507 0 1 a
+Z
+1 18217
+Z
+1 18209
+S
+#11508
+Decoys for the Guild~
+Sew another Guild decoy kit.
+~
+The Guild thanks you for another good decoy kit.
+~
+9 d 0 0 0
+A
+1 18218
+A
+1 18210
+P
+36 11505 0 1 a
+P
+16 18200 0 6 a
+P
+0 11505 0 1 a
+R
+9 11505 10
+R
+6 11508 11508
+T 11505
+W
+36 11505 0 1 a
+W
+2 11508 0 1 a
+Z
+1 18218
+Z
+1 18210
+S
+$

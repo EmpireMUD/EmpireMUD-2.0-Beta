@@ -794,7 +794,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 		
 		// find any 'waiting' copies and kill them
 		if (GET_TRIG_WAIT(live_trig)) {
-			event_cancel(GET_TRIG_WAIT(live_trig), cancel_wait_event);
+			dg_event_cancel(GET_TRIG_WAIT(live_trig), cancel_wait_event);
 			GET_TRIG_WAIT(live_trig) = NULL;
 			GET_TRIG_DEPTH(live_trig) = 0;
 			free_varlist(GET_TRIG_VARS(live_trig));

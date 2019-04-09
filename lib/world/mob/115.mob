@@ -1,0 +1,41 @@
+#11510
+hound adventure brown little~
+a brown adventure hound~
+A little brown adventure hound sniffs along the ground.
+~
+1 1 bdoD n 1
+0 0 0 15
+D
+   This little hound dog is decked out in cloth armor and elbow pads, with a
+little backpack on its back. It looks like this hound is ready for an
+adventure.
+~
+S
+#11511
+steed adventurer's adventurers~
+an adventurer's steed~
+An adventurer's steed is standing here.
+~
+100 100 dej 0 4
+0 0 0 11
+D
+   This tall, gray horse is decked out in light armor and prominently displays
+its empire's colors on its saddle and barding.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+S
+#11512
+pegasus adventurer's adventurers~
+an adventurer's pegasus~
+An adventurer's pegasus flaps its wings and whinnies.
+~
+150 150 dej m 4
+0 0 0 11
+D
+   This stunning white pegasus is lightly armored in barding matching the
+empire's banner. The pegasus stretches its wings, rears up on its hind legs,
+and kicks at the air.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+S
+$

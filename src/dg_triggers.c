@@ -2860,7 +2860,7 @@ EVENTFUNC(run_reset_triggers) {
 */
 void check_reset_trigger_event(room_data *room, bool random_offset) {
 	struct room_event_data *data;
-	struct event *ev;
+	struct dg_event *ev;
 	int mins;
 	
 	if (!IS_ADVENTURE_ROOM(room) && SCRIPT_CHECK(room, WTRIG_RESET)) {
@@ -2870,7 +2870,7 @@ void check_reset_trigger_event(room_data *room, bool random_offset) {
 			
 			// schedule every 7.5 minutes
 			mins = 7.5 - (random_offset ? number(0,6) : 0);
-			ev = event_create(run_reset_triggers, (void*)data, (mins * 60) RL_SEC);
+			ev = dg_event_create(run_reset_triggers, (void*)data, (mins * 60) RL_SEC);
 			add_stored_event_room(room, SEV_RESET_TRIGGER, ev);
 		}
 	}

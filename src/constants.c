@@ -33,6 +33,7 @@
 *   Character Constants
 *   Craft Recipe Constants
 *   Empire Constants
+*   Event Constants
 *   Faction Constants
 *   Generic Constants
 *   Mob Constants
@@ -559,6 +560,7 @@ const char *grant_bits[] = {
 	"automessage",
 	"peace",	// 40
 	"unprogress",
+	"events",
 	"\n"
 };
 
@@ -1545,7 +1547,7 @@ struct character_size_data size_data[] = {
 	/* normal/human */	{ 100, OBJ_LARGE, TRUE, FALSE, "", "%s's corpse is festering on the ground.", "%s's body is lying here.", NULL },
 	/* large */		{ 150, OBJ_LARGE, TRUE, FALSE, "large", "The large corpse of %s is rotting on the ground.", "%s's large body is lying here, rotting.", "$E is large." },
 	/* huge */		{ 200, OBJ_LARGE, FALSE, FALSE, "huge", "The huge corpse of %s is festering here.", "The huge body of %s body is festering here.", "$E is huge!" },
-	/* enormous */	{ 300, OBJ_LARGE, FALSE, TRUE, "enormous", "The enormouse corpse of %s is rotting here.", "%s's enormous body is rotting here.", "$E is enormous!" },
+	/* enormous */	{ 300, OBJ_LARGE, FALSE, TRUE, "enormous", "The enormous corpse of %s is rotting here.", "%s's enormous body is rotting here.", "$E is enormous!" },
 };
 
 
@@ -1874,6 +1876,32 @@ const char *wf_problem_types[] = {
 	"already sheared",
 	"delayed",
 	"out of city",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENT CONSTANTS /////////////////////////////////////////////////////////
+
+// EVT_x: event types
+const char *event_types[] = {
+};
+
+
+// EVTF_x: event flags
+const char *event_flags[] = {
+	"IN-DEVELOPMENT",	// 0
+	"CONTINUES",
+	"\n"
+};
+
+
+// EVTS_x: event status
+const char *event_status[] = {
+	"not started",
+	"running",
+	"complete",
+	"collected",
 	"\n"
 };
 
@@ -2601,6 +2629,7 @@ const char *olc_flag_bits[] = {
 	"!GENERICS",
 	"!SHOPS",
 	"!PROGRESS",
+	"!EVENTS",
 	"\n"
 };
 
@@ -2632,6 +2661,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"generic",
 	"shop",
 	"progression",
+	"event",
 	"\n"
 };
 
@@ -2714,6 +2744,7 @@ const char *quest_reward_types[] = {
 	"QUEST-CHAIN",
 	"REPUTATION",
 	"CURRENCY",
+	"EVENT-POINTS",
 	"\n",
 };
 
@@ -3861,7 +3892,9 @@ const char *requirement_types[] = {
 	"HAVE-CITY",
 	"EMPIRE-MILITARY",
 	"EMPIRE-PRODUCED-OBJECT",
-	"EMPIRE-PRODUCED-COMPONENT",
+	"EMPIRE-PRODUCED-COMPONENT",	// 35
+	"EVENT-RUNNING",
+	"EVENT-NOT-RUNNING",
 	"\n",
 };
 
@@ -3904,6 +3937,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// empire military
 	REQ_AMT_NUMBER,	// empire produced object
 	REQ_AMT_NUMBER,	// empire produced component
+	REQ_AMT_NONE,	// event running
+	REQ_AMT_NONE,	// event not running
 };
 
 
@@ -3945,6 +3980,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// empire military
 	FALSE,	// empire produced object
 	FALSE,	// empire produced component
+	FALSE,	// event running
+	FALSE,	// event not running
 };
 
 

@@ -463,6 +463,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	craft_data *craft, *next_craft;
+	event_data *event, *next_event;
 	morph_data *morph, *next_morph;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -684,6 +685,18 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update events
+	HASH_ITER(hh, event_table, event, next_event) {
+		// QR_x: event reward types
+		found = delete_event_reward_from_list(&EVT_RANK_REWARDS(event), QR_OBJECT, vnum);
+		found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(event), QR_OBJECT, vnum);
+		
+		if (found) {
+			// SET_BIT(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_EVT, EVT_VNUM(event));
+		}
+	}
+	
 	// update globals
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_OBJ, vnum);
@@ -884,6 +897,16 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		if (GET_OLC_CROP(desc)) {
 			if (delete_from_interaction_list(&GET_OLC_CROP(desc)->interactions, TYPE_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the crop you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_EVENT(desc)) {
+			// QR_x: event reward types
+			found = delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_OBJECT, vnum);
+			found |= delete_event_reward_from_list(&EVT_THRESHOLD_REWARDS(GET_OLC_EVENT(desc)), QR_OBJECT, vnum);
+		
+			if (found) {
+				// SET_BIT(EVT_FLAGS(GET_OLC_EVENT(desc)), EVTF_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An object used as a reward by the event you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_GLOBAL(desc)) {
@@ -1272,6 +1295,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	archetype_data *arch, *next_arch;
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
+	event_data *event, *next_event;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
@@ -1388,6 +1412,21 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			}
+		}
+	}
+	
+	// events
+	HASH_ITER(hh, event_table, event, next_event) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x: event rewards
+		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_OBJECT, vnum);
+		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_OBJECT, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	

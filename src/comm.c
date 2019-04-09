@@ -949,6 +949,7 @@ void heartbeat(int heart_pulse) {
 	void update_players_online_stats();
 	void update_trading_post();
 	void weather_and_time(int mode);
+	void write_running_events_file();
 
 	static int mins_since_crashsave = 0;
 	bool debug_log = FALSE;
@@ -962,7 +963,7 @@ void heartbeat(int heart_pulse) {
 		gain_cond_message = TRUE;
 	}
 	
-	event_process();
+	dg_event_process();
 
 	// this is meant to be slightly longer than the mobile_activity pulse, and is mentioned in help files
 	if (HEARTBEAT(13)) {
@@ -1108,13 +1109,16 @@ void heartbeat(int heart_pulse) {
 			process_imports();
 			if (debug_log && HEARTBEAT(15)) { log("debug 25.5:\t%lld", microtime()); }
 		}
-		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(1)) {
 		if (data_table_needs_save) {
 			save_data_table(FALSE);
 			if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
+		}
+		if (events_need_save) {
+			write_running_events_file();
+			if (debug_log && HEARTBEAT(15)) { log("debug 26.5:\t%lld", microtime()); }
 		}
 		save_marked_empires();
 		if (debug_log && HEARTBEAT(15)) { log("debug 27:\t%lld", microtime()); }
@@ -1896,6 +1900,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_crop) {
 		free_crop(d->olc_crop);
+	}
+	if (d->olc_event) {
+		free_event(d->olc_event);
 	}
 	if (d->olc_faction) {
 		free_faction(d->olc_faction);
@@ -3882,7 +3889,7 @@ void init_game(ush_int port) {
 		mother_desc = init_socket(port);
 	}
 
-	event_init();
+	dg_event_init();
 
 	/* set up hash table for find_char() */
 	init_lookup_table();

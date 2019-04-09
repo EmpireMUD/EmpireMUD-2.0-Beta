@@ -108,6 +108,12 @@ double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
 bool check_delayed_refresh = FALSE;	// triggers multiple refreshes
 
+// events
+event_data *event_table = NULL;	// global hash table (hh)
+int top_event_id = 0;	// highest unique id used
+struct event_running_data *running_events = NULL;	// list of active events
+bool events_need_save = FALSE;	// triggers a save on running_events
+
 // factions
 faction_data *faction_table = NULL;	// main hash (hh)
 faction_data *sorted_factions = NULL;	// alpha hash (sorted_hh)
@@ -273,6 +279,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ GEN_PREFIX, GEN_SUFFIX, TRUE },	// DB_BOOT_GEN
 	{ SHOP_PREFIX, SHOP_SUFFIX, TRUE },	// DB_BOOT_SHOP
 	{ PRG_PREFIX, PRG_SUFFIX, TRUE },	// DB_BOOT_PRG
+	{ EVT_PREFIX, EVT_SUFFIX, TRUE },	// DB_BOOT_EVT
 };
 
 
@@ -465,11 +472,13 @@ void boot_world(void) {
 	void load_empire_storage();
 	void load_instances();
 	void load_islands();
+	void load_running_events_file();
 	void load_world_map_from_file();
 	void number_and_count_islands(bool reset);
 	void read_ability_requirements();
 	void renum_world();
 	void setup_start_locations();
+	void verify_running_events();
 	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
 	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
 	extern int sort_augments_by_data(augment_data *a, augment_data *b);
@@ -576,6 +585,9 @@ void boot_world(void) {
 	log("Loading empire progression.");
 	index_boot(DB_BOOT_PRG);
 	
+	log("Loading events.");
+	index_boot(DB_BOOT_EVT);
+	
 	log("Loading socials.");
 	index_boot(DB_BOOT_SOC);
 	
@@ -589,6 +601,9 @@ void boot_world(void) {
 	log("Loading daily quest cycles.");
 	load_daily_quest_file();
 	
+	log("Loading active events.");
+	load_running_events_file();
+	
 	// check for bad data
 	log("Verifying data.");
 	check_abilities();
@@ -598,6 +613,7 @@ void boot_world(void) {
 	check_skills();
 	check_for_bad_buildings();
 	check_for_bad_sectors();
+	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
 	
@@ -1926,6 +1942,7 @@ const char *versions_list[] = {
 	"b5.47",
 	"b5.48",
 	"b5.58",
+	"b5.60",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3463,6 +3480,32 @@ void b5_58_gather_totals(void) {
 }
 
 
+// add new channel
+PLAYER_UPDATE_FUNC(b5_60_update_players) {
+	extern struct slash_channel *create_slash_channel(char *name);
+	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
+	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
+	
+	struct player_slash_channel *slash;
+	struct slash_channel *chan;
+	int iter;
+	
+	char *to_join[] = { "events", "\n" };
+	
+	for (iter = 0; *to_join[iter] != '\n'; ++iter) {
+		if (!(chan = find_slash_channel_by_name(to_join[iter], TRUE))) {
+			chan = create_slash_channel(to_join[iter]);
+		}
+		if (!find_on_slash_channel(ch, chan->id)) {
+			CREATE(slash, struct player_slash_channel, 1);
+			slash->next = GET_SLASH_CHANNELS(ch);
+			GET_SLASH_CHANNELS(ch) = slash;
+			slash->id = chan->id;
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3736,6 +3779,10 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.58")) {
 			b5_58_gather_totals();
+		}
+		if (MATCH_VERSION("b5.60")) {
+			log("Applying b5.60 channel update to players...");
+			update_all_players(NULL, b5_60_update_players);
 		}
 	}
 	

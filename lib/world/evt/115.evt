@@ -1,0 +1,62 @@
+#11500
+Pen Is Mightier~
+   It's one thing to sit there, idly clicking your pen. And another thing to do
+it in a meeting, as your co-workers glower. But it's a whole 'nother thing
+entirely to click the pen at the competitive level. Can you be the very best
+there ever was?
+~
+   Your thumb sore, but not your pride, you retire from the event. You've
+proven that the pen is mightier -- that's what really matters.
+~
+   This is a test event that just uses a 'click' action on object 11500. The
+only way to acquire the item is by loading it.
+~
+8 0 a 0 0 1 -1
+R 1 1 2 125 1
+R 2 3 2 100 1
+R 4 10 2 121 1
+T 10 0 2 100 1
+T 20 0 2 100 2
+T 30 0 2 100 3
+S
+#11505
+Supplies for the Guild of Adventurers~
+   The Guild of Adventurers needs your help! It takes considerable resources to
+loot so many dungeons, towers, castles, and houses. This event is open to all
+Guild members, so if you haven't already joined, look for the atlasian tortoise
+and build your guildhall today! Start the event by picking up the quest from
+your local guildhall superintendant. The winner will be the person who provides
+the most swords, smudges, and decoys to the Guild during the four-day event.
+~
+   Thanks to cleverly marketing their equipment shortage as a competition, the
+Guild is now well-stocked on swords, smudges, and decoys. At last, you can
+relax and soak your crafting fingers -- they must be tired.
+~
+   This is a crafting event based around the Guild of Adventurers. The quests
+turn themselves on, and are acquired at the Guild. The purpose of this event is
+to use up large resource stockpiles, and to encourage people to log in and play
+all weekend.
+~
+7 0 0 0 0 5760 -1
+R 1 1 2 11501 1
+R 1 1 2 18221 1
+R 1 3 2 11512 1
+R 2 3 2 11502 1
+R 1 5 2 11509 1
+R 1 10 2 11515 1
+R 1 25 2 11514 1
+R 1 50 2 11513 1
+T 10 0 2 11513 1
+T 50 0 2 11510 1
+T 100 0 2 11513 1
+T 150 0 2 11516 1
+T 200 0 2 11513 1
+T 250 0 2 263 1
+T 400 0 2 11513 1
+T 500 0 2 11517 1
+T 750 0 2 11514 1
+T 1000 0 2 11514 1
+T 1250 0 2 11511 1
+T 1500 0 2 11503 1
+S
+$

@@ -986,6 +986,14 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = get_production_total_component(emp, task->vnum, task->misc);
 				break;
 			}
+			case REQ_EVENT_RUNNING: {
+				task->current = find_running_event_by_vnum(task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_EVENT_NOT_RUNNING: {
+				task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
+				break;
+			}
 			
 			/* otherwise... do nothing
 			default: {
@@ -1217,6 +1225,33 @@ void et_change_greatness(empire_data *emp) {
 	
 	// members online
 	qt_empire_players(emp, qt_empire_greatness, 0);
+}
+
+
+/**
+* Empire Tracker: event starts or stops (update all empires)
+*
+* @param any_vnum event_vnum Which event has started or stopped.
+*/
+void et_event_start_stop(any_vnum event_vnum) {
+	struct empire_goal *goal, *next_goal;
+	empire_data *emp, *next_emp;
+	struct req_data *task;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+			LL_FOREACH(goal->tracker, task) {
+				if (task->type == REQ_EVENT_RUNNING && task->vnum == event_vnum) {
+					task->current = find_running_event_by_vnum(task->vnum) ? task->needed : 0;
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				}
+				else if (task->type == REQ_EVENT_NOT_RUNNING && task->vnum == event_vnum) {
+					task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				}
+			}
+		}
+	}
 }
 
 

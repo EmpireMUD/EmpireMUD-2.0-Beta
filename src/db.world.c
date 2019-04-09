@@ -467,7 +467,7 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// delete this first
 	if (ROOM_UNLOAD_EVENT(room)) {
-		event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
+		dg_event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
 		ROOM_UNLOAD_EVENT(room) = NULL;
 	}
 	
@@ -581,7 +581,7 @@ void delete_room(room_data *room, bool check_exits) {
 	while ((af = ROOM_AFFECTS(room))) {
 		ROOM_AFFECTS(room) = af->next;
 		if (af->expire_event) {
-			event_cancel(af->expire_event, cancel_room_expire_event);
+			dg_event_cancel(af->expire_event, cancel_room_expire_event);
 		}
 		free(af);
 	}
@@ -1504,14 +1504,14 @@ EVENT_CANCEL_FUNC(cancel_burn_event) {
 */
 void schedule_burn_down(room_data *room) {
 	struct room_event_data *burn_data;
-	struct event *ev;
+	struct dg_event *ev;
 	
 	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->burn_down_time > 0) {
 		// create the event
 		CREATE(burn_data, struct room_event_data, 1);
 		burn_data->room = room;
 		
-		ev = event_create(burn_down_event, burn_data, (COMPLEX_DATA(room)->burn_down_time - time(0)) * PASSES_PER_SEC);
+		ev = dg_event_create(burn_down_event, burn_data, (COMPLEX_DATA(room)->burn_down_time - time(0)) * PASSES_PER_SEC);
 		add_stored_event_room(room, SEV_BURN_DOWN, ev);
 	}
 }
@@ -2085,7 +2085,7 @@ EVENTFUNC(tavern_update) {
 */
 void check_tavern_setup(room_data *room) {
 	struct room_event_data *data;
-	struct event *ev;
+	struct dg_event *ev;
 	
 	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(room, FNC_TAVERN)) {
 		// not a tavern or not set up
@@ -2102,7 +2102,7 @@ void check_tavern_setup(room_data *room) {
 		data->room = room;
 		
 		// schedule every 7.5 minutes -- the same frequency this ran under the old system
-		ev = event_create(tavern_update, (void*)data, (7.5 * 60) RL_SEC);
+		ev = dg_event_create(tavern_update, (void*)data, (7.5 * 60) RL_SEC);
 		add_stored_event_room(room, SEV_TAVERN, ev);
 	}
 }
@@ -2512,13 +2512,13 @@ EVENTFUNC(trench_fill_event) {
 void schedule_trench_fill(struct map_data *map) {
 	long when = get_extra_data(map->shared->extra_data, ROOM_EXTRA_TRENCH_FILL_TIME);
 	struct map_event_data *trench_data;
-	struct event *ev;
+	struct dg_event *ev;
 	
 	if (!find_stored_event(map->shared->events, SEV_TRENCH_FILL)) {
 		CREATE(trench_data, struct map_event_data, 1);
 		trench_data->map = map;
 		
-		ev = event_create(trench_fill_event, (void*)trench_data, (when > 0 ? ((when - time(0)) * PASSES_PER_SEC) : 1));
+		ev = dg_event_create(trench_fill_event, (void*)trench_data, (when > 0 ? ((when - time(0)) * PASSES_PER_SEC) : 1));
 		add_stored_event(&map->shared->events, SEV_TRENCH_FILL, ev);
 	}
 }
@@ -3377,7 +3377,7 @@ void schedule_check_unload(room_data *room, bool offset) {
 		if (offset) {
 			mins += number(-300, 300) / 100.0;
 		}
-		ROOM_UNLOAD_EVENT(room) = event_create(check_unload_room, (void*)data, (mins * 60) RL_SEC);
+		ROOM_UNLOAD_EVENT(room) = dg_event_create(check_unload_room, (void*)data, (mins * 60) RL_SEC);
 	}
 }
 
@@ -3389,7 +3389,7 @@ void schedule_check_unload(room_data *room, bool offset) {
 */
 void schedule_crop_growth(struct map_data *map) {
 	struct map_event_data *data;
-	struct event *ev;
+	struct dg_event *ev;
 	long when;
 	
 	// cancel any existing event
@@ -3402,7 +3402,7 @@ void schedule_crop_growth(struct map_data *map) {
 		CREATE(data, struct map_event_data, 1);
 		data->map = map;
 		
-		ev = event_create(grow_crop_event, data, (when - time(0)) * PASSES_PER_SEC);
+		ev = dg_event_create(grow_crop_event, data, (when - time(0)) * PASSES_PER_SEC);
 		add_stored_event(&map->shared->events, SEV_GROW_CROP, ev);
 	}
 }

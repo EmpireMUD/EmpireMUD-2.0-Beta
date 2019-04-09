@@ -28,7 +28,7 @@ extern long pulse;
 
 
 /* initializes the event queue */
-void event_init(void) {
+void dg_event_init(void) {
 	event_q = queue_init();
 }
 
@@ -37,13 +37,13 @@ void event_init(void) {
 ** Add an event to the current list
 */
 /* creates an event and returns it */
-struct event *event_create(EVENTFUNC(*func), void *event_obj, long when) {
-	struct event *new_event;
+struct dg_event *dg_event_create(EVENTFUNC(*func), void *event_obj, long when) {
+	struct dg_event *new_event;
 
 	if (when < 1) /* make sure its in the future */
 		when = 1;
 
-	CREATE(new_event, struct event, 1);
+	CREATE(new_event, struct dg_event, 1);
 	new_event->func = func;
 	new_event->event_obj = event_obj;
 	new_event->q_el = queue_enq(event_q, new_event, when + pulse);
@@ -53,7 +53,7 @@ struct event *event_create(EVENTFUNC(*func), void *event_obj, long when) {
 
 
 /* removes the event from the system */
-void event_cancel(struct event *event, EVENT_CANCEL_FUNC(*func)) {
+void dg_event_cancel(struct dg_event *event, EVENT_CANCEL_FUNC(*func)) {
 	if (!event) {
 		log("SYSERR:  Attempted to cancel a NULL event");
 		return;
@@ -80,19 +80,19 @@ void event_cancel(struct event *event, EVENT_CANCEL_FUNC(*func)) {
 
 
 /* Process any events whose time has come. */
-void event_process(void) {
-	struct event *the_event;
+void dg_event_process(void) {
+	struct dg_event *the_event;
 	long new_time;
 
 	while ((long) pulse >= queue_key(event_q)) {
-		if (!(the_event = (struct event *) queue_head(event_q))) {
+		if (!(the_event = (struct dg_event *) queue_head(event_q))) {
 			log("SYSERR: Attempt to get a NULL event");
 			return;
 		}
 
 		/*
 		** Set the_event->q_el to NULL so that any functions called beneath
-		** event_process can tell if they're being called beneath the actual
+		** dg_event_process can tell if they're being called beneath the actual
 		** event function.
 		*/
 		the_event->q_el = NULL;
@@ -113,7 +113,7 @@ void event_process(void) {
 
 
 /* returns the time remaining before the event */
-long event_time(struct event *event) {
+long dg_event_time(struct dg_event *event) {
 	long when;
 
 	when = queue_elmt_key(event->q_el);
@@ -123,10 +123,10 @@ long event_time(struct event *event) {
 
 
 /* frees all events in the queue */
-void event_free_all(void) {
-	struct event *the_event;
+void dg_event_free_all(void) {
+	struct dg_event *the_event;
 
-	while ((the_event = (struct event *) queue_head(event_q))) {
+	while ((the_event = (struct dg_event *) queue_head(event_q))) {
 		if (the_event->event_obj)
 			free(the_event->event_obj);
 		free(the_event);
@@ -136,7 +136,7 @@ void event_free_all(void) {
 }
 
 /* boolean function to tell whether an event is queued or not */
-int event_is_queued(struct event *event) {
+int dg_event_is_queued(struct dg_event *event) {
 	if (event->q_el)
 		return 1;
 	else

@@ -1309,7 +1309,7 @@ void script_stat (char_data *ch, struct script_data *sc) {
 		msg_to_char(ch, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s\r\n",  buf1, GET_TRIG_NARG(t), ((GET_TRIG_ARG(t) && *GET_TRIG_ARG(t)) ? GET_TRIG_ARG(t) : "None"));
 
 		if (GET_TRIG_WAIT(t)) {
-			msg_to_char(ch, "    Wait: %ld, Current line: %s\r\n", event_time(GET_TRIG_WAIT(t)), t->curr_state ? t->curr_state->cmd : "End of Script");
+			msg_to_char(ch, "    Wait: %ld, Current line: %s\r\n", dg_event_time(GET_TRIG_WAIT(t)), t->curr_state ? t->curr_state->cmd : "End of Script");
 			msg_to_char(ch, "  Variables: %s\r\n", GET_TRIG_VARS(t) ? "" : "None");
 
 			for (tv = GET_TRIG_VARS(t); tv; tv = tv->next) {
@@ -2062,6 +2062,15 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		snprintf(str, slen, "%s", p);
 		return TRUE;
 	}
+	else if (!str_cmp(field, "char")) {
+		int pos = atoi(NULLSAFE(subfield));
+		if (subfield && strlen(vd->value) > pos) {
+			snprintf(str, slen, "%c", vd->value[pos]);
+		}
+		else {
+			snprintf(str, slen, "0");
+		}
+	}
 	else if (!str_cmp(field, "contains")) {            /* contains  */
 		if (str_str(vd->value, subfield))
 			snprintf(str, slen, "1");
@@ -2087,6 +2096,15 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 
 		snprintf(str, slen, "%s", cdr);
 		return TRUE;
+	}
+	else if (!str_cmp(field, "index_of")) {
+		char *find;
+		if (subfield && *subfield && (find = strchr(vd->value, *subfield))) {
+			snprintf(str, slen, "%d", (int)(find - vd->value));
+		}
+		else {
+			snprintf(str, slen, "-1");
+		}
 	}
 	else if (!str_cmp(field, "mudcommand")) {
 		/* find the mud command returned from this text */
@@ -2231,7 +2249,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		}
 	}
 
-	if (!*field) {
+	if (!field || !*field) {
 		if (vd) {
 			snprintf(str, slen, "%s", vd->value);
 		}
@@ -3178,6 +3196,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							snprintf(str, slen, "%c%d",UID_CHAR, obj_script_id(GET_EQ(c, pos)));
 					}
+					else if (!str_cmp(field, "event_points")) {
+						extern struct player_event_data *get_event_data(char_data *ch, int event_id);
+						
+						if (subfield && *subfield && isdigit(*subfield)) {
+							struct event_running_data *running = find_running_event_by_vnum(atoi(subfield));
+							struct player_event_data *ped;
+							if (running && (ped = get_event_data(c, running->id))) {
+								snprintf(str, slen, "%d", ped->points);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					break;
 				}
 				case 'f': {	// char.f*
@@ -3228,6 +3263,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'g': {	// char.g*
 					if (!str_cmp(field, "grt") || !str_cmp(field, "greatness")) {
 						snprintf(str, slen, "%d", GET_GREATNESS(c));
+					}
+					else if (!str_cmp(field, "gain_event_points")) {
+						extern int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
+						// %actor.gain_event_points(vnum,amt)%
+						
+						if (subfield && *subfield && !IS_NPC(c)) {
+							char arg1[256], arg2[256];
+							comma_args(subfield, arg1, arg2);
+							
+							if (*arg1 && *arg2 && isdigit(*arg1)) {
+								int pts = gain_event_points(c, atoi(arg1), atoi(arg2));
+								snprintf(str, slen, "%d", pts);
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+						else {
+							strcpy(str, "0");
+						}
 					}
 					else if (!str_cmp(field, "gain_reputation")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
@@ -5925,7 +5980,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 	wait_event_obj->go = go;
 	wait_event_obj->type = type;
 
-	GET_TRIG_WAIT(trig) = event_create(trig_wait_event, wait_event_obj, when);
+	GET_TRIG_WAIT(trig) = dg_event_create(trig_wait_event, wait_event_obj, when);
 	trig->curr_state = cl->next;
 }
 

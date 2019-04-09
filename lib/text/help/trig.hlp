@@ -582,8 +582,12 @@ When using field - The variable returns
 &ccar&0 - Returns the first word of the string. For %text%="this is the string";
    %text.car% will yield "this".
 &ccdr&0 - Returns all but the first word of the string, trimmed. For %text%=
-   "this is the string"; %text.cdr% will yield "is the string". 
+   "this is the string"; %text.cdr% will yield "is the string".
+&cchar(pos)&0 - Returns the character at that position in the string (or 0 if
+   the string is too short).
 &ccontains()&0 - Subfield used for comparison.
+&cindex_of(char)&0 - Returns the first position of a given character in the
+   string, or -1 if it's not found.
 &cmudcommand&0 - Returns the mud command the string is shorthand for. Used to make 
    sure the command you react to is the one you want: For %text%="o"
    %text.mudcommand% will yield "open".

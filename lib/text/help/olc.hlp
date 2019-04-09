@@ -20,11 +20,11 @@ Available types are:
  .aug - augments                 .arch - archetypes
  .b - buildings                  .book - books
  .c - crafts                     .class - classes
- .crop - crops                   .f - factions
- .g - globals                    .gen - generics
- .m - mobiles                    .map - map tiles/interiors
- .morph - morphs                 .o - objects
- .prog - empire progression goal
+ .crop - crops                   .ev - events
+ .f - factions                   .g - globals
+ .gen - generics                 .m - mobiles
+ .map - map tiles/interiors      .morph - morphs
+ .o - objects                    .prog - empire progression goal
  .q - quests                     .r - room templates
  .sect - map sectors             .shop - shops
  .skill - skills                 .soc - socials
@@ -74,6 +74,7 @@ bld (or bdg) - building (these include designated rooms)
 cft - craft
 cls - class
 crp - crop
+ev/evt - event
 fct - faction
 gen - generic
 glb - global
@@ -213,6 +214,9 @@ Crops (CROPEDIT):
   should usually use a 1x item for this interaction.
 - Orchard crops need a CHOP interaction if they will give trees. Orchards are
   still choppable without this, though.
+
+Events (EVEDIT):
+- Use quests or scripts to give event points.
 
 Factions (FEDIT):
 - The REP-FROM-KILLS flag causes you to lose reputation if you kill a mob who
@@ -504,7 +508,7 @@ Usage:  .abil <command>
 The .olc ability editor allows you to configure the data for various abilities.
 The main properties set up here are names and mastery abilities.
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP ABILEDIT <COMMAND>&0
 
@@ -2451,7 +2455,7 @@ skills. Classes can have broadly overlapping requirements (but can't be
 identical to each other), allowing players with similar sets of skills to end
 up in different classes.
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP CLASSEDIT <COMMAND>&0
 
@@ -2679,6 +2683,134 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
+EVEDIT EVENTEDIT "OLC EVENTS" "EVENT EDITOR"
+
+Usage:  .ev <command>
+        .command
+
+The .olc event editor allows you to configure the data for events, which
+are global competitions that players can parcticipate in. The event data
+includes text and rewards, but the actual points come from quests or scripts.
+
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on these commands by typing:
+  &yHELP EVEDIT <COMMAND>&0
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .ev edit 123
+> .name Save the Elves
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"EVEDIT COMPLETEMESSAGE" "EVEDIT COMPLETE MESSAGE"
+
+Usage:  .completemessage
+
+The complete message is shown to players when the event ends.
+
+The message is set in the string editor. You should use /fi to format it
+with indent inside the string editor if it's longer than one line (80 chars).
+
+See also: OLC EVENTS, STRING EDITOR
+#d
+"EVEDIT DESCRIPTION"
+
+Usage:  .description
+
+The event's description is shown on the information display for the event. It
+should describe the event briefly, and should include how to earn points.
+
+The message is set in the string editor. You should use /fi to format it
+with indent inside the string editor if it's longer than one line (80 chars).
+
+See also: OLC EVENTS, STRING EDITOR
+#d
+"EVEDIT DURATION"
+
+Usage:  .duration <minutes>
+
+This is the length of time that an event runs once it starts.
+
+See also: OLC EVENTS
+#d
+"EVEDIT FLAGS" "EVENT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following faction flags are available:
+ IN-DEVELOPMENT - The event cannot run with this flag on.
+ CONTINUES - When this event runs, it re-uses the id and leaderboard from the
+    previous run (for events that are broken and must be paused and re-started)
+
+See also: OLC EVENTS, OLC REMOVEINDEV
+#d
+"EVEDIT NAME"
+
+Usage:  .name <name>
+
+This sets the name of the event. Events should have a simple, unique name.
+Avoid starting with "The" or "A".
+
+See also: OLC EVENTS
+#d
+"EVEDIT MINLEVEL" "EVEDIT MAXLEVEL" "EVEDIT MIN LEVEL" "EVEDIT MAX LEVEL" "EVEDIT MINIMUM LEVEL" "EVEDIT MAXIMUM LEVEL"
+
+Usage:  .minlevel <level>
+        .maxlevel <level>
+
+This allows you to set the level limits on an event. This is only used for
+display, and is not enforced. If you wish to enforce a level limit on an event,
+do it in the quests or scripts that reward event points.
+
+See also: OLC EVENTS
+#d
+"EVEDIT NOTES"
+
+Usage:  .notes
+
+Notes are for internal use only. THis message is set in the string editor, and
+you should record anything that's important for running the event.
+
+See also: OLC EVENTS, STRING EDITOR
+#d
+"EVEDIT REPEAT" "EVEDIT REPEAT TIME" "EVEDIT REPEATS AFTER"
+
+Usage:  .repeat <minutes>
+
+This setting causes an event to automatically repeat itself after it ends.
+
+See also: OLC EVENTS
+#d
+"EVEDIT REWARDS" "EVEDIT THRESHOLDREWARDS" "EVEDIT RANKREWARDS" "EVEDIT THRESHOLD REWARDS" "EVEDIT RANK REWARDS"
+
+Usage: .rankrewards add <min rank> <max rank> <type> <amount> <vnum/type>
+       .thresholdrewards add <min threshold> <type> <amount> <vnum/type>
+       .*rewards change <number> <min | max | vnum | amount> <value>
+       .*rewards copy <from type> <from vnum>
+       .*rewards remove <number | all>
+       .*rewards move <number> <up | down>
+
+These commands set the rewards for an event. Rewards are collected by players
+using the 'event collect' command. There are two types of rewards:
+
+Threshold rewards are granted when a player passes a certain number of event
+points. These rewards can be collected any time. You only need to set the
+minimum number of threshold points required to earn each reward.
+
+Rank rewards are granted at the end of the event, based on how well the player
+did compared to other participants. For each of these rewards, you set a
+minimum and maximum rank (inclusive) and all players who finish within those
+ranks will receive the reward.
+
+See HELP QEDIT REWARD for a list of reward types.
+
+See also: EVENTS, OLC EVENTS
+#d
 "FACTION SCRIPTING" "SCRIPTING FACTIONS"
 
 Writing scripts using faction gives you the ability to control access to
@@ -2711,7 +2843,7 @@ are groups that NPCs can belong to. Players gain and lose reputation with
 factions, and these reputation levels can be used to control access to quests
 and adventure content.
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP FEDIT <COMMAND>&0
 
@@ -3953,7 +4085,7 @@ Usage:  .morph <command>
 The .olc morph editor allows you to configure the data for morphs, which are
 used by players (and NPCs) to change shape.
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP MORPHEDIT <COMMAND>&0
 
@@ -5213,7 +5345,7 @@ The .olc adventure zone editor allows you to configure the data for adventure
 zones. Each adventure zone contains a set of room templates. The .adv editor
 controls meta-data about the adventure zone, such as its name and level range.
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP ADVEDIT <COMMAND>&0
 
@@ -5573,7 +5705,7 @@ its start and end numbers.
 This is NOT the editor for designatable rooms -- use .build for that (see
 HELP OLC BUILDINGS).
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP REDIT <COMMAND>&0
 
@@ -5697,7 +5829,7 @@ The .olc progression editor allows you to configure goals, which empires can
 complete in exchange for rewards. Some goals are unlocked by completing tasks,
 and others can be purchased for a cost.
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP PROGEDIT <COMMAND>&0
 
@@ -5961,6 +6093,7 @@ Available reward types:
     are not already on it.
  REPUTATION - Gain/lose faction reputation.
  CURRENCY - Gives generic currency (e.g. tokens).
+ EVENT-POINTS - Points toward an event (only happens if the event is running).
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -6387,7 +6520,7 @@ mobs, objects, room templates, and buildings. Shops can sell items for coins
 or for various adventure currencies (generics). However, shops are not
 currently able to buy items.
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP SHOPEDIT <COMMAND>&0
 
@@ -6491,7 +6624,7 @@ this is to choose which abilities that skill unlocks, and at what level. This
 does not control what class a player becomes (see HELP CLASSEDIT), only which
 powers they have access to and in which order.
 
-All commands in the editor arg highlighted in yellow/green and placed inside
+All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
   &yHELP SKILLEDIT <COMMAND>&0
 

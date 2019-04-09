@@ -218,6 +218,7 @@ auto_approve 1
 build_approval 1
 chat_approval 1
 craft_approval 1
+event_approval 1
 gather_approval 1
 join_empire_approval 1
 manage_empire_approval 1

@@ -27,6 +27,7 @@
 *   Crop Utils
 *   Descriptor Utils
 *   Empire Utils
+*   Event Utils
 *   Faction Utils
 *   Fight Utils
 *   Generic Utils
@@ -509,6 +510,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_CLASS(desc)  ((desc)->olc_class)
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
+#define GET_OLC_EVENT(desc)  ((desc)->olc_event)
 #define GET_OLC_FACTION(desc)  ((desc)->olc_faction)
 #define GET_OLC_GENERIC(desc)  ((desc)->olc_generic)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
@@ -610,6 +612,28 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // deprecated
 #define EMPIRE_CITY_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_CITY)
 #define EMPIRE_OUTSIDE_TERRITORY(emp)  EMPIRE_TERRITORY(emp, TER_OUTSKIRTS)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENT UTILS /////////////////////////////////////////////////////////////
+
+#define EVT_VNUM(evt)  ((evt)->vnum)
+#define EVT_COMPLETE_MSG(evt)  ((evt)->complete_msg)
+#define EVT_DESCRIPTION(evt)  ((evt)->description)
+#define EVT_DURATION(evt)  ((evt)->duration)
+#define EVT_FLAGS(evt)  ((evt)->flags)
+#define EVT_MAX_LEVEL(evt)  ((evt)->max_level)
+#define EVT_MIN_LEVEL(evt)  ((evt)->min_level)
+#define EVT_NAME(evt)  ((evt)->name)
+#define EVT_NOTES(evt)  ((evt)->notes)
+#define EVT_RANK_REWARDS(evt)  ((evt)->rank_rewards)
+#define EVT_REPEATS_AFTER(evt)  ((evt)->repeats_after)
+#define EVT_THRESHOLD_REWARDS(evt)  ((evt)->threshold_rewards)
+#define EVT_TYPE(evt)  ((evt)->type)
+#define EVT_VERSION(evt)  ((evt)->version)
+
+// helpers
+#define EVT_FLAGGED(evt, fl)  IS_SET(EVT_FLAGS(evt), (fl))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1094,6 +1118,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_DAILY_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_quests))
 #define GET_DISGUISED_NAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_name))
 #define GET_DISGUISED_SEX(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_sex))
+#define GET_EVENT_DATA(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->event_data))
 #define GET_EXP_TODAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->exp_today))
 #define GET_FACTIONS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->factions))
 #define GET_FIGHT_MESSAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->fight_messages))
@@ -1670,6 +1695,7 @@ void prune_crlf(char *txt);
 extern const char *skip_filler(char *string);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
 void sprinttype(int type, const char *names[], char *result);
+extern char *time_length_string(int seconds);
 extern char *trim(char *string);
 
 // world functions in utils.c
@@ -1752,6 +1778,7 @@ void qt_gain_tile_sector(char_data *ch, sector_vnum vnum);
 void qt_change_coins(char_data *ch);
 void qt_change_currency(char_data *ch, any_vnum vnum, int total);
 void qt_empire_wealth(char_data *ch, any_vnum amount);
+void qt_event_start_stop(any_vnum event_vnum);
 void qt_gain_vehicle(char_data *ch, any_vnum vnum);
 void qt_get_obj(char_data *ch, obj_data *obj);
 void qt_keep_obj(char_data *ch, obj_data *obj, bool true_for_keep);
@@ -1773,6 +1800,7 @@ void et_change_cities(empire_data *emp);
 void et_change_coins(empire_data *emp, int amount);
 void et_change_diplomacy(empire_data *emp);
 void et_change_greatness(empire_data *emp);
+void et_event_start_stop(any_vnum event_vnum);
 void et_gain_building(empire_data *emp, any_vnum vnum);
 void et_gain_tile_sector(empire_data *emp, sector_vnum vnum);
 void et_gain_vehicle(empire_data *emp, any_vnum vnum);
