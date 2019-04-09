@@ -138,6 +138,7 @@ void end_event(struct event_running_data *re) {
 	}
 	
 	// announce
+	syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has ended", EVT_VNUM(event), EVT_NAME(event), re->id);
 	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has ended!", EVT_NAME(event));
 	
 	qt_event_start_stop(EVT_VNUM(event));
@@ -325,6 +326,7 @@ void start_event(event_data *event) {
 	events_need_save = TRUE;
 	
 	// announce
+	syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s has started with event id %d", EVT_VNUM(event), EVT_NAME(event), re->id);
 	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has been begun!", EVT_NAME(event));
 	
 	qt_event_start_stop(EVT_VNUM(event));
@@ -619,6 +621,7 @@ void cancel_running_event(struct event_running_data *re) {
 	
 	// announce
 	if (re->event) {
+		syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s (id %d) has canceled", EVT_VNUM(re->event), EVT_NAME(re->event), re->id);
 		log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has been canceled", EVT_NAME(re->event));
 	}
 	
@@ -2930,7 +2933,7 @@ EVENT_CMD(evcmd_cancel) {
 		}
 		
 		// ok cancel it
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has canceled event: %d %s", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has canceled event: %d %s (id %d)", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event), re->id);
 		send_config_msg(ch, "ok_string");
 		cancel_running_event(re);
 	}
@@ -3071,7 +3074,7 @@ EVENT_CMD(evcmd_end) {
 		}
 		
 		// ok end it
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has ended event: %d %s", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has ended event: %d %s (id %d)", GET_NAME(ch), EVT_VNUM(event), EVT_NAME(event), re->id);
 		send_config_msg(ch, "ok_string");
 		end_event(re);
 	}
