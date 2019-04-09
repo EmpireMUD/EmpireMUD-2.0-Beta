@@ -1,0 +1,216 @@
+#11500
+pen~
+a pen~
+A pen is lying here.~
+   It's a ball-point pen with a clicking mechanism. When you 'click' the pen,
+it makes a very satisfying sound.
+~
+3 0 a 2
+0 0 0
+2 1440
+T 11500
+S
+#11501
+trophy first place event~
+a first place event trophy~
+A first place event trophy is standing here.~
+This trophy looks like it came from a first-place win!
+~
+15 0 a 4
+32 0 0
+4 0
+R
+5611 a
+S
+#11502
+trophy event~
+an event trophy~
+An event trophy is standing here.~
+This golden trophy must have come from a high-ranking event finish!
+~
+15 0 a 5
+16 0 0
+4 0
+R
+5611 a
+S
+#11503
+trophy participation~
+a participation trophy~
+A participation trophy is sitting here.~
+It looks like the owner of this trophy participated in an event.
+~
+15 0 a 6
+8 0 0
+4 0
+R
+5611 a
+S
+#11505
+list supplies guild~
+a list of Guild supplies~
+A list of Guild supplies is lying here.~
+   Build as many of these supplies as you can before time runs out on the
+'Supplies for the Guild of Adventurers' event. While the event is running, you
+can see details by typing 'event Supplies for the Guild'.
+- Guild swords (Forge): 10x (common metal), 2x (large leather)
+- Guild cleansing smudges (Basic Crafts): 10x (basic herb), 2x (magic, basic gem)
+- Guild decoy kit (Sew): 10x (fibers), 3x (mundane textile)
+~
+3 k a 3
+0 0 0
+0 1152
+S
+#11506
+swords bundle guild~
+a bundle of Guild swords~
+A bundle of Guild swords is lying here.~
+   The Guild of Adventurers needs as many swords as possible to support its
+adventurers overseas. For complex reasons related to international commerce,
+the swords are rather low-quality and will surely need replacing soon.
+   This item is used for the 'Supplies for the Guild of Adventurers' event.
+Talk to your guildhall superintendant or to Nostrazak the Incautious to
+turn in these swords while the event is still running.
+~
+3 ek a 3
+0 0 0
+2 0
+S
+#11507
+smudges cleansing guild bag~
+a bag of Guild cleansing smudges~
+A bag of Guild cleansing smudges is lying here.~
+   The Guild of Adventurers needs a huge number of cleansing smudges -- bundles
+of powerful herbs -- to dispel curses and repel hexes. After all, it's not safe
+to loot so many ancient treasures without them.
+   This item is used for the 'Supplies for the Guild of Adventurers' event.
+Talk to your local guildmage or umbramancer to turn in these smudges while the
+event is still running.
+~
+3 ek a 5
+0 0 0
+0 0
+S
+#11508
+decoy guild kit~
+a Guild decoy kit~
+A Guild decoy kit is sitting here.~
+   The Guild of Adventurers needs decoys like this one to protect its members
+from the things that guard ancient hoards and hidden treasures. Unfortunately
+most decoys don't survive the process, so the Guild needs a lot of them.
+   This item is used for the 'Supplies for the Guild of Adventurers' event.
+Talk to your guildhall librarian or tinker to turn in this decoy kit while
+the event is still running.
+~
+3 ek a 4
+0 0 0
+0 0
+S
+#11509
+blueprints statue adventurer~
+the blueprints for a statue of an adventurer~
+The blueprints for a statue of an adventurer are here.~
+   These blueprints look like they'll let you build 1 'adventurerstatue'. But
+pick a good spot for it, because the blueprints crumble after the first use.
+~
+3 0 a 1
+0 0 0
+0 0
+S
+#11510
+whistle brown adventure hound~
+a brown adventure hound whistle~
+A brown adventure hound whistle is hanging here.~
+This whistle grants you a new mini-pet! Type 'use whistle' to get it.
+~
+19 p a 5
+11510 0 0
+0 0
+S
+#11511
+whistle steed adventurer's adventurers~
+an adventurer's steed whistle~
+The whistle for an adventurer's steed is lying here.~
+This whistle can be used to summon an adventurer's steed.
+~
+3 p a 6
+11511 0 0
+14 0
+T 10263
+S
+#11512
+whistle pegasus adventurers adventurer's~
+an adventurer's pegasus whistle~
+The whistle for an adventurer's pegasus is lying here.~
+This whistle can be used to summon an adventurer's flying pegasus.
+~
+3 p a 7
+11512 0 0
+14 0
+T 10263
+S
+#11513
+resources pack small~
+a small pack of resources~
+A small pack of resources is sitting here.~
+   This little pack of resources could contain almost anything. I wonder what's
+inside?
+~
+3 0 a 3
+20 10 0
+0 0
+T 11513
+S
+#11514
+pack resource great~
+a great resource pack~
+A great resource pack is sitting here.~
+This pack of resources could contain almost anything. I wonder what's inside?
+~
+3 0 a 4
+10 5 0
+0 0
+T 11514
+S
+#11515
+boots brown adventuring pair~
+brown adventuring boots~
+A pair of brown adventuring boots is sitting here.~
+   These leather boots are carved with arcane symbols, perhaps to protect you
+from whatever you might step in on your next adventure.
+~
+2 mp ag 5
+0 0 0
+7 0
+A
+5 1 0
+A
+19 1 0
+A
+11 1 0
+A
+6 2 0
+S
+#11516
+canteen dragonskin~
+a dragonskin canteen~
+A dragonskin canteen is lying here.~
+   This canteen looks to be made from dragonskin, although it's quite thin and
+could as easily be snakeskin.
+~
+5 p a 4
+112 112 11516
+7 0
+S
+#11517
+rucksack sack dragonskin~
+a dragonskin rucksack~
+A dragonskin rucksack is lying here.~
+   This pack appears to be made from dragonskin, but it's rather thin and might
+turn out to be plain old snakeskin.
+~
+24 mp ar 2
+1 0 0
+7 0
+S
+$
