@@ -387,20 +387,18 @@ void free_event_leaderboard(struct event_leaderboard *hash) {
 void check_player_events(char_data *ch) {
 	struct player_event_data *ped, *next_ped;
 	struct event_running_data *running;
-	// bool any_running = FALSE;
 	
 	if (!IS_NPC(ch)) {
 		return;	// safety first
 	}
 	
 	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
-		if (!ped->event) {	// event does not exist
+		// event does not exist, or has an invalid event id
+		if (!ped->event || ped->id > top_event_id) {
 			HASH_DEL(GET_EVENT_DATA(ch), ped);
 			free(ped);
 			continue;
 		}
-		// TODO should this also have removed events that are in-dev?
-		// TODO this should probably also remove events that have id > top_event_id
 		
 		// check status
 		if ((running = find_running_event_by_id(ped->id))) {
