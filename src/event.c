@@ -398,6 +398,7 @@ void check_player_events(char_data *ch) {
 			continue;
 		}
 		// TODO should this also have removed events that are in-dev?
+		// TODO this should probably also remove events that have id > top_event_id
 		
 		// check status
 		if ((running = find_running_event_by_id(ped->id))) {
@@ -670,6 +671,7 @@ EVENT_CANCEL_FUNC(cancel_event_event) {
 EVENTFUNC(check_event_announce) {
 	struct event_event_data *data = (struct event_event_data *)event_obj;
 	struct event_running_data *erd = data->running;
+	int when;
 	
 	if (!erd) {	// somehow
 		log("SYSERR: check_event_announce called with null event");
@@ -681,7 +683,10 @@ EVENTFUNC(check_event_announce) {
 	erd->next_dg_event = NULL;
 	
 	if (erd->event) {
-		log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s will end in %s", EVT_NAME(erd->event), time_length_string(erd->start_time + (EVT_DURATION(erd->event) * SECS_PER_REAL_MIN) - time(0)));
+		when = erd->start_time + (EVT_DURATION(erd->event) * SECS_PER_REAL_MIN) - time(0);
+		if (when > 0) {
+			log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s will end in %s", EVT_NAME(erd->event), time_length_string(when));
+		}
 	}
 	
 	schedule_event_event(erd);	// schedule the next one
@@ -2575,7 +2580,7 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 	}
 	
 	// RANK
-	size += snprintf(buf + size, sizeof(buf) - size, "Rank rewards for %s:\r\n", EVT_NAME(re->event));
+	size += snprintf(buf + size, sizeof(buf) - size, "\r\nRank rewards for %s:\r\n", EVT_NAME(re->event));
 	LL_FOREACH(EVT_RANK_REWARDS(re->event), reward) {
 		collect = (ped && ped->rank >= reward->min && ped->rank <= reward->max);
 		done = (ped && ped->status == EVTS_COLLECTED);
@@ -2610,7 +2615,7 @@ void show_events_no_arg(char_data *ch) {
 	struct event_running_data *running, *only;
 	struct player_event_data *ped;
 	char part[MAX_STRING_LENGTH];
-	int count, rank;
+	int count, rank, when;
 	
 	// fetch count and optional only-running-event
 	only = only_one_running_event(&count);
@@ -2656,9 +2661,12 @@ void show_events_no_arg(char_data *ch) {
 				msg_to_char(ch, " (%d point%s, %s)", ped->points, PLURAL(ped->points), part);
 			}
 			
-			msg_to_char(ch, "\r\n");
+			when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN) - time(0);
+			if (when > 0) {
+				msg_to_char(ch, ", ends in %s", time_length_string(when));
+			}
 			
-			// TODO show time remaining?
+			msg_to_char(ch, "\r\n");
 		}
 	}
 }
@@ -2937,8 +2945,6 @@ EVENT_CMD(evcmd_collect) {
 		msg_to_char(ch, "You can't specify what to collect. Just use 'event collect' to collect all your rewards.\r\n");
 		return;
 	}
-	
-	// TODO check that player is allowed to play in events (approved, etc)
 	
 	any = FALSE;
 	
