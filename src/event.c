@@ -2143,15 +2143,21 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 *
 * @param descriptor_data *desc The descriptor who is saving.
 */
-void save_olc_event(descriptor_data *desc) {	
+void save_olc_event(descriptor_data *desc) {
+	struct event_running_data *running;
 	event_data *proto, *event = GET_OLC_EVENT(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
-	// descriptor_data *iter;
+	bool cancel = FALSE;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
 	if (!(proto = find_event_by_vnum(vnum))) {
 		proto = create_event_table_entry(vnum);
+	}
+	
+	// event needs canceling?
+	if (EVT_FLAGGED(event, EVTF_IN_DEVELOPMENT) && !EVT_FLAGGED(proto, EVTF_IN_DEVELOPMENT)) {
+		cancel = TRUE;
 	}
 	
 	// free prototype strings and pointers
@@ -2203,18 +2209,15 @@ void save_olc_event(descriptor_data *desc) {
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_EVT, vnum);
 	
-	// look for players on the event and update them
-	/*
-	LL_FOREACH(descriptor_list, iter) {
-		if (STATE(iter) != CON_PLAYING || !iter->character) {
-			continue;
+	// update any running events
+	if ((running = find_running_event_by_vnum(vnum))) {
+		if (cancel) {
+			cancel_running_event(running);
 		}
-		if (!is_on_quest(iter->character, vnum)) {
-			continue;
+		else {	// not canceling but still may have changed: this will cancel any current end-schedule and set a new one
+			schedule_event_event(running);
 		}
-		refresh_all_quests(iter->character);
 	}
-	*/
 }
 
 
@@ -2409,9 +2412,14 @@ void show_event_detail(char_data *ch, event_data *event) {
 	// bool full_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EVENTS));
 	struct event_running_data *running = find_last_event_by_vnum(EVT_VNUM(event));
 	char vnum[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	struct player_event_data *ped;
-	bool ended_recently = FALSE;
-	int diff, rank;
+	struct player_event_data *ped = NULL;
+	int diff, rank = 0;
+	
+	// load this for later
+	if (running) {
+		ped = get_event_data(ch, running->id);
+		rank = get_event_rank(ch, running);
+	}
 	
 	// vnum portion
 	if (IS_IMMORTAL(ch)) {
@@ -2432,14 +2440,17 @@ void show_event_detail(char_data *ch, event_data *event) {
 	// header
 	msg_to_char(ch, "%s\tc%s\t0%s\r\n", vnum, EVT_NAME(event), part);
 	
+	if (EVT_FLAGGED(event, EVTF_IN_DEVELOPMENT)) {
+		msg_to_char(ch, "\trThis event is in-development. You cannot play it or collect rewards.\t0\r\n");
+	}
+	
 	// desc?
 	if (!running || running->status == EVTS_RUNNING || running->status == EVTS_NOT_STARTED) {
 		// show desc while running
 		msg_to_char(ch, "%s", EVT_DESCRIPTION(event));
 	}
-	else if ((running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) + SECS_PER_REAL_WEEK) > time(0)) {
-		// show complete message
-		ended_recently = TRUE;
+	else if (ped && (rank > 0 || ped->points > 0) && (running->start_time + (EVT_DURATION(event) * SECS_PER_REAL_MIN) + SECS_PER_REAL_WEEK) > time(0)) {
+		// show complete message -- if it's ended AND they participated
 		msg_to_char(ch, "%s", EVT_COMPLETE_MSG(event));
 	}
 	else {
@@ -2466,8 +2477,7 @@ void show_event_detail(char_data *ch, event_data *event) {
 			// no other status shown
 		}
 		
-		if ((ped = get_event_data(ch, running->id))) {
-			rank = get_event_rank(ch, running);
+		if (ped) {
 			if (rank > 0) {
 				msg_to_char(ch, "Rank: %d (%d point%s)\r\n", rank, ped->points, PLURAL(ped->points));
 			}
@@ -2941,8 +2951,17 @@ EVENT_CMD(evcmd_collect) {
 	qr.next = NULL;
 	
 	// bad arg check
-	if (*argument) {
+	if (*argument && !str_cmp(argument, "confirm")) {
+		// player explicitly confirms (code continues)
+	}
+	else if (*argument) {
 		msg_to_char(ch, "You can't specify what to collect. Just use 'event collect' to collect all your rewards.\r\n");
+		return;
+	}
+	else if (GET_LOYALTY(ch) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+		// no arg and not in territory
+		msg_to_char(ch, "You should only collect rewards in your own territory, in case they overfill your inventory.\r\n");
+		msg_to_char(ch, "Type 'event collect confirm' to override this.\r\n");
 		return;
 	}
 	
@@ -2950,8 +2969,8 @@ EVENT_CMD(evcmd_collect) {
 	
 	// check player's event data
 	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
-		if (!ped->event) {
-			continue;	// no work if no event
+		if (!ped->event || EVT_FLAGGED(ped->event, EVTF_IN_DEVELOPMENT)) {
+			continue;	// no work if no event or in-dev
 		}
 		if (ped->status == EVTS_COLLECTED) {
 			continue;	// no work for fully-collected events
