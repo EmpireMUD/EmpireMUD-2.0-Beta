@@ -16,8 +16,8 @@ a first place event trophy~
 A first place event trophy is standing here.~
 This trophy looks like it came from a first-place win!
 ~
-15 0 a 4
-32 0 0
+15 0 a 5
+64 0 0
 4 0
 R
 5611 a
@@ -28,8 +28,8 @@ an event trophy~
 An event trophy is standing here.~
 This golden trophy must have come from a high-ranking event finish!
 ~
-15 0 a 5
-16 0 0
+15 0 a 6
+32 0 0
 4 0
 R
 5611 a
@@ -40,8 +40,8 @@ a participation trophy~
 A participation trophy is sitting here.~
 It looks like the owner of this trophy participated in an event.
 ~
-15 0 a 6
-8 0 0
+15 0 a 7
+16 0 0
 4 0
 R
 5611 a
@@ -56,8 +56,10 @@ can see details by typing 'event Supplies for the Guild'.
 - Guild swords (Forge): 10x (common metal), 2x (large leather)
 - Guild cleansing smudges (Basic Crafts): 10x (basic herb), 2x (magic, basic gem)
 - Guild decoy kit (Sew): 10x (fibers), 3x (mundane textile)
+(Keep this list so you can make the items. If you lose it, re-start any of the
+event quests.)
 ~
-3 k a 3
+3 k a 4
 0 0 0
 0 1152
 S
@@ -112,8 +114,9 @@ the blueprints for a statue of an adventurer~
 The blueprints for a statue of an adventurer are here.~
    These blueprints look like they'll let you build 1 'adventurerstatue'. But
 pick a good spot for it, because the blueprints crumble after the first use.
+You require the Architect ability to build this.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -150,24 +153,25 @@ This whistle can be used to summon an adventurer's flying pegasus.
 T 10263
 S
 #11513
-resources pack small~
-a small pack of resources~
-A small pack of resources is sitting here.~
-   This little pack of resources could contain almost anything. I wonder what's
+shipment resources small~
+a small shipment of resources~
+A small shipment of resources is sitting here.~
+   This shipment of resources could contain almost anything. I wonder what's
 inside?
 ~
-3 0 a 3
+3 0 a 4
 20 10 0
 0 0
 T 11513
 S
 #11514
-pack resource great~
-a great resource pack~
-A great resource pack is sitting here.~
-This pack of resources could contain almost anything. I wonder what's inside?
+shipment resources great~
+a great shipment of resources~
+A great shipment of resources is sitting here.~
+   This shipment could contain almost anything. I wonder what great resources
+you'll find inside?
 ~
-3 0 a 4
+3 0 a 5
 10 5 0
 0 0
 T 11514
@@ -198,8 +202,8 @@ A dragonskin canteen is lying here.~
    This canteen looks to be made from dragonskin, although it's quite thin and
 could as easily be snakeskin.
 ~
-5 p a 4
-112 112 11516
+5 p a 5
+224 224 11516
 7 0
 S
 #11517

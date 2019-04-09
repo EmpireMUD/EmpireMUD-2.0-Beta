@@ -24,9 +24,10 @@ if !%actor.inventory(11505)%
 end
 ~
 #11513
-small pack of resources~
+small shipment of resources~
 1 n 100
 ~
+wait 0
 * uses val0 (quantity of common items), val1 (quantity of rare items)
 if !%self.carried_by%
   %purge% %self%
@@ -94,9 +95,10 @@ end
 %purge% %self%
 ~
 #11514
-great resource pack~
+great shipment of resources~
 1 n 100
 ~
+wait 0
 * uses val0 (quantity of common items), val1 (quantity of rare items)
 if !%self.carried_by%
   %purge% %self%

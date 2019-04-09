@@ -4,10 +4,11 @@ Supplies for the Guild of Adventurers~
 maintain its constant assault on ancient tombs, sky-high towers, and wayward
 druids. Take this supply list and forge Guild swords, craft Guild cleansing
 smudges, and sew Guild decoy kits. Bring back one of each to get us started.
+(Look at the list of supplies to see how to make the items.)
 ~
 It's going to take a lot more supplies than that to keep the guild running...
 ~
-6 d 0 0 5760
+7 d 0 0 5760
 A
 1 18219
 A
@@ -44,7 +45,7 @@ Forge another batch of Guild swords.
 ~
 The Guild thanks you for another set of swords.
 ~
-6 d 0 0 0
+7 d 0 0 0
 A
 1 18219
 A
@@ -57,6 +58,8 @@ P
 0 11505 0 1 a
 R
 9 11505 10
+R
+6 11506 11506
 T 11505
 W
 36 11505 0 1 a
@@ -73,7 +76,7 @@ Craft another batch of Guild cleansing smudges.
 ~
 The Guild thanks you for another set of smudges.
 ~
-7 d 0 0 0
+8 d 0 0 0
 A
 1 18217
 A
@@ -86,6 +89,8 @@ P
 0 11505 0 1 a
 R
 9 11505 10
+R
+6 11507 11507
 T 11505
 W
 36 11505 0 1 a
@@ -102,7 +107,7 @@ Sew another Guild decoy kit.
 ~
 The Guild thanks you for another good decoy kit.
 ~
-8 d 0 0 0
+9 d 0 0 0
 A
 1 18218
 A
@@ -115,6 +120,8 @@ P
 0 11505 0 1 a
 R
 9 11505 10
+R
+6 11508 11508
 T 11505
 W
 36 11505 0 1 a
