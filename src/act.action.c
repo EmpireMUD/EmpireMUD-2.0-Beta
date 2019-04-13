@@ -1245,7 +1245,7 @@ void process_burn_area(char_data *ch) {
 		// messaging
 		if (lighter) {
 			act("You use $p to light some fires!", FALSE, ch, lighter, NULL, TO_CHAR);
-			act("$n uses $p to light some fires!.", FALSE, ch, lighter, NULL, TO_ROOM);
+			act("$n uses $p to light some fires!", FALSE, ch, lighter, NULL, TO_ROOM);
 		}
 		else {
 			act("You light some fires!", FALSE, ch, NULL, NULL, TO_CHAR);
@@ -1256,7 +1256,7 @@ void process_burn_area(char_data *ch) {
 		// finished burning
 		perform_burn_room(IN_ROOM(ch));
 		cancel_action(ch);
-		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA, NOTHING);
+		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA, CHORE_BURN_STUMPS);
 		
 		if (lighter) {
 			used_lighter(ch, lighter);

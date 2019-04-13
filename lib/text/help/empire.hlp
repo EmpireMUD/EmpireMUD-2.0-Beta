@@ -1267,6 +1267,7 @@ Workforce types:
   &yrepair-vehicles&0: Will keep vehicles maintained.
   &yoilmaking:&0 Will press oil.
   &yfishing:&0 Will catch fish at the fishery. Costs no food.
+  &yburn-stumps:&0 Will burn down 'stumps' tiles.
   
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.

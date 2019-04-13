@@ -171,6 +171,7 @@
 #define BUILDER  209
 #define STEALTH_MASTER  221
 #define DIGGER  224
+#define STUMP_BURNER  226
 #define SCRAPER  227
 #define REPAIRMAN  229
 #define THUG  230
