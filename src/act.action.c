@@ -2738,7 +2738,7 @@ void do_burn_area(char_data *ch, int subcmd) {
 		// sends its own message
 	}
 	else {
-		start_action(ch, ACT_BURN_AREA, 5);
+		start_action(ch, ACT_BURN_AREA, 4);
 		GET_ACTION_VNUM(ch, 0) = subcmd;
 		
 		msg_to_char(ch, "You prepare to burn the area...\r\n");
