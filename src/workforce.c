@@ -1457,7 +1457,7 @@ void do_chore_burn_stumps(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BURN_STUMPS].mob);
 	
 	if (!worker) {	// as a backup, use a chopper if present
-		find_chore_worker_in_room(room, chore_data[CHORE_CHOPPING].mob);
+		worker = find_chore_worker_in_room(room, chore_data[CHORE_CHOPPING].mob);
 	}
 	
 	if (worker) {	// always just 1 tick
