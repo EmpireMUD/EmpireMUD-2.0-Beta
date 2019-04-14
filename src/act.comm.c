@@ -35,6 +35,7 @@ void clear_last_act_message(descriptor_data *desc);
 
 // locals
 struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
+bool is_ignoring(char_data *ch, char_data *victim);
 void process_add_to_channel_history(struct channel_history_data **history, char *message);
 
 
@@ -122,22 +123,80 @@ void add_to_slash_channel_history(char_data *ch, struct slash_channel *chan, cha
 
 
 /**
+* Determines if the majority of online members of an empire are ignoring the
+* victim. If there's a tie, this counts as 'ignoring'. This can be used to
+* prevent spamming with things like diplomacy.
+*
+* @param empire_data *emp The empire to check.
+* @param char_data *victim The person they might be ignoring.
+* @return bool TRUE if the majority of online members are ignoring that person.
+*/
+bool empire_is_ignoring(empire_data *emp, char_data *victim) {
+	descriptor_data *desc;
+	int is = 0, not = 0;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !desc->character) {
+			continue;	// skippable
+		}
+		if (GET_LOYALTY(desc->character) != emp) {
+			continue;	// wrong empire
+		}
+		
+		// count how many online members are/not ignoring
+		if (is_ignoring(desc->character, victim)) {
+			++is;
+		}
+		else {
+			++ not;
+		}
+	}
+	
+	if (is > 0 && is >= not) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+
+/**
+* Checks if the character is ignoring anybody on the victim's account.
+* Immortals cannot be ignored (and cannot ignore).
+*
 * @param char_data *ch The player to check.
 * @param char_data *victim The person talking (potentially ignored by ch).
 * @return bool TRUE if ch is ignoring victim
 */
 bool is_ignoring(char_data *ch, char_data *victim) {
+	struct account_player *plr;
 	int iter;
 	bool found = FALSE;
 	
-	if (!REAL_NPC(ch) && !REAL_NPC(victim)) {
-		// only bother checking if neither is an immortal -- immortals cannot ignore or be ignored
-		if (!IS_IMMORTAL(REAL_CHAR(ch)) && !IS_IMMORTAL(REAL_CHAR(victim))) {
-			for (iter = 0; iter < MAX_IGNORES && !found; ++iter) {
-				if (GET_IGNORE_LIST(REAL_CHAR(ch), iter) == GET_IDNUM(REAL_CHAR(victim))) {
-					found = TRUE;
-				}
+	// shortcuts
+	if (REAL_NPC(ch) || REAL_NPC(victim)) {
+		return FALSE;
+	}
+	if (IS_IMMORTAL(REAL_CHAR(ch)) || IS_IMMORTAL(REAL_CHAR(victim))) {
+		return FALSE;
+	}
+	
+	// check everyone on the victim's account
+	LL_FOREACH(GET_ACCOUNT(REAL_CHAR(victim))->players, plr) {
+		if (!plr->player) {
+			continue;
+		}
+		
+		// compare to idnums on the ignore list
+		for (iter = 0; iter < MAX_IGNORES && !found; ++iter) {
+			if (GET_IGNORE_LIST(REAL_CHAR(ch), iter) == plr->player->idnum) {
+				found = TRUE;
 			}
+		}
+		
+		if (found) {
+			break;
 		}
 	}
 	

@@ -245,6 +245,10 @@ Engage in politics with another empire. This command is used to offer, accept,
 or demand political relations. You can also cancel open offers. Check the
 empire detail page to see current relationships.
 
+If an empire's members are ignoring you, you will not be able to engage in
+diplomacy with them. Repeating certain diplomatic actions too quickly may
+result in a cooldown, to prevent the use of diplomacy for spamming.
+
 You can only burn down or besiege another empires buildings if you are at war.
 You can only go to war with or steal from an empire if at least one of their
 members is online.
@@ -267,7 +271,7 @@ a non-aggression pact (or better) with. This also applies to thievery permits.
 
 You do not need a thievery permit if you're already at war.
 
-See also: EMPIRE SCORE, THIEVERY
+See also: EMPIRE SCORE, IGNORE, THIEVERY
 #
 DISMANTLE-MINES "DISMANTLE MINES"
 

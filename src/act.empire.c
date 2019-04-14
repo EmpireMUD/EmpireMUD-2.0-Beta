@@ -62,6 +62,7 @@ void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
 extern bool empire_can_claim(empire_data *emp);
+extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
 extern int get_main_island(empire_data *emp);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
@@ -3738,6 +3739,9 @@ ACMD(do_diplomacy) {
 	}
 	else if (EMPIRE_IMM_ONLY(vict_emp)) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
+	}
+	else if (empire_is_ignoring(vict_emp, ch)) {
+		msg_to_char(ch, "You cannot engage in diplomacy with that empire because they're ignoring you.\r\n");
 	}
 	else if (ch_emp == vict_emp) {
 		msg_to_char(ch, "You can't engage in diplomacy with your own empire!\r\n");
