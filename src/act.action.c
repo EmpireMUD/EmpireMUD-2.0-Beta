@@ -148,7 +148,7 @@ const struct action_data_struct action_data[] = {
 	{ "piloting", "is piloting the vessel.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
 	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
-	{ "burning", "is preparing to burn the area.", NOBITS, process_burn_area, NULL },	// ACT_BURN_AREA
+	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -2738,7 +2738,7 @@ void do_burn_area(char_data *ch, int subcmd) {
 		// sends its own message
 	}
 	else {
-		start_action(ch, ACT_BURN_AREA, 4);
+		start_action(ch, ACT_BURN_AREA, 5);
 		GET_ACTION_VNUM(ch, 0) = subcmd;
 		
 		msg_to_char(ch, "You prepare to burn the area...\r\n");
