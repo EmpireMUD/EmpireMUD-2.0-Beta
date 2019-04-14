@@ -1075,7 +1075,9 @@ can store fibers like cotton and wool, and weave them into fine cloth. Like
 all storage buildings, your NPCs will carry cloth between tailors so that you
 can retrieve it from any such location.
 
-See also: STORAGE, WEAVE
+Sewing and weaving happen faster at a tailor.
+
+See also: STORAGE, SEW, WEAVE
 #
 TANNERY
 
