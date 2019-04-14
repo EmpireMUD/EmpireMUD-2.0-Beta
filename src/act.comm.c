@@ -163,7 +163,8 @@ bool empire_is_ignoring(empire_data *emp, char_data *victim) {
 
 /**
 * Checks if the character is ignoring anybody on the victim's account.
-* Immortals cannot be ignored (and cannot ignore).
+* Immortals cannot be ignored (and cannot ignore). This also counts alts, if
+* ch is ignoring at least 2 of victim's alts.
 *
 * @param char_data *ch The player to check.
 * @param char_data *victim The person talking (potentially ignored by ch).
@@ -171,8 +172,7 @@ bool empire_is_ignoring(empire_data *emp, char_data *victim) {
 */
 bool is_ignoring(char_data *ch, char_data *victim) {
 	struct account_player *plr;
-	int iter;
-	bool found = FALSE;
+	int iter, alts = 0;
 	
 	// shortcuts
 	if (REAL_NPC(ch) || REAL_NPC(victim)) {
@@ -189,18 +189,23 @@ bool is_ignoring(char_data *ch, char_data *victim) {
 		}
 		
 		// compare to idnums on the ignore list
-		for (iter = 0; iter < MAX_IGNORES && !found; ++iter) {
+		for (iter = 0; iter < MAX_IGNORES; ++iter) {
 			if (GET_IGNORE_LIST(REAL_CHAR(ch), iter) == plr->player->idnum) {
-				found = TRUE;
+				if (plr->player->idnum == GET_IDNUM(REAL_CHAR(victim))) {
+					// found the actual person
+					return TRUE;
+				}
+				else {	// found an alt
+					if (++alts >= 2) {
+						return TRUE;	// found 2 alts
+					}
+				}
 			}
-		}
-		
-		if (found) {
-			break;
 		}
 	}
 	
-	return found;
+	// not found
+	return FALSE;
 }
 
 
