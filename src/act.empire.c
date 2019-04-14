@@ -3740,9 +3740,6 @@ ACMD(do_diplomacy) {
 	else if (EMPIRE_IMM_ONLY(vict_emp)) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
 	}
-	else if (empire_is_ignoring(vict_emp, ch)) {
-		msg_to_char(ch, "You cannot engage in diplomacy with that empire because they're ignoring you.\r\n");
-	}
 	else if (ch_emp == vict_emp) {
 		msg_to_char(ch, "You can't engage in diplomacy with your own empire!\r\n");
 	}
@@ -3752,7 +3749,10 @@ ACMD(do_diplomacy) {
 	
 	// cancel? (has its own logic not based on current relations)
 	else if (cancel) {
-		if (!(ch_pol = find_relation(ch_emp, vict_emp)) || !POL_OFFERED(ch_pol, diplo_option[type].add_bits)) {
+		if (empire_is_ignoring(vict_emp, ch)) {
+			msg_to_char(ch, "You cannot engage in diplomacy with that empire because they're ignoring you.\r\n");
+		}
+		else if (!(ch_pol = find_relation(ch_emp, vict_emp)) || !POL_OFFERED(ch_pol, diplo_option[type].add_bits)) {
 			msg_to_char(ch, "You haven't offered that to %s.\r\n", EMPIRE_NAME(vict_emp));
 		}
 		else {
@@ -3768,6 +3768,9 @@ ACMD(do_diplomacy) {
 	}
 	
 	// relationship validation
+	else if (!IS_SET(diplo_option[type].flags, DIPF_UNILATERAL) && empire_is_ignoring(vict_emp, ch)) {
+		msg_to_char(ch, "You cannot engage in diplomacy with that empire because they're ignoring you.\r\n");
+	}
 	else if ((ch_pol = find_relation(ch_emp, vict_emp)) && POL_FLAGGED(ch_pol, DIPL_WAR) && !IS_SET(diplo_option[type].requires_bits, DIPL_WAR)) {
 		msg_to_char(ch, "You can't do that while you're at war.\r\n");
 	}
