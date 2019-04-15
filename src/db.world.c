@@ -1128,8 +1128,8 @@ void annual_update_map_tile(struct map_data *tile) {
 		}
 	}
 	
-	// 25% chance that unclaimed non-wild crops vanish
-	if (tile->crop_type && (!room || !ROOM_OWNER(room)) && CROP_FLAGGED(tile->crop_type, CROPF_NOT_WILD) && !number(0, 3)) {
+	// 33% chance that unclaimed non-wild crops vanish
+	if (tile->crop_type && (!room || !ROOM_OWNER(room)) && CROP_FLAGGED(tile->crop_type, CROPF_NOT_WILD) && !number(0, 2)) {
 		if (!room) {	// load room if needed
 			room = real_room(tile->vnum);
 		}
