@@ -233,7 +233,7 @@ void do_customize_road(char_data *ch, char *argument) {
 		"crossroad", "crossroads", "freeway", "lane", "loop", "pass",
 		"parkway", "plaza", "trail", "route", "skyway", "terrace", "track",
 		"trace", "tunnel", "turnpike", "bluff", "rd", "av", "ave", "st", "wy",
-		"dr", "blf", "blvd", "cir", "pkwy",
+		"dr", "blf", "blvd", "cir", "pkwy", "pathway", "path", "walkway", "walk",
 		"\n"
 	};
 	

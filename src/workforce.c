@@ -40,6 +40,7 @@ struct empire_territory_data *global_next_territory_entry = NULL;
 // protos
 void do_chore_brickmaking(empire_data *emp, room_data *room);
 void do_chore_building(empire_data *emp, room_data *room, int mode);
+void do_chore_burn_stumps(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
 void do_chore_digging(empire_data *emp, room_data *room);
 void do_chore_dismantle(empire_data *emp, room_data *room);
@@ -120,6 +121,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "oilmaking", PRESS_WORKER, FALSE },
 	{ "general", NOTHING, TRUE },
 	{ "fishing", FISHERMAN, FALSE },
+	{ "burn-stumps", STUMP_BURNER, FALSE },
 };
 
 
@@ -138,7 +140,7 @@ int einv_interaction_chore_type = 0;
 * @param empire_data *emp the empire -- a shortcut to prevent re-detecting
 * @param room_data *room
 */
-void process_one_chore(empire_data *emp, room_data *room) {	
+void process_one_chore(empire_data *emp, room_data *room) {
 	int island = GET_ISLAND_ID(room);	// just look this up once
 	
 	#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
@@ -176,6 +178,12 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	// All choppables -- except crops, which are handled by farming
 	if (CHORE_ACTIVE(CHORE_CHOPPING) && !ROOM_CROP(room) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM_NO_VEH((room), INTERACT_CHOP))) {
 		do_chore_chopping(emp, room);
+		return;
+	}
+	
+	// burnable sects
+	if (CHORE_ACTIVE(CHORE_BURN_STUMPS) && has_evolution_type(SECT(room), EVO_BURNS_TO)) {
+		do_chore_burn_stumps(emp, room);
 		return;
 	}
 	
@@ -1443,6 +1451,36 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 }
 
 
+void do_chore_burn_stumps(empire_data *emp, room_data *room) {
+	void perform_burn_room(room_data *room);
+	
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BURN_STUMPS].mob);
+	
+	if (!worker) {	// as a backup, use a chopper if present
+		worker = find_chore_worker_in_room(room, chore_data[CHORE_CHOPPING].mob);
+	}
+	
+	if (worker) {	// always just 1 tick
+		if (has_evolution_type(SECT(room), EVO_BURNS_TO)) {
+			act("$n lights some fires!", FALSE, worker, NULL, NULL, TO_ROOM);
+			perform_burn_room(room);
+			add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
+		}
+		
+		// done: mark for de-spawn
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+		stop_room_action(room, ACT_BURN_AREA, CHORE_BURN_STUMPS);
+		
+		if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED)) {
+			abandon_room(room);
+		}
+	}
+	else {
+		worker = place_chore_worker(emp, CHORE_BURN_STUMPS, room);
+	}
+}
+
+
 INTERACTION_FUNC(one_chop_chore) {
 	empire_data *emp = ROOM_OWNER(inter_room);
 	
@@ -1487,7 +1525,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
 					
-					if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED)) {
+					if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED) && (!has_evolution_type(SECT(room), EVO_BURNS_TO) || !empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BURN_STUMPS))) {
 						abandon_room(room);
 					}
 				}

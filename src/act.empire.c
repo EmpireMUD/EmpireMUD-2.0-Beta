@@ -62,6 +62,7 @@ void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
 extern bool empire_can_claim(empire_data *emp);
+extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
 extern int get_main_island(empire_data *emp);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
@@ -3748,7 +3749,10 @@ ACMD(do_diplomacy) {
 	
 	// cancel? (has its own logic not based on current relations)
 	else if (cancel) {
-		if (!(ch_pol = find_relation(ch_emp, vict_emp)) || !POL_OFFERED(ch_pol, diplo_option[type].add_bits)) {
+		if (empire_is_ignoring(vict_emp, ch)) {
+			msg_to_char(ch, "You cannot engage in diplomacy with that empire because they're ignoring you.\r\n");
+		}
+		else if (!(ch_pol = find_relation(ch_emp, vict_emp)) || !POL_OFFERED(ch_pol, diplo_option[type].add_bits)) {
 			msg_to_char(ch, "You haven't offered that to %s.\r\n", EMPIRE_NAME(vict_emp));
 		}
 		else {
@@ -3764,6 +3768,9 @@ ACMD(do_diplomacy) {
 	}
 	
 	// relationship validation
+	else if (!IS_SET(diplo_option[type].flags, DIPF_UNILATERAL) && empire_is_ignoring(vict_emp, ch)) {
+		msg_to_char(ch, "You cannot engage in diplomacy with that empire because they're ignoring you.\r\n");
+	}
 	else if ((ch_pol = find_relation(ch_emp, vict_emp)) && POL_FLAGGED(ch_pol, DIPL_WAR) && !IS_SET(diplo_option[type].requires_bits, DIPL_WAR)) {
 		msg_to_char(ch, "You can't do that while you're at war.\r\n");
 	}

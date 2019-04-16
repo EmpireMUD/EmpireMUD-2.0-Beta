@@ -1005,7 +1005,7 @@ Informative map mode shows you details about your buildings.
 
 See also: TOGGLES, MAINTAIN, WORKFORCE
 #
-IGNORE IGNORING
+IGNORE IGNORING IGNORED
 
 Usage:  ignore [player]
 
@@ -1014,9 +1014,19 @@ This will block tells, says, whispers, emotes, socials, and public channels.
 If you want to stop ignoring someone, you can use the ignore command on them
 again.
 
+If you have ignored at 2 of a player's alts (other characters), none of their
+characters will be able to communicate with you (even though you don't see
+those other alts on your ignore list). Your ignore list is NOT automatically
+shared to your own alts, but you can use 'alt import' to copy the list from
+character to character.
+
 Typing "ignore" with no argument will list who you're ignoring. You can't
 choose to ignore an immortal player, and immortals cannot use the ignore
 feature at all.
+
+Ignoring also affects the diplomacy command.
+
+See also: ALTERNATE, ALT IMPORT, DIPLOMACY
 #
 INFO POLICY VERSION RULES CREDITS
 

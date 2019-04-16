@@ -83,13 +83,15 @@ int get_event_rank(char_data *ch, struct event_running_data *re) {
 	struct event_leaderboard *lb, *next_lb;
 	int rank = 0;
 	
+	bool need_appr = config_get_bool("event_approval");
+	
 	if (!ch || !re) {
 		return NOTHING;
 	}
 	
 	HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
 		// compute rank
-		if (!lb->ignore && (lb->approved || !config_get_bool("event_approval"))) {
+		if (!lb->ignore && (lb->approved || !need_appr)) {
 			++rank;	// otherwise they don't count toward rank
 			
 			// it me?
@@ -388,7 +390,7 @@ void check_player_events(char_data *ch) {
 	struct player_event_data *ped, *next_ped;
 	struct event_running_data *running;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;	// safety first
 	}
 	

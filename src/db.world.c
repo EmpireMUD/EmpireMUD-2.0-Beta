@@ -1128,6 +1128,22 @@ void annual_update_map_tile(struct map_data *tile) {
 		}
 	}
 	
+	// 33% chance that unclaimed non-wild crops vanish
+	if (tile->crop_type && (!room || !ROOM_OWNER(room)) && CROP_FLAGGED(tile->crop_type, CROPF_NOT_WILD) && !number(0, 2)) {
+		if (!room) {	// load room if needed
+			room = real_room(tile->vnum);
+		}
+		
+		// change to base sect
+		change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(room))]);
+		
+		// stop all possible chores here since the sector changed
+		stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
+		stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
+		stop_room_action(room, ACT_PICKING, CHORE_HERB_GARDENING);
+		stop_room_action(room, ACT_GATHERING, NOTHING);
+	}
+	
 	// fill in trenches slightly
 	if (SECT_FLAGGED(tile->sector_type, SECTF_IS_TRENCH) && (!room || !ROOM_OWNER(room)) && (trenched = get_extra_data(tile->shared->extra_data, ROOM_EXTRA_TRENCH_PROGRESS)) < 0) {
 		// move halfway toward initial: remember initial value is negative
@@ -1226,7 +1242,7 @@ void annual_world_update(void) {
 	bool naturalize_newbie_islands = config_get_bool("naturalize_newbie_islands");
 	bool naturalize_unclaimable = config_get_bool("naturalize_unclaimable");
 	
-	snprintf(message, sizeof(message), "\r\n%s\r\n", config_get_string("newyear_message"));
+	snprintf(message, sizeof(message), "\r\n%s\r\n\r\n", config_get_string("newyear_message"));
 	
 	// MESSAGE TO ALL
 	for (d = descriptor_list; d; d = d->next) {

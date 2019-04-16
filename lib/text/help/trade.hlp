@@ -111,6 +111,7 @@ Command:  craft [number] <item>
           craft info <item>
 
 All crafting abilities train when you complete recipes that require them.
+Crafting is faster if you have the Master Craftsman ability.
 
 Basic Crafts:
   bricks
@@ -135,7 +136,7 @@ This ability also allows you to:
   tan (skins into leather)
 
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
-PRIMITIVE CRAFTS, MILL
+PRIMITIVE CRAFTS, MILL, MASTER CRAFTSMAN
 #
 BRONZE "BRONZE INGOT"
 
@@ -248,6 +249,17 @@ There are also more recipes to find.
 
 See also: COOKING FIRE, FAMILY RECIPES, GOURMET CHEF, CRAFTING LEVEL, MILL,
    BAKERY, RESOURCES, KEEP, RECIPES, COOK INFO, RECIPES
+#
+CRAFT CRAFTS
+
+Command:  craft [number] <item>
+          craft info <item>
+
+You can craft many types of items, from pottery to woodworking to arrows.
+All crafting abilities train when you finish recipes that require them.
+
+See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, RECIPES, POTTERY,
+PRIMITIVE CRAFTS, WOODWORKING
 #
 "CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO"
 
@@ -414,7 +426,8 @@ and gold are found through mining. You can craft a stone hammer to get started,
 but a superior hammer will allow you to forge more quickly.
 
 There are three forge specializations: Weaponcrafting, Armorsmithing,
-and Jewelry. You can also learn to be a Master Blacksmith.
+and Jewelry. You can also learn to be a Master Blacksmith, which lets you make
+superior items and allows you to forge and smelt faster.
 
 With the basic Forge skill, you can create:
   nails (x4)
@@ -693,7 +706,8 @@ See also: HARVEST, MILL, SHEAR
 Master Craftsman (Trade ability)
 
 This mastery ability improves the quality of certain items from the Pottery
-and woodworking tree.
+and woodworking tree (certain items come out superior). It also lets you craft
+them more quickly.
 
 It also allows you to craft the following:
 
@@ -706,11 +720,13 @@ See also: POTTERY, FINE POTTERY, SUPERIOR, LETHEIAN ICON
 Master Tailor (Trade ability)
 
 Items you sew will be superior in quality and ability. (This stacks with
-enchantments). You can only level up with this ability by sewing items that
-can come out superior.
+enchantments). You can also sew those items faster. You can only level up with
+this ability by sewing items that can come out superior.
+
+This ability applies to weaving too.
 
 See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
-  MAGIC ATTIRE, MAGICAL VESTMENTS, SUPERIOR
+  MAGIC ATTIRE, MAGICAL VESTMENTS, SUPERIOR, WEAVE
 #
 "MOONSTONE SMELTING" "MOONSTONE ORE" MOONSTONE "ARGENTINE INGOT" "EVENTIDE INGOT"
 
@@ -759,7 +775,8 @@ Building:  (PP) potter
 Command:  craft [number] <item>
 
 A good potter can mold clay into many different useful items. You will need
-a fire, but the pottery goes much faster if you are in a Potter building.
+a fire, but the pottery goes much faster if you are in a Potter building. It's
+also faster if you have the Master Craftsman ability.
 
 With Pottery you can craft:
   bowl
@@ -770,14 +787,13 @@ With Pottery you can craft:
 
 See also: CLAY, DIG, FINE POTTERY, MASTER CRAFTSMAN
 #
-"PRIMITIVE CRAFTS" CRAFT CRAFTS
+"PRIMITIVE CRAFTS"
 
 Primitive Crafts (Trade ability)
 
 Command:  craft [number] <item>
-          craft info <item>
 
-All crafting abilities train when you complete recipes that require them.
+You know how to craft the following items:
 
 Primitive crafts:
   handle, bone handle
@@ -786,16 +802,15 @@ Primitive crafts:
   spear
   fire sticks (for lighting torches and fires)
 
-With Archery, you can craft:
-  arrows
-
 This ability also allows you to:
   saw
   chip
   scrape
 
-See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, RECIPES,
-BASIC CRAFTS, SAW, CHIP, SCRAPE
+Gain Trade skill when you craft any of these items.
+
+See also: CRAFT, CRAFT INFO, CRAFTING LEVEL, WOODWORKING, BASIC CRAFTS, SAW,
+CHIP, SCRAPE
 #
 "PRISMATIC CRYSTALS" "PRISMATIC CRYSTAL"
 
@@ -926,8 +941,9 @@ Command:  sew [number] <item>
           sew info <item>
 
 The art of sewing is one of the oldest and simplest trade skills, but it also
-makes some of the finest clothing and the lightest armor. The only resources
-required for sewing are skins or cloth.
+makes some of the finest clothing and the lightest armor. The primary resources
+required for sewing are skins or cloth. The Master Tailor ability will allow
+you to sew faster, as will sewing in a tailor shop.
 
 For a list of clothing items you can sew, see HELP CLOTHING.
 
@@ -942,7 +958,7 @@ Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, LEATHERWORKING,
-   RAWHIDE STITCHING, RECIPES
+   RAWHIDE STITCHING, RECIPES, MASTER TAILOR
 #
 SHIP SHIPS 
 
@@ -1139,7 +1155,7 @@ Command:  weave [number] <item>
           weave info <item>
 
 Weaving converts raw materials into cloth. You can weave anywhere, but it goes
-much faster at the tailor shop.
+much faster at the tailor shop. Master Tailors can also weave faster.
 
 Using the Sew ability:
   cloth  2 cotton
@@ -1147,7 +1163,7 @@ Using the Sew ability:
   
 (Wool cloth and cotton cloth are used for the same things.)
 
-See also: SHEAR, RESOURCES, KEEP, RECIPES, CRAFT INFO
+See also: SHEAR, RESOURCES, KEEP, RECIPES, CRAFT INFO, MASTER TAILOR
 #
 WOODWORKING "WOOD WORKING"
 
