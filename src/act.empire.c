@@ -4027,11 +4027,6 @@ ACMD(do_esay) {
 		return;
 		}
 
-	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
-		msg_to_char(ch, "You can't use the empire channel while muted.\r\n");
-		return;
-		}
-
 	skip_spaces(&argument);
 
 	if (!*argument) {
