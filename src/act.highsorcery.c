@@ -237,6 +237,7 @@ struct ritual_data_type {
 		start_chant_of_druids,
 		perform_chant_of_druids,
 		{{ "You start the chant of druids...", "$n starts the chant of druids..." },
+		/*
 		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
 		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
 		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
@@ -249,6 +250,20 @@ struct ritual_data_type {
 		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
 		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
 		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		*/
+		{ "You chant, 'Feoh byb frofur fira gehwylcum,'", "$n chants, 'Feoh byb frofur fira gehwylcum,'" },
+		{ "You chant, 'Sceal deah manna gehwylc miclun hyt daelan,'", "$n chants, 'Sceal deah manna gehwylc miclun hyt daelan,'" },
+		{ "You chant, 'Gif he wile for drihtne domes hleotan.'", "$n chants, 'Gif he wile for drihtne domes hleotan.'" },
+		{ "You chant, 'Urbyþ anmod ond oferhyrned,'", "$n chants, 'Urbyþ anmod ond oferhyrned,'" },
+		{ "You chant, 'Felafrecne deor, feohteb mid hornum,'", "$n chants, 'Felafrecne deor, feohteb mid hornum,'" },
+		{ "You chant, 'Maere morstapa; baet is modig wuht.'", "$n chants, 'Maere morstapa; baet is modig wuht.'" },
+		{ "You chant, 'Dorn byb dearle scearp; degna gehwylcum,'", "$n chants, 'Dorn byb dearle scearp; degna gehwylcum,'" },
+		{ "You chant, 'Anfeng ys yfyl, ungemetum rebe,'", "$n chants, 'Anfeng ys yfyl, ungemetum rebe,'" },
+		{ "You chant, 'Manna gehwelcum, de him mid rested.'", "$n chants, 'Manna gehwelcum, de him mid rested.'" },
+		{ "You chant, 'Os byb ordfruma aelere spraece,'", "$n chants, 'Os byb ordfruma aelere spraece,'" },
+		{ "You chant, 'Wisdomes wradu ond witena frofur,'", "$n chants, 'Wisdomes wradu ond witena frofur,'" },
+		{ "You chant, 'And eorla gehwam eadnys ond tohiht.'", "$n chants, 'And eorla gehwam eadnys ond tohiht.'" },
+		 
 		MESSAGE_END
 	}},
 	
