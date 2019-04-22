@@ -444,6 +444,12 @@ usually fine.
 
 Not all types of trees can be sawed into lumber.
 
+Common types of lumber are:
+ stack of lumber (basic)
+ rough boards (basic)
+ fine tropical lumber (basic)
+ stellar magewood (magic)
+
 See also: COMPONENT, CHOP, MAGEWOOD, SAW
 #
 MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED"
@@ -545,6 +551,11 @@ Used for:  building
 The most commonly used pillars are simple wooden logs. You can also craft bound
 wooden columns from saplings and rope if you have Basic Crafts. This may be
 useful if you're unable to get logs (for example, rough wood cannot be scraped).
+
+Common types of pillars are:
+ heavy log (basic)
+ bound wooden column (basic)
+ fine wooden pillar (basic)
 
 See also: BASIC CRAFTS, COMPONENT, LOGS
 #
