@@ -854,6 +854,10 @@ someone loose.
 If someone has beckoned you to follow, you can just type 'follow' without
 their name.
 
+Your followers can follow you into private buildings and portals, including
+ones owned by your allies, even if they are hostile players. Your guards and
+guard towers will also ignore people who are following you.
+
 Examples:
   > follow ras
   > follow self

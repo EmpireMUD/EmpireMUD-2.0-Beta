@@ -398,7 +398,7 @@ within 20 tiles of their homes.
 
 See also: DESIGNATE, MARK, WORKFORCE
 #
-COIN COINS COINAGE CURRENCY GOLD
+COIN COINS COINAGE CURRENCY GOLD "EXCHANGE RATE"
 
 Commands:  coins
            give <number> [empire] coins <person>
