@@ -727,6 +727,13 @@ Tailor.
 You can use any type of cloth if a recipe calls for a (textile), but some
 recipes may need a specific type.
 
+Common types of textile are:
+ cotton cloth (mundane, basic)
+ wool cloth (mundane, basic)
+ llama wool cloth (mundane, basic)
+ sparkfiber cloth (magic)
+ manasilk cloth (magic)
+
 See also: COMPONENT, CLOTH, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
 #
 "TRADE COMMAND"
