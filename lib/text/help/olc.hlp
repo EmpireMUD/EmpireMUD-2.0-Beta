@@ -4286,6 +4286,11 @@ despawns.
 To create a mount whistle, attach script 10263 (Mount whistle use) to an
 object, and set the object's <value0> field to the vnum of the mount.
 #d
+NOBITS "NO BITS"
+
+When you see "NOBITS", this indicates no bits are set on a set of flags (called
+a bitvector because of how the data is stored).
+#d
 "OBJECT VALUES" "OBJ VALUES" "OBJECT VALS" "OBJ VALS" OBJVALS "ITEM VALUES"
 
 The 'object values' are 3 multi-purpose numbers attached to each object. These
@@ -6082,7 +6087,7 @@ as few rewards as possible, and you can also use quest scripts to give more
 complicated rewards instead.
 
 Available reward types:
- BONUS-EXP - Give the player additional bonus exp (expires at end of day).
+ BONUS-EXP - Give the player additional bonus exp today.
  COINS - Give the player some coins (empire or misc).
  OBJECT - Give the player items.
  SET-SKILL - Set the player's skill to a specific level (usually 0, 50, 75,

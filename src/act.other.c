@@ -2038,7 +2038,7 @@ ACMD(do_group) {
 
 	// no-arg
 	if (!*buf) {
-		msg_to_char(ch, "Available group options: invite, join, kick, leave, leader\r\n");
+		msg_to_char(ch, "Available group options: new, invite, join, kick, leave, leader\r\n");
 		
 		if (GROUP(ch)) {
 			// should we replace this with the group summary? -pc

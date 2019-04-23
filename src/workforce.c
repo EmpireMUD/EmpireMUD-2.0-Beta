@@ -175,15 +175,15 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		return;
 	}
 	
-	// All choppables -- except crops, which are handled by farming
-	if (CHORE_ACTIVE(CHORE_CHOPPING) && !ROOM_CROP(room) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM_NO_VEH((room), INTERACT_CHOP))) {
-		do_chore_chopping(emp, room);
-		return;
-	}
-	
 	// burnable sects
 	if (CHORE_ACTIVE(CHORE_BURN_STUMPS) && has_evolution_type(SECT(room), EVO_BURNS_TO)) {
 		do_chore_burn_stumps(emp, room);
+		return;
+	}
+	
+	// All choppables -- except crops, which are handled by farming
+	if (CHORE_ACTIVE(CHORE_CHOPPING) && !ROOM_CROP(room) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM_NO_VEH((room), INTERACT_CHOP))) {
+		do_chore_chopping(emp, room);
 		return;
 	}
 	
