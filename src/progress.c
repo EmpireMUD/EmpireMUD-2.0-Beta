@@ -397,6 +397,10 @@ char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
 		case PRG_PERK_CRAFT: {
 			if ((craft = craft_proto(perk->value))) {
 				sprintf(save_buffer, "%s: %s%s", craft_types[GET_CRAFT_TYPE(craft)], numstr, GET_CRAFT_NAME(craft));
+				
+				if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
+					sprintf(save_buffer + strlen(save_buffer), " (%s)", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+				}
 			}
 			else {
 				strcpy(save_buffer, "UNKNOWN");
