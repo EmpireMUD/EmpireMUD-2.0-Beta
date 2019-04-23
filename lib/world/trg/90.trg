@@ -598,6 +598,17 @@ else
   halt
 end
 ~
+#9046
+Tame Sheep Evolution~
+0 ab 100
+~
+%load% mob 9004
+set sheep %self.room.people%
+if %sheep.vnum% == 9004
+  %echo% %self.name% is now %sheep.name%!
+  %purge% %self%
+end
+~
 #9061
 Hypnotoad fight~
 0 k 75
