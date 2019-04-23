@@ -329,7 +329,7 @@ void start_event(event_data *event) {
 	
 	// announce
 	syslog(SYS_INFO, LVL_START_IMM, TRUE, "EVENT: [%d] %s has started with event id %d", EVT_VNUM(event), EVT_NAME(event), re->id);
-	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has been begun!", EVT_NAME(event));
+	log_to_slash_channel_by_name(EVENT_LOG_CHANNEL, NULL, "%s has begun!", EVT_NAME(event));
 	
 	qt_event_start_stop(EVT_VNUM(event));
 	et_event_start_stop(EVT_VNUM(event));

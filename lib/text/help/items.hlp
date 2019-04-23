@@ -238,6 +238,7 @@ of fibers are:
  basket of cotton (plant, soft)
  bag of wool (animal, soft)
  bale of straw (hard, plant, basic)
+ bird feathers (animal, soft, basic)
 
 See also: COMPONENT, GATHER
 #
@@ -745,7 +746,7 @@ Common types of textile are:
  sparkfiber cloth (magic)
  manasilk cloth (magic)
 
-See also: COMPONENT, CLOTH, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
+See also: COMPONENT, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
 #
 "TRADE COMMAND"
 

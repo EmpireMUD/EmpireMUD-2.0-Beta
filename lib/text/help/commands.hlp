@@ -932,7 +932,8 @@ Usage:  group  -- see status on the group
 
 Grouping allows multiple players to work on the same challenge, and gives them
 access to a private group channel. You can also type "group" by itself to see
-the status of all members.
+the status of all members. You will automatically assist members of your group,
+including NPCs, who are in combat.
 
 Unlike older CircleMUDs, EmpireMUD does not require that you be following a
 player to group with them, and members don't have to be present for you to
@@ -1874,7 +1875,7 @@ Available options:
  * toggle brief - This will hide the map display entirely and not show you
      what you can see in each direction.
 
-See also: DISPLAY, SCAN, TOGGLE, MAPSIZE
+See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, MAPSCAN, CHART
 #
 SCROLLING
 
