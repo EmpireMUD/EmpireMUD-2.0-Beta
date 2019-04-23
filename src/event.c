@@ -3165,9 +3165,9 @@ EVENT_CMD(evcmd_recent) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d point%s, %s)", ped->points, PLURAL(ped->points), part);
 		}
 		
-		when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN) - time(0);
-		if (when < 0) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, ", %s ago", time_length_string(when));
+		when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN);
+		if (when - time(0) < 0) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, ", ended %s ago", simple_time_since(when));
 		}
 		
 		if (lsize < sizeof(line) - 2) {
