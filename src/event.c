@@ -3126,6 +3126,7 @@ EVENT_CMD(evcmd_recent) {
 	struct player_event_data *ped;
 	int rank, when, count = 0;
 	size_t size, lsize;
+	char *ptr;
 	
 	size = snprintf(buf, sizeof(buf), "Recent events (see HELP EVENTS for more options):\r\n");
 	LL_FOREACH(running_events, running) {
@@ -3167,7 +3168,9 @@ EVENT_CMD(evcmd_recent) {
 		
 		when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN);
 		if (when - time(0) < 0) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, ", ended %s ago", simple_time_since(when));
+			ptr = simple_time_since(when);
+			skip_spaces(&ptr);
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, ", ended %s ago", ptr);
 		}
 		
 		if (lsize < sizeof(line) - 2) {
