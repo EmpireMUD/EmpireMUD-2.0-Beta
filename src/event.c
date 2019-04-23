@@ -3166,7 +3166,7 @@ EVENT_CMD(evcmd_recent) {
 		}
 		
 		when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN) - time(0);
-		if (when > 0) {
+		if (when < 0) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, ", %s ago", time_length_string(when));
 		}
 		
