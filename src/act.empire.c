@@ -2614,9 +2614,10 @@ struct manage_data_type {
 
 // configuration for do_manage
 const struct manage_data_type manage_data[] = {
-	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS },
 	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS },
 	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, 0, FALSE, NOBITS },
+	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS },
+	
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS },
 	
 	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS }	// last

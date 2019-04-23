@@ -755,6 +755,19 @@ maintain your buildings.
 
 See also: FINDMAINTENANCE, RUINS, WORKFORCE
 #
+MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE
+
+Usage:  manage [option] [on/off]
+
+This command allows you to manage land use. You can configure the following
+options:
+ &cpublic&0 - Non-members can use the room/building.
+ &cno-dismantle&0 - The building cannot be dismantled.
+ &cno-work&0 - Workforce will not work the tile.
+
+Immortals can also configure additional options:
+ &cunclaimable&0 - Players cannot claim the tile.
+#
 MEMBERS MEMBERSHIP "EMPIRE MEMBERS" "EMPIRE MEMBERSHIP" "EMPIRE GREATNESS" "TIMED-OUT" "TIMED OUT" TIMEOUTS "EMPIRE TIMEOUT"
 
 You can add other players to your empire by having them type "pledge empire
