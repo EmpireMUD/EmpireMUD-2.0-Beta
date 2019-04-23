@@ -257,6 +257,7 @@ ACMD(do_look);
 
 ACMD(do_mail);
 ACMD(do_maintain);
+ACMD(do_manage);
 ACMD(do_manashield);
 ACMD(do_mapout);
 ACMD(do_mapscan);
@@ -819,6 +820,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	SIMPLE_CMD( "mount", POS_STANDING, do_mount, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "maintain", POS_STANDING, do_maintain, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "manage", POS_DEAD, do_manage, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "manashield", POS_RESTING, do_manashield, NO_MIN, CTYPE_COMBAT, ABIL_MANASHIELD ),
 	STANDARD_CMD( "manufacture", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MANUFACTURE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "mapscan", POS_RESTING, do_mapscan, NO_MIN, CTYPE_UTIL ),
