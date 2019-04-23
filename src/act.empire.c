@@ -5532,7 +5532,7 @@ ACMD(do_manage) {
 				continue;	// level invalid
 			}
 			
-			on = manage_data[iter].roomflag ? ROOM_AFF_FLAGGED(IN_ROOM(ch), manage_data[iter].roomflag) : FALSE;
+			on = (manage_data[iter].roomflag && ROOM_AFF_FLAGGED(IN_ROOM(ch), manage_data[iter].roomflag)) ? TRUE : FALSE;
 			snprintf(buf, sizeof(buf), "%s: %s\t0", manage_data[iter].name, on ? "\tgon" : "\troff");
 			msg_to_char(ch, " %s\r\n", CAP(buf));
 		}
