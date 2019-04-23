@@ -3124,8 +3124,8 @@ EVENT_CMD(evcmd_recent) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct event_running_data *running;
 	struct player_event_data *ped;
+	int rank, when, count = 0;
 	size_t size, lsize;
-	int rank, when;
 	
 	size = snprintf(buf, sizeof(buf), "Recent events (see HELP EVENTS for more options):\r\n");
 	LL_FOREACH(running_events, running) {
@@ -3135,6 +3135,8 @@ EVENT_CMD(evcmd_recent) {
 		if (running->status != EVTS_COMPLETE) {
 			continue;	// only show finished events
 		}
+		
+		++count;	// any
 		
 		// level portion
 		if (EVT_MIN_LEVEL(running->event) == EVT_MAX_LEVEL(running->event) && EVT_MIN_LEVEL(running->event) == 0) {
@@ -3181,6 +3183,10 @@ EVENT_CMD(evcmd_recent) {
 		else {
 			size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
 		}
+	}
+	
+	if (!count) {
+		strcat(buf, " none\r\n");	// always room in buf if !count
 	}
 	
 	if (ch->desc) {
