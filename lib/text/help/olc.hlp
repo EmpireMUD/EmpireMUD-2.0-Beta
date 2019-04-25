@@ -813,8 +813,8 @@ Examples:
  > .abil fullsearch -scaleover 50 -scaleunder 99
 
 To search other fields, you can generally use the normal "search" option for
-other OLC types. For example, to find all objects with the "Mini-pet Use"
-trigger, use ".t search 9900".
+other OLC types. For example, to find all abilities with a certain cooldown,
+use ".gen search 1234".
 #d
 "ABILEDIT GAINHOOKS" "ABILEDIT GAIN HOOKS" "GAIN HOOKS"
 
@@ -5559,12 +5559,18 @@ of the olc 'list' command.
 
 See also: OLC LIST, VNUM
 #d
-"OLC FULLSEARCH"
+"OLC FULLSEARCH" FULLSEARCH
 
 Usage:  .<type> fullsearch <arguments>
 
-See the individual help files such as OEDIT FULLSEARCH. This command is only
-implemented for types that have such a help file.
+See the individual help files such as OEDIT FULLSEARCH.
+
+Supported types:
+  ability
+  mobile
+  object
+  progress
+  trigger
 #d
 "OLC LIST" OLIST MLIST RLIST
 
@@ -5881,6 +5887,32 @@ The following progress goal flags are available:
  HIDDEN - Will not show up in lists until completed.
 
 See also: OLC PROGRESS
+#d
+"PROGEDIT FULLSEARCH"
+
+Usage:  .prog fullsearch -<field> <argument> <...>
+
+This command allows you to search for progress goals matching certain criteria.
+You can specify multiple fields if you want. Any arguments that don't start
+with a dash (-) are matched to the goal's name and other text.
+
+Fields:
+  &c-cost&0 - match a specific cost
+  &c-flagged&0, &c-unflagged&0 - see HELP PROGEDIT FLAGS
+  &c-perks&0 - see HELP PROGEDIT PERKS
+  &c-tasks&0 - see HELP PROGEDIT TASKS
+  &c-type&0 - see HELP PROGEDIT TYPE
+  &c-value&0 - match a specific value
+
+Examples:
+ > .prog fullsearch -type PLAYER-TECH -ptech Swimming
+ > .prog fullsearch -flagged RANGED -flagged RANGED-ONLY
+ > .prog fullsearch -scaleover 50 -scaleunder 99
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all goals that require you to kill a
+certain mob, use ".m search 12345", which will search the task field on all
+goals for that mob.
 #d
 "PROGEDIT NAME"
 

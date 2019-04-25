@@ -43,6 +43,7 @@ const char *default_progress_name = "Unnamed Goal";
 extern const char *progress_flags[];
 extern const char *progress_perk_types[];
 extern const char *progress_types[];
+extern const char *requirement_types[];
 extern const char *techs[];
 
 // external funcs
@@ -2272,6 +2273,173 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 	msg_to_char(ch, "Progress entry %d deleted.\r\n", vnum);
 	
 	free_progress(prg);
+}
+
+
+/**
+* Searches properties of progress goals.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_progress(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
+	bitvector_t  find_tasks = NOBITS, found_tasks, find_perks = NOBITS, found_perks;
+	int count, lookup, only_cost = NOTHING, only_value = NOTHING, only_type = NOTHING;
+	progress_data *prg, *next_prg;
+	struct progress_perk *perk;
+	struct req_data *task;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP PROGEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		else if (is_abbrev(type_arg, "-cost")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_cost = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, progress_flags, FALSE)) != NOTHING) {
+				only_flags |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-perks")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, progress_perk_types, FALSE)) != NOTHING) {
+				find_perks |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid perk type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-tasks")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, requirement_types, FALSE)) != NOTHING) {
+				find_tasks |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid task type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-type")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_type = search_block(val_arg, progress_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-unflagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, progress_flags, FALSE)) != NOTHING) {
+				not_flagged |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-value")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_value = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Progress goal fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up items
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		if (only_value != NOTHING && PRG_VALUE(prg) != only_value) {
+			continue;
+		}
+		if (only_cost != NOTHING && PRG_COST(prg) != only_cost) {
+			continue;
+		}
+		
+		if (only_type != NOTHING && PRG_TYPE(prg) != only_type) {
+			continue;
+		}
+		if (not_flagged != NOBITS && PRG_FLAGGED(prg, not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (PRG_FLAGS(prg) & only_flags) != only_flags) {
+			continue;
+		}
+		if (find_perks) {	// look up its perks
+			found_perks = NOBITS;
+			LL_FOREACH(PRG_PERKS(prg), perk) {
+				found_perks |= BIT(perk->type);
+			}
+			if ((find_perks & found_perks) != find_perks) {
+				continue;
+			}
+		}
+		if (find_tasks) {	// look up its tasks
+			found_tasks = NOBITS;
+			LL_FOREACH(PRG_TASKS(prg), task) {
+				found_tasks |= BIT(task->type);
+			}
+			if ((find_tasks & found_tasks) != find_tasks) {
+				continue;
+			}
+		}
+		if (*find_keywords && !multi_isname(find_keywords, PRG_NAME(prg)) && !multi_isname(find_keywords, PRG_DESCRIPTION(prg))) {
+			continue;
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d progress goals)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 
