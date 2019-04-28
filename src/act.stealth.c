@@ -36,6 +36,7 @@
 extern const int rev_dir[];
 
 // external funcs
+ACMD(do_dismount);
 void check_combat_start(char_data *ch);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 void scale_item_to_level(obj_data *obj, int level);
@@ -836,8 +837,13 @@ ACMD(do_hide) {
 	}
 	
 	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "You can't hide while mounted!\r\n");
-		return;
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "You can't hide while mounted!\r\n");
+			return;
+		}
 	}
 	
 	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_HIDE)) {
@@ -947,8 +953,9 @@ ACMD(do_infiltrate) {
 		msg_to_char(ch, "You can only infiltrate buildings.\r\n");
 	else if (IS_INSIDE(IN_ROOM(ch)))
 		msg_to_char(ch, "You're already inside.\r\n");
-	else if (IS_RIDING(ch))
+	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't infiltrate while riding.\r\n");
+	}
 	else if (!ROOM_IS_CLOSED(to_room) || can_use_room(ch, to_room, GUESTS_ALLOWED))
 		msg_to_char(ch, "You can just walk in.\r\n");
 	else if (BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))
@@ -957,6 +964,11 @@ ACMD(do_infiltrate) {
 		// sends own message
 	}
 	else {
+		// auto-dismount
+		if (IS_RIDING(ch)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		
 		was_in = IN_ROOM(ch);
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		
@@ -1448,8 +1460,9 @@ ACMD(do_shadowstep) {
 	else if (!can_use_ability(ch, ABIL_SHADOWSTEP, MOVE, cost, COOLDOWN_SHADOWSTEP)) {
 		// sends own messages
 	}
-	else if (IS_RIDING(ch))
+	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't shadowstep while riding.\r\n");
+	}
 	else if (!can_teleport_to(ch, IN_ROOM(ch), FALSE)) {
 		msg_to_char(ch, "You can't teleport out of here.\r\n");
 	}
@@ -1482,6 +1495,11 @@ ACMD(do_shadowstep) {
 		msg_to_char(ch, "You can't shadowstep there.\r\n");
 	}
 	else {
+		// auto-dismount
+		if (IS_RIDING(ch)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		
 		was_in = IN_ROOM(ch);
 		infil = !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED);
 		
@@ -1564,8 +1582,13 @@ ACMD(do_sneak) {
 		return;
 	}
 	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "You can't sneak while mounted!\r\n");
-		return;
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "You can't sneak while mounted!\r\n");
+			return;
+		}
 	}
 
 	one_argument(argument, arg);
@@ -1695,11 +1718,16 @@ ACMD(do_whisperstride) {
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_WHISPERSTRIDE)) {
 		return;
 	}
-	else if (IS_RIDING(ch)) {
+	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't use Whisperstride while mounted!\r\n");
 		return;
 	}
 	else {
+		// auto-dismount
+		if (IS_RIDING(ch)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_WHISPERSTRIDE, 5 * SECS_PER_REAL_MIN, WAIT_ABILITY);
 		
 		msg_to_char(ch, "You cloak yourself with dark whispers, muffling your movement...\r\n");

@@ -35,6 +35,7 @@
 // external vars
 
 // external funcs
+ACMD(do_dismount);
 extern obj_data *find_obj(int n, bool error);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
@@ -580,8 +581,13 @@ ACMD(do_earthmeld) {
 	}
 	
 	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "You can't do that while mounted.\r\n");
-		return;
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "You can't do that while mounted.\r\n");
+			return;
+		}
 	}
 
 	GET_MANA(ch) -= cost;
