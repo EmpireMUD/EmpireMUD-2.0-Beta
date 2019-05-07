@@ -4845,6 +4845,7 @@ Fields:
      or adventures, see ADVEDIT CASCADE for help)
   &c-material&0 - see OEDIT MATERIAL
   &c-type&0 - see HELP OEDIT TYPE
+  &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
   &c-wear&0 - see HELP OEDIT WEAR
 
 Examples:
