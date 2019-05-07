@@ -36,7 +36,7 @@ guard #n~
 #a guard #n is standing here.
 ~
 50 75 bdqtuv 0 3
-1 0 0 1
+0 0 0 1
 S
 #205
 #n bodyguard guard~
@@ -44,7 +44,7 @@ S
 #n the bodyguard is standing here.
 ~
 0 125 bdpqvG cm 3
-1 0 0 1
+0 0 0 1
 S
 #206
 #n farmer~
@@ -492,12 +492,12 @@ I 4 104 10.00 1 X  # LOOT: a red bloodstone
 I 4 1300 10.00 1 X  # LOOT: a glowing green seashell
 S
 #251
-guard cityguard~
+guard cityguard #n~
 a city guard~
 A city guard is standing here.
 ~
 75 100 dqtuvA c 3
-1 0 0 1
+0 0 0 1
 I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
@@ -506,36 +506,36 @@ T 251
 T 250
 S
 #252
-guard outguard #e~
+guard outguard #e #n~
 an outguard~
 An outguard from #e is standing here.
 ~
 75 100 dqtuv c 3
-1 0 0 1
+0 0 0 1
 I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
 I 4 2302 10.00 1  # LOOT: leather vambraces
 I 4 2315 10.00 1  # LOOT: a kite shield
 S
 #253
-scout #a~
+scout #a #n~
 a #a scout~
 A #a scout is standing here.
 ~
 50 75 dqtv c 3
-1 0 0 1
+0 0 0 1
 I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
 I 4 2302 10.00 1  # LOOT: leather vambraces
 I 4 909 10.00 1  # LOOT: a short bow
 S
 #254
-imperial guard~
+imperial guard #n~
 an imperial guard~
 An imperial guard is standing here.
 ~
 75 100 bdpqtuvyB 0 3
-1 0 0 1
+0 0 0 1
 I 4 2202 10.00 1  # LOOT: an arming sword
 I 4 2210 10.00 1  # LOOT: a mace
 I 4 2310 10.00 1  # LOOT: splint vambraces

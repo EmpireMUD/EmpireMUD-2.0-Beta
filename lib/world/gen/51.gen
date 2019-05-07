@@ -34,4 +34,21 @@ meteorite shard~
 T1
 meteorite shards~
 S
+#5136
+clean pigeon cages~
+2 0
+0 0 0 0
+T0
+You clean out the pigeon cages.~
+T1
+$n cleans out the pigeon cages.~
+T2
+You clean out the pigeon cages on $V.~
+T3
+$n cleans out the pigeon cages on $V.~
+T4
+You clean out the pigeon cages on $V.~
+T5
+$n cleans out the pigeon cages on $V.~
+S
 $
