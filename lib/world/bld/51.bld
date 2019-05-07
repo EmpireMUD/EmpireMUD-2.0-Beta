@@ -14,7 +14,7 @@ much protection against the elements.
 R
 1002 1 5 0
 R
-7 2 1 1048848
+1010 1 5 0
 S
 #5101
 Cabin~
@@ -31,7 +31,7 @@ down. It is, however, still susceptible to fire.
 R
 1002 1 5 0
 R
-7 2 1 1048848
+1010 1 5 0
 S
 #5102
 Small House~
@@ -46,9 +46,9 @@ here than outside because the better construction traps heat. Even the ground
 is planked with wood to trap in heat.
 ~
 R
-19 1 1 0
-R
 1003 1 5 0
+R
+1010 1 5 0
 S
 #5103
 Mud Hut~
@@ -64,7 +64,7 @@ burned down, but provides little defense against invaders.
 R
 1000 1 5 0
 R
-7 2 1 1048848
+1010 1 5 0
 S
 #5104
 Pueblo~
@@ -81,7 +81,7 @@ pueblos can be very large.
 R
 1002 1 5 0
 R
-21 1 1 0
+1010 1 5 0
 S
 #5105
 Cliff Dwelling~
@@ -96,9 +96,9 @@ magnitude and design. In fact, it is nearly indestructible, save for an act
 of god.
 ~
 R
-19 1 1 0
-R
 1003 1 5 0
+R
+1010 1 5 0
 S
 #5106
 Well~
@@ -287,7 +287,7 @@ A Wooden Gate~
 R
 1003 1 5 0
 R
-25 2 1 1048576
+25 1 1 1048576
 S
 #5114
 Cannery~
@@ -306,7 +306,7 @@ assorted fruit. Some empty jars have been left on one of the tables.
 R
 1002 1 5 0
 R
-7 1 1 1048848
+1010 1 5 0
 S
 #5115
 Foundry~
@@ -326,7 +326,7 @@ v
 R
 1009 1 5 0
 R
-7 1 1 1048848
+1010 1 5 0
 S
 #5116
 Granary~
@@ -347,7 +347,7 @@ corn kernels.
 R
 1002 1 5 0
 R
-7 1 1 1048848
+1010 1 5 0
 S
 #5117
 Gravel Pit~
@@ -366,9 +366,7 @@ are scattered all around the place. A pick that's so worn it looks more like
 a mace is lying at your feet.
 ~
 R
-1002 1 5 0
-R
-7 1 1 1048848
+1002 2 5 0
 S
 #5118
 Lumber Yard~
@@ -388,9 +386,7 @@ scattered around your feet.
 F
 t
 R
-1002 1 5 0
-R
-7 1 1 1048848
+1002 2 5 0
 S
 #5119
 Smokehouse~
@@ -412,7 +408,7 @@ G
 R
 1002 1 5 0
 R
-7 1 1 1048848
+1010 1 5 0
 S
 #5120
 Tannery~
@@ -434,7 +430,7 @@ M
 R
 1002 1 5 0
 R
-7 1 1 1048848
+1010 1 5 0
 S
 #5121
 Utility Shed~
@@ -453,7 +449,7 @@ purpose.
 R
 1002 1 5 0
 R
-7 1 1 1048848
+1010 1 5 0
 S
 #5122
 Quarry~
@@ -737,9 +733,9 @@ M
 M
 9024 20.00 0
 R
-16 1 1 1048576
+1010 1 5 0
 R
-19 1 1 0
+5136 1 5 0
 S
 #5137
 Tailor~
@@ -827,9 +823,9 @@ many different and curious items.
 F
 E
 R
-16 1 1 1048576
+1002 1 5 0
 R
-19 1 1 0
+1010 1 5 0
 S
 #5140
 Steps~

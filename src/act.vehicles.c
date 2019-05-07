@@ -41,6 +41,7 @@ extern const char *mob_move_types[];
 extern const int rev_dir[];
 
 // external funcs
+ACMD(do_dismount);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int count_harnessed_animals(vehicle_data *veh);
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
@@ -1094,7 +1095,7 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	else if (GET_POS(ch) < POS_STANDING || GET_SITTING_ON(ch)) {
 		msg_to_char(ch, "You need to stand up before you can do that.\r\n");
 	}
-	else if (IS_RIDING(ch)) {
+	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't do that while mounted.\r\n");
 	}
 	else if (!(veh = get_vehicle_in_room_vis(ch, argument))) {
@@ -1104,6 +1105,11 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 		// sends own message
 	}
 	else {
+		// auto-dismount
+		if (IS_RIDING(ch)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		
 		snprintf(buf, sizeof(buf), "You sit %s $V.", IN_OR_ON(veh));
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 		
@@ -1257,7 +1263,7 @@ ACMD(do_board) {
 	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to %s it.\r\n", command);
 	}
-	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
+	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't %s that while riding.\r\n", command);
 	}
 	else if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_MOBS)) {
@@ -1270,6 +1276,11 @@ ACMD(do_board) {
 		act("You can't lead $V in there.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
 	}
 	else {
+		// auto-dismount
+		if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		
 		// move ch: out-message
 		snprintf(buf, sizeof(buf), "You %s $V.", command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
@@ -1390,10 +1401,15 @@ ACMD(do_disembark) {
 	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 	}
-	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
+	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't disembark here while riding.\r\n");
 	}
 	else {
+		// auto-dismount
+		if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		
 		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
 			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
 		}

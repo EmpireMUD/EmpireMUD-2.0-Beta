@@ -2092,6 +2092,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_TRAVEL_LOOK  BIT(35)	// auto-looks each time you run or move a vehicle
 #define PRF_AUTOCLIMB  BIT(36)	// will enter mountains without 'climb'
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
+// note: if you add prefs, consider adding them to alt_import_preferences()
 
 
 // PTECH_x: player techs

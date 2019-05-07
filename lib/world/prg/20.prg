@@ -126,7 +126,7 @@ W
 S
 #2014
 Ironclad Future~
-   It will take a lot of iron ingots to ensure the success of your empire. 
+   It will take a lot of iron ingots to ensure the success of your empire.
 Your reward for all this mining is the ability to dig deeper mines.
 ~
 5 2 0 15 0
@@ -233,24 +233,24 @@ W
 S
 #2019
 Herbal Empire~
-   Ensure your empire never runs out of herbs by building up a stockpile of 500
+   Ensure your empire never runs out of herbs by building up a stockpile of 250
 of each herb.
 ~
-5 1 0 50 0
+6 1 0 50 0
 K 7 5
 P 2018
 W
-34 1200 0 500 a
+34 1200 0 250 a
 W
-34 1201 0 500 a
+34 1201 0 250 a
 W
-34 1202 0 500 a
+34 1202 0 250 a
 W
-34 1203 0 500 a
+34 1203 0 250 a
 W
-34 1204 0 500 a
+34 1204 0 250 a
 W
-34 1205 0 500 a
+34 1205 0 250 a
 S
 #2030
 Early Harvest~

@@ -709,6 +709,7 @@ You can also use the following event commands:
    Tip: Wear your best gear before collecting, because some rewards might be
    scaled to your level. Collect at home in case they fill your inventory.
  &clb <event>&0 - View the leaderboard for a current or past event.
+ &crecent&0 - Shows recently-ended events.
  &crewards <event>&0 - View the list of rewards for an event.
 
 Immortals see also: IMMORTAL EVENTS COMMAND
@@ -997,7 +998,7 @@ INFORMATIVE "TOGGLE INFORMATIVE"
 
 Usage:  toggle informative [on/off]
 
-Informative map mode shows you details about your buildings.
+Informative map mode shows you details about map tiles:
 
   &C[--]&0  being dismantled
   &c(--)&0  not done building
@@ -1005,8 +1006,9 @@ Informative map mode shows you details about your buildings.
   &r(GG)&0  high damage/extreme disrepair
   &g/[]\&0  mine with ore
   &r/[]\&0  depleted mine
-  &y^()^&0  chameleon building (immortal only)
   &B^^^^&0  no-work
+  
+  &y^()^&0  chameleon building (immortal only)
 
 See also: TOGGLES, MAINTAIN, WORKFORCE
 #
@@ -2075,7 +2077,7 @@ Usage:  survey
 
 This command gets you basic information about the room you're currently in.
 
-See also: ADVENTURE, CHART
+See also: ADVENTURE, CHART, MANAGE
 #
 SWAP
 

@@ -168,4 +168,21 @@ You shovel soot out of $V's furnace.~
 T5
 $n shovels soot out of $V's furnace.~
 S
+#1010
+repair walls~
+2 0
+0 0 0 0
+T0
+You repair the walls.~
+T1
+$n repairs the walls.~
+T2
+You repair the walls of $V.~
+T3
+$n repairs the walls of $V.~
+T4
+You repair the walls of $V.~
+T5
+$n repairs the walls of $V.~
+S
 $

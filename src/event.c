@@ -2833,6 +2833,7 @@ EVENT_CMD(evcmd_cancel);
 EVENT_CMD(evcmd_collect);
 EVENT_CMD(evcmd_end);
 EVENT_CMD(evcmd_leaderboard);
+EVENT_CMD(evcmd_recent);
 EVENT_CMD(evcmd_rewards);
 EVENT_CMD(evcmd_start);
 
@@ -2846,6 +2847,7 @@ const struct {
 	{ "collect", evcmd_collect, 0, NO_GRANTS },
 	{ "leaderboard", evcmd_leaderboard, 0, NO_GRANTS },
 	{ "lb", evcmd_leaderboard, 0, NO_GRANTS },
+	{ "recent", evcmd_recent, 0, NO_GRANTS },
 	{ "rewards", evcmd_rewards, 0, NO_GRANTS },
 	
 	// immortal commands
@@ -3114,6 +3116,85 @@ EVENT_CMD(evcmd_leaderboard) {
 	
 	// success
 	show_event_leaderboard(ch, re);
+}
+
+
+// shows recent events
+EVENT_CMD(evcmd_recent) {
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct event_running_data *running;
+	struct player_event_data *ped;
+	int rank, when, count = 0;
+	size_t size, lsize;
+	char *ptr;
+	
+	size = snprintf(buf, sizeof(buf), "Recent events (see HELP EVENTS for more options):\r\n");
+	LL_FOREACH(running_events, running) {
+		if (!running->event) {
+			continue;	// can't show one with no event
+		}
+		if (running->status != EVTS_COMPLETE) {
+			continue;	// only show finished events
+		}
+		
+		++count;	// any
+		
+		// level portion
+		if (EVT_MIN_LEVEL(running->event) == EVT_MAX_LEVEL(running->event) && EVT_MIN_LEVEL(running->event) == 0) {
+			snprintf(part, sizeof(part), " (all levels)");
+		}
+		else {
+			snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
+		}
+		
+		lsize = 0;
+		*line = '\0';
+		
+		if (IS_IMMORTAL(ch)) {	// imms see id prefix
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d.", running->id);
+		}
+		
+		lsize += snprintf(line + lsize, sizeof(line) - lsize, " %s%s", EVT_NAME(running->event), part);
+		
+		if ((ped = get_event_data(ch, running->id))) {
+			if ((rank = get_event_rank(ch, running)) > 0) {
+				sprintf(part, "rank %d", rank);
+			}
+			else {
+				strcpy(part, "unranked");
+			}
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d point%s, %s)", ped->points, PLURAL(ped->points), part);
+		}
+		
+		when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN);
+		if (when - time(0) < 0) {
+			ptr = simple_time_since(when);
+			skip_spaces(&ptr);
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, ", ended %s ago", ptr);
+		}
+		
+		if (lsize < sizeof(line) - 2) {
+			strcat(line, "\r\n");
+			lsize += 2;
+		}
+		
+		// append
+		if (lsize + size < sizeof(buf)) {
+			strcat(buf, line);
+			size += lsize;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
+		}
+	}
+	
+	if (!count) {
+		strcat(buf, " none\r\n");	// always room in buf if !count
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 

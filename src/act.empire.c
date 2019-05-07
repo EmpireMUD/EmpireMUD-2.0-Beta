@@ -34,6 +34,7 @@
 *   Import / Export Helpers
 *   Inspire Helpers
 *   Islands Helpers
+*   Land Management
 *   Tavern Helpers
 *   Territory Helpers
 *   Empire Commands
@@ -48,6 +49,7 @@ extern const char *empire_admin_flags[];
 extern const char *empire_trait_types[];
 extern const char *offense_flags[];
 extern struct offense_info_type offense_info[NUM_OFFENSES];
+extern const char *priv[];
 extern const char *progress_types[];
 extern const char *trade_type[];
 extern const char *trade_mostleast[];
@@ -516,7 +518,6 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type, bool p
 * @param empire_data *e The empire to show
 */
 static void show_detailed_empire(char_data *ch, empire_data *e) {
-	extern const char *priv[];
 	extern const char *score_type[];
 	extern const char *techs[];
 	
@@ -2593,6 +2594,34 @@ void do_islands_has_territory(struct do_islands_data **list, int island_id, int 
 	}
 	SAFE_ADD(isle->territory, amount, INT_MIN, INT_MAX, TRUE);
 }
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LAND MANAGEMENT /////////////////////////////////////////////////////////
+
+// for do_manage
+struct manage_data_type {
+	char *name;	// command to type
+	char *altname;	// 2nd version to accept, if any (NULL for none)
+	int priv;	// which PRIV_ is needed, if any (NOTHING for none)
+	bool owned_only;	// requires ownership if TRUE
+	bitvector_t roomflag;	// ROOM_ flag to set, if any (NOBITS if not using this)
+	bool flag_home;	// if TRUE, sets the roomflag on the home room
+	int access_level;	// player level required
+	bitvector_t grant;	// GRANT_ flag to override access_level, if any
+};
+
+
+// configuration for do_manage
+const struct manage_data_type manage_data[] = {
+	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS },
+	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, 0, FALSE, NOBITS },
+	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS },
+	
+	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS },
+	
+	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS }	// last
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -5460,6 +5489,105 @@ ACMD(do_inspire) {
 		else if (vict) {
 			perform_inspire(ch, vict, type);
 		}
+	}
+}
+
+
+// manage [option] [on/off]
+ACMD(do_manage) {
+	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
+	int iter, type = NOTHING;
+	room_data *flag_room;
+	bool on;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot manage the land.\r\n");
+		return;
+	}
+	
+	argument = any_one_arg(argument, arg);
+	skip_spaces(&argument);
+	
+	// determine what they typed?
+	if (*arg) {
+		for (iter = 0; *manage_data[iter].name != '\n'; ++iter) {
+			if (manage_data[iter].access_level > GET_ACCESS_LEVEL(ch) && (manage_data[iter].grant == NOBITS || !IS_GRANTED(ch, manage_data[iter].grant))) {
+				continue;	// level invalid
+			}
+			if (!is_abbrev(arg, manage_data[iter].name) && (!manage_data[iter].altname || !*manage_data[iter].altname || !is_abbrev(arg, manage_data[iter].altname))) {
+				continue;	// not a name match
+			}
+			
+			// found!
+			type = iter;
+			break;
+		}
+	}
+	
+	if (!*arg) {
+		msg_to_char(ch, "Land management:\r\n");
+		
+		for (iter = 0; *manage_data[iter].name != '\n'; ++iter) {
+			if (manage_data[iter].access_level > GET_ACCESS_LEVEL(ch) && (manage_data[iter].grant == NOBITS || !IS_GRANTED(ch, manage_data[iter].grant))) {
+				continue;	// level invalid
+			}
+			
+			on = (manage_data[iter].roomflag && ROOM_AFF_FLAGGED(IN_ROOM(ch), manage_data[iter].roomflag)) ? TRUE : FALSE;
+			snprintf(buf, sizeof(buf), "%s: %s\t0", manage_data[iter].name, on ? "\tgon" : "\troff");
+			msg_to_char(ch, " %s\r\n", CAP(buf));
+		}
+	}
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown land management option '%s'.\r\n", arg);
+	}
+	else if (manage_data[type].owned_only && (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can only do that on a tile you own.\r\n");
+	}
+	else if (manage_data[type].priv != NOTHING && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), manage_data[type].priv)) {
+		msg_to_char(ch, "You require %s privileges to do that\r\n", priv[manage_data[type].priv]);
+	}
+	else {
+		// which room gets the flag
+		flag_room = manage_data[type].flag_home ? HOME_ROOM(IN_ROOM(ch)) : IN_ROOM(ch);
+		
+		// check for optional on/off arg
+		if (!str_cmp(argument, "on")) {
+			if (manage_data[type].roomflag != NOBITS) {
+				SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
+				SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+			}
+			// else: nothing to do?
+			on = TRUE;
+		}
+		else if (!str_cmp(argument, "off")) {
+			if (manage_data[type].roomflag != NOBITS) {
+				REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
+				REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+			}
+			// else: nothing to do?
+			on = FALSE;
+		}
+		else {	// neither on nor off specified: toggle
+			if (manage_data[type].roomflag != NOBITS) {
+				on = !ROOM_AFF_FLAGGED(flag_room, manage_data[type].roomflag);
+				if (on) {
+					SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
+					SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+				}
+				else {	// off
+					REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
+					REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+				}
+			}
+			else {
+				msg_to_char(ch, "Error toggling that management option.\r\n");
+				on = FALSE;	// nothing to do??
+			}
+		}
+		
+		msg_to_char(ch, "You turn the %s land management option %s.\r\n", manage_data[type].name, on ? "on" : "off");
+		snprintf(buf, sizeof(buf), "$n turns the %s land management option %s.", manage_data[type].name, on ? "on" : "off");
+		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
 	}
 }
 
