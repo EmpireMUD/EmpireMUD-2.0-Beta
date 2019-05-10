@@ -53,6 +53,7 @@ extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void expire_trading_post_item(struct trading_post_data *tpd);
 void free_shop_temp_list(struct shop_temp_list *list);
+extern struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 extern char *get_room_name(room_data *room, bool color);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 void read_vault(empire_data *emp);
@@ -329,7 +330,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 
 	struct obj_storage_type *store;
 	struct custom_message *ocm;
+	struct player_eq_set *pset;
 	player_index_data *index;
+	struct eq_set_obj *oset;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH], *temp;
 	obj_data *proto;
@@ -623,6 +626,19 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 				break;
 			}
 		}
+	}
+	
+	// equipment sets?
+	if (GET_OBJ_EQ_SETS(obj)) {
+		any = FALSE;
+		msg_to_char(ch, "Equipment sets:");
+		LL_FOREACH(GET_OBJ_EQ_SETS(obj), oset) {
+			if ((pset = get_eq_set_by_id(ch, oset->id))) {
+				msg_to_char(ch, "%s%s (%s)", any ? ", " : " ", pset->name, wear_data[oset->pos].name);
+				any = TRUE;
+			}
+		}
+		msg_to_char(ch, "%s\r\n", any ? "" : " none");
 	}
 }
 
