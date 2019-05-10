@@ -79,6 +79,7 @@ int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 empire_vnum find_free_empire_vnum(void);
+void free_obj_eq_set(struct eq_set_obj *eq_set);
 void free_theft_logs(struct theft_log *list);
 void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
@@ -4857,6 +4858,24 @@ void add_object_to_table(obj_data *obj) {
 	}
 }
 
+
+/**
+* Removes all eq sets from an object, e.g. when a player loses the object.
+*
+* @param obj_data *obj The obj to remove eq sets from.
+*/
+void clear_obj_eq_sets(obj_data *obj) {
+	struct eq_set_obj *eq_set;
+	
+	if (obj) {
+		while ((eq_set = GET_OBJ_EQ_SETS(obj))) {
+			GET_OBJ_EQ_SETS(obj) = eq_set->next;
+			free_obj_eq_set(eq_set);
+		}
+	}
+}
+
+
 /**
 * Removes an object from the hash table.
 *
@@ -4896,7 +4915,6 @@ void free_obj_eq_set(struct eq_set_obj *eq_set) {
 void free_obj(obj_data *obj) {
 	struct interaction_item *interact;
 	struct obj_storage_type *store;
-	struct eq_set_obj *eq_set;
 	obj_data *proto;
 	
 	proto = obj_proto(GET_OBJ_VNUM(obj));
@@ -4938,11 +4956,7 @@ void free_obj(obj_data *obj) {
 	}
 	
 	free_obj_binding(&OBJ_BOUND_TO(obj));
-	
-	while ((eq_set = GET_OBJ_EQ_SETS(obj))) {
-		GET_OBJ_EQ_SETS(obj) = eq_set->next;
-		free_obj_eq_set(eq_set);
-	}
+	clear_obj_eq_sets(obj);
 	
 	// applies are ALWAYS a copy
 	free_obj_apply_list(GET_OBJ_APPLIES(obj));

@@ -81,6 +81,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 EVENT_CANCEL_FUNC(cancel_room_event);
 void check_delayed_load(char_data *ch);
+void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -5524,6 +5525,11 @@ void obj_to_char(obj_data *object, char_data *ch) {
 			bind_obj_to_player(object, ch);
 		}
 		
+		// new owner?
+		if (IS_NPC(ch) || object->last_owner_id != GET_IDNUM(ch)) {
+			clear_obj_eq_sets(object);
+		}
+		
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
 		
@@ -5665,8 +5671,9 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
 		
-		// clear keep now
+		// clear these now
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+		clear_obj_eq_sets(obj);
 
 		obj->next_content = obj_to->contains;
 		obj_to->contains = obj;
@@ -5697,8 +5704,9 @@ void obj_to_room(obj_data *object, room_data *room) {
 			ROOM_LIGHTS(IN_ROOM(object))++;
 		}
 		
-		// clear keep now
+		// clear these now
 		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
+		clear_obj_eq_sets(object);
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
@@ -5723,8 +5731,9 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 		object->in_vehicle = veh;
 		VEH_CARRYING_N(veh) += obj_carry_size(object);
 		
-		// clear keep now
+		// clear these now
 		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
+		clear_obj_eq_sets(object);
 		
 		// set the timer here; actual rules for it are in limits.c
 		VEH_LAST_MOVE_TIME(veh) = GET_AUTOSTORE_TIMER(object) = time(0);
@@ -8445,6 +8454,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	
 	// empty/clear first
 	REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+	clear_obj_eq_sets(obj);
 	LAST_OWNER_ID(obj) = NOBODY;
 	obj->last_empire_id = NOTHING;
 	empty_obj_before_extract(obj);
