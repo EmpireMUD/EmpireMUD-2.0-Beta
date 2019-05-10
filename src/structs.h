@@ -3719,6 +3719,14 @@ struct player_currency {
 };
 
 
+// equipment sets
+struct player_eq_set {
+	int id;	// unique set id
+	char *name;	// keyword to set the set
+	struct player_eq_set *next;	// LL
+};
+
+
 // used in player_special_data
 struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
@@ -3825,6 +3833,7 @@ struct player_special_data {
 	struct coin_data *coins;	// linked list of coin data
 	struct player_currency *currencies;	// hash table of adventure currencies
 	struct alias_data *aliases;	// Character's aliases
+	struct player_eq_set *eq_sets;	// player's saved equipment sets
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct player_slash_history *slash_history;	// slash-channel histories
@@ -4862,6 +4871,7 @@ struct obj_data {
 	time_t autostore_timer;	// how long an object has been where it be
 	
 	struct obj_binding *bound_to;	// LL of who it's bound to
+	struct eq_set_obj *eq_sets;	// LL of what eq sets it's part of
 
 	obj_data *in_obj;	// In what object NULL when none
 	obj_data *contains;	// Contains objects
@@ -4879,6 +4889,14 @@ struct obj_data {
 	bool search_mark;
 	
 	UT_hash_handle hh;	// object_table hash
+};
+
+
+// for player equipment sets
+struct eq_set_obj {
+	int id;	// which set (for the current owner)
+	int pos;	// wear location
+	struct eq_set_obj *next;	// LL
 };
 
 

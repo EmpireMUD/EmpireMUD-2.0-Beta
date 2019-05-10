@@ -4880,10 +4880,23 @@ void free_obj_binding(struct obj_binding **list) {
 }
 
 
+/**
+* Frees the data for a single eq_set_obj.
+*
+* @param struct eq_set_obj *eq_set The set data to free.
+*/
+void free_obj_eq_set(struct eq_set_obj *eq_set) {
+	if (eq_set) {
+		free(eq_set);
+	}
+}
+
+
 /* release memory allocated for an obj struct */
 void free_obj(obj_data *obj) {
 	struct interaction_item *interact;
 	struct obj_storage_type *store;
+	struct eq_set_obj *eq_set;
 	obj_data *proto;
 	
 	proto = obj_proto(GET_OBJ_VNUM(obj));
@@ -4925,6 +4938,11 @@ void free_obj(obj_data *obj) {
 	}
 	
 	free_obj_binding(&OBJ_BOUND_TO(obj));
+	
+	while ((eq_set = GET_OBJ_EQ_SETS(obj))) {
+		GET_OBJ_EQ_SETS(obj) = eq_set->next;
+		free_obj_eq_set(eq_set);
+	}
 	
 	// applies are ALWAYS a copy
 	free_obj_apply_list(GET_OBJ_APPLIES(obj));

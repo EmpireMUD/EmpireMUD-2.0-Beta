@@ -55,6 +55,7 @@ void update_class(char_data *ch);
 // local protos
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
+void free_player_eq_set(struct player_eq_set *eq_set);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
@@ -797,6 +798,7 @@ void free_char(char_data *ch) {
 	struct player_currency *cur, *next_cur;
 	struct minipet_data *mini, *next_mini;
 	struct interaction_item *interact;
+	struct player_eq_set *eq_set;
 	struct pursuit_data *purs;
 	struct player_tech *ptech;
 	struct offer_data *offer;
@@ -993,6 +995,11 @@ void free_char(char_data *ch) {
 			free(mount);
 		}
 		free_player_event_data(GET_EVENT_DATA(ch));
+		
+		while ((eq_set = GET_EQ_SETS(ch))) {
+			GET_EQ_SETS(ch) = eq_set->next;
+			free_player_eq_set(eq_set);
+		}
 		
 		while ((ptech = GET_TECHS(ch))) {
 			GET_TECHS(ch) = ptech->next;
@@ -3756,6 +3763,21 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	pause_affect_total = FALSE;
 	affect_total(ch);
+}
+
+
+/**
+* Frees the data for 1 player_eq_set.
+*
+* @param struct player_eq_set *eq_set The eq set to free.
+*/
+void free_player_eq_set(struct player_eq_set *eq_set) {
+	if (eq_set) {
+		if (eq_set->name) {
+			free(eq_set->name);
+		}
+		free(eq_set);
+	}
 }
 
 
