@@ -4609,7 +4609,7 @@ int add_eq_set_to_char(char_data *ch, int set_id, char *name) {
 *
 * @param obj_data *obj Which object to set data on.
 * @param int set_id The id of the set.
-* @param int post
+* @param int pos Which WEAR_ pos to set it to.
 */
 void add_obj_to_eq_set(obj_data *obj, int set_id, int pos) {
 	struct eq_set_obj *eq_set;
@@ -4735,6 +4735,51 @@ struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name) {
 	}
 	
 	return partial;	// if any
+}
+
+
+/**
+* Finds a matching eq set entry on an object, if present.
+*
+* @param obj_data *obj The object to look at.
+* @param int id The equipment set id to find.
+* @return struct eq_set_obj* The found set entry, if it exists.
+*/
+struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id) {
+	struct eq_set_obj *oset;
+	
+	if (obj) {
+		LL_FOREACH(GET_OBJ_EQ_SETS(obj), oset) {
+			if (oset->id == id) {
+				return oset;
+			}
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* If obj is part of the listed eq set, it removes it.
+*
+* @param obj_data *obj Which object to set data on.
+* @param int set_id The id of the set.
+*/
+void remove_obj_from_eq_set(obj_data *obj, int set_id) {
+	struct eq_set_obj *eq_set, *next_set;
+	
+	if (!obj) {
+		return;	// invalid data
+	}
+	
+	// look for data to remove
+	LL_FOREACH_SAFE(GET_OBJ_EQ_SETS(obj), eq_set, next_set) {
+		if (eq_set->id == set_id) {
+			LL_DELETE(GET_OBJ_EQ_SETS(obj), eq_set);
+			free_obj_eq_set(eq_set);
+		}
+	}
 }
 
 

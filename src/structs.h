@@ -4249,6 +4249,7 @@ struct wear_data_type {
 	char *wear_msg_to_room;	// msg act()'d to room on wear
 	char *wear_msg_to_char;	// msg act()'d to char on wear
 	bool allow_custom_msgs;	// some slots don't
+	bool save_to_eq_set;	// slots that can be saved with 'eq set'
 };
 
 

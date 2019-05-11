@@ -2239,47 +2239,6 @@ ACMD(do_display) {
 }
 
 
-ACMD(do_equipment) {
-	int i;
-	bool all = FALSE, found = FALSE;
-	
-	one_argument(argument, arg);
-	
-	if (*arg && (!str_cmp(arg, "all") || !str_cmp(arg, "-all") || !str_cmp(arg, "-a"))) {
-		all = TRUE;
-	}
-	
-	if (!IS_NPC(ch)) {
-		msg_to_char(ch, "You are using (gear level %d):\r\n", GET_GEAR_LEVEL(ch));
-	}
-	else {
-		send_to_char("You are using:\r\n", ch);
-	}
-	
-	for (i = 0; i < NUM_WEARS; i++) {
-		if (GET_EQ(ch, i)) {
-			if (CAN_SEE_OBJ(ch, GET_EQ(ch, i))) {
-				send_to_char(wear_data[i].eq_prompt, ch);
-				show_obj_to_char(GET_EQ(ch, i), ch, OBJ_DESC_EQUIPMENT);
-				found = TRUE;
-			}
-			else {
-				send_to_char(wear_data[i].eq_prompt, ch);
-				send_to_char("Something.\r\n", ch);
-				found = TRUE;
-			}
-		}
-		else if (all) {
-			msg_to_char(ch, "%s\r\n", wear_data[i].eq_prompt);
-			found = TRUE;
-		}
-	}
-	if (!found) {
-		send_to_char(" Nothing.\r\n", ch);
-	}
-}
-
-
 ACMD(do_examine) {
 	vehicle_data *tmp_veh = NULL;
 	char_data *tmp_char;

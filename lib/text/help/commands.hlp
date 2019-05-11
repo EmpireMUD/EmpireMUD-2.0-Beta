@@ -674,12 +674,20 @@ See also: SOCIALS
 EQUIPMENT
 
 Usage:  equipment [-all]
+        equipment set <name>  -- save an equipment set
+        equipment delete <name>  -- delete an equipment set
+        equipment list  -- list your equipment sets
+        equipment <name>  -- change to an equipment set
 
 Gives you a list of all the equipment you're wearing, holding, and wielding.
 Items do not take up inventory space when equipped (except containers and their
 contents).
 
 If you also want to see empty slots, use the -a flag.
+
+You can also use this command to save and restore equipment sets. Just equip
+all the items you want for one set, and use 'equipment set' with a set name.
+You can then change back to that set any time you're not in combat.
 
 See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP
 #
