@@ -1426,6 +1426,8 @@ void do_eq_change(char_data *ch, char *argument) {
 		// attempt to equip this one
 		perform_wear(ch, obj, oset->pos);
 	}
+	
+	command_lag(ch, WAIT_OTHER);
 }
 
 
@@ -1550,6 +1552,8 @@ void do_eq_set(char_data *ch, char *argument) {
 	
 	msg_to_char(ch, "Your current equipment has been saved as '%s'.\r\n", argument);
 	SAVE_CHAR(ch);
+	
+	command_lag(ch, WAIT_OTHER);
 }
 
 
