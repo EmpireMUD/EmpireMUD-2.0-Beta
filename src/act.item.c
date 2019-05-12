@@ -73,6 +73,7 @@ ACMD(do_unshare);
 room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
+obj_data *perform_eq_change_unequip(char_data *ch, int pos);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
 bool ship_is_empty(vehicle_data *ship);
@@ -1399,16 +1400,16 @@ void do_eq_change(char_data *ch, char *argument) {
 			else {	// swap
 				if (GET_EQ(ch, oset->pos)) {
 					// remove old item
-					unequip_char_to_inventory(ch, oset->pos);
+					perform_eq_change_unequip(ch, oset->pos);
 				}
 				// attempt to move this one
-				if ((obj = unequip_char_to_inventory(ch, iter))) {
+				if ((obj = perform_eq_change_unequip(ch, iter))) {
 					perform_wear(ch, obj, oset->pos);
 				}
 			}
 		}
 		else { // not part of the set
-			unequip_char_to_inventory(ch, iter);
+			perform_eq_change_unequip(ch, iter);
 		}
 	}
 	
@@ -1421,7 +1422,7 @@ void do_eq_change(char_data *ch, char *argument) {
 		// attempt to equip it
 		if (GET_EQ(ch, oset->pos)) {
 			// remove old item
-			unequip_char_to_inventory(ch, oset->pos);
+			perform_eq_change_unequip(ch, oset->pos);
 		}
 		// attempt to equip this one
 		perform_wear(ch, obj, oset->pos);
@@ -1546,6 +1547,12 @@ void do_eq_set(char_data *ch, char *argument) {
 		if ((obj = GET_EQ(ch, iter))) {
 			if (wear_data[iter].save_to_eq_set) {
 				add_obj_to_eq_set(obj, set_id, iter);
+				
+				// auto-keep the item when it's added to a set
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+					qt_keep_obj(ch, obj, TRUE);
+				}
 			}
 			else {	// otherwise treat it like inventory
 				remove_obj_from_eq_set(obj, set_id);
@@ -1562,6 +1569,32 @@ void do_eq_set(char_data *ch, char *argument) {
 	SAVE_CHAR(ch);
 	
 	command_lag(ch, WAIT_OTHER);
+}
+
+
+/**
+* Unequips an object when it is removed via the "equip" command, as part of a
+* set. These items are placed at the END of the player's inventory, not the
+* start.
+*
+* @param char_data *ch The person to unequip.
+* @param int pos Which WEAR_ pos to unequip.
+* @return obj_data* A pointer to the removed object, if it exists.
+*/
+obj_data *perform_eq_change_unequip(char_data *ch, int pos) {
+	obj_data *obj;
+	
+	if (GET_EQ(ch, pos)) {
+		obj = unequip_char_to_inventory(ch, pos);
+		if (obj && obj->carried_by == ch) {	// e.g. not single-use
+			// move from start of inventory to end
+			LL_DELETE2(ch->carrying, obj, next_content);
+			LL_APPEND2(ch->carrying, obj, next_content);
+		}
+		return obj;
+	}
+	
+	return NULL;
 }
 
 

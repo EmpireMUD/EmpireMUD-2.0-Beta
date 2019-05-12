@@ -5842,10 +5842,10 @@ obj_data *unequip_char(char_data *ch, int pos) {
 obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
-	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 		extract_obj(obj);
 	}
-	else {
+	else if (obj) {
 		obj_to_char(obj, ch);
 		return obj;
 	}
@@ -5865,10 +5865,10 @@ obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 obj_data *unequip_char_to_room(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
-	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+	if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 		extract_obj(obj);
 	}
-	else if (IN_ROOM(ch)) {
+	else if (obj && IN_ROOM(ch)) {
 		obj_to_room(obj, IN_ROOM(ch));
 		return obj;
 	}
