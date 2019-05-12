@@ -673,7 +673,7 @@ See also: SOCIALS
 #
 EQUIPMENT
 
-Usage:  equipment [-all]
+Usage:  equipment [-all]  -- see your current gear
         equipment set <name>  -- save an equipment set
         equipment delete <name>  -- delete an equipment set
         equipment list  -- list your equipment sets
@@ -688,6 +688,7 @@ If you also want to see empty slots, use the -a flag.
 You can also use this command to save and restore equipment sets. Just equip
 all the items you want for one set, and use 'equipment set' with a set name.
 You can then change back to that set any time you're not in combat.
+Note: The saddle and 'shared' slots do not save as part of the equipment set.
 
 See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP
 #
