@@ -1502,6 +1502,10 @@ void do_eq_set(char_data *ch, char *argument) {
 		msg_to_char(ch, "You must specify a name to save this equipment set under.\r\n");
 		return;
 	}
+	else if (strlen(argument) > 78) {
+		msg_to_char(ch, "Set name too long. Pick something shorter.\r\n");
+		return;
+	}
 	
 	// check invalid words
 	for (iter = 0; *invalids[iter] != '\n'; ++iter) {
