@@ -643,6 +643,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	extern const char *bld_on_flags[];
 	extern const char *craft_flag_for_info[];
 	extern const char *item_types[];
+	extern const char *wear_bits[];
 	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
@@ -675,6 +676,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	else if ((proto = obj_proto(GET_CRAFT_OBJECT(craft)))) {
 		// build info string
 		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
+		if (GET_OBJ_WEAR(proto) & ~ITEM_WEAR_TAKE) {
+			prettier_sprintbit(GET_OBJ_WEAR(proto) & ~ITEM_WEAR_TAKE, wear_bits, part);
+			sprintf(buf + strlen(buf), ", %s", part);
+		}
 		LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
 			sprintf(buf + strlen(buf), ", %s%s", (apply->modifier<0 ? "-" : "+"), apply_types[(int) apply->location]);
 		}
