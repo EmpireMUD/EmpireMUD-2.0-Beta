@@ -1495,6 +1495,8 @@ void do_eq_list(char_data *ch, char *argument) {
 * @param char *argument The name to set.
 */
 void do_eq_set(char_data *ch, char *argument) {
+	extern int count_eq_sets(char_data *ch);
+	
 	const char *invalids[] = { "all", "delete", "list", "save", "set", "\n" };
 	struct player_eq_set *eq_set;
 	int iter, set_id = NOTHING;
@@ -1528,6 +1530,12 @@ void do_eq_set(char_data *ch, char *argument) {
 	// find or create set
 	if ((eq_set = get_eq_set_by_name(ch, argument))) {
 		set_id = eq_set->id;
+	}
+	else if (count_eq_sets(ch) > 50) {
+		// only check this if it's NOT replacing a set
+		// 50 is an arbitrary limit for sanity reasons
+		msg_to_char(ch, "You already have too many equipment sets. Delete one first.\r\n");
+		return;
 	}
 	else {
 		set_id = add_eq_set_to_char(ch, NOTHING, argument);

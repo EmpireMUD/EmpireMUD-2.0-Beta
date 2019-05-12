@@ -4687,6 +4687,22 @@ void check_eq_sets(char_data *ch) {
 
 
 /**
+* @param char_data *ch The player.
+* @return int The number of eq sets the play has saved, currently.
+*/
+int count_eq_sets(char_data *ch) {
+	struct player_eq_set *eq_set;
+	int num = 0;
+	
+	if (!IS_NPC(ch)) {
+		LL_COUNT(GET_EQ_SETS(ch), eq_set, num);
+	}
+	
+	return num;
+}
+
+
+/**
 * Look up an equipment set by id.
 *
 * @param char_data *ch The player to look up a set for.
