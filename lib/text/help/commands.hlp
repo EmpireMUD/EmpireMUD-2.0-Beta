@@ -1286,8 +1286,9 @@ MORTLOG
 
 Usage:  toggle mortlog [on/off]
 
-This will give you periodic updates, such as when a player logs in, leaves, or
-dies. It's useful in keeping up on current events. Mortlog is colored cyan.
+This will give you periodic updates, such as when a player creates, logs in, or
+leaves (depending on the game's settings). It's useful in keeping up on current
+events. Mortlog is colored cyan.
 #
 MOTD
 
@@ -2201,7 +2202,7 @@ Toggles:
   extra-spacing - adds an extra blank line after you type a command
   informative - informative map coloring -- HELP INFORMATIVE
   map-color - shut off color for just the map
-  mortlog - see logs when people create characters and die
+  mortlog - see logs when people create characters
   no-empire - will not create a new empire when you try to claim or build
   no-paint - turns off custom paint colors on buildings
   no-repeat - Some commands will say "ok" instead of typing out your message
