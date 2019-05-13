@@ -1424,7 +1424,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOUNTABLE  BIT(4)	// e. Can be ridden
 #define MOB_MILKABLE  BIT(5)	// f. May be milked
 #define MOB_SCAVENGER  BIT(6)	// g. Eats corpses
-#define MOB_UNDEAD  BIT(7)	// h. Undead :)
+#define MOB_NO_CORPSE  BIT(7)	// h. Does not leave a corpse when killed (this flag was formerly called UNDEAD)
 #define MOB_TIED  BIT(8)	// i. (R) Mob is tied up
 #define MOB_ANIMAL  BIT(9)	// j. mob is an animal
 #define MOB_MOUNTAINWALK  BIT(10)	// k. Walks on mountains

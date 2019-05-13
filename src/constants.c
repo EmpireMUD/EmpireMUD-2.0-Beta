@@ -1991,7 +1991,7 @@ const char *action_bits[] = {
 	"MOUNTABLE",
 	"MILKABLE",	// 5
 	"SCAVENGER",
-	"UNDEAD",
+	"NO-CORPSE",
 	"TIED",
 	"ANIMAL",
 	"MOUNTAIN-WALK",	// 10
