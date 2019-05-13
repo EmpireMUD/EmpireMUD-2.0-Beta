@@ -1044,21 +1044,31 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	char buf[MAX_STRING_LENGTH];
 	size_t size = 0;
 	
+	// pre-description
 	if (VEH_OWNER(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
+	
+	// main desc
+	if (VEH_IS_COMPLETE(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", VEH_SHORT_DESC(veh));
+	}
 	
 	// additional descriptions like what's attached:
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is ON FIRE!\r\n");
 	}
+	/* this is now indicated instead of the long desc
 	if (!VEH_IS_COMPLETE(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
 	}
+	*/
 	else if (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is in need of repair.\r\n");
 	}
