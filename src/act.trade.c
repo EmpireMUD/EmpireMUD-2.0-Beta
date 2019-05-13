@@ -681,7 +681,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			sprintf(buf + strlen(buf), ", %s", part);
 		}
 		LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
-			sprintf(buf + strlen(buf), ", %s%s", (apply->modifier<0 ? "-" : "+"), apply_types[(int) apply->location]);
+			// don't show applies that can't come from crafting
+			if (apply->apply_type != APPLY_TYPE_HARD_DROP && apply->apply_type != APPLY_TYPE_GROUP_DROP && apply->apply_type != APPLY_TYPE_BOSS_DROP) {
+				sprintf(buf + strlen(buf), ", %s%s", (apply->modifier<0 ? "-" : "+"), apply_types[(int) apply->location]);
+			}
 		}
 		if (GET_OBJ_AFF_FLAGS(proto)) {
 			prettier_sprintbit(GET_OBJ_AFF_FLAGS(proto), affected_bits, part);
