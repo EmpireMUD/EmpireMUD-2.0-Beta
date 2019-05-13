@@ -2689,7 +2689,7 @@ Usage:  .ev <command>
         .command
 
 The .olc event editor allows you to configure the data for events, which
-are global competitions that players can parcticipate in. The event data
+are global competitions that players can participate in. The event data
 includes text and rewards, but the actual points come from quests or scripts.
 
 All commands in the editor are highlighted in yellow/green and placed inside
