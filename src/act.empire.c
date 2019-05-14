@@ -6660,7 +6660,7 @@ ACMD(do_territory) {
 			next_node = node->next;
 			total += node->count;
 			
-			sprintf(buf + strlen(buf), "%2d tile%s near%s%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+			sprintf(buf + strlen(buf), "%2d tile%s near%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
 			free(node);
 		}
 		
