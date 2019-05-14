@@ -1903,6 +1903,16 @@ some people for features like the WHO list.
 
 See also: TOGGLE
 #
+SEED SEEDS SEEDING DESEED DE-SEED "REMOVE SEEDS"
+
+Usage:  seed <fruit>
+
+This command allows you to remove the seeds from a fruit, usually to plant
+them. Most fruits can still be eaten afterwards. Some fruits can also be
+planted without removing the seeds first.
+
+See also: PLANT, CROPS
+#
 SELFDELETE "SELF DELETE" SELF-DELETE DELETE
 
 Usage:  selfdelete <password> CONFIRM

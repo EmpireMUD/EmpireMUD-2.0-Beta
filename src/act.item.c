@@ -6121,6 +6121,9 @@ ACMD(do_seed) {
 			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 				extract_obj(obj);
 			}
+			else {
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_STORE);
+			}
 		}
 		else {
 			act("You fail to seed $p.", FALSE, ch, obj, NULL, TO_CHAR);
