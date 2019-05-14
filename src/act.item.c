@@ -132,8 +132,6 @@ INTERACTION_FUNC(combine_obj_interact) {
 	new_obj = read_object(interaction->vnum, TRUE);
 	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 	
-	// Note: does not currently affect an empire's gather totals
-	
 	if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
 		GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
 	}
@@ -1017,6 +1015,54 @@ void remove_honed_gear(char_data *ch) {
 
 
 /**
+* Interaction func for "seed".
+*/
+INTERACTION_FUNC(seed_obj_interact) {
+	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
+	obj_data *new_obj;
+	int iter;
+	
+	if (interaction->quantity) {
+		snprintf(to_char, sizeof(to_char), "You seed %s and get %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+		act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+		snprintf(to_room, sizeof(to_room), "$n seeds %s and gets %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+		act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
+	}
+	else {
+		snprintf(to_char, sizeof(to_char), "You seed %s and get %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+		act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+		snprintf(to_room, sizeof(to_room), "$n seeds %s and gets %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+		act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
+	}
+	
+	if (GET_LOYALTY(ch)) {
+		// add the gained items to production
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		new_obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+		
+		// ownership
+		new_obj->last_owner_id = GET_IDNUM(ch);
+		new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+		
+		// put it somewhere
+		if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(new_obj, ch);
+		}
+		else {
+			obj_to_room(new_obj, IN_ROOM(ch));
+		}
+		load_otrigger(new_obj);
+	}
+	
+	return TRUE;
+}
+
+
+/**
 * Interaction func for "separate".
 */
 INTERACTION_FUNC(separate_obj_interact) {
@@ -1055,8 +1101,6 @@ INTERACTION_FUNC(separate_obj_interact) {
 		}
 		load_otrigger(new_obj);
 	}
-	
-	// note: does not currently add to an empire's gathered amount
 	
 	return TRUE;
 }
@@ -6053,6 +6097,35 @@ ACMD(do_roadsign) {
 
 		gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 		extract_obj(sign);
+	}
+}
+
+
+ACMD(do_seed) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Remove the seeds from what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!has_interaction(obj->interactions, INTERACT_SEED)) {
+		msg_to_char(ch, "You can't seed that!\r\n");
+	}
+	else {		
+		if (run_interactions(ch, obj->interactions, INTERACT_SEED, IN_ROOM(ch), NULL, obj, seed_obj_interact)) {
+			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+				extract_obj(obj);
+			}
+		}
+		else {
+			act("You fail to seed $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
