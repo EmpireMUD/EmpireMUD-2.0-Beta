@@ -1370,6 +1370,7 @@ void do_eq_change(char_data *ch, char *argument) {
 	struct player_eq_set *eq_set;
 	obj_data *obj, *next_obj;
 	struct eq_set_obj *oset;
+	bool any = FALSE;
 	int iter;
 	
 	if (!(eq_set = get_eq_set_by_name(ch, argument))) {
@@ -1405,6 +1406,7 @@ void do_eq_change(char_data *ch, char *argument) {
 				// attempt to move this one
 				if ((obj = perform_eq_change_unequip(ch, iter))) {
 					perform_wear(ch, obj, oset->pos);
+					any = TRUE;
 				}
 			}
 		}
@@ -1426,6 +1428,12 @@ void do_eq_change(char_data *ch, char *argument) {
 		}
 		// attempt to equip this one
 		perform_wear(ch, obj, oset->pos);
+		any = TRUE;
+	}
+	
+	// if we didn't call perform_wear, we MUST determine gear level again at the end
+	if (!any) {
+		determine_gear_level(ch);
 	}
 	
 	command_lag(ch, WAIT_OTHER);
