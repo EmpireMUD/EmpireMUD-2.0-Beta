@@ -30,6 +30,7 @@
 * Contents:
 *   Helpers
 *   Drop Helpers
+*   Equipment Set Helpers
 *   Get Helpers
 *   Give Helpers
 *   Liquid Helpers
@@ -47,16 +48,23 @@ extern struct faction_reputation_type reputation_levels[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
+extern int add_eq_set_to_char(char_data *ch, int set_id, char *name);
+void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct shop_temp_list *build_available_shop_list(char_data *ch);
 extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void expire_trading_post_item(struct trading_post_data *tpd);
+void free_player_eq_set(struct player_eq_set *eq_set);
 void free_shop_temp_list(struct shop_temp_list *list);
+extern struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
+extern struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name);
+extern struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id);
 extern char *get_room_name(room_data *room, bool color);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 void read_vault(empire_data *emp);
 void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
+void remove_obj_from_eq_set(obj_data *obj, int set_id);
 void save_trading_post();
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
@@ -65,6 +73,7 @@ ACMD(do_unshare);
 room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
+obj_data *perform_eq_change_unequip(char_data *ch, int pos);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
 bool ship_is_empty(vehicle_data *ship);
@@ -329,7 +338,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 
 	struct obj_storage_type *store;
 	struct custom_message *ocm;
+	struct player_eq_set *pset;
 	player_index_data *index;
+	struct eq_set_obj *oset;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH], *temp;
 	obj_data *proto;
@@ -623,6 +634,19 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 				break;
 			}
 		}
+	}
+	
+	// equipment sets?
+	if (GET_OBJ_EQ_SETS(obj)) {
+		any = FALSE;
+		msg_to_char(ch, "Equipment sets:");
+		LL_FOREACH(GET_OBJ_EQ_SETS(obj), oset) {
+			if ((pset = get_eq_set_by_id(ch, oset->id))) {
+				msg_to_char(ch, "%s%s (%s)", any ? ", " : " ", pset->name, wear_data[oset->pos].name);
+				any = TRUE;
+			}
+		}
+		msg_to_char(ch, "%s\r\n", any ? "" : " none");
 	}
 }
 
@@ -1287,6 +1311,298 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			stack_msg_to_desc(ch->desc, "You drop %s which disappear%s in a puff of smoke!\r\n", (amount != 1 ? "some coins" : "a coin"), (amount == 1 ? "s" : ""));
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EQUIPMENT SET HELPERS ///////////////////////////////////////////////////
+
+/**
+* Shows the character their current equipment.
+*
+* @param char_data *ch The character.
+* @param bool show_all If TRUE, shows empty slots.
+*/
+void do_eq_show_current(char_data *ch, bool show_all) {
+	void show_obj_to_char(obj_data *obj, char_data *ch, int mode);
+	
+	bool found = FALSE;
+	int pos;
+	
+	if (!IS_NPC(ch)) {
+		msg_to_char(ch, "You are using (gear level %d):\r\n", GET_GEAR_LEVEL(ch));
+	}
+	else {
+		send_to_char("You are using:\r\n", ch);
+	}
+	
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if (GET_EQ(ch, pos)) {
+			if (CAN_SEE_OBJ(ch, GET_EQ(ch, pos))) {
+				send_to_char(wear_data[pos].eq_prompt, ch);
+				show_obj_to_char(GET_EQ(ch, pos), ch, OBJ_DESC_EQUIPMENT);
+				found = TRUE;
+			}
+			else {
+				send_to_char(wear_data[pos].eq_prompt, ch);
+				send_to_char("Something.\r\n", ch);
+				found = TRUE;
+			}
+		}
+		else if (show_all) {
+			msg_to_char(ch, "%s\r\n", wear_data[pos].eq_prompt);
+			found = TRUE;
+		}
+	}
+	if (!found) {
+		send_to_char(" Nothing.\r\n", ch);
+	}
+}
+
+
+/**
+* Changes the character into one of their other equipment sets.
+*
+* @param char_data *ch The character changing sets.
+* @param char *argument The name of an eq set.
+*/
+void do_eq_change(char_data *ch, char *argument) {
+	struct player_eq_set *eq_set;
+	obj_data *obj, *next_obj;
+	struct eq_set_obj *oset;
+	bool any = FALSE;
+	int iter;
+	
+	if (!(eq_set = get_eq_set_by_name(ch, argument))) {
+		msg_to_char(ch, "You don't have an equipment set named '%s' to switch to.\r\n", argument);
+		return;
+	}
+	if (GET_POS(ch) == POS_FIGHTING || GET_POS(ch) < POS_RESTING) {
+		msg_to_char(ch, "You can't change equipment sets right now.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "You switch to your '%s' equipment set.\r\n", eq_set->name);
+	
+	// look for misplaced or unneeded items already equipped
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!wear_data[iter].save_to_eq_set) {
+			continue;	// ignore this slot
+		}
+		if (!(obj = GET_EQ(ch, iter))) {
+			continue;	// no item
+		}
+		
+		// move or remove?
+		if ((oset = get_obj_eq_set_by_id(obj, eq_set->id))) {
+			if (oset->pos == iter) {
+				// already in the right place
+			}
+			else {	// swap
+				if (GET_EQ(ch, oset->pos)) {
+					// remove old item
+					perform_eq_change_unequip(ch, oset->pos);
+				}
+				// attempt to move this one
+				if ((obj = perform_eq_change_unequip(ch, iter))) {
+					perform_wear(ch, obj, oset->pos);
+					any = TRUE;
+				}
+			}
+		}
+		else { // not part of the set
+			perform_eq_change_unequip(ch, iter);
+		}
+	}
+	
+	// now look for items in inventory to equip
+	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		if (!(oset = get_obj_eq_set_by_id(obj, eq_set->id))) {
+			continue;	// not in set
+		}
+		
+		// attempt to equip it
+		if (GET_EQ(ch, oset->pos)) {
+			// remove old item
+			perform_eq_change_unequip(ch, oset->pos);
+		}
+		// attempt to equip this one
+		perform_wear(ch, obj, oset->pos);
+		any = TRUE;
+	}
+	
+	// if we didn't call perform_wear, we MUST determine gear level again at the end
+	if (!any) {
+		determine_gear_level(ch);
+	}
+	
+	command_lag(ch, WAIT_OTHER);
+}
+
+
+/**
+* Deletes an equipment set.
+*
+* @param char_data *ch The person deleting a set.
+* @param char *argument Name of the set to dleete.
+*/
+void do_eq_delete(char_data *ch, char *argument) {
+	struct player_eq_set *eq_set;
+	obj_data *obj;
+	int iter;
+	
+	if (!(eq_set = get_eq_set_by_name(ch, argument))) {
+		msg_to_char(ch, "You don't have an equipment set named '%s' to delete.\r\n", argument);
+		return;
+	}
+	
+	msg_to_char(ch, "You have deleted the equipment set '%s'.\r\n", eq_set->name);
+	
+	// remove all current gear from that set
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter))) {
+			remove_obj_from_eq_set(obj, eq_set->id);
+		}
+	}
+	
+	// remove set from inventory gear
+	LL_FOREACH2(ch->carrying, obj, next_content) {
+		remove_obj_from_eq_set(obj, eq_set->id);
+	}
+	
+	LL_DELETE(GET_EQ_SETS(ch), eq_set);
+	free_player_eq_set(eq_set);
+	SAVE_CHAR(ch);
+}
+
+
+/**
+* Lists a character's eq lists.
+*
+* @param char_data *ch The person viewing the list.
+*/
+void do_eq_list(char_data *ch, char *argument) {
+	struct player_eq_set *eq_set;
+	int count = 0;
+	
+	msg_to_char(ch, "Saved equipment sets:\r\n");
+	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+		++count;
+		msg_to_char(ch, " %s\r\n", eq_set->name);
+	}
+	
+	if (!count) {
+		msg_to_char(ch, " none\r\n");
+	}
+}
+
+
+/**
+* Sets the character's current eq as an equipment set.
+*
+* @param char_data *ch The person setting an eq set.
+* @param char *argument The name to set.
+*/
+void do_eq_set(char_data *ch, char *argument) {
+	extern int count_eq_sets(char_data *ch);
+	
+	const char *invalids[] = { "all", "delete", "list", "save", "set", "\n" };
+	struct player_eq_set *eq_set;
+	int iter, set_id = NOTHING;
+	obj_data *obj;
+	
+	if (!*argument) {
+		msg_to_char(ch, "You must specify a name to save this equipment set under.\r\n");
+		return;
+	}
+	else if (strlen(argument) > 78) {
+		msg_to_char(ch, "Set name too long. Pick something shorter.\r\n");
+		return;
+	}
+	
+	// check invalid words
+	for (iter = 0; *invalids[iter] != '\n'; ++iter) {
+		if (!str_cmp(argument, invalids[iter])) {
+			msg_to_char(ch, "You cannot name an equipment set '%s'.\r\n", invalids[iter]);
+			return;
+		}
+	}
+	
+	// check alphanumeric
+	for (iter = 0; iter < strlen(argument); ++iter) {
+		if (argument[iter] != ' ' && !isdigit(argument[iter]) && !isalpha(argument[iter])) {
+			msg_to_char(ch, "Equipment set names must be alphanumeric.\r\n");
+			return;
+		}
+	}
+	
+	// find or create set
+	if ((eq_set = get_eq_set_by_name(ch, argument))) {
+		set_id = eq_set->id;
+	}
+	else if (count_eq_sets(ch) > 50) {
+		// only check this if it's NOT replacing a set
+		// 50 is an arbitrary limit for sanity reasons
+		msg_to_char(ch, "You already have too many equipment sets. Delete one first.\r\n");
+		return;
+	}
+	else {
+		set_id = add_eq_set_to_char(ch, NOTHING, argument);
+	}
+	
+	// put all current gear on that set
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter))) {
+			if (wear_data[iter].save_to_eq_set) {
+				add_obj_to_eq_set(obj, set_id, iter);
+				
+				// auto-keep the item when it's added to a set
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
+					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
+					qt_keep_obj(ch, obj, TRUE);
+				}
+			}
+			else {	// otherwise treat it like inventory
+				remove_obj_from_eq_set(obj, set_id);
+			}
+		}
+	}
+	
+	// remove set from inventory gear
+	LL_FOREACH2(ch->carrying, obj, next_content) {
+		remove_obj_from_eq_set(obj, set_id);
+	}
+	
+	msg_to_char(ch, "Your current equipment has been saved as '%s'.\r\n", argument);
+	SAVE_CHAR(ch);
+	
+	command_lag(ch, WAIT_OTHER);
+}
+
+
+/**
+* Unequips an object when it is removed via the "equip" command, as part of a
+* set. These items are placed at the END of the player's inventory, not the
+* start.
+*
+* @param char_data *ch The person to unequip.
+* @param int pos Which WEAR_ pos to unequip.
+* @return obj_data* A pointer to the removed object, if it exists.
+*/
+obj_data *perform_eq_change_unequip(char_data *ch, int pos) {
+	obj_data *obj;
+	
+	if (GET_EQ(ch, pos)) {
+		obj = unequip_char_to_inventory(ch, pos);
+		if (obj && obj->carried_by == ch) {	// e.g. not single-use
+			// move from start of inventory to end
+			LL_DELETE2(ch->carrying, obj, next_content);
+			LL_APPEND2(ch->carrying, obj, next_content);
+		}
+		return obj;
+	}
+	
+	return NULL;
 }
 
 
@@ -4462,6 +4778,37 @@ ACMD(do_eat) {
 			bind_obj_to_player(food, ch);
 			reduce_obj_binding(food, ch);
 		}
+	}
+}
+
+
+ACMD(do_equipment) {
+	char *second;
+	
+	skip_spaces(&argument);
+	second = one_argument(argument, arg);
+	skip_spaces(&second);
+	
+	if (!*arg) {
+		do_eq_show_current(ch, FALSE);
+	}
+	else if (!str_cmp(arg, "all") || !str_cmp(arg, "-all") || !str_cmp(arg, "-a")) {
+		do_eq_show_current(ch, TRUE);
+	}
+	else if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot have equipment sets.\r\n");
+	}
+	else if (!str_cmp(arg, "del") || !str_cmp(arg, "-del") || !str_cmp(arg, "delete") || !str_cmp(arg, "-delete")) {
+		do_eq_delete(ch, second);
+	}
+	else if (!str_cmp(arg, "list") || !str_cmp(arg, "-list")) {
+		do_eq_list(ch, second);
+	}
+	else if (!str_cmp(arg, "set") || !str_cmp(arg, "-set") || !str_cmp(arg, "save") || !str_cmp(arg, "-save")) {
+		do_eq_set(ch, second);
+	}
+	else {
+		do_eq_change(ch, argument);	// full arg
 	}
 }
 

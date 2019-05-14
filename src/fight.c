@@ -1357,7 +1357,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	}
 
 	drop_loot(ch, killmaster);
-	if (MOB_FLAGGED(ch, MOB_UNDEAD)) {
+	if (MOB_FLAGGED(ch, MOB_NO_CORPSE)) {
 		// remove any gear
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
 			if (GET_EQ(ch, iter)) {

@@ -1031,6 +1031,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t only_worn = NOBITS, cmp_flags = NOBITS, not_cmp_flagged = NOBITS, only_affs = NOBITS;
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	int count, lookup, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING, only_cmp = NOTHING;
+	int only_weapontype = NOTHING;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	obj_data *obj, *next_obj;
@@ -1160,6 +1161,13 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
+		else if (is_abbrev(type_arg, "-weapontype")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_weapontype = search_block(val_arg, (const char**)get_weapon_types_string(), FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid weapon type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
 		else if (is_abbrev(type_arg, "-wear") || is_abbrev(type_arg, "-worn")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, wear_bits, FALSE)) != NOTHING) {
@@ -1216,6 +1224,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_mat != NOTHING && GET_OBJ_MATERIAL(obj) != only_mat) {
+			continue;
+		}
+		if (only_weapontype != NOTHING && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != only_weapontype)) {
 			continue;
 		}
 		if (find_applies) {	// look up its applies

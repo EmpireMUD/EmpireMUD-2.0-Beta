@@ -31,6 +31,7 @@
 *   Autowiz Wizlist Generator
 *   Helpers
 *   Empire Player Management
+*   Equipment Sets
 *   Promo Codes
 */
 
@@ -48,13 +49,18 @@ extern int top_account_id;
 extern int top_idnum;
 
 // external funcs
+extern int add_eq_set_to_char(char_data *ch, int set_id, char *name);
 void add_learned_craft(char_data *ch, any_vnum vnum);
 ACMD(do_slash_channel);
+void free_obj_eq_set(struct eq_set_obj *eq_set);
 void update_class(char_data *ch);
 
 // local protos
+void check_eq_sets(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
+void free_player_eq_set(struct player_eq_set *eq_set);
+struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
@@ -797,6 +803,7 @@ void free_char(char_data *ch) {
 	struct player_currency *cur, *next_cur;
 	struct minipet_data *mini, *next_mini;
 	struct interaction_item *interact;
+	struct player_eq_set *eq_set;
 	struct pursuit_data *purs;
 	struct player_tech *ptech;
 	struct offer_data *offer;
@@ -993,6 +1000,11 @@ void free_char(char_data *ch) {
 			free(mount);
 		}
 		free_player_event_data(GET_EVENT_DATA(ch));
+		
+		while ((eq_set = GET_EQ_SETS(ch))) {
+			GET_EQ_SETS(ch) = eq_set->next;
+			free_player_eq_set(eq_set);
+		}
 		
 		while ((ptech = GET_TECHS(ch))) {
 			GET_TECHS(ch) = ptech->next;
@@ -1525,6 +1537,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "End Primary Data", length)) {
 					// this tag is no longer used; ignore it
+				}
+				else if (PFILE_TAG(line, "Eq-set:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						add_eq_set_to_char(ch, i_in[0], fread_string(fl, error));
+					}
 				}
 				else if (PFILE_TAG(line, "Event:", length)) {
 					if (sscanf(line + length + 1, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3], &i_in[4], &i_in[5]) == 7) {
@@ -2693,6 +2710,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct player_faction_data *pfd, *next_pfd;
 	struct player_event_data *ped, *next_ped;
 	struct channel_history_data *hist;
+	struct player_eq_set *eq_set;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
 	struct alias_data *alias;
@@ -2727,6 +2745,9 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'E'
+	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+		fprintf(fl, "Eq-set: %d\n%s~\n", eq_set->id, eq_set->name);
+	}
 	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
 		if (ped->event) {
 			fprintf(fl, "Event: %d %d %ld %d %d %d %d\n", ped->id, EVT_VNUM(ped->event), ped->timestamp, ped->points, ped->collected_points, ped->rank, ped->status);
@@ -3734,6 +3755,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	refresh_all_quests(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);
+	check_eq_sets(ch);
 	check_minipets(ch);
 	check_player_events(ch);
 	
@@ -3756,6 +3778,21 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	pause_affect_total = FALSE;
 	affect_total(ch);
+}
+
+
+/**
+* Frees the data for 1 player_eq_set.
+*
+* @param struct player_eq_set *eq_set The eq set to free.
+*/
+void free_player_eq_set(struct player_eq_set *eq_set) {
+	if (eq_set) {
+		if (eq_set->name) {
+			free(eq_set->name);
+		}
+		free(eq_set);
+	}
 }
 
 
@@ -4510,6 +4547,254 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	// re-sort now only if we aren't reading techs (this hints that we're also reading territory)
 	if (!read_techs) {
 		resort_empires(FALSE);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EQUIPMENT SETS //////////////////////////////////////////////////////////
+
+/**
+* Creates an equipment set entry for the player. This will fail if the data is
+* invalid. If there's already a set with that id, its name will be overwritten.
+*
+* @param char_data *ch The player to add the set to.
+* @param int set_id The set's idnum, or NOTHING if you want to auto-detect and create a new one.
+* @param char *name The name of the equipment set (arbitrary but must be pre-validated).
+* @return int The id of the set (in case you requested a new one), or NOTHING if we failed to create one.
+*/
+int add_eq_set_to_char(char_data *ch, int set_id, char *name) {
+	struct player_eq_set *eq_set = NULL;
+	bool found = FALSE;
+	int max_id = 0;
+	
+	if (!ch || IS_NPC(ch) || set_id == 0 || !name || !*name) {
+		return NOTHING;	// invalid input
+	}
+	
+	// because eq sets are delay data...
+	check_delayed_load(ch);
+	
+	// look for existing set
+	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+		if (set_id > 0 && eq_set->id == set_id) {
+			// found existing
+			if (eq_set->name) {
+				free(eq_set->name);
+			}
+			eq_set->name = str_dup(name);
+			found = TRUE;
+			return eq_set->id;	// done
+		}
+		else if (max_id < eq_set->id) {
+			max_id = eq_set->id;
+		}
+	}
+	
+	if (!found) {
+		CREATE(eq_set, struct player_eq_set, 1);
+		eq_set->id = (set_id > 0 ? set_id : ++max_id);
+		eq_set->name = str_dup(name);
+		LL_PREPEND(GET_EQ_SETS(ch), eq_set);
+	}
+	
+	return eq_set ? eq_set->id : NOTHING;
+}
+
+
+/**
+* Adds an object to an equipment set, checking that it's unique in the obj's
+* list and overwriting existing data if not. This does NOT validate the set id
+* in any way.
+*
+* @param obj_data *obj Which object to set data on.
+* @param int set_id The id of the set.
+* @param int pos Which WEAR_ pos to set it to.
+*/
+void add_obj_to_eq_set(obj_data *obj, int set_id, int pos) {
+	struct eq_set_obj *eq_set;
+	bool found = FALSE;
+	
+	if (!obj || set_id <= 0 || pos < 0 || pos >= NUM_WEARS) {
+		return;	// invalid data
+	}
+	
+	// look for data to overwrite
+	LL_FOREACH(GET_OBJ_EQ_SETS(obj), eq_set) {
+		if (eq_set->id == set_id) {
+			eq_set->pos = pos;
+			found = TRUE;
+			break;	// only need 1
+		}
+	}
+	
+	// add if needed
+	if (!found) {
+		CREATE(eq_set, struct eq_set_obj, 1);
+		eq_set->id = set_id;
+		eq_set->pos = pos;
+		LL_PREPEND(GET_OBJ_EQ_SETS(obj), eq_set);
+	}
+}
+
+
+/**
+* Verifies all equipment sets on a player and their objects when they log in.
+* Invalid sets will be removed.
+*
+* @param char_data *ch The player to check.
+*/
+void check_eq_sets(char_data *ch) {
+	struct player_eq_set *pset, *next_pset;
+	struct eq_set_obj *oset, *next_oset;
+	obj_data *obj;
+	int pos;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	// verify set integrity first
+	LL_FOREACH_SAFE(GET_EQ_SETS(ch), pset, next_pset) {
+		if (pset->id < 1 || !pset->name || !*pset->name) {
+			LL_DELETE(GET_EQ_SETS(ch), pset);
+			free_player_eq_set(pset);
+		}
+	}
+	
+	// make sure all the player's objects (and their objects) are on valid sets
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if ((obj = GET_EQ(ch, pos))) {
+			LL_FOREACH_SAFE(GET_OBJ_EQ_SETS(obj), oset, next_oset) {
+				if (!get_eq_set_by_id(ch, oset->id)) {
+					// not found
+					LL_DELETE(GET_OBJ_EQ_SETS(obj), oset);
+					free_obj_eq_set(oset);
+				}
+			}
+		}
+	}
+	LL_FOREACH2(ch->carrying, obj, next_content) {
+		LL_FOREACH_SAFE(GET_OBJ_EQ_SETS(obj), oset, next_oset) {
+			if (!get_eq_set_by_id(ch, oset->id)) {
+				// not found
+				LL_DELETE(GET_OBJ_EQ_SETS(obj), oset);
+				free_obj_eq_set(oset);
+			}
+		}
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @return int The number of eq sets the play has saved, currently.
+*/
+int count_eq_sets(char_data *ch) {
+	struct player_eq_set *eq_set;
+	int num = 0;
+	
+	if (!IS_NPC(ch)) {
+		LL_COUNT(GET_EQ_SETS(ch), eq_set, num);
+	}
+	
+	return num;
+}
+
+
+/**
+* Look up an equipment set by id.
+*
+* @param char_data *ch The player to look up a set for.
+* @param int id Which set to find.
+* @return struct player_eq_set* The found eq set, if any, or NULL if not.
+*/
+struct player_eq_set *get_eq_set_by_id(char_data *ch, int id) {
+	struct player_eq_set *eq_set;
+	
+	if (IS_NPC(ch)) {
+		return NULL;
+	}
+	
+	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+		if (eq_set->id == id) {
+			return eq_set;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* Look up an equipment set by name. It prefers an exact match but will also
+* allow a multi-keyword match.
+*
+* @param char_data *ch The player to look up a set for.
+* @param char *name The name to find;
+* @return struct player_eq_set* The found eq set, if any, or NULL if not.
+*/
+struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name) {
+	struct player_eq_set *eq_set, *partial = NULL;
+	
+	if (IS_NPC(ch)) {
+		return NULL;
+	}
+	
+	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+		if (!str_cmp(name, eq_set->name)) {
+			return eq_set;	// exact match
+		}
+		else if (!partial && multi_isname(name, eq_set->name)) {
+			partial = eq_set;	// save for later
+		}
+	}
+	
+	return partial;	// if any
+}
+
+
+/**
+* Finds a matching eq set entry on an object, if present.
+*
+* @param obj_data *obj The object to look at.
+* @param int id The equipment set id to find.
+* @return struct eq_set_obj* The found set entry, if it exists.
+*/
+struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id) {
+	struct eq_set_obj *oset;
+	
+	if (obj) {
+		LL_FOREACH(GET_OBJ_EQ_SETS(obj), oset) {
+			if (oset->id == id) {
+				return oset;
+			}
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* If obj is part of the listed eq set, it removes it.
+*
+* @param obj_data *obj Which object to set data on.
+* @param int set_id The id of the set.
+*/
+void remove_obj_from_eq_set(obj_data *obj, int set_id) {
+	struct eq_set_obj *eq_set, *next_set;
+	
+	if (!obj) {
+		return;	// invalid data
+	}
+	
+	// look for data to remove
+	LL_FOREACH_SAFE(GET_OBJ_EQ_SETS(obj), eq_set, next_set) {
+		if (eq_set->id == set_id) {
+			LL_DELETE(GET_OBJ_EQ_SETS(obj), eq_set);
+			free_obj_eq_set(eq_set);
+		}
 	}
 }
 

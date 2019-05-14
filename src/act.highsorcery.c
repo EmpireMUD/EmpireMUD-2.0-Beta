@@ -755,7 +755,7 @@ ACMD(do_disenchant) {
 	}
 	else {
 		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED | OBJ_SUPERIOR);
+		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED);
 		
 		for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
 			next_apply = apply->next;

@@ -2,25 +2,26 @@
 whip studded leather~
 a studded whip~
 A studded leather whip is lying on the ground.~
-This whip has been studded with bolts at the end to increase its strike.
+This whip has been studded with bolts at the end to make it more intimidating!
 ~
-1 mo an 1
+1 mo an 2
 0 1 7
 7 0
 A
-21 2 0
+18 2 0
 S
 #2201
 whip razor-studded studded~
 a razor-studded whip~
 A razor-studded whip is snaked out on the ground.~
-The end of this whip has been lined with razors!
+   The end of this whip has been lined with razors! Surely no one will want to
+stand in striking range.
 ~
-1 imo an 1
+1 imo an 2
 0 1 7
 7 0
 A
-21 2 0
+18 2 0
 S
 #2202
 sword arming~
@@ -223,9 +224,11 @@ a rawhide whip~
 A rawhide whip has been left on the ground.~
 The rawhide whip is firm and strong.
 ~
-1 mo an 1
+1 mo an 2
 0 1 7
 7 0
+A
+18 1 0
 S
 #2219
 hammer iron smith's~

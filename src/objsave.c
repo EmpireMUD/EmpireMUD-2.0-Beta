@@ -39,8 +39,11 @@
 *   Object Utils
 */
 
-// externs
+// external vars
 extern const struct wear_data_type wear_data[NUM_WEARS];
+
+// external funcs
+void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -243,6 +246,11 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			
 					ex->keyword = fread_string(fl, error);
 					ex->description = fread_string(fl, error);
+				}
+				else if (OBJ_FILE_TAG(line, "Eq-set:", length)) {
+					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						add_obj_to_eq_set(obj, i_in[0], i_in[1]);
+					}
 				}
 				break;
 			}
@@ -467,6 +475,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	char temp[MAX_STRING_LENGTH];
 	struct extra_descr_data *ex;
 	struct trig_var_data *tvd;
+	struct eq_set_obj *eq_set;
 	struct obj_binding *bind;
 	struct obj_apply *apply;
 	obj_data *proto;
@@ -571,6 +580,11 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	// who it's bound to
 	for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
 		fprintf(fl, "Bound-to: %d\n", bind->idnum);
+	}
+	
+	// any equipment sets it's in
+	LL_FOREACH(GET_OBJ_EQ_SETS(obj), eq_set) {
+		fprintf(fl, "Eq-set: %d %d\n", eq_set->id, eq_set->pos);
 	}
 	
 	// scripts

@@ -673,7 +673,11 @@ See also: SOCIALS
 #
 EQUIPMENT
 
-Usage:  equipment [-all]
+Usage:  equipment [-all]  -- see your current gear
+        equipment set <name>  -- save an equipment set
+        equipment delete <name>  -- delete an equipment set
+        equipment list  -- list your equipment sets
+        equipment <name>  -- change to an equipment set
 
 Gives you a list of all the equipment you're wearing, holding, and wielding.
 Items do not take up inventory space when equipped (except containers and their
@@ -681,7 +685,16 @@ contents).
 
 If you also want to see empty slots, use the -a flag.
 
-See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP
+You can also use this command to save and restore equipment sets. Just equip
+all the items you want for one set, and use 'equipment set' with a set name.
+You can then change back to that set any time you're not in combat.
+Note: The saddle and 'shared' slots do not save as part of the equipment set.
+
+Saving an equipment set will automatically 'keep' all items in the set. When
+you change equipment sets, any items that are removed will be placed at the
+end of your inventory (instead of at the beginning like normal).
+
+See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP, KEEP
 #
 ESTATS ESTATISTICS
 
@@ -1273,8 +1286,9 @@ MORTLOG
 
 Usage:  toggle mortlog [on/off]
 
-This will give you periodic updates, such as when a player logs in, leaves, or
-dies. It's useful in keeping up on current events. Mortlog is colored cyan.
+This will give you periodic updates, such as when a player creates, logs in, or
+leaves (depending on the game's settings). It's useful in keeping up on current
+events. Mortlog is colored cyan.
 #
 MOTD
 
@@ -2188,7 +2202,7 @@ Toggles:
   extra-spacing - adds an extra blank line after you type a command
   informative - informative map coloring -- HELP INFORMATIVE
   map-color - shut off color for just the map
-  mortlog - see logs when people create characters and die
+  mortlog - see logs when people create characters
   no-empire - will not create a new empire when you try to claim or build
   no-paint - turns off custom paint colors on buildings
   no-repeat - Some commands will say "ok" instead of typing out your message

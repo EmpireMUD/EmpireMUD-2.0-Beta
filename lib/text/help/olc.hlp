@@ -2689,7 +2689,7 @@ Usage:  .ev <command>
         .command
 
 The .olc event editor allows you to configure the data for events, which
-are global competitions that players can parcticipate in. The event data
+are global competitions that players can participate in. The event data
 includes text and rewards, but the actual points come from quests or scripts.
 
 All commands in the editor are highlighted in yellow/green and placed inside
@@ -3779,7 +3779,7 @@ Available mob flags:
  MOUNTABLE - Can be ridden by players.
  MILKABLE - Can be milked in a stable.
  SCAVENGER - Eats corpses off the ground (not larger than the mob).
- UNDEAD - Leaves no corpse when it dies.
+ NO-CORPSE - Leaves no corpse when it dies (loot falls on the ground).
  TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
  ANIMAL - Counts as an animal for herding, tying, etc.
  MOUNTAIN-WALK - Can cross mountain tiles.
@@ -4845,6 +4845,7 @@ Fields:
      or adventures, see ADVEDIT CASCADE for help)
   &c-material&0 - see OEDIT MATERIAL
   &c-type&0 - see HELP OEDIT TYPE
+  &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
   &c-wear&0 - see HELP OEDIT WEAR
 
 Examples:

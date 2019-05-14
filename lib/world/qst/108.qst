@@ -649,7 +649,7 @@ Basic Crafts ability. You can type 'skill trade' to see it.
 Make 2 leather ropes:
  1. If you haven't already, type 'skill buy basic crafts'.
  2. You should still have 2 small leather.
- 3. Type 'craft 2 rope'.
+ 3. Type 'craft 2 leather rope'.
 Make a pile of bricks:
  1. You need 2 clay and a fire. You can make a fire by lighting some wood.
  2. Type 'craft bricks'.
@@ -660,7 +660,7 @@ Return to Horation when you've made the items.
 ~
 Horation is impressed with your crafting skills.
 ~
-27 d 0 25 -1
+28 d 0 25 -1
 A
 1 10826
 P

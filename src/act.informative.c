@@ -1044,21 +1044,31 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	char buf[MAX_STRING_LENGTH];
 	size_t size = 0;
 	
+	// pre-description
 	if (VEH_OWNER(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
+	
+	// main desc
+	if (VEH_IS_COMPLETE(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", VEH_SHORT_DESC(veh));
+	}
 	
 	// additional descriptions like what's attached:
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is ON FIRE!\r\n");
 	}
+	/* this is now indicated instead of the long desc
 	if (!VEH_IS_COMPLETE(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
 	}
+	*/
 	else if (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is in need of repair.\r\n");
 	}
@@ -2235,47 +2245,6 @@ ACMD(do_display) {
 	else {
 		delete_doubledollar(argument);
 		msg_to_char(ch, "%s\r\n", replace_prompt_codes(ch, argument));
-	}
-}
-
-
-ACMD(do_equipment) {
-	int i;
-	bool all = FALSE, found = FALSE;
-	
-	one_argument(argument, arg);
-	
-	if (*arg && (!str_cmp(arg, "all") || !str_cmp(arg, "-all") || !str_cmp(arg, "-a"))) {
-		all = TRUE;
-	}
-	
-	if (!IS_NPC(ch)) {
-		msg_to_char(ch, "You are using (gear level %d):\r\n", GET_GEAR_LEVEL(ch));
-	}
-	else {
-		send_to_char("You are using:\r\n", ch);
-	}
-	
-	for (i = 0; i < NUM_WEARS; i++) {
-		if (GET_EQ(ch, i)) {
-			if (CAN_SEE_OBJ(ch, GET_EQ(ch, i))) {
-				send_to_char(wear_data[i].eq_prompt, ch);
-				show_obj_to_char(GET_EQ(ch, i), ch, OBJ_DESC_EQUIPMENT);
-				found = TRUE;
-			}
-			else {
-				send_to_char(wear_data[i].eq_prompt, ch);
-				send_to_char("Something.\r\n", ch);
-				found = TRUE;
-			}
-		}
-		else if (all) {
-			msg_to_char(ch, "%s\r\n", wear_data[i].eq_prompt);
-			found = TRUE;
-		}
-	}
-	if (!found) {
-		send_to_char(" Nothing.\r\n", ch);
 	}
 }
 

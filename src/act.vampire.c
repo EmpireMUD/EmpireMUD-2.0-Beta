@@ -97,6 +97,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 				act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
 				// this may extract it
 				unequip_char_to_inventory(ch, iter);
+				determine_gear_level(ch);
 				break;	// only need 1 matching apply
 			}
 		}
