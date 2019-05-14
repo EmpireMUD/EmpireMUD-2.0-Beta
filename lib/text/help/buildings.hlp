@@ -793,11 +793,12 @@ Requires:  Architect ability, Foundations goal
 Stored here:  paints
 
 This building is used to make and store paints (although you also require
-glassblowing tech to make them). Only a Master Craftsman can learn to make
-paints, and can start the quest to make paints once a painter spawns in this
-building.
+glassblowing tech to make them).
 
-See also: PAINT, QUEST
+A Master Craftsman can learn to make paints, and can start the quest to make
+paints once a painter spawns in this building.
+
+See also: PAINT, QUEST, MASTER CRAFTSMAN
 #
 PARK
 
