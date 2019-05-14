@@ -5567,7 +5567,7 @@ ACMD(do_list) {
 		any_cur = FALSE;
 		HASH_ITER(hh, curt_hash, curt, next_curt) {
 			amt = get_currency(ch, curt->vnum);
-			snprintf(line, sizeof(line), "%s%3d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
+			snprintf(line, sizeof(line), "%s%d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
