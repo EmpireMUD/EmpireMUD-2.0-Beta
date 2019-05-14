@@ -848,9 +848,11 @@ a spidersilk whip~
 A silk whip is coiled here.~
 This whip is actually just a thick strand of spiderweb.
 ~
-1 hmp an 1
+1 hmp an 2
 0 1 7
 11 0
+A
+2 1 0
 S
 #10763
 lantern silk spidersilk~

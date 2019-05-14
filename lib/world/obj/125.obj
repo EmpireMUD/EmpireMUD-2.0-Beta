@@ -424,15 +424,17 @@ some small part of a great contraption. The teeth on the belt are sharp, and
 they have been removed at one end to form a handle. Someone has repurposed this
 belt into a vicious whip.
 ~
-1 moy an 10
-0 5 7
+1 moy an 11
+0 1 7
 2 0
 A
-17 1 0
+17 -2 0
 A
-1 1 0
+2 1 0
 A
-18 -2 0
+18 2 0
+A
+13 2 0
 C
 100 200
 S
@@ -462,9 +464,9 @@ a clockwork wristplate~
 A clockwork wristplate has fallen here.~
    This device straps onto your wrist and then operates like a small shield,
 using tiny gears to move damages plates to the sides and put stronger plates in
-the path your opponent's weapon.
+the path of your opponent's weapon.
 ~
-27 mp aj 15
+27 mp aj 16
 3 0 0
 2 0
 A
