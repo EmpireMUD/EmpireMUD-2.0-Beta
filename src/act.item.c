@@ -5428,10 +5428,18 @@ ACMD(do_list) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH], vstr[128];
 	struct shop_temp_list *stl, *shop_list = NULL;
 	struct shop_item *item;
-	bool any, this;
+	bool any, any_cur, this;
 	obj_data *obj;
+	any_vnum vnum;
 	size_t size;
 	bool ok;
+	int amt;
+	
+	// helper type for displaying currencies at the end
+	struct cur_t {
+		any_vnum vnum;
+		UT_hash_handle hh;
+	} *curt, *next_curt, *curt_hash = NULL;
 	
 	skip_spaces(&argument);	// optional filter
 	
@@ -5532,6 +5540,16 @@ ACMD(do_list) {
 			
 			snprintf(line, sizeof(line), " - %s%s (%d %s%s)\r\n", vstr, GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			
+			// store currency for listing later
+			if ((vnum = item->currency) != NOTHING) {
+				HASH_FIND_INT(curt_hash, &vnum, curt);
+				if (!curt) {
+					CREATE(curt, struct cur_t, 1);
+					curt->vnum = vnum;
+					HASH_ADD_INT(curt_hash, vnum, curt);
+				}
+			}
+			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
 				size += strlen(line);
@@ -5540,6 +5558,26 @@ ACMD(do_list) {
 			else {
 				break;
 			}
+		}
+	}
+	
+	// append currencies if any
+	if (curt_hash && size < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "You have:");
+		any_cur = FALSE;
+		HASH_ITER(hh, curt_hash, curt, next_curt) {
+			amt = get_currency(ch, curt->vnum);
+			snprintf(line, sizeof(line), "%s%3d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+				any_cur = TRUE;
+			}
+		}
+		if (size + 2 < sizeof(buf)) {
+			strcat(buf, "\r\n");
+			size += 2;
 		}
 	}
 
@@ -5553,6 +5591,12 @@ ACMD(do_list) {
 	}
 
 	free_shop_temp_list(shop_list);
+	
+	// clean up currency list
+	HASH_ITER(hh, curt_hash, curt, next_curt) {
+		HASH_DEL(curt_hash, curt);
+		free(curt);
+	}
 }
 
 
