@@ -2257,32 +2257,33 @@ int item_wear_to_wear[] = {
 
 // OBJ_x (extra bits), part 1
 const char *extra_bits[] = {
-	"UNIQUE",
+	"UNIQUE",	// 0
 	"PLANTABLE",
 	"LIGHT",
 	"SUPERIOR",
 	"LARGE",
-	"*CREATED",
+	"*CREATED",	// 5
 	"1-USE",
 	"SLOW",
 	"FAST",
 	"ENCHANTED",
-	"JUNK",
+	"JUNK",	// 10
 	"CREATABLE",
 	"SCALABLE",
 	"TWO-HANDED",
 	"BOE",
-	"BOP",
+	"BOP",	// 15
 	"STAFF",
 	"UNCOLLECTED-LOOT",
 	"*KEEP",
 	"TOOL-PAN",
-	"TOOL-SHOVEL",
+	"TOOL-SHOVEL",	// 20
 	"!AUTOSTORE",
 	"HARD-DROP",
 	"GROUP-DROP",
 	"GENERIC-DROP",
-	"!STORE",
+	"!STORE",	// 25
+	"SEEDED",
 	"\n"
 };
 
@@ -2315,6 +2316,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// group-drop
 	"",	// generic-drop
 	"",	// no-store
+	"",	// seeded
 	"\n"
 };
 
@@ -2346,7 +2348,8 @@ const double obj_flag_scaling_bonus[] = {
 	1.2,	// OBJ_HARD_DROP
 	1.4,	// OBJ_GROUP_DROP
 	1.0,	// OBJ_GENERIC_DROP
-	1.0	// OBJ_NO_STORE
+	1.0,	// OBJ_NO_STORE
+	1.0,	// OBJ_SEEDED
 };
 
 
@@ -3747,31 +3750,32 @@ const char *global_flags[] = {
 
 // INTERACT_x, see also interact_vnum_types, interact_attach_types
 const char *interact_types[] = {
-	"BUTCHER",
+	"BUTCHER",	// 0
 	"SKIN",
 	"SHEAR",
 	"BARDE",
 	"LOOT",
-	"DIG",
+	"DIG",	// 5
 	"FORAGE",
 	"FIND-HERB",
 	"HARVEST",
 	"GATHER",
-	"ENCOUNTER",
+	"ENCOUNTER",	// 10
 	"LIGHT",
 	"PICKPOCKET",
 	"MINE",
 	"COMBINE",
-	"SEPARATE",
+	"SEPARATE",	// 15
 	"SCRAPE",
 	"SAW",
 	"TAN",
 	"CHIP",
-	"CHOP",
+	"CHOP",	// 20
 	"FISH",
 	"PAN",
 	"QUARRY",
 	"TAME",
+	"SEED",	// 25
 	"\n"
 };
 
@@ -3803,6 +3807,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// pan
 	TYPE_ROOM,	// quarry
 	TYPE_MOB,	// tame
+	TYPE_OBJ,	// seed
 };
 
 
@@ -3833,6 +3838,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// pan
 	TYPE_OBJ,	// quarry
 	TYPE_MOB,	// tame
+	TYPE_OBJ,	// seed
 };
 
 
