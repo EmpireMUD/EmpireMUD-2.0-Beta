@@ -401,6 +401,7 @@ When using field  - The variable returns:
 &cfind_lighter&0 - Finds an available LIGHTER in the inventory, if one exists.
    Note: Players may also light things with %actor.has_tech(Light-Fires)%.
 &cfirstname&0 - The actor's first name (or first keyword, for mobs).
+&cfollower&0 - The first follower, if any, of the character.
 &cfollower(name)&0 - The follower of the actor (as an id) with name supplied.
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
 &cgain_event_points(vnum,amt)&0 - Give (or take) points for a current event.
@@ -461,6 +462,7 @@ When using field  - The variable returns:
 &cmove(amount)&0 - Add/subtract movement points on the actor.
 &cmovetype&0 - The "walks" verb for this mob/player.
 &cname&0 - The actor's name (the short description for mobs).
+&cnext_follower&0 - The next follower in the list, if the person is following.
 &cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
    for loops, or an empty return.
 &cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.

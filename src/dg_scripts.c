@@ -3253,10 +3253,30 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "follower")) {
-						if (!c->followers || !c->followers->follower)
+						struct follow_type *fol;
+						bool fnd = FALSE;
+						
+						if (!c->followers || !c->followers->follower) {
+							// no followers
 							*str = '\0';
-						else
+						}
+						else if (subfield && *subfield) {
+							LL_FOREACH(c->followers, fol) {
+								if (fol->follower && multi_isname(subfield, GET_PC_NAME(fol->follower))) {
+									// found follower
+									snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(fol->follower));
+									fnd = TRUE;
+									break;
+								}
+							}
+							if (!fnd) {
+								*str = '\0';	// no match
+							}
+						}
+						else {
+							// simple 1st-follower
 							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(c->followers->follower));
+						}
 					}
 					break;
 				}
@@ -3654,9 +3674,31 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'n': {	// char.n*
-					if (!str_cmp(field, "name"))
+					if (!str_cmp(field, "name")) {
 						snprintf(str, slen, "%s", PERS(c, c, FALSE));
-
+					}
+					else if (!str_cmp(field, "next_follower")) {
+						struct follow_type *fol;
+						bool fnd = FALSE, success = FALSE;
+						
+						if (c->master) {
+							LL_FOREACH(c->master->followers, fol) {
+								if (fnd && fol->follower) {	// already found c...
+									snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(fol->follower));
+									success = TRUE;
+								}
+								else if (fol->follower == c) {
+									fnd = TRUE;	// found my position in the list
+								}
+							}
+							if (!success) {
+								*str = '\0';	// no next follower
+							}
+						}
+						else {
+							*str = '\0';	// no master == no next follower
+						}
+					}
 					else if (!str_cmp(field, "next_in_room")) {
 						char_data *temp_ch;
 						
