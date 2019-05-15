@@ -1626,6 +1626,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	extern int *start_locs;
 	
 	empire_data *emp_iter, *next_emp;
+	char buf[MAX_STRING_LENGTH];
 	struct island_info *isle;
 	int iter, dist;
 	struct empire_city_data *city;
@@ -1738,6 +1739,9 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 	
 	send_config_msg(ch, "ok_string");
+	
+	snprintf(buf, sizeof(buf), "$n has founded %s here!", city->name);
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	stop_room_action(IN_ROOM(ch), ACT_CHOPPING, CHORE_CHOPPING);
 	stop_room_action(IN_ROOM(ch), ACT_PICKING, CHORE_FARMING);
