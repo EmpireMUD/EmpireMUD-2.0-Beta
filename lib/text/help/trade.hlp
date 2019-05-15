@@ -891,12 +891,12 @@ Reforge (Trade ability)
 Usage:  reforge <item | person> name <new name>
         reforge <item | person> <renew | superior>
 
-A great blacksmith (weapons) or tailor (armors and shields) can use this
+A great blacksmith (weapons) or tailor (armors, clothing, shields) can use this
 ability in three ways:
 
 Name: You can take a generic item and give it a name. The name must contain
-the original name (except a leading a/an/the). Requires 1 blue iris per 3 gear
-rating on the item.
+the main keyword of the original item (like 'sword', 'clothes', etc, depending
+on the item). Requires 1 blue iris per 3 gear rating on the item.
 
 Renew: This undoes any enchantments, disenchantments, name, superior quality, 
 and all other effects, and restores the item to its base stats. Requires 1
