@@ -6270,7 +6270,7 @@ ACMD(do_ship) {
 	struct island_info *from_isle, *to_isle;
 	struct empire_storage_data *store;
 	struct shipping_data *sd, *temp;
-	bool done, wrong_isle, gave_number = FALSE;
+	bool done, wrong_isle, gave_number = FALSE, all = FALSE;
 	vehicle_data *veh;
 	obj_data *proto;
 	int number = 1;
@@ -6280,12 +6280,16 @@ ACMD(do_ship) {
 	const char *status_type[] = { "preparing", "en route", "delivered", "waiting for ship", "\n" };
 	
 	argument = any_one_word(argument, arg1);	// command
-	argument = any_one_word(argument, arg2);	// number or keywords
+	argument = any_one_word(argument, arg2);	// number/all or keywords
 	skip_spaces(&argument);	// keywords
 	
 	if (isdigit(*arg2)) {
 		number = atoi(arg2);
 		gave_number = TRUE;
+		snprintf(keywords, sizeof(keywords), "%s", argument);
+	}
+	else if (!str_cmp(arg2, "all")) {
+		all = TRUE;
 		snprintf(keywords, sizeof(keywords), "%s", argument);
 	}
 	else {
@@ -6305,7 +6309,7 @@ ACMD(do_ship) {
 	else if (!*arg1) {
 		msg_to_char(ch, "Usage: ship status\r\n");
 		msg_to_char(ch, "Usage: ship cancel [number] <item>\r\n");
-		msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
+		msg_to_char(ch, "Usage: ship <island> [number | all] <item>\r\n");
 	}
 	else if (!str_cmp(arg1, "status") || !str_cmp(arg1, "stat")) {
 		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(GET_LOYALTY(ch)));
@@ -6418,14 +6422,14 @@ ACMD(do_ship) {
 		else if (!(store = find_island_storage_by_keywords(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), keywords))) {
 			msg_to_char(ch, "You don't seem to have any '%s' stored on this island to ship.\r\n", keywords);
 		}
-		else if (store->amount < number) {
+		else if (!all && store->amount < number) {
 			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
 		}
 		else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
 			msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
 		}
 		else {
-			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), to_isle->id, number, store->vnum);
+			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), to_isle->id, all ? store->amount : number, store->vnum);
 		}
 	}
 }

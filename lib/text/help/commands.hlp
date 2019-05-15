@@ -1962,7 +1962,7 @@ See also: DRAW, SWAP
 
 Usage:  ship status
         ship cancel [number] <item>
-        ship <island> [number] <item>
+        ship <island> [number | all] <item>
 
 This command allows you to ship stored resources between islands using ships at
 your docks. You don't have to be at the docks to queue shipments -- only on
