@@ -129,7 +129,7 @@ OLC_MODULE(mapedit_terrain) {
 	void finish_trench(room_data *room);
 	
 	struct empire_city_data *city, *temp;
-	empire_data *emp;
+	empire_data *emp, *rescan_emp = NULL;
 	int count;
 	sector_data *sect = NULL, *next_sect, *old_sect = NULL;
 	crop_data *crop, *next_crop;
@@ -173,6 +173,7 @@ OLC_MODULE(mapedit_terrain) {
 				free(city->name);
 			}
 			free(city);
+			rescan_emp = emp;
 			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		}
 		
@@ -209,6 +210,11 @@ OLC_MODULE(mapedit_terrain) {
 		}
 		else {
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
+		}
+		
+		// rescan territory at the end
+		if (rescan_emp) {
+			read_empire_territory(rescan_emp, FALSE);
 		}
 	}
 }
