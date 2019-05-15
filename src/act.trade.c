@@ -2089,10 +2089,11 @@ ACMD(do_reforge) {
 			proto = obj_proto(GET_OBJ_VNUM(obj));
 			
 			// rename keywords
+			snprintf(temp, sizeof(temp), "%s %s", fname(GET_OBJ_KEYWORDS(proto)), skip_filler(argument));
 			if (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
 				free(GET_OBJ_KEYWORDS(obj));
 			}
-			GET_OBJ_KEYWORDS(obj) = str_dup(skip_filler(argument));
+			GET_OBJ_KEYWORDS(obj) = str_dup(temp);
 			
 			// rename short desc
 			if (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
