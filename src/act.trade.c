@@ -1147,10 +1147,10 @@ const struct {
 	char *command;
 	any_vnum ability;	// required ability
 	bool (*validate_func)(char_data *ch);	// e.g. can_forge, func that returns TRUE if ok -- must send own errors if FALSE
-	int types[3];	// NOTHING-terminated list of valid obj types
+	int types[4];	// NOTHING-terminated list of valid obj types
 } reforge_data[] = {
 	{ "reforge", ABIL_REFORGE, can_forge, { ITEM_WEAPON, ITEM_MISSILE_WEAPON, NOTHING } },	// SCMD_REFORGE
-	{ "refashion", ABIL_REFASHION, can_refashion, { ITEM_ARMOR, ITEM_SHIELD, NOTHING } }	// SCMD_REFASHION
+	{ "refashion", ABIL_REFASHION, can_refashion, { ITEM_ARMOR, ITEM_SHIELD, ITEM_WORN, NOTHING } }	// SCMD_REFASHION
 };
 
 
@@ -1207,9 +1207,12 @@ bool match_reforge_type(obj_data *obj, int subcmd) {
 * @return bool TRUE if it's ok to rename, FALSE otherwise.
 */
 bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
+	char must_have[MAX_STRING_LENGTH];
 	bool ok = FALSE, has_cap = FALSE;
 	obj_data *proto;
 	int iter;
+	
+	strcpy(must_have, fname(GET_OBJ_KEYWORDS(obj)));
 	
 	for (iter = 0; iter < strlen(GET_OBJ_SHORT_DESC(obj)) && !has_cap; ++iter) {
 		if (isupper(*(GET_OBJ_SHORT_DESC(obj) + iter))) {
@@ -1226,8 +1229,8 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 	else if (strchr(name, '&') || strchr(name, '%')) {
 		msg_to_char(ch, "Item names cannot contain the \t& or %% symbols.\r\n");
 	}
-	else if (!str_str(name, (char*)skip_filler(GET_OBJ_SHORT_DESC(obj)))) {
-		msg_to_char(ch, "The new name must contain '%s'.\r\n", skip_filler(GET_OBJ_SHORT_DESC(obj)));
+	else if (!str_str(name, must_have)) {
+		msg_to_char(ch, "The new name must contain '%s'.\r\n", must_have);
 	}
 	else if (strlen(name) > 40) {
 		msg_to_char(ch, "You can't set a name longer than 40 characters.\r\n");
@@ -2008,7 +2011,7 @@ ACMD(do_recipes) {
 }
 
 
-// this handles both 'reforge' and 'refashion'
+// do_refashion / this handles both 'reforge' and 'refashion'
 ACMD(do_reforge) {
 	extern char *shared_by(obj_data *obj, char_data *ch);
 	extern const char *item_types[];
