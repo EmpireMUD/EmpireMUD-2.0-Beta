@@ -1411,6 +1411,9 @@ void abandon_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has abandoned %s", PERS(ch, ch, 1), city->name);
+	if (city->location && ROOM_PEOPLE(city->location)) {
+		act("The city has been removed.", FALSE, ROOM_PEOPLE(city->location), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
 	send_config_msg(ch, "ok_string");
 	perform_abandon_city(emp, city, TRUE);
 	
@@ -1610,6 +1613,9 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 	else {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s - it is no longer a city", PERS(ch, ch, 1), city->name);
+		if (city->location && ROOM_PEOPLE(city->location)) {
+			act("The city has been removed.", FALSE, ROOM_PEOPLE(city->location), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
 		perform_abandon_city(emp, city, FALSE);
 	}
 	
