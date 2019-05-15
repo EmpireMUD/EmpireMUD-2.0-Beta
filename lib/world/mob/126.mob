@@ -67,7 +67,7 @@ a burning elemental~
 A fire elemental burns brightly!
 ~
 0 25 dh cG 2
-0 0 18 16
+0 0 18 33
 I 4 12602 100.00 1  # LOOT: the essence of fire
 I 4 12613 10.00 1  # LOOT: a ball of fire whistle
 M
@@ -134,7 +134,7 @@ a floating ember~
 An ember is floating here.
 ~
 1 1 abdhnoD G 0
-0 0 27 16
+0 0 27 33
 T 12608
 S
 #12612
@@ -560,7 +560,7 @@ the spirit of rage~
 The spirit of rage is floating here, screaming with primal fury!
 ~
 0 0 bd n 0
-0 0 2 16
+0 0 2 28
 T 12686
 T 12687
 S

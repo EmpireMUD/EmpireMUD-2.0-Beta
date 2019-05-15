@@ -4,13 +4,13 @@ the flame dragon~
 A flame dragon is reducing the countryside to ash!
 ~
 100 150 dgxA c 6
-0 0 5 16
+0 0 5 33
 I 0 3012 50.00 4  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 I 1 10006 100.00 1  # SKIN: a dragon scale
 I 1 1351 50.00 2  # SKIN: a large skin
 I 1 1351 100.00 2  # SKIN: a large skin
-I 4 10300 4.00 1 a  # LOOT: the dragon's hoard
+I 4 10300 4.00 1 a  # LOOT: the flame dragon's hoard
 I 4 10301 4.00 1 a  # LOOT: a dragon egg
 I 4 10312 4.00 1 a  # LOOT: the dragonscale leggings pattern
 I 4 10313 4.00 1 a  # LOOT: the dragonweave stockings pattern
@@ -63,7 +63,7 @@ a flame imp~
 A little imp is jumping from flame to flame.
 ~
 1 15 doA G 2
-0 0 9 16
+0 0 9 33
 S
 #10304
 phoenix scorched~
@@ -98,7 +98,7 @@ a flickering flame~
 A flickering flame is burning the fields.
 ~
 30 50 doA 0 0
-0 0 18 16
+0 0 18 33
 S
 #10330
 wyvern wandering~
@@ -232,7 +232,7 @@ an emerald dragon~
 An emerald dragon has been saddled and looks ready to fly.
 ~
 100 125 bde m 5
-0 0 2 16
+0 0 2 33
 S
 #10336
 dragonguard guard~
