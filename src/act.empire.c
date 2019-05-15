@@ -2599,6 +2599,12 @@ void do_islands_has_territory(struct do_islands_data **list, int island_id, int 
  //////////////////////////////////////////////////////////////////////////////
 //// LAND MANAGEMENT /////////////////////////////////////////////////////////
 
+#define MANAGE_FUNC(name)		void (name)(char_data *ch, bool on)
+
+// protos
+MANAGE_FUNC(mng_nowork);
+
+
 // for do_manage
 struct manage_data_type {
 	char *name;	// command to type
@@ -2609,19 +2615,27 @@ struct manage_data_type {
 	bool flag_home;	// if TRUE, sets the roomflag on the home room
 	int access_level;	// player level required
 	bitvector_t grant;	// GRANT_ flag to override access_level, if any
+	MANAGE_FUNC(*func);	// callback func (optional)
 };
 
 
 // configuration for do_manage
 const struct manage_data_type manage_data[] = {
-	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS },
-	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, 0, FALSE, NOBITS },
-	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS },
+	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS, NULL },
+	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, 0, FALSE, NOBITS, mng_nowork },
+	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
 	
-	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS },
+	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
 	
-	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS }	// last
+	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS, NULL }	// last
 };
+
+
+MANAGE_FUNC(mng_nowork) {
+	if (!on && ROOM_OWNER(IN_ROOM(ch))) {
+		deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+	}
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -5493,7 +5507,7 @@ ACMD(do_inspire) {
 }
 
 
-// manage [option] [on/off]
+// manage [option] [on/off] -- uses manage_data (above)
 ACMD(do_manage) {
 	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
 	int iter, type = NOTHING;
@@ -5582,12 +5596,18 @@ ACMD(do_manage) {
 			else {
 				msg_to_char(ch, "Error toggling that management option.\r\n");
 				on = FALSE;	// nothing to do??
+				return;
 			}
 		}
 		
 		msg_to_char(ch, "You turn the %s land management option %s.\r\n", manage_data[type].name, on ? "on" : "off");
 		snprintf(buf, sizeof(buf), "$n turns the %s land management option %s.", manage_data[type].name, on ? "on" : "off");
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
+		
+		// callback func (optional)
+		if (manage_data[type].func) {
+			(manage_data[type].func)(ch, on);
+		}
 	}
 }
 
