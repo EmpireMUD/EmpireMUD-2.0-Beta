@@ -4140,8 +4140,7 @@ void reboot_recover(void) {
 		init_descriptor(d, desc);
 
 		d->host = str_dup(host);
-		d->next = descriptor_list;
-		descriptor_list = d;
+		LL_APPEND(descriptor_list, d);
 
 		d->connected = CON_CLOSE;
 				
