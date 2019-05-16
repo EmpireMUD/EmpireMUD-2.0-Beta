@@ -3904,6 +3904,9 @@ void init_player(char_data *ch) {
 		for (iter = 0; *syslog_types[iter] != '\n'; ++iter) {
 			SYSLOG_FLAGS(ch) |= BIT(iter);
 		}
+		
+		SAVE_CHAR(ch);
+		check_autowiz(ch);
 	}
 	
 	ch->points.max_pools[HEALTH] = base_player_pools[HEALTH];
