@@ -43,6 +43,7 @@ extern const char *paint_names[];
 extern struct character_size_data size_data[];
 
 // external functions
+extern char *get_room_name(room_data *room, bool color);
 extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 
@@ -106,6 +107,60 @@ bool adjacent_room_is_light(room_data *room) {
 	}
 	
 	return FALSE;
+}
+
+
+/**
+* Gets the one-line description for a single exit.
+*
+* @param char_data *ch The person looking at exits (for see-in-dark/roomflags).
+* @param room_data *room The room they're looking at.
+* @param const char *prefix The direction or other prefix.
+*/
+char *exit_description(char_data *ch, room_data *room, const char *prefix) {
+	static char output[MAX_STRING_LENGTH];
+	char coords[80], rlbuf[80];
+	int check_x, check_y;
+	size_t size;
+	
+	size = snprintf(output, sizeof(output), "%-5s - ", prefix);
+	
+	// done early if they can't see the target room
+	if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {
+		size += printf(output + size, sizeof(output) - size, "Too dark to tell\r\n");
+		return output;
+	}
+	
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		*coords = '\0';	// only show coords on the map
+	}
+	else {	// show coords
+		check_x = X_COORD(room);
+		check_y = Y_COORD(room);
+		if (CHECK_MAP_BOUNDS(check_x, check_y)) {
+			snprintf(coords, sizeof(coords), " (%d, %d)", check_x, check_y);
+		}
+		else {
+			snprintf(coords, sizeof(coords), " (unknown)");
+		}
+	}
+	
+	*rlbuf = '\0';
+	if (ROOM_CUSTOM_NAME(room)) {
+		snprintf(rlbuf, sizeof(rlbuf), " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
+	}
+	
+	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+		size += printf(output + size, sizeof(output) - size, "[%d] %s%s%s", GET_ROOM_VNUM(room), get_room_name(room, FALSE), rlbuf, coords);
+	}
+	else if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(room, RMT_NO_LOCATION) && (HOME_ROOM(room) == room || !ROOM_IS_CLOSED(room)) && X_COORD(room) >= 0) {
+		size += printf(output + size, sizeof(output) - size, "%s%s%s", get_room_name(room, FALSE), rlbuf, coords);
+	}
+	else {
+		size += printf(output + size, sizeof(output) - size, get_room_name(room, FALSE), rlbuf);
+	}
+	
+	return output;
 }
 
 
@@ -2108,13 +2163,13 @@ void perform_immort_where(char_data *ch, char *arg) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+// with cmd == 0, this suppresses extra exits
 ACMD(do_exits) {
-	char *get_room_name(room_data *room, bool color);
-	
 	struct room_direction_data *ex;
 	room_data *room, *to_room;
-	int check_x, check_y;
-	char coords[80], rlbuf[MAX_STRING_LENGTH];
+	vehicle_data *veh;
+	obj_data *obj;
+	bool any;
 
 	if (subcmd == -1) {
 		room = IN_ROOM(ch);
@@ -2131,43 +2186,36 @@ ACMD(do_exits) {
 		*buf = '\0';
 		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
 			if ((to_room = ex->room_ptr) && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				sprintf(buf2, "%-5s - ", dirs[get_direction_for_char(ch, ex->dir)]);
-				if (!CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-					strcat(buf2, "Too dark to tell\r\n");
-				}
-				else {
-					check_x = X_COORD(to_room);	// in case we're not on the map
-					check_y = Y_COORD(to_room);
-					if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-						snprintf(coords, sizeof(coords), "(%d, %d)", check_x, check_y);
-					}
-					else {
-						snprintf(coords, sizeof(coords), "(unknown)");
-					}
-						
-					*rlbuf = '\0';
-					if (ROOM_CUSTOM_NAME(to_room)) {
-						sprintf(rlbuf, " (%s)", GET_BUILDING(to_room) ? GET_BLD_NAME(GET_BUILDING(to_room)) : GET_SECT_NAME(SECT(to_room)));
-					}
-					
-					if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-						sprintf(buf2 + strlen(buf2), "[%d] %s%s %s\r\n", GET_ROOM_VNUM(to_room), get_room_name(to_room, FALSE), rlbuf, coords);
-					}
-					else if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(to_room, RMT_NO_LOCATION) && (HOME_ROOM(to_room) == to_room || !ROOM_IS_CLOSED(to_room)) && X_COORD(to_room) >= 0) {
-						sprintf(buf2 + strlen(buf2), "%s%s %s\r\n", get_room_name(to_room, FALSE), rlbuf, coords);
-					}
-					else {
-						sprintf(buf2 + strlen(buf2), "%s%s\r\n", get_room_name(to_room, FALSE), rlbuf);
-					}
-				}
+				sprintf(buf2, "%s\r\n", exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)]));
 				strcat(buf, CAP(buf2));
 			}
+		}
+		// disembark?
+		if (!cmd && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && IN_ROOM(veh)) {
+			sprintf(buf + strlen(buf), "%s\r\n", exit_description(ch, IN_ROOM(veh), "Disembark"));
 		}
 		msg_to_char(ch, "Obvious exits:\r\n%s", *buf ? buf : "None.\r\n");
 	}
 	else {
 		// out on the map?
 		look_at_room(ch);
+	}
+	
+	// portals
+	if (!cmd) {
+		any = FALSE;
+		LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+			if (!IS_PORTAL(obj) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(obj)))) {
+				continue;
+			}
+			
+			// display
+			if (!any) {
+				msg_to_char(ch, "Portals:\r\n");
+				any = TRUE;
+			}
+			msg_to_char(ch, "%s\r\n", exit_description(ch, to_room, skip_filler(GET_OBJ_SHORT_DESC(obj))));
+		}
 	}
 }
 
