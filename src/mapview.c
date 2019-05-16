@@ -2186,13 +2186,13 @@ ACMD(do_exits) {
 		*buf = '\0';
 		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
 			if ((to_room = ex->room_ptr) && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				sprintf(buf2, "%s\r\n", exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)]));
+				sprintf(buf2, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)]));
 				strcat(buf, CAP(buf2));
 			}
 		}
 		// disembark?
 		if (cmd != -1 && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && IN_ROOM(veh)) {
-			sprintf(buf + strlen(buf), "%s\r\n", exit_description(ch, IN_ROOM(veh), "Disembark"));
+			sprintf(buf + strlen(buf), " %s\r\n", exit_description(ch, IN_ROOM(veh), "Disembark"));
 		}
 		msg_to_char(ch, "Obvious exits:\r\n%s", *buf ? buf : "None.\r\n");
 	}
@@ -2225,7 +2225,7 @@ ACMD(do_exits) {
 				msg_to_char(ch, "Portals:\r\n");
 				any = TRUE;
 			}
-			msg_to_char(ch, "%s\r\n", exit_description(ch, to_room, skip_filler(GET_OBJ_SHORT_DESC(obj))));
+			msg_to_char(ch, " %s\r\n", exit_description(ch, to_room, skip_filler(GET_OBJ_SHORT_DESC(obj))));
 		}
 	}
 }
