@@ -3183,7 +3183,7 @@ ACMD(do_plant) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
-		msg_to_char(ch, "You can't plant that!\r\n");
+		msg_to_char(ch, "You can't plant that!%s\r\n", has_interaction(obj->interactions, INTERACT_SEED) ? " Try seeding it first." : "");
 	}
 	else if (!(cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
 		// this is a sanity check for bad crop values
