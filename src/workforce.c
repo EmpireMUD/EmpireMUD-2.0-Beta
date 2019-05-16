@@ -1690,6 +1690,10 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_DISMANTLE_MINES].mob);
 	bool can_do = IS_COMPLETE(room);
 	
+	if (!worker) {	// as a backup, use a miner if present
+		worker = find_chore_worker_in_room(room, chore_data[CHORE_MINING].mob);
+	}
+	
 	if (worker && can_do) {
 		start_dismantle_building(room);
 		act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);
