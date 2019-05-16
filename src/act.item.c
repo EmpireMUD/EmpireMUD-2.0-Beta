@@ -6604,6 +6604,11 @@ ACMD(do_store) {
 			if (full) {
 				msg_to_char(ch, "It's full.\r\n");
 			}
+			else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+				// pass control to warehouse func
+				sprintf(buf, "store %s", argument);
+				do_warehouse(ch, buf, 0, 0);
+			}
 			else {
 				msg_to_char(ch, "You can't store that here!\r\n");
 			}
