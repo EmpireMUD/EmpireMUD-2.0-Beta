@@ -2226,7 +2226,7 @@ ACMD(do_exits) {
 				msg_to_char(ch, "Portals:\r\n");
 				any = TRUE;
 			}
-			msg_to_char(ch, " %s\r\n", exit_description(ch, to_room, skip_filler(GET_OBJ_SHORT_DESC(obj))));
+			msg_to_char(ch, " %s\r\n", CAP(exit_description(ch, to_room, skip_filler(GET_OBJ_SHORT_DESC(obj)))));
 		}
 	}
 }
