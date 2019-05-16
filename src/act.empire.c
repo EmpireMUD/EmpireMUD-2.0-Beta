@@ -5076,8 +5076,8 @@ ACMD(do_home) {
 		else if (ROOM_PRIVATE_OWNER(real) == GET_IDNUM(ch)) {
 			msg_to_char(ch, "But it's already your home!\r\n");
 		}
-		else if (ROOM_PRIVATE_OWNER(real) != NOBODY && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
-			msg_to_char(ch, "Someone already owns this home.\r\n");
+		else if (ROOM_PRIVATE_OWNER(real) != NOBODY) {
+			msg_to_char(ch, "Someone already owns this home.%s\r\n", (GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) ? "" : "Use 'home clear' to clear it first.");
 		}
 		else if (!has_permission(ch, PRIV_HOMES, IN_ROOM(ch))) {	// after the has-owner check because otherwise the error is misleading
 			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
@@ -5144,7 +5144,7 @@ ACMD(do_home) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
-			msg_to_char(ch, "You need to own a building to make it your home.\r\n");
+			msg_to_char(ch, "You need to own the building.\r\n");
 		}
 		else if (ROOM_PRIVATE_OWNER(real) != GET_IDNUM(ch) && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
 			msg_to_char(ch, "You can't take away somebody's home.\r\n");
