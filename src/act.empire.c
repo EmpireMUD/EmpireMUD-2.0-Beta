@@ -4441,6 +4441,7 @@ ACMD(do_enroll) {
 		// move data over
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
 			log_to_empire(e, ELOG_DIPLOMACY, "%s merged into this empire", EMPIRE_NAME(old));
+			syslog(SYS_EMPIRE, 0, TRUE, "EMPIRE: %s has merged into %s", EMPIRE_NAME(old), EMPIRE_NAME(e));
 			
 			// attempt to estimate the new member count so cities and territory transfer correctly
 			// note: may over-estimate if some players already had alts in both empires
