@@ -1106,7 +1106,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 	/* Exits ? */
 	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
-		do_exits(ch, "", 0, GET_ROOM_VNUM(room));
+		do_exits(ch, "", -1, GET_ROOM_VNUM(room));
 	}
 }
 
@@ -2163,7 +2163,7 @@ void perform_immort_where(char_data *ch, char *arg) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
-// with cmd == 0, this suppresses extra exits
+// with cmd == -1, this suppresses extra exits
 ACMD(do_exits) {
 	struct room_direction_data *ex;
 	room_data *room, *to_room;
@@ -2191,7 +2191,7 @@ ACMD(do_exits) {
 			}
 		}
 		// disembark?
-		if (!cmd && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && IN_ROOM(veh)) {
+		if (cmd != -1 && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && IN_ROOM(veh)) {
 			sprintf(buf + strlen(buf), "%s\r\n", exit_description(ch, IN_ROOM(veh), "Disembark"));
 		}
 		msg_to_char(ch, "Obvious exits:\r\n%s", *buf ? buf : "None.\r\n");
@@ -2213,7 +2213,7 @@ ACMD(do_exits) {
 	}
 	
 	// portals
-	if (!cmd) {
+	if (cmd != -1) {
 		any = FALSE;
 		LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 			if (!IS_PORTAL(obj) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(obj)))) {
