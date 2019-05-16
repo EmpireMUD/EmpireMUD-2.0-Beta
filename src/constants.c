@@ -54,6 +54,7 @@ void afk_notify(char_data *ch);
 void tog_informative(char_data *ch);
 void tog_mapcolor(char_data *ch);
 void tog_political(char_data *ch);
+void tog_pvp(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -694,7 +695,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "autoswim", TOG_ONOFF, PRF_AUTOSWIM, 0, NULL },
 	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
-	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, NULL },
+	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, tog_pvp },
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	{ "travel-look", TOG_ONOFF, PRF_TRAVEL_LOOK, 0, NULL },
