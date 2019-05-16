@@ -70,6 +70,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 // local protos
 ACMD(do_unshare);
+ACMD(do_warehouse);
 room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
@@ -5955,6 +5956,7 @@ ACMD(do_remove) {
 
 
 ACMD(do_retrieve) {
+	char buf[MAX_STRING_LENGTH], original[MAX_INPUT_LENGTH];
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle;
 	obj_data *objn;
@@ -5987,7 +5989,8 @@ ACMD(do_retrieve) {
 		msg_to_char(ch, "This storage building must be in a city to use it.\r\n");
 		return;
 	}
-
+	
+	strcpy(original, argument);
 	half_chop(argument, arg, buf);
 
 	if (*arg && is_number(arg)) {
@@ -6075,7 +6078,14 @@ ACMD(do_retrieve) {
 		}
 
 		if (!found) {
-			msg_to_char(ch, "Nothing like that is stored here!\r\n");
+			if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+				// pass control to warehouse func
+				sprintf(buf, "retrieve %s", original);
+				do_warehouse(ch, buf, 0, 0);
+			}
+			else {
+				msg_to_char(ch, "Nothing like that is stored here!\r\n");
+			}
 			return;
 		}
 	}
@@ -6483,7 +6493,8 @@ ACMD(do_split) {
 }
 
 
-ACMD(do_store) {	
+ACMD(do_store) {
+	char buf[MAX_STRING_LENGTH];
 	struct empire_storage_data *store;
 	obj_data *obj, *next_obj;
 	int count = 0, total = 1, done = 0, dotmode;
@@ -6553,6 +6564,11 @@ ACMD(do_store) {
 		if (!done) {
 			if (full) {
 				msg_to_char(ch, "It's full.\r\n");
+			}
+			else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+				// pass control to warehouse func
+				sprintf(buf, "store %s", argument);
+				do_warehouse(ch, buf, 0, 0);
 			}
 			else {
 				msg_to_char(ch, "You don't have anything that can be stored here.\r\n");
