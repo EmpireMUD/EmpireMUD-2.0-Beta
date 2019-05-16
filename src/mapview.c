@@ -2186,7 +2186,8 @@ ACMD(do_exits) {
 		*buf = '\0';
 		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
 			if ((to_room = ex->room_ptr) && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				sprintf(buf2, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, to_room, CAP(dirs[get_direction_for_char(ch, ex->dir)])));
+				sprintf(buf2, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)]));
+				CAP(buf2 + (cmd != -1 ? 1 : 0));	// capitalize direction
 				strcat(buf, buf2);
 			}
 		}
