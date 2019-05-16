@@ -40,6 +40,7 @@
 // external vars
 extern const char *paint_colors[];
 extern const char *paint_names[];
+extern const int rev_dir[];
 extern struct character_size_data size_data[];
 
 // external functions
@@ -1114,7 +1115,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 void look_in_direction(char_data *ch, int dir) {
 	ACMD(do_weather);
 	extern const char *from_dir[];
-	extern const int rev_dir[];
 	
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
 	vehicle_data *veh;
@@ -2165,11 +2165,14 @@ void perform_immort_where(char_data *ch, char *arg) {
 
 // with cmd == -1, this suppresses extra exits
 ACMD(do_exits) {
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	struct room_direction_data *ex;
 	room_data *room, *to_room;
 	vehicle_data *veh;
 	obj_data *obj;
+	size_t size;
 	bool any;
+	int dir;
 
 	if (subcmd == -1) {
 		room = IN_ROOM(ch);
@@ -2177,46 +2180,54 @@ ACMD(do_exits) {
 	else {
 		room = real_room(subcmd);
 	}
+	
+	// using buf for the output
+	*buf = '\0';
+	size = 0;
 
 	if (AFF_FLAGGED(ch, AFF_BLIND)) {
 		msg_to_char(ch, "You can't see a damned thing, you're blind!\r\n");
 		return;
 	}
 	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
-		*buf = '\0';
 		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
 			if ((to_room = ex->room_ptr) && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				sprintf(buf2, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)]));
-				CAP(buf2 + (cmd != -1 ? 1 : 0));	// capitalize direction
-				strcat(buf, buf2);
+				snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)])));
+				if (size + strlen(buf2) < sizeof(buf)) {
+					strcat(buf, buf2);
+					size += strlen(buf2);
+				}
 			}
 		}
 		// disembark?
-		if (cmd != -1 && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && IN_ROOM(veh)) {
-			sprintf(buf + strlen(buf), " %s\r\n", exit_description(ch, IN_ROOM(veh), "Disembark"));
+		if (cmd != -1 && (veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh)) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", exit_description(ch, IN_ROOM(veh), "Disembark"));
 		}
-		msg_to_char(ch, "Obvious exits:\r\n%s", *buf ? buf : "None.\r\n");
 	}
-	else {
-		// out on the map?
-		look_at_room(ch);
-		/*
-		if (dir >= NUM_2D_DIRS || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
-			msg_to_char(ch, "You can't throw it that direction.\r\n");
-		}
-		if (to_room && ROOM_IS_CLOSED(to_room)) {
-			if (BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
-				msg_to_char(ch, "You can only throw it through the entrance.\r\n");
-				to_room = NULL;
+	else {	// out on the map
+		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+			if (!(to_room = real_shift(room, shift_dir[dir][0], shift_dir[dir][1]))) {
+				continue;	// no way to go that dir
+			}
+			if (ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+				continue;	// building blocking
+			}
+			
+			// append
+			snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, dir)])));
+			if (size + strlen(buf2) < sizeof(buf)) {
+				strcat(buf, buf2);
+				size += strlen(buf2);
 			}
 		}
-		*/
 	}
+	
+	msg_to_char(ch, "Obvious exits:\r\n%s", *buf ? buf : " None.\r\n");
 	
 	// portals
 	if (cmd != -1) {
 		any = FALSE;
-		LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
 			if (!IS_PORTAL(obj) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(obj)))) {
 				continue;
 			}

@@ -792,8 +792,10 @@ EXITS
 
 Usage:  exits
 
-Gives you a list of the obvious exits from your location. This command is
-only useful indoors, because on the world map all directions are exits.
+Gives you a list of the obvious exits from your location. This includes all
+directions you can walk, disembark, and any portals present.
+
+See also: DIRECTIONS, DISEMBARK, ENTER
 #
 FACTION FACTIONS REPUTATIONS REP "FACTION REP"
 
