@@ -151,13 +151,13 @@ char *exit_description(char_data *ch, room_data *room, const char *prefix) {
 	}
 	
 	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-		size += printf(output + size, sizeof(output) - size, "[%d] %s%s%s", GET_ROOM_VNUM(room), get_room_name(room, FALSE), rlbuf, coords);
+		size += snprintf(output + size, sizeof(output) - size, "[%d] %s%s%s", GET_ROOM_VNUM(room), get_room_name(room, FALSE), rlbuf, coords);
 	}
 	else if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(room, RMT_NO_LOCATION) && (HOME_ROOM(room) == room || !ROOM_IS_CLOSED(room)) && X_COORD(room) >= 0) {
-		size += printf(output + size, sizeof(output) - size, "%s%s%s", get_room_name(room, FALSE), rlbuf, coords);
+		size += snprintf(output + size, sizeof(output) - size, "%s%s%s", get_room_name(room, FALSE), rlbuf, coords);
 	}
 	else {
-		size += printf(output + size, sizeof(output) - size, get_room_name(room, FALSE), rlbuf);
+		size += snprintf(output + size, sizeof(output) - size, get_room_name(room, FALSE), rlbuf);
 	}
 	
 	return output;
@@ -2199,6 +2199,17 @@ ACMD(do_exits) {
 	else {
 		// out on the map?
 		look_at_room(ch);
+		/*
+		if (dir >= NUM_2D_DIRS || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+			msg_to_char(ch, "You can't throw it that direction.\r\n");
+		}
+		if (to_room && ROOM_IS_CLOSED(to_room)) {
+			if (BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+				msg_to_char(ch, "You can only throw it through the entrance.\r\n");
+				to_room = NULL;
+			}
+		}
+		*/
 	}
 	
 	// portals
