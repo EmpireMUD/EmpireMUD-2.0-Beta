@@ -112,10 +112,7 @@ Animal Becomes Hidden Over Time~
 if %self.fighting% || %self.disabled%
   halt
 end
-* Prevent duplicates
-dg_affect %self% HIDE off
-* Add infinite hide
-dg_affect %self% HIDE on -1
+hide
 ~
 #9118
 Mob Becomes Hostile on Interaction~
