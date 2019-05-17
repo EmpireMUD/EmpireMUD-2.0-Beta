@@ -196,7 +196,7 @@ struct temp_portal_data *build_portal_list_near(char_data *ch, room_data *origin
 bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bool skip_permissions) {
 	extern bool can_infiltrate(char_data *ch, empire_data *emp);
 	
-	room_data *to_room;
+	room_data *to_room, *was_in = IN_ROOM(ch);
 	bool ok = FALSE;
 	
 	// easy checks
@@ -221,6 +221,20 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	}
 	else if (!IS_IMMORTAL(ch) && GET_OBJ_VNUM(portal) == o_PORTAL && get_cooldown_time(ch, COOLDOWN_PORTAL_SICKNESS) > SECS_PER_REAL_MIN) {
 		msg_to_char(ch, "You can't enter a portal until your portal sickness cooldown is under one minute.\r\n");
+	}
+	
+	// leave trigger section (the was_in check is in case the player was teleported by the script)
+	else if (!leave_mtrigger(ch, NO_DIR, "portal") || IN_ROOM(ch) != was_in) {
+		// sends own message
+	}
+	else if (!leave_wtrigger(IN_ROOM(ch), ch, NO_DIR, "portal") || IN_ROOM(ch) != was_in) {
+		// sends own message
+	}
+	else if (!leave_vtrigger(ch, NO_DIR, "portal") || IN_ROOM(ch) != was_in) {
+		// sends own message
+	}
+	else if (!leave_otrigger(IN_ROOM(ch), ch, NO_DIR, "portal") || IN_ROOM(ch) != was_in) {
+		// sends own message
 	}
 	else {
 		ok = TRUE;
@@ -1218,19 +1232,19 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	}
 
 	/* blocked by a leave trigger ? */
-	if (!leave_mtrigger(ch, dir) || IN_ROOM(ch) != was_in) {
+	if (!leave_mtrigger(ch, dir, NULL) || IN_ROOM(ch) != was_in) {
 		/* prevent teleport crashes */
 		return FALSE;
 	}
-	if (!leave_wtrigger(IN_ROOM(ch), ch, dir) || IN_ROOM(ch) != was_in) {
+	if (!leave_wtrigger(IN_ROOM(ch), ch, dir, NULL) || IN_ROOM(ch) != was_in) {
 		/* prevent teleport crashes */
 		return FALSE;
 	}
-	if (!leave_vtrigger(ch, dir) || IN_ROOM(ch) != was_in) {
+	if (!leave_vtrigger(ch, dir, NULL) || IN_ROOM(ch) != was_in) {
 		/* prevent teleport crashes */
 		return FALSE;
 	}
-	if (!leave_otrigger(IN_ROOM(ch), ch, dir) || IN_ROOM(ch) != was_in) {
+	if (!leave_otrigger(IN_ROOM(ch), ch, dir, NULL) || IN_ROOM(ch) != was_in) {
 		/* prevent teleport crashes */
 		return FALSE;
 	}

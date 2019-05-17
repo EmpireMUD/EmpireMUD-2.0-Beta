@@ -327,7 +327,8 @@ Note: Leave triggers attached to charmed mobs will not fire unless the trigger
 
 Variables: 
   &c%actor%&0 - The character trying to leave the room.
-  &c%direction%&0 - The direction the character is leaving to.
+  &c%direction%&0 - The direction the character is leaving to, or "portal" if
+     they are leaving through a portal.
 
 See also: MTRIG LEAVE
 #d
