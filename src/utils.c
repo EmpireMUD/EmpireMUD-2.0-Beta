@@ -1969,10 +1969,7 @@ bool is_multiword_abbrev(const char *arg, const char *phrase) {
 		strcpy(phrasecpy, phrase);
 		strcpy(argcpy, arg);
 		
-		argptr = argcpy;
-		do {		// skip fill words like "of" so "bunch of apples" also matches "bunch apples"
-			argptr = any_one_arg(argptr, argword);
-		} while (fill_word(argword));
+		argptr = any_one_arg(argcpy, argword);
 		phraseptr = any_one_arg(phrasecpy, phraseword);
 		
 		ok = TRUE;
