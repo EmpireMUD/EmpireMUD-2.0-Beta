@@ -1383,10 +1383,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		}
 	}
 
-	// mark it
-	add_tracks(ch, IN_ROOM(ch), dir);
-	mark_move_time(ch);
-
 	char_from_room(ch);
 	char_to_room(ch, to_room);
 
@@ -1397,6 +1393,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		char_to_room(ch, was_in);
 		return FALSE;
 	}
+
+	// mark the move
+	add_tracks(ch, was_in, dir);
+	mark_move_time(ch);
 
 	if (!IS_NPC(ch)) {
 		GET_LAST_DIR(ch) = dir;
