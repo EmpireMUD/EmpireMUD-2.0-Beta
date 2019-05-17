@@ -1977,9 +1977,7 @@ bool is_multiword_abbrev(const char *arg, const char *phrase) {
 			if (!is_abbrev(argword, phraseword)) {
 				ok = FALSE;
 			}
-			do {	// skip fill words
-				argptr = any_one_arg(argptr, argword);
-			} while (fill_word(argword));
+			argptr = any_one_arg(argptr, argword);
 			phraseptr = any_one_arg(phraseptr, phraseword);
 		}
 		
