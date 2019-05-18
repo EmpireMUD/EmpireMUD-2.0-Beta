@@ -144,6 +144,7 @@ Basic buildings:
   {GG} granary -- store grains
   {PP} gravelpit -- store rocks
   {LL} lumberyard -- store lumber
+  |SS| seedsilo -- store seeds
   {SS} smokehouse -- store meats
   {TT} tannery -- store skins
   {UU} utilityshed -- store tools
@@ -916,6 +917,17 @@ It takes roughly two and a half months (realtime) for buildings to decay,
 although unfinished buildings decay faster.
 
 See also: MAINTAIN
+#
+SEEDSILO "SEED SILO"
+
+|SS|  Seed Silo  (Build ability)
+
+Stored here:  seeds
+
+The seed silo stores all your empire's seeds safely, to ensure you'll be able
+to plant all the best crops in the future.
+
+See also: STORAGE
 #
 SHADYGARDEN "SHADY GARDEN"
 
