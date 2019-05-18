@@ -1420,11 +1420,14 @@ int land_can_claim(empire_data *emp, int ter_type) {
 	int cur, from_wealth, out_t = 0, fron_t = 0, total = 0, min_cap = 0;
 	double outskirts_mod = config_get_double("land_outside_city_modifier");
 	double frontier_mod = config_get_double("land_frontier_modifier");
+	int frontier_timeout = config_get_int("frontier_timeout");
 	
 	if (!emp) {
 		return 0;
 	}
-	
+	if (ter_type == TER_FRONTIER && frontier_timeout > 0 && (EMPIRE_LAST_LOGON(emp) + (frontier_timeout * SECS_PER_REAL_DAY)) < time(0)) {
+		return 0;	// no frontier territory if gone longer than this
+	}
 	
 	// so long as there's at least 1 active member, they get the min cap
 	if (EMPIRE_MEMBERS(emp) > 0) {

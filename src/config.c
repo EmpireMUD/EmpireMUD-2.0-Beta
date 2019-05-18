@@ -1761,6 +1761,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "land_min_cap", CONFTYPE_INT, "lowest possible claim cap, to prevent very low numbers");
 	init_config(CONFIG_EMPIRE, "land_outside_city_modifier", CONFTYPE_DOUBLE, "portion of land that can be in the outskirts area of cities");
 	init_config(CONFIG_EMPIRE, "building_population_timer", CONFTYPE_INT, "game hours per citizen move-in");
+	init_config(CONFIG_EMPIRE, "frontier_timeout", CONFTYPE_INT, "after this many days, all frontier territory is lost; 0 to disable this");
 	init_config(CONFIG_EMPIRE, "time_to_empire_delete", CONFTYPE_INT, "weeks until an empire is deleted");
 	init_config(CONFIG_EMPIRE, "time_to_empire_emptiness", CONFTYPE_INT, "weeks until NPCs don't spawn");
 	init_config(CONFIG_EMPIRE, "member_timeout_newbie", CONFTYPE_INT, "days until newbie times out");
