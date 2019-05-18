@@ -212,7 +212,13 @@ The mobile will begin to hunt for victim, and engage in combat upon finding
 them. Only Mobiles may use this command. Hunting mobs will walk through !MOB
 rooms.
 
+Hunting uses normal tracks, so players who don't leave tracks (such as those
+with Unseen Passing or No Trace) also can't be hunted. Teleporting also breaks
+tracking.
+
 Note: You must use "mhunt" (not "%hunt%") for this.
+
+See also: PURSUIT
 #d
 MJUNK %JUNK%
 
