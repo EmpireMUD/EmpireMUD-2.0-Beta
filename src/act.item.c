@@ -6170,6 +6170,9 @@ ACMD(do_seed) {
 	else if (!has_interaction(obj->interactions, INTERACT_SEED)) {
 		msg_to_char(ch, "You can't seed that!\r\n");
 	}
+	else if (OBJ_FLAGGED(obj, OBJ_SEEDED)) {
+		msg_to_char(ch, "It has already been seeded.\r\n");
+	}
 	else {		
 		if (run_interactions(ch, obj->interactions, INTERACT_SEED, IN_ROOM(ch), NULL, obj, seed_obj_interact)) {
 			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
