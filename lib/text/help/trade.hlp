@@ -450,6 +450,21 @@ See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
   DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES
 #
+"FREE ACTIONS" "CLEAR TERRAIN" "TIDY UP" "SCOUT AREA" "BLOCK WATER" ENGRAVE "MAGIC WORDS" ORGANIZE "SHOVEL SOOT"
+
+Sometimes building or maintaining a building requires you to take certain
+actions which have no cost, and just take a few moments to complete. These are
+indicated in square brackets, such as [clear terrain], in the list of
+resources.
+
+These actions are part of normal building. Type 'build' (or 'maintain') to
+start working on the building. Workforce can also perform all of these free
+actions.
+
+Note: The [dig] free action should not be confused with the regular 'dig'
+command. This digging must be in the correct place, which only happens if you
+begin it with the 'build' command.
+#
 "GOURMET CHEF"
 
 Gourmet Chef (Trade ability)
