@@ -1532,7 +1532,7 @@ ACMD(do_dismantle) {
 	}
 	
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
-		msg_to_char(ch, "You can't dismantle this building.\r\n");
+		msg_to_char(ch, "You can't dismantle this building because an adventure is currently linked here.\r\n");
 		return;
 	}
 
@@ -1544,7 +1544,7 @@ ACMD(do_dismantle) {
 	}
 
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
-		msg_to_char(ch, "You can't dismantle this.\r\n");
+		msg_to_char(ch, "You can't dismantle this building because the tile is unclaimable.\r\n");
 		return;
 	}
 
@@ -1564,7 +1564,7 @@ ACMD(do_dismantle) {
 	}
 
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
-		msg_to_char(ch, "You can't dismantle this building (use 'nodismantle' to toggle).\r\n");
+		msg_to_char(ch, "You can't dismantle this building (use 'manage no-dismantle' to toggle).\r\n");
 		return;
 	}
 	

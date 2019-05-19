@@ -1356,7 +1356,7 @@ bool has_tech_available(char_data *ch, int tech) {
 		return FALSE;
 	}
 	else if (!has_tech_available_room(IN_ROOM(ch), tech)) {
-		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", techs[tech]);
+		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s on this island.\r\n", techs[tech]);
 		return FALSE;
 	}
 	else {
