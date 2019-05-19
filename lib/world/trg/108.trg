@@ -99,6 +99,14 @@ if (%actor.is_npc% && %boss%)
   %teleport% %actor% %boss.room%
 end
 ~
+#10850
+No-see on spawn~
+0 n 100
+~
+* Mob will appear via its greet trig later
+nop %self.add_mob_flag(SILENT)%
+dg_affect %self% !SEE on -1
+~
 #10851
 Detect Ritual of Burdens~
 2 p 100
@@ -140,18 +148,21 @@ end
 return 1
 ~
 #10855
-Detect Sneak~
-0 h 100
+Detect Sneak on Leave~
+0 s 100
 ~
-if %actor.on_quest(10855)%
+if %actor.on_quest(10855)% && !%actor.quest_triggered(10855)%
   if %actor.aff_flagged(SNEAK)%
     %quest% %actor% trigger 10855
     wait 1
-    %send% %actor% You have successfully sneaked up on %self.name%!
+    %send% %actor% You have successfully sneaked! The quest is complete.
   else
     wait 1
     %send% %actor% You weren't sneaky enough.
   end
+elseif %direction% == north && !%actor.aff_flagged(SNEAK)%
+  %send% %actor% You can't get there unless you're sneaking.
+  return 0
 end
 ~
 #10856
@@ -209,5 +220,76 @@ Convert Spirit Token~
 %actor.give_currency(10852,1)%
 %purge% %self%
 return 0
+~
+#10860
+Soulstream Mob Show/Hide~
+0 h 100
+~
+if %actor.is_npc%
+  halt
+end
+* determine skill
+switch %self.vnum%
+  case 10851
+    set skl High Sorcery
+  break
+  case 10852
+    set skl Survival
+  break
+  case 10853
+    set skl Battle
+  break
+  case 10854
+    set skl Natural Magic
+  break
+  case 10855
+    set skl Stealth
+  break
+  case 10857
+    set skl Vampire
+  break
+  case 10858
+    set skl Trade
+  break
+  default
+    * No valid skill to check
+    halt
+  break
+done
+* Wait for all arrivals...
+wait 1
+* Count and see if we should then appear/disappear (sometimes followers enter late)
+set count 0
+set person %self.room.people%
+while %person%
+  if %person.is_pc% && %person.skill(%skl%)% > 0
+    eval count %count% + 1
+  end
+  set person %person.next_in_room%
+done
+if %count% > 0 && %self.aff_flagged(!SEE)%
+  nop %self.remove_mob_flag(SILENT)%
+  dg_affect %self% !SEE off
+  %echo% %self.name% appears from deep in the soulstream!
+elseif %count% == 0 && !%self.aff_flagged(!SEE)%
+  %echo% %self.name% vanishes into the soulstream.
+  nop %self.add_mob_flag(SILENT)%
+  dg_affect %self% !SEE on -1
+end
+~
+#10861
+Detect Sneak on Greet~
+0 h 100
+~
+if %actor.on_quest(10855)% && !%actor.quest_triggered(10855)%
+  if %actor.aff_flagged(SNEAK)%
+    %quest% %actor% trigger 10855
+    wait 1
+    %send% %actor% You have successfully sneaked! The quest is complete.
+  else
+    wait 1
+    %send% %actor% You weren't sneaky enough.
+  end
+end
 ~
 $

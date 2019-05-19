@@ -891,18 +891,20 @@ Enter the Soulstream~
    Enter the Soulstream and begin the EmpireMUD basic tutorial! This area will
 teach you the basics of EmpireMUD including how to find and complete quests.
 Use the following commands:
- 1. quest start Enter the Soulstream
+ 1. quest start Enter the Soulstream (if you're not already on this quest)
  2. enter soulstream
- 3. quest track Enter the Soulstream
+ 3. quest track Enter the Soulstream (to see that it's completed)
  4. quest finish Enter the Soulstream
+ 5. You can leave the Soulstream any time by typing 'enter portal' inside.
 (You can abbreviate both commands and quest names.)
 ~
    Congratulations on completing the first tutorial quest. You found your way
 into the Soulstream! Look around to see who else has quests for you in here --
 different tutorials might be available based on which skills you started with.
-Don't worry, you can always learn new skills, too.
+Don't worry, you can always learn new skills, too. You can leave the Soulstream
+at any time by typing 'enter portal' while inside.
 ~
-3 h 0 25 -1
+4 h 0 25 -1
 A
 2 10850
 R
@@ -930,10 +932,11 @@ need to learn the Ritual of Burdens.
  2. Cast the ritual inside the Soulstream with 'ritual burdens'.
  3. Wait for the ritual to complete.
  4. Return to the Spirit of Order.
+ 5. Type 'quest finish High Sorcery'.
 ~
 You have performed a ritual and satisfied the Spirit of Order!
 ~
-8 0 0 25 -1
+9 0 0 25 -1
 A
 1 10851
 P
@@ -961,14 +964,21 @@ S
 Survival: Dig Some Rocks~
    The Spirit of the Wild would like you to dig up a rock and a flint stone.
 These basic items will be useful for making tools, and you can dig them up in
-most locations on the map. Find a suitable spot, type 'dig', and see what you
-can find. When you have a rock and a flint, return to the Spirit of the Wild.
+most locations on the map. Follow these steps:
+ 1. Type 'enter portal' to get back out into the world.
+ 2. Walk away from the Tower of Souls by typing a direction such as 'east'.
+ 3. Type 'dig'. If you can't dig here, move to another tile and try again.
+ 4. Keep digging until you have a rock and a flint. Flints appear about 8% of
+    the time, so it may take a few tries.
+ 5. When you have the rock and the flint, go back to the Tower of Souls and
+    type 'enter soulstream' to get back inside.
+ 6. Type 'quest finish Survival' at the Spirit of the Wild.
 ~
    You have satisfied the Spirit of the Wild! Digging and gathering are good
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
 Navigation' to improve your map.
 ~
-8 d 0 25 -1
+9 d 0 25 -1
 A
 1 10852
 P
@@ -997,18 +1007,25 @@ S
 #10853
 Battle: Slay A Beast~
    The Spirit of the Hunt wants you to practice your Battle skill by killing a
-wild animal. Exit the Soulstream and find an animal to hunt. You should pick a
-small one like a squirrel or prairie dog, as you might find larger animals to
-be too much trouble. Use the 'kill' command to attack the animal; you will
-continue to hit it until one of you defeats the other. When you have killed a
-small animal, skin it and bring its skin back to the Spirit of the Hunt. You
-may have to kill several animals to find a good skin.
-   You receive a stone skinning knife for this quest. Look at it to learn
-how to use it.
+wild animal. You receive a stone skinning knife for this quest. You can look at
+it to learn how to use it. Here are the steps for this quest:
+ 1. Type 'enter portal' to get back out into the world.
+ 2. Walk around looking for a small animal like a squirrel, prairie dog, or
+    rabbit.
+ 3. Use the 'kill' command to attack the animal. You will continue to hit it
+    until it dies, or until it knocks you unconscious.
+ 4. When you have killed a small animal, use the 'skin' command on it and bring
+    a small skin back to the Spirit of the Hunt. You may have to kill a few
+    animals to get a good skin.
+ 5. If you're having trouble finding animals, use the 'where' command, such as
+    'where rabbit'.
+ 6. When you have the small skin, go back to the Tower of Souls and type
+    'enter soulstream' to get back inside.
+ 7. Type 'quest finish Battle' at the Spirit of the Hunt.
 ~
 You have satisfied the Spirit of the Hunt!
 ~
-7 d 0 25 -1
+9 d 0 25 -1
 A
 1 10853
 P
@@ -1037,16 +1054,17 @@ Z
 S
 #10854
 Natural Magic: Heal The Spirits~
-   The Spirit of Mana seems to be fading, and needs you to heal it. Purchase
-the healing ability using 'skill buy heal', and then heal the Spirit of Mana
-using 'heal mana'. The Heal ability can usually only be used on yourself (until
-you learn Heal Friend), but the Spirit of Mana can be healed with the basic
-Heal.
+The Spirit of Mana seems to be fading, and needs you to heal it:
+ 1. Purchase the Healing ability using 'skill buy heal'.
+ 2. Heal the Spirit of Mana using 'heal mana'.
+ 3. Type 'quest finish Natural Magic' when complete.
+Note: The Heal ability can usually only be used on yourself (until you learn
+Heal Friend), but the Spirit of Mana can be healed with the basic Heal.
 ~
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.
 ~
-15 0 0 25 -1
+16 0 0 25 -1
 A
 1 10854
 P
@@ -1077,18 +1095,17 @@ allows you to do this, although it isn't a guaranteed success at low levels.
 You can't really tell whether or not you were successful at sneaking. But don't
 worry, you'll get better at it as you level up.
  1. Purchase the ability with 'skill buy sneak'.
- 2. Find the Spirit of Darkness again.
- 3. Go to another room in the Soulstream.
- 4. Move toward the Spirit of Darkness with 'sneak <direction>'.
-    (e.g. 'sneak west')
- 5. If you were successful, this quest's tracker will show complete.
- 6. Type 'quest track Stealth' to check.
- 7. Repeatedly try to sneak up on the Spirit of Darkness until successful.
- 8. When you succeed, turn in the quest using 'quest finish Stealth'.
+ 2. Make sure you're in the Soulstream.
+ 3. Sneak into the hidden part of the Soulstream with 'sneak north'.
+ 4. If you were successful, this quest's tracker will show complete.
+ 5. Type 'quest track Stealth' to check.
+ 6. Sneak between the two rooms of the Soulstream until complete.
+ 7. When you succeed, turn in the quest to the Spirit of Darkness using
+    'quest finish Stealth'.
 ~
 You have satisfied the Spirit of Darkness with your stealth.
 ~
-12 0 0 25 -1
+13 0 0 25 -1
 A
 1 10855
 P
@@ -1157,17 +1174,22 @@ S
 #10857
 Vampire: Feed On Blood~
    The Spirit of Blood wants you to feed on a living creature to refill your
-blood. Leave the Soulstream and find something with a beating heart to feast
-from. Knock out your victim in combat ('toggle autokill' will make you stop
-combat before killing your victim), then 'bite' them and drain some blood.
-When you have done this, return to the Spirit of Blood.
-Note: This quest will not show as 'complete' until you re-enter the
-Soulstream. Use 'skill buy bite' if you don't already have the Bite ability.
+blood. Follow these steps:
+ 1. Buy the Bite ability with 'skill buy Bite', if you haven't already.
+ 2. Type 'enter portal' to get back out into the world.
+ 3. Type 'toggle autokill off' so you'll only knock your opponents unconscious.
+ 4. Find something to fight. A small animal is usually a safe victim.
+ 5. Attack the animal with the 'kill' command and fight until it's knocked out.
+ 6. Use the 'bite' command to bite the unconscious victim.
+ 7. Wait to drink all its blood.
+ 8. Go back to the Tower of Souls and type 'enter soulstream' to get inside.
+ 9. Type 'Vampire' at the Spirit of Blood.
+Note: This quest will not show as 'complete' until you re-enter the Soulstream.
 ~
    You have satisfied the Spirit of Blood! Buy and use more abilities from the
 Vampire skill tree to become a sanguine master!
 ~
-14 0 0 25 -1
+15 0 0 25 -1
 A
 1 10857
 P
@@ -1196,18 +1218,20 @@ S
 Trade: Craft A Spear Head~
    The Spirit of Innovation would like you to craft a simple spear head, which
 can be used like a knife for butchering and skinning. Try this:
- 1. Leave the Soulstream by entering the exit portal.
+ 1. Leave the Soulstream by typing 'enter portal'.
  2. Find a suitable place and type 'dig'.
  3. Dig until you find a rock and a flint stone.
  4. 'Wield' the rock.
  5. Type 'chip flint'. You will have to chip it several times until
-    it becomes a spear head.
- 6. Return to the Spirit of Innovation with your spear head.
+    it becomes a spear head. (It becomes a chipped flint, then a handaxe, then
+    a spear head).
+ 6. Return to the Tower of Souls and 'enter soulstream' to get back inside.
+ 7. Type 'quest finish Trade' at the Spirit of Innovation with your spear head.
 ~
    You have satisfied the Spirit of Innovation! That spear head can be used for
 butchering, scraping, skinning, and even sewing!
 ~
-11 0 0 25 -1
+12 0 0 25 -1
 A
 1 10858
 P

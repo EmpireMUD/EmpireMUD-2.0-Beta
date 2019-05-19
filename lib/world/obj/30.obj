@@ -27,10 +27,11 @@ a bunch of apples~
 There are a bunch of apples scattered across the ground.~
 You can eat apples, or plant them.
 ~
-6 bl a 4
+6 bl a 5
 24 13 0
 7 168
 I 15 3001 100.00 4 x  # SEPARATE: a green apple
+I 25 3057 100.00 2  # SEED: some apple seeds
 O
 9 bq
 R
@@ -680,11 +681,11 @@ Some lettuce seeds are scattered on the ground.~
    It looks like about a handful of tiny seeds. They can be used to plant
 lettuce, or you can press them into oil.
 ~
-6 bl a 6
+6 bl a 7
 1 3017 0
 7 576
 R
-5116 0
+5210 0
 S
 #3051
 urchin sea~
@@ -759,10 +760,24 @@ Some calabash seeds are scattered on the ground.~
    The calabash seeds are small, round, and yellow. These seeds can be planted
 near the river to grow bottle gourds.
 ~
-3 b a 7
+3 b a 8
 0 3018 0
 7 1152
 R
-5116 0
+5210 0
+S
+#3057
+seeds apple~
+some apple seeds~
+Some apple seeds are scattered here.~
+This handful of tiny brown seeds comes from the mighty apple tree.
+~
+3 b a 2
+0 13 0
+0 0
+O
+23 0
+R
+5210 0
 S
 $

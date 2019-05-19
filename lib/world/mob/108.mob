@@ -92,66 +92,115 @@ spirit order~
 the Spirit of Order~
 The Spirit of Order picks and knits at the clouds.
 ~
-0 0 dF n 0
+0 0 bdF n 0
 0 0 27 15
+D
+   This ethereal spirit is a pale blue color, and has the shape of a sorcerer.
+This spirit offers the High Sorcery tutorial.
+~
+T 10860
+T 10850
 S
 #10852
 spirit wild~
 the Spirit of the Wild~
 The Spirit of the Wild comes screaming through the veil of clouds.
 ~
-0 0 dF n 0
+0 0 bdF n 0
 0 0 27 15
+D
+   This feral spirit is brown in color and almost appears to have fur. It
+offers the Survival tutorial.
+~
+T 10860
+T 10850
 S
 #10853
 spirit hunt~
 the Spirit of the Hunt~
 The Spirit of the Hunt is perched high above you.
 ~
-0 0 dF n 0
+0 0 bdF n 0
 0 0 27 15
+D
+   This pale red spirit holds a spear as it peers through the veil between the
+worlds. It offers the Battle tutorial.
+~
+T 10860
+T 10850
 S
 #10854
 spirit mana~
 the Spirit of Mana~
 The Spirit of Mana takes the form of the clouds themselves.
 ~
-0 0 dF n 0
+0 0 bdF n 0
 0 0 27 15
+D
+   This strange spirit is pale blue in color but it shifts from one shape to
+another as it moves, like water spilling over rocks. This spirit offers the
+Natural Magic tutorial.
+~
 T 10854
+T 10860
+T 10850
 S
 #10855
 spirit darkness~
 the Spirit of Darkness~
 The Spirit of Darkness looms beyond the clouds.
 ~
-0 0 dF n 0
+0 0 bdF n 0
 0 0 27 15
+D
+   This spirit is so dark you can barely see it, but you can feel its eyes on
+you at all times. It offers the Stealth tutorial.
+~
 T 10855
+T 10860
+T 10850
+T 10861
 S
 #10856
 spirit progress~
 the Spirit of Progress~
 The Spirit of Progress marches through the stream.
 ~
-0 0 dF n 0
+0 0 bdF n 0
 0 0 27 15
+D
+This spirit used to teach the Empire skill.
+~
+T 10860
+T 10850
 S
 #10857
 spirit blood~
 the Spirit of Blood~
 The Spirit of Blood pools beneath you.
 ~
-0 0 dF n 0
+0 0 bdF n 0
 0 0 27 15
+D
+   This spirit is bright red, and moves almost like a fluid as it hovers in the
+soulstream. It offers the Vampire tutorial.
+~
+T 10860
+T 10850
 S
 #10858
 spirit innovation~
 the Spirit of Innovation~
 The Spirit of Innovation flows forth from the Soulstream.
 ~
-0 0 dF n 0
+0 0 bdF n 0
 0 0 27 15
+D
+   This spirit seems to be made from flint, then wood, then marble, then glass.
+It offers the Trade tutorial.
+~
+T 10860
+T 10850
 S
 #10859
 spirit companion friendly~

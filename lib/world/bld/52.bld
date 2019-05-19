@@ -187,4 +187,17 @@ R
 R
 19 1 1 0
 S
+#5210
+Seed Silo~
+A Seed Silo~
+&0|SS|~
+8 0 bdp 0
+0 0 0 -1
+C
+inventory, retrieve, store~
+R
+1002 1 5 0
+R
+1010 1 5 0
+S
 $
