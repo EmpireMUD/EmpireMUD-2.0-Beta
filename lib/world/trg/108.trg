@@ -114,13 +114,20 @@ Detect Ritual of Burdens~
 if (%ability% != 163 || !%actor.on_quest(10851)%)
   halt
 end
-set invsize %actor.maxcarrying%
-wait 5 s
-* Attempt to detect that they cast the ritual
-if %actor.maxcarrying% > %invsize% || %invsize% > 25
-  %quest% %actor% trigger 10851
-  %send% %actor% You have completed the ritual for your quest.
-end
+* check every second for 12 seconds to detect the affect
+set tries 12
+while %tries% > 0
+  wait 1 sec
+  eval tries %tries% - 1
+  if !%actor%
+    halt
+  end
+  if %actor.affect(3052)%
+    %quest% %actor% trigger 10851
+    %send% %actor% You have completed the ritual for your quest.
+    halt
+  end
+done
 ~
 #10852
 Give Scythe~
