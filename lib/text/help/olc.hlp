@@ -3878,6 +3878,7 @@ Object interaction types:
  SAW - Items you get when sawing this item (tree -> lumber).
  TAN - Items you get when tanning this item (skin -> leather).
  CHIP - What you get for chipping at the item.
+ SEED - Gives an item when seeded.
 
 Room/vehicle interaction types:
  DIG - Items received when using the dig action.
@@ -4802,6 +4803,7 @@ Available flags:
  GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
  GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
  !STORE - cannot be stored (this is usually toggled on by scripts)
+ SEEDED - has already been seeded with the 'seed' command
 
 See also: BINDING, OLC OBJECTS
 #d

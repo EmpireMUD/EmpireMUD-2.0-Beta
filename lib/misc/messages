@@ -955,6 +955,22 @@ Your bullet stops in midair before $N.
 A bullet from $n stops in midair before you.
 A bullet from $n stops in midair before $N.
 
+* Fire Breath
+M
+ 33
+You scorch $N with hotter and hotter fire breath until $E is blackened and dead!
+$n's fire breath burns and burns, until you succumb to the flames!
+$n scorches $N with hotter and hotter fire breath until $E is blackened and dead!
+You breathe fire at $N, but $E skillfully dodges.
+$n breathes fire at you, but you skillfully dodge.
+$n breathes fire at $N but $E dodges out of the way.
+#
+#
+#
+You breathe fire at $N, but it doesn't seem to affect $M.
+$n breathes fire fire at you, but you can barely feel it.
+$n breathes fire fire at $N, who isn't even singed.
+
 * Suffering
 M
  50

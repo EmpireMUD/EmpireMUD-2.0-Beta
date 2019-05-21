@@ -117,7 +117,7 @@ const struct action_data_struct action_data[] = {
 	{ "harvesting", "is harvesting the crop.", ACTF_HASTE | ACTF_FAST_CHORES, process_harvesting, NULL },	// ACT_HARVESTING
 	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
-	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
+	{ "minting", "is minting coins.", ACTF_ALWAYS_FAST | ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", ACTF_SITTING, process_fishing, NULL },	// ACT_FISHING
 	{ "preparing", "is preparing to fill in the trench.", NOBITS, process_start_fillin, NULL },	// ACT_START_FILLIN
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
@@ -135,7 +135,7 @@ const struct action_data_struct action_data[] = {
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_fillin, NULL },	// ACT_FILLING_IN
 	{ "reclaiming", "is reclaiming this acre!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
 	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
-	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, cancel_movement_string },	// unused
+	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, cancel_movement_string },	// unused
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
@@ -299,6 +299,9 @@ void update_actions(void) {
 		
 		// things that modify speed...
 		if (IS_SET(act_flags, ACTF_ALWAYS_FAST)) {
+			speed += ACTION_CYCLE_SECOND;
+		}
+		if (IS_SET(act_flags, ACTF_EVEN_FASTER)) {
 			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
@@ -3180,7 +3183,7 @@ ACMD(do_plant) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
-		msg_to_char(ch, "You can't plant that!\r\n");
+		msg_to_char(ch, "You can't plant that!%s\r\n", has_interaction(obj->interactions, INTERACT_SEED) ? " Try seeding it first." : "");
 	}
 	else if (!(cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
 		// this is a sanity check for bad crop values

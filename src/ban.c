@@ -121,7 +121,7 @@ ACMD(do_ban) {
 			send_to_char("No sites are banned.\r\n", ch);
 			return;
 		}
-		strcpy(format, "%-25.25s  %-8.8s  %-10.10s  %-16.16s\r\n");
+		strcpy(format, "%-25s  %-8.8s  %-10.10s  %-16.16s\r\n");
 		msg_to_char(ch, format, "Banned Site Name", "Ban Type", "Banned On", "Banned By");
 		msg_to_char(ch, format, "---------------------------------", "---------------------------------", "---------------------------------", "---------------------------------");
 

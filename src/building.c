@@ -1176,6 +1176,7 @@ ACMD(do_build) {
 	void show_craft_info(char_data *ch, char *argument, int craft_types);
 	
 	room_data *to_room = NULL, *to_rev = NULL;
+	any_vnum missing_abil = NO_ABIL;
 	obj_data *found_obj = NULL;
 	empire_data *e = NULL;
 	int dir = NORTH, ter_type;
@@ -1218,6 +1219,20 @@ ACMD(do_build) {
 	// this figures out if the argument was a build recipe
 	if (*arg) {
 		HASH_ITER(sorted_hh, sorted_crafts, iter, next_iter) {
+			if (GET_CRAFT_TYPE(iter) != CRAFT_TYPE_BUILD) {
+				continue;	// must be 'build'
+			}
+			if (IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY)) {
+				continue;	// these flags always rule out 'build'
+			}
+			if (IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+				continue;	// non-imms can't build in-dev
+			}
+			if (!is_abbrev(arg, GET_CRAFT_NAME(iter))) {
+				continue;	// preliminary arg test saves some lookups
+			}
+			
+			// ok, probably a match: test if they can build it
 			if (CHAR_CAN_BUILD(ch, iter)) {
 				if (!str_cmp(arg, GET_CRAFT_NAME(iter))) {
 					type = iter;
@@ -1226,6 +1241,9 @@ ACMD(do_build) {
 				else if (!abbrev_match && is_abbrev(arg, GET_CRAFT_NAME(iter))) {
 					abbrev_match = iter;
 				}
+			}
+			else if (GET_CRAFT_ABILITY(iter) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(iter))) {
+				missing_abil = GET_CRAFT_ABILITY(iter);
 			}
 		}
 	}
@@ -1239,8 +1257,11 @@ ACMD(do_build) {
 	if (type && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
 		found_obj = get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying);
 	}
-
-	if (!*arg || !type) {
+	
+	if (!type && missing_abil != NOTHING) {
+		msg_to_char(ch, "You need the %s ability to build that.\r\n", get_ability_name_by_vnum(missing_abil));
+	}
+	else if (!*arg || !type) {
 		/* Cancel building */
 		if (GET_ACTION(ch) == ACT_BUILDING) {
 			msg_to_char(ch, "You stop building.\r\n");
@@ -1511,7 +1532,7 @@ ACMD(do_dismantle) {
 	}
 	
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
-		msg_to_char(ch, "You can't dismantle this building.\r\n");
+		msg_to_char(ch, "You can't dismantle this building because an adventure is currently linked here.\r\n");
 		return;
 	}
 
@@ -1523,7 +1544,7 @@ ACMD(do_dismantle) {
 	}
 
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
-		msg_to_char(ch, "You can't dismantle this.\r\n");
+		msg_to_char(ch, "You can't dismantle this building because the tile is unclaimable.\r\n");
 		return;
 	}
 
@@ -1543,7 +1564,7 @@ ACMD(do_dismantle) {
 	}
 
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
-		msg_to_char(ch, "You can't dismantle this building (use 'nodismantle' to toggle).\r\n");
+		msg_to_char(ch, "You can't dismantle this building (use 'manage no-dismantle' to toggle).\r\n");
 		return;
 	}
 	

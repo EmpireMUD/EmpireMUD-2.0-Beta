@@ -1411,6 +1411,9 @@ void abandon_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has abandoned %s", PERS(ch, ch, 1), city->name);
+	if (city->location && ROOM_PEOPLE(city->location)) {
+		act("The city has been removed.", FALSE, ROOM_PEOPLE(city->location), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
 	send_config_msg(ch, "ok_string");
 	perform_abandon_city(emp, city, TRUE);
 	
@@ -1610,6 +1613,9 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 	else {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s - it is no longer a city", PERS(ch, ch, 1), city->name);
+		if (city->location && ROOM_PEOPLE(city->location)) {
+			act("The city has been removed.", FALSE, ROOM_PEOPLE(city->location), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
 		perform_abandon_city(emp, city, FALSE);
 	}
 	
@@ -1626,6 +1632,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	extern int *start_locs;
 	
 	empire_data *emp_iter, *next_emp;
+	char buf[MAX_STRING_LENGTH];
 	struct island_info *isle;
 	int iter, dist;
 	struct empire_city_data *city;
@@ -1738,6 +1745,9 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 	
 	send_config_msg(ch, "ok_string");
+	
+	snprintf(buf, sizeof(buf), "$n has founded %s here!", city->name);
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	stop_room_action(IN_ROOM(ch), ACT_CHOPPING, CHORE_CHOPPING);
 	stop_room_action(IN_ROOM(ch), ACT_PICKING, CHORE_FARMING);
@@ -2599,6 +2609,12 @@ void do_islands_has_territory(struct do_islands_data **list, int island_id, int 
  //////////////////////////////////////////////////////////////////////////////
 //// LAND MANAGEMENT /////////////////////////////////////////////////////////
 
+#define MANAGE_FUNC(name)		void (name)(char_data *ch, bool on)
+
+// protos
+MANAGE_FUNC(mng_nowork);
+
+
 // for do_manage
 struct manage_data_type {
 	char *name;	// command to type
@@ -2609,19 +2625,27 @@ struct manage_data_type {
 	bool flag_home;	// if TRUE, sets the roomflag on the home room
 	int access_level;	// player level required
 	bitvector_t grant;	// GRANT_ flag to override access_level, if any
+	MANAGE_FUNC(*func);	// callback func (optional)
 };
 
 
 // configuration for do_manage
 const struct manage_data_type manage_data[] = {
-	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS },
-	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, 0, FALSE, NOBITS },
-	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS },
+	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS, NULL },
+	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, 0, FALSE, NOBITS, mng_nowork },
+	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
 	
-	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS },
+	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
 	
-	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS }	// last
+	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS, NULL }	// last
 };
+
+
+MANAGE_FUNC(mng_nowork) {
+	if (!on && ROOM_OWNER(IN_ROOM(ch))) {
+		deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+	}
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4417,6 +4441,7 @@ ACMD(do_enroll) {
 		// move data over
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
 			log_to_empire(e, ELOG_DIPLOMACY, "%s merged into this empire", EMPIRE_NAME(old));
+			syslog(SYS_EMPIRE, 0, TRUE, "EMPIRE: %s has merged into %s", EMPIRE_NAME(old), EMPIRE_NAME(e));
 			
 			// attempt to estimate the new member count so cities and territory transfer correctly
 			// note: may over-estimate if some players already had alts in both empires
@@ -5051,8 +5076,8 @@ ACMD(do_home) {
 		else if (ROOM_PRIVATE_OWNER(real) == GET_IDNUM(ch)) {
 			msg_to_char(ch, "But it's already your home!\r\n");
 		}
-		else if (ROOM_PRIVATE_OWNER(real) != NOBODY && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
-			msg_to_char(ch, "Someone already owns this home.\r\n");
+		else if (ROOM_PRIVATE_OWNER(real) != NOBODY) {
+			msg_to_char(ch, "Someone already owns this home.%s\r\n", (GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) ? "" : "Use 'home clear' to clear it first.");
 		}
 		else if (!has_permission(ch, PRIV_HOMES, IN_ROOM(ch))) {	// after the has-owner check because otherwise the error is misleading
 			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
@@ -5119,7 +5144,7 @@ ACMD(do_home) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
-			msg_to_char(ch, "You need to own a building to make it your home.\r\n");
+			msg_to_char(ch, "You need to own the building.\r\n");
 		}
 		else if (ROOM_PRIVATE_OWNER(real) != GET_IDNUM(ch) && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
 			msg_to_char(ch, "You can't take away somebody's home.\r\n");
@@ -5493,7 +5518,7 @@ ACMD(do_inspire) {
 }
 
 
-// manage [option] [on/off]
+// manage [option] [on/off] -- uses manage_data (above)
 ACMD(do_manage) {
 	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
 	int iter, type = NOTHING;
@@ -5582,12 +5607,18 @@ ACMD(do_manage) {
 			else {
 				msg_to_char(ch, "Error toggling that management option.\r\n");
 				on = FALSE;	// nothing to do??
+				return;
 			}
 		}
 		
 		msg_to_char(ch, "You turn the %s land management option %s.\r\n", manage_data[type].name, on ? "on" : "off");
 		snprintf(buf, sizeof(buf), "$n turns the %s land management option %s.", manage_data[type].name, on ? "on" : "off");
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
+		
+		// callback func (optional)
+		if (manage_data[type].func) {
+			(manage_data[type].func)(ch, on);
+		}
 	}
 }
 
@@ -6660,7 +6691,7 @@ ACMD(do_territory) {
 			next_node = node->next;
 			total += node->count;
 			
-			sprintf(buf + strlen(buf), "%2d tile%s near%s%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+			sprintf(buf + strlen(buf), "%2d tile%s near%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
 			free(node);
 		}
 		

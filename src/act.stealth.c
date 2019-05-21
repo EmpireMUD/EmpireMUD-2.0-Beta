@@ -825,9 +825,10 @@ ACMD(do_escape) {
 
 
 ACMD(do_hide) {
+	bool npc_access = IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_ORDERED);
 	char_data *c;
 	
-	if (!can_use_ability(ch, ABIL_HIDE, NOTHING, 0, NOTHING)) {
+	if (!npc_access && !can_use_ability(ch, ABIL_HIDE, NOTHING, 0, NOTHING)) {
 		return;
 	}
 	
@@ -836,7 +837,7 @@ ACMD(do_hide) {
 		return;
 	}
 	
-	if (IS_RIDING(ch)) {
+	if (!npc_access && IS_RIDING(ch)) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
@@ -857,18 +858,20 @@ ACMD(do_hide) {
 	}
 
 	command_lag(ch, WAIT_ABILITY);
-
-	for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
-		if (c != ch && (c->master != ch || !AFF_FLAGGED(c, AFF_CHARM)) && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
-			msg_to_char(ch, "You can't hide with somebody watching!\r\n");
-			return;
+	
+	if (!npc_access) {	// npcs ignore people present
+		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+			if (c != ch && (c->master != ch || !AFF_FLAGGED(c, AFF_CHARM)) && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
+				msg_to_char(ch, "You can't hide with somebody watching!\r\n");
+				return;
+			}
 		}
 	}
 
 	gain_ability_exp(ch, ABIL_HIDE, 33.4);
 	gain_player_tech_exp(ch, PTECH_HIDE_UPGRADE, 10);
 
-	if (has_player_tech(ch, PTECH_HIDE_UPGRADE) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
+	if (npc_access || has_player_tech(ch, PTECH_HIDE_UPGRADE) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 }

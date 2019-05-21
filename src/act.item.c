@@ -70,6 +70,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 // local protos
 ACMD(do_unshare);
+ACMD(do_warehouse);
 room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
@@ -131,8 +132,6 @@ INTERACTION_FUNC(combine_obj_interact) {
 	
 	new_obj = read_object(interaction->vnum, TRUE);
 	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
-	
-	// Note: does not currently affect an empire's gather totals
 	
 	if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
 		GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
@@ -1017,6 +1016,54 @@ void remove_honed_gear(char_data *ch) {
 
 
 /**
+* Interaction func for "seed".
+*/
+INTERACTION_FUNC(seed_obj_interact) {
+	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
+	obj_data *new_obj;
+	int iter;
+	
+	if (interaction->quantity) {
+		snprintf(to_char, sizeof(to_char), "You seed %s and get %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+		act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+		snprintf(to_room, sizeof(to_room), "$n seeds %s and gets %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+		act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
+	}
+	else {
+		snprintf(to_char, sizeof(to_char), "You seed %s and get %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+		act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+		snprintf(to_room, sizeof(to_room), "$n seeds %s and gets %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+		act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
+	}
+	
+	if (GET_LOYALTY(ch)) {
+		// add the gained items to production
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		new_obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+		
+		// ownership
+		new_obj->last_owner_id = GET_IDNUM(ch);
+		new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+		
+		// put it somewhere
+		if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(new_obj, ch);
+		}
+		else {
+			obj_to_room(new_obj, IN_ROOM(ch));
+		}
+		load_otrigger(new_obj);
+	}
+	
+	return TRUE;
+}
+
+
+/**
 * Interaction func for "separate".
 */
 INTERACTION_FUNC(separate_obj_interact) {
@@ -1055,8 +1102,6 @@ INTERACTION_FUNC(separate_obj_interact) {
 		}
 		load_otrigger(new_obj);
 	}
-	
-	// note: does not currently add to an empire's gathered amount
 	
 	return TRUE;
 }
@@ -5384,10 +5429,18 @@ ACMD(do_list) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH], vstr[128];
 	struct shop_temp_list *stl, *shop_list = NULL;
 	struct shop_item *item;
-	bool any, this;
+	bool any, any_cur, this;
 	obj_data *obj;
+	any_vnum vnum;
 	size_t size;
 	bool ok;
+	int amt;
+	
+	// helper type for displaying currencies at the end
+	struct cur_t {
+		any_vnum vnum;
+		UT_hash_handle hh;
+	} *curt, *next_curt, *curt_hash = NULL;
 	
 	skip_spaces(&argument);	// optional filter
 	
@@ -5488,6 +5541,16 @@ ACMD(do_list) {
 			
 			snprintf(line, sizeof(line), " - %s%s (%d %s%s)\r\n", vstr, GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			
+			// store currency for listing later
+			if ((vnum = item->currency) != NOTHING) {
+				HASH_FIND_INT(curt_hash, &vnum, curt);
+				if (!curt) {
+					CREATE(curt, struct cur_t, 1);
+					curt->vnum = vnum;
+					HASH_ADD_INT(curt_hash, vnum, curt);
+				}
+			}
+			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
 				size += strlen(line);
@@ -5496,6 +5559,26 @@ ACMD(do_list) {
 			else {
 				break;
 			}
+		}
+	}
+	
+	// append currencies if any
+	if (curt_hash && size < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "You have:");
+		any_cur = FALSE;
+		HASH_ITER(hh, curt_hash, curt, next_curt) {
+			amt = get_currency(ch, curt->vnum);
+			snprintf(line, sizeof(line), "%s%d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+				any_cur = TRUE;
+			}
+		}
+		if (size + 2 < sizeof(buf)) {
+			strcat(buf, "\r\n");
+			size += 2;
 		}
 	}
 
@@ -5509,6 +5592,12 @@ ACMD(do_list) {
 	}
 
 	free_shop_temp_list(shop_list);
+	
+	// clean up currency list
+	HASH_ITER(hh, curt_hash, curt, next_curt) {
+		HASH_DEL(curt_hash, curt);
+		free(curt);
+	}
 }
 
 
@@ -5867,6 +5956,7 @@ ACMD(do_remove) {
 
 
 ACMD(do_retrieve) {
+	char buf[MAX_STRING_LENGTH], original[MAX_INPUT_LENGTH];
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle;
 	obj_data *objn;
@@ -5899,7 +5989,8 @@ ACMD(do_retrieve) {
 		msg_to_char(ch, "This storage building must be in a city to use it.\r\n");
 		return;
 	}
-
+	
+	strcpy(original, argument);
 	half_chop(argument, arg, buf);
 
 	if (*arg && is_number(arg)) {
@@ -5987,7 +6078,14 @@ ACMD(do_retrieve) {
 		}
 
 		if (!found) {
-			msg_to_char(ch, "Nothing like that is stored here!\r\n");
+			if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+				// pass control to warehouse func
+				sprintf(buf, "retrieve %s", original);
+				do_warehouse(ch, buf, 0, 0);
+			}
+			else {
+				msg_to_char(ch, "Nothing like that is stored here!\r\n");
+			}
 			return;
 		}
 	}
@@ -6053,6 +6151,41 @@ ACMD(do_roadsign) {
 
 		gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 		extract_obj(sign);
+	}
+}
+
+
+ACMD(do_seed) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Remove the seeds from what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!has_interaction(obj->interactions, INTERACT_SEED)) {
+		msg_to_char(ch, "You can't seed that!\r\n");
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_SEEDED)) {
+		msg_to_char(ch, "It has already been seeded.\r\n");
+	}
+	else {		
+		if (run_interactions(ch, obj->interactions, INTERACT_SEED, IN_ROOM(ch), NULL, obj, seed_obj_interact)) {
+			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+				extract_obj(obj);
+			}
+			else {
+				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_STORE);
+			}
+		}
+		else {
+			act("You fail to seed $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
@@ -6150,7 +6283,7 @@ ACMD(do_ship) {
 	struct island_info *from_isle, *to_isle;
 	struct empire_storage_data *store;
 	struct shipping_data *sd, *temp;
-	bool done, wrong_isle, gave_number = FALSE;
+	bool done, wrong_isle, gave_number = FALSE, all = FALSE;
 	vehicle_data *veh;
 	obj_data *proto;
 	int number = 1;
@@ -6160,12 +6293,16 @@ ACMD(do_ship) {
 	const char *status_type[] = { "preparing", "en route", "delivered", "waiting for ship", "\n" };
 	
 	argument = any_one_word(argument, arg1);	// command
-	argument = any_one_word(argument, arg2);	// number or keywords
+	argument = any_one_word(argument, arg2);	// number/all or keywords
 	skip_spaces(&argument);	// keywords
 	
 	if (isdigit(*arg2)) {
 		number = atoi(arg2);
 		gave_number = TRUE;
+		snprintf(keywords, sizeof(keywords), "%s", argument);
+	}
+	else if (!str_cmp(arg2, "all")) {
+		all = TRUE;
 		snprintf(keywords, sizeof(keywords), "%s", argument);
 	}
 	else {
@@ -6185,7 +6322,7 @@ ACMD(do_ship) {
 	else if (!*arg1) {
 		msg_to_char(ch, "Usage: ship status\r\n");
 		msg_to_char(ch, "Usage: ship cancel [number] <item>\r\n");
-		msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
+		msg_to_char(ch, "Usage: ship <island> [number | all] <item>\r\n");
 	}
 	else if (!str_cmp(arg1, "status") || !str_cmp(arg1, "stat")) {
 		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(GET_LOYALTY(ch)));
@@ -6298,14 +6435,14 @@ ACMD(do_ship) {
 		else if (!(store = find_island_storage_by_keywords(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), keywords))) {
 			msg_to_char(ch, "You don't seem to have any '%s' stored on this island to ship.\r\n", keywords);
 		}
-		else if (store->amount < number) {
+		else if (!all && store->amount < number) {
 			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
 		}
 		else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
 			msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
 		}
 		else {
-			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), to_isle->id, number, store->vnum);
+			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), to_isle->id, all ? store->amount : number, store->vnum);
 		}
 	}
 }
@@ -6359,7 +6496,8 @@ ACMD(do_split) {
 }
 
 
-ACMD(do_store) {	
+ACMD(do_store) {
+	char buf[MAX_STRING_LENGTH];
 	struct empire_storage_data *store;
 	obj_data *obj, *next_obj;
 	int count = 0, total = 1, done = 0, dotmode;
@@ -6430,6 +6568,11 @@ ACMD(do_store) {
 			if (full) {
 				msg_to_char(ch, "It's full.\r\n");
 			}
+			else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+				// pass control to warehouse func
+				sprintf(buf, "store %s", argument);
+				do_warehouse(ch, buf, 0, 0);
+			}
 			else {
 				msg_to_char(ch, "You don't have anything that can be stored here.\r\n");
 			}
@@ -6463,6 +6606,11 @@ ACMD(do_store) {
 		if (!done) {
 			if (full) {
 				msg_to_char(ch, "It's full.\r\n");
+			}
+			else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+				// pass control to warehouse func
+				sprintf(buf, "store %s", argument);
+				do_warehouse(ch, buf, 0, 0);
 			}
 			else {
 				msg_to_char(ch, "You can't store that here!\r\n");

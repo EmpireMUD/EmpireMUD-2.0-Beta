@@ -1356,7 +1356,7 @@ bool has_tech_available(char_data *ch, int tech) {
 		return FALSE;
 	}
 	else if (!has_tech_available_room(IN_ROOM(ch), tech)) {
-		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", techs[tech]);
+		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s on this island.\r\n", techs[tech]);
 		return FALSE;
 	}
 	else {
@@ -1420,11 +1420,14 @@ int land_can_claim(empire_data *emp, int ter_type) {
 	int cur, from_wealth, out_t = 0, fron_t = 0, total = 0, min_cap = 0;
 	double outskirts_mod = config_get_double("land_outside_city_modifier");
 	double frontier_mod = config_get_double("land_frontier_modifier");
+	int frontier_timeout = config_get_int("frontier_timeout");
 	
 	if (!emp) {
 		return 0;
 	}
-	
+	if (ter_type == TER_FRONTIER && frontier_timeout > 0 && (EMPIRE_LAST_LOGON(emp) + (frontier_timeout * SECS_PER_REAL_DAY)) < time(0)) {
+		return 0;	// no frontier territory if gone longer than this
+	}
 	
 	// so long as there's at least 1 active member, they get the min cap
 	if (EMPIRE_MEMBERS(emp) > 0) {
@@ -1969,10 +1972,7 @@ bool is_multiword_abbrev(const char *arg, const char *phrase) {
 		strcpy(phrasecpy, phrase);
 		strcpy(argcpy, arg);
 		
-		argptr = argcpy;
-		do {		// skip fill words like "of" so "bunch of apples" also matches "bunch apples"
-			argptr = any_one_arg(argptr, argword);
-		} while (fill_word(argword));
+		argptr = any_one_arg(argcpy, argword);
 		phraseptr = any_one_arg(phrasecpy, phraseword);
 		
 		ok = TRUE;
@@ -1980,9 +1980,7 @@ bool is_multiword_abbrev(const char *arg, const char *phrase) {
 			if (!is_abbrev(argword, phraseword)) {
 				ok = FALSE;
 			}
-			do {	// skip fill words
-				argptr = any_one_arg(argptr, argword);
-			} while (fill_word(argword));
+			argptr = any_one_arg(argptr, argword);
 			phraseptr = any_one_arg(phraseptr, phraseword);
 		}
 		

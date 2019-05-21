@@ -45,19 +45,20 @@ the Soulstream~
 A vibrantly colored portal draws light down from the sky!~
    The portal whips and churns as it spills light in every color of the
 rainbow. If you're new here, try using 'quest start' to begin the tutorial
-quests.
+quests. You can enter the portal by typing 'enter soulstream'.
 ~
-8 0 0 2
+8 0 0 3
 -1 0 0
 10 0
 S
 #10851
 portal bright exit soulstream stream~
 the portal to the real world~
-The bright colors of the Soulstream are escaping through a portal!~
-The portal whips and churns as it spills light in every color of the rainbow.
+A bright portal leads back out into the world! (enter portal)~
+   The portal whips and churns as it spills light in every color of the
+rainbow. Type 'enter portal' to leave the Soulstream and return to the world.
 ~
-8 0 0 2
+8 0 0 3
 -1 0 0
 10 0
 S

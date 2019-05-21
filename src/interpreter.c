@@ -361,6 +361,7 @@ ACMD(do_score);
 ACMD(do_scrap);
 ACMD(do_scrape);
 ACMD(do_search);
+ACMD(do_seed);
 ACMD(do_send);
 ACMD(do_selfdelete);
 ACMD(do_separate);
@@ -952,6 +953,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "scrap", POS_STANDING, do_scrap, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ABBREV, NO_ABIL ),
 	STANDARD_CMD( "scrape", POS_STANDING, do_scrape, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "search", POS_STANDING, do_search, NO_MIN, CTYPE_COMBAT, ABIL_SEARCH ),
+	SIMPLE_CMD( "seed", POS_RESTING, do_seed, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "selfdelete", POS_SLEEPING, do_selfdelete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 	GRANT_CMD( "send", POS_SLEEPING, do_send, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SEND ),
 	SIMPLE_CMD( "separate", POS_RESTING, do_separate, NO_MIN, CTYPE_UTIL ),

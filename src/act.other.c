@@ -1300,6 +1300,17 @@ void tog_political(char_data *ch) {
 }
 
 
+/**
+* Sets the pvp cooldown if needed.
+*
+* @param char_data *ch The player.
+*/
+void tog_pvp(char_data *ch) {
+	if (!PRF_FLAGGED(ch, PRF_ALLOW_PVP)) {
+		add_cooldown(ch, COOLDOWN_PVP_FLAG, config_get_int("pvp_timer") * SECS_PER_REAL_MIN);
+	}
+}
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
@@ -3331,6 +3342,11 @@ ACMD(do_toggle) {
 	else {
 		// check for optional on/off arg
 		if (!str_cmp(argument, "on")) {
+			if (IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) {
+				msg_to_char(ch, "That toggle is already on.\r\n");
+				return;
+			}
+			
 			if (toggle_data[type].type == TOG_ONOFF) {
 				SET_BIT(PRF_FLAGS(ch), toggle_data[type].bit);
 			}
@@ -3339,6 +3355,11 @@ ACMD(do_toggle) {
 			}
 		}
 		else if (!str_cmp(argument, "off")) {
+			if (!IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) {
+				msg_to_char(ch, "That toggle is already off.\r\n");
+				return;
+			}
+			
 			if (toggle_data[type].type == TOG_ONOFF) {
 				REMOVE_BIT(PRF_FLAGS(ch), toggle_data[type].bit);
 			}
@@ -3351,11 +3372,6 @@ ACMD(do_toggle) {
 		}
 		
 		on = PRF_FLAGGED(ch, toggle_data[type].bit) ? 1 : 0;
-		
-		// special case for pvp toggle
-		if (toggle_data[type].bit == PRF_ALLOW_PVP) {
-			add_cooldown(ch, COOLDOWN_PVP_FLAG, config_get_int("pvp_timer") * SECS_PER_REAL_MIN);
-		}
 		
 		msg_to_char(ch, "You toggle %s %s%s&0.\r\n", toggle_data[type].name, togcols[toggle_data[type].type][on], tognames[toggle_data[type].type][on]);
 		

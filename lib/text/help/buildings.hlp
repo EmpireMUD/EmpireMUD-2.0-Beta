@@ -144,6 +144,7 @@ Basic buildings:
   {GG} granary -- store grains
   {PP} gravelpit -- store rocks
   {LL} lumberyard -- store lumber
+  |SS| seedsilo -- store seeds
   {SS} smokehouse -- store meats
   {TT} tannery -- store skins
   {UU} utilityshed -- store tools
@@ -793,11 +794,12 @@ Requires:  Architect ability, Foundations goal
 Stored here:  paints
 
 This building is used to make and store paints (although you also require
-glassblowing tech to make them). Only a Master Craftsman can learn to make
-paints, and can start the quest to make paints once a painter spawns in this
-building.
+glassblowing tech to make them).
 
-See also: PAINT, QUEST
+A Master Craftsman can learn to make paints, and can start the quest to make
+paints once a painter spawns in this building.
+
+See also: PAINT, QUEST, MASTER CRAFTSMAN
 #
 PARK
 
@@ -915,6 +917,17 @@ It takes roughly two and a half months (realtime) for buildings to decay,
 although unfinished buildings decay faster.
 
 See also: MAINTAIN
+#
+SEEDSILO "SEED SILO"
+
+|SS|  Seed Silo  (Build ability)
+
+Stored here:  seeds
+
+The seed silo stores all your empire's seeds safely, to ensure you'll be able
+to plant all the best crops in the future.
+
+See also: STORAGE
 #
 SHADYGARDEN "SHADY GARDEN"
 

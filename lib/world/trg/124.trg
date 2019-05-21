@@ -946,7 +946,7 @@ if %self.vnum% == 12406
     halt
   end
 end
-if (%actor.nohassle% || %actor.has_reputation(12401, Liked)% || (%direction% == fore && %actor.has_reputation(12401, Neutral)%))
+if (%actor.is_npc% || %actor.nohassle% || %actor.has_reputation(12401, Liked)% || (%direction% == fore && %actor.has_reputation(12401, Neutral)%))
   halt
 end
 %send% %actor% %self.name% won't let you pass!

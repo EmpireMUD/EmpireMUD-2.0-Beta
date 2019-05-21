@@ -1705,6 +1705,9 @@ ACMD(do_drag) {
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to drag that.\r\n");
 	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't drag that around -- it's on fire!\r\n");
+	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "You can't drag that around until it's finished.\r\n");
 	}

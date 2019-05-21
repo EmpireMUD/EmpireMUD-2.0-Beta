@@ -297,9 +297,9 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
 int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
 
-int leave_mtrigger(char_data *actor, int dir);
-int leave_wtrigger(room_data *room, char_data *actor, int dir);
-int leave_otrigger(room_data *room, char_data *actor, int dir);
+int leave_mtrigger(char_data *actor, int dir, char *custom_dir);
+int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir);
+int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir);
 
 int door_mtrigger(char_data *actor, int subcmd, int dir);
 int door_wtrigger(char_data *actor, int subcmd, int dir);
@@ -313,7 +313,7 @@ extern int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
 int destroy_vtrigger(vehicle_data *veh);
 int entry_vtrigger(vehicle_data *veh);
-int leave_vtrigger(char_data *actor, int dir);
+int leave_vtrigger(char_data *actor, int dir, char *custom_dir);
 void load_vtrigger(vehicle_data *veh);
 int greet_vtrigger(char_data *actor, int dir);
 void speech_vtrigger(char_data *actor, char *str);

@@ -122,12 +122,9 @@ is spinning around you. Vividly colorful clouds and blinding beams of light
 whoosh past you, through the portal, and out into the real world.
 ~
 cgh 0 0
-D14
+D0
 ~
 0 10851
-D14
-~
-0 10852
 E
 clouds colors~
 The clouds come in every hue, from blood red to inky blue.
@@ -137,17 +134,24 @@ light beams~
 A bolt of brilliant white light shoots past you!
 ~
 M 0 10851 100.00 1
+M 0 10852 100.00 1
+M 0 10853 100.00 1
+M 0 10854 100.00 1
+M 0 10855 100.00 1
+M 0 10857 100.00 1
+M 0 10858 100.00 1
 T 10851
 T 10858
 S
 #10851
-The Soulstream~
+A Hidden Part of the Soulstream~
    The wild, colorful swirls of the Soulstream whip around you, sometimes
 clinging to your feet as you step over them. There's no physical substance here
-to stand on, but you have no trouble moving from place to place.
+to stand on, but you have no trouble moving from place to place. You'll have to
+go back south to get to the exit portal.
 ~
 cgh 0 0
-D14
+D2
 ~
 0 10850
 E
@@ -158,8 +162,6 @@ E
 colors swirls soulstream~
 It looks as if you're in a tornado made from rainbows.
 ~
-M 0 10852 100.00 1
-M 0 10853 100.00 1
 T 10851
 T 10858
 S
@@ -170,15 +172,9 @@ whirling cloud. You can no longer see the portal to the real world from here,
 but if you focus, you can still look out over the world.
 ~
 cgh 0 0
-D14
+D2
 ~
 0 10850
-D14
-~
-0 10853
-D14
-~
-0 10854
 E
 clouds colors~
 The clouds come in every hue, from blood red to inky blue.
@@ -187,10 +183,6 @@ E
 colors swirls soulstream~
 It looks as if you're in a tornado made from rainbows.
 ~
-M 0 10854 100.00 1
-M 0 10855 100.00 1
-T 10851
-T 10858
 S
 #10853
 The Soulstream~
@@ -199,9 +191,9 @@ The glowing arc of the Milky Way fills the sky above you, shimmering from one
 edge of your view to the other.
 ~
 cgh 0 0
-D14
+D2
 ~
-0 10852
+0 10850
 E
 clouds twisting vibrant~
 The clouds swirl and eddy around you.
@@ -210,9 +202,6 @@ E
 glowing milky way galaxy sky up~
 The galaxy looks larger than ever!
 ~
-M 0 10857 100.00 1
-T 10851
-T 10858
 S
 #10854
 The Soulstream~
@@ -221,9 +210,9 @@ the limits of the Soulstream. The roaring, smoky clouds seem to be coming from
 an ethereal volcano, after which you can go no further.
 ~
 cgh 0 0
-D14
+D2
 ~
-0 10852
+0 10850
 E
 clouds twisting raging smoke~
 The clouds have lost their vibrant colors here, and look more like hot smoke.
@@ -232,8 +221,5 @@ E
 smoky volcano ethereal~
 It looks like a volcano coming from the sky.
 ~
-M 0 10858 100.00 1
-T 10851
-T 10858
 S
 $

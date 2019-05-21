@@ -354,7 +354,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_PAN  22
 #define INTERACT_QUARRY  23
 #define INTERACT_TAME  24
-#define NUM_INTERACTS  25
+#define INTERACT_SEED  25
+#define NUM_INTERACTS  26
 
 
 // for object saving
@@ -1690,9 +1691,10 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_GROUP_DROP  BIT(23)	// x. dropped by a 'group' mob
 #define OBJ_GENERIC_DROP  BIT(24)	// y. blocks the hard/group drop flags
 #define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
+#define OBJ_SEEDED  BIT(26)	// A. has already been seeded
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
-#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE)	// flags that are preserved
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
@@ -1830,6 +1832,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTF_FAST_PROSPECT  BIT(8)	// empire tech boosts speed
 #define ACTF_FAST_EXCAVATE  BIT(9)	// empire tech boosts speed, when in-city
 #define ACTF_VEHICLE_SPEEDS BIT(10)  // signals that this action accelerates based on vehicle speeds
+#define ACTF_EVEN_FASTER  BIT(11)	// another speed boost for various actions
 
 
 // BONUS_x: bonus traits

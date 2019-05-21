@@ -1266,6 +1266,9 @@ else
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
+if !%actor% || !%self.fighting%
+  halt
+end
 %send% %actor% &r%self.name% pulls out a gnarled wooden staff and smacks you over the head with it!
 %echoaround% %actor% %self.name% pulls out a gnarled wooden staff and smacks %actor.name% over the head with it!
 %damage% %actor% 25 physical

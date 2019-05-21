@@ -170,7 +170,7 @@ a street urchin~
 A street urchin is chasing rats.
 ~
 0 20 dv c 3
-1 0 7 15
+1 0 7 4
 I 4 10017 100.00 2  # LOOT: some rat jerky
 I 4 10013 50.00 1  # LOOT: a rat skin
 I 4 10019 20.00 1  # LOOT: a hooded cloak
@@ -253,7 +253,7 @@ a city official~
 A city official is inspecting the sewer.
 ~
 0 40 dv 0 3
-1 0 0 15
+1 0 0 5
 I 4 2014 75.00 1  # LOOT: a shirt and waistcoat
 I 4 2025 75.00 1  # LOOT: a leather belt
 T 10022

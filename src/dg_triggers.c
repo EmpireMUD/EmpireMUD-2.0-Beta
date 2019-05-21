@@ -740,7 +740,13 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 }
 
 
-int leave_mtrigger(char_data *actor, int dir) {
+/**
+* @param char_data *actor The person trying to leave.
+* @param int dir The direction they are trying to go (passed through to %direction%).
+* @param char *custom_dir Optional: A different value for %direction% (may be NULL).
+* @return int 0 = block the leave, 1 = pass
+*/
+int leave_mtrigger(char_data *actor, int dir, char *custom_dir) {
 	trig_data *t;
 	char_data *ch;
 	char buf[MAX_INPUT_LENGTH];
@@ -764,9 +770,9 @@ int leave_mtrigger(char_data *actor, int dir) {
 			if (((IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE) && CAN_SEE(ch, actor)) || IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE_ALL)) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[dir], 0);
+					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : (char *)dirs[dir], 0);
 				else
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : "none", 0);
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 				sdd.c = ch;
 				return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
@@ -1264,7 +1270,15 @@ int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil) {
 return 1;
 }
 
-int leave_otrigger(room_data *room, char_data *actor, int dir) {
+
+/**
+* @param room_data *room The room the person is trying to leave.
+* @param char_data *actor The person trying to leave.
+* @param int dir The direction they are trying to go (passed through to %direction%).
+* @param char *custom_dir Optional: A different value for %direction% (may be NULL).
+* @return int 0 = block the leave, 1 = pass
+*/
+int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 	int temp, final = 1;
@@ -1283,9 +1297,9 @@ int leave_otrigger(room_data *room, char_data *actor, int dir) {
 			if (TRIGGER_CHECK(t, OTRIG_LEAVE) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[dir], 0);
+					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : (char *)dirs[dir], 0);
 				else
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : "none", 0);
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 				sdd.o = obj;
 				temp = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
@@ -1838,7 +1852,14 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum 
 }
 
 
-int leave_wtrigger(room_data *room, char_data *actor, int dir) {
+/**
+* @param room_data *room The room the person is trying to leave.
+* @param char_data *actor The person trying to leave.
+* @param int dir The direction they are trying to go (passed through to %direction%).
+* @param char *custom_dir Optional: A different value for %direction% (may be NULL).
+* @return int 0 = block the leave, 1 = pass
+*/
+int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 
@@ -1853,9 +1874,9 @@ int leave_wtrigger(room_data *room, char_data *actor, int dir) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			if (dir>=0 && dir < NUM_OF_DIRS)
-				add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[dir], 0);
+				add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : (char *)dirs[dir], 0);
 			else
-				add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : "none", 0);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			sdd.r = room;
 			return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
@@ -2177,7 +2198,13 @@ int greet_vtrigger(char_data *actor, int dir) {
 }
 
 
-int leave_vtrigger(char_data *actor, int dir) {
+/**
+* @param char_data *actor The person trying to leave.
+* @param int dir The direction they are trying to go (passed through to %direction%).
+* @param char *custom_dir Optional: A different value for %direction% (may be NULL).
+* @return int 0 = block the leave, 1 = pass
+*/
+int leave_vtrigger(char_data *actor, int dir, char *custom_dir) {
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t;
@@ -2195,10 +2222,10 @@ int leave_vtrigger(char_data *actor, int dir) {
 			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_LEAVE) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				if ( dir >= 0 && dir < NUM_OF_DIRS) {
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[dir], 0);
+					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : (char *)dirs[dir], 0);
 				}
 				else {
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+					add_var(&GET_TRIG_VARS(t), "direction", custom_dir ? custom_dir : "none", 0);
 				}
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 				sdd.v = veh;
