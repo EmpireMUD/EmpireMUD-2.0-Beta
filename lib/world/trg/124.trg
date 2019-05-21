@@ -934,6 +934,9 @@ wait 20 sec
 Golden Goblin reputation gate~
 0 s 100
 ~
+if %direction% == portal || %direction% == none
+  halt
+end
 if %self.vnum% == 12406
   if %actor.has_reputation(12401, Liked)%
     %send% %actor% As you leave, %self.name% mutters some magic words.
