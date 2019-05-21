@@ -1184,8 +1184,13 @@ ACMD(do_build) {
 	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
 	bool junk, wait;
 	
-	// simple rules for ch building a given craft
-	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && (!IS_SET(GET_CRAFT_FLAGS(ttype), CRAFT_LEARNED) || has_learned_craft(ch, GET_CRAFT_VNUM(ttype))) && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))) && (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying)))
+	// rules for ch building a given craft
+	#define CHAR_CAN_BUILD_BASIC(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)))
+	#define CHAR_CAN_BUILD_LEARNED(ch, ttype)  (!IS_SET(GET_CRAFT_FLAGS(ttype), CRAFT_LEARNED) || has_learned_craft(ch, GET_CRAFT_VNUM(ttype)))
+	#define CHAR_CAN_BUILD_ABIL(ch, ttype)  (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype))))
+	#define CHAR_CAN_BUILD_REQOBJ(ch, ttype)  (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying))
+	// all rules combined:
+	#define CHAR_CAN_BUILD(ch, ttype)  (CHAR_CAN_BUILD_BASIC(ch, ttype) && CHAR_CAN_BUILD_LEARNED(ch, ttype) && CHAR_CAN_BUILD_ABIL(ch, ttype) && CHAR_CAN_BUILD_REQOBJ(ch, ttype))
 	
 	skip_spaces(&argument);
 	
@@ -1219,14 +1224,8 @@ ACMD(do_build) {
 	// this figures out if the argument was a build recipe
 	if (*arg) {
 		HASH_ITER(sorted_hh, sorted_crafts, iter, next_iter) {
-			if (GET_CRAFT_TYPE(iter) != CRAFT_TYPE_BUILD) {
-				continue;	// must be 'build'
-			}
-			if (IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY)) {
-				continue;	// these flags always rule out 'build'
-			}
-			if (IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
-				continue;	// non-imms can't build in-dev
+			if (!CHAR_CAN_BUILD_BASIC(ch, iter)) {
+				continue;	// basic checks first
 			}
 			if (!is_abbrev(arg, GET_CRAFT_NAME(iter))) {
 				continue;	// preliminary arg test saves some lookups
@@ -1242,8 +1241,8 @@ ACMD(do_build) {
 					abbrev_match = iter;
 				}
 			}
-			else if (GET_CRAFT_ABILITY(iter) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(iter)) && (!IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_LEARNED) || has_learned_craft(ch, GET_CRAFT_VNUM(iter)))) {
-				// if it meets all these conditions, they're only missing the ability, which we can tell them
+			else if (!CHAR_CAN_BUILD_ABIL(ch, iter) && CHAR_CAN_BUILD_LEARNED(ch, iter) && CHAR_CAN_BUILD_REQOBJ(ch, iter)) {
+				// if ONLY missing the ability
 				missing_abil = GET_CRAFT_ABILITY(iter);
 			}
 		}
@@ -1300,8 +1299,13 @@ ACMD(do_build) {
 		
 		/* Send output */
 		else {
-			msg_to_char(ch, "Usage: build <structure> [direction]\r\n");
-			msg_to_char(ch, "       build info <structure>\r\n");
+			if (*arg) {
+				msg_to_char(ch, "You don't know how to build '%s'.\r\n", arg);
+			}
+			else {
+				msg_to_char(ch, "Usage: build <structure> [direction]\r\n");
+				msg_to_char(ch, "       build info <structure>\r\n");
+			}
 			msg_to_char(ch, "You know how to build:\r\n");
 			this_line = FALSE;
 			found_any = FALSE;
