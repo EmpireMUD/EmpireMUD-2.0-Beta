@@ -1242,7 +1242,8 @@ ACMD(do_build) {
 					abbrev_match = iter;
 				}
 			}
-			else if (GET_CRAFT_ABILITY(iter) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(iter))) {
+			else if (GET_CRAFT_ABILITY(iter) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(iter)) && (!IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_LEARNED) || has_learned_craft(ch, GET_CRAFT_VNUM(iter)))) {
+				// if it meets all these conditions, they're only missing the ability, which we can tell them
 				missing_abil = GET_CRAFT_ABILITY(iter);
 			}
 		}
