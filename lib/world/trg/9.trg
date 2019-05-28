@@ -1,3 +1,10 @@
+#900
+Shoddy Raft Drop~
+1 n 100
+~
+%load% veh 923
+%purge% %self%
+~
 #921
 Caravan setup~
 5 n 100

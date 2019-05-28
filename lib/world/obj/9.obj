@@ -1,3 +1,15 @@
+#900
+raft shoddy~
+a shoddy raft~
+A shoddy raft is floating here.~
+   This token should be replaced by a shoddy raft (vehicle). You shouldn't be
+reading this.
+~
+3 0 a 2
+0 0 0
+0 0
+T 900
+S
 #908
 arrows quiver wooden~
 a quiver of wooden arrows~
@@ -282,7 +294,7 @@ drill fire~
 a fire drill~
 A fire drill is lying on the ground.~
    The fire drill is an ancient way to quickly start a fire. It works like an
-ordinary pump drill, twirling and untwirling a short rope to spin the drill. 
+ordinary pump drill, twirling and untwirling a short rope to spin the drill.
 But instead of a hard drill bit, it spins bare wood against a plank to build
 friction and start a fire with very little effort. Unfortunately, it doesn't
 last very long before too much of the wood has burned away.

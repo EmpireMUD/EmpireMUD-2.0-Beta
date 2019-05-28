@@ -5,6 +5,9 @@ A small, flittering bug zooms around -- you should report it!
 ~
 1 1 bdjo 0 0
 0 0 0 10
+D
+Like most bugs, the closer you look, the harder it is to see.
+~
 S
 #33
 lion time regal~
@@ -13,14 +16,9 @@ A regal time lion is basking before you.
 ~
 200 200 dhuA c 3
 0 0 0 10
-T 33
-S
-#50
-mobile new~
-a new mobile~
-A new mobile is standing here.
+D
+Do not mess with the time lion. There could be consequences.
 ~
-75 75 d 0 3
-0 0 0 15
+T 33
 S
 $

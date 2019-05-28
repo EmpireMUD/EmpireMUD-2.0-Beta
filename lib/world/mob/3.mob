@@ -5,6 +5,10 @@ An armored warhorse stands valiantly here.
 ~
 40 80 bdej 0 4
 0 0 0 11
+D
+   The warhorse has been barded in the empire's colors and protected with iron
+armor.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 4 175 100.00 4  # LOOT: an iron ingot
@@ -28,6 +32,9 @@ An armored warunicorn stands majestically here!
 ~
 100 150 bdejx 0 4
 0 0 0 11
+D
+The valiant unicorn has been decked out in the finest armor.
+~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 9040 100.00 1  # BUTCHER: a unicorn horn
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -43,6 +50,9 @@ A huge, armored warelephant stands proudly here.
 ~
 90 110 bdejy 0 5
 0 0 0 27
+D
+The massive elephant has been armored for battle!
+~
 I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
 I 0 9140 50.00 2 t  # BUTCHER: a huge ivory tusk
 I 0 9140 25.00 1 t  # BUTCHER: a huge ivory tusk
@@ -59,8 +69,10 @@ An armored warcamel stands firmly here.
 ~
 40 80 bdefj 0 4
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+The camel is heavy with fine iron armor.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot
@@ -73,15 +85,14 @@ An armored wooly warmammoth dominates the view!
 ~
 100 150 bdefjy 0 5
 0 0 0 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   The enormous mammoth as been armored by someone who really wants to make an
+impression on the battlefield.
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
+I 0 9058 100.00 1  # BUTCHER: an enormous mammoth tusk
+I 0 9058 50.00 1  # BUTCHER: an enormous mammoth tusk
+I 1 1351 100.00 3  # SKIN: a large skin
 I 1 1351 75.00 1  # SKIN: a large skin
 I 2 1358 100.00 4  # SHEAR: a bag of wool
 I 2 1358 50.00 4  # SHEAR: a bag of wool
@@ -98,8 +109,10 @@ An armored wardonkey is circling you.
 ~
 40 80 dejo 0 4
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+Though it looks preposterous, someone has armored this donkey for battle.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot
@@ -115,9 +128,10 @@ An armored war ox is standing valiantly.
 ~
 40 70 dejo 0 4
 0 0 0 11
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+The ox has been armored, perhaps to pull catapults through enemy lines.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot

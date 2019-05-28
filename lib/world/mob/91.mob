@@ -1159,6 +1159,11 @@ An arctic hare sits upright, staring.
 ~
 10 20 djo 0 1
 0 0 15 9
+D
+   The coat of this hare is as white as the driven snow, punctuated only by
+black tips on its ears. It's larger than the rabbits and hares you're used to,
+and hard to see as it bounds through the snow.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -1169,10 +1174,13 @@ A reindeer raises its head from grazing.
 ~
 50 75 dejo 0 4
 0 0 14 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
-I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
+D
+   This heavy creature is a reindeer, found only in the coldest parts of the
+world. It has a dull gray coat with a white belly, a short tail, and two
+enormous antlers. Despite persistent rumors, it can't fly.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
 I 0 1351 100.00 1  # BUTCHER: a large skin
 I 3 9176 100.00 1  # BARDE: a barded reindeer
 S
@@ -1183,10 +1191,13 @@ A barded reindeer waits regally nearby.
 ~
 50 75 bdej 0 4
 0 0 14 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
-I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
+D
+   This heavy creature is a reindeer, found only in the coldest parts of the
+world. It has a dull gray coat with a white belly, a short tail, and two
+enormous antlers. Despite persistent rumors, it can't fly.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
 I 0 1351 100.00 1  # BUTCHER: a large skin
 I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
@@ -1200,9 +1211,12 @@ A polar bear scratches at the ground.
 ~
 75 100 dgjkoy c 4
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This strange creature is the largest bear you've ever seen! It has the bulk,
+the shape, and the face of a bear, but its fur is stark white and it looks VERY
+hungry.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
 I 1 9177 100.00 1  # SKIN: a polar bear fur
 S
 #9178
@@ -1212,12 +1226,13 @@ A huge narwhal breaks the surface of the water.
 ~
 50 75 djloy 0 4
 0 0 6 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The narwhal is smaller than most whales you've seen, but still larger than
+any bear or bison. It has a single long, spiraling tooth protruding from its
+head like a horn. Its name comes from its resemblance to a drowned, bloated
+corpse.
+~
+I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
 I 0 9178 100.00 1 X  # BUTCHER: a narwhal's horn
 S
 #9179
@@ -1227,6 +1242,9 @@ A small lemming darts between the shadows.
 ~
 5 8 adjo 0 1
 0 0 7 9
+D
+This tiny, round rodent has long, soft fur splotched with brown and black.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -1237,14 +1255,15 @@ A huge walrus bellows nearby.
 ~
 75 100 djoA 0 4
 0 0 13 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 9180 100.00 1  # BUTCHER: a walrus tusk
-I 0 9180 100.00 1  # BUTCHER: a walrus tusk
-I 1 1351 100.00 1  # SKIN: a large skin
-I 1 1351 100.00 1  # SKIN: a large skin
+D
+   This massive creature, which looks to be half seal and half bear, bears
+tusks the size of broadswords. Its body is truly huge, and it stands its ground
+as you approach. It looks like it could flatten you beneath its incredible
+mass, if you aren't careful.
+~
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
+I 0 9180 100.00 2  # BUTCHER: a walrus tusk
+I 1 1351 100.00 2  # SKIN: a large skin
 S
 #9181
 wolverine bristling~
@@ -1253,19 +1272,28 @@ A bristling wolverine watches you menacingly.
 ~
 75 100 cdjo c 2
 0 0 7 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 9181 100.00 1  # SKIN: a wolverine fur
-I 1 9181 100.00 1  # SKIN: a wolverine fur
+D
+   This small predator has the shape of a weasel, the bulk of a bear, the claws
+of a lion, and the ferocity of a dragon. Its brown and black fur is highly
+prized, but hard to remove as you must first get past the claws.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 9181 100.00 2  # SKIN: a wolverine fur
 S
 #9182
-puffin rainbow~
+puffin rainbow-billed rainbowbilled~
 a rainbow-billed puffin~
 A rainbow-billed puffin preens its feathers nearby.
 ~
 10 20 dgjlo 0 1
 0 0 16 26
+D
+   The puffin is a mid-sized black and white water bird with bright orange feet
+and a spectacular multi-colored bill. Like penguins, puffins hunt fish by
+diving beneath the waves.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 100.00 1  # BUTCHER: some bird feathers
 S
 #9183
 penguin~
@@ -1274,7 +1302,13 @@ A penguin pops out of the ice.
 ~
 30 50 djo 0 2
 0 0 16 26
+D
+   This black and white penguin looks around for predators and then climbs onto
+the ice. It stands upright, tall for its size, and waddles around with
+difficulty. It clearly prefers to spend time in the water.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 100.00 1  # BUTCHER: some bird feathers
 T 9183
 S
 #9184
@@ -1284,20 +1318,29 @@ An emperor penguin slides across the ice nearby.
 ~
 50 75 dgjlo 0 2
 0 0 16 26
+D
+   This enormous penguin has a splash of yellow over its white belly. It
+otherwise looks like a larger version of the other penguins you've seen -- as
+if it's their emperor.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 100.00 1  # BUTCHER: some bird feathers
 T 9183
 S
 #9185
-seal elephant~
+seal elephant large~
 a large elephant seal~
 A large elephant seal bellows nearby.
 ~
 75 100 djoA 0 4
 0 0 13 5
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   Although it's easily the largest seal you've ever seen, the most impressive
+part of this creature isn't its size, it's the trunk-like protrusion on its
+nose. As the elephant seal lifts its body, it tilts its head back and bellows a
+loud, powerful call through its nose.
+~
+I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 I 1 9185 100.00 1  # SKIN: a sealskin
 S
 #9186
@@ -1307,6 +1350,10 @@ A seal slides across the ice.
 ~
 30 50 dgjlo 0 3
 0 0 16 9
+D
+   This little gray seal slides around on the ice, moving in circles around you
+as if trying to play a game.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -1317,6 +1364,11 @@ The Emperor of Penguins stares at you from beneath his penguin cowl.
 ~
 150 150 bdvA 0 3
 1 0 13 15
+D
+   This strange man is wearing a white suit with a black cape and cowl. He
+waddles across the ice, almost perfectly imitating a large penguin. When you
+lock eyes with him, he glares at you with an icy stare that freezes your bones.
+~
 I 4 9187 100.00 1  # LOOT: an arctic aura
 S
 #9188
@@ -1326,6 +1378,9 @@ A mouse scurries by.
 ~
 1 5 bdjo c 1
 0 0 8 9
+D
+This tiny brown mouse scampers from one hole to the next, looking for food.
+~
 T 9188
 S
 #9189
@@ -1335,6 +1390,9 @@ A rat scurries by.
 ~
 1 5 bdjo c 1
 0 0 8 9
+D
+The rat is large and brown, with a scaly tail and a voracious appetite.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 T 9188
@@ -1346,6 +1404,9 @@ A spider scurries by.
 ~
 1 5 bdjo cG 1
 0 0 7 9
+D
+The closer you look at the spider, the less close to it you want to be.
+~
 T 9188
 S
 #9191
@@ -1355,6 +1416,10 @@ A large spider creeps by.
 ~
 1 5 djo cG 1
 0 0 9 9
+D
+   This spider is larger enough -- and hairy enough -- to be a mouse. Instead,
+though, it's the thing mice see in their nightmares.
+~
 T 9188
 S
 #9192
@@ -1364,6 +1429,10 @@ A tabby cat purrs nearby.
 ~
 5 15 djoz c 2
 0 0 0 10
+D
+   This friendly brown cat has soft stripes and the fur on its forehead forms
+the letter 'M'. You can hear it purring from here.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 M
 0
@@ -1380,6 +1449,10 @@ A tabby cat arches and hisses at you.
 ~
 5 15 djoz c 2
 0 0 0 10
+D
+   This little gray cat puffs up its fur and arches its back as you approach.
+It doesn't seem to like you very much.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 M
 0
@@ -1387,21 +1460,27 @@ $n hisses and arches $s back at you.~
 T 9002
 S
 #9194
-hound dog~
+hound dog hunting~
 a hunting hound~
 A hunting hound watches you, tail wagging.
 ~
 5 15 djoz c 2
 0 0 14 9
+D
+The old hound dog circles you, wagging its tail, ready to hunt.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #9195
-hound dog~
+hound hunting dog~
 a hunting hound~
 A hunting hound growls and bristles at you.
 ~
 5 15 djoz c 2
 0 0 14 9
+D
+This old hound doesn't look too friendly. Perhaps it belongs to someone else.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
 #9196
@@ -1411,6 +1490,10 @@ A tree frog blinks each eye at you.
 ~
 1 5 bdjo c 1
 0 0 1 9
+D
+   This tiny green frog has huge black eyes. It sits motionless, perhaps
+waiting for you to pass.
+~
 S
 #9197
 gecko~
@@ -1419,6 +1502,10 @@ A gecko flicks its tongue nearby.
 ~
 1 5 bdjko c 1
 0 0 1 9
+D
+   The tiny gecko clings just above eye level, nearly motionless except to
+occasionally clean one of its eyes with its tongue.
+~
 T 9188
 S
 #9198
@@ -1428,6 +1515,9 @@ A moth flutters nearby.
 ~
 1 5 bdjo cG 1
 0 0 2 15
+D
+The little brown moth flits to and fro, never stopping for long.
+~
 T 9198
 S
 #9199
@@ -1437,6 +1527,9 @@ A beetle skitters for cover nearby.
 ~
 1 5 bdjo c 1
 0 0 8 9
+D
+This shiny little black beetle doesn't seem too interested in you.
+~
 T 9188
 S
 $

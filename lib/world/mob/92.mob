@@ -5,9 +5,12 @@ A boar snuffles the ground nearby.
 ~
 10 20 djo 0 3
 0 0 0 27
-I 0 3201 100.00 1  # BUTCHER: a slab of pork
-I 0 3201 100.00 1  # BUTCHER: a slab of pork
-I 0 3201 100.00 1  # BUTCHER: a slab of pork
+D
+   Though it resembles the pig in shape, this wild boar is thinner, larger, and
+considerably scruffier. It sniffs along the ground, perhaps looking for fungi
+or roots to eat.
+~
+I 0 3201 100.00 3  # BUTCHER: a slab of pork
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9201
@@ -17,8 +20,12 @@ A forest tapir is rooting around a bush.
 ~
 20 30 djo 0 3
 0 0 0 9
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This fat creature looks like someone took the worst parts of the pig, horse,
+and elephant, mashed them with a pestle, and made a new animal. The tapir just
+seems to be foraging. It pays very little attention to you.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9202
@@ -28,6 +35,11 @@ A capybara sits here, staring sideways at you.
 ~
 20 30 djo 0 2
 0 0 0 9
+D
+   Though it resembles a guinea pig, the capybara is the largest of all
+rodents. It watches you with narrowed black eyes which peer out from its shaggy
+brown fur.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
@@ -38,6 +50,9 @@ A harbor seal is rolling around playfully.
 ~
 20 30 bdjo 0 3
 0 0 16 9
+D
+This friendly seal is light brown with dark spots all over its back.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 M
@@ -54,6 +69,10 @@ A horseshoe crab sits at the water's edge.
 ~
 10 15 bdjoz G 1
 0 0 8 3
+D
+   This strange little creature looks like a crab with a long tail, until you
+flip it over and discover it's more like a spider with a turtle shell.
+~
 M
 0
 $n skitters around in the water.~
@@ -68,6 +87,11 @@ A marine iguana basks on a rock.
 ~
 10 20 bdjo 0 2
 0 0 16 9
+D
+   This strange, black iguana seems perfectly at home basking on the sun-lit
+rocks. These creatures dive beneath the waves to scrape plant material from the
+rocky ocean floor.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 S
@@ -78,6 +102,9 @@ A pink flamingo is standing on one leg.
 ~
 10 20 djo m 2
 0 0 2 26
+D
+The flamingo is bright pink in color. It stands on a single leg just offshore.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 M
@@ -94,6 +121,10 @@ A playful river otter rolls around in the water.
 ~
 15 25 djlo 0 2
 0 0 6 9
+D
+   The sleek little brown otter rolls and plays in the water, sometimes diving
+below the surface and returning with a fish.
+~
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
 M
@@ -113,6 +144,11 @@ A tall heron pokes its beak around for food.
 ~
 10 20 djo m 2
 0 0 2 9
+D
+   This lanky brown bird is a heron, a predator of the shoreline. It stalks
+through the water on its spindly legs, occasionally stabbing its long, pointed
+beak into the water to retrieve a fish.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 I 0 9025 75.00 1  # BUTCHER: some bird feathers
 S
@@ -123,6 +159,10 @@ A mud crab pokes its head up.
 ~
 10 15 djloz G 1
 0 0 6 3
+D
+   This little brown crab has buried itself in the mud, perhaps to wait for
+some unsuspecting meal to walk over it.
+~
 S
 #9210
 pirate salty~
@@ -131,6 +171,11 @@ A salty pirate stands atop a half-buried chest.
 ~
 75 100 bdvyz c 3
 1 0 0 1
+D
+   The pirate looks like he's had a rough life. He's missing an eye, a leg, and
+part of his arm -- replaced with a patch, a peg, and a hook, respectively. It
+looks like he's trying to bury a chest.
+~
 I 4 9210 100.00 1  # LOOT: a pirate's chest
 M
 1
@@ -149,6 +194,11 @@ A little penguin waddles along.
 ~
 10 15 djo 0 1
 0 0 16 9
+D
+   This black and white penguin looks around for predators and then climbs onto
+the shore. It stands upright, tall for its size, and waddles around with
+difficulty. It clearly prefers to spend time in the water.
+~
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 M
 0
