@@ -420,7 +420,7 @@ int get_crafting_level(char_data *ch) {
 * @return int The best scale level.
 */
 int get_craft_scale_level(char_data *ch, craft_data *craft) {
-	int level = 1, psr;
+	int level = 1, psr, craft_lev;
 	ability_data *abil;
 	obj_data *req;
 	
@@ -428,10 +428,12 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 		return 0;
 	}
 	
+	craft_lev = get_crafting_level(ch);
+	
 	// determine ideal scale level
 	if (craft) {
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && (req = obj_proto(GET_CRAFT_REQUIRES_OBJ(craft)))) {
-			level = get_crafting_level(ch);
+			level = craft_lev;
 			
 			// check bounds on the required object
 			if (GET_OBJ_MAX_SCALE_LEVEL(req) > 0) {
@@ -443,7 +445,7 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 		}
 		else if (CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
 			// learned recipes would be constrained by the created obj, if anything
-			level = get_crafting_level(ch);
+			level = craft_lev;
 		}
 		else {
 			if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
@@ -451,34 +453,34 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 			}
 			else if (!ABIL_ASSIGNED_SKILL(abil)) {
 				// probably a class skill
-				level = get_crafting_level(ch);
+				level = craft_lev;
 			}
 			else if ((psr = ABIL_SKILL_LEVEL(abil)) != NOTHING) {
 				if (psr < BASIC_SKILL_CAP) {
-					level = MIN(BASIC_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+					level = MIN(BASIC_SKILL_CAP, craft_lev);
 				}
 				else if (psr < SPECIALTY_SKILL_CAP) {
-					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+					level = MIN(SPECIALTY_SKILL_CAP, craft_lev);
 				}
 				else if (psr < CLASS_SKILL_CAP) {
-					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+					level = MIN(CLASS_SKILL_CAP, craft_lev);
 				}
 				else {	// is a skill ability but >= class skill level (100) -- don't restrict
-					level = get_crafting_level(ch);
+					level = craft_lev;
 				}
 			}
 			else {
 				// this is probably unreachable
-				level = get_crafting_level(ch);
+				level = craft_lev;
 			}
 			
 			// always bound by the crafting level
-			level = MIN(level, get_crafting_level(ch));
+			level = MIN(level, craft_lev);
 		}
 	}
 	else {
 		// no craft given
-		level = get_crafting_level(ch);
+		level = craft_lev;
 	}
 	
 	return level;
