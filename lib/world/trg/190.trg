@@ -988,7 +988,7 @@ else
   remote difficulty %mob.id%
   nop %mob.add_mob_flag(SPAWNED)%
   nop %mob.add_mob_flag(!LOOT)%
-  nop %mob.add_mob_flag(UNDEAD)%
+  nop %mob.add_mob_flag(NO-CORPSE)%
   nop %mob.remove_mob_flag(HARD)%
   nop %mob.remove_mob_flag(GROUP)%
   %scale% %mob% %mob.level%
