@@ -117,7 +117,7 @@ done
 Unstable Portal - Block farther entry~
 2 q 100
 ~
-if %actor.nohassle% || %direction% == none
+if %actor.nohassle% || %direction% == none || %direction% == portal
   return 1
   halt
 end
@@ -144,7 +144,7 @@ while %person%
       set vnum %room.template%
       * Do they already have it?
       set item %person.inventory(%vnum%)%
-      if !%item%
+      if !%item% && !%actor.has_minipet(%vnum%)%
         * Give them the item
         %load% obj %vnum% %person% inv
         * Message

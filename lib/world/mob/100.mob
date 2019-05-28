@@ -5,6 +5,11 @@ A spiny black wildling is crawling down the tree.
 ~
 0 0 bcdj ce 2
 0 0 1 10
+D
+   This strange furry little creature is hard to see in in the shade beneath
+the canopy of trees. Long spines protrude from its black fur, and only its
+gleaming white teeth give away its demeanor.
+~
 I 0 3012 90.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 90.00 1  # SKIN: a small skin
 I 4 10001 5.00 1  # LOOT: wild fire
@@ -18,6 +23,11 @@ A hooded figure is standing amongst the trees.
 ~
 0 0 abdvxz c 3
 1 0 0 18
+D
+   The druid is covered head-to-toe by a long brown robe, exposing only its
+face and hands. The face is bestial almost to the point of being inhuman, and
+the hands are unusually hairy.
+~
 I 4 10001 25.00 1  # LOOT: wild fire
 I 4 10002 5.00 1  # LOOT: stag antlers
 I 4 10003 10.00 1  # LOOT: the ring of the badger
@@ -32,6 +42,11 @@ A tall, antlered druid stands beneath the canopy of trees.
 ~
 0 0 abdvxz c 3
 2 0 0 16
+D
+   The druid's hood has been pulled back to reveal strange, branching antlers
+that protrude from the druid's forehead. Whatever this druid is, she's not
+entirely human.
+~
 I 4 10001 25.00 1  # LOOT: wild fire
 I 4 10002 100.00 1  # LOOT: stag antlers
 I 4 10003 10.00 1  # LOOT: the ring of the badger
@@ -46,6 +61,10 @@ A huge creature - half man, half badger - looms over you!
 ~
 0 0 abdvz cq 3
 1 0 0 10
+D
+   The druid's brown robe is in tatters, barely clinging to the shoulders of
+this half-man, half-badger creature.
+~
 I 4 10001 25.00 1  # LOOT: wild fire
 I 4 10002 5.00 1  # LOOT: stag antlers
 I 4 10003 100.00 1  # LOOT: the ring of the badger
@@ -60,6 +79,10 @@ Archdruid #n seems to glow with the energy of the Grove!
 ~
 0 0 abdvxy c 3
 2 3 0 20
+D
+   The archdruid's brown robe is woven with strands of glimmering gold and
+silver, which seem to pulse as she channels mana from the earth.
+~
 I 4 10001 25.00 1  # LOOT: wild fire
 I 4 10002 5.00 1  # LOOT: stag antlers
 I 4 10003 5.00 1  # LOOT: the ring of the badger
@@ -76,6 +99,10 @@ A tame wildling is curled up on the ground.
 ~
 0 75 dej 0 4
 0 0 0 10
+D
+   This huge black furry creature is hard to identify, but it appears tame
+enough that you might be able to ride it.
+~
 I 4 10001 25.00 1  # LOOT: wild fire
 S
 #10006

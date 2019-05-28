@@ -302,7 +302,7 @@ ACMD(do_sacrifice) {
 		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))))
 			msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
 		else if (!CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-			msg_to_char(ch, "You can't sacrifice that!\r\n");
+			msg_to_char(ch, "You can't sacrifice an item that you can't pick up!\r\n");
 		}
 		else if (!bind_ok(obj, ch)) {
 			msg_to_char(ch, "You can't sacrifice an item that's bound to someone else.\r\n");

@@ -77,7 +77,7 @@ end
 ~
 #9106
 Jungle Bird Animation~
-0 bw 3
+0 bw 20
 ~
 * Jungle Bird Animation (9106)
 switch (%random.8%)
@@ -90,7 +90,7 @@ switch (%random.8%)
   break
   case 3
     if (%self.varexists(last_phrase)%)
-      %echo% %self.name% says, *squawk '%self.last_phrase%' *squawk*
+      %echo% %self.name% says, Squawk! '%self.last_phrase%' Squawk!
     end
   break
   default

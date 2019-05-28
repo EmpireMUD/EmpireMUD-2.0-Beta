@@ -6,11 +6,11 @@ A wooden cart is parked here.~
 ride on the cart and drive it around.
 ~
 ~
-bfhio 22 5 200 1
-R
-19 1 1 0
+bfhio 22 5 200 1 0 0 0
 P
 0
+R
+19 1 1 0
 S
 #901
 carriage wooden~
@@ -22,15 +22,15 @@ several people to ride around in style. You must harness an animal to the cart
 and then sit on it to drive it, or board it to get inside.
 ~
 ~
-bfhio 19 16 200 1
+bfhio 19 16 200 1 0 0 0
 D
 5521 0 0
+P
+1
 R
 19 1 1 0
 R
 20 1 1 0
-P
-1
 S
 #902
 wagon covered~
@@ -40,13 +40,13 @@ A covered wagon has been parked here.~
 harness two horses to the wagon and then lead it, or ride in it and drive it.
 ~
 ~
-bfhiou 19 24 400 2
+bfhiou 19 24 400 2 0 0 0
+P
+2
 R
 19 1 1 0
 R
 20 1 1 0
-P
-2
 S
 #903
 catapult~
@@ -56,17 +56,17 @@ A catapult is poised to strike!~
 will need two horses to pull the catapult.
 ~
 &0o==o~
-bor 19 24 0 2
+bor 19 24 0 2 0 0 0
 C
 0 100
+P
+0
 R
 19 1 1 0
 R
 16 1 1 1048576
 R
 20 1 1 0
-P
-0
 S
 #904
 chair wooden~
@@ -75,7 +75,7 @@ There is a wooden chair here.~
 You can sit on the chair.
 ~
 ~
-fghlnv 19 1 0 0
+fghlnv 19 1 0 0 0 0 0
 P
 2
 S
@@ -86,7 +86,7 @@ There is a wooden bench here.~
 You can sit on the bench.
 ~
 ~
-fhlnv 19 1 0 0
+fhlnv 19 1 0 0 0 0 0
 P
 2
 S
@@ -97,7 +97,7 @@ There is a long table here.~
 Tables are merely for decoration.
 ~
 ~
-hlnv 19 1 0 0
+hlnv 19 1 0 0 0 0 0
 P
 2
 S
@@ -108,7 +108,7 @@ There is a wooden stool here.~
 You can sit on the stool.
 ~
 ~
-fhlnv 19 1 0 0
+fhlnv 19 1 0 0 0 0 0
 P
 2
 S
@@ -119,7 +119,7 @@ There is a throne at the head of the room.~
 You can sit on the throne.
 ~
 ~
-fhlnv 19 1 0 0
+fhlnv 19 1 0 0 0 0 0
 P
 2
 S
@@ -131,11 +131,11 @@ There is a wooden canoe here.~
 to the edge of the water, 'sit' in it, and then type 'sail <direction>'.
 ~
 ~
-cfghlnu 3 3 0 0
-R
-1003 1 5 0
+cfghlnu 3 3 0 0 0 0 0
 P
 0
+R
+1003 1 5 0
 S
 #921
 caravan brightly-painted painted wooden~
@@ -146,9 +146,11 @@ features of a house on the move, but it's not big enough to be a proper home
 for someone as important as you.
 ~
 ~
-bfhiou 19 25 100 4
+bfhiou 19 25 100 4 0 0 0
 D
 5518 1 r
+P
+2
 R
 19 1 1 0
 R
@@ -156,8 +158,6 @@ R
 R
 20 1 1 0
 T 921
-P
-2
 S
 #922
 raft wooden~
@@ -168,11 +168,25 @@ You can 'drag' the raft to the edge of the water, 'sit' on it, then type 'sail
 <direction>'.
 ~
 ~
-cfhlnu 3 3 0 0
-R
-1003 1 5 0
+cfhlnu 3 3 0 0 0 0 0
 P
 0
+R
+1003 1 5 0
+S
+#923
+raft shoddy poorly-constructed constructed poorlyconstructed~
+a shoddy raft~
+A poorly-constructed raft is floating here.~
+   The raft is in bad shape and probably won't hold together long. But you can
+still 'sit' on it and 'sail' it toward land. You can also 'drag' it on land.
+~
+~
+cfhlnu 3 2 0 0 0 0 0
+P
+0
+R
+1003 1 5 0
 S
 #952
 caravel lateen-rigged~
@@ -182,9 +196,11 @@ A lateen-rigged caravel is floating here.~
 everywhere. You can "board" the ship from here.
 ~
 &0<&u44&0>~
-chijktu 20 32 150 0
+chijktu 20 32 150 0 0 0 0
 D
 5501 2 o
+P
+1
 R
 16 1 1 1048576
 R
@@ -192,8 +208,6 @@ R
 R
 26 1 1 0
 T 952
-P
-1
 S
 #953
 cog~
@@ -204,9 +218,11 @@ can be used for shipping, or to move items manually between islands. You can
 "board" it from here.
 ~
 &0<&u44&0>~
-cijtu 20 32 450 0
+cijtu 20 32 450 0 0 0 0
 D
 5501 1 0
+P
+1
 R
 16 1 1 1048576
 R
@@ -214,8 +230,6 @@ R
 R
 26 1 1 0
 T 953
-P
-1
 S
 #954
 longship fearsome~
@@ -226,11 +240,13 @@ fierce emblem of its master. This longship is armed with cannon, and used to
 raid up and down the coast. You can "board" it from here.
 ~
 &0<&u44&0>~
-ckrtu 20 64 0 0
+ckrtu 20 64 0 0 0 0 0
 C
 0 100
 D
 5501 2 o
+P
+0
 R
 16 1 1 1048576
 R
@@ -238,8 +254,6 @@ R
 R
 26 1 1 0
 T 954
-P
-0
 S
 #955
 brigantine massive~
@@ -250,11 +264,13 @@ It has at least ten sails, granting it great speed and control on the high seas
 as it lets the great seafaring empire move weapons over incredible distances.
 ~
 &0<&u44&0>~
-ckpqrtu 20 128 0 0
+ckpqrtu 20 128 0 0 0 0 0
 C
 0 100
 D
 5501 4 op
+P
+1
 R
 16 2 1 1048576
 R
@@ -262,8 +278,6 @@ R
 R
 26 2 1 0
 T 955
-P
-1
 S
 #956
 carrack four-masted~
@@ -273,9 +287,11 @@ A four-masted carrack looms large on the water.~
 to carry the entire expedition, and fast enough to move between continents.
 ~
 &0<&u44&0>~
-ciktu 20 96 400 0
+ciktu 20 96 400 0 0 0 0
 D
 5522 8 opq
+P
+2
 R
 16 2 1 1048576
 R
@@ -283,8 +299,6 @@ R
 R
 26 2 1 0
 T 956
-P
-2
 S
 #957
 hulk cargo huge~
@@ -294,9 +308,11 @@ A huge cargo hulk is floating here.~
 seas. You can keep items in it, or use it to move goods from dock to dock.
 ~
 &0<&u44&0>~
-cijkpqtu 20 64 1000 0
+cijkpqtu 20 64 1000 0 0 0 0
 D
 5501 4 op
+P
+1
 R
 16 1 1 1048576
 R
@@ -304,7 +320,5 @@ R
 R
 26 1 1 0
 T 957
-P
-1
 S
 $

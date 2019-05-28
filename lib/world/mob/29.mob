@@ -5,6 +5,10 @@ A little imperial griffin charges at you from above.
 ~
 1 1 bdoD mn 1
 0 0 2 10
+D
+   This young griffin squawks at you through its eagle-like beak while batting
+at you with its paws.
+~
 M
 0
 $n squawks raucously.~
@@ -30,6 +34,9 @@ A heroic little changeling is florping around on the ground.
 ~
 1 1 bdoD mn 1
 0 0 21 28
+D
+Every time you think you've figured out what it is, it changes shape again!
+~
 M
 0
 $n trots around like a peacock.~

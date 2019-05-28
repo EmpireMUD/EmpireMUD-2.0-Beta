@@ -2642,7 +2642,7 @@ const struct manage_data_type manage_data[] = {
 
 
 MANAGE_FUNC(mng_nowork) {
-	if (!on && ROOM_OWNER(IN_ROOM(ch))) {
+	if (on && ROOM_OWNER(IN_ROOM(ch))) {
 		deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 	}
 }

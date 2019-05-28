@@ -5,8 +5,13 @@ A ferocious deinonychus is stalking around!
 ~
 40 50 dejo 0 3
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   The deinonychus looks like a fearsome bird with a feathered tail longer than
+you are tall. Its feet hold massive sickle-shaped talons and its powerful jaw
+is lined with razor-sharp teeth. Though shorter than a person, this swift beast
+has been magically prepared to serve as a mount.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 S
 #401
 liger swift gigantic~
@@ -15,8 +20,12 @@ A gigantic liger is prowling around!
 ~
 40 50 dejo 0 4
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This truly enormous beast is a liger -- a hybrid of a lion and a tiger, but
+larger than either of them. Its pale tan coat is punctuated by faded, broken
+stripes. It seems unnaturally tame, like you could ride it.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -27,8 +36,11 @@ A swift, giant serpent is coiled and ready to strike!
 ~
 40 50 dejo 0 4
 0 0 5 7
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This massive snake is sleek, with soft scales the size of dinner plates. It
+seems oddly tame, like you could ride it.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 S
 #403
 stag swift majestic white~
@@ -37,8 +49,12 @@ A majestic white stag is standing before you!
 ~
 40 50 dejo 0 4
 0 0 0 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This massive stag is as white as the driven snow, from its hooves to its
+antlers. It seems quite tame, like you could ride it, if you could figure out
+how to get all the way up onto it.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 S
 #404
 bear swift golden~
@@ -47,8 +63,11 @@ A swift golden bear stands up and towers over you!
 ~
 40 50 dejo 0 4
 0 0 0 10
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+D
+   This enormous bear has golden fur, like no bear you've ever seen. Though its
+teeth are as big as daggers, the bear seems unnaturally tame when you approach.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -59,6 +78,9 @@ A mirror image is standing here.
 ~
 0 0 bdhnqxDF cmG 3
 0 0 0 7
+D
+It's like looking in a mirror!
+~
 T 450
 T 9901
 S
