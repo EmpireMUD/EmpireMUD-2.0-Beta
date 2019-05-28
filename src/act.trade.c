@@ -456,6 +456,8 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 				level = craft_lev;
 			}
 			else if ((psr = ABIL_SKILL_LEVEL(abil)) != NOTHING) {
+				// craft comes from a skill-ability (and is not learned/requires-obj):
+				// limit to the the top of that skill range
 				if (psr < BASIC_SKILL_CAP) {
 					level = MIN(BASIC_SKILL_CAP, craft_lev);
 				}
