@@ -2277,6 +2277,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if ((num = search_block(var, script_commands, TRUE)) != NOTHING) {
 				snprintf(str, slen, "%c%s", cmd_prefix[type], script_commands[num]);
 			}
+			else if (!str_cmp(var, "event")) {
+				// %event% with no field
+				script_log("Trigger: %s, VNum %d, %%event%% called with no field", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+				strcpy(str, "0");
+			}
 			else if (!str_cmp(var, "instance")) {
 				// %instance% with no field
 				struct instance_data *inst = get_instance_for_script(type, go);
@@ -2450,6 +2455,47 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", time_info.year);
 				else
 					*str = '\0';
+				return;
+			}
+			else if (!str_cmp(var, "event")) {	// %event.*%
+				if (!str_cmp(field, "name")) {
+					if (subfield && *subfield && isdigit(*subfield)) {
+						snprintf(str, slen, "%s", get_event_name_by_proto(atoi(subfield)));
+					}
+					else {
+						script_log("Trigger: %s, VNum %d, event.name invalid event vnum: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
+						strcpy(str, "");
+					}
+				}
+				else if (!str_cmp(field, "running")) {
+					if (subfield && *subfield && isdigit(*subfield)) {
+						snprintf(str, slen, "%d", find_running_event_by_vnum(atoi(subfield)) ? 1 : 0);
+					}
+					else {
+						script_log("Trigger: %s, VNum %d, event.running invalid event vnum: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
+						strcpy(str, "0");
+					}
+				}
+				if (!str_cmp(field, "time")) {
+					if (subfield && *subfield && isdigit(*subfield)) {
+						struct event_running_data *ev = find_running_event_by_vnum(atoi(subfield));
+						if (ev && ev->event && ev->status == EVTS_RUNNING) {
+							int remains = (time(0) - (ev->start_time + (EVT_DURATION(ev->event) * SECS_PER_REAL_MIN))) / SECS_PER_REAL_MIN;
+							snprintf(str, slen, "%d", MAX(1, remains));
+						}
+						else {
+							strcpy(str, "0");	// not running = 0 time left
+						}
+					}
+					else {
+						script_log("Trigger: %s, VNum %d, event.time invalid event vnum: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
+						strcpy(str, "0");
+					}
+				}
+				else {
+					// bad field
+					script_log("Trigger: %s, VNum %d, unknown event field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), field);
+				}
 				return;
 			}
 			else if (!str_cmp(var, "instance")) {

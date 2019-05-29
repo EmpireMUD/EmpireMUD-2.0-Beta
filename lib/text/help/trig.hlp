@@ -480,6 +480,9 @@ Special Variables When using field - The variable returns:
 &ccooldown.<vnum>&0 - Get the name of a cooldown, by vnum.
 &ccurrency.<vnum>(amt)&0 - Gets the currency name. The amt is used to determine
    whether to use the singular or plural name.
+&cevent.name(vnum)&0 - Gets the name of an event.
+&cevent.running(vnum)&0 - Whether or not that event is currently running.
+&cevent.time(vnum)&0 - Minutes left in that event, if running.
 &cinstance.id&0 - Unique id of the adventure instance, if any.
 &cinstance.level&0 - Get the locked level of the instance (if it has one of the
    LOCK-LEVEL-* flags).
