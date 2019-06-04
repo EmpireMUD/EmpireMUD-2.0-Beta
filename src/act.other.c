@@ -2471,6 +2471,7 @@ ACMD(do_morph) {
 	double multiplier;
 	obj_data *obj;
 	bool normal, fast;
+	char *tmp;
 	
 	// safety first: mobs must use %morph%
 	if (IS_NPC(ch)) {
@@ -2494,7 +2495,14 @@ ACMD(do_morph) {
 				continue;
 			}
 			
-			msg_to_char(ch, ", %s", skip_filler(MORPH_SHORT_DESC(morph)));
+			if (strstr(MORPH_SHORT_DESC(morph), "#n")) {
+				tmp = str_replace("#n", PERS(ch, ch, TRUE), MORPH_SHORT_DESC(morph));
+				msg_to_char(ch, ", %s", tmp);
+				free(tmp);	// allocated by str_replace
+			}
+			else { // no #n
+				msg_to_char(ch, ", %s", skip_filler(MORPH_SHORT_DESC(morph)));
+			}
 		}
 		
 		msg_to_char(ch, "\r\n");
