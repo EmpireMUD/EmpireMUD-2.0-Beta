@@ -294,6 +294,9 @@ Morphs (MORPHEDIT):
   scalable item. Scalable items will refund at the wrong level.
 - If the morph requires a synergy ability, you should also set the CHECK-SOLO
   flag. This is necessary to use it in the Solo role.
+- If you use the #n code to pass through the morph's real name, put it in the
+  short and/or long description, but not the keywords. You should not combine
+  the #n code with the ANIMAL flag (which makes it a disguise morph).
 
 Objects (OEDIT):
 - The most significant keyword should always be first. A fiery torch should put
@@ -4189,6 +4192,11 @@ The long description is the text you see when the morphed character is in the
 room. Its name should appear somewhere near the beginning, and the rest should
 be a complete sentence indicating that the person is present.
 
+You can use #n to indicate the morphed person's real name (e.g. Galstaf, Joe
+Jones, a painted horse). If you do this, be sure not to set the ANIMAL flag on
+the morph (if they can tell the real name, it shouldn't have the disguise
+effects of that flag).
+
 Examples:
 There is a cow munching on some grass.
 A fiery dragon circles overhead.
@@ -4262,6 +4270,11 @@ and almost everywhere else except when a player types 'look' in the room (where
 the long description is shown instead). This should be short, should generally
 begin with a/an/the unless it's a proper noun, and should not be capitalized
 (again unless it's a proper noun).
+
+You can use #n to indicate the morphed person's real name (e.g. Galstaf, Joe
+Jones, a painted horse). If you do this, be sure not to set the ANIMAL flag on
+the morph (if they can tell the real name, it shouldn't have the disguise
+effects of that flag).
 
 The short description is also shown in the available morphs list (with any
 leading a/an/the removed).

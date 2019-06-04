@@ -1022,7 +1022,7 @@ ACMD(do_mirrorimage) {
 	
 	// longdesc is more complicated
 	if (GET_MORPH(ch)) {
-		sprintf(buf, "%s\r\n", MORPH_LONG_DESC(GET_MORPH(ch)));
+		sprintf(buf, "%s\r\n", get_morph_desc(ch, TRUE));
 	}
 	else if ((ocm = pick_custom_longdesc(ch))) {
 		sprintf(buf, "%s\r\n", ocm->msg);

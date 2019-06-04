@@ -1578,7 +1578,7 @@ extern struct weather_data weather_info;	// db.c
 
 // basic functions from utils.c
 extern bool any_players_in_room(room_data *room);
-extern char *PERS(char_data *ch, char_data *vict, bool real);
+extern const char *PERS(char_data *ch, char_data *vict, bool real);
 extern double diminishing_returns(double val, double scale);
 extern int att_max(char_data *ch);
 extern int count_bits(bitvector_t bitset);
@@ -1680,7 +1680,7 @@ extern char *fname(const char *namelist);
 extern char *reverse_strstr(char *haystack, char *needle);
 extern bool search_custom_messages(char *keywords, struct custom_message *list);
 extern char *str_dup(const char *source);
-extern char *str_replace(char *search, char *replace, char *subject);
+extern char *str_replace(const char *search, const char *replace, const char *subject);
 extern char *str_str(char *cs, char *ct);
 extern char *strip_color(char *input);
 void strip_crlf(char *buffer);
@@ -1694,7 +1694,7 @@ extern int str_cmp(const char *arg1, const char *arg2);
 extern int strn_cmp(const char *arg1, const char *arg2, int n);
 void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result);
 void prune_crlf(char *txt);
-extern const char *skip_filler(char *string);
+extern const char *skip_filler(const char *string);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
 void sprinttype(int type, const char *names[], char *result);
 extern char *time_length_string(int seconds);
@@ -1758,6 +1758,9 @@ void gain_condition(char_data *ch, int condition, int value);
 extern bool adjacent_room_is_light(room_data *room);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
+
+// utils from morph.c
+extern const char *get_morph_desc(char_data *ch, bool long_desc_if_true);
 
 // utils from olc.building.c
 extern bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);

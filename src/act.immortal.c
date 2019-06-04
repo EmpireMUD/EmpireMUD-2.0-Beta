@@ -4878,7 +4878,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	}
 	
 	if (IS_MORPHED(k)) {
-		msg_to_char(ch, "Morphed into: %d - %s\r\n", MORPH_VNUM(GET_MORPH(k)), MORPH_SHORT_DESC(GET_MORPH(k)));
+		msg_to_char(ch, "Morphed into: %d - %s\r\n", MORPH_VNUM(GET_MORPH(k)), get_morph_desc(k, FALSE));
 	}
 	if (IS_DISGUISED(k)) {
 		msg_to_char(ch, "Disguised as: %s\r\n", GET_DISGUISED_NAME(k));
