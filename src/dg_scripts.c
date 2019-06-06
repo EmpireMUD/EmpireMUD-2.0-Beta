@@ -2476,7 +2476,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						strcpy(str, "0");
 					}
 				}
-				if (!str_cmp(field, "time")) {
+				else if (!str_cmp(field, "time")) {
 					if (subfield && *subfield && isdigit(*subfield)) {
 						struct event_running_data *ev = find_running_event_by_vnum(atoi(subfield));
 						if (ev && ev->event && ev->status == EVTS_RUNNING) {
