@@ -289,8 +289,7 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 			return output;
 		}
 		else if (long_desc_if_true) {
-			MORPH_LONG_DESC(GET_MORPH(ch));
-			return output;
+			return MORPH_LONG_DESC(GET_MORPH(ch));
 		}
 		else {	// short desc and no data
 			return MORPH_SHORT_DESC(GET_MORPH(ch));
