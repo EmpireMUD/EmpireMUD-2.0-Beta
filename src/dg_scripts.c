@@ -6973,8 +6973,8 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 						return ret_val;
 					}
 					*/
-					if (GET_TRIG_LOOPS(trig) >= 100) {
-						script_log("Trigger VNum %d has looped 100 times!!!",
+					if (GET_TRIG_LOOPS(trig) >= 300) {
+						script_log("Trigger VNum %d has looped 300 times!!!",
 						GET_TRIG_VNUM(trig));
 						break;
 					}
