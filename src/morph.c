@@ -289,11 +289,11 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 			return output;
 		}
 		else if (long_desc_if_true) {
-			snprintf(output, sizeof(output), "%s is here.", realname);
+			MORPH_LONG_DESC(GET_MORPH(ch));
 			return output;
 		}
 		else {	// short desc and no data
-			return realname;
+			return MORPH_SHORT_DESC(GET_MORPH(ch));
 		}
 	}
 	else {	// not morphed
