@@ -541,7 +541,7 @@ while %ch% && !%found%
   set ch %ch.next_in_room%
 done
 if %found%
-  %send% %actor% You already have a pixy-sniffing hog.
+  %send% %actor% You already have a sprite-sniffing hog.
   return 1
   halt
 end

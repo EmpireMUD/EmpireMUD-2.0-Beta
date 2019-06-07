@@ -179,16 +179,16 @@ $n barks at you and attempts to flee!~
 T 11524
 S
 #11527
-hog pixy-sniffing pixie-sniffing sniffing~
-a pixy-sniffing hog~
-A hog is rooting around, sniffing for pixies.
+hog sprite-sniffing sniffing~
+a sprite-sniffing hog~
+A hog is rooting around, sniffing for sprites.
 ~
 40 40 bdoF nGJ 3
 0 0 14 9
 D
-   This old sow has been raised on a strict all-pixy diet, and is adept at
-rooting them out. This is part of the Pixy Pursuit event. You can 'dismiss' the
-hog at any time.
+   This old sow has been raised on a strict diet of only pixies, fairies, and
+gnomes. It's adept at rooting them out. This is part of the Pixy Pursuit event.
+You can 'dismiss' the hog at any time.
 ~
 T 11523
 T 9901
