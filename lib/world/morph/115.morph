@@ -1,0 +1,71 @@
+#11524
+horse talking~
+a talking horse~
+A horse looks up from the grass and greets you by name.~
+cj 11 14 100 0 4
+2 25 215 11525
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+D
+It just looks like an ordinary horse.
+~
+S
+#11525
+bunny talking~
+a talking bunny~
+A bunny thumps its foot and asks you for the time.~
+cj 9 15 100 0 1
+2 25 215 11525
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+D
+It looks like a perfectly ordinary bunny.
+~
+S
+#11526
+bear singing~
+a singing bear~
+A bear is dancing around and singing a tune.~
+cj 10 0 100 0 4
+2 25 215 11525
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+D
+It just looks like a regular bear.
+~
+S
+#11528
+#n tiny~
+tiny #n~
+#n stands here, shrunken to the size of a mouse!~
+bm 15 0 0 0 1
+2 0 -1 -1
+A
+15 -2
+A
+21 -2
+A
+22 -2
+D
+They've shrunk down to the size of a mouse!
+~
+S
+$

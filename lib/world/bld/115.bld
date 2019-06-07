@@ -11,4 +11,116 @@ R
 R
 3 1 1 0
 S
+#11527
+Pixy House~
+In a Tiny Pixy House~
+@.@.&P'&?@.~
+96 10 inHR efgm
+10 1 0 -1
+D
+   You shrink to miniature size as you enter the tiny pixy house, which doesn't
+look like much until you're as tiny as it is. The house is made from elegant
+magewood which sparkles pink and blue as if gems were embedded in it, although
+you know those sparkles are actually the size of a grain of sand. It has all
+the warmth of home without the need to burn a tiny fire, and you feel yourself
+wrapped in comfort the moment you enter.
+~
+F
+d
+R
+1007 2 5 0
+T 11528
+T 11527
+T 11529
+S
+#11528
+Leafy Hallway~
+A Leafy Hallway~
+~
+0 0 aHR 0
+0 0 0 -1
+D
+   This strange little hallway is made of glimmering magewood and covered in
+foliage of all colors. The leaves seem to grow right out of the wood on the
+walls, although each leaf is a different shape and size. A warm, comforting
+feeling follows you as you move from room to room.
+~
+F
+d
+M
+11531 1.00 0
+T 11528
+T 11529
+S
+#11529
+Elfin Workshop~
+An Elfin Workshop~
+&0[  ]~
+1 0 aHR 0
+0 0 0 -1
+C
+(functions as a tailor and tannery)~
+D
+   Tucked in the back of the house, you find a little workshop that has been
+carved out of the sparkling magewood. Tiny pieces of leather are hanging on
+racks, and swatches of cloth are spread all over. It looks like someone has
+been making shoes in here.
+~
+F
+dyz
+M
+11531 1.00 0
+T 11528
+T 11529
+U
+1 5120
+U
+1 5137
+S
+#11530
+Tiny Kitchen~
+A Tiny, Cluttered Kitchen~
+~
+0 0 aHR 0
+0 0 0 -1
+C
+cook~
+D
+   This tiny kitchen has been carved into the magewood pixy house and despite
+many cabinets and cupboards, the room is almost too cluttered to work. But as
+you approach the stove, the clutter seems to shrink away from you and make room
+for you to work. As with the rest of the house, there's a strong feeling of
+comfort surrounding you -- but in this room, it smells like cookies.
+~
+F
+dG
+M
+11531 1.00 0
+T 11528
+T 11529
+U
+1 5606
+U
+1 5610
+S
+#11531
+Pixy Bedroom~
+An Enchanted Pixy Bedroom~
+&0[  ]~
+1 0 aHR 0
+0 0 0 -1
+D
+   Nestled deep within the miniature pixy house, you find this bedroom. The
+walls shimmer and sparkle with the pinks and blues of magewood, and the
+brightly-colored curtains appear to be made from the scales of butterfly and
+moth wings. The bedroom feels cozy, like you could sleep for a lifetime in here
+and no one would miss you.
+~
+F
+d
+M
+11531 1.00 0
+T 11528
+T 11529
+S
 $
