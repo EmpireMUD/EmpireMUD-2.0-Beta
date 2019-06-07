@@ -221,12 +221,12 @@ S
 jars pixy pixie enchanted~
 some enchanted pixy jars~
 Some enchanted pixy jars lie here, empty.~
-   These glass jars have been enchanted to be able to capture and hold even the
+   These glass jars have been enchanted to be able to catch and hold even the
 strongest pixy -- if you can get close enough to one. Look around for pixies,
 catch them, and return them to the alchemist to earn points for the Pixy
 Pursuit event.
 To summon your pixy-sniffing hog: &cwhistle hog&0
-To catch a pixy: &ccapture pixy&0
+To catch a pixy: &ccatch pixy&0
 To turn in pixies and dust for points at the Alchemist: &cexchange&0
 ~
 3 p a 9

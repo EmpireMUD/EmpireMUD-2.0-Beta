@@ -178,9 +178,9 @@ start Pixy Pursuit quest~
 %load% obj 11520 %actor% inv
 ~
 #11521
-Pixy Pursuit: capture~
+Pixy Pursuit: catch~
 1 c 2
-capture~
+catch~
 * This is the command for capturing pixies for the Pixy Pursuit event
 if %actor.fighting%
   %send% %actor% You can't do that while fighting!
@@ -188,12 +188,12 @@ if %actor.fighting%
   halt
 end
 if %actor.carrying% >= %actor.maxcarrying%
-  %send% %actor% You can't capture anything because your inventory is full!
+  %send% %actor% You can't catch anything because your inventory is full!
   return 1
   halt
 end
 if !%arg%
-  %send% %actor% What do you want to capture with %self.shortdesc%?
+  %send% %actor% What do you want to catch with %self.shortdesc%?
   return 1
   halt
 end
@@ -204,12 +204,12 @@ if !%target%
   halt
 end
 if !%target.is_npc%
-  %send% %actor% You can really only capture pixies with those jars.
+  %send% %actor% You can really only catch pixies with those jars.
   return 1
   halt
 end
 if %target.fighting%
-  %send% %actor% You can't capture someone who's in combat!
+  %send% %actor% You can't catch someone who's in combat!
   return 1
   halt
 end
@@ -322,7 +322,7 @@ end
 set value 0
 set item %actor.inventory%
 while %item% && !%overflow%
-  set next_item %item.next_content%
+  set next_item %item.next_in_list%
   if %item.vnum% == 11521
     eval value %value% + 10
     %purge% %item%
