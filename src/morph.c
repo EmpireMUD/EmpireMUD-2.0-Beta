@@ -270,26 +270,34 @@ void finish_morphing(char_data *ch, morph_data *morph) {
 * @return const char* A pointer to the generated description.
 */
 const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
-	static char output[MAX_STRING_LENGTH];
+	static char output[MAX_STRING_LENGTH], realname[128];
+	
+	// all senses end up needing the real name
+	if (IS_NPC(ch)) {
+		strcpy(realname, GET_SHORT_DESC(ch));
+	}
+	else {
+		snprintf(realname, sizeof(realname), "%s%s%s", GET_PC_NAME(ch), GET_LASTNAME(ch) ? " " : "", NULLSAFE(GET_LASTNAME(ch)));
+	}
 	
 	if (GET_MORPH(ch)) {
 		char *source = long_desc_if_true ? MORPH_LONG_DESC(GET_MORPH(ch)) : MORPH_SHORT_DESC(GET_MORPH(ch));
 		if (strstr(source, "#n")) {
-			char *tmp = str_replace("#n", PERS(ch, ch, TRUE), source);
+			char *tmp = str_replace("#n", realname, source);
 			strcpy(output, tmp);
 			free(tmp);	// str_replace allocated this
 			return output;
 		}
 		else if (long_desc_if_true) {
-			snprintf(output, sizeof(output), "%s is here.", PERS(ch, ch, FALSE));
+			snprintf(output, sizeof(output), "%s is here.", realname);
 			return output;
 		}
 		else {	// short desc and no data
-			return PERS(ch, ch, FALSE);
+			return realname;
 		}
 	}
 	else {	// not morphed
-		snprintf(output, sizeof(output), "%s%s", PERS(ch, ch, FALSE), long_desc_if_true ? " is standing here." : "");
+		snprintf(output, sizeof(output), "%s%s", realname, long_desc_if_true ? " is standing here." : "");
 		return output;
 	}
 }
