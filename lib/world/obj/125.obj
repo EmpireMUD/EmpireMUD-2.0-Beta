@@ -142,10 +142,10 @@ a clockwork elephant whistle~
 A clockwork elephant whistle is lying here.~
 This brass whistle can summon a new mount. Type 'use elephant' to summon it.
 ~
-3 p a 6
+3 p a 7
 12511 0 0
 2 0
-T 10263
+T 9910
 S
 #12512
 whistle eagle clockwork~
@@ -154,10 +154,10 @@ A clockwork eagle whistle is lying here.~
    This brass whistle can summon a new flying mount. Type 'use eagle' to summon
 it.
 ~
-3 p a 7
+3 p a 8
 12512 0 0
 2 0
-T 10263
+T 9910
 S
 #12513
 gear boot inscribed~

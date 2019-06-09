@@ -255,10 +255,10 @@ A sanguine whistle is lying on the ground.~
 fingers sticky as you touch it. If you 'use' the whistle, it will summon a new
 mount.
 ~
-3 ep a 7
+3 ep a 8
 18228 0 0
 2 0
-T 10263
+T 9910
 S
 #18230
 whistle umbral~
@@ -268,10 +268,10 @@ An umbral whistle is lying here.~
 is made from pure shadow. You have no idea where something like this could have
 come from, but it does seem as if you could 'use' it to summon a new mount.
 ~
-3 ep a 6
+3 ep a 7
 18230 0 0
 2 0
-T 10263
+T 9910
 S
 #18232
 apparatus clockwork~
@@ -281,10 +281,10 @@ A clockwork apparatus is lying on the floor.~
 at least, it's simple: there is one large button marked 'use'. An inscription
 on the back indicates that it summons a clockwork steed.
 ~
-3 ep a 5
+3 ep a 6
 18232 0 0
 2 0
-T 10263
+T 9910
 S
 #18234
 whistle imperium-clad clad~
@@ -294,10 +294,10 @@ A clockwork apparatus is lying on the floor.~
 sigil of the Guild of Adventurers. If you 'use' this whistle, it will summon an
 epic mount.
 ~
-3 ep a 6
+3 ep a 7
 18234 0 0
 2 0
-T 10263
+T 9910
 S
 #18236
 ring tortoiseshell shell mettle~
@@ -553,10 +553,10 @@ An imaginary whistle might be here.~
    This whistle might or might not summon a flying mount who might or might not
 be real, if you 'use whistle'.
 ~
-3 eo a 6
+3 eo a 7
 18284 0 0
 10 0
-T 10263
+T 9910
 S
 #18285
 egg imaginary~

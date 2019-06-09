@@ -46,7 +46,8 @@ A royal pixy is fluttering about.
 100 100 do mG 3
 0 0 18 28
 D
-This little pixy the size of a mouse, and wearing a crown of dandelion petals.
+   This little pixy is the size of a mouse, and wearing a crown of dandelion
+petals.
 ~
 M
 0
@@ -60,12 +61,15 @@ $n tries to hex you, but the hex is so tiny that it barely itches!~
 M
 1
 I can survive this with a little faith, trust, and pixy dust.~
+M
+0
+$n glows majestically.~
 T 11524
 S
 #11521
 pixy pixie colt~
-the colt pixy~
-A colt pixy whips past your ear.
+the pixy colt~
+A pixy in the shape of a colt whips past your ear.
 ~
 50 50 do mG 3
 0 0 18 28
@@ -79,11 +83,17 @@ $n sees you and attempts to flee!~
 M
 0
 $n whinnies as $e attempts to flee!~
+M
+0
+$n charges past you!~
+M
+0
+$n looks at you and says, 'Neigh!'~
 T 11524
 S
 #11522
-pixy pixie mouse little~
-the mouse pixy~
+pixy pixie mouse little mousy~
+the mousy pixy~
 A little pixy in the shape of a mouse scurries away from you.
 ~
 50 50 do mG 3
@@ -98,11 +108,14 @@ $n sees you and attempts to flee!~
 M
 0
 $n squeaks as $e attempts to flee!~
+M
+0
+$n squeaks and tries to hide!~
 T 11524
 S
 #11523
-pixy pixie steam pure~
-the steam pixy~
+pixy pixie steam pure steamy~
+the steamy pixy~
 A pixy made of pure steam is trying to evaporate away from you.
 ~
 50 50 do mG 3
@@ -117,6 +130,12 @@ $n sees you and attempts to flee!~
 M
 0
 $n evaporates as it attempts to flee!~
+M
+0
+$n vanishes into thin air, only to reappear nearby!~
+M
+0
+$n fumes at you.~
 T 11524
 S
 #11524
@@ -135,18 +154,24 @@ $n sees you and attempts to flee!~
 M
 0
 $n reflects blinding light at you as $e attempts to flee!~
+M
+0
+The glare reflecting off of $n nearly blinds you!~
+M
+0
+$n poses and pretends to be a tiny statue.~
 T 11524
 S
 #11525
 pixy pixie owl little~
-the owl pixy~
+the pixy owl~
 A little pixy in the shape of an owl is perched here.
 ~
 50 50 do mG 3
 0 0 18 28
 D
    This pixy has taken the shape of an owl, but its disguise is given away by
-its buttefly wings.
+its butterfly wings.
 ~
 M
 0
@@ -154,11 +179,17 @@ $n sees you and attempts to flee!~
 M
 0
 $n hoots wildly as $e attempts to flee!~
+M
+0
+$n hoots.~
+M
+0
+$n looks around and says, 'Hoo?'~
 T 11524
 S
 #11526
 pixy pixie fox~
-the fox pixy~
+the pixy fox~
 A pixy in the shape of a fox is running from you.
 ~
 50 50 do mG 3
@@ -176,6 +207,12 @@ $n chases $s tail in circles.~
 M
 0
 $n barks at you and attempts to flee!~
+M
+0
+$n takes a leap and flutters up into the air.~
+M
+0
+$n yips.~
 T 11524
 S
 #11527

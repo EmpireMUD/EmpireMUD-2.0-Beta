@@ -524,10 +524,10 @@ A crocodile whistle is lying on the ground.~
    This whistle has a crocodile carved in the side. If you type 'use whistle',
 it will summon a mount.
 ~
-3 p a 7
+3 p a 8
 18327 0 0
 14 0
-T 10263
+T 9910
 S
 #18328
 whistle falcon~
@@ -536,10 +536,10 @@ A falcon whistle is lying here.~
    This whistle has a falcon carved on the top. If you type 'use whistle', it
 will summon a flying mount.
 ~
-3 p a 7
+3 p a 8
 18328 0 0
 14 0
-T 10263
+T 9910
 S
 #18329
 disk solar ra~

@@ -261,10 +261,10 @@ A green orca whistle is lying here.~
 This little whistle is black and white... and green.
 Type 'use orca' to summon this aquatic mount.
 ~
-3 p a 6
+3 p a 7
 12421 0 0
 14 0
-T 10263
+T 9910
 S
 #12422
 shell raging kraken~
@@ -273,10 +273,10 @@ A raging kraken shell is lying here.~
    This epic seashell has the Mark of the Kraken etched into the side of it.
 Type 'use kraken' to summon this aquatic mount.
 ~
-3 p a 5
+3 p a 6
 12422 0 0
 14 0
-T 10263
+T 9910
 S
 #12423
 shell giant albatross~
@@ -285,10 +285,10 @@ A giant albatross shell is lying here.~
    This epic seashell has the Mark of the Albatross painted on the side of it.
 Type 'use albatross' to summon this flying mount.
 ~
-3 p a 6
+3 p a 7
 12423 0 0
 14 0
-T 10263
+T 9910
 S
 #12424
 figurehead lucky goblin~

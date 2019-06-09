@@ -96,10 +96,10 @@ An R.O.U.S. whistle is lying here.~
    This whistle is made mostly from rat hair. It looks like you could use it to
 summon a land mount.
 ~
-3 p a 11
+3 p a 12
 19008 0 0
 7 0
-T 10263
+T 9910
 S
 #19009
 whistle manatee~
@@ -108,10 +108,10 @@ A manatee whistle is here.~
    This whistle is made mostly from rat hair. It looks like you could use it to
 summon a aquatic mount.
 ~
-3 p a 12
+3 p a 13
 19009 0 0
 7 0
-T 10263
+T 9910
 S
 #19010
 broom enchanted~
@@ -120,10 +120,10 @@ An enchanted broom is lying here.~
    This enchanted broom seems fairly inert, but if you 'use broom', it will
 summon a flying mount.
 ~
-3 jp a 13
+3 jp a 14
 19010 0 0
 7 0
-T 10263
+T 9910
 S
 #19011
 stench repulsive~

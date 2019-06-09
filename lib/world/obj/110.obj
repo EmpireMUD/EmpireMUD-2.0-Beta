@@ -234,10 +234,10 @@ A tawny roc egg towers over you.~
    The tawny roc egg is as tall as you are, and quite warm. Type 'use egg' to
 summon a flying tawny roc mount.
 ~
-3 ep a 4
+3 ep a 5
 11018 0 0
 14 0
-T 10263
+T 9910
 S
 #11019
 egg ostrich lithe~
@@ -246,10 +246,10 @@ A lithe ostrich egg sits on the ground.~
    The ostrich egg is large and beige, and wiggles around as you hold it. Type
 'use egg' to summon a lithe ostrich mount.
 ~
-3 ep a 5
+3 ep a 6
 11019 0 0
 14 0
-T 10263
+T 9910
 S
 #11020
 egg swan trumpeter~
@@ -258,10 +258,10 @@ A trumpeter swan egg is sitting here.~
    The trumpeter swan egg is surprisingly large, but pure white. Type 'use egg'
 to summon a huge trumpeter swan, an aquatic mount.
 ~
-3 ep a 6
+3 ep a 7
 11020 0 0
 14 0
-T 10263
+T 9910
 S
 #11021
 loss sense~

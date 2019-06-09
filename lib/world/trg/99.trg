@@ -98,6 +98,35 @@ if %count% < 1
   %purge% %self%
 end
 ~
+#9910
+Use: Summon Mob / Mount Whistle~
+1 c 2
+use~
+* use <self>: loads mob vnum val0 and purges self (single-use)
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+if !%actor.canuseroom_member%
+  %send% %actor% You can't use %self.shortdesc% here because someone else owns this location.
+  halt
+end
+%load% m %self.val0%
+set mob %self.room.people%
+if (%mob% && %mob.vnum% == %self.val0%)
+  %send% %actor% You use %self.shortdesc% and %mob.name% appears!
+  %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+  nop %mob.unlink_instance%
+else
+  %send% %actor% You use %self.shortdesc% but nothing happens.
+  %echoaround% %actor% %actor.name% uses %self.shortdesc% but nothing happens.
+end
+%purge% %self%
+~
 #9926
 Heisenbug!~
 0 btw 25

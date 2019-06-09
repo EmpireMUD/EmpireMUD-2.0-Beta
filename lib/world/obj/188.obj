@@ -615,10 +615,10 @@ a headless horse whistle~
 A headless horse whistle is lying here.~
 This whistle will summon an eerie new mount.
 ~
-3 p a 5
+3 p a 6
 18839 0 0
 14 0
-T 10263
+T 9910
 S
 #18840
 whistle nightmare~
@@ -626,10 +626,10 @@ a nightmare whistle~
 A nightmare whistle dangles in the air.~
 This whistle will summon an eerie flying mount.
 ~
-3 p a 6
+3 p a 7
 18840 0 0
 14 0
-T 10263
+T 9910
 S
 #18841
 whistle ghoul~

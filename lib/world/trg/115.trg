@@ -215,16 +215,18 @@ if %target.fighting%
 end
 * switch will validate the target vnum and set up chances: needs, has -- default needs is random.15 (attribute roll)
 set needs %random.15%
+set jar_vnum 11522
 switch %target.vnum%
   case 615
-    * feral pixy / enchanted forest
-    set needs %random.200%
+    * feral pixy / enchanted forest (harder because common)
+    set needs %random.500%
     set has %actor.level%
   break
   case 616
-    * pixy queen / enchanted forest
-    set needs %random.400%
+    * pixy queen / enchanted forest (easier because rare)
+    set needs %random.200%
     set has %actor.level%
+    set jar_vnum 11535
   break
   case 10042
     * pixy / skycleave
@@ -235,6 +237,7 @@ switch %target.vnum%
     * royal pixy
     set needs %random.400%
     set has %actor.level%
+    set jar_vnum 11535
   break
   case 11521
     * colt/str pixy
@@ -282,7 +285,7 @@ if %target.fighting% || %actor.fighting% || %actor.room% != %target.room% || %ac
 end
 if %has% >= %needs%
   * Success!
-  %load% obj 11522 %actor% inv
+  %load% obj %jar_vnum% %actor% inv
   %send% %actor% You catch %target.name% in a jar!
   %echoaround% %actor% %actor.name% catches %target.name% in a jar!
 else
@@ -322,12 +325,10 @@ end
 set value 0
 set item %actor.inventory%
 while %item% && !%overflow%
-  set next_item %item.next_in_list%
-  if %item.vnum% == 11521
-    eval value %value% + 10
-    %purge% %item%
-  elseif %item.vnum% == 11522
-    eval value %value% + 20
+  set next_item %item.next_content%
+  
+  if %item.vnum% == 11521 || %item.vnum% == 11522 || %item.vnum% == 11535
+    eval value %value% + %item.val0%
     %purge% %item%
   end
   * otherwise it's not a pixy
@@ -413,7 +414,7 @@ if %self.disabled%
 end
 * Randomly morph the actor
 if %actor.is_pc% && %random.5% == 5 && %actor.morph% != 11528
-  %send% %actor% %self.name% casts a spell and shrinks you to the size of a mouse!
+  %send% %actor% %self.name% casts a spell and shrinks you to the size of a mouse! (type 'morph normal' to return to full size)
   %echoaround% %actor% %self.name% casts a spell at %actor.name% and shrinks %actor.himher% to the size of a mouse!
   %morph% %actor% 11528
   halt
@@ -491,9 +492,9 @@ end
 set ch %room.people%
 while %ch%
   if (%ch.is_pc% && !%ch.nohassle% && %ch.morph% != 11528)
-    %morph% %ch% 11528
-    %send% %ch% You shrink to tiny size!
+    %send% %ch% You shrink to tiny size! (type 'morph normal' to return to full size)
     %echoaround% %ch% %ch.name% shrinks to tiny size!
+    %morph% %ch% 11528
   end
   set ch %ch.next_in_room%
 done
@@ -510,9 +511,9 @@ end
 if %actor.morph% == 11528
   halt
 end
-%morph% %actor% 11528
-%send% %actor% You shrink to tiny size!
+%send% %actor% You shrink to tiny size! (type 'morph normal' to return to full size)
 %echoaround% %actor% %actor.name% shrinks to tiny size!
+%morph% %actor% 11528
 ~
 #11529
 Block morph~

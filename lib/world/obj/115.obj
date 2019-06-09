@@ -136,10 +136,10 @@ an adventurer's steed whistle~
 The whistle for an adventurer's steed is lying here.~
 This whistle can be used to summon an adventurer's steed.
 ~
-3 p a 6
+3 p a 7
 11511 0 0
 14 0
-T 10263
+T 9910
 S
 #11512
 whistle pegasus adventurers adventurer's~
@@ -147,10 +147,10 @@ an adventurer's pegasus whistle~
 The whistle for an adventurer's pegasus is lying here.~
 This whistle can be used to summon an adventurer's flying pegasus.
 ~
-3 p a 7
+3 p a 8
 11512 0 0
 14 0
-T 10263
+T 9910
 S
 #11513
 shipment resources small~
@@ -247,8 +247,8 @@ A little pixy dust is piled on the ground.~
 must still have the enchanted pixy jars to make the exchange. If you've lost
 your jars, re-start the Pixy Pursuit quest at the alchemist.
 ~
-3 k a 3
-0 0 0
+3 k a 4
+10 0 0
 10 0
 S
 #11522
@@ -260,8 +260,8 @@ pixy for Pixy Pursuit event points at an Alchemist. You must still have the
 enchanted pixy jars to make the exchange. If you've lost your jars, re-start
 the Pixy Pursuit quest at the alchemist.
 ~
-3 k a 2
-0 0 0
+3 k a 3
+20 0 0
 8 0
 S
 #11523
@@ -358,10 +358,10 @@ a rainbow beetle mount whistle~
 The whistle for a rainbow beetle mount is lying here.~
 This whistle can be used to summon a giant rainbow beetle mount.
 ~
-3 p a 7
+3 p a 8
 11529 0 0
 14 0
-T 10263
+T 9910
 S
 #11530
 whistle mount rainbow dragonfly~
@@ -369,10 +369,10 @@ a rainbow dragonfly mount whistle~
 The whistle for a rainbow dragonfly mount is lying here.~
 This whistle can be used to summon a giant rainbow dragonfly flying mount.
 ~
-3 p a 9
+3 p a 10
 11530 0 0
 14 0
-T 10263
+T 9910
 S
 #11531
 shoes pair elf-made elfmade leather~
@@ -430,5 +430,19 @@ Usage: upgrade <item>
 0 0 0
 0 0
 T 11534
+S
+#11535
+jar pixy pixie royal~
+a royal pixy in a jar~
+A jar with a royal pixy inside has been left here.~
+   Someone has trapped this poor pixy in a jar! You can 'exchange' this jarred
+pixy for Pixy Pursuit event points at an Alchemist. You must still have the
+enchanted pixy jars to make the exchange. If you've lost your jars, re-start
+the Pixy Pursuit quest at the alchemist.
+   Royal pixies are worth more points.
+~
+3 k a 3
+30 0 0
+8 0
 S
 $

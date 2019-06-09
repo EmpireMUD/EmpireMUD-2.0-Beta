@@ -52,10 +52,10 @@ A crimson serpent egg is smouldering on the ground.~
    The crimson red egg is the size of your head, and is hot to the touch. Type
 'use egg' to summon a crimson serpent mount.
 ~
-3 ep a 2
+3 ep a 3
 10904 0 0
 14 0
-T 10263
+T 9910
 S
 #10905
 egg crimson dragon~
@@ -64,10 +64,10 @@ A crimson dragon egg is smouldering here.~
    The crimson red egg is the size of your head, and is hot to the touch. Type
 'use egg' to summon a crimson dragon mount.
 ~
-3 ep a 4
+3 ep a 5
 10905 0 0
 14 0
-T 10263
+T 9910
 S
 #10906
 egg dragon sea~
@@ -76,10 +76,10 @@ A sea dragon egg is smouldering here.~
    The crimson red egg is the size of your head, and is hot to the touch. Type
 'use egg' to summon a sea dragon mount.
 ~
-3 ep a 5
+3 ep a 6
 10906 0 0
 14 0
-T 10263
+T 9910
 S
 #10907
 steak dragon raw huge~
@@ -601,7 +601,7 @@ S
 schematic wand draconic~
 the draconic wand schematic~
 The draconic wand schematic is lying here.~
-   This schematic makes a flaming draconic wand, a powerful healer's weapon. 
+   This schematic makes a flaming draconic wand, a powerful healer's weapon.
 You need Lore Crafts (Trade/High Sorcery) to craft this weapon.
 ~
 7 0 a 8
@@ -635,7 +635,7 @@ S
 design dragonbone tower shield~
 the dragonbone tower shield design~
 The dragonbone tower shield design is lying here.~
-   This design is for a dragonbone tower shield, a strong shield for tanks. 
+   This design is for a dragonbone tower shield, a strong shield for tanks.
 You require Mythic Forge (Trade/Battle) to forge this shield.
 ~
 7 0 a 11

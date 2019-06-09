@@ -813,10 +813,10 @@ A polar bear charm is lying here.~
    This charm is carved from marble, in the shape of a polar bear. Though the
 charm is small, if you 'use charm', it will summon a mount.
 ~
-3 p a 9
+3 p a 10
 10564 0 0
 1 0
-T 10263
+T 9910
 S
 #10565
 charm penguin~
@@ -825,10 +825,10 @@ A penguin charm is lying here.~
    This charm is carved from marble, in the shape of a penguin. Though the
 charm is small, if you 'use charm', it will summon a swimming mount.
 ~
-3 p a 10
+3 p a 11
 10565 0 0
 1 0
-T 10263
+T 9910
 S
 #10566
 charm wyvern~
@@ -837,10 +837,10 @@ A wyvern charm is floating in the air.~
    This charm is carved from marble, in the shape of a wyvern. Though the charm
 is small, if you 'use charm', it will summon a flying mount.
 ~
-3 p a 11
+3 p a 12
 10566 0 0
 1 0
-T 10263
+T 9910
 S
 #10567
 whistle polar cub~

@@ -766,9 +766,10 @@ end
 return 0
 ~
 #10263
-Mount whistle use~
+DEPRECATED: mount whistle use~
 1 c 2
 use~
+DEPRECATED: Use 9910 instead
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -785,6 +786,7 @@ if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end
 %purge% %self%
+* DEPRECATED: Use 9910 instead
 ~
 #10264
 Dracosaur boss spawner~
