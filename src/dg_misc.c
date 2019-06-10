@@ -412,6 +412,8 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 	void kill_empire_npc(char_data *ch);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
+	empire_data *owner;
+	
 	if (vict && IS_NPC(vict)) {
 		if (GET_LOYALTY(vict) && emp != GET_LOYALTY(vict) && GET_EMPIRE_NPC_DATA(vict)) {
 			// resets the population timer on their house
@@ -424,18 +426,25 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
 	}
 	if (veh) {
-		if (VEH_OWNER(veh) && emp != VEH_OWNER(veh)) {
+		if ((owner = VEH_OWNER(veh)) && emp != owner) {
 			VEH_SHIPPING_ID(veh) = -1;
 			if (VEH_INTERIOR_HOME_ROOM(veh)) {
 				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 			}
 			adjust_vehicle_tech(veh, FALSE);
+			
+			qt_empire_players(owner, qt_lose_vehicle, VEH_VNUM(veh));
+			et_lose_vehicle(owner, VEH_VNUM(veh));
 		}
 		VEH_OWNER(veh) = emp;
 		if (emp && VEH_INTERIOR_HOME_ROOM(veh)) {
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
 		}
-		adjust_vehicle_tech(veh, TRUE);
+		if (emp) {
+			adjust_vehicle_tech(veh, TRUE);
+			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
+			et_gain_vehicle(emp, VEH_VNUM(veh));
+		}
 	}
 	if (room) {
 		if (ROOM_OWNER(room) && emp != ROOM_OWNER(room)) {
