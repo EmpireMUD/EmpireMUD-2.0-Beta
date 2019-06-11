@@ -374,10 +374,10 @@ a hellsteed's reins~
 A set of hellish reins are lying here.~
 These reins can be used just once, to summon a hellsteed mount.
 ~
-3 0 a 4
+3 0 a 5
 18078 0 0
 7 0
-T 10263
+T 9910
 S
 #18096
 ashes phoenix noble pile~
@@ -386,10 +386,10 @@ The ashes of a noble phoenix are lying here.~
    This pile of ash, when used, will be restored into a noble Phoenix, which
 will be indebted to you!
 ~
-3 0 a 8
+3 0 a 9
 18079 0 0
 10 0
-T 10263
+T 9910
 S
 #18097
 essence molten~

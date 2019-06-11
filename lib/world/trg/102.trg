@@ -40,7 +40,7 @@ done
 Zelkab Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
+if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -99,7 +99,7 @@ done
 Garlgarl Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
+if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -147,7 +147,7 @@ Filks Archer Combat~
 Filks Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
+if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -201,7 +201,7 @@ Walts Sapper Combat~
 Walts Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
+if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -268,7 +268,7 @@ done
 Nilbog Death~
 0 f 100
 ~
-if %self.mob_flagged(UNDEAD)% || !%self.varexists(difficulty)%
+if %self.mob_flagged(NO-CORPSE)% || !%self.varexists(difficulty)%
   * This is probably a summoned copy.
   halt
 end
@@ -380,13 +380,13 @@ set fighting 0
 set person %room.people%
 while %person%
   if %person.vnum% == 10202
-    if %person.fighting% || %person.mob_flagged(UNDEAD)%
+    if %person.fighting% || %person.mob_flagged(NO-CORPSE)%
       set fighting 1
     end
     set goblin %person%
     set filks_present 1
   elseif %person.vnum% == 10203
-    if %person.fighting% || %person.mob_flagged(UNDEAD)%
+    if %person.fighting% || %person.mob_flagged(NO-CORPSE)%
       set fighting 1
     end
     set walts_present 1
@@ -766,9 +766,10 @@ end
 return 0
 ~
 #10263
-Mount whistle use~
+DEPRECATED: mount whistle use~
 1 c 2
 use~
+DEPRECATED: Use 9910 instead
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -785,6 +786,7 @@ if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end
 %purge% %self%
+* DEPRECATED: Use 9910 instead
 ~
 #10264
 Dracosaur boss spawner~

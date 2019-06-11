@@ -261,6 +261,48 @@ void finish_morphing(char_data *ch, morph_data *morph) {
 
 
 /**
+* This function gets/generates a short/long description for a morphed person
+* or npc. It returns simple output if NOT morphed, but you should really only
+* use this for a morphed person.
+* 
+* @param char_data *ch The person who is morphed.
+* @param bool long_desc_if_true If TRUE, returns a long description instead of a short desc.
+* @return const char* A pointer to the generated description.
+*/
+const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
+	static char output[MAX_STRING_LENGTH], realname[128];
+	
+	// all senses end up needing the real name
+	if (IS_NPC(ch)) {
+		strcpy(realname, GET_SHORT_DESC(ch));
+	}
+	else {
+		snprintf(realname, sizeof(realname), "%s%s%s", GET_PC_NAME(ch), GET_LASTNAME(ch) ? " " : "", NULLSAFE(GET_LASTNAME(ch)));
+	}
+	
+	if (GET_MORPH(ch)) {
+		char *source = long_desc_if_true ? MORPH_LONG_DESC(GET_MORPH(ch)) : MORPH_SHORT_DESC(GET_MORPH(ch));
+		if (strstr(source, "#n")) {
+			char *tmp = str_replace("#n", realname, source);
+			strcpy(output, tmp);
+			free(tmp);	// str_replace allocated this
+			return output;
+		}
+		else if (long_desc_if_true) {
+			return MORPH_LONG_DESC(GET_MORPH(ch));
+		}
+		else {	// short desc and no data
+			return MORPH_SHORT_DESC(GET_MORPH(ch));
+		}
+	}
+	else {	// not morphed
+		snprintf(output, sizeof(output), "%s%s", realname, long_desc_if_true ? " is standing here." : "");
+		return output;
+	}
+}
+
+
+/**
 * Checks morph affinities.
 *
 * @param room_data *location Where the morph affinity is happening.

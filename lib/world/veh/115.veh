@@ -1,0 +1,19 @@
+#11526
+rainbow enchanted~
+an enchanted rainbow~
+An enchanted rainbow streams down from the sky!~
+   Though it looks like an ordinary rainbow, this one has been enchanted to be
+solid, almost like a flying carriage. The rainbow twists and untwists itself as
+it moves, shimmering up into the sky and back down again. You can sit on the
+rainbow and pilot it around.
+~
+&w<**>~
+defnu 32 96 0 0 0 0 0
+C
+100 100
+P
+1
+R
+1007 1 5 0
+S
+$

@@ -116,10 +116,10 @@ a riding jaguar whistle~
 A riding jaguar whistle is lying on the ground.~
 This whistle can be used just once, to summon a riding jaguar mount.
 ~
-3 0 a 3
+3 0 a 4
 18512 0 0
 14 0
-T 10263
+T 9910
 S
 #18513
 whistle sea serpent~
@@ -127,10 +127,10 @@ a sea serpent whistle~
 A sea serpent whistle is lying on the ground.~
 This whistle can be used just once, to summon a sea serpent mount.
 ~
-3 0 a 3
+3 0 a 4
 18513 0 0
 14 0
-T 10263
+T 9910
 S
 #18514
 whistle feathered serpent~
@@ -138,10 +138,10 @@ the feathered serpent whistle~
 A feathered serpent whistle is lying on the ground here.~
 This whistle can be used just once, to summon a feathered serpent mount.
 ~
-3 0 a 6
+3 0 a 7
 18514 0 0
 14 0
-T 10263
+T 9910
 S
 #18515
 whistle jaguar cub~

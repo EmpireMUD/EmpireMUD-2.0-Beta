@@ -884,7 +884,7 @@ eval vnum 12407 + %random.4%
 set summon %self.room.people%
 if %summon.vnum% == %vnum%
   %echo% %self.name% sends up a jet of sparkling blue mana and %summon.name% appears!
-  nop %summon.add_mob_flag(UNDEAD)%
+  nop %summon.add_mob_flag(NO-CORPSE)%
   nop %summon.add_mob_flag(!LOOT)%
   nop %summon.add_mob_flag(SPAWNED)%
   nop %summon.add_mob_flag(BRING-A-FRIEND)%

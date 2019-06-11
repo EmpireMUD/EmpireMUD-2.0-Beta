@@ -779,8 +779,10 @@ const struct olc_command_data olc_data[] = {
 	{ "minlevel", evedit_minlevel, OLC_EVENT, OLC_CF_EDITOR },
 	{ "notes", evedit_notes, OLC_EVENT, OLC_CF_EDITOR },
 	{ "ranks", evedit_rankrewards, OLC_EVENT, OLC_CF_EDITOR },
+	{ "rankrewards", evedit_rankrewards, OLC_EVENT, OLC_CF_EDITOR },
 	{ "repeat", evedit_repeat, OLC_EVENT, OLC_CF_EDITOR },
 	{ "thresholds", evedit_thresholdrewards, OLC_EVENT, OLC_CF_EDITOR },
+	{ "thresholdrewards", evedit_thresholdrewards, OLC_EVENT, OLC_CF_EDITOR },
 	
 	// faction commands
 	{ "description", fedit_description, OLC_FACTION, OLC_CF_EDITOR },

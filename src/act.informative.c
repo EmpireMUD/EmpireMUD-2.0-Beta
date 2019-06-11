@@ -911,7 +911,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
 			msg_to_char(ch, "*");
 		}
-		msg_to_char(ch, "%s\r\n", MORPH_LONG_DESC(GET_MORPH(i)));
+		msg_to_char(ch, "%s\r\n", get_morph_desc(i, TRUE));
 	}
 	else if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
@@ -2043,7 +2043,7 @@ ACMD(do_affects) {
 
 	/* Morph */
 	if (IS_MORPHED(ch)) {
-		msg_to_char(ch, "   You are in the form of %s!\r\n", MORPH_SHORT_DESC(GET_MORPH(ch)));
+		msg_to_char(ch, "   You are in the form of %s!\r\n", get_morph_desc(ch, FALSE));
 	}
 	else if (IS_DISGUISED(ch)) {
 		msg_to_char(ch, "   You are disguised as %s!\r\n", PERS(ch, ch, 0));

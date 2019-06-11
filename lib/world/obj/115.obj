@@ -116,7 +116,7 @@ The blueprints for a statue of an adventurer are here.~
 pick a good spot for it, because the blueprints crumble after the first use.
 You require the Architect ability to build this.
 ~
-3 0 a 2
+3 g a 3
 0 0 0
 0 0
 S
@@ -136,10 +136,10 @@ an adventurer's steed whistle~
 The whistle for an adventurer's steed is lying here.~
 This whistle can be used to summon an adventurer's steed.
 ~
-3 p a 6
+3 p a 7
 11511 0 0
 14 0
-T 10263
+T 9910
 S
 #11512
 whistle pegasus adventurers adventurer's~
@@ -147,10 +147,10 @@ an adventurer's pegasus whistle~
 The whistle for an adventurer's pegasus is lying here.~
 This whistle can be used to summon an adventurer's flying pegasus.
 ~
-3 p a 7
+3 p a 8
 11512 0 0
 14 0
-T 10263
+T 9910
 S
 #11513
 shipment resources small~
@@ -216,5 +216,233 @@ turn out to be plain old snakeskin.
 24 mp ar 2
 1 0 0
 7 0
+S
+#11520
+jars pixy pixie enchanted~
+some enchanted pixy jars~
+Some enchanted pixy jars lie here, empty.~
+   These glass jars have been enchanted to be able to catch and hold even the
+strongest pixy -- if you can get close enough to one. Look around for pixies,
+catch them, and return them to the alchemist to earn points for the Pixy
+Pursuit event.
+To summon your sprite-sniffing hog: &cwhistle hog&0
+To catch a pixy: &ccatch pixy&0
+To turn in pixies and dust for points at the Alchemist: &cexchange&0
+~
+3 p a 9
+0 0 0
+8 0
+Q 11520
+T 11521
+T 11522
+T 11525
+T 11530
+S
+#11521
+dust pixy pixie little piled~
+a little pixy dust~
+A little pixy dust is piled on the ground.~
+   This dust was left by a pixy who was trying to escape at full speed! You can
+'exchange' this pixy dust for Pixy Pursuit event points at an Alchemist. You
+must still have the enchanted pixy jars to make the exchange. If you've lost
+your jars, re-start the Pixy Pursuit quest at the alchemist.
+~
+3 k a 4
+10 0 0
+10 0
+S
+#11522
+jar pixy pixie~
+a pixy in a jar~
+A jar with a pixy inside has been dropped here.~
+   Someone has trapped this poor pixy in a jar! You can 'exchange' this jarred
+pixy for Pixy Pursuit event points at an Alchemist. You must still have the
+enchanted pixy jars to make the exchange. If you've lost your jars, re-start
+the Pixy Pursuit quest at the alchemist.
+~
+3 k a 3
+20 0 0
+8 0
+S
+#11523
+droppings pixy pixie~
+pixy droppings~
+Some pixy droppings are scattered on the ground.~
+   It looks like a pixy has been here recently. On closer inspection, it's
+mostly leaves and berries. Oh well; you'd better look somewhere else for now.
+~
+3 0 0 2
+0 0 0
+0 3
+S
+#11524
+robes flowing iridescent~
+flowing iridescent robes~
+Some flowing iridescent robes have been left here.~
+   These gossamer robes are almost transparent on their own, but are worn in
+layers so that all you can see is a cascade of rainbows as the light twinkles
+off of them.
+~
+2 p ad 7
+0 0 0
+11 0
+A
+5 1 0
+C
+1 1
+M
+12
+$n sparkles in all the colors of the rainbow.~
+M
+12
+$n shimmers iridescently in the light.~
+M
+8
+A rainbow shoots down and engulfs you as you wear $p!~
+M
+9
+A rainbow shoots down and engulfs $n as $e wears $p!~
+M
+12
+$n is here, glowing dimly in all the colors of the rainbow.~
+S
+#11525
+stone talking animal morphing~
+a talking animal morphing stone~
+A talking animal morphing stone is lying here.~
+   This strange little stone allows you to morph into several talking animals,
+if you have the Animal Forms ability.
+You can morph into: talking horse, talking bunny, singing bear
+~
+3 p a 3
+0 0 0
+12 0
+S
+#11526
+rainbow enchanted flying vehicle~
+an enchanted rainbow flying vehicle~
+An enchanted rainbow flying vehicle is here.~
+This rainbow has been enchanted to function almost like a flying carriage!
+~
+3 p a 2
+0 0 0
+10 0
+T 11526
+S
+#11527
+schematic house pixy pixie tiny~
+a tiny pixy house schematic~
+The schematic for a tiny pixy house is lying here.~
+   This fragile piece of magewood bark is enscribed with the instructions for
+building a tiny pixy house. These houses are known to shrink anyone who enters
+them. Be warned, you can only use this schematic a single time.
+Usage: build pixyhouse <direction to face>
+~
+3 g a 2
+0 0 0
+0 0
+S
+#11528
+whistle minipet rainbow firefly~
+a rainbow firefly minipet whistle~
+A rainbow firefly minipet whistle is lying here.~
+This whistle grants you a new mini-pet! Type 'use whistle' to get it.
+~
+19 p a 6
+11528 0 0
+0 0
+S
+#11529
+whistle rainbow beetle mount~
+a rainbow beetle mount whistle~
+The whistle for a rainbow beetle mount is lying here.~
+This whistle can be used to summon a giant rainbow beetle mount.
+~
+3 p a 8
+11529 0 0
+14 0
+T 9910
+S
+#11530
+whistle mount rainbow dragonfly~
+a rainbow dragonfly mount whistle~
+The whistle for a rainbow dragonfly mount is lying here.~
+This whistle can be used to summon a giant rainbow dragonfly flying mount.
+~
+3 p a 10
+11530 0 0
+14 0
+T 9910
+S
+#11531
+shoes pair elf-made elfmade leather~
+elf-made leather shoes~
+A pair of elf-made leather shoes is lying here.~
+   These fine leather shoes appear to have been made by elves, evidenced by the
+tiny stitchwork and near-invisible seams. Elves of this sort are known to make
+shoes for impoverished and overworked shoemakers who make the right sacrifices
+under the new moon.
+~
+2 mp ag 6
+0 0 0
+7 0
+A
+5 1 0
+A
+19 1 0
+A
+11 1 0
+A
+6 2 0
+S
+#11532
+dewdrop drop enchanted~
+an enchanted dewdrop~
+There is an enchanted dewdrop on the ground.~
+   This large drop of dew has been enchanted to hold itself together. You even
+seem to be able to carry it around without it spilling.
+~
+5 p a 7
+224 224 11532
+7 0
+S
+#11533
+bag wishing~
+a wishing bag~
+A wishing bag is lying here.~
+   This appears to be a pixy's wishing bag -- the place where it puts all the
+wishes it hears. You don't have the correct ability to put wishes in the bag,
+but it does look like it would hold a bunch of your stuff.
+~
+24 mp ar 3
+1 0 0
+7 0
+S
+#11534
+dust elf-made elfmade upgrade~
+some elf-made upgrade dust~
+Some elf-made ugprade dust is lying here.~
+   This magical substance is made from pixy dust and dragonfly mucus. It can be
+used to upgrade the elf-made shoes and the wishing bag items.
+Usage: upgrade <item>
+~
+3 p a 2
+0 0 0
+0 0
+T 11534
+S
+#11535
+jar pixy pixie royal~
+a royal pixy in a jar~
+A jar with a royal pixy inside has been left here.~
+   Someone has trapped this poor pixy in a jar! You can 'exchange' this jarred
+pixy for Pixy Pursuit event points at an Alchemist. You must still have the
+enchanted pixy jars to make the exchange. If you've lost your jars, re-start
+the Pixy Pursuit quest at the alchemist.
+   Royal pixies are worth more points.
+~
+3 k a 3
+30 0 0
+8 0
 S
 $

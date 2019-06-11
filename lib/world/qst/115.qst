@@ -132,4 +132,35 @@ Z
 Z
 1 18210
 S
+#11520
+Pixy Pursuit (event)~
+   The Alchemist has lost his supplier for pixy dust, which he needs in order
+to brew many of his critical, life-saving potions. In this treasure hunt event,
+players find and catch pixies for the Alchemist to earn event points. Scour
+the world with a sprite-sniffing hog and bring back as many pixies as you can
+catch. To participate in this event:
+To participate in the event:
+- Type 'whistle hog' to summon your sprite-sniffing hog
+- Pixies will appear as you move around; type 'catch pixy' and then wait a
+  few seconds to complete the catch -- your chances depend on your stats
+- If you're successful, you'll get a pixy in a jar (worth 20+ points); if not
+  you still get some pixy dust (worth 10 points)
+- Return to the Alchemist at any time and type 'exchange' to trade all your
+  pixies and dust for points.
+- If you lose your enchanted pixy jars, drop the Pixy Pursuit quest and then
+  re-start it at the Alchemist.
+- You don't have to complete or turn in this quest. All points come from the
+  'exchange' command.
+~
+The event has ended.
+~
+5 0 0 0 0
+A
+1 231
+P
+36 11520 0 1
+T 11520
+W
+11 0 0 1
+S
 $

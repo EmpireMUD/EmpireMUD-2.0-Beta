@@ -334,7 +334,7 @@ struct time_info_data *mud_time_passed(time_t t2, time_t t1) {
 * @param char_data *vict The person who is seeing them.
 * @param bool real If TRUE, uses real name instead of disguise/morph.
 */
-char *PERS(char_data *ch, char_data *vict, bool real) {
+const char *PERS(char_data *ch, char_data *vict, bool real) {
 	static char output[MAX_INPUT_LENGTH];
 
 	if (!CAN_SEE(vict, ch)) {
@@ -342,7 +342,7 @@ char *PERS(char_data *ch, char_data *vict, bool real) {
 	}
 
 	if (IS_MORPHED(ch) && !real) {
-		return MORPH_SHORT_DESC(GET_MORPH(ch));
+		return get_morph_desc(ch, FALSE);
 	}
 	
 	if (!real && IS_DISGUISED(ch)) {
@@ -3957,12 +3957,12 @@ char *show_color_codes(char *string) {
 *
 * If you want to save the result somewhere, you should str_dup() it
 *
-* @param char *string The original string.
+* @param const char *string The original string.
 */
-const char *skip_filler(char *string) {	
+const char *skip_filler(const char *string) {	
 	static char remainder[MAX_STRING_LENGTH];
 	char temp[MAX_STRING_LENGTH];
-	char *ptr;
+	char *ptr, *ot;
 	int pos = 0;
 	
 	*remainder = '\0';
@@ -3974,7 +3974,9 @@ const char *skip_filler(char *string) {
 	
 	do {
 		string += pos;
-		skip_spaces(&string);
+		ot = (char*)string;	// just to skip_spaces on it, which won't modify the string
+		skip_spaces(&ot);
+		string = ot;
 		
 		if ((ptr = strchr(string, ' '))) {
 			pos = ptr - string;
@@ -4118,12 +4120,12 @@ void ucwords(char *string) {
 * Generic string replacement function: returns a memory-allocated char* with
 * the resulting string.
 *
-* @param char *search The search string ('foo').
-* @param char *replace The replacement string ('bar').
-* @param char *subject The string to alter ('foodefoo').
+* @param const char *search The search string ('foo').
+* @param const char *replace The replacement string ('bar').
+* @param const char *subject The string to alter ('foodefoo').
 * @return char* A pointer to a new string with the replacements ('bardebar').
 */
-char *str_replace(char *search, char *replace, char *subject) {
+char *str_replace(const char *search, const char *replace, const char *subject) {
 	static char output[MAX_STRING_LENGTH];
 	int spos, opos, slen, rlen;
 	

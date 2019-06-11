@@ -30,12 +30,904 @@ an adventurer's pegasus~
 An adventurer's pegasus flaps its wings and whinnies.
 ~
 150 150 dej m 4
-0 0 0 11
+0 0 2 11
 D
    This stunning white pegasus is lightly armored in barding matching the
 empire's banner. The pegasus stretches its wings, rears up on its hind legs,
 and kicks at the air.
 ~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+S
+#11520
+pixy pixie royal~
+the royal pixy~
+A royal pixy is fluttering about.
+~
+100 100 do mG 3
+0 0 18 28
+D
+   This little pixy is the size of a mouse, and wearing a crown of dandelion
+petals.
+~
+M
+0
+$n sees you and attempts to flee!~
+M
+1
+Whatcha lookin' at, shorty?~
+M
+0
+$n tries to hex you, but the hex is so tiny that it barely itches!~
+M
+1
+I can survive this with a little faith, trust, and pixy dust.~
+M
+0
+$n glows majestically.~
+T 11524
+S
+#11521
+pixy pixie colt~
+the pixy colt~
+A pixy in the shape of a colt whips past your ear.
+~
+50 50 do mG 3
+0 0 18 28
+D
+   This pixy has taken on the form of a tiny horse, though it still has
+butterfly wings.
+~
+M
+0
+$n sees you and attempts to flee!~
+M
+0
+$n whinnies as $e attempts to flee!~
+M
+0
+$n charges past you!~
+M
+0
+$n looks at you and says, 'Neigh!'~
+T 11524
+S
+#11522
+pixy pixie mouse little mousy~
+the mousy pixy~
+A little pixy in the shape of a mouse scurries away from you.
+~
+50 50 do mG 3
+0 0 18 28
+D
+   The pixy has taken on the shape of a mouse, although its gossamer wings give
+away its secret.
+~
+M
+0
+$n sees you and attempts to flee!~
+M
+0
+$n squeaks as $e attempts to flee!~
+M
+0
+$n squeaks and tries to hide!~
+T 11524
+S
+#11523
+pixy pixie steam pure steamy~
+the steamy pixy~
+A pixy made of pure steam is trying to evaporate away from you.
+~
+50 50 do mG 3
+0 0 18 28
+D
+   This pixy has turned itself into steam, although it still has the same basic
+size and shape of a pixy. A jar should still be able to hold it.
+~
+M
+0
+$n sees you and attempts to flee!~
+M
+0
+$n evaporates as it attempts to flee!~
+M
+0
+$n vanishes into thin air, only to reappear nearby!~
+M
+0
+$n fumes at you.~
+T 11524
+S
+#11524
+pixy pixie golden~
+the golden pixy~
+A golden pixy shines radiantly above you.
+~
+50 50 do mG 3
+0 0 18 28
+D
+This pixy appears to be made of pure gold, wings and all!
+~
+M
+0
+$n sees you and attempts to flee!~
+M
+0
+$n reflects blinding light at you as $e attempts to flee!~
+M
+0
+The glare reflecting off of $n nearly blinds you!~
+M
+0
+$n poses and pretends to be a tiny statue.~
+T 11524
+S
+#11525
+pixy pixie owl little~
+the pixy owl~
+A little pixy in the shape of an owl is perched here.
+~
+50 50 do mG 3
+0 0 18 28
+D
+   This pixy has taken the shape of an owl, but its disguise is given away by
+its butterfly wings.
+~
+M
+0
+$n sees you and attempts to flee!~
+M
+0
+$n hoots wildly as $e attempts to flee!~
+M
+0
+$n hoots.~
+M
+0
+$n looks around and says, 'Hoo?'~
+T 11524
+S
+#11526
+pixy pixie fox~
+the pixy fox~
+A pixy in the shape of a fox is running from you.
+~
+50 50 do mG 3
+0 0 18 28
+D
+   This pixy has taken the shape of a fox, although it's far too small to be a
+real fox. The butterfly wings also give it away.
+~
+M
+0
+$n sees you and attempts to flee!~
+M
+0
+$n chases $s tail in circles.~
+M
+0
+$n barks at you and attempts to flee!~
+M
+0
+$n takes a leap and flutters up into the air.~
+M
+0
+$n yips.~
+T 11524
+S
+#11527
+hog sprite-sniffing sniffing~
+a sprite-sniffing hog~
+A hog is rooting around, sniffing for sprites.
+~
+40 40 bdoF nGJ 3
+0 0 14 9
+D
+   This old sow has been raised on a strict diet of only pixies, fairies, and
+gnomes. It's adept at rooting them out. This is part of the Pixy Pursuit event.
+You can 'dismiss' the hog at any time.
+~
+T 11523
+T 9901
+S
+#11528
+firefly tiny rainbow~
+a tiny rainbow firefly~
+There's a tiny firefly here.
+~
+1 1 bdoD mn 1
+0 0 2 15
+D
+   The little firefly seems friendly and puts on a show in every color of the
+rainbow.
+~
+M
+0
+$n flashes red, red, red.~
+M
+0
+$n flashes red, red, orange.~
+M
+0
+$n flashes red, red, yellow.~
+M
+0
+$n flashes red, red, green.~
+M
+0
+$n flashes red, red, blue.~
+M
+0
+$n flashes red, red, violet.~
+M
+0
+$n flashes red, orange, red.~
+M
+0
+$n flashes red, orange, orange.~
+M
+0
+$n flashes red, orange, yellow.~
+M
+0
+$n flashes red, orange, green.~
+M
+0
+$n flashes red, orange, blue.~
+M
+0
+$n flashes red, orange, violet.~
+M
+0
+$n flashes red, yellow, red.~
+M
+0
+$n flashes red, yellow, orange.~
+M
+0
+$n flashes red, yellow, yellow.~
+M
+0
+$n flashes red, yellow, green.~
+M
+0
+$n flashes red, yellow, blue.~
+M
+0
+$n flashes red, yellow, violet.~
+M
+0
+$n flashes red, green, red.~
+M
+0
+$n flashes red, green, orange.~
+M
+0
+$n flashes red, green, yellow.~
+M
+0
+$n flashes red, green, green.~
+M
+0
+$n flashes red, green, blue.~
+M
+0
+$n flashes red, green, violet.~
+M
+0
+$n flashes red, blue, red.~
+M
+0
+$n flashes red, blue, orange.~
+M
+0
+$n flashes red, blue, yellow.~
+M
+0
+$n flashes red, blue, green.~
+M
+0
+$n flashes red, blue, blue.~
+M
+0
+$n flashes red, blue, violet.~
+M
+0
+$n flashes red, violet, red.~
+M
+0
+$n flashes red, violet, orange.~
+M
+0
+$n flashes red, violet, yellow.~
+M
+0
+$n flashes red, violet, green.~
+M
+0
+$n flashes red, violet, blue.~
+M
+0
+$n flashes red, violet, violet.~
+M
+0
+$n flashes orange, red, red.~
+M
+0
+$n flashes orange, red, orange.~
+M
+0
+$n flashes orange, red, yellow.~
+M
+0
+$n flashes orange, red, green.~
+M
+0
+$n flashes orange, red, blue.~
+M
+0
+$n flashes orange, red, violet.~
+M
+0
+$n flashes orange, orange, red.~
+M
+0
+$n flashes orange, orange, orange.~
+M
+0
+$n flashes orange, orange, yellow.~
+M
+0
+$n flashes orange, orange, green.~
+M
+0
+$n flashes orange, orange, blue.~
+M
+0
+$n flashes orange, orange, violet.~
+M
+0
+$n flashes orange, yellow, red.~
+M
+0
+$n flashes orange, yellow, orange.~
+M
+0
+$n flashes orange, yellow, yellow.~
+M
+0
+$n flashes orange, yellow, green.~
+M
+0
+$n flashes orange, yellow, blue.~
+M
+0
+$n flashes orange, yellow, violet.~
+M
+0
+$n flashes orange, green, red.~
+M
+0
+$n flashes orange, green, orange.~
+M
+0
+$n flashes orange, green, yellow.~
+M
+0
+$n flashes orange, green, green.~
+M
+0
+$n flashes orange, green, blue.~
+M
+0
+$n flashes orange, green, violet.~
+M
+0
+$n flashes orange, blue, red.~
+M
+0
+$n flashes orange, blue, orange.~
+M
+0
+$n flashes orange, blue, yellow.~
+M
+0
+$n flashes orange, blue, green.~
+M
+0
+$n flashes orange, blue, blue.~
+M
+0
+$n flashes orange, blue, violet.~
+M
+0
+$n flashes orange, violet, red.~
+M
+0
+$n flashes orange, violet, orange.~
+M
+0
+$n flashes orange, violet, yellow.~
+M
+0
+$n flashes orange, violet, green.~
+M
+0
+$n flashes orange, violet, blue.~
+M
+0
+$n flashes orange, violet, violet.~
+M
+0
+$n flashes yellow, red, red.~
+M
+0
+$n flashes yellow, red, orange.~
+M
+0
+$n flashes yellow, red, yellow.~
+M
+0
+$n flashes yellow, red, green.~
+M
+0
+$n flashes yellow, red, blue.~
+M
+0
+$n flashes yellow, red, violet.~
+M
+0
+$n flashes yellow, orange, red.~
+M
+0
+$n flashes yellow, orange, orange.~
+M
+0
+$n flashes yellow, orange, yellow.~
+M
+0
+$n flashes yellow, orange, green.~
+M
+0
+$n flashes yellow, orange, blue.~
+M
+0
+$n flashes yellow, orange, violet.~
+M
+0
+$n flashes yellow, yellow, red.~
+M
+0
+$n flashes yellow, yellow, orange.~
+M
+0
+$n flashes yellow, yellow, yellow.~
+M
+0
+$n flashes yellow, yellow, green.~
+M
+0
+$n flashes yellow, yellow, blue.~
+M
+0
+$n flashes yellow, yellow, violet.~
+M
+0
+$n flashes yellow, green, red.~
+M
+0
+$n flashes yellow, green, orange.~
+M
+0
+$n flashes yellow, green, yellow.~
+M
+0
+$n flashes yellow, green, green.~
+M
+0
+$n flashes yellow, green, blue.~
+M
+0
+$n flashes yellow, green, violet.~
+M
+0
+$n flashes yellow, blue, red.~
+M
+0
+$n flashes yellow, blue, orange.~
+M
+0
+$n flashes yellow, blue, yellow.~
+M
+0
+$n flashes yellow, blue, green.~
+M
+0
+$n flashes yellow, blue, blue.~
+M
+0
+$n flashes yellow, blue, violet.~
+M
+0
+$n flashes yellow, violet, red.~
+M
+0
+$n flashes yellow, violet, orange.~
+M
+0
+$n flashes yellow, violet, yellow.~
+M
+0
+$n flashes yellow, violet, green.~
+M
+0
+$n flashes yellow, violet, blue.~
+M
+0
+$n flashes yellow, violet, violet.~
+M
+0
+$n flashes green, red, red.~
+M
+0
+$n flashes green, red, orange.~
+M
+0
+$n flashes green, red, yellow.~
+M
+0
+$n flashes green, red, green.~
+M
+0
+$n flashes green, red, blue.~
+M
+0
+$n flashes green, red, violet.~
+M
+0
+$n flashes green, orange, red.~
+M
+0
+$n flashes green, orange, orange.~
+M
+0
+$n flashes green, orange, yellow.~
+M
+0
+$n flashes green, orange, green.~
+M
+0
+$n flashes green, orange, blue.~
+M
+0
+$n flashes green, orange, violet.~
+M
+0
+$n flashes green, yellow, red.~
+M
+0
+$n flashes green, yellow, orange.~
+M
+0
+$n flashes green, yellow, yellow.~
+M
+0
+$n flashes green, yellow, green.~
+M
+0
+$n flashes green, yellow, blue.~
+M
+0
+$n flashes green, yellow, violet.~
+M
+0
+$n flashes green, green, red.~
+M
+0
+$n flashes green, green, orange.~
+M
+0
+$n flashes green, green, yellow.~
+M
+0
+$n flashes green, green, green.~
+M
+0
+$n flashes green, green, blue.~
+M
+0
+$n flashes green, green, violet.~
+M
+0
+$n flashes green, blue, red.~
+M
+0
+$n flashes green, blue, orange.~
+M
+0
+$n flashes green, blue, yellow.~
+M
+0
+$n flashes green, blue, green.~
+M
+0
+$n flashes green, blue, blue.~
+M
+0
+$n flashes green, blue, violet.~
+M
+0
+$n flashes green, violet, red.~
+M
+0
+$n flashes green, violet, orange.~
+M
+0
+$n flashes green, violet, yellow.~
+M
+0
+$n flashes green, violet, green.~
+M
+0
+$n flashes green, violet, blue.~
+M
+0
+$n flashes green, violet, violet.~
+M
+0
+$n flashes blue, red, red.~
+M
+0
+$n flashes blue, red, orange.~
+M
+0
+$n flashes blue, red, yellow.~
+M
+0
+$n flashes blue, red, green.~
+M
+0
+$n flashes blue, red, blue.~
+M
+0
+$n flashes blue, red, violet.~
+M
+0
+$n flashes blue, orange, red.~
+M
+0
+$n flashes blue, orange, orange.~
+M
+0
+$n flashes blue, orange, yellow.~
+M
+0
+$n flashes blue, orange, green.~
+M
+0
+$n flashes blue, orange, blue.~
+M
+0
+$n flashes blue, orange, violet.~
+M
+0
+$n flashes blue, yellow, red.~
+M
+0
+$n flashes blue, yellow, orange.~
+M
+0
+$n flashes blue, yellow, yellow.~
+M
+0
+$n flashes blue, yellow, green.~
+M
+0
+$n flashes blue, yellow, blue.~
+M
+0
+$n flashes blue, yellow, violet.~
+M
+0
+$n flashes blue, green, red.~
+M
+0
+$n flashes blue, green, orange.~
+M
+0
+$n flashes blue, green, yellow.~
+M
+0
+$n flashes blue, green, green.~
+M
+0
+$n flashes blue, green, blue.~
+M
+0
+$n flashes blue, green, violet.~
+M
+0
+$n flashes blue, blue, red.~
+M
+0
+$n flashes blue, blue, orange.~
+M
+0
+$n flashes blue, blue, yellow.~
+M
+0
+$n flashes blue, blue, green.~
+M
+0
+$n flashes blue, blue, blue.~
+M
+0
+$n flashes blue, blue, violet.~
+M
+0
+$n flashes blue, violet, red.~
+M
+0
+$n flashes blue, violet, orange.~
+M
+0
+$n flashes blue, violet, yellow.~
+M
+0
+$n flashes blue, violet, green.~
+M
+0
+$n flashes blue, violet, blue.~
+M
+0
+$n flashes blue, violet, violet.~
+M
+0
+$n flashes violet, red, red.~
+M
+0
+$n flashes violet, red, orange.~
+M
+0
+$n flashes violet, red, yellow.~
+M
+0
+$n flashes violet, red, green.~
+M
+0
+$n flashes violet, red, blue.~
+M
+0
+$n flashes violet, red, violet.~
+M
+0
+$n flashes violet, orange, red.~
+M
+0
+$n flashes violet, orange, orange.~
+M
+0
+$n flashes violet, orange, yellow.~
+M
+0
+$n flashes violet, orange, green.~
+M
+0
+$n flashes violet, orange, blue.~
+M
+0
+$n flashes violet, orange, violet.~
+M
+0
+$n flashes violet, yellow, red.~
+M
+0
+$n flashes violet, yellow, orange.~
+M
+0
+$n flashes violet, yellow, yellow.~
+M
+0
+$n flashes violet, yellow, green.~
+M
+0
+$n flashes violet, yellow, blue.~
+M
+0
+$n flashes violet, yellow, violet.~
+M
+0
+$n flashes violet, green, red.~
+M
+0
+$n flashes violet, green, orange.~
+M
+0
+$n flashes violet, green, yellow.~
+M
+0
+$n flashes violet, green, green.~
+M
+0
+$n flashes violet, green, blue.~
+M
+0
+$n flashes violet, green, violet.~
+M
+0
+$n flashes violet, blue, red.~
+M
+0
+$n flashes violet, blue, orange.~
+M
+0
+$n flashes violet, blue, yellow.~
+M
+0
+$n flashes violet, blue, green.~
+M
+0
+$n flashes violet, blue, blue.~
+M
+0
+$n flashes violet, blue, violet.~
+M
+0
+$n flashes violet, violet, red.~
+M
+0
+$n flashes violet, violet, orange.~
+M
+0
+$n flashes violet, violet, yellow.~
+M
+0
+$n flashes violet, violet, green.~
+M
+0
+$n flashes violet, violet, blue.~
+M
+0
+$n flashes violet, violet, violet.~
+S
+#11529
+beetle rainbow giant~
+a giant rainbow beetle~
+A giant rainbow beetle is roaming around.
+~
+100 100 dej G 4
+0 0 0 27
+D
+   This enormous beetle is nearly the size of a horse and its smooth, black
+carapace reflects every color of the rainbow when it catches the light. Its
+back forms a natural saddle, and it's easily big enough to ride.
+~
+S
+#11530
+dragonfly rainbow giant~
+a giant rainbow dragonfly~
+A giant rainbow dragonfly has landed near you.
+~
+150 150 dej mG 4
+0 0 2 9
+D
+   This stunning creature is almost as large as a horse, with a wingspan the
+size of a house. Its long, thin carapace forms a natural saddle in front of the
+wings. As you move around the dragonfly, its smooth black carapace reflects
+light in every color of the rainbow.
+~
+S
+#11531
+moth giant~
+a giant moth~
+A giant moth flutters nearby!
+~
+75 100 bdjo cG 1
+0 0 2 9
+D
+   This looks like an ordinary little white moth, except it's MUCH larger than
+you!
+~
+T 9198
 S
 $

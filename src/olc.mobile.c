@@ -1204,7 +1204,8 @@ char_data *setup_olc_mobile(char_data *input) {
 void olc_show_mobile(char_data *ch) {
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
-
+	
+	char buf[MAX_STRING_LENGTH * 4];	// these get long
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	struct custom_message *mcm;
 	int count;
