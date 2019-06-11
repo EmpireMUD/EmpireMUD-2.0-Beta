@@ -11,7 +11,7 @@ proven that the pen is mightier -- that's what really matters.
    This is a test event that just uses a 'click' action on object 11500. The
 only way to acquire the item is by loading it.
 ~
-9 0 0 0 0 1 -1
+10 0 a 0 0 1 -1
 R 1 1 2 125 1
 R 2 3 2 100 1
 R 4 10 2 121 1

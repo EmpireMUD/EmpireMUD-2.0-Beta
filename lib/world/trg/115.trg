@@ -324,9 +324,8 @@ end
 * Okay, the alchemist is valid, now look for items to turn in
 set value 0
 set item %actor.inventory%
-while %item% && !%overflow%
-  set next_item %item.next_content%
-  
+while %item%
+  set next_item %item.next_in_list%
   if %item.vnum% == 11521 || %item.vnum% == 11522 || %item.vnum% == 11535
     eval value %value% + %item.val0%
     %purge% %item%
