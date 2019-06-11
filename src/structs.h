@@ -4659,6 +4659,7 @@ struct player_event_data {
 	int collected_points;	// the highest threshold reward collected by the player
 	int rank;	// last recorded rank
 	int status;	// what state the event is in
+	int level;	// best-recorded player level during the event
 	
 	UT_hash_handle hh;	// hash handle for GET_EVENT_DATA(ch)
 };

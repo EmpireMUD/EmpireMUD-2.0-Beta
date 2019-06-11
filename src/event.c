@@ -501,6 +501,9 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		return 0;	// cannot get/create an event data entry
 	}
 	
+	if (GET_HIGHEST_KNOWN_LEVEL(ch) > ped->level) {
+		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
+	}
 	SAFE_ADD(ped->points, points, 0, INT_MAX, FALSE);
 	update_player_leaderboard(ch, running, ped);
 	
@@ -560,6 +563,9 @@ void set_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		return;	// cannot get/create an event data entry
 	}
 	
+	if (GET_HIGHEST_KNOWN_LEVEL(ch) > ped->level) {
+		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
+	}
 	ped->points = points;
 	update_player_leaderboard(ch, running, ped);
 }
