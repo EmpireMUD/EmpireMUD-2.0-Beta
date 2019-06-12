@@ -718,9 +718,9 @@ Typing 'events' by itself lists any events that are currently running, or you
 can type 'event <name>' to see info on an event.
 
 You can also use the following event commands:
- &ccollect&0 - Collect all your pending event rewards.
-   Tip: Wear your best gear before collecting, because some rewards might be
-   scaled to your level. Collect at home in case they fill your inventory.
+ &ccollect&0 - Collect all your pending event rewards. Note: Rewards will be
+   scaled to the highest level your character attained while gaining event
+   points, not your current level when collecting.
  &clb <event>&0 - View the leaderboard for a current or past event.
  &crecent&0 - Shows recently-ended events.
  &crewards <event>&0 - View the list of rewards for an event.
