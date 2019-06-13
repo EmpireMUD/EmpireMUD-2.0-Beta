@@ -501,6 +501,9 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		return 0;	// cannot get/create an event data entry
 	}
 	
+	if (GET_HIGHEST_KNOWN_LEVEL(ch) > ped->level) {
+		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
+	}
 	SAFE_ADD(ped->points, points, 0, INT_MAX, FALSE);
 	update_player_leaderboard(ch, running, ped);
 	
@@ -560,6 +563,9 @@ void set_event_points(char_data *ch, any_vnum event_vnum, int points) {
 		return;	// cannot get/create an event data entry
 	}
 	
+	if (GET_HIGHEST_KNOWN_LEVEL(ch) > ped->level) {
+		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
+	}
 	ped->points = points;
 	update_player_leaderboard(ch, running, ped);
 }
@@ -2946,7 +2952,7 @@ EVENT_CMD(evcmd_cancel) {
 EVENT_CMD(evcmd_collect) {
 	void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
 	
-	int level, base_level = get_approximate_level(ch);
+	int level;
 	struct player_event_data *ped, *next_ped;
 	struct event_reward *reward;
 	struct quest_reward qr;
@@ -2981,8 +2987,8 @@ EVENT_CMD(evcmd_collect) {
 			continue;	// no work for fully-collected events
 		}
 		
-		// determine reward level
-		level = base_level;
+		// determine reward level (if no level was recorded, use their current one
+		level = ped->level ? ped->level : GET_HIGHEST_KNOWN_LEVEL(ch);
 		if (EVT_MIN_LEVEL(ped->event) > 0) {
 			level = MAX(level, EVT_MIN_LEVEL(ped->event));
 		}
@@ -2998,7 +3004,7 @@ EVENT_CMD(evcmd_collect) {
 				// show header
 				if (!header) {
 					header = TRUE,
-					msg_to_char(ch, "You collect threshold rewards for %s (%d point%s):\r\n", EVT_NAME(ped->event), ped->points, PLURAL(ped->points));
+					msg_to_char(ch, "You collect threshold rewards for %s (%d point%s, level %d):\r\n", EVT_NAME(ped->event), ped->points, PLURAL(ped->points), level);
 				}
 				
 				ped->collected_points = reward->min;	// update highest collection
@@ -3023,7 +3029,7 @@ EVENT_CMD(evcmd_collect) {
 					// show header
 					if (!header) {
 						header = TRUE,
-						msg_to_char(ch, "You collect rank rewards for %s (rank %d):\r\n", EVT_NAME(ped->event), ped->rank);
+						msg_to_char(ch, "You collect rank rewards for %s (rank %d, level %d):\r\n", EVT_NAME(ped->event), ped->rank, level);
 					}
 					
 					// copy helper data to use quest rewards

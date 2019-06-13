@@ -1157,7 +1157,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_ability_data *abildata;
 	struct player_automessage *automsg;
 	struct player_skill_data *skdata;
-	int length, i_in[7], iter, num;
+	int length, i_in[7], iter, num, val;
 	struct player_event_data *ped;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
@@ -1544,13 +1544,15 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "Event:", length)) {
-					if (sscanf(line + length + 1, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3], &i_in[4], &i_in[5]) == 7) {
+					// last arg (level) is optional, for backwards-compatibility
+					if ((val = sscanf(line + length + 1, "%d %d %ld %d %d %d %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6])) >= 7) {
 						if ((ped = create_event_data(ch, i_in[0], i_in[1]))) {
 							ped->timestamp = l_in[0];
 							ped->points = i_in[2];
 							ped->collected_points = i_in[3];
 							ped->rank = i_in[4];
 							ped->status = i_in[5];
+							ped->level = (val == 8) ? i_in[6] : 0;	// backwards-compatibility
 						}
 					}
 				}
@@ -2750,7 +2752,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
 		if (ped->event) {
-			fprintf(fl, "Event: %d %d %ld %d %d %d %d\n", ped->id, EVT_VNUM(ped->event), ped->timestamp, ped->points, ped->collected_points, ped->rank, ped->status);
+			fprintf(fl, "Event: %d %d %ld %d %d %d %d %d\n", ped->id, EVT_VNUM(ped->event), ped->timestamp, ped->points, ped->collected_points, ped->rank, ped->status, ped->level);
 		}
 	}
 	
