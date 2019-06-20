@@ -1410,14 +1410,6 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 			add_trigger(SCRIPT(room), trig, -1);
 		}
 		
-		// remove instance flags AFTER the script
-		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
-		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
-	
-		// and the home room
-		REMOVE_BIT(ROOM_BASE_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
-		REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
-		
 		// run scripts
 		adventure_cleanup_wtrigger(room);
 		
@@ -1436,12 +1428,22 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 			}
 		}
 	}
+		
+	// remove instance flags AFTER the script
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
+	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
+
+	// and the home room
+	REMOVE_BIT(ROOM_BASE_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
+	REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
 	
 	// exits to it will be cleaned up by delete_room
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
 		if (ROOM_PEOPLE(room)) {
 			act("The adventure vanishes around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
+		
+		// and remove the building
 		disassociate_building(room);
 	}
 }
