@@ -1080,6 +1080,12 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	room_data *room, *extraction_room;
 	int iter;
 	
+	if (inst->cleanup) {
+		return;	// can't run it on one that's already in cleanup
+	}
+	
+	inst->cleanup = TRUE;	// instance is mid-cleanup -- do not clean up a second time
+	
 	// disable instance saving
 	instance_save_wait = TRUE;
 	
