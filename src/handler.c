@@ -679,6 +679,8 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	affected_alloc->next = ROOM_AFFECTS(room);
 	ROOM_AFFECTS(room) = affected_alloc;
 	
+	affected_alloc->expire_event = NULL;	// cannot have an event in the copied af at this point
+	
 	SET_BIT(ROOM_AFF_FLAGS(room), affected_alloc->bitvector);
 	schedule_room_affect_expire(room, affected_alloc);
 	
