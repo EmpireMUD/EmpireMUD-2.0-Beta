@@ -602,6 +602,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 	
 	if (af->expire_event) {
 		dg_event_cancel(af->expire_event, cancel_room_expire_event);
+		af->expire_event = NULL;
 	}
 	
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
@@ -1019,13 +1020,22 @@ bool room_affected_by_spell(room_data *room, any_vnum type) {
 void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 	struct room_expire_event_data *expire_data;
 	
-	if (!af->expire_event && af->duration != UNLIMITED) {
+	// check for and remove old event
+	if (af->expire_event) {
+		dg_event_cancel(af->expire_event, cancel_room_expire_event);
+		af->expire_event = NULL;
+	}
+	
+	if (af->duration != UNLIMITED) {
 		// create the event
 		CREATE(expire_data, struct room_expire_event_data, 1);
 		expire_data->room = room;
 		expire_data->affect = af;
 		
 		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
+	}
+	else {
+		af->expire_event = NULL;	// ensure null
 	}
 }
 
