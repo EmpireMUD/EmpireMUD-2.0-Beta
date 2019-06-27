@@ -1349,11 +1349,7 @@ You can use the "workforce copy" command to copy the workforce limit
 configuration of another island into the island you are currently in. Using
 "workforce keep" lets you prevent some or all of the item from being used.
 
-Note: Your workforce will only do chores if your empire has less than a certain
-amount of the resource provided by the chore. This amount is 100 per member,
-plus any additional workforce cap provided by progression goals. This does not
-apply to dismantling. Workers on each island will still collect a small amount
-of each resource if your empire is over the cap globally.
+Note: Your workforce will only produce resources up to your workforce cap.
 
 See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptions.
 
@@ -1364,10 +1360,18 @@ See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
 
 Workforce will only gather resources up to a certain limit. Workers will not
 work chores that would give you more of an item than that cap. You can see your
-workforce caps on your empire detail.
+current workforce cap on your empire detail page.
 
 You can set your own caps on chores by choosing a limit with the 'workforce'
 command.
+
+The maximum workforce cap is 100 per member, plus any additional amount earned
+from progression goals. This is a global cap, but workers on each of your
+islands will produce up to 25 of something, even if you're above the global
+cap.
+
+The workforce cap does not apply to dismantling buildings -- workers can still
+dismantle and store the resources.
 
 See also: WORKFORCE
 #
