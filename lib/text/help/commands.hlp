@@ -1089,7 +1089,7 @@ contents).
 
 See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP
 #
-JUNK
+JUNK "JUNK ITEM" "JUNK OBJECT"
 
 Usage:  junk <object>
         junk <number> [empire] coins
@@ -1105,6 +1105,9 @@ Examples:
 
   > junk cup
   > junk all.bronze
+
+Were you looking for the 'JUNK' item flag? This indicates an item that cannot
+be stored anywhere. It will disappear if left on the ground too long.
 
 See also: COINS, DROP
 #
