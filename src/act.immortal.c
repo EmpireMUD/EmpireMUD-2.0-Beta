@@ -4846,7 +4846,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	}
 
 	if (!is_proto) {
-		sprintf(buf, "Carried items: %d; ", IS_CARRYING_N(k));
+		sprintf(buf, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
 		for (i = 0, j = k->carrying; j; j = j->next_content, i++);
 		sprintf(buf + strlen(buf), "Items in: inventory: %d, ", i);
 
