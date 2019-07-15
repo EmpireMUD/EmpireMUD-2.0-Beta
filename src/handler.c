@@ -2193,9 +2193,10 @@ double exchange_rate(empire_data *from, empire_data *to) {
 * @param empire_data **emp_found A place to store the found empire id, if any.
 * @param int *amount_found The numerical argument.
 * @param bool assume_coins If TRUE, the word "coins" can be omitted.
+* @param bool *gave_coin_type Optional: A variable to bind whether or not the person typed a coin type ("10 misc coins" instead of "10 coins")
 * @return char* A pointer to the remaining argument (or the full argument, if no coins).
 */
-char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool assume_coins) {
+char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool assume_coins, bool *gave_coin_type) {
 	char arg[MAX_INPUT_LENGTH];
 	char *pos, *final;
 	int amt;
@@ -2203,6 +2204,9 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 	// clear immediately
 	*emp_found = NULL;
 	*amount_found = 0;
+	if (gave_coin_type) {
+		*gave_coin_type = FALSE;
+	}
 	
 	// quick check: prevent work
 	if (!assume_coins && !strstr(input, "coin")) {
@@ -2226,6 +2230,9 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 		// no empire arg but we're done
 		*amount_found = amt;
 		*emp_found = REAL_OTHER_COIN;
+		if (gave_coin_type) {
+			*gave_coin_type = FALSE;
+		}
 		return pos;
 	}
 	
@@ -2237,6 +2244,11 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 			// no match -- no success
 			return input;
 		}
+	}
+	
+	// at this point they must have specified a type
+	if (gave_coin_type) {
+		*gave_coin_type = TRUE;
 	}
 	
 	// still here? then they provided number and empire; check that the next arg is coins

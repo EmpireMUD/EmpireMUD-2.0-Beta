@@ -3698,7 +3698,7 @@ ACMD(do_deposit) {
 		// real members only
 		msg_to_char(ch, "You don't have permission to deposit coins here.\r\n");
 	}
-	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE) == argument || coin_amt < 1) {
+	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, NULL) == argument || coin_amt < 1) {
 		msg_to_char(ch, "Usage: deposit <number> [type] coins\r\n");
 	}
 	else if (!(coin = find_coin_entry(GET_PLAYER_COINS(ch), coin_emp)) || coin->amount < coin_amt) {
@@ -6948,6 +6948,7 @@ ACMD(do_workforce) {
 
 ACMD(do_withdraw) {
 	empire_data *emp, *coin_emp;
+	bool gave_type;
 	int coin_amt;
 	
 	if (IS_NPC(ch)) {
@@ -6972,11 +6973,11 @@ ACMD(do_withdraw) {
 		// real members only
 		msg_to_char(ch, "You don't have permission to withdraw coins here.\r\n");
 	}
-	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE) == argument || coin_amt < 1) {
+	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, &gave_type) == argument || coin_amt < 1) {
 		msg_to_char(ch, "Usage: withdraw <number> coins\r\n");
 	}
-	else if (coin_emp != NULL && coin_emp != emp) {
-		// player typed a coin type that didn't match -- ignore OTHER because it likely means they typed no empire arg
+	else if ((coin_emp != emp && coin_emp != NULL) || (coin_emp == NULL && gave_type)) {
+		// player typed a coin type that didn't match -- but allow no-type
 		msg_to_char(ch, "Only %s coins are stored here.\r\n", EMPIRE_ADJECTIVE(emp));
 	}
 	else if (EMPIRE_COINS(emp) < coin_amt) {
