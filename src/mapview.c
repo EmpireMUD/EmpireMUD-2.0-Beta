@@ -1005,21 +1005,26 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		if (ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC)) {
 			msg_to_char(ch, " (public)");
 		}
-		if (emp == GET_LOYALTY(ch) && ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_NO_DISMANTLE)) {
+		if (emp == GET_LOYALTY(ch) && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_NO_DISMANTLE)) {
 			msg_to_char(ch, " (no-dismantle)");
 		}
 		
 		msg_to_char(ch, "\r\n");
+		
+		// owned but not in-city?
+		if ((ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) || HAS_FUNCTION(room, FNC_IN_CITY_ONLY)) && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
+			msg_to_char(ch, "\trThis building need to be in an established city.\t0\r\n");
+		}
 	}
-	else if (!emp && ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_NO_DISMANTLE)) {
+	else if (!emp && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_NO_DISMANTLE)) {
 		// show no-dismantle anyway
 		msg_to_char(ch, "This area is (no-dismantle).\r\n");
 	}
 	
-	if (ROOM_PAINT_COLOR(IN_ROOM(ch))) {
-		strcpy(col_buf, paint_names[ROOM_PAINT_COLOR(IN_ROOM(ch))]);
+	if (ROOM_PAINT_COLOR(room)) {
+		strcpy(col_buf, paint_names[ROOM_PAINT_COLOR(room)]);
 		*col_buf = LOWER(*col_buf);
-		msg_to_char(ch, "The building has been painted %s%s.\r\n", (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
+		msg_to_char(ch, "The building has been painted %s%s.\r\n", (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
 	}
 	
 	if (emp && GET_LOYALTY(ch) == emp && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
