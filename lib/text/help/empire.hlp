@@ -1323,7 +1323,7 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce copy <island name>
         workforce keep [number | all] <item name>
 
-Once at least one member of an empire has the Workforce reward, the empire's
+Once your empire has purchased the Workforce progress reward, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
 enable or disable each specific task using the "workforce" command. The work-
 force is generally much slower than a player would be at the same task. Most
