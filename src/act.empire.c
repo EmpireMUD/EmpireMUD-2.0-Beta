@@ -1874,7 +1874,8 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 	if (is_own) {
 		used = count_city_points_used(emp);
 		points = city_points_available(emp);
-		msg_to_char(ch, "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+		snprintf(buf, sizeof(buf), "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+		msg_to_char(ch, "%s", CAP(buf));
 	}
 	else {
 		msg_to_char(ch, "Known cities for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
