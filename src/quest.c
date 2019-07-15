@@ -2042,6 +2042,40 @@ struct player_quest *is_on_quest(char_data *ch, any_vnum quest) {
 }
 
 
+/**
+* Used to determine if the character is on a quest with the given name, e.g.
+* to give a better error message when they try to start/drop a quest. Prefers
+* an exact match
+*
+* @param char_data *ch The person to check.
+* @param char *argument What was typed.
+* @return struct player_quest* The player's quest data if on the quest, NULL (FALSE) if not.
+*/
+struct player_quest *is_on_quest_by_name(char_data *ch, char *argument) {
+	struct player_quest *pq, *abbrev = NULL;
+	quest_data *quest;
+	
+	if (IS_NPC(ch) || !*argument) {
+		return NULL;	// shortcut
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		if (!(quest = quest_proto(pq->vnum))) {
+			continue;	// missing data
+		}
+		
+		if (!str_cmp(argument, QUEST_NAME(quest))) {
+			return pq; // exact match
+		}
+		else if (!abbrev && is_multiword_abbrev(argument, QUEST_NAME(quest))) {
+			abbrev = pq;
+		}
+	}
+	
+	return abbrev;	// if any
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// QUEST TRACKERS //////////////////////////////////////////////////////////
 
