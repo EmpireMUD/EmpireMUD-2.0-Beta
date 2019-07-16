@@ -4564,7 +4564,7 @@ ACMD(do_drop) {
 	}
 	
 	// drop coins?
-	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, FALSE)) > argument && coin_amt > 0) {
+	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, FALSE, NULL)) > argument && coin_amt > 0) {
 		perform_drop_coins(ch, coin_emp, coin_amt, mode);
 		return;
 	}
@@ -4899,7 +4899,7 @@ ACMD(do_exchange) {
 	else if (!*arg) {
 		msg_to_char(ch, "Exchange what for coins?\r\n");
 	}
-	else if ((pos = find_coin_arg(argument, &coin_emp, &amount, FALSE)) > argument && amount > 0) {
+	else if ((pos = find_coin_arg(argument, &coin_emp, &amount, FALSE, NULL)) > argument && amount > 0) {
 		// exchanging coins
 		if (!(coin = find_coin_entry(GET_PLAYER_COINS(ch), coin_emp))) {
 			msg_to_char(ch, "You don't have any %s coins.\r\n", (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "of those"));
@@ -5096,7 +5096,7 @@ ACMD(do_give) {
 	bool any = FALSE;
 	
 	// give coins?
-	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, FALSE)) > argument && coin_amt > 0) {
+	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, FALSE, NULL)) > argument && coin_amt > 0) {
 		argument = one_argument(argpos, arg);
 		if ((vict = give_find_vict(ch, arg))) {
 			perform_give_coins(ch, vict, coin_emp, coin_amt);
@@ -6477,7 +6477,7 @@ ACMD(do_split) {
 	}
 
 	// parse args
-	pos = find_coin_arg(argument, &coin_emp, &coin_amt, TRUE);
+	pos = find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, NULL);
 	
 	if (!*argument || pos == argument || coin_amt <= 0) {
 		msg_to_char(ch, "Usage: split <amount> <type> coins\r\n");

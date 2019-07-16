@@ -1298,7 +1298,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		}
 		
 		// main body
-		msg_to_char(to, "  &r%s&0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(to, "   &r%s&0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 }
 
@@ -1379,6 +1379,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 * @return bool TRUE if any items were shown at all, otherwise FALSE
 */
 bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) {
+	char buf[MAX_STRING_LENGTH];
 	bool found = FALSE;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *eisle;
@@ -1399,7 +1400,9 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 		if ((proto = store->proto)) {
 			if (obj_can_be_retrieved(proto, room)) {
 				if (!found) {
-					msg_to_char(ch, "\r\n%s inventory available here:\r\n", EMPIRE_ADJECTIVE(emp));
+					snprintf(buf, sizeof(buf), "\r\n%s inventory available here:\r\n", EMPIRE_ADJECTIVE(emp));
+					CAP(buf + 2);
+					msg_to_char(ch, "%s", buf);
 				}
 				
 				show_one_stored_item_to_char(ch, emp, store, FALSE);

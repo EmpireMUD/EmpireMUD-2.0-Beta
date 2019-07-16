@@ -602,6 +602,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 	
 	if (af->expire_event) {
 		dg_event_cancel(af->expire_event, cancel_room_expire_event);
+		af->expire_event = NULL;
 	}
 	
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
@@ -677,6 +678,8 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	*affected_alloc = *af;
 	affected_alloc->next = ROOM_AFFECTS(room);
 	ROOM_AFFECTS(room) = affected_alloc;
+	
+	affected_alloc->expire_event = NULL;	// cannot have an event in the copied af at this point
 	
 	SET_BIT(ROOM_AFF_FLAGS(room), affected_alloc->bitvector);
 	schedule_room_affect_expire(room, affected_alloc);
@@ -1019,13 +1022,22 @@ bool room_affected_by_spell(room_data *room, any_vnum type) {
 void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 	struct room_expire_event_data *expire_data;
 	
-	if (!af->expire_event && af->duration != UNLIMITED) {
+	// check for and remove old event
+	if (af->expire_event) {
+		dg_event_cancel(af->expire_event, cancel_room_expire_event);
+		af->expire_event = NULL;
+	}
+	
+	if (af->duration != UNLIMITED) {
 		// create the event
 		CREATE(expire_data, struct room_expire_event_data, 1);
 		expire_data->room = room;
 		expire_data->affect = af;
 		
 		af->expire_event = dg_event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
+	}
+	else {
+		af->expire_event = NULL;	// ensure null
 	}
 }
 
@@ -2181,9 +2193,10 @@ double exchange_rate(empire_data *from, empire_data *to) {
 * @param empire_data **emp_found A place to store the found empire id, if any.
 * @param int *amount_found The numerical argument.
 * @param bool assume_coins If TRUE, the word "coins" can be omitted.
+* @param bool *gave_coin_type Optional: A variable to bind whether or not the person typed a coin type ("10 misc coins" instead of "10 coins")
 * @return char* A pointer to the remaining argument (or the full argument, if no coins).
 */
-char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool assume_coins) {
+char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool assume_coins, bool *gave_coin_type) {
 	char arg[MAX_INPUT_LENGTH];
 	char *pos, *final;
 	int amt;
@@ -2191,6 +2204,9 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 	// clear immediately
 	*emp_found = NULL;
 	*amount_found = 0;
+	if (gave_coin_type) {
+		*gave_coin_type = FALSE;
+	}
 	
 	// quick check: prevent work
 	if (!assume_coins && !strstr(input, "coin")) {
@@ -2214,6 +2230,9 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 		// no empire arg but we're done
 		*amount_found = amt;
 		*emp_found = REAL_OTHER_COIN;
+		if (gave_coin_type) {
+			*gave_coin_type = FALSE;
+		}
 		return pos;
 	}
 	
@@ -2225,6 +2244,11 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 			// no match -- no success
 			return input;
 		}
+	}
+	
+	// at this point they must have specified a type
+	if (gave_coin_type) {
+		*gave_coin_type = TRUE;
 	}
 	
 	// still here? then they provided number and empire; check that the next arg is coins

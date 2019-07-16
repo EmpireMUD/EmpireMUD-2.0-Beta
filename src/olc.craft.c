@@ -55,6 +55,7 @@ const char *default_craft_name = "unnamed recipe";
 bool audit_craft(craft_data *craft, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
+	bld_data *bld = NULL;
 	int count;
 
 	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
@@ -88,7 +89,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 	
 	// different types of crafts
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {	// buildings only
-		if (GET_CRAFT_BUILD_TYPE(craft) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(craft))) {
+		if (GET_CRAFT_BUILD_TYPE(craft) == NOTHING || !(bld = building_proto(GET_CRAFT_BUILD_TYPE(craft)))) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
 			problem = TRUE;
 		}
@@ -98,6 +99,14 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		}
 		if (IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING | BLD_ANY_FOREST)) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building has invalid build-on flags!");
+			problem = TRUE;
+		}
+		if (bld && !CRAFT_FLAGGED(craft, CRAFT_IN_CITY_ONLY) && (IS_SET(GET_BLD_FLAGS(bld), BLD_IN_CITY_ONLY) || IS_SET(GET_BLD_FUNCTIONS(bld), FNC_IN_CITY_ONLY))) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Missing in-city-only flag on craft (already set on building or building functions)");
+			problem = TRUE;
+		}
+		if (bld && CRAFT_FLAGGED(craft, CRAFT_IN_CITY_ONLY) && !IS_SET(GET_BLD_FLAGS(bld), BLD_IN_CITY_ONLY) && !IS_SET(GET_BLD_FUNCTIONS(bld), FNC_IN_CITY_ONLY)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Possible unnecessary in-city-only flag (not set on building or building functions)");
 			problem = TRUE;
 		}
 	}

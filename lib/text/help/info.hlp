@@ -1176,8 +1176,8 @@ mapsize.
 
 You can also scan for nearby tiles matching a given keyword, such as a crop,
 building, or vehicle name. It will scan a distance up to your mapsize. Vehicles
-can only be seen with this command if they are large enough to show up on the
-map.
+and NPCs can only be seen with this command if they are large enough to show up
+on the map.
 
 You can get extra information if you have the 'political' or 'informative'
 toggles turned on. Scanning for 'foreign' tiles will show ones owned by empires

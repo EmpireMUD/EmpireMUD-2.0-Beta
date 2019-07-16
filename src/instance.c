@@ -1080,13 +1080,16 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	room_data *room, *extraction_room;
 	int iter;
 	
+	if (inst->cleanup) {
+		return;	// can't run it on one that's already in cleanup
+	}
+	
+	inst->cleanup = TRUE;	// instance is mid-cleanup -- do not clean up a second time
+	
 	// disable instance saving
 	instance_save_wait = TRUE;
 	
 	extraction_room = get_extraction_room();
-	remove_instance_fake_loc(inst);	// if any
-	
-	expire_instance_quests(inst);
 	
 	if ((room = INST_LOCATION(inst)) != NULL) {
 		// remove any players inside
@@ -1104,6 +1107,10 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 		// unlink from location:
 		unlink_instance_entrance(INST_LOCATION(inst), inst, run_cleanup);
 	}
+	
+	// do these after unlinking the entrance, because the script may need them
+	remove_instance_fake_loc(inst);	// if any
+	expire_instance_quests(inst);
 	
 	// any portal in will be cleaned up by delete_room
 	
@@ -1388,13 +1395,6 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;
 	
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
-	
-	// and the home room
-	REMOVE_BIT(ROOM_BASE_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
-	REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
-	
 	// check for scripts
 	if (run_cleanup && adv && GET_ADV_SCRIPTS(adv)) {
 		// add scripts
@@ -1434,12 +1434,22 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 			}
 		}
 	}
+		
+	// remove instance flags AFTER the script
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
+	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
+
+	// and the home room
+	REMOVE_BIT(ROOM_BASE_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
+	REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
 	
 	// exits to it will be cleaned up by delete_room
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
 		if (ROOM_PEOPLE(room)) {
 			act("The adventure vanishes around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
+		
+		// and remove the building
 		disassociate_building(room);
 	}
 }

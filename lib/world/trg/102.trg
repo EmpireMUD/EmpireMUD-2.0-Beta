@@ -769,7 +769,7 @@ return 0
 DEPRECATED: mount whistle use~
 1 c 2
 use~
-DEPRECATED: Use 9910 instead
+* DEPRECATED: Use 9910 instead
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt

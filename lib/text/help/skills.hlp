@@ -57,7 +57,7 @@ See also: CRAFT
 #
 CHOP
 
-Chop (Primitive Crafts ability)
+Chop (Scavenging ability)
 
 Usage:  chop
 Speed boosts:  Faster Chores bonus, haste, higher axe damage, higher Strength
@@ -464,7 +464,7 @@ Usage:  shear <animal>
 You can shear sheep in a stable, giving you wool to weave into cloth. Sheep
 can be shorn every 6 hours (of real time).
 
-Sheaing requires the Animal Husbandry ability.
+Shearing requires the Animal Husbandry ability.
 
 See also: ANIMAL HUSBANDRY, WEAVE
 #

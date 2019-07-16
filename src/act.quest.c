@@ -901,6 +901,8 @@ QCMD(qcmd_share) {
 
 
 QCMD(qcmd_start) {
+	extern struct player_quest *is_on_quest_by_name(char_data *ch, char *argument);
+	
 	struct quest_temp_list *qtl, *quest_list = NULL;
 	struct instance_data *inst = NULL;
 	char buf[MAX_STRING_LENGTH], vstr[128];
@@ -986,7 +988,12 @@ QCMD(qcmd_start) {
 		free_quest_temp_list(quest_list);
 	}
 	else if (!(qst = find_local_quest_by_name(ch, argument, FALSE, TRUE, &inst))) {
-		msg_to_char(ch, "You don't see that quest here.\r\n");
+		if (is_on_quest_by_name(ch, argument)) {
+			msg_to_char(ch, "You are already on that quest.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't see that quest here.\r\n");
+		}
 	}
 	else if (QUEST_FLAGGED(qst, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
 		msg_to_char(ch, "You can't start any more daily quests today.\r\n");

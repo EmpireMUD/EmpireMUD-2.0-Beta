@@ -1874,7 +1874,8 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 	if (is_own) {
 		used = count_city_points_used(emp);
 		points = city_points_available(emp);
-		msg_to_char(ch, "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+		snprintf(buf, sizeof(buf), "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+		msg_to_char(ch, "%s", CAP(buf));
 	}
 	else {
 		msg_to_char(ch, "Known cities for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
@@ -1903,7 +1904,7 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 			pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));
 			dist = compute_distance(IN_ROOM(ch), city->location);
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), city->location));
-			msg_to_char(ch, "%d.%s %s, on %s (%s/%d%s), %d %s%s\r\n", count, coord_display_room(ch, rl, TRUE), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, traits, dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), pending ? " &r(new)&0" : "");
+			msg_to_char(ch, "%d.%s %s, on %s (%s/%d%s), %d %s%s\r\n", count, coord_display_room(ch, rl, TRUE), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, traits, dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), pending ? " &r(establishing)&0" : "");
 		}
 		else {
 			msg_to_char(ch, "%s %s, on %s (traits: %s)\r\n", coord_display_room(ch, rl, TRUE), city->name, get_island_name_for(isle->id, ch), *buf ? buf : "none");
@@ -3698,7 +3699,7 @@ ACMD(do_deposit) {
 		// real members only
 		msg_to_char(ch, "You don't have permission to deposit coins here.\r\n");
 	}
-	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE) == argument || coin_amt < 1) {
+	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, NULL) == argument || coin_amt < 1) {
 		msg_to_char(ch, "Usage: deposit <number> [type] coins\r\n");
 	}
 	else if (!(coin = find_coin_entry(GET_PLAYER_COINS(ch), coin_emp)) || coin->amount < coin_amt) {
@@ -6948,6 +6949,7 @@ ACMD(do_workforce) {
 
 ACMD(do_withdraw) {
 	empire_data *emp, *coin_emp;
+	bool gave_type;
 	int coin_amt;
 	
 	if (IS_NPC(ch)) {
@@ -6972,11 +6974,11 @@ ACMD(do_withdraw) {
 		// real members only
 		msg_to_char(ch, "You don't have permission to withdraw coins here.\r\n");
 	}
-	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE) == argument || coin_amt < 1) {
+	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, &gave_type) == argument || coin_amt < 1) {
 		msg_to_char(ch, "Usage: withdraw <number> coins\r\n");
 	}
-	else if (coin_emp != NULL && coin_emp != emp) {
-		// player typed a coin type that didn't match -- ignore OTHER because it likely means they typed no empire arg
+	else if ((coin_emp != emp && coin_emp != NULL) || (coin_emp == NULL && gave_type)) {
+		// player typed a coin type that didn't match -- but allow no-type
 		msg_to_char(ch, "Only %s coins are stored here.\r\n", EMPIRE_ADJECTIVE(emp));
 	}
 	else if (EMPIRE_COINS(emp) < coin_amt) {

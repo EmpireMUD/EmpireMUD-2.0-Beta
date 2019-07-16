@@ -3134,6 +3134,7 @@ struct instance_data {
 	int size;	// size of room arrays
 	room_data **room;	// array of rooms (some == NULL)
 	struct instance_mob *mob_counts;	// hash table (hh)
+	bool cleanup;	// TRUE if the instance is expired and mid-cleanup
 	
 	struct instance_data *next;
 };

@@ -256,17 +256,20 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 		all_off = TRUE;
 		// simple mode
 	}
-	else {
-		if (!*value_p || !*duration_p) {
-			script_log("Trigger: %s, VNum %d. dg_affect_room usage: [#affect vnum] <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-			return;
-		}
+	else {	// niot all-off
+		// duration:
+		if (str_cmp(value_p, "off")) {	// not "off"
+			if (!*value_p || !*duration_p) {
+				script_log("Trigger: %s, VNum %d. dg_affect_room usage: [#affect vnum] <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+				return;
+			}
 	
-		duration = atoi(duration_p);
-		if (duration == 0 || duration < -1) {
-			script_log("Trigger: %s, VNum %d. dg_affect_room: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-			script_log("Line was: dg_affect_room %s %s %s %s (%d)", roomname, property, value_p, duration_p, duration);
-			return;
+			duration = atoi(duration_p);
+			if (duration == 0 || duration < -1) {
+				script_log("Trigger: %s, VNum %d. dg_affect_room: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+				script_log("Line was: dg_affect_room %s %s %s %s (%d)", roomname, property, value_p, duration_p, duration);
+				return;
+			}
 		}
 
 		// find the property -- search room_aff_bits

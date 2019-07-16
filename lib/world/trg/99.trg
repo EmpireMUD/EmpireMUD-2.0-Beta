@@ -68,7 +68,7 @@ if %arg% != pet
 end
 if (%self.master% && %self.master% == %actor%)
   %send% %actor% You dismiss %self.name%.
-  %echoaround %actor% %actor.name% dismisses %self.name%.
+  %echoaround% %actor% %actor.name% dismisses %self.name%.
   %purge% %self%
 else
   if %arg% == pet
