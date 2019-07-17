@@ -2073,13 +2073,13 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;	// just skip stray dashes
 		}
 		
-		else if (is_abbrev(type_arg, "-animals-required")) {
+		else if (is_abbrev(type_arg, "-animalsrequired")) {
 			argument = any_one_word(argument, val_arg);
 			if (!str_cmp(val_arg, "any")) {
 				needs_animals = TRUE;
 			}
 			else if (!isdigit(*val_arg) || (only_animals = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid animals-required '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid animalsrequired '%s'.\r\n", val_arg);
 				return;
 			}
 		}
@@ -2090,17 +2090,17 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-capacity-over")) {
+		else if (is_abbrev(type_arg, "-capacityover")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (cap_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid capacity-over '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid capacityover '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-capacity-under")) {
+		else if (is_abbrev(type_arg, "-capacityunder")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (cap_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid capacity-under '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid capacityunder '%s'.\r\n", val_arg);
 				return;
 			}
 		}
@@ -2121,17 +2121,17 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-fame-over")) {
+		else if (is_abbrev(type_arg, "-fameover")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (fame_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid fame-over '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid fameover '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-fame-under")) {
+		else if (is_abbrev(type_arg, "-fameunder")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (fame_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid fame-under '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid fameunder '%s'.\r\n", val_arg);
 				return;
 			}
 		}
@@ -2186,21 +2186,21 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-hitpoints-over")) {
+		else if (is_abbrev(type_arg, "-hitpointsover")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (hitpoints_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid hitpoints-over '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid hitpointsover '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-hitpoints-under")) {
+		else if (is_abbrev(type_arg, "-hitpointsunder")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (hitpoints_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid hitpoints-under '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid hitpointsunder '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-move-type")) {
+		else if (is_abbrev(type_arg, "-movetype")) {
 			argument = any_one_word(argument, val_arg);
 			if ((only_move = search_block(val_arg, mob_move_types, FALSE)) == NOTHING) {
 				msg_to_char(ch, "Invalid move-type '%s'.\r\n", val_arg);
@@ -2221,17 +2221,17 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-rooms-over")) {
+		else if (is_abbrev(type_arg, "-roomsover")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (rooms_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid rooms-over '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid roomsover '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-rooms-under")) {
+		else if (is_abbrev(type_arg, "-roomsunder")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (rooms_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid rooms-under '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid roomsunder '%s'.\r\n", val_arg);
 				return;
 			}
 		}
@@ -2242,17 +2242,17 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-military-over")) {
+		else if (is_abbrev(type_arg, "-militaryover")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (military_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid military-over '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid militaryover '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-military-under")) {
+		else if (is_abbrev(type_arg, "-militaryunder")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (military_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid military-under '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid militaryunder '%s'.\r\n", val_arg);
 				return;
 			}
 		}

@@ -5587,6 +5587,7 @@ Supported types:
   object
   progress
   trigger
+  vehicle
 #d
 "OLC LIST" OLIST MLIST RLIST
 
@@ -5923,7 +5924,6 @@ Fields:
 Examples:
  > .prog fullsearch -type PLAYER-TECH -ptech Swimming
  > .prog fullsearch -flagged RANGED -flagged RANGED-ONLY
- > .prog fullsearch -scaleover 50 -scaleunder 99
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all goals that require you to kill a
@@ -7505,6 +7505,38 @@ than one of these flags can be moved on any valid terrain with any of those
 commands.
 
 See also: OLC VEHICLES
+#d
+"VEDIT FULLSEARCH"
+
+Usage:  .veh fullsearch -<field> <argument> <...>
+
+This command allows you to search for vehicles matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start
+with a dash (-) are matched to the goal's name and other text.
+
+Fields:
+  &c-animalsrequired&0 - number required (or "any" for anything over zero)
+  &c-capacity -capacityover -capacityunder&0 - specific capacity
+  &c-designate&0 - see HELP DESIGNATE FLAGS
+  &c-fame -fameover -fameunder&0 - specific fame amount
+  &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
+  &c-functions&0 - see HELP VEDIT FUNCTIONS
+  &c-icon&0 - match the text of the icon, if any
+  &c-interactions&0 - has a specific type, see HELP VEDIT INTERACTION
+  &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
+  &c-level&0 - matches anything where this level is within the range
+  &c-military -militaryover -militaryunder&0 - specific military value
+  &c-movetype&0 - see HELP VEDIT MOVETYPE
+  &c-speed&0 - see HELP VEDIT SPEED
+
+Examples:
+ > .veh fullsearch -level 125 -hitpointsover 50
+ > .veh fullsearch wood -flagged BURNABLE
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all vehicles that have a certain interior
+room vnum, use ".b search 12345", which will search the vnum field on all
+vehicles for that building/room.
 #d
 "VEDIT HITPOINTS" "VEDIT HEALTH"
 
