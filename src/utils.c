@@ -3790,6 +3790,10 @@ bool multi_isname(const char *arg, const char *namelist) {
 	char argcpy[MAX_INPUT_LENGTH], argword[256];
 	char *ptr;
 	bool ok;
+	
+	if (!namelist || !*namelist) {
+		return FALSE;	// shortcut
+	}
 
 	/* the easy way */
 	if (!str_cmp(arg, namelist)) {
