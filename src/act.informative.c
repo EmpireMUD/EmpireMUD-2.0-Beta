@@ -2199,6 +2199,12 @@ ACMD(do_contents) {
 	vehicle_data *veh;
 	obj_data *obj;
 	
+	skip_spaces(&argument);
+	if (*argument) {
+		msg_to_char(ch, "This command only gets the contents of the room. To see the contents of an object, try 'look in <object>'.\r\n");
+		return;
+	}
+	
 	// verify we can see even 1 obj
 	if (!can_see_anything) {
 		LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
