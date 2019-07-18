@@ -2194,6 +2194,44 @@ ACMD(do_coins) {
 }
 
 
+ACMD(do_contents) {
+	bool can_see_anything = FALSE;
+	vehicle_data *veh;
+	obj_data *obj;
+	
+	// verify we can see even 1 obj
+	if (!can_see_anything) {
+		LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj)) {
+				can_see_anything = TRUE;
+				break;	// only need 1
+			}
+		}
+	}
+	// verify we can see even 1 vehicle
+	if (!can_see_anything) {
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (CAN_SEE_VEHICLE(ch, veh)) {
+				can_see_anything = TRUE;
+				break;	// only need 1
+			}
+		}
+	}
+	
+	// ok: show it
+	if (can_see_anything) {
+		send_to_char("&g", ch);
+		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
+		send_to_char("&w", ch);
+		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch);
+		send_to_char("&0", ch);
+	}
+	else {	// can see nothing
+		msg_to_char(ch, "There are no contents here.\r\n");
+	}
+}
+
+
 ACMD(do_cooldowns) {	
 	struct cooldown_data *cool;
 	int diff;

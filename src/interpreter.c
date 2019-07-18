@@ -111,6 +111,7 @@ ACMD(do_confer);
 ACMD(do_config);
 ACMD(do_confirm);
 ACMD(do_consider);
+ACMD(do_contents);
 ACMD(do_cooldowns);
 ACMD(do_counterspell);
 ACMD(do_create);
@@ -640,6 +641,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "config", POS_DEAD, do_config, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "confirm", POS_SLEEPING, do_confirm, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "confer", POS_RESTING, do_confer, NO_MIN, CTYPE_SKILL, ABIL_CONFER ),
+	SIMPLE_CMD( "contents", POS_RESTING, do_contents, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "cook", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_COOK, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "cooldowns", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "counterspell", POS_FIGHTING, do_counterspell, NO_MIN, CTYPE_SKILL, ABIL_COUNTERSPELL ),
