@@ -2317,7 +2317,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		if (*only_icon && !VEH_ICON(veh)) {
 			continue;
 		}
-		if (*only_icon && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh)))) {
+		if (*only_icon && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh))) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh))) {
 			continue;
 		}
 		if (find_interacts) {	// look up its interactions

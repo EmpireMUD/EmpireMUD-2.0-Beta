@@ -3937,6 +3937,30 @@ bool search_custom_messages(char *keywords, struct custom_message *list) {
 
 
 /**
+* Looks for certain keywords in a set of extra descriptions. All given keywords
+* must appear in 1 of the descriptions or its keywords to be valid.
+*
+* @param char *keywords The word(s) we are looking for.
+* @param struct extra_descr_data *list The list of extra descs to search.
+* @return bool TRUE if the keywords were found, FALSE if not.
+*/
+bool search_extra_descs(char *keywords, struct extra_descr_data *list) {
+	struct extra_descr_data *iter;
+	
+	LL_FOREACH(list, iter) {
+		if (iter->keyword && multi_isname(keywords, iter->keyword)) {
+			return TRUE;
+		}
+		if (iter->description && multi_isname(keywords, iter->description)) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// not found
+}
+
+
+/**
 * Doubles the & in a string so that color codes are displayed to the user.
 *
 * @param char *string The input string.

@@ -1679,6 +1679,7 @@ extern char *CAP(char *txt);
 extern char *fname(const char *namelist);
 extern char *reverse_strstr(char *haystack, char *needle);
 extern bool search_custom_messages(char *keywords, struct custom_message *list);
+extern bool search_extra_descs(char *keywords, struct extra_descr_data *list);
 extern char *str_dup(const char *source);
 extern char *str_replace(const char *search, const char *replace, const char *subject);
 extern char *str_str(char *cs, char *ct);
