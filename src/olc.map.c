@@ -761,7 +761,7 @@ OLC_MODULE(mapedit_remember) {
 OLC_MODULE(mapedit_roomtype) {
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	
-	bld_data *id;
+	bld_data *id = NULL;
 
 	if (!IS_INSIDE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to be in one of the interior rooms of a building first.\r\n");
@@ -777,7 +777,7 @@ OLC_MODULE(mapedit_roomtype) {
 		msg_to_char(ch, "Invalid building (room) vnum '%s'.\r\n", argument);
 		return;
 	}
-	else if (!(id = get_building_by_name(argument, TRUE))) {
+	else if (!id && !(id = get_building_by_name(argument, TRUE))) {
 		msg_to_char(ch, "Invalid building (room) type name '%s'.\r\n", argument);
 		return;
 	}
