@@ -2177,7 +2177,7 @@ ACMD(do_coins) {
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
 			if (*argument && !multi_isname(argument, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)))) {
-				// no keyword match
+				continue; // no keyword match
 			}
 			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
