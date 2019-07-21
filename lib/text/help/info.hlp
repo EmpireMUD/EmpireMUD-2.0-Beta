@@ -400,7 +400,7 @@ See also: DESIGNATE, MARK, WORKFORCE
 #
 COIN COINS COINAGE CURRENCY GOLD "EXCHANGE RATE"
 
-Commands:  coins
+Commands:  coins [type]
            give <number> [empire] coins <person>
            drop <number> [empire] coins
            withdraw <number> coins
@@ -433,6 +433,9 @@ You can create coins from valuable metals at a mint building. You can exchange
 coin types, or treasure for coins, at the mint or vault. You can deposit and
 withdraw coins from the vault. Coins that are left on the ground will autostore
 on claimed land, or disappear over time on unclaimed land.
+
+The 'coins' command also shows special currencies (e.g. from adventures). You
+can search for specific ones by typing the name, such as 'coins permafrost'.
 
 See also: DEPOSIT, EXCHANGE, MINT, SPLIT, WITHDRAW
 #
