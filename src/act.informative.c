@@ -2155,20 +2155,31 @@ ACMD(do_chart) {
 ACMD(do_coins) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vstr[64];
 	struct player_currency *cur, *next_cur;
-	size_t size;
+	bool any = FALSE;
+	size_t size = 0;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs don't carry coins.\r\n");
 		return;
 	}
 	
-	coin_string(GET_PLAYER_COINS(ch), line);
-	size = snprintf(buf, sizeof(buf), "You have %s.\r\n", line);
+	skip_spaces(&argument);
+	*buf = '\0';
+	
+	// basic coins -- only show if no-arg
+	if (!*argument) {
+		coin_string(GET_PLAYER_COINS(ch), line);
+		size = snprintf(buf, sizeof(buf), "You have %s.\r\n", line);
+	}
 	
 	if (GET_CURRENCIES(ch) && subcmd) {
-		size += snprintf(buf + size, sizeof(buf) - size, "You also have:\r\n");
+		size += snprintf(buf + size, sizeof(buf) - size, "You%s have:\r\n", *argument ? "" : " also");
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+			if (*argument && !multi_isname(argument, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)))) {
+				// no keyword match
+			}
+			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", cur->vnum);
 			}
@@ -2177,6 +2188,7 @@ ACMD(do_coins) {
 			}
 			
 			snprintf(line, sizeof(line), "%s%3d %s\r\n", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+			any = TRUE;
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
@@ -2188,7 +2200,10 @@ ACMD(do_coins) {
 		}
 	}
 	
-	if (ch->desc) {
+	if (*argument && !any) {
+		msg_to_char(ch, "You have no special currency called '%s'.\r\n", argument);
+	}
+	else if (ch->desc) {	// show currency
 		page_string(ch->desc, buf, TRUE);
 	}
 }
