@@ -2155,20 +2155,31 @@ ACMD(do_chart) {
 ACMD(do_coins) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vstr[64];
 	struct player_currency *cur, *next_cur;
-	size_t size;
+	bool any = FALSE;
+	size_t size = 0;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs don't carry coins.\r\n");
 		return;
 	}
 	
-	coin_string(GET_PLAYER_COINS(ch), line);
-	size = snprintf(buf, sizeof(buf), "You have %s.\r\n", line);
+	skip_spaces(&argument);
+	*buf = '\0';
+	
+	// basic coins -- only show if no-arg
+	if (!*argument) {
+		coin_string(GET_PLAYER_COINS(ch), line);
+		size = snprintf(buf, sizeof(buf), "You have %s.\r\n", line);
+	}
 	
 	if (GET_CURRENCIES(ch) && subcmd) {
-		size += snprintf(buf + size, sizeof(buf) - size, "You also have:\r\n");
+		size += snprintf(buf + size, sizeof(buf) - size, "You%s have:\r\n", *argument ? "" : " also");
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+			if (*argument && !multi_isname(argument, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)))) {
+				continue; // no keyword match
+			}
+			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", cur->vnum);
 			}
@@ -2177,6 +2188,7 @@ ACMD(do_coins) {
 			}
 			
 			snprintf(line, sizeof(line), "%s%3d %s\r\n", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+			any = TRUE;
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
@@ -2188,8 +2200,55 @@ ACMD(do_coins) {
 		}
 	}
 	
-	if (ch->desc) {
+	if (*argument && !any) {
+		msg_to_char(ch, "You have no special currency called '%s'.\r\n", argument);
+	}
+	else if (ch->desc) {	// show currency
 		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+ACMD(do_contents) {
+	bool can_see_anything = FALSE;
+	vehicle_data *veh;
+	obj_data *obj;
+	
+	skip_spaces(&argument);
+	if (*argument) {
+		msg_to_char(ch, "This command only gets the contents of the room. To see the contents of an object, try 'look in <object>'.\r\n");
+		return;
+	}
+	
+	// verify we can see even 1 obj
+	if (!can_see_anything) {
+		LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj)) {
+				can_see_anything = TRUE;
+				break;	// only need 1
+			}
+		}
+	}
+	// verify we can see even 1 vehicle
+	if (!can_see_anything) {
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (CAN_SEE_VEHICLE(ch, veh)) {
+				can_see_anything = TRUE;
+				break;	// only need 1
+			}
+		}
+	}
+	
+	// ok: show it
+	if (can_see_anything) {
+		send_to_char("&g", ch);
+		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
+		send_to_char("&w", ch);
+		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch);
+		send_to_char("&0", ch);
+	}
+	else {	// can see nothing
+		msg_to_char(ch, "There are no contents here.\r\n");
 	}
 }
 

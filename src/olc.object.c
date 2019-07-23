@@ -1256,7 +1256,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj))) && !search_custom_messages(find_keywords, obj->custom_msgs)) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj))) && !search_custom_messages(find_keywords, obj->custom_msgs) && !search_extra_descs(find_keywords, obj->ex_description)) {
 			continue;
 		}
 		

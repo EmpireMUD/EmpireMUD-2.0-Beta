@@ -454,6 +454,16 @@ There are also several possible modifier tags:
  
 See also: DROP FLAGS, LEVELS
 #
+CONTENTS
+
+Usage:  contents
+
+This lists the objects and vehicles in the room with you, exactly like they
+appear when you type 'look', but without all the other information from the
+'look' command.
+
+See also: LOOK
+#
 COTTON
 
 Stored in:  Tailor

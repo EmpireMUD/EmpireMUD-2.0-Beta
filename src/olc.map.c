@@ -761,12 +761,30 @@ OLC_MODULE(mapedit_remember) {
 OLC_MODULE(mapedit_roomtype) {
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	
-	bld_data *id;
+	bld_data *id = NULL;
 
-	if (!IS_INSIDE(IN_ROOM(ch)))
+	if (!IS_INSIDE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to be in one of the interior rooms of a building first.\r\n");
-	else if (!*argument || !(id = get_building_by_name(argument, TRUE))) {
+		return;
+	}
+	if (!*argument) {
 		msg_to_char(ch, "What type of room would you like to set (use 'vnum b <name>' to search)?\r\n");
+		return;
+	}
+	
+	// parse arg
+	if (isdigit(*argument) && !(id = building_proto(atoi(argument)))) {
+		msg_to_char(ch, "Invalid building (room) vnum '%s'.\r\n", argument);
+		return;
+	}
+	else if (!id && !(id = get_building_by_name(argument, TRUE))) {
+		msg_to_char(ch, "Invalid building (room) type name '%s'.\r\n", argument);
+		return;
+	}
+	
+	// final handling
+	if (!id || !IS_SET(GET_BLD_FLAGS(id), BLD_ROOM)) {
+		msg_to_char(ch, "Invalid room type. You must specify a building with the ROOM flag.\r\n");
 	}
 	else {
 		dismantle_wtrigger(IN_ROOM(ch), ch, FALSE);
