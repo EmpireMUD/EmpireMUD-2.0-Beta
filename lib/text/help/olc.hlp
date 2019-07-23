@@ -1933,6 +1933,38 @@ Available flags:
 
 See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
 #d
+"BEDIT FULLSEARCH"
+
+Usage:  .b fullsearch -<field> <argument> <...>
+
+This command allows you to search for buildings matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start
+with a dash (-) are matched to the building's name and other text.
+
+Fields:
+  &c-affects&0 - see HELP BEDIT AFFECTS
+  &c-citizens -citizensover -citizensunder&0 - specific number of citizens
+  &c-commands&0 - match the text of the commands line, if any
+  &c-designate&0 - see HELP DESIGNATE FLAGS
+  &c-fame -fameover -fameunder&0 - specific fame amount
+  &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
+  &c-functions&0 - see HELP BEDIT FUNCTIONS
+  &c-icon&0 - match the text of the icon, if any
+  &c-interactions&0 - has a specific type, see HELP BEDIT INTERACTION
+  &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
+  &c-military -militaryover -militaryunder&0 - specific military value
+  &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
+
+Examples:
+ > .b fullsearch -hitpointsover 50
+ > .b fullsearch -unflagged ROOM -function FORGE
+ > .b fullsearch -flagged ROOM -citizensover 1
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all buildings that have a certain artisan
+vnum, use ".mob search 12345", which will search the artisan vnum field on all
+buildings for that mob.
+#d
 "BEDIT FUNCTIONS" "REDIT FUNCTIONS" "VEDIT FUNCTIONS" "FUNCTION FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -5583,6 +5615,7 @@ See the individual help files such as OEDIT FULLSEARCH.
 
 Supported types:
   ability
+  building (search designatable rooms with -flag ROOM)
   mobile
   object
   progress
@@ -7512,7 +7545,7 @@ Usage:  .veh fullsearch -<field> <argument> <...>
 
 This command allows you to search for vehicles matching certain criteria. You
 can specify multiple fields if you want. Any arguments that don't start
-with a dash (-) are matched to the goal's name and other text.
+with a dash (-) are matched to the vehicle's name and other text.
 
 Fields:
   &c-animalsrequired&0 - number required (or "any" for anything over zero)
@@ -7527,6 +7560,7 @@ Fields:
   &c-level&0 - matches anything where this level is within the range
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-movetype&0 - see HELP VEDIT MOVETYPE
+  &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
   &c-speed&0 - see HELP VEDIT SPEED
 
 Examples:

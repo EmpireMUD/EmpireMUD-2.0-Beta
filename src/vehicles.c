@@ -2033,6 +2033,156 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 
 
 /**
+* WARNING: This function actually deletes a vehicle.
+*
+* @param char_data *ch The person doing the deleting.
+* @param any_vnum vnum The vnum to delete.
+*/
+void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+	
+	vehicle_data *veh, *iter, *next_iter;
+	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
+	room_template *rmt, *next_rmt;
+	social_data *soc, *next_soc;
+	descriptor_data *desc;
+	bool found;
+	
+	if (!(veh = vehicle_proto(vnum))) {
+		msg_to_char(ch, "There is no such vehicle %d.\r\n", vnum);
+		return;
+	}
+	
+	// remove live vehicles
+	LL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
+		if (VEH_VNUM(iter) != vnum) {
+			continue;
+		}
+		
+		if (ROOM_PEOPLE(IN_ROOM(iter))) {
+			act("$V vanishes.", FALSE, ROOM_PEOPLE(IN_ROOM(iter)), NULL, iter, TO_CHAR | TO_ROOM);
+		}
+		extract_vehicle(iter);
+	}
+	
+	// remove it from the hash table first
+	remove_vehicle_from_table(veh);
+	
+	// save index and vehicle file now
+	save_index(DB_BOOT_VEH);
+	save_library_file_for_vnum(DB_BOOT_VEH, vnum);
+	
+	// update crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		found = FALSE;
+		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+			GET_CRAFT_OBJECT(craft) = NOTHING;
+			found = TRUE;
+		}
+		
+		if (found) {
+			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// update progress
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			need_progress_refresh = TRUE;
+		}
+	}
+	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
+	// update room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
+	// olc editor updates
+	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_CRAFT(desc)) {
+			found = FALSE;
+			if (CRAFT_FLAGGED(GET_OLC_CRAFT(desc), CRAFT_VEHICLE) && GET_OLC_CRAFT(desc)->object == vnum) {
+				GET_OLC_CRAFT(desc)->object = NOTHING;
+				found = TRUE;
+			}
+		
+			if (found) {
+				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
+				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_PROGRESS(desc)) {
+			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle used by the progression goal you're editing has been deleted.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_OWN_VEHICLE, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_ROOM_TEMPLATE(desc)) {
+			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_VEH, vnum)) {
+				msg_to_char(desc->character, "One of the vehicles that spawns in the room template you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle required by the social you are editing was deleted.\r\n");
+			}
+		}
+	}
+	
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d", GET_NAME(ch), vnum);
+	msg_to_char(ch, "Vehicle %d deleted.\r\n", vnum);
+	
+	free_vehicle(veh);
+}
+
+
+/**
 * Searches properties of vehicles.
 *
 * @param char_data *ch The person searching.
@@ -2046,7 +2196,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS;
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
-	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING;
+	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING, only_speed = NOTHING;
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
@@ -2256,6 +2406,13 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 				return;
 			}
 		}
+		else if (is_abbrev(type_arg, "-speed")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_speed = search_block(val_arg, vehicle_speed_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid speed '%s'.\r\n", val_arg);
+				return;
+			}
+		}
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}
@@ -2317,7 +2474,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		if (*only_icon && !VEH_ICON(veh)) {
 			continue;
 		}
-		if (*only_icon && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh))) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh))) {
+		if (*only_icon && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh)))) {
 			continue;
 		}
 		if (find_interacts) {	// look up its interactions
@@ -2358,8 +2515,11 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		if (rooms_under != NOTHING && (VEH_MAX_ROOMS(veh) > rooms_under || VEH_MAX_ROOMS(veh) == 0)) {
 			continue;
 		}
+		if (only_speed != NOTHING && VEH_SPEED_BONUSES(veh) != only_speed) {
+			continue;
+		}
 		
-		if (*find_keywords && !multi_isname(find_keywords, VEH_KEYWORDS(veh)) && !multi_isname(find_keywords, VEH_LONG_DESC(veh)) && !multi_isname(find_keywords, VEH_LOOK_DESC(veh)) && !multi_isname(find_keywords, VEH_SHORT_DESC(veh))) {
+		if (*find_keywords && !multi_isname(find_keywords, VEH_KEYWORDS(veh)) && !multi_isname(find_keywords, VEH_LONG_DESC(veh)) && !multi_isname(find_keywords, VEH_LOOK_DESC(veh)) && !multi_isname(find_keywords, VEH_SHORT_DESC(veh)) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh))) {
 			continue;
 		}
 		
@@ -2385,156 +2545,6 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	if (ch->desc) {
 		page_string(ch->desc, buf, TRUE);
 	}
-}
-
-
-/**
-* WARNING: This function actually deletes a vehicle.
-*
-* @param char_data *ch The person doing the deleting.
-* @param any_vnum vnum The vnum to delete.
-*/
-void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
-	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
-	
-	vehicle_data *veh, *iter, *next_iter;
-	craft_data *craft, *next_craft;
-	quest_data *quest, *next_quest;
-	progress_data *prg, *next_prg;
-	room_template *rmt, *next_rmt;
-	social_data *soc, *next_soc;
-	descriptor_data *desc;
-	bool found;
-	
-	if (!(veh = vehicle_proto(vnum))) {
-		msg_to_char(ch, "There is no such vehicle %d.\r\n", vnum);
-		return;
-	}
-	
-	// remove live vehicles
-	LL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
-		if (VEH_VNUM(iter) != vnum) {
-			continue;
-		}
-		
-		if (ROOM_PEOPLE(IN_ROOM(iter))) {
-			act("$V vanishes.", FALSE, ROOM_PEOPLE(IN_ROOM(iter)), NULL, iter, TO_CHAR | TO_ROOM);
-		}
-		extract_vehicle(iter);
-	}
-	
-	// remove it from the hash table first
-	remove_vehicle_from_table(veh);
-	
-	// save index and vehicle file now
-	save_index(DB_BOOT_VEH);
-	save_library_file_for_vnum(DB_BOOT_VEH, vnum);
-	
-	// update crafts
-	HASH_ITER(hh, craft_table, craft, next_craft) {
-		found = FALSE;
-		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
-			GET_CRAFT_OBJECT(craft) = NOTHING;
-			found = TRUE;
-		}
-		
-		if (found) {
-			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
-			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
-		}
-	}
-	
-	// update progress
-	HASH_ITER(hh, progress_table, prg, next_prg) {
-		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_OWN_VEHICLE, vnum);
-		
-		if (found) {
-			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
-			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
-			need_progress_refresh = TRUE;
-		}
-	}
-	
-	// update quests
-	HASH_ITER(hh, quest_table, quest, next_quest) {
-		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
-		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
-		
-		if (found) {
-			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
-			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
-		}
-	}
-	
-	// update room templates
-	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
-		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
-		if (found) {
-			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
-		}
-	}
-	
-	// update socials
-	HASH_ITER(hh, social_table, soc, next_soc) {
-		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_OWN_VEHICLE, vnum);
-		
-		if (found) {
-			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
-			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
-		}
-	}
-	
-	// olc editor updates
-	LL_FOREACH(descriptor_list, desc) {
-		if (GET_OLC_CRAFT(desc)) {
-			found = FALSE;
-			if (CRAFT_FLAGGED(GET_OLC_CRAFT(desc), CRAFT_VEHICLE) && GET_OLC_CRAFT(desc)->object == vnum) {
-				GET_OLC_CRAFT(desc)->object = NOTHING;
-				found = TRUE;
-			}
-		
-			if (found) {
-				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
-				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
-			}
-		}
-		if (GET_OLC_PROGRESS(desc)) {
-			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_OWN_VEHICLE, vnum);
-		
-			if (found) {
-				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A vehicle used by the progression goal you're editing has been deleted.\r\n");
-			}
-		}
-		if (GET_OLC_QUEST(desc)) {
-			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_OWN_VEHICLE, vnum);
-			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_OWN_VEHICLE, vnum);
-		
-			if (found) {
-				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A vehicle used by the quest you are editing was deleted.\r\n");
-			}
-		}
-		if (GET_OLC_ROOM_TEMPLATE(desc)) {
-			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_VEH, vnum)) {
-				msg_to_char(desc->character, "One of the vehicles that spawns in the room template you're editing was deleted.\r\n");
-			}
-		}
-		if (GET_OLC_SOCIAL(desc)) {
-			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_OWN_VEHICLE, vnum);
-		
-			if (found) {
-				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A vehicle required by the social you are editing was deleted.\r\n");
-			}
-		}
-	}
-	
-	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d", GET_NAME(ch), vnum);
-	msg_to_char(ch, "Vehicle %d deleted.\r\n", vnum);
-	
-	free_vehicle(veh);
 }
 
 

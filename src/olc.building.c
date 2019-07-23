@@ -590,6 +590,345 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 
 
 /**
+* Searches properties of buildings.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_building(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count, lookup;
+	
+	char only_icon[MAX_INPUT_LENGTH], only_commands[MAX_INPUT_LENGTH];
+	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS;
+	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
+	bitvector_t only_affs = NOBITS;
+	int only_cits = NOTHING, cits_over = NOTHING, cits_under = NOTHING;
+	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING;
+	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING;
+	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
+	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING;
+	
+	struct interaction_item *inter;
+	bld_data *bld, *next_bld;
+	size_t size;
+	
+	*only_icon = '\0';
+	*only_commands = '\0';
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP VEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		else if (is_abbrev(type_arg, "-affects")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, room_aff_bits, FALSE)) != NOTHING) {
+				only_affs |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid affect flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-citizens")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_cits = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid citizens '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-citizensover")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (cits_over = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid citizensover '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-citizensunder")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (cits_under = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid citizensunder '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-commands")) {
+			argument = any_one_word(argument, val_arg);
+			strcpy(only_commands, argument);
+		}
+		else if (is_abbrev(type_arg, "-designate")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, designate_flags, FALSE)) != NOTHING) {
+				only_designate |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid designate flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-fame")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_fame = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid fame '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-fameover")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (fame_over = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid fameover '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-fameunder")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (fame_under = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid fameunder '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, bld_flags, FALSE)) != NOTHING) {
+				only_flags |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-unflagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, bld_flags, FALSE)) != NOTHING) {
+				not_flagged |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-functions")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, function_flags, FALSE)) != NOTHING) {
+				only_functions |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid function '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-icon")) {
+			argument = any_one_word(argument, val_arg);
+			strcpy(only_icon, argument);
+		}
+		else if (is_abbrev(type_arg, "-interaction")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, interact_types, FALSE)) != NOTHING) {
+				find_interacts |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid interaction type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-hitpoints")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_hitpoints = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid hitpoints '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-hitpointsover")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (hitpoints_over = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid hitpointsover '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-hitpointsunder")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (hitpoints_under = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid hitpointsunder '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-rooms")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_rooms = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid rooms '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-roomsover")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (rooms_over = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid roomsover '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-roomsunder")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (rooms_under = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid roomsunder '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-military")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_military = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid military '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-militaryover")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (military_over = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid militaryover '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-militaryunder")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (military_under = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid militaryunder '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Building fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up items
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		if (only_affs != NOBITS && (GET_BLD_BASE_AFFECTS(bld) & only_affs) != only_affs) {
+			continue;
+		}
+		if (only_cits != NOTHING && GET_BLD_CITIZENS(bld) != only_cits) {
+			continue;
+		}
+		if (cits_over != NOTHING && GET_BLD_CITIZENS(bld) < cits_over) {
+			continue;
+		}
+		if (cits_under != NOTHING && (GET_BLD_CITIZENS(bld) > cits_under || GET_BLD_CITIZENS(bld) == 0)) {
+			continue;
+		}
+		if (only_designate != NOBITS && (GET_BLD_DESIGNATE_FLAGS(bld) & only_designate) != only_designate) {
+			continue;
+		}
+		if (only_fame != NOTHING && GET_BLD_FAME(bld) != only_fame) {
+			continue;
+		}
+		if (fame_over != NOTHING && GET_BLD_FAME(bld) < fame_over) {
+			continue;
+		}
+		if (fame_under != NOTHING && (GET_BLD_FAME(bld) > fame_under || GET_BLD_FAME(bld) == 0)) {
+			continue;
+		}
+		if (not_flagged != NOBITS && IS_SET(GET_BLD_FLAGS(bld), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GET_BLD_FLAGS(bld) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_functions != NOBITS && (GET_BLD_FUNCTIONS(bld) & only_functions) != only_functions) {
+			continue;
+		}
+		if (only_hitpoints != NOTHING && GET_BLD_MAX_DAMAGE(bld) != only_hitpoints) {
+			continue;
+		}
+		if (hitpoints_over != NOTHING && GET_BLD_MAX_DAMAGE(bld) < hitpoints_over) {
+			continue;
+		}
+		if (hitpoints_under != NOTHING && GET_BLD_MAX_DAMAGE(bld) > hitpoints_under) {
+			continue;
+		}
+		if (*only_icon && !GET_BLD_ICON(bld)) {
+			continue;
+		}
+		if (*only_icon && !strstr(only_icon, GET_BLD_ICON(bld)) && !strstr(only_icon, strip_color(GET_BLD_ICON(bld)))) {
+			continue;
+		}
+		if (*only_commands && !GET_BLD_COMMANDS(bld)) {
+			continue;
+		}
+		if (*only_commands && !multi_isname(only_commands, GET_BLD_COMMANDS(bld))) {
+			continue;
+		}
+		if (find_interacts) {	// look up its interactions
+			found_interacts = NOBITS;
+			LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
+				found_interacts |= BIT(inter->type);
+			}
+			if ((find_interacts & found_interacts) != find_interacts) {
+				continue;
+			}
+		}
+		if (only_military != NOTHING && GET_BLD_MILITARY(bld) != only_military) {
+			continue;
+		}
+		if (military_over != NOTHING && GET_BLD_MILITARY(bld) < military_over) {
+			continue;
+		}
+		if (military_under != NOTHING && (GET_BLD_MILITARY(bld) > military_under || GET_BLD_MILITARY(bld) == 0)) {
+			continue;
+		}
+		if (only_rooms != NOTHING && GET_BLD_EXTRA_ROOMS(bld) != only_rooms) {
+			continue;
+		}
+		if (rooms_over != NOTHING && GET_BLD_EXTRA_ROOMS(bld) < rooms_over) {
+			continue;
+		}
+		if (rooms_under != NOTHING && (GET_BLD_EXTRA_ROOMS(bld) > rooms_under || GET_BLD_EXTRA_ROOMS(bld) == 0)) {
+			continue;
+		}
+
+		if (*find_keywords && !multi_isname(find_keywords, GET_BLD_NAME(bld)) && !multi_isname(find_keywords, GET_BLD_TITLE(bld)) && !multi_isname(find_keywords, GET_BLD_DESC(bld)) && !search_extra_descs(find_keywords, GET_BLD_EX_DESCS(bld))) {
+			continue;
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d buildings)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a building and displays them.
 *
 * @param char_data *ch The player.
