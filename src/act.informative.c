@@ -2840,6 +2840,7 @@ ACMD(do_mapsize) {
 		else {
 			msg_to_char(ch, "Your map size is set to automatic.\r\n");
 		}
+		return;
 	}
 	
 	// usage: mapsize <distance> [radius|width]

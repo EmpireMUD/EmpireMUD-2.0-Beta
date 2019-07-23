@@ -1221,7 +1221,8 @@ Map size is measured in either 'radius' or 'width'. Radius is the distance you
 see in each direction, while 'width' is the full display with of the ascii map,
 which is double the radius, plus 1. The default mode when setting your map size
 is radius for screenreader users, and width for visual players (because the map
-is displayed differently for each).
+is displayed differently for each). Widths must be odd numbers with a minimum
+of 3, while the radius has a minimum of 1.
 
 The standard mapsize is radius 7 (width 15).
 
