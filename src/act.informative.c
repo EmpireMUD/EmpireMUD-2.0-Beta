@@ -49,6 +49,7 @@ extern const char *wear_bits[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external functions
+void clear_recent_moves(char_data *ch);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char *get_room_name(room_data *room, bool color);
 extern char *list_harnessed_mobs(vehicle_data *veh);
@@ -2762,7 +2763,6 @@ ACMD(do_inventory) {
 
 
 ACMD(do_look) {
-	void clear_recent_moves(char_data *ch);
 	void look_in_direction(char_data *ch, int dir);
 	
 	char arg2[MAX_INPUT_LENGTH];
@@ -2817,6 +2817,52 @@ ACMD(do_look) {
 		else
 			look_at_target(ch, arg);
 	}
+}
+
+
+ACMD(do_map) {
+	int dist, mapsize;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs can't use this command.\r\n");
+		return;
+	}
+	if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only look at the map outdoors. (Try 'look out' instead.)\r\n");
+		return;
+	}
+	
+	dist = GET_MAPSIZE(ch);
+	
+	// check args
+	skip_spaces(&argument);
+	if (*argument) {
+		if (isdigit(*argument)) {
+			dist = atoi(argument);
+		}
+		else {
+			msg_to_char(ch, "Usage: map [view distance]\r\n");
+			return;
+		}
+	}
+	
+	// validate size
+	if (*argument && dist > config_get_int("max_map_size")) {
+		msg_to_char(ch, "The maximum view distance is %d.\r\n", config_get_int("max_map_size"));
+		return;
+	}
+	else if (*argument && dist < 1) {
+		msg_to_char(ch, "You must specify a distance of at least 1.\r\n");
+		return;
+	}
+	
+	mapsize = GET_MAPSIZE(ch);	// store for later
+	GET_MAPSIZE(ch) = dist;	// requested distance
+	
+	clear_recent_moves(ch);	// prevents shrinkage
+	look_at_room_by_loc(ch, IN_ROOM(ch), LRR_LOOK_OUT);
+	
+	GET_MAPSIZE(ch) = mapsize;
 }
 
 

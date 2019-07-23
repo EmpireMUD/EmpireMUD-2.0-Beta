@@ -1207,7 +1207,17 @@ Examples:
 Note that if you LOOK AT CORPSE you will not see its inventory.
 To see what's inside a container (i.e. a corpse) use LOOK IN <object>.
 
-See also: GET, READ, TAKE, SURVEY
+See also: GET, MAP, READ, TAKE, SURVEY
+#
+MAP "MAP COMMAND"
+
+Usage:  map [distance]
+
+This command displays the map around you, similar to "look", but without any
+contents or people. The distance defaults to your map size setting, but you can
+specify a distance if you choose.
+
+See also: LOOK, MAPSIZE, LEGEND (for a list of map symbols)
 #
 MAPSIZE "MAP SIZE"
 
@@ -1235,7 +1245,7 @@ surroundings (and saves the game time rendering large views repeatedly). You
 can restore your original map size if you stop and type 'look', or wait a few
 seconds.
 
-See also: TOGGLE
+See also: MAP, TOGGLE
 #
 MAIL CHECK RECEIVE SEND "PIGEON MAIL"
 
