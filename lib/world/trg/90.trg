@@ -383,9 +383,20 @@ mjunk all
 #9028
 Tameness Required to Tame~
 0 c 0
-tame~
+tame feed~
 * Amount of tameness required
 set target 5
+* This script also overrides 'feed'
+if %cmd% == feed
+  if %actor.char_target(%arg.cdr%) == %self%
+    %send% %actor% Just 'give' the food to %self.himher%.
+    return 1
+  else
+    * ignore 'feed'
+    return 0
+  end
+  halt
+end
 * Check target and tech
 if (!%actor.has_tech(Tame)% || %actor.char_target(%arg%)% != %self%)
   return 0
