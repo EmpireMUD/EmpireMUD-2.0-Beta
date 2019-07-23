@@ -1226,13 +1226,13 @@ of 3, while the radius has a minimum of 1.
 
 The standard mapsize is radius 7 (width 15).
 
-If you set your mapsize to 'auto', the game will attempt to detect the size of
+If you set your map size to 'auto', the game will attempt to detect the size of
 your client window.
 
-When you move very fast on the map, your mapsize will start to shrink as it
+When you move very fast on the map, your map size will start to shrink as it
 becomes more difficult for your character to pay attention to all his/her
 surroundings (and saves the game time rendering large views repeatedly). You
-can restore your original mapsize if you stop and type 'look', or wait a few
+can restore your original map size if you stop and type 'look', or wait a few
 seconds.
 
 See also: TOGGLE
@@ -1897,11 +1897,8 @@ impaired. Since EmpireMUD relies so heavily on the ascii map to show what's
 going on around you, we have created this mode especially for players who
 can't see the map.
 
-The "mapsize" command will determine how far away you can see things. Since
-this command is shared with the non-screen-reader view, it is actually the
-total diameter of your view and you'll see halfway in each direction. For
-example, if your mapsize is 15, you will see up to 7 tiles west and 7 tiles
-east.
+The "mapsize" command will determine how far away you can see things. It sets
+the number of tiles you see in each direction on commands like look and scan.
 
 Available options:
  * toggle informative - If on, tiles will indicate if they are being built
