@@ -1950,7 +1950,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir]);
 	}
 	
-	if (!IS_SET(options, LRR_SHIP_PARTIAL)) {
+	if (!IS_SET(options, LRR_SHIP_PARTIAL | LRR_LOOK_OUT)) {
 		msg_to_char(ch, "Here:\r\n");
 	}
 }
