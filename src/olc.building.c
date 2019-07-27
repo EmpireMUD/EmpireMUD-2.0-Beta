@@ -597,7 +597,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 */
 void olc_fullsearch_building(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
-	int count, lookup;
+	int count;
 	
 	char only_icon[MAX_INPUT_LENGTH], only_commands[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS;
@@ -631,179 +631,31 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 			continue;	// just skip stray dashes
 		}
 		
-		else if (is_abbrev(type_arg, "-affects")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, room_aff_bits, FALSE)) != NOTHING) {
-				only_affs |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid affect flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-citizens")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_cits = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid citizens '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-citizensover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (cits_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid citizensover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-citizensunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (cits_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid citizensunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-commands")) {
-			argument = any_one_word(argument, val_arg);
-			strcpy(only_commands, argument);
-		}
-		else if (is_abbrev(type_arg, "-designate")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, designate_flags, FALSE)) != NOTHING) {
-				only_designate |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid designate flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-fame")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_fame = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid fame '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-fameover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (fame_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid fameover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-fameunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (fame_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid fameunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, bld_flags, FALSE)) != NOTHING) {
-				only_flags |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-unflagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, bld_flags, FALSE)) != NOTHING) {
-				not_flagged |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-functions")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, function_flags, FALSE)) != NOTHING) {
-				only_functions |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid function '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-icon")) {
-			argument = any_one_word(argument, val_arg);
-			strcpy(only_icon, argument);
-		}
-		else if (is_abbrev(type_arg, "-interaction")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, interact_types, FALSE)) != NOTHING) {
-				find_interacts |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid interaction type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-hitpoints")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_hitpoints = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid hitpoints '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-hitpointsover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (hitpoints_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid hitpointsover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-hitpointsunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (hitpoints_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid hitpointsunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-rooms")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_rooms = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid rooms '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-roomsover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (rooms_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid roomsover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-roomsunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (rooms_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid roomsunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-military")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_military = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid military '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-militaryover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (military_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid militaryover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-militaryunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (military_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid militaryunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
+		FULLSEARCH_FLAGS("affects", only_affs, room_aff_bits)
+		FULLSEARCH_INT("citizens", only_cits, 0, INT_MAX)
+		FULLSEARCH_INT("citizensover", cits_over, 0, INT_MAX)
+		FULLSEARCH_INT("citizensunder", cits_under, 0, INT_MAX)
+		FULLSEARCH_STRING("commands", only_commands)
+		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
+		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
+		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
+		FULLSEARCH_INT("fameunder", fame_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("flags", only_flags, bld_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, bld_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, bld_flags)
+		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
+		FULLSEARCH_STRING("icon", only_icon)
+		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("hitpoints", only_hitpoints, 0, INT_MAX)
+		FULLSEARCH_INT("hitpointsover", hitpoints_over, 0, INT_MAX)
+		FULLSEARCH_INT("hitpointsunder", hitpoints_under, 0, INT_MAX)
+		FULLSEARCH_INT("rooms", only_rooms, 0, INT_MAX)
+		FULLSEARCH_INT("roomsover", rooms_over, 0, INT_MAX)
+		FULLSEARCH_INT("roomsunder", rooms_under, 0, INT_MAX)
+		FULLSEARCH_INT("military", only_military, 0, INT_MAX)
+		FULLSEARCH_INT("militaryover", military_over, 0, INT_MAX)
+		FULLSEARCH_INT("militaryunder", military_under, 0, INT_MAX)
+		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}
