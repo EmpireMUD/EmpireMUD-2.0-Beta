@@ -172,6 +172,15 @@ bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnu
 		}	\
 	}
 
+#define FULLSEARCH_FUNC(string, var, func)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		argument = any_one_word(argument, val_arg);	\
+		if ((var = (func)) == NOTHING) {	\
+			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
+			return;	\
+		}	\
+	}
+
 #define FULLSEARCH_LIST(string, var, names)	\
 	else if (is_abbrev(type_arg, "-"string)) {	\
 		argument = any_one_word(argument, val_arg);	\
