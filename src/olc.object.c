@@ -1026,11 +1026,13 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
+	extern int get_attack_type_by_name(char *name);
+	
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, cmp_flags = NOBITS, not_cmp_flagged = NOBITS, only_affs = NOBITS;
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
-	int count, lookup, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING, only_cmp = NOTHING;
+	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING, only_cmp = NOTHING;
 	int only_weapontype = NOTHING;
 	struct interaction_item *inter;
 	struct custom_message *cust;
@@ -1043,6 +1045,8 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		return;
 	}
 	
+	check_oedit_material_list();
+	
 	// process argument
 	*find_keywords = '\0';
 	while (*argument) {
@@ -1052,132 +1056,26 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (!strcmp(type_arg, "-")) {
 			continue;	// just skip stray dashes
 		}
-		else if (is_abbrev(type_arg, "-affects")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
-				only_affs |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid affect flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-apply") || is_abbrev(type_arg, "-applies")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, apply_types, FALSE)) != NOTHING) {
-				find_applies |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid apply type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-cflags") || is_abbrev(type_arg, "-cflagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, component_flags, FALSE)) != NOTHING) {
-				cmp_flags |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid component flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-component")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_cmp = search_block(val_arg, component_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid component '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-custom")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, obj_custom_types, FALSE)) != NOTHING) {
-				find_custom |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid custom message type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
-				only_flags |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-interaction")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, interact_types, FALSE)) != NOTHING) {
-				find_interacts |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid interaction type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-level")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_level = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid level '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-material")) {
-			check_oedit_material_list();
-			argument = any_one_word(argument, val_arg);
-			if ((only_mat = search_block(val_arg, (const char **)olc_material_list, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid material '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-type")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_type = search_block(val_arg, item_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-uncflagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, component_flags, FALSE)) != NOTHING) {
-				not_cmp_flagged |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid component flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-unflagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
-				not_flagged |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-weapontype")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_weapontype = search_block(val_arg, (const char**)get_weapon_types_string(), FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid weapon type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-wear") || is_abbrev(type_arg, "-worn")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, wear_bits, FALSE)) != NOTHING) {
-				only_worn |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid wear location '%s'.\r\n", val_arg);
-				return;
-			}
-		}
+		
+		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
+		FULLSEARCH_FLAGS("apply", find_applies, apply_types)
+		FULLSEARCH_FLAGS("applies", find_applies, apply_types)
+		FULLSEARCH_FLAGS("cflags", cmp_flags, component_flags)
+		FULLSEARCH_FLAGS("cflagged", cmp_flags, component_flags)
+		FULLSEARCH_LIST("component", only_cmp, component_types)
+		FULLSEARCH_FLAGS("custom", find_custom, obj_custom_types)
+		FULLSEARCH_FLAGS("flags", only_flags, extra_bits)
+		FULLSEARCH_FLAGS("flagged", only_flags, extra_bits)
+		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
+		FULLSEARCH_LIST("type", only_type, item_types)
+		FULLSEARCH_FLAGS("uncflagged", not_cmp_flagged, component_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
+		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
+		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
+		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
+		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}
