@@ -2286,7 +2286,7 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t  find_tasks = NOBITS, found_tasks, find_perks = NOBITS, found_perks;
-	int count, lookup, only_cost = NOTHING, only_value = NOTHING, only_type = NOTHING;
+	int count, only_cost = NOTHING, only_value = NOTHING, only_type = NOTHING;
 	progress_data *prg, *next_prg;
 	struct progress_perk *perk;
 	struct req_data *task;
@@ -2306,67 +2306,16 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 		if (!strcmp(type_arg, "-")) {
 			continue;	// just skip stray dashes
 		}
-		else if (is_abbrev(type_arg, "-cost")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_cost = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, progress_flags, FALSE)) != NOTHING) {
-				only_flags |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-perks")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, progress_perk_types, FALSE)) != NOTHING) {
-				find_perks |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid perk type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-tasks")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, requirement_types, FALSE)) != NOTHING) {
-				find_tasks |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid task type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-type")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_type = search_block(val_arg, progress_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-unflagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, progress_flags, FALSE)) != NOTHING) {
-				not_flagged |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-value")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_value = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
-				return;
-			}
-		}
+		
+		FULLSEARCH_INT("cost", only_cost, 0, INT_MAX)
+		FULLSEARCH_FLAGS("flags", only_flags, progress_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, progress_flags)
+		FULLSEARCH_FLAGS("perks", find_perks, progress_perk_types)
+		FULLSEARCH_FLAGS("tasks", find_tasks, requirement_types)
+		FULLSEARCH_LIST("type", only_type, progress_types)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, progress_flags)
+		FULLSEARCH_INT("value", only_value, 0, INT_MAX)
+		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}
