@@ -1254,6 +1254,7 @@ ACMD(do_mteleport) {
 	char_data *vict, *next_ch;
 	struct instance_data *inst;
 	vehicle_data *veh;
+	obj_data *obj;
 	int iter;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -1351,6 +1352,9 @@ ACMD(do_mteleport) {
 			vehicle_to_room(veh, target);
 			adjust_vehicle_tech(veh, TRUE);
 			entry_vtrigger(veh);
+		}
+		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_vis(ch, arg1))) {
+			obj_to_room(obj, target);
 		}
 		else {
 			mob_log(ch, "mteleport: victim (%s) does not exist", arg1);

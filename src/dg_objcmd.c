@@ -925,6 +925,7 @@ OCMD(do_oteleport) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	vehicle_data *veh;
+	obj_data *tobj;
 	int iter;
 
 	two_arguments(argument, arg1, arg2);
@@ -1010,6 +1011,9 @@ OCMD(do_oteleport) {
 			vehicle_to_room(veh, target);
 			adjust_vehicle_tech(veh, TRUE);
 			entry_vtrigger(veh);
+		}
+		else if ((tobj = get_obj_by_obj(obj, arg1))) {
+			obj_to_room(tobj, target);
 		}
 		else {
 			obj_log(obj, "oteleport: no target found");

@@ -741,6 +741,7 @@ VCMD(do_vteleport) {
 	struct instance_data *inst;
 	char_data *ch, *next_ch;
 	vehicle_data *v;
+	obj_data *obj;
 	int iter;
 
 	two_arguments(argument, arg1, arg2);
@@ -828,6 +829,9 @@ VCMD(do_vteleport) {
 			vehicle_to_room(v, target);
 			adjust_vehicle_tech(v, FALSE);
 			entry_vtrigger(v);
+		}
+		else if ((obj = get_obj_by_vehicle(veh, arg1))) {
+			obj_to_room(obj, target);
 		}
 		else {
 			veh_log(veh, "vteleport: no target found");
