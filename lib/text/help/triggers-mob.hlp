@@ -454,6 +454,8 @@ When using field  - The variable returns:
 &clastname&0 - The actor's last name (empty for mobs).
 &clearned(vnum)&0 - Whether the actor has learned a recipe vnum.
 &clevel&0 - The actor's computed level (or scaled level, for mobs).
+&clink_instance&0 - Marks this mob as belonging to the adventure instance of
+   the room it's currently in.
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.
 &cmaster&0 - The master of the actor (as an id), or an empty return.
