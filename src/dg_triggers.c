@@ -435,7 +435,7 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch_next) {
 		ch_next = ch->next_in_room;
 
-		if (SCRIPT_CHECK(ch, MTRIG_COMMAND)) {
+		if (SCRIPT_CHECK(ch, MTRIG_COMMAND) && (actor != ch || !AFF_FLAGGED(ch, AFF_ORDERED))) {
 			for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
 				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 					continue;
