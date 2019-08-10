@@ -3749,6 +3749,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							MOB_DYNAMIC_NAME(c) = atoi(subfield);
 							setup_generic_npc(c, GET_LOYALTY(c), MOB_DYNAMIC_NAME(c), MOB_DYNAMIC_SEX(c));
+							*str = '\0';
 						}
 					}
 					else if (!str_cmp(field, "next_follower")) {
