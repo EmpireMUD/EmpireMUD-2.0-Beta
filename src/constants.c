@@ -2073,6 +2073,7 @@ const char *mob_move_types[] = {
 	"leaves",
 	"shuffles",
 	"marches",
+	"sweeps",
 	"\n"
 };
 
