@@ -470,6 +470,8 @@ When using field  - The variable returns:
 &cmove(amount)&0 - Add/subtract movement points on the actor.
 &cmovetype&0 - The "walks" verb for this mob/player.
 &cname&0 - The actor's name (the short description for mobs).
+&cnamelist(num)&0 - Get the current generic name list entry number (if no arg),
+   or set the mob to that name list entry number.
 &cnext_follower&0 - The next follower in the list, if the person is following.
 &cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
    for loops, or an empty return.

@@ -3737,6 +3737,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "name")) {
 						snprintf(str, slen, "%s", PERS(c, c, FALSE));
 					}
+					else if (!str_cmp(field, "namelist")) {
+						void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+						
+						if (!IS_NPC(c)) {
+							snprintf(str, slen, "%d", NOTHING);
+						}
+						else if (!subfield || !*subfield || !isdigit(*subfield)) {
+							snprintf(str, slen, "%d", MOB_DYNAMIC_NAME(c));
+						}
+						else {
+							MOB_DYNAMIC_NAME(c) = atoi(subfield);
+							setup_generic_npc(c, GET_LOYALTY(c), MOB_DYNAMIC_NAME(c), MOB_DYNAMIC_SEX(c));
+						}
+					}
 					else if (!str_cmp(field, "next_follower")) {
 						struct follow_type *fol;
 						bool fnd = FALSE, success = FALSE;
