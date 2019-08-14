@@ -2073,6 +2073,7 @@ const char *mob_move_types[] = {
 	"leaves",
 	"shuffles",
 	"marches",
+	"sweeps",
 	"\n"
 };
 
@@ -2924,6 +2925,7 @@ const char *evo_types[] = {
 	"AUTUMN",
 	"WINTER",	// 15
 	"BURNS-TO",
+	"SPREADS-TO",
 	"\n"
 };
 
@@ -2947,6 +2949,7 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// autumn
 	EVO_VAL_NONE,	// winter
 	EVO_VAL_NONE,	// burns-to
+	EVO_VAL_SECTOR,	// spreads-to
 };
 
 
@@ -2969,6 +2972,7 @@ bool evo_is_over_time[] = {
 	TRUE,	// autumn
 	TRUE,	// winter
 	FALSE,	// burns-to
+	TRUE,	// spreads-to
 };
 
 

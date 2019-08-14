@@ -49,6 +49,7 @@ extern const char *wear_bits[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external functions
+void clear_recent_moves(char_data *ch);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char *get_room_name(room_data *room, bool color);
 extern char *list_harnessed_mobs(vehicle_data *veh);
@@ -2762,7 +2763,6 @@ ACMD(do_inventory) {
 
 
 ACMD(do_look) {
-	void clear_recent_moves(char_data *ch);
 	void look_in_direction(char_data *ch, int dir);
 	
 	char arg2[MAX_INPUT_LENGTH];
@@ -2820,36 +2820,131 @@ ACMD(do_look) {
 }
 
 
-ACMD(do_mapsize) {
-	int size;
+ACMD(do_map) {
+	int dist, mapsize;
 	
-	// NOTE: player picks the total size, but we store it as distance
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs can't use this command.\r\n");
+		return;
+	}
+	if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only look at the map outdoors. (Try 'look out' instead.)\r\n");
+		return;
+	}
 	
+	dist = GET_MAPSIZE(ch);
+	
+	// check args
 	skip_spaces(&argument);
+	if (*argument) {
+		if (isdigit(*argument)) {
+			dist = atoi(argument);
+		}
+		else {
+			msg_to_char(ch, "Usage: map [view distance]\r\n");
+			return;
+		}
+	}
+	
+	// validate size
+	if (*argument && dist > config_get_int("max_map_size")) {
+		msg_to_char(ch, "The maximum view distance is %d.\r\n", config_get_int("max_map_size"));
+		return;
+	}
+	else if (*argument && dist < 1) {
+		msg_to_char(ch, "You must specify a distance of at least 1.\r\n");
+		return;
+	}
+	
+	mapsize = GET_MAPSIZE(ch);	// store for later
+	GET_MAPSIZE(ch) = dist;	// requested distance
+	
+	clear_recent_moves(ch);	// prevents shrinkage
+	look_at_room_by_loc(ch, IN_ROOM(ch), LRR_LOOK_OUT);
+	
+	GET_MAPSIZE(ch) = mapsize;
+}
+
+
+ACMD(do_mapsize) {
+	#define MAPSIZE_RADIUS  1
+	#define MAPSIZE_WIDTH  2
+	
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	int max_size, size, pos, mode;
 	
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
+	// check no-arg first
+	skip_spaces(&argument);
 	if (!*argument) {
 		if (GET_MAPSIZE(ch) > 0) {
-			msg_to_char(ch, "Current map size: %d\r\n", GET_MAPSIZE(ch) * 2 + 1);
+			msg_to_char(ch, "Current map size: radius %d (width %d)\r\n", GET_MAPSIZE(ch), GET_MAPSIZE(ch) * 2 + 1);
 		}
 		else {
 			msg_to_char(ch, "Your map size is set to automatic.\r\n");
 		}
+		return;
 	}
-	else if (!str_cmp(argument, "auto")) {
+	
+	// usage: mapsize <distance> [radius|width]
+	// screenreader players default to radius but sighted players default to width
+	
+	half_chop(argument, num_arg, type_arg);
+	if (*num_arg && !*type_arg && str_cmp(num_arg, "auto")) {	// look for type_arg attached to num_arg
+		for (pos = 0; pos < strlen(num_arg); ++pos) {
+			if (isdigit(num_arg[pos])) {
+				continue;	// still in the number portion
+			}
+			else if (isspace(num_arg[pos])) {
+				num_arg[pos] = '\0';	// terminate at the first space
+				continue;
+			}
+			else if (!isdigit(num_arg[pos])) {
+				// found the start of the real second arg (first non-digit char)
+				strcpy(type_arg, num_arg + pos);
+				num_arg[pos] = '\0';
+				break;	// done parsing
+			}
+		}
+	}
+	
+	// verify type argument, if any
+	if (*type_arg && is_abbrev(type_arg, "width")) {
+		mode = MAPSIZE_WIDTH;
+	}
+	else if (*type_arg && is_abbrev(type_arg, "radius")) {
+		mode = MAPSIZE_RADIUS;
+	}
+	else if (*type_arg) {
+		msg_to_char(ch, "Invalid type. Usage: mapsize <distance> [radius | width]\r\n");
+		return;
+	}
+	else {
+		// default mode is based on screenreader status
+		mode = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? MAPSIZE_RADIUS : MAPSIZE_WIDTH;
+	}
+	
+	// determine max size
+	max_size = (mode == MAPSIZE_RADIUS ? config_get_int("max_map_size") : (config_get_int("max_map_size") * 2 + 1));
+	
+	// and process
+	if (!str_cmp(num_arg, "auto")) {
 		GET_MAPSIZE(ch) = 0;
 		msg_to_char(ch, "Your map size is now automatic.\r\n");
 	
 	}
-	else if ((size = atoi(argument)) < 3 || size > (config_get_int("max_map_size") * 2 + 1)) {
-		msg_to_char(ch, "You must choose a size between 3 and %d.\r\n", config_get_int("max_map_size") * 2 + 1);
+	else if ((size = atoi(num_arg)) < 1) {
+		msg_to_char(ch, "Invalid map size. Usage: mapsize <distance> [radius | width]\r\n");
+	}
+	else if (size > max_size) {
+		msg_to_char(ch, "You must choose a size between %d and %d.\r\n", (mode == MAPSIZE_RADIUS ? 1 : 3), max_size);
 	}
 	else {
-		GET_MAPSIZE(ch) = size/2;
-		msg_to_char(ch, "Your map size is now %d.\r\n", GET_MAPSIZE(ch) * 2 + 1);
+		GET_MAPSIZE(ch) = (mode == MAPSIZE_RADIUS ? size : MAX(1, size/2));
+		msg_to_char(ch, "Your map size is now: radius %d (width %d)\r\n", GET_MAPSIZE(ch), GET_MAPSIZE(ch) * 2 + 1);
 	}
 }
 

@@ -6472,6 +6472,7 @@ Available types ([value] isn't used unless specified):
     vnum).
  SPRING, SUMMER, AUTUMN, WINTER - Triggers during this season.
  BURNS-TO - Sector this tile becomes when burned down by a player.
+ SPREADS-TO - The opposite of adjacent-one: spreads from this tile to that one.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28

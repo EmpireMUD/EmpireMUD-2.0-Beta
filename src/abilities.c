@@ -2482,7 +2482,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom;
-	int count, lookup, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
+	int count, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
 	int min_cost = NOTHING, max_cost = NOTHING, min_cost_per = NOTHING, max_cost_per = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
 	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_attack = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
 	struct ability_data_list *data;
@@ -2506,157 +2506,41 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		if (!strcmp(type_arg, "-")) {
 			continue;	// just skip stray dashes
 		}
-		else if (is_abbrev(type_arg, "-affects")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
-				only_affs |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid affect flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-apply") || is_abbrev(type_arg, "-applies")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, apply_types, FALSE)) != NOTHING) {
-				find_applies |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid apply type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-attacktype")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_attack = get_attack_type_by_name(val_arg)) == NOTHING) {
-				msg_to_char(ch, "Invalid attack type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-costtype")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_cost_type = search_block(val_arg, pool_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid cost type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-custom")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, ability_custom_types, FALSE)) != NOTHING) {
-				find_custom |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid custom message type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-damagetype")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_damage = search_block(val_arg, damage_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid damage type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-difficulty")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_wait = search_block(val_arg, skill_check_difficulty, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid difficulty '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, ability_flags, FALSE)) != NOTHING) {
-				only_flags |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-gains") || is_abbrev(type_arg, "-gainhooks")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, ability_gain_hooks, FALSE)) != NOTHING) {
-				only_gains |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid gain hook '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-immunities") || is_abbrev(type_arg, "-immunity") || is_abbrev(type_arg, "immune")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
-				only_immunities |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid immunity '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-linkedtrait")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_linked = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid linked trait '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-maxcooldowntime")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (max_cd = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid cooldown time '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-mincooldowntime")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (min_cd = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid cooldown time '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-maxcost")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (max_cost = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-mincost")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (min_cost = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-maxcostperscalepoint")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (max_cost_per = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-mincostperscalepoint")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (min_cost_per = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-maxposition")) {
-			argument = any_one_word(argument, val_arg);
-			if ((max_pos = search_block(val_arg, position_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid position '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-minposition")) {
-			argument = any_one_word(argument, val_arg);
-			if ((min_pos = search_block(val_arg, position_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid position '%s'.\r\n", val_arg);
-				return;
-			}
-		}
+		
+		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
+		FULLSEARCH_FLAGS("apply", find_applies, apply_types)
+		FULLSEARCH_FLAGS("applies", find_applies, apply_types)
+		FULLSEARCH_FUNC("attacktype", only_attack, get_attack_type_by_name(val_arg))
+		FULLSEARCH_LIST("costtype", only_cost_type, pool_types)
+		FULLSEARCH_FLAGS("custom", find_custom, ability_custom_types)
+		FULLSEARCH_LIST("damagetype", only_damage, damage_types)
+		FULLSEARCH_LIST("difficulty", only_diff, skill_check_difficulty)
+		FULLSEARCH_FLAGS("flags", only_flags, ability_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, ability_flags)
+		FULLSEARCH_FLAGS("gains", only_gains, ability_gain_hooks)
+		FULLSEARCH_FLAGS("gainhooks", only_gains, ability_gain_hooks)
+		FULLSEARCH_FLAGS("immunities", only_immunities, affected_bits)
+		FULLSEARCH_FLAGS("immunity", only_immunities, affected_bits)
+		FULLSEARCH_FLAGS("immune", only_immunities, affected_bits)
+		FULLSEARCH_LIST("linkedtrait", only_linked, apply_types)
+		FULLSEARCH_INT("maxcooldowntime", max_cd, 0, INT_MAX)
+		FULLSEARCH_INT("mincooldowntime", min_cd, 0, INT_MAX)
+		FULLSEARCH_INT("maxcost", max_cost, 0, INT_MAX)
+		FULLSEARCH_INT("mincost", min_cost, 0, INT_MAX)
+		FULLSEARCH_INT("maxcostperscalepoint", max_cost_per, 0, INT_MAX)
+		FULLSEARCH_INT("mincostperscalepoint", min_cost_per, 0, INT_MAX)
+		FULLSEARCH_LIST("maxposition", max_pos, position_types)
+		FULLSEARCH_LIST("minposition", min_pos, position_types)
+		FULLSEARCH_LIST("ptech", only_ptech, player_tech_types)
+		FULLSEARCH_INT("scale", only_scale, 0, INT_MAX)
+		FULLSEARCH_INT("scaleover", scale_over, 0, INT_MAX)
+		FULLSEARCH_INT("scaleunder", scale_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("targets", only_targets, ability_target_flags)
+		FULLSEARCH_LIST("type", only_type, ability_type_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, ability_flags)
+		FULLSEARCH_LIST("waittype", only_wait, wait_types)
+		
+		// custom:
 		else if (is_abbrev(type_arg, "-maxduration")) {
 			argument = any_one_word(argument, val_arg);
 			if (is_abbrev(val_arg, "unlimited")) {
@@ -2677,68 +2561,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "-ptech")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_ptech = search_block(val_arg, player_tech_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid player tech '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-scale")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_scale = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid scale percent '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-scaleover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (scale_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid scale-over percent '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-scaleunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (scale_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid scale-under percent '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-targets")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, ability_target_flags, FALSE)) != NOTHING) {
-				only_targets |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid target flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-type")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_type = search_block(val_arg, ability_type_flags, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-unflagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, ability_flags, FALSE)) != NOTHING) {
-				not_flagged |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-waittype")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_wait = search_block(val_arg, wait_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid wait type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
+		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}

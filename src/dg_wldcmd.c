@@ -567,6 +567,7 @@ WCMD(do_wteleport) {
 	char_data *ch, *next_ch;
 	vehicle_data *veh;
 	room_data *target;
+	obj_data *obj;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	int iter;
@@ -657,6 +658,9 @@ WCMD(do_wteleport) {
 			vehicle_to_room(veh, target);
 			adjust_vehicle_tech(veh, TRUE);
 			entry_vtrigger(veh);
+		}
+		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_by_room(room, arg1))) {
+			obj_to_room(obj, target);
 		}
 		else
 			wld_log(room, "wteleport: no target found");

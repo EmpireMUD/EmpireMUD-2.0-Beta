@@ -1,4 +1,4 @@
-MAP LEGEND TERRAIN
+LEGEND TERRAIN
 
 These are the common map icons:
 
@@ -22,7 +22,7 @@ See HELP CROPS for the icons for various wild crops.
 You can find specific buildings in the HELP BUILDING information as well as
 the other help files listed in its "see also".
 
-See also: TOWER OF SOULS, BUILDING, CROPS
+See also: LOOK, MAP, TOWER OF SOULS, BUILDING, CROPS
 #
 ACCOUNT ACCOUNTS
 
@@ -893,7 +893,7 @@ maximum distance, which is based on the size of the world map.
 
 You must have Navigation to do this.
 
-See also: SCAN, LOOK
+See also: SCAN, LOOK, MAP
 #
 MOVE MOVES "MOVE POINTS" "MOVEMENT POINTS"
 

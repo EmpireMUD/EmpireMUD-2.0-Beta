@@ -1500,6 +1500,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_LEAVES  33
 #define MOB_MOVE_SHUFFLES  34
 #define MOB_MOVE_MARCHES  35
+#define MOB_MOVE_SWEEPS  36
 
 
 // name sets: add matching files in lib/text/names/
@@ -2450,7 +2451,8 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_AUTUMN  14	// triggers if it's autumn
 #define EVO_WINTER  15	// triggers if it's winter
 #define EVO_BURNS_TO  16	// caused by a player burning it
-#define NUM_EVOS  17	// total
+#define EVO_SPREADS_TO  17	// reverse of adjacent-one
+#define NUM_EVOS  18	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0

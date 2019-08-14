@@ -2190,7 +2190,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 */
 void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
-	int count, lookup;
+	int count;
 	
 	char only_icon[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS;
@@ -2223,196 +2223,35 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;	// just skip stray dashes
 		}
 		
-		else if (is_abbrev(type_arg, "-animalsrequired")) {
-			argument = any_one_word(argument, val_arg);
-			if (!str_cmp(val_arg, "any")) {
-				needs_animals = TRUE;
-			}
-			else if (!isdigit(*val_arg) || (only_animals = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid animalsrequired '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-capacity")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_cap = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid capacity '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-capacityover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (cap_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid capacityover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-capacityunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (cap_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid capacityunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-designate")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, designate_flags, FALSE)) != NOTHING) {
-				only_designate |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid designate flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-fame")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_fame = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid fame '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-fameover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (fame_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid fameover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-fameunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (fame_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid fameunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, vehicle_flags, FALSE)) != NOTHING) {
-				only_flags |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-unflagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, vehicle_flags, FALSE)) != NOTHING) {
-				not_flagged |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-functions")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, function_flags, FALSE)) != NOTHING) {
-				only_functions |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid function '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-icon")) {
-			argument = any_one_word(argument, val_arg);
-			strcpy(only_icon, argument);
-		}
-		else if (is_abbrev(type_arg, "-interaction")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, interact_types, FALSE)) != NOTHING) {
-				find_interacts |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid interaction type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-hitpoints")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_hitpoints = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid hitpoints '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-hitpointsover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (hitpoints_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid hitpointsover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-hitpointsunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (hitpoints_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid hitpointsunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-movetype")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_move = search_block(val_arg, mob_move_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid move-type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-level")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_level = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid level '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-rooms")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_rooms = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid rooms '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-roomsover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (rooms_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid roomsover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-roomsunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (rooms_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid roomsunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-military")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_military = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid military '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-militaryover")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (military_over = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid militaryover '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-militaryunder")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (military_under = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid militaryunder '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-speed")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_speed = search_block(val_arg, vehicle_speed_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid speed '%s'.\r\n", val_arg);
-				return;
-			}
-		}
+		// else-ifs defined in olc.h process these args:
+		FULLSEARCH_INT("animalsrequired", only_animals, 0, INT_MAX)
+		FULLSEARCH_BOOL("anyanimalsrequired", needs_animals)
+		FULLSEARCH_INT("capacity", only_cap, 0, INT_MAX)
+		FULLSEARCH_INT("capacityover", cap_over, 0, INT_MAX)
+		FULLSEARCH_INT("capacityunder", cap_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
+		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
+		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
+		FULLSEARCH_INT("fameunder", fame_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("flagged", only_flags, vehicle_flags)
+		FULLSEARCH_FLAGS("flags", only_flags, vehicle_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, vehicle_flags)
+		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
+		FULLSEARCH_STRING("icon", only_icon)
+		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("hitpoints", only_hitpoints, 0, INT_MAX)
+		FULLSEARCH_INT("hitpointsover", hitpoints_over, 0, INT_MAX)
+		FULLSEARCH_INT("hitpointsunder", hitpoints_under, 0, INT_MAX)
+		FULLSEARCH_LIST("movetype", only_move, mob_move_types)
+		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_INT("rooms", only_rooms, 0, INT_MAX)
+		FULLSEARCH_INT("roomsover", rooms_over, 0, INT_MAX)
+		FULLSEARCH_INT("roomsunder", rooms_under, 0, INT_MAX)
+		FULLSEARCH_INT("military", only_military, 0, INT_MAX)
+		FULLSEARCH_INT("militaryover", military_over, 0, INT_MAX)
+		FULLSEARCH_INT("militaryunder", military_under, 0, INT_MAX)
+		FULLSEARCH_LIST("speed", only_speed, vehicle_speed_types)
+		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}

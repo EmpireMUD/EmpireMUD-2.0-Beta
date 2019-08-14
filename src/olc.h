@@ -141,3 +141,57 @@ void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure
 // helpers from other systems
 bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);
+
+
+// fullsearch helpers
+
+#define FULLSEARCH_BOOL(string, var)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		var = TRUE;	\
+	}
+
+#define FULLSEARCH_INT(string, var, min, max)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		argument = any_one_word(argument, val_arg);	\
+		if (!isdigit(*val_arg) || (var = atoi(val_arg)) < min || var > max) {	\
+			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
+			return;	\
+		}	\
+	}
+
+#define FULLSEARCH_FLAGS(string, var, names)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		int lookup;	\
+		argument = any_one_word(argument, val_arg);	\
+		if ((lookup = search_block(val_arg, names, FALSE)) != NOTHING) {	\
+			var |= BIT(lookup);	\
+		}	\
+		else {	\
+			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
+			return;	\
+		}	\
+	}
+
+#define FULLSEARCH_FUNC(string, var, func)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		argument = any_one_word(argument, val_arg);	\
+		if (!(var = (func))) {	\
+			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
+			return;	\
+		}	\
+	}
+
+#define FULLSEARCH_LIST(string, var, names)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		argument = any_one_word(argument, val_arg);	\
+		if ((var = search_block(val_arg, names, FALSE)) == NOTHING) {	\
+			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
+			return;	\
+		}	\
+	}
+
+#define FULLSEARCH_STRING(string, var)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		argument = any_one_word(argument, val_arg);	\
+		strcpy(var, val_arg);	\
+	}

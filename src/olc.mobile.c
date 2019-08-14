@@ -579,11 +579,13 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_mob(char_data *ch, char *argument) {
+	extern int get_attack_type_by_name(char *name);
+	
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
 	int only_attack = NOTHING, only_move = NOTHING, only_nameset = NOTHING;
-	int count, lookup, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING;
+	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING;
 	faction_data *only_fct = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
@@ -604,105 +606,21 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		if (!strcmp(type_arg, "-")) {
 			continue;	// just skip stray dashes
 		}
-		else if (is_abbrev(type_arg, "-allegiance") || is_abbrev(type_arg, "-faction")) {
-			argument = any_one_word(argument, val_arg);
-			if (!(only_fct = find_faction(val_arg))) {
-				msg_to_char(ch, "Invalid faction '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-affects")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
-				only_affs |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid affect flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-attack")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_attack = search_block(val_arg, (const char**)get_weapon_types_string(), FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid attack type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-custom")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, mob_custom_types, FALSE)) != NOTHING) {
-				find_custom |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid custom message type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, action_bits, FALSE)) != NOTHING) {
-				only_flags |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-interaction")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, interact_types, FALSE)) != NOTHING) {
-				find_interacts |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid interaction type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-level")) {
-			argument = any_one_word(argument, val_arg);
-			if (!isdigit(*val_arg) || (only_level = atoi(val_arg)) < 0) {
-				msg_to_char(ch, "Invalid level '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-movetype")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_move = search_block(val_arg, mob_move_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid move type '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-nameset")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_nameset = search_block(val_arg, name_sets, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid name set '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-sex") || is_abbrev(type_arg, "-gender")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_sex = search_block(val_arg, genders, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid gender '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-size")) {
-			argument = any_one_word(argument, val_arg);
-			if ((only_size = search_block(val_arg, size_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid size '%s'.\r\n", val_arg);
-				return;
-			}
-		}
-		else if (is_abbrev(type_arg, "-unflagged")) {
-			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, action_bits, FALSE)) != NOTHING) {
-				not_flagged |= BIT(lookup);
-			}
-			else {
-				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
-				return;
-			}
-		}
+		FULLSEARCH_FUNC("allegiance", only_fct, find_faction(val_arg))
+		FULLSEARCH_FUNC("faction", only_fct, find_faction(val_arg))
+		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
+		FULLSEARCH_FUNC("attack", only_attack, get_attack_type_by_name(val_arg))
+		FULLSEARCH_FLAGS("custom", find_custom, mob_custom_types)
+		FULLSEARCH_FLAGS("flags", only_flags, action_bits)
+		FULLSEARCH_FLAGS("flagged", only_flags, action_bits)
+		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_LIST("movetype", only_move, mob_move_types)
+		FULLSEARCH_LIST("nameset", only_nameset, name_sets)
+		FULLSEARCH_LIST("sex", only_sex, genders)
+		FULLSEARCH_LIST("gender", only_sex, genders)
+		FULLSEARCH_LIST("size", only_size, size_types)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, action_bits)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);

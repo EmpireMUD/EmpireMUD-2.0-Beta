@@ -59,6 +59,7 @@ struct map_t {
 struct map_t world[MAP_WIDTH][MAP_HEIGHT];	// world map grid
 struct map_t *land = NULL;	// linked list of land tiles
 sector_data *sector_table = NULL;	// sector hash table
+FILE *outfl = NULL;	// file for saving data
 
 
 // these are the arguments to shift_tile() to shift one tile in a direction, e.g. shift_tile(tile, shift_dir[dir][0], shift_dir[dir][1]) -- NUM_OF_DIRS
@@ -94,6 +95,7 @@ int number(int from, int to);
 int season(struct map_t *tile);
 bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance, bool count_original_sect);
 struct map_t *shift_tile(struct map_t *origin, int x_shift, int y_shift);
+void write_tile(struct map_t *tile, sector_vnum old);
 
 // this allows the inclusion of utils.h
 void basic_mud_log(const char *format, ...) { }
@@ -188,38 +190,65 @@ void evolve_one(struct map_t *tile) {
 }
 
 
+// evolutions that spread TO other tiles, rather than FROM
+int spread_one(struct map_t *tile) {
+	struct evolution_data *evo;
+	sector_vnum become = NOTHING, old;
+	struct map_t *to_room, *found_room;
+	sector_data *new_sect;
+	int iter, count, changed = 0;
+	
+	if ((evo = get_evo_by_type(tile->sector_type, EVO_SPREADS_TO))) {
+		found_room = NULL;
+		count = 0;
+		
+		for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
+			to_room = shift_tile(tile, shift_dir[iter][0], shift_dir[iter][1]);
+			if (to_room && to_room->sector_type == evo->value && !IS_SET(to_room->affects, ROOM_AFF_NO_EVOLVE)) {
+				// spreadable... choose a direction randomly
+				if (!number(0, count++) || !found_room) {
+					found_room = to_room;
+				}
+			}
+		}
+		
+		if (found_room) {
+			become = evo->becomes;
+			HASH_FIND_INT(sector_table, &become, new_sect);
+			if (become != NOTHING && new_sect) {
+				old = found_room->sector_type;
+				found_room->sector_type = become;
+				write_tile(found_room, old);
+				++changed;
+			}
+		}
+	}
+	
+	return changed;	// how many were changed
+}
+
+
 /**
 * runs the evolutions on the whole map and writes the hint file
 */
 void evolve_map(void) {
-	struct evo_import_data dat;
 	struct map_t *tile;
 	sector_vnum old;
 	int changed = 0;
-	FILE *fl;
-	
-	if (!(fl = fopen(EVOLUTION_FILE TEMP_SUFFIX, "wb"))) {
-		printf("ERROR: Unable to open evolution file %s\n", EVOLUTION_FILE);
-		exit(1);
-	}
 	
 	LL_FOREACH(land, tile) {
+		// main evos
 		old = tile->sector_type;
-		
 		evolve_one(tile);
 		
 		if (tile->sector_type != old) {
-			dat.vnum = tile->vnum;
-			dat.old_sect = old;
-			dat.new_sect = tile->sector_type;
-			
-			fwrite(&dat, sizeof(struct evo_import_data), 1, fl);
+			write_tile(tile, old);
 			++changed;
 		}
+		
+		// spreader-style evos
+		changed += spread_one(tile);
 	}
-	
-	fclose(fl);
-	rename(EVOLUTION_FILE TEMP_SUFFIX, EVOLUTION_FILE);
 	
 	if (DEBUG_MODE) {
 		printf("Changed %d tile%s\n", changed, PLURAL(changed));
@@ -274,8 +303,18 @@ int main(int argc, char **argv) {
 		printf("Loaded: %d land tiles\n", num);
 	}
 	
+	// open file for writing
+	if (!(outfl = fopen(EVOLUTION_FILE TEMP_SUFFIX, "wb"))) {
+		printf("ERROR: Unable to open evolution file %s\n", EVOLUTION_FILE);
+		exit(1);
+	}
+	
 	// evolve data
 	evolve_map();
+	
+	// close file
+	fclose(outfl);
+	rename(EVOLUTION_FILE TEMP_SUFFIX, EVOLUTION_FILE);
 	
 	// signal back to the mud that we're done
 	if (pid) {
@@ -708,6 +747,23 @@ void load_base_map(void) {
 	}
 	
 	fclose(fl);
+}
+
+
+// writes a single tile to the open output file
+void write_tile(struct map_t *tile, sector_vnum old) {
+	struct evo_import_data dat;
+	
+	if (!outfl) {
+		printf("Error: called write_tile() with out the output file open\n");
+		exit(0);
+	}
+	
+	dat.vnum = tile->vnum;
+	dat.old_sect = old;
+	dat.new_sect = tile->sector_type;
+	
+	fwrite(&dat, sizeof(struct evo_import_data), 1, outfl);
 }
 
 

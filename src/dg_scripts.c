@@ -63,6 +63,7 @@ void check_for_eligible_goals(empire_data *emp);	// progress.c
 extern int count_harnessed_animals(vehicle_data *veh);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
@@ -526,7 +527,6 @@ obj_data *get_obj(char *name)  {
 * @return room_data* The found room, or NULL if none.
 */
 room_data *get_room(room_data *ref, char *name) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	struct instance_data *inst;
@@ -3075,7 +3075,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "can_enter_instance")) {
 						extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-						extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						struct instance_data *inst;
 						
@@ -3654,6 +3653,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", get_approximate_level(c)); 
 					}
+					else if (!str_cmp(field, "link_instance")) {
+						struct instance_data *inst;
+						if (IS_NPC(c)) {
+							if (MOB_INSTANCE_ID(c) != NOTHING) {
+								// remove from old instance?
+								subtract_instance_mob(real_instance(MOB_INSTANCE_ID(c)), GET_MOB_VNUM(c));
+								MOB_INSTANCE_ID(c) = NOTHING;
+							}
+							if ((inst = find_instance_by_room(IN_ROOM(c), FALSE, TRUE))) {
+								MOB_INSTANCE_ID(c) = inst->id;
+								add_instance_mob(inst, GET_MOB_VNUM(c));
+							}
+						}
+						*str = '\0';
+					}
 					break;
 				}
 				case 'm': {	// char.m*
@@ -3722,6 +3736,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'n': {	// char.n*
 					if (!str_cmp(field, "name")) {
 						snprintf(str, slen, "%s", PERS(c, c, FALSE));
+					}
+					else if (!str_cmp(field, "namelist")) {
+						void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+						
+						if (!IS_NPC(c)) {
+							snprintf(str, slen, "%d", NOTHING);
+						}
+						else if (!subfield || !*subfield || !isdigit(*subfield)) {
+							snprintf(str, slen, "%d", MOB_DYNAMIC_NAME(c));
+						}
+						else {
+							MOB_DYNAMIC_NAME(c) = atoi(subfield);
+							setup_generic_npc(c, GET_LOYALTY(c), MOB_DYNAMIC_NAME(c), MOB_DYNAMIC_SEX(c));
+							*str = '\0';
+						}
 					}
 					else if (!str_cmp(field, "next_follower")) {
 						struct follow_type *fol;
@@ -6300,7 +6329,6 @@ room_data *dg_room_of_obj(obj_data *obj) {
 
 /* create a UID variable from the id number */
 void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	char junk[MAX_INPUT_LENGTH], varname[MAX_INPUT_LENGTH];
