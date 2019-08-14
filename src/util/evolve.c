@@ -184,6 +184,9 @@ void evolve_one(struct map_t *tile) {
 	
 	// DONE: now change it
 	HASH_FIND_INT(sector_table, &become, new_sect);
+	if (become != NOTHING && new_sect) {
+		tile->sector_type = become;
+	}
 }
 
 
