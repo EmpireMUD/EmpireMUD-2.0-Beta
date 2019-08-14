@@ -168,6 +168,12 @@ For each type, there is a help file named &yOTRIG <type>&0.
 All object scripts provide the &c%self%&0 variable.
 
 When using field  - The variable returns:
+&cattack(field)&0 - Gets info on a weapon's attack type. Valid fields are:
+  &yname&0 - attack name             &yfirst-person or 1&0 - 1st person attack message
+  &ynoun&0 - noun form of attack     &ythird-person or 3&0 - 3rd person attack message
+  &ysharp&0 - is a sharp weapon?     &ydamage&0 - physical, magical, etc
+  &yblunt&0 - is a blunt weapon?     &ydisarmable&0 - can be disarmed?
+  &ymagic&0 - is a magic weapon?
 &cbind(person)&0 - Binds the item to a player (or "nobody" to unbind it). You
    can copy another object's whole binding list with %newobj.bind(%obj%)%.
 &ccan_wear(flag)&0 - True if the object has the given wear flag (HELP OEDIT WEAR).

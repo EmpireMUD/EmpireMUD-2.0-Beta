@@ -4186,6 +4186,46 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 			*str = '\x1';
 			switch (LOWER(*field)) {
+				case 'a': {
+					if (!str_cmp(field, "attack")) {
+						extern const char *damage_types[];
+						
+						if (IS_WEAPON(o) || IS_MISSILE_WEAPON(o)) {
+							int type = IS_WEAPON(o) ? GET_WEAPON_TYPE(o) : GET_MISSILE_WEAPON_TYPE(o);
+							if (!subfield || !*subfield || !str_cmp(subfield, "0") || is_abbrev(subfield, "name")) {
+								snprintf(str, slen, "%s", attack_hit_info[type].name);
+							}
+							else if (!str_cmp(subfield, "1") || is_abbrev(subfield, "first-person")) {
+								snprintf(str, slen, "%s", attack_hit_info[type].first_pers);
+							}
+							else if (!str_cmp(subfield, "3") || is_abbrev(subfield, "third-person")) {
+								snprintf(str, slen, "%s", attack_hit_info[type].third_pers);
+							}
+							else if (is_abbrev(subfield, "noun")) {
+								snprintf(str, slen, "%s", attack_hit_info[type].noun);
+							}
+							else if (is_abbrev(subfield, "sharp")) {
+								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_SHARP ? 1 : 0);
+							}
+							else if (is_abbrev(subfield, "blunt")) {
+								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_BLUNT ? 1 : 0);
+							}
+							else if (is_abbrev(subfield, "magic")) {
+								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_MAGIC ? 1 : 0);
+							}
+							else if (is_abbrev(subfield, "damage")) {
+								snprintf(str, slen, "%s", damage_types[attack_hit_info[type].damage_type]);
+							}
+							else if (is_abbrev(subfield, "disarmable")) {
+								snprintf(str, slen, "%d", attack_hit_info[type].disarmable);
+							}
+						}
+						else {	// not a weapon
+							*str = '\0';
+						}
+					}
+					break;
+				}
 				case 'b': {	// obj.b*
 					if (!str_cmp(field, "bind")) {
 						void free_obj_binding(struct obj_binding **list);
