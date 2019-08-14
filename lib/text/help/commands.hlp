@@ -323,10 +323,16 @@ Examples:
 BUY LIST SHOP SHOPS
 
 Usage:  list [keywords]
+        list identify <keywords>
         buy <item>
 
 These commands let you list and buy items from shops. You can find shops in
 various places around the world.
+
+Using "list ID" will let you identify an item and view its description before
+you buy it. Some adventures have shops with specialized items. These adventures
+usually have a help file (such as HELP MAGITERRANEAN: PERMAFROST) which
+indicate what the items in the shop do.
 #
 CHANGEPASS CHANGEPASSWORD "CHANGE PASSWORD" PASSWORD
 
