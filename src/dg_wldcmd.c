@@ -563,6 +563,38 @@ WCMD(do_wsiege) {
 }
 
 
+// kills the target
+WCMD(do_wslay) {
+	char name[MAX_INPUT_LENGTH];
+	char_data *vict;
+	
+	argument = one_argument(argument, name);
+
+	if (!*name) {
+		wld_log(room, "wslay: no target");
+		return;
+	}
+	
+	if (*name == UID_CHAR) {
+		if (!(vict = get_char(name))) {
+			wld_log(room, "wslay: victim (%s) does not exist", name);
+			return;
+		}
+	}
+	else if (!(vict = get_char_by_room(room, name))) {
+		wld_log(room, "wslay: victim (%s) does not exist", name);
+		return;
+	}
+	
+	if (IS_IMMORTAL(vict)) {
+		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
+	}
+	else {
+		die(vict, vict);
+	}
+}
+
+
 WCMD(do_wteleport) {
 	char_data *ch, *next_ch;
 	vehicle_data *veh;
@@ -1563,6 +1595,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wscale", do_wscale, NO_SCMD },
 	{ "wsend", do_wsend, SCMD_WSEND },
 	{ "wsiege", do_wsiege, NO_SCMD },
+	{ "wslay", do_wslay, NO_SCMD },
 	{ "wteleport", do_wteleport, NO_SCMD },
 	{ "wterracrop", do_wterracrop, NO_SCMD },
 	{ "wterraform", do_wterraform, NO_SCMD },

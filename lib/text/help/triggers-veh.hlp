@@ -50,6 +50,7 @@ help files for more info):
 &c%scale%&0 - Changes the scale level of a target.
 &c%send%&0 - Send a message to one person.
 &c%siege%&0 - Deals siege damage to a vehicle or room.
+&c%slay%&0 - Instantly kills the target.
 &c%teleport%&0 - Moves people to another location.
 &c%terracrop%&0 - Changes the terrain to a certain crop type.
 &c%terraform%&0 - Changes the terrain to a certain sector type.

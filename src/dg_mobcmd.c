@@ -1952,6 +1952,46 @@ ACMD(do_msiege) {
 }
 
 
+// kills the target
+ACMD(do_mslay) {
+	char name[MAX_INPUT_LENGTH];
+	char_data *vict;
+
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	if (AFF_FLAGGED(ch, AFF_ORDERED))
+		return;
+
+	argument = one_argument(argument, name);
+
+	if (!*name) {
+		mob_log(ch, "mslay: no target");
+		return;
+	}
+	
+	if (*name == UID_CHAR) {
+		if (!(vict = get_char(name))) {
+			mob_log(ch, "mslay: victim (%s) does not exist", name);
+			return;
+		}
+	}
+	else if (!(vict = get_char_room_vis(ch, name))) {
+		mob_log(ch, "mslay: victim (%s) does not exist", name);
+		return;
+	}
+	
+	if (IS_IMMORTAL(vict)) {
+		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
+	}
+	else {
+		die(vict, ch);
+	}
+}
+
+
 /* transform into a different mobile */
 ACMD(do_mtransform) {
 	char arg[MAX_INPUT_LENGTH];

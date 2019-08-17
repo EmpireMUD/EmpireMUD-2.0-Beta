@@ -735,6 +735,38 @@ VCMD(do_vsiege) {
 }
 
 
+// kills the target
+VCMD(do_vslay) {
+	char name[MAX_INPUT_LENGTH];
+	char_data *vict;
+	
+	argument = one_argument(argument, name);
+
+	if (!*name) {
+		veh_log(veh, "vslay: no target");
+		return;
+	}
+	
+	if (*name == UID_CHAR) {
+		if (!(vict = get_char(name))) {
+			veh_log(veh, "vslay: victim (%s) does not exist", name);
+			return;
+		}
+	}
+	else if (!(vict = get_char_by_vehicle(veh, name))) {
+		veh_log(veh, "vslay: victim (%s) does not exist", name);
+		return;
+	}
+	
+	if (IS_IMMORTAL(vict)) {
+		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
+	}
+	else {
+		die(vict, vict);
+	}
+}
+
+
 VCMD(do_vteleport) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	room_data *target, *orm = IN_ROOM(veh);
@@ -1623,6 +1655,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vscale", do_vscale, NO_SCMD },
 	{ "vsend", do_vsend, SCMD_VSEND },
 	{ "vsiege", do_vsiege, NO_SCMD },
+	{ "vslay", do_vslay, NO_SCMD },
 	{ "vteleport", do_vteleport, NO_SCMD },
 	{ "vterracrop", do_vterracrop, NO_SCMD },
 	{ "vterraform", do_vterraform, NO_SCMD },
