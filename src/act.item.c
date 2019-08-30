@@ -3141,6 +3141,8 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
+	
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 
