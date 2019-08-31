@@ -2289,7 +2289,8 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					exit(0);
 				}
 				
-				if (obj_proto(t[0])) {
+				if (obj_proto(t[0]) || t[0] == NOTHING) {
+					// only allow if it's a real item OR there was no item (i.e. dispatch)
 					CREATE(shipd, struct shipping_data, 1);
 					shipd->vnum = t[0];
 					shipd->amount = t[1];

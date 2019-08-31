@@ -8182,6 +8182,7 @@ ACMD(do_purge) {
 						deliver_shipment(VEH_OWNER(veh), shipd);
 					}
 				}
+				VEH_SHIPPING_ID(veh) = -1;
 			}
 			
 			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM);
@@ -9232,6 +9233,7 @@ ACMD(do_trans) {
 					deliver_shipment(VEH_OWNER(veh), shipd);
 				}
 			}
+			VEH_SHIPPING_ID(veh) = -1;
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
