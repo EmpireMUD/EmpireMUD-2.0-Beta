@@ -6679,7 +6679,12 @@ ACMD(do_breakreply) {
 		GET_LAST_TELL(iter) = NOBODY;
 	}
 	
-	send_config_msg(ch, "ok_string");
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "Players currently in-game can no longer reply to you (unless you send them another tell).\r\n");
+	}
 }
 
 
