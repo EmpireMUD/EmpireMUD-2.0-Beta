@@ -1120,6 +1120,36 @@ INTERACTION_FUNC(separate_obj_interact) {
 
 
 /**
+* Gets info on an item for sale in a shop, via "list id <item>".
+*
+* @param char_data *ch The player.
+* @param obj_data *shop_obj A pointer to the prototype of an object for sale.
+*/
+void do_shop_identify(char_data *ch, obj_data *shop_obj) {
+	obj_data *obj;
+	
+	if (!shop_obj || !(obj = read_object(GET_OBJ_VNUM(shop_obj), FALSE))) {
+		msg_to_char(ch, "Unable to identify that item.\r\n");
+		return;
+	}
+	
+	// temporarily put it in the room to inherit scale constraints
+	obj_to_room(obj, IN_ROOM(ch));
+	scale_item_to_level(obj, get_approximate_level(ch));
+	obj_from_room(obj);
+	
+	// show id and desc
+	identify_obj_to_char(obj, ch);
+	if (GET_OBJ_ACTION_DESC(obj)) {
+		msg_to_char(ch, "%s", GET_OBJ_ACTION_DESC(obj));
+	}
+	
+	// get rid of loaded obj
+	extract_obj(obj);
+}
+
+
+/**
 * Sends the wear message when a person puts an item on.
 *
 * @param char_data *ch The person wearing the item.
@@ -3111,6 +3141,8 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
+	
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 
@@ -5438,14 +5470,14 @@ ACMD(do_light) {
 
 
 ACMD(do_list) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH], vstr[128];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH], vstr[128], drinkstr[128], *ptr;
 	struct shop_temp_list *stl, *shop_list = NULL;
 	struct shop_item *item;
 	bool any, any_cur, this;
 	obj_data *obj;
 	any_vnum vnum;
 	size_t size;
-	bool ok;
+	bool ok, id;
 	int amt;
 	
 	// helper type for displaying currencies at the end
@@ -5454,7 +5486,22 @@ ACMD(do_list) {
 		UT_hash_handle hh;
 	} *curt, *next_curt, *curt_hash = NULL;
 	
-	skip_spaces(&argument);	// optional filter
+	// check for "list id <obj> syntax"
+	ptr = one_argument(argument, line);
+	if (!strn_cmp(line, "id", 2) && is_abbrev(line, "identify")) {
+		id = TRUE;
+		argument = ptr;
+		
+		if (!*argument) {	// filter arg required
+			msg_to_char(ch, "Usage: list identify <item>\r\n");
+			return;
+		}
+	}
+	else {
+		id = FALSE;
+	}
+	
+	skip_spaces(&argument);	// optional filter (remaining args)
 	
 	// find shops
 	shop_list = build_available_shop_list(ch);
@@ -5496,6 +5543,11 @@ ACMD(do_list) {
 				if (!ok) {
 					continue;	// search option
 				}
+			}
+			
+			if (id) {	// just identifying -- show shop id then exit the loop early
+				do_shop_identify(ch, obj);
+				break;
 			}
 			
 			if (!this) {
@@ -5551,7 +5603,14 @@ ACMD(do_list) {
 				*vstr = '\0';
 			}
 			
-			snprintf(line, sizeof(line), " - %s%s (%d %s%s)\r\n", vstr, GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
+			if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+				snprintf(drinkstr, sizeof(drinkstr), " (of %s)", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			}
+			else {
+				*drinkstr = '\0';
+			}
+			
+			snprintf(line, sizeof(line), " - %s%s%s (%d %s%s)\r\n", vstr, GET_OBJ_SHORT_DESC(obj), drinkstr, item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			
 			// store currency for listing later
 			if ((vnum = item->currency) != NOTHING) {
@@ -5574,33 +5633,35 @@ ACMD(do_list) {
 		}
 	}
 	
-	// append currencies if any
-	if (curt_hash && size < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "You have:");
-		any_cur = FALSE;
-		HASH_ITER(hh, curt_hash, curt, next_curt) {
-			amt = get_currency(ch, curt->vnum);
-			snprintf(line, sizeof(line), "%s%d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
+	if (!id) {	// normal view
+		// append currencies if any
+		if (curt_hash && size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "You have:");
+			any_cur = FALSE;
+			HASH_ITER(hh, curt_hash, curt, next_curt) {
+				amt = get_currency(ch, curt->vnum);
+				snprintf(line, sizeof(line), "%s%d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
 			
-			if (size + strlen(line) < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-				any_cur = TRUE;
+				if (size + strlen(line) < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+					any_cur = TRUE;
+				}
+			}
+			if (size + 2 < sizeof(buf)) {
+				strcat(buf, "\r\n");
+				size += 2;
 			}
 		}
-		if (size + 2 < sizeof(buf)) {
-			strcat(buf, "\r\n");
-			size += 2;
-		}
-	}
 
-	if (any) {
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
+		if (any) {
+			if (ch->desc) {
+				page_string(ch->desc, buf, TRUE);
+			}
 		}
-	}
-	else {
-		msg_to_char(ch, "There's nothing for sale here%s.\r\n", (*argument ? " by that name" : ""));
+		else {
+			msg_to_char(ch, "There's nothing for sale here%s.\r\n", (*argument ? " by that name" : ""));
+		}
 	}
 
 	free_shop_temp_list(shop_list);

@@ -919,6 +919,38 @@ OCMD(do_osiege) {
 }
 
 
+// kills the target
+OCMD(do_oslay) {
+	char name[MAX_INPUT_LENGTH];
+	char_data *vict;
+	
+	argument = one_argument(argument, name);
+
+	if (!*name) {
+		obj_log(obj, "oslay: no target");
+		return;
+	}
+	
+	if (*name == UID_CHAR) {
+		if (!(vict = get_char(name))) {
+			obj_log(obj, "oslay: victim (%s) does not exist", name);
+			return;
+		}
+	}
+	else if (!(vict = get_char_by_obj(obj, name))) {
+		obj_log(obj, "oslay: victim (%s) does not exist", name);
+		return;
+	}
+	
+	if (IS_IMMORTAL(vict)) {
+		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
+	}
+	else {
+		die(vict, vict);
+	}
+}
+
+
 OCMD(do_oteleport) {	
 	char_data *ch, *next_ch;
 	room_data *target, *orm = obj_room(obj);
@@ -1715,6 +1747,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "osend", do_osend, SCMD_OSEND },
 	{ "osetval", do_osetval, NO_SCMD },
 	{ "osiege", do_osiege, NO_SCMD },
+	{ "oslay", do_oslay, NO_SCMD },
 	{ "oteleport", do_oteleport, NO_SCMD },
 	{ "oterracrop", do_oterracrop, NO_SCMD },
 	{ "oterraform", do_oterraform, NO_SCMD },

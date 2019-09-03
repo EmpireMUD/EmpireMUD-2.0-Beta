@@ -129,6 +129,7 @@ help files for more info):
 &c%scale%&0 - Changes the scale level of a target.
 &c%send%&0 - Send a message to one person.
 &c%siege%&0 - Deals siege damage to a vehicle or room.
+&c%slay%&0 - Instantly kills the target.
 &c%teleport%&0 - Moves people to another location.
 &c%terracrop%&0 - Changes the terrain to a certain crop type.
 &c%terraform%&0 - Changes the terrain to a certain sector type.
@@ -168,6 +169,12 @@ For each type, there is a help file named &yOTRIG <type>&0.
 All object scripts provide the &c%self%&0 variable.
 
 When using field  - The variable returns:
+&cattack(field)&0 - Gets info on a weapon's attack type. Valid fields are:
+  &yname&0 - attack name             &yfirst-person or 1&0 - 1st person attack message
+  &ynoun&0 - noun form of attack     &ythird-person or 3&0 - 3rd person attack message
+  &ysharp&0 - is a sharp weapon?     &ydamage&0 - physical, magical, etc
+  &yblunt&0 - is a blunt weapon?     &ydisarmable&0 - can be disarmed?
+  &ymagic&0 - is a magic weapon?
 &cbind(person)&0 - Binds the item to a player (or "nobody" to unbind it). You
    can copy another object's whole binding list with %newobj.bind(%obj%)%.
 &ccan_wear(flag)&0 - True if the object has the given wear flag (HELP OEDIT WEAR).

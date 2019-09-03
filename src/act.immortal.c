@@ -6679,7 +6679,12 @@ ACMD(do_breakreply) {
 		GET_LAST_TELL(iter) = NOBODY;
 	}
 	
-	send_config_msg(ch, "ok_string");
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "Players currently in-game can no longer reply to you (unless you send them another tell).\r\n");
+	}
 }
 
 
@@ -8182,6 +8187,7 @@ ACMD(do_purge) {
 						deliver_shipment(VEH_OWNER(veh), shipd);
 					}
 				}
+				VEH_SHIPPING_ID(veh) = -1;
 			}
 			
 			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM);
@@ -9232,6 +9238,7 @@ ACMD(do_trans) {
 					deliver_shipment(VEH_OWNER(veh), shipd);
 				}
 			}
+			VEH_SHIPPING_ID(veh) = -1;
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {

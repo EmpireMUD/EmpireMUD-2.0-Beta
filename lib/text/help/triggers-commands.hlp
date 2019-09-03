@@ -689,6 +689,12 @@ Examples:
   %siege% %veh%
   %siege% north 100
 #d
+%SLAY% MSLAY OSLAY VSLAY WSLAY
+
+Usage:  %slay% <target>
+
+This commant instantly kills a mob or player.
+#d
 "SWITCH STATEMENT" "CASE STATEMENT" "BREAK STATEMENT" "DEFAULT STATEMENT" CASE DEFAULT BREAK TRIG-SWITCH TRIGEDIT-SWITCH
 
 Switch statements let you compare once variable to several outcomes. A switch

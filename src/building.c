@@ -1910,6 +1910,9 @@ ACMD(do_interlink) {
 		if (IS_INSIDE(IN_ROOM(ch))) {
 			msg_to_char(ch, "This room's code is: %s\r\n", vnum_to_interlink(GET_ROOM_VNUM(IN_ROOM(ch))));
 		}
+		else {
+			msg_to_char(ch, "You can't interlink to this room -- only to the additional interior rooms of buildings.\r\n");
+		}
 	}
 	else if (!IS_INSIDE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only interlink the additional interior rooms of buildings.\r\n");

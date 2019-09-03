@@ -1604,6 +1604,8 @@ ACMD(do_dispatch) {
 		
 		LL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
 		sail_shipment(GET_LOYALTY(ch), veh);
+		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
+		
 		send_config_msg(ch, "ok_string");
 	}
 }
