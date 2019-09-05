@@ -242,6 +242,25 @@ of fibers are:
 
 See also: COMPONENT, GATHER
 #
+FLINT FLINTS "FLINT STONE"
+
+Used for:  basic tool crafting
+Stored at:  Gravel Pit
+
+Flint is a hard, sedimentary form of quartz that has long been used for tool-
+making by people all over the world. You can dig it up almost anywhere.
+
+Flint can be used to make:
+- a handaxe (using chip)
+- a spear head (using chip)
+- a shiv (using craft)
+- flint arrows (using craft)
+- a firesteel tinderbox (using forge)
+- a road (using lay)
+- any building that requires a generic (rock) component
+
+See also: BUILD, COMPONENT, DIG, CHIP, CRAFT, FORGE, LAY, ROCK COMPONENT
+#
 FLOUR "FLOUR COMPONENT"
 
 Flour (resource, component)
@@ -585,11 +604,12 @@ Rock (component)
 Used for:  basic crafting, basic building
 Stored at:  Gravel Pit
 
-You can find rocks by digging in the ground. They can be used to create
-weapons and as part of some larger buildings. There are multiple types of rock,
-but in most cases where you need a rock, any rock will do.
+You can find rocks by digging in the ground. They can be used as a primitive
+hammer for chipping flint, for laying roads, and as filler for many building.
+There are multiple types of rock, but in most cases where you need a (rock)
+component, any rock will do.
 
-See also: BUILD, COMPONENT, DIG, CHIP, FLINT
+See also: BUILD, COMPONENT, DIG, CHIP, LAY, FLINT
 #
 SEEDS "SEED COMPONENT" "SEEDS COMPONENT"
 
