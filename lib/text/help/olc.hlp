@@ -3336,6 +3336,8 @@ things. Each type may have its own properties.
 
 Types:
  Mob Interactions - Used for global SHEAR, LOOT, and PICKPOCKET tables.
+ Mine Data - Used for MINE interactions, see HELP MINE DATA GLOBAL.
+ Newbie Gear - Given/equipped to all new players.
 
 See also: OLC GLOBALS
 #d
