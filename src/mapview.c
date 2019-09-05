@@ -1013,7 +1013,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		
 		// owned but not in-city?
 		if ((ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) || HAS_FUNCTION(room, FNC_IN_CITY_ONLY)) && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
-			msg_to_char(ch, "\trThis building need to be in an established city.\t0\r\n");
+			msg_to_char(ch, "\trThis building needs to be in an established city.\t0\r\n");
 		}
 	}
 	else if (!emp && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_NO_DISMANTLE)) {
