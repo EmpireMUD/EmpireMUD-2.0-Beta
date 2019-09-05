@@ -3792,7 +3792,7 @@ SHOW(show_account) {
 	}
 	
 	if (last_online > 0) {
-		msg_to_char(ch, " (last online: %-18s)\r\n", ctime(&last_online));
+		msg_to_char(ch, " (last online: %-24.24s)\r\n", ctime(&last_online));
 	}
 	
 	if (plr && file) {
