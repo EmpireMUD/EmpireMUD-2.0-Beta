@@ -3926,7 +3926,7 @@ SHOW(show_currency) {
 	}
 	else {
 	
-		coin_string(GET_PLAYER_COINS(ch), line);
+		coin_string(GET_PLAYER_COINS(plr), line);
 		size = snprintf(buf, sizeof(buf), "%s has %s.\r\n", GET_NAME(plr), line);
 	
 		if (GET_CURRENCIES(plr)) {
