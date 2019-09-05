@@ -491,7 +491,7 @@ switch %random.4%
     %echo% You barely dodge a burst of flames from the statue!
   break
   case 4
-    %echo% Smoke bellows from the statue!
+    %echo% Smoke billows from the statue!
   break
 done
 ~
