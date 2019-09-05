@@ -569,6 +569,9 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		}
 		if (*find_keywords) {
 			any = multi_isname(find_keywords, GET_TRIG_NAME(trig));	// check name first
+			if (!any && GET_TRIG_ARG(trig)) {
+				any |= multi_isname(find_keywords, GET_TRIG_ARG(trig));	// text arg
+			}
 			
 			if (!any) {
 				LL_FOREACH(trig->cmdlist, cmd) {
