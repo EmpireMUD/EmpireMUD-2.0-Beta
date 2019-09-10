@@ -9,7 +9,7 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
 I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
-I 0 1351 100.00 1  # BUTCHER: a large skin
+I 1 1351 100.00 1  # SKIN: a large skin
 S
 #10701
 carolers group~
@@ -61,7 +61,7 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
 I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
-I 0 1351 100.00 1  # BUTCHER: a large skin
+I 1 1351 100.00 1  # SKIN: a large skin
 I 3 9176 100.00 1  # BARDE: a barded reindeer
 S
 #10709

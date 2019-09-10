@@ -3723,6 +3723,9 @@ SHOW(show_account) {
 	char skills[MAX_STRING_LENGTH];
 	char_data *plr = NULL, *loaded;
 	int acc_id = NOTHING;
+	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
+	
+	#define ONLINE_NOW  -2
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: show account <player>\r\n");
@@ -3769,10 +3772,14 @@ SHOW(show_account) {
 		if (GET_ACCOUNT(loaded)->id == acc_id) {
 			if (!loaded_file) {
 				msg_to_char(ch, " &c[%d %s] %s (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+				last_online = ONLINE_NOW;
 			}
 			else {
 				// not playing but same account
 				msg_to_char(ch, " [%d %s] %s\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+				if (last_online != ONLINE_NOW) {
+					last_online = MAX(last_online, loaded->prev_logon);
+				}
 			}
 		}
 		else {
@@ -3782,6 +3789,10 @@ SHOW(show_account) {
 		if (loaded_file) {
 			free_char(loaded);
 		}
+	}
+	
+	if (last_online > 0) {
+		msg_to_char(ch, " (last online: %-24.24s)\r\n", ctime(&last_online));
 	}
 	
 	if (plr && file) {
@@ -3926,7 +3937,7 @@ SHOW(show_currency) {
 	}
 	else {
 	
-		coin_string(GET_PLAYER_COINS(ch), line);
+		coin_string(GET_PLAYER_COINS(plr), line);
 		size = snprintf(buf, sizeof(buf), "%s has %s.\r\n", GET_NAME(plr), line);
 	
 		if (GET_CURRENCIES(plr)) {

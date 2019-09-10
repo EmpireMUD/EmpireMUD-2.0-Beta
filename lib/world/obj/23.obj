@@ -616,11 +616,13 @@ A guildmaster has left his tunic here.~
 the front. It is also fireproof, and resists stains. This is a tier 1 crafting
 item.
 ~
-2 p ad 9
+2 p ad 10
 0 0 0
 11 0
 A
 25 25 0
+A
+5 1 0
 C
 100 100
 M
@@ -856,11 +858,13 @@ A traveling tinker's trappings are lying here.~
 attached to a traveler's outfit would probably let you work very efficiently on
 the move if you knew how to use it. This is a tier 2 crafting item.
 ~
-2 p ad 8
+2 p ad 9
 0 0 0
 2 0
 A
 25 50 0
+A
+5 1 0
 C
 150 150
 M
