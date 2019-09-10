@@ -1810,7 +1810,7 @@ ACMD(do_learned) {
 			if (!(craft = craft_proto(pcd->vnum))) {
 				continue;	// no craft?
 			}
-			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 				continue;	// in-dev
 			}
 			if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft)) && str_cmp(craft_types[GET_CRAFT_TYPE(craft)], argument)) {
