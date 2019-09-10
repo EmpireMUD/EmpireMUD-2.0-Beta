@@ -1021,7 +1021,7 @@ switch %random.2%
     %echoaround% %actor% %self.name% withdraws a small dagger and hurls it at %actor.name%!
     %echoaround% %actor% The dagger hits %actor.himher% in the shoulder, drawing blood!
     %damage% %actor% 50 physical
-    %dot% #10985 %actor% 100 15
+    %dot% #10985 %actor% 100 15 physical
   break
 done
 ~
