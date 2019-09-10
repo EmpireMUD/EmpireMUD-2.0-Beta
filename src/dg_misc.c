@@ -113,6 +113,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		atype = atoi(charname+1);
 		half_chop(cmd, charname, cmd);
 		if (!find_generic(atype, GENERIC_AFFECT)) {
+			script_log("Trigger: %s, VNum %d. dg_affect: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
 			atype = ATYPE_DG_AFFECT;
 		}
 	}
