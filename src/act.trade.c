@@ -1747,7 +1747,7 @@ ACMD(do_learn) {
 	}
 	
 	// validate the player's ability to MAKE the recipe
-	else if (IS_SET(GET_CRAFT_FLAGS(recipe), CRAFT_IN_DEVELOPMENT)) {
+	else if (!IS_IMMORTAL(ch) && IS_SET(GET_CRAFT_FLAGS(recipe), CRAFT_IN_DEVELOPMENT)) {
 		msg_to_char(ch, "That recipe is not currently available to learn.\r\n");
 	}
 	else if (GET_CRAFT_ABILITY(recipe) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(recipe))) {

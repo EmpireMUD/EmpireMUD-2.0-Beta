@@ -1942,12 +1942,17 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Usage: set <name> learned <craft vnum> <on | off>\r\n");
 			return 0;
 		}
-		if (!(cft = craft_proto(atoi(vnum_arg))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED) || CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
+		if (!(cft = craft_proto(atoi(vnum_arg))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED)) {
 			msg_to_char(ch, "Invalid craft (must be LEARNED and not IN-DEV).\r\n");
 			return 0;
 		}
 		
 		if (!str_cmp(onoff_arg, "on")) {
+			if (CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(vict)) {
+				msg_to_char(ch, "Craft must not be IN-DEV to set it on a player.\r\n");
+				return 0;
+			}
+			
 			add_learned_craft(ch, GET_CRAFT_VNUM(cft));
 			sprintf(output, "%s learned craft %d %s.", GET_NAME(vict), GET_CRAFT_VNUM(cft), GET_CRAFT_NAME(cft));
 		}
