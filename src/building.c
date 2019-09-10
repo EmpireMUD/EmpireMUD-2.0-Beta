@@ -42,6 +42,7 @@ extern bool can_claim(char_data *ch);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 void free_complex_data(struct complex_room_data *data);
+extern char *get_room_name(room_data *room, bool color);
 extern room_data *create_room(room_data *home);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 void scale_item_to_level(obj_data *obj, int level);
@@ -1482,7 +1483,7 @@ ACMD(do_dismantle) {
 	craft_data *type;
 	
 	skip_spaces(&argument);
-	if (*argument) {
+	if (*argument && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
 		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
 		return;
 	}
@@ -1895,7 +1896,6 @@ ACMD(do_designate) {
 
 ACMD(do_interlink) {
 	extern int count_flagged_sect_between(bitvector_t sectf_bits, room_data *start, room_data *end, bool check_base_sect);
-	extern char *get_room_name(room_data *room, bool color);
 	
 	char arg2[MAX_INPUT_LENGTH];
 	room_vnum vnum;
