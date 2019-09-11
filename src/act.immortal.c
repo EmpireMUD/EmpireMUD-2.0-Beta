@@ -2532,7 +2532,7 @@ SHOW(show_player) {
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	
-	if (GET_ACCESS_LEVEL(plr) <= GET_ACCESS_LEVEL(ch)) {
+	if (GET_ACCESS_LEVEL(plr) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
 		sprintf(buf + strlen(buf), "Creation host: %s\r\n", NULLSAFE(GET_CREATION_HOST(plr)));
 	}
 	
