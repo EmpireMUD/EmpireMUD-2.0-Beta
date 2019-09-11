@@ -4740,8 +4740,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 	send_to_char(strcat(buf, buf2), ch);
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
-		sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
-		msg_to_char(ch, "Account: [%d], Flags: &g%s&0\r\n", GET_ACCOUNT(k)->id, buf);
+		if (GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
+			sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
+			msg_to_char(ch, "Account: [%d], Flags: &g%s&0\r\n", GET_ACCOUNT(k)->id, buf);
+		}
+		else {	// low-level imms only see certain account flags
+			sprintbit(GET_ACCOUNT(k)->flags & VISIBLE_ACCT_FLAGS, account_flags, buf, TRUE);
+			msg_to_char(ch, "Account: &g%s&0\r\n", buf);
+		}
 	}
 	
 	if (IS_MOB(k)) {
@@ -8743,7 +8749,7 @@ ACMD(do_show) {
 		{ "crops", LVL_START_IMM, show_crops },
 		{ "players", LVL_START_IMM, show_players },
 		{ "terrain", LVL_START_IMM, show_terrain },
-		{ "account", LVL_CIMPL, show_account },
+		{ "account", LVL_TO_SEE_ACCOUNTS, show_account },
 		{ "notes", LVL_START_IMM, show_notes },
 		{ "ammotypes", LVL_START_IMM, show_ammotypes },
 		{ "skills", LVL_START_IMM, show_skills },
