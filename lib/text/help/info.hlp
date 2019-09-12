@@ -186,6 +186,15 @@ tutorial by typing INFO.
 
 See also: CHOP
 #
+BASE-TERRAIN-ALLOWED "BASE TERRAIN ALLOWED" "ALLOW BASE TERRAIN"
+
+When a building says it can be built facing "base-terrain-allowed", this means
+it can be built facing a tile that has something constructed on it already.
+
+For example, a quarry must be built facing a mountain tile. But because it says
+"You need to build facing: mountain, base-terrain-allowed", you can also build
+it facing a mountain tile with a mine on it.
+#
 BINDING BOUND "BIND ON EQUIP" "BIND ON PICKUP" BIND-ON-EQUIP BIND-ON-PICKUP "OBJECT BINDING" BOE BOP
 
 Some items bind to the player who acquires or equips them. This means that
