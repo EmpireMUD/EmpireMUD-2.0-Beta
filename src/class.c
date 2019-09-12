@@ -61,8 +61,8 @@ extern const char *pool_types[];
 * any they shouldn't have. This function ignores immortals.
 *
 * @param char_data *ch The player to check.
-* @param class_data *cls Any player class, or NULL to detect fomr the player.
-* @param int roole Any ROLE_ const, or NOTHING to detect from the player.
+* @param class_data *cls Optional: Any player class, or NULL to detect from the player.
+* @param int role Optional: Any ROLE_ const, or NOTHING to detect from the player.
 */
 void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	void check_skill_sell(char_data *ch, ability_data *abil);
@@ -437,6 +437,11 @@ void update_class(char_data *ch) {
 	// set level
 	GET_SKILL_LEVEL(ch) = (best_total - IGNORE_BOTTOM_SKILL_POINTS) * 100 / MAX(1, BEST_SUM_REQUIRED_FOR_100 - IGNORE_BOTTOM_SKILL_POINTS);
 	GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
+	
+	// disallow role if level is too low
+	if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
+		GET_CLASS_ROLE(ch) = ROLE_NONE;
+	}
 	
 	// set progression (% of the way from 75 to 100)
 	if (best_class && GET_SKILL_LEVEL(ch) >= SPECIALTY_SKILL_CAP) {
@@ -1069,6 +1074,7 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 			continue;
 		}
 		update_class(chiter);
+		assign_class_abilities(chiter, NULL, NOTHING);
 	}
 
 	// save index and class file now
@@ -1140,6 +1146,7 @@ void save_olc_class(descriptor_data *desc) {
 	LL_FOREACH(character_list, ch_iter) {
 		if (!IS_NPC(ch_iter)) {
 			update_class(ch_iter);
+			assign_class_abilities(ch_iter, NULL, NOTHING);
 		}
 	}
 }

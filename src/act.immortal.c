@@ -67,6 +67,7 @@ extern const char *syslog_types[];
 // external functions
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int adjusted_instance_limit(adv_data *adv);
+void assign_class_abilities(char_data *ch, class_data *cls, int role);
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
@@ -517,8 +518,6 @@ ADMIN_UTIL(util_b318_buildings) {
 
 // for util_clear_roles
 PLAYER_UPDATE_FUNC(update_clear_roles) {
-	void assign_class_abilities(char_data *ch, class_data *cls, int role);
-	
 	if (IS_IMMORTAL(ch)) {
 		return;
 	}
@@ -1928,6 +1927,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		set_skill(vict, SKILL_VNUM(skill), level);
 		update_class(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
+		assign_class_abilities(vict, NULL, NOTHING);
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 	else if SET_CASE("learned") {
@@ -8543,6 +8543,7 @@ ACMD(do_restore) {
 				set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 			}
 			update_class(vict);
+			assign_class_abilities(vict, NULL, NOTHING);
 			
 			// temporarily remove empire abilities
 			emp = GET_LOYALTY(vict);
