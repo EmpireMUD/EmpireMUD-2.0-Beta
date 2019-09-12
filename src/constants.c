@@ -2781,6 +2781,7 @@ const char *bld_on_flags[] = {
 	"riverbank",
 	"estuary",
 	"lake",	// 20
+	"base-terrain-allowed",
 	"\n"
 };
 

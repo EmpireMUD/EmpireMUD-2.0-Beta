@@ -2238,6 +2238,8 @@ The following flags are available:
  &criverbank&0 - the land on the edge of rivers
  &cestuary&0 - where the river meets the sea
  &clake&0 - a lake tile
+ &cbase-terrain-allowed&0 - checks the base terrain for the other build-facings
+    rather than only the current terrain (e.g. a building built on a mountain)
 
 See also: OLC CRAFTS
 #d
@@ -2279,6 +2281,7 @@ The following flags are available:
  &criverbank&0 - the land on the edge of rivers
  &cestuary&0 - where the river meets the sea
  &clake&0 - a lake tile
+ &cbase-terrain-allowed&0 - *** do not use for buildon
 
 See also: CEDIT BUILDFACING, OLC CRAFTS
 #d
@@ -6410,6 +6413,7 @@ Available flags:
  &criverbank&0 - the land on the edge of rivers
  &cestuary&0 - where the river meets the sea
  &clake&0 - a lake tile
+ &cbase-terrain-allowed&0 - *** do not set this on a sector
 
 Note: When adding these flags to adventure linking rules, they all have to
 be added in one line, so you can't type multiple words. Try abbreviating them

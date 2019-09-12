@@ -109,6 +109,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Possible unnecessary in-city-only flag (not set on building or building functions)");
 			problem = TRUE;
 		}
+		if (IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_BASE_TERRAIN_ALLOWED)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Builds on base-terrain-allowed -- this is not allowed in the buildon field");
+			problem = TRUE;
+		}
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {	// vehicles only
 		if (GET_CRAFT_OBJECT(craft) == NOTHING || !vehicle_proto(GET_CRAFT_OBJECT(craft))) {

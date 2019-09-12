@@ -733,6 +733,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_RIVERBANK  BIT(18)
 #define BLD_ON_ESTUARY  BIT(19)
 #define BLD_ON_LAKE  BIT(20)
+#define BLD_ON_BASE_TERRAIN_ALLOWED  BIT(21)	// for facing-only, allows the base sector to match
 
 
 // BLD_REL_x: relationships with other buildings

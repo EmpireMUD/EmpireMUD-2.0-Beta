@@ -96,6 +96,7 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 
 	return (!IS_SET(flags, BLD_ON_NOT_PLAYER_MADE) || !IS_PLAYER_MADE(room)) && (
 		IS_SET(GET_SECT_BUILD_FLAGS(SECT(room)), flags) || 
+		(IS_SET(flags, BLD_ON_BASE_TERRAIN_ALLOWED) && IS_SET(GET_SECT_BUILD_FLAGS(BASE_SECT(room)), flags)) ||
 		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))
 	);
 }
