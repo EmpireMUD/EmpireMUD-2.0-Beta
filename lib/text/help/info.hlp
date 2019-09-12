@@ -1239,6 +1239,16 @@ blacksmith at a forge.
 
 See also: DIG, EXCAVATE, FORGE
 #
+SINGLE-USE 1-USE ONE-USE "SINGLE USE" "1 USE" "ONE USE"
+
+Single-use items will vanish when you unequip them, or otherwise use the for
+something. One example of this include the fireballs from the Ready Fireball
+ability.
+
+Other single-use items include some adventure items that build reward
+buildings. These buildings can only be built once, and cannot be re-built if
+you dismantle them.
+#
 "SLASH CHANNELS" SLASH-CHANNELS SLASHCHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY VC "VIRTUAL CHANNELS"
 
 Usage:  /join <channel>
