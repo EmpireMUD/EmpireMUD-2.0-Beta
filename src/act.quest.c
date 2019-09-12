@@ -993,6 +993,7 @@ QCMD(qcmd_start) {
 		}
 		else {
 			msg_to_char(ch, "You don't see that quest here.\r\n");
+			qcmd_start(ch, "");	// list quests available here
 		}
 	}
 	else if (QUEST_FLAGGED(qst, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
