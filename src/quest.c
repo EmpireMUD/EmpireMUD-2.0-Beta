@@ -2067,7 +2067,7 @@ struct player_quest *is_on_quest_by_name(char_data *ch, char *argument) {
 		if (!str_cmp(argument, QUEST_NAME(quest))) {
 			return pq; // exact match
 		}
-		else if (!abbrev && is_multiword_abbrev(argument, QUEST_NAME(quest))) {
+		else if (!abbrev && multi_isname(argument, QUEST_NAME(quest))) {
 			abbrev = pq;
 		}
 	}

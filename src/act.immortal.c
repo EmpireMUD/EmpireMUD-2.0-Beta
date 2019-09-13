@@ -2722,7 +2722,7 @@ SHOW(show_quests) {
 				continue;
 			}
 			
-			if (is_multiword_abbrev(arg2, QUEST_NAME(qst))) {
+			if (multi_isname(arg2, QUEST_NAME(qst))) {
 				msg_to_char(ch, "%s ", QUEST_NAME(qst));	// followed by "Quest Tracker:"
 				show_quest_tracker(ch, pq);
 				found = TRUE;
