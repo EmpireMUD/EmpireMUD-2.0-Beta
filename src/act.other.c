@@ -234,6 +234,7 @@ void do_customize_road(char_data *ch, char *argument) {
 		"parkway", "plaza", "trail", "route", "skyway", "terrace", "track",
 		"trace", "tunnel", "turnpike", "bluff", "rd", "av", "ave", "st", "wy",
 		"dr", "blf", "blvd", "cir", "pkwy", "pathway", "path", "walkway", "walk",
+		"intersection", "fork", "corner", 
 		"\n"
 	};
 	
