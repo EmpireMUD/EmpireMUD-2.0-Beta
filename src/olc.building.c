@@ -617,7 +617,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	*only_commands = '\0';
 	
 	if (!*argument) {
-		msg_to_char(ch, "See HELP VEDIT FULLSEARCH for syntax.\r\n");
+		msg_to_char(ch, "See HELP BEDIT FULLSEARCH for syntax.\r\n");
 		return;
 	}
 	
