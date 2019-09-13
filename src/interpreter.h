@@ -114,6 +114,7 @@ struct alias_data {
 #define SCMD_MOTD		7
 #define SCMD_IMOTD		8
 #define SCMD_CLEAR		9
+#define SCMD_NEWS		10
 
 /* do_say */
 #define SCMD_SAY			0

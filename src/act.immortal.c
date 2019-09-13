@@ -8354,6 +8354,7 @@ ACMD(do_reload) {
 	void load_intro_screens();
 	extern char *credits;
 	extern char *motd;
+	extern char *news;
 	extern char *imotd;
 	extern char *CREDIT_MESSG;
 	extern char *help;
@@ -8377,6 +8378,7 @@ ACMD(do_reload) {
 		file_to_string_alloc(GODLIST_FILE, &godlist);
 		file_to_string_alloc(CREDITS_FILE, &credits);
 		file_to_string_alloc(MOTD_FILE, &motd);
+		file_to_string_alloc(NEWS_FILE, &news);
 		file_to_string_alloc(IMOTD_FILE, &imotd);
 		file_to_string_alloc(HELP_PAGE_FILE, &help);
 		file_to_string_alloc(INFO_FILE, &info);
@@ -8393,6 +8395,8 @@ ACMD(do_reload) {
 		file_to_string_alloc(MOTD_FILE, &motd);
 	else if (!str_cmp(arg, "imotd"))
 		file_to_string_alloc(IMOTD_FILE, &imotd);
+	else if (!str_cmp(arg, "news"))
+		file_to_string_alloc(NEWS_FILE, &news);
 	else if (!str_cmp(arg, "help"))
 		file_to_string_alloc(HELP_PAGE_FILE, &help);
 	else if (!str_cmp(arg, "info"))

@@ -212,6 +212,7 @@ char *wizlist = NULL;	// list of higher gods
 char *godlist = NULL;	// list of peon gods
 char *handbook = NULL;	// handbook for new immortals
 char *policies = NULL;	// policies page
+char *news = NULL;	// news for players
 
 // tips of the day system
 char **tips_of_the_day = NULL;	// array of tips
@@ -347,6 +348,7 @@ void boot_db(void) {
 	file_to_string_alloc(POLICIES_FILE, &policies);
 	file_to_string_alloc(HANDBOOK_FILE, &handbook);
 	file_to_string_alloc(SCREDITS_FILE, &CREDIT_MESSG);
+	file_to_string_alloc(NEWS_FILE, &news);
 	load_intro_screens();
 
 	// Load the world!

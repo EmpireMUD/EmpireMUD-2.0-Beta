@@ -1345,6 +1345,13 @@ and use ,/h for help or ,/s to save and end.
 
 See also: TEXT EDITOR
 #
+NEWS
+
+Usage:  news
+
+Shows any recent news from the game staff. For example, updates or new
+adventures might appear here.
+#
 NOREPEAT NO-REPEAT "NO REPEAT"
 
 Usage:  toggle no-repeat [on/off]

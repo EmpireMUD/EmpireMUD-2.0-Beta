@@ -856,6 +856,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "mydescription", POS_STANDING, do_mydescription, NO_MIN, CTYPE_UTIL ),
 
 	SIMPLE_CMD( "nearby", POS_RESTING, do_nearby, NO_MIN, CTYPE_UTIL ),
+	SCMD_CMD( "news", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_NEWS ),
 	SIMPLE_CMD( "nodismantle", POS_SLEEPING, do_nodismantle, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "noskill", POS_DEAD, do_noskill, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "notitle", POS_DEAD, do_wizutil, LVL_CIMPL, CTYPE_IMMORTAL, SCMD_NOTITLE ),
