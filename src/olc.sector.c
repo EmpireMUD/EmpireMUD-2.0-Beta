@@ -120,6 +120,11 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (IS_SET(GET_SECT_BUILD_FLAGS(sect), BLD_ON_BASE_TERRAIN_ALLOWED)) {
+		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Has the base-terrain-allowed build flag -- this is not allowed on sectors");
+		problem = TRUE;
+	}
+	
 	if (has_evolution_type(sect, EVO_CHOPPED_DOWN) && !has_interaction(GET_SECT_INTERACTIONS(sect), INTERACT_CHOP)) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Choppable sect with no chop interaction");
 		problem = TRUE;

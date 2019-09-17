@@ -1301,6 +1301,10 @@ void script_stat (char_data *ch, struct script_data *sc) {
 			msg_to_char(ch, "  Trigger Intended Assignment: Rooms\r\n");
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
+		else if (t->attach_type == VEH_TRIGGER) {
+			msg_to_char(ch, "  Trigger Intended Assignment: Vehicles\r\n");
+			sprintbit(GET_TRIG_TYPE(t), vtrig_types, buf1, TRUE);
+		}
 		else {
 			msg_to_char(ch, "  Trigger Intended Assignment: Mobiles\r\n");
 			sprintbit(GET_TRIG_TYPE(t), trig_types, buf1, TRUE);

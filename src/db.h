@@ -147,6 +147,7 @@
 #define GODLIST_FILE  LIB_TEXT"godlist"	// for GODLIST
 #define POLICIES_FILE  LIB_TEXT"policies"	// player policies/rules
 #define HANDBOOK_FILE  LIB_TEXT"handbook"	// handbook for new immorts
+#define NEWS_FILE  LIB_TEXT"news"	// shown when players type 'news'
 
 // misc files (user-modifiable libs)
 #define CONFIG_FILE  LIB_MISC"game_configs"  // config.c system

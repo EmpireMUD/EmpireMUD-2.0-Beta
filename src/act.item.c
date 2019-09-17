@@ -6321,33 +6321,62 @@ ACMD(do_share) {
 
 
 ACMD(do_sheathe) {
+	char arg[MAX_INPUT_LENGTH];
 	obj_data *obj;
-	int loc = 0;
-
-	if (!(obj = GET_EQ(ch, WEAR_WIELD))) {
-		msg_to_char(ch, "You aren't even wielding anything!\r\n");
-		return;
-	}
+	int to_loc = NOWHERE, from_loc = NOWHERE;
 	
-	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
-		msg_to_char(ch, "You can't sheathe that.\r\n");
-		return;
-	}
-
+	one_argument(argument, arg);
+	
 	/* are any of them even open? */
 	if (!GET_EQ(ch, WEAR_SHEATH_1)) {
-		loc = WEAR_SHEATH_1;
+		to_loc = WEAR_SHEATH_1;
 	}
 	else if (!GET_EQ(ch, WEAR_SHEATH_2)) {
-		loc = WEAR_SHEATH_2;
+		to_loc = WEAR_SHEATH_2;
 	}
 	else {
 		msg_to_char(ch, "You have no empty sheaths!\r\n");
 		return;
 	}
-
-	obj_to_char(unequip_char(ch, WEAR_WIELD), ch);
-	perform_wear(ch, obj, loc);
+	
+	// determine obj and from_loc
+	if ((obj = GET_EQ(ch, WEAR_WIELD)) && (!*arg || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
+		from_loc = WEAR_WIELD;
+	}
+	else if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_WEAPON(obj) && (!*arg || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
+		from_loc = WEAR_HOLD;
+	}
+	else if (*arg) {
+		if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			// found obj
+			from_loc = NOWHERE;
+		}
+		else {
+			msg_to_char(ch, "You don't have %s %s to sheathe.\r\n", AN(arg), arg);
+			return;
+		}
+	}
+	else {	// no arg and no weapons to sheath
+		msg_to_char(ch, "You aren't wielding anything you can sheath!\r\n");
+		return;
+	}
+	
+	if (!IS_WEAPON(obj)) {
+		msg_to_char(ch, "You can only sheathe weapons.\r\n");
+		return;
+	}
+	
+	// don't allow sheathing of 1-use objs
+	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+		msg_to_char(ch, "You can't sheathe a single-use item.\r\n");
+		return;
+	}
+	
+	// and do it
+	if (from_loc != NOWHERE && obj->worn_by) {
+		obj_to_char(unequip_char(ch, from_loc), ch);
+	}
+	perform_wear(ch, obj, to_loc);
 }
 
 

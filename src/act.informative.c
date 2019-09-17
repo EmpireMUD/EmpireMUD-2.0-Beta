@@ -2459,6 +2459,11 @@ ACMD(do_gen_ps) {
 			page_string(ch->desc, imotd, 0);
 			break;
 		}
+		case SCMD_NEWS: {
+			extern char *news;
+			page_string(ch->desc, news, 0);
+			break;
+		}
 		case SCMD_CLEAR: {
 			send_to_char("\033[H\033[J", ch);
 			break;

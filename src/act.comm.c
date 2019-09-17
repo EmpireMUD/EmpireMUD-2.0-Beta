@@ -1158,7 +1158,6 @@ ACMD(do_slash_channel) {
 		strcpy(buf, arg2);
 		half_chop(buf, arg2, arg3);
 		skip_slash(arg2);
-		skip_slash(arg3);
 		
 		// list players
 		if (!*arg2 || !*arg3) {

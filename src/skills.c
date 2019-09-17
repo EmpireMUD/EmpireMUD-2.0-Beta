@@ -51,6 +51,7 @@ extern const char *class_role_color[];
 
 // eternal functions
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
+void assign_class_abilities(char_data *ch, class_data *cls, int role);
 void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
 void scale_item_to_level(obj_data *obj, int level);
@@ -975,6 +976,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 		
 		// update class and progression
 		update_class(ch);
+		assign_class_abilities(ch, NULL, NOTHING);
 		SAVE_CHAR(ch);
 	}
 	
@@ -1405,8 +1407,6 @@ void mark_level_gained_from_ability(char_data *ch, ability_data *abil) {
 * @param char_data *ch The player to swap.
 */
 void perform_swap_skill_sets(char_data *ch) {
-	void assign_class_abilities(char_data *ch, class_data *cls, int role);
-	
 	struct player_ability_data *plab, *next_plab;
 	int cur_set, old_set;
 	ability_data *abil;
@@ -1846,6 +1846,7 @@ ACMD(do_skills) {
 			set_skill(ch, SKILL_VNUM(skill), level);
 			update_class(ch);
 			check_ability_levels(ch, SKILL_VNUM(skill));
+			assign_class_abilities(ch, NULL, NOTHING);
 			
 			SAVE_CHAR(ch);
 		}
@@ -2058,6 +2059,7 @@ ACMD(do_specialize) {
 
 		// check class and skill levels
 		update_class(ch);
+		assign_class_abilities(ch, NULL, NOTHING);
 	}
 }
 
@@ -3547,6 +3549,7 @@ void save_olc_skill(descriptor_data *desc) {
 		if (!IS_NPC(ch_iter)) {
 			update_class(ch_iter);
 			give_level_zero_abilities(ch_iter);
+			assign_class_abilities(ch_iter, NULL, NOTHING);
 		}
 	}
 }

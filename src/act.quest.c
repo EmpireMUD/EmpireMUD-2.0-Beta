@@ -357,7 +357,7 @@ quest_data *find_local_quest_by_name(char_data *ch, char *argument, bool check_c
 				*find_inst = get_instance_by_id(pq->instance_id);
 				return quest;
 			}
-			else if (!abbrev && is_multiword_abbrev(argument, QUEST_NAME(quest))) {
+			else if (!abbrev && multi_isname(argument, QUEST_NAME(quest))) {
 				abbrev = quest;
 				abbrev_inst = get_instance_by_id(pq->instance_id);
 			}
@@ -378,7 +378,7 @@ quest_data *find_local_quest_by_name(char_data *ch, char *argument, bool check_c
 				*find_inst = inst;
 				return quest;
 			}
-			else if (!abbrev && is_multiword_abbrev(argument, QUEST_NAME(quest))) {
+			else if (!abbrev && multi_isname(argument, QUEST_NAME(quest))) {
 				abbrev = quest;
 				abbrev_inst = inst;
 			}
@@ -993,6 +993,7 @@ QCMD(qcmd_start) {
 		}
 		else {
 			msg_to_char(ch, "You don't see that quest here.\r\n");
+			qcmd_start(ch, "");	// list quests available here
 		}
 	}
 	else if (QUEST_FLAGGED(qst, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {

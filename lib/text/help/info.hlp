@@ -186,6 +186,15 @@ tutorial by typing INFO.
 
 See also: CHOP
 #
+BASE-TERRAIN-ALLOWED "BASE TERRAIN ALLOWED" "ALLOW BASE TERRAIN"
+
+When a building says it can be built facing "base-terrain-allowed", this means
+it can be built facing a tile that has something constructed on it already.
+
+For example, a quarry must be built facing a mountain tile. But because it says
+"You need to build facing: mountain, base-terrain-allowed", you can also build
+it facing a mountain tile with a mine on it.
+#
 BINDING BOUND "BIND ON EQUIP" "BIND ON PICKUP" BIND-ON-EQUIP BIND-ON-PICKUP "OBJECT BINDING" BOE BOP
 
 Some items bind to the player who acquires or equips them. This means that
@@ -1229,6 +1238,16 @@ A shovel can help you dig or excavate much faster. It can be made by any
 blacksmith at a forge.
 
 See also: DIG, EXCAVATE, FORGE
+#
+SINGLE-USE 1-USE ONE-USE "SINGLE USE" "1 USE" "ONE USE"
+
+Single-use items will vanish when you unequip them, or otherwise use the for
+something. One example of this include the fireballs from the Ready Fireball
+ability.
+
+Other single-use items include some adventure items that build reward
+buildings. These buildings can only be built once, and cannot be re-built if
+you dismantle them.
 #
 "SLASH CHANNELS" SLASH-CHANNELS SLASHCHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY VC "VIRTUAL CHANNELS"
 

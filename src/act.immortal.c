@@ -67,6 +67,7 @@ extern const char *syslog_types[];
 // external functions
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int adjusted_instance_limit(adv_data *adv);
+void assign_class_abilities(char_data *ch, class_data *cls, int role);
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
@@ -517,8 +518,6 @@ ADMIN_UTIL(util_b318_buildings) {
 
 // for util_clear_roles
 PLAYER_UPDATE_FUNC(update_clear_roles) {
-	void assign_class_abilities(char_data *ch, class_data *cls, int role);
-	
 	if (IS_IMMORTAL(ch)) {
 		return;
 	}
@@ -1928,6 +1927,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		set_skill(vict, SKILL_VNUM(skill), level);
 		update_class(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
+		assign_class_abilities(vict, NULL, NOTHING);
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 	else if SET_CASE("learned") {
@@ -1942,12 +1942,17 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Usage: set <name> learned <craft vnum> <on | off>\r\n");
 			return 0;
 		}
-		if (!(cft = craft_proto(atoi(vnum_arg))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED) || CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
+		if (!(cft = craft_proto(atoi(vnum_arg))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED)) {
 			msg_to_char(ch, "Invalid craft (must be LEARNED and not IN-DEV).\r\n");
 			return 0;
 		}
 		
 		if (!str_cmp(onoff_arg, "on")) {
+			if (CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(vict)) {
+				msg_to_char(ch, "Craft must not be IN-DEV to set it on a player.\r\n");
+				return 0;
+			}
+			
 			add_learned_craft(ch, GET_CRAFT_VNUM(cft));
 			sprintf(output, "%s learned craft %d %s.", GET_NAME(vict), GET_CRAFT_VNUM(cft), GET_CRAFT_NAME(cft));
 		}
@@ -2527,7 +2532,7 @@ SHOW(show_player) {
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	
-	if (GET_ACCESS_LEVEL(plr) <= GET_ACCESS_LEVEL(ch)) {
+	if (GET_ACCESS_LEVEL(plr) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
 		sprintf(buf + strlen(buf), "Creation host: %s\r\n", NULLSAFE(GET_CREATION_HOST(plr)));
 	}
 	
@@ -2717,7 +2722,7 @@ SHOW(show_quests) {
 				continue;
 			}
 			
-			if (is_multiword_abbrev(arg2, QUEST_NAME(qst))) {
+			if (multi_isname(arg2, QUEST_NAME(qst))) {
 				msg_to_char(ch, "%s ", QUEST_NAME(qst));	// followed by "Quest Tracker:"
 				show_quest_tracker(ch, pq);
 				found = TRUE;
@@ -3054,7 +3059,7 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
 		skill = plsk->ptr;
 		
-		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), get_skill_exp(vict, SKILL_VNUM(skill)), get_ability_points_available_for_char(vict, SKILL_VNUM(skill)));
+		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d%s]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), get_skill_exp(vict, SKILL_VNUM(skill)), get_ability_points_available_for_char(vict, SKILL_VNUM(skill)), plsk->resets ? "*" : "");
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
@@ -4735,8 +4740,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 	send_to_char(strcat(buf, buf2), ch);
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
-		sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
-		msg_to_char(ch, "Account: [%d], Flags: &g%s&0\r\n", GET_ACCOUNT(k)->id, buf);
+		if (GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
+			sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
+			msg_to_char(ch, "Account: [%d], Flags: &g%s&0\r\n", GET_ACCOUNT(k)->id, buf);
+		}
+		else {	// low-level imms only see certain account flags
+			sprintbit(GET_ACCOUNT(k)->flags & VISIBLE_ACCT_FLAGS, account_flags, buf, TRUE);
+			msg_to_char(ch, "Account: &g%s&0\r\n", buf);
+		}
 	}
 	
 	if (IS_MOB(k)) {
@@ -4777,7 +4788,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		buf2[4] = '\0';	// get only year
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
-		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch)) {
+		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
 			msg_to_char(ch, "Created from host: [%s]\r\n", NULLSAFE(GET_CREATION_HOST(k)));
 		}
 		
@@ -8343,6 +8354,7 @@ ACMD(do_reload) {
 	void load_intro_screens();
 	extern char *credits;
 	extern char *motd;
+	extern char *news;
 	extern char *imotd;
 	extern char *CREDIT_MESSG;
 	extern char *help;
@@ -8366,6 +8378,7 @@ ACMD(do_reload) {
 		file_to_string_alloc(GODLIST_FILE, &godlist);
 		file_to_string_alloc(CREDITS_FILE, &credits);
 		file_to_string_alloc(MOTD_FILE, &motd);
+		file_to_string_alloc(NEWS_FILE, &news);
 		file_to_string_alloc(IMOTD_FILE, &imotd);
 		file_to_string_alloc(HELP_PAGE_FILE, &help);
 		file_to_string_alloc(INFO_FILE, &info);
@@ -8382,6 +8395,8 @@ ACMD(do_reload) {
 		file_to_string_alloc(MOTD_FILE, &motd);
 	else if (!str_cmp(arg, "imotd"))
 		file_to_string_alloc(IMOTD_FILE, &imotd);
+	else if (!str_cmp(arg, "news"))
+		file_to_string_alloc(NEWS_FILE, &news);
 	else if (!str_cmp(arg, "help"))
 		file_to_string_alloc(HELP_PAGE_FILE, &help);
 	else if (!str_cmp(arg, "info"))
@@ -8532,6 +8547,7 @@ ACMD(do_restore) {
 				set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 			}
 			update_class(vict);
+			assign_class_abilities(vict, NULL, NOTHING);
 			
 			// temporarily remove empire abilities
 			emp = GET_LOYALTY(vict);
@@ -8738,7 +8754,7 @@ ACMD(do_show) {
 		{ "crops", LVL_START_IMM, show_crops },
 		{ "players", LVL_START_IMM, show_players },
 		{ "terrain", LVL_START_IMM, show_terrain },
-		{ "account", LVL_CIMPL, show_account },
+		{ "account", LVL_TO_SEE_ACCOUNTS, show_account },
 		{ "notes", LVL_START_IMM, show_notes },
 		{ "ammotypes", LVL_START_IMM, show_ammotypes },
 		{ "skills", LVL_START_IMM, show_skills },

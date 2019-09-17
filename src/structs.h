@@ -733,6 +733,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_RIVERBANK  BIT(18)
 #define BLD_ON_ESTUARY  BIT(19)
 #define BLD_ON_LAKE  BIT(20)
+#define BLD_ON_BASE_TERRAIN_ALLOWED  BIT(21)	// for facing-only, allows the base sector to match
 
 
 // BLD_REL_x: relationships with other buildings
@@ -1333,6 +1334,9 @@ typedef struct vehicle_data vehicle_data;
 #define LVL_START_IMM  (LVL_GOD+1)
 #define LVL_GOD  (LVL_MORTAL+1)
 
+// global level configs
+#define LVL_TO_SEE_ACCOUNTS  LVL_CIMPL
+
 
 // Player killing options (config.c)
 #define PK_NONE  NOBITS
@@ -1776,6 +1780,9 @@ typedef struct vehicle_data vehicle_data;
 #define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
 #define ACCT_APPROVED  BIT(6)	// g. approved for full gameplay
 #define ACCT_NOCUSTOMIZE  BIT(7)	// h. cannot use 'customize'
+
+// list of account flags that are visible to low-level imms:
+#define VISIBLE_ACCT_FLAGS  (ACCT_FROZEN | ACCT_MUTED | ACCT_NOTITLE | ACCT_APPROVED | ACCT_NOCUSTOMIZE)
 
 
 // ACT_x: Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players

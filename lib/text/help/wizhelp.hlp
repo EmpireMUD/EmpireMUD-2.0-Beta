@@ -1267,6 +1267,10 @@ Usage:  show skills <player name> [swap]
 
 Shows the target player's skills and abilities. The optional "swap" argument
 shows the player's alternate set of abilities.
+
+The numbers displayed are: [level, experience, unspent points]
+If there is an asterisk after the unspent ability points, it indicates that the
+player has skill resets available for that skill.
 #e
 "SHOW SPAWNS"
 

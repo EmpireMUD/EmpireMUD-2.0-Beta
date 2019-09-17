@@ -1345,6 +1345,13 @@ and use ,/h for help or ,/s to save and end.
 
 See also: TEXT EDITOR
 #
+NEWS
+
+Usage:  news
+
+Shows any recent news from the game staff. For example, updates or new
+adventures might appear here.
+#
 NOREPEAT NO-REPEAT "NO REPEAT"
 
 Usage:  toggle no-repeat [on/off]
@@ -1982,11 +1989,13 @@ See also: ENCHANT
 #
 SHEATH SHEATHE
 
-Usage:  sheathe
+Usage:  sheathe [item]
 
-You can stow up to two weapons from your wield slot, without sending them to
-your inventory. Any regular weapon can be sheathed. You do not gain attribute
-bonuses from a weapon while it is sheathed.
+You can stow up to two weapons directly from your wield/hold slot, without
+sending them to your inventory. Any regular weapon can be sheathed. You do not
+gain attribute bonuses from a weapon while it is sheathed.
+
+You can also put weapons from your inventory into your sheathes.
 
 See also: DRAW, SWAP
 #

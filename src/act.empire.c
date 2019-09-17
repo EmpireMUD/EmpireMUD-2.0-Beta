@@ -427,9 +427,16 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 	}
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-		if (isle->island != NO_ISLAND) {
-			isle->workforce_limit[chore] = limit;
+		if (isle->island == NO_ISLAND) {
+			continue;	// skip if non-island
 		}
+		if (limit != 0 && isle->workforce_limit[chore] == 0) {	// things we only skip if it's not "off" or there's already data
+			if (!isle->store && !isle->population && isle->territory[TER_TOTAL] < 1) {
+				continue;	// appears to be a non-island
+			}
+		}
+		
+		isle->workforce_limit[chore] = limit;
 	}
 }
 
@@ -1915,9 +1922,11 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 		msg_to_char(ch, "  none\r\n");
 	}
 	
+	/* // probably no longer need this message since city points show above
 	if (points > 0 && is_own) {
 		msg_to_char(ch, "* The empire has %d city point%s available.\r\n", points, (points != 1 ? "s" : ""));
 	}
+	*/
 }
 
 
@@ -3376,7 +3385,9 @@ ACMD(do_city) {
 	half_chop(argptr, arg, arg1);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
+		// msg_to_char(ch, "Usage: city <found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
+		list_cities(ch, emp, "");
+		msg_to_char(ch, "See HELP CITY COMMANDS for more options.\r\n");
 	}
 	else if (is_abbrev(arg, "list")) {
 		list_cities(ch, emp, arg1);
