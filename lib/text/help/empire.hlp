@@ -90,31 +90,25 @@ or HELP CITY TYPES ?)
 
 Usage:  city <command> [city name]
 
+Commands:
 - &ccity list [empire]&0: This lists the cities already established in the
     empire, as well as how many city points are available to spend. You can
     also use this command to find other empires' cities (but it can't find
     their outposts).
-
 - &ccity found <name>&0: This founds a new city on the spot where you're standing.
     It creates a "city center" building, which is open (does not block move-
     ment). It costs 1 city point. You must be 25 tiles away from a starting
     location and 30 from another empire's city (10 tiles if allied).
-
 - &ccity upgrade <name>&0: This upgrades the given city by 1 level at the cost of
     1 city point.
-
 - &ccity downgrade <name>&0: This downgrades the given city by 1 level, or
     removes its city status entirely if it was at the minimum.
-
 - &ccity claim <name> [all]&0: This claims all unclaimed structures within
     the borders of the city, up to your maximum territory -- or, all tiles with
     the 'all' option.
-
 - &ccity abandon <name>&0: This abolishes the city, refunds your city points, and
     un-claims all territory within the city border.
-
 - &ccity rename <number> <new name>&0: This allows you to rename a city.
-
 - &ccity traits <name> [add | remove] <trait(s)>&0: Change city traits.
 
 See also: CITY INFORMATION, CITY TRAITS, CLAIM, ESTABLISHING

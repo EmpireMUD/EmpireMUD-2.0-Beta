@@ -3383,7 +3383,9 @@ ACMD(do_city) {
 	half_chop(argptr, arg, arg1);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
+		// msg_to_char(ch, "Usage: city <found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
+		list_cities(ch, emp, "");
+		msg_to_char(ch, "See HELP CITY COMMANDS for more options.\r\n");
 	}
 	else if (is_abbrev(arg, "list")) {
 		list_cities(ch, emp, arg1);
