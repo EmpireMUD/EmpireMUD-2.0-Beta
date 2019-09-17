@@ -1922,9 +1922,11 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 		msg_to_char(ch, "  none\r\n");
 	}
 	
+	/* // probably no longer need this message since city points show above
 	if (points > 0 && is_own) {
 		msg_to_char(ch, "* The empire has %d city point%s available.\r\n", points, (points != 1 ? "s" : ""));
 	}
+	*/
 }
 
 
