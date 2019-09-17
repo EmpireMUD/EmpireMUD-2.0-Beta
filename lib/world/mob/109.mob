@@ -171,7 +171,7 @@ back arches out of the water, coiling in circles around you. What sort of prize
 might this dragon hold?
 ~
 I 0 10907 100.00 4  # BUTCHER: a raw dragon steak
-I 1 1357 100.00 8  # SKIN: a large piece of leather
+I 1 1351 100.00 8  # SKIN: a large skin
 I 1 10006 60.00 1 a  # SKIN: a dragon scale
 I 1 10006 30.00 2 a  # SKIN: a dragon scale
 I 1 10006 10.00 3 a  # SKIN: a dragon scale
