@@ -3224,7 +3224,7 @@ ACMD(do_barde) {
 		// find interact
 		found = FALSE;
 		for (interact = mob->interactions; interact; interact = interact->next) {
-			if (interact->type == INTERACT_BARDE && check_exclusion_set(&excl, interact->exclusion_code, interact->percent)) {
+			if (interact->type == INTERACT_BARDE && check_exclusion_set(&excl, interact->exclusion_code, interact->percent) && meets_interaction_restrictions(interact->restrictions, ch, GET_LOYALTY(ch))) {
 				if (!found) {
 					// first one found
 					act("You strap heavy armor onto $N.", FALSE, ch, NULL, mob, TO_CHAR);

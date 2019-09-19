@@ -3787,6 +3787,15 @@ const char *interact_types[] = {
 };
 
 
+// INTERACT_RESTRICT_x: types of interaction restrictions
+const char *interact_restriction_types[] = {
+	"ability",
+	"ptech",
+	"tech",
+	"\n"
+};
+
+
 // INTERACT_x, see also interact_types, interact_vnum_types
 const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_MOB,

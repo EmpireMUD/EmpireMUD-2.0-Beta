@@ -503,9 +503,11 @@ extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *olc_flag_bits[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern const char *pool_types[];
+extern const char *player_tech_types[];
 extern const bool requirement_amt_type[];
 extern const char *requirement_types[];
 extern const char *resource_types[];
+extern const char *techs[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -4044,6 +4046,61 @@ void get_icons_display(struct icon_data *list, char *save_buffer) {
 
 
 /**
+* Gets the text for a single interaction restriction, or for a full list.
+*
+* @param struct interact_restriction *list The restriction or list to show.
+* @param bool whole_list If TRUE, displays the whole list.
+* @return char* The text to display.
+*/
+char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list) {
+	static char output[MAX_STRING_LENGTH];
+	struct interact_restriction *res;
+	char line[256];
+	size_t size;
+	
+	*output = '\0';
+	size = 0;
+	
+	LL_FOREACH(list, res) {
+		// INTERACT_RESTRICT_x
+		switch(res->type) {
+			case INTERACT_RESTRICT_ABILITY: {
+				snprintf(line, sizeof(line), "Ability: %s", get_ability_name_by_vnum(res->vnum));
+				break;
+			}
+			case INTERACT_RESTRICT_PTECH: {
+				snprintf(line, sizeof(line), "PTech: %s", player_tech_types[res->vnum]);
+				break;
+			}
+			case INTERACT_RESTRICT_TECH: {
+				snprintf(line, sizeof(line), "Tech: %s", techs[res->vnum]);
+				break;
+			}
+			default: {
+				snprintf(line, sizeof(line), "Unknown %d:%d", res->type, res->vnum);
+				break;
+			}
+		}
+		
+		// append
+		if (strlen(line) + size + 2 < sizeof(output)) {
+			size += snprintf(output + size, sizeof(output) - size, "%s%s", size > 0 ? ", " : "", line);
+		}
+		else {
+			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW");
+			break;
+		}
+		
+		if (!whole_list) {
+			break;
+		}
+	}
+	
+	return output;
+}
+
+
+/**
 * Displays the interactions data from a given list.
 *
 * @param struct interaction_item *list Pointer to the start of a list of interactions.
@@ -4069,6 +4126,9 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, lbuf, interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
 			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
+		}
+		if (interact->restrictions) {
+			sprintf(save_buffer + strlen(save_buffer), " (requires: %s)", get_interaction_restriction_display(interact->restrictions, TRUE));
 		}
 		strcat(save_buffer, "\r\n");
 	}
@@ -4433,6 +4493,35 @@ struct icon_data *copy_icon_set(struct icon_data *input_list) {
 
 
 /**
+* Creates a copy of a restriction list.
+*
+* @param struct interact_restriction *input_list The list to copy.
+* @return struct interact_restriction* The copied list.
+*/
+struct interact_restriction *copy_interaction_restrictions(struct interact_restriction *input_list) {
+	struct interact_restriction *iter, *new_res, *list, *last;
+	
+	// copy in order
+	list = last = NULL;
+	LL_FOREACH(input_list, iter) {
+		CREATE(new_res, struct interact_restriction, 1);
+		*new_res = *iter;
+		new_res->next = NULL;
+		
+		if (last) {
+			last->next = new_res;
+		}
+		else {
+			list = new_res;
+		}
+		last = new_res;
+	}
+	
+	return list;
+}
+
+
+/**
 * Creates a copy of an interaction list.
 *
 * @param struct interaction_item *input_list A pointer to the start of the list to copy.
@@ -4446,6 +4535,7 @@ struct interaction_item *copy_interaction_list(struct interaction_item *input_li
 	for (interact = input_list; interact; interact = interact->next) {
 		CREATE(new_interact, struct interaction_item, 1);
 		*new_interact = *interact;
+		new_interact->restrictions = copy_interaction_restrictions(interact->restrictions);
 		new_interact->next = NULL;
 		
 		// preserve order
@@ -6277,6 +6367,97 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 
 
 /**
+* Parses out any -ability, -tech, or -ptech flags, as well as any exclusion
+* code (a single letter). This is used with '.interaction add' to set
+* restrictions.
+*
+* @param char_data *ch The person using the OLC editor.
+* @param char *argument The remaining args from a '.interaction add'.
+* @param struct interact_restriction **found_restrictions If we find any restrictions, we will pass them back on this parameter.
+* @param char *found_exclusion If we find an exclusion code, we pass it back on this parameter.
+* @return bool TRUE normally; FALSE if there was an error (message sent to character).
+*/
+bool parse_interaction_restrictions(char_data *ch, char *argument, struct interact_restriction **found_restrictions, char *found_exclusion) {
+	void free_interaction_restrictions(struct interact_restriction *list);
+	
+	char arg[MAX_INPUT_LENGTH], *ptr = argument;
+	struct interact_restriction *res;
+	ability_data *abil;
+	bool fail = FALSE;
+	int num;
+	
+	// init
+	*found_exclusion = (char)0;
+	*found_restrictions = NULL;
+	
+	while (*ptr && !fail) {
+		ptr = any_one_word(ptr, arg);
+		
+		if (strlen(arg) == 1 && isalpha(*arg)) {	// probably an exclusion code
+			if (!*found_exclusion) {
+				*found_exclusion = *arg;
+			}
+			else {	// duplicate
+				msg_to_char(ch, "Error: Found two exclusion codes: '%c' and '%c'.\r\n", *found_exclusion, *arg);
+				fail = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-ability")) {
+			ptr = any_one_word(ptr, arg);
+			if ((abil = find_ability(arg))) {	// valid restriction
+				CREATE(res, struct interact_restriction, 1);
+				res->type = INTERACT_RESTRICT_ABILITY;
+				res->vnum = ABIL_VNUM(abil);
+				LL_APPEND(*found_restrictions, res);
+			}
+			else {
+				msg_to_char(ch, "Invalid ability '%s'.\r\n", arg);
+				fail = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-technology")) {
+			ptr = any_one_word(ptr, arg);
+			if ((num = search_block(arg, techs, FALSE)) != NOTHING) {	// valid restriction
+				CREATE(res, struct interact_restriction, 1);
+				res->type = INTERACT_RESTRICT_TECH;
+				res->vnum = num;
+				LL_APPEND(*found_restrictions, res);
+			}
+			else {
+				msg_to_char(ch, "Invalid tech '%s'.\r\n", arg);
+				fail = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-ptech")) {
+			ptr = any_one_word(ptr, arg);
+			if ((num = search_block(arg, player_tech_types, FALSE)) != NOTHING) {	// valid restriction
+				CREATE(res, struct interact_restriction, 1);
+				res->type = INTERACT_RESTRICT_PTECH;
+				res->vnum = num;
+				LL_APPEND(*found_restrictions, res);
+			}
+			else {
+				msg_to_char(ch, "Invalid ptech '%s'.\r\n", arg);
+				fail = TRUE;
+			}
+		}
+		else {
+			msg_to_char(ch, "Unknown argument '%s'.\r\n", arg);
+			fail = TRUE;
+		}
+	}
+	
+	// free any already found
+	if (fail && *found_restrictions) {
+		free_interaction_restrictions(*found_restrictions);
+		*found_restrictions = NULL;
+	}
+	
+	return !fail;
+}
+
+
+/**
 * OLC processor for interaction data, which is used on buildings, crops, mobs, and sectors.
 *
 * @param char_data *ch The player using OLC.
@@ -6287,6 +6468,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], arg6[MAX_INPUT_LENGTH];
 	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL, *change;
+	struct interact_restriction *found_restrictions = NULL;
 	struct interaction_item iitem;
 	int iter, loc, num, count, findtype;
 	any_vnum vnum;
@@ -6496,14 +6678,14 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		half_chop(buf, arg2, buf1);	// arg2: type
 		half_chop(buf1, arg3, buf);	// arg3: quantity
 		half_chop(buf, arg4, buf1);	// arg4: vnum
-		half_chop(buf1, arg5, arg6);	// arg5: percent, arg6: exclusion
+		half_chop(buf1, arg5, arg6);	// arg5: percent, arg6: exclusion/restrictions
 	
 		num = atoi(arg3);
 		vnum = atoi(arg4);
 		prc = atof(arg5);
 		
 		if (!*arg2 || !*arg3 || !*arg4 || !*arg5 || !isdigit(*arg3) || !isdigit(*arg4) || (!isdigit(*arg5) && *arg5 != '.')) {
-			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
+			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]\r\n");
 		}
 		else if ((loc = search_block(arg2, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
 			msg_to_char(ch, "Invalid type.\r\n");
@@ -6520,8 +6702,8 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		else if (prc < 0.01 || prc > 100.00) {
 			msg_to_char(ch, "You must choose a percentage between 0.01 and 100.00.\r\n");
 		}
-		else if (*arg6 && !isalpha(*arg6)) {
-			msg_to_char(ch, "Invalid exclusion code (must be a letter, or leave it blank).\r\n");
+		else if (!parse_interaction_restrictions(ch, arg6, &found_restrictions, &exc)) {
+			// sends own message if it fails
 		}
 		else {
 			CREATE(temp, struct interaction_item, 1);
@@ -6529,7 +6711,8 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			temp->vnum = vnum;
 			temp->percent = prc;
 			temp->quantity = num;
-			temp->exclusion_code = exc = isalpha(*arg6) ? *arg6 : 0;
+			temp->exclusion_code = exc;
+			temp->restrictions = found_restrictions;
 			temp->next = NULL;
 			
 			if ((interact = *list) != NULL) {
@@ -6546,6 +6729,9 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum)) : skip_filler(get_obj_name_by_proto(vnum))), prc);
 			if (exc) {
 				msg_to_char(ch, " (%c)", exc);
+			}
+			if (found_restrictions) {
+				msg_to_char(ch, " (requires: %s)", get_interaction_restriction_display(found_restrictions, TRUE));
 			}
 			msg_to_char(ch, "\r\n");
 		}
@@ -6645,7 +6831,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		sort_interactions(list);
 	}
 	else {
-		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code]\r\n");
+		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]\r\n");
 		msg_to_char(ch, "Usage: interaction change <number> <field> <value>\r\n");
 		msg_to_char(ch, "Usage: interaction copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: interaction remove <number | all>\r\n");
@@ -7557,6 +7743,7 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 		
 		CREATE(new_interact, struct interaction_item, 1);
 		*new_interact = *interact;
+		new_interact->restrictions = copy_interaction_restrictions(interact->restrictions);
 		new_interact->next = NULL;
 		
 		// preserve order

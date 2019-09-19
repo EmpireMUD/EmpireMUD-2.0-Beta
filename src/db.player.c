@@ -802,7 +802,6 @@ void free_char(char_data *ch) {
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
 	struct minipet_data *mini, *next_mini;
-	struct interaction_item *interact;
 	struct player_eq_set *eq_set;
 	struct pursuit_data *purs;
 	struct player_tech *ptech;
@@ -1045,10 +1044,7 @@ void free_char(char_data *ch) {
 		free_proto_scripts(&ch->proto_script);
 	}
 	if (ch->interactions && (!proto || ch->interactions != proto->interactions)) {
-		while ((interact = ch->interactions)) {
-			ch->interactions = interact->next;
-			free(interact);
-		}
+		free_interactions(ch->interactions);
 	}
 	if (MOB_CUSTOM_MSGS(ch) && (!proto || MOB_CUSTOM_MSGS(ch) != MOB_CUSTOM_MSGS(proto))) {
 		free_custom_messages(MOB_CUSTOM_MSGS(ch));

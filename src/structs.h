@@ -358,6 +358,12 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_INTERACTS  26
 
 
+// INTERACT_RESTRICT_x: types of interaction restrictions
+#define INTERACT_RESTRICT_ABILITY  0	// player must have an ability
+#define INTERACT_RESTRICT_PTECH  1	// player must have a ptech
+#define INTERACT_RESTRICT_TECH  2	// empire must have a tech
+
+
 // for object saving
 #define LOC_INVENTORY	0
 #define MAX_BAG_ROWS	5
@@ -2774,6 +2780,14 @@ struct interact_exclusion_data {
 };
 
 
+// restricts interactions to certain players
+struct interact_restriction {
+	int type;	// INTERACT_RESTRICT_ type
+	any_vnum vnum;	// based on type
+	struct interact_restriction *next;
+};
+
+
 // for the "interactions" system (like butcher, dig, etc)
 struct interaction_item {
 	int type;	// INTERACT_
@@ -2781,6 +2795,8 @@ struct interaction_item {
 	double percent;	// how often to do it 0.01 - 100.00
 	int quantity;	// how many to give
 	char exclusion_code;	// creates mutually-exclusive sets
+	
+	struct interact_restriction *restrictions;	// linked list
 	
 	struct interaction_item *next;
 };

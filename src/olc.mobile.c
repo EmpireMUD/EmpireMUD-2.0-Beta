@@ -199,7 +199,8 @@ bool delete_from_interaction_list(struct interaction_item **list, int vnum_type,
 		if (interact_vnum_types[inter->type] == vnum_type && inter->vnum == vnum) {
 			found = TRUE;
 			REMOVE_FROM_LIST(inter, *list, next);
-			free(inter);
+			inter->next = NULL;
+			free_interactions(inter);
 		}
 	}
 	
@@ -950,7 +951,6 @@ void save_olc_mobile(descriptor_data *desc) {
 
 	char_data *mob = GET_OLC_MOBILE(desc), *mob_iter, *proto;
 	mob_vnum vnum = GET_OLC_VNUM(desc);
-	struct interaction_item *interact;
 	struct quest_lookup *ql;
 	struct shop_lookup *sl;
 	UT_hash_handle hh;
@@ -1034,10 +1034,7 @@ void save_olc_mobile(descriptor_data *desc) {
 		free(GET_LOOK_DESC(proto));
 	}
 
-	while ((interact = proto->interactions)) {
-		proto->interactions = interact->next;
-		free(interact);
-	}
+	free_interactions(proto->interactions);
 	free_custom_messages(MOB_CUSTOM_MSGS(proto));
 	
 	if (proto->proto_script) {

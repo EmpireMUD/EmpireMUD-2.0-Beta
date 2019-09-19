@@ -532,7 +532,6 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 void save_olc_sector(descriptor_data *desc) {	
 	sector_data *proto, *st = GET_OLC_SECTOR(desc);
 	sector_vnum vnum = GET_OLC_VNUM(desc);
-	struct interaction_item *interact;
 	struct spawn_info *spawn;
 	UT_hash_handle hh;
 	
@@ -556,10 +555,7 @@ void save_olc_sector(descriptor_data *desc) {
 		GET_SECT_SPAWNS(proto) = spawn->next;
 		free(spawn);
 	}
-	while ((interact = GET_SECT_INTERACTIONS(proto))) {
-		GET_SECT_INTERACTIONS(proto) = interact->next;
-		free(interact);
-	}
+	free_interactions(GET_SECT_INTERACTIONS(proto));
 	
 	// sanity
 	if (!GET_SECT_NAME(st) || !*GET_SECT_NAME(st)) {

@@ -434,6 +434,7 @@ static void ewt_mark_resource_worker(empire_data *emp, room_data *loc, obj_vnum 
 static void ewt_mark_for_interaction_list(empire_data *emp, room_data *location, struct interaction_item *list, int interaction_type) {
 	struct interaction_item *interact;
 	LL_FOREACH(list, interact) {
+		// should this be checking meets_interaction_restrictions() ?
 		if (interact->type == interaction_type) {
 			ewt_mark_resource_worker(emp, location, interact->vnum);
 		}
@@ -554,6 +555,9 @@ bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *
 		}
 		if (!proto->storage) {
 			continue;	// MUST be storable
+		}
+		if (!meets_interaction_restrictions(interact->restrictions, NULL, emp)) {
+			continue;
 		}
 		
 		// found
@@ -2338,7 +2342,7 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 			
 			// find shear interaction
 			for (interact = mob->interactions; interact && !shearable; interact = interact->next) {
-				if (interact->type != INTERACT_SHEAR) {
+				if (interact->type != INTERACT_SHEAR || !meets_interaction_restrictions(interact->restrictions, NULL, emp)) {
 					continue;
 				}
 				if (!can_gain_chore_resource(emp, room, CHORE_SHEARING, interact->vnum)) {
