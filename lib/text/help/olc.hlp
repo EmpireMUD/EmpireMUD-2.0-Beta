@@ -3923,7 +3923,7 @@ Object interaction types:
 Room/vehicle interaction types:
  DIG - Items received when using the dig action.
  FORAGE - Items received when using the Forage ability.
- FIND-HERB - Items found when picking, if the user has Find Herbs.
+ PICK - Items found when picking.
  HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
  GATHER - Items received from the gather action.
  ENCOUNTER - Hostile mob loaded when a random encounter triggers.

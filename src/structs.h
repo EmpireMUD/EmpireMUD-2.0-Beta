@@ -336,7 +336,7 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_LOOT  4
 #define INTERACT_DIG  5
 #define INTERACT_FORAGE  6
-#define INTERACT_FIND_HERB  7
+#define INTERACT_PICK  7	// formerly FIND-HERB
 #define INTERACT_HARVEST  8
 #define INTERACT_GATHER  9
 #define INTERACT_ENCOUNTER  10

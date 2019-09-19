@@ -19,12 +19,12 @@ I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 1200 15.00 1 X  # PICK: a handful of whitegrass
+I 7 1201 15.00 1 X  # PICK: a sack of fiveleaf
+I 7 1202 15.00 1 X  # PICK: a twig of redthorn
+I 7 1203 15.00 1 X  # PICK: some magewhisper sepals
+I 7 1204 15.00 1 X  # PICK: a daggerbite frond
+I 7 1205 15.00 1 X  # PICK: some bileberries
 I 9 121 100.00 1 X  # GATHER: a stick
 M 0 10000 50.00 4
 M 0 10001 20.00 2
@@ -53,12 +53,12 @@ I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 1200 15.00 1 X  # PICK: a handful of whitegrass
+I 7 1201 15.00 1 X  # PICK: a sack of fiveleaf
+I 7 1202 15.00 1 X  # PICK: a twig of redthorn
+I 7 1203 15.00 1 X  # PICK: some magewhisper sepals
+I 7 1204 15.00 1 X  # PICK: a daggerbite frond
+I 7 1205 15.00 1 X  # PICK: some bileberries
 I 9 121 100.00 1 X  # GATHER: a stick
 M 0 10000 50.00 4
 M 0 10001 20.00 2
@@ -88,12 +88,12 @@ I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 1200 15.00 1 X  # PICK: a handful of whitegrass
+I 7 1201 15.00 1 X  # PICK: a sack of fiveleaf
+I 7 1202 15.00 1 X  # PICK: a twig of redthorn
+I 7 1203 15.00 1 X  # PICK: some magewhisper sepals
+I 7 1204 15.00 1 X  # PICK: a daggerbite frond
+I 7 1205 15.00 1 X  # PICK: some bileberries
 I 9 121 100.00 1 X  # GATHER: a stick
 M 0 10000 50.00 4
 M 0 10001 20.00 2
@@ -125,12 +125,12 @@ I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 1200 15.00 1 X  # PICK: a handful of whitegrass
+I 7 1201 15.00 1 X  # PICK: a sack of fiveleaf
+I 7 1202 15.00 1 X  # PICK: a twig of redthorn
+I 7 1203 15.00 1 X  # PICK: some magewhisper sepals
+I 7 1204 15.00 1 X  # PICK: a daggerbite frond
+I 7 1205 15.00 1 X  # PICK: some bileberries
 I 9 121 100.00 1 X  # GATHER: a stick
 M 0 10000 50.00 4
 M 0 10001 20.00 2
@@ -163,12 +163,12 @@ I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 1200 15.00 1 X  # PICK: a handful of whitegrass
+I 7 1201 15.00 1 X  # PICK: a sack of fiveleaf
+I 7 1202 15.00 1 X  # PICK: a twig of redthorn
+I 7 1203 15.00 1 X  # PICK: some magewhisper sepals
+I 7 1204 15.00 1 X  # PICK: a daggerbite frond
+I 7 1205 15.00 1 X  # PICK: some bileberries
 I 9 121 100.00 1 X  # GATHER: a stick
 M 0 10001 20.00 2
 M 0 10002 10.00 1
@@ -197,12 +197,12 @@ I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
 I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
 I 6 3001 100.00 1 X  # FORAGE: a green apple
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
+I 7 1200 15.00 1 X  # PICK: a handful of whitegrass
+I 7 1201 15.00 1 X  # PICK: a sack of fiveleaf
+I 7 1202 15.00 1 X  # PICK: a twig of redthorn
+I 7 1203 15.00 1 X  # PICK: some magewhisper sepals
+I 7 1204 15.00 1 X  # PICK: a daggerbite frond
+I 7 1205 15.00 1 X  # PICK: some bileberries
 I 9 121 100.00 1 X  # GATHER: a stick
 M 0 10000 100.00 6
 M 0 10000 100.00 6

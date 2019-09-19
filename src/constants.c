@@ -3764,7 +3764,7 @@ const char *interact_types[] = {
 	"LOOT",
 	"DIG",	// 5
 	"FORAGE",
-	"FIND-HERB",
+	"PICK",
 	"HARVEST",
 	"GATHER",
 	"ENCOUNTER",	// 10
