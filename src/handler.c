@@ -3964,6 +3964,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func)) {
 	struct interact_exclusion_data *exclusion = NULL;
 	struct interaction_item *interact;
+	struct interact_restriction *res;
 	bool success = FALSE;
 
 	for (interact = run_list; interact; interact = interact->next) {
@@ -3971,6 +3972,20 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 			if (func) {
 				// run function
 				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
+				
+				// skill gains?
+				LL_FOREACH(interact->restrictions, res) {
+					switch (res->type) {
+						case INTERACT_RESTRICT_ABILITY: {
+							gain_ability_exp(ch, res->vnum, 5);
+							break;
+						}
+						case INTERACT_RESTRICT_PTECH: {
+							gain_player_tech_exp(ch, res->vnum, 5);
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
