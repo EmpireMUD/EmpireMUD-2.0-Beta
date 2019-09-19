@@ -3974,15 +3974,17 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
 				
 				// skill gains?
-				LL_FOREACH(interact->restrictions, res) {
-					switch (res->type) {
-						case INTERACT_RESTRICT_ABILITY: {
-							gain_ability_exp(ch, res->vnum, 5);
-							break;
-						}
-						case INTERACT_RESTRICT_PTECH: {
-							gain_player_tech_exp(ch, res->vnum, 5);
-							break;
+				if (!IS_NPC(ch)) {
+					LL_FOREACH(interact->restrictions, res) {
+						switch (res->type) {
+							case INTERACT_RESTRICT_ABILITY: {
+								gain_ability_exp(ch, res->vnum, 5);
+								break;
+							}
+							case INTERACT_RESTRICT_PTECH: {
+								gain_player_tech_exp(ch, res->vnum, 5);
+								break;
+							}
 						}
 					}
 				}
