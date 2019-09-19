@@ -3967,7 +3967,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 	bool success = FALSE;
 
 	for (interact = run_list; interact; interact = interact->next) {
-		if (interact->type == type && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent) && meets_interaction_restrictions(interact->restrictions, ch, GET_LOYALTY(ch))) {
+		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, GET_LOYALTY(ch)) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
 				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
