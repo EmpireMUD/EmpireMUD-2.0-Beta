@@ -1,0 +1,302 @@
+#16100
+hydra oceanic monstrous~
+the oceanic hydra~
+A monstrous oceanic hydra forms its own waves as it surfaces!
+~
+225 325 adlyBE cE 4
+0 0 6 25
+D
+   This serpentine monster can't be seen properly as a majority of its body is
+still under the water. All you can properly see is its head, or is that heads?
+~
+I 0 16108 65.00 1 b  # BUTCHER: a massive hydra bone
+I 0 16108 30.00 2 b  # BUTCHER: a massive hydra bone
+I 0 16108 5.00 3 b  # BUTCHER: a massive hydra bone
+I 0 3012 50.00 4 f  # BUTCHER: a fillet of raw meat
+I 0 3012 30.00 5 f  # BUTCHER: a fillet of raw meat
+I 0 3012 20.00 6 f  # BUTCHER: a fillet of raw meat
+I 1 16101 55.00 1 h  # SKIN: a hydra hide
+I 1 16101 30.00 2 h  # SKIN: a hydra hide
+I 1 16101 15.00 3 h  # SKIN: a hydra hide
+I 1 16134 75.00 1 s  # SKIN: a hydra scale
+I 1 16134 25.00 2 s  # SKIN: a hydra scale
+I 4 16132 15.00 1  # LOOT: a multi-headed whistle
+I 4 16102 2.50 1 g  # LOOT: a hydra fang wand
+I 4 16103 2.50 1 g  # LOOT: a hydra fang dagger
+I 4 16104 2.50 1 g  # LOOT: a hydra fang trident
+I 4 16105 2.50 1 g  # LOOT: a hydra fang staff
+I 4 16106 2.50 1 g  # LOOT: a hydra fang bow
+I 4 16107 2.50 1 g  # LOOT: a hydra hide whip
+I 4 16111 2.50 1 g  # LOOT: a hydra hide surcoat
+I 4 16112 2.50 1 g  # LOOT: a hydra shield
+I 4 16113 2.50 1 g  # LOOT: a hydra hide cloak
+I 4 16114 2.50 1 g  # LOOT: a hydra hide robe
+I 4 16115 2.50 1 g  # LOOT: an aura of terror
+I 4 16116 2.50 1 g  # LOOT: a hydra hide jacket
+I 4 16117 2.50 1 g  # LOOT: a pair of hydra hide pants
+I 4 16119 2.50 1 g  # LOOT: a hydra hide belt
+I 4 16120 2.50 1 g  # LOOT: a hydra scale belt
+I 4 16121 2.50 1 g  # LOOT: a hydra fang belt
+I 4 16122 2.50 1 g  # LOOT: a pair of hydra scale gloves
+I 4 16123 2.50 1 g  # LOOT: a pair of hydra hide gloves
+I 4 16124 2.50 1 g  # LOOT: a hydra hide mask
+I 4 16125 2.50 1 g  # LOOT: a hydra hide helm
+I 4 16126 2.50 1 g  # LOOT: a pair of hydra fang earrings
+I 4 16127 2.50 1 g  # LOOT: a single hydra fang stud
+I 4 16128 2.50 1 g  # LOOT: a hydra fang hoop
+I 4 16129 2.50 1 g  # LOOT: a hydra fang post
+I 4 16130 2.50 1 g  # LOOT: a hydra scale hood
+I 4 16131 2.50 1 g  # LOOT: a hydra scale mask
+I 4 16136 2.50 1 g  # LOOT: a hydra scale tunic
+I 4 16137 2.50 1 g  # LOOT: a hydra scale girtle
+I 4 16138 2.50 1 g  # LOOT: a pair of hydra hide handwraps
+I 4 16139 2.50 1 g  # LOOT: a pair of plated hydra gloves
+I 4 16141 2.50 1 g  # LOOT: a hydra's eye
+I 4 16142 2.50 1 g  # LOOT: a hydra fetish
+I 4 16143 2.50 1 g  # LOOT: a plated hydra cape
+I 4 16144 2.50 1 g  # LOOT: a majestic aura
+I 4 16145 2.50 1 g  # LOOT: some hydra scale leggings
+I 4 16146 2.50 1 g  # LOOT: a hydra hide skirt
+I 4 16147 2.50 1 g  # LOOT: a pair of hydra hide trousers
+I 4 16135 5.00 1 g  # LOOT: a hydraling whistle
+I 4 16148 2.50 1 g  # LOOT: a hydra fang longsword
+I 4 16102 0.50 1 i  # LOOT: a hydra fang wand
+I 4 16103 0.50 1 i  # LOOT: a hydra fang dagger
+I 4 16104 0.50 1 i  # LOOT: a hydra fang trident
+I 4 16105 0.50 1 i  # LOOT: a hydra fang staff
+I 4 16106 0.50 1 i  # LOOT: a hydra fang bow
+I 4 16107 0.50 1 i  # LOOT: a hydra hide whip
+I 4 16111 0.50 1 i  # LOOT: a hydra hide surcoat
+I 4 16112 0.50 1 i  # LOOT: a hydra shield
+I 4 16113 0.50 1 i  # LOOT: a hydra hide cloak
+I 4 16114 0.50 1 i  # LOOT: a hydra hide robe
+I 4 16115 0.50 1 i  # LOOT: an aura of terror
+I 4 16116 0.50 1 i  # LOOT: a hydra hide jacket
+I 4 16117 0.50 1 i  # LOOT: a pair of hydra hide pants
+I 4 16119 0.50 1 i  # LOOT: a hydra hide belt
+I 4 16120 0.50 1 i  # LOOT: a hydra scale belt
+I 4 16121 0.50 1 i  # LOOT: a hydra fang belt
+I 4 16122 0.50 1 i  # LOOT: a pair of hydra scale gloves
+I 4 16123 0.50 1 i  # LOOT: a pair of hydra hide gloves
+I 4 16124 0.50 1 i  # LOOT: a hydra hide mask
+I 4 16125 0.50 1 i  # LOOT: a hydra hide helm
+I 4 16126 0.50 1 i  # LOOT: a pair of hydra fang earrings
+I 4 16127 0.50 1 i  # LOOT: a single hydra fang stud
+I 4 16128 0.50 1 i  # LOOT: a hydra fang hoop
+I 4 16129 0.50 1 i  # LOOT: a hydra fang post
+I 4 16130 0.50 1 i  # LOOT: a hydra scale hood
+I 4 16131 0.50 1 i  # LOOT: a hydra scale mask
+I 4 16136 0.50 1 i  # LOOT: a hydra scale tunic
+I 4 16137 0.50 1 i  # LOOT: a hydra scale girtle
+I 4 16138 0.50 1 i  # LOOT: a pair of hydra hide handwraps
+I 4 16139 0.50 1 i  # LOOT: a pair of plated hydra gloves
+I 4 16141 0.50 1 i  # LOOT: a hydra's eye
+I 4 16142 0.50 1 i  # LOOT: a hydra fetish
+I 4 16143 0.50 1 i  # LOOT: a plated hydra cape
+I 4 16144 0.50 1 i  # LOOT: a majestic aura
+I 4 16145 0.50 1 i  # LOOT: some hydra scale leggings
+I 4 16146 0.50 1 i  # LOOT: a hydra hide skirt
+I 4 16147 0.50 1 i  # LOOT: a pair of hydra hide trousers
+I 4 16118 1.00 1 i  # LOOT: a hydra hide saddle
+I 4 16148 0.50 1 i  # LOOT: a hydra fang longsword
+T 16103
+T 16104
+T 16108
+T 16110
+T 16100
+S
+#16101
+head ethereal~
+an ethereal head~
+An ethereal head sways here.
+~
+225 325 abdhlxE cdjG 0
+0 0 6 28
+D
+   A non-corporeal, serpent-like head attaches to an equally ethereal neck
+leading back to the bulk of the hydra. As the waves swell they seem to pass
+straight through this particular head.
+~
+I 4 16110 40.00 1  # LOOT: a pile of coins
+T 16105
+S
+#16102
+head vicious~
+a vicious head~
+A vicious head sways here.
+~
+225 325 abdlzE cdq 3
+0 0 6 9
+D
+   A vicious serpent-like head sways back and forth here on the end of a
+serpentine neck, which leads back to the main trunk of the hydra. Fangs the
+length of daggers are clearly on display as it snaps at you.
+~
+I 0 16109 80.00 1 f  # BUTCHER: a hydra fang
+I 0 16109 10.00 2 f  # BUTCHER: a hydra fang
+I 0 3012 10.00 2 m  # BUTCHER: a fillet of raw meat
+I 0 3012 90.00 1 m  # BUTCHER: a fillet of raw meat
+T 16107
+T 16102
+S
+#16103
+head withered~
+a withered head~
+A withered head sways here.
+~
+225 325 abdlE cd 3
+0 0 6 9
+D
+   Blackened and shriveled flesh peeks through the scattered scales on this
+head and the serpentine neck attached. As it moves about, a thin layer of slime
+coating the head seems to cling to anything it touches.
+~
+I 0 16109 1.00 4 f  # BUTCHER: a hydra fang
+I 0 16109 5.00 3 f  # BUTCHER: a hydra fang
+I 0 16109 15.00 2 f  # BUTCHER: a hydra fang
+I 0 16109 25.00 1 f  # BUTCHER: a hydra fang
+I 0 3012 50.00 2 m  # BUTCHER: a fillet of raw meat
+I 0 3012 25.00 4 m  # BUTCHER: a fillet of raw meat
+I 0 3012 20.00 3 m  # BUTCHER: a fillet of raw meat
+I 0 3012 5.00 1 m  # BUTCHER: a fillet of raw meat
+T 16109
+T 16102
+S
+#16104
+head majestic~
+a majestic head~
+A majestic head sways here.
+~
+225 325 abdlxE cds 3
+0 0 6 15
+D
+   This head seems to sit back away from the main fighting and direct the
+others like a general ordering his troops. The scale pattern in the shape of a
+crown gives it a sence of majesty among its fellows.
+~
+I 0 16109 1.00 4 f  # BUTCHER: a hydra fang
+I 0 16109 5.00 3 f  # BUTCHER: a hydra fang
+I 0 16109 15.00 2 f  # BUTCHER: a hydra fang
+I 0 16109 25.00 1 f  # BUTCHER: a hydra fang
+I 0 3012 50.00 2 m  # BUTCHER: a fillet of raw meat
+I 0 3012 25.00 4 m  # BUTCHER: a fillet of raw meat
+I 0 3012 20.00 3 m  # BUTCHER: a fillet of raw meat
+I 0 3012 5.00 1 m  # BUTCHER: a fillet of raw meat
+T 16102
+T 16113
+S
+#16105
+head miniature hydra ethereal~
+a miniature ethereal hydra head~
+A miniature ethereal hydra head floats unsupported here.
+~
+0 1 bdnoD mn 0
+0 0 27 15
+D
+   A miniature ethereal hydra head without a neck or body floats above the
+ground. Smaller than the actual hydra's head, this is still obviously one and
+the same.
+~
+M
+0
+$n moves as though to headbutt you, but passes straight through upon contact.~
+M
+0
+$n hisses and swivels about the same way the oceanic hydra's head would.~
+M
+0
+Some leaves blow by and pass straight through $n.~
+S
+#16106
+head miniature hydra vicious~
+a miniature vicious hydra head~
+A miniature vicious hydra head floats unsupported here.
+~
+0 1 bdnoD mn 1
+0 0 27 15
+D
+   A miniature vicious hydra head without a neck or body floats above the
+ground. Smaller than the actual hydra's head, this is still obviously one and
+the same.
+~
+M
+0
+$n hisses as it bares its fangs at you!~
+M
+0
+An insect buzzes by your head, but before you can figure out what it was $n has eaten it.~
+M
+0
+$n swivels about, just as the real oceanic hydra's head would.~
+S
+#16107
+head miniature hydra withering~
+a miniature withering hydra head~
+A miniature withering hydra head floats here unsupported.
+~
+0 1 bdnoD mn 1
+0 0 27 15
+D
+   A miniature withering hydra head without a neck or body floats above the
+ground. Smaller than the actual hydra's head, this is still obviously one and
+the same.
+~
+M
+0
+$n hisses and swivels about the same way the oceanic hydra's head would.~
+M
+0
+$n rubs against you and leaves behind a thin coating of slime. Hopefully it isn't toxic!~
+M
+0
+Hissing fills the air as $n lunges at you!~
+S
+#16108
+head miniature hydra majestic~
+a miniature majestic hydra head~
+A miniature majestic hydra head floats here unsupported.
+~
+0 1 bdnoD mn 1
+0 0 27 15
+D
+   A miniature majestic hydra head without a neck or body floats above the
+ground. Smaller than the actual hydra's head, this is still obviously one and
+the same.
+~
+M
+0
+$n hisses and swivels about the same way the oceanic hydra's head would.~
+M
+0
+$n's eyes glow and you feel euphoric for a second or two.~
+M
+0
+You hear hissing. As you look about, $n pops up behind its ally!~
+S
+#16109
+hydra oceanic baby~
+a baby oceanic hydra~
+A baby oceanic hydra does its best to be intimidating.
+~
+0 1 dnoD cn 2
+0 0 17 15
+D
+   This undersized oceanic hydra still does its best to intimidate all whom
+look at it. Unfortunately, no one seems to have told it that babies aren't all
+that terrifying.
+~
+T 16118
+S
+#16110
+hydraling oceanic~
+an oceanic hydraling~
+An oceanic hydraling waits here for a rider.
+~
+0 100 bdel c 3
+0 0 6 9
+D
+   Smaller than the true beast, yet larger than a baby oceanic hydra, this
+hydraling is perfectly sized to carry a rider across the ocean.
+~
+S
+$
