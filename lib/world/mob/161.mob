@@ -20,85 +20,8 @@ I 1 16101 30.00 2 h  # SKIN: a hydra hide
 I 1 16101 15.00 3 h  # SKIN: a hydra hide
 I 1 16134 75.00 1 s  # SKIN: a hydra scale
 I 1 16134 25.00 2 s  # SKIN: a hydra scale
-I 4 16132 15.00 1  # LOOT: a multi-headed whistle
-I 4 16102 2.50 1 g  # LOOT: a hydra fang wand
-I 4 16103 2.50 1 g  # LOOT: a hydra fang dagger
-I 4 16104 2.50 1 g  # LOOT: a hydra fang trident
-I 4 16105 2.50 1 g  # LOOT: a hydra fang staff
-I 4 16106 2.50 1 g  # LOOT: a hydra fang bow
-I 4 16107 2.50 1 g  # LOOT: a hydra hide whip
-I 4 16111 2.50 1 g  # LOOT: a hydra hide surcoat
-I 4 16112 2.50 1 g  # LOOT: a hydra shield
-I 4 16113 2.50 1 g  # LOOT: a hydra hide cloak
-I 4 16114 2.50 1 g  # LOOT: a hydra hide robe
-I 4 16115 2.50 1 g  # LOOT: an aura of terror
-I 4 16116 2.50 1 g  # LOOT: a hydra hide jacket
-I 4 16117 2.50 1 g  # LOOT: a pair of hydra hide pants
-I 4 16119 2.50 1 g  # LOOT: a hydra hide belt
-I 4 16120 2.50 1 g  # LOOT: a hydra scale belt
-I 4 16121 2.50 1 g  # LOOT: a hydra fang belt
-I 4 16122 2.50 1 g  # LOOT: a pair of hydra scale gloves
-I 4 16123 2.50 1 g  # LOOT: a pair of hydra hide gloves
-I 4 16124 2.50 1 g  # LOOT: a hydra hide mask
-I 4 16125 2.50 1 g  # LOOT: a hydra hide helm
-I 4 16126 2.50 1 g  # LOOT: a pair of hydra fang earrings
-I 4 16127 2.50 1 g  # LOOT: a single hydra fang stud
-I 4 16128 2.50 1 g  # LOOT: a hydra fang hoop
-I 4 16129 2.50 1 g  # LOOT: a hydra fang post
-I 4 16130 2.50 1 g  # LOOT: a hydra scale hood
-I 4 16131 2.50 1 g  # LOOT: a hydra scale mask
-I 4 16136 2.50 1 g  # LOOT: a hydra scale tunic
-I 4 16137 2.50 1 g  # LOOT: a hydra scale girtle
-I 4 16138 2.50 1 g  # LOOT: a pair of hydra hide handwraps
-I 4 16139 2.50 1 g  # LOOT: a pair of plated hydra gloves
-I 4 16141 2.50 1 g  # LOOT: a hydra's eye
-I 4 16142 2.50 1 g  # LOOT: a hydra fetish
-I 4 16143 2.50 1 g  # LOOT: a plated hydra cape
-I 4 16144 2.50 1 g  # LOOT: a majestic aura
-I 4 16145 2.50 1 g  # LOOT: some hydra scale leggings
-I 4 16146 2.50 1 g  # LOOT: a hydra hide skirt
-I 4 16147 2.50 1 g  # LOOT: a pair of hydra hide trousers
-I 4 16135 5.00 1 g  # LOOT: a hydraling whistle
-I 4 16148 2.50 1 g  # LOOT: a hydra fang longsword
-I 4 16102 0.50 1 i  # LOOT: a hydra fang wand
-I 4 16103 0.50 1 i  # LOOT: a hydra fang dagger
-I 4 16104 0.50 1 i  # LOOT: a hydra fang trident
-I 4 16105 0.50 1 i  # LOOT: a hydra fang staff
-I 4 16106 0.50 1 i  # LOOT: a hydra fang bow
-I 4 16107 0.50 1 i  # LOOT: a hydra hide whip
-I 4 16111 0.50 1 i  # LOOT: a hydra hide surcoat
-I 4 16112 0.50 1 i  # LOOT: a hydra shield
-I 4 16113 0.50 1 i  # LOOT: a hydra hide cloak
-I 4 16114 0.50 1 i  # LOOT: a hydra hide robe
-I 4 16115 0.50 1 i  # LOOT: an aura of terror
-I 4 16116 0.50 1 i  # LOOT: a hydra hide jacket
-I 4 16117 0.50 1 i  # LOOT: a pair of hydra hide pants
-I 4 16119 0.50 1 i  # LOOT: a hydra hide belt
-I 4 16120 0.50 1 i  # LOOT: a hydra scale belt
-I 4 16121 0.50 1 i  # LOOT: a hydra fang belt
-I 4 16122 0.50 1 i  # LOOT: a pair of hydra scale gloves
-I 4 16123 0.50 1 i  # LOOT: a pair of hydra hide gloves
-I 4 16124 0.50 1 i  # LOOT: a hydra hide mask
-I 4 16125 0.50 1 i  # LOOT: a hydra hide helm
-I 4 16126 0.50 1 i  # LOOT: a pair of hydra fang earrings
-I 4 16127 0.50 1 i  # LOOT: a single hydra fang stud
-I 4 16128 0.50 1 i  # LOOT: a hydra fang hoop
-I 4 16129 0.50 1 i  # LOOT: a hydra fang post
-I 4 16130 0.50 1 i  # LOOT: a hydra scale hood
-I 4 16131 0.50 1 i  # LOOT: a hydra scale mask
-I 4 16136 0.50 1 i  # LOOT: a hydra scale tunic
-I 4 16137 0.50 1 i  # LOOT: a hydra scale girtle
-I 4 16138 0.50 1 i  # LOOT: a pair of hydra hide handwraps
-I 4 16139 0.50 1 i  # LOOT: a pair of plated hydra gloves
-I 4 16141 0.50 1 i  # LOOT: a hydra's eye
-I 4 16142 0.50 1 i  # LOOT: a hydra fetish
-I 4 16143 0.50 1 i  # LOOT: a plated hydra cape
-I 4 16144 0.50 1 i  # LOOT: a majestic aura
-I 4 16145 0.50 1 i  # LOOT: some hydra scale leggings
-I 4 16146 0.50 1 i  # LOOT: a hydra hide skirt
-I 4 16147 0.50 1 i  # LOOT: a pair of hydra hide trousers
-I 4 16118 1.00 1 i  # LOOT: a hydra hide saddle
-I 4 16148 0.50 1 i  # LOOT: a hydra fang longsword
+I 4 16149 100.00 1  # LOOT: a hydra lootbox
+I 4 16149 25.00 1  # LOOT: a hydra lootbox
 T 16103
 T 16104
 T 16108

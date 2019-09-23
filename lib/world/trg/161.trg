@@ -393,45 +393,46 @@ done
 heal %random.ally%
 ~
 #16114
-hydra gear load boe bop~
+when hydra gear is crafted~
 1 n 100
 ~
-set actor %self.carried_by%
-if !%actor%
-  halt
+if %self.level%
+  set level %self.level%
+else
+  set level 225
 end
-if %actor.is_pc%
-  * Item was crafted
+set actor %self.carried_by%
+if !%actor.is_pc%
+  if !%self.is_flagged(GROUP-DROP)%
+    %echo% adding group flag.
+    nop %self.flag(GROUP-DROP)%
+  end
+else
+  if %self.is_flagged(GROUP-DROP)%
+    %echo% removing group flag.
+    nop %self.flag(GROUP-DROP)%
+  end
+end
+if !%actor.is_pc%
+  %echo% loaded on a mob.
+  if !%self.is_flagged(BOP)%
+    %echo% adding the bop flag.
+    nop %self.flag(BOP)%
+  end
+else
   if %self.is_flagged(BOP)%
+    %echo% removing the bop flag.
     nop %self.flag(BOP)%
   end
   if !%self.is_flagged(BOE)%
+    %echo% setting the boe flag and unbinding.
     nop %self.flag(BOE)%
     nop %self.bind(nobody)%
   end
-  if %self.is_flagged(GROUP-DROP)%
-    nop %self.flag(GROUP-DROP)%
-  end
-else
-  * Item was probably dropped
-  if %self.is_flagged(BOP)%
-    nop %self.flag(BOP)%
-  end
-  if !%self.is_flagged(BOE)%
-    nop %self.flag(BOE)%
-  end
-  if !%self.is_flagged(GROUP-DROP)%
-    nop %self.flag(GROUP-DROP)%
-  end
-  if %self.is_flagged(SUPERIOR)%
-    nop %self.flag(SUPERIOR)%
-  end
 end
-if !%self.level%
-  %scale% %self% 225
-else
-  %scale% %self% %self.level%
-end
+wait 1
+%echo% scaling %self.name% to level %level%
+%scale% %self% %level%
 ~
 #16115
 hydra seeking stone~
@@ -607,8 +608,8 @@ done
 loot replacer~
 1 n 100
 ~
+set actor %self.carried_by%
 eval LootRoll %random.1200%
-%echo% loot roll is %LootRoll%
 if %LootRoll% <= 25
   set LoadObj 16102
 elseif %LootRoll% <= 50
@@ -695,14 +696,25 @@ else
   set LoadObj 16148
 end
 if %self.level%
-  eval level %self.level%
+  set level %self.level%
 else
-  eval level 225
+  set level 225
 end
-%echo% loading %LoadObj%
-%echo% level %level%
 %load% obj %LoadObj% %actor% inv %level%
+set item %actor.inventory%
+%echo% item is %item.name%
+eval bind %%item.bind(%self%)%%
+nop %bind%
 wait 1
-%purge%
+%purge% %self%
+~
+#16121
+throw away trig~
+1 n 100
+~
+nop %self.bind(nobody)%
+nop %self.flag(BOE)%
+wait 0
+%scale% %self% 225
 ~
 $
