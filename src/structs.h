@@ -1705,7 +1705,7 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_SEEDED  BIT(26)	// A. has already been seeded
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
-#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED)	// flags that are preserved
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED | OBJ_BIND_FLAGS)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
