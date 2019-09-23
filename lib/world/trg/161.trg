@@ -298,31 +298,12 @@ while %check_pet%
   end
   if !%actor.has_minipet(%GrantPet%)%
     nop %actor.add_minipet(%GrantPet%)%
-    eval GrantPet %GrantPet% - 16104
-    switch %GrantPet%
-      case 1
-        %send% %actor% You blow %self.shortdesc% and a miniature ethereal head begins to follow you.
-        %echoaround% %actor% %actor.name% blows %self.shortdesc% and a miniature ethereal head begins to follow %actor.himher%.
-      break
-      case 2
-        %send% %actor% You blow %self.shortdesc% and a miniature vicious head begins to follow you.
-        %echoaround% %actor% %actor.name% blows %self.shortdesc% and a miniature vicious head begins to follow %actor.himher%.
-      break
-      case 3
-        %send% %actor% You blow %self.shortdesc% and a miniature withering head begins to follow you.
-        %echoaround% %actor% %actor.name% blows %self.shortdesc% and a miniature withering head begins to follow %actor.himher%.
-      break
-      case 4
-        %send% %actor% You blow %self.shortdesc% and a miniature majestic head begins to follow you.
-        %echoaround% %actor% %actor.name% blows %self.shortdesc% and a miniature majestic head begins to follow %actor.himher%.
-      break
-      case 5
-        %send% %actor% You blow %self.shortdesc% and a baby oceanic hydra begins to follow you.
-        %echoaround% %actor% %actor.name% blows %self.shortdesc% and a baby oceanic hydra begins to follow %actor.himher%.
-      break
-    done
-    %purge% %self%
+    %load% mob %GrantPet%
+    set GrantPet %self.room.people.name%
+    %purge% %self.room.people%
+    %send% %actor% You gain '%GrantPet%' as a mini-pet. Use the minipets command to summon it.
     set check_pet 0
+    %purge% %self%
   else
     if %GrantPet% < 16109
       eval GrantPet %GrantPet% + 1
@@ -404,34 +385,27 @@ end
 set actor %self.carried_by%
 if !%actor.is_pc%
   if !%self.is_flagged(GROUP-DROP)%
-    %echo% adding group flag.
     nop %self.flag(GROUP-DROP)%
   end
 else
   if %self.is_flagged(GROUP-DROP)%
-    %echo% removing group flag.
     nop %self.flag(GROUP-DROP)%
   end
 end
 if !%actor.is_pc%
-  %echo% loaded on a mob.
   if !%self.is_flagged(BOP)%
-    %echo% adding the bop flag.
     nop %self.flag(BOP)%
   end
 else
   if %self.is_flagged(BOP)%
-    %echo% removing the bop flag.
     nop %self.flag(BOP)%
   end
   if !%self.is_flagged(BOE)%
-    %echo% setting the boe flag and unbinding.
     nop %self.flag(BOE)%
     nop %self.bind(nobody)%
   end
 end
 wait 1
-%echo% scaling %self.name% to level %level%
 %scale% %self% %level%
 ~
 #16115

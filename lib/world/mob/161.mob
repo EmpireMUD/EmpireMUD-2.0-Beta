@@ -12,9 +12,13 @@ still under the water. All you can properly see is its head, or is that heads?
 I 0 16108 65.00 1 b  # BUTCHER: a massive hydra bone
 I 0 16108 30.00 2 b  # BUTCHER: a massive hydra bone
 I 0 16108 5.00 3 b  # BUTCHER: a massive hydra bone
-I 0 3012 50.00 4 f  # BUTCHER: a fillet of raw meat
-I 0 3012 30.00 5 f  # BUTCHER: a fillet of raw meat
-I 0 3012 20.00 6 f  # BUTCHER: a fillet of raw meat
+I 0 16109 60.00 1 f  # BUTCHER: a hydra fang
+I 0 16109 10.00 3 f  # BUTCHER: a hydra fang
+I 0 16109 5.00 4 f  # BUTCHER: a hydra fang
+I 0 16109 25.00 2 f  # BUTCHER: a hydra fang
+I 0 3012 30.00 5 m  # BUTCHER: a fillet of raw meat
+I 0 3012 20.00 6 m  # BUTCHER: a fillet of raw meat
+I 0 3012 50.00 4 m  # BUTCHER: a fillet of raw meat
 I 1 16101 55.00 1 h  # SKIN: a hydra hide
 I 1 16101 30.00 2 h  # SKIN: a hydra hide
 I 1 16101 15.00 3 h  # SKIN: a hydra hide
@@ -48,17 +52,13 @@ head vicious~
 a vicious head~
 A vicious head sways here.
 ~
-225 325 abdlzE cdq 3
+225 325 abdhlzE cdq 3
 0 0 6 9
 D
    A vicious serpent-like head sways back and forth here on the end of a
 serpentine neck, which leads back to the main trunk of the hydra. Fangs the
 length of daggers are clearly on display as it snaps at you.
 ~
-I 0 16109 80.00 1 f  # BUTCHER: a hydra fang
-I 0 16109 10.00 2 f  # BUTCHER: a hydra fang
-I 0 3012 10.00 2 m  # BUTCHER: a fillet of raw meat
-I 0 3012 90.00 1 m  # BUTCHER: a fillet of raw meat
 T 16107
 T 16102
 S
@@ -67,21 +67,13 @@ head withered~
 a withered head~
 A withered head sways here.
 ~
-225 325 abdlE cd 3
+225 325 abdhlE cd 3
 0 0 6 9
 D
    Blackened and shriveled flesh peeks through the scattered scales on this
 head and the serpentine neck attached. As it moves about, a thin layer of slime
 coating the head seems to cling to anything it touches.
 ~
-I 0 16109 1.00 4 f  # BUTCHER: a hydra fang
-I 0 16109 5.00 3 f  # BUTCHER: a hydra fang
-I 0 16109 15.00 2 f  # BUTCHER: a hydra fang
-I 0 16109 25.00 1 f  # BUTCHER: a hydra fang
-I 0 3012 50.00 2 m  # BUTCHER: a fillet of raw meat
-I 0 3012 25.00 4 m  # BUTCHER: a fillet of raw meat
-I 0 3012 20.00 3 m  # BUTCHER: a fillet of raw meat
-I 0 3012 5.00 1 m  # BUTCHER: a fillet of raw meat
 T 16109
 T 16102
 S
@@ -90,21 +82,13 @@ head majestic~
 a majestic head~
 A majestic head sways here.
 ~
-225 325 abdlxE cds 3
+225 325 abdhlxE cds 3
 0 0 6 15
 D
    This head seems to sit back away from the main fighting and direct the
 others like a general ordering his troops. The scale pattern in the shape of a
 crown gives it a sence of majesty among its fellows.
 ~
-I 0 16109 1.00 4 f  # BUTCHER: a hydra fang
-I 0 16109 5.00 3 f  # BUTCHER: a hydra fang
-I 0 16109 15.00 2 f  # BUTCHER: a hydra fang
-I 0 16109 25.00 1 f  # BUTCHER: a hydra fang
-I 0 3012 50.00 2 m  # BUTCHER: a fillet of raw meat
-I 0 3012 25.00 4 m  # BUTCHER: a fillet of raw meat
-I 0 3012 20.00 3 m  # BUTCHER: a fillet of raw meat
-I 0 3012 5.00 1 m  # BUTCHER: a fillet of raw meat
 T 16102
 T 16113
 S
