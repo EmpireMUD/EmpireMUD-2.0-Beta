@@ -4951,6 +4951,11 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	
 	// preserve some flags
 	GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & OBJ_PRESERVE_FLAGS;
+	
+	// remove preservable flags that are absent in the original
+	GET_OBJ_EXTRA(new) &= ~(OBJ_PRESERVE_FLAGS & ~GET_OBJ_EXTRA(obj));
+	
+	// always remove quality flags if it's now generic
 	if (OBJ_FLAGGED(new, OBJ_GENERIC_DROP)) {
 		REMOVE_BIT(GET_OBJ_EXTRA(new), (OBJ_HARD_DROP | OBJ_GROUP_DROP));
 	}
