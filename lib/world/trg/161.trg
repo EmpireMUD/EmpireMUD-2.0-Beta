@@ -167,6 +167,7 @@ while %person%
   end
   set person %person.next_in_room%
 done
+%at% i16100 %load% obj 16110 room
 ~
 #16109
 hydra withering head debuff~
@@ -676,19 +677,15 @@ else
 end
 %load% obj %LoadObj% %actor% inv %level%
 set item %actor.inventory%
-%echo% item is %item.name%
 eval bind %%item.bind(%self%)%%
 nop %bind%
 wait 1
 %purge% %self%
 ~
 #16121
-throw away trig~
-1 n 100
+adventure clean up~
+1 f 0
 ~
-nop %self.bind(nobody)%
-nop %self.flag(BOE)%
-wait 0
-%scale% %self% 225
+%adventurecomplete%
 ~
 $

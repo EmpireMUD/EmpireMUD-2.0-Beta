@@ -258,19 +258,16 @@ R
 5193 0
 S
 #16110
-coins pile hydra~
-a pile of coins~
-A pile of coins from the hydra float here.~
-   A sack of coins floats here tied to a wooden symbol. Seems like your
-benefactor wanted to be sure they wouldn't sink before you collected your
-payment.
+skull hydra~
+a hydra skull~
+A petrified hydra skull is anchored here.~
+   If you can see this, something has gone wrong and you should tell the
+immortals immediately as possible. Feel free to use the bug command to do so.
 ~
-11 mp a 8
-1 -1 0
-0 0
-C
-250 325
-T 16106
+3 0 0 4
+0 0 0
+1 48
+T 16121
 S
 #16111
 surcoat hydra hide~
