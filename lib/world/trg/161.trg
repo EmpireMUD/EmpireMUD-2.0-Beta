@@ -67,7 +67,7 @@ if %self.varexists(LostImmunity)%
   eval SinceImmunity %timestamp% - %LostImmunity%
   if %SinceImmunity% >= 90
     dg_affect #16100 %self% IMMUNE-DAMAGE on -1
-    dg_affect %self% bonus-physical 15 -1
+    dg_affect #16103 %self% bonus-physical 15 -1
     rdelete LostImmunity %self.id%
   end
 end
@@ -111,6 +111,7 @@ if %headcount% == 0
   %load% mob %randomhead% ally
   %echo% Water splashes everywhere as the hydra lifts a head to look at you.
 end
+dg_affect #16103 %self% off
 ~
 #16105
 hydra ethereal head death~
@@ -138,12 +139,6 @@ if %hydranum.aff_flagged(IMMUNE-DAMAGE)%
   set LostImmunity %timestamp%
   remote LostImmunity %hydranum.id%
 end
-~
-#16106
-hydra coin drop~
-1 n 100
-~
-%echo% A mysterious voice tells you, 'We've been watching the fight. Good work with the ethereal head. Have some coins for your effort.'
 ~
 #16107
 hydra vicious head buff~
