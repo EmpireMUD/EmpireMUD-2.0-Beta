@@ -1581,7 +1581,6 @@ void save_olc_object(descriptor_data *desc) {
 	obj_data *obj = GET_OLC_OBJECT(desc), *obj_iter, *proto;
 	obj_vnum vnum = GET_OLC_VNUM(desc);
 	struct empire_unique_storage *eus;
-	struct interaction_item *interact;
 	struct obj_storage_type *store;
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
@@ -1631,10 +1630,7 @@ void save_olc_object(descriptor_data *desc) {
 		free(GET_OBJ_ACTION_DESC(proto));
 	}
 	free_extra_descs(&proto->ex_description);
-	while ((interact = proto->interactions)) {
-		proto->interactions = interact->next;
-		free(interact);
-	}
+	free_interactions(proto->interactions);
 	while ((store = proto->storage)) {
 		proto->storage = store->next;
 		free(store);

@@ -1479,7 +1479,6 @@ void clear_vehicle(vehicle_data *veh) {
 void free_vehicle(vehicle_data *veh) {
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	struct vehicle_attached_mob *vam;
-	struct interaction_item *interact;
 	struct spawn_info *spawn;
 	
 	// strings
@@ -1525,11 +1524,8 @@ void free_vehicle(vehicle_data *veh) {
 		if (VEH_EX_DESCS(veh)) {
 			free_extra_descs(&VEH_EX_DESCS(veh));
 		}
-		if (VEH_INTERACTIONS(veh)) {
-			while ((interact = VEH_INTERACTIONS(veh))) {
-				VEH_INTERACTIONS(veh) = interact->next;
-				free(interact);
-			}
+		if (VEH_INTERACTIONS(veh) && (!proto || VEH_INTERACTIONS(veh) != VEH_INTERACTIONS(proto))) {
+			free_interactions(VEH_INTERACTIONS(veh));
 		}
 		if (VEH_SPAWNS(veh)) {
 			while ((spawn = VEH_SPAWNS(veh))) {
@@ -2397,7 +2393,6 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
-	struct interaction_item *interact;
 	struct spawn_info *spawn;
 	bitvector_t old_flags;
 	UT_hash_handle hh;
@@ -2500,10 +2495,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_YEARLY_MAINTENANCE(proto)) {
 		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
 	}
-	while ((interact = VEH_INTERACTIONS(proto))) {
-		VEH_INTERACTIONS(proto) = interact->next;
-		free(interact);
-	}
+	free_interactions(VEH_INTERACTIONS(proto));
 	while ((spawn = VEH_SPAWNS(proto))) {
 		VEH_SPAWNS(proto) = spawn->next;
 		free(spawn);

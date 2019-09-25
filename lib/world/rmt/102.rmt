@@ -60,13 +60,21 @@ D2
 0 10226
 I 6 10228 50.00 1 X  # FORAGE: a stack of cactus pads
 I 6 10229 100.00 1 X  # FORAGE: a cactus fruit
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
-I 7 10228 100.00 1 X  # FIND-HERB: a stack of cactus pads
+I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
+I 7 1200 13.62 1 p  # PICK: a handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 1201 13.61 1 p  # PICK: a sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 1202 13.61 1 p  # PICK: a twig of redthorn
+I+ 0 70  # Ability: Find Herbs
+I 7 1203 13.61 1 p  # PICK: some magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 1204 13.61 1 p  # PICK: a daggerbite frond
+I+ 0 70  # Ability: Find Herbs
+I 7 1205 13.61 1 p  # PICK: some bileberries
+I+ 0 70  # Ability: Find Herbs
+I 7 10228 10.00 1 p  # PICK: a stack of cactus pads
+I 7 123 90.00 1 p  # PICK: a small flower
 M 0 10226 33.00 4
 M 1 10243 10.00 1
 S
@@ -84,13 +92,21 @@ D3
 0 10226
 I 6 10226 50.00 1 X  # FORAGE: a pineapple
 I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
-I 7 10226 100.00 1 X  # FIND-HERB: a pineapple
+I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
+I 7 1200 13.62 1 p  # PICK: a handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 1201 13.61 1 p  # PICK: a sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 1202 13.61 1 p  # PICK: a twig of redthorn
+I+ 0 70  # Ability: Find Herbs
+I 7 1203 13.61 1 p  # PICK: some magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 1204 13.61 1 p  # PICK: a daggerbite frond
+I+ 0 70  # Ability: Find Herbs
+I 7 1205 13.61 1 p  # PICK: some bileberries
+I+ 0 70  # Ability: Find Herbs
+I 7 10226 10.00 1 p  # PICK: a pineapple
+I 7 123 90.00 1 p  # PICK: a small flower
 M 0 10226 33.00 4
 M 1 10232 10.00 1
 S
@@ -108,13 +124,21 @@ D0
 0 10226
 I 6 10227 50.00 1 X  # FORAGE: an agave heart
 I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
-I 7 10227 100.00 1 X  # FIND-HERB: an agave heart
+I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
+I 7 1200 13.62 1 p  # PICK: a handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 1201 13.61 1 p  # PICK: a sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 1202 13.61 1 p  # PICK: a twig of redthorn
+I+ 0 70  # Ability: Find Herbs
+I 7 1203 13.61 1 p  # PICK: some magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 1204 13.61 1 p  # PICK: a daggerbite frond
+I+ 0 70  # Ability: Find Herbs
+I 7 1205 13.61 1 p  # PICK: some bileberries
+I+ 0 70  # Ability: Find Herbs
+I 7 10227 10.00 1 p  # PICK: an agave heart
+I 7 123 90.00 1 p  # PICK: a small flower
 M 0 10226 33.00 4
 M 1 10241 10.00 1
 S
@@ -132,13 +156,21 @@ D1
 0 10226
 I 6 10230 50.00 1 X  # FORAGE: some thick aloe leaves
 I 6 10231 100.00 1 X  # FORAGE: some desert dandelions
-I 7 1200 15.00 1 X  # FIND-HERB: a handful of whitegrass
-I 7 1201 15.00 1 X  # FIND-HERB: a sack of fiveleaf
-I 7 1202 15.00 1 X  # FIND-HERB: a twig of redthorn
-I 7 1203 15.00 1 X  # FIND-HERB: some magewhisper sepals
-I 7 1204 15.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1205 15.00 1 X  # FIND-HERB: some bileberries
-I 7 10230 100.00 1 X  # FIND-HERB: some thick aloe leaves
+I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
+I 7 1200 13.62 1 p  # PICK: a handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 1201 13.61 1 p  # PICK: a sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 1202 13.61 1 p  # PICK: a twig of redthorn
+I+ 0 70  # Ability: Find Herbs
+I 7 1203 13.61 1 p  # PICK: some magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 1204 13.61 1 p  # PICK: a daggerbite frond
+I+ 0 70  # Ability: Find Herbs
+I 7 1205 13.61 1 p  # PICK: some bileberries
+I+ 0 70  # Ability: Find Herbs
+I 7 10230 10.00 1 p  # PICK: some thick aloe leaves
+I 7 123 90.00 1 p  # PICK: a small flower
 M 0 10226 33.00 4
 M 1 10245 10.00 1
 S

@@ -578,7 +578,6 @@ void save_olc_room_template(descriptor_data *desc) {
 	
 	room_template *proto, *rmt = GET_OLC_ROOM_TEMPLATE(desc);
 	rmt_vnum vnum = GET_OLC_VNUM(desc);
-	struct interaction_item *interact;
 	struct adventure_spawn *spawn;
 	struct trig_proto_list *trig;
 	struct exit_template *ex;
@@ -607,10 +606,7 @@ void save_olc_room_template(descriptor_data *desc) {
 		free_exit_template(ex);
 	}
 	free_extra_descs(&GET_RMT_EX_DESCS(proto));
-	while ((interact = GET_RMT_INTERACTIONS(proto))) {
-		GET_RMT_INTERACTIONS(proto) = interact->next;
-		free(interact);
-	}
+	free_interactions(GET_RMT_INTERACTIONS(proto));
 	while ((trig = GET_RMT_SCRIPTS(proto))) {
 		GET_RMT_SCRIPTS(proto) = trig->next;
 		free(trig);

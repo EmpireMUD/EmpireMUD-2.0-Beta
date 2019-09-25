@@ -1556,7 +1556,7 @@ A Terraced Garden~
 0 0 0 -1
 C
 pick~
-I 7 1202 100.00 1  # FIND-HERB: a twig of redthorn
+I 7 1202 100.00 1  # PICK: a twig of redthorn
 R
 16 1 1 1048576
 R
@@ -1570,7 +1570,7 @@ A Garden Made of Rafts~
 0 0 0 -1
 C
 pick~
-I 7 1205 100.00 1  # FIND-HERB: some bileberries
+I 7 1205 100.00 1  # PICK: some bileberries
 R
 16 1 1 1048576
 R
@@ -1584,8 +1584,8 @@ An Oasis Garden~
 0 0 0 -1
 C
 pick~
-I 7 1204 50.00 1 X  # FIND-HERB: a daggerbite frond
-I 7 1203 100.00 1 X  # FIND-HERB: some magewhisper sepals
+I 7 1204 50.00 1 X  # PICK: a daggerbite frond
+I 7 1203 100.00 1 X  # PICK: some magewhisper sepals
 R
 16 1 1 1048576
 R
@@ -1599,7 +1599,7 @@ An Estuary Garden~
 0 0 0 -1
 C
 pick~
-I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+I 7 1200 100.00 1  # PICK: a handful of whitegrass
 R
 16 1 1 1048576
 R
@@ -1613,7 +1613,7 @@ A Shady Garden~
 0 0 0 -1
 C
 pick~
-I 7 1201 100.00 1  # FIND-HERB: a sack of fiveleaf
+I 7 1201 100.00 1  # PICK: a sack of fiveleaf
 R
 16 1 1 1048576
 R

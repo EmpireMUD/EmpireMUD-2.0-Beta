@@ -3808,6 +3808,46 @@ bool has_interaction(struct interaction_item *list, int type) {
 
 
 /**
+* Validates a set of restrictions on an interaction.
+*
+* @param struct interact_restriction *list The list of restrictions to check.
+* @param char_data *ch Optional: The person trying to interact (for ability/ptech/local tech; may be NULL).
+* @param empire_data *emp Optional: The empire trying to interact (for techs; may be NULL).
+* @return bool TRUE if okay, FALSE if failed.
+*/
+bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp) {
+	struct interact_restriction *res;
+	
+	LL_FOREACH(list, res) {
+		// INTERACT_RESTRICT_x
+		switch (res->type) {
+			case INTERACT_RESTRICT_ABILITY: {
+				if (!ch || IS_NPC(ch) || !has_ability(ch, res->vnum)) {
+					return FALSE;
+				}
+				break;
+			}
+			case INTERACT_RESTRICT_PTECH: {
+				if (!ch || IS_NPC(ch) || !has_player_tech(ch, res->vnum)) {
+					return FALSE;
+				}
+				break;
+			}
+			case INTERACT_RESTRICT_TECH: {
+				if (!(ch && has_tech_available(ch, res->vnum)) && !(emp && EMPIRE_HAS_TECH(emp, res->vnum))) {
+					return FALSE;
+				}
+				break;
+			}
+			// no default: restriction does not work
+		}
+	}
+	
+	return TRUE;	// made it this far
+}
+
+
+/**
 * Attempts to run global mob interactions -- interactions from the globals table.
 *
 * @param char_data *ch The player who is interacting.
@@ -3924,13 +3964,30 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func)) {
 	struct interact_exclusion_data *exclusion = NULL;
 	struct interaction_item *interact;
+	struct interact_restriction *res;
 	bool success = FALSE;
 
 	for (interact = run_list; interact; interact = interact->next) {
-		if (interact->type == type && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
+		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, GET_LOYALTY(ch)) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
 				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
+				
+				// skill gains?
+				if (!IS_NPC(ch)) {
+					LL_FOREACH(interact->restrictions, res) {
+						switch (res->type) {
+							case INTERACT_RESTRICT_ABILITY: {
+								gain_ability_exp(ch, res->vnum, 5);
+								break;
+							}
+							case INTERACT_RESTRICT_PTECH: {
+								gain_player_tech_exp(ch, res->vnum, 5);
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -4894,6 +4951,11 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	
 	// preserve some flags
 	GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & OBJ_PRESERVE_FLAGS;
+	
+	// remove preservable flags that are absent in the original
+	GET_OBJ_EXTRA(new) &= ~(OBJ_PRESERVE_FLAGS & ~GET_OBJ_EXTRA(obj));
+	
+	// always remove quality flags if it's now generic
 	if (OBJ_FLAGGED(new, OBJ_GENERIC_DROP)) {
 		REMOVE_BIT(GET_OBJ_EXTRA(new), (OBJ_HARD_DROP | OBJ_GROUP_DROP));
 	}

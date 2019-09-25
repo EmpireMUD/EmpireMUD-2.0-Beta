@@ -1,0 +1,47 @@
+#16100
+hydra immunity~
+4 0
+0 0 0 0
+T1
+The flickering light on the hydra's body fades. (Target the hydra!)~
+T3
+The flickering light begins to once again play over the hydra's skin. (Hydra is immune!)~
+S
+#16103
+hydra damage buff~
+4 0
+0 0 0 0
+S
+#16104
+hydra majestic head buff~
+4 0
+0 0 0 0
+T1
+The magical enhancement on $n seems to fade.~
+T3
+The majestic head stretches over and casts a blessing on $n.~
+S
+#16107
+hydra vicious head buff~
+3 0
+0 0 0 0
+S
+#16109
+withering~
+4 0
+0 0 0 0
+T0
+You feel better and the discoloration to your skin begins to revert.~
+T2
+Your flesh begins to blacken as the withering head strikes.~
+T3
+$n's flesh begins to blacken as the withering head strikes $m.~
+S
+#16115
+hydra seeking stone~
+3 0
+0 0 0 0
+T0
+Your hydra seeking stone cooldown has ended.~
+S
+$

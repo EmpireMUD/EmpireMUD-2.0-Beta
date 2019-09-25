@@ -336,7 +336,7 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_LOOT  4
 #define INTERACT_DIG  5
 #define INTERACT_FORAGE  6
-#define INTERACT_FIND_HERB  7
+#define INTERACT_PICK  7	// formerly FIND-HERB
 #define INTERACT_HARVEST  8
 #define INTERACT_GATHER  9
 #define INTERACT_ENCOUNTER  10
@@ -356,6 +356,12 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_TAME  24
 #define INTERACT_SEED  25
 #define NUM_INTERACTS  26
+
+
+// INTERACT_RESTRICT_x: types of interaction restrictions
+#define INTERACT_RESTRICT_ABILITY  0	// player must have an ability
+#define INTERACT_RESTRICT_PTECH  1	// player must have a ptech
+#define INTERACT_RESTRICT_TECH  2	// empire must have a tech
 
 
 // for object saving
@@ -1699,7 +1705,7 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_SEEDED  BIT(26)	// A. has already been seeded
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
-#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED)	// flags that are preserved
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED | OBJ_BIND_FLAGS)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
@@ -2774,6 +2780,14 @@ struct interact_exclusion_data {
 };
 
 
+// restricts interactions to certain players
+struct interact_restriction {
+	int type;	// INTERACT_RESTRICT_ type
+	any_vnum vnum;	// based on type
+	struct interact_restriction *next;
+};
+
+
 // for the "interactions" system (like butcher, dig, etc)
 struct interaction_item {
 	int type;	// INTERACT_
@@ -2781,6 +2795,8 @@ struct interaction_item {
 	double percent;	// how often to do it 0.01 - 100.00
 	int quantity;	// how many to give
 	char exclusion_code;	// creates mutually-exclusive sets
+	
+	struct interact_restriction *restrictions;	// linked list
 	
 	struct interaction_item *next;
 };

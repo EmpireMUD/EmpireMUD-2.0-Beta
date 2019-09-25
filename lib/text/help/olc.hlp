@@ -3886,7 +3886,7 @@ trigger, use ".t search 9901".
 #d
 "MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" "VEDIT INTERACTION" INTERACTIONS
 
-Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code]
+Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]
         .interaction change <number> <field> <value>
         .interaction copy <from type> <from vnum>
         .interaction remove <number | all>
@@ -3923,7 +3923,7 @@ Object interaction types:
 Room/vehicle interaction types:
  DIG - Items received when using the dig action.
  FORAGE - Items received when using the Forage ability.
- FIND-HERB - Items found when picking, if the user has Find Herbs.
+ PICK - Items found when picking.
  HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
  GATHER - Items received from the gather action.
  ENCOUNTER - Hostile mob loaded when a random encounter triggers.
@@ -3943,6 +3943,12 @@ lative roll (meaning if the percents add up to 100, one of them is guaranteed)
 but only one item from the same exclusion set will ever pass. The rest will
 fail. If you don't set an exclusion code, the interaction is not exclusive and
 always gets its own percent roll.
+
+You can also set restrictions (optional) that require a player/empire to have
+a specific ability/ptech/tech. To do this, use "-ability <name/vnum>",
+"-ptech <name>", or "-tech <name>". You can put more than one restriction on
+the same interaction. For a multi-word name, put it in quotation marks.
+Example: .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
 
 You can use '.interact move' to rearrange entries. Interactions are always
 processed from top to bottom.

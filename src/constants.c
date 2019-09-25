@@ -3764,7 +3764,7 @@ const char *interact_types[] = {
 	"LOOT",
 	"DIG",	// 5
 	"FORAGE",
-	"FIND-HERB",
+	"PICK",
 	"HARVEST",
 	"GATHER",
 	"ENCOUNTER",	// 10
@@ -3783,6 +3783,15 @@ const char *interact_types[] = {
 	"QUARRY",
 	"TAME",
 	"SEED",	// 25
+	"\n"
+};
+
+
+// INTERACT_RESTRICT_x: types of interaction restrictions
+const char *interact_restriction_types[] = {
+	"ability",
+	"ptech",
+	"tech",
 	"\n"
 };
 

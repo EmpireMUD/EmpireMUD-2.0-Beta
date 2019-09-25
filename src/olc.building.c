@@ -949,7 +949,6 @@ void save_olc_building(descriptor_data *desc) {
 
 	bld_data *proto, *bdg = GET_OLC_BUILDING(desc);
 	bld_vnum vnum = GET_OLC_VNUM(desc);
-	struct interaction_item *interact;
 	struct trig_proto_list *trig;
 	struct spawn_info *spawn;
 	struct quest_lookup *ql;
@@ -982,10 +981,7 @@ void save_olc_building(descriptor_data *desc) {
 		GET_BLD_SPAWNS(proto) = spawn->next;
 		free(spawn);
 	}
-	while ((interact = GET_BLD_INTERACTIONS(proto))) {
-		GET_BLD_INTERACTIONS(proto) = interact->next;
-		free(interact);
-	}
+	free_interactions(GET_BLD_INTERACTIONS(proto));
 	while ((trig = GET_BLD_SCRIPTS(proto))) {
 		GET_BLD_SCRIPTS(proto) = trig->next;
 		free(trig);

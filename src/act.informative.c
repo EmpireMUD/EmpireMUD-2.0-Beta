@@ -3541,6 +3541,7 @@ ACMD(do_whoami) {
 
 ACMD(do_whois) {
 	void check_delayed_load(char_data *ch);
+	extern const char *genders[];
 	extern const char *level_names[][2];
 	
 	char part[MAX_STRING_LENGTH];
@@ -3564,7 +3565,8 @@ ACMD(do_whois) {
 	
 	// basic info
 	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
-	msg_to_char(ch, "Status: %s\r\n", level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
+	sprinttype(GET_REAL_SEX(victim), genders, part);
+	msg_to_char(ch, "Status: %s %s\r\n", CAP(part), level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
 
 	// show class (but don't bother for immortals, as they generally have all skills
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {

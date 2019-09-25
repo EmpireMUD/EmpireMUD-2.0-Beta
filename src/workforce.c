@@ -207,7 +207,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		}
 		
 		// this covers all the herbs
-		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_HERB_GARDENING) && IS_ANY_BUILDING(room) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_FIND_HERB)) {
+		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_HERB_GARDENING) && IS_ANY_BUILDING(room) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK)) {
 			do_chore_gardening(emp, room);
 		}
 	
@@ -434,6 +434,7 @@ static void ewt_mark_resource_worker(empire_data *emp, room_data *loc, obj_vnum 
 static void ewt_mark_for_interaction_list(empire_data *emp, room_data *location, struct interaction_item *list, int interaction_type) {
 	struct interaction_item *interact;
 	LL_FOREACH(list, interact) {
+		// should this be checking meets_interaction_restrictions() ?
 		if (interact->type == interaction_type) {
 			ewt_mark_resource_worker(emp, location, interact->vnum);
 		}
@@ -554,6 +555,9 @@ bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *
 		}
 		if (!proto->storage) {
 			continue;	// MUST be storable
+		}
+		if (!meets_interaction_restrictions(interact->restrictions, NULL, emp)) {
+			continue;
 		}
 		
 		// found
@@ -2023,20 +2027,20 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_HERB_GARDENING].mob);
 	bool depleted = (get_depletion(room, DPLTN_PICK) >= garden_depletion);
-	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_HERB_GARDENING, INTERACT_FIND_HERB);
+	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_HERB_GARDENING, INTERACT_PICK);
 	bool can_do = !depleted && can_gain;
 	
-	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_FIND_HERB) && can_do) {
+	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK) && can_do) {
 		// not able to ewt_mark_resource_worker() until inside the interaction
 		if (worker) {
 			add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 2);
-			if (!run_room_interactions(worker, room, INTERACT_FIND_HERB, one_gardening_chore)) {
+			if (!run_room_interactions(worker, room, INTERACT_PICK, one_gardening_chore)) {
 				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			}
 		}
 		else {
 			if ((worker = place_chore_worker(emp, CHORE_HERB_GARDENING, room))) {
-				ewt_mark_for_interactions(emp, room, INTERACT_FIND_HERB);
+				ewt_mark_for_interactions(emp, room, INTERACT_PICK);
 			}
 		}
 	}
@@ -2338,7 +2342,7 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 			
 			// find shear interaction
 			for (interact = mob->interactions; interact && !shearable; interact = interact->next) {
-				if (interact->type != INTERACT_SHEAR) {
+				if (interact->type != INTERACT_SHEAR || !meets_interaction_restrictions(interact->restrictions, NULL, emp)) {
 					continue;
 				}
 				if (!can_gain_chore_resource(emp, room, CHORE_SHEARING, interact->vnum)) {

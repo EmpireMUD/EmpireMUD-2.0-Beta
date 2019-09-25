@@ -359,7 +359,6 @@ void olc_search_crop(char_data *ch, crop_vnum vnum) {
 void save_olc_crop(descriptor_data *desc) {	
 	crop_data *proto, *cp = GET_OLC_CROP(desc);
 	crop_vnum vnum = GET_OLC_VNUM(desc);
-	struct interaction_item *interact;
 	struct spawn_info *spawn;
 	UT_hash_handle hh;
 
@@ -380,10 +379,7 @@ void save_olc_crop(descriptor_data *desc) {
 		GET_CROP_SPAWNS(proto) = spawn->next;
 		free(spawn);
 	}
-	while ((interact = GET_CROP_INTERACTIONS(proto))) {
-		GET_CROP_INTERACTIONS(proto) = interact->next;
-		free(interact);
-	}
+	free_interactions(GET_CROP_INTERACTIONS(proto));
 	
 	// sanity
 	if (!GET_CROP_NAME(cp) || !*GET_CROP_NAME(cp)) {

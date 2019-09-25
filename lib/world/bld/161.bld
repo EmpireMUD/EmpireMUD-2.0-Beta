@@ -1,0 +1,29 @@
+#16101
+Bow of the Hydra~
+The Bow of the Hydra Slayer~
+&0[  ]~
+1 0 aHR 0
+0 0 0 -1
+C
+disembark sail~
+D
+You stand at the leading head of this hydra-shaped war ship.
+~
+S
+#16102
+Cabin~
+The Captain's Cabin~
+&0[  ]~
+1 0 aH 0
+0 0 0 -1
+C
+disembark~
+D
+   Upon entering the cabin of this ship, it clearly isn't intended for comfort.
+A pair of nets act as beds, two small cupboards hold personal affects, and a
+single central strip of floor acts as walkway.
+~
+F
+d
+S
+$

@@ -912,27 +912,11 @@ INTERACTION_FUNC(finish_panning) {
 }
 
 
-INTERACTION_FUNC(finish_picking_herb) {
+INTERACTION_FUNC(finish_picking) {
 	obj_data *obj = NULL;
 	room_data *in_room = IN_ROOM(ch);
 	obj_vnum vnum = interaction->vnum;
 	int iter, num = interaction->quantity;
-	
-	if (has_ability(ch, ABIL_FIND_HERBS)) {
-		gain_ability_exp(ch, ABIL_FIND_HERBS, 10);
-	
-		if (!number(0, 11)) {
-			// random chance of gem -- TODO come up with some way to do this in-game
-			vnum = o_IRIDESCENT_IRIS;
-			num = 1;
-		}
-	}
-	else {
-		// if they don't have find herbs, they get something different here
-		// TODO move these to configs?
-		vnum = (!number(0, 11) ? o_IRIDESCENT_IRIS : o_FLOWER);
-		num = 1;
-	}
 
 	// give objs
 	for (iter = 0; iter < num; ++iter) {
@@ -951,48 +935,6 @@ INTERACTION_FUNC(finish_picking_herb) {
 	if (obj) {
 		if (num > 1) {
 			sprintf(buf, "You find $p (x%d)!", num);
-			act(buf, FALSE, ch, obj, 0, TO_CHAR);
-		}
-		else {
-			act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
-		}
-		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
-	}
-	else {
-		msg_to_char(ch, "You find nothing.\r\n");
-	}
-		
-	// re-start
-	if (in_room == IN_ROOM(ch)) {
-		start_picking(ch);
-	}
-	
-	return TRUE;
-}
-
-
-INTERACTION_FUNC(finish_picking_crop) {
-	obj_data *obj = NULL;
-	room_data *in_room = IN_ROOM(ch);
-	int iter;
-	
-	// give objs
-	for (iter = 0; iter < interaction->quantity; ++iter) {
-		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char_or_room(obj, ch);
-		add_depletion(inter_room, DPLTN_PICK, TRUE);
-		load_otrigger(obj);
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
-	if (obj) {
-		if (interaction->quantity > 1) {
-			sprintf(buf, "You find $p (x%d)!", interaction->quantity);
 			act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		}
 		else {
@@ -2091,13 +2033,13 @@ void process_picking(char_data *ch) {
 			act("$n stops looking for things to pick as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FIND_HERB, finish_picking_herb)) {
+			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_PICK, finish_picking)) {
 				gain_ability_exp(ch, ABIL_SCAVENGING, 10);
 				found = TRUE;
 			}
 			else if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
 				// only orchards allow pick -- and only run this if we hit no herbs at all
-				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking_crop)) {
+				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking)) {
 					gain_ability_exp(ch, ABIL_SCAVENGING, 10);
 					found = TRUE;
 				}

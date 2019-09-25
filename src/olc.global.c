@@ -267,7 +267,6 @@ void olc_search_global(char_data *ch, any_vnum vnum) {
 void save_olc_global(descriptor_data *desc) {	
 	struct global_data *proto, *glb = GET_OLC_GLOBAL(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
-	struct interaction_item *interact;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -279,10 +278,7 @@ void save_olc_global(descriptor_data *desc) {
 	if (GET_GLOBAL_NAME(proto)) {
 		free(GET_GLOBAL_NAME(proto));
 	}
-	while ((interact = GET_GLOBAL_INTERACTIONS(proto))) {
-		GET_GLOBAL_INTERACTIONS(proto) = interact->next;
-		free(interact);
-	}
+	free_interactions(GET_GLOBAL_INTERACTIONS(proto));
 	free_archetype_gear(GET_GLOBAL_GEAR(proto));
 	
 	// sanity

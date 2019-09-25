@@ -594,7 +594,6 @@ void free_building(bld_data *bdg) {
 	void free_bld_relations(struct bld_relation *list);
 	
 	bld_data *proto = building_proto(GET_BLD_VNUM(bdg));
-	struct interaction_item *interact;
 	struct spawn_info *spawn;
 	
 	if (GET_BLD_NAME(bdg) && (!proto || GET_BLD_NAME(bdg) != GET_BLD_NAME(proto))) {
@@ -618,10 +617,7 @@ void free_building(bld_data *bdg) {
 	}
 
 	if (GET_BLD_INTERACTIONS(bdg) && (!proto || GET_BLD_INTERACTIONS(bdg) != GET_BLD_INTERACTIONS(proto))) {
-		while ((interact = GET_BLD_INTERACTIONS(bdg))) {
-			GET_BLD_INTERACTIONS(bdg) = interact->next;
-			free(interact);
-		}
+		free_interactions(GET_BLD_INTERACTIONS(bdg));
 	}
 	if (GET_BLD_SPAWNS(bdg) && (!proto || GET_BLD_SPAWNS(bdg) != GET_BLD_SPAWNS(proto))) {
 		while ((spawn = GET_BLD_SPAWNS(bdg))) {
@@ -1193,7 +1189,6 @@ void remove_crop_from_table(crop_data *crop) {
 void free_crop(crop_data *cp) {
 	crop_data *proto = crop_proto(cp->vnum);
 	struct spawn_info *spawn;
-	struct interaction_item *interact;
 	
 	if (GET_CROP_NAME(cp) && (!proto || GET_CROP_NAME(cp) != GET_CROP_NAME(proto))) {
 		free(GET_CROP_NAME(cp));
@@ -1214,10 +1209,7 @@ void free_crop(crop_data *cp) {
 	}
 
 	if (GET_CROP_INTERACTIONS(cp) && (!proto || GET_CROP_INTERACTIONS(cp) != GET_CROP_INTERACTIONS(proto))) {
-		while ((interact = GET_CROP_INTERACTIONS(cp))) {
-			GET_CROP_INTERACTIONS(cp) = interact->next;
-			free(interact);
-		}
+		free_interactions(GET_CROP_INTERACTIONS(cp));
 	}
 
 	free(cp);
@@ -4008,17 +4000,13 @@ void clear_global(struct global_data *glb) {
 */
 void free_global(struct global_data *glb) {
 	struct global_data *proto = global_proto(GET_GLOBAL_VNUM(glb));
-	struct interaction_item *interact;
 	
 	if (GET_GLOBAL_NAME(glb) && (!proto || GET_GLOBAL_NAME(glb) != GET_GLOBAL_NAME(proto))) {
 		free(GET_GLOBAL_NAME(glb));
 	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb) && (!proto || GET_GLOBAL_INTERACTIONS(glb) != GET_GLOBAL_INTERACTIONS(proto))) {
-		while ((interact = GET_GLOBAL_INTERACTIONS(glb))) {
-			GET_GLOBAL_INTERACTIONS(glb) = interact->next;
-			free(interact);
-		}
+		free_interactions(GET_GLOBAL_INTERACTIONS(glb));
 	}
 	
 	if (GET_GLOBAL_GEAR(glb) && (!proto || GET_GLOBAL_GEAR(glb) != GET_GLOBAL_GEAR(proto))) {
@@ -4249,6 +4237,37 @@ void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list) {
 //// INTERACTION LIB /////////////////////////////////////////////////////////
 
 /**
+* Frees 1 interact_restriction (or a list of them).
+* 
+* @param struct interact_restriction *list The restriction(s) to free.
+*/
+void free_interaction_restrictions(struct interact_restriction *list) {
+	struct interact_restriction *res, *next_res;
+	
+	LL_FOREACH_SAFE(list, res, next_res) {
+		free(res);
+	}
+}
+
+
+/**
+* Frees 1 interaction (or a list of them).
+* 
+* @param struct interaction_item *list The interaction(s) to free.
+*/
+void free_interactions(struct interaction_item *list) {
+	struct interaction_item *inter, *next_inter;
+	
+	LL_FOREACH_SAFE(list, inter, next_inter) {
+		free_interaction_restrictions(inter->restrictions);
+		
+		// everything else is simple data
+		free(inter);
+	}
+}
+
+
+/**
 * Parse one interaction item and assign it to the end of the given list.
 * This function will trigger an exit(1) if it errors.
 *
@@ -4258,9 +4277,32 @@ void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list) {
 */
 void parse_interaction(char *line, struct interaction_item **list, char *error_part) {
 	struct interaction_item *interact, *inter_iter;
+	static struct interaction_item *last_interact = NULL;
+	struct interact_restriction *res;
 	int int_in[3];
 	double dbl_in;
 	char char_in, excl = 0;
+	
+	// parse restrictions lines separately
+	if (!strncmp(line, "I+ ", 3)) {
+		if (!last_interact) {
+			log("SYSERR: Found 'I+' line with no last interaction in %s", error_part);
+			exit(1);
+		}
+		
+		if (sscanf(line, "I+ %d %d", &int_in[0], &int_in[1]) != 2) {
+			log("SYSERR: Format error in 'I+' field, %s", error_part);
+			exit(1);
+		}
+		
+		CREATE(res, struct interact_restriction, 1);
+		res->type = int_in[0];
+		res->vnum = int_in[1];
+		LL_APPEND(last_interact->restrictions, res);
+		return;
+	}
+	
+	// otherwise, it's a regular interaction:
 
 	// interaction item: I type vnum percent quantity X
 	if (sscanf(line, "I %d %d %lf %d %c", &int_in[0], &int_in[1], &dbl_in, &int_in[2], &char_in) == 5) {	// with exclusion code
@@ -4270,7 +4312,7 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 		excl = 0;
 	}
 	else {
-		log("SYSERR: Format error in 'I' field, %s\n", error_part);
+		log("SYSERR: Format error in 'I' field, %s", error_part);
 		exit(1);
 	}
 	
@@ -4292,6 +4334,8 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 	else {
 		*list = interact;
 	}
+	
+	last_interact = interact;
 }
 
 
@@ -4302,10 +4346,12 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 * @param struct interaction_item *list The interaction list to write.
 */
 void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
+	extern char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
 	extern const char *interact_types[];
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	struct interaction_item *interact;
+	struct interact_restriction *res;
 	
 	for (interact = list; interact; interact = interact->next) {
 		fprintf(fl, "I %d %d %.2f %d", interact->type, interact->vnum, interact->percent, interact->quantity);
@@ -4315,6 +4361,11 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 		}
 		
 		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum) : get_obj_name_by_proto(interact->vnum));
+		
+		// restrictions?
+		LL_FOREACH(interact->restrictions, res) {
+			fprintf(fl, "I+ %d %d  # %s\n", res->type, res->vnum, get_interaction_restriction_display(res, FALSE));
+		}
 	}
 }
 
@@ -4914,7 +4965,6 @@ void free_obj_eq_set(struct eq_set_obj *eq_set) {
 
 /* release memory allocated for an obj struct */
 void free_obj(obj_data *obj) {
-	struct interaction_item *interact;
 	struct obj_storage_type *store;
 	obj_data *proto;
 	
@@ -4940,10 +4990,7 @@ void free_obj(obj_data *obj) {
 	}
 
 	if (obj->interactions && (!proto || obj->interactions != proto->interactions)) {
-		while ((interact = obj->interactions)) {
-			obj->interactions = interact->next;
-			free(interact);
-		}
+		free_interactions(obj->interactions);
 	}
 	if (obj->storage && (!proto || obj->storage != proto->storage)) {
 		while ((store = obj->storage)) {
@@ -6024,7 +6071,6 @@ void remove_room_template_from_table(room_template *rmt) {
 */
 void free_room_template(room_template *rmt) {
 	room_template *proto = room_template_proto(GET_RMT_VNUM(rmt));
-	struct interaction_item *interact;
 	struct adventure_spawn *spawn;
 	struct exit_template *ex;
 	
@@ -6053,10 +6099,7 @@ void free_room_template(room_template *rmt) {
 		}
 	}
 	if (GET_RMT_INTERACTIONS(rmt) && (!proto || GET_RMT_INTERACTIONS(rmt) != GET_RMT_INTERACTIONS(proto))) {
-		while ((interact = GET_RMT_INTERACTIONS(rmt))) {
-			GET_RMT_INTERACTIONS(rmt) = interact->next;
-			free(interact);
-		}
+		free_interactions(GET_RMT_INTERACTIONS(rmt));
 	}
 	
 	if (GET_RMT_SCRIPTS(rmt) && (!proto || GET_RMT_SCRIPTS(rmt) != GET_RMT_SCRIPTS(proto))) {
@@ -6309,7 +6352,6 @@ void remove_sector_from_table(sector_data *sect) {
 * @param sector_data *st The sector to free.
 */
 void free_sector(sector_data *st) {
-	struct interaction_item *interact;
 	struct evolution_data *evo;
 	struct spawn_info *spawn;
 	sector_data *proto;
@@ -6345,10 +6387,7 @@ void free_sector(sector_data *st) {
 	}
 
 	if (GET_SECT_INTERACTIONS(st) && (!proto || GET_SECT_INTERACTIONS(st) != GET_SECT_INTERACTIONS(proto))) {
-		while ((interact = GET_SECT_INTERACTIONS(st))) {
-			GET_SECT_INTERACTIONS(st) = interact->next;
-			free(interact);
-		}
+		free_interactions(GET_SECT_INTERACTIONS(st));
 	}
 
 	free(st);

@@ -1,0 +1,9 @@
+#16133
+hydra seeking stone drop~
+0 0 0 D 225-325
+E
+-1 2.00
+0 0 0
+I 4 16133 100.00 1  # LOOT: a hydra seeking stone
+S
+$
