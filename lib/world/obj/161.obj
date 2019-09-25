@@ -14,7 +14,7 @@ S
 #16101
 hide hydra~
 a hydra hide~
-A hydra hide lays here.~
+A hydra hide lies here.~
    This hide still has a scale print on it from when it was still part of the
 monstrous oceanic hydra. It seems like quite a few things could be made from
 such a hide.
@@ -55,7 +55,7 @@ S
 #16102
 wand hydra fang~
 a hydra fang wand~
-A hydra fang wand lays here.~
+A hydra fang wand lies here.~
    A wand crafted from wood and inlaid with hydra fangs flickers with the same
 light as the beast did.
 ~
@@ -79,7 +79,7 @@ S
 #16103
 dagger hydra fang~
 a hydra fang dagger~
-A dagger made from a hydra fang lays here.~
+A dagger made from a hydra fang lies here.~
    A pair of hydra fangs were bound together and sharpened to make a double
 edged blade perfect for puncturing flesh.
 ~
@@ -426,7 +426,7 @@ S
 pants pair hydra hide~
 a pair of hydra hide pants~
 A pair of hydra hide pants are folded here.~
-   This pare of pants is made of hydra hide and cut close to the body for
+   This pair of pants is made of hydra hide and cut close to the body for
 maximum movement.
 ~
 27 m af 15
@@ -451,7 +451,7 @@ S
 #16118
 saddle hydra hide~
 a hydra hide saddle~
-A saddle cut to fit a hydra lays here.~
+A saddle cut to fit a hydra lies here.~
    The saddle fits a single necked mount well enough, but was clearly
 originally intended for a multiheaded beast.
 ~
@@ -526,8 +526,8 @@ S
 belt hydra fang~
 a hydra fang belt~
 A hydra fang belt is looped here.~
-   Looking more like an over sized spike collar, this belt is clearly meant for
-an aggressive mind set. Fangs jut out at periotic intervals along the length
+   Looking more like an oversized spiked collar, this belt is clearly meant for
+an aggressive mindset. Fangs jut out at periodic intervals along the length
 for both intimidation and function.
 ~
 27 m al 12
@@ -623,7 +623,7 @@ S
 #16125
 helm hydra hide~
 a hydra hide helm~
-A hydra hide helm is set here.~
+A hydra hide helm is sitting here.~
 A hardened helm of hydra hide is ready to protect someone's head from harm.
 ~
 27 m ae 16
@@ -696,7 +696,7 @@ S
 #16128
 hoop hydra fang~
 a hydra fang hoop~
-A hydra fang hoop is laying here.~
+A hydra fang hoop is lying here.~
    A loop of precious metal forms the body of this adornment with two shaved
 fangs offering a striking effect.
 ~
@@ -933,7 +933,7 @@ S
 gloves pair hydra plated~
 a pair of plated hydra gloves~
 A pair of plated hydra gloves are clasped here.~
-   Hydra hide layered in plates of various metals prove to be most affective
+   Hydra hide, layered in plates of various metals, proves to be most effective
 protection against anything that might want at the wearer's hands.
 ~
 27 m ah 12
@@ -958,7 +958,7 @@ claymore hydra fang~
 a hydra fang claymore~
 A claymore comprised of hydra fangs is staked in the ground here.~
    This massive sword has a core of fangs, coated in metal and sharpened to a
-combat ready edge.
+combat-ready edge.
 ~
 1 ehmn an 12
 0 13 1
@@ -979,9 +979,9 @@ S
 eye hydra's~
 a hydra's eye~
 A single hydra eye glares about.~
-   This eye was carved out of one of the many oceanic hydra's heads and mounted
-on a hydra fang from the same said head. The mystical properties are maintained
-and a slight glow can be seen.
+   This eye was carved out of one of the oceanic hydra's many heads and mounted
+on a hydra fang from the same head. The mystical properties are maintained and
+a slight glow can be seen.
 ~
 3 m ao 11
 0 0 0
@@ -1004,7 +1004,7 @@ S
 fetish hydra~
 a hydra fetish~
 A fetish of hydra bits and pieces rests here.~
-   A hydra skin pouch, tied with hydra sinue string holds bits and pieces of
+   A hydra skin pouch, tied with hydra sinew string holds bits and pieces of
 bone, fang, and scale from the same oceanic hydra.
 ~
 3 m ao 10
@@ -1077,8 +1077,8 @@ S
 #16145
 leggings chainmail hydra scale pair~
 some hydra scale leggings~
-A pair of hydra scale chainmail leggings lays piled up here.~
-   A pair of dragonscale weave chainmail leggings has been adorned with hydra
+A pair of hydra scale chainmail leggings lies piled up here.~
+   A pair of dragonscale-weave chainmail leggings has been adorned with hydra
 scales instead of the standard.
 ~
 27 m af 10
@@ -1125,7 +1125,7 @@ S
 #16147
 trousers pair hydra hide~
 a pair of hydra hide trousers~
-A pair of hydra hide trousers rests here neatly folded.~
+A pair of hydra hide trousers rests here, neatly folded.~
    These trousers, sewn from hydra hide, have been imbued with some form of
 mystical essence. They give off a faint glow, which grows and fades with the
 caster's use of magic.

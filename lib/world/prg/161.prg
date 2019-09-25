@@ -2,7 +2,7 @@
 Oceanic Hydra Slayer~
    A monstrous hydra has been swimming about the edges of islands and
 continents, terrorizing shipping lines. Kill the beast, making sure each of its
-heads are removed and putting the creature to rest.
+heads are removed, and putting the creature to rest.
 ~
 11 4 0 5 c
 K 2 16100
