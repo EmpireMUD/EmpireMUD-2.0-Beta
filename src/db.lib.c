@@ -617,7 +617,7 @@ void free_building(bld_data *bdg) {
 	}
 
 	if (GET_BLD_INTERACTIONS(bdg) && (!proto || GET_BLD_INTERACTIONS(bdg) != GET_BLD_INTERACTIONS(proto))) {
-		free_interactions(GET_BLD_INTERACTIONS(bdg));
+		free_interactions(&GET_BLD_INTERACTIONS(bdg));
 	}
 	if (GET_BLD_SPAWNS(bdg) && (!proto || GET_BLD_SPAWNS(bdg) != GET_BLD_SPAWNS(proto))) {
 		while ((spawn = GET_BLD_SPAWNS(bdg))) {
@@ -1209,7 +1209,7 @@ void free_crop(crop_data *cp) {
 	}
 
 	if (GET_CROP_INTERACTIONS(cp) && (!proto || GET_CROP_INTERACTIONS(cp) != GET_CROP_INTERACTIONS(proto))) {
-		free_interactions(GET_CROP_INTERACTIONS(cp));
+		free_interactions(&GET_CROP_INTERACTIONS(cp));
 	}
 
 	free(cp);
@@ -4006,7 +4006,7 @@ void free_global(struct global_data *glb) {
 	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb) && (!proto || GET_GLOBAL_INTERACTIONS(glb) != GET_GLOBAL_INTERACTIONS(proto))) {
-		free_interactions(GET_GLOBAL_INTERACTIONS(glb));
+		free_interactions(&GET_GLOBAL_INTERACTIONS(glb));
 	}
 	
 	if (GET_GLOBAL_GEAR(glb) && (!proto || GET_GLOBAL_GEAR(glb) != GET_GLOBAL_GEAR(proto))) {
@@ -4239,31 +4239,42 @@ void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list) {
 /**
 * Frees 1 interact_restriction (or a list of them).
 * 
-* @param struct interact_restriction *list The restriction(s) to free.
+* @param struct interact_restriction **list A reference to the restriction(s) to free.
 */
-void free_interaction_restrictions(struct interact_restriction *list) {
+void free_interaction_restrictions(struct interact_restriction **list) {
 	struct interact_restriction *res, *next_res;
 	
-	LL_FOREACH_SAFE(list, res, next_res) {
+	if (!list) {
+		return;
+	}
+	
+	LL_FOREACH_SAFE(*list, res, next_res) {
 		free(res);
 	}
+	*list = NULL;
 }
 
 
 /**
 * Frees 1 interaction (or a list of them).
 * 
-* @param struct interaction_item *list The interaction(s) to free.
+* @param struct interaction_item **list A pointer to the interaction(s) to free.
 */
-void free_interactions(struct interaction_item *list) {
+void free_interactions(struct interaction_item **list) {
 	struct interaction_item *inter, *next_inter;
 	
-	LL_FOREACH_SAFE(list, inter, next_inter) {
-		free_interaction_restrictions(inter->restrictions);
+	if (!list) {
+		return;
+	}
+	
+	LL_FOREACH_SAFE(*list, inter, next_inter) {
+		free_interaction_restrictions(&inter->restrictions);
 		
 		// everything else is simple data
 		free(inter);
 	}
+	
+	*list = NULL;
 }
 
 
@@ -4990,7 +5001,7 @@ void free_obj(obj_data *obj) {
 	}
 
 	if (obj->interactions && (!proto || obj->interactions != proto->interactions)) {
-		free_interactions(obj->interactions);
+		free_interactions(&obj->interactions);
 	}
 	if (obj->storage && (!proto || obj->storage != proto->storage)) {
 		while ((store = obj->storage)) {
@@ -6099,7 +6110,7 @@ void free_room_template(room_template *rmt) {
 		}
 	}
 	if (GET_RMT_INTERACTIONS(rmt) && (!proto || GET_RMT_INTERACTIONS(rmt) != GET_RMT_INTERACTIONS(proto))) {
-		free_interactions(GET_RMT_INTERACTIONS(rmt));
+		free_interactions(&GET_RMT_INTERACTIONS(rmt));
 	}
 	
 	if (GET_RMT_SCRIPTS(rmt) && (!proto || GET_RMT_SCRIPTS(rmt) != GET_RMT_SCRIPTS(proto))) {
@@ -6387,7 +6398,7 @@ void free_sector(sector_data *st) {
 	}
 
 	if (GET_SECT_INTERACTIONS(st) && (!proto || GET_SECT_INTERACTIONS(st) != GET_SECT_INTERACTIONS(proto))) {
-		free_interactions(GET_SECT_INTERACTIONS(st));
+		free_interactions(&GET_SECT_INTERACTIONS(st));
 	}
 
 	free(st);

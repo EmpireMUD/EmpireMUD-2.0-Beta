@@ -606,7 +606,7 @@ void save_olc_room_template(descriptor_data *desc) {
 		free_exit_template(ex);
 	}
 	free_extra_descs(&GET_RMT_EX_DESCS(proto));
-	free_interactions(GET_RMT_INTERACTIONS(proto));
+	free_interactions(&GET_RMT_INTERACTIONS(proto));
 	while ((trig = GET_RMT_SCRIPTS(proto))) {
 		GET_RMT_SCRIPTS(proto) = trig->next;
 		free(trig);

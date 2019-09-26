@@ -379,7 +379,7 @@ void save_olc_crop(descriptor_data *desc) {
 		GET_CROP_SPAWNS(proto) = spawn->next;
 		free(spawn);
 	}
-	free_interactions(GET_CROP_INTERACTIONS(proto));
+	free_interactions(&GET_CROP_INTERACTIONS(proto));
 	
 	// sanity
 	if (!GET_CROP_NAME(cp) || !*GET_CROP_NAME(cp)) {

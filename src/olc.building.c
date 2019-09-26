@@ -981,7 +981,7 @@ void save_olc_building(descriptor_data *desc) {
 		GET_BLD_SPAWNS(proto) = spawn->next;
 		free(spawn);
 	}
-	free_interactions(GET_BLD_INTERACTIONS(proto));
+	free_interactions(&GET_BLD_INTERACTIONS(proto));
 	while ((trig = GET_BLD_SCRIPTS(proto))) {
 		GET_BLD_SCRIPTS(proto) = trig->next;
 		free(trig);

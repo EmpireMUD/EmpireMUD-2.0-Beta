@@ -278,7 +278,7 @@ void save_olc_global(descriptor_data *desc) {
 	if (GET_GLOBAL_NAME(proto)) {
 		free(GET_GLOBAL_NAME(proto));
 	}
-	free_interactions(GET_GLOBAL_INTERACTIONS(proto));
+	free_interactions(&GET_GLOBAL_INTERACTIONS(proto));
 	free_archetype_gear(GET_GLOBAL_GEAR(proto));
 	
 	// sanity

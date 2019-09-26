@@ -555,7 +555,7 @@ void save_olc_sector(descriptor_data *desc) {
 		GET_SECT_SPAWNS(proto) = spawn->next;
 		free(spawn);
 	}
-	free_interactions(GET_SECT_INTERACTIONS(proto));
+	free_interactions(&GET_SECT_INTERACTIONS(proto));
 	
 	// sanity
 	if (!GET_SECT_NAME(st) || !*GET_SECT_NAME(st)) {

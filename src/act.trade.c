@@ -433,15 +433,8 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 	// determine ideal scale level
 	if (craft) {
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && (req = obj_proto(GET_CRAFT_REQUIRES_OBJ(craft)))) {
+			// anything that requires an object handles its own level range (on the crafted item itself)
 			level = craft_lev;
-			
-			// check bounds on the required object
-			if (GET_OBJ_MAX_SCALE_LEVEL(req) > 0) {
-				level = MIN(level, GET_OBJ_MAX_SCALE_LEVEL(req));
-			}
-			if (GET_OBJ_MIN_SCALE_LEVEL(req) > 0) {
-				level = MAX(level, GET_OBJ_MIN_SCALE_LEVEL(req));
-			}
 		}
 		else if (CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
 			// learned recipes would be constrained by the created obj, if anything
