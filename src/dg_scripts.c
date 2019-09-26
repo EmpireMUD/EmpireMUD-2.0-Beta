@@ -66,6 +66,7 @@ extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
+extern char *get_room_name(room_data *room, bool color);
 void free_varlist(struct trig_var_data *vd);
 extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
@@ -2602,7 +2603,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					room_data *targ_room;
 					
 					if (subfield && *subfield && (targ_room = get_room(get_room_by_script(type, go), subfield))) {
-						set_instance_fake_loc(inst, targ_room);
+						if (SHARED_DATA(targ_room) && SHARED_DATA(targ_room) == &ocean_shared_data) {
+							script_log("Trigger: %s, VNum %d, instance.set_location: unable to set location to '%d %s': location is in the ocean or is sharing data", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), GET_ROOM_VNUM(targ_room), get_room_name(targ_room, FALSE));
+						}
+						else {
+							set_instance_fake_loc(inst, targ_room);
+						}
 					}
 					else {
 						script_log("Trigger: %s, VNum %d, bad instance.set_location: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
@@ -4867,7 +4873,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'n': {	// room.n*
 					if (!str_cmp(field, "name")) {
-						extern char *get_room_name(room_data *room, bool color);
 						snprintf(str, slen, "%s",  get_room_name(r, FALSE));
 					}
 					else if (!str_cmp(field, "north")) {
