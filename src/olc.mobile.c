@@ -200,7 +200,7 @@ bool delete_from_interaction_list(struct interaction_item **list, int vnum_type,
 			found = TRUE;
 			REMOVE_FROM_LIST(inter, *list, next);
 			inter->next = NULL;
-			free_interactions(inter);
+			free_interactions(&inter);
 		}
 	}
 	
@@ -1034,7 +1034,7 @@ void save_olc_mobile(descriptor_data *desc) {
 		free(GET_LOOK_DESC(proto));
 	}
 
-	free_interactions(proto->interactions);
+	free_interactions(&proto->interactions);
 	free_custom_messages(MOB_CUSTOM_MSGS(proto));
 	
 	if (proto->proto_script) {

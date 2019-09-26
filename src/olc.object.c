@@ -1630,7 +1630,7 @@ void save_olc_object(descriptor_data *desc) {
 		free(GET_OBJ_ACTION_DESC(proto));
 	}
 	free_extra_descs(&proto->ex_description);
-	free_interactions(proto->interactions);
+	free_interactions(&proto->interactions);
 	while ((store = proto->storage)) {
 		proto->storage = store->next;
 		free(store);

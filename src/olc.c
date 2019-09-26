@@ -6378,7 +6378,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 * @return bool TRUE normally; FALSE if there was an error (message sent to character).
 */
 bool parse_interaction_restrictions(char_data *ch, char *argument, struct interact_restriction **found_restrictions, char *found_exclusion) {
-	void free_interaction_restrictions(struct interact_restriction *list);
+	void free_interaction_restrictions(struct interact_restriction **list);
 	
 	char arg[MAX_INPUT_LENGTH], *ptr = argument;
 	struct interact_restriction *res;
@@ -6449,7 +6449,7 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 	
 	// free any already found
 	if (fail && *found_restrictions) {
-		free_interaction_restrictions(*found_restrictions);
+		free_interaction_restrictions(found_restrictions);
 		*found_restrictions = NULL;
 	}
 	

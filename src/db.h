@@ -396,7 +396,7 @@ void free_global(struct global_data *glb);
 extern struct global_data *global_proto(any_vnum vnum);
 
 // interactions
-void free_interactions(struct interaction_item *list);
+void free_interactions(struct interaction_item **list);
 
 // islands
 extern struct island_info *island_table;
