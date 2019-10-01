@@ -19,20 +19,29 @@ eval randomhead %random.4% + 16100
 hydra head death~
 0 f 100
 ~
+if !%self.char_target(hydra oceanic monstrous)%
+  halt
+end
 set hydranum %instance.mob(16100)%
+if %self.vnum% == 16101
+  set LowestHead 16101
+  eval headspawn %random.4% + 16100
+else
+  set LowestHead 16102
+  eval headspawn %random.3% + 16101
+end
 set person %self.room.people%
 set headcount 0
 while %person%
   if %person.is_npc% && %person% != %self%
-    if %person.vnum% >= 16102 && %person.vnum% <= 16104
+    if %person.vnum% >= %LowestHead% && %person.vnum% <= 16104
       eval headcount %headcount% + 1
     end
   end
   set person %person.next_in_room%
 done
-if %headcount% <= 3
+if %headcount% <= 2
   %echo% As the life leaves the one head's eyes a bulge appears on the leading end of the hydra before the skin splits and a head shoots forward.
-  eval headspawn %random.3% + 16101
   %load% mob %headspawn%
   %force% %self.room.people% mfollow %hydranum%
 end
@@ -88,8 +97,6 @@ while %person%
   end
   set person %person.next_in_room%
 done
-eval room %self.room%
-nop %instance.set_location(%room%)%
 if %actor.is_npc% || %self.fighting%
   halt
 end
@@ -112,33 +119,6 @@ if %headcount% == 0
   %echo% Water splashes everywhere as the hydra lifts a head to look at you.
 end
 dg_affect #16103 %self% off
-~
-#16105
-hydra ethereal head death~
-0 f 100
-~
-set hydranum %instance.mob(16100)%
-set person %self.room.people%
-set headcount 0
-while %person%
-  if %person.is_npc% && %person% != %self%
-    if %person.vnum% >= 16101 && %person.vnum% <= 16104
-      eval headcount %headcount% + 1
-    end
-  end
-  set person %person.next_in_room%
-done
-if %headcount% <= 3
-  %echo% As the life leaves the one head's eyes a bulge appears on the leading end of the hydra before the skin splits and a head shoots forward.
-  eval headspawn %random.4% + 16100
-  %load% mob %headspawn%
-  %force% %self.room.people% mfollow %hydranum%
-end
-if %hydranum.aff_flagged(IMMUNE-DAMAGE)%
-  dg_affect #16100 %hydranum% off
-  set LostImmunity %timestamp%
-  remote LostImmunity %hydranum.id%
-end
 ~
 #16107
 hydra vicious head buff~
@@ -163,6 +143,7 @@ while %person%
   set person %person.next_in_room%
 done
 %at% i16100 %load% obj 16110 room
+nop %instance.set_location(%instance.real_location%)%
 ~
 #16109
 hydra withering head debuff~
@@ -258,10 +239,9 @@ if %room.distance(%instance.real_location%)% > 30
   %echo% %self.name% sinuously twists around and doubles back.
   halt
 end
-eval RandomUpdate %random.5%
-if %RandomUpdate% == 3
-  nop %instance.set_location(%room%)%
-end
+* if !(%room.sector_vnum% == 6)
+* nop %instance.set_location(%room%)%
+* end
 ~
 #16111
 hydra slayer build~
@@ -373,6 +353,7 @@ heal %random.ally%
 when hydra gear is crafted~
 1 n 100
 ~
+%echo% level is %self.level%.
 if %self.level%
   set level %self.level%
 else
