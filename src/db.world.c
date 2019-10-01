@@ -439,7 +439,6 @@ void delete_room(room_data *room, bool check_exits) {
 	void relocate_players(room_data *room, room_data *to_room);
 	void remove_instance_fake_loc(struct instance_data *inst);
 	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
-	void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct empire_territory_data *ter;
