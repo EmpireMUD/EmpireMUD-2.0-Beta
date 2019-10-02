@@ -400,7 +400,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	old_emp = GET_LOYALTY(old);
 	
 	// prepare logs
-	snprintf(sys, sizeof(sys), "%s used alternate to switch to %s.", GET_NAME(old), GET_NAME(new));
+	snprintf(sys, sizeof(sys), "%s used alternate to switch to %s at %s.", GET_NAME(old), GET_NAME(new), IN_ROOM(new) ? room_log_identifier(IN_ROOM(new)) : "an unknown location");
 
 	strcpy(temp, PERS(new, new, TRUE));
 	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
