@@ -1126,14 +1126,14 @@ when possible.
 T 16120
 S
 #16150
-tongue hydra~
-an in-tact hydra tongue~
-An in-tact hydra tongue is coiled here like a spool of rope.~
-   A rare thing, an in-tact tongue from a dead hydra. Most often, they mangle
+tongue hydra intact~
+an intact hydra tongue~
+An intact hydra tongue is coiled here like a spool of rope.~
+   A rare thing, an intact tongue from a dead hydra. Most often, they mangle
 it with their serrated teeth in their death throws. You can use this to bind
 bones together and build an oceanic tower.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 7 0
 R
