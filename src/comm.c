@@ -1801,7 +1801,7 @@ void close_socket(descriptor_data *d) {
 			act("$n has lost $s link.", TRUE, d->character, 0, 0, TO_ROOM);
 			if (!IS_NPC(d->character)) {
 				SAVE_CHAR(d->character);
-				syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "Closing link to: %s.", GET_NAME(d->character));
+				syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "Closing link to: %s at %s.", GET_NAME(d->character), IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
 			}
 			d->character->desc = NULL;
 		}
