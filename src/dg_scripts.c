@@ -1461,7 +1461,7 @@ ACMD(do_tattach) {
 		}
 		add_trigger(SCRIPT(victim), trig, loc);
 
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
 	}
 	else if (is_abbrev(arg, "object") || is_abbrev(arg, "otr")) {
@@ -1500,7 +1500,7 @@ ACMD(do_tattach) {
 		}
 		add_trigger(SCRIPT(object), trig, loc);
 
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object));
 	}
 	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "vtr")) {
@@ -1537,7 +1537,7 @@ ACMD(do_tattach) {
 		}
 		add_trigger(SCRIPT(veh), trig, loc);
 
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh), GET_NAME(ch));
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), VEH_SHORT_DESC(veh), VEH_VNUM(veh));
 	}
 	else if (is_abbrev(arg, "room") || is_abbrev(arg, "wtr")) {
@@ -1573,7 +1573,7 @@ ACMD(do_tattach) {
 		}
 		add_trigger(SCRIPT(room), trig, loc);
 
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to room %d by %s.", tn, GET_TRIG_NAME(trig), GET_ROOM_VNUM(room), GET_NAME(ch));
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to room %d by %s", tn, GET_TRIG_NAME(trig), GET_ROOM_VNUM(room), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to room %d.\r\n", tn, GET_TRIG_NAME(trig), GET_ROOM_VNUM(room));
 	}
 	else
@@ -1711,13 +1711,13 @@ ACMD(do_tdetach) {
 		else if (!str_cmp(arg2, "all")) {
 			extract_script(room, WLD_TRIGGER);
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from room %d by %s.", GET_ROOM_VNUM(IN_ROOM(ch)), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from room %d by %s", GET_ROOM_VNUM(IN_ROOM(ch)), GET_NAME(ch));
 			}
 			msg_to_char(ch, "All triggers removed from room.\r\n");
 		}
 		else if (remove_trigger(SCRIPT(room), arg2)) {
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from room %d by %s.", arg2, GET_ROOM_VNUM(IN_ROOM(ch)), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from room %d by %s", arg2, GET_ROOM_VNUM(IN_ROOM(ch)), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			if (!TRIGGERS(SCRIPT(room))) {
@@ -1853,13 +1853,13 @@ ACMD(do_tdetach) {
 		else if (trigger && !str_cmp(trigger, "all")) {
 			extract_script(victim, MOB_TRIGGER);
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s.", GET_SHORT(victim), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s", GET_SHORT(victim), GET_NAME(ch));
 			}
 			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT(victim));
 		}
 		else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s.", trigger, GET_SHORT(victim), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s", trigger, GET_SHORT(victim), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			if (!TRIGGERS(SCRIPT(victim))) {
@@ -1875,13 +1875,13 @@ ACMD(do_tdetach) {
 		else if (trigger && !str_cmp(trigger, "all")) {
 			extract_script(object, OBJ_TRIGGER);
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from obj %s by %s.", GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from obj %s by %s", GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
 			}
 			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name);
 		}
 		else if (remove_trigger(SCRIPT(object), trigger)) {
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from obj %s by %s.", trigger, GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from obj %s by %s", trigger, GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			if (!TRIGGERS(SCRIPT(object))) {
@@ -1898,13 +1898,13 @@ ACMD(do_tdetach) {
 		else if (trigger && !str_cmp(trigger, "all")) {
 			extract_script(veh, VEH_TRIGGER);
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from vehicle %s by %s.", VEH_SHORT_DESC(veh), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from vehicle %s by %s", VEH_SHORT_DESC(veh), GET_NAME(ch));
 			}
 			msg_to_char(ch, "All triggers removed from %s.\r\n", VEH_SHORT_DESC(veh));
 		}
 		else if (remove_trigger(SCRIPT(veh), trigger)) {
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from vehicle %s by %s.", trigger, VEH_SHORT_DESC(veh), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from vehicle %s by %s", trigger, VEH_SHORT_DESC(veh), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			if (!TRIGGERS(SCRIPT(veh))) {

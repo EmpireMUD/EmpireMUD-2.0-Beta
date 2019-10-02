@@ -6312,7 +6312,7 @@ ACMD(do_advance) {
 	send_config_msg(ch, "ok_string");
 
 	if (newlevel < oldlevel)
-		syslog(SYS_LVL, GET_INVIS_LEV(ch), TRUE, "LVL: %s demoted %s from level %d to %d.", GET_NAME(ch), GET_NAME(victim), oldlevel, newlevel);
+		syslog(SYS_LVL, GET_INVIS_LEV(ch), TRUE, "LVL: %s demoted %s from level %d to %d", GET_NAME(ch), GET_NAME(victim), oldlevel, newlevel);
 	else
 		syslog(SYS_LVL, GET_INVIS_LEV(ch), TRUE, "LVL: %s has promoted %s to level %d (from %d)", GET_NAME(ch), GET_NAME(victim), newlevel, oldlevel);
 
@@ -7296,7 +7296,7 @@ ACMD(do_file) {
 
 	/* open the requested file */
 	if (!(req_file = fopen(file_lookup[l].file, "r"))) {
-		syslog(SYS_ERROR, GET_INVIS_LEV(ch), TRUE, "SYSERR: Error opening file %s using 'file' command.", file_lookup[l].file);
+		syslog(SYS_ERROR, GET_INVIS_LEV(ch), TRUE, "SYSERR: Error opening file %s using 'file' command", file_lookup[l].file);
 		return;
 	}
 
@@ -8076,7 +8076,7 @@ ACMD(do_playerdelete) {
 	}
 	else {
 		// logs and messaging
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has deleted player %s.", GET_NAME(ch), GET_NAME(victim));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has deleted player %s", GET_NAME(ch), GET_NAME(victim));
 		if (!file) {
 			if (!GET_INVIS_LEV(victim)) {
 				act("$n has left the game.", TRUE, victim, FALSE, FALSE, TO_ROOM);
@@ -8185,7 +8185,7 @@ ACMD(do_purge) {
 			act("$n disintegrates $N.", FALSE, ch, 0, vict, TO_NOTVICT);
 
 			if (!REAL_NPC(vict)) {
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged %s.", GET_NAME(ch), GET_NAME(vict));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged %s", GET_NAME(ch), GET_NAME(vict));
 				SAVE_CHAR(vict);
 				if (vict->desc) {
 					STATE(vict->desc) = CON_CLOSE;
@@ -9434,7 +9434,7 @@ ACMD(do_unquest) {
 		}
 		else {	// ch != vict
 			if (found) {
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has removed [%d] %s from %s's quest lists.", GET_NAME(ch), QUEST_VNUM(quest), QUEST_NAME(quest), GET_NAME(vict));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has removed [%d] %s from %s's quest lists", GET_NAME(ch), QUEST_VNUM(quest), QUEST_NAME(quest), GET_NAME(vict));
 				msg_to_char(ch, "You remove [%d] %s from %s's quest lists.\r\n", QUEST_VNUM(quest), QUEST_NAME(quest), PERS(vict, ch, TRUE));
 			}
 			else {
@@ -10013,12 +10013,12 @@ ACMD(do_wizutil) {
 		switch (subcmd) {
 			case SCMD_NOTITLE:
 				result = ((TOGGLE_BIT(GET_ACCOUNT(vict)->flags, ACCT_NOTITLE)) & ACCT_NOTITLE);
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: Notitle %s for %s by %s.", ONOFF(result), GET_NAME(vict), GET_NAME(ch));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: Notitle %s for %s by %s", ONOFF(result), GET_NAME(vict), GET_NAME(ch));
 				msg_to_char(ch, "Notitle %s for %s.\r\n", ONOFF(result), GET_NAME(vict));
 				break;
 			case SCMD_MUTE:
 				result = ((TOGGLE_BIT(GET_ACCOUNT(vict)->flags, ACCT_MUTED)) & ACCT_MUTED);
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: Mute %s for %s by %s.", ONOFF(result), GET_NAME(vict), GET_NAME(ch));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: Mute %s for %s by %s", ONOFF(result), GET_NAME(vict), GET_NAME(ch));
 				msg_to_char(ch, "Mute %s for %s.\r\n", ONOFF(result), GET_NAME(vict));
 				break;
 			case SCMD_FREEZE:
@@ -10034,14 +10034,14 @@ ACMD(do_wizutil) {
 				send_to_char("A bitter wind suddenly rises and drains every erg of heat from your body!\r\nYou feel frozen!\r\n", vict);
 				send_to_char("Frozen.\r\n", ch);
 				act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM);
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s frozen by %s.", GET_NAME(vict), GET_NAME(ch));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s frozen by %s", GET_NAME(vict), GET_NAME(ch));
 				break;
 			case SCMD_THAW:
 				if (!ACCOUNT_FLAGGED(vict, ACCT_FROZEN)) {
 					send_to_char("Sorry, your victim is not morbidly encased in ice at the moment.\r\n", ch);
 					return;
 				}
-				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s un-frozen by %s.", GET_NAME(vict), GET_NAME(ch));
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s un-frozen by %s", GET_NAME(vict), GET_NAME(ch));
 				REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n", vict);
 				send_to_char("Thawed.\r\n", ch);
