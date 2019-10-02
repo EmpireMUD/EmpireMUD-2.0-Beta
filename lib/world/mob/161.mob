@@ -9,7 +9,7 @@ D
    This serpentine monster can't be seen properly as a majority of its body is
 still under the water. All you can properly see is its head, or is that heads?
 ~
-I 0 16150 1.00 1  # BUTCHER: an in-tact hydra tongue
+I 0 16150 5.00 1  # BUTCHER: an in-tact hydra tongue
 I 0 16108 80.00 1 b  # BUTCHER: a massive hydra bone
 I 0 16108 20.00 2 b  # BUTCHER: a massive hydra bone
 I 0 16109 60.00 1 f  # BUTCHER: a hydra fang
