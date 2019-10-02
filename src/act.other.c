@@ -2764,7 +2764,7 @@ ACMD(do_quit) {
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}
-		syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has quit the game.", GET_NAME(ch));
+		syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has quit the game at %s.", GET_NAME(ch), IN_ROOM(ch) ? room_log_identifier(IN_ROOM(ch)) : "an unknown location");
 		if (GET_INVIS_LEV(ch) == 0) {
 			if (config_get_bool("public_logins")) {
 				mortlog("%s has left the game", PERS(ch, ch, 1));
