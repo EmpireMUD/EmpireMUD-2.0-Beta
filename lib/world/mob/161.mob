@@ -9,9 +9,9 @@ D
    This serpentine monster can't be seen properly as a majority of its body is
 still under the water. All you can properly see is its head, or is that heads?
 ~
-I 0 16108 65.00 1 b  # BUTCHER: a massive hydra bone
-I 0 16108 30.00 2 b  # BUTCHER: a massive hydra bone
-I 0 16108 5.00 3 b  # BUTCHER: a massive hydra bone
+I 0 16150 5.00 1  # BUTCHER: an in-tact hydra tongue
+I 0 16108 80.00 1 b  # BUTCHER: a massive hydra bone
+I 0 16108 20.00 2 b  # BUTCHER: a massive hydra bone
 I 0 16109 60.00 1 f  # BUTCHER: a hydra fang
 I 0 16109 10.00 3 f  # BUTCHER: a hydra fang
 I 0 16109 5.00 4 f  # BUTCHER: a hydra fang
@@ -44,7 +44,7 @@ D
 leading back to the bulk of the hydra. As the waves swell they seem to pass
 straight through this particular head.
 ~
-T 16105
+T 16102
 S
 #16102
 head vicious~

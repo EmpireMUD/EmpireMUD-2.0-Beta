@@ -26,4 +26,51 @@ single central strip of floor acts as walkway.
 F
 d
 S
+#16108
+Oceanic Tower~
+An Oceanic Tower~
+&T'TT'~
+24 0 blpR 0
+0 0 0 -1
+C
+upgrade~
+D
+   This is a well-constructed guard tower, anchored by long hydra bones. It is
+tall, allowing it to see over most buildings and structures. The tower shoots
+at any unescorted trespassers it sees. The tower is made from bone, so it is
+not well protected against invasion. Hopefully, it will be enough defense. The
+tower may be upgraded by typing upgrade here.
+~
+F
+j
+M
+251 5.00 ce
+R
+16 1 1 1048576
+R
+19 1 1 0
+U
+0 16109
+S
+#16109
+Advanced Oceanic Tower~
+An Advanced Oceanic Tower~
+&T"TT"~
+64 5 blRU 0
+0 0 0 -1
+D
+   This is a well-constructed guard tower, anchored by long hydra bones. It is
+tall, allowing it to see over most buildings and structures. The tower shoots
+at any unescorted trespassers it sees. The tower is made from bone, so it is
+not well protected against invasion. Hopefully, it will be enough defense.
+~
+F
+j
+M
+251 5.00 ce
+R
+16 1 1 1048576
+R
+19 1 1 0
+S
 $
