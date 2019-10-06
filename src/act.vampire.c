@@ -676,7 +676,7 @@ ACMD(do_bite) {
 		check_scaling(victim, ch);
 		
 		// cases where the player gets a full blood-drinking bite for free
-		if (!AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && (!AWAKE(victim) || (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_BOTHERABLE)) || IS_INJURED(victim, INJ_TIED | INJ_STAKED) || GET_HEALTH(victim) > MAX(5, GET_MAX_HEALTH(victim)/20))) {
+		if (!AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && (!AWAKE(victim) || (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_BOTHERABLE)) || IS_INJURED(victim, INJ_TIED | INJ_STAKED) || GET_HEALTH(victim) < MAX(5, GET_MAX_HEALTH(victim)/20))) {
 			free_bite = TRUE;
 		}
 		
