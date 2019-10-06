@@ -341,10 +341,15 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 		act("$n grasps $N's wrist and bites into it.", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("$n grasps your wrist and bites into it.", FALSE, ch, 0, victim, TO_VICT);
 	}
-	else {
+	else if (GET_HEALTH(victim) > 0 || !AWAKE(victim)) {
 		act("You lunge at $N, grasping onto $S neck and biting into it vigorously!", FALSE, ch, 0, victim, TO_CHAR);
 		act("$n lunges at $N, grasping onto $S neck and biting into it vigorously!", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("$n lunges at you... $e grasps onto your neck and bites into it!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
+	}
+	else {	// probably dead or asleep
+		act("You grasp onto $N and bite deep into $S neck!", FALSE, ch, 0, victim, TO_CHAR);
+		act("$n grasps onto $N and bites deep into $S neck!", FALSE, ch, 0, victim, TO_NOTVICT);
+		act("$n grasps onto you and bites deep into your neck!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 	}
 }
 
