@@ -623,7 +623,7 @@ ACMD(do_bite) {
 	void perform_social(char_data *ch, social_data *soc, char *argument);
 	
 	bool attacked = FALSE, free_bite = FALSE, in_combat = FALSE;
-	char_data *victim, *ch_iter;
+	char_data *victim = NULL, *ch_iter;
 	struct affected_type *af;
 	social_data *soc;
 	int success;
@@ -650,9 +650,10 @@ ACMD(do_bite) {
 	}
 	else if (GET_ACTION(ch) != ACT_SIRING && GET_ACTION(ch) != ACT_NONE)
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
-	else if (!*arg)
+	else if (!*arg && !(victim = FIGHTING(ch))) {
 		msg_to_char(ch, "Bite whom?\r\n");
-	else if (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM))))
+	}
+	else if (!victim && subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM))))
 		send_config_msg(ch, "no_person");
 	else if (ch == victim)
 		msg_to_char(ch, "That seems a bit redundant...\r\n");
