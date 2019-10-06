@@ -622,7 +622,7 @@ ACMD(do_bite) {
 	extern social_data *find_social(char_data *ch, char *name, bool exact);
 	void perform_social(char_data *ch, social_data *soc, char *argument);
 	
-	bool free_bite = FALSE, in_combat = FALSE;
+	bool attacked = FALSE, free_bite = FALSE, in_combat = FALSE;
 	char_data *victim, *ch_iter;
 	struct affected_type *af;
 	social_data *soc;
@@ -704,6 +704,7 @@ ACMD(do_bite) {
 		
 		// attack version
 		if (in_combat || !free_bite) {
+			attacked = TRUE;
 			success = IS_SPECIALTY_ABILITY(ch, ABIL_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
 			
 			if (success) {
@@ -726,7 +727,7 @@ ACMD(do_bite) {
 		//	- does that happen in damage() or die() instead?
 		
 		// actually drink the blood
-		if (!GET_FEEDING_FROM(ch)) {
+		if (!attacked && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim) && !IS_DEAD(victim)) {
 			start_drinking_blood(ch, victim);
 		}
 	}
