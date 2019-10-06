@@ -2901,6 +2901,7 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
+	void start_drinking_blood(char_data *ch, char_data *victim);
 	extern const struct wear_data_type wear_data[NUM_WEARS];
 	
 	struct instance_data *inst;
@@ -3099,8 +3100,16 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 
 	/* Uh oh.  Victim died. */
 	if (GET_POS(victim) == POS_DEAD) {
-		perform_execute(ch, victim, attacktype, damtype);
-		return -1;
+		if (attacktype == ATTACK_VAMPIRE_BITE && ch != victim && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim)) {
+			GET_HEALTH(victim) = 0;
+			GET_POS(victim) = POS_STUNNED;
+			start_drinking_blood(ch, victim);
+			// fall through to return dam below
+		}
+		else {
+			perform_execute(ch, victim, attacktype, damtype);
+			return -1;
+		}
 	}
 	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
 		// SHOULD this also remove DoTs etc? -paul 5/6/2017

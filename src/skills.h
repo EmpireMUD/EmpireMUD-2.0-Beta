@@ -337,7 +337,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ATTACK_SUNBURN			(TYPE_SUFFERING + 6)
 #define ATTACK_POISON			(TYPE_SUFFERING + 7)
 	#define ATTACK_CREO_IGNEM		(TYPE_SUFFERING + 8)
-#define ATTACK_BITE				(TYPE_SUFFERING + 9)
+#define ATTACK_VAMPIRE_BITE		(TYPE_SUFFERING + 9)
 #define ATTACK_LIGHTNINGBOLT	(TYPE_SUFFERING + 10)	// 60
 #define ATTACK_PHYSICAL_DOT		(TYPE_SUFFERING + 11)
 #define ATTACK_BACKSTAB			(TYPE_SUFFERING + 12)

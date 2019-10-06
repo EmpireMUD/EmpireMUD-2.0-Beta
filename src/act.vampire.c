@@ -708,15 +708,17 @@ ACMD(do_bite) {
 			success = IS_SPECIALTY_ABILITY(ch, ABIL_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
 			
 			if (success) {
-				damage(ch, victim, GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch), ATTACK_BITE, DAM_PHYSICAL);
+				damage(ch, victim, GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
 			}
 			else {
-				damage(ch, victim, 0, ATTACK_BITE, DAM_PHYSICAL);
+				damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
 			}
 			
 			// reduce DODGE
-			af = create_mod_aff(ATYPE_BITE_PENALTY, 1, APPLY_DODGE, -GET_DODGE(ch), ch);
-			affect_join(ch, af, 0);
+			if (GET_DODGE(ch) > 0) {
+				af = create_mod_aff(ATYPE_BITE_PENALTY, 1, APPLY_DODGE, -GET_DODGE(ch), ch);
+				affect_join(ch, af, 0);
+			}
 			
 			if (can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_BITE, 15);
