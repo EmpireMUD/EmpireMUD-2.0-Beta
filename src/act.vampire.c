@@ -658,7 +658,7 @@ ACMD(do_bite) {
 	else if (!*arg && !(victim = FIGHTING(ch))) {
 		msg_to_char(ch, "Bite whom?\r\n");
 	}
-	else if (!victim && subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM))))
+	else if (!victim && (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))))
 		send_config_msg(ch, "no_person");
 	else if (ch == victim)
 		msg_to_char(ch, "That seems a bit redundant...\r\n");
