@@ -78,11 +78,10 @@ your blood points. This WILL kill your victim, so use it cautiously. Of course,
 you could always stop before your victim dies.
 
 You can use "toggle bother" to turn on and off no-bother. If you are no-bother,
-vampires cannot bite you without permissions.
+vampires cannot bite you unless you are in a situation where they could attack
+you.
 
-To bite an NPC or a player who hasn't toggled "bother", you must first knock
-them out in combat. You can "toggle autokill" to stop yourself from killing
-them instead, and then bite them when they are knocked out or very injured.
+Non-vampires can use this command, too, but will only pretend to bite.
 
 Example:
   > bite wolf
