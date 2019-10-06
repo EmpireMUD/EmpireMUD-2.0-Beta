@@ -37,12 +37,34 @@ extern obj_data *die(char_data *ch, char_data *killer);
 void end_morph(char_data *ch);
 
 // locals
+bool cancel_biting(char_data *ch);
 bool check_vampire_sun(char_data *ch, bool message);
-ACMD(do_bite);
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Cancels vampire feeding, if happening.
+*
+* @param char_data *ch The vampire who's biting someone.
+* @return bool TRUE if biting was canceled; FALSE if nobody was biting.
+*/
+bool cancel_biting(char_data *ch) {
+	char_data *vict;
+	
+	if (ch && (vict = GET_FEEDING_FROM(ch))) {
+		act("You stop feeding from $N.", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n stops feeding from you.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n stops feeding from $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
+		GET_FED_ON_BY(vict) = NULL;
+		GET_FEEDING_FROM(ch) = NULL;
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
 
 /**
 * Attempts to cancel the vampire powers that require upkeeps, e.g. upon
@@ -111,9 +133,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 * @param char_data *ch The acting player
 */
 void cancel_siring(char_data *ch) {
-	if (GET_FEEDING_FROM(ch)) {
-		do_bite(ch, "", 0, 0);
-	}
+	cancel_biting(ch);
 }
 
 
@@ -440,7 +460,7 @@ void update_biting_char(char_data *ch) {
 			// give back a little blood
 			GET_BLOOD(victim) = 1;
 			GET_BLOOD(ch) -= 1;
-			do_bite(ch, "", 0, 0);
+			cancel_biting(ch);
 			return;
 		}
 
@@ -562,23 +582,29 @@ void update_vampire_sun(char_data *ch) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_bite) {
+	// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
 	extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
+	extern social_data *find_social(char_data *ch, char *name, bool exact);
+	void perform_social(char_data *ch, social_data *soc, char *argument);
 
 	char_data *victim, *ch_iter;
+	social_data *soc;
 	int success;
 	bool found;
 
 	one_argument(argument, arg);
 
-	if (GET_FEEDING_FROM(ch)) {
-		act("You stop feeding from $N.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_CHAR);
-		act("$n stops feeding from you.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_VICT);
-		act("$n stops feeding from $N.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_NOTVICT);
-		GET_FED_ON_BY(GET_FEEDING_FROM(ch)) = NULL;
-		GET_FEEDING_FROM(ch) = NULL;
+	if (cancel_biting(ch)) {
+		// sends own message
 	}
 	else if (!IS_VAMPIRE(ch)) {
-		send_config_msg(ch, "must_be_vampire");
+		if ((soc = find_social(ch, "bite", TRUE))) {
+			// perform a bite social if possible (pass through args)
+			perform_social(ch, soc, argument);
+		}
+		else {	// social not available?
+			send_config_msg(ch, "must_be_vampire");
+		}
 	}
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "Nope.\r\n");
