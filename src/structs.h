@@ -2174,6 +2174,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_TAME  58	// can tame animals
 #define PTECH_BITE_MELEE_UPGRADE  59	// melee features of 'bite'
 #define PTECH_BITE_TANK_UPGRADE  60	// tank features of 'bite'
+#define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

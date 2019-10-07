@@ -369,16 +369,18 @@ See also: BITE
 Savage Bite (Vampire ability)
 
 Your 'bite' becomes more dangerous in combat, with effects that depend on what
-group role you're in.
+group role you're in. All roles will steal a small amount of blood with each
+bite.
 
 Melee/Solo role:
 - Bite never "taunts" the target to focus on you (instead of 33% chance).
+- Applies a DoT effect that stacks higher based on your level.
 
 Tank/Solo role:
 - There is no dodge penalty.
 - Bite always "taunts" the target to focus on you. (Tank role only)
 
-See also: BITE
+See also: BITE, DOT
 #
 SIRE SIRING
 

@@ -645,7 +645,7 @@ ACMD(do_bite) {
 	char_data *victim = NULL, *ch_iter;
 	struct affected_type *af;
 	social_data *soc;
-	int result, success;
+	int result, stacks, success;
 
 	one_argument(argument, arg);
 
@@ -751,6 +751,18 @@ ACMD(do_bite) {
 				perform_rescue(ch, FIGHTING(victim), victim);
 			}
 			
+			// melee DoT effect
+			if (melee && result > 0) {
+				stacks = get_approximate_level(ch) / 50;
+				apply_dot_effect(victim, ATYPE_BITE, 3, DAM_PHYSICAL, 8, MAX(1, stacks), ch);
+			}
+			
+			// steal blood effect
+			if (has_player_tech(ch, PTECH_BITE_STEAL_BLOOD) && result > 0 && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FED_ON_BY(victim)) {
+				GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + 2);
+				GET_BLOOD(victim) = MAX(1, GET_BLOOD(victim) - 2);
+			}
+			
 			if (can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_BITE, 10);
 				if (melee) {
@@ -766,7 +778,7 @@ ACMD(do_bite) {
 		//	- does that happen in damage() or die() instead?
 		
 		// actually drink the blood
-		if (!attacked && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim) && !IS_DEAD(victim)) {
+		if (!attacked && !GET_FEEDING_FROM(ch) && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && IN_ROOM(ch) == IN_ROOM(victim) && !IS_DEAD(victim)) {
 			start_drinking_blood(ch, victim);
 		}
 	}
