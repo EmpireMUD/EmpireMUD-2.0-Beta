@@ -503,6 +503,13 @@ dispirit~
 T0
 Your wits return.~
 S
+#3070
+bite~
+4 0
+0 0 0 0
+T0
+You're no longer bleeding from the bite wound.~
+S
 #3072
 shadowlash~
 4 0
