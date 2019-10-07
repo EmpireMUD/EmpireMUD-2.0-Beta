@@ -69,7 +69,7 @@ BITE
 
 Bite (Vampire ability)
 
-Usage:  bite <target> 
+Usage:  bite [target]
 Cooldown:  12 seconds
 
 A vampire is only as good as the blood it drinks. Use this command to bite a
@@ -367,6 +367,8 @@ See also: BITE
 "SAVAGE BITE"
 
 Savage Bite (Vampire ability)
+
+Usage:  bite [target]
 
 Your 'bite' becomes more dangerous in combat, with effects that depend on what
 group role you're in. All roles will steal a small amount of blood with each
