@@ -747,7 +747,7 @@ ACMD(do_bite) {
 			}
 			
 			// 33% chance of taunting npcs
-			if (!melee && !IS_DEAD(victim) && IS_NPC(victim) && FIGHTING(victim) && FIGHTING(victim) != ch && (tank || !number(0, 2))) {
+			if (!melee && result > 0 && !IS_DEAD(victim) && IS_NPC(victim) && FIGHTING(victim) && FIGHTING(victim) != ch && (tank || !number(0, 2))) {
 				perform_rescue(ch, FIGHTING(victim), victim);
 			}
 			
