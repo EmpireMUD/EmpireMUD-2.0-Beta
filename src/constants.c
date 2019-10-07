@@ -827,6 +827,8 @@ const char *player_tech_types[] = {
 	"Milk",
 	"Shear",
 	"Tame",
+	"Bite-Melee-Upgrade",
+	"Bite-Tank-Upgrade",	// 60
 	"\n"
 };
 

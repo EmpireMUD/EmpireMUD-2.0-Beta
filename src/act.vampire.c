@@ -637,13 +637,15 @@ ACMD(do_bite) {
 	// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
 	extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 	extern social_data *find_social(char_data *ch, char *name, bool exact);
+	void perform_rescue(char_data *ch, char_data *vict, char_data *from);
 	void perform_social(char_data *ch, social_data *soc, char *argument);
 	
 	bool attacked = FALSE, free_bite = FALSE, in_combat = FALSE;
+	bool tank, melee;
 	char_data *victim = NULL, *ch_iter;
 	struct affected_type *af;
 	social_data *soc;
-	int success;
+	int result, success;
 
 	one_argument(argument, arg);
 
@@ -726,24 +728,37 @@ ACMD(do_bite) {
 		
 		// attack version
 		if (in_combat || !free_bite) {
+			melee = (has_player_tech(ch, PTECH_BITE_MELEE_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
+			tank = (has_player_tech(ch, PTECH_BITE_TANK_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
 			attacked = TRUE;
 			success = IS_SPECIALTY_ABILITY(ch, ABIL_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
 			
 			if (success) {
-				damage(ch, victim, GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
+				result = damage(ch, victim, GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
 			}
 			else {
-				damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
+				result = damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
 			}
 			
 			// reduce DODGE
-			if (GET_DODGE(ch) > 0) {
+			if (GET_DODGE(ch) > 0 && !tank) {
 				af = create_mod_aff(ATYPE_BITE_PENALTY, 1, APPLY_DODGE, -GET_DODGE(ch), ch);
 				affect_join(ch, af, 0);
 			}
 			
+			// 33% chance of taunting npcs
+			if (!melee && !IS_DEAD(victim) && IS_NPC(victim) && FIGHTING(victim) && FIGHTING(victim) != ch && (tank || !number(0, 2))) {
+				perform_rescue(ch, FIGHTING(victim), victim);
+			}
+			
 			if (can_gain_exp_from(ch, victim)) {
-				gain_ability_exp(ch, ABIL_BITE, 15);
+				gain_ability_exp(ch, ABIL_BITE, 10);
+				if (melee) {
+					gain_player_tech_exp(ch, PTECH_BITE_MELEE_UPGRADE, 10);
+				}
+				if (tank) {
+					gain_player_tech_exp(ch, PTECH_BITE_TANK_UPGRADE, 10);
+				}
 			}
 		}
 		

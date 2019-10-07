@@ -2172,6 +2172,8 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_MILK  56	// can milk animals (at a stable)
 #define PTECH_SHEAR  57	// can shear animals (at a stable)
 #define PTECH_TAME  58	// can tame animals
+#define PTECH_BITE_MELEE_UPGRADE  59	// melee features of 'bite'
+#define PTECH_BITE_TANK_UPGRADE  60	// tank features of 'bite'
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

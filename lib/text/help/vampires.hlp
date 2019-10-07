@@ -79,7 +79,9 @@ your blood points. This WILL kill your victim, so use it cautiously. Of course,
 you could always stop before your victim dies.
 
 You can also bite as a melee attack in combat. This deals damage based on your
-Strength, but briefly reduces your Dodge by 100%.
+Strength, but briefly reduces your Dodge by 100%. It also has a 33% chance
+to cause the target to change its focus to you, if it was attacking someone
+else. The Savage Bite ability changes some of these behaviors.
 
 You can use "toggle bother" to turn on and off no-bother. If you are no-bother,
 vampires cannot bite you unless you are in a situation where they could attack
@@ -90,7 +92,8 @@ Non-vampires can use this command, too, but will only pretend to bite.
 Example:
   > bite wolf
 
-See also: ANCIENT BLOOD, SANGUINE RESTORATION, TOGGLE, UNNATURAL THIRST
+See also: SAVAGE BITE, ANCIENT BLOOD, SANGUINE RESTORATION, TOGGLE,
+   UNNATURAL THIRST
 #
 "BLOOD FORTITUDE" FORTITUDE
 
@@ -358,6 +361,22 @@ Blood is life. When drinking blood from a human victim, your health, move, and
 mana will regenerate by 10% per drink.
 
 You will gain experience with this ability when drinking blood.
+
+See also: BITE
+#
+"SAVAGE BITE"
+
+Savage Bite (Vampire ability)
+
+Your 'bite' becomes more dangerous in combat, with effects that depend on what
+group role you're in.
+
+Melee/Solo role:
+- Bite never "taunts" the target to focus on you (instead of 33% chance).
+
+Tank/Solo role:
+- There is no dodge penalty.
+- Bite always "taunts" the target to focus on you. (Tank role only)
 
 See also: BITE
 #
