@@ -468,7 +468,7 @@ void update_biting_char(char_data *ch) {
 	
 	char_data *victim;
 	obj_data *corpse;
-	int amount;
+	int amount, hamt;
 
 	if (!(victim = GET_FEEDING_FROM(ch)))
 		return;
@@ -491,6 +491,18 @@ void update_biting_char(char_data *ch) {
 		amount *= 2;
 	}
 	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
+	
+	// sanguine restoration: 10% heal to h/m/v per drink when biting humans
+	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+		hamt = GET_MAX_HEALTH(ch) / 10;
+		heal(ch, ch, hamt);
+		
+		hamt = GET_MAX_MANA(ch) / 10;
+		GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + hamt);
+		
+		hamt = GET_MAX_MOVE(ch) / 10;
+		GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + hamt);
+	}
 
 	if (GET_BLOOD(victim) <= 0 && GET_ACTION(ch) != ACT_SIRING) {
 		GET_BLOOD(victim) = 0;
