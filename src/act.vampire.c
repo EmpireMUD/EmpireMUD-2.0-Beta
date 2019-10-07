@@ -720,7 +720,6 @@ ACMD(do_bite) {
 		
 		// SUCCESS
 		command_lag(ch, WAIT_COMBAT_ABILITY);
-		add_cooldown(ch, COOLDOWN_BITE, 9);
 		
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
@@ -732,6 +731,9 @@ ACMD(do_bite) {
 			tank = (has_player_tech(ch, PTECH_BITE_TANK_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
 			attacked = TRUE;
 			success = IS_SPECIALTY_ABILITY(ch, ABIL_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
+			
+			// only cools down if it's an attack bite
+			add_cooldown(ch, COOLDOWN_BITE, melee ? 9 : 12);
 			
 			if (success) {
 				result = damage(ch, victim, GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);

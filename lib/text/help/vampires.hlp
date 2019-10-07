@@ -70,7 +70,7 @@ BITE
 Bite (Vampire ability)
 
 Usage:  bite <target> 
-Cooldown:  9 seconds
+Cooldown:  12 seconds
 
 A vampire is only as good as the blood it drinks. Use this command to bite a
 victim and drink their blood. This means that you will suck the blood from
@@ -375,10 +375,11 @@ bite.
 Melee/Solo role:
 - Bite never "taunts" the target to focus on you (instead of 33% chance).
 - Applies a DoT effect that stacks higher based on your level.
+- Cooldown reduced to 9 seconds.
 
 Tank/Solo role:
 - There is no dodge penalty.
-- Bite always "taunts" the target to focus on you. (Tank role only)
+- Bite always "taunts" the target to focus on you (tank role only).
 
 See also: BITE, DOT
 #
