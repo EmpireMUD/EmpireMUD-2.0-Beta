@@ -390,6 +390,12 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define FMODE_WAITING  2	// Fighting someone in ranged combat
 
 
+// Rescue message types
+#define RESCUE_NO_MSG  0
+#define RESCUE_RESCUE  1	// traditional rescue message
+#define RESCUE_FOCUS  2		// mob changes focus
+
+
 // speeds for attack_hit_info.speed
 #define SPD_FAST  0
 #define SPD_NORMAL  1

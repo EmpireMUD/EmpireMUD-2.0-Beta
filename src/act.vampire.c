@@ -637,7 +637,7 @@ ACMD(do_bite) {
 	// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
 	extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 	extern social_data *find_social(char_data *ch, char *name, bool exact);
-	void perform_rescue(char_data *ch, char_data *vict, char_data *from);
+	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
 	void perform_social(char_data *ch, social_data *soc, char *argument);
 	
 	bool attacked = FALSE, free_bite = FALSE, in_combat = FALSE;
@@ -750,7 +750,7 @@ ACMD(do_bite) {
 			
 			// 33% chance of taunting npcs
 			if (!melee && result > 0 && !IS_DEAD(victim) && IS_NPC(victim) && FIGHTING(victim) && FIGHTING(victim) != ch && (tank || !number(0, 2))) {
-				perform_rescue(ch, FIGHTING(victim), victim);
+				perform_rescue(ch, FIGHTING(victim), victim, RESCUE_FOCUS);
 			}
 			
 			// melee DoT effect

@@ -48,11 +48,27 @@ extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 * @param char_data *ch The person who is rescuing...
 * @param char_data *vict The person in need of rescue.
 * @param char_data *from The attacker, who will now hit ch.
+* @param int msg Which RESCUE_ message type to send.
 */
-void perform_rescue(char_data *ch, char_data *vict, char_data *from) {
-	send_to_char("Banzai! To the rescue...\r\n", ch);
-	act("You are rescued by $N!", FALSE, vict, 0, ch, TO_CHAR);
-	act("$n heroically rescues $N!", FALSE, ch, 0, vict, TO_NOTVICT);
+void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg) {
+	switch (msg) {
+		case RESCUE_RESCUE: {
+			send_to_char("Banzai! To the rescue...\r\n", ch);
+			act("You are rescued by $N!", FALSE, vict, 0, ch, TO_CHAR);
+			act("$n heroically rescues $N!", FALSE, ch, 0, vict, TO_NOTVICT);
+			break;
+		}
+		case RESCUE_FOCUS: {
+			act("$N changes $S focus to you!", FALSE, ch, NULL, from, TO_CHAR);
+			act("You change your focus to $n!", FALSE, ch, NULL, from, TO_VICT);
+			act("$N changes $S focus to $n!", FALSE, ch, NULL, from, TO_NOTVICT);
+			break;
+		}
+		default: {	// and RESCUE_NO_MSG
+			// no message
+			break;
+		}
+	}
 	
 	// switch ch to fighting from
 	if (FIGHTING(ch) && FIGHTING(ch) != from) {
@@ -647,7 +663,7 @@ ACMD(do_outrage) {
 				
 				// rescue check
 				if (has_ability(ch, ABIL_RESCUE) && FIGHTING(victim) && !IS_NPC(FIGHTING(victim)) && FIGHTING(victim) != ch && skill_check(ch, ABIL_RESCUE, DIFF_MEDIUM)) {
-					perform_rescue(ch, FIGHTING(victim), victim);
+					perform_rescue(ch, FIGHTING(victim), victim, RESCUE_FOCUS);
 					if (can_gain_exp_from(ch, victim)) {
 						gain_ability_exp(ch, ABIL_RESCUE, 15);
 					}
@@ -691,7 +707,7 @@ ACMD(do_rescue) {
 			}
 
 			charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
-			perform_rescue(ch, FIGHTING(vict), vict);
+			perform_rescue(ch, FIGHTING(vict), vict, RESCUE_RESCUE);
 			if (can_gain_exp_from(ch, vict)) {
 				gain_ability_exp(ch, ABIL_RESCUE, 15);
 			}
@@ -738,7 +754,7 @@ ACMD(do_rescue) {
 	}
 
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_RESCUE, 6, WAIT_COMBAT_ABILITY);
-	perform_rescue(ch, vict, tmp_ch);
+	perform_rescue(ch, vict, tmp_ch, RESCUE_RESCUE);
 	if (can_gain_exp_from(ch, tmp_ch)) {
 		gain_ability_exp(ch, ABIL_RESCUE, 15);
 	}

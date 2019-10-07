@@ -2785,7 +2785,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 * @param char_data *ch The person who needs help!
 */
 void check_auto_assist(char_data *ch) {
-	void perform_rescue(char_data *ch, char_data *vict, char_data *from);
+	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
 	
 	char_data *ch_iter, *next_iter, *iter_master;
 	bool assist;
@@ -2814,7 +2814,7 @@ void check_auto_assist(char_data *ch) {
 		if (MOB_FLAGGED(ch_iter, MOB_CHAMPION) && iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter)) {
 			if (FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
 				// can rescue only in melee
-				perform_rescue(ch_iter, ch, FIGHTING(ch));
+				perform_rescue(ch_iter, ch, FIGHTING(ch), RESCUE_RESCUE);
 			}
 			// else { champion but not in melee? just fall through to the continue
 			continue;
