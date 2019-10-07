@@ -659,6 +659,10 @@ ACMD(do_bite) {
 			send_config_msg(ch, "must_be_vampire");
 		}
 	}
+	else if (GET_POS(ch) < POS_FIGHTING) {
+		// do_bite allows positions as low as sleeping so you can cancel biting, but they can't do anything past here
+		send_low_pos_msg(ch);
+	}
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "Nope.\r\n");
 	}
