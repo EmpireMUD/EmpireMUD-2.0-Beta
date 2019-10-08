@@ -736,7 +736,7 @@ ACMD(do_bite) {
 			add_cooldown(ch, COOLDOWN_BITE, melee ? 9 : 12);
 			
 			if (success) {
-				result = damage(ch, victim, GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
+				result = damage(ch, victim, (2 * GET_STRENGTH(ch)) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
 			}
 			else {
 				result = damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
@@ -756,7 +756,7 @@ ACMD(do_bite) {
 			// melee DoT effect
 			if (melee && result > 0) {
 				stacks = get_approximate_level(ch) / 50;
-				apply_dot_effect(victim, ATYPE_BITE, 3, DAM_PHYSICAL, 8, MAX(1, stacks), ch);
+				apply_dot_effect(victim, ATYPE_BITE, 3, DAM_PHYSICAL, 7, MAX(1, stacks), ch);
 			}
 			
 			// steal blood effect
