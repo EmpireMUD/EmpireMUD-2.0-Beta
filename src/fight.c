@@ -2785,7 +2785,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 * @param char_data *ch The person who needs help!
 */
 void check_auto_assist(char_data *ch) {
-	void perform_rescue(char_data *ch, char_data *vict, char_data *from);
+	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
 	
 	char_data *ch_iter, *next_iter, *iter_master;
 	bool assist;
@@ -2814,7 +2814,7 @@ void check_auto_assist(char_data *ch) {
 		if (MOB_FLAGGED(ch_iter, MOB_CHAMPION) && iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter)) {
 			if (FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
 				// can rescue only in melee
-				perform_rescue(ch_iter, ch, FIGHTING(ch));
+				perform_rescue(ch_iter, ch, FIGHTING(ch), RESCUE_RESCUE);
 			}
 			// else { champion but not in melee? just fall through to the continue
 			continue;
@@ -2901,6 +2901,7 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
+	void start_drinking_blood(char_data *ch, char_data *victim);
 	extern const struct wear_data_type wear_data[NUM_WEARS];
 	
 	struct instance_data *inst;
@@ -3099,8 +3100,16 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 
 	/* Uh oh.  Victim died. */
 	if (GET_POS(victim) == POS_DEAD) {
-		perform_execute(ch, victim, attacktype, damtype);
-		return -1;
+		if (attacktype == ATTACK_VAMPIRE_BITE && ch != victim && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim)) {
+			GET_HEALTH(victim) = 0;
+			GET_POS(victim) = POS_STUNNED;
+			start_drinking_blood(ch, victim);
+			// fall through to return dam below
+		}
+		else {
+			perform_execute(ch, victim, attacktype, damtype);
+			return -1;
+		}
 	}
 	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
 		// SHOULD this also remove DoTs etc? -paul 5/6/2017

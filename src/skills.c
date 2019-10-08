@@ -2595,7 +2595,7 @@ bool audit_skill(skill_data *skill, char_data *ch) {
 		}
 		
 		// verify tree
-		if (skab->prerequisite) {
+		if (skab->prerequisite != NO_ABIL) {
 			if (skab->vnum == skab->prerequisite) {
 				olc_audit_msg(ch, SKILL_VNUM(skill), "Ability %d %s is its own prerequisite", ABIL_VNUM(abil), ABIL_NAME(abil));
 				problem = TRUE;

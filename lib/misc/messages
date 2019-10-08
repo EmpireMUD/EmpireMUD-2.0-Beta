@@ -1169,21 +1169,35 @@ You shoot a bolt of fire at $N, but miss!
 $n shoots a bolt of fire from $s hand, but misses you pathetically!
 $n shoots a bolt of fire from $s hand, but misses $N!
 
-* Bleeding -- THIS IS NOW UNUSED
+* Bite attack (Vampire ability)
 M
  59
-#
-You wince in pain as blood seeps from your deep cuts.
-$N winces in pain as blood seeps from $S deep cuts.
-#
-You wince in pain as blood seeps from your deep cuts.
-$N winces in pain as blood seeps from $S deep cuts.
-#
-You wince in pain as blood seeps from your deep cuts.
-$N winces in pain as blood seeps from $S deep cuts.
-#
-You wince in pain as blood seeps from your deep cuts.
-$N winces in pain as blood seeps from $S deep cuts.
+Your fangs sink into $N's neck...
+You feel $n's fangs sink into your neck...
+$n sinks $s fangs into $N's neck...
+You gnash at $N with your fangs, but miss!
+$n gnashes at you with $s fangs, but you dodge!
+$n gnashes at $N with $s fangs, but misses!
+You lunge at $N and take a bite out of $M with your fangs!
+You shout in pain as $n takes a bite out of you with $s fangs!
+$N shouts in pain as $n takes a bite out of $M with $s fangs!
+Your fangs retreat into your gums as you try -- and fail -- to bite $N!
+$n's fangs retreat into $s gums as $e tries -- and fails -- to bite you!
+$n's fangs retreat into $s gums as $e tries -- and fails -- to bite $N!
+M
+ 59
+Your fangs sink into $N's neck...
+You feel $n's fangs sink into your neck...
+$n sinks $s fangs into $N's neck...
+You gnash at $N with your fangs, but miss!
+$n gnashes at you with $s fangs, but you dodge!
+$n gnashes at $N with $s fangs, but misses!
+You rip a chunk out of $N with your fangs!
+$n rips a chunk out of you with $s fangs!
+$n rips a chunk out of $M with $s fangs!
+Your fangs crack and chip as you try -- and fail -- to bite $N!
+$n's fangs crack and chip as $e tries -- and fails -- to bite you!
+$n's fangs crack and chip as $e tries -- and fails -- to bite $N!
 
 * Lightning Bolt
 M

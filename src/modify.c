@@ -326,7 +326,7 @@ void string_add(descriptor_data *d, char *str) {
 						fputs(stripcr(buf1, *d->str), fl);
 					fclose(fl);
 
-					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s saves '%s'.", GET_NAME(d->character), d->file_storage);
+					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s saves '%s'", GET_NAME(d->character), d->file_storage);
 					SEND_TO_Q("Saved.\r\n", d);
 				}
 			}

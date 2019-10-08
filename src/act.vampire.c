@@ -37,12 +37,34 @@ extern obj_data *die(char_data *ch, char_data *killer);
 void end_morph(char_data *ch);
 
 // locals
+bool cancel_biting(char_data *ch);
 bool check_vampire_sun(char_data *ch, bool message);
-ACMD(do_bite);
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Cancels vampire feeding, if happening.
+*
+* @param char_data *ch The vampire who's biting someone.
+* @return bool TRUE if biting was canceled; FALSE if nobody was biting.
+*/
+bool cancel_biting(char_data *ch) {
+	char_data *vict;
+	
+	if (ch && (vict = GET_FEEDING_FROM(ch))) {
+		act("You stop feeding from $N.", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n stops feeding from you.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n stops feeding from $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
+		GET_FED_ON_BY(vict) = NULL;
+		GET_FEEDING_FROM(ch) = NULL;
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
 
 /**
 * Attempts to cancel the vampire powers that require upkeeps, e.g. upon
@@ -111,9 +133,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 * @param char_data *ch The acting player
 */
 void cancel_siring(char_data *ch) {
-	if (GET_FEEDING_FROM(ch)) {
-		do_bite(ch, "", 0, 0);
-	}
+	cancel_biting(ch);
 }
 
 
@@ -295,6 +315,45 @@ void sire_char(char_data *ch, char_data *victim) {
 }
 
 
+/**
+* Initiates drinking blood. Use cancel_biting() to stop.
+*
+* @param char_data *ch The person doing the biting.
+* @param char_data *victim The person being bitten.
+*/
+void start_drinking_blood(char_data *ch, char_data *victim) {
+	// safety first
+	if (GET_FEEDING_FROM(ch)) {
+		cancel_biting(ch);
+	}
+	if (GET_FED_ON_BY(victim)) {
+		cancel_biting(GET_FED_ON_BY(victim));
+	}
+	
+	GET_FEEDING_FROM(ch) = victim;
+	GET_FED_ON_BY(victim) = ch;
+
+	stop_fighting(ch);
+	stop_fighting(victim);
+
+	if (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_BOTHERABLE)) {
+		act("You grasp $N's wrist and bite into it.", FALSE, ch, 0, victim, TO_CHAR);
+		act("$n grasps $N's wrist and bites into it.", FALSE, ch, 0, victim, TO_NOTVICT);
+		act("$n grasps your wrist and bites into it.", FALSE, ch, 0, victim, TO_VICT);
+	}
+	else if (GET_HEALTH(victim) > 0 || !AWAKE(victim)) {
+		act("You lunge at $N, grasping onto $S neck and biting into it vigorously!", FALSE, ch, 0, victim, TO_CHAR);
+		act("$n lunges at $N, grasping onto $S neck and biting into it vigorously!", FALSE, ch, 0, victim, TO_NOTVICT);
+		act("$n lunges at you... $e grasps onto your neck and bites into it!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
+	}
+	else {	// probably dead or asleep
+		act("You grasp onto $N and bite deep into $S neck!", FALSE, ch, 0, victim, TO_CHAR);
+		act("$n grasps onto $N and bites deep into $S neck!", FALSE, ch, 0, victim, TO_NOTVICT);
+		act("$n grasps onto you and bites deep into your neck!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
+	}
+}
+
+
 // sends the message that a sunlight effect is happening
 void sun_message(char_data *ch) {
 	if (AWAKE(ch)) {
@@ -409,7 +468,7 @@ void update_biting_char(char_data *ch) {
 	
 	char_data *victim;
 	obj_data *corpse;
-	int amount;
+	int amount, hamt;
 
 	if (!(victim = GET_FEEDING_FROM(ch)))
 		return;
@@ -432,6 +491,18 @@ void update_biting_char(char_data *ch) {
 		amount *= 2;
 	}
 	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
+	
+	// sanguine restoration: 10% heal to h/m/v per drink when biting humans
+	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+		hamt = GET_MAX_HEALTH(ch) / 10;
+		heal(ch, ch, hamt);
+		
+		hamt = GET_MAX_MANA(ch) / 10;
+		GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + hamt);
+		
+		hamt = GET_MAX_MOVE(ch) / 10;
+		GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + hamt);
+	}
 
 	if (GET_BLOOD(victim) <= 0 && GET_ACTION(ch) != ACT_SIRING) {
 		GET_BLOOD(victim) = 0;
@@ -440,7 +511,7 @@ void update_biting_char(char_data *ch) {
 			// give back a little blood
 			GET_BLOOD(victim) = 1;
 			GET_BLOOD(ch) -= 1;
-			do_bite(ch, "", 0, 0);
+			cancel_biting(ch);
 			return;
 		}
 
@@ -561,33 +632,51 @@ void update_vampire_sun(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+// has subcmd==1 when sent from do_sire
 ACMD(do_bite) {
+	// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
 	extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
-
-	char_data *victim, *ch_iter;
-	int success;
-	bool found;
+	extern social_data *find_social(char_data *ch, char *name, bool exact);
+	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
+	void perform_social(char_data *ch, social_data *soc, char *argument);
+	
+	bool attacked = FALSE, free_bite = FALSE, in_combat = FALSE;
+	bool tank, melee;
+	char_data *victim = NULL, *ch_iter;
+	struct affected_type *af;
+	social_data *soc;
+	int result, stacks, success;
 
 	one_argument(argument, arg);
 
-	if (GET_FEEDING_FROM(ch)) {
-		act("You stop feeding from $N.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_CHAR);
-		act("$n stops feeding from you.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_VICT);
-		act("$n stops feeding from $N.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_NOTVICT);
-		GET_FED_ON_BY(GET_FEEDING_FROM(ch)) = NULL;
-		GET_FEEDING_FROM(ch) = NULL;
+	if (cancel_biting(ch)) {
+		// sends own message
 	}
 	else if (!IS_VAMPIRE(ch)) {
-		send_config_msg(ch, "must_be_vampire");
+		if ((soc = find_social(ch, "bite", TRUE))) {
+			// perform a bite social if possible (pass through args)
+			perform_social(ch, soc, argument);
+		}
+		else {	// social not available?
+			send_config_msg(ch, "must_be_vampire");
+		}
+	}
+	else if (GET_POS(ch) < POS_FIGHTING) {
+		// do_bite allows positions as low as sleeping so you can cancel biting, but they can't do anything past here
+		send_low_pos_msg(ch);
 	}
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "Nope.\r\n");
 	}
+	else if (get_cooldown_time(ch, COOLDOWN_BITE) > 0) {
+		msg_to_char(ch, "Bite is still on cooldown.\r\n");
+	}
 	else if (GET_ACTION(ch) != ACT_SIRING && GET_ACTION(ch) != ACT_NONE)
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
-	else if (!*arg)
+	else if (!*arg && !(victim = FIGHTING(ch))) {
 		msg_to_char(ch, "Bite whom?\r\n");
-	else if (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM))))
+	}
+	else if (!victim && (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))))
 		send_config_msg(ch, "no_person");
 	else if (ch == victim)
 		msg_to_char(ch, "That seems a bit redundant...\r\n");
@@ -598,69 +687,101 @@ ACMD(do_bite) {
 	else if (IS_DEAD(victim)) {
 		msg_to_char(ch, "Your victim seems to be dead.\r\n");
 	}
-	else if (AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD)) {
-		act("You can't drink blood from $N.", FALSE, ch, NULL, victim, TO_CHAR);
-	}
 	else if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && !can_fight(ch, victim))
 		act("You can't attack $N!", FALSE, ch, 0, victim, TO_CHAR);
 	else if (NOT_MELEE_RANGE(ch, victim)) {
 		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
-	else if (check_scaling(victim, ch) && !PRF_FLAGGED(victim, PRF_BOTHERABLE) && AWAKE(victim) && GET_HEALTH(victim) > MAX(5, GET_MAX_HEALTH(victim)/20)) {
-		// must scale before checking health ^
-		msg_to_char(ch, "You can only bite people who are vulnerable or low on health.\r\n");
+	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_BITE)) {
+		return;
 	}
 	else {
-		// final check: is anybody other than victim fighting me
-		found = FALSE;
-		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter && !found; ch_iter = ch_iter->next_in_room) {
+		// more complex checks before we finish...
+		check_scaling(victim, ch);
+		
+		// cases where the player gets a full blood-drinking bite for free
+		if (!AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && (!AWAKE(victim) || (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_BOTHERABLE)) || IS_INJURED(victim, INJ_TIED | INJ_STAKED) || GET_HEALTH(victim) < MAX(5, GET_MAX_HEALTH(victim)/20))) {
+			free_bite = TRUE;
+		}
+		
+		// is anybody other than victim fighting me (allows attack bite but not free-bite)
+		in_combat = FALSE;
+		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter && !in_combat; ch_iter = ch_iter->next_in_room) {
 			if (ch_iter != victim && FIGHTING(ch_iter) == ch) {
-				found = TRUE;
+				in_combat = TRUE;
 			}
 		}
 		
-		if (found) {
+		// trying to sire? deny in this case
+		if (in_combat && subcmd) {
 			msg_to_char(ch, "You can't do that while someone else is attacking you!\r\n");
+			return;
 		}
-		else {
-			// SUCCESS
-			if (SHOULD_APPEAR(ch))
-				appear(ch);
-
-			/* if the person isn't biteable, gotta roll! */
-			if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && AWAKE(victim) && !IS_INJURED(victim, INJ_TIED | INJ_STAKED)) {
-				success = check_hit_vs_dodge(ch, victim, FALSE);
-
-				if (!success && !MOB_FLAGGED(victim, MOB_ANIMAL)) {
-					act("You lunge at $N, but $E dodges you!", FALSE, ch, 0, victim, TO_CHAR);
-					act("$n lunges at $N, but $E dodges it!", FALSE, ch, 0, victim, TO_NOTVICT);
-					act("$n lunges at you, but you dodge $m!", FALSE, ch, 0, victim, TO_VICT);
-					
-					command_lag(ch, WAIT_COMBAT_ABILITY);
-					if (!FIGHTING(victim)) {
-						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
-					}
-					return;
-				}
-			}
-
-			/* All-clear */
-			GET_FEEDING_FROM(ch) = victim;
-			GET_FED_ON_BY(victim) = ch;
 		
-			stop_fighting(ch);
-			stop_fighting(victim);
-
-			if (!IS_NPC(victim) && PRF_FLAGGED(victim, PRF_BOTHERABLE)) {
-				act("You grasp $N's wrist and bite into it.", FALSE, ch, 0, victim, TO_CHAR);
-				act("$n grasps $N's wrist and bites into it.", FALSE, ch, 0, victim, TO_NOTVICT);
-				act("$n grasps your wrist and bites into it.", FALSE, ch, 0, victim, TO_VICT);
+		// SUCCESS
+		command_lag(ch, WAIT_COMBAT_ABILITY);
+		
+		if (SHOULD_APPEAR(ch)) {
+			appear(ch);
+		}
+		
+		// attack version
+		if (in_combat || !free_bite) {
+			melee = (has_player_tech(ch, PTECH_BITE_MELEE_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
+			tank = (has_player_tech(ch, PTECH_BITE_TANK_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
+			attacked = TRUE;
+			success = IS_SPECIALTY_ABILITY(ch, ABIL_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
+			
+			// only cools down if it's an attack bite
+			add_cooldown(ch, COOLDOWN_BITE, melee ? 9 : 12);
+			
+			if (success) {
+				result = damage(ch, victim, (2 * GET_STRENGTH(ch)) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
 			}
 			else {
-				act("You lunge at $N, grasping onto $S neck and biting into it vigorously!", FALSE, ch, 0, victim, TO_CHAR);
-				act("$n lunges at $N, grasping onto $S neck and biting into it vigorously!", FALSE, ch, 0, victim, TO_NOTVICT);
-				act("$n lunges at you... $e grasps onto your neck and bites into it!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
+				result = damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
 			}
+			
+			// reduce DODGE
+			if (GET_DODGE(ch) > 0 && !tank) {
+				af = create_mod_aff(ATYPE_BITE_PENALTY, 1, APPLY_DODGE, -GET_DODGE(ch), ch);
+				affect_join(ch, af, 0);
+			}
+			
+			// 33% chance of taunting npcs
+			if (!melee && result > 0 && !IS_DEAD(victim) && IS_NPC(victim) && FIGHTING(victim) && FIGHTING(victim) != ch && (tank || !number(0, 2))) {
+				perform_rescue(ch, FIGHTING(victim), victim, RESCUE_FOCUS);
+			}
+			
+			// melee DoT effect
+			if (melee && result > 0) {
+				stacks = get_approximate_level(ch) / 50;
+				apply_dot_effect(victim, ATYPE_BITE, 3, DAM_PHYSICAL, 7, MAX(1, stacks), ch);
+			}
+			
+			// steal blood effect
+			if (has_player_tech(ch, PTECH_BITE_STEAL_BLOOD) && result > 0 && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FED_ON_BY(victim)) {
+				GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + 2);
+				GET_BLOOD(victim) = MAX(1, GET_BLOOD(victim) - 2);
+			}
+			
+			if (can_gain_exp_from(ch, victim)) {
+				gain_ability_exp(ch, ABIL_BITE, 10);
+				if (melee) {
+					gain_player_tech_exp(ch, PTECH_BITE_MELEE_UPGRADE, 10);
+				}
+				if (tank) {
+					gain_player_tech_exp(ch, PTECH_BITE_TANK_UPGRADE, 10);
+				}
+			}
+		}
+		
+		// if this attack would kill them, need to go into blood drinking instead
+		//	- does that happen in damage() or die() instead?
+		
+		// actually drink the blood
+		if (!attacked && !GET_FEEDING_FROM(ch) && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && IN_ROOM(ch) == IN_ROOM(victim) && !IS_DEAD(victim)) {
+			start_drinking_blood(ch, victim);
 		}
 	}
 }
@@ -1243,7 +1364,7 @@ ACMD(do_sire) {
 		sprintf(buf, "%s", GET_NAME(victim));
 		do_bite(ch, buf, 0, 1);
 		
-		if (GET_FEEDING_FROM(ch)) {
+		if (GET_FEEDING_FROM(ch) == victim) {
 			start_action(ch, ACT_SIRING, -1);
 		}
 	}

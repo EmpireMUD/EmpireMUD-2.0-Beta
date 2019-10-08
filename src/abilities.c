@@ -1564,7 +1564,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	
 	// other abils
 	HASH_ITER(hh, ability_table, iter, next_iter) {
-		if (iter != abil && !str_cmp(ABIL_NAME(iter), ABIL_NAME(abil))) {
+		if (iter != abil && ABIL_VNUM(iter) != ABIL_VNUM(abil) && !str_cmp(ABIL_NAME(iter), ABIL_NAME(abil))) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Same name as ability %d", ABIL_VNUM(iter));
 			problem = TRUE;
 		}

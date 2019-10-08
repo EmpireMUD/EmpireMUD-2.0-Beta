@@ -750,7 +750,7 @@ void perform_reboot(void) {
 	*group_data = '\0';
 
 	if (reboot_control.type == SCMD_REBOOT && !(fl = fopen(REBOOT_FILE, "w"))) {
-		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Reboot file not writeable, aborting reboot.");
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Reboot file not writeable, aborting reboot");
 		reboot_control.time = -1;
 		return;
 	}
@@ -1801,18 +1801,18 @@ void close_socket(descriptor_data *d) {
 			act("$n has lost $s link.", TRUE, d->character, 0, 0, TO_ROOM);
 			if (!IS_NPC(d->character)) {
 				SAVE_CHAR(d->character);
-				syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "Closing link to: %s.", GET_NAME(d->character));
+				syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "Closing link to: %s at %s", GET_NAME(d->character), IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
 			}
 			d->character->desc = NULL;
 		}
 		else {
-			syslog(SYS_LOGIN, 0, TRUE, "Losing player: %s.", GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
+			syslog(SYS_LOGIN, 0, TRUE, "Losing player: %s", GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
 			free_char(d->character);
 		}
 	}
 	else {
 		if (config_get_bool("log_losing_descriptor_without_char")) {
-			syslog(SYS_LOGIN, 0, TRUE, "Losing descriptor without char.");
+			syslog(SYS_LOGIN, 0, TRUE, "Losing descriptor without char");
 		}
 	}
 

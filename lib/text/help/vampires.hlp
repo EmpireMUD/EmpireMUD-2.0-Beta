@@ -69,7 +69,8 @@ BITE
 
 Bite (Vampire ability)
 
-Usage:  bite <target> 
+Usage:  bite [target]
+Cooldown:  12 seconds
 
 A vampire is only as good as the blood it drinks. Use this command to bite a
 victim and drink their blood. This means that you will suck the blood from
@@ -77,17 +78,22 @@ your victim until they have no blood remaining. This is vital to replenish
 your blood points. This WILL kill your victim, so use it cautiously. Of course,
 you could always stop before your victim dies.
 
-You can use "toggle bother" to turn on and off no-bother. If you are no-bother,
-vampires cannot bite you without permissions.
+You can also bite as a melee attack in combat. This deals damage based on your
+Strength, but briefly reduces your Dodge by 100%. It also has a 33% chance
+to cause the target to change its focus to you, if it was attacking someone
+else. The Savage Bite ability changes some of these behaviors.
 
-To bite an NPC or a player who hasn't toggled "bother", you must first knock
-them out in combat. You can "toggle autokill" to stop yourself from killing
-them instead, and then bite them when they are knocked out or very injured.
+You can use "toggle bother" to turn on and off no-bother. If you are no-bother,
+vampires cannot bite you unless you are in a situation where they could attack
+you.
+
+Non-vampires can use this command, too, but will only pretend to bite.
 
 Example:
   > bite wolf
 
-See also: ANCIENT BLOOD, SANGUINE RESTORATION, TOGGLE, UNNATURAL THIRST
+See also: SAVAGE BITE, ANCIENT BLOOD, SANGUINE RESTORATION, TOGGLE,
+   UNNATURAL THIRST
 #
 "BLOOD FORTITUDE" FORTITUDE
 
@@ -351,11 +357,33 @@ Gains experience whenever you use this ability.
 
 Sanguine Restoration (Vampire ability)
 
-While drinking blood from a live victim, your rate of regeneration goes up 4x.
+Blood is life. When drinking blood from a human victim, your health, move, and
+mana will regenerate by 10% per drink.
 
 You will gain experience with this ability when drinking blood.
 
 See also: BITE
+#
+"SAVAGE BITE"
+
+Savage Bite (Vampire ability)
+
+Usage:  bite [target]
+
+Your 'bite' becomes more dangerous in combat, with effects that depend on what
+group role you're in. All roles will steal a small amount of blood with each
+bite.
+
+Melee/Solo role:
+- Bite never "taunts" the target to focus on you (instead of 33% chance).
+- Applies a DoT effect that stacks higher based on your level.
+- Cooldown reduced to 9 seconds.
+
+Tank/Solo role:
+- There is no dodge penalty.
+- Bite always "taunts" the target to focus on you (tank role only).
+
+See also: BITE, DOT
 #
 SIRE SIRING
 

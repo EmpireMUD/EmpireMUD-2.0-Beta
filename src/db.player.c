@@ -3140,7 +3140,7 @@ void announce_login(char_data *ch) {
 	descriptor_data *desc;
 	int iter;
 	
-	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has entered the game", GET_NAME(ch));
+	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has entered the game at %s", GET_NAME(ch), IN_ROOM(ch) ? room_log_identifier(IN_ROOM(ch)) : "an unknown location");
 	
 	// auto-notes
 	if (GET_ACCOUNT(ch) && GET_ACCOUNT(ch)->notes) {

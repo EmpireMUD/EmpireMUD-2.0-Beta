@@ -176,6 +176,11 @@ entangle~
 T0
 You are no longer entangled in vines.~
 S
+#3025
+biting~
+4 0
+0 0 0 0
+S
 #3026
 inspire~
 4 0
@@ -497,6 +502,13 @@ dispirit~
 0 0 0 0
 T0
 Your wits return.~
+S
+#3070
+bite~
+4 0
+0 0 0 0
+T0
+You're no longer bleeding from the bite wound.~
 S
 #3072
 shadowlash~

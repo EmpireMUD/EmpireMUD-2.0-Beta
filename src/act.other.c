@@ -400,7 +400,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	old_emp = GET_LOYALTY(old);
 	
 	// prepare logs
-	snprintf(sys, sizeof(sys), "%s used alternate to switch to %s.", GET_NAME(old), GET_NAME(new));
+	snprintf(sys, sizeof(sys), "%s used alternate to switch to %s at %s.", GET_NAME(old), GET_NAME(new), IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location");
 
 	strcpy(temp, PERS(new, new, TRUE));
 	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
@@ -2764,7 +2764,7 @@ ACMD(do_quit) {
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}
-		syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has quit the game.", GET_NAME(ch));
+		syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has quit the game at %s", GET_NAME(ch), IN_ROOM(ch) ? room_log_identifier(IN_ROOM(ch)) : "an unknown location");
 		if (GET_INVIS_LEV(ch) == 0) {
 			if (config_get_bool("public_logins")) {
 				mortlog("%s has left the game", PERS(ch, ch, 1));
@@ -2844,7 +2844,7 @@ ACMD(do_selfdelete) {
 	else {
 		
 		// logs and messaging
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted.", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch));
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch));
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}

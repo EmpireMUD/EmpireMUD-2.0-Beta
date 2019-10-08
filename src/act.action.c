@@ -3375,13 +3375,13 @@ ACMD(do_scrape) {
 
 ACMD(do_stop) {
 	void cancel_action(char_data *ch);
-	ACMD(do_bite);
+	extern bool cancel_biting(char_data *ch);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "No, you stop.\r\n");
 	}
-	else if (GET_FEEDING_FROM(ch)) {
-		do_bite(ch, "", 0, 0);
+	else if (cancel_biting(ch)) {
+		// sends its own message if the player was biting someone
 	}
 	else if (GET_ACTION(ch) == ACT_NONE) {
 		msg_to_char(ch, "You can stop if you want to.\r\n");

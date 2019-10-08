@@ -597,7 +597,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "bash", POS_FIGHTING, do_bash, NO_MIN, CTYPE_COMBAT, ABIL_BASH ),
 	SIMPLE_CMD( "bathe", POS_STANDING, do_bathe, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "beckon", POS_RESTING, do_beckon, NO_MIN, CTYPE_UTIL ),
-	STANDARD_CMD( "bite", POS_FIGHTING, do_bite, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, ABIL_BITE ),
+	STANDARD_CMD( "bite", POS_SLEEPING, do_bite, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "bloodsweat", POS_SLEEPING, do_bloodsweat, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWEAT ),
 	SCMD_CMD( "board", POS_STANDING, do_board, NO_MIN, CTYPE_MOVE, SCMD_BOARD ),
 	ABILITY_CMD( "boost", POS_RESTING, do_boost, NO_MIN, CTYPE_UTIL, ABIL_BOOST ),
@@ -2226,17 +2226,17 @@ int perform_dupe_check(descriptor_data *d) {
 		case RECON:
 			SEND_TO_Q("Reconnecting.\r\n", d);
 			act("$n has reconnected.", TRUE, d->character, 0, 0, TO_ROOM);
-			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
+			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected at %s", GET_NAME(d->character), d->host, IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
 			break;
 		case USURP:
 			SEND_TO_Q("You take over your own body, already in use!\r\n", d);
 			act("$n suddenly keels over in pain, surrounded by a white aura...\r\n"
 				"$n's body has been taken over by a new spirit!", TRUE, d->character, 0, 0, TO_ROOM);
-			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s has re-logged in ... disconnecting old socket.", GET_NAME(d->character));
+			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s has re-logged in at %s ... disconnecting old socket", GET_NAME(d->character), IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
 			break;
 		case UNSWITCH:
 			SEND_TO_Q("Reconnecting to unswitched char.", d);
-			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected.", GET_NAME(d->character), d->host);
+			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has reconnected at %s", GET_NAME(d->character), d->host, IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
 			break;
 	}
 	
@@ -2485,7 +2485,7 @@ void nanny(descriptor_data *d, char *arg) {
 					return;
 				
 				if (!PLR_FLAGGED(d->character, PLR_INVSTART)) {
-					syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has connected.", GET_NAME(d->character), PLR_FLAGGED(d->character, PLR_IPMASK) ? "masked" : d->host);
+					syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has connected", GET_NAME(d->character), PLR_FLAGGED(d->character, PLR_IPMASK) ? "masked" : d->host);
 				}
 
 				// check here if they need more traits than they have (IF they are an existing char?)

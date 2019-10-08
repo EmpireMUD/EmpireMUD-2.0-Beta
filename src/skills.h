@@ -336,8 +336,8 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ATTACK_BASH				(TYPE_SUFFERING + 5)
 #define ATTACK_SUNBURN			(TYPE_SUFFERING + 6)
 #define ATTACK_POISON			(TYPE_SUFFERING + 7)
-#define ATTACK_CREO_IGNEM		(TYPE_SUFFERING + 8)
-	#define ATTACK_UNUSED			(TYPE_SUFFERING + 9)
+	#define ATTACK_CREO_IGNEM		(TYPE_SUFFERING + 8)
+#define ATTACK_VAMPIRE_BITE		(TYPE_SUFFERING + 9)
 #define ATTACK_LIGHTNINGBOLT	(TYPE_SUFFERING + 10)	// 60
 #define ATTACK_PHYSICAL_DOT		(TYPE_SUFFERING + 11)
 #define ATTACK_BACKSTAB			(TYPE_SUFFERING + 12)
@@ -388,6 +388,12 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define FMODE_MELEE  0	// Hand-to-hand combat
 #define FMODE_MISSILE  1	// Ranged combat
 #define FMODE_WAITING  2	// Fighting someone in ranged combat
+
+
+// Rescue message types
+#define RESCUE_NO_MSG  0
+#define RESCUE_RESCUE  1	// traditional rescue message
+#define RESCUE_FOCUS  2		// mob changes focus
 
 
 // speeds for attack_hit_info.speed
