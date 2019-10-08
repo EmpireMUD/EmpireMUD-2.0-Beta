@@ -717,4 +717,21 @@ You high-five yourself smugly.~
 M7
 $n high-fives $mself, looking smug.~
 S
+#245
+bite~
+bite~
+0 8 4
+M0
+Bite whom?~
+M2
+You pretend to bite at $N as if you're a vampire.~
+M3
+$n pretends to bite at $N as if $e's a vampire.~
+M4
+$n pretends to be a vampire and bites at your neck.~
+M5
+You don't see them here.~
+M6
+You can't very well bite yourself.~
+S
 $
