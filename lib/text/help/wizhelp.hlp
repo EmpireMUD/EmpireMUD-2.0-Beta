@@ -959,10 +959,10 @@ skill          PC      MISC         Changes a skill level
 title          PC      STRING       Player's title
 vampire        PC      BINARY       Makes/unmakes vampires
 
-blood          NPC     NUMBER       Maximum blood
-health         NPC     NUMBER       Maximum health
-mana           NPC     NUMBER       Maximum mana
-move           NPC     NUMBER       Maximum moves
+blood          BOTH    NUMBER       Current blood
+health         BOTH    NUMBER       Current health
+mana           BOTH    NUMBER       Current mana
+move           BOTH    NUMBER       Current moves
 
 strength       BOTH    NUMBER       Strength attribute
 dexterity      BOTH    NUMBER       Dexterity attribute

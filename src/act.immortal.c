@@ -1383,10 +1383,10 @@ struct set_struct {
 		{ "notitle",	LVL_START_IMM,	PC, 	BINARY },
 		{ "nocustomize", LVL_START_IMM,	PC,		BINARY },
 
-		{ "health",		LVL_START_IMM, 	NPC, 	NUMBER },
-		{ "move",		LVL_START_IMM, 	NPC, 	NUMBER },
-		{ "mana",		LVL_START_IMM, 	NPC, 	NUMBER },
-		{ "blood",		LVL_START_IMM, 	NPC, 	NUMBER },
+		{ "health",		LVL_START_IMM, 	BOTH, 	NUMBER },
+		{ "move",		LVL_START_IMM, 	BOTH, 	NUMBER },
+		{ "mana",		LVL_START_IMM, 	BOTH, 	NUMBER },
+		{ "blood",		LVL_START_IMM, 	BOTH, 	NUMBER },
 
 		{ "coins",		LVL_START_IMM,	PC,		MISC },
 		{ "frozen",		LVL_START_IMM,	PC, 	BINARY },
