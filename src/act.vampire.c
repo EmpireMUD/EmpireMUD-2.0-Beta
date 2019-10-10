@@ -386,7 +386,7 @@ bool starving_vampire_aggro(char_data *ch) {
 			if (AFF_FLAGGED(ch_iter, AFF_NO_DRINK_BLOOD)) {
 				continue;	// nothing to drink
 			}
-			if (!can_fight(ch, ch_iter)) {
+			if (!CAN_SEE(ch, ch_iter) || !can_fight(ch, ch_iter)) {
 				continue;	// cannot attack
 			}
 			
