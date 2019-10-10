@@ -371,7 +371,7 @@ bool starving_vampire_aggro(char_data *ch) {
 	int backup_found = 0, vict_found = 0;
 	char arg[MAX_INPUT_LENGTH];
 	
-	if (GET_FEEDING_FROM(ch) || IS_DEAD(ch) || GET_POS(ch) < POS_RESTING || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(ch, INJ_TIED | INJ_STAKED) || !IS_VAMPIRE(ch)) {
+	if (IS_IMMORTAL(ch) || GET_FEEDING_FROM(ch) || IS_DEAD(ch) || GET_POS(ch) < POS_RESTING || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(ch, INJ_TIED | INJ_STAKED) || !IS_VAMPIRE(ch)) {
 		return FALSE;	// conditions which will block bite
 	}
 	if (get_cooldown_time(ch, COOLDOWN_BITE) > 0) {
@@ -386,7 +386,7 @@ bool starving_vampire_aggro(char_data *ch) {
 			if (AFF_FLAGGED(ch_iter, AFF_NO_DRINK_BLOOD)) {
 				continue;	// nothing to drink
 			}
-			if (!CAN_SEE(ch, ch_iter) || !can_fight(ch, ch_iter)) {
+			if (!CAN_SEE(ch, ch_iter) || IS_IMMORTAL(ch_iter) || !can_fight(ch, ch_iter)) {
 				continue;	// cannot attack
 			}
 			
