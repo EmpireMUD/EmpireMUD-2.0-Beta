@@ -543,6 +543,7 @@ void real_update_char(char_data *ch) {
 	void do_unseat_from_vehicle(char_data *ch);
 	extern bool fail_daily_quests(char_data *ch);
 	void random_encounter(char_data *ch);
+	extern bool starving_vampire_aggro(char_data *ch);
 	void update_biting_char(char_data *ch);
 	void update_vampire_sun(char_data *ch);
 	
@@ -825,6 +826,9 @@ void real_update_char(char_data *ch) {
 		out_of_blood(ch);
 		return;
 	}
+	else if (IS_BLOOD_STARVED(ch) && !number(0, 5)) {
+		starving_vampire_aggro(ch);
+	}
 	
 	// too-many-followers check
 	fol_count = 0;
@@ -851,7 +855,7 @@ void real_update_char(char_data *ch) {
 			}
 		}
 	}
-
+	
 	random_encounter(ch);
 }
 
