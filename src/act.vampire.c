@@ -423,6 +423,13 @@ bool starving_vampire_aggro(char_data *ch) {
 		}
 	}
 	
+	// message only if not already fighting
+	if (!FIGHTING(ch)) {
+		act("You lunge toward $N as the sound of $S heartbeat overwhelms your senses...", FALSE, ch, NULL, victim, TO_CHAR);
+		act("$n lunges toward you with fiery red eyes and bare fangs...", FALSE, ch, NULL, victim, TO_VICT);
+		act("$n lunges toward $N with fiery red eyes and bare fangs...", FALSE, ch, NULL, victim, TO_NOTVICT);
+	}
+	
 	sprintf(arg, "%c%d", UID_CHAR, char_script_id(victim));
 	do_bite(ch, arg, 0, 0);
 	return TRUE;
