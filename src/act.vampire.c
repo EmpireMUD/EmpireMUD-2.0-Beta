@@ -250,7 +250,8 @@ void make_vampire(char_data *ch, bool lore) {
 			gain_skill(ch, find_skill_by_vnum(SKILL_VAMPIRE), 1);
 		}
 
-		GET_BLOOD(ch) = 30;
+		GET_BLOOD(ch) = config_get_int("blood_starvation_level") * 1.5;
+		GET_BLOOD(ch) = MIN(GET_BLOOD(ch), GET_MAX_BLOOD(ch));
 
 		remove_lore(ch, LORE_START_VAMPIRE);
 		remove_lore(ch, LORE_SIRE_VAMPIRE);
