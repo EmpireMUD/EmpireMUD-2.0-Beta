@@ -481,6 +481,8 @@ Usage:  %mod% <target> <field> <value>
 This command can be used to restring mobs, objects, vehicles, and rooms. You
 MUST use a variable for the target (e.g. %self% or %self.room%).
 
+To remove a modified field, use: %mod% <target> <field> -
+
 Supported fields are:
  Mobs: keywords, longdesc, shortdesc
  Objects: keywords, longdesc, shortdesc

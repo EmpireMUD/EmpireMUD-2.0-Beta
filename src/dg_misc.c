@@ -1217,12 +1217,14 @@ void script_heal(void *thing, int type, char *argument) {
 */
 void script_modify(char *argument) {
 	extern vehicle_data *get_vehicle(char *name);
+	extern bool world_map_needs_save;
 	
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL, *v_proto;
 	char_data *mob = NULL, *m_proto;
 	obj_data *obj = NULL, *o_proto;
 	room_data *room = NULL;
+	bool clear;
 	
 	half_chop(argument, targ_arg, temp);
 	half_chop(temp, field_arg, value);
@@ -1236,6 +1238,9 @@ void script_modify(char *argument) {
 		return;
 	}
 	
+	// this indicates we're clearing a field and setting it back to the prototype
+	clear = !str_cmp(value, "-") || !str_cmp(value, "--");
+	
 	// targetting
 	if ((mob = get_char(targ_arg))) {	// CHARACTER MODE
 		m_proto = IS_NPC(mob) ? mob_proto(GET_MOB_VNUM(mob)) : NULL;
@@ -1248,20 +1253,20 @@ void script_modify(char *argument) {
 			if (GET_PC_NAME(mob) && (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto))) {
 				free(GET_PC_NAME(mob));
 			}
-			GET_PC_NAME(mob) = str_dup(value);
+			GET_PC_NAME(mob) = clear ? (m_proto ? GET_PC_NAME(m_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
 			if (GET_LONG_DESC(mob) && (!m_proto || GET_LONG_DESC(mob) != GET_LONG_DESC(m_proto))) {
 				free(GET_LONG_DESC(mob));
 			}
 			strcat(value, "\r\n");	// required by long descs
-			GET_LONG_DESC(mob) = str_dup(value);
+			GET_LONG_DESC(mob) = clear ? (m_proto ? GET_LONG_DESC(m_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			if (GET_SHORT_DESC(mob) && (!m_proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(m_proto))) {
 				free(GET_SHORT_DESC(mob));
 			}
-			GET_SHORT_DESC(mob) = str_dup(value);
+			GET_SHORT_DESC(mob) = clear ? (m_proto ? GET_SHORT_DESC(m_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else {
 			script_log("%%mod%% called with invalid mob field '%s'", field_arg);
@@ -1274,25 +1279,29 @@ void script_modify(char *argument) {
 			if (GET_OBJ_KEYWORDS(obj) && (!o_proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(o_proto))) {
 				free(GET_OBJ_KEYWORDS(obj));
 			}
-			GET_OBJ_KEYWORDS(obj) = str_dup(value);
+			GET_OBJ_KEYWORDS(obj) = clear ? (o_proto ? GET_OBJ_KEYWORDS(o_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
 			if (GET_OBJ_LONG_DESC(obj) && (!o_proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(o_proto))) {
 				free(GET_OBJ_LONG_DESC(obj));
 			}
-			GET_OBJ_LONG_DESC(obj) = str_dup(value);
+			GET_OBJ_LONG_DESC(obj) = clear ? (o_proto ? GET_OBJ_LONG_DESC(o_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			if (GET_OBJ_SHORT_DESC(obj) && (!o_proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(o_proto))) {
 				free(GET_OBJ_SHORT_DESC(obj));
 			}
-			GET_OBJ_SHORT_DESC(obj) = str_dup(value);
+			GET_OBJ_SHORT_DESC(obj) = clear ? (o_proto ? GET_OBJ_SHORT_DESC(o_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else {
 			script_log("%%mod%% called with invalid obj field '%s'", field_arg);
 		}
 	}
 	else if ((room = get_room(NULL, targ_arg))) {	// ROOM MODE
+		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+			world_map_needs_save = TRUE;
+		}
+		
 		if (SHARED_DATA(room) == &ocean_shared_data) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}
@@ -1300,7 +1309,7 @@ void script_modify(char *argument) {
 			if (ROOM_CUSTOM_NAME(room)) {
 				free(ROOM_CUSTOM_NAME(room));
 			}
-			ROOM_CUSTOM_NAME(room) = str_dup(value);
+			ROOM_CUSTOM_NAME(room) = clear ? NULL : str_dup(value);
 		}
 		else {
 			script_log("%%mod%% called with invalid room field '%s'", field_arg);
@@ -1313,19 +1322,19 @@ void script_modify(char *argument) {
 			if (VEH_KEYWORDS(veh) && (!v_proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(v_proto))) {
 				free(VEH_KEYWORDS(veh));
 			}
-			VEH_KEYWORDS(veh) = str_dup(value);
+			VEH_KEYWORDS(veh) = clear ? (v_proto ? VEH_KEYWORDS(v_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
 			if (VEH_LONG_DESC(veh) && (!v_proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(v_proto))) {
 				free(VEH_LONG_DESC(veh));
 			}
-			VEH_LONG_DESC(veh) = str_dup(value);
+			VEH_LONG_DESC(veh) = clear ? (v_proto ? VEH_LONG_DESC(v_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			if (VEH_SHORT_DESC(veh) && (!v_proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(v_proto))) {
 				free(VEH_SHORT_DESC(veh));
 			}
-			VEH_SHORT_DESC(veh) = str_dup(value);
+			VEH_SHORT_DESC(veh) = clear ? (v_proto ? VEH_SHORT_DESC(v_proto) : str_dup("ERROR")) : str_dup(value);
 		}
 		else {
 			script_log("%%mod%% called with invalid vehicle field '%s'", field_arg);
