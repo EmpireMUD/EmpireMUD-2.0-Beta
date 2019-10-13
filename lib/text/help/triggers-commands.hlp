@@ -474,6 +474,19 @@ Examples:
   * this will award the actor with 10 coins
   nop %actor.give_coins(10)%
 #d
+%MOD% %MODIFY% MMOD MMODIFY OMOD OMODIFY VMOD VMODIFY WMOD WMODIFY
+
+Usage:  %mod% <target> <field> <value>
+
+This command can be used to restring mobs, objects, vehicles, and rooms. You
+MUST use a variable for the target (e.g. %self% or %self.room%).
+
+Supported fields are:
+ Mobs: keywords, longdesc, shortdesc
+ Objects: keywords, longdesc, shortdesc
+ Vehicles: keywords, longdesc, shortdesc
+ Rooms: title
+#d
 %MORPH% MMORPH OMORPH VMORPH WMORPH
 
 Usage:  %morph% <person> <vnum | normal>

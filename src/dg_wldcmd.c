@@ -1211,6 +1211,12 @@ WCMD(do_wload) {
 }
 
 
+WCMD(do_wmod) {
+	void script_modify(char *argument);
+	script_modify(argument);
+}
+
+
 WCMD(do_wmorph) {
 	char tar_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
 	morph_data *morph = NULL;
@@ -1588,6 +1594,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wforce", do_wforce, NO_SCMD },
 	{ "wheal", do_wheal, NO_SCMD },
 	{ "wload", do_wload, NO_SCMD },
+	{ "wmod", do_wmod, NO_SCMD },
 	{ "wmorph", do_wmorph, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },
 	{ "wquest", do_wquest, NO_SCMD },

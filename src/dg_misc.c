@@ -1206,3 +1206,131 @@ void script_heal(void *thing, int type, char *argument) {
 		script_log("%s script_heal: Invalid thing to heal: %s", log_root, what_arg);
 	}
 }
+
+
+/**
+* %mod% <variable> <field> <value>
+*
+* This function allows scripts to modify a mob/object/room/vehicle.
+*
+* @param char *argument Expected to be: <variable> <field> <value>
+*/
+void script_modify(char *argument) {
+	extern vehicle_data *get_vehicle(char *name);
+	
+	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
+	vehicle_data *veh = NULL, *v_proto;
+	char_data *mob = NULL, *m_proto;
+	obj_data *obj = NULL, *o_proto;
+	room_data *room = NULL;
+	
+	half_chop(argument, targ_arg, temp);
+	half_chop(temp, field_arg, value);
+	
+	if (!*targ_arg || !*field_arg || !*value) {
+		script_log("%%mod%% called without %s arguments", (!*targ_arg ? "any" : (!*field_arg ? "field and value" : "value")));
+		return;
+	}
+	if (*targ_arg != UID_CHAR) {
+		script_log("%%mod%% requires a variable for the target, got '%s' instead", targ_arg);
+		return;
+	}
+	
+	// targetting
+	if ((mob = get_char(targ_arg))) {	// CHARACTER MODE
+		m_proto = IS_NPC(mob) ? mob_proto(GET_MOB_VNUM(mob)) : NULL;
+		
+		if (!IS_NPC(mob)) {
+			script_log("%%mod%% cannot target a player");
+		}
+		else if (is_abbrev(field_arg, "keywords")) {
+			if (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto)) {
+				free(GET_PC_NAME(mob));
+			}
+			GET_PC_NAME(mob) = str_dup(value);
+		}
+		else if (is_abbrev(field_arg, "longdescription")) {
+			if (!m_proto || GET_LONG_DESC(mob) != GET_LONG_DESC(m_proto)) {
+				free(GET_LONG_DESC(mob));
+			}
+			GET_LONG_DESC(mob) = str_dup(value);
+		}
+		else if (is_abbrev(field_arg, "shortdescription")) {
+			if (!m_proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(m_proto)) {
+				free(GET_SHORT_DESC(mob));
+			}
+			GET_SHORT_DESC(mob) = str_dup(value);
+		}
+		else {
+			script_log("%%mod%% called with invalid mob field '%s'", field_arg);
+		}
+	}
+	else if ((obj = get_obj(targ_arg))) {	// OBJECT MODE
+		o_proto = obj_proto(GET_OBJ_VNUM(obj));
+		
+		if (is_abbrev(field_arg, "keywords")) {
+			if (!o_proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(o_proto)) {
+				free(GET_OBJ_KEYWORDS(obj));
+			}
+			GET_OBJ_KEYWORDS(obj) = str_dup(value);
+		}
+		else if (is_abbrev(field_arg, "longdescription")) {
+			if (!o_proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(o_proto)) {
+				free(GET_OBJ_LONG_DESC(obj));
+			}
+			GET_OBJ_LONG_DESC(obj) = str_dup(value);
+		}
+		else if (is_abbrev(field_arg, "shortdescription")) {
+			if (!o_proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(o_proto)) {
+				free(GET_OBJ_SHORT_DESC(obj));
+			}
+			GET_OBJ_SHORT_DESC(obj) = str_dup(value);
+		}
+		else {
+			script_log("%%mod%% called with invalid obj field '%s'", field_arg);
+		}
+	}
+	else if ((room = get_room(NULL, targ_arg))) {	// ROOM MODE
+		if (SHARED_DATA(room) == &ocean_shared_data) {
+			script_log("%%mod%% cannot be used on Ocean rooms");
+		}
+		else if (is_abbrev(field_arg, "name") || is_abbrev(field_arg, "title")) {
+			if (ROOM_CUSTOM_NAME(room)) {
+				free(ROOM_CUSTOM_NAME(room));
+			}
+			ROOM_CUSTOM_NAME(room) = str_dup(value);
+		}
+		else {
+			script_log("%%mod%% called with invalid room field '%s'", field_arg);
+		}
+	}
+	else if ((veh = get_vehicle(targ_arg))) {	// VEHICLE MODE
+		v_proto = vehicle_proto(VEH_VNUM(veh));
+		
+		if (is_abbrev(field_arg, "keywords")) {
+			if (!v_proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(v_proto)) {
+				free(VEH_KEYWORDS(veh));
+			}
+			VEH_KEYWORDS(veh) = str_dup(value);
+		}
+		else if (is_abbrev(field_arg, "longdescription")) {
+			if (!v_proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(v_proto)) {
+				free(VEH_LONG_DESC(veh));
+			}
+			VEH_LONG_DESC(veh) = str_dup(value);
+		}
+		else if (is_abbrev(field_arg, "shortdescription")) {
+			if (!v_proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(v_proto)) {
+				free(VEH_SHORT_DESC(veh));
+			}
+			VEH_SHORT_DESC(veh) = str_dup(value);
+		}
+		else {
+			script_log("%%mod%% called with invalid vehicle field '%s'", field_arg);
+		}
+	}
+	else {	// no target?
+		script_log("%%mod%% called with invalid target");
+		return;
+	}
+}
