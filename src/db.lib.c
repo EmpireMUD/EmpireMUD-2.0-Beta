@@ -5687,6 +5687,10 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				else if (strchr("O", reset->command) != NULL) {
 					// 0-arg: nothing to do
 				}
+				else if (strchr("S", reset->command) != NULL) {	// mob custom strings: <string type> <value>
+					skip_spaces(&ptr);
+					reset->sarg1 = strdup(ptr);
+				}
 				else {	// all other types (1-arg?)
 					if (sscanf(ptr, " %d ", &reset->arg1) != 1) {
 						error = TRUE;
@@ -5847,11 +5851,12 @@ void parse_room(FILE *fl, room_vnum vnum) {
 void write_room_to_file(FILE *fl, room_data *room) {
 	extern bool objpack_save_room(room_data *room);
 	
+	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct trig_var_data *tvd;
 	struct affected_type *af;
 	trig_data *trig;
-	char_data *mob;
+	char_data *mob, *m_proto;
 	
 	if (!fl || !room) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_room_to_file called without %s", !fl ? "file" : "room");
@@ -5900,7 +5905,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		}
 		if (ROOM_PEOPLE(room)) {
 			for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
-				if (mob && IS_NPC(mob) && !MOB_FLAGGED(mob, MOB_EMPIRE | MOB_FAMILIAR)) {
+				if (mob && IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING && !MOB_FLAGGED(mob, MOB_EMPIRE | MOB_FAMILIAR)) {
 					// C M vnum flags rope-vnum
 					fprintf(fl, "C M %d %s %d\n", GET_MOB_VNUM(mob), bitv_to_alpha(MOB_FLAGS(mob)), GET_ROPE_VNUM(mob));
 					
@@ -5917,6 +5922,22 @@ void write_room_to_file(FILE *fl, room_data *room) {
 					// C C type time
 					for (cool = mob->cooldowns; cool; cool = cool->next) {
 						fprintf(fl, "C C %d %d\n", cool->type, (int)(cool->expire_time - time(0)));
+					}
+					
+					// C S type string
+					if (mob->customized) {
+						m_proto = mob_proto(GET_MOB_VNUM(mob));
+						if (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto)) {
+							fprintf(fl, "C S keywords %s\n", NULLSAFE(GET_PC_NAME(mob)));
+						}
+						if (!m_proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(m_proto)) {
+							fprintf(fl, "C S short %s\n", NULLSAFE(GET_SHORT_DESC(mob)));
+						}
+						if (!m_proto || GET_LONG_DESC(mob) != GET_LONG_DESC(m_proto)) {
+							strcpy(temp, NULLSAFE(GET_LONG_DESC(mob)));
+							strip_crlf(temp);
+							fprintf(fl, "C S long %s\n", temp);
+						}
 					}
 					
 					if (SCRIPT(mob)) {

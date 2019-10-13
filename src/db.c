@@ -1707,6 +1707,8 @@ void clear_char(char_data *ch) {
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
 	MOB_PURSUIT_LEASH_LOC(ch) = NOWHERE;
 	GET_ROPE_VNUM(ch) = NOTHING;
+	
+	ch->customized = FALSE;
 }
 
 

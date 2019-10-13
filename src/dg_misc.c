@@ -1239,24 +1239,26 @@ void script_modify(char *argument) {
 	// targetting
 	if ((mob = get_char(targ_arg))) {	// CHARACTER MODE
 		m_proto = IS_NPC(mob) ? mob_proto(GET_MOB_VNUM(mob)) : NULL;
+		mob->customized = TRUE;	// triggers string saving
 		
 		if (!IS_NPC(mob)) {
 			script_log("%%mod%% cannot target a player");
 		}
 		else if (is_abbrev(field_arg, "keywords")) {
-			if (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto)) {
+			if (GET_PC_NAME(mob) && (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto))) {
 				free(GET_PC_NAME(mob));
 			}
 			GET_PC_NAME(mob) = str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
-			if (!m_proto || GET_LONG_DESC(mob) != GET_LONG_DESC(m_proto)) {
+			if (GET_LONG_DESC(mob) && (!m_proto || GET_LONG_DESC(mob) != GET_LONG_DESC(m_proto))) {
 				free(GET_LONG_DESC(mob));
 			}
+			strcat(value, "\r\n");	// required by long descs
 			GET_LONG_DESC(mob) = str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
-			if (!m_proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(m_proto)) {
+			if (GET_SHORT_DESC(mob) && (!m_proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(m_proto))) {
 				free(GET_SHORT_DESC(mob));
 			}
 			GET_SHORT_DESC(mob) = str_dup(value);
@@ -1269,19 +1271,19 @@ void script_modify(char *argument) {
 		o_proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		if (is_abbrev(field_arg, "keywords")) {
-			if (!o_proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(o_proto)) {
+			if (GET_OBJ_KEYWORDS(obj) && (!o_proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(o_proto))) {
 				free(GET_OBJ_KEYWORDS(obj));
 			}
 			GET_OBJ_KEYWORDS(obj) = str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
-			if (!o_proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(o_proto)) {
+			if (GET_OBJ_LONG_DESC(obj) && (!o_proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(o_proto))) {
 				free(GET_OBJ_LONG_DESC(obj));
 			}
 			GET_OBJ_LONG_DESC(obj) = str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
-			if (!o_proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(o_proto)) {
+			if (GET_OBJ_SHORT_DESC(obj) && (!o_proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(o_proto))) {
 				free(GET_OBJ_SHORT_DESC(obj));
 			}
 			GET_OBJ_SHORT_DESC(obj) = str_dup(value);
@@ -1308,19 +1310,19 @@ void script_modify(char *argument) {
 		v_proto = vehicle_proto(VEH_VNUM(veh));
 		
 		if (is_abbrev(field_arg, "keywords")) {
-			if (!v_proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(v_proto)) {
+			if (VEH_KEYWORDS(veh) && (!v_proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(v_proto))) {
 				free(VEH_KEYWORDS(veh));
 			}
 			VEH_KEYWORDS(veh) = str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
-			if (!v_proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(v_proto)) {
+			if (VEH_LONG_DESC(veh) && (!v_proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(v_proto))) {
 				free(VEH_LONG_DESC(veh));
 			}
 			VEH_LONG_DESC(veh) = str_dup(value);
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
-			if (!v_proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(v_proto)) {
+			if (VEH_SHORT_DESC(veh) && (!v_proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(v_proto))) {
 				free(VEH_SHORT_DESC(veh));
 			}
 			VEH_SHORT_DESC(veh) = str_dup(value);
