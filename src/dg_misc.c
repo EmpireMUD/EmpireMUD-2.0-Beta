@@ -1217,6 +1217,7 @@ void script_heal(void *thing, int type, char *argument) {
 */
 void script_modify(char *argument) {
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
+	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
 	extern bool world_map_needs_save;
 	
@@ -1304,7 +1305,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
 			}
 			else {
-				sprintf(temp, "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
+				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
 				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
 					free(GET_OBJ_ACTION_DESC(obj));
 				}
@@ -1354,7 +1355,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: description length is too long (%d max)", MAX_ROOM_DESCRIPTION);
 			}
 			else {
-				sprintf(temp, "%s%s\r\n", NULLSAFE(ROOM_CUSTOM_DESCRIPTION(room)), value);
+				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
 				if (ROOM_CUSTOM_DESCRIPTION(room)) {
 					free(ROOM_CUSTOM_DESCRIPTION(room));
 				}
@@ -1397,7 +1398,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: vehicle lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
 			}
 			else {
-				sprintf(temp, "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
+				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
 				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
 					free(VEH_LOOK_DESC(veh));
 				}
