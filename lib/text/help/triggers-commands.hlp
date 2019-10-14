@@ -481,13 +481,17 @@ Usage:  %mod% <target> <field> <value>
 This command can be used to restring mobs, objects, vehicles, and rooms. You
 MUST use a variable for the target (e.g. %self% or %self.room%).
 
-To remove a modified field, use: %mod% <target> <field> -
+To remove a modified field, use a dash: %mod% <target> <field> -
+
+When setting descriptions, use the 'description' field to start the description
+and then the 'append-description' field to add more lines. It will
+automatically format itself.
 
 Supported fields are:
  Mobs: keywords, longdesc, shortdesc
  Objects: keywords, longdesc, shortdesc
  Vehicles: keywords, longdesc, shortdesc
- Rooms: title
+ Rooms: title, description, append-description
 #d
 %MORPH% MMORPH OMORPH VMORPH WMORPH
 

@@ -1216,10 +1216,11 @@ void script_heal(void *thing, int type, char *argument) {
 * @param char *argument Expected to be: <variable> <field> <value>
 */
 void script_modify(char *argument) {
+	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	extern vehicle_data *get_vehicle(char *name);
 	extern bool world_map_needs_save;
 	
-	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
+	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL, *v_proto;
 	char_data *mob = NULL, *m_proto;
 	obj_data *obj = NULL, *o_proto;
@@ -1310,6 +1311,24 @@ void script_modify(char *argument) {
 				free(ROOM_CUSTOM_NAME(room));
 			}
 			ROOM_CUSTOM_NAME(room) = clear ? NULL : str_dup(value);
+		}
+		else if (is_abbrev(field_arg, "description")) {	// SETS the description
+			if (ROOM_CUSTOM_DESCRIPTION(room)) {
+				free(ROOM_CUSTOM_DESCRIPTION(room));
+			}
+			strcat(value, "\r\n");
+			ROOM_CUSTOM_DESCRIPTION(room) = clear ? NULL : str_dup(value);
+			format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		}
+		else if (is_abbrev(field_arg, "append-description")) {	// ADDS TO THE END OF the description
+			if (strlen(NULLSAFE(ROOM_CUSTOM_DESCRIPTION(room))) + strlen(value) + 2 > MAX_ROOM_DESCRIPTION) {
+				script_log("%%mod%% append-description: description length is too long (%d max)", MAX_ROOM_DESCRIPTION);
+			}
+			else {
+				sprintf(temp, "%s%s\r\n", NULLSAFE(ROOM_CUSTOM_DESCRIPTION(room)), value);
+				ROOM_CUSTOM_DESCRIPTION(room) = str_dup(temp);
+				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			}
 		}
 		else {
 			script_log("%%mod%% called with invalid room field '%s'", field_arg);
