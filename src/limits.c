@@ -546,6 +546,7 @@ void real_update_char(char_data *ch) {
 	extern bool starving_vampire_aggro(char_data *ch);
 	void update_biting_char(char_data *ch);
 	void update_vampire_sun(char_data *ch);
+	extern int max_inventory_size;
 	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
@@ -572,6 +573,11 @@ void real_update_char(char_data *ch) {
 	
 	if (!IS_NPC(ch) && IS_RIDING(ch)) {
 		check_should_dismount(ch);
+	}
+	
+	// record maximum global inventory size, for script safety
+	if (!IS_NPC(ch) && CAN_CARRY_N(ch) > max_inventory_size) {
+		max_inventory_size = CAN_CARRY_N(ch);
 	}
 	
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {

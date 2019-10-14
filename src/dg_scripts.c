@@ -6930,6 +6930,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	void obj_command_interpreter(obj_data *obj, char *argument);
 	void vehicle_command_interpreter(vehicle_data *veh, char *argument);
 	void wld_command_interpreter(room_data *room, char *argument);
+	extern int max_inventory_size;
 
 	if (depth > MAX_SCRIPT_DEPTH) {
 		script_log("Triggers recursed beyond maximum allowed depth.");
@@ -7052,9 +7053,8 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 						return ret_val;
 					}
 					*/
-					if (GET_TRIG_LOOPS(trig) >= 300) {
-						script_log("Trigger VNum %d has looped 300 times!!!",
-						GET_TRIG_VNUM(trig));
+					if (GET_TRIG_LOOPS(trig) > MAX(300, max_inventory_size)) {
+						script_log("Trigger VNum %d has looped %d times!!!", GET_TRIG_VNUM(trig), MAX(300, max_inventory_size));
 						break;
 					}
 				}
