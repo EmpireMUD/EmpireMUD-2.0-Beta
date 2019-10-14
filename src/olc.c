@@ -3668,6 +3668,7 @@ OLC_MODULE(olc_save) {
 			case OLC_VEHICLE: {
 				void save_olc_vehicle(descriptor_data *desc);
 				save_olc_vehicle(ch->desc);
+				audit_vehicle(GET_OLC_VEHICLE(ch->desc), ch);
 				free_vehicle(GET_OLC_VEHICLE(ch->desc));
 				GET_OLC_VEHICLE(ch->desc) = NULL;
 				break;
