@@ -5733,6 +5733,7 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - factions
 - globals
 - morphs
+- progress goals
 - quests
 - shops
 - skills

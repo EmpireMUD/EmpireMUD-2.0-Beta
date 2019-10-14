@@ -3121,6 +3121,7 @@ OLC_MODULE(olc_removeindev) {
 	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
 	event_data *event, *next_event;
+	progress_data *prg, *next_prg;
 	faction_data *fct, *next_fct;
 	social_data *soc, *next_soc;
 	augment_data *aug, *next_aug;
@@ -3312,6 +3313,23 @@ OLC_MODULE(olc_removeindev) {
 			REMOVE_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
 			msg_to_char(ch, "Removed IN-DEV flag from morph [%d] %s.\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+			any = TRUE;
+		}
+		
+		HASH_ITER(hh, progress_table, prg, next_prg) {
+			if (PRG_VNUM(prg) < from || PRG_VNUM(prg) > to) {
+				continue;
+			}
+			if (!PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_PROGRESS, PRG_VNUM(prg))) {
+				continue;
+			}
+			
+			REMOVE_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+			msg_to_char(ch, "Removed IN-DEV flag from progress goal [%d] %s.\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 			any = TRUE;
 		}
 		
