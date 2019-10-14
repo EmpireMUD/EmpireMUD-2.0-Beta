@@ -866,11 +866,15 @@ museum for a small gift to help you on your way.
    Curator Horation congratulates you on the progress you've made on your
 journey to becoming a master craftsman.
 ~
-4 0 0 50 -1
+5 0 0 50 -1
 A
 1 10826
 A
 1 10827
+P
+5 10837 0 1 a
+P
+6 10837 0 1 a
 P
 0 10827 0 1 a
 R
@@ -881,6 +885,42 @@ R
 0 0 3
 W
 9 6 0 51
+Z
+1 10826
+Z
+1 10827
+S
+#10837
+A Grandmaster's Journey~
+   Horation seems pleased to meet such a skilled craftsman. His museum may be
+dedicated to the early history of mankind's crafts, but he always likes to
+encourage modern artisans. He's willing to give you one of his infamous
+imperium chisels (+15 to Crafting) if you can craft his design for a mechanical
+clock. He hands you the design for the clock (look at the design to see how to
+make it).
+~
+   Curator Horation takes the mechanical clock to display on the shelf in his
+museum. He congratulates you on the progress you've made on your journey to
+become a grandmaster craftsman.
+~
+8 d 0 100 -1
+A
+1 10826
+A
+1 10827
+P
+9 6 0 75 a
+P
+5 10836 0 1 a
+P
+6 10836 0 1 a
+R
+2 10825 1
+R
+1 -1 100
+T 10837
+W
+2 10838 0 1
 Z
 1 10826
 Z

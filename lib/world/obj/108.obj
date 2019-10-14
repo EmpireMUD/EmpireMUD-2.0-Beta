@@ -19,6 +19,31 @@ M
 9
 $n slides $p proudly onto $s finger.~
 S
+#10801
+ring imperial~
+the imperial ring~
+An imperial ring is lying on the ground.~
+   This oversized gold ring has been forged, carved, and polished by a skilled
+artisan. It is set with a precious gem in the empire's color.
+~
+2 am ab 7
+0 0 0
+4 0
+A
+5 1 0
+A
+5 1 3
+C
+0 50
+M
+8
+You slide $p proudly onto your finger.~
+M
+9
+$n slides $p proudly onto $s finger.~
+T 10803
+T 10804
+S
 #10825
 chisel imperium~
 an imperium chisel~
@@ -38,6 +63,34 @@ You grab $p and hold it proudly in the air.~
 M
 9
 $n grabs $p and holds it proudly in the air.~
+S
+#10837
+design horation's horations clock mechanical~
+Horation's mechanical clock design~
+Horation's design for a mechanical clock is lying here.~
+   This design shows you how to craft a mechanical clock, although you're not
+really sure what that's useful for.
+Usage: craft mechanical clock
+~
+3 0 a 1
+0 0 0
+0 0
+Q 10837
+S
+#10838
+clock mechanical ornate~
+an ornate mechanical clock~
+An ornate mechanical clock is sitting here.~
+   This odd device is what Horation calls a "clock", perhaps in reference to
+the tiny bells at the top that ring out at the start of each hour. The clock
+has an intricately-carved wooden case, and the clock face is inlaid with
+precious metal. Unfortunately, you don't know how to read the clock face and
+cannot use it to determine the time.
+~
+3 e a 1
+0 0 0
+0 0
+Q 10837
 S
 #10850
 portal vibrantly colored soulstream stream~
