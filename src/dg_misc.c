@@ -1242,8 +1242,8 @@ void script_modify(char *argument) {
 	// this indicates we're clearing a field and setting it back to the prototype
 	clear = !str_cmp(value, "-") || !str_cmp(value, "--");
 	
-	// targetting
-	if ((mob = get_char(targ_arg))) {	// CHARACTER MODE
+	// CHARACTER MODE
+	if ((mob = get_char(targ_arg))) {
 		m_proto = IS_NPC(mob) ? mob_proto(GET_MOB_VNUM(mob)) : NULL;
 		mob->customized = TRUE;	// triggers string saving
 		
@@ -1273,7 +1273,8 @@ void script_modify(char *argument) {
 			script_log("%%mod%% called with invalid mob field '%s'", field_arg);
 		}
 	}
-	else if ((obj = get_obj(targ_arg))) {	// OBJECT MODE
+	// OBJECT MODE
+	else if ((obj = get_obj(targ_arg))) {
 		o_proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		if (is_abbrev(field_arg, "keywords")) {
@@ -1288,6 +1289,31 @@ void script_modify(char *argument) {
 			}
 			GET_OBJ_LONG_DESC(obj) = clear ? (o_proto ? GET_OBJ_LONG_DESC(o_proto) : str_dup("ERROR")) : str_dup(value);
 		}
+		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
+			if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
+				free(GET_OBJ_ACTION_DESC(obj));
+			}
+			strcat(value, "\r\n");
+			GET_OBJ_ACTION_DESC(obj) = clear ? (o_proto ? GET_OBJ_ACTION_DESC(o_proto) : str_dup("")) : str_dup(value);
+			if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
+				format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			}
+		}
+		else if (is_abbrev(field_arg, "append-lookdescription")) {	// ADDS TO THE END OF the lookdescription
+			if (strlen(NULLSAFE(GET_OBJ_ACTION_DESC(obj))) + strlen(value) + 2 > MAX_ITEM_DESCRIPTION) {
+				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
+			}
+			else {
+				sprintf(temp, "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
+				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
+					free(GET_OBJ_ACTION_DESC(obj));
+				}
+				GET_OBJ_ACTION_DESC(obj) = str_dup(temp);
+				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
+					format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+				}
+			}
+		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			if (GET_OBJ_SHORT_DESC(obj) && (!o_proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(o_proto))) {
 				free(GET_OBJ_SHORT_DESC(obj));
@@ -1298,7 +1324,8 @@ void script_modify(char *argument) {
 			script_log("%%mod%% called with invalid obj field '%s'", field_arg);
 		}
 	}
-	else if ((room = get_room(NULL, targ_arg))) {	// ROOM MODE
+	// ROOM MODE
+	else if ((room = get_room(NULL, targ_arg))) {
 		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 			world_map_needs_save = TRUE;
 		}
@@ -1328,6 +1355,9 @@ void script_modify(char *argument) {
 			}
 			else {
 				sprintf(temp, "%s%s\r\n", NULLSAFE(ROOM_CUSTOM_DESCRIPTION(room)), value);
+				if (ROOM_CUSTOM_DESCRIPTION(room)) {
+					free(ROOM_CUSTOM_DESCRIPTION(room));
+				}
 				ROOM_CUSTOM_DESCRIPTION(room) = str_dup(temp);
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 			}
@@ -1336,7 +1366,8 @@ void script_modify(char *argument) {
 			script_log("%%mod%% called with invalid room field '%s'", field_arg);
 		}
 	}
-	else if ((veh = get_vehicle(targ_arg))) {	// VEHICLE MODE
+	// VEHICLE MODE
+	else if ((veh = get_vehicle(targ_arg))) {
 		v_proto = vehicle_proto(VEH_VNUM(veh));
 		
 		if (is_abbrev(field_arg, "keywords")) {
@@ -1350,6 +1381,31 @@ void script_modify(char *argument) {
 				free(VEH_LONG_DESC(veh));
 			}
 			VEH_LONG_DESC(veh) = clear ? (v_proto ? VEH_LONG_DESC(v_proto) : str_dup("ERROR")) : str_dup(value);
+		}
+		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
+			if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
+				free(VEH_LOOK_DESC(veh));
+			}
+			strcat(value, "\r\n");
+			VEH_LOOK_DESC(veh) = clear ? (v_proto ? VEH_LOOK_DESC(v_proto) : str_dup("")) : str_dup(value);
+			if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
+				format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			}
+		}
+		else if (is_abbrev(field_arg, "append-lookdescription")) {	// ADDS TO THE END OF the lookdescription
+			if (strlen(NULLSAFE(VEH_LOOK_DESC(veh))) + strlen(value) + 2 > MAX_ITEM_DESCRIPTION) {
+				script_log("%%mod%% append-description: vehicle lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
+			}
+			else {
+				sprintf(temp, "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
+				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
+					free(VEH_LOOK_DESC(veh));
+				}
+				VEH_LOOK_DESC(veh) = str_dup(temp);
+				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
+					format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+				}
+			}
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			if (VEH_SHORT_DESC(veh) && (!v_proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(v_proto))) {
