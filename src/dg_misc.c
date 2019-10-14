@@ -1318,7 +1318,9 @@ void script_modify(char *argument) {
 			}
 			strcat(value, "\r\n");
 			ROOM_CUSTOM_DESCRIPTION(room) = clear ? NULL : str_dup(value);
-			format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			if (ROOM_CUSTOM_DESCRIPTION(room)) {
+				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			}
 		}
 		else if (is_abbrev(field_arg, "append-description")) {	// ADDS TO THE END OF the description
 			if (strlen(NULLSAFE(ROOM_CUSTOM_DESCRIPTION(room))) + strlen(value) + 2 > MAX_ROOM_DESCRIPTION) {
