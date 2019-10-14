@@ -545,6 +545,7 @@ extern bool audit_sector(sector_data *sect, char_data *ch);
 extern bool audit_shop(shop_data *shop, char_data *ch);
 extern bool audit_skill(skill_data *skill, char_data *ch);
 extern bool audit_social(social_data *soc, char_data *ch);
+extern bool audit_trigger(trig_data *trig, char_data *ch);
 extern bool audit_vehicle(vehicle_data *veh, char_data *ch);
 
 // prototypes: show
@@ -609,7 +610,7 @@ extern bool validate_icon(char *icon);
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
 	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
 	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
@@ -1565,21 +1566,15 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
-			/*
 			case OLC_TRIGGER: {
 				trig_data *trig, *next_trig;
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
-						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+						found |= audit_trigger(trig, ch);
 					}
 				}
 				break;
 			}
-			*/
 			case OLC_VEHICLE: {
 				vehicle_data *veh, *next_veh;
 				HASH_ITER(hh, vehicle_table, veh, next_veh) {
@@ -3656,7 +3651,7 @@ OLC_MODULE(olc_save) {
 			case OLC_TRIGGER: {
 				void save_olc_trigger(descriptor_data *desc, char *script_text);
 				save_olc_trigger(ch->desc, GET_OLC_STORAGE(ch->desc));
-				// audit_trigger(GET_OLC_TRIGGER(ch->desc), ch);
+				audit_trigger(GET_OLC_TRIGGER(ch->desc), ch);
 				free_trigger(GET_OLC_TRIGGER(ch->desc));
 				GET_OLC_TRIGGER(ch->desc) = NULL;
 				if (GET_OLC_STORAGE(ch->desc)) {

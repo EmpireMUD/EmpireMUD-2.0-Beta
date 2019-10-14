@@ -64,6 +64,35 @@ const char *default_trig_name = "new trigger";
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Checks for common trigger problems and reports them to ch.
+*
+* @param trig_data *trigger The thing to audit.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_trigger(trig_data *trig, char_data *ch) {
+	struct cmdlist_element *cmd;
+	bool problem = FALSE;
+		
+	if (!str_cmp(GET_TRIG_NAME(trig), default_trig_name)) {
+		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Name not set");
+		problem = TRUE;
+	}
+	
+	// TODO look for a 'percent' type with a 0%
+	
+	LL_FOREACH(trig->cmdlist, cmd) {
+		if (strlen(cmd->cmd) > 255) {
+			olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Trigger has a line longer than 255 characters and won't save properly");
+			problem = TRUE;
+		}
+	}
+	
+	return problem;
+}
+
+
+/**
 * Determines all the argument types to show for the various types of a trigger.
 *
 * @param trig_data *trig The trigger.
