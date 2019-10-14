@@ -660,6 +660,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	struct mappc_data *pc, *next_pc;
 	struct empire_city_data *city;
 	char output[MAX_STRING_LENGTH], veh_buf[256], col_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], rlbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH], advcolbuf[128];
+	char room_name_color[MAX_STRING_LENGTH];
 	int s, t, mapsize, iter, check_x, check_y, level, ter_type;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
@@ -705,6 +706,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// mappc setup
 	CREATE(mappc, struct mappc_data_container, 1);
 	
+	// BASE: room name
+	strcpy(room_name_color, get_room_name(room, TRUE));
+	
 	// put ship in name
 	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(ch)))));
@@ -725,8 +729,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		snprintf(locbuf, sizeof(locbuf), "(unknown)");
 	}
 	
+	// append (Real Name) of a room if the name has been customized and DOESN'T appear in the custom name
 	*rlbuf = '\0';
-	if (ROOM_CUSTOM_NAME(room)) {
+	if (ROOM_CUSTOM_NAME(room) && !str_str(room_name_color, GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)))) {
 		sprintf(rlbuf, " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
 	}
 	
@@ -748,14 +753,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		
-		sprintf(output, "[%d] %s%s%s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), advcolbuf, get_room_name(room, TRUE), veh_buf, rlbuf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
+		sprintf(output, "[%d] %s%s%s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), advcolbuf, room_name_color, veh_buf, rlbuf, locbuf, (SCRIPT(room) ? "[TRIG] " : ""), flagbuf);
 	}
 	else if (HAS_NAVIGATION(ch) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		// need navigation to see coords
-		sprintf(output, "%s%s%s%s %s&0\r\n", advcolbuf, get_room_name(room, TRUE), veh_buf, rlbuf, locbuf);
+		sprintf(output, "%s%s%s%s %s&0\r\n", advcolbuf, room_name_color, veh_buf, rlbuf, locbuf);
 	}
 	else {
-		sprintf(output, "%s%s%s%s&0\r\n", advcolbuf, get_room_name(room, TRUE), rlbuf, veh_buf);
+		sprintf(output, "%s%s%s%s&0\r\n", advcolbuf, room_name_color, rlbuf, veh_buf);
 	}
 
 	// show the room
