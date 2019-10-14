@@ -145,6 +145,13 @@ earthen claws~
 T0
 Your armor is no longer damaged by earthen claws.~
 S
+#12665
+grand fireball~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by the grand fireball.~
+S
 #12666
 firebrand~
 4 0

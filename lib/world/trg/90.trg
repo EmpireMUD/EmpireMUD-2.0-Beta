@@ -694,7 +694,7 @@ switch %effect%
   break
   case 2
     %echo% %self.name% squeaks, and you feel your strength desert you.
-  end
+  break
   case 3
     %echo% %self.name% scratches you with a claw, and you feel fragile.
   break
