@@ -129,7 +129,7 @@ Basic buildings:
   (==) house
   &y.&0[]&y.&0 pueblo
   &y[==]&0 cliffdwelling
-  (&c~~&0) well
+  &t(&c~~&t) well
   &y/&0[]&y\&0 mine
   (FF) forge
   (MM) mill  (must be by a river)
@@ -1346,9 +1346,10 @@ See also: CIRCLE, GATEHOUSE, GREAT WALLS, RITUAL OF DEFENSE
 #
 WELL
 
-(&c~~&0)  Well  (Build ability)
+&t(&c~~&t)  Well  (Build ability)
 
-Wells provide water for your little settlement.
+Wells provide water for your little settlement. They can be built on temperate
+plains or on an oasis in the desert.
 
 See also: DRINK, FILL
 #
