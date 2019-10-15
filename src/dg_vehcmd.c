@@ -409,6 +409,12 @@ VCMD(do_vsend) {
 }
 
 
+VCMD(do_vmod) {
+	void script_modify(char *argument);
+	script_modify(argument);
+}
+
+
 VCMD(do_vmorph) {
 	char tar_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
 	morph_data *morph = NULL;
@@ -1648,6 +1654,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vforce", do_vforce, NO_SCMD },
 	{ "vheal", do_vheal, NO_SCMD },
 	{ "vload", do_dgvload, NO_SCMD },
+	{ "vmod", do_vmod, NO_SCMD },
 	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },
 	{ "vquest", do_vquest, NO_SCMD },

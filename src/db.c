@@ -172,6 +172,7 @@ int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
 bool pause_affect_total = FALSE;	// helps prevent unnecessary calls to affect_total
+int max_inventory_size = 25;	// records how high inventories go right now (for script safety)
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
@@ -1707,6 +1708,8 @@ void clear_char(char_data *ch) {
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
 	MOB_PURSUIT_LEASH_LOC(ch) = NOWHERE;
 	GET_ROPE_VNUM(ch) = NOTHING;
+	
+	ch->customized = FALSE;
 }
 
 

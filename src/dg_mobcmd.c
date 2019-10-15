@@ -839,6 +839,12 @@ ACMD(do_mload) {
 }
 
 
+ACMD(do_mmod) {
+	void script_modify(char *argument);
+	script_modify(argument);
+}
+
+
 ACMD(do_mmorph) {
 	char tar_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
 	morph_data *morph = NULL;

@@ -26,6 +26,48 @@ if %random.3% == 3
   %regionecho% %self.room% 20 %self.name% shouts, 'Learn the Empire skill at the (^^) Royal Planning Office!'
 end
 ~
+#10803
+imperial ring: setup on load~
+1 n 100
+~
+set pers %self.carried_by%
+if %pers%
+  set emp %pers.empire%
+  if %emp%
+    set empire %emp.id%
+    %mod% %self% shortdesc the imperial ring of %emp.name%
+    %mod% %self% longdesc The %emp.adjective% imperial ring is lying here.
+    %mod% %self% keywords ring imperial %emp.name% %emp.adjective%
+    %mod% %self% append-lookdesc It can only be worn by members of %emp.name%.
+  else
+    set empire -1
+  end
+  global empire
+end
+~
+#10804
+imperial ring: bind-to-empire~
+1 j 0
+~
+if !%empire%
+  %send% %actor% %self.shortdesc% can't be used anymore.
+  return 0
+  halt
+end
+makeuid emp %empire%
+if !%emp%
+  %send% %actor% %self.shortdesc% is from a long-lost empire and can no longer be used.
+  return 0
+  halt
+end
+if %actor.empire% != %emp%
+  %send% %actor% Only members of %emp.name% can use %self.shortdesc%.
+  return 0
+  halt
+end
+* success
+return 1
+~
 #10825
 Crier spawn~
 0 n 100
@@ -98,6 +140,12 @@ set boss %actor.master%
 if (%actor.is_npc% && %boss%)
   %teleport% %actor% %boss.room%
 end
+~
+#10837
+Start Grandmaster's Journey~
+2 u 0
+~
+%load% obj 10837 %actor%
 ~
 #10850
 No-see on spawn~

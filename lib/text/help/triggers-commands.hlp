@@ -474,6 +474,27 @@ Examples:
   * this will award the actor with 10 coins
   nop %actor.give_coins(10)%
 #d
+%MOD% %MODIFY% MMOD MMODIFY OMOD OMODIFY VMOD VMODIFY WMOD WMODIFY
+
+Usage:  %mod% <target> <field> <value>
+
+This command can be used to restring mobs, objects, vehicles, and rooms. You
+MUST use a variable for the target (e.g. %self% or %self.room%).
+
+To remove a modified field, use a dash: %mod% <target> <field> -
+
+When setting descriptions, use the 'description' field to start the description
+and then the 'append-description' field to add more lines. It will
+automatically format itself.
+
+Supported fields are:
+ Mobs: keywords, longdesc, shortdesc
+ Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc
+ Vehicles: keywords, longdesc, shortdesc, lookdesc, append-lookdesc
+ Rooms: title, description, append-description
+
+&rWARNING&0: Each line of a script can be no longer than 255 characters.
+#d
 %MORPH% MMORPH OMORPH VMORPH WMORPH
 
 Usage:  %morph% <person> <vnum | normal>

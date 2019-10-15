@@ -4092,6 +4092,7 @@ struct char_data {
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
+	bool customized;	// mob strings need saving if TRUE
 	
 	UT_hash_handle hh;	// mobile_table
 };

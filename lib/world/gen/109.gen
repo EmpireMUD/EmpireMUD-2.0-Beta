@@ -26,11 +26,11 @@ T3
 $n is covered in mud.~
 S
 #10957
-stunned~
+burrow charge~
 4 0
 0 0 0 0
 T0
-You are no longer stunned.~
+You are no longer hard-stunned by the burrow charge.~
 S
 #10958
 swamp breath~

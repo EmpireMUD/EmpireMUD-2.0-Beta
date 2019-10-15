@@ -3806,6 +3806,8 @@ void update_pos(char_data *victim) {
 * @param obj_data *weapon Optional: Which weapon to attack with (NULL means fists)
 */
 void perform_violence_melee(char_data *ch, obj_data *weapon) {
+	extern bool starving_vampire_aggro(char_data *ch);
+	
 	// sanity
 	if (weapon && !IS_WEAPON(weapon)) {
 		weapon = NULL;
@@ -3814,6 +3816,13 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_player_tech(ch, PTECH_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
 		msg_to_char(ch, "You must be alone to use two-handed weapons in the solo role.\r\n");
 		return;
+	}
+	
+	// random chance of this INSTEAD of 'hit' when blood-starved
+	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && IS_BLOOD_STARVED(ch) && !number(0, 5)) {
+		if (starving_vampire_aggro(ch)) {
+			return;
+		}
 	}
 	
 	if (hit(ch, FIGHTING(ch), weapon, TRUE) < 0) {

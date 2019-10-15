@@ -612,7 +612,7 @@ else
   %send% %actor% &r%self.name% bursts from the swampy ground beneath your feet, sending you flying!
   %send% %actor% %self.name% bursts from the swampy ground beneath %actor.name%'s feet, sending %actor.himher% flying!
   %damage% %actor% 200 physical
-  dg_affect #12957 %actor% HARD-STUNNED on 10
+  dg_affect #10957 %actor% HARD-STUNNED on 10
 end
 dg_affect #10959 %self% off
 ~

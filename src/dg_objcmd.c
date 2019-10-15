@@ -599,6 +599,12 @@ OCMD(do_otransform) {
 }
 
 
+OCMD(do_omod) {
+	void script_modify(char *argument);
+	script_modify(argument);
+}
+
+
 OCMD(do_omorph) {
 	char tar_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
 	morph_data *morph = NULL;
@@ -1738,6 +1744,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oheal", do_oheal, NO_SCMD },
 	{ "oload", do_dgoload, NO_SCMD },
+	{ "omod", do_omod, NO_SCMD },
 	{ "omorph", do_omorph, NO_SCMD },
 	{ "oown", do_oown, NO_SCMD },
 	{ "opurge", do_opurge, NO_SCMD },

@@ -5733,6 +5733,7 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - factions
 - globals
 - morphs
+- progress goals
 - quests
 - shops
 - skills
@@ -5961,7 +5962,7 @@ Fields:
   &c-cost&0 - match a specific cost
   &c-flagged&0, &c-unflagged&0 - see HELP PROGEDIT FLAGS
   &c-perks&0 - see HELP PROGEDIT PERKS
-  &c-tasks&0 - see HELP PROGEDIT TASKS
+  &c-tasks&0 - see HELP REQUIREMENTS / HELP PROGEDIT TASKS
   &c-type&0 - see HELP PROGEDIT TYPE
   &c-value&0 - match a specific value
 

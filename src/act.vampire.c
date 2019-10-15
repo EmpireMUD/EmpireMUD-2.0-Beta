@@ -39,6 +39,7 @@ void end_morph(char_data *ch);
 // locals
 bool cancel_biting(char_data *ch);
 bool check_vampire_sun(char_data *ch, bool message);
+ACMD(do_bite);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -249,7 +250,8 @@ void make_vampire(char_data *ch, bool lore) {
 			gain_skill(ch, find_skill_by_vnum(SKILL_VAMPIRE), 1);
 		}
 
-		GET_BLOOD(ch) = 30;
+		GET_BLOOD(ch) = config_get_int("blood_starvation_level") * 1.5;
+		GET_BLOOD(ch) = MIN(GET_BLOOD(ch), GET_MAX_BLOOD(ch));
 
 		remove_lore(ch, LORE_START_VAMPIRE);
 		remove_lore(ch, LORE_SIRE_VAMPIRE);
@@ -351,6 +353,86 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 		act("$n grasps onto $N and bites deep into $S neck!", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("$n grasps onto you and bites deep into your neck!", FALSE, ch, 0, victim, TO_VICT | TO_SLEEP);
 	}
+}
+
+
+/**
+* Attempts to auto-bite either the character's current target, or a random
+* valid target in the room. Call only when the vampire is already starving.
+*
+* @param char_data *ch The person who is trying to bite.
+* @return bool TRUE if the vampire aggroed something, FALSE if not.
+*/
+bool starving_vampire_aggro(char_data *ch) {
+	ACMD(do_stand);
+	extern bool is_fight_ally(char_data *ch, char_data *frenemy);
+	
+	char_data *ch_iter, *backup = NULL, *victim = FIGHTING(ch);
+	int backup_found = 0, vict_found = 0;
+	char arg[MAX_INPUT_LENGTH];
+	
+	if (IS_IMMORTAL(ch) || GET_FEEDING_FROM(ch) || IS_DEAD(ch) || GET_POS(ch) < POS_RESTING || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(ch, INJ_TIED | INJ_STAKED) || !IS_VAMPIRE(ch)) {
+		return FALSE;	// conditions which will block bite
+	}
+	if (get_cooldown_time(ch, COOLDOWN_BITE) > 0) {
+		return FALSE;	// can't bite right now
+	}
+	
+	if (!victim) {	// not fighting anyone? pick a target
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (ch_iter == ch) {
+				continue;	// self
+			}
+			if (AFF_FLAGGED(ch_iter, AFF_NO_DRINK_BLOOD)) {
+				continue;	// nothing to drink
+			}
+			if (!CAN_SEE(ch, ch_iter) || IS_IMMORTAL(ch_iter) || !can_fight(ch, ch_iter)) {
+				continue;	// cannot attack
+			}
+			
+			// appears valid...
+			if (is_fight_ally(ch, ch_iter)) {
+				// only a backup if it's an ally
+				if (!number(0, backup_found++) || !backup) {
+					backup = ch_iter;
+				}
+			}
+			else {	// not an ally
+				// randomly choose if we already found one
+				if (!number(0, vict_found++) || !victim) {
+					victim = ch_iter;
+				}
+			}
+		}
+		
+		// did we find someone valid?
+		if (!victim) {
+			victim = backup;
+		}
+	}
+	
+	if (!victim) {
+		return FALSE;	// nobody to aggro
+	}
+	
+	// get ready
+	if (GET_POS(ch) < POS_FIGHTING) {
+		do_stand(ch, "", 0, 0);
+		if (GET_POS(ch) < POS_FIGHTING) {
+			return FALSE;	// failed to stand
+		}
+	}
+	
+	// message only if not already fighting
+	if (!FIGHTING(ch)) {
+		act("You lunge toward $N as the sound of $S heartbeat overwhelms your senses...", FALSE, ch, NULL, victim, TO_CHAR);
+		act("$n lunges toward you with fiery red eyes and bare fangs...", FALSE, ch, NULL, victim, TO_VICT);
+		act("$n lunges toward $N with fiery red eyes and bare fangs...", FALSE, ch, NULL, victim, TO_NOTVICT);
+	}
+	
+	sprintf(arg, "%c%d", UID_CHAR, char_script_id(victim));
+	do_bite(ch, arg, 0, 0);
+	return TRUE;
 }
 
 
@@ -676,8 +758,14 @@ ACMD(do_bite) {
 	else if (!*arg && !(victim = FIGHTING(ch))) {
 		msg_to_char(ch, "Bite whom?\r\n");
 	}
-	else if (!victim && (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))))
+	else if (!victim && (*arg == UID_CHAR ? !(victim = get_char(arg)) : (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))))) {
+		// targeting can be by UID for script/aggro use
 		send_config_msg(ch, "no_person");
+	}
+	else if (IN_ROOM(ch) != IN_ROOM(victim)) {
+		// uid-targeting can hit people in other rooms
+		send_config_msg(ch, "no_person");
+	}
 	else if (ch == victim)
 		msg_to_char(ch, "That seems a bit redundant...\r\n");
 	else if (GET_FED_ON_BY(victim))

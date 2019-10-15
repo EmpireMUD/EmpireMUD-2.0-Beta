@@ -2086,6 +2086,9 @@ void read_ability_requirements(void) {
 	
 	HASH_ITER(hh, skill_table, skill, next_skill) {
 		LL_FOREACH(SKILL_ABILITIES(skill), iter) {
+			if (IS_SET(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT)) {
+				continue;	// don't count if in-dev
+			}
 			if (!(abil = find_ability_by_vnum(iter->vnum))) {
 				continue;
 			}
