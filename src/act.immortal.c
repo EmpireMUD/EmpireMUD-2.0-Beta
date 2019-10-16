@@ -3882,8 +3882,8 @@ SHOW(show_olc) {
 	// check all players
 	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 		if ((pers = find_or_load_player(index->name, &file))) {
-			if (vnum != NOBITS ? ((GET_OLC_MIN_VNUM(pers) <= vnum && GET_OLC_MAX_VNUM(pers) >= vnum) || GET_ACCESS_LEVEL(pers) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(pers, OLC_FLAG_ALL_VNUMS)) : (GET_ACCESS_LEVEL(pers) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(pers, OLC_FLAG_ALL_VNUMS) || GET_OLC_MIN_VNUM(pers) > 0 || GET_OLC_MAX_VNUM(pers) > 0)) {
-				sprintbit(GET_OLC_FLAGS(pers), olc_flag_bits, buf, FALSE);
+			if (vnum != NOTHING ? ((GET_OLC_MIN_VNUM(pers) <= vnum && GET_OLC_MAX_VNUM(pers) >= vnum) || GET_ACCESS_LEVEL(pers) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(pers, OLC_FLAG_ALL_VNUMS)) : (GET_ACCESS_LEVEL(pers) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(pers, OLC_FLAG_ALL_VNUMS) || GET_OLC_MIN_VNUM(pers) > 0 || GET_OLC_MAX_VNUM(pers) > 0)) {
+				sprintbit(GET_OLC_FLAGS(pers), olc_flag_bits, buf, TRUE);
 				msg_to_char(ch, " %s [&c%d-%d&0] &g%s&0\r\n", GET_PC_NAME(pers), GET_OLC_MIN_VNUM(pers), GET_OLC_MAX_VNUM(pers), buf);
 				any = TRUE;
 			}

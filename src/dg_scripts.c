@@ -2856,7 +2856,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							sprintbit(AFF_FLAGS(c), affected_bits, buf, FALSE);
+							sprintbit(AFF_FLAGS(c), affected_bits, buf, TRUE);
 							snprintf(str, slen, "%s", buf);
 						}
 					}
@@ -3731,7 +3731,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								snprintf(str, slen, "%d", MOB_FLAGGED(c, BIT(pos)) ? 1 : 0);
 							}
 							else {
-								sprintbit(IS_NPC(c) ? MOB_FLAGS(c) : NOBITS, action_bits, buf, FALSE);
+								sprintbit(IS_NPC(c) ? MOB_FLAGS(c) : NOBITS, action_bits, buf, TRUE);
 								snprintf(str, slen, "%s", buf);
 							}
 						}
@@ -3884,7 +3884,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							sprintbit(!IS_NPC(c) ? PLR_FLAGS(c) : NOBITS, player_bits, buf, FALSE);
+							sprintbit(!IS_NPC(c) ? PLR_FLAGS(c) : NOBITS, player_bits, buf, TRUE);
 							snprintf(str, slen, "%s", buf);
 						}
 					}
@@ -4415,7 +4415,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							sprintbit(GET_OBJ_EXTRA(o), extra_bits, buf, FALSE);
+							sprintbit(GET_OBJ_EXTRA(o), extra_bits, buf, TRUE);
 							snprintf(str, slen, "%s", buf);
 						}
 					}
@@ -4630,7 +4630,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							sprintbit(ROOM_AFF_FLAGS(r), room_aff_bits, buf, FALSE);
+							sprintbit(ROOM_AFF_FLAGS(r), room_aff_bits, buf, TRUE);
 							snprintf(str, slen, "%s", buf);
 						}
 					}
@@ -4668,7 +4668,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							sprintbit(GET_BUILDING(r) ? GET_BLD_FLAGS(GET_BUILDING(r)) : NOBITS, bld_flags, buf, FALSE);
+							sprintbit(GET_BUILDING(r) ? GET_BLD_FLAGS(GET_BUILDING(r)) : NOBITS, bld_flags, buf, TRUE);
 							snprintf(str, slen, "%s", buf);
 						}
 					}
@@ -4949,7 +4949,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							sprintbit(GET_ROOM_TEMPLATE(r) ? GET_RMT_FLAGS(GET_ROOM_TEMPLATE(r)) : NOBITS, room_template_flags, buf, FALSE);
+							sprintbit(GET_ROOM_TEMPLATE(r) ? GET_RMT_FLAGS(GET_ROOM_TEMPLATE(r)) : NOBITS, room_template_flags, buf, TRUE);
 							snprintf(str, slen, "%s", buf);
 						}
 					}
@@ -5249,7 +5249,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							sprintbit(VEH_FLAGS(v), vehicle_flags, buf, FALSE);
+							sprintbit(VEH_FLAGS(v), vehicle_flags, buf, TRUE);
 							snprintf(str, slen, "%s", buf);
 						}
 					}
