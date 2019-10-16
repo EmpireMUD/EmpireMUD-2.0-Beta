@@ -142,9 +142,11 @@ All room scripts provide the &c%room%&0 variable.
 
 When using field - The variable returns:
 &caff_flagged(AFF)&0 - True if the room has an affect flag on it.
+   If called with no argument, lists current flags instead.
 &cbld_dir(dir)&0 - Rotates the given direction based on which way the building
    is facing (compared to North). Returns the same dir if no building.
 &cbld_flagged(AFF)&0 - True if the room has a building flag on it.
+   If called with no argument, lists current flags instead.
 &cbuilding&0 - The name of the building on the room, if any.
 &cbuilding_vnum&0 - The vnum of the building on the room, if any.
 &ccan_build(FLAG)&0 - True if the room has the given build flags.
@@ -178,6 +180,7 @@ When using field - The variable returns:
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
+   If called with no argument, lists current flags instead.
 &csector&0 - The sector type of the room.
 &csector_vnum&0 - The sector vnum of the room.
 &ctemplate&0 - The room template vnum, if any.
