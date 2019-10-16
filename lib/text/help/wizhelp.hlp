@@ -1066,6 +1066,7 @@ learned    Immort   Shows you learned recipes.
 minipets   Immort   Shows you mini-pets collected by a player.
 mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
+olc        Immort   Shows all players with OLC access (vnum optional).
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
 produced   Immort   Shows total produced items for an empire.
@@ -1191,6 +1192,13 @@ See also: SET MOUNT
 Usage:  show notes <player name>
 
 Shows immortal notes for the target player's account.
+#e
+"SHOW OLC"
+
+Usage:  show olc [vnum]
+
+This shows you all players who have OLC access. If you specify a vnum, it
+shows only players who have access to that vnum.
 #e
 "SHOW PILES"
 
