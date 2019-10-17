@@ -129,11 +129,15 @@ composite level (if you're wielding a permanent weapon when you ready a
 blood weapon, this will include any levels you get from that weapon).
 
 You can create:
+  bloodaxe (slice/sharp)
   bloodmace (pound/blunt)
+  bloodmattock (pick/mining)
+  bloodmaul (hammer/forging)
   bloodskean (stab/stealth)
   bloodspear (jab/tank)
   bloodstaff (staff/caster)
   bloodsword (slash)
+  bloodwhip (whip/tank)
 
 When you activate this power, you will automatically wield the weapon of your
 choice, and it will disappear when unequipped.
