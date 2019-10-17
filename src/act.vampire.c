@@ -84,17 +84,25 @@ void cancel_blood_upkeeps(char_data *ch) {
 	struct obj_apply *app;
 	obj_data *obj;
 	int iter;
-	bool any;
+	bool any, messaged;
 	
 	if (IS_NPC(ch) || !IS_VAMPIRE(ch)) {
 		return;
 	}
+	
+	// we'll only send the preface message if they're not dead
+	messaged = (GET_POS(ch) < POS_SLEEPING);
 	
 	// affs: loop because removing multiple affects makes iterating over affects hard
 	do {
 		any = FALSE;
 		LL_FOREACH(ch->affected, aff) {
 			if (aff->location == APPLY_BLOOD_UPKEEP && aff->modifier > 0) {
+				if (!messaged) {
+					msg_to_char(ch, "You're too low on blood...\r\n");
+					messaged = TRUE;
+				}
+				
 				// special case: morphs
 				if (aff->type == ATYPE_MORPH) {
 					perform_morph(ch, NULL);
@@ -121,6 +129,11 @@ void cancel_blood_upkeeps(char_data *ch) {
 		
 		LL_FOREACH(obj->applies, app) {
 			if (app->location == APPLY_BLOOD_UPKEEP && app->modifier > 0) {
+				if (!messaged) {
+					msg_to_char(ch, "You're too low on blood...\r\n");
+					messaged = TRUE;
+				}
+				
 				act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
 				act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
 				// this may extract it
