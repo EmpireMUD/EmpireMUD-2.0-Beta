@@ -55,6 +55,11 @@ bool cancel_biting(char_data *ch) {
 	char_data *vict;
 	
 	if (ch && (vict = GET_FEEDING_FROM(ch))) {
+		if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
+			msg_to_char(ch, "You can't seem to stop!\r\n");
+			return TRUE;
+		}
+		
 		act("You stop feeding from $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n stops feeding from you.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n stops feeding from $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
