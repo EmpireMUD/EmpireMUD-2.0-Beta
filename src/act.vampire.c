@@ -614,6 +614,9 @@ void update_biting_char(char_data *ch) {
 		act("$N falls limply from $n's arms!", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("You feel faint as the last of your blood is pulled from your body!", FALSE, ch, 0, victim, TO_VICT);
 		
+		// cancel a can't-stop effect, if present
+		affect_from_char(ch, ATYPE_CANT_STOP, FALSE);
+		
 		if (can_gain_exp_from(ch, victim)) {
 			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 15);
 		}
