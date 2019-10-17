@@ -370,6 +370,7 @@ bool starving_vampire_aggro(char_data *ch) {
 	char_data *ch_iter, *backup = NULL, *victim = FIGHTING(ch);
 	int backup_found = 0, vict_found = 0;
 	char arg[MAX_INPUT_LENGTH];
+	struct affected_type *af;
 	
 	if (IS_IMMORTAL(ch) || GET_FEEDING_FROM(ch) || IS_DEAD(ch) || GET_POS(ch) < POS_RESTING || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(ch, INJ_TIED | INJ_STAKED) || !IS_VAMPIRE(ch)) {
 		return FALSE;	// conditions which will block bite
@@ -432,6 +433,13 @@ bool starving_vampire_aggro(char_data *ch) {
 	
 	sprintf(arg, "%c%d", UID_CHAR, char_script_id(victim));
 	do_bite(ch, arg, 0, 0);
+	
+	// stun to keep them from stopping
+	if (GET_FEEDING_FROM(ch)) {
+		af = create_flag_aff(ATYPE_CANT_STOP, 6, AFF_HARD_STUNNED, ch);
+		affect_join(ch, af, 0);
+	}
+	
 	return TRUE;
 }
 
