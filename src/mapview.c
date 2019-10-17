@@ -128,7 +128,7 @@ char *exit_description(char_data *ch, room_data *room, const char *prefix) {
 	
 	// done early if they can't see the target room
 	if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {
-		size += snprintf(output + size, sizeof(output) - size, "Too dark to tell\r\n");
+		size += snprintf(output + size, sizeof(output) - size, "Too dark to tell");
 		return output;
 	}
 	
