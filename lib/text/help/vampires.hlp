@@ -148,17 +148,21 @@ BOOST
 
 Boost (Vampire ability)
 
-Usage:  boost <strength | charisma | intelligence>
+Usage:  boost <trait>
         boost end
 Cost:  10 blood
 Upkeep:  1 blood/hr per boost
 
-This ability allows a vampire to boost primary attributes by spending blood.
-At high skill levels, you may get a stronger boost at the same cost.
+This ability allows a vampire to boost primary attributes (strength, charisma,
+and intelligence) by spending blood. You can also boost additional traits,
+depending on what role you're currently in. Type 'boost' by itself to see the
+list of traits you can currently boost.
 
-You can end your boosts early by typing "boost end".
+At high skill levels, you may get a stronger boost at the same cost. You can
+end your boosts early by typing "boost end". Gains experience when you activate
+your boosts.
 
-Gains experience when you activate your boosts.
+See also: ROLE
 #
 CLAWS
 
