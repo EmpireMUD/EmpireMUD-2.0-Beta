@@ -2175,6 +2175,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_BITE_MELEE_UPGRADE  59	// melee features of 'bite'
 #define PTECH_BITE_TANK_UPGRADE  60	// tank features of 'bite'
 #define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
+#define PTECH_SEE_IN_DARK_OUTDOORS  62  // can see in dark only if outside
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

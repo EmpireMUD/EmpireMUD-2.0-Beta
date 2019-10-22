@@ -105,7 +105,8 @@ When using field  - The variable returns:
 &cid&0 - The id number of the vehicle.
 &cin_on&0 - "in" or "on" depending on how characters sit in/on the vehicle.
 &cinterior&0 - The base inside room (where you'd board to, if it has one).
-&cis_flagged(FLAG)&0 - True if the vehicle has the flag.
+&cis_flagged(FLAG)&0 - True if the vehicle has the flag. If called with no
+   argument, lists current flags instead.
 &ckeywords&0 - The vehicle's keyword list.
 &cled_by&0 - The person leading the vehicle, if any.
 &clevel&0 - What level the vehicle is scaled to.

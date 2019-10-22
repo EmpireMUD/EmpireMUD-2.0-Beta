@@ -55,6 +55,11 @@ bool cancel_biting(char_data *ch) {
 	char_data *vict;
 	
 	if (ch && (vict = GET_FEEDING_FROM(ch))) {
+		if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
+			msg_to_char(ch, "You can't seem to stop!\r\n");
+			return TRUE;
+		}
+		
 		act("You stop feeding from $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n stops feeding from you.", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n stops feeding from $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
@@ -79,17 +84,25 @@ void cancel_blood_upkeeps(char_data *ch) {
 	struct obj_apply *app;
 	obj_data *obj;
 	int iter;
-	bool any;
+	bool any, messaged;
 	
 	if (IS_NPC(ch) || !IS_VAMPIRE(ch)) {
 		return;
 	}
+	
+	// we'll only send the preface message if they're not dead
+	messaged = (GET_POS(ch) < POS_SLEEPING);
 	
 	// affs: loop because removing multiple affects makes iterating over affects hard
 	do {
 		any = FALSE;
 		LL_FOREACH(ch->affected, aff) {
 			if (aff->location == APPLY_BLOOD_UPKEEP && aff->modifier > 0) {
+				if (!messaged) {
+					msg_to_char(ch, "You're too low on blood...\r\n");
+					messaged = TRUE;
+				}
+				
 				// special case: morphs
 				if (aff->type == ATYPE_MORPH) {
 					perform_morph(ch, NULL);
@@ -116,6 +129,11 @@ void cancel_blood_upkeeps(char_data *ch) {
 		
 		LL_FOREACH(obj->applies, app) {
 			if (app->location == APPLY_BLOOD_UPKEEP && app->modifier > 0) {
+				if (!messaged) {
+					msg_to_char(ch, "You're too low on blood...\r\n");
+					messaged = TRUE;
+				}
+				
 				act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
 				act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
 				// this may extract it
@@ -370,6 +388,7 @@ bool starving_vampire_aggro(char_data *ch) {
 	char_data *ch_iter, *backup = NULL, *victim = FIGHTING(ch);
 	int backup_found = 0, vict_found = 0;
 	char arg[MAX_INPUT_LENGTH];
+	struct affected_type *af;
 	
 	if (IS_IMMORTAL(ch) || GET_FEEDING_FROM(ch) || IS_DEAD(ch) || GET_POS(ch) < POS_RESTING || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(ch, INJ_TIED | INJ_STAKED) || !IS_VAMPIRE(ch)) {
 		return FALSE;	// conditions which will block bite
@@ -432,6 +451,13 @@ bool starving_vampire_aggro(char_data *ch) {
 	
 	sprintf(arg, "%c%d", UID_CHAR, char_script_id(victim));
 	do_bite(ch, arg, 0, 0);
+	
+	// stun to keep them from stopping
+	if (GET_FEEDING_FROM(ch)) {
+		af = create_flag_aff(ATYPE_CANT_STOP, 6, AFF_HARD_STUNNED, ch);
+		affect_join(ch, af, 0);
+	}
+	
 	return TRUE;
 }
 
@@ -600,6 +626,9 @@ void update_biting_char(char_data *ch) {
 		act("You pull the last of $N's blood from $S veins, and $E falls limply to the ground!", FALSE, ch, 0, victim, TO_CHAR);
 		act("$N falls limply from $n's arms!", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("You feel faint as the last of your blood is pulled from your body!", FALSE, ch, 0, victim, TO_VICT);
+		
+		// cancel a can't-stop effect, if present
+		affect_from_char(ch, ATYPE_CANT_STOP, FALSE);
 		
 		if (can_gain_exp_from(ch, victim)) {
 			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 15);
@@ -917,105 +946,105 @@ ACMD(do_bloodsweat) {
 
 ACMD(do_boost) {
 	struct affected_type *af;
-	int cost = 10;
+	int iter, pos = NOTHING, cost = 10;
+	bool any;
+	
+	struct {
+		char *name;
+		char *alt_name;	// secondary name that can be used optionally (phys instead of bonus-phys)
+		int role;	// required ROLE_ or ROLE_NONE
+		int main_att;	// like STRENGTH; NOTHING if using a secondary attribute (like an ATT_)
+		int apply;	// which APPLY_ const
+		int base_amt;	// how much with low-level skill
+		int high_amt;	// how much with high skill (TODO: should it just scale?)
+		char *msg;	// string shown to the user
+	} boost_data[] = {
+		{ "charisma", "charisma", ROLE_NONE, CHARISMA, APPLY_CHARISMA, 1, 2, "You focus your blood into your skin and voice, increasing your charisma!\r\n" },
+		{ "strength", "strength", ROLE_NONE, STRENGTH, APPLY_STRENGTH, 1, 2, "You force blood into your muscles, boosting your strength!\r\n" },
+		{ "intelligence", "intelligence", ROLE_NONE, INTELLIGENCE, APPLY_INTELLIGENCE, 1, 2, "You focus your blood into your mind, increasing your intelligence!\r\n" },
+		
+		{ "bonus-physical", "physical", ROLE_MELEE, NOTHING, APPLY_BONUS_PHYSICAL, 1, 2, "You focus your blood into a blinding rage, increasing your physical damage!\r\n" },
+		{ "bonus-magical", "magical", ROLE_CASTER, NOTHING, APPLY_BONUS_MAGICAL, 1, 2, "You turn your blood into pure mental focus, increasing your magical damage!\r\n" },
+		{ "bonus-healing", "healing", ROLE_HEALER, NOTHING, APPLY_BONUS_HEALING, 1, 2, "You draw the magic from your blood, increasing your magical healing!\r\n" },
+		{ "dodge", "dodge", ROLE_TANK, NOTHING, APPLY_DODGE, 1, 2, "You focus your blood to increase your speed, boosting your ability to dodge!\r\n" },
+		
+		{ "\n", "\n", ROLE_NONE, NOTHING, NOTHING, 0, 0, "\n" }	// must be last
+	};
 
 	one_argument(argument, arg);
 
 	if (!check_vampire_ability(ch, ABIL_BOOST, BLOOD, cost, NOTHING)) {
-		return;
+		return;	// sends own message
 	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
+	if (!check_vampire_sun(ch, TRUE)) {
+		return;	// sends own message
 	}
-	else if (!*arg) {
-		msg_to_char(ch, "Which attribute do you wish to boost (strength, charisma, or intelligence), or 'end' to cancel boosts?\r\n");
+	if (!*arg) {
+		msg_to_char(ch, "Which attribute do you wish to boost? Or type 'boost end' to cancel boosts.\r\nAttributes:");
+		any = FALSE;
+		for (iter = 0; *boost_data[iter].name != '\n'; ++iter) {
+			if (boost_data[iter].role == ROLE_NONE || boost_data[iter].role == GET_CLASS_ROLE(ch)) {
+				msg_to_char(ch, "%s%s", (any ? ", " : " "), boost_data[iter].name);
+				any = TRUE;
+			}
+		}
+		msg_to_char(ch, "\r\n");
+		return;
 	}
 	
-	else if (is_abbrev(arg, "end")) {
+	// END boosts
+	if (is_abbrev(arg, "end")) {
 		if (affected_by_spell(ch, ATYPE_BOOST)) {
 			end_boost(ch);
 		}
 		else {
 			msg_to_char(ch, "Your attributes aren't boosted!\r\n");
 		}
-	}
-	
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_BOOST)) {
 		return;
 	}
-
-	// Charisma
-	else if (is_abbrev(arg, "charisma")) {
-		if (GET_CHARISMA(ch) >= att_max(ch)) {
-			msg_to_char(ch, "Your charisma is already at maximum!\r\n");
-		}
-		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_CHARISMA)) {
-			msg_to_char(ch, "Your charisma is already boosted!\r\n");
-		}
-		else {
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_CHARISMA, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
-			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
-			
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
-			affect_to_char(ch, af);
-			free(af);
-
-			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-
-			msg_to_char(ch, "You focus your blood into your skin and voice, increasing your charisma!\r\n");
-			gain_ability_exp(ch, ABIL_BOOST, 20);
+	
+	// identify which boost
+	for (iter = 0; *boost_data[iter].name != '\n'; ++iter) {
+		if (is_abbrev(arg, boost_data[iter].name) || is_abbrev(arg, boost_data[iter].alt_name)) {
+			pos = iter;	// found!
+			break;
 		}
 	}
-
-	// Strength
-	else if (is_abbrev(arg, "strength")) {
-		if (GET_STRENGTH(ch) >= att_max(ch)) {
-			msg_to_char(ch, "Your strength is already at maximum!\r\n");
-		}
-		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_STRENGTH)) {
-			msg_to_char(ch, "Your strength is already boosted!\r\n");
-		}
-		else {
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_STRENGTH, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
-			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
-			
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
-			affect_to_char(ch, af);
-			free(af);
-
-			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-
-			msg_to_char(ch, "You force blood into your muscles, boosting your strength!\r\n");
-			gain_ability_exp(ch, ABIL_BOOST, 20);
-		}
-	}
-
-	// Intelligence
-	else if (is_abbrev(arg, "intelligence")) {
-		if (GET_INTELLIGENCE(ch) >= att_max(ch)) {
-			msg_to_char(ch, "Your intelligence is already at maximum!\r\n");
-		}
-		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_INTELLIGENCE)) {
-			msg_to_char(ch, "Your intelligence is already boosted!\r\n");
-		}
-		else {
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_INTELLIGENCE, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
-			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
-			
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
-			affect_to_char(ch, af);
-			free(af);
-
-			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-
-			msg_to_char(ch, "You focus your blood into your mind, increasing your intelligence!\r\n");
-			gain_ability_exp(ch, ABIL_BOOST, 20);
-		}
+	if (pos == NOTHING) {	// no valid choice
+		msg_to_char(ch, "You don't know how to boost '%s'.\r\n", arg);
+		return;
 	}
 	
-	else {
-		msg_to_char(ch, "Would you like to increase your strength, charisma, or intelligence?\r\n");
+	// final checks:
+	if (boost_data[pos].main_att != NOTHING && GET_ATT(ch, boost_data[pos].main_att) >= att_max(ch)) {
+		msg_to_char(ch, "Your %s is already at maximum!\r\n", boost_data[pos].name);
+		return;
 	}
+	if (affected_by_spell_and_apply(ch, ATYPE_BOOST, boost_data[pos].apply)) {
+		msg_to_char(ch, "Your %s is already boosted!\r\n", boost_data[pos].name);
+		return;
+	}
+	
+	// check trigs
+	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_BOOST)) {
+		return;
+	}
+	
+	// SUCCESS!
+	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
+	
+	af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, boost_data[pos].apply, (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? boost_data[pos].high_amt : boost_data[pos].base_amt), ch);
+	affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
+	
+	af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
+	affect_to_char(ch, af);
+	free(af);
+	
+	if (boost_data[pos].msg) {
+		msg_to_char(ch, "%s", boost_data[pos].msg);
+	}
+	
+	gain_ability_exp(ch, ABIL_BOOST, 20);
 }
 
 

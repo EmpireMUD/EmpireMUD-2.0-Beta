@@ -55,6 +55,7 @@ extern const char *grant_bits[];
 extern const char *instance_flags[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
+extern const char *olc_flag_bits[];
 extern const char *progress_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
@@ -3857,6 +3858,48 @@ SHOW(show_notes) {
 }
 
 
+SHOW(show_olc) {
+	char buf[MAX_STRING_LENGTH];
+	player_index_data *index, *next_index;
+	any_vnum vnum = NOTHING;
+	bool file, any = FALSE;
+	char_data *pers;
+	
+	one_argument(argument, arg);
+	if (*arg && (!isdigit(*arg) || (vnum = atoi(arg)) < 0)) {
+		msg_to_char(ch, "Usage: show olc [optional vnum]\r\n");
+		return;
+	}
+	
+	// heading
+	if (vnum != NOTHING) {
+		msg_to_char(ch, "Players with OLC access for vnum %d:\r\n", vnum);
+	}
+	else {
+		msg_to_char(ch, "Players with OLC access:\r\n");
+	}
+	
+	// check all players
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if ((pers = find_or_load_player(index->name, &file))) {
+			if (vnum != NOTHING ? ((GET_OLC_MIN_VNUM(pers) <= vnum && GET_OLC_MAX_VNUM(pers) >= vnum) || GET_ACCESS_LEVEL(pers) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(pers, OLC_FLAG_ALL_VNUMS)) : (GET_ACCESS_LEVEL(pers) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(pers, OLC_FLAG_ALL_VNUMS) || GET_OLC_MIN_VNUM(pers) > 0 || GET_OLC_MAX_VNUM(pers) > 0)) {
+				sprintbit(GET_OLC_FLAGS(pers), olc_flag_bits, buf, TRUE);
+				msg_to_char(ch, " %s [&c%d-%d&0] &g%s&0\r\n", GET_PC_NAME(pers), GET_OLC_MIN_VNUM(pers), GET_OLC_MAX_VNUM(pers), buf);
+				any = TRUE;
+			}
+			
+			if (file) {
+				free_char(pers);
+			}
+		}
+	}
+	
+	if (!any) {
+		msg_to_char(ch, "none\r\n");
+	}
+}
+
+
 SHOW(show_ammotypes) {
 	obj_data *obj, *next_obj;
 	int total;
@@ -4715,7 +4758,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *position_types[];
 	extern const char *preference_bits[];
 	extern const char *connected_types[];
-	extern const char *olc_flag_bits[];
 	extern const int base_hit_chance;
 	extern struct promo_code_list promo_codes[];
 
@@ -8783,6 +8825,7 @@ ACMD(do_show) {
 		{ "progression", LVL_START_IMM, show_progression },
 		{ "produced", LVL_START_IMM, show_produced },
 		{ "resource", LVL_START_IMM, show_resource },
+		{ "olc", LVL_START_IMM, show_olc },
 
 		// last
 		{ "\n", 0, NULL }

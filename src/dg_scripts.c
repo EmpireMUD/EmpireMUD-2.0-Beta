@@ -2189,6 +2189,7 @@ void direction_vars(room_data *room, int dir, char *subfield, char *str, size_t 
 
 /* sets str to be the value of var.field */
 void find_replacement(void *go, struct script_data *sc, trig_data *trig, int type, char *var, char *field, char *subfield, char *str, size_t slen) {
+	char buf[MAX_STRING_LENGTH];
 	struct trig_var_data *vd=NULL;
 	char_data *ch = NULL, *c = NULL, *rndm;
 	vehicle_data *veh = NULL, *v = NULL;
@@ -2855,7 +2856,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							snprintf(str, slen, "0");
+							sprintbit(AFF_FLAGS(c), affected_bits, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
 						}
 					}
 					
@@ -3723,13 +3725,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(c->master));
 					}
 					else if (!str_cmp(field, "mob_flagged")) {
-						if (subfield && *subfield && IS_NPC(c)) {
+						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
 							if (pos != NOTHING) {
 								snprintf(str, slen, "%d", MOB_FLAGGED(c, BIT(pos)) ? 1 : 0);
 							}
 							else {
-								snprintf(str, slen, "0");
+								sprintbit(IS_NPC(c) ? MOB_FLAGS(c) : NOBITS, action_bits, buf, TRUE);
+								snprintf(str, slen, "%s", buf);
 							}
 						}
 						else {
@@ -3871,7 +3874,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", GET_PC_NAME(c));
 					}
 					else if (!str_cmp(field, "plr_flagged")) {
-						if (subfield && *subfield && !IS_NPC(c)) {
+						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, player_bits, FALSE);
 							if (pos != NOTHING) {
 								snprintf(str, slen, "%d", PLR_FLAGGED(c, BIT(pos)) ? 1 : 0);
@@ -3881,7 +3884,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							snprintf(str, slen, "0");
+							sprintbit(!IS_NPC(c) ? PLR_FLAGS(c) : NOBITS, player_bits, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
 						}
 					}
 					else if (!str_cmp(field, "poison_immunity")) {
@@ -4263,8 +4267,25 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								}
 							}
 						}
+						
 						// no result
 						*str = '\0';
+					}
+					else if (!str_cmp(field, "bound_to")) {
+						if (OBJ_BOUND_TO(o)) {
+							player_index_data *index;
+							struct obj_binding *bind;
+							bool any = FALSE;
+							
+							*str = '\0';
+							LL_FOREACH(OBJ_BOUND_TO(o), bind) {
+								snprintf(str + strlen(str), slen - strlen(str), "%s%s", (any ? ", " : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+								any = TRUE;
+							}
+						}
+						else {
+							strcpy(str, "");
+						}
 					}
 					break;
 				}
@@ -4285,7 +4306,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							strcpy(str,"");
 					}
-
+					else if (!str_cmp(field, "component_type")) {
+						snprintf(str, slen, "%s", GET_OBJ_CMP_TYPE(o) != CMP_NONE ? component_string(GET_OBJ_CMP_TYPE(o), GET_OBJ_CMP_FLAGS(o)) : "");
+					}
 					else if (!str_cmp(field, "contents")) {
 						if (o->contains)
 							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(o->contains));
@@ -4392,7 +4415,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							snprintf(str, slen, "0");
+							sprintbit(GET_OBJ_EXTRA(o), extra_bits, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
 						}
 					}
 					
@@ -4606,7 +4630,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							snprintf(str, slen, "0");
+							sprintbit(ROOM_AFF_FLAGS(r), room_aff_bits, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
 						}
 					}
 					else if (!str_cmp(field, "aft")) {
@@ -4643,7 +4668,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							snprintf(str, slen, "0");
+							sprintbit(GET_BUILDING(r) ? GET_BLD_FLAGS(GET_BUILDING(r)) : NOBITS, bld_flags, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
 						}
 					}
 					else if (!str_cmp(field, "building")) {
@@ -4923,7 +4949,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							snprintf(str, slen, "0");
+							sprintbit(GET_ROOM_TEMPLATE(r) ? GET_RMT_FLAGS(GET_ROOM_TEMPLATE(r)) : NOBITS, room_template_flags, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
 						}
 					}
 					break;
@@ -5210,8 +5237,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "is_flagged")) {
+						extern const char *vehicle_flags[];
+						
 						if (subfield && *subfield) {
-							extern const char *vehicle_flags[];
 							int fl = search_block(subfield, vehicle_flags, FALSE);
 							if (fl != NOTHING) {
 								snprintf(str, slen, (VEH_FLAGGED(v, BIT(fl)) ? "1" : "0"));
@@ -5221,7 +5249,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
-							snprintf(str, slen, "0");
+							sprintbit(VEH_FLAGS(v), vehicle_flags, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
 						}
 					}
 					break;
