@@ -203,6 +203,33 @@ The staff drips with blood.
 A
 17 1 0
 S
+#1117
+whip bloody bloodwhip dripping~
+a dripping bloodwhip~
+A bloody whip is pooling on the ground.~
+   The whip appears to be made from congealed blood, stretched to the length of
+a horse, and coiled into a horrific mass. It splashes blood everywhere as you
+whip it around.
+~
+1 gmp an 5
+0 1 7
+10 0
+A
+18 3 0
+S
+#1118
+axe bloodaxe~
+a bloodaxe~
+A bloodaxe is dripping on the ground.~
+   The axe is made from blood, handle and all. It drips and splashes as you
+swing it.
+~
+1 gmp an 7
+0 1 2
+10 0
+A
+1 1 0
+S
 #1119
 spike nocturnium~
 a nocturnium spike~
@@ -214,5 +241,31 @@ The nocturnium spike can be used for the Chant of Illusions.
 2 0
 R
 5164 0
+S
+#1120
+maul bloodmaul~
+a bloodmaul~
+A bloodmaul has been hammered into the ground.~
+   This great maul is made from blood itself, though it looks like you could
+still use it as a hammer in the forge.
+~
+1 gmp an 9
+0 1 6
+10 0
+A
+17 1 0
+S
+#1122
+mattock bloodmattock~
+a bloodmattock~
+A bloodmattock is dripping on the ground.~
+   This pick mattock is made from red, dripping blood. It looks like you could
+use it for mining -- or murder.
+~
+1 gmp an 8
+0 1 8
+10 0
+A
+1 1 0
 S
 $
