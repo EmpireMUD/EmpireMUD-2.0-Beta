@@ -1721,7 +1721,8 @@ ACMD(do_tdetach) {
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			if (!TRIGGERS(SCRIPT(room))) {
-				extract_script(room, WLD_TRIGGER);
+				// no longer extracting script when triggers run out: this would lose remote vars
+				//extract_script(room, WLD_TRIGGER);
 			}
 		}
 		else {
@@ -1863,7 +1864,8 @@ ACMD(do_tdetach) {
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			if (!TRIGGERS(SCRIPT(victim))) {
-				extract_script(victim, MOB_TRIGGER);
+				// no longer extracting script when triggers run out: this would lose remote vars
+				//extract_script(victim, MOB_TRIGGER);
 			}
 		}
 		else
@@ -1885,7 +1887,8 @@ ACMD(do_tdetach) {
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			if (!TRIGGERS(SCRIPT(object))) {
-				extract_script(object, OBJ_TRIGGER);
+				// no longer extracting script when triggers run out: this would lose remote vars
+				//extract_script(object, OBJ_TRIGGER);
 			}
 		}
 		else
@@ -1908,7 +1911,8 @@ ACMD(do_tdetach) {
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			if (!TRIGGERS(SCRIPT(veh))) {
-				extract_script(veh, VEH_TRIGGER);
+				// no longer extracting script when triggers run out: this would lose remote vars
+				//extract_script(veh, VEH_TRIGGER);
 			}
 		}
 		else {
@@ -6344,7 +6348,8 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		}
 		if (remove_trigger(SCRIPT(c), trignum_s)) {
 			if (!TRIGGERS(SCRIPT(c))) {
-				extract_script(c, MOB_TRIGGER);
+				// no longer extracting script when triggers run out: this would lose remote vars
+				// extract_script(c, MOB_TRIGGER);
 			}
 		}
 		return;
@@ -6357,7 +6362,8 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		}
 		if (remove_trigger(SCRIPT(v), trignum_s)) {
 			if (!TRIGGERS(SCRIPT(v))) {
-				extract_script(v, VEH_TRIGGER);
+				// no longer extracting script when triggers run out: this would lose remote vars
+				//extract_script(v, VEH_TRIGGER);
 			}
 		}
 		return;
@@ -6370,7 +6376,8 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		}
 		if (remove_trigger(SCRIPT(o), trignum_s)) {
 			if (!TRIGGERS(SCRIPT(o))) {
-				extract_script(o, OBJ_TRIGGER);
+				// no longer extracting script when triggers run out: this would lose remote vars
+				//extract_script(o, OBJ_TRIGGER);
 			}
 		}
 		return;
@@ -6383,7 +6390,8 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		}
 		if (remove_trigger(SCRIPT(r), trignum_s)) {
 			if (!TRIGGERS(SCRIPT(r))) {
-				extract_script(r, WLD_TRIGGER);
+				// no longer extracting script when triggers run out: this would lose remote vars
+				//extract_script(r, WLD_TRIGGER);
 			}
 		}
 		return;
@@ -6636,6 +6644,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	char *line, *var, *uid_p;
 	char arg[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 	int uid, context;
+	vehicle_data *veh;
 	room_data *room;
 	char_data *mob;
 	obj_data *obj;
@@ -6681,23 +6690,27 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	context = vd->context;
 
 	if ((room = find_room(uid))) {
-		sc_remote = SCRIPT(room);
+		sc_remote = SCRIPT(room) ? SCRIPT(room) : create_script_data(room, WLD_TRIGGER);
 	}
 	else if ((mob = find_char(uid))) {
-		sc_remote = SCRIPT(mob);
+		sc_remote = SCRIPT(mob) ? SCRIPT(mob) : create_script_data(mob, MOB_TRIGGER);
 		if (!IS_NPC(mob))
 			context = 0;
 	}
 	else if ((obj = find_obj(uid, FALSE))) {
-		sc_remote = SCRIPT(obj);
+		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
+	}
+	else if ((veh = find_vehicle(uid))) {
+		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
 	}
 	else {
 		script_log("Trigger: %s, VNum %d. remote: uid '%d' invalid", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), uid);
 		return;
 	}
 
-	if (sc_remote==NULL)
-		return; /* no script to assign */
+	if (!sc_remote) {
+		return; // nothing to assign to
+	}
 
 	add_var(&(sc_remote->global_vars), vd->name, vd->value, context);
 }

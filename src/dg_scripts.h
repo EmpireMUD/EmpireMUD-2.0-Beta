@@ -421,6 +421,8 @@ int valid_dg_target(char_data *ch, int bitvector);
 #define SCRIPT_TYPES(s)		  ((s)->types)				  
 #define TRIGGERS(s)		  ((s)->trig_list)
 
+#define HAS_TRIGGERS(o)  (SCRIPT(o) && TRIGGERS(SCRIPT(o)))
+
 #define GET_SHORT(ch)    ((ch)->player.short_descr)
 
 
