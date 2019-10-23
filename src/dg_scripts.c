@@ -1709,7 +1709,7 @@ ACMD(do_tdetach) {
 			msg_to_char(ch, "You can't edit this vnum.\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			extract_script(room, WLD_TRIGGER);
+			remove_all_triggers(room, WLD_TRIGGER);
 			if (!IS_NPC(ch)) {
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from room %d by %s", GET_ROOM_VNUM(IN_ROOM(ch)), GET_NAME(ch));
 			}
@@ -1720,10 +1720,7 @@ ACMD(do_tdetach) {
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from room %d by %s", arg2, GET_ROOM_VNUM(IN_ROOM(ch)), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
-			if (!TRIGGERS(SCRIPT(room))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				//extract_script(room, WLD_TRIGGER);
-			}
+			check_extract_script(room, WLD_TRIGGER);
 		}
 		else {
 			msg_to_char(ch, "That trigger was not found.\r\n");
@@ -1852,7 +1849,7 @@ ACMD(do_tdetach) {
 		else if (!SCRIPT(victim))
 			msg_to_char(ch, "That mob doesn't have any triggers.\r\n");
 		else if (trigger && !str_cmp(trigger, "all")) {
-			extract_script(victim, MOB_TRIGGER);
+			remove_all_triggers(victim, MOB_TRIGGER);
 			if (!IS_NPC(ch)) {
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s", GET_SHORT(victim), GET_NAME(ch));
 			}
@@ -1863,10 +1860,7 @@ ACMD(do_tdetach) {
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s", trigger, GET_SHORT(victim), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
-			if (!TRIGGERS(SCRIPT(victim))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				//extract_script(victim, MOB_TRIGGER);
-			}
+			check_extract_script(victim, MOB_TRIGGER);
 		}
 		else
 			msg_to_char(ch, "That trigger was not found.\r\n");
@@ -1875,7 +1869,7 @@ ACMD(do_tdetach) {
 		if (!SCRIPT(object))
 			msg_to_char(ch, "That object doesn't have any triggers.\r\n");
 		else if (trigger && !str_cmp(trigger, "all")) {
-			extract_script(object, OBJ_TRIGGER);
+			remove_all_triggers(object, OBJ_TRIGGER);
 			if (!IS_NPC(ch)) {
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from obj %s by %s", GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
 			}
@@ -1886,10 +1880,7 @@ ACMD(do_tdetach) {
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from obj %s by %s", trigger, GET_OBJ_SHORT_DESC(object), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
-			if (!TRIGGERS(SCRIPT(object))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				//extract_script(object, OBJ_TRIGGER);
-			}
+			check_extract_script(object, OBJ_TRIGGER);
 		}
 		else
 			msg_to_char(ch, "That trigger was not found.\r\n");
@@ -1899,7 +1890,7 @@ ACMD(do_tdetach) {
 			msg_to_char(ch, "That vehicle has no triggers.\r\n");
 		}
 		else if (trigger && !str_cmp(trigger, "all")) {
-			extract_script(veh, VEH_TRIGGER);
+			remove_all_triggers(veh, VEH_TRIGGER);
 			if (!IS_NPC(ch)) {
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from vehicle %s by %s", VEH_SHORT_DESC(veh), GET_NAME(ch));
 			}
@@ -1910,10 +1901,7 @@ ACMD(do_tdetach) {
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from vehicle %s by %s", trigger, VEH_SHORT_DESC(veh), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
-			if (!TRIGGERS(SCRIPT(veh))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				//extract_script(veh, VEH_TRIGGER);
-			}
+			check_extract_script(veh, VEH_TRIGGER);
 		}
 		else {
 			msg_to_char(ch, "That trigger was not found.\r\n");
@@ -6343,56 +6331,44 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 
 	if (c && SCRIPT(c)) {
 		if (!str_cmp(trignum_s, "all")) {
-			extract_script(c, MOB_TRIGGER);
+			remove_all_triggers(c, MOB_TRIGGER);
 			return;
 		}
 		if (remove_trigger(SCRIPT(c), trignum_s)) {
-			if (!TRIGGERS(SCRIPT(c))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				// extract_script(c, MOB_TRIGGER);
-			}
+			check_extract_script(c, MOB_TRIGGER);
 		}
 		return;
 	}
 
 	if (v && SCRIPT(v)) {
 		if (!str_cmp(trignum_s, "all")) {
-			extract_script(v, VEH_TRIGGER);
+			remove_all_triggers(v, VEH_TRIGGER);
 			return;
 		}
 		if (remove_trigger(SCRIPT(v), trignum_s)) {
-			if (!TRIGGERS(SCRIPT(v))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				//extract_script(v, VEH_TRIGGER);
-			}
+			check_extract_script(v, VEH_TRIGGER);
 		}
 		return;
 	}
 
 	if (o && SCRIPT(o)) {
 		if (!str_cmp(trignum_s, "all")) {
-			extract_script(o, OBJ_TRIGGER);
+			remove_all_triggers(o, OBJ_TRIGGER);
 			return;
 		}
 		if (remove_trigger(SCRIPT(o), trignum_s)) {
-			if (!TRIGGERS(SCRIPT(o))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				//extract_script(o, OBJ_TRIGGER);
-			}
+			check_extract_script(o, OBJ_TRIGGER);
 		}
 		return;
 	}
 
 	if (r && SCRIPT(r)) {
 		if (!str_cmp(trignum_s, "all")) {
-			extract_script(r, WLD_TRIGGER);
+			remove_all_triggers(r, WLD_TRIGGER);
 			return;
 		}
 		if (remove_trigger(SCRIPT(r), trignum_s)) {
-			if (!TRIGGERS(SCRIPT(r))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				//extract_script(r, WLD_TRIGGER);
-			}
+			check_extract_script(r, WLD_TRIGGER);
 		}
 		return;
 	}

@@ -2460,7 +2460,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 		
 		// remove old scripts
 		if (SCRIPT(iter)) {
-			extract_script(iter, VEH_TRIGGER);
+			remove_all_triggers(iter, VEH_TRIGGER);
 		}
 		if (iter->proto_script && iter->proto_script != proto->proto_script) {
 			free_proto_scripts(&iter->proto_script);

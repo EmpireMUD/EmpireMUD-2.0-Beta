@@ -339,10 +339,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	for (mob = character_list; mob; mob = mob->next) {
 		if (IS_NPC(mob) && SCRIPT(mob)) {
 			remove_live_script_by_vnum(SCRIPT(mob), vnum);
-			if (!TRIGGERS(SCRIPT(mob))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				// extract_script(mob, MOB_TRIGGER);
-			}
+			check_extract_script(mob, MOB_TRIGGER);
 		}
 	}
 	
@@ -350,10 +347,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	for (obj = object_list; obj; obj = obj->next) {
 		if (SCRIPT(obj)) {
 			remove_live_script_by_vnum(SCRIPT(obj), vnum);
-			if (!TRIGGERS(SCRIPT(obj))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				// extract_script(obj, OBJ_TRIGGER);
-			}
+			check_extract_script(obj, OBJ_TRIGGER);
 		}
 	}
 	
@@ -361,10 +355,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	LL_FOREACH(vehicle_list, veh) {
 		if (SCRIPT(veh)) {
 			remove_live_script_by_vnum(SCRIPT(veh), vnum);
-			if (!TRIGGERS(SCRIPT(veh))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				// extract_script(veh, VEH_TRIGGER);
-			}
+			check_extract_script(veh, VEH_TRIGGER);
 		}
 	}
 	
@@ -372,10 +363,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (SCRIPT(room)) {
 			remove_live_script_by_vnum(SCRIPT(room), vnum);
-			if (!TRIGGERS(SCRIPT(room))) {
-				// no longer extracting script when triggers run out: this would lose remote vars
-				// extract_script(room, WLD_TRIGGER);
-			}
+			check_extract_script(room, WLD_TRIGGER);
 		}
 		delete_from_proto_list_by_vnum(&(room->proto_script), vnum);
 	}

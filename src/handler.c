@@ -7523,10 +7523,7 @@ void detach_building_from_room(room_data *room) {
 				SCRIPT_TYPES(SCRIPT(room)) |= GET_TRIG_TYPE(trig);
 			}
 		}
-		if (!TRIGGERS(SCRIPT(room))) {
-			// no longer extracting script when triggers run out: this would lose remote vars
-			// extract_script(room, WLD_TRIGGER);
-		}
+		check_extract_script(room, WLD_TRIGGER);
 	}
 	
 	affect_total_room(room);
