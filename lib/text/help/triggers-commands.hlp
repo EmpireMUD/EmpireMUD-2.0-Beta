@@ -322,19 +322,24 @@ room, then makes him look to see the description:
 
 Usage:  global <variablename>
 
-Used to change a variable from local to global. If a global variable is 
-modified, this command must be used to update the global contents as well.
-Global variables aren't quite as global as they sound; they are stored to the
-room in which the script is executing, where they are available to other
-scripts running in the same room.
+This command changes the scope of a variable from 'local' (only existing in the
+current execution of a script) to 'global' (available to all scripts that are
+attached to the same thing).
+
+If you modify a variable, you must use the global command again to store those
+changes to the global version of the variable.
+
+Global variables are NOT truly global. Only scripts attached to the same thing
+can access the same global variables. To store variables somewhere permanent
+where other scripts can find them, use 'remote' instead.
 
 Example:
+set has_bribed_guard 1
 * To make a variable 'reachable' from other scripts it has to be made 'global'. 
 * In this case I make a local known var %has_bribed_guard% and make it global. 
-* It's a good idea to use this in conjunction with context.
 global has_bribed_guard
 
-See also: VARIABLES, CONTEXT
+See also: VARIABLES, CONTEXT, REMOTE
 #d
 HALT
 
