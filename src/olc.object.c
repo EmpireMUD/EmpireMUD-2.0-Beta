@@ -1558,7 +1558,7 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	
 	// remove old scripts
 	if (SCRIPT(to_update)) {
-		extract_script(to_update, OBJ_TRIGGER);
+		remove_all_triggers(to_update, OBJ_TRIGGER);
 	}
 	if (to_update->proto_script && to_update->proto_script != old_proto->proto_script) {
 		free_proto_scripts(&to_update->proto_script);

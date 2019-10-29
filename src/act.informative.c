@@ -905,7 +905,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
-		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), SCRIPT(i) ? "[TRIG] " : "");
+		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), HAS_TRIGGERS(i) ? "[TRIG] " : "");
 	}
 	
 	if (IS_MORPHED(i) && GET_POS(i) == POS_STANDING) {
@@ -1050,7 +1050,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
+		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), HAS_TRIGGERS(veh) ? "[TRIG] " : "");
 	}
 	
 	// main desc
@@ -1433,14 +1433,13 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 		if (OBJ_CAN_STACK(i)) {
 			// look for a previous matching item
 			
-			strcpy(buf, GET_OBJ_DESC(i, ch, OBJ_DESC_SHORT));
 			for (j = list; j != i; j = j->next_content) {
 				if (OBJ_CAN_STACK(j) && OBJS_ARE_SAME(i, j)) {
-					if (!strcmp(buf, GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT))) {
-						if (GET_OBJ_VNUM(j) == NOTHING)
-							break;
-						else if (GET_OBJ_VNUM(j) == GET_OBJ_VNUM(i))
-							break;
+					if (GET_OBJ_VNUM(j) == NOTHING) {
+						break;
+					}
+					else if (GET_OBJ_VNUM(j) == GET_OBJ_VNUM(i)) {
+						break;
 					}
 				}
 			}
@@ -1452,12 +1451,11 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 			// determine number
 			for (j = i; j; j = j->next_content) {
 				if (OBJ_CAN_STACK(j) && OBJS_ARE_SAME(i, j)) {
-					strcpy(buf, GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT));
-					if (!strcmp(buf, GET_OBJ_DESC(i, ch, OBJ_DESC_SHORT))) {
-						if (GET_OBJ_VNUM(j) == NOTHING)
-							num++;
-						else if (GET_OBJ_VNUM(j) == GET_OBJ_VNUM(i))
-							num++;
+					if (GET_OBJ_VNUM(j) == NOTHING) {
+						num++;
+					}
+					else if (GET_OBJ_VNUM(j) == GET_OBJ_VNUM(i)) {
+						num++;
 					}
 				}
 			}
@@ -1498,7 +1496,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 
 	// initialize buf as the obj desc
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-		sprintf(buf, "[%d] %s%s", GET_OBJ_VNUM(obj), (SCRIPT(obj) ? "[TRIG] " : ""), GET_OBJ_DESC(obj, ch, mode));
+		sprintf(buf, "[%d] %s%s", GET_OBJ_VNUM(obj), (HAS_TRIGGERS(obj) ? "[TRIG] " : ""), GET_OBJ_DESC(obj, ch, mode));
 	}
 	else {
 		strcpy(buf, GET_OBJ_DESC(obj, ch, mode));

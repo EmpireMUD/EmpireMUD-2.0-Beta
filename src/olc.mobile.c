@@ -1008,7 +1008,7 @@ void save_olc_mobile(descriptor_data *desc) {
 
 			// remove old scripts
 			if (SCRIPT(mob_iter)) {
-				extract_script(mob_iter, MOB_TRIGGER);
+				remove_all_triggers(mob_iter, MOB_TRIGGER);
 			}
 			if (mob_iter->proto_script && mob_iter->proto_script != proto->proto_script) {
 				free_proto_scripts(&mob_iter->proto_script);

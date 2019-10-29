@@ -345,6 +345,8 @@ void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str
 extern trig_data *real_trigger(trig_vnum vnum);
 void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
+void check_extract_script(void *go, int type);
+void remove_all_triggers(void *thing, int type);
 void free_proto_scripts(struct trig_proto_list **list);
 void free_trigger(trig_data *trig);
 extern struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
@@ -420,6 +422,8 @@ int valid_dg_target(char_data *ch, int bitvector);
 
 #define SCRIPT_TYPES(s)		  ((s)->types)				  
 #define TRIGGERS(s)		  ((s)->trig_list)
+
+#define HAS_TRIGGERS(o)  (SCRIPT(o) && TRIGGERS(SCRIPT(o)))
 
 #define GET_SHORT(ch)    ((ch)->player.short_descr)
 

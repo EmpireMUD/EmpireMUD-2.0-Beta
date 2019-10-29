@@ -798,9 +798,7 @@ ADMIN_UTIL(util_resetbuildingtriggers) {
 			}
 			
 			// remove old triggers
-			if (SCRIPT(room)) {
-				extract_script(room, WLD_TRIGGER);
-			}
+			remove_all_triggers(room, WLD_TRIGGER);
 			free_proto_scripts(&room->proto_script);
 			
 			// add any triggers
