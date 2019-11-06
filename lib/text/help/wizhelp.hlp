@@ -890,13 +890,17 @@ See also: GRANT
 #d
 RESTORE
 
-Usage:  restore <player | mobile>
+Usage:  restore <player | mobile> [types]
 
-RESTORE restores a player or mobile to full hit, mana, and movement points.
-It also resets all cooldowns. This command is grantable.
+RESTORE is used to heal and cure a player or mobile. If you use it without a
+type argument, it fully restores the target. Or, you can choose one or more
+types to restore from: health, mana, movement, blood, hunger, thirst,
+drunkenness, cooldowns, and DoTs.
 
-If used on immortals, it also sets all skill levels to 100 and grants all
-abilities (on the first skill set only).
+If a full restore (all) is performed on an immortal, it also sets all skill
+levels to 100 and gives all abilities (on the main skill set only).
+
+This command is grantable.
 
 See also: GRANT, SKILL SWAP
 #d
