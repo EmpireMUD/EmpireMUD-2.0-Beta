@@ -57,11 +57,18 @@ bool check_social(char_data *ch, char *string, bool exact) {
 	skip_spaces(&string);
 	half_chop(string, arg, arg1);
 	
-	if (!*arg)
+	if (!*arg) {
 		return FALSE;
+	}
 	
-	if (!(soc = find_social(ch, arg, exact)))
+	if (!(soc = find_social(ch, arg, exact))) {
 		return FALSE;
+	}
+	
+	// earthmeld doesn't hit the correct error in char_can_act -- just block all socials in earthmeld
+	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		msg_to_char(ch, "You can't do that while in earthmeld.\r\n");
+	}
 	
 	// this passes POS_DEAD because social pos is checked in perform_social
 	if (!char_can_act(ch, POS_DEAD, TRUE, TRUE)) {
