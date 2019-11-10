@@ -372,10 +372,10 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		if (not_flagged != NOBITS && CROP_FLAGGED(crop, not_flagged)) {
 			continue;
 		}
-		if (only_climate && GET_CROP_CLIMATE(crop) != only_climate) {
+		if (only_climate != NOTHING && GET_CROP_CLIMATE(crop) != only_climate) {
 			continue;
 		}
-		if (only_mapout && GET_CROP_MAPOUT(crop) != only_mapout) {
+		if (only_mapout != NOTHING && GET_CROP_MAPOUT(crop) != only_mapout) {
 			continue;
 		}
 		if (find_interacts) {	// look up its interactions
