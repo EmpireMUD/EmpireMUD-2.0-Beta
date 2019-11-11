@@ -636,9 +636,9 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	complete_quest(ch, pq, giver_emp);
 	
 	// group completion
-	if (QST_FLAGGED(quest, QST_GROUP_COMPLETION) && GROUP(ch)) {
+	if (QUEST_FLAGGED(quest, QST_GROUP_COMPLETION) && GROUP(ch)) {
 		LL_FOREACH(GROUP(ch)->members, mem) {
-			if (mem->member != ch && !IS_NPC(mem->member) && IN_ROOM(mem->member) == IN_ROOM(ch) && (pq = is_on_quest(mem->member, QST_VNUM(quest)))) {
+			if (mem->member != ch && !IS_NPC(mem->member) && IN_ROOM(mem->member) == IN_ROOM(ch) && (pq = is_on_quest(mem->member, QUEST_VNUM(quest)))) {
 				complete_quest(mem->member, pq, giver_emp);
 			}
 		}
@@ -813,7 +813,7 @@ QCMD(qcmd_info) {
 			msg_to_char(ch, "Turn in at: %s.\r\n", buf);
 		}
 		
-		if (QST_FLAGGED(qst, QST_GROUP_COMPLETION)) {
+		if (QUEST_FLAGGED(qst, QST_GROUP_COMPLETION)) {
 			msg_to_char(ch, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.\r\n");
 		}
 	}
