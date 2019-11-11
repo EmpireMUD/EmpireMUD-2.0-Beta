@@ -2727,6 +2727,7 @@ const char *quest_flags[] = {
 	"EMPIRE-ONLY",
 	"NO-GUESTS",
 	"TUTORIAL",
+	"GROUP-COMPLETION",
 	"\n"
 };
 

@@ -2250,6 +2250,7 @@ typedef struct vehicle_data vehicle_data;
 #define QST_EMPIRE_ONLY  BIT(5)	// only available if quest giver and player are in the same empire
 #define QST_NO_GUESTS  BIT(6)	// quest start/finish use MEMBERS_ONLY
 #define QST_TUTORIAL  BIT(7)	// quest can be blocked by 'toggle tutorial'
+#define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
 
 
 // QG_x: quest giver types

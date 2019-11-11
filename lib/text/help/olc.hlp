@@ -6151,6 +6151,8 @@ The following quest flags are available:
  NO-GUESTS - Checks actual ownership on the room when you start/finish a quest.
  TUTORIAL - This quest will not appear if the player uses 'toggle tutorials'.
     Use this flag for basic tutorials only, like ones on common items.
+ GROUP-COMPLETION - Will auto-finish the quest if a group member turns it in
+    while in the same room.
 
 See also: OLC QUESTS, DAILY QUEST
 #d
