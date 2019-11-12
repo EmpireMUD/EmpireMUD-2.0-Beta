@@ -242,9 +242,9 @@ A petrified hydra skull is anchored here.~
    If you can see this, something has gone wrong and you should tell the
 immortals immediately as possible. Feel free to use the bug command to do so.
 ~
-3 0 0 4
+3 0 0 5
 0 0 0
-1 48
+1 4
 T 16121
 S
 #16111
@@ -758,9 +758,9 @@ A hydra seeking stone lies here.~
    This stone will tell you where the oceanic hydra was last seen. Just "seek
 hydra" to use it.
 ~
-3 p a 19
+3 p a 20
 0 0 0
-12 288
+12 24
 C
 1 1
 T 16115

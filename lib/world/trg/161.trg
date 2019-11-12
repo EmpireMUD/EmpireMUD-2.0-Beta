@@ -3,6 +3,8 @@ Hydra Load~
 0 n 100
 ~
 dg_affect #16100 %self% IMMUNE-DAMAGE on -1
+set HydraBuffCounter 0
+global HydraBuffCounter
 if %instance.location%
   mgoto %instance.location%
 end
@@ -14,6 +16,27 @@ end
 * spawn one of the possible hydra heads.
 eval randomhead %random.4% + 16100
 %load% mob %randomhead% ally
+~
+#16101
+hydra vicious head attack~
+0 k 10
+~
+set person %self.room.people%
+set counter 0
+while %person%
+  if !%person.is_npc%
+    eval counter %counter% + 1
+  end
+  set person %person.next_in_room%
+done
+if %counter% == 1
+  set ViciousDamage 300
+else
+  set ViciousDamage 110
+end
+%send% %actor% %self.name% suddenly strikes with the speed of a cobra!
+%echoaround% %actor% %self.name% suddenly strikes %actor.name% with the speed of a cobra!
+%damage% %actor% %ViciousDamage%
 ~
 #16102
 hydra head death~
@@ -76,9 +99,16 @@ if %self.varexists(LostImmunity)%
   eval SinceImmunity %timestamp% - %LostImmunity%
   if %SinceImmunity% >= 90
     dg_affect #16100 %self% IMMUNE-DAMAGE on -1
-    dg_affect #16103 %self% bonus-physical 15 -1
     rdelete LostImmunity %self.id%
   end
+end
+eval HydraBuffCounter %HydraBuffCounter% + 1
+global HydraBuffCounter
+eval HydraBuffCounter %HydraBuffCounter% - 3
+if %HydraBuffCounter% >= 1
+  eval BuffUpHydra %HydraBuffCounter% * 30
+  dg_affect #16103 %self% off
+  dg_affect #16103 %self% bonus-physical %BuffUpHydra% -1
 end
 ~
 #16104
@@ -119,17 +149,57 @@ if %headcount% == 0
   %echo% Water splashes everywhere as the hydra lifts a head to look at you.
 end
 dg_affect #16103 %self% off
+set HydraBuffCounter 0
+global HydraBuffCounter
+~
+#16105
+wandering mob adventure command~
+0 c 0
+adventure~
+if !(summon /= %arg.car%)
+  %teleport% %actor% %instance.real_location%
+  %force% %actor% adventure
+  %teleport% %actor% %self%
+  return 1
+  halt
+end
+return 0
+~
+#16106
+hydra ethereal head combat~
+0 k 10
+~
+set person %self.room.people%
+set counter 0
+while %person%
+  if !%person.is_npc%
+    set ptarget %person%
+    eval counter %counter% + 1
+  end
+  set person %person.next_in_room%
+done
+if %counter% == 1 && !%ptarget.disabled%
+  %send% %ptarget% You're frozen with fear as %self.name% gazes directly at you!
+  dg_affect #16106 %ptarget% HARD-STUNNED on 10
+elseif %counter% == 1
+  %send% %ptarget% %self.name% opens wide and spits a bolt of mana at you!
+  %dot% #16105 %ptarget% 120 15 magical 3
+else
+  %send% %actor% %self.name% opens wide and spits a bolt of mana at you!
+  %dot% #16105 %actor% 75 15 magical 3
+  %echoaround% %actor% %self.name% opens wide and spits a bolt of mana at %actor.name%!
+end
 ~
 #16107
 hydra vicious head buff~
-0 l 25
+0 l 40
 ~
 if %self.cooldown(16107)%
   halt
 end
 %echo% %self.name%'s eyes glow bright red and a fury overtakes it.
 dg_affect %self% bonus-physical 50 90
-nop %self.set_cooldown(16107, 90)%
+nop %self.set_cooldown(16107, 60)%
 ~
 #16108
 hydra death head purge~
@@ -147,7 +217,7 @@ nop %instance.set_location(%instance.real_location%)%
 ~
 #16109
 hydra withering head debuff~
-0 k 10
+0 k 20
 ~
 switch %random.13%
   case 1
@@ -231,17 +301,17 @@ end
 hydra leash~
 0 i 100
 ~
-eval room %self.room%
-if %room.distance(%instance.real_location%)% > 30
+set room %self.room%
+if %room.distance(%instance.real_location%)% > 40
   %echo% %self.name% sinuously twists around and doubles back.
   return 0
   wait 1
   %echo% %self.name% sinuously twists around and doubles back.
   halt
 end
-* if !(%room.sector_vnum% == 6)
-* nop %instance.set_location(%room%)%
-* end
+if %room.sector_vnum% != 6
+  nop %instance.set_location(%room%)%
+end
 ~
 #16111
 hydra slayer build~
@@ -292,7 +362,7 @@ done
 ~
 #16113
 hydra majestic head buffs~
-0 k 15
+0 k 10
 ~
 set person %self.room.people%
 switch %random.4%
@@ -300,31 +370,25 @@ switch %random.4%
     while %person%
       if %person.is_npc%
         if %person.vnum% >= 16101 && %person.vnum% <= 16104
-          heal %person%
-          halt
+          %heal% %person% health 100
         end
       end
       set person %person.next_in_room%
     done
+    %echo% %self.name% heals all visible heads.
   break
   case 2
     while %person%
-      if %person.is_npc%
-        if %person.vnum% == 16102
-          dg_affect #16104 %person% bonus-physical 10 13
-          halt
-        end
+      if %person.is_npc% && %person.vnum% == 16102
+        dg_affect #16104 %person% bonus-physical 15 20
       end
       set person %person.next_in_room%
     done
   break
   case 3
     while %person%
-      if %person.is_npc%
-        if %person.vnum% == 16101
-          dg_affect #16104 %person% bonus-magical 10 13
-          halt
-        end
+      if %person.is_npc% && %person.vnum% == 16101
+        dg_affect #16104 %person% bonus-magical 15 20
       end
       set person %person.next_in_room%
     done
@@ -336,10 +400,8 @@ switch %random.4%
           if %person% == %self%
             %echo% The majestic head begins to glow all over as it seems to enhance itself.
             dg_affect %person% bonus-healing 5 -1
-            halt
           else
-            dg_affect #16104 %person% bonus-healing 10 13
-            halt
+            dg_affect #16104 %person% bonus-healing 15 20
           end
         end
       end
@@ -347,13 +409,12 @@ switch %random.4%
     done
   break
 done
-heal %random.ally%
+%heal% %random.ally% health 150
 ~
 #16114
 when hydra gear is crafted~
 1 n 100
 ~
-%echo% level is %self.level%.
 if %self.level%
   set level %self.level%
 else
@@ -407,11 +468,11 @@ else
     halt
   end
   eval adv %instance.nearest_adventure(16100)%
+  nop %actor.set_cooldown(16115, 300)%
   if !%adv%
     %send% %actor% Could not find a single oceanic hydra.
     halt
   end
-  nop %actor.set_cooldown(16115, 300)%
   %send% %actor% You hold %self.shortdesc% aloft...
   eval real_dir %%room.direction(%adv%)%%
   eval direction %%actor.dir(%real_dir%)%%
@@ -424,11 +485,7 @@ else
   else
     set plural tiles
   end
-  if %actor.ability(Navigation)%
-    %send% %actor% The oceanic hydra was last seen at %adv.coords%, %distance% %plural% to the %direction%.
-  else
-    %send% %actor% The oceanic hydra was last seen %distance% %plural% to the %direction%.
-  end
+  %send% %actor% The oceanic hydra was last seen %distance% %plural% to the %direction%.
   %echoaround% %actor% %actor.name% holds %self.shortdesc% aloft...
 end
 ~
