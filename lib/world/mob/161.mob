@@ -1,7 +1,7 @@
 #16100
 hydra oceanic monstrous~
 the oceanic hydra~
-A monstrous oceanic hydra forms its own waves as it surfaces!
+A monstrous oceanic hydra forms its own waves as it surfaces! (adventure)
 ~
 225 325 adlyBE cE 4
 0 0 6 25
@@ -9,7 +9,7 @@ D
    This serpentine monster can't be seen properly as a majority of its body is
 still under the water. All you can properly see is its head, or is that heads?
 ~
-I 0 16150 5.00 1  # BUTCHER: an in-tact hydra tongue
+I 0 16150 5.00 1  # BUTCHER: an intact hydra tongue
 I 0 16108 80.00 1 b  # BUTCHER: a massive hydra bone
 I 0 16108 20.00 2 b  # BUTCHER: a massive hydra bone
 I 0 16109 60.00 1 f  # BUTCHER: a hydra fang
@@ -31,6 +31,7 @@ T 16104
 T 16108
 T 16110
 T 16100
+T 16105
 S
 #16101
 head ethereal~
@@ -45,6 +46,7 @@ leading back to the bulk of the hydra. As the waves swell they seem to pass
 straight through this particular head.
 ~
 T 16102
+T 16106
 S
 #16102
 head vicious~
@@ -60,6 +62,7 @@ length of daggers are clearly on display as it snaps at you.
 ~
 T 16107
 T 16102
+T 16101
 S
 #16103
 head withered~

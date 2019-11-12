@@ -294,6 +294,141 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 
 
 /**
+* Searches properties of crops.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_crop(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	bitvector_t  find_interacts = NOBITS, found_interacts;
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
+	int count, only_climate = NOTHING, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING;
+	struct interaction_item *inter;
+	crop_data *crop, *next_crop;
+	struct icon_data *icon;
+	size_t size;
+	bool match;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP CROPEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_LIST("climate", only_climate, climate_types)
+		FULLSEARCH_FLAGS("flags", only_flags, crop_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, crop_flags)
+		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_LIST("mapout", only_mapout, mapout_color_names)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, crop_flags)
+		FULLSEARCH_INT("x", only_x, 0, 100)
+		FULLSEARCH_INT("y", only_y, 0, 100)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Crop fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up crpos
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		if ((only_x != NOTHING || only_y != NOTHING) && CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
+			continue;	// can't search x/y on not-wild crops
+		}
+		if (only_x != NOTHING) {
+			if (GET_CROP_X_MAX(crop) > GET_CROP_X_MIN(crop) && (GET_CROP_X_MAX(crop) < only_x || GET_CROP_X_MIN(crop) > only_x)) {
+				continue;	// outside of range (max > min)
+			}
+			if (GET_CROP_X_MAX(crop) < GET_CROP_X_MIN(crop) && (GET_CROP_X_MAX(crop) < only_x && GET_CROP_X_MIN(crop) > only_x)) {
+				continue;	// outside of range (max < min)
+			}
+		}
+		if (only_y != NOTHING) {
+			if (GET_CROP_Y_MAX(crop) > GET_CROP_Y_MIN(crop) && (GET_CROP_Y_MAX(crop) < only_y || GET_CROP_Y_MIN(crop) > only_y)) {
+				continue;	// outside of range (max > min)
+			}
+			if (GET_CROP_Y_MAX(crop) < GET_CROP_Y_MIN(crop) && (GET_CROP_Y_MAX(crop) < only_y && GET_CROP_Y_MIN(crop) > only_y)) {
+				continue;	// outside of range (max < min)
+			}
+		}
+		if (only_flags != NOBITS && (GET_CROP_FLAGS(crop) & only_flags) != only_flags) {
+			continue;
+		}
+		if (not_flagged != NOBITS && CROP_FLAGGED(crop, not_flagged)) {
+			continue;
+		}
+		if (only_climate != NOTHING && GET_CROP_CLIMATE(crop) != only_climate) {
+			continue;
+		}
+		if (only_mapout != NOTHING && GET_CROP_MAPOUT(crop) != only_mapout) {
+			continue;
+		}
+		if (find_interacts) {	// look up its interactions
+			found_interacts = NOBITS;
+			LL_FOREACH(GET_CROP_INTERACTIONS(crop), inter) {
+				found_interacts |= BIT(inter->type);
+			}
+			if ((find_interacts & found_interacts) != find_interacts) {
+				continue;
+			}
+		}
+		
+		// string search
+		if (*find_keywords && !multi_isname(find_keywords, GET_CROP_NAME(crop)) && !multi_isname(find_keywords, GET_CROP_TITLE(crop))) {
+			// check icons too
+			match = FALSE;
+			LL_FOREACH(GET_CROP_ICONS(crop), icon) {
+				if (multi_isname(find_keywords, icon->color) || multi_isname(find_keywords, icon->icon)) {
+					match = TRUE;
+					break;	// only need 1 match
+				}
+			}
+			if (!match) {
+				continue;
+			}
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d crop%s)\r\n", count, PLURAL(count));
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a crop and displays them.
 *
 * @param char_data *ch The player.

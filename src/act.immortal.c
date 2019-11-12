@@ -8547,86 +8547,204 @@ ACMD(do_rescale) {
 ACMD(do_restore) {
 	void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 	
+	char name_arg[MAX_INPUT_LENGTH], *type_args, arg[MAX_INPUT_LENGTH], msg[MAX_STRING_LENGTH], types[MAX_STRING_LENGTH];
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
 	empire_data *emp;
 	char_data *vict;
 	int i, iter;
+	
+	// modes
+	bool all = FALSE, blood = FALSE, cds = FALSE, dots = FALSE, drunk = FALSE, health = FALSE, hunger = FALSE, mana = FALSE, moves = FALSE, thirst = FALSE;
 
-	one_argument(argument, buf);
-	if (!*buf)
+	type_args = one_argument(argument, name_arg);
+	skip_spaces(&type_args);
+	
+	if (!*name_arg) {
 		send_to_char("Whom do you wish to restore?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, buf, FIND_CHAR_WORLD)))
+		return;
+	}
+	else if (!(vict = get_char_vis(ch, name_arg, FIND_CHAR_WORLD))) {
 		send_config_msg(ch, "no_person");
+		return;
+	}
+	
+	// parse type args
+	if (!*type_args) {
+		all = TRUE;
+	}
 	else {
-		// remove DoTs
-		while (vict->over_time_effects) {
-			dot_remove(vict, vict->over_time_effects);
+		all = FALSE;
+		while (*type_args) {
+			type_args = any_one_arg(type_args, arg);
+			skip_spaces(&type_args);
+			
+			if (is_abbrev(arg, "all") || is_abbrev(arg, "full")) {
+				all = TRUE;
+			}
+			else if (is_abbrev(arg, "blood")) {
+				blood = TRUE;
+			}
+			else if (is_abbrev(arg, "cooldowns")) {
+				cds = TRUE;
+			}
+			else if (is_abbrev(arg, "dots")) {
+				dots = TRUE;
+			}
+			else if (is_abbrev(arg, "drunkenness")) {
+				drunk = TRUE;
+			}
+			else if (is_abbrev(arg, "health") || is_abbrev(arg, "hitpoints")) {
+				health = TRUE;
+			}
+			else if (is_abbrev(arg, "hunger")) {
+				hunger = TRUE;
+			}
+			else if (is_abbrev(arg, "mana")) {
+				mana = TRUE;
+			}
+			else if (is_abbrev(arg, "moves") || is_abbrev(arg, "movement") || is_abbrev(arg, "vitality")) {
+				// "vitality" catches "v" on "restore <name> h m v"
+				moves = TRUE;
+			}
+			else if (is_abbrev(arg, "thirsty")) {
+				thirst = TRUE;
+			}
+			else {
+				msg_to_char(ch, "Unknown restore type '%s'.\r\n", arg);
+				return;
+			}
 		}
-
+	}
+	
+	// OK: setup default messages
+	*types = '\0';
+	if (ch == vict) {
+		if (all) {
+			strcpy(msg, "You have fully restored yourself!");
+		}
+		else {
+			strcpy(msg, "You have restored your");
+		}
+	}
+	else {
+		if (all) {
+			strcpy(msg, "You have been fully restored by $N!");
+		}
+		else {
+			strcpy(msg, "$N has restored your");
+		}
+	}
+	
+	// OK: do the work
+	
+	// fill pools
+	if (all || health) {
+		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
+		
 		if (GET_POS(vict) < POS_SLEEPING) {
 			GET_POS(vict) = POS_STANDING;
 		}
 		
-		// remove all cooldowns
+		update_pos(vict);
+		sprintf(types + strlen(types), "%s health", *types ? "," : "");
+	}
+	if (all || mana) {
+		GET_MANA(vict) = GET_MAX_MANA(vict);
+		sprintf(types + strlen(types), "%s mana", *types ? "," : "");
+	}
+	if (all || moves) {
+		GET_MOVE(vict) = GET_MAX_MOVE(vict);
+		sprintf(types + strlen(types), "%s moves", *types ? "," : "");
+	}
+	if (all || blood) {
+		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
+		sprintf(types + strlen(types), "%s blood", *types ? "," : "");
+	}
+	
+	// remove DoTs
+	if (all || dots) {
+		while (vict->over_time_effects) {
+			dot_remove(vict, vict->over_time_effects);
+		}
+		
+		sprintf(types + strlen(types), "%s DoTs", *types ? "," : "");
+	}
+	
+	// remove all cooldowns
+	if (all || cds) {
 		while ((cool = vict->cooldowns)) {
 			vict->cooldowns = cool->next;
 			free(cool);
 		}
-
-		if (!IS_NPC(vict) && (GET_ACCESS_LEVEL(ch) >= LVL_GOD) && (GET_ACCESS_LEVEL(vict) >= LVL_GOD)) {
-			for (i = 0; i < NUM_CONDS; i++)
-				GET_COND(vict, i) = UNLIMITED;
-
-			for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-				vict->real_attributes[iter] = att_max(vict);
-			}
-			
-			HASH_ITER(hh, skill_table, skill, next_skill) {
-				set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
-			}
-			update_class(vict);
-			assign_class_abilities(vict, NULL, NOTHING);
-			
-			// temporarily remove empire abilities
-			emp = GET_LOYALTY(vict);
-			if (emp) {
-				adjust_abilities_to_empire(vict, emp, FALSE);
-			}
-			
-			HASH_ITER(hh, ability_table, abil, next_abil) {
-				// add abilities to set 0
-				add_ability_by_set(vict, abil, 0, TRUE);
-			}
-
-			affect_total(vict);
-			
-			// re-add abilities
-			if (emp) {
-				adjust_abilities_to_empire(vict, emp, TRUE);
-			}
-		}
-		else if (!IS_NPC(vict)) {
-			for (i = 0; i < NUM_CONDS; i++) {
-				if (GET_COND(vict, i) != UNLIMITED) {
-					GET_COND(vict, i) = 0;
-				}
-			}
-		}
 		
-		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
-		GET_MOVE(vict) = GET_MAX_MOVE(vict);
-		GET_MANA(vict) = GET_MAX_MANA(vict);
-		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
-		
-		update_pos(vict);
-		if (ch != vict) {
-			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict));
-		}
-		send_config_msg(ch, "ok_string");
-		act("You have been fully healed by $N!", FALSE, vict, 0, ch, TO_CHAR);
+		sprintf(types + strlen(types), "%s cooldowns", *types ? "," : "");
 	}
+	
+	// conditions
+	if (all || hunger) {
+		if (!IS_NPC(vict) && GET_COND(vict, FULL) != UNLIMITED) {
+			GET_COND(vict, FULL) = 0;
+		}
+		sprintf(types + strlen(types), "%s hunger", *types ? "," : "");
+	}
+	if (all || thirst) {
+		if (!IS_NPC(vict) && GET_COND(vict, THIRST) != UNLIMITED) {
+			GET_COND(vict, THIRST) = 0;
+		}
+		sprintf(types + strlen(types), "%s thirst", *types ? "," : "");
+	}
+	if (all || drunk) {
+		if (!IS_NPC(vict) && GET_COND(vict, DRUNK) != UNLIMITED) {
+			GET_COND(vict, DRUNK) = 0;
+		}
+		sprintf(types + strlen(types), "%s drunkenness", *types ? "," : "");
+	}
+
+	if (all && !IS_NPC(vict) && (GET_ACCESS_LEVEL(ch) >= LVL_GOD) && (GET_ACCESS_LEVEL(vict) >= LVL_GOD)) {
+		for (i = 0; i < NUM_CONDS; i++)
+			GET_COND(vict, i) = UNLIMITED;
+
+		for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+			vict->real_attributes[iter] = att_max(vict);
+		}
+		
+		HASH_ITER(hh, skill_table, skill, next_skill) {
+			set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
+		}
+		update_class(vict);
+		assign_class_abilities(vict, NULL, NOTHING);
+		
+		// temporarily remove empire abilities
+		emp = GET_LOYALTY(vict);
+		if (emp) {
+			adjust_abilities_to_empire(vict, emp, FALSE);
+		}
+		
+		HASH_ITER(hh, ability_table, abil, next_abil) {
+			// add abilities to set 0
+			add_ability_by_set(vict, abil, 0, TRUE);
+		}
+
+		affect_total(vict);
+		
+		// re-add abilities
+		if (emp) {
+			adjust_abilities_to_empire(vict, emp, TRUE);
+		}
+	}
+	
+	if (ch != vict) {
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s:%s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), all ? " full restore" : types);
+	}
+	
+	send_config_msg(ch, "ok_string");
+	
+	if (!all) {
+		sprintf(msg + strlen(msg), "%s!", types);
+	}
+	act(msg, FALSE, vict, NULL, ch, TO_CHAR);
 }
 
 

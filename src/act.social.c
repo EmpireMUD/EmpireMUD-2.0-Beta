@@ -51,17 +51,25 @@ void perform_social(char_data *ch, social_data *soc, char *argument);
 bool check_social(char_data *ch, char *string, bool exact) {
 	extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 	
-	char arg1[MAX_STRING_LENGTH];
+	char str[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
 	social_data *soc;
 	
 	skip_spaces(&string);
-	half_chop(string, arg, arg1);
+	half_chop(string, str, arg1);
 	
-	if (!*arg)
+	if (!*str) {
 		return FALSE;
+	}
 	
-	if (!(soc = find_social(ch, arg, exact)))
-		return FALSE;
+	if (!(soc = find_social(ch, str, exact))) {
+		return FALSE;	// no match to any social
+	}
+	
+	// earthmeld doesn't hit the correct error in char_can_act -- just block all socials in earthmeld
+	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		msg_to_char(ch, "You can't do that while in earthmeld.\r\n");
+		return TRUE;
+	}
 	
 	// this passes POS_DEAD because social pos is checked in perform_social
 	if (!char_can_act(ch, POS_DEAD, TRUE, TRUE)) {
