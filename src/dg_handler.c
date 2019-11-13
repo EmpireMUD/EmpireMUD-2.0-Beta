@@ -79,6 +79,14 @@ struct script_data *create_script_data(void *attach_to, int type) {
 			}
 			break;
 		}
+		case EMP_TRIGGER: {
+			empire_data *emp = (empire_data*)attach_to;
+			if (!(scr = SCRIPT(emp))) {
+				CREATE(scr, struct script_data, 1);
+				SCRIPT(emp) = scr;
+			}
+			break;
+		}
 		// no default: just won't set scr
 	}
 	
@@ -219,6 +227,11 @@ void extract_script(void *thing, int type) {
 			SCRIPT(veh) = NULL;
 			break;
 		}
+		case EMP_TRIGGER: {
+			empire_data *emp = (empire_data*)thing;
+			sc = SCRIPT(emp);
+			SCRIPT(emp) = NULL;
+		}
 		default: {
 			log("SYSERR: Invalid type called for extract_script()");
 			return;
@@ -317,6 +330,13 @@ void check_extract_script(void *go, int type) {
 			}
 			break;
 		}
+		case EMP_TRIGGER: {
+			empire_data *emp = (empire_data*)go;
+			if (SCRIPT(emp) && !TRIGGERS(SCRIPT(emp)) && !SCRIPT(emp)->global_vars) {
+				extract_script(emp, EMP_TRIGGER);
+			}
+			break;
+		}
 	}
 }
 
@@ -352,6 +372,11 @@ void remove_all_triggers(void *thing, int type) {
 		case VEH_TRIGGER: {
 			vehicle_data *veh = (vehicle_data*)thing;
 			sc = SCRIPT(veh);
+			break;
+		}
+		case EMP_TRIGGER: {
+			empire_data *emp = (empire_data*)thing;
+			sc = SCRIPT(emp);
 			break;
 		}
 		default: {

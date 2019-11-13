@@ -582,6 +582,10 @@ room_data *get_room_by_script(int type, void *go) {
 			room = IN_ROOM((vehicle_data*)go);
 			break;
 		}
+		case EMP_TRIGGER: {
+			room = NULL;	// cannot detect this way
+			break;
+		}
 	}
 	
 	return room;
@@ -1023,6 +1027,7 @@ void script_trigger_check(void) {
 	char buf[MAX_STRING_LENGTH];
 	struct script_data *sc;
 	vehicle_data *veh;
+	empire_data *emp;
 	char_data *mob;
 	obj_data *obj;
 	bool fail;
@@ -1072,6 +1077,12 @@ void script_trigger_check(void) {
 				in_room = IN_ROOM(veh);
 				break;
 			}
+			case EMP_TRIGGER: {
+				// WARNING: empires really do not support running scripts
+				emp = (empire_data *)sc->attached_to;
+				in_room = NULL;
+				break;
+			}
 			default: {	// all world trigger types
 				room = in_room = (room_data*)sc->attached_to;
 				break;
@@ -1106,6 +1117,10 @@ void script_trigger_check(void) {
 				union script_driver_data_u sdd;
 				sdd.v = veh;
 				script_driver(&sdd, trig, VEH_TRIGGER, TRIG_NEW);
+				break;
+			}
+			case EMP_TRIGGER: {
+				// type not supported: do nothing
 				break;
 			}
 			default: {	// all world trigger types
@@ -1165,6 +1180,9 @@ EVENTFUNC(trig_wait_event) {
 					break;
 				}
 			}
+		}
+		else if (type == EMP_TRIGGER) {
+			// this type is really not supported
 		}
 		else {	// WLD_TRIGGER, RMT_TRIGGER, ADV_TRIGGER, BLD_TRIGGER
 			room_data *i, *next_i;
@@ -1227,6 +1245,11 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		case VEH_TRIGGER: {
 			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Vehicles\r\n");
 			sprintbit(GET_TRIG_TYPE(trig), vtrig_types, buf, TRUE);
+			break;
+		}
+		case EMP_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Empires\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
 	}
@@ -1305,6 +1328,10 @@ void script_stat (char_data *ch, struct script_data *sc) {
 		else if (t->attach_type == VEH_TRIGGER) {
 			msg_to_char(ch, "  Trigger Intended Assignment: Vehicles\r\n");
 			sprintbit(GET_TRIG_TYPE(t), vtrig_types, buf1, TRUE);
+		}
+		else if (t->attach_type == EMP_TRIGGER) {
+			msg_to_char(ch, "  Trigger Intended Assignment: Empires\r\n");
+			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
 		else {
 			msg_to_char(ch, "  Trigger Intended Assignment: Mobiles\r\n");
@@ -2018,6 +2045,12 @@ void script_log_by_type(int go_type, void *go, const char *format, ...) {
 			vnum = VEH_VNUM((vehicle_data*)go);
 			break;
 		}
+		case EMP_TRIGGER: {
+			strcpy(type, "Empire");
+			strcpy(name, EMPIRE_NAME((empire_data*)go));
+			vnum = EMPIRE_VNUM((empire_data*)go);
+			break;
+		}
 		default: {
 			strcpy(type, "???");
 			strcpy(name, "???");
@@ -2187,12 +2220,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	vehicle_data *veh = NULL, *v = NULL;
 	obj_data *obj = NULL, *o = NULL;
 	room_data *room, *r = NULL;
-	empire_data *emp = NULL;
+	empire_data *emp = NULL, *e = NULL;
 	char *name;
 	int num, count;
 
-	// x_TRIGGER: mob, obj, world, rmt, adv, vehicle, bld
-	const char cmd_prefix[] = { 'm', 'o', 'w', 'w', 'w', 'v', 'w' };
+	// x_TRIGGER: mob, obj, world, rmt, adv, vehicle, bld, emp
+	const char cmd_prefix[] = { 'm', 'o', 'w', 'w', 'w', 'v', 'w', 'e' };
 	
 	// commands that work with '%command%' syntax (will be replaced with 'mcommand', 'ocommand', etc)
 	const char *script_commands[] = {
@@ -2272,6 +2305,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id((vehicle_data*) go));
 						break;
 					}
+					case EMP_TRIGGER: {
+						snprintf(str, slen, "%c%d", UID_CHAR, EMPIRE_VNUM((empire_data*) go) + EMPIRE_ID_BASE);
+						break;
+					}
 				}
 			//        snprintf(str, slen, "self");
 			else if ((num = search_block(var, script_commands, TRUE)) != NOTHING) {
@@ -2346,7 +2383,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if ((r = get_room(IN_ROOM(ch), name))) {
 						// just setting
 					}
-					else if ((emp = get_empire(name))) {
+					else if ((e = get_empire(name))) {
 						// just setting
 					}
 
@@ -2366,7 +2403,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if ((r = get_room(obj_room(obj), name))) {
 						// just setting
 					}
-					else if ((emp = get_empire(name))) {
+					else if ((e = get_empire(name))) {
 						// just setting
 					}
 					else {
@@ -2392,7 +2429,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if ((r = get_room(room, name))) {
 						// just setting
 					}
-					else if ((emp = get_empire(name))) {
+					else if ((e = get_empire(name))) {
 						// just setting
 					}
 
@@ -2400,8 +2437,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case VEH_TRIGGER: {
 					veh = (vehicle_data*)go;
 					
-					if ((c = get_char_by_vehicle(veh, name)) || (v = get_vehicle_by_vehicle(veh, name)) || (o = get_obj_by_vehicle(veh, name)) || (r = get_room(IN_ROOM(veh), name)) || (emp = get_empire(name))) {
+					if ((c = get_char_by_vehicle(veh, name)) || (v = get_vehicle_by_vehicle(veh, name)) || (o = get_obj_by_vehicle(veh, name)) || (r = get_room(IN_ROOM(veh), name)) || (e = get_empire(name))) {
 						// just setting vars
+					}
+					break;
+				}
+				case EMP_TRIGGER: {
+					emp = (empire_data*)go;
+					
+					if ((c = get_char(name))) {
+						// just setting
+					}
+					else if ((v = get_vehicle(name))) {
+						// just setting
+					}
+					else if ((o = get_obj(name))) {
+						// just setting
+					}
+					else if ((r = get_room(NULL, name))) {
+						// just setting
+					}
+					else if ((e = get_empire(name))) {
+						// just setting
 					}
 					break;
 				}
@@ -2415,12 +2472,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						r = NULL;
 						v = NULL;
 						o = NULL;  /* NULL assignments added to avoid self to always be    */ 
+						e = NULL;
 						break;     /* the room.  - Welcor        */
 					case OBJ_TRIGGER:
 						o = (obj_data*) go;
 						c = NULL;
 						r = NULL;
 						v = NULL;
+						e = NULL;
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
@@ -2430,10 +2489,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						c = NULL;
 						o = NULL;
 						v = NULL;
+						e = NULL;
 						break;
 					case VEH_TRIGGER: {
 						v = (vehicle_data*)go;
 						c = NULL;
+						o = NULL;
+						r = NULL;
+						e = NULL;
+						break;
+					}
+					case EMP_TRIGGER: {
+						e = (empire_data*)go;
+						c = NULL;
+						v = NULL;
 						o = NULL;
 						r = NULL;
 						break;
@@ -2706,6 +2775,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								}
 							}
 						}
+					}
+					else if (type == EMP_TRIGGER) {
+						// type not supported here
 					}
 
 					if (rndm)
@@ -5362,7 +5434,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		}	// if (v) ...
 		
 
-		else if (emp) {	// empire variable
+		else if (e) {	// empire variable
 			if (text_processed(field, subfield, vd, str, slen)) {
 				return;
 			}
@@ -5376,10 +5448,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							any_vnum vnum;
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
-								if (!empire_has_completed_goal(emp, vnum)) {
+								if (!empire_has_completed_goal(e, vnum)) {
 									void script_reward_goal(empire_data *emp, progress_data *prg);
-									script_reward_goal(emp, prg);
-									check_for_eligible_goals(emp);
+									script_reward_goal(e, prg);
+									check_for_eligible_goals(e);
 								}
 								strcpy(str, "1");
 							}
@@ -5393,37 +5465,37 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "adjective")) {
-						snprintf(str, slen, "%s", EMPIRE_ADJECTIVE(emp));
+						snprintf(str, slen, "%s", EMPIRE_ADJECTIVE(e));
 					}
 					break;
 				}
 				case 'b': {	// emp.b*
 					if (!str_cmp(field, "banner")) {
-						snprintf(str, slen, "%s", EMPIRE_BANNER(emp));
+						snprintf(str, slen, "%s", EMPIRE_BANNER(e));
 					}
 					break;
 				}
 				case 'c': {	// emp.c*
 					if (!str_cmp(field, "coins")) {
-						snprintf(str, slen, "%d", (int) EMPIRE_COINS(emp));
+						snprintf(str, slen, "%d", (int) EMPIRE_COINS(e));
 					}
 					break;
 				}
 				case 'd': {	// emp.d*
 					if (!str_cmp(field, "description")) {
-						snprintf(str, slen, "%s", EMPIRE_DESCRIPTION(emp));
+						snprintf(str, slen, "%s", EMPIRE_DESCRIPTION(e));
 					}
 					break;
 				}
 				case 'f': {	// emp.f*
 					if (!str_cmp(field, "fame")) {
-						snprintf(str, slen, "%d", EMPIRE_FAME(emp));
+						snprintf(str, slen, "%d", EMPIRE_FAME(e));
 					}
 					break;
 				}
 				case 'g': {	// emp.g*
 					if (!str_cmp(field, "grt") || !str_cmp(field, "greatness")) {
-						snprintf(str, slen, "%d", EMPIRE_GREATNESS(emp));
+						snprintf(str, slen, "%d", EMPIRE_GREATNESS(e));
 					}
 					break;
 				}
@@ -5433,7 +5505,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							any_vnum vnum;
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING) {
-								snprintf(str, slen, "%d", empire_has_completed_goal(emp, vnum) ? 1 : 0);
+								snprintf(str, slen, "%d", empire_has_completed_goal(e, vnum) ? 1 : 0);
 							}
 							else {
 								strcpy(str, "0");
@@ -5449,7 +5521,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int pos;
 							
 							if ((pos = search_block(subfield, techs, FALSE)) != NOTHING) {
-								snprintf(str, slen, "%d", EMPIRE_HAS_TECH(emp, pos) ? 1 : 0);
+								snprintf(str, slen, "%d", EMPIRE_HAS_TECH(e, pos) ? 1 : 0);
 							}
 							else {
 								*str = '\0';
@@ -5464,14 +5536,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'i': {	// emp.i*
 					if (!str_cmp(field, "id")) {
 						// this is scripting id
-						snprintf(str, slen, "%d", EMPIRE_VNUM(emp) + EMPIRE_ID_BASE);
+						snprintf(str, slen, "%d", EMPIRE_VNUM(e) + EMPIRE_ID_BASE);
 					}
 					else if (!str_cmp(field, "is_on_progress")) {
 						if (subfield && *subfield) {
 							any_vnum vnum;
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING) {
-								snprintf(str, slen, "%d", get_current_goal(emp, vnum) ? 1 : 0);
+								snprintf(str, slen, "%d", get_current_goal(e, vnum) ? 1 : 0);
 							}
 							else {
 								strcpy(str, "0");
@@ -5485,31 +5557,31 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'l': {	// emp.l*
 					if (!str_cmp(field, "leader_id")) {
-						snprintf(str, slen, "%d", EMPIRE_LEADER(emp));
+						snprintf(str, slen, "%d", EMPIRE_LEADER(e));
 					}
 					break;
 				}
 				case 'm': {	// emp.m*
 					if (!str_cmp(field, "max_territory")) {
-						snprintf(str, slen, "%d", land_can_claim(emp, TER_TOTAL));
+						snprintf(str, slen, "%d", land_can_claim(e, TER_TOTAL));
 					}
 					else if (!str_cmp(field, "members")) {
-						snprintf(str, slen, "%d", EMPIRE_MEMBERS(emp));
+						snprintf(str, slen, "%d", EMPIRE_MEMBERS(e));
 					}
 					else if (!str_cmp(field, "military")) {
-						snprintf(str, slen, "%d", EMPIRE_MILITARY(emp));
+						snprintf(str, slen, "%d", EMPIRE_MILITARY(e));
 					}
 					break;
 				}
 				case 'n': {	// emp.n*
 					if (!str_cmp(field, "name")) {
-						snprintf(str, slen, "%s", EMPIRE_NAME(emp));
+						snprintf(str, slen, "%s", EMPIRE_NAME(e));
 					}
 					break;
 				}
 				case 'p': {	// emp.p*
 					if (!str_cmp(field, "population")) {
-						snprintf(str, slen, "%d", EMPIRE_POPULATION(emp));
+						snprintf(str, slen, "%d", EMPIRE_POPULATION(e));
 					}
 					else if (!str_cmp(field, "priv")) {
 						if (subfield && *subfield) {
@@ -5517,7 +5589,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int pos = search_block(subfield, priv, FALSE);
 							
 							if (pos != NOTHING) {
-								snprintf(str, slen, "%d", EMPIRE_PRIV(emp, pos));
+								snprintf(str, slen, "%d", EMPIRE_PRIV(e, pos));
 							}
 							// let any other result error out.
 						}
@@ -5531,7 +5603,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							any_vnum vnum;
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
-								snprintf(str, slen, "%d", (!empire_has_completed_goal(emp, vnum) && empire_meets_goal_prereqs(emp, prg)) ? 1 : 0);
+								snprintf(str, slen, "%d", (!empire_has_completed_goal(e, vnum) && empire_meets_goal_prereqs(e, prg)) ? 1 : 0);
 							}
 							else {
 								strcpy(str, "0");
@@ -5547,8 +5619,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "rank")) {
 						if (subfield && *subfield) {
 							int num = atoi(subfield);
-							if (num > 0 && num <= EMPIRE_NUM_RANKS(emp)) {
-								snprintf(str, slen, "%s", EMPIRE_RANK(emp, num-1));
+							if (num > 0 && num <= EMPIRE_NUM_RANKS(e)) {
+								snprintf(str, slen, "%s", EMPIRE_RANK(e, num-1));
 							}
 							else {
 								*str = '\0';
@@ -5565,15 +5637,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							any_vnum vnum;
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
-								if (empire_has_completed_goal(emp, vnum)) {
+								if (empire_has_completed_goal(e, vnum)) {
 									void remove_completed_goal(empire_data *emp, any_vnum vnum);
-									remove_completed_goal(emp, vnum);
+									remove_completed_goal(e, vnum);
 								}
-								if ((goal = get_current_goal(emp, vnum))) {
-									cancel_empire_goal(emp, goal);
+								if ((goal = get_current_goal(e, vnum))) {
+									cancel_empire_goal(e, goal);
 								}
 								strcpy(str, "1");
-								check_for_eligible_goals(emp);
+								check_for_eligible_goals(e);
 							}
 							else {
 								strcpy(str, "0");
@@ -5584,7 +5656,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "ranks")) {
-						snprintf(str, slen, "%d", EMPIRE_NUM_RANKS(emp));
+						snprintf(str, slen, "%d", EMPIRE_NUM_RANKS(e));
 					}
 					break;
 				}
@@ -5595,21 +5667,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							any_vnum vnum;
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
-								if (!empire_has_completed_goal(emp, vnum) && !get_current_goal(emp, vnum) && empire_meets_goal_prereqs(emp, prg)) {
-									extern struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
+								if (!empire_has_completed_goal(e, vnum) && !get_current_goal(e, vnum) && empire_meets_goal_prereqs(e, prg)) {
+									extern struct empire_goal *start_empire_goal(empire_data *e, progress_data *prg);
 									
-									struct empire_goal *goal = start_empire_goal(emp, prg);
+									struct empire_goal *goal = start_empire_goal(e, prg);
 									int complete, total;
 									
 									if (goal) {
 										void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
-										refresh_one_goal_tracker(emp, goal);
+										refresh_one_goal_tracker(e, goal);
 									}
 									// check if complete
 									count_quest_tasks(goal->tracker, &complete, &total);
 									if (complete == total) {
 										void complete_goal(empire_data *emp, struct empire_goal *goal);
-										complete_goal(emp, goal);
+										complete_goal(e, goal);
 									}
 								}
 								strcpy(str, "1");
@@ -5628,29 +5700,45 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				
 				case 't': {	// emp.t*
 					if (!str_cmp(field, "territory")) {
-						snprintf(str, slen, "%d", EMPIRE_TERRITORY(emp, TER_TOTAL));
+						snprintf(str, slen, "%d", EMPIRE_TERRITORY(e, TER_TOTAL));
 					}
 					break;
 				}
 				case 'v': {	// emp.v*
 					if (!str_cmp(field, "vnum")) {
-						snprintf(str, slen, "%d", EMPIRE_VNUM(emp));
+						snprintf(str, slen, "%d", EMPIRE_VNUM(e));
 					}
 					break;
 				}
 				case 'w': {	// emp.w*
 					if (!str_cmp(field, "wealth")) {
-						snprintf(str, slen, "%d", (int) GET_TOTAL_WEALTH(emp));
+						snprintf(str, slen, "%d", (int) GET_TOTAL_WEALTH(e));
 					}
 					break;
 				}
 			}	// end switch
 			
 			if (*str == '\x1') { /* no match in switch */
-				*str = '\0';
-				script_log("Trigger: %s, VNum %d, type: %d. unknown empire field: '%s%s%s%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field, (subfield && *subfield) ? "(" : "", NULLSAFE(subfield), (subfield && *subfield) ? ")" : "");
+				if (SCRIPT(e)) { /* check for global var */
+					for (vd = (SCRIPT(e))->global_vars; vd; vd = vd->next) {
+						if (!str_cmp(vd->name, field)) {
+							break;
+						}
+					}
+					if (vd) {
+						snprintf(str, slen, "%s", vd->value);
+					}
+					else {
+						*str = '\0';
+						script_log("Trigger: %s, VNum %d, type: %d. unknown empire field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field);
+					}
+				}
+				else {
+					*str = '\0';
+					script_log("Trigger: %s, VNum %d, type: %d. unknown empire field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), type, field);
+				}
 			}
-		}	// if (emp) ...
+		}	// if (e) ...
 		
 		else {
 			if (vd && text_processed(field, subfield, vd, str, slen))
@@ -6454,6 +6542,10 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					c = get_char_near_vehicle((vehicle_data*)go, name);
 					break;
 				}
+				case EMP_TRIGGER: {
+					c = get_char(name);
+					break;
+				}
 			}
 			if (c) 
 				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, char_script_id(c));
@@ -6476,6 +6568,10 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					break;
 				case VEH_TRIGGER: {
 					o = get_obj_near_vehicle((vehicle_data*)go, name);
+					break;
+				}
+				case EMP_TRIGGER: {
+					o = get_obj(name);
 					break;
 				}
 			}
@@ -6530,6 +6626,10 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					}
 					break;
 				}
+				case EMP_TRIGGER: {
+					r = get_room(NULL, name);
+					break;
+				}
 			}
 			if (r) {
 				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, GET_ROOM_VNUM(r) + ROOM_ID_BASE);
@@ -6555,6 +6655,10 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				}
 				case VEH_TRIGGER: {
 					v = get_vehicle_near_vehicle((vehicle_data*)go, name);
+					break;
+				}
+				case EMP_TRIGGER: {
+					v = get_vehicle(name);
 					break;
 				}
 			}
@@ -6621,6 +6725,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 	int uid, context;
 	vehicle_data *veh;
+	empire_data *emp;
 	room_data *room;
 	char_data *mob;
 	obj_data *obj;
@@ -6679,6 +6784,10 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
 	}
+	else if ((emp = find_empire_by_uid(uid))) {
+		sc_remote = SCRIPT(emp) ? SCRIPT(emp) : create_script_data(emp, EMP_TRIGGER);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
 	else {
 		script_log("Trigger: %s, VNum %d. remote: uid '%d' invalid", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), uid);
 		return;
@@ -6703,6 +6812,8 @@ ACMD(do_vdelete) {
 	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 	int uid;
 	// long context;	// unused
+	vehicle_data *veh;
+	empire_data *emp;
 	room_data *room;
 	char_data *mob;
 	obj_data *obj;
@@ -6740,6 +6851,13 @@ ACMD(do_vdelete) {
 	}
 	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
+	}
+	else if ((veh = find_vehicle(uid))) {
+		sc_remote = SCRIPT(veh);
+	}
+	else if ((emp = find_empire_by_uid(uid))) {
+		sc_remote = SCRIPT(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	else {
 		msg_to_char(ch, "vdelete: cannot resolve specified id.\r\n");
@@ -6791,6 +6909,8 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	int uid;
 	// long context;	// unused
+	vehicle_data *veh;
+	empire_data *emp;
 	room_data *room;
 	char_data *mob;
 	obj_data *obj;
@@ -6829,6 +6949,13 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
+	}
+	else if ((veh = find_vehicle(uid))) {
+		sc_remote = SCRIPT(veh);
+	}
+	else if ((emp = find_empire_by_uid(uid))) {
+		sc_remote = SCRIPT(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	else {
 		script_log("Trigger: %s, VNum %d. remote: uid '%d' invalid", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), uid);
@@ -6987,6 +7114,10 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			go = sdd->v;
 			sc = SCRIPT((vehicle_data*) go);
 			dg_owner_veh = (vehicle_data*)go;
+			break;
+		}
+		case EMP_TRIGGER: {
+			script_log("Attempting to run unsupported script on empire (trig: %d)", GET_TRIG_VNUM(trig));
 			break;
 		}
 	}
@@ -7164,6 +7295,10 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 						vehicle_command_interpreter((vehicle_data*) go, cmd);
 						break;
 					}
+					case EMP_TRIGGER: {
+						// unsupported type
+						break;
+					}
 				}
 				if (dg_owner_purged) {
 						depth--;
@@ -7191,6 +7326,10 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			break;
 		case VEH_TRIGGER: {
 			sc = SCRIPT((vehicle_data*) go);
+			break;
+		}
+		case EMP_TRIGGER: {
+			sc = SCRIPT((empire_data*) go);
 			break;
 		}
 	}

@@ -5158,6 +5158,7 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 */
 void do_stat_empire(char_data *ch, empire_data *emp) {
 	extern int get_total_score(empire_data *emp);
+	void script_stat (char_data *ch, struct script_data *sc);
 	
 	extern const char *empire_admin_flags[];
 	extern const char *empire_attributes[];
@@ -5237,6 +5238,14 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	}
 	if (len > 0) {
 		msg_to_char(ch, "\r\n");
+	}
+	
+	msg_to_char(ch, "Script information:\r\n");
+	if (SCRIPT(emp)) {
+		script_stat(ch, SCRIPT(emp));
+	}
+	else {
+		msg_to_char(ch, "  None.\r\n");
 	}
 }
 

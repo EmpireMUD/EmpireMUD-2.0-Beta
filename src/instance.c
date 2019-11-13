@@ -1920,6 +1920,10 @@ struct instance_data *get_instance_for_script(int go_type, void *go) {
 				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE, TRUE);
 				break;
 			}
+			case EMP_TRIGGER:
+			default: {	// types that do not associate to instances
+				break;
+			}
 		}
 	}
 	

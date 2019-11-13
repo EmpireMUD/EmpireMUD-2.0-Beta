@@ -4551,7 +4551,7 @@ struct empire_data {
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command
 	int base_tech[NUM_TECHS];	// TECH_ from rewards (not added by buildings or players)
 
-	// linked lists
+	// linked lists, hashes, etc
 	struct empire_political_data *diplomacy;
 	struct shipping_data *shipping_list;
 	struct empire_unique_storage *unique_store;	// LL: eus->next
@@ -4563,6 +4563,7 @@ struct empire_data {
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
+	struct script_data *script;	// for storing variables
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

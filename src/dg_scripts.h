@@ -19,10 +19,11 @@
 #define MOB_TRIGGER  0
 #define OBJ_TRIGGER  1
 #define WLD_TRIGGER  2
-#define RMT_TRIGGER  3
-#define ADV_TRIGGER  4
+#define RMT_TRIGGER  3	// actually a wld trigger attached to a rmt
+#define ADV_TRIGGER  4	// actually a wld trigger attached to an adv
 #define VEH_TRIGGER  5
-#define BLD_TRIGGER  6
+#define BLD_TRIGGER  6	// actually a wld trigger attached to a bld
+#define EMP_TRIGGER  7	// empires only store vars, not triggers
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1

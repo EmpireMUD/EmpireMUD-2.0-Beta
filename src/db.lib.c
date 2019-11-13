@@ -2063,6 +2063,10 @@ void free_empire(empire_data *emp) {
 	}
 	ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
 	
+	if (SCRIPT(emp)) {
+		extract_script(emp, EMP_TRIGGER);
+	}
+	
 	free(emp);
 }
 
@@ -2669,6 +2673,17 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				LL_APPEND(emp->logs, elog);
 				break;
 			}
+			case 'K': {	// script var
+				if (sscanf(line, "K %s %ld", str_in, &long_in) != 2 || !get_line(fl, line)) {
+					log("SYSERR: Bad variable format in N line of empire %d", vnum);
+					exit(1);
+				}
+				if (!SCRIPT(emp)) {
+					create_script_data(emp, EMP_TRIGGER);
+				}
+				add_var(&(SCRIPT(emp)->global_vars), str_in, line, long_in);
+				break;
+			}
 			case 'M': {	// motd
 				EMPIRE_MOTD(emp) = fread_string(fl, buf2);
 				break;
@@ -2928,6 +2943,19 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		}
 	}
 	
+	// K: script variables
+	if (SCRIPT(emp)) {
+		struct trig_var_data *tvd;
+		
+		LL_FOREACH(SCRIPT(emp)->global_vars, tvd) {
+			if (*tvd->name == '-' || !*tvd->value) { // don't save if it begins with - or is empty
+				continue;
+			}
+			
+			fprintf(fl, "K %s %ld\n%s\n", tvd->name, tvd->context, tvd->value);
+		}
+	}
+	
 	// M: MOTD
 	if (EMPIRE_MOTD(emp) && *EMPIRE_MOTD(emp)) {
 		char temp[MAX_MOTD_LENGTH + 12];
@@ -2937,6 +2965,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		fprintf(fl, "M\n%s~\n", temp);
 	}
 	
+	// avoid N (NPCs, below)
 	// avoid L (used by empire logs)
 	// avoid O (used by empire storage)
 
@@ -2947,6 +2976,8 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	// R: ranks
 	for (iter = 0; iter < emp->num_ranks; ++iter)
 		fprintf(fl, "R%d\n%s~\n", iter, EMPIRE_RANK(emp, iter));
+	
+	// cannot use S
 	
 	// T: territory buildings
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {

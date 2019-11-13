@@ -627,6 +627,10 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 			}
 			break;
 		}
+		case EMP_TRIGGER: {
+			script_log_by_type(go_type, go, "dg_quest: empire triggers are not supported");
+			break;
+		}
 		default: {
 			script_log_by_type(go_type, go, "dg_quest: unknown type %d", go_type);
 			return;
@@ -1116,6 +1120,10 @@ void script_heal(void *thing, int type, char *argument) {
 			}
 			
 			snprintf(log_root, sizeof(log_root), "Veh (%s, VNum %d)::", VEH_SHORT_DESC((vehicle_data*)thing), VEH_VNUM((vehicle_data*)thing));
+			break;
+		}
+		case EMP_TRIGGER: {
+			script_log("%s script_heal: Empire scripts are not supported", log_root);
 			break;
 		}
 		case WLD_TRIGGER:
