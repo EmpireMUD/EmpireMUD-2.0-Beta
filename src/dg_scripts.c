@@ -1027,7 +1027,7 @@ void script_trigger_check(void) {
 	char buf[MAX_STRING_LENGTH];
 	struct script_data *sc;
 	vehicle_data *veh;
-	empire_data *emp;
+	// empire_data *emp;
 	char_data *mob;
 	obj_data *obj;
 	bool fail;
@@ -1079,7 +1079,7 @@ void script_trigger_check(void) {
 			}
 			case EMP_TRIGGER: {
 				// WARNING: empires really do not support running scripts
-				emp = (empire_data *)sc->attached_to;
+				// emp = (empire_data *)sc->attached_to;
 				in_room = NULL;
 				break;
 			}
@@ -2220,7 +2220,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	vehicle_data *veh = NULL, *v = NULL;
 	obj_data *obj = NULL, *o = NULL;
 	room_data *room, *r = NULL;
-	empire_data *emp = NULL, *e = NULL;
+	empire_data *e = NULL;
 	char *name;
 	int num, count;
 
@@ -2443,7 +2443,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case EMP_TRIGGER: {
-					emp = (empire_data*)go;
+					// emp = (empire_data*)go;
 					
 					if ((c = get_char(name))) {
 						// just setting
