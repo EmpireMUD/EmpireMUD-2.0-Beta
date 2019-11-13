@@ -4618,7 +4618,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// obj.v*
-					if (!str_cmp(field, "vnum"))
+					if (!str_cmp(field, "varexists")) {
+						struct trig_var_data *remote_vd;
+						snprintf(str, slen, "0");
+						if (SCRIPT(o)) {
+							for (remote_vd = SCRIPT(o)->global_vars; remote_vd; remote_vd = remote_vd->next) {
+								if (!str_cmp(remote_vd->name, subfield)) {
+									break;
+								}
+							}
+							if (remote_vd) {
+								snprintf(str, slen, "1");
+							}
+						}
+					}
+					else if (!str_cmp(field, "vnum"))
 						snprintf(str, slen, "%d", GET_OBJ_VNUM(o));
 					else if (!str_cmp(field, "val0")) {
 						if (subfield && is_number(subfield)) {
@@ -5058,7 +5072,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// room.v*
-					if (!str_cmp(field, "vehicles")) {
+					if (!str_cmp(field, "varexists")) {
+						struct trig_var_data *remote_vd;
+						snprintf(str, slen, "0");
+						if (SCRIPT(r)) {
+							for (remote_vd = SCRIPT(r)->global_vars; remote_vd; remote_vd = remote_vd->next) {
+								if (!str_cmp(remote_vd->name, subfield)) {
+									break;
+								}
+							}
+							if (remote_vd) {
+								snprintf(str, slen, "1");
+							}
+						}
+					}
+					else if (!str_cmp(field, "vehicles")) {
 						if (ROOM_VEHICLES(r)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(ROOM_VEHICLES(r)));
 						}
@@ -5404,7 +5432,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// veh.v*
-					if (!str_cmp(field, "vnum")) {
+					if (!str_cmp(field, "varexists")) {
+						struct trig_var_data *remote_vd;
+						snprintf(str, slen, "0");
+						if (SCRIPT(v)) {
+							for (remote_vd = SCRIPT(v)->global_vars; remote_vd; remote_vd = remote_vd->next) {
+								if (!str_cmp(remote_vd->name, subfield)) {
+									break;
+								}
+							}
+							if (remote_vd) {
+								snprintf(str, slen, "1");
+							}
+						}
+					}
+					else if (!str_cmp(field, "vnum")) {
 						snprintf(str, slen, "%d", VEH_VNUM(v));
 					}
 					break;
@@ -5705,7 +5747,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// emp.v*
-					if (!str_cmp(field, "vnum")) {
+					if (!str_cmp(field, "varexists")) {
+						struct trig_var_data *remote_vd;
+						snprintf(str, slen, "0");
+						if (SCRIPT(e)) {
+							for (remote_vd = SCRIPT(e)->global_vars; remote_vd; remote_vd = remote_vd->next) {
+								if (!str_cmp(remote_vd->name, subfield)) {
+									break;
+								}
+							}
+							if (remote_vd) {
+								snprintf(str, slen, "1");
+							}
+						}
+					}
+					else if (!str_cmp(field, "vnum")) {
 						snprintf(str, slen, "%d", EMPIRE_VNUM(e));
 					}
 					break;

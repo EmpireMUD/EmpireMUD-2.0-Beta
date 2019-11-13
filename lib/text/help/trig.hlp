@@ -177,6 +177,8 @@ When using field - The variable returns:
    also immediately auto-complete if tasks are already complete. Otherwise, it
    will behave like a normal goal.
 &cterritory&0 - The amount of land claimed.
+&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+   Useful when dealing with remote vars on empires.
 &cvnum&0 - The empire's vnum.
 &cwealth&0 - The empire's total wealth (coins + treasure).
 #d
