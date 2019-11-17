@@ -2314,6 +2314,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if ((num = search_block(var, script_commands, TRUE)) != NOTHING) {
 				snprintf(str, slen, "%c%s", cmd_prefix[type], script_commands[num]);
 			}
+			else if (!str_cmp(var, "dailycycle")) {
+				snprintf(str, slen, "%ld", 1 + ((data_get_long(DATA_DAILY_CYCLE) - data_get_long(DATA_WORLD_START)) / SECS_PER_REAL_DAY));
+				return;
+			}
 			else if (!str_cmp(var, "event")) {
 				// %event% with no field
 				script_log("Trigger: %s, VNum %d, %%event%% called with no field", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
