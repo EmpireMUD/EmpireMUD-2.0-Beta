@@ -1413,7 +1413,9 @@ struct set_struct {
 		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "bonustrait",	LVL_START_IMM,	PC,		MISC },
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
+		{ "dailyquestscompleted", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
+		{ "maxlevel", LVL_START_IMM, PC, NUMBER },
 		{ "skill", LVL_START_IMM, PC, MISC },
 		{ "faction", LVL_START_IMM, PC, MISC },
 		{ "learned", LVL_START_IMM, PC, MISC },
@@ -1783,6 +1785,12 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("bonusexp") {
 		GET_DAILY_BONUS_EXPERIENCE(vict) = RANGE(0, 255);
+	}
+	else if SET_CASE("dailyquestscompleted") {
+		GET_DAILY_QUESTS(vict) = RANGE(0, config_get_int("dailies_per_day"));
+	}
+	else if SET_CASE("maxlevel") {
+		GET_HIGHEST_KNOWN_LEVEL(vict) = RANGE(0, SHRT_MAX);
 	}
 	else if SET_CASE("grants") {
 		bitvector_t new, old = GET_GRANT_FLAGS(vict);
