@@ -273,6 +273,7 @@ const char *adventure_link_types[] = {
 	"TIME-LIMIT",
 	"NOT-NEAR-SELF",
 	"PORTAL-CROP",
+	"EVENT-RUNNING",
 	"\n"
 };
 

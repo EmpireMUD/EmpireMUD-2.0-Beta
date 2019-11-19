@@ -359,6 +359,11 @@ void get_advedit_linking_params(int type, int *vnum_type, bool *need_vnum, bool 
 			*need_num = TRUE;
 			break;
 		}
+		case ADV_LINK_EVENT_RUNNING: {
+			*need_vnum = TRUE;
+			*vnum_type = OLC_EVENT;
+			break;
+		}
 	}
 }
 
@@ -659,6 +664,10 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 			}
 			case ADV_LINK_NOT_NEAR_SELF: {
 				sprintf(lbuf, "not within %d tiles of itself", rule->value);
+				break;
+			}
+			case ADV_LINK_EVENT_RUNNING: {
+				sprintf(lbuf, "[\tc%d\t0] %s", rule->value, get_event_name_by_proto(rule->value));
 				break;
 			}
 			default: {
@@ -1019,6 +1028,10 @@ OLC_MODULE(advedit_linking) {
 				argument = any_one_word(argument, num_arg);
 				break;
 			}
+			case ADV_LINK_EVENT_RUNNING: {
+				argument = any_one_word(argument, vnum_arg);
+				break;
+			}
 		}
 		
 		// anything left is flags
@@ -1074,6 +1087,10 @@ OLC_MODULE(advedit_linking) {
 				}
 				if (vnum_type == OLC_CROP && !crop_proto(value)) {
 					msg_to_char(ch, "Invalid crop vnum '%s'.\r\n", vnum_arg);
+					return;
+				}
+				if (vnum_type == OLC_EVENT && !find_event_by_vnum(value)) {
+					msg_to_char(ch, "Invalid event vnum '%s'.\r\n", vnum_arg);
 					return;
 				}
 				if (restrict_sect && SECT_FLAGGED(sector_proto(value), SECTF_ADVENTURE)) {
@@ -1189,6 +1206,9 @@ OLC_MODULE(advedit_linking) {
 			}
 			else if (vnum_type == OLC_CROP && !crop_proto(value)) {
 				msg_to_char(ch, "Invalid crop vnum '%s'.\r\n", val_arg);
+			}
+			else if (vnum_type == OLC_EVENT && !find_event_by_vnum(value)) {
+				msg_to_char(ch, "Invalid event vnum '%s'.\r\n", val_arg);
 			}
 			else if (restrict_sect && SECT_FLAGGED(sector_proto(value), SECTF_ADVENTURE)) {
 				msg_to_char(ch, "You may not use ADVENTURE-type sectors for this.\r\n");

@@ -1211,6 +1211,16 @@ flag) for this, because they can't be built on the map.
 
 See also: ADVEDIT LINKING, SECTEDIT BUILDFLAGS, VNUM
 #d
+"ADVEDIT EVENT-RUNNING" "ADVEDIT LINK EVENT-RUNNING" "ADVEDIT LINKING EVENT-RUNNING"
+
+Usage:  .linking add EVENT-RUNNING <event vnum>
+
+This linking rule means the event can only spawn when a certain event is
+running. It will also auto-complete all instances if they are open and the
+event is not running.
+
+See also: ADVEDIT LINKING
+#d
 "ADVEDIT NOT-NEAR-SELF" "ADVEDIT LINK NOT-NEAR-SELF" "ADVEDIT LINKING NOT-NEAR-SELF"
 
 Usage:  .linking add NOT-NEAR-SELF <distance>
@@ -1328,6 +1338,7 @@ See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
  &cPORTAL-CROP&0: Portal appears on a matching crop tile.
  &cTIME-LIMIT&0: Removes instances after a certain number of minutes expire.
  &cNOT-NEAR-SELF&0: Prevent the adventure from linking near other copies of itself.
+ &cEVENT-RUNNING&0: This adventure can only spawn when a specific event is running.
 
 Available flags:
  &cCLAIMED-OK&0 - Can link to claimed locations (default: unclaimed only).

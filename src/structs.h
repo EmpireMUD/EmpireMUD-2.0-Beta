@@ -582,6 +582,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINK_TIME_LIMIT  5
 #define ADV_LINK_NOT_NEAR_SELF  6
 #define ADV_LINK_PORTAL_CROP  7
+#define ADV_LINK_EVENT_RUNNING  8
 
 
 // ADV_LINKF_x: adventure link rule flags
