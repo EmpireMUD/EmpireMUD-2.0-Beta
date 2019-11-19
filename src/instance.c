@@ -1565,7 +1565,7 @@ bool can_instance(adv_data *adv) {
 			case ADV_LINK_EVENT_RUNNING: {
 				if (!find_running_event_by_vnum(rule->value)) {
 					// event not running
-					break;
+					return FALSE;
 				}
 				break;
 			}
