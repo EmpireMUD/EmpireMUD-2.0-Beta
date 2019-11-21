@@ -6254,11 +6254,14 @@ Available quest giver types:
  OBJECT - Quest starts at a given object (if not bound to someone else).
  ROOM-TEMPLATE - Quest starts at a given room template.
  TRIGGER - Quest is given by a trigger.
+ QUEST - Starts from the rewards of another quest.
+ VEHICLE - Quest starts at a vehicle.
 
 NOTE: The "trigger" type is only used for tracking purposes. Unlike the other
 types, it won't cause the trigger to automatically offer the quest. Instead,
 this indicates that you will use the %quest% command to give or complete the
-quest in that trigger.
+quest in that trigger. The "quest" type is similar, and you must put this
+quest in the rewards list of that quest for it to start.
 
 See also: %QUEST%, OLC QUESTS
 #d
@@ -6739,6 +6742,7 @@ Available location types:
  OBJECT - An object has the shop. Be careful; this will work even if the object
    is in the player's inventory.
  ROOM-TEMPLATE - The shop is in a room template in an adventure.
+ VEHICLE - A vehicle operates the shop, wherever that vehicle is.
 
 Shop locations use the same system as the start/end locations of a quest, and
 you can copy from those fields (and vice versa) with this syntax:

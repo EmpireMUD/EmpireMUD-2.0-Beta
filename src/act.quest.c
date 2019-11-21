@@ -38,6 +38,7 @@
 extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
 extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
+extern bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
 extern struct req_data *copy_requirements(struct req_data *from);
 void free_player_quests(struct player_quest *list);
@@ -70,6 +71,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 */
 struct quest_temp_list *build_available_quest_list(char_data *ch) {
 	struct quest_temp_list *quest_list = NULL;
+	vehicle_data *veh;
 	char_data *mob;
 	obj_data *obj;
 	
@@ -91,6 +93,11 @@ struct quest_temp_list *build_available_quest_list(char_data *ch) {
 		if (IS_NPC(mob)) {
 			can_get_quest_from_mob(ch, mob, &quest_list);
 		}
+	}
+	
+	// search vehicles in room
+	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		can_get_quest_from_vehicle(ch, veh, &quest_list);
 	}
 	
 	return quest_list;

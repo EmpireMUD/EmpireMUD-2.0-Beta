@@ -88,6 +88,7 @@ struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_obj_quest_lookups(obj_vnum vnum);
+void update_veh_quest_lookups(any_vnum vnum);
 void write_daily_quest_file();
 
 
@@ -106,6 +107,7 @@ void write_daily_quest_file();
 */
 bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empire_data **giver_emp) {
 	struct quest_giver *giver;
+	vehicle_data *veh;
 	char_data *mob;
 	obj_data *obj;
 	
@@ -148,6 +150,15 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 				if (GET_ROOM_TEMPLATE(loc) && GET_RMT_VNUM(GET_ROOM_TEMPLATE(loc)) == giver->vnum) {
 					*giver_emp = ROOM_OWNER(loc);
 					return TRUE;
+				}
+				break;
+			}
+			case QG_VEHICLE: {
+				LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+					if (VEH_VNUM(veh) == giver->vnum && CAN_SEE_VEHICLE(ch, veh)) {
+						*giver_emp = VEH_OWNER(veh);
+						return TRUE;
+					}
 				}
 				break;
 			}
@@ -818,6 +829,10 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 			snprintf(output, sizeof(output), "%s%s", vnum, qq ? skip_filler(QUEST_NAME(qq)) : "UNKNOWN");
 			break;
 		}
+		case QG_VEHICLE: {
+			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_vehicle_name_by_proto(giver->vnum)));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "%d %sUNKNOWN", giver->type, vnum);
 			break;
@@ -1363,6 +1378,7 @@ void smart_copy_quest_rewards(struct quest_reward **to_list, struct quest_reward
 void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 	struct quest_giver *list[2], *giver;
 	room_template *rmt;
+	vehicle_data *veh;
 	char_data *mob;
 	bld_data *bld;
 	obj_data *obj;
@@ -1425,6 +1441,18 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 							remove_quest_lookup(&GET_RMT_QUEST_LOOKUPS(rmt), quest);
 						}
 						// does not require live update
+					}
+					break;
+				}
+				case QG_VEHICLE: {
+					if ((veh = vehicle_proto(giver->vnum))) {
+						if (add) {
+							add_quest_lookup(&VEH_QUEST_LOOKUPS(veh), quest);
+						}
+						else {
+							remove_quest_lookup(&VEH_QUEST_LOOKUPS(veh), quest);
+						}
+						update_veh_quest_lookups(VEH_VNUM(veh));
 					}
 					break;
 				}
@@ -1538,6 +1566,26 @@ void update_obj_quest_lookups(obj_vnum vnum) {
 		if (GET_OBJ_VNUM(obj) == vnum) {
 			// re-set the pointer
 			GET_OBJ_QUEST_LOOKUPS(obj) = GET_OBJ_QUEST_LOOKUPS(proto);
+		}
+	}
+}
+
+
+/**
+* Fixes quest lookup pointers on live copies of vehicles -- this should ALWAYS
+* point to the proto.
+*/
+void update_veh_quest_lookups(any_vnum vnum) {
+	vehicle_data *proto, *veh;
+	
+	if (!(proto = vehicle_proto(vnum))) {
+		return;
+	}
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_VNUM(veh) == vnum) {
+			// re-set the pointer
+			VEH_QUEST_LOOKUPS(veh) = VEH_QUEST_LOOKUPS(proto);
 		}
 	}
 }
@@ -1740,6 +1788,73 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 					// only need 1
 					return TRUE;
 				}
+			}
+		}
+	}
+	
+	// nope
+	return any;
+}
+
+
+/**
+* @param char_data *ch Any player playing.
+* @param vehicle_data *veh Any vehicle.
+* @param struct quest_temp_list **build_list Optional: Builds a temp list of quests available.
+* @return bool TRUE if the vehicle has a quest the character can get; FALSE otherwise.
+*/
+bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list) {
+	struct instance_data *inst;
+	struct quest_lookup *ql;
+	bool any = FALSE;
+	bool dailies;
+	
+	if (IS_NPC(ch) || !VEH_QUEST_LOOKUPS(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
+		return FALSE;
+	}
+	
+	dailies = GET_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
+	
+	LL_FOREACH(VEH_QUEST_LOOKUPS(veh), ql) {
+		// make sure they're a giver
+		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_VEHICLE, VEH_VNUM(veh))) {
+			continue;
+		}
+		// hide tutorials
+		if (QUEST_FLAGGED(ql->quest, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			continue;
+		}
+		// hide dailies
+		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
+			continue;
+		}
+		// matching empire
+		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+			continue;
+		}
+		if (!can_use_vehicle(ch, veh, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+			continue;	// vehicle permissions
+		}
+		if (!can_use_room(ch, IN_ROOM(ch), QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+			continue;	// room permissions
+		}
+		// already on quest?
+		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
+			continue;
+		}
+		
+		// success
+		inst = (IN_ROOM(veh) ? find_instance_by_room(IN_ROOM(veh), FALSE, TRUE) : NULL);
+		
+		// pre-reqs?
+		if (char_meets_prereqs(ch, ql->quest, inst)) {
+			if (build_list) {
+				any = TRUE;
+				add_to_quest_temp_list(build_list, ql->quest, inst);
+			}
+			else {
+				// only need 1
+				return TRUE;
 			}
 		}
 	}
@@ -3622,6 +3737,12 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 					}
 					break;
 				}
+				case QG_VEHICLE: {
+					if (vehicle_proto(vnum)) {
+						ok = TRUE;
+					}
+					break;
+				}
 			}
 			
 			// did we find one? if so, buf is set
@@ -3704,6 +3825,12 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 				}
 				case QG_QUEST: {
 					if (quest_proto(vnum)) {
+						ok = TRUE;
+					}
+					break;
+				}
+				case QG_VEHICLE: {
+					if (vehicle_proto(vnum)) {
 						ok = TRUE;
 					}
 					break;

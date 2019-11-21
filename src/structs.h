@@ -2261,6 +2261,7 @@ typedef struct vehicle_data vehicle_data;
 #define QG_ROOM_TEMPLATE  3
 #define QG_TRIGGER  4	// just to help lookups
 #define QG_QUEST  5	// (e.g. as chain reward) just to help lookups
+#define QG_VEHICLE  6
 
 
 // QR_x: quest reward types
@@ -5257,6 +5258,7 @@ struct vehicle_data {
 	// lists
 	struct vehicle_data *next;	// vehicle_list (global) linked list
 	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
+	struct quest_lookup *quest_lookups;
 	UT_hash_handle hh;	// vehicle_table hash handle
 };
 

@@ -2741,6 +2741,7 @@ const char *quest_giver_types[] = {
 	"ROOM-TEMPLATE",
 	"TRIGGER",
 	"QUEST",	// 5
+	"VEHICLE",
 	"\n"
 };
 

@@ -791,6 +791,7 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 * @param any_vnum vnum The vehicle vnum.
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
@@ -841,6 +842,8 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		}
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
+		any |= find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_VEHICLE, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_VEHICLE, vnum);
 		
 		if (any) {
 			++found;
@@ -2036,6 +2039,7 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	
 	vehicle_data *veh, *iter, *next_iter;
@@ -2100,6 +2104,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_VEHICLE, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_VEHICLE, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
