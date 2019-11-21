@@ -993,6 +993,9 @@ void save_olc_shop(descriptor_data *desc) {
 		proto = create_shop_table_entry(vnum);
 	}
 	
+	// delete from lookups FIRST
+	add_or_remove_all_shop_lookups_for(proto, FALSE);
+	
 	// free prototype strings and pointers
 	if (SHOP_NAME(proto)) {
 		free(SHOP_NAME(proto));
@@ -1007,9 +1010,6 @@ void save_olc_shop(descriptor_data *desc) {
 		}
 		SHOP_NAME(shop) = str_dup(default_shop_name);
 	}
-	
-	// delete from lookups
-	add_or_remove_all_shop_lookups_for(proto, FALSE);
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handles

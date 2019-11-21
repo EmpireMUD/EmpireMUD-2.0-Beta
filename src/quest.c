@@ -4748,6 +4748,9 @@ void save_olc_quest(descriptor_data *desc) {
 	// store for later
 	old_cycle = QUEST_DAILY_CYCLE(proto);
 	
+	// delete from lookups FIRST
+	add_or_remove_all_quest_lookups_for(proto, FALSE);
+	
 	// free prototype strings and pointers
 	if (QUEST_NAME(proto)) {
 		free(QUEST_NAME(proto));
@@ -4784,9 +4787,6 @@ void save_olc_quest(descriptor_data *desc) {
 		}
 		QUEST_COMPLETE_MSG(quest) = str_dup(default_quest_complete_msg);
 	}
-	
-	// delete from lookups
-	add_or_remove_all_quest_lookups_for(proto, FALSE);
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
