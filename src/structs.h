@@ -5180,6 +5180,7 @@ struct shop_temp_list {
 	char_data *from_mob;	// may
 	obj_data *from_obj;	// be any
 	room_data *from_room;	// of these
+	vehicle_data *from_veh;	// things
 	
 	struct shop_temp_list *next;
 };
@@ -5259,6 +5260,7 @@ struct vehicle_data {
 	struct vehicle_data *next;	// vehicle_list (global) linked list
 	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
 	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 	UT_hash_handle hh;	// vehicle_table hash handle
 };
 

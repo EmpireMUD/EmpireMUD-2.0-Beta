@@ -2400,6 +2400,8 @@ void save_olc_vehicle(descriptor_data *desc) {
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	struct spawn_info *spawn;
+	struct quest_lookup *ql;
+	struct shop_lookup *sl;
 	bitvector_t old_flags;
 	UT_hash_handle hh;
 
@@ -2516,9 +2518,15 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	ql = proto->quest_lookups;	// save lookups
+	sl = proto->shop_lookups;
+	
 	*proto = *veh;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
+	
 	proto->hh = hh;	// restore old hash handle
+	proto->quest_lookups = ql;	// restore lookups
+	proto->shop_lookups = sl;
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_VEH, vnum);

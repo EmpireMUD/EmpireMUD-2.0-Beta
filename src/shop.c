@@ -55,6 +55,7 @@ void add_shop_lookup(struct shop_lookup **list, shop_data *shop);
 bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop);
 void update_mob_shop_lookups(mob_vnum vnum);
 void update_obj_shop_lookups(obj_vnum vnum);
+void update_vehicle_shop_lookups(any_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -180,6 +181,7 @@ void smart_copy_shop_items(struct shop_item **to_list, struct shop_item *from_li
 void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 	struct quest_giver *giver;
 	room_template *rmt;
+	vehicle_data *veh;
 	char_data *mob;
 	bld_data *bld;
 	obj_data *obj;
@@ -239,6 +241,18 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 				}
 				break;
 			}
+			case QG_VEHICLE: {
+				if ((veh = vehicle_proto(giver->vnum))) {
+					if (add) {
+						add_shop_lookup(&VEH_SHOP_LOOKUPS(veh), shop);
+					}
+					else {
+						remove_shop_lookup(&VEH_SHOP_LOOKUPS(veh), shop);
+					}
+					update_vehicle_shop_lookups(VEH_VNUM(veh));
+				}
+				break;
+			}
 		}
 	}
 }
@@ -247,8 +261,7 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 /**
 * Adds a shop lookup hint to a list (e.g. on a mob).
 *
-* Note: For mob/obj shops, run update_mob_shop_lookups() or
-* update_obj_shop_lookups() after this.
+* Note: For mob/obj/veh shops, run update_mob_shop_lookups() etc after this.
 *
 * @param struct shop_lookup **list A pointer to the list to add to.
 * @param shop_data *shop The shop to add.
@@ -282,8 +295,9 @@ void add_shop_lookup(struct shop_lookup **list, shop_data *shop) {
 * @param char_data *mob The mob vendor, IF any.
 * @param obj_data *obj The obj vendor, IF any.
 * @param room_data *room The room vendor, IF any.
+* @param vehicle_data *veh The vehicle vendor, IF any.
 */
-void add_temp_shop(struct shop_temp_list **shop_list, shop_data *shop, char_data *mob, obj_data *obj, room_data *room) {
+void add_temp_shop(struct shop_temp_list **shop_list, shop_data *shop, char_data *mob, obj_data *obj, room_data *room, vehicle_data *veh) {
 	struct shop_temp_list *stl;
 	bool found = FALSE;
 	
@@ -301,6 +315,7 @@ void add_temp_shop(struct shop_temp_list **shop_list, shop_data *shop, char_data
 		stl->from_mob = mob;
 		stl->from_obj = obj;
 		stl->from_room = room;
+		stl->from_veh = veh;
 		LL_APPEND(*shop_list, stl);
 	}
 }
@@ -327,6 +342,7 @@ void build_all_shop_lookups(void) {
 struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	struct shop_temp_list *shop_list = NULL;
 	struct shop_lookup *sl;
+	vehicle_data *veh;
 	char_data *mob;
 	obj_data *obj;
 	
@@ -337,7 +353,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		}
 		LL_FOREACH(MOB_SHOP_LOOKUPS(mob), sl) {
 			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_MOBILE, GET_MOB_VNUM(mob))) {
-				add_temp_shop(&shop_list, sl->shop, mob, NULL, NULL);
+				add_temp_shop(&shop_list, sl->shop, mob, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -349,7 +365,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		}
 		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
 			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
-				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL);
+				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL, NULL);
 			}
 		}
 	}
@@ -361,7 +377,19 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		}
 		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
 			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
-				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL);
+				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL, NULL);
+			}
+		}
+	}
+	
+	// vehicles
+	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		if (!CAN_SEE_VEHICLE(ch, veh)) {
+			continue;
+		}
+		LL_FOREACH(VEH_SHOP_LOOKUPS(veh), sl) {
+			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_VEHICLE, VEH_VNUM(veh))) {
+				add_temp_shop(&shop_list, sl->shop, NULL, NULL, NULL, veh);
 			}
 		}
 	}
@@ -372,7 +400,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		if (GET_BUILDING(IN_ROOM(ch))) {
 			LL_FOREACH(GET_BLD_SHOP_LOOKUPS(GET_BUILDING(IN_ROOM(ch))), sl) {
 				if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))))) {
-					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch));
+					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch), NULL);
 				}
 			}
 		}
@@ -381,7 +409,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
 			LL_FOREACH(GET_RMT_SHOP_LOOKUPS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), sl) {
 				if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) {
-					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch));
+					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch), NULL);
 				}
 			}
 		}
@@ -407,8 +435,7 @@ void free_shop_temp_list(struct shop_temp_list *list) {
 /**
 * Adds a shop lookup hint to a list (e.g. on a mob).
 *
-* Note: For mob/obj shop, run update_mob_shop_lookups() or
-* update_obj_shop_lookups() after this.
+* Note: For mob/obj/veh shop, run update_mob_shop_lookups() etc after this.
 *
 * @param struct shop_lookup **list A pointer to the list to add to.
 * @param shop_data *shop The shop to add.
@@ -467,6 +494,26 @@ void update_obj_shop_lookups(obj_vnum vnum) {
 		if (GET_OBJ_VNUM(obj) == vnum) {
 			// re-set the pointer
 			GET_OBJ_SHOP_LOOKUPS(obj) = GET_OBJ_SHOP_LOOKUPS(proto);
+		}
+	}
+}
+
+
+/**
+* Fixes shop lookup pointers on live copies of vehicles -- this should ALWAYS
+* point to the proto.
+*/
+void update_vehicle_shop_lookups(mob_vnum vnum) {
+	vehicle_data *proto, *veh;
+	
+	if (!(proto = vehicle_proto(vnum))) {
+		return;
+	}
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_VNUM(veh) == vnum) {
+			// re-set the pointer
+			VEH_SHOP_LOOKUPS(veh) = VEH_SHOP_LOOKUPS(proto);
 		}
 	}
 }

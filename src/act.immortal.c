@@ -3368,6 +3368,9 @@ SHOW(show_shops) {
 		else if (stl->from_obj) {
 			snprintf(buf, sizeof(buf), " (%s)", GET_OBJ_SHORT_DESC(stl->from_obj));
 		}
+		else if (stl->from_veh) {
+			snprintf(buf, sizeof(buf), " (%s)", VEH_SHORT_DESC(stl->from_veh));
+		}
 		else if (stl->from_room) {
 			strcpy(buf, " (room)");
 		}
