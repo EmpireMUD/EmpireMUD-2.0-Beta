@@ -1043,6 +1043,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 */
 void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	extern bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
+	extern bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 	
 	char buf[MAX_STRING_LENGTH];
 	size_t size = 0;
@@ -1097,6 +1098,9 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	
 	if (can_get_quest_from_vehicle(ch, veh, NULL)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it has a quest for you!\r\n");
+	}
+	if (can_turn_quest_in_to_vehicle(ch, veh, NULL)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...you can finish a quest here!\r\n");
 	}
 
 	send_to_char(buf, ch);

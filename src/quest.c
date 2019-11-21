@@ -1835,9 +1835,6 @@ bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_t
 		if (!can_use_vehicle(ch, veh, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// vehicle permissions
 		}
-		if (!can_use_room(ch, IN_ROOM(ch), QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
-			continue;	// room permissions
-		}
 		// already on quest?
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
@@ -2025,6 +2022,59 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 			else {
 				return TRUE;
 			}
+		}
+	}
+	
+	// nope
+	return any;
+}
+
+
+/**
+* @param char_data *ch Any player playing.
+* @param vehicle_data *veh Any vehicle.
+* @param struct quest_temp_list **build_list Optional: Builds a temp list of quests available.
+* @return bool TRUE if the player has finished a quest that the vehicle accepts; FALSE otherwise.
+*/
+bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list) {
+	struct player_quest *pq;
+	struct quest_lookup *ql;
+	int complete, total;
+	bool any = FALSE;
+	
+	if (IS_NPC(ch) || !VEH_QUEST_LOOKUPS(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(VEH_QUEST_LOOKUPS(veh), ql) {
+		// make sure they're a giver
+		if (!find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_VEHICLE, VEH_VNUM(veh))) {
+			continue;
+		}
+		// matching empire
+		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+			continue;
+		}
+		if (!can_use_vehicle(ch, veh, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+			continue;	// vehicle
+		}
+		// are they on quest?
+		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
+			continue;
+		}
+		
+		count_quest_tasks(pq->tracker, &complete, &total);
+		if (complete < total) {
+			continue;
+		}
+		
+		// success!
+		if (build_list) {
+			any = TRUE;
+			add_to_quest_temp_list(build_list, ql->quest, NULL);
+		}
+		else {
+			return TRUE;
 		}
 	}
 	
