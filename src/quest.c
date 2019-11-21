@@ -1465,8 +1465,7 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 /**
 * Adds a quest lookup hint to a list (e.g. on a mob).
 *
-* Note: For mob/obj quests, run update_mob_quest_lookups() or
-* update_obj_quest_lookups() after this.
+* Note: For mob/obj/veh quests, run update_mob_quest_lookups() etc after this.
 *
 * @param struct quest_lookup **list A pointer to the list to add to.
 * @param quest_data *quest The quest to add.
@@ -1506,8 +1505,7 @@ void build_all_quest_lookups(void) {
 /**
 * Adds a quest lookup hint to a list (e.g. on a mob).
 *
-* Note: For mob/obj quests, run update_mob_quest_lookups() or
-* update_obj_quest_lookups() after this.
+* Note: For mob/obj/veh quests, run update_mob_quest_lookups() etc after this.
 *
 * @param struct quest_lookup **list A pointer to the list to add to.
 * @param quest_data *quest The quest to add.
