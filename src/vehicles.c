@@ -801,6 +801,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	struct adventure_spawn *asp;
 	int size, found;
 	bool any;
@@ -859,6 +860,20 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 				break;	// only need 1
 			}
+		}
+	}
+	
+	// on shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QG_x: shop types
+		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_VEHICLE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -2048,6 +2063,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	bool found;
 	
@@ -2121,6 +2137,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		// QG_x: quest types
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_OWN_VEHICLE, vnum);
@@ -2165,6 +2192,15 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
 			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_VEH, vnum)) {
 				msg_to_char(desc->character, "One of the vehicles that spawns in the room template you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(desc)) {
+			// QG_x: quest types
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle used by the shop you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {

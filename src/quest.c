@@ -3448,7 +3448,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	// on other shops
+	// on shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
 		if (size >= sizeof(buf)) {
 			break;
