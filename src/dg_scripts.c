@@ -2861,7 +2861,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					
 					else if (!str_cmp(field, "add_minipet")) {
-						if (subfield && *subfield && isdigit(*subfield)) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
 							void add_minipet(char_data *ch, any_vnum vnum);
 							char_data *pet = mob_proto(atoi(subfield));
 							if (pet) {
@@ -2886,6 +2886,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						snprintf(str, slen, "0");
+					}
+					
+					else if (!str_cmp(field, "add_mount")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							char_data *mount = mob_proto(atoi(subfield));
+							if (mount) {
+								add_mount(c, GET_MOB_VNUM(mount), get_mount_flags_by_mob(mount));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid mount: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
 					}
 					
 					else if (!str_cmp(field, "add_resources")) {
@@ -3519,8 +3533,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "has_minipet")) {
 						extern bool has_minipet(char_data *ch, any_vnum vnum);
 						
-						if (subfield && *subfield && isdigit(*subfield) && has_minipet(c, atoi(subfield))) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_minipet(c, atoi(subfield))) {
 							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "has_mount")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", find_mount_data(c, atoi(subfield)) ? 1 : 0);
 						}
 						else {
 							strcpy(str, "0");
@@ -4028,9 +4050,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						strcpy(str, "0");
 					}
 					else if (!str_cmp(field, "remove_minipet")) {
-						if (subfield && *subfield && isdigit(*subfield)) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
 							void remove_minipet(char_data *ch, any_vnum vnum);
 							remove_minipet(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_mount")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							struct mount_data *mount;
+							
+							// unmount first?
+							if (GET_MOUNT_VNUM(c) == atoi(subfield)) {
+								ACMD(do_dismount);
+								do_dismount(c, "", 0, 0);
+							}
+							
+							// remove data
+							if ((mount = find_mount_data(c, atoi(subfield)))) {
+								HASH_DEL(GET_MOUNT_LIST(c), mount);
+								free(mount);
+							}
 						}
 						
 						strcpy(str, "0");
