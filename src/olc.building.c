@@ -714,7 +714,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		if (*only_icon && !GET_BLD_ICON(bld)) {
 			continue;
 		}
-		if (*only_icon && !strstr(only_icon, GET_BLD_ICON(bld)) && !strstr(only_icon, strip_color(GET_BLD_ICON(bld)))) {
+		if (*only_icon && !strstr(GET_BLD_ICON(bld), only_icon) && !strstr(strip_color(GET_BLD_ICON(bld)), only_icon)) {
 			continue;
 		}
 		if (*only_commands && !GET_BLD_COMMANDS(bld)) {
