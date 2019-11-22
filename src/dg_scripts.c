@@ -5055,7 +5055,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						extern const char *icon_types[];
 						int season = pick_season(r);
 						snprintf(str, slen, "%s", icon_types[season]);
-						LOWER(str);
+						*str = LOWER(*str);
 					}
 					else if (!str_cmp(field, "sector")) {
 						snprintf(str, slen, "%s", GET_SECT_NAME(SECT(r)));
