@@ -4987,6 +4987,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "is_outdoors")) {
+						snprintf(str, slen, "%d", IS_OUTDOOR_TILE(r) ? 1 : 0);
+					}
 					break;
 				}
 				case 'n': {	// room.n*
@@ -5047,7 +5050,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 's': {	// room.s*
-					if (!str_cmp(field, "sector")) {
+					if (!str_cmp(field, "season")) {
+						extern int pick_season(room_data *room);
+						extern const char *icon_types[];
+						int season = pick_season(r);
+						snprintf(str, slen, "%s", icon_types[season]);
+						LOWER(str);
+					}
+					else if (!str_cmp(field, "sector")) {
 						snprintf(str, slen, "%s", GET_SECT_NAME(SECT(r)));
 					}
 					else if (!str_cmp(field, "sector_vnum")) {
