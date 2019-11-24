@@ -1323,6 +1323,18 @@ void script_modify(char *argument) {
 				}
 			}
 		}
+		else if (is_abbrev(field_arg, "append-lookdesc-noformat")) {	// ADDS TO THE END OF the lookdescription without formatting
+			if (strlen(NULLSAFE(GET_OBJ_ACTION_DESC(obj))) + strlen(value) + 2 > MAX_ITEM_DESCRIPTION) {
+				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
+			}
+			else {
+				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
+				if (GET_OBJ_ACTION_DESC(obj) && (!o_proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(o_proto))) {
+					free(GET_OBJ_ACTION_DESC(obj));
+				}
+				GET_OBJ_ACTION_DESC(obj) = str_dup(temp);
+			}
+		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			if (GET_OBJ_SHORT_DESC(obj) && (!o_proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(o_proto))) {
 				free(GET_OBJ_SHORT_DESC(obj));
@@ -1371,6 +1383,18 @@ void script_modify(char *argument) {
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 			}
 		}
+		else if (is_abbrev(field_arg, "append-desc-noformat")) {	// ADDS TO THE END OF the description
+			if (strlen(NULLSAFE(ROOM_CUSTOM_DESCRIPTION(room))) + strlen(value) + 2 > MAX_ROOM_DESCRIPTION) {
+				script_log("%%mod%% append-description: description length is too long (%d max)", MAX_ROOM_DESCRIPTION);
+			}
+			else {
+				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
+				if (ROOM_CUSTOM_DESCRIPTION(room)) {
+					free(ROOM_CUSTOM_DESCRIPTION(room));
+				}
+				ROOM_CUSTOM_DESCRIPTION(room) = str_dup(temp);
+			}
+		}
 		else {
 			script_log("%%mod%% called with invalid room field '%s'", field_arg);
 		}
@@ -1414,6 +1438,18 @@ void script_modify(char *argument) {
 				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
 					format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
 				}
+			}
+		}
+		else if (is_abbrev(field_arg, "append-lookdesc-noformat")) {	// ADDS TO THE END OF the lookdescription
+			if (strlen(NULLSAFE(VEH_LOOK_DESC(veh))) + strlen(value) + 2 > MAX_ITEM_DESCRIPTION) {
+				script_log("%%mod%% append-description: vehicle lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
+			}
+			else {
+				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
+				if (VEH_LOOK_DESC(veh) && (!v_proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(v_proto))) {
+					free(VEH_LOOK_DESC(veh));
+				}
+				VEH_LOOK_DESC(veh) = str_dup(temp);
 			}
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {

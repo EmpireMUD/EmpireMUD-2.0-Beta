@@ -498,9 +498,14 @@ automatically format itself.
 
 Supported fields are:
  Mobs: keywords, longdesc, shortdesc
- Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc
- Vehicles: keywords, longdesc, shortdesc, lookdesc, append-lookdesc
- Rooms: title, description, append-description
+ Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
+          append-lookdesc-noformat
+ Vehicles: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
+          append-lookdesc-noformat
+ Rooms: title, description, append-description, append-desc-noformat
+
+Appending to descriptions triggers string formatting. Using the 'noformat'
+version will prevent this.
 
 &rWARNING&0: Each line of a script can be no longer than 255 characters.
 #d
