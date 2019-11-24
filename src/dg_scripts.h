@@ -439,6 +439,9 @@ int valid_dg_target(char_data *ch, int bitvector);
 
 #define ABILITY_TRIGGERS(actor, vict, obj, abil)  (!ability_wtrigger((actor), (vict), (obj), (abil)) || !ability_mtrigger((actor), (vict), (abil)) || !ability_otrigger((actor), (obj), (abil)))
 
+#define SCRIPT_SHOULD_SKIP_CHAR(ch)  (EXTRACTED(ch) || (!IS_NPC(ch) && (PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO) || GET_INVIS_LEV(ch) >= LVL_START_IMM)) || AFF_FLAGGED(ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))
+
+
 /* needed for new %load% handling */
 int can_wear_on_pos(obj_data *obj, int pos);
 

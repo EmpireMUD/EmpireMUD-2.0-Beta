@@ -3894,7 +3894,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						
 						// attempt to prevent extracted people from showing in lists
 						temp_ch = c->next_in_room;
-						while (temp_ch && (EXTRACTED(temp_ch) || GET_INVIS_LEV(temp_ch) >= LVL_START_IMM || AFF_FLAGGED(temp_ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))) {
+						while (temp_ch && SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
 							temp_ch = temp_ch->next_in_room;
 						}
 						
@@ -5064,7 +5064,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				
 						// attempt to prevent extracted people from showing in lists
 						temp_ch = ROOM_PEOPLE(r);
-						while (temp_ch && (EXTRACTED(temp_ch) || GET_INVIS_LEV(temp_ch) >= LVL_START_IMM || AFF_FLAGGED(temp_ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))) {
+						while (temp_ch && SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
 							temp_ch = temp_ch->next_in_room;
 						}
 				
