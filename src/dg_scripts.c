@@ -3731,6 +3731,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 					}
 					
+					else if (!str_cmp(field, "is_ignoring")) {
+						bool is_ignoring(char_data *ch, char_data *victim);
+						char_data *targ;
+						if (subfield && *subfield && ((targ = get_char(subfield))) && is_ignoring(c, targ)) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "is_immortal")) {
 						snprintf(str, slen, "%d", IS_IMMORTAL(c) ? 1 : 0);
 					}

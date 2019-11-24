@@ -450,6 +450,7 @@ When using field  - The variable returns:
 &cis_god&0 - Returns true if the actor is a god-level player.
 &cis_hostile(on/off)&0 - If the ()'s are omitted, return value is whether or
    not the actor is marked as a Hostile player.
+&cis_ignoring(target)&0 - True if the person is ignoring the target player.
 &cis_immortal&0 - Returns true if the actor is an immortal (admin).
 &cis_name(str)&0 - Returns true if str is a valid name for the actor.
 &cis_npc&0 - True if the actor is NOT a player.
