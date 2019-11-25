@@ -81,7 +81,7 @@ void update_player_leaderboard(char_data *ch, struct event_running_data *re, str
 */
 int get_event_rank(char_data *ch, struct event_running_data *re) {
 	struct event_leaderboard *lb, *next_lb;
-	int rank = 0;
+	int rank = 0, total_rank = 0, last_points = -1;
 	
 	bool need_appr = config_get_bool("event_approval");
 	
@@ -91,8 +91,13 @@ int get_event_rank(char_data *ch, struct event_running_data *re) {
 	
 	HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
 		// compute rank
-		if (!lb->ignore && (lb->approved || !need_appr)) {
-			++rank;	// otherwise they don't count toward rank
+		if (!lb->ignore && (lb->approved || !need_appr)) {	// otherwise they don't count toward rank
+			++total_rank;
+			if (lb->points != last_points) {	// not a tie
+				rank = total_rank;
+			}
+			// else: leave rank where it was (tie)
+			last_points = lb->points;
 			
 			// it me?
 			if (lb->id == GET_IDNUM(ch)) {
@@ -2511,7 +2516,7 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[256];
 	struct event_leaderboard *lb, *next_lb;
 	player_index_data *index;
-	int rank = 0;
+	int rank = 0, total_rank = 0, last_points = -1;
 	size_t size;
 	
 	bool need_approval = config_get_bool("event_approval");
@@ -2528,7 +2533,14 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 			strcpy(part, " *");
 		}
 		else {
-			sprintf(part, "%2d", ++rank);
+			++total_rank;
+			if (lb->points != last_points) {	// not a tie
+				rank = total_rank;
+			}
+			// else: leave rank where it was (tie)
+			last_points = lb->points;
+			
+			sprintf(part, "%2d", rank);
 		}
 		
 		index = find_player_index_by_idnum(lb->id);
