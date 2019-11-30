@@ -103,9 +103,10 @@ a Christmas tree binding~
 A rope for binding Christmas trees for transport lies here.~
    This rope has been used for binding Christmas trees and then dragging them
 along the ground to their new home for quite a while. Perhaps it has been an
-empire tradition.
+empire tradition. Once you have your chosen tree, craft a Christmas tree stand
+and plant it in your city center.
 ~
-3 ep a 7
+3 ep a 8
 0 0 0
 11 0
 Q 16607
@@ -203,7 +204,7 @@ ornaments set winter~
 a winter ornament set~
 A set of winter holiday ornaments are boxed up.~
    This set of winter ornaments is a work of love. Each piece carefully shaped
-and worked into a beautiful (and, more importantly, cheerful) bit of eye candy. 
+and worked into a beautiful (and, more importantly, cheerful) bit of eye candy.
 Within the set you have: strands of garland, a candy cane hanging, a faerie
 lantern, and reindeer hoofprint maker.
 Type 'hang ornaments' in 4 rooms.
@@ -359,7 +360,7 @@ Usage: upgrade <item>
 
 hideous sweater: gains +1 Greatness and a different player description
 bottomless gift sack: increased size (becomes superior)
-red Christmas hat: +1 Greatness 
+red Christmas hat: +1 Greatness
 
 (The item must be in your inventory.)
 ~
@@ -616,12 +617,12 @@ S
 #16673
 spirit christmas warm~
 a warm Christmas spirit~
-A warm Chistmas spirit fills the air.~
+A warm Christmas spirit fills the air.~
    Christmas is the coldest time of year, when a good fire is the difference
 between life and death. You're filled with this spirit of warmth, and perhaps
 through your knowledge of the old magicks, you can spread this fire to others.
 ~
-2 mp ak 5
+2 mp ak 6
 0 0 0
 10 0
 A

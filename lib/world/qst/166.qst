@@ -34,11 +34,13 @@ up your own gift, though, as Father Christmas only gives one per visitor.
    The Guild head is greatful for your kindness and ready to spread holiday
 cheer himself now.
 ~
-12 de 0 0 -1
+13 de 0 0 -1
 A
 1 18211
 A
 1 18219
+P
+0 16608 0 1 a
 P
 16 18200 0 6 a
 P
@@ -234,14 +236,15 @@ S
 Stand a Christmas Tree~
    It's time to put up a Christmas tree for the holiday season. Get your axe,
 take this binding, and search for a Christmas tree. Evergreen forests are a
-great place to find one. You might alos find something useable in any overgrown
+great place to find one. You might also find something useable in any overgrown
 forest. There's even been reports of people finding Christmas-worthy trees in
-enchanted forests before. 'Plant' a stand and set it up in the city center.
+enchanted forests before. Craft a Christmas tree stand and plant the tree in
+the city center.
 ~
    Your citizens are excited to see the new tree and hope it'll get some
 ornaments soon!
 ~
-16 de 0 0 -1
+17 de 0 0 -1
 A
 1 10701
 P
@@ -261,6 +264,33 @@ W
 11 0 0 1 a
 Z
 4 16606
+S
+#16608
+Cookies for the Guild~
+   Your guild is too grumpy. It's time to bring some Christmas cheer to them.
+Make some cookies and deliver them to the superintendant.
+(If you don't have the recipe for Christmas cookies, try opening more gifts.)
+~
+   Who can stay grumpy with Christmas cookies in their belly? Wonder how else
+you could cheer the guild up.
+~
+2 d 0 0 -1
+A
+1 18219
+A
+1 18211
+P
+36 10700 0 1
+R
+2 16659 1
+W
+2 10716 0 20 a
+W
+36 10700 0 1 a
+Z
+1 18211
+Z
+1 18219
 S
 #16610
 Be An Angel~
