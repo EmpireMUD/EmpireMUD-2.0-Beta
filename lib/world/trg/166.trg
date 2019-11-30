@@ -152,14 +152,14 @@ elseif %questvnum% == 16618 || %questvnum% == 16617
     %mod% %mod_obj% shortdesc an elf outfit
     %mod% %mod_obj% longdesc An elf outfit lays here empty.
     %mod% %mod_obj% lookdesc This elf outfit is a bit strange. It seems to be intended for a quadruped rather than a biped. And at the back end there's a hole for possibly a tail.
-    %mod% %mod_obj% append-lookdesc-noformat (dress <target>)
+    %mod% %mod_obj% append-lookdesc-noformat Usage: dress <target>
   end
   if %questvnum% == 16618
     %mod% %mod_obj% longdesc A reindeer outfit lays here empty.
     %mod% %mod_obj% shortdesc a reindeer outfit
     %mod% %mod_obj% keywords outfit reindeer
     %mod% %mod_obj% lookdesc This reindeer outfit is sized for a horse and has been used before given the hairs on the inside.
-    %mod% %mod_obj% append-lookdesc-noformat (dress <target>)
+    %mod% %mod_obj% append-lookdesc-noformat Usage: dress <target>
   end
 elseif %questvnum% == 16620
   %load% obj 16620 %actor% inv
