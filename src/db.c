@@ -3516,6 +3516,7 @@ void b5_80_dailies_fix(void) {
 	void setup_daily_quest_cycles(int only_cycle);
 	
 	log("Applying b5.80 daily quests...");
+	setup_daily_quest_cycles(10700);
 	setup_daily_quest_cycles(16602);
 	setup_daily_quest_cycles(16604);
 	setup_daily_quest_cycles(16606);
