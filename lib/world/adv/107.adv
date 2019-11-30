@@ -1,7 +1,35 @@
+#10700
+Winter Wonderland~
+Khufu, Yvain, and Domino~
+   Venture to the top of a snowy mountain in search of holiday gifts, where
+Father Christmas will enlist your help saving Christmas from a grinchy green
+demon. Complete daily quests and help drive off the grinchy demon to earn event
+rewards and compete for a high event rank.
+   Type 'event Winter Wonderland' for more information.
+~
+10700 10729 0-400
+20 0 ek 0
+L
+5 0
+60 -1 -1
+-1 0 0
+L
+4 0
+10700 10700 10701
+-1 n 0
+L
+4 0
+10701 10700 10701
+-1 el 0
+L
+8 0
+10700 -1 -1
+-1 0 0
+S
 #10775
 Tree of Knowledge~
 Paul Clarke~
-   This is certainly some unusual weather... What could be happening here? 
+   This is certainly some unusual weather... What could be happening here?
 Check back later to find out.
 ~
 10775 10799 0-0

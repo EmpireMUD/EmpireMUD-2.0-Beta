@@ -1,0 +1,60 @@
+#10700
+Winter Wonderland~
+   The holiday season is upon us and there are presents for everybody! From
+December 1 to January 6, look for the Winter Wonderland adventure on your
+'nearby' command. Visit every day for presents from Father Christmas, and fight
+off the grinchy demon before he ruins the holidays for everyone.
+There's a lot to do:
+- Get 10 different gifts from Father Christmas, one per day.
+- Stockings have 8 mini-pets to collect, or other prizes.
+- Defeat the grinchy demon to earn some Christmas spirit.
+- Make your empire festive!
+- The upgrade glitter reward lets you improve the sweater, the gift sack, and
+  the red hat.
+- Complete 5 daily quests each day to earn event points and stockings. Dailies
+  change each day and may come from:
+  - Inside the Winter Wonderland adventure.
+  - The Guild of Adventurers.
+  - Any wandering vampire.
+  - Boys and girls around your towns.
+  - Your stable, Christmas tree, and sleigh.
+~
+   Alas, the winter holidays are over for another year. You have finally driven
+off the grinchy demon and you can lean back, count your gifts, and spend some
+well-deserved time with friends and family. And don't worry, Father Christmas
+will be back again next year!
+~
+~
+9 0 0 0 400 53280 -1
+R 1 1 2 11514 1
+R 1 1 2 16655 1
+R 1 1 2 16650 1
+R 1 1 2 11501 1
+R 1 25 2 11514 1
+R 1 25 2 16655 1
+R 1 25 2 16652 1
+R 2 25 2 11502 1
+R 1 50 2 11513 1
+R 1 50 2 16651 1
+R 1 50 2 16655 1
+T 10 0 2 11513 1
+T 20 0 2 263 1
+T 30 0 2 11513 1
+T 50 0 2 16653 1
+T 80 0 2 11513 1
+T 100 0 2 10718 1
+T 150 0 2 11513 1
+T 200 0 2 11513 1
+T 250 0 2 10708 1
+T 300 0 2 10711 1
+T 350 0 2 11513 1
+T 400 0 2 263 1
+T 450 0 2 11514 1
+T 500 0 2 10712 1
+T 550 0 2 11514 1
+T 600 0 2 11514 1
+T 650 0 2 10706 1
+T 700 0 2 11503 1
+T 750 0 2 16658 1
+S
+$

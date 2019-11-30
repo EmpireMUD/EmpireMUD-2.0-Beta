@@ -1,0 +1,118 @@
+#16651
+Goose Farm~
+A Goose Farm~
+&0|GG|~
+20 1 d 0
+0 0 0 -1
+M
+16651 100.00 0
+M
+16651 20.00 0
+M
+16651 5.00 0
+R
+16 1 1 1048576
+R
+19 1 1 0
+S
+#16654
+Ballroom~
+An Icy Ballroom~
+~
+0 0 a 0
+0 0 0 -1
+D
+   As you step into the grand ballroom, you almost lose your footing. The floor
+is made of perfectly smooth ice, polished until it looks like a silver mirror.
+The high ceilings are decorated with fairly lights and a moon roof cascades
+light across the floor. Any groove or pit in the icy floor instantly heals
+itself, so this room also doubles as a skating rink.
+~
+S
+#16655
+Icy Great Hall~
+The Great Hall~
+~
+0 0 a 0
+0 0 0 -1
+D
+   The hall is grand in every sense, from its cathedral ceilings with hoarfrost
+accents, to the walkway wide enough to drive three carriages abreast. The
+icicles hanging from the ceiling chime as an icy wind blows through them,
+though it's warm enough down here that you're barely shivering.
+~
+M
+245 20.00 ce
+M
+239 15.00 ce
+M
+238 15.00 ce
+M
+251 15.00 ce
+S
+#16656
+Throne Room~
+A Frozen Throne Room~
+~
+0 0 a 0
+0 0 0 -1
+D
+   The cavernous throne room looks as if it was carved from pure ice. The
+ceiling is bordered in long, sharp icicles, and the walls are highlighted by
+hoarfrost. The throne itself sits on a raised staircase of ice, overlooking
+nobles and commoners alike.
+~
+M
+245 20.00 ce
+M
+239 20.00 ce
+M
+238 20.00 ce
+M
+254 50.00 c
+S
+#16657
+Gallery~
+An Icy Gallery~
+~
+0 0 aR 0
+0 0 0 -1
+D
+   This long gallery looks as if it's carved from pure ice, with every window,
+arch and accent highlighted in snowy frost. Ice sculptures line the inside
+wall, opposite the grand windows.
+~
+E
+sculptures~
+Sculptures of the royal family are carved from ice.
+~
+M
+245 20.00 ce
+M
+239 15.00 ce
+M
+238 15.00 ce
+M
+251 15.00 ce
+S
+#16658
+Ice Palace~
+A Magnificent Ice Palace~
+@U&C[]@V~
+128 0 floR abeghijkm
+35 0 0 -1
+D
+   This incredible ice palace rises from the ground like a glacier, with
+dagger-like icicle parapets and jagged, frozen stones to make climbing the
+walls impossible. Steam rolls off the frozen blocks, but they never thaw. The
+magic that holds this palace together must be powerful indeed.
+~
+R
+16 2 1 1048576
+R
+19 2 1 0
+R
+3 2 1 0
+T 16658
+S
+$

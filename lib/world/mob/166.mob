@@ -1,0 +1,285 @@
+#16600
+snowman~
+a snowman~
+A snowman dances around in a circle.
+~
+1 0 dhnDFG G 3
+0 0 35 15
+D
+   Three progressively larger snowballs are stacked atop each other to form the
+body of this snowman. Some coal for eyes, a carrot for a nose, and the
+finishing touch, a top hat.
+~
+M
+4
+$n leaves behind small drips as it moves.~
+M
+5
+$n continues to dance about, even though it's dark.~
+M
+0
+$n sings, "Frosty the snowman--" Then asks, "that's my brother you know?"~
+T 16617
+S
+#16609
+elf christmas sneaky~
+a christmas elf~
+A sneaky christmas elf watches as people look for the perfect tree.
+~
+1 1 bdoH en 3
+0 0 0 15
+D
+   This sneaky little elf is watching the tree choppers around these parts as
+they look for the perfect christmas tree.
+~
+T 16609
+T 16607
+S
+#16613
+demon grinchy tall green~
+a grinchy demon~
+A tall, green grinchy demon sneaks about.
+~
+50 400 bdhoy c 4
+1 0 9 7
+D
+   This demon is a furry green cave-dweller who absolutely hates Christmas. 
+Each year, he tries to ruin Christmas for as many empires as possible. He's
+spinning a long whip made from Christmas lights, and not just any Who can stop
+him! Defeat him before it's too late.
+~
+I 4 16663 14.00 1 l  # LOOT: a rocking horse saddle
+I 4 16670 14.00 1 l  # LOOT: a hearty Christmas spirit
+I 4 16671 14.00 1 l  # LOOT: a generous Christmas spirit
+I 4 16672 14.00 1 l  # LOOT: a serene Christmas spirit
+I 4 16673 14.00 1 l  # LOOT: a warm Christmas spirit
+I 4 16674 14.00 1 l  # LOOT: an anxious Christmas spirit
+I 4 16675 14.00 1 l  # LOOT: a nostalgic Christmas spirit
+I 4 16664 1.00 1 l  # LOOT: a mini-grinchy pet whistle
+I 4 16665 1.00 1 l  # LOOT: a reindeer dog mini-pet whistle
+T 16603
+T 16614
+T 16615
+T 16616
+T 16605
+S
+#16614
+dog max reindeer~
+Max the reindeer dog~
+A dog is here, dressed as a reindeer.
+~
+50 400 abdhjozAD q 3
+1 0 0 9
+D
+   Someone has attached a single fake antler to this little brown dog, and
+polished its nose, so that it almost looks like a reindeer. You doubt this
+would fool any Who, but it looks adorable.
+~
+T 16619
+S
+#16651
+goose plump~
+a plump goose~
+A goose is waddling around.
+~
+1 3 dj 0 2
+0 0 16 9
+D
+This fat white goose looks ready to eat.
+~
+I 0 3200 100.00 2  # BUTCHER: a cut of poultry
+I 0 9025 100.00 1  # BUTCHER: some bird feathers
+M
+0
+$n honks.~
+M
+0
+$n honks loudly.~
+M
+0
+$n honks loudly at you.~
+S
+#16652
+reindeer deer flying red-nosed nosed rednosed~
+a red-nosed reindeer~
+A red-nosed reindeer flies overhead!
+~
+30 70 de m 4
+0 0 2 27
+D
+   This reindeer has a shiny nose. Now that you can see it, you would even say
+it glows!
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
+I 1 1351 100.00 1  # SKIN: a large skin
+S
+#16653
+ghost christmas present~
+the ghost of a Christmas present~
+The ghost of a Christmas present hovers in the air.
+~
+1 1 bdoD n 2
+0 0 27 11
+D
+   This transparent little present is hovering around in the air. It
+occasionally stops above someone's head and shakes itself, rattling like it's
+full of chains.
+~
+M
+0
+$n floats over your head and shakes itself until it rattles.~
+M
+0
+$n looks for a tree to hide under.~
+M
+0
+You remember that time is short, and you should enjoy the present.~
+M
+0
+$n hops around on the ground.~
+M
+0
+$n tries to open itself.~
+S
+#16654
+nutcracker wooden fancy~
+a fancy nutcracker~
+A fancy wooden nutcracker is parading about.
+~
+1 1 bdoD n 2
+0 0 35 11
+D
+   The nutcracker is short, fashioned from wood, and bears a toothy grimace.
+It wears a green jacket and red pants, and has a tall black hat. Its tufts of
+white hair give it a distinguished look, and it bears a pointed black
+moustache.
+~
+M
+0
+$n parades around in circles.~
+M
+1
+When you miss someone, you remember them.~
+M
+1
+Merry Christmas!~
+M
+1
+The future of the realms lies with you.~
+M
+1
+Don't you know it's dangerous here?~
+M
+1
+It's time to save the kingdom.~
+M
+1
+You're quite the Dumas.~
+M
+0
+$n twirls around.~
+M
+0
+$n pirouettes on one foot.~
+S
+#16655
+mouse little~
+a little mouse~
+A little mouse is stirring on the ground.
+~
+1 1 bdoD n 1
+0 0 7 9
+D
+The little mouse is sitting here, stirring something.
+~
+M
+0
+$n stirs.~
+M
+0
+You hear the faint sound of jingling bells.~
+S
+#16656
+gruber dastardly~
+the gruber~
+A dastardly gruber is creeping about.
+~
+1 1 bdoD n 2
+0 0 0 15
+D
+The gruber is small, bearded, and difficult to catch.
+~
+M
+1
+That's a very nice suit of armor. It would be a shame to ruin it.~
+M
+1
+I'm going to count to three. There will not be a four.~
+M
+1
+You can walk out of here or be carried out.~
+M
+1
+Sooner or later, I might get to someone you care about.~
+M
+1
+You're very perceptive.~
+M
+1
+How nice to make your acquaintance.~
+M
+1
+What was it they said? Yippee-ki-ay?~
+S
+#16664
+demon grinchy tiny~
+a tiny grinchy demon~
+A tiny grinchy demon is running around in circles.
+~
+1 1 bdoD n 2
+1 0 9 15
+D
+   It's a furry little green demon with a positively malevolent look on its
+face that just makes it look SO adorable!
+~
+M
+0
+Your heart grows two sizes larger.~
+M
+0
+$n leaps into the air and tries to fly. He fails, but it was cute to watch.~
+M
+0
+$n barks.~
+M
+0
+$n curls up at your feet.~
+M
+0
+You feel a warm Christmas feeling.~
+M
+0
+You think you hear sleigh bells in the distance.~
+M
+0
+$n tries to paw the fake antler off its head.~
+T 9901
+T 9902
+S
+#16665
+dog reindeer disguised~
+a reindeer dog~
+A dog is here, poorly disguised as a reindeer.
+~
+1 1 bdoD n 2
+1 0 28 15
+D
+   Someone has attached a single fake antler to this little brown dog, and
+polished its nose, so that it almost looks like a reindeer. You doubt this
+would fool any Who, but it looks adorable.
+~
+T 9901
+T 9902
+S
+$

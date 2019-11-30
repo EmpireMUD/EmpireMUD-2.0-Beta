@@ -8,14 +8,19 @@ few more.
    You hand over the freshly baked Christmas cookies, and the elf gives you a
 left-over gift.
 ~
-3 de 0 0 -1
+8 de 0 0 -1
 A
 1 10702
+P
+36 10700 0 1
 R
-2 10727 1
-T 10700
+9 10700 10
+R
+2 16659 1
 W
-2 10716 0 20
+2 10716 0 20 a
+W
+36 10700 0 1 a
 Z
 1 10702
 S
