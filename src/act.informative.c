@@ -3154,7 +3154,6 @@ ACMD(do_nearby) {
 		adventures = FALSE;
 	}
 	
-	log("debug 1");
 	// displaying:
 	size = snprintf(buf, sizeof(buf), "You find nearby:\r\n");
 	#define NEARBY_DIR  (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
@@ -3218,11 +3217,9 @@ ACMD(do_nearby) {
 			if (!loc) {
 				continue;	// no location
 			}
-			;
 			
 			// distance check based on global-nearby flag
 			dist = compute_distance(IN_ROOM(ch), loc);
-			log("debug 2: %d %d %d", GET_ADV_VNUM(INST_ADVENTURE(inst)), inst->id, dist);
 			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_GLOBAL_NEARBY)) {
 				// check global
 				vnum = GET_ADV_VNUM(INST_ADVENTURE(inst));
@@ -3233,18 +3230,14 @@ ACMD(do_nearby) {
 					glb->dist = dist;
 					glb->loc = loc;
 					HASH_ADD_INT(hash, vnum, glb);
-					log("         (new)");
 				}
 				
 				if (dist <= glb->dist) {
 					// update entry
 					glb->dist = dist;
 					glb->loc = loc;
-					
-					log("         (updated 1)");
 				}
 				else {	// not closer
-					log("         (not updated)");
 					continue;
 				}
 			}
@@ -3270,7 +3263,6 @@ ACMD(do_nearby) {
 					free(glb->str);
 				}
 				glb->str = str_dup(line);
-				log("         (updated 2)");
 			}
 			else if (size + strlen(line) < sizeof(buf)) {
 				// not global: append to buf
@@ -3284,10 +3276,8 @@ ACMD(do_nearby) {
 	HASH_ITER(hh, hash, glb, next_glb) {
 		HASH_DEL(hash, glb);
 		if (glb->str) {
-			log("debug 3");
 			if (size + strlen(glb->str) < sizeof(buf)) {
-				log("debug 4");
-				strcat(buf, line);
+				strcat(buf, glb->str);
 				size += strlen(glb->str);
 			}
 			free(glb->str);
