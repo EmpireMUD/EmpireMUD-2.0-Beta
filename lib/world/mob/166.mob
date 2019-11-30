@@ -7,8 +7,8 @@ A snowman dances around in a circle.
 0 0 35 15
 D
    Three progressively larger snowballs are stacked atop each other to form the
-body of this snowman. Some coal for eyes, a carrot for a nose, and the
-finishing touch, a top hat.
+body of this snowman. He has some coal for eyes, a carrot for a nose, and the
+finishing touch: a top hat.
 ~
 M
 4
@@ -18,19 +18,19 @@ M
 $n continues to dance about, even though it's dark.~
 M
 0
-$n sings, "Frosty the snowman--" Then asks, "that's my brother you know?"~
+$n sings, 'Frosty the snowman--' Then says, 'That's my brother you know?'~
 T 16617
 S
 #16609
 elf christmas sneaky~
-a christmas elf~
-A sneaky christmas elf watches as people look for the perfect tree.
+a Christmas elf~
+A sneaky Christmas elf watches as people look for the perfect tree.
 ~
 1 1 bdoH en 3
 0 0 0 15
 D
    This sneaky little elf is watching the tree choppers around these parts as
-they look for the perfect christmas tree.
+they look for the perfect Christmas tree.
 ~
 T 16609
 T 16607
@@ -46,7 +46,7 @@ D
    This demon is a furry green cave-dweller who absolutely hates Christmas. 
 Each year, he tries to ruin Christmas for as many empires as possible. He's
 spinning a long whip made from Christmas lights, and not just any Who can stop
-him! Defeat him before it's too late.
+him! Drive him off before it's too late.
 ~
 I 4 16663 14.00 1 l  # LOOT: a rocking horse saddle
 I 4 16670 14.00 1 l  # LOOT: a hearty Christmas spirit

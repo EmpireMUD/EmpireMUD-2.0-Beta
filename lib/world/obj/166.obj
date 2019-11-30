@@ -19,7 +19,7 @@ a tin syringe~
 A tin syringe is fully compressed here.~
    This cheaply made syringe is clearly only meant to be used once before it's
 destroyed.
-Use syringe <target> to draw the victim's blood.
+Type 'use syringe <target>' to draw the victim's blood.
 ~
 3 k a 2
 0 0 0
@@ -28,10 +28,10 @@ T 16601
 S
 #16602
 stand tree christmas simple~
-a christmas tree stand~
+a Christmas tree stand~
 A simple but sturdy stand is here waiting for a tree.~
    This is a simple stand intended to hold up a tree. Tiny reindeer and elves
-are carved into the sides indicating this is probably for a christmas tree
+are carved into the sides indicating this is probably for a Christmas tree
 specifically.
 ~
 3 e a 1
@@ -63,7 +63,7 @@ just post the letter instead.
 T 16604
 S
 #16605
-snowball ball~
+snowball ball single lonely~
 a snowball~
 A single lonely snowball waits to be part of a snowman.~
 Just looks like a bunch of snow, rolled together, and compressed.
@@ -75,10 +75,10 @@ Q 16606
 S
 #16606
 tree christmas fallen~
-a fallen christmas tree~
-A christmas tree lays ere sadly.~
-   This tree is sadly laying on its side. Hopefully someone will stand it up
-right soon. After you make a christmas tree stand of course.
+a fallen Christmas tree~
+A Christmas tree lies here sadly.~
+   This tree is sadly lying on its side. Hopefully someone will stand it up
+right soon. After you make a Christmas tree stand, of course.
 ~
 3 0 a 4
 0 0 0
@@ -88,8 +88,8 @@ T 16606
 S
 #16607
 tree christmas bland~
-a christmas tree~
-A bland christmas tree stands here.~
+a Christmas tree~
+A bland Christmas tree stands here.~
    It looks like whoever set this tree up just hacked down the first one they
 came across and stuck it up in the city center for the holiday.
 ~
@@ -98,12 +98,12 @@ came across and stuck it up in the city center for the holiday.
 0 8064
 S
 #16608
-binding rope tree christmas~
-a christmas tree binding~
-A rope for binding christmas trees for transport lays here.~
-   This rope has been used for binding christmas trees and then dragging them
+binding rope tree Christmas~
+a Christmas tree binding~
+A rope for binding Christmas trees for transport lies here.~
+   This rope has been used for binding Christmas trees and then dragging them
 along the ground to their new home for quite a while. Perhaps it has been an
-empire trodition.
+empire tradition.
 ~
 3 ep a 7
 0 0 0
@@ -114,7 +114,7 @@ S
 #16609
 angel snow beautiful~
 a beautiful snow angel~
-A beautiful snow angel covers the ground.~
+A beautiful snow angel is imprinted on the ground.~
 A quickly melting imprint in the snow forms the shape of an angel.
 ~
 3 0 0 3
@@ -122,7 +122,7 @@ A quickly melting imprint in the snow forms the shape of an angel.
 10 12
 S
 #16610
-blanket waterproof~
+blanket waterproof thin~
 a waterproof blanket~
 A thin but waterproof blanket is folded in half.~
    This blanket is perfect for making snow angels without getting yourself wet
@@ -139,7 +139,7 @@ gift generic~
 a generic gift~
 A gift with generic wrapping and tag sits on the ground.~
    This gift is wrapped in simple paper, tied with a simple bow. The tag
-indicates it's for "citizen".
+indicates it's for 'Citizen'.
 ~
 3 k a 1
 0 0 0
@@ -161,9 +161,9 @@ Q 16612
 S
 #16613
 sack christmas containment~
-a christmas containment sack~
-A containment sack with christmas images on it lays empty.~
-   This oversized sack is covered in images of christmas cheer. A little boy
+a Christmas containment sack~
+A containment sack with Christmas images on it lies empty.~
+   This oversized sack is covered in images of Christmas cheer. A little boy
 flying down hill on a sled. A little girl laying in the snow, her angel nearly
 finished. But oddly, there's also an image of a tall green creature leaving a
 home with a sack of gifts over his shoulder. Is this the grinchy demon Father
@@ -189,7 +189,7 @@ S
 #16618
 outfit animal~
 an animal outfit~
-An outfit for an animal lays empty.~
+An outfit for an animal lies empty.~
    This outfit is clearly meant for an animal, but what it's supposed to look
 like is hard to tell without a body inside it.
 ~
@@ -202,14 +202,10 @@ S
 ornaments set winter~
 a winter ornament set~
 A set of winter holiday ornaments are boxed up.~
-   This set or winter ornaments is a work of love. Each piece carefully shaped
-and worked into a beautiful and more importantly cheerful bit of eye candy. 
-Within the set you have:
-Strands of Garland
-A Candy Cane Hanging
-A Faerie Lantern
-A Reindeer Hoofprint Maker
-
+   This set of winter ornaments is a work of love. Each piece carefully shaped
+and worked into a beautiful (and, more importantly, cheerful) bit of eye candy. 
+Within the set you have: strands of garland, a candy cane hanging, a faerie
+lantern, and reindeer hoofprint maker.
 Type 'hang ornaments' in 4 rooms.
 ~
 3 p a 6

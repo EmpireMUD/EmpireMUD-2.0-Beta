@@ -244,7 +244,7 @@ end
 set room %self.room%
 * See if they're trying to set it up in the city center or not.
 if %room.building_vnum% != 5009
-  %send% %actor% You can only set up your christmas tree in a city center.
+  %send% %actor% You can only set up your Christmas tree in a city center.
   halt
 end
 set act_emp %actor.empire%
@@ -256,12 +256,12 @@ if !(%act_emp% == %room.empire%)
 end
 * check if the empire has a tree here already.
 if %room.contents(16607)%
-  %send% %actor% Your empire already has a christmas tree in this city center.
+  %send% %actor% Your empire already has a Christmas tree in this city center.
   halt
 end
 * see if they have a xmas tree stand to hold up the tree.
 if !%actor.inventory(16602)%
-  %send% %actor% You should probably craft a christmas tree stand first.
+  %send% %actor% You should probably craft a Christmas tree stand first.
   halt
 end
 %load% obj 16607 room
@@ -270,17 +270,17 @@ set xmas_tree %room.contents(16607)%
 if %self.varexists(winter_holiday_sect_check)%
   set winter_holiday_sect_check %self.winter_holiday_sect_check%
   if %winter_holiday_sect_check% == 10565 || %winter_holiday_sect_check% == 10564 || %winter_holiday_sect_check% == 10563 || %winter_holiday_sect_check% == 10562
-    %mod% %xmas_tree% keywords tree spruce christmas
-    %mod% %xmas_tree% shortdesc a spruce christmas tree
-    %mod% %xmas_tree% longdesc A tall spruce christmas tree cheers the citizens.
+    %mod% %xmas_tree% keywords tree spruce Christmas
+    %mod% %xmas_tree% shortdesc a spruce Christmas tree
+    %mod% %xmas_tree% longdesc A tall spruce Christmas tree cheers the citizens.
   elseif %winter_holiday_sect_check% == 604
-    %mod% %xmas_tree% keywords tree enchanted christmas
-    %mod% %xmas_tree% shortdesc an enchanted christmas tree
-    %mod% %xmas_tree% longdesc A tall enchanted christmas tree cheers the citizens.
+    %mod% %xmas_tree% keywords tree enchanted Christmas
+    %mod% %xmas_tree% shortdesc an enchanted Christmas tree
+    %mod% %xmas_tree% longdesc A tall enchanted Christmas tree cheers the citizens.
   elseif %winter_holiday_sect_check% == 4
-    %mod% %xmas_tree% keywords tree christmas unimpressive
-    %mod% %xmas_tree% shortdesc an unimpressive christmas tree
-    %mod% %xmas_tree% longdesc An unimpressive christmas tree cheers the citizens.
+    %mod% %xmas_tree% keywords tree Christmas unimpressive
+    %mod% %xmas_tree% shortdesc an unimpressive Christmas tree
+    %mod% %xmas_tree% longdesc An unimpressive Christmas tree cheers the citizens.
   end
 end
 * See if the player's empire has the twelve trees of xmas progress or not.
@@ -334,7 +334,7 @@ if !(%winter_holiday_sect_check% == 4 || %winter_holiday_sect_check% == 604 || (
 end
 eval maxcarrying %actor.maxcarrying% - 1
 if %actor.carrying% >= %maxcarrying%
-  %send% %actor% Maybe you should unload before trying to chop down a christmas tree?
+  %send% %actor% Maybe you should unload before trying to chop down a Christmas tree?
   halt
 end
 set person %self.room.people%
@@ -394,7 +394,7 @@ set mod_tree %actor.inventory()%
 remote winter_holiday_sect_check %mod_tree.id%
 %force% %actor% stop
 %send% %actor% You've found it! The perfect tree for your city center!
-%echoaround% %actor% It looks perfect to be used as a christmas tree!
+%echoaround% %actor% It looks perfect to be used as a Christmas tree!
 ~
 #16610
 make snow angel~
@@ -745,7 +745,7 @@ switch %random.4%
     set grinch_gift_is neck ties?
   break
   case 2
-    set grinch_gift_is A christmas sweater?
+    set grinch_gift_is A Christmas sweater?
   break
   case 3
     set grinch_gift_is Fluffy woolen socks?

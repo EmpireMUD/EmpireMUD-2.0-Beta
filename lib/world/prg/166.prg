@@ -1,7 +1,7 @@
 #16600
 Twelve Trees of Christmas~
-   Your empire has planted a new christmas tree on at least twelve different
-days of the winter holidays. Way to keep the cheer going.
+   Your empire has planted a new Christmas tree on at least twelve different
+days of the winter holidays. Way to keep the cheer going!
 ~
 4 1 0 5 d
 K 7 5
