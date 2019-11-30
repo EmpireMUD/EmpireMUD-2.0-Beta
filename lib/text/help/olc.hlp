@@ -1157,6 +1157,7 @@ The following adventure flags are available:
  IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
  CHECK-OUTSIDE-FIGHTS - Makes sure nobody is fighting a mob from the instance
     outside the adventure, before despawning.
+ GLOBAL-NEARBY - Shows the nearest location from any distance.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d

@@ -3115,6 +3115,16 @@ ACMD(do_nearby) {
 	int iter, dist, dir, size;
 	bool found = FALSE;
 	room_data *loc;
+	any_vnum vnum;
+	
+	// for global nearby
+	struct glb_nrb {
+		any_vnum vnum;	// adventure vnum
+		int dist;	// distance
+		room_data *loc;	// location
+		char *str; // part shown
+		UT_hash_handle hh;
+	} *hash = NULL, *glb, *next_glb;
 	
 	if (!ch->desc) {
 		return;
@@ -3193,6 +3203,8 @@ ACMD(do_nearby) {
 	// check instances
 	if (adventures) {
 		LL_FOREACH(instance_list, inst) {
+			glb = NULL;	// init this now -- used later
+			
 			if (!INST_FAKE_LOC(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
 				continue;
 			}
@@ -3202,8 +3214,35 @@ ACMD(do_nearby) {
 			}
 		
 			loc = INST_FAKE_LOC(inst);
-			if (!loc || (dist = compute_distance(IN_ROOM(ch), loc)) > max_dist) {
-				continue;
+			if (!loc) {
+				continue;	// no location
+			}
+			
+			// distance check based on global-nearby flag
+			dist = compute_distance(IN_ROOM(ch), loc);
+			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_GLOBAL_NEARBY)) {
+				// check global
+				vnum = GET_ADV_VNUM(INST_ADVENTURE(inst));
+				HASH_FIND_INT(hash, &vnum, glb);
+				if (!glb) {	// create entry
+					CREATE(glb, struct glb_nrb, 1);
+					glb->vnum = vnum;
+					glb->dist = dist;
+					glb->loc = loc;
+					HASH_ADD_INT(hash, vnum, glb);
+				}
+				
+				if (dist < glb->dist) {
+					// update entry
+					glb->dist = dist;
+					glb->loc = loc;
+				}
+				else {	// not closer
+					continue;
+				}
+			}
+			else if (dist > max_dist) {
+				continue;	// too far
 			}
 			
 			// owner part
@@ -3219,11 +3258,31 @@ ACMD(do_nearby) {
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			snprintf(line, sizeof(line), " %d %s: %s%s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
-			if (size + strlen(line) < sizeof(buf)) {
+			if (glb) {	// just add it to the global list
+				if (glb->str) {
+					free(glb->str);
+				}
+				glb->str = str_dup(line);
+			}
+			else if (size + strlen(line) < sizeof(buf)) {
+				// not global: append to buf
 				strcat(buf, line);
 				size += strlen(line);
 			}
 		}
+	}
+	
+	// add globals to buf and free global data
+	HASH_ITER(hh, hash, glb, next_glb) {
+		HASH_DEL(hash, glb);
+		if (glb->str) {
+			if (size + strlen(glb->str) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(glb->str);
+			}
+			free(glb->str);
+		}
+		free(glb);
 	}
 	
 	if (!found) {

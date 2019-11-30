@@ -247,6 +247,7 @@ const char *adventure_flags[] = {
 	"IGNORE-WORLD-SIZE",
 	"IGNORE-ISLAND-LEVELS",
 	"CHECK-OUTSIDE-FIGHTS",
+	"GLOBAL-NEARBY",
 	"\n"
 };
 
