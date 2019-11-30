@@ -1948,6 +1948,7 @@ const char *versions_list[] = {
 	"b5.48",
 	"b5.58",
 	"b5.60",
+	"b5.80",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3511,6 +3512,18 @@ PLAYER_UPDATE_FUNC(b5_60_update_players) {
 }
 
 
+void b5_80_dailies_fix(void) {
+	void setup_daily_quest_cycles(int only_cycle);
+	
+	log("Applying b5.80 daily quests...");
+	setup_daily_quest_cycles(16602);
+	setup_daily_quest_cycles(16604);
+	setup_daily_quest_cycles(16606);
+	setup_daily_quest_cycles(16611);
+	setup_daily_quest_cycles(16618);
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3788,6 +3801,9 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.60")) {
 			log("Applying b5.60 channel update to players...");
 			update_all_players(NULL, b5_60_update_players);
+		}
+		if (MATCH_VERSION("b5.80")) {
+			b5_80_dailies_fix();
 		}
 	}
 	
