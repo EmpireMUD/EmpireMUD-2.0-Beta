@@ -141,6 +141,9 @@ set person %self.room.people%
 * Gifts for everyone! (if they haven't gotten one today)
 while %person%
   if %person.is_pc%
+    if %person.empire%
+      nop %person.empire.start_progress(10700)%
+    end
     if !%person.varexists(last_christmas_day)%
       set last_christmas_day 0
     else
