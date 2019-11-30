@@ -3241,7 +3241,7 @@ ACMD(do_nearby) {
 					continue;
 				}
 			}
-			else if (dist > max_dist) {
+			else if (dist > max_dist) {	// not global
 				continue;	// too far
 			}
 			
