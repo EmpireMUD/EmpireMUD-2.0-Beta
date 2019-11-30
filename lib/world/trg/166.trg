@@ -108,9 +108,11 @@ else
   if %actor.on_quest(16602)% && !(%target.vnum% == 10703)
     %send% %actor% That isn't the right blood!
     halt
-  elseif %actor.on_quest(16603)% && !(%target.vnum% == 10700)
-    %send% %actor% That isn't the right blood!
-    halt
+  elseif %actor.on_quest(16603)%
+    if %target.vnum% != 10700 && %target.vnum% != 10705
+      %send% %actor% That isn't the right blood!
+      halt
+    end
   end
   %send% %actor% You use all of your vampire know-how to prick %target.name%'s neck and hide the vial of blood before anyone notices.
   %echoaround% %actor% %actor.name% does something near %target.name%, but it happens so fast you can't tell what.
