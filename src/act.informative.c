@@ -3232,7 +3232,7 @@ ACMD(do_nearby) {
 					HASH_ADD_INT(hash, vnum, glb);
 				}
 				
-				if (dist < glb->dist) {
+				if (dist <= glb->dist) {
 					// update entry
 					glb->dist = dist;
 					glb->loc = loc;
