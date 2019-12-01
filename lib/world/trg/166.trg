@@ -1343,8 +1343,13 @@ return 1
 ~
 #16699
 immortal event point modifier~
-1 c 1
+1 c 2
 modify~
+if !%actor.is_immortal%
+  %send% %actor% This isn't for your use!
+  %purge% %self%
+  halt
+end
 if !%arg%
   %send% %actor% Who are you attempting to modify the event points of and by how much?
   %send% %actor% Use (modify <player name> <possative or negative number>
@@ -1355,6 +1360,12 @@ if !%event.running(10700)%
   halt
 end
 set target %actor.char_target(%arg.car%)%
-nop %target.gain_event_points(10700,%arg.cdr%)%
+if !%target%
+  %send% %actor% You don't see them here.
+  halt
+end
+set val %target.gain_event_points(10700,%arg.cdr%)%
+%send% %actor% You have modified %target.name%'s event points by %arg.cdr%.
+%send% %actor% %target.heshe% now has %val% points.
 ~
 $
