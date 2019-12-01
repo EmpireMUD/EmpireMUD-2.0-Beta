@@ -1,23 +1,3 @@
-#10700
-Mini-pet quest start~
-2 u 100
-~
-if (%questvnum% != 10700)
-  return 1
-  halt
-end
-set vnum 10723
-while %vnum% <= 10726
-  if !%actor.inventory(%vnum%)%
-    return 1
-    halt
-  end
-  eval vnum %vnum% + 1
-done
-%send% %actor% You already have all of the rewards from this quest.
-%send% %actor% You can still repeat it, but you won't get anything else.
-return 1
-~
 #10701
 Carolers caroling a'merrily~
 0 g 100
@@ -93,13 +73,13 @@ if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor
   halt
 end
 if !%actor.varexists(last_christmas_gift_item)%
-  set last_christmas_gift_item 10706
+  set last_christmas_gift_item 16656
 else
   set last_christmas_gift_item %actor.last_christmas_gift_item%
 end
 set next_gift 0
 switch %last_christmas_gift_item%
-  case 10708
+  case 16657
     set next_gift 10709
   break
   case 10709
@@ -109,9 +89,9 @@ switch %last_christmas_gift_item%
     set next_gift 10710
   break
   case 10710
-    set next_gift 10706
+    set next_gift 16656
   break
-  case 10706
+  case 16656
     set next_gift 10717
   break
   case 10717
@@ -127,7 +107,10 @@ switch %last_christmas_gift_item%
     set next_gift 10720
   break
   case 10720
-    set next_gift 10708
+    set next_gift 16657
+  break
+  default
+    set next_gift 10717
   break
 done
 %load% obj %next_gift% %actor% inv
@@ -136,18 +119,17 @@ set item %actor.inventory()%
 %echoaround% %actor% %actor.name% finishes unwrapping the gift and finds %item.shortdesc%!
 set last_christmas_gift_item %next_gift%
 remote last_christmas_gift_item %actor.id%
+%quest% %actor% trigger 16600
+if %self.carried_by.quest_finished(16600)%
+  %quest% %actor% finish 16600
+end
 %purge% %self%
 ~
 #10703
 Father Christmas gift give~
 0 g 100
 ~
-if !%actor.is_pc% || %actor.nohassle%
-  halt
-end
-if %self.varexists(gave_gifts)%
-  wait 4
-  %echo% %self.name% seems to be out of gifts!
+if !%actor.is_pc%
   halt
 end
 wait 1 sec
@@ -156,30 +138,37 @@ wait 3 sec
 say Ho ho ho! Merry Christmas!
 wait 1 sec
 set person %self.room.people%
-* Gifts for everyone!
-set count 0
+* Gifts for everyone! (if they haven't gotten one today)
 while %person%
   if %person.is_pc%
-    %send% %person% %self.name% gives you a gift!
-    %echoaround% %person% %self.name% gives %person.name% a gift!
-    %load% obj 10702 %person%
-    eval count %count%+1
+    if %person.empire%
+      nop %person.empire.start_progress(10700)%
+    end
+    if !%person.varexists(last_christmas_day)%
+      set last_christmas_day 0
+    else
+      set last_christmas_day %person.last_christmas_day%
+    end
+    if %last_christmas_day% < %dailycycle%
+      %send% %person% %self.name% gives you a gift!
+      %echoaround% %person% %self.name% gives %person.name% a gift!
+      %load% obj 10702 %person%
+      set last_christmas_day %dailycycle%
+      remote last_christmas_day %person.id%
+    elseif %person% == %actor%
+      %send% %person% You already received your gift today.
+    end
   end
   set person %person.next_in_room%
 done
-if %count%==0
-  * Everyone left :(
-  halt
-end
-* Gave at least one gift
-set gave_gifts 1
-remote gave_gifts %self.id%
+* Adventure ends now
 %adventurecomplete%
 ~
 #10704
 Completer~
 0 f 100
 ~
+* This formerly completed the adventure at the end of the frost elf fight.
 %adventurecomplete%
 ~
 #10710
@@ -226,8 +215,8 @@ wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
-%send% %actor% %self.shortdesc% glows a wintery white and the light begins to envelop you!
-%echoaround% %actor% %self.shortdesc% glows a wintery white and the light begins to envelop %actor.name%!
+%send% %actor% %self.shortdesc% glows a wintry white and the light begins to envelop you!
+%echoaround% %actor% %self.shortdesc% glows a wintry white and the light begins to envelop %actor.name%!
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
@@ -238,6 +227,26 @@ end
 %echoaround% %actor% %actor.name% appears in a flurry of snow!
 nop %actor.set_cooldown(256, 1800)%
 nop %actor.cancel_adventure_summon%
+~
+#10712
+bottomless gift sack: spawn elf on claimed land~
+1 bw 3
+~
+* Randomly spawns an elf while worn (on claimed land)
+set ch %self.worn_by%
+if !%ch%
+  halt
+end
+set room %self.room%
+if !ch.empire% || %room.empire% != %ch.empire%
+  halt
+end
+* load the elf
+%load% mob 10712
+set mob %room.people%
+if %mob.vnum% == 10712
+  %echo% %mob.name% comes tumbling out of %self.shortdesc%!
+end
 ~
 #10713
 Reindeer spawner~
@@ -250,57 +259,54 @@ else
 end
 %purge% %self%
 ~
-#10727
-Christmas minipet replacer~
-1 n 100
+#10714
+Elf despawner~
+0 b 10
 ~
-wait 1
-set actor %self.carried_by%
-if !%actor%
-  %purge% %self%
+if %self.fighting% || %self.disabled%
   halt
 end
-* Pick a random pet the owner doesn't have on him/her
-* This crudely simulates an array... it might be doable in a better way
-set pets_remaining 4
-set vnum 10723
-set number 1
-while %vnum% <= 10726
-  if %actor.inventory(%vnum%)%
-    eval pets_remaining %pets_remaining%-1
-    set has_%vnum% 1
-  else
-    set has_%vnum% 0
-    set pet_%number% %vnum%
-    eval number %number% + 1
+%echo% %self.name% runs off!
+%purge% %self%
+~
+#10727
+Winter Wonderland minipet whistle (gain list in order)~
+1 c 2
+use~
+* List of vnums granted by this whistle (minipet mobs)
+set list 10723 10724 10725 10726 16653 16654 16655 16656
+* Check targeting
+if %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+* All other results will return 1
+return 1
+* Pick a random pet the owner doesn't know
+set found 0
+while (%list% && !%found%)
+  * get next vnum in list
+  set vnum %list.car%
+  set list %list.cdr%
+  if !%actor.has_minipet(%vnum%)%
+    set found %vnum%
   end
-  eval vnum %vnum% + 1
 done
-if %pets_remaining% == 0
-  %send% %actor% You already have all four mini-pets from this quest!
+* Nothing to give
+if !%found%
+  %send% %actor% You already have all the mini-pets from the Winter Wonderland!
   %purge% %self%
   halt
 end
-eval ran_num %%random.%pets_remaining%%%
-eval vnum %%pet_%ran_num%%%
-* and give them the pet
-if %actor%
-  * We don't need to scale pet whistles
-  * if %self.level%
-  *   set level %self.level%
-  * else
-  *   set level 100
-  * end
-  %load% obj %vnum% %actor% inv %level%
-  set item %actor.inventory(%vnum%)%
-  %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
-  if %item.is_flagged(BOE)%
-    nop %item.flag(BOE)%
-  end
-  if !%item.is_flagged(BOP)%
-    nop %item.flag(BOP)%
-  end
-  nop %item.bind(%actor%)%
+* and load 1 for verification and messaging
+%load% mob %vnum%
+set pet %actor.room.people%
+if %pet.vnum% == %vnum%
+  nop %actor.add_minipet(%vnum%)%
+  %send% %actor% You gain '%pet.name%' as a mini-pet. Use the minipets command to summon it.
+  %purge% %pet%
+else
+  %send% %actor% There seems to be a problem giving you minipet #%vnum%. Please report this.
 end
 %purge% %self%
 ~

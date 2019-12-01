@@ -791,6 +791,7 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 * @param any_vnum vnum The vehicle vnum.
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
@@ -800,6 +801,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	struct adventure_spawn *asp;
 	int size, found;
 	bool any;
@@ -841,6 +843,8 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		}
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
+		any |= find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_VEHICLE, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_VEHICLE, vnum);
 		
 		if (any) {
 			++found;
@@ -856,6 +860,20 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 				break;	// only need 1
 			}
+		}
+	}
+	
+	// on shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QG_x: shop types
+		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_VEHICLE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -2036,6 +2054,7 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	
 	vehicle_data *veh, *iter, *next_iter;
@@ -2044,6 +2063,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	bool found;
 	
@@ -2100,6 +2120,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_VEHICLE, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_VEHICLE, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -2112,6 +2134,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		// QG_x: quest types
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
 	
@@ -2159,6 +2192,15 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
 			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_VEH, vnum)) {
 				msg_to_char(desc->character, "One of the vehicles that spawns in the room template you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(desc)) {
+			// QG_x: quest types
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle used by the shop you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {
@@ -2394,6 +2436,8 @@ void save_olc_vehicle(descriptor_data *desc) {
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	struct spawn_info *spawn;
+	struct quest_lookup *ql;
+	struct shop_lookup *sl;
 	bitvector_t old_flags;
 	UT_hash_handle hh;
 
@@ -2510,9 +2554,15 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	ql = proto->quest_lookups;	// save lookups
+	sl = proto->shop_lookups;
+	
 	*proto = *veh;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
+	
 	proto->hh = hh;	// restore old hash handle
+	proto->quest_lookups = ql;	// restore lookups
+	proto->shop_lookups = sl;
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_VEH, vnum);

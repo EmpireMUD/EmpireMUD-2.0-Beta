@@ -5575,6 +5575,10 @@ ACMD(do_list) {
 					strcpy(tmp, GET_OBJ_SHORT_DESC(stl->from_obj));
 					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
+				else if (stl->from_veh) {
+					strcpy(tmp, VEH_SHORT_DESC(stl->from_veh));
+					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+				}
 				else {
 					snprintf(line, sizeof(line), "%s%sYou can %sbuy%s%s:\r\n", (*buf ? "\r\n" : ""), vstr, (*buf ? "also " : ""), rep, matching);
 				}

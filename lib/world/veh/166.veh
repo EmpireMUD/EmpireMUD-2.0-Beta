@@ -1,0 +1,17 @@
+#16650
+sleigh red sleek flying~
+the flying sleigh~
+A sleek red sleigh is flying here.~
+   The sleigh is small, but there's a curious red sack in the back that seems
+to hold a great deal. This sleigh appears to be flying! Use the 'pilot' command
+to fly it.
+~
+&r\--|~
+dfgiou 2 18 300 2 0 0 0
+P
+2
+R
+19 1 1 0
+T 16649
+S
+$

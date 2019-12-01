@@ -80,7 +80,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	one_argument(argument, arg);
 	
 	if (GET_POS(ch) < POS_STANDING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
+		send_low_pos_msg(ch);
 	}
 	else if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
 		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
@@ -1428,7 +1428,7 @@ ACMD(do_accept) {
 		return;
 	}
 	if (GET_POS(ch) < offer_types[type].min_pos) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
+		send_low_pos_msg(ch);
 		return;
 	}
 	

@@ -947,11 +947,13 @@ bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
 currency       PC      MISC         Sets amounts of adventure currencies
+dailyquestscompleted  PC  NUMBER    Number of dailies they have completed today
 faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
 learned        PC      MISC         Turns learned recipes on/off
+maxlevel       PC      NUMBER       Sets the max-known-level, limiting EQ level
 minipet        PC      MISC         Adds/removes minipets
 mount          PC      MISC         Adds/removes mounts
 access         PC      NUMBER       Player's immortal access level

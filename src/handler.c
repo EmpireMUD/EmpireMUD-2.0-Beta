@@ -4944,10 +4944,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 		// get a normal 'bug' object
-		return read_object(0, TRUE);
+		return read_object(0, FALSE);
 	}
 
-	new = read_object(GET_OBJ_VNUM(obj), TRUE);
+	new = read_object(GET_OBJ_VNUM(obj), FALSE);
 	
 	// preserve some flags
 	GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & OBJ_PRESERVE_FLAGS;

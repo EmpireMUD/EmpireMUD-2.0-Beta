@@ -1413,7 +1413,9 @@ struct set_struct {
 		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "bonustrait",	LVL_START_IMM,	PC,		MISC },
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
+		{ "dailyquestscompleted", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
+		{ "maxlevel", LVL_START_IMM, PC, NUMBER },
 		{ "skill", LVL_START_IMM, PC, MISC },
 		{ "faction", LVL_START_IMM, PC, MISC },
 		{ "learned", LVL_START_IMM, PC, MISC },
@@ -1783,6 +1785,12 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("bonusexp") {
 		GET_DAILY_BONUS_EXPERIENCE(vict) = RANGE(0, 255);
+	}
+	else if SET_CASE("dailyquestscompleted") {
+		GET_DAILY_QUESTS(vict) = RANGE(0, config_get_int("dailies_per_day"));
+	}
+	else if SET_CASE("maxlevel") {
+		GET_HIGHEST_KNOWN_LEVEL(vict) = RANGE(0, SHRT_MAX);
 	}
 	else if SET_CASE("grants") {
 		bitvector_t new, old = GET_GRANT_FLAGS(vict);
@@ -3359,6 +3367,9 @@ SHOW(show_shops) {
 		}
 		else if (stl->from_obj) {
 			snprintf(buf, sizeof(buf), " (%s)", GET_OBJ_SHORT_DESC(stl->from_obj));
+		}
+		else if (stl->from_veh) {
+			snprintf(buf, sizeof(buf), " (%s)", VEH_SHORT_DESC(stl->from_veh));
 		}
 		else if (stl->from_room) {
 			strcpy(buf, " (room)");
@@ -5158,6 +5169,7 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 */
 void do_stat_empire(char_data *ch, empire_data *emp) {
 	extern int get_total_score(empire_data *emp);
+	void script_stat (char_data *ch, struct script_data *sc);
 	
 	extern const char *empire_admin_flags[];
 	extern const char *empire_attributes[];
@@ -5237,6 +5249,14 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	}
 	if (len > 0) {
 		msg_to_char(ch, "\r\n");
+	}
+	
+	msg_to_char(ch, "Script information:\r\n");
+	if (SCRIPT(emp)) {
+		script_stat(ch, SCRIPT(emp));
+	}
+	else {
+		msg_to_char(ch, "  None.\r\n");
 	}
 }
 

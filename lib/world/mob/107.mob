@@ -5,10 +5,11 @@ A flying reindeer prances above the ground.
 ~
 30 70 de m 4
 0 0 2 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
-I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
+D
+This stunning slate-gray reindeer is hovering a few feet above the ground!
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #10701
@@ -18,19 +19,37 @@ A group of carolers is singing loudly.
 ~
 0 0 bd cn 4
 0 0 0 15
+D
+The carolers are dressed in their finest winter coats.
+~
 T 10701
 S
 #10702
-elf frost~
-the frost elf~
-A frost elf is rolling snowballs.
+elf half-buried buried~
+the half-buried elf~
+A half-buried elf is playing in the snow.
 ~
-0 0 bdy cE 2
+0 0 bd cn 2
 0 0 0 20
-I 4 10711 33.30 1 a  # LOOT: a red Christmas hat
-I 4 10712 33.30 1 a  # LOOT: a bottomless gift sack
-I 4 10718 33.40 1 a  # LOOT: the sleigh schematic
-T 10704
+D
+   This tiny elf is so cold that its skin has turned blue. But that doesn't
+seem to have interrupted its fun.
+~
+M
+0
+$n throws a snowball at you, but misses.~
+M
+0
+$n makes a tiny snow angel.~
+M
+0
+$n burrows into the snow, then pops up behind you!~
+M
+0
+$n shivers in the snow.~
+M
+1
+Why am I such a misfit?~
 S
 #10703
 father christmas~
@@ -39,7 +58,79 @@ Father Christmas sits on a great candy-striped throne.
 ~
 0 0 bd nD 3
 1 0 0 15
+D
+   Father Christmas is a merry old gentleman, dressed in warm red furs lined
+with white. When he laughs his hearty laugh, his belly shakes like a bowl full
+of jelly.
+~
+M
+1
+Some people call me Saint Nicholas.~
+M
+1
+Some people call me St Nick.~
+M
+1
+Some people call me Kris Kringle.~
+M
+1
+Some people call me Pelznickel.~
+M
+1
+Some people call me Saint Nikolaas.~
+M
+1
+Some people call me Sinterklaas.~
+M
+1
+Some people call me Pere Noel.~
+M
+1
+Some people call me Papai Noel.~
+M
+1
+Some people call me Viejo Pascuero.~
+M
+1
+Some people call me Dun Che Lao Ren.~
+M
+1
+Some people call me Kerstman.~
+M
+1
+Some people call me Joulupukki.~
+M
+1
+Some people call me Wihnachtsmann.~
+M
+1
+Some people call me Kanakaloka.~
+M
+1
+Some people call me Babbo Natale.~
+M
+1
+Some people call me Hoteiosho.~
+M
+1
+Some people call me Julenissen.~
+M
+1
+Some people call me Swiety Mikolaj.~
+M
+1
+Some people call me Ded Moroz.~
+M
+1
+Some people call me Jultomten.~
+M
+1
+Some people call me Topo Gigio.~
+M
+1
+Some people call me Scott Calvin.~
 T 10703
+T 16612
 S
 #10704
 goose plump~
@@ -48,7 +139,20 @@ A goose is playing in the snow.
 ~
 1 3 dj 0 2
 2 0 0 9
+D
+This fat white goose is frolicking in the snow.
+~
 I 0 3200 100.00 2  # BUTCHER: a cut of poultry
+I 0 9025 100.00 1  # BUTCHER: some bird feathers
+M
+0
+$n honks.~
+M
+0
+$n honks loudly.~
+M
+0
+$n honks loudly at you.~
 S
 #10705
 deer reindeer~
@@ -57,10 +161,11 @@ A reindeer raises its head from grazing.
 ~
 30 70 dej 0 4
 0 0 14 27
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
-I 0 9175 100.00 1  # BUTCHER: a reindeer's antlers
+D
+The reindeer is a beautiful slate-gray color, with long, strong antlers.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
 I 1 1351 100.00 1  # SKIN: a large skin
 I 3 9176 100.00 1  # BARDE: a barded reindeer
 S
@@ -71,8 +176,73 @@ A cheerful elf is dancing about.
 ~
 1 1 bdoD n 2
 1 0 0 15
+D
+   This tiny elf is dressed all in green, and dances around to the music in his
+head.
+~
+M
+1
+I want to be a dentist!~
+M
+0
+$n frolicks around you.~
+M
+0
+$n attempts to deck the halls.~
+M
+0
+$n looks at you with shifty eyes, then looks up your name on $s list.~
+M
+0
+$n hums a catchy carol.~
 T 9901
 T 9902
+S
+#10712
+elf #n~
+#n the elf~
+A little elf is running around on the ground!
+~
+1 10 do 0 2
+0 0 11 16
+D
+   This little elf appears to have escaped from a workshop somewhere. Based on
+the fur-lined clothing, you have to assume it's somewhere cold!
+~
+M
+1
+Good news! I saw a dog today!~
+M
+1
+I'm a cotton-headed ninny-muggins.~
+M
+1
+Oh, I forgot to give you a hug.~
+M
+1
+It's just nice to meet a human that shares my affinity for elf culture.~
+M
+1
+The best way to spread Christmas cheer is singing loud for all to hear.~
+M
+1
+We elves try to stick to the four main food groups: candy, candy canes, candy corns, and syrup.~
+M
+1
+Does somebody need a hug?~
+M
+1
+I just like to smile! Smiling's my favorite.~
+M
+1
+Son of a nutcracker!~
+M
+1
+You sit on a throne of lies.~
+M
+1
+You're an angry elf.~
+T 10714
 S
 #10723
 sapling pine little~
@@ -81,8 +251,24 @@ An little pine sapling laden with decorations shuffles past.
 ~
 1 1 bdoD n 2
 0 0 31 23
-T 9901
-T 9902
+D
+This little tree has been all dressed up for Yule.
+~
+M
+0
+You feel a sense of holiday cheer.~
+M
+0
+You feel merry and bright.~
+M
+0
+You feel generous and warm.~
+M
+0
+Your mind wanders to thoughts of family.~
+M
+0
+The Twelve Days of Christmas plays on repeat in your head.~
 S
 #10724
 fawn reindeer~
@@ -91,8 +277,21 @@ A reindeer fawn gazes curiously around.
 ~
 1 1 bdoD n 2
 0 0 14 11
-T 9901
-T 9902
+D
+This tiny reindeer is all black, and hasn't grown its first antlers yet.
+~
+M
+0
+$n circles around your legs.~
+M
+0
+$n scampers along.~
+M
+0
+$n makes a honking noise.~
+M
+0
+$n prances up into the air for a moment, but falls back to the ground.~
 S
 #10725
 snowman animated small~
@@ -101,8 +300,28 @@ A small snowman turns and looks at you with its button eyes.
 ~
 1 1 bdoD n 3
 0 0 21 15
-T 9901
-T 9902
+D
+   This adorable snowman seems to leave a trail of water behind it as it
+shuffles around.
+~
+M
+1
+Some people are worth melting for.~
+M
+1
+An act of true love will thaw a frozen heart.~
+M
+1
+I like warm hugs.~
+M
+1
+Hands down, this is the best day of my life.~
+M
+1
+Winter's a good time to stay in and cuddle.~
+M
+1
+All good things, all good things.~
 S
 #10726
 soldier toy~
@@ -111,8 +330,15 @@ A toy soldier salutes you smartly.
 ~
 1 1 bdoD n 1
 0 0 35 1
-T 9901
-T 9902
+D
+This little soldier is complete with wooden armor and a little wooden hat.
+~
+M
+0
+$n marches around in a circle.~
+M
+0
+$n salutes you.~
 S
 #10728
 snowman large~
@@ -121,6 +347,10 @@ A large snowman stands nearby.
 ~
 1 1 dhoD nrG 3
 0 0 9 15
+D
+   The snowman looks smart with his corn cob pipe, his button nose, and two
+eyes made out of coal.
+~
 S
 #10730
 cat musical~

@@ -350,7 +350,7 @@ WCMD(do_wregionecho) {
 				if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
 					continue;
 				}
-				if (RMT_FLAGGED(IN_ROOM(targ), RMT_NO_LOCATION)) {
+				if (NO_LOCATION(IN_ROOM(targ))) {
 					continue;
 				}
 				if (compute_distance(center, IN_ROOM(targ)) > radius) {

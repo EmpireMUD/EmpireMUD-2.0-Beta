@@ -80,6 +80,7 @@ const bool is_location_rule[] = {
 	FALSE,	// ADV_LINK_TIME_LIMIT
 	FALSE,	// ADV_LINK_NOT_NEAR_SELF
 	TRUE,	// ADV_LINK_PORTAL_CROP
+	FALSE,	// ADV_LINK_EVENT_RUNNING
 };
 
 
@@ -1338,17 +1339,18 @@ void reset_instances(void) {
 */
 void prune_instances(void) {
 	struct instance_data *inst, *next_inst;
-	struct adventure_link_rule *rule;
+	struct adventure_link_rule *rule, *evt_run;
 	bool delayed, save = FALSE;
 	room_data *room, *next_room;
 	
 	// look for dead instances
 	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		rule = get_link_rule_by_type(INST_ADVENTURE(inst), ADV_LINK_TIME_LIMIT);
+		evt_run = get_link_rule_by_type(INST_ADVENTURE(inst), ADV_LINK_EVENT_RUNNING);
 		delayed = IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) ? TRUE : FALSE;
 		
 		// look for completed or orphaned instances
-		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_CREATED(inst) + 60 * rule->value) < time(0))) {
+		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_CREATED(inst) + 60 * rule->value) < time(0)) || (evt_run && !find_running_event_by_vnum(evt_run->value))) {
 			// well, only if empty
 			if (count_players_in_instance(inst, TRUE, NULL) == 0 && (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_CHECK_OUTSIDE_FIGHTS) || check_outside_fights(inst))) {
 				delete_instance(inst, TRUE);
@@ -1535,6 +1537,8 @@ bool can_enter_instance(char_data *ch, struct instance_data *inst) {
 * @return bool TRUE if it's ok to add an instance of the adventure, or FALSE.
 */
 bool can_instance(adv_data *adv) {
+	struct adventure_link_rule *rule;
+	
 	if (!adv) {
 		return FALSE;
 	}
@@ -1552,6 +1556,20 @@ bool can_instance(adv_data *adv) {
 	if (count_instances(adv) >= adjusted_instance_limit(adv)) {
 		// never more
 		return FALSE;
+	}
+	
+	// check for a linking rule that would block it
+	LL_FOREACH(GET_ADV_LINKING(adv), rule) {
+		// ADV_LINK_x: rules that would prevent instancing entirely
+		switch (rule->type) {
+			case ADV_LINK_EVENT_RUNNING: {
+				if (!find_running_event_by_vnum(rule->value)) {
+					// event not running
+					return FALSE;
+				}
+				break;
+			}
+		}
 	}
 	
 	// yay!
@@ -1918,6 +1936,10 @@ struct instance_data *get_instance_for_script(int go_type, void *go) {
 			}
 			case VEH_TRIGGER: {
 				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE, TRUE);
+				break;
+			}
+			case EMP_TRIGGER:
+			default: {	// types that do not associate to instances
 				break;
 			}
 		}

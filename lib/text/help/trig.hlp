@@ -177,6 +177,8 @@ When using field - The variable returns:
    also immediately auto-complete if tasks are already complete. Otherwise, it
    will behave like a normal goal.
 &cterritory&0 - The amount of land claimed.
+&cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
+   Useful when dealing with remote vars on empires.
 &cvnum&0 - The empire's vnum.
 &cwealth&0 - The empire's total wealth (coins + treasure).
 #d
@@ -479,6 +481,8 @@ Special Variables When using field - The variable returns:
 &ccooldown.<vnum>&0 - Get the name of a cooldown, by vnum.
 &ccurrency.<vnum>(amt)&0 - Gets the currency name. The amt is used to determine
    whether to use the singular or plural name.
+&cdailycycle&0 - The number of whole days since the MUD first started (tied to
+   the bonus experience and daily quest cycle).
 &cevent.name(vnum)&0 - Gets the name of an event.
 &cevent.running(vnum)&0 - Whether or not that event is currently running.
 &cevent.time(vnum)&0 - Minutes left in that event, if running.

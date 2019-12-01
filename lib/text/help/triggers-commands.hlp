@@ -67,6 +67,8 @@ Example:
   * attached).
   attach 3001 %self.id%
 
+Note: You cannot attach triggers to empires.
+
 See also: DETACH, TATTACH, TDETACH
 #d
 %BUILD% MBUILD OBUILD VBUILD WBUILD
@@ -184,6 +186,8 @@ Example:
   detach 3000 %self.id%
   * or
   detach all %self.id%
+
+Note: You cannot attach triggers to empires.
 
 See also: TATTACH, TDETACH, TRIG-ATTACH
 #d
@@ -494,9 +498,14 @@ automatically format itself.
 
 Supported fields are:
  Mobs: keywords, longdesc, shortdesc
- Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc
- Vehicles: keywords, longdesc, shortdesc, lookdesc, append-lookdesc
- Rooms: title, description, append-description
+ Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
+          append-lookdesc-noformat
+ Vehicles: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
+          append-lookdesc-noformat
+ Rooms: title, description, append-description, append-desc-noformat
+
+Appending to descriptions triggers string formatting. Using the 'noformat'
+version will prevent this.
 
 &rWARNING&0: Each line of a script can be no longer than 255 characters.
 #d
@@ -616,8 +625,7 @@ Usage:  remote <variable> <id>
 
 Remoting a variable saves that variable to the player file for future access.
 The variable must first exist in the script (but don't put % signs around its
-name in this command). This is used heavily for quests to limit a player to
-only performing it once.
+name in this command).
 
 You can see if a person has a remote variable using %actor.varexists(varname)%
 and access it using %actor.varname%.
@@ -779,6 +787,8 @@ Examples:
   tattach obj 1480 sword   - Attaches obj trigger 1480 to a sword. 
   tattach veh 952 %boat%   - Attach trigger 952 to the %boat% vehicle.
 
+Note: You cannot attach triggers to empires.
+
 See also: TDETACH, TRIG-ATTACH, TRIG-DETACH, OLC, TRIGEDIT, STAT
 #d
 TDETACH
@@ -826,6 +836,8 @@ room template vnum instead of live room number (if used in an instanced zone).
 Examples:
   %teleport% all i17401
   %teleport% %actor% %actor.home%
+
+Note: You cannot attach triggers to empires.
 #d
 %TERRACROP% MTERRACROP OTERRACROP VTERRACROP WTERRACROP
 
@@ -907,14 +919,15 @@ VDELETE
 
 Usage:  vdelete <variablename> <id>
 
-Use this to remove a variable from either mob, room, obj, or player.
+Use this to remove a variable from either mob, room, obj, vehicle, empire, or
+player.
 
 Examples:
   vdelete has_solved_quest 5351
 
 To determine the player ID, stat player:
   > stat file test
-  male PC 'Test'  IDNum: [ 3531], In room [    0]
+  Male PC 'Test'  IDNum: [ 3531], In room [    0]
 
 See also: REMOTE, RDELETE
 #d

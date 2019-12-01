@@ -1,0 +1,735 @@
+#16600
+hat top magic~
+a magic top hat~
+A magic top hat awaits a special head.~
+This old silk hat seems to have some magic in it.
+To use it:
+- 'make snowball' 3 times
+- 'make snowman'
+~
+3 k a 3
+0 0 0
+11 0
+Q 16606
+T 16600
+S
+#16601
+syringe tin~
+a tin syringe~
+A tin syringe is fully compressed here.~
+   This cheaply made syringe is clearly only meant to be used once before it's
+destroyed.
+Type 'use syringe <target>' to draw the victim's blood.
+~
+3 k a 2
+0 0 0
+2 0
+T 16601
+S
+#16602
+stand tree christmas simple~
+a Christmas tree stand~
+A simple but sturdy stand is here waiting for a tree.~
+   This is a simple stand intended to hold up a tree. Tiny reindeer and elves
+are carved into the sides indicating this is probably for a Christmas tree
+specifically.
+~
+3 e a 1
+0 0 0
+6 0
+Q 16607
+S
+#16603
+vial blood~
+vial of blood~
+A vial of blood is here.~
+Just a small glass vial with dark red blood in it.
+~
+3 k a 2
+0 0 0
+8 72
+S
+#16604
+letter father christmas sealed~
+a letter to Father Christmas~
+A sealed letter to Father Christmas flutters in the wind.~
+   You are tempted to read the letter, but if you did then Father Christmas at
+the least would know. And you don't want to get on to the naughty list. Better
+just post the letter instead.
+~
+3 k a 2
+0 0 0
+0 0
+T 16604
+S
+#16605
+snowball ball single lonely~
+a snowball~
+A single lonely snowball waits to be part of a snowman.~
+Just looks like a bunch of snow, rolled together, and compressed.
+~
+3 k a 1
+0 0 0
+10 0
+Q 16606
+S
+#16606
+tree christmas fallen~
+a fallen Christmas tree~
+A Christmas tree lies here sadly.~
+   This tree is sadly lying on its side. Hopefully someone will stand it up
+right soon. After you make a Christmas tree stand, of course.
+~
+3 0 a 4
+0 0 0
+0 0
+Q 16607
+T 16606
+S
+#16607
+tree christmas bland~
+a Christmas tree~
+A bland Christmas tree stands here.~
+   It looks like whoever set this tree up just hacked down the first one they
+came across and stuck it up in the city center for the holiday.
+~
+3 v 0 4
+0 0 0
+0 8064
+S
+#16608
+binding rope tree Christmas~
+a Christmas tree binding~
+A rope for binding Christmas trees for transport lies here.~
+   This rope has been used for binding Christmas trees and then dragging them
+along the ground to their new home for quite a while. Perhaps it has been an
+empire tradition. Once you have your chosen tree, craft a Christmas tree stand
+and plant it in your city center.
+Type 'quest info Stand a Christmas Tree' for more information.
+~
+3 ep a 9
+0 0 0
+11 0
+Q 16607
+T 16608
+S
+#16609
+angel snow beautiful~
+a beautiful snow angel~
+A beautiful snow angel is imprinted on the ground.~
+A quickly melting imprint in the snow forms the shape of an angel.
+~
+3 0 0 3
+0 0 0
+10 12
+S
+#16610
+snowflake enchanted oversized flake~
+an enchanted snowflake~
+An oversized snowflake glows with some form of enchantment.~
+   In the center is a snowflake, larger than most you've ever seen. And from
+the edges a constant stream of flurries spread. You could probably make a snow
+angel in all the additional snow being created.
+Type: make snow angel
+~
+3 0 a 5
+0 0 0
+11 0
+Q 16610
+T 16610
+S
+#16611
+gift generic~
+a generic gift~
+A gift with generic wrapping and tag sits on the ground.~
+   This gift is wrapped in simple paper, tied with a simple bow. The tag
+indicates it's for 'Citizen'.
+~
+3 k a 1
+0 0 0
+0 0
+Q 16611
+T 16611
+S
+#16612
+cap stocking red hat Santa's santas~
+Santa's red stocking cap~
+A red stocking cap has been discarded here.~
+   This stocking cap is made from red felt, and lined in white fur, with a
+matching white tassel at the end.
+~
+3 k a 3
+0 0 0
+0 0
+Q 16612
+S
+#16613
+sack christmas containment~
+a Christmas containment sack~
+A containment sack with Christmas images on it lies empty.~
+   This oversized sack is covered in images of Christmas cheer. A little boy
+flying down hill on a sled. A little girl laying in the snow, her angel nearly
+finished. But oddly, there's also an image of a tall green creature leaving a
+home with a sack of gifts over his shoulder. Is this the grinchy demon Father
+Christmas asked you to stop?
+Type 'use sack <normal | hard | group | boss>' to find him.
+~
+3 ek a 4
+0 0 0
+0 0
+Q 16613
+T 16613
+S
+#16614
+sense rage~
+a sense of rage~
+A sense of rage can be felt in the room.~
+How can you see a feeling?
+~
+3 k 0 1
+0 0 0
+10 12
+S
+#16618
+outfit reindeer~
+a reindeer outfit~
+A reindeer outfit lays here empty.~
+   This reindeer outfit is sized for a horse and has been used before given the
+hairs on the inside.
+Usage: dress horse
+~
+3 k a 4
+0 0 0
+11 0
+Q 16618
+T 16618
+S
+#16619
+ornaments set winter~
+a winter ornament set~
+A set of winter holiday ornaments are boxed up.~
+   This set of winter ornaments is a work of love. Each piece carefully shaped
+and worked into a beautiful (and, more importantly, cheerful) bit of eye candy.
+Within the set you have: strands of garland, a candy cane hanging, a faerie
+lantern, and reindeer hoofprint maker.
+Type 'hang ornaments' in 4 rooms.
+~
+3 p a 6
+0 0 0
+0 0
+Q 16620
+T 16620
+S
+#16620
+list ornaments crafter~
+a list of ornaments~
+A crafter's list of ornaments is folded in forths.~
+The instructions detail how to make the set of four ornaments.
+1. 'craft winter ornaments'
+2. 'hang ornaments' in 4 rooms to prepare for the winter holiday
+~
+3 kp a 3
+0 0 0
+0 0
+Q 16620
+S
+#16621
+garland strands silver gold green~
+strands of garland~
+Silver, gold, and green strands of garland are artfully draped about the room.~
+   The garland is hand-made, from items that look like they came out of the
+back of the empire's storage barns.
+~
+3 v 0 5
+0 0 0
+11 288
+S
+#16622
+canes hanging candy artful~
+a candy cane hanging~
+An artful hanging made up of candy canes dangles down in the middle of the area.~
+   A number of candy canes interlock, crisscross, and otherwise connect to form
+an abstract winter scene.
+~
+3 v 0 7
+0 0 0
+7 288
+S
+#16623
+lantern faerie large~
+a faerie lantern~
+A large faerie lantern sparkles brighly, lighting the area for all.~
+   A thin metal cage branches up from a central circular base. A bright glow
+comes from within, but the design of the metal makes it impossible to see what
+causes it.
+~
+3 cv 0 6
+0 0 0
+2 288
+S
+#16624
+hoofprints prints reindeer ground~
+reindeer hoofprints~
+A set of reindeer hoofprints are clearly visible in the ground.~
+   A reindeer has seemingly landed and taken off from this place, leaving deep
+hoofprints in the ground.
+~
+3 v 0 6
+0 0 0
+10 288
+S
+#16625
+outfit elf~
+an elf outfit~
+An elf outfit lays here empty.~
+   This elf outfit is a bit strange. It seems to be intended for a quadruped
+rather than a biped. And at the back end there's a hole for possibly a tail.
+Usage: dress terrier
+~
+3 k a 4
+0 0 0
+11 0
+Q 16617
+T 16618
+S
+#16650
+wax sleigh elfish flying~
+some elfish flying sleigh wax~
+Some elfish flying sleigh wax has been left here.~
+   This wax can be used to enchant a sleigh in order to make it fly. It can
+only be used on the regular red sleigh from the Winter Wonderland event.
+Usage: enchant sleigh
+~
+3 0 a 2
+0 0 0
+10 0
+R
+5193 0
+T 16650
+S
+#16651
+design goose farm~
+the design for a goose farm~
+The design for a goose farm is lying here.~
+This design will let you build a goose farm.
+Usage: build goosefarm
+~
+3 0 a 1
+0 0 0
+0 0
+S
+#16652
+tin flying reindeer polish~
+a tin of flying reindeer polish~
+A tin of flying reindeer polish is lying here.~
+   This polish will upgrade your regular reindeer mount into a flying reindeer.
+If you already have a flying reindeer mount, it'll just polish the nose. This
+works directly on your mount list, so you already need to know a reindeer mount
+to use it.
+Usage: use polish
+~
+3 p a 1
+0 0 0
+2 0
+T 16652
+S
+#16653
+sweater hideous~
+a hideous sweater~
+A hideous sweater has been tossed aside on the ground.~
+   The sweater is made from red and green yarn, in a pattern that loosely
+resembles a fir tree. Yellow yarn is used all over for ornaments and
+highlights, but the entire thing looks like it was knitted by a troll.
+~
+2 p ad 3
+0 0 0
+0 0
+A
+5 1 0
+M
+12
+$n is spreading holiday cheer!~
+S
+#16654
+sweater hideous glowing~
+a hideous glowing sweater~
+A hideous glowing sweater has been discarded here.~
+   The sweater is made from red and green yarn, with flecks of gold that have
+been enchanted to light up like candles outlining the shape of a fir tree. The
+effect is majestic, but the sweater itself appears to have been knitted by a
+cave troll.
+~
+2 p ad 3
+0 0 0
+0 0
+A
+5 2 0
+M
+12
+$n glows like a yule log as $e spreads holiday cheer!~
+S
+#16655
+packet enchanted upgrade glitter~
+an enchanted packet of upgrade glitter~
+An enchanted packet of upgrade glitter has fallen here.~
+   Apply this packet of glitter to the hideous sweater, the red Christmas hat,
+or the bottomless gift sack from the Winter Wonderland. The glow of the glitter
+will make one of these items better using the magic of Christmas!
+Usage: upgrade <item>
+
+hideous sweater: gains +1 Greatness and a different player description
+bottomless gift sack: increased size (becomes superior)
+red Christmas hat: +1 Greatness
+
+(The item must be in your inventory.)
+~
+3 p a 5
+0 0 0
+0 0
+T 16655
+S
+#16656
+mistletoe sprig~
+a sprig of mistletoe~
+A sprig of mistletoe is hanging here.~
+   Tradition says that whosoever stands beneath a sprig of mistletoe must kiss.
+You can 'drop' the mistletoe and see what happens! Enjoy it while it lasts,
+because the mistletoe will go bad eventually.
+~
+3 p a 4
+0 0 0
+0 8064
+T 16656
+S
+#16657
+dreidel dreidl wooden~
+a dreidel~
+A wooden dreidel is lying on the ground.~
+   The dreidel is a four-sided spinning top that's often used during the
+December holiday of Hanukkah. The sides of the dreidel have letters on them:
+nun (nothing), hei (half), gimel (all), and shin (put in).
+Type 'spin dreidel' to use it.
+~
+3 0 a 4
+0 0 0
+0 0
+R
+5193 0
+T 16657
+T 16651
+S
+#16658
+stone ice frozen~
+a frozen ice stone~
+A frozen ice stone lies here, freezing the ground around it.~
+   This stone is magically enchanted to turn any ordinary stone to ice. It can
+be used to build a magnificent ice palace!
+Build (requires Architect): icepalace
+~
+3 e a 1
+0 0 0
+1 0
+S
+#16659
+stocking knitted red~
+a red knitted stocking~
+A red knitted stocking is lying here.~
+   The stocking is far too large to wear, but it's the type that someone might
+hang from a fireplace on Christmas Eve. This one feels like it contains a
+gift... Type 'open stocking' to receive it.
+~
+3 p a 2
+0 0 0
+11 0
+T 16659
+S
+#16660
+coins chocolate~
+some chocolate coins~
+Some chocolate coins are lying on the ground.~
+These coins are made from chocolate and coated in thin foil.
+~
+6 p a 2
+6 0 0
+7 1024
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+A
+4 1 0
+A
+8 1 0
+M
+4
+You unwrap the chocolate coins and eat them.~
+M
+5
+$n unwraps some chocolate coins and eats them.~
+S
+#16661
+cookies snowball ball~
+some snowball cookies~
+Some snowball cookies are disguised on the ground.~
+   These cookies are small and dense, and coated in powdered sugar so they look
+like snowballs.
+~
+6 mp a 2
+6 0 0
+7 1024
+A
+19 1 0
+C
+50 50
+M
+5
+$n pops $p into $s mouth eats them.~
+M
+4
+You pop $p in your mouth and eat them.~
+S
+#16662
+cookies thumbprints print~
+some thumbprint cookies~
+Some thumbprint cookies are lying on the ground.~
+   The cookies are coated in chopped nuts and have jelly in a little impression
+in the top.
+~
+6 mp a 3
+6 0 0
+7 1024
+A
+6 1 0
+C
+50 50
+M
+4
+You carefully eat $p.~
+M
+5
+$n carefully eats $p.~
+S
+#16663
+saddle rocking horse~
+a rocking horse saddle~
+A rocking horse saddle is lying here.~
+   This wooden saddle clearly came from a toy rocking horse. However, the red
+and green glow means it's been enchanted with the Christmas spirit, and it
+seems to reshape itself to fit any mount.
+~
+2 emp as 3
+0 0 0
+0 0
+A
+11 2 0
+A
+6 3 0
+A
+5 1 6
+S
+#16664
+whistle pet mini-grinchy grinchy~
+a mini-grinchy pet whistle~
+A mini-grinchy pet whistle is lying here.~
+   This whistle will teach you the tiny grinchy demon mini-pet. Type 'use
+whistle'.
+~
+19 p a 7
+16664 0 0
+2 0
+S
+#16665
+whistle reindeer mini-pet dog~
+a reindeer dog mini-pet whistle~
+A reindeer dog mini-pet whistle is lying here.~
+This whistle will teach you the reindeer dog mini-pet.
+Type 'use whistle'.
+~
+19 p a 8
+16665 0 0
+2 0
+S
+#16670
+spirit christmas hearty~
+a hearty Christmas spirit~
+A hearty Christmas spirit lingers in the air.~
+   Christmas is a time for hearty food to keep you healthy through the winter,
+and it takes a hearty person to survive the cold and dark. The Christmas spirit
+fills you with that hearty feeling, and your fear of midwinter vanishes.
+~
+2 mp ak 2
+0 0 0
+10 0
+A
+2 1 0
+A
+18 3 0
+A
+13 2 0
+A
+5 1 6
+M
+8
+You're filled with $p!~
+M
+9
+$n glows with $p!~
+S
+#16671
+spirit christmas generous~
+a generous Christmas spirit~
+A generous Christmas spirit hangs in the air.~
+   Christmas is the season of giving, when those who 'have' share with those
+who 'have not'. What you have is a good dagger (or sword, or axe), and you're
+filled with the urge to give it to someone else blade-first.
+~
+2 mp ak 3
+0 0 0
+10 0
+A
+1 1 0
+A
+9 1 0
+A
+17 3 0
+A
+21 3 0
+A
+5 1 6
+M
+8
+You're filled with $p!~
+M
+9
+$n glows with $p!~
+S
+#16672
+spirit christmas serene~
+a serene Christmas spirit~
+A serene Christmas spirit hangs in the air.~
+   Christmas is a time for serene reflection in the warm glow of freshly fallen
+snow. It's a time for coming together and for healing, and for facing the
+coming year together.
+~
+2 mp ak 4
+0 0 0
+10 0
+A
+8 1 0
+A
+9 1 0
+A
+23 3 0
+A
+7 2 0
+A
+5 1 6
+M
+8
+You're filled with $p!~
+M
+9
+$n glows with $p!~
+S
+#16673
+spirit christmas warm~
+a warm Christmas spirit~
+A warm Christmas spirit fills the air.~
+   Christmas is the coldest time of year, when a good fire is the difference
+between life and death. You're filled with this spirit of warmth, and perhaps
+through your knowledge of the old magicks, you can spread this fire to others.
+~
+2 mp ak 6
+0 0 0
+10 0
+A
+8 1 0
+A
+9 1 0
+A
+17 3 0
+A
+22 3 0
+A
+5 1 6
+M
+8
+You're filled with $p!~
+M
+9
+$n glows with $p!~
+S
+#16674
+spirit anxious christmas~
+an anxious Christmas spirit~
+An anxious Christmas spirit fills the air.~
+   Christmas is a season of anxiety, both for children who await their gifts,
+and for adults who dread the large groups of friends and family. But for some,
+that anxiety is a source of power.
+~
+2 mp ak 7
+0 0 0
+10 0
+A
+2 1 0
+A
+9 1 0
+A
+17 3 0
+A
+13 2 0
+A
+5 1 6
+M
+8
+You're filled with $p!~
+M
+9
+$n glows with $p!~
+S
+#16675
+spirit christmas nostalgic~
+a nostalgic Christmas spirit~
+A nostalgic Christmas spirit hovers in the air.~
+   Christmas is a time that brings back memories, both good and bad. From the
+childhood gifts we'll never forget, to the people who we spent those
+Christmasses with who are gone. But those are memories of the people we love,
+who live in our hearts forever, and a little nostalgia is good for passing the
+long winter nights.
+~
+2 mp ak 8
+0 0 0
+10 0
+A
+5 1 0
+A
+5 1 6
+A
+19 1 0
+A
+6 2 0
+A
+25 5 0
+M
+8
+You're filled with $p!~
+M
+9
+$n glows with $p!~
+S
+#16699
+marker immortal~
+an immortal marker~
+A giant marker for immortals is here.~
+if you're not an immortal, then how did you get this?
+If you are an immortal, the command is below:
+type: modify <player name> <positive or negative number>
+~
+3 0 a 3
+0 0 0
+10 0
+T 16699
+S
+$

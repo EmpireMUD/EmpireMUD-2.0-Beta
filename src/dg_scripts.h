@@ -19,10 +19,11 @@
 #define MOB_TRIGGER  0
 #define OBJ_TRIGGER  1
 #define WLD_TRIGGER  2
-#define RMT_TRIGGER  3
-#define ADV_TRIGGER  4
+#define RMT_TRIGGER  3	// actually a wld trigger attached to a rmt
+#define ADV_TRIGGER  4	// actually a wld trigger attached to an adv
 #define VEH_TRIGGER  5
-#define BLD_TRIGGER  6
+#define BLD_TRIGGER  6	// actually a wld trigger attached to a bld
+#define EMP_TRIGGER  7	// empires only store vars, not triggers
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1
@@ -437,6 +438,9 @@ int valid_dg_target(char_data *ch, int bitvector);
 
 
 #define ABILITY_TRIGGERS(actor, vict, obj, abil)  (!ability_wtrigger((actor), (vict), (obj), (abil)) || !ability_mtrigger((actor), (vict), (abil)) || !ability_otrigger((actor), (obj), (abil)))
+
+#define SCRIPT_SHOULD_SKIP_CHAR(ch)  (EXTRACTED(ch) || (!IS_NPC(ch) && (PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO) || GET_INVIS_LEV(ch) >= LVL_START_IMM)) || AFF_FLAGGED(ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))
+
 
 /* needed for new %load% handling */
 int can_wear_on_pos(obj_data *obj, int pos);

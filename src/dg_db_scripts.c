@@ -319,6 +319,10 @@ void assign_triggers(void *i, int type) {
 			}
 			break;
 		}
+		case EMP_TRIGGER: {
+			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: unable to assign triggers to empires in assign_triggers()");
+			break;
+		}
 		default:
 			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: unknown type for assign_triggers()");
 			break;

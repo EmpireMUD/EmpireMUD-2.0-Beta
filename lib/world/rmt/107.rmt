@@ -4,7 +4,7 @@ A Winter Wonderland~
 have been carved from ice, but a fierce blizzard is quickly covering them in
 snow. Behind the whip and howl of the wind, you can hear people singing carols.
 ~
-ai 0 0
+aci 0 0
 D0
 ~
 0 10701
@@ -20,7 +20,7 @@ A Winter Wonderland~
 blizard, the beauty of the snow-covered peak is striking. Evergreen trees
 frosted in glittering snow give you the warm feeling of home.
 ~
-ai 0 0
+aci 0 0
 D2
 ~
 0 10700
@@ -44,7 +44,7 @@ A Winter Wonderland~
 the snow tell you that you're not the only one here. You can hear carolers
 singing in the distance, and the smell of cookies fills the air with warmth.
 ~
-ai 0 0
+aci 0 0
 D3
 ~
 0 10701
@@ -61,7 +61,7 @@ fluffy as though it just fell. Below, you can see the top of a harsh winter
 blizzard. But though it is cold up here, you're warmed by visions of sugarplums
 dancing in your head.
 ~
-ai 0 0
+aci 0 0
 D0
 ~
 0 10702
@@ -81,7 +81,7 @@ peak, and you have found the source of the lovely music that fills the cold
 mountain air. You're above even the evergreen trees here, surrounded by nothing
 but the untouched beauty of the snow.
 ~
-ai 0 0
+aci 0 0
 D1
 ~
 0 10703

@@ -1157,6 +1157,7 @@ The following adventure flags are available:
  IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
  CHECK-OUTSIDE-FIGHTS - Makes sure nobody is fighting a mob from the instance
     outside the adventure, before despawning.
+ GLOBAL-NEARBY - Shows the nearest location from any distance.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -1210,6 +1211,16 @@ CAUTION: You must not use designated rooms (or any "building" with the ROOM
 flag) for this, because they can't be built on the map.
 
 See also: ADVEDIT LINKING, SECTEDIT BUILDFLAGS, VNUM
+#d
+"ADVEDIT EVENT-RUNNING" "ADVEDIT LINK EVENT-RUNNING" "ADVEDIT LINKING EVENT-RUNNING"
+
+Usage:  .linking add EVENT-RUNNING <event vnum>
+
+This linking rule means the event can only spawn when a certain event is
+running. It will also auto-complete all instances if they are open and the
+event is not running.
+
+See also: ADVEDIT LINKING
 #d
 "ADVEDIT NOT-NEAR-SELF" "ADVEDIT LINK NOT-NEAR-SELF" "ADVEDIT LINKING NOT-NEAR-SELF"
 
@@ -1328,6 +1339,7 @@ See specific help files for each type: &yHELP ADVEDIT <TYPE>&0
  &cPORTAL-CROP&0: Portal appears on a matching crop tile.
  &cTIME-LIMIT&0: Removes instances after a certain number of minutes expire.
  &cNOT-NEAR-SELF&0: Prevent the adventure from linking near other copies of itself.
+ &cEVENT-RUNNING&0: This adventure can only spawn when a specific event is running.
 
 Available flags:
  &cCLAIMED-OK&0 - Can link to claimed locations (default: unclaimed only).
@@ -6243,11 +6255,14 @@ Available quest giver types:
  OBJECT - Quest starts at a given object (if not bound to someone else).
  ROOM-TEMPLATE - Quest starts at a given room template.
  TRIGGER - Quest is given by a trigger.
+ QUEST - Starts from the rewards of another quest.
+ VEHICLE - Quest starts at a vehicle.
 
 NOTE: The "trigger" type is only used for tracking purposes. Unlike the other
 types, it won't cause the trigger to automatically offer the quest. Instead,
 this indicates that you will use the %quest% command to give or complete the
-quest in that trigger.
+quest in that trigger. The "quest" type is similar, and you must put this
+quest in the rewards list of that quest for it to start.
 
 See also: %QUEST%, OLC QUESTS
 #d
@@ -6728,6 +6743,7 @@ Available location types:
  OBJECT - An object has the shop. Be careful; this will work even if the object
    is in the player's inventory.
  ROOM-TEMPLATE - The shop is in a room template in an adventure.
+ VEHICLE - A vehicle operates the shop, wherever that vehicle is.
 
 Shop locations use the same system as the start/end locations of a quest, and
 you can copy from those fields (and vice versa) with this syntax:

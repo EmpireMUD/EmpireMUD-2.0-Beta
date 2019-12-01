@@ -571,6 +571,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_IGNORE_WORLD_SIZE  BIT(11)	// l. does not adjust the instance limit
 #define ADV_IGNORE_ISLAND_LEVELS  BIT(12)	// m. does not skip islands with no players in the level range
 #define ADV_CHECK_OUTSIDE_FIGHTS  BIT(13)	// n. looks for mobs in combat before despawning
+#define ADV_GLOBAL_NEARBY  BIT(14)	// o. will show the closest one no matter how far away
 
 
 // ADV_LINK_x: adventure link rule types
@@ -582,6 +583,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_LINK_TIME_LIMIT  5
 #define ADV_LINK_NOT_NEAR_SELF  6
 #define ADV_LINK_PORTAL_CROP  7
+#define ADV_LINK_EVENT_RUNNING  8
 
 
 // ADV_LINKF_x: adventure link rule flags
@@ -2260,6 +2262,7 @@ typedef struct vehicle_data vehicle_data;
 #define QG_ROOM_TEMPLATE  3
 #define QG_TRIGGER  4	// just to help lookups
 #define QG_QUEST  5	// (e.g. as chain reward) just to help lookups
+#define QG_VEHICLE  6
 
 
 // QR_x: quest reward types
@@ -4551,7 +4554,7 @@ struct empire_data {
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command
 	int base_tech[NUM_TECHS];	// TECH_ from rewards (not added by buildings or players)
 
-	// linked lists
+	// linked lists, hashes, etc
 	struct empire_political_data *diplomacy;
 	struct shipping_data *shipping_list;
 	struct empire_unique_storage *unique_store;	// LL: eus->next
@@ -4563,6 +4566,7 @@ struct empire_data {
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
+	struct script_data *script;	// for storing variables
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -5177,6 +5181,7 @@ struct shop_temp_list {
 	char_data *from_mob;	// may
 	obj_data *from_obj;	// be any
 	room_data *from_room;	// of these
+	vehicle_data *from_veh;	// things
 	
 	struct shop_temp_list *next;
 };
@@ -5255,6 +5260,8 @@ struct vehicle_data {
 	// lists
 	struct vehicle_data *next;	// vehicle_list (global) linked list
 	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
+	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 	UT_hash_handle hh;	// vehicle_table hash handle
 };
 

@@ -247,6 +247,7 @@ const char *adventure_flags[] = {
 	"IGNORE-WORLD-SIZE",
 	"IGNORE-ISLAND-LEVELS",
 	"CHECK-OUTSIDE-FIGHTS",
+	"GLOBAL-NEARBY",
 	"\n"
 };
 
@@ -273,6 +274,7 @@ const char *adventure_link_types[] = {
 	"TIME-LIMIT",
 	"NOT-NEAR-SELF",
 	"PORTAL-CROP",
+	"EVENT-RUNNING",
 	"\n"
 };
 
@@ -2740,6 +2742,7 @@ const char *quest_giver_types[] = {
 	"ROOM-TEMPLATE",
 	"TRIGGER",
 	"QUEST",	// 5
+	"VEHICLE",
 	"\n"
 };
 
@@ -3685,6 +3688,7 @@ const char *trig_attach_types[] = {
 	"*ADV (use Room)",	// adv_trigger -- never set on an actual trigger
 	"Vehicle",
 	"*BDG (use Room)",	// bdg_trigger -- actually just uses room triggers
+	"*EMP",	// emp_trigger -- empires only store scripts, not triggers
 	"\n"
 };
 
@@ -3698,6 +3702,7 @@ const char **trig_attach_type_list[] = {
 	wtrig_types,	// ADV_TRIGGER (not really used)
 	vtrig_types,
 	wtrig_types,	// BLD_TRIGGER (not really used)
+	wtrig_types,	// EMP_TRIGGER (not really used)
 };
 
 
@@ -3710,6 +3715,7 @@ const bitvector_t *trig_argument_type_list[] = {
 	wtrig_argument_types,	// ADV_TRIGGER (not really used)
 	vtrig_argument_types,	// VEH_TRIGGER
 	wtrig_argument_types,	// BLD_TRIGGER (not really used)
+	wtrig_argument_types,	// EMP_TRIGGER (not really used)
 };
 
 

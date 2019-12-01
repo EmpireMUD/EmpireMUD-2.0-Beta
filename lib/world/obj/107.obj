@@ -113,25 +113,25 @@ You can cook: roast goose
 0 0
 S
 #10709
-bell holiday~
-a holiday bell~
-A holiday bell is lying here.~
+bell minipet cheerful elf~
+a cheerful elf minipet bell~
+A cheerful elf minipet bell is lying here.~
 This bell can summon a cheerful elf (a noncombat pet)!
-Type 'use bell' to summon him.
+Type 'use bell' to gain the cheerful elf mini-pet.
 ~
-19 p a 5
+19 p a 7
 10709 0 0
 2 0
 S
 #10710
-snowglobe globe~
-a snowglobe~
+snowglobe globe home~
+a snowglobe of home~
 A snowglobe is lying here.~
    The snowglobe has a tiny model of your house in here. You can 'use
 snowglobe' to teleport home, like a hestian trinket. Use the home command to
 set your home.
 ~
-3 p a 4
+3 p a 5
 0 0 0
 8 0
 T 10710
@@ -143,13 +143,13 @@ A red Christmas hat is lying on the ground.~
    The hat is red with white fur lining, with the scent of peppermint and a
 brisk winter breeze.
 ~
-2 p ae 3
+2 mp ae 4
 0 0 0
 11 0
 A
-5 2 0
-C
-1 300
+5 1 0
+A
+5 1 3
 S
 #10712
 sack bottomless gift~
@@ -157,20 +157,18 @@ a bottomless gift sack~
 A bottomless sack is lying on the ground.~
 You really can't see the bottom!
 ~
-24 mp ar 2
-3 0 0
+24 mp ar 3
+1 0 0
 0 0
-A
-4 1 0
-C
-1 300
+T 10712
 S
 #10713
 spawner reindeer~
 the reindeer spawner~
 The reindeer spawner is here.~
+This item spawns one of the two reindeer.
 ~
-3 0 0 2
+3 0 0 3
 0 0 0
 0 0
 T 10713
@@ -214,9 +212,9 @@ S
 recipe cookie christmas~
 the Christmas cookie recipe~
 The Christmas cookie recipe is lying here.~
-You can cook: Christmas cookies
+Learn this recipe and you'll be able to cook Christmas cookies.
 ~
-7 p a 5
+7 p a 6
 10716 0 0
 0 0
 S
@@ -231,16 +229,16 @@ This schematic teaches you to craft a sleigh.
 0 0
 S
 #10719
-statuette christmas~
-a Christmas statuette~
+statuette christmas morphing~
+a Christmas morphing statuette~
 A small Christmas statuette is standing here.~
    This delicate marble statuette of a reindeer, an elf and a snowman grants
 you minor shapeshifting abilities!
 'morph reindeer' (requires Animal Forms): Temperate disguise morph.
 'morph large snowman' (no ability): Immobile disguise morph.
-'morph christmas elf' (no ability): Cosmetic morph.
+'morph Christmas elf' (no ability): Cosmetic morph.
 ~
-3 p a 2
+3 p a 4
 0 0 0
 1 0
 S
@@ -273,8 +271,8 @@ A handful of chestnuts are lying here.~
    The insides of these smooth brown nuts can be eaten. Or you could roast
 them, if you can find some more.
 ~
-6 0 a 3
-0 0 0
+6 0 a 4
+1 0 0
 7 48
 I 14 10720 100.00 4  # COMBINE: a basket of chestnuts
 M
@@ -302,56 +300,57 @@ R
 5606 0
 S
 #10723
-whistle Christmas tree~
-a Christmas tree whistle~
+whistle Christmas tree minipet~
+a Christmas tree minipet whistle~
 Someone has left their Christmas tree whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to summon it.
+Type 'use whistle' to gain the little pine sapling mini-pet.
 ~
-19 p a 3
+19 p a 4
 10723 0 0
 2 0
 S
 #10724
-whistle reindeer fawn~
-a reindeer fawn whistle~
+whistle reindeer fawn minipet~
+a reindeer fawn minipet whistle~
 Someone has left their reindeer fawn whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to summon it.
+Type 'use whistle' to gain the reindee fawn mini-pet.
 ~
-19 p a 4
+19 p a 5
 10724 0 0
 2 0
 S
 #10725
-whistle snowman small animated~
-an animated snowman whistle~
+whistle snowman animated minipet~
+an animated snowman minipet whistle~
 Someone has left their animated snowman whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to summon it.
+Type 'use whistle' to gain the animated snowman mini-pet.
 ~
-19 p a 5
+19 p a 7
 10725 0 0
 2 0
 S
 #10726
-whistle toy soldier~
-a toy soldier whistle~
+whistle toy soldier minipet~
+a toy soldier minipet whistle~
 Someone has left their toy soldier whistle here.~
 This whistle can summon a noncombat pet!
-Type 'use whistle' to summon it.
+Type 'use whistle' to gain the toy soldier mini-pet.
 ~
-19 p a 6
+19 p a 7
 10726 0 0
 2 0
 S
 #10727
-whistle mini-pet pet random~
-a random mini-pet whistle~
-A random mini-pet whistle should have replaced this. Oops.~
-This item purges itself and spawns an actual quest reward.
+whistle minipet winter wonderland~
+a Winter Wonderland minipet whistle~
+A Winter Wonderland minipet whistle is lying here.~
+   Type 'use whistle' to gain a mini-pet from the Winter Wonderland, if there
+are any left you don't have.
 ~
-3 0 a 4
+3 p a 6
 0 0 0
 10 0
 T 10727
