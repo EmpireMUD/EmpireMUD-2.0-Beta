@@ -1,12 +1,12 @@
 #16600
-Grateful for the Gift~
-   Father Christmas has a gift for you. Probably polite to thank him. Unless,
-of course, you aren't the holiday type, in which case the guild might have an
-interest in what the wintery guy is giving out.
+Grateful For The Gift~
+   Father Christmas has a gift for you. Probably polite to thank him, after you
+open it. Unless, of course, you aren't the holiday type, in which case the
+guild might have an interest in what the wintery guy is giving out.
 ~
 You thank Father Christmas and he rewards your politeness.
 ~
-15 e 0 0 -1
+17 e 0 0 -1
 A
 3 10705
 P
@@ -238,13 +238,16 @@ Stand a Christmas Tree~
 take this binding, and search for a Christmas tree. Evergreen forests are a
 great place to find one. You might also find something useable in any overgrown
 forest. There's even been reports of people finding Christmas-worthy trees in
-enchanted forests before. Craft a Christmas tree stand and plant the tree in
-the city center.
+enchanted forests before.
+Travel to your chosen forest.
+chop until you find a Christmas worthy tree.
+Craft a Christmas tree stand.
+Plant the tree in your city center.
 ~
    Your citizens are excited to see the new tree and hope it'll get some
 ornaments soon!
 ~
-17 de 0 0 -1
+18 de 0 0 -1
 A
 1 10701
 P
@@ -266,7 +269,7 @@ Z
 4 16606
 S
 #16608
-Cookies for the Guild~
+Cookies For The Guild~
    Your guild is too grumpy. It's time to bring some Christmas cheer to them.
 Make some cookies and deliver them to the superintendant.
 (If you don't have the recipe for Christmas cookies, try opening more gifts.)
@@ -274,7 +277,7 @@ Make some cookies and deliver them to the superintendant.
    Who can stay grumpy with Christmas cookies in their belly? Wonder how else
 you could cheer the guild up.
 ~
-2 d 0 0 -1
+3 d 0 0 -1
 A
 1 18219
 A
@@ -295,12 +298,12 @@ S
 #16610
 Be An Angel~
    Seeing your tree makes you wish there was some other wintery beauty around
-the city. Take this waterproof blanket and make five snow angels to brighten
-things up.
+the city. Take this waterproof blanket, find somewhere wintery, and make five
+snow angels to brighten up your empire.
 ~
 That will sure make things more wintery around here!
 ~
-6 e 0 0 -1
+7 e 0 0 -1
 A
 2 16607
 D 16606

@@ -421,6 +421,14 @@ if %room.contents(16609)%
   %send% %actor% Someone has already made a snow angel here.
   halt
 end
+if %actor.fighting%
+  %send% %actor% You can't do that while fighting!
+  halt
+end
+if %actor.riding%
+  %send% %actor% You can't do that while mounted.
+  halt
+end
 if !%room.in_city%
   %send% %actor% You are supposed to be beautifying your city.
   halt
@@ -896,7 +904,7 @@ end
 if !%actor.on_quest(16617)% && !%actor.on_quest(16618)%
   halt
 end
-set target %arg%
+set target %actor.char_target(%arg%)%
 if %actor.on_quest(16617)%
   if %target.vnum% != 223
     %send% %actor% You're looking for a terrier to dress up.
@@ -926,6 +934,7 @@ end
 if %actor.quest_finished(%morphnum%)%
   %quest% %actor% finish %morphnum%
 end
+%purge% %self%
 ~
 #16619
 Max the reindeer dog no-death~
