@@ -487,7 +487,6 @@ if !%arg%
   halt
 end
 set MoveDir %actor.parse_dir(%arg%)%
-%echo% move dir is %MoveDir%.
 set SelfRoom %self.room%
 if !%SelfRoom.in_city%
   %send% %actor% While you have a gift to deliver, you should probably be sneaking around your own city.
@@ -512,7 +511,6 @@ while %person%
   end
   set person %person.next_in_room%
 done
-%echo% people? %CitizenCount%.
 if %CitizenCount% > 0
   eval sneak_out %actor.skill(stealth)% - %CitizenCount% * 10
   set sneak_check %random.99%
@@ -541,7 +539,6 @@ while %person%
   end
   set person %person.next_in_room%
 done
-%echo% citizens here equals %CitizenCount%.
 if %CitizenCount% > 0
   %send% %actor% You made it in, but they'll see you place the gift. Have to try again later.
   nop %actor.set_cooldown(16611, 5)%
@@ -883,14 +880,22 @@ winter dress up~
 1 c 2
 dress~
 if !%arg%
-  return 0
   %send% %actor% Who are you trying to dress?
   halt
 end
 if !%actor.on_quest(16617)% && !%actor.on_quest(16618)%
+  %purge% %self%
   halt
 end
 set target %actor.char_target(%arg%)%
+if !%target%
+  %send% %actor% You don't see them here.
+  halt
+end
+if %target.morph%
+  %send% %actor% Looks like they're already dressed up.
+  halt
+end
 if %actor.on_quest(16617)%
   if %target.vnum% != 223
     %send% %actor% You're looking for a terrier to dress up.
@@ -905,7 +910,7 @@ if %actor.on_quest(16617)%
   end
 end
 if %actor.on_quest(16618)%
-  if %target.pc_name.car% != horse
+  if %target.is_pc% || %target.pc_name.car% != horse
     %send% %actor% You're going to need a horse for this outfit.
     halt
   else
