@@ -400,11 +400,12 @@ take care of him. Take the sack, find a bedroom to lie in wait, and use it to
 capture him. He'll probably put up a fight, so be ready. The quest will
 complete when you've defeated the demon.
 Type 'use sack <normal | hard | group | boss>' to summon the demon.
+If you lose your the sack, you need to drop this quest and start it again from Father Christmas.
 ~
    You've stopped the grinchy demon, for now. Even though he got away, the
 citizens' gifts are safe for another night.
 ~
-9 e 0 0 -1
+10 e 0 0 -1
 A
 1 10703
 P

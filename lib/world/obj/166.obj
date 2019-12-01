@@ -105,8 +105,9 @@ A rope for binding Christmas trees for transport lies here.~
 along the ground to their new home for quite a while. Perhaps it has been an
 empire tradition. Once you have your chosen tree, craft a Christmas tree stand
 and plant it in your city center.
+Type 'quest info Stand a Christmas Tree' for more information.
 ~
-3 ep a 8
+3 ep a 9
 0 0 0
 11 0
 Q 16607
@@ -171,9 +172,9 @@ flying down hill on a sled. A little girl laying in the snow, her angel nearly
 finished. But oddly, there's also an image of a tall green creature leaving a
 home with a sack of gifts over his shoulder. Is this the grinchy demon Father
 Christmas asked you to stop?
-Type 'sack <normal | hard | group | boss>' to find him.
+Type 'use sack <normal | hard | group | boss>' to find him.
 ~
-3 ek a 3
+3 ek a 4
 0 0 0
 0 0
 Q 16613
@@ -190,15 +191,17 @@ How can you see a feeling?
 10 12
 S
 #16618
-outfit animal~
-an animal outfit~
-An outfit for an animal lies empty.~
-   This outfit is clearly meant for an animal, but what it's supposed to look
-like is hard to tell without a body inside it.
+outfit reindeer~
+a reindeer outfit~
+A reindeer outfit lays here empty.~
+   This reindeer outfit is sized for a horse and has been used before given the
+hairs on the inside.
+Usage: dress horse
 ~
-3 k a 2
+3 k a 4
 0 0 0
 11 0
+Q 16618
 T 16618
 S
 #16619
@@ -274,6 +277,20 @@ hoofprints in the ground.
 3 v 0 6
 0 0 0
 10 288
+S
+#16625
+outfit elf~
+an elf outfit~
+An elf outfit lays here empty.~
+   This elf outfit is a bit strange. It seems to be intended for a quadruped
+rather than a biped. And at the back end there's a hole for possibly a tail.
+Usage: dress terrier
+~
+3 k a 4
+0 0 0
+11 0
+Q 16617
+T 16618
 S
 #16650
 wax sleigh elfish flying~
@@ -701,5 +718,18 @@ You're filled with $p!~
 M
 9
 $n glows with $p!~
+S
+#16699
+marker immortal~
+an immortal marker~
+A giant marker for immortals is here.~
+if you're not an immortal, then how did you get this?
+If you are an immortal, the command is below:
+type: modify <player name> <positive or negative number>
+~
+3 0 an 2
+0 0 0
+10 0
+T 16699
 S
 $

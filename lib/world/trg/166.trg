@@ -144,23 +144,10 @@ elseif %questvnum% == 16611
   %load% obj 16611 %actor% inv
 elseif %questvnum% == 16613
   %load% obj 16613 %actor% inv
-elseif %questvnum% == 16618 || %questvnum% == 16617
+elseif %questvnum% == 16618
   %load% obj 16618 %actor% inv
-  set mod_obj %actor.inventory(16618)%
-  if %questvnum% == 16617
-    %mod% %mod_obj% keywords outfit elf
-    %mod% %mod_obj% shortdesc an elf outfit
-    %mod% %mod_obj% longdesc An elf outfit lays here empty.
-    %mod% %mod_obj% lookdesc This elf outfit is a bit strange. It seems to be intended for a quadruped rather than a biped. And at the back end there's a hole for possibly a tail.
-    %mod% %mod_obj% append-lookdesc-noformat Usage: dress <target>
-  end
-  if %questvnum% == 16618
-    %mod% %mod_obj% longdesc A reindeer outfit lays here empty.
-    %mod% %mod_obj% shortdesc a reindeer outfit
-    %mod% %mod_obj% keywords outfit reindeer
-    %mod% %mod_obj% lookdesc This reindeer outfit is sized for a horse and has been used before given the hairs on the inside.
-    %mod% %mod_obj% append-lookdesc-noformat Usage: dress <target>
-  end
+elseif %questvnum% == 16617
+  %load% obj 16625 %actor% inv
 elseif %questvnum% == 16620
   %load% obj 16620 %actor% inv
 end
@@ -928,9 +915,9 @@ if %actor.on_quest(16618)%
     %quest% %actor% trigger %morphnum%
   end
 end
-%morph% %target% %morphnum%
 %send% %actor% You put %self.shortdesc% on %target.name%.
 %echoaround% %actor% %actor.name% puts %self.shortdesc% on %target.name%.
+%morph% %target% %morphnum%
 if %actor.quest_finished(%morphnum%)%
   %quest% %actor% finish %morphnum%
 end
@@ -1349,5 +1336,21 @@ else
 end
 return 1
 %purge% %self%
+~
+#16699
+immortal event point modifier~
+1 c 1
+modify~
+if !%arg%
+  %send% %actor% Who are you attempting to modify the event points of and by how much?
+  %send% %actor% Use (modify <player name> <possative or negative number>
+  halt
+end
+if !%event.running(10700)%
+  %send% %actor% The winter holiday event isn't currently running.
+  halt
+end
+set target %actor.char_target(%arg.car%)%
+nop %target.gain_event_points(10700,%arg.cdr%)%
 ~
 $
