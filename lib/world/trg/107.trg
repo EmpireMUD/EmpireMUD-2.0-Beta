@@ -215,8 +215,8 @@ wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
-%send% %actor% %self.shortdesc% glows a wintery white and the light begins to envelop you!
-%echoaround% %actor% %self.shortdesc% glows a wintery white and the light begins to envelop %actor.name%!
+%send% %actor% %self.shortdesc% glows a wintry white and the light begins to envelop you!
+%echoaround% %actor% %self.shortdesc% glows a wintry white and the light begins to envelop %actor.name%!
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
