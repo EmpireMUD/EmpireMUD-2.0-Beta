@@ -472,7 +472,7 @@ char *show_daily_quest_line(char_data *ch) {
 		snprintf(output, sizeof(output), "You can complete %d more daily quest%s today.", amount, PLURAL(amount));
 	}
 	else {
-		snprintf(output, sizeof(output), "You have completed all your daily quests for the day.\r\n");
+		snprintf(output, sizeof(output), "You have completed all your daily quests for the day.");
 	}
 	
 	return output;
