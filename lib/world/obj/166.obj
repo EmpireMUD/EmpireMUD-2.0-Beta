@@ -124,15 +124,15 @@ A quickly melting imprint in the snow forms the shape of an angel.
 10 12
 S
 #16610
-blanket waterproof thin~
-a waterproof blanket~
-A thin but waterproof blanket is folded in half.~
-   This blanket is perfect for making snow angels without getting yourself wet
-from the inevitable melting that will happen because of your body heat. Find a
-wintery bit of territory and make some snow angels.
-(type: make snow angel)
+snowflake enchanted oversized flake~
+an enchanted snowflake~
+An oversized snowflake glows with some form of enchantment.~
+   In the center is a snowflake, larger than most you've ever seen. And from
+the edges a constant stream of flurries spread. You could probably make a snow
+angel in all the additional snow being created.
+Type: make snow angel
 ~
-3 0 a 3
+3 0 a 5
 0 0 0
 11 0
 Q 16610

@@ -227,8 +227,9 @@ dg_affect #16606 %self% DODGE %SelfLevel% -1
 plant the christmas tree~
 1 c 2
 plant~
-* Check if they're interacting with the fallen xmas tree object or not.
-if !(%actor.obj_target(%arg%)% == %self%)
+* Check if they're interacting with the fallen xmas tree object or stand.
+set targ %actor.obj_target(%arg%)%
+if (%targ% != %self% && %targ.vnum% != 16602)
   return 0
   halt
 end
@@ -418,10 +419,6 @@ if %actor.riding%
 end
 if !%room.in_city%
   %send% %actor% You are supposed to be beautifying your city.
-  halt
-end
-if %room.season% != winter
-  %send% %actor% You can only make snow angels during winter. If you can't wait that long, you might want to take a trip elsewhere to find winter.
   halt
 end
 if !%room.is_outdoors%
@@ -730,7 +727,7 @@ end
 ~
 #16615
 grinchy combat 2~
-0 k 40
+0 k 25
 ~
 set grinch_level 0
 if %self.mob_flagged(hard)%
@@ -739,7 +736,7 @@ end
 if %self.mob_flagged(group)%
   eval grinch_level %grinch_level% + 2
 end
-switch %random.4%
+switch %random.5%
   case 1
     set grinch_gift_is neck ties?
   break
@@ -753,7 +750,7 @@ switch %random.4%
     set grinch_gift_is Is that a pet rock?
   break
   case 5
-    set grinch_gift_is A segmented thirty-nine and a half foot pole?
+    set grinch_gift_is A segmented thirty-nine-and-a-half foot pole?
   break
 done
 switch %random.3%
@@ -763,7 +760,7 @@ switch %random.3%
       if %grinch_level% == 0
         %send% %actor% %self.name% pulls out a gift and throws it at you!
         %echoaround% %actor% %self.name% pulls out a gift and throws it at %actor.name%!
-        %damage% %actor% %random.100%
+        %damage% %actor% %random.50%
       elseif %grinch_level% == 1
         %send% %actor% %self.name% pulls out a gift and throws it at you!
         %echoaround% %actor% %self.name% pulls out a gift and throws it at %actor.name%!
@@ -782,15 +779,17 @@ switch %random.3%
   break
   case 2
     if !%self.cooldown(16613)%
-      if %grinch_level% == 0 || %grinch_level% == 1
+      if %grinch_level% == 1
         set grinch_timer 15
       elseif %grinch_level% == 2 || %grinch_level% == 3
         set grinch_timer 30
       end
       nop %self.set_cooldown(16613, 30)%
-      %send% %actor% %self.name% glares at you and you shiver in fear.
-      %echoaround% %actor% %self.name% glares at %actor.name% and %actor.heshe% shutters in fear.
-      dg_affect #16612 %actor% dodge -%actor.level% %grinch_timer%
+      if %grinch_level% != 0
+        %send% %actor% %self.name% glares at you and you shiver in fear.
+        %echoaround% %actor% %self.name% glares at %actor.name% and %actor.heshe% shudders in fear.
+        dg_affect #16612 %actor% dodge -%actor.level% %grinch_timer%
+      end
     end
   break
   case 3
@@ -798,7 +797,7 @@ switch %random.3%
       nop %self.set_cooldown(16614, 45)%
       set running 1
       remote running %self.id%
-      %echo% %self.name% starts to swing a thirty-nine and a half foot pole.
+      %echo% %self.name% starts to swing a thirty-nine-and-a-half foot pole.
       %echo% &YYou'd better duck!&0
       wait 10 sec
       %echo% %self.name% swings the pole like a bat!
@@ -819,9 +818,9 @@ switch %random.3%
             end
           end
           if %command% != duck
-            %send% %person% &rYou are knocked senseless by the thirty-nine and a half foot pole!
-            %echoaround% %person% %person.name% is knocked senseless by the thirty-nine and a half foot pole!
-            eval grinch_damage %grinch_level% * 25 + 100
+            %send% %person% &rYou are knocked senseless by the thirty-nine-and-a-half foot pole!
+            %echoaround% %person% %person.name% is knocked senseless by the thirty-nine-and-a-half foot pole!
+            eval grinch_damage %grinch_level% * 50 + 20
             %damage% %person% %grinch_damage% physical
             dg_affect #16616 %person% STUNNED on 5
           else
