@@ -3290,9 +3290,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "drunk")) {
 						if (subfield && *subfield) {
-							gain_condition(ch, DRUNK, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+							gain_condition(c, DRUNK, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
 						}
-						snprintf(str, slen, "%d", GET_COND(ch, DRUNK) / REAL_UPDATES_PER_MUD_HOUR);
+						snprintf(str, slen, "%d", GET_COND(c, DRUNK) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 					break;
 				}
@@ -3640,9 +3640,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "hunger")) {
 						if (subfield && *subfield) {
-							gain_condition(ch, FULL, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+							gain_condition(c, FULL, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
 						}
-						snprintf(str, slen, "%d", GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR);
+						snprintf(str, slen, "%d", GET_COND(c, FULL) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 						
 					break;
@@ -4191,7 +4191,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < get_skill_level(c, SKILL_VNUM(sk)) || noskill_ok(c, SKILL_VNUM(sk)))) {
-								// TODO skill cap checking! need a f() like can_set_skill_to(ch, sk, lev)
+								// TODO skill cap checking! need a f() like can_set_skill_to(c, sk, lev)
 								set_skill(c, SKILL_VNUM(sk), sk_lev);
 								snprintf(str, slen, "1");
 							}
@@ -4207,9 +4207,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 't': {	// char.t*
 					if (!str_cmp(field, "thirst")) {
 						if (subfield && *subfield) {
-							gain_condition(ch, THIRST, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+							gain_condition(c, THIRST, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
 						}
-						snprintf(str, slen, "%d", GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR);
+						snprintf(str, slen, "%d", GET_COND(c, THIRST) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 					else if (!str_cmp(field, "tohit")) {
 						extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
