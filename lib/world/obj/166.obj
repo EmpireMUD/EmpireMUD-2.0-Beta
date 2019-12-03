@@ -254,8 +254,9 @@ a candy cane hanging~
 An artful hanging made up of candy canes dangles down in the middle of the area.~
    A number of candy canes interlock, crisscross, and otherwise connect to form
 an abstract winter scene.
+type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 9
+3 v 0 10
 0 0 0
 7 576
 T 16627
@@ -267,8 +268,9 @@ A large faerie lantern sparkles brighly, lighting the area for all.~
    A thin metal cage branches up from a central circular base. A bright glow
 comes from within, but the design of the metal makes it impossible to see what
 causes it.
+type: buff <target> to extend how long the ornament sticks around.
 ~
-3 cv 0 8
+3 cv 0 9
 0 0 0
 2 576
 T 16627
@@ -279,8 +281,9 @@ reindeer hoofprints~
 A set of reindeer hoofprints are clearly visible in the ground.~
    A reindeer has seemingly landed and taken off from this place, leaving deep
 hoofprints in the ground.
+type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 8
+3 v 0 9
 0 0 0
 10 576
 T 16627
