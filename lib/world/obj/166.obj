@@ -91,11 +91,13 @@ tree christmas bland~
 a Christmas tree~
 A bland Christmas tree stands here.~
    It looks like whoever set this tree up just hacked down the first one they
-came across and stuck it up in the city center for the holiday.
+came across and stuck it up in the city center for the holiday. If you need to
+remove it, you could always light it on fire.
 ~
-3 v 0 4
+3 v 0 7
 0 0 0
-0 8064
+0 576
+I 11 1002 100.00 1  # LIGHT: a roaring fire
 S
 #16608
 binding rope tree Christmas~
@@ -239,10 +241,12 @@ strands of garland~
 Silver, gold, and green strands of garland are artfully draped about the room.~
    The garland is hand-made, from items that look like they came out of the
 back of the empire's storage barns.
+type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 5
+3 v 0 8
 0 0 0
-11 288
+11 576
+T 16627
 S
 #16622
 canes hanging candy artful~
@@ -251,9 +255,10 @@ An artful hanging made up of candy canes dangles down in the middle of the area.
    A number of candy canes interlock, crisscross, and otherwise connect to form
 an abstract winter scene.
 ~
-3 v 0 7
+3 v 0 9
 0 0 0
-7 288
+7 576
+T 16627
 S
 #16623
 lantern faerie large~
@@ -263,9 +268,10 @@ A large faerie lantern sparkles brighly, lighting the area for all.~
 comes from within, but the design of the metal makes it impossible to see what
 causes it.
 ~
-3 cv 0 6
+3 cv 0 8
 0 0 0
-2 288
+2 576
+T 16627
 S
 #16624
 hoofprints prints reindeer ground~
@@ -274,9 +280,10 @@ A set of reindeer hoofprints are clearly visible in the ground.~
    A reindeer has seemingly landed and taken off from this place, leaving deep
 hoofprints in the ground.
 ~
-3 v 0 6
+3 v 0 8
 0 0 0
-10 288
+10 576
+T 16627
 S
 #16625
 outfit elf~
@@ -291,6 +298,16 @@ Usage: dress terrier
 11 0
 Q 16617
 T 16618
+S
+#16626
+pixy frozen~
+a frozen pixy~
+A safely frozen pixy is in mid flutter.~
+~
+3 0 a 3
+0 0 0
+10 1
+T 16625
 S
 #16650
 wax sleigh elfish flying~

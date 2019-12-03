@@ -109,7 +109,7 @@ else
     %send% %actor% That isn't the right blood!
     halt
   elseif %actor.on_quest(16603)%
-    if %target.vnum% != 10700 && %target.vnum% != 10705
+    if %target.vnum% != 10700 && %target.vnum% != 10705 && %target.vnum% != 9175
       %send% %actor% That isn't the right blood!
       halt
     end
@@ -202,7 +202,7 @@ end
 ~
 #16605
 grinchy buff~
-0 l 25
+0 l 20
 ~
 if %self.cooldown(16605)%
   halt
@@ -214,6 +214,9 @@ if %self.mob_flagged(hard)%
 end
 if %self.mob_flagged(group)%
   eval grinch_level %grinch_level% + 2
+end
+if %grinch_level% == 0
+  halt
 end
 set SelfLevel %self.level%
 eval grinch_dam %SelfLevel% / 15 * ( %grinch_level% + 1 )
@@ -696,6 +699,9 @@ grinchy demon combat 1~
 if !%self.fighting%
   halt
 end
+if %self.cooldown(16617)%
+  halt
+end
 set person %self.room.people%
 while %person%
   if %person.vnum% == 16614
@@ -721,6 +727,7 @@ elseif %grinch_level% == 2 && %grinch_roll% > 60
 end
 %echo% %self.name% shouts, "get 'hem Max!"
 %load% mob 16614 ally
+nop %self.set_cooldown(16617, 90)%
 ~
 #16615
 grinchy combat 2~
@@ -732,6 +739,9 @@ if %self.mob_flagged(hard)%
 end
 if %self.mob_flagged(group)%
   eval grinch_level %grinch_level% + 2
+end
+if %grinch_level% == 0
+  halt
 end
 switch %random.5%
   case 1
@@ -754,22 +764,18 @@ switch %random.3%
   case 1
     if !%self.cooldown(16615)%
       say %grinch_gift_is%
-      if %grinch_level% == 0
+      if %grinch_level% == 1
         %send% %actor% %self.name% pulls out a gift and throws it at you!
         %echoaround% %actor% %self.name% pulls out a gift and throws it at %actor.name%!
-        %damage% %actor% %random.50%
-      elseif %grinch_level% == 1
-        %send% %actor% %self.name% pulls out a gift and throws it at you!
-        %echoaround% %actor% %self.name% pulls out a gift and throws it at %actor.name%!
-        %damage% %actor% 110
+        %damage% %actor% 100
       elseif %grinch_level% == 2
         set grinch_target %random.enemy%
         %send% %grinch_target% %self.name% pulls out a gift and throws it at you!
         %echoaround% %grinch_target% %self.name% pulls out a gift and throws it at %grinch_target.name%!
-        %damage% %grinch_target% 110
+        %damage% %grinch_target% 100
       elseif %grinch_level% == 3
         %echo% %self.name% pulls out a gift and throws it on the ground, causing everyone to go flying!
-        %aoe% 110
+        %aoe% 100
       end
       nop %self.set_cooldown(16615, 30)%
     end
@@ -904,7 +910,6 @@ if %actor.on_quest(16617)%
     %send% %actor% You probably shouldn't dress up a terrier if it doesn't belong to your own empire.
     halt
   else
-    %echo% quest is finished!!
     set morphnum 16617
     %quest% %actor% trigger %morphnum%
   end
@@ -914,7 +919,6 @@ if %actor.on_quest(16618)%
     %send% %actor% You're going to need a horse for this outfit.
     halt
   else
-    %echo% quest is finished!
     set morphnum 16618
     %quest% %actor% trigger %morphnum%
   end
@@ -985,6 +989,71 @@ if %ornament_counter% >= 4 && %actor.quest_finished(16620)%
 else
   remote ornament_counter %self.id%
 end
+~
+#16621
+grinchy greeting~
+0 g 100
+~
+if %actor.is_pc% && !%self.fighting%
+  dg_affect #16613 %self% off
+end
+~
+#16625
+pixy thaws out~
+1 f 0
+~
+if !%self.carried_by%
+  halt
+end
+return 0
+set carried_by %self.carried_by%
+set pixy_rng %random.100%
+if %pixy_rng% <= 60
+  %send% %carried_by% %self.shortdesc% thaws out and suddenly vanishes in a poof of dust!
+  %echoaround% %carried_by% %carried_by.name% is mysteriously engulfed in a cloud of dust!
+elseif %pixy_rng% <= 80
+  %send% %carried_by% %self.shortdesc% melts in your hands, but the cold seems to intensify until you're frozen yourself!
+  %echoaround% %carried_by% %carried_by.name% starts turning blue, and eventually comes to a halt as though frozen in place!
+  dg_affect #16625 %carried_by% HARD-STUNNED on 60
+elseif %pixy_rng% <= 95
+  %send% %carried_by% %self.shortdesc% warms and angrily covers you in dust, you feel drunk all of a sudden!
+  %echoaround% %carried_by% %carried_by.name% sparkles for a moment and begins to stagger.
+  nop %carried_by.drunk(30)%
+else
+  %send% %carried_by% %self.shortdesc% has apparently thawed out and is quite furious with you!
+  %echoaround% %carried_by% A furious pixy begins to attack %carried_by.name% out of no where!
+  %load% mob 16625 room
+  %force% %self.room.people% kill %carried_by.name%
+end
+%purge% %self%
+~
+#16626
+pixy cetching~
+0 0 100
+~
+* No script
+~
+#16627
+ornament extention~
+1 c 4
+buff~
+if !%arg%
+  return 0
+  halt
+end
+set buffing %actor.obj_target(%arg%)%
+if !%buffing%
+  return 0
+  halt
+end
+set buffnum %buffing.vnum%
+if %buffnum% != 16621 && %buffnum% != 16622 && %buffnum% != 16623 && %buffnum% != 16624
+  %send% %actor% You can only buff the ornaments from the winter ornament set.
+  halt
+end
+otimer 1152
+%send% %actor% You buff %buffing.shortdesc% with a cloth, extending the beauty.
+%echoaround% %actor% %actor.name% buffs %buffing.shortdesc% with a cloth, extending the beauty.
 ~
 #16649
 Only harness flying mobs~

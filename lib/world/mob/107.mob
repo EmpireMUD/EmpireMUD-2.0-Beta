@@ -11,6 +11,7 @@ This stunning slate-gray reindeer is hovering a few feet above the ground!
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
 I 1 1351 100.00 1  # SKIN: a large skin
+T 10715
 S
 #10701
 carolers group~
@@ -168,6 +169,7 @@ I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 9175 100.00 2  # BUTCHER: a reindeer's antlers
 I 1 1351 100.00 1  # SKIN: a large skin
 I 3 9176 100.00 1  # BARDE: a barded reindeer
+T 10715
 S
 #10709
 elf cheerful~
@@ -243,6 +245,19 @@ M
 1
 You're an angry elf.~
 T 10714
+S
+#10713
+elf reindeer-wrangling wrangling hidden~
+a reindeer-wrangling elf~
+A hidden reindeer-wrangling elf is here.
+~
+0 0 bd klJ 3
+0 0 0 15
+D
+   This little guy just makes sure the reindeer appears when it should. It will
+stay here until a player arrives who hasn't spawned a reindeer today.
+~
+T 10713
 S
 #10723
 sapling pine little~

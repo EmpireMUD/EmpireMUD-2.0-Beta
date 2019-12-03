@@ -250,12 +250,31 @@ end
 ~
 #10713
 Reindeer spawner~
-1 n 100
+0 h 100
 ~
+if !%actor.varexists(last_christmas_reindeer_day)%
+  set last_christmas_reindeer_day 0
+else
+  set last_christmas_reindeer_day %actor.last_christmas_reindeer_day%
+end
+if %last_christmas_reindeer_day% >= %dailycycle%
+  * already spawned this actor 1 today
+  halt
+end
+* Safe to spawn: update their indicator
+set last_christmas_reindeer_day %dailycycle%
+remote last_christmas_reindeer_day %actor.id%
+* load the reindeer
 if %random.100% <= 14
   %load% mob 10700
 else
   %load% mob 10705
+end
+wait 1
+set mob %self.room.people%
+if %mob.vnum% == 10700 || %mob.vnum% == 10705
+  * success: send a message
+  %echo% %mob.name% walks up from lower on the mountain.
 end
 %purge% %self%
 ~
@@ -268,6 +287,17 @@ if %self.fighting% || %self.disabled%
 end
 %echo% %self.name% runs off!
 %purge% %self%
+~
+#10715
+Reindeer mount response~
+0 c 0
+mount ride~
+* This marks last-reindeer-spawn-day when mounted, IF in the adventure
+return 0
+if %actor.char_target(%arg.car%)% == %self% && %self.room.template% >= 10700 && %self.room.template% <= 10729
+  set last_christmas_reindeer_day %dailycycle%
+  remote last_christmas_reindeer_day %actor.id%
+end
 ~
 #10727
 Winter Wonderland minipet whistle (gain list in order)~
