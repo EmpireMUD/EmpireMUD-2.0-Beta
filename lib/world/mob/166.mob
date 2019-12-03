@@ -7,7 +7,7 @@ A snowman dances around in a circle.
 0 0 35 15
 D
    Three progressively larger snowballs are stacked atop each other to form the
-body of this snowman. He has some coal for eyes, a carrot for a nose, and the
+body of this snowman. It has some coal for eyes, a carrot for a nose, and the
 finishing touch: a top hat.
 ~
 M
@@ -26,7 +26,7 @@ elf christmas sneaky~
 a Christmas elf~
 A sneaky Christmas elf watches as people look for the perfect tree.
 ~
-1 1 bdoH en 3
+1 1 bdoH cen 3
 0 0 0 15
 D
    This sneaky little elf is watching the tree choppers around these parts as
@@ -62,13 +62,14 @@ T 16614
 T 16615
 T 16616
 T 16605
+T 16621
 S
 #16614
 dog max reindeer~
 Max the reindeer dog~
 A dog is here, dressed as a reindeer.
 ~
-50 400 abdhjozAD q 3
+50 400 abdhjoAD q 3
 1 0 0 9
 D
    Someone has attached a single fake antler to this little brown dog, and
@@ -76,6 +77,14 @@ polished its nose, so that it almost looks like a reindeer. You doubt this
 would fool any Who, but it looks adorable.
 ~
 T 16619
+S
+#16625
+pixy enraged~
+an enraged pixy~
+A new mobile is standing here.
+~
+0 0 d 0 3
+0 0 0 15
 S
 #16651
 goose plump~

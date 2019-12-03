@@ -163,15 +163,19 @@ You really can't see the bottom!
 T 10712
 S
 #10713
-spawner reindeer~
-the reindeer spawner~
-The reindeer spawner is here.~
-This item spawns one of the two reindeer.
+grass exposed patch~
+a patch of exposed grass~
+There's a patch of exposed grass in the snow.~
+   Some grass pokes through the snow. This will be a boon to animals like
+reindeer, who hunt their food under snow that sometimes comes up to their
+bellies. But if this grass is still here, there are no reindeer nearby. You
+must already have seen one today, and another won't spawn for you until
+tomorrow.
+NOTE: This object formerly spawned the reindeer; was replaced by mob 10713.
 ~
-3 0 0 3
+3 0 0 5
 0 0 0
 0 0
-T 10713
 S
 #10714
 screwdriver elfish~
