@@ -305,6 +305,8 @@ Winter Wonderland minipet whistle (gain list in order)~
 use~
 * List of vnums granted by this whistle (minipet mobs)
 set list 10723 10724 10725 10726 16653 16654 16655 16656
+* length is used to shuffle the start point of the list
+set length 8
 * Check targeting
 if %actor.obj_target(%arg.car%)% != %self%
   return 0
@@ -312,6 +314,12 @@ if %actor.obj_target(%arg.car%)% != %self%
 end
 * All other results will return 1
 return 1
+* shuffle the start point
+eval start %%random.%length%%% - 1
+while %start% > 0
+  eval start %start% - 1
+  set list %list.cdr% %list.car%
+done
 * Pick a random pet the owner doesn't know
 set found 0
 while (%list% && !%found%)

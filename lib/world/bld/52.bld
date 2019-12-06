@@ -145,7 +145,7 @@ A Fishery on the River~
 C
 fish~
 F
-I
+FI
 I 21 1311 25.00 1 f  # FISH: a spotted eel
 I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: a speckled trout
@@ -163,7 +163,7 @@ A Fishery on the Lake~
 C
 fish~
 F
-I
+FI
 I 21 1314 25.00 1 f  # FISH: a fat catfish
 I 21 1315 25.00 1 f  # FISH: a yellow perch
 I 21 1312 100.00 1 f  # FISH: a speckled trout
