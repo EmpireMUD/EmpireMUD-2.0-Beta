@@ -1,32 +1,32 @@
 #250
-bowl clay~
-a clay bowl~
-A clay bowl is lying here, slightly cracked.~
+bowl ceramic~
+a bowl~
+A ceramic bowl is lying on the ground.~
 The bowl looks like it would be good for holding water.
 ~
-5 0 a 1
+5 0 a 2
 12 0 0
 6 0
 S
 #251
-pot clay~
-a clay pot~
-A clay pot is lying here, slightly cracked.~
+pot ceramic~
+a pot~
+A ceramic pot is lying here, slightly cracked.~
 You can carry water in the pot.
 ~
-5 0 a 1
+5 0 a 2
 24 0 0
 6 0
 R
 5606 0
 S
 #254
-vessel clay~
-a clay vessel~
-A clay vessel has been left here.~
+vessel ceramic~
+a ceramic vessel~
+A ceramic vessel has been left here.~
 The vessel looks like it would hold a lot of water.
 ~
-5 0 a 1
+5 0 a 2
 56 0 0
 6 0
 R
@@ -51,12 +51,13 @@ R
 T 256
 S
 #257
-bricks pile clay~
-a pile of clay bricks~
-Some clay bricks are piled on the ground.~
-You can use the bricks for building.
+bricks pile~
+a pile of bricks~
+Some bricks are piled on the ground.~
+   These bricks have been made from fired clay, with holes in the middle to
+reduce the weight. You can use the bricks for building.
 ~
-3 el a 4
+3 el a 5
 0 0 0
 6 0
 M
@@ -147,14 +148,14 @@ R
 T 262
 S
 #263
-icon letheian clay~
+icon letheian ceramic~
 a letheian icon~
-A clay letheian icon is lying on the ground.~
+A ceramic letheian icon is lying on the ground.~
    This icon grants a free skill reset. Once you use it, you can choose a
 different set of abilities for that skill tree. Type 'use icon Skill Name' to
 gain the reset, then 'skill reset Skill Name' to use it.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 T 263

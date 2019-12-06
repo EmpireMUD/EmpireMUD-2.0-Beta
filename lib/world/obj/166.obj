@@ -193,14 +193,14 @@ How can you see a feeling?
 10 12
 S
 #16618
-outfit reindeer~
-a reindeer outfit~
-A reindeer outfit lays here empty.~
+outfit reindeer set~
+a reindeer outfit set~
+Some reindeer outfits lay here empty.~
    This reindeer outfit is sized for a horse and has been used before given the
 hairs on the inside.
 Usage: dress horse
 ~
-3 k a 4
+3 k a 5
 0 0 0
 11 0
 Q 16618
@@ -289,14 +289,14 @@ type: buff <target> to extend how long the ornament sticks around.
 T 16627
 S
 #16625
-outfit elf~
-an elf outfit~
-An elf outfit lays here empty.~
+outfit elf set~
+an elf outfit set~
+Some elf outfits lay here empty.~
    This elf outfit is a bit strange. It seems to be intended for a quadruped
 rather than a biped. And at the back end there's a hole for possibly a tail.
 Usage: dress terrier
 ~
-3 k a 4
+3 k a 5
 0 0 0
 11 0
 Q 16617
@@ -306,11 +306,31 @@ S
 pixy frozen~
 a frozen pixy~
 A safely frozen pixy is in mid flutter.~
+   An already beautiful creature, this pixy has a enhanced loveliness from the
+frost coating it's entire body.
+Type: 'place <object>' to top the tree.
 ~
-3 0 a 3
+3 k a 7
 0 0 0
-10 1
+10 0
+Q 16626
 T 16625
+T 16626
+S
+#16627
+wand icicle~
+an icicle wand~
+A wand carved to look like an icicle lays here.~
+   This wand is carved perfectly to look like an icicle. Fitting, given the
+ability it has.
+Type: 'freeze pixy'
+~
+3 0 a 4
+0 0 0
+0 0
+Q 16626
+T 16624
+T 16623
 S
 #16650
 wax sleigh elfish flying~

@@ -6,7 +6,7 @@ guild might have an interest in what the wintry guy is giving out.
 ~
 You thank Father Christmas and he rewards your politeness.
 ~
-18 e 0 0 -1
+19 e 0 0 -1
 A
 3 10705
 P
@@ -16,11 +16,11 @@ R
 R
 2 16659 1
 W
-5 16601 0 1 a
-W
 36 10700 0 1 a
 W
 11 0 0 1 a
+W
+6 16601 0 1 a
 Z
 4 10702
 S
@@ -34,7 +34,7 @@ up your own gift, though, as Father Christmas only gives one per visitor.
    The Guild head is greatful for your kindness and ready to spread holiday
 cheer himself now.
 ~
-14 de 0 0 -1
+15 de 0 0 -1
 A
 1 18211
 A
@@ -52,9 +52,9 @@ R
 W
 2 10702 0 1 a
 W
-5 16600 0 1 a
-W
 36 10700 0 1 a
+W
+6 16600 0 1 a
 Z
 1 18219
 Z
@@ -432,14 +432,14 @@ S
 #16617
 Terrorize the Terriers (Winter Wonderland)~
    While standing in your stable, you get the great idea that the animals of
-the empire should get into the holiday spirit as well. So, you take a elf
-outfit and begin your search for a terrier to dress up.
+the empire should get into the holiday spirit as well. So, you take a couple
+elf outfits and begin your search for two terriers to dress up.
 Type: dress terrier
 ~
    There, now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-7 e 0 0 -1
+8 e 0 0 -1
 A
 0 5111
 A
@@ -462,14 +462,14 @@ S
 #16618
 Replica Reindeer Wrangling (Winter Wonderland)~
    While standing in your stable, you get the great idea that the animals of
-the empire should get into the holiday spirit as well. So, you take a reindeer
-outfit and begin your search for a horse to dress up.
+the empire should get into the holiday spirit as well. So, you take some
+reindeer outfits and begin your search for five horses to dress up.
 Type: dress horse
 ~
    There! Now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-7 e 0 0 -1
+8 e 0 0 -1
 A
 0 5111
 A
@@ -523,11 +523,15 @@ Z
 S
 #16626
 Topping Off~
-This quest has no description.
+   Looking at the Christmas tree, you notice it's not quite up to snuff. Most
+importantly, it's missing a topper! Take this wand and go freeze a pixy for the
+tree. They can be found all over the place, so if you don't find one
+immediately just keep looking.
+type: 'freeze pixy'
 ~
-You have completed the quest.
+You and your citizens agree that makes the tree look much better.
 ~
-4 ade 0 0 -1
+7 ade 0 0 -1
 A
 2 16607
 D 16626

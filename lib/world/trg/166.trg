@@ -250,9 +250,21 @@ if !(%act_emp% == %room.empire%)
   halt
 end
 * check if the empire has a tree here already.
-if %room.contents(16607)%
+set old_xmas_tree %room.contents(16607)%
+if %old_xmas_tree%
   %send% %actor% Your empire already has a Christmas tree in this city center.
-  halt
+  set light_with_mind %actor.has_tech(Light-Fire)%
+  set use_a_lighter %actor.find_lighter%
+  if !%light_with_mind% && !%use_a_lighter%
+    %send% %actor% And you don't have any way to burn the old tree.
+    halt
+  elseif %use_a_lighter% && !%light_with_mind%
+    nop %use_a_lighter.used_lighter(%actor%)%
+  end
+  %send% %actor% You light %old_xmas_tree.shortdesc% on fire!
+  %echoaround% %actor% %actor.name% lights %old_xmas_tree.shortdesc% on fire!
+  %load% obj 1002 room
+  %purge% %old_xmas_tree%
 end
 * see if they have a xmas tree stand to hold up the tree.
 if !%actor.inventory(16602)%
@@ -265,17 +277,17 @@ set xmas_tree %room.contents(16607)%
 if %self.varexists(winter_holiday_sect_check)%
   set winter_holiday_sect_check %self.winter_holiday_sect_check%
   if %winter_holiday_sect_check% == 10565 || %winter_holiday_sect_check% == 10564 || %winter_holiday_sect_check% == 10563 || %winter_holiday_sect_check% == 10562
-    %mod% %xmas_tree% keywords tree spruce Christmas
+    %mod% %xmas_tree% keywords tree spruce Christmas tall
     %mod% %xmas_tree% shortdesc a spruce Christmas tree
     %mod% %xmas_tree% longdesc A tall spruce Christmas tree cheers the citizens.
   elseif %winter_holiday_sect_check% == 604
-    %mod% %xmas_tree% keywords tree enchanted Christmas
+    %mod% %xmas_tree% keywords tree enchanted Christmas tall
     %mod% %xmas_tree% shortdesc an enchanted Christmas tree
     %mod% %xmas_tree% longdesc A tall enchanted Christmas tree cheers the citizens.
   elseif %winter_holiday_sect_check% == 4
-    %mod% %xmas_tree% keywords tree Christmas unimpressive
+    %mod% %xmas_tree% keywords tree Christmas unimpressive tall
     %mod% %xmas_tree% shortdesc an unimpressive Christmas tree
-    %mod% %xmas_tree% longdesc An unimpressive Christmas tree cheers the citizens.
+    %mod% %xmas_tree% longdesc A tall but unimpressive Christmas tree cheers the citizens.
   end
 end
 * See if the player's empire has the twelve trees of xmas progress or not.
@@ -431,7 +443,7 @@ end
 %send% %actor% You spread %self.shortdesc%, lay down, and swiftly make a snow angel on the ground.
 %echoaround% %actor% %actor.name% spreads %self.shortdesc%, lays down, and swiftly makes a snow angel on the ground.
 %load% obj 16609 room
-nop %actor.set_cooldown(16610, 90)%
+nop %actor.set_cooldown(16610, 30)%
 if !%self.varexists(angel_count)%
   set angel_count 1
 else
@@ -563,19 +575,22 @@ end
 if !%actor.on_quest(16612)%
   return 1
   halt
+else
+  return 0
 end
 if %actor.inventory(16612)%
   %send% %actor% You already have his hat, why would you need to bother him again?
   halt
 end
-if %actor.cooldown(16612)% > 5
+if %actor.cooldown(16601)% > 5
   %send% %actor% %self.name% is highly upset with you and tosses you out!
   %echoaround% %actor% %self.name% grabs %actor.name% and throws %actor.himher% out!
   %teleport% %actor% %instance.location%
+  %force% %actor% look
   halt
-elseif %actor.cooldown(16612)%
+elseif %actor.cooldown(16601)%
   %send% %actor% You probably shouldn't do that, %self.name% almost caught you once already.
-  nop %actor.set_cooldown(16612, 30)%
+  nop %actor.set_cooldown(16601, 30)%
   halt
 end
 set theft_roll %random.100%
@@ -584,7 +599,7 @@ if %actor.skill(stealth)% >= %theft_roll%
   set item %actor.inventory()%
   %send% %actor% You find %item.shortdesc%!
 else
-  nop %actor.set_cooldown(16612, 5)%
+  nop %actor.set_cooldown(16601, 5)%
   %send% %actor% %self.name% turns in your direction and you have to abort your theft.
 end
 ~
@@ -911,7 +926,11 @@ if %actor.on_quest(16617)%
     halt
   else
     set morphnum 16617
-    %quest% %actor% trigger %morphnum%
+    if !%self.varexists(dress_up_counter)%
+      set dress_up_counter 2
+    else
+      set dress_up_counter %self.dress_up_counter%
+    end
   end
 end
 if %actor.on_quest(16618)%
@@ -920,16 +939,26 @@ if %actor.on_quest(16618)%
     halt
   else
     set morphnum 16618
-    %quest% %actor% trigger %morphnum%
+    if !%self.varexists(dress_up_counter)%
+      set dress_up_counter 5
+    else
+      set dress_up_counter %self.dress_up_counter%
+    end
   end
 end
-%send% %actor% You put %self.shortdesc% on %target.name%.
-%echoaround% %actor% %actor.name% puts %self.shortdesc% on %target.name%.
+%send% %actor% You dress %target.name% with %self.shortdesc%.
+%echoaround% %actor% %actor.name% dresses %target.name% with %self.shortdesc%.
 %morph% %target% %morphnum%
+eval dress_up_counter %dress_up_counter% - 1
+if %dress_up_counter% > 0
+  remote dress_up_counter %self.id%
+else
+  %quest% %actor% trigger %morphnum%
+end
 if %actor.quest_finished(%morphnum%)%
   %quest% %actor% finish %morphnum%
+  %purge% %self%
 end
-%purge% %self%
 ~
 #16619
 Max the reindeer dog no-death~
@@ -992,11 +1021,74 @@ end
 ~
 #16621
 grinchy greeting~
-0 g 100
+0 h 0
 ~
 if %actor.is_pc% && !%self.fighting%
-  dg_affect #16613 %self% off
+  dg_affect #16606 %self% off
 end
+~
+#16623
+pixy spawning~
+1 b 40
+~
+if %self.carried_by.inventory(16626)%
+  halt
+end
+set person %self.room.people%
+while %person%
+  if %person.is_npc% && %person.vnum% == 16624
+    halt
+  end
+  set person %person.next_in_room%
+done
+%load% mob 16624 room
+set pixy_here %self.room.people%
+switch %random.4%
+  case 1
+    %echo% You see %pixy_here.name% out of the corner of your eye.
+  break
+  case 2
+    %echo% What looks like a flying snowball wizzes by.
+  break
+  case 3
+    %echo% %pixy_here.name% dances in midair.
+  break
+  case 4
+    %echo% Snow flies everywhere as %pixy_here.name% spins in circles.
+  break
+done
+~
+#16624
+freeze the pixy~
+1 c 2
+freeze~
+if !%arg%
+  %send% %actor% What do you want to blast with %self.shortdesc%?
+  return 1
+  halt
+end
+if %actor.inventory(16626)%
+  %send% %actor% You already have a pixy on ice. Should probably get it back to the tree before it thaws out.
+  halt
+end
+set target %actor.char_target(%arg%)%
+if !%target%
+  %send% %actor% They must have fled from your awesome power, because they're not here.
+  return 1
+  halt
+end
+if %target.is_npc% && %target.vnum% == 16624
+  %send% %actor% You point %self.shortdesc% at %target.name% and unleash a blast of icy magic!
+  %echoaround% %actor% %actor.name% points %self.shortdesc% at %target.name% and unleashes a blast of icy magic!
+  %echo% %target.name% is covered in a layer of ice and becomes motionless.
+  return 1
+else
+  %send% %actor% You can only use %self.shortdesc% on the winter pixies.
+  return 1
+  halt
+end
+%purge% %target%
+%load% obj 16626 %actor% inv
 ~
 #16625
 pixy thaws out~
@@ -1028,10 +1120,30 @@ end
 %purge% %self%
 ~
 #16626
-pixy cetching~
-0 0 100
-~
-* No script
+pixy placement~
+1 c 2
+place~
+if !%arg%
+  return 0
+  halt
+end
+set christmas_tree %self.room.contents(16607)%
+if !%christmas_tree%
+  %send% %actor% There's no Christmas tree here for you to place %self.shortdesc% on top of.
+  halt
+end
+if %actor.obj_target(%arg%)% != %self%
+  %send% %actor% Only %self.shortdesc% can be used to top a Christmas tree.
+  halt
+end
+if !%christmas_tree.varexists(pixy_topped_off)%
+%mod% %christmas_tree% append-lookdesc-noformat On top %self.shortdesc% sits, frozen in place.
+set pixy_topped_off 1
+remote pixy_topped_off %christmas_tree%
+%quest% %actor% trigger 16626
+if %actor.quest_finished(16626)%
+  %quest% %actor% finish 16626
+end
 ~
 #16627
 ornament extention~
