@@ -83,11 +83,11 @@ pixy winter~
 a winter pixy~
 A winter pixy trickles snow from its wings as it flutters by.
 ~
-0 0 dno mn 2
+1 1 dno mn 2
 0 0 2 15
 D
-   This *insert ice color* pixy almost looks to be an animated snowball, due to
-the constant flurries of snow it produces.
+   This translucent blue and white pixy almost looks to be an animated
+snowball, due to the constant flurries of snow it produces.
 ~
 M
 4
@@ -98,18 +98,27 @@ Bright flashes of white come from $n's direction.~
 M
 0
 $n zips around your head.~
+T 16622
 S
 #16625
 pixy enraged~
 an enraged pixy~
 An enraged pixy furiously flutters about.
 ~
-0 0 douzD cm 2
+1 400 douD cm 2
 0 0 2 20
 D
    Small patches of ice are still melting off this raging pixy. Seems someone
 froze it and didn't put it on the tree in time.
 ~
+S
+#16628
+snowman abominable~
+the abominable snowman~
+A massive hairy abominable snowman roars at everyone nearby.
+~
+1 400 dkloF cdhosBCDGJ 4
+0 0 0 15
 S
 #16651
 goose plump~
