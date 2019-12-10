@@ -293,7 +293,7 @@ if %target% == allplayers
     end
     set person %person.next_in_room%
   done
-else
+elseif %target%
   dg_affect #16109 %target% %WitheringDebuff% -%DebuffValue% %DebuffTimer%
 end
 ~
