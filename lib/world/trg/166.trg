@@ -6,7 +6,7 @@ if !%arg%
   return 0
   halt
 end
-if %arg% != snowball && %arg% != snowman
+if !(snowball /= %arg%) && !(snowman /= %arg%)
   return 0
   halt
 end
@@ -16,7 +16,7 @@ if %actor.cooldown(16600)%
 end
 set player_name %actor.name%
 if %cmd% == make
-  if %arg% == snowman && %actor.has_resources(16605,3)%
+  if (snowman /= %arg%) && %actor.has_resources(16605,3)%
     %send% %actor% You begin to build a snowman.
     %echoaround% %actor% %player_name% begins to build a snowman.
     set BuildRoom %self.room%
@@ -54,12 +54,12 @@ if %cmd% == make
       %send% %actor% You've stopped building the snowman.
       halt
     end
-  elseif %arg% == snowman
+  elseif (snowman /= %arg%)
     %send% %actor% You don't have enough snowballs yet.
     halt
   end
 end
-if %cmd% == scoop && %arg% != snowball
+if %cmd% == scoop && snowball /= %arg%
   %send% %actor% You can only make snowballs when scooping.
   halt
 end
@@ -150,6 +150,8 @@ elseif %questvnum% == 16617
   %load% obj 16625 %actor% inv
 elseif %questvnum% == 16620
   %load% obj 16620 %actor% inv
+elseif %questvnum% == 16626
+  %load% obj 16627 %actor% inv
 end
 ~
 #16603
@@ -1027,9 +1029,19 @@ if %actor.is_pc% && !%self.fighting%
   dg_affect #16606 %self% off
 end
 ~
+#16622
+winter pixy spawn~
+0 n 80
+~
+set movement %random.5%
+while %movement%
+  mmove
+  eval movement %movement% - 1
+done
+~
 #16623
 pixy spawning~
-1 b 40
+1 b 25
 ~
 if %self.carried_by.inventory(16626)%
   halt
@@ -1137,9 +1149,17 @@ if %actor.obj_target(%arg%)% != %self%
   halt
 end
 if !%christmas_tree.varexists(pixy_topped_off)%
-%mod% %christmas_tree% append-lookdesc-noformat On top %self.shortdesc% sits, frozen in place.
-set pixy_topped_off 1
-remote pixy_topped_off %christmas_tree%
+  %mod% %christmas_tree% append-lookdesc-noformat On top %self.shortdesc% sits, frozen in place.
+  %send% %actor% You place %self.shortdesc% on top of %christmas_tree.shortdesc%.
+  %echoaround% %actor% %actor.name% places %self.shortdesc% on top of %christmas_tree.shortdesc%.
+  set pixy_topped_off 1
+  remote pixy_topped_off %christmas_tree.id%
+else
+  %send% %actor% You remove %christmas_tree.player_topped_tree%'s pixy from %christmas_tree.shortdesc% and throw it away, before placing your own.
+  %echoaround% %actor% %actor.name% removes %christmas_tree.player_topped_tree%'s pixy from %christmas_tree.shortdesc% and throws it away, before placing %actor.hisher% own on top.
+end
+set player_topped_tree %actor.name%
+remote player_topped_tree %christmas_tree.id%
 %quest% %actor% trigger 16626
 if %actor.quest_finished(16626)%
   %quest% %actor% finish 16626

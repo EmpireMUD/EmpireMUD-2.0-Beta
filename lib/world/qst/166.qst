@@ -6,15 +6,13 @@ guild might have an interest in what the wintry guy is giving out.
 ~
 You thank Father Christmas and he rewards your politeness.
 ~
-19 e 0 0 -1
+21 e 0 0 -1
 A
 3 10705
 P
 36 10700 0 1
 R
 9 10700 10
-R
-2 16659 1
 W
 36 10700 0 1 a
 W
@@ -23,6 +21,8 @@ W
 6 16601 0 1 a
 Z
 4 10702
+Z
+1 10703
 S
 #16601
 The Guild's Interest in Father Christmas's Gifts (Winter Wonderland)~
@@ -211,10 +211,10 @@ Instructions:
 - 'make snowball' 3 times
 - Then 'make snowman'
 ~
-   There must have been some magic in that old top hat they found. For when
-you place it on his head, he begins to dance around!
+   It looks just like you, and it should last a while. Just don't let it go
+inside.
 ~
-10 de 0 0 -1
+12 de 0 0 -1
 A
 1 10701
 D 16606
@@ -433,13 +433,14 @@ S
 Terrorize the Terriers (Winter Wonderland)~
    While standing in your stable, you get the great idea that the animals of
 the empire should get into the holiday spirit as well. So, you take a couple
-elf outfits and begin your search for two terriers to dress up.
-Type: dress terrier
+elf outfits and begin your search for two terriers to dress up. Terriers are
+afraid of the dark, so you probably won't find them at night.
+Type: 'dress terrier'
 ~
    There, now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
-8 e 0 0 -1
+9 e 0 0 -1
 A
 0 5111
 A
@@ -522,16 +523,17 @@ Z
 4 16620
 S
 #16626
-Topping Off~
+Topping Off (Winter Wonderland)~
    Looking at the Christmas tree, you notice it's not quite up to snuff. Most
 importantly, it's missing a topper! Take this wand and go freeze a pixy for the
 tree. They can be found all over the place, so if you don't find one
 immediately just keep looking.
-type: 'freeze pixy'
+type: 'freeze pixy' to freeze a winter pixy.
+type: 'place pixy' to place a frozen pixy on the tree.
 ~
 You and your citizens agree that makes the tree look much better.
 ~
-7 ade 0 0 -1
+11 de 0 0 -1
 A
 2 16607
 D 16626
@@ -556,5 +558,14 @@ W
 2 16626 0 1 a
 Z
 4 16626
+S
+#16628
+abominable snowman quest~
+This quest has no description.
+~
+You have completed the quest.
+~
+1 ae 0 0 -1
+D 16626
 S
 $

@@ -308,11 +308,11 @@ a frozen pixy~
 A safely frozen pixy is in mid flutter.~
    An already beautiful creature, this pixy has a enhanced loveliness from the
 frost coating it's entire body.
-Type: 'place <object>' to top the tree.
+Type: 'place pixy' to top the tree.
 ~
-3 k a 7
+3 k a 9
 0 0 0
-10 0
+10 12
 Q 16626
 T 16625
 T 16626
@@ -331,6 +331,20 @@ Type: 'freeze pixy'
 Q 16626
 T 16624
 T 16623
+S
+#16628
+snowball enchanted encrusted~
+enchanted snowball~
+A gem encrusted snowball sparkles with enchantment.~
+   This snowball contains quite a bit of magical potential, channeled by the
+various gems pressed into the packed snow. It should be enough to freeze the
+abominable snowman and save your snow buddy from being violently melted.
+type: 'throw snowball'
+~
+3 jk a 2
+0 0 0
+10 0
+Q 16628
 S
 #16650
 wax sleigh elfish flying~
