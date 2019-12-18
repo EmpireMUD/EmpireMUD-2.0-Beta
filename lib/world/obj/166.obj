@@ -94,9 +94,9 @@ A bland Christmas tree stands here.~
 came across and stuck it up in the city center for the holiday. If you need to
 remove it, you could always light it on fire.
 ~
-3 v 0 7
+3 v 0 8
 0 0 0
-0 576
+0 8064
 I 11 1002 100.00 1  # LIGHT: a roaring fire
 S
 #16608
@@ -121,9 +121,9 @@ a beautiful snow angel~
 A beautiful snow angel is imprinted on the ground.~
 A quickly melting imprint in the snow forms the shape of an angel.
 ~
-3 0 0 3
+3 0 0 4
 0 0 0
-10 12
+10 48
 S
 #16610
 snowflake enchanted oversized flake~
@@ -334,17 +334,47 @@ T 16623
 S
 #16628
 snowball enchanted encrusted~
-enchanted snowball~
+an enchanted snowball~
 A gem encrusted snowball sparkles with enchantment.~
    This snowball contains quite a bit of magical potential, channeled by the
 various gems pressed into the packed snow. It should be enough to freeze the
 abominable snowman and save your snow buddy from being violently melted.
-type: 'throw snowball'
+type: 'throw snowball <target>'
 ~
-3 jk a 2
+3 k a 5
 0 0 0
 10 0
 Q 16628
+T 16628
+S
+#16629
+snowball plane basic white~
+a basic snowball~
+A plane white snowball melts in the heat.~
+   Looking at it there's nothing whatsoever special about it. A smoothe, white,
+sphere of snow, and nothing else. However, you know that it came from your snow
+buddy and it's just waiting for you to enchant it, so you can protect your
+buddy from the abominable snowman.
+type: 'enchant snowball freezing'
+(Requires 6 seashells)
+~
+3 k a 5
+0 0 0
+10 0
+Q 16628
+T 16629
+S
+#16630
+sculpture snowman abominable icy ice~
+an icy abominable snowman~
+A sculpture of ice perfectly captures the rage of the abominable snowman.~
+   This ice sculpture perfectly captures the ferocity of what was once a living
+abominable snowman. After a chilling bit of magic though, it's nothing more
+than a beautiful winter ornament.
+~
+3 v 0 2
+0 0 0
+10 2304
 S
 #16650
 wax sleigh elfish flying~

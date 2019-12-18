@@ -1,5 +1,5 @@
 #16600
-Grateful For The Gift (Winter Wonderland)~
+Winter Wonderland: Grateful For The Gift~
    Father Christmas has a gift for you. Probably polite to thank him, after you
 open it. Unless, of course, you aren't the holiday type, in which case the
 guild might have an interest in what the wintry guy is giving out.
@@ -7,7 +7,7 @@ Note: This daily quest does not reward you with a stocking.
 ~
 You thank Father Christmas and he rewards your politeness.
 ~
-22 e 0 0 -1
+23 e 0 0 -1
 A
 3 10705
 P
@@ -26,7 +26,7 @@ Z
 1 10703
 S
 #16601
-The Guild's Interest in Father Christmas's Gifts (Winter Wonderland)~
+Winter Wonderland: The Guild's Interest in Father Christmas's Gifts~
    The Guild head is very busy running the guild. He wishes he could go collect
 his gift from Father Christmas, but is stuck at the hall. If you're feeling
 kind, you could collect a gift on his behalf. This would probably mean giving
@@ -35,7 +35,7 @@ up your own gift, though, as Father Christmas only gives one per visitor.
    The Guild head is greatful for your kindness and ready to spread holiday
 cheer himself now.
 ~
-15 de 0 0 -1
+16 de 0 0 -1
 A
 1 18211
 A
@@ -62,7 +62,7 @@ Z
 1 18211
 S
 #16602
-Winter's Blood (Winter Wonderland)~
+Winter Wonderland: Winter's Blood~
    As a wanderer, this poor soul has never gotten gifts from Father Christmas.
 As an act of revenge for the vampire, a vial of Father Christmas's blood must
 be collected from the source. Take the tin syringe and hunt him down. Return
@@ -72,7 +72,7 @@ Type: use syringe <target>
    You got the blood and the wanderer is delighted. Here's hoping it hurt the
 old fool.
 ~
-12 de 0 0 -1
+13 de 0 0 -1
 A
 1 9064
 D 16602
@@ -95,7 +95,7 @@ Z
 1 9064
 S
 #16603
-Magic Blood (Winter Wonderland)~
+Winter Wonderland: Magic Blood~
    As a ranking member of the Guild of Adventurers, this vampire doesn't
 collect samples any longer. That's a job for underlings, such as yourself.
 Take the tin syringe, find a reindeer, and bring a full vial of its blood back
@@ -106,7 +106,7 @@ Type: use syringe <target>
 ability to fly without turning into giant bats. Hopefully it was from a flying
 reindeer.
 ~
-18 de 0 0 -1
+19 de 0 0 -1
 A
 1 18208
 A
@@ -135,7 +135,7 @@ Z
 1 18218
 S
 #16604
-Letter to Father Christmas (Winter Wonderland)~
+Winter Wonderland: Letter to Father Christmas~
    This young child wrote a letter to Father Christmas, but isn't allowed to
 send it. As the good samaritan that you are, you offer to take and post the
 letter for them. Take the letter to any building you can send mail from and
@@ -146,7 +146,7 @@ Instructions:
    As you watch the bird take flight, you feel more holiday cheer infuse your
 body.
 ~
-11 e 0 0 -1
+12 e 0 0 -1
 A
 1 200
 D 16604
@@ -169,7 +169,7 @@ Z
 4 16604
 S
 #16605
-Letter to Father Christmas (Winter Wonderland)~
+Winter Wonderland: Letter to Father Christmas~
    This young child wrote a letter to Father Christmas, but isn't allowed to
 send it. As the good samaritan that you are, you offer to take and post the
 letter for them. Take the letter to any building you can send mail from and
@@ -180,7 +180,7 @@ Instructions:
    As you watch the bird take flight, you feel more holiday cheer infuse your
 body.
 ~
-11 e 0 0 -1
+12 e 0 0 -1
 A
 1 201
 D 16604
@@ -203,7 +203,7 @@ Z
 4 16604
 S
 #16606
-Snobody Like My Snow Buddy (Winter Wonderland)~
+Winter Wonderland: Snobody Like My Snow Buddy~
    The carolers think you look lonely and have found a magic top hat. With the
 understanding that you will use said hat to finish up a personalized snowman,
 they give it to you. Use the hat to magically make three snow balls, then build
@@ -215,7 +215,7 @@ Instructions:
    It looks just like you, and it should last a while. Just don't let it go
 inside.
 ~
-12 de 0 0 -1
+13 de 0 0 -1
 A
 1 10701
 D 16606
@@ -238,7 +238,7 @@ Z
 4 16600
 S
 #16607
-Stand a Christmas Tree (Winter Wonderland)~
+Winter Wonderland: Stand a Christmas Tree~
    It's time to put up a Christmas tree for the holiday season. Get your axe,
 take this binding, and search for a Christmas tree. Evergreen forests are a
 great place to find one. You might also find something useable in any overgrown
@@ -254,7 +254,7 @@ Instructions:
    Your citizens are excited to see the new tree and hope it'll get some
 ornaments soon!
 ~
-19 de 0 0 -1
+20 de 0 0 -1
 A
 1 10701
 P
@@ -276,7 +276,7 @@ Z
 4 16606
 S
 #16608
-Cookies For The Guild (Winter Wonderland)~
+Winter Wonderland: Cookies For The Guild~
    Your guild is too grumpy. It's time to bring some Christmas cheer to them.
 Make some cookies and deliver them to the superintendant.
 (If you don't have the recipe for Christmas cookies, try opening more gifts.)
@@ -284,7 +284,7 @@ Make some cookies and deliver them to the superintendant.
    Who can stay grumpy with Christmas cookies in their belly? Wonder how else
 you could cheer the guild up.
 ~
-4 d 0 0 -1
+5 d 0 0 -1
 A
 1 18219
 A
@@ -303,7 +303,7 @@ Z
 1 18219
 S
 #16610
-Be An Angel (Winter Wonderland)~
+Winter Wonderland: Be An Angel~
    Seeing your tree makes you wish there was some other wintry beauty around
 the city. Take this enchanted snowflake and make five snow angels to brighten
 up your empire.
@@ -311,7 +311,7 @@ Type: make snow angel
 ~
 That will sure make things more wintry around here!
 ~
-9 e 0 0 -1
+10 e 0 0 -1
 A
 2 16607
 D 16606
@@ -330,7 +330,7 @@ Z
 4 16610
 S
 #16611
-The Winter Robin Hood (Winter Wonderland)~
+Winter Wonderland: The Winter Robin Hood~
    There's so many gifts in the back of this sleigh. Surely one going missing
 couldn't draw attention? You should take a wrapped gift, sneak into one of your
 citizen's bedrooms, and leave it for them to find.
@@ -338,7 +338,7 @@ citizen's bedrooms, and leave it for them to find.
    Upon finding the room empty, you put the gift on the bed and grin to
 yourself at the joy you've brought another citizen of your empire.
 ~
-9 e 0 0 -1
+10 e 0 0 -1
 A
 6 16650
 A
@@ -363,7 +363,7 @@ Z
 4 16611
 S
 #16612
-That Red Stocking Cap (Winter Wonderland)~
+Winter Wonderland: That Red Stocking Cap~
    The mage of the guild of adventurers has been interested in what gives
 Father Christmas his powers. Unfortunately, to date Father Christmas hasn't
 been willing to tell him. The latest theory is that Father Christmas's hat is
@@ -373,7 +373,7 @@ to the guild mage.
    The guild mage is shocked that you managed the theft, but appreciative all
 the same.
 ~
-8 de 0 0 -1
+9 de 0 0 -1
 A
 1 18209
 A
@@ -401,7 +401,7 @@ Z
 1 18209
 S
 #16613
-He's a Mean One (Winter Wonderland)~
+Winter Wonderland: He's a Mean One~
    He's a mean one, all right. There's a grinchy demon going around stealing
 delivered gifts from citizens in the empire. Father Christmas would like you to
 take care of him. Take the sack, find a bedroom to lie in wait, and use it to
@@ -413,7 +413,7 @@ Type 'use sack <normal | hard | group | boss>' to summon the demon.
    You've stopped the grinchy demon, for now. Even though he got away, the
 citizens' gifts are safe for another night.
 ~
-12 e 0 0 -1
+13 e 0 0 -1
 A
 1 10703
 P
@@ -431,7 +431,7 @@ Z
 4 16603
 S
 #16617
-Terrorize the Terriers (Winter Wonderland)~
+Winter Wonderland: Terrorize the Terriers~
    While standing in your stable, you get the great idea that the animals of
 the empire should get into the holiday spirit as well. So, you take a couple
 elf outfits and begin your search for two terriers to dress up. Terriers are
@@ -439,6 +439,36 @@ afraid of the dark, so you probably won't find them at night.
 Type: 'dress terrier'
 ~
    There, now even the animals of your empire are in the holiday mood, whether
+they want to be or not.
+~
+10 e 0 0 -1
+A
+0 5111
+A
+0 10923
+D 16618
+P
+36 10700 0 1 a
+R
+9 10700 10
+R
+2 16659 1
+T 16602
+W
+36 10700 0 1 a
+W
+11 0 0 1 a
+Z
+4 16618
+S
+#16618
+Winter Wonderland: Replica Reindeer Wrangling~
+   While standing in your stable, you get the great idea that the animals of
+the empire should get into the holiday spirit as well. So, you take some
+reindeer outfits and begin your search for five horses to dress up.
+Type: dress horse
+~
+   There! Now even the animals of your empire are in the holiday mood, whether
 they want to be or not.
 ~
 9 e 0 0 -1
@@ -461,38 +491,8 @@ W
 Z
 4 16618
 S
-#16618
-Replica Reindeer Wrangling (Winter Wonderland)~
-   While standing in your stable, you get the great idea that the animals of
-the empire should get into the holiday spirit as well. So, you take some
-reindeer outfits and begin your search for five horses to dress up.
-Type: dress horse
-~
-   There! Now even the animals of your empire are in the holiday mood, whether
-they want to be or not.
-~
-8 e 0 0 -1
-A
-0 5111
-A
-0 10923
-D 16618
-P
-36 10700 0 1 a
-R
-9 10700 10
-R
-2 16659 1
-T 16602
-W
-36 10700 0 1 a
-W
-11 0 0 1 a
-Z
-4 16618
-S
 #16620
-Deck the Halls (Winter Wonderland)~
+Winter Wonderland: Deck the Halls~
    Nestled in the branches of the Christmas tree is a folded paper. After
 unfolding it, you find directions for more ways to decorate the empire. All you
 have to do is craft a 'winter ornament set', and begin hanging them around the
@@ -503,7 +503,7 @@ Type 'craft winter ornament' set to make them, then 'hang ornament' in 4 rooms.
    You've got this decorating thing down. Tree? Check! Ornaments? Check! What
 else could your citizens ask for?
 ~
-8 e 0 0 -1
+9 e 0 0 -1
 A
 2 16607
 D 10700
@@ -524,7 +524,7 @@ Z
 4 16620
 S
 #16626
-Topping Off (Winter Wonderland)~
+Winter Wonderland: Topping Off~
    Looking at the Christmas tree, you notice it's not quite up to snuff. Most
 importantly, it's missing a topper! Take this wand and go freeze a pixy for the
 tree. They can be found all over the place, so if you don't find one
@@ -534,7 +534,7 @@ type: 'place pixy' to place a frozen pixy on the tree.
 ~
 You and your citizens agree that makes the tree look much better.
 ~
-11 de 0 0 -1
+12 de 0 0 -1
 A
 2 16607
 D 16626
@@ -561,12 +561,43 @@ Z
 4 16626
 S
 #16628
-abominable snowman quest~
-This quest has no description.
+Winter Wonderland: That's Just Abominable~
+   Your snow buddy is being threatened by an abominable snowman. The last one
+stated that good sir snowy is going to be turned to mush. Unfortunately, the
+abominable snowman is immune to an out right attack, so you'll have to get
+inventive. Enchant a snowball with freezing, and throw it at the abominable
+snowman to turn him into a snow man in truth. You can use this one that your
+buddy has pulled from his own body for you.
+Type: 'enchant snowball freezing'
+Type: 'throw snowball abominable'
 ~
-You have completed the quest.
+   That'll teach him! Or not, given he's been turned into a snowman. At least
+your buddy is safe again.
 ~
-1 ae 0 0 -1
+12 de 0 0 -1
+A
+1 16600
 D 16626
+P
+36 10700 0 1 a
+P
+9 3 0 1 a
+P
+36 10700 0 1 b
+P
+9 2 0 1 b
+R
+2 16659 1
+R
+9 10700 10
+T 16602
+W
+2 16628 0 1 a
+W
+11 0 0 1 a
+W
+36 10700 0 1 a
+Z
+4 16628
 S
 $
