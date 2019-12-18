@@ -166,6 +166,7 @@ elseif %questvnum% == 16628
   set SnowmanInRoomID %SnowmanInRoom.id%
   detach 16617 %SnowmanInRoomID%
   attach 16630 %SnowmanInRoomID%
+  attach 16633 %SnowmanInRoomID%
   %teleport% %SnowmanInRoom% %self%
   %force% %actor% follow snowman
   set PlayerOnAbominableQuest %actor%
@@ -1075,7 +1076,6 @@ switch %random.4%
 done
 wait 1 s
 eval movement %random.11% - 1
-%echo% %movement%
 while %movement%
   mmove
   eval movement %movement% - 1
@@ -1083,7 +1083,7 @@ done
 ~
 #16623
 pixy spawning~
-1 b 100
+1 b 25
 ~
 set carrying %self.carried_by%
 if !%carrying%
@@ -1252,7 +1252,7 @@ end
 %send% %actor% You throw %self.shortdesc% at %AbominableSnowmanHere.name% with all your might...
 %echoaround% %actor% %actor.name% throws %self.shortdesc% at %AbominableSnowmanHere.name% with all %actor.hisher% might...
 %load% obj 16630 room
-wait 1 s
+wait 1
 %echo% Instantly %AbominableSnowmanHere.name% freezes solid!
 %purge% %AbominableSnowmanHere%
 %quest% %actor% trigger 16628
@@ -1288,7 +1288,7 @@ nop %actor.add_resources(1300, -6)%
 ~
 #16630
 snowman summons abominable snowman~
-0 i 100
+0 i 50
 ~
 wait 1
 %load% mob 16628 %self.level%
@@ -1342,6 +1342,20 @@ else
     end
     set person %person.next_in_room%
   done
+end
+~
+#16633
+protected the snowman~
+0 v 0
+~
+if %questvnum% != 16628
+  halt
+end
+if %self.PlayerOnAbominableQuest% == %actor%
+  set MyID %self.id%
+  detach 16630 %MyID%
+  attach 16617 %MyID%
+  detach 16633 %MyID%
 end
 ~
 #16649
