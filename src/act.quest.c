@@ -646,7 +646,9 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	if (QUEST_FLAGGED(quest, QST_GROUP_COMPLETION) && GROUP(ch)) {
 		LL_FOREACH(GROUP(ch)->members, mem) {
 			if (mem->member != ch && !IS_NPC(mem->member) && IN_ROOM(mem->member) == IN_ROOM(ch) && (pq = is_on_quest(mem->member, QUEST_VNUM(quest)))) {
-				complete_quest(mem->member, pq, giver_emp);
+				if (check_finish_quest_trigger(mem->member, quest, get_instance_by_id(pq->instance_id))) {
+					complete_quest(mem->member, pq, giver_emp);
+				}
 			}
 		}
 	}

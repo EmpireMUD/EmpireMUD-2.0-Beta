@@ -652,8 +652,12 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	}
 	else if (is_abbrev(cmd_arg, "finish")) {
 		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
+			extern int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 			void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_emp);
-			complete_quest(vict, pq, emp);
+			
+			if (check_finish_quest_trigger(vict, quest, get_instance_by_id(pq->instance_id))) {
+				complete_quest(vict, pq, emp);
+			}
 		}
 	}
 	else if (is_abbrev(cmd_arg, "start")) {
