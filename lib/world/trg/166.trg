@@ -152,6 +152,24 @@ elseif %questvnum% == 16620
   %load% obj 16620 %actor% inv
 elseif %questvnum% == 16626
   %load% obj 16627 %actor% inv
+elseif %questvnum% == 16628
+  %load% obj 16629 %actor% inv
+  set activate 1
+  set SnowmanInRoom %self.people%
+  while %activate%
+    if %SnowmanInRoom.is_npc% && %SnowmanInRoom.vnum% == 16600
+      set activate 0
+    else
+      set SnowmanInRoom %SnowmanInRoom.next_in_room%
+    end
+  done
+  set SnowmanInRoomID %SnowmanInRoom.id%
+  detach 16617 %SnowmanInRoomID%
+  attach 16630 %SnowmanInRoomID%
+  %teleport% %SnowmanInRoom% %self%
+  %force% %actor% follow snowman
+  set PlayerOnAbominableQuest %actor%
+  remote PlayerOnAbominableQuest %SnowmanInRoomID%
 end
 ~
 #16603
@@ -884,18 +902,26 @@ melting snowman~
 0 i 100
 ~
 wait 1 s
+if !%self.room.in_city%
+  %echo% %self.name% melts into a puddle from the heat.
+  %purge% %self%
+end
 if !%self.varexists(melt_counter)%
   set melt_counter 0
-  remote melt_counter %self.id%
+else
+  set melt_counter %self.melt_counter%
 end
 if !%self.room.is_outdoors%
-  eval melt_counter %self.melt_counter% + 1
-  if %melt_counter% >= 10
-    %echo% %self.name% melts into a puddle from the heat.
-    %purge% %self%
-  else
-    remote melt_counter %self.id%
-  end
+  set AddMelt 3
+else
+  eval AddMelt %random.2% - 1
+end
+eval melt_counter %melt_counter% + %AddMelt%
+if %melt_counter% >= 20
+  %echo% %self.name% melts into a puddle from the heat.
+  %purge% %self%
+else
+  remote melt_counter %self.id%
 end
 ~
 #16618
@@ -1031,9 +1057,25 @@ end
 ~
 #16622
 winter pixy spawn~
-0 n 80
+0 n 100
 ~
-set movement %random.5%
+switch %random.4%
+  case 1
+    %echo% You see %self.name% out of the corner of your eye.
+  break
+  case 2
+    %echo% What looks like a flying snowball wizzes by.
+  break
+  case 3
+    %echo% %self.name% dances in midair.
+  break
+  case 4
+    %echo% Snow flies everywhere as %self.name% spins in circles.
+  break
+done
+wait 1 s
+eval movement %random.11% - 1
+%echo% %movement%
 while %movement%
   mmove
   eval movement %movement% - 1
@@ -1041,9 +1083,13 @@ done
 ~
 #16623
 pixy spawning~
-1 b 25
+1 b 100
 ~
-if %self.carried_by.inventory(16626)%
+set carrying %self.carried_by%
+if !%carrying%
+  halt
+end
+if %carrying.inventory(16626)%
   halt
 end
 set person %self.room.people%
@@ -1054,21 +1100,6 @@ while %person%
   set person %person.next_in_room%
 done
 %load% mob 16624 room
-set pixy_here %self.room.people%
-switch %random.4%
-  case 1
-    %echo% You see %pixy_here.name% out of the corner of your eye.
-  break
-  case 2
-    %echo% What looks like a flying snowball wizzes by.
-  break
-  case 3
-    %echo% %pixy_here.name% dances in midair.
-  break
-  case 4
-    %echo% Snow flies everywhere as %pixy_here.name% spins in circles.
-  break
-done
 ~
 #16624
 freeze the pixy~
@@ -1186,6 +1217,132 @@ end
 otimer 1152
 %send% %actor% You buff %buffing.shortdesc% with a cloth, extending the beauty.
 %echoaround% %actor% %actor.name% buffs %buffing.shortdesc% with a cloth, extending the beauty.
+~
+#16628
+throw the enchanted snowball~
+1 c 2
+throw~
+if !%arg%
+  return 0
+  halt
+elseif !(%actor.obj_target(%arg.car%)% == %self%)
+  return 0
+  halt
+end
+if !%arg.cdr%
+  %send% %actor% Fine, but who or what did you want to throw %self.shortdesc% at?
+  halt
+end
+if (abominable /= %arg.cdr%) || (snowman /= %arg.cdr%)
+  set person %self.room.people%
+  while %person%
+    if %person.vnum% == 16628
+      set AbominableSnowmanHere %person%
+    end
+    set person %person.next_in_room%
+  done
+  if !%AbominableSnowmanHere%
+    %send% %actor% Doesn't seem the abominable snowman is here for you to freeze with your snowball.
+    halt
+  end
+else
+  %send% %actor% You can only freeze the abominable snowman with %self.shortdesc%.
+  halt
+end
+%send% %actor% You throw %self.shortdesc% at %AbominableSnowmanHere.name% with all your might...
+%echoaround% %actor% %actor.name% throws %self.shortdesc% at %AbominableSnowmanHere.name% with all %actor.hisher% might...
+%load% obj 16630 room
+wait 1 s
+%echo% Instantly %AbominableSnowmanHere.name% freezes solid!
+%purge% %AbominableSnowmanHere%
+%quest% %actor% trigger 16628
+if %actor.quest_finished(16628)%
+  %quest% %actor% finish 16628
+end
+~
+#16629
+enchant the snowball~
+1 c 2
+enchant~
+if !%arg%
+  return 0
+  halt
+end
+if !(%actor.obj_target(%arg.car%)% == %self%)
+  return 0
+  halt
+end
+if %arg.cdr% != freezing
+  %send% %actor% You must enchant %self.shortdesc% with freezing to subdue the abominable snowman.
+  halt
+end
+if !%actor.has_resources(1300,6)%
+  %send% %actor% It will take six seashells to enchant %self.shortdesc% with freezing.
+  halt
+end
+nop %actor.add_resources(1300, -6)%
+%load% obj 16628 %actor% inv
+%send% %actor% You enchant %self.shortdesc% with freezing.
+%echoaround% %actor% %actor.name% enchants %self.shortdesc% with freezing.
+%purge% %self%
+~
+#16630
+snowman summons abominable snowman~
+0 i 100
+~
+wait 1
+%load% mob 16628 %self.level%
+set SnowmanUnderAttack %self.id%
+remote SnowmanUnderAttack %self.room.people.id%
+set AbominableSnowman %self.room.people%
+switch %random.4%
+  case 1
+    %echo% %AbominableSnowman.name% roars and begins to swing at %self.name%!
+  break
+  case 2
+    %echo% Suddenly, a white blur lunges at %self.name% and you see %AbominableSnowman.name% hit it!
+  break
+  case 3
+    %echo% %AbominableSnowman.name% comes out of nowhere and begins to deal blows to %self.name%!
+  break
+  case 4
+    %echo% Snow flies everywhere as %AbominableSnowman.name% pops up and violently strikes %self.name%!
+  break
+done
+%teleport% %self% %self.room%
+%force% %AbominableSnowman% kill %self.pc_name%
+wait 1
+%send% %self.PlayerOnAbominableQuest% %self.name% tells you, 'The abominable snowman is here at %self.room.name%!'
+~
+#16631
+snowman target will not escape~
+0 s 100
+~
+if %actor.id% == %self.SnowmanUnderAttack%
+  return 0
+  %echo% %self.name% growls and drags %actor.name% back.
+  mkill %actor%
+end
+~
+#16632
+abominable kills regular snowman~
+0 z 100
+~
+if %actor.vnum% == 16600
+  %send% %actor.PlayerOnAbominableQuest% %self.name% tells you, 'You obviously aren't a very good protector, %actor.name% is mush.'
+  wait 1
+  %echo% %self.name% runs off!
+  %purge% %self%
+else
+  set person %self.room.people%
+  while %person%
+    if %person.id% == %self.SnowmanUnderAttack%
+      mkill %person%
+      unset person
+    end
+    set person %person.next_in_room%
+  done
+end
 ~
 #16649
 Only harness flying mobs~

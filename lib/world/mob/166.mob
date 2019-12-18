@@ -3,7 +3,7 @@ snowman~
 a snowman~
 A snowman dances around in a circle.
 ~
-1 0 dhnDFG G 3
+1 400 dhnyDFG G 3
 0 0 35 15
 D
    Three progressively larger snowballs are stacked atop each other to form the
@@ -117,8 +117,14 @@ snowman abominable~
 the abominable snowman~
 A massive hairy abominable snowman roars at everyone nearby.
 ~
-1 400 dkloF cdhosBCDGJ 4
+1 400 bdkloFG cdhosBCDGJ 4
 0 0 0 15
+D
+   A large apelike creature with snow white fur and glowing red eyes, this
+doesn't seem like something you would want to take in a straight fight.
+~
+T 16631
+T 16632
 S
 #16651
 goose plump~
