@@ -46,6 +46,8 @@ if %cmd% == make
       %mod% %snowman% shortdesc a snow %player_name%
       %mod% %snowman% longdesc A snow %player_name% dances around in a circle.
       %mod% %snowman% keywords snowman %player_name%
+      set IWasBornOn %dailycycle%
+      remote IWasBornOn %snowman.id%
       if %actor.quest_finished(16606)%
         %quest% %actor% finish 16606
       end
@@ -1358,6 +1360,21 @@ if %self.PlayerOnAbominableQuest% == %actor%
   detach 16633 %MyID%
 end
 ~
+#16634
+snowman has lived too long~
+0 ab 2
+~
+if %self.varexists(IWasBornOn)%
+  eval SinceLoaded %dailycycle% - %self.IWasBornOn%
+else
+  %echo% %self.name% melts after such a long time of standing around.
+  %purge% %self%
+end
+if %SinceLoaded% >= 3 || !%event.running(10700)%
+  %echo% %self.name% melts after such a long time of standing around.
+  %purge% %self%
+end
+~
 #16649
 Only harness flying mobs~
 5 c 0
@@ -1538,7 +1555,7 @@ end
 ~
 #16656
 Mistletoe Kiss sequence~
-1 bw 2
+1 bw 4
 ~
 if !%self.is_inroom%
   halt
@@ -1679,6 +1696,12 @@ Open Stocking (winter wonderland dailies)~
 open~
 if !%arg% || %actor.obj_target(%arg.car%)% != %self%
   return 0
+  halt
+end
+if !%event.running(10700)%
+  %echo% It's empty! You must have missed Christmas.
+  return 1
+  %purge% %self%
   halt
 end
 set roll %random.1000%
