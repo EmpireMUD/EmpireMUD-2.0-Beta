@@ -155,6 +155,7 @@ When using field - The variable returns:
 &ccontents(vnum)&0 - The id of the first obj in the room that has that vnum.
 &ccoords&0 - The (x, y) location of the room on the map.
 &ccrop&0 - The name of the crop on the map room, if any.
+&ccrop_flagged(FLG)&0 - True if it's a crop and a given crop flag is present.
 &ccrop_vnum&0 - The vnum of the crop on the map room, if any.
 &cdirection(target)&0 - The approximate direction to the target.
 &cdistance(target)&0 - The distance between this room and the target.
@@ -184,6 +185,7 @@ When using field - The variable returns:
    If called with no argument, lists current flags instead.
 &cseason&0 - The local season (spring, summer, autumn, winter).
 &csector&0 - The sector type of the room.
+&csector_flagged(FLG)&0 - True if a given sector flag is present.
 &csector_vnum&0 - The sector vnum of the room.
 &ctemplate&0 - The room template vnum, if any.
 &cvehicles&0 - The id of the first vehicle in the room, if any
