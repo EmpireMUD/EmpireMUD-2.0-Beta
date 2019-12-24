@@ -3562,7 +3562,9 @@ void b5_82_snowman_fix(void) {
 		}
 	}
 	
-	save_whole_world();
+	if (any) {
+		save_whole_world();
+	}
 }
 
 
