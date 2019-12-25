@@ -627,7 +627,7 @@ ADMIN_UTIL(util_exportcsv) {
 				else {
 					*str2 = '\0';
 				}
-				fprintf(fl, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], str2);
+				fprintf(fl, "%s%+d to %s%s", found++ ? ", " : "", apply->modifier, apply_types[(int) apply->location], str2);
 			}
 			
 			sprintbit(GET_OBJ_AFF_FLAGS(obj), affected_bits, str1, TRUE);
