@@ -1949,6 +1949,7 @@ const char *versions_list[] = {
 	"b5.58",
 	"b5.60",
 	"b5.80",
+	"b5.82",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3525,6 +3526,48 @@ void b5_80_dailies_fix(void) {
 }
 
 
+// applies a new script to existing snowpersons
+void b5_82_snowman_fix(void) {
+	char_data *ch, *next_ch;
+	trig_data *trig;
+	bool has, any = FALSE;
+	
+	int snowman_vnum = 16600;
+	int new_script = 16634;
+	
+	log("Applying b5.82 snowman fix...");
+	
+	LL_FOREACH_SAFE(character_list, ch, next_ch) {
+		if (!IS_NPC(ch) || GET_MOB_VNUM(ch) != snowman_vnum) {
+			continue;	// wrong mob
+		}
+		// check if it already has the new script
+		has = FALSE;
+		if (SCRIPT(ch)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(ch)), trig) {
+				if (GET_TRIG_VNUM(trig) == new_script) {
+					has = TRUE;
+					break;
+				}
+			}
+		}
+		
+		// attach if not
+		if (!has && (trig = read_trigger(new_script))) {
+			if (!SCRIPT(ch)) {
+				create_script_data(ch, MOB_TRIGGER);
+			}
+			add_trigger(SCRIPT(ch), trig, -1);
+			any = TRUE;
+		}
+	}
+	
+	if (any) {
+		save_whole_world();
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3805,6 +3848,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.80")) {
 			b5_80_dailies_fix();
+		}
+		if (MATCH_VERSION("b5.82")) {
+			b5_82_snowman_fix();
 		}
 	}
 	

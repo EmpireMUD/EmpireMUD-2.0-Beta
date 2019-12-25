@@ -1,32 +1,32 @@
 #250
-bowl ceramic~
-a bowl~
-A ceramic bowl is lying on the ground.~
+bowl earthenware~
+an earthenware bowl~
+An earthenware bowl is lying on the ground.~
 The bowl looks like it would be good for holding water.
 ~
-5 0 a 2
+5 0 a 3
 12 0 0
 6 0
 S
 #251
-pot ceramic~
-a pot~
-A ceramic pot is lying here, slightly cracked.~
+pot earthenware~
+an earthenware pot~
+An earthenware pot is lying here, slightly cracked.~
 You can carry water in the pot.
 ~
-5 0 a 2
+5 0 a 3
 24 0 0
 6 0
 R
 5606 0
 S
 #254
-vessel ceramic~
-a ceramic vessel~
-A ceramic vessel has been left here.~
+vessel earthenware~
+an earthenware vessel~
+An earthenware vessel has been left here.~
 The vessel looks like it would hold a lot of water.
 ~
-5 0 a 2
+5 0 a 3
 56 0 0
 6 0
 R
@@ -148,14 +148,14 @@ R
 T 262
 S
 #263
-icon letheian ceramic~
+icon letheian~
 a letheian icon~
-A ceramic letheian icon is lying on the ground.~
+A letheian icon is lying on the ground.~
    This icon grants a free skill reset. Once you use it, you can choose a
 different set of abilities for that skill tree. Type 'use icon Skill Name' to
 gain the reset, then 'skill reset Skill Name' to use it.
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 0 0
 T 263

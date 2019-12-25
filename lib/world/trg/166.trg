@@ -17,9 +17,13 @@ end
 set player_name %actor.name%
 if %cmd% == make
   if (snowman /= %arg%) && %actor.has_resources(16605,3)%
+    set BuildRoom %self.room%
+    if %BuildRoom.sector_flagged(FRESH-WATER)% || %BuildRoom.sector_flagged(ocean)% || %BuildRoom.sector_flagged(SHALLOW-WATER)%
+      %send% %actor% If you built a snowman in the water, it would probably just wash away before you could stack the snowballs.
+      halt
+    end
     %send% %actor% You begin to build a snowman.
     %echoaround% %actor% %player_name% begins to build a snowman.
-    set BuildRoom %self.room%
     wait 5 s
     if !%actor.fighting% && %BuildRoom% == %self.room%
       %send% %actor% You stack the snowballs you've collected on top of one another carefully, making sure they don't fall.
@@ -46,6 +50,8 @@ if %cmd% == make
       %mod% %snowman% shortdesc a snow %player_name%
       %mod% %snowman% longdesc A snow %player_name% dances around in a circle.
       %mod% %snowman% keywords snowman %player_name%
+      set IWasBornOn %dailycycle%
+      remote IWasBornOn %snowman.id%
       if %actor.quest_finished(16606)%
         %quest% %actor% finish 16606
       end
@@ -67,15 +73,12 @@ if %actor.has_resources(16605,3)%
   %send% %actor% You already have three snowballs, just make the snowman.
   halt
 end
-set wrs %self.room.sector_vnum%
-if %wrs% == 5 || %wrs% == 19 || %wrs% == 32
+set room %self.room%
+if %room.function(DRINK-WATER)%
   %send% %actor% You dip %self.shortdesc% into the water and it freezes the liquid into snow.
   %echoaround% %actor% %player_name% dips %self.shortdesc% into the water and it freezes the liquid into snow.
-elseif %wrs% == 33
-  %send% %actor% You press the brim of %self.shortdesc% to the ice and it sinks through, turning the solid water into snow.
-  %echoaround% %actor% %actor.name% presses the brim of %self.shortdesc% to the ice and it sinks through, turning the solid water into snow.
 else
-  %send% %actor% You can't find snow worthy water here. Try a river, lake, canal, or even a frozen lake.
+  %send% %actor% You can't find snow worthy water here. Try somewhere you can drink fresh water.
   halt
 end
 set BuildRoom %self.room%
@@ -1358,6 +1361,21 @@ if %self.PlayerOnAbominableQuest% == %actor%
   detach 16633 %MyID%
 end
 ~
+#16634
+snowman has lived too long~
+0 ab 2
+~
+if %self.varexists(IWasBornOn)%
+  eval SinceLoaded %dailycycle% - %self.IWasBornOn%
+else
+  %echo% %self.name% melts after such a long time of standing around.
+  %purge% %self%
+end
+if %SinceLoaded% >= 3 || !%event.running(10700)%
+  %echo% %self.name% melts after such a long time of standing around.
+  %purge% %self%
+end
+~
 #16649
 Only harness flying mobs~
 5 c 0
@@ -1538,7 +1556,7 @@ end
 ~
 #16656
 Mistletoe Kiss sequence~
-1 bw 2
+1 bw 4
 ~
 if !%self.is_inroom%
   halt
@@ -1679,6 +1697,12 @@ Open Stocking (winter wonderland dailies)~
 open~
 if !%arg% || %actor.obj_target(%arg.car%)% != %self%
   return 0
+  halt
+end
+if !%event.running(10700)%
+  %echo% It's empty! You must have missed Christmas.
+  return 1
+  %purge% %self%
   halt
 end
 set roll %random.1000%

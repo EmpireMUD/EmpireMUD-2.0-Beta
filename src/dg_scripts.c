@@ -4890,6 +4890,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "crop_flagged")) {
+						extern const char *crop_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, crop_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", ROOM_CROP_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							sprintbit((ROOM_SECT_FLAGGED(r, SECTF_HAS_CROP_DATA) && ROOM_CROP(r)) ? GET_CROP_FLAGS(ROOM_CROP(r)) : NOBITS, crop_flags, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
+						}
+					}
 					else if (!str_cmp(field, "crop_vnum")) {
 						crop_data *cp;
 						if ((cp = ROOM_CROP(r))) {
@@ -5110,6 +5127,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "sector")) {
 						snprintf(str, slen, "%s", GET_SECT_NAME(SECT(r)));
+					}
+					else if (!str_cmp(field, "sector_flagged")) {
+						extern const char *sector_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, sector_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", ROOM_SECT_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							sprintbit(GET_SECT_FLAGS(SECT(r)), sector_flags, buf, TRUE);
+							snprintf(str, slen, "%s", buf);
+						}
 					}
 					else if (!str_cmp(field, "sector_vnum")) {
 						snprintf(str, slen, "%d", GET_SECT_VNUM(SECT(r)));

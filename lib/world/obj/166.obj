@@ -264,13 +264,13 @@ S
 #16623
 lantern faerie large~
 a faerie lantern~
-A large faerie lantern sparkles brighly, lighting the area for all.~
+A large faerie lantern sparkles brightly, lighting the area for all.~
    A thin metal cage branches up from a central circular base. A bright glow
 comes from within, but the design of the metal makes it impossible to see what
 causes it.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 cv 0 9
+3 cv 0 10
 0 0 0
 2 576
 T 16627
@@ -520,9 +520,10 @@ a red knitted stocking~
 A red knitted stocking is lying here.~
    The stocking is far too large to wear, but it's the type that someone might
 hang from a fireplace on Christmas Eve. This one feels like it contains a
-gift... Type 'open stocking' to receive it.
+gift... Type 'open stocking' to receive it. But be sure to open it before the
+event ends.
 ~
-3 p a 2
+3 p a 3
 0 0 0
 11 0
 T 16659

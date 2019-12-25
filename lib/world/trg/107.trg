@@ -272,9 +272,12 @@ else
 end
 wait 1
 set mob %self.room.people%
-if %mob.vnum% == 10700 || %mob.vnum% == 10705
+if %mob.vnum% == 10705
   * success: send a message
   %echo% %mob.name% walks up from lower on the mountain.
+elseif %mob.vnum% == 10700
+  * success: send a message
+  %echo% %mob.name% flies up from lower on the mountain.
 end
 %purge% %self%
 ~
