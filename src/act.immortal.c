@@ -610,12 +610,12 @@ ADMIN_UTIL(util_exportcsv) {
 			adv = get_adventure_for_vnum(GET_OBJ_VNUM(obj));	// if any
 			
 			// (leading \n) adv, vnum, name, min, max
-			fprintf(fl, "\n\"%s\",%d,\"%s\",%d,%d", (adv ? GET_ADV_NAME(adv) : ""), GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
+			fprintf(fl, "\n\"%s\",%d,\"%s\",%d,%d,", (adv ? GET_ADV_NAME(adv) : ""), GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
 			
 			// wear, type, flags, attack
 			sprintbit(GET_OBJ_WEAR(obj), wear_bits, str1, TRUE);
 			sprintbit(GET_OBJ_EXTRA(obj), extra_bits, str2, TRUE);
-			fprintf(fl, "%s,%s,%s,%s", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? attack_hit_info[GET_WEAPON_TYPE(obj)].name : "");
+			fprintf(fl, "%s,%s,%s,%s,", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? attack_hit_info[GET_WEAPON_TYPE(obj)].name : "");
 			
 			// applies, affects, triggers
 			fprintf(fl, "\"");	// leading quote for applies
