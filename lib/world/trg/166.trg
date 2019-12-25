@@ -17,9 +17,13 @@ end
 set player_name %actor.name%
 if %cmd% == make
   if (snowman /= %arg%) && %actor.has_resources(16605,3)%
+    set BuildRoom %self.room%
+    if %BuildRoom.sector_flagged(FRESH-WATER)% || %BuildRoom.sector_flagged(ocean)% || %BuildRoom.sector_flagged(SHALLOW-WATER)%
+      %send% %actor% If you built a snowman in the water, it would probably just wash away before you could stack the snowballs.
+      halt
+    end
     %send% %actor% You begin to build a snowman.
     %echoaround% %actor% %player_name% begins to build a snowman.
-    set BuildRoom %self.room%
     wait 5 s
     if !%actor.fighting% && %BuildRoom% == %self.room%
       %send% %actor% You stack the snowballs you've collected on top of one another carefully, making sure they don't fall.
@@ -69,15 +73,12 @@ if %actor.has_resources(16605,3)%
   %send% %actor% You already have three snowballs, just make the snowman.
   halt
 end
-set wrs %self.room.sector_vnum%
-if %wrs% == 5 || %wrs% == 19 || %wrs% == 32
+set room %self.room%
+if %room.function(DRINK-WATER)%
   %send% %actor% You dip %self.shortdesc% into the water and it freezes the liquid into snow.
   %echoaround% %actor% %player_name% dips %self.shortdesc% into the water and it freezes the liquid into snow.
-elseif %wrs% == 33
-  %send% %actor% You press the brim of %self.shortdesc% to the ice and it sinks through, turning the solid water into snow.
-  %echoaround% %actor% %actor.name% presses the brim of %self.shortdesc% to the ice and it sinks through, turning the solid water into snow.
 else
-  %send% %actor% You can't find snow worthy water here. Try a river, lake, canal, or even a frozen lake.
+  %send% %actor% You can't find snow worthy water here. Try somewhere you can drink fresh water.
   halt
 end
 set BuildRoom %self.room%
