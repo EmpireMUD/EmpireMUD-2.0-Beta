@@ -41,6 +41,7 @@
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *apply_types[];
+extern const char *apply_type_names[];
 extern const char *bld_on_flags[];
 extern const char *bonus_bits[];
 extern const char *climate_types[];
@@ -54,6 +55,7 @@ extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *instance_flags[];
 extern const char *island_bits[];
+extern const char *item_types[];
 extern const char *mapout_color_names[];
 extern const char *olc_flag_bits[];
 extern const char *progress_types[];
@@ -64,6 +66,7 @@ extern const char *size_types[];
 extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
+extern const char *wear_bits[];
 
 // external functions
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
@@ -77,6 +80,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.item.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
+extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
@@ -362,6 +366,7 @@ ADMIN_UTIL(util_b318_buildings);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
 ADMIN_UTIL(util_evolve);
+ADMIN_UTIL(util_exportcsv);
 ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
@@ -384,6 +389,7 @@ struct {
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
 	{ "evolve", LVL_CIMPL, util_evolve },
+	{ "exportcsv", LVL_CIMPL, util_exportcsv },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
@@ -572,6 +578,77 @@ ADMIN_UTIL(util_evolve) {
 	send_config_msg(ch, "ok_string");
 	manual_evolutions = TRUE;	// triggers a log
 	run_external_evolutions();
+}
+
+
+ADMIN_UTIL(util_exportcsv) {
+	char str1[MAX_STRING_LENGTH], str2[MAX_STRING_LENGTH];
+	struct trig_proto_list *trig;
+	obj_data *obj, *next_obj;
+	struct obj_apply *apply;
+	adv_data *adv;
+	int found;
+	FILE *fl;
+	
+	if (is_abbrev(argument, "equipment")) {
+		msg_to_char(ch, "Exporting equipment CSV to lib/equipment.csv...\r\n");
+		if (!(fl = fopen("equipment.csv", "w"))) {
+			msg_to_char(ch, "Failed to open file.\r\n");
+			return;
+		}
+		
+		// header
+		fprintf(fl, "Adventure,Vnum,Name,Min,Max,");
+		fprintf(fl, "Wear,Type,Flags,Attack,");
+		fprintf(fl, "Applies,Affects,Triggers");
+		
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (!CAN_WEAR(obj, ~ITEM_WEAR_TAKE)) {
+				continue;	// wearable only
+			}
+			
+			adv = get_adventure_for_vnum(GET_OBJ_VNUM(obj));	// if any
+			
+			// (leading \n) adv, vnum, name, min, max
+			fprintf(fl, "\n\"%s\",%d,\"%s\",%d,%d", (adv ? GET_ADV_NAME(adv) : ""), GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
+			
+			// wear, type, flags, attack
+			sprintbit(GET_OBJ_WEAR(obj), wear_bits, str1, TRUE);
+			sprintbit(GET_OBJ_EXTRA(obj), extra_bits, str2, TRUE);
+			fprintf(fl, "%s,%s,%s,%s", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? attack_hit_info[GET_WEAPON_TYPE(obj)].name : "");
+			
+			// applies, affects, triggers
+			fprintf(fl, "\"");	// leading quote for applies
+			found = 0;
+			LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
+				if (apply->apply_type != APPLY_TYPE_NATURAL) {
+					sprintf(str2, " (%s)", apply_type_names[(int)apply->apply_type]);
+				}
+				else {
+					*str2 = '\0';
+				}
+				fprintf(fl, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], str2);
+			}
+			
+			sprintbit(GET_OBJ_AFF_FLAGS(obj), affected_bits, str1, TRUE);
+			fprintf(fl, "\",%s,\"", str1);	// including quotes for applies and triggers
+			
+			found = 0;
+			LL_FOREACH(obj->proto_script, trig) {
+				fprintf(fl, "%s%d", found++ ? ", " : "", trig->vnum);
+			}
+			
+			fprintf(fl, "\"");	// trailing " for trigs	
+			
+			// no trailing \n
+		}
+		
+		fclose(fl);
+	}
+	else {
+		msg_to_char(ch, "Export options:\r\n");
+		msg_to_char(ch, "  equipment - All equippable items.\r\n");
+	}
 }
 
 
@@ -5317,10 +5394,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
-	extern const char *apply_type_names[];
 	extern const struct material_data materials[NUM_MATERIALS];
-	extern const char *wear_bits[];
-	extern const char *item_types[];
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
@@ -5896,7 +5970,6 @@ void do_stat_room(char_data *ch) {
 * @param room_template *rmt The room template to display.
 */
 void do_stat_room_template(char_data *ch, room_template *rmt) {
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	void get_exit_template_display(struct exit_template *list, char *save_buffer);
 	void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
 	extern const char *room_template_flags[];
