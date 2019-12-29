@@ -703,7 +703,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	// row 4 (optional: add more conditions as more things appear on this line)
 	if (GET_EXTRA_ATT(ch, ATT_FISHING)) {
-		sprintf(lbuf, "Fishing  [%s%d\t0]", HAPPY_COLOR(GET_EXTRA_ATT(ch, ATT_FISHING), 0), GET_EXTRA_ATT(ch, ATT_FISHING));
+		sprintf(lbuf, "Fishing  [%s%+d\t0]", HAPPY_COLOR(GET_EXTRA_ATT(ch, ATT_FISHING), 0), GET_EXTRA_ATT(ch, ATT_FISHING));
 		msg_to_char(ch, "  %-28.28s\r\n", lbuf);
 	}
 	
