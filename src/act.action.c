@@ -744,8 +744,12 @@ INTERACTION_FUNC(finish_digging) {
 
 INTERACTION_FUNC(finish_fishing) {
 	char buf[MAX_STRING_LENGTH];
-	obj_data *obj = NULL;
-	int num;
+	char *to_char, *to_room;
+	obj_data *obj = NULL, *eq;
+	int num, iter, tc_count, tr_count;
+	
+	const char *default_to_char = "You catch $p!";
+	const char *default_to_room = "$n catches $p!";
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
@@ -761,15 +765,31 @@ INTERACTION_FUNC(finish_fishing) {
 	
 	// messaging
 	if (obj) {
+		// look for an object with custom fishing messages
+		to_char = to_room = NULL;
+		tc_count = tr_count = 0;
+		for (iter = 0; iter < NUM_WEARS; ++iter) {
+			if (!(eq = GET_EQ(ch, iter))) {
+				continue;	// nothing in that slot
+			}
+			
+			if (obj_has_custom_message(eq, OBJ_CUSTOM_FISH_TO_CHAR) && !number(0, tc_count++)) {
+				to_char = obj_get_custom_message(eq, OBJ_CUSTOM_FISH_TO_CHAR);
+			}
+			if (obj_has_custom_message(eq, OBJ_CUSTOM_FISH_TO_ROOM) && !number(0, tr_count++)) {
+				to_room = obj_get_custom_message(eq, OBJ_CUSTOM_FISH_TO_ROOM);
+			}
+		}
+		
 		if (interaction->quantity > 1) {
-			sprintf(buf, "You jab your spear into the water and when you extract it you find $p (x%d) on the end!", interaction->quantity);
+			sprintf(buf, "%s (x%d)", to_char ? to_char : default_to_char, interaction->quantity);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {
-			act("You jab your spear into the water and when you extract it you find $p on the end!", FALSE, ch, obj, NULL, TO_CHAR);
+			act(to_char ? to_char : default_to_char, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		
-		act("$n jabs $s spear into the water and when $e draws it out, it has $p on the end!", TRUE, ch, obj, NULL, TO_ROOM);
+		act(to_room ? to_room : default_to_room, TRUE, ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
@@ -1571,8 +1591,8 @@ void process_fishing(char_data *ch) {
 	dir = GET_ACTION_VNUM(ch, 0);
 	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir, FALSE);
 	
-	if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
-		msg_to_char(ch, "You'll need a spear to fish.\r\n");
+	if (GET_EXTRA_ATT(ch, ATT_FISHING) <= 0) {
+		msg_to_char(ch, "You aren't using any fishing equipment.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1587,7 +1607,7 @@ void process_fishing(char_data *ch) {
 		return;
 	}
 	
-	GET_ACTION_TIMER(ch) -= GET_CHARISMA(ch) + (player_tech_skill_check(ch, PTECH_FISH, DIFF_MEDIUM) ? 2 : 0);
+	GET_ACTION_TIMER(ch) -= GET_EXTRA_ATT(ch, ATT_FISHING) + (player_tech_skill_check(ch, PTECH_FISH, DIFF_MEDIUM) ? 2 : 0);
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
 		switch (number(0, 10)) {
@@ -1606,6 +1626,35 @@ void process_fishing(char_data *ch) {
 			case 2: {
 				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
 					msg_to_char(ch, "The fish are jumping off in the distance, but you can't seem to catch one!\r\n");
+				}
+				break;
+			}
+			case 3:
+			case 4: {	// custom messaging
+				int iter, tc_count, tr_count;
+				char *to_char, *to_room;
+				obj_data *eq;
+				
+				to_char = to_room = NULL;
+				tc_count = tr_count = 0;
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if (!(eq = GET_EQ(ch, iter))) {
+						continue;	// nothing in that slot
+					}
+			
+					if (obj_has_custom_message(eq, OBJ_CUSTOM_FISH_PROGRESS_TO_CHAR) && !number(0, tc_count++)) {
+						to_char = obj_get_custom_message(eq, OBJ_CUSTOM_FISH_PROGRESS_TO_CHAR);
+					}
+					if (obj_has_custom_message(eq, OBJ_CUSTOM_FISH_PROGRESS_TO_ROOM) && !number(0, tr_count++)) {
+						to_room = obj_get_custom_message(eq, OBJ_CUSTOM_FISH_PROGRESS_TO_ROOM);
+					}
+				}
+				
+				if (to_char) {
+					act(to_char, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+				}
+				if (to_room) {
+					act(to_room, TRUE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				}
 				break;
 			}

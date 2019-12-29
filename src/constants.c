@@ -494,6 +494,7 @@ const char *extra_attribute_types[] = {
 	"Crafting-Bonus",
 	"Blood-Upkeep",
 	"Age",
+	"Fishing",
 	"\n"
 };
 
@@ -1394,6 +1395,7 @@ const char *apply_types[] = {
 	"RESIST-MAGICAL",
 	"CRAFTING",
 	"BLOOD-UPKEEP",
+	"FISHING",
 	"\n"
 };
 
@@ -1427,6 +1429,7 @@ const double apply_values[] = {
 	0.5,	// RESIST-MAGICAL
 	0.01,	// CRAFTING
 	1,	// BLOOD-UPKEEP
+	1,	// FISHING
 };
 
 
@@ -1458,7 +1461,8 @@ const int apply_attribute[] = {
 	NOTHING,	// bonus-heal
 	NOTHING,	// resist-magical
 	NOTHING,	// crafting
-	NOTHING	// blood-upkeep
+	NOTHING,	// blood-upkeep
+	NOTHING,	// fishing
 };
 
 
@@ -1490,7 +1494,8 @@ const bool apply_never_scales[] = {
 	FALSE,	// BONUS-HEALING
 	FALSE,	// RESIST-MAGICAL
 	TRUE,	// CRAFTING
-	TRUE	// BLOOD-UPKEEP
+	TRUE,	// BLOOD-UPKEEP
+	TRUE,	// FISHING
 };
 
 
@@ -2545,21 +2550,25 @@ const char *storage_bits[] = {
 
 // OBJ_CUSTOM_x
 const char *obj_custom_types[] = {
-	"build-to-char",
+	"build-to-char",	// 0
 	"build-to-room",
 	"instrument-to-char",
 	"instrument-to-room",
 	"eat-to-char",
-	"eat-to-room",
+	"eat-to-room",	// 5
 	"craft-to-char",
 	"craft-to-room",
 	"wear-to-char",
 	"wear-to-room",
-	"remove-to-char",
+	"remove-to-char",	// 10
 	"remove-to-room",
 	"longdesc",
 	"longdesc-female",
 	"longdesc-male",
+	"fish-to-char",	// 15
+	"fish-to-room",
+	"fish-progress-to-char",
+	"fish-progress-to-room",
 	"\n"
 };
 

@@ -98,18 +98,20 @@ FISH FISHING
 Fish (Survival ability)
 
 Usage:  fish [direction]
-Tool:  spear
+Tool:  anything with +FISHING
 
-Learn to live at the water's edge through spear-fishing. As your skill
-improves, you will find yourself catching fish faster. You can fish the map
-location you're standing in, or any adjacent tile.
+Learn to live at the water's edge by fishing. As your skill improves, you will
+find yourself catching fish faster. You can fish the map location you're
+standing in, or any adjacent tile.
 
-To make a spear, craft a handle and chip a flint until it is a spearhead, then
-craft the spear from the handle and spearhead.
+You can fish with a spear or with any item that has +FISHING (when you identify
+it). To make a basic fishing spear, craft a handle and chip a flint until it is
+a spearhead, then craft the spear from the handle and spearhead. Be sure to
+equip the item (wield or hold the spear).
 
 You can find all kinds of useful things while fishing, but not everything you
-find while fishing will be useful. Higher Charisma and Survival will improve
-your fishing speed.
+find while fishing will be useful. Higher Survival skill and the Fishing
+attribute will improve your fishing speed.
 
 Gains experience when you catch something.
 

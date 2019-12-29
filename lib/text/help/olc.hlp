@@ -4542,6 +4542,7 @@ Most applies are self-explanatory:
  RESIST-MAGICAL - magical damage reduction
  CRAFTING - bonus to craft level (unscaled)
  BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
+ FISHING - speeds up fishing (items should only have +1 or +2; unscaled)
 
 See also: OLC OBJECTS
 #d
@@ -4811,6 +4812,10 @@ Message types:
  &clongdesc&0 - Object gives the player a custom long description when worn.
  &clongdesc-female&0 - Same as longdesc but only for females.
  &clongdesc-male&0 - Same as longdesc but only for males.
+ &cfish-to-char&0 - Shown to the player when they catch a fish ($p for item caught).
+ &cfish-to-room&0 - Shown to the room when someone catches a fish ($p for item caught).
+ &cfish-progress-to-char&0 - Shown to the player while fishing.
+ &cfish-progress-to-room&0 - Shown to the room while fishing.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d

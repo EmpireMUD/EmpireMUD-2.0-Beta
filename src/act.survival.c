@@ -641,8 +641,8 @@ ACMD(do_fish) {
 	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
-	else if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
-		msg_to_char(ch, "You'll need a spear to fish.\r\n");
+	else if (GET_EXTRA_ATT(ch, ATT_FISHING) <= 0) {
+		msg_to_char(ch, "You aren't using any fishing equipment.\r\n");
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_FISH, NULL, NULL)) {
 		return;
