@@ -903,15 +903,23 @@ the dracosaur bone spear~
 A dracosaur bone spear is lying here.~
 This huge spear looks like it was made from the massive legbone of a dracosaur!
 ~
-1 emo an 1
+1 emo an 2
 0 1 3
 14 0
 A
 13 1 0
 A
 18 1 0
+A
+27 5 0
 C
 0 125
+M
+15
+You jab your spear into the water and when you extract it you find $p on the end!~
+M
+16
+$n jabs $s spear into the water and when $e draws it out, it has $p on the end!~
 S
 #10271
 pattern spear dracosaur bone~

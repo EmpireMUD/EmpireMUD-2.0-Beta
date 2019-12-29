@@ -377,13 +377,21 @@ a spear~
 A long spear is protruding from the ground.~
 Spears can be used for fishing or fighting.
 ~
-1 ehl an 2
+1 ehl an 6
 0 2 3
 1 0
 A
 2 1 0
+A
+27 1 0
 C
 1 1
+M
+15
+You jab your spear into the water and when you extract it you find $p on the end!~
+M
+16
+$n jabs $s spear into the water and when $e draws it out, it has $p on the end!~
 S
 #2130
 backpack leather~
@@ -511,13 +519,21 @@ An obsidian spear is stuck in the ground.~
    This strong, light spear is tipped with pitch-black obsidian, sharp enough
 to penetrate even a mammoth hide.
 ~
-1 eho an 4
+1 eho an 5
 0 2 3
 8 0
 A
 21 1 0
+A
+27 3 0
 C
 50 50
+M
+15
+You jab your spear into the water and when you extract it you find $p on the end!~
+M
+16
+$n jabs $s spear into the water and when $e draws it out, it has $p on the end!~
 S
 #2139
 sword obsidian~

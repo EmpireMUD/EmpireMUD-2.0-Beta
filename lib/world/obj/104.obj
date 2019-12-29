@@ -281,13 +281,21 @@ a mammoth spear~
 A mammoth spear protrudes from the ground.~
 This spear looks like it could be used to take down a mammoth!
 ~
-1 ehmnp an 1
+1 ehmnp an 3
 0 3 3
 0 0
 A
 17 1 0
 A
 9 1 0
+A
+27 6 0
+M
+15
+You jab your spear into the water and when you extract it you find $p on the end!~
+M
+16
+$n jabs $s spear into the water and when $e draws it out, it has $p on the end!~
 S
 #10422
 cloak imperium-weave weave~
