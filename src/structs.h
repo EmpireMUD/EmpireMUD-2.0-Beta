@@ -992,7 +992,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
 #define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
 #define CRAFT_ALCHEMY  BIT(5)  // requires access to glass/alchemist and fire
-#define CRAFT_SHARP  BIT(6)  // requires sharp tool
+#define CRAFT_KNIFE  BIT(6)  // requires 'knife' tool
 #define CRAFT_FIRE  BIT(7)  // requires any fire source
 #define CRAFT_SOUP  BIT(8)  // is a soup: requires a container of water, and the "object" property is a liquid id
 #define CRAFT_IN_DEVELOPMENT  BIT(9)	// craft cannot be performed by mortals
@@ -1696,11 +1696,11 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_TWO_HANDED  BIT(13)	// n. weapon requires both hands
 #define OBJ_BIND_ON_EQUIP  BIT(14)	// o. binds when equipped
 #define OBJ_BIND_ON_PICKUP  BIT(15)	// p. binds when acquired
-#define OBJ_STAFF  BIT(16)	// q. counts as a staff
+//	#define OBJ_UNUSED1  BIT(16)	// q. formerly STAFF
 #define OBJ_UNCOLLECTED_LOOT  BIT(17)	// r. will junk instead of autostore
 #define OBJ_KEEP  BIT(18)	// s. obj will not be part of any "all" commands like "drop all"
-#define OBJ_TOOL_PAN  BIT(19)	// t. counts as pan
-#define OBJ_TOOL_SHOVEL  BIT(20)	// u. counts as shovel
+//	#define OBJ_UNUSED2  BIT(19)	// t. formerly TOOL-PAN
+//	#define OBJ_UNUSED3  BIT(20)	// u. formerly TOOL-SHOVEL
 #define OBJ_NO_AUTOSTORE  BIT(21)	// v. keeps the game from cleaning it up
 #define OBJ_HARD_DROP  BIT(22)	// w. dropped by a 'hard' mob
 #define OBJ_GROUP_DROP  BIT(23)	// x. dropped by a 'group' mob
@@ -1730,8 +1730,6 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_LONGDESC_MALE  14
 #define OBJ_CUSTOM_FISH_TO_CHAR  15
 #define OBJ_CUSTOM_FISH_TO_ROOM  16
-#define OBJ_CUSTOM_FISH_PROGRESS_TO_CHAR  17
-#define OBJ_CUSTOM_FISH_PROGRESS_TO_ROOM  18
 
 
 // RES_x: resource requirement types
@@ -1746,6 +1744,25 @@ typedef struct vehicle_data vehicle_data;
 
 // storage flags (for obj storage locations)
 #define STORAGE_WITHDRAW  BIT(0)	// requires withdraw privilege
+
+
+// TOOL_x: tool flags for objects
+#define TOOL_AXE  BIT(0)	// a. required to 'chop' trees
+#define TOOL_FISHING  BIT(1)	// b. required for 'fish' command
+#define TOOL_HAMMER  BIT(2)	// c. required for 'forge' command
+#define TOOL_HARVESTING  BIT(3)	// d. required for 'harvest'
+#define TOOL_KNAPPER  BIT(4)	// e. required to 'chip'
+#define TOOL_KNIFE  BIT(5)	// f. required for the skin/butcher commands
+#define TOOL_LOOM  BIT(6)	// g. allows the 'weave' command anywhere
+#define TOOL_MINING  BIT(7)	// h. required for the 'mine' command
+#define TOOL_PAN  BIT(8)	// i. required for 'pan' command
+#define TOOL_POTTERY_WHEEL  BIT(9)	// j. required for some pottery
+#define TOOL_QUARRYING  BIT(10)	// k. required for the 'quarry' command
+#define TOOL_SAW  BIT(11)	// l. used to 'saw' lumber
+#define TOOL_SEWING_KIT  BIT(12)	// m. required for 'sew' command
+#define TOOL_SHEARS  BIT(13)	// n. required for shearing
+#define TOOL_SHOVEL  BIT(14)	// o. speeds digging and is required to 'excavate'
+#define TOOL_STAFF  BIT(15)	// p. counts as a staff (usually for magic)
 
 
 // WEAR_x: Character equipment positions
@@ -4870,6 +4887,7 @@ struct obj_flag_data {
 	byte type_flag;	// Type of item
 	bitvector_t wear_flags;	// Where you can wear it
 	bitvector_t extra_flags;	// If it hums, glows, etc.
+	bitvector_t tool_flags;	// any TOOL_ uses it provides when equipped
 	int carrying_n;	// number of items inside
 	int cost;	// Value when sold (gp.)
 	int timer;	// Timer for object

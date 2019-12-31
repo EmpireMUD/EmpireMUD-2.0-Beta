@@ -43,7 +43,6 @@ extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-extern obj_data *has_sharp_tool(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
 extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
 
@@ -53,7 +52,6 @@ bool can_refashion(char_data *ch);
 ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
-obj_data *has_hammer(char_data *ch);
 obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 
@@ -95,8 +93,8 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER | CRAFT_SHIPYARD | CRAFT_GLASSBLOWER)) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHARP) && !has_sharp_tool(ch)) {
-		msg_to_char(ch, "You need to be using a sharp tool to %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_KNIFE) && !has_tool(ch, TOOL_KNIFE)) {
+		msg_to_char(ch, "You need to be using a good knife to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_APIARIES) && !has_tech_available(ch, TECH_APIARIES)) {
 		// message sent for us
@@ -169,8 +167,8 @@ bool can_forge(char_data *ch) {
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
-	else if (!has_hammer(ch)) {
-		// sends own message
+	else if (!has_tool(ch, TOOL_HAMMER)) {
+		msg_to_char(ch, "You need to use a hammer to do that.\r\n");
 	}
 	else {
 		ok = TRUE;
@@ -479,32 +477,6 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 	}
 	
 	return level;
-}
-
-
-/**
-* This finds a hammer in either tool slot, and returns it.
-*
-* @param char_data *ch The person using the hammer?
-* @return obj_data *The hammer object.
-*/
-obj_data *has_hammer(char_data *ch) {
-	obj_data *hammer = NULL;
-	int iter;
-	
-	// list of valid slots; terminate with -1
-	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
-	
-	for (iter = 0; slots[iter] != -1; ++iter) {
-		hammer = GET_EQ(ch, slots[iter]);
-		if (hammer && IS_WEAPON(hammer) && GET_WEAPON_TYPE(hammer) == TYPE_HAMMER) {
-			return hammer;
-		}
-	}
-	
-	// nope
-	msg_to_char(ch, "You need to use a hammer to do that.\r\n");
-	return NULL;
 }
 
 
@@ -1082,12 +1054,12 @@ void process_gen_craft(char_data *ch) {
 	}
 	
 	// things that check for & set weapon
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !(weapon = has_hammer(ch)) && !can_forge(ch)) {
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !(weapon = has_tool(ch, TOOL_HAMMER)) && !can_forge(ch)) {
 		// can_forge sends its own message
 		cancel_gen_craft(ch);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHARP) && !(weapon = has_sharp_tool(ch))) {
-		msg_to_char(ch, "You need to be using a sharp tool to %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_KNIFE) && !(weapon = has_tool(ch, TOOL_KNIFE))) {
+		msg_to_char(ch, "You need to be using a good knife to %s this.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 		cancel_gen_craft(ch);
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {

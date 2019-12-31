@@ -1574,7 +1574,7 @@ const char *craft_flags[] = {
 	"GLASSBLOWER",
 	"CARPENTER",
 	"ALCHEMY",
-	"SHARP-TOOL",
+	"KNIFE",
 	"FIRE",
 	"SOUP",
 	"IN-DEVELOPMENT",
@@ -1598,7 +1598,7 @@ const char *craft_flag_for_info[] = {
 	"requires glassblower building",
 	"requires carpenter building",
 	"alchemy",
-	"requires sharp tool",
+	"requires a knife",
 	"requires fire",
 	"",	// soup
 	"",	// in-dev
@@ -2286,11 +2286,11 @@ const char *extra_bits[] = {
 	"TWO-HANDED",
 	"BOE",
 	"BOP",	// 15
-	"STAFF",
+	"*STAFF",	// formerly STAFF
 	"UNCOLLECTED-LOOT",
 	"*KEEP",
-	"TOOL-PAN",
-	"TOOL-SHOVEL",	// 20
+	"*TOOL-PAN",	// formerly TOOL-PAN
+	"*TOOL-SHOVEL",	// 20, formerly TOOL-SHOVEL
 	"!AUTOSTORE",
 	"HARD-DROP",
 	"GROUP-DROP",
@@ -2352,11 +2352,11 @@ const double obj_flag_scaling_bonus[] = {
 	1.5,	// OBJ_TWO_HANDED
 	1.3333,	// OBJ_BIND_ON_EQUIP
 	1.5,	// OBJ_BIND_ON_PICKUP
-	1.0,	// OBJ_STAFF
+	1.0,	// unused
 	1.0,	// OBJ_UNCOLLECTED_LOOT
 	1.0,	// OBJ_KEEP
-	1.0,	// OBJ_TOOL_PAN
-	1.0,	// OBJ_TOOL_SHOVEL
+	1.0,	// unused
+	1.0,	// unused
 	1.0,	// OBJ_NO_AUTOSTORE
 	1.2,	// OBJ_HARD_DROP
 	1.4,	// OBJ_GROUP_DROP
@@ -2548,6 +2548,28 @@ const char *storage_bits[] = {
 };
 
 
+// TOOL_x: tool flags for objects
+const char *tool_flags[] = {
+	"axe",	// 0
+	"fishing tool",
+	"hammer",
+	"harvesting tool",
+	"knapper",
+	"knife",	// 5
+	"loom",
+	"mining tool",
+	"pan",
+	"pottery wheel",
+	"quarrying tools",	// 10
+	"saw",
+	"sewing kit",
+	"shears",
+	"shovel",
+	"staff",	// 15
+	"\n"
+};
+
+
 // OBJ_CUSTOM_x
 const char *obj_custom_types[] = {
 	"build-to-char",	// 0
@@ -2567,8 +2589,6 @@ const char *obj_custom_types[] = {
 	"longdesc-male",
 	"fish-to-char",	// 15
 	"fish-to-room",
-	"fish-progress-to-char",
-	"fish-progress-to-room",
 	"\n"
 };
 

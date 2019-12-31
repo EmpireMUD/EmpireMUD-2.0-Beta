@@ -2279,26 +2279,6 @@ int get_attack_type_by_name(char *name) {
 
 
 /**
-* @param char_data *ch the user
-* @return obj_data *a valid chipper, or NULL if the user has none
-*/
-obj_data *find_chip_weapon(char_data *ch) {
-	obj_data *weapon;
-
-	// find valid weapon
-	weapon = GET_EQ(ch, WEAR_WIELD);
-	if (!weapon || (GET_WEAPON_TYPE(weapon) != TYPE_HAMMER && GET_OBJ_VNUM(weapon) != o_ROCK)) {
-		weapon = GET_EQ(ch, WEAR_HOLD);
-		if (!weapon || (GET_WEAPON_TYPE(weapon) != TYPE_HAMMER && GET_OBJ_VNUM(weapon) != o_ROCK)) {
-			weapon = NULL;
-		}
-	}
-	
-	return weapon;
-}
-
-
-/**
 * Finds a particular ability's skill assignment data, if any.
 *
 * @param skill_data *skill The skill whose assignments to check.
@@ -2479,30 +2459,6 @@ bool has_cooking_fire(char_data *ch) {
 	}
 	
 	return FALSE;
-}
-
-
-/**
-* Checks to see if ch has a sharp tool equipped, and returns it if so
-*
-* char_data *ch the person to check
-* return obj_data *the sharp tool or NULL
-*/
-obj_data *has_sharp_tool(char_data *ch) {
-	obj_data *obj;
-	int iter;
-	
-	// slots to check (ensure a -1 terminator)
-	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
-	
-	for (iter = 0; slots[iter] != -1; ++iter) {
-		obj = GET_EQ(ch, slots[iter]);
-		if (obj && IS_WEAPON(obj) && attack_hit_info[GET_WEAPON_TYPE(obj)].weapon_type == WEAPON_SHARP) {
-			return obj;
-		}
-	}
-	
-	return NULL;
 }
 
 

@@ -3566,7 +3566,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	bool ok = FALSE;
 	bool revert = TRUE;
 	char_data *m;
-	obj_data *weapon;
+	// obj_data *weapon;
 	bool msg;
 
 	/* stop_fighting() is split around here to help with exp */
@@ -3596,7 +3596,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		return;
 	}
 
-	/* We will TRY to find a slicing/slashing weapon */
+	/* We will TRY to find a slicing/slashing weapon
 	weapon = GET_EQ(ch, WEAR_WIELD);
 	if ((!weapon || (GET_WEAPON_TYPE(weapon) != TYPE_SLASH && GET_WEAPON_TYPE(weapon) != TYPE_SLICE)) && GET_EQ(ch, WEAR_HOLD)) {
 		weapon = GET_EQ(ch, WEAR_HOLD);
@@ -3604,6 +3604,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 			weapon = GET_EQ(ch, WEAR_WIELD);
 		}
 	}
+	// weapon currently unused */
 
 	if (revert && IS_MORPHED(victim)) {
 		sprintf(buf, "%s reverts into $n!", PERS(victim, victim, FALSE));

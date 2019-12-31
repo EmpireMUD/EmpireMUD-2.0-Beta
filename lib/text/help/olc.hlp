@@ -4815,8 +4815,6 @@ Message types:
  &clongdesc-male&0 - Same as longdesc but only for males.
  &cfish-to-char&0 - Shown to the player when they catch a fish ($p for item caught).
  &cfish-to-room&0 - Shown to the room when someone catches a fish ($p for item caught).
- &cfish-progress-to-char&0 - Shown to the player while fishing.
- &cfish-progress-to-room&0 - Shown to the room while fishing.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
@@ -4894,8 +4892,6 @@ Available flags:
  STAFF - counts as a staff (even if it doesn't have a staff weapon type)
  UNCOLLECTED-LOOT - will decay on the ground if no player gets it
  *KEEP - player has marked the object with the 'keep' command
- TOOL-PAN - can pan for gold if holding this
- TOOL-SHOVEL - acts as a shovel for dig and excavate
  !AUTOSTORE - will not autostore (e.g. furniture)
  HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
@@ -4944,13 +4940,14 @@ Fields:
      (note: will not account for objects whose levels are inherited from mobs
      or adventures, see ADVEDIT CASCADE for help)
   &c-material&0 - see OEDIT MATERIAL
+  &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
   &c-wear&0 - see HELP OEDIT WEAR
 
 Examples:
  > .o fullsearch -type WEAPON -wear HOLD
- > .o fullsearch -flagged LARGE -flagged TOOL-SHOVEL
+ > .o fullsearch -flagged LARGE -flagged BOP
  > .o fullsearch -level 50 sword
 
 To search other fields, you can generally use the normal "search" option for
@@ -5257,6 +5254,18 @@ Remember, items left on the ground outdoors will decay or bestored after 3
 real hours, regardless of their decay timers.
 
 See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
+#d
+"OEDIT TOOLS" "OEDIT TOOL FLAGS" "TOOL FLAGS"
+
+Usage:  .tools [add | remove] <flags>
+
+Tool flags allow an object to be used for various tasks.
+
+Available tool flags:
+ &cPAN&0 - for the 'pan' command
+ &cSTAFF&0 - counts as a staff for certain magical abilities
+
+See also: OLC OBJECTS
 #d
 "OEDIT TYPE"
 

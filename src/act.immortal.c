@@ -5398,6 +5398,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
+	extern const char *tool_flags[];
 	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
@@ -5452,6 +5453,9 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	sprintbit(GET_OBJ_EXTRA(j), extra_bits, buf, TRUE);
 	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
+	
+	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
+	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
 	
 	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, component_string(GET_OBJ_CMP_TYPE(j), GET_OBJ_CMP_FLAGS(j)));
 	

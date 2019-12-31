@@ -518,8 +518,6 @@ void do_mount_swap(char_data *ch, char *argument) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_butcher) {
-	extern obj_data *has_sharp_tool(char_data *ch);
-	
 	char_data *proto;
 	obj_data *corpse;
 	
@@ -550,8 +548,8 @@ ACMD(do_butcher) {
 	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse)))) {
 		msg_to_char(ch, "You can't get any good meat out of that.\r\n");
 	}
-	else if (!has_sharp_tool(ch)) {
-		msg_to_char(ch, "You need a sharp tool to butcher with.\r\n");
+	else if (!has_tool(ch, TOOL_KNIFE)) {
+		msg_to_char(ch, "You need to equip a good knife to butcher with.\r\n");
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse)) {
 		return;
@@ -641,7 +639,7 @@ ACMD(do_fish) {
 	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
-	else if (GET_EXTRA_ATT(ch, ATT_FISHING) <= 0) {
+	else if (!has_tool(ch, TOOL_FISHING)) {
 		msg_to_char(ch, "You aren't using any fishing equipment.\r\n");
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_FISH, NULL, NULL)) {

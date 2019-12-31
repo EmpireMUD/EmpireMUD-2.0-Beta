@@ -204,10 +204,11 @@ Usage:  harvest
 Speed boosts:  Faster Chores bonus, haste
 
 Allows you to harvest a crop. Be careful that you also replant some,
-otherwise you'll run out of that crop quickly. You must be wielding a slashing
-or slicing weapon (sword or axe) to harvest crops.
+otherwise you'll run out of that crop quickly. You must be using the right
+tool to harvest crops -- look for a sickle or identify other items to see if
+they can be used to harvest.
 
-See also: PLANT
+See also: IDENTIFY, PLANT
 #
 HERD HERDING
 

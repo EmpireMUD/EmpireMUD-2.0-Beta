@@ -355,6 +355,7 @@ OLC_MODULE(oedit_size);
 OLC_MODULE(oedit_storage);
 OLC_MODULE(oedit_text);
 OLC_MODULE(oedit_timer);
+OLC_MODULE(oedit_tools);
 OLC_MODULE(oedit_type);
 OLC_MODULE(oedit_uses);
 OLC_MODULE(oedit_value0);
@@ -944,6 +945,7 @@ const struct olc_command_data olc_data[] = {
 	{ "store", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "text", oedit_text, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "tools", oedit_tools, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "type", oedit_type, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "uses", oedit_uses, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value0", oedit_value0, OLC_OBJECT, OLC_CF_EDITOR },
