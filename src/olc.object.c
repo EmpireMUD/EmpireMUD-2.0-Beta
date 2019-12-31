@@ -3106,7 +3106,7 @@ OLC_MODULE(oedit_timer) {
 
 OLC_MODULE(oedit_tools) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	GET_OBJ_TOOL_FLAGS(obj) = olc_process_flag(ch, argument, "tool flags", "tools", tool_flags, GET_OBJ_TOOL_FLAGS(obj));
+	GET_OBJ_TOOL_FLAGS(obj) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, GET_OBJ_TOOL_FLAGS(obj));
 }
 
 
