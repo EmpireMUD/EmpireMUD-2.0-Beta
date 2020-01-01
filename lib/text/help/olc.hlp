@@ -4542,8 +4542,6 @@ Most applies are self-explanatory:
  RESIST-MAGICAL - magical damage reduction
  CRAFTING - bonus to craft level (unscaled)
  BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
- FISHING - speeds up fishing (at +40 will always fish instantly, based on the
-           "fishing_timer" config; unscaled)
 
 See also: OLC OBJECTS
 #d

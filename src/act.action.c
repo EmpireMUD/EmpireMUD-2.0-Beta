@@ -1595,7 +1595,7 @@ void process_fishing(char_data *ch) {
 		return;
 	}
 	
-	amt = GET_EXTRA_ATT(ch, ATT_FISHING) + (player_tech_skill_check(ch, PTECH_FISH, DIFF_MEDIUM) ? 2 : 0);
+	amt = (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20) + (player_tech_skill_check(ch, PTECH_FISH, DIFF_MEDIUM) ? 2 : 0);
 	GET_ACTION_TIMER(ch) -= MAX(1, amt);
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
