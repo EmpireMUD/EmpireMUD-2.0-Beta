@@ -82,6 +82,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR) && !has_tool(ch, TOOL_LOOM)) {
+		msg_to_char(ch, "You need a loom to do that.\r\n");
+	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SMELT)) {
 		msg_to_char(ch, "You can't %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
@@ -1060,6 +1063,10 @@ void process_gen_craft(char_data *ch) {
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_KNIFE) && !(weapon = has_tool(ch, TOOL_KNIFE))) {
 		msg_to_char(ch, "You need to be using a good knife to %s this.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		cancel_gen_craft(ch);
+	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR) && !has_tool(ch, TOOL_LOOM)) {
+		msg_to_char(ch, "You need a loom to keep weaving.\r\n");
 		cancel_gen_craft(ch);
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {

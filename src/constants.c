@@ -2553,7 +2553,7 @@ const char *tool_flags[] = {
 	"harvesting tool",
 	"knapper",
 	"knife",	// 5
-	"*loom",
+	"loom",
 	"mining tool",
 	"pan",
 	"*pottery wheel",

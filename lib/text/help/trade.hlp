@@ -125,6 +125,7 @@ Basic Crafts:
   raft
   bound wooden column
   saddle
+  backstrap loom
   violet dye  (glassblowing)
   orange dye  (glassblowing)
 
@@ -1174,6 +1175,7 @@ WEAVE
 
 Command:  weave [number] <item>
           weave info <item>
+Requires:  loom or tailor
 
 Weaving converts raw materials into cloth. You can weave anywhere, but it goes
 much faster at the tailor shop. Master Tailors can also weave faster.
@@ -1184,7 +1186,8 @@ Using the Sew ability:
   
 (Wool cloth and cotton cloth are used for the same things.)
 
-See also: SHEAR, RESOURCES, KEEP, RECIPES, CRAFT INFO, MASTER TAILOR
+See also: SHEAR, RESOURCES, KEEP, RECIPES, CRAFT INFO, LOOM, TAILOR, 
+  MASTER TAILOR
 #
 WOODWORKING "WOOD WORKING"
 

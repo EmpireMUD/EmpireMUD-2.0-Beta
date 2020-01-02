@@ -2476,7 +2476,7 @@ Available types are:
  BREW - potions
  MIX - poisons
  BUILD - used with the build command
- WEAVE
+ WEAVE - requires loom or tailor
  WORKFORCE - has specific code interactions, but no player command
  MANUFACTURE - for shipbuilding
 

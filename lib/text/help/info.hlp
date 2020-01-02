@@ -1400,7 +1400,7 @@ Types of tools are:
  &charvesting tool&0 - For harvesting.
  &cknapper&0 - For chipping flints.
  &cknife&0 - For skin, butcher, and some crafts.
- &cloom&0 - Unused.
+ &cloom&0 - Required to weave (if not at a tailor).
  &cmining tool&0 - For mining.
  &cpan&0 - To pan for gold.
  &cpottery wheel&0 - Unused.
