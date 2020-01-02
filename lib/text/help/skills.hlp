@@ -198,15 +198,16 @@ See also: DRAG, LEAD
 #
 HARVEST HARVESTING
 
-Harvest (Primitive Crafts ability)
+Harvest (Scavenging ability)
 
 Usage:  harvest
 Speed boosts:  Faster Chores bonus, haste
+Tool type: sickle or scythe
 
 Allows you to harvest a crop. Be careful that you also replant some,
 otherwise you'll run out of that crop quickly. You must be using the right
-tool to harvest crops -- look for a sickle or identify other items to see if
-they can be used to harvest.
+tool to harvest crops -- you can craft a flint sickle or identify other items
+to see if they can be used to harvest.
 
 See also: IDENTIFY, PLANT
 #

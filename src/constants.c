@@ -2551,14 +2551,14 @@ const char *tool_flags[] = {
 	"harvesting tool",
 	"knapper",
 	"knife",	// 5
-	"loom",
+	"*loom",
 	"mining tool",
 	"pan",
-	"pottery wheel",
-	"quarrying tools",	// 10
-	"saw",
-	"sewing kit",
-	"shears",
+	"*pottery wheel",
+	"*quarrying tools",	// 10
+	"*saw",
+	"*sewing kit",
+	"*shears",
 	"shovel",
 	"staff",	// 15
 	"\n"

@@ -66,6 +66,7 @@ extern const char *size_types[];
 extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
+extern const char *tool_flags[];
 extern const char *wear_bits[];
 
 // external functions
@@ -3598,6 +3599,43 @@ SHOW(show_terrain) {
 }
 
 
+SHOW(show_tools) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj, *next_obj;
+	size_t size;
+	int type;
+	
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show tools <type>\r\n");
+		msg_to_char(ch, "See: HELP TOOL FLAGS\r\n");
+	}
+	else if ((type = search_block(argument, tool_flags, FALSE)) == NOTHING) {
+		msg_to_char(ch, "Unknown tool type '%s' (see HELP TOOL FLAGS).\r\n", arg);
+	}
+	else {
+		// preamble
+		size = snprintf(buf, sizeof(buf), "Types of %s:\r\n", tool_flags[type]);
+		
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (size >= sizeof(buf)) {
+				break;	// overflow
+			}
+			if (!TOOL_FLAGGED(obj, BIT(type))) {
+				continue;	// wrong type
+			}
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_unlearnable) {
 	struct progress_perk *perk, *next_perk;
 	craft_data *craft, *next_craft;
@@ -5398,7 +5436,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
-	extern const char *tool_flags[];
 	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
@@ -9032,6 +9069,7 @@ ACMD(do_show) {
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },
+		{ "tools", LVL_START_IMM, show_tools },
 		{ "shops", LVL_START_IMM, show_shops },
 		{ "piles", LVL_CIMPL, show_piles },
 		{ "progress", LVL_START_IMM, show_progress },

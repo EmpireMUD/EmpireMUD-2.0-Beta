@@ -339,6 +339,7 @@ Deadly Weapons:
   horsemans pick
   kris
   maul
+  reaping scythe
   claymore (two-handed)
 
 Ship Weapons:
@@ -433,12 +434,14 @@ With the basic Forge skill, you can create:
   nails (x4)
   imperium spike (x3)
   nocturnium spike (x3)
-  hammer
+  hammer -- for forging
+  knife -- for skinning, butchering, and crafting
   woodsman axe -- for chopping
   short sword -- basic weapon
   pick -- for mining
   shovel -- dig faster
   pan -- pan for gold
+  sickle -- used for harvesting
   mirror
   coin mill
   anchor -- used on ships
@@ -587,6 +590,7 @@ Iron Blades:
   mace
   pickaxe
   pike
+  iron sickle
 
 Tools:
   iron hammer
@@ -815,6 +819,7 @@ Primitive crafts:
   stone axe
   stone hammer
   spear
+  flint sickle
   fire sticks (for lighting torches and fires)
 
 This ability also allows you to:
@@ -1158,6 +1163,7 @@ Weaponcrafting:
   bronze spear
   bronze axe
   bronze mace
+  bronze scythe
 
 Weaponcrafting -> Iron Blades -> Deadly Weapons
 

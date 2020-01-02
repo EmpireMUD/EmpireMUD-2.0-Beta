@@ -5260,8 +5260,22 @@ Usage:  .tools [add | remove] <flags>
 Tool flags allow an object to be used for various tasks.
 
 Available tool flags:
- &cPAN&0 - for the 'pan' command
- &cSTAFF&0 - counts as a staff for certain magical abilities
+ &caxe&0 - For chopping trees.
+ &cfishing tool&0 - For the fish command.
+ &chammer&0 - For forging.
+ &charvesting tool&0 - For harvesting.
+ &cknapper&0 - For chipping flints.
+ &cknife&0 - For skin, butcher, and some crafts.
+ &cloom&0 - Unused.
+ &cmining tool&0 - For mining.
+ &cpan&0 - To pan for gold.
+ &cpottery wheel&0 - Unused.
+ &cquarrying tools&0 - Unused.
+ &csaw&0 - Unused.
+ &csewing kit&0 - Unused.
+ &cshears&0 - Unused.
+ &cshovel&0 - For excavating, and to speed up digging.
+ &cstaff&0 - For Staff Mastery or other staff-related abilities.
 
 See also: OLC OBJECTS
 #d
