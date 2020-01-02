@@ -1049,6 +1049,7 @@ See also: CRAFT, FORGE
 "SKIN COMMAND" SKINNING
 
 Usage:  skin <corpse>
+Tool:  knife
 
 You can skin a fresh corpse to get usable material, which can later be turned
 into good equipment. Some corpses cannot be skinned, especially severely

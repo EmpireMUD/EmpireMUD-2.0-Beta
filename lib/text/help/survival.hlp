@@ -17,6 +17,7 @@ See also: SCAVENGING, ROLE, SKILL, SKILL SYNERGY
 BUTCHER
 
 Usage:  butcher <corpse>
+Tool:  knife
 
 With a little practice, you can butcher a corpse into smaller cuts of meat.
 This command succeeds about 60% of the time unskilled, and 100% of the time

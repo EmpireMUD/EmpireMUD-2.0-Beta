@@ -40,15 +40,17 @@ Bathe is used to begin cleaning yourself in either a bath house or a river.
 You must bathe regularly to keep clean. If you bathe in a bath house you will
 get cleaner faster than if you were to bathe in a river.
 #
-CHIP
+CHIP KNAPPER KNAPPING "FLINT KNAPPING"
 
 Chip (Primitive Crafts ability)
 
 Usage:  chip <item>
 Speed boosts:  Faster Chores bonus
+Tool: knapper
 
 This lets you chip a flint down to a sharper, more refined tool. You need to be
-wielding a rock or other hammer to do this.
+using a knapping tool (even just a simple rock). Identify a tool to see if it's
+a knapper.
 
 If you keep chipping, you can make a handaxe. You can chip this again to make
 a spear head.
@@ -196,7 +198,7 @@ Example:
 
 See also: DRAG, LEAD
 #
-HARVEST HARVESTING
+HARVEST HARVESTING SICKLE SCYTHE
 
 Harvest (Scavenging ability)
 

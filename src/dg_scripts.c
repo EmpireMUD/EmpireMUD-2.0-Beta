@@ -192,6 +192,7 @@ int find_eq_pos_script(char *arg) {
 		{ "ranged", WEAR_RANGED },
 		{ "hold", WEAR_HOLD },
 		{ "held", WEAR_HOLD },
+		{ "tool", WEAR_TOOL },
 		{ "shared", WEAR_SHARE },
 		{ "none", NO_WEAR }
 	};

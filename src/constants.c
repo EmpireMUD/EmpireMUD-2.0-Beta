@@ -2121,6 +2121,7 @@ const char *wear_keywords[] = {
 	"\r!",	// wield
 	"\r!",	// ranged
 	"\r!",	// hold
+	"\r!",	// tool
 	"\r!",	// share
 	"\n"
 };
@@ -2151,6 +2152,7 @@ const struct wear_data_type wear_data[NUM_WEARS] = {
 	{ "         <wielded> ", "wield", ITEM_WEAR_WIELD, 	TRUE, 2.0, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p.", TRUE, TRUE },
 	{ "          <ranged> ", "ranged", ITEM_WEAR_RANGED, TRUE, 0, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p.", TRUE, TRUE },
 	{ "            <held> ", "hold", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p.", TRUE, TRUE },
+	{ "            <tool> ", "tool", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already using $p.", "$n equips $p.", "You equip $p.", TRUE, FALSE },
 	{ "          (shared) ", "shared", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already sharing $p.", "$n shares $p.", "You share $p.", FALSE, FALSE }
 };
 
@@ -2215,7 +2217,7 @@ const char *wear_bits[] = {
 };
 
 
-// ITEM_WEAR_x - position importance, for item scaling
+// ITEM_WEAR_x, WEAR_POS_x - position importance, for item scaling
 const int wear_significance[] = {
 	WEAR_POS_MINOR,	// take
 	WEAR_POS_MINOR,	// finger

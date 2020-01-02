@@ -1634,7 +1634,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_BOOK  28	// tied to the book/library system
 
 
-// Take/Wear flags -- where an item can be worn
+// ITEM_WEAR_x: Take/Wear flags -- where an item can be worn
 // NOTE: Don't confuse these with the actual wear locations (WEAR_x)
 #define ITEM_WEAR_TAKE  BIT(0)	// a. Item can be taken
 #define ITEM_WEAR_FINGER  BIT(1)	// b. Can be worn on finger
@@ -1788,8 +1788,9 @@ typedef struct vehicle_data vehicle_data;
 #define WEAR_WIELD  19
 #define WEAR_RANGED  20
 #define WEAR_HOLD  21
-#define WEAR_SHARE  22
-#define NUM_WEARS  23	/* This must be the # of eq positions!! */
+#define WEAR_TOOL  22
+#define WEAR_SHARE  23
+#define NUM_WEARS  24	/* This must be the # of eq positions!! */
 
 
 // for item scaling based on wear flags
@@ -3264,7 +3265,7 @@ struct archetype_skill {
 
 
 struct archetype_gear {
-	int wear;	// WEAR_x, -1 == inventory
+	int wear;	// WEAR_, -1 == inventory
 	obj_vnum vnum;
 	struct archetype_gear *next;
 };
@@ -3286,7 +3287,7 @@ struct augment_data {
 	char *name;	// descriptive text
 	int type;	// AUGMENT_x
 	bitvector_t flags;	// AUG_x flags
-	bitvector_t wear_flags;	// ITEM_WEAR_x where this augment applies
+	bitvector_t wear_flags;	// ITEM_WEAR_ where this augment applies
 	
 	any_vnum ability;	// required ability or NO_ABIL
 	obj_vnum requires_obj;	// required item or NOTHING
@@ -4296,11 +4297,11 @@ struct toggle_data_type {
 };
 
 
-// WEAR_x data for each equipment slot
+// WEAR_ data for each equipment slot
 struct wear_data_type {
 	char *eq_prompt;	// shown on 'eq' list
 	char *name;	// display name
-	bitvector_t item_wear;	// matching ITEM_WEAR_x
+	bitvector_t item_wear;	// matching ITEM_WEAR_
 	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
 	double gear_level_mod;	// modifier (slot significance) when counting gear level
 	int cascade_pos;	// for ring 1 -> ring 2; use NO_WEAR if it doesn't cascade

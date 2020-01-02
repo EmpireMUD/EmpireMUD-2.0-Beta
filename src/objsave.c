@@ -82,7 +82,7 @@ void ensure_safe_obj(obj_data *obj) {
 *
 * @param FILE *fl The open item file.
 * @param obj_vnum vnum The vnum of the item being loaded, or NOTHING for non-prototyped item.
-* @param int *location A place to bind the current WEAR_x position of the item; also used to track container contents.
+* @param int *location A place to bind the current WEAR_ position of the item; also used to track container contents.
 * @param char_data *notify Optional: A person to notify if an item is updated (NULL for none).
 * @return obj_data* The loaded item, or NULL if it's not available.
 */
@@ -639,7 +639,7 @@ void extract_all_items(char_data *ch) {
 * This code seeks to autoequip the character with an item from the crash file,
 * rather than loading all items into inventory like a stock CircleMUD.
 *
-* The 'location' parameter is a WEAR_x flag + 1 (the +1 is because 0 is
+* The 'location' parameter is a WEAR_ flag + 1 (the +1 is because 0 is
 * special-cased in the autoequip code we used).
 *
 * This function formerly checked if the object was wearable in the position
