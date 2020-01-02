@@ -385,7 +385,7 @@ obj_data *has_tool(char_data *ch, bitvector_t flags) {
 	int iter;
 	
 	// list of valid slots (in order of priority; terminate with -1
-	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
 	
 	for (iter = 0; slots[iter] != -1; ++iter) {
 		tool = GET_EQ(ch, slots[iter]);
