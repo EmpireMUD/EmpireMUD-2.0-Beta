@@ -534,6 +534,7 @@ void cancel_movement_string(char_data *ch) {
 */
 void start_chopping(char_data *ch) {
 	char buf[MAX_STRING_LENGTH], weapon[MAX_STRING_LENGTH];
+	obj_data *tool;
 	
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
@@ -549,11 +550,11 @@ void start_chopping(char_data *ch) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, config_get_int("chop_timer"));
 		}
 		
-		if (GET_EQ(ch, WEAR_WIELD)) {
-			strcpy(weapon, GET_OBJ_SHORT_DESC(GET_EQ(ch, WEAR_WIELD)));
+		if ((tool = has_tool(ch, TOOL_AXE))) {
+			strcpy(weapon, GET_OBJ_SHORT_DESC(tool));
 		}
 		else {
-			strcpy(weapon, "axe");
+			strcpy(weapon, "your axe");
 		}
 		
 		snprintf(buf, sizeof(buf), "You swing back %s and prepare to chop...", weapon);
