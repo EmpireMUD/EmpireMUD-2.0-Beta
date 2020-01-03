@@ -776,29 +776,31 @@ INTERACTION_FUNC(tame_interact) {
 
 // CRAFT_TYPE_x
 struct gen_craft_data_t gen_craft_data[] = {
-	{ "error", "erroring", NOBITS, { "", "" } },	// dummy to require scmd
+	{ "error", "erroring", NOBITS, { "", "", "" } },	// dummy to require scmd
 	
 	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
-	{ "forge", "forging", NOBITS, { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
-	{ "craft", "crafting", NOBITS, { "You continue crafting the %s...", "$n continues crafting the %s..." } },
-	{ "cook", "cooking", ACTF_FAST_CHORES, { "You continue cooking the %s...", "$n continues cooking the %s..." } },
-	{ "sew", "sewing", NOBITS, { "You carefully sew the %s...", "$n carefully sews the %s..." } },
-	{ "mill", "milling", NOBITS, { "You grind the millstone, making %s...", "$n grinds the millstone, making %s..." } },
-	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion..." } },
-	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
+	// strings are { periodic message to ch, periodic message to room, long desc to room }
+	// - the messages may have one %s for the craft name. The long desc will automatically add a/an to the beginning of it.
+	{ "forge", "forging", NOBITS, { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!", "$n is forging %s." } },
+	{ "craft", "crafting", NOBITS, { "You continue crafting the %s...", "$n continues crafting the %s...", "$n is crafting %s." } },
+	{ "cook", "cooking", ACTF_FAST_CHORES, { "You continue cooking the %s...", "$n continues cooking the %s...", "$n is cooking %s." } },
+	{ "sew", "sewing", NOBITS, { "You carefully sew the %s...", "$n carefully sews the %s...", "$n is sewing %s." } },
+	{ "mill", "milling", NOBITS, { "You grind the millstone, making %s...", "$n grinds the millstone, making %s...", "$n grinds the millstone, making %s." } },
+	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion...", "$n stirs a potion." } },
+	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison...", "$n stirs a bubbling poison." } },
 	
 	// build is special and doesn't use do_gen_craft, so doesn't really use this data
-	{ "build", "building", NOBITS, { "You work on the building...", "$n works on the building..." } },
+	{ "build", "building", NOBITS, { "You work on the building...", "$n works on the building...", "$n is working on the building." } },
 	
-	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
+	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s...", "$n is weaving %s." } },
 	
-	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n works on the %s..." } },	// not used by players
+	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
 	
-	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
-	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire..." } },
-	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s..." } },
+	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s...", "$n is manufacturing %s." } },
+	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire...", "$n is smelting %s." } },
+	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s...", "$n is working the press." } },
 	
-	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake..." } },
+	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake...", "$n is baking %s." } },
 };
 
 

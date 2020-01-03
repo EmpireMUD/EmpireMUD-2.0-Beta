@@ -849,6 +849,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
+	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
 	struct custom_message *ocm;
 	
 	// POS_x
@@ -931,11 +932,12 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			else if (!IS_NPC(i) && GET_ACTION(i) == ACT_GEN_CRAFT) {
 				// show crafting
 				craft_data *ctype = craft_proto(GET_ACTION_VNUM(i, 0));
-				if (ctype && strstr(gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_STRING_TO_ROOM], "%s")) {
-					sprintf(buf, gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_STRING_TO_ROOM], GET_CRAFT_NAME(ctype));
+				if (ctype && strstr(gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_LONG_DESC], "%s")) {
+					sprintf(buf1, "%s %s", AN(GET_CRAFT_NAME(ctype)), GET_CRAFT_NAME(ctype));
+					sprintf(buf, gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_LONG_DESC], buf1);
 				}
 				else if (ctype) {
-					strcpy(buf, gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_STRING_TO_ROOM]);
+					strcpy(buf, gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_LONG_DESC]);
 				}
 				else {
 					sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);

@@ -1015,6 +1015,7 @@ typedef struct vehicle_data vehicle_data;
 // for gen_craft_data[].strings
 #define GCD_STRING_TO_CHAR  0
 #define GCD_STRING_TO_ROOM  1
+#define GCD_LONG_DESC  2
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4207,7 +4208,7 @@ struct gen_craft_data_t {
 	char *command;	// "forge"
 	char *verb;	// "forging"
 	bitvector_t actf_flags;	// additional ACTF_ flags
-	char *strings[2];	// periodic message { to char, to room }
+	char *strings[3];	// periodic message { to char, to room }
 };
 
 
