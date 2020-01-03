@@ -1012,6 +1012,10 @@ typedef struct vehicle_data vehicle_data;
 #define FIND_BUILD_NORMAL  0
 #define FIND_BUILD_UPGRADE  1
 
+// for gen_craft_data[].strings
+#define GCD_STRING_TO_CHAR  0
+#define GCD_STRING_TO_ROOM  1
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// CROP DEFINES ////////////////////////////////////////////////////////////

@@ -40,6 +40,7 @@ extern struct city_metadata_type city_type[];
 extern const char *class_role[];
 extern const char *class_role_color[];
 extern const char *dirs[];
+extern struct gen_craft_data_t gen_craft_data[];
 extern struct help_index_element *help_table;
 extern const char *item_types[];
 extern int top_of_helpt;
@@ -927,7 +928,21 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			if (GET_SITTING_ON(i)) {
 				sprintf(buf, "$n is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
+			else if (!IS_NPC(i) && GET_ACTION(i) == ACT_GEN_CRAFT) {
+				// show crafting
+				craft_data *ctype = craft_proto(GET_ACTION_VNUM(i, 0));
+				if (ctype && strstr(gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_STRING_TO_ROOM], "%s")) {
+					sprintf(buf, gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_STRING_TO_ROOM], GET_CRAFT_NAME(ctype));
+				}
+				else if (ctype) {
+					strcpy(buf, gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_STRING_TO_ROOM]);
+				}
+				else {
+					sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
+				}
+			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
+				// show non-crafting action
 				sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
 			}
 			else if (AFF_FLAGGED(i, AFF_DEATHSHROUD) && GET_POS(i) <= POS_RESTING) {

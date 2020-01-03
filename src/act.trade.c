@@ -774,11 +774,6 @@ INTERACTION_FUNC(tame_interact) {
 #define SOUP_TIMER  336  // hours
 
 
-// for gen_craft_data[].strings
-#define GCD_STRING_TO_CHAR  0
-#define GCD_STRING_TO_ROOM  1
-
-
 // CRAFT_TYPE_x
 struct gen_craft_data_t gen_craft_data[] = {
 	{ "error", "erroring", NOBITS, { "", "" } },	// dummy to require scmd
@@ -797,7 +792,7 @@ struct gen_craft_data_t gen_craft_data[] = {
 	
 	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
 	
-	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n work on the %s..." } },	// not used by players
+	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n works on the %s..." } },	// not used by players
 	
 	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
 	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire..." } },
