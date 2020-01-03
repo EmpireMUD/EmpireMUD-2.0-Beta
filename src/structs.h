@@ -817,6 +817,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_FISHING  BIT(34)	// workforce can fish here
 #define FNC_STORE_ALL BIT(35) // anything can be stored here (does not allow retrieval)
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
+#define FNC_OVEN  BIT(37)	// for cooking
 
 // These function flags don't work on movable vehicles (they require room data)
 #define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
@@ -981,6 +982,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_MANUFACTURE  11
 #define CRAFT_TYPE_SMELT  12
 #define CRAFT_TYPE_PRESS  13
+#define CRAFT_TYPE_BAKE  14
 
 
 // CRAFT_x: Craft Flags for do_gen_craft

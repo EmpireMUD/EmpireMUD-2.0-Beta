@@ -2023,6 +2023,7 @@ Available functions:
  FISHING - workforce can fish here (also need fish interaction)
  STORE-ALL - any regular storable item can be stored (but not retrieved)
  &yIN-CITY-ONLY&0 - all function flags only work when in a city
+ OVEN - allows baking
  
 &r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
 buildings and stationary vehicles.
@@ -2479,6 +2480,7 @@ Available types are:
  WEAVE - requires loom or tailor
  WORKFORCE - has specific code interactions, but no player command
  MANUFACTURE - for shipbuilding
+ BAKE - requires a bakery or oven
 
 Note: The SOUP and VEHICLE craft flags both also modify the recipe.
 

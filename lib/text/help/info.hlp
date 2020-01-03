@@ -60,7 +60,7 @@ messages for starting and stopping the action, plus any resources you get.
 The following things will speed up various chores:
 - Faster chores (bonus): dig, gather, chop, build, dismantle, harvest, plant,
    mine, mint, repair, chip, excavate, pick, scrape, fillin, saw, quarry, tan,
-   cook, smelt, burning stumps
+   cook, smelt, burning stumps, bake
 - Faster walking: run
 - Finder: dig, gather, pan, pick
 - Haste: dig, gather, chop, build, dismantle, harvest, plant, mine, repair,
@@ -337,7 +337,8 @@ See also: SCORE
 "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
 You can create a cooking fire by lighting a tree or log, using fire sticks.
-This will let you cook food, brew potions, or craft pottery.
+This will let you cook food, brew potions, or craft pottery. However, you can't
+bake with it.
 
 You can also cook in a Kitchen, Alchemist, Potter, or Laboratory. If you have
 the Touch of Flame ability, you don't need a fire at all.

@@ -1625,6 +1625,7 @@ const char *craft_types[] = {
 	"MANUFACTURE",
 	"SMELT",
 	"PRESS",
+	"BAKE",
 	"\n"
 };
 
@@ -3050,6 +3051,7 @@ const char *function_flags[] = {
 	"FISHING",
 	"STORE-ALL", // 35
 	"IN-CITY-ONLY",
+	"OVEN",
 	"\n"
 };
 

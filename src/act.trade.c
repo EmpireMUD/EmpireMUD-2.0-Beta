@@ -88,6 +88,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SMELT)) {
 		msg_to_char(ch, "You can't %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_BAKE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_OVEN)) {
+		msg_to_char(ch, "You need an oven to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	}
 	
 	// flag checks
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
@@ -799,6 +802,8 @@ struct gen_craft_data_t gen_craft_data[] = {
 	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
 	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire..." } },
 	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s..." } },
+	
+	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake..." } },
 };
 
 

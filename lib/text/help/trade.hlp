@@ -219,9 +219,11 @@ Command:  cook [number] <item>
 
 Speed boosts:  Faster Chores bonus
 
-The cook command (formerly "bake") allows you to make food from a variety of
-raw ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
+The bake and cook commandas allow you to make food from a variety of raw
+ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
 a bakery, an alchemist, or a laboratory. The Touch of Flame ability also works.
+However, to bake anything, you'll need a kitchen, bakery, or another type of
+full-sized oven.
 Many basic cooked foods also give you small food buffs (see WELL-FED).
 
 You can cook:
@@ -262,7 +264,7 @@ All crafting abilities train when you finish recipes that require them.
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, RECIPES, POTTERY,
 PRIMITIVE CRAFTS, WOODWORKING
 #
-"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO"
+"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO"
 
 Usage:  <verb> info <recipe name>
 
@@ -366,7 +368,8 @@ See also: CRAFT, LAND VEHICLES
 Family Recipes (Trade ability)
 
 Usage:  cook [number] <recipe>
-Requirements:  cooking fire, sharp tool
+        bake [number] <recipe>
+Requirements:  cooking fire, bakery, sharp tool
 
 You can use old family recipes to create buff foods -- foods that give you an
 effect for a while after you eat them. These foods are bind-on-pickup, so only
