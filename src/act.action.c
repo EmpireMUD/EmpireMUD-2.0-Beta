@@ -1049,15 +1049,25 @@ void perform_saw(char_data *ch) {
 	ACMD(do_saw);
 	
 	char buf[MAX_STRING_LENGTH];
-	bool success = FALSE;
-	obj_data *proto;
+	bool success = FALSE, room = FALSE;
+	obj_data *proto, *saw;
 	
+	// check both of these because they both have bonuses
+	room = room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW);
+	saw = has_tool(ch, TOOL_SAW);
+	
+	if (!room && !saw) {
+		msg_to_char(ch, "You need to use a saw of some kind to do that.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to finish sawing.\r\n");
 		cancel_action(ch);
 		return;
 	}
 	
+	// ok, message:
 	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
 		msg_to_char(ch, "You saw %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 	}
@@ -1065,6 +1075,10 @@ void perform_saw(char_data *ch) {
 	// base
 	GET_ACTION_TIMER(ch) -= 1;
 	
+	// faster at a lumber mill OR if the tool is superior, and with the ptech
+	if (room || (saw && OBJ_FLAGGED(saw, OBJ_SUPERIOR))) {
+		GET_ACTION_TIMER(ch) -= 1;
+	}
 	if (has_player_tech(ch, PTECH_FAST_WOOD_PROCESSING)) {
 		GET_ACTION_TIMER(ch) -= 1;
 	}
@@ -3276,7 +3290,7 @@ ACMD(do_quarry) {
 
 
 ACMD(do_saw) {
-	obj_data *obj;
+	obj_data *obj, *saw;
 
 	one_argument(argument, arg);
 
@@ -3290,19 +3304,10 @@ ACMD(do_saw) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW)) {
-		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
+	else if (!(saw = has_tool(ch, TOOL_SAW)) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW)) {
+		msg_to_char(ch, "You need to use a saw of some kind to do that.\r\n");
 	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "You can only saw in this building if it's in a city.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Complete the building first.\r\n");
-	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	else if (!saw && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to saw here.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
@@ -3321,7 +3326,9 @@ ACMD(do_saw) {
 		msg_to_char(ch, "It's too dark to saw anything here.\r\n");
 	}
 	else {
-		start_action(ch, ACT_SAWING, 8);
+		// TODO: move the timer here to a config; timer is halved if there's a
+		// SAW function or TOOL_SAW, and halves again if there's a ptech
+		start_action(ch, ACT_SAWING, 16);
 		
 		// store the item that was used
 		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));

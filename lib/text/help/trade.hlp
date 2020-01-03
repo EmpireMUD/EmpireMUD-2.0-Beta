@@ -443,6 +443,7 @@ With the basic Forge skill, you can create:
   shovel -- dig faster
   pan -- pan for gold
   sickle -- used for harvesting
+  saw -- for sawing lumber
   mirror
   coin mill
   anchor -- used on ships
@@ -452,7 +453,7 @@ It also allows you to smelt bronze ingots from tin and copper.
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
-  DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES
+  DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES, SAW
 #
 "FREE ACTIONS" "CLEAR TERRAIN" "TIDY UP" "SCOUT AREA" "BLOCK WATER" ENGRAVE "MAGIC WORDS" ORGANIZE "SHOVEL SOOT"
 

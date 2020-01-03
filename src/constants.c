@@ -2558,7 +2558,7 @@ const char *tool_flags[] = {
 	"pan",
 	"*pottery wheel",
 	"*quarrying tools",	// 10
-	"*saw",
+	"saw",
 	"*sewing kit",
 	"*shears",
 	"shovel",
