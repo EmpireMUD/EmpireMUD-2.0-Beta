@@ -2355,6 +2355,30 @@ Available flags:
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
+"CEDIT FULLSEARCH" "CRAFT FULLSEARCH"
+
+Usage:  .craft fullsearch -<field> <argument> <...>
+
+This command allows you to search for crafts matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the craft's name.
+
+Fields:
+  &c-type&0 - see HELP CEDIT TYPE
+  &c-flagged&0, &cunflagged&0 - see HELP CEDIT FLAGS
+  &c-level -levelover -levelunder&0 - specific level requirement
+  &c-quantity -quantityover -quantityunder&0 - specific quantity value
+  &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
+
+Examples:
+ > .craft fullsearch -type FORGE -levelover 1
+ > .craft fullsearch -type COOK -flagged FIRE
+ > .craft fullsearch -levelover 50 sword
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all crafts that require the 'Cook'
+ability, use ".abil search 293".
+#d
 "CEDIT LEVELREQUIRED" "CEDIT LEVEL REQUIRED"
 
 Usage:  .levelrequired <level>
@@ -5676,6 +5700,7 @@ See the individual help files such as OEDIT FULLSEARCH.
 Supported types:
   ability
   building (search designatable rooms with -flag ROOM)
+  craft
   mobile
   object
   progress
