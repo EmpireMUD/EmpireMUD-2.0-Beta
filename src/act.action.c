@@ -1067,11 +1067,6 @@ void perform_saw(char_data *ch) {
 		return;
 	}
 	
-	// ok, message:
-	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		msg_to_char(ch, "You saw %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
-	}
-	
 	// base
 	GET_ACTION_TIMER(ch) -= 1;
 	
@@ -1109,6 +1104,10 @@ void perform_saw(char_data *ch) {
 			// lather, rinse, rescrape
 			do_saw(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
+	}
+	else if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+		// message last, only if they didn't finish
+		msg_to_char(ch, "You saw %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 	}
 }
 
