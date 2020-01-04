@@ -5704,6 +5704,7 @@ Supported types:
   mobile
   object
   progress
+  room templates
   trigger
   vehicle
 #d
@@ -6357,6 +6358,30 @@ The following room template flags are available:
  !LOCATION - no location shown; disables "where"
 
 See also: OLC ROOM TEMPLATES
+#d
+"REDIT FULLSEARCH"
+
+Usage:  .r fullsearch -<field> <argument> <...>
+
+This command allows you to search for room templates matching certain criteria.
+You can specify multiple fields if you want. Any arguments that don't start
+with a dash (-) are matched to the template's title and other text.
+
+Fields:
+  &c-affects&0 - see HELP REDIT AFFECTS
+  &c-flagged -unflagged&0 - see HELP REDIT FLAGS
+  &c-functions&0 - see HELP REDIT FUNCTIONS
+  &c-interactions&0 - has a specific type, see HELP REDIT INTERACTION
+
+Examples:
+ > .r fullsearch -interactions DIG
+ > .r fullsearch -unflagged LIGHT -function FORGE
+ > .r fullsearch -flagged !MOB -flagged DARK
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all templates that spawn a certain mob
+vnum, use ".mob search 12345", which will search the spawns on all templates
+for that mob.
 #d
 "REDIT MATCHEXITS" "REDIT MATCH EXITS"
 

@@ -334,7 +334,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	size_t size;
 	
 	if (!*argument) {
-		msg_to_char(ch, "See HELP BEDIT FULLSEARCH for syntax.\r\n");
+		msg_to_char(ch, "See HELP CEDIT FULLSEARCH for syntax.\r\n");
 		return;
 	}
 	
