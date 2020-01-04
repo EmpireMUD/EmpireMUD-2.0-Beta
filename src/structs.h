@@ -1761,7 +1761,7 @@ typedef struct vehicle_data vehicle_data;
 #define TOOL_LOOM  BIT(6)	// g. allows the 'weave' command anywhere
 #define TOOL_MINING  BIT(7)	// h. required for the 'mine' command
 #define TOOL_PAN  BIT(8)	// i. required for 'pan' command
-#define TOOL_POTTERY_WHEEL  BIT(9)	// j. required for some pottery
+#define TOOL_GRINDING_STONE  BIT(9)	// j. mill without a mill building
 #define TOOL_QUARRYING  BIT(10)	// k. required for the 'quarry' command
 #define TOOL_SAW  BIT(11)	// l. used to 'saw' lumber
 #define TOOL_SEWING_KIT  BIT(12)	// m. required for 'sew' command

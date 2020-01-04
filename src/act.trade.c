@@ -70,8 +70,8 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	bool wait, room_wait;
 	
 	// type checks
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) {
-		msg_to_char(ch, "You need to be in a mill to do that.\r\n");
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !has_tool(ch, TOOL_GRINDING_STONE) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) {
+		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do that.\r\n");
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_PRESS)) {
 		msg_to_char(ch, "You need a press to do that.\r\n");
@@ -1046,6 +1046,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 void process_gen_craft(char_data *ch) {
 	obj_data *weapon = NULL;
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
+	bool has_mill = FALSE;
 	
 	if (!type) {
 		cancel_gen_craft(ch);
@@ -1071,6 +1072,10 @@ void process_gen_craft(char_data *ch) {
 		msg_to_char(ch, "You need a loom to keep weaving.\r\n");
 		cancel_gen_craft(ch);
 	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !(has_mill = room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) &&  !has_tool(ch, TOOL_GRINDING_STONE)) {
+		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do keep milling.\r\n");
+		cancel_gen_craft(ch);
+	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
@@ -1081,6 +1086,11 @@ void process_gen_craft(char_data *ch) {
 		// bonus point for superior tool -- if this craft requires a tool
 		if (weapon && OBJ_FLAGGED(weapon, OBJ_SUPERIOR)) {
 			GET_ACTION_TIMER(ch) -= 1;
+		}
+		
+		// mill penalty if using TOOL_GRINDING_STONE instead of FNC_MILL
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !has_mill && !number(0, 1)) {
+			GET_ACTION_TIMER(ch) += 1;	// PENALTY
 		}
 		
 		// tailor bonus for weave

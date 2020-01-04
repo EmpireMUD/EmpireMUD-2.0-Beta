@@ -281,13 +281,15 @@ Building:  (MM)  Mill  (must be by a river; Build ability)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>
+Tool:  grinding  stone
 
 You can mill:
   wheat into flour
   corn into cornmeal
   oats into oatmeal
 
-You must do this at a Mill building.
+You must do this at a Mill building or have a grinding stone equipped.
+However, it will take longer to do it without the building.
 
 See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES
 #

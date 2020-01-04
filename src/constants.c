@@ -2557,7 +2557,7 @@ const char *tool_flags[] = {
 	"loom",
 	"mining tool",
 	"pan",
-	"*pottery wheel",
+	"grinding stone",
 	"*quarrying tools",	// 10
 	"saw",
 	"*sewing kit",

@@ -350,6 +350,15 @@ Used for:  cooking
 
 See also: COMPONENT
 #
+"GRINDING STONE" "GRIND STONE" GRINDSTONE
+
+Usage:  mill <item>
+
+A grinding stone can be used to mill items without a full mill building. You
+can craft a simple grinding stone using Primitive Crafts.
+
+See also: MILL
+#
 HANDLE "HANDLE COMPONENT"
 
 Handle (component)
