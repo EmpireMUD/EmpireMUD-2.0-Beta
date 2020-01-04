@@ -4225,6 +4225,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "tool")) {
+						extern const char *tool_flags[];
+						obj_data *tool;
+						int tool_type;
+						if (subfield && *subfield && (tool_type = search_block(subfield, tool_flags, FALSE)) != NOTHING && (tool = has_tool(ch, BIT(tool_type)))) {
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(tool));
+						}
+						else {
+							strcpy(str, "");	// tool not found
+						}
+					}
 					break;
 				}
 				case 'u': {	// char.u*
