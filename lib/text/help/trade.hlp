@@ -223,30 +223,33 @@ The bake and cook commandas allow you to make food from a variety of raw
 ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
 a bakery, an alchemist, or a laboratory. The Touch of Flame ability also works.
 However, to bake anything, you'll need a kitchen, bakery, or another type of
-full-sized oven.
-Many basic cooked foods also give you small food buffs (see WELL-FED).
+full-sized oven. Many basic cooked foods also give you small food buffs
+(see WELL-FED).
 
 You can cook:
-  bean soup                              pumpkin pie (charisma)
-  fried meat pie (strength)              blackberry tart
-  apple pie (charisma)                   nutty squash flatbread (dodge)
-  peach pie (charisma)                   roast plate (resist-physical)
-  cherry pie (charisma)                  fish plate (wits)
-  candied apple                          catfish plate (intelligence)
-  casserole (inventory)                  roast meat
-  jerky (bonus-physical)                 banana pie (charisma)
-  tortilla                               banana bread (moves)
+  bean soup                              fried meat pie (strength)              
+  fish plate (wits)                      catfish plate (intelligence)
+  tortilla                               jerky (bonus-physical)                 
   burrito (resist-physical)              spicy jerky (bonus-magical)
-  bread (move-regen)                     potato slices
   fried rice (dexterity)                 prunes (age)
-  salt pork                              plum pie (charisma)
-  chicken and vegetables (health)        strawberry pie (charisma)
+  salt pork                              potato slices
+  chicken and vegetables (health)        orange chicken and pears
   ham and cheese sandwich (move-regen)   strawberry jam (mana-regen)
   fruit bowl                             candied mango
-  orange chicken and pears               blueberry pie (charisma)
   sausage link (to-hit)                  blueberry jam (mana)
   road biscuit (block)                   coffee
-  mushroom plate (resist-magical)        oat cake (bonus-healing)
+  candied apple                          mushroom plate (resist-magical)
+
+You can bake:
+  bread (move-regen)                     
+  apple pie (charisma)                   nutty squash flatbread (dodge)
+  peach pie (charisma)                   roast plate (resist-physical)
+  cherry pie (charisma)                  strawberry pie (charisma)
+  blueberry pie (charisma)               plum pie (charisma)
+  banana pie (charisma)                  banana bread (moves)
+  pumpkin pie (charisma)                 blackberry tart
+  casserole (inventory)                  roast meat
+  oat cake (bonus-healing)
 
 There are also more recipes to find.
 
@@ -375,13 +378,15 @@ You can use old family recipes to create buff foods -- foods that give you an
 effect for a while after you eat them. These foods are bind-on-pickup, so only
 the person who makes them can eat them.
 
-You can make the following family recipes:
-  berry cobbler (wits)                     hearty meatloaf (strength)
-  biscuits and gravy (move-regen)          jellied eels (dodge)
-  black sausage (to-hit)                   mom's pie (max-mana)
-  chicken and dumplings (intelligence)     pot roast (max-health)
-  chili (max-moves)                        shepherd's pie (dexterity)
+You can cook the following family recipes:
+  black sausage (to-hit)                   jellied eels (dodge)
+  pot roast (max-health)                   chili (max-moves)
   fish and chips (charisma)                stewed vegetables (mana-regen)
+  
+You can bake the following family recipes:
+  berry cobbler (wits)                     hearty meatloaf (strength)
+  biscuits and gravy (move-regen)          mom's pie (max-mana)
+  chicken and dumplings (intelligence)     shepherd's pie (dexterity)
 
 See also: BUFF FOOD, BOP, COOKING FIRE
 #

@@ -1054,6 +1054,16 @@ may happen on newbie islands:
 
 See also: INFO, GETTING STARTED
 #
+OVEN OVENS
+
+Command:  bake <item>
+
+You can bake some foods in ovens. Most kitchens, including the one you can
+designate in your house, have an oven. Things that require an oven can't be
+cooked on an ordinary cooking fire.
+
+See also: BAKE
+#
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
 EmpireMUD player-killing rules
