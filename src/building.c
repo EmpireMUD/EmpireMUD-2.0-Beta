@@ -34,6 +34,7 @@
 
 // locals
 void process_build(char_data *ch, room_data *room, int act_type);
+void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
@@ -808,6 +809,11 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 	// just emergency check that it's not actually dismantling
 	if (!IS_DISMANTLING(room) && BUILDING_RESOURCES(room)) {
 		if ((res = get_next_resource(ch, BUILDING_RESOURCES(room), can_use_room(ch, room, GUESTS_ALLOWED), TRUE, &found_obj))) {
+			// if maintaining, remove a "similar" item from the old built-with list -- this is what the maintaining item is replacing
+			if (act_type == ACT_MAINTENANCE && found_obj) {
+				remove_like_item_from_built_with(&GET_BUILT_WITH(room), found_obj);
+			}
+			
 			// take the item; possibly free the res
 			apply_resource(ch, res, &GET_BUILDING_RESOURCES(room), found_obj, APPLY_RES_BUILD, NULL, &GET_BUILT_WITH(room));
 			
@@ -958,6 +964,65 @@ void remove_designate_objects(room_data *room) {
 					extract_obj(o);
 				}
 			}
+		}
+	}
+}
+
+
+/**
+* This removes an earlier entry (with the same component type) in a built-with
+* list. This is called during maintenance so that the newly-added resource will
+* replace an older one. Call this BEFORE adding the new resource to built-with.
+*
+* @param struct resource_data **built_with The room's &GET_BUILT_WITH()
+* @param int cmp_type What type of component we're replacing.
+*/
+void remove_like_component_from_built_with(struct resource_data **built_with, int cmp_type) {
+	struct resource_data *iter, *next;
+	obj_data *proto;
+	
+	if (!built_with || !*built_with) {
+		return;	// no work
+	}
+	
+	LL_FOREACH_SAFE(*built_with, iter, next) {
+		if (iter->type == RES_OBJECT && (proto = obj_proto(iter->vnum)) && GET_OBJ_CMP_TYPE(proto) == cmp_type) {
+			iter->amount -= 1;
+			if (iter->amount <= 0) {
+				LL_DELETE(*built_with, iter);
+				free(iter);
+			}
+			break;	// only need 1
+		}
+	}
+}
+
+
+/**
+* This removes an earlier entry (with the same component type or vnum as obj)
+* in a built-with list. This is called during maintenance so that the newly-
+* added resource will replace an older one. Call this BEFORE adding the new
+* resource to built-with.
+*
+* @param struct resource_data **built_with The room's &GET_BUILT_WITH()
+* @param obj_data *obj The obj that will be added (for matching the thing to remove).
+*/
+void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj) {
+	struct resource_data *iter, *next;
+	obj_data *proto;
+	
+	if (!built_with || !*built_with || !obj) {
+		return;	// no work
+	}
+	
+	LL_FOREACH_SAFE(*built_with, iter, next) {
+		if (iter->type == RES_OBJECT && (iter->vnum == GET_OBJ_VNUM(obj) || ((proto = obj_proto(iter->vnum)) && GET_OBJ_CMP_TYPE(proto) == GET_OBJ_CMP_TYPE(obj)))) {
+			iter->amount -= 1;
+			if (iter->amount <= 0) {
+				LL_DELETE(*built_with, iter);
+				free(iter);
+			}
+			break;	// only need 1
 		}
 	}
 }
