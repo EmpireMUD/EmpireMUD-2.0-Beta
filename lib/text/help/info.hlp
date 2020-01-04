@@ -67,7 +67,7 @@ The following things will speed up various chores:
    play (music), excavate, pick, scrape, fillin, saw, quarry
 - Shovel: dig
 - Weapon damage: chop, mine
-- Superior tool: craft, forge
+- Superior tool: craft, forge, sew
 - Higher level tool: fish
 - Progression goals: excavate, prospect
 - Mastery abilities: forge, sew, crafts in general
@@ -1417,7 +1417,7 @@ Types of tools are:
  &cgrinding stone&0 - Allows milling anywhere, at a lower speed.
  &cquarrying tools&0 - Unused.
  &csaw&0 - Allows you to saw lumber anywhere.
- &csewing kit&0 - Unused.
+ &csewing kit&0 - Required to sew unless you're at a tailor.
  &cshears&0 - Unused.
  &cshovel&0 - For excavating, and to speed up digging.
  &cstaff&0 - For Staff Mastery or other staff-related abilities.

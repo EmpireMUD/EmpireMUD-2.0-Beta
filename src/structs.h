@@ -1764,7 +1764,7 @@ typedef struct vehicle_data vehicle_data;
 #define TOOL_GRINDING_STONE  BIT(9)	// j. mill without a mill building
 #define TOOL_QUARRYING  BIT(10)	// k. required for the 'quarry' command
 #define TOOL_SAW  BIT(11)	// l. used to 'saw' lumber
-#define TOOL_SEWING_KIT  BIT(12)	// m. required for 'sew' command
+#define TOOL_SEWING_KIT  BIT(12)	// m. required for 'sew' command unless at a tailor
 #define TOOL_SHEARS  BIT(13)	// n. required for shearing
 #define TOOL_SHOVEL  BIT(14)	// o. speeds digging and is required to 'excavate'
 #define TOOL_STAFF  BIT(15)	// p. counts as a staff (usually for magic)
