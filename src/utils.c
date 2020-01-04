@@ -3724,6 +3724,10 @@ bool has_keyword(char *string, const char *list[], bool exact) {
 bool isname(const char *str, const char *namelist) {
 	char *newlist, *curtok;
 	bool found = FALSE;
+	
+	if (!*str || !*namelist) {
+		return FALSE;	// shortcut
+	}
 
 	/* the easy way */
 	if (!str_cmp(str, namelist)) {
@@ -3791,7 +3795,7 @@ bool multi_isname(const char *arg, const char *namelist) {
 	char *ptr;
 	bool ok;
 	
-	if (!namelist || !*namelist) {
+	if (!*arg || !namelist || !*namelist) {
 		return FALSE;	// shortcut
 	}
 
