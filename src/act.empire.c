@@ -6593,6 +6593,7 @@ ACMD(do_roster) {
 
 
 ACMD(do_territory) {
+	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], *ptr;
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
@@ -6614,6 +6615,7 @@ ACMD(do_territory) {
 	}
 	
 	skip_spaces(&argument);
+	*search_str = *exclude_str = '\0';
 	
 	if (!emp) {
 		msg_to_char(ch, "You are not in an empire.\r\n");
@@ -6637,6 +6639,19 @@ ACMD(do_territory) {
 	}
 	else {
 		outside_only = *argument ? FALSE : TRUE;
+		
+		// process the argument into search_str, exclude_str
+		ptr = argument;
+		while (*ptr) {
+			ptr = any_one_word(ptr, arg);
+			
+			if (*arg == '-') {
+				sprintf(exclude_str + strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
+			}
+			else {
+				sprintf(search_str + strlen(search_str), "%s%s", *search_str ? " " : "", arg);
+			}
+		}
 	}
 	
 	// ready?
@@ -6658,19 +6673,19 @@ ACMD(do_territory) {
 		}
 		
 		// compare request
-		if (!*argument) {
+		if (!*search_str && !*exclude_str) {
 			ok = TRUE;
 		}
-		else if (multi_isname(argument, GET_SECT_NAME(SECT(iter)))) {
+		else if ((!*search_str || multi_isname(search_str, GET_SECT_NAME(SECT(iter)))) && !multi_isname(exclude_str, GET_SECT_NAME(SECT(iter)))) {
 			ok = TRUE;
 		}
-		else if (GET_BUILDING(iter) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(iter)))) {
+		else if (GET_BUILDING(iter) && (!*search_str || multi_isname(search_str, GET_BLD_NAME(GET_BUILDING(iter)))) && !multi_isname(exclude_str, GET_BLD_NAME(GET_BUILDING(iter)))) {
 			ok = TRUE;
 		}
-		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(argument, GET_CROP_NAME(crop))) {
+		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && (!*search_str || multi_isname(search_str, GET_CROP_NAME(crop))) && !multi_isname(exclude_str, GET_CROP_NAME(crop))) {
 			ok = TRUE;
 		}
-		else if (multi_isname(argument, get_room_name(iter, FALSE))) {
+		else if ((!*search_str || multi_isname(search_str, get_room_name(iter, FALSE))) && !multi_isname(exclude_str, get_room_name(iter, FALSE))) {
 			ok = TRUE;
 		}
 		else {
