@@ -992,7 +992,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
 #define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
 #define CRAFT_ALCHEMY  BIT(5)  // requires access to glass/alchemist and fire
-#define CRAFT_KNIFE  BIT(6)  // requires 'knife' tool
+	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)
 #define CRAFT_FIRE  BIT(7)  // requires any fire source
 #define CRAFT_SOUP  BIT(8)  // is a soup: requires a container of water, and the "object" property is a liquid id
 #define CRAFT_IN_DEVELOPMENT  BIT(9)	// craft cannot be performed by mortals

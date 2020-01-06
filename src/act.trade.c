@@ -104,9 +104,6 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER | CRAFT_SHIPYARD | CRAFT_GLASSBLOWER)) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_KNIFE) && !has_tool(ch, TOOL_KNIFE)) {
-		msg_to_char(ch, "You need to be using a good knife to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_APIARIES) && !has_tech_available(ch, TECH_APIARIES)) {
 		// message sent for us
 	}
@@ -702,11 +699,6 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Requires: %s\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 	}
 	
-	if (GET_CRAFT_REQUIRES_TOOL(craft)) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, part);
-		msg_to_char(ch, "Requires tool%s: %s\r\n", (count_bits(GET_CRAFT_REQUIRES_TOOL(craft)) != 1) ? "s" : "", part);
-	}
-	
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
 		sprintf(buf, "%s", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
 		if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
@@ -720,6 +712,11 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	
 	if (GET_CRAFT_MIN_LEVEL(craft) > 0) {
 		msg_to_char(ch, "Requires: crafting level %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
+	}
+	
+	if (GET_CRAFT_REQUIRES_TOOL(craft)) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, part);
+		msg_to_char(ch, "Requires tool%s: %s\r\n", (count_bits(GET_CRAFT_REQUIRES_TOOL(craft)) != 1) ? "s" : "", part);
 	}
 	
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
@@ -1065,7 +1062,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 * @param char_data *ch The actor.
 */
 void process_gen_craft(char_data *ch) {
-	obj_data *weapon = NULL;
+	obj_data *weapon = NULL, *tool = NULL;
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
 	bool has_mill = FALSE;
 	
@@ -1085,10 +1082,6 @@ void process_gen_craft(char_data *ch) {
 		// can_forge sends its own message
 		cancel_gen_craft(ch);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_KNIFE) && !(weapon = has_tool(ch, TOOL_KNIFE))) {
-		msg_to_char(ch, "You need to be using a good knife to %s this.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-		cancel_gen_craft(ch);
-	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SEW && !(weapon = has_tool(ch, TOOL_SEWING_KIT)) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR)) {
 		msg_to_char(ch, "You need to equip a sewing kit to sew this, or sew it at a tailor.\r\n");
 		cancel_gen_craft(ch);
@@ -1105,7 +1098,7 @@ void process_gen_craft(char_data *ch) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
 	}
-	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type)))) {
 		msg_to_char(ch, "You aren't using the right tool to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	}
 	else {
@@ -1113,6 +1106,9 @@ void process_gen_craft(char_data *ch) {
 
 		// bonus point for superior tool -- if this craft requires a tool
 		if (weapon && OBJ_FLAGGED(weapon, OBJ_SUPERIOR)) {
+			GET_ACTION_TIMER(ch) -= 1;
+		}
+		else if (tool && OBJ_FLAGGED(tool, OBJ_SUPERIOR)) {
 			GET_ACTION_TIMER(ch) -= 1;
 		}
 		

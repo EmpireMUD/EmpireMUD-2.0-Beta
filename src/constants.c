@@ -1569,7 +1569,7 @@ const char *craft_flags[] = {
 	"GLASSBLOWER",
 	"CARPENTER",
 	"ALCHEMY",
-	"KNIFE",
+	"*",	// formerly sharp-tool
 	"FIRE",
 	"SOUP",
 	"IN-DEVELOPMENT",
@@ -1593,7 +1593,7 @@ const char *craft_flag_for_info[] = {
 	"requires glassblower building",
 	"requires carpenter building",
 	"alchemy",
-	"requires a knife",
+	"",
 	"requires fire",
 	"",	// soup
 	"",	// in-dev

@@ -372,7 +372,7 @@ Family Recipes (Trade ability)
 
 Usage:  cook [number] <recipe>
         bake [number] <recipe>
-Requirements:  cooking fire, bakery, sharp tool
+Requirements:  cooking fire, bakery, knife
 
 You can use old family recipes to create buff foods -- foods that give you an
 effect for a while after you eat them. These foods are bind-on-pickup, so only

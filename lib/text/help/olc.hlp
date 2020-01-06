@@ -2338,7 +2338,6 @@ Available flags:
  GLASSBLOWER - requires being at an actual glassblower building
  CARPENTER - requires being at a carpenter building
  ALCHEMY - requires cooking fire and glassblowing tech, or alchemist/laboratory
- SHARP-TOOL - requires a sharp tool in the wield slot
  FIRE - requires cooking fire
  SOUP - requires a container of water and creates a liquid instead of an item
  IN-DEVELOPMENT - only immortals can use this recipe
@@ -2480,8 +2479,8 @@ potter's hut.
 All crafting times are cut in half for players with the matching mastery
 ability.
 
-All crafting times are cut in half if they require a hammer or sharp tool,
-and that tool is marked (superior).
+All crafting times are cut in half if the craft type requires a tool (hammer
+to forge, sewing kit to sew), and that tool is marked (superior).
 
 See also: CEDIT FLAGS, CEDIT MASTERY, CEDIT TYPE, OLC CRAFTS
 #d
