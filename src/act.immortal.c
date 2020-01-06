@@ -5223,6 +5223,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
 	
+	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
+	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
+	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 		sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, buf, TRUE);
 		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
