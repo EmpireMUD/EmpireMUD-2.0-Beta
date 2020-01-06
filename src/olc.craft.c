@@ -377,7 +377,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	
 	// okay now look up crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (only_type != NOBITS && GET_CRAFT_TYPE(craft) != only_type) {
+		if (only_type != NOTHING && GET_CRAFT_TYPE(craft) != only_type) {
 			continue;
 		}
 		if (not_flagged != NOBITS && IS_SET(GET_CRAFT_FLAGS(craft), not_flagged)) {
