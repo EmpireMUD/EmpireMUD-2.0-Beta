@@ -3349,7 +3349,7 @@ ACMD(do_toggle) {
 	else {
 		// check for optional on/off arg
 		if (!str_cmp(argument, "on")) {
-			if (IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) {
+			if ((toggle_data[type].type == TOG_ONOFF && IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) || (toggle_data[type].type == TOG_OFFON && !IS_SET(PRF_FLAGS(ch), toggle_data[type].bit))) {
 				msg_to_char(ch, "That toggle is already on.\r\n");
 				return;
 			}
@@ -3362,7 +3362,7 @@ ACMD(do_toggle) {
 			}
 		}
 		else if (!str_cmp(argument, "off")) {
-			if (!IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) {
+			if ((toggle_data[type].type == TOG_ONOFF && !IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) || (toggle_data[type].type == TOG_OFFON && IS_SET(PRF_FLAGS(ch), toggle_data[type].bit))) {
 				msg_to_char(ch, "That toggle is already off.\r\n");
 				return;
 			}
