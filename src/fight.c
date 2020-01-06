@@ -1202,15 +1202,15 @@ void death_restore(char_data *ch) {
 	GET_MANA(ch) = MAX(1, GET_MAX_MANA(ch) / 4);
 	GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 4) : GET_MAX_BLOOD(ch);
 	
-	// conditions restore
-	if (GET_COND(ch, FULL) > 0) {
-		GET_COND(ch, FULL) = 0;
+	// conditions: drunk goes away, but you become hungry/thirsty (by half)
+	if (GET_COND(ch, FULL) >= 0) {
+		GET_COND(ch, FULL) =  MAX_CONDITION / 2;
 	}
 	if (GET_COND(ch, DRUNK) > 0) {
 		GET_COND(ch, DRUNK) = 0;
 	}
-	if (GET_COND(ch, THIRST) > 0) {
-		GET_COND(ch, THIRST) = 0;
+	if (GET_COND(ch, THIRST) >= 0) {
+		GET_COND(ch, THIRST) = MAX_CONDITION / 2;
 	}
 	
 	INJURY_FLAGS(ch) = NOBITS;
@@ -1674,7 +1674,15 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 			GET_MOVE(ch) = MAX(1, GET_MAX_MOVE(ch) / 2);
 			GET_MANA(ch) = MAX(1, GET_MAX_MANA(ch) / 2);
 			GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 2) : GET_MAX_BLOOD(ch);
-
+			
+			// custom restore conditions: less hungry/thirsty (won't incur a penalty yet)
+			if (GET_COND(ch, FULL) >= 0) {
+				GET_COND(ch, FULL) =  MAX_CONDITION / 4;
+			}
+			if (GET_COND(ch, THIRST) >= 0) {
+				GET_COND(ch, THIRST) = MAX_CONDITION / 4;
+			}
+			
 			msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
 			msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
 			if (rez_by && rez_by != ch) {

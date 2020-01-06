@@ -543,19 +543,19 @@ DEATH DYING
 
 When you die in EmpireMUD, you will lie on the ground for a short time, until
 you type 'respawn'. When you respawn, you'll appear at your chosen tomb, at
-any nearby tomb your empire owns, or at a random starting location. If you die
-too often, you may have to wait a while before you can move after respawning.
+any nearby tomb your empire owns, or at a random starting location. You can
+only be reanimated in a tomb if your empire owns one on the same island
+where you died (rivers don't count for this; only oceans separate islands).
 
-You can only be reanimated in a cemetery if your empire owns one on the same
-island where you died (rivers don't count for this; only oceans separate
-islands). If you own more than one, you will generally be reanimated in the
-oldest cemetery.
+When you die, you'll come back hungry and thirsty, and with a quarter of your
+maximum health, moves, and mana. Vampires also come back with a quarter of
+their blood. Any spells and affects go away when you die.
 
 If you die too many times in a row, you will start to accrue a death penalty,
 where you must wait before you can start acting. If you're at war, this penalty
 starts at a lower number of deaths.
 
-See also: RESPAWN, RESURRECT, STARTING LOCATION, TOMB
+See also: RESPAWN, RESURRECT, STARTING LOCATION, TOMB, AFFECTS
 #
 DEPLETION DEPLETED
 

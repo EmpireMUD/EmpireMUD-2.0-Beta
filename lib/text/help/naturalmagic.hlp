@@ -593,7 +593,8 @@ Cooldown:  20 minutes
 
 This powerful ability channels the healing magic of the moon to raise a player
 from the dead, even during combat. The player will return with half of his or
-her health, mana, and moves.
+her health, mana, and moves. The player will also be less hungry/thirsty than
+from a normal death or resurrection.
 
 You can target a dead player or the player's most recent corpse.
 
