@@ -37,6 +37,7 @@
 
 // external vars
 extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+extern const char *tool_flags[];
 
 // external funcs
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
@@ -377,11 +378,11 @@ void update_actions(void) {
 * Finds a tool equipped by the character.
 *
 * @param char_data *ch The person who might have the tool.
-* @param bitvector_t flags The TOOL_ flags required.
+* @param bitvector_t flags The TOOL_ flags required -- player must have ONE of these flags (see has_all_tools).
 * @return obj_data* The character's equipped tool, or NULL if they have none.
 */
 obj_data *has_tool(char_data *ch, bitvector_t flags) {
-	obj_data *tool = NULL;
+	obj_data *tool;
 	int iter;
 	
 	// list of valid slots (in order of priority; terminate with -1
@@ -395,6 +396,42 @@ obj_data *has_tool(char_data *ch, bitvector_t flags) {
 	}
 	
 	return NULL;
+}
+
+
+/**
+* Variant of has_tool() that requires ALL flags be present.
+*
+* @param char_data *ch The person who might have the tool.
+* @param bitvector_t flags The TOOL_ flags required -- all flags must be present.
+* @return obj_data* The best equipped tool that matches (more than 1 tool could have contributed the required flags), or NULL if they don't have all the required flags.
+*/
+obj_data *has_all_tools(char_data *ch, bitvector_t flags) {
+	obj_data *tool, *best_tool = NULL;
+	bitvector_t to_find = flags;
+	int iter;
+	
+	// list of valid slots (in order of priority; terminate with -1
+	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	
+	for (iter = 0; to_find && slots[iter] != -1; ++iter) {
+		tool = GET_EQ(ch, slots[iter]);
+		if (tool && TOOL_FLAGGED(tool, flags)) {
+			// it has 1 or more of the flags (original, not remaining flags): try to see if it's better
+			if (!best_tool || OBJ_FLAGGED(tool, OBJ_SUPERIOR) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
+				best_tool = tool;	// it seems better
+			}
+			// now remove it from remaining flags (we only need to find any flags that remain
+			REMOVE_BIT(to_find, GET_OBJ_TOOL_FLAGS(tool));
+		}
+	}
+	
+	if (to_find) {
+		return NULL;	// we didn't find all the flags
+	}
+	else {
+		return best_tool;	// we DID find all the flags; return the best tool
+	}
 }
 
 
@@ -1162,12 +1199,30 @@ void process_bathing(char_data *ch) {
 * @param char_data *ch The builder.
 */
 void process_build_action(char_data *ch) {
+	extern craft_data *find_building_list_entry(room_data *room, byte type);
+	
+	char buf1[MAX_STRING_LENGTH];
+	craft_data *type = NULL;
 	int count, total;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to keep working here.\r\n");
 		cancel_action(ch);
 		return;
+	}
+	
+	// check for build recipe
+	type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL);
+	
+	// ensure tools are still present
+	if (type && GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
+			msg_to_char(ch, "You need the following tools to work on this building: %s\r\n", buf1);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to work on this building.\r\n", AN(buf1), buf1);
+		}
 	}
 
 	total = 1;	// number of materials to attach in one go (add things that speed up building)

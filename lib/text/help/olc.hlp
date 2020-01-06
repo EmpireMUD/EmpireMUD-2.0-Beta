@@ -5279,15 +5279,18 @@ real hours, regardless of their decay timers.
 
 See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
 #d
-"OEDIT TOOLS" "OEDIT TOOL FLAGS"
+"OEDIT TOOLS" "OEDIT TOOL FLAGS" "CEDIT TOOLS" "CEDIT TOOL FLAGS"
 
 Usage:  .tools [add | remove] <flags>
 
-Tool flags allow an object to be used for various tasks.
+Objects: Tool flags allow an object to be used for various tasks, like sawing.
+Crafts: You can require 1 or more tools to create the craft. These tools MUST
+        be present, and you can't substitute with a building (e.g. tailor for
+        sewing kit).
 
 See &yHELP TOOLS&0 for a full list.
 
-See also: OLC OBJECTS
+See also: OLC CRAFTS, OLC OBJECTS
 #d
 "OEDIT TYPE"
 

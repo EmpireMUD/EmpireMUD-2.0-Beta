@@ -34,6 +34,7 @@ extern const char *bld_on_flags[];
 extern const char *craft_flags[];
 extern const char *craft_types[];
 extern const char *road_types[];
+extern const char *tool_flags[];
 
 // external funcs
 void init_craft(craft_data *craft);
@@ -325,7 +326,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
 	
-	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_tools = NOBITS;
 	int only_type = NOTHING, only_level = NOTHING, only_quantity = NOTHING, only_time = NOTHING;
 	int quantity_over = NOTHING, level_over = NOTHING, time_over = NOTHING;
 	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING;
@@ -361,6 +362,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_INT("time", only_time, 0, INT_MAX)
 		FULLSEARCH_INT("timesover", time_over, 0, INT_MAX)
 		FULLSEARCH_INT("timeunder", time_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
@@ -409,6 +411,9 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 			continue;
 		}
 		if (time_under != NOTHING && (GET_CRAFT_TIME(craft) > time_under || GET_CRAFT_TIME(craft) == 0)) {
+			continue;
+		}
+		if (only_tools != NOBITS && (GET_CRAFT_REQUIRES_TOOL(craft) & only_tools) != only_tools) {
 			continue;
 		}
 		
@@ -683,6 +688,9 @@ void olc_show_craft(char_data *ch) {
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT), buf1);
 	
+	sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf1, TRUE);
+	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_TOOL(craft), NOBITS), buf1);
+	
 	sprintf(buf + strlen(buf), "<%srequiresobject\t0> %d - %s\r\n", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_OBJ(craft), NOTHING), GET_CRAFT_REQUIRES_OBJ(craft), GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING ? "none" : get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 
 	// resources
@@ -931,6 +939,12 @@ OLC_MODULE(cedit_time) {
 	else {
 		GET_CRAFT_TIME(craft) = olc_process_number(ch, argument, "time", "time", 1, MAX_INT, GET_CRAFT_TIME(craft));
 	}
+}
+
+
+OLC_MODULE(cedit_tools) {
+	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+	GET_CRAFT_REQUIRES_TOOL(craft) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, GET_CRAFT_REQUIRES_TOOL(craft));
 }
 
 

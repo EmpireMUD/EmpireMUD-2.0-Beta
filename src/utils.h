@@ -457,6 +457,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_CRAFT_OBJECT(craft)  ((craft)->object)
 #define GET_CRAFT_QUANTITY(craft)  ((craft)->quantity)
 #define GET_CRAFT_REQUIRES_OBJ(craft)  ((craft)->requires_obj)
+#define GET_CRAFT_REQUIRES_TOOL(craft)  ((craft)->requires_tool)
 #define GET_CRAFT_RESOURCES(craft)  ((craft)->resources)
 #define GET_CRAFT_TIME(craft)  ((craft)->time)
 #define GET_CRAFT_TYPE(craft)  ((craft)->type)
@@ -1737,6 +1738,7 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 // utils from act.action.c
 void cancel_action(char_data *ch);
 extern obj_data *has_tool(char_data *ch, bitvector_t flags);
+extern obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void start_action(char_data *ch, int type, int timer);
 
 // utils from act.comm.c

@@ -55,6 +55,7 @@ extern const bool can_designate_dir[NUM_OF_DIRS];
 extern const bool can_designate_dir_vehicle[NUM_OF_DIRS];
 extern const char *dirs[];
 extern int rev_dir[];
+extern const char *tool_flags[];
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1242,6 +1243,7 @@ ACMD(do_build) {
 	extern int get_crafting_level(char_data *ch);
 	void show_craft_info(char_data *ch, char *argument, int craft_types);
 	
+	char buf1[MAX_STRING_LENGTH];
 	room_data *to_room = NULL, *to_rev = NULL;
 	any_vnum missing_abil = NO_ABIL;
 	obj_data *found_obj = NULL;
@@ -1446,6 +1448,15 @@ ACMD(do_build) {
 	}
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
 		return;	// the trigger should send its own message if it prevented this
+	}
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
+			msg_to_char(ch, "You need the following tools to build that: %s\r\n", buf1);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to build that.\r\n", AN(buf1), buf1);
+		}
 	}
 	else {
 		found = TRUE;

@@ -172,6 +172,7 @@ OLC_MODULE(cedit_quantity);
 OLC_MODULE(cedit_requiresobject);
 OLC_MODULE(cedit_resource);
 OLC_MODULE(cedit_time);
+OLC_MODULE(cedit_tools);
 OLC_MODULE(cedit_type);
 OLC_MODULE(cedit_volume);
 
@@ -756,6 +757,7 @@ const struct olc_command_data olc_data[] = {
 	{ "requiresobject", cedit_requiresobject, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "resource", cedit_resource, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "time", cedit_time, OLC_CRAFT, OLC_CF_EDITOR },
+	{ "tools", cedit_tools, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "type", cedit_type, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "volume", cedit_volume, OLC_CRAFT, OLC_CF_EDITOR },
 	

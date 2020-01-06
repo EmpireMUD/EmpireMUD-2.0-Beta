@@ -37,6 +37,7 @@
 extern const struct augment_type_data augment_info[];
 extern const char *craft_types[];
 extern struct gen_craft_data_t gen_craft_data[];
+extern const char *tool_flags[];
 
 // external functions
 extern struct resource_data *copy_resource_list(struct resource_data *input);
@@ -67,6 +68,7 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 * @return bool TRUE if okay, FALSE if not.
 */
 bool check_can_craft(char_data *ch, craft_data *type) {
+	char buf1[MAX_STRING_LENGTH];
 	bool wait, room_wait;
 	
 	// type checks
@@ -139,6 +141,17 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	// end flag checks
+	
+	// tool checks
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
+			msg_to_char(ch, "You need the to equip following tools to %s that: %s\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, buf1);
+		}
+		else {
+			msg_to_char(ch, "You need to equip %s %s to %s that.\r\n", AN(buf1), buf1, gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		}
+	}
 	
 	// types that require the building be complete
 	else if (!IS_COMPLETE(IN_ROOM(ch)) && (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) || GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS)) {
@@ -689,6 +702,11 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Requires: %s\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 	}
 	
+	if (GET_CRAFT_REQUIRES_TOOL(craft)) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, part);
+		msg_to_char(ch, "Requires tool%s: %s\r\n", (count_bits(GET_CRAFT_REQUIRES_TOOL(craft)) != 1) ? "s" : "", part);
+	}
+	
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
 		sprintf(buf, "%s", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
 		if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
@@ -1086,6 +1104,9 @@ void process_gen_craft(char_data *ch) {
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
+	}
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
+		msg_to_char(ch, "You aren't using the right tool to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;

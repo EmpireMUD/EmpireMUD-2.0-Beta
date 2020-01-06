@@ -4195,6 +4195,7 @@ struct craft_data {
 	bitvector_t build_on;	// BLD_ON_ flags for the tile it's built upon
 	bitvector_t build_facing;	// BLD_ON_ flags for the tile it's facing
 	
+	bitvector_t requires_tool;	// any TOOL_ flags required to make this
 	obj_vnum requires_obj;	// only shows up if you have the item
 	struct resource_data *resources;	// linked list
 	

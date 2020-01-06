@@ -1037,10 +1037,17 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 	GET_CRAFT_OBJECT(craft) = int_in[0];
 	GET_CRAFT_QUANTITY(craft) = int_in[1];
 	
-	// line 3: type ability flags time
-	if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d", int_in, int_in + 1, str_in, int_in + 2, int_in + 3) != 5) {
-		log("SYSERR: Format error in line 3 of craft recipe #%d", vnum);
+	// line 3: type ability flags time requires-obj requires-tool
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 3 of craft recipe #%d", vnum);
 		exit(1);
+	}
+	if (sscanf(line, "%d %d %s %d %d %s", int_in, int_in + 1, str_in, int_in + 2, int_in + 3, str_in2) != 6) {
+		strcpy(str_in2, "0");	// backwards-compatible with missing requires-tool
+		if (sscanf(line, "%d %d %s %d %d", int_in, int_in + 1, str_in, int_in + 2, int_in + 3) != 5) {
+			log("SYSERR: Format error in line 3 of craft recipe #%d", vnum);
+			exit(1);
+		}
 	}
 	
 	GET_CRAFT_TYPE(craft) = int_in[0];
@@ -1048,6 +1055,7 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 	GET_CRAFT_FLAGS(craft) = asciiflag_conv(str_in);
 	GET_CRAFT_TIME(craft) = int_in[2];
 	GET_CRAFT_REQUIRES_OBJ(craft) = int_in[3];
+	GET_CRAFT_REQUIRES_TOOL(craft) = asciiflag_conv(str_in2);
 	
 	// optionals
 
@@ -1122,7 +1130,10 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	fprintf(fl, "%s~\n", NULLSAFE(GET_CRAFT_NAME(craft)));
 	
 	fprintf(fl, "%d %d\n", GET_CRAFT_OBJECT(craft), GET_CRAFT_QUANTITY(craft));
-	fprintf(fl, "%d %d %s %d %d\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), bitv_to_alpha(GET_CRAFT_FLAGS(craft)), GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft));
+	
+	strcpy(temp1, bitv_to_alpha(GET_CRAFT_FLAGS(craft)));
+	strcpy(temp2, bitv_to_alpha(GET_CRAFT_REQUIRES_TOOL(craft)));
+	fprintf(fl, "%d %d %s %d %d %s\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), temp1, GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft), temp2);
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 		strcpy(temp1, bitv_to_alpha(GET_CRAFT_BUILD_ON(craft)));
