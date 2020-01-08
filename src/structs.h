@@ -2484,7 +2484,8 @@ typedef struct vehicle_data vehicle_data;
 #define DPLTN_PAN  6
 #define DPLTN_TRAPPING  7
 #define DPLTN_CHOP  8
-#define NUM_DEPLETION_TYPES  9	// total
+#define DPLTN_HUNT  9
+#define NUM_DEPLETION_TYPES  10	// total
 
 
 // EVO_x: world evolutions

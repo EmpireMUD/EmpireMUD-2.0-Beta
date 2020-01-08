@@ -2915,7 +2915,8 @@ const char *depletion_type[NUM_DEPLETION_TYPES] = {
 	"quarry",
 	"pan",
 	"trapping",
-	"chop"
+	"chop",
+	"hunt"
 };
 
 

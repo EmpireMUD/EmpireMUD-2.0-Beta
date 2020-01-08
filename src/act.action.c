@@ -1851,6 +1851,14 @@ void process_hunting(char_data *ch) {
 	
 	if (number(1, 10000) <= chance_times_100) {
 		// found it!
+		
+		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT) >= config_get_int("short_depletion")) {
+			// late check for depletion: make them hunt first
+			msg_to_char(ch, "You don't seem to be able to find any. Maybe this area has been hunted to depletion.\r\n");
+			GET_ACTION(ch) = ACT_NONE;
+			return;
+		}
+		
 		mob = read_mobile(mob_vnum, TRUE);
 		
 		// basic setup
@@ -1875,6 +1883,7 @@ void process_hunting(char_data *ch) {
 		
 		GET_ACTION(ch) = ACT_NONE;
 		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
+		add_depletion(IN_ROOM(ch), DPLTN_HUNT, TRUE);
 	}
 	else {
 		// tick messaging
