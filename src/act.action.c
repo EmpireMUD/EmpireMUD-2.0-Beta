@@ -146,7 +146,7 @@ const struct action_data_struct action_data[] = {
 	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
 	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
-	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER | ACTF_ALWAYS_FAST  | ACTF_EVEN_FASTER, process_hunting, NULL },	// ACT_HUNTING
+	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER | ACTF_ALWAYS_FAST, process_hunting, NULL },	// ACT_HUNTING
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
