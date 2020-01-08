@@ -1859,11 +1859,13 @@ void process_hunting(char_data *ch) {
 		
 		// scale it to the hunter's level and flag it to keep it there
 		scale_mob_for_character(mob, ch);
-		SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+		SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE | MOB_SPAWNED);
 		
 		// messaging
 		act("You've found $N!", FALSE, ch, NULL, mob, TO_CHAR);
 		act("$n has found $N!", FALSE, ch, NULL, mob, TO_NOTVICT);
+		
+		load_mtrigger(mob);
 		
 		// stun it if triggers allow
 		if (!run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, mob, NULL)) {
