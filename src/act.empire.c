@@ -4475,6 +4475,7 @@ ACMD(do_enroll) {
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
 					update_player_index(index, victim);
+					refresh_all_quests(victim);
 					SAVE_CHAR(victim);
 				}
 				else if ((victim = find_or_load_player(index->name, &sub_file))) {
@@ -4638,6 +4639,7 @@ ACMD(do_enroll) {
 		
 		// targ still around when we got this far?
 		if (targ) {
+			refresh_all_quests(targ);
 			// save now
 			if (file) {
 				// this frees targ

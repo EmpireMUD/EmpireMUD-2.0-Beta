@@ -3956,8 +3956,8 @@ const char *requirement_types[] = {
 	"EMPIRE-PRODUCED-COMPONENT",	// 35
 	"EVENT-RUNNING",
 	"EVENT-NOT-RUNNING",
-	"REQ-LEVEL-UNDER",
-	"REQ-LEVEL-OVER",
+	"LEVEL-UNDER",
+	"LEVEL-OVER",
 	"\n",
 };
 
