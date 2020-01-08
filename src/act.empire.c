@@ -4475,7 +4475,6 @@ ACMD(do_enroll) {
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
 					update_player_index(index, victim);
-					refresh_all_quests(victim);
 					SAVE_CHAR(victim);
 				}
 				else if ((victim = find_or_load_player(index->name, &sub_file))) {
@@ -4623,23 +4622,10 @@ ACMD(do_enroll) {
 			
 			// Delete the old empire
 			delete_empire(old);
-			
-			// update goal trackers
-			refresh_empire_goals(e, NOTHING);
-			
-			save_empire(e, TRUE);
-			
-			// need to update quests too
-			LL_FOREACH(character_list, victim) {
-				if (GET_LOYALTY(victim) == e) {
-					refresh_all_quests(victim);
-				}
-			}
 		}
 		
 		// targ still around when we got this far?
 		if (targ) {
-			refresh_all_quests(targ);
 			// save now
 			if (file) {
 				// this frees targ
@@ -4659,6 +4645,18 @@ ACMD(do_enroll) {
 		
 		// This will PROPERLY reset wealth and land, plus members and abilities
 		reread_empire_tech(GET_LOYALTY(ch));
+		
+		// need to update quests too: do this AFTER rereading tech
+		LL_FOREACH(character_list, victim) {
+			if (!IS_NPC(victim) && GET_LOYALTY(victim) == e) {
+				refresh_all_quests(victim);
+			}
+		}
+			
+		// update goal trackers: AFTER rereading tech
+		refresh_empire_goals(e, NOTHING);
+		
+		save_empire(e, TRUE);
 	}
 	
 	// clean up if still necessary
