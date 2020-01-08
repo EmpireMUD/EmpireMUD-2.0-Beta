@@ -1114,6 +1114,14 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
 				break;
 			}
+			case REQ_LEVEL_UNDER: {
+				task->current = (get_approximate_level(ch) <= task->needed) ? task->needed : -1; // -1 because 0 is a valid 'needed'
+				break;
+			}
+			case REQ_LEVEL_OVER: {
+				task->current = (get_approximate_level(ch) >= task->needed) ? task->needed : 0;
+				break;
+			}
 		}
 	}
 }
@@ -2260,6 +2268,33 @@ void qt_change_ability(char_data *ch, any_vnum abil) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_HAVE_ABILITY && task->vnum == abil) {
 				task->current = (has_ability(ch, abil) ? task->needed : 0);
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch gains or loses levels (total levels)
+*
+* @param char_data *ch The player.
+* @param int level The new level.
+*/
+void qt_change_level(char_data *ch, int level) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_LEVEL_OVER) {
+				task->current = (level >= task->needed ? task->needed : 0);
+			}
+			else if (task->type == REQ_LEVEL_UNDER) {
+				task->current = (level <= task->needed ? task->needed : -1);	// must set below 0 because 0 is a valid needed
 			}
 		}
 	}

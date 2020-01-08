@@ -6492,6 +6492,8 @@ Available tasks:
  &cEMPIRE-PRODUCED-COMPONENT&0 - Empire has produced an amount of a component.
  &cEVENT-RUNNING&0 - Only available while the event is running.
  &cEVENT-NOT-RUNNING&0 - Not available while the event is running.
+ &cLEVEL-UNDER&0 - Composite/total level not higher than this.
+ &cLEVEL-OVER&0 - Composite/total level not lower than this.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

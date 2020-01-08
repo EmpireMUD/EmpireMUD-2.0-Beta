@@ -408,6 +408,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_EMPIRE_PRODUCED_COMPONENT  35
 #define REQ_EVENT_RUNNING  36
 #define REQ_EVENT_NOT_RUNNING  37
+#define REQ_LEVEL_UNDER  38
+#define REQ_LEVEL_OVER  39
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types

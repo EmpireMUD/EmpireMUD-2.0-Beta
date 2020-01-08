@@ -7037,6 +7037,18 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_LEVEL_UNDER: {
+				if (get_approximate_level(ch) > req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_LEVEL_OVER: {
+				if (get_approximate_level(ch) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -7271,6 +7283,14 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_EVENT_NOT_RUNNING: {
 			snprintf(output, sizeof(output), "Event is not running: %s%s", vnum, get_event_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_LEVEL_UNDER: {
+			snprintf(output, sizeof(output), "Level under %d", req->needed);
+			break;
+		}
+		case REQ_LEVEL_OVER: {
+			snprintf(output, sizeof(output), "Level over %d", req->needed);
 			break;
 		}
 		default: {

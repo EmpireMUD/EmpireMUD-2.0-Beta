@@ -1779,6 +1779,7 @@ extern char *get_bld_name_by_proto(bld_vnum vnum);
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);
 void qt_change_ability(char_data *ch, any_vnum abil);
+void qt_change_level(char_data *ch, int level);
 void qt_change_production_total(char_data *ch, any_vnum vnum, int amount);
 void qt_change_reputation(char_data *ch, any_vnum faction);
 void qt_change_skill_level(char_data *ch, any_vnum skl);

@@ -3956,6 +3956,8 @@ const char *requirement_types[] = {
 	"EMPIRE-PRODUCED-COMPONENT",	// 35
 	"EVENT-RUNNING",
 	"EVENT-NOT-RUNNING",
+	"REQ-LEVEL-UNDER",
+	"REQ-LEVEL-OVER",
 	"\n",
 };
 
@@ -4000,6 +4002,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// empire produced component
 	REQ_AMT_NONE,	// event running
 	REQ_AMT_NONE,	// event not running
+	REQ_AMT_THRESHOLD,	// level under
+	REQ_AMT_THRESHOLD,	// level over
 };
 
 
@@ -4043,6 +4047,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// empire produced component
 	FALSE,	// event running
 	FALSE,	// event not running
+	FALSE,	// level under
+	FALSE,	// level over
 };
 
 
