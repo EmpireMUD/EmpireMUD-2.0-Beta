@@ -760,6 +760,10 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "Hunt what?\r\n");
 		return;
 	}
+	if ((mob = get_char_vis(ch, argument, FIND_CHAR_ROOM))) {
+		act("You can see $N right here!", FALSE, ch, NULL, mob, TO_CHAR);
+		return;
+	}
 	
 	// build lists: vehicles
 	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {

@@ -1871,6 +1871,7 @@ void process_hunting(char_data *ch) {
 			affect_join(mob, af, 0);
 		}
 		
+		GET_ACTION(ch) = ACT_NONE;
 		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
 	}
 	else {
