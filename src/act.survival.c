@@ -722,7 +722,7 @@ ACMD(do_hunt) {
 	struct spawn_info *spawn, *found_spawn = NULL;
 	char_data *mob, *found_proto = NULL;
 	vehicle_data *veh, *next_veh;
-	bool in_city, junk, non_animal = FALSE;
+	bool junk, non_animal = FALSE;
 	int count, x_coord, y_coord;
 	
 	double min_percent = 1.0;	// won't find things below 1% spawn
@@ -735,7 +735,7 @@ ACMD(do_hunt) {
 	
 	skip_spaces(&argument);
 	
-	if (GET_ACTION(ch) == ACT_HUNTING) {
+	if (GET_ACTION(ch) == ACT_HUNTING && !*argument) {
 		msg_to_char(ch, "You stop hunting.\r\n");
 		cancel_action(ch);
 		return;
@@ -748,11 +748,16 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "You can only hunt while outdoors.\r\n");
 		return;
 	}
+	if (ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &junk)) {
+		// note: if you remove the in-city restriction, the validate_spawn_location() below will need in-city info
+		msg_to_char(ch, "You can't hunt in cities.\r\n");
+		return;
+	}
 	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
 		msg_to_char(ch, "You can't hunt anything while entangled.\r\n");
 		return;
 	}
-	if (GET_ACTION(ch) != ACT_NONE) {
+	if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_HUNTING) {
 		msg_to_char(ch, "You're too busy to hunt right now.\r\n");
 		return;
 	}
@@ -814,7 +819,6 @@ ACMD(do_hunt) {
 	// prepare data for validation (calling these here prevents multiple function calls
 	x_coord = X_COORD(IN_ROOM(ch));
 	y_coord = Y_COORD(IN_ROOM(ch));
-	in_city = (ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))), TRUE, &junk)) ? TRUE : FALSE;
 	
 	// find the thing to hunt
 	LL_FOREACH_SAFE(helpers, item, next_item) {
@@ -822,7 +826,7 @@ ACMD(do_hunt) {
 			if (spawn->percent < min_percent) {
 				continue;	// too low
 			}
-			if (!validate_spawn_location(IN_ROOM(ch), spawn, x_coord, y_coord, in_city)) {
+			if (!validate_spawn_location(IN_ROOM(ch), spawn, x_coord, y_coord, FALSE)) {
 				continue;	// cannot spawn here
 			}
 			if (!(mob = mob_proto(spawn->vnum))) {

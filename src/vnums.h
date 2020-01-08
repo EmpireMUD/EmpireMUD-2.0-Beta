@@ -284,6 +284,7 @@
 #define ATYPE_DOT  3085
 #define ATYPE_UNSTUCK  3101
 #define ATYPE_POTION  3102
+#define ATYPE_HUNTED  3103
 
 
 // GENERIC_COOLDOWN entires used by the code
