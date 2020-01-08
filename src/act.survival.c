@@ -723,7 +723,7 @@ ACMD(do_hunt) {
 	char_data *mob, *found_proto = NULL;
 	vehicle_data *veh, *next_veh;
 	bool in_city, junk, non_animal = FALSE;
-	int x_coord, y_coord;
+	int count, x_coord, y_coord;
 	
 	double min_percent = 1.0;	// won't find things below 1% spawn
 	
@@ -760,8 +760,24 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "Hunt what?\r\n");
 		return;
 	}
-	if ((mob = get_char_vis(ch, argument, FIND_CHAR_ROOM))) {
-		act("You can see $N right here!", FALSE, ch, NULL, mob, TO_CHAR);
+	
+	// count how many people are in the room and also check for a matching animal here
+	count = 0;
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+		++count;
+		
+		if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_ANIMAL)) {
+			continue;
+		}
+		
+		if (multi_isname(argument, GET_PC_NAME(mob))) {
+			act("You can see $N right here!", FALSE, ch, NULL, mob, TO_CHAR);
+			return;
+		}
+	}
+	
+	if (count > 4) {
+		msg_to_char(ch, "The area is too crowded to hunt for anything.\r\n");
 		return;
 	}
 	
