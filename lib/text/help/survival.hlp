@@ -133,16 +133,32 @@ Gains experience when you find things by foraging.
 
 See also: DEPLETION
 #
-HUNTSMAN HUNT HUNTING "HUNTSMAN ABILITY"
+HUNT HUNTING
+
+Usage:  hunt <animal>
+Requires:  Huntsman (Survival ability)
+
+You can hunt animals that live in the area, even if you can't see any at the
+moment.
+
+This ability only targets animals that spawn with a rate of at least 1% in the
+terrain you're currently in. The amount of time it takes depends upon the
+spawn rate.
+
+See also: HUNTSMAN
+#
+HUNTSMAN "HUNTSMAN ABILITY"
 
 Huntsman (Survival ability)
 
 Those with the Huntsman ability deal twice as much damage to animals. This
 ability has a chance to not activate at low levels.
 
-Huntsmen (and women) also get a 100% chance to skin or butcher corpses.
+Huntsmen (and women) also gain access to the hunt command, and get a 100%
+chance to skin or butcher corpses.
 
-Gains experience when you hit an animal, or skin or butcher a corpse.
+Gains experience when successfully hunt, when you hit an animal, or skin or
+butcher a corpse.
 
 See also: SKIN, BUTCHER
 Immortals see also: MHUNT

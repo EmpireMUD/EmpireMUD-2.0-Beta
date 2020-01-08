@@ -1866,6 +1866,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_SWAP_SKILL_SETS	38
 #define ACT_MAINTENANCE		39
 #define ACT_BURN_AREA		40
+#define ACT_HUNTING			41
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -2209,6 +2210,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_BITE_TANK_UPGRADE  60	// tank features of 'bite'
 #define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
 #define PTECH_SEE_IN_DARK_OUTDOORS  62  // can see in dark only if outside
+#define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

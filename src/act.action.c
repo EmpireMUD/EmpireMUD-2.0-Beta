@@ -78,6 +78,7 @@ void process_fishing(char_data *ch);
 void process_gathering(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_harvesting(char_data *ch);
+void process_hunting(char_data *ch);
 void process_maintenance(char_data *ch);
 void process_mining(char_data *ch);
 void process_minting(char_data *ch);
@@ -145,6 +146,7 @@ const struct action_data_struct action_data[] = {
 	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
 	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
+	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER | ACTF_ALWAYS_FAST  | ACTF_EVEN_FASTER, process_hunting, NULL },	// ACT_HUNTING
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -1827,6 +1829,52 @@ void process_harvesting(char_data *ch) {
 		if (sect) {
 			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 		}
+	}
+}
+
+
+/**
+* Tick update for hunt action.
+*
+* @param char_data *ch The hunter.
+*/
+void process_hunting(char_data *ch) {
+	void scale_mob_for_character(char_data *mob, char_data *ch);
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	struct affected_type *af;
+	char_data *mob;
+	
+	// from stored data
+	any_vnum mob_vnum = GET_ACTION_VNUM(ch, 0);
+	int chance_times_100 = GET_ACTION_VNUM(ch, 1);
+	
+	if (number(1, 10000) <= chance_times_100) {
+		// found it!
+		mob = read_mobile(mob_vnum, TRUE);
+		
+		// basic setup
+		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
+		char_to_room(mob, IN_ROOM(ch));
+		
+		// scale it to the hunter's level and flag it to keep it there
+		scale_mob_for_character(mob, ch);
+		SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+		
+		// messaging
+		act("You've found $N!", FALSE, ch, NULL, mob, TO_CHAR);
+		act("$n has found $N!", FALSE, ch, NULL, mob, TO_NOTVICT);
+		
+		// stun it if triggers allow
+		if (!run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, mob, NULL)) {
+			af = create_flag_aff(ATYPE_BASH, 1, AFF_STUNNED, ch);
+			affect_join(mob, af, 0);
+		}
+		
+		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
+	}
+	else {
+		act("You stalk low to the ground, hunting...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 	}
 }
 

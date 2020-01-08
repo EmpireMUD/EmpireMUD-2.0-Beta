@@ -989,6 +989,13 @@ Available techs are:
  &cMilk&0 - Can milk animals (in a stable).
  &cShear&0 - Can shear animals (in a stable).
  &cTame&0 - Can tame animals.
+ &cBite-Melee-Upgrade&0 - Bite lowers cooldown, doesn't taunt, and has a Dot, 
+    if in Melee/Solo roles.
+ &cBite-Tank-Upgrade&0 - Bite loses the dodge penalty in Tank/Solo and always
+    taunts if in Tank role.
+ &cBite-Steal-Blood&0 - Bite steals a small amount of blood.
+ &cSee-In-Dark-Outdoors&0 - Can see in dark rooms if outdoors.
+ &cHunt-Animals&0 - Can use the 'hunt' command, on animals.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
