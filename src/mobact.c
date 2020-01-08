@@ -1181,10 +1181,10 @@ bool validate_spawn_location(room_data *room, struct spawn_info *spawn, int x_co
 	
 	// home room checks
 	home = HOME_ROOM(room);
-	if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(room)) {
+	if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home)) {
 		return FALSE;
 	}
-	if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(room)) {
+	if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home)) {
 		return FALSE;
 	}
 	
