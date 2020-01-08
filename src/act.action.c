@@ -1875,7 +1875,10 @@ void process_hunting(char_data *ch) {
 		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
 	}
 	else {
-		act("You stalk low to the ground, hunting...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		// tick messaging
+		if (!number(0, 2)) {
+			act("You stalk low to the ground, hunting...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		}
 	}
 }
 
