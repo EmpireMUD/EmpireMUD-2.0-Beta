@@ -2285,11 +2285,11 @@ const char *extra_bits[] = {
 	"TWO-HANDED",
 	"BOE",
 	"BOP",	// 15
-	"*STAFF",	// formerly STAFF
+	"*",	// formerly STAFF
 	"UNCOLLECTED-LOOT",
 	"*KEEP",
-	"*TOOL-PAN",	// formerly TOOL-PAN
-	"*TOOL-SHOVEL",	// 20, formerly TOOL-SHOVEL
+	"*",	// formerly TOOL-PAN
+	"*",	// 20, formerly TOOL-SHOVEL
 	"!AUTOSTORE",
 	"HARD-DROP",
 	"GROUP-DROP",
@@ -2318,11 +2318,11 @@ const char *extra_bits_inv_flags[] = {
 	"(2h)",
 	"(boe)",
 	"(bop)",
-	"",	// staff
+	"",	// *
 	"",	// uncollected
 	"(keep)",
-	"",	// pan
-	"",	// shovel
+	"",	// *
+	"",	// *
 	"",	// !autostore
 	"",	// hard-drop
 	"",	// group-drop
