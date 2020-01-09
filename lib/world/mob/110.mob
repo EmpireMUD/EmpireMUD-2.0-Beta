@@ -94,7 +94,7 @@ roc tawny~
 a tawny roc~
 A tawny roc is perched over you.
 ~
-100 125 de m 5
+100 125 dej m 5
 0 0 2 26
 S
 #11019
@@ -110,7 +110,7 @@ swan huge trumpeter~
 a huge trumpeter swan~
 A huge trumpeter swan glides past you with grace.
 ~
-100 125 del 0 3
+100 125 dejl 0 3
 0 0 6 9
 S
 $

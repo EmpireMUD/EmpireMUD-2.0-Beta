@@ -4,14 +4,14 @@ Flint Tutorial~
 types can be used to lay roads, but you can also make tools from flints.
 Instructions:
  1. You need a rock and a flint stone.
- 2. Wield the rock.
+ 2. 'Use' the rock.
  3. Chip the flint.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
    Chipped flints aren't very useful on their own, but you can make them into
 other tools.
 ~
-5 h 0 15 -1
+6 h 0 15 -1
 A
 2 102
 R
@@ -51,14 +51,14 @@ S
 Handle Tutorial~
    You can turn this sapling into a handle that could be made into a tool or
 weapon. Here are the instructions:
- 1. Wield a sharp weapon like a sword or dagger.
+ 1. 'Use' some kind of knife, such as a spear head.
  2. Type 'craft handle'.
  Tip: You can type 'craft info handle' to see more info about the craft.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
 This handle can be used for lots of other crafts.
 ~
-3 h 0 15 -1
+4 h 0 15 -1
 A
 2 131
 R
@@ -75,13 +75,13 @@ Scrape Tutorial~
    Now that you have a tree, there's a couple of things you can do with it.
 One of them is scrape it to make a log (a type of pillar component). Here's
 how:
- 1. Wield a sharp tool like a dagger or sword.
+ 1. 'Use' a knife tool (such as a handaxe).
  2. Type 'scrape tree'.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
 You seem to have mastered the scrape command.
 ~
-3 h 0 15 -1
+4 h 0 15 -1
 A
 2 120
 R
@@ -240,12 +240,12 @@ S
 #180
 Chipped Flint Tutorial~
    You've chipped some pieces off the flint! Chip the flint again to turn it
-into a better tool. Don't forget to wield a rock to chip it with.
+into a better tool. Don't forget to 'use' a rock to chip it with.
 (You can type 'toggle tutorials' to stop seeing new tutorial quests.)
 ~
 Chipping flints is a good way to make primitive tools.
 ~
-4 h 0 15 -1
+5 h 0 15 -1
 A
 2 180
 R

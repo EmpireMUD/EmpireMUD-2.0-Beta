@@ -1,21 +1,21 @@
 #18501
 dismantle jungle temple~
 -1 0
-8 -1 l 1 -1
+8 -1 l 1 -1 0
 B
 18501 0 0
 S
 #18509
 dismantle jungle temple~
 -1 0
-8 -1 l 1 -1
+8 -1 l 1 -1 0
 B
 18509 0 0
 S
 #18517
 fearsome jaguar armor~
 18517 1
-1 197 q 12 -1
+1 197 q 12 -1 0
 L
 125
 R
@@ -30,7 +30,7 @@ S
 #18519
 red coyote armor~
 18519 1
-4 182 gq 12 -1
+4 182 q 12 -1 f
 L
 125
 R
@@ -47,7 +47,7 @@ S
 #18521
 feathered serpent armor~
 18521 1
-4 199 gq 12 -1
+4 199 q 12 -1 f
 L
 125
 R
@@ -62,7 +62,7 @@ S
 #18523
 eagle warrior armor~
 18523 1
-4 199 gq 12 -1
+4 199 q 12 -1 f
 L
 125
 R
@@ -77,7 +77,7 @@ S
 #18525
 blue chameleon armor~
 18525 1
-1 197 q 12 -1
+1 197 q 12 -1 0
 L
 125
 R

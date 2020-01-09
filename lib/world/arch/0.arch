@@ -29,6 +29,8 @@ G
 19 2102  # a short sword
 G
 21 2104  # a torch
+G
+22 2147  # a simple skinning knife
 K
 0 10
 K
@@ -67,6 +69,8 @@ G
 19 2102  # a short sword
 G
 21 2104  # a torch
+G
+-1 2146  # fine sewing needles
 K
 0 20
 K
@@ -103,6 +107,10 @@ G
 19 2102  # a short sword
 G
 21 2104  # a torch
+G
+-1 2145  # feather sewing needles
+G
+22 2148  # a hobby knife
 K
 6 30
 S
@@ -173,6 +181,8 @@ G
 19 2101  # a woodsman's axe
 G
 21 2104  # a torch
+G
+22 2147  # a simple skinning knife
 K
 5 20
 K
@@ -209,6 +219,8 @@ G
 19 2100  # a stone axe
 G
 21 2104  # a torch
+G
+22 2147  # a simple skinning knife
 K
 5 15
 K
@@ -279,6 +291,8 @@ G
 19 2100  # a stone axe
 G
 21 2104  # a torch
+G
+22 2147  # a simple skinning knife
 K
 3 20
 K
@@ -449,6 +463,8 @@ G
 19 2100  # a stone axe
 G
 21 2104  # a torch
+G
+22 2148  # a hobby knife
 K
 3 20
 K
