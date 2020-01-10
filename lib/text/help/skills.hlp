@@ -328,7 +328,7 @@ Types of mines:
 
 See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 #
-MINT
+MINT "COIN MILLS" COINMILLS
 
 Mint (Basic Crafts ability)
 
@@ -341,7 +341,10 @@ The mint building allows you to mint valuable metals into coins. Each building
 can only mint coins for the empire it belongs to. The mint command will auto-
 repeat; stopping the action will give you back the item you were minting.
 
-See also: COINS, STOP
+Constructing this building requires coin mills, which can be made with the
+Forge ability.
+
+See also: COINS, STOP, FORGE
 #
 MORPH MORPHING SHAPESHIFTING FASTMORPH
 
