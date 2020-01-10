@@ -3238,9 +3238,11 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 	extern const bool requirement_needs_tracker[];
 	
 	struct trig_proto_list *tpl;
+	struct quest_reward *rew;
 	struct req_data *task;
 	trig_data *trig;
 	bool problem = FALSE;
+	int max_q = 0;
 	
 	if (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, QUEST_VNUM(quest), "IN-DEVELOPMENT");
@@ -3296,6 +3298,21 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 			problem = TRUE;
 			break;
 		}
+	}
+	
+	// QR_x: audit rewards
+	LL_FOREACH(QUEST_REWARDS(quest), rew) {
+		switch (rew->type) {
+			case QR_BONUS_EXP:
+			case QR_OBJECT: {
+				max_q = MAX(max_q, rew->amount);
+				break;
+			}
+		}
+	}
+	if (max_q > 10) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "Unusual reward quantity: %d", max_q);
+		problem = TRUE;
 	}
 	
 	return problem;

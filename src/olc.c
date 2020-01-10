@@ -4336,7 +4336,7 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch) {
 	struct interaction_item *iter;
 	bool problem = FALSE;
-	int code, type;
+	int code, type, max_quantity = 0;
 	
 	struct audint_t {
 		int code;
@@ -4356,6 +4356,9 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 			olc_audit_msg(ch, vnum, "Bad interaction: %s", interact_types[iter->type]);
 			problem = TRUE;
 		}
+		
+		// store for later
+		max_quantity = MAX(max_quantity, iter->quantity);
 		
 		// track cumulative percent
 		if (iter->exclusion_code) {
@@ -4389,6 +4392,11 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 		}
 		HASH_DEL(set, as);
 		free(as);
+	}
+	
+	if (max_quantity > 10) {
+		olc_audit_msg(ch, vnum, "Interaction has unusually high quantity %d", max_quantity);
+		problem = TRUE;
 	}
 	
 	return problem;
