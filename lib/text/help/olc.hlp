@@ -7542,18 +7542,15 @@ flavor to construction and take time, but don't cost anything. These will only
 be visible for things that build over time (like buildings, maintenance,
 vehicles, and repair) -- not things that take resources instantly (like forge).
 
-Available resource actions are:
-  dig
-  clear terrain
-  tidy up
-  repair
-  scout area
-  block water
-  engrave
-  magic words
-  organize
+You can add resource actions using generics. Here are some common ones:
+  1000 dig                   1006 engrave
+  1001 clear terrain         1007 magic words
+  1002 tidy up               1008 organize
+  1003 repair                1009 shovel soot
+  1004 scout area            1010 repair walls
+  1005 block water
 
-See also: BEDIT RESOURCE, CEDIT RESOURCES, VEDIT RESOURCE
+See also: BEDIT RESOURCE, CEDIT RESOURCES, VEDIT RESOURCE, OLC GENERICS
 #d
 "SHIELD ITEM" "SHIELD OBJECT"
 

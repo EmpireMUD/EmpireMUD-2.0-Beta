@@ -48,6 +48,8 @@ for any portion under 150 levels. For example, if you are level 75, you gain
 half your Greatness. At level 150, it's your full Greatness. At level 300, it's
 2x Greatness.
 
+This ability gains experience when you use an ability that's boosted by it.
+
 Note: Bonus healing does not add to the cost of healing spells.
 
 See also: HEAL, REJUVENATE
