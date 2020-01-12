@@ -1,7 +1,7 @@
 #2900
 imperial traveling pack~
 2900 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 100
 R
@@ -14,7 +14,7 @@ S
 #2902
 prismatic imperial pack~
 2902 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 100
 R
@@ -37,7 +37,7 @@ S
 #2904
 winged imperial shoes~
 2904 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 100
 R
@@ -86,7 +86,7 @@ S
 #2910
 heroic adventuring pack~
 2910 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 200
 R
@@ -99,7 +99,7 @@ S
 #2912
 heroic boots of seven strides~
 2912 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 200
 R

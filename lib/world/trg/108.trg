@@ -347,4 +347,17 @@ if %actor.on_quest(10855)% && !%actor.quest_triggered(10855)%
   end
 end
 ~
+#10865
+good omen buff~
+1 n 100
+~
+set actor %self.carried_by%
+if %actor%
+  dg_affect #10865 %actor% off
+  dg_affect #10865 %actor% MOVE-REGEN 4 86400
+  dg_affect #10865 %actor% MAX-MOVE 50 86400
+  %send% %actor% You feel refreshed and ready to work!
+end
+%purge% %self%
+~
 $

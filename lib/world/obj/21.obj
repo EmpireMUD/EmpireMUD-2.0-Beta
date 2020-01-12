@@ -618,15 +618,15 @@ R
 5118 0
 S
 #2145
-needles sewing feather set~
-feather sewing needles~
-A set of feather sewing needles is hidden on the ground.~
+kit needles feather sewing~
+a feather sewing kit~
+A kit of feather sewing needles is hidden on the ground.~
    The sewing needles are made from the rigid shafts of bird feathers,
-carefully punctured to put an eye in each needle. You can 'use' this set of
-needles to equip it. It will enable you to sew all manner of things, if you
-learn the Trade skill.
+carefully punctured to put an eye in each needle. You can 'use' this kit to
+equip it. It will enable you to sew all manner of things, if you learn the
+Trade skill.
 ~
-3 0 a m 3
+3 0 a m 4
 0 0 0
 14 0
 C
@@ -639,17 +639,17 @@ R
 5610 0
 S
 #2146
-needles sewing fine set~
-fine sewing needles~
-A set of fine sewing needles is bundled here.~
-   These needles were crafted by someone with an excellent hand. They're
-perfect for doing fine stitching without damaging the cloth. You can 'use' this
-set of needles to equip it. It will enable you to sew all manner of things, if
-you learn the Trade skill.
+kit fine sewing~
+a fine sewing kit~
+A fine sewing kit is bundled here.~
+   This fine sewing kit was crafted by someone with an excellend hand. The
+needles are perfect for doing fine stitching without damaging the cloth. You
+can 'use' this kit to equip it. It will enable you to sew all manner of things,
+if you learn the Trade skill.
 ~
-3 o a m 3
+3 o a m 4
 0 0 0
-14 0
+3 0
 C
 1 1
 S

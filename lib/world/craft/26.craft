@@ -1,7 +1,7 @@
 #2600
 imperial serpent scale mail~
 2600 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 100
 R
@@ -22,7 +22,7 @@ S
 #2602
 imperial serpent hood~
 2602 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 100
 R
@@ -39,7 +39,7 @@ S
 #2604
 imperial serpent coil~
 2604 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 100
 R
@@ -71,7 +71,7 @@ S
 #2608
 heroic naga scale armor~
 2608 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 200
 R
@@ -92,7 +92,7 @@ S
 #2610
 heroic naga hood~
 2610 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 200
 R
@@ -109,7 +109,7 @@ S
 #2612
 heroic naga armband~
 2612 1
-4 182 q 42 -1 f
+4 182 q 42 -1 0
 L
 200
 R

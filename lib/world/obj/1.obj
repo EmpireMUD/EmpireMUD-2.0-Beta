@@ -738,9 +738,9 @@ S
 goldflake flake golden small~
 a small flake of gold~
 A small golden flake is lying here.~
-You can melt down gold flakes to make discs.
+You can smelt 8 gold flakes into an ingot using 'smelt gold flake ingot'.
 ~
-15 l a 0 2
+15 l a 0 3
 0 0 0
 4 0
 R

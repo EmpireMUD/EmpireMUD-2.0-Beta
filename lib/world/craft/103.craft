@@ -1,7 +1,7 @@
 #10308
 dragonscale leggings~
 10308 1
-4 199 hq 24 -1 f
+4 199 hq 24 -1 0
 R
 10006 3 0 0
 R
@@ -14,7 +14,7 @@ S
 #10309
 dragonweave stockings~
 10309 1
-4 199 hq 24 -1 f
+4 199 hq 24 -1 0
 R
 10006 3 0 0
 R
@@ -84,7 +84,7 @@ S
 #10345
 dragonscale bracers~
 10345 1
-4 182 q 30 -1 f
+4 182 q 30 -1 0
 R
 10006 3 0 0
 R
@@ -97,7 +97,7 @@ S
 #10347
 dragonscale saddle~
 10347 1
-4 182 q 30 -1 f
+4 182 q 30 -1 0
 R
 10006 2 0 0
 R

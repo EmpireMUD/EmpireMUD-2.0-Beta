@@ -148,7 +148,7 @@ S
 #10919
 crimson dragon girdle~
 10919 1
-4 10903 q 12 -1 f
+4 10903 q 12 -1 0
 R
 10928 4 0 0
 R
@@ -161,7 +161,7 @@ S
 #10920
 burning dragonsteel waistband~
 10920 1
-4 10903 q 12 -1 f
+4 10903 q 12 -1 0
 R
 10928 4 0 0
 R
@@ -174,7 +174,7 @@ S
 #10921
 flaming draconic cincture~
 10921 1
-4 10901 q 12 -1 f
+4 10901 q 12 -1 0
 R
 10903 2 0 0
 R
@@ -187,7 +187,7 @@ S
 #10922
 burning dragoncloth sash~
 10922 1
-4 10901 q 12 -1 f
+4 10901 q 12 -1 0
 R
 10903 2 0 0
 R

@@ -90,10 +90,10 @@ Abundant Water~
 every day grows tiring. Build a well to ensure easy access to water. You will
 be able to drink from the well, or fill your bottle from it. In temperate
 areas, you can build the well anywhere on the plains; but if you live in the
-desert, you must build it on an oasis. E sure to claim the well in order to
+desert, you must build it on an oasis. Be sure to claim the well in order to
 complete this goal.
 ~
-2 1 0 5 0
+3 1 0 5 0
 W
 7 5106 0 1
 S

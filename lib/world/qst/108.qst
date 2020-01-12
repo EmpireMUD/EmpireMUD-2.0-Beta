@@ -439,10 +439,11 @@ his Museum of Early Man &y/()\&0. This short tutorial will help you get started 
 teach you to gather crafting materials and make some basic items. These quests
 reward Trade skill levels and bonus experience.
    Note: Make sure you don't have Trade noskilled.
+   Tip: Use the 'nearby' command to look for the Museum of Early Man.
 ~
 You've found Horation and the Museum of Early Man!
 ~
-14 h 0 25 -1
+15 h 0 25 -1
 A
 1 10825
 P
@@ -1479,9 +1480,11 @@ home:
 ~
    Finishing this quest was just the beginning. Use the 'progress' command to
 see what goals remain for you to work toward in your new home, and keep an eye
-on the 'nearby' command for adventures around you.
+on the 'nearby' command for adventures around you. For finishing this quest,
+you receive the 'good omen' buff, which will last a very long time (unless you
+die).
 ~
-3 0 0 100 -1
+5 0 0 100 -1
 A
 3 10850
 P
@@ -1498,6 +1501,10 @@ P
 0 10857 0 1
 P
 0 10858 0 1
+R
+0 0 5
+R
+2 10865 1
 W
 39 0 0 50 a
 W

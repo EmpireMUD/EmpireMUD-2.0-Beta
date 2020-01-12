@@ -30,7 +30,7 @@ S
 #18519
 red coyote armor~
 18519 1
-4 182 q 12 -1 f
+4 182 q 12 -1 0
 L
 125
 R
@@ -47,7 +47,7 @@ S
 #18521
 feathered serpent armor~
 18521 1
-4 199 q 12 -1 f
+4 199 q 12 -1 0
 L
 125
 R
@@ -62,7 +62,7 @@ S
 #18523
 eagle warrior armor~
 18523 1
-4 199 q 12 -1 f
+4 199 q 12 -1 0
 L
 125
 R

@@ -8,7 +8,7 @@ S
 #12412
 black tricorne hat~
 12412 1
-4 182 q 6 -1 f
+4 182 q 6 -1 0
 R
 15 6 1 32
 R
@@ -193,7 +193,7 @@ S
 #12452
 goblin scullery pantaloons~
 12452 1
-4 199 q 24 -1 f
+4 199 q 24 -1 0
 R
 176 16 0 0
 R
@@ -210,7 +210,7 @@ S
 #12454
 goblin sea-shaman pantaloons~
 12454 1
-4 199 q 24 -1 f
+4 199 q 24 -1 0
 R
 176 16 0 0
 R
@@ -227,7 +227,7 @@ S
 #12456
 pirate boarding pantaloons~
 12456 1
-4 182 q 24 -1 f
+4 182 q 24 -1 0
 R
 177 16 0 0
 R
@@ -244,7 +244,7 @@ S
 #12458
 goblin dress pantaloons~
 12458 1
-4 182 q 24 -1 f
+4 182 q 24 -1 0
 R
 177 16 0 0
 R
