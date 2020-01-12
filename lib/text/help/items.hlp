@@ -433,7 +433,9 @@ See also: COMPONENT
 KNIFE KNIVES
 
 Tasks like skinning, butchering, and some crafting require a good knife. You
-can identify a dagger or knife to see if it works as this kind of tool.
+can identify a dagger or knife to see if it works as this kind of tool. This
+type of tool can be equipped with the 'use' command, or it will usually work
+from the wield, hold, or sheath slots.
 
 The handaxe and stone spear head will also work as primitive knives.
 #
