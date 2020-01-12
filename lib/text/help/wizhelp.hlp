@@ -1088,6 +1088,7 @@ startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 technology Immort   Shows ability techs a player has.
 terrain    Immort   Shows tile counts for all sector types (vnum/name optional).
+tools      Immort   Shows all objects with a given tool type.
 unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
@@ -1322,6 +1323,14 @@ Lists the total count of each sector, crop, or building type in the world. You
 can also specify one to see a list of matching tiles in the world, with their
 owners. However, if there is a large number of tiles, you'll only be able to
 see as many as fit in the text buffer.
+#e
+"SHOW TOOLS"
+
+Usage:  show tools <type>
+
+Lists all objects with a given tool type.
+
+See also: HELP TOOL FLAGS
 #e
 "SHOW UNLEARNABLE"
 

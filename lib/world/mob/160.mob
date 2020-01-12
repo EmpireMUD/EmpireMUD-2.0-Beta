@@ -232,7 +232,7 @@ horse fragmented bone~
 a horse made of fragmented bone~
 A horse made up of fragmented bone stands here.
 ~
-125 200 deh G 4
+125 200 dehj G 4
 0 0 22 11
 T 16010
 S
@@ -241,7 +241,7 @@ horse vine~
 a viney horse~
 A horse made up of more vine than anything else sways here.
 ~
-125 200 deh G 4
+125 200 dehj G 4
 0 0 14 15
 T 16010
 S
@@ -250,7 +250,7 @@ construct skeleton skeletal~
 a skeletal construct~
 A skeletal construct, made of many different creatures stands here.
 ~
-125 200 deh G 4
+125 200 dehj G 4
 0 0 22 9
 T 16010
 S
@@ -259,7 +259,7 @@ construct plants~
 a plant construct~
 A construct made up of various plants sways here.
 ~
-125 200 deh G 4
+125 200 dehj G 4
 0 0 13 7
 T 16010
 S
@@ -276,7 +276,7 @@ dracolich skeletal~
 a skeletal dracolich~
 A skeletal dracolich stands here with flames in its eyes.
 ~
-125 200 deh mG 5
+125 200 dehj mG 5
 0 0 25 12
 T 16010
 S
@@ -285,7 +285,7 @@ dragon viney~
 a viney dragon~
 A viney dragon looks to have grown up out of the ground.
 ~
-125 200 deh mG 5
+125 200 dehj mG 5
 0 0 25 15
 T 16010
 S
@@ -294,7 +294,7 @@ shark viney plant~
 a viney shark~
 A shark made up entirely of vines and other plant life swims here.
 ~
-125 200 dehl 0 5
+125 200 dehjl 0 5
 0 0 6 9
 T 16010
 S
@@ -303,7 +303,7 @@ hawk skeletal giant~
 a giant skeletal hawk~
 A giant skeletal hawk hovers here.
 ~
-125 200 deh m 4
+125 200 dehj m 4
 0 0 2 26
 T 16010
 S
@@ -312,7 +312,7 @@ bird leafy leaves~
 a leafy bird~
 A bird with leaves for feathers hovers here.
 ~
-125 200 deh m 4
+125 200 dehj m 4
 0 0 2 26
 T 16010
 S

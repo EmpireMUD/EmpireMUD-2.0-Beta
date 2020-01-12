@@ -34,6 +34,7 @@
 
 // locals
 void process_build(char_data *ch, room_data *room, int act_type);
+void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
@@ -54,6 +55,7 @@ extern const bool can_designate_dir[NUM_OF_DIRS];
 extern const bool can_designate_dir_vehicle[NUM_OF_DIRS];
 extern const char *dirs[];
 extern int rev_dir[];
+extern const char *tool_flags[];
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -808,6 +810,11 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 	// just emergency check that it's not actually dismantling
 	if (!IS_DISMANTLING(room) && BUILDING_RESOURCES(room)) {
 		if ((res = get_next_resource(ch, BUILDING_RESOURCES(room), can_use_room(ch, room, GUESTS_ALLOWED), TRUE, &found_obj))) {
+			// if maintaining, remove a "similar" item from the old built-with list -- this is what the maintaining item is replacing
+			if (act_type == ACT_MAINTENANCE && found_obj) {
+				remove_like_item_from_built_with(&GET_BUILT_WITH(room), found_obj);
+			}
+			
 			// take the item; possibly free the res
 			apply_resource(ch, res, &GET_BUILDING_RESOURCES(room), found_obj, APPLY_RES_BUILD, NULL, &GET_BUILT_WITH(room));
 			
@@ -867,7 +874,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 	if (res) {
 		// RES_x: messaging
 		switch (res->type) {
-			// RES_COMPONENT, RES_ACTION, and RES_CURRENCY aren't possible here
+			// RES_COMPONENT (stored as obj), RES_ACTION, RES_TOOL (stored as obj), and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
 				snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
@@ -958,6 +965,65 @@ void remove_designate_objects(room_data *room) {
 					extract_obj(o);
 				}
 			}
+		}
+	}
+}
+
+
+/**
+* This removes an earlier entry (with the same component type) in a built-with
+* list. This is called during maintenance so that the newly-added resource will
+* replace an older one. Call this BEFORE adding the new resource to built-with.
+*
+* @param struct resource_data **built_with The room's &GET_BUILT_WITH()
+* @param int cmp_type What type of component we're replacing.
+*/
+void remove_like_component_from_built_with(struct resource_data **built_with, int cmp_type) {
+	struct resource_data *iter, *next;
+	obj_data *proto;
+	
+	if (!built_with || !*built_with) {
+		return;	// no work
+	}
+	
+	LL_FOREACH_SAFE(*built_with, iter, next) {
+		if (iter->type == RES_OBJECT && (proto = obj_proto(iter->vnum)) && GET_OBJ_CMP_TYPE(proto) == cmp_type) {
+			iter->amount -= 1;
+			if (iter->amount <= 0) {
+				LL_DELETE(*built_with, iter);
+				free(iter);
+			}
+			break;	// only need 1
+		}
+	}
+}
+
+
+/**
+* This removes an earlier entry (with the same component type or vnum as obj)
+* in a built-with list. This is called during maintenance so that the newly-
+* added resource will replace an older one. Call this BEFORE adding the new
+* resource to built-with.
+*
+* @param struct resource_data **built_with The room's &GET_BUILT_WITH()
+* @param obj_data *obj The obj that will be added (for matching the thing to remove).
+*/
+void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj) {
+	struct resource_data *iter, *next;
+	obj_data *proto;
+	
+	if (!built_with || !*built_with || !obj) {
+		return;	// no work
+	}
+	
+	LL_FOREACH_SAFE(*built_with, iter, next) {
+		if (iter->type == RES_OBJECT && (iter->vnum == GET_OBJ_VNUM(obj) || ((proto = obj_proto(iter->vnum)) && GET_OBJ_CMP_TYPE(proto) == GET_OBJ_CMP_TYPE(obj)))) {
+			iter->amount -= 1;
+			if (iter->amount <= 0) {
+				LL_DELETE(*built_with, iter);
+				free(iter);
+			}
+			break;	// only need 1
 		}
 	}
 }
@@ -1177,6 +1243,7 @@ ACMD(do_build) {
 	extern int get_crafting_level(char_data *ch);
 	void show_craft_info(char_data *ch, char *argument, int craft_types);
 	
+	char buf1[MAX_STRING_LENGTH];
 	room_data *to_room = NULL, *to_rev = NULL;
 	any_vnum missing_abil = NO_ABIL;
 	obj_data *found_obj = NULL;
@@ -1381,6 +1448,15 @@ ACMD(do_build) {
 	}
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
 		return;	// the trigger should send its own message if it prevented this
+	}
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
+			msg_to_char(ch, "You need the following tools to build that: %s\r\n", buf1);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to build that.\r\n", AN(buf1), buf1);
+		}
 	}
 	else {
 		found = TRUE;

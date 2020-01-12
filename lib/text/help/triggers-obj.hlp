@@ -204,6 +204,7 @@ When using field  - The variable returns:
 &cshortdesc&0 - The name of the object that players see.
 &csize&0 - Inventory size of the object.
 &ctimer&0 - The timer of the object.
+&ctool&0 - The object's tool types (separated by spaces), if any.
 &ctype&0 - The type of object, such as WEAPON, ARMOR, or PACK.
 &cused_lighter(PERSON)&0 - Uses up a charge on a LIGHTER item, if applicable.
    The person using it is an optional argument; they receive a message if the

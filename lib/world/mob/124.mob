@@ -590,7 +590,7 @@ orca green-tinged tinged~
 a green-tinged orca~
 A green-tinged orca is stalking you.
 ~
-100 125 del 0 5
+100 125 dejl 0 5
 0 0 6 9
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 S
@@ -599,7 +599,7 @@ kraken raging rages~
 a raging kraken~
 A kraken rages violently in the water!
 ~
-100 125 del 0 5
+100 125 dejl 0 5
 0 0 6 7
 I 0 12404 100.00 3  # BUTCHER: a fillet of fish
 S

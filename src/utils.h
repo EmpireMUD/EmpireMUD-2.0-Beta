@@ -457,6 +457,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_CRAFT_OBJECT(craft)  ((craft)->object)
 #define GET_CRAFT_QUANTITY(craft)  ((craft)->quantity)
 #define GET_CRAFT_REQUIRES_OBJ(craft)  ((craft)->requires_obj)
+#define GET_CRAFT_REQUIRES_TOOL(craft)  ((craft)->requires_tool)
 #define GET_CRAFT_RESOURCES(craft)  ((craft)->resources)
 #define GET_CRAFT_TIME(craft)  ((craft)->time)
 #define GET_CRAFT_TYPE(craft)  ((craft)->type)
@@ -874,6 +875,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->obj_flags.requires_quest)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
+#define GET_OBJ_TOOL_FLAGS(obj)  ((obj)->obj_flags.tool_flags)
 #define GET_OBJ_TYPE(obj)  ((obj)->obj_flags.type_flag)
 #define GET_OBJ_VAL(obj, val)  ((obj)->obj_flags.value[(val)])
 #define GET_OBJ_WEAR(obj)  ((obj)->obj_flags.wear_flags)
@@ -897,6 +899,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define OBJS(obj, vict)  (CAN_SEE_OBJ((vict), (obj)) ? GET_OBJ_DESC((obj), vict, 1) : "something")
 #define OBJVAL_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_VAL((obj), 1), (flag)))
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
+#define TOOL_FLAGGED(obj, flag)  IS_SET(GET_OBJ_TOOL_FLAGS(obj), (flag))
 
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !IS_AMMO(obj))
@@ -941,7 +944,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_WEAPON_TYPE(obj)  (IS_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_WEAPON_TYPE) : TYPE_UNDEFINED)
 
 #define IS_ANY_WEAPON(obj)  (IS_WEAPON(obj) || IS_MISSILE_WEAPON(obj))
-#define IS_STAFF(obj)  (GET_WEAPON_TYPE(obj) == TYPE_LIGHTNING_STAFF || GET_WEAPON_TYPE(obj) == TYPE_BURN_STAFF || GET_WEAPON_TYPE(obj) == TYPE_AGONY_STAFF || OBJ_FLAGGED((obj), OBJ_STAFF))
+#define IS_STAFF(obj)  (GET_WEAPON_TYPE(obj) == TYPE_LIGHTNING_STAFF || GET_WEAPON_TYPE(obj) == TYPE_BURN_STAFF || GET_WEAPON_TYPE(obj) == TYPE_AGONY_STAFF || TOOL_FLAGGED((obj), TOOL_STAFF))
 
 // ITEM_ARMOR subtype
 #define IS_ARMOR(obj)  (GET_OBJ_TYPE(obj) == ITEM_ARMOR)
@@ -1734,6 +1737,8 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 
 // utils from act.action.c
 void cancel_action(char_data *ch);
+extern obj_data *has_tool(char_data *ch, bitvector_t flags);
+extern obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void start_action(char_data *ch, int type, int timer);
 
 // utils from act.comm.c
@@ -1774,6 +1779,7 @@ extern char *get_bld_name_by_proto(bld_vnum vnum);
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);
 void qt_change_ability(char_data *ch, any_vnum abil);
+void qt_change_level(char_data *ch, int level);
 void qt_change_production_total(char_data *ch, any_vnum vnum, int amount);
 void qt_change_reputation(char_data *ch, any_vnum faction);
 void qt_change_skill_level(char_data *ch, any_vnum skl);

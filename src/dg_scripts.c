@@ -52,6 +52,7 @@ extern const char *mob_move_types[];
 extern struct time_info_data time_info;
 extern const char *otrig_types[];
 extern struct instance_data *quest_instance_global;
+extern const char *tool_flags[];
 extern const char *trig_attach_types[];
 extern const char *trig_types[];
 extern const char *vtrig_types[];
@@ -192,6 +193,7 @@ int find_eq_pos_script(char *arg) {
 		{ "ranged", WEAR_RANGED },
 		{ "hold", WEAR_HOLD },
 		{ "held", WEAR_HOLD },
+		{ "tool", WEAR_TOOL },
 		{ "shared", WEAR_SHARE },
 		{ "none", NO_WEAR }
 	};
@@ -4224,6 +4226,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "tool")) {
+						obj_data *tool;
+						int tool_type;
+						if (subfield && *subfield && (tool_type = search_block(subfield, tool_flags, FALSE)) != NOTHING && (tool = has_tool(ch, BIT(tool_type)))) {
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(tool));
+						}
+						else {
+							strcpy(str, "");	// tool not found
+						}
+					}
 					break;
 				}
 				case 'u': {	// char.u*
@@ -4665,6 +4677,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					else if (!str_cmp(field, "timer"))
 						snprintf(str, slen, "%d", GET_OBJ_TIMER(o));
+					else if (!str_cmp(field, "tool")) {
+						if (GET_OBJ_TOOL_FLAGS(o)) {
+							sprintbit(GET_OBJ_TOOL_FLAGS(o), tool_flags, str, TRUE);
+						}
+						else {	// not a tool
+							strcpy(str, "");
+						}
+					}
 					break;
 				}
 				case 'u': {	// obj.u*

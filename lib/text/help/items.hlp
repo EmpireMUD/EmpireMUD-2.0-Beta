@@ -350,6 +350,15 @@ Used for:  cooking
 
 See also: COMPONENT
 #
+"GRINDING STONE" "GRIND STONE" GRINDSTONE
+
+Usage:  mill <item>
+
+A grinding stone can be used to mill items without a full mill building. You
+can craft a simple grinding stone using Primitive Crafts.
+
+See also: MILL
+#
 HANDLE "HANDLE COMPONENT"
 
 Handle (component)
@@ -421,6 +430,15 @@ ones available.
 
 See also: COMPONENT
 #
+KNIFE KNIVES
+
+Tasks like skinning, butchering, and some crafting require a good knife. You
+can identify a dagger or knife to see if it works as this kind of tool. This
+type of tool can be equipped with the 'use' command, or it will usually work
+from the wield, hold, or sheath slots.
+
+The handaxe and stone spear head will also work as primitive knives.
+#
 LARGE "LARGE ITEMS" "LARGE FLAG" (LARGE)
 
 The (large) flag on items indicates that the item is over-sized and takes up
@@ -451,6 +469,17 @@ Yellow Lightning Stone (resource)
 Stored in:  Tower of Sorcery
 
 This rare stone can be found in the desert where lightning has struck.
+#
+LOOM LOOMS "BACKSTRAP LOOM" "BACK STRAP LOOM"
+
+The loom is a tool which is used to weave cloth and other textiles. The loom
+holds the warp strings taut while the weaver passes the weft string back and
+forth. Tailor buildings always have looms in them, so you can weave there
+without bringing your own.
+
+You can craft a simple backstrap loom with Basic Crafts.
+
+See also: BASIC CRAFTS, WEAVE
 #
 LUMBER "LUMBER COMPONENT"
 
@@ -573,11 +602,11 @@ wooden columns from saplings and rope if you have Basic Crafts. This may be
 useful if you're unable to get logs (for example, rough wood cannot be scraped).
 
 Common types of pillars are:
- heavy log (basic)
- bound wooden column (basic)
- fine wooden pillar (basic)
+ heavy log (basic) -- scrape a tree
+ bound wooden column (basic) -- craft with Basic Crafts
+ fine wooden pillar (basic) -- scrape a jungle tree
 
-See also: BASIC CRAFTS, COMPONENT, LOGS
+See also: BASIC CRAFTS, COMPONENT, LOGS, SCRAPE
 #
 RETRIEVE
 
@@ -622,6 +651,17 @@ some crops use seeds for planting. However, most crops are planted using the
 harvested item (e.g. a bunch of apples).
 
 See also: PLANT
+#
+"SEWING KIT" NEEDLES
+
+A sewing kit is required to use the 'sew' command, unless you're in a tailor
+building. You can craft a feather sewing kit with Primitive Crafts or forge
+a fine sewing kit with Jewelry.
+
+If you need feathers to craft the feather sewing kit, kill and butcher small
+birds.
+
+See also: SEW, CRAFT, FORGE, PRIMITIVE CRAFTS, JEWELRY
 #
 SKIN SKINS "SKIN COMPONENT"
 

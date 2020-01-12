@@ -193,7 +193,7 @@ int count_objs_in_room(room_data *room) {
 * @param char_data *ch The player.
 * @param obj_data *obj The item trying to wear.
 * @param char *arg The typed argument, which may be empty, or a body part.
-* @return int A WEAR_x pos, or NO_WEAR.
+* @return int A WEAR_ pos, or NO_WEAR.
 */
 int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 	extern const char *wear_keywords[];
@@ -303,10 +303,10 @@ bool get_check_money(char_data *ch, obj_data *obj) {
 
 
 /**
-* Converts an ITEM_WEAR_x into a corresponding WEAR_x flag.
+* Converts an ITEM_WEAR_ into a corresponding WEAR_ flag.
 *
-* @param bitvector_t item_wear The ITEM_WEAR_x bits.
-* @return int A WEAR_x position that matches, or NOWEHRE.
+* @param bitvector_t item_wear The ITEM_WEAR_ bits.
+* @return int A WEAR_ position that matches, or NOWEHRE.
 */
 int get_wear_by_item_wear(bitvector_t item_wear) {
 	extern int item_wear_to_wear[];
@@ -339,6 +339,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const char *size_types[];
+	extern const char *tool_flags[];
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
@@ -448,12 +449,17 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		prettier_sprintbit(GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE, wear_bits, buf);
 		msg_to_char(ch, "Can be worn on: %s\r\n", buf);
 	}
-
 	
 	// flags
 	if (GET_OBJ_EXTRA(obj) & show_obj_flags) {
 		prettier_sprintbit(GET_OBJ_EXTRA(obj) & show_obj_flags, extra_bits, buf);
 		msg_to_char(ch, "It is: %s\r\n", buf);
+	}
+	
+	// tool types
+	if (GET_OBJ_TOOL_FLAGS(obj)) {
+		prettier_sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf);
+		msg_to_char(ch, "Tool type: %s\r\n", buf);
 	}
 	
 	if (GET_OBJ_AFF_FLAGS(obj)) {
@@ -1154,7 +1160,7 @@ void do_shop_identify(char_data *ch, obj_data *shop_obj) {
 *
 * @param char_data *ch The person wearing the item.
 * @param obj_data *obj The item he's wearing.
-* @param int where Any WEAR_x position.
+* @param int where Any WEAR_ position.
 */
 static void wear_message(char_data *ch, obj_data *obj, int where) {
 	// char message
@@ -6854,6 +6860,19 @@ ACMD(do_use) {
 		}
 		if (IS_MINIPET(obj)) {
 			use_minipet_obj(ch, obj);
+			return;
+		}
+		if (GET_OBJ_TOOL_FLAGS(obj)) {	// use as tool
+			if (GET_EQ(ch, WEAR_TOOL)) {
+				// try to remove
+				perform_remove(ch, WEAR_TOOL);
+			}
+			if (GET_EQ(ch, WEAR_TOOL)) {	// still?
+				act("You're already using $p as a tool.", FALSE, ch, GET_EQ(ch, WEAR_TOOL), NULL, TO_CHAR);
+			}
+			else {
+				perform_wear(ch, obj, WEAR_TOOL);
+			}
 			return;
 		}
 	

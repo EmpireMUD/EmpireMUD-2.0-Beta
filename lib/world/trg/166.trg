@@ -74,7 +74,7 @@ if %actor.has_resources(16605,3)%
   halt
 end
 set room %self.room%
-if %room.function(DRINK-WATER)%
+if %room.function(DRINK-WATER)% || %room.sector_flagged(DRINK)%
   %send% %actor% You dip %self.shortdesc% into the water and it freezes the liquid into snow.
   %echoaround% %actor% %player_name% dips %self.shortdesc% into the water and it freezes the liquid into snow.
 else
@@ -1077,7 +1077,6 @@ switch %random.4%
     %echo% Snow flies everywhere as %self.name% spins in circles.
   break
 done
-wait 1 s
 eval movement %random.11% - 1
 while %movement%
   mmove

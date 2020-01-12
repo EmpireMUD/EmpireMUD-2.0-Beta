@@ -48,6 +48,7 @@ extern const char *paint_colors[];
 extern const char *paint_names[];
 extern const char *size_types[];
 extern const char *storage_bits[];
+extern const char *tool_flags[];
 extern const char *wear_bits[];
 
 // external funcs
@@ -1031,7 +1032,8 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, cmp_flags = NOBITS, not_cmp_flagged = NOBITS, only_affs = NOBITS;
-	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
+	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
+	bitvector_t only_tools = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING, only_cmp = NOTHING;
 	int only_weapontype = NOTHING;
 	struct interaction_item *inter;
@@ -1069,6 +1071,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
+		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_LIST("type", only_type, item_types)
 		FULLSEARCH_FLAGS("uncflagged", not_cmp_flagged, component_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
@@ -1119,6 +1122,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
+			continue;
+		}
+		if (only_tools != NOBITS && (GET_OBJ_TOOL_FLAGS(obj) & only_tools) != only_tools) {
 			continue;
 		}
 		if (only_mat != NOTHING && GET_OBJ_MATERIAL(obj) != only_mat) {
@@ -2008,6 +2014,9 @@ void olc_show_object(char_data *ch) {
 	
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_EXTRA(obj), NOBITS), buf1);
+	
+	sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf1, TRUE);
+	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TOOL_FLAGS(obj), NOBITS), buf1);
 	
 	sprintf(buf + strlen(buf), "<%scomponent\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_CMP_TYPE(obj), 0), component_types[GET_OBJ_CMP_TYPE(obj)]);
 	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
@@ -3092,6 +3101,12 @@ OLC_MODULE(oedit_storage) {
 OLC_MODULE(oedit_timer) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	GET_OBJ_TIMER(obj) = olc_process_number(ch, argument, "decay timer", "timer", -1, MAX_INT, GET_OBJ_TIMER(obj));
+}
+
+
+OLC_MODULE(oedit_tools) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	GET_OBJ_TOOL_FLAGS(obj) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, GET_OBJ_TOOL_FLAGS(obj));
 }
 
 

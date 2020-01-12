@@ -60,14 +60,15 @@ messages for starting and stopping the action, plus any resources you get.
 The following things will speed up various chores:
 - Faster chores (bonus): dig, gather, chop, build, dismantle, harvest, plant,
    mine, mint, repair, chip, excavate, pick, scrape, fillin, saw, quarry, tan,
-   cook, smelt, burning stumps
+   cook, smelt, burning stumps, bake
 - Faster walking: run
-- Finder: dig, gather, pan, pick
+- Finder: dig, gather, hunt, pan, pick
 - Haste: dig, gather, chop, build, dismantle, harvest, plant, mine, repair,
    play (music), excavate, pick, scrape, fillin, saw, quarry
 - Shovel: dig
 - Weapon damage: chop, mine
-- Superior tool: craft, forge
+- Superior tool: craft, forge, saw, sew
+- Higher level tool: fish
 - Progression goals: excavate, prospect
 - Mastery abilities: forge, sew, crafts in general
 - Certain buildings: sew (tailor), weaving (tailor), craft (clay at potter)
@@ -336,7 +337,8 @@ See also: SCORE
 "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
 You can create a cooking fire by lighting a tree or log, using fire sticks.
-This will let you cook food, brew potions, or craft pottery.
+This will let you cook food, brew potions, or craft pottery. However, you can't
+bake with it.
 
 You can also cook in a Kitchen, Alchemist, Potter, or Laboratory. If you have
 the Touch of Flame ability, you don't need a fire at all.
@@ -390,7 +392,6 @@ Charisma is a measure of your character's charm and ability to manipulate a
 situation.
 
 Charisma is used for:
- - Improving your fishing ability.
  - Many Stealth abilities.
 
 See also: ATTRIBUTES
@@ -542,19 +543,19 @@ DEATH DYING
 
 When you die in EmpireMUD, you will lie on the ground for a short time, until
 you type 'respawn'. When you respawn, you'll appear at your chosen tomb, at
-any nearby tomb your empire owns, or at a random starting location. If you die
-too often, you may have to wait a while before you can move after respawning.
+any nearby tomb your empire owns, or at a random starting location. You can
+only be reanimated in a tomb if your empire owns one on the same island
+where you died (rivers don't count for this; only oceans separate islands).
 
-You can only be reanimated in a cemetery if your empire owns one on the same
-island where you died (rivers don't count for this; only oceans separate
-islands). If you own more than one, you will generally be reanimated in the
-oldest cemetery.
+When you die, you'll come back hungry and thirsty, and with a quarter of your
+maximum health, moves, and mana. Vampires also come back with a quarter of
+their blood. Any spells and affects go away when you die.
 
 If you die too many times in a row, you will start to accrue a death penalty,
 where you must wait before you can start acting. If you're at war, this penalty
 starts at a lower number of deaths.
 
-See also: RESPAWN, RESURRECT, STARTING LOCATION, TOMB
+See also: RESPAWN, RESURRECT, STARTING LOCATION, TOMB, AFFECTS
 #
 DEPLETION DEPLETED
 
@@ -791,7 +792,7 @@ stack. You will continue to accumulate hunger and thirst (making it harder to
 remove these penalties) until 50 hours have passed.
 
 Vampires with low blood pools suffer a starvation penalty identical to hunger
-and thirst. They will also aggresively and uncontrollably try to bite anyone
+and thirst. They will also aggressively and uncontrollably try to bite anyone
 nearby that has blood.
 
 All timed actions, such as crafting and chores, take twice as long while you
@@ -1052,6 +1053,16 @@ may happen on newbie islands:
 - Hostile mobs like the highwayman won't attack you on a newbie island.
 
 See also: INFO, GETTING STARTED
+#
+OVEN OVENS
+
+Command:  bake <item>
+
+You can bake some foods in ovens. Most kitchens, including the one you can
+designate in your house, have an oven. Things that require an oven can't be
+cooked on an ordinary cooking fire.
+
+See also: BAKE
 #
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
@@ -1386,6 +1397,37 @@ around the world. These types of transportation require harnessed animals to
 lead them, but can store far more than you can carry alone.
 
 See also: WOODWORKING, RIDE, HARNESS, PUT, GET
+#
+TOOL TOOLS "TOOL TYPES" "TOOL FLAGS"
+
+You can't complete a task properly without the right tools. Identify an object
+to see if it's a tool. You can equip a tool with the 'use' command, but you
+can also wield or hold some other types of tools. Tools must be equipped to
+use them (unless they're being used as a resource in a craft).
+
+Types of tools are:
+ &caxe&0 - For chopping trees.
+ &cfishing tool&0 - For the fish command.
+ &chammer&0 - For forging.
+ &charvesting tool&0 - For harvesting.
+ &cknapper&0 - For chipping flints.
+ &cknife&0 - For skin, butcher, and some crafts.
+ &cloom&0 - Required to weave (if not at a tailor).
+ &cmining tool&0 - For mining.
+ &cpan&0 - To pan for gold.
+ &cgrinding stone&0 - Allows milling anywhere, at a lower speed.
+ &cquarrying tools&0 - Unused.
+ &csaw&0 - Allows you to saw lumber anywhere.
+ &csewing kit&0 - Required to sew unless you're at a tailor.
+ &cshears&0 - Unused.
+ &cshovel&0 - For excavating, and to speed up digging.
+ &cstaff&0 - For Staff Mastery or other staff-related abilities.
+
+Note that the <tool> gear slot does NOT provide stats to your character, even
+if you equip a tool like an axe that would apply stats if it were in the
+<wield> slot.
+
+See also: USE
 #
 UNSTUCK
 

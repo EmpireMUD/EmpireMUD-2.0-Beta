@@ -37,13 +37,13 @@
 extern const struct augment_type_data augment_info[];
 extern const char *craft_types[];
 extern struct gen_craft_data_t gen_craft_data[];
+extern const char *tool_flags[];
 
 // external functions
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-extern obj_data *has_sharp_tool(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
 extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
 
@@ -53,7 +53,6 @@ bool can_refashion(char_data *ch);
 ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
-obj_data *has_hammer(char_data *ch);
 obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 
@@ -69,11 +68,12 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 * @return bool TRUE if okay, FALSE if not.
 */
 bool check_can_craft(char_data *ch, craft_data *type) {
+	char buf1[MAX_STRING_LENGTH];
 	bool wait, room_wait;
 	
 	// type checks
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) {
-		msg_to_char(ch, "You need to be in a mill to do that.\r\n");
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !has_tool(ch, TOOL_GRINDING_STONE) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) {
+		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do that.\r\n");
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_PRESS)) {
 		msg_to_char(ch, "You need a press to do that.\r\n");
@@ -84,8 +84,17 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SEW && !has_tool(ch, TOOL_SEWING_KIT) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR)) {
+		msg_to_char(ch, "You need to equip a sewing kit to make that, or sew it at a tailor.\r\n");
+	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR) && !has_tool(ch, TOOL_LOOM)) {
+		msg_to_char(ch, "You need a loom to do that.\r\n");
+	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SMELT)) {
 		msg_to_char(ch, "You can't %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_BAKE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_OVEN)) {
+		msg_to_char(ch, "You need an oven to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	
 	// flag checks
@@ -94,9 +103,6 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	}
 	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER | CRAFT_SHIPYARD | CRAFT_GLASSBLOWER)) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
-	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHARP) && !has_sharp_tool(ch)) {
-		msg_to_char(ch, "You need to be using a sharp tool to %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_APIARIES) && !has_tech_available(ch, TECH_APIARIES)) {
 		// message sent for us
@@ -132,6 +138,17 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	// end flag checks
+	
+	// tool checks
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
+			msg_to_char(ch, "You need the to equip following tools to %s that: %s\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, buf1);
+		}
+		else {
+			msg_to_char(ch, "You need to equip %s %s to %s that.\r\n", AN(buf1), buf1, gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		}
+	}
 	
 	// types that require the building be complete
 	else if (!IS_COMPLETE(IN_ROOM(ch)) && (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) || GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS)) {
@@ -169,8 +186,8 @@ bool can_forge(char_data *ch) {
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
-	else if (!has_hammer(ch)) {
-		// sends own message
+	else if (!has_tool(ch, TOOL_HAMMER)) {
+		msg_to_char(ch, "You need to use a hammer to do that.\r\n");
 	}
 	else {
 		ok = TRUE;
@@ -483,32 +500,6 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 
 
 /**
-* This finds a hammer in either tool slot, and returns it.
-*
-* @param char_data *ch The person using the hammer?
-* @return obj_data *The hammer object.
-*/
-obj_data *has_hammer(char_data *ch) {
-	obj_data *hammer = NULL;
-	int iter;
-	
-	// list of valid slots; terminate with -1
-	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
-	
-	for (iter = 0; slots[iter] != -1; ++iter) {
-		hammer = GET_EQ(ch, slots[iter]);
-		if (hammer && IS_WEAPON(hammer) && GET_WEAPON_TYPE(hammer) == TYPE_HAMMER) {
-			return hammer;
-		}
-	}
-	
-	// nope
-	msg_to_char(ch, "You need to use a hammer to do that.\r\n");
-	return NULL;
-}
-
-
-/**
 * Finds the required obj for a craft, if present, and returns it. If the item
 * is in the room, it must be bind-ok.
 *
@@ -723,6 +714,11 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Requires: crafting level %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
+	if (GET_CRAFT_REQUIRES_TOOL(craft)) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, part);
+		msg_to_char(ch, "Requires tool%s: %s\r\n", (count_bits(GET_CRAFT_REQUIRES_TOOL(craft)) != 1) ? "s" : "", part);
+	}
+	
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
 	msg_to_char(ch, "Notes: %s\r\n", part);
 	
@@ -796,34 +792,33 @@ INTERACTION_FUNC(tame_interact) {
 #define SOUP_TIMER  336  // hours
 
 
-// for gen_craft_data[].strings
-#define GCD_STRING_TO_CHAR  0
-#define GCD_STRING_TO_ROOM  1
-
-
 // CRAFT_TYPE_x
 struct gen_craft_data_t gen_craft_data[] = {
-	{ "error", "erroring", NOBITS, { "", "" } },	// dummy to require scmd
+	{ "error", "erroring", NOBITS, { "", "", "" } },	// dummy to require scmd
 	
 	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
-	{ "forge", "forging", NOBITS, { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
-	{ "craft", "crafting", NOBITS, { "You continue crafting the %s...", "$n continues crafting the %s..." } },
-	{ "cook", "cooking", ACTF_FAST_CHORES, { "You continue cooking the %s...", "$n continues cooking the %s..." } },
-	{ "sew", "sewing", NOBITS, { "You carefully sew the %s...", "$n carefully sews the %s..." } },
-	{ "mill", "milling", NOBITS, { "You grind the millstone, making %s...", "$n grinds the millstone, making %s..." } },
-	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion..." } },
-	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
+	// strings are { periodic message to ch, periodic message to room, long desc to room }
+	// - the messages may have one %s for the craft name. The long desc will automatically add a/an to the beginning of it.
+	{ "forge", "forging", NOBITS, { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!", "$n is forging %s." } },
+	{ "craft", "crafting", NOBITS, { "You continue crafting the %s...", "$n continues crafting the %s...", "$n is crafting %s." } },
+	{ "cook", "cooking", ACTF_FAST_CHORES, { "You continue cooking the %s...", "$n continues cooking the %s...", "$n is cooking %s." } },
+	{ "sew", "sewing", NOBITS, { "You carefully sew the %s...", "$n carefully sews the %s...", "$n is sewing %s." } },
+	{ "mill", "milling", NOBITS, { "You grind the millstone, making %s...", "$n grinds the millstone, making %s...", "$n grinds the millstone, making %s." } },
+	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion...", "$n stirs a potion." } },
+	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison...", "$n stirs a bubbling poison." } },
 	
 	// build is special and doesn't use do_gen_craft, so doesn't really use this data
-	{ "build", "building", NOBITS, { "You work on the building...", "$n works on the building..." } },
+	{ "build", "building", NOBITS, { "You work on the building...", "$n works on the building...", "$n is working on the building." } },
 	
-	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
+	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s...", "$n is weaving %s." } },
 	
-	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n work on the %s..." } },	// not used by players
+	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
 	
-	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
-	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire..." } },
-	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s..." } },
+	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s...", "$n is manufacturing %s." } },
+	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire...", "$n is smelting %s." } },
+	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s...", "$n is working the press." } },
+	
+	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake...", "$n is baking %s." } },
 };
 
 
@@ -1067,8 +1062,9 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 * @param char_data *ch The actor.
 */
 void process_gen_craft(char_data *ch) {
-	obj_data *weapon = NULL;
+	obj_data *weapon = NULL, *tool = NULL;
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
+	bool has_mill = FALSE;
 	
 	if (!type) {
 		cancel_gen_craft(ch);
@@ -1082,17 +1078,28 @@ void process_gen_craft(char_data *ch) {
 	}
 	
 	// things that check for & set weapon
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !(weapon = has_hammer(ch)) && !can_forge(ch)) {
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !(weapon = has_tool(ch, TOOL_HAMMER)) && !can_forge(ch)) {
 		// can_forge sends its own message
 		cancel_gen_craft(ch);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHARP) && !(weapon = has_sharp_tool(ch))) {
-		msg_to_char(ch, "You need to be using a sharp tool to %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SEW && !(weapon = has_tool(ch, TOOL_SEWING_KIT)) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR)) {
+		msg_to_char(ch, "You need to equip a sewing kit to sew this, or sew it at a tailor.\r\n");
+		cancel_gen_craft(ch);
+	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR) && !has_tool(ch, TOOL_LOOM)) {
+		msg_to_char(ch, "You need a loom to keep weaving.\r\n");
+		cancel_gen_craft(ch);
+	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !(has_mill = room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) &&  !has_tool(ch, TOOL_GRINDING_STONE)) {
+		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do keep milling.\r\n");
 		cancel_gen_craft(ch);
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
+	}
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type)))) {
+		msg_to_char(ch, "You aren't using the right tool to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;
@@ -1100,6 +1107,14 @@ void process_gen_craft(char_data *ch) {
 		// bonus point for superior tool -- if this craft requires a tool
 		if (weapon && OBJ_FLAGGED(weapon, OBJ_SUPERIOR)) {
 			GET_ACTION_TIMER(ch) -= 1;
+		}
+		else if (tool && OBJ_FLAGGED(tool, OBJ_SUPERIOR)) {
+			GET_ACTION_TIMER(ch) -= 1;
+		}
+		
+		// mill penalty if using TOOL_GRINDING_STONE instead of FNC_MILL
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !has_mill && !number(0, 1)) {
+			GET_ACTION_TIMER(ch) += 1;	// PENALTY
 		}
 		
 		// tailor bonus for weave

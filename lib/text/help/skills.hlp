@@ -40,15 +40,17 @@ Bathe is used to begin cleaning yourself in either a bath house or a river.
 You must bathe regularly to keep clean. If you bathe in a bath house you will
 get cleaner faster than if you were to bathe in a river.
 #
-CHIP
+CHIP KNAPPER KNAPPING "FLINT KNAPPING"
 
 Chip (Primitive Crafts ability)
 
 Usage:  chip <item>
 Speed boosts:  Faster Chores bonus
+Tool: knapper
 
 This lets you chip a flint down to a sharper, more refined tool. You need to be
-wielding a rock or other hammer to do this.
+using a knapping tool (even just a simple rock). Identify a tool to see if it's
+a knapper.
 
 If you keep chipping, you can make a handaxe. You can chip this again to make
 a spear head.
@@ -103,7 +105,7 @@ Room types:
  dining room - No special features
  great hall - A larger hallway (castle only)
  hall - A connecting room
- kitchen - Allows cooking and other fire-dependent tasks
+ kitchen - Allows cooking, baking, and other fire-dependent tasks
  laboratory - Identical to the free-standing Alchemist
  larder - A place to store food
  sitting room - No special features
@@ -196,18 +198,20 @@ Example:
 
 See also: DRAG, LEAD
 #
-HARVEST HARVESTING
+HARVEST HARVESTING SICKLE SCYTHE
 
-Harvest (Primitive Crafts ability)
+Harvest (Scavenging ability)
 
 Usage:  harvest
 Speed boosts:  Faster Chores bonus, haste
+Tool type: sickle or scythe
 
 Allows you to harvest a crop. Be careful that you also replant some,
-otherwise you'll run out of that crop quickly. You must be wielding a slashing
-or slicing weapon (sword or axe) to harvest crops.
+otherwise you'll run out of that crop quickly. You must be using the right
+tool to harvest crops -- you can craft a flint sickle or identify other items
+to see if they can be used to harvest.
 
-See also: PLANT
+See also: IDENTIFY, PLANT
 #
 HERD HERDING
 
@@ -277,13 +281,15 @@ Building:  (MM)  Mill  (must be by a river; Build ability)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>
+Tool:  grinding  stone
 
 You can mill:
   wheat into flour
   corn into cornmeal
   oats into oatmeal
 
-You must do this at a Mill building.
+You must do this at a Mill building or have a grinding stone equipped.
+However, it will take longer to do it without the building.
 
 See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, BASIC CRAFTS, RECIPES
 #
@@ -322,7 +328,7 @@ Types of mines:
 
 See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 #
-MINT
+MINT "COIN MILLS" COINMILLS
 
 Mint (Basic Crafts ability)
 
@@ -335,7 +341,10 @@ The mint building allows you to mint valuable metals into coins. Each building
 can only mint coins for the empire it belongs to. The mint command will auto-
 repeat; stopping the action will give you back the item you were minting.
 
-See also: COINS, STOP
+Constructing this building requires coin mills, which can be made with the
+Forge ability.
+
+See also: COINS, STOP, FORGE
 #
 MORPH MORPHING SHAPESHIFTING FASTMORPH
 
@@ -436,13 +445,17 @@ Saw (Primitive Crafts ability)
 
 Usage:  saw <item>
 Speed boosts:  Faster Chores bonus, haste
+Tool:  saw or lumber yard
 
 You can saw most trees and logs into lumber. You must be in a lumber yard. This
 will go faster if you have the Woodworking ability.
 
+You can saw at a lumber yard or you can forge a saw to do it anywhere (albeit
+more slowly unless your saw is superior).
+
 Not all types of trees can be sawed.
 
-See also: TREES, LOGS, LUMBER
+See also: TREES, LOGS, LUMBER, FORGE
 #
 SCRAPE
 

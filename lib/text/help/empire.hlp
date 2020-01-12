@@ -1083,7 +1083,7 @@ See also: CITIES, EMPIRE TIMEOUT, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 
-Usage:  territory [type]
+Usage:  territory [keywords] [-exclude keyword]
         territory [outskirts | frontier]
         territory <empire> [type]  -- immortals only
 
@@ -1096,6 +1096,9 @@ You can optionally specify a building or terrain type and see all your tiles of
 that type. You can also specify 'outskirts' or 'frontier' to filter out-of-city
 territory to just one of those two categories. You can also type 'territory
 building' to get a list of all your buildings.
+
+If you put a dash (-) in front of a keyword, it will exclude results that
+match that keyword. You can specify more than 1 keyword to search or exclude.
 
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.

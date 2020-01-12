@@ -1374,6 +1374,8 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	void finish_building(char_data *ch, room_data *room);
 	void finish_maintenance(char_data *ch, room_data *room);
+	void remove_like_component_from_built_with(struct resource_data **built_with, int cmp_type);
+	void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[mode].mob);
 	struct empire_storage_data *store = NULL;
@@ -1393,7 +1395,9 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
 			can_do = TRUE;
 		}
-		else if (res->type == RES_ACTION) {
+		else if (res->type == RES_ACTION || res->type == RES_TOOL) {
+			// workforce can always do actions/tools
+			// TODO: some day, empires could have a list of tools available and this could require them
 			can_do = TRUE;
 		}
 	}
@@ -1405,10 +1409,19 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 			found = TRUE;
 			
 			if (res->type == RES_OBJECT) {
+				if (mode == CHORE_MAINTENANCE) {
+					// remove an older matching object
+					remove_like_item_from_built_with(&GET_BUILT_WITH(room), obj_proto(res->vnum));
+				}
+				
 				add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, res->vnum, 1, 0);
 				charge_stored_resource(emp, islid, res->vnum, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
+				if (mode == CHORE_MAINTENANCE) {
+					// remove an older matching component
+					remove_like_component_from_built_with(&GET_BUILT_WITH(room), res->vnum);
+				}
 				charge_stored_component(emp, islid, res->vnum, res->misc, 1, FALSE, &GET_BUILT_WITH(room));
 			}
 			
@@ -2480,7 +2493,9 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
 			can_do = TRUE;
 		}
-		else if (res->type == RES_ACTION) {
+		else if (res->type == RES_ACTION || res->type == RES_TOOL) {
+			// workforce can always do actions/tools
+			// TODO: some day, empires could have a list of tools available and this could require them
 			can_do = TRUE;
 		}
 	}

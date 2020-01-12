@@ -3141,6 +3141,7 @@ char *prompt_str(char_data *ch) {
 * @return char* The processed string
 */
 char *replace_prompt_codes(char_data *ch, char *str) {
+	extern struct gen_craft_data_t gen_craft_data[];
 	extern const char *health_levels[];
 	extern const char *move_levels[];
 	extern const char *mana_levels[];
@@ -3427,7 +3428,11 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				case 'a': {	// action
-					if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
+					if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_GEN_CRAFT) {
+						craft_data *ctype = craft_proto(GET_ACTION_VNUM(ch, 0));
+						strcpy(i, gen_craft_data[GET_CRAFT_TYPE(ctype)].verb);
+					}
+					else if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 						strcpy(i, action_data[GET_ACTION(ch)].name);
 					}
 					else if (GET_FEEDING_FROM(ch)) {

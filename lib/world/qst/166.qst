@@ -99,14 +99,14 @@ Winter Wonderland: Magic Blood~
    As a ranking member of the Guild of Adventurers, this vampire doesn't
 collect samples any longer. That's a job for underlings, such as yourself.
 Take the tin syringe, find a reindeer, and bring a full vial of its blood back
-to the guild for exampination.
+to the guild for examination.
 Type: use syringe <target>
 ~
    After so many years, perhaps this magic blood will grant vampires the
 ability to fly without turning into giant bats. Hopefully it was from a flying
 reindeer.
 ~
-19 de 0 0 -1
+20 de 0 0 -1
 A
 1 18208
 A
@@ -498,12 +498,12 @@ unfolding it, you find directions for more ways to decorate the empire. All you
 have to do is craft a 'winter ornament set', and begin hanging them around the
 land you own. Should be fun, and your citizens will certainly enjoy the winter
 cheer.
-Type 'craft winter ornament' set to make them, then 'hang ornament' in 4 rooms.
+Type 'craft winter ornament set' to make them, then 'hang ornament' in 4 rooms.
 ~
    You've got this decorating thing down. Tree? Check! Ornaments? Check! What
 else could your citizens ask for?
 ~
-9 e 0 0 -1
+10 e 0 0 -1
 A
 2 16607
 D 10700

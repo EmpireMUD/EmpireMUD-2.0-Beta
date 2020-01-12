@@ -435,6 +435,109 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 
 
 /**
+* Searches properties of room templates.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_room_template(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count;
+	
+	bitvector_t only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;;
+	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
+	
+	struct interaction_item *inter;
+	room_template *rmt, *next_rmt;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP REDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("affects", only_affs, room_aff_bits)
+		FULLSEARCH_FLAGS("flags", only_flags, room_template_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, room_template_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, room_template_flags)
+		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
+		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Room template fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		if (only_affs != NOBITS && (GET_RMT_BASE_AFFECTS(rmt) & only_affs) != only_affs) {
+			continue;
+		}
+		if (not_flagged != NOBITS && IS_SET(GET_RMT_FLAGS(rmt), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GET_RMT_FLAGS(rmt) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_functions != NOBITS && (GET_RMT_FUNCTIONS(rmt) & only_functions) != only_functions) {
+			continue;
+		}
+		if (find_interacts) {	// look up its interactions
+			found_interacts = NOBITS;
+			LL_FOREACH(GET_RMT_INTERACTIONS(rmt), inter) {
+				found_interacts |= BIT(inter->type);
+			}
+			if ((find_interacts & found_interacts) != find_interacts) {
+				continue;
+			}
+		}
+		
+		if (*find_keywords && !multi_isname(find_keywords, GET_RMT_TITLE(rmt)) && !multi_isname(find_keywords, GET_RMT_DESC(rmt)) && !search_extra_descs(find_keywords, GET_RMT_EX_DESCS(rmt))) {
+			continue;
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d room templates)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a crop and displays them.
 *
 * @param char_data *ch The player.

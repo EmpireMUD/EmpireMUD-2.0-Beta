@@ -3,7 +3,7 @@ grave empty~
 an empty grave~
 A grave lies empty here.~
 ~
-3 0 0 1
+3 0 0 0 1
 0 0 0
 1 24
 S
@@ -17,7 +17,7 @@ lantern to summon one.
    Type 'use turnip <difficulty>' to summon the horse man. You can choose
 Normal, Hard, Group, or Boss difficulty. The horse man is level 25-275.
 ~
-3 0 a 4
+3 0 a 0 4
 0 0 0
 0 0
 Q 18801
@@ -32,7 +32,7 @@ like someone might have dropped it, so it might be a bit dodgy. Sacrifice this
 candy in any enclosed tomb to summon a restless spirit and join in on the
 Halloween fun!
 ~
-6 m a 9
+6 m a 0 9
 24 0 0
 0 72
 A
@@ -54,7 +54,7 @@ Some candy bonkers are on the ground.~
    This candy sure packs a punch. Sacrifice this candy in any enclosed tomb to
 summon a restless spirit and join in on the Halloween fun!
 ~
-6 m a 7
+6 m a 0 7
 24 0 0
 0 72
 A
@@ -76,7 +76,7 @@ A handful of smarties have been scattered here.~
    These tiny candies look like they're mostly sugar. Sacrifice this candy in
 any enclosed tomb to summon a restless spirit and join in on the Halloween fun!
 ~
-6 m a 7
+6 m a 0 7
 24 0 0
 0 72
 A
@@ -93,7 +93,7 @@ A full-size candy bar has been foolishly left behind.~
 Sacrifice this candy in any enclosed tomb to summon a restless spirit and join
 in on the Halloween fun!
 ~
-6 m a 7
+6 m a 0 7
 24 0 0
 0 72
 A
@@ -110,7 +110,7 @@ Some stolen candy has been dropped here.~
 candy in any enclosed tomb to summon a restless spirit and join in on the
 Halloween fun!
 ~
-6 m a 7
+6 m a 0 7
 24 0 0
 0 72
 A
@@ -127,7 +127,7 @@ Some pixy sticks are lying on the ground.~
 candy in any enclosed tomb to summon a restless spirit and join in on the
 Halloween fun!
 ~
-6 m a 7
+6 m a 0 7
 24 0 0
 0 72
 A
@@ -144,7 +144,7 @@ Some sour demon heads have been scattered here.~
 part is merely a coating, though. Sacrifice this candy in any enclosed tomb to
 summon a restless spirit and join in on the Halloween fun!
 ~
-6 m a 7
+6 m a 0 7
 24 0 0
 0 72
 A
@@ -161,7 +161,7 @@ Some everlasting goblin stoppers are scattered on the ground.~
 Sacrifice this candy in any enclosed tomb to summon a restless spirit and join
 in on the Halloween fun!
 ~
-6 m a 9
+6 m a 0 9
 24 0 0
 0 72
 A
@@ -177,7 +177,7 @@ A manatomic fireball candy is hovering here.~
    This candy is bright red and ready to explode! Sacrifice this candy in any
 enclosed tomb to summon a restless spirit and join in on the Halloween fun!
 ~
-6 m a 9
+6 m a 0 9
 24 0 0
 0 72
 A
@@ -200,7 +200,7 @@ Some necro wafers are rotting on the ground.~
 candy in any enclosed tomb to summon a restless spirit and join in on the
 Halloween fun!
 ~
-6 m a 10
+6 m a 0 10
 24 0 0
 0 72
 A
@@ -216,7 +216,7 @@ a ghost costume~
 A ghost costume has been hanged here.~
 It's really just a sheet with two holes in it.
 ~
-2 mo ad 3
+2 mo ad 0 3
 0 0 0
 0 0
 A
@@ -234,7 +234,7 @@ A pirate costume is half-buried here.~
    It's got a peg leg, a hook hand, an eyepatch, and a piece of fruit that
 almost looks like a parrot.
 ~
-2 mo ad 4
+2 mo ad 0 4
 0 0 0
 0 0
 A
@@ -251,7 +251,7 @@ a princess costume~
 A princess costume is draped elegantly before you.~
 A dress with stitches this fine could only have been made by mice.
 ~
-2 mo ad 4
+2 mo ad 0 4
 0 0 0
 0 0
 A
@@ -268,7 +268,7 @@ a witch costume~
 A witch costume sits in a puddle of water.~
 The pointed hat and fake wart really complete the costume.
 ~
-2 mo ad 4
+2 mo ad 0 4
 0 0 0
 0 0
 A
@@ -285,7 +285,7 @@ a skeleton costume~
 A skeleton costume is piled on the ground.~
 It's really just a bunch of bones and some string.
 ~
-2 mo ad 4
+2 mo ad 0 4
 0 0 0
 0 0
 A
@@ -303,7 +303,7 @@ A wizard costume is sweeping up the floor.~
    This wizard robe is actually quite comfortable, and seems to appreciate that
 you think so.
 ~
-2 mo ad 4
+2 mo ad 0 4
 0 0 0
 0 0
 A
@@ -322,7 +322,7 @@ A costume kit is lying here.~
 princess, witch, skeleton, and wizard). You can type 'learn costumes' to learn
 them all, but you'll need the Sew ability to make them.
 ~
-3 p a 2
+3 p a 0 2
 0 0 0
 0 0
 T 18818
@@ -334,7 +334,7 @@ A costume trunk is sitting here.~
    This trunk is filled with odds and ends to quickly put together a good
 costume. Type 'costume <citizen>' to put a costume onto a friendly citizen.
 ~
-3 ep a 4
+3 ep a 0 4
 18812 0 0
 0 0
 T 18819
@@ -347,7 +347,7 @@ An empty costume trunk is sitting here.~
 costumes are etched into the sides of the trunk. Type 'sew halloween costume
 trunk' to make the costumes you'll need to complete the quest.
 ~
-3 e a 2
+3 e a 0 2
 0 0 0
 0 0
 Q 18819
@@ -360,7 +360,7 @@ A warty wand is here.~
 side is etched with the words 'polymorph <citizen>' -- you spend a moment
 wondering what that does.
 ~
-3 0 a 3
+3 0 a 0 3
 4 0 0
 0 0
 Q 18821
@@ -372,7 +372,7 @@ the veil between the worlds~
 The veil between this world and the next has been shattered!~
 As you peer through the veil, a howling demon chases you back!
 ~
-3 0 0 3
+3 0 0 0 3
 0 0 0
 10 48
 T 18822
@@ -385,7 +385,7 @@ The spirit ritual notes are here.~
 and brings spirits into the realm of the living. You must merely find a city
 center and type 'rite spirits'.
 ~
-3 0 a 3
+3 0 a 0 3
 0 0 0
 0 0
 Q 18823
@@ -399,7 +399,7 @@ A bog roll is here.~
 its most important use is for decoration. Visit three houses in your city and
 type 'use roll' to redecorate them.
 ~
-3 0 a 3
+3 0 a 0 3
 3 0 0
 0 0
 Q 18824
@@ -411,7 +411,7 @@ some paper remnants~
 The house is decked in long strands of white paper.~
 This looks like someone has thrown a bog roll over the house, repeatedly!
 ~
-3 0 0 2
+3 0 0 0 2
 0 0 0
 0 144
 S
@@ -422,7 +422,7 @@ A whistle that's slightly psychic has been left here.~
 This whistle can summon a noncombat companion!
 Type 'use whistle' to summon it.
 ~
-19 p a 5
+19 p a 0 5
 18826 0 0
 2 0
 S
@@ -435,7 +435,7 @@ the power to reflect Dracula himself, although you're certain he's just a myth.
 Regardless of whether or not he is real, you have the power to type 'morph
 Dracula' while this mirror is in your possession.
 ~
-3 0 a 3
+3 0 a 0 3
 0 0 0
 8 0
 Q 18827
@@ -447,7 +447,7 @@ the deed to an unearthly manor~
 The deed to an unearthly manor is here.~
 This deed allows you to build the 'unearthlymanor' house.
 ~
-3 g a 3
+3 g a 0 3
 0 0 0
 0 0
 Q 18828
@@ -460,7 +460,7 @@ A glowing bone shield is resting on the ground.~
 filaments. The entire thing emits a strange orange glow, barely visible in
 daylight but overpowering at night.
 ~
-23 emp ao 1
+23 emp ao 0 1
 0 0 0
 14 0
 A
@@ -481,7 +481,7 @@ it is somehow strong enough to repel a mace. The whole shield has been crafted
 into the shape of a single large bat wing, and gives a faint violet glow in the
 dark.
 ~
-23 emp ao 2
+23 emp ao 0 2
 0 0 0
 7 0
 A
@@ -502,7 +502,7 @@ larger with magic. Leather wrapped around the top forms a sort of handle, and
 the talon has been hardened with some black metal that glows red in faint
 light.
 ~
-1 mp ao 4
+1 mp ao f 5
 0 3 4
 14 0
 A
@@ -524,7 +524,7 @@ The Tome of the Nightmare Empire is hidden in the corner.~
 arcane magic. In bright light, the book emits a black glow as it devours stray
 beams of light and leaves only nightmares in their place.
 ~
-3 emp ao 5
+3 emp ao 0 5
 0 0 0
 14 0
 A
@@ -547,7 +547,7 @@ point. The lower jaw is missing, and the flesh is long gone. But the faint red
 glow that pulses from the skull gives you the feeling that you could kill
 anyone.
 ~
-3 mp ao 6
+3 mp ao 0 6
 0 0 0
 14 0
 A
@@ -565,7 +565,7 @@ A flaming gourd burns brightly on the ground.~
 wildfire placed in its mouth. It emits a pale yellow light, clearly visible in
 darkness, though it casts no light on the room.
 ~
-3 emp ao 7
+3 emp ao 0 7
 0 0 0
 7 0
 A
@@ -585,7 +585,7 @@ An oversized candy bag has been dropped here.~
 hold enough candy to last the winter. If only you could enchant it to hold even
 more...
 ~
-24 emp ar 3
+24 emp ar 0 3
 1 0 0
 11 0
 C
@@ -599,7 +599,7 @@ The headless centaur's saddle is lying here.~
 bleeds every time it rides into battle. It is said this saddle was once used to
 ride a headless centaur in the Great War.
 ~
-2 emp as 2
+2 emp as 0 2
 0 0 0
 2 0
 A
@@ -615,7 +615,7 @@ a headless horse whistle~
 A headless horse whistle is lying here.~
 This whistle will summon an eerie new mount.
 ~
-3 p a 6
+3 p a 0 6
 18839 0 0
 14 0
 T 9910
@@ -626,7 +626,7 @@ a nightmare whistle~
 A nightmare whistle dangles in the air.~
 This whistle will summon an eerie flying mount.
 ~
-3 p a 7
+3 p a 0 7
 18840 0 0
 14 0
 T 9910
@@ -638,7 +638,7 @@ A ghoul whistle has been dropped here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 5
+19 p a 0 5
 18841 0 0
 2 0
 S
@@ -650,7 +650,7 @@ A tray of candy apples is sitting on the ground.~
 irresistible. Through some strange magic, the apples actually grow this way on
 the tree. Perhaps some clever mage has cross-bred them with caramels.
 ~
-6 b a 6
+6 b a 0 6
 36 18842 0
 7 168
 O
@@ -665,7 +665,7 @@ A piece of caramel is stuck to the ground.~
    This little piece of fresh caramel has a stem stuck in it. Perhaps it grew
 on a tree.
 ~
-6 0 a 5
+6 0 a 0 5
 2 0 0
 7 48
 S
@@ -676,7 +676,7 @@ A mausoleum cornerstone is lying here.~
    This magnificent marble cornerstone allows you to build a 'mausoleum', a
 large tomb with multiple rooms.
 ~
-3 eg a 1
+3 eg a 0 1
 0 0 0
 1 0
 S
@@ -687,7 +687,7 @@ A spooky dead tree is laying here.~
    This tree looks like it has been dead for some time, but you can probably
 still get some good lumber out of it.
 ~
-3 e a 4
+3 e a 0 4
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -701,7 +701,7 @@ some candy seeds~
 Some candy seeds are scattered here.~
 Who knows what you'd get if you planted these?
 ~
-3 b a 1
+3 b a 0 1
 0 18842 0
 0 0
 S
@@ -721,7 +721,7 @@ forms, if you have the right skills:
 
 You must take off the mask to use these morphs.
 ~
-2 p ae 3
+2 p ae 0 3
 0 0 0
 0 0
 A
@@ -733,7 +733,7 @@ the spirits of the dead~
 The spirits of the dead are appeased.~
 You must seek out a different tomb to make the rest of your sacrifices.
 ~
-3 0 0 1
+3 0 0 0 1
 0 0 0
 10 48
 S
@@ -744,7 +744,7 @@ The metal offering instructions are lying here.~
    Take 10x (common metal) to 'offer' at 5 different tombs to complete this
 quest. Common metals include iron and bronze ingots.
 ~
-3 0 a 8
+3 0 a 0 8
 5 0 0
 0 0
 Q 18829
@@ -757,7 +757,7 @@ The block offering instructions are lying here.~
    Take 10x (block) to 'offer' at 5 different tombs to complete this quest.
 You can use stone blocks or piles of bricks for the offerings.
 ~
-3 0 a 9
+3 0 a 0 9
 5 0 0
 0 0
 Q 18830
@@ -770,7 +770,7 @@ The rock offering instructions are lying here.~
    Take 10x (rock) to 'offer' at 5 different tombs to complete this quest. Any
 generic rock, including flint and obsidian, will work.
 ~
-3 0 a 11
+3 0 a 0 11
 5 0 0
 0 0
 Q 18831
@@ -784,7 +784,7 @@ The fiber offering instructions are lying here.~
 quest. Common types of plant fiber are straw, sticks, leaves, branches, vines,
 and cotton.
 ~
-3 0 a 10
+3 0 a 0 10
 5 0 0
 0 0
 Q 18832

@@ -5,7 +5,7 @@ A brilliant firecloth skirt blazes here!~
    This glowing skirt seems to have been woven from the flames of a raging
 inferno! It is only warm, not hot, to the touch.
 ~
-27 mp af 2
+27 mp af 0 2
 0 0 0
 10 0
 A
@@ -24,7 +24,7 @@ A pair of firecloth pauldrons is blazing here!~
    These fiery shoulder guards seem to have been woven from the flames of a
 raging inferno! They throw off a fierce heat, but are safe to wear.
 ~
-27 mp ai 3
+27 mp ai 0 3
 0 0 0
 10 0
 A
@@ -42,7 +42,7 @@ a hearthflame skirt~
 A warm hearthflame skirt is lying here.~
 This dark red cloth skirt feels soothing and warm to the touch.
 ~
-27 mp af 3
+27 mp af 0 3
 0 0 0
 10 0
 A
@@ -60,7 +60,7 @@ hearthflame sleeves~
 A pair of hearthflame sleeves is lying here.~
 Touching these dark red cloth sleeves makes you feel slightly more calm.
 ~
-27 mp ai 5
+27 mp ai 0 5
 0 0 0
 11 0
 A
@@ -79,7 +79,7 @@ A pair of heavy magma-forged pauldrons is lying here.~
    These heavy iron pauldrons were forged by the land itself at a density no
 mortal smith could hope to match.
 ~
-27 mp ai 13
+27 mp ai 0 13
 3 0 0
 2 0
 A
@@ -98,7 +98,7 @@ A huge suit of core-forged plate armor is piled up here.~
    This pile of massive armor plates were forged by the land itself to an
 incredible density. No normal man could even wear this armor.
 ~
-27 emp aq 10
+27 emp aq 0 10
 3 0 0
 2 0
 A
@@ -117,7 +117,7 @@ A pair of huge spiked pauldrons is lying here.~
    Unleash your inner berserker with these incredibly top-heavy shoulder
 guards! Be careful not to shrug.
 ~
-27 mp ai 13
+27 mp ai 0 13
 1 0 0
 2 0
 A
@@ -138,7 +138,7 @@ A fiendskin jerkin is lying here, radiating warmth.~
    This thick, leathery demonhide jacket is nice and warm... Even in the middle
 of a blizzard.
 ~
-27 mp aq 12
+27 mp aq 0 12
 1 0 0
 7 0
 A
@@ -157,7 +157,7 @@ Someone has left a flame-embroidered pouch here.~
    This leather pouch is stained with fiery designs. It appears to be quite
 deep... Luckily, it is too small to fall into.
 ~
-24 mp ar 20
+24 mp ar 0 20
 2 0 0
 7 0
 A
@@ -176,7 +176,7 @@ A spiked igneous shield is lying here.~
    This bladed shield of black stone looks like it could do some serious
 damage! It's a bit awkward to hold, though.
 ~
-23 mp ao 6
+23 mp ao 0 6
 0 0 0
 1 0
 A
@@ -193,7 +193,7 @@ A ring made of lava is lying here, cold to the touch!~
    This ring is weirdly cool to the touch. It seems to be safe, but the
 patterns on it still look like they're flowing...
 ~
-2 mp ab 2
+2 mp ab 0 2
 0 0 0
 1 0
 A
@@ -212,7 +212,7 @@ A sheet of flickering flames is hovering here!~
    This sheet of magical fire radiates all of its heat in one direction - you
 could safely wrap it around yourself!
 ~
-27 mp ak 2
+27 mp ak 0 2
 0 0 0
 10 0
 A
@@ -235,7 +235,7 @@ There is a pair of flame-shaped earrings lying here.~
    You're not sure if these intricate earrings are made from gemstones, or
 magically frozen fires. They should be safe to wear anyhow.
 ~
-2 mp am 2
+2 mp am 0 2
 0 0 0
 10 0
 A
@@ -252,7 +252,7 @@ A pair of glowing emberweave gloves is lying here.~
    These gloves look like they were woven from ash studded with hot coals, but
 they are only pleasantly warm to the touch.
 ~
-27 mp ah 2
+27 mp ah 0 2
 0 0 0
 11 0
 A
@@ -269,7 +269,7 @@ A pair of molten iron gauntlets is lying here.~
    These gauntlets, formed from molten metal and emblazoned with an infernal
 crest, are extremely hot, but safe to wear. For a given value of 'safe'.
 ~
-27 mp ah 3
+27 mp ah 0 3
 3 0 0
 2 0
 A
@@ -290,7 +290,7 @@ The molten fiend's earrings are lying here!~
    These golden earrings are inscribed with countless demonic sigils, and grant
 unholy vitality to the wearer!
 ~
-2 mp am 2
+2 mp am 0 2
 0 0 0
 4 0
 A
@@ -309,7 +309,7 @@ A flaming talon is stabbed into the ground here.~
    This talon, about the size and shape of a dagger, blazes energetically with
 fiendish flames. It looks absolutely lethal!
 ~
-1 imp ano 1
+1 imp ano f 2
 0 6 4
 14 0
 A
@@ -324,7 +324,7 @@ A razor-sharp obsidian earring is lying here.~
    If you don't want to wear it, you could always stab someone with it... Then
 again, you would probably cut yourself in the process.
 ~
-2 mp am 3
+2 mp am 0 3
 0 0 0
 8 0
 A
@@ -341,7 +341,7 @@ An obsidian crown wreathed in abyssal flames is levitating here!~
    Despite their dull hue, the flames adorning this demonic status symbol give
 off the heat of a blast furnace. Only the wearer is safe...
 ~
-2 mp ae 8
+2 mp ae 0 8
 0 0 0
 1 0
 A
@@ -362,7 +362,7 @@ A bladed bow made from a fiend's horns is lying here.~
    This raises an interesting question: did someone carve this out, or were
 this demon's horns always neatly bow-shaped?
 ~
-20 mp ap 4
+20 mp ap 0 4
 29 3 0
 14 0
 A
@@ -374,7 +374,7 @@ a hellsteed's reins~
 A set of hellish reins are lying here.~
 These reins can be used just once, to summon a hellsteed mount.
 ~
-3 0 a 5
+3 0 a 0 5
 18078 0 0
 7 0
 T 9910
@@ -386,7 +386,7 @@ The ashes of a noble phoenix are lying here.~
    This pile of ash, when used, will be restored into a noble Phoenix, which
 will be indebted to you!
 ~
-3 0 a 9
+3 0 a 0 9
 18079 0 0
 10 0
 T 9910
@@ -402,7 +402,7 @@ something out of it?
 While standing on the ledge, type 'list' to see the things you can make and
 'buy <item>' to buy one.
 ~
-3 mp ao 7
+3 mp ao 0 7
 0 0 0
 10 0
 C

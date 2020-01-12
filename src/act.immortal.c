@@ -66,6 +66,7 @@ extern const char *size_types[];
 extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *syslog_types[];
+extern const char *tool_flags[];
 extern const char *wear_bits[];
 
 // external functions
@@ -627,7 +628,7 @@ ADMIN_UTIL(util_exportcsv) {
 				else {
 					*str2 = '\0';
 				}
-				fprintf(fl, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], str2);
+				fprintf(fl, "%s%+d to %s%s", found++ ? ", " : "", apply->modifier, apply_types[(int) apply->location], str2);
 			}
 			
 			sprintbit(GET_OBJ_AFF_FLAGS(obj), affected_bits, str1, TRUE);
@@ -3598,6 +3599,43 @@ SHOW(show_terrain) {
 }
 
 
+SHOW(show_tools) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj, *next_obj;
+	size_t size;
+	int type;
+	
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show tools <type>\r\n");
+		msg_to_char(ch, "See: HELP TOOL FLAGS\r\n");
+	}
+	else if ((type = search_block(argument, tool_flags, FALSE)) == NOTHING) {
+		msg_to_char(ch, "Unknown tool type '%s' (see HELP TOOL FLAGS).\r\n", arg);
+	}
+	else {
+		// preamble
+		size = snprintf(buf, sizeof(buf), "Types of %s:\r\n", tool_flags[type]);
+		
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (size >= sizeof(buf)) {
+				break;	// overflow
+			}
+			if (!TOOL_FLAGGED(obj, BIT(type))) {
+				continue;	// wrong type
+			}
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_unlearnable) {
 	struct progress_perk *perk, *next_perk;
 	craft_data *craft, *next_craft;
@@ -5185,6 +5223,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
 	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
 	
+	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
+	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
+	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 		sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, buf, TRUE);
 		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
@@ -5452,6 +5493,9 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	sprintbit(GET_OBJ_EXTRA(j), extra_bits, buf, TRUE);
 	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
+	
+	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
+	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
 	
 	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, component_string(GET_OBJ_CMP_TYPE(j), GET_OBJ_CMP_FLAGS(j)));
 	
@@ -9028,6 +9072,7 @@ ACMD(do_show) {
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },
 		{ "technology", LVL_START_IMM, show_technology },
+		{ "tools", LVL_START_IMM, show_tools },
 		{ "shops", LVL_START_IMM, show_shops },
 		{ "piles", LVL_CIMPL, show_piles },
 		{ "progress", LVL_START_IMM, show_progress },

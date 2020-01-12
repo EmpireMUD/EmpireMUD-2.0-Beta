@@ -144,7 +144,7 @@ dragon crimson small~
 the crimson dragon~
 A small crimson dragon is circling.
 ~
-100 125 de m 2
+100 125 dej m 2
 0 0 2 10
 I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
 S
@@ -153,7 +153,7 @@ dragon sea crimson~
 a crimson sea dragon~
 A crimson sea dragon splashes around.
 ~
-100 125 del 0 2
+100 125 dejl 0 2
 0 0 6 9
 I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
 S

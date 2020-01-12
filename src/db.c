@@ -1950,6 +1950,7 @@ const char *versions_list[] = {
 	"b5.60",
 	"b5.80",
 	"b5.82",
+	"b5.83",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3568,6 +3569,21 @@ void b5_82_snowman_fix(void) {
 }
 
 
+// update gear positions for new tool slot, which was inserted before the "shared" slot
+// NOTE: it's generally not safe to insert slots in the middle due to both player gear sets
+// and archetype gear sets
+PLAYER_UPDATE_FUNC(b5_83_update_players) {
+	obj_data *obj;
+	
+	check_delayed_load(ch);
+	
+	if ((obj = GET_EQ(ch, WEAR_TOOL))) {
+		unequip_char(ch, WEAR_TOOL);
+		equip_char(ch, obj, WEAR_SHARE);
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3851,6 +3867,10 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.82")) {
 			b5_82_snowman_fix();
+		}
+		if (MATCH_VERSION("b5.83")) {
+			log("Applying b5.83 tool update to players...");
+			update_all_players(NULL, b5_83_update_players);
 		}
 	}
 	

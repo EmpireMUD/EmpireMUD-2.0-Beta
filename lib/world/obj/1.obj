@@ -3,11 +3,11 @@ rock~
 a rock~
 A rock is lying on the ground.~
    It's an ordinary, common rock of the sort you find everywhere in the ground.
-Rocks can be used as a primitive weapon, used as a hammer to chip pieces of
+Rocks can be used as a primitive weapon, used as a knapper to chip pieces of
 flint, as a crafting component, or as catapult shot. They are also used to lay
 roads and build some buildings.
 ~
-1 il ano 6
+1 il ano e 7
 0 2 5
 1 0
 O
@@ -21,7 +21,7 @@ a lump of clay~
 Some clay is lumped here.~
 You can craft clay into pottery.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 6 0
 O
@@ -37,7 +37,7 @@ A piece of flint is lying on the ground.~
 potential to be shaped into a powerful primitive weapon. Wield a rock and
 'chip' this flint to work it into a more useful shape.
 ~
-1 il ano 5
+1 il ano 0 5
 0 1 5
 5 0
 I 19 180 100.00 1  # CHIP: a chipped flint
@@ -52,7 +52,7 @@ a yellow lightning stone~
 A translucent yellow lightning stone is lying here.~
 The lightning stone can be used for certain crafts and enchantments.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 1 0
 O
@@ -66,7 +66,7 @@ a red bloodstone~
 A red bloodstone is sitting on the ground.~
 The bloodstone can be used for certain crafts and enchantments.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 1 0
 O
@@ -80,7 +80,7 @@ a huge stone block~
 A huge stone block is sitting here.~
 The stone block is used in monumental architecture.
 ~
-3 el a 4
+3 el a 0 4
 0 0 0
 1 0
 M
@@ -102,7 +102,7 @@ A black piece of obsidian is on the ground.~
 obsidian shows through. Obsidian forms a cutting edge like no other stone. Use
 'chip' to give it a sharp edge.
 ~
-1 hl ano 7
+1 hl ano 0 7
 0 2 5
 8 0
 I 19 182 100.00 1  # CHIP: a sharpened piece of obsidian
@@ -118,7 +118,7 @@ A large tree has fallen here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
 into a canoe.
 ~
-3 el a 6
+3 el a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -149,7 +149,7 @@ Some sticks and leaves are piled here.~
    It's a small pile of plant debris. It might be useful for crafting or
 building.
 ~
-3 l a 5
+3 l a 0 5
 0 0 0
 0 0
 C
@@ -168,7 +168,7 @@ Some rough wood is stacked here.~
 tree. You can saw it into boards, and might even be able to salvage some
 sticks.
 ~
-3 e a 7
+3 e a 0 7
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -188,7 +188,7 @@ a small flower~
 A small flower has been dropped here.~
 It's a very pretty flower.
 ~
-3 kl a 1
+3 kl a 0 1
 0 0 0
 7 64
 S
@@ -198,7 +198,7 @@ a heavy log~
 A heavy log has been left here.~
 Logs are used in construction.
 ~
-3 el a 6
+3 el a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -221,7 +221,7 @@ a stack of lumber~
 Some lumber is stacked on the ground.~
 Lumber is used in building construction.
 ~
-3 el a 4
+3 el a 0 4
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -250,7 +250,7 @@ some rough boards~
 There are rough boards stacked here.~
 Lumber is used in building construction.
 ~
-3 e a 5
+3 e a 0 5
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -280,7 +280,7 @@ A bound column of wood is lying on the ground.~
    This sturdy column is made by several thin saplings bound with rope. It
 could be used in place of logs for building.
 ~
-3 e a 8
+3 e a 0 8
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -308,7 +308,7 @@ A massive tree is lying on its side.~
    You can use a sharp tool to shape this exotic tree into a pillar, or you can
 saw it into lumber.
 ~
-3 e a 6
+3 e a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -328,7 +328,7 @@ a fine wooden pillar~
 A fine wooden pillar is lying here.~
 This pillar can be used in construction, or sawn into lumber.
 ~
-3 e a 6
+3 e a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -360,7 +360,7 @@ Some fine tropical lumber is stacked here.~
    This exotic lumber looks like it was cut from the darkest of jungles. It can
 be used for construction and exquisite crafts.
 ~
-3 e a 6
+3 e a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -390,7 +390,7 @@ A green sapling has fallen here.~
    This sapling is young, straight, and taller than you are. It could be used
 to build a simple hut, or carved into a handle, or fashioned into an arrow.
 ~
-1 l an 3
+1 l an 0 3
 0 2 5
 0 0
 C
@@ -408,7 +408,7 @@ Some thorny branches are piled here.~
    It's a small pile of plant debris. It might be useful for crafting or
 building.
 ~
-3 l a 6
+3 l a 0 6
 0 0 0
 0 0
 C
@@ -426,7 +426,7 @@ A tangle of vines is piled on the ground.~
    This tangle of vines must have come from an incredible jungle. It's a small
 pile of plant debris. It might be useful for crafting or building.
 ~
-3 l a 7
+3 l a 0 7
 0 0 0
 0 0
 C
@@ -444,7 +444,7 @@ A thorny sapling has fallen here.~
 matters when they're buried in your flesh. Still, it could be used for building
 or carved into a handle.
 ~
-1 i an 4
+1 i an 0 4
 0 2 5
 0 0
 C
@@ -463,7 +463,7 @@ A reaching sapling has fallen here.~
 perhaps reaching for the high canopy of the jungle. It could be used for
 building, or carved into a handle.
 ~
-1 0 an 3
+1 0 an 0 3
 0 2 5
 0 0
 C
@@ -481,7 +481,7 @@ A large shoot is lying here.~
    This shoot once grew out of a mighty tree. It is long and straight, and
 would be just as useful as a young sapling for building or crafting.
 ~
-1 0 an 3
+1 0 an 0 3
 0 2 5
 0 0
 C
@@ -498,7 +498,7 @@ a bundle of wheat~
 A bundle of wheat has been left on the ground.~
 Wheat can be milled into flour, or planted.
 ~
-3 bl a 2
+3 bl a 0 2
 0 1 0
 7 168
 O
@@ -512,7 +512,7 @@ a bushel of hops~
 A bushel of hops is sitting on the ground.~
 Hops can be made into ale at the tavern.
 ~
-3 bl a 1
+3 bl a 0 1
 0 3 0
 7 168
 M
@@ -530,7 +530,7 @@ a basket of cotton~
 A basket of cotton has been left here.~
 Weave cotton into cloth.
 ~
-3 bl a 3
+3 bl a 0 3
 0 4 0
 7 0
 O
@@ -544,7 +544,7 @@ a sack of barley~
 A sack of barley is sitting here.~
 Barley can be made into ale at the tavern.
 ~
-3 bl a 2
+3 bl a 0 2
 0 5 0
 7 168
 M
@@ -564,7 +564,7 @@ some iron ore~
 A piece of iron ore has fallen to the ground.~
 Iron is used for forging and building.
 ~
-3 l a 3
+3 l a 0 3
 0 0 0
 2 0
 R
@@ -576,7 +576,7 @@ a silver nugget~
 A silver nugget has fallen to the ground.~
 Silver can be melted down for money.
 ~
-15 l a 5
+15 l a 0 5
 2 0 0
 3 0
 R
@@ -588,7 +588,7 @@ a pile of gold dust~
 Some sparkling gold dust is scattered across the ground.~
 Gold can be melted down for money.
 ~
-15 l a 6
+15 l a 0 6
 3 0 0
 4 0
 R
@@ -600,7 +600,7 @@ some nocturnium ore~
 A chunk of nocturnium ore has fallen to the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 5
+3 l a 0 5
 0 0 0
 2 0
 R
@@ -612,7 +612,7 @@ some imperium ore~
 A glistening hunk of imperium ore is sitting here.~
 Imperium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 3
+3 l a 0 3
 0 0 0
 2 0
 R
@@ -624,7 +624,7 @@ some copper ore~
 Some copper ore is piled on the ground.~
 Copper ore can be smelted into ingots and bars.
 ~
-3 l a 2
+3 l a 0 2
 0 0 0
 13 0
 R
@@ -636,7 +636,7 @@ some tin ore~
 Some tin ore is piled on the ground.~
 Tin ore can be smelted into ingots, which are then used to make bronze.
 ~
-3 l a 3
+3 l a 0 3
 0 0 0
 2 0
 R
@@ -649,7 +649,7 @@ A tin ingot is stacked here.~
    The tin has a bright white color. Tin ingots are primarily smelted with
 copper to make bronze.
 ~
-3 l a 6
+3 l a 0 6
 0 0 0
 2 0
 O
@@ -664,7 +664,7 @@ A bronze ingot is stacked here.~
    The bronze has a rich, brown color and a fine finish. Bronze is used to make
 many different tools and armors.
 ~
-3 l a 6
+3 l a 0 6
 0 0 0
 13 0
 O
@@ -679,7 +679,7 @@ A silver ingot is stacked here.~
    Ingots are used in crafting, but aren't as valuable as the larger silver
 bars. They can be stored in your vault to add to your wealth.
 ~
-15 l a 7
+15 l a 0 7
 4 0 0
 3 0
 O
@@ -694,7 +694,7 @@ A gold ingot is stacked here.~
    Ingots are usually used in crafting, and aren't as valuable as larger bars
 of gold. They can be stored in the vault to add to your wealth.
 ~
-15 l a 8
+15 l a 0 8
 6 0 0
 4 0
 O
@@ -709,7 +709,7 @@ A bar of silver has been left on the ground.~
    Store the silver bar in your vault to gain wealth. You can also separate the
 bar back into ingots for crafting.
 ~
-15 l a 6
+15 l a 0 6
 10 1 0
 3 0
 I 15 170 100.00 2 s  # SEPARATE: a silver ingot
@@ -725,7 +725,7 @@ A bar of gold is lying on the ground.~
    Store the gold bar in your vault to gain wealth. You can also separate the
 bar back into ingots for crafting.
 ~
-15 l a 6
+15 l a 0 6
 16 1 0
 4 0
 I 15 171 100.00 2 s  # SEPARATE: a gold ingot
@@ -738,9 +738,9 @@ S
 goldflake flake golden small~
 a small flake of gold~
 A small golden flake is lying here.~
-You can melt down gold flakes to make discs.
+You can smelt 8 gold flakes into an ingot using 'smelt gold flake ingot'.
 ~
-15 l a 2
+15 l a 0 3
 0 0 0
 4 0
 R
@@ -752,7 +752,7 @@ an iron ingot~
 An iron ingot is sitting on the ground.~
 Iron is used for forging and building.
 ~
-3 l a 3
+3 l a 0 3
 0 0 0
 2 0
 O
@@ -766,7 +766,7 @@ an ingot of nocturnium~
 A nocturnium ingot is sitting on the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 2
+3 l a 0 2
 0 0 0
 2 0
 M
@@ -786,7 +786,7 @@ an imperium ingot~
 An imperium ingot is sitting on the ground.~
 Imperium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 3
+3 l a 0 3
 0 0 0
 2 0
 M
@@ -807,7 +807,7 @@ A copper ingot is sitting here.~
    Copper ingots can be made into bars (to be stored in the vault, for wealth),
 or smelted with tin to make bronze ingots.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 13 0
 O
@@ -821,7 +821,7 @@ a copper bar~
 A bar of copper has been left here.~
 Store the copper bar in your vault to gain wealth.
 ~
-15 l a 6
+15 l a 0 6
 1 1 0
 13 0
 I 15 178 100.00 2 s  # SEPARATE: a copper ingot
@@ -840,7 +840,7 @@ A chipped flint is lying on the ground.~
 make a tool -- is one of mankind's oldest techniques. Keep chipping the flint
 until it becomes a useful tool.
 ~
-1 ikl ano 6
+1 ikl ano 0 6
 0 2 5
 1 0
 I 19 181 100.00 1  # CHIP: a handaxe
@@ -854,7 +854,7 @@ be used to cut, slice, and scrape. It's still large, and not very sharp, and
 can't be used to chop until it has a handle. From here, you can wield the
 handaxe, use it to mine ore, or craft it into a stone axe.
 ~
-1 hl ano 3
+1 hl ano fh 5
 0 2 5
 1 0
 I 19 186 100.00 1  # CHIP: a stone spear head
@@ -872,7 +872,7 @@ form a razor-sharp edge, sharper than any steel. It's far too sharp to use
 bare-handed, but you could craft it into an obsidian knife, obsidian spear, or
 obsidian sword (requires Basic Crafts).
 ~
-3 l a 7
+3 l a 0 7
 0 0 0
 8 0
 R
@@ -888,7 +888,7 @@ striking good steel against a piece of flint to produce sparks, which light the
 tinder and can be used to light a larger fire. Type 'light <object>' to light
 something using this tinderbox.
 ~
-18 0 a 6
+18 0 a 0 6
 10 0 0
 5 0
 C
@@ -904,7 +904,7 @@ a torch~
 A torch has been dropped here.~
 A torch is important when you're out at night.
 ~
-1 chl ano 2
+1 chl ano 0 2
 0 2 12
 0 8
 S
@@ -916,10 +916,29 @@ A spear head is jabbed into the ground.~
 You can wield this spearhead alone, like a knife, or attach it to a shaft to
 make a full spear.
 ~
-1 il ano 2
+1 il ano f 3
 0 1 4
 1 0
 R
 5121 0
+S
+#187
+stones grinding set~
+a set of grinding stones~
+A set of grinding stones are lying here.~
+   The grinding stones are used to process grain into meal or flour. One stone
+is large with a flat dish in the center, while the other is small and flat for
+grinding by hand. You can 'mill' some items with this, but it will be slower
+than doing it in a proper mill building. 'Use' this item to equip it.
+~
+3 e a j 2
+0 0 0
+1 0
+C
+1 1
+R
+5121 0
+R
+5606 0
 S
 $

@@ -48,6 +48,8 @@ for any portion under 150 levels. For example, if you are level 75, you gain
 half your Greatness. At level 150, it's your full Greatness. At level 300, it's
 2x Greatness.
 
+This ability gains experience when you use an ability that's boosted by it.
+
 Note: Bonus healing does not add to the cost of healing spells.
 
 See also: HEAL, REJUVENATE
@@ -593,7 +595,8 @@ Cooldown:  20 minutes
 
 This powerful ability channels the healing magic of the moon to raise a player
 from the dead, even during combat. The player will return with half of his or
-her health, mana, and moves.
+her health, mana, and moves. The player will also be less hungry/thirsty than
+from a normal death or resurrection.
 
 You can target a dead player or the player's most recent corpse.
 
@@ -926,6 +929,7 @@ Touch of Flame (Natural Magic ability)
 
 This ability lets you light things without a fire source. It also allows you to
 brew potions, mix poisons, and cook foods without needing a fire or stove.
+However, you cannot bake with it.
 
 This ability gains experience when you use it to light things, but not when you
 cook things with it. It will be used in preference to fire sticks or other

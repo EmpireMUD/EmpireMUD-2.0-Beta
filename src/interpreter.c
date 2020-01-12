@@ -223,6 +223,7 @@ ACMD(do_hit);
 ACMD(do_home);
 ACMD(do_hostile);
 ACMD(do_howl);
+ACMD(do_hunt);
 
 ACMD(do_identify);
 ACMD(do_ignore);
@@ -593,6 +594,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	STANDARD_CMD( "build", POS_DEAD, do_build, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "backstab", POS_FIGHTING, do_backstab, NO_MIN, CTYPE_COMBAT, ABIL_BACKSTAB ),
+	STANDARD_CMD( "bake", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_BAKE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "ban", POS_DEAD, do_ban, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_BAN ),
 	STANDARD_CMD( "barde", POS_STANDING, do_barde, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "bash", POS_FIGHTING, do_bash, NO_MIN, CTYPE_COMBAT, ABIL_BASH ),
@@ -783,6 +785,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "hone", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_HONE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
 	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
+	SIMPLE_CMD( "hunt", POS_STANDING, do_hunt, NO_MIN, CTYPE_SKILL ),
 
 	SIMPLE_CMD( "inventory", POS_DEAD, do_inventory, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "identify", POS_RESTING, do_identify, NO_MIN, CTYPE_SKILL ),

@@ -46,6 +46,7 @@ extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
 void scale_mob_to_level(char_data *mob, int level);
+bool validate_spawn_location(room_data *room, struct spawn_info *spawn, int x_coord, int y_coord, bool in_city);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -966,34 +967,7 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 	
 	LL_FOREACH(list, spawn) {
 		// validate flags
-		if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home)) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home)) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_NORTHERN) && (y_coord == -1 || y_coord < (MAP_HEIGHT / 2))) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && (y_coord == -1 || y_coord >= (MAP_HEIGHT / 2))) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_EASTERN) && (x_coord == -1 || x_coord < (MAP_WIDTH / 2))) {
-			continue;
-		}
-		if (IS_SET(spawn->flags, SPAWN_WESTERN) && (x_coord == -1 || x_coord >= (MAP_WIDTH / 2))) {
+		if (!validate_spawn_location(room, spawn, x_coord, y_coord, in_city)) {
 			continue;
 		}
 		
@@ -1172,6 +1146,72 @@ void spawn_mobs_from_center(room_data *center) {
 			}
 		}
 	}
+}
+
+
+/**
+* Validates 1 location for a spawn_info entry, based on the flags (including
+* time-of-day flags). This does not check spawn percentage or validate the mob.
+* This function takes in-city and coords as parameters because normal uses of
+* the function will call it many many times.
+*
+* @param room_data *room The room to validate.
+* @param struct spawn_info *spawn The spawn data to match to the room.
+* @param int x_coord The x-coordinate of the room (prevents multiple function calls).
+* @param int y_coord The y-coordinate of the room (prevents multiple function calls).
+* @param bool in_city Whether or not the room is in-city (prevents multiple function calls).
+* @return bool TRUE if the spawn matches; FALSE if not.
+*/
+bool validate_spawn_location(room_data *room, struct spawn_info *spawn, int x_coord, int y_coord, bool in_city) {
+	room_data *home;
+	
+	if (!room || !spawn) {
+		return FALSE;	// shortcut
+	}
+	
+	// SPAWN_x: this code validates spawn flags
+	
+	// easy checks
+	if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET) {
+		return FALSE;
+	}
+	if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE) {
+		return FALSE;
+	}
+	
+	// home room checks
+	home = HOME_ROOM(room);
+	if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home)) {
+		return FALSE;
+	}
+	if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home)) {
+		return FALSE;
+	}
+	
+	// in-city checks
+	if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city) {
+		return FALSE;
+	}
+	if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city) {
+		return FALSE;
+	}
+	
+	// validate coords
+	if (IS_SET(spawn->flags, SPAWN_NORTHERN) && (y_coord == -1 || y_coord < (MAP_HEIGHT / 2))) {
+		return FALSE;
+	}
+	if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && (y_coord == -1 || y_coord >= (MAP_HEIGHT / 2))) {
+		return FALSE;
+	}
+	if (IS_SET(spawn->flags, SPAWN_EASTERN) && (x_coord == -1 || x_coord < (MAP_WIDTH / 2))) {
+		return FALSE;
+	}
+	if (IS_SET(spawn->flags, SPAWN_WESTERN) && (x_coord == -1 || x_coord >= (MAP_WIDTH / 2))) {
+		return FALSE;
+	}
+	
+	// ok?
+	return TRUE;
 }
 
 

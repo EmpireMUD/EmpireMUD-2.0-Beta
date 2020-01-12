@@ -537,7 +537,7 @@ nautilus huge~
 a huge nautilus~
 A huge nautilus is curled up here.
 ~
-100 125 del 0 4
+100 125 dejl 0 4
 0 0 6 28
 S
 #18499
@@ -545,7 +545,7 @@ hippogriff hippogryph majestic~
 a majestic hippogriff~
 A majestic hippogriff is prancing overhead.
 ~
-100 125 de m 4
+100 125 dej m 4
 0 0 2 26
 S
 $

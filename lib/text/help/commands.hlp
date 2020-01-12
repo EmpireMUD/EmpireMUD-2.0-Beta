@@ -2321,9 +2321,10 @@ USE
 Usage:  use <item>
 
 This command is used to interact with some items, such as the hestian trinket.
-It also sets your active poison or your preferred ammunition.
+It also sets your active poison or your preferred ammunition. If you 'use' a
+tool, it equips to your 'tool' gear slot.
 
-See also: HESTIAN TRINKET, POISON, AMMUNITION
+See also: HESTIAN TRINKET, POISON, AMMUNITION, EQUIPMENT
 #
 VISIBLE
 

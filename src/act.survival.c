@@ -518,8 +518,6 @@ void do_mount_swap(char_data *ch, char *argument) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_butcher) {
-	extern obj_data *has_sharp_tool(char_data *ch);
-	
 	char_data *proto;
 	obj_data *corpse;
 	
@@ -550,8 +548,8 @@ ACMD(do_butcher) {
 	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse)))) {
 		msg_to_char(ch, "You can't get any good meat out of that.\r\n");
 	}
-	else if (!has_sharp_tool(ch)) {
-		msg_to_char(ch, "You need a sharp tool to butcher with.\r\n");
+	else if (!has_tool(ch, TOOL_KNIFE)) {
+		msg_to_char(ch, "You need to equip a good knife to butcher with.\r\n");
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse)) {
 		return;
@@ -641,8 +639,8 @@ ACMD(do_fish) {
 	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
-	else if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
-		msg_to_char(ch, "You'll need a spear to fish.\r\n");
+	else if (!has_tool(ch, TOOL_FISHING)) {
+		msg_to_char(ch, "You aren't using any fishing equipment.\r\n");
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_FISH, NULL, NULL)) {
 		return;
@@ -714,6 +712,158 @@ ACMD(do_forage) {
 	}
 	else {
 		msg_to_char(ch, "You don't seem to be able to find anything to forage for.\r\n");
+	}
+}
+
+
+ACMD(do_hunt) {
+	extern bool validate_spawn_location(room_data *room, struct spawn_info *spawn, int x_coord, int y_coord, bool in_city);
+	
+	struct spawn_info *spawn, *found_spawn = NULL;
+	char_data *mob, *found_proto = NULL;
+	vehicle_data *veh, *next_veh;
+	bool junk, non_animal = FALSE;
+	int count, x_coord, y_coord;
+	
+	double min_percent = 1.0;	// won't find things below 1% spawn
+	
+	// helper data
+	struct hunt_helper {
+		struct spawn_info *list;
+		struct hunt_helper *next;	// linked list
+	} *helpers = NULL, *item, *next_item;
+	
+	skip_spaces(&argument);
+	
+	if (GET_ACTION(ch) == ACT_HUNTING && !*argument) {
+		msg_to_char(ch, "You stop hunting.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if (!has_player_tech(ch, PTECH_HUNT_ANIMALS)) {
+		msg_to_char(ch, "You don't have the right ability to hunt anything.\r\n");
+		return;
+	}
+	if (!IS_OUTDOORS(ch)) {
+		msg_to_char(ch, "You can only hunt while outdoors.\r\n");
+		return;
+	}
+	if (ROOM_OWNER(IN_ROOM(ch)) && is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &junk)) {
+		// note: if you remove the in-city restriction, the validate_spawn_location() below will need in-city info
+		msg_to_char(ch, "You can't hunt in cities.\r\n");
+		return;
+	}
+	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
+		msg_to_char(ch, "You can't hunt anything while entangled.\r\n");
+		return;
+	}
+	if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_HUNTING) {
+		msg_to_char(ch, "You're too busy to hunt right now.\r\n");
+		return;
+	}
+	if (!*argument) {
+		msg_to_char(ch, "Hunt what?\r\n");
+		return;
+	}
+	
+	// count how many people are in the room and also check for a matching animal here
+	count = 0;
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+		++count;
+		
+		if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_ANIMAL)) {
+			continue;
+		}
+		
+		if (multi_isname(argument, GET_PC_NAME(mob))) {
+			act("You can see $N right here!", FALSE, ch, NULL, mob, TO_CHAR);
+			return;
+		}
+	}
+	
+	if (count > 4) {
+		msg_to_char(ch, "The area is too crowded to hunt for anything.\r\n");
+		return;
+	}
+	
+	// build lists: vehicles
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
+		if (VEH_SPAWNS(veh)) {
+			CREATE(item, struct hunt_helper, 1);
+			item->list = VEH_SPAWNS(veh);
+			LL_PREPEND(helpers, item);
+		}
+	}
+	// build lists: building
+	if (GET_BUILDING(IN_ROOM(ch))) {
+		// only find a spawn list here if the building is complete; otherwise no list = no spawn
+		if (IS_COMPLETE(IN_ROOM(ch)) && GET_BLD_SPAWNS(GET_BUILDING(IN_ROOM(ch)))) {
+			CREATE(item, struct hunt_helper, 1);
+			item->list = GET_BLD_SPAWNS(GET_BUILDING(IN_ROOM(ch)));
+			LL_PREPEND(helpers, item);
+		}
+	}
+	// build lists: crop
+	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP) && ROOM_CROP(IN_ROOM(ch))) {
+		CREATE(item, struct hunt_helper, 1);
+		item->list = GET_CROP_SPAWNS(ROOM_CROP(IN_ROOM(ch)));
+		LL_PREPEND(helpers, item);
+	}
+	// build lists: sect
+	else {
+		CREATE(item, struct hunt_helper, 1);
+		item->list = GET_SECT_SPAWNS(SECT(IN_ROOM(ch)));
+		LL_PREPEND(helpers, item);
+	}
+	
+	// prepare data for validation (calling these here prevents multiple function calls
+	x_coord = X_COORD(IN_ROOM(ch));
+	y_coord = Y_COORD(IN_ROOM(ch));
+	
+	// find the thing to hunt
+	LL_FOREACH_SAFE(helpers, item, next_item) {
+		LL_FOREACH(item->list, spawn) {
+			if (spawn->percent < min_percent) {
+				continue;	// too low
+			}
+			if (!validate_spawn_location(IN_ROOM(ch), spawn, x_coord, y_coord, FALSE)) {
+				continue;	// cannot spawn here
+			}
+			if (!(mob = mob_proto(spawn->vnum))) {
+				continue;	// no proto
+			}
+			if (!multi_isname(argument, GET_PC_NAME(mob))) {
+				continue;	// name mismatch
+			}
+			if (!MOB_FLAGGED(mob, MOB_ANIMAL)) {
+				non_animal = TRUE;
+				continue;	// only animals	-- check this last because it triggers an error message
+			}
+			
+			// seems ok:
+			found_proto = mob;
+			found_spawn = spawn;	// records the percent etc
+		}
+		
+		// and free the temporary data while we're here
+		free(item);
+	}
+	helpers = NULL;	// all freed by the ll_foreach_safe
+	
+	// did we find anything?
+	if (found_proto) {
+		act("You see signs that $N has been here recently, and crouch low to stalk it.", FALSE, ch, NULL, found_proto, TO_CHAR);
+		act("$n crouches low and begins to hunt.", TRUE, ch, NULL, NULL, TO_ROOM);
+		
+		start_action(ch, ACT_HUNTING, 0);
+		GET_ACTION_VNUM(ch, 0) = GET_MOB_VNUM(found_proto);
+		GET_ACTION_VNUM(ch, 1) = found_spawn->percent * 100;	// 10000 = 100.00%
+	}
+	else if (non_animal) {	// and also not success
+		msg_to_char(ch, "You can only hunt animals.\r\n");
+	}
+	else {
+		msg_to_char(ch, "You can't find a trail for anything like that here.\r\n");
 	}
 }
 

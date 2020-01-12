@@ -125,6 +125,7 @@ Basic Crafts:
   raft
   bound wooden column
   saddle
+  backstrap loom
   violet dye  (glassblowing)
   orange dye  (glassblowing)
 
@@ -218,32 +219,37 @@ Command:  cook [number] <item>
 
 Speed boosts:  Faster Chores bonus
 
-The cook command (formerly "bake") allows you to make food from a variety of
-raw ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
+The bake and cook commandas allow you to make food from a variety of raw
+ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
 a bakery, an alchemist, or a laboratory. The Touch of Flame ability also works.
-Many basic cooked foods also give you small food buffs (see WELL-FED).
+However, to bake anything, you'll need a kitchen, bakery, or another type of
+full-sized oven. Many basic cooked foods also give you small food buffs
+(see WELL-FED).
 
 You can cook:
-  bean soup                              pumpkin pie (charisma)
-  fried meat pie (strength)              blackberry tart
-  apple pie (charisma)                   nutty squash flatbread (dodge)
-  peach pie (charisma)                   roast plate (resist-physical)
-  cherry pie (charisma)                  fish plate (wits)
-  candied apple                          catfish plate (intelligence)
-  casserole (inventory)                  roast meat
-  jerky (bonus-physical)                 banana pie (charisma)
-  tortilla                               banana bread (moves)
+  bean soup                              fried meat pie (strength)              
+  fish plate (wits)                      catfish plate (intelligence)
+  tortilla                               jerky (bonus-physical)                 
   burrito (resist-physical)              spicy jerky (bonus-magical)
-  bread (move-regen)                     potato slices
   fried rice (dexterity)                 prunes (age)
-  salt pork                              plum pie (charisma)
-  chicken and vegetables (health)        strawberry pie (charisma)
+  salt pork                              potato slices
+  chicken and vegetables (health)        orange chicken and pears
   ham and cheese sandwich (move-regen)   strawberry jam (mana-regen)
   fruit bowl                             candied mango
-  orange chicken and pears               blueberry pie (charisma)
   sausage link (to-hit)                  blueberry jam (mana)
   road biscuit (block)                   coffee
-  mushroom plate (resist-magical)        oat cake (bonus-healing)
+  candied apple                          mushroom plate (resist-magical)
+
+You can bake:
+  bread (move-regen)                     
+  apple pie (charisma)                   nutty squash flatbread (dodge)
+  peach pie (charisma)                   roast plate (resist-physical)
+  cherry pie (charisma)                  strawberry pie (charisma)
+  blueberry pie (charisma)               plum pie (charisma)
+  banana pie (charisma)                  banana bread (moves)
+  pumpkin pie (charisma)                 blackberry tart
+  casserole (inventory)                  roast meat
+  oat cake (bonus-healing)
 
 There are also more recipes to find.
 
@@ -261,7 +267,7 @@ All crafting abilities train when you finish recipes that require them.
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, RECIPES, POTTERY,
 PRIMITIVE CRAFTS, WOODWORKING
 #
-"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO"
+"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO"
 
 Usage:  <verb> info <recipe name>
 
@@ -339,6 +345,7 @@ Deadly Weapons:
   horsemans pick
   kris
   maul
+  reaping scythe
   claymore (two-handed)
 
 Ship Weapons:
@@ -364,19 +371,22 @@ See also: CRAFT, LAND VEHICLES
 Family Recipes (Trade ability)
 
 Usage:  cook [number] <recipe>
-Requirements:  cooking fire, sharp tool
+        bake [number] <recipe>
+Requirements:  cooking fire, bakery, knife
 
 You can use old family recipes to create buff foods -- foods that give you an
 effect for a while after you eat them. These foods are bind-on-pickup, so only
 the person who makes them can eat them.
 
-You can make the following family recipes:
-  berry cobbler (wits)                     hearty meatloaf (strength)
-  biscuits and gravy (move-regen)          jellied eels (dodge)
-  black sausage (to-hit)                   mom's pie (max-mana)
-  chicken and dumplings (intelligence)     pot roast (max-health)
-  chili (max-moves)                        shepherd's pie (dexterity)
+You can cook the following family recipes:
+  black sausage (to-hit)                   jellied eels (dodge)
+  pot roast (max-health)                   chili (max-moves)
   fish and chips (charisma)                stewed vegetables (mana-regen)
+  
+You can bake the following family recipes:
+  berry cobbler (wits)                     hearty meatloaf (strength)
+  biscuits and gravy (move-regen)          mom's pie (max-mana)
+  chicken and dumplings (intelligence)     shepherd's pie (dexterity)
 
 See also: BUFF FOOD, BOP, COOKING FIRE
 #
@@ -433,12 +443,15 @@ With the basic Forge skill, you can create:
   nails (x4)
   imperium spike (x3)
   nocturnium spike (x3)
-  hammer
+  hammer -- for forging
+  knife -- for skinning, butchering, and crafting
   woodsman axe -- for chopping
   short sword -- basic weapon
   pick -- for mining
   shovel -- dig faster
   pan -- pan for gold
+  sickle -- used for harvesting
+  saw -- for sawing lumber
   mirror
   coin mill
   anchor -- used on ships
@@ -448,7 +461,7 @@ It also allows you to smelt bronze ingots from tin and copper.
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
-  DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES
+  DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES, SAW
 #
 "FREE ACTIONS" "CLEAR TERRAIN" "TIDY UP" "SCOUT AREA" "BLOCK WATER" ENGRAVE "MAGIC WORDS" ORGANIZE "SHOVEL SOOT"
 
@@ -587,6 +600,7 @@ Iron Blades:
   mace
   pickaxe
   pike
+  iron sickle
 
 Tools:
   iron hammer
@@ -596,7 +610,7 @@ Weaponcrafting -> Iron Blades -> Deadly Weapons
 
 See also: FORGE, IRON BLADES, DEADLY WEAPONS
 #
-JEWELRY
+JEWELRY JEWELERY
 
 Jewelry (Trade ability)
 Command:  forge [number] <item>
@@ -614,6 +628,7 @@ The Jewelry ability is a forge specialization that can make:
   engagement ring
   wedding band
   crown
+  fine sewing kit  (for sewing)
 
 All silver and gold costs are in ingots. You can separate bars back down into
 these forms if you have already smelted them into bars.
@@ -812,10 +827,13 @@ You know how to craft the following items:
 
 Primitive crafts:
   handle, bone handle
-  stone axe
-  stone hammer
-  spear
-  fire sticks (for lighting torches and fires)
+  stone axe  (for chopping)
+  stone hammer  (for forging)
+  spear  (for fishing)
+  flint sickle  (for harvesting)
+  fire sticks  (for lighting torches and fires)
+  grinding stones  (for milling)
+  feather sewing kit  (for sewing)
 
 This ability also allows you to:
   saw
@@ -953,11 +971,13 @@ SEW SEWING
 Sew (Trade ability)
 Command:  sew [number] <item>
           sew info <item>
+Requires:  sewing kit or a tailor building
 
 The art of sewing is one of the oldest and simplest trade skills, but it also
 makes some of the finest clothing and the lightest armor. The primary resources
 required for sewing are skins or cloth. The Master Tailor ability will allow
-you to sew faster, as will sewing in a tailor shop.
+you to sew faster, as will sewing in a tailor shop or using a superior sewing
+kit. You can craft a feather sewing kit using Primitive Crafts.
 
 For a list of clothing items you can sew, see HELP CLOTHING.
 
@@ -1044,6 +1064,7 @@ See also: CRAFT, FORGE
 "SKIN COMMAND" SKINNING
 
 Usage:  skin <corpse>
+Tool:  knife
 
 You can skin a fresh corpse to get usable material, which can later be turned
 into good equipment. Some corpses cannot be skinned, especially severely
@@ -1158,6 +1179,7 @@ Weaponcrafting:
   bronze spear
   bronze axe
   bronze mace
+  bronze scythe
 
 Weaponcrafting -> Iron Blades -> Deadly Weapons
 
@@ -1167,6 +1189,7 @@ WEAVE
 
 Command:  weave [number] <item>
           weave info <item>
+Requires:  loom or tailor
 
 Weaving converts raw materials into cloth. You can weave anywhere, but it goes
 much faster at the tailor shop. Master Tailors can also weave faster.
@@ -1177,7 +1200,8 @@ Using the Sew ability:
   
 (Wool cloth and cotton cloth are used for the same things.)
 
-See also: SHEAR, RESOURCES, KEEP, RECIPES, CRAFT INFO, MASTER TAILOR
+See also: SHEAR, RESOURCES, KEEP, RECIPES, CRAFT INFO, LOOM, TAILOR, 
+  MASTER TAILOR
 #
 WOODWORKING "WOOD WORKING"
 
@@ -1201,6 +1225,7 @@ With Woodworking you can craft:
   table*
   throne*
 
+Many of these crafts require you to equip a good knife.
 * Crafts marked with an asterisk require the Carpenter building.
 
 See also: CRAFT, LAND VEHICLES

@@ -37,21 +37,17 @@
 
 // external vars
 extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+extern const char *tool_flags[];
 
 // external funcs
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
-extern obj_data *find_chip_weapon(char_data *ch);
 extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 extern char *get_mine_type_name(room_data *room);
-extern obj_data *has_sharp_tool(char_data *ch);
 extern bool is_deep_mine(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void scale_item_to_level(obj_data *obj, int level);
 void schedule_crop_growth(struct map_data *map);
-
-// local prototypes
-obj_data *has_shovel(char_data *ch);
 
 // cancel protos
 void cancel_resource_list(char_data *ch);
@@ -82,6 +78,7 @@ void process_fishing(char_data *ch);
 void process_gathering(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_harvesting(char_data *ch);
+void process_hunting(char_data *ch);
 void process_maintenance(char_data *ch);
 void process_mining(char_data *ch);
 void process_minting(char_data *ch);
@@ -149,6 +146,7 @@ const struct action_data_struct action_data[] = {
 	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
 	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
+	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -323,7 +321,7 @@ void update_actions(void) {
 			speed += ACTION_CYCLE_HALF_SEC;
 			gain_player_tech_exp(ch, PTECH_FAST_FIND, 0.1);
 		}
-		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
+		if (IS_SET(act_flags, ACTF_SHOVEL) && has_tool(ch, TOOL_SHOVEL)) {
 			speed += ACTION_CYCLE_HALF_SEC;
 		}
 		
@@ -379,26 +377,63 @@ void update_actions(void) {
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
-* Finds a shovel for the character.
+* Finds a tool equipped by the character.
 *
-* @param char_data *ch The person who might have a shovel.
-* @return obj_data* The character's shovel, or NULL if they have none.
+* @param char_data *ch The person who might have the tool.
+* @param bitvector_t flags The TOOL_ flags required -- player must have ONE of these flags (see has_all_tools).
+* @return obj_data* The character's equipped tool, or NULL if they have none.
 */
-obj_data *has_shovel(char_data *ch) {
-	obj_data *shovel = NULL;
+obj_data *has_tool(char_data *ch, bitvector_t flags) {
+	obj_data *tool;
 	int iter;
 	
-	// list of valid slots; terminate with -1
-	int slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	// list of valid slots (in order of priority; terminate with -1
+	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
 	
 	for (iter = 0; slots[iter] != -1; ++iter) {
-		shovel = GET_EQ(ch, slots[iter]);
-		if (shovel && OBJ_FLAGGED(shovel, OBJ_TOOL_SHOVEL)) {
-			return shovel;
+		tool = GET_EQ(ch, slots[iter]);
+		if (tool && TOOL_FLAGGED(tool, flags)) {
+			return tool;
 		}
 	}
 	
 	return NULL;
+}
+
+
+/**
+* Variant of has_tool() that requires ALL flags be present.
+*
+* @param char_data *ch The person who might have the tool.
+* @param bitvector_t flags The TOOL_ flags required -- all flags must be present.
+* @return obj_data* The best equipped tool that matches (more than 1 tool could have contributed the required flags), or NULL if they don't have all the required flags.
+*/
+obj_data *has_all_tools(char_data *ch, bitvector_t flags) {
+	obj_data *tool, *best_tool = NULL;
+	bitvector_t to_find = flags;
+	int iter;
+	
+	// list of valid slots (in order of priority; terminate with -1
+	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	
+	for (iter = 0; to_find && slots[iter] != -1; ++iter) {
+		tool = GET_EQ(ch, slots[iter]);
+		if (tool && TOOL_FLAGGED(tool, flags)) {
+			// it has 1 or more of the flags (original, not remaining flags): try to see if it's better
+			if (!best_tool || OBJ_FLAGGED(tool, OBJ_SUPERIOR) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
+				best_tool = tool;	// it seems better
+			}
+			// now remove it from remaining flags (we only need to find any flags that remain
+			REMOVE_BIT(to_find, GET_OBJ_TOOL_FLAGS(tool));
+		}
+	}
+	
+	if (to_find) {
+		return NULL;	// we didn't find all the flags
+	}
+	else {
+		return best_tool;	// we DID find all the flags; return the best tool
+	}
 }
 
 
@@ -538,6 +573,7 @@ void cancel_movement_string(char_data *ch) {
 */
 void start_chopping(char_data *ch) {
 	char buf[MAX_STRING_LENGTH], weapon[MAX_STRING_LENGTH];
+	obj_data *tool;
 	
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
@@ -553,11 +589,11 @@ void start_chopping(char_data *ch) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, config_get_int("chop_timer"));
 		}
 		
-		if (GET_EQ(ch, WEAR_WIELD)) {
-			strcpy(weapon, GET_OBJ_SHORT_DESC(GET_EQ(ch, WEAR_WIELD)));
+		if ((tool = has_tool(ch, TOOL_AXE))) {
+			strcpy(weapon, GET_OBJ_SHORT_DESC(tool));
 		}
 		else {
-			strcpy(weapon, "axe");
+			strcpy(weapon, "your axe");
 		}
 		
 		snprintf(buf, sizeof(buf), "You swing back %s and prepare to chop...", weapon);
@@ -744,8 +780,12 @@ INTERACTION_FUNC(finish_digging) {
 
 INTERACTION_FUNC(finish_fishing) {
 	char buf[MAX_STRING_LENGTH];
-	obj_data *obj = NULL;
+	char *to_char = NULL, *to_room = NULL;
+	obj_data *obj = NULL, *tool;
 	int num;
+	
+	const char *default_to_char = "You catch $p!";
+	const char *default_to_room = "$n catches $p!";
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
@@ -761,15 +801,21 @@ INTERACTION_FUNC(finish_fishing) {
 	
 	// messaging
 	if (obj) {
+		// check for custom messages on their fishing tool
+		if ((tool = has_tool(ch, TOOL_FISHING))) {
+			to_char = obj_get_custom_message(tool, OBJ_CUSTOM_FISH_TO_CHAR);
+			to_room = obj_get_custom_message(tool, OBJ_CUSTOM_FISH_TO_ROOM);
+		}
+		
 		if (interaction->quantity > 1) {
-			sprintf(buf, "You jab your spear into the water and when you extract it you find $p (x%d) on the end!", interaction->quantity);
+			sprintf(buf, "%s (x%d)", to_char ? to_char : default_to_char, interaction->quantity);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {
-			act("You jab your spear into the water and when you extract it you find $p on the end!", FALSE, ch, obj, NULL, TO_CHAR);
+			act(to_char ? to_char : default_to_char, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		
-		act("$n jabs $s spear into the water and when $e draws it out, it has $p on the end!", TRUE, ch, obj, NULL, TO_ROOM);
+		act(to_room ? to_room : default_to_room, TRUE, ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
@@ -1042,22 +1088,31 @@ void perform_saw(char_data *ch) {
 	ACMD(do_saw);
 	
 	char buf[MAX_STRING_LENGTH];
-	bool success = FALSE;
-	obj_data *proto;
+	bool success = FALSE, room = FALSE;
+	obj_data *proto, *saw;
 	
+	// check both of these because they both have bonuses
+	room = room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW);
+	saw = has_tool(ch, TOOL_SAW);
+	
+	if (!room && !saw) {
+		msg_to_char(ch, "You need to use a saw of some kind to do that.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to finish sawing.\r\n");
 		cancel_action(ch);
 		return;
 	}
 	
-	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		msg_to_char(ch, "You saw %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
-	}
-	
 	// base
 	GET_ACTION_TIMER(ch) -= 1;
 	
+	// faster at a lumber mill OR if the tool is superior, and with the ptech
+	if (room || (saw && OBJ_FLAGGED(saw, OBJ_SUPERIOR))) {
+		GET_ACTION_TIMER(ch) -= 1;
+	}
 	if (has_player_tech(ch, PTECH_FAST_WOOD_PROCESSING)) {
 		GET_ACTION_TIMER(ch) -= 1;
 	}
@@ -1088,6 +1143,10 @@ void perform_saw(char_data *ch) {
 			// lather, rinse, rescrape
 			do_saw(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
+	}
+	else if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+		// message last, only if they didn't finish
+		msg_to_char(ch, "You saw %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 	}
 }
 
@@ -1142,12 +1201,30 @@ void process_bathing(char_data *ch) {
 * @param char_data *ch The builder.
 */
 void process_build_action(char_data *ch) {
+	extern craft_data *find_building_list_entry(room_data *room, byte type);
+	
+	char buf1[MAX_STRING_LENGTH];
+	craft_data *type = NULL;
 	int count, total;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to keep working here.\r\n");
 		cancel_action(ch);
 		return;
+	}
+	
+	// check for build recipe
+	type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL);
+	
+	// ensure tools are still present
+	if (type && GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
+			msg_to_char(ch, "You need the following tools to work on this building: %s\r\n", buf1);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to work on this building.\r\n", AN(buf1), buf1);
+		}
 	}
 
 	total = 1;	// number of materials to attach in one go (add things that speed up building)
@@ -1219,8 +1296,8 @@ void process_chipping(char_data *ch) {
 	obj_data *proto;
 	bool success;
 	
-	if (!find_chip_weapon(ch)) {
-		msg_to_char(ch, "You need to be wielding some kind of hammer or rock to chip it.\r\n");
+	if (!has_tool(ch, TOOL_KNAPPER)) {
+		msg_to_char(ch, "You need to be using a rock or other knapping tool to chip it.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1270,9 +1347,10 @@ void process_chop(char_data *ch) {
 	
 	bool got_any = FALSE;
 	char_data *ch_iter;
+	obj_data *axe;
 	
-	if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
-		send_to_char("You need to be wielding an axe to chop.\r\n", ch);
+	if (!(axe = has_tool(ch, TOOL_AXE))) {
+		send_to_char("You need to be using an axe to chop.\r\n", ch);
 		cancel_action(ch);
 		return;
 	}
@@ -1282,9 +1360,9 @@ void process_chop(char_data *ch) {
 		return;
 	}
 
-	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 3 * get_base_dps(GET_EQ(ch, WEAR_WIELD))));
-	act("You swing $p hard!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR | TO_SPAMMY);
-	act("$n swings $p hard!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_ROOM | TO_SPAMMY);
+	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 3 * (axe ? get_base_dps(axe) : 0)));
+	act("You swing $p hard!", FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
+	act("$n swings $p hard!", FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
 	
 	// complete?
 	if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
@@ -1439,7 +1517,7 @@ void process_excavating(char_data *ch) {
 
 	total = 1;	// shovelfuls at once (add things that speed up excavate)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_EXCAVATING; ++count) {
-		if (!has_shovel(ch)) {
+		if (!has_tool(ch, TOOL_SHOVEL)) {
 			msg_to_char(ch, "You need a shovel to excavate.\r\n");
 			cancel_action(ch);
 		}
@@ -1513,7 +1591,7 @@ void process_fillin(char_data *ch) {
 
 	total = 1;	// shovelfuls to fill in at once (add things that speed up fillin)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_FILLING_IN; ++count) {
-		if (!has_shovel(ch)) {
+		if (!has_tool(ch, TOOL_SHOVEL)) {
 			msg_to_char(ch, "You need a shovel to fill in the trench.\r\n");
 			cancel_action(ch);
 		}
@@ -1566,13 +1644,14 @@ void process_fillin(char_data *ch) {
 void process_fishing(char_data *ch) {
 	bool success = FALSE;
 	room_data *room;
-	int dir;
+	obj_data *tool;
+	int amt, dir;
 	
 	dir = GET_ACTION_VNUM(ch, 0);
 	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir, FALSE);
 	
-	if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
-		msg_to_char(ch, "You'll need a spear to fish.\r\n");
+	if (!(tool = has_tool(ch, TOOL_FISHING))) {
+		msg_to_char(ch, "You aren't using any fishing equipment.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1587,7 +1666,8 @@ void process_fishing(char_data *ch) {
 		return;
 	}
 	
-	GET_ACTION_TIMER(ch) -= GET_CHARISMA(ch) + (player_tech_skill_check(ch, PTECH_FISH, DIFF_MEDIUM) ? 2 : 0);
+	amt = (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20) + (player_tech_skill_check(ch, PTECH_FISH, DIFF_MEDIUM) ? 2 : 0);
+	GET_ACTION_TIMER(ch) -= MAX(1, amt);
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
 		switch (number(0, 10)) {
@@ -1687,8 +1767,8 @@ void process_harvesting(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!GET_EQ(ch, WEAR_WIELD) || (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLASH)) {
-		send_to_char("You're not wielding the proper tool for harvesting.\r\n", ch);
+	if (!has_tool(ch, TOOL_HARVESTING)) {
+		send_to_char("You're not using the proper tool for harvesting.\r\n", ch);
 		cancel_action(ch);
 		return;
 	}
@@ -1754,6 +1834,67 @@ void process_harvesting(char_data *ch) {
 
 
 /**
+* Tick update for hunt action.
+*
+* @param char_data *ch The hunter.
+*/
+void process_hunting(char_data *ch) {
+	void scale_mob_for_character(char_data *mob, char_data *ch);
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	struct affected_type *af;
+	char_data *mob;
+	
+	// from stored data
+	any_vnum mob_vnum = GET_ACTION_VNUM(ch, 0);
+	int chance_times_100 = GET_ACTION_VNUM(ch, 1);
+	
+	if (number(1, 10000) <= chance_times_100) {
+		// found it!
+		
+		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT) >= config_get_int("short_depletion")) {
+			// late check for depletion: make them hunt first
+			msg_to_char(ch, "You don't seem to be able to find any. Maybe this area has been hunted to depletion.\r\n");
+			GET_ACTION(ch) = ACT_NONE;
+			return;
+		}
+		
+		mob = read_mobile(mob_vnum, TRUE);
+		
+		// basic setup
+		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
+		char_to_room(mob, IN_ROOM(ch));
+		
+		// scale it to the hunter's level and flag it to keep it there
+		scale_mob_for_character(mob, ch);
+		SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE | MOB_SPAWNED);
+		
+		// messaging
+		act("You've found $N!", FALSE, ch, NULL, mob, TO_CHAR);
+		act("$n has found $N!", FALSE, ch, NULL, mob, TO_NOTVICT);
+		
+		load_mtrigger(mob);
+		
+		// stun it if triggers allow
+		if (!run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, mob, NULL)) {
+			af = create_flag_aff(ATYPE_HUNTED, 1, AFF_ENTANGLED, ch);
+			affect_join(mob, af, 0);
+		}
+		
+		GET_ACTION(ch) = ACT_NONE;
+		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
+		add_depletion(IN_ROOM(ch), DPLTN_HUNT, TRUE);
+	}
+	else {
+		// tick messaging
+		if (!number(0, 2)) {
+			act("You stalk low to the ground, hunting...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		}
+	}
+}
+
+
+/**
 * Tick update for maintenance.
 *
 * @param char_data *ch The repairman.
@@ -1778,6 +1919,7 @@ void process_mining(char_data *ch) {
 	struct global_data *glb;
 	int count, total;
 	room_data *in_room;
+	obj_data *tool;
 	bool success;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -1786,9 +1928,9 @@ void process_mining(char_data *ch) {
 		return;
 	}
 
-	total = 1;	// pick swings at once (add things that speed up mining)
+	total = 1;	// pick swings per tick
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_MINING; ++count) {
-		if (!GET_EQ(ch, WEAR_WIELD) || ((GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_PICK) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_HANDAXE)) {
+		if (!(tool = has_tool(ch, TOOL_MINING))) {
 			send_to_char("You're not using the proper tool for mining!\r\n", ch);
 			cancel_action(ch);
 			break;
@@ -1804,10 +1946,10 @@ void process_mining(char_data *ch) {
 			break;
 		}
 
-		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + 3 * get_base_dps(GET_EQ(ch, WEAR_WIELD));
+		GET_ACTION_TIMER(ch) -= GET_STRENGTH(ch) + 3 * (tool ? get_base_dps(tool) : 0);
 
-		act("You pick at the walls with $p, looking for ore.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_CHAR | TO_SPAMMY);
-		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_ROOM | TO_SPAMMY);
+		act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_CHAR | TO_SPAMMY);
+		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_ROOM | TO_SPAMMY);
 
 		// done??
 		if (GET_ACTION_TIMER(ch) <= 0) {
@@ -1955,9 +2097,9 @@ void process_panning(char_data *ch) {
 	
 	dir = GET_ACTION_VNUM(ch, 0);
 	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir, FALSE);
-
-	if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
-		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
+	
+	if (!has_tool(ch, TOOL_PAN)) {
+		msg_to_char(ch, "You need to be using a pan to do that.\r\n");
 		cancel_action(ch);
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -2288,8 +2430,8 @@ void process_scraping(char_data *ch) {
 	bool success = FALSE;
 	obj_data *proto;
 	
-	if (!has_sharp_tool(ch)) {
-		msg_to_char(ch, "You need to be using a sharp tool to scrape it.\r\n");
+	if (!has_tool(ch, TOOL_AXE | TOOL_KNIFE)) {
+		msg_to_char(ch, "You need to be using a good axe or knife to scrape it.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -2570,7 +2712,7 @@ ACMD(do_chip) {
 	else if (!has_interaction(target->interactions, INTERACT_CHIP)) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
-	else if (!find_chip_weapon(ch)) {
+	else if (!has_tool(ch, TOOL_KNAPPER)) {
 		msg_to_char(ch, "You need to be wielding some kind of hammer or rock to chip it.\r\n");
 	}
 	else {
@@ -2615,8 +2757,8 @@ ACMD(do_chop) {
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !has_permission(ch, PRIV_CHOP, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to chop down trees in the empire.\r\n");
 	}
-	else if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
-		send_to_char("You need to be wielding some kind of axe to chop.\r\n", ch);
+	else if (!has_tool(ch, TOOL_AXE)) {
+		send_to_char("You need to be using some kind of axe to chop.\r\n", ch);
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to chop anything here.\r\n");
@@ -2723,7 +2865,7 @@ ACMD(do_excavate) {
 		// 1st check: allies ok
 		msg_to_char(ch, "You don't have permission to excavate here!\r\n");
 	}
-	else if (!has_shovel(ch)) {
+	else if (!has_tool(ch, TOOL_SHOVEL)) {
 		msg_to_char(ch, "You need a shovel to excavate.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) < 0) {
@@ -2792,7 +2934,7 @@ ACMD(do_fillin) {
 		// 1st check: allies can help
 		msg_to_char(ch, "You don't have permission to fill in here!\r\n");
 	}
-	else if (!has_shovel(ch)) {
+	else if (!has_tool(ch, TOOL_SHOVEL)) {
 		msg_to_char(ch, "You need a shovel to do that.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
@@ -2887,7 +3029,7 @@ ACMD(do_harvest) {
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !has_permission(ch, PRIV_HARVEST, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to harvest empire crops.\r\n");
 	}
-	else if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLASH)) {
+	else if (!has_tool(ch, TOOL_HARVESTING)) {
 		msg_to_char(ch, "You aren't using the proper tool for that.\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -2940,7 +3082,7 @@ ACMD(do_mine) {
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 		msg_to_char(ch, "The mine is depleted, you find nothing of use.\r\n");
 	}
-	else if (!GET_EQ(ch, WEAR_WIELD) || ((GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_PICK) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_HANDAXE)) {
+	else if (!has_tool(ch, TOOL_MINING)) {
 		msg_to_char(ch, "You aren't wielding a tool suitable for mining.\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -3042,8 +3184,8 @@ ACMD(do_pan) {
 	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to pan %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
-	else if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
-		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
+	else if (!has_tool(ch, TOOL_PAN)) {
+		msg_to_char(ch, "You need to be using a pan to do that.\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to pan for anything here.\r\n");
@@ -3265,7 +3407,7 @@ ACMD(do_quarry) {
 
 
 ACMD(do_saw) {
-	obj_data *obj;
+	obj_data *obj, *saw;
 
 	one_argument(argument, arg);
 
@@ -3279,19 +3421,10 @@ ACMD(do_saw) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW)) {
-		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
+	else if (!(saw = has_tool(ch, TOOL_SAW)) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW)) {
+		msg_to_char(ch, "You need to use a saw of some kind to do that.\r\n");
 	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "You can only saw in this building if it's in a city.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Complete the building first.\r\n");
-	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	else if (!saw && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to saw here.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
@@ -3310,7 +3443,9 @@ ACMD(do_saw) {
 		msg_to_char(ch, "It's too dark to saw anything here.\r\n");
 	}
 	else {
-		start_action(ch, ACT_SAWING, 8);
+		// TODO: move the timer here to a config; timer is halved if there's a
+		// SAW function or TOOL_SAW, and halves again if there's a ptech
+		start_action(ch, ACT_SAWING, 16);
 		
 		// store the item that was used
 		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
@@ -3351,8 +3486,8 @@ ACMD(do_scrape) {
 	else if (!has_interaction(obj->interactions, INTERACT_SCRAPE)) {
 		msg_to_char(ch, "You can't scrape that!\r\n");
 	}
-	else if (!has_sharp_tool(ch)) {
-		msg_to_char(ch, "You need to be using a sharp tool to scrape anything.\r\n");
+	else if (!has_tool(ch, TOOL_AXE | TOOL_KNIFE)) {
+		msg_to_char(ch, "You need to be using a good axe or knife to scrape anything.\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to scrape anything here.\r\n");

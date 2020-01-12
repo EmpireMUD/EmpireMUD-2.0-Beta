@@ -1,14 +1,14 @@
 #12410
 crispy fish~
 12410 1
-3 293 h 6 -1
+3 293 h 6 -1 0
 R
 17 3 1 526336
 S
 #12412
 black tricorne hat~
 12412 1
-4 182 gq 6 -1
+4 182 q 6 -1 0
 R
 15 6 1 32
 R
@@ -23,7 +23,7 @@ S
 #12419
 deep-sea feast~
 12419 1
-3 271 ghq 6 -1
+3 271 hq 6 -1 f
 R
 17 3 1 524288
 R
@@ -32,7 +32,7 @@ S
 #12424
 goblin smuggler's hulk~
 12424 1
-11 61 kno 1 12424
+11 61 kno 1 12424 0
 R
 12424 1 0 0
 R
@@ -51,7 +51,7 @@ S
 #12425
 goblin pirate ship~
 12425 1
-11 61 kno 1 12425
+11 61 kno 1 12425 0
 R
 12425 1 0 0
 R
@@ -72,7 +72,7 @@ S
 #12426
 cliffdocks~
 -1 1
-8 300 0 1 12426
+8 300 0 1 12426 0
 B
 12426 c ah
 R
@@ -87,7 +87,7 @@ S
 #12427
 smugglerswharf~
 -1 1
-8 300 0 1 12427
+8 300 0 1 12427 0
 B
 12427 c ah
 R
@@ -102,7 +102,7 @@ S
 #12438
 imperium pirate hoop~
 12438 1
-1 54 q 8 -1
+1 54 q 8 -1 0
 R
 171 2 0 0
 R
@@ -115,7 +115,7 @@ S
 #12440
 nocturnium pirate hoop~
 12440 1
-1 54 q 8 -1
+1 54 q 8 -1 0
 R
 170 2 0 0
 R
@@ -128,7 +128,7 @@ S
 #12442
 seaweed salad~
 12442 1
-3 293 g 6 12407
+3 293 0 6 12407 f
 R
 12407 6 0 0
 R
@@ -137,7 +137,7 @@ S
 #12444
 golden pirate hoop~
 12444 1
-1 54 q 8 -1
+1 54 q 8 -1 0
 R
 171 2 0 0
 R
@@ -150,7 +150,7 @@ S
 #12446
 silver pirate hoop~
 12446 1
-1 54 q 8 -1
+1 54 q 8 -1 0
 R
 170 2 0 0
 R
@@ -163,7 +163,7 @@ S
 #12448
 bone hoop earring~
 12448 1
-1 54 q 8 -1
+1 54 q 8 -1 0
 R
 18 2 1 1032
 R
@@ -176,7 +176,7 @@ S
 #12450
 heavy plated pantaloons~
 12450 1
-1 197 q 42 -1
+1 197 q 42 -1 0
 R
 177 16 0 0
 R
@@ -193,7 +193,7 @@ S
 #12452
 goblin scullery pantaloons~
 12452 1
-4 199 gq 24 -1
+4 199 q 24 -1 0
 R
 176 16 0 0
 R
@@ -210,7 +210,7 @@ S
 #12454
 goblin sea-shaman pantaloons~
 12454 1
-4 199 gq 24 -1
+4 199 q 24 -1 0
 R
 176 16 0 0
 R
@@ -227,7 +227,7 @@ S
 #12456
 pirate boarding pantaloons~
 12456 1
-4 182 gq 24 -1
+4 182 q 24 -1 0
 R
 177 16 0 0
 R
@@ -244,7 +244,7 @@ S
 #12458
 goblin dress pantaloons~
 12458 1
-4 182 gq 24 -1
+4 182 q 24 -1 0
 R
 177 16 0 0
 R

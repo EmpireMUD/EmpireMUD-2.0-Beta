@@ -833,6 +833,7 @@ const char *player_tech_types[] = {
 	"Bite-Tank-Upgrade",	// 60
 	"Bite-Steal-Blood",
 	"See-In-Dark-Outdoors",
+	"Hunt-Animals",
 	"\n"
 };
 
@@ -1458,7 +1459,7 @@ const int apply_attribute[] = {
 	NOTHING,	// bonus-heal
 	NOTHING,	// resist-magical
 	NOTHING,	// crafting
-	NOTHING	// blood-upkeep
+	NOTHING,	// blood-upkeep
 };
 
 
@@ -1490,7 +1491,7 @@ const bool apply_never_scales[] = {
 	FALSE,	// BONUS-HEALING
 	FALSE,	// RESIST-MAGICAL
 	TRUE,	// CRAFTING
-	TRUE	// BLOOD-UPKEEP
+	TRUE,	// BLOOD-UPKEEP
 };
 
 
@@ -1569,7 +1570,7 @@ const char *craft_flags[] = {
 	"GLASSBLOWER",
 	"CARPENTER",
 	"ALCHEMY",
-	"SHARP-TOOL",
+	"*",	// formerly sharp-tool
 	"FIRE",
 	"SOUP",
 	"IN-DEVELOPMENT",
@@ -1593,7 +1594,7 @@ const char *craft_flag_for_info[] = {
 	"requires glassblower building",
 	"requires carpenter building",
 	"alchemy",
-	"requires sharp tool",
+	"",
 	"requires fire",
 	"",	// soup
 	"",	// in-dev
@@ -1625,6 +1626,7 @@ const char *craft_types[] = {
 	"MANUFACTURE",
 	"SMELT",
 	"PRESS",
+	"BAKE",
 	"\n"
 };
 
@@ -2121,6 +2123,7 @@ const char *wear_keywords[] = {
 	"\r!",	// wield
 	"\r!",	// ranged
 	"\r!",	// hold
+	"\r!",	// tool
 	"\r!",	// share
 	"\n"
 };
@@ -2151,6 +2154,7 @@ const struct wear_data_type wear_data[NUM_WEARS] = {
 	{ "         <wielded> ", "wield", ITEM_WEAR_WIELD, 	TRUE, 2.0, NO_WEAR, "You're already wielding $p.", "$n wields $p.", "You wield $p.", TRUE, TRUE },
 	{ "          <ranged> ", "ranged", ITEM_WEAR_RANGED, TRUE, 0, NO_WEAR, "You're already using $p.", "$n uses $p.", "You use $p.", TRUE, TRUE },
 	{ "            <held> ", "hold", ITEM_WEAR_HOLD, TRUE, 1.0, NO_WEAR, "You're already holding $p.", "$n grabs $p.", "You grab $p.", TRUE, TRUE },
+	{ "            <tool> ", "tool", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already using $p.", "$n equips $p.", "You equip $p.", TRUE, FALSE },
 	{ "          (shared) ", "shared", ITEM_WEAR_TAKE, FALSE, 0, NO_WEAR, "You're already sharing $p.", "$n shares $p.", "You share $p.", FALSE, FALSE }
 };
 
@@ -2215,7 +2219,7 @@ const char *wear_bits[] = {
 };
 
 
-// ITEM_WEAR_x - position importance, for item scaling
+// ITEM_WEAR_x, WEAR_POS_x - position importance, for item scaling
 const int wear_significance[] = {
 	WEAR_POS_MINOR,	// take
 	WEAR_POS_MINOR,	// finger
@@ -2281,11 +2285,11 @@ const char *extra_bits[] = {
 	"TWO-HANDED",
 	"BOE",
 	"BOP",	// 15
-	"STAFF",
+	"*",	// formerly STAFF
 	"UNCOLLECTED-LOOT",
 	"*KEEP",
-	"TOOL-PAN",
-	"TOOL-SHOVEL",	// 20
+	"*",	// formerly TOOL-PAN
+	"*",	// 20, formerly TOOL-SHOVEL
 	"!AUTOSTORE",
 	"HARD-DROP",
 	"GROUP-DROP",
@@ -2314,11 +2318,11 @@ const char *extra_bits_inv_flags[] = {
 	"(2h)",
 	"(boe)",
 	"(bop)",
-	"",	// staff
+	"",	// *
 	"",	// uncollected
 	"(keep)",
-	"",	// pan
-	"",	// shovel
+	"",	// *
+	"",	// *
 	"",	// !autostore
 	"",	// hard-drop
 	"",	// group-drop
@@ -2347,11 +2351,11 @@ const double obj_flag_scaling_bonus[] = {
 	1.5,	// OBJ_TWO_HANDED
 	1.3333,	// OBJ_BIND_ON_EQUIP
 	1.5,	// OBJ_BIND_ON_PICKUP
-	1.0,	// OBJ_STAFF
+	1.0,	// unused
 	1.0,	// OBJ_UNCOLLECTED_LOOT
 	1.0,	// OBJ_KEEP
-	1.0,	// OBJ_TOOL_PAN
-	1.0,	// OBJ_TOOL_SHOVEL
+	1.0,	// unused
+	1.0,	// unused
 	1.0,	// OBJ_NO_AUTOSTORE
 	1.2,	// OBJ_HARD_DROP
 	1.4,	// OBJ_GROUP_DROP
@@ -2532,6 +2536,7 @@ const char *resource_types[] = {
 	"pool",
 	"action",
 	"currency",
+	"tool",
 	"\n"
 };
 
@@ -2543,23 +2548,47 @@ const char *storage_bits[] = {
 };
 
 
+// TOOL_x: tool flags for objects
+const char *tool_flags[] = {
+	"axe",	// 0
+	"fishing tool",
+	"hammer",
+	"harvesting tool",
+	"knapper",
+	"knife",	// 5
+	"loom",
+	"mining tool",
+	"pan",
+	"grinding stone",
+	"*quarrying tools",	// 10
+	"saw",
+	"sewing kit",
+	"*shears",
+	"shovel",
+	"staff",	// 15
+	"\n"
+};
+
+
 // OBJ_CUSTOM_x
 const char *obj_custom_types[] = {
-	"build-to-char",
+	"build-to-char",	// 0
 	"build-to-room",
 	"instrument-to-char",
 	"instrument-to-room",
 	"eat-to-char",
-	"eat-to-room",
+	"eat-to-room",	// 5
 	"craft-to-char",
 	"craft-to-room",
 	"wear-to-char",
 	"wear-to-room",
-	"remove-to-char",
+	"remove-to-char",	// 10
 	"remove-to-room",
 	"longdesc",
 	"longdesc-female",
 	"longdesc-male",
+	"fish-to-char",	// 15
+	"fish-to-room",
 	"\n"
 };
 
@@ -2887,7 +2916,8 @@ const char *depletion_type[NUM_DEPLETION_TYPES] = {
 	"quarry",
 	"pan",
 	"trapping",
-	"chop"
+	"chop",
+	"hunt"
 };
 
 
@@ -3024,6 +3054,7 @@ const char *function_flags[] = {
 	"FISHING",
 	"STORE-ALL", // 35
 	"IN-CITY-ONLY",
+	"OVEN",
 	"\n"
 };
 
@@ -3928,6 +3959,8 @@ const char *requirement_types[] = {
 	"EMPIRE-PRODUCED-COMPONENT",	// 35
 	"EVENT-RUNNING",
 	"EVENT-NOT-RUNNING",
+	"LEVEL-UNDER",
+	"LEVEL-OVER",
 	"\n",
 };
 
@@ -3972,6 +4005,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// empire produced component
 	REQ_AMT_NONE,	// event running
 	REQ_AMT_NONE,	// event not running
+	REQ_AMT_THRESHOLD,	// level under
+	REQ_AMT_THRESHOLD,	// level over
 };
 
 
@@ -4015,6 +4050,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// empire produced component
 	FALSE,	// event running
 	FALSE,	// event not running
+	FALSE,	// level under
+	FALSE,	// level over
 };
 
 

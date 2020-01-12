@@ -408,6 +408,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_EMPIRE_PRODUCED_COMPONENT  35
 #define REQ_EVENT_RUNNING  36
 #define REQ_EVENT_NOT_RUNNING  37
+#define REQ_LEVEL_UNDER  38
+#define REQ_LEVEL_OVER  39
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -817,6 +819,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_FISHING  BIT(34)	// workforce can fish here
 #define FNC_STORE_ALL BIT(35) // anything can be stored here (does not allow retrieval)
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
+#define FNC_OVEN  BIT(37)	// for cooking
 
 // These function flags don't work on movable vehicles (they require room data)
 #define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
@@ -981,6 +984,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_MANUFACTURE  11
 #define CRAFT_TYPE_SMELT  12
 #define CRAFT_TYPE_PRESS  13
+#define CRAFT_TYPE_BAKE  14
 
 
 // CRAFT_x: Craft Flags for do_gen_craft
@@ -990,7 +994,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
 #define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
 #define CRAFT_ALCHEMY  BIT(5)  // requires access to glass/alchemist and fire
-#define CRAFT_SHARP  BIT(6)  // requires sharp tool
+	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)
 #define CRAFT_FIRE  BIT(7)  // requires any fire source
 #define CRAFT_SOUP  BIT(8)  // is a soup: requires a container of water, and the "object" property is a liquid id
 #define CRAFT_IN_DEVELOPMENT  BIT(9)	// craft cannot be performed by mortals
@@ -1009,6 +1013,11 @@ typedef struct vehicle_data vehicle_data;
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
 #define FIND_BUILD_UPGRADE  1
+
+// for gen_craft_data[].strings
+#define GCD_STRING_TO_CHAR  0
+#define GCD_STRING_TO_ROOM  1
+#define GCD_LONG_DESC  2
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1634,7 +1643,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_BOOK  28	// tied to the book/library system
 
 
-// Take/Wear flags -- where an item can be worn
+// ITEM_WEAR_x: Take/Wear flags -- where an item can be worn
 // NOTE: Don't confuse these with the actual wear locations (WEAR_x)
 #define ITEM_WEAR_TAKE  BIT(0)	// a. Item can be taken
 #define ITEM_WEAR_FINGER  BIT(1)	// b. Can be worn on finger
@@ -1694,11 +1703,11 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_TWO_HANDED  BIT(13)	// n. weapon requires both hands
 #define OBJ_BIND_ON_EQUIP  BIT(14)	// o. binds when equipped
 #define OBJ_BIND_ON_PICKUP  BIT(15)	// p. binds when acquired
-#define OBJ_STAFF  BIT(16)	// q. counts as a staff
+//	#define OBJ_UNUSED1  BIT(16)	// q. formerly STAFF
 #define OBJ_UNCOLLECTED_LOOT  BIT(17)	// r. will junk instead of autostore
 #define OBJ_KEEP  BIT(18)	// s. obj will not be part of any "all" commands like "drop all"
-#define OBJ_TOOL_PAN  BIT(19)	// t. counts as pan
-#define OBJ_TOOL_SHOVEL  BIT(20)	// u. counts as shovel
+//	#define OBJ_UNUSED2  BIT(19)	// t. formerly TOOL-PAN
+//	#define OBJ_UNUSED3  BIT(20)	// u. formerly TOOL-SHOVEL
 #define OBJ_NO_AUTOSTORE  BIT(21)	// v. keeps the game from cleaning it up
 #define OBJ_HARD_DROP  BIT(22)	// w. dropped by a 'hard' mob
 #define OBJ_GROUP_DROP  BIT(23)	// x. dropped by a 'group' mob
@@ -1726,6 +1735,8 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_LONGDESC  12
 #define OBJ_CUSTOM_LONGDESC_FEMALE  13
 #define OBJ_CUSTOM_LONGDESC_MALE  14
+#define OBJ_CUSTOM_FISH_TO_CHAR  15
+#define OBJ_CUSTOM_FISH_TO_ROOM  16
 
 
 // RES_x: resource requirement types
@@ -1736,10 +1747,30 @@ typedef struct vehicle_data vehicle_data;
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
 #define RES_ACTION  5	// flavorful action strings (take time but not resources)
 #define RES_CURRENCY  6	// adventure currencies (generics)
+#define RES_TOOL  7	// must have a tool of the given type (will be used up)
 
 
 // storage flags (for obj storage locations)
 #define STORAGE_WITHDRAW  BIT(0)	// requires withdraw privilege
+
+
+// TOOL_x: tool flags for objects
+#define TOOL_AXE  BIT(0)	// a. required to 'chop' trees
+#define TOOL_FISHING  BIT(1)	// b. required for 'fish' command
+#define TOOL_HAMMER  BIT(2)	// c. required for 'forge' command
+#define TOOL_HARVESTING  BIT(3)	// d. required for 'harvest'
+#define TOOL_KNAPPER  BIT(4)	// e. required to 'chip'
+#define TOOL_KNIFE  BIT(5)	// f. required for the skin/butcher commands
+#define TOOL_LOOM  BIT(6)	// g. allows the 'weave' command anywhere
+#define TOOL_MINING  BIT(7)	// h. required for the 'mine' command
+#define TOOL_PAN  BIT(8)	// i. required for 'pan' command
+#define TOOL_GRINDING_STONE  BIT(9)	// j. mill without a mill building
+#define TOOL_QUARRYING  BIT(10)	// k. required for the 'quarry' command
+#define TOOL_SAW  BIT(11)	// l. used to 'saw' lumber
+#define TOOL_SEWING_KIT  BIT(12)	// m. required for 'sew' command unless at a tailor
+#define TOOL_SHEARS  BIT(13)	// n. required for shearing
+#define TOOL_SHOVEL  BIT(14)	// o. speeds digging and is required to 'excavate'
+#define TOOL_STAFF  BIT(15)	// p. counts as a staff (usually for magic)
 
 
 // WEAR_x: Character equipment positions
@@ -1767,8 +1798,9 @@ typedef struct vehicle_data vehicle_data;
 #define WEAR_WIELD  19
 #define WEAR_RANGED  20
 #define WEAR_HOLD  21
-#define WEAR_SHARE  22
-#define NUM_WEARS  23	/* This must be the # of eq positions!! */
+#define WEAR_TOOL  22
+#define WEAR_SHARE  23
+#define NUM_WEARS  24	/* This must be the # of eq positions!! */
 
 
 // for item scaling based on wear flags
@@ -1835,6 +1867,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_SWAP_SKILL_SETS	38
 #define ACT_MAINTENANCE		39
 #define ACT_BURN_AREA		40
+#define ACT_HUNTING			41
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -2178,6 +2211,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_BITE_TANK_UPGRADE  60	// tank features of 'bite'
 #define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
 #define PTECH_SEE_IN_DARK_OUTDOORS  62  // can see in dark only if outside
+#define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2451,7 +2485,8 @@ typedef struct vehicle_data vehicle_data;
 #define DPLTN_PAN  6
 #define DPLTN_TRAPPING  7
 #define DPLTN_CHOP  8
-#define NUM_DEPLETION_TYPES  9	// total
+#define DPLTN_HUNT  9
+#define NUM_DEPLETION_TYPES  10	// total
 
 
 // EVO_x: world evolutions
@@ -3243,7 +3278,7 @@ struct archetype_skill {
 
 
 struct archetype_gear {
-	int wear;	// WEAR_x, -1 == inventory
+	int wear;	// WEAR_, -1 == inventory
 	obj_vnum vnum;
 	struct archetype_gear *next;
 };
@@ -3265,7 +3300,7 @@ struct augment_data {
 	char *name;	// descriptive text
 	int type;	// AUGMENT_x
 	bitvector_t flags;	// AUG_x flags
-	bitvector_t wear_flags;	// ITEM_WEAR_x where this augment applies
+	bitvector_t wear_flags;	// ITEM_WEAR_ where this augment applies
 	
 	any_vnum ability;	// required ability or NO_ABIL
 	obj_vnum requires_obj;	// required item or NOTHING
@@ -4166,6 +4201,7 @@ struct craft_data {
 	bitvector_t build_on;	// BLD_ON_ flags for the tile it's built upon
 	bitvector_t build_facing;	// BLD_ON_ flags for the tile it's facing
 	
+	bitvector_t requires_tool;	// any TOOL_ flags required to make this
 	obj_vnum requires_obj;	// only shows up if you have the item
 	struct resource_data *resources;	// linked list
 	
@@ -4179,7 +4215,7 @@ struct gen_craft_data_t {
 	char *command;	// "forge"
 	char *verb;	// "forging"
 	bitvector_t actf_flags;	// additional ACTF_ flags
-	char *strings[2];	// periodic message { to char, to room }
+	char *strings[3];	// periodic message { to char, to room }
 };
 
 
@@ -4275,11 +4311,11 @@ struct toggle_data_type {
 };
 
 
-// WEAR_x data for each equipment slot
+// WEAR_ data for each equipment slot
 struct wear_data_type {
 	char *eq_prompt;	// shown on 'eq' list
 	char *name;	// display name
-	bitvector_t item_wear;	// matching ITEM_WEAR_x
+	bitvector_t item_wear;	// matching ITEM_WEAR_
 	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
 	double gear_level_mod;	// modifier (slot significance) when counting gear level
 	int cascade_pos;	// for ring 1 -> ring 2; use NO_WEAR if it doesn't cascade
@@ -4864,6 +4900,7 @@ struct obj_flag_data {
 	byte type_flag;	// Type of item
 	bitvector_t wear_flags;	// Where you can wear it
 	bitvector_t extra_flags;	// If it hums, glows, etc.
+	bitvector_t tool_flags;	// any TOOL_ uses it provides when equipped
 	int carrying_n;	// number of items inside
 	int cost;	// Value when sold (gp.)
 	int timer;	// Timer for object

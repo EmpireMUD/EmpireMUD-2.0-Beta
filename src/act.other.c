@@ -2923,8 +2923,6 @@ ACMD(do_shear) {
 
 
 ACMD(do_skin) {
-	extern obj_data *has_sharp_tool(char_data *ch);
-
 	obj_data *obj;
 	char_data *proto;
 
@@ -2949,8 +2947,8 @@ ACMD(do_skin) {
 		msg_to_char(ch, "It's too badly mangled to get any amount of usable skin.\r\n");
 	else if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_SKINNED))
 		msg_to_char(ch, "It's already been skinned.\r\n");
-	else if (!has_sharp_tool(ch))
-		msg_to_char(ch, "You need to be wielding a sharp tool to skin a corpse.\r\n");
+	else if (!has_tool(ch, TOOL_KNIFE))
+		msg_to_char(ch, "You need to be using a good knife to skin a corpse.\r\n");
 	else {
 		// run it
 		if (!run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, skin_interact)) {
@@ -3351,7 +3349,7 @@ ACMD(do_toggle) {
 	else {
 		// check for optional on/off arg
 		if (!str_cmp(argument, "on")) {
-			if (IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) {
+			if ((toggle_data[type].type == TOG_ONOFF && IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) || (toggle_data[type].type == TOG_OFFON && !IS_SET(PRF_FLAGS(ch), toggle_data[type].bit))) {
 				msg_to_char(ch, "That toggle is already on.\r\n");
 				return;
 			}
@@ -3364,7 +3362,7 @@ ACMD(do_toggle) {
 			}
 		}
 		else if (!str_cmp(argument, "off")) {
-			if (!IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) {
+			if ((toggle_data[type].type == TOG_ONOFF && !IS_SET(PRF_FLAGS(ch), toggle_data[type].bit)) || (toggle_data[type].type == TOG_OFFON && IS_SET(PRF_FLAGS(ch), toggle_data[type].bit))) {
 				msg_to_char(ch, "That toggle is already off.\r\n");
 				return;
 			}

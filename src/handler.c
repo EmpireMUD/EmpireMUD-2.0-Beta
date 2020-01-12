@@ -5425,7 +5425,7 @@ void check_obj_in_void(obj_data *obj) {
 *
 * @param char_data *ch The person to equip
 * @param obj_data *obj The item to equip
-* @param int pos the WEAR_x spot to it
+* @param int pos the WEAR_ spot to it
 */
 void equip_char(char_data *ch, obj_data *obj, int pos) {
 	struct obj_apply *apply;
@@ -5875,7 +5875,7 @@ void swap_obj_for_obj(obj_data *old, obj_data *new) {
 * Remove whatever ch has equipped in pos, and return the item.
 *
 * @param char_data *ch The person to unequip.
-* @param int pos The WEAR_x slot to remove.
+* @param int pos The WEAR_ slot to remove.
 * @return obj_data *The removed item, or NULL if there was none.
 */
 obj_data *unequip_char(char_data *ch, int pos) {	
@@ -5922,7 +5922,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 * This also handles single-use items by extracting them.
 *
 * @param char_data *ch The person to unequip
-* @param int pos The WEAR_x slot to remove
+* @param int pos The WEAR_ slot to remove
 * @return obj_data* A pointer to the object removed IF it wasn't extracted.
 */
 obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
@@ -5945,7 +5945,7 @@ obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 * Extracts it if it IS single-use.
 *
 * @param char_data *ch The person to unequip
-* @param int pos The WEAR_x position to remove
+* @param int pos The WEAR_ position to remove
 * @return obj_data* A pointer to the obj IF it wasn't extracted.
 */
 obj_data *unequip_char_to_room(char_data *ch, int pos) {
@@ -6210,7 +6210,7 @@ obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list) {
 * @param char_data *ch The person who's looking.
 * @param char *arg The typed argument (item name).
 * @param obj_data *equipment[] The character's gear array.
-* @return int The WEAR_x position, or NO_WEAR if no match was found.
+* @return int The WEAR_ position, or NO_WEAR if no match was found.
 */
 int get_obj_pos_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]) {
 	int j, num;
@@ -6300,7 +6300,7 @@ obj_data *get_obj_vis(char_data *ch, char *name) {
 * @param char_data *ch The person who's looking for an item.
 * @param char *arg The target argument.
 * @param obj_data *equipment[] A pointer to an equipment array.
-* @param int *pos A variable to store the WEAR_x const if an item is found.
+* @param int *pos A variable to store the WEAR_ const if an item is found.
 * @return obj_data *The found object, or NULL.
 */
 obj_data *get_object_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[], int *pos) {
@@ -7037,6 +7037,18 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_LEVEL_UNDER: {
+				if (get_approximate_level(ch) > req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_LEVEL_OVER: {
+				if (get_approximate_level(ch) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -7271,6 +7283,14 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_EVENT_NOT_RUNNING: {
 			snprintf(output, sizeof(output), "Event is not running: %s%s", vnum, get_event_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_LEVEL_UNDER: {
+			snprintf(output, sizeof(output), "Level under %d", req->needed);
+			break;
+		}
+		case REQ_LEVEL_OVER: {
+			snprintf(output, sizeof(output), "Level over %d", req->needed);
 			break;
 		}
 		default: {

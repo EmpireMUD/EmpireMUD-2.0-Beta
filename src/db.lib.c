@@ -1037,10 +1037,17 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 	GET_CRAFT_OBJECT(craft) = int_in[0];
 	GET_CRAFT_QUANTITY(craft) = int_in[1];
 	
-	// line 3: type ability flags time
-	if (!get_line(fl, line) || sscanf(line, "%d %d %s %d %d", int_in, int_in + 1, str_in, int_in + 2, int_in + 3) != 5) {
-		log("SYSERR: Format error in line 3 of craft recipe #%d", vnum);
+	// line 3: type ability flags time requires-obj requires-tool
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 3 of craft recipe #%d", vnum);
 		exit(1);
+	}
+	if (sscanf(line, "%d %d %s %d %d %s", int_in, int_in + 1, str_in, int_in + 2, int_in + 3, str_in2) != 6) {
+		strcpy(str_in2, "0");	// backwards-compatible with missing requires-tool
+		if (sscanf(line, "%d %d %s %d %d", int_in, int_in + 1, str_in, int_in + 2, int_in + 3) != 5) {
+			log("SYSERR: Format error in line 3 of craft recipe #%d", vnum);
+			exit(1);
+		}
 	}
 	
 	GET_CRAFT_TYPE(craft) = int_in[0];
@@ -1048,6 +1055,7 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 	GET_CRAFT_FLAGS(craft) = asciiflag_conv(str_in);
 	GET_CRAFT_TIME(craft) = int_in[2];
 	GET_CRAFT_REQUIRES_OBJ(craft) = int_in[3];
+	GET_CRAFT_REQUIRES_TOOL(craft) = asciiflag_conv(str_in2);
 	
 	// optionals
 
@@ -1122,7 +1130,10 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	fprintf(fl, "%s~\n", NULLSAFE(GET_CRAFT_NAME(craft)));
 	
 	fprintf(fl, "%d %d\n", GET_CRAFT_OBJECT(craft), GET_CRAFT_QUANTITY(craft));
-	fprintf(fl, "%d %d %s %d %d\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), bitv_to_alpha(GET_CRAFT_FLAGS(craft)), GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft));
+	
+	strcpy(temp1, bitv_to_alpha(GET_CRAFT_FLAGS(craft)));
+	strcpy(temp2, bitv_to_alpha(GET_CRAFT_REQUIRES_TOOL(craft)));
+	fprintf(fl, "%d %d %s %d %d %s\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), temp1, GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft), temp2);
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 		strcpy(temp1, bitv_to_alpha(GET_CRAFT_BUILD_ON(craft)));
@@ -5075,7 +5086,7 @@ void parse_object(FILE *obj_f, int nr) {
 	static char line[256];
 	int t[10], retval;
 	char *tmpptr;
-	char f1[256], f2[256];
+	char f1[256], f2[256], f3[256];
 	struct obj_storage_type *store, *last_store = NULL;
 	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *find;
@@ -5114,17 +5125,22 @@ void parse_object(FILE *obj_f, int nr) {
 		log("SYSERR: Expecting first numeric line of %s, but file ended!", buf2);
 		exit(1);
 	}
-	if ((retval = sscanf(line, " %d %s %s %d", &t[0], f1, f2, &t[1])) != 4) {
-		// older version of the file: missing version into
-		t[1] = 1;
-		if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
-			log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
-			exit(1);
+	// type extra-flags wear-flags tool-flags version
+	if ((retval = sscanf(line, " %d %s %s %s %d", &t[0], f1, f2, f3, &t[1])) != 5) {
+		strcpy(f3, "0");	// backwards-compatible version has no tool flags
+		if ((retval = sscanf(line, " %d %s %s %d", &t[0], f1, f2, &t[1])) != 4) {
+			// older version of the file: missing version into
+			t[1] = 1;
+			if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
+				log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
+				exit(1);
+			}
 		}
 	}
 	obj->obj_flags.type_flag = t[0];
 	obj->obj_flags.extra_flags = asciiflag_conv(f1);
 	obj->obj_flags.wear_flags = asciiflag_conv(f2);
+	obj->obj_flags.tool_flags = asciiflag_conv(f3);
 	OBJ_VERSION(obj) = t[1];
 
 	if (!get_line(obj_f, line)) {
@@ -5294,7 +5310,7 @@ void parse_object(FILE *obj_f, int nr) {
 * @param obj_data *obj The object to save.
 */
 void write_obj_to_file(FILE *fl, obj_data *obj) {
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	struct obj_apply *apply;
 	
@@ -5312,10 +5328,11 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
 	
-	// I imagine calling this function twice in one fprintf would not have the desired effect.
+	// I imagine calling this function thrice in one fprintf would not have the desired effect.
 	strcpy(temp, bitv_to_alpha(GET_OBJ_EXTRA(obj)));
 	strcpy(temp2, bitv_to_alpha(GET_OBJ_WEAR(obj)));
-	fprintf(fl, "%d %s %s %d\n", GET_OBJ_TYPE(obj), temp, temp2, OBJ_VERSION(obj));
+	strcpy(temp3, bitv_to_alpha(GET_OBJ_TOOL_FLAGS(obj)));
+	fprintf(fl, "%d %s %s %s %d\n", GET_OBJ_TYPE(obj), temp, temp2, temp3, OBJ_VERSION(obj));
 
 	fprintf(fl, "%d %d %d\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2));
 	

@@ -235,10 +235,10 @@ D
    This is a small, steamy hut. In the center is a large oven used for firing
 clay. There are also other resources here which are used by potters to create
 better pots and sculptures from their clay. The clay used here is dug from
-riversides and then sculpted and heated in the furnace.
+riversides and then sculpted and heated in the kiln.
 ~
 F
-rG
+rGL
 M
 241 15.00 ce
 R
@@ -653,7 +653,7 @@ meats that have been cooked in these ovens since their construction, and it
 makes your mouth water with envy of the person who ate them.
 ~
 F
-G
+GL
 M
 241 15.00 ce
 R
@@ -1361,9 +1361,9 @@ The Great Hall~
 30 0 0 -1
 D
    This is the Great Hall, a room lined with magnificent suits of armor and
-decorated with the best gold available. The Great Hall is often one of the
-most important parts of the castle as it shows the wealth of the king. It
-also leads to the throne room.
+decorated with the best gold available. The Great Hall is often one of the most
+important parts of the castle as it shows the wealth of the monarch. It also
+leads to the throne room.
 ~
 R
 16 2 1 1048576
@@ -1630,7 +1630,7 @@ exchange, mint~
 D
    The mint's tall granite walls dwarf its machinery, which stamps out coin
 after coin and provides the empire with currency. The mint is always as well-
-guarded as it is well-staffed, to ensure none of the king's treasure goes
+guarded as it is well-staffed, to ensure none of the monarch's treasure goes
 missing. The mills are quite worn, but they still churn out coins by the pound.
 ~
 F

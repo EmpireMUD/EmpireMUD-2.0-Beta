@@ -344,7 +344,7 @@ S
 #18219
 superintendant #n~
 Superintendant #n~
-The superintendant is sitting at his desk.
+The superintendant is sitting at the desk.
 ~
 100 150 bdqv e 3
 1 0 0 1
@@ -458,7 +458,7 @@ monstrosity sanguine~
 a sanguine monstrosity~
 A sanguine monstrosity is dripping along the ground.
 ~
-100 125 de 0 4
+100 125 dej 0 4
 0 0 10 27
 T 18240
 S
@@ -467,7 +467,7 @@ warg umbral~
 an umbral warg~
 An umbral warg stalks from shadow to shadow.
 ~
-100 125 de 0 4
+100 125 dej 0 4
 0 0 9 9
 T 18240
 S
@@ -485,7 +485,7 @@ bear imperium-clad clad~
 an imperium-clad bear~
 An imperium-clad bear rears up on its hind legs!
 ~
-100 125 de 0 4
+100 125 dej 0 4
 0 0 26 10
 T 18240
 S
@@ -632,7 +632,7 @@ dragon imaginary~
 an imaginary dragon~
 An imaginary dragon is (or isn't) flitting about.
 ~
-100 125 de m 5
+100 125 dej m 5
 0 0 2 10
 S
 #18285

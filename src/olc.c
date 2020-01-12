@@ -172,6 +172,7 @@ OLC_MODULE(cedit_quantity);
 OLC_MODULE(cedit_requiresobject);
 OLC_MODULE(cedit_resource);
 OLC_MODULE(cedit_time);
+OLC_MODULE(cedit_tools);
 OLC_MODULE(cedit_type);
 OLC_MODULE(cedit_volume);
 
@@ -355,6 +356,7 @@ OLC_MODULE(oedit_size);
 OLC_MODULE(oedit_storage);
 OLC_MODULE(oedit_text);
 OLC_MODULE(oedit_timer);
+OLC_MODULE(oedit_tools);
 OLC_MODULE(oedit_type);
 OLC_MODULE(oedit_uses);
 OLC_MODULE(oedit_value0);
@@ -508,6 +510,7 @@ extern const bool requirement_amt_type[];
 extern const char *requirement_types[];
 extern const char *resource_types[];
 extern const char *techs[];
+extern const char *tool_flags[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -755,6 +758,7 @@ const struct olc_command_data olc_data[] = {
 	{ "requiresobject", cedit_requiresobject, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "resource", cedit_resource, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "time", cedit_time, OLC_CRAFT, OLC_CF_EDITOR },
+	{ "tools", cedit_tools, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "type", cedit_type, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "volume", cedit_volume, OLC_CRAFT, OLC_CF_EDITOR },
 	
@@ -944,6 +948,7 @@ const struct olc_command_data olc_data[] = {
 	{ "store", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "text", oedit_text, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "tools", oedit_tools, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "type", oedit_type, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "uses", oedit_uses, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value0", oedit_value0, OLC_OBJECT, OLC_CF_EDITOR },
@@ -1086,7 +1091,7 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CROP | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_ROOM_TEMPLATE | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -2643,6 +2648,11 @@ OLC_MODULE(olc_fullsearch) {
 			olc_fullsearch_building(ch, argument);
 			break;
 		}
+		case OLC_CRAFT: {
+			void olc_fullsearch_craft(char_data *ch, char *argument);
+			olc_fullsearch_craft(ch, argument);
+			break;
+		}
 		case OLC_CROP: {
 			void olc_fullsearch_crop(char_data *ch, char *argument);
 			olc_fullsearch_crop(ch, argument);
@@ -2661,6 +2671,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_PROGRESS: {
 			void olc_fullsearch_progress(char_data *ch, char *argument);
 			olc_fullsearch_progress(ch, argument);
+			break;
+		}
+		case OLC_ROOM_TEMPLATE: {
+			void olc_fullsearch_room_template(char_data *ch, char *argument);
+			olc_fullsearch_room_template(ch, argument);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -4184,7 +4199,7 @@ void get_requirement_display(struct req_data *list, char *save_buffer) {
 * @param char *save_buffer A string to write the output to.
 */
 void get_resource_display(struct resource_data *list, char *save_buffer) {
-	char line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
 	int num;
@@ -4226,6 +4241,12 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 			case RES_CURRENCY: {
 				sprintf(line, "%dx %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				break;
+			}
+			case RES_TOOL: {
+				prettier_sprintbit(res->vnum, tool_flags, buf);
+				sprintf(line, "%dx %s (tool%s)", res->amount, buf, PLURAL(res->amount));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-26.26s", num, line);
 				break;
 			}
 			default: {
@@ -4322,7 +4343,7 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch) {
 	struct interaction_item *iter;
 	bool problem = FALSE;
-	int code, type;
+	int code, type, max_quantity = 0;
 	
 	struct audint_t {
 		int code;
@@ -4342,6 +4363,9 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 			olc_audit_msg(ch, vnum, "Bad interaction: %s", interact_types[iter->type]);
 			problem = TRUE;
 		}
+		
+		// store for later
+		max_quantity = MAX(max_quantity, iter->quantity);
 		
 		// track cumulative percent
 		if (iter->exclusion_code) {
@@ -4375,6 +4399,11 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 		}
 		HASH_DEL(set, as);
 		free(as);
+	}
+	
+	if (max_quantity > 10) {
+		olc_audit_msg(ch, vnum, "Interaction has unusually high quantity %d", max_quantity);
+		problem = TRUE;
 	}
 	
 	return problem;
@@ -6878,7 +6907,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 */
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
+	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
 	any_vnum vnum;
@@ -7014,6 +7043,19 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "There is no such generic currency vnum %d.\r\n", vnum);
 						return;
 					}
+					break;
+				}
+				case RES_TOOL: {
+					if (!*arg4) {
+						msg_to_char(ch, "Usage: resource add tool <amount> <type>\r\n");
+						return;
+					}
+					if ((vnum = search_block(arg4, tool_flags, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown tool type '%s'.\r\n", arg4);
+						return;
+					}
+					// tool type is a flag
+					vnum = BIT(vnum);
 					break;
 				}
 			}
@@ -7170,7 +7212,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			change->vnum = vnum;
 			msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_resource_name(change));
 		}
-		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool")) {
+		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool") || is_abbrev(arg3, "tool")) {
 			// RES_x: some resource types support "change name"
 			switch (change->type) {
 				case RES_COMPONENT: {
@@ -7192,6 +7234,18 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					
 					change->vnum = vnum;
 					msg_to_char(ch, "You change resource %d's pool to %s.\r\n", atoi(arg2), pool_types[vnum]);
+					break;
+				}
+				case RES_TOOL: {
+					if ((vnum = search_block(arg4, tool_flags, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown tool type '%s'.\r\n", arg4);
+						return;
+					}
+					
+					vnum = BIT(vnum);	// is a flag
+					change->vnum = vnum;
+					prettier_sprintbit(vnum, tool_flags, buf);
+					msg_to_char(ch, "You change resource %d's tool type to %s.\r\n", atoi(arg2), buf);
 					break;
 				}
 				default: {

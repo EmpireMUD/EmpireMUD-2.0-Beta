@@ -1114,6 +1114,14 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
 				break;
 			}
+			case REQ_LEVEL_UNDER: {
+				task->current = (get_approximate_level(ch) <= task->needed) ? task->needed : -1; // -1 because 0 is a valid 'needed'
+				break;
+			}
+			case REQ_LEVEL_OVER: {
+				task->current = (get_approximate_level(ch) >= task->needed) ? task->needed : 0;
+				break;
+			}
 		}
 	}
 }
@@ -2267,6 +2275,33 @@ void qt_change_ability(char_data *ch, any_vnum abil) {
 
 
 /**
+* Quest Tracker: ch gains or loses levels (total levels)
+*
+* @param char_data *ch The player.
+* @param int level The new level.
+*/
+void qt_change_level(char_data *ch, int level) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_LEVEL_OVER) {
+				task->current = (level >= task->needed ? task->needed : 0);
+			}
+			else if (task->type == REQ_LEVEL_UNDER) {
+				task->current = (level <= task->needed ? task->needed : -1);	// must set below 0 because 0 is a valid needed
+			}
+		}
+	}
+}
+
+
+/**
 * Quest Tracker: ch gains or loses faction reputation
 *
 * @param char_data *ch The player.
@@ -3203,9 +3238,11 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 	extern const bool requirement_needs_tracker[];
 	
 	struct trig_proto_list *tpl;
+	struct quest_reward *rew;
 	struct req_data *task;
 	trig_data *trig;
 	bool problem = FALSE;
+	int max_q = 0;
 	
 	if (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, QUEST_VNUM(quest), "IN-DEVELOPMENT");
@@ -3261,6 +3298,21 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 			problem = TRUE;
 			break;
 		}
+	}
+	
+	// QR_x: audit rewards
+	LL_FOREACH(QUEST_REWARDS(quest), rew) {
+		switch (rew->type) {
+			case QR_BONUS_EXP:
+			case QR_OBJECT: {
+				max_q = MAX(max_q, rew->amount);
+				break;
+			}
+		}
+	}
+	if (max_q > 10) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "Unusual reward quantity: %d", max_q);
+		problem = TRUE;
 	}
 	
 	return problem;

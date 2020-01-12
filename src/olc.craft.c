@@ -34,6 +34,7 @@ extern const char *bld_on_flags[];
 extern const char *craft_flags[];
 extern const char *craft_types[];
 extern const char *road_types[];
+extern const char *tool_flags[];
 
 // external funcs
 void init_craft(craft_data *craft);
@@ -316,6 +317,136 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 
 
 /**
+* Searches properties of craft.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_craft(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count;
+	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_tools = NOBITS;
+	int only_type = NOTHING, only_level = NOTHING, only_quantity = NOTHING, only_time = NOTHING;
+	int quantity_over = NOTHING, level_over = NOTHING, time_over = NOTHING;
+	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING;
+	
+	craft_data *craft, *next_craft;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP CEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_LIST("type", only_type, craft_types)
+		FULLSEARCH_FLAGS("flags", only_flags, craft_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, craft_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, craft_flags)
+		FULLSEARCH_INT("quantity", only_quantity, 0, INT_MAX)
+		FULLSEARCH_INT("quantitysover", quantity_over, 0, INT_MAX)
+		FULLSEARCH_INT("quantityunder", quantity_under, 0, INT_MAX)
+		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_INT("levelsover", level_over, 0, INT_MAX)
+		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
+		FULLSEARCH_INT("time", only_time, 0, INT_MAX)
+		FULLSEARCH_INT("timesover", time_over, 0, INT_MAX)
+		FULLSEARCH_INT("timeunder", time_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Craft fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (only_type != NOTHING && GET_CRAFT_TYPE(craft) != only_type) {
+			continue;
+		}
+		if (not_flagged != NOBITS && IS_SET(GET_CRAFT_FLAGS(craft), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GET_CRAFT_FLAGS(craft) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_quantity != NOTHING && GET_CRAFT_QUANTITY(craft) != only_quantity) {
+			continue;
+		}
+		if (quantity_over != NOTHING && GET_CRAFT_QUANTITY(craft) < quantity_over) {
+			continue;
+		}
+		if (quantity_under != NOTHING && (GET_CRAFT_QUANTITY(craft) > quantity_under || GET_CRAFT_QUANTITY(craft) == 0)) {
+			continue;
+		}
+		if (only_level != NOTHING && GET_CRAFT_MIN_LEVEL(craft) != only_level) {
+			continue;
+		}
+		if (level_over != NOTHING && GET_CRAFT_MIN_LEVEL(craft) < level_over) {
+			continue;
+		}
+		if (level_under != NOTHING && (GET_CRAFT_MIN_LEVEL(craft) > level_under || GET_CRAFT_MIN_LEVEL(craft) == 0)) {
+			continue;
+		}
+		if (only_time != NOTHING && GET_CRAFT_TIME(craft) != only_time) {
+			continue;
+		}
+		if (time_over != NOTHING && GET_CRAFT_TIME(craft) < time_over) {
+			continue;
+		}
+		if (time_under != NOTHING && (GET_CRAFT_TIME(craft) > time_under || GET_CRAFT_TIME(craft) == 0)) {
+			continue;
+		}
+		if (only_tools != NOBITS && (GET_CRAFT_REQUIRES_TOOL(craft) & only_tools) != only_tools) {
+			continue;
+		}
+		
+		if (*find_keywords && !multi_isname(find_keywords, GET_CRAFT_NAME(craft))) {
+			continue;
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d crafts)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a craft and displays them.
 *
 * @param char_data *ch The player.
@@ -556,6 +687,9 @@ void olc_show_craft(char_data *ch) {
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT), buf1);
+	
+	sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf1, TRUE);
+	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_TOOL(craft), NOBITS), buf1);
 	
 	sprintf(buf + strlen(buf), "<%srequiresobject\t0> %d - %s\r\n", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_OBJ(craft), NOTHING), GET_CRAFT_REQUIRES_OBJ(craft), GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING ? "none" : get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 
@@ -805,6 +939,12 @@ OLC_MODULE(cedit_time) {
 	else {
 		GET_CRAFT_TIME(craft) = olc_process_number(ch, argument, "time", "time", 1, MAX_INT, GET_CRAFT_TIME(craft));
 	}
+}
+
+
+OLC_MODULE(cedit_tools) {
+	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+	GET_CRAFT_REQUIRES_TOOL(craft) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, GET_CRAFT_REQUIRES_TOOL(craft));
 }
 
 
