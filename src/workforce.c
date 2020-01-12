@@ -1395,7 +1395,9 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
 			can_do = TRUE;
 		}
-		else if (res->type == RES_ACTION) {
+		else if (res->type == RES_ACTION || res->type == RES_TOOL) {
+			// workforce can always do actions/tools
+			// TODO: some day, empires could have a list of tools available and this could require them
 			can_do = TRUE;
 		}
 	}
@@ -2491,7 +2493,9 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
 			can_do = TRUE;
 		}
-		else if (res->type == RES_ACTION) {
+		else if (res->type == RES_ACTION || res->type == RES_TOOL) {
+			// workforce can always do actions/tools
+			// TODO: some day, empires could have a list of tools available and this could require them
 			can_do = TRUE;
 		}
 	}

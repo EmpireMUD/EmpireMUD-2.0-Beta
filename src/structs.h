@@ -1747,6 +1747,7 @@ typedef struct vehicle_data vehicle_data;
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
 #define RES_ACTION  5	// flavorful action strings (take time but not resources)
 #define RES_CURRENCY  6	// adventure currencies (generics)
+#define RES_TOOL  7	// must have a tool of the given type (will be used up)
 
 
 // storage flags (for obj storage locations)

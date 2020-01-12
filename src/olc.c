@@ -510,6 +510,7 @@ extern const bool requirement_amt_type[];
 extern const char *requirement_types[];
 extern const char *resource_types[];
 extern const char *techs[];
+extern const char *tool_flags[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -4198,7 +4199,7 @@ void get_requirement_display(struct req_data *list, char *save_buffer) {
 * @param char *save_buffer A string to write the output to.
 */
 void get_resource_display(struct resource_data *list, char *save_buffer) {
-	char line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
 	int num;
@@ -4240,6 +4241,12 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 			case RES_CURRENCY: {
 				sprintf(line, "%dx %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				break;
+			}
+			case RES_TOOL: {
+				prettier_sprintbit(res->vnum, tool_flags, buf);
+				sprintf(line, "%dx %s (tool%s)", res->amount, buf, PLURAL(res->amount));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-26.26s", num, line);
 				break;
 			}
 			default: {
@@ -6900,7 +6907,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 */
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
+	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
 	any_vnum vnum;
@@ -7036,6 +7043,19 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "There is no such generic currency vnum %d.\r\n", vnum);
 						return;
 					}
+					break;
+				}
+				case RES_TOOL: {
+					if (!*arg4) {
+						msg_to_char(ch, "Usage: resource add tool <amount> <type>\r\n");
+						return;
+					}
+					if ((vnum = search_block(arg4, tool_flags, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown tool type '%s'.\r\n", arg4);
+						return;
+					}
+					// tool type is a flag
+					vnum = BIT(vnum);
 					break;
 				}
 			}
@@ -7192,7 +7212,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			change->vnum = vnum;
 			msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_resource_name(change));
 		}
-		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool")) {
+		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool") || is_abbrev(arg3, "tool")) {
 			// RES_x: some resource types support "change name"
 			switch (change->type) {
 				case RES_COMPONENT: {
@@ -7214,6 +7234,18 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					
 					change->vnum = vnum;
 					msg_to_char(ch, "You change resource %d's pool to %s.\r\n", atoi(arg2), pool_types[vnum]);
+					break;
+				}
+				case RES_TOOL: {
+					if ((vnum = search_block(arg4, tool_flags, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown tool type '%s'.\r\n", arg4);
+						return;
+					}
+					
+					vnum = BIT(vnum);	// is a flag
+					change->vnum = vnum;
+					prettier_sprintbit(vnum, tool_flags, buf);
+					msg_to_char(ch, "You change resource %d's tool type to %s.\r\n", atoi(arg2), buf);
 					break;
 				}
 				default: {

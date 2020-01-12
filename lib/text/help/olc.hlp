@@ -5844,11 +5844,12 @@ Specific syntaxes for adding:
   .resource add pool <number of points> <pool type>
   .resource add action <amount> <type>
   .resource add currency <amount> <currency vnum>
+  .resource add tool <amount> <tool type>
 
 Valid pools are: health, mana, move, blood.
 
 See also: COMPONENTS, COMPONENT FLAGS, OEDIT LIQUID, RESOURCE ACTIONS
-See also: AUGEDIT RESOURCES, CEDIT RESOURCES, VEDIT RESOURCES
+See also: AUGEDIT RESOURCES, CEDIT RESOURCES, VEDIT RESOURCES, TOOL TYPES
 #d
 "OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
 

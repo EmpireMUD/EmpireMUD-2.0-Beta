@@ -50,6 +50,7 @@
 
 // external vars
 extern const char *pool_types[];
+extern const char *tool_flags[];
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
@@ -2563,8 +2564,9 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 	
 	// RES_x: Remove one resource based on type.
 	switch (res->type) {
-		case RES_OBJECT:	// obj/component are just simple objs
-		case RES_COMPONENT: {
+		case RES_OBJECT:	// obj/component are just simple objs, as are tools
+		case RES_COMPONENT:
+		case RES_TOOL: {
 			// APPLY_RES_x: generic messaging if not previously sent
 			switch (msg_type) {
 				case APPLY_RES_BUILD: {
@@ -2801,7 +2803,8 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 			switch (res->type) {
 				case RES_OBJECT:
 				case RES_COMPONENT:
-				case RES_LIQUID: {	// these 3 types check objects
+				case RES_LIQUID:
+				case RES_TOOL: {	// these 4 types check objects
 					obj_data *search_list[2];
 					search_list[0] = ch->carrying;
 					search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
@@ -2857,6 +2860,17 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 										if (build_used_list) {
 											add_to_resource_list(build_used_list, RES_LIQUID, res->vnum, diff, 0);
 										}
+									}
+									break;
+								}
+								case RES_TOOL: {
+									if (TOOL_FLAGGED(obj, res->vnum)) {
+										if (build_used_list) {
+											add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+										}
+									
+										--remaining;
+										extract_obj(obj);
 									}
 									break;
 								}
@@ -2929,7 +2943,8 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 		switch (res->type) {
 			case RES_OBJECT:
 			case RES_COMPONENT:
-			case RES_LIQUID: {	// these 3 types check objects
+			case RES_LIQUID:
+			case RES_TOOL: {	// these 4 types check objects
 				obj_data *search_list[2];
 				search_list[0] = ch->carrying;
 				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
@@ -2966,6 +2981,14 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 							}
 							case RES_LIQUID: {
 								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+									// got one!
+									*found_obj = obj;
+									return res;
+								}
+								break;
+							}
+							case RES_TOOL: {
+								if (TOOL_FLAGGED(obj, res->vnum)) {
 									// got one!
 									*found_obj = obj;
 									return res;
@@ -3024,8 +3047,9 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 * @param sturct resource_data *res The resource to display.
 * @return char* A short string including quantity and type.
 */
-char *get_resource_name(struct resource_data *res) {	
+char *get_resource_name(struct resource_data *res) {
 	static char output[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	
 	*output = '\0';
 	
@@ -3059,6 +3083,11 @@ char *get_resource_name(struct resource_data *res) {
 			snprintf(output, sizeof(output), "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
 			break;
 		}
+		case RES_TOOL: {
+			prettier_sprintbit(res->vnum, tool_flags, buf);
+			snprintf(output, sizeof(output), "%dx %s (tool%s)", res->amount, buf, PLURAL(res->amount));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "[unknown resource %d]", res->type);
 			break;
@@ -3086,7 +3115,8 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 		// RES_x: give resources by type
 		switch (res->type) {
 			case RES_COMPONENT:
-			case RES_ACTION: {
+			case RES_ACTION:
+			case RES_TOOL: {
 				// nothing to do -- we can't refund these
 				break;
 			}
@@ -3242,7 +3272,8 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 			switch (res->type) {
 				case RES_OBJECT:
 				case RES_COMPONENT:
-				case RES_LIQUID: {	// these 3 types check objects
+				case RES_LIQUID:
+				case RES_TOOL: {	// these 4 types check objects
 					obj_data *search_list[2];
 					search_list[0] = ch->carrying;
 					search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
@@ -3287,6 +3318,13 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									}
 									break;
 								}
+								case RES_TOOL: {
+									if (TOOL_FLAGGED(obj, res->vnum)) {
+										++total;
+										obj->search_mark = TRUE;
+									}
+									break;
+								}
 							}
 						
 							// ok to break out early if we found enough
@@ -3311,6 +3349,10 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 								case RES_LIQUID: {
 									msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 									break;
+								}
+								case RES_TOOL: {
+									prettier_sprintbit(res->vnum, tool_flags, buf);
+									msg_to_char(ch, "%s %d more %s (tool%s)", (ok ? "You need" : ","), res->amount - total, buf, PLURAL(res->amount - total));
 								}
 							}
 						}

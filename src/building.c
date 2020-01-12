@@ -874,7 +874,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 	if (res) {
 		// RES_x: messaging
 		switch (res->type) {
-			// RES_COMPONENT, RES_ACTION, and RES_CURRENCY aren't possible here
+			// RES_COMPONENT (stored as obj), RES_ACTION, RES_TOOL (stored as obj), and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
 				snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
