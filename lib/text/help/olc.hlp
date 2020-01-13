@@ -344,6 +344,7 @@ Objects (OEDIT):
 - Potions should have a locked level (min equal to max) to be storable.
 - Rope components can be used to tie up players and animals. They should always
   be locked to just 1 level, because they'll be downscaled when returned.
+- Basic resources should include a plural version of their main keyword, too.
 
 Empire Progress Goals (PROGEDIT):
 - Goals that are PURCHASABLE should not have cost or tasks.
