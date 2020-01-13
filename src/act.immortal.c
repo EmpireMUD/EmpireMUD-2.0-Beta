@@ -3607,12 +3607,12 @@ SHOW(show_tools) {
 	
 	skip_spaces(&argument);
 	
-	if (!*arg) {
+	if (!*argument) {
 		msg_to_char(ch, "Usage: show tools <type>\r\n");
 		msg_to_char(ch, "See: HELP TOOL FLAGS\r\n");
 	}
 	else if ((type = search_block(argument, tool_flags, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Unknown tool type '%s' (see HELP TOOL FLAGS).\r\n", arg);
+		msg_to_char(ch, "Unknown tool type '%s' (see HELP TOOL FLAGS).\r\n", argument);
 	}
 	else {
 		// preamble
