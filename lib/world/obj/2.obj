@@ -35,7 +35,7 @@ R
 5606 0
 S
 #256
-trinket hestian~
+trinket trinkets hestian~
 a hestian trinket~
 A hestian trinket is sitting on the ground.~
    You can use the trinket to teleport home. Use the home command to set your
@@ -133,7 +133,7 @@ A
 16 1 0
 S
 #262
-trinket conveyance~
+trinket trinkets conveyance~
 a trinket of conveyance~
 A trinket of conveyance seems to have been dropped here.~
 You can use this trinket to teleport to a random starting location.
@@ -148,7 +148,7 @@ R
 T 262
 S
 #263
-icon letheian~
+icon icons letheian~
 a letheian icon~
 A letheian icon is lying on the ground.~
    This icon grants a free skill reset. Once you use it, you can choose a

@@ -1,5 +1,5 @@
 #600
-seed crystal strange~
+seed seeds crystal strange~
 a strange crystal seed~
 A strange crystal seed is lying on the ground.~
    This unusual seed is encased in a shell of clear crystal, and it glimmers as
@@ -15,7 +15,7 @@ R
 T 600
 S
 #601
-seed prismatic~
+seed seeds prismatic~
 a prismatic seed~
 A prismatic seed is sparkling in the light.~
    This enchanted seed sparkles with every color of the rainbow. As you stare
@@ -30,7 +30,7 @@ powerful necrovandals seek out unclaimed enchanted forests.
 T 601
 S
 #602
-crystal prismatic~
+crystal prismatic gems~
 a prismatic crystal~
 A prismatic crystal sparkles on the ground.~
    This small gem shimmers with every color of the rainbow, casting fanciful
@@ -45,7 +45,7 @@ R
 5164 0
 S
 #603
-tree enchanted~
+tree trees enchanted~
 an enchanted tree~
 An enchanted tree is lying here, leaking mana from its stump.~
    This bright pink tree must have come from an enchanted forest. Lumber from
@@ -61,7 +61,7 @@ R
 5118 0
 S
 #604
-magewood wood stellar pile~
+magewood wood stellar pile lumber~
 some stellar magewood~
 A pile of magewood is lying here.~
    This bright pink lumber must have come from an enchanted forest. Mana seeps
@@ -119,7 +119,7 @@ O
 9 gn
 S
 #607
-hide shimmering~
+hide skins shimmering~
 a shimmering hide~
 The shimmering hide of a magical beast is lying here.~
    Light breaks apart into rainbows as it passes near this magical skin, making
@@ -135,7 +135,7 @@ R
 5120 0
 S
 #608
-leather shimmering piece~
+leather leathers shimmering piece~
 a piece of shimmering leather~
 A large piece of shimmering leather is lying here.~
    This large piece of leather tanned from the skin of a magical beast glows
@@ -165,7 +165,7 @@ R
 5115 0
 S
 #610
-argentineingot argentine ingot~
+argentineingot argentine ingots~
 an argentine ingot~
 An argentine ingot is stacked here.~
    The ingot is almost pure white, perhaps more silver than silver itself.
@@ -181,7 +181,7 @@ R
 5115 0
 S
 #611
-eventideingot ingot eventide~
+eventideingot ingots eventide~
 an eventide ingot~
 An eventide ingot is stacked here.~
    This ingot is blue-black like the sky at midnight, and what little light
@@ -232,7 +232,7 @@ R
 5137 0
 S
 #614
-briarhide hide briar pile~
+briarhide hide briar pile leathers~
 some briar hide~
 A pile of briar hide is precariously stacked here.~
    Briar hide is leather that has been magically treated with redthorn until
@@ -248,7 +248,7 @@ R
 5120 0
 S
 #615
-absinthianleather leather absinthian pile~
+absinthianleather leather absinthian pile leathers~
 absinthian leather~
 A pile of absinthian leather seethes on the ground.~
    Absinthian leather is an exotic hide, treated with bileberries until its
@@ -264,7 +264,7 @@ R
 5120 0
 S
 #616
-handle elegant~
+handle handles elegant~
 an elegant handle~
 An elegant handle is lying on the ground.~
    This wooden handle has taken on a deep magenta color, and there is a faint
