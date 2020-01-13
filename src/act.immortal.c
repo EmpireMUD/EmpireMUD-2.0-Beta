@@ -1875,9 +1875,13 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		new = GET_GRANT_FLAGS(vict) = olc_process_flag(ch, val_arg, "grants", NULL, grant_bits, GET_GRANT_FLAGS(vict));
 		
 		// this indicates a change
-		if (new != old) {
-			prettier_sprintbit(new, grant_bits, buf);
-			sprintf(output, "%s now has grants: %s", GET_NAME(vict), buf);
+		if (old & ~new) {	// removed
+			prettier_sprintbit(old & ~new, grant_bits, buf);
+			sprintf(output, "%s lost grants: %s", GET_NAME(vict), buf);
+		}
+		else if (new & ~old) {	// added
+			prettier_sprintbit(new & ~old, grant_bits, buf);
+			sprintf(output, "%s gained grants: %s", GET_NAME(vict), buf);
 		}
 		else {
 			// no change
