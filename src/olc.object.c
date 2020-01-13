@@ -93,7 +93,9 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		do {
 			ptr = any_one_arg(ptr, temp);
 			strcpy(unplural, temp);
-			unplural[strlen(unplural)-1] = '\0';	// trim last letter -- trying to see if this keyword is a plural form
+			if (unplural[strlen(unplural)-1] == 's') {
+				unplural[strlen(unplural)-1] = '\0';	// trim last letter -- trying to see if this keyword is a plural form
+			}
 			if (*temp && !str_str(GET_OBJ_SHORT_DESC(obj), temp) && !str_str(GET_OBJ_SHORT_DESC(obj), unplural) && !str_str(GET_OBJ_LONG_DESC(obj), temp) && !str_str(GET_OBJ_LONG_DESC(obj), unplural)) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keyword '%s' not found in strings", temp);
 				problem = TRUE;
