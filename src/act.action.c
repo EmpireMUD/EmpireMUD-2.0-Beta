@@ -1849,6 +1849,12 @@ void process_hunting(char_data *ch) {
 	any_vnum mob_vnum = GET_ACTION_VNUM(ch, 0);
 	int chance_times_100 = GET_ACTION_VNUM(ch, 1);
 	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to keep hunting now.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	
 	if (number(1, 10000) <= chance_times_100) {
 		// found it!
 		
