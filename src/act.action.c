@@ -2719,7 +2719,7 @@ ACMD(do_chip) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
 	else if (!has_tool(ch, TOOL_KNAPPER)) {
-		msg_to_char(ch, "You need to be wielding some kind of hammer or rock to chip it.\r\n");
+		msg_to_char(ch, "You need to be wielding some kind of knapper (or basic rock) to chip it.\r\n");
 	}
 	else {
 		start_action(ch, ACT_CHIPPING, chip_timer);
