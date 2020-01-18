@@ -1729,6 +1729,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "mud_name", CONFTYPE_SHORT_STRING, "name of your mud");
 	init_config(CONFIG_GAME, "mud_status", CONFTYPE_SHORT_STRING, "one of: Alpha, Closed Beta, Open Beta, Live");
 	init_config(CONFIG_GAME, "mud_website", CONFTYPE_SHORT_STRING, "your mud's website");
+	init_config(CONFIG_GAME, "name_rules", CONFTYPE_LONG_STRING, "shown during creation");
 	init_config(CONFIG_GAME, "newyear_message", CONFTYPE_SHORT_STRING, "text shown to players before the laggy 'new year' world update");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
@@ -2026,7 +2027,7 @@ ACMD(do_config) {
 					break;
 				}
 				case CONFTYPE_LONG_STRING: {
-					lsize = snprintf(line, sizeof(line), "<set>");
+					lsize = snprintf(line, sizeof(line), "<%s>", cnf->data.string_val ? "set" : "not set");
 				}
 				default: {
 					syslog(SYS_ERROR, GET_INVIS_LEV(ch), TRUE, "SYSERR: config: %s: unable to display unknown type %d", cnf->key, cnf->type);

@@ -1810,7 +1810,12 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_CLAST_NAME: {
-			msg_to_desc(d, "\r\nDid I get that right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_LASTNAME(d->character), (UPPER(*GET_LASTNAME(d->character)) != *GET_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
+			const char *rules = config_get_string("name_rules");
+			msg_to_desc(d, "\r\nNew character:\r\n");
+			if (rules && *rules) {
+				msg_to_desc(d, "%s\r\n", rules);
+			}
+			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_LASTNAME(d->character), (UPPER(*GET_LASTNAME(d->character)) != *GET_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
 			break;
 		}
 		case CON_QSEX: {
