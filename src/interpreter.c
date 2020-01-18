@@ -46,6 +46,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
 bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
+void next_creation_step(descriptor_data *d);
 void set_creation_state(descriptor_data *d, int state);
 void show_bonus_trait_menu(char_data *ch);
 
@@ -1744,7 +1745,7 @@ struct {
 	{ CON_PROMO_CODE },
 	{ CON_CONFIRM_PROMO_CODE },	// only if given invalid code
 	
-	{ CON_REFERRAL },
+	{ CON_REFERRAL },	// skipped if alt
 	{ CON_FINISH_CREATION },
 	
 	// put this last
@@ -1857,7 +1858,12 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_REFERRAL: {
-			SEND_TO_Q("\r\nWhere did you hear about us (optional, but please mention which website or friend): ", d);
+			if (!GET_REFERRED_BY(d->character)) {
+				SEND_TO_Q("\r\nWhere did you hear about us (optional, but please mention which website or friend): ", d);
+			}
+			else {
+				next_creation_step(d);
+			}
 			break;
 		}
 		case CON_FINISH_CREATION: {
@@ -1949,6 +1955,13 @@ void process_alt_password(descriptor_data *d, char *arg) {
 				save = TRUE;
 			}
 			GET_TEMPORARY_ACCOUNT_ID(d->character) = GET_ACCOUNT(alt)->id;
+			
+			if ((!GET_REFERRED_BY(d->character) || !*GET_REFERRED_BY(d->character)) && GET_REFERRED_BY(alt)) {
+				if (GET_REFERRED_BY(d->character)) {
+					free(GET_REFERRED_BY(d->character));
+				}
+				GET_REFERRED_BY(d->character) = str_dup(GET_REFERRED_BY(alt));
+			}
 			
 			next_creation_step(d);
 		}
