@@ -269,7 +269,8 @@ bool has_one_day_playtime(char_data *ch) {
 */
 int num_earned_bonus_traits(char_data *ch) {
 	struct time_info_data t;
-	int count = 1;	// all players deserve 1
+	int hours;
+	int count = 0;	// number of traits to give
 	
 	if (IS_NPC(ch)) {
 		return 0;
@@ -277,7 +278,11 @@ int num_earned_bonus_traits(char_data *ch) {
 	
 	// extra point at 2 days playtime
 	t = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
-	if (t.day >= 2) {
+	hours = t.day * 24 + t.hours;
+	if (hours >= config_get_int("hours_to_first_bonus_trait")) {
+		++count;
+	}
+	if (hours >= config_get_int("hours_to_second_bonus_trait")) {
 		++count;
 	}
 

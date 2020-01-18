@@ -1922,7 +1922,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLAYER_LOG_CHANNEL  "grats"
 
 
-// Modes of connectedness
+// CON_x: Modes of connectedness
 #define CON_PLAYING  0	// Playing - Nominal state
 #define CON_CLOSE  1	// Disconnecting
 #define CON_GET_NAME  2	// By what name ..?
@@ -1946,7 +1946,7 @@ typedef struct vehicle_data vehicle_data;
 #define CON_FINISH_CREATION  20	// Done!
 #define CON_Q_ARCHETYPE  21	// starting skills and spells
 #define CON_GOODBYE  22	// Close on <enter>
-#define CON_BONUS_CREATION  23	// choose bonus trait (new character)
+	#define CON_UNUSED2  23
 #define CON_BONUS_EXISTING  24	// choose bonus trait (existing char)
 #define CON_PROMO_CODE  25	// promo code?
 #define CON_CONFIRM_PROMO_CODE  26	// promo confirmation

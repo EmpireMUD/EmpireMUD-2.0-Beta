@@ -1738,9 +1738,8 @@ struct {
 	{ CON_Q_ALT_NAME },
 	{ CON_Q_ALT_PASSWORD },
 	
-	{ CON_Q_ARCHETYPE },	// skips to CON_BONUS_CREATION if no archetypes exist
+	{ CON_Q_ARCHETYPE },	// skips to CON_PROMO_CODE if no archetypes exist
 	{ CON_ARCHETYPE_CNFRM },
-	{ CON_BONUS_CREATION },
 	
 	{ CON_PROMO_CODE },
 	{ CON_CONFIRM_PROMO_CODE },	// only if given invalid code
@@ -1824,7 +1823,7 @@ void prompt_creation(descriptor_data *d) {
 			}
 			else {
 				// no archetypes for some reason?
-				set_creation_state(d, CON_BONUS_CREATION);
+				set_creation_state(d, CON_PROMO_CODE);
 			}
 			break;
 		}
@@ -1865,8 +1864,7 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			break;
 		}
-		case CON_BONUS_EXISTING:
-		case CON_BONUS_CREATION: {
+		case CON_BONUS_EXISTING: {
 			show_bonus_trait_menu(d->character);
 			break;
 		}
@@ -2493,8 +2491,8 @@ void nanny(descriptor_data *d, char *arg) {
 					syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has connected", GET_NAME(d->character), PLR_FLAGGED(d->character, PLR_IPMASK) ? "masked" : d->host);
 				}
 
-				// check here if they need more traits than they have (IF they are an existing char?)
-				if (GET_ACCESS_LEVEL(d->character) > 0 && num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
+				// check here if they need more traits than they have
+				if (num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
 					show_bonus_trait_menu(d->character);
 					STATE(d) = CON_BONUS_EXISTING;
 					return;
@@ -2836,8 +2834,7 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 
-		// both add-trait menus
-		case CON_BONUS_CREATION:
+		// add-trait menu
 		case CON_BONUS_EXISTING: {
 			bool skip = FALSE;
 			i = 0;
@@ -2868,8 +2865,8 @@ void nanny(descriptor_data *d, char *arg) {
 				SET_BIT(GET_BONUS_TRAITS(d->character), BIT(i));
 			}
 			
-			// only apply now if they are NOT creating
-			if (STATE(d) != CON_BONUS_CREATION) {
+			// only apply now if they are NOT currently doing creation -- otherwise it will be applied during creation
+			if (GET_ACCESS_LEVEL(d->character) > 0) {
 				void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 				
 				if (!skip) {

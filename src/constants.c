@@ -760,7 +760,7 @@ const char *connected_types[] = {
 	"Finish Creation",	// 20
 	"Archetype",
 	"Goodbye",
-	"Choose bonus",
+		"UNUSED 2",
 	"Add bonus",
 	"Promo code?",	// 25
 	"Confirm promo",
